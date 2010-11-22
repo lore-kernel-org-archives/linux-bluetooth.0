@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 23:03:22 +0100
+Date: Mon, 22 Nov 2010 22:51:07 +0100
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: "John W. Linville" <linville@tuxdriver.com>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-2.6 2010-11-22
-Message-ID: <20101122220322.GA15543@jh-x301>
-References: <20101122181411.GD23109@vigoh>
- <20101122193029.GE2117@tuxdriver.com>
- <20101122201330.GE23109@vigoh>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Arun K. Singh" <arunkat@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Automate remote name requests
+Message-ID: <20101122215107.GA15444@jh-x301>
+References: <1290111749-8968-1-git-send-email-johan.hedberg@gmail.com>
+ <1290111749-8968-2-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTinMq-3K09y-bCWM1Z254FsWoRuZ=QEuZM11WPMb@mail.gmail.com>
+ <20101122071243.GA23443@jh-x301>
+ <AANLkTikHPWyjS+m2NMrxcL0FP6WhX+APExNELRuw4=Pe@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101122201330.GE23109@vigoh>
+In-Reply-To: <AANLkTikHPWyjS+m2NMrxcL0FP6WhX+APExNELRuw4=Pe@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Mon, Nov 22, 2010, Gustavo F. Padovan wrote:
-> > The other fixes are larger than I would like to see.  What is the
-> > effect of the bug?  Does the Bluetooth controller stop completely?
-> > Does it cause a crash?
-> > 
-> > Is this a newly-introduced bug?  Or one that has been around for
-> > a while?
+On Mon, Nov 22, 2010, Luiz Augusto von Dentz wrote:
+> >> Could you be bit more explicit about such user space versions that you
+> >> recommend? Would latest bluez versions such as 4.80 qualify for your
+> >> recommendation?
+> >
+> > The automated name requests upon "connect complete" events were removed
+> > in 4.78 so any version from there onwards would qualify.
 > 
-> No, it is not serious like that. By not having this patch we won't have
-> the remote name request command during connection setup, The remote name
-> request was done by bluetoothd, but we already removed it from
-> userspace. It is not a really big problem once we also cache the remote
-> devices names in bluetoothd.
-> So I'm seeing no way to convince you tou pull this patch (actually I'm
-> now also covinced to queue this to bluetooth-next).  I'll sent a new
-> pull request soon, after wait some time for new patches.
+> Maybe there is some way to detect that the kernel is not doing it, or
+> at least force bluetoothd to resolve once to make sure it can be used
+> with older kernel versions so it doesn't have to always update as it
+> was used to be but if we are to authenticate or authorize a device it
+> should have a name so the ui can display it to the user.
 
-IIRC the symptom that prompted the initial investigation was the failure
-to properly connect to one specific Bluetooth headset. After discussions
-with Marcel the conculsion was to move more control of these commands to
-the kernel side. OTOH, this is certainly not the first time a BT
-controller chokes up when receiving too many commands at the same time
-(I've seen this several times during the last 8 years or so that I've
-been involved with Bluetooth). Anyway, I agree that this might be better
-suited for bluetooth-next.
+Regarding the kernel version detection, this was certainly considered
+but there doesn't seem to be any simple way to do it. However, now that
+you mention it, this can certainly be an inconvenient issue with
+incoming connections for devices which we've never seen during a device
+discovery. Therefore, some kind of a userspace workaround for this would
+imho be desirable and I'd certainly be willing to accept a patch for it
+as long as it doesn't get too complicated. I suppose it's sufficient if
+the patch would be for hciops only since any system running mgmtops
+would also have a kernel that does the name request.
 
 Johan
