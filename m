@@ -1,151 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Holler <holler@ahsoftware.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Alicke Xu <sxu@atheros.com>,
-	"Luis R. Rodriguez" <lrodriguez@atheros.com>,
-	Vikram Kandukuri <vikram.kandukuri@atheros.com>,
-	linux-bluetooth@vger.kernel.org,
-	Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH] ath3k: reduce memory usage
-Date: Mon, 22 Nov 2010 21:09:01 +0100
-Message-Id: <1290456541-3812-1-git-send-email-holler@ahsoftware.de>
+Date: Mon, 22 Nov 2010 14:30:30 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2010-11-22
+Message-ID: <20101122193029.GE2117@tuxdriver.com>
+References: <20101122181411.GD23109@vigoh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101122181411.GD23109@vigoh>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to hold the firmware in memory.
+On Mon, Nov 22, 2010 at 04:14:11PM -0200, Gustavo F. Padovan wrote:
+> Hi John,
+> 
+> Following batch is intended to 2.6.37, it includes a very trivial return
+> err fix from myself and an remote name request fix from Johan Hedberg.
+> This fix move the remote name request (during the connection creation
+> process) to the kernelspace. In addition we have removed this operation
+> from BlueZ in userspace. Quoting part of Johan's patch which already
+> explain the change:
+> 
+>    "So far userspace has been responsible for this extra name request but
+>     tighter control is needed in order not to flood Bluetooth controllers
+>     with two many commands during connection creation. It has been shown
+>     that some controllers simply fail to function correctly if they get too
+>     many (almost) simultaneous commands during connection creation. The
+>     simplest way to acheive better control of these commands is to move
+>     their sending completely to the kernel side."
+> 
+> As side effect, we have a clean up patch in preparation to this fix.
+> 
+> Please pull, or let me know any problems you find here. Thanks.
 
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
----
- drivers/bluetooth/ath3k.c |   75 ++++++++++++---------------------------------
- 1 files changed, 20 insertions(+), 55 deletions(-)
+The return code fix seems reasonable -- small and obvious, etc.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 128cae4..81cd1ed 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -43,46 +43,40 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
- #define USB_REQ_DFU_DNLOAD	1
- #define BULK_SIZE		4096
- 
--struct ath3k_data {
--	struct usb_device *udev;
--	u8 *fw_data;
--	u32 fw_size;
--	u32 fw_sent;
--};
--
--static int ath3k_load_firmware(struct ath3k_data *data,
--				unsigned char *firmware,
--				int count)
-+static int ath3k_load_firmware(struct usb_device *udev,
-+				const struct firmware *firmware)
- {
- 	u8 *send_buf;
- 	int err, pipe, len, size, sent = 0;
-+	int count = firmware->size;
- 
--	BT_DBG("ath3k %p udev %p", data, data->udev);
-+	BT_DBG("udev %p", udev);
- 
--	pipe = usb_sndctrlpipe(data->udev, 0);
-+	pipe = usb_sndctrlpipe(udev, 0);
- 
--	if ((usb_control_msg(data->udev, pipe,
-+	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
-+	if (!send_buf) {
-+		BT_ERR("Can't allocate memory chunk for firmware");
-+		return -ENOMEM;
-+	}
-+
-+	memcpy(send_buf, firmware->data, 20);
-+	if ((err = usb_control_msg(udev, pipe,
- 				USB_REQ_DFU_DNLOAD,
- 				USB_TYPE_VENDOR, 0, 0,
--				firmware, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
-+				send_buf, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
- 		BT_ERR("Can't change to loading configuration err");
--		return -EBUSY;
-+		goto error;
- 	}
- 	sent += 20;
- 	count -= 20;
- 
--	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
--	if (!send_buf) {
--		BT_ERR("Can't allocate memory chunk for firmware");
--		return -ENOMEM;
--	}
--
- 	while (count) {
- 		size = min_t(uint, count, BULK_SIZE);
--		pipe = usb_sndbulkpipe(data->udev, 0x02);
--		memcpy(send_buf, firmware + sent, size);
-+		pipe = usb_sndbulkpipe(udev, 0x02);
-+		memcpy(send_buf, firmware->data + sent, size);
- 
--		err = usb_bulk_msg(data->udev, pipe, send_buf, size,
-+		err = usb_bulk_msg(udev, pipe, send_buf, size,
- 					&len, 3000);
- 
- 		if (err || (len != size)) {
-@@ -108,57 +102,28 @@ static int ath3k_probe(struct usb_interface *intf,
- {
- 	const struct firmware *firmware;
- 	struct usb_device *udev = interface_to_usbdev(intf);
--	struct ath3k_data *data;
--	int size;
- 
- 	BT_DBG("intf %p id %p", intf, id);
- 
- 	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
- 		return -ENODEV;
- 
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
--
--	data->udev = udev;
--
- 	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
--		kfree(data);
- 		return -EIO;
- 	}
- 
--	size = max_t(uint, firmware->size, 4096);
--	data->fw_data = kmalloc(size, GFP_KERNEL);
--	if (!data->fw_data) {
-+	if (ath3k_load_firmware(udev, firmware)) {
- 		release_firmware(firmware);
--		kfree(data);
--		return -ENOMEM;
--	}
--
--	memcpy(data->fw_data, firmware->data, firmware->size);
--	data->fw_size = firmware->size;
--	data->fw_sent = 0;
--	release_firmware(firmware);
--
--	usb_set_intfdata(intf, data);
--	if (ath3k_load_firmware(data, data->fw_data, data->fw_size)) {
--		usb_set_intfdata(intf, NULL);
--		kfree(data->fw_data);
--		kfree(data);
- 		return -EIO;
- 	}
-+	release_firmware(firmware);
- 
- 	return 0;
- }
- 
- static void ath3k_disconnect(struct usb_interface *intf)
- {
--	struct ath3k_data *data = usb_get_intfdata(intf);
--
- 	BT_DBG("ath3k_disconnect intf %p", intf);
--
--	kfree(data->fw_data);
--	kfree(data);
- }
- 
- static struct usb_driver ath3k_driver = {
+The other fixes are larger than I would like to see.  What is the
+effect of the bug?  Does the Bluetooth controller stop completely?
+Does it cause a crash?
+
+Is this a newly-introduced bug?  Or one that has been around for
+a while?
+
+John
 -- 
-1.7.2.3
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
