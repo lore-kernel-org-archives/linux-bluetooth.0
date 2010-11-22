@@ -1,102 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 15:24:59 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 22 Nov 2010 14:00:35 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: do not use assignment in if condition
-Message-ID: <20101122132459.GA4617@null>
-References: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Fix fetching contact photo file name
+Message-ID: <20101122130035.GA29249@jh-x301>
+References: <1289828017-13412-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1289828017-13412-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Mon, Nov 22, 2010 at 01:21:37PM +0200, ext Emeltchenko Andrei wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> 
-> Fix checkpatch errors like:
-> "ERROR: do not use assignment in if condition"
-> Simplify code and fix one long line.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-
-Looks good to me
-
-Acked-by: Ville Tervo <ville.tervo@nokia.com>
-
-
+On Mon, Nov 15, 2010, Bartosz Szatkowski wrote:
+> Previously photo id was fetched. File name may be further converted to
+> binary data (actual image) if such behavior would be desired in the future.
 > ---
->  net/bluetooth/hci_event.c |   18 ++++++++++++------
->  1 files changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 4165895..3c1957c 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -996,12 +996,14 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
->  
->  		hci_dev_lock(hdev);
->  
-> -		if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr)))
-> +		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
-> +		if (ie)
->  			memcpy(ie->data.dev_class, ev->dev_class, 3);
->  
->  		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
->  		if (!conn) {
-> -			if (!(conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr))) {
-> +			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr);
-> +			if (!conn) {
->  				BT_ERR("No memory for new connection");
->  				hci_dev_unlock(hdev);
->  				return;
-> @@ -1608,7 +1610,8 @@ static inline void hci_clock_offset_evt(struct hci_dev *hdev, struct sk_buff *sk
->  	if (conn && !ev->status) {
->  		struct inquiry_entry *ie;
->  
-> -		if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst))) {
-> +		ie = hci_inquiry_cache_lookup(hdev, &conn->dst);
-> +		if (ie) {
->  			ie->data.clock_offset = ev->clock_offset;
->  			ie->timestamp = jiffies;
->  		}
-> @@ -1642,7 +1645,8 @@ static inline void hci_pscan_rep_mode_evt(struct hci_dev *hdev, struct sk_buff *
->  
->  	hci_dev_lock(hdev);
->  
-> -	if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr))) {
-> +	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
-> +	if (ie) {
->  		ie->data.pscan_rep_mode = ev->pscan_rep_mode;
->  		ie->timestamp = jiffies;
->  	}
-> @@ -1713,7 +1717,8 @@ static inline void hci_remote_ext_features_evt(struct hci_dev *hdev, struct sk_b
->  	if (!ev->status && ev->page == 0x01) {
->  		struct inquiry_entry *ie;
->  
-> -		if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst)))
-> +		ie = hci_inquiry_cache_lookup(hdev, &conn->dst);
-> +		if (ie)
->  			ie->data.ssp_mode = (ev->features[0] & 0x01);
->  
->  		conn->ssp_mode = (ev->features[0] & 0x01);
-> @@ -1886,7 +1891,8 @@ static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_
->  
->  	hci_dev_lock(hdev);
->  
-> -	if ((ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr)))
-> +	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
-> +	if (ie)
->  		ie->data.ssp_mode = (ev->features[0] & 0x01);
->  
->  	hci_dev_unlock(hdev);
-> -- 
-> 1.7.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  plugins/phonebook-tracker.c |   60 ++++++++++++++++++++++++++++++++++++++----
+>  1 files changed, 54 insertions(+), 6 deletions(-)
+
+Sorry about the delay with this one (I simply missed it). The patch has
+now been pushed upstream.
+
+Johan
