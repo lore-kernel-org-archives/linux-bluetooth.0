@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 23:07:08 +0100
+Date: Mon, 22 Nov 2010 23:03:22 +0100
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix typo in adapter documentation
-Message-ID: <20101122220708.GA15647@jh-x301>
-References: <1290452756-7967-1-git-send-email-santoscadenas@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: "John W. Linville" <linville@tuxdriver.com>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2010-11-22
+Message-ID: <20101122220322.GA15543@jh-x301>
+References: <20101122181411.GD23109@vigoh>
+ <20101122193029.GE2117@tuxdriver.com>
+ <20101122201330.GE23109@vigoh>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290452756-7967-1-git-send-email-santoscadenas@gmail.com>
+In-Reply-To: <20101122201330.GE23109@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jose,
+Hi,
 
-On Mon, Nov 22, 2010, Jose Antonio Santos Cadenas wrote:
-> ---
->  doc/adapter-api.txt |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Nov 22, 2010, Gustavo F. Padovan wrote:
+> > The other fixes are larger than I would like to see.  What is the
+> > effect of the bug?  Does the Bluetooth controller stop completely?
+> > Does it cause a crash?
+> > 
+> > Is this a newly-introduced bug?  Or one that has been around for
+> > a while?
 > 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 65e2887..f287f29 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -148,7 +148,7 @@ Methods		dict GetProperties()
->  
->  			This registers the adapter wide agent.
->  
-> -			The object path defines the path the of the agent
-> +			The object path defines the path of the agent
->  			that will be called when user input is needed.
->  
->  			If an application disconnects from the bus all
+> No, it is not serious like that. By not having this patch we won't have
+> the remote name request command during connection setup, The remote name
+> request was done by bluetoothd, but we already removed it from
+> userspace. It is not a really big problem once we also cache the remote
+> devices names in bluetoothd.
+> So I'm seeing no way to convince you tou pull this patch (actually I'm
+> now also covinced to queue this to bluetooth-next).  I'll sent a new
+> pull request soon, after wait some time for new patches.
 
-Pushed upstream. Thanks.
+IIRC the symptom that prompted the initial investigation was the failure
+to properly connect to one specific Bluetooth headset. After discussions
+with Marcel the conculsion was to move more control of these commands to
+the kernel side. OTOH, this is certainly not the first time a BT
+controller chokes up when receiving too many commands at the same time
+(I've seen this several times during the last 8 years or so that I've
+been involved with Bluetooth). Anyway, I agree that this might be better
+suited for bluetooth-next.
 
 Johan
