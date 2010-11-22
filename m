@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 15:40:50 -0200
+Date: Mon, 22 Nov 2010 15:34:47 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: do not use assignment in if condition
-Message-ID: <20101122174050.GB23109@vigoh>
-References: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix error handling for l2cap_init()
+Message-ID: <20101122173447.GA23109@vigoh>
+References: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Anderson,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-11-22 13:21:37 +0200]:
+* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-11-22 06:57:14 -0400]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
+> this happens, the return value is not set to a negative value and the
+> module load will succeed. It will then crash on module unload because of
+> a destroy_workqueue() call on a NULL pointer.
 > 
-> Fix checkpatch errors like:
-> "ERROR: do not use assignment in if condition"
-> Simplify code and fix one long line.
+> Additionally, the _busy_wq workqueue is not being destroyed if any
+> errors happen on l2cap_init().
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
 > ---
->  net/bluetooth/hci_event.c |   18 ++++++++++++------
->  1 files changed, 12 insertions(+), 6 deletions(-)
+>  net/bluetooth/l2cap.c |    8 ++++++--
+>  1 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 18a802c..7980e24 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -4875,8 +4875,10 @@ static int __init l2cap_init(void)
+>  		return err;
+>  
+>  	_busy_wq = create_singlethread_workqueue("l2cap");
+> -	if (!_busy_wq)
+> -		goto error;
+> +	if (!_busy_wq) {
+> +		err = -ENOMEM;
+> +		goto error_busy_wq;
+> +	}
 
-Applied, thanks.
+I prefer if you move the workqueue creation to after the
+hci_register_proto block. That will make things easier.
 
 -- 
 Gustavo F. Padovan
