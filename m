@@ -1,100 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTin5t-=bMeBmAJ2A+hV4h=dXQeu5dNFbMby43ssS@mail.gmail.com>
-References: <1290423382-5493-1-git-send-email-bulislaw@linux.com>
-	<20101122143345.GA2303@jh-x301>
-	<AANLkTin5t-=bMeBmAJ2A+hV4h=dXQeu5dNFbMby43ssS@mail.gmail.com>
-Date: Mon, 22 Nov 2010 23:17:42 +0000
-Message-ID: <AANLkTi=TUWxsJtU6qvY46+MmRstT8N_1=-poHSsEuyYH@mail.gmail.com>
-Subject: Re: [PATCH] Fix managing dbus filters depending on BT state
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Wade Brown <brownw@us.panasonic.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Wade Brown <brownw@us.panasonic.com>
+Subject: [PATCH] Add a runtime option to set the BCSP communication rate
+Date: Mon, 22 Nov 2010 23:03:12 +0000
+Message-Id: <1290466992-5023-1-git-send-email-brownw@us.panasonic.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Nov 22, 2010 at 8:12 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Mon, Nov 22, 2010 at 4:33 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Bartosz,
->>
->> On Mon, Nov 22, 2010, Bartosz Szatkowski wrote:
->>> Previously even if BT was disabled, bluetoothd would handle some dbus
->>> singals (mostly connected with HFP). Now filters are added when
->>> BT is enabled and removed when BT is disabled.
->>> ---
->>>  audio/manager.c          |    4 ++--
->>>  audio/telephony-dummy.c  |   10 ++++++++++
->>>  audio/telephony-maemo5.c |   10 ++++++++++
->>>  audio/telephony-maemo6.c |   10 ++++++++++
->>>  audio/telephony-ofono.c  |   10 ++++++++++
->>>  audio/telephony.h        |    1 +
->>>  src/adapter.c            |    5 +++++
->>>  7 files changed, 48 insertions(+), 2 deletions(-)
->>
->> Nack on this one. I understand the issue you're trying to fix but it
->> needs to be done differently.
->>
->>> diff --git a/audio/manager.c b/audio/manager.c
->>> index 816c807..2fc7bf1 100644
->>> --- a/audio/manager.c
->>> +++ b/audio/manager.c
->>> @@ -1178,7 +1178,7 @@ proceed:
->>>               btd_register_adapter_driver(&media_server_driver);
->>>
->>>       if (enabled.headset) {
->>> -             telephony_init();
->>> +             telephony_set_state(1);
->>>               btd_register_adapter_driver(&headset_server_driver);
->>>       }
->>
->> If you're gonna call this "state" you should have proper defines or
->> enums for the values, however in this case it's essentially a boolean so
->> that's not necessary. In fact since it's a boolean you don't even need
->> to have any new function or variable at all for it: just use
->> telephony_init and telephony_exit.
->>
->>> --- a/src/adapter.c
->>> +++ b/src/adapter.c
->>> @@ -57,6 +57,7 @@
->>>  #include "glib-helper.h"
->>>  #include "agent.h"
->>>  #include "storage.h"
->>> +#include "../audio/telephony.h"
->>>
->>>  #define IO_CAPABILITY_DISPLAYONLY    0x00
->>>  #define IO_CAPABILITY_DISPLAYYESNO   0x01
->>> @@ -2404,6 +2405,8 @@ int adapter_start(struct btd_adapter *adapter)
->>>
->>>       err = adapter_up(adapter, mode);
->>>
->>> +     telephony_init();
->>> +
->>
->> This is just wrong. The core daemon should never have direct access to
->> the telephony driver. Instead, you should have the audio plugin
->> (probably audio/manager.c or audio/headset.c) register a adapter powered
->> callback and then call telehony_init/exit from that callback.
->
-> I have an almost working version of this using adapter drivers and
-> powered changes via callback registration, the tricky part here is how
-> to detect when to do headset_init/headset_exit since those should be
-> called only once. I didn't know there somebody working on this but
-> anyway I gonna try to finish this asap.
->
-> --
-> Luiz Augusto von Dentz
-> Computer Engineer
->
+---
+ tools/bccmd.c    |   45 ++++++++++++++++++++++++++++++++++++++++-----
+ tools/csr.h      |    3 ++-
+ tools/csr_bcsp.c |    4 ++--
+ 3 files changed, 44 insertions(+), 8 deletions(-)
 
-Hi Luiz,
-please fell free to send it (no hard fillings :) ) Ive just getting to
-know bluez so probably it would take me a while to get through whole
-plugin/callback subsystem.
-
+diff --git a/tools/bccmd.c b/tools/bccmd.c
+index 686e858..5cb9255 100644
+--- a/tools/bccmd.c
++++ b/tools/bccmd.c
+@@ -59,7 +59,7 @@
+ #define CSR_TYPE_ARRAY		CSR_TYPE_COMPLEX
+ #define CSR_TYPE_BDADDR		CSR_TYPE_COMPLEX
+ 
+-static inline int transport_open(int transport, char *device)
++static inline int transport_open(int transport, char *device, speed_t bcsp_rate)
+ {
+ 	switch (transport) {
+ 	case CSR_TRANSPORT_HCI:
+@@ -69,7 +69,7 @@ static inline int transport_open(int transport, char *device)
+ 		return csr_open_usb(device);
+ #endif
+ 	case CSR_TRANSPORT_BCSP:
+-		return csr_open_bcsp(device);
++		return csr_open_bcsp(device, bcsp_rate);
+ 	case CSR_TRANSPORT_H4:
+ 		return csr_open_h4(device);
+ 	case CSR_TRANSPORT_3WIRE:
+@@ -1109,6 +1109,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t-t <transport>     Select the transport\n"
+ 		"\t-d <device>        Select the device\n"
++		"\t-b <bcsp rate>     Select the bcsp transfer rate\n"
+ 		"\t-h, --help         Display help\n"
+ 		"\n");
+ 
+@@ -1137,6 +1138,7 @@ static void usage(void)
+ static struct option main_options[] = {
+ 	{ "transport",	1, 0, 't' },
+ 	{ "device",	1, 0, 'd' },
++	{ "bcsprate", 1, 0, 'b'},
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+ };
+@@ -1145,8 +1147,9 @@ int main(int argc, char *argv[])
+ {
+ 	char *device = NULL;
+ 	int i, err, opt, transport = CSR_TRANSPORT_HCI;
++	speed_t bcsp_rate = B38400;
+ 
+-	while ((opt=getopt_long(argc, argv, "+t:d:i:h", main_options, NULL)) != EOF) {
++	while ((opt=getopt_long(argc, argv, "+t:d:i:b:h", main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 't':
+ 			if (!strcasecmp(optarg, "hci"))
+@@ -1171,7 +1174,39 @@ int main(int argc, char *argv[])
+ 		case 'i':
+ 			device = strdup(optarg);
+ 			break;
+-
++		case 'b':
++			switch (atoi(optarg)) {
++			case 9600: bcsp_rate = B9600; break;
++			case 19200: bcsp_rate = B19200; break;
++			case 38400: bcsp_rate = B38400; break;
++			case 57600: bcsp_rate = B57600; break;
++			case 115200: bcsp_rate = B115200; break;
++			case 230400: bcsp_rate = B230400; break;
++			case 460800: bcsp_rate = B460800; break;
++			case 500000: bcsp_rate = B500000; break;
++			case 576000: bcsp_rate = B576000; break;
++			case 921600: bcsp_rate = B921600; break;
++			case 1000000: bcsp_rate = B1000000; break;
++			case 1152000: bcsp_rate = B1152000; break;
++			case 1500000: bcsp_rate = B1500000; break;
++			case 2000000: bcsp_rate = B2000000; break;
++#ifdef B2500000
++			case 2500000: bcsp_rate = B2500000; break;
++#endif
++#ifdef B3000000
++			case 3000000: bcsp_rate = B3000000; break;
++#endif
++#ifdef B3500000
++			case 3500000: bcsp_rate = B3500000; break;
++#endif
++#ifdef B4000000
++			case 4000000: bcsp_rate = B4000000; break;
++#endif
++			default:
++				printf("Unknown BCSP baud rate specified, defaulting to 38400bps\n");
++				bcsp_rate = B38400;
++			}
++			break;
+ 		case 'h':
+ 		default:
+ 			usage();
+@@ -1188,7 +1223,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	if (transport_open(transport, device) < 0)
++	if (transport_open(transport, device, bcsp_rate) < 0)
+ 		exit(1);
+ 
+ 	if (device)
+diff --git a/tools/csr.h b/tools/csr.h
+index 1d70491..8b94d7b 100644
+--- a/tools/csr.h
++++ b/tools/csr.h
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include <stdint.h>
++#include <termios.h>
+ 
+ #define CSR_VARID_PS_CLR_ALL			0x000b	/* valueless */
+ #define CSR_VARID_PS_FACTORY_SET		0x000c	/* valueless */
+@@ -519,7 +520,7 @@ int csr_read_usb(uint16_t varid, uint8_t *value, uint16_t length);
+ int csr_write_usb(uint16_t varid, uint8_t *value, uint16_t length);
+ void csr_close_usb(void);
+ 
+-int csr_open_bcsp(char *device);
++int csr_open_bcsp(char *device, speed_t bcsp_rate);
+ int csr_read_bcsp(uint16_t varid, uint8_t *value, uint16_t length);
+ int csr_write_bcsp(uint16_t varid, uint8_t *value, uint16_t length);
+ void csr_close_bcsp(void);
+diff --git a/tools/csr_bcsp.c b/tools/csr_bcsp.c
+index e551311..df247a2 100644
+--- a/tools/csr_bcsp.c
++++ b/tools/csr_bcsp.c
+@@ -46,7 +46,7 @@ static uint8_t send_buffer[512];
+ static struct ubcsp_packet receive_packet;
+ static uint8_t receive_buffer[512];
+ 
+-int csr_open_bcsp(char *device)
++int csr_open_bcsp(char *device, speed_t bcsp_rate)
+ {
+ 	struct termios ti;
+ 	uint8_t delay, activity = 0x00;
+@@ -84,7 +84,7 @@ int csr_open_bcsp(char *device)
+ 	ti.c_cc[VMIN] = 1;
+ 	ti.c_cc[VTIME] = 0;
+ 
+-	cfsetospeed(&ti, B38400);
++	cfsetospeed(&ti, bcsp_rate);
+ 
+ 	if (tcsetattr(fd, TCSANOW, &ti) < 0) {
+ 		fprintf(stderr, "Can't change port settings: %s (%d)\n",
 -- 
-Pozdrowienia,
-Bartosz Szatkowski
+1.7.2.2
+
