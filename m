@@ -1,66 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 19:46:23 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: pavan_savoy@ti.com
+Date: Mon, 22 Nov 2010 08:17:31 -0800 (PST)
+Message-Id: <20101122.081731.226770168.davem@davemloft.net>
+To: tdent48227@gmail.com
 Cc: marcel@holtmann.org, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6] Bluetooth: btwilink driver
-Message-ID: <20101122164623.GB8882@bicker>
-References: <1290424125-2717-1-git-send-email-pavan_savoy@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290424125-2717-1-git-send-email-pavan_savoy@ti.com>
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ sjur.brandeland@stericsson.com, socketcan@hartkopp.net,
+ urs.thuermann@volkswagen.de, socketcan-core@lists.berlios.de,
+ sage@newdream.net, ceph-devel@vger.kernel.org, wang840925@gmail.com,
+ jlayton@redhat.com, kaber@trash.net, pekkas@netcore.fi,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ netfilter@vger.kernel.org, samuel@sortiz.org
+Subject: Re: [PATCH 00/00] Remove deprecated items from Makefiles
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+References: <1290387808-2239-1-git-send-email-tdent48227@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Nov 22, 2010 at 06:08:45AM -0500, pavan_savoy@ti.com wrote:
-> +static int bt_ti_probe(struct platform_device *pdev)
-> +{
-> +	static struct ti_st *hst;
-> +	struct hci_dev *hdev;
-> +	int err;
-> +
-> +	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
-> +	if (!hst)
-> +		return -ENOMEM;
-> +
-> +	/* Expose "hciX" device to user space */
-> +	hdev = hci_alloc_dev();
-> +	if (!hdev) {
-> +		kfree(hst);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	BT_DBG("hdev %p", hdev);
-> +
-> +	hst->hdev = hdev;
-> +	hdev->bus = HCI_UART;
-> +	hdev->driver_data = hst;
-> +	hdev->open = ti_st_open;
-> +	hdev->close = ti_st_close;
-> +	hdev->flush = NULL;
-> +	hdev->send = ti_st_send_frame;
-> +	hdev->destruct = ti_st_destruct;
-> +	hdev->owner = THIS_MODULE;
-> +
-> +	err = hci_register_dev(hdev);
-> +	if (err < 0) {
-> +		BT_ERR("Can't register HCI device error %d", err);
-> +		hci_free_dev(hdev);
+From: Tracey Dent <tdent48227@gmail.com>
+Date: Sun, 21 Nov 2010 20:03:11 -0500
 
-	Should there be a kfree(hst); here?  That's how it's done in
-	bpa10x_probe() from drivers/bluetooth/bpa10x.c
+> I changed Makefiles to use <modules>-y instead of <modules>-objs because -objs
+> is deprecated and not even mentioned in Documentation/kbuild/makefiles.txt.
+> 
+> Also, remove some if-conditional statments because I used the ccflags-$ flag 
+> instead of EXTRA_CFLAGS because EXTRA_CFLAGS.
 
-> +		return err;
-> +	}
-> +
-> +	BT_DBG(" HCI device registered (hdev %p)", hdev);
-                ^
-	Quite a few places have an extra space at the start.
-
-> +
-> +	dev_set_drvdata(&pdev->dev, hst);
-> +	return err;
-> +}
-
-regards,
-dan carpenter
+All applied, thanks Tracey.
