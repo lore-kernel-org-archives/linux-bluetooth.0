@@ -1,52 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Nov 2010 15:34:47 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Date: Mon, 22 Nov 2010 18:05:25 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix error handling for l2cap_init()
-Message-ID: <20101122173447.GA23109@vigoh>
-References: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH 2/2] Fix: increment MDL and MCL reference counter in IO
+ watchers.
+Message-ID: <20101122170525.GA13003@jh-x301>
+References: <AANLkTinQAeN8jyBmmPnw0tMWDfvOVamOU5+gBXLF-hTT@mail.gmail.com>
+ <1290437712-28991-1-git-send-email-santoscadenas@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1290437712-28991-1-git-send-email-santoscadenas@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Jose,
 
-* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-11-22 06:57:14 -0400]:
-
-> create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
-> this happens, the return value is not set to a negative value and the
-> module load will succeed. It will then crash on module unload because of
-> a destroy_workqueue() call on a NULL pointer.
+On Mon, Nov 22, 2010, Jose Antonio Santos Cadenas wrote:
+> When a io_watcher is added to an MDL or an MCL channel, its reference
+> should be incremented because the watcher should keep its own
+> reference the the structure.
 > 
-> Additionally, the _busy_wq workqueue is not being destroyed if any
-> errors happen on l2cap_init().
-> 
-> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+> Also  a destroy function is added in order to decrement the reference
+> once the watcher is removed.
 > ---
->  net/bluetooth/l2cap.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 18a802c..7980e24 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -4875,8 +4875,10 @@ static int __init l2cap_init(void)
->  		return err;
->  
->  	_busy_wq = create_singlethread_workqueue("l2cap");
-> -	if (!_busy_wq)
-> -		goto error;
-> +	if (!_busy_wq) {
-> +		err = -ENOMEM;
-> +		goto error_busy_wq;
-> +	}
+>  health/mcap.c |   28 +++++++++++++++++++---------
+>  1 files changed, 19 insertions(+), 9 deletions(-)
 
-I prefer if you move the workqueue creation to after the
-hci_register_proto block. That will make things easier.
+Thanks. Pushed upstream, but I still had to tweak the summary line a
+little bit (take a look at the upstream tree if you're interested).
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Johan
