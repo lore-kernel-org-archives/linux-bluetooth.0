@@ -2,11 +2,10 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC 16/20] Bluetooth: LE SMP Cryptoolbox functions
-Date: Tue, 23 Nov 2010 12:06:32 -0300
-Message-Id: <1290524796-32246-17-git-send-email-vinicius.gomes@openbossa.org>
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC 15/20] Bluetooth: simple SMP pairing negotiation
+Date: Tue, 23 Nov 2010 12:06:31 -0300
+Message-Id: <1290524796-32246-16-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,156 +13,176 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-This patch implements SMP crypto functions called ah, c1, s1 and e.
-These functions are needed for SMP keys generation.
+This implementation only exchanges SMP messages between the Host and the
+Remote. No keys are being generated. TK and STK generation will be
+provided in further patches.
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |  129 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 129 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |    3 +-
+ net/bluetooth/smp.c        |  115 ++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 113 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8ee2bd5..24719d3 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4624,7 +4624,8 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		break;
+ 
+ 	case L2CAP_CID_SMP:
+-		smp_sig_channel(conn, skb);
++		if (smp_sig_channel(conn, skb))
++			l2cap_conn_del(conn->hcon, 0x05);
+ 		break;
+ 
+ 	default:
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index d3f9828..7997978 100644
+index e9dde5f..d3f9828 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -24,6 +24,135 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
-+#include <linux/crypto.h>
-+#include <crypto/b128ops.h>
-+
-+/* Criptographic toolbox functions */
-+
-+static int smp_e(const u8 *k, const u8 *r)
-+{
-+	struct crypto_blkcipher *tfm;
-+	struct blkcipher_desc desc;
-+	struct scatterlist sg[1];
-+	int err, iv_len;
-+	unsigned char iv[128];
-+
-+	tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(tfm)) {
-+		BT_ERR("Failed to load transform for ecb(aes): %ld",
-+				PTR_ERR(tfm));
-+		return PTR_ERR(tfm);
-+	}
-+
-+	desc.tfm = tfm;
-+	desc.flags = 0;
-+
-+	err = crypto_blkcipher_setkey(tfm, k, 16);
-+	if (err) {
-+		BT_ERR("smp_e: cipher setkey failed: %d", err);
-+		goto out;
-+	}
-+
-+	sg_init_table(sg, 1);
-+	sg_set_buf(sg, r, 16);
-+
-+	iv_len = crypto_blkcipher_ivsize(tfm);
-+	if (iv_len) {
-+		memset(&iv, 0xff, iv_len);
-+		crypto_blkcipher_set_iv(tfm, iv, iv_len);
-+	}
-+
-+	err = crypto_blkcipher_encrypt(&desc, sg, sg, 16);
-+	if (err)
-+		BT_ERR("smp_e: Encrypt data error %d", err);
-+
-+out:
-+	crypto_free_blkcipher(tfm);
-+	return err;
-+}
-+
-+static int smp_ah(const u8 *k, const u8 *r, u8 *res)
-+{
-+	u8 _r[16];
-+	int err;
-+
-+	/* _r = padding || r */
-+	memset(_r, 0, 16);
-+	memcpy(_r + 13, r, 3);
-+
-+	err = smp_e(k, _r);
-+	if (err) {
-+		BT_ERR("smp_ah: Encrypt data error");
-+		goto out;
-+	}
-+
-+	/* Returns last 24 bits from previous intermediate result _r */
-+	memcpy(res, _r + 13, 3);
-+
-+out:
-+	return err;
-+}
-+
-+static int smp_c1(const u8 *k, const u8 *r, const u8 *pres, const u8 *preq,
-+		const u8 _iat, const u8 *ia, const u8 _rat, const u8 *ra,
-+		u8 *res)
-+{
-+	u8 p1[16], p2[16];
-+	int err;
-+
-+	/* p1 = pres || preq || _rat || _iat */
-+	memset(p1, 0, 16);
-+	memcpy(p1, pres, 7);
-+	memcpy(p1 + 7, preq, 7);
-+	*(p1 + 14) = _rat;
-+	*(p1 + 15) = _iat;
-+
-+	/* p2 = padding || ia || ra */
-+	memset(p2, 0, 16);
-+	memcpy(p2 + 4, ia, 6);
-+	memcpy(p2 + 10, ra, 6);
-+
-+	/* res = r XOR p1 */
-+	u128_xor((u128 *)res, (u128 *)r, (u128 *)p1);
-+
-+	/* res = e(k, res) */
-+	err = smp_e(k, res);
-+	if (err) {
-+		BT_ERR("smp_c1: Encrypt data error");
-+		goto out;
-+	}
-+
-+	/* res = res XOR p2 */
-+	u128_xor((u128 *)res, (u128 *)res, (u128 *)p2);
-+
-+	/* res = e(k, res) */
-+	err = smp_e(k, res);
-+	if (err) {
-+		BT_ERR("smp_c1: Encrypt data error");
-+		goto out;
-+	}
-+
-+out:
-+	return err;
-+}
-+
-+static int smp_s1(const u_char *k, const u_char *r1, const u_char *r2, u_char *_r)
-+{
-+	int err;
-+
-+	/* Just least significant octets from r1 and r2 are considered */
-+	memcpy(_r, r1 + 8, 8);
-+	memcpy(_r + 8, r2 + 8, 8);
-+
-+	err = smp_e(k, _r);
-+	if (err) {
-+		BT_ERR("smp_s1: Encrypt data error");
-+		goto out;
-+	}
-+
-+out:
-+	return err;
-+}
+@@ -64,6 +64,103 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
+ 	hci_send_acl(conn->hcon, skb, 0);
+ }
  
- static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
- 		u16 dlen, void *data)
++static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct smp_cmd_pairing *rp = (void *) skb->data;
++
++	BT_DBG("");
++
++	skb_pull(skb, sizeof(struct smp_cmd_pairing));
++
++	rp->io_capability = 0x00;
++	rp->oob_flag = 0x00;
++	rp->max_key_size = 16;
++	rp->init_key_dist = 0x00;
++	rp->resp_key_dist = 0x00;
++	rp->auth_req &= 0x05;
++
++	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
++}
++
++static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct smp_cmd_pairing_confirm cp;
++
++	BT_DBG("");
++
++	memset(&cp, 0, sizeof(struct smp_cmd_pairing_confirm));
++
++	smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
++}
++
++static void smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	BT_DBG("");
++
++	if (conn->hcon->out) {
++
++		struct smp_cmd_pairing_random random;
++
++		BT_DBG("master");
++
++		memset(&random, 0, sizeof(struct smp_cmd_pairing_random));
++
++		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(random),
++								&random);
++	} else {
++		struct smp_cmd_pairing_confirm confirm;
++
++		BT_DBG("slave");
++
++		memset(&confirm, 0, sizeof(struct smp_cmd_pairing_confirm));
++
++		smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(confirm),
++								&confirm);
++	}
++}
++
++static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct smp_cmd_pairing_random cp;
++
++	BT_DBG("");
++
++	skb_pull(skb, sizeof(struct smp_cmd_pairing_random));
++
++	/* FIXME: check if random matches */
++
++	if (conn->hcon->out) {
++		BT_DBG("master");
++		/* FIXME: start encryption */
++	} else {
++		BT_DBG("slave");
++
++		memset(&cp, 0, sizeof(struct smp_cmd_pairing_random));
++
++		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(cp), &cp);
++	}
++}
++
++static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct smp_cmd_security_req *rp = (void *) skb->data;
++	struct smp_cmd_pairing cp;
++
++	BT_DBG("");
++
++	skb_pull(skb, sizeof(struct smp_cmd_security_req));
++	memset(&cp, 0, sizeof(struct smp_cmd_pairing));
++
++	cp.io_capability = 0x00;
++	cp.oob_flag = 0x00;
++	cp.max_key_size = 16;
++	cp.init_key_dist = 0x00;
++	cp.resp_key_dist = 0x00;
++	cp.auth_req = rp->auth_req & 0x05;
++
++	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
++}
++
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ {
+ 	__u8 authreq;
+@@ -114,23 +211,33 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	switch (code) {
+ 	case SMP_CMD_PAIRING_REQ:
+-		reason = SMP_PAIRING_NOTSUPP;
+-		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
+-		err = -1;
++		smp_cmd_pairing_req(conn, skb);
+ 		break;
+ 
+ 	case SMP_CMD_PAIRING_FAIL:
+ 		break;
+ 
+ 	case SMP_CMD_PAIRING_RSP:
++		smp_cmd_pairing_rsp(conn, skb);
++		break;
++
++	case SMP_CMD_SECURITY_REQ:
++		smp_cmd_security_req(conn, skb);
++		break;
++
+ 	case SMP_CMD_PAIRING_CONFIRM:
++		smp_cmd_pairing_confirm(conn, skb);
++		break;
++
+ 	case SMP_CMD_PAIRING_RANDOM:
++		smp_cmd_pairing_random(conn, skb);
++		break;
++
+ 	case SMP_CMD_ENCRYPT_INFO:
+ 	case SMP_CMD_MASTER_IDENT:
+ 	case SMP_CMD_IDENT_INFO:
+ 	case SMP_CMD_IDENT_ADDR_INFO:
+ 	case SMP_CMD_SIGN_INFO:
+-	case SMP_CMD_SECURITY_REQ:
+ 	default:
+ 		BT_DBG("Unknown command code 0x%2.2x", code);
+ 
 -- 
 1.7.3.2
 
