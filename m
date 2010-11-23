@@ -2,47 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 3/7] Add phonebook_req_cancel to tracker
-Date: Tue, 23 Nov 2010 20:11:25 +0200
-Message-Id: <1290535889-17038-4-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/7] Add phonebook_req_cancel prototype
+Date: Tue, 23 Nov 2010 20:11:24 +0200
+Message-Id: <1290535889-17038-3-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1290535889-17038-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1290535889-17038-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add phonebook_req_cancel function to phonebook_tracker.c that cancels
-pending request and deallocates memory of requst object.
+Add phonebook_req_cancel function prototype to cancel pending request
+to backend.
 ---
- plugins/phonebook-tracker.c |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+ plugins/phonebook.h |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index afe0f2f..6ee5750 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1803,6 +1803,22 @@ done:
- 	return path;
- }
- 
-+void phonebook_req_cancel(void *request)
-+{
-+	struct phonebook_req *req = request;
+diff --git a/plugins/phonebook.h b/plugins/phonebook.h
+index d7cfa46..7ae5ccc 100644
+--- a/plugins/phonebook.h
++++ b/plugins/phonebook.h
+@@ -107,3 +107,9 @@ int phonebook_get_entry(const char *folder, const char *id,
+  */
+ int phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 			phonebook_cache_ready_cb ready_cb, void *user_data);
 +
-+	if (!req)
-+		return;
-+
-+	if (req->call) {
-+		dbus_pending_call_cancel(req->call);
-+		dbus_pending_call_unref(req->call);
-+	}
-+
-+	g_free(req);
-+	req = NULL;
-+}
-+
- int phonebook_pull(const char *name, const struct apparam_field *params,
- 					phonebook_cb cb, void *user_data)
- {
++/* 
++ * Function used to cancel pending request to backend and free resources
++ * allocated for phonebook request structure.
++ */
++void phonebook_req_cancel(void *request);
 -- 
 1.7.0.4
 
