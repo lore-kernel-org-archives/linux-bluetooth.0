@@ -1,45 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 20:52:37 -0200
+Date: Tue, 23 Nov 2010 20:48:39 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [RFC 09/20] Bluetooth: Fix locking balance in
- l2cap_le_conn_ready
-Message-ID: <20101123225237.GB11860@vigoh>
+Subject: Re: [RFC 06/20] Bluetooth: Do not send disconn comand over LE links
+Message-ID: <20101123224839.GA11860@vigoh>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
- <1290524796-32246-10-git-send-email-vinicius.gomes@openbossa.org>
+ <1290524796-32246-7-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290524796-32246-10-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1290524796-32246-7-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
-
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:25 -0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:22 -0300]:
 
 > From: Ville Tervo <ville.tervo@nokia.com>
 > 
-> Don't try to unlock sock if the lock was not held.
+> l2cap over LE links can be disconnected without sending
+> disconnect command first.
 > 
 > Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 > ---
->  net/bluetooth/l2cap.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap.c |   15 ++++++++++-----
+>  1 files changed, 10 insertions(+), 5 deletions(-)
 > 
 > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 5894662..172bf93 100644
+> index 0b583c4..5894662 100644
 > --- a/net/bluetooth/l2cap.c
 > +++ b/net/bluetooth/l2cap.c
-> @@ -1441,7 +1441,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
->  	parent = l2cap_get_sock_by_cid(BT_LISTEN, L2CAP_CID_LE_DATA,
->  					conn->src);
->  	if (!parent)
-> -		goto clean;
-> +		return;
+> @@ -873,6 +873,8 @@ static void l2cap_sock_kill(struct sock *sk)
+>  
+>  static void __l2cap_sock_close(struct sock *sk, int reason)
+>  {
+> +	struct l2cap_conn *conn;
+> +
+>  	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
+>  
+>  	switch (sk->sk_state) {
+> @@ -882,8 +884,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
+>  
+>  	case BT_CONNECTED:
+>  	case BT_CONFIG:
+> -		if (sk->sk_type == SOCK_SEQPACKET ||
+> -				sk->sk_type == SOCK_STREAM) {
+> +		conn = l2cap_pi(sk)->conn;
+> +		if ((sk->sk_type == SOCK_SEQPACKET ||
+> +				sk->sk_type == SOCK_STREAM) &&
+> +				conn->hcon->type != LE_LINK) {
 
-Why not merging this into patch 5/20?
+Makes more senses check for conn->hcon->type == ACL_LINK.
+
+>  			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+>  
+>  			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
+> @@ -893,9 +897,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
+>  		break;
+>  
+>  	case BT_CONNECT2:
+> -		if (sk->sk_type == SOCK_SEQPACKET ||
+> -				sk->sk_type == SOCK_STREAM) {
+> -			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+> +		conn = l2cap_pi(sk)->conn;
+> +		if ((sk->sk_type == SOCK_SEQPACKET ||
+> +				sk->sk_type == SOCK_STREAM) &&
+> +				conn->hcon->type != LE_LINK) {
+
+Same here.
 
 -- 
 Gustavo F. Padovan
