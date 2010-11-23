@@ -1,52 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 11:15:22 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Suraj Sumangala <suraj@Atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
+Message-ID: <4CEB9296.2060702@Atheros.com>
+Date: Tue, 23 Nov 2010 15:38:22 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
+MIME-Version: 1.0
+To: <linux-bluetooth@vger.kernel.org>,
+	<Jothikumar.Mothilal@Atheros.com>
 Subject: Re: [PATCH] hciattach: download configuration at maximum baud rate
  possible
-Message-ID: <20101123101522.GA32222@jh-x301>
-References: <1290423480-29840-1-git-send-email-suraj@atheros.com>
- <20101123092346.GB28017@jh-x301>
- <4CEB9296.2060702@Atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4CEB9296.2060702@Atheros.com>
+References: <1290423480-29840-1-git-send-email-suraj@atheros.com> <20101123092346.GB28017@jh-x301>
+In-Reply-To: <20101123092346.GB28017@jh-x301>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Johan,
 
-On Tue, Nov 23, 2010, Suraj Sumangala wrote:
-> The set_speed function is defined in hciattach.c as
-> 
-> int set_speed(...)
-> {
-> 	cfsetospeed(...);
-> 	cfsetispeed(...);
-> 	return tcsetattr(...);
-> }
-> 
-> I think this function could end up returning Success even if the
-> first two function calls failed?
+On 11/23/2010 2:53 PM, Johan Hedberg wrote:
+> In general the patch looks ok'ish, but:
+>
+>> >  +	if (set_speed(fd, ti, speed)<  0) {
+>> >  +		perror("Can't set required baud rate");
+>> >  +		return -1;
+>> >  +	}
+> To be consistent with the other return values, instead of -1 you should
+> be returning a proper errno here. I.e. probably something like:
+>
+> 	if (set_speed(fd, ti, speed)<  0) {
+> 		err = -errno;
+> 		perror("Can't set required baud rate");
+> 		return err;
 
-Seems so, yes.
+The set_speed function is defined in hciattach.c as
 
-> Does it makes sense to rewrite it to
-> 
-> int set_speed(...)
-> {
-> 	if(cfsetospeed(...) < 0)
-> 		return -errno;
-> 	if(cfsetispeed(...) < 0)
-> 		return -errno;
+int set_speed(...)
+{
+	cfsetospeed(...);
+	cfsetispeed(...);
+	return tcsetattr(...);
+}
 
-This looks fine, except for the coding style: space between if and (
+I think this function could end up returning Success even if the first 
+two function calls failed?
 
-> 	return tcsetattr(...);
+Does it makes sense to rewrite it to
 
-I guess this should be a similar if statement as for the other two
-calls, and then a final "return 0" at the end of the function. This
-set_speed fix should be in a separate patch though.
+int set_speed(...)
+{
+	if(cfsetospeed(...) < 0)
+		return -errno;
+	if(cfsetispeed(...) < 0)
+		return -errno;
+	return tcsetattr(...);
+}
 
-Johan
+Then, I can return the error code directly in my function call.
+
+Regards
+Suraj
+	
