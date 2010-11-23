@@ -1,29 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 12:10:21 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
-Subject: Re: [PATCH] hciattach: makes set_speed return error if any one
- operation fail
-Message-ID: <20101123111021.GA4245@jh-x301>
-References: <1290508783-31183-1-git-send-email-suraj@atheros.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv4 6/7] Update D-Bus OOB API with RequestPairing method
+Date: Tue, 23 Nov 2010 12:05:19 +0100
+References: <1290509592-9262-1-git-send-email-szymon.janc@tieto.com> <1290509592-9262-7-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1290509592-9262-7-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290508783-31183-1-git-send-email-suraj@atheros.com>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201011231205.19325.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Fixed version (.orig removed)
 
-On Tue, Nov 23, 2010, Suraj Sumangala wrote:
-> This patch lets set_speed function changing UART baud rate
-> to return an error code if any one operation fails
-> instead of returning only the last operation's status.
-> 
-> ---
->  tools/hciattach.c |   13 ++++++++++---
->  1 files changed, 10 insertions(+), 3 deletions(-)
+---
+ doc/oob-api.txt |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
 
-Pushed upstream. Thanks.
-
-Johan
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index 4796e4c..e08f6f8 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -60,3 +60,17 @@ Methods		void RegisterProvider(object provider)
+ 			Possible errors: org.bluez.Error.ReadFailed
+ 					 org.bluez.Error.NoProvider
+ 					 org.bluez.Error.InProgress
++
++--------------------------------------------------------------------------------
++
++Service		unique name
++Interface	org.bluez.Agent
++Object path	freely definable
++
++Methods		void RequestPairing(object device)
++
++			This method gets called when the service daemon
++			needs to confirm incoming pairing request.
++
++			Possible errors: org.bluez.Error.Rejected
++					 org.bluez.Error.Canceled
+-- 
+1.7.1
