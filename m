@@ -1,38 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 20:06:56 -0300
+Date: Tue, 23 Nov 2010 20:04:02 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 12/20] Bluetooth: fix receiving L2CAP packets over LE
-Message-ID: <20101123230656.GB19333@eris.indt.org>
+	linux-bluetooth@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [RFC 10/20] Bluetooth: Add server socket support for LE
+ connection
+Message-ID: <20101123230402.GA19333@eris.indt.org>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
- <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
- <20101123225558.GD11860@vigoh>
+ <1290524796-32246-11-git-send-email-vinicius.gomes@openbossa.org>
+ <20101123225432.GC11860@vigoh>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101123225558.GD11860@vigoh>
+In-Reply-To: <20101123225432.GC11860@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-On 20:55 Tue 23 Nov     , Gustavo F. Padovan wrote:
-> Hi Vinicius,
+On 20:54 Tue 23 Nov     , Gustavo F. Padovan wrote:
+> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:26 -0300]:
 > 
-> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:28 -0300]:
-> 
-> > As L2CAP packets coming over LE don't have any more encapsulation,
-> > other than L2CAP, we are able to process them as soon as they arrive.
+> > From: Ville Tervo <ville.tervo@nokia.com>
 > > 
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > Add support for LE server sockets.
+> > 
+> > Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 > > ---
-> >  net/bluetooth/l2cap.c |   17 +++++++++++++++--
-> >  1 files changed, 15 insertions(+), 2 deletions(-)
+> >  net/bluetooth/l2cap.c |    3 +--
+> >  1 files changed, 1 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index 172bf93..e481d6b 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -1438,8 +1438,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+> >  	BT_DBG("");
+> >  
+> >  	/* Check if we have socket listening on cid */
+> > -	parent = l2cap_get_sock_by_cid(BT_LISTEN, L2CAP_CID_LE_DATA,
+> > -					conn->src);
+> > +	parent = l2cap_get_sock_by_cid(BT_LISTEN, L2CAP_CID_LE_DATA, conn->src);
 > 
-> So move this patch before the SMP changes in the patchset.
+> I didn't get this change, commit message tell about other stuff.
 
-Will do.
+My mistake, this should have happened when I rebased these changes on top of
+bluetooth-next.
 
 > 
 > -- 
