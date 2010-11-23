@@ -1,26 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 10:13:39 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Wade Brown <brownw@us.panasonic.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add a runtime option to set the BCSP communication rate
-Message-ID: <20101123091339.GA28017@jh-x301>
-References: <1290466992-5023-1-git-send-email-brownw@us.panasonic.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290466992-5023-1-git-send-email-brownw@us.panasonic.com>
+Date: Tue, 23 Nov 2010 16:06:11 +0800
+Message-ID: <AANLkTik+qRFJZJ_Zc6G1-7dxxbaN0XD=c3ALRNuo3KzY@mail.gmail.com>
+Subject: How to change the waiting time when building bluetooth connection
+From: Roc Bai <buroc83@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Wade,
+2010/11/22 Gustavo F. Padovan <padovan@profusion.mobi>:
+> Hi Roc,
+>
+> * Roc Bai <buroc83@gmail.com> [2010-11-22 11:13:27 +0800]:
+>
+>> Hi, All:
+>>  When i pair my phone with the PC, i have to quickly input the PIN code
+>> with the linux-2.6.35.1 kernel. But i can do it slowly with linux-2.6.26
+>> kernel. All the application and library are same. So i think the waiting
+>> timeout is changed, but i cann't find the changement. I hope get your help
+>> on the issue. Thanks very much!
+>>
+>> My hcid version is 3.36.
+>
+> Please move to the latest bluez 4 version and then report it again if it
+> is the case.
 
-On Mon, Nov 22, 2010, Wade Brown wrote:
-> ---
->  tools/bccmd.c    |   45 ++++++++++++++++++++++++++++++++++++++++-----
->  tools/csr.h      |    3 ++-
->  tools/csr_bcsp.c |    4 ++--
->  3 files changed, 44 insertions(+), 8 deletions(-)
+The same phenomenon. But one strange result, some phone can connect
+normally, but some phone should input PIN quickly.  But those phones
+can work in the old kernel. I think some phones have special
+parameters and the changement of new kernel are sensitive with them.
+More idea ?
+>
+> --
+> Gustavo F. Padovan
+> http://profusion.mobi
+>
 
-Pushed upstream. Thanks.
 
-Johan
+
+-- 
+------------------------
+
+Thinking before action, but you are wasting time if you don't do action.
