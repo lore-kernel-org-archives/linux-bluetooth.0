@@ -1,79 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 00/20] Simple SMP Just Works implementation
-Date: Tue, 23 Nov 2010 12:06:16 -0300
-Message-Id: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Extend discover characteristic by UUID in gatttool to fetch all values
+Date: Tue, 23 Nov 2010 07:37:19 -0500
+Message-Id: <1290515839-11867-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+If the number of characteristics returned exceeds the MTU size, it will
+be needed to ask for more data until the handle range is entirely
+searched.
+---
+ attrib/gatttool.c |   24 +++++++++++++++++++++++-
+ 1 files changed, 23 insertions(+), 1 deletions(-)
 
-This is an implementation of the Just Works SMP procedure, on top of the work
-done by Ville (included in this series to give some context). The SMP stuff
-starts at 11/20.
-
-The most important thing about this series is the discussion that (I hope)
-it will cause.
-
-Some things that I would like to point (in no order):
-
-- the SMP function names follow the spec nomeclature, would it be better to
-  use more meaningful names?
-
-- the crypto transform is allocated during the adapter registration, is this
-  the best place to do this?
-
-- renaming l2cap.c to l2cap_core.c was the only way we could find to keep the
-  SMP implementation separated from the "core" l2cap.
-
-I think this is enough to start a discussion.
-
-So, as the Human Torch would say: Flame on! :-)
-
-
-Anderson Briglia (3):
-  Bluetooth: Start SMP procedure
-  Bluetooth: simple SMP pairing negotiation
-  Bluetooth: LE SMP Cryptoolbox functions
-
-Ville Tervo (10):
-  Bluetooth: Add low energy commands and events
-  Bluetooth: Add LE connect support
-  Bluetooth: Use LE buffers for LE traffic
-  Bluetooth: Add LE connection support to L2CAP
-  Bluetooth: Add server socket support for LE connection
-  Bluetooth: Do not send disconn comand over LE links
-  Bluetooth: Treat LE and ACL links separately on timeout
-  Bluetooth: Fix locking balance in l2cap_le_conn_ready
-  Bluetooth: Add server socket support for LE connection
-  Bluetooth: Add SMP command structures
-
-Vinicius Costa Gomes (7):
-  Bluetooth: Fix initiated LE connections
-  Bluetooth: fix receiving L2CAP packets over LE
-  Bluetooth: Implement the first SMP commands
-  Bluetooth: Add support for using the crypto subsystem
-  Bluetooth: Add support for SMP confirmation checks
-  Bluetooth: Add support for LE Start Encryption
-  Bluetooth: Add support for resuming socket when SMP is finished
-
- include/net/bluetooth/hci.h             |   86 ++++++
- include/net/bluetooth/hci_core.h        |   37 +++-
- include/net/bluetooth/l2cap.h           |   10 +
- include/net/bluetooth/smp.h             |   80 ++++++
- net/bluetooth/Makefile                  |    1 +
- net/bluetooth/hci_conn.c                |  104 +++++++-
- net/bluetooth/hci_core.c                |   94 ++++++-
- net/bluetooth/hci_event.c               |  206 ++++++++++++++-
- net/bluetooth/{l2cap.c => l2cap_core.c} |  237 +++++++++++++---
- net/bluetooth/smp.c                     |  465 +++++++++++++++++++++++++++++++
- 10 files changed, 1264 insertions(+), 56 deletions(-)
- create mode 100644 include/net/bluetooth/smp.h
- rename net/bluetooth/{l2cap.c => l2cap_core.c} (96%)
- create mode 100644 net/bluetooth/smp.c
-
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index d0ef6d3..6ad2cfb 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -401,9 +401,14 @@ done:
+ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
++	struct characteristic_data *char_data = user_data;
+ 	struct att_data_list *list;
+ 	int i;
+ 
++	if ((status == ATT_ECODE_ATTR_NOT_FOUND) &&
++			(char_data->start != opt_start))
++		goto done;
++
+ 	if (status != 0) {
+ 		g_printerr("Read characteristics by UUID failed: %s\n",
+ 							att_ecode2str(status));
+@@ -418,6 +423,8 @@ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 		uint8_t *value = list->data[i];
+ 		int j;
+ 
++		char_data->start = att_get_u16(value) + 1;
++
+ 		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
+ 		value += 2;
+ 		for (j = 0; j < list->len - 2; j++, value++)
+@@ -427,7 +434,14 @@ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 
+ 	att_data_list_free(list);
+ 
++	gatt_read_char_by_uuid(char_data->attrib, char_data->start,
++					char_data->end, opt_uuid,
++					char_read_by_uuid_cb,
++					char_data);
++
++	return;
+ done:
++	g_free(char_data);
+ 	g_main_loop_quit(event_loop);
+ }
+ 
+@@ -436,8 +450,16 @@ static gboolean characteristics_read(gpointer user_data)
+ 	GAttrib *attrib = user_data;
+ 
+ 	if (opt_uuid != NULL) {
++		struct characteristic_data *char_data;
++
++		char_data = g_new(struct characteristic_data, 1);
++		char_data->attrib = attrib;
++		char_data->start = opt_start;
++		char_data->end = opt_end;
++
+ 		gatt_read_char_by_uuid(attrib, opt_start, opt_end, opt_uuid,
+-						char_read_by_uuid_cb, attrib);
++						char_read_by_uuid_cb, char_data);
++
+ 		return FALSE;
+ 	}
+ 
 -- 
 1.7.3.2
 
