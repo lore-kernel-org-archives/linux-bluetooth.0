@@ -1,60 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 12/20] Bluetooth: fix receiving L2CAP packets over LE
-Date: Tue, 23 Nov 2010 12:06:28 -0300
-Message-Id: <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>
+Subject: [RFC 11/20] Bluetooth: Add SMP command structures
+Date: Tue, 23 Nov 2010 12:06:27 -0300
+Message-Id: <1290524796-32246-12-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As L2CAP packets coming over LE don't have any more encapsulation,
-other than L2CAP, we are able to process them as soon as they arrive.
+From: Ville Tervo <ville.tervo@nokia.com>
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Add command structures for security manager protocol.
+
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 ---
- net/bluetooth/l2cap.c |   17 +++++++++++++++--
- 1 files changed, 15 insertions(+), 2 deletions(-)
+ include/net/bluetooth/smp.h |   76 +++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 76 insertions(+), 0 deletions(-)
+ create mode 100644 include/net/bluetooth/smp.h
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index e481d6b..0d168aa 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4798,17 +4798,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct l2cap_hdr *hdr;
-+	int len;
- 
- 	if (!conn && !(conn = l2cap_conn_add(hcon, 0)))
- 		goto drop;
- 
- 	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
- 
-+	if (hcon->type == LE_LINK) {
-+		hdr = (struct l2cap_hdr *) skb->data;
-+		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+new file mode 100644
+index 0000000..8f2edbf
+--- /dev/null
++++ b/include/net/bluetooth/smp.h
+@@ -0,0 +1,76 @@
++#ifndef __SMP_H
++#define __SMP_H
 +
-+		if (len == skb->len) {
-+			/* Complete frame received */
-+			l2cap_recv_frame(conn, skb);
-+			return 0;
-+		}
++struct smp_command_hdr {
++	__u8	code;
++} __packed;
 +
-+		goto drop;
-+	}
++#define SMP_CMD_PAIRING_REQ	0x01
++#define SMP_CMD_PAIRING_RSP	0x02
++struct smp_cmd_pairing {
++	__u8	io_capability;
++	__u8	oob_flag;
++	__u8	auth_req;
++	__u8	max_key_size;
++	__u8	init_key_dist;
++	__u8	resp_key_dist;
++} __packed;
 +
- 	if (flags & ACL_START) {
--		struct l2cap_hdr *hdr;
- 		struct sock *sk;
- 		u16 cid;
--		int len;
- 
- 		if (conn->rx_len) {
- 			BT_ERR("Unexpected start frame (len %d)", skb->len);
++#define SMP_CMD_PAIRING_CONFIRM	0x03
++struct smp_cmd_pairing_confirm {
++	__u8	confirm_val[16];
++} __packed;
++
++#define SMP_CMD_PAIRING_RANDOM	0x04
++struct smp_cmd_pairing_random {
++	__u8	rand_val[16];
++} __packed;
++
++#define SMP_CMD_PAIRING_FAIL	0x05
++struct smp_cmd_pairing_fail {
++	__u8	reason;
++} __packed;
++
++#define SMP_CMD_ENCRYPT_INFO	0x06
++struct smp_cmd_encrypt_info {
++	__u8	ltk[16];
++} __packed;
++
++#define SMP_CMD_MASTER_IDENT	0x07
++struct smp_cmd_master_ident {
++	__u16	ediv;
++	__u8	rand[8];
++} __packed;
++
++#define SMP_CMD_IDENT_INFO	0x08
++struct smp_cmd_ident_info {
++	__u8	irk[16];
++} __packed;
++
++#define SMP_CMD_IDENT_ADDR_INFO	0x09
++struct smp_cmd_ident_addr_info {
++	__u8	addr_type;
++	bdaddr_t bdaddr;
++} __packed;
++
++#define SMP_CMD_SIGN_INFO	0x0a
++struct smp_cmd_sign_info {
++	__u8	csrk[16];
++} __packed;
++
++#define SMP_CMD_SECURITY_REQ	0x0b
++struct smp_cmd_security_req {
++	__u8	auth_req;
++} __packed;
++
++#define SMP_PASSKEY_ENTRY_FAILED	0x01
++#define SMP_OOB_NOT_AVAIL		0x02
++#define SMP_AUTH_REQUIREMENTS		0x03
++#define SMP_CONFIRM_FAILED		0x04
++#define SMP_PAIRING_NOTSUPP		0x05
++#define SMP_ENC_KEY_SIZE		0x06
++#define SMP_CMD_NOTSUPP		0x07
++#define SMP_UNSPECIFIED		0x08
++#define SMP_REPEATED_ATTEMPTS		0x09
++
++#endif /* __SMP_H */
 -- 
 1.7.3.2
 
