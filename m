@@ -1,74 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 20:48:39 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [RFC 06/20] Bluetooth: Do not send disconn comand over LE links
-Message-ID: <20101123224839.GA11860@vigoh>
-References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
- <1290524796-32246-7-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290524796-32246-7-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1290535889-17038-2-git-send-email-dmitriy.paliy@nokia.com>
+References: <1290535889-17038-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1290535889-17038-2-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 23 Nov 2010 23:07:28 +0200
+Message-ID: <AANLkTinNTKdL6wQwi3gC+D4zW9X31St7MB+-mDJAuPkA@mail.gmail.com>
+Subject: Re: [PATCH 1/7] Add phonebook request
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:22 -0300]:
+Hi,
 
-> From: Ville Tervo <ville.tervo@nokia.com>
-> 
-> l2cap over LE links can be disconnected without sending
-> disconnect command first.
-> 
-> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+On Tue, Nov 23, 2010 at 8:11 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
+> Add phonebook request structure to phonebook-tracker and pointer to
+> pending call in PBAP object.
 > ---
->  net/bluetooth/l2cap.c |   15 ++++++++++-----
->  1 files changed, 10 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 0b583c4..5894662 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -873,6 +873,8 @@ static void l2cap_sock_kill(struct sock *sk)
->  
->  static void __l2cap_sock_close(struct sock *sk, int reason)
->  {
-> +	struct l2cap_conn *conn;
-> +
->  	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
->  
->  	switch (sk->sk_state) {
-> @@ -882,8 +884,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
->  
->  	case BT_CONNECTED:
->  	case BT_CONFIG:
-> -		if (sk->sk_type == SOCK_SEQPACKET ||
-> -				sk->sk_type == SOCK_STREAM) {
-> +		conn = l2cap_pi(sk)->conn;
-> +		if ((sk->sk_type == SOCK_SEQPACKET ||
-> +				sk->sk_type == SOCK_STREAM) &&
-> +				conn->hcon->type != LE_LINK) {
+>  plugins/pbap.c              |    1 +
+>  plugins/phonebook-tracker.c |    4 ++++
+>  2 files changed, 5 insertions(+), 0 deletions(-)
+>
+> diff --git a/plugins/pbap.c b/plugins/pbap.c
+> index 1a7d001..3264e85 100644
+> --- a/plugins/pbap.c
+> +++ b/plugins/pbap.c
+> @@ -147,6 +147,7 @@ struct pbap_session {
+>  struct pbap_object {
+>        GString *buffer;
+>        struct pbap_session *session;
+> +       void *request;
+>  };
+>
+>  static const uint8_t PBAP_TARGET[TARGET_SIZE] = {
+> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+> index 20053f6..afe0f2f 100644
+> --- a/plugins/phonebook-tracker.c
+> +++ b/plugins/phonebook-tracker.c
+> @@ -1035,6 +1035,10 @@ struct phonebook_index {
+>        int index;
+>  };
+>
+> +struct phonebook_req {
+> +       DBusPendingCall *call;
+> +};
 
-Makes more senses check for conn->hcon->type == ACL_LINK.
-
->  			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
->  
->  			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
-> @@ -893,9 +897,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
->  		break;
->  
->  	case BT_CONNECT2:
-> -		if (sk->sk_type == SOCK_SEQPACKET ||
-> -				sk->sk_type == SOCK_STREAM) {
-> -			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
-> +		conn = l2cap_pi(sk)->conn;
-> +		if ((sk->sk_type == SOCK_SEQPACKET ||
-> +				sk->sk_type == SOCK_STREAM) &&
-> +				conn->hcon->type != LE_LINK) {
-
-Same here.
+No need to create a struct here, you can pass the call since there is
+not other members.
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Luiz Augusto von Dentz
+Computer Engineer
