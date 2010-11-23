@@ -1,34 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Cancel pending phonebook request
-Date: Tue, 23 Nov 2010 20:11:22 +0200
-Message-Id: <1290535889-17038-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 23 Nov 2010 15:57:05 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [RFC 02/20] Bluetooth: Add LE connect support
+Message-ID: <20101123175705.GD22502@vigoh>
+References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1290524796-32246-3-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290524796-32246-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ville,
 
-In this patch, pending request to backend is calceled when OBEX
-object is destroyed. Such prevents situations of response on
-query arriving to destroyed object, e.g. OBEX session is closed
-in the middle of query to tracker.
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:18 -0300]:
 
-Such required some changes in phonebook API. More specifcally,
-changes in API affect phonebook_pull, phonebook_get_entry, and 
-phonebook_create_cache functions. phonebook_req_cancel is added
-to cancel pending request and deallocate resources respective to
-it.
+> From: Ville Tervo <ville.tervo@nokia.com>
+> 
+> Bluetooth V4.0 adds support for Low Energy (LE)
+> connections. Specification introduses new set
+> of hci commands to control LE connection.
+> This patch adds logic to create, cancel and
+> disconnect LE connections
+> 
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 
-Phonebook request structure is specific to each backend and
-created dinamically only for tracker. Therefore phonebook-dummy
-and phonebook-ebook methods always return NULL instead of pending
-request.
+I remember Marcel acked some of these patches. Why the ack is not here?
+It makes life easier if you tell who is acking your patch already.
 
-For PBAP, the object holds pointer to pending call. In IRMC, it 
-is session where the pointer is stored and pending call canceled 
-when closing OBEX object, and valid for phonebook_pull only.
-
-BR,
-Dmitriy
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
