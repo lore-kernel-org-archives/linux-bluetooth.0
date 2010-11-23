@@ -1,94 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Nov 2010 21:02:18 -0200
+Date: Tue, 23 Nov 2010 20:55:58 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 17/20] Bluetooth: Add support for using the crypto
- subsystem
-Message-ID: <20101123230218.GE11860@vigoh>
+Subject: Re: [RFC 12/20] Bluetooth: fix receiving L2CAP packets over LE
+Message-ID: <20101123225558.GD11860@vigoh>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
- <1290524796-32246-18-git-send-email-vinicius.gomes@openbossa.org>
+ <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290524796-32246-18-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:33 -0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-11-23 12:06:28 -0300]:
 
-> This will allow using the crypto subsystem for encrypting data. As SMP
-> (Security Manager Protocol) is implemented almost entirely on the host
-> side and the crypto module already implements the needed methods
-> (AES-128), it makes sense to use it.
+> As L2CAP packets coming over LE don't have any more encapsulation,
+> other than L2CAP, we are able to process them as soon as they arrive.
 > 
 > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_core.c         |   10 ++++++++++
->  net/bluetooth/smp.c              |    1 -
->  3 files changed, 12 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e2d857a..ee5efa8 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -135,6 +135,8 @@ struct hci_dev {
->  	__u32			req_status;
->  	__u32			req_result;
->  
-> +	struct crypto_blkcipher	*tfm;
-> +
->  	struct inquiry_cache	inq_cache;
->  	struct hci_conn_hash	conn_hash;
->  	struct list_head	blacklist;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5750b80..0e98ffb 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -41,6 +41,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/notifier.h>
->  #include <linux/rfkill.h>
-> +#include <linux/crypto.h>
->  #include <net/sock.h>
->  
->  #include <asm/system.h>
-> @@ -947,6 +948,13 @@ int hci_register_dev(struct hci_dev *hdev)
->  	if (!hdev->workqueue)
->  		goto nomem;
->  
-> +	hdev->tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
-> +	if (IS_ERR(hdev->tfm)) {
-> +		BT_ERR("Failed to load transform for ecb(aes): %ld",
-> +							PTR_ERR(hdev->tfm));
-> +		goto nomem;
-> +	}
-> +
->  	hci_register_sysfs(hdev);
->  
->  	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
-> @@ -987,6 +995,8 @@ int hci_unregister_dev(struct hci_dev *hdev)
->  	for (i = 0; i < NUM_REASSEMBLY; i++)
->  		kfree_skb(hdev->reassembly[i]);
->  
-> +	crypto_free_blkcipher(hdev->tfm);
-> +
->  	hci_notify(hdev, HCI_DEV_UNREG);
->  
->  	if (hdev->rfkill) {
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 7997978..8e8be47 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -227,7 +227,6 @@ static void smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb
->  	BT_DBG("");
->  
->  	if (conn->hcon->out) {
-> -
+>  net/bluetooth/l2cap.c |   17 +++++++++++++++--
+>  1 files changed, 15 insertions(+), 2 deletions(-)
 
-Change not related to your patch here.
+So move this patch before the SMP changes in the patchset.
 
 -- 
 Gustavo F. Padovan
