@@ -1,44 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Nov 2010 23:47:47 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
- interface callbacks
-Message-ID: <20101124214747.GA8626@jh-x301>
-References: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
- <1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
- <AANLkTik0x3tjnM85Mu=vwU6GB2pXAgWXnqe28aKS+QkN@mail.gmail.com>
+Date: Wed, 24 Nov 2010 19:08:48 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: ext Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 00/20] Simple SMP Just Works implementation
+Message-ID: <20101124210848.GC2592@vigoh>
+References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20101124054211.GI874@null>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTik0x3tjnM85Mu=vwU6GB2pXAgWXnqe28aKS+QkN@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101124054211.GI874@null>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Ville,
 
-On Wed, Nov 24, 2010, Andrei Emeltchenko wrote:
-> > -       if (haddr->hci_dev != HCI_DEV_NONE) {
-> > -               if (!(hdev = hci_dev_get(haddr->hci_dev))) {
-> > +       if (haddr.hci_dev != HCI_DEV_NONE) {
-> > +               if (!(hdev = hci_dev_get(haddr.hci_dev))) {
+* Ville Tervo <ville.tervo@nokia.com> [2010-11-24 07:42:11 +0200]:
+
+> Hi,
 > 
-> doesn't checkpatch give errors here?
-
-Probably, but I've understood that it's ok if it's the existing code
-that contains the coding style issue.
-
-> Would be more clean like:
-> ...
-> hdev = hci_dev_get(haddr.hci_dev);
-> if (!hdev)
-> ...
 > 
-> At some point shall be fixed in the old code also
+> On Tue, Nov 23, 2010 at 12:06:16PM -0300, ext Vinicius Costa Gomes wrote:
+> > Hi,
+> > 
+> > This is an implementation of the Just Works SMP procedure, on top of the work
+> > done by Ville (included in this series to give some context). The SMP stuff
+> > starts at 11/20.
+> > 
+> > The most important thing about this series is the discussion that (I hope)
+> > it will cause.
+> > 
+> > Some things that I would like to point (in no order):
+> > 
+> > - the SMP function names follow the spec nomeclature, would it be better to
+> >   use more meaningful names?
+> > 
+> > - the crypto transform is allocated during the adapter registration, is this
+> >   the best place to do this?
+> > 
+> > - renaming l2cap.c to l2cap_core.c was the only way we could find to keep the
+> >   SMP implementation separated from the "core" l2cap.
+> 
+> Gustavo do you have something against this change?
 
-Agreed. A separate code cleanup patch would be nice. I've intentionally
-kept the old style to not mix coding style and functional changes into
-the same patch and to make it clear that I'm not introducing any changes
-to the code logic at this place.
+I'm ok with this change.
 
-Johan
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
