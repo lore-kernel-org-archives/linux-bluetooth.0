@@ -1,90 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Nov 2010 11:47:18 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: ext Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 12/20] Bluetooth: fix receiving L2CAP packets over LE
-Message-ID: <20101124144718.GA16200@eris.indt.org>
-References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
- <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
- <20101124053202.GH874@null>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101124053202.GH874@null>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH 3/3] Bluetooth: Make hci_send_to_sock usable for management control sockets
+Date: Wed, 24 Nov 2010 15:39:35 +0100
+Message-Id: <1290609575-28435-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
+References: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-On 07:32 Wed 24 Nov, Ville Tervo wrote:
-> Hi,
-> 
-> 
-> On Tue, Nov 23, 2010 at 12:06:28PM -0300, ext Vinicius Costa Gomes wrote:
-> > As L2CAP packets coming over LE don't have any more encapsulation,
-> > other than L2CAP, we are able to process them as soon as they arrive.
-> > 
-> 
-> I thought this patch was only fixing symphoms of broken controller? LE frames
-> should have same continuation bits as ACL. See Vol 2 Part E 5.4.2.
+In order to send data to management control sockets the function should:
 
-You are right. Broken controller. A better behaved one has the right flags.
+  - skip checks intended for raw HCI data and stack internal events
+  - make sure RAW HCI data or stack internal events don't go to
+    management control sockets
 
-Will drop this patch.
+In order to accomplish this the patch adds a new member to the bluetooth
+skb private data to flag skb's that are destined for management control
+sockets.
 
-> 
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> > ---
-> >  net/bluetooth/l2cap.c |   17 +++++++++++++++--
-> >  1 files changed, 15 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> > index e481d6b..0d168aa 100644
-> > --- a/net/bluetooth/l2cap.c
-> > +++ b/net/bluetooth/l2cap.c
-> > @@ -4798,17 +4798,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
-> >  static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
-> >  {
-> >  	struct l2cap_conn *conn = hcon->l2cap_data;
-> > +	struct l2cap_hdr *hdr;
-> > +	int len;
-> >  
-> >  	if (!conn && !(conn = l2cap_conn_add(hcon, 0)))
-> >  		goto drop;
-> >  
-> >  	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
-> >  
-> > +	if (hcon->type == LE_LINK) {
-> > +		hdr = (struct l2cap_hdr *) skb->data;
-> > +		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
-> > +
-> > +		if (len == skb->len) {
-> > +			/* Complete frame received */
-> > +			l2cap_recv_frame(conn, skb);
-> > +			return 0;
-> > +		}
-> > +
-> > +		goto drop;
-> > +	}
-> > +
-> >  	if (flags & ACL_START) {
-> > -		struct l2cap_hdr *hdr;
-> >  		struct sock *sk;
-> >  		u16 cid;
-> > -		int len;
-> >  
-> >  		if (conn->rx_len) {
-> >  			BT_ERR("Unexpected start frame (len %d)", skb->len);
-> > -- 
-> > 1.7.3.2
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/hci_sock.c          |   10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletions(-)
 
-
-Cheers,
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index d81ea79..0c5e725 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -144,6 +144,7 @@ struct bt_skb_cb {
+ 	__u8 tx_seq;
+ 	__u8 retries;
+ 	__u8 sar;
++	unsigned short channel;
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+ 
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 730a4e8..ab449b2 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -104,6 +104,12 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (skb->sk == sk)
+ 			continue;
+ 
++		if (bt_cb(skb)->channel != hci_pi(sk)->channel)
++			continue;
++
++		if (bt_cb(skb)->channel == HCI_CHANNEL_CONTROL)
++			goto clone;
++
+ 		/* Apply filter */
+ 		flt = &hci_pi(sk)->filter;
+ 
+@@ -127,11 +133,13 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 				continue;
+ 		}
+ 
++clone:
+ 		if (!(nskb = skb_clone(skb, GFP_ATOMIC)))
+ 			continue;
+ 
+ 		/* Put type byte before the data */
+-		memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
++		if (bt_cb(skb)->channel == HCI_CHANNEL_RAW)
++			memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
+ 
+ 		if (sock_queue_rcv_skb(sk, nskb))
+ 			kfree_skb(nskb);
 -- 
-Vinicius
+1.7.2.3
+
