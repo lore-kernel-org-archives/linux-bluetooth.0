@@ -1,51 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
-References: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
-	<1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 24 Nov 2010 11:38:22 -0400
-Message-ID: <AANLkTimFz=FRPiGT31xt9wMjWoxC5cuKBubEqYNT0s=5@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management interface callbacks
+In-Reply-To: <1290602554.13641.13.camel@aeonflux.mpl.access-company.com>
+References: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1290602554.13641.13.camel@aeonflux.mpl.access-company.com>
+Date: Wed, 24 Nov 2010 11:13:30 -0400
+Message-ID: <AANLkTi=pwDA5JQCoz4QNO=mLAHuW+moNOEO4Nqz3jQrJ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix error handling for l2cap_init()
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@nokia.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-On Wed, Nov 24, 2010 at 10:39 AM,  <johan.hedberg@gmail.com> wrote:
->  static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
->  {
-> -       struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
-> +       struct sockaddr_hci haddr;
-
-Just out of curiosity: why is this change necessary (i.e. make a stack
-copy of addr data and use it instead of using a cast of addr)?
-
->        struct sock *sk = sock->sk;
->        struct hci_dev *hdev = NULL;
-> -       int err = 0;
-> +       int len, err = 0;
+On Wed, Nov 24, 2010 at 8:42 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+>> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+>> index 18a802c..7980e24 100644
+>> --- a/net/bluetooth/l2cap.c
+>> +++ b/net/bluetooth/l2cap.c
+>> @@ -4875,8 +4875,10 @@ static int __init l2cap_init(void)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return err;
+>>
+>> =A0 =A0 =A0 _busy_wq =3D create_singlethread_workqueue("l2cap");
+>> - =A0 =A0 if (!_busy_wq)
+>> - =A0 =A0 =A0 =A0 =A0 =A0 goto error;
+>> + =A0 =A0 if (!_busy_wq) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 err =3D -ENOMEM;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 goto error_busy_wq;
+>> + =A0 =A0 }
 >
->        BT_DBG("sock %p sk %p", sock, sk);
->
-> -       if (!haddr || haddr->hci_family != AF_BLUETOOTH)
-> +       if (!addr)
-> +               return -EINVAL;
-> +
-> +       memset(&haddr, 0, sizeof(haddr));
-> +       len = min_t(unsigned int, sizeof(haddr), addr_len);
-> +       memcpy(&haddr, addr, len);
+> aren't these returning PTR_ERR etc.?
 
-Looks like you are playing safe here, but looking at least a few
-->bind() implementations I see most just cast the original struct
-sockaddr, which is has size (sizeof(unsigned short) + 14).
+No, create_singlethread_workqueue() is just a wrapper around
+__alloc_workqueue_key(), which returns eiter a kzalloc()'ed pointer,
+or NULL on error. There is no way to get the actual reason of the
+error, but by taking a look at the function we can see most (if not
+all) errors are -ENOMEM. Thus why I used it here.
+
+Padovan: so how to proceed here: keep the patch as is and keep
+semantics, of make your proposed changes (with a slightly risk of a
+race condition and having _busy_wq NULL) ?
 
 Regards,
--- 
+--=20
 Anderson Lizardo
 OpenBossa Labs - INdT
 Manaus - Brazil
