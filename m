@@ -1,73 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] sdpd header cleanup
-Date: Wed, 24 Nov 2010 15:16:56 -0300
-Message-Id: <1290622616-26505-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
+References: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
+	<1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 24 Nov 2010 11:38:22 -0400
+Message-ID: <AANLkTimFz=FRPiGT31xt9wMjWoxC5cuKBubEqYNT0s=5@mail.gmail.com>
+Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management interface callbacks
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/sdpd-request.c |   12 +++++++++++-
- src/sdpd.h         |   14 --------------
- 2 files changed, 11 insertions(+), 15 deletions(-)
+Hi Johan,
 
-diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-index 025de60..9e4b6b8 100644
---- a/src/sdpd-request.c
-+++ b/src/sdpd-request.c
-@@ -45,6 +45,16 @@
- #include "sdpd.h"
- #include "log.h"
- 
-+typedef struct {
-+	uint32_t timestamp;
-+	union {
-+		uint16_t maxBytesSent;
-+		uint16_t lastIndexSent;
-+	} cStateValue;
-+} sdp_cont_state_t;
-+
-+#define SDP_CONT_STATE_SIZE (sizeof(uint8_t) + sizeof(sdp_cont_state_t))
-+
- #define MIN(x, y) ((x) < (y)) ? (x): (y)
- 
- typedef struct _sdp_cstate_list sdp_cstate_list_t;
-@@ -58,7 +68,7 @@ struct _sdp_cstate_list {
- static sdp_cstate_list_t *cstates;
- 
- // FIXME: should probably remove it when it's found
--sdp_buf_t *sdp_get_cached_rsp(sdp_cont_state_t *cstate)
-+static sdp_buf_t *sdp_get_cached_rsp(sdp_cont_state_t *cstate)
- {
- 	sdp_cstate_list_t *p;
- 
-diff --git a/src/sdpd.h b/src/sdpd.h
-index a46ad3c..f8e6ee7 100644
---- a/src/sdpd.h
-+++ b/src/sdpd.h
-@@ -79,20 +79,6 @@ void register_server_service(void);
- void register_device_id(const uint16_t vendor, const uint16_t product,
- 						const uint16_t version);
- 
--typedef struct {
--	uint32_t timestamp;
--	union {
--		uint16_t maxBytesSent;
--		uint16_t lastIndexSent;
--	} cStateValue;
--} sdp_cont_state_t;
--
--#define SDP_CONT_STATE_SIZE (sizeof(uint8_t) + sizeof(sdp_cont_state_t))
--
--sdp_buf_t *sdp_get_cached_rsp(sdp_cont_state_t *cstate);
--void sdp_cstate_cache_init(void);
--void sdp_cstate_clean_buf(void);
--
- int record_sort(const void *r1, const void *r2);
- void sdp_svcdb_reset(void);
- void sdp_svcdb_collect_all(int sock);
+On Wed, Nov 24, 2010 at 10:39 AM,  <johan.hedberg@gmail.com> wrote:
+>  static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+>  {
+> -       struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
+> +       struct sockaddr_hci haddr;
+
+Just out of curiosity: why is this change necessary (i.e. make a stack
+copy of addr data and use it instead of using a cast of addr)?
+
+>        struct sock *sk = sock->sk;
+>        struct hci_dev *hdev = NULL;
+> -       int err = 0;
+> +       int len, err = 0;
+>
+>        BT_DBG("sock %p sk %p", sock, sk);
+>
+> -       if (!haddr || haddr->hci_family != AF_BLUETOOTH)
+> +       if (!addr)
+> +               return -EINVAL;
+> +
+> +       memset(&haddr, 0, sizeof(haddr));
+> +       len = min_t(unsigned int, sizeof(haddr), addr_len);
+> +       memcpy(&haddr, addr, len);
+
+Looks like you are playing safe here, but looking at least a few
+->bind() implementations I see most just cast the original struct
+sockaddr, which is has size (sizeof(unsigned short) + 14).
+
+Regards,
 -- 
-1.7.3.2
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
