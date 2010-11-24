@@ -1,94 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Nov 2010 07:42:11 +0200
+Date: Wed, 24 Nov 2010 07:32:02 +0200
 From: Ville Tervo <ville.tervo@nokia.com>
 To: ext Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Subject: Re: [RFC 00/20] Simple SMP Just Works implementation
-Message-ID: <20101124054211.GI874@null>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 12/20] Bluetooth: fix receiving L2CAP packets over LE
+Message-ID: <20101124053202.GH874@null>
 References: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290524796-32246-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1290524796-32246-13-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
 
-On Tue, Nov 23, 2010 at 12:06:16PM -0300, ext Vinicius Costa Gomes wrote:
-> Hi,
+On Tue, Nov 23, 2010 at 12:06:28PM -0300, ext Vinicius Costa Gomes wrote:
+> As L2CAP packets coming over LE don't have any more encapsulation,
+> other than L2CAP, we are able to process them as soon as they arrive.
 > 
-> This is an implementation of the Just Works SMP procedure, on top of the work
-> done by Ville (included in this series to give some context). The SMP stuff
-> starts at 11/20.
-> 
-> The most important thing about this series is the discussion that (I hope)
-> it will cause.
-> 
-> Some things that I would like to point (in no order):
-> 
-> - the SMP function names follow the spec nomeclature, would it be better to
->   use more meaningful names?
-> 
-> - the crypto transform is allocated during the adapter registration, is this
->   the best place to do this?
-> 
-> - renaming l2cap.c to l2cap_core.c was the only way we could find to keep the
->   SMP implementation separated from the "core" l2cap.
 
-Gustavo do you have something against this change?
+I thought this patch was only fixing symphoms of broken controller? LE frames
+should have same continuation bits as ACL. See Vol 2 Part E 5.4.2.
 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/l2cap.c |   17 +++++++++++++++--
+>  1 files changed, 15 insertions(+), 2 deletions(-)
 > 
-> I think this is enough to start a discussion.
-> 
-> So, as the Human Torch would say: Flame on! :-)
-
-I'll try to find time to do some testing soon.
-
-
-
-> 
-> Anderson Briglia (3):
->   Bluetooth: Start SMP procedure
->   Bluetooth: simple SMP pairing negotiation
->   Bluetooth: LE SMP Cryptoolbox functions
-> 
-> Ville Tervo (10):
->   Bluetooth: Add low energy commands and events
->   Bluetooth: Add LE connect support
->   Bluetooth: Use LE buffers for LE traffic
->   Bluetooth: Add LE connection support to L2CAP
->   Bluetooth: Add server socket support for LE connection
->   Bluetooth: Do not send disconn comand over LE links
->   Bluetooth: Treat LE and ACL links separately on timeout
->   Bluetooth: Fix locking balance in l2cap_le_conn_ready
->   Bluetooth: Add server socket support for LE connection
->   Bluetooth: Add SMP command structures
-> 
-> Vinicius Costa Gomes (7):
->   Bluetooth: Fix initiated LE connections
->   Bluetooth: fix receiving L2CAP packets over LE
->   Bluetooth: Implement the first SMP commands
->   Bluetooth: Add support for using the crypto subsystem
->   Bluetooth: Add support for SMP confirmation checks
->   Bluetooth: Add support for LE Start Encryption
->   Bluetooth: Add support for resuming socket when SMP is finished
-> 
->  include/net/bluetooth/hci.h             |   86 ++++++
->  include/net/bluetooth/hci_core.h        |   37 +++-
->  include/net/bluetooth/l2cap.h           |   10 +
->  include/net/bluetooth/smp.h             |   80 ++++++
->  net/bluetooth/Makefile                  |    1 +
->  net/bluetooth/hci_conn.c                |  104 +++++++-
->  net/bluetooth/hci_core.c                |   94 ++++++-
->  net/bluetooth/hci_event.c               |  206 ++++++++++++++-
->  net/bluetooth/{l2cap.c => l2cap_core.c} |  237 +++++++++++++---
->  net/bluetooth/smp.c                     |  465 +++++++++++++++++++++++++++++++
->  10 files changed, 1264 insertions(+), 56 deletions(-)
->  create mode 100644 include/net/bluetooth/smp.h
->  rename net/bluetooth/{l2cap.c => l2cap_core.c} (96%)
->  create mode 100644 net/bluetooth/smp.c
-> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index e481d6b..0d168aa 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -4798,17 +4798,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+>  static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+>  	struct l2cap_conn *conn = hcon->l2cap_data;
+> +	struct l2cap_hdr *hdr;
+> +	int len;
+>  
+>  	if (!conn && !(conn = l2cap_conn_add(hcon, 0)))
+>  		goto drop;
+>  
+>  	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
+>  
+> +	if (hcon->type == LE_LINK) {
+> +		hdr = (struct l2cap_hdr *) skb->data;
+> +		len = __le16_to_cpu(hdr->len) + L2CAP_HDR_SIZE;
+> +
+> +		if (len == skb->len) {
+> +			/* Complete frame received */
+> +			l2cap_recv_frame(conn, skb);
+> +			return 0;
+> +		}
+> +
+> +		goto drop;
+> +	}
+> +
+>  	if (flags & ACL_START) {
+> -		struct l2cap_hdr *hdr;
+>  		struct sock *sk;
+>  		u16 cid;
+> -		int len;
+>  
+>  		if (conn->rx_len) {
+>  			BT_ERR("Unexpected start frame (len %d)", skb->len);
 > -- 
 > 1.7.3.2
 > 
