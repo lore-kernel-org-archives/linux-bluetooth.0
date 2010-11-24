@@ -1,24 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Greg Mercurio <gmercurio@yahoo.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 24 Nov 2010 09:29:39 -0500
-Subject: RE: Enabling SCO mode
-Message-ID: <6766E7426BDDFA48A15497A520F556A548A21CF63A@IAD2MBX02.mex02.mlsrvr.com>
-References: <734620.13775.qm@web65716.mail.ac4.yahoo.com>
-In-Reply-To: <734620.13775.qm@web65716.mail.ac4.yahoo.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH v2] Bluetooth: Fix error handling for l2cap_init()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+In-Reply-To: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1290423434-2920-1-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 24 Nov 2010 13:42:34 +0100
+Message-ID: <1290602554.13641.13.camel@aeonflux.mpl.access-company.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgR3JlZywNCg0KPiBTdWJqZWN0OiBFbmFibGluZyBTQ08gbW9kZQ0KPiANCj4gSSBhbSBuZXcg
-dG8gQmx1ZXogYW5kIGhhdmUgYSBxdWVzdGlvbiBhYm91dCBzY28gYXVkaW8uICBJIGFtIHVzaW5n
-DQo+IEJsdWV6IHZlcnNpb24gNC40NyBpbiBhbiBBbmRyb2lkIGVudmlyb25tZW50Lg0KLi4uDQo+
-IENhbiBzb21lb25lIGNvbmZpcm0gbXkgYXNzdW1wdGlvbnMgYW5kIHBvaW50IG1lIHRvIHRoZSBw
-bGFjZSBpbiB0aGUNCj4gY29kZSB3aGVyZSBlbmFibGluZyB0aGUgc2NvIGNvbW1hbmRzIGFyZSBz
-ZW50IHRvIHRoZSBjaGlwPw0KDQpUaGUgSENJIGNvZGUgaXMgaW4gdGhlIEFuZHJvaWQga2VybmVs
-LiBUaGUgQW5kcm9pZCBrZXJuZWwgZ2l0IHRyZWUgaXMgYXQgZ2l0Oi8vYW5kcm9pZC5naXQua2Vy
-bmVsLm9yZy9rZXJuZWwvY29tbW9uLmdpdC4gVGhlIEJUIGNvZGUgeW91J3JlIGludGVyZXN0ZWQg
-aW4gaXMgaW4gdGhlIG5ldC9ibHVldG9vdGggc3ViZGlyIC0gc3BlY2lmaWNhbGx5IGhjaV9jb25u
-LmMvaGNpX2Nvbm5lY3QoKS4NCg0KUmVnYXJkcywNClBldGVyIEh1cmxleQ0KIA0KDQo=
+Hi Anderson,
+
+> create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
+> this happens, the return value is not set to a negative value and the
+> module load will succeed. It will then crash on module unload because of
+> a destroy_workqueue() call on a NULL pointer.
+> 
+> Additionally, the _busy_wq workqueue is not being destroyed if any
+> errors happen on l2cap_init().
+> 
+> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+> ---
+>  net/bluetooth/l2cap.c |    8 ++++++--
+>  1 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 18a802c..7980e24 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -4875,8 +4875,10 @@ static int __init l2cap_init(void)
+>  		return err;
+>  
+>  	_busy_wq = create_singlethread_workqueue("l2cap");
+> -	if (!_busy_wq)
+> -		goto error;
+> +	if (!_busy_wq) {
+> +		err = -ENOMEM;
+> +		goto error_busy_wq;
+> +	}
+
+aren't these returning PTR_ERR etc.?
+
+Regards
+
+Marcel
+
+
