@@ -1,165 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CED942E.8080204@theforce.com.au>
-Date: Thu, 25 Nov 2010 09:39:42 +1100
-From: Grahame Jordan <gbj@theforce.com.au>
+Date: Wed, 24 Nov 2010 19:58:46 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
+ interface callbacks
+Message-ID: <20101124215846.GD2592@vigoh>
+References: <1290609575-28435-1-git-send-email-johan.hedberg@gmail.com>
+ <1290609575-28435-3-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTik0x3tjnM85Mu=vwU6GB2pXAgWXnqe28aKS+QkN@mail.gmail.com>
+ <20101124214747.GA8626@jh-x301>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: sdptool hanging remote
-References: <4CEB532F.1070804@theforce.com.au> <20101123175156.GA30860@eris.indt.org>
-In-Reply-To: <20101123175156.GA30860@eris.indt.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20101124214747.GA8626@jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+* Johan Hedberg <johan.hedberg@gmail.com> [2010-11-24 23:47:47 +0200]:
 
-I have tested 4.77 4.80 and git. All appear to have the same issue.
+> Hi Andrei,
+> 
+> On Wed, Nov 24, 2010, Andrei Emeltchenko wrote:
+> > > -       if (haddr->hci_dev != HCI_DEV_NONE) {
+> > > -               if (!(hdev = hci_dev_get(haddr->hci_dev))) {
+> > > +       if (haddr.hci_dev != HCI_DEV_NONE) {
+> > > +               if (!(hdev = hci_dev_get(haddr.hci_dev))) {
+> > 
+> > doesn't checkpatch give errors here?
+> 
+> Probably, but I've understood that it's ok if it's the existing code
+> that contains the coding style issue.
+> 
+> > Would be more clean like:
+> > ...
+> > hdev = hci_dev_get(haddr.hci_dev);
+> > if (!hdev)
+> > ...
+> > 
+> > At some point shall be fixed in the old code also
+> 
+> Agreed. A separate code cleanup patch would be nice. I've intentionally
+> kept the old style to not mix coding style and functional changes into
+> the same patch and to make it clear that I'm not introducing any changes
+> to the code logic at this place.
 
+Yes, that should be a separated patch.
 
-2000-01-02 07:35:12.360814 < ACL data: handle 256 flags 0x02 dlen 18
-     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-       MTU 672
-2000-01-02 07:35:12.360884 < ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-2000-01-02 07:35:12.370559 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:12.380596 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:12.380628 > ACL data: handle 256 flags 0x02 dlen 18
-     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-       MTU 672
-2000-01-02 07:35:12.410670 > ACL data: handle 256 flags 0x02 dlen 23
-     L2CAP(d): cid 0x0041 len 19 [psm 1]
-         SDP SA Req: tid 0x0 len 0xe
-           handle 0x1001e
-           max 65535
-           aid(s) 0x0000 - 0xffff
-           cont 00
-2000-01-02 07:35:12.412008 < ACL data: handle 256 flags 0x02 dlen 11
-     L2CAP(d): cid 0x0041 len 7 [psm 1]
-         SDP Error Rsp: tid 0x0 len 0x2
-           code 0x2 info none
-2000-01-02 07:35:12.430720 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:12.430756 > ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-2000-01-02 07:35:12.430979 < ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-2000-01-02 07:35:12.440583 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:12.460651 > ACL data: ha
-# Hang here
+Johan, your patches are fine, but I have to wait the wireless-next-2.6
+be synced with the net-next-2.6 tree. Then I'll able to apply it.
 
-# Resumed after about 10 seconds
-ndle 256 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x0042
-2000-01-02 07:35:12.460904 < ACL data: handle 256 flags 0x02 dlen 16
-     L2CAP(s)i2c: error: timeout
-: Connect rsp: dcid 0x0041 scid 0x0042 result 0 status 0
-       i2c: msg_num: 0 msg_idx: 1 msg_ptr: 0
-Connection successful
-2000-01-02 07:35:12.480629 > HCI Event: Ni2c: ICR: 000097e0 ISR: 00000000
-umber of Completed Packets (0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:12.510724 > ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-2000-01-02 07:35:12.510946 < ACL data: handle 256 flags 0x02 dlen 18
-     L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 4
-       MTU 672
-....
-
-2000-01-02 07:35:34.220696 > ACL data: handle 256 flags 0x02 dlen 23
-     L2CAP(d): cid 0x0041 len 19 [psm 1]
-         SDP SA Req: tid 0x0 len 0xe
-           handle 0x1030a
-           max 65535
-           aid(s) 0x0000 - 0xffff
-           cont 00
-2000-01-02 07:35:34.222038 < ACL data: handle 256 flags 0x02 dlen 11
-     L2CAP(d): cid 0x0041 len 7 [psm 1]
-         SDP Error Rsp: tid 0x0 len 0x2
-           code 0x2 info none
-2000-01-02 07:35:34.250696 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:34.250733 > ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-2000-01-02 07:35:34.250962 < ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-2000-01-02
-# Hang here
-
-# Pressed CTL-C on remote "sdptool records 00:80:37:2F:5A:77"
-07:35:34.260581 > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 256 packets 1
-2000-01-02 07:35:34.280679 > ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x0042
-2000-01-02 07:35:34.280930 < ACL data: handle 256 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0042 result 0 status 0
-       Connection successful
-2000-01-02 07:35:34.300522 > HCI Event: Number of Completed Packets 
-(0x13) plen 5
-     handle 256 packets 1
-
-...
-
-
-Thanks
-
-Grahame Jordan
-
-
-On 24/11/10 04:51, Vinicius Costa Gomes wrote:
-> On 16:37 Tue 23 Nov     , Grahame Jordan wrote:
->
->> Hi,
->>
->> I am using bluez-4.77 on a Gumstix Verdex kernel 2.4.32 patch 21
->>
->> When I run:
->> sdptool records 00:80:37:2F:06:08"
->> from the Workstation Ubuntu 10.04 Bluez-4.6? to the Gumstix the Gumstix
->> hangs.
->> It does not hang completely but is very busy. It hangs for about 20
->> seconds and then releases for about 1 second
->> before it locks up again.
->>
-> I couldn't find anything that could solve this kind of problem in the logs
-> between 4.6 and the git head. But anyway, could you give a try to 4.80, or
-> better yet, the git head[1]? and see if the problem still happens?
->
->
->> I have tried this on several different Gumstix with the same issue.
->>
->> Changing workstations from Ubuntu 10.04 to Ubuntu 8.04 does make a
->> difference.
->>   From Ubuntu 8.04 there seems to be no problem. blue-utils 3.26?
->>
->>
-> A really helpful piece of information that you could provide is the hcidump[2]
-> logs of both cases, just be sure to give hcidump the options "-V" (verbose
-> output) and "-t" (timestamps, to see where the hang happens).
->
->
->> Appreciate help
->>
->>
->> Thanks
->>
->> Grahame Jordan
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
-> Cheers,
->
-
-
-
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
