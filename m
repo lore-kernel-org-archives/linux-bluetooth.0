@@ -1,35 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: do not use assignment in if condition
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1290424897-32463-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 24 Nov 2010 13:40:39 +0100
-Message-ID: <1290602439.13641.12.camel@aeonflux.mpl.access-company.com>
-Mime-Version: 1.0
+MIME-Version: 1.0
+From: Dave Keck <davekeck@gmail.com>
+Date: Wed, 24 Nov 2010 02:01:08 -0500
+Message-ID: <AANLkTimB7N=LSUt8-6P=rfmezFxjum5xWc-jTit7oxQF@mail.gmail.com>
+Subject: Gaining Vendor Documentation
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi list,
 
-> Fix checkpatch errors like:
-> "ERROR: do not use assignment in if condition"
-> Simplify code and fix one long line.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/hci_event.c |   18 ++++++++++++------
->  1 files changed, 12 insertions(+), 6 deletions(-)
+I'm in the process of debugging some Bluetooth software, and I've
+discovered a bug for which all evidence implicates the firmware for my
+system's Bluetooth chipset (manufactured by Broadcom.) Intending to
+workaround this bug, I'm waiting to hear back from Broadcom regarding
+the documentation that might exist for my chipset.
 
-I am fine with these. It is just pretty old code and it is good that you
-start fixing these up.
+I was wondering if anyone has experience dealing with vendors and has
+advice towards getting access to their non-public documentation? As an
+independent developer, I'm not sure what to expect.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Thanks!
 
-Regards
+David
 
-Marcel
-
-
+(I apologize that this is off-topic, but as Bluetooth stack developers
+I couldn't find a better place to ask. I humbly request your
+forgiveness.)
