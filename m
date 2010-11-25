@@ -1,27 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Nov 2010 22:11:56 +0200
+Date: Thu, 25 Nov 2010 22:04:46 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix crash after simultaneous authentication requests
-Message-ID: <20101125201156.GA31596@jh-x301>
-References: <1290679615-26273-1-git-send-email-michalski.raf@gmail.com>
+Subject: Re: [PATCH] sdpd header cleanup
+Message-ID: <20101125200446.GB30633@jh-x301>
+References: <1290622616-26505-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290679615-26273-1-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1290622616-26505-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Hi Claudio,
 
-On Thu, Nov 25, 2010, Rafal Michalski wrote:
-> Previously simultaneous authentication requests to the same device caused
-> bluetoothd crash. Now if ongoing authentication occurs error is returned,
-> preventing from simultaneous requests to the same device.
+On Wed, Nov 24, 2010, Claudio Takahasi wrote:
 > ---
->  src/device.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+>  src/sdpd-request.c |   12 +++++++++++-
+>  src/sdpd.h         |   14 --------------
+>  2 files changed, 11 insertions(+), 15 deletions(-)
 
-Pushed upstream. Thanks.
+Thanks. Pushed upstream.
 
 Johan
