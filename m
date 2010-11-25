@@ -1,30 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Nov 2010 22:01:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix not deinitializing telephony driver when there
- is no adapter powered
-Message-ID: <20101125200151.GA30633@jh-x301>
-References: <1290698551-8706-1-git-send-email-luiz.dentz@gmail.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 25 Nov 2010 16:16:14 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Yuri Ershov <ext-yuri.ershov@nokia.com>
+Cc: marcel@holtmann.org, davem@davemloft.net, jprvita@profusion.mobi,
+	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
+	andrei.emeltchenko@nokia.com
+Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
+Message-ID: <20101125181614.GA25686@vigoh>
+References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290698551-8706-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Yuri,
 
-On Thu, Nov 25, 2010, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> 
-> This changes hook telephony driver de/initialization to powered state so
-> telephony drivers can now free their resources when there is no adapter
-> active in the system.
-> ---
->  audio/manager.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 files changed, 54 insertions(+), 5 deletions(-)
+* Yuri Ershov <ext-yuri.ershov@nokia.com> [2010-11-25 12:55:33 +0300]:
 
-All three patches (v2 of 3/3) have been pushed upstream. Thanks.
+> This patch is an addition to my previous patch for this issue.
+> The problem is in resynchronization between two loops:
+> 1. Main controlling loop (l2cap_connect_req, l2cap_config_req,
+> l2cap_config_rsp, l2cap_disconnect_req, etc.)
+> 2. Loop waiting of BT_CONNECTED state of socket (l2cap_sock_accept,
+> bt_accept_dequeue, etc.).
+> In case of fast sequence of connect/disconnect operations the loop #1
+> makes several cycles, while the loop #2 only has time to make one
+> cycle and it results crash.
 
-Johan
+What is the crash point? Can you provide a log?
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
