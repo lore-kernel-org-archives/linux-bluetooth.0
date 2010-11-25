@@ -1,9 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3 v2] Fix telephony maemo6 driver deinitialization
-Date: Thu, 25 Nov 2010 18:07:02 +0200
-Message-Id: <1290701222-10076-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 3/3] Fix telephony maemo6 driver deinitialization
+Date: Thu, 25 Nov 2010 17:22:31 +0200
+Message-Id: <1290698551-8706-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1290698551-8706-1-git-send-email-luiz.dentz@gmail.com>
+References: <1290698551-8706-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -12,11 +14,11 @@ From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 Remove all match rules and unregister its interface when telephony_exit
 is called.
 ---
- audio/telephony-maemo6.c |  168 +++++++++++++++++++++++----------------------
- 1 files changed, 86 insertions(+), 82 deletions(-)
+ audio/telephony-maemo6.c |  198 +++++++++++++++++++++++++++-------------------
+ 1 files changed, 116 insertions(+), 82 deletions(-)
 
 diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 72c8e36..2e01fb1 100644
+index 72c8e36..542fab9 100644
 --- a/audio/telephony-maemo6.c
 +++ b/audio/telephony-maemo6.c
 @@ -149,6 +149,7 @@ static int get_property(const char *iface, const char *prop);
@@ -104,23 +106,12 @@ index 72c8e36..2e01fb1 100644
  	if (dbus_message_is_signal(msg, CSD_CALL_INTERFACE, "Coming"))
  		handle_incoming_call(msg);
  	else if (dbus_message_is_signal(msg, CSD_CALL_INTERFACE, "Created"))
-@@ -1934,7 +1879,67 @@ static DBusHandlerResult signal_filter(DBusConnection *conn,
+@@ -1934,7 +1879,61 @@ static DBusHandlerResult signal_filter(DBusConnection *conn,
  						"modem_state_changed_ind"))
  		handle_modem_state(msg);
  
 -	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 +	return TRUE;
-+}
-+
-+static void add_watch(const char *sender, const char *path,
-+				const char *interface, const char *member)
-+{
-+	guint watch;
-+
-+	watch = g_dbus_add_signal_watch(connection, sender, path, interface,
-+					member, signal_filter, NULL, NULL);
-+
-+	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
 +}
 +
 +static void hal_find_device_reply(DBusPendingCall *call, void *user_data)
@@ -130,6 +121,7 @@ index 72c8e36..2e01fb1 100644
 +	DBusMessageIter iter, sub;
 +	const char *path;
 +	int type;
++	guint watch;
 +
 +	reply = dbus_pending_call_steal_reply(call);
 +
@@ -161,8 +153,12 @@ index 72c8e36..2e01fb1 100644
 +
 +	DBG("telephony-maemo6: found battery device at %s", path);
 +
-+	add_watch(NULL, path, "org.freedesktop.Hal.Device",
-+							"PropertyModified");
++	watch = g_dbus_add_signal_watch(connection, NULL, path,
++					"org.freedesktop.Hal.Device",
++					"PropertyModified", signal_filter,
++					NULL, NULL);
++
++	watches = g_slist_prepend(watches, GINT_TO_POINTER(watch));
 +
 +	hal_get_integer(path, "battery.charge_level.last_full", &battchg_last);
 +	hal_get_integer(path, "battery.charge_level.current", &battchg_cur);
@@ -173,12 +169,14 @@ index 72c8e36..2e01fb1 100644
  }
  
  int telephony_init(void)
-@@ -1948,30 +1953,17 @@ int telephony_init(void)
+@@ -1947,31 +1946,54 @@ int telephony_init(void)
+ 				AG_FEATURE_ENHANCED_CALL_CONTROL |
  				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
  				AG_FEATURE_THREE_WAY_CALLING;
- 
-+	DBG("");
++	guint watch;
 +
++	DBG("");
+ 
  	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
  
 -	if (!dbus_connection_add_filter(connection, signal_filter,
@@ -203,17 +201,52 @@ index 72c8e36..2e01fb1 100644
 -	dbus_bus_add_match(connection,
 -				"type=signal,interface=" SSC_DBUS_IFACE
 -				",member=modem_state_changed_ind", NULL);
-+	add_watch(NULL, NULL, CSD_CALL_INTERFACE, NULL);
-+	add_watch(NULL, NULL, CSD_CALL_INSTANCE, NULL);
-+	add_watch(NULL, NULL, CSD_CALL_CONFERENCE, NULL);
-+	add_watch(NULL, NULL, CSD_CSNET_REGISTRATION, NULL);
-+	add_watch(NULL, NULL, CSD_CSNET_OPERATOR, NULL);
-+	add_watch(NULL, NULL, CSD_CSNET_SIGNAL, NULL);
-+	add_watch(NULL, NULL, CSD_CSNET_SIGNAL, "modem_state_changed_ind");
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CALL_INTERFACE, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CALL_INSTANCE, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CALL_CONFERENCE, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CSNET_REGISTRATION, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CSNET_OPERATOR, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					CSD_CSNET_SIGNAL, NULL,
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
++
++	watch = g_dbus_add_signal_watch(connection, NULL, NULL,
++					SSC_DBUS_IFACE,
++					"modem_state_changed_ind",
++					signal_filter, NULL, NULL);
++
++	watches = g_slist_prepend(watches, GUINT_TO_POINTER(watch));
  
  	if (send_method_call(SSC_DBUS_NAME, SSC_DBUS_PATH, SSC_DBUS_IFACE,
  					"get_modem_state", modem_state_reply,
-@@ -2005,8 +1997,15 @@ int telephony_init(void)
+@@ -2005,8 +2027,15 @@ int telephony_init(void)
  	return 0;
  }
  
@@ -229,7 +262,7 @@ index 72c8e36..2e01fb1 100644
  	g_free(net.operator_name);
  	net.operator_name = NULL;
  
-@@ -2017,7 +2016,12 @@ void telephony_exit(void)
+@@ -2017,7 +2046,12 @@ void telephony_exit(void)
  	g_slist_free(calls);
  	calls = NULL;
  
