@@ -1,35 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Nov 2010 14:21:10 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Extend discover characteristic by UUID in gatttool to
- fetch all values
-Message-ID: <20101125122110.GA20559@jh-x301>
-References: <1290515839-11867-1-git-send-email-sheldon.demario@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290515839-11867-1-git-send-email-sheldon.demario@openbossa.org>
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH] Fix crash after simultaneous authentication requests
+Date: Thu, 25 Nov 2010 11:06:55 +0100
+Message-Id: <1290679615-26273-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Previously simultaneous authentication requests to the same device caused
+bluetoothd crash. Now if ongoing authentication occurs error is returned,
+preventing from simultaneous requests to the same device.
+---
+ src/device.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-On Tue, Nov 23, 2010, Sheldon Demario wrote:
-> If the number of characteristics returned exceeds the MTU size, it will
-> be needed to ask for more data until the handle range is entirely
-> searched.
-> ---
->  attrib/gatttool.c |   24 +++++++++++++++++++++++-
->  1 files changed, 23 insertions(+), 1 deletions(-)
+diff --git a/src/device.c b/src/device.c
+index 7c421e3..4427cd4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2178,6 +2178,11 @@ int device_request_authentication(struct btd_device *device, auth_type_t type,
+ 	struct agent *agent;
+ 	int err;
+ 
++	if (device->authr) {
++		error("%s: authentication already requested", device->path);
++		return -EALREADY;
++	}
++
+ 	DBG("%s: requesting agent authentication", device->path);
+ 
+ 	agent = device_get_agent(device);
+-- 
+1.6.3.3
 
-Thanks.
-
-> +	if ((status == ATT_ECODE_ATTR_NOT_FOUND) &&
-> +			(char_data->start != opt_start))
-> +		goto done;
-
-No need for the extra () here. However, since it was the only issue I
-found I fixed it myself and pushed the patch upstream.
-
-Johan
