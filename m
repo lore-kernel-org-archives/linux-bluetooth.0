@@ -1,94 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CEFA3A4.7030806@atheros.com>
-Date: Fri, 26 Nov 2010 17:40:12 +0530
 From: Bala Shanmugam <sbalashanmugam@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Bala Shanmugam <sbalashanmugam@atheros.com>
+Subject: [PATCH v3] Bluetooth: Add new PID for Atheros 3011
+Date: Fri, 26 Nov 2010 17:35:46 +0530
+Message-ID: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Add new PID for Atheros 3011
-References: <1290766393-3801-1-git-send-email-sbalashanmugam@atheros.com> <1290770560.4795.12.camel@aeonflux>
-In-Reply-To: <1290770560.4795.12.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann wrote:
-> Hi Bala,
->
->   
->> Atheros 3011 has small sflash firmware and needs to be
->> blacklisted in transport driver to load actual firmware
->> in DFU driver.
->>     
->
-> please add an empty line here. The signed-off line should always be
-> separated from the commit message. The git am takes it literal as it is
-> and does not modify it.
->
->   
->> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
->> ---
->>  drivers/bluetooth/ath3k.c |    2 ++
->>  drivers/bluetooth/btusb.c |    3 +++
->>  2 files changed, 5 insertions(+), 0 deletions(-)
->>
->> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
->> index 128cae4..c70fb0b 100644
->> --- a/drivers/bluetooth/ath3k.c
->> +++ b/drivers/bluetooth/ath3k.c
->> @@ -35,6 +35,8 @@
->>  static struct usb_device_id ath3k_table[] = {
->>  	/* Atheros AR3011 */
->>  	{ USB_DEVICE(0x0CF3, 0x3000) },
->>     
->
-> For the sake of readability add another empty line here as well.
->
->   
->> +	/* Atheros AR3011 with sflash firmware*/
->> +	{ USB_DEVICE(0x0CF3, 0x3002) },
->>     
->
-> And for consistency, add another empty line here as well.
->
->   
->>  	{ }	/* Terminating entry */
->>  };
->>  
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index ab3894f..ca3fdc1 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -99,6 +99,9 @@ static struct usb_device_id blacklist_table[] = {
->>  	/* Broadcom BCM2033 without firmware */
->>  	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = BTUSB_IGNORE },
->>  
->> +	/* Atheros 3011 with sflash firmware */
->> +	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
->> +
->>  	/* Broadcom BCM2035 */
->>  	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
->>  	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
->>     
->
-> If this finally solves the mess with the firmware loading, then I am
-> fine with it. It looks clean and simple now.
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
-> Regards
->
-> Marcel
->
->
->   
-Yes Marcel it solves our problem.
-Probably, later if our customers wants to use different VID/PID,
-we might have to blacklist those.
-I have sent the updated patch.
+Atheros 3011 has small sflash firmware and needs to be
+blacklisted in transport driver to load actual firmware
+in DFU driver.
 
-Thanks for your comments.
+Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+---
+ drivers/bluetooth/ath3k.c |    4 ++++
+ drivers/bluetooth/btusb.c |    3 +++
+ 2 files changed, 7 insertions(+), 0 deletions(-)
 
-Regards,
-Bala.
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 128cae4..949ed09 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -35,6 +35,10 @@
+ static struct usb_device_id ath3k_table[] = {
+ 	/* Atheros AR3011 */
+ 	{ USB_DEVICE(0x0CF3, 0x3000) },
++
++	/* Atheros AR3011 with sflash firmware*/
++	{ USB_DEVICE(0x0CF3, 0x3002) },
++
+ 	{ }	/* Terminating entry */
+ };
+ 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ab3894f..ca3fdc1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -99,6 +99,9 @@ static struct usb_device_id blacklist_table[] = {
+ 	/* Broadcom BCM2033 without firmware */
+ 	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = BTUSB_IGNORE },
+ 
++	/* Atheros 3011 with sflash firmware */
++	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
++
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+-- 
+1.6.3.3
+
