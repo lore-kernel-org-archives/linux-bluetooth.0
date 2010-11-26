@@ -1,479 +1,405 @@
 Return-Path: <cyrus@holtmann.org>
-From: pavan_savoy@ti.com
-To: padovan@profusion.mobi, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pavan Savoy <pavan_savoy@ti.com>
-Subject: [PATCH v7] Bluetooth: btwilink driver
-Date: Fri, 26 Nov 2010 04:20:57 -0500
-Message-Id: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
+Message-ID: <4CEF74BA.4050807@nokia.com>
+Date: Fri, 26 Nov 2010 11:50:02 +0300
+From: Yuri Ershov <ext-yuri.ershov@nokia.com>
+MIME-Version: 1.0
+To: "ext Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: marcel@holtmann.org, davem@davemloft.net, jprvita@profusion.mobi,
+        linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
+        andrei.emeltchenko@nokia.com
+Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
+References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com> <20101125181614.GA25686@vigoh>
+In-Reply-To: <20101125181614.GA25686@vigoh>
+Content-Type: multipart/alternative;
+ boundary="------------060207040007000205080509"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Pavan Savoy <pavan_savoy@ti.com>
+This is a multi-part message in MIME format.
+--------------060207040007000205080509
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Marcel, Gustavo,
+ext Gustavo F. Padovan wrote:
+> Hi Yuri,
+>
+> * Yuri Ershov <ext-yuri.ershov@nokia.com> [2010-11-25 12:55:33 +0300]:
+>
+>   
+>> This patch is an addition to my previous patch for this issue.
+>> The problem is in resynchronization between two loops:
+>> 1. Main controlling loop (l2cap_connect_req, l2cap_config_req,
+>> l2cap_config_rsp, l2cap_disconnect_req, etc.)
+>> 2. Loop waiting of BT_CONNECTED state of socket (l2cap_sock_accept,
+>> bt_accept_dequeue, etc.).
+>> In case of fast sequence of connect/disconnect operations the loop #1
+>> makes several cycles, while the loop #2 only has time to make one
+>> cycle and it results crash.
+>>     
+>
+> What is the crash point? Can you provide a log?
+>
+>   
+Hello,
 
-comments attended to from v5 and v6,
+There are two situations depending on timing:
+1. Dereferencing in "bt_accept_unlink of NULL pointer bt_sk(sk)->parent 
+of already freed socket.
 
-1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPERM,
-Now I handle for EINPROGRESS - which is not really an error and
-return during all other error cases.
+[ 3555.897247] Unable to handle kernel NULL pointer dereference at virtual
+address 000000bc
+[ 3555.915039] pgd = cab9c000
+[ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
+[ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
+[ 3555.933044] last sysfs file:
+/sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+[ 3555.940734] Modules linked in: wl1271_spi iptable_filter ip_tables rfcomm
+sco l2cap xt_IDLETIMER x_tables arc4 ecb crc7 wl1271 mac80211 ]
+[ 3555.999786] CPU: 0    Not tainted  (2.6.32.21-13874-g67918ef #65)
+[ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+[ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+[ 3556.017303] pc : [<bf0007fc>]    lr : [<bf000870>]    psr: 68000153
+[ 3556.017333] sp : cfa7fea8  ip : df24a95c  fp : bee2eab4
+[ 3556.028869] r10: df24ac00  r9 : df24a800  r8 : c8231c00
+[ 3556.034118] r7 : df24ad5c  r6 : df24ad5c  r5 : df24a800  r4 : df24a95c
+[ 3556.040679] r3 : df24a95c  r2 : 00000000  r1 : 00000000  r0 : df24a800
+[ 3556.047241] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segment
+user
+[ 3556.054504] Control: 10c5387d  Table: 8ab9c019  DAC: 00000015
+[ 3556.060272] Process l2test (pid: 9298, stack limit = 0xcfa7e2e8)
+[ 3556.066314] Stack: (0xcfa7fea8 to 0xcfa80000)
+[ 3556.070709] fea0:                   7fffffff df24ac00 cfa7e000 00000001
+c8231c00 cfa7e000
+[ 3556.078948] fec0: bee2ea8c bf324df8 c04640e0 00000001 ca1bb0c0 c005c0b8
+c8231910 c8231910
+[ 3556.087158] fee0: c8231c00 00000005 00000000 c8231900 bee2ea6c c026a0a8
+0000081f cfa7ffb0
+[ 3556.095397] ff00: 4019=4a4 4001e2e0 00001040 c002c2b4 da87e080 ca1bb0c0
+c041c5f8 00000002
+[ 3556.103607] ff20: 00000000 00000000 cfa7ff4c c005939c c041c5f8 da87e080
+000025a4 00000000
+[ 3556.111846] ff40: 00000000 00000000 cfa7ff64 c005c47c 00000000 60000053
+da87e080 01200011
+[ 3556.120086] ff60: bee2ea1c c005e290 df92c480 00000000 dfe6d9c0 df92c480
+00000000 c00cc0b4
+[ 3556.128295] ff80: 00000000 df92c500 dfe6d9c0 00000000 bee2ea8c bee2ea74
+0000011d c002cb24
+[ 3556.136535] ffa0: 000147c8 c002c9a0 00000000 bee2ea8c 00000003 bee2ea6c
+bee2ea8c 00000001
+[ 3556.144744] ffc0: 00000000 bem2ea8c bee2ea74 0000011d 00000005 00014800
+000147c8 bee2eab4
+[ 3556.152984] ffe0: bee2ea70 bee2ea20 00009f64 4012d6ec 40000050 00000003
+00000000 00000000
+[ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+[<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+[ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
+[<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap])
+[ 3556.184082] [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
+[<c026a0a8>] (sys_accept4+0x120/0x1e0)
+[ 3556.193969] [<c026a0a8>] (sys_accept4+0x120/0x1e0) from [<c002c9a0>]
+(ret_fast_syscall+0x0/0x2c)
+[ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc) 
+[ 3556.215393] ---[ end trace f11f032273933575 ]---
 
-2. _write is still a function pointer and not an exported function, I
-need to change the underlying driver's code for this.
-However, previous lkml comments on the underlying driver's code
-suggested it to be kept as a function pointer and not EXPORT.
-Gustavo, Marcel - Please comment on this.
-Is this absolutely required? If so why?
+This was partially fixed by Andrei Emeltchenko by checking of 
+sock_owned_by_user in l2cap_disconnect_req.
 
-3. test_and_set_bit of HCI_RUNNING is done at beginning of
-ti_st_open, and did not see issues during firmware download.
-However ideally I would still like to set HCI_RUNNING once the firmware
-download is done, because I don't want to allow a _send_frame during
-firmware download - Marcel, Gustavo - Please comment.
+2. Attempt of access to non-valid pointer of freed socket.
 
-4. test_and_clear of HCI_RUNNING now done @ beginning of close.
+[  997.846099] Unable to handle kernel paging request at virtual address
+65756c62
+[  997.853424] pgd = b2680000
+[  997.856140] [65756c62] *pgd=00000000
+[  997.859771] Internal error: Oops: 5 [#1] PREEMPT
+[  997.864410] last sysfs file:
+/sys/devices/platform/i2c_omap.2/i2c-2/2-0032/engine1_mode
+[  997.872467] Modules linked in: rfcomm sco xt_IDLETIMER x_tables l2cap arc4
+ecb wl1271_spi crc7 wl1271 mac80211 cfg80211 pn_pep as3645a ad58xx smiapp
+smiaregs board_rm680_camera omap3_isp v4l2_common iovmm omap3_iommu g_nokia
+iommu2 iommu fuse mtdswap mtd_blkdevs bridgedriver omaplfb iphb uinput
+cmt_speech ssi_protocol cmt hsi_char phonet radio_wl1273 hci_h4p videodev
+pvrsrvkm omap_ssi lis3lv02d_i2c mailbox_mach twl5031_aci lis3lv02d
+hid_twl4030_vibra leds_lp5523 rtc_twl4030 mailbox media bcm4751_gps ak8974
+bhsfh led_class rtc_core input_polldev twl4030_pwrbutton twl4030_keypad
+gpio_keys eci ff_memless bluetooth [last unloaded: g_file_storage]
+[  997.930175] CPU: 0    Not tainted  (2.6.32.23-13390-g03b424f #314)
+[  997.936401] PC is at release_sock+0x5c/0xe4
+[  997.940612] LR is at release_sock+0x18/0xe4
+[  997.944793] pc : [<b02868d4>]    lr : [<b0286890>]    psr: 60000053
+[  997.944824] sp : ba17de88  ip : 00000000  fp : aeff5ab4
+[  997.956359] r10: ba16d000  r9 : b33b0c00  r8 : c545d300
+[  997.961608] r7 : 65756c62  r6 : ba17c000  r5 : b33b0c00  r4 : b33b0c00
+[  997.968170] r3 : 00000000  r2 : ba17c000  r1 : 00000000  r0 : b33b0c00
+[  997.974731] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segment
+user
+[  997.981964] Control: 10c5387d  Table: 82680019  DAC: 00000015
+[  997.987762] Process l2test (pid: 3973, stack limit = 0xba17c2e8)
+[  997.993774] Stack: (0xba17de88 to 0xba17e000)
+[  997.998168] de80:                   b33b0c00 b33b0d5c ba16d15c b33b0d5c
+c545d300 af000c2c
+[  998.006378] dea0: ba17c000 ba16d000 7fffffff 00000001 00000000 ba17c000
+c545d300 af16fac4
+[  998.014617] dec0: b032d040 00000001 b27416c0 b006427c c545d610 c545d610
+00000005 c545d300
+[  998.022827] dee0: 00000005 00000000 c545d600 aeff5a6c aeff5a8c b028590c
+0000081f ba17dfb0
+[  998.031066] df00: 3ac5d490 00001258 3ac5e264 b002d2b4 b2742080 b27416c0
+b044c600 00000003
+[  998.039276] df20: 00000000 00000000 ba17df4c b00617d8 b044c600 b2742080
+000015f1 00000000
+[  998.047515] df40: 00000000 00000000 ba17df64 b0064600 00000000 60000053
+b2742080 01200011
+[  998.055725] df60: aeff5a14 b0066420 cbad2700 00000000 b6e98780 cbad2700
+00000000 b00d4698
+[  998.063934] df80: 00000000 cbad2480 b6e98780 00015214 000151e0 00000003
+0000011d b002db24
+[  998.072174] dfa0: aeff5a8c b002d9a0 00015214 000151e0 00000003 aeff5a6c
+aeff5a8c 0000000c
+[  998.080383] dfc0: 00015214 000151e0 00000003 0000011d 00000000 aeff5a74
+aeff5a8c aeff5ab4
+[  998.088623] dfe0: aeff5a6c aeff5a18 0000a6f8 3abee76c 40000050 00000003
+00000000 00000000
+[  998.096923] [<b02868d4>] (release_sock+0x5c/0xe4) from [<af000c2c>]
+(bt_accept_dequeue+0xec/0x13c [bluetooth])
+[  998.107055] [<af000c2c>] (bt_accept_dequeue+0xec/0x13c [bluetooth]) from
+[<af16fac4>] (l2cap_sock_accept+0x148/0x234 [l2cap])
+[  998.118469] [<af16fac4>] (l2cap_sock_accept+0x148/0x234 [l2cap]) from
+[<b028590c>] (sys_accept4+0x120/0x1e0)
+[  998.128356] [<b028590c>] (sys_accept4+0x120/0x1e0) from [<b002d9a0>]
+(ret_fast_syscall+0x0/0x2c)
+[  998.137207] Code: e5963000 e3130002 0a000000 eb01f2d8 (e5974000) 
+[  998.143341] ---[ end trace 2b5f71a75cc62b96 ]---
+[  998.148010] Kernel panic - not syncing: Fatal exception in interrupt
+[  998.154418] [<b003266c>] (unwind_backtrace+0x0/0x150) from [<b0302cec>]
+(panic+0x58/0x130)
+[  998.162750] [<b0302cec>] (panic+0x58/0x130) from [<b003107c>]
+(die+0x27c/0x2b8)
+[  998.170135] [<b003107c>] (die+0x27c/0x2b8) from [<b0033530>]
+(__do_kernel_fault+0x64/0x74)
+[  998.178466] [<b0033530>] (__do_kernel_fault+0x64/0x74) from [<b03070b8>]
+(do_page_fault+0x240/0x258)
+[  998.187683] [<b03070b8>] (do_page_fault+0x240/0x258) from [<b002d2b4>]
+(do_DataAbort+0x34/0x94)
+[  998.196441] [<b002d2b4>] (do_DataAbort+0x34/0x94) from [<b030522c>]
+(__dabt_svc+0x4c/0x60)
+[  998.204772] Exception stack(0xba17de40 to 0xba17de88)
+[  998.209838] de40: b33b0c00 00000000 ba17c000 00000000 b33b0c00 b33b0c00
+ba17c000 65756c62
+[  998.218078] de60: c545d300 b33b0c00 ba16d000 aeff5ab4 00000000 ba17de88
+b0286890 b02868d4
+[  998.226318] de80: 60000053 ffffffff
+[  998.229858] [<b030522c>] (__dabt_svc+0x4c/0x60) from [<b02868d4>]
+(release_sock+0x5c/0xe4)
+[  998.238220] [<b02868d4>] (release_sock+0x5c/0xe4) from [<af000c2c>]
+(bt_accept_dequeue+0xec/0x13c [bluetooth])
+[  998.248352] [<af000c2c>] (bt_accept_dequeue+0xec/0x13c [bluetooth]) from
+[<af16fac4>] (l2cap_sock_accept+0x148/0x234 [l2cap])
+[  998.259765] [<af16fac4>] (l2cap_sock_accept+0x148/0x234 [l2cap]) from
+[<b028590c>] (sys_accept4+0x120/0x1e0)
+[  998.269653] [<b028590c>] (sys_accept4+0x120/0x1e0) from [<b002d9a0>]
+(ret_fast_syscall+0x0/0x2c)
 
-5. EAGAIN on failure of st_write is to suggest to try and write again.
-I have never this happen - However only if UART goes bad this case may
-occur.
 
-6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
-fact the code is pretty much borrowed from there.
-Marcel, Gustavo - Please suggest where should it be done? If not here.
+Regards,
+Yuri
 
-7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fails.
 
-8. platform_driver registration inside module_init now is similar to
-other drivers.
+--------------060207040007000205080509
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-9. Dan Carpenter's comments on leaking hst memory on failed
-hci_register_dev and empty space after quotes in debug statements
-fixed.
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+ext Gustavo F. Padovan wrote:
+<blockquote cite="mid:20101125181614.GA25686@vigoh" type="cite">
+  <pre wrap="">Hi Yuri,
 
-Thanks for the comments...
-Sorry, for previously not being very clear on which comments were
-handled and which were not.
+* Yuri Ershov <a class="moz-txt-link-rfc2396E" href="mailto:ext-yuri.ershov@nokia.com">&lt;ext-yuri.ershov@nokia.com&gt;</a> [2010-11-25 12:55:33 +0300]:
 
--- patch description --
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">This patch is an addition to my previous patch for this issue.
+The problem is in resynchronization between two loops:
+1. Main controlling loop (l2cap_connect_req, l2cap_config_req,
+l2cap_config_rsp, l2cap_disconnect_req, etc.)
+2. Loop waiting of BT_CONNECTED state of socket (l2cap_sock_accept,
+bt_accept_dequeue, etc.).
+In case of fast sequence of connect/disconnect operations the loop #1
+makes several cycles, while the loop #2 only has time to make one
+cycle and it results crash.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+What is the crash point? Can you provide a log?
 
-This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-Texas Instrument's WiLink chipsets combine wireless technologies
-like BT, FM, GPS and WLAN onto a single chip.
+  </pre>
+</blockquote>
+Hello,<br>
+<br>
+There are two situations depending on timing:<br>
+1. Dereferencing in "bt_accept_unlink of NULL pointer
+bt_sk(sk)-&gt;parent of already freed socket.<br>
+<pre class="bz_comment_text" id="comment_text_0">[ 3555.897247] Unable to handle kernel NULL pointer dereference at virtual
+address 000000bc
+[ 3555.915039] pgd = cab9c000
+[ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
+[ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
+[ 3555.933044] last sysfs file:
+/sys/devices/platform/hci_h4p/firmware/hci_h4p/loading
+[ 3555.940734] Modules linked in: wl1271_spi iptable_filter ip_tables rfcomm
+sco l2cap xt_IDLETIMER x_tables arc4 ecb crc7 wl1271 mac80211 ]
+[ 3555.999786] CPU: 0    Not tainted  (2.6.32.21-13874-g67918ef #65)
+[ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+[ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+[ 3556.017303] pc : [&lt;bf0007fc&gt;]    lr : [&lt;bf000870&gt;]    psr: 68000153
+[ 3556.017333] sp : cfa7fea8  ip : df24a95c  fp : bee2eab4
+[ 3556.028869] r10: df24ac00  r9 : df24a800  r8 : c8231c00
+[ 3556.034118] r7 : df24ad5c  r6 : df24ad5c  r5 : df24a800  r4 : df24a95c
+[ 3556.040679] r3 : df24a95c  r2 : 00000000  r1 : 00000000  r0 : df24a800
+[ 3556.047241] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segment
+user
+[ 3556.054504] Control: 10c5387d  Table: 8ab9c019  DAC: 00000015
+[ 3556.060272] Process l2test (pid: 9298, stack limit = 0xcfa7e2e8)
+[ 3556.066314] Stack: (0xcfa7fea8 to 0xcfa80000)
+[ 3556.070709] fea0:                   7fffffff df24ac00 cfa7e000 00000001
+c8231c00 cfa7e000
+[ 3556.078948] fec0: bee2ea8c bf324df8 c04640e0 00000001 ca1bb0c0 c005c0b8
+c8231910 c8231910
+[ 3556.087158] fee0: c8231c00 00000005 00000000 c8231900 bee2ea6c c026a0a8
+0000081f cfa7ffb0
+[ 3556.095397] ff00: 4019=4a4 4001e2e0 00001040 c002c2b4 da87e080 ca1bb0c0
+c041c5f8 00000002
+[ 3556.103607] ff20: 00000000 00000000 cfa7ff4c c005939c c041c5f8 da87e080
+000025a4 00000000
+[ 3556.111846] ff40: 00000000 00000000 cfa7ff64 c005c47c 00000000 60000053
+da87e080 01200011
+[ 3556.120086] ff60: bee2ea1c c005e290 df92c480 00000000 dfe6d9c0 df92c480
+00000000 c00cc0b4
+[ 3556.128295] ff80: 00000000 df92c500 dfe6d9c0 00000000 bee2ea8c bee2ea74
+0000011d c002cb24
+[ 3556.136535] ffa0: 000147c8 c002c9a0 00000000 bee2ea8c 00000003 bee2ea6c
+bee2ea8c 00000001
+[ 3556.144744] ffc0: 00000000 bem2ea8c bee2ea74 0000011d 00000005 00014800
+000147c8 bee2eab4
+[ 3556.152984] ffe0: bee2ea70 bee2ea20 00009f64 4012d6ec 40000050 00000003
+00000000 00000000
+[ 3556.161285] [&lt;bf0007fc&gt;] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+[&lt;bf000870&gt;] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+[ 3556.172729] [&lt;bf000870&gt;] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
+[&lt;bf324df8&gt;] (l2cap_sock_accept+0x100/0x15c [l2cap])
+[ 3556.184082] [&lt;bf324df8&gt;] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
+[&lt;c026a0a8&gt;] (sys_accept4+0x120/0x1e0)
+[ 3556.193969] [&lt;c026a0a8&gt;] (sys_accept4+0x120/0x1e0) from [&lt;c002c9a0&gt;]
+(ret_fast_syscall+0x0/0x2c)
+[ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc) 
+[ 3556.215393] ---[ end trace f11f032273933575 ]---
+</pre>
+This was partially fixed by Andrei Emeltchenko by checking of
+sock_owned_by_user in l2cap_disconnect_req. <br>
+<br>
+2. Attempt of access to non-valid pointer of freed socket. <br>
+<br>
+<pre class="bz_comment_text" id="comment_text_11">[  997.846099] Unable to handle kernel paging request at virtual address
+65756c62
+[  997.853424] pgd = b2680000
+[  997.856140] [65756c62] *pgd=00000000
+[  997.859771] Internal error: Oops: 5 [#1] PREEMPT
+[  997.864410] last sysfs file:
+/sys/devices/platform/i2c_omap.2/i2c-2/2-0032/engine1_mode
+[  997.872467] Modules linked in: rfcomm sco xt_IDLETIMER x_tables l2cap arc4
+ecb wl1271_spi crc7 wl1271 mac80211 cfg80211 pn_pep as3645a ad58xx smiapp
+smiaregs board_rm680_camera omap3_isp v4l2_common iovmm omap3_iommu g_nokia
+iommu2 iommu fuse mtdswap mtd_blkdevs bridgedriver omaplfb iphb uinput
+cmt_speech ssi_protocol cmt hsi_char phonet radio_wl1273 hci_h4p videodev
+pvrsrvkm omap_ssi lis3lv02d_i2c mailbox_mach twl5031_aci lis3lv02d
+hid_twl4030_vibra leds_lp5523 rtc_twl4030 mailbox media bcm4751_gps ak8974
+bhsfh led_class rtc_core input_polldev twl4030_pwrbutton twl4030_keypad
+gpio_keys eci ff_memless bluetooth [last unloaded: g_file_storage]
+[  997.930175] CPU: 0    Not tainted  (2.6.32.23-13390-g03b424f #314)
+[  997.936401] PC is at release_sock+0x5c/0xe4
+[  997.940612] LR is at release_sock+0x18/0xe4
+[  997.944793] pc : [&lt;b02868d4&gt;]    lr : [&lt;b0286890&gt;]    psr: 60000053
+[  997.944824] sp : ba17de88  ip : 00000000  fp : aeff5ab4
+[  997.956359] r10: ba16d000  r9 : b33b0c00  r8 : c545d300
+[  997.961608] r7 : 65756c62  r6 : ba17c000  r5 : b33b0c00  r4 : b33b0c00
+[  997.968170] r3 : 00000000  r2 : ba17c000  r1 : 00000000  r0 : b33b0c00
+[  997.974731] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segment
+user
+[  997.981964] Control: 10c5387d  Table: 82680019  DAC: 00000015
+[  997.987762] Process l2test (pid: 3973, stack limit = 0xba17c2e8)
+[  997.993774] Stack: (0xba17de88 to 0xba17e000)
+[  997.998168] de80:                   b33b0c00 b33b0d5c ba16d15c b33b0d5c
+c545d300 af000c2c
+[  998.006378] dea0: ba17c000 ba16d000 7fffffff 00000001 00000000 ba17c000
+c545d300 af16fac4
+[  998.014617] dec0: b032d040 00000001 b27416c0 b006427c c545d610 c545d610
+00000005 c545d300
+[  998.022827] dee0: 00000005 00000000 c545d600 aeff5a6c aeff5a8c b028590c
+0000081f ba17dfb0
+[  998.031066] df00: 3ac5d490 00001258 3ac5e264 b002d2b4 b2742080 b27416c0
+b044c600 00000003
+[  998.039276] df20: 00000000 00000000 ba17df4c b00617d8 b044c600 b2742080
+000015f1 00000000
+[  998.047515] df40: 00000000 00000000 ba17df64 b0064600 00000000 60000053
+b2742080 01200011
+[  998.055725] df60: aeff5a14 b0066420 cbad2700 00000000 b6e98780 cbad2700
+00000000 b00d4698
+[  998.063934] df80: 00000000 cbad2480 b6e98780 00015214 000151e0 00000003
+0000011d b002db24
+[  998.072174] dfa0: aeff5a8c b002d9a0 00015214 000151e0 00000003 aeff5a6c
+aeff5a8c 0000000c
+[  998.080383] dfc0: 00015214 000151e0 00000003 0000011d 00000000 aeff5a74
+aeff5a8c aeff5ab4
+[  998.088623] dfe0: aeff5a6c aeff5a18 0000a6f8 3abee76c 40000050 00000003
+00000000 00000000
+[  998.096923] [&lt;b02868d4&gt;] (release_sock+0x5c/0xe4) from [&lt;af000c2c&gt;]
+(bt_accept_dequeue+0xec/0x13c [bluetooth])
+[  998.107055] [&lt;af000c2c&gt;] (bt_accept_dequeue+0xec/0x13c [bluetooth]) from
+[&lt;af16fac4&gt;] (l2cap_sock_accept+0x148/0x234 [l2cap])
+[  998.118469] [&lt;af16fac4&gt;] (l2cap_sock_accept+0x148/0x234 [l2cap]) from
+[&lt;b028590c&gt;] (sys_accept4+0x120/0x1e0)
+[  998.128356] [&lt;b028590c&gt;] (sys_accept4+0x120/0x1e0) from [&lt;b002d9a0&gt;]
+(ret_fast_syscall+0x0/0x2c)
+[  998.137207] Code: e5963000 e3130002 0a000000 eb01f2d8 (e5974000) 
+[  998.143341] ---[ end trace 2b5f71a75cc62b96 ]---
+[  998.148010] Kernel panic - not syncing: Fatal exception in interrupt
+[  998.154418] [&lt;b003266c&gt;] (unwind_backtrace+0x0/0x150) from [&lt;b0302cec&gt;]
+(panic+0x58/0x130)
+[  998.162750] [&lt;b0302cec&gt;] (panic+0x58/0x130) from [&lt;b003107c&gt;]
+(die+0x27c/0x2b8)
+[  998.170135] [&lt;b003107c&gt;] (die+0x27c/0x2b8) from [&lt;b0033530&gt;]
+(__do_kernel_fault+0x64/0x74)
+[  998.178466] [&lt;b0033530&gt;] (__do_kernel_fault+0x64/0x74) from [&lt;b03070b8&gt;]
+(do_page_fault+0x240/0x258)
+[  998.187683] [&lt;b03070b8&gt;] (do_page_fault+0x240/0x258) from [&lt;b002d2b4&gt;]
+(do_DataAbort+0x34/0x94)
+[  998.196441] [&lt;b002d2b4&gt;] (do_DataAbort+0x34/0x94) from [&lt;b030522c&gt;]
+(__dabt_svc+0x4c/0x60)
+[  998.204772] Exception stack(0xba17de40 to 0xba17de88)
+[  998.209838] de40: b33b0c00 00000000 ba17c000 00000000 b33b0c00 b33b0c00
+ba17c000 65756c62
+[  998.218078] de60: c545d300 b33b0c00 ba16d000 aeff5ab4 00000000 ba17de88
+b0286890 b02868d4
+[  998.226318] de80: 60000053 ffffffff
+[  998.229858] [&lt;b030522c&gt;] (__dabt_svc+0x4c/0x60) from [&lt;b02868d4&gt;]
+(release_sock+0x5c/0xe4)
+[  998.238220] [&lt;b02868d4&gt;] (release_sock+0x5c/0xe4) from [&lt;af000c2c&gt;]
+(bt_accept_dequeue+0xec/0x13c [bluetooth])
+[  998.248352] [&lt;af000c2c&gt;] (bt_accept_dequeue+0xec/0x13c [bluetooth]) from
+[&lt;af16fac4&gt;] (l2cap_sock_accept+0x148/0x234 [l2cap])
+[  998.259765] [&lt;af16fac4&gt;] (l2cap_sock_accept+0x148/0x234 [l2cap]) from
+[&lt;b028590c&gt;] (sys_accept4+0x120/0x1e0)
+[  998.269653] [&lt;b028590c&gt;] (sys_accept4+0x120/0x1e0) from [&lt;b002d9a0&gt;]
+(ret_fast_syscall+0x0/0x2c)
+</pre>
+<br>
+Regards,<br>
+Yuri<br>
+<br>
+</body>
+</html>
 
-This Bluetooth driver works on top of the TI_ST shared transport
-line discipline driver which also allows other drivers like
-FM V4L2 and GPS character driver to make use of the same UART interface.
-
-Kconfig and Makefile modifications to enable the Bluetooth
-driver for Texas Instrument's WiLink 7 chipset.
-
-Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
----
- drivers/bluetooth/Kconfig    |   10 ++
- drivers/bluetooth/Makefile   |    1 +
- drivers/bluetooth/btwilink.c |  363 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 374 insertions(+), 0 deletions(-)
- create mode 100644 drivers/bluetooth/btwilink.c
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 02deef4..8e0de9a 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -219,4 +219,14 @@ config BT_ATH3K
- 	  Say Y here to compile support for "Atheros firmware download driver"
- 	  into the kernel or say M to compile it as module (ath3k).
- 
-+config BT_WILINK
-+	tristate "Texas Instruments WiLink7 driver"
-+	depends on TI_ST
-+	help
-+	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
-+	  combo devices. This makes use of shared transport line discipline
-+	  core driver to communicate with the BT core of the combo chip.
-+
-+	  Say Y here to compile support for Texas Instrument's WiLink7 driver
-+	  into the kernel or say M to compile it as module.
- endmenu
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 71bdf13..f4460f4 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -18,6 +18,7 @@ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
- obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
- obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-+obj-$(CONFIG_BT_WILINK)		+= btwilink.o
- 
- btmrvl-y			:= btmrvl_main.o
- btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-new file mode 100644
-index 0000000..71e69f8
---- /dev/null
-+++ b/drivers/bluetooth/btwilink.c
-@@ -0,0 +1,363 @@
-+/*
-+ *  Texas Instrument's Bluetooth Driver For Shared Transport.
-+ *
-+ *  Bluetooth Driver acts as interface between HCI core and
-+ *  TI Shared Transport Layer.
-+ *
-+ *  Copyright (C) 2009-2010 Texas Instruments
-+ *  Author: Raja Mani <raja_mani@ti.com>
-+ *	Pavan Savoy <pavan_savoy@ti.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <linux/platform_device.h>
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include <linux/ti_wilink_st.h>
-+
-+/* Bluetooth Driver Version */
-+#define VERSION               "1.0"
-+
-+/* Number of seconds to wait for registration completion
-+ * when ST returns PENDING status.
-+ */
-+#define BT_REGISTER_TIMEOUT   6000	/* 6 sec */
-+
-+/**
-+ * struct ti_st - driver operation structure
-+ * @hdev: hci device pointer which binds to bt driver
-+ * @reg_status: ST registration callback status
-+ * @st_write: write function provided by the ST driver
-+ *	to be used by the driver during send_frame.
-+ * @wait_reg_completion - completion sync between ti_st_open
-+ *	and ti_st_registration_completion_cb.
-+ */
-+struct ti_st {
-+	struct hci_dev *hdev;
-+	char reg_status;
-+	long (*st_write) (struct sk_buff *);
-+	struct completion wait_reg_completion;
-+};
-+
-+/* Increments HCI counters based on pocket ID (cmd,acl,sco) */
-+static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
-+{
-+	struct hci_dev *hdev = hst->hdev;
-+
-+	/* Update HCI stat counters */
-+	switch (pkt_type) {
-+	case HCI_COMMAND_PKT:
-+		hdev->stat.cmd_tx++;
-+		break;
-+
-+	case HCI_ACLDATA_PKT:
-+		hdev->stat.acl_tx++;
-+		break;
-+
-+	case HCI_SCODATA_PKT:
-+		hdev->stat.sco_tx++;
-+		break;
-+	}
-+}
-+
-+/* ------- Interfaces to Shared Transport ------ */
-+
-+/* Called by ST layer to indicate protocol registration completion
-+ * status.ti_st_open() function will wait for signal from this
-+ * API when st_register() function returns ST_PENDING.
-+ */
-+static void st_registration_completion_cb(void *priv_data, char data)
-+{
-+	struct ti_st *lhst = priv_data;
-+
-+	/* Save registration status for use in ti_st_open() */
-+	lhst->reg_status = data;
-+	/* complete the wait in ti_st_open() */
-+	complete(&lhst->wait_reg_completion);
-+}
-+
-+/* Called by Shared Transport layer when receive data is
-+ * available */
-+static long st_receive(void *priv_data, struct sk_buff *skb)
-+{
-+	struct ti_st *lhst = priv_data;
-+	int err;
-+
-+	if (!skb)
-+		return -EFAULT;
-+
-+	if (!lhst) {
-+		kfree_skb(skb);
-+		return -EFAULT;
-+	}
-+
-+	skb->dev = (void *) lhst->hdev;
-+
-+	/* Forward skb to HCI core layer */
-+	err = hci_recv_frame(skb);
-+	if (err < 0) {
-+		BT_ERR("Unable to push skb to HCI core(%d)", err);
-+		return err;
-+	}
-+
-+	lhst->hdev->stat.byte_rx += skb->len;
-+
-+	return 0;
-+}
-+
-+/* ------- Interfaces to HCI layer ------ */
-+/* protocol structure registered with shared transport */
-+static struct st_proto_s ti_st_proto = {
-+	.type = ST_BT,
-+	.recv = st_receive,
-+	.reg_complete_cb = st_registration_completion_cb,
-+};
-+
-+/* Called from HCI core to initialize the device */
-+static int ti_st_open(struct hci_dev *hdev)
-+{
-+	unsigned long timeleft;
-+	struct ti_st *hst;
-+	int err;
-+
-+	BT_DBG("%s %p", hdev->name, hdev);
-+	if (test_and_set_bit(HCI_RUNNING, &hdev->flags)) {
-+		BT_ERR("btwilink already opened");
-+		return -EBUSY;
-+	}
-+
-+	/* provide contexts for callbacks from ST */
-+	hst = hdev->driver_data;
-+	ti_st_proto.priv_data = hst;
-+
-+	err = st_register(&ti_st_proto);
-+	if (err == -EINPROGRESS) {
-+		/* ST is busy with either protocol registration or firmware
-+		 * download.
-+		 */
-+		/* Prepare wait-for-completion handler data structures.
-+		 */
-+		init_completion(&hst->wait_reg_completion);
-+
-+		/* Reset ST registration callback status flag , this value
-+		 * will be updated in ti_st_registration_completion_cb()
-+		 * function whenever it called from ST driver.
-+		 */
-+		hst->reg_status = -EINPROGRESS;
-+
-+		BT_DBG("waiting for registration completion signal from ST");
-+		timeleft = wait_for_completion_timeout
-+			(&hst->wait_reg_completion,
-+			 msecs_to_jiffies(BT_REGISTER_TIMEOUT));
-+		if (!timeleft) {
-+			clear_bit(HCI_RUNNING, &hdev->flags);
-+			BT_ERR("Timeout(%d sec),didn't get reg "
-+					"completion signal from ST",
-+					BT_REGISTER_TIMEOUT / 1000);
-+			return -ETIMEDOUT;
-+		}
-+
-+		/* Is ST registration callback called with ERROR status? */
-+		if (hst->reg_status != 0) {
-+			clear_bit(HCI_RUNNING, &hdev->flags);
-+			BT_ERR("ST registration completed with invalid "
-+					"status %d", hst->reg_status);
-+			return -EAGAIN;
-+		}
-+		err = 0;
-+	} else if (err != 0) {
-+		clear_bit(HCI_RUNNING, &hdev->flags);
-+		BT_ERR("st_register failed %d", err);
-+		return err;
-+	}
-+
-+	/* ti_st_proto.write is filled up by the underlying shared
-+	 * transport driver upon registration
-+	 */
-+	hst->st_write = ti_st_proto.write;
-+	if (!hst->st_write) {
-+		BT_ERR("undefined ST write function");
-+		clear_bit(HCI_RUNNING, &hdev->flags);
-+
-+		/* Undo registration with ST */
-+		err = st_unregister(ST_BT);
-+		if (err)
-+			BT_ERR("st_unregister() failed with error %d", err);
-+
-+		hst->st_write = NULL;
-+		return err;
-+	}
-+
-+	return err;
-+}
-+
-+/* Close device */
-+static int ti_st_close(struct hci_dev *hdev)
-+{
-+	int err;
-+	struct ti_st *hst = hdev->driver_data;
-+
-+	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
-+		return 0;
-+
-+	/* continue to unregister from transport */
-+	err = st_unregister(ST_BT);
-+	if (err)
-+		BT_ERR("st_unregister() failed with error %d", err);
-+
-+	hst->st_write = NULL;
-+
-+	return err;
-+}
-+
-+static int ti_st_send_frame(struct sk_buff *skb)
-+{
-+	struct hci_dev *hdev;
-+	struct ti_st *hst;
-+	long len;
-+
-+	hdev = (struct hci_dev *)skb->dev;
-+
-+	if (!test_bit(HCI_RUNNING, &hdev->flags))
-+		return -EBUSY;
-+
-+	hst = hdev->driver_data;
-+
-+	/* Prepend skb with frame type */
-+	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-+
-+	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type,
-+			skb->len);
-+
-+	/* Insert skb to shared transport layer's transmit queue.
-+	 * Freeing skb memory is taken care in shared transport layer,
-+	 * so don't free skb memory here.
-+	 */
-+	len = hst->st_write(skb);
-+	if (len < 0) {
-+		kfree_skb(skb);
-+		BT_ERR("ST write failed (%ld)", len);
-+		/* Try Again, would only fail if UART has gone bad */
-+		return -EAGAIN;
-+	}
-+
-+	/* ST accepted our skb. So, Go ahead and do rest */
-+	hdev->stat.byte_tx += len;
-+	ti_st_tx_complete(hst, bt_cb(skb)->pkt_type);
-+
-+	return 0;
-+}
-+
-+static void ti_st_destruct(struct hci_dev *hdev)
-+{
-+	BT_DBG("%s", hdev->name);
-+	kfree(hdev->driver_data);
-+}
-+
-+static int bt_ti_probe(struct platform_device *pdev)
-+{
-+	static struct ti_st *hst;
-+	struct hci_dev *hdev;
-+	int err;
-+
-+	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
-+	if (!hst)
-+		return -ENOMEM;
-+
-+	/* Expose "hciX" device to user space */
-+	hdev = hci_alloc_dev();
-+	if (!hdev) {
-+		kfree(hst);
-+		return -ENOMEM;
-+	}
-+
-+	BT_DBG("hdev %p", hdev);
-+
-+	hst->hdev = hdev;
-+	hdev->bus = HCI_UART;
-+	hdev->driver_data = hst;
-+	hdev->open = ti_st_open;
-+	hdev->close = ti_st_close;
-+	hdev->flush = NULL;
-+	hdev->send = ti_st_send_frame;
-+	hdev->destruct = ti_st_destruct;
-+	hdev->owner = THIS_MODULE;
-+
-+	err = hci_register_dev(hdev);
-+	if (err < 0) {
-+		BT_ERR("Can't register HCI device error %d", err);
-+		kfree(hst);
-+		hci_free_dev(hdev);
-+		return err;
-+	}
-+
-+	BT_DBG("HCI device registered (hdev %p)", hdev);
-+
-+	dev_set_drvdata(&pdev->dev, hst);
-+	return err;
-+}
-+
-+static int bt_ti_remove(struct platform_device *pdev)
-+{
-+	struct hci_dev *hdev;
-+	struct ti_st *hst = dev_get_drvdata(&pdev->dev);
-+
-+	if (!hst)
-+		return -EFAULT;
-+
-+	hdev = hst->hdev;
-+	ti_st_close(hdev);
-+	hci_unregister_dev(hdev);
-+
-+	hci_free_dev(hdev);
-+	kfree(hst);
-+
-+	dev_set_drvdata(&pdev->dev, NULL);
-+	return 0;
-+}
-+
-+static struct platform_driver btwilink_driver = {
-+	.probe = bt_ti_probe,
-+	.remove = bt_ti_remove,
-+	.driver = {
-+		.name = "btwilink",
-+		.owner = THIS_MODULE,
-+	},
-+};
-+
-+/* ------- Module Init/Exit interfaces ------ */
-+static int __init btwilink_init(void)
-+{
-+	BT_INFO("Bluetooth Driver for TI WiLink - Version %s", VERSION);
-+
-+	return platform_driver_register(&btwilink_driver);
-+}
-+
-+static void __exit btwilink_exit(void)
-+{
-+	platform_driver_unregister(&btwilink_driver);
-+}
-+
-+module_init(btwilink_init);
-+module_exit(btwilink_exit);
-+
-+/* ------ Module Info ------ */
-+
-+MODULE_AUTHOR("Raja Mani <raja_mani@ti.com>");
-+MODULE_DESCRIPTION("Bluetooth Driver for TI Shared Transport" VERSION);
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
--- 
-1.5.6.3
+--------------060207040007000205080509--
