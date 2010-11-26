@@ -1,46 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4CEFD855.6000503@ahsoftware.de>
+Date: Fri, 26 Nov 2010 16:55:01 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 26 Nov 2010 12:14:01 -0400
-Message-ID: <AANLkTi=_a1omXZdLXg_eEqDD7c0h=f0FgnTnxn1DvGDQ@mail.gmail.com>
-Subject: Re: [RFC 1/4] Bluetooth: clean up sco code
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ Shanmugamkamatchi Balashanmugam <Shanmugamkamatchi.Balashanmugam@Atheros.com>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Add new PID for Atheros 3011
+References: <1290766393-3801-1-git-send-email-sbalashanmugam@atheros.com> <1290770560.4795.12.camel@aeonflux> <4CEFA3A4.7030806@atheros.com> <4CEFD4D1.1040706@ahsoftware.de>
+In-Reply-To: <4CEFD4D1.1040706@ahsoftware.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Am 26.11.2010 16:40, schrieb Alexander Holler:
+> Hello,
+>
+> Am 26.11.2010 13:10, schrieb Bala Shanmugam:
+>> Marcel Holtmann wrote:
+>>> Hi Bala,
+>>>
+>>>> Atheros 3011 has small sflash firmware and needs to be
+>>>> blacklisted in transport driver to load actual firmware
+>>>> in DFU driver.
+>>>
+>>> please add an empty line here. The signed-off line should always be
+>>> separated from the commit message. The git am takes it literal as it is
+>>> and does not modify it.
+>>>
+>>>> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+>>>> ---
+>>>> drivers/bluetooth/ath3k.c | 2 ++
+>>>> drivers/bluetooth/btusb.c | 3 +++
+>>>> 2 files changed, 5 insertions(+), 0 deletions(-)
+>>>>
+>>>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+>>>> index 128cae4..c70fb0b 100644
+>>>> --- a/drivers/bluetooth/ath3k.c
+>>>> +++ b/drivers/bluetooth/ath3k.c
+>>>> @@ -35,6 +35,8 @@
+>>>> static struct usb_device_id ath3k_table[] = {
+>>>> /* Atheros AR3011 */
+>>>> { USB_DEVICE(0x0CF3, 0x3000) },
+>>>
+>>> For the sake of readability add another empty line here as well.
+>>>
+>>>> + /* Atheros AR3011 with sflash firmware*/
+>>>> + { USB_DEVICE(0x0CF3, 0x3002) },
+>
+> I don't understand this patch and starting bluetooth will fail here,
+> when that patch is applied (to 2.6.36.1):
+>
+> -----------
+> [ 118.395793] usb 1-1.3: new full speed USB device using orion-ehci and
+> address 4
+> [ 118.506262] usb 1-1.3: New USB device found, idVendor=0cf3,
+> idProduct=3000
+> [ 118.506280] usb 1-1.3: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=0
+> [ 118.654973] Bluetooth: Atheros AR30xx firmware driver ver 1.0
+> [ 119.072139] usbcore: registered new interface driver ath3k
+> [ 119.184499] usb 1-1.3: USB disconnect, address 4
+> [ 120.695642] usb 1-1.3: new full speed USB device using orion-ehci and
+> address 5
+> [ 120.806394] usb 1-1.3: New USB device found, idVendor=0cf3,
+> idProduct=3002
+> [ 120.806410] usb 1-1.3: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=0
+> [ 125.815007] ath3k_load_firmware: Can't change to loading configuration
+> err
+> [ 125.815096] ath3k: probe of 1-1.3:1.0 failed with error -5
+> -----------
+>
+> As I've understood it, the pid 0x3002 will only come up, when the
+> firmwire was already uploaded. So adding 0x3002 to ath3k seems to be wrong.
 
-On Fri, Nov 26, 2010 at 11:22 AM, Emeltchenko Andrei
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> @@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
->
->  static void sco_conn_ready(struct sco_conn *conn)
->  {
-> -       struct sock *parent, *sk;
-> +       struct sock *parent;
-> +       struct sock *sk = conn->sk;
+I assume bluetooth will fail here, because of the second part of that 
+patch which adds BTUSB_IGNORE to btusb.c:
 
-I wonder if there is a problem with accessing conn->sk here outside
-the lock protection?
+------------
++    /* Atheros 3011 with sflash firmware */
++    { USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+------------
 
->
->        BT_DBG("conn %p", conn);
->
->        sco_conn_lock(conn);
->
-> -       if ((sk = conn->sk)) {
-> +       if (sk) {
->                sco_sock_clear_timer(sk);
->                bh_lock_sock(sk);
->                sk->sk_state = BT_CONNECTED;
+This means when the firmware was uploaded and the device identifies 
+itself afterwards with the pid 0x3002, btusb will ignore it.
 
 Regards,
--- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+
+Alexander
