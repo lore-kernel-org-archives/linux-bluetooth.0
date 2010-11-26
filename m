@@ -1,79 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CEFD4D1.1040706@ahsoftware.de>
-Date: Fri, 26 Nov 2010 16:40:01 +0100
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- Shanmugamkamatchi Balashanmugam <Shanmugamkamatchi.Balashanmugam@Atheros.com>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Add new PID for Atheros 3011
-References: <1290766393-3801-1-git-send-email-sbalashanmugam@atheros.com> <1290770560.4795.12.camel@aeonflux> <4CEFA3A4.7030806@atheros.com>
-In-Reply-To: <4CEFA3A4.7030806@atheros.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 1/4] Bluetooth: clean up sco code
+Date: Fri, 26 Nov 2010 17:22:42 +0200
+Message-Id: <1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Am 26.11.2010 13:10, schrieb Bala Shanmugam:
-> Marcel Holtmann wrote:
->> Hi Bala,
->>
->>> Atheros 3011 has small sflash firmware and needs to be
->>> blacklisted in transport driver to load actual firmware
->>> in DFU driver.
->>
->> please add an empty line here. The signed-off line should always be
->> separated from the commit message. The git am takes it literal as it is
->> and does not modify it.
->>
->>> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
->>> ---
->>> drivers/bluetooth/ath3k.c | 2 ++
->>> drivers/bluetooth/btusb.c | 3 +++
->>> 2 files changed, 5 insertions(+), 0 deletions(-)
->>>
->>> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
->>> index 128cae4..c70fb0b 100644
->>> --- a/drivers/bluetooth/ath3k.c
->>> +++ b/drivers/bluetooth/ath3k.c
->>> @@ -35,6 +35,8 @@
->>> static struct usb_device_id ath3k_table[] = {
->>> /* Atheros AR3011 */
->>> { USB_DEVICE(0x0CF3, 0x3000) },
->>
->> For the sake of readability add another empty line here as well.
->>
->>> + /* Atheros AR3011 with sflash firmware*/
->>> + { USB_DEVICE(0x0CF3, 0x3002) },
+Do not use assignments in IF condition, clean extra spaces.
 
-I don't understand this patch and starting bluetooth will fail here, 
-when that patch is applied (to 2.6.36.1):
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ include/net/bluetooth/sco.h |   20 ++++++++++----------
+ net/bluetooth/sco.c         |   22 +++++++++++++---------
+ 2 files changed, 23 insertions(+), 19 deletions(-)
 
------------
-[  118.395793] usb 1-1.3: new full speed USB device using orion-ehci and 
-address 4
-[  118.506262] usb 1-1.3: New USB device found, idVendor=0cf3, 
-idProduct=3000
-[  118.506280] usb 1-1.3: New USB device strings: Mfr=0, Product=0, 
-SerialNumber=0
-[  118.654973] Bluetooth: Atheros AR30xx firmware driver ver 1.0
-[  119.072139] usbcore: registered new interface driver ath3k
-[  119.184499] usb 1-1.3: USB disconnect, address 4
-[  120.695642] usb 1-1.3: new full speed USB device using orion-ehci and 
-address 5
-[  120.806394] usb 1-1.3: New USB device found, idVendor=0cf3, 
-idProduct=3002
-[  120.806410] usb 1-1.3: New USB device strings: Mfr=0, Product=0, 
-SerialNumber=0
-[  125.815007] ath3k_load_firmware: Can't change to loading 
-configuration err
-[  125.815096] ath3k: probe of 1-1.3:1.0 failed with error -5
------------
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index e28a2a7..1e35c43 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -1,4 +1,4 @@
+-/* 
++/*
+    BlueZ - Bluetooth protocol stack for Linux
+    Copyright (C) 2000-2001 Qualcomm Incorporated
+ 
+@@ -12,13 +12,13 @@
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
+-   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
+-   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
+-   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
++   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ 
+-   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
+-   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
++   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
+    SOFTWARE IS DISCLAIMED.
+ */
+ 
+@@ -55,11 +55,11 @@ struct sco_conninfo {
+ struct sco_conn {
+ 	struct hci_conn	*hcon;
+ 
+-	bdaddr_t 	*dst;
+-	bdaddr_t 	*src;
+-	
++	bdaddr_t	*dst;
++	bdaddr_t	*src;
++
+ 	spinlock_t	lock;
+-	struct sock 	*sk;
++	struct sock	*sk;
+ 
+ 	unsigned int    mtu;
+ };
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 66b9e5c..960c6d1 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -44,7 +44,7 @@
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+-#include <asm/uaccess.h>
++#include <linux/uaccess.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -52,7 +52,7 @@
+ 
+ #define VERSION "0.6"
+ 
+-static int disable_esco = 0;
++static int disable_esco;
+ 
+ static const struct proto_ops sco_sock_ops;
+ 
+@@ -138,16 +138,17 @@ static inline struct sock *sco_chan_get(struct sco_conn *conn)
+ 
+ static int sco_conn_del(struct hci_conn *hcon, int err)
+ {
+-	struct sco_conn *conn;
++	struct sco_conn *conn = hcon->sco_data;
+ 	struct sock *sk;
+ 
+-	if (!(conn = hcon->sco_data))
++	if (!conn)
+ 		return 0;
+ 
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
+ 	/* Kill socket */
+-	if ((sk = sco_chan_get(conn))) {
++	sk = sco_chan_get(conn);
++	if (sk) {
+ 		bh_lock_sock(sk);
+ 		sco_sock_clear_timer(sk);
+ 		sco_chan_del(sk, err);
+@@ -185,7 +186,8 @@ static int sco_connect(struct sock *sk)
+ 
+ 	BT_DBG("%s -> %s", batostr(src), batostr(dst));
+ 
+-	if (!(hdev = hci_get_route(dst, src)))
++	hdev = hci_get_route(dst, src);
++	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+ 	hci_dev_lock_bh(hdev);
+@@ -510,7 +512,8 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
+ 	/* Set destination address and psm */
+ 	bacpy(&bt_sk(sk)->dst, &sa->sco_bdaddr);
+ 
+-	if ((err = sco_connect(sk)))
++	err = sco_connect(sk);
++	if (err)
+ 		goto done;
+ 
+ 	err = bt_sock_wait_state(sk, BT_CONNECTED,
+@@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
+ 
+ static void sco_conn_ready(struct sco_conn *conn)
+ {
+-	struct sock *parent, *sk;
++	struct sock *parent;
++	struct sock *sk = conn->sk;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+ 	sco_conn_lock(conn);
+ 
+-	if ((sk = conn->sk)) {
++	if (sk) {
+ 		sco_sock_clear_timer(sk);
+ 		bh_lock_sock(sk);
+ 		sk->sk_state = BT_CONNECTED;
+-- 
+1.7.1
 
-As I've understood it, the pid 0x3002 will only come up, when the 
-firmwire was already uploaded. So adding 0x3002 to ath3k seems to be wrong.
-
-Regards,
-
-Alexander
