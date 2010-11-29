@@ -1,56 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH] Attrib server should truncate attribute value to pdu length
-Date: Mon, 29 Nov 2010 07:44:22 -0500
-Message-Id: <1291034662-6138-1-git-send-email-sheldon.demario@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4CF38E4B.9070807@ahsoftware.de>
+Date: Mon, 29 Nov 2010 12:28:11 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
+CC: Shanmugamkamatchi Balashanmugam <Shanmugamkamatchi.Balashanmugam@Atheros.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Add new PID for Atheros 3011
+References: <1290766393-3801-1-git-send-email-sbalashanmugam@atheros.com> <1290770560.4795.12.camel@aeonflux> <4CEFA3A4.7030806@atheros.com> <4CEFD4D1.1040706@ahsoftware.de> <4CEFD855.6000503@ahsoftware.de> <4CF343A1.8010606@atheros.com>
+In-Reply-To: <4CF343A1.8010606@atheros.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the size of attribute value is greater than pdu size, it should be
-truncated to the pdu length - 2
----
- attrib/att.c |   15 +++++++--------
- 1 files changed, 7 insertions(+), 8 deletions(-)
+Am 29.11.2010 07:09, schrieb Bala Shanmugam:
 
-diff --git a/attrib/att.c b/attrib/att.c
-index 8655e5e..445b192 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -379,7 +379,7 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, int len, uint16_t *start,
- uint16_t enc_read_by_type_resp(struct att_data_list *list, uint8_t *pdu, int len)
- {
- 	uint8_t *ptr;
--	int i, w;
-+	int i, w, l;
- 
- 	if (list == NULL)
- 		return 0;
-@@ -387,17 +387,16 @@ uint16_t enc_read_by_type_resp(struct att_data_list *list, uint8_t *pdu, int len
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < list->len + 2)
--		return 0;
-+	l = MIN(len - 2, list->len);
- 
- 	pdu[0] = ATT_OP_READ_BY_TYPE_RESP;
--	pdu[1] = list->len;
-+	pdu[1] = l;
- 	ptr = &pdu[2];
- 
--	for (i = 0, w = 2; i < list->num && w + list->len <= len; i++) {
--		memcpy(ptr, list->data[i], list->len);
--		ptr += list->len;
--		w += list->len;
-+	for (i = 0, w = 2; i < list->num && w + l <= len; i++) {
-+		memcpy(ptr, list->data[i], l);
-+		ptr += l;
-+		w += l;
- 	}
- 
- 	return w;
--- 
-1.7.3.2
+> This patch is for Atheros 3011 with sflash firmware.
+> This device gets identified Generic bluetooth USB device when plugged in.
+> We are blacklisting 3002 in btusb to load actual firmware in ath3k.
+> Latest firmware comes up with PID 3005 and not 3002.
 
+Thanks for the explanation. Is there a place in the web where the latest 
+firmware could be found?
+
+The only place I've found to look at was the linux-firmware repository 
+and that repo currently has no new firmware for the ath3k.
+
+Btw., did you have a look at the small patch for ath3k I posted lately:
+
+http://marc.info/?l=linux-bluetooth&m=129045856314243
+
+This avoids storing the firmware in RAM (I don't see a reason to do 
+that, it is never used again) and simplifies the small driver a bit.
+
+Regards,
+
+Alexander
