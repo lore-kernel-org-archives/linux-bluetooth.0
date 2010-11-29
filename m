@@ -1,28 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Nov 2010 16:13:54 +0200
+Date: Mon, 29 Nov 2010 16:05:26 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix problem with fetching 0.vcf vCard entry
-Message-ID: <20101129141354.GA17807@jh-x301>
-References: <1291038716-7244-1-git-send-email-michalski.raf@gmail.com>
+Subject: Re: [PATCH] Emit Connect signal for LE capable devices
+Message-ID: <20101129140525.GA17558@jh-x301>
+References: <1290705769-15487-1-git-send-email-sheldon.demario@openbossa.org>
+ <20101129125208.GA15399@jh-x301>
+ <4CF3ABD4.6080809@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291038716-7244-1-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <4CF3ABD4.6080809@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Hi Sheldon,
 
-On Mon, Nov 29, 2010, Rafal Michalski wrote:
-> Previously after attempting to get single 0.vcf vCard entry from phonebook
-> ("telecom/pb/0.vcf") "Not Found" status was received and this entry wasn't
-> downloaded. Now "OK" status is received and valid 0.vcf vCard entry is
-> downloaded.
-> ---
->  plugins/phonebook-tracker.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Nov 29, 2010, Sheldon Demario wrote:
+> On 11/29/2010 07:52 AM, Johan Hedberg wrote:
+> >Hi Sheldon,
+> >
+> >On Thu, Nov 25, 2010, Sheldon Demario wrote:
+> >>+	if (le) {
+> >>+		evt_le_connection_complete *evt = ptr;
+> >>+		evt_bdaddr =&evt->peer_bdaddr;
+> >>+		evt_handle = evt->handle;
+> >>+		evt_status = evt->status;
+> >>+	}  else {
+> >>+		evt_conn_complete *evt = ptr;
+> >>+		evt_bdaddr =&evt->bdaddr;
+> >>+		evt_handle = evt->handle;
+> >>+		evt_status = evt->status;
+> >>+
+> >>+		if (evt->link_type != ACL_LINK)
+> >>+			return;
+> >>+	}
+> >Instead of this kind of trickery, I have a feeling that the code would
+> >be easier to read if you had a separate function for the LE connect
+> >complete. Could try try to come up with a patch that does it like that?
+> 
+> For sure, but don't you think that doing this way there will be a
+> lot of duplicated code?
 
-Pushed upstream. Thanks.
+There will be more code, but not a lot (I'm guessing 10 lines or so
+more). In the end readability & maintainability wins over that. It's
+also possible that we'll need more special casing for the LE events
+(e.g. wrt. random addresses) in the future so having it separate will
+help there too.
 
 Johan
