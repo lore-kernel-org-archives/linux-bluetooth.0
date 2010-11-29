@@ -1,51 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v3] Bluetooth: Fix error handling for l2cap_init()
-Date: Mon, 29 Nov 2010 12:15:50 -0400
-Message-Id: <1291047350-32126-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Mon, 29 Nov 2010 17:02:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Removed unused define
+Message-ID: <20101129150200.GA19157@jh-x301>
+References: <1291037054-22247-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291037054-22247-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
-this happens, the return value is not set to a negative value and the
-module load will succeed. It will then crash on module unload because of
-a destroy_workqueue() call on a NULL pointer.
+Hi Claudio,
 
-Additionally, the _busy_wq workqueue is not being destroyed if any
-errors happen on l2cap_init().
+On Mon, Nov 29, 2010, Claudio Takahasi wrote:
+> ---
+>  src/device.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/src/device.c b/src/device.c
+> index 77353a4..65acc08 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -57,7 +57,6 @@
+>  #include "storage.h"
+>  #include "btio.h"
+>  
+> -#define DEFAULT_XML_BUF_SIZE	1024
+>  #define DISCONNECT_TIMER	2
+>  #define DISCOVERY_TIMER		2
 
-Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
----
- net/bluetooth/l2cap.c |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+Pushed upstream. Thanks.
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 12b4aa2..a1c7ae8 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4871,8 +4871,10 @@ static int __init l2cap_init(void)
- 		return err;
- 
- 	_busy_wq = create_singlethread_workqueue("l2cap");
--	if (!_busy_wq)
--		goto error;
-+	if (!_busy_wq) {
-+		proto_unregister(&l2cap_proto);
-+		return -ENOMEM;
-+	}
- 
- 	err = bt_sock_register(BTPROTO_L2CAP, &l2cap_sock_family_ops);
- 	if (err < 0) {
-@@ -4900,6 +4902,7 @@ static int __init l2cap_init(void)
- 	return 0;
- 
- error:
-+	destroy_workqueue(_busy_wq);
- 	proto_unregister(&l2cap_proto);
- 	return err;
- }
--- 
-1.7.0.4
-
+Johan
