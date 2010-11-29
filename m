@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Nov 2010 19:21:39 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Implements primary service search when creating a
- device
-Message-ID: <20101129172139.GA23846@jh-x301>
-References: <1290565847-17382-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290565847-17382-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v3] Bluetooth: Fix error handling for l2cap_init()
+Date: Mon, 29 Nov 2010 12:15:50 -0400
+Message-Id: <1291047350-32126-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
+this happens, the return value is not set to a negative value and the
+module load will succeed. It will then crash on module unload because of
+a destroy_workqueue() call on a NULL pointer.
 
-On Wed, Nov 24, 2010, Claudio Takahasi wrote:
-> Discover primary services implemented inside the device entity to allow
-> proper integration of attribute plugin. Implements a single entry point
-> to the attribute plugin no matter the transport(BR/EDR or LE), the device
-> probe callback is called for both types.
-> 
-> Add a new function to discover all primary services without additional
-> calls to fetch the remaining primary services, sub-procedure iterations
-> is handled inside this function.
-> 
-> The next action are: clean the attribute client removing implicity service
-> and characteristics discovery, issue the Discover Primary Service based on
-> the remote properties and fetch the characteristic on demand.
-> ---
->  attrib/manager.c  |   27 +++-------
->  src/device.c      |  106 +++++++++++++++++++++++++++++++-------
->  src/glib-helper.c |  147 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  src/glib-helper.h |    5 ++
->  4 files changed, 246 insertions(+), 39 deletions(-)
+Additionally, the _busy_wq workqueue is not being destroyed if any
+errors happen on l2cap_init().
 
-All five patches have been pushed upstream. Thanks.
+Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+---
+ net/bluetooth/l2cap.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 12b4aa2..a1c7ae8 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -4871,8 +4871,10 @@ static int __init l2cap_init(void)
+ 		return err;
+ 
+ 	_busy_wq = create_singlethread_workqueue("l2cap");
+-	if (!_busy_wq)
+-		goto error;
++	if (!_busy_wq) {
++		proto_unregister(&l2cap_proto);
++		return -ENOMEM;
++	}
+ 
+ 	err = bt_sock_register(BTPROTO_L2CAP, &l2cap_sock_family_ops);
+ 	if (err < 0) {
+@@ -4900,6 +4902,7 @@ static int __init l2cap_init(void)
+ 	return 0;
+ 
+ error:
++	destroy_workqueue(_busy_wq);
+ 	proto_unregister(&l2cap_proto);
+ 	return err;
+ }
+-- 
+1.7.0.4
+
