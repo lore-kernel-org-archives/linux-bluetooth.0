@@ -1,54 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CF492C4.1000501@atheros.com>
-Date: Tue, 30 Nov 2010 11:29:32 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-To: Alexander Holler <holler@ahsoftware.de>
-CC: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>, Marcel Holtmann
-	<marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Add new PID for Atheros 3011
-References: <1290766393-3801-1-git-send-email-sbalashanmugam@atheros.com> <1290770560.4795.12.camel@aeonflux> <4CEFA3A4.7030806@atheros.com> <4CEFD4D1.1040706@ahsoftware.de> <4CEFD855.6000503@ahsoftware.de> <4CF343A1.8010606@atheros.com> <4CF38E4B.9070807@ahsoftware.de>
-In-Reply-To: <4CF38E4B.9070807@ahsoftware.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <AANLkTi=VPn1k=kLdo7QbM4epc88fdcW2XsbLyFeYt9y4@mail.gmail.com>
+References: <AANLkTi=k=Dvsm6fySREejtP3sf7Cch3G2KYr4sYpg2Q4@mail.gmail.com>
+	<AANLkTi=VPn1k=kLdo7QbM4epc88fdcW2XsbLyFeYt9y4@mail.gmail.com>
+Date: Mon, 29 Nov 2010 22:24:12 -0700
+Message-ID: <AANLkTim5Rnu1Jkh9BOq5oGL6mvFJcHydNDMJZDZD9hP_@mail.gmail.com>
+Subject: Re: wi2wi bluecore4
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Alexander Holler wrote:
-> Am 29.11.2010 07:09, schrieb Bala Shanmugam:
->
->   
->> This patch is for Atheros 3011 with sflash firmware.
->> This device gets identified Generic bluetooth USB device when plugged in.
->> We are blacklisting 3002 in btusb to load actual firmware in ath3k.
->> Latest firmware comes up with PID 3005 and not 3002.
->>     
->
-> Thanks for the explanation. Is there a place in the web where the latest 
-> firmware could be found?
->
-> The only place I've found to look at was the linux-firmware repository 
-> and that repo currently has no new firmware for the ath3k.
->
-> Btw., did you have a look at the small patch for ath3k I posted lately:
->
-> http://marc.info/?l=linux-bluetooth&m=129045856314243
->
-> This avoids storing the firmware in RAM (I don't see a reason to do 
-> that, it is never used again) and simplifies the small driver a bit.
->
-> Regards,
->
-> Alexander
->   
-Alex,
+Hey
 
-I am waiting for official release for the firmware and will upload the 
-same today or tomorrow.
-I had look at your patch its good.  I did these changes few months 
-before and it didn't work for me.
-I couldn't find time to debug it that time.
-Will test it now and update you.
+I think I am a little closer, just wanted to see if anyone has any ideas.
 
-Regards,
-Bala.
+I rebuilt bccmd so it would connect at 115k instead of 38k. Not sure
+why it's hardcoded if the chip cares (this chip refuses to respond at
+38k). In any case, now bccmd can set and reset the chip apparently:
+
+# cat pskey.psr
+// PSKEY_UART_BAUDRATE
+&01be = 0ebf
+// PSKEY_SCO_MAPPING
+&01ab = 0
+# bccmd.115 -t H4 -d /dev/ttyS1 psload -r pskey.psr
+Loading PSKEY_UART_BAUDRATE ... done
+Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
+#
+
+But the hciattach still fails with "Initialization timed out.". The
+chip returns a single byte...
+
+# strace -s 64 hciattach ttyS1 csr 921600 noflow
+...
+open("/dev/ttyS1", O_RDWR|O_NOCTTY)     = 3
+ioctl(3, TCFLSH, 0x2)                   = 0
+ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, TCFLSH, 0x2)                   = 0
+write(3, "\1\0\374\27\302\0\0\t\0\0\0\31(\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 27) = 27
+read(3, "\374", 1)                      = 1
+read(3, 0xbed819dc, 1)                  = ? ERESTARTSYS (To be restarted)
+--- SIGALRM (Alarm clock) @ 0 (0) ---
+
+What is the chip saying to us when we read \374? Why is hciattach
+initializing at 115k when i told it to use 921k? So I tried setting
+the init speed too:
+
+# strace -s 64 hciattach -s 921600 ttyS1 csr 921600 noflow
+...
+open("/dev/ttyS1", O_RDWR|O_NOCTTY)     = 3
+ioctl(3, TCFLSH, 0x2)                   = 0
+ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, SNDCTL_TMR_START or TCSETS, {B921600 -opost -isig -icanon
+-echo ...}) = 0
+ioctl(3, TCFLSH, 0x2)                   = 0
+write(3, "\1\0\374\27\302\0\0\t\0\0\0\31(\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 27) = 27
+read(3, 0xbeebf9cc, 1)                  = ? ERESTARTSYS (To be restarted)
+--- SIGALRM (Alarm clock) @ 0 (0) ---
+
+this time it didn't even get one junk byte. Is there anything else I can check?
+
+Brad
