@@ -1,31 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Fix interface name of modem states on maemo6 telephony driver
-Date: Tue, 30 Nov 2010 14:26:13 +0200
-Message-Id: <1291119975-9460-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 30 Nov 2010 13:50:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Populate adapter services list
+Message-ID: <20101130115036.GA3520@jh-x301>
+References: <AANLkTik7su9-KfW-+ZC-yc_SrXq+5K3PvZtu5kKxiJhG@mail.gmail.com>
+ <AANLkTimwgPtxRVKuDHT0DZa2MhqOqFFDKiEzAJ3opv_W@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimwgPtxRVKuDHT0DZa2MhqOqFFDKiEzAJ3opv_W@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Daniel,
 
----
- audio/telephony-maemo6.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Tue, Nov 30, 2010, Daniel Örstadius wrote:
+> In case service records have been added to bluetoothd before a new
+> adapter is registered, the records which are shared by all adapters
+> (indicated by having the address set to BDADDR_ANY) need to be added
+> to the services list of the new adapter. This patch adds a function
+> for this on adapter initialization.
+> 
+> The issue could be reproduced by running bluetoothd and obexd on a
+> PC and briefly removing the BT dongle. The service records from
+> obexd would not be present in the adapter's local list (which is
+> used to set the class of device).
+> ---
+>  src/adapter.c       |    1 +
+>  src/sdpd-database.c |   24 ++++++++++++++++++++++++
+>  src/sdpd.h          |    2 ++
+>  3 files changed, 27 insertions(+), 0 deletions(-)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 2e01fb1..0240957 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -1963,7 +1963,7 @@ int telephony_init(void)
- 	add_watch(NULL, NULL, CSD_CSNET_REGISTRATION, NULL);
- 	add_watch(NULL, NULL, CSD_CSNET_OPERATOR, NULL);
- 	add_watch(NULL, NULL, CSD_CSNET_SIGNAL, NULL);
--	add_watch(NULL, NULL, CSD_CSNET_SIGNAL, "modem_state_changed_ind");
-+	add_watch(NULL, NULL, SSC_DBUS_IFACE, "modem_state_changed_ind");
- 
- 	if (send_method_call(SSC_DBUS_NAME, SSC_DBUS_PATH, SSC_DBUS_IFACE,
- 					"get_modem_state", modem_state_reply,
--- 
-1.7.1
+Thanks. Pushed upstream after a few minor cosmetic changes.
 
+Johan
