@@ -1,104 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 30 Nov 2010 13:46:54 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: pavan_savoy@ti.com
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7] Bluetooth: btwilink driver
-Message-ID: <20101130154654.GE5919@vigoh>
-References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
+Date: Tue, 30 Nov 2010 15:06:56 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-input@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Kosina <jkosina@suse.cz>, Alan Ott <alan@signal11.us>
+Subject: Re: hidp_output_raw_report, HID_OUTPUT_REPORT and Sixaxis
+Message-Id: <20101130150656.e3353e6e.ospite@studenti.unina.it>
+In-Reply-To: <20101130145405.d8142bc3.ospite@studenti.unina.it>
+References: <20101130145405.d8142bc3.ospite@studenti.unina.it>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Tue__30_Nov_2010_15_06_56_+0100_GGlWyX5IX9lPn3/E"
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+--Signature=_Tue__30_Nov_2010_15_06_56_+0100_GGlWyX5IX9lPn3/E
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-* pavan_savoy@ti.com <pavan_savoy@ti.com> [2010-11-26 04:20:57 -0500]:
+On Tue, 30 Nov 2010 14:54:05 +0100
+Antonio Ospite <ospite@studenti.unina.it> wrote:
 
-> From: Pavan Savoy <pavan_savoy@ti.com>
-> 
-> Marcel, Gustavo,
-> 
-> comments attended to from v5 and v6,
-> 
-> 1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPERM,
-> Now I handle for EINPROGRESS - which is not really an error and
-> return during all other error cases.
-> 
-> 2. _write is still a function pointer and not an exported function, I
-> need to change the underlying driver's code for this.
-> However, previous lkml comments on the underlying driver's code
-> suggested it to be kept as a function pointer and not EXPORT.
-> Gustavo, Marcel - Please comment on this.
-> Is this absolutely required? If so why?
-> 
-> 3. test_and_set_bit of HCI_RUNNING is done at beginning of
-> ti_st_open, and did not see issues during firmware download.
-> However ideally I would still like to set HCI_RUNNING once the firmware
-> download is done, because I don't want to allow a _send_frame during
-> firmware download - Marcel, Gustavo - Please comment.
-> 
-> 4. test_and_clear of HCI_RUNNING now done @ beginning of close.
-> 
-> 5. EAGAIN on failure of st_write is to suggest to try and write again.
-> I have never this happen - However only if UART goes bad this case may
-> occur.
-> 
-> 6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
-> fact the code is pretty much borrowed from there.
-> Marcel, Gustavo - Please suggest where should it be done? If not here.
-> 
-> 7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fails.
-> 
-> 8. platform_driver registration inside module_init now is similar to
-> other drivers.
-> 
-> 9. Dan Carpenter's comments on leaking hst memory on failed
-> hci_register_dev and empty space after quotes in debug statements
-> fixed.
-> 
-> Thanks for the comments...
-> Sorry, for previously not being very clear on which comments were
-> handled and which were not.
-> 
-> -- patch description --
-> 
-> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> Texas Instrument's WiLink chipsets combine wireless technologies
-> like BT, FM, GPS and WLAN onto a single chip.
-> 
-> This Bluetooth driver works on top of the TI_ST shared transport
-> line discipline driver which also allows other drivers like
-> FM V4L2 and GPS character driver to make use of the same UART interface.
-> 
-> Kconfig and Makefile modifications to enable the Bluetooth
-> driver for Texas Instrument's WiLink 7 chipset.
-> 
-> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> ---
->  drivers/bluetooth/Kconfig    |   10 ++
->  drivers/bluetooth/Makefile   |    1 +
->  drivers/bluetooth/btwilink.c |  363 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 374 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/bluetooth/btwilink.c
+> Hi,
+>=20
+> another piece in the Sixaxis jigsaw:
+> in commit d4bfa033ed84e0ae446eff445d107ffd5ee78df3 support for setting
+> different report types was added to hidp, however in my Sixaxis
+> experiments setting leds (sending and output report) was not working
 
-So as part of reviewing this I took a look at your underlying driver and
-I didn't like what I saw there, you are handling Bluetooth stuff inside
-the core driver and that is just wrong. You have a Bluetooth driver here
-then you have to leave the Bluetooth data handling to the Bluetooth
-driver and do not do that in the core. 
+sending _an_ output report.
 
-So I'm going to clear NACK this. Your TI ST driver architecture is
-a mess, Ideally you should not have any #include <net/bluetoooth/...>
-there. Implement a core driver that only gets the Shared Transport
-data and pass it to the right driver without look into the data and
-process it. Process the data is not the role of the core driver.
+Regards,
+   Antonio
 
-Please fix this and come back when you have a proper solution for your
-driver.
+--=20
+Antonio Ospite
+http://ao2.it
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Tue__30_Nov_2010_15_06_56_+0100_GGlWyX5IX9lPn3/E
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkz1BQAACgkQ5xr2akVTsAEm/wCgkL4VAn34F4x9HQnxxS6vHwCK
+orIAnArtcp6RowYIazzZmYfYpQ5Fb8cu
+=9RFs
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__30_Nov_2010_15_06_56_+0100_GGlWyX5IX9lPn3/E--
