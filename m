@@ -1,77 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+CC: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH 1/2] Sim Access Profile API
+Date: Tue, 30 Nov 2010 11:36:04 +0100
+Message-ID: <1291113364-6401-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1291113364-6401-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1291113364-6401-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Date: Tue, 30 Nov 2010 11:51:53 +0200
-Message-ID: <AANLkTik7su9-KfW-+ZC-yc_SrXq+5K3PvZtu5kKxiJhG@mail.gmail.com>
-Subject: [PATCH] Populate adapter services list
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00163630f7116e25710496422317
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00163630f7116e25710496422317
-Content-Type: text/plain; charset=ISO-8859-1
+New API for Sim Access Profile.
+---
+ Makefile.am     |    2 +-
+ doc/sap-api.txt |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 1 deletions(-)
+ create mode 100644 doc/sap-api.txt
 
-Attaching patch proposal for review.
-
-/Daniel
-
---00163630f7116e25710496422317
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Populate-adapter-services-list.patch"
-Content-Disposition: attachment;
-	filename="0001-Populate-adapter-services-list.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gh4ly9320
-
-RnJvbSBhYTliMmEzNDdkMTlmNTA1NzVlNmIyODY0ZjUwM2U5ZDQ1NDAzNjljIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCAzMCBOb3YgMjAxMCAxMTo0MjowOCArMDIwMApTdWJqZWN0OiBb
-UEFUQ0hdIFBvcHVsYXRlIGFkYXB0ZXIgc2VydmljZXMgbGlzdAoKSW4gY2FzZSB0aGF0IHNlcnZp
-Y2UgcmVjb3JkcyBoYXZlIGJlZW4gYWRkZWQgdG8gYmx1ZXRvb3RoZCBiZWZvcmUKYSBuZXcgYWRh
-cHRlciBpcyByZWdpc3RlcmVkLCB0aGUgYWRkZWQgcmVjb3JkcyB3aGljaCBhcmUgc2hhcmVkIGJ5
-CmFsbCBhZGFwdGVycyAoaW5kaWNhdGVkIGJ5IGhhdmluZyBhbiBhZGRyZXNzIHNldCB0byBCREFE
-RFJfQU5ZKQpuZWVkIHRvIGJlIGFkZGVkIHRvIHRoZSBzZXJ2aWNlcyBsaXN0IG9mIHRoZSBuZXcg
-YWRhcHRlci4gVGhpcwpwYXRjaCBhZGRzIGEgZnVuY3Rpb24gZm9yIHRoaXMgb24gYWRhcHRlciBp
-bml0aWFsaXphdGlvbi4KClRoZSBpc3N1ZSBjb3VsZCBiZSByZXByb2R1Y2VkIGJ5IHJ1bm5pbmcg
-Ymx1ZXRvb3RoZCBhbmQgb2JleGQgb24gYQpQQyBhbmQgYnJpZWZseSByZW1vdmluZyB0aGUgQlQg
-ZG9uZ2xlLiBUaGUgc2VydmljZSByZWNvcmRzIGZyb20Kb2JleGQgd291bGQgbm90IGJlIHByZXNl
-bnQgaW4gdGhlIGFkYXB0ZXIncyBsb2NhbCBsaXN0ICh3aGljaCBpcwp1c2VkIHRvIHNldCB0aGUg
-Y2xhc3Mgb2YgZGV2aWNlKS4KLS0tCiBzcmMvYWRhcHRlci5jICAgICAgIHwgICAgMSArCiBzcmMv
-c2RwZC1kYXRhYmFzZS5jIHwgICA0MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrCiBzcmMvc2RwZC5oICAgICAgICAgIHwgICAgMiArKwogMyBmaWxlcyBjaGFuZ2Vk
-LCA0NiBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFw
-dGVyLmMgYi9zcmMvYWRhcHRlci5jCmluZGV4IDk5OWYzNjkuLjdkMDUwOTggMTAwNjQ0Ci0tLSBh
-L3NyYy9hZGFwdGVyLmMKKysrIGIvc3JjL2FkYXB0ZXIuYwpAQCAtMjMxOSw2ICsyMzE5LDcgQEAg
-cHJvY2VlZDoKIAkJcmV0dXJuIGVycjsKIAogCWlmIChhZGFwdGVyLT5pbml0aWFsaXplZCA9PSBG
-QUxTRSkgeworCQlzZHBfcG9wdWxhdGVfc2VydmljZXMoJmFkYXB0ZXItPmJkYWRkcik7CiAJCWxv
-YWRfZHJpdmVycyhhZGFwdGVyKTsKIAkJY2xlYXJfYmxvY2tlZChhZGFwdGVyKTsKIAkJbG9hZF9k
-ZXZpY2VzKGFkYXB0ZXIpOwpkaWZmIC0tZ2l0IGEvc3JjL3NkcGQtZGF0YWJhc2UuYyBiL3NyYy9z
-ZHBkLWRhdGFiYXNlLmMKaW5kZXggZGEzYmM3ZC4uMTExMzcxZCAxMDA2NDQKLS0tIGEvc3JjL3Nk
-cGQtZGF0YWJhc2UuYworKysgYi9zcmMvc2RwZC1kYXRhYmFzZS5jCkBAIC04MSw2ICs4MSwxOSBA
-QCBzdGF0aWMgaW50IGFjY2Vzc19zb3J0KGNvbnN0IHZvaWQgKnIxLCBjb25zdCB2b2lkICpyMikK
-IAlyZXR1cm4gcmVjMS0+aGFuZGxlIC0gcmVjMi0+aGFuZGxlOwogfQogCitzdGF0aWMgaW50IGZp
-bmRfZGV2aWNlKGNvbnN0IHZvaWQgKnIxLCBjb25zdCB2b2lkICpyMikKK3sKKwljb25zdCBzZHBf
-YWNjZXNzX3QgKnJlYzEgPSByMTsKKwljb25zdCBzZHBfYWNjZXNzX3QgKnJlYzIgPSByMjsKKwor
-CWlmICghcmVjMSB8fCAhcmVjMikgeworCQllcnJvcigiTlVMTCBSRUNPUkQgTElTVCBGQVRBTCIp
-OworCQlyZXR1cm4gLTE7CisJfQorCisJcmV0dXJuIGJhY21wKCZyZWMxLT5kZXZpY2UsICZyZWMy
-LT5kZXZpY2UpOworfQorCiBzdGF0aWMgdm9pZCBhY2Nlc3NfZnJlZSh2b2lkICpwKQogewogCWZy
-ZWUocCk7CkBAIC0zMDYsMyArMzE5LDMzIEBAIHVpbnQzMl90IHNkcF9uZXh0X2hhbmRsZSh2b2lk
-KQogCiAJcmV0dXJuIGhhbmRsZTsKIH0KKwordm9pZCBzZHBfcG9wdWxhdGVfc2VydmljZXMoYmRh
-ZGRyX3QgKmRldmljZSkKK3sKKwlzZHBfcmVjb3JkX3QgKnJlYzsKKwlzZHBfbGlzdF90ICpwOwor
-CXNkcF9hY2Nlc3NfdCByZWZfYWRyOworCXNkcF9hY2Nlc3NfdCAqYWNjZXNzOworCisJU0RQREJH
-KCIiKTsKKworCWlmICghYWNjZXNzX2RiKQorCQlyZXR1cm47CisKKwliYWNweSgmcmVmX2Fkci5k
-ZXZpY2UsIEJEQUREUl9BTlkpOworCXAgPSBzZHBfbGlzdF9maW5kKGFjY2Vzc19kYiwgJnJlZl9h
-ZHIsIGZpbmRfZGV2aWNlKTsKKworCXdoaWxlIChwKSB7CisJCWFjY2VzcyA9IChzZHBfYWNjZXNz
-X3QqKSAocC0+ZGF0YSk7CisKKwkJcmVjID0gc2RwX3JlY29yZF9maW5kKGFjY2Vzcy0+aGFuZGxl
-KTsKKworCQlpZiAocmVjKSB7CisJCQlTRFBEQkcoImFkZGluZyByZWNvcmQgd2l0aCBoYW5kbGUg
-JWQiLCBhY2Nlc3MtPmhhbmRsZSk7CisJCQlhZGFwdGVyX3NlcnZpY2VfaW5zZXJ0KGRldmljZSwg
-cmVjKTsKKwkJfQorCisJCXAgPSBwLT5uZXh0ID8KKwkJCShzZHBfbGlzdF9maW5kKHAtPm5leHQs
-ICZyZWZfYWRyLCBmaW5kX2RldmljZSkpIDogTlVMTDsKKwl9Cit9CmRpZmYgLS1naXQgYS9zcmMv
-c2RwZC5oIGIvc3JjL3NkcGQuaAppbmRleCBmOGU2ZWU3Li5iNjkwMzRhIDEwMDY0NAotLS0gYS9z
-cmMvc2RwZC5oCisrKyBiL3NyYy9zZHBkLmgKQEAgLTEwNiwzICsxMDYsNSBAQCBpbnQgcmVtb3Zl
-X3JlY29yZF9mcm9tX3NlcnZlcih1aW50MzJfdCBoYW5kbGUpOwogdm9pZCBjcmVhdGVfZXh0X2lu
-cXVpcnlfcmVzcG9uc2UoY29uc3QgY2hhciAqbmFtZSwKIAkJCQkJaW50OF90IHR4X3Bvd2VyLCBz
-ZHBfbGlzdF90ICpzZXJ2aWNlcywKIAkJCQkJdWludDhfdCAqZGF0YSk7CisKK3ZvaWQgc2RwX3Bv
-cHVsYXRlX3NlcnZpY2VzKGJkYWRkcl90ICpkZXZpY2UpOwotLSAKMS42LjAuNAoK
---00163630f7116e25710496422317--
+diff --git a/Makefile.am b/Makefile.am
+index 5f96975..97345a3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -354,7 +354,7 @@ EXTRA_DIST += doc/manager-api.txt \
+ 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
+ 		doc/serial-api.txt doc/network-api.txt \
+ 		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
+-		doc/hfp-api.txt doc/assigned-numbers.txt
++		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
+ 
+ AM_YFLAGS = -d
+ 
+diff --git a/doc/sap-api.txt b/doc/sap-api.txt
+new file mode 100644
+index 0000000..4e5626e
+--- /dev/null
++++ b/doc/sap-api.txt
+@@ -0,0 +1,47 @@
++BlueZ D-Bus Sim Access Profile API description
++***********************************
++
++Copyright (C) 2010 ST-Ericsson SA
++
++
++Sim Access Profile hierarchy
++============================
++
++Service		org.bluez
++Interface	org.bluez.SimAccess
++Object path	[variable prefix]/{hci0,hci1,...}
++
++Methods		void Disconnect()
++
++			Disconnects SAP client from the server.
++
++			Possible errors: org.bluez.Error.Failed
++
++		void SetProperty(string name, variant value)
++
++			Changes the value of the specified property. Only
++			properties that are listed a read-write are changeable.
++
++			Possible Errors: org.bluez.Error.DoesNotExist
++					 org.bluez.Error.InvalidArguments
++
++		dict GetProperties()
++
++			Return all properties for the interface. See the
++			properties section for available properties.
++
++			Possible Errors: org.bluez.Error.Failed
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++Properties	boolean Enabled [readwrite]
++
++			Set to true to start-up SAP server and register SDP record for
++			it. Set to false to shutdown SAP server and remove the SDP record.
++
++		boolean Connected [readonly]
++
++			Indicates if SAP client is connected to the server.
+-- 
+1.7.0.4
