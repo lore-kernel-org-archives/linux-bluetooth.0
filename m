@@ -1,99 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 30 Nov 2010 08:02:06 -0800
-Subject: RE: [PATCHv4 0/7] Support for out of band association model
-Message-ID: <35B17FE5076C7040809188FBE7913F98406D68CFAB@SC1EXMB-MBCL.global.atheros.com>
-References: <1290509592-9262-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1290509592-9262-1-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: pavan_savoy@sify.com
+In-Reply-To: <20101130154654.GE5919@vigoh>
+References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
+	<20101130154654.GE5919@vigoh>
+Date: Tue, 30 Nov 2010 21:30:47 +0530
+Message-ID: <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
+Subject: Re: [PATCH v7] Bluetooth: btwilink driver
+From: Pavan Savoy <pavan_savoy@ti.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Gustavo,
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Szymon Janc
-Sent: Tuesday, November 23, 2010 2:53 AM
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc
-Subject: [PATCHv4 0/7] Support for out of band association model
+On Tue, Nov 30, 2010 at 9:16 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi Pavan,
+>
+> * pavan_savoy@ti.com <pavan_savoy@ti.com> [2010-11-26 04:20:57 -0500]:
+>
+>> From: Pavan Savoy <pavan_savoy@ti.com>
+>>
+>> Marcel, Gustavo,
+>>
+>> comments attended to from v5 and v6,
+>>
+>> 1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPERM,
+>> Now I handle for EINPROGRESS - which is not really an error and
+>> return during all other error cases.
+>>
+>> 2. _write is still a function pointer and not an exported function, I
+>> need to change the underlying driver's code for this.
+>> However, previous lkml comments on the underlying driver's code
+>> suggested it to be kept as a function pointer and not EXPORT.
+>> Gustavo, Marcel - Please comment on this.
+>> Is this absolutely required? If so why?
+>>
+>> 3. test_and_set_bit of HCI_RUNNING is done at beginning of
+>> ti_st_open, and did not see issues during firmware download.
+>> However ideally I would still like to set HCI_RUNNING once the firmware
+>> download is done, because I don't want to allow a _send_frame during
+>> firmware download - Marcel, Gustavo - Please comment.
+>>
+>> 4. test_and_clear of HCI_RUNNING now done @ beginning of close.
+>>
+>> 5. EAGAIN on failure of st_write is to suggest to try and write again.
+>> I have never this happen - However only if UART goes bad this case may
+>> occur.
+>>
+>> 6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
+>> fact the code is pretty much borrowed from there.
+>> Marcel, Gustavo - Please suggest where should it be done? If not here.
+>>
+>> 7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fails.
+>>
+>> 8. platform_driver registration inside module_init now is similar to
+>> other drivers.
+>>
+>> 9. Dan Carpenter's comments on leaking hst memory on failed
+>> hci_register_dev and empty space after quotes in debug statements
+>> fixed.
+>>
+>> Thanks for the comments...
+>> Sorry, for previously not being very clear on which comments were
+>> handled and which were not.
+>>
+>> -- patch description --
+>>
+>> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+>> Texas Instrument's WiLink chipsets combine wireless technologies
+>> like BT, FM, GPS and WLAN onto a single chip.
+>>
+>> This Bluetooth driver works on top of the TI_ST shared transport
+>> line discipline driver which also allows other drivers like
+>> FM V4L2 and GPS character driver to make use of the same UART interface.
+>>
+>> Kconfig and Makefile modifications to enable the Bluetooth
+>> driver for Texas Instrument's WiLink 7 chipset.
+>>
+>> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+>> ---
+>> =C2=A0drivers/bluetooth/Kconfig =C2=A0 =C2=A0| =C2=A0 10 ++
+>> =C2=A0drivers/bluetooth/Makefile =C2=A0 | =C2=A0 =C2=A01 +
+>> =C2=A0drivers/bluetooth/btwilink.c | =C2=A0363 +++++++++++++++++++++++++=
++++++++++++++++++
+>> =C2=A03 files changed, 374 insertions(+), 0 deletions(-)
+>> =C2=A0create mode 100644 drivers/bluetooth/btwilink.c
+>
+> So as part of reviewing this I took a look at your underlying driver and
+> I didn't like what I saw there, you are handling Bluetooth stuff inside
+> the core driver and that is just wrong. You have a Bluetooth driver here
+> then you have to leave the Bluetooth data handling to the Bluetooth
+> driver and do not do that in the core.
 
-Changes in this version:
-  - code style/flow comments from Johan included
-  - changes in D-Bus OOB api - ReadLocalOobData and provider
-    register/unregister moved to adapter path (OobManager interface), provider
-    is registered per adapter now
-  - some bug fixes
+Thanks for reviewing this and the underlying driver.
+yes, we do have Bluetooth/FM/GPS handling inside the TI ST driver, on
+addition of further technologies
+we do plan to have them inside the ST driver too.
 
-Some things I'd like to collect comments about:
-  - OobManager interface could be only available on 2.1 or higher adapters
-    (this would require some adapter interface to be able check this in
-    dbusoob plugin)
-  - Agent's RequestPairing method name
-  - RequestPairing is called only on device accepting incoming connection when
-    it has OOB data for remote device (on RequestRemoteOobData event).
-    Consequence is that when only initiator has OOB data RequestPairing is not
-    called. We could store initiator's OOB capability in device structure (now
-    only auth and cap are stored) to be able to know if initiator has OOB data.
-    Yet, in such case RequestRemoteOobData on accepting device will not be 
-    called and I have no idea where/when OOB capability should be check to call
-    RequestPairing (and reject pairing if necessary)..
+The understanding of BT or FM or GPS is required for the ST driver
+because, the data coming from the chip
+can either be of these technologies, further-more the data might not
+come in a set.
+As in, an a2dp/ftp ACL frame might come in 2 frames instead of 1, and
+in other cases,
+there might be a HCI-EVENT + FM CH8 data in a single frame received by the =
+UART.
 
-[MTsai]7.7.44 Remote OOB Data Request Event.
-If host has received remote peer's OOB data before pairing, the host shall set the "OOB present" flag of the peer device. This "OOB present" flag will be sent over the air as part of pairing process with lmp_ioCap_Req or lmp_iocap_rsp.
-If either one of the devices have OOB data, then OOB shall be used to do the pairing.
-The event "Remote OOB Data Request Event" shall be sent to host before calculating the commitment value.
-The LM state machine shall call "device_request_oob_data" when either local or remote peer has "OOB data present". I think this part of the code is not present.
+> So I'm going to clear NACK this. Your TI ST driver architecture is
+> a mess, Ideally you should not have any #include <net/bluetoooth/...>
+> there. Implement a core driver that only gets the Shared Transport
+> data and pass it to the right driver without look into the data and
+> process it. Process the data is not the role of the core driver.
 
-Comments are welcome.
+So as I see it the tty_receive which translates to st_int_recv() in
+TI-ST is the area of concern for
+you ...
+So any suggestions as to how we can go about just abstracting the BT,
+FM and GPS data part to their individual drivers?
 
-BR,
-Szymon Janc
-on behalf of ST-Ericsson
-
-
-Szymon Janc (7):
-  Add support for Out of Band (OOB) association model
-  Add D-Bus OOB plugin
-  Add D-Bus OOB API documentation
-  Add simple-oobprovider for testing
-  Add request for accepting incoming pairing requests with OOB
-    mechanism
-  Update D-Bus OOB API with RequestPairing method
-  Add RequestPairing method in simple-agent for accepting incoming OOB 
-       pairing requests
-
- Makefile.am             |   10 +-
- acinclude.m4            |    6 +
- doc/oob-api.txt         |   76 +++++++++
- doc/oob-api.txt.orig    |   79 +++++++++
- lib/hci.h               |    3 +
- plugins/dbusoob.c       |  412 +++++++++++++++++++++++++++++++++++++++++++++++
- plugins/hciops.c        |  107 +++++++++++--
- src/adapter.c           |   21 +++-
- src/adapter.h           |   10 ++
- src/agent.c             |   59 +++++++-
- src/agent.h             |    3 +
- src/device.c            |   96 +++++++++++
- src/device.h            |   13 ++
- src/event.c             |   89 ++++++++---
- src/event.h             |    4 +-
- src/oob.c               |   67 ++++++++
- src/oob.h               |   47 ++++++
- test/simple-agent       |   10 ++
- test/simple-oobprovider |   57 +++++++
- 19 files changed, 1131 insertions(+), 38 deletions(-)
- create mode 100644 doc/oob-api.txt
- create mode 100644 doc/oob-api.txt.orig
- create mode 100644 plugins/dbusoob.c
- create mode 100644 src/oob.c
- create mode 100644 src/oob.h
- create mode 100755 test/simple-oobprovider
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please fix this and come back when you have a proper solution for your
+> driver.
+>
+> --
+> Gustavo F. Padovan
+> http://profusion.mobi
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
+>
