@@ -1,73 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 29 Nov 2010 23:52:00 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Alicke Xu <sxu@atheros.com>,
+	"Luis R. Rodriguez" <lrodriguez@atheros.com>,
+	Vikram Kandukuri <vikram.kandukuri@atheros.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] ath3k: reduce memory usage
+Message-ID: <20101130015200.GD5919@vigoh>
+References: <1290456541-3812-1-git-send-email-holler@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=VPn1k=kLdo7QbM4epc88fdcW2XsbLyFeYt9y4@mail.gmail.com>
-References: <AANLkTi=k=Dvsm6fySREejtP3sf7Cch3G2KYr4sYpg2Q4@mail.gmail.com>
-	<AANLkTi=VPn1k=kLdo7QbM4epc88fdcW2XsbLyFeYt9y4@mail.gmail.com>
-Date: Mon, 29 Nov 2010 22:24:12 -0700
-Message-ID: <AANLkTim5Rnu1Jkh9BOq5oGL6mvFJcHydNDMJZDZD9hP_@mail.gmail.com>
-Subject: Re: wi2wi bluecore4
-From: Brad Midgley <bmidgley@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290456541-3812-1-git-send-email-holler@ahsoftware.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+Hi Alexander,
 
-I think I am a little closer, just wanted to see if anyone has any ideas.
+* Alexander Holler <holler@ahsoftware.de> [2010-11-22 21:09:01 +0100]:
 
-I rebuilt bccmd so it would connect at 115k instead of 38k. Not sure
-why it's hardcoded if the chip cares (this chip refuses to respond at
-38k). In any case, now bccmd can set and reset the chip apparently:
+> There is no need to hold the firmware in memory.
+> 
+> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+> ---
+>  drivers/bluetooth/ath3k.c |   75 ++++++++++++---------------------------------
+>  1 files changed, 20 insertions(+), 55 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 128cae4..81cd1ed 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -43,46 +43,40 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
+>  #define USB_REQ_DFU_DNLOAD	1
+>  #define BULK_SIZE		4096
+>  
+> -struct ath3k_data {
+> -	struct usb_device *udev;
+> -	u8 *fw_data;
+> -	u32 fw_size;
+> -	u32 fw_sent;
+> -};
+> -
+> -static int ath3k_load_firmware(struct ath3k_data *data,
+> -				unsigned char *firmware,
+> -				int count)
+> +static int ath3k_load_firmware(struct usb_device *udev,
+> +				const struct firmware *firmware)
+>  {
+>  	u8 *send_buf;
+>  	int err, pipe, len, size, sent = 0;
+> +	int count = firmware->size;
+>  
+> -	BT_DBG("ath3k %p udev %p", data, data->udev);
+> +	BT_DBG("udev %p", udev);
+>  
+> -	pipe = usb_sndctrlpipe(data->udev, 0);
+> +	pipe = usb_sndctrlpipe(udev, 0);
+>  
+> -	if ((usb_control_msg(data->udev, pipe,
+> +	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
+> +	if (!send_buf) {
+> +		BT_ERR("Can't allocate memory chunk for firmware");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	memcpy(send_buf, firmware->data, 20);
+> +	if ((err = usb_control_msg(udev, pipe,
+>  				USB_REQ_DFU_DNLOAD,
+>  				USB_TYPE_VENDOR, 0, 0,
+> -				firmware, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
+> +				send_buf, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
+>  		BT_ERR("Can't change to loading configuration err");
+> -		return -EBUSY;
+> +		goto error;
+>  	}
+>  	sent += 20;
+>  	count -= 20;
 
-# cat pskey.psr
-// PSKEY_UART_BAUDRATE
-&01be = 0ebf
-// PSKEY_SCO_MAPPING
-&01ab = 0
-# bccmd.115 -t H4 -d /dev/ttyS1 psload -r pskey.psr
-Loading PSKEY_UART_BAUDRATE ... done
-Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
-#
+Patch looks good to me,  but I have a question here: what's 20 here? I
+didn't figured out.
 
-But the hciattach still fails with "Initialization timed out.". The
-chip returns a single byte...
+Vikram, what's your opinion on this patch? Can you ack/nack it?
 
-# strace -s 64 hciattach ttyS1 csr 921600 noflow
-...
-open("/dev/ttyS1", O_RDWR|O_NOCTTY)     = 3
-ioctl(3, TCFLSH, 0x2)                   = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, TCFLSH, 0x2)                   = 0
-write(3, "\1\0\374\27\302\0\0\t\0\0\0\31(\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 27) = 27
-read(3, "\374", 1)                      = 1
-read(3, 0xbed819dc, 1)                  = ? ERESTARTSYS (To be restarted)
---- SIGALRM (Alarm clock) @ 0 (0) ---
-
-What is the chip saying to us when we read \374? Why is hciattach
-initializing at 115k when i told it to use 921k? So I tried setting
-the init speed too:
-
-# strace -s 64 hciattach -s 921600 ttyS1 csr 921600 noflow
-...
-open("/dev/ttyS1", O_RDWR|O_NOCTTY)     = 3
-ioctl(3, TCFLSH, 0x2)                   = 0
-ioctl(3, SNDCTL_TMR_TIMEBASE or TCGETS, {B115200 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B115200 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, SNDCTL_TMR_START or TCSETS, {B921600 -opost -isig -icanon
--echo ...}) = 0
-ioctl(3, TCFLSH, 0x2)                   = 0
-write(3, "\1\0\374\27\302\0\0\t\0\0\0\31(\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 27) = 27
-read(3, 0xbeebf9cc, 1)                  = ? ERESTARTSYS (To be restarted)
---- SIGALRM (Alarm clock) @ 0 (0) ---
-
-this time it didn't even get one junk byte. Is there anything else I can check?
-
-Brad
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
