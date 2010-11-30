@@ -1,37 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Nov 2010 13:50:36 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Populate adapter services list
-Message-ID: <20101130115036.GA3520@jh-x301>
-References: <AANLkTik7su9-KfW-+ZC-yc_SrXq+5K3PvZtu5kKxiJhG@mail.gmail.com>
- <AANLkTimwgPtxRVKuDHT0DZa2MhqOqFFDKiEzAJ3opv_W@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimwgPtxRVKuDHT0DZa2MhqOqFFDKiEzAJ3opv_W@mail.gmail.com>
+In-Reply-To: <AANLkTik7su9-KfW-+ZC-yc_SrXq+5K3PvZtu5kKxiJhG@mail.gmail.com>
+References: <AANLkTik7su9-KfW-+ZC-yc_SrXq+5K3PvZtu5kKxiJhG@mail.gmail.com>
+Date: Tue, 30 Nov 2010 13:33:57 +0200
+Message-ID: <AANLkTimwgPtxRVKuDHT0DZa2MhqOqFFDKiEzAJ3opv_W@mail.gmail.com>
+Subject: Re: [PATCH] Populate adapter services list
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00163630f5857ad5dd04964390c9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+--00163630f5857ad5dd04964390c9
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Tue, Nov 30, 2010, Daniel Örstadius wrote:
-> In case service records have been added to bluetoothd before a new
-> adapter is registered, the records which are shared by all adapters
-> (indicated by having the address set to BDADDR_ANY) need to be added
-> to the services list of the new adapter. This patch adds a function
-> for this on adapter initialization.
-> 
-> The issue could be reproduced by running bluetoothd and obexd on a
-> PC and briefly removing the BT dongle. The service records from
-> obexd would not be present in the adapter's local list (which is
-> used to set the class of device).
-> ---
->  src/adapter.c       |    1 +
->  src/sdpd-database.c |   24 ++++++++++++++++++++++++
->  src/sdpd.h          |    2 ++
->  3 files changed, 27 insertions(+), 0 deletions(-)
+Updated patch after offline feedback from Johan.
 
-Thanks. Pushed upstream after a few minor cosmetic changes.
+/Daniel
 
-Johan
+--00163630f5857ad5dd04964390c9
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Initialize-adapter-services-list.patch"
+Content-Disposition: attachment;
+	filename="0001-Initialize-adapter-services-list.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gh4pkgmp1
+
+RnJvbSA0MmVkZjE0NjIzMWFhMDUzYmJjYzk3ZDgwZmQ5ZGQzYWEzZjI0N2VjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogVHVlLCAzMCBOb3YgMjAxMCAxMzoyNzo1NyArMDIwMApTdWJqZWN0OiBb
+UEFUQ0hdIEluaXRpYWxpemUgYWRhcHRlciBzZXJ2aWNlcyBsaXN0CgpJbiBjYXNlIHNlcnZpY2Ug
+cmVjb3JkcyBoYXZlIGJlZW4gYWRkZWQgdG8gYmx1ZXRvb3RoZCBiZWZvcmUgYSBuZXcKYWRhcHRl
+ciBpcyByZWdpc3RlcmVkLCB0aGUgcmVjb3JkcyB3aGljaCBhcmUgc2hhcmVkIGJ5IGFsbCBhZGFw
+dGVycwooaW5kaWNhdGVkIGJ5IGhhdmluZyB0aGUgYWRkcmVzcyBzZXQgdG8gQkRBRERSX0FOWSkg
+bmVlZCB0byBiZSBhZGRlZAp0byB0aGUgc2VydmljZXMgbGlzdCBvZiB0aGUgbmV3IGFkYXB0ZXIu
+IFRoaXMgcGF0Y2ggYWRkcyBhIGZ1bmN0aW9uCmZvciB0aGlzIG9uIGFkYXB0ZXIgaW5pdGlhbGl6
+YXRpb24uCgpUaGUgaXNzdWUgY291bGQgYmUgcmVwcm9kdWNlZCBieSBydW5uaW5nIGJsdWV0b290
+aGQgYW5kIG9iZXhkIG9uIGEKUEMgYW5kIGJyaWVmbHkgcmVtb3ZpbmcgdGhlIEJUIGRvbmdsZS4g
+VGhlIHNlcnZpY2UgcmVjb3JkcyBmcm9tCm9iZXhkIHdvdWxkIG5vdCBiZSBwcmVzZW50IGluIHRo
+ZSBhZGFwdGVyJ3MgbG9jYWwgbGlzdCAod2hpY2ggaXMKdXNlZCB0byBzZXQgdGhlIGNsYXNzIG9m
+IGRldmljZSkuCi0tLQogc3JjL2FkYXB0ZXIuYyAgICAgICB8ICAgIDEgKwogc3JjL3NkcGQtZGF0
+YWJhc2UuYyB8ICAgMjQgKysrKysrKysrKysrKysrKysrKysrKysrCiBzcmMvc2RwZC5oICAgICAg
+ICAgIHwgICAgMiArKwogMyBmaWxlcyBjaGFuZ2VkLCAyNyBpbnNlcnRpb25zKCspLCAwIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jCmluZGV4
+IDk5OWYzNjkuLjYyYWZjMGMgMTAwNjQ0Ci0tLSBhL3NyYy9hZGFwdGVyLmMKKysrIGIvc3JjL2Fk
+YXB0ZXIuYwpAQCAtMjMxOSw2ICsyMzE5LDcgQEAgcHJvY2VlZDoKIAkJcmV0dXJuIGVycjsKIAog
+CWlmIChhZGFwdGVyLT5pbml0aWFsaXplZCA9PSBGQUxTRSkgeworCQlzZHBfaW5pdF9zZXJ2aWNl
+c19saXN0KCZhZGFwdGVyLT5iZGFkZHIpOwogCQlsb2FkX2RyaXZlcnMoYWRhcHRlcik7CiAJCWNs
+ZWFyX2Jsb2NrZWQoYWRhcHRlcik7CiAJCWxvYWRfZGV2aWNlcyhhZGFwdGVyKTsKZGlmZiAtLWdp
+dCBhL3NyYy9zZHBkLWRhdGFiYXNlLmMgYi9zcmMvc2RwZC1kYXRhYmFzZS5jCmluZGV4IGRhM2Jj
+N2QuLmYzNTM4YWUgMTAwNjQ0Ci0tLSBhL3NyYy9zZHBkLWRhdGFiYXNlLmMKKysrIGIvc3JjL3Nk
+cGQtZGF0YWJhc2UuYwpAQCAtMzA2LDMgKzMwNiwyNyBAQCB1aW50MzJfdCBzZHBfbmV4dF9oYW5k
+bGUodm9pZCkKIAogCXJldHVybiBoYW5kbGU7CiB9CisKK3ZvaWQgc2RwX2luaXRfc2VydmljZXNf
+bGlzdChiZGFkZHJfdCAqZGV2aWNlKQoreworCXNkcF9saXN0X3QgKnA7CisKKwlTRFBEQkcoIiIp
+OworCisJZm9yIChwID0gYWNjZXNzX2RiOyBwICE9IE5VTEw7IHAgPSBwLT5uZXh0KSB7CisJCXNk
+cF9yZWNvcmRfdCAqcmVjOworCQlzZHBfYWNjZXNzX3QgKmFjY2VzcyA9IHAtPmRhdGE7CisKKwkJ
+aWYgKGJhY21wKEJEQUREUl9BTlksICZhY2Nlc3MtPmRldmljZSkpCisJCQljb250aW51ZTsKKwor
+CQlyZWMgPSBzZHBfcmVjb3JkX2ZpbmQoYWNjZXNzLT5oYW5kbGUpOworCisJCWlmIChyZWMgPT0g
+TlVMTCkKKwkJCWNvbnRpbnVlOworCisJCVNEUERCRygiYWRkaW5nIHJlY29yZCB3aXRoIGhhbmRs
+ZSAleCIsIGFjY2Vzcy0+aGFuZGxlKTsKKworCQlhZGFwdGVyX3NlcnZpY2VfaW5zZXJ0KGRldmlj
+ZSwgcmVjKTsKKwl9Cit9CmRpZmYgLS1naXQgYS9zcmMvc2RwZC5oIGIvc3JjL3NkcGQuaAppbmRl
+eCBmOGU2ZWU3Li4wZTNkZGRmIDEwMDY0NAotLS0gYS9zcmMvc2RwZC5oCisrKyBiL3NyYy9zZHBk
+LmgKQEAgLTEwNiwzICsxMDYsNSBAQCBpbnQgcmVtb3ZlX3JlY29yZF9mcm9tX3NlcnZlcih1aW50
+MzJfdCBoYW5kbGUpOwogdm9pZCBjcmVhdGVfZXh0X2lucXVpcnlfcmVzcG9uc2UoY29uc3QgY2hh
+ciAqbmFtZSwKIAkJCQkJaW50OF90IHR4X3Bvd2VyLCBzZHBfbGlzdF90ICpzZXJ2aWNlcywKIAkJ
+CQkJdWludDhfdCAqZGF0YSk7CisKK3ZvaWQgc2RwX2luaXRfc2VydmljZXNfbGlzdChiZGFkZHJf
+dCAqZGV2aWNlKTsKLS0gCjEuNi4wLjQKCg==
+--00163630f5857ad5dd04964390c9--
