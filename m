@@ -1,68 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 29 Nov 2010 23:09:39 -0200
+Date: Mon, 29 Nov 2010 23:05:55 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [RFC 2/4] Bluetooth: clean up rfcomm code
-Message-ID: <20101130010939.GB5919@vigoh>
-References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1290784965-4508-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Fix error handling for l2cap_init()
+Message-ID: <20101130010555.GA5919@vigoh>
+References: <1291047350-32126-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290784965-4508-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1291047350-32126-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Anderson,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-11-26 17:22:43 +0200]:
+* Anderson Lizardo <anderson.lizardo@openbossa.org> [2010-11-29 12:15:50 -0400]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> create_singlethread_workqueue() may fail with errors such as -ENOMEM. If
+> this happens, the return value is not set to a negative value and the
+> module load will succeed. It will then crash on module unload because of
+> a destroy_workqueue() call on a NULL pointer.
 > 
-> Remove extra spaces, assignments in if statement, zeroing static
-> variables.
+> Additionally, the _busy_wq workqueue is not being destroyed if any
+> errors happen on l2cap_init().
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  include/net/bluetooth/rfcomm.h |   18 +++++++++---------
->  net/bluetooth/rfcomm/core.c    |    8 ++++----
->  net/bluetooth/rfcomm/sock.c    |    5 +++--
->  net/bluetooth/rfcomm/tty.c     |   28 ++++++++++++++++------------
->  4 files changed, 32 insertions(+), 27 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-> index 71047bc..6eac4a7 100644
-> --- a/include/net/bluetooth/rfcomm.h
-> +++ b/include/net/bluetooth/rfcomm.h
-> @@ -1,5 +1,5 @@
-> -/* 
-> -   RFCOMM implementation for Linux Bluetooth stack (BlueZ).
-> +/*
-> +   RFCOMM implementation for Linux Bluetooth stack (BlueZ)
->     Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
->     Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
->  
-> @@ -11,13 +11,13 @@
->     OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
->     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
->     IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
-> -   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
-> -   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
-> -   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
-> +   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-> +   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-> +   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
->     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
->  
-> -   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
-> -   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-> +   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-> +   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
->     SOFTWARE IS DISCLAIMED.
+> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
 
-Marcel refused a patch from me in the past because its was touching legal
-stuff, so or you remove these changes for your patches or wait for
-Marcel's comments here.
+Patch has been applied, thanks a lot.
 
 -- 
 Gustavo F. Padovan
