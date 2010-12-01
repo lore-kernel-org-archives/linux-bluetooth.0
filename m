@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/5] Bluetooth: clean up rfcomm code
-Date: Wed,  1 Dec 2010 16:58:23 +0200
-Message-Id: <1291215506-11398-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/5] Bluetooth: clean up hci code
+Date: Wed,  1 Dec 2010 16:58:25 +0200
+Message-Id: <1291215506-11398-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1291215506-11398-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1291215506-11398-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,195 +11,436 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Remove extra spaces, assignments in if statement, zeroing static
-variables, extra braces. Fix includes.
+Do not use assignment in IF condition, remove extra spaces,
+fixing typos, simplify code.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 ---
- include/net/bluetooth/rfcomm.h |    4 ++--
- net/bluetooth/rfcomm/core.c    |    8 ++++----
- net/bluetooth/rfcomm/sock.c    |    5 +++--
- net/bluetooth/rfcomm/tty.c     |   28 ++++++++++++++++------------
- 4 files changed, 25 insertions(+), 20 deletions(-)
+ include/net/bluetooth/hci.h      |    4 +-
+ include/net/bluetooth/hci_core.h |   14 ++++----
+ net/bluetooth/hci_conn.c         |   23 ++++++++----
+ net/bluetooth/hci_core.c         |   66 ++++++++++++++++++++++++--------------
+ net/bluetooth/hci_event.c        |    8 +++--
+ net/bluetooth/hci_sock.c         |   17 ++++++---
+ 6 files changed, 82 insertions(+), 50 deletions(-)
 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 71047bc..2e78756 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -105,7 +105,7 @@
- struct rfcomm_hdr {
- 	u8 addr;
- 	u8 ctrl;
--	u8 len;    // Actual size can be 2 bytes
-+	u8 len;    /* Actual size can be 2 bytes */
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index e30e008..e9527c5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -489,7 +489,7 @@ struct hci_rp_read_local_name {
+ 
+ #define HCI_OP_WRITE_PG_TIMEOUT		0x0c18
+ 
+-#define HCI_OP_WRITE_SCAN_ENABLE 	0x0c1a
++#define HCI_OP_WRITE_SCAN_ENABLE	0x0c1a
+ 	#define SCAN_DISABLED		0x00
+ 	#define SCAN_INQUIRY		0x01
+ 	#define SCAN_PAGE		0x02
+@@ -874,7 +874,7 @@ struct hci_ev_si_security {
+ 
+ struct hci_command_hdr {
+ 	__le16	opcode;		/* OCF & OGF */
+-	__u8 	plen;
++	__u8	plen;
  } __packed;
  
- struct rfcomm_cmd {
-@@ -228,7 +228,7 @@ struct rfcomm_dlc {
- /* ---- RFCOMM SEND RPN ---- */
- int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
- 			u8 bit_rate, u8 data_bits, u8 stop_bits,
--			u8 parity, u8 flow_ctrl_settings, 
-+			u8 parity, u8 flow_ctrl_settings,
- 			u8 xon_char, u8 xoff_char, u16 param_mask);
+ struct hci_event_hdr {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ebec8c9..9c08625 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -44,15 +44,15 @@ struct inquiry_data {
+ };
  
- /* ---- RFCOMM DLCs (channels) ---- */
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index fa642aa..c1e2bba 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -41,7 +41,7 @@
- #include <linux/slab.h>
+ struct inquiry_entry {
+-	struct inquiry_entry 	*next;
++	struct inquiry_entry	*next;
+ 	__u32			timestamp;
+ 	struct inquiry_data	data;
+ };
  
- #include <net/sock.h>
--#include <asm/uaccess.h>
-+#include <linux/uaccess.h>
- #include <asm/unaligned.h>
+ struct inquiry_cache {
+-	spinlock_t 		lock;
++	spinlock_t		lock;
+ 	__u32			timestamp;
+-	struct inquiry_entry 	*list;
++	struct inquiry_entry	*list;
+ };
  
- #include <net/bluetooth/bluetooth.h>
-@@ -51,10 +51,10 @@
+ struct hci_conn_hash {
+@@ -141,7 +141,7 @@ struct hci_dev {
+ 	void			*driver_data;
+ 	void			*core_data;
  
- #define VERSION "1.11"
+-	atomic_t 		promisc;
++	atomic_t		promisc;
  
--static int disable_cfc = 0;
-+static int disable_cfc;
-+static int l2cap_ertm;
- static int channel_mtu = -1;
- static unsigned int l2cap_mtu = RFCOMM_MAX_L2CAP_MTU;
--static int l2cap_ertm = 0;
+ 	struct dentry		*debugfs;
  
- static struct task_struct *rfcomm_thread;
+@@ -150,7 +150,7 @@ struct hci_dev {
  
-@@ -1901,7 +1901,7 @@ static inline void rfcomm_check_connection(struct rfcomm_session *s)
+ 	struct rfkill		*rfkill;
  
- 	BT_DBG("%p state %ld", s, s->state);
+-	struct module 		*owner;
++	struct module		*owner;
  
--	switch(sk->sk_state) {
-+	switch (sk->sk_state) {
- 	case BT_CONNECTED:
- 		s->state = BT_CONNECT;
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+@@ -215,8 +215,8 @@ extern rwlock_t hci_dev_list_lock;
+ extern rwlock_t hci_cb_list_lock;
  
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 0207bd6..66cc1f0 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -45,7 +45,7 @@
+ /* ----- Inquiry cache ----- */
+-#define INQUIRY_CACHE_AGE_MAX   (HZ*30)   // 30 seconds
+-#define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   // 60 seconds
++#define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
++#define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
+ 
+ #define inquiry_cache_lock(c)		spin_lock(&c->lock)
+ #define inquiry_cache_unlock(c)		spin_unlock(&c->lock)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 0b1e460..6b90a41 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -39,7 +39,7 @@
  #include <net/sock.h>
  
  #include <asm/system.h>
 -#include <asm/uaccess.h>
 +#include <linux/uaccess.h>
+ #include <asm/unaligned.h>
  
  #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -888,7 +888,8 @@ static int rfcomm_sock_shutdown(struct socket *sock, int how)
+@@ -66,7 +66,8 @@ void hci_acl_connect(struct hci_conn *conn)
+ 	bacpy(&cp.bdaddr, &conn->dst);
+ 	cp.pscan_rep_mode = 0x02;
  
- 	BT_DBG("sock %p, sk %p", sock, sk);
+-	if ((ie = hci_inquiry_cache_lookup(hdev, &conn->dst))) {
++	ie = hci_inquiry_cache_lookup(hdev, &conn->dst);
++	if (ie) {
+ 		if (inquiry_entry_age(ie) <= INQUIRY_ENTRY_AGE_MAX) {
+ 			cp.pscan_rep_mode = ie->data.pscan_rep_mode;
+ 			cp.pscan_mode     = ie->data.pscan_mode;
+@@ -368,8 +369,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
  
--	if (!sk) return 0;
-+	if (!sk)
-+		return 0;
+ 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
  
- 	lock_sock(sk);
- 	if (!sk->sk_shutdown) {
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a9b81f5..2575c2d 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -58,9 +58,9 @@ struct rfcomm_dev {
+-	if (!(acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst))) {
+-		if (!(acl = hci_conn_add(hdev, ACL_LINK, dst)))
++	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
++	if (!acl) {
++		acl = hci_conn_add(hdev, ACL_LINK, dst);
++		if (!acl)
+ 			return NULL;
+ 	}
  
- 	bdaddr_t		src;
- 	bdaddr_t		dst;
--	u8 			channel;
-+	u8			channel;
+@@ -389,8 +392,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	if (type == ACL_LINK)
+ 		return acl;
  
--	uint 			modem_status;
-+	uint			modem_status;
+-	if (!(sco = hci_conn_hash_lookup_ba(hdev, type, dst))) {
+-		if (!(sco = hci_conn_add(hdev, type, dst))) {
++	sco = hci_conn_hash_lookup_ba(hdev, type, dst);
++	if (!sco) {
++		sco = hci_conn_add(hdev, type, dst);
++		if (!sco) {
+ 			hci_conn_put(acl);
+ 			return NULL;
+ 		}
+@@ -647,10 +652,12 @@ int hci_get_conn_list(void __user *arg)
  
- 	struct rfcomm_dlc	*dlc;
- 	struct tty_struct	*tty;
-@@ -69,7 +69,7 @@ struct rfcomm_dev {
+ 	size = sizeof(req) + req.conn_num * sizeof(*ci);
  
- 	struct device		*tty_dev;
+-	if (!(cl = kmalloc(size, GFP_KERNEL)))
++	cl = kmalloc(size, GFP_KERNEL);
++	if (!cl)
+ 		return -ENOMEM;
  
--	atomic_t 		wmem_alloc;
-+	atomic_t		wmem_alloc;
+-	if (!(hdev = hci_dev_get(req.dev_id))) {
++	hdev = hci_dev_get(req.dev_id);
++	if (!hdev) {
+ 		kfree(cl);
+ 		return -ENODEV;
+ 	}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bc2a052..51c61f7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -44,7 +44,7 @@
+ #include <net/sock.h>
  
- 	struct sk_buff_head	pending;
- };
-@@ -431,7 +431,8 @@ static int rfcomm_release_dev(void __user *arg)
+ #include <asm/system.h>
+-#include <asm/uaccess.h>
++#include <linux/uaccess.h>
+ #include <asm/unaligned.h>
  
- 	BT_DBG("dev_id %d flags 0x%x", req.dev_id, req.flags);
+ #include <net/bluetooth/bluetooth.h>
+@@ -349,20 +349,23 @@ struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *b
+ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data)
+ {
+ 	struct inquiry_cache *cache = &hdev->inq_cache;
+-	struct inquiry_entry *e;
++	struct inquiry_entry *ie;
  
--	if (!(dev = rfcomm_dev_get(req.dev_id)))
-+	dev = rfcomm_dev_get(req.dev_id);
-+	if (!dev)
+ 	BT_DBG("cache %p, %s", cache, batostr(&data->bdaddr));
+ 
+-	if (!(e = hci_inquiry_cache_lookup(hdev, &data->bdaddr))) {
++	ie = hci_inquiry_cache_lookup(hdev, &data->bdaddr);
++	if (!ie) {
+ 		/* Entry not in the cache. Add new one. */
+-		if (!(e = kzalloc(sizeof(struct inquiry_entry), GFP_ATOMIC)))
++		ie = kzalloc(sizeof(struct inquiry_entry), GFP_ATOMIC);
++		if (!ie)
+ 			return;
+-		e->next     = cache->list;
+-		cache->list = e;
++
++		ie->next = cache->list;
++		cache->list = ie;
+ 	}
+ 
+-	memcpy(&e->data, data, sizeof(*data));
+-	e->timestamp = jiffies;
++	memcpy(&ie->data, data, sizeof(*data));
++	ie->timestamp = jiffies;
+ 	cache->timestamp = jiffies;
+ }
+ 
+@@ -422,16 +425,20 @@ int hci_inquiry(void __user *arg)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 	if (inquiry_cache_age(hdev) > INQUIRY_CACHE_AGE_MAX ||
+-					inquiry_cache_empty(hdev) ||
+-					ir.flags & IREQ_CACHE_FLUSH) {
++				inquiry_cache_empty(hdev) ||
++				ir.flags & IREQ_CACHE_FLUSH) {
+ 		inquiry_cache_flush(hdev);
+ 		do_inquiry = 1;
+ 	}
+ 	hci_dev_unlock_bh(hdev);
+ 
+ 	timeo = ir.length * msecs_to_jiffies(2000);
+-	if (do_inquiry && (err = hci_request(hdev, hci_inq_req, (unsigned long)&ir, timeo)) < 0)
+-		goto done;
++
++	if (do_inquiry) {
++		err = hci_request(hdev, hci_inq_req, (unsigned long)&ir, timeo);
++		if (err < 0)
++			goto done;
++	}
+ 
+ 	/* for unlimited number of responses we will use buffer with 255 entries */
+ 	max_rsp = (ir.num_rsp == 0) ? 255 : ir.num_rsp;
+@@ -439,7 +446,8 @@ int hci_inquiry(void __user *arg)
+ 	/* cache_dump can't sleep. Therefore we allocate temp buffer and then
+ 	 * copy it to the user space.
+ 	 */
+-	if (!(buf = kmalloc(sizeof(struct inquiry_info) * max_rsp, GFP_KERNEL))) {
++	buf = kmalloc(sizeof(struct inquiry_info) *max_rsp, GFP_KERNEL);
++	if (!buf) {
+ 		err = -ENOMEM;
+ 		goto done;
+ 	}
+@@ -611,7 +619,8 @@ int hci_dev_close(__u16 dev)
+ 	struct hci_dev *hdev;
+ 	int err;
+ 
+-	if (!(hdev = hci_dev_get(dev)))
++	hdev = hci_dev_get(dev);
++	if (!hdev)
+ 		return -ENODEV;
+ 	err = hci_dev_do_close(hdev);
+ 	hci_dev_put(hdev);
+@@ -623,7 +632,8 @@ int hci_dev_reset(__u16 dev)
+ 	struct hci_dev *hdev;
+ 	int ret = 0;
+ 
+-	if (!(hdev = hci_dev_get(dev)))
++	hdev = hci_dev_get(dev);
++	if (!hdev)
  		return -ENODEV;
  
- 	if (dev->flags != NOCAP_FLAGS && !capable(CAP_NET_ADMIN)) {
-@@ -470,7 +471,8 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 	hci_req_lock(hdev);
+@@ -663,7 +673,8 @@ int hci_dev_reset_stat(__u16 dev)
+ 	struct hci_dev *hdev;
+ 	int ret = 0;
  
- 	size = sizeof(*dl) + dev_num * sizeof(*di);
+-	if (!(hdev = hci_dev_get(dev)))
++	hdev = hci_dev_get(dev);
++	if (!hdev)
+ 		return -ENODEV;
  
--	if (!(dl = kmalloc(size, GFP_KERNEL)))
-+	dl = kmalloc(size, GFP_KERNEL);
+ 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
+@@ -682,7 +693,8 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ 	if (copy_from_user(&dr, arg, sizeof(dr)))
+ 		return -EFAULT;
+ 
+-	if (!(hdev = hci_dev_get(dr.dev_id)))
++	hdev = hci_dev_get(dr.dev_id);
++	if (!hdev)
+ 		return -ENODEV;
+ 
+ 	switch (cmd) {
+@@ -763,7 +775,8 @@ int hci_get_dev_list(void __user *arg)
+ 
+ 	size = sizeof(*dl) + dev_num * sizeof(*dr);
+ 
+-	if (!(dl = kzalloc(size, GFP_KERNEL)))
++	dl = kzalloc(size, GFP_KERNEL);
 +	if (!dl)
  		return -ENOMEM;
  
- 	di = dl->dev_info;
-@@ -513,7 +515,8 @@ static int rfcomm_get_dev_info(void __user *arg)
+ 	dr = dl->dev_req;
+@@ -797,7 +810,8 @@ int hci_get_dev_info(void __user *arg)
  	if (copy_from_user(&di, arg, sizeof(di)))
  		return -EFAULT;
  
--	if (!(dev = rfcomm_dev_get(di.id)))
-+	dev = rfcomm_dev_get(di.id);
-+	if (!dev)
+-	if (!(hdev = hci_dev_get(di.dev_id)))
++	hdev = hci_dev_get(di.dev_id);
++	if (!hdev)
  		return -ENODEV;
  
- 	di.flags   = dev->flags;
-@@ -561,7 +564,8 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
- 		return;
- 	}
+ 	strcpy(di.name, hdev->name);
+@@ -905,7 +919,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	hdev->sniff_max_interval = 800;
+ 	hdev->sniff_min_interval = 80;
  
--	if (!(tty = dev->tty) || !skb_queue_empty(&dev->pending)) {
-+	tty = dev->tty;
-+	if (!tty || !skb_queue_empty(&dev->pending)) {
- 		skb_queue_tail(&dev->pending, skb);
- 		return;
- 	}
-@@ -796,7 +800,8 @@ static int rfcomm_tty_write(struct tty_struct *tty, const unsigned char *buf, in
+-	tasklet_init(&hdev->cmd_task, hci_cmd_task,(unsigned long) hdev);
++	tasklet_init(&hdev->cmd_task, hci_cmd_task, (unsigned long) hdev);
+ 	tasklet_init(&hdev->rx_task, hci_rx_task, (unsigned long) hdev);
+ 	tasklet_init(&hdev->tx_task, hci_tx_task, (unsigned long) hdev);
  
- 		memcpy(skb_put(skb, size), buf + sent, size);
+@@ -1368,7 +1382,8 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+ 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+ 	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
  
--		if ((err = rfcomm_dlc_send(dlc, skb)) < 0) {
-+		err = rfcomm_dlc_send(dlc, skb);
-+		if (err < 0) {
- 			kfree_skb(skb);
- 			break;
+-	if (!(list = skb_shinfo(skb)->frag_list)) {
++	list = skb_shinfo(skb)->frag_list;
++	if (!list) {
+ 		/* Non fragmented */
+ 		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
+ 
+@@ -1609,7 +1624,8 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_conn_enter_active_mode(conn);
+ 
+ 		/* Send to upper protocol */
+-		if ((hp = hci_proto[HCI_PROTO_L2CAP]) && hp->recv_acldata) {
++		hp = hci_proto[HCI_PROTO_L2CAP];
++		if (hp && hp->recv_acldata) {
+ 			hp->recv_acldata(conn, skb, flags);
+ 			return;
  		}
-@@ -892,7 +897,7 @@ static void rfcomm_tty_set_termios(struct tty_struct *tty, struct ktermios *old)
+@@ -1644,7 +1660,8 @@ static inline void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		register struct hci_proto *hp;
  
- 	/* Parity on/off and when on, odd/even */
- 	if (((old->c_cflag & PARENB) != (new->c_cflag & PARENB)) ||
--			((old->c_cflag & PARODD) != (new->c_cflag & PARODD)) ) {
-+			((old->c_cflag & PARODD) != (new->c_cflag & PARODD))) {
- 		changes |= RFCOMM_RPN_PM_PARITY;
- 		BT_DBG("Parity change detected.");
+ 		/* Send to upper protocol */
+-		if ((hp = hci_proto[HCI_PROTO_SCO]) && hp->recv_scodata) {
++		hp = hci_proto[HCI_PROTO_SCO];
++		if (hp && hp->recv_scodata) {
+ 			hp->recv_scodata(conn, skb);
+ 			return;
+ 		}
+@@ -1727,7 +1744,8 @@ static void hci_cmd_task(unsigned long arg)
+ 	if (atomic_read(&hdev->cmd_cnt) && (skb = skb_dequeue(&hdev->cmd_q))) {
+ 		kfree_skb(hdev->sent_cmd);
+ 
+-		if ((hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC))) {
++		hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC);
++		if (hdev->sent_cmd) {
+ 			atomic_dec(&hdev->cmd_cnt);
+ 			hci_send_frame(skb);
+ 			hdev->cmd_last_tx = jiffies;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3c1957c..8923b36 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -39,7 +39,7 @@
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+-#include <asm/uaccess.h>
++#include <linux/uaccess.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -1512,10 +1512,12 @@ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			conn->sent -= count;
+ 
+ 			if (conn->type == ACL_LINK) {
+-				if ((hdev->acl_cnt += count) > hdev->acl_pkts)
++				hdev->acl_cnt += count;
++				if (hdev->acl_cnt > hdev->acl_pkts)
+ 					hdev->acl_cnt = hdev->acl_pkts;
+ 			} else {
+-				if ((hdev->sco_cnt += count) > hdev->sco_pkts)
++				hdev->sco_cnt += count;
++				if (hdev->sco_cnt > hdev->sco_pkts)
+ 					hdev->sco_cnt = hdev->sco_pkts;
+ 			}
+ 		}
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 83acd16..b3753ba 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -43,7 +43,7 @@
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+-#include <asm/uaccess.h>
++#include <linux/uaccess.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -125,7 +125,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 				continue;
+ 		}
+ 
+-		if (!(nskb = skb_clone(skb, GFP_ATOMIC)))
++		nskb = skb_clone(skb, GFP_ATOMIC);
++		if (!nskb)
+ 			continue;
+ 
+ 		/* Put type byte before the data */
+@@ -370,7 +371,8 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
  	}
-@@ -937,11 +942,10 @@ static void rfcomm_tty_set_termios(struct tty_struct *tty, struct ktermios *old)
- 	/* POSIX does not support 1.5 stop bits and RFCOMM does not
- 	 * support 2 stop bits. So a request for 2 stop bits gets
- 	 * translated to 1.5 stop bits */
--	if (new->c_cflag & CSTOPB) {
-+	if (new->c_cflag & CSTOPB)
- 		stop_bits = RFCOMM_RPN_STOP_15;
--	} else {
-+	else
- 		stop_bits = RFCOMM_RPN_STOP_1;
--	}
  
- 	/* Handle number of data bits [5-8] */
- 	if ((old->c_cflag & CSIZE) != (new->c_cflag & CSIZE))
+ 	if (haddr->hci_dev != HCI_DEV_NONE) {
+-		if (!(hdev = hci_dev_get(haddr->hci_dev))) {
++		hdev = hci_dev_get(haddr->hci_dev);
++		if (!hdev) {
+ 			err = -ENODEV;
+ 			goto done;
+ 		}
+@@ -457,7 +459,8 @@ static int hci_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 	if (sk->sk_state == BT_CLOSED)
+ 		return 0;
+ 
+-	if (!(skb = skb_recv_datagram(sk, flags, noblock, &err)))
++	skb = skb_recv_datagram(sk, flags, noblock, &err);
++	if (!skb)
+ 		return err;
+ 
+ 	msg->msg_namelen = 0;
+@@ -499,7 +502,8 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 
+ 	lock_sock(sk);
+ 
+-	if (!(hdev = hci_pi(sk)->hdev)) {
++	hdev = hci_pi(sk)->hdev;
++	if (!hdev) {
+ 		err = -EBADFD;
+ 		goto done;
+ 	}
+@@ -509,7 +513,8 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 		goto done;
+ 	}
+ 
+-	if (!(skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err)))
++	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
++	if (!skb)
+ 		goto done;
+ 
+ 	if (memcpy_fromiovec(skb_put(skb, len), msg->msg_iov, len)) {
 -- 
 1.7.1
 
