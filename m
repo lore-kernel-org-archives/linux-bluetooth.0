@@ -1,48 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 1 Dec 2010 19:11:28 -0200
+Date: Wed, 1 Dec 2010 15:50:36 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2010-11-01
-Message-ID: <20101201211128.GC16125@vigoh>
+To: Bala Shanmugam <sbalashanmugam@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Add new PID for Atheros 3011
+Message-ID: <20101201175035.GB16125@vigoh>
+References: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Bala,
 
-Here goes 3 simple patches intended to 2.6.37. First one is from myself
-and fix some trivial return values. Then we also have a fix from Stefan
-Seyfried on btusb to avoid emitting an err when we USB is autosupended.
-Last, a patch from Bala Shanmugam that fix the firmware loading process
-for the ath3k driver.
+* Bala Shanmugam <sbalashanmugam@atheros.com> [2010-11-26 17:35:46 +0530]:
 
-Please pull, or let me know if you disagree with the patches. Thanks a
-lot. ;)
+> Atheros 3011 has small sflash firmware and needs to be
+> blacklisted in transport driver to load actual firmware
+> in DFU driver.
+> 
+> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    4 ++++
+>  drivers/bluetooth/btusb.c |    3 +++
+>  2 files changed, 7 insertions(+), 0 deletions(-)
 
-
-The following changes since commit 916448e77f6bcaaa7f13c3de0c3851783ae2bfd0:
-
-  ath9k: Fix STA disconnect issue due to received MIC failed bcast frames (2010-11-30 13:45:02 -0500)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
-
-Bala Shanmugam (1):
-      Bluetooth: Add new PID for Atheros 3011
-
-Gustavo F. Padovan (1):
-      Bluetooth: Fix not returning proper error in SCO
-
-Stefan Seyfried (1):
-      Bluetooth: Fix log spamming in btusb due to autosuspend
-
- drivers/bluetooth/ath3k.c |    4 ++++
- drivers/bluetooth/btusb.c |   12 +++++++++---
- net/bluetooth/sco.c       |    6 +++---
- 3 files changed, 16 insertions(+), 6 deletions(-)
+Applied, thanks.
 
 -- 
 Gustavo F. Padovan
