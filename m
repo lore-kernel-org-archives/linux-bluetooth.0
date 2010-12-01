@@ -1,145 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/5] Bluetooth: clean up legal text
-Date: Wed,  1 Dec 2010 16:58:26 +0200
-Message-Id: <1291215506-11398-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1291215506-11398-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1291215506-11398-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 1 Dec 2010 15:47:14 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, gregkh@suse.de, Stefan Seyfried
+ <seife+kernel@b1-systems.com>, Oliver Neukum <oneukum@suse.de>, Gustavo F.
+ Padovan <padovan@profusion.mobi>
+Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
+Message-ID: <20101201154714.517289f7@susi>
+In-Reply-To: <1291200140.4795.91.camel@aeonflux>
+References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
+	<1291200140.4795.91.camel@aeonflux>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Hi Marcel,
 
-Remove extra spaces from legal text so that legal stuff looks
-the same for all bluetooth code.
+On Wed, 01 Dec 2010 11:42:20 +0100
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
----
- include/net/bluetooth/hci.h    |   12 ++++++------
- include/net/bluetooth/l2cap.h  |   12 ++++++------
- include/net/bluetooth/rfcomm.h |   14 +++++++-------
- include/net/bluetooth/sco.h    |   12 ++++++------
- 4 files changed, 25 insertions(+), 25 deletions(-)
+> Hi Stefan,
+> 
+> > If a device is autosuspended an inability to resubmit URBs is
+> > to be expected. Check the error code and only log real errors.
+> > (Now that autosuspend is default enabled for btusb, those log
+> > messages were happening all the time e.g. with a BT mouse)
+> > 
+> > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
+> > Signed-off-by: Oliver Neukum <oneukum@suse.de>
+> 
+> we had a similar one some time ago, but I am fine with this one as well.
+> Actually this one might be a bit better since it still keeps some
+> errors.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e9527c5..f3c5ed6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1,4 +1,4 @@
--/* 
-+/*
-    BlueZ - Bluetooth protocol stack for Linux
-    Copyright (C) 2000-2001 Qualcomm Incorporated
- 
-@@ -12,13 +12,13 @@
-    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- 
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-    SOFTWARE IS DISCLAIMED.
- */
- 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 217bb91..7ad25ca 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -1,4 +1,4 @@
--/* 
-+/*
-    BlueZ - Bluetooth protocol stack for Linux
-    Copyright (C) 2000-2001 Qualcomm Incorporated
-    Copyright (C) 2009-2010 Gustavo F. Padovan <gustavo@padovan.org>
-@@ -14,13 +14,13 @@
-    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- 
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-    SOFTWARE IS DISCLAIMED.
- */
- 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 2e78756..6eac4a7 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -1,5 +1,5 @@
--/* 
--   RFCOMM implementation for Linux Bluetooth stack (BlueZ).
-+/*
-+   RFCOMM implementation for Linux Bluetooth stack (BlueZ)
-    Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
-    Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
- 
-@@ -11,13 +11,13 @@
-    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- 
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-    SOFTWARE IS DISCLAIMED.
- */
- 
-diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-index ea5c664..1e35c43 100644
---- a/include/net/bluetooth/sco.h
-+++ b/include/net/bluetooth/sco.h
-@@ -1,4 +1,4 @@
--/* 
-+/*
-    BlueZ - Bluetooth protocol stack for Linux
-    Copyright (C) 2000-2001 Qualcomm Incorporated
- 
-@@ -12,13 +12,13 @@
-    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-    IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN 
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF 
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- 
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS, 
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS 
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-    SOFTWARE IS DISCLAIMED.
- */
- 
+Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
+messages are annoying and users will complain if they are still in 2.6.37
+final.
+
+It will probably have more weight if the maintainer sends it than if I
+send it ;)
 -- 
-1.7.1
+Stefan Seyfried
 
+"Any ideas, John?"
+"Well, surrounding them's out."
