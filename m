@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 1 Dec 2010 15:49:10 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	gregkh@suse.de, Stefan Seyfried <seife+kernel@b1-systems.com>,
-	Oliver Neukum <oneukum@suse.de>
-Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
-Message-ID: <20101201174910.GA16125@vigoh>
-References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
- <1291200140.4795.91.camel@aeonflux>
- <20101201154714.517289f7@susi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101201154714.517289f7@susi>
+From: Rahul Ruikar <rahul.ruikar@gmail.com>
+Date: Wed, 1 Dec 2010 22:24:19 +0530
+Message-ID: <AANLkTi=4rW7kuYL0arf98UHBzNfiWz2-nixtP=2yx1sk@mail.gmail.com>
+Subject: not able to connect mobile with laptop using bluetooth
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi,
 
-* Stefan Seyfried <stefan.seyfried@googlemail.com> [2010-12-01 15:47:14 +0100]:
+I am not able to pair my mobile with laptop.
+when I try to pair it..it times out very soonwhile tying "pin"
+i get following error
+Dec  1 22:17:38 ganesha bluetoothd[1094]: Discovery session 0xb8fc95b8
+with :1.73 activated
+Dec  1 22:17:48 ganesha bluetoothd[1094]: Stopping discovery
+Dec  1 22:17:50 ganesha bluetoothd[1094]: link_key_request
+(sba=00:16:CF:FB:D4:99, dba=00:23:AF:D7:53:20)
+Dec  1 22:17:50 ganesha bluetoothd[1094]: pin_code_request
+(sba=00:16:CF:FB:D4:99, dba=00:23:AF:D7:53:20)
+Dec  1 22:18:01 ganesha NetworkManager[914]: <info> BT device
+00:23:AF:D7:53:20 removed
+Dec  1 22:18:01 ganesha bluetoothd[1094]: Stopping discovery
 
-> Hi Marcel,
-> 
-> On Wed, 01 Dec 2010 11:42:20 +0100
-> Marcel Holtmann <marcel@holtmann.org> wrote:
-> 
-> > Hi Stefan,
-> > 
-> > > If a device is autosuspended an inability to resubmit URBs is
-> > > to be expected. Check the error code and only log real errors.
-> > > (Now that autosuspend is default enabled for btusb, those log
-> > > messages were happening all the time e.g. with a BT mouse)
-> > > 
-> > > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
-> > > Signed-off-by: Oliver Neukum <oneukum@suse.de>
-> > 
-> > we had a similar one some time ago, but I am fine with this one as well.
-> > Actually this one might be a bit better since it still keeps some
-> > errors.
-> > 
-> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
-> messages are annoying and users will complain if they are still in 2.6.37
-> final.
+sometimes i get this error if i use option "Send files to device"
+Dec  1 20:13:48 ganesha bluetoothd[1267]: link_key_notify
+(sba=00:16:CF:FB:D4:99, dba=00:23:AF:D7:53:20, type=0)
+Dec  1 20:13:59 ganesha bluetoothd[1267]: probe failed with driver
+input-headset for device /org/bluez/1252/hci0/dev_00_23_AF_D7_53_20
+Dec  1 20:13:59 ganesha bluetoothd[1267]: Stopping discovery
+Dec  1 20:14:06 ganesha kernel: btusb_intr_complete: hci0 urb d15cf580
+failed to resubmit (1)
+Dec  1 20:14:06 ganesha kernel: btusb_bulk_complete: hci0 urb d15cf080
+failed to resubmit (1)
+Dec  1 20:14:06 ganesha kernel: btusb_bulk_complete: hci0 urb d15cf480
+failed to resubmit (1)
+Dec  1 20:14:24 ganesha kernel: btusb_intr_complete: hci0 urb d1491a00
+failed to resubmit (1)
+Dec  1 20:14:24 ganesha kernel: btusb_bulk_complete: hci0 urb d1491300
+failed to resubmit (1)
+Dec  1 20:14:24 ganesha kernel: btusb_bulk_complete: hci0 urb d1491b80
+failed to resubmit (1)
+Dec  1 20:14:37 ganesha kernel: btusb_intr_complete: hci0 urb f6683400
+failed to resubmit (1)
+Dec  1 20:14:37 ganesha kernel: btusb_bulk_complete: hci0 urb f6683200
+failed to resubmit (1)
+Dec  1 20:14:37 ganesha kernel: btusb_bulk_complete: hci0 urb f6683180
+failed to resubmit (1)
 
-I'll send it, applied to bluetooth-2.6 tree. Thanks.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+any idea what could be wrong ..also why it says "input-headset"
+
+Thanks,
+Rahul
