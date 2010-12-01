@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3] Bluetooth: Add new PID for Atheros 3011
+Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
-References: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
+To: stefan.seyfried@googlemail.com
+Cc: gregkh@suse.de, linux-bluetooth@vger.kernel.org,
+	Stefan Seyfried <seife+kernel@b1-systems.com>,
+	Oliver Neukum <oneukum@suse.de>
+In-Reply-To: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
+References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 01 Dec 2010 11:44:44 +0100
-Message-ID: <1291200284.4795.92.camel@aeonflux>
+Date: Wed, 01 Dec 2010 11:42:20 +0100
+Message-ID: <1291200140.4795.91.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bala,
+Hi Stefan,
 
-> Atheros 3011 has small sflash firmware and needs to be
-> blacklisted in transport driver to load actual firmware
-> in DFU driver.
+> If a device is autosuspended an inability to resubmit URBs is
+> to be expected. Check the error code and only log real errors.
+> (Now that autosuspend is default enabled for btusb, those log
+> messages were happening all the time e.g. with a BT mouse)
 > 
-> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
-> ---
->  drivers/bluetooth/ath3k.c |    4 ++++
->  drivers/bluetooth/btusb.c |    3 +++
->  2 files changed, 7 insertions(+), 0 deletions(-)
+> Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
+> Signed-off-by: Oliver Neukum <oneukum@suse.de>
 
-looks good to me now.
+we had a similar one some time ago, but I am fine with this one as well.
+Actually this one might be a bit better since it still keeps some
+errors.
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
