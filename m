@@ -1,139 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Dec 2010 19:20:34 -0200
+Date: Wed, 1 Dec 2010 19:16:35 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/5] Bluetooth: clean up sco code
-Message-ID: <20101201212034.GE16125@vigoh>
-References: <1291215506-11398-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1291215506-11398-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/4] Bluetooth: clean up sco code
+Message-ID: <20101201211635.GD16125@vigoh>
+References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <AANLkTi=_a1omXZdLXg_eEqDD7c0h=f0FgnTnxn1DvGDQ@mail.gmail.com>
+ <AANLkTikfeMqq-4fTRHwmL81TDnF2=sQsMhL9o7GoEcX2@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291215506-11398-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTikfeMqq-4fTRHwmL81TDnF2=sQsMhL9o7GoEcX2@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Andrei, 
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-12-01 16:58:22 +0200]:
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-12-01 15:44:50 +0200]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> Hi,
 > 
-> Do not use assignments in IF condition, remove extra spaces
+> On Fri, Nov 26, 2010 at 6:14 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+> > Hi Andrei,
+> >
+> > On Fri, Nov 26, 2010 at 11:22 AM, Emeltchenko Andrei
+> > <Andrei.Emeltchenko.news@gmail.com> wrote:
+> >> @@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
+> >>
+> >>  static void sco_conn_ready(struct sco_conn *conn)
+> >>  {
+> >> -       struct sock *parent, *sk;
+> >> +       struct sock *parent;
+> >> +       struct sock *sk = conn->sk;
+> >
+> > I wonder if there is a problem with accessing conn->sk here outside
+> > the lock protection?
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  include/net/bluetooth/sco.h |    8 ++++----
->  net/bluetooth/sco.c         |   22 +++++++++++++---------
->  2 files changed, 17 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-> index e28a2a7..ea5c664 100644
-> --- a/include/net/bluetooth/sco.h
-> +++ b/include/net/bluetooth/sco.h
-> @@ -55,11 +55,11 @@ struct sco_conninfo {
->  struct sco_conn {
->  	struct hci_conn	*hcon;
->  
-> -	bdaddr_t 	*dst;
-> -	bdaddr_t 	*src;
-> -	
-> +	bdaddr_t	*dst;
-> +	bdaddr_t	*src;
-> +
->  	spinlock_t	lock;
-> -	struct sock 	*sk;
-> +	struct sock	*sk;
->  
->  	unsigned int    mtu;
->  };
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 66b9e5c..960c6d1 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -44,7 +44,7 @@
->  #include <net/sock.h>
->  
->  #include <asm/system.h>
-> -#include <asm/uaccess.h>
-> +#include <linux/uaccess.h>
->  
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> @@ -52,7 +52,7 @@
->  
->  #define VERSION "0.6"
->  
-> -static int disable_esco = 0;
-> +static int disable_esco;
+> I believe here is a safe access. We just acquire pointer and possible
+> protected operations
+> are executed inside lock.
 
-I don't think this change is right. Can we be sure that disable_esco
-will be 0 by default?
-
->  
->  static const struct proto_ops sco_sock_ops;
->  
-> @@ -138,16 +138,17 @@ static inline struct sock *sco_chan_get(struct sco_conn *conn)
->  
->  static int sco_conn_del(struct hci_conn *hcon, int err)
->  {
-> -	struct sco_conn *conn;
-> +	struct sco_conn *conn = hcon->sco_data;
->  	struct sock *sk;
->  
-> -	if (!(conn = hcon->sco_data))
-> +	if (!conn)
->  		return 0;
->  
->  	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
->  
->  	/* Kill socket */
-> -	if ((sk = sco_chan_get(conn))) {
-> +	sk = sco_chan_get(conn);
-> +	if (sk) {
->  		bh_lock_sock(sk);
->  		sco_sock_clear_timer(sk);
->  		sco_chan_del(sk, err);
-> @@ -185,7 +186,8 @@ static int sco_connect(struct sock *sk)
->  
->  	BT_DBG("%s -> %s", batostr(src), batostr(dst));
->  
-> -	if (!(hdev = hci_get_route(dst, src)))
-> +	hdev = hci_get_route(dst, src);
-> +	if (!hdev)
->  		return -EHOSTUNREACH;
->  
->  	hci_dev_lock_bh(hdev);
-> @@ -510,7 +512,8 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
->  	/* Set destination address and psm */
->  	bacpy(&bt_sk(sk)->dst, &sa->sco_bdaddr);
->  
-> -	if ((err = sco_connect(sk)))
-> +	err = sco_connect(sk);
-> +	if (err)
->  		goto done;
->  
->  	err = bt_sock_wait_state(sk, BT_CONNECTED,
-> @@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
->  
->  static void sco_conn_ready(struct sco_conn *conn)
->  {
-> -	struct sock *parent, *sk;
-> +	struct sock *parent;
-> +	struct sock *sk = conn->sk;
->  
->  	BT_DBG("conn %p", conn);
->  
->  	sco_conn_lock(conn);
->  
-> -	if ((sk = conn->sk)) {
-> +	if (sk) {
->  		sco_sock_clear_timer(sk);
->  		bh_lock_sock(sk);
->  		sk->sk_state = BT_CONNECTED;
-
-
-Otherwise looks good.
+Agreed.
 
 -- 
 Gustavo F. Padovan
