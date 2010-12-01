@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Dec 2010 15:50:36 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 1 Dec 2010 15:49:10 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: Add new PID for Atheros 3011
-Message-ID: <20101201175035.GB16125@vigoh>
-References: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	gregkh@suse.de, Stefan Seyfried <seife+kernel@b1-systems.com>,
+	Oliver Neukum <oneukum@suse.de>
+Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
+Message-ID: <20101201174910.GA16125@vigoh>
+References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
+ <1291200140.4795.91.camel@aeonflux>
+ <20101201154714.517289f7@susi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1290773146-4705-1-git-send-email-sbalashanmugam@atheros.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20101201154714.517289f7@susi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bala,
+Hi Stefan,
 
-* Bala Shanmugam <sbalashanmugam@atheros.com> [2010-11-26 17:35:46 +0530]:
+* Stefan Seyfried <stefan.seyfried@googlemail.com> [2010-12-01 15:47:14 +0100]:
 
-> Atheros 3011 has small sflash firmware and needs to be
-> blacklisted in transport driver to load actual firmware
-> in DFU driver.
+> Hi Marcel,
 > 
-> Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
-> ---
->  drivers/bluetooth/ath3k.c |    4 ++++
->  drivers/bluetooth/btusb.c |    3 +++
->  2 files changed, 7 insertions(+), 0 deletions(-)
+> On Wed, 01 Dec 2010 11:42:20 +0100
+> Marcel Holtmann <marcel@holtmann.org> wrote:
+> 
+> > Hi Stefan,
+> > 
+> > > If a device is autosuspended an inability to resubmit URBs is
+> > > to be expected. Check the error code and only log real errors.
+> > > (Now that autosuspend is default enabled for btusb, those log
+> > > messages were happening all the time e.g. with a BT mouse)
+> > > 
+> > > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
+> > > Signed-off-by: Oliver Neukum <oneukum@suse.de>
+> > 
+> > we had a similar one some time ago, but I am fine with this one as well.
+> > Actually this one might be a bit better since it still keeps some
+> > errors.
+> > 
+> > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
+> messages are annoying and users will complain if they are still in 2.6.37
+> final.
 
-Applied, thanks.
+I'll send it, applied to bluetooth-2.6 tree. Thanks.
 
 -- 
 Gustavo F. Padovan
