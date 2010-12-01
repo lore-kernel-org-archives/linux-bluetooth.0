@@ -1,49 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Dec 2010 19:16:35 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 1 Dec 2010 19:11:28 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+To: linville@tuxdriver.com
+Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/4] Bluetooth: clean up sco code
-Message-ID: <20101201211635.GD16125@vigoh>
-References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <AANLkTi=_a1omXZdLXg_eEqDD7c0h=f0FgnTnxn1DvGDQ@mail.gmail.com>
- <AANLkTikfeMqq-4fTRHwmL81TDnF2=sQsMhL9o7GoEcX2@mail.gmail.com>
+Subject: pull request: bluetooth-2.6 2010-11-01
+Message-ID: <20101201211128.GC16125@vigoh>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTikfeMqq-4fTRHwmL81TDnF2=sQsMhL9o7GoEcX2@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei, 
+Hi John,
 
-* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2010-12-01 15:44:50 +0200]:
+Here goes 3 simple patches intended to 2.6.37. First one is from myself
+and fix some trivial return values. Then we also have a fix from Stefan
+Seyfried on btusb to avoid emitting an err when we USB is autosupended.
+Last, a patch from Bala Shanmugam that fix the firmware loading process
+for the ath3k driver.
 
-> Hi,
-> 
-> On Fri, Nov 26, 2010 at 6:14 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
-> > Hi Andrei,
-> >
-> > On Fri, Nov 26, 2010 at 11:22 AM, Emeltchenko Andrei
-> > <Andrei.Emeltchenko.news@gmail.com> wrote:
-> >> @@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
-> >>
-> >>  static void sco_conn_ready(struct sco_conn *conn)
-> >>  {
-> >> -       struct sock *parent, *sk;
-> >> +       struct sock *parent;
-> >> +       struct sock *sk = conn->sk;
-> >
-> > I wonder if there is a problem with accessing conn->sk here outside
-> > the lock protection?
-> 
-> I believe here is a safe access. We just acquire pointer and possible
-> protected operations
-> are executed inside lock.
+Please pull, or let me know if you disagree with the patches. Thanks a
+lot. ;)
 
-Agreed.
+
+The following changes since commit 916448e77f6bcaaa7f13c3de0c3851783ae2bfd0:
+
+  ath9k: Fix STA disconnect issue due to received MIC failed bcast frames (2010-11-30 13:45:02 -0500)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Bala Shanmugam (1):
+      Bluetooth: Add new PID for Atheros 3011
+
+Gustavo F. Padovan (1):
+      Bluetooth: Fix not returning proper error in SCO
+
+Stefan Seyfried (1):
+      Bluetooth: Fix log spamming in btusb due to autosuspend
+
+ drivers/bluetooth/ath3k.c |    4 ++++
+ drivers/bluetooth/btusb.c |   12 +++++++++---
+ net/bluetooth/sco.c       |    6 +++---
+ 3 files changed, 16 insertions(+), 6 deletions(-)
 
 -- 
 Gustavo F. Padovan
