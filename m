@@ -1,41 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>
-Date: Wed, 1 Dec 2010 13:27:53 +0200
-Subject: RE: [PATCH 1/2] Sim Access Profile API
-Message-ID: <99B09243E1A5DA4898CDD8B7001114480BDADF1B37@EXMB04.eu.tieto.com>
+Date: Wed, 1 Dec 2010 13:21:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Waldemar.Rymarkiewicz@tieto.com
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Sim Access Profile API
+Message-ID: <20101201112138.GA1855@jh-x301>
 References: <1291113364-6401-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
  <1291113364-6401-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
  <1291200591.4795.95.camel@aeonflux>
  <99B09243E1A5DA4898CDD8B7001114480BDADF1B1B@EXMB04.eu.tieto.com>
- <20101201112138.GA1855@jh-x301>
-In-Reply-To: <20101201112138.GA1855@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <99B09243E1A5DA4898CDD8B7001114480BDADF1B1B@EXMB04.eu.tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,=20
+Hi Waldek,
 
->-----Original Message-----
->From: Johan Hedberg [mailto:johan.hedberg@gmail.com]=20
->
->On Wed, Dec 01, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
->> >do we want this really as property? Wouldn't be=20
->configuration option=20
->> >be better to enable this. None of the other profiles has this=20
->> >anymore.
->>=20
->> Well, that is actually a proposal and I don't see any problems if we=20
->> go for conf options in here. Even more, that would be if fact more=20
->> usef-ull.  Is the main.conf a right place for say EnableSAP=3Dtrue=20
->> option ?
->
->If the SAP support is all contained within a single plugin you=20
->probably don't need a new option at all but can simply use the=20
->DisablePlugins option for it.
->
+On Wed, Dec 01, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
+> >do we want this really as property? Wouldn't be configuration 
+> >option be better to enable this. None of the other profiles 
+> >has this anymore. 
+> 
+> Well, that is actually a proposal and I don't see any problems if we
+> go for conf options in here. Even more, that would be if fact more
+> usef-ull.  Is the main.conf a right place for say EnableSAP=true
+> option ?
 
-Ok. I see that.
+If the SAP support is all contained within a single plugin you probably
+don't need a new option at all but can simply use the DisablePlugins
+option for it.
 
-/Waldek
+Johan
