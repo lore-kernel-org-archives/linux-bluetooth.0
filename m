@@ -1,48 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Dec 2010 15:47:14 +0100
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, gregkh@suse.de, Stefan Seyfried
- <seife+kernel@b1-systems.com>, Oliver Neukum <oneukum@suse.de>, Gustavo F.
- Padovan <padovan@profusion.mobi>
-Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
-Message-ID: <20101201154714.517289f7@susi>
-In-Reply-To: <1291200140.4795.91.camel@aeonflux>
-References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
-	<1291200140.4795.91.camel@aeonflux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+In-Reply-To: <AANLkTi=_a1omXZdLXg_eEqDD7c0h=f0FgnTnxn1DvGDQ@mail.gmail.com>
+References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1290784965-4508-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<AANLkTi=_a1omXZdLXg_eEqDD7c0h=f0FgnTnxn1DvGDQ@mail.gmail.com>
+Date: Wed, 1 Dec 2010 15:44:50 +0200
+Message-ID: <AANLkTikfeMqq-4fTRHwmL81TDnF2=sQsMhL9o7GoEcX2@mail.gmail.com>
+Subject: Re: [RFC 1/4] Bluetooth: clean up sco code
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Wed, 01 Dec 2010 11:42:20 +0100
-Marcel Holtmann <marcel@holtmann.org> wrote:
+On Fri, Nov 26, 2010 at 6:14 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Andrei,
+>
+> On Fri, Nov 26, 2010 at 11:22 AM, Emeltchenko Andrei
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> @@ -828,13 +831,14 @@ static void sco_chan_del(struct sock *sk, int err)
+>>
+>>  static void sco_conn_ready(struct sco_conn *conn)
+>>  {
+>> -       struct sock *parent, *sk;
+>> +       struct sock *parent;
+>> +       struct sock *sk = conn->sk;
+>
+> I wonder if there is a problem with accessing conn->sk here outside
+> the lock protection?
 
-> Hi Stefan,
-> 
-> > If a device is autosuspended an inability to resubmit URBs is
-> > to be expected. Check the error code and only log real errors.
-> > (Now that autosuspend is default enabled for btusb, those log
-> > messages were happening all the time e.g. with a BT mouse)
-> > 
-> > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
-> > Signed-off-by: Oliver Neukum <oneukum@suse.de>
-> 
-> we had a similar one some time ago, but I am fine with this one as well.
-> Actually this one might be a bit better since it still keeps some
-> errors.
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+I believe here is a safe access. We just acquire pointer and possible
+protected operations
+are executed inside lock.
 
-Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
-messages are annoying and users will complain if they are still in 2.6.37
-final.
+>
+>>
+>>        BT_DBG("conn %p", conn);
+>>
+>>        sco_conn_lock(conn);
+>>
+>> -       if ((sk = conn->sk)) {
+>> +       if (sk) {
+>>                sco_sock_clear_timer(sk);
+>>                bh_lock_sock(sk);
+>>                sk->sk_state = BT_CONNECTED;
 
-It will probably have more weight if the maintainer sends it than if I
-send it ;)
 -- 
-Stefan Seyfried
-
-"Any ideas, John?"
-"Well, surrounding them's out."
+Regards,
+Andrei
