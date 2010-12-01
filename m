@@ -1,100 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <johan.hedberg@gmail.com>
+CC: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>
+Date: Wed, 1 Dec 2010 13:27:53 +0200
+Subject: RE: [PATCH 1/2] Sim Access Profile API
+Message-ID: <99B09243E1A5DA4898CDD8B7001114480BDADF1B37@EXMB04.eu.tieto.com>
+References: <1291113364-6401-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1291113364-6401-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1291200591.4795.95.camel@aeonflux>
+ <99B09243E1A5DA4898CDD8B7001114480BDADF1B1B@EXMB04.eu.tieto.com>
+ <20101201112138.GA1855@jh-x301>
+In-Reply-To: <20101201112138.GA1855@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1291200356.4795.93.camel@aeonflux>
-References: <1290784965-4508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1290784965-4508-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20101130010939.GB5919@vigoh>
-	<AANLkTimDn_oVX2YMHhEAqyw=YpeYZuX5WL6mr_F463dC@mail.gmail.com>
-	<1291200356.4795.93.camel@aeonflux>
-Date: Wed, 1 Dec 2010 14:20:31 +0200
-Message-ID: <AANLkTi=Tdb7KAxxG6aF0FSB8mfWz3Pk-kD4LpELBSH+7@mail.gmail.com>
-Subject: Re: [RFC 2/4] Bluetooth: clean up rfcomm code
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,=20
 
-On Wed, Dec 1, 2010 at 12:45 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Andrei,
+>-----Original Message-----
+>From: Johan Hedberg [mailto:johan.hedberg@gmail.com]=20
 >
->> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-11-26 1=
-7:22:43 +0200]:
->> >
->> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> >>
->> >> Remove extra spaces, assignments in if statement, zeroing static
->> >> variables.
->> >>
->> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> >> ---
->> >> =A0include/net/bluetooth/rfcomm.h | =A0 18 +++++++++---------
->> >> =A0net/bluetooth/rfcomm/core.c =A0 =A0| =A0 =A08 ++++----
->> >> =A0net/bluetooth/rfcomm/sock.c =A0 =A0| =A0 =A05 +++--
->> >> =A0net/bluetooth/rfcomm/tty.c =A0 =A0 | =A0 28 ++++++++++++++++------=
-------
->> >> =A04 files changed, 32 insertions(+), 27 deletions(-)
->> >>
->> >> diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/r=
-fcomm.h
->> >> index 71047bc..6eac4a7 100644
->> >> --- a/include/net/bluetooth/rfcomm.h
->> >> +++ b/include/net/bluetooth/rfcomm.h
->> >> @@ -1,5 +1,5 @@
->> >> -/*
->> >> - =A0 RFCOMM implementation for Linux Bluetooth stack (BlueZ).
->> >> +/*
->> >> + =A0 RFCOMM implementation for Linux Bluetooth stack (BlueZ)
->> >> =A0 =A0 Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
->> >> =A0 =A0 Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
->> >>
->> >> @@ -11,13 +11,13 @@
->> >> =A0 =A0 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF ME=
-RCHANTABILITY,
->> >> =A0 =A0 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD=
- PARTY RIGHTS.
->> >> =A0 =A0 IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LI=
-ABLE FOR ANY
->> >> - =A0 CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY=
- DAMAGES
->> >> - =A0 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER=
- IN AN
->> >> - =A0 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISIN=
-G OUT OF
->> >> + =A0 CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY=
- DAMAGES
->> >> + =A0 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER=
- IN AN
->> >> + =A0 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISIN=
-G OUT OF
->> >> =A0 =A0 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE=
-.
->> >>
->> >> - =A0 ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATE=
-NTS,
->> >> - =A0 COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
->> >> + =A0 ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATE=
-NTS,
->> >> + =A0 COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
->> >> =A0 =A0 SOFTWARE IS DISCLAIMED.
->> >
->> > Marcel refused a patch from me in the past because its was touching le=
-gal
->> > stuff, so or you remove these changes for your patches or wait for
->> > Marcel's comments here.
->>
->> I fixed extra spaces at the end of the sentences, no legal stuff
->> touched in legal terms :-)
->> I believe that it is better to have legal text identical to other
->> parts of the kernel otherwise
->> the legal stuff looks different when comparing with diff tools.
+>On Wed, Dec 01, 2010, Waldemar.Rymarkiewicz@tieto.com wrote:
+>> >do we want this really as property? Wouldn't be=20
+>configuration option=20
+>> >be better to enable this. None of the other profiles has this=20
+>> >anymore.
+>>=20
+>> Well, that is actually a proposal and I don't see any problems if we=20
+>> go for conf options in here. Even more, that would be if fact more=20
+>> usef-ull.  Is the main.conf a right place for say EnableSAP=3Dtrue=20
+>> option ?
 >
-> make it a separate patch and not just fix it while at it.
+>If the SAP support is all contained within a single plugin you=20
+>probably don't need a new option at all but can simply use the=20
+>DisablePlugins option for it.
+>
 
-OK, I'll do it this way.
+Ok. I see that.
 
-Regards,
-Andrei
+/Waldek
