@@ -1,25 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Brian Gix <bgix@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 2 Dec 2010 17:21:32 -0800
-Subject: RE: Are LE connections possible yet?
-Message-ID: <35B17FE5076C7040809188FBE7913F98406D794075@SC1EXMB-MBCL.global.atheros.com>
-References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
- <20101202162236.GA1291@jh-x301> <000001cb927b$08458e80$18d0ab80$@org>
-In-Reply-To: <000001cb927b$08458e80$18d0ab80$@org>
-Content-Type: text/plain; charset="us-ascii"
+From: "Brian Gix" <bgix@codeaurora.org>
+To: <linux-bluetooth@vger.kernel.org>
+References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com> <20101202162236.GA1291@jh-x301>
+In-Reply-To: <20101202162236.GA1291@jh-x301>
+Subject: Are LE connections possible yet?
+Date: Thu, 2 Dec 2010 15:45:42 -0800
+Message-ID: <000001cb927b$08458e80$18d0ab80$@org>
 MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi Brian,
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Brian Gix
-Sent: Thursday, December 02, 2010 3:46 PM
-To: linux-bluetooth@vger.kernel.org
-Subject: Are LE connections possible yet?
 
 Hi All,
 
@@ -44,8 +35,6 @@ if I have not yet run hciattach.
 
 Other (BR/EDR) hcitool commands work as expected, such as "hcitool scan" and
 "hcitool inq"
-[MTsai]which kernel driver you are using? It seems the kernel does not know the LE create connection OpCode?
-
 
 Brian Gix
 bgix@codeaurora.org
@@ -54,7 +43,3 @@ Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
 
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
