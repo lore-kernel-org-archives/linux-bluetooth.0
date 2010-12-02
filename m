@@ -1,72 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 2 Dec 2010 13:19:38 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 1/4] Sim Access Profile API
-Message-ID: <20101202151938.GA32133@vigoh>
-References: <1291299261-26016-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Date: Thu, 2 Dec 2010 16:58:55 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: Re: [PATCH 1/3] Initial attribute permission implementation
+Message-ID: <20101202145855.GA31448@jh-x301>
+References: <1291219986-29913-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1291219986-29913-2-git-send-email-anderson.lizardo@openbossa.org>
+ <20101202101031.GB18808@jh-x301>
+ <AANLkTinbiQyXTKKPc+jfpEtfuJAFCZphzR6Dcwm3Qaj+@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291299261-26016-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AANLkTinbiQyXTKKPc+jfpEtfuJAFCZphzR6Dcwm3Qaj+@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Anderson,
 
-* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2010-12-02 15:14:21 +0100]:
-
-> New API for Sim Access Profile.
-> ---
->  Makefile.am     |    2 +-
->  doc/sap-api.txt |   34 ++++++++++++++++++++++++++++++++++
->  2 files changed, 35 insertions(+), 1 deletions(-)
->  create mode 100644 doc/sap-api.txt
+On Thu, Dec 02, 2010, Anderson Lizardo wrote:
+> > Why not make sure that they are all orthogonal from the start
+> > instead of assigning the same value for authentication and
+> > writability like you do now. I.e. instead you could have:
+> >
+> > none            0
+> > read            1
+> > write           2
+> > authentication  4
+> > authorization   8
 > 
-> diff --git a/Makefile.am b/Makefile.am
-> index 5f96975..97345a3 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -354,7 +354,7 @@ EXTRA_DIST += doc/manager-api.txt \
->  		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
->  		doc/serial-api.txt doc/network-api.txt \
->  		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
-> -		doc/hfp-api.txt doc/assigned-numbers.txt
-> +		doc/hfp-api.txt doc/assigned-numbers.txt doc/sap-api.txt
+> This was the first attempt (as it seemed obvious). But see vol 3, part
+> F, section 4:
+> 
+> "For example, an attribute value may be allowed to be read by any device, but
+> only written by an authenticated device. An implementation should take this
+> into account, and not assume that just because it can read an attribute’s value,
+> it will also be able to write the value. [...]"
+> 
+> This makes it clear that the authentication/authorization permissions
+> are not orthogonal. Further on it is confirmed by the attribute
+> permissions of "Client Characteristic Configuration" (vol 3, part G,
+> 3.3.3.4):
+> 
+> * Readable with no authentication or authorization.
+> * Writable with authentication and authorization defined by a higher
+> layer specification or is implementation specific.
+> 
+> The scheme implemented in this patch set is just a compacted version
+> of unix permissions using a 2-bit grouping (not sure if it will look
+> nice to read):
+> 
+> 5 4 3 2 1 0  bit
+> | | | | | \_ Read
+> | | | | \___ Write
+> | | | \_____ Authenticated read
+> | | \_______ Authenticated write
+> | \_________ Authorized read
+> \___________ Authorized write
 
-Leave assigned-numbers.txt in the end.
+Ok, now I understand what you were trying to accomplish. If you had put
+all this into the commit message or as a code comment we'd have avoided
+some confusion ;)
 
->  
->  AM_YFLAGS = -d
->  
-> diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-> new file mode 100644
-> index 0000000..b8b7253
-> --- /dev/null
-> +++ b/doc/sap-api.txt
-> @@ -0,0 +1,34 @@
-> +BlueZ D-Bus Sim Access Profile API description
-> +***********************************
-> +
-> +Copyright (C) 2010 ST-Ericsson SA
-> +
-> +
-> +Sim Access Profile hierarchy
-> +============================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.SimAccess
-> +Object path	[variable prefix]/{hci0,hci1,...}
-> +
-> +Methods		void Disconnect()
-> +
-> +			Disconnects SAP client from the server.
-> +
-> +			Possible errors: org.bluez.Error.Failed
+> With an addition that, if the authenticated/authorized read/write bits
+> are set, the "none" read/write bits are set as well (I think the
+> reason is obvious).
 
-Don't you need a Connect() method?
+Wouldn't it be the other way around, i.e. if the "none" bits are set
+(i.e.  no special authentication or authentication requirements) then
+for higher security (authenticated or authorized) reads and writes would
+also succeed.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Anyway, if the requirement checks are really supposed to be so flexible
+and up to the profile implementation you will still have some gaps with
+your scheme. It's not e.g. possible to say "allow write only if *both*
+authenticated *and* authorized". So, for ultimate flexibility, I don't
+think there's any other choice then have a profile specific callback
+function that makes the decision. The callback would at least get the
+attempted operation (read/write) as well as the current level of
+security (authorized/authenticated) as parameters. Any thoughts on this?
+
+Johan
