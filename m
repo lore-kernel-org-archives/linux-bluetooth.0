@@ -1,159 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 1 Dec 2010 22:32:01 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next-2.6 2010-11-01
+Message-ID: <20101202003201.GN16125@vigoh>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
-References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
-	<20101130154654.GE5919@vigoh>
-	<AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
-Date: Thu, 2 Dec 2010 06:18:12 +0530
-Message-ID: <AANLkTi=YOQxr3mL_tgkXC1qM8rrH1bTAtRLVn5N-4U_c@mail.gmail.com>
-Subject: Re: [PATCH v7] Bluetooth: btwilink driver
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo,
+Hi John,
 
-On Tue, Nov 30, 2010 at 9:30 PM, Pavan Savoy <pavan_savoy@ti.com> wrote:
->>> Marcel, Gustavo,
->>> comments attended to from v5 and v6,
+Here are the first batch for 2.6.38, biggest change here is the move of
+the Remote Name Request to the kernel to fix some synchronization
+problems with other commands sent during the connection setup in
+Bluetooth. The rest is just bug fixes and clean ups in the whole stack,
+no big feature this time.
 
-There was 1 solution which was proposed for this,
-See in tty_receive/st_int_recv() - we pretty much want only the
-packet_id, header length and
-the offset of the payload in the header structure.
-this is to pack together the data coming in single frame or sets of
-multiple frames...
+This pull request includes the patches that I sent in the pull request
+to 2.6.37, but you should expect no problem when merging everything in
+wireless-next-2.6.
 
-so if bt driver can do something like,
-st_register(acl_proto) -> where ACL_PKT=3D0x2, acl_hdr.len and
-acl_hdr.payload_offset is sent to ST
-st_register(sco_proto) -> where SCO_PKT=3D0x3, sco_hdr.len and
-sco_hdr.payload_offset is sent to ST
-st_register(evt_proto) -> where EVT_PKT=3D0x2, sco_hdr.len and
-evt_hdr.payload_offset is sent to ST
+Please pull or let me know anything wrong. Thanks.
 
-and all 3 map to same st_recv() functions from ST, then
-the ST driver as you suggested can be generic enough not to include
-any net/bluetooth/ stuff,
-and also can be ignorant about any bluetooth, fm or gps stuff in general...
 
-So please suggest if this seems a valid solution, we had previously
-declined it because it made bt_driver
-sort of register to ST 3 times instead of 1 time like now....
+The following changes since commit 61790c5f3c5f158821821a00797d94504531839f:
 
-Thanks,
-Pavan
+  iwlagn: fix microcode error on 4965 (2010-11-30 13:58:18 -0500)
 
->>> 1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPERM=
-,
->>> Now I handle for EINPROGRESS - which is not really an error and
->>> return during all other error cases.
->>>
->>> 2. _write is still a function pointer and not an exported function, I
->>> need to change the underlying driver's code for this.
->>> However, previous lkml comments on the underlying driver's code
->>> suggested it to be kept as a function pointer and not EXPORT.
->>> Gustavo, Marcel - Please comment on this.
->>> Is this absolutely required? If so why?
->>>
->>> 3. test_and_set_bit of HCI_RUNNING is done at beginning of
->>> ti_st_open, and did not see issues during firmware download.
->>> However ideally I would still like to set HCI_RUNNING once the firmware
->>> download is done, because I don't want to allow a _send_frame during
->>> firmware download - Marcel, Gustavo - Please comment.
->>>
->>> 4. test_and_clear of HCI_RUNNING now done @ beginning of close.
->>>
->>> 5. EAGAIN on failure of st_write is to suggest to try and write again.
->>> I have never this happen - However only if UART goes bad this case may
->>> occur.
->>>
->>> 6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
->>> fact the code is pretty much borrowed from there.
->>> Marcel, Gustavo - Please suggest where should it be done? If not here.
->>>
->>> 7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fails=
-.
->>>
->>> 8. platform_driver registration inside module_init now is similar to
->>> other drivers.
->>>
->>> 9. Dan Carpenter's comments on leaking hst memory on failed
->>> hci_register_dev and empty space after quotes in debug statements
->>> fixed.
->>>
->>> Thanks for the comments...
->>> Sorry, for previously not being very clear on which comments were
->>> handled and which were not.
->>>
->>> -- patch description --
->>>
->>> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
->>> Texas Instrument's WiLink chipsets combine wireless technologies
->>> like BT, FM, GPS and WLAN onto a single chip.
->>>
->>> This Bluetooth driver works on top of the TI_ST shared transport
->>> line discipline driver which also allows other drivers like
->>> FM V4L2 and GPS character driver to make use of the same UART interface=
-.
->>>
->>> Kconfig and Makefile modifications to enable the Bluetooth
->>> driver for Texas Instrument's WiLink 7 chipset.
->>>
->>> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
->>> ---
->>> =C2=A0drivers/bluetooth/Kconfig =C2=A0 =C2=A0| =C2=A0 10 ++
->>> =C2=A0drivers/bluetooth/Makefile =C2=A0 | =C2=A0 =C2=A01 +
->>> =C2=A0drivers/bluetooth/btwilink.c | =C2=A0363 ++++++++++++++++++++++++=
-++++++++++++++++++
->>> =C2=A03 files changed, 374 insertions(+), 0 deletions(-)
->>> =C2=A0create mode 100644 drivers/bluetooth/btwilink.c
->>
->> So as part of reviewing this I took a look at your underlying driver and
->> I didn't like what I saw there, you are handling Bluetooth stuff inside
->> the core driver and that is just wrong. You have a Bluetooth driver here
->> then you have to leave the Bluetooth data handling to the Bluetooth
->> driver and do not do that in the core.
->
-> Thanks for reviewing this and the underlying driver.
-> yes, we do have Bluetooth/FM/GPS handling inside the TI ST driver, on
-> addition of further technologies
-> we do plan to have them inside the ST driver too.
->
-> The understanding of BT or FM or GPS is required for the ST driver
-> because, the data coming from the chip
-> can either be of these technologies, further-more the data might not
-> come in a set.
-> As in, an a2dp/ftp ACL frame might come in 2 frames instead of 1, and
-> in other cases,
-> there might be a HCI-EVENT + FM CH8 data in a single frame received by th=
-e UART.
->
->> So I'm going to clear NACK this. Your TI ST driver architecture is
->> a mess, Ideally you should not have any #include <net/bluetoooth/...>
->> there. Implement a core driver that only gets the Shared Transport
->> data and pass it to the right driver without look into the data and
->> process it. Process the data is not the role of the core driver.
->
-> So as I see it the tty_receive which translates to st_int_recv() in
-> TI-ST is the area of concern for
-> you ...
-> So any suggestions as to how we can go about just abstracting the BT,
-> FM and GPS data part to their individual drivers?
->
->> Please fix this and come back when you have a proper solution for your
->> driver.
->>
->> --
->> Gustavo F. Padovan
->> http://profusion.mobi
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
-h" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
->>
->
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+
+Anderson Lizardo (1):
+      Bluetooth: Fix error handling for l2cap_init()
+
+Andrei Emeltchenko (8):
+      Bluetooth: Check sk is not owned before freeing l2cap_conn
+      Bluetooth: timer check sk is not owned before freeing
+      Bluetooth: do not use assignment in if condition
+      Bluetooth: clean up sco code
+      Bluetooth: clean up rfcomm code
+      Bluetooth: clean up l2cap code
+      Bluetooth: clean up hci code
+      Bluetooth: clean up legal text
+
+Bala Shanmugam (1):
+      Bluetooth: Add new PID for Atheros 3011
+
+Gustavo F. Padovan (4):
+      Bluetooth: Fix not returning proper error in SCO
+      Merge git://git.kernel.org/.../padovan/bluetooth-2.6 into test
+      Bluetooth: Get rid of __l2cap_get_sock_by_psm()
+      Bluetooth: Get rid of __rfcomm_get_sock_by_channel()
+
+Johan Hedberg (3):
+      Bluetooth: Simplify remote features callback function logic
+      Bluetooth: Create a unified authentication request function
+      Bluetooth: Automate remote name requests
+
+Stefan Seyfried (1):
+      Bluetooth: Fix log spamming in btusb due to autosuspend
+
+Vasiliy Kulikov (3):
+      Bluetooth: bnep: fix information leak to userland
+      Bluetooth: cmtp: fix information leak to userland
+      Bluetooth: hidp: fix information leak to userland
+
+ drivers/bluetooth/ath3k.c        |    4 +
+ drivers/bluetooth/btusb.c        |   12 ++-
+ include/net/bluetooth/hci.h      |   16 ++--
+ include/net/bluetooth/hci_core.h |   14 ++--
+ include/net/bluetooth/l2cap.h    |   22 +++---
+ include/net/bluetooth/rfcomm.h   |   18 ++--
+ include/net/bluetooth/sco.h      |   20 ++--
+ net/bluetooth/bnep/core.c        |    1 +
+ net/bluetooth/cmtp/core.c        |    1 +
+ net/bluetooth/hci_conn.c         |   23 +++--
+ net/bluetooth/hci_core.c         |   66 +++++++++-----
+ net/bluetooth/hci_event.c        |  177 +++++++++++++++++++++++++++-----------
+ net/bluetooth/hci_sock.c         |   17 +++--
+ net/bluetooth/hidp/core.c        |    2 +-
+ net/bluetooth/l2cap.c            |   94 ++++++++++++++-------
+ net/bluetooth/rfcomm/core.c      |    8 +-
+ net/bluetooth/rfcomm/sock.c      |   24 ++---
+ net/bluetooth/rfcomm/tty.c       |   28 ++++---
+ net/bluetooth/sco.c              |   28 ++++---
+ 19 files changed, 363 insertions(+), 212 deletions(-)
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
