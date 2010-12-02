@@ -1,45 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Brian Gix" <bgix@codeaurora.org>
-To: <linux-bluetooth@vger.kernel.org>
-References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com> <20101202162236.GA1291@jh-x301>
-In-Reply-To: <20101202162236.GA1291@jh-x301>
-Subject: Are LE connections possible yet?
-Date: Thu, 2 Dec 2010 15:45:42 -0800
-Message-ID: <000001cb927b$08458e80$18d0ab80$@org>
+Date: Thu, 2 Dec 2010 18:22:36 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Optimize tracker queries for PBAP
+Message-ID: <20101202162236.GA1291@jh-x301>
+References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Radek,
 
-I am bringing up an LE capable (BR/EDR/LE) baseband, and attempting to use
-it to establish a
-GATT/ATT connection over an LE link.  However when executing the command:
+On Thu, Dec 02, 2010, Radoslaw Jablonski wrote:
+> Now data from tracker is fetched without redundand fields. Also
+> determining which type has phone, address and email (work or home) is
+> done in backend code - no tracker sub-query is used for that case. Now
+> queries are about 6 times faster for any amount of data( call history
+> queries, which were heavy loaded with OPTIONAL sub-queries are even 10
+> times faster than before)
+> ---
+>  plugins/phonebook-tracker.c |  514 ++++++++++++++-----------------------------
+>  1 files changed, 166 insertions(+), 348 deletions(-)
 
-% ./tools/hcitool lecc 00:14:BB:55:66:77
+Pushed upstream. Thanks.
 
-I get a very rapid failure of:
-
-"Could not create connection: Operation not permitted"
-
-The correct HCI command does not appear to be making it to the BR/EDR/LE
-baseband.
-
-It appears to be a socket issue of some sort.  I can cause this error, when
-attached to the baseband, and:
-"Could not create connection: File descriptor in bad state"
-
-if I have not yet run hciattach.
-
-Other (BR/EDR) hcitool commands work as expected, such as "hcitool scan" and
-"hcitool inq"
-
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
-
+Johan
