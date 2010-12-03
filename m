@@ -2,71 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 4/5] glib-helper: fix coding style issues
-Date: Fri,  3 Dec 2010 11:28:51 -0300
-Message-Id: <1291386532-4985-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH 3/5] Make EIR type an optional argument for bt_extract_eir_name
+Date: Fri,  3 Dec 2010 11:28:50 -0300
+Message-Id: <1291386532-4985-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/glib-helper.c |   14 +++++++-------
- 1 files changed, 7 insertions(+), 7 deletions(-)
+ src/adapter.c     |    4 ++--
+ src/glib-helper.c |    5 +++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 04ffd2b..03ae1e9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3135,8 +3135,8 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
+ 						(GCompareFunc) dev_rssi_cmp);
+ 
+ 	if (info->length) {
+-		uint8_t type, flags;
+-		char *tmp_name = bt_extract_eir_name(info->data, &type);
++		uint8_t flags;
++		char *tmp_name = bt_extract_eir_name(info->data, NULL);
+ 		if (tmp_name) {
+ 			g_free(dev->name);
+ 			dev->name = tmp_name;
 diff --git a/src/glib-helper.c b/src/glib-helper.c
-index e71841b..2db307e 100644
+index 927fb7c..e71841b 100644
 --- a/src/glib-helper.c
 +++ b/src/glib-helper.c
-@@ -115,7 +115,7 @@ static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
- }
+@@ -744,9 +744,10 @@ char *bt_extract_eir_name(uint8_t *data, uint8_t *type)
+ 	if (data[0] == 0)
+ 		return NULL;
  
- static void cache_sdp_session(bdaddr_t *src, bdaddr_t *dst,
--				sdp_session_t *session)
-+						sdp_session_t *session)
- {
- 	struct cached_sdp_session *cached;
+-	*type = data[1];
++	if (type)
++		*type = data[1];
  
-@@ -210,8 +210,8 @@ done:
- 	search_context_cleanup(ctxt);
- }
- 
--static gboolean search_process_cb(GIOChannel *chan,
--			GIOCondition cond, void *user_data)
-+static gboolean search_process_cb(GIOChannel *chan, GIOCondition cond,
-+							gpointer user_data)
- {
- 	struct search_context *ctxt = user_data;
- 	int err = 0;
-@@ -240,7 +240,8 @@ failed:
- 	return FALSE;
- }
- 
--static gboolean connect_watch(GIOChannel *chan, GIOCondition cond, gpointer user_data)
-+static gboolean connect_watch(GIOChannel *chan, GIOCondition cond,
-+							gpointer user_data)
- {
- 	struct search_context *ctxt = user_data;
- 	sdp_list_t *search, *attrids;
-@@ -297,8 +298,7 @@ failed:
- }
- 
- static int create_search_context(struct search_context **ctxt,
--				const bdaddr_t *src, const bdaddr_t *dst,
--				uuid_t *uuid)
-+			const bdaddr_t *src, const bdaddr_t *dst, uuid_t *uuid)
- {
- 	sdp_session_t *s;
- 	GIOChannel *chan;
-@@ -363,7 +363,7 @@ int bt_discover_services(const bdaddr_t *src, const bdaddr_t *dst,
- 	return bt_search_service(src, dst, &uuid, cb, user_data, destroy);
- }
- 
--static int find_by_bdaddr(const void *data, const void *user_data)
-+static gint find_by_bdaddr(gconstpointer data, gconstpointer user_data)
- {
- 	const struct search_context *ctxt = data, *search = user_data;
- 
+-	switch (*type) {
++	switch (data[1]) {
+ 	case EIR_NAME_SHORT:
+ 	case EIR_NAME_COMPLETE:
+ 		if (!g_utf8_validate((char *) (data + 2), data[0] - 1, NULL))
 -- 
 1.7.3.2
 
