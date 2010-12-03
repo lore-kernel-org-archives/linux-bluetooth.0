@@ -1,80 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1291386290-2521-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1291386290-2521-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Fri, 3 Dec 2010 16:37:00 +0200
-Message-ID: <AANLkTikrFvKHQ9zcxiK_hA7L1cr8ooBUJgu2GHa8yBEP@mail.gmail.com>
-Subject: Re: [PATCH] Remove automatic battery state change on attribute example
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 5/5] Make bt_name2class static on glib-helper
+Date: Fri,  3 Dec 2010 11:28:52 -0300
+Message-Id: <1291386532-4985-5-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ src/glib-helper.c |    6 +++---
+ src/glib-helper.h |    1 -
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-On Fri, Dec 3, 2010 at 4:24 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Legacy code implemented to test Indication and Notification
-> ---
->  attrib/example.c |   19 -------------------
->  1 files changed, 0 insertions(+), 19 deletions(-)
->
-> diff --git a/attrib/example.c b/attrib/example.c
-> index c29e1e4..2d5b758 100644
-> --- a/attrib/example.c
-> +++ b/attrib/example.c
-> @@ -59,22 +59,6 @@
->  #define FMT_KILOGRAM_UUID              0xA010
->  #define FMT_HANGING_UUID               0xA011
->
-> -static guint timeout_id = 0;
-> -
-> -static gboolean change_battery_state(gpointer user_data)
-> -{
-> -       static uint8_t state =  0x05;
-> -       uuid_t uuid;
-> -       uint8_t atval[1];
-> -
-> -       /* Battery state is being increased every 10 seconds. */
-> -       atval[0] = state++;
-> -       sdp_uuid16_create(&uuid, BATTERY_STATE_UUID);
-> -       attrib_db_update(0x0110, &uuid, atval, 1);
-> -
-> -       return TRUE;
-> -}
-> -
->  static int register_attributes(void)
->  {
->        const char *devname = "Example Device";
-> @@ -170,8 +154,6 @@ static int register_attributes(void)
->        atval[1] = 0x00;
->        attrib_db_add(0x0111, &uuid, atval, 2);
->
-> -       timeout_id = g_timeout_add_seconds(10, change_battery_state, NULL);
-> -
->        /* Thermometer: primary service definition */
->        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->        u16 = htons(THERM_HUMIDITY_SVC_UUID);
-> @@ -436,5 +418,4 @@ int server_example_init(void)
->
->  void server_example_exit(void)
->  {
-> -       g_source_remove(timeout_id);
->  }
-> --
-> 1.7.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-I wonder what is the relation of this code with attrib-server.c, does
-this work if we don't have the attrib server enabled?
-
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 2db307e..9871c5b 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -586,7 +586,7 @@ static struct {
+ 	{ }
+ };
+ 
+-uint16_t bt_name2class(const char *pattern)
++static uint16_t name2class(const char *pattern)
+ {
+ 	int i;
+ 
+@@ -636,7 +636,7 @@ char *bt_name2string(const char *pattern)
+ 		return g_strdup(pattern);
+ 
+ 	/* Friendly service name format */
+-	uuid16 = bt_name2class(pattern);
++	uuid16 = name2class(pattern);
+ 	if (uuid16)
+ 		goto proceed;
+ 
+@@ -683,7 +683,7 @@ int bt_string2uuid(uuid_t *uuid, const char *string)
+ 
+ 		return 0;
+ 	} else {
+-		uint16_t class = bt_name2class(string);
++		uint16_t class = name2class(string);
+ 		if (class) {
+ 			sdp_uuid16_create(uuid, class);
+ 			return 0;
+diff --git a/src/glib-helper.h b/src/glib-helper.h
+index 018ff92..5bb20a6 100644
+--- a/src/glib-helper.h
++++ b/src/glib-helper.h
+@@ -38,7 +38,6 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 					bt_destroy_t destroy);
+ 
+ gchar *bt_uuid2string(uuid_t *uuid);
+-uint16_t bt_name2class(const char *string);
+ char *bt_name2string(const char *string);
+ int bt_string2uuid(uuid_t *uuid, const char *string);
+ gchar *bt_list2string(GSList *list);
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.3.2
+
