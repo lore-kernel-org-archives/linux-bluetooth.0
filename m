@@ -1,60 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: Mike Tsai <Mike.Tsai@Atheros.com>
+To: Brian Gix <bgix@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 2 Dec 2010 17:21:32 -0800
+Subject: RE: Are LE connections possible yet?
+Message-ID: <35B17FE5076C7040809188FBE7913F98406D794075@SC1EXMB-MBCL.global.atheros.com>
+References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+ <20101202162236.GA1291@jh-x301> <000001cb927b$08458e80$18d0ab80$@org>
+In-Reply-To: <000001cb927b$08458e80$18d0ab80$@org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <20101029172443.61f7b067@pyx>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
-	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-	<AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
-	<20101029172443.61f7b067@pyx>
-Date: Fri, 3 Dec 2010 10:16:25 +0100
-Message-ID: <AANLkTimiyxiKzT=9pKXLFACkc6C=nTD2dtBR7PcgjhOL@mail.gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2010/10/29 Alan Cox <alan@lxorguk.ukuu.org.uk>:
->> The reason is that the work is generated so often that a work is not
->> finished before next work of same type comes. This is especially true
->> for transmit and receive. Then I get 0 back when queuing the work and
->> there is no real way to solve it from what I can see than to allocate
->> new work structures every time.
->
-> So if that is the case what bounds your memory usage - can a busy box end
-> up with thousands of work queue slos used ? It sounds like your model is
-> perhaps wrong - if there is a continual stream of work maybe you should
-> simply have a kernel thread to handle it if it cannot be deferred
-> - remember ldisc code is able to sleep in most paths.
->
->
+Hi Brian,
 
-Hi Alan,
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Brian Gix
+Sent: Thursday, December 02, 2010 3:46 PM
+To: linux-bluetooth@vger.kernel.org
+Subject: Are LE connections possible yet?
 
-I went through my old mails here and realized I hadn't answered you
-for this question.
-Basically most of the time we are able to handle the works in time for
-the next work to be created. But there are occasions where next work
-is created really quickly and we end up with an error situation when
-starting the work. But if we allocate the work it will then be handled
-when the first one is ready. It's not like we will never handle it.
-The data transfers can be received in a bit bursty way and then there
-are no interrupts for a while. So in the end all works are handled
-rather quickly and queue will never build up. We have tested with
-several large file transfers and data pumps without issues.
+Hi All,
 
-By the way, I will soon release a new patch set for CG2900 (hopefully
-next week), which contains major rework. It's hard to explain
-everything here and now but changes include:
- - Reuse of existing HCI line discipline under /drivers/bluetooth/.
-Line discipline has been modified so it is selectable from protocol if
-line discipline should register to Bluetooth stack or not.
- - Architecture modification: core, chip, and transport is new created
-from platform specific files (/arch/). Each chip file then spawns MFD
-devices for the channels it support.
- - Core file now only handles detection of connected chip. All chip
-dependent code is moved to transport and chip files.
+I am bringing up an LE capable (BR/EDR/LE) baseband, and attempting to use
+it to establish a
+GATT/ATT connection over an LE link.  However when executing the command:
 
-/P-G
+% ./tools/hcitool lecc 00:14:BB:55:66:77
+
+I get a very rapid failure of:
+
+"Could not create connection: Operation not permitted"
+
+The correct HCI command does not appear to be making it to the BR/EDR/LE
+baseband.
+
+It appears to be a socket issue of some sort.  I can cause this error, when
+attached to the baseband, and:
+"Could not create connection: File descriptor in bad state"
+
+if I have not yet run hciattach.
+
+Other (BR/EDR) hcitool commands work as expected, such as "hcitool scan" and
+"hcitool inq"
+[MTsai]which kernel driver you are using? It seems the kernel does not know the LE create connection OpCode?
+
+
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
