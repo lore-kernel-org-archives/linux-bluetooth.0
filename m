@@ -1,60 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Remove automatic battery state change on attribute example
-Date: Fri,  3 Dec 2010 11:24:50 -0300
-Message-Id: <1291386290-2521-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <AANLkTimiyxiKzT=9pKXLFACkc6C=nTD2dtBR7PcgjhOL@mail.gmail.com>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
+	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
+	<AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
+	<20101029172443.61f7b067@pyx>
+	<AANLkTimiyxiKzT=9pKXLFACkc6C=nTD2dtBR7PcgjhOL@mail.gmail.com>
+Date: Fri, 3 Dec 2010 12:42:49 +0100
+Message-ID: <AANLkTim7brB0JecKXDNddt0am=Um457Kfbm6bRG_yzFM@mail.gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+From: Vitaly Wool <vitalywool@gmail.com>
+To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Legacy code implemented to test Indication and Notification
----
- attrib/example.c |   19 -------------------
- 1 files changed, 0 insertions(+), 19 deletions(-)
+Hi Par,
 
-diff --git a/attrib/example.c b/attrib/example.c
-index c29e1e4..2d5b758 100644
---- a/attrib/example.c
-+++ b/attrib/example.c
-@@ -59,22 +59,6 @@
- #define FMT_KILOGRAM_UUID		0xA010
- #define FMT_HANGING_UUID		0xA011
- 
--static guint timeout_id = 0;
--
--static gboolean change_battery_state(gpointer user_data)
--{
--	static uint8_t state =  0x05;
--	uuid_t uuid;
--	uint8_t atval[1];
--
--	/* Battery state is being increased every 10 seconds. */
--	atval[0] = state++;
--	sdp_uuid16_create(&uuid, BATTERY_STATE_UUID);
--	attrib_db_update(0x0110, &uuid, atval, 1);
--
--	return TRUE;
--}
--
- static int register_attributes(void)
- {
- 	const char *devname = "Example Device";
-@@ -170,8 +154,6 @@ static int register_attributes(void)
- 	atval[1] = 0x00;
- 	attrib_db_add(0x0111, &uuid, atval, 2);
- 
--	timeout_id = g_timeout_add_seconds(10, change_battery_state, NULL);
--
- 	/* Thermometer: primary service definition */
- 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
- 	u16 = htons(THERM_HUMIDITY_SVC_UUID);
-@@ -436,5 +418,4 @@ int server_example_init(void)
- 
- void server_example_exit(void)
- {
--	g_source_remove(timeout_id);
- }
--- 
-1.7.3.2
+On Fri, Dec 3, 2010 at 10:16 AM, Par-Gunnar Hjalmdahl
+<pghatwork@gmail.com> wrote:
+> 2010/10/29 Alan Cox <alan@lxorguk.ukuu.org.uk>:
 
+> By the way, I will soon release a new patch set for CG2900 (hopefully
+> next week), which contains major rework. It's hard to explain
+> everything here and now but changes include:
+> =A0- Reuse of existing HCI line discipline under /drivers/bluetooth/.
+> Line discipline has been modified so it is selectable from protocol if
+> line discipline should register to Bluetooth stack or not.
+
+So is it true that if there's the other chip with similar
+functionality I have to implement support for, I'll have to pretty
+much duplicate your line discipline driver?
+
+Isn't it better to have a new line discipline that the standard
+drivers (H4, LL, ...) will be applicable to?
+
+~Vitaly
