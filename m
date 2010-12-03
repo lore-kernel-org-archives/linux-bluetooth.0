@@ -1,42 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/3] Basic attribute permission support
-Date: Fri,  3 Dec 2010 14:26:19 -0400
-Message-Id: <1291400782-24736-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <35B17FE5076C7040809188FBE7913F98406D794075@SC1EXMB-MBCL.global.atheros.com>
+References: <1291305728-3463-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+	<20101202162236.GA1291@jh-x301>
+	<000001cb927b$08458e80$18d0ab80$@org>
+	<35B17FE5076C7040809188FBE7913F98406D794075@SC1EXMB-MBCL.global.atheros.com>
+Date: Fri, 3 Dec 2010 15:07:00 -0300
+Message-ID: <AANLkTi=gWTQXcfisupHXs9qVpHbUbYZ1yxxqKf2Mm9EU@mail.gmail.com>
+Subject: Re: Are LE connections possible yet?
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Mike Tsai <Mike.Tsai@atheros.com>
+Cc: Brian Gix <bgix@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi All,
 
-Changes since V1:
+On Thu, Dec 2, 2010 at 10:21 PM, Mike Tsai <Mike.Tsai@atheros.com> wrote:
+> Hi Brian,
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Brian Gix
+> Sent: Thursday, December 02, 2010 3:46 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: Are LE connections possible yet?
+>
+> Hi All,
+>
+> I am bringing up an LE capable (BR/EDR/LE) baseband, and attempting to use
+> it to establish a
+> GATT/ATT connection over an LE link.  However when executing the command:
+>
+> % ./tools/hcitool lecc 00:14:BB:55:66:77
+>
+> I get a very rapid failure of:
+>
+> "Could not create connection: Operation not permitted"
+>
+> The correct HCI command does not appear to be making it to the BR/EDR/LE
+> baseband.
+>
+> It appears to be a socket issue of some sort.  I can cause this error, when
+> attached to the baseband, and:
+> "Could not create connection: File descriptor in bad state"
+>
+> if I have not yet run hciattach.
+>
+> Other (BR/EDR) hcitool commands work as expected, such as "hcitool scan" and
+> "hcitool inq"
+> [MTsai]which kernel driver you are using? It seems the kernel does not know the LE create connection OpCode?
+>
+>
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-* Simplified permission scheme according to discussion on IRC.
-* Fixed incorrect error sent by server.
+For hcitool lecc it is not necessary a LE "capable" kernel, hcitool
+sends the HCI commands from the userspace.
+Try sudo hcitool lecc ... and don't forget putting the remote on
+advertising mode: $hciconfig hcix leadv
 
-This patchset adds initial support for attribute permission checks. Currently,
-only access and authentication permissions are checked. Authorization
-permissions require integration with the BlueZ agent, which is not implemented
-yet.
+If you want to test the connections managed by the kernel use Ville's kernel:
+git://git.kernel.org/pub/scm/linux/kernel/git/vtervo/bluetooth-le-2.6.git
 
-There are some pending issues necessary for a minimum complete attribute
-permission support (all of them are being worked on):
-
-* The attribute client, upon receiving the "Insufficient Encryption" error,
-  shall increase the security level and resend the failed request.
-* The attribute server shall verify the connection permissions on each ATT
-  request, and not just once on connection callback.
-* On kernel side, increasing the security level (using setsockopt()) shall
-  trigger SMP negotiation for a LE connection, blocking next socket I/O until
-  negotiation is finished.
-* On BR/EDR, link encryption is mandatory for GATT (see Vol 3, Part G, 2.4
-  "Profile Fundamentals").
-
-Albeit the above issues, we believe these patches are ready for commit.
+l2test support LE connections, use -J option to pass the fixed channel 4
 
 Regards,
---
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
-
+Claudio
