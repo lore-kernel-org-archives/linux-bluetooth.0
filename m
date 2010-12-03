@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 2/3] Check attribute permissions in attribute server
-Date: Fri,  3 Dec 2010 14:26:21 -0400
-Message-Id: <1291400782-24736-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 1/3] Initial attribute permission implementation
+Date: Fri,  3 Dec 2010 14:26:20 -0400
+Message-Id: <1291400782-24736-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1291400782-24736-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1291400782-24736-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,179 +12,409 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-The attribute server must verify if the operation (read/write) is
-permitted before running the request, and send "Read Not Permitted" or
-"Write Not Permitted" error response to client if appropriate.
----
- TODO                |    7 -----
- src/attrib-server.c |   68 ++++++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 62 insertions(+), 13 deletions(-)
+Add enums for attribute read/write requirements, which may be "none",
+"authentication required" or "authorization required". Additionally, a
+"not permitted" requirement means that operation is not permitted,
+allowing read-only or write-only attributes.
 
-diff --git a/TODO b/TODO
-index 49a9e76..32d3a61 100644
---- a/TODO
-+++ b/TODO
-@@ -136,13 +136,6 @@ ATT/GATT
-   Priority: Low
-   Complexity: C2
+The attrib_db_add() API was changed to allow setting these requirements,
+and the example server was changed to set requirements for its
+attributes.
+---
+ attrib/att.h        |   10 ++++++
+ attrib/example.c    |   80 +++++++++++++++++++++++++-------------------------
+ src/attrib-server.c |    5 ++-
+ src/attrib-server.h |    3 +-
+ 4 files changed, 56 insertions(+), 42 deletions(-)
+
+diff --git a/attrib/att.h b/attrib/att.h
+index 7c98b4a..2c8c724 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -109,9 +109,19 @@
+ #define ATT_MAX_MTU				256
+ #define ATT_DEFAULT_MTU				23
  
--- Attribute server shall implement attribute permission verification,
--  returning an error code if necessary. See Volume 3, Part F, 3.2.5
--  for more information.
--
--  Priority: Low
--  Complexity: C2
--
- - Implement Client Characteristic Configuration support in the attribute
-   server to manage indications and notications. This is a per client attribute
-   to control how the client wants to receive reports of changes in a given
++/* Requirements for read/write operations */
++enum {
++	ATT_NONE,		/* No restrictions */
++	ATT_AUTHENTICATION,	/* Authentication required */
++	ATT_AUTHORIZATION,	/* Authorization required */
++	ATT_NOT_PERMITTED,	/* Operation not permitted */
++};
++
+ struct attribute {
+ 	uint16_t handle;
+ 	uuid_t uuid;
++	int read_reqs;
++	int write_reqs;
+ 	int len;
+ 	uint8_t data[0];
+ };
+diff --git a/attrib/example.c b/attrib/example.c
+index c29e1e4..4307804 100644
+--- a/attrib/example.c
++++ b/attrib/example.c
+@@ -101,7 +101,7 @@ static int register_attributes(void)
+ 	u16 = htons(GENERIC_ACCESS_PROFILE_ID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0001, &uuid, atval, 2);
++	attrib_db_add(0x0001, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* GAP service: device name characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -111,20 +111,20 @@ static int register_attributes(void)
+ 	atval[2] = 0x00;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0004, &uuid, atval, 5);
++	attrib_db_add(0x0004, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* GAP service: device name attribute */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
+ 	len = strlen(devname);
+ 	strncpy((char *) atval, devname, len);
+-	attrib_db_add(0x0006, &uuid, atval, len);
++	attrib_db_add(0x0006, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* GATT service: primary service definition */
+ 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	u16 = htons(GENERIC_ATTRIB_PROFILE_ID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0010, &uuid, atval, 2);
++	attrib_db_add(0x0010, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* GATT service: attributes opcodes characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -134,20 +134,20 @@ static int register_attributes(void)
+ 	atval[2] = 0x00;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0011, &uuid, atval, 5);
++	attrib_db_add(0x0011, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* GATT service: attribute opcodes supported */
+ 	sdp_uuid16_create(&uuid, OPCODES_SUPPORTED_UUID);
+ 	atval[0] = 0xFF;
+ 	atval[1] = 0x01;
+-	attrib_db_add(0x0012, &uuid, atval, 2);
++	attrib_db_add(0x0012, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Battery state service: primary service definition */
+ 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	u16 = htons(BATTERY_STATE_SVC_UUID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0100, &uuid, atval, 2);
++	attrib_db_add(0x0100, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Battery: battery state characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -157,18 +157,18 @@ static int register_attributes(void)
+ 	atval[2] = 0x01;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0106, &uuid, atval, 5);
++	attrib_db_add(0x0106, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Battery: battery state attribute */
+ 	sdp_uuid16_create(&uuid, BATTERY_STATE_UUID);
+ 	atval[0] = 0x04;
+-	attrib_db_add(0x0110, &uuid, atval, 1);
++	attrib_db_add(0x0110, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+ 
+ 	/* Battery: Client Characteristic Configuration */
+ 	sdp_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+ 	atval[0] = 0x00;
+ 	atval[1] = 0x00;
+-	attrib_db_add(0x0111, &uuid, atval, 2);
++	attrib_db_add(0x0111, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval, 2);
+ 
+ 	timeout_id = g_timeout_add_seconds(10, change_battery_state, NULL);
+ 
+@@ -177,7 +177,7 @@ static int register_attributes(void)
+ 	u16 = htons(THERM_HUMIDITY_SVC_UUID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0200, &uuid, atval, 2);
++	attrib_db_add(0x0200, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Thermometer: Include */
+ 	sdp_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+@@ -188,14 +188,14 @@ static int register_attributes(void)
+ 	atval[3] = 0x05;
+ 	atval[4] = u16 >> 8;
+ 	atval[5] = u16;
+-	attrib_db_add(0x0201, &uuid, atval, 6);
++	attrib_db_add(0x0201, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Thermometer: Include */
+ 	atval[0] = 0x50;
+ 	atval[1] = 0x05;
+ 	atval[2] = 0x68;
+ 	atval[3] = 0x05;
+-	attrib_db_add(0x0202, &uuid, atval, 4);
++	attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 4);
+ 
+ 	/* Thermometer: temperature characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -205,13 +205,13 @@ static int register_attributes(void)
+ 	atval[2] = 0x02;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0203, &uuid, atval, 5);
++	attrib_db_add(0x0203, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Thermometer: temperature characteristic value */
+ 	sdp_uuid16_create(&uuid, TEMPERATURE_UUID);
+ 	atval[0] = 0x8A;
+ 	atval[1] = 0x02;
+-	attrib_db_add(0x0204, &uuid, atval, 2);
++	attrib_db_add(0x0204, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Thermometer: temperature characteristic format */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+@@ -224,13 +224,13 @@ static int register_attributes(void)
+ 	u16 = htons(FMT_OUTSIDE_UUID);
+ 	atval[5] = u16 >> 8;
+ 	atval[6] = u16;
+-	attrib_db_add(0x0205, &uuid, atval, 7);
++	attrib_db_add(0x0205, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 7);
+ 
+ 	/* Thermometer: characteristic user description */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_out_temp);
+ 	strncpy((char *) atval, desc_out_temp, len);
+-	attrib_db_add(0x0206, &uuid, atval, len);
++	attrib_db_add(0x0206, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Thermometer: relative humidity characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -240,12 +240,12 @@ static int register_attributes(void)
+ 	atval[2] = 0x02;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0210, &uuid, atval, 5);
++	attrib_db_add(0x0210, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Thermometer: relative humidity value */
+ 	sdp_uuid16_create(&uuid, RELATIVE_HUMIDITY_UUID);
+ 	atval[0] = 0x27;
+-	attrib_db_add(0x0212, &uuid, atval, 1);
++	attrib_db_add(0x0212, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+ 
+ 	/* Thermometer: relative humidity characteristic format */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+@@ -260,20 +260,20 @@ static int register_attributes(void)
+ 	u16 = htons(FMT_OUTSIDE_UUID);
+ 	atval[6] = u16 >> 8;
+ 	atval[7] = u16;
+-	attrib_db_add(0x0213, &uuid, atval, 8);
++	attrib_db_add(0x0213, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 8);
+ 
+ 	/* Thermometer: characteristic user description */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_out_hum);
+ 	strncpy((char *) atval, desc_out_hum, len);
+-	attrib_db_add(0x0214, &uuid, atval, len);
++	attrib_db_add(0x0214, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Secondary Service: Manufacturer Service */
+ 	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	u16 = htons(MANUFACTURER_SVC_UUID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0500, &uuid, atval, 2);
++	attrib_db_add(0x0500, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Manufacturer name characteristic definition */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -283,13 +283,13 @@ static int register_attributes(void)
+ 	atval[2] = 0x05;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0501, &uuid, atval, 5);
++	attrib_db_add(0x0501, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Manufacturer name characteristic value */
+ 	sdp_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
+ 	len = strlen(manufacturer_name1);
+ 	strncpy((char *) atval, manufacturer_name1, len);
+-	attrib_db_add(0x0502, &uuid, atval, len);
++	attrib_db_add(0x0502, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Manufacturer serial number characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -299,20 +299,20 @@ static int register_attributes(void)
+ 	atval[2] = 0x05;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0503, &uuid, atval, 5);
++	attrib_db_add(0x0503, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Manufacturer serial number characteristic value */
+ 	sdp_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
+ 	len = strlen(serial1);
+ 	strncpy((char *) atval, serial1, len);
+-	attrib_db_add(0x0504, &uuid, atval, len);
++	attrib_db_add(0x0504, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Secondary Service: Manufacturer Service */
+ 	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	u16 = htons(MANUFACTURER_SVC_UUID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0505, &uuid, atval, 2);
++	attrib_db_add(0x0505, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Manufacturer name characteristic definition */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -322,14 +322,14 @@ static int register_attributes(void)
+ 	atval[2] = 0x05;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0506, &uuid, atval, 5);
++	attrib_db_add(0x0506, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Secondary Service: Vendor Specific Service */
+ 	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	u16 = htons(VENDOR_SPECIFIC_SVC_UUID);
+ 	atval[0] = u16 >> 8;
+ 	atval[1] = u16;
+-	attrib_db_add(0x0550, &uuid, atval, 2);
++	attrib_db_add(0x0550, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Vendor Specific Type characteristic definition */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -339,7 +339,7 @@ static int register_attributes(void)
+ 	atval[2] = 0x05;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0560, &uuid, atval, 5);
++	attrib_db_add(0x0560, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Vendor Specific Type characteristic value */
+ 	sdp_uuid16_create(&uuid, VENDOR_SPECIFIC_TYPE_UUID);
+@@ -349,13 +349,13 @@ static int register_attributes(void)
+ 	atval[3] = 0x64;
+ 	atval[4] = 0x6F;
+ 	atval[5] = 0x72;
+-	attrib_db_add(0x0568, &uuid, atval, 6);
++	attrib_db_add(0x0568, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Manufacturer name attribute */
+ 	sdp_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
+ 	len = strlen(manufacturer_name2);
+ 	strncpy((char *) atval, manufacturer_name2, len);
+-	attrib_db_add(0x0507, &uuid, atval, len);
++	attrib_db_add(0x0507, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Characteristic: serial number */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -365,18 +365,18 @@ static int register_attributes(void)
+ 	atval[2] = 0x05;
+ 	atval[3] = u16 >> 8;
+ 	atval[4] = u16;
+-	attrib_db_add(0x0508, &uuid, atval, 5);
++	attrib_db_add(0x0508, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Serial number characteristic value */
+ 	sdp_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
+ 	len = strlen(serial2);
+ 	strncpy((char *) atval, serial2, len);
+-	attrib_db_add(0x0509, &uuid, atval, len);
++	attrib_db_add(0x0509, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Weight service: primary service definition */
+ 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	memcpy(atval, prim_weight_uuid, 16);
+-	attrib_db_add(0x0680, &uuid, atval, 16);
++	attrib_db_add(0x0680, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 16);
+ 
+ 	/* Weight: include */
+ 	sdp_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+@@ -387,7 +387,7 @@ static int register_attributes(void)
+ 	atval[3] = 0x05;
+ 	atval[4] = u16 >> 8;
+ 	atval[5] = u16;
+-	attrib_db_add(0x0681, &uuid, atval, 6);
++	attrib_db_add(0x0681, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Weight: characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+@@ -395,7 +395,7 @@ static int register_attributes(void)
+ 	atval[1] = 0x83;
+ 	atval[2] = 0x06;
+ 	memcpy(atval + 3, char_weight_uuid, 16);
+-	attrib_db_add(0x0682, &uuid, atval, 19);
++	attrib_db_add(0x0682, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 19);
+ 
+ 	/* Weight: characteristic value */
+ 	sdp_uuid128_create(&uuid, char_weight_uuid);
+@@ -403,7 +403,7 @@ static int register_attributes(void)
+ 	atval[1] = 0x55;
+ 	atval[2] = 0x00;
+ 	atval[3] = 0x00;
+-	attrib_db_add(0x0683, &uuid, atval, 4);
++	attrib_db_add(0x0683, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 4);
+ 
+ 	/* Weight: characteristic format */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+@@ -418,13 +418,13 @@ static int register_attributes(void)
+ 	u16 = htons(FMT_HANGING_UUID);
+ 	atval[6] = u16 >> 8;
+ 	atval[7] = u16;
+-	attrib_db_add(0x0684, &uuid, atval, 8);
++	attrib_db_add(0x0684, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 8);
+ 
+ 	/* Weight: characteristic user description */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_weight);
+ 	strncpy((char *) atval, desc_weight, len);
+-	attrib_db_add(0x0685, &uuid, atval, len);
++	attrib_db_add(0x0685, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	return 0;
+ }
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 410ac98..2ba21e9 100644
+index 41c0ffc..410ac98 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -138,6 +138,28 @@ static sdp_record_t *server_record_new(void)
- 	return record;
+@@ -760,7 +760,8 @@ void attrib_server_exit(void)
+ 		remove_record_from_server(sdp_handle);
  }
  
-+static uint8_t att_check_reqs(uint8_t opcode, int reqs)
-+{
-+	switch (opcode) {
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_READ_BY_TYPE_REQ:
-+	case ATT_OP_READ_REQ:
-+	case ATT_OP_READ_BLOB_REQ:
-+	case ATT_OP_READ_MULTI_REQ:
-+		if (reqs == ATT_NOT_PERMITTED)
-+			return ATT_ECODE_READ_NOT_PERM;
-+		break;
-+	case ATT_OP_PREP_WRITE_REQ:
-+	case ATT_OP_WRITE_REQ:
-+	case ATT_OP_WRITE_CMD:
-+		if (reqs == ATT_NOT_PERMITTED)
-+			return ATT_ECODE_WRITE_NOT_PERM;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static uint16_t read_by_group(uint16_t start, uint16_t end, uuid_t *uuid,
- 							uint8_t *pdu, int len)
- {
-@@ -146,6 +168,7 @@ static uint16_t read_by_group(uint16_t start, uint16_t end, uuid_t *uuid,
- 	struct group_elem *cur, *old = NULL;
- 	GSList *l, *groups;
- 	uint16_t length, last_handle, last_size = 0;
-+	uint8_t status;
- 	int i;
- 
- 	if (start > end || start == 0x0000)
-@@ -189,6 +212,14 @@ static uint16_t read_by_group(uint16_t start, uint16_t end, uuid_t *uuid,
- 		if (last_size && (last_size != a->len))
- 			break;
- 
-+		status = att_check_reqs(ATT_OP_READ_BY_GROUP_REQ, a->read_reqs);
-+		if (status) {
-+			g_slist_foreach(groups, (GFunc) g_free, NULL);
-+			g_slist_free(groups);
-+			return enc_error_resp(ATT_OP_READ_BY_GROUP_REQ,
-+						a->handle, status, pdu, len);
-+		}
-+
- 		cur = g_new0(struct group_elem, 1);
- 		cur->handle = a->handle;
- 		cur->data = a->data;
-@@ -247,6 +278,7 @@ static uint16_t read_by_type(uint16_t start, uint16_t end, uuid_t *uuid,
- 	GSList *l, *types;
- 	struct attribute *a;
- 	uint16_t num, length;
-+	uint8_t status;
- 	int i;
- 
- 	if (start > end || start == 0x0000)
-@@ -265,6 +297,13 @@ static uint16_t read_by_type(uint16_t start, uint16_t end, uuid_t *uuid,
- 		if (sdp_uuid_cmp(&a->uuid, uuid)  != 0)
- 			continue;
- 
-+		status = att_check_reqs(ATT_OP_READ_BY_TYPE_REQ, a->read_reqs);
-+		if (status) {
-+			g_slist_free(types);
-+			return enc_error_resp(ATT_OP_READ_BY_TYPE_REQ,
-+						a->handle, status, pdu, len);
-+		}
-+
- 		/* All elements must have the same length */
- 		if (length == 0)
- 			length = a->len;
-@@ -472,6 +511,7 @@ static int attribute_cmp(gconstpointer a1, gconstpointer a2)
- static uint16_t read_value(uint16_t handle, uint8_t *pdu, int len)
+-int attrib_db_add(uint16_t handle, uuid_t *uuid, const uint8_t *value, int len)
++int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
++						const uint8_t *value, int len)
  {
  	struct attribute *a;
-+	uint8_t status;
- 	GSList *l;
- 	guint h = handle;
  
-@@ -482,23 +522,41 @@ static uint16_t read_value(uint16_t handle, uint8_t *pdu, int len)
+@@ -769,6 +770,8 @@ int attrib_db_add(uint16_t handle, uuid_t *uuid, const uint8_t *value, int len)
+ 	a = g_malloc0(sizeof(struct attribute) + len);
+ 	a->handle = handle;
+ 	memcpy(&a->uuid, uuid, sizeof(uuid_t));
++	a->read_reqs = read_reqs;
++	a->write_reqs = write_reqs;
+ 	a->len = len;
+ 	memcpy(a->data, value, len);
  
- 	a = l->data;
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index 4a0afa6..ba90ff4 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -25,7 +25,8 @@
+ int attrib_server_init(void);
+ void attrib_server_exit(void);
  
-+	status = att_check_reqs(ATT_OP_READ_REQ, a->read_reqs);
-+	if (status)
-+		return enc_error_resp(ATT_OP_READ_REQ, handle, status, pdu,
-+									len);
-+
- 	return enc_read_resp(a->data, a->len, pdu, len);
- }
- 
--static void write_value(uint16_t handle, const uint8_t *value, int vlen)
-+static uint16_t write_value(uint16_t handle, const uint8_t *value, int vlen,
-+							uint8_t *pdu, int len)
- {
- 	struct attribute *a;
-+	uint8_t status;
- 	GSList *l;
- 	guint h = handle;
- 	uuid_t uuid;
- 
- 	l = g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp);
- 	if (!l)
--		return;
-+		return enc_error_resp(ATT_OP_WRITE_REQ, handle,
-+				ATT_ECODE_INVALID_HANDLE, pdu, len);
- 
- 	a = l->data;
-+
-+	status = att_check_reqs(ATT_OP_WRITE_REQ, a->write_reqs);
-+	if (status)
-+		return enc_error_resp(ATT_OP_WRITE_REQ, handle, status, pdu,
-+									len);
-+
- 	memcpy(&uuid, &a->uuid, sizeof(uuid_t));
- 	attrib_db_update(handle, &uuid, value, vlen);
-+
-+	pdu[0] = ATT_OP_WRITE_RESP;
-+
-+	return sizeof(pdu[0]);
- }
- 
- static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
-@@ -582,14 +640,12 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 			goto done;
- 		}
- 
--		write_value(start, value, vlen);
--		opdu[0] = ATT_OP_WRITE_RESP;
--		length = sizeof(opdu[0]);
-+		length = write_value(start, value, vlen, opdu, channel->mtu);
- 		break;
- 	case ATT_OP_WRITE_CMD:
- 		length = dec_write_cmd(ipdu, len, &start, value, &vlen);
- 		if (length > 0)
--			write_value(start, value, vlen);
-+			write_value(start, value, vlen, opdu, channel->mtu);
- 		return;
- 	case ATT_OP_FIND_BY_TYPE_REQ:
- 		length = dec_find_by_type_req(ipdu, len, &start, &end,
+-int attrib_db_add(uint16_t handle, uuid_t *uuid, const uint8_t *value, int len);
++int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
++						const uint8_t *value, int len);
+ int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
+ 								int len);
+ int attrib_db_del(uint16_t handle);
 -- 
 1.7.0.4
 
