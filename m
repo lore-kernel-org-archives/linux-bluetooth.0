@@ -1,38 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimr=ESQpid8yR-ZkK7uJcaOKoF9dAnmfPu1qiG3@mail.gmail.com>
-References: <AANLkTimr=ESQpid8yR-ZkK7uJcaOKoF9dAnmfPu1qiG3@mail.gmail.com>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Sat, 4 Dec 2010 13:29:48 -0800
-Message-ID: <AANLkTi=uV3d9+u0ajm0i=qs7AMwDn+0m9_zaqet6G-Aw@mail.gmail.com>
-Subject: Re: [compat-wireless] compat-wireless-2.6.37-rc4?
-To: sedat.dilek@gmail.com
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Sat, 4 Dec 2010 11:36:31 -0700
+Message-ID: <AANLkTinS82Qk38qZEDBKggFO81RJc_g3dmo23+Cog4+O@mail.gmail.com>
+Subject: HID parser for Bluetooth devices
+From: Viswanathan Sankararam <developervishwa@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 2, 2010 at 2:21 AM, Sedat Dilek <sedat.dilek@googlemail.com> wrote:
-> Hi Luis,
->
-> are you planning a stable compat-wireless-2.6.37-rc4 tarball?
->
-> Kind Regards,
-> - Sedat -
->
-> [1] http://wireless.kernel.org/en/users/Download/stable/#Releases
->
+All, I am new to bluetooth. I am trying to understand where in Linux
+stack a bluetooth HID device parser exists. Is it part of the
+bluetooth HIDP driver or somehow hooks into the HID driver for USB HID
+devices. Also I see that bluez sources has a directory called input
+and an input.so file is created. What is the function of this library?
+I would really appreciate an explanation of how bluez integrates with
+Linxu input subsystem and HID parser.
 
-Sure here:
-
-http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc4-1.tar.bz2
-
-ChangeLog:
-
-http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/ChangeLog-2.6.37-wireless
-
-Sorry for the delay.
-
-  Luis
+Thanks
+Vish
