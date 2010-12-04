@@ -1,35 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4CFBA177.1040807@ahsoftware.de>
-Date: Sun, 05 Dec 2010 15:28:07 +0100
-From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-To: Bala Shanmugam <sbalashanmugam@atheros.com>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	SongXing Xu <SongXing.Xu@Atheros.com>,
-	Luis Rodriguez <Luis.Rodriguez@Atheros.com>,
-	Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] ath3k: reduce memory usage
-References: <1290456541-3812-1-git-send-email-holler@ahsoftware.de> <20101130015200.GD5919@vigoh> <4CF4BAE6.1080502@ahsoftware.de> <4CF8CBB1.90506@atheros.com>
-In-Reply-To: <4CF8CBB1.90506@atheros.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <AANLkTimr=ESQpid8yR-ZkK7uJcaOKoF9dAnmfPu1qiG3@mail.gmail.com>
+References: <AANLkTimr=ESQpid8yR-ZkK7uJcaOKoF9dAnmfPu1qiG3@mail.gmail.com>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Sat, 4 Dec 2010 13:29:48 -0800
+Message-ID: <AANLkTi=uV3d9+u0ajm0i=qs7AMwDn+0m9_zaqet6G-Aw@mail.gmail.com>
+Subject: Re: [compat-wireless] compat-wireless-2.6.37-rc4?
+To: sedat.dilek@gmail.com
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Thu, Dec 2, 2010 at 2:21 AM, Sedat Dilek <sedat.dilek@googlemail.com> wrote:
+> Hi Luis,
+>
+> are you planning a stable compat-wireless-2.6.37-rc4 tarball?
+>
+> Kind Regards,
+> - Sedat -
+>
+> [1] http://wireless.kernel.org/en/users/Download/stable/#Releases
+>
 
-Am 03.12.2010 11:51, schrieb Bala Shanmugam:
+Sure here:
 
-> I manually made these changes and its not working.
-> I am unable to apply Alex patch taken from my office id.
-> Alex can you send the patch to btlinuxmail@gmail.com.
+http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc4-1.tar.bz2
 
-The patch applies cleanly to 2.6.36.x and the current 2.6.37 as found in 
-Linus tree. I'm using that patch on an armv5, a x86_64 (both 2.6.36.1) 
-and on an armv7 with 2.6.37-rc4.
+ChangeLog:
 
-I've sent it to the above e-mail address.
+http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/ChangeLog-2.6.37-wireless
 
-Regards,
+Sorry for the delay.
 
-Alexander
+  Luis
