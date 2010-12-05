@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management interface callbacks
-Date: Sun,  5 Dec 2010 20:19:29 +0200
-Message-Id: <1291573170-3708-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Add Bluetooth Management interface definitions
+Date: Sun,  5 Dec 2010 20:19:28 +0200
+Message-Id: <1291573170-3708-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
 References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,139 +12,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-Add initial code for handling Bluetooth Management interface messages.
+Add initial definitions for the new Bluetooth Management interface to
+the bluetooth headers.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
-Acked-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 ---
- include/net/bluetooth/hci_core.h |    3 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/hci_sock.c         |   39 +++++++++++++--
- net/bluetooth/mgmt.c             |   99 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 136 insertions(+), 7 deletions(-)
- create mode 100644 net/bluetooth/mgmt.c
+ include/net/bluetooth/hci.h      |    4 +++
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |   46 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+), 0 deletions(-)
+ create mode 100644 include/net/bluetooth/mgmt.h
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index f3c5ed6..29a7a8c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -934,9 +934,13 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
+ struct sockaddr_hci {
+ 	sa_family_t    hci_family;
+ 	unsigned short hci_dev;
++	unsigned short hci_channel;
+ };
+ #define HCI_DEV_NONE	0xffff
+ 
++#define HCI_CHANNEL_RAW		0
++#define HCI_CHANNEL_CONTROL	1
++
+ struct hci_filter {
+ 	unsigned long type_mask;
+ 	unsigned long event_mask[2];
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3e34359..1992fac 100644
+index 9c08625..3e34359 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -660,6 +660,9 @@ void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data);
- /* ----- HCI Sockets ----- */
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -668,6 +668,7 @@ struct hci_pinfo {
+ 	struct hci_dev    *hdev;
+ 	struct hci_filter filter;
+ 	__u32             cmsg_mask;
++	unsigned short   channel;
+ };
  
-+/* Management interface */
-+int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
-+
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
- 
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index d1e433f..8b411d9 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_BNEP)	+= bnep/
- obj-$(CONFIG_BT_CMTP)	+= cmtp/
- obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
--bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
-+bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o hci_sock.o hci_sysfs.o lib.o
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b3753ba..207be7a 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -49,6 +49,8 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+static int enable_mgmt;
-+
- /* ----- HCI socket interface ----- */
- 
- static inline int hci_test_bit(int nr, void *addr)
-@@ -353,25 +355,35 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long a
- 
- static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
- {
--	struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
-+	struct sockaddr_hci haddr;
- 	struct sock *sk = sock->sk;
- 	struct hci_dev *hdev = NULL;
--	int err = 0;
-+	int len, err = 0;
- 
- 	BT_DBG("sock %p sk %p", sock, sk);
- 
--	if (!haddr || haddr->hci_family != AF_BLUETOOTH)
-+	if (!addr)
-+		return -EINVAL;
-+
-+	memset(&haddr, 0, sizeof(haddr));
-+	len = min_t(unsigned int, sizeof(haddr), addr_len);
-+	memcpy(&haddr, addr, len);
-+
-+	if (haddr.hci_family != AF_BLUETOOTH)
-+		return -EINVAL;
-+
-+	if (haddr.hci_channel != HCI_CHANNEL_RAW && !enable_mgmt)
- 		return -EINVAL;
- 
- 	lock_sock(sk);
- 
--	if (hci_pi(sk)->hdev) {
-+	if (sk->sk_state == BT_BOUND || hci_pi(sk)->hdev) {
- 		err = -EALREADY;
- 		goto done;
- 	}
- 
--	if (haddr->hci_dev != HCI_DEV_NONE) {
--		hdev = hci_dev_get(haddr->hci_dev);
-+	if (haddr.hci_dev != HCI_DEV_NONE) {
-+		hdev = hci_dev_get(haddr.hci_dev);
- 		if (!hdev) {
- 			err = -ENODEV;
- 			goto done;
-@@ -380,6 +392,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
- 		atomic_inc(&hdev->promisc);
- 	}
- 
-+	hci_pi(sk)->channel = haddr.hci_channel;
- 	hci_pi(sk)->hdev = hdev;
- 	sk->sk_state = BT_BOUND;
- 
-@@ -502,6 +515,17 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 
- 	lock_sock(sk);
- 
-+	switch (hci_pi(sk)->channel) {
-+	case HCI_CHANNEL_RAW:
-+		break;
-+	case HCI_CHANNEL_CONTROL:
-+		err = mgmt_control(sk, msg, len);
-+		goto done;
-+	default:
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
- 	hdev = hci_pi(sk)->hdev;
- 	if (!hdev) {
- 		err = -EBADFD;
-@@ -831,3 +855,6 @@ void __exit hci_sock_cleanup(void)
- 
- 	proto_unregister(&hci_sk_proto);
- }
-+
-+module_param(enable_mgmt, bool, 0644);
-+MODULE_PARM_DESC(enable_mgmt, "Enable Management interface");
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+ /* HCI security filter */
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
 new file mode 100644
-index 0000000..78255f1
+index 0000000..95974da
 --- /dev/null
-+++ b/net/bluetooth/mgmt.c
-@@ -0,0 +1,99 @@
++++ b/include/net/bluetooth/mgmt.h
+@@ -0,0 +1,46 @@
 +/*
 +   BlueZ - Bluetooth protocol stack for Linux
++
 +   Copyright (C) 2010  Nokia Corporation
 +
 +   This program is free software; you can redistribute it and/or modify
@@ -165,83 +83,29 @@ index 0000000..78255f1
 +   SOFTWARE IS DISCLAIMED.
 +*/
 +
-+/* Bluetooth HCI Management interface */
++struct mgmt_hdr {
++	__le16 opcode;
++	__le16 len;
++} __packed;
++#define MGMT_HDR_SIZE			4
 +
-+#include <asm/uaccess.h>
-+#include <asm/unaligned.h>
++#define MGMT_EV_CMD_COMPLETE		0x0001
++struct mgmt_ev_cmd_complete {
++	__le16 opcode;
++	__u8 data[0];
++} __packed;
 +
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/mgmt.h>
++#define MGMT_EV_CMD_STATUS		0x0002
++struct mgmt_ev_cmd_status {
++	__u8 status;
++	__le16 opcode;
++} __packed;
 +
-+static void cmd_status(struct sock *sk, u16 cmd, u8 status)
-+{
-+	struct sk_buff *skb;
-+	struct mgmt_hdr *hdr;
-+	struct mgmt_ev_cmd_status *ev;
-+
-+	BT_DBG("sock %p", sk);
-+
-+	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
-+	if (!skb)
-+		return;
-+
-+	hdr = (void *) skb_put(skb, sizeof(struct mgmt_hdr));
-+
-+	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
-+	hdr->len = cpu_to_le16(3);
-+
-+	ev = (void *) skb_put(skb, sizeof(*ev));
-+	ev->status = status;
-+	put_unaligned_le16(cmd, &ev->opcode);
-+
-+	if (sock_queue_rcv_skb(sk, skb) < 0)
-+		kfree_skb(skb);
-+}
-+
-+int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
-+{
-+	unsigned char *buf;
-+	struct mgmt_hdr *hdr;
-+	u16 opcode, len;
-+	int err;
-+
-+	BT_DBG("got %zu bytes", msglen);
-+
-+	if (msglen < sizeof(*hdr))
-+		return -EINVAL;
-+
-+	buf = kmalloc(msglen, GFP_ATOMIC);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	if (memcpy_fromiovec(buf, msg->msg_iov, msglen)) {
-+		err = -EFAULT;
-+		goto done;
-+	}
-+
-+	hdr = (struct mgmt_hdr *) buf;
-+	opcode = get_unaligned_le16(&hdr->opcode);
-+	len = get_unaligned_le16(&hdr->len);
-+
-+	if (len != msglen - sizeof(struct mgmt_hdr)) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	switch (opcode) {
-+	default:
-+		BT_DBG("Unknown op %u", opcode);
-+		cmd_status(sk, opcode, 0x01);
-+		break;
-+	}
-+
-+	err = msglen;
-+
-+done:
-+	kfree(buf);
-+	return err;
-+}
++#define MGMT_EV_CONTROLLER_ERROR	0x0003
++struct mgmt_ev_controller_error {
++	__le16 index;
++	__u8 error_code;
++} __packed;
 -- 
 1.7.2.3
 
