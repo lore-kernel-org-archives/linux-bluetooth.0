@@ -1,71 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTim7brB0JecKXDNddt0am=Um457Kfbm6bRG_yzFM@mail.gmail.com>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
-	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-	<AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
-	<20101029172443.61f7b067@pyx>
-	<AANLkTimiyxiKzT=9pKXLFACkc6C=nTD2dtBR7PcgjhOL@mail.gmail.com>
-	<AANLkTim7brB0JecKXDNddt0am=Um457Kfbm6bRG_yzFM@mail.gmail.com>
-Date: Mon, 6 Dec 2010 10:06:02 +0100
-Message-ID: <AANLkTik4T=PsMzB+umSQPLDPmeD-6sebgCtrQRePH_2h@mail.gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-From: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-To: Vitaly Wool <vitalywool@gmail.com>
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH 3/3] Bluetooth: Make hci_send_to_sock usable for management control sockets
+Date: Sun,  5 Dec 2010 20:19:30 +0200
+Message-Id: <1291573170-3708-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
+References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vitaly,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-2010/12/3 Vitaly Wool <vitalywool@gmail.com>:
-> Hi Par,
->
-> On Fri, Dec 3, 2010 at 10:16 AM, Par-Gunnar Hjalmdahl
-> <pghatwork@gmail.com> wrote:
->> 2010/10/29 Alan Cox <alan@lxorguk.ukuu.org.uk>:
->
->> By the way, I will soon release a new patch set for CG2900 (hopefully
->> next week), which contains major rework. It's hard to explain
->> everything here and now but changes include:
->> =A0- Reuse of existing HCI line discipline under /drivers/bluetooth/.
->> Line discipline has been modified so it is selectable from protocol if
->> line discipline should register to Bluetooth stack or not.
->
-> So is it true that if there's the other chip with similar
-> functionality I have to implement support for, I'll have to pretty
-> much duplicate your line discipline driver?
->
+In order to send data to management control sockets the function should:
 
-What will be in the protocol file, i.e. the same level as hci_h4.c,
-hci_bcsp.c, etc, will be to ~80% vendor specific. The only H4 channels
-that are in a standardized specification are the Bluetooth channels
-1-4. Other channels such as FM and GPS are vendor specific. I've seen
-that for example TI has the same channels for FM and GPS, but these
-channels, 8 and 9, are in no way standardized. The CG2900 also carries
-a number of other channels, such as debug and device channels, which
-I'm pretty sure is individual for this chip.
-This identification of the channels is also only one function, even
-though it is an important function. There are also a lot of other code
-regarding baud rate settings, low power handling, etc that I'm
-positive will not apply to chips of other vendors. It is of course
-possible that other chips from ST-Ericsson, current and future, will
-be able to reuse this file, but as I said I doubt that other vendors
-might be able to use it.
+  - skip checks intended for raw HCI data and stack internal events
+  - make sure RAW HCI data or stack internal events don't go to
+    management control sockets
 
-> Isn't it better to have a new line discipline that the standard
-> drivers (H4, LL, ...) will be applicable to?
->
-> ~Vitaly
->
+In order to accomplish this the patch adds a new member to the bluetooth
+skb private data to flag skb's that are destined for management control
+sockets.
 
-I'm not certain what you mean. We are modifying the line discipline a
-bit, but the only thing we have needed to do with existing protocol
-drivers has been to add a boolean parameter for the protocol settings
-(so they will register to the Bluetooth stack). I don't see why we
-should create a new line discipline driver and then move the existing
-protocol drivers to this.
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/hci_sock.c          |   10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletions(-)
 
-/P-G
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index d81ea79..0c5e725 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -144,6 +144,7 @@ struct bt_skb_cb {
+ 	__u8 tx_seq;
+ 	__u8 retries;
+ 	__u8 sar;
++	unsigned short channel;
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+ 
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 207be7a..f6c18ab 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -104,6 +104,12 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (skb->sk == sk)
+ 			continue;
+ 
++		if (bt_cb(skb)->channel != hci_pi(sk)->channel)
++			continue;
++
++		if (bt_cb(skb)->channel == HCI_CHANNEL_CONTROL)
++			goto clone;
++
+ 		/* Apply filter */
+ 		flt = &hci_pi(sk)->filter;
+ 
+@@ -127,12 +133,14 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 				continue;
+ 		}
+ 
++clone:
+ 		nskb = skb_clone(skb, GFP_ATOMIC);
+ 		if (!nskb)
+ 			continue;
+ 
+ 		/* Put type byte before the data */
+-		memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
++		if (bt_cb(skb)->channel == HCI_CHANNEL_RAW)
++			memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
+ 
+ 		if (sock_queue_rcv_skb(sk, nskb))
+ 			kfree_skb(nskb);
+-- 
+1.7.2.3
+
