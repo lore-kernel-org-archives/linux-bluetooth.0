@@ -1,129 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 6 Dec 2010 19:23:26 -0200
+Date: Mon, 6 Dec 2010 19:15:17 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Pavan Savoy <pavan_savoy@ti.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7] Bluetooth: btwilink driver
-Message-ID: <20101206212326.GI883@vigoh>
-References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
- <20101130154654.GE5919@vigoh>
- <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
+To: Yuri Ershov <ext-yuri.ershov@nokia.com>
+Cc: marcel@holtmann.org, davem@davemloft.net, jprvita@profusion.mobi,
+	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
+	andrei.emeltchenko@nokia.com
+Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
+Message-ID: <20101206211516.GH883@vigoh>
+References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Hi Yuri,
 
-* Pavan Savoy <pavan_savoy@ti.com> [2010-11-30 21:30:47 +0530]:
+* Yuri Ershov <ext-yuri.ershov@nokia.com> [2010-11-25 12:55:33 +0300]:
 
-> Gustavo,
->=20
-> On Tue, Nov 30, 2010 at 9:16 PM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
-> > Hi Pavan,
-> >
-> > * pavan_savoy@ti.com <pavan_savoy@ti.com> [2010-11-26 04:20:57 -0500]:
-> >
-> >> From: Pavan Savoy <pavan_savoy@ti.com>
-> >>
-> >> Marcel, Gustavo,
-> >>
-> >> comments attended to from v5 and v6,
-> >>
-> >> 1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPER=
-M,
-> >> Now I handle for EINPROGRESS - which is not really an error and
-> >> return during all other error cases.
-> >>
-> >> 2. _write is still a function pointer and not an exported function, I
-> >> need to change the underlying driver's code for this.
-> >> However, previous lkml comments on the underlying driver's code
-> >> suggested it to be kept as a function pointer and not EXPORT.
-> >> Gustavo, Marcel - Please comment on this.
-> >> Is this absolutely required? If so why?
-> >>
-> >> 3. test_and_set_bit of HCI_RUNNING is done at beginning of
-> >> ti_st_open, and did not see issues during firmware download.
-> >> However ideally I would still like to set HCI_RUNNING once the firmware
-> >> download is done, because I don't want to allow a _send_frame during
-> >> firmware download - Marcel, Gustavo - Please comment.
-> >>
-> >> 4. test_and_clear of HCI_RUNNING now done @ beginning of close.
-> >>
-> >> 5. EAGAIN on failure of st_write is to suggest to try and write again.
-> >> I have never this happen - However only if UART goes bad this case may
-> >> occur.
-> >>
-> >> 6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
-> >> fact the code is pretty much borrowed from there.
-> >> Marcel, Gustavo - Please suggest where should it be done? If not here.
-> >>
-> >> 7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fail=
-s.
-> >>
-> >> 8. platform_driver registration inside module_init now is similar to
-> >> other drivers.
-> >>
-> >> 9. Dan Carpenter's comments on leaking hst memory on failed
-> >> hci_register_dev and empty space after quotes in debug statements
-> >> fixed.
-> >>
-> >> Thanks for the comments...
-> >> Sorry, for previously not being very clear on which comments were
-> >> handled and which were not.
-> >>
-> >> -- patch description --
-> >>
-> >> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> >> Texas Instrument's WiLink chipsets combine wireless technologies
-> >> like BT, FM, GPS and WLAN onto a single chip.
-> >>
-> >> This Bluetooth driver works on top of the TI_ST shared transport
-> >> line discipline driver which also allows other drivers like
-> >> FM V4L2 and GPS character driver to make use of the same UART interfac=
-e.
-> >>
-> >> Kconfig and Makefile modifications to enable the Bluetooth
-> >> driver for Texas Instrument's WiLink 7 chipset.
-> >>
-> >> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> >> ---
-> >> =A0drivers/bluetooth/Kconfig =A0 =A0| =A0 10 ++
-> >> =A0drivers/bluetooth/Makefile =A0 | =A0 =A01 +
-> >> =A0drivers/bluetooth/btwilink.c | =A0363 +++++++++++++++++++++++++++++=
-+++++++++++++
-> >> =A03 files changed, 374 insertions(+), 0 deletions(-)
-> >> =A0create mode 100644 drivers/bluetooth/btwilink.c
-> >
-> > So as part of reviewing this I took a look at your underlying driver and
-> > I didn't like what I saw there, you are handling Bluetooth stuff inside
-> > the core driver and that is just wrong. You have a Bluetooth driver here
-> > then you have to leave the Bluetooth data handling to the Bluetooth
-> > driver and do not do that in the core.
->=20
-> Thanks for reviewing this and the underlying driver.
-> yes, we do have Bluetooth/FM/GPS handling inside the TI ST driver, on
-> addition of further technologies
-> we do plan to have them inside the ST driver too.
->=20
-> The understanding of BT or FM or GPS is required for the ST driver
-> because, the data coming from the chip
-> can either be of these technologies, further-more the data might not
-> come in a set.
-> As in, an a2dp/ftp ACL frame might come in 2 frames instead of 1, and
-> in other cases,
-> there might be a HCI-EVENT + FM CH8 data in a single frame received by th=
-e UART.
+> This patch is an addition to my previous patch for this issue.
+> The problem is in resynchronization between two loops:
+> 1. Main controlling loop (l2cap_connect_req, l2cap_config_req,
+> l2cap_config_rsp, l2cap_disconnect_req, etc.)
+> 2. Loop waiting of BT_CONNECTED state of socket (l2cap_sock_accept,
+> bt_accept_dequeue, etc.).
+> In case of fast sequence of connect/disconnect operations the loop #1
+> makes several cycles, while the loop #2 only has time to make one
+> cycle and it results crash.
+> The aim of the patch is to skeep handling of sockets queued for
+> deletion.
+> 
+> Signed-off-by: Yuri Ershov <ext-yuri.ershov@nokia.com>
+> ---
+>  net/bluetooth/af_bluetooth.c |    2 ++
+>  net/bluetooth/l2cap.c        |    6 ++++--
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index c4cf3f5..f9389da 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -200,6 +200,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+>  	BT_DBG("parent %p", parent);
+>  
+>  	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
+> +		if (n == p)
+> +			break;
 
-Can't you differentiate Bluetooth data in a generic way, withou looking if =
-it
-is ACL, SCO or HCI EVENT? That done, you can just accumulate in a buffer all
-the Bluetooth data you received in that stream then send it to Bluetooth
-driver after finish that stream processing.
+So in which situations (n == p), or (p == p->next)? That should happen only
+when p is the only element in the list, then p == head, right?
 
---=20
+>  		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
+>  
+>  		lock_sock(sk);
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index 12b4aa2..29f30b0 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -133,7 +133,8 @@ static struct sock *__l2cap_get_chan_by_dcid(struct l2cap_chan_list *l, u16 cid)
+>  {
+>  	struct sock *s;
+>  	for (s = l->head; s; s = l2cap_pi(s)->next_c) {
+> -		if (l2cap_pi(s)->dcid == cid)
+> +		if ((l2cap_pi(s)->dcid == cid) &&
+> +		    (sk->sk_state != BT_DISCONN) && (sk->sk_state != BT_CLOSED))
+
+I think its better check for the cid first, and if it matches check for the
+socket states, if they are BT_DISCONN or BT_CLOSED return NULL. Then you avoid
+unnecessary loops here.
+
+>  			break;
+>  	}
+>  	return s;
+> @@ -143,7 +144,8 @@ static struct sock *__l2cap_get_chan_by_scid(struct l2cap_chan_list *l, u16 cid)
+>  {
+>  	struct sock *s;
+>  	for (s = l->head; s; s = l2cap_pi(s)->next_c) {
+> -		if (l2cap_pi(s)->scid == cid)
+> +		if ((l2cap_pi(s)->scid == cid) &&
+> +		    (sk->sk_state != BT_DISCONN) && (sk->sk_state != BT_CLOSED))
+>  			break;
+
+Same for this one.
+
+-- 
 Gustavo F. Padovan
 http://profusion.mobi
