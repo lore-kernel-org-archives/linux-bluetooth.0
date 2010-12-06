@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <AANLkTik=WyfpbULNywPPXGi-KB=6tK3on2p6TYL94E0O@mail.gmail.com>
 References: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
 	<AANLkTik=WyfpbULNywPPXGi-KB=6tK3on2p6TYL94E0O@mail.gmail.com>
-Date: Mon, 6 Dec 2010 15:21:42 -0300
-Message-ID: <AANLkTinFBtVhu0j6xcHsH6XQZM8J-UeHSG2fOJJ-otcJ@mail.gmail.com>
+Date: Mon, 6 Dec 2010 15:20:01 -0300
+Message-ID: <AANLkTimrcQTPWEr39WG9f_+-jEbkn4T-6_33KGqOdtfV@mail.gmail.com>
 Subject: Re: [PATCH 1/5] Add device type to identify LE, BR/EDR or dual mode devices
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
