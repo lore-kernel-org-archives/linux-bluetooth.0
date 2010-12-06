@@ -1,89 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Dec 2010 16:21:16 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
- interface callbacks
-Message-ID: <20101206142116.GA19084@jh-x301>
-References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
- <1291573170-3708-3-git-send-email-johan.hedberg@gmail.com>
- <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Vitaly Wool <vitalywool@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Mon, 6 Dec 2010 15:06:04 +0100
+Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ linus.walleij@stericsson.com,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTik4T=PsMzB+umSQPLDPmeD-6sebgCtrQRePH_2h@mail.gmail.com> <AANLkTimjACtU_Mx5mDHkm9OpVJ4ueNWgZPsX3YjL0cTi@mail.gmail.com>
+In-Reply-To: <AANLkTimjACtU_Mx5mDHkm9OpVJ4ueNWgZPsX3YjL0cTi@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201012061506.04364.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+On Monday 06 December 2010, Vitaly Wool wrote:
 
-On Mon, Dec 06, 2010, Anderson Lizardo wrote:
-> On Sun, Dec 5, 2010 at 2:19 PM,  <johan.hedberg@gmail.com> wrote:
-> > +static void cmd_status(struct sock *sk, u16 cmd, u8 status)
-> > +{
+> On Mon, Dec 6, 2010 at 10:06 AM, Par-Gunnar Hjalmdahl
+> <pghatwork@gmail.com> wrote:
+
+> >> Isn't it better to have a new line discipline that the standard
+> >> drivers (H4, LL, ...) will be applicable to?
 > 
-> I see some inconsistence on how you calculate struct sizes on this
-> function. See below...
+> > I'm not certain what you mean. We are modifying the line discipline a
+> > bit, but the only thing we have needed to do with existing protocol
+> > drivers has been to add a boolean parameter for the protocol settings
+> > (so they will register to the Bluetooth stack). I don't see why we
+> > should create a new line discipline driver and then move the existing
+> > protocol drivers to this.
 > 
-> > +       struct sk_buff *skb;
-> > +       struct mgmt_hdr *hdr;
-> > +       struct mgmt_ev_cmd_status *ev;
-> > +
-> > +       BT_DBG("sock %p", sk);
-> > +
-> > +       skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
-> 
-> Here you use sizeof(<var>)
+> Okay, let me try to be more specific. There's for instance
+> drivers/bluetooth/hci_ll.c which is the line discipline driver that is
+> meant to work with any BT chip supporting LL protocol. Your solution
+> seems to imply that one will have to create a variation of this
+> implementation for each BT chip supporting LL that will use your
+> shared transport implementation. Is it really the case?
 
-Yep, in Chapter 14 of Documentation/CodingStyle this seems to be the
-preferred form.
+hci_ll is not the line discipline but the a TI specific uart protocol.
+The line discipline driver (hci_ldisc.c) is shared across all protocols
+(h4, ll, ...) and gets extended slightly so it can deal with cg2900
+in addition to the existing HCIs. The rest of the cg2900 support is
+about adding more hci_uart_protos.
 
-> > +       if (!skb)
-> > +               return;
-> > +
-> > +       hdr = (void *) skb_put(skb, sizeof(struct mgmt_hdr));
-> 
-> But here you use sizeof(<struct>). Could be sizeof(*hdr)?
-
-Yes, could be.
-
-> > +
-> > +       hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
-> > +       hdr->len = cpu_to_le16(3);
-> 
-> and here a hard-coded size. Could be sizeof(struct mgmt_ev_cmd_status)?
-
-Yes, could be.
-
-> > +       if (len != msglen - sizeof(struct mgmt_hdr)) {
-> 
-> You could use sizeof(*hdr) here.
-
-Indeed.
-
-I suppose these style fixes should be as a separate patch since the
-original one already got acks from the relevant people? (if not, someone
-please enlighten me how the kernel patch process deals with comments
-received after acks :)
-
-> > +               err = -EINVAL;
-> > +               goto done;
-> > +       }
-> > +
-> > +       switch (opcode) {
-> > +       default:
-> > +               BT_DBG("Unknown op %u", opcode);
-> > +               cmd_status(sk, opcode, 0x01);
-> > +               break;
-> > +       }
-> > +
-> > +       err = msglen;
-> 
-> Would there be a chance of integer overflow here? The function returns
-> (signed) int, but msglen is (unsigned) size_t.
-
-The core of the issue is in the way that the sendmsg callback for
-sockets is defined. At least L2CAP and RFCOMM sockets do similar
-assignments in their sendmsg callbacks so I've assumed it to be ok.
-
-Johan
+	Arnd
