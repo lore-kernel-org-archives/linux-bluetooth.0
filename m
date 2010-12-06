@@ -1,78 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Brian Gix" <bgix@codeaurora.org>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: EVT_NUM_COMP_PKTS and LE, GATT and SM
-Date: Mon, 6 Dec 2010 16:35:51 -0800
-Message-ID: <002501cb95a6$b350fc50$19f2f4f0$@org>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Vitaly Wool <vitalywool@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Tue, 7 Dec 2010 00:07:19 +0100
+Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ linus.walleij@stericsson.com,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <201012061754.44592.arnd@arndb.de> <AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
+In-Reply-To: <AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201012070007.19239.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Monday 06 December 2010 22:24:34 Vitaly Wool wrote:
+> On Mon, Dec 6, 2010 at 5:54 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> 
+> >> But I was trying to make a different point here. On a basic level,
+> >> there's this cg2000 chip from STE that does BT, FM and GPS. There's
+> >> the chip from TI that does BT, FM and GPS, and there's the Broadcom
+> >> chip that does BT+FM. They all use HCI to access the other functions
+> >> of the combo chip and they do it in a really simiar way, with the
+> >> differences mostly in power management techniques. So I think it's
+> >> quite sensible to have some kind of framework that is suitable for
+> >> such devices.
+> >
+> > Yes, I agree 100% in principle. I could not find the code that
+> > Broadcom/TI FM and GPS stuff so far, can you point us to that?
+> 
+> Sure, the TI "shared transport" code is mostly at drivers/misc/ti-st.
+> 
+> Some Broadcom BCM43xx chips work in a similar way AFAIK but I'm not
+> sure about the mainline support for those.
 
-I've have encountered a problem while using the gatttool, where my write
-commands get clobbered by the LE ACL being disconnected prior to the ATT
-(fixed channel 4) WRITE_CMD being sent over the LE based ACL link.
+Ah, it had not occured to me to look in drivers/misc. Looking at the
+code over there, it becomes much clearer what your point is. Evidently
+the ti-st driver implements a line discipline similar to, but conflicting
+with hci_ldisc, and it has its own copy of the hci_ll code.
 
-I believe this is fundamentally due to there being no dependency on the
-EVT_NUM_COMP_PKTS event when gatttool decides that the WRITE_CMD has been
-successfully sent.  There is multiple parts to this.
+I guess this is exactly what we're trying to avoid having with the
+cg2900 code ;-).
 
-1. In User space, the WRITE_CMD pkt is written to the socket.  Gatttool
-erroneously considers a successful socket write as completion, disconnects
-the socket and exits.
+> > The cg2900 solution for this was to use MFD (plus another layer
+> > in the posted version, but that will go away I assume). Using
+> > MFD is not the only possibility here, but I could not see anything
+> > wrong with it either. Do you think we can move them all over to
+> > use MFD infrastructure?
+> 
+> I guess so but it's probably more of a detail than what I'm up to now :)
 
-2. In Kernel space, the ACL packet is added to an ACL queue, which is
-separate from the CMD queue, which can allow either the Disconnect request,
-or the ACL packet to be sent over the H4 link to the baseband.
+Agreed.
+ 
+> >> But generally speaking, isn't a line discipline/driver attached to a
+> >> tty? We can use dumb tty for e. g. SPI and still be able to use
+> >> hci_ll, right?
+> >
+> > I suggested that as well, but the point was made that this would
+> > add an unnecessary indirection for the SPI case, which is not
+> > really much like a serial port. It's certainly possible to do it
+> > like you say, but if we add a way to register the high-level
+> > protocols with an HCI-like multi-function device, we could
+> > also do it in a way that does not rely on tty-ldisc but keeps it
+> > as one of the options.
+> 
+> I actually don't think it's such a big indirection, I prefer to think
+> of it more as of the abstraction layer. If not use this, are we going
+> to have direct SPI device drivers? I'm afraid we might end up with a
+> huge duplication of code in that case.
 
-3. In the baseband, due to LE clocking (and possible other baseband
-activity) the ACL packet could be received first, and the Disconnect CMD
-second, and still result in the connection being detached prior to Tx of the
-ACL packet containing the ATT WRITE_CMD.
+The question is how it should be modeled in a better way than today.
 
-This is not an issue with  any of the ATT READ/FIND/MTU or WRITE_REQ
-transactions, because they require a response from the server.  I believe
-for ATT, this problem is restricted to the WRITE_CMD only, due to it's
-unacknowledged nature.
+I believe we already agree it should be something like
 
-However, this will also be an issue with the LE Security Manager, because as
-stated in the Core Spec v4.0, Vol 3, in the last paragraph of 3.6.1 Key
-Distribution on page 630 (of 656):
-
-	> Key distribution is complete in the device sending the final key
-when it receives
-	> the baseband acknowledgement for that key and is complete in the
-receiving
-	> device when it receives the final key being distributed.
-
-This is intended to prevent exactly the kind of problem I am experiencing
-with the ATT WRITE_CMD, and the acknowledgement from the baseband can only
-be the EVT_NUM_COMP_PKTS event.
-
-While talking to my colleagues here, we were thinking that the cleanest
-method to get this accomplished would be by using the "select" method with
-the ATT socket, where the socket could be marked as non-writable by the
-kernel driver until the EVT_NUM_COMP_PKTS is received. The User space code
-could then wait for the socket to become writeable before issuing the socket
-disconnect.
-
-If the Security manager is totally within the kernel, it probably does not
-have to do as much work, however it does still need to wait on the
-EVT_NUM_COMP_PKTS before disconnecting the remote device.
-
-Has anybody else observed this issue with ATT WRITE_CMD? It could be getting
-exacerbated by slow (115Kbps) H4 links that I am using, however the hcidump
-tool confirms that the disconnect happens prior to the EVT_NUM_COMP_PKTS.
+   bt   ti-radio    st-e-radio    ti-gps   st-e-gps  broadcom-radio ...
+   |         |          |            |          |          |         |
+   +---------+----------+---------+--+----------+----------+---------+
+                                  |
+                          common-hci-module
+                                  |
+                      +-----------+-----------+
+                      |        |       |      |
+                    serial    spi     i2c    ...
 
 
-	
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Any objections to this?
 
+If you agree, I think we should discuss the alternatives for the common
+module. I think you are saying we should make the common module a single
+ldisc doing the multiplexing and have all transports register as ttys into
+it, right?
 
+What we discussed before was to split it into multiple modules, one for
+the tty ldisc and one for the common code, and then have the spi/i2c/...
+drivers feed into the common multiplexer without going through tty.
 
+I don't currently see a significant advantage or disadvantage with either
+approach.
+
+	Arnd
