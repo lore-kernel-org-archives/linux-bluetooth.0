@@ -1,48 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Vitaly Wool <vitalywool@gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-Date: Mon, 6 Dec 2010 15:06:04 +0100
-Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
- Alan Cox <alan@lxorguk.ukuu.org.uk>,
- linus.walleij@stericsson.com,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTik4T=PsMzB+umSQPLDPmeD-6sebgCtrQRePH_2h@mail.gmail.com> <AANLkTimjACtU_Mx5mDHkm9OpVJ4ueNWgZPsX3YjL0cTi@mail.gmail.com>
-In-Reply-To: <AANLkTimjACtU_Mx5mDHkm9OpVJ4ueNWgZPsX3YjL0cTi@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201012061506.04364.arnd@arndb.de>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH] Bluetooth: Fix initial RFCOMM DLC security level
+Date: Mon,  6 Dec 2010 15:56:17 +0200
+Message-Id: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 06 December 2010, Vitaly Wool wrote:
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-> On Mon, Dec 6, 2010 at 10:06 AM, Par-Gunnar Hjalmdahl
-> <pghatwork@gmail.com> wrote:
+Due to commit 63ce0900 connections initiated through TTYs created with
+"rfcomm bind ..." would have security level BT_SECURITY_SDP instead of
+BT_SECURITY_LOW. This would cause instant connection failure between any
+two SSP capable devices due to the L2CAP connect request to RFCOMM being
+sent before authentication has been performed. This patch fixes the
+regression by always initializing the DLC security level to
+BT_SECURITY_LOW.
 
-> >> Isn't it better to have a new line discipline that the standard
-> >> drivers (H4, LL, ...) will be applicable to?
-> 
-> > I'm not certain what you mean. We are modifying the line discipline a
-> > bit, but the only thing we have needed to do with existing protocol
-> > drivers has been to add a boolean parameter for the protocol settings
-> > (so they will register to the Bluetooth stack). I don't see why we
-> > should create a new line discipline driver and then move the existing
-> > protocol drivers to this.
-> 
-> Okay, let me try to be more specific. There's for instance
-> drivers/bluetooth/hci_ll.c which is the line discipline driver that is
-> meant to work with any BT chip supporting LL protocol. Your solution
-> seems to imply that one will have to create a variation of this
-> implementation for each BT chip supporting LL that will use your
-> shared transport implementation. Is it really the case?
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ net/bluetooth/rfcomm/core.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-hci_ll is not the line discipline but the a TI specific uart protocol.
-The line discipline driver (hci_ldisc.c) is shared across all protocols
-(h4, ll, ...) and gets extended slightly so it can deal with cg2900
-in addition to the existing HCIs. The rest of the cg2900 support is
-about adding more hci_uart_protos.
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index fa642aa..432a9a6 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -311,6 +311,7 @@ static void rfcomm_dlc_clear_state(struct rfcomm_dlc *d)
+ 	d->state      = BT_OPEN;
+ 	d->flags      = 0;
+ 	d->mscex      = 0;
++	d->sec_level  = BT_SECURITY_LOW;
+ 	d->mtu        = RFCOMM_DEFAULT_MTU;
+ 	d->v24_sig    = RFCOMM_V24_RTC | RFCOMM_V24_RTR | RFCOMM_V24_DV;
+ 
+-- 
+1.7.1
 
-	Arnd
