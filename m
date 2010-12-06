@@ -1,54 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 6 Dec 2010 16:21:16 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
+ interface callbacks
+Message-ID: <20101206142116.GA19084@jh-x301>
+References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
+ <1291573170-3708-3-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
-References: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 6 Dec 2010 16:34:49 +0200
-Message-ID: <AANLkTin-GeijFDGrkBSBDJkEJmqaindzuJs3k7cN-fdu@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix initial RFCOMM DLC security level
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Anderson,
 
-On Mon, Dec 6, 2010 at 3:56 PM,  <johan.hedberg@gmail.com> wrote:
-> From: Johan Hedberg <johan.hedberg@nokia.com>
->
-> Due to commit 63ce0900 connections initiated through TTYs created with
-> "rfcomm bind ..." would have security level BT_SECURITY_SDP instead of
-> BT_SECURITY_LOW. This would cause instant connection failure between any
-> two SSP capable devices due to the L2CAP connect request to RFCOMM being
-> sent before authentication has been performed. This patch fixes the
-> regression by always initializing the DLC security level to
-> BT_SECURITY_LOW.
->
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
->  net/bluetooth/rfcomm/core.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
->
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index fa642aa..432a9a6 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -311,6 +311,7 @@ static void rfcomm_dlc_clear_state(struct rfcomm_dlc *d)
->        d->state      = BT_OPEN;
->        d->flags      = 0;
->        d->mscex      = 0;
-> +       d->sec_level  = BT_SECURITY_LOW;
->        d->mtu        = RFCOMM_DEFAULT_MTU;
->        d->v24_sig    = RFCOMM_V24_RTC | RFCOMM_V24_RTR | RFCOMM_V24_DV;
->
+On Mon, Dec 06, 2010, Anderson Lizardo wrote:
+> On Sun, Dec 5, 2010 at 2:19 PM,  <johan.hedberg@gmail.com> wrote:
+> > +static void cmd_status(struct sock *sk, u16 cmd, u8 status)
+> > +{
+> 
+> I see some inconsistence on how you calculate struct sizes on this
+> function. See below...
+> 
+> > +       struct sk_buff *skb;
+> > +       struct mgmt_hdr *hdr;
+> > +       struct mgmt_ev_cmd_status *ev;
+> > +
+> > +       BT_DBG("sock %p", sk);
+> > +
+> > +       skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
+> 
+> Here you use sizeof(<var>)
 
-Nice catch, I completely forgot to check if tty initialize sec_level
-with anything.
+Yep, in Chapter 14 of Documentation/CodingStyle this seems to be the
+preferred form.
 
-Acked-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> > +       if (!skb)
+> > +               return;
+> > +
+> > +       hdr = (void *) skb_put(skb, sizeof(struct mgmt_hdr));
+> 
+> But here you use sizeof(<struct>). Could be sizeof(*hdr)?
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Yes, could be.
+
+> > +
+> > +       hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
+> > +       hdr->len = cpu_to_le16(3);
+> 
+> and here a hard-coded size. Could be sizeof(struct mgmt_ev_cmd_status)?
+
+Yes, could be.
+
+> > +       if (len != msglen - sizeof(struct mgmt_hdr)) {
+> 
+> You could use sizeof(*hdr) here.
+
+Indeed.
+
+I suppose these style fixes should be as a separate patch since the
+original one already got acks from the relevant people? (if not, someone
+please enlighten me how the kernel patch process deals with comments
+received after acks :)
+
+> > +               err = -EINVAL;
+> > +               goto done;
+> > +       }
+> > +
+> > +       switch (opcode) {
+> > +       default:
+> > +               BT_DBG("Unknown op %u", opcode);
+> > +               cmd_status(sk, opcode, 0x01);
+> > +               break;
+> > +       }
+> > +
+> > +       err = msglen;
+> 
+> Would there be a chance of integer overflow here? The function returns
+> (signed) int, but msglen is (unsigned) size_t.
+
+The core of the issue is in the way that the sendmsg callback for
+sockets is defined. At least L2CAP and RFCOMM sockets do similar
+assignments in their sendmsg callbacks so I've assumed it to be ok.
+
+Johan
