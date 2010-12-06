@@ -1,70 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mike Tsai <Mike.Tsai@atheros.com>
+Subject: Re: [PATCHv4 0/7] Support for out of band association model
+Date: Mon, 6 Dec 2010 10:46:09 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1290509592-9262-1-git-send-email-szymon.janc@tieto.com> <35B17FE5076C7040809188FBE7913F98406D68CFAB@SC1EXMB-MBCL.global.atheros.com>  <35B17FE5076C7040809188FBE7913F98406D68D125@SC1EXMB-MBCL.global.atheros.com>
+In-Reply-To: <35B17FE5076C7040809188FBE7913F98406D68D125@SC1EXMB-MBCL.global.atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTik4T=PsMzB+umSQPLDPmeD-6sebgCtrQRePH_2h@mail.gmail.com>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
-	<20101022135130.617f0ce8@lxorguk.ukuu.org.uk>
-	<AANLkTinj93zAXJAipB3HjE62Xa1Z=9k9gPBxaT=+MLtg@mail.gmail.com>
-	<20101029172443.61f7b067@pyx>
-	<AANLkTimiyxiKzT=9pKXLFACkc6C=nTD2dtBR7PcgjhOL@mail.gmail.com>
-	<AANLkTim7brB0JecKXDNddt0am=Um457Kfbm6bRG_yzFM@mail.gmail.com>
-	<AANLkTik4T=PsMzB+umSQPLDPmeD-6sebgCtrQRePH_2h@mail.gmail.com>
-Date: Mon, 6 Dec 2010 10:46:43 +0100
-Message-ID: <AANLkTimjACtU_Mx5mDHkm9OpVJ4ueNWgZPsX3YjL0cTi@mail.gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-From: Vitaly Wool <vitalywool@gmail.com>
-To: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201012061046.09668.szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Par,
+Hi,
 
-On Mon, Dec 6, 2010 at 10:06 AM, Par-Gunnar Hjalmdahl
-<pghatwork@gmail.com> wrote:
+> [Mtsai correction]
+> The local OOB data present is set when host send HCI command "Read Local OOB
+> Data". And this "OOB data present" flag is sent over the air to peer device
+> during pairing.
 
->> So is it true that if there's the other chip with similar
->> functionality I have to implement support for, I'll have to pretty
->> much duplicate your line discipline driver?
->>
->
-> What will be in the protocol file, i.e. the same level as hci_h4.c,
-> hci_bcsp.c, etc, will be to ~80% vendor specific. The only H4 channels
-> that are in a standardized specification are the Bluetooth channels
-> 1-4. Other channels such as FM and GPS are vendor specific. I've seen
-> that for example TI has the same channels for FM and GPS, but these
-> channels, 8 and 9, are in no way standardized. The CG2900 also carries
-> a number of other channels, such as debug and device channels, which
-> I'm pretty sure is individual for this chip.
-> This identification of the channels is also only one function, even
-> though it is an important function. There are also a lot of other code
-> regarding baud rate settings, low power handling, etc that I'm
-> positive will not apply to chips of other vendors. It is of course
-> possible that other chips from ST-Ericsson, current and future, will
-> be able to reuse this file, but as I said I doubt that other vendors
-> might be able to use it.
+I think you confused local and remote OOB data.
+This flag is about "OOB authentication data from remote device present".
+Please see Vol.2 Part E. 7.1.29 "IO Capability Request Reply Command".
 
-Wait. What level of abstraction is this file at if even some future
-STE chips are not guaranteed to work with it? Is it at a level of
-hardcoding the GPIO numbers?
+-- 
+Szymon Janc
+on behalf of ST-Ericsson
 
->> Isn't it better to have a new line discipline that the standard
->> drivers (H4, LL, ...) will be applicable to?
-
-> I'm not certain what you mean. We are modifying the line discipline a
-> bit, but the only thing we have needed to do with existing protocol
-> drivers has been to add a boolean parameter for the protocol settings
-> (so they will register to the Bluetooth stack). I don't see why we
-> should create a new line discipline driver and then move the existing
-> protocol drivers to this.
-
-Okay, let me try to be more specific. There's for instance
-drivers/bluetooth/hci_ll.c which is the line discipline driver that is
-meant to work with any BT chip supporting LL protocol. Your solution
-seems to imply that one will have to create a variation of this
-implementation for each BT chip supporting LL that will use your
-shared transport implementation. Is it really the case?
-
-Thanks,
-   Vitaly
