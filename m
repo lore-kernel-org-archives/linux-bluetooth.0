@@ -1,176 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Bruna Moreira <bruna.moreira@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC v2 6/9] Bluetooth: LE SMP Cryptoolbox functions
-Date: Mon,  6 Dec 2010 18:43:49 -0300
-Message-Id: <1291671832-13435-7-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC v2 5/9] Bluetooth: Add support for using the crypto subsystem
+Date: Mon,  6 Dec 2010 18:43:48 -0300
+Message-Id: <1291671832-13435-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+This will allow using the crypto subsystem for encrypting data. As SMP
+(Security Manager Protocol) is implemented almost entirely on the host
+side and the crypto module already implements the needed methods
+(AES-128), it makes sense to use it.
 
-This patch implements SMP crypto functions called ah, c1, s1 and e.
-It also implements auxiliary functions. All These functions are needed
-for SMP keys generation.
-
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |  133 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 133 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   10 ++++++++++
+ 2 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b25010f..b62160e 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -24,6 +24,139 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/smp.h>
-+#include <linux/crypto.h>
-+#include <crypto/b128ops.h>
-+
-+static inline void swap128(u8 src[16], u8 dst[16])
-+{
-+	int i;
-+	for (i = 0; i < 16; i++)
-+		dst[15 - i] = src[i];
-+}
-+
-+static inline void swap56(u8 src[7], u8 dst[7])
-+{
-+	int i;
-+	for (i = 0; i < 7; i++)
-+		dst[6 - i] = src[i];
-+}
-+
-+static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
-+{
-+	struct blkcipher_desc desc;
-+	struct scatterlist sg;
-+	int err, iv_len;
-+	unsigned char iv[128];
-+
-+	if (tfm == NULL) {
-+		BT_ERR("tfm %p", tfm);
-+		err = -1;
-+		goto out;
-+	}
-+
-+	desc.tfm = tfm;
-+	desc.flags = 0;
-+
-+	err = crypto_blkcipher_setkey(tfm, k, 16);
-+	if (err) {
-+		BT_ERR("cipher setkey failed: %d", err);
-+		goto out;
-+	}
-+
-+	sg_init_one(&sg, r, 16);
-+
-+	iv_len = crypto_blkcipher_ivsize(tfm);
-+	if (iv_len) {
-+		memset(&iv, 0xff, iv_len);
-+		crypto_blkcipher_set_iv(tfm, iv, iv_len);
-+	}
-+
-+	err = crypto_blkcipher_encrypt(&desc, &sg, &sg, 16);
-+	if (err)
-+		BT_ERR("Encrypt data error %d", err);
-+
-+out:
-+	return err;
-+}
-+
-+static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
-+		u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
-+		u8 _rat, bdaddr_t *ra, u8 res[16])
-+{
-+	u8 p1[16], p2[16], pair[7];
-+	bdaddr_t addr;
-+	int err;
-+
-+	/* p1 = pres || preq || _rat || _iat */
-+	memset(p1, 0, 16);
-+	swap56(pres, pair);
-+
-+	memcpy(p1, pair, 7);
-+	swap56(preq, pair);
-+
-+	memcpy(p1 + 7, pair, 7);
-+	*(p1 + 14) = _rat;
-+	*(p1 + 15) = _iat;
-+
-+	/* p2 = padding || ia || ra */
-+	memset(p2, 0, 16);
-+	baswap(&addr, ia);
-+	memcpy(p2 + 4, &addr, 6);
-+	baswap(&addr, ra);
-+	memcpy(p2 + 10, &addr, 6);
-+
-+	/* res = r XOR p1 */
-+	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
-+
-+	/* res = e(k, res) */
-+	err = smp_e(tfm, k, res);
-+	if (err) {
-+		BT_ERR("Encrypt data error");
-+		goto out;
-+	}
-+
-+	/* res = res XOR p2 */
-+	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
-+
-+	/* res = e(k, res) */
-+	err = smp_e(tfm, k, res);
-+	if (err) {
-+		BT_ERR("Encrypt data error");
-+		goto out;
-+	}
-+
-+out:
-+	return err;
-+}
-+
-+static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16],
-+			u8 r1[16], u8 r2[16], u8 _r[16])
-+{
-+	u8 r[16];
-+	int err;
-+
-+	/* Just least significant octets from r1 and r2 are considered */
-+	swap128(r1, r);
-+	memcpy(_r, r + 8, 8);
-+	swap128(r2, r);
-+	memcpy(_r + 8, r + 8, 8);
-+
-+	err = smp_e(tfm, k, _r);
-+	if (err) {
-+		BT_ERR("smp_s1: Encrypt data error");
-+		goto out;
-+	}
-+
-+out:
-+	return err;
-+}
-+
-+static int smp_rand(u8 *buf)
-+{
-+	get_random_bytes(buf, 16);
-+
-+	return 0;
-+}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0687e2f..d0a9f5d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -135,6 +135,8 @@ struct hci_dev {
+ 	__u32			req_status;
+ 	__u32			req_result;
  
- static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
- 		u16 dlen, void *data)
++	struct crypto_blkcipher	*tfm;
++
+ 	struct inquiry_cache	inq_cache;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 12c6735..b96c3dd 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -41,6 +41,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/notifier.h>
+ #include <linux/rfkill.h>
++#include <linux/crypto.h>
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+@@ -961,6 +962,13 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (!hdev->workqueue)
+ 		goto nomem;
+ 
++	hdev->tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(hdev->tfm)) {
++		BT_ERR("Failed to load transform for ecb(aes): %ld",
++							PTR_ERR(hdev->tfm));
++		goto nomem;
++	}
++
+ 	hci_register_sysfs(hdev);
+ 
+ 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+@@ -1001,6 +1009,8 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 	for (i = 0; i < NUM_REASSEMBLY; i++)
+ 		kfree_skb(hdev->reassembly[i]);
+ 
++	crypto_free_blkcipher(hdev->tfm);
++
+ 	hci_notify(hdev, HCI_DEV_UNREG);
+ 
+ 	if (hdev->rfkill) {
 -- 
 1.7.3.2
 
