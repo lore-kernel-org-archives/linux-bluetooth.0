@@ -1,80 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Dec 2010 18:37:19 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 6 Dec 2010 18:07:51 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
- interface callbacks
-Message-ID: <20101206203719.GG883@vigoh>
-References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
- <1291573170-3708-3-git-send-email-johan.hedberg@gmail.com>
- <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
- <20101206142116.GA19084@jh-x301>
+To: Joe Perches <joe@perches.com>
+Cc: =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirqus@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] bluetooth: Use printf extension %pMbt
+Message-ID: <20101206200751.GF883@vigoh>
+References: <cover.1291419007.git.joe@perches.com>
+ <b966e9510dec12556a3d1313b026cb2c8281e4d6.1291419007.git.joe@perches.com>
+ <20101206181507.GC883@vigoh>
+ <1291661413.17494.219.camel@Joe-Laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20101206142116.GA19084@jh-x301>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1291661413.17494.219.camel@Joe-Laptop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Joe,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2010-12-06 16:21:16 +0200]:
+* Joe Perches <joe@perches.com> [2010-12-06 10:50:13 -0800]:
 
-> Hi Anderson,
-> 
-> On Mon, Dec 06, 2010, Anderson Lizardo wrote:
-> > On Sun, Dec 5, 2010 at 2:19 PM,  <johan.hedberg@gmail.com> wrote:
-> > > +static void cmd_status(struct sock *sk, u16 cmd, u8 status)
-> > > +{
-> > 
-> > I see some inconsistence on how you calculate struct sizes on this
-> > function. See below...
-> > 
-> > > +       struct sk_buff *skb;
-> > > +       struct mgmt_hdr *hdr;
-> > > +       struct mgmt_ev_cmd_status *ev;
-> > > +
-> > > +       BT_DBG("sock %p", sk);
-> > > +
-> > > +       skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
-> > 
-> > Here you use sizeof(<var>)
-> 
-> Yep, in Chapter 14 of Documentation/CodingStyle this seems to be the
-> preferred form.
-> 
-> > > +       if (!skb)
-> > > +               return;
-> > > +
-> > > +       hdr = (void *) skb_put(skb, sizeof(struct mgmt_hdr));
-> > 
-> > But here you use sizeof(<struct>). Could be sizeof(*hdr)?
-> 
-> Yes, could be.
-> 
-> > > +
-> > > +       hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
-> > > +       hdr->len = cpu_to_le16(3);
-> > 
-> > and here a hard-coded size. Could be sizeof(struct mgmt_ev_cmd_status)?
-> 
-> Yes, could be.
-> 
-> > > +       if (len != msglen - sizeof(struct mgmt_hdr)) {
-> > 
-> > You could use sizeof(*hdr) here.
-> 
-> Indeed.
-> 
-> I suppose these style fixes should be as a separate patch since the
-> original one already got acks from the relevant people? (if not, someone
-> please enlighten me how the kernel patch process deals with comments
-> received after acks :)
+> On Mon, 2010-12-06 at 16:15 -0200, Gustavo F. Padovan wrote:
+> > This patch doesn't apply to the bluetooth-next-2.6 tree.
+> > Can you please rebase it against the bluetooth-next-2.6 tree?
+>=20
+> No worries, it was done against next-20101202.
+>=20
+> Do you care about using %pMR vs %pMbt as Micha=C5=82 suggested in
+> https://lkml.org/lkml/2010/12/4/21 ?
 
->From what I understand the Acked-by is more about the whole idea of the patch,
-so to me it is fine to do such styles fixes and keep the ack in the patch. You
-won't change essentials parts of the patch.
+I'm fine either way. It depends more if another subsystem will want to use
+%pMR or not as you said.
 
--- 
+--=20
 Gustavo F. Padovan
 http://profusion.mobi
