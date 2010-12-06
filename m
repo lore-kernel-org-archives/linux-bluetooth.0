@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Vitaly Wool <vitalywool@gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-Date: Mon, 6 Dec 2010 15:49:01 +0100
-Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
- Alan Cox <alan@lxorguk.ukuu.org.uk>,
- linus.walleij@stericsson.com,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTikMAWikj9HQ76YVeHr7pMoFK6ME2=HHpuQ1kUxq@mail.gmail.com> <AANLkTi=V+89hmBP8iqz13xMhYVfnBkbiVnk=FY=OBE8T@mail.gmail.com>
-In-Reply-To: <AANLkTi=V+89hmBP8iqz13xMhYVfnBkbiVnk=FY=OBE8T@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201012061549.01534.arnd@arndb.de>
+In-Reply-To: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
+References: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 6 Dec 2010 16:34:49 +0200
+Message-ID: <AANLkTin-GeijFDGrkBSBDJkEJmqaindzuJs3k7cN-fdu@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix initial RFCOMM DLC security level
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 06 December 2010, Vitaly Wool wrote:
-> > As a quick answer to your question: that would depend on the
-> > difference between the different controllers, I guess. But CG2900
-> > doesn't support the LL protocol so it is not an issue for that.
-> 
-> Right, but if you are only aiming cg2000, why would you create a
-> framework for that?  I initially thought your solution was generic
-> enough to handle other "many-in-one" Bluetooth chips but I'm
-> completely unsure about that now.
+Hi,
 
-As far as I understand, the point is that it's no longer a 'solution'
-at the core, i.e. there is no replacement for hci_ldisc or any
-of these, just modules for the additional h4 protocols that don't
-have a linux implementation yet.
+On Mon, Dec 6, 2010 at 3:56 PM,  <johan.hedberg@gmail.com> wrote:
+> From: Johan Hedberg <johan.hedberg@nokia.com>
+>
+> Due to commit 63ce0900 connections initiated through TTYs created with
+> "rfcomm bind ..." would have security level BT_SECURITY_SDP instead of
+> BT_SECURITY_LOW. This would cause instant connection failure between any
+> two SSP capable devices due to the L2CAP connect request to RFCOMM being
+> sent before authentication has been performed. This patch fixes the
+> regression by always initializing the DLC security level to
+> BT_SECURITY_LOW.
+>
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> ---
+>  net/bluetooth/rfcomm/core.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+>
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index fa642aa..432a9a6 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -311,6 +311,7 @@ static void rfcomm_dlc_clear_state(struct rfcomm_dlc *d)
+>        d->state      = BT_OPEN;
+>        d->flags      = 0;
+>        d->mscex      = 0;
+> +       d->sec_level  = BT_SECURITY_LOW;
+>        d->mtu        = RFCOMM_DEFAULT_MTU;
+>        d->v24_sig    = RFCOMM_V24_RTC | RFCOMM_V24_RTR | RFCOMM_V24_DV;
+>
 
-The patch set that was originally posted here had a new framework,
-but after the comments from Alan and me, Par-Gunnar agreed to use
-the existing framework instead and extend it in a useful way.
-Please read all of the discussion we already had. You made a good
-point here, but I fear you had both Par-Gunnar and me confused
-because it was a point that already got resolved.
+Nice catch, I completely forgot to check if tty initialize sec_level
+with anything.
 
-	Arnd
+Acked-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
