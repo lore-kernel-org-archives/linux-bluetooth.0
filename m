@@ -1,104 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Vitaly Wool <vitalywool@gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-Date: Tue, 7 Dec 2010 00:07:19 +0100
-Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
- Alan Cox <alan@lxorguk.ukuu.org.uk>,
- linus.walleij@stericsson.com,
- linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <201012061754.44592.arnd@arndb.de> <AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
-In-Reply-To: <AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201012070007.19239.arnd@arndb.de>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC v2 9/9] Bluetooth: Add support for resuming socket when SMP is finished
+Date: Mon,  6 Dec 2010 18:43:52 -0300
+Message-Id: <1291671832-13435-10-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 06 December 2010 22:24:34 Vitaly Wool wrote:
-> On Mon, Dec 6, 2010 at 5:54 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> 
-> >> But I was trying to make a different point here. On a basic level,
-> >> there's this cg2000 chip from STE that does BT, FM and GPS. There's
-> >> the chip from TI that does BT, FM and GPS, and there's the Broadcom
-> >> chip that does BT+FM. They all use HCI to access the other functions
-> >> of the combo chip and they do it in a really simiar way, with the
-> >> differences mostly in power management techniques. So I think it's
-> >> quite sensible to have some kind of framework that is suitable for
-> >> such devices.
-> >
-> > Yes, I agree 100% in principle. I could not find the code that
-> > Broadcom/TI FM and GPS stuff so far, can you point us to that?
-> 
-> Sure, the TI "shared transport" code is mostly at drivers/misc/ti-st.
-> 
-> Some Broadcom BCM43xx chips work in a similar way AFAIK but I'm not
-> sure about the mainline support for those.
+This adds support for resuming the user space traffic when SMP
+negotiation is complete.
 
-Ah, it had not occured to me to look in drivers/misc. Looking at the
-code over there, it becomes much clearer what your point is. Evidently
-the ti-st driver implements a line discipline similar to, but conflicting
-with hci_ldisc, and it has its own copy of the hci_ll code.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/l2cap_core.c |   72 +++++++++++++++++++++++++------------------
+ net/bluetooth/smp.c        |    9 +++++
+ 2 files changed, 51 insertions(+), 30 deletions(-)
 
-I guess this is exactly what we're trying to avoid having with the
-cg2900 code ;-).
-
-> > The cg2900 solution for this was to use MFD (plus another layer
-> > in the posted version, but that will go away I assume). Using
-> > MFD is not the only possibility here, but I could not see anything
-> > wrong with it either. Do you think we can move them all over to
-> > use MFD infrastructure?
-> 
-> I guess so but it's probably more of a detail than what I'm up to now :)
-
-Agreed.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index da4f13d..061248f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -624,6 +624,22 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 	}
+ }
  
-> >> But generally speaking, isn't a line discipline/driver attached to a
-> >> tty? We can use dumb tty for e. g. SPI and still be able to use
-> >> hci_ll, right?
-> >
-> > I suggested that as well, but the point was made that this would
-> > add an unnecessary indirection for the SPI case, which is not
-> > really much like a serial port. It's certainly possible to do it
-> > like you say, but if we add a way to register the high-level
-> > protocols with an HCI-like multi-function device, we could
-> > also do it in a way that does not rely on tty-ldisc but keeps it
-> > as one of the options.
-> 
-> I actually don't think it's such a big indirection, I prefer to think
-> of it more as of the abstraction layer. If not use this, are we going
-> to have direct SPI device drivers? I'm afraid we might end up with a
-> huge duplication of code in that case.
++static void l2cap_chan_ready(struct sock *sk)
++{
++	struct sock *parent = bt_sk(sk)->parent;
++
++	BT_DBG("sk %p, parent %p", sk, parent);
++
++	l2cap_pi(sk)->conf_state = 0;
++	l2cap_sock_clear_timer(sk);
++
++	sk->sk_state = BT_CONNECTED;
++	sk->sk_state_change(sk);
++
++	if (parent)
++		parent->sk_data_ready(parent, 0);
++}
++
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ {
+ 	struct l2cap_chan_list *l = &conn->chan_list;
+@@ -640,14 +656,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 		bh_lock_sock(sk);
+ 
+ 		if (conn->hcon->type == LE_LINK) {
+-			l2cap_sock_clear_timer(sk);
+-			sk->sk_state = BT_CONNECTED;
+-			sk->sk_state_change(sk);
+ 			if (smp_conn_security(conn, l2cap_pi(sk)->sec_level))
+-				BT_DBG("Insufficient security");
+-		}
++				l2cap_chan_ready(sk);
+ 
+-		if (sk->sk_type != SOCK_SEQPACKET &&
++		} else if (sk->sk_type != SOCK_SEQPACKET &&
+ 				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+@@ -1199,7 +1211,7 @@ static int l2cap_do_connect(struct sock *sk)
+ 				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+-		} else
++		} else if (hcon->type == ACL_LINK)
+ 			l2cap_do_start(sk);
+ 	}
+ 
+@@ -2162,6 +2174,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct bt_security sec;
++	struct l2cap_conn *conn;
+ 	int len, err = 0;
+ 	u32 opt;
+ 
+@@ -2198,6 +2211,18 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 		}
+ 
+ 		l2cap_pi(sk)->sec_level = sec.level;
++
++		conn = l2cap_pi(sk)->conn;
++		if (conn && conn->hcon->type == LE_LINK) {
++			if (!conn->hcon->out) {
++				err = -EINVAL;
++				break;
++			}
++
++			sk->sk_state = BT_CONFIG;
++			smp_conn_security(conn, sec.level);
++		}
++
+ 		break;
+ 
+ 	case BT_DEFER_SETUP:
+@@ -2410,29 +2435,6 @@ static int l2cap_sock_release(struct socket *sock)
+ 	return err;
+ }
+ 
+-static void l2cap_chan_ready(struct sock *sk)
+-{
+-	struct sock *parent = bt_sk(sk)->parent;
+-
+-	BT_DBG("sk %p, parent %p", sk, parent);
+-
+-	l2cap_pi(sk)->conf_state = 0;
+-	l2cap_sock_clear_timer(sk);
+-
+-	if (!parent) {
+-		/* Outgoing channel.
+-		 * Wake up socket sleeping on connect.
+-		 */
+-		sk->sk_state = BT_CONNECTED;
+-		sk->sk_state_change(sk);
+-	} else {
+-		/* Incoming channel.
+-		 * Wake up socket sleeping on accept.
+-		 */
+-		parent->sk_data_ready(parent, 0);
+-	}
+-}
+-
+ /* Copy frame to all raw sockets on that connection */
+ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+@@ -4753,6 +4755,16 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
+ 
++		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
++			if (!status && encrypt) {
++				l2cap_pi(sk)->sec_level = BT_SECURITY_MEDIUM;
++				l2cap_chan_ready(sk);
++			}
++
++			bh_unlock_sock(sk);
++			continue;
++		}
++
+ 		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND) {
+ 			bh_unlock_sock(sk);
+ 			continue;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index d19b8a2..c7a0e63 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -346,9 +346,13 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_security_req *rp = (void *) skb->data;
+ 	struct smp_cmd_pairing cp;
++	struct hci_conn *hcon = conn->hcon;
+ 
+ 	BT_DBG("");
+ 
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
++		return;
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	memset(&cp, 0, sizeof(cp));
+@@ -364,10 +368,13 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&conn->preq[1], &cp, sizeof(cp));
+ 
+ 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
++
++	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
+ }
+ 
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ {
++	struct hci_conn *hcon = conn->hcon;
+ 	__u8 authreq;
+ 
+ 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, conn->hcon, sec_level);
+@@ -407,6 +414,8 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+ 	}
+ 
++	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
++
+ 	return 0;
+ }
+ 
+-- 
+1.7.3.2
 
-The question is how it should be modeled in a better way than today.
-
-I believe we already agree it should be something like
-
-   bt   ti-radio    st-e-radio    ti-gps   st-e-gps  broadcom-radio ...
-   |         |          |            |          |          |         |
-   +---------+----------+---------+--+----------+----------+---------+
-                                  |
-                          common-hci-module
-                                  |
-                      +-----------+-----------+
-                      |        |       |      |
-                    serial    spi     i2c    ...
-
-
-Any objections to this?
-
-If you agree, I think we should discuss the alternatives for the common
-module. I think you are saying we should make the common module a single
-ldisc doing the multiplexing and have all transports register as ttys into
-it, right?
-
-What we discussed before was to split it into multiple modules, one for
-the tty ldisc and one for the common code, and then have the spi/i2c/...
-drivers feed into the common multiplexer without going through tty.
-
-I don't currently see a significant advantage or disadvantage with either
-approach.
-
-	Arnd
