@@ -1,58 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 6 Dec 2010 16:15:07 -0200
+Date: Mon, 6 Dec 2010 15:53:22 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Joe Perches <joe@perches.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] bluetooth: Use printf extension %pMbt
-Message-ID: <20101206181507.GC883@vigoh>
-References: <cover.1291419007.git.joe@perches.com>
- <b966e9510dec12556a3d1313b026cb2c8281e4d6.1291419007.git.joe@perches.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [PATCH] Bluetooth: Fix initial RFCOMM DLC security level
+Message-ID: <20101206175322.GA883@vigoh>
+References: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <b966e9510dec12556a3d1313b026cb2c8281e4d6.1291419007.git.joe@perches.com>
+In-Reply-To: <1291643777-18851-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
+Hi Johan,
 
-* Joe Perches <joe@perches.com> [2010-12-03 18:33:04 -0800]:
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2010-12-06 15:56:17 +0200]:
 
-> Save some text and bss.
-> Remove function batostr so there's no possibility of bad output.
+> From: Johan Hedberg <johan.hedberg@nokia.com>
 > 
-> from the net/bluetooth directory:
+> Due to commit 63ce0900 connections initiated through TTYs created with
+> "rfcomm bind ..." would have security level BT_SECURITY_SDP instead of
+> BT_SECURITY_LOW. This would cause instant connection failure between any
+> two SSP capable devices due to the L2CAP connect request to RFCOMM being
+> sent before authentication has been performed. This patch fixes the
+> regression by always initializing the DLC security level to
+> BT_SECURITY_LOW.
 > 
-> $ size built-in.o.*
->    text	   data	    bss	    dec	    hex	filename
->  293562	  16265	  70088	 379915	  5cc0b	built-in.o.allyesconfig.new
->  294619	  16269	  70480	 381368	  5d1b8	built-in.o.allyesconfig.old
->   30359	    772	     56	  31187	   79d3	built-in.o.btonly.new
->   30555	    776	     92	  31423	   7abf	built-in.o.btonly.old
-> 
-> Signed-off-by: Joe Perches <joe@perches.com>
-> ---
->  net/bluetooth/bnep/core.c   |    3 +--
->  net/bluetooth/cmtp/core.c   |    2 +-
->  net/bluetooth/hci_conn.c    |    6 +++---
->  net/bluetooth/hci_core.c    |    8 ++++----
->  net/bluetooth/hci_event.c   |    6 +++---
->  net/bluetooth/hci_sysfs.c   |   10 +++++-----
->  net/bluetooth/hidp/core.c   |    4 ++--
->  net/bluetooth/l2cap.c       |   19 +++++++++----------
->  net/bluetooth/lib.c         |   14 --------------
->  net/bluetooth/rfcomm/core.c |   16 ++++++++--------
->  net/bluetooth/rfcomm/sock.c |    8 ++++----
->  net/bluetooth/rfcomm/tty.c  |    6 +++---
->  net/bluetooth/sco.c         |   12 ++++++------
->  13 files changed, 49 insertions(+), 65 deletions(-)
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 
-This patch doesn't apply to the bluetooth-next-2.6 tree. Can you please rebase
-it against the bluetooth-next-2.6 tree? The tree is at:
-
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git
-
+Patch has been applied to bluetooth-2.6, thanks.
 
 -- 
 Gustavo F. Padovan
