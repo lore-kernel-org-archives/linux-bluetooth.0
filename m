@@ -1,68 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 6 Dec 2010 16:15:07 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Joe Perches <joe@perches.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] bluetooth: Use printf extension %pMbt
+Message-ID: <20101206181507.GC883@vigoh>
+References: <cover.1291419007.git.joe@perches.com>
+ <b966e9510dec12556a3d1313b026cb2c8281e4d6.1291419007.git.joe@perches.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTik=WyfpbULNywPPXGi-KB=6tK3on2p6TYL94E0O@mail.gmail.com>
-References: <1291386532-4985-1-git-send-email-claudio.takahasi@openbossa.org>
-	<AANLkTik=WyfpbULNywPPXGi-KB=6tK3on2p6TYL94E0O@mail.gmail.com>
-Date: Mon, 6 Dec 2010 15:20:01 -0300
-Message-ID: <AANLkTimrcQTPWEr39WG9f_+-jEbkn4T-6_33KGqOdtfV@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Add device type to identify LE, BR/EDR or dual mode devices
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <b966e9510dec12556a3d1313b026cb2c8281e4d6.1291419007.git.joe@perches.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Joe,
 
->> +{
->> +       /* Inferring the remote type based on the EIR Flags field */
->> +
->> +       if (flags & EIR_SIM_CONTROLLER && flags & EIR_SIM_HOST)
->> +               return DUALMODE_TYPE;
->
-> Can the above be simplified to the following?
->
->  if (flags & (EIR_SIM_CONTROLLER | EIR_SIM_HOST))
+* Joe Perches <joe@perches.com> [2010-12-03 18:33:04 -0800]:
 
-We are both wrong, read the last sentence for dual mode devices.
+> Save some text and bss.
+> Remove function batostr so there's no possibility of bad output.
+> 
+> from the net/bluetooth directory:
+> 
+> $ size built-in.o.*
+>    text	   data	    bss	    dec	    hex	filename
+>  293562	  16265	  70088	 379915	  5cc0b	built-in.o.allyesconfig.new
+>  294619	  16269	  70480	 381368	  5d1b8	built-in.o.allyesconfig.old
+>   30359	    772	     56	  31187	   79d3	built-in.o.btonly.new
+>   30555	    776	     92	  31423	   7abf	built-in.o.btonly.old
+> 
+> Signed-off-by: Joe Perches <joe@perches.com>
+> ---
+>  net/bluetooth/bnep/core.c   |    3 +--
+>  net/bluetooth/cmtp/core.c   |    2 +-
+>  net/bluetooth/hci_conn.c    |    6 +++---
+>  net/bluetooth/hci_core.c    |    8 ++++----
+>  net/bluetooth/hci_event.c   |    6 +++---
+>  net/bluetooth/hci_sysfs.c   |   10 +++++-----
+>  net/bluetooth/hidp/core.c   |    4 ++--
+>  net/bluetooth/l2cap.c       |   19 +++++++++----------
+>  net/bluetooth/lib.c         |   14 --------------
+>  net/bluetooth/rfcomm/core.c |   16 ++++++++--------
+>  net/bluetooth/rfcomm/sock.c |    8 ++++----
+>  net/bluetooth/rfcomm/tty.c  |    6 +++---
+>  net/bluetooth/sco.c         |   12 ++++++------
+>  13 files changed, 49 insertions(+), 65 deletions(-)
 
->From Bluetooth SPEC(page 1744):
+This patch doesn't apply to the bluetooth-next-2.6 tree. Can you please rebase
+it against the bluetooth-next-2.6 tree? The tree is at:
 
-BR/EDR/LE OPERATION MODES AND PROCEDURE
-13.1.1.2 Discoverable Mode
-...
-A device supporting both BR/EDR and LE physical links shall expose the
-capabilities of both physical links by performing the following steps:
-a) The ‘LE Supported (Controller)’ and ‘LE Supported (Host)’ bits in
-the LMP features shall be set as defined in [Vol. 2], Part C Section
-3.2.
-b) The ‘BR/EDR Not Supported’ bit in the Flags AD type shall be set to
-‘0’ as defined in Section 18.1.
-c) The ‘Simultaneous LE and BR/EDR to Same Device Capable
-(Controller)’ and ‘Simultaneous LE and BR/EDR to Same Device Capable
-(Host)’ bits in the Flags AD type shall be set to ‘0’ as defined in
-Section 18.1
+git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git
 
->
-> I know the semantics will change slightly, but I suppose that either
-> host or controller supports simultaneous LE and BR/EDR, it can be
-> considered dual mode. It would no be necessary to have *both* bits set
-> (my impression).
->
->> @@ -3082,6 +3098,7 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
->>        if (new_dev) {
->>                dev->le = TRUE;
->>                dev->evt_type = info->evt_type;
->> +               dev->type = LE_TYPE;
->>        } else if (dev->rssi == rssi)
->>                return;
->>
->
-> Can you remind me why both dev->le and dev->type are necessary in
-> struct remote_dev_info ?
 
-"le" will be removed. Thanks!
-
-Regards,
-Claudio
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
