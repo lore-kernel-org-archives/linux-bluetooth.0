@@ -1,87 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 6 Dec 2010 19:15:17 -0200
+Date: Mon, 6 Dec 2010 18:37:19 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Yuri Ershov <ext-yuri.ershov@nokia.com>
-Cc: marcel@holtmann.org, davem@davemloft.net, jprvita@profusion.mobi,
-	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
-	andrei.emeltchenko@nokia.com
-Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
-Message-ID: <20101206211516.GH883@vigoh>
-References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: Add initial Bluetooth Management
+ interface callbacks
+Message-ID: <20101206203719.GG883@vigoh>
+References: <1291573170-3708-1-git-send-email-johan.hedberg@gmail.com>
+ <1291573170-3708-3-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTimYKSvo8WpNa-ft61MoBaAgKZxt5j0qVuRBfCb3@mail.gmail.com>
+ <20101206142116.GA19084@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20101206142116.GA19084@jh-x301>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yuri,
+Hi Johan,
 
-* Yuri Ershov <ext-yuri.ershov@nokia.com> [2010-11-25 12:55:33 +0300]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2010-12-06 16:21:16 +0200]:
 
-> This patch is an addition to my previous patch for this issue.
-> The problem is in resynchronization between two loops:
-> 1. Main controlling loop (l2cap_connect_req, l2cap_config_req,
-> l2cap_config_rsp, l2cap_disconnect_req, etc.)
-> 2. Loop waiting of BT_CONNECTED state of socket (l2cap_sock_accept,
-> bt_accept_dequeue, etc.).
-> In case of fast sequence of connect/disconnect operations the loop #1
-> makes several cycles, while the loop #2 only has time to make one
-> cycle and it results crash.
-> The aim of the patch is to skeep handling of sockets queued for
-> deletion.
+> Hi Anderson,
 > 
-> Signed-off-by: Yuri Ershov <ext-yuri.ershov@nokia.com>
-> ---
->  net/bluetooth/af_bluetooth.c |    2 ++
->  net/bluetooth/l2cap.c        |    6 ++++--
->  2 files changed, 6 insertions(+), 2 deletions(-)
+> On Mon, Dec 06, 2010, Anderson Lizardo wrote:
+> > On Sun, Dec 5, 2010 at 2:19 PM,  <johan.hedberg@gmail.com> wrote:
+> > > +static void cmd_status(struct sock *sk, u16 cmd, u8 status)
+> > > +{
+> > 
+> > I see some inconsistence on how you calculate struct sizes on this
+> > function. See below...
+> > 
+> > > +       struct sk_buff *skb;
+> > > +       struct mgmt_hdr *hdr;
+> > > +       struct mgmt_ev_cmd_status *ev;
+> > > +
+> > > +       BT_DBG("sock %p", sk);
+> > > +
+> > > +       skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
+> > 
+> > Here you use sizeof(<var>)
 > 
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index c4cf3f5..f9389da 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -200,6 +200,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
->  	BT_DBG("parent %p", parent);
->  
->  	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
-> +		if (n == p)
-> +			break;
+> Yep, in Chapter 14 of Documentation/CodingStyle this seems to be the
+> preferred form.
+> 
+> > > +       if (!skb)
+> > > +               return;
+> > > +
+> > > +       hdr = (void *) skb_put(skb, sizeof(struct mgmt_hdr));
+> > 
+> > But here you use sizeof(<struct>). Could be sizeof(*hdr)?
+> 
+> Yes, could be.
+> 
+> > > +
+> > > +       hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
+> > > +       hdr->len = cpu_to_le16(3);
+> > 
+> > and here a hard-coded size. Could be sizeof(struct mgmt_ev_cmd_status)?
+> 
+> Yes, could be.
+> 
+> > > +       if (len != msglen - sizeof(struct mgmt_hdr)) {
+> > 
+> > You could use sizeof(*hdr) here.
+> 
+> Indeed.
+> 
+> I suppose these style fixes should be as a separate patch since the
+> original one already got acks from the relevant people? (if not, someone
+> please enlighten me how the kernel patch process deals with comments
+> received after acks :)
 
-So in which situations (n == p), or (p == p->next)? That should happen only
-when p is the only element in the list, then p == head, right?
-
->  		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
->  
->  		lock_sock(sk);
-> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> index 12b4aa2..29f30b0 100644
-> --- a/net/bluetooth/l2cap.c
-> +++ b/net/bluetooth/l2cap.c
-> @@ -133,7 +133,8 @@ static struct sock *__l2cap_get_chan_by_dcid(struct l2cap_chan_list *l, u16 cid)
->  {
->  	struct sock *s;
->  	for (s = l->head; s; s = l2cap_pi(s)->next_c) {
-> -		if (l2cap_pi(s)->dcid == cid)
-> +		if ((l2cap_pi(s)->dcid == cid) &&
-> +		    (sk->sk_state != BT_DISCONN) && (sk->sk_state != BT_CLOSED))
-
-I think its better check for the cid first, and if it matches check for the
-socket states, if they are BT_DISCONN or BT_CLOSED return NULL. Then you avoid
-unnecessary loops here.
-
->  			break;
->  	}
->  	return s;
-> @@ -143,7 +144,8 @@ static struct sock *__l2cap_get_chan_by_scid(struct l2cap_chan_list *l, u16 cid)
->  {
->  	struct sock *s;
->  	for (s = l->head; s; s = l2cap_pi(s)->next_c) {
-> -		if (l2cap_pi(s)->scid == cid)
-> +		if ((l2cap_pi(s)->scid == cid) &&
-> +		    (sk->sk_state != BT_DISCONN) && (sk->sk_state != BT_CLOSED))
->  			break;
-
-Same for this one.
+>From what I understand the Acked-by is more about the whole idea of the patch,
+so to me it is fine to do such styles fixes and keep the ack in the patch. You
+won't change essentials parts of the patch.
 
 -- 
 Gustavo F. Padovan
