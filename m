@@ -1,64 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 6 Dec 2010 19:23:26 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Pavan Savoy <pavan_savoy@ti.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7] Bluetooth: btwilink driver
+Message-ID: <20101206212326.GI883@vigoh>
+References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
+ <20101130154654.GE5919@vigoh>
+ <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <201012061754.44592.arnd@arndb.de>
-References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
-	<201012061615.28093.arnd@arndb.de>
-	<AANLkTi=upn_ieeW_OXzKaHsrEumH2F_fMn07P6-97qb1@mail.gmail.com>
-	<201012061754.44592.arnd@arndb.de>
-Date: Mon, 6 Dec 2010 22:24:34 +0100
-Message-ID: <AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
-Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
-From: Vitaly Wool <vitalywool@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Par-Gunnar Hjalmdahl <pghatwork@gmail.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	linus.walleij@stericsson.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Dec 6, 2010 at 5:54 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+Hi Pavan,
 
->> But I was trying to make a different point here. On a basic level,
->> there's this cg2000 chip from STE that does BT, FM and GPS. There's
->> the chip from TI that does BT, FM and GPS, and there's the Broadcom
->> chip that does BT+FM. They all use HCI to access the other functions
->> of the combo chip and they do it in a really simiar way, with the
->> differences mostly in power management techniques. So I think it's
->> quite sensible to have some kind of framework that is suitable for
->> such devices.
->
-> Yes, I agree 100% in principle. I could not find the code that
-> Broadcom/TI FM and GPS stuff so far, can you point us to that?
+* Pavan Savoy <pavan_savoy@ti.com> [2010-11-30 21:30:47 +0530]:
 
-Sure, the TI "shared transport" code is mostly at drivers/misc/ti-st.
+> Gustavo,
+>=20
+> On Tue, Nov 30, 2010 at 9:16 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Pavan,
+> >
+> > * pavan_savoy@ti.com <pavan_savoy@ti.com> [2010-11-26 04:20:57 -0500]:
+> >
+> >> From: Pavan Savoy <pavan_savoy@ti.com>
+> >>
+> >> Marcel, Gustavo,
+> >>
+> >> comments attended to from v5 and v6,
+> >>
+> >> 1. Inside ti_st_open, I previously only checked for EINPROGRESS & EPER=
+M,
+> >> Now I handle for EINPROGRESS - which is not really an error and
+> >> return during all other error cases.
+> >>
+> >> 2. _write is still a function pointer and not an exported function, I
+> >> need to change the underlying driver's code for this.
+> >> However, previous lkml comments on the underlying driver's code
+> >> suggested it to be kept as a function pointer and not EXPORT.
+> >> Gustavo, Marcel - Please comment on this.
+> >> Is this absolutely required? If so why?
+> >>
+> >> 3. test_and_set_bit of HCI_RUNNING is done at beginning of
+> >> ti_st_open, and did not see issues during firmware download.
+> >> However ideally I would still like to set HCI_RUNNING once the firmware
+> >> download is done, because I don't want to allow a _send_frame during
+> >> firmware download - Marcel, Gustavo - Please comment.
+> >>
+> >> 4. test_and_clear of HCI_RUNNING now done @ beginning of close.
+> >>
+> >> 5. EAGAIN on failure of st_write is to suggest to try and write again.
+> >> I have never this happen - However only if UART goes bad this case may
+> >> occur.
+> >>
+> >> 6. ti_st_tx_complete is very similar to hci_ldisc's tx_complete - in
+> >> fact the code is pretty much borrowed from there.
+> >> Marcel, Gustavo - Please suggest where should it be done? If not here.
+> >>
+> >> 7. comments cleaned-up + hst memory leak fixed when hci_alloc_dev fail=
+s.
+> >>
+> >> 8. platform_driver registration inside module_init now is similar to
+> >> other drivers.
+> >>
+> >> 9. Dan Carpenter's comments on leaking hst memory on failed
+> >> hci_register_dev and empty space after quotes in debug statements
+> >> fixed.
+> >>
+> >> Thanks for the comments...
+> >> Sorry, for previously not being very clear on which comments were
+> >> handled and which were not.
+> >>
+> >> -- patch description --
+> >>
+> >> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+> >> Texas Instrument's WiLink chipsets combine wireless technologies
+> >> like BT, FM, GPS and WLAN onto a single chip.
+> >>
+> >> This Bluetooth driver works on top of the TI_ST shared transport
+> >> line discipline driver which also allows other drivers like
+> >> FM V4L2 and GPS character driver to make use of the same UART interfac=
+e.
+> >>
+> >> Kconfig and Makefile modifications to enable the Bluetooth
+> >> driver for Texas Instrument's WiLink 7 chipset.
+> >>
+> >> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+> >> ---
+> >> =A0drivers/bluetooth/Kconfig =A0 =A0| =A0 10 ++
+> >> =A0drivers/bluetooth/Makefile =A0 | =A0 =A01 +
+> >> =A0drivers/bluetooth/btwilink.c | =A0363 +++++++++++++++++++++++++++++=
++++++++++++++
+> >> =A03 files changed, 374 insertions(+), 0 deletions(-)
+> >> =A0create mode 100644 drivers/bluetooth/btwilink.c
+> >
+> > So as part of reviewing this I took a look at your underlying driver and
+> > I didn't like what I saw there, you are handling Bluetooth stuff inside
+> > the core driver and that is just wrong. You have a Bluetooth driver here
+> > then you have to leave the Bluetooth data handling to the Bluetooth
+> > driver and do not do that in the core.
+>=20
+> Thanks for reviewing this and the underlying driver.
+> yes, we do have Bluetooth/FM/GPS handling inside the TI ST driver, on
+> addition of further technologies
+> we do plan to have them inside the ST driver too.
+>=20
+> The understanding of BT or FM or GPS is required for the ST driver
+> because, the data coming from the chip
+> can either be of these technologies, further-more the data might not
+> come in a set.
+> As in, an a2dp/ftp ACL frame might come in 2 frames instead of 1, and
+> in other cases,
+> there might be a HCI-EVENT + FM CH8 data in a single frame received by th=
+e UART.
 
-Some Broadcom BCM43xx chips work in a similar way AFAIK but I'm not
-sure about the mainline support for those.
+Can't you differentiate Bluetooth data in a generic way, withou looking if =
+it
+is ACL, SCO or HCI EVENT? That done, you can just accumulate in a buffer all
+the Bluetooth data you received in that stream then send it to Bluetooth
+driver after finish that stream processing.
 
-> The cg2900 solution for this was to use MFD (plus another layer
-> in the posted version, but that will go away I assume). Using
-> MFD is not the only possibility here, but I could not see anything
-> wrong with it either. Do you think we can move them all over to
-> use MFD infrastructure?
-
-I guess so but it's probably more of a detail than what I'm up to now :)
-
->> But generally speaking, isn't a line discipline/driver attached to a
->> tty? We can use dumb tty for e. g. SPI and still be able to use
->> hci_ll, right?
->
-> I suggested that as well, but the point was made that this would
-> add an unnecessary indirection for the SPI case, which is not
-> really much like a serial port. It's certainly possible to do it
-> like you say, but if we add a way to register the high-level
-> protocols with an HCI-like multi-function device, we could
-> also do it in a way that does not rely on tty-ldisc but keeps it
-> as one of the options.
-
-I actually don't think it's such a big indirection, I prefer to think
-of it more as of the abstraction layer. If not use this, are we going
-to have direct SPI device drivers? I'm afraid we might end up with a
-huge duplication of code in that case.
-
-Thanks,
-   Vitaly
+--=20
+Gustavo F. Padovan
+http://profusion.mobi
