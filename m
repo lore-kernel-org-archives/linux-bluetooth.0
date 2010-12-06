@@ -1,101 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Dec 2010 11:50:49 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: "'Gustavo F. Padovan'" <padovan@profusion.mobi>,
-	'Ville Tervo' <ville.tervo@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
-Message-ID: <20101206145049.GA3534@eris>
-References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
- <20101203220534.GA16709@eris>
- <001f01cb934b$d065e4c0$7131ae40$@org>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Vitaly Wool <vitalywool@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Mon, 6 Dec 2010 15:49:01 +0100
+Cc: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ linus.walleij@stericsson.com,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTikMAWikj9HQ76YVeHr7pMoFK6ME2=HHpuQ1kUxq@mail.gmail.com> <AANLkTi=V+89hmBP8iqz13xMhYVfnBkbiVnk=FY=OBE8T@mail.gmail.com>
+In-Reply-To: <AANLkTi=V+89hmBP8iqz13xMhYVfnBkbiVnk=FY=OBE8T@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <001f01cb934b$d065e4c0$7131ae40$@org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201012061549.01534.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+On Monday 06 December 2010, Vitaly Wool wrote:
+> > As a quick answer to your question: that would depend on the
+> > difference between the different controllers, I guess. But CG2900
+> > doesn't support the LL protocol so it is not an issue for that.
+> 
+> Right, but if you are only aiming cg2000, why would you create a
+> framework for that?  I initially thought your solution was generic
+> enough to handle other "many-in-one" Bluetooth chips but I'm
+> completely unsure about that now.
 
-On 16:40 Fri 03 Dec, Brian Gix wrote:
-> 
-> 
-> Hi Vinicius & Gustavo,
-> 
-> 
-> -----Original Message-----
-> From: Vinicius Costa Gomes [mailto:vinicius.gomes@openbossa.org] 
-> Sent: 03 December, 2010 2:06 PM
-> To: Brian Gix
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
-> 
-> Hi Brian,
-> 
-> On 11:11 Fri 03 Dec, Brian Gix wrote:
-> > 
-> > Hi Claudio, Johan & All,
-> > 
-> > Is this LE capable kernel that Ville is working on, the development stream
-> > for the LE Security Manager?  And if so, is it in a partial fleshed out
-> > state?
-> 
-> There is a simple implementation of SMP here[1] on my "devel" branch. I am 
-> cleaning it up for sending it for review.
-> 
-> If you want to help, have any comments or just want to tell us what you are
-> working on, please drop by #bluez on freenode, or send an email.
-> 
-> [Gix] Unfortunately, I can't access git.infradead.org.  Gustavo, would it be
-> possible for you to pull Vinicius' devel branch from
-> git://git.infradead.org/users/vcgomes/linux-2.6.git to an le-devel branch on
-> your bluetooth-testing repository?
-> 
+As far as I understand, the point is that it's no longer a 'solution'
+at the core, i.e. there is no replacement for hci_ldisc or any
+of these, just modules for the additional h4 protocols that don't
+have a linux implementation yet.
 
-Sorry for the delay.
+The patch set that was originally posted here had a new framework,
+but after the comments from Alan and me, Par-Gunnar agreed to use
+the existing framework instead and extend it in a useful way.
+Please read all of the discussion we already had. You made a good
+point here, but I fear you had both Par-Gunnar and me confused
+because it was a point that already got resolved.
 
-I pushed a copy to gitorious:
-
-http://gitorious.org/bluetooth-next branch devel.
-
-
-> [Gix] I am trying to integrate Qualcomm's latest LE capable (BR/EDR/LE)
-> chipset with bluez.  Additionally, I do have a working non-open-source
-> [Gix]  host which has had it's LE Security Manager UPF tested, which I hope
-> to be able to use to help test/solidify the bluez version.
-> 
-> 
-> > 
-> > >
-> git://git.kernel.org/pub/scm/linux/kernel/git/vtervo/bluetooth-le-2.6.git
-> > 
-> > 
-> > Brian Gix
-> > bgix@codeaurora.org
-> > Employee of Qualcomm Innovation Center, Inc.
-> > Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> > 
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> Cheers,
-> -- 
-> Vinicius
-> 
-> [1] git://git.infradead.org/users/vcgomes/linux-2.6.git 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
+	Arnd
