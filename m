@@ -1,252 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Brian Gix" <bgix@codeaurora.org>
-To: "'Vinicius Costa Gomes'" <vinicius.gomes@openbossa.org>,
-	<linux-bluetooth@vger.kernel.org>
-Cc: "'Anderson Briglia'" <anderson.briglia@openbossa.org>
-References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org> <1291671832-13435-5-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1291671832-13435-5-git-send-email-vinicius.gomes@openbossa.org>
-Subject: RE: [RFC v2 4/9] Bluetooth: simple SMP pairing negotiation
-Date: Tue, 7 Dec 2010 10:26:58 -0800
-Message-ID: <002e01cb963c$560392b0$020ab810$@org>
+Date: Tue, 7 Dec 2010 16:05:19 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 5/9] Bluetooth: Add support for using the crypto
+ subsystem
+Message-ID: <20101207180519.GI2944@vigoh>
+References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1291671832-13435-6-git-send-email-vinicius.gomes@openbossa.org>
+ <20101207172713.GF2944@vigoh>
+ <20101207175117.GA4797@eris>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20101207175117.GA4797@eris>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-
 Hi Vinicius,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Vinicius Costa Gomes
-> Sent: 06 December, 2010 1:44 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Anderson Briglia; Vinicius Costa Gomes
-> Subject: [RFC v2 4/9] Bluetooth: simple SMP pairing negotiation
-> 
-> From: Anderson Briglia <anderson.briglia@openbossa.org>
-> 
-> This implementation only exchanges SMP messages between the Host and
-> the
-> Remote. No keys are being generated. TK and STK generation will be
-> provided in further patches.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  net/bluetooth/l2cap_core.c |    3 +-
->  net/bluetooth/smp.c        |  114
-> ++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 112 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 674799c..da4f13d 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4630,7 +4630,8 @@ static void l2cap_recv_frame(struct l2cap_conn
-> *conn, struct sk_buff *skb)
->  		break;
-> 
->  	case L2CAP_CID_SMP:
-> -		smp_sig_channel(conn, skb);
-> +		if (smp_sig_channel(conn, skb))
-> +			l2cap_conn_del(conn->hcon, 0x05);
->  		break;
-> 
->  	default:
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index e9dde5f..b25010f 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -64,6 +64,102 @@ static void smp_send_cmd(struct l2cap_conn *conn,
-> u8 code, u16 len, void *data)
->  	hci_send_acl(conn->hcon, skb, 0);
->  }
-> 
-> +static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> +{
-> +	struct smp_cmd_pairing *rp = (void *) skb->data;
-> +
-> +	BT_DBG("");
-> +
-> +	skb_pull(skb, sizeof(struct smp_cmd_pairing));
-> +
-> +	rp->io_capability = 0x00;
-> +	rp->oob_flag = 0x00;
-> +	rp->max_key_size = 16;
-> +	rp->init_key_dist = 0x00;
-> +	rp->resp_key_dist = 0x00;
-> +	rp->auth_req &= 0x05;
-> +
-> +	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
-> +}
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-12-07 14:51:17 -0300]:
 
-As a "placeholder" I understand that there is a fair amount of fleshing
-out that these changes need.  However, as you have an conn->hcon->out
-flag that indicates direction (which hopefully is based on Link Master),
-I would like to see checking in this function and next, that the
-correct role has received these SMP packets, with a rejection if they
-were received by the incorrect role. Also, although the placeholder is
-requesting no key distribution, in the fleshed out version, the responder
-should be returning the subset (logical AND) of the requesters and the
-responders key_dist masks, which in this case is still of course Zero.
-
-I'm sorry if this is to many comments for this starting point.
-
-> +
-> +static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> +{
-> +	struct smp_cmd_pairing_confirm cp;
-> +
-> +	BT_DBG("");
-> +
-> +	memset(&cp, 0, sizeof(struct smp_cmd_pairing_confirm));
-> +
-> +	smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
-> +}
-> +
-> +static void smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> +{
-> +	BT_DBG("");
-> +
-> +	if (conn->hcon->out) {
-> +		struct smp_cmd_pairing_random random;
-> +
-> +		BT_DBG("master");
-> +
-> +		memset(&random, 0, sizeof(struct smp_cmd_pairing_random));
-> +
-> +		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(random),
-> +								&random);
-> +	} else {
-> +		struct smp_cmd_pairing_confirm confirm;
-> +
-> +		BT_DBG("slave");
-> +
-> +		memset(&confirm, 0, sizeof(struct
-> smp_cmd_pairing_confirm));
-> +
-> +		smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM,
-> sizeof(confirm),
-> +								&confirm);
-> +	}
-> +}
-> +
-> +static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> +{
-> +	struct smp_cmd_pairing_random cp;
-> +
-> +	BT_DBG("");
-> +
-> +	skb_pull(skb, sizeof(struct smp_cmd_pairing_random));
-> +
-> +	/* FIXME: check if random matches */
-
-The random numbers will not match. The correct check will be that
-when the encryption with p1, p2, k, and the remote's random number,
-is performed, that it matches the confirm previously received
-via smp_cmd_pairing_confirm.
-
-> +
-> +	if (conn->hcon->out) {
-> +		BT_DBG("master");
-> +		/* FIXME: start encryption */
-> +	} else {
-> +		BT_DBG("slave");
-> +
-> +		memset(&cp, 0, sizeof(struct smp_cmd_pairing_random));
-> +
-> +		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(cp),
-> &cp);
-> +	}
-> +}
-> +
-> +static void smp_cmd_security_req(struct l2cap_conn *conn, struct
-> sk_buff *skb)
-> +{
-> +	struct smp_cmd_security_req *rp = (void *) skb->data;
-> +	struct smp_cmd_pairing cp;
-> +
-> +	BT_DBG("");
-> +
-> +	skb_pull(skb, sizeof(struct smp_cmd_security_req));
-> +	memset(&cp, 0, sizeof(struct smp_cmd_pairing));
-> +
-> +	cp.io_capability = 0x00;
-> +	cp.oob_flag = 0x00;
-> +	cp.max_key_size = 16;
-> +	cp.init_key_dist = 0x00;
-> +	cp.resp_key_dist = 0x00;
-> +	cp.auth_req = rp->auth_req & 0x05;
-> +
-> +	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
-> +}
-> +
-
-This function may need to be overloaded, such that if an existing
-set of keys already exist (from an earlier pairing) that they are
-used by simply encrypting the link, or signing the WRITE_CMD pkt
-as needed.  Should the link encryption fail due to remote rejection,
-we might then request security, subject to the same limitations
-used by BR/EDR's SSP. 
-
-But I do not know where the division lies between the key storage dB,
-the kernel mode code and the user mode code.
-
-
->  int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
->  {
->  	__u8 authreq;
-> @@ -114,23 +210,33 @@ int smp_sig_channel(struct l2cap_conn *conn,
-> struct sk_buff *skb)
+> Hi Gustavo,
 > 
->  	switch (code) {
->  	case SMP_CMD_PAIRING_REQ:
-> -		reason = SMP_PAIRING_NOTSUPP;
-> -		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
-> -		err = -1;
-> +		smp_cmd_pairing_req(conn, skb);
->  		break;
+> On 15:27 Tue 07 Dec, Gustavo F. Padovan wrote:
+> > Hi Vinicius,
+> > 
+> > * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-12-06 18:43:48 -0300]:
+> > 
+> > > This will allow using the crypto subsystem for encrypting data. As SMP
+> > > (Security Manager Protocol) is implemented almost entirely on the host
+> > > side and the crypto module already implements the needed methods
+> > > (AES-128), it makes sense to use it.
+> > > 
+> > > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > > ---
+> > >  include/net/bluetooth/hci_core.h |    2 ++
+> > >  net/bluetooth/hci_core.c         |   10 ++++++++++
+> > >  2 files changed, 12 insertions(+), 0 deletions(-)
+> > > 
+> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > > index 0687e2f..d0a9f5d 100644
+> > > --- a/include/net/bluetooth/hci_core.h
+> > > +++ b/include/net/bluetooth/hci_core.h
+> > > @@ -135,6 +135,8 @@ struct hci_dev {
+> > >  	__u32			req_status;
+> > >  	__u32			req_result;
+> > >  
+> > > +	struct crypto_blkcipher	*tfm;
+> > > +
+> > >  	struct inquiry_cache	inq_cache;
+> > >  	struct hci_conn_hash	conn_hash;
+> > >  	struct list_head	blacklist;
+> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > index 12c6735..b96c3dd 100644
+> > > --- a/net/bluetooth/hci_core.c
+> > > +++ b/net/bluetooth/hci_core.c
+> > > @@ -41,6 +41,7 @@
+> > >  #include <linux/interrupt.h>
+> > >  #include <linux/notifier.h>
+> > >  #include <linux/rfkill.h>
+> > > +#include <linux/crypto.h>
+> > >  #include <net/sock.h>
+> > >  
+> > >  #include <asm/system.h>
+> > > @@ -961,6 +962,13 @@ int hci_register_dev(struct hci_dev *hdev)
+> > >  	if (!hdev->workqueue)
+> > >  		goto nomem;
+> > >  
+> > > +	hdev->tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+> > > +	if (IS_ERR(hdev->tfm)) {
+> > > +		BT_ERR("Failed to load transform for ecb(aes): %ld",
+> > > +							PTR_ERR(hdev->tfm));
+> > > +		goto nomem;
+> > 
+> > You are leaking hdev->workqueue here.
 > 
->  	case SMP_CMD_PAIRING_FAIL:
->  		break;
+> Thanks, see below.
 > 
->  	case SMP_CMD_PAIRING_RSP:
-> +		smp_cmd_pairing_rsp(conn, skb);
-> +		break;
-> +
-> +	case SMP_CMD_SECURITY_REQ:
-> +		smp_cmd_security_req(conn, skb);
-> +		break;
-> +
->  	case SMP_CMD_PAIRING_CONFIRM:
-> +		smp_cmd_pairing_confirm(conn, skb);
-> +		break;
-> +
->  	case SMP_CMD_PAIRING_RANDOM:
-> +		smp_cmd_pairing_random(conn, skb);
-> +		break;
-> +
->  	case SMP_CMD_ENCRYPT_INFO:
->  	case SMP_CMD_MASTER_IDENT:
->  	case SMP_CMD_IDENT_INFO:
->  	case SMP_CMD_IDENT_ADDR_INFO:
->  	case SMP_CMD_SIGN_INFO:
-> -	case SMP_CMD_SECURITY_REQ:
->  	default:
->  		BT_DBG("Unknown command code 0x%2.2x", code);
+> > 
+> > Also you will need to add CRYPTO_BLKCIPHER dependence in the Kconfig.
+> > Maybe we should add a CONFIG_BLUETOOTH_SMP, and just build with blkcipher
+> > in the case SMP was selected to be built.
 > 
-> --
-> 1.7.3.2
+> Sounds fair. Another alternative is: instead of not being able to register the 
+> HCI device if the blockcypher allocation fails, we could reply "Pairing Not
+> Supported" at the SMP level. We would just need to document somewhere that the
+> crypto subsystem and support for AES are needed for SMP to work.
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-
-> bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> What do you think?
 
+No, because the build will fail if we don't select CRYPTO_BLKCIPHER and
+CRYPTO_AES. It that case you can add a #ifdef CONFIG_CRYTO... to avoid the
+build failure and comment that you need to enable such features. But I think
+that would be better to add an Kconfig option for SMP in this case instead of
+document somewhere that we need to enable some other options in the kernel to
+have SMP working.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
