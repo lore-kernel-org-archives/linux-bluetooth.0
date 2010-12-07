@@ -1,23 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Dec 2010 19:06:25 -0300
+Date: Tue, 7 Dec 2010 19:05:27 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org,
 	Anderson Briglia <anderson.briglia@openbossa.org>
 Subject: Re: [RFC v2 2/9] Bluetooth: Implement the first SMP commands
-Message-ID: <20101207220625.GE4797@eris>
+Message-ID: <20101207220527.GD4797@eris>
 References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
  <1291671832-13435-3-git-send-email-vinicius.gomes@openbossa.org>
- <20101207161003.GC2944@vigoh>
+ <20101207160307.GB2944@vigoh>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20101207161003.GC2944@vigoh>
+In-Reply-To: <20101207160307.GB2944@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-On 14:10 Tue 07 Dec, Gustavo F. Padovan wrote:
+On 14:03 Tue 07 Dec, Gustavo F. Padovan wrote:
 > Hi Vinicius,
 > 
 > * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2010-12-06 18:43:45 -0300]:
@@ -32,6 +32,12 @@ On 14:10 Tue 07 Dec, Gustavo F. Padovan wrote:
 > >  include/net/bluetooth/smp.h             |    4 +
 > >  net/bluetooth/Makefile                  |    1 +
 > >  net/bluetooth/{l2cap.c => l2cap_core.c} |    0
+> 
+> I want a separated patch for the l2cap.c rename.
+>
+
+Sure. Will do.
+
 > >  net/bluetooth/smp.c                     |  144 +++++++++++++++++++++++++++++++
 > >  4 files changed, 149 insertions(+), 0 deletions(-)
 > >  rename net/bluetooth/{l2cap.c => l2cap_core.c} (100%)
@@ -150,15 +156,80 @@ On 14:10 Tue 07 Dec, Gustavo F. Padovan wrote:
 > > +	case BT_SECURITY_HIGH:
 > > +		/* Bonding, MITM protection */
 > > +		authreq = 0x05;
+> > +		break;
+> > +
+> > +	case BT_SECURITY_LOW:
+> > +	default:
+> > +		return 1;
+> > +	}
+> > +
+> > +	if (conn->hcon->link_mode & HCI_LM_MASTER) {
+> > +		struct smp_cmd_pairing cp;
+> > +		cp.io_capability = 0x00;
+> > +		cp.oob_flag = 0x00;
+> > +		cp.max_key_size = 16;
+> > +		cp.init_key_dist = 0x00;
+> > +		cp.resp_key_dist = 0x00;
+> > +		cp.auth_req = authreq;
+> > +		smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
+> > +	} else {
+> > +		struct smp_cmd_security_req cp;
+> > +		cp.auth_req = authreq;
+> > +		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+> > +{
+> > +	__u8 code = skb->data[0];
+> > +	__u8 reason;
+> > +	int err = 0;
+> > +
+> > +	skb_pull(skb, 1);
+> > +
+> > +	switch (code) {
+> > +	case SMP_CMD_PAIRING_REQ:
+> > +		reason = SMP_PAIRING_NOTSUPP;
+> > +		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
+> > +		err = -1;
 > 
-> It would be good have some defines for the authreq values.
+> Don't use -1, use a proper error macro here.
 
-Makes sense.
+Sure.
+
+> 
+> > +		break;
+> > +
+> > +	case SMP_CMD_PAIRING_FAIL:
+> > +		break;
+> > +
+> > +	case SMP_CMD_PAIRING_RSP:
+> > +	case SMP_CMD_PAIRING_CONFIRM:
+> > +	case SMP_CMD_PAIRING_RANDOM:
+> > +	case SMP_CMD_ENCRYPT_INFO:
+> > +	case SMP_CMD_MASTER_IDENT:
+> > +	case SMP_CMD_IDENT_INFO:
+> > +	case SMP_CMD_IDENT_ADDR_INFO:
+> > +	case SMP_CMD_SIGN_INFO:
+> > +	case SMP_CMD_SECURITY_REQ:
+> > +	default:
+> > +		BT_DBG("Unknown command code 0x%2.2x", code);
+> > +
+> > +		reason = SMP_CMD_NOTSUPP;
+> > +		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
+> > +		err = -1;
+> 
+> Same here.
+
+Ok.
 
 > 
 > -- 
 > Gustavo F. Padovan
 > http://profusion.mobi
+
 
 Cheers,
 -- 
