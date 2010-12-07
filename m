@@ -1,90 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Dec 2010 10:47:04 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: EVT_NUM_COMP_PKTS and LE, GATT and SM
-Message-ID: <20101207084704.GY874@null>
-References: <002501cb95a6$b350fc50$19f2f4f0$@org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <002501cb95a6$b350fc50$19f2f4f0$@org>
+Date: Tue, 7 Dec 2010 15:01:21 +0800
+Message-ID: <AANLkTinu7oKUD5FmGyJ2x+ZYqRmOyFijuZgWtgjg=tk=@mail.gmail.com>
+Subject: [PATCH 1/1] bluetooth: add NULL pointer check in hci
+From: Jun Nie <niej0001@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: Brian Gix <bgix@codeaurora.org>, linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=002215048ad374fd560496cc92a9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+--002215048ad374fd560496cc92a9
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Mon, Dec 06, 2010 at 04:35:51PM -0800, ext Brian Gix wrote:
-> Hi All,
-> 
-> I've have encountered a problem while using the gatttool, where my write
-> commands get clobbered by the LE ACL being disconnected prior to the ATT
-> (fixed channel 4) WRITE_CMD being sent over the LE based ACL link.
-> 
-> I believe this is fundamentally due to there being no dependency on the
-> EVT_NUM_COMP_PKTS event when gatttool decides that the WRITE_CMD has been
-> successfully sent.  There is multiple parts to this.
-> 
-> 1. In User space, the WRITE_CMD pkt is written to the socket.  Gatttool
-> erroneously considers a successful socket write as completion, disconnects
-> the socket and exits.
-> 
-> 2. In Kernel space, the ACL packet is added to an ACL queue, which is
-> separate from the CMD queue, which can allow either the Disconnect request,
-> or the ACL packet to be sent over the H4 link to the baseband.
-> 
+Resend it to fix checkpatch.pl warning.
 
-And in usb case CMD and ACL are even using different endpoints.
+--002215048ad374fd560496cc92a9
+Content-Type: text/x-diff; charset=US-ASCII;
+	name="0001-bluetooth-add-NULL-pointer-check-in-hci.patch"
+Content-Disposition: attachment;
+	filename="0001-bluetooth-add-NULL-pointer-check-in-hci.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ghefrqu21
 
-> 3. In the baseband, due to LE clocking (and possible other baseband
-> activity) the ACL packet could be received first, and the Disconnect CMD
-> second, and still result in the connection being detached prior to Tx of the
-> ACL packet containing the ATT WRITE_CMD.
-> 
-> This is not an issue with  any of the ATT READ/FIND/MTU or WRITE_REQ
-> transactions, because they require a response from the server.  I believe
-> for ATT, this problem is restricted to the WRITE_CMD only, due to it's
-> unacknowledged nature.
-
-True.
-
-> However, this will also be an issue with the LE Security Manager, because as
-> stated in the Core Spec v4.0, Vol 3, in the last paragraph of 3.6.1 Key
-> Distribution on page 630 (of 656):
-> 
-> 	> Key distribution is complete in the device sending the final key
-> when it receives
-> 	> the baseband acknowledgement for that key and is complete in the
-> receiving
-> 	> device when it receives the final key being distributed.
-> 
-> This is intended to prevent exactly the kind of problem I am experiencing
-> with the ATT WRITE_CMD, and the acknowledgement from the baseband can only
-> be the EVT_NUM_COMP_PKTS event.
-> 
-> While talking to my colleagues here, we were thinking that the cleanest
-> method to get this accomplished would be by using the "select" method with
-> the ATT socket, where the socket could be marked as non-writable by the
-> kernel driver until the EVT_NUM_COMP_PKTS is received. The User space code
-> could then wait for the socket to become writeable before issuing the socket
-> disconnect.
-> 
-
-How about implement waiting on l2cap_sock_shutdown() like for ERTM.  User space
-could then call shutdown() before closing the socket so make sure the data is
-sent or timeout occurred.
-
-Would this be enough to solve the problem?
-
-> If the Security manager is totally within the kernel, it probably does not
-> have to do as much work, however it does still need to wait on the
-> EVT_NUM_COMP_PKTS before disconnecting the remote device.
-> 
-> Has anybody else observed this issue with ATT WRITE_CMD? It could be getting
-> exacerbated by slow (115Kbps) H4 links that I am using, however the hcidump
-> tool confirms that the disconnect happens prior to the EVT_NUM_COMP_PKTS.
-
-I have seen this problem but didn't dig it deeper.
-
--- 
-Ville
+RnJvbSA3NWRjMTExYjVkOWY2MjYxOWJiZWVjODAzYjE1ZTg0NDEyYWUwNTBlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKdW4gTmllIDxuanVuQG1hcnZlbGwuY29tPgpEYXRlOiBUdWUs
+IDcgRGVjIDIwMTAgMTQ6MDM6MzggKzA4MDAKU3ViamVjdDogW1BBVENIXSBibHVldG9vdGg6IGFk
+ZCBOVUxMIHBvaW50ZXIgY2hlY2sgaW4gaGNpCgpTaWduZWQtb2ZmLWJ5OiBKdW4gTmllIDxuanVu
+QG1hcnZlbGwuY29tPgotLS0KIGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sZGlzYy5jIHwgICAgNiAr
+KysrLS0KIDEgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoK
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sZGlzYy5jIGIvZHJpdmVycy9ibHVl
+dG9vdGgvaGNpX2xkaXNjLmMKaW5kZXggNzIwMTQ4Mi4uM2M2Y2FiYyAxMDA2NDQKLS0tIGEvZHJp
+dmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX2xk
+aXNjLmMKQEAgLTMxMSw4ICszMTEsMTAgQEAgc3RhdGljIHZvaWQgaGNpX3VhcnRfdHR5X2Nsb3Nl
+KHN0cnVjdCB0dHlfc3RydWN0ICp0dHkpCiAKIAkJaWYgKHRlc3RfYW5kX2NsZWFyX2JpdChIQ0lf
+VUFSVF9QUk9UT19TRVQsICZodS0+ZmxhZ3MpKSB7CiAJCQlodS0+cHJvdG8tPmNsb3NlKGh1KTsK
+LQkJCWhjaV91bnJlZ2lzdGVyX2RldihoZGV2KTsKLQkJCWhjaV9mcmVlX2RldihoZGV2KTsKKwkJ
+CWlmIChoZGV2KSB7CisJCQkJaGNpX3VucmVnaXN0ZXJfZGV2KGhkZXYpOworCQkJCWhjaV9mcmVl
+X2RldihoZGV2KTsKKwkJCX0KIAkJfQogCX0KIH0KLS0gCjEuNy4wLjQKCg==
+--002215048ad374fd560496cc92a9--
