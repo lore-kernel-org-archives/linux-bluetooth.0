@@ -1,91 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 7 Dec 2010 10:47:04 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: EVT_NUM_COMP_PKTS and LE, GATT and SM
+Message-ID: <20101207084704.GY874@null>
+References: <002501cb95a6$b350fc50$19f2f4f0$@org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=_1qAiH9o_4eBy66OQ9=ba=4GuatVBVtcJG5=x@mail.gmail.com>
-References: <AANLkTikzecKtx3ib-03n3f8_2u4KF0Y+PSmEJgccEg-i@mail.gmail.com>
-	<AANLkTi=_1qAiH9o_4eBy66OQ9=ba=4GuatVBVtcJG5=x@mail.gmail.com>
-Date: Tue, 7 Dec 2010 14:22:47 +0530
-Message-ID: <AANLkTin+K_AYeF9+t0qWWFRJrW5uv9OM4DGY8a2Aaaek@mail.gmail.com>
-Subject: Re: [RFC] AVRCP 1.4 : Design proposal for future on Target Role
-From: Shivendra Agrawal <ag.shivendra@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <002501cb95a6$b350fc50$19f2f4f0$@org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I guess for all people that are interested in AVRCP 1.4 we can start
-> adding items to TODO list, to make it easier to share development
-> between us. Since this may be too much to handle in a single global
-> TODO maybe we can have a separated file like audio/TODO.
->
-Somehow I was unable to send the file with TODO list for AVRCP 1.4
-So I have copied here for initial feedback from all.
-If this needs any modifications please let me know and I would come
-back with updates asap.
+Hi Brian,
 
-Background
-==========
+On Mon, Dec 06, 2010 at 04:35:51PM -0800, ext Brian Gix wrote:
+> Hi All,
+> 
+> I've have encountered a problem while using the gatttool, where my write
+> commands get clobbered by the LE ACL being disconnected prior to the ATT
+> (fixed channel 4) WRITE_CMD being sent over the LE based ACL link.
+> 
+> I believe this is fundamentally due to there being no dependency on the
+> EVT_NUM_COMP_PKTS event when gatttool decides that the WRITE_CMD has been
+> successfully sent.  There is multiple parts to this.
+> 
+> 1. In User space, the WRITE_CMD pkt is written to the socket.  Gatttool
+> erroneously considers a successful socket write as completion, disconnects
+> the socket and exits.
+> 
+> 2. In Kernel space, the ACL packet is added to an ACL queue, which is
+> separate from the CMD queue, which can allow either the Disconnect request,
+> or the ACL packet to be sent over the H4 link to the baseband.
+> 
 
-- Priority scale: High, Medium and Low
+And in usb case CMD and ACL are even using different endpoints.
 
-- Complexity scale: C1, C2, C4 and C8.  The complexity scale is exponential,
-  with complexity 1 being the lowest complexity.  Complexity is a function
-  of both task 'complexity' and task 'scope'.
+> 3. In the baseband, due to LE clocking (and possible other baseband
+> activity) the ACL packet could be received first, and the Disconnect CMD
+> second, and still result in the connection being detached prior to Tx of the
+> ACL packet containing the ATT WRITE_CMD.
+> 
+> This is not an issue with  any of the ATT READ/FIND/MTU or WRITE_REQ
+> transactions, because they require a response from the server.  I believe
+> for ATT, this problem is restricted to the WRITE_CMD only, due to it's
+> unacknowledged nature.
 
-  The general rule of thumb is that a complexity 1 task should take 1-2 weeks
-  for a person very familiar with BlueZ codebase.  Higher complexity tasks
-  require more time and have higher uncertainty.
+True.
 
-  Higher complexity tasks should be refined into several lower complexity tasks
-  once the task is better understood.
+> However, this will also be an issue with the LE Security Manager, because as
+> stated in the Core Spec v4.0, Vol 3, in the last paragraph of 3.6.1 Key
+> Distribution on page 630 (of 656):
+> 
+> 	> Key distribution is complete in the device sending the final key
+> when it receives
+> 	> the baseband acknowledgement for that key and is complete in the
+> receiving
+> 	> device when it receives the final key being distributed.
+> 
+> This is intended to prevent exactly the kind of problem I am experiencing
+> with the ATT WRITE_CMD, and the acknowledgement from the baseband can only
+> be the EVT_NUM_COMP_PKTS event.
+> 
+> While talking to my colleagues here, we were thinking that the cleanest
+> method to get this accomplished would be by using the "select" method with
+> the ATT socket, where the socket could be marked as non-writable by the
+> kernel driver until the EVT_NUM_COMP_PKTS is received. The User space code
+> could then wait for the socket to become writeable before issuing the socket
+> disconnect.
+> 
 
-AVRCP 1.4
-==========
+How about implement waiting on l2cap_sock_shutdown() like for ERTM.  User space
+could then call shutdown() before closing the socket so make sure the data is
+sent or timeout occurred.
 
-- Add SDP record for AVRCP 1.4 to inform CT of the version and features
-  supported by target.
+Would this be enough to solve the problem?
 
-  Priority: Medium
-  Complexity: C1
+> If the Security manager is totally within the kernel, it probably does not
+> have to do as much work, however it does still need to wait on the
+> EVT_NUM_COMP_PKTS before disconnecting the remote device.
+> 
+> Has anybody else observed this issue with ATT WRITE_CMD? It could be getting
+> exacerbated by slow (115Kbps) H4 links that I am using, however the hcidump
+> tool confirms that the disconnect happens prior to the EVT_NUM_COMP_PKTS.
 
-- Add callback to accept browsing channel establishment.
+I have seen this problem but didn't dig it deeper.
 
-  Priority: Medium
-  Complexity: C1
-
-- Enhancing bt_io_listen for browsing PSM
-
-  Priority: Medium
-  Complexity: C2
-
-- Features to be added
-
-	All below mentioned features will have
-		Priority: Medium
-		Complexity: C2
-
-		As per spec section 6.4.1     GetCapabilities
-		As per spec section 6.5.1     ListPlayerApplicationSettingAttributes
-		As per spec section 6.5.2     ListPlayerApplicationSettingValues
-		As per spec section 6.5.3     GetCurrentPlayerApplicationSettingValue
-		As per spec section 6.5.4     SetPlayerApplicationSettingValue
-		As per spec section 6.5.5     GetPlayerApplicationSettingAttributeText
-		As per spec section 6.5.6     GetPlayerApplicationSettingValueText
-		As per spec section 6.5.7     InformDisplayableCharacterSet
-		As per spec section 6.5.8     InformBatteryStatusOfCT
-		As per spec section 6.6.1     GetElementAttributes
-		As per spec section 6.7.1     GetPlayStatus
-		As per spec section 6.7.2     RegisterNotification
-		As per spec section 6.8.1     RequestContinuingResponse
-		As per spec section 6.8.2     AbortContinuingResponse
-		As per spec section 6.9.1     SetAddressedPlayer
-		As per spec section 6.9.2     Addressed Player Changed Notification
-		As per spec section 6.9.3     SetBrowsedPlayer
-		As per spec section 6.9.4     Available Players Changed Notification
-		As per spec section 6.9.5     Notify Now Playing Content Changed
-		As per spec section 6.10.3.3    UIDs Changed Notification
-		As per spec section 6.10.4.1    ChangePath
-		As per spec section 6.10.4.2    GetFolderItems
-		As per spec section 6.10.4.3    GetItemAttributes
-		As per spec section 6.12.1      PlayItem
-		As per spec section 6.13.1      Absolute Volume
-		As per spec section 6.13.3      Notify volume change
+-- 
+Ville
