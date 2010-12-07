@@ -1,25 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Dec 2010 00:24:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Remove fixed item from TODO
-Message-ID: <20101207222418.GA1756@jh-x301>
-References: <1291760437-32216-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291760437-32216-1-git-send-email-claudio.takahasi@openbossa.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>
+Subject: [PATCH 3/3] Bluetooth: Make hci_send_to_sock usable for management control sockets
+Date: Wed,  8 Dec 2010 00:21:07 +0200
+Message-Id: <1291760467-1569-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1291760467-1569-1-git-send-email-johan.hedberg@gmail.com>
+References: <1291760467-1569-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-On Tue, Dec 07, 2010, Claudio Takahasi wrote:
-> Read by UUID is already supported by attribute server and gatttool.
-> ---
->  TODO |    5 -----
->  1 files changed, 0 insertions(+), 5 deletions(-)
+In order to send data to management control sockets the function should:
 
-Pushed upstream. Thanks.
+  - skip checks intended for raw HCI data and stack internal events
+  - make sure RAW HCI data or stack internal events don't go to
+    management control sockets
 
-Johan
+In order to accomplish this the patch adds a new member to the bluetooth
+skb private data to flag skb's that are destined for management control
+sockets.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/hci_sock.c          |   10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index d81ea79..0c5e725 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -144,6 +144,7 @@ struct bt_skb_cb {
+ 	__u8 tx_seq;
+ 	__u8 retries;
+ 	__u8 sar;
++	unsigned short channel;
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+ 
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 207be7a..f6c18ab 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -104,6 +104,12 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (skb->sk == sk)
+ 			continue;
+ 
++		if (bt_cb(skb)->channel != hci_pi(sk)->channel)
++			continue;
++
++		if (bt_cb(skb)->channel == HCI_CHANNEL_CONTROL)
++			goto clone;
++
+ 		/* Apply filter */
+ 		flt = &hci_pi(sk)->filter;
+ 
+@@ -127,12 +133,14 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 				continue;
+ 		}
+ 
++clone:
+ 		nskb = skb_clone(skb, GFP_ATOMIC);
+ 		if (!nskb)
+ 			continue;
+ 
+ 		/* Put type byte before the data */
+-		memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
++		if (bt_cb(skb)->channel == HCI_CHANNEL_RAW)
++			memcpy(skb_push(nskb, 1), &bt_cb(nskb)->pkt_type, 1);
+ 
+ 		if (sock_queue_rcv_skb(sk, nskb))
+ 			kfree_skb(nskb);
+-- 
+1.7.2.3
+
