@@ -1,28 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Dec 2010 23:35:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Remove automatic battery state change on attribute
- example
-Message-ID: <20101207213537.GA30415@jh-x301>
-References: <1291386290-2521-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291386290-2521-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 3/5] Make EIR type an optional argument for bt_extract_eir_name
+Date: Tue,  7 Dec 2010 18:33:15 -0300
+Message-Id: <1291757595-15301-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1291386532-4985-3-git-send-email-claudio.takahasi@openbossa.org>
+References: <1291386532-4985-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+---
+ src/adapter.c     |    3 +--
+ src/glib-helper.c |    5 +++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-On Fri, Dec 03, 2010, Claudio Takahasi wrote:
-> Legacy code implemented to test Indication and Notification
-> ---
->  attrib/example.c |   19 -------------------
->  1 files changed, 0 insertions(+), 19 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index 102aad7..b581674 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3142,8 +3142,7 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
+ 						(GCompareFunc) dev_rssi_cmp);
+ 
+ 	if (info->length) {
+-		uint8_t type;
+-		char *tmp_name = bt_extract_eir_name(info->data, &type);
++		char *tmp_name = bt_extract_eir_name(info->data, NULL);
+ 		if (tmp_name) {
+ 			g_free(dev->name);
+ 			dev->name = tmp_name;
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 927fb7c..e71841b 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -744,9 +744,10 @@ char *bt_extract_eir_name(uint8_t *data, uint8_t *type)
+ 	if (data[0] == 0)
+ 		return NULL;
+ 
+-	*type = data[1];
++	if (type)
++		*type = data[1];
+ 
+-	switch (*type) {
++	switch (data[1]) {
+ 	case EIR_NAME_SHORT:
+ 	case EIR_NAME_COMPLETE:
+ 		if (!g_utf8_validate((char *) (data + 2), data[0] - 1, NULL))
+-- 
+1.7.3.2
 
-Sorry, but you'll need to rebase this one since it doesn't apply anymore
-cleanly (due to the "Initial attribute permission implementation"
-patch).
-
-Johan
