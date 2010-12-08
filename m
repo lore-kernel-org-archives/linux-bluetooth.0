@@ -1,27 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Dec 2010 09:03:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Revert use of new error function for Blocked
-Message-ID: <20101208070307.GA6934@jh-x301>
-References: <1291770126-2726-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291770126-2726-1-git-send-email-padovan@profusion.mobi>
+Date: Tue, 7 Dec 2010 23:55:19 -0700
+Message-ID: <AANLkTikUPV6i4ADPOyO8jVumfHXmqtxDVoFhK2pkkUhz@mail.gmail.com>
+Subject: csr initialization
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hey,
 
-On Tue, Dec 07, 2010, Gustavo F. Padovan wrote:
-> The error message says a lot about what the user need to do, I'm reverting
-> this change and will fix in the next patch series about the DBus error
-> handling.
-> ---
->  src/device.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
+Is anyone on this list using the csr dev board and csr tools? It would
+be great to know if we might be able to make a bluecore4-rom chip
+change baud rate and reroute sco using some initialization and a soft
+reboot. If we can figure something, it could be submitted as a patch
+to bccmd. I'm just not sure it's possible.
 
-Applied, thanks.
-
-Johan
+-- 
+Brad Midgley
