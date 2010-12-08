@@ -1,39 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Dec 2010 17:15:58 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add support for stat files bigger than 2GB on
- 32-bit systems
-Message-ID: <20101208151558.GA31117@jh-x301>
-References: <1291821222-18990-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291821222-18990-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Add support for stat files bigger than 2GB on 32-bit systems
+Date: Wed,  8 Dec 2010 17:13:42 +0200
+Message-Id: <1291821222-18990-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Wed, Dec 08, 2010, Luiz Augusto von Dentz wrote:
-> From stat documentation:
-> 
-> "(stat())  path  refers to a file whose size cannot be represented in the
-> type off_t.  This can occur when an application compiled on a 32-bit
-> platform without -D_FILE_OFFSET_BITS=64 calls stat() on a file whose size
-> exceeds (2<<31)-1 bits."
-> 
-> To fix this now size header is omitted when the file is over 32-bit, but
-> it is able to transfer it by using 64-bit variables. In addition to that
-> folder-listing now should report such big sizes properly.
-> ---
->  acinclude.m4         |    2 +-
->  client/transfer.c    |    5 +++--
->  plugins/filesystem.c |    7 ++++---
->  src/obex-priv.h      |    6 +++---
->  src/obex.c           |    7 ++++---
->  5 files changed, 15 insertions(+), 12 deletions(-)
+>From stat documentation:
 
-Thanks. The patch has been pushed upstream.
+"(stat())  path  refers to a file whose size cannot be represented in the
+type off_t.  This can occur when an application compiled on a 32-bit
+platform without -D_FILE_OFFSET_BITS=64 calls stat() on a file whose size
+exceeds (2<<31)-1 bits."
 
-Johan
+To fix this now size header is omitted when the file is over 32-bit, but
+it is able to transfer it by using 64-bit variables. In addition to that
+folder-listing now should report such big sizes properly.
+---
+ acinclude.m4         |    2 +-
+ client/transfer.c    |    5 +++--
+ plugins/filesystem.c |    7 ++++---
+ src/obex-priv.h      |    6 +++---
+ src/obex.c           |    7 ++++---
+ 5 files changed, 15 insertions(+), 12 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index 4594073..3d1f511 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -12,7 +12,7 @@ AC_DEFUN([AC_PROG_CC_PIE], [
+ 
+ AC_DEFUN([COMPILER_FLAGS], [
+ 	if (test "${CFLAGS}" = ""); then
+-		CFLAGS="-Wall -O2 -D_FORTIFY_SOURCE=2"
++		CFLAGS="-Wall -O2 -D_FORTIFY_SOURCE=2 -D_FILE_OFFSET_BITS=64"
+ 	fi
+ 	if (test "$USE_MAINTAINER_MODE" = "yes"); then
+ 		CFLAGS+=" -Werror -Wextra"
+diff --git a/client/transfer.c b/client/transfer.c
+index 6eec513..fdcaa46 100644
+--- a/client/transfer.c
++++ b/client/transfer.c
+@@ -470,7 +470,7 @@ int transfer_put(struct transfer_data *transfer, transfer_callback_t func,
+ 	struct session_data *session = transfer->session;
+ 	gw_obex_xfer_cb_t cb;
+ 	struct stat st;
+-	int fd;
++	int fd, size;
+ 
+ 	if (transfer->xfer != NULL)
+ 		return -EALREADY;
+@@ -497,8 +497,9 @@ int transfer_put(struct transfer_data *transfer, transfer_callback_t func,
+ 	cb = put_xfer_progress;
+ 
+ done:
++	size = transfer->size < UINT32_MAX ? transfer->size : 0;
+ 	transfer->xfer = gw_obex_put_async(session->obex, transfer->name,
+-						transfer->type, transfer->size,
++						transfer->type, size,
+ 						-1, NULL);
+ 	if (transfer->xfer == NULL)
+ 		return -ENOTCONN;
+diff --git a/plugins/filesystem.c b/plugins/filesystem.c
+index bb758ab..b4ff556 100644
+--- a/plugins/filesystem.c
++++ b/plugins/filesystem.c
+@@ -66,7 +66,7 @@
+ 
+ #define FL_PARENT_FOLDER_ELEMENT "<parent-folder/>" EOL_CHARS
+ 
+-#define FL_FILE_ELEMENT "<file name=\"%s\" size=\"%lu\"" \
++#define FL_FILE_ELEMENT "<file name=\"%s\" size=\"%" PRIu64 "\"" \
+ 			" %s accessed=\"%s\" " \
+ 			"modified=\"%s\" created=\"%s\"/>" EOL_CHARS
+ 
+@@ -121,8 +121,9 @@ static char *file_stat_line(char *filename, struct stat *fstat,
+ 			ret = g_strdup_printf(FL_FOLDER_ELEMENT, escaped, perm,
+ 							atime, mtime, ctime);
+ 	} else if (S_ISREG(fstat->st_mode))
+-		ret = g_strdup_printf(FL_FILE_ELEMENT, escaped, fstat->st_size,
+-						perm, atime, mtime, ctime);
++		ret = g_strdup_printf(FL_FILE_ELEMENT, escaped,
++					(uint64_t) fstat->st_size,
++					perm, atime, mtime, ctime);
+ 
+ 	g_free(escaped);
+ 
+diff --git a/src/obex-priv.h b/src/obex-priv.h
+index c9be1c5..0806a56 100644
+--- a/src/obex-priv.h
++++ b/src/obex-priv.h
+@@ -33,9 +33,9 @@ struct obex_session {
+ 	char *path;
+ 	time_t time;
+ 	uint8_t *buf;
+-	int32_t pending;
+-	int32_t offset;
+-	int32_t size;
++	int64_t pending;
++	int64_t offset;
++	int64_t size;
+ 	void *object;
+ 	gboolean aborted;
+ 	struct obex_service_driver *service;
+diff --git a/src/obex.c b/src/obex.c
+index 6d4430d..effb81e 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -590,7 +590,8 @@ static int obex_read_stream(struct obex_session *os, obex_t *obex,
+ 
+ 	/* only write if both object and driver are valid */
+ 	if (os->object == NULL || os->driver == NULL) {
+-		DBG("Stored %u bytes into temporary buffer", os->pending);
++		DBG("Stored %" PRIu64 " bytes into temporary buffer",
++								os->pending);
+ 		return 0;
+ 	}
+ 
+@@ -796,7 +797,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+ 	if (err < 0)
+ 		goto done;
+ 
+-	if (os->size != OBJECT_SIZE_UNKNOWN) {
++	if (os->size != OBJECT_SIZE_UNKNOWN && os->size < UINT32_MAX) {
+ 		hd.bq4 = os->size;
+ 		OBEX_ObjectAddHeader(obex, obj,
+ 				OBEX_HDR_LENGTH, hd, 4, 0);
+@@ -1005,7 +1006,7 @@ static gboolean check_put(obex_t *obex, obex_object_t *obj)
+ 
+ 		case OBEX_HDR_LENGTH:
+ 			os->size = hd.bq4;
+-			DBG("OBEX_HDR_LENGTH: %d", os->size);
++			DBG("OBEX_HDR_LENGTH: %" PRIu64, os->size);
+ 			break;
+ 		case OBEX_HDR_TIME:
+ 			os->time = parse_iso8610((const char *) hd.bs, hlen);
+-- 
+1.7.1
+
