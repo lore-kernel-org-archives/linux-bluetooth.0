@@ -1,52 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Dec 2010 14:54:58 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix regression causing crash in 3-way calling
-Message-ID: <20101208125455.GA23047@jh-x301>
-References: <1291809471-806-1-git-send-email-dmitriy.paliy@nokia.com>
- <1291809471-806-2-git-send-email-dmitriy.paliy@nokia.com>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+Date: Wed, 8 Dec 2010 13:51:43 +0100
+Cc: Pavan Savoy <pavan_savoy@sify.com>,
+ Vitaly Wool <vitalywool@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ linus.walleij@stericsson.com,
+ linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com> <AANLkTimCKK9NAiXD4wsCkJt8bsy_exYEBWdb1+M6+NOE@mail.gmail.com> <AANLkTi=B4wT5SbN2qyyO5RZd7qMnkZXHpB6d=RTQeRtX@mail.gmail.com>
+In-Reply-To: <AANLkTi=B4wT5SbN2qyyO5RZd7qMnkZXHpB6d=RTQeRtX@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291809471-806-2-git-send-email-dmitriy.paliy@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201012081351.43752.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+On Wednesday 08 December 2010, Par-Gunnar Hjalmdahl wrote:
+> > Marcel did previously suggest a bus-driver sort of a structure, where
+> > the transport are sort of adapter drivers, the data interpretation
+> > logic like splitting HCI-events, FM CH-8 packets all fall into the
+> > algos drivers and the actual Bluetooth driver or GPS or FM-V4L2
+> > drivers falling into the client/protocol drivers....
+> 
+> What the cg2900 driver has now turned into is almost like the
+> cg2900_core acting as a bus, identifying which chip is connected and
+> choosing correct chip driver from this. This cg2900_core module should
+> not contain any vendor specific code. When identified, the chip driver
+> then uses MFD to setup channels according to the functionality it
+> supports (one MFD device per H4 channel). It's hard to explain
+> everything of the new architecture here. I would like you to check the
+> new patch set I'm trying hard to create at the moment. I will try to
+> get it out on Friday, but it's hard to promise anything (there is a
+> lot of work to do with it). There you could then see if it is
+> something you could consider useful.
 
-On Wed, Dec 08, 2010, Dmitriy Paliy wrote:
-> Fix obexd crash in 3-way calling scenario. Crash happens when there
-> is redialed second incoming call. Cache for the PBAP session is
-> already created at that moment, but PBAP object is destroyed. Crash
-> happens when object is dereferenced in vobject_list_open.
-> 
-> Therefore, PBAP object has to be created before any attempt to write
-> cached data to buffer associated to this object.
-> 
-> However, cache_ready_notify function, which is invoked in
-> vobject_vcard_open for valid cache case, sends also PBAP object data
-> via callback function to obex.c and written to OBEX stream as GET
-> response in handle_async_io handler function.
-> 
-> A new response is sent to OBEX stream after cache_ready_notify exists
-> to vobject_list_open function, which is callback function for
-> obex_mime_type_driver. Such leads to undefined befavior. Therefore,
-> cache_ready_notify is splitted in two cache_ready_notify and
-> generate_response functions.
-> 
-> generate_response fills data to buffer and returns error, if any,
-> while cache_ready_notify notifies OBEX core to write this data to
-> stream.
-> 
-> In order to avoid writing to stream twice, cache_ready_notify is
-> replaced by generate_response in vobject_list_open. As a result,
-> PBAP buffer data is generated from existing cache and sent to
-> stream upon start of OBEX stream after vobject_list_open exits.
-> ---
->  plugins/pbap.c |   98 +++++++++++++++++++++++++++++++-------------------------
->  1 files changed, 54 insertions(+), 44 deletions(-)
+It sounds really good, I'm looking forward to your new patch set!
+If it's generic enough to replace the ti-st code, that would be a
+clear sign that you are on the right track ;-)
 
-Pushed upstream. Thanks.
+I'm not asking to fix their code yourself, but it might be good to
+look at it and see if it would work.
 
-Johan
+	Arnd
