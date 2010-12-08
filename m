@@ -1,24 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3 v3] Cancel pending phonebook request
-Date: Wed,  8 Dec 2010 23:15:53 +0200
-Message-Id: <1291842956-8610-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Wed, 8 Dec 2010 22:58:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/7] Fix coding styling issues in src/error.c
+Message-ID: <20101208205810.GA12485@jh-x301>
+References: <1291839961-14940-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291839961-14940-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-This is updated version of patch to handle pending phonebook
-request and to cancel it if OBEX session is terminated.
+On Wed, Dec 08, 2010, Gustavo F. Padovan wrote:
+> ---
+>  src/error.c |   26 +++++++++-----------------
+>  1 files changed, 9 insertions(+), 17 deletions(-)
 
-Additionally to previous submission, it containts updates for
-phonebook-dummy.c and phonebook-ebook.c backend drivers. Therefore,
-it is highly encouraged for those who exploit them to provide
-feedback.
+Thanks! All seven patches have been pushed upstream.
 
-Also, code for tracker was significantly improved.
-
-BR,
-Dmitriy
-
+Johan
