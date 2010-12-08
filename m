@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Dec 2010 13:26:32 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jun Nie <niej0001@gmail.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Brian Gix <bgix@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/1] bluetooth: add NULL pointer check in hci
-Message-ID: <20101208152632.GB1247@vigoh>
-References: <AANLkTinu7oKUD5FmGyJ2x+ZYqRmOyFijuZgWtgjg=tk=@mail.gmail.com>
- <20101207150608.GA1867@vigoh>
- <AANLkTinN3R4q-YA=4jweveB4LfE9S2SwhCK2xXYORw6W@mail.gmail.com>
+Date: Wed, 8 Dec 2010 17:18:45 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Changed obex_service_driver put() signature.
+Message-ID: <20101208151845.GA28588@jh-x301>
+References: <AANLkTikzUraZ9ac5qf9ePG8YKo0Sx0B2YZoKz8HoRTmn@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTinN3R4q-YA=4jweveB4LfE9S2SwhCK2xXYORw6W@mail.gmail.com>
+In-Reply-To: <AANLkTikzUraZ9ac5qf9ePG8YKo0Sx0B2YZoKz8HoRTmn@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jun,
+Hi,
 
-* Jun Nie <niej0001@gmail.com> [2010-12-08 13:46:34 +0800]:
-
-> From e729eda3b2cfae501c704e2eb39e07aa1b8607f0 Mon Sep 17 00:00:00 2001
-> From: Jun Nie <njun@marvell.com>
-> Date: Tue, 7 Dec 2010 14:03:38 +0800
-> Subject: [PATCH] bluetooth: add NULL pointer check in hci
+On Wed, Dec 08, 2010, Slawomir Bochenski wrote:
+> This API change is needed for implementing Message Access Profile, as
+> MAP uses application parameters in puts also (for example
+> SetMessageStatus function, see MAP specification, chapter 5.7) and in
+> order to access application parameters headers access to obex object
+> is required.
 > 
-> If we fail to find a hci device pointer in hci_uart, don't try
-> to deref the NULL one we do have.
-> 
-> Signed-off-by: Jun Nie <njun@marvell.com>
 > ---
->  drivers/bluetooth/hci_ldisc.c |    6 ++++--
->  1 files changed, 4 insertions(+), 2 deletions(-)
+>  plugins/ftp.c           |    3 ++-
+>  plugins/opp.c           |    3 ++-
+>  plugins/syncevolution.c |    3 ++-
+>  src/obex.c              |    2 +-
+>  src/service.h           |    3 ++-
+>  5 files changed, 9 insertions(+), 5 deletions(-)
 
-Patch is applied now, thanks.
+The patch looks good, but I can't apply it with git am. I get the
+following:
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+fatal: corrupt patch at line 14
+Patch failed at 0001 Changed obex_service_driver put() signature.
+
+Could you try recreating it with git format-patch and resending with git
+send-email? Thanks.
+
+Btw, summary line should start with "Change ..." instead of "Changed
+..." and it shouldn't end with a .
+
+Johan
