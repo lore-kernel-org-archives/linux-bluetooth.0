@@ -1,100 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 8 Dec 2010 14:54:58 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Fix regression causing crash in 3-way calling
+Message-ID: <20101208125455.GA23047@jh-x301>
+References: <1291809471-806-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1291809471-806-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Date: Wed, 8 Dec 2010 15:50:53 +0100
-Message-ID: <AANLkTikzUraZ9ac5qf9ePG8YKo0Sx0B2YZoKz8HoRTmn@mail.gmail.com>
-Subject: [PATCH] Changed obex_service_driver put() signature.
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291809471-806-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This API change is needed for implementing Message Access Profile, as
-MAP uses application parameters in puts also (for example
-SetMessageStatus function, see MAP specification, chapter 5.7) and in
-order to access application parameters headers access to obex object
-is required.
+Hi Dmitriy,
 
----
- plugins/ftp.c           |    3 ++-
- plugins/opp.c           |    3 ++-
- plugins/syncevolution.c |    3 ++-
- src/obex.c              |    2 +-
- src/service.h           |    3 ++-
- 5 files changed, 9 insertions(+), 5 deletions(-)
+On Wed, Dec 08, 2010, Dmitriy Paliy wrote:
+> Fix obexd crash in 3-way calling scenario. Crash happens when there
+> is redialed second incoming call. Cache for the PBAP session is
+> already created at that moment, but PBAP object is destroyed. Crash
+> happens when object is dereferenced in vobject_list_open.
+> 
+> Therefore, PBAP object has to be created before any attempt to write
+> cached data to buffer associated to this object.
+> 
+> However, cache_ready_notify function, which is invoked in
+> vobject_vcard_open for valid cache case, sends also PBAP object data
+> via callback function to obex.c and written to OBEX stream as GET
+> response in handle_async_io handler function.
+> 
+> A new response is sent to OBEX stream after cache_ready_notify exists
+> to vobject_list_open function, which is callback function for
+> obex_mime_type_driver. Such leads to undefined befavior. Therefore,
+> cache_ready_notify is splitted in two cache_ready_notify and
+> generate_response functions.
+> 
+> generate_response fills data to buffer and returns error, if any,
+> while cache_ready_notify notifies OBEX core to write this data to
+> stream.
+> 
+> In order to avoid writing to stream twice, cache_ready_notify is
+> replaced by generate_response in vobject_list_open. As a result,
+> PBAP buffer data is generated from existing cache and sent to
+> stream upon start of OBEX stream after vobject_list_open exits.
+> ---
+>  plugins/pbap.c |   98 +++++++++++++++++++++++++++++++-------------------------
+>  1 files changed, 54 insertions(+), 44 deletions(-)
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 91c77a3..a952f64 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -258,7 +258,8 @@ static int ftp_chkput(struct obex_session *os,
-void *user_data)
- 	return ret;
- }
+Pushed upstream. Thanks.
 
--static int ftp_put(struct obex_session *os, void *user_data)
-+static int ftp_put(struct obex_session *os, obex_object_t *obj,
-+						void *user_data)
- {
- 	struct ftp_session *ftp = user_data;
- 	const char *name = obex_get_name(os);
-diff --git a/plugins/opp.c b/plugins/opp.c
-index 05f944f..17c4356 100644
---- a/plugins/opp.c
-+++ b/plugins/opp.c
-@@ -155,7 +155,8 @@ skip_auth:
- 	return ret;
- }
-
--static int opp_put(struct obex_session *os, void *user_data)
-+static int opp_put(struct obex_session *os, obex_object_t *obj,
-+						void *user_data)
- {
- 	const char *name = obex_get_name(os);
- 	const char *folder = obex_get_root_folder(os);
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index bf436a9..8041df6 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -243,7 +243,8 @@ failed:
- 	return NULL;
- }
-
--static int synce_put(struct obex_session *os, void *user_data)
-+static int synce_put(struct obex_session *os, obex_object_t *obj,
-+					void *user_data)
- {
- 	return 0;
- }
-diff --git a/src/obex.c b/src/obex.c
-index 6d4430d..1649cd0 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -1089,7 +1089,7 @@ static void cmd_put(struct obex_session *os,
-obex_t *obex, obex_object_t *obj)
- 		return;
- 	}
-
--	err = os->service->put(os, os->service_data);
-+	err = os->service->put(os, obj, os->service_data);
- 	if (err < 0)
- 		os_set_response(obj, err);
- }
-diff --git a/src/service.h b/src/service.h
-index 1726c43..a844885 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -34,7 +34,8 @@ struct obex_service_driver {
- 	void (*progress) (struct obex_session *os, void *user_data);
- 	int (*get) (struct obex_session *os, obex_object_t *obj,
- 			gboolean *stream, void *user_data);
--	int (*put) (struct obex_session *os, void *user_data);
-+	int (*put) (struct obex_session *os, obex_object_t *obj,
-+			void *user_data);
- 	int (*chkput) (struct obex_session *os, void *user_data);
- 	int (*setpath) (struct obex_session *os, obex_object_t *obj,
- 							void *user_data);
-
-
--- 
-Slawomir Bochenski
+Johan
