@@ -1,69 +1,286 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20101207150608.GA1867@vigoh>
-References: <AANLkTinu7oKUD5FmGyJ2x+ZYqRmOyFijuZgWtgjg=tk=@mail.gmail.com>
-	<20101207150608.GA1867@vigoh>
-Date: Wed, 8 Dec 2010 13:46:34 +0800
-Message-ID: <AANLkTinN3R4q-YA=4jweveB4LfE9S2SwhCK2xXYORw6W@mail.gmail.com>
-Subject: Re: [PATCH 1/1] bluetooth: add NULL pointer check in hci
-From: Jun Nie <niej0001@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Brian Gix <bgix@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00221532c430dd8bf30496dfa426
+In-Reply-To: <1291671832-13435-8-git-send-email-vinicius.gomes@openbossa.org>
+References: <1291671832-13435-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1291671832-13435-8-git-send-email-vinicius.gomes@openbossa.org>
+Date: Wed, 8 Dec 2010 11:18:37 +0530
+Message-ID: <AANLkTikkMK6gXigQ49iMa25c2XZ1Dx9hp7DvWR=8_3XQ@mail.gmail.com>
+Subject: Re: [RFC v2 7/9] Bluetooth: Add support for SMP confirmation checks
+From: Koustuv Ghosh <koustuvg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00221532c430dd8bf30496dfa426
-Content-Type: text/plain; charset=ISO-8859-1
+ Hello Vinicus,
+ regarding the below routine,
+ is it not good to check the IO capabilities and authentication
+rquirement of the remote device from the skb inside this routine and
+based on that we can trigger JustWorks or PassKey paring method.
+Though I know you are implementing  only JustWorks
+ but I feel it will be good approach to parse the response and then
+trigger the paring method.
 
-2010/12/7 Gustavo F. Padovan <padovan@profusion.mobi>:
-> Hi Jun,
+
+  static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+  {
++       struct smp_cmd_pairing *rp = (void *) skb->data;
+        struct smp_cmd_pairing_confirm cp;
+ +       struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+ +       int ret;
+ +       u8 k[16], res[16];
+
+ -       BT_DBG("");
+ +       /* Just Works */
+ +       memset(k, 0, sizeof(k));
+ +
+ +       conn->pres[0] = SMP_CMD_PAIRING_RSP;
+ +       memcpy(&conn->pres[1], rp, sizeof(*rp));
+ +       skb_pull(skb, sizeof(*rp));
+
+ -       memset(&cp, 0, sizeof(struct smp_cmd_pairing_confirm));
+ +       ret = smp_rand(conn->prnd);
+ +       if (ret)
+ +               return;
+ +
+ +       ret = smp_c1(tfm, k, conn->prnd, conn->preq, conn->pres, 0,
+ +                       conn->src, 0, conn->dst, res);
+ +       if (ret)
+ +               return;
+
+        smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
+  }
+
+On Tue, Dec 7, 2010 at 3:13 AM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> This adds supports for verifying the confirmation value that the
+> remote side has sent. This includes support for generating and sending
+> the random value used to produce the confirmation value.
 >
-> * Jun Nie <niej0001@gmail.com> [2010-12-07 15:01:21 +0800]:
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    5 ++
+>  net/bluetooth/smp.c           |  121 ++++++++++++++++++++++++++++++++---------
+>  2 files changed, 101 insertions(+), 25 deletions(-)
 >
->> Resend it to fix checkpatch.pl warning.
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index a3cb1ab..bcda2aa 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -290,6 +290,11 @@ struct l2cap_conn {
 >
->> From 75dc111b5d9f62619bbeec803b15e84412ae050e Mon Sep 17 00:00:00 2001
->> From: Jun Nie <njun@marvell.com>
->> Date: Tue, 7 Dec 2010 14:03:38 +0800
->> Subject: [PATCH] bluetooth: add NULL pointer check in hci
+>        __u8            disc_reason;
 >
-> Clearly a bug fix, but can you add a commit message to your patch. Thanks.
+> +       __u8            preq[7];
+> +       __u8            pres[7];
+> +       __u8            prnd[16];
+> +       __u8            pcnf[16];
+> +
+>        struct l2cap_chan_list chan_list;
+>  };
+>
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index b62160e..7d7e8ad 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -203,7 +203,9 @@ static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>
+>        BT_DBG("");
+>
+> -       skb_pull(skb, sizeof(struct smp_cmd_pairing));
+> +       conn->preq[0] = SMP_CMD_PAIRING_REQ;
+> +       memcpy(&conn->preq[1], rp, sizeof(*rp));
+> +       skb_pull(skb, sizeof(*rp));
+>
+>        rp->io_capability = 0x00;
+>        rp->oob_flag = 0x00;
+> @@ -212,64 +214,125 @@ static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>        rp->resp_key_dist = 0x00;
+>        rp->auth_req &= 0x05;
+>
+> +       conn->pres[0] = SMP_CMD_PAIRING_RSP;
+> +       memcpy(&conn->pres[1], rp, sizeof(rp));
+> +
+>        smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
+>  }
+>
+>  static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+>  {
+> +       struct smp_cmd_pairing *rp = (void *) skb->data;
+>        struct smp_cmd_pairing_confirm cp;
+> +       struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+> +       int ret;
+> +       u8 k[16], res[16];
+>
+> -       BT_DBG("");
+> +       /* Just Works */
+> +       memset(k, 0, sizeof(k));
+> +
+> +       conn->pres[0] = SMP_CMD_PAIRING_RSP;
+> +       memcpy(&conn->pres[1], rp, sizeof(*rp));
+> +       skb_pull(skb, sizeof(*rp));
+> +
+> +       ret = smp_rand(conn->prnd);
+> +       if (ret)
+> +               return;
+>
+> -       memset(&cp, 0, sizeof(struct smp_cmd_pairing_confirm));
+> +       ret = smp_c1(tfm, k, conn->prnd, conn->preq, conn->pres, 0,
+> +                       conn->src, 0, conn->dst, res);
+> +       if (ret)
+> +               return;
+> +
+> +       swap128(res, cp.confirm_val);
+>
+>        smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
+>  }
+>
+>  static void smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+>  {
+> +       struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+> +
+>        BT_DBG("");
+>
+> -       if (conn->hcon->out) {
+> -               struct smp_cmd_pairing_random random;
+> +       memcpy(conn->pcnf, skb->data, 16);
+> +       skb_pull(skb, 16);
+>
+> -               BT_DBG("master");
+> +       if (conn->hcon->out) {
+> +               u8 random[16];
+>
+> -               memset(&random, 0, sizeof(struct smp_cmd_pairing_random));
+> +               swap128(conn->prnd, random);
+>
+> -               smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(random),
+> -                                                               &random);
+> +               smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, 16, random);
+>        } else {
+> -               struct smp_cmd_pairing_confirm confirm;
+> +               struct smp_cmd_pairing_confirm cp;
+> +               int ret;
+> +               u8 k[16], res[16];
+> +
+> +               /* Just Works */
+> +               memset(k, 0, sizeof(k));
+>
+> -               BT_DBG("slave");
+> +               ret = smp_rand(conn->prnd);
+> +               if (ret)
+> +                       return;
+>
+> -               memset(&confirm, 0, sizeof(struct smp_cmd_pairing_confirm));
+> +               ret = smp_c1(tfm, k, conn->prnd, conn->preq, conn->pres, 0,
+> +                               conn->dst, 0, conn->src, res);
+> +               if (ret)
+> +                       return;
+>
+> -               smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(confirm),
+> -                                                               &confirm);
+> +               swap128(res, cp.confirm_val);
+> +
+> +               smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
+>        }
+>  }
+>
+>  static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+>  {
+> -       struct smp_cmd_pairing_random cp;
+> +       struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+> +       int ret;
+> +       u8 k[16], key[16], res[16], random[16], confirm[16], buf[128];
+> +
+> +       swap128(skb->data, random);
+> +       skb_pull(skb, 16);
+> +
+> +       memset(k, 0, sizeof(k));
+> +
+> +       if (conn->hcon->out)
+> +               ret = smp_c1(tfm, k, random, conn->preq, conn->pres, 0,
+> +                               conn->src, 0, conn->dst, res);
+> +       else
+> +               ret = smp_c1(tfm, k, random, conn->preq, conn->pres, 0,
+> +                               conn->dst, 0, conn->src, res);
+> +       if (ret)
+> +               return;
+>
+> -       BT_DBG("");
+> +       swap128(res, confirm);
+>
+> -       skb_pull(skb, sizeof(struct smp_cmd_pairing_random));
+> +       if (memcmp(conn->pcnf, confirm, 16) != 0) {
+> +               struct smp_cmd_pairing_fail cp;
+>
+> -       /* FIXME: check if random matches */
+> +               BT_ERR("Pairing failed (confirmation values mismatch)");
+> +               cp.reason = SMP_CONFIRM_FAILED;
+> +               smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(cp), &cp);
+> +               return;
+> +       }
+>
+>        if (conn->hcon->out) {
+> -               BT_DBG("master");
+> -               /* FIXME: start encryption */
+> +               smp_s1(tfm, k, random, conn->prnd, key);
+> +
+> +               hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
+> +               BT_DBG("key %s", buf);
+>        } else {
+> -               BT_DBG("slave");
+> +               u8 r[16];
+>
+> -               memset(&cp, 0, sizeof(struct smp_cmd_pairing_random));
+> +               swap128(conn->prnd, r);
+> +               smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, 16, r);
+>
+> -               smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(cp), &cp);
+> +               smp_s1(tfm, k, conn->prnd, random, key);
+> +
+> +               hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
+> +               BT_DBG("key %s", buf);
+>        }
+>  }
+>
+> @@ -280,8 +343,9 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>
+>        BT_DBG("");
+>
+> -       skb_pull(skb, sizeof(struct smp_cmd_security_req));
+> -       memset(&cp, 0, sizeof(struct smp_cmd_pairing));
+> +       skb_pull(skb, sizeof(*rp));
+> +
+> +       memset(&cp, 0, sizeof(cp));
+>
+>        cp.io_capability = 0x00;
+>        cp.oob_flag = 0x00;
+> @@ -290,6 +354,9 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+>        cp.resp_key_dist = 0x00;
+>        cp.auth_req = rp->auth_req & 0x05;
+>
+> +       conn->preq[0] = SMP_CMD_PAIRING_REQ;
+> +       memcpy(&conn->preq[1], &cp, sizeof(cp));
+> +
+>        smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
+>  }
+>
+> @@ -323,6 +390,10 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+>                cp.init_key_dist = 0x00;
+>                cp.resp_key_dist = 0x00;
+>                cp.auth_req = authreq;
+> +
+> +               conn->preq[0] = SMP_CMD_PAIRING_REQ;
+> +               memcpy(&conn->preq[1], &cp, sizeof(cp));
+> +
+>                smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
+>        } else {
+>                struct smp_cmd_security_req cp;
+> --
+> 1.7.3.2
 >
 > --
-> Gustavo F. Padovan
-> http://profusion.mobi
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-
-Add commit message for understanding in a glance.
-
-Jun
-
---00221532c430dd8bf30496dfa426
-Content-Type: text/x-diff; charset=US-ASCII;
-	name="0001-bluetooth-add-NULL-pointer-check-in-hci.patch"
-Content-Disposition: attachment;
-	filename="0001-bluetooth-add-NULL-pointer-check-in-hci.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ghfshqhe0
-
-RnJvbSBlNzI5ZWRhM2IyY2ZhZTUwMWM3MDRlMmViMzllMDdhYTFiODYwN2YwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKdW4gTmllIDxuanVuQG1hcnZlbGwuY29tPgpEYXRlOiBUdWUs
-IDcgRGVjIDIwMTAgMTQ6MDM6MzggKzA4MDAKU3ViamVjdDogW1BBVENIXSBibHVldG9vdGg6IGFk
-ZCBOVUxMIHBvaW50ZXIgY2hlY2sgaW4gaGNpCgpJZiB3ZSBmYWlsIHRvIGZpbmQgYSBoY2kgZGV2
-aWNlIHBvaW50ZXIgaW4gaGNpX3VhcnQsIGRvbid0IHRyeQp0byBkZXJlZiB0aGUgTlVMTCBvbmUg
-d2UgZG8gaGF2ZS4KClNpZ25lZC1vZmYtYnk6IEp1biBOaWUgPG5qdW5AbWFydmVsbC5jb20+Ci0t
-LQogZHJpdmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMgfCAgICA2ICsrKystLQogMSBmaWxlcyBj
-aGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMgYi9kcml2ZXJzL2JsdWV0b290aC9oY2lfbGRpc2Mu
-YwppbmRleCA3MjAxNDgyLi4zYzZjYWJjIDEwMDY0NAotLS0gYS9kcml2ZXJzL2JsdWV0b290aC9o
-Y2lfbGRpc2MuYworKysgYi9kcml2ZXJzL2JsdWV0b290aC9oY2lfbGRpc2MuYwpAQCAtMzExLDgg
-KzMxMSwxMCBAQCBzdGF0aWMgdm9pZCBoY2lfdWFydF90dHlfY2xvc2Uoc3RydWN0IHR0eV9zdHJ1
-Y3QgKnR0eSkKIAogCQlpZiAodGVzdF9hbmRfY2xlYXJfYml0KEhDSV9VQVJUX1BST1RPX1NFVCwg
-Jmh1LT5mbGFncykpIHsKIAkJCWh1LT5wcm90by0+Y2xvc2UoaHUpOwotCQkJaGNpX3VucmVnaXN0
-ZXJfZGV2KGhkZXYpOwotCQkJaGNpX2ZyZWVfZGV2KGhkZXYpOworCQkJaWYgKGhkZXYpIHsKKwkJ
-CQloY2lfdW5yZWdpc3Rlcl9kZXYoaGRldik7CisJCQkJaGNpX2ZyZWVfZGV2KGhkZXYpOworCQkJ
-fQogCQl9CiAJfQogfQotLSAKMS43LjAuNAoK
---00221532c430dd8bf30496dfa426--
