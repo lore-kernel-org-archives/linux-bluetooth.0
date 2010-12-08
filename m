@@ -1,66 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Wed, 8 Dec 2010 16:15:11 -0800
-Message-ID: <AANLkTim5HQGNL-vSapeQw_-dJue89pYz7zc8eiShma8j@mail.gmail.com>
-Subject: compat-wireless-2.6.37-rc5 released
-To: linux-wireless <linux-wireless@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/3 v3] Unified ebook data structures
+Date: Wed,  8 Dec 2010 23:15:54 +0200
+Message-Id: <1291842956-8610-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1291842956-8610-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1291842956-8610-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We're closing in on the 2.6.37 release, now at rc5, so I'll start
-making two releases, a vanilla release and one which has more stuff.
-For now I'll just suck in all pending stable patches (all patches
-marked with Cc: stable@kernel.org on linux-next.git, not only
-Atheros', everyone's). This is:
+Query data structures are unified in phonebook-ebook.c to have a
+unique identifier for ebook async operation. Purpose of this
+modification is next commit where pending async operation can be
+cancelled.
+---
+ plugins/phonebook-ebook.c |   36 ++++++++++++++++--------------------
+ 1 files changed, 16 insertions(+), 20 deletions(-)
 
-pending-stable/0001-cfg80211-pass-the-reg-hint-initiator-to-helpers.patch
-pending-stable/0002-cfg80211-fix-allowing-country-IEs-for-WIPHY_FLAG_STR.patch
-pending-stable/0003-cfg80211-fix-disabling-channels-based-on-hints.patch
-pending-stable/0004-ath9k_hw-fix-potential-spurious-tx-error-bit-interpr.patch
-pending-stable/0005-ath9k-simplify-hw-reset-locking.patch
-pending-stable/0006-ath9k-move-the-PCU-lock-to-the-sc-structure.patch
-pending-stable/0007-ath9k-content-DMA-start-stop-through-the-PCU-lock.patch
-pending-stable/0008-ath9k_hw-Fix-XPABIAS-level-configuration-for-AR9003.patch
-pending-stable/0009-ath9k-Fix-bug-in-delimiter-padding-computation.patch
-pending-stable/0010-ath9k-Disable-SWBA-interrupt-on-remove_interface.patch
-pending-stable/0011-mac80211-Fix-STA-disconnect-due-to-MIC-failure.patch
-pending-stable/0012-ath9k-Fix-STA-disconnect-issue-due-to-received-MIC-f.patch
-pending-stable/0013-ath9k-Fix-bug-in-reading-input-gpio-state-for-ar9003.patch
-pending-stable/0014-ath9k_hw-fix-endian-issues-with-CTLs-on-AR9003.patch
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index 073ff33..b9d297a 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -45,13 +45,9 @@
+ #define QUERY_NAME "(contains \"given_name\" \"%s\")"
+ #define QUERY_PHONE "(contains \"phone\" \"%s\")"
+ 
+-struct contacts_query {
++struct context_query {
+ 	const struct apparam_field *params;
+-	phonebook_cb cb;
+-	void *user_data;
+-};
+-
+-struct cache_query {
++	phonebook_cb contacts_cb;
+ 	phonebook_entry_cb entry_cb;
+ 	phonebook_cache_ready_cb ready_cb;
+ 	void *user_data;
+@@ -141,7 +137,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
+ static void ebookpull_cb(EBook *book, EBookStatus estatus, GList *contacts,
+ 							void *user_data)
+ {
+-	struct contacts_query *data = user_data;
++	struct context_query *data = user_data;
+ 	GString *string = g_string_new("");
+ 	unsigned int count = 0, maxcount;
+ 	GList *l;
+@@ -182,7 +178,7 @@ static void ebookpull_cb(EBook *book, EBookStatus estatus, GList *contacts,
+ 
+ 
+ done:
+-	data->cb(string->str, string->len, count, 0, data->user_data);
++	data->contacts_cb(string->str, string->len, count, 0, data->user_data);
+ 
+ 	g_string_free(string, TRUE);
+ 	g_free(data);
+@@ -191,14 +187,14 @@ done:
+ static void ebook_entry_cb(EBook *book, EBookStatus estatus,
+ 			EContact *contact, void *user_data)
+ {
+-	struct contacts_query *data = user_data;
++	struct context_query *data = user_data;
+ 	EVCard *evcard;
+ 	char *vcard;
+ 	size_t len;
+ 
+ 	if (estatus != E_BOOK_ERROR_OK) {
+ 		error("E-Book query failed: status %d", estatus);
+-		data->cb(NULL, 0, 1, 0, data->user_data);
++		data->contacts_cb(NULL, 0, 1, 0, data->user_data);
+ 		g_free(data);
+ 		return;
+ 	}
+@@ -210,7 +206,7 @@ static void ebook_entry_cb(EBook *book, EBookStatus estatus,
+ 
+ 	len = vcard ? strlen(vcard) : 0;
+ 
+-	data->cb(vcard, len, 1, 0, data->user_data);
++	data->contacts_cb(vcard, len, 1, 0, data->user_data);
+ 
+ 	g_free(vcard);
+ 	g_free(data);
+@@ -249,7 +245,7 @@ static char *evcard_name_attribute_to_string(EVCard *evcard)
+ static void cache_cb(EBook *book, EBookStatus estatus, GList *contacts,
+ 							void *user_data)
+ {
+-	struct cache_query *data = user_data;
++	struct context_query *data = user_data;
+ 	GList *l;
+ 
+ 	if (estatus != E_BOOK_ERROR_OK) {
+@@ -411,13 +407,13 @@ done:
+ int phonebook_pull(const char *name, const struct apparam_field *params,
+ 					phonebook_cb cb, void *user_data)
+ {
+-	struct contacts_query *data;
++	struct context_query *data;
+ 	EBookQuery *query;
+ 
+ 	query = e_book_query_any_field_contains("");
+ 
+-	data = g_new0(struct contacts_query, 1);
+-	data->cb = cb;
++	data = g_new0(struct context_query, 1);
++	data->contacts_cb = cb;
+ 	data->params = params;
+ 	data->user_data = user_data;
+ 
+@@ -432,10 +428,10 @@ int phonebook_get_entry(const char *folder, const char *id,
+ 					const struct apparam_field *params,
+ 					phonebook_cb cb, void *user_data)
+ {
+-	struct contacts_query *data;
++	struct context_query *data;
+ 
+-	data = g_new0(struct contacts_query, 1);
+-	data->cb = cb;
++	data = g_new0(struct context_query, 1);
++	data->contacts_cb = cb;
+ 	data->params = params;
+ 	data->user_data = user_data;
+ 
+@@ -450,7 +446,7 @@ int phonebook_get_entry(const char *folder, const char *id,
+ int phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 			phonebook_cache_ready_cb ready_cb, void *user_data)
+ {
+-	struct cache_query *data;
++	struct context_query *data;
+ 	EBookQuery *query;
+ 	gboolean ret;
+ 
+@@ -459,7 +455,7 @@ int phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 
+ 	query = e_book_query_any_field_contains("");
+ 
+-	data = g_new0(struct cache_query, 1);
++	data = g_new0(struct context_query, 1);
+ 	data->entry_cb = entry_cb;
+ 	data->ready_cb = ready_cb;
+ 	data->user_data = user_data;
+-- 
+1.7.0.4
 
-You can find the vanilla [1] and extra pending-stable [2] releass on
-the stable download page [3] along with the respective ChangeLog of
-all:
-
-  * The kernel components
-  * compat-wireless
-  * compat
-
-In later releases we will have to consider if we want to cherry pick
-anything extra or leave them as is. These few patches seem tempting to
-suck in:
-
-01-ath9k-OTP.patch
-03-ath9k-no-aggr-VO.patch
-04-mac80211-no-aggr-VO.patch
-05-ath9k-Reintroduce-modparam-to-enable-btcoex.patch
-06-ath9k_hw-fix-A-MPDU-key-search-issues-on-AR9003.patch
-
-Particularly it is now known AR9003 devices will only ship with OTP
-so.. it seems to make sense to actually disable AR9003 on 36 and even
-37 and only have it available with the OTP patch and above EEPROM
-fixes. I'm inclined to just disregard all these and just let us get
-AR9003 from 2.6.38.... but we already have users of AR9003 coming up
-so this can't wait in practice now. This now goes compile-tested and
-fixed for 2.6.31.
-
-[1] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc5-2.tar.bz2
-[2] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc5-2-s.tar.bz2
-[3] http://wireless.kernel.org/en/users/Download/stable
-[4] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/ChangeLog-2.6.37-wireless
-
-  Luis
