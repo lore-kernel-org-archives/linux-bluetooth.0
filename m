@@ -1,19 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 8 Dec 2010 13:49:20 +0530
-Message-ID: <AANLkTikt5QrB3yMDWhAoQB=vArSLL-8VE+HkMJuWy+w5@mail.gmail.com>
-Subject: LE Slave
-From: Koustuv Ghosh <koustuvg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <201012070007.19239.arnd@arndb.de>
+References: <AANLkTi=XTUau_GbASJEUBgsZ_FYYmRAX6W43YtRdv2wS@mail.gmail.com>
+	<201012061754.44592.arnd@arndb.de>
+	<AANLkTin_VOjz=bGCnANgp8G2SFFFOkT3TKRh50p5L1Gj@mail.gmail.com>
+	<201012070007.19239.arnd@arndb.de>
+Date: Wed, 8 Dec 2010 13:11:35 +0530
+Message-ID: <AANLkTimCKK9NAiXD4wsCkJt8bsy_exYEBWdb1+M6+NOE@mail.gmail.com>
+Subject: Re: [PATCH 5/9] mfd: Add UART support for the ST-Ericsson CG2900.
+From: Pavan Savoy <pavan_savoy@sify.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Vitaly Wool <vitalywool@gmail.com>, Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, linus.walleij@stericsson.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello ,
+On Tue, Dec 7, 2010 at 4:37 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Monday 06 December 2010 22:24:34 Vitaly Wool wrote:
+>> On Mon, Dec 6, 2010 at 5:54 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+>>
+>> >> But I was trying to make a different point here. On a basic level,
+>> >> there's this cg2000 chip from STE that does BT, FM and GPS. There's
+>> >> the chip from TI that does BT, FM and GPS, and there's the Broadcom
+>> >> chip that does BT+FM. They all use HCI to access the other functions
+>> >> of the combo chip and they do it in a really simiar way, with the
+>> >> differences mostly in power management techniques. So I think it's
+>> >> quite sensible to have some kind of framework that is suitable for
+>> >> such devices.
+>> >
+>> > Yes, I agree 100% in principle. I could not find the code that
+>> > Broadcom/TI FM and GPS stuff so far, can you point us to that?
+>>
+>> Sure, the TI "shared transport" code is mostly at drivers/misc/ti-st.
+>>
+>> Some Broadcom BCM43xx chips work in a similar way AFAIK but I'm not
+>> sure about the mainline support for those.
+>
+> Ah, it had not occured to me to look in drivers/misc. Looking at the
+> code over there, it becomes much clearer what your point is. Evidently
+> the ti-st driver implements a line discipline similar to, but conflicting
+> with hci_ldisc, and it has its own copy of the hci_ll code.
+>
+> I guess this is exactly what we're trying to avoid having with the
+> cg2900 code ;-).
+>
+>> > The cg2900 solution for this was to use MFD (plus another layer
+>> > in the posted version, but that will go away I assume). Using
+>> > MFD is not the only possibility here, but I could not see anything
+>> > wrong with it either. Do you think we can move them all over to
+>> > use MFD infrastructure?
+>>
+>> I guess so but it's probably more of a detail than what I'm up to now :)
+>
+> Agreed.
+>
+>> >> But generally speaking, isn't a line discipline/driver attached to a
+>> >> tty? We can use dumb tty for e. g. SPI and still be able to use
+>> >> hci_ll, right?
+>> >
+>> > I suggested that as well, but the point was made that this would
+>> > add an unnecessary indirection for the SPI case, which is not
+>> > really much like a serial port. It's certainly possible to do it
+>> > like you say, but if we add a way to register the high-level
+>> > protocols with an HCI-like multi-function device, we could
+>> > also do it in a way that does not rely on tty-ldisc but keeps it
+>> > as one of the options.
+>>
+>> I actually don't think it's such a big indirection, I prefer to think
+>> of it more as of the abstraction layer. If not use this, are we going
+>> to have direct SPI device drivers? I'm afraid we might end up with a
+>> huge duplication of code in that case.
+>
+> The question is how it should be modeled in a better way than today.
+>
+> I believe we already agree it should be something like
+>
+> =C2=A0 bt =C2=A0 ti-radio =C2=A0 =C2=A0st-e-radio =C2=A0 =C2=A0ti-gps =C2=
+=A0 st-e-gps =C2=A0broadcom-radio ...
+> =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0 |
+> =C2=A0 +---------+----------+---------+--+----------+----------+---------=
++
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0common-hci-module
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0+-----------+-----------+
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0| =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=
+=A0|
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0seri=
+al =C2=A0 =C2=A0spi =C2=A0 =C2=A0 i2c =C2=A0 =C2=A0...
 
-dose anybody know whether any commercial LE slave(core 4.0 compatible)
-is available where slave side Security Manager Protocol is up and
-running?
+Yes, this sort of architecture would certainly help...
+However, I suppose the most common question as one of you stated above
+was how can the channel -ID and other factors such as offset-header
+packet format be generalized?
 
-rgds
-Koustuv
+As in over here, will the common-hci-module work fine, If say ti-radio
+says he is expecting packets starting from id-8 which is of length 10?
+and also work for st-e-radio which would say expecting data from id-6
+with 15 max bytes?
+Answering this I suppose would solve a lot of our problems....
+
+Marcel did previously suggest a bus-driver sort of a structure, where
+the transport are sort of adapter drivers, the data interpretation
+logic like splitting HCI-events, FM CH-8 packets all fall into the
+algos drivers and the actual Bluetooth driver or GPS or FM-V4L2
+drivers falling into the client/protocol drivers....
+
+
+
+> Any objections to this?
+>
+> If you agree, I think we should discuss the alternatives for the common
+> module. I think you are saying we should make the common module a single
+> ldisc doing the multiplexing and have all transports register as ttys int=
+o
+> it, right?
+>
+> What we discussed before was to split it into multiple modules, one for
+> the tty ldisc and one for the common code, and then have the spi/i2c/...
+> drivers feed into the common multiplexer without going through tty.
+>
+> I don't currently see a significant advantage or disadvantage with either
+> approach.
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0Arnd
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
+>
