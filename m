@@ -1,33 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1012092329480.25880@swampdragon.chaosbits.net>
-References: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com> <alpine.LNX.2.00.1012092329480.25880@swampdragon.chaosbits.net>
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 9 Dec 2010 14:39:08 -0800
-Message-ID: <AANLkTikc_u4NhxdGzwQMjbEe12qYmhq481amazTK-JRc@mail.gmail.com>
-Subject: Re: Start dropping PCMCIA from compat-wireless for 2.6.38+
-To: Jesper Juhl <jj@chaosbits.net>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+Date: Thu, 9 Dec 2010 23:36:47 +0100 (CET)
+From: Jesper Juhl <jj@chaosbits.net>
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+cc: linux-wireless <linux-wireless@vger.kernel.org>,
 	linux-kernel@vger.kernel.org,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Start dropping PCMCIA from compat-wireless for 2.6.38+
+In-Reply-To: <AANLkTikc_u4NhxdGzwQMjbEe12qYmhq481amazTK-JRc@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1012092335380.25880@swampdragon.chaosbits.net>
+References: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com> <alpine.LNX.2.00.1012092329480.25880@swampdragon.chaosbits.net> <AANLkTikc_u4NhxdGzwQMjbEe12qYmhq481amazTK-JRc@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 9, 2010 at 2:31 PM, Jesper Juhl <jj@chaosbits.net> wrote:
-> On Thu, 9 Dec 2010, Luis R. Rodriguez wrote:
->
->> I'm going to start dropping PCMCIA stuff from compat-wireless as I
->> don't think we have any users of it nor interest to keep backporting
->> it. This entails dropping drivers like orinoco, b43 PCMCIA support,
->> libertas, as well as bluetooth bluecard_cs, bluecard_cs, dtl1_cs,
->> bt3c_cs and of course CONFIG_SSB_PCMCIAHOST. If you are a user please
->> yell now.
->>
-> Yelling.
-> While I'm not personally a user, my mother is. She still has an old IBM
-> Thinkpad 600 laptop with a PCMCIA card in it that uses the orinoco driver.
+On Thu, 9 Dec 2010, Luis R. Rodriguez wrote:
 
-And you have your mother using compat-wireless?
+> On Thu, Dec 9, 2010 at 2:31 PM, Jesper Juhl <jj@chaosbits.net> wrote:
+> > On Thu, 9 Dec 2010, Luis R. Rodriguez wrote:
+> >
+> >> I'm going to start dropping PCMCIA stuff from compat-wireless as I
+> >> don't think we have any users of it nor interest to keep backporting
+> >> it. This entails dropping drivers like orinoco, b43 PCMCIA support,
+> >> libertas, as well as bluetooth bluecard_cs, bluecard_cs, dtl1_cs,
+> >> bt3c_cs and of course CONFIG_SSB_PCMCIAHOST. If you are a user please
+> >> yell now.
+> >>
+> > Yelling.
+> > While I'm not personally a user, my mother is. She still has an old IBM
+> > Thinkpad 600 laptop with a PCMCIA card in it that uses the orinoco driver.
+> 
+> And you have your mother using compat-wireless?
+> 
+Yes, as a matter of fact I do.
 
-  Luis
+-- 
+Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
+Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
+Plain text mails only, please.
+
