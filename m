@@ -1,21 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 9 Dec 2010 22:09:27 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Convert CreateDevice on test-device script to an
+ asynchronous call
+Message-ID: <20101209200927.GA4283@jh-x301>
+References: <1291923166-30880-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1291923734-30979-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 9 Dec 2010 14:20:17 -0800
-Message-ID: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com>
-Subject: Start dropping PCMCIA from compat-wireless for 2.6.38+
-To: linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291923734-30979-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm going to start dropping PCMCIA stuff from compat-wireless as I
-don't think we have any users of it nor interest to keep backporting
-it. This entails dropping drivers like orinoco, b43 PCMCIA support,
-libertas, as well as bluetooth bluecard_cs, bluecard_cs, dtl1_cs,
-bt3c_cs and of course CONFIG_SSB_PCMCIAHOST. If you are a user please
-yell now.
+Hi Claudio,
 
- Luis
+On Thu, Dec 09, 2010, Claudio Takahasi wrote:
+> Change required to test the scenario when the sender of a CreateDevice
+> request disconnects from the system bus. Current implementation is
+> blocking and it doesn't allow the user to cancel a request.
+> ---
+>  test/test-device |   22 +++++++++++++++++++---
+>  1 files changed, 19 insertions(+), 3 deletions(-)
+
+Pushed upstream. Thanks.
+
+Johan
