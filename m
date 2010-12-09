@@ -3,16 +3,13 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Subject: [PATCH] Convert CreateDevice on test-device script to an asynchronous call
-Date: Thu,  9 Dec 2010 16:42:14 -0300
-Message-Id: <1291923734-30979-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1291923166-30880-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1291923166-30880-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Thu,  9 Dec 2010 16:32:46 -0300
+Message-Id: <1291923166-30880-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Change required to test the scenario when the sender of a CreateDevice
-request disconnects from the system bus. Current implementation is
-blocking and it doesn't allow the user to cancel a request.
+or CreatePairedDevice request disconnects from the system bus.
 ---
  test/test-device |   22 +++++++++++++++++++---
  1 files changed, 19 insertions(+), 3 deletions(-)
