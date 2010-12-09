@@ -1,68 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Convert CreateDevice on test-device script to an asynchronous call
-Date: Thu,  9 Dec 2010 16:32:46 -0300
-Message-Id: <1291923166-30880-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 9 Dec 2010 20:16:57 +0100
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+ gregkh@suse.de, Stefan Seyfried <seife+kernel@b1-systems.com>, Oliver
+ Neukum <oneukum@suse.de>
+Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
+Message-ID: <20101209201657.0b7964fc@susi>
+In-Reply-To: <20101201174910.GA16125@vigoh>
+References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
+	<1291200140.4795.91.camel@aeonflux>
+	<20101201154714.517289f7@susi>
+	<20101201174910.GA16125@vigoh>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change required to test the scenario when the sender of a CreateDevice
-or CreatePairedDevice request disconnects from the system bus.
----
- test/test-device |   22 +++++++++++++++++++---
- 1 files changed, 19 insertions(+), 3 deletions(-)
+Hi all,
 
-diff --git a/test/test-device b/test/test-device
-index a04ff35..828349c 100755
---- a/test/test-device
-+++ b/test/test-device
-@@ -1,11 +1,16 @@
- #!/usr/bin/python
- 
-+import gobject
-+
- import sys
- import dbus
-+import dbus.mainloop.glib
- import re
- from optparse import OptionParser, make_option
- 
-+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
- bus = dbus.SystemBus()
-+mainloop = gobject.MainLoop()
- 
- manager = dbus.Interface(bus.get_object("org.bluez", "/"), "org.bluez.Manager")
- 
-@@ -48,13 +53,24 @@ if (args[0] == "list"):
- 
- 	sys.exit(0)
- 
-+def create_device_reply(device):
-+	print "New device (%s)" % device
-+	mainloop.quit()
-+	sys.exit(0)
-+
-+def create_device_error(error):
-+	print "Creating device failed: %s" % error
-+	mainloop.quit()
-+	sys.exit(1)
-+
- if (args[0] == "create"):
- 	if (len(args) < 2):
- 		print "Need address parameter"
- 	else:
--		device = adapter.CreateDevice(args[1])
--		print device
--	sys.exit(0)
-+		adapter.CreateDevice(args[1],
-+				reply_handler=create_device_reply,
-+				error_handler=create_device_error)
-+	mainloop.run()
- 
- if (args[0] == "remove"):
- 	if (len(args) < 2):
+On Wed, 1 Dec 2010 15:49:10 -0200
+"Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
+
+> Hi Stefan,
+> 
+> * Stefan Seyfried <stefan.seyfried@googlemail.com> [2010-12-01 15:47:14 +0100]:
+
+> > > > If a device is autosuspended an inability to resubmit URBs is
+> > > > to be expected. Check the error code and only log real errors.
+> > > > (Now that autosuspend is default enabled for btusb, those log
+> > > > messages were happening all the time e.g. with a BT mouse)
+> > > > 
+> > > > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
+> > > > Signed-off-by: Oliver Neukum <oneukum@suse.de>
+> > > 
+> > > we had a similar one some time ago, but I am fine with this one as well.
+> > > Actually this one might be a bit better since it still keeps some
+> > > errors.
+> > > 
+> > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > 
+> > Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
+> > messages are annoying and users will complain if they are still in 2.6.37
+> > final.
+> 
+> I'll send it, applied to bluetooth-2.6 tree. Thanks.
+
+unfortunately, it does not seem to make it into 2.6.37?
 -- 
-1.7.3.3
+Stefan Seyfried
 
+"Any ideas, John?"
+"Well, surrounding them's out."
