@@ -1,131 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 9 Dec 2010 12:19:50 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/3 v4] Cancel pending phonebook request
+Message-ID: <20101209101950.GA23258@jh-x301>
+References: <1291889119-23915-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTim9qOTdeWhU1H-ove2rPR4MlEyUmQZ3zUeS75K_@mail.gmail.com>
-References: <35c90d960912081950t135e3f10m8848e54fde1e596f@mail.gmail.com>
-	<1260335175.2901.20.camel@violet>
-	<35c90d960912082213s26fb0ebse75ce85d43213d9@mail.gmail.com>
-	<1260482634.2901.70.camel@violet>
-	<35c90d960912161359u2b3f9b2fi875288896a7a8478@mail.gmail.com>
-	<35c90d961003091207u66571bt789461dcc7972693@mail.gmail.com>
-	<1268167524.3712.61.camel@localhost.localdomain>
-	<AANLkTinOFG0NcADz2ewxyaPWiLpe52MFLP8GCEvFna2a@mail.gmail.com>
-	<AANLkTim9qOTdeWhU1H-ove2rPR4MlEyUmQZ3zUeS75K_@mail.gmail.com>
-Date: Thu, 9 Dec 2010 12:37:56 +0200
-Message-ID: <AANLkTimPNHrnY4Xn-oqsOQac45Z_rSr1SZtV90cna+ey@mail.gmail.com>
-Subject: Re: RFC: Allow Bluez to select flushable or non-flushable ACL packets
- with L2CAP_LM_RELIABLE
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Nick Pelly <npelly@google.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1291889119-23915-1-git-send-email-dmitriy.paliy@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Dmitriy,
 
-On Wed, Jun 16, 2010 at 5:15 PM, Nick Pelly <npelly@google.com> wrote:
-> On Wed, Jun 16, 2010 at 4:40 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi,
->>
->> On Tue, Mar 9, 2010 at 11:45 PM, Marcel Holtmann <marcel@holtmann.org> w=
-rote:
->>> Hi Nick,
->>>
->>>> >>> >> Right now Bluez always requests flushable ACL packets (but does=
- not
->>>> >>> >> set a flush timeout, so effectively they are non-flushable):
->>>> >>> >>
->>>> >>> >> However it is desirable to use an ACL flush timeout on A2DP pac=
-kets so
->>>> >>> >> that if the ACL packets block for some reason then the LM can f=
-lush
->>>> >>> >> them to make room for newer packets.
->>>> >>> >>
->>>> >>> >> Is it reasonable for Bluez to use the 0x00 ACL packet boundary =
-flag by
->>>> >>> >> default (non-flushable packet), and let userspace request flush=
-able
->>>> >>> >> packets on A2DP L2CAP sockets with the socket option
->>>> >>> >> L2CAP_LM_RELIABLE.
->>>> >>> >
->>>> >>> > the reliable option has a different meaning. It comes back from =
-the old
->>>> >>> > Bluetooth 1.1 qualification days where we had to tests on L2CAP =
-that had
->>>> >>> > to confirm that we can detect malformed packets and report them.=
- These
->>>> >>> > days it is just fine to drop them.
->>>> >>>
->>>> >>> Got it, how about introducing
->>>> >>>
->>>> >>> #define L2CAP_LM_FLUSHABLE 0x0040
->>>> >>
->>>> >> that l2cap_sock_setsockopt_old() sets this didn't give you a hint t=
-hat
->>>> >> we might wanna deprecate this socket options ;)
->>>> >>
->>>> >> I need to read up on the flushable stuff, but in the end it deserve=
-s its
->>>> >> own socket option. Also an ioctl() to actually trigger Enhanced flu=
-sh
->>>> >> might be needed.
->>>> >>
->>>> >>> struct l2cap_pinfo {
->>>> >>> =A0 =A0...
->>>> >>> =A0 =A0__u8 flushable;
->>>> >>> }
->>>> >>
->>>> >> Sure. In the long run we need to turn this into a bitmask. We are j=
-ust
->>>> >> wasting memory here.
->>>> >
->>>> > Attached is an updated patch, that checks the LMP features bitmask
->>>> > before using the new non-flushable packet type.
->>>> >
->>>> > I am still using L2CAP_LM_FLUSHABLE socket option in
->>>> > l2cap_sock_setsockopt_old(), which I don't think you are happy with.
->>>> > So how about a new option:
->>>> >
->>>> > SOL_L2CAP, L2CAP_ACL_FLUSH
->>>> > which has a default value of 0, and can be set to 1 to make the ACL
->>>> > data sent by this L2CAP socket flushable.
->>>> >
->>>> > In a later commit we would then add
->>>> > SOL_ACL, ACL_FLUSH_TIMEOUT
->>>> > That is used to set an automatic flush timeout for the ACL link on a
->>>> > L2CAP socket. Note that SOL_ACL is new.
->>>> >
->>>> > But maybe this is not what you had in mind, so I'm looking for your
->>>> > advice before I implement this.
->>>>
->>>> Attached an updated patch for 2.6.32 kernel. We've been using this
->>>> patch successfully on production devices.
->>>
->>> can see anything wrong with that patch. However we need to use
->>> SOL_BLUETOOTH for it of course. So we need to come up with something to
->>> make this simple.
+On Thu, Dec 09, 2010, Dmitriy Paliy wrote:
+> Structure context_query changed to query_context in phonebook-ebook.c
+> comparing to previous submission, and phonebook_req_cancel changed to
+> phonebook_req_finalize.
+> 
+> More comments added to phonebook.h.
 
-Nick are you going to take Marcel comments? Otherwise I could take
-care about the patch as it seems that it might help in some
-situations.
+Thanks for the update. All three patches have been pushed upstream.
 
->>> An additional change I like to see is to use flags for booleans like
->>> flushable in the structures. Can you work on changing that.
->>>
->>> Also do we have decoding support for this in hcidump. It might be nice
->>> to include some really simple examples in the commit message.
-
-At least wireshark which I use understands those packets.
-
->> I would like to play a little bit with this, so is there any missing upd=
-ates?
->
-> Nope, that is our most recent version.
-
-Nick, do you know headset which could help to hear the real
-difference? I was trying to use Sony DR-BT22 headset which has some
-issues with A2DP but the solution did not help much.
-
-Regards,
-Andrei
+Johan
