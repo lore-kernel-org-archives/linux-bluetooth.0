@@ -1,26 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Dec 2010 16:01:45 +0200
+Date: Thu, 9 Dec 2010 16:00:50 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix compiler flags when CFLAGS is set in the
- environment
-Message-ID: <20101209140144.GB27789@jh-x301>
-References: <1291902098-20765-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Check the security level on a per request base
+Message-ID: <20101209140050.GA27789@jh-x301>
+References: <1291900153-8541-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1291902098-20765-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1291900153-8541-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Bruna,
 
-On Thu, Dec 09, 2010, Luiz Augusto von Dentz wrote:
-> D_FILE_OFFSET_BITS need to be set even if CFLAGS is not empty
+On Thu, Dec 09, 2010, Bruna Moreira wrote:
+> Check security level on attribute server on each request, and update the
+> "encrypted" flag.
 > ---
->  Makefile.am  |    2 +-
->  acinclude.m4 |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  attrib/gattrib.c    |   13 +++++++++++++
+>  attrib/gattrib.h    |    2 ++
+>  src/attrib-server.c |    7 ++-----
+>  3 files changed, 17 insertions(+), 5 deletions(-)
 
 Pushed upstream. Thanks.
 
