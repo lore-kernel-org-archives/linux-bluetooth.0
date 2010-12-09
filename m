@@ -1,95 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v2] Change obex_service_driver put() signature
-Date: Thu,  9 Dec 2010 08:08:00 +0100
-Message-Id: <1291878480-14865-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Wed, 8 Dec 2010 16:15:11 -0800
+Message-ID: <AANLkTim5HQGNL-vSapeQw_-dJue89pYz7zc8eiShma8j@mail.gmail.com>
+Subject: compat-wireless-2.6.37-rc5 released
+To: linux-wireless <linux-wireless@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This API change is needed for implementing Message Access Profile, as
-MAP uses application parameters in puts also (for example
-SetMessageStatus function, see MAP specification, chapter 5.7) and in
-order to access application parameters headers, access to obex object
-is required.
----
- plugins/ftp.c           |    3 ++-
- plugins/opp.c           |    3 ++-
- plugins/syncevolution.c |    3 ++-
- src/obex.c              |    2 +-
- src/service.h           |    3 ++-
- 5 files changed, 9 insertions(+), 5 deletions(-)
+We're closing in on the 2.6.37 release, now at rc5, so I'll start
+making two releases, a vanilla release and one which has more stuff.
+For now I'll just suck in all pending stable patches (all patches
+marked with Cc: stable@kernel.org on linux-next.git, not only
+Atheros', everyone's). This is:
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 91c77a3..a952f64 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -258,7 +258,8 @@ static int ftp_chkput(struct obex_session *os, void *user_data)
- 	return ret;
- }
- 
--static int ftp_put(struct obex_session *os, void *user_data)
-+static int ftp_put(struct obex_session *os, obex_object_t *obj,
-+						void *user_data)
- {
- 	struct ftp_session *ftp = user_data;
- 	const char *name = obex_get_name(os);
-diff --git a/plugins/opp.c b/plugins/opp.c
-index 05f944f..17c4356 100644
---- a/plugins/opp.c
-+++ b/plugins/opp.c
-@@ -155,7 +155,8 @@ skip_auth:
- 	return ret;
- }
- 
--static int opp_put(struct obex_session *os, void *user_data)
-+static int opp_put(struct obex_session *os, obex_object_t *obj,
-+						void *user_data)
- {
- 	const char *name = obex_get_name(os);
- 	const char *folder = obex_get_root_folder(os);
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index bf436a9..8041df6 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -243,7 +243,8 @@ failed:
- 	return NULL;
- }
- 
--static int synce_put(struct obex_session *os, void *user_data)
-+static int synce_put(struct obex_session *os, obex_object_t *obj,
-+					void *user_data)
- {
- 	return 0;
- }
-diff --git a/src/obex.c b/src/obex.c
-index 6d4430d..1649cd0 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -1089,7 +1089,7 @@ static void cmd_put(struct obex_session *os, obex_t *obex, obex_object_t *obj)
- 		return;
- 	}
- 
--	err = os->service->put(os, os->service_data);
-+	err = os->service->put(os, obj, os->service_data);
- 	if (err < 0)
- 		os_set_response(obj, err);
- }
-diff --git a/src/service.h b/src/service.h
-index 1726c43..a844885 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -34,7 +34,8 @@ struct obex_service_driver {
- 	void (*progress) (struct obex_session *os, void *user_data);
- 	int (*get) (struct obex_session *os, obex_object_t *obj,
- 			gboolean *stream, void *user_data);
--	int (*put) (struct obex_session *os, void *user_data);
-+	int (*put) (struct obex_session *os, obex_object_t *obj,
-+			void *user_data);
- 	int (*chkput) (struct obex_session *os, void *user_data);
- 	int (*setpath) (struct obex_session *os, obex_object_t *obj,
- 							void *user_data);
--- 
-1.7.1
+pending-stable/0001-cfg80211-pass-the-reg-hint-initiator-to-helpers.patch
+pending-stable/0002-cfg80211-fix-allowing-country-IEs-for-WIPHY_FLAG_STR.patch
+pending-stable/0003-cfg80211-fix-disabling-channels-based-on-hints.patch
+pending-stable/0004-ath9k_hw-fix-potential-spurious-tx-error-bit-interpr.patch
+pending-stable/0005-ath9k-simplify-hw-reset-locking.patch
+pending-stable/0006-ath9k-move-the-PCU-lock-to-the-sc-structure.patch
+pending-stable/0007-ath9k-content-DMA-start-stop-through-the-PCU-lock.patch
+pending-stable/0008-ath9k_hw-Fix-XPABIAS-level-configuration-for-AR9003.patch
+pending-stable/0009-ath9k-Fix-bug-in-delimiter-padding-computation.patch
+pending-stable/0010-ath9k-Disable-SWBA-interrupt-on-remove_interface.patch
+pending-stable/0011-mac80211-Fix-STA-disconnect-due-to-MIC-failure.patch
+pending-stable/0012-ath9k-Fix-STA-disconnect-issue-due-to-received-MIC-f.patch
+pending-stable/0013-ath9k-Fix-bug-in-reading-input-gpio-state-for-ar9003.patch
+pending-stable/0014-ath9k_hw-fix-endian-issues-with-CTLs-on-AR9003.patch
 
+You can find the vanilla [1] and extra pending-stable [2] releass on
+the stable download page [3] along with the respective ChangeLog of
+all:
+
+  * The kernel components
+  * compat-wireless
+  * compat
+
+In later releases we will have to consider if we want to cherry pick
+anything extra or leave them as is. These few patches seem tempting to
+suck in:
+
+01-ath9k-OTP.patch
+03-ath9k-no-aggr-VO.patch
+04-mac80211-no-aggr-VO.patch
+05-ath9k-Reintroduce-modparam-to-enable-btcoex.patch
+06-ath9k_hw-fix-A-MPDU-key-search-issues-on-AR9003.patch
+
+Particularly it is now known AR9003 devices will only ship with OTP
+so.. it seems to make sense to actually disable AR9003 on 36 and even
+37 and only have it available with the OTP patch and above EEPROM
+fixes. I'm inclined to just disregard all these and just let us get
+AR9003 from 2.6.38.... but we already have users of AR9003 coming up
+so this can't wait in practice now. This now goes compile-tested and
+fixed for 2.6.31.
+
+[1] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc5-2.tar.bz2
+[2] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-rc5-2-s.tar.bz2
+[3] http://wireless.kernel.org/en/users/Download/stable
+[4] http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/ChangeLog-2.6.37-wireless
+
+  Luis
