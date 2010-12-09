@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTim5HQGNL-vSapeQw_-dJue89pYz7zc8eiShma8j@mail.gmail.com>
-References: <AANLkTim5HQGNL-vSapeQw_-dJue89pYz7zc8eiShma8j@mail.gmail.com>
+In-Reply-To: <alpine.LNX.2.00.1012092329480.25880@swampdragon.chaosbits.net>
+References: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com> <alpine.LNX.2.00.1012092329480.25880@swampdragon.chaosbits.net>
 From: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 9 Dec 2010 17:08:22 -0800
-Message-ID: <AANLkTikFnb=ErjA0VeS6oekExHxT1-Mh5_wa28UqEZZ4@mail.gmail.com>
-Subject: Re: compat-wireless-2.6.37-rc5 released
-To: linux-wireless <linux-wireless@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org,
+Date: Thu, 9 Dec 2010 14:39:08 -0800
+Message-ID: <AANLkTikc_u4NhxdGzwQMjbEe12qYmhq481amazTK-JRc@mail.gmail.com>
+Subject: Re: Start dropping PCMCIA from compat-wireless for 2.6.38+
+To: Jesper Juhl <jj@chaosbits.net>
+Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-kernel@vger.kernel.org,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 8, 2010 at 4:15 PM, Luis R. Rodriguez <mcgrof@gmail.com> wrote:
-> In later releases we will have to consider if we want to cherry pick
-> anything extra or leave them as is. These few patches seem tempting to
-> suck in:
+On Thu, Dec 9, 2010 at 2:31 PM, Jesper Juhl <jj@chaosbits.net> wrote:
+> On Thu, 9 Dec 2010, Luis R. Rodriguez wrote:
 >
-> 01-ath9k-OTP.patch
-> 03-ath9k-no-aggr-VO.patch
-> 04-mac80211-no-aggr-VO.patch
-> 05-ath9k-Reintroduce-modparam-to-enable-btcoex.patch
-> 06-ath9k_hw-fix-A-MPDU-key-search-issues-on-AR9003.patch
->
-> Particularly it is now known AR9003 devices will only ship with OTP
-> so..
+>> I'm going to start dropping PCMCIA stuff from compat-wireless as I
+>> don't think we have any users of it nor interest to keep backporting
+>> it. This entails dropping drivers like orinoco, b43 PCMCIA support,
+>> libertas, as well as bluetooth bluecard_cs, bluecard_cs, dtl1_cs,
+>> bt3c_cs and of course CONFIG_SSB_PCMCIAHOST. If you are a user please
+>> yell now.
+>>
+> Yelling.
+> While I'm not personally a user, my mother is. She still has an old IBM
+> Thinkpad 600 laptop with a PCMCIA card in it that uses the orinoco driver.
 
-So it turns out this is inaccurate, AR9003 devices can ship with
-EEPROM only or with OTP, it will vary, so while 2.6.36 and 2.6.37 will
-not support only OTP based devices 2.6.38 will support both. What we
-can do is cherry pick the OTP patches to the 2.6.36 and 2.6.37
-compat-wireless releases but those two older stock kernels won't have
-support for these.
+And you have your mother using compat-wireless?
 
- Luis
+  Luis
