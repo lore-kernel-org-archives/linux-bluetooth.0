@@ -1,62 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTimJiHhkwb-0PQqc6n3wJwx2WPterQqMCXqzce8z@mail.gmail.com>
-References: <1290763257-12382-1-git-send-email-pavan_savoy@ti.com>
-	<20101130154654.GE5919@vigoh>
-	<AANLkTiktDkjFH=aGbu3f+mkVUgmFDwB6xLW3e1VNXKtz@mail.gmail.com>
-	<20101206212326.GI883@vigoh>
-	<AANLkTimJiHhkwb-0PQqc6n3wJwx2WPterQqMCXqzce8z@mail.gmail.com>
-Date: Thu, 9 Dec 2010 13:17:32 +0530
-Message-ID: <AANLkTimewUbJMax-pv+-JSdnbNZvOU8yTVGV-T+BJBo1@mail.gmail.com>
-Subject: Re: [PATCH v7] Bluetooth: btwilink driver
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: Vitaly Wool <vitalywool@gmail.com>, "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH v2] Change obex_service_driver put() signature
+Date: Thu,  9 Dec 2010 08:08:00 +0100
+Message-Id: <1291878480-14865-1-git-send-email-lkslawek@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo,
+This API change is needed for implementing Message Access Profile, as
+MAP uses application parameters in puts also (for example
+SetMessageStatus function, see MAP specification, chapter 5.7) and in
+order to access application parameters headers, access to obex object
+is required.
+---
+ plugins/ftp.c           |    3 ++-
+ plugins/opp.c           |    3 ++-
+ plugins/syncevolution.c |    3 ++-
+ src/obex.c              |    2 +-
+ src/service.h           |    3 ++-
+ 5 files changed, 9 insertions(+), 5 deletions(-)
 
-On Tue, Dec 7, 2010 at 3:05 AM, Vitaly Wool <vitalywool@gmail.com> wrote:
-> Hi Gustavo,
->
-> On Mon, Dec 6, 2010 at 10:23 PM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
->
->> Can't you differentiate Bluetooth data in a generic way, withou looking =
-if it
->> is ACL, SCO or HCI EVENT? That done, you can just accumulate in a buffer=
- all
->> the Bluetooth data you received in that stream then send it to Bluetooth
->> driver after finish that stream processing.
->
-> I'm afraid he can't do this because he needs to route events to the
-> appropriate entity (BT/FM/GPS). I'm not sure how it can be done
-> without analyzing the incoming packet.
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index 91c77a3..a952f64 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -258,7 +258,8 @@ static int ftp_chkput(struct obex_session *os, void *user_data)
+ 	return ret;
+ }
+ 
+-static int ftp_put(struct obex_session *os, void *user_data)
++static int ftp_put(struct obex_session *os, obex_object_t *obj,
++						void *user_data)
+ {
+ 	struct ftp_session *ftp = user_data;
+ 	const char *name = obex_get_name(os);
+diff --git a/plugins/opp.c b/plugins/opp.c
+index 05f944f..17c4356 100644
+--- a/plugins/opp.c
++++ b/plugins/opp.c
+@@ -155,7 +155,8 @@ skip_auth:
+ 	return ret;
+ }
+ 
+-static int opp_put(struct obex_session *os, void *user_data)
++static int opp_put(struct obex_session *os, obex_object_t *obj,
++						void *user_data)
+ {
+ 	const char *name = obex_get_name(os);
+ 	const char *folder = obex_get_root_folder(os);
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index bf436a9..8041df6 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -243,7 +243,8 @@ failed:
+ 	return NULL;
+ }
+ 
+-static int synce_put(struct obex_session *os, void *user_data)
++static int synce_put(struct obex_session *os, obex_object_t *obj,
++					void *user_data)
+ {
+ 	return 0;
+ }
+diff --git a/src/obex.c b/src/obex.c
+index 6d4430d..1649cd0 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -1089,7 +1089,7 @@ static void cmd_put(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+ 		return;
+ 	}
+ 
+-	err = os->service->put(os, os->service_data);
++	err = os->service->put(os, obj, os->service_data);
+ 	if (err < 0)
+ 		os_set_response(obj, err);
+ }
+diff --git a/src/service.h b/src/service.h
+index 1726c43..a844885 100644
+--- a/src/service.h
++++ b/src/service.h
+@@ -34,7 +34,8 @@ struct obex_service_driver {
+ 	void (*progress) (struct obex_session *os, void *user_data);
+ 	int (*get) (struct obex_session *os, obex_object_t *obj,
+ 			gboolean *stream, void *user_data);
+-	int (*put) (struct obex_session *os, void *user_data);
++	int (*put) (struct obex_session *os, obex_object_t *obj,
++			void *user_data);
+ 	int (*chkput) (struct obex_session *os, void *user_data);
+ 	int (*setpath) (struct obex_session *os, obex_object_t *obj,
+ 							void *user_data);
+-- 
+1.7.1
 
-Think of TI-ST driver as a extension to the HCI-H4 driver or HCI-LL
-with FM and GPS being the additional protocols, and more protocols
-coming in future...
-So some driver has to have a knowledge of the protocols which are on chip.
-the basic arch can be found @ http://omappedia.org/wiki/Wilink_ST
-
-As Vitaly rightly pointed out, the TI-ST driver needs to peek into all
-the protocol's data be it BT, FM or GPS to assemble fragmented data
-(say ACL data coming out of TTY in 2 fragments) or fragment multiple
-protocol data (say HCI-Event + FM Channel 8 event data)....
-Note: we include even the FM and GPS headers to understand protocol
-frames, but they lack a standard unlike Bluetooth...
-
-Since there lacks a generic way to differentiate BT, FM or GPS data at
-TI-ST driver layer,  please suggest what can be done ...
-
-
-> Thanks,
-> =C2=A0 Vitaly
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
->
