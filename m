@@ -1,104 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH] Check the security level on a per request base
-Date: Thu,  9 Dec 2010 09:09:13 -0400
-Message-Id: <1291900153-8541-1-git-send-email-bruna.moreira@openbossa.org>
+Message-ID: <4D00C505.7040500@atheros.com>
+Date: Thu, 9 Dec 2010 17:31:09 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
+MIME-Version: 1.0
+To: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+CC: "dwmw2@infradead.org" <dwmw2@infradead.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] ath3k-fw: Fix EEPROM radio table issue.
+References: <1291367907-3650-1-git-send-email-sbalashanmugam@atheros.com>
+In-Reply-To: <1291367907-3650-1-git-send-email-sbalashanmugam@atheros.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check security level on attribute server on each request, and update the
-"encrypted" flag.
----
- attrib/gattrib.c    |   13 +++++++++++++
- attrib/gattrib.h    |    2 ++
- src/attrib-server.c |    7 ++-----
- 3 files changed, 17 insertions(+), 5 deletions(-)
+On 12/3/2010 2:48 PM, Shanmugamkamatchi Balashanmugam wrote:
+> Updated PID value to 3005 for devices with
+> sflash firmware.
+>
+> Signed-off-by: Bala Shanmugam<sbalashanmugam@atheros.com>
+> ---
+>   WHENCE     |    2 ++
+>   ath3k-1.fw |  Bin 246804 ->  246804 bytes
+>   2 files changed, 2 insertions(+), 0 deletions(-)
+>
+> diff --git a/WHENCE b/WHENCE
+> index 907fe68..0e3468f 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -1101,6 +1101,8 @@ Driver: ath3k - DFU Driver for Atheros bluetooth chipset AR3011
+>   File: ath3k-1.fw
+>   Info: v1.0
+>
+> +Fix EEPROM radio table issue and change PID to 3005
+> +
+>   Licence: Redistributable. See LICENCE.atheros_firmware for details
+>
+>   --------------------------------------------------------------------------
+> diff --git a/ath3k-1.fw b/ath3k-1.fw
+> index 4a5ffb8de898fab1595662742f287493689e2b3b..63aa9b9ad87d3d918e441d921ada9cad08687ae5 100644
+> GIT binary patch
+> delta 129491
+>
+David,
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 1083519..4ed29d9 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -32,6 +32,7 @@
- #include <bluetooth/sdp.h>
- 
- #include "att.h"
-+#include "btio.h"
- #include "gattrib.h"
- 
- struct _GAttrib {
-@@ -489,6 +490,18 @@ static gint event_cmp_by_id(gconstpointer a, gconstpointer b)
- 	return evt->id - id;
- }
- 
-+gboolean g_attrib_is_encrypted(GAttrib *attrib)
-+{
-+	BtIOSecLevel sec_level;
-+
-+	if (!bt_io_get(attrib->io, BT_IO_L2CAP, NULL,
-+			BT_IO_OPT_SEC_LEVEL, &sec_level,
-+			BT_IO_OPT_INVALID))
-+		return FALSE;
-+
-+	return sec_level > BT_IO_SEC_LOW;
-+}
-+
- gboolean g_attrib_unregister(GAttrib *attrib, guint id)
- {
- 	struct event *evt;
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 4306ca4..0940289 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -63,6 +63,8 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode,
- 		GAttribNotifyFunc func, gpointer user_data,
- 					GDestroyNotify notify);
- 
-+gboolean g_attrib_is_encrypted(GAttrib *attrib);
-+
- gboolean g_attrib_unregister(GAttrib *attrib, guint id);
- gboolean g_attrib_unregister_all(GAttrib *attrib);
- 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index f2df853..18759e7 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -145,6 +145,8 @@ static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
- 	/* FIXME: currently, it is assumed an encrypted link is enough for
- 	 * authentication. This will allow to enable the SMP negotiation once
- 	 * it is on upstream kernel. */
-+	if (!channel->encrypted)
-+		channel->encrypted = g_attrib_is_encrypted(channel->attrib);
- 	if (reqs == ATT_AUTHENTICATION && !channel->encrypted)
- 		return ATT_ECODE_INSUFF_ENC;
- 
-@@ -700,7 +702,6 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- {
- 	struct gatt_channel *channel;
- 	GError *gerr = NULL;
--	int sec_level;
- 
- 	if (err) {
- 		error("%s", err->message);
-@@ -712,7 +713,6 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- 	bt_io_get(io, BT_IO_L2CAP, &gerr,
- 			BT_IO_OPT_SOURCE_BDADDR, &channel->src,
- 			BT_IO_OPT_DEST_BDADDR, &channel->dst,
--			BT_IO_OPT_SEC_LEVEL, &sec_level,
- 			BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		error("bt_io_get: %s", gerr->message);
-@@ -725,9 +725,6 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- 	channel->attrib = g_attrib_new(io);
- 	channel->mtu = ATT_DEFAULT_MTU;
- 
--	/* FIXME: the security level needs to checked on every request. */
--	channel->encrypted = sec_level > BT_IO_SEC_LOW;
--
- 	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_EVENTS,
- 				channel_handler, channel, NULL);
- 
--- 
-1.7.0.4
+We have upstreamed the transport driver changes.
+We need this firmware upstreamed soon for our chip to work.
 
+Do you have any comments on this patch?
+
+Regards,
+Bala.
