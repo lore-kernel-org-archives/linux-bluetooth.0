@@ -1,95 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1291954417-18138-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1291954417-18138-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Fri, 10 Dec 2010 12:31:32 +0200
-Message-ID: <AANLkTik8pqd0uaV2kVaeenBOfTPrVeO0YuW2mfQzJy1J@mail.gmail.com>
-Subject: Re: [PATCH] Initial draft of Application registration API
+In-Reply-To: <20101209144103.GA30557@jh-x301>
+References: <3b53a90114d801b0adba526895deed74.squirrel@www.codeaurora.org>
+	<20101209144103.GA30557@jh-x301>
+Date: Fri, 10 Dec 2010 11:51:16 +0200
+Message-ID: <AANLkTik78DiC7TgWtR0q=xPs+ZZq470_md-gJWv8tB8f@mail.gmail.com>
+Subject: Re: A2DP reconfigure with BMW Carkit (supporting multi streams) timeouts.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
+To: roystonr@codeaurora.org, linux-bluetooth@vger.kernel.org,
+	skrovvid@codeaurora.org, rshaffer@codeaurora.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Dec 10, 2010 at 6:13 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
->  doc/attribute-api.txt |   44 +++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 43 insertions(+), 1 deletions(-)
+On Thu, Dec 9, 2010 at 4:41 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Royston,
 >
-> diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-> index 23808e6..ab62313 100644
-> --- a/doc/attribute-api.txt
-> +++ b/doc/attribute-api.txt
-> @@ -23,7 +23,6 @@ fully transparent and a differentiation becomes unimportant in the future.
->  A service consists of some generic service information and a set of
->  characteristics. All characteristic are presented as object path as well.
+> On Thu, Dec 09, 2010, roystonr@codeaurora.org wrote:
+>> Change expected:
+>> avdtp_get_seps should be able to provide the SEP of the one used in the
+>> AVDTP_CLOSE previously. But there weren't any previously closed streams
+>> then provide the SEP which is not in use (as done currently).
+>>
+>> Kindly let us know whether our understanding is right and can this be a
+>> suspected cause of the issue seen. Correct if mistaken.
 >
-> -
->  Local Service hierarchy
->  =======================
+> Sounds like that might be the cause. Have you experimented with patching
+> the bluez code to reuse the same SEP as was used for the Close? If not
+> I'd advice you to do that so we can be sure that a change to the ACP SEP
+> selection logic makes sense.
 >
-> @@ -37,6 +36,35 @@ Methods
->  Properties
->
->
-> +Adapter Application Attribute hierarchy
-> +=======================================
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.Attrib
-> +Object path    [variable prefix]/{hci0,hci1,...}
-> +
-> +Methods                void RegisterApplication(array{string} uuids, dict settings)
-> +
-> +                       Method to allow applications to control automatic
-> +                       connections to known devices.
-> +
-> +                       "settings" dictionary defines the wanted application
-> +                       connection parameters. Defined values:
-> +                       - Latency: low, medium and high
-> +                       - BandWidth: TBD
-> +                       - AutoConnect: boolean
-> +
-> +                       Latency parameter controls the scan and connect
-> +                       interval. AutoConnect parameter controls automatic
-> +                       connections if a bonded device emits a connectable
-> +                       advertising report.
-> +
-> +               void UnregisterApplication(array{string} uuids)
-> +
-> +                       Unregister a previously registered application.
-> +                       Remotes are automatically disconnected if no more
-> +                       applications are interested in the given services.
-> +
->  Device Service hierarchy
->  ========================
->
-> @@ -154,3 +182,17 @@ Object path        freely definable
->  Methods                void ValueChanged(object characteristic, array{byte})
->
->                        New raw value of the Characteristic Value attribute.
-> +
-> +Adapter Application Agent hierarchy
-> +====================================
-> +
-> +Service                unique name
-> +Interface      org.bluez.Application
-> +Object path    freely definable
-> +
-> +Methods                void Connected(object device, array{object} services)
-> +
-> +                       Indication that a given remote device was found
-> +                       and the connection has been established. service
-> +                       object represents an instance of a primary service
-> +                       that the application is interested in.
+> Right now the reconfiguration happens in audio/a2dp.c where there's a
+> setup->reconfigure flag to track if a new stream should be configured
+> after receiving close_ind. The a2dp_reconfigure function in a2dp.c is
+> responsible for selecting the remote SEP. Could you try the attached
+> (completely untested) patch to see if it helps? It stores the old remote
+> SEP in the setup structure when starting the Close procedure in which
+> case a2dp_reconfigure() shouldn't try to reselect a new remote SEP but
+> use the stored one instead.
 
-It seems it is missing the object path on RegisterAplication to be
-used to call Connected, also I could see some use of this Application
-Agent for regular (non-LE) profiles, but of course the settings would
-have a bit different purpose for those.
+I guess it would be better to have the call to
+avdtp_stream_get_remote_sep on close_cfm, it is probably safer to do
+there and less code too, but the fix is probably right.
 
 -- 
 Luiz Augusto von Dentz
