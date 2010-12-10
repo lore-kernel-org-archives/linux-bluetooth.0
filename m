@@ -1,44 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Dec 2010 09:17:16 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: Yuri Ershov <ext-yuri.ershov@nokia.com>
-Cc: "ext Gustavo F. Padovan" <padovan@profusion.mobi>,
-	andrei.emeltchenko@nokia.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
-Message-ID: <20101210071716.GK874@null>
-References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
- <20101206211516.GH883@vigoh>
- <4CFE32A0.6090601@nokia.com>
- <20101207155037.GA2944@vigoh>
- <4CFF6359.7000305@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4CFF6359.7000305@nokia.com>
+In-Reply-To: <1291954417-18138-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1291954417-18138-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 10 Dec 2010 02:13:12 -0300
+Message-ID: <AANLkTi=yGjNbLuy-7Gk9tWnMXV2r+DhKF5xjr4zfZXFb@mail.gmail.com>
+Subject: Re: [PATCH] Initial draft of Application registration API
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yuri,
+Hi,
 
-On Wed, Dec 08, 2010 at 01:52:09PM +0300, Yuri Ershov wrote:
+It should be a RFC instead of PATCH in the subject prefix.
 
+On Fri, Dec 10, 2010 at 1:13 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Add new methods to allow automatic connection when a known remote device
+> which supports the wanted services is found.
+>
+> Overview: RegisterApplication method allows a given application to
+> controls the connection establishment procedure for bonded devices.
+> StartDiscovery() implements an interleaved discovery, switching between
+> inquiry and LE active scanning. For single mode devices found, an
+> application can call CreateDevice or CreatePairedDevice, these methods
+> will trigger the Discover All Primary Services and SSP(if applied).
 
-> >>>So in which situations (n == p), or (p == p->next)? That should happen only
-> >>>when p is the only element in the list, then p == head, right?
-> >>The (n == p) is in situation, when sk is unlinked by task
-> >>responsible for handling connect/disconnect requests while the
-> >>"bt_accept_dequeue". This condition is indirect checking of sk
-> >>validity.
-> >
-> >Why not using a list lock here instead? Fits a way better.
-> >
-> Yes, it's better. I tried to use the locks in this function, but it
-> slows down the task handling connect/disconnect/etc. events and the
-> task skips some events from fast clients.
-> 
+Please read SMP instead of SSP for CreatePairedDevice. GATT/ATT
+implements a per attribute permission, for BlueZ we are planning to
+use CreatePairedDevice to trigger the SMP/key distribution. SMP
+negotiation is being implemented completely in the kernel, but at the
+moment there isn't key storage and management interface between the
+kernel and the userspace to notify the keys. SMP just works method
+will be triggered when the client access the first attribute which
+requires encryption or when a encrypted link is created.
 
-What kind of problems you exactly got with locks? Maybe they should be fixed
-also.
+IMHO, automatic connections needs to be restricted to bonded devices.
+If necessary, we can also use the Trusted property.
 
--- 
-Ville
+Claudio
