@@ -1,31 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Holger Schurig <holgerschurig@gmail.com>
-To: "Luis R. Rodriguez" <mcgrof@gmail.com>
-Subject: Re: Start dropping PCMCIA from compat-wireless for 2.6.38+
-Date: Mon, 13 Dec 2010 08:46:16 +0100
-Cc: "linux-wireless" <linux-wireless@vger.kernel.org>,
-	linux-kernel@vger.kernel.org,
-	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>
-References: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com>
-In-Reply-To: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com>
+Message-ID: <4D03DC83.8010200@aircable.net>
+Date: Sat, 11 Dec 2010 17:18:11 -0300
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201012130846.16522.holgerschurig@gmail.com>
-Sender: linux-wireless-owner@vger.kernel.org
+To: BlueZ <linux-bluetooth@vger.kernel.org>
+Subject: EDR support
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please, if the burden is not too much, keep it for the benefit of 
-embedded people.
+Hi guys,
 
-If you have some embedded device (e.g. ARM based), it's usually not so 
-easy to hieve this device to newest 2.6.3[5-7] kernel. However, it's 
-easy to use your adapted kernel, and compile compat-wireless against it.
+I was checking the latest BlueZ source code and the kernel source code, 
+and I noticed that by default EDR is disabled, when a dongle is detected 
+net/bluetooth/hci_core.c initializes the packet types with DM1, DH1 and 
+HV1, and then net/bluetooth/hci_event.c does it for DM3-5 DH3-5 and 
+HV3-5, but it never initializes the 2DHx or 3DHx. Was it made on purpose 
+or is it a bug in the code?
 
-I'm in such a situation with libertas_cs.
+I just figured out how to help and try fixing it, but kernel hacking 
+isn't an easy to do task, and would prefer to get professional advice first.
 
-Greetings,
-Holger
-
--- 
-Homepage: http://www.holgerschurig.de
+Manuel
