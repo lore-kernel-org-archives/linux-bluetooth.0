@@ -1,104 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
-Subject: [PATCH] Setting default Link Policy according to the chip supported features
-Date: Mon, 13 Dec 2010 15:19:14 +0100
-Message-Id: <1292249954-8544-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <20101213132145.GA13767@jh-x301>
+References: <AANLkTin4xG5KUEpn6QaZA0V6y3cDvxpWhwRJhMrE_8QO@mail.gmail.com>
+	<20101213120003.GA12104@jh-x301>
+	<AANLkTim2Q9dgj0t+AAcww33O=pdOHJp=sfQ_F7s8N08i@mail.gmail.com>
+	<20101213132145.GA13767@jh-x301>
+Date: Mon, 13 Dec 2010 14:56:05 +0100
+Message-ID: <AANLkTin=vZ6rwx+8+KvdGtpSmWdSuvnyrwgCsLK_Axfo@mail.gmail.com>
+Subject: Re: How to implement multiple instances of obexd service?
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-By default all features are enabled (RSWITCH, HOLD, PARK, SNIFF).
-When "read local supported features" complete event occurs, not supported
-features are disabled and then "Write default link policy" command with
-supported features is sent.
+On Mon, Dec 13, 2010 at 2:21 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Slawek,
+>
+> On Mon, Dec 13, 2010, Slawomir Bochenski wrote:
+>> On Mon, Dec 13, 2010 at 1:00 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> >> And what about assigned bitmask values for services in src/obex.h?
+>> >
+>> > Do we need to change something there?
+>>
+>> In that case src/obex.h is the only place that will need simple
+>> modification for now -- MAP service value for services bitmask. This
+>> may be OBEX_MAP (or OBEX_MAS) and I supppose its value should be the
+>> next one available -- (1 << 8).
+>
+> Right, we'll need that. I thought you were talking about something
+> related to multiple MAS instances (which I don't think affect this
+> bitmask in any way).
+>
+> Johan
+>
 
-On behalf of ST-Ericsson SA
----
- plugins/hciops.c |   35 +++++++++++++++--------------------
- 1 files changed, 15 insertions(+), 20 deletions(-)
+Yes, if we were to implement multiple instances using multiple
+obex_service_driver structures (which would be needed in order to
+support additional sdp records and additional channels), then we would
+again have to add one define for each planned instance as obexd allows
+adding only one service driver per service.
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 4af137c..44039ba 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -297,6 +297,7 @@ static void start_adapter(int index)
- {
- 	uint8_t events[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00, 0x00 };
- 	uint8_t inqmode;
-+	uint16_t policy;
- 
- 	if (VER(index).lmp_ver > 1) {
- 		if (FEATURES(index)[5] & LMP_SNIFF_SUBR)
-@@ -345,6 +346,20 @@ static void start_adapter(int index)
- 		hci_send_cmd(SK(index), OGF_HOST_CTL,
- 				OCF_READ_INQ_RESPONSE_TX_POWER_LEVEL, 0, NULL);
- 
-+	/* Set default link policy */
-+	if (!(FEATURES(index)[0] & LMP_RSWITCH))
-+		main_opts.link_policy &= ~HCI_LP_RSWITCH;
-+	if (!(FEATURES(index)[0] & LMP_HOLD))
-+		main_opts.link_policy &= ~HCI_LP_HOLD;
-+	if (!(FEATURES(index)[0] & LMP_SNIFF))
-+		main_opts.link_policy &= ~HCI_LP_SNIFF;
-+	if (!(FEATURES(index)[1] & LMP_PARK))
-+		main_opts.link_policy &= ~HCI_LP_PARK;
-+
-+	policy = htobs(main_opts.link_policy);
-+	hci_send_cmd(SK(index), OGF_LINK_POLICY,
-+				OCF_WRITE_DEFAULT_LINK_POLICY, 2, &policy);
-+
- 	CURRENT_COD(index) = 0;
- 	memset(EIR(index), 0, sizeof(EIR(index)));
- 
-@@ -1949,7 +1964,6 @@ static void at_child_exit(void)
- static void device_devup_setup(int index)
- {
- 	struct hci_dev_info di;
--	uint16_t policy;
- 	read_stored_link_key_cp cp;
- 
- 	DBG("hci%d", index);
-@@ -1972,11 +1986,6 @@ static void device_devup_setup(int index)
- 					WRITE_PAGE_TIMEOUT_CP_SIZE, &cp);
- 	}
- 
--	/* Set default link policy */
--	policy = htobs(main_opts.link_policy);
--	hci_send_cmd(SK(index), OGF_LINK_POLICY,
--				OCF_WRITE_DEFAULT_LINK_POLICY, 2, &policy);
--
- 	bacpy(&cp.bdaddr, BDADDR_ANY);
- 	cp.read_all = 1;
- 	hci_send_cmd(SK(index), OGF_HOST_CTL, OCF_READ_STORED_LINK_KEY,
-@@ -1997,7 +2006,6 @@ static void init_pending(int index)
- static void init_device(int index)
- {
- 	struct hci_dev_req dr;
--	struct hci_dev_info di;
- 	int dd;
- 	pid_t pid;
- 
-@@ -2042,19 +2050,6 @@ static void init_device(int index)
- 		error("Can't set link mode on hci%d: %s (%d)",
- 						index, strerror(errno), errno);
- 
--	/* Set link policy for BR/EDR HCI devices */
--	if (hci_devinfo(index, &di) < 0)
--		goto fail;
--
--	if (!ignore_device(&di)) {
--		dr.dev_opt = main_opts.link_policy;
--		if (ioctl(dd, HCISETLINKPOL, (unsigned long) &dr) < 0 &&
--							errno != ENETDOWN) {
--			error("Can't set link policy on hci%d: %s (%d)",
--						index, strerror(errno), errno);
--		}
--	}
--
- 	/* Start HCI device */
- 	if (ioctl(dd, HCIDEVUP, index) < 0 && errno != EALREADY) {
- 		error("Can't init device hci%d: %s (%d)",
 -- 
-1.7.0.4
-
+Slawomir Bochenski
