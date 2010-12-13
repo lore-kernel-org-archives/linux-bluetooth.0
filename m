@@ -1,30 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Allow Bluez to select flushable or non-flushable ACL packets
-Date: Mon, 13 Dec 2010 16:38:24 +0200
-Message-Id: <1292251105-31130-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 13 Dec 2010 16:27:25 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Setting default Link Policy according to the chip
+ supported features
+Message-ID: <20101213142725.GA15075@jh-x301>
+References: <1292249954-8544-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1292249954-8544-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Hi Pawel,
 
-Slight modification of original patch from Nick Pelly <npelly@google.com>
+On Mon, Dec 13, 2010, Pawel Wieczorkiewicz wrote:
+> By default all features are enabled (RSWITCH, HOLD, PARK, SNIFF).
+> When "read local supported features" complete event occurs, not supported
+> features are disabled and then "Write default link policy" command with
+> supported features is sent.
+> 
+> On behalf of ST-Ericsson SA
+> ---
+>  plugins/hciops.c |   35 +++++++++++++++--------------------
+>  1 files changed, 15 insertions(+), 20 deletions(-)
 
-Changes: rebasing, simplifying logic, using SOL_BLUETOOTH instead of SOL_L2CAP.
+Thanks! The patch has been pushed upstream.
 
-No changes done for RFCOMM sockets since no use case exist so far but can be
-added later
-
-Andrei Emeltchenko (1):
-  Bluetooth: Use non-flushable pb flag by default for ACL data on
-    capable chipsets.
-
- include/net/bluetooth/bluetooth.h |    5 +++++
- include/net/bluetooth/hci.h       |    2 ++
- include/net/bluetooth/hci_core.h  |    1 +
- include/net/bluetooth/l2cap.h     |    2 ++
- net/bluetooth/hci_core.c          |    6 ++++--
- net/bluetooth/l2cap.c             |   33 +++++++++++++++++++++++++++++++--
- 6 files changed, 45 insertions(+), 4 deletions(-)
-
+Johan
