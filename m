@@ -1,27 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+From: Holger Schurig <holgerschurig@gmail.com>
+To: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Subject: Re: Start dropping PCMCIA from compat-wireless for 2.6.38+
+Date: Mon, 13 Dec 2010 08:46:16 +0100
+Cc: "linux-wireless" <linux-wireless@vger.kernel.org>,
+	linux-kernel@vger.kernel.org,
+	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>
+References: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com>
+In-Reply-To: <AANLkTik4W+UxgyPjVyHDeEFTRCkXdDBQ9obgPkpnhzGW@mail.gmail.com>
 MIME-Version: 1.0
-Date: Mon, 13 Dec 2010 12:10:12 +0100
-Message-ID: <AANLkTin4xG5KUEpn6QaZA0V6y3cDvxpWhwRJhMrE_8QO@mail.gmail.com>
-Subject: How to implement multiple instances of obexd service?
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201012130846.16522.holgerschurig@gmail.com>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to fully implement Message Access Profile, support for more
-than one so-called instance is needed (MAP specification, chapter
-3.1.8). According to specs, separate e-mail accounts on MSE should be
-represented by separate MAS instances. This requires one SDP record
-per instance and those differ by MASInstanceID and ServiceName.
+Please, if the burden is not too much, keep it for the benefit of 
+embedded people.
 
-As I understand this also implies that each and every instance needs
-its own separate RFCOMM channel?
+If you have some embedded device (e.g. ARM based), it's usually not so 
+easy to hieve this device to newest 2.6.3[5-7] kernel. However, it's 
+easy to use your adapted kernel, and compile compat-wireless against it.
 
-What would be the preffered way to deal with this ugliness in obexd
-code? If separate channels are needed how to keep this in compliance
-with bluez doc/assigned-numbers.txt? And what about assigned bitmask values for
-services in src/obex.h?
+I'm in such a situation with libertas_cs.
+
+Greetings,
+Holger
 
 -- 
-Slawomir Bochenski
+Homepage: http://www.holgerschurig.de
