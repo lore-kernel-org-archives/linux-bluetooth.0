@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] Bluetooth: Add management events for controller addition & removal
-Date: Mon, 13 Dec 2010 21:07:07 +0200
-Message-Id: <1292267227-22028-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/5] Bluetooth: Add read_info management command
+Date: Mon, 13 Dec 2010 21:07:06 +0200
+Message-Id: <1292267227-22028-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1292267227-22028-1-git-send-email-johan.hedberg@gmail.com>
 References: <1292267227-22028-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,118 +11,172 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-This patch adds Bluetooth Management interface events for controller
-addition and removal. The events correspond to the existing HCI_DEV_REG
-and HCI_DEV_UNREG stack internal events.
+This patch implements the read_info command which is used to fetch basic
+info about an adapter.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +
- include/net/bluetooth/mgmt.h     |   10 +++++++++
- net/bluetooth/hci_core.c         |    2 +
- net/bluetooth/mgmt.c             |   41 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 55 insertions(+), 0 deletions(-)
+ include/net/bluetooth/mgmt.h |   19 +++++++++
+ net/bluetooth/mgmt.c         |   90 ++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 101 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1992fac..3786ee8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -662,6 +662,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
- 
- /* Management interface */
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
-+int mgmt_index_added(u16 index);
-+int mgmt_index_removed(u16 index);
- 
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 70985aa..ca29c13 100644
+index c2b4c83..70985aa 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -75,3 +75,13 @@ struct mgmt_ev_controller_error {
- 	__le16 index;
- 	__u8 error_code;
+@@ -39,6 +39,25 @@ struct mgmt_rp_read_index_list {
+ 	__le16 index[0];
  } __packed;
-+
-+#define MGMT_EV_INDEX_ADDED		0x0004
-+struct mgmt_ev_index_added {
+ 
++#define MGMT_OP_READ_INFO		0x0004
++struct mgmt_cp_read_info {
 +	__le16 index;
 +} __packed;
-+
-+#define MGMT_EV_INDEX_REMOVED		0x0005
-+struct mgmt_ev_index_removed {
++struct mgmt_rp_read_info {
 +	__le16 index;
++	__u8 type;
++	__u8 powered;
++	__u8 discoverable;
++	__u8 pairable;
++	__u8 sec_mode;
++	bdaddr_t bdaddr;
++	__u8 dev_class[3];
++	__u8 features[8];
++	__u16 manufacturer;
++	__u8 hci_ver;
++	__u16 hci_rev;
 +} __packed;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 51c61f7..1a4ec97 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -960,6 +960,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 		}
- 	}
- 
-+	mgmt_index_added(hdev->id);
- 	hci_notify(hdev, HCI_DEV_REG);
- 
- 	return id;
-@@ -989,6 +990,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 	for (i = 0; i < NUM_REASSEMBLY; i++)
- 		kfree_skb(hdev->reassembly[i]);
- 
-+	mgmt_index_removed(hdev->id);
- 	hci_notify(hdev, HCI_DEV_UNREG);
- 
- 	if (hdev->rfkill) {
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d6c5a32..f827fd9 100644
+index 7a8e321..d6c5a32 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -265,3 +265,44 @@ done:
- 	kfree(buf);
- 	return err;
- }
-+
-+static int mgmt_event(u16 event, void *data, u16 data_len)
+@@ -32,6 +32,33 @@
+ #define MGMT_VERSION	0
+ #define MGMT_REVISION	1
+ 
++static int cmd_status(struct sock *sk, u16 cmd, u8 status)
 +{
 +	struct sk_buff *skb;
 +	struct mgmt_hdr *hdr;
++	struct mgmt_ev_cmd_status *ev;
 +
-+	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_ATOMIC);
++	BT_DBG("sock %p", sk);
++
++	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
 +	if (!skb)
 +		return -ENOMEM;
 +
-+	bt_cb(skb)->channel = HCI_CHANNEL_CONTROL;
-+
 +	hdr = (void *) skb_put(skb, sizeof(*hdr));
-+	hdr->opcode = cpu_to_le16(event);
-+	hdr->len = cpu_to_le16(data_len);
 +
-+	memcpy(skb_put(skb, data_len), data, data_len);
++	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
++	hdr->len = cpu_to_le16(sizeof(*ev));
 +
-+	hci_send_to_sock(NULL, skb);
-+	kfree_skb(skb);
++	ev = (void *) skb_put(skb, sizeof(*ev));
++	ev->status = status;
++	put_unaligned_le16(cmd, &ev->opcode);
++
++	if (sock_queue_rcv_skb(sk, skb) < 0)
++		kfree_skb(skb);
 +
 +	return 0;
 +}
 +
-+int mgmt_index_added(u16 index)
-+{
-+	struct mgmt_ev_index_added ev;
+ static int read_version(struct sock *sk)
+ {
+ 	struct sk_buff *skb;
+@@ -112,26 +139,70 @@ static int read_index_list(struct sock *sk)
+ 	return 0;
+ }
+ 
+-static int cmd_status(struct sock *sk, u16 cmd, u8 status)
++static int read_controller_info(struct sock *sk, unsigned char *data, u16 len)
+ {
+ 	struct sk_buff *skb;
+ 	struct mgmt_hdr *hdr;
+-	struct mgmt_ev_cmd_status *ev;
++	struct mgmt_ev_cmd_complete *ev;
++	struct mgmt_rp_read_info *rp;
++	struct mgmt_cp_read_info *cp;
++	struct hci_dev *hdev;
++	u16 dev_id;
+ 
+ 	BT_DBG("sock %p", sk);
+ 
+-	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
++	if (len != 2)
++		return cmd_status(sk, MGMT_OP_READ_INFO, EINVAL);
 +
-+	put_unaligned_le16(index, &ev.index);
++	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + sizeof(*rp), GFP_ATOMIC);
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
+ 	hdr = (void *) skb_put(skb, sizeof(*hdr));
+-
+-	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_STATUS);
+-	hdr->len = cpu_to_le16(sizeof(*ev));
++	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_COMPLETE);
++	hdr->len = cpu_to_le16(sizeof(*ev) + sizeof(*rp));
+ 
+ 	ev = (void *) skb_put(skb, sizeof(*ev));
+-	ev->status = status;
+-	put_unaligned_le16(cmd, &ev->opcode);
++	put_unaligned_le16(MGMT_OP_READ_INFO, &ev->opcode);
 +
-+	return mgmt_event(MGMT_EV_INDEX_ADDED, &ev, sizeof(ev));
-+}
++	rp = (void *) skb_put(skb, sizeof(*rp));
 +
-+int mgmt_index_removed(u16 index)
-+{
-+	struct mgmt_ev_index_added ev;
++	cp = (void *) data;
++	dev_id = get_unaligned_le16(&cp->index);
 +
-+	put_unaligned_le16(index, &ev.index);
++	BT_DBG("request for hci%u", dev_id);
 +
-+	return mgmt_event(MGMT_EV_INDEX_REMOVED, &ev, sizeof(ev));
-+}
++	hdev = hci_dev_get(dev_id);
++	if (!hdev) {
++		kfree_skb(skb);
++		return cmd_status(sk, MGMT_OP_READ_INFO, ENODEV);
++	}
++
++	hci_dev_lock_bh(hdev);
++
++	put_unaligned_le16(hdev->id, &rp->index);
++	rp->type = hdev->dev_type;
++
++	rp->powered = test_bit(HCI_UP, &hdev->flags);
++	rp->discoverable = test_bit(HCI_ISCAN, &hdev->flags);
++	rp->pairable = test_bit(HCI_PSCAN, &hdev->flags);
++
++	if (test_bit(HCI_AUTH, &hdev->flags))
++		rp->sec_mode = 3;
++	else if (hdev->ssp_mode > 0)
++		rp->sec_mode = 4;
++	else
++		rp->sec_mode = 2;
++
++	bacpy(&rp->bdaddr, &hdev->bdaddr);
++	memcpy(rp->features, hdev->features, 8);
++	memcpy(rp->dev_class, hdev->dev_class, 3);
++	put_unaligned_le16(hdev->manufacturer, &rp->manufacturer);
++	rp->hci_ver = hdev->hci_ver;
++	put_unaligned_le16(hdev->hci_rev, &rp->hci_rev);
++
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
+ 
+ 	if (sock_queue_rcv_skb(sk, skb) < 0)
+ 		kfree_skb(skb);
+@@ -176,6 +247,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_READ_INDEX_LIST:
+ 		err = read_index_list(sk);
+ 		break;
++	case MGMT_OP_READ_INFO:
++		err = read_controller_info(sk, buf + sizeof(*hdr), len);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, opcode, 0x01);
 -- 
 1.7.2.3
 
