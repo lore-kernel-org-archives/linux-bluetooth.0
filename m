@@ -1,135 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/10] serial: use btd_error_failed()
-Date: Mon, 13 Dec 2010 19:33:06 -0200
-Message-Id: <1292275987-13799-10-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1292275987-13799-9-git-send-email-padovan@profusion.mobi>
-References: <1292275987-13799-1-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-2-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-3-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-4-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-5-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-6-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-7-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-8-git-send-email-padovan@profusion.mobi>
- <1292275987-13799-9-git-send-email-padovan@profusion.mobi>
+Message-ID: <4D069115.7070509@codeaurora.org>
+Date: Mon, 13 Dec 2010 13:33:09 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	rshaffer@codeaurora.org
+Subject: Re: [PATCH 1/1] Support for reading long Characteristic Values.
+References: <1292261066-28100-1-git-send-email-bgix@codeaurora.org> <1292261066-28100-3-git-send-email-bgix@codeaurora.org> <20101213183951.GB7549@eris> <4D067A6C.6080404@codeaurora.org> <20101213203336.GC7549@eris>
+In-Reply-To: <20101213203336.GC7549@eris>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- serial/port.c  |   20 +++++++++-----------
- serial/proxy.c |    8 ++------
- 2 files changed, 11 insertions(+), 17 deletions(-)
+Hi Vinicius,
 
-diff --git a/serial/port.c b/serial/port.c
-index 0d1e600..1458f06 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -248,7 +248,7 @@ static void open_notify(int fd, int err, struct serial_port *port)
- 	if (err) {
- 		/* Max tries exceeded */
- 		port_release(port);
--		reply = failed(port->msg, strerror(err));
-+		reply = btd_error_failed(port->msg, strerror(err));
- 	} else {
- 		port->fd = fd;
- 		reply = g_dbus_create_reply(port->msg,
-@@ -316,7 +316,7 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 
- 	if (conn_err) {
- 		error("%s", conn_err->message);
--		reply = failed(port->msg, conn_err->message);
-+		reply = btd_error_failed(port->msg, conn_err->message);
- 		goto fail;
- 	}
- 
-@@ -335,7 +335,7 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 	if (port->id < 0) {
- 		int err = errno;
- 		error("ioctl(RFCOMMCREATEDEV): %s (%d)", strerror(err), err);
--		reply = failed(port->msg, strerror(err));
-+		reply = btd_error_failed(port->msg, strerror(err));
- 		g_io_channel_shutdown(chan, TRUE, NULL);
- 		goto fail;
- 	}
-@@ -378,13 +378,13 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	if (err < 0) {
- 		error("Unable to get service record: %s (%d)", strerror(-err),
- 			-err);
--		reply = failed(port->msg, strerror(-err));
-+		reply = btd_error_failed(port->msg, strerror(-err));
- 		goto failed;
- 	}
- 
- 	if (!recs || !recs->data) {
- 		error("No record found");
--		reply = failed(port->msg, "No record found");
-+		reply = btd_error_failed(port->msg, "No record found");
- 		goto failed;
- 	}
- 
-@@ -392,7 +392,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 
- 	if (sdp_get_access_protos(record, &protos) < 0) {
- 		error("Unable to get access protos from port record");
--		reply = failed(port->msg, "Invalid channel");
-+		reply = btd_error_failed(port->msg, "Invalid channel");
- 		goto failed;
- 	}
- 
-@@ -409,7 +409,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 				BT_IO_OPT_INVALID);
- 	if (!port->io) {
- 		error("%s", gerr->message);
--		reply = failed(port->msg, gerr->message);
-+		reply = btd_error_failed(port->msg, gerr->message);
- 		g_error_free(gerr);
- 		goto failed;
- 	}
-@@ -505,13 +505,11 @@ static DBusMessage *port_connect(DBusConnection *conn,
- 
- 	err = connect_port(port);
- 	if (err < 0) {
--		DBusMessage *reply;
--
- 		error("%s", strerror(-err));
- 		g_dbus_remove_watch(conn, port->listener_id);
- 		port->listener_id = 0;
--		reply = failed(msg, strerror(-err));
--		return reply;
-+
-+		return btd_error_failed(msg, strerror(-err));
- 	}
- 
- 	return NULL;
-diff --git a/serial/proxy.c b/serial/proxy.c
-index c779c4e..20aea7d 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -553,11 +553,8 @@ static DBusMessage *proxy_enable(DBusConnection *conn,
- 	err = enable_proxy(prx);
- 	if (err == -EALREADY)
- 		return failed(msg, "Already enabled");
--	else if (err == -ENOMEM)
--		return failed(msg, "Unable to allocate new service record");
- 	else if (err < 0)
--		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
--				"Proxy enable failed (%s)", strerror(-err));
-+		return btd_error_failed(msg, strerror(-err));
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -1051,8 +1048,7 @@ static DBusMessage *create_proxy(DBusConnection *conn,
- 	else if (err == -EALREADY)
- 		return btd_error_already_exists(msg);
- 	else if (err < 0)
--		return g_dbus_create_error(msg, ERROR_INTERFACE "Failed",
--				"Proxy creation failed (%s)", strerror(-err));
-+		return btd_error_failed(msg, strerror(-err));
- 
- 	proxy->owner = g_strdup(dbus_message_get_sender(msg));
- 	proxy->watch = g_dbus_add_disconnect_watch(conn, proxy->owner,
+On 12/13/2010 12:33 PM, Vinicius Costa Gomes wrote:
+> On 11:56 Mon 13 Dec, Brian Gix wrote:
+> [trimmed]
+ >
+ >>>> +
+ >>>> +	if (ret_val != 0)
+ >>>> +		return;
+ >>>> +
+ >>>> +	status = ATT_ECODE_INSUFF_RESOURCES;
+ >>>> +
+ >>>> +done:
+ >>>> +	long_read->func(status, res_pdu, res_len, long_read->user_data);
+ >>>
+ >>> If g_attrib_send() fails, load_read->result_data may be leaking here.
+>>
+>> Is there no guarantee that the GAttribResultFunc parameter will be
+>> invoked if there is a non-Zero return value from g_attrib_send?
+>>
+>> If there is paths that could result in a non-response (abnormal link
+>> termination?) then you are correct, and I will need to rethink clean-up.
+>
+> The case I was referring was when g_attrib_send() cannot allocate memory for
+> the command.
+>
+
+I don't think this is an issue, because if g_attrib_send() cannot 
+allocate memory, then it will return a 0, and fall through to the 
+completion and clean-up. However, I like the idea of doing all clean-up 
+in the destructor anyway, which resolves the memory leak potential.
+
+
+>>>  [...]
+>> Also:
+>> If we intend to use the ID of the (original) command to cancel the GATT
+>> procedure, I propose the following:
+>>
+>> Compound GATT procedure such as the Read Long procedure that I am
+>> implementing, should save the original ID returned by g_attrib_send in
+>> the nested user_data structure such as I have done. When subsequent ATT
+>> commands are sent as part of the same GATT procedure, the new command
+>> shall be assigned the same ID as the original.  This could be done with
+>> a function in gattrib.c with the prototype:
+>>
+>> g_attrib_set_id(GAttrib *attrib, guint old_id, guint new_id);
+>>
+>> This would allow the upper layer to cancel the entire GATT procedure,
+>> even if it is partially completed.
+>>
+>> This same methodology could then be applied to long writes, and other
+>> compound GATT procedures.
+>>
+>> What do you think?
+>
+> Sounds good, I just don't know about messing with the commands id's,
+> maybe having some thing like command groups.
+>
+> For example, adding these funtions:
+>
+> guint g_attrib_send_full(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
+> 				guint16 len, guint group, GAttribResultFunc func,
+> 				gpointer user_data, GDestroyNotify notify);
+>
+> gboolean g_attrib_cancel_group(GAttrib *attrib, guint group);
+>
+> How do this look?
+>
+
+My biggest objection would be that to go this route, I think we would 
+want to extend this "command group" to all GATT procedures, and not just 
+the ones known or suspected to be Compound.  I don't think that 
+canceling a "Characteristic Value Read" procedure should be any 
+different (or use a different parameter type) than canceling "Find 
+Primary Service", for example.
+
+Do you think everything in gatt.c should use these "command groups"? 
+And if so, by what mechanism would the "group number" remain unique?
+
+It doesn't seem to me to be such a horrible overloading of the id. I do 
+see that when a cancel is called, that it is important that only one 
+command with that ID is in the queue. However, this reclaimation/reuse 
+of the old ID would only occur after the prior instance is in the 
+process of being destroyed. The danger I suppose would be the misuse of 
+this renumbering capability by an entity other than gatt.c.
+
+
+I'm sorry this is getting long winded BUT:
+
+This also highlights the inherent danger of allowing multiple Requests 
+to be queued up. If are to allow a Read-Value, Write-Value, Read-Value 
+sequence of commands to be enqueued onto the attrib->queue, it will be 
+impossible to correctly implement any of the compound Read or Write 
+commands, because the subsequent "Read-Blob" would be added to the end 
+of the queue, and the read could be split around a write.  GATT/ATT was 
+always intended to be a single outstanding request (and procedure) at a 
+time kind of protocol, and having a FIFO attrib->queue subverts that intent.
+
+To get compound GATT procedures to work properly (while maintaining the 
+Attrib queuing mechanism) we may need to restructure gattrib.c such that 
+we can add the subsequent commands to the *head* of the queue, and not 
+call wake_up_sender in the received_data() function until after the 
+cmd->func() has been invoked, and given the opportunity to "continue the 
+current procedure".
+
+>
+> Cheers,
+
+
 -- 
-1.7.3.2
-
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
