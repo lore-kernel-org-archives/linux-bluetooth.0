@@ -1,94 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Dec 2010 15:15:29 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	rshaffer@codeaurora.org
-Subject: Re: [PATCH 1/1] Implempent READ_BLOB encoding for ATT.
-Message-ID: <20101213181529.GA7549@eris>
-References: <1292261066-28100-1-git-send-email-bgix@codeaurora.org>
- <1292261066-28100-2-git-send-email-bgix@codeaurora.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 13 Dec 2010 15:46:24 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	gregkh@suse.de, Stefan Seyfried <seife+kernel@b1-systems.com>,
+	Oliver Neukum <oneukum@suse.de>
+Subject: Re: [PATCH] btusb: Fix log spamming due to autosuspend
+Message-ID: <20101213174624.GB3142@vigoh>
+References: <1291150148-14376-1-git-send-email-stefan.seyfried@googlemail.com>
+ <1291200140.4795.91.camel@aeonflux>
+ <20101201154714.517289f7@susi>
+ <20101201174910.GA16125@vigoh>
+ <20101209201657.0b7964fc@susi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292261066-28100-2-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20101209201657.0b7964fc@susi>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Stefan,
 
-On 09:24 Mon 13 Dec, Brian Gix wrote:
-> Added enc_read_blob_req() API to ATT transport, to enable
-> the reading of attributes that exceed the length of the
-> MTU.
-> 
-> The packet composed conforms to the Bluetooth Core v4.0 specification.
-> 
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum 
+* Stefan Seyfried <stefan.seyfried@googlemail.com> [2010-12-09 20:16:57 +0100]:
 
-Not sure if this signature belongs in the patch comment.
-
+> Hi all,
 > 
-> ---
->  attrib/att.c |   18 ++++++++++++++++++
->  attrib/att.h |    2 ++
->  2 files changed, 20 insertions(+), 0 deletions(-)
+> On Wed, 1 Dec 2010 15:49:10 -0200
+> "Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
 > 
-> diff --git a/attrib/att.c b/attrib/att.c
-> index 445b192..d0879f8 100644
-> --- a/attrib/att.c
-> +++ b/attrib/att.c
-> @@ -542,6 +542,24 @@ uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, int len)
->  	return min_len;
->  }
->  
-> +uint16_t enc_read_blob_req(uint16_t handle, uint16_t offset, uint8_t *pdu,
-> +			   						int len)
-
-I couldn't apply the patches because there were a mix between tabs and spaces,
-please use only tabs for indentation.
-
-> +{
-> +	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) + sizeof(offset);
-> +
-> +	if (pdu == NULL)
-> +		return 0;
-> +
-> +	if (len < min_len)
-> +		return 0;
-> +
-> +	pdu[0] = ATT_OP_READ_BLOB_REQ;
-> +	att_put_u16(handle, &pdu[1]);
-> +	att_put_u16(offset, &pdu[3]);
-> +
-> +	return min_len;
-> +}
-> +
->  uint16_t dec_read_req(const uint8_t *pdu, int len, uint16_t *handle)
->  {
->  	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle);
-> diff --git a/attrib/att.h b/attrib/att.h
-> index 2c8c724..46bdad4 100644
-> --- a/attrib/att.h
-> +++ b/attrib/att.h
-> @@ -202,6 +202,8 @@ uint16_t enc_write_req(uint16_t handle, const uint8_t *value, int vlen,
->  uint16_t dec_write_req(const uint8_t *pdu, int len, uint16_t *handle,
->  						uint8_t *value, int *vlen);
->  uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, int len);
-> +uint16_t enc_read_blob_req(uint16_t handle, uint16_t offset, uint8_t *pdu,
-> +			   						int len);
->  uint16_t dec_read_req(const uint8_t *pdu, int len, uint16_t *handle);
->  uint16_t enc_read_resp(uint8_t *value, int vlen, uint8_t *pdu, int len);
->  uint16_t dec_read_resp(const uint8_t *pdu, int len, uint8_t *value, int *vlen);
-> -- 
-> 1.7.1
+> > Hi Stefan,
+> > 
+> > * Stefan Seyfried <stefan.seyfried@googlemail.com> [2010-12-01 15:47:14 +0100]:
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > > > > If a device is autosuspended an inability to resubmit URBs is
+> > > > > to be expected. Check the error code and only log real errors.
+> > > > > (Now that autosuspend is default enabled for btusb, those log
+> > > > > messages were happening all the time e.g. with a BT mouse)
+> > > > > 
+> > > > > Signed-off-by: Stefan Seyfried <seife+kernel@b1-systems.com>
+> > > > > Signed-off-by: Oliver Neukum <oneukum@suse.de>
+> > > > 
+> > > > we had a similar one some time ago, but I am fine with this one as well.
+> > > > Actually this one might be a bit better since it still keeps some
+> > > > errors.
+> > > > 
+> > > > Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> > > 
+> > > Could you (or Gustavo) send it to Linus? It's pretty trivial, but the
+> > > messages are annoying and users will complain if they are still in 2.6.37
+> > > final.
+> > 
+> > I'll send it, applied to bluetooth-2.6 tree. Thanks.
+> 
+> unfortunately, it does not seem to make it into 2.6.37?
+
+Patch is in net-2.6 right now. Should go to mainline soon.
 
 -- 
-Vinicius
+Gustavo F. Padovan
+http://profusion.mobi
