@@ -1,23 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: Patches to fix kernel side init/deinit of adapters
-Date: Tue, 14 Dec 2010 14:04:02 +0200
-Message-Id: <1292328244-5335-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 14 Dec 2010 10:56:21 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/10] More btd_error_* patches
+Message-ID: <20101214085621.GA1713@jh-x301>
+References: <1292275987-13799-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1292275987-13799-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-Before I start implementing support for powering on and off adapters
-through the management interface some basic things in the current code
-need fixing. The first issue is that the __hci_request doesn't work the
-way it's supposed to when called from hci_open_dev. It's supposed to
-return when the entire request is complete but right now it returns as
-soon as the first command in the request is complete.
+On Mon, Dec 13, 2010, Gustavo F. Padovan wrote:
+> This patch set adds a new error function btd_error_failed(), which has a str
+> parameter to enable a more accurate error report in the case the usual
+> btd_error_* does not fit.
+> 
+> After this patch set there will 10 occurrences of g_dbus_create_error() inside
+> bluez code (not counting health/ here)
 
-The first patch in this set is needed to make it possible to take
-advantage of the HCI_INIT flag in the second patch.
+Thanks. The patches are now upstream. However, I did have to push other
+fixes on top of them since a few functions that you assumed were
+returning a proper negative errno value were in fact only returning -1.
 
 Johan
-
