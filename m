@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Dec 2010 16:44:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Error should be returned instead of unnecessary
- dict_append_array()
-Message-ID: <20101214144448.GA10118@jh-x301>
-References: <1292336427-20380-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292336427-20380-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
+From: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pawel Wieczorkiewicz <pawel.wieczorkiewicz@tieto.com>
+Subject: [PATCH] Error should be returned instead of unnecessary dict_append_array()
+Date: Tue, 14 Dec 2010 15:20:27 +0100
+Message-Id: <1292336427-20380-1-git-send-email-pawel.wieczorkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pawel,
+If there are no adapter up and running, there would be
+no elements to be added using dict_append_array(). We
+should return DBus error ".DoesNotExist", rather than
+appending NULL pointer and zero elements.
 
-On Tue, Dec 14, 2010, Pawel Wieczorkiewicz wrote:
-> If there are no adapter up and running, there would be
-> no elements to be added using dict_append_array(). We
-> should return DBus error ".DoesNotExist", rather than
-> appending NULL pointer and zero elements.
-> 
-> On behalf of ST-Ericsson SA
-> ---
->  src/manager.c |    9 +++++++++
->  1 files changed, 9 insertions(+), 0 deletions(-)
+On behalf of ST-Ericsson SA
+---
+ src/manager.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-Nack. Manager.GetProperties shouldn't fail if there no adapters. There
-will be more properties coming in the future (a "DefaultAdapter"
-property for sure) and could either have an empty array for the Adapters
-or just leave out that key from the dictionary (i.e. in the worst case
-we've got an empty dictionary, but that's fine too imho).
+diff --git a/src/manager.c b/src/manager.c
+index c8ec7e5..9060180 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -185,12 +185,21 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 		array[i] = (char *) adapter_get_path(adapter);
+ 		i++;
+ 	}
++
++	if (!i)
++		goto error;
++
+ 	dict_append_array(&dict, "Adapters", DBUS_TYPE_OBJECT_PATH, &array, i);
+ 	g_free(array);
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	return reply;
++
++error:
++	g_free(array);
++	g_free(reply);
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist", "Adapter does not exist");
+ }
+ 
+ static GDBusMethodTable manager_methods[] = {
+-- 
+1.7.0.4
 
-Johan
