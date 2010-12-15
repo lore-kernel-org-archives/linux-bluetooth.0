@@ -2,28 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Fix memory leak of gattrib commands queue
-Date: Wed, 15 Dec 2010 17:00:09 -0300
-Message-Id: <1292443209-31156-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH 5/5] Remove unneeded variable
+Date: Wed, 15 Dec 2010 16:54:12 -0300
+Message-Id: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1292442852-26457-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1292442852-26457-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- attrib/gattrib.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ src/glib-helper.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 4ed29d9..eace01b 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -177,6 +177,7 @@ void g_attrib_unref(GAttrib *attrib)
- 	while ((c = g_queue_pop_head(attrib->queue)))
- 		command_destroy(c);
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index edc46d8..8cf29ae 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -525,7 +525,6 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ {
+ 	struct gattrib_context *ctxt;
+ 	GIOChannel *io;
+-	GError *gerr = NULL;
  
-+	g_queue_free(attrib->queue);
- 	attrib->queue = NULL;
+ 	ctxt = g_try_new0(struct gattrib_context, 1);
+ 	if (ctxt == NULL)
+@@ -538,14 +537,14 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 	ctxt->destroy = destroy;
  
- 	for (l = attrib->events; l; l = l->next)
+ 	if (psm < 0)
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_CID, GATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	else
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_PSM, psm,
 -- 
 1.7.3.3
 
