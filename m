@@ -1,145 +1,240 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] convert more dbus errors to btd_error_*
-Date: Wed, 15 Dec 2010 19:29:28 -0200
-Message-Id: <1292448568-16854-3-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1292448568-16854-2-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 2/3] remove error_common_reply()
+Date: Wed, 15 Dec 2010 19:29:27 -0200
+Message-Id: <1292448568-16854-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1292448568-16854-1-git-send-email-padovan@profusion.mobi>
 References: <1292448568-16854-1-git-send-email-padovan@profusion.mobi>
- <1292448568-16854-2-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Remove old dbus error report function. This patch doesn't make things
+really really better, but is a start.
 ---
- audio/headset.c |    7 ++-----
- serial/port.c   |    8 +-------
- serial/proxy.c  |   12 ++----------
- src/adapter.c   |   10 ++--------
- 4 files changed, 7 insertions(+), 30 deletions(-)
+ audio/gateway.c |   18 ++++++++++--------
+ audio/headset.c |   37 +++++++++++++++----------------------
+ audio/sink.c    |    7 ++++---
+ audio/source.c  |    7 ++++---
+ src/error.c     |   18 ------------------
+ src/error.h     |    3 ---
+ 6 files changed, 33 insertions(+), 57 deletions(-)
 
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 6a095ca..da899a0 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -254,10 +254,11 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
+ 	return;
+ 
+ fail:
+-	if (gw->msg)
+-		error_common_reply(dev->conn, gw->msg,
+-						ERROR_INTERFACE ".Failed",
+-						"Connection attempt failed");
++	if (gw->msg) {
++		DBusMessage *reply;
++		reply = btd_error_failed(gw->msg, "Connect failed");
++		g_dbus_send_message(dev->conn, reply);
++	}
+ 
+ 	change_state(dev, GATEWAY_STATE_DISCONNECTED);
+ }
+@@ -333,10 +334,11 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	return;
+ 
+ fail:
+-	if (gw->msg)
+-		error_common_reply(dev->conn, gw->msg,
+-					ERROR_INTERFACE ".NotSupported",
+-					"Not supported");
++	if (gw->msg) {
++		DBusMessage *reply = btd_error_failed(gw->msg,
++					gerr ? gerr->message : strerror(-err));
++		g_dbus_send_message(dev->conn, reply);
++	}
+ 
+ 	change_state(dev, GATEWAY_STATE_DISCONNECTED);
+ 
 diff --git a/audio/headset.c b/audio/headset.c
-index 55bdc61..6fbb4dd 100644
+index 34b2b89..55bdc61 100644
 --- a/audio/headset.c
 +++ b/audio/headset.c
-@@ -1696,8 +1696,7 @@ static DBusMessage *hs_connect(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_already_connected(msg);
+@@ -176,19 +176,12 @@ struct event {
  
- 	if (hs->hfp_handle && !ag.telephony_ready)
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
--					"Telephony subsystem not ready");
-+		return btd_error_failed(msg, "Telephony subsystem not ready");
+ static GSList *headset_callbacks = NULL;
  
- 	device->auto_connect = FALSE;
- 
-@@ -1874,9 +1873,7 @@ static DBusMessage *hs_set_gain(DBusConnection *conn,
- 
- 	err = headset_set_gain(device, gain, type);
- 	if (err < 0)
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--						".InvalidArgument",
--						"Must be less than or equal to 15");
-+		return btd_error_invalid_args(msg);
- 
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
-diff --git a/serial/port.c b/serial/port.c
-index 33450b3..233e317 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -234,12 +234,6 @@ void port_release_all(void)
- 	g_slist_free(devices);
- }
- 
--static inline DBusMessage *failed(DBusMessage *msg, const char *description)
--{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
--							"%s", description);
+-static DBusHandlerResult error_not_supported(DBusConnection *conn,
+-							DBusMessage *msg)
++static void error_connect_failed(DBusConnection *conn, DBusMessage *msg,
++								int err)
+ {
+-	return error_common_reply(conn, msg, ERROR_INTERFACE ".NotSupported",
+-							"Not supported");
 -}
 -
- static void open_notify(int fd, int err, struct serial_port *port)
- {
- 	struct serial_device *device = port->device;
-@@ -495,7 +489,7 @@ static DBusMessage *port_connect(DBusConnection *conn,
+-static DBusHandlerResult error_connection_attempt_failed(DBusConnection *conn,
+-						DBusMessage *msg, int err)
+-{
+-	return error_common_reply(conn, msg,
+-			ERROR_INTERFACE ".ConnectionAttemptFailed",
+-			err < 0 ? strerror(-err) : "Connection attempt failed");
++	DBusMessage *reply = btd_error_failed(msg,
++			err < 0 ? strerror(-err) : "Connect failed");
++	g_dbus_send_message(conn, reply);
+ }
+ 
+ static int rfcomm_connect(struct audio_device *device, headset_stream_cb_t cb,
+@@ -567,9 +560,7 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 		if (p != NULL) {
+ 			p->err = -errno;
+ 			if (p->msg)
+-				error_connection_attempt_failed(dev->conn,
+-								p->msg,
+-								p->err);
++				error_connect_failed(dev->conn, p->msg, p->err);
+ 			pending_connect_finalize(dev);
+ 		}
+ 
+@@ -679,7 +670,7 @@ static void hfp_slc_complete(struct audio_device *dev)
+ 	p->err = sco_connect(dev, NULL, NULL, NULL);
+ 	if (p->err < 0) {
+ 		if (p->msg)
+-			error_connection_attempt_failed(dev->conn, p->msg, p->err);
++			error_connect_failed(dev->conn, p->msg, p->err);
+ 		pending_connect_finalize(dev);
+ 	}
+ }
+@@ -1397,7 +1388,7 @@ void headset_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 
+ failed:
+ 	if (p && p->msg)
+-		error_connection_attempt_failed(dev->conn, p->msg, p->err);
++		error_connect_failed(dev->conn, p->msg, p->err);
+ 	pending_connect_finalize(dev);
+ 	if (hs->rfcomm)
+ 		headset_set_state(dev, HEADSET_STATE_CONNECTED);
+@@ -1454,7 +1445,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 		error("Unable to get service record: %s (%d)",
+ 							strerror(-err), -err);
+ 		p->err = -err;
+-		error_connection_attempt_failed(dev->conn, p->msg, p->err);
++		error_connect_failed(dev->conn, p->msg, p->err);
+ 		goto failed;
  	}
  
- 	if (port->listener_id)
--		return failed(msg, "Port already in use");
-+		return btd_error_failed(msg, "Port already in use");
+@@ -1503,7 +1494,7 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	if (err < 0) {
+ 		error("Unable to connect: %s (%d)", strerror(-err), -err);
+ 		p->err = -err;
+-		error_connection_attempt_failed(dev->conn, p->msg, p->err);
++		error_connect_failed(dev->conn, p->msg, p->err);
+ 		goto failed;
+ 	}
  
- 	port->listener_id = g_dbus_add_disconnect_watch(conn,
- 						dbus_message_get_sender(msg),
-diff --git a/serial/proxy.c b/serial/proxy.c
-index 20aea7d..b1ee65e 100644
---- a/serial/proxy.c
-+++ b/serial/proxy.c
-@@ -131,12 +131,6 @@ static void proxy_free(struct serial_proxy *prx)
- 	g_free(prx);
+@@ -1513,8 +1504,10 @@ failed_not_supported:
+ 	if (p->svclass == HANDSFREE_SVCLASS_ID &&
+ 			get_records(dev, NULL, NULL, NULL) == 0)
+ 		return;
+-	if (p->msg)
+-		error_not_supported(dev->conn, p->msg);
++	if (p->msg) {
++		DBusMessage *reply = btd_error_not_supported(p->msg);
++		g_dbus_send_message(dev->conn, reply);
++	}
+ failed:
+ 	p->svclass = 0;
+ 	pending_connect_finalize(dev);
+@@ -2667,7 +2660,7 @@ void headset_shutdown(struct audio_device *dev)
+ 	struct pending_connect *p = dev->headset->pending;
+ 
+ 	if (p && p->msg)
+-		error_connection_attempt_failed(dev->conn, p->msg, ECANCELED);
++		error_connect_failed(dev->conn, p->msg, ECANCELED);
+ 
+ 	pending_connect_finalize(dev);
+ 	headset_set_state(dev, HEADSET_STATE_DISCONNECTED);
+diff --git a/audio/sink.c b/audio/sink.c
+index 5746c55..2d5db18 100644
+--- a/audio/sink.c
++++ b/audio/sink.c
+@@ -253,10 +253,11 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 	sink->stream_state = new_state;
  }
  
--static inline DBusMessage *failed(DBusMessage *msg, const char *description)
--{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
--							"%s", description);
--}
--
- static void add_lang_attr(sdp_record_t *r)
+-static DBusHandlerResult error_failed(DBusConnection *conn,
+-					DBusMessage *msg, const char * desc)
++static void error_failed(DBusConnection *conn, DBusMessage *msg,
++							const char *desc)
  {
- 	sdp_lang_attr_t base_lang;
-@@ -551,9 +545,7 @@ static DBusMessage *proxy_enable(DBusConnection *conn,
- 	int err;
- 
- 	err = enable_proxy(prx);
--	if (err == -EALREADY)
--		return failed(msg, "Already enabled");
--	else if (err < 0)
-+	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
- 	return dbus_message_new_method_return(msg);
-@@ -565,7 +557,7 @@ static DBusMessage *proxy_disable(DBusConnection *conn,
- 	struct serial_proxy *prx = data;
- 
- 	if (!prx->io)
--		return failed(msg, "Not enabled");
-+		return btd_error_failed(msg, "Not enabled");
- 
- 	/* Remove the watches and unregister the record */
- 	disable_proxy(prx);
-diff --git a/src/adapter.c b/src/adapter.c
-index 73c8a9b..2b66490 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -146,12 +146,6 @@ static inline DBusMessage *adapter_not_ready(DBusMessage *msg)
- 			"Adapter is not ready");
+-	return error_common_reply(conn, msg, ERROR_INTERFACE ".Failed", desc);
++	DBusMessage *reply = btd_error_failed(msg, desc);
++	g_dbus_send_message(conn, reply);
  }
  
--static inline DBusMessage *not_in_progress(DBusMessage *msg, const char *str)
+ static gboolean stream_setup_retry(gpointer user_data)
+diff --git a/audio/source.c b/audio/source.c
+index 29ceb0f..6d266f2 100644
+--- a/audio/source.c
++++ b/audio/source.c
+@@ -206,10 +206,11 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 	source->stream_state = new_state;
+ }
+ 
+-static DBusHandlerResult error_failed(DBusConnection *conn,
+-					DBusMessage *msg, const char * desc)
++static void error_failed(DBusConnection *conn, DBusMessage *msg,
++							const char *desc)
+ {
+-	return error_common_reply(conn, msg, ERROR_INTERFACE ".Failed", desc);
++	DBusMessage *reply = btd_error_failed(msg, desc);
++	g_dbus_send_message(conn, reply);
+ }
+ 
+ static gboolean stream_setup_retry(gpointer user_data)
+diff --git a/src/error.c b/src/error.c
+index 25f89f6..7d3afd4 100644
+--- a/src/error.c
++++ b/src/error.c
+@@ -31,24 +31,6 @@
+ 
+ #include "error.h"
+ 
+-/* Helper function - internal use only */
+-DBusHandlerResult error_common_reply(DBusConnection *conn, DBusMessage *msg,
+-					const char *name, const char *descr)
 -{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotInProgress",
--								"%s", str);
+-	DBusMessage *derr;
+-
+-	if (!conn || !msg)
+-		return DBUS_HANDLER_RESULT_HANDLED;
+-
+-	derr = dbus_message_new_error(msg, name, descr);
+-	if (!derr)
+-		return DBUS_HANDLER_RESULT_NEED_MEMORY;
+-
+-	g_dbus_send_message(conn, derr);
+-
+-	return DBUS_HANDLER_RESULT_HANDLED;
 -}
 -
- static int found_device_cmp(const struct remote_dev_info *d1,
- 			const struct remote_dev_info *d2)
+ DBusMessage *btd_error_invalid_args(DBusMessage *msg)
  {
-@@ -1232,7 +1226,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	ba2str(&adapter->bdaddr, srcaddr);
+ 	return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArguments",
+diff --git a/src/error.h b/src/error.h
+index 0f2eb22..b8c06ce 100644
+--- a/src/error.h
++++ b/src/error.h
+@@ -27,9 +27,6 @@
  
- 	if (check_address(srcaddr) < 0)
--		return adapter_not_ready(msg);
-+		return btd_error_invalid_args(msg);
+ #define ERROR_INTERFACE "org.bluez.Error"
  
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
-@@ -1511,7 +1505,7 @@ static DBusMessage *cancel_device_creation(DBusConnection *conn,
- 
- 	device = adapter_find_device(adapter, address);
- 	if (!device || !device_is_creating(device, NULL))
--		return not_in_progress(msg, "Device creation not in progress");
-+		return btd_error_does_not_exist(msg);
- 
- 	if (!device_is_creating(device, sender))
- 		return btd_error_not_authorized(msg);
+-DBusHandlerResult error_common_reply(DBusConnection *conn, DBusMessage *msg,
+-					const char *name, const char *descr);
+-
+ DBusMessage *btd_error_invalid_args(DBusMessage *msg);
+ DBusMessage *btd_error_busy(DBusMessage *msg);
+ DBusMessage *btd_error_already_exists(DBusMessage *msg);
 -- 
 1.7.3.2
 
