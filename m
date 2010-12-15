@@ -1,243 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Dec 2010 08:35:25 -0800 (PST)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Use non-flushable pb flag by default for ACL
- data on capable chipsets.
-In-Reply-To: <20101214192223.GD18509@vigoh>
-Message-ID: <alpine.DEB.2.00.1012150817580.12898@linux-sea-02>
-References: <1292251105-31130-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1292251105-31130-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <20101214192223.GD18509@vigoh>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Add AVDTP SRC stream send buffer size verification
+Date: Wed, 15 Dec 2010 11:48:53 +0200
+Message-Id: <1292406533-18574-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1292406533-18574-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1292406533-18574-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Functions get_send_buffer_size and set_send_buffer_size are added to
+avdpt.c.
 
-On Tue, 14 Dec 2010, Gustavo F. Padovan wrote:
+get_send_buffer_size returns size of send buffer for a given socket
+on success or error code on failure. set_send_buffer_size sets size
+of send buffer for a given socket, and returns 0 on success or error
+code on failure.
 
-> Hi Andrei,
->
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-12-13 16:38:25 +0200]:
->
->> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->>
->> Modification of Nick Pelly <npelly@google.com> patch.
->>
->> With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
->> makes ACL data packets non-flushable by default on compatible chipsets, and
->> adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
->> data packets for a given L2CAP socket. This is useful for A2DP data which can
->> be safely discarded if it can not be delivered within a short time (while
->> other ACL data should not be discarded).
->>
->> Note that making ACL data flushable has no effect unless the automatic flush
->> timeout for that ACL link is changed from its default of 0 (infinite).
+Size of send buffer for L2CAP socket for SRC AVDTP stream is verified
+during establishment of a new transport channel. If the size is less
+than twice of outgoing L2CAP MTU, then it is considered as being
+insufficient to handle streaming data reliably.
 
-This is a great feature to add, not only for A2DP.  Both ERTM and 
-streaming mode only really make sense on unreliable links.
+In this case buffer size is increased to be twice of MTU size. Such
+fixes some IOP problems with car-kits that use large MTU for music
+playback.
+---
+ audio/avdtp.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 53 insertions(+), 0 deletions(-)
 
->> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> ---
->>  include/net/bluetooth/bluetooth.h |    5 +++++
->>  include/net/bluetooth/hci.h       |    2 ++
->>  include/net/bluetooth/hci_core.h  |    1 +
->>  include/net/bluetooth/l2cap.h     |    2 ++
->>  net/bluetooth/hci_core.c          |    6 ++++--
->>  net/bluetooth/l2cap.c             |   33 +++++++++++++++++++++++++++++++--
->>  6 files changed, 45 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->> index 0c5e725..ed7d775 100644
->> --- a/include/net/bluetooth/bluetooth.h
->> +++ b/include/net/bluetooth/bluetooth.h
->> @@ -64,6 +64,11 @@ struct bt_security {
->>
->>  #define BT_DEFER_SETUP	7
->>
->> +#define BT_FLUSHABLE	8
->> +
->> +#define BT_FLUSHABLE_OFF	0
->> +#define BT_FLUSHABLE_ON		1
->> +
->>  #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
->>  #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
->>  #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index 29a7a8c..333d5cb 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -150,6 +150,7 @@ enum {
->>  #define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
->>
->>  /* ACL flags */
->> +#define ACL_START_NO_FLUSH	0x00
->>  #define ACL_CONT		0x01
->>  #define ACL_START		0x02
->>  #define ACL_ACTIVE_BCAST	0x04
->> @@ -193,6 +194,7 @@ enum {
->>  #define LMP_EDR_ESCO_3M	0x40
->>  #define LMP_EDR_3S_ESCO	0x80
->>
->> +#define LMP_NO_FLUSH	0x01
->>  #define LMP_SIMPLE_PAIR	0x08
->>
->>  /* Connection modes */
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index 1992fac..9778bc8 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -456,6 +456,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->>  #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
->>  #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
->>  #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
->> +#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
->
-> IMHO lmp_flush_capable() makes more sense. We can avoid things like
-> (!lmp_no_flush_capable(dev)) and add two negatives in the same comparison.
->
->>
->>  /* ----- HCI protocols ----- */
->>  struct hci_proto {
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 7ad25ca..af35711 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -75,6 +75,7 @@ struct l2cap_conninfo {
->>  #define L2CAP_LM_TRUSTED	0x0008
->>  #define L2CAP_LM_RELIABLE	0x0010
->>  #define L2CAP_LM_SECURE		0x0020
->> +#define L2CAP_LM_FLUSHABLE	0x0040
->
-> Not using this anywhere.
->
->>
->>  /* L2CAP command codes */
->>  #define L2CAP_COMMAND_REJ	0x01
->> @@ -327,6 +328,7 @@ struct l2cap_pinfo {
->>  	__u8		sec_level;
->>  	__u8		role_switch;
->>  	__u8		force_reliable;
->> +	__u8		flushable;
->>
->>  	__u8		conf_req[64];
->>  	__u8		conf_len;
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 51c61f7..c0d776b 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -1380,7 +1380,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
->>
->>  	skb->dev = (void *) hdev;
->>  	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
->> -	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
->> +	hci_add_acl_hdr(skb, conn->handle, flags);
->>
->>  	list = skb_shinfo(skb)->frag_list;
->>  	if (!list) {
->> @@ -1398,12 +1398,14 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
->>  		spin_lock_bh(&conn->data_q.lock);
->>
->>  		__skb_queue_tail(&conn->data_q, skb);
->> +		flags &= ~ACL_START;
->> +		flags |= ACL_CONT;
->>  		do {
->>  			skb = list; list = list->next;
->>
->>  			skb->dev = (void *) hdev;
->>  			bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
->> -			hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
->> +			hci_add_acl_hdr(skb, conn->handle, flags);
->>
->>  			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
->>
->> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index c791fcd..c7f25c2 100644
->> --- a/net/bluetooth/l2cap.c
->> +++ b/net/bluetooth/l2cap.c
->> @@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
->>  static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
->>  {
->>  	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
->> +	u8 flags;
->>
->>  	BT_DBG("code 0x%2.2x", code);
->>
->>  	if (!skb)
->>  		return;
->>
->> -	hci_send_acl(conn->hcon, skb, 0);
->> +	if (lmp_no_flush_capable(conn->hcon->hdev))
->> +		flags = ACL_START_NO_FLUSH;
->> +	else
->> +		flags = ACL_START;
->> +
->> +	hci_send_acl(conn->hcon, skb, flags);
->
-> I also agree that l2cap commands should be non-flushable. Just pass
-> ACL_START_NO_FLUSH to hci_send_acl() here.
-> You should add this check to l2cap_do_send() instead.
->
->>  }
->>
->>  static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
->> @@ -900,6 +906,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
->>  		pi->sec_level = l2cap_pi(parent)->sec_level;
->>  		pi->role_switch = l2cap_pi(parent)->role_switch;
->>  		pi->force_reliable = l2cap_pi(parent)->force_reliable;
->> +		pi->flushable = l2cap_pi(parent)->flushable;
->>  	} else {
->>  		pi->imtu = L2CAP_DEFAULT_MTU;
->>  		pi->omtu = 0;
->> @@ -915,6 +922,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
->>  		pi->sec_level = BT_SECURITY_LOW;
->>  		pi->role_switch = 0;
->>  		pi->force_reliable = 0;
->> +		pi->flushable = BT_FLUSHABLE_OFF;
->>  	}
->>
->>  	/* Default config options */
->> @@ -2098,6 +2106,20 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
->>  		bt_sk(sk)->defer_setup = opt;
->>  		break;
->>
->> +	case BT_FLUSHABLE:
->> +		if (get_user(opt, (u32 __user *) optval)) {
->> +			err = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		if (opt > BT_FLUSHABLE_ON) {
->> +			err = -EINVAL;
->> +			break;
->> +		}
->> +
->> +		l2cap_pi(sk)->flushable = opt;
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 1683e7c..34b95fd 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -838,6 +838,40 @@ static gboolean transport_cb(GIOChannel *chan, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
++static int get_send_buffer_size(int sk)
++{
++	int size;
++	socklen_t optlen = sizeof(size);
++
++	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &optlen) < 0) {
++		int err = -errno;
++		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
++									-err);
++		return err;
++	}
++
++	/*
++	 * Doubled value is returned by getsockopt since kernel uses that
++	 * space for its own purposes (see man 7 socket, bookkeeping overhead
++	 * for SO_SNDBUF).
++	 */
++	return size / 2;
++}
++
++static int set_send_buffer_size(int sk, int size)
++{
++	socklen_t optlen = sizeof(size);
++
++	if (setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, optlen) < 0) {
++		int err = -errno;
++		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
++									-err);
++		return err;
++	}
++
++	return 0;
++}
++
+ static void handle_transport_connect(struct avdtp *session, GIOChannel *io,
+ 					uint16_t imtu, uint16_t omtu)
+ {
+@@ -865,6 +899,25 @@ static void handle_transport_connect(struct avdtp *session, GIOChannel *io,
+ 	stream->omtu = omtu;
+ 	stream->imtu = imtu;
+ 
++	/* only if local SEP is of type SRC */
++	if (sep->info.type == AVDTP_SEP_TYPE_SOURCE) {
++		int sk, buf_size, min_buf_size;
++
++		sk = g_io_channel_unix_get_fd(stream->io);
++		buf_size = get_send_buffer_size(sk);
++		if (buf_size < 0)
++			goto proceed;
++
++		DBG("sk %d, omtu %d, send buffer size %d", sk, omtu, buf_size);
++		min_buf_size = omtu * 2;
++		if (buf_size < min_buf_size) {
++			DBG("send buffer size to be increassed to %d",
++								min_buf_size);
++			set_send_buffer_size(sk, min_buf_size);
++		}
++	}
++
++proceed:
+ 	if (!stream->open_acp && sep->cfm && sep->cfm->open)
+ 		sep->cfm->open(session, sep, stream, NULL, sep->user_data);
+ 
+-- 
+1.7.0.4
 
-Does it make sense to check the HCI device for flush capability here? 
-If the HCI device is not capable, this option should remain false. 
-This would also let the application use getsockopt() to find out if 
-the link is really flushable or not.
-
->
-> You are not using this flushable value anywhere. Something is wrong here.
-
-I agree - like Gustavo mentioned above, l2cap_do_send() needs to be 
-checking l2cap_pi(sk)->flushable and setting the flags in 
-hci_send_acl() appropriately.
-
-There is one more thing missing:  Even though there is an L2CAP socket 
-option to set flush_to, and the flush_to is passed around during L2CAP 
-configuration, there is no use of the "Write Automatic Flush Timeout" 
-HCI command to tell the baseband what the flush timeout is!  Since the 
-flush timeout is shared across all connections on the ACL, how should 
-BlueZ handle the case where different flush timeouts are set on 
-connections that share the same ACL?  (My guess is that either the 
-longest or shortest timeout should be used, but there are good 
-arguments either way)
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
