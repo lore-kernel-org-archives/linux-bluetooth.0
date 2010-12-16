@@ -1,40 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 16 Dec 2010 16:33:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix sending duplicate speaker/microphone gains to the
+ headset
+Message-ID: <20101216143332.GB13322@jh-x301>
+References: <1292508801-15581-1-git-send-email-luiz.dentz@gmail.com>
+ <1292508801-15581-2-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.00.1012150817580.12898@linux-sea-02>
-References: <1292251105-31130-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1292251105-31130-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20101214192223.GD18509@vigoh>
-	<alpine.DEB.2.00.1012150817580.12898@linux-sea-02>
-Date: Thu, 16 Dec 2010 16:40:54 +0200
-Message-ID: <AANLkTi=Kfm9jV0HA=Sa9=hs1meXthrpZEzn5-czTaSO+@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Use non-flushable pb flag by default for ACL
- data on capable chipsets.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1292508801-15581-2-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Wed, Dec 15, 2010 at 6:35 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
-<skipped>
-> There is one more thing missing:  Even though there is an L2CAP socket
-> option to set flush_to, and the flush_to is passed around during L2CAP
-> configuration, there is no use of the "Write Automatic Flush Timeout" HCI
-> command to tell the baseband what the flush timeout is!  Since the flush
-> timeout is shared across all connections on the ACL, how should BlueZ handle
-> the case where different flush timeouts are set on connections that share
-> the same ACL?  (My guess is that either the longest or shortest timeout
-> should be used, but there are good arguments either way)
+On Thu, Dec 16, 2010, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> Current code only prevent duplicate D-Bus signals, so in case headset
+> changes the volume a client may set the same volume level again which
+> would be send as new volume level.
+> 
+> To fix this headset_set_gain now return -EALREADY if nothing has changed
+> so code using it can just ignore the change instead of sending to remote
+> device.
+> ---
+>  audio/headset.c |   12 ++++++++----
+>  1 files changed, 8 insertions(+), 4 deletions(-)
 
-I would suggest bluetoothd to take care about setting Flush Timeout.
-There is of course possibility to have sockopt for timeout and send HCI command
-but this looks like a dirty hack.
+This one has also been pushed upstream. Thanks.
 
-I think bluetoothd can read compare and write new flush timeout value.
-
-Regards,
-Andrei
+Johan
