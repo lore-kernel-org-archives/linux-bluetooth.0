@@ -1,1367 +1,271 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH v3] Further optimalization of PBAP tracker queries
-Date: Thu, 16 Dec 2010 16:57:03 +0200
-Message-Id: <1292511423-3140-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [RFCv2] Bluetooth: Use non-flushable by default L2CAP data packets
+Date: Thu, 16 Dec 2010 16:54:26 +0200
+Message-Id: <1292511266-826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now emails, addresses and telephone numbers of the same type
-(work/home/other) are concatenated into sigle strings - this
-gains huge difference in speed of queries when there are a lot
-of contacts in database. Also changed functions for splitting
-these fields on our backend side.
----
- plugins/phonebook-tracker.c | 1241 +++++++++++++++++++++++++------------------
- 1 files changed, 711 insertions(+), 530 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 0a023aa..59221cb 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -46,103 +46,111 @@
- #define AFFILATION_HOME "Home"
- #define AFFILATION_WORK "Work"
- #define ADDR_FIELD_AMOUNT 7
--#define PULL_QUERY_COL_AMOUNT 40
-+#define PULL_QUERY_COL_AMOUNT 26
- #define COUNT_QUERY_COL_AMOUNT 1
+Modification of Nick Pelly <npelly@google.com> patch.
+
+With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
+makes ACL data packets non-flushable by default on compatible chipsets, and
+adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
+data packets for a given L2CAP socket. This is useful for A2DP data which can
+be safely discarded if it can not be delivered within a short time (while
+other ACL data should not be discarded).
+
+Note that making ACL data flushable has no effect unless the automatic flush
+timeout for that ACL link is changed from its default of 0 (infinite).
+
+Default packet types (for compatible chipsets):
+Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+Bluetooth HCI H4
+Bluetooth HCI ACL Packet
+    .... 0000 0000 0010 = Connection Handle: 0x0002
+    ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
+    00.. .... .... .... = BC Flag: Point-To-Point (0)
+    Data Total Length: 8
+Bluetooth L2CAP Packet
+
+After setting BT_FLUSHABLE
+(sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
+Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+Bluetooth HCI H4
+Bluetooth HCI ACL Packet
+    .... 0000 0000 0010 = Connection Handle: 0x0002
+    ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
+    00.. .... .... .... = BC Flag: Point-To-Point (0)
+    Data Total Length: 8
+Bluetooth L2CAP Packet
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ include/net/bluetooth/bluetooth.h |    5 ++++
+ include/net/bluetooth/hci.h       |    2 +
+ include/net/bluetooth/hci_core.h  |    1 +
+ include/net/bluetooth/l2cap.h     |    2 +
+ net/bluetooth/hci_core.c          |    6 +++-
+ net/bluetooth/l2cap.c             |   48 ++++++++++++++++++++++++++++++++++--
+ 6 files changed, 59 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 0c5e725..ed7d775 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -64,6 +64,11 @@ struct bt_security {
  
--#define COL_PHONE_NUMBER 0
-+#define COL_PHONE_AFF 0 /* work/home phone numbers */
- #define COL_FULL_NAME 1
- #define COL_FAMILY_NAME 2
- #define COL_GIVEN_NAME 3
- #define COL_ADDITIONAL_NAME 4
- #define COL_NAME_PREFIX 5
- #define COL_NAME_SUFFIX 6
--#define COL_EMAIL 7
--#define COL_CELL_NUMBER 8
--
--#define COL_ADDR_POBOX 9
--#define COL_ADDR_EXT 10
--#define COL_ADDR_STREET 11
--#define COL_ADDR_LOCALITY 12
--#define COL_ADDR_REGION 13
--#define COL_ADDR_CODE 14
--#define COL_ADDR_COUNTRY 15
--
--#define COL_FAX_NUMBER 16
--#define COL_AFF_TYPE 17
--#define COL_BIRTH_DATE 18
--#define COL_NICKNAME 19
--#define COL_URL 20
--#define COL_PHOTO 21
--
--#define COL_ORG_NAME 22
--#define COL_ORG_DEPARTMENT 23
--#define COL_ORG_ROLE 24
--
--#define COL_UID 25
--#define COL_TITLE 26
--#define COL_OTHER_NUMBER 27
--
--#define COL_OTHER_ADDR_POBOX 28
--#define COL_OTHER_ADDR_EXT 29
--#define COL_OTHER_ADDR_STREET 30
--#define COL_OTHER_ADDR_LOCALITY 31
--#define COL_OTHER_ADDR_REGION 32
--#define COL_OTHER_ADDR_CODE 33
--#define COL_OTHER_ADDR_COUNTRY 34
--
--#define COL_OTHER_EMAIL 35
--#define COL_DATE 36
--#define COL_SENT 37
--#define COL_ANSWERED 38
--#define CONTACTS_ID_COL 39
-+#define COL_EMAIL_CONTACT 7 /*email's for other category */
-+#define COL_ADDR_AFF 8 /* addresses from affilation */
-+#define COL_ADDR_CONTACT 9 /* addresses from contacts */
-+#define COL_PHONE_CONTACT 10 /* phone numbers from contact's */
-+#define COL_BIRTH_DATE 11
-+#define COL_NICKNAME 12
-+#define COL_URL 13
-+#define COL_PHOTO 14
-+#define COL_ORG_ROLE 15
-+#define COL_UID 16
-+#define COL_TITLE 17
-+#define COL_AFF_TYPE 18
-+#define COL_ORG_NAME 19
-+#define COL_ORG_DEPARTMENT 20
-+#define COL_EMAIL_AFF 21 /* email's from affilation (work/home) */
-+#define COL_DATE 22
-+#define COL_SENT 23
-+#define COL_ANSWERED 24
-+#define CONTACTS_ID_COL 25
- #define CONTACT_ID_PREFIX "contact:"
+ #define BT_DEFER_SETUP	7
  
-+#define FAX_NUM_TYPE "http://www.semanticdesktop.org/ontologies/2007/03/22/nco#FaxNumber"
-+#define MOBILE_NUM_TYPE "http://www.semanticdesktop.org/ontologies/2007/03/22/nco#CellPhoneNumber"
++#define BT_FLUSHABLE	8
 +
-+#define MAIN_DELIM "\30" /* Main delimiter between phones, addresses, emails*/
-+#define SUB_DELIM "\31" /* Delimiter used in telephone number strings*/
-+#define MAX_FIELDS 100 /* Max amount of fields to be concatenated at once*/
++#define BT_FLUSHABLE_OFF	0
++#define BT_FLUSHABLE_ON		1
 +
- #define CONTACTS_QUERY_ALL						\
--	"SELECT nco:phoneNumber(?v) nco:fullname(?c) "			\
--	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
--	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
--	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) ?f ?affType "		\
--	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(?c) "				\
--	"nco:title(?a) ?t nco:pobox(?po) nco:extendedAddress(?po) "	\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"\"NOTACALL\" \"false\" \"false\" ?c "				\
--	"WHERE { "							\
--		"?c a nco:PersonContact . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--	"OPTIONAL { ?c nco:hasPhoneNumber ?h . "			\
--		"OPTIONAL {"						\
--		"?h a nco:FaxNumber ; "					\
--		"nco:phoneNumber ?f . "					\
--		"}"							\
--		"OPTIONAL {"						\
--		"?h a nco:CellPhoneNumber ; "				\
--		"nco:phoneNumber ?vc"					\
--		"}"							\
--		"OPTIONAL {"						\
--		"?h a nco:VoicePhoneNumber ; "				\
--		"nco:phoneNumber ?t"					\
--		"}"							\
--	"}"								\
--	"OPTIONAL { "							\
--		"?c nco:hasAffiliation ?a . "				\
--		"OPTIONAL { ?a rdfs:label ?affType .}"			\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:hasPhoneNumber ?v . } "	\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--	"} "								\
--	"OPTIONAL { ?c nco:hasPostalAddress ?po . } "			\
--	"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "			\
--	"}"
-+"SELECT "								\
-+"(SELECT GROUP_CONCAT("							\
-+"nco:phoneNumber(?number), \"\30\")"					\
-+"WHERE {"								\
-+"	?_role nco:hasPhoneNumber ?number"				\
-+"}) "									\
-+"nco:fullname(?_contact) "						\
-+"nco:nameFamily(?_contact) "						\
-+"nco:nameGiven(?_contact) "						\
-+"nco:nameAdditional(?_contact) "					\
-+"nco:nameHonorificPrefix(?_contact) "					\
-+"nco:nameHonorificSuffix(?_contact) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\") " 			\
-+	"WHERE {"							\
-+	"?_contact nco:hasEmailAddress "				\
-+			"[nco:emailAddress ?emailaddress_other]"	\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","	\
-+"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"		\
-+"WHERE {"								\
-+"?_role nco:hasPostalAddress ?aff_addr"					\
-+"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","	\
-+"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"		\
-+"WHERE {"								\
-+"	?_contact nco:hasPostalAddress ?oth_addr"			\
-+"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat(rdf:type(?contact_number),"		\
-+"\"\31\", nco:phoneNumber(?contact_number)), \"\30\")"			\
-+"WHERE {"								\
-+"	?_contact nco:hasPhoneNumber ?contact_number"			\
-+"}) "									\
-+"nco:birthDate(?_contact) "						\
-+"nco:nickname(?_contact) "						\
-+"nco:url(?_contact) "							\
-+"nie:url(nco:photo(?_contact)) "					\
-+"nco:role(?_role) "							\
-+"nco:contactUID(?_contact) "						\
-+"nco:title(?_role) "							\
-+"rdfs:label(?_role) "							\
-+"nco:fullname(nco:org(?_role))"						\
-+"nco:department(?_role) "						\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\")"				\
-+"WHERE {"								\
-+"	?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ]"	\
-+"}) "									\
-+"\"NOTACALL\" \"false\" \"false\" "					\
-+"?_contact "								\
-+"WHERE {"								\
-+"	?_contact a nco:PersonContact ;"				\
-+"	nco:nameFamily ?_key ."						\
-+"	OPTIONAL {?_contact nco:hasAffiliation ?_role .}"		\
-+"}"									\
-+"ORDER BY ?_key tracker:id(?_contact)"
+ #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+ #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+ #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 29a7a8c..333d5cb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -150,6 +150,7 @@ enum {
+ #define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
  
- #define CONTACTS_QUERY_ALL_LIST						\
- 	"SELECT ?c nco:nameFamily(?c) "					\
-@@ -159,84 +167,114 @@
- 	"} GROUP BY ?c"
+ /* ACL flags */
++#define ACL_START_NO_FLUSH	0x00
+ #define ACL_CONT		0x01
+ #define ACL_START		0x02
+ #define ACL_ACTIVE_BCAST	0x04
+@@ -193,6 +194,7 @@ enum {
+ #define LMP_EDR_ESCO_3M	0x40
+ #define LMP_EDR_3S_ESCO	0x80
  
- #define MISSED_CALLS_QUERY						\
--	"SELECT nco:phoneNumber(?ap) nco:fullname(?c) "			\
--	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
--	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
--	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) \"\" ?affType "		\
--	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(?c) "				\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) nco:extendedAddress(?po) "	\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"nmo:receivedDate(?call) "					\
--	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
-+"SELECT "								\
-+"(SELECT nco:phoneNumber(?role_number) "				\
-+	"WHERE {"							\
-+	"?_role nco:hasPhoneNumber ?role_number "			\
-+	"FILTER (?role_number = ?_number)"				\
-+"} GROUP BY nco:phoneNumber(?role_number) ) "				\
-+	"nco:fullname(?_contact) "					\
-+	"nco:nameFamily(?_contact) "					\
-+	"nco:nameGiven(?_contact) "					\
-+	"nco:nameAdditional(?_contact) "				\
-+	"nco:nameHonorificPrefix(?_contact) "				\
-+	"nco:nameHonorificSuffix(?_contact) "				\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\") " 			\
-+	"WHERE {"							\
-+	"?_contact nco:hasEmailAddress "				\
-+			"[nco:emailAddress ?emailaddress_other]"	\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"	\
-+	"WHERE {"							\
-+	"?_role nco:hasPostalAddress ?aff_addr"				\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"	\
-+	"WHERE {"							\
-+	"?_contact nco:hasPostalAddress ?oth_addr"			\
-+	"}) "								\
-+"(SELECT fn:concat(rdf:type(?contact_number),"				\
-+	"\"\31\", nco:phoneNumber(?contact_number))"			\
-+	"WHERE {"							\
-+	"{"								\
-+"		?_contact nco:hasPhoneNumber ?contact_number . "	\
-+"		FILTER (?contact_number = ?_number) "			\
-+"	} UNION { "							\
-+"		?_unb_contact nco:hasPhoneNumber ?contact_number . "	\
-+"	} "								\
-+"}GROUP BY nco:phoneNumber(?contact_number) ) "				\
-+	"nco:birthDate(?_contact) "					\
-+	"nco:nickname(?_contact) "					\
-+	"nco:url(?_contact) "						\
-+	"nie:url(nco:photo(?_contact)) "				\
-+	"nco:role(?_role) "						\
-+	"nco:contactUID(?_contact) "					\
-+	"nco:title(?_role) "						\
-+	"rdfs:label(?_role) "						\
-+	"nco:fullname(nco:org(?_role)) "				\
-+	"nco:department(?_role) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
- 	"WHERE { "							\
--	"{ "								\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered false . "				\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasPhoneNumber ?t . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL { "						\
--			"?t a nco:CellPhoneNumber ; "			\
--				"nco:phoneNumber ?vc . "		\
--		"} "							\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--		"OPTIONAL { "						\
--			"?c nco:hasAffiliation ?a . "			\
--			"OPTIONAL { ?a nco:title ?title } "		\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:org ?o . } "			\
--		"} "							\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?ap . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered false . "				\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?ap . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL {?a rdfs:label ?affType . }"			\
--		"OPTIONAL {?a nco:hasEmailAddress ?e . } "		\
--		"OPTIONAL {?a nco:hasPostalAddress ?p . }"		\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--		"OPTIONAL { ?a nco:title ?title } "			\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered false . "				\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasPhoneNumber ?t . } "			\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?t . } "			\
--		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
--	"} "								\
--	"} ORDER BY DESC(nmo:receivedDate(?call)) "
-+	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"}) "								\
-+	"nmo:receivedDate(?_call) "					\
-+	"nmo:isSent(?_call) "						\
-+	"nmo:isAnswered(?_call) "					\
-+	"fn:concat(tracker:coalesce(?_ncontact, \"\"),"			\
-+	"tracker:coalesce(?_unb_contact, \"\"))"			\
-+	" "								\
-+"WHERE { "								\
-+"{ "									\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isAnswered false ;"					\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact ; "				\
-+	"nco:hasPhoneNumber ?_number . "				\
-+	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
-+	"?_contact nco:nameFamily ?_key ."				\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isAnswered false ;"					\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact . "				\
-+	"?_contact nco:nameFamily ?_key . "				\
-+	"?_contact nco:hasAffiliation ?_role . "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+"} UNION { "								\
-+	"?_unb_contact a nco:Contact . "				\
-+	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_unb_contact ; "					\
-+	"nmo:isAnswered false ;"					\
-+	"nmo:isSent false . "						\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasPhoneNumber ?_number . } "				\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasAffiliation ?_role . "					\
-+	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
-+"} "									\
-+"} "									\
-+"ORDER BY DESC(nmo:sentDate(?_call)) "
++#define LMP_NO_FLUSH	0x01
+ #define LMP_SIMPLE_PAIR	0x08
  
+ /* Connection modes */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1992fac..9778bc8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -456,6 +456,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+ #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+ #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
++#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
  
- #define MISSED_CALLS_LIST						\
-@@ -275,85 +313,114 @@
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
+ /* ----- HCI protocols ----- */
+ struct hci_proto {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 7ad25ca..af35711 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -75,6 +75,7 @@ struct l2cap_conninfo {
+ #define L2CAP_LM_TRUSTED	0x0008
+ #define L2CAP_LM_RELIABLE	0x0010
+ #define L2CAP_LM_SECURE		0x0020
++#define L2CAP_LM_FLUSHABLE	0x0040
  
- #define INCOMING_CALLS_QUERY						\
--	"SELECT nco:phoneNumber(?ap) nco:fullname(?c) "			\
--	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
--	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
--	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) \"\" ?affType "		\
--	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(?c) "				\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
--	"nco:extendedAddress(?po) "					\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"nmo:receivedDate(?call) "					\
--	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
-+"SELECT "								\
-+"(SELECT nco:phoneNumber(?role_number) "				\
-+	"WHERE {"							\
-+"	?_role nco:hasPhoneNumber ?role_number"				\
-+"	FILTER (?role_number = ?_number)"				\
-+"} GROUP BY nco:phoneNumber(?role_number) ) "				\
-+	"nco:fullname(?_contact) "					\
-+	"nco:nameFamily(?_contact) "					\
-+	"nco:nameGiven(?_contact) "					\
-+	"nco:nameAdditional(?_contact) "				\
-+	"nco:nameHonorificPrefix(?_contact) "				\
-+	"nco:nameHonorificSuffix(?_contact) "				\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\") " 			\
-+	"WHERE {"							\
-+	"?_contact nco:hasEmailAddress "				\
-+			"[nco:emailAddress ?emailaddress_other]"	\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"	\
-+	"WHERE {"							\
-+	"?_role nco:hasPostalAddress ?aff_addr"				\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"	\
-+	"WHERE {"							\
-+	"?_contact nco:hasPostalAddress ?oth_addr"			\
-+	"}) "								\
-+"(SELECT fn:concat(rdf:type(?contact_number),"				\
-+	"\"\31\", nco:phoneNumber(?contact_number))"			\
-+	"WHERE {"							\
-+	"{"								\
-+"		?_contact nco:hasPhoneNumber ?contact_number . "	\
-+"		FILTER (?contact_number = ?_number) "			\
-+"	} UNION { "							\
-+"		?_unb_contact nco:hasPhoneNumber ?contact_number . "	\
-+"	} "								\
-+	"}GROUP BY nco:phoneNumber(?contact_number) ) "			\
-+	"nco:birthDate(?_contact) "					\
-+	"nco:nickname(?_contact) "					\
-+	"nco:url(?_contact) "						\
-+	"nie:url(nco:photo(?_contact)) "				\
-+	"nco:role(?_role) "						\
-+	"nco:contactUID(?_contact) "					\
-+	"nco:title(?_role) "						\
-+	"rdfs:label(?_role) "						\
-+	"nco:fullname(nco:org(?_role)) "				\
-+	"nco:department(?_role) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
- 	"WHERE { "							\
--	"{ "								\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered true . "				\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasPhoneNumber ?t . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL { "						\
--			"?t a nco:CellPhoneNumber ; "			\
--				"nco:phoneNumber ?vc . "		\
--		"} "							\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--		"OPTIONAL { "						\
--			"?c nco:hasAffiliation ?a . "			\
--			"OPTIONAL { ?a nco:title ?title } "		\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:org ?o . } "			\
--		"} "							\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?ap . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered true . "				\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?ap . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL {?a rdfs:label ?affType . }"			\
--		"OPTIONAL {?a nco:hasEmailAddress ?e . } "		\
--		"OPTIONAL {?a nco:hasPostalAddress ?p . }"		\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--		"OPTIONAL { ?a nco:title ?title } "			\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false ; "					\
--		"nmo:isAnswered true . "				\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasPhoneNumber ?t . } "			\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?t . } "			\
--		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
--	"} "								\
--	"} ORDER BY DESC(nmo:receivedDate(?call)) "
-+	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"}) "								\
-+	"nmo:receivedDate(?_call) "					\
-+	"nmo:isSent(?_call) "						\
-+	"nmo:isAnswered(?_call) "					\
-+	"fn:concat(tracker:coalesce(?_ncontact, \"\"),"			\
-+	"tracker:coalesce(?_unb_contact, \"\"))"			\
-+	" "								\
-+"WHERE { "								\
-+"{ "									\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isAnswered true ;"						\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact ; "				\
-+	"nco:hasPhoneNumber ?_number . "				\
-+	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
-+	"?_contact nco:nameFamily ?_key ."				\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isAnswered true ;"						\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact . "				\
-+	"?_contact nco:nameFamily ?_key . "				\
-+	"?_contact nco:hasAffiliation ?_role . "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+"} UNION { "								\
-+	"?_unb_contact a nco:Contact . "				\
-+	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_unb_contact ; "					\
-+	"nmo:isAnswered true ;"						\
-+	"nmo:isSent false . "						\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasPhoneNumber ?_number . } "				\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasAffiliation ?_role . "					\
-+	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
-+"} "									\
-+"} "\
-+"ORDER BY DESC(nmo:sentDate(?_call)) "
+ /* L2CAP command codes */
+ #define L2CAP_COMMAND_REJ	0x01
+@@ -327,6 +328,7 @@ struct l2cap_pinfo {
+ 	__u8		sec_level;
+ 	__u8		role_switch;
+ 	__u8		force_reliable;
++	__u8		flushable;
  
- #define INCOMING_CALLS_LIST						\
- 	"SELECT ?c nco:nameFamily(?c) "					\
-@@ -391,82 +458,111 @@
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
+ 	__u8		conf_req[64];
+ 	__u8		conf_len;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 51c61f7..c0d776b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1380,7 +1380,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
  
- #define OUTGOING_CALLS_QUERY						\
--	"SELECT nco:phoneNumber(?ap) nco:fullname(?c) "			\
--	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
--	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
--	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) \"\" ?affType "		\
--	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(?c) "				\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
--	"nco:extendedAddress(?po) "					\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"nmo:receivedDate(?call) "					\
--	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
-+"SELECT "								\
-+"(SELECT nco:phoneNumber(?role_number) "				\
-+	"WHERE {"							\
-+"	?_role nco:hasPhoneNumber ?role_number"				\
-+"	FILTER (?role_number = ?_number)"				\
-+"} GROUP BY nco:phoneNumber(?role_number) ) "				\
-+	"nco:fullname(?_contact) "					\
-+	"nco:nameFamily(?_contact) "					\
-+	"nco:nameGiven(?_contact) "					\
-+	"nco:nameAdditional(?_contact) "				\
-+	"nco:nameHonorificPrefix(?_contact) "				\
-+	"nco:nameHonorificSuffix(?_contact) "				\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\") " 			\
-+	"WHERE {"							\
-+	"?_contact nco:hasEmailAddress "				\
-+			"[nco:emailAddress ?emailaddress_other]"	\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"	\
-+	"WHERE {"							\
-+	"?_role nco:hasPostalAddress ?aff_addr"				\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"	\
-+	"WHERE {"							\
-+	"?_contact nco:hasPostalAddress ?oth_addr"			\
-+	"}) "								\
-+"(SELECT fn:concat(rdf:type(?contact_number),"				\
-+	"\"\31\", nco:phoneNumber(?contact_number))"			\
-+	"WHERE {"							\
-+	"{"								\
-+"		?_contact nco:hasPhoneNumber ?contact_number . "	\
-+"		FILTER (?contact_number = ?_number) "			\
-+"	} UNION { "							\
-+"		?_unb_contact nco:hasPhoneNumber ?contact_number . "	\
-+"	} "								\
-+	"}GROUP BY nco:phoneNumber(?contact_number) ) "			\
-+	"nco:birthDate(?_contact) "					\
-+	"nco:nickname(?_contact) "					\
-+	"nco:url(?_contact) "						\
-+	"nie:url(nco:photo(?_contact)) "				\
-+	"nco:role(?_role) "						\
-+	"nco:contactUID(?_contact) "					\
-+	"nco:title(?_role) "						\
-+	"rdfs:label(?_role) "						\
-+	"nco:fullname(nco:org(?_role)) "				\
-+	"nco:department(?_role) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
- 	"WHERE { "							\
--	"{ "								\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasPhoneNumber ?t . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL { "						\
--			"?t a nco:CellPhoneNumber ; "			\
--				"nco:phoneNumber ?vc . "		\
--		"} "							\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--		"OPTIONAL { "						\
--			"?c nco:hasAffiliation ?a . "			\
--			"OPTIONAL { ?a nco:title ?title } "		\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:org ?o . } "			\
--		"} "							\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?ap . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?ap . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL {?a rdfs:label ?affType . }"			\
--		"OPTIONAL {?a nco:hasEmailAddress ?e . } "		\
--		"OPTIONAL {?a nco:hasPostalAddress ?p . }"		\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--		"OPTIONAL { ?a nco:title ?title } "			\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasPhoneNumber ?t . } "			\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?t . } "			\
--		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
--	"} "								\
--	"} ORDER BY DESC(nmo:sentDate(?call)) "
-+	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"}) "								\
-+	"nmo:receivedDate(?_call) "					\
-+	"nmo:isSent(?_call) "						\
-+	"nmo:isAnswered(?_call) "					\
-+	"fn:concat(tracker:coalesce(?_ncontact, \"\"),"			\
-+	"tracker:coalesce(?_unb_contact, \"\"))"			\
-+	" "								\
-+"WHERE { "								\
-+"{ "									\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_ncontact ; "						\
-+	"nmo:isSent true . "						\
-+	"?_contact a nco:PersonContact ; "				\
-+	"nco:hasPhoneNumber ?_number . "				\
-+	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
-+	"?_contact nco:nameFamily ?_key ."				\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_ncontact ; "						\
-+	"nmo:isSent true . "						\
-+	"?_contact a nco:PersonContact . "				\
-+	"?_contact nco:nameFamily ?_key . "				\
-+	"?_contact nco:hasAffiliation ?_role . "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+"} UNION { "								\
-+	"?_unb_contact a nco:Contact . "				\
-+	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_unb_contact ; "					\
-+	"nmo:isSent true . "						\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasPhoneNumber ?_number . } "				\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasAffiliation ?_role . "					\
-+	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
-+"} "									\
-+"} "									\
-+"ORDER BY DESC(nmo:sentDate(?_call)) "
+ 	skb->dev = (void *) hdev;
+ 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
++	hci_add_acl_hdr(skb, conn->handle, flags);
  
- #define OUTGOING_CALLS_LIST						\
- 	"SELECT ?c nco:nameFamily(?c) "					\
-@@ -501,139 +597,143 @@
- 	"} GROUP BY ?call ORDER BY DESC(nmo:sentDate(?call))"
+ 	list = skb_shinfo(skb)->frag_list;
+ 	if (!list) {
+@@ -1398,12 +1398,14 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+ 		spin_lock_bh(&conn->data_q.lock);
  
- #define COMBINED_CALLS_QUERY						\
--	"SELECT nco:phoneNumber(?ap) nco:fullname(?c) "			\
--	"nco:nameFamily(?c) nco:nameGiven(?c) "				\
--	"nco:nameAdditional(?c) nco:nameHonorificPrefix(?c) "		\
--	"nco:nameHonorificSuffix(?c) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) \"\" ?affType "		\
--	"nco:birthDate(?c) nco:nickname(?c) nco:url(?c) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(?c) "				\
--	"nco:title(?a) nco:phoneNumber(?t) nco:pobox(?po) "		\
--	"nco:extendedAddress(?po) "					\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"nmo:receivedDate(?call) "					\
--	"nmo:isSent(?call) nmo:isAnswered(?call) ?x "			\
-+"SELECT "								\
-+"(SELECT nco:phoneNumber(?role_number) "				\
-+	"WHERE {"							\
-+"	?_role nco:hasPhoneNumber ?role_number"				\
-+"	FILTER (?role_number = ?_number)"				\
-+"} GROUP BY nco:phoneNumber(?role_number) ) "				\
-+	"nco:fullname(?_contact) "					\
-+	"nco:nameFamily(?_contact) "					\
-+	"nco:nameGiven(?_contact) "					\
-+	"nco:nameAdditional(?_contact) "				\
-+	"nco:nameHonorificPrefix(?_contact) "				\
-+	"nco:nameHonorificSuffix(?_contact) "				\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\") " 			\
-+	"WHERE {"							\
-+	"?_contact nco:hasEmailAddress "				\
-+			"[nco:emailAddress ?emailaddress_other]"	\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"	\
-+	"WHERE {"							\
-+	"?_role nco:hasPostalAddress ?aff_addr"				\
-+	"}) "								\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+	"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","\
-+	"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","		\
-+	"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","	\
-+	"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"	\
-+	"WHERE {"							\
-+	"?_contact nco:hasPostalAddress ?oth_addr"			\
-+	"}) "								\
-+"(SELECT fn:concat(rdf:type(?contact_number),"				\
-+	"\"\31\", nco:phoneNumber(?contact_number))"			\
-+	"WHERE {"							\
-+	"{"								\
-+"		?_contact nco:hasPhoneNumber ?contact_number . "	\
-+"		FILTER (?contact_number = ?_number) "			\
-+"	} UNION { "							\
-+"		?_unb_contact nco:hasPhoneNumber ?contact_number . "	\
-+"	} "								\
-+	"}GROUP BY nco:phoneNumber(?contact_number) ) "			\
-+	"nco:birthDate(?_contact) "					\
-+	"nco:nickname(?_contact) "					\
-+	"nco:url(?_contact) "						\
-+	"nie:url(nco:photo(?_contact)) "				\
-+	"nco:role(?_role) "						\
-+	"nco:contactUID(?_contact) "					\
-+	"nco:title(?_role) "						\
-+	"rdfs:label(?_role) "						\
-+	"nco:fullname(nco:org(?_role)) "				\
-+	"nco:department(?_role) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
- 	"WHERE { "							\
--	"{ "								\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasPhoneNumber ?t . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL { "						\
--			"?t a nco:CellPhoneNumber ; "			\
--				"nco:phoneNumber ?vc . "		\
--		"} "							\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--		"OPTIONAL { "						\
--			"?c nco:hasAffiliation ?a . "			\
--			"OPTIONAL { ?a nco:title ?title } "		\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:org ?o . } "			\
--		"} "							\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?ap . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?ap . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL {?a rdfs:label ?affType . }"			\
--		"OPTIONAL {?a nco:hasEmailAddress ?e . } "		\
--		"OPTIONAL {?a nco:hasPostalAddress ?p . }"		\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--		"OPTIONAL { ?a nco:title ?title } "			\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:to ?x ; "						\
--		"nmo:isSent true . "					\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasPhoneNumber ?t . } "			\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?t . } "			\
--		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasPhoneNumber ?t . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL { "						\
--			"?t a nco:CellPhoneNumber ; "			\
--				"nco:phoneNumber ?vc . "		\
--		"} "							\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--		"OPTIONAL { "						\
--			"?c nco:hasAffiliation ?a . "			\
--			"OPTIONAL { ?a nco:title ?title } "		\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:org ?o . } "			\
--		"} "							\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?ap . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false . "					\
--		"?c a nco:PersonContact . "				\
--		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?ap . "				\
--		"OPTIONAL { "						\
--			"?c a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--		"OPTIONAL {?a rdfs:label ?affType . }"			\
--		"OPTIONAL {?a nco:hasEmailAddress ?e . } "		\
--		"OPTIONAL {?a nco:hasPostalAddress ?p . }"		\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--		"OPTIONAL { ?a nco:title ?title } "			\
--		"OPTIONAL { ?c nco:hasPostalAddress ?po . } "		\
--		"OPTIONAL { ?c nco:hasEmailAddress ?eo . } "		\
--	"} UNION { "							\
--		"?x a nco:Contact . "					\
--		"?x nco:hasPhoneNumber ?t . "				\
--		"?call a nmo:Call ; "					\
--		"nmo:from ?x ; "					\
--		"nmo:isSent false . "					\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasPhoneNumber ?t . } "			\
--		"OPTIONAL {?c a nco:PersonContact ; "			\
--			"nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?t . } "			\
--		"FILTER ( !bound(?c) && !bound(?a) ) . "		\
--	"} "								\
--	"} ORDER BY DESC(nmo:receivedDate(?call)) "
-+	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"}) "								\
-+	"nmo:receivedDate(?_call) "					\
-+	"nmo:isSent(?_call) "						\
-+	"nmo:isAnswered(?_call) "					\
-+	"fn:concat(tracker:coalesce(?_ncontact, \"\"),"			\
-+	"tracker:coalesce(?_unb_contact, \"\"))"			\
-+	" "								\
-+"WHERE { "								\
-+"{ "									\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_ncontact ; "						\
-+	"nmo:isSent true . "						\
-+	"?_contact a nco:PersonContact ; "				\
-+	"nco:hasPhoneNumber ?_number . "				\
-+	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
-+	"?_contact nco:nameFamily ?_key ."				\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_ncontact ; "						\
-+	"nmo:isSent true . "						\
-+	"?_contact a nco:PersonContact . "				\
-+	"?_contact nco:nameFamily ?_key . "				\
-+	"?_contact nco:hasAffiliation ?_role . "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+"} UNION { "								\
-+	"?_unb_contact a nco:Contact . "				\
-+	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:to ?_unb_contact ; "					\
-+	"nmo:isSent true . "						\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasPhoneNumber ?_number . } "				\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasAffiliation ?_role . "					\
-+	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact ; "				\
-+	"nco:hasPhoneNumber ?_number . "				\
-+	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
-+	"?_contact nco:nameFamily ?_key ."				\
-+"} UNION { "								\
-+	"?_ncontact a nco:Contact . "					\
-+	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_ncontact ; "					\
-+	"nmo:isSent false . "						\
-+	"?_contact a nco:PersonContact . "				\
-+	"?_contact nco:nameFamily ?_key . "				\
-+	"?_contact nco:hasAffiliation ?_role . "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+"} UNION { "								\
-+	"?_unb_contact a nco:Contact . "				\
-+	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_call a nmo:Call ; "						\
-+	"nmo:from ?_unb_contact ; "					\
-+	"nmo:isSent false . "						\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasPhoneNumber ?_number . } "				\
-+	"OPTIONAL {?_contact a nco:PersonContact ; "			\
-+	"nco:hasAffiliation ?_role . "					\
-+	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
-+"} "									\
-+"} "									\
-+"ORDER BY DESC(nmo:sentDate(?_call)) "
+ 		__skb_queue_tail(&conn->data_q, skb);
++		flags &= ~ACL_START;
++		flags |= ACL_CONT;
+ 		do {
+ 			skb = list; list = list->next;
  
- #define COMBINED_CALLS_LIST						\
- 	"SELECT ?c nco:nameFamily(?c) nco:nameGiven(?c) "		\
-@@ -690,58 +790,77 @@
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
+ 			skb->dev = (void *) hdev;
+ 			bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-			hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
++			hci_add_acl_hdr(skb, conn->handle, flags);
  
- #define CONTACTS_QUERY_FROM_URI						\
--	"SELECT nco:phoneNumber(?v) nco:fullname(<%s>) "			\
--	"nco:nameFamily(<%s>) nco:nameGiven(<%s>) "				\
--	"nco:nameAdditional(<%s>) nco:nameHonorificPrefix(<%s>) "		\
--	"nco:nameHonorificSuffix(<%s>) nco:emailAddress(?e) ?vc "		\
--	"nco:pobox(?p) nco:extendedAddress(?p) "			\
--	"nco:streetAddress(?p) nco:locality(?p) nco:region(?p) "	\
--	"nco:postalcode(?p) nco:country(?p) ?f ?affType "		\
--	"nco:birthDate(<%s>) nco:nickname(<%s>) nco:url(<%s>) "		\
--	"?file nco:fullname(?o) nco:department(?a) "			\
--	"nco:role(?a) nco:contactUID(<%s>) "				\
--	"nco:title(?a) ?t nco:pobox(?po) nco:extendedAddress(?po) "	\
--	"nco:streetAddress(?po) nco:locality(?po) nco:region(?po) "	\
--	"nco:postalcode(?po) nco:country(?po) nco:emailAddress(?eo) "	\
--	"\"NOTACALL\" \"false\" \"false\" <%s> "				\
--	"WHERE { "							\
--		"<%s> a nco:PersonContact . "				\
--		"OPTIONAL { "						\
--			"<%s> a nco:PersonContact ; nco:photo ?pht . "	\
--			"?pht a nfo:FileDataObject ; nie:url ?file . "	\
--		"} "							\
--	"OPTIONAL { <%s> nco:hasPhoneNumber ?h . "			\
--		"OPTIONAL {"						\
--		"?h a nco:FaxNumber ; "					\
--		"nco:phoneNumber ?f . "					\
--		"}"							\
--		"OPTIONAL {"						\
--		"?h a nco:CellPhoneNumber ; "				\
--		"nco:phoneNumber ?vc"					\
--		"}"							\
--		"OPTIONAL {"						\
--		"?h a nco:VoicePhoneNumber ; "				\
--		"nco:phoneNumber ?t"					\
--		"}"							\
--	"}"								\
--	"OPTIONAL { "							\
--		"<%s> nco:hasAffiliation ?a . "				\
--		"OPTIONAL { ?a rdfs:label ?affType .}"			\
--			"OPTIONAL { ?a nco:hasEmailAddress ?e . } "	\
--			"OPTIONAL { ?a nco:hasPostalAddress ?p . } "	\
--			"OPTIONAL { ?a nco:hasPhoneNumber ?v . } "	\
--		"OPTIONAL { ?a nco:org ?o . } "				\
--	"} "								\
--	"OPTIONAL { <%s> nco:hasPostalAddress ?po . } "			\
--	"OPTIONAL { <%s> nco:hasEmailAddress ?eo . } "			\
--	"}"
-+"SELECT "								\
-+"(SELECT GROUP_CONCAT("							\
-+"nco:phoneNumber(?number), \"\30\")"					\
-+"WHERE {"								\
-+"	?_role nco:hasPhoneNumber ?number"				\
-+"}) "									\
-+"nco:fullname(<%s>) "							\
-+"nco:nameFamily(<%s>) "							\
-+"nco:nameGiven(<%s>) "							\
-+"nco:nameAdditional(<%s>) "						\
-+"nco:nameHonorificPrefix(<%s>) "					\
-+"nco:nameHonorificSuffix(<%s>) "					\
-+"(SELECT GROUP_CONCAT(?emailaddress_other, \"\30\")"			\
-+"WHERE {"								\
-+"	<%s> nco:hasEmailAddress [nco:emailAddress ?emailaddress_other]"\
-+"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+"tracker:coalesce(nco:pobox(?aff_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:extendedAddress(?aff_addr), \"\"), \";\","	\
-+"tracker:coalesce(nco:streetAddress(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:locality(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:region(?aff_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:postalcode(?aff_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:country(?aff_addr), \"\") ),\";\")"		\
-+"WHERE {"								\
-+"?_role nco:hasPostalAddress ?aff_addr"					\
-+"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat("					\
-+"tracker:coalesce(nco:pobox(?oth_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:extendedAddress(?oth_addr), \"\"), \";\","	\
-+"tracker:coalesce(nco:streetAddress(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:locality(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:region(?oth_addr), \"\"), \";\","			\
-+"tracker:coalesce(nco:postalcode(?oth_addr), \"\"), \";\","		\
-+"tracker:coalesce(nco:country(?oth_addr), \"\") ),\"\30\")"		\
-+"WHERE {"								\
-+"	<%s> nco:hasPostalAddress ?oth_addr"				\
-+"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat(rdf:type(?contact_number),"		\
-+"\"\31\", nco:phoneNumber(?contact_number)), \"\30\")"			\
-+"WHERE {"								\
-+"	<%s> nco:hasPhoneNumber ?contact_number"			\
-+"}) "									\
-+"nco:birthDate(<%s>) "							\
-+"nco:nickname(<%s>) "							\
-+"nco:url(<%s>) "							\
-+"nie:url(nco:photo(<%s>)) "						\
-+"nco:role(?_role) "							\
-+"nco:contactUID(<%s>) "							\
-+"nco:title(?_role) "							\
-+"rdfs:label(?_role) "							\
-+"nco:fullname(nco:org(?_role))"						\
-+"nco:department(?_role) "						\
-+"(SELECT GROUP_CONCAT(?emailaddress, \"\30\")"				\
-+"WHERE {"								\
-+"	?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ]"	\
-+"}) "									\
-+"\"NOTACALL\" \"false\" \"false\" "					\
-+"<%s> "									\
-+"WHERE {"								\
-+"	<%s> a nco:PersonContact ;"					\
-+"	nco:nameFamily ?_key ."						\
-+"	OPTIONAL {<%s> nco:hasAffiliation ?_role .}"			\
-+"}"									\
-+"ORDER BY ?_key tracker:id(<%s>)"
+ 			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
  
- #define CONTACTS_OTHER_QUERY_FROM_URI					\
--	"SELECT \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "\
--	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
--	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
--	"\"\" "								\
--	"nco:phoneNumber(?t) \"NOTACALL\" \"false\" \"false\" <%s> "	\
-+	"SELECT \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "	\
-+	"fn:concat(\"TYPE_OTHER\", \"\31\", nco:phoneNumber(?t)) \"\" "	\
-+	"\"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" \"\" "		\
-+	" \"NOTACALL\" \"false\" \"false\" <%s> "	\
- 	"WHERE { "							\
- 		"<%s> a nco:Contact . "					\
- 		"OPTIONAL { <%s> nco:hasPhoneNumber ?t . } "		\
-@@ -1333,21 +1452,65 @@ static enum phonebook_number_type get_phone_type(const char *affilation)
- 	return TEL_TYPE_OTHER;
- }
- 
-+static void add_main_number(struct phonebook_contact *contact, char *pnumber)
-+{
-+	char **num_parts;
-+	char *type, *number;
-+
-+	/* For phone taken directly from contacts data, phone number string
-+	 * is represented as number type and number string - those strings are
-+	 * separated by SUB_DELIM string */
-+	num_parts = g_strsplit(pnumber, SUB_DELIM, 2);
-+
-+	if (!num_parts)
-+		return;
-+
-+	if (num_parts[0])
-+		type = num_parts[0];
-+	else
-+		goto failed;
-+
-+	if (num_parts[1])
-+		number = num_parts[1];
-+	else
-+		goto failed;
-+
-+	if (g_strrstr(type, FAX_NUM_TYPE))
-+		add_phone_number(contact, number, TEL_TYPE_FAX);
-+	else if (g_strrstr(type, MOBILE_NUM_TYPE))
-+		add_phone_number(contact, number, TEL_TYPE_MOBILE);
-+	else
-+		add_phone_number(contact, number, TEL_TYPE_OTHER);
-+
-+failed:
-+	g_strfreev(num_parts);
-+}
-+
- static void contact_add_numbers(struct phonebook_contact *contact,
- 								char **reply)
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index c791fcd..efa60eb 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
+ static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
  {
--	add_phone_number(contact, reply[COL_PHONE_NUMBER],
-+	char **aff_numbers, **con_numbers;
-+	int i;
-+
-+	/* Filling phonegit  numbers from contact's affilation */
-+	aff_numbers = g_strsplit(reply[COL_PHONE_AFF], MAIN_DELIM, MAX_FIELDS);
-+
-+	if (aff_numbers)
-+		for(i = 0;aff_numbers[i]; ++i)
-+			add_phone_number(contact, aff_numbers[i],
- 					get_phone_type(reply[COL_AFF_TYPE]));
--	add_phone_number(contact, reply[COL_FAX_NUMBER], TEL_TYPE_FAX);
--	add_phone_number(contact, reply[COL_CELL_NUMBER], TEL_TYPE_MOBILE);
+ 	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
++	u8 flags;
  
--	if (g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_CELL_NUMBER]) == 0)
--		return;
-+	g_strfreev(aff_numbers);
+ 	BT_DBG("code 0x%2.2x", code);
  
--	if (g_strcmp0(reply[COL_OTHER_NUMBER], reply[COL_PHONE_NUMBER]) == 0)
--		return;
-+	/* Filling phone numbers directly from contact's struct */
-+	con_numbers = g_strsplit(reply[COL_PHONE_CONTACT], MAIN_DELIM,
-+								MAX_FIELDS);
+ 	if (!skb)
+ 		return;
  
--	add_phone_number(contact, reply[COL_OTHER_NUMBER], TEL_TYPE_OTHER);
-+	if (con_numbers)
-+		for(i = 0; con_numbers[i] != NULL; ++i)
-+			add_main_number(contact, con_numbers[i]);
+-	hci_send_acl(conn->hcon, skb, 0);
++	if (lmp_no_flush_capable(conn->hcon->hdev))
++		flags = ACL_START_NO_FLUSH;
++	else
++		flags = ACL_START;
 +
-+	g_strfreev(con_numbers);
++	hci_send_acl(conn->hcon, skb, flags);
  }
  
- static enum phonebook_email_type get_email_type(const char *affilation)
-@@ -1363,9 +1526,29 @@ static enum phonebook_email_type get_email_type(const char *affilation)
- static void contact_add_emails(struct phonebook_contact *contact,
- 								char **reply)
+ static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+@@ -900,6 +906,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->sec_level = l2cap_pi(parent)->sec_level;
+ 		pi->role_switch = l2cap_pi(parent)->role_switch;
+ 		pi->force_reliable = l2cap_pi(parent)->force_reliable;
++		pi->flushable = l2cap_pi(parent)->flushable;
+ 	} else {
+ 		pi->imtu = L2CAP_DEFAULT_MTU;
+ 		pi->omtu = 0;
+@@ -915,6 +922,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->sec_level = BT_SECURITY_LOW;
+ 		pi->role_switch = 0;
+ 		pi->force_reliable = 0;
++		pi->flushable = BT_FLUSHABLE_OFF;
+ 	}
+ 
+ 	/* Default config options */
+@@ -1450,10 +1458,17 @@ static void l2cap_drop_acked_frames(struct sock *sk)
+ static inline void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
  {
--	add_email(contact, reply[COL_EMAIL],
-+	char **aff_emails, **con_emails;
-+	int i;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	struct hci_conn *hcon = pi->conn->hcon;
++	u16 flags;
+ 
+ 	BT_DBG("sk %p, skb %p len %d", sk, skb, skb->len);
+ 
+-	hci_send_acl(pi->conn->hcon, skb, 0);
++	if (lmp_no_flush_capable(hcon->hdev) && !l2cap_pi(sk)->flushable)
++		flags = ACL_START_NO_FLUSH;
++	else
++		flags = ACL_START;
 +
-+	/* Emails from affilation */
-+	aff_emails = g_strsplit(reply[COL_EMAIL_AFF], MAIN_DELIM, MAX_FIELDS);
-+
-+	if (aff_emails)
-+		for(i = 0; aff_emails[i] != NULL; ++i)
-+			add_email(contact, aff_emails[i],
- 					get_email_type(reply[COL_AFF_TYPE]));
--	add_email(contact, reply[COL_OTHER_EMAIL], EMAIL_TYPE_OTHER);
-+
-+	g_strfreev(aff_emails);
-+
-+	/* Emails taken directly from contact's data have always type OTHER */
-+	con_emails = g_strsplit(reply[COL_EMAIL_CONTACT], MAIN_DELIM,
-+								MAX_FIELDS);
-+
-+	if (con_emails)
-+		for(i = 0; con_emails[i] != NULL; ++i)
-+			add_email(contact, con_emails[i], EMAIL_TYPE_OTHER);
-+
-+	g_strfreev(con_emails);
-+
++	hci_send_acl(hcon, skb, flags);
  }
  
- static enum phonebook_address_type get_addr_type(const char *affilation)
-@@ -1382,32 +1565,30 @@ static void contact_add_addresses(struct phonebook_contact *contact,
- 								char **reply)
+ static void l2cap_streaming_send(struct sock *sk)
+@@ -2045,6 +2060,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
  {
+ 	struct sock *sk = sock->sk;
++	struct hci_conn *hcon = l2cap_pi(sk)->conn->hcon;
+ 	struct bt_security sec;
+ 	int len, err = 0;
+ 	u32 opt;
+@@ -2098,6 +2114,26 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 		bt_sk(sk)->defer_setup = opt;
+ 		break;
  
--	char *main_addr, *other_addr;
-+	char **aff_addr, **con_addr;
-+	int i;
++	case BT_FLUSHABLE:
++		if (get_user(opt, (u32 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
 +
-+	/* Addresses from affilation */
-+	aff_addr = g_strsplit(reply[COL_ADDR_AFF], MAIN_DELIM,
-+								MAX_FIELDS);
++		if (opt > BT_FLUSHABLE_ON) {
++			err = -EINVAL;
++			break;
++		}
 +
-+	if (aff_addr)
-+		for(i = 0; aff_addr[i] != NULL; ++i)
-+			add_address(contact, aff_addr[i],
-+					get_addr_type(reply[COL_AFF_TYPE]));
++		if (opt == BT_FLUSHABLE_OFF &&
++				!lmp_no_flush_capable(hcon->hdev)) {
++			err = -EINVAL;
++			break;
++		}
++
++		l2cap_pi(sk)->flushable = opt;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -2237,6 +2273,12 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
  
--	main_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
--					reply[COL_ADDR_POBOX],
--					reply[COL_ADDR_EXT],
--					reply[COL_ADDR_STREET],
--					reply[COL_ADDR_LOCALITY],
--					reply[COL_ADDR_REGION],
--					reply[COL_ADDR_CODE],
--					reply[COL_ADDR_COUNTRY]);
-+	g_strfreev(aff_addr);
+ 		break;
  
--	other_addr = g_strdup_printf("%s;%s;%s;%s;%s;%s;%s",
--					reply[COL_OTHER_ADDR_POBOX],
--					reply[COL_OTHER_ADDR_EXT],
--					reply[COL_OTHER_ADDR_STREET],
--					reply[COL_OTHER_ADDR_LOCALITY],
--					reply[COL_OTHER_ADDR_REGION],
--					reply[COL_OTHER_ADDR_CODE],
--					reply[COL_OTHER_ADDR_COUNTRY]);
-+	/* Addresses from contact struct */
-+	con_addr = g_strsplit(reply[COL_ADDR_CONTACT], MAIN_DELIM,
-+								MAX_FIELDS);
++	case BT_FLUSHABLE:
++		if (put_user(l2cap_pi(sk)->flushable, (u32 __user *) optval))
++			err = -EFAULT;
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -4697,7 +4739,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
  
--	add_address(contact, main_addr, get_addr_type(reply[COL_AFF_TYPE]));
-+	if (con_addr)
-+		for(i = 0; con_addr[i] != NULL; ++i)
-+			add_address(contact, con_addr[i], ADDR_TYPE_OTHER);
+ 	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
  
--	add_address(contact, other_addr, ADDR_TYPE_OTHER);
-+	g_strfreev(con_addr);
- 
--	g_free(main_addr);
--	g_free(other_addr);
- }
- 
- static void contact_add_organization(struct phonebook_contact *contact,
-@@ -1722,7 +1903,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
- 	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0)
- 		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
- 						id, id, id, id, id, id, id, id,
--						id, id, id, id, id);
-+						id, id, id, id, id, id);
- 	else
- 		query = g_strdup_printf(CONTACTS_OTHER_QUERY_FROM_URI,
- 								id, id, id);
+-	if (flags & ACL_START) {
++	if (!(flags & ACL_CONT)) {
+ 		struct l2cap_hdr *hdr;
+ 		struct sock *sk;
+ 		u16 cid;
 -- 
-1.7.0.4
+1.7.1
 
