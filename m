@@ -1,75 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.00.1012160741390.15684@linux-sea-02>
-References: <1292251105-31130-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1292251105-31130-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20101214192223.GD18509@vigoh>
-	<alpine.DEB.2.00.1012150817580.12898@linux-sea-02>
-	<AANLkTi=Kfm9jV0HA=Sa9=hs1meXthrpZEzn5-czTaSO+@mail.gmail.com>
-	<alpine.DEB.2.00.1012160741390.15684@linux-sea-02>
-Date: Fri, 17 Dec 2010 09:48:54 +0200
-Message-ID: <AANLkTimg3L021rh2iJYm1ZhaUrpb37tKM8N=WVKQaME-@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Use non-flushable pb flag by default for ACL
- data on capable chipsets.
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=81AdVX-F8Z=eDnMbc7S2mWK0s=BFLujmEU0x8@mail.gmail.com>
+References: <AANLkTi=81AdVX-F8Z=eDnMbc7S2mWK0s=BFLujmEU0x8@mail.gmail.com>
+Date: Thu, 16 Dec 2010 20:01:18 -0300
+Message-ID: <AANLkTim03oK2+aD0ZMup_rheOzqMKuQTjDaJUXDSS_bH@mail.gmail.com>
+Subject: Fwd: Initialization script for CC2540 Low energy dev kit
+From: =?ISO-8859-1?B?Sm9z6SBMde1z?= <jose.nascimento@signove.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi people,
 
-On Thu, Dec 16, 2010 at 7:03 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
->> <skipped>
->>>
->>> There is one more thing missing:  Even though there is an L2CAP socket
->>> option to set flush_to, and the flush_to is passed around during L2CAP
->>> configuration, there is no use of the "Write Automatic Flush Timeout" HCI
->>> command to tell the baseband what the flush timeout is!  Since the flush
->>> timeout is shared across all connections on the ACL, how should BlueZ
->>> handle
->>> the case where different flush timeouts are set on connections that share
->>> the same ACL?  (My guess is that either the longest or shortest timeout
->>> should be used, but there are good arguments either way)
->>
->> I would suggest bluetoothd to take care about setting Flush Timeout. There
->> is of course possibility to have sockopt for timeout and send HCI command
->> but this looks like a dirty hack.
->>
->> I think bluetoothd can read compare and write new flush timeout value.
->
-> There is *already* a sockopt for flush timeout (flush_to in l2cap_options,
-> it was added before 2005), but it is not terribly useful because it does not
-> configure the baseband.
+I'm trying to start with Low energy CC2540 Mini Development kit of TI on Linux,
+but I can't get the usb dongle work properly. When I try to attach the hci
+interface to the device with the command:
 
-Yes, I just check, that code is just dummy code and only used to set dummy
-value in L2CAP configuration phase with no actual use.
+hciattach /dev/ttyACM0 texas 57600 flow
 
-If I execute command like:
-#Write Automatic Flush Timeout
-~# hcitool cmd 0x03 0x0028 0x01 0x00 0xa0 0x0
-#for handle 0x0001 to 100ms
+I got the message:
 
-it will still report old value through that kernel interface.
+Found a Texas Instruments' chip!
+Firmware file : /lib/firmware/TIInit_0.2.0.bts
+can't open firmware file: No such file or directory
+Warning: cannot find BTS file: /lib/firmware/TIInit_0.2.0.bts
+Device setup complete
 
-> One more piece of background information: The spec requires the default
-> flush timeout to be infinite, so if no "Write Automatic Flush Timeout"
-> command is sent, none of this flush code will accomplish anything.  Android
-> has customized their version of BlueZ to send this command for A2DP
-> connections, with certain BR/EDR basebands.
+I would like to know where I can found this firmware initialization
+script (TIInit_0.2.0.bts) or a driver to make this dongle work.
+I'm using the git master version of bluez, and kernel 2.6.37-rc1+
+of vcgomes git tree (git://git.infradead.org/users/vcgomes/linux-2.6.git devel)
 
-I believe they do it right way.
+More information:
+lsusb shows:
+Bus 004 Device 004: ID 0451:16aa Texas Instruments, Inc.
+dmesg:
+[ 8125.944210] usb 4-2: new full speed USB device using uhci_hcd and address 4
+[ 8126.106197] cdc_acm 4-2:1.0: This device cannot do calls on its
+own. It is not a modem.
+[ 8126.106267] cdc_acm 4-2:1.0: ttyACM1: USB ACM device
 
-> I don't have any major objection to managing this setting from bluetoothd.
->  My only minor objection is that it requires an application to manipulate
-> the setting via DBus instead of using the existing sockopt - it would be
-> confusing to have both available, but I suppose the sockopt could be
-> deprecated or made read-only.  The flush timeout would seem to fit well as a
-> device property.
+hcitool lescan, returns:
+Enable scan failed: Connection timed out
+with the following hcidump:
+hcidump -X
+HCI sniffer - Bluetooth packet analyzer ver 0.17
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+  0000: 01 10 00 10 00 00 00                              .......
+> HCI Event: Command Complete (0x0e) plen 4
+    LE Set Scan Parameters (0x08|0x000b) ncmd 1
+    0000: 00                                                .
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+  0000: 01 00
 
-I would remove it at all, but of course it can be done as read-only.
 
-Regards,
-Andrei
+Thanks for any tip in advance
+
+[]'s
+
+--
+José Luís do Nascimento
+Signove - Seamless Technologies for Life!
+Home page: http://www.signove.com
