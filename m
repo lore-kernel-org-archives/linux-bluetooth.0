@@ -1,87 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Dec 2010 14:52:42 -0200
+Date: Thu, 16 Dec 2010 14:09:59 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
+To: Daniel Wagner <wagi@monom.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] Bluetooth: Add error handling for managment
- command handlers
-Message-ID: <20101216165242.GC5927@vigoh>
-References: <1292267227-22028-1-git-send-email-johan.hedberg@gmail.com>
- <1292267227-22028-2-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: HFP: typo in error path?
+Message-ID: <20101216160959.GA5927@vigoh>
+References: <20101216064231.GA2033@candlejack.bmw-carit.intra>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292267227-22028-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <20101216064231.GA2033@candlejack.bmw-carit.intra>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Daniel,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2010-12-13 21:07:03 +0200]:
+* Daniel Wagner <wagi@monom.org> [2010-12-16 07:42:31 +0100]:
 
-> From: Johan Hedberg <johan.hedberg@nokia.com>
+> Hi,
 > 
-> The command handlers for bluetooth management messaging should be able
-> to report errors (such as memory allocation failures) to the higher
-> levels in the call stack.
+> I'm reading a bit through the code and try to understand how the HF
+> role in HFP is implemented. I found following in audio/gateway.c:
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
->  net/bluetooth/mgmt.c |   11 ++++++++---
->  1 files changed, 8 insertions(+), 3 deletions(-)
+> static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond,
+> 			struct audio_device *dev)
+> {
+> 	struct gateway *gw = dev->gateway;
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index d15bf67..7ea5489 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -29,7 +29,7 @@
->  #include <net/bluetooth/hci_core.h>
->  #include <net/bluetooth/mgmt.h>
->  
-> -static void cmd_status(struct sock *sk, u16 cmd, u8 status)
-> +static int cmd_status(struct sock *sk, u16 cmd, u8 status)
->  {
->  	struct sk_buff *skb;
->  	struct mgmt_hdr *hdr;
-> @@ -39,7 +39,7 @@ static void cmd_status(struct sock *sk, u16 cmd, u8 status)
->  
->  	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
->  	if (!skb)
-> -		return;
-> +		return -ENOMEM;
->  
->  	hdr = (void *) skb_put(skb, sizeof(*hdr));
->  
-> @@ -52,6 +52,8 @@ static void cmd_status(struct sock *sk, u16 cmd, u8 status)
->  
->  	if (sock_queue_rcv_skb(sk, skb) < 0)
->  		kfree_skb(skb);
-> +
-> +	return 0;
->  }
->  
->  int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
-> @@ -87,10 +89,13 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
->  	switch (opcode) {
->  	default:
->  		BT_DBG("Unknown op %u", opcode);
-> -		cmd_status(sk, opcode, 0x01);
-> +		err = cmd_status(sk, opcode, 0x01);
->  		break;
->  	}
->  
-> +	if (err < 0)
-> +		goto done;
-> +
->  	err = msglen;
+> 	if (cond & G_IO_NVAL)
+> 		return FALSE;
+> 
+> 	if (cond & (G_IO_ERR | G_IO_HUP)) {
+> 		DBG("sco connection is released");
+> 		g_io_channel_shutdown(gw->sco, TRUE, NULL);
+> 		g_io_channel_unref(gw->sco);
+> 		gw->sco = NULL;
+> 		change_state(dev, GATEWAY_STATE_CONNECTED);
+> 		return FALSE;
+> 	}
+> 
+> 	return TRUE;
+> }
+> 
+> I don't really understand what's going on here, but just from the
+> naming I think the change_state call should be
+> GATEWAY_STATE_DISCONNECTED. If my assumation is correct I can spin a
+> patch.
 
-
-I think
-	if (!err)
-		err = msglen;
-
-
-is better.
-
+GATEWAY_STATE_CONNECTED means that we have Service Level Connection with the
+Phone, then if a new call arrives we change to the GATEWAY_STATE_PLAYING
+state to signal that we have audio, but if for some reason the SCO link fails
+we just go back to the GATEWAY_STATE_CONNECTED state because we still have the
+SLC running. So your assumption is wrong. ;)
 
 -- 
 Gustavo F. Padovan
