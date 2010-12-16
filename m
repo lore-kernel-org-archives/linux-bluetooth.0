@@ -1,123 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] add btd_error_not_ready()
-Date: Thu, 16 Dec 2010 15:58:08 -0200
-Message-Id: <1292522289-15173-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1292522289-15173-1-git-send-email-padovan@profusion.mobi>
-References: <1292522289-15173-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 1/3] add btd_error_agent_not_available()
+Date: Thu, 16 Dec 2010 15:58:07 -0200
+Message-Id: <1292522289-15173-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/headset.c |    3 +--
- src/adapter.c   |   16 +++++-----------
+ audio/gateway.c |    3 +--
+ src/adapter.c   |    3 +--
  src/error.c     |    6 ++++++
  src/error.h     |    1 +
- 4 files changed, 13 insertions(+), 13 deletions(-)
+ 4 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/audio/headset.c b/audio/headset.c
-index 01f91db..af75f8b 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -1696,8 +1696,7 @@ static DBusMessage *hs_connect(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_already_connected(msg);
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 655047d..43a4b02 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -369,8 +369,7 @@ static DBusMessage *ag_connect(DBusConnection *conn, DBusMessage *msg,
+ 	int err;
  
- 	if (hs->hfp_handle && !ag.telephony_ready)
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
--					"Telephony subsystem not ready");
-+		return btd_error_not_ready(msg);
+ 	if (!gw->agent)
+-		return g_dbus_create_error(msg, ERROR_INTERFACE
+-				".Failed", "Agent not assigned");
++		return btd_error_agent_not_available(msg);
  
- 	device->auto_connect = FALSE;
- 
+ 	err = get_records(au_dev);
+ 	if (err < 0)
 diff --git a/src/adapter.c b/src/adapter.c
-index a36d2b1..cd53455 100644
+index 2ff59a0..a36d2b1 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -140,12 +140,6 @@ struct btd_adapter {
- static void adapter_set_pairable_timeout(struct btd_adapter *adapter,
- 					guint interval);
- 
--static inline DBusMessage *adapter_not_ready(DBusMessage *msg)
--{
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
--			"Adapter is not ready");
--}
--
- static inline DBusMessage *not_in_progress(DBusMessage *msg, const char *str)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotInProgress",
-@@ -554,7 +548,7 @@ static DBusMessage *set_pairable(DBusConnection *conn, DBusMessage *msg,
+@@ -1412,8 +1412,7 @@ static DBusMessage *request_session(DBusConnection *conn,
  	int err;
  
- 	if (adapter->scan_mode == SCAN_DISABLED)
--		return adapter_not_ready(msg);
-+		return btd_error_not_ready(msg);
+ 	if (!adapter->agent)
+-		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
+-						"No agent registered");
++		return btd_error_agent_not_available(msg);
  
- 	if (pairable == adapter->pairable)
- 		goto done;
-@@ -1166,7 +1160,7 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
- 	int err;
- 
- 	if (!adapter->up)
--		return adapter_not_ready(msg);
-+		return btd_error_not_ready(msg);
- 
- 	req = find_session(adapter->disc_sessions, sender);
- 	if (req) {
-@@ -1198,7 +1192,7 @@ static DBusMessage *adapter_stop_discovery(DBusConnection *conn,
- 	const char *sender = dbus_message_get_sender(msg);
- 
- 	if (!adapter->up)
--		return adapter_not_ready(msg);
-+		return btd_error_not_ready(msg);
- 
- 	req = find_session(adapter->disc_sessions, sender);
- 	if (!req)
-@@ -1575,7 +1569,7 @@ static DBusMessage *create_device(DBusConnection *conn,
- 		return btd_error_invalid_args(msg);
- 
- 	if (!adapter->up)
--		return adapter_not_ready(msg);
-+		return btd_error_not_ready(msg);
- 
- 	if (adapter_find_device(adapter, address))
- 		return btd_error_already_exists(msg);
-@@ -1652,7 +1646,7 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
- 		return btd_error_invalid_args(msg);
- 
- 	if (!adapter->up)
--		return adapter_not_ready(msg);
-+		return btd_error_not_ready(msg);
- 
- 	sender = dbus_message_get_sender(msg);
- 	if (adapter->agent &&
+ 	if (!adapter->mode_sessions)
+ 		adapter->global_mode = adapter->mode;
 diff --git a/src/error.c b/src/error.c
-index ebfc614..c2d9baa 100644
+index 1ee98c8..ebfc614 100644
 --- a/src/error.c
 +++ b/src/error.c
-@@ -103,6 +103,12 @@ DBusMessage *btd_error_agent_not_available(DBusMessage *msg)
- 					"Agent Not Available");
+@@ -97,6 +97,12 @@ DBusMessage *btd_error_no_such_adapter(DBusMessage *msg)
+ 					"No such adapter");
  }
  
-+DBusMessage *btd_error_not_ready(DBusMessage *msg)
++DBusMessage *btd_error_agent_not_available(DBusMessage *msg)
 +{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
-+					"Resource Not Ready");
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".AgentNotAvailable",
++					"Agent Not Available");
 +}
 +
  DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
  {
  	return g_dbus_create_error(msg, ERROR_INTERFACE
 diff --git a/src/error.h b/src/error.h
-index ffd4332..cdb8919 100644
+index f346c07..ffd4332 100644
 --- a/src/error.h
 +++ b/src/error.h
-@@ -39,4 +39,5 @@ DBusMessage *btd_error_does_not_exist(DBusMessage *msg);
+@@ -38,4 +38,5 @@ DBusMessage *btd_error_in_progress(DBusMessage *msg);
+ DBusMessage *btd_error_does_not_exist(DBusMessage *msg);
  DBusMessage *btd_error_not_authorized(DBusMessage *msg);
  DBusMessage *btd_error_no_such_adapter(DBusMessage *msg);
- DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
-+DBusMessage *btd_error_not_ready(DBusMessage *msg);
++DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
  DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
 -- 
 1.7.3.2
