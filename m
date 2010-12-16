@@ -1,74 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] add btd_error_agent_not_available()
-Date: Thu, 16 Dec 2010 15:58:07 -0200
-Message-Id: <1292522289-15173-1-git-send-email-padovan@profusion.mobi>
+Date: Thu, 16 Dec 2010 19:31:50 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Add error handling for managment
+ command handlers
+Message-ID: <20101216173150.GA23500@jh-x301>
+References: <1292267227-22028-1-git-send-email-johan.hedberg@gmail.com>
+ <1292267227-22028-2-git-send-email-johan.hedberg@gmail.com>
+ <20101216165242.GC5927@vigoh>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="sm4nu43k4a2Rpi4c"
+In-Reply-To: <20101216165242.GC5927@vigoh>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/gateway.c |    3 +--
- src/adapter.c   |    3 +--
- src/error.c     |    6 ++++++
- src/error.h     |    1 +
- 4 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 655047d..43a4b02 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -369,8 +369,7 @@ static DBusMessage *ag_connect(DBusConnection *conn, DBusMessage *msg,
- 	int err;
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Gustavo,
+
+On Thu, Dec 16, 2010, Gustavo F. Padovan wrote:
+> > +	if (err < 0)
+> > +		goto done;
+> > +
+> >  	err = msglen;
+> 
+> 
+> I think
+> 	if (!err)
+> 		err = msglen;
+> 
+> 
+> is better.
+
+Agreed. Here's an updated patch. I used "err == 0" since that seems to
+be more common at least in Marcel's user space projects for non-boolean
+variable tests.
+
+Johan
+
+--sm4nu43k4a2Rpi4c
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-Bluetooth-Add-error-handling-for-managment-command-h.patch"
+
+>From 1b37152df73d9480382263f3e17c3856e8f403f3 Mon Sep 17 00:00:00 2001
+From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Fri, 10 Dec 2010 12:06:16 +0200
+Subject: [PATCH] Bluetooth: Add error handling for managment command handlers
+
+The command handlers for bluetooth management messaging should be able
+to report errors (such as memory allocation failures) to the higher
+levels in the call stack.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ net/bluetooth/mgmt.c |   11 +++++++----
+ 1 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d15bf67..e336fc1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -29,7 +29,7 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
  
- 	if (!gw->agent)
--		return g_dbus_create_error(msg, ERROR_INTERFACE
--				".Failed", "Agent not assigned");
-+		return btd_error_agent_not_available(msg);
+-static void cmd_status(struct sock *sk, u16 cmd, u8 status)
++static int cmd_status(struct sock *sk, u16 cmd, u8 status)
+ {
+ 	struct sk_buff *skb;
+ 	struct mgmt_hdr *hdr;
+@@ -39,7 +39,7 @@ static void cmd_status(struct sock *sk, u16 cmd, u8 status)
  
- 	err = get_records(au_dev);
- 	if (err < 0)
-diff --git a/src/adapter.c b/src/adapter.c
-index 2ff59a0..a36d2b1 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1412,8 +1412,7 @@ static DBusMessage *request_session(DBusConnection *conn,
- 	int err;
+ 	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev), GFP_ATOMIC);
+ 	if (!skb)
+-		return;
++		return -ENOMEM;
  
- 	if (!adapter->agent)
--		return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed",
--						"No agent registered");
-+		return btd_error_agent_not_available(msg);
+ 	hdr = (void *) skb_put(skb, sizeof(*hdr));
  
- 	if (!adapter->mode_sessions)
- 		adapter->global_mode = adapter->mode;
-diff --git a/src/error.c b/src/error.c
-index 1ee98c8..ebfc614 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -97,6 +97,12 @@ DBusMessage *btd_error_no_such_adapter(DBusMessage *msg)
- 					"No such adapter");
+@@ -52,6 +52,8 @@ static void cmd_status(struct sock *sk, u16 cmd, u8 status)
+ 
+ 	if (sock_queue_rcv_skb(sk, skb) < 0)
+ 		kfree_skb(skb);
++
++	return 0;
  }
  
-+DBusMessage *btd_error_agent_not_available(DBusMessage *msg)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".AgentNotAvailable",
-+					"Agent Not Available");
-+}
-+
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE
-diff --git a/src/error.h b/src/error.h
-index f346c07..ffd4332 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -38,4 +38,5 @@ DBusMessage *btd_error_in_progress(DBusMessage *msg);
- DBusMessage *btd_error_does_not_exist(DBusMessage *msg);
- DBusMessage *btd_error_not_authorized(DBusMessage *msg);
- DBusMessage *btd_error_no_such_adapter(DBusMessage *msg);
-+DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+@@ -87,11 +89,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	switch (opcode) {
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+-		cmd_status(sk, opcode, 0x01);
++		err = cmd_status(sk, opcode, 0x01);
+ 		break;
+ 	}
+ 
+-	err = msglen;
++	if (err == 0)
++		err = msglen;
+ 
+ done:
+ 	kfree(buf);
 -- 
-1.7.3.2
+1.7.2.3
 
+
+--sm4nu43k4a2Rpi4c--
