@@ -1,66 +1,358 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTi=81AdVX-F8Z=eDnMbc7S2mWK0s=BFLujmEU0x8@mail.gmail.com>
-References: <AANLkTi=81AdVX-F8Z=eDnMbc7S2mWK0s=BFLujmEU0x8@mail.gmail.com>
-Date: Thu, 16 Dec 2010 20:01:18 -0300
-Message-ID: <AANLkTim03oK2+aD0ZMup_rheOzqMKuQTjDaJUXDSS_bH@mail.gmail.com>
-Subject: Fwd: Initialization script for CC2540 Low energy dev kit
-From: =?ISO-8859-1?B?Sm9z6SBMde1z?= <jose.nascimento@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 2/5] Change CreatePairedDevice to support LE devices
+From: Brian Gix <bgix@codeaurora.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sheldon Demario <sheldon.demario@openbossa.org>
+In-Reply-To: <1292442852-26457-2-git-send-email-claudio.takahasi@openbossa.org>
+References: <1292442852-26457-1-git-send-email-claudio.takahasi@openbossa.org>
+	 <1292442852-26457-2-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain
+Date: Thu, 16 Dec 2010 14:42:47 -0800
+Message-Id: <1292539367.6740.13.camel@sealablnx02.qualcomm.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi people,
+Hi Claudio,
 
-I'm trying to start with Low energy CC2540 Mini Development kit of TI on Linux,
-but I can't get the usb dongle work properly. When I try to attach the hci
-interface to the device with the command:
+On Wed, 2010-12-15 at 16:54 -0300, Claudio Takahasi wrote:
+> From: Sheldon Demario <sheldon.demario@openbossa.org>
+> 
+> CreatePairedDevice implements now the same behaviour of CreateDevice,
+> triggering Discover All Primary Services when needed. SMP negotiation
+> starts when the link is established. LE capable kernel is required to
+> test this method properly.
 
-hciattach /dev/ttyACM0 texas 57600 flow
+What is your plan for handling single mode LE (remote) devices which
+have privacy enabled (random addresses). This impacts connection
+establishment, and SM pairing, as the remote device's addr type must
+be known at that time, and handled differently.
 
-I got the message:
+> 
+> Limitation: For dual mode devices, Discover All Primary Services is not
+> being executed after SDP search if GATT record is found.
+> ---
+>  src/adapter.c     |   46 ++++++++++++++++++++++++---
+>  src/device.c      |   89 +++++++++++++++++++++++++++-------------------------
+>  src/device.h      |    7 +++-
+>  src/glib-helper.c |    5 ++-
+>  src/glib-helper.h |    3 ++
+>  5 files changed, 98 insertions(+), 52 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 2ff59a0..c1fddce 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1611,7 +1611,11 @@ static DBusMessage *create_device(DBusConnection *conn,
+>  		return reply;
+>  	}
+>  
+> -	err = device_browse(device, conn, msg, NULL, FALSE);
+> +	if (type != DEVICE_TYPE_LE)
+> +		err = device_browse_sdp(device, conn, msg, NULL, FALSE);
+> +	else
+> +		err = device_browse_primary(device, conn, msg, BT_IO_SEC_LOW);
+> +
+>  	if (err < 0) {
+>  		adapter_remove_device(conn, adapter, device, TRUE);
+>  		return btd_error_failed(msg, strerror(-err));
+> @@ -1642,6 +1646,8 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
+>  	struct btd_device *device;
+>  	const gchar *address, *agent_path, *capability, *sender;
+>  	uint8_t cap;
+> +	device_type_t type;
+> +	int err;
+>  
+>  	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+>  					DBUS_TYPE_OBJECT_PATH, &agent_path,
+> @@ -1666,12 +1672,40 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
+>  	if (cap == IO_CAPABILITY_INVALID)
+>  		return btd_error_invalid_args(msg);
+>  
+> -	device = adapter_get_device(conn, adapter, address);
+> -	if (!device)
+> -		return btd_error_failed(msg,
+> -				"Unable to create a new device object");
+> +	device = adapter_find_device(adapter, address);
+> +	if (!device) {
+> +		struct remote_dev_info *dev, match;
+> +
+> +		memset(&match, 0, sizeof(struct remote_dev_info));
+> +		str2ba(address, &match.bdaddr);
+> +		match.name_status = NAME_ANY;
+> +
+> +		dev = adapter_search_found_devices(adapter, &match);
+> +		if (dev && dev->flags)
+> +			type = flags2type(dev->flags);
+> +		else
+> +			type = DEVICE_TYPE_BREDR;
+> +
+> +		if (type == DEVICE_TYPE_LE &&
+> +					!event_is_connectable(dev->evt_type))
+> +			return btd_error_failed(msg,
+> +					"Device is not connectable");
+> +
+> +		device = adapter_create_device(conn, adapter, address, type);
+> +		if (!device)
+> +			return NULL;
+> +	} else
+> +		type = device_get_type(device);
+> +
+> +	if (type != DEVICE_TYPE_LE)
+> +		return device_create_bonding(device, conn, msg,
+> +							agent_path, cap);
+>  
+> -	return device_create_bonding(device, conn, msg, agent_path, cap);
+> +	err = device_browse_primary(device, conn, msg, BT_IO_SEC_HIGH);
+> +	if (err < 0)
+> +		return btd_error_failed(msg, strerror(-err));
+> +
+> +	return NULL;
+>  }
+>  
+>  static gint device_path_cmp(struct btd_device *device, const gchar *path)
+> diff --git a/src/device.c b/src/device.c
+> index d20a6d4..cf3b146 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -586,7 +586,7 @@ static DBusMessage *discover_services(DBusConnection *conn,
+>  		return btd_error_invalid_args(msg);
+>  
+>  	if (strlen(pattern) == 0) {
+> -		err = device_browse(device, conn, msg, NULL, FALSE);
+> +		err = device_browse_sdp(device, conn, msg, NULL, FALSE);
+>  		if (err < 0)
+>  			goto fail;
+>  	} else {
+> @@ -597,7 +597,7 @@ static DBusMessage *discover_services(DBusConnection *conn,
+>  
+>  		sdp_uuid128_to_uuid(&uuid);
+>  
+> -		err = device_browse(device, conn, msg, &uuid, FALSE);
+> +		err = device_browse_sdp(device, conn, msg, &uuid, FALSE);
+>  		if (err < 0)
+>  			goto fail;
+>  	}
+> @@ -988,6 +988,11 @@ void device_get_name(struct btd_device *device, char *name, size_t len)
+>  	strncpy(name, device->name, len);
+>  }
+>  
+> +device_type_t device_get_type(struct btd_device *device)
+> +{
+> +	return device->type;
+> +}
+> +
+>  void device_remove_bonding(struct btd_device *device)
+>  {
+>  	char filename[PATH_MAX + 1];
+> @@ -1540,41 +1545,62 @@ done:
+>  	browse_request_free(req);
+>  }
+>  
+> -static struct browse_req *browse_primary(struct btd_device *device, int *err)
+> +int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+> +				DBusMessage *msg, BtIOSecLevel sec_level)
+>  {
+>  	struct btd_adapter *adapter = device->adapter;
+>  	struct browse_req *req;
+>  	bdaddr_t src;
+> -	int ret;
+> +	int err;
+> +
+> +	if (device->browse)
+> +		return -EBUSY;
+>  
+>  	req = g_new0(struct browse_req, 1);
+>  	req->device = btd_device_ref(device);
+>  
+>  	adapter_get_address(adapter, &src);
+>  
+> -	ret = bt_discover_primary(&src, &device->bdaddr, -1, primary_cb, req,
+> -									NULL);
+> -
+> -	if (ret < 0) {
+> +	err = bt_discover_primary(&src, &device->bdaddr, -1, primary_cb, req,
+> +								sec_level, NULL);
+> +	if (err < 0) {
+>  		browse_request_free(req);
+> -		if (err)
+> -			*err = ret;
+> +		return err;
+> +	}
+>  
+> -		return NULL;
+> +	if (conn == NULL)
+> +		conn = get_dbus_connection();
+> +
+> +	req->conn = dbus_connection_ref(conn);
+> +	device->browse = req;
+> +
+> +	if (msg) {
+> +		const char *sender = dbus_message_get_sender(msg);
+> +
+> +		req->msg = dbus_message_ref(msg);
+> +		/* Track the request owner to cancel it
+> +		 * automatically if the owner exits */
+> +		req->listener_id = g_dbus_add_disconnect_watch(conn,
+> +						sender,
+> +						discover_services_req_exit,
+> +						req, NULL);
+>  	}
+>  
+> -	return req;
+> +	return err;
+>  }
+>  
+> -static struct browse_req *browse_sdp(struct btd_device *device, uuid_t *search,
+> -						gboolean reverse, int *err)
+> +int device_browse_sdp(struct btd_device *device, DBusConnection *conn,
+> +			DBusMessage *msg, uuid_t *search, gboolean reverse)
+>  {
+>  	struct btd_adapter *adapter = device->adapter;
+>  	struct browse_req *req;
+>  	bt_callback_t cb;
+>  	bdaddr_t src;
+>  	uuid_t uuid;
+> -	int ret;
+> +	int err;
+> +
+> +	if (device->browse)
+> +		return -EBUSY;
+>  
+>  	adapter_get_address(adapter, &src);
+>  
+> @@ -1589,34 +1615,11 @@ static struct browse_req *browse_sdp(struct btd_device *device, uuid_t *search,
+>  		cb = browse_cb;
+>  	}
+>  
+> -	ret = bt_search_service(&src, &device->bdaddr, &uuid, cb, req, NULL);
+> -	if (ret < 0) {
+> +	err = bt_search_service(&src, &device->bdaddr, &uuid, cb, req, NULL);
+> +	if (err < 0) {
+>  		browse_request_free(req);
+> -		if (err)
+> -			*err = ret;
+> -
+> -		return NULL;
+> -	}
+> -
+> -	return req;
+> -}
+> -
+> -int device_browse(struct btd_device *device, DBusConnection *conn,
+> -			DBusMessage *msg, uuid_t *search, gboolean reverse)
+> -{
+> -	struct browse_req *req;
+> -	int err = 0;
+> -
+> -	if (device->browse)
+> -		return -EBUSY;
+> -
+> -	if (device->type == DEVICE_TYPE_LE)
+> -		req = browse_primary(device, &err);
+> -	else
+> -		req = browse_sdp(device, search, reverse, &err);
+> -
+> -	if (req == NULL)
+>  		return err;
+> +	}
+>  
+>  	if (conn == NULL)
+>  		conn = get_dbus_connection();
+> @@ -1719,7 +1722,7 @@ static gboolean start_discovery(gpointer user_data)
+>  {
+>  	struct btd_device *device = user_data;
+>  
+> -	device_browse(device, NULL, NULL, NULL, TRUE);
+> +	device_browse_sdp(device, NULL, NULL, NULL, TRUE);
+>  
+>  	device->discov_timer = 0;
+>  
+> @@ -2051,7 +2054,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
+>  			device->discov_timer = 0;
+>  		}
+>  
+> -		device_browse(device, bonding->conn, bonding->msg,
+> +		device_browse_sdp(device, bonding->conn, bonding->msg,
+>  				NULL, FALSE);
+>  
+>  		bonding_request_free(bonding);
+> diff --git a/src/device.h b/src/device.h
+> index 784e931..cafa529 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -24,6 +24,8 @@
+>  
+>  #define DEVICE_INTERFACE	"org.bluez.Device"
+>  
+> +#include "btio.h"
+> +
+>  struct btd_device;
+>  
+>  typedef enum {
+> @@ -46,9 +48,12 @@ struct btd_device *device_create(DBusConnection *conn,
+>  				const gchar *address, device_type_t type);
+>  void device_set_name(struct btd_device *device, const char *name);
+>  void device_get_name(struct btd_device *device, char *name, size_t len);
+> +device_type_t device_get_type(struct btd_device *device);
+>  void device_remove(struct btd_device *device, gboolean remove_stored);
+>  gint device_address_cmp(struct btd_device *device, const gchar *address);
+> -int device_browse(struct btd_device *device, DBusConnection *conn,
+> +int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+> +				DBusMessage *msg, BtIOSecLevel sec_level);
+> +int device_browse_sdp(struct btd_device *device, DBusConnection *conn,
+>  			DBusMessage *msg, uuid_t *search, gboolean reverse);
+>  void device_probe_drivers(struct btd_device *device, GSList *profiles);
+>  const sdp_record_t *btd_device_get_record(struct btd_device *device,
+> diff --git a/src/glib-helper.c b/src/glib-helper.c
+> index 6505249..edc46d8 100644
+> --- a/src/glib-helper.c
+> +++ b/src/glib-helper.c
+> @@ -520,6 +520,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  
+>  int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+>  					bt_primary_t cb, void *user_data,
+> +					BtIOSecLevel sec_level,
+>  					bt_destroy_t destroy)
+>  {
+>  	struct gattrib_context *ctxt;
+> @@ -541,14 +542,14 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+>  				BT_IO_OPT_SOURCE_BDADDR, src,
+>  				BT_IO_OPT_DEST_BDADDR, dst,
+>  				BT_IO_OPT_CID, GATT_CID,
+> -				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> +				BT_IO_OPT_SEC_LEVEL, sec_level,
+>  				BT_IO_OPT_INVALID);
+>  	else
+>  		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
+>  				BT_IO_OPT_SOURCE_BDADDR, src,
+>  				BT_IO_OPT_DEST_BDADDR, dst,
+>  				BT_IO_OPT_PSM, psm,
+> -				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> +				BT_IO_OPT_SEC_LEVEL, sec_level,
+>  				BT_IO_OPT_INVALID);
+>  
+>  	if (io == NULL) {
+> diff --git a/src/glib-helper.h b/src/glib-helper.h
+> index 5bb20a6..a16de6c 100644
+> --- a/src/glib-helper.h
+> +++ b/src/glib-helper.h
+> @@ -21,6 +21,8 @@
+>   *
+>   */
+>  
+> +#include "btio.h"
+> +
+>  typedef void (*bt_callback_t) (sdp_list_t *recs, int err, gpointer user_data);
+>  typedef void (*bt_primary_t) (GSList *l, int err, gpointer user_data);
+>  typedef void (*bt_destroy_t) (gpointer user_data);
+> @@ -35,6 +37,7 @@ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst);
+>  
+>  int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+>  					bt_primary_t cb, void *user_data,
+> +					BtIOSecLevel sec_level,
+>  					bt_destroy_t destroy);
+>  
+>  gchar *bt_uuid2string(uuid_t *uuid);
 
-Found a Texas Instruments' chip!
-Firmware file : /lib/firmware/TIInit_0.2.0.bts
-can't open firmware file: No such file or directory
-Warning: cannot find BTS file: /lib/firmware/TIInit_0.2.0.bts
-Device setup complete
-
-I would like to know where I can found this firmware initialization
-script (TIInit_0.2.0.bts) or a driver to make this dongle work.
-I'm using the git master version of bluez, and kernel 2.6.37-rc1+
-of vcgomes git tree (git://git.infradead.org/users/vcgomes/linux-2.6.git devel)
-
-More information:
-lsusb shows:
-Bus 004 Device 004: ID 0451:16aa Texas Instruments, Inc.
-dmesg:
-[ 8125.944210] usb 4-2: new full speed USB device using uhci_hcd and address 4
-[ 8126.106197] cdc_acm 4-2:1.0: This device cannot do calls on its
-own. It is not a modem.
-[ 8126.106267] cdc_acm 4-2:1.0: ttyACM1: USB ACM device
-
-hcitool lescan, returns:
-Enable scan failed: Connection timed out
-with the following hcidump:
-hcidump -X
-HCI sniffer - Bluetooth packet analyzer ver 0.17
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-  0000: 01 10 00 10 00 00 00                              .......
-> HCI Event: Command Complete (0x0e) plen 4
-    LE Set Scan Parameters (0x08|0x000b) ncmd 1
-    0000: 00                                                .
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-  0000: 01 00
-
-
-Thanks for any tip in advance
-
-[]'s
-
---
-José Luís do Nascimento
-Signove - Seamless Technologies for Life!
-Home page: http://www.signove.com
