@@ -1,208 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Fix __hci_request synchronization for hci_open_dev
-Date: Thu, 16 Dec 2010 19:16:44 +0200
-Message-Id: <1292519804-23286-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20101216092432.GB4322@jh-x301>
+References: <1292442852-26457-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1292442852-26457-2-git-send-email-claudio.takahasi@openbossa.org>
+	<20101216092432.GB4322@jh-x301>
+Date: Thu, 16 Dec 2010 14:16:26 -0300
+Message-ID: <AANLkTikQOsuUH5NdmBgu47AJLcKMyQ08nRRruj+X8Lfc@mail.gmail.com>
+Subject: Re: [PATCH 2/5] Change CreatePairedDevice to support LE devices
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Sheldon Demario <sheldon.demario@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Johan,
 
-The initialization function used by hci_open_dev (hci_init_req) sends
-many different HCI commands. The __hci_request function should only
-return when all of these commands have completed (or a timeout occurs).
-Several of these commands cause hci_req_complete to be called which
-causes __hci_request to return prematurely.
+On Thu, Dec 16, 2010 at 6:24 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Dec 15, 2010, Claudio Takahasi wrote:
+>> CreatePairedDevice implements now the same behaviour of CreateDevice,
+>> triggering Discover All Primary Services when needed. SMP negotiation
+>> starts when the link is established. LE capable kernel is required to
+>> test this method properly.
+>>
+>> Limitation: For dual mode devices, Discover All Primary Services is not
+>> being executed after SDP search if GATT record is found.
+>> ---
+>>  src/adapter.c     |   46 ++++++++++++++++++++++++---
+>>  src/device.c      |   89 +++++++++++++++++++++++++++-------------------------
+>>  src/device.h      |    7 +++-
+>>  src/glib-helper.c |    5 ++-
+>>  src/glib-helper.h |    3 ++
+>>  5 files changed, 98 insertions(+), 52 deletions(-)
+>
+> Couple of issue here:
+>
+>> @@ -1642,6 +1646,8 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
+>>       struct btd_device *device;
+>>       const gchar *address, *agent_path, *capability, *sender;
+>>       uint8_t cap;
+>> +     device_type_t type;
+>> +     int err;
+>>
+>>       if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+>>                                       DBUS_TYPE_OBJECT_PATH, &agent_path,
+>> @@ -1666,12 +1672,40 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
+>>       if (cap == IO_CAPABILITY_INVALID)
+>>               return btd_error_invalid_args(msg);
+>>
+>> -     device = adapter_get_device(conn, adapter, address);
+>> -     if (!device)
+>> -             return btd_error_failed(msg,
+>> -                             "Unable to create a new device object");
+>> +     device = adapter_find_device(adapter, address);
+>> +     if (!device) {
+>> +             struct remote_dev_info *dev, match;
+>> +
+>> +             memset(&match, 0, sizeof(struct remote_dev_info));
+>> +             str2ba(address, &match.bdaddr);
+>> +             match.name_status = NAME_ANY;
+>> +
+>> +             dev = adapter_search_found_devices(adapter, &match);
+>> +             if (dev && dev->flags)
+>> +                     type = flags2type(dev->flags);
+>> +             else
+>> +                     type = DEVICE_TYPE_BREDR;
+>> +
+>> +             if (type == DEVICE_TYPE_LE &&
+>> +                                     !event_is_connectable(dev->evt_type))
+>> +                     return btd_error_failed(msg,
+>> +                                     "Device is not connectable");
+>> +
+>> +             device = adapter_create_device(conn, adapter, address, type);
+>> +             if (!device)
+>> +                     return NULL;
+>> +     } else
+>> +             type = device_get_type(device);
+>> +
+>> +     if (type != DEVICE_TYPE_LE)
+>> +             return device_create_bonding(device, conn, msg,
+>> +                                                     agent_path, cap);
+>>
+>> -     return device_create_bonding(device, conn, msg, agent_path, cap);
+>> +     err = device_browse_primary(device, conn, msg, BT_IO_SEC_HIGH);
+>> +     if (err < 0)
+>> +             return btd_error_failed(msg, strerror(-err));
+>> +
+>> +     return NULL;
+>>  }
+>
+> I don't really like the way this makes the create_paired_device function
+> quite long. Could you maybe refactor the if (!device) branch into a
+> separate function?
+ok. We will try. Maybe it will be possible to create a common function
+to move shared code between CreateDevice and CreatePairedDevice.
 
-This patch fixes the issue by adding a new hdev->req_last_cmd variable
-which is set during the initialization procedure. The hci_req_complete
-function will no longer mark the request as complete until the command
-matching hdev->req_last_cmd completes.
+>
+>> diff --git a/src/device.h b/src/device.h
+>> index 784e931..cafa529 100644
+>> --- a/src/device.h
+>> +++ b/src/device.h
+>> @@ -24,6 +24,8 @@
+>>
+>>  #define DEVICE_INTERFACE     "org.bluez.Device"
+>>
+>> +#include "btio.h"
+>> +
+>
+> Includes should be the first thing after the copyright/license comments
+> in the file. However, to keep a clear visibility of potential circular
+> dependencies Marcel has requested this kind of inclusion of an internal
+> header file from within an internal header file to be avoided. Instead
+> make sure you include btio.h from early enough in the respective .c
+> file. You could also reconsider if you really need BtIOSecLevel here.
+> Maybe a "gboolean secure" flag would be enough?
+For now a boolean is enough, we can change it to boolean.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
-v3: This version makes the last command of the request completely
-generic so that __hci_request can be used for other multi-HCI command
-purposes besides the init sequence (something that will be needed in the
-future). The need for the HCI_CLOSE flag also goes away with this patch
-so the original patch for that can be ignored.
+>
+>> --- a/src/glib-helper.h
+>> +++ b/src/glib-helper.h
+>> @@ -21,6 +21,8 @@
+>>   *
+>>   */
+>>
+>> +#include "btio.h"
+>> +
+>
+> Same here.
+>
+> I'm feeling a little bit ambivalent about your additions to
+> glib-helper.c. It never had a clearly defined scope and I had been
+> hoping to get rid of it completely. However now it seems you guys are
+> constantly adding new stuff there. Is it really so that you can't find a
+> more specific location for these functions? Could you describe in one or
+> two sentences the purpose and scope that you think the glib-helper.c
+> functions have?
+>
+> Johan
+>
 
- include/net/bluetooth/hci_core.h |    3 ++-
- net/bluetooth/hci_core.c         |   10 +++++++---
- net/bluetooth/hci_event.c        |   33 +++++++++++++++++++++++----------
- 3 files changed, 32 insertions(+), 14 deletions(-)
+Currently, the purpose are service search functions and UUIDs utility functions.
+glib-helper was originally created to implement some utility functions
+to manage connections and sdp search abstractions.
+Connection functions were moved/removed when btio was created. I have
+two suggestions to try cleanup the code:
+1. keep only sdp functions that use GLib types and rename the file to
+gsdp or other convenient name
+2. Or create a btd_device_search/cancel functions(moving them to
+device.c) and try to remove glib-helper from the source tree, in the
+worst case keep only functions to manipulate UUIDs
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3786ee8..aad10e2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -129,6 +129,7 @@ struct hci_dev {
- 	wait_queue_head_t	req_wait_q;
- 	__u32			req_status;
- 	__u32			req_result;
-+	int			req_last_cmd;
- 
- 	struct inquiry_cache	inq_cache;
- 	struct hci_conn_hash	conn_hash;
-@@ -693,6 +694,6 @@ struct hci_sec_filter {
- #define hci_req_lock(d)		mutex_lock(&d->req_lock)
- #define hci_req_unlock(d)	mutex_unlock(&d->req_lock)
- 
--void hci_req_complete(struct hci_dev *hdev, int result);
-+void hci_req_complete(struct hci_dev *hdev, int cmd, int result);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1a4ec97..f60e68b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -91,9 +91,12 @@ static void hci_notify(struct hci_dev *hdev, int event)
- 
- /* ---- HCI requests ---- */
- 
--void hci_req_complete(struct hci_dev *hdev, int result)
-+void hci_req_complete(struct hci_dev *hdev, int cmd, int result)
- {
--	BT_DBG("%s result 0x%2.2x", hdev->name, result);
-+	BT_DBG("%s command %d result 0x%2.2x", hdev->name, cmd, result);
-+
-+	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
-+		return;
- 
- 	if (hdev->req_status == HCI_REQ_PEND) {
- 		hdev->req_result = result;
-@@ -149,7 +152,7 @@ static int __hci_request(struct hci_dev *hdev, void (*req)(struct hci_dev *hdev,
- 		break;
- 	}
- 
--	hdev->req_status = hdev->req_result = 0;
-+	hdev->req_last_cmd = hdev->req_status = hdev->req_result = 0;
- 
- 	BT_DBG("%s end: err %d", hdev->name, err);
- 
-@@ -252,6 +255,7 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	/* Connection accept timeout ~20 secs */
- 	param = cpu_to_le16(0x7d00);
- 	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
-+	hdev->req_last_cmd = HCI_OP_WRITE_CA_TIMEOUT;
- }
- 
- static void hci_scan_req(struct hci_dev *hdev, unsigned long opt)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8923b36..3810017 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -58,7 +58,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
- 
- 	hci_conn_check_pending(hdev);
- }
-@@ -174,7 +174,7 @@ static void hci_cc_write_def_link_policy(struct hci_dev *hdev, struct sk_buff *s
- 	if (!status)
- 		hdev->link_policy = get_unaligned_le16(sent);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, status);
- }
- 
- static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -183,7 +183,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_RESET, status);
- }
- 
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -235,7 +235,7 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 			clear_bit(HCI_AUTH, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_AUTH_ENABLE, status);
- }
- 
- static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -258,7 +258,7 @@ static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 			clear_bit(HCI_ENCRYPT, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_ENCRYPT_MODE, status);
- }
- 
- static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -285,7 +285,7 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 			set_bit(HCI_PSCAN, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_SCAN_ENABLE, status);
- }
- 
- static void hci_cc_read_class_of_dev(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -383,7 +383,7 @@ static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_HOST_BUFFER_SIZE, status);
- }
- 
- static void hci_cc_read_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -536,7 +536,16 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!rp->status)
- 		bacpy(&hdev->bdaddr, &rp->bdaddr);
- 
--	hci_req_complete(hdev, rp->status);
-+	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
-+}
-+
-+static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	hci_req_complete(hdev, HCI_OP_WRITE_CA_TIMEOUT, status);
- }
- 
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
-@@ -544,7 +553,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
- 	if (status) {
--		hci_req_complete(hdev, status);
-+		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 		hci_conn_check_pending(hdev);
- 	} else
-@@ -871,7 +880,7 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 	hci_conn_check_pending(hdev);
- }
-@@ -1379,6 +1388,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
- 
-+	case HCI_OP_WRITE_CA_TIMEOUT:
-+		hci_cc_write_ca_timeout(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
--- 
-1.7.2.3
+The bt_discover_primary can be moved to gatt.c if we split the
+discover cancel function.
+bt_discover_services() can be removed, there isn't reference in code.
 
+Which approach do you prefer? Any other suggestion?
+
+Regards,
+Claudio
