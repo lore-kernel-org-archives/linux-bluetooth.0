@@ -1,52 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: [PATCH 0/1] Add enc_read_blob_req() as defined in BT Core v4.0
 From: Brian Gix <bgix@codeaurora.org>
-Cc: rshaffer@codeaurora.org, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org
-Subject: [RFC 0/1] Implement Compound (Multi-step) GATT Procedure Support
-Date: Fri, 17 Dec 2010 14:48:50 -0800
-Message-Id: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
-To: unlisted-recipients:; (no To-header on input)
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1292612933-31095-1-git-send-email-bgix@codeaurora.org>
+References: <1292612933-31095-1-git-send-email-bgix@codeaurora.org>
+Content-Type: text/plain
+Date: Fri, 17 Dec 2010 13:01:32 -0800
+Message-Id: <1292619692.17733.11.camel@sealablnx02.qualcomm.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi All
 
-The following two proposed patches implement a method for correctly
-staging GATT procedures that require multiple ATT req/resp exchanges.
+On Fri, 2010-12-17 at 11:08 -0800, Brian Gix wrote:
+> Trivial addition of ATT API to encode READ_BLOB_REQ pkt.
+> 
 
-The first RFC / PATCH is gattrib.[ch], which allows the caller to specify
-a gboolean indicating that the command being queued is Compound
-(even if the procedure ends up being single/atomic) and a queue ID
-number, which allows the caller to cancel the GATT procedure at any
-stage of the transaction.
+I apologize for messing up what must seem to be trivial rules for what
+information to put where in the patches I am trying to get incorporated.
 
-IF -
-The ATT opcode being queued is specified as compound, the resulting response
-will not cause the next item in the queue to be sent until *after* the
-response has been forwarded to the caller via the response callback.
+This particular patch is in fact a trivial addition to the ATT code,
+which I believe probably is identical in all respects (including WS I
+hope) to how anyone else here would have implemented it.
 
-IF -
-The ATT opcode being queued is *not* compound, the resulting response
-will service the pkt queue immediately (legacy functionality).
+My follow on to this will be multi-step GATT procedures, I am going to
+try as an RFC first, as the concept of GATT procedures that contain more
+than one ATT Request/Response will be something that undoubtedly will
+cause people to want to offer input on.
 
-IF -
-The ID passed to g_attrib_send_seq is ZERO, the command pkt will
-be added to the TAIL of the queue, and a new ID assigned to it.
-(Legacy functionality)
+I also apologize for the sporadic nature of communication this week, as
+my workstation had a catastrophic failure which is taking some time to
+recover from.
 
-IF -
-The ID passed to g_attrib_send_seq is NON-ZERO, the command pkt
-will be added to the HEAD of the queue, causing it to be the next
-pkt sent to the remote device.  The NON-ZERO ID is also then able
-to cancel the command.
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-
-The second RFC / PATCH is to gatt.c. It modifies the existing gatt_read_char()
-function to recognize the need for a compound Read procedure, and implements
-it as a READ_REQ + READ_BLOB_REQ + READ_BLOB_REQ ...<etc> as needed, using
-the g_attrib_send_seq() logic from the first RFC / PATCH.
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
