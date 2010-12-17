@@ -11,567 +11,316 @@ Cc: <linux-kernel@vger.kernel.org>,
 	Linus Walleij <linus.walleij@stericsson.com>,
 	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
 	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH 10/11] arch_mach-ux500: Add U8500 board support for CG2900
-Date: Fri, 17 Dec 2010 12:25:49 +0100
-Message-ID: <1292585149-28654-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Subject: [PATCH 07/11] Bluetooth: Add UART API functions to ldisc
+Date: Fri, 17 Dec 2010 12:24:54 +0100
+Message-ID: <1292585094-28544-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds device settings and necessary callbacks for
-the ST-Ericsson CG2900 MFD driver into the UX500 board files.
-CG2900 is Connectivity combo controller supporting GPS, Bluetooth,
-and FM radio.
+This patch adds new functions to control break and flow
+as well as changing UART baud rate directly through the ldisc API
+rather then using the TTY API directly.
+It also adds a boolean parameter so it is optional to register
+to the Bluetooth stack (for drivers where a separate module
+registers to the Bluetooth stack instead).
 
 Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
 ---
- arch/arm/mach-ux500/Makefile         |    1 +
- arch/arm/mach-ux500/board-mop500.c   |  152 ++++++++++++++++
- arch/arm/mach-ux500/devices-cg2900.c |  313 ++++++++++++++++++++++++++++++++++
- arch/arm/mach-ux500/devices-cg2900.h |   19 ++
- 4 files changed, 485 insertions(+), 0 deletions(-)
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
+ drivers/bluetooth/hci_ath.c   |    1 +
+ drivers/bluetooth/hci_bcsp.c  |    3 +-
+ drivers/bluetooth/hci_h4.c    |    1 +
+ drivers/bluetooth/hci_ldisc.c |  101 +++++++++++++++++++++++++++++++++++++---
+ drivers/bluetooth/hci_ll.c    |    1 +
+ drivers/bluetooth/hci_uart.h  |   16 +++++++
+ 6 files changed, 114 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm/mach-ux500/Makefile b/arch/arm/mach-ux500/Makefile
-index 8411183..3497ec4 100644
---- a/arch/arm/mach-ux500/Makefile
-+++ b/arch/arm/mach-ux500/Makefile
-@@ -14,3 +14,4 @@ obj-$(CONFIG_REGULATOR_AB8500)	+= board-mop500-regulators.o
- obj-$(CONFIG_U5500_MODEM_IRQ)	+= modem_irq.o
- obj-$(CONFIG_U5500_MBOX)	+= mbox.o
- obj-$(CONFIG_CPU_FREQ)		+= cpufreq.o
-+obj-$(CONFIG_MFD_CG2900)	+= devices-cg2900.o
-diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
-index 3c3daf6..727d4a5 100644
---- a/arch/arm/mach-ux500/board-mop500.c
-+++ b/arch/arm/mach-ux500/board-mop500.c
-@@ -20,9 +20,13 @@
- #include <linux/amba/serial.h>
- #include <linux/spi/spi.h>
- #include <linux/mfd/ab8500.h>
-+#include <linux/mfd/cg2900.h>
- #include <linux/mfd/tc35892.h>
- #include <linux/input/matrix_keypad.h>
- 
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci.h>
-+
- #include <asm/mach-types.h>
- #include <asm/mach/arch.h>
- 
-@@ -37,6 +41,7 @@
- #include <mach/irqs.h>
- 
- #include "ste-dma40-db8500.h"
-+#include "devices-cg2900.h"
- #include "devices-db8500.h"
- #include "pins-db8500.h"
- #include "board-mop500.h"
-@@ -133,6 +138,130 @@ static struct spi_board_info ab8500_spi_devices[] = {
- 	},
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index 6a160c1..a948be6 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -215,6 +215,7 @@ static struct hci_uart_proto athp = {
+ 	.enqueue = ath_enqueue,
+ 	.dequeue = ath_dequeue,
+ 	.flush = ath_flush,
++	.register_hci_dev = true,
  };
  
-+#ifdef CONFIG_MFD_CG2900
-+#define CG2900_BT_ENABLE_GPIO		170
-+#define CG2900_GBF_ENA_RESET_GPIO	171
-+#define CG2900_BT_CTS_GPIO		0
-+
-+enum cg2900_gpio_pull_sleep cg2900_sleep_gpio[21] = {
-+	CG2900_NO_PULL,		/* GPIO 0:  PTA_CONFX */
-+	CG2900_PULL_DN,		/* GPIO 1:  PTA_STATUS */
-+	CG2900_NO_PULL,		/* GPIO 2:  UART_CTSN */
-+	CG2900_PULL_UP,		/* GPIO 3:  UART_RTSN */
-+	CG2900_PULL_UP,		/* GPIO 4:  UART_TXD */
-+	CG2900_NO_PULL,		/* GPIO 5:  UART_RXD */
-+	CG2900_PULL_DN,		/* GPIO 6:  IOM_DOUT */
-+	CG2900_NO_PULL,		/* GPIO 7:  IOM_FSC */
-+	CG2900_NO_PULL,		/* GPIO 8:  IOM_CLK */
-+	CG2900_NO_PULL,		/* GPIO 9:  IOM_DIN */
-+	CG2900_PULL_DN,		/* GPIO 10: PWR_REQ */
-+	CG2900_PULL_DN,		/* GPIO 11: HOST_WAKEUP */
-+	CG2900_PULL_DN,		/* GPIO 12: IIS_DOUT */
-+	CG2900_NO_PULL,		/* GPIO 13: IIS_WS */
-+	CG2900_NO_PULL,		/* GPIO 14: IIS_CLK */
-+	CG2900_NO_PULL,		/* GPIO 15: IIS_DIN */
-+	CG2900_PULL_DN,		/* GPIO 16: PTA_FREQ */
-+	CG2900_PULL_DN,		/* GPIO 17: PTA_RF_ACTIVE */
-+	CG2900_NO_PULL,		/* GPIO 18: NotConnected (J6428) */
-+	CG2900_NO_PULL,		/* GPIO 19: EXT_DUTY_CYCLE */
-+	CG2900_NO_PULL,		/* GPIO 20: EXT_FRM_SYNCH */
-+};
-+
-+static struct platform_device ux500_cg2900_device = {
-+	.name = "cg2900",
-+};
-+
-+#ifdef CONFIG_MFD_CG2900_CHIP
-+static struct platform_device ux500_cg2900_chip_device = {
-+	.name = "cg2900-chip",
-+	.dev = {
-+		.parent = &ux500_cg2900_device.dev,
-+	},
-+};
-+#endif /* CONFIG_MFD_CG2900_CHIP */
-+
-+#ifdef CONFIG_MFD_STLC2690_CHIP
-+static struct platform_device ux500_stlc2690_chip_device = {
-+	.name = "stlc2690-chip",
-+	.dev = {
-+		.parent = &ux500_cg2900_device.dev,
-+	},
-+};
-+#endif /* CONFIG_MFD_STLC2690_CHIP */
-+
-+#ifdef CONFIG_MFD_CG2900_TEST
-+static struct cg2900_platform_data cg2900_test_platform_data = {
-+	.bus = HCI_VIRTUAL,
-+	.gpio_sleep = cg2900_sleep_gpio,
-+};
-+
-+static struct platform_device ux500_cg2900_test_device = {
-+	.name = "cg2900-test",
-+	.dev = {
-+		.parent = &ux500_cg2900_device.dev,
-+		.platform_data = &cg2900_test_platform_data,
-+	},
-+};
-+#endif /* CONFIG_MFD_CG2900_TEST */
-+
-+#ifdef CONFIG_MFD_CG2900_UART
-+static struct resource cg2900_uart_resources[] = {
-+	{
-+		.start = CG2900_GBF_ENA_RESET_GPIO,
-+		.end = CG2900_GBF_ENA_RESET_GPIO,
-+		.flags = IORESOURCE_IO,
-+		.name = "gbf_ena_reset",
-+	},
-+	{
-+		.start = CG2900_BT_ENABLE_GPIO,
-+		.end = CG2900_BT_ENABLE_GPIO,
-+		.flags = IORESOURCE_IO,
-+		.name = "bt_enable",
-+	},
-+	{
-+		.start = NOMADIK_GPIO_TO_IRQ(CG2900_BT_CTS_GPIO),
-+		.end = NOMADIK_GPIO_TO_IRQ(CG2900_BT_CTS_GPIO),
-+		.flags = IORESOURCE_IRQ,
-+		.name = "cts_irq",
-+	},
-+};
-+
-+static pin_cfg_t cg2900_uart_enabled[] = {
-+	GPIO0_U0_CTSn   | PIN_INPUT_PULLUP,
-+	GPIO1_U0_RTSn   | PIN_OUTPUT_HIGH,
-+	GPIO2_U0_RXD    | PIN_INPUT_PULLUP,
-+	GPIO3_U0_TXD    | PIN_OUTPUT_HIGH
-+};
-+
-+static pin_cfg_t cg2900_uart_disabled[] = {
-+	GPIO0_GPIO   | PIN_INPUT_PULLUP,	/* CTS pull up. */
-+	GPIO1_GPIO   | PIN_OUTPUT_HIGH,		/* RTS high-flow off. */
-+	GPIO2_GPIO   | PIN_INPUT_PULLUP,	/* RX pull down. */
-+	GPIO3_GPIO   | PIN_OUTPUT_LOW		/* TX low - break on. */
-+};
-+
-+static struct cg2900_platform_data cg2900_uart_platform_data = {
-+	.bus = HCI_UART,
-+	.gpio_sleep = cg2900_sleep_gpio,
-+	.uart = {
-+		.n_uart_gpios = 4,
-+		.uart_enabled = cg2900_uart_enabled,
-+		.uart_disabled = cg2900_uart_disabled,
-+	},
-+};
-+
-+static struct platform_device ux500_cg2900_uart_device = {
-+	.name = "cg2900-uart",
-+	.dev = {
-+		.platform_data = &cg2900_uart_platform_data,
-+		.parent = &ux500_cg2900_device.dev,
-+	},
-+	.num_resources = ARRAY_SIZE(cg2900_uart_resources),
-+	.resource = cg2900_uart_resources,
-+};
-+#endif /* CONFIG_MFD_CG2900_UART */
-+#endif /* CONFIG_MFD_CG2900 */
-+
- /*
-  * TC35892
-  */
-@@ -446,6 +575,29 @@ static void __init u8500_init_machine(void)
- 	ux500_ske_keypad_device.dev.platform_data = &ske_keypad_board;
- 	platform_add_devices(platform_devs, ARRAY_SIZE(platform_devs));
+ int __init ath_init(void)
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 9c5b2dc..fe66cab 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -736,7 +736,8 @@ static struct hci_uart_proto bcsp = {
+ 	.enqueue	= bcsp_enqueue,
+ 	.dequeue	= bcsp_dequeue,
+ 	.recv		= bcsp_recv,
+-	.flush		= bcsp_flush
++	.flush		= bcsp_flush,
++	.register_hci_dev = true,
+ };
  
-+#ifdef CONFIG_MFD_CG2900
-+#ifdef CONFIG_MFD_CG2900_TEST
-+	dcg2900_init_platdata(&cg2900_test_platform_data);
-+#endif /* CONFIG_MFD_CG2900_TEST */
-+#ifdef CONFIG_MFD_CG2900_UART
-+	dcg2900_init_platdata(&cg2900_uart_platform_data);
-+#endif /* CONFIG_MFD_CG2900_UART */
+ int __init bcsp_init(void)
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 7b8ad93..3fd7e00 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -171,6 +171,7 @@ static struct hci_uart_proto h4p = {
+ 	.enqueue	= h4_enqueue,
+ 	.dequeue	= h4_dequeue,
+ 	.flush		= h4_flush,
++	.register_hci_dev = true,
+ };
+ 
+ int __init h4_init(void)
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 7201482..b00597e 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -46,7 +46,10 @@
+ 
+ #include "hci_uart.h"
+ 
+-#define VERSION "2.2"
++#define VERSION "2.3"
 +
-+	platform_device_register(&ux500_cg2900_device);
-+#ifdef CONFIG_MFD_CG2900_UART
-+	platform_device_register(&ux500_cg2900_uart_device);
-+#endif /* CONFIG_MFD_CG2900_UART */
-+#ifdef CONFIG_MFD_CG2900_TEST
-+	platform_device_register(&ux500_cg2900_test_device);
-+#endif /* CONFIG_MFD_CG2900_TEST */
-+#ifdef CONFIG_MFD_CG2900_CHIP
-+	platform_device_register(&ux500_cg2900_chip_device);
-+#endif /* CONFIG_MFD_CG2900_CHIP */
-+#ifdef CONFIG_MFD_STLC2690_CHIP
-+	platform_device_register(&ux500_stlc2690_chip_device);
-+#endif /* CONFIG_MFD_STLC2690_CHIP */
-+#endif /* CONFIG_MFD_CG2900 */
++#define TTY_BREAK_ON		(-1)
++#define TTY_BREAK_OFF		(0)
+ 
+ static int reset = 0;
+ 
+@@ -90,6 +93,9 @@ static inline void hci_uart_tx_complete(struct hci_uart *hu, int pkt_type)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+ 
++	if (!hdev)
++		return;
 +
- 	mop500_i2c_init();
- 	mop500_sdi_init();
- 	mop500_spi_init();
-diff --git a/arch/arm/mach-ux500/devices-cg2900.c b/arch/arm/mach-ux500/devices-cg2900.c
-new file mode 100644
-index 0000000..4dcef97
---- /dev/null
-+++ b/arch/arm/mach-ux500/devices-cg2900.c
-@@ -0,0 +1,313 @@
-+/*
-+ * arch/arm/mach-ux500/devices-cg2900.c
-+ *
-+ * Copyright (C) ST-Ericsson SA 2010
-+ * Authors:
-+ * Par-Gunnar Hjalmdahl (par-gunnar.p.hjalmdahl@stericsson.com) for ST-Ericsson.
-+ * Henrik Possung (henrik.possung@stericsson.com) for ST-Ericsson.
-+ * Josef Kindberg (josef.kindberg@stericsson.com) for ST-Ericsson.
-+ * Dariusz Szymszak (dariusz.xd.szymczak@stericsson.com) for ST-Ericsson.
-+ * Kjell Andersson (kjell.k.andersson@stericsson.com) for ST-Ericsson.
-+ * License terms:  GNU General Public License (GPL), version 2
-+ *
-+ * Board specific device support for the Linux Bluetooth HCI H:4 Driver
-+ * for ST-Ericsson connectivity controller.
-+ */
-+#define NAME			"devices-cg2900"
-+#define pr_fmt(fmt)		NAME ": " fmt "\n"
-+
-+#include <asm/byteorder.h>
-+#include <asm-generic/errno-base.h>
-+#include <linux/delay.h>
-+#include <linux/gpio.h>
-+#include <linux/interrupt.h>
-+#include <linux/ioport.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+#include <linux/skbuff.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+#include <linux/mfd/cg2900.h>
-+#include <plat/pincfg.h>
-+
-+#ifdef CONFIG_MFD_CG2900
-+
-+#define BT_VS_POWER_SWITCH_OFF		0xFD40
-+
-+#define H4_HEADER_LENGTH		0x01
-+#define BT_HEADER_LENGTH		0x03
-+
-+#define STLC2690_HCI_REV		0x0600
-+#define CG2900_PG1_HCI_REV		0x0101
-+#define CG2900_PG2_HCI_REV		0x0200
-+#define CG2900_PG1_SPECIAL_HCI_REV	0x0700
-+
-+struct vs_power_sw_off_cmd {
-+	__le16	op_code;
-+	u8	len;
-+	u8	gpio_0_7_pull_up;
-+	u8	gpio_8_15_pull_up;
-+	u8	gpio_16_20_pull_up;
-+	u8	gpio_0_7_pull_down;
-+	u8	gpio_8_15_pull_down;
-+	u8	gpio_16_20_pull_down;
-+} __attribute__((packed));
-+
-+struct dcg2900_info {
-+	int	gbf_gpio;
-+	int	bt_gpio;
-+	bool	sleep_gpio_set;
-+	u8	gpio_0_7_pull_up;
-+	u8	gpio_8_15_pull_up;
-+	u8	gpio_16_20_pull_up;
-+	u8	gpio_0_7_pull_down;
-+	u8	gpio_8_15_pull_down;
-+	u8	gpio_16_20_pull_down;
-+};
-+
-+static void dcg2900_enable_chip(struct cg2900_chip_dev *dev)
+ 	/* Update HCI stat counters */
+ 	switch (pkt_type) {
+ 	case HCI_COMMAND_PKT:
+@@ -139,7 +145,8 @@ restart:
+ 
+ 		set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+ 		len = tty->ops->write(tty, skb->data, skb->len);
+-		hdev->stat.byte_tx += len;
++		if (hdev)
++			hdev->stat.byte_tx += len;
+ 
+ 		skb_pull(skb, len);
+ 		if (skb->len) {
+@@ -158,6 +165,65 @@ restart:
+ 	return 0;
+ }
+ 
++int hci_uart_set_break(struct hci_uart *hu, bool break_on)
 +{
-+	struct dcg2900_info *info = dev->b_data;
++	struct tty_struct *tty = hu->tty;
++	int state = TTY_BREAK_OFF;
 +
-+	gpio_set_value(info->gbf_gpio, 1);
++	if (break_on)
++		state = TTY_BREAK_ON;
++
++	if (tty->ops->break_ctl)
++		return tty->ops->break_ctl(tty, state);
++	else
++		return -EOPNOTSUPP;
 +}
 +
-+static void dcg2900_disable_chip(struct cg2900_chip_dev *dev)
++void hci_uart_flow_ctrl(struct hci_uart *hu, bool flow_on)
 +{
-+	struct dcg2900_info *info = dev->b_data;
-+
-+	gpio_set_value(info->gbf_gpio, 0);
++	if (flow_on)
++		tty_unthrottle(hu->tty);
++	else
++		tty_throttle(hu->tty);
 +}
 +
-+static struct sk_buff *dcg2900_get_power_switch_off_cmd
-+				(struct cg2900_chip_dev *dev, u16 *op_code)
++int hci_uart_set_baudrate(struct hci_uart *hu, int baud)
 +{
-+	struct sk_buff *skb;
-+	struct vs_power_sw_off_cmd *cmd;
-+	struct dcg2900_info *info;
-+	int i;
++	struct ktermios old_termios;
++	struct tty_struct *tty = hu->tty;
 +
-+	/* If connected chip does not support the command return NULL */
-+	if (CG2900_PG1_SPECIAL_HCI_REV != dev->chip.hci_revision &&
-+	    CG2900_PG1_HCI_REV != dev->chip.hci_revision &&
-+	    CG2900_PG2_HCI_REV != dev->chip.hci_revision)
-+		return NULL;
++	if (!tty->ops->set_termios)
++		return -EOPNOTSUPP;
 +
-+	dev_dbg(dev->dev, "Generating PowerSwitchOff command\n");
++	mutex_lock(&(tty->termios_mutex));
++	/* Start by storing the old termios. */
++	memcpy(&old_termios, tty->termios, sizeof(old_termios));
 +
-+	info = dev->b_data;
++	tty_encode_baud_rate(tty, baud, baud);
 +
-+	skb = alloc_skb(sizeof(*cmd) + H4_HEADER_LENGTH, GFP_KERNEL);
-+	if (!skb) {
-+		dev_err(dev->dev, "Could not allocate skb\n");
-+		return NULL;
-+	}
++	/* Finally inform the driver */
++	tty->ops->set_termios(tty, &old_termios);
 +
-+	skb_reserve(skb, H4_HEADER_LENGTH);
-+	cmd = (struct vs_power_sw_off_cmd *)skb_put(skb, sizeof(*cmd));
-+	cmd->op_code = cpu_to_le16(BT_VS_POWER_SWITCH_OFF);
-+	cmd->len = sizeof(*cmd) - BT_HEADER_LENGTH;
-+	/*
-+	 * Enter system specific GPIO settings here:
-+	 * Section data[3-5] is GPIO pull-up selection
-+	 * Section data[6-8] is GPIO pull-down selection
-+	 * Each section is a bitfield where
-+	 * - byte 0 bit 0 is GPIO 0
-+	 * - byte 0 bit 1 is GPIO 1
-+	 * - up to
-+	 * - byte 2 bit 4 which is GPIO 20
-+	 * where each bit means:
-+	 * - 0: No pull-up / no pull-down
-+	 * - 1: Pull-up / pull-down
-+	 * All GPIOs are set as input.
-+	 */
-+	if (!info->sleep_gpio_set) {
-+		struct cg2900_platform_data *pf_data;
-+
-+		pf_data = dev_get_platdata(dev->dev);
-+		for (i = 0; i < 8; i++) {
-+			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
-+				info->gpio_0_7_pull_up |= (1 << i);
-+			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
-+				info->gpio_0_7_pull_down |= (1 << i);
-+		}
-+		for (i = 8; i < 16; i++) {
-+			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
-+				info->gpio_8_15_pull_up |= (1 << (i - 8));
-+			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
-+				info->gpio_8_15_pull_down |= (1 << (i - 8));
-+		}
-+		for (i = 16; i < 21; i++) {
-+			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
-+				info->gpio_16_20_pull_up |= (1 << (i - 16));
-+			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
-+				info->gpio_16_20_pull_down |= (1 << (i - 16));
-+		}
-+		info->sleep_gpio_set = true;
-+	}
-+	cmd->gpio_0_7_pull_up = info->gpio_0_7_pull_up;
-+	cmd->gpio_8_15_pull_up = info->gpio_8_15_pull_up;
-+	cmd->gpio_16_20_pull_up = info->gpio_16_20_pull_up;
-+	cmd->gpio_0_7_pull_down = info->gpio_0_7_pull_down;
-+	cmd->gpio_8_15_pull_down = info->gpio_8_15_pull_down;
-+	cmd->gpio_16_20_pull_down = info->gpio_16_20_pull_down;
-+
-+
-+	if (op_code)
-+		*op_code = BT_VS_POWER_SWITCH_OFF;
-+
-+	return skb;
-+}
-+
-+static int dcg2900_init(struct cg2900_chip_dev *dev)
-+{
-+	int err = 0;
-+	struct dcg2900_info *info;
-+	struct resource *resource;
-+	const char *gbf_name;
-+	const char *bt_name = NULL;
-+
-+	/* First retrieve and save the resources */
-+	info = kzalloc(sizeof(*info), GFP_KERNEL);
-+	if (!info) {
-+		dev_err(dev->dev, "Could not allocate dcg2900_info\n");
-+		return -ENOMEM;
-+	}
-+
-+	if (!dev->pdev->num_resources) {
-+		dev_dbg(dev->dev, "No resources available\n");
-+		info->gbf_gpio = -1;
-+		info->bt_gpio = -1;
-+		goto finished;
-+	}
-+
-+	resource = platform_get_resource(dev->pdev, IORESOURCE_IO, 0);
-+	if (!resource) {
-+		dev_err(dev->dev, "GBF GPIO does not exist\n");
-+		err = -EINVAL;
-+		goto err_handling;
-+	}
-+	info->gbf_gpio = resource->start;
-+	gbf_name = resource->name;
-+
-+	resource = platform_get_resource(dev->pdev, IORESOURCE_IO, 1);
-+	/* BT Enable GPIO may not exist */
-+	if (resource) {
-+		info->bt_gpio = resource->start;
-+		bt_name = resource->name;
-+	}
-+
-+	/* Now setup the GPIOs */
-+	err = gpio_request(info->gbf_gpio, gbf_name);
-+	if (err < 0) {
-+		dev_err(dev->dev, "gpio_request failed with err: %d\n", err);
-+		goto err_handling;
-+	}
-+
-+	err = gpio_direction_output(info->gbf_gpio, 0);
-+	if (err < 0) {
-+		dev_err(dev->dev, "gpio_direction_output failed with err: %d\n",
-+			err);
-+		goto err_handling_free_gpio_gbf;
-+	}
-+
-+	if (!bt_name) {
-+		info->bt_gpio = -1;
-+		goto finished;
-+	}
-+
-+	err = gpio_request(info->bt_gpio, bt_name);
-+	if (err < 0) {
-+		dev_err(dev->dev, "gpio_request failed with err: %d\n", err);
-+		goto err_handling_free_gpio_gbf;
-+	}
-+
-+	err = gpio_direction_output(info->bt_gpio, 1);
-+	if (err < 0) {
-+		dev_err(dev->dev, "gpio_direction_output failed with err: %d\n",
-+			err);
-+		goto err_handling_free_gpio_bt;
-+	}
-+
-+finished:
-+	dev->b_data = info;
-+	return 0;
-+
-+err_handling_free_gpio_bt:
-+	gpio_free(info->bt_gpio);
-+err_handling_free_gpio_gbf:
-+	gpio_free(info->gbf_gpio);
-+err_handling:
-+	kfree(info);
-+	return err;
-+}
-+
-+static void dcg2900_exit(struct cg2900_chip_dev *dev)
-+{
-+	struct dcg2900_info *info = dev->b_data;
-+
-+	dcg2900_disable_chip(dev);
-+	if (info->bt_gpio != -1)
-+		gpio_free(info->bt_gpio);
-+	if (info->gbf_gpio != -1)
-+		gpio_free(info->gbf_gpio);
-+	kfree(info);
-+	dev->b_data = NULL;
-+}
-+
-+#ifdef CONFIG_MFD_CG2900_UART
-+static int dcg2900_disable_uart(struct cg2900_chip_dev *dev)
-+{
-+	int err;
-+	struct cg2900_platform_data *pdata = dev_get_platdata(dev->dev);
-+
-+	/*
-+	 * Without this delay we get interrupt on CTS immediately
-+	 * due to some turbulences on this line.
-+	 */
-+	mdelay(4);
-+
-+	/* Disable UART functions. */
-+	err = nmk_config_pins(pdata->uart.uart_disabled,
-+			      pdata->uart.n_uart_gpios);
-+	if (err)
-+		goto error;
++	mutex_unlock(&(tty->termios_mutex));
 +
 +	return 0;
-+
-+error:
-+	(void)nmk_config_pins(pdata->uart.uart_enabled,
-+			      pdata->uart.n_uart_gpios);
-+	dev_err(dev->dev, "Cannot set interrupt (%d)\n", err);
-+	return err;
 +}
 +
-+static int dcg2900_enable_uart(struct cg2900_chip_dev *dev)
++int hci_uart_tiocmget(struct hci_uart *hu)
 +{
-+	int err;
-+	struct cg2900_platform_data *pdata = dev_get_platdata(dev->dev);
++	struct tty_struct *tty = hu->tty;
 +
-+	/* Restore UART settings. */
-+	err = nmk_config_pins(pdata->uart.uart_enabled,
-+			      pdata->uart.n_uart_gpios);
-+	if (err)
-+		dev_err(dev->dev, "Unable to enable UART (%d)\n", err);
++	if (!tty->ops->tiocmget ||  !hu->fd)
++		return -EOPNOTSUPP;
 +
-+	return err;
++	return tty->ops->tiocmget(tty, hu->fd);
 +}
-+#endif /* CONFIG_MFD_CG2900_UART */
 +
-+void dcg2900_init_platdata(struct cg2900_platform_data *data)
++void hci_uart_flush_buffer(struct hci_uart *hu)
 +{
-+	data->init = dcg2900_init;
-+	data->exit = dcg2900_exit;
-+	data->enable_chip = dcg2900_enable_chip;
-+	data->disable_chip = dcg2900_disable_chip;
-+	data->get_power_switch_off_cmd = dcg2900_get_power_switch_off_cmd;
-+#ifdef CONFIG_MFD_CG2900_UART
-+	data->uart.enable_uart = dcg2900_enable_uart;
-+	data->uart.disable_uart = dcg2900_disable_uart;
-+#endif /* CONFIG_MFD_CG2900_UART */
++	tty_driver_flush_buffer(hu->tty);
 +}
-+#endif /* CONFIG_MFD_CG2900 */
-diff --git a/arch/arm/mach-ux500/devices-cg2900.h b/arch/arm/mach-ux500/devices-cg2900.h
-new file mode 100644
-index 0000000..958b750
---- /dev/null
-+++ b/arch/arm/mach-ux500/devices-cg2900.h
-@@ -0,0 +1,19 @@
-+/*
-+ * Copyright (C) ST-Ericsson SA 2010
-+ *
-+ * Author: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-+ * License terms: GNU General Public License (GPL), version 2.
-+ */
 +
-+#ifndef __DEVICES_CG2900_H
-+#define __DEVICES_CG2900_H
+ /* ------- Interface to HCI layer ------ */
+ /* Initialize device */
+ static int hci_uart_open(struct hci_dev *hdev)
+@@ -210,6 +276,7 @@ static int hci_uart_close(struct hci_dev *hdev)
+ static int hci_uart_send_frame(struct sk_buff *skb)
+ {
+ 	struct hci_dev* hdev = (struct hci_dev *) skb->dev;
++	struct tty_struct *tty;
+ 	struct hci_uart *hu;
+ 
+ 	if (!hdev) {
+@@ -221,6 +288,7 @@ static int hci_uart_send_frame(struct sk_buff *skb)
+ 		return -EBUSY;
+ 
+ 	hu = (struct hci_uart *) hdev->driver_data;
++	tty = hu->tty;
+ 
+ 	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
+ 
+@@ -311,8 +379,11 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 
+ 		if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+ 			hu->proto->close(hu);
+-			hci_unregister_dev(hdev);
+-			hci_free_dev(hdev);
 +
-+#include <linux/mfd/cg2900.h>
++			if (hdev) {
++				hci_unregister_dev(hdev);
++				hci_free_dev(hdev);
++			}
+ 		}
+ 	}
+ }
+@@ -367,7 +438,8 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data, char *f
+ 
+ 	spin_lock(&hu->rx_lock);
+ 	hu->proto->recv(hu, (void *) data, count);
+-	hu->hdev->stat.byte_rx += count;
++	if (hu->hdev)
++		hu->hdev->stat.byte_rx += count;
+ 	spin_unlock(&hu->rx_lock);
+ 
+ 	tty_unthrottle(tty);
+@@ -423,11 +495,18 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 	if (!p)
+ 		return -EPROTONOSUPPORT;
+ 
++	hu->proto = p;
 +
-+/**
-+ * dcg2900_init_platdata() - Initializes platform data with callback functions.
-+ * @data:	Platform data.
-+ */
-+extern void dcg2900_init_platdata(struct cg2900_platform_data *data);
+ 	err = p->open(hu);
+ 	if (err)
+ 		return err;
+ 
+-	hu->proto = p;
++	/*
++	 * Protocol might register hdev by itself.
++	 * In that case, there is no need to register it here.
++	 */
++	if (!hu->proto->register_hci_dev)
++		return 0;
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+@@ -471,6 +550,8 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
+ 				clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+ 				return err;
+ 			}
++			/* Keep file descriptor.*/
++			hu->fd = file;
+ 		} else
+ 			return -EBUSY;
+ 		break;
+@@ -481,8 +562,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
+ 		return -EUNATCH;
+ 
+ 	case HCIUARTGETDEVICE:
+-		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+-			return hu->hdev->id;
++		if (test_bit(HCI_UART_PROTO_SET, &hu->flags)) {
++			if (hu->hdev)
++				return hu->hdev->id;
++			else
++				return -ENOMSG;
++		}
+ 		return -EUNATCH;
+ 
+ 	case HCIUARTSETFLAGS:
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 38595e7..085656c 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -515,6 +515,7 @@ static struct hci_uart_proto llp = {
+ 	.enqueue	= ll_enqueue,
+ 	.dequeue	= ll_dequeue,
+ 	.flush		= ll_flush,
++	.register_hci_dev = true,
+ };
+ 
+ int __init ll_init(void)
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 99fb352..ab195fb 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -43,9 +43,16 @@
+ #define HCI_UART_H4DS	3
+ #define HCI_UART_LL	4
+ #define HCI_UART_ATH3K	5
++#define HCI_UART_STE	6
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ 
++/* UART break and flow control parameters */
++#define BREAK_ON		true
++#define BREAK_OFF		false
++#define FLOW_ON			true
++#define FLOW_OFF		false
 +
-+#endif /* __DEVICES_CG2900_H */
+ struct hci_uart;
+ 
+ struct hci_uart_proto {
+@@ -56,6 +63,8 @@ struct hci_uart_proto {
+ 	int (*recv)(struct hci_uart *hu, void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
++	bool register_hci_dev;
++	struct device *dev;
+ };
+ 
+ struct hci_uart {
+@@ -70,6 +79,8 @@ struct hci_uart {
+ 	struct sk_buff		*tx_skb;
+ 	unsigned long		tx_state;
+ 	spinlock_t		rx_lock;
++
++	struct file		*fd;
+ };
+ 
+ /* HCI_UART proto flag bits */
+@@ -82,6 +93,11 @@ struct hci_uart {
+ int hci_uart_register_proto(struct hci_uart_proto *p);
+ int hci_uart_unregister_proto(struct hci_uart_proto *p);
+ int hci_uart_tx_wakeup(struct hci_uart *hu);
++int hci_uart_set_baudrate(struct hci_uart *hu, int baud);
++int hci_uart_set_break(struct hci_uart *hu, bool break_on);
++int hci_uart_tiocmget(struct hci_uart *hu);
++void hci_uart_flush_buffer(struct hci_uart *hu);
++void hci_uart_flow_ctrl(struct hci_uart *hu, bool flow_on);
+ 
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
 -- 
 1.7.3.2
