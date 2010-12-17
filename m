@@ -11,465 +11,567 @@ Cc: <linux-kernel@vger.kernel.org>,
 	Linus Walleij <linus.walleij@stericsson.com>,
 	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
 	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH 06/11] mfd: Add CG2900 test character device
-Date: Fri, 17 Dec 2010 12:24:37 +0100
-Message-ID: <1292585077-28510-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Subject: [PATCH 10/11] arch_mach-ux500: Add U8500 board support for CG2900
+Date: Fri, 17 Dec 2010 12:25:49 +0100
+Message-ID: <1292585149-28654-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a character device used for testing the
-chip driver connected to the ST-Ericsson CG2900 framework.
-This patch creates a character device, which when opened registers
-as a transport. This allows for test applications placed in User space
-to act as chips.
+This patch adds device settings and necessary callbacks for
+the ST-Ericsson CG2900 MFD driver into the UX500 board files.
+CG2900 is Connectivity combo controller supporting GPS, Bluetooth,
+and FM radio.
 
 Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
 ---
- drivers/mfd/Kconfig              |    7 +
- drivers/mfd/cg2900/Makefile      |    2 +
- drivers/mfd/cg2900/cg2900_test.c |  402 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 411 insertions(+), 0 deletions(-)
- create mode 100644 drivers/mfd/cg2900/cg2900_test.c
+ arch/arm/mach-ux500/Makefile         |    1 +
+ arch/arm/mach-ux500/board-mop500.c   |  152 ++++++++++++++++
+ arch/arm/mach-ux500/devices-cg2900.c |  313 ++++++++++++++++++++++++++++++++++
+ arch/arm/mach-ux500/devices-cg2900.h |   19 ++
+ 4 files changed, 485 insertions(+), 0 deletions(-)
+ create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
+ create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
 
-diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-index 44a36bb..4c2b5cc 100644
---- a/drivers/mfd/Kconfig
-+++ b/drivers/mfd/Kconfig
-@@ -299,6 +299,13 @@ config MFD_CG2900_AUDIO
- 	  Does not itself connect to for example ALSA framework, but is used by
- 	  ALSA drivers.
+diff --git a/arch/arm/mach-ux500/Makefile b/arch/arm/mach-ux500/Makefile
+index 8411183..3497ec4 100644
+--- a/arch/arm/mach-ux500/Makefile
++++ b/arch/arm/mach-ux500/Makefile
+@@ -14,3 +14,4 @@ obj-$(CONFIG_REGULATOR_AB8500)	+= board-mop500-regulators.o
+ obj-$(CONFIG_U5500_MODEM_IRQ)	+= modem_irq.o
+ obj-$(CONFIG_U5500_MBOX)	+= mbox.o
+ obj-$(CONFIG_CPU_FREQ)		+= cpufreq.o
++obj-$(CONFIG_MFD_CG2900)	+= devices-cg2900.o
+diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
+index 3c3daf6..727d4a5 100644
+--- a/arch/arm/mach-ux500/board-mop500.c
++++ b/arch/arm/mach-ux500/board-mop500.c
+@@ -20,9 +20,13 @@
+ #include <linux/amba/serial.h>
+ #include <linux/spi/spi.h>
+ #include <linux/mfd/ab8500.h>
++#include <linux/mfd/cg2900.h>
+ #include <linux/mfd/tc35892.h>
+ #include <linux/input/matrix_keypad.h>
  
-+config MFD_CG2900_TEST
-+	tristate "Support CG2900 Test Char Device"
-+	depends on MFD_CG2900
-+	help
-+	  Support for ST-Ericsson CG2900 Test Character Device.
-+	  It is used as a virtual transport when verifying the chip driver.
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci.h>
 +
- config PMIC_DA903X
- 	bool "Dialog Semiconductor DA9030/DA9034 PMIC Support"
- 	depends on I2C=y
-diff --git a/drivers/mfd/cg2900/Makefile b/drivers/mfd/cg2900/Makefile
-index e4f6a4b..4188888 100644
---- a/drivers/mfd/cg2900/Makefile
-+++ b/drivers/mfd/cg2900/Makefile
-@@ -7,6 +7,8 @@ export-objs			:= cg2900_core.o cg2900_lib.o
+ #include <asm/mach-types.h>
+ #include <asm/mach/arch.h>
  
- obj-$(CONFIG_MFD_CG2900)	+= cg2900_char_devices.o
+@@ -37,6 +41,7 @@
+ #include <mach/irqs.h>
  
-+obj-$(CONFIG_MFD_CG2900_TEST)	+= cg2900_test.o
+ #include "ste-dma40-db8500.h"
++#include "devices-cg2900.h"
+ #include "devices-db8500.h"
+ #include "pins-db8500.h"
+ #include "board-mop500.h"
+@@ -133,6 +138,130 @@ static struct spi_board_info ab8500_spi_devices[] = {
+ 	},
+ };
+ 
++#ifdef CONFIG_MFD_CG2900
++#define CG2900_BT_ENABLE_GPIO		170
++#define CG2900_GBF_ENA_RESET_GPIO	171
++#define CG2900_BT_CTS_GPIO		0
 +
- obj-$(CONFIG_MFD_CG2900_CHIP)	+= cg2900_chip.o
- obj-$(CONFIG_MFD_STLC2690_CHIP)	+= stlc2690_chip.o
++enum cg2900_gpio_pull_sleep cg2900_sleep_gpio[21] = {
++	CG2900_NO_PULL,		/* GPIO 0:  PTA_CONFX */
++	CG2900_PULL_DN,		/* GPIO 1:  PTA_STATUS */
++	CG2900_NO_PULL,		/* GPIO 2:  UART_CTSN */
++	CG2900_PULL_UP,		/* GPIO 3:  UART_RTSN */
++	CG2900_PULL_UP,		/* GPIO 4:  UART_TXD */
++	CG2900_NO_PULL,		/* GPIO 5:  UART_RXD */
++	CG2900_PULL_DN,		/* GPIO 6:  IOM_DOUT */
++	CG2900_NO_PULL,		/* GPIO 7:  IOM_FSC */
++	CG2900_NO_PULL,		/* GPIO 8:  IOM_CLK */
++	CG2900_NO_PULL,		/* GPIO 9:  IOM_DIN */
++	CG2900_PULL_DN,		/* GPIO 10: PWR_REQ */
++	CG2900_PULL_DN,		/* GPIO 11: HOST_WAKEUP */
++	CG2900_PULL_DN,		/* GPIO 12: IIS_DOUT */
++	CG2900_NO_PULL,		/* GPIO 13: IIS_WS */
++	CG2900_NO_PULL,		/* GPIO 14: IIS_CLK */
++	CG2900_NO_PULL,		/* GPIO 15: IIS_DIN */
++	CG2900_PULL_DN,		/* GPIO 16: PTA_FREQ */
++	CG2900_PULL_DN,		/* GPIO 17: PTA_RF_ACTIVE */
++	CG2900_NO_PULL,		/* GPIO 18: NotConnected (J6428) */
++	CG2900_NO_PULL,		/* GPIO 19: EXT_DUTY_CYCLE */
++	CG2900_NO_PULL,		/* GPIO 20: EXT_FRM_SYNCH */
++};
++
++static struct platform_device ux500_cg2900_device = {
++	.name = "cg2900",
++};
++
++#ifdef CONFIG_MFD_CG2900_CHIP
++static struct platform_device ux500_cg2900_chip_device = {
++	.name = "cg2900-chip",
++	.dev = {
++		.parent = &ux500_cg2900_device.dev,
++	},
++};
++#endif /* CONFIG_MFD_CG2900_CHIP */
++
++#ifdef CONFIG_MFD_STLC2690_CHIP
++static struct platform_device ux500_stlc2690_chip_device = {
++	.name = "stlc2690-chip",
++	.dev = {
++		.parent = &ux500_cg2900_device.dev,
++	},
++};
++#endif /* CONFIG_MFD_STLC2690_CHIP */
++
++#ifdef CONFIG_MFD_CG2900_TEST
++static struct cg2900_platform_data cg2900_test_platform_data = {
++	.bus = HCI_VIRTUAL,
++	.gpio_sleep = cg2900_sleep_gpio,
++};
++
++static struct platform_device ux500_cg2900_test_device = {
++	.name = "cg2900-test",
++	.dev = {
++		.parent = &ux500_cg2900_device.dev,
++		.platform_data = &cg2900_test_platform_data,
++	},
++};
++#endif /* CONFIG_MFD_CG2900_TEST */
++
++#ifdef CONFIG_MFD_CG2900_UART
++static struct resource cg2900_uart_resources[] = {
++	{
++		.start = CG2900_GBF_ENA_RESET_GPIO,
++		.end = CG2900_GBF_ENA_RESET_GPIO,
++		.flags = IORESOURCE_IO,
++		.name = "gbf_ena_reset",
++	},
++	{
++		.start = CG2900_BT_ENABLE_GPIO,
++		.end = CG2900_BT_ENABLE_GPIO,
++		.flags = IORESOURCE_IO,
++		.name = "bt_enable",
++	},
++	{
++		.start = NOMADIK_GPIO_TO_IRQ(CG2900_BT_CTS_GPIO),
++		.end = NOMADIK_GPIO_TO_IRQ(CG2900_BT_CTS_GPIO),
++		.flags = IORESOURCE_IRQ,
++		.name = "cts_irq",
++	},
++};
++
++static pin_cfg_t cg2900_uart_enabled[] = {
++	GPIO0_U0_CTSn   | PIN_INPUT_PULLUP,
++	GPIO1_U0_RTSn   | PIN_OUTPUT_HIGH,
++	GPIO2_U0_RXD    | PIN_INPUT_PULLUP,
++	GPIO3_U0_TXD    | PIN_OUTPUT_HIGH
++};
++
++static pin_cfg_t cg2900_uart_disabled[] = {
++	GPIO0_GPIO   | PIN_INPUT_PULLUP,	/* CTS pull up. */
++	GPIO1_GPIO   | PIN_OUTPUT_HIGH,		/* RTS high-flow off. */
++	GPIO2_GPIO   | PIN_INPUT_PULLUP,	/* RX pull down. */
++	GPIO3_GPIO   | PIN_OUTPUT_LOW		/* TX low - break on. */
++};
++
++static struct cg2900_platform_data cg2900_uart_platform_data = {
++	.bus = HCI_UART,
++	.gpio_sleep = cg2900_sleep_gpio,
++	.uart = {
++		.n_uart_gpios = 4,
++		.uart_enabled = cg2900_uart_enabled,
++		.uart_disabled = cg2900_uart_disabled,
++	},
++};
++
++static struct platform_device ux500_cg2900_uart_device = {
++	.name = "cg2900-uart",
++	.dev = {
++		.platform_data = &cg2900_uart_platform_data,
++		.parent = &ux500_cg2900_device.dev,
++	},
++	.num_resources = ARRAY_SIZE(cg2900_uart_resources),
++	.resource = cg2900_uart_resources,
++};
++#endif /* CONFIG_MFD_CG2900_UART */
++#endif /* CONFIG_MFD_CG2900 */
++
+ /*
+  * TC35892
+  */
+@@ -446,6 +575,29 @@ static void __init u8500_init_machine(void)
+ 	ux500_ske_keypad_device.dev.platform_data = &ske_keypad_board;
+ 	platform_add_devices(platform_devs, ARRAY_SIZE(platform_devs));
  
-diff --git a/drivers/mfd/cg2900/cg2900_test.c b/drivers/mfd/cg2900/cg2900_test.c
++#ifdef CONFIG_MFD_CG2900
++#ifdef CONFIG_MFD_CG2900_TEST
++	dcg2900_init_platdata(&cg2900_test_platform_data);
++#endif /* CONFIG_MFD_CG2900_TEST */
++#ifdef CONFIG_MFD_CG2900_UART
++	dcg2900_init_platdata(&cg2900_uart_platform_data);
++#endif /* CONFIG_MFD_CG2900_UART */
++
++	platform_device_register(&ux500_cg2900_device);
++#ifdef CONFIG_MFD_CG2900_UART
++	platform_device_register(&ux500_cg2900_uart_device);
++#endif /* CONFIG_MFD_CG2900_UART */
++#ifdef CONFIG_MFD_CG2900_TEST
++	platform_device_register(&ux500_cg2900_test_device);
++#endif /* CONFIG_MFD_CG2900_TEST */
++#ifdef CONFIG_MFD_CG2900_CHIP
++	platform_device_register(&ux500_cg2900_chip_device);
++#endif /* CONFIG_MFD_CG2900_CHIP */
++#ifdef CONFIG_MFD_STLC2690_CHIP
++	platform_device_register(&ux500_stlc2690_chip_device);
++#endif /* CONFIG_MFD_STLC2690_CHIP */
++#endif /* CONFIG_MFD_CG2900 */
++
+ 	mop500_i2c_init();
+ 	mop500_sdi_init();
+ 	mop500_spi_init();
+diff --git a/arch/arm/mach-ux500/devices-cg2900.c b/arch/arm/mach-ux500/devices-cg2900.c
 new file mode 100644
-index 0000000..3678a29
+index 0000000..4dcef97
 --- /dev/null
-+++ b/drivers/mfd/cg2900/cg2900_test.c
-@@ -0,0 +1,402 @@
++++ b/arch/arm/mach-ux500/devices-cg2900.c
+@@ -0,0 +1,313 @@
 +/*
++ * arch/arm/mach-ux500/devices-cg2900.c
++ *
 + * Copyright (C) ST-Ericsson SA 2010
 + * Authors:
 + * Par-Gunnar Hjalmdahl (par-gunnar.p.hjalmdahl@stericsson.com) for ST-Ericsson.
++ * Henrik Possung (henrik.possung@stericsson.com) for ST-Ericsson.
++ * Josef Kindberg (josef.kindberg@stericsson.com) for ST-Ericsson.
 + * Dariusz Szymszak (dariusz.xd.szymczak@stericsson.com) for ST-Ericsson.
++ * Kjell Andersson (kjell.k.andersson@stericsson.com) for ST-Ericsson.
 + * License terms:  GNU General Public License (GPL), version 2
 + *
-+ * Driver for ST-Ericsson CG2900 test character device.
++ * Board specific device support for the Linux Bluetooth HCI H:4 Driver
++ * for ST-Ericsson connectivity controller.
 + */
-+#define NAME					"cg2900_test"
-+#define pr_fmt(fmt)				NAME ": " fmt "\n"
++#define NAME			"devices-cg2900"
++#define pr_fmt(fmt)		NAME ": " fmt "\n"
 +
 +#include <asm/byteorder.h>
-+#include <linux/firmware.h>
-+#include <linux/fs.h>
-+#include <linux/gfp.h>
-+#include <linux/init.h>
++#include <asm-generic/errno-base.h>
++#include <linux/delay.h>
++#include <linux/gpio.h>
++#include <linux/interrupt.h>
++#include <linux/ioport.h>
 +#include <linux/kernel.h>
-+#include <linux/list.h>
-+#include <linux/miscdevice.h>
 +#include <linux/module.h>
-+#include <linux/mutex.h>
 +#include <linux/platform_device.h>
-+#include <linux/poll.h>
-+#include <linux/sched.h>
 +#include <linux/skbuff.h>
-+#include <linux/wait.h>
++#include <linux/string.h>
++#include <linux/types.h>
 +#include <linux/mfd/cg2900.h>
++#include <plat/pincfg.h>
 +
-+#include "cg2900_core.h"
++#ifdef CONFIG_MFD_CG2900
 +
-+#define MISC_DEV			(info->misc_dev.this_device)
++#define BT_VS_POWER_SWITCH_OFF		0xFD40
 +
-+/* Device names */
-+#define CG2900_CDEV_NAME		"cg2900_core_test"
++#define H4_HEADER_LENGTH		0x01
++#define BT_HEADER_LENGTH		0x03
 +
-+/**
-+ * struct test_info - Main info structure for CG2900 test char device.
-+ * @misc_dev:	Registered Misc Device.
-+ * @rx_queue:	RX data queue.
-+ * @dev:	Device structure for STE Connectivity driver.
-+ * @pdev:	Platform device structure for STE Connectivity driver.
-+ */
-+struct test_info {
-+	struct miscdevice	misc_dev;
-+	struct sk_buff_head	rx_queue;
-+	struct device		*dev;
-+	struct platform_device	*pdev;
++#define STLC2690_HCI_REV		0x0600
++#define CG2900_PG1_HCI_REV		0x0101
++#define CG2900_PG2_HCI_REV		0x0200
++#define CG2900_PG1_SPECIAL_HCI_REV	0x0700
++
++struct vs_power_sw_off_cmd {
++	__le16	op_code;
++	u8	len;
++	u8	gpio_0_7_pull_up;
++	u8	gpio_8_15_pull_up;
++	u8	gpio_16_20_pull_up;
++	u8	gpio_0_7_pull_down;
++	u8	gpio_8_15_pull_down;
++	u8	gpio_16_20_pull_down;
++} __attribute__((packed));
++
++struct dcg2900_info {
++	int	gbf_gpio;
++	int	bt_gpio;
++	bool	sleep_gpio_set;
++	u8	gpio_0_7_pull_up;
++	u8	gpio_8_15_pull_up;
++	u8	gpio_16_20_pull_up;
++	u8	gpio_0_7_pull_down;
++	u8	gpio_8_15_pull_down;
++	u8	gpio_16_20_pull_down;
 +};
 +
-+static struct test_info *test_info;
-+
-+/*
-+ * main_wait_queue - Char device Wait Queue in CG2900 Core.
-+ */
-+static DECLARE_WAIT_QUEUE_HEAD(char_wait_queue);
-+
-+/**
-+ * tx_to_char_dev() - Handle data received from CG2900 Core.
-+ * @dev:	Current chip device information.
-+ * @skb:	Buffer with data coming form device.
-+ */
-+static int tx_to_char_dev(struct cg2900_chip_dev *dev, struct sk_buff *skb)
++static void dcg2900_enable_chip(struct cg2900_chip_dev *dev)
 +{
-+	struct test_info *info = dev->t_data;
-+	skb_queue_tail(&info->rx_queue, skb);
-+	wake_up_interruptible_all(&char_wait_queue);
-+	return 0;
++	struct dcg2900_info *info = dev->b_data;
++
++	gpio_set_value(info->gbf_gpio, 1);
 +}
 +
-+/**
-+ * cg2900_test_open() - User space char device has been opened.
-+ * @inode:	Device driver information.
-+ * @filp:	Pointer to the file struct.
-+ *
-+ * Returns:
-+ *   0 if there is no error.
-+ *   -EACCES if transport already exists.
-+ *   -ENOMEM if allocation fails.
-+ *   Errors from create_work_item.
-+ */
-+static int cg2900_test_open(struct inode *inode, struct file *filp)
++static void dcg2900_disable_chip(struct cg2900_chip_dev *dev)
 +{
-+	struct test_info *info = test_info;
-+	struct cg2900_chip_dev *dev;
++	struct dcg2900_info *info = dev->b_data;
 +
-+	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
-+	if (!dev) {
-+		dev_err(MISC_DEV, "Cannot allocate test_dev\n");
-+		return -ENOMEM;
-+	}
-+	dev->dev = info->dev;
-+	dev->pdev = info->pdev;
-+	dev->t_data = info;
-+	dev->t_cb.write = tx_to_char_dev;
-+	filp->private_data = dev;
-+
-+	dev_info(MISC_DEV, "CG2900 test char dev opened\n");
-+	return cg2900_register_trans_driver(dev);
++	gpio_set_value(info->gbf_gpio, 0);
 +}
 +
-+/**
-+ * cg2900_test_release() - User space char device has been closed.
-+ * @inode:	Device driver information.
-+ * @filp:	Pointer to the file struct.
-+ *
-+ * Returns:
-+ *   0 if there is no error.
-+ */
-+static int cg2900_test_release(struct inode *inode, struct file *filp)
-+{
-+	struct cg2900_chip_dev *dev = filp->private_data;
-+	struct test_info *info = dev->t_data;
-+
-+	dev_info(MISC_DEV, "CG2900 test char dev closed\n");
-+	skb_queue_purge(&info->rx_queue);
-+	cg2900_deregister_trans_driver(dev);
-+	kfree(dev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * cg2900_test_read() - Queue and copy buffer to user space char device.
-+ * @filp:	Pointer to the file struct.
-+ * @buf:	Received buffer.
-+ * @count:	Count of received data in bytes.
-+ * @f_pos:	Position in buffer.
-+ *
-+ * Returns:
-+ *   >= 0 is number of bytes read.
-+ *   -EFAULT if copy_to_user fails.
-+ */
-+static ssize_t cg2900_test_read(struct file *filp, char __user *buf,
-+				size_t count, loff_t *f_pos)
++static struct sk_buff *dcg2900_get_power_switch_off_cmd
++				(struct cg2900_chip_dev *dev, u16 *op_code)
 +{
 +	struct sk_buff *skb;
-+	int bytes_to_copy;
-+	int err;
-+	struct cg2900_chip_dev *dev = filp->private_data;
-+	struct test_info *info = dev->t_data;
-+	struct sk_buff_head *rx_queue = &info->rx_queue;
++	struct vs_power_sw_off_cmd *cmd;
++	struct dcg2900_info *info;
++	int i;
 +
-+	dev_dbg(MISC_DEV, "cg2900_test_read count %d\n", count);
++	/* If connected chip does not support the command return NULL */
++	if (CG2900_PG1_SPECIAL_HCI_REV != dev->chip.hci_revision &&
++	    CG2900_PG1_HCI_REV != dev->chip.hci_revision &&
++	    CG2900_PG2_HCI_REV != dev->chip.hci_revision)
++		return NULL;
 +
-+	if (skb_queue_empty(rx_queue))
-+		wait_event_interruptible(char_wait_queue,
-+					 !(skb_queue_empty(rx_queue)));
++	dev_dbg(dev->dev, "Generating PowerSwitchOff command\n");
 +
-+	skb = skb_dequeue(rx_queue);
++	info = dev->b_data;
++
++	skb = alloc_skb(sizeof(*cmd) + H4_HEADER_LENGTH, GFP_KERNEL);
 +	if (!skb) {
-+		dev_dbg(MISC_DEV,
-+			"skb queue is empty - return with zero bytes\n");
-+		bytes_to_copy = 0;
++		dev_err(dev->dev, "Could not allocate skb\n");
++		return NULL;
++	}
++
++	skb_reserve(skb, H4_HEADER_LENGTH);
++	cmd = (struct vs_power_sw_off_cmd *)skb_put(skb, sizeof(*cmd));
++	cmd->op_code = cpu_to_le16(BT_VS_POWER_SWITCH_OFF);
++	cmd->len = sizeof(*cmd) - BT_HEADER_LENGTH;
++	/*
++	 * Enter system specific GPIO settings here:
++	 * Section data[3-5] is GPIO pull-up selection
++	 * Section data[6-8] is GPIO pull-down selection
++	 * Each section is a bitfield where
++	 * - byte 0 bit 0 is GPIO 0
++	 * - byte 0 bit 1 is GPIO 1
++	 * - up to
++	 * - byte 2 bit 4 which is GPIO 20
++	 * where each bit means:
++	 * - 0: No pull-up / no pull-down
++	 * - 1: Pull-up / pull-down
++	 * All GPIOs are set as input.
++	 */
++	if (!info->sleep_gpio_set) {
++		struct cg2900_platform_data *pf_data;
++
++		pf_data = dev_get_platdata(dev->dev);
++		for (i = 0; i < 8; i++) {
++			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
++				info->gpio_0_7_pull_up |= (1 << i);
++			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
++				info->gpio_0_7_pull_down |= (1 << i);
++		}
++		for (i = 8; i < 16; i++) {
++			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
++				info->gpio_8_15_pull_up |= (1 << (i - 8));
++			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
++				info->gpio_8_15_pull_down |= (1 << (i - 8));
++		}
++		for (i = 16; i < 21; i++) {
++			if (pf_data->gpio_sleep[i] == CG2900_PULL_UP)
++				info->gpio_16_20_pull_up |= (1 << (i - 16));
++			else if (pf_data->gpio_sleep[i] == CG2900_PULL_DN)
++				info->gpio_16_20_pull_down |= (1 << (i - 16));
++		}
++		info->sleep_gpio_set = true;
++	}
++	cmd->gpio_0_7_pull_up = info->gpio_0_7_pull_up;
++	cmd->gpio_8_15_pull_up = info->gpio_8_15_pull_up;
++	cmd->gpio_16_20_pull_up = info->gpio_16_20_pull_up;
++	cmd->gpio_0_7_pull_down = info->gpio_0_7_pull_down;
++	cmd->gpio_8_15_pull_down = info->gpio_8_15_pull_down;
++	cmd->gpio_16_20_pull_down = info->gpio_16_20_pull_down;
++
++
++	if (op_code)
++		*op_code = BT_VS_POWER_SWITCH_OFF;
++
++	return skb;
++}
++
++static int dcg2900_init(struct cg2900_chip_dev *dev)
++{
++	int err = 0;
++	struct dcg2900_info *info;
++	struct resource *resource;
++	const char *gbf_name;
++	const char *bt_name = NULL;
++
++	/* First retrieve and save the resources */
++	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	if (!info) {
++		dev_err(dev->dev, "Could not allocate dcg2900_info\n");
++		return -ENOMEM;
++	}
++
++	if (!dev->pdev->num_resources) {
++		dev_dbg(dev->dev, "No resources available\n");
++		info->gbf_gpio = -1;
++		info->bt_gpio = -1;
 +		goto finished;
 +	}
 +
-+	bytes_to_copy = min(count, skb->len);
-+	err = copy_to_user(buf, skb->data, bytes_to_copy);
-+	if (err) {
-+		skb_queue_head(rx_queue, skb);
-+		return -EFAULT;
++	resource = platform_get_resource(dev->pdev, IORESOURCE_IO, 0);
++	if (!resource) {
++		dev_err(dev->dev, "GBF GPIO does not exist\n");
++		err = -EINVAL;
++		goto err_handling;
++	}
++	info->gbf_gpio = resource->start;
++	gbf_name = resource->name;
++
++	resource = platform_get_resource(dev->pdev, IORESOURCE_IO, 1);
++	/* BT Enable GPIO may not exist */
++	if (resource) {
++		info->bt_gpio = resource->start;
++		bt_name = resource->name;
 +	}
 +
-+	skb_pull(skb, bytes_to_copy);
++	/* Now setup the GPIOs */
++	err = gpio_request(info->gbf_gpio, gbf_name);
++	if (err < 0) {
++		dev_err(dev->dev, "gpio_request failed with err: %d\n", err);
++		goto err_handling;
++	}
 +
-+	if (skb->len > 0)
-+		skb_queue_head(rx_queue, skb);
-+	else
-+		kfree_skb(skb);
++	err = gpio_direction_output(info->gbf_gpio, 0);
++	if (err < 0) {
++		dev_err(dev->dev, "gpio_direction_output failed with err: %d\n",
++			err);
++		goto err_handling_free_gpio_gbf;
++	}
++
++	if (!bt_name) {
++		info->bt_gpio = -1;
++		goto finished;
++	}
++
++	err = gpio_request(info->bt_gpio, bt_name);
++	if (err < 0) {
++		dev_err(dev->dev, "gpio_request failed with err: %d\n", err);
++		goto err_handling_free_gpio_gbf;
++	}
++
++	err = gpio_direction_output(info->bt_gpio, 1);
++	if (err < 0) {
++		dev_err(dev->dev, "gpio_direction_output failed with err: %d\n",
++			err);
++		goto err_handling_free_gpio_bt;
++	}
 +
 +finished:
-+	return bytes_to_copy;
-+}
-+
-+/**
-+ * cg2900_test_write() - Copy buffer from user and write to CG2900 Core.
-+ * @filp:	Pointer to the file struct.
-+ * @buf:	Read buffer.
-+ * @count:	Size of the buffer write.
-+ * @f_pos:	Position in buffer.
-+ *
-+ * Returns:
-+ *   >= 0 is number of bytes written.
-+ *   -EFAULT if copy_from_user fails.
-+ */
-+static ssize_t cg2900_test_write(struct file *filp, const char __user *buf,
-+				 size_t count, loff_t *f_pos)
-+{
-+	struct sk_buff *skb;
-+	struct cg2900_chip_dev *dev = filp->private_data;
-+	struct test_info *info = dev->t_data;
-+
-+	dev_dbg(MISC_DEV, "cg2900_test_write count %d\n", count);
-+
-+	/* Allocate the SKB and reserve space for the header */
-+	skb = alloc_skb(count + RX_SKB_RESERVE, GFP_KERNEL);
-+	if (!skb) {
-+		dev_err(MISC_DEV, "cg2900_test_write: Failed to alloc skb\n");
-+		return -ENOMEM;
-+	}
-+	skb_reserve(skb, RX_SKB_RESERVE);
-+
-+	if (copy_from_user(skb_put(skb, count), buf, count)) {
-+		kfree_skb(skb);
-+		return -EFAULT;
-+	}
-+
-+	dev->c_cb.data_from_chip(dev, skb);
-+
-+	return count;
-+}
-+
-+/**
-+ * cg2900_test_poll() - Handle POLL call to the interface.
-+ * @filp:	Pointer to the file struct.
-+ * @wait:	Poll table supplied to caller.
-+ *
-+ * Returns:
-+ *   Mask of current set POLL values (0 or (POLLIN | POLLRDNORM))
-+ */
-+static unsigned int cg2900_test_poll(struct file *filp, poll_table *wait)
-+{
-+	struct cg2900_chip_dev *dev = filp->private_data;
-+	struct test_info *info = dev->t_data;
-+	unsigned int mask = 0;
-+
-+	poll_wait(filp, &char_wait_queue, wait);
-+
-+	if (!(skb_queue_empty(&info->rx_queue)))
-+		mask |= POLLIN | POLLRDNORM;
-+
-+	return mask;
-+}
-+
-+static const struct file_operations test_char_dev_fops = {
-+	.open = cg2900_test_open,
-+	.release = cg2900_test_release,
-+	.read = cg2900_test_read,
-+	.write = cg2900_test_write,
-+	.poll = cg2900_test_poll
-+};
-+
-+/**
-+ * test_char_dev_create() - Create a char device for testing.
-+ * @info:	Test device info.
-+ *
-+ * Creates a separate char device that will interact directly with userspace
-+ * test application.
-+ *
-+ * Returns:
-+ *   0 if there is no error.
-+ *   Error codes from misc_register.
-+ */
-+static int test_char_dev_create(struct test_info *info)
-+{
-+	int err;
-+
-+	/* Initialize the RX queue */
-+	skb_queue_head_init(&info->rx_queue);
-+
-+	/* Prepare miscdevice struct before registering the device */
-+	info->misc_dev.minor = MISC_DYNAMIC_MINOR;
-+	info->misc_dev.name = CG2900_CDEV_NAME;
-+	info->misc_dev.fops = &test_char_dev_fops;
-+	info->misc_dev.parent = info->dev;
-+	info->misc_dev.mode = S_IRUGO | S_IWUGO;
-+
-+	err = misc_register(&info->misc_dev);
-+	if (err) {
-+		dev_err(info->dev, "Error %d registering misc dev", err);
-+		return err;
-+	}
-+
++	dev->b_data = info;
 +	return 0;
++
++err_handling_free_gpio_bt:
++	gpio_free(info->bt_gpio);
++err_handling_free_gpio_gbf:
++	gpio_free(info->gbf_gpio);
++err_handling:
++	kfree(info);
++	return err;
 +}
 +
-+/**
-+ * test_char_dev_destroy() - Clean up after test_char_dev_create().
-+ * @info:	Test device info.
-+ */
-+static void test_char_dev_destroy(struct test_info *info)
++static void dcg2900_exit(struct cg2900_chip_dev *dev)
++{
++	struct dcg2900_info *info = dev->b_data;
++
++	dcg2900_disable_chip(dev);
++	if (info->bt_gpio != -1)
++		gpio_free(info->bt_gpio);
++	if (info->gbf_gpio != -1)
++		gpio_free(info->gbf_gpio);
++	kfree(info);
++	dev->b_data = NULL;
++}
++
++#ifdef CONFIG_MFD_CG2900_UART
++static int dcg2900_disable_uart(struct cg2900_chip_dev *dev)
 +{
 +	int err;
++	struct cg2900_platform_data *pdata = dev_get_platdata(dev->dev);
 +
-+	err = misc_deregister(&info->misc_dev);
++	/*
++	 * Without this delay we get interrupt on CTS immediately
++	 * due to some turbulences on this line.
++	 */
++	mdelay(4);
++
++	/* Disable UART functions. */
++	err = nmk_config_pins(pdata->uart.uart_disabled,
++			      pdata->uart.n_uart_gpios);
 +	if (err)
-+		dev_err(info->dev, "Error %d deregistering misc dev\n", err);
++		goto error;
 +
-+	/* Clean the message queue */
-+	skb_queue_purge(&info->rx_queue);
++	return 0;
++
++error:
++	(void)nmk_config_pins(pdata->uart.uart_enabled,
++			      pdata->uart.n_uart_gpios);
++	dev_err(dev->dev, "Cannot set interrupt (%d)\n", err);
++	return err;
 +}
 +
-+/**
-+ * cg2900_test_probe() - Initialize module.
-+ *
-+ * @pdev:	Platform device.
-+ *
-+ * This function initializes and registers the test misc char device.
-+ *
-+ * Returns:
-+ *   0 if success.
-+ *   -ENOMEM for failed alloc or structure creation.
-+ *   -EEXIST if device already exists.
-+ *   Error codes generated by test_char_dev_create.
-+ */
-+static int __devinit cg2900_test_probe(struct platform_device *pdev)
++static int dcg2900_enable_uart(struct cg2900_chip_dev *dev)
 +{
 +	int err;
++	struct cg2900_platform_data *pdata = dev_get_platdata(dev->dev);
 +
-+	dev_dbg(&pdev->dev, "cg2900_test_probe\n");
++	/* Restore UART settings. */
++	err = nmk_config_pins(pdata->uart.uart_enabled,
++			      pdata->uart.n_uart_gpios);
++	if (err)
++		dev_err(dev->dev, "Unable to enable UART (%d)\n", err);
 +
-+	if (test_info) {
-+		dev_err(&pdev->dev, "test_info exists\n");
-+		return -EEXIST;
-+	}
-+
-+	test_info = kzalloc(sizeof(*test_info), GFP_KERNEL);
-+	if (!test_info) {
-+		dev_err(&pdev->dev, "Couldn't allocate test_info\n");
-+		return -ENOMEM;
-+	}
-+
-+	test_info->dev = &pdev->dev;
-+	test_info->pdev = pdev;
-+
-+	/* Create and add test char device. */
-+	err = test_char_dev_create(test_info);
-+	if (err) {
-+		kfree(test_info);
-+		test_info = NULL;
-+		return err;
-+	}
-+
-+	dev_set_drvdata(&pdev->dev, test_info);
-+
-+	dev_info(&pdev->dev, "CG2900 test char device driver started\n");
-+
-+	return 0;
++	return err;
 +}
++#endif /* CONFIG_MFD_CG2900_UART */
++
++void dcg2900_init_platdata(struct cg2900_platform_data *data)
++{
++	data->init = dcg2900_init;
++	data->exit = dcg2900_exit;
++	data->enable_chip = dcg2900_enable_chip;
++	data->disable_chip = dcg2900_disable_chip;
++	data->get_power_switch_off_cmd = dcg2900_get_power_switch_off_cmd;
++#ifdef CONFIG_MFD_CG2900_UART
++	data->uart.enable_uart = dcg2900_enable_uart;
++	data->uart.disable_uart = dcg2900_disable_uart;
++#endif /* CONFIG_MFD_CG2900_UART */
++}
++#endif /* CONFIG_MFD_CG2900 */
+diff --git a/arch/arm/mach-ux500/devices-cg2900.h b/arch/arm/mach-ux500/devices-cg2900.h
+new file mode 100644
+index 0000000..958b750
+--- /dev/null
++++ b/arch/arm/mach-ux500/devices-cg2900.h
+@@ -0,0 +1,19 @@
++/*
++ * Copyright (C) ST-Ericsson SA 2010
++ *
++ * Author: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
++ * License terms: GNU General Public License (GPL), version 2.
++ */
++
++#ifndef __DEVICES_CG2900_H
++#define __DEVICES_CG2900_H
++
++#include <linux/mfd/cg2900.h>
 +
 +/**
-+ * cg2900_test_remove() - Remove module.
-+ *
-+ * @pdev:	Platform device.
-+ *
-+ * Returns:
-+ *   0 if success.
-+ *   -ENOMEM if core_info does not exist.
-+ *   -EINVAL if platform data does not exist in the device.
++ * dcg2900_init_platdata() - Initializes platform data with callback functions.
++ * @data:	Platform data.
 + */
-+static int __devexit cg2900_test_remove(struct platform_device *pdev)
-+{
-+	struct test_info *test_info;
++extern void dcg2900_init_platdata(struct cg2900_platform_data *data);
 +
-+	dev_dbg(&pdev->dev, "cg2900_test_remove\n");
-+	test_info = dev_get_drvdata(&pdev->dev);
-+	test_char_dev_destroy(test_info);
-+	dev_set_drvdata(&pdev->dev, NULL);
-+	kfree(test_info);
-+	test_info = NULL;
-+	dev_info(&pdev->dev, "CG2900 Test char device driver removed\n");
-+	return 0;
-+}
-+
-+static struct platform_driver cg2900_test_driver = {
-+	.driver = {
-+		.name	= "cg2900-test",
-+		.owner	= THIS_MODULE,
-+	},
-+	.probe	= cg2900_test_probe,
-+	.remove	= __devexit_p(cg2900_test_remove),
-+};
-+
-+/**
-+ * cg2900_test_init() - Initialize module.
-+ *
-+ * Registers platform driver.
-+ */
-+static int __init cg2900_test_init(void)
-+{
-+	pr_debug("cg2900_test_init");
-+	return platform_driver_register(&cg2900_test_driver);
-+}
-+
-+/**
-+ * cg2900_test_exit() - Remove module.
-+ *
-+ * Unregisters platform driver.
-+ */
-+static void __exit cg2900_test_exit(void)
-+{
-+	pr_debug("cg2900_test_exit");
-+	platform_driver_unregister(&cg2900_test_driver);
-+}
-+
-+module_init(cg2900_test_init);
-+module_exit(cg2900_test_exit);
-+
-+MODULE_AUTHOR("Par-Gunnar Hjalmdahl ST-Ericsson");
-+MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("Linux CG2900 Test Char Device Driver");
++#endif /* __DEVICES_CG2900_H */
 -- 
 1.7.3.2
