@@ -1,45 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 0/1] Add enc_read_blob_req() as defined in BT Core v4.0
 From: Brian Gix <bgix@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
+Cc: rshaffer@codeaurora.org, padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org, Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH] Add enc_read_blob_req() as defined in BT Core Spec v4.0
+Date: Fri, 17 Dec 2010 11:08:53 -0800
+Message-Id: <1292612933-31095-2-git-send-email-bgix@codeaurora.org>
 In-Reply-To: <1292612933-31095-1-git-send-email-bgix@codeaurora.org>
 References: <1292612933-31095-1-git-send-email-bgix@codeaurora.org>
-Content-Type: text/plain
-Date: Fri, 17 Dec 2010 13:01:32 -0800
-Message-Id: <1292619692.17733.11.camel@sealablnx02.qualcomm.com>
-Mime-Version: 1.0
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All
+---
+ attrib/att.c |   19 +++++++++++++++++++
+ attrib/att.h |    2 ++
+ 2 files changed, 21 insertions(+), 0 deletions(-)
 
-On Fri, 2010-12-17 at 11:08 -0800, Brian Gix wrote:
-> Trivial addition of ATT API to encode READ_BLOB_REQ pkt.
-> 
-
-I apologize for messing up what must seem to be trivial rules for what
-information to put where in the patches I am trying to get incorporated.
-
-This particular patch is in fact a trivial addition to the ATT code,
-which I believe probably is identical in all respects (including WS I
-hope) to how anyone else here would have implemented it.
-
-My follow on to this will be multi-step GATT procedures, I am going to
-try as an RFC first, as the concept of GATT procedures that contain more
-than one ATT Request/Response will be something that undoubtedly will
-cause people to want to offer input on.
-
-I also apologize for the sporadic nature of communication this week, as
-my workstation had a catastrophic failure which is taking some time to
-recover from.
-
-> --
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/attrib/att.c b/attrib/att.c
+index 445b192..f8dbc02 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -542,6 +542,25 @@ uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, int len)
+ 	return min_len;
+ }
+ 
++uint16_t enc_read_blob_req(uint16_t handle, uint16_t offset, uint8_t *pdu,
++									int len)
++{
++	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
++							sizeof(offset);
++
++	if (pdu == NULL)
++		return 0;
++
++	if (len < min_len)
++		return 0;
++
++	pdu[0] = ATT_OP_READ_BLOB_REQ;
++	att_put_u16(handle, &pdu[1]);
++	att_put_u16(offset, &pdu[3]);
++
++	return min_len;
++}
++
+ uint16_t dec_read_req(const uint8_t *pdu, int len, uint16_t *handle)
+ {
+ 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(*handle);
+diff --git a/attrib/att.h b/attrib/att.h
+index 2c8c724..0b8612e 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -202,6 +202,8 @@ uint16_t enc_write_req(uint16_t handle, const uint8_t *value, int vlen,
+ uint16_t dec_write_req(const uint8_t *pdu, int len, uint16_t *handle,
+ 						uint8_t *value, int *vlen);
+ uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, int len);
++uint16_t enc_read_blob_req(uint16_t handle, uint16_t offset, uint8_t *pdu,
++									int len);
+ uint16_t dec_read_req(const uint8_t *pdu, int len, uint16_t *handle);
+ uint16_t enc_read_resp(uint8_t *value, int vlen, uint8_t *pdu, int len);
+ uint16_t dec_read_resp(const uint8_t *pdu, int len, uint8_t *value, int *vlen);
+-- 
+1.7.2.2
 
