@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1292585117-28584-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
-References: <1292585117-28584-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
-Date: Fri, 17 Dec 2010 13:02:52 +0100
-Message-ID: <AANLkTimjDCF4V9wGszVcuDYqZ8Qq0CYhCzxnxEKcibxN@mail.gmail.com>
-Subject: Re: [PATCH 08/11] Bluetooth: Add support for CG2900 UART
+In-Reply-To: <1292585094-28544-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+References: <1292585094-28544-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Fri, 17 Dec 2010 12:40:34 +0100
+Message-ID: <AANLkTi=f6XPbsUiTSiFru2tj_XsQSu=-h898b0R2AePo@mail.gmail.com>
+Subject: Re: [PATCH 07/11] Bluetooth: Add UART API functions to ldisc
 From: Vitaly Wool <vitalywool@gmail.com>
 To: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
 Cc: Pavan Savoy <pavan_savoy@sify.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
@@ -18,46 +18,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Par,
 
-so on the top level: this is yet another H4 implementation plus
-channel-based packet routing, right?
+On Fri, Dec 17, 2010 at 12:24 PM, Par-Gunnar Hjalmdahl
+<par-gunnar.p.hjalmdahl@stericsson.com> wrote:
+> This patch adds new functions to control break and flow
+> as well as changing UART baud rate directly through the ldisc API
+> rather then using the TTY API directly.
 
-Could you please also elaborate
+What do you need that for?
 
-More comments on the code are inlined.
+> It also adds a boolean parameter so it is optional to register
+> to the Bluetooth stack (for drivers where a separate module
+> registers to the Bluetooth stack instead).
 
-> +#define MAIN_DEV =A0 =A0 =A0 =A0 =A0 =A0 =A0 (uart_info->dev)
-
-What is that for?
-
-> + * cg2900_uart_suspend() - Called by Linux PM to put the device in a low=
- power mode.
-> + * @pdev: =A0 =A0 =A0Pointer to platform device.
-> + * @state: =A0 =A0 New state.
-> + *
-> + * In UART case, CG2900 driver does nothing on suspend.
-> + *
-> + * Returns:
-> + * =A0 0 - Success.
-> + */
-> +static int cg2900_uart_suspend(struct platform_device *pdev, pm_message_=
-t state)
-> +{
-> + =A0 =A0 =A0 struct uart_info *uart_info =3D dev_get_drvdata(&pdev->dev)=
-;
-> +
-> + =A0 =A0 =A0 if (uart_info->sleep_state =3D=3D CHIP_POWERED_DOWN)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> +
-> + =A0 =A0 =A0 if (uart_info->sleep_state !=3D CHIP_ASLEEP)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EBUSY;
-> +
-> + =A0 =A0 =A0 dev_dbg(MAIN_DEV, "New sleep_state: CHIP_SUSPENDED\n");
-> + =A0 =A0 =A0 uart_info->sleep_state =3D CHIP_SUSPENDED;
-> + =A0 =A0 =A0 return 0;
-> +}
-
-I don't think this is safe wrt work queue. What if it gets scheduled
-when drivers are suspended?
+I never liked this idea and I don't like it now as it scatters the
+changes needed to support devices you are aiming to support with your
+changes.
 
 Thanks,
    Vitaly
