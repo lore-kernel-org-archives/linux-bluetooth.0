@@ -1,104 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Samuel Ortiz <sameo@linux.intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
-Date: Fri, 17 Dec 2010 12:20:29 +0100
-Message-ID: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <AANLkTik+R_pBHTjqmcHxOcz3VpNcBsefgbGbtD3iaOVr@mail.gmail.com>
+References: <1291989348-3911-1-git-send-email-michalski.raf@gmail.com>
+	<AANLkTinVMvv9KG0oG1C=_wA6t7LhcYcCunuYGTWyn1Hs@mail.gmail.com>
+	<AANLkTi=jaKy=o0MhzV6xRwyk00OxOhk302-DHXM7fEgE@mail.gmail.com>
+	<20101214153405.GA11741@jh-x301>
+	<1292341274.3050.15.camel@novo.hadess.net>
+	<AANLkTimMOeuyUj5CRMsm7QpoumgHRMmOsby2E6GoSHrd@mail.gmail.com>
+	<AANLkTim5y+g0n2-k8XMHE4kU-N-n-p4DvHVGg045Aoys@mail.gmail.com>
+	<AANLkTik+R_pBHTjqmcHxOcz3VpNcBsefgbGbtD3iaOVr@mail.gmail.com>
+Date: Fri, 17 Dec 2010 11:29:07 +0200
+Message-ID: <AANLkTinHyH6i_pq-77_SYEkyf3jfwbfqL_WXav6nB2tc@mail.gmail.com>
+Subject: Re: [PATCH] Fix crash while reading from mapped file
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is the 3rd patch set for the ST-Ericsson CG2900 connectivity
-controller. The CG2900 is a combo controller supporting GPS, Bluetooth,
-and FM radio. It uses HCI H:4 protocol to combine different functionalities
-on a common transport, where first byte in the data indicates the current
-channel. Channels 1-4 are standardized in the Bluetooth Core specification
-while the other channels are vendor specific.
+Hi,
 
-Compared to 2nd patch set this patch set has the following changes:
- * UART handling is moved from mfd to bluetooth folder. It now reuses the
-   existing N_HCI line discipline.
- * mfd creation has been moved from cg2900_core into chip specific files.
- * All information for each channel, including API functions, exist in each
-   MFD devices, making them independent of each other.
- * All chip specific information has been moved from cg2900_core into the
-   chip specific files. cg2900_core now only handles registration and
-   connection between transport and chip driver.
- * Fixes for several review comments including use of existing debug system.
+On Thu, Dec 16, 2010 at 11:28 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Dec 15, 2010 at 8:19 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> On Tue, Dec 14, 2010 at 2:20 PM, Lukasz Pawlik <lucas.pawlik@gmail.com> wrote:
+>>> Hi,
+>>>
+>>>> If somebody can explain what that code is supposed to do, then writing a
+>>>> glib-ish version should be trivial, without having to duplicate the
+>>>> contents again. Then again, using something like:
+>>>> g_mapped_file_new ();
+>>>> g_strsplit ();
+>>>> g_mapped_file_unref ();
+>>>
+>>> That won't fix anything since g_mapped_file_new uses mmap function so
+>>> contents may not be zero-terminated and we want use string function
+>>> next.
+>>
+>> What about using g_strstr_len() instead of strpbrk() on the original
+>> code? See http://library.gnome.org/devel/glib/unstable/glib-String-Utility-Functions.html#g-strstr-len
+>
+> That looks to be a good replacement for strpbrk, probably 1 line patch.
 
-Par-Gunnar Hjalmdahl (11):
-  mfd: Add support for CG2900 controller framework
-  mfd: Add CG2900 character devices
-  mfd: Add support for CG2900 controller
-  mfd: Add support for STLC2690 controller
-  mfd: Add CG2900 audio
-  mfd: Add CG2900 test character device
-  Bluetooth: Add UART API functions to ldisc
-  Bluetooth: Add support for CG2900 UART
-  Bluetooth: Add support for CG2900 controller
-  arch_mach-ux500: Add U8500 board support for CG2900
-  Bluetooth and mach-ux500: Fix of minor issues
+I guess we cannot use any of glib functions here since textfile.c is
+also used in some tools which doesn't link with glib, so if we don't
+want to add this dependency to the than we need some other way to fix
+it.
 
- arch/arm/mach-ux500/Makefile             |    1 +
- arch/arm/mach-ux500/board-mop500.c       |  152 ++
- arch/arm/mach-ux500/devices-cg2900.c     |  315 +++
- arch/arm/mach-ux500/devices-cg2900.h     |   19 +
- drivers/bluetooth/Kconfig                |    7 +
- drivers/bluetooth/Makefile               |    2 +
- drivers/bluetooth/btcg2900.c             | 1134 ++++++++++
- drivers/bluetooth/cg2900_uart.c          | 1849 ++++++++++++++++
- drivers/bluetooth/hci_ath.c              |    1 +
- drivers/bluetooth/hci_bcsp.c             |    3 +-
- drivers/bluetooth/hci_h4.c               |    1 +
- drivers/bluetooth/hci_ldisc.c            |  101 +-
- drivers/bluetooth/hci_ll.c               |    1 +
- drivers/bluetooth/hci_uart.h             |   18 +-
- drivers/mfd/Kconfig                      |   53 +
- drivers/mfd/Makefile                     |    2 +
- drivers/mfd/cg2900/Makefile              |   16 +
- drivers/mfd/cg2900/cg2900_audio.c        | 3415 ++++++++++++++++++++++++++++++
- drivers/mfd/cg2900/cg2900_char_devices.c |  701 ++++++
- drivers/mfd/cg2900/cg2900_chip.c         | 3250 ++++++++++++++++++++++++++++
- drivers/mfd/cg2900/cg2900_chip.h         |  602 ++++++
- drivers/mfd/cg2900/cg2900_core.c         |  711 +++++++
- drivers/mfd/cg2900/cg2900_core.h         |   51 +
- drivers/mfd/cg2900/cg2900_lib.c          |  391 ++++
- drivers/mfd/cg2900/cg2900_lib.h          |   61 +
- drivers/mfd/cg2900/cg2900_test.c         |  402 ++++
- drivers/mfd/cg2900/stlc2690_chip.c       | 1673 +++++++++++++++
- drivers/mfd/cg2900/stlc2690_chip.h       |   47 +
- include/linux/mfd/cg2900.h               |  287 +++
- include/linux/mfd/cg2900_audio.h         |  473 +++++
- include/net/bluetooth/hci.h              |    5 +
- 31 files changed, 15734 insertions(+), 10 deletions(-)
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
- create mode 100644 drivers/bluetooth/btcg2900.c
- create mode 100644 drivers/bluetooth/cg2900_uart.c
- create mode 100644 drivers/mfd/cg2900/Makefile
- create mode 100644 drivers/mfd/cg2900/cg2900_audio.c
- create mode 100644 drivers/mfd/cg2900/cg2900_char_devices.c
- create mode 100644 drivers/mfd/cg2900/cg2900_chip.c
- create mode 100644 drivers/mfd/cg2900/cg2900_chip.h
- create mode 100644 drivers/mfd/cg2900/cg2900_core.c
- create mode 100644 drivers/mfd/cg2900/cg2900_core.h
- create mode 100644 drivers/mfd/cg2900/cg2900_lib.c
- create mode 100644 drivers/mfd/cg2900/cg2900_lib.h
- create mode 100644 drivers/mfd/cg2900/cg2900_test.c
- create mode 100644 drivers/mfd/cg2900/stlc2690_chip.c
- create mode 100644 drivers/mfd/cg2900/stlc2690_chip.h
- create mode 100644 include/linux/mfd/cg2900.h
- create mode 100644 include/linux/mfd/cg2900_audio.h
+What about this:
+
+diff --git a/src/textfile.c b/src/textfile.c
+index 2429cc7..2e4c642 100644
+--- a/src/textfile.c
++++ b/src/textfile.c
+@@ -394,7 +394,7 @@ int textfile_foreach(const char *pathname,
+textfile_cb func, void *data)
+                goto unlock;
+        }
+
+-       size = st.st_size;
++       size = st.st_size + 1;
+
+        map = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+        if (!map || map == MAP_FAILED) {
+
+It will probably use 1 more page if the file size is multiple of the
+page size but it seems correct if you compare to e.g. malloc, well if
+the possibility of the extra page is too much than we need our own
+version of g_strstr_len/strpbrk_len like the following:
+
+http://www.google.com/codesearch/p?hl=en#cZwlSNS7aEw/external/bluetooth/glib/glib/gstrfuncs.c&q=g_strstr_len&d=4
 
 -- 
-1.7.3.2
+Luiz Augusto von Dentz
+Computer Engineer
