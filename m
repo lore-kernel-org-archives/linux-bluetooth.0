@@ -1,100 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTinHyH6i_pq-77_SYEkyf3jfwbfqL_WXav6nB2tc@mail.gmail.com>
+References: <1291989348-3911-1-git-send-email-michalski.raf@gmail.com>
+	<AANLkTinVMvv9KG0oG1C=_wA6t7LhcYcCunuYGTWyn1Hs@mail.gmail.com>
+	<AANLkTi=jaKy=o0MhzV6xRwyk00OxOhk302-DHXM7fEgE@mail.gmail.com>
+	<20101214153405.GA11741@jh-x301>
+	<1292341274.3050.15.camel@novo.hadess.net>
+	<AANLkTimMOeuyUj5CRMsm7QpoumgHRMmOsby2E6GoSHrd@mail.gmail.com>
+	<AANLkTim5y+g0n2-k8XMHE4kU-N-n-p4DvHVGg045Aoys@mail.gmail.com>
+	<AANLkTik+R_pBHTjqmcHxOcz3VpNcBsefgbGbtD3iaOVr@mail.gmail.com>
+	<AANLkTinHyH6i_pq-77_SYEkyf3jfwbfqL_WXav6nB2tc@mail.gmail.com>
+Date: Fri, 17 Dec 2010 15:25:00 +0200
+Message-ID: <AANLkTimTuZD-vYUcVt4Xqp-GwprBgFYxZRXNtXHg7x5m@mail.gmail.com>
+Subject: Re: [PATCH] Fix crash while reading from mapped file
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Fix crash when mmaping files which size is multiple of page size
-Date: Fri, 17 Dec 2010 15:31:26 +0200
-Message-Id: <1292592686-14908-1-git-send-email-luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi,
 
-In this case the buffer returned by mmap is not NULL terminated so
-functions like strpbrk that expect a string goes out of bounds.
+On Fri, Dec 17, 2010 at 11:29 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Dec 16, 2010 at 11:28 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> On Wed, Dec 15, 2010 at 8:19 PM, Anderson Lizardo
+>> <anderson.lizardo@openbossa.org> wrote:
+>>> On Tue, Dec 14, 2010 at 2:20 PM, Lukasz Pawlik <lucas.pawlik@gmail.com> wrote:
+>>>> Hi,
+>>>>
+>>>>> If somebody can explain what that code is supposed to do, then writing a
+>>>>> glib-ish version should be trivial, without having to duplicate the
+>>>>> contents again. Then again, using something like:
+>>>>> g_mapped_file_new ();
+>>>>> g_strsplit ();
+>>>>> g_mapped_file_unref ();
+>>>>
+>>>> That won't fix anything since g_mapped_file_new uses mmap function so
+>>>> contents may not be zero-terminated and we want use string function
+>>>> next.
+>>>
+>>> What about using g_strstr_len() instead of strpbrk() on the original
+>>> code? See http://library.gnome.org/devel/glib/unstable/glib-String-Utility-Functions.html#g-strstr-len
+>>
+>> That looks to be a good replacement for strpbrk, probably 1 line patch.
+>
+> I guess we cannot use any of glib functions here since textfile.c is
+> also used in some tools which doesn't link with glib, so if we don't
+> want to add this dependency to the than we need some other way to fix
+> it.
+>
+> What about this:
+>
+> diff --git a/src/textfile.c b/src/textfile.c
+> index 2429cc7..2e4c642 100644
+> --- a/src/textfile.c
+> +++ b/src/textfile.c
+> @@ -394,7 +394,7 @@ int textfile_foreach(const char *pathname,
+> textfile_cb func, void *data)
+>                goto unlock;
+>        }
+>
+> -       size = st.st_size;
+> +       size = st.st_size + 1;
+>
+>        map = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+>        if (!map || map == MAP_FAILED) {
+>
+> It will probably use 1 more page if the file size is multiple of the
+> page size but it seems correct if you compare to e.g. malloc, well if
+> the possibility of the extra page is too much than we need our own
+> version of g_strstr_len/strpbrk_len like the following:
+>
+> http://www.google.com/codesearch/p?hl=en#cZwlSNS7aEw/external/bluetooth/glib/glib/gstrfuncs.c&q=g_strstr_len&d=4
 
-To fix this strpbrk_len was introduced which takes the size of the buffer
-making sure it never goes out of bounds.
----
- src/textfile.c |   38 +++++++++++++++++++++++++++++++++-----
- 1 files changed, 33 insertions(+), 5 deletions(-)
+The patch doesn't really work, it cause Non-existent physical address
+error, anyway I have sent a patch that introduces strpbrk_len, but I
+will probably be changing to strnpbrk to conform with some other strn*
+variants.
 
-diff --git a/src/textfile.c b/src/textfile.c
-index 2429cc7..d115ff6 100644
---- a/src/textfile.c
-+++ b/src/textfile.c
-@@ -156,6 +156,28 @@ static inline int write_key_value(int fd, const char *key, const char *value)
- 	return err;
- }
- 
-+static char *strnpbrk(const char *s, ssize_t len, const char *accept)
-+{
-+	const char *p = s;
-+	const char *end;
-+
-+	end = s + len - 1;
-+
-+	while (p <= end && *p) {
-+		const char *a = accept;
-+
-+		while (*a) {
-+			if (*p == *a)
-+				return (char *) p;
-+			a++;
-+		}
-+
-+		p++;
-+	}
-+
-+	return NULL;
-+}
-+
- static int write_key(const char *pathname, const char *key, const char *value, int icase)
- {
- 	struct stat st;
-@@ -207,7 +229,7 @@ static int write_key(const char *pathname, const char *key, const char *value, i
- 
- 	base = off - map;
- 
--	end = strpbrk(off, "\r\n");
-+	end = strnpbrk(off, size, "\r\n");
- 	if (!end) {
- 		err = EILSEQ;
- 		goto unmap;
-@@ -315,7 +337,7 @@ static char *read_key(const char *pathname, const char *key, int icase)
- 		goto unmap;
- 	}
- 
--	end = strpbrk(off, "\r\n");
-+	end = strnpbrk(off, size - (map - off), "\r\n");
- 	if (!end) {
- 		err = EILSEQ;
- 		goto unmap;
-@@ -404,8 +426,8 @@ int textfile_foreach(const char *pathname, textfile_cb func, void *data)
- 
- 	off = map;
- 
--	while (1) {
--		end = strpbrk(off, " ");
-+	while (size - (off - map) > 0) {
-+		end = strnpbrk(off, size - (off - map), " ");
- 		if (!end) {
- 			err = EILSEQ;
- 			break;
-@@ -424,7 +446,13 @@ int textfile_foreach(const char *pathname, textfile_cb func, void *data)
- 
- 		off = end + 1;
- 
--		end = strpbrk(off, "\r\n");
-+		if (size - (off - map) < 0) {
-+			err = EILSEQ;
-+			free(key);
-+			break;
-+		}
-+
-+		end = strnpbrk(off, size - (off - map), "\r\n");
- 		if (!end) {
- 			err = EILSEQ;
- 			free(key);
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
+Computer Engineer
