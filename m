@@ -1,204 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: Fix __hci_request synchronization for hci_open_dev
-Date: Fri, 17 Dec 2010 14:48:31 +0200
-Message-Id: <1292590111-6564-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+To: Vitaly Wool <vitalywool@gmail.com>
+Cc: Pavan Savoy <pavan_savoy@sify.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Samuel Ortiz <sameo@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Date: Fri, 17 Dec 2010 13:43:42 +0100
+Subject: RE: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33489D2B94@EXDCVYMBSTM005.EQ1STM.local>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <AANLkTikboaQGMGTVchXyo6tidtq7c33KDRU2puL1youv@mail.gmail.com>
+In-Reply-To: <AANLkTikboaQGMGTVchXyo6tidtq7c33KDRU2puL1youv@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Vitaly,
 
-The initialization function used by hci_open_dev (hci_init_req) sends
-many different HCI commands. The __hci_request function should only
-return when all of these commands have completed (or a timeout occurs).
-Several of these commands cause hci_req_complete to be called which
-causes __hci_request to return prematurely.
+> -----Original Message-----
+> From: Vitaly Wool [mailto:vitalywool@gmail.com]
+> Sent: den 17 december 2010 13:11
+> To: Par-Gunnar HJALMDAHL
+> Cc: Pavan Savoy; Alan Cox; Arnd Bergmann; Samuel Ortiz; Marcel
+> Holtmann; linux-kernel@vger.kernel.org; linux-
+> bluetooth@vger.kernel.org; Lukasz Rymanowski; Linus WALLEIJ; Par-Gunnar
+> Hjalmdahl
+> Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+>=20
+> Hi Par,
+>=20
+> On Fri, Dec 17, 2010 at 12:20 PM, Par-Gunnar Hjalmdahl
+> <par-gunnar.p.hjalmdahl@stericsson.com> wrote:
+> > This is the 3rd patch set for the ST-Ericsson CG2900 connectivity
+> > controller. The CG2900 is a combo controller supporting GPS,
+> Bluetooth,
+> > and FM radio. It uses HCI H:4 protocol to combine different
+> functionalities
+> > on a common transport, where first byte in the data indicates the
+> current
+> > channel. Channels 1-4 are standardized in the Bluetooth Core
+> specification
+> > while the other channels are vendor specific.
+> >
+> > Compared to 2nd patch set this patch set has the following changes:
+> > =A0* UART handling is moved from mfd to bluetooth folder. It now reuses
+> the
+> > =A0 existing N_HCI line discipline.
+> > =A0* mfd creation has been moved from cg2900_core into chip specific
+> files.
+> > =A0* All information for each channel, including API functions, exist
+> in each
+> > =A0 MFD devices, making them independent of each other.
+> > =A0* All chip specific information has been moved from cg2900_core into
+> the
+> > =A0 chip specific files. cg2900_core now only handles registration and
+> > =A0 connection between transport and chip driver.
+> > =A0* Fixes for several review comments including use of existing debug
+> system.
+>=20
+> this patchset has only multiplied my confusion.
+>=20
+> Not really diving into the details, I'm just trying to understand how
+> I'd rewrite the TI shared transport using your approach if I had to.
+> It looks like I'd have to, at least:
+>  - implement a heavyweight line discipline driver (like cg2900_uart.c)
+> half duplicating the functionality in yours;
+>  - implement specific MFD driver.
+>=20
+> Actually the reuse of this implementation will be at a level of
+> statistics error. The only thing to reuse is actually the approach
+> which I'm not really happy about.
+>=20
+> So...
+>=20
+> If you are aiming for a generic solution, then why you get more and
+> more things handled in cg2900-specific code (e. g. packet routing
+> which is fairly generic)?
+>=20
 
-This patch fixes the issue by adding a new hdev->req_last_cmd variable
-which is set during the initialization procedure. The hci_req_complete
-function will no longer mark the request as complete until the command
-matching hdev->req_last_cmd completes.
+You are absolutely correct that there is not much that is generic and the r=
+eason for this is that it is not much that is generic. If you for example l=
+ook at packet routing the method can be considered pretty generic. Check fi=
+rst byte and choose a structure type... But first of all this must be done =
+with minimum overhead since it is done on every packet received. And second=
+ly if you look at number of lines of code, it is not really much you save.
+If you look closer at the code for the CG2900 you will see that the majorit=
+y of the code is things that you could probably never apply to the chip of =
+another vendor. A lot of the code in e.g. cg2900_chip.c is regarding bt_aud=
+io and fm_audio, which is really chip specific.
+Also, if you want to keep the structure modular and supporting e.g. multipl=
+e transports with the same chip driver, you must focus on what is chip spec=
+ific, what is transport specific, and what is chip and transport specific. =
+When you start to think about it like this it becomes very hard to make too=
+ much code generic. Usually what you get with that kind of generic code is =
+a solution way more complex than you started out with.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
-v4: Use __u16 instead of int for req_last_cmd
+> If you are solving your particular problems, isn't the change too
+> dramatic e. g. when it comes to line discipline drivers and baudrate
+> manipulation?
+>=20
 
- include/net/bluetooth/hci_core.h |    3 ++-
- net/bluetooth/hci_core.c         |   10 +++++++---
- net/bluetooth/hci_event.c        |   33 +++++++++++++++++++++++----------
- 3 files changed, 32 insertions(+), 14 deletions(-)
+The changes in hci_ldisc.c is not what I would call dramatic. It is quite s=
+imple functions. As I've stated earlier, if people object to this, there is=
+ no big issue to solve this within cg2900_uart.c instead. But we think that=
+ these API functions are a proper extension to the current hci_ldisc API.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3786ee8..a29feb0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -129,6 +129,7 @@ struct hci_dev {
- 	wait_queue_head_t	req_wait_q;
- 	__u32			req_status;
- 	__u32			req_result;
-+	__u16			req_last_cmd;
- 
- 	struct inquiry_cache	inq_cache;
- 	struct hci_conn_hash	conn_hash;
-@@ -693,6 +694,6 @@ struct hci_sec_filter {
- #define hci_req_lock(d)		mutex_lock(&d->req_lock)
- #define hci_req_unlock(d)	mutex_unlock(&d->req_lock)
- 
--void hci_req_complete(struct hci_dev *hdev, int result);
-+void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1a4ec97..787c8df 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -91,9 +91,12 @@ static void hci_notify(struct hci_dev *hdev, int event)
- 
- /* ---- HCI requests ---- */
- 
--void hci_req_complete(struct hci_dev *hdev, int result)
-+void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result)
- {
--	BT_DBG("%s result 0x%2.2x", hdev->name, result);
-+	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
-+
-+	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
-+		return;
- 
- 	if (hdev->req_status == HCI_REQ_PEND) {
- 		hdev->req_result = result;
-@@ -149,7 +152,7 @@ static int __hci_request(struct hci_dev *hdev, void (*req)(struct hci_dev *hdev,
- 		break;
- 	}
- 
--	hdev->req_status = hdev->req_result = 0;
-+	hdev->req_last_cmd = hdev->req_status = hdev->req_result = 0;
- 
- 	BT_DBG("%s end: err %d", hdev->name, err);
- 
-@@ -252,6 +255,7 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	/* Connection accept timeout ~20 secs */
- 	param = cpu_to_le16(0x7d00);
- 	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
-+	hdev->req_last_cmd = HCI_OP_WRITE_CA_TIMEOUT;
- }
- 
- static void hci_scan_req(struct hci_dev *hdev, unsigned long opt)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8923b36..3810017 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -58,7 +58,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
- 
- 	hci_conn_check_pending(hdev);
- }
-@@ -174,7 +174,7 @@ static void hci_cc_write_def_link_policy(struct hci_dev *hdev, struct sk_buff *s
- 	if (!status)
- 		hdev->link_policy = get_unaligned_le16(sent);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, status);
- }
- 
- static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -183,7 +183,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_RESET, status);
- }
- 
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -235,7 +235,7 @@ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 			clear_bit(HCI_AUTH, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_AUTH_ENABLE, status);
- }
- 
- static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -258,7 +258,7 @@ static void hci_cc_write_encrypt_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 			clear_bit(HCI_ENCRYPT, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_ENCRYPT_MODE, status);
- }
- 
- static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -285,7 +285,7 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 			set_bit(HCI_PSCAN, &hdev->flags);
- 	}
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_WRITE_SCAN_ENABLE, status);
- }
- 
- static void hci_cc_read_class_of_dev(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -383,7 +383,7 @@ static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_HOST_BUFFER_SIZE, status);
- }
- 
- static void hci_cc_read_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -536,7 +536,16 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!rp->status)
- 		bacpy(&hdev->bdaddr, &rp->bdaddr);
- 
--	hci_req_complete(hdev, rp->status);
-+	hci_req_complete(hdev, HCI_OP_READ_BD_ADDR, rp->status);
-+}
-+
-+static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%x", hdev->name, status);
-+
-+	hci_req_complete(hdev, HCI_OP_WRITE_CA_TIMEOUT, status);
- }
- 
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
-@@ -544,7 +553,7 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
- 	if (status) {
--		hci_req_complete(hdev, status);
-+		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 		hci_conn_check_pending(hdev);
- 	} else
-@@ -871,7 +880,7 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
--	hci_req_complete(hdev, status);
-+	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 	hci_conn_check_pending(hdev);
- }
-@@ -1379,6 +1388,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
- 
-+	case HCI_OP_WRITE_CA_TIMEOUT:
-+		hci_cc_write_ca_timeout(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
--- 
-1.7.2.3
+> As of now, I really see no reason why anyone would promote this
+> solution instead of making something more generic out of ti-st and
+> reusing it then.
+>=20
+> Thanks,
+>    Vitaly
 
+Just to be clear, I have no problem with having both solutions (our and ti-=
+st) side by side. They are structured quite differently and has different f=
+ocus. I'm in no way trying to replace ti-st. I'm not trying to force anyone=
+ into using our structure.
+
+/P-G
