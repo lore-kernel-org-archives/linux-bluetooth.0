@@ -1,76 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Vitaly Wool <vitalywool@gmail.com>
-Cc: Pavan Savoy <pavan_savoy@sify.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Samuel Ortiz <sameo@linux.intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-Date: Fri, 17 Dec 2010 13:17:35 +0100
-Subject: RE: [PATCH 07/11] Bluetooth: Add UART API functions to ldisc
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33489D2B4F@EXDCVYMBSTM005.EQ1STM.local>
-References: <1292585094-28544-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <AANLkTi=f6XPbsUiTSiFru2tj_XsQSu=-h898b0R2AePo@mail.gmail.com>
-In-Reply-To: <AANLkTi=f6XPbsUiTSiFru2tj_XsQSu=-h898b0R2AePo@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Fri, 17 Dec 2010 13:11:22 +0100
+Message-ID: <AANLkTikboaQGMGTVchXyo6tidtq7c33KDRU2puL1youv@mail.gmail.com>
+Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+From: Vitaly Wool <vitalywool@gmail.com>
+To: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Pavan Savoy <pavan_savoy@sify.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Arnd Bergmann <arnd@arndb.de>, Samuel Ortiz <sameo@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>, Linus Walleij <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vitaly,
+Hi Par,
 
-> -----Original Message-----
-> From: Vitaly Wool [mailto:vitalywool@gmail.com]
-> Sent: den 17 december 2010 12:41
-> To: Par-Gunnar HJALMDAHL
-> Cc: Pavan Savoy; Alan Cox; Arnd Bergmann; Samuel Ortiz; Marcel
-> Holtmann; linux-kernel@vger.kernel.org; linux-
-> bluetooth@vger.kernel.org; Lukasz Rymanowski; Linus WALLEIJ; Par-Gunnar
-> Hjalmdahl
-> Subject: Re: [PATCH 07/11] Bluetooth: Add UART API functions to ldisc
->=20
-> Hi Par,
->=20
-> On Fri, Dec 17, 2010 at 12:24 PM, Par-Gunnar Hjalmdahl
-> <par-gunnar.p.hjalmdahl@stericsson.com> wrote:
-> > This patch adds new functions to control break and flow
-> > as well as changing UART baud rate directly through the ldisc API
-> > rather then using the TTY API directly.
->=20
-> What do you need that for?
->=20
+On Fri, Dec 17, 2010 at 12:20 PM, Par-Gunnar Hjalmdahl
+<par-gunnar.p.hjalmdahl@stericsson.com> wrote:
+> This is the 3rd patch set for the ST-Ericsson CG2900 connectivity
+> controller. The CG2900 is a combo controller supporting GPS, Bluetooth,
+> and FM radio. It uses HCI H:4 protocol to combine different functionaliti=
+es
+> on a common transport, where first byte in the data indicates the current
+> channel. Channels 1-4 are standardized in the Bluetooth Core specificatio=
+n
+> while the other channels are vendor specific.
+>
+> Compared to 2nd patch set this patch set has the following changes:
+> =A0* UART handling is moved from mfd to bluetooth folder. It now reuses t=
+he
+> =A0 existing N_HCI line discipline.
+> =A0* mfd creation has been moved from cg2900_core into chip specific file=
+s.
+> =A0* All information for each channel, including API functions, exist in =
+each
+> =A0 MFD devices, making them independent of each other.
+> =A0* All chip specific information has been moved from cg2900_core into t=
+he
+> =A0 chip specific files. cg2900_core now only handles registration and
+> =A0 connection between transport and chip driver.
+> =A0* Fixes for several review comments including use of existing debug sy=
+stem.
 
-For the break and flow control it is a means for the protocol driver to set=
- break and flow using only the hci_uart structure, i.e. without interfacing=
- directly towards tty. This is of course not 100% necessary to make it work=
-, but it means a clean API where the protocol drivers can perform their tas=
-ks without performing different operations on different stack levels. As it=
- was before write was performed using hci_uart structure while flow control=
- was done using tty structure and API, even though you could consider these=
- functions to be similar (not in functionality of course but from a stack l=
-evel perspective).
+this patchset has only multiplied my confusion.
 
-For baud rate changes it also simplifies handling a bit, since the new func=
-tion also implements using the proper mutexes and calling right termios fun=
-ctions. It should work simply (as long as you don't want different baud rat=
-es for TX and RX which should be pretty rare).
+Not really diving into the details, I'm just trying to understand how
+I'd rewrite the TI shared transport using your approach if I had to.
+It looks like I'd have to, at least:
+ - implement a heavyweight line discipline driver (like cg2900_uart.c)
+half duplicating the functionality in yours;
+ - implement specific MFD driver.
 
-> > It also adds a boolean parameter so it is optional to register
-> > to the Bluetooth stack (for drivers where a separate module
-> > registers to the Bluetooth stack instead).
->=20
-> I never liked this idea and I don't like it now as it scatters the
-> changes needed to support devices you are aiming to support with your
-> changes.
->=20
+Actually the reuse of this implementation will be at a level of
+statistics error. The only thing to reuse is actually the approach
+which I'm not really happy about.
 
-OK. Sadly I can't do much about how you feel towards the change. In my opin=
-ion this is probably the best reuse we can get of existing protocols and pa=
-rts. There is so much that is vendor specific if you look at for example cg=
-2900_uart.c that it is not much you could do generic.
+So...
 
-> Thanks,
->    Vitaly
+If you are aiming for a generic solution, then why you get more and
+more things handled in cg2900-specific code (e. g. packet routing
+which is fairly generic)?
+
+If you are solving your particular problems, isn't the change too
+dramatic e. g. when it comes to line discipline drivers and baudrate
+manipulation?
+
+As of now, I really see no reason why anyone would promote this
+solution instead of making something more generic out of ti-st and
+reusing it then.
+
+Thanks,
+   Vitaly
