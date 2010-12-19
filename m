@@ -1,56 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 1/3] Fix memory leak in src/rfkill.c
-Date: Mon, 20 Dec 2010 00:29:04 -0400
-Message-Id: <1292819346-27318-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <AANLkTimCYea+G7Z+o-2BDCGHbRobM2n+VJLLcDO6g=9d@mail.gmail.com>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+	<AANLkTimCYea+G7Z+o-2BDCGHbRobM2n+VJLLcDO6g=9d@mail.gmail.com>
+Date: Sun, 19 Dec 2010 23:57:31 +0100
+Message-ID: <AANLkTi=J1AdOgxA_S9p9Ts65PL3Mi5NXXWMf0f-=0AwN@mail.gmail.com>
+Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+From: Vitaly Wool <vitalywool@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>,
+	Pavan Savoy <pavan_savoy@sify.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Arnd Bergmann <arnd@arndb.de>, Samuel Ortiz <sameo@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>, Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Watches must be removed with g_source_remove() otherwise they leak a
-reference count to the GIOChannel and internal memory allocations.
+Hi Linus,
 
-Also g_io_channel_set_close_on_unref() is used, so there is no need to
-call g_io_channel_shutdown() by hand.
----
- src/rfkill.c |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
+On Sun, Dec 19, 2010 at 10:23 PM, Linus Walleij
+<linus.walleij@linaro.org> wrote:
+> I'm slightly confused by different comment threads on this patch set.
 
-diff --git a/src/rfkill.c b/src/rfkill.c
-index 75397b8..6e9e040 100644
---- a/src/rfkill.c
-+++ b/src/rfkill.c
-@@ -139,6 +139,7 @@ static gboolean rfkill_event(GIOChannel *chan,
- }
- 
- static GIOChannel *channel = NULL;
-+static guint watch_id = 0;
- 
- void rfkill_init(void)
- {
-@@ -156,8 +157,8 @@ void rfkill_init(void)
- 	channel = g_io_channel_unix_new(fd);
- 	g_io_channel_set_close_on_unref(channel, TRUE);
- 
--	g_io_add_watch(channel, G_IO_IN | G_IO_NVAL | G_IO_HUP | G_IO_ERR,
--							rfkill_event, NULL);
-+	watch_id = g_io_add_watch(channel, G_IO_IN | G_IO_NVAL | G_IO_HUP |
-+						G_IO_ERR, rfkill_event, NULL);
- }
- 
- void rfkill_exit(void)
-@@ -165,7 +166,9 @@ void rfkill_exit(void)
- 	if (!channel)
- 		return;
- 
--	g_io_channel_shutdown(channel, TRUE, NULL);
-+	if (watch_id > 0)
-+		g_source_remove(watch_id);
-+
- 	g_io_channel_unref(channel);
- 
- 	channel = NULL;
--- 
-1.7.0.4
+let me first first repost the part from Arnd's email on the
+architecture of the "shared transport" type of thing:
 
+> I believe we already agree it should be something like
+>
+>   bt   ti-radio    st-e-radio    ti-gps   st-e-gps  broadcom-radio ...
+>   |         |          |            |          |          |         |
+>   +---------+----------+---------+--+----------+----------+---------+
+>                                  |
+>                         common-hci-module
+>                                  |
+>                      +-----------+-----------+
+>                      |        |       |      |
+>                    serial    spi     i2c    ...
+
+I think an explanation on how the patchset from Par maps to this
+architecture could be a good starting point for confusion minimization
+:)
+
+Thanks,
+   Vitaly
