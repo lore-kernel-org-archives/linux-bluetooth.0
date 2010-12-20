@@ -2,165 +2,204 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 3/3] Fix memory leaks in btio/btio.c
-Date: Mon, 20 Dec 2010 00:29:06 -0400
-Message-Id: <1292819346-27318-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 2/3] Fix memory leak in src/sdpd-server.c
+Date: Mon, 20 Dec 2010 00:29:05 -0400
+Message-Id: <1292819346-27318-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1292819346-27318-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1292819346-27318-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The watches created by bt_io_* functions were not being removed from
-main context, therefore the "destroy" function was never being called.
----
- btio/btio.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- btio/btio.h |    2 ++
- src/main.c  |    3 +++
- 3 files changed, 56 insertions(+), 5 deletions(-)
+Watches must be removed with g_source_remove() otherwise they leak a
+reference count to the GIOChannel and internal memory allocations.
 
-diff --git a/btio/btio.c b/btio/btio.c
-index d8439e0..0cd046e 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -65,12 +65,14 @@ struct connect {
- 	BtIOConnect connect;
- 	gpointer user_data;
- 	GDestroyNotify destroy;
+Also do a little refactoring to avoid too many global variables.
+---
+ src/sdpd-server.c |   83 +++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 46 insertions(+), 37 deletions(-)
+
+diff --git a/src/sdpd-server.c b/src/sdpd-server.c
+index efd6fd0..fbc4c96 100644
+--- a/src/sdpd-server.c
++++ b/src/sdpd-server.c
+@@ -48,9 +48,11 @@
+ #include "log.h"
+ #include "sdpd.h"
+ 
+-static GIOChannel *l2cap_io = NULL, *unix_io = NULL;
+-
+-static int l2cap_sock, unix_sock;
++static struct sock_info {
++	int sk;
++	GIOChannel *io;
 +	guint watch_id;
- };
++} l2cap_sk, unix_sk;
  
- struct accept {
- 	BtIOConnect connect;
- 	gpointer user_data;
- 	GDestroyNotify destroy;
-+	guint watch_id;
- };
+ /*
+  * SDP server initialization on startup includes creating the
+@@ -71,8 +73,8 @@ static int init_server(uint16_t mtu, int master, int compat)
+ 	register_server_service();
  
- struct server {
-@@ -78,8 +80,11 @@ struct server {
- 	BtIOConfirm confirm;
- 	gpointer user_data;
- 	GDestroyNotify destroy;
-+	guint watch_id;
- };
+ 	/* Create L2CAP socket */
+-	l2cap_sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+-	if (l2cap_sock < 0) {
++	l2cap_sk.sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++	if (l2cap_sk.sk < 0) {
+ 		error("opening L2CAP socket: %s", strerror(errno));
+ 		return -1;
+ 	}
+@@ -82,14 +84,16 @@ static int init_server(uint16_t mtu, int master, int compat)
+ 	bacpy(&l2addr.l2_bdaddr, BDADDR_ANY);
+ 	l2addr.l2_psm = htobs(SDP_PSM);
  
-+static GSList *servers = NULL, *accepts = NULL, *connects = NULL;
-+
- static void server_remove(struct server *server)
- {
- 	if (server->destroy)
-@@ -215,8 +220,11 @@ static void server_add(GIOChannel *io, BtIOConnect connect,
- 	server->destroy = destroy;
+-	if (bind(l2cap_sock, (struct sockaddr *) &l2addr, sizeof(l2addr)) < 0) {
++	if (bind(l2cap_sk.sk, (struct sockaddr *) &l2addr,
++							sizeof(l2addr)) < 0) {
+ 		error("binding L2CAP socket: %s", strerror(errno));
+ 		return -1;
+ 	}
  
- 	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, server_cb, server,
--					(GDestroyNotify) server_remove);
-+	server->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-+						server_cb, server,
-+						(GDestroyNotify) server_remove);
-+
-+	servers = g_slist_append(servers, server);
+ 	if (master) {
+ 		int opt = L2CAP_LM_MASTER;
+-		if (setsockopt(l2cap_sock, SOL_L2CAP, L2CAP_LM, &opt, sizeof(opt)) < 0) {
++		if (setsockopt(l2cap_sk.sk, SOL_L2CAP, L2CAP_LM, &opt,
++							sizeof(opt)) < 0) {
+ 			error("setsockopt: %s", strerror(errno));
+ 			return -1;
+ 		}
+@@ -99,7 +103,8 @@ static int init_server(uint16_t mtu, int master, int compat)
+ 		memset(&opts, 0, sizeof(opts));
+ 		optlen = sizeof(opts);
+ 
+-		if (getsockopt(l2cap_sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, &optlen) < 0) {
++		if (getsockopt(l2cap_sk.sk, SOL_L2CAP, L2CAP_OPTIONS, &opts,
++								&optlen) < 0) {
+ 			error("getsockopt: %s", strerror(errno));
+ 			return -1;
+ 		}
+@@ -107,25 +112,24 @@ static int init_server(uint16_t mtu, int master, int compat)
+ 		opts.omtu = mtu;
+ 		opts.imtu = mtu;
+ 
+-		if (setsockopt(l2cap_sock, SOL_L2CAP, L2CAP_OPTIONS, &opts, sizeof(opts)) < 0) {
++		if (setsockopt(l2cap_sk.sk, SOL_L2CAP, L2CAP_OPTIONS, &opts,
++							sizeof(opts)) < 0) {
+ 			error("setsockopt: %s", strerror(errno));
+ 			return -1;
+ 		}
+ 	}
+ 
+-	if (listen(l2cap_sock, 5) < 0) {
++	if (listen(l2cap_sk.sk, 5) < 0) {
+ 		error("listen: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 
+-	if (!compat) {
+-		unix_sock = -1;
++	if (!compat)
+ 		return 0;
+-	}
+ 
+ 	/* Create local Unix socket */
+-	unix_sock = socket(PF_UNIX, SOCK_STREAM, 0);
+-	if (unix_sock < 0) {
++	unix_sk.sk = socket(PF_UNIX, SOCK_STREAM, 0);
++	if (unix_sk.sk < 0) {
+ 		error("opening UNIX socket: %s", strerror(errno));
+ 		return -1;
+ 	}
+@@ -136,12 +140,13 @@ static int init_server(uint16_t mtu, int master, int compat)
+ 
+ 	unlink(unaddr.sun_path);
+ 
+-	if (bind(unix_sock, (struct sockaddr *) &unaddr, sizeof(unaddr)) < 0) {
++	if (bind(unix_sk.sk, (struct sockaddr *) &unaddr,
++							sizeof(unaddr)) < 0) {
+ 		error("binding UNIX socket: %s", strerror(errno));
+ 		return -1;
+ 	}
+ 
+-	if (listen(unix_sock, 5) < 0) {
++	if (listen(unix_sk.sk, 5) < 0) {
+ 		error("listen UNIX socket: %s", strerror(errno));
+ 		return -1;
+ 	}
+@@ -195,21 +200,19 @@ static gboolean io_accept_event(GIOChannel *chan, GIOCondition cond, gpointer da
+ 	GIOChannel *io;
+ 	int nsk;
+ 
+-	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+-		g_io_channel_unref(chan);
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+ 		return FALSE;
+-	}
+ 
+-	if (data == &l2cap_sock) {
++	if (data == &l2cap_sk) {
+ 		struct sockaddr_l2 addr;
+ 		socklen_t len = sizeof(addr);
+ 
+-		nsk = accept(l2cap_sock, (struct sockaddr *) &addr, &len);
+-	} else if (data == &unix_sock) {
++		nsk = accept(l2cap_sk.sk, (struct sockaddr *) &addr, &len);
++	} else if (data == &unix_sk) {
+ 		struct sockaddr_un addr;
+ 		socklen_t len = sizeof(addr);
+ 
+-		nsk = accept(unix_sock, (struct sockaddr *) &addr, &len);
++		nsk = accept(unix_sk.sk, (struct sockaddr *) &addr, &len);
+ 	} else
+ 		return FALSE;
+ 
+@@ -256,18 +259,20 @@ int start_sdp_server(uint16_t mtu, const char *did, uint32_t flags)
+ 		}
+ 	}
+ 
+-	l2cap_io = g_io_channel_unix_new(l2cap_sock);
+-	g_io_channel_set_close_on_unref(l2cap_io, TRUE);
++	l2cap_sk.io = g_io_channel_unix_new(l2cap_sk.sk);
++	g_io_channel_set_close_on_unref(l2cap_sk.io, TRUE);
+ 
+-	g_io_add_watch(l2cap_io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					io_accept_event, &l2cap_sock);
++	l2cap_sk.watch_id = g_io_add_watch(l2cap_sk.io, G_IO_IN | G_IO_ERR |
++						G_IO_HUP | G_IO_NVAL,
++						io_accept_event, &l2cap_sk);
+ 
+-	if (compat && unix_sock > fileno(stderr)) {
+-		unix_io = g_io_channel_unix_new(unix_sock);
+-		g_io_channel_set_close_on_unref(unix_io, TRUE);
++	if (compat) {
++		unix_sk.io = g_io_channel_unix_new(unix_sk.sk);
++		g_io_channel_set_close_on_unref(unix_sk.io, TRUE);
+ 
+-		g_io_add_watch(unix_io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+-					io_accept_event, &unix_sock);
++		unix_sk.watch_id = g_io_add_watch(unix_sk.io, G_IO_IN |
++						G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++						io_accept_event, &unix_sk);
+ 	}
+ 
+ 	return 0;
+@@ -279,9 +284,13 @@ void stop_sdp_server(void)
+ 
+ 	sdp_svcdb_reset();
+ 
+-	if (unix_io)
+-		g_io_channel_unref(unix_io);
++	if (l2cap_sk.watch_id > 0)
++		g_source_remove(l2cap_sk.watch_id);
++	g_io_channel_unref(l2cap_sk.io);
++	memset(&l2cap_sk, 0, sizeof(l2cap_sk));
+ 
+-	if (l2cap_io)
+-		g_io_channel_unref(l2cap_io);
++	if (unix_sk.watch_id > 0)
++		g_source_remove(unix_sk.watch_id);
++	g_io_channel_unref(unix_sk.io);
++	memset(&unix_sk, 0, sizeof(unix_sk));
  }
- 
- static void connect_add(GIOChannel *io, BtIOConnect connect,
-@@ -231,8 +239,11 @@ static void connect_add(GIOChannel *io, BtIOConnect connect,
- 	conn->destroy = destroy;
- 
- 	cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, conn,
-+	conn->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-+					connect_cb, conn,
- 					(GDestroyNotify) connect_remove);
-+
-+	connects = g_slist_append(connects, conn);
- }
- 
- static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
-@@ -247,8 +258,11 @@ static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
- 	accept->destroy = destroy;
- 
- 	cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, accept_cb, accept,
--					(GDestroyNotify) accept_remove);
-+	accept->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-+						accept_cb, accept,
-+						(GDestroyNotify) accept_remove);
-+
-+	accepts = g_slist_append(accepts, accept);
- }
- 
- static int l2cap_bind(int sock, const bdaddr_t *src, uint16_t psm,
-@@ -1313,6 +1327,38 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
- 	return io;
- }
- 
-+void bt_io_destroy(void)
-+{
-+	GSList *l;
-+
-+	for (l = servers; l != NULL; l = g_slist_next(l)) {
-+		struct server *server = l->data;
-+
-+		if (server->watch_id > 0)
-+			g_source_remove(server->watch_id);
-+	}
-+	g_slist_free(servers);
-+	servers = NULL;
-+
-+	for (l = connects; l != NULL; l = g_slist_next(l)) {
-+		struct connect *conn = l->data;
-+
-+		if (conn->watch_id > 0)
-+			g_source_remove(conn->watch_id);
-+	}
-+	g_slist_free(connects);
-+	connects = NULL;
-+
-+	for (l = connects; l != NULL; l = g_slist_next(l)) {
-+		struct accept *accept = l->data;
-+
-+		if (accept->watch_id > 0)
-+			g_source_remove(accept->watch_id);
-+	}
-+	g_slist_free(accepts);
-+	accepts = NULL;
-+}
-+
- GQuark bt_io_error_quark(void)
- {
- 	return g_quark_from_static_string("bt-io-error-quark");
-diff --git a/btio/btio.h b/btio/btio.h
-index 53e8eaa..87e722f 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -95,4 +95,6 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
- 				GDestroyNotify destroy, GError **err,
- 				BtIOOption opt1, ...);
- 
-+void bt_io_destroy(void);
-+
- #endif
-diff --git a/src/main.c b/src/main.c
-index 1aaa181..1b7ff40 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -56,6 +56,7 @@
- #include "dbus-common.h"
- #include "agent.h"
- #include "manager.h"
-+#include "btio.h"
- 
- #ifdef HAVE_CAPNG
- #include <cap-ng.h>
-@@ -495,6 +496,8 @@ int main(int argc, char *argv[])
- 
- 	agent_exit();
- 
-+	bt_io_destroy();
-+
- 	g_main_loop_unref(event_loop);
- 
- 	if (config)
 -- 
 1.7.0.4
 
