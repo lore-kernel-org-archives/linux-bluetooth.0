@@ -1,183 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
+From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+To: Vitaly Wool <vitalywool@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Cc: Pavan Savoy <pavan_savoy@sify.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Samuel Ortiz <sameo@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
+Date: Mon, 20 Dec 2010 10:15:37 +0100
+Subject: RE: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3348A3A516@EXDCVYMBSTM005.EQ1STM.local>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+	<AANLkTimCYea+G7Z+o-2BDCGHbRobM2n+VJLLcDO6g=9d@mail.gmail.com>
+ <AANLkTi=J1AdOgxA_S9p9Ts65PL3Mi5NXXWMf0f-=0AwN@mail.gmail.com>
+In-Reply-To: <AANLkTi=J1AdOgxA_S9p9Ts65PL3Mi5NXXWMf0f-=0AwN@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1292819346-27318-3-git-send-email-anderson.lizardo@openbossa.org>
-References: <1292819346-27318-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1292819346-27318-3-git-send-email-anderson.lizardo@openbossa.org>
-Date: Mon, 20 Dec 2010 11:20:51 +0200
-Message-ID: <AANLkTimNkaxqTShFMr4-5Dk+i3iFKDz_b6wHNKb-0fQX@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Fix memory leaks in btio/btio.c
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vitaly,
 
-On Mon, Dec 20, 2010 at 6:29 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> The watches created by bt_io_* functions were not being removed from
-> main context, therefore the "destroy" function was never being called.
-> ---
->  btio/btio.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  btio/btio.h |    2 ++
->  src/main.c  |    3 +++
->  3 files changed, 56 insertions(+), 5 deletions(-)
->
-> diff --git a/btio/btio.c b/btio/btio.c
-> index d8439e0..0cd046e 100644
-> --- a/btio/btio.c
-> +++ b/btio/btio.c
-> @@ -65,12 +65,14 @@ struct connect {
->        BtIOConnect connect;
->        gpointer user_data;
->        GDestroyNotify destroy;
-> +       guint watch_id;
->  };
->
->  struct accept {
->        BtIOConnect connect;
->        gpointer user_data;
->        GDestroyNotify destroy;
-> +       guint watch_id;
->  };
->
->  struct server {
-> @@ -78,8 +80,11 @@ struct server {
->        BtIOConfirm confirm;
->        gpointer user_data;
->        GDestroyNotify destroy;
-> +       guint watch_id;
->  };
->
-> +static GSList *servers = NULL, *accepts = NULL, *connects = NULL;
-> +
->  static void server_remove(struct server *server)
->  {
->        if (server->destroy)
-> @@ -215,8 +220,11 @@ static void server_add(GIOChannel *io, BtIOConnect connect,
->        server->destroy = destroy;
->
->        cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> -       g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, server_cb, server,
-> -                                       (GDestroyNotify) server_remove);
-> +       server->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-> +                                               server_cb, server,
-> +                                               (GDestroyNotify) server_remove);
-> +
-> +       servers = g_slist_append(servers, server);
->  }
->
->  static void connect_add(GIOChannel *io, BtIOConnect connect,
-> @@ -231,8 +239,11 @@ static void connect_add(GIOChannel *io, BtIOConnect connect,
->        conn->destroy = destroy;
->
->        cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> -       g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, conn,
-> +       conn->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-> +                                       connect_cb, conn,
->                                        (GDestroyNotify) connect_remove);
-> +
-> +       connects = g_slist_append(connects, conn);
->  }
->
->  static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
-> @@ -247,8 +258,11 @@ static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
->        accept->destroy = destroy;
->
->        cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> -       g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, accept_cb, accept,
-> -                                       (GDestroyNotify) accept_remove);
-> +       accept->watch_id = g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond,
-> +                                               accept_cb, accept,
-> +                                               (GDestroyNotify) accept_remove);
-> +
-> +       accepts = g_slist_append(accepts, accept);
->  }
->
->  static int l2cap_bind(int sock, const bdaddr_t *src, uint16_t psm,
-> @@ -1313,6 +1327,38 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
->        return io;
->  }
->
-> +void bt_io_destroy(void)
-> +{
-> +       GSList *l;
-> +
-> +       for (l = servers; l != NULL; l = g_slist_next(l)) {
-> +               struct server *server = l->data;
-> +
-> +               if (server->watch_id > 0)
-> +                       g_source_remove(server->watch_id);
-> +       }
-> +       g_slist_free(servers);
-> +       servers = NULL;
-> +
-> +       for (l = connects; l != NULL; l = g_slist_next(l)) {
-> +               struct connect *conn = l->data;
-> +
-> +               if (conn->watch_id > 0)
-> +                       g_source_remove(conn->watch_id);
-> +       }
-> +       g_slist_free(connects);
-> +       connects = NULL;
-> +
-> +       for (l = connects; l != NULL; l = g_slist_next(l)) {
-> +               struct accept *accept = l->data;
-> +
-> +               if (accept->watch_id > 0)
-> +                       g_source_remove(accept->watch_id);
-> +       }
-> +       g_slist_free(accepts);
-> +       accepts = NULL;
-> +}
-> +
->  GQuark bt_io_error_quark(void)
->  {
->        return g_quark_from_static_string("bt-io-error-quark");
-> diff --git a/btio/btio.h b/btio/btio.h
-> index 53e8eaa..87e722f 100644
-> --- a/btio/btio.h
-> +++ b/btio/btio.h
-> @@ -95,4 +95,6 @@ GIOChannel *bt_io_listen(BtIOType type, BtIOConnect connect,
->                                GDestroyNotify destroy, GError **err,
->                                BtIOOption opt1, ...);
->
-> +void bt_io_destroy(void);
-> +
->  #endif
-> diff --git a/src/main.c b/src/main.c
-> index 1aaa181..1b7ff40 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -56,6 +56,7 @@
->  #include "dbus-common.h"
->  #include "agent.h"
->  #include "manager.h"
-> +#include "btio.h"
->
->  #ifdef HAVE_CAPNG
->  #include <cap-ng.h>
-> @@ -495,6 +496,8 @@ int main(int argc, char *argv[])
->
->        agent_exit();
->
-> +       bt_io_destroy();
-> +
->        g_main_loop_unref(event_loop);
->
->        if (config)
-> --
-> 1.7.0.4
+> -----Original Message-----
+> From: Vitaly Wool [mailto:vitalywool@gmail.com]
+> Sent: den 19 december 2010 23:58
+> To: Linus Walleij
+> Cc: Par-Gunnar HJALMDAHL; Pavan Savoy; Alan Cox; Arnd Bergmann; Samuel
+> Ortiz; Marcel Holtmann; linux-kernel@vger.kernel.org; linux-
+> bluetooth@vger.kernel.org; Lukasz Rymanowski; Par-Gunnar Hjalmdahl
+> Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+>=20
+> Hi Linus,
+>=20
+> On Sun, Dec 19, 2010 at 10:23 PM, Linus Walleij
+> <linus.walleij@linaro.org> wrote:
+> > I'm slightly confused by different comment threads on this patch set.
+>=20
+> let me first first repost the part from Arnd's email on the
+> architecture of the "shared transport" type of thing:
+>=20
+> > I believe we already agree it should be something like
+> >
+> >   bt   ti-radio    st-e-radio    ti-gps   st-e-gps  broadcom-radio
+> ...
+> >   |         |          |            |          |          |         |
+> >   +---------+----------+---------+--+----------+----------+---------+
+> >                                  |
+> >                         common-hci-module
+> >                                  |
+> >                      +-----------+-----------+
+> >                      |        |       |      |
+> >                    serial    spi     i2c    ...
+>=20
+> I think an explanation on how the patchset from Par maps to this
+> architecture could be a good starting point for confusion minimization
+> :)
+>=20
+> Thanks,
+>    Vitaly
 
-While I see the reference problem I don't really see how this could
-help since the application doesn't know about internal watches only
-the reference returned, so if the application releases its references
-btio won't release its own and in fact it can still call the
-application callbacks.
+I would say our design would map like this:
+common-hci-module: cg2900_core
+serial, spi, i2c,... : cg2900_uart together with hci_ldisc (for other trans=
+ports it would be different files)
+bt, ti-radio, st-e-radio,...: cg2900_chip together with btcg2900 and other =
+users per channel (cg2900_char_devices for users in User space)
+So it is not a 1-to-1 mapping for the upper parts. I would draw it like thi=
+s:
 
+                               bt   st-e-radio  st-e-gps
+                                |         |          |
+                                +---------+----------+
+                                          |
+                   ti-xx                st-e cg2900...
+                     |                    |
+                     +---------+----------+
+                               |
+                       common-hci-module
+                               |
+                   +-----------+-----------+
+                   |        |       |      |
+                 serial    spi     i2c    ...
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+The reason for this difference I've gone through before. Basically there ar=
+e so many special behaviors and needed handling that is individual for each=
+ chip (like startup and shutdown and in the case of CG2900 flow control ove=
+r FM and BT channels for audio commands). If you then look at the users I g=
+uess it would be possible to have one BT user, but it would have to be modi=
+fied to handle vendor specific commands (as btcg2900 does with BT_ENABLE co=
+mmand). As Arnd has drawn for FM and GPS the users would be completely indi=
+vidual since they don't have a standardized  interface.
+
+/P-G
