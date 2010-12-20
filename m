@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTi=9iFhHSK2p21eCDK8mT9Y-BPagCTd4XhTyGCer@mail.gmail.com>
+References: <1292819346-27318-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1292819346-27318-3-git-send-email-anderson.lizardo@openbossa.org>
+	<AANLkTimNkaxqTShFMr4-5Dk+i3iFKDz_b6wHNKb-0fQX@mail.gmail.com>
+	<AANLkTi=9iFhHSK2p21eCDK8mT9Y-BPagCTd4XhTyGCer@mail.gmail.com>
+Date: Mon, 20 Dec 2010 07:57:36 -0400
+Message-ID: <AANLkTinwPiiJjT5FTtJam2nZkPRP_ORaxb-Q5D0O3xeO@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Fix memory leaks in btio/btio.c
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH] Fix memory leak of unused EIR name
-Date: Mon, 20 Dec 2010 09:38:15 -0400
-Message-Id: <1292852295-11104-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a code path in btd_event_device_found() where the EIR name is
-not used. This requires freeing eir_data.name to avoid a leak.
+On Mon, Dec 20, 2010 at 7:36 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Luiz,
+>
+> On Mon, Dec 20, 2010 at 5:20 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> While I see the reference problem I don't really see how this could
+>> help since the application doesn't know about internal watches only
+>> the reference returned, so if the application releases its references
+>> btio won't release its own and in fact it can still call the
+>> application callbacks.
 
-Additionally, an incorrect use of free() is replaced with g_free().
----
- src/event.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+After Johan's explanation on IRC about btio policy regarding keeping
+state, I think I understand your comment now and I believe the patch
+can be just ignored.
 
-diff --git a/src/event.c b/src/event.c
-index 3603643..0c11da7 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -527,6 +527,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 	/* if found: don't send the name again */
- 	dev = adapter_search_found_devices(adapter, &match);
- 	if (dev) {
-+		g_free(eir_data.name);
- 		adapter_update_found_devices(adapter, peer, rssi, class,
- 						NULL, NULL, dev->legacy,
- 						eir_data.services,
-@@ -570,7 +571,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 			name = eir_data.name;
- 		} else {
- 			if (name)
--				free(eir_data.name);
-+				g_free(eir_data.name);
- 			else
- 				name = eir_data.name;
- 		}
+Regards,
 -- 
-1.7.0.4
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
