@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Dec 2010 17:36:06 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: anderson.lizardo@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix memory leak of unused EIR name
-Message-ID: <20101220153606.GA14575@jh-x301>
+From: anderson.lizardo@openbossa.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v2] Fix memory leak of unused EIR name
+Date: Mon, 20 Dec 2010 11:32:19 -0400
+Message-Id: <4d0f7725.81a5e60a.143c.2315@mx.google.com>
+In-Reply-To: <1292852295-11104-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1292852295-11104-1-git-send-email-anderson.lizardo@openbossa.org>
- <4d0f7725.81a5e60a.143c.2315@mx.google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4d0f7725.81a5e60a.143c.2315@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 
-On Mon, Dec 20, 2010, anderson.lizardo@openbossa.org wrote:
-> There is a code path in btd_event_device_found() where the EIR name is
-> not used. This requires freeing eir_data.name to avoid a leak.
-> ---
->  src/event.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+There is a code path in btd_event_device_found() where the EIR name is
+not used. This requires freeing eir_data.name to avoid a leak.
+---
+ src/event.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-Thanks. Pushed upstream.
+diff --git a/src/event.c b/src/event.c
+index 3603643..22f4f72 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -527,6 +527,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+ 	/* if found: don't send the name again */
+ 	dev = adapter_search_found_devices(adapter, &match);
+ 	if (dev) {
++		g_free(eir_data.name);
+ 		adapter_update_found_devices(adapter, peer, rssi, class,
+ 						NULL, NULL, dev->legacy,
+ 						eir_data.services,
+-- 
+1.7.0.4
 
-Johan
