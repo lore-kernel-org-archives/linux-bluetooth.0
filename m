@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1292539367.6740.13.camel@sealablnx02.qualcomm.com>
-References: <1292442852-26457-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1292442852-26457-2-git-send-email-claudio.takahasi@openbossa.org>
-	<1292539367.6740.13.camel@sealablnx02.qualcomm.com>
-Date: Mon, 20 Dec 2010 11:03:40 -0300
-Message-ID: <AANLkTimLuXaEEqx3ER2BxV8nyeYN0GCXke0_Hpy40_BV@mail.gmail.com>
-Subject: Re: [PATCH 2/5] Change CreatePairedDevice to support LE devices
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sheldon Demario <sheldon.demario@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Fix memory leak of unused EIR name
+Date: Mon, 20 Dec 2010 09:38:15 -0400
+Message-Id: <1292852295-11104-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+There is a code path in btd_event_device_found() where the EIR name is
+not used. This requires freeing eir_data.name to avoid a leak.
 
-On Thu, Dec 16, 2010 at 7:42 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> Hi Claudio,
->
-> On Wed, 2010-12-15 at 16:54 -0300, Claudio Takahasi wrote:
->> From: Sheldon Demario <sheldon.demario@openbossa.org>
->>
->> CreatePairedDevice implements now the same behaviour of CreateDevice,
->> triggering Discover All Primary Services when needed. SMP negotiation
->> starts when the link is established. LE capable kernel is required to
->> test this method properly.
->
-> What is your plan for handling single mode LE (remote) devices which
-> have privacy enabled (random addresses). This impacts connection
-> establishment, and SM pairing, as the remote device's addr type must
-> be known at that time, and handled differently.
+Additionally, an incorrect use of free() is replaced with g_free().
+---
+ src/event.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-At the moment, we don't have a clear picture how we will address
-random address. For this first phase I was considering to support
-public address only.
+diff --git a/src/event.c b/src/event.c
+index 3603643..0c11da7 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -527,6 +527,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+ 	/* if found: don't send the name again */
+ 	dev = adapter_search_found_devices(adapter, &match);
+ 	if (dev) {
++		g_free(eir_data.name);
+ 		adapter_update_found_devices(adapter, peer, rssi, class,
+ 						NULL, NULL, dev->legacy,
+ 						eir_data.services,
+@@ -570,7 +571,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+ 			name = eir_data.name;
+ 		} else {
+ 			if (name)
+-				free(eir_data.name);
++				g_free(eir_data.name);
+ 			else
+ 				name = eir_data.name;
+ 		}
+-- 
+1.7.0.4
 
-The kernel doesn't have persistent storage of the key, we will
-implement it using the new kernel management interface.
-We discussed the possibility of translate/resolve the address in the
-kernel, but we didn't reach a conclusion yet.
-
-Regards,
-Claudio.
