@@ -1,26 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Dec 2010 01:02:27 +0200
+Date: Tue, 21 Dec 2010 01:00:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] Remove unneeded variable
-Message-ID: <20101220230227.GC6365@jh-x301>
-References: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
- <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH v2 4/5] Fix missing reply when create device is
+ cancelled
+Message-ID: <20101220230058.GB6365@jh-x301>
+References: <1292442852-26457-4-git-send-email-claudio.takahasi@openbossa.org>
+ <1292885255-21662-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1292885255-21662-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Claudio,
 
 On Mon, Dec 20, 2010, Claudio Takahasi wrote:
+> When CancelDeviceCreation is called or when the device is removed for
+> any reason, the reply for the pending CreateDevice is not sent.
 > ---
->  src/glib-helper.c |    5 ++---
->  1 files changed, 2 insertions(+), 3 deletions(-)
+>  src/device.c |    8 ++++++--
+>  1 files changed, 6 insertions(+), 2 deletions(-)
 
-This patch seems fine but it doesn't apply (probably due to me not
-applying v2 2/5).
+Pushed upstream. Thanks.
 
 Johan
