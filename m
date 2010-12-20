@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Dec 2010 00:59:09 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: Re: [PATCH v2 2/5] Change CreatePairedDevice to support LE devices
-Message-ID: <20101220225909.GA6365@jh-x301>
-References: <20101216210111.GA25720@jh-x301>
- <1292885021-21619-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292885021-21619-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 4/5] Fix missing reply when create device is cancelled
+Date: Mon, 20 Dec 2010 19:47:35 -0300
+Message-Id: <1292885255-21662-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1292442852-26457-4-git-send-email-claudio.takahasi@openbossa.org>
+References: <1292442852-26457-4-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When CancelDeviceCreation is called or when the device is removed for
+any reason, the reply for the pending CreateDevice is not sent.
+---
+ src/device.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-> +static struct btd_device *create_common(DBusConnection *conn,
+diff --git a/src/device.c b/src/device.c
+index 33b09eb..b7c7ddf 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -727,8 +727,10 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 	if (device->bonding)
+ 		bonding_request_cancel(device->bonding);
+ 
+-	if (device->browse)
++	if (device->browse) {
++		discover_services_reply(device->browse, -ECANCELED, NULL);
+ 		browse_request_cancel(device->browse);
++	}
+ 
+ 	if (msg)
+ 		device->disconnects = g_slist_append(device->disconnects,
+@@ -1040,8 +1042,10 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ 	if (device->bonding)
+ 		device_cancel_bonding(device, HCI_OE_USER_ENDED_CONNECTION);
+ 
+-	if (device->browse)
++	if (device->browse) {
++		discover_services_reply(device->browse, -ECANCELED, NULL);
+ 		browse_request_cancel(device->browse);
++	}
+ 
+ 	if (device->handle)
+ 		do_disconnect(device);
+-- 
+1.7.3.3
 
-I don't really like this name since it doesn't explain what the function
-does in any way except that it creates "something". Could you call it
-e.g. __create_device() or create_device_internal()?
-
-> +	if (type == DEVICE_TYPE_LE && !event_is_connectable(dev->evt_type)) {
-> +		if (force)
-> +			goto create;
-> +
-> +		if (err)
-> +			*err = -ENOTCONN;
-> +
-> +		return NULL;
-> +	}
-> +
-> +create:
-
-You could avoid the label and goto by simply adding if (!force && type...
-to the beginning of the if-statement.
-
-> +int device_browse_primary(struct btd_device *device, DBusConnection *conn,
-> +				DBusMessage *msg, gboolean sec_level_high)
-
-Could you call the gboolean parameter just "secure"?
-
-Johan
