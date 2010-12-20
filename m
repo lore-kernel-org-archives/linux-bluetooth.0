@@ -1,36 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Dec 2010 17:38:17 +0200
+Date: Mon, 20 Dec 2010 17:36:06 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
+To: anderson.lizardo@openbossa.org
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] More CodingStyle in lib and tools
-Message-ID: <20101220153817.GB14575@jh-x301>
-References: <1292840029-27770-1-git-send-email-michal.labedzki@tieto.com>
- <1292840029-27770-4-git-send-email-michal.labedzki@tieto.com>
+Subject: Re: [PATCH v2] Fix memory leak of unused EIR name
+Message-ID: <20101220153606.GA14575@jh-x301>
+References: <1292852295-11104-1-git-send-email-anderson.lizardo@openbossa.org>
+ <4d0f7725.81a5e60a.143c.2315@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292840029-27770-4-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <4d0f7725.81a5e60a.143c.2315@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Lizardo,
 
-On Mon, Dec 20, 2010, Michal Labedzki wrote:
-> --- a/lib/hci.c
-> +++ b/lib/hci.c
-> @@ -56,8 +56,8 @@ typedef struct {
->  
->  static int is_number(const char *c)
->  {
-> -	while(*c) {
-> -		if (! isdigit(*c))
-> +	while (*c) {
-> +		if (!isdigit(*c))
->  			return 0;
->  		++c;
+On Mon, Dec 20, 2010, anderson.lizardo@openbossa.org wrote:
+> There is a code path in btd_event_device_found() where the EIR name is
+> not used. This requires freeing eir_data.name to avoid a leak.
+> ---
+>  src/event.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-Could you please merge this part to your first patch that introduced the
-issue. Besides that the cleanups seem fine to me (after a very quick
-look).
+Thanks. Pushed upstream.
 
 Johan
