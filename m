@@ -2,48 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 4/5] Fix missing reply when create device is cancelled
-Date: Mon, 20 Dec 2010 19:47:35 -0300
-Message-Id: <1292885255-21662-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1292442852-26457-4-git-send-email-claudio.takahasi@openbossa.org>
-References: <1292442852-26457-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 5/5] Remove unneeded variable
+Date: Mon, 20 Dec 2010 19:49:48 -0300
+Message-Id: <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
+References: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When CancelDeviceCreation is called or when the device is removed for
-any reason, the reply for the pending CreateDevice is not sent.
 ---
- src/device.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ src/glib-helper.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 33b09eb..b7c7ddf 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -727,8 +727,10 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
- 	if (device->bonding)
- 		bonding_request_cancel(device->bonding);
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 6ab288a..aa7f2c7 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -526,7 +526,6 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 	struct gattrib_context *ctxt;
+ 	BtIOSecLevel sec_level;
+ 	GIOChannel *io;
+-	GError *gerr = NULL;
  
--	if (device->browse)
-+	if (device->browse) {
-+		discover_services_reply(device->browse, -ECANCELED, NULL);
- 		browse_request_cancel(device->browse);
-+	}
+ 	ctxt = g_try_new0(struct gattrib_context, 1);
+ 	if (ctxt == NULL)
+@@ -545,14 +544,14 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
  
- 	if (msg)
- 		device->disconnects = g_slist_append(device->disconnects,
-@@ -1040,8 +1042,10 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
- 	if (device->bonding)
- 		device_cancel_bonding(device, HCI_OE_USER_ENDED_CONNECTION);
  
--	if (device->browse)
-+	if (device->browse) {
-+		discover_services_reply(device->browse, -ECANCELED, NULL);
- 		browse_request_cancel(device->browse);
-+	}
- 
- 	if (device->handle)
- 		do_disconnect(device);
+ 	if (psm < 0)
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_CID, GATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	else
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_PSM, psm,
 -- 
 1.7.3.3
 
