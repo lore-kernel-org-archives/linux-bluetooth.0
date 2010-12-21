@@ -1,34 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20101220230227.GC6365@jh-x301>
-References: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
-	<1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20101220230227.GC6365@jh-x301>
-Date: Tue, 21 Dec 2010 08:03:54 -0400
-Message-ID: <AANLkTi=2BWZn+1LPL+0A44oBqSVdFW8+BEiTEdX3gszZ@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] Remove unneeded variable
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v3] Remove unneeded variable
+Date: Tue, 21 Dec 2010 08:02:48 -0400
+Message-Id: <1292932968-3951-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Dec 20, 2010 at 7:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Mon, Dec 20, 2010, Claudio Takahasi wrote:
->> ---
->>  src/glib-helper.c |    5 ++---
->>  1 files changed, 2 insertions(+), 3 deletions(-)
->
-> This patch seems fine but it doesn't apply (probably due to me not
-> applying v2 2/5).
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-Just sent a rebased one that should apply to master branch.
+---
+ src/glib-helper.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-Regards,
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 0233eb7..bf39a83 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -514,7 +514,6 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ {
+ 	struct gattrib_context *ctxt;
+ 	GIOChannel *io;
+-	GError *gerr = NULL;
+ 
+ 	ctxt = g_try_new0(struct gattrib_context, 1);
+ 	if (ctxt == NULL)
+@@ -527,14 +526,14 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 	ctxt->destroy = destroy;
+ 
+ 	if (psm < 0)
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_CID, GATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
+ 	else
+-		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
++		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+ 				BT_IO_OPT_PSM, psm,
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.7.0.4
+
