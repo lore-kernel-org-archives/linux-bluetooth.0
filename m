@@ -1,423 +1,271 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH v4 2/5] Change CreatePairedDevice to support LE devices
-Date: Tue, 21 Dec 2010 09:34:57 -0500
-Message-Id: <1292942097-14820-1-git-send-email-sheldon.demario@openbossa.org>
-In-Reply-To: <20101221084243.GA14108@jh-x301>
-References: <20101221084243.GA14108@jh-x301>
+Subject: [PATCHv2] Bluetooth: Use non-flushable by default L2CAP data packets
+Date: Tue, 21 Dec 2010 16:21:29 +0200
+Message-Id: <1292941289-513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-CreatePairedDevice implements now the same behaviour of CreateDevice,
-triggering Discover All Primary Services when needed. SMP negotiation
-starts when the link is established. LE capable kernel is required to
-test this method properly.
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-Limitation: For dual mode devices, Discover All Primary Services is not
-being executed after SDP search if GATT record is found.
+Modification of Nick Pelly <npelly@google.com> patch.
+
+With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
+makes ACL data packets non-flushable by default on compatible chipsets, and
+adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
+data packets for a given L2CAP socket. This is useful for A2DP data which can
+be safely discarded if it can not be delivered within a short time (while
+other ACL data should not be discarded).
+
+Note that making ACL data flushable has no effect unless the automatic flush
+timeout for that ACL link is changed from its default of 0 (infinite).
+
+Default packet types (for compatible chipsets):
+Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+Bluetooth HCI H4
+Bluetooth HCI ACL Packet
+    .... 0000 0000 0010 = Connection Handle: 0x0002
+    ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
+    00.. .... .... .... = BC Flag: Point-To-Point (0)
+    Data Total Length: 8
+Bluetooth L2CAP Packet
+
+After setting BT_FLUSHABLE
+(sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
+Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+Bluetooth HCI H4
+Bluetooth HCI ACL Packet
+    .... 0000 0000 0010 = Connection Handle: 0x0002
+    ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
+    00.. .... .... .... = BC Flag: Point-To-Point (0)
+    Data Total Length: 8
+Bluetooth L2CAP Packet
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 ---
- src/adapter.c     |  102 +++++++++++++++++++++++++++++++++++++----------------
- src/device.c      |   89 ++++++++++++++++++++++++----------------------
- src/device.h      |    5 ++-
- src/glib-helper.c |   12 +++++-
- src/glib-helper.h |    1 +
- 5 files changed, 132 insertions(+), 77 deletions(-)
+ include/net/bluetooth/bluetooth.h |    5 ++++
+ include/net/bluetooth/hci.h       |    2 +
+ include/net/bluetooth/hci_core.h  |    1 +
+ include/net/bluetooth/l2cap.h     |    2 +
+ net/bluetooth/hci_core.c          |    6 +++-
+ net/bluetooth/l2cap.c             |   48 ++++++++++++++++++++++++++++++++++--
+ 6 files changed, 59 insertions(+), 5 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index cf3566d..82f55ef 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1510,15 +1510,48 @@ static gboolean event_is_connectable(uint8_t type)
- 	}
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 0c5e725..ed7d775 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -64,6 +64,11 @@ struct bt_security {
  
-+static struct btd_device *create_device_internal(DBusConnection *conn,
-+						struct btd_adapter *adapter,
-+						const gchar *address,
-+						gboolean force, int *err)
-+{
-+	struct remote_dev_info *dev, match;
-+	struct btd_device *device;
-+	device_type_t type;
+ #define BT_DEFER_SETUP	7
+ 
++#define BT_FLUSHABLE	8
 +
-+	memset(&match, 0, sizeof(struct remote_dev_info));
-+	str2ba(address, &match.bdaddr);
-+	match.name_status = NAME_ANY;
++#define BT_FLUSHABLE_OFF	0
++#define BT_FLUSHABLE_ON		1
 +
-+	dev = adapter_search_found_devices(adapter, &match);
-+	if (dev && dev->flags)
-+		type = flags2type(dev->flags);
-+	else
-+		type = DEVICE_TYPE_BREDR;
-+
-+	if (!force && type == DEVICE_TYPE_LE &&
-+					!event_is_connectable(dev->evt_type)) {
-+		if (err)
-+			*err = -ENOTCONN;
-+
-+		return NULL;
-+	}
-+
-+	device = adapter_create_device(conn, adapter, address, type);
-+	if (!device && err)
-+		*err = -ENOMEM;
-+
-+	return device;
-+}
-+
- static DBusMessage *create_device(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+ #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+ #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+ #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 29a7a8c..333d5cb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -150,6 +150,7 @@ enum {
+ #define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
+ 
+ /* ACL flags */
++#define ACL_START_NO_FLUSH	0x00
+ #define ACL_CONT		0x01
+ #define ACL_START		0x02
+ #define ACL_ACTIVE_BCAST	0x04
+@@ -193,6 +194,7 @@ enum {
+ #define LMP_EDR_ESCO_3M	0x40
+ #define LMP_EDR_3S_ESCO	0x80
+ 
++#define LMP_NO_FLUSH	0x01
+ #define LMP_SIMPLE_PAIR	0x08
+ 
+ /* Connection modes */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1992fac..9778bc8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -456,6 +456,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+ #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+ #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
++#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+ 
+ /* ----- HCI protocols ----- */
+ struct hci_proto {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 7ad25ca..af35711 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -75,6 +75,7 @@ struct l2cap_conninfo {
+ #define L2CAP_LM_TRUSTED	0x0008
+ #define L2CAP_LM_RELIABLE	0x0010
+ #define L2CAP_LM_SECURE		0x0020
++#define L2CAP_LM_FLUSHABLE	0x0040
+ 
+ /* L2CAP command codes */
+ #define L2CAP_COMMAND_REJ	0x01
+@@ -327,6 +328,7 @@ struct l2cap_pinfo {
+ 	__u8		sec_level;
+ 	__u8		role_switch;
+ 	__u8		force_reliable;
++	__u8		flushable;
+ 
+ 	__u8		conf_req[64];
+ 	__u8		conf_len;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 51c61f7..c0d776b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1380,7 +1380,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+ 
+ 	skb->dev = (void *) hdev;
+ 	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
++	hci_add_acl_hdr(skb, conn->handle, flags);
+ 
+ 	list = skb_shinfo(skb)->frag_list;
+ 	if (!list) {
+@@ -1398,12 +1398,14 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+ 		spin_lock_bh(&conn->data_q.lock);
+ 
+ 		__skb_queue_tail(&conn->data_q, skb);
++		flags &= ~ACL_START;
++		flags |= ACL_CONT;
+ 		do {
+ 			skb = list; list = list->next;
+ 
+ 			skb->dev = (void *) hdev;
+ 			bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+-			hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
++			hci_add_acl_hdr(skb, conn->handle, flags);
+ 
+ 			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
+ 
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index c791fcd..efa60eb 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
+ static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
  {
- 	struct btd_adapter *adapter = data;
- 	struct btd_device *device;
--	struct remote_dev_info *dev, match;
- 	const gchar *address;
-+	DBusMessage *reply;
- 	int err;
--	device_type_t type;
+ 	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
++	u8 flags;
  
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
- 						DBUS_TYPE_INVALID) == FALSE)
-@@ -1535,41 +1568,36 @@ static DBusMessage *create_device(DBusConnection *conn,
+ 	BT_DBG("code 0x%2.2x", code);
  
- 	DBG("%s", address);
+ 	if (!skb)
+ 		return;
  
--	memset(&match, 0, sizeof(struct remote_dev_info));
--	str2ba(address, &match.bdaddr);
--	match.name_status = NAME_ANY;
-+	device = create_device_internal(conn, adapter, address, TRUE, &err);
-+	if (!device)
-+		goto failed;
- 
--	dev = adapter_search_found_devices(adapter, &match);
--	if (dev && dev->flags)
--		type = flags2type(dev->flags);
-+	if (device_get_type(device) != DEVICE_TYPE_LE)
-+		err = device_browse_sdp(device, conn, msg, NULL, FALSE);
- 	else
--		type = DEVICE_TYPE_BREDR;
-+		err = device_browse_primary(device, conn, msg, FALSE);
- 
--	device = adapter_create_device(conn, adapter, address, type);
--	if (!device)
--		return NULL;
-+	if (err < 0) {
-+		adapter_remove_device(conn, adapter, device, TRUE);
-+		return btd_error_failed(msg, strerror(-err));
-+	}
- 
--	if (type == DEVICE_TYPE_LE && !event_is_connectable(dev->evt_type)) {
-+	return NULL;
+-	hci_send_acl(conn->hcon, skb, 0);
++	if (lmp_no_flush_capable(conn->hcon->hdev))
++		flags = ACL_START_NO_FLUSH;
++	else
++		flags = ACL_START;
 +
-+failed:
-+	if (err == -ENOTCONN) {
- 		/* Device is not connectable */
- 		const char *path = device_get_path(device);
--		DBusMessage *reply;
- 
- 		reply = dbus_message_new_method_return(msg);
- 
- 		dbus_message_append_args(reply,
--					DBUS_TYPE_OBJECT_PATH, &path,
--					DBUS_TYPE_INVALID);
--
--		return reply;
--	}
--
--	err = device_browse(device, conn, msg, NULL, FALSE);
--	if (err < 0) {
--		adapter_remove_device(conn, adapter, device, TRUE);
--		return btd_error_failed(msg, strerror(-err));
--	}
-+				DBUS_TYPE_OBJECT_PATH, &path,
-+				DBUS_TYPE_INVALID);
-+	} else
-+		reply = btd_error_failed(msg, strerror(-err));
- 
--	return NULL;
-+	return reply;
++	hci_send_acl(conn->hcon, skb, flags);
  }
  
- static uint8_t parse_io_capability(const char *capability)
-@@ -1594,6 +1622,7 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
- 	struct btd_device *device;
- 	const gchar *address, *agent_path, *capability, *sender;
- 	uint8_t cap;
-+	int err;
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
- 					DBUS_TYPE_OBJECT_PATH, &agent_path,
-@@ -1618,12 +1647,23 @@ static DBusMessage *create_paired_device(DBusConnection *conn,
- 	if (cap == IO_CAPABILITY_INVALID)
- 		return btd_error_invalid_args(msg);
- 
--	device = adapter_get_device(conn, adapter, address);
--	if (!device)
--		return btd_error_failed(msg,
--				"Unable to create a new device object");
-+	device = adapter_find_device(adapter, address);
-+	if (!device) {
-+		device = create_device_internal(conn, adapter, address,
-+								FALSE, &err);
-+		if (!device)
-+			return btd_error_failed(msg, strerror(-err));
-+	}
-+
-+	if (device_get_type(device) != DEVICE_TYPE_LE)
-+		return device_create_bonding(device, conn, msg,
-+							agent_path, cap);
- 
--	return device_create_bonding(device, conn, msg, agent_path, cap);
-+	err = device_browse_primary(device, conn, msg, TRUE);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
-+
-+	return NULL;
- }
- 
- static gint device_path_cmp(struct btd_device *device, const gchar *path)
-diff --git a/src/device.c b/src/device.c
-index bef8e71..87a6647 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -583,7 +583,7 @@ static DBusMessage *discover_services(DBusConnection *conn,
- 		return btd_error_invalid_args(msg);
- 
- 	if (strlen(pattern) == 0) {
--		err = device_browse(device, conn, msg, NULL, FALSE);
-+		err = device_browse_sdp(device, conn, msg, NULL, FALSE);
- 		if (err < 0)
- 			goto fail;
+ static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+@@ -900,6 +906,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->sec_level = l2cap_pi(parent)->sec_level;
+ 		pi->role_switch = l2cap_pi(parent)->role_switch;
+ 		pi->force_reliable = l2cap_pi(parent)->force_reliable;
++		pi->flushable = l2cap_pi(parent)->flushable;
  	} else {
-@@ -594,7 +594,7 @@ static DBusMessage *discover_services(DBusConnection *conn,
- 
- 		sdp_uuid128_to_uuid(&uuid);
- 
--		err = device_browse(device, conn, msg, &uuid, FALSE);
-+		err = device_browse_sdp(device, conn, msg, &uuid, FALSE);
- 		if (err < 0)
- 			goto fail;
- 	}
-@@ -985,6 +985,11 @@ void device_get_name(struct btd_device *device, char *name, size_t len)
- 	strncpy(name, device->name, len);
- }
- 
-+device_type_t device_get_type(struct btd_device *device)
-+{
-+	return device->type;
-+}
-+
- void device_remove_bonding(struct btd_device *device)
- {
- 	char filename[PATH_MAX + 1];
-@@ -1537,41 +1542,62 @@ done:
- 	browse_request_free(req);
- }
- 
--static struct browse_req *browse_primary(struct btd_device *device, int *err)
-+int device_browse_primary(struct btd_device *device, DBusConnection *conn,
-+				DBusMessage *msg, gboolean secure)
- {
- 	struct btd_adapter *adapter = device->adapter;
- 	struct browse_req *req;
- 	bdaddr_t src;
--	int ret;
-+	int err;
-+
-+	if (device->browse)
-+		return -EBUSY;
- 
- 	req = g_new0(struct browse_req, 1);
- 	req->device = btd_device_ref(device);
- 
- 	adapter_get_address(adapter, &src);
- 
--	ret = bt_discover_primary(&src, &device->bdaddr, -1, primary_cb, req,
--									NULL);
--
--	if (ret < 0) {
-+	err = bt_discover_primary(&src, &device->bdaddr, -1, primary_cb, req,
-+							secure, NULL);
-+	if (err < 0) {
- 		browse_request_free(req);
--		if (err)
--			*err = ret;
-+		return err;
-+	}
- 
--		return NULL;
-+	if (conn == NULL)
-+		conn = get_dbus_connection();
-+
-+	req->conn = dbus_connection_ref(conn);
-+	device->browse = req;
-+
-+	if (msg) {
-+		const char *sender = dbus_message_get_sender(msg);
-+
-+		req->msg = dbus_message_ref(msg);
-+		/* Track the request owner to cancel it
-+		 * automatically if the owner exits */
-+		req->listener_id = g_dbus_add_disconnect_watch(conn,
-+						sender,
-+						discover_services_req_exit,
-+						req, NULL);
+ 		pi->imtu = L2CAP_DEFAULT_MTU;
+ 		pi->omtu = 0;
+@@ -915,6 +922,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		pi->sec_level = BT_SECURITY_LOW;
+ 		pi->role_switch = 0;
+ 		pi->force_reliable = 0;
++		pi->flushable = BT_FLUSHABLE_OFF;
  	}
  
--	return req;
-+	return err;
- }
- 
--static struct browse_req *browse_sdp(struct btd_device *device, uuid_t *search,
--						gboolean reverse, int *err)
-+int device_browse_sdp(struct btd_device *device, DBusConnection *conn,
-+			DBusMessage *msg, uuid_t *search, gboolean reverse)
+ 	/* Default config options */
+@@ -1450,10 +1458,17 @@ static void l2cap_drop_acked_frames(struct sock *sk)
+ static inline void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
  {
- 	struct btd_adapter *adapter = device->adapter;
- 	struct browse_req *req;
- 	bt_callback_t cb;
- 	bdaddr_t src;
- 	uuid_t uuid;
--	int ret;
-+	int err;
-+
-+	if (device->browse)
-+		return -EBUSY;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	struct hci_conn *hcon = pi->conn->hcon;
++	u16 flags;
  
- 	adapter_get_address(adapter, &src);
+ 	BT_DBG("sk %p, skb %p len %d", sk, skb, skb->len);
  
-@@ -1586,34 +1612,11 @@ static struct browse_req *browse_sdp(struct btd_device *device, uuid_t *search,
- 		cb = browse_cb;
- 	}
- 
--	ret = bt_search_service(&src, &device->bdaddr, &uuid, cb, req, NULL);
--	if (ret < 0) {
-+	err = bt_search_service(&src, &device->bdaddr, &uuid, cb, req, NULL);
-+	if (err < 0) {
- 		browse_request_free(req);
--		if (err)
--			*err = ret;
--
--		return NULL;
--	}
--
--	return req;
--}
--
--int device_browse(struct btd_device *device, DBusConnection *conn,
--			DBusMessage *msg, uuid_t *search, gboolean reverse)
--{
--	struct browse_req *req;
--	int err = 0;
--
--	if (device->browse)
--		return -EBUSY;
--
--	if (device->type == DEVICE_TYPE_LE)
--		req = browse_primary(device, &err);
--	else
--		req = browse_sdp(device, search, reverse, &err);
--
--	if (req == NULL)
- 		return err;
-+	}
- 
- 	if (conn == NULL)
- 		conn = get_dbus_connection();
-@@ -1716,7 +1719,7 @@ static gboolean start_discovery(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
- 
--	device_browse(device, NULL, NULL, NULL, TRUE);
-+	device_browse_sdp(device, NULL, NULL, NULL, TRUE);
- 
- 	device->discov_timer = 0;
- 
-@@ -2053,7 +2056,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
- 			device->discov_timer = 0;
- 		}
- 
--		device_browse(device, bonding->conn, bonding->msg,
-+		device_browse_sdp(device, bonding->conn, bonding->msg,
- 				NULL, FALSE);
- 
- 		bonding_request_free(bonding);
-diff --git a/src/device.h b/src/device.h
-index 74b968c..9c645df 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -46,9 +46,12 @@ struct btd_device *device_create(DBusConnection *conn,
- 				const gchar *address, device_type_t type);
- void device_set_name(struct btd_device *device, const char *name);
- void device_get_name(struct btd_device *device, char *name, size_t len);
-+device_type_t device_get_type(struct btd_device *device);
- void device_remove(struct btd_device *device, gboolean remove_stored);
- gint device_address_cmp(struct btd_device *device, const gchar *address);
--int device_browse(struct btd_device *device, DBusConnection *conn,
-+int device_browse_primary(struct btd_device *device, DBusConnection *conn,
-+				DBusMessage *msg, gboolean secure);
-+int device_browse_sdp(struct btd_device *device, DBusConnection *conn,
- 			DBusMessage *msg, uuid_t *search, gboolean reverse);
- void device_probe_drivers(struct btd_device *device, GSList *profiles);
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
-diff --git a/src/glib-helper.c b/src/glib-helper.c
-index c440e60..459a21c 100644
---- a/src/glib-helper.c
-+++ b/src/glib-helper.c
-@@ -520,9 +520,11 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 
- int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 					bt_primary_t cb, void *user_data,
-+					gboolean secure,
- 					bt_destroy_t destroy)
- {
- 	struct gattrib_context *ctxt;
-+	BtIOSecLevel sec_level;
- 	GIOChannel *io;
- 	GError *gerr = NULL;
- 
-@@ -536,19 +538,25 @@ int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 	ctxt->cb = cb;
- 	ctxt->destroy = destroy;
- 
-+	if (secure == TRUE)
-+		sec_level = BT_IO_SEC_HIGH;
+-	hci_send_acl(pi->conn->hcon, skb, 0);
++	if (lmp_no_flush_capable(hcon->hdev) && !l2cap_pi(sk)->flushable)
++		flags = ACL_START_NO_FLUSH;
 +	else
-+		sec_level = BT_IO_SEC_LOW;
++		flags = ACL_START;
 +
++	hci_send_acl(hcon, skb, flags);
+ }
+ 
+ static void l2cap_streaming_send(struct sock *sk)
+@@ -2045,6 +2060,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+ {
+ 	struct sock *sk = sock->sk;
++	struct hci_conn *hcon = l2cap_pi(sk)->conn->hcon;
+ 	struct bt_security sec;
+ 	int len, err = 0;
+ 	u32 opt;
+@@ -2098,6 +2114,26 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 		bt_sk(sk)->defer_setup = opt;
+ 		break;
+ 
++	case BT_FLUSHABLE:
++		if (get_user(opt, (u32 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
 +
- 	if (psm < 0)
- 		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
- 				BT_IO_OPT_DEST_BDADDR, dst,
- 				BT_IO_OPT_CID, GATT_CID,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	else
- 		io = bt_io_connect(BT_IO_L2CAP, connect_cb, ctxt, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, src,
- 				BT_IO_OPT_DEST_BDADDR, dst,
- 				BT_IO_OPT_PSM, psm,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
++		if (opt > BT_FLUSHABLE_ON) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (opt == BT_FLUSHABLE_OFF &&
++				!lmp_no_flush_capable(hcon->hdev)) {
++			err = -EINVAL;
++			break;
++		}
++
++		l2cap_pi(sk)->flushable = opt;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -2237,6 +2273,12 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
  
- 	if (io == NULL) {
-diff --git a/src/glib-helper.h b/src/glib-helper.h
-index 10718bb..17739cf 100644
---- a/src/glib-helper.h
-+++ b/src/glib-helper.h
-@@ -35,6 +35,7 @@ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst);
+ 		break;
  
- int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 					bt_primary_t cb, void *user_data,
-+					gboolean secure,
- 					bt_destroy_t destroy);
++	case BT_FLUSHABLE:
++		if (put_user(l2cap_pi(sk)->flushable, (u32 __user *) optval))
++			err = -EFAULT;
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -4697,7 +4739,7 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
  
- gchar *bt_uuid2string(uuid_t *uuid);
+ 	BT_DBG("conn %p len %d flags 0x%x", conn, skb->len, flags);
+ 
+-	if (flags & ACL_START) {
++	if (!(flags & ACL_CONT)) {
+ 		struct l2cap_hdr *hdr;
+ 		struct sock *sk;
+ 		u16 cid;
 -- 
-1.7.3.2
+1.7.1
 
