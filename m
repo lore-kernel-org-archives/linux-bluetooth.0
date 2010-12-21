@@ -1,66 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 0/1] Implement Compound (Multi-step) GATT Procedure
- Support
-From: Brian Gix <bgix@codeaurora.org>
-To: claudio.takahasi@openbossa.org, vinicius.gomes@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
-References: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Date: Tue, 21 Dec 2010 09:25:55 -0800
-Message-ID: <1292952355.14993.9.camel@sealablnx02.qualcomm.com>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] sbc: detect when bitpool has changed
+Date: Tue, 21 Dec 2010 18:58:44 +0200
+Message-Id: <1292950724-4918-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio & Vinicius,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
+---
+ sbc/sbc.c |    8 +++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
 
-On Fri, 2010-12-17 at 14:48 -0800, Brian Gix wrote:
-> The following two proposed patches implement a method for correctly
-> staging GATT procedures that require multiple ATT req/resp exchanges.
-
-If you guys get a chance, could you consider this proposed change
-to gattrib.[ch] and the subsequent change to gatt.c? It differs from my
-initial proposed patch which subverted the gattrib queuing mechanism. It
-now lets each ATT command run to completion. It also fixes the memory
-leak potential that Vinicius spotted.  I think it is important that you
-give it at least a cursory look, because you guys know more about bluez
-GATT than anyone else here at this point.  Otherwise, I will resubmit
-this version as a patch request. -- thx
-
-> 
-> The first RFC / PATCH is gattrib.[ch], which allows the caller to specify
-> a gboolean indicating that the command being queued is Compound
-> (even if the procedure ends up being single/atomic) and a queue ID
-> number, which allows the caller to cancel the GATT procedure at any
-> stage of the transaction.
-> 
-> IF -
-> The ATT opcode being queued is specified as compound, the resulting response
-> will not cause the next item in the queue to be sent until *after* the
-> response has been forwarded to the caller via the response callback.
-> 
-> IF -
-> The ATT opcode being queued is *not* compound, the resulting response
-> will service the pkt queue immediately (legacy functionality).
-> 
-> IF -
-> The ID passed to g_attrib_send_seq is ZERO, the command pkt will
-> be added to the TAIL of the queue, and a new ID assigned to it.
-> (Legacy functionality)
-> 
-> IF -
-> The ID passed to g_attrib_send_seq is NON-ZERO, the command pkt
-> will be added to the HEAD of the queue, causing it to be the next
-> pkt sent to the remote device.  The NON-ZERO ID is also then able
-> to cancel the command.
-> 
-> 
-> The second RFC / PATCH is to gatt.c. It modifies the existing gatt_read_char()
-> function to recognize the need for a compound Read procedure, and implements
-> it as a READ_REQ + READ_BLOB_REQ + READ_BLOB_REQ ...<etc> as needed, using
-> the g_attrib_send_seq() logic from the first RFC / PATCH.
-> 
-
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index a6391ae..b3a7a09 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -965,7 +965,8 @@ ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+ 
+ 	framelen = sbc_unpack_frame(input, &priv->frame, input_len);
+ 
+-	if (!priv->init) {
++	/* init if no previous frame was encode or bitpool has changed */
++	if (!priv->init || priv->frame.bitpool != sbc->bitpool) {
+ 		sbc_decoder_init(&priv->dec_state, &priv->frame);
+ 		priv->init = 1;
+ 
+@@ -1035,7 +1036,8 @@ ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+ 	if (written)
+ 		*written = 0;
+ 
+-	if (!priv->init) {
++	/* init if no previous frame was encode or bitpool has changed */
++	if (!priv->init || priv->frame.bitpool != sbc->bitpool) {
+ 		priv->frame.frequency = sbc->frequency;
+ 		priv->frame.mode = sbc->mode;
+ 		priv->frame.channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
+@@ -1120,7 +1122,7 @@ size_t sbc_get_frame_length(sbc_t *sbc)
+ 	struct sbc_priv *priv;
+ 
+ 	priv = sbc->priv;
+-	if (priv->init)
++	if (priv->init && priv->frame.bitpool == sbc->bitpool)
+ 		return priv->frame.length;
+ 
+ 	subbands = sbc->subbands ? 8 : 4;
+-- 
+1.7.1
 
