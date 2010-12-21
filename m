@@ -1,48 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2c8fd2a055b2bc89623407a66d050c00.squirrel@www.codeaurora.org>
-Date: Tue, 21 Dec 2010 09:35:41 -0800 (PST)
-Subject: AVRCP connect failing with Interop headset-Buffalo
-From: roystonr@codeaurora.org
-To: linux-bluetooth@vger.kernel.org
-Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-	"Johan Hedberg" <johan.hedberg@gmail.com>, roystonr@codeaurora.org,
-	rshaffer@codeaurora.org, skrovvid@codeaurora.org
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+Subject: Re: [RFC 0/1] Implement Compound (Multi-step) GATT Procedure
+ Support
+From: Brian Gix <bgix@codeaurora.org>
+To: claudio.takahasi@openbossa.org, vinicius.gomes@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
+References: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 21 Dec 2010 09:25:55 -0800
+Message-ID: <1292952355.14993.9.camel@sealablnx02.qualcomm.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio & Vinicius,
 
-During Interop testing with Buffalo headset (supporting A2DP+AVRCP), its
-observed that the A2DP connection is failing.
 
->From the sniffer logs, it’s observed that the DUT (Device under test)
-issues avrcp_connect even before the l2cap connections for avdtp transport
-and signaling are completed. It’s also observed from the sniffer logs that
-the remote side hasn’t responded to one of the DUT’s l2cap connection
-request, before the DUT initiates the avrcp_connect.
+On Fri, 2010-12-17 at 14:48 -0800, Brian Gix wrote:
+> The following two proposed patches implement a method for correctly
+> staging GATT procedures that require multiple ATT req/resp exchanges.
 
-As an experiment, by modifying the CONTROL_CONNECT_TIMEOUT (in device.c)
-value from 2 to 5 seconds this issue with the mentioned headset is
-avoided.
+If you guys get a chance, could you consider this proposed change
+to gattrib.[ch] and the subsequent change to gatt.c? It differs from my
+initial proposed patch which subverted the gattrib queuing mechanism. It
+now lets each ATT command run to completion. It also fixes the memory
+leak potential that Vinicius spotted.  I think it is important that you
+give it at least a cursory look, because you guys know more about bluez
+GATT than anyone else here at this point.  Otherwise, I will resubmit
+this version as a patch request. -- thx
 
-To my understanding, CONTROL_CONNECT_TIMEOUT controls the interval at
-which the avrcp_connect is initiated from the DUT i.e. if the stream setup
-is active then the timer is kicked in to delay the DUT side avrcp_connect.
+> 
+> The first RFC / PATCH is gattrib.[ch], which allows the caller to specify
+> a gboolean indicating that the command being queued is Compound
+> (even if the procedure ends up being single/atomic) and a queue ID
+> number, which allows the caller to cancel the GATT procedure at any
+> stage of the transaction.
+> 
+> IF -
+> The ATT opcode being queued is specified as compound, the resulting response
+> will not cause the next item in the queue to be sent until *after* the
+> response has been forwarded to the caller via the response callback.
+> 
+> IF -
+> The ATT opcode being queued is *not* compound, the resulting response
+> will service the pkt queue immediately (legacy functionality).
+> 
+> IF -
+> The ID passed to g_attrib_send_seq is ZERO, the command pkt will
+> be added to the TAIL of the queue, and a new ID assigned to it.
+> (Legacy functionality)
+> 
+> IF -
+> The ID passed to g_attrib_send_seq is NON-ZERO, the command pkt
+> will be added to the HEAD of the queue, causing it to be the next
+> pkt sent to the remote device.  The NON-ZERO ID is also then able
+> to cancel the command.
+> 
+> 
+> The second RFC / PATCH is to gatt.c. It modifies the existing gatt_read_char()
+> function to recognize the need for a compound Read procedure, and implements
+> it as a READ_REQ + READ_BLOB_REQ + READ_BLOB_REQ ...<etc> as needed, using
+> the g_attrib_send_seq() logic from the first RFC / PATCH.
+> 
 
-Though by increasing the CONTROL_CONNECT_TIMEOUT value, this issue with
-the headset under test is avoided. The ideal way would be to trigger the
-DUT initiated avrcp_connect only after the l2cap connections are
-completed. Correct me if my understanding is wrong.
-
-Kindly provide reference as to how to control the DUT initiated
-avrcp_connect only after ensuring that the l2cap connections are
-completed. Or is it safe to the modify CONTROL_CONNECT_TIMEOUT value as
-mentioned above.
-
-Regards,
-Royston Rodrigues.
-"Sent by an employee of the Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum."
 
