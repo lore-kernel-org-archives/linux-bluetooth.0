@@ -1,46 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 21 Dec 2010 17:12:08 -0300
-Message-ID: <AANLkTi=px0CQY+W9PqrjMHZGQ6RdXgbd-iQo=K8AA_H6@mail.gmail.com>
-Subject: [RFC] LE General Discovery Procedure
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC 0/1] Implement Compound (Multi-step) GATT Procedure
+ Support
+From: Brian Gix <bgix@codeaurora.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: vinicius.gomes@openbossa.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTin8BHWOhpnv36ncteMNRfXwU81r17owAAaixiD-@mail.gmail.com>
+References: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
+	 <1292952355.14993.9.camel@sealablnx02.qualcomm.com>
+	 <AANLkTin8BHWOhpnv36ncteMNRfXwU81r17owAAaixiD-@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Date: Tue, 21 Dec 2010 11:50:59 -0800
+Message-ID: <1292961059.14993.47.camel@sealablnx02.qualcomm.com>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi folks,
+Hi Caudio,
 
-I'd like to receive opinions of how we should implement the General
-Discovery procedure aligned to UI/API and Bluetooth Qualification.
-The current implementation reports all found devices using the D-Bus
-signal DeviceFound(), Flags AD Type is ignored at the moment, meaning
-that Broadcaster and Peripheral are reported.
+On Tue, 2010-12-21 at 16:25 -0300, Claudio Takahasi wrote:
+> Hi Brian,
+> 
+> On Tue, Dec 21, 2010 at 2:25 PM, Brian Gix <bgix@codeaurora.org> wrote:
+> > Hi Claudio & Vinicius,
+> >
+> >
+> > On Fri, 2010-12-17 at 14:48 -0800, Brian Gix wrote:
+> >> The following two proposed patches implement a method for correctly
+> >> staging GATT procedures that require multiple ATT req/resp exchanges.
+> >
+> > If you guys get a chance, could you consider this proposed change
+> > to gattrib.[ch] and the subsequent change to gatt.c? It differs from my
+> > initial proposed patch which subverted the gattrib queuing mechanism. It
+> > now lets each ATT command run to completion. It also fixes the memory
+> > leak potential that Vinicius spotted.  I think it is important that you
+> > give it at least a cursory look, because you guys know more about bluez
+> > GATT than anyone else here at this point.  Otherwise, I will resubmit
+> > this version as a patch request. -- thx
+> >
+> 
+> ok. We can review your patches.
+> Could you please send patches to change gatttool to support this new feature?
+> How are you testing it? Do you have a modified BlueZ attribute server
+> or another GATT server?
 
->From Bluetooth SPEC: General Discovery Procedure -  page 1704
+There are no changes required to gatttool. The implemented high level
+function is still to read an attribute, and the function works the same
+if the remote attribute is shorter than 22 octets, and will be "long"
+only if the first response indicates a remote attribute of 22 octets or
+longer. (accounting for the one octet for the response hdr)
 
-"The Host shall check for the Flags AD type in the advertising data.
-If the Flags AD type is present and either the LE General Discoverable
-Mode flag is set to one or the LE Limited Discoverable Mode flag is
-set to one then the Host shall consider the device as a discovered
-device, otherwise the advertising data shall be ignored."
+I am testing this against against the internal Qualcomm GATT server,
+which has been tested at the past two UPFs. This is also the same stack
+which I hope to use to pre-vet the SM changes you are leading, prior to
+the UPF in Las Vegas.
 
-GAP Test Requirement document says that "General Discovery Procedure
-Does not find Broadcast device"
+As my next task, I could implement the capability to support long reads
+in the BlueZ GATT server. (likely followed by long writes in both the
+GATT client and server of BlueZ)
 
-We may need to represent the Broadcaster devices creating a D-Bus
-device object, it is still unclear to me at the moment. So I have
-three suggestions(I prefer the first):
-1. Report Peripheral and Broadcaster using DeviceFound() signal and
-add an property to identify the role. eg: Broadcaster=false/true
-2. Ignore the Broadcaster devices. Means that it will not be possible
-to call CreateDevice for these devices.
-3. Add a config option to change the discovery behavior to ignore
-Broadcaster devices. For qualification test only.
+> 
+> Claudio
 
-If we choose the first, for qualification test I guess it will be
-enough to add an extra filter to ignore the broadcaster devices in the
-BlueZ test script.
+Thanks,
 
-Regards,
-Claudio
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
