@@ -2,122 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 07/18] Add support for creating devices from stored primary services
-Date: Tue, 21 Dec 2010 19:26:29 -0200
-Message-Id: <1292966800-6264-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 06/18] Add support for creating devices from stored types
+Date: Tue, 21 Dec 2010 19:26:28 -0200
+Message-Id: <1292966800-6264-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From what we can retrieve from storage we are able to create the devices
-and probe the device drivers.
+This adds a way to restore devices from their types.
 ---
- src/adapter.c |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 77 insertions(+), 0 deletions(-)
+ src/adapter.c |   28 ++++++++++++++++++++++++++++
+ src/device.c  |    8 ++++++++
+ src/device.h  |    1 +
+ 3 files changed, 37 insertions(+), 0 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 9c57bea..3d5fafc 100644
+index ea81722..9c57bea 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -55,6 +55,7 @@
- #include "glib-helper.h"
- #include "agent.h"
- #include "storage.h"
-+#include "att.h"
- 
- /* Flags Descriptions */
- #define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
-@@ -1931,6 +1932,78 @@ static void create_stored_device_from_types(char *key, char *value,
+@@ -1906,6 +1906,31 @@ static void create_stored_device_from_blocked(char *key, char *value,
  	}
  }
  
-+static GSList *string_to_primary_list(char *str)
-+{
-+	GSList *l = NULL;
-+	char **services;
-+	int i;
-+
-+	if (str == NULL)
-+		return NULL;
-+
-+	services = g_strsplit(str, " ", 0);
-+	if (services == NULL)
-+		return NULL;
-+
-+	for (i = 0; services[i]; i++) {
-+		struct att_primary *prim;
-+		int ret;
-+
-+		prim = g_new0(struct att_primary, 1);
-+
-+		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->start,
-+							&prim->end, prim->uuid);
-+
-+		if (ret < 3) {
-+			att_primary_free(prim);
-+			continue;
-+		}
-+
-+		l = g_slist_append(l, prim);
-+	}
-+
-+	g_strfreev(services);
-+
-+	return l;
-+}
-+
-+static void create_stored_device_from_primary(char *key, char *value,
++static void create_stored_device_from_types(char *key, char *value,
 +							void *user_data)
 +{
++	GSList *l;
 +	struct btd_adapter *adapter = user_data;
 +	struct btd_device *device;
-+	GSList *services, *uuids, *l;
++	uint8_t type;
++
++	type = strtol(value, NULL, 16);
 +
 +	l = g_slist_find_custom(adapter->devices,
 +				key, (GCompareFunc) device_address_cmp);
-+	if (l)
++	if (l) {
 +		device = l->data;
-+	else {
-+		device = device_create(connection, adapter, key, DEVICE_TYPE_BREDR);
-+		if (!device)
-+			return;
++		device_set_type(device, type);
++		return;
++	}
 +
++	device = device_create(connection, adapter, key, type);
++	if (device) {
 +		device_set_temporary(device, FALSE);
 +		adapter->devices = g_slist_append(adapter->devices, device);
 +	}
-+
-+	services = string_to_primary_list(value);
-+	if (services == NULL)
-+		return;
-+
-+	for (l = services, uuids = NULL; l; l = l->next) {
-+		struct att_primary *prim = l->data;
-+		uuids = g_slist_append(uuids, prim->uuid);
-+	}
-+
-+	device_probe_drivers(device, uuids);
-+
-+	g_slist_free(uuids);
-+
-+	g_slist_foreach(services, (GFunc) att_primary_free, NULL);
-+	g_slist_free(services);
 +}
 +
  static void load_devices(struct btd_adapter *adapter)
  {
  	char filename[PATH_MAX + 1];
-@@ -1944,6 +2017,10 @@ static void load_devices(struct btd_adapter *adapter)
- 	textfile_foreach(filename, create_stored_device_from_profiles,
- 								adapter);
+@@ -1933,6 +1958,9 @@ static void load_devices(struct btd_adapter *adapter)
  
-+	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "primary");
-+	textfile_foreach(filename, create_stored_device_from_primary,
-+								adapter);
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
+ 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
 +
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "linkkeys");
- 	textfile_foreach(filename, create_stored_device_from_linkkeys, &keys);
++	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "types");
++	textfile_foreach(filename, create_stored_device_from_types, adapter);
+ }
  
+ int btd_adapter_block_address(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+diff --git a/src/device.c b/src/device.c
+index ca2c5bc..d67f804 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1767,6 +1767,14 @@ uint8_t device_get_auth(struct btd_device *device)
+ 	return device->auth;
+ }
+ 
++void device_set_type(struct btd_device *device, device_type_t type)
++{
++	if (!device)
++		return;
++
++	device->type = type;
++}
++
+ static gboolean start_discovery(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+diff --git a/src/device.h b/src/device.h
+index 74b968c..7820636 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -66,6 +66,7 @@ gboolean device_is_trusted(struct btd_device *device);
+ void device_set_paired(struct btd_device *device, gboolean paired);
+ void device_set_temporary(struct btd_device *device, gboolean temporary);
+ void device_set_cap(struct btd_device *device, uint8_t cap);
++void device_set_type(struct btd_device *device, device_type_t type);
+ uint8_t device_get_cap(struct btd_device *device);
+ void device_set_auth(struct btd_device *device, uint8_t auth);
+ uint8_t device_get_auth(struct btd_device *device);
 -- 
 1.7.3.4
 
