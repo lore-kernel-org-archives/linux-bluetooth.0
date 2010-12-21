@@ -1,145 +1,294 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 04/18] Add a way to store the remote device type
-Date: Tue, 21 Dec 2010 19:26:26 -0200
-Message-Id: <1292966800-6264-5-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 03/18] Move primary service storage to device.c
+Date: Tue, 21 Dec 2010 19:26:25 -0200
+Message-Id: <1292966800-6264-4-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Because we need to know the device type (LE, Basic Rate or Dual Mode)
-to be able to fully restore the device from storage, we have to store
-and load this information to permanent storage.
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 
-Note: due to "device_type_t" usage in storage.h, some header includes
-needed to be reordered in files which include storage.h.
+Discover All Primary Services has beed moved to device.c in order
+to follow a similar approach of BR/EDR service records.
 ---
- input/device.c   |    4 ++--
- plugins/hciops.c |    2 +-
- serial/port.c    |    2 ++
- src/storage.c    |   40 ++++++++++++++++++++++++++++++++++++++++
- src/storage.h    |    3 +++
- 5 files changed, 48 insertions(+), 3 deletions(-)
+ attrib/att.c      |    5 +++++
+ attrib/att.h      |    7 +++++++
+ attrib/client.c   |   41 -----------------------------------------
+ attrib/gattrib.c  |    1 +
+ src/device.c      |   44 +++++++++++++++++++++++++++++++++++++++++++-
+ src/glib-helper.c |   24 ++++++++++++++++--------
+ 6 files changed, 72 insertions(+), 50 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index d735028..8a17966 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -46,11 +46,11 @@
- #include "textfile.h"
- #include "uinput.h"
- 
--#include "../src/storage.h"
- #include "../src/adapter.h"
-+#include "../src/device.h"
-+#include "../src/storage.h"
- #include "../src/manager.h"
- #include "../src/dbus-common.h"
--#include "../src/device.h"
- 
- #include "device.h"
- #include "error.h"
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 131df1a..43e3d93 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -41,11 +41,11 @@
- #include "hcid.h"
- #include "sdpd.h"
- #include "adapter.h"
-+#include "device.h"
- #include "plugin.h"
- #include "log.h"
- #include "storage.h"
- #include "event.h"
--#include "device.h"
- #include "manager.h"
- 
- static int child_pipe[2] = { -1, -1 };
-diff --git a/serial/port.c b/serial/port.c
-index 233e317..7d56faa 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -53,6 +53,8 @@
- 
- #include "error.h"
- #include "manager.h"
-+#include "adapter.h"
-+#include "device.h"
- #include "storage.h"
- #include "port.h"
- 
-diff --git a/src/storage.c b/src/storage.c
-index 06b36f1..fb6e401 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -45,6 +45,8 @@
- #include <bluetooth/sdp_lib.h>
- 
- #include "textfile.h"
-+#include "adapter.h"
-+#include "device.h"
- #include "glib-helper.h"
- #include "storage.h"
- 
-@@ -1391,3 +1393,41 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
- 
- 	return textfile_foreach(filename, func, data);
+diff --git a/attrib/att.c b/attrib/att.c
+index f8dbc02..6c2d799 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -78,6 +78,11 @@ const char *att_ecode2str(uint8_t status)
+ 	}
  }
-+
-+int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
-+						device_type_t type)
-+{
-+	char filename[PATH_MAX + 1], addr[18], chars[3];
-+
-+	create_filename(filename, PATH_MAX, sba, "types");
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	ba2str(dba, addr);
-+
-+	snprintf(chars, sizeof(chars), "%2.2X", type);
-+
-+	return textfile_put(filename, addr, chars);
-+}
-+
-+device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba)
-+{
-+	char filename[PATH_MAX + 1], addr[18], *chars;
-+	device_type_t type;
-+
-+	create_filename(filename, PATH_MAX, sba, "types");
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	ba2str(dba, addr);
-+
-+	chars = textfile_caseget(filename, addr);
-+	if (chars == NULL)
-+		return DEVICE_TYPE_UNKNOWN;
-+
-+	type = strtol(chars, NULL, 16);
-+
-+	free(chars);
-+
-+	return type;
-+}
-diff --git a/src/storage.h b/src/storage.h
-index c7e342c..f36cefb 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -91,6 +91,9 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
-                                         uint16_t handle, const char *chars);
- int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
-+int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
-+						device_type_t type);
-+device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba);
  
- #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
++void att_primary_free(struct att_primary *prim)
++{
++	g_free(prim);
++}
++
+ void att_data_list_free(struct att_data_list *list)
+ {
+ 	int i;
+diff --git a/attrib/att.h b/attrib/att.h
+index 0b8612e..17124d7 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -137,6 +137,12 @@ struct att_range {
+ 	uint16_t end;
+ };
+ 
++struct att_primary {
++	char uuid[MAX_LEN_UUID_STR + 1];
++	uint16_t start;
++	uint16_t end;
++};
++
+ /* These functions do byte conversion */
+ static inline uint8_t att_get_u8(const void *ptr)
+ {
+@@ -172,6 +178,7 @@ static inline void att_put_u32(uint16_t src, void *dst)
+ }
+ 
+ void att_data_list_free(struct att_data_list *list);
++void att_primary_free(struct att_primary *prim);
+ 
+ const char *att_ecode2str(uint8_t status);
+ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, uuid_t *uuid,
+diff --git a/attrib/client.c b/attrib/client.c
+index 69e4fb8..00d0bbc 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -1086,35 +1086,6 @@ static void load_attribute_data(char *key, char *value, void *data)
+ 		chr->format = attr_data_from_string(value + MAX_LEN_UUID_STR);
+ }
+ 
+-static char *primary_list_to_string(GSList *primary_list)
+-{
+-	GString *services;
+-	GSList *l;
+-
+-	services = g_string_new(NULL);
+-
+-	for (l = primary_list; l; l = l->next) {
+-		struct primary *primary = l->data;
+-		uuid_t *uuid128;
+-		char service[64];
+-		char uuidstr[MAX_LEN_UUID_STR];
+-
+-		memset(service, 0, sizeof(service));
+-
+-		uuid128 = sdp_uuid_to_uuid128(&primary->uuid);
+-		sdp_uuid2strn(uuid128, uuidstr, MAX_LEN_UUID_STR);
+-
+-		bt_free(uuid128);
+-
+-		snprintf(service, sizeof(service), "%04X#%04X#%s ",
+-				primary->start, primary->end, uuidstr);
+-
+-		services = g_string_append(services, service);
+-	}
+-
+-	return g_string_free(services, FALSE);
+-}
+-
+ static GSList *string_to_primary_list(struct gatt_service *gatt,
+ 							const char *str)
+ {
+@@ -1158,17 +1129,6 @@ static GSList *string_to_primary_list(struct gatt_service *gatt,
+ 	return l;
+ }
+ 
+-static void store_primary_services(struct gatt_service *gatt)
+-{
+-       char *services;
+-
+-       services = primary_list_to_string(gatt->primary);
+-
+-       write_device_services(&gatt->sba, &gatt->dba, services);
+-
+-       g_free(services);
+-}
+-
+ static gboolean load_primary_services(struct gatt_service *gatt)
+ {
+ 	GSList *primary_list;
+@@ -1225,7 +1185,6 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		if (gatt->primary == NULL)
+ 			goto done;
+ 
+-		store_primary_services(gatt);
+ 		register_primary(gatt);
+ 
+ 		g_slist_foreach(gatt->primary, discover_all_char, gatt);
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index eace01b..9268001 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -30,6 +30,7 @@
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
+ 
+ #include "att.h"
+ #include "btio.h"
+diff --git a/src/device.c b/src/device.c
+index c306e43..4bf9b52 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -45,6 +45,7 @@
+ #include "log.h"
+ #include "textfile.h"
+ 
++#include "att.h"
+ #include "hcid.h"
+ #include "adapter.h"
+ #include "device.h"
+@@ -1518,10 +1519,36 @@ static void init_browse(struct browse_req *req, gboolean reverse)
+ 						l->data);
+ }
+ 
++static char *primary_list_to_string(GSList *primary_list)
++{
++	GString *services;
++	GSList *l;
++
++	services = g_string_new(NULL);
++
++	for (l = primary_list; l; l = l->next) {
++		struct att_primary *primary = l->data;
++		char service[64];
++
++		memset(service, 0, sizeof(service));
++
++		snprintf(service, sizeof(service), "%04X#%04X#%s ",
++				primary->start, primary->end, primary->uuid);
++
++		services = g_string_append(services, service);
++	}
++
++	return g_string_free(services, FALSE);
++}
++
+ static void primary_cb(GSList *services, int err, gpointer user_data)
+ {
+ 	struct browse_req *req = user_data;
+ 	struct btd_device *device = req->device;
++	struct btd_adapter *adapter = device->adapter;
++	GSList *l, *uuids = NULL;
++	bdaddr_t dba, sba;
++	char *str;
+ 
+ 	if (err) {
+ 		DBusMessage *reply;
+@@ -1532,10 +1559,25 @@ static void primary_cb(GSList *services, int err, gpointer user_data)
+ 
+ 	services_changed(device);
+ 	device_set_temporary(device, FALSE);
+-	device_probe_drivers(device, services);
++
++	for (l = services; l; l = l->next) {
++		struct att_primary *prim = l->data;
++		uuids = g_slist_append(uuids, prim->uuid);
++	}
++
++	device_probe_drivers(device, uuids);
++	g_slist_free(uuids);
+ 
+ 	create_device_reply(device, req);
+ 
++	str = primary_list_to_string(services);
++
++	adapter_get_address(adapter, &sba);
++	device_get_address(device, &dba);
++
++	write_device_services(&sba, &dba, str);
++	g_free(str);
++
+ done:
+ 	device->browse = NULL;
+ 	browse_request_free(req);
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index bf39a83..4bd6a50 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -55,7 +55,7 @@ struct gattrib_context {
+ 	bt_primary_t cb;
+ 	bt_destroy_t destroy;
+ 	gpointer user_data;
+-	GSList *uuids;
++	GSList *primaries;
+ };
+ 
+ static GSList *gattrib_list = NULL;
+@@ -75,8 +75,8 @@ static void gattrib_context_free(struct gattrib_context *ctxt)
+ 	if (ctxt->destroy)
+ 		ctxt->destroy(ctxt->user_data);
+ 
+-	g_slist_foreach(ctxt->uuids, (GFunc) g_free, NULL);
+-	g_slist_free(ctxt->uuids);
++	g_slist_foreach(ctxt->primaries, (GFunc) att_primary_free, NULL);
++	g_slist_free(ctxt->primaries);
+ 	g_attrib_unref(ctxt->attrib);
+ 	if (ctxt->io) {
+ 		g_io_channel_unref(ctxt->io);
+@@ -439,7 +439,7 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	struct gattrib_context *ctxt = user_data;
+ 	struct att_data_list *list;
+ 	unsigned int i, err;
+-	uint16_t end;
++	uint16_t start, end;
+ 
+ 	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
+ 		err = 0;
+@@ -459,9 +459,10 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 
+ 	for (i = 0, end = 0; i < list->num; i++) {
+ 		const uint8_t *data = list->data[i];
+-		char *prim;
++		struct att_primary *primary;
+ 		uuid_t u128, u16;
+ 
++		start = att_get_u16(&data[0]);
+ 		end = att_get_u16(&data[2]);
+ 
+ 		if (list->len == 6) {
+@@ -475,8 +476,15 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 			/* Skipping invalid data */
+ 			continue;
+ 
+-		prim = bt_uuid2string(&u128);
+-		ctxt->uuids = g_slist_append(ctxt->uuids, prim);
++		primary = g_try_new0(struct att_primary, 1);
++		if (!primary) {
++			err = -ENOMEM;
++			goto done;
++		}
++		primary->start = start;
++		primary->end = end;
++		sdp_uuid2strn(&u128, primary->uuid, sizeof(primary->uuid));
++		ctxt->primaries = g_slist_append(ctxt->primaries, primary);
+ 	}
+ 
+ 	att_data_list_free(list);
+@@ -489,7 +497,7 @@ static void primary_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
+ 
+ done:
+-	ctxt->cb(ctxt->uuids, err, ctxt->user_data);
++	ctxt->cb(ctxt->primaries, err, ctxt->user_data);
+ 	gattrib_context_free(ctxt);
+ }
  
 -- 
 1.7.3.4
