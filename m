@@ -1,28 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Dec 2010 14:47:09 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: Re: [PATCH v3] Remove unneeded variable
-Message-ID: <20101221124709.GA23024@jh-x301>
-References: <1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
- <1292932968-3951-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292932968-3951-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <20101220230227.GC6365@jh-x301>
+References: <1292442852-26457-5-git-send-email-claudio.takahasi@openbossa.org>
+	<1292885388-21703-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20101220230227.GC6365@jh-x301>
+Date: Tue, 21 Dec 2010 08:03:54 -0400
+Message-ID: <AANLkTi=2BWZn+1LPL+0A44oBqSVdFW8+BEiTEdX3gszZ@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] Remove unneeded variable
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, Dec 20, 2010 at 7:02 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Mon, Dec 20, 2010, Claudio Takahasi wrote:
+>> ---
+>>  src/glib-helper.c |    5 ++---
+>>  1 files changed, 2 insertions(+), 3 deletions(-)
+>
+> This patch seems fine but it doesn't apply (probably due to me not
+> applying v2 2/5).
 
-On Tue, Dec 21, 2010, Anderson Lizardo wrote:
-> From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> 
-> ---
->  src/glib-helper.c |    5 ++---
->  1 files changed, 2 insertions(+), 3 deletions(-)
+Just sent a rebased one that should apply to master branch.
 
-Pushed upstream. Thanks.
-
-Johan
+Regards,
+-- 
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
