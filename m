@@ -1,44 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Dec 2010 10:49:54 +0200
+Date: Tue, 21 Dec 2010 10:42:43 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] Filter device name in hciconfig.
-Message-ID: <20101221084954.GB14108@jh-x301>
-References: <1292840029-27770-2-git-send-email-michal.labedzki@tieto.com>
- <1292920258-28989-1-git-send-email-michal.labedzki@tieto.com>
+Subject: Re: [PATCH v3 2/5] Change CreatePairedDevice to support LE devices
+Message-ID: <20101221084243.GA14108@jh-x301>
+References: <20101220225909.GA6365@jh-x301>
+ <1292889434-3773-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292920258-28989-1-git-send-email-michal.labedzki@tieto.com>
+In-Reply-To: <1292889434-3773-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi Sheldon,
 
-On Tue, Dec 21, 2010, Michal Labedzki wrote:
-> No anymore work someting like "hciconfig tty1", "hciconfig qfg1" or
-> "hciconfig hci1hg" as "hci1".
-> ---
->  lib/hci.c         |   12 +++++++++++-
->  tools/hciconfig.c |   30 +++++++++++++++++++++++++++++-
->  2 files changed, 40 insertions(+), 2 deletions(-)
+On Mon, Dec 20, 2010, Sheldon Demario wrote:
+> +static struct btd_device *create_device_internal(DBusConnection *conn,
+> +						struct btd_adapter *adapter,
+> +						const gchar *address,
+> +						gboolean secure, int *err)
+> +{
+> +	struct remote_dev_info *dev, match;
+> +	struct btd_device *device;
+> +	device_type_t type;
+> +
+> +	memset(&match, 0, sizeof(struct remote_dev_info));
+> +	str2ba(address, &match.bdaddr);
+> +	match.name_status = NAME_ANY;
+> +
+> +	dev = adapter_search_found_devices(adapter, &match);
+> +	if (dev && dev->flags)
+> +		type = flags2type(dev->flags);
+> +	else
+> +		type = DEVICE_TYPE_BREDR;
+> +
+> +	if (!secure && type == DEVICE_TYPE_LE &&
+> +					!event_is_connectable(dev->evt_type)) {
 
-This doesn't compile for me:
+I think you got something mixed up here. I asked you to change the
+sec_level_high variable occurences to secure. Here you've gone and
+changed the force variable to secure (something that I didn't request).
 
-lib/hci.c: In function 'is_number':
-lib/hci.c:60: error: implicit declaration of function 'isdigit'
+I.e. please use "force" like before (since that describes its purpose
+within the create_device_internal function more intuitively) and change
+the following:
 
-Did you actually compile using ./boostrap-configure? Always do that
-before submitting patches. It'll enable some extra checks and convert
-all warnings to errors so you don't miss them by mistake.
+> +int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+> +				DBusMessage *msg, gboolean sec_level_high)
 
-"man isdigit" tells me that <ctype.h> should be included to use the
-funciton.
+> +int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+> +				DBusMessage *msg, gboolean sec_level_high);
 
-Also, your commit message doesn't match the patch content. The patch
-also changes hci_devid which is in no way specific to hciconfig whereas
-your commit message implies that the patch is specific to hciconfig.
-Feel free to split this into two separate patches with appropriate
-commit messages.
+>  int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+>  					bt_primary_t cb, void *user_data,
+> +					gboolean sec_level_high,
+>  					bt_destroy_t destroy)
+
+>  int bt_discover_primary(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+>  					bt_primary_t cb, void *user_data,
+> +					gboolean sec_level_high,
+>  					bt_destroy_t destroy);
 
 Johan
