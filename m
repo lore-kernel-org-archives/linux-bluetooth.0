@@ -1,30 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Dec 2010 00:20:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Configure HFP/HSP endpoints if headset interface is
- already connected
-Message-ID: <20101221222042.GA17957@jh-x301>
-References: <1292946195-25355-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292946195-25355-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1292969192.14993.61.camel@sealablnx02.qualcomm.com>
+References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1292969192.14993.61.camel@sealablnx02.qualcomm.com>
+Date: Tue, 21 Dec 2010 20:19:28 -0200
+Message-ID: <AANLkTik1skVDxCPQjN9S0sHpqoA4gXm8U3jkLkG6kTWL@mail.gmail.com>
+Subject: Re: [PATCH 00/18] Making GATT a first class citizen
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Brian,
 
-On Tue, Dec 21, 2010, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> 
-> HFP/HSP can be connected when registering an endpoint which is different
-> than on a2dp where the sep cannot be configured already since it wasn't
-> available before.
-> ---
->  audio/media.c |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
+On Tue, Dec 21, 2010 at 8:06 PM, Brian Gix <bgix@codeaurora.org> wrote:
+> Hi Vinicius,
+>
+> On Tue, 2010-12-21 at 19:26 -0200, Vinicius Costa Gomes wrote:
+>> Hi,
+>>
+>> These are the first steps in the direction of making GATT a first
+>> class citizen in Bluez.
+>
+> Is there a simple text file anywhere yet, that details the up-to-date
+> Object-Path/Interface/Method/Properties/etc DBus API layout of the LE
+> additions?
+>
 
-The patch has been pushed upstream. Thanks.
+Yes, doc/attribute-api.txt should contain the documentation of the DBus API.
 
-Johan
+> Thanks,
+>
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+
+-- 
+Vinicius
