@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-Cc: "'Hagen Hentschel \(Ellisys\)'" <hagen.hentschel@ellisys.com>
-References: <1293010548-25151-1-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1293010548-25151-1-git-send-email-luiz.dentz@gmail.com>
-Subject: SBC loudness bug?
-Date: Wed, 22 Dec 2010 15:14:16 +0100
-Message-ID: <000601cba1e2$86077e70$92167b50$@de>
+Date: Wed, 22 Dec 2010 14:00:04 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 05/18] Add support for storing the device type
+Message-ID: <20101222120004.GE27483@jh-x301>
+References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1292966800-6264-6-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1292966800-6264-6-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Vinicius,
 
-Mr. Hagen Hentschel was telling me that the BlueZ SBC implementation still has an bug. As compared to Bluetooth's reference implementation the signal is twotimes too silent. We told me, that in the last step of calculating the PCM samples a 1 bit right shift was done too much.
+On Tue, Dec 21, 2010, Vinicius Costa Gomes wrote:
+> When the service discovery (SDP or GATT) is finished, write the device
+> type so it can be retrieved from storage when needed.
+> ---
+>  src/device.c |   11 ++++++++++-
+>  1 files changed, 10 insertions(+), 1 deletions(-)
 
-A correct implementation for C# can be found at http://sourceforge.net/projects/sbcsharp/
+This one doesn't apply, probably because I didn't apply 3/18. Please
+resend a fixed 3/18 and then I'll proceed with processing this patch
+set.
 
-Sorry, due to time limits I cannot provide you with a patch...
-
-With best regards,
-
- Christian Hoene
-
-
-
+Johan
