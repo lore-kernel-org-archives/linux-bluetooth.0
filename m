@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v5] Bluetooth: Fix __hci_request synchronization for
- hci_open_dev
-From: Marcel Holtmann <marcel@holtmann.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1292965287-29849-1-git-send-email-johan.hedberg@gmail.com>
-References: <1292965287-29849-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 22 Dec 2010 13:31:31 -0800
-Message-ID: <1293053496.9439.0.camel@aeonflux>
-Mime-Version: 1.0
+From: Bruna Moreira <bruna.moreira@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH] Change LE scan interval and window to recommended values
+Date: Wed, 22 Dec 2010 15:11:48 -0400
+Message-Id: <1293045108-14011-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Replace default scan interval and scan window values with recommended
+ones for general discovery procedure, according to the Core
+specification.
+---
+ plugins/hciops.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-> The initialization function used by hci_open_dev (hci_init_req) sends
-> many different HCI commands. The __hci_request function should only
-> return when all of these commands have completed (or a timeout occurs).
-> Several of these commands cause hci_req_complete to be called which
-> causes __hci_request to return prematurely.
-> 
-> This patch fixes the issue by adding a new hdev->req_last_cmd variable
-> which is set during the initialization procedure. The hci_req_complete
-> function will no longer mark the request as complete until the command
-> matching hdev->req_last_cmd completes.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
-> v5: comment added for req_last_cmd check as well as empty line added to
-> hci_init_req as requested
-
-looks all good to me.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org.
-
-Regards
-
-Marcel
-
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 43e3d93..be143e9 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -2583,8 +2583,10 @@ static int hciops_start_scanning(int index)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.type = 0x01;			/* Active scanning */
+-	cp.interval = htobs(0x0010);
+-	cp.window = htobs(0x0010);
++	/* The recommended value for scan interval and window is 11.25 msec.
++	 * It is calculated by: time = n * 0.625 msec */
++	cp.interval = htobs(0x0012);
++	cp.window = htobs(0x0012);
+ 	cp.own_bdaddr_type = 0;		/* Public address */
+ 	cp.filter = 0;			/* Accept all adv packets */
+ 
+-- 
+1.7.0.4
 
