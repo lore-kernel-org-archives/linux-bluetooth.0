@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Dec 2010 14:00:04 +0200
+Date: Wed, 22 Dec 2010 13:58:29 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 05/18] Add support for storing the device type
-Message-ID: <20101222120004.GE27483@jh-x301>
+Subject: Re: [PATCH 04/18] Add a way to store the remote device type
+Message-ID: <20101222115827.GD27483@jh-x301>
 References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
- <1292966800-6264-6-git-send-email-vinicius.gomes@openbossa.org>
+ <1292966800-6264-5-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292966800-6264-6-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1292966800-6264-5-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
 On Tue, Dec 21, 2010, Vinicius Costa Gomes wrote:
-> When the service discovery (SDP or GATT) is finished, write the device
-> type so it can be retrieved from storage when needed.
+> Because we need to know the device type (LE, Basic Rate or Dual Mode)
+> to be able to fully restore the device from storage, we have to store
+> and load this information to permanent storage.
+> 
+> Note: due to "device_type_t" usage in storage.h, some header includes
+> needed to be reordered in files which include storage.h.
 > ---
->  src/device.c |   11 ++++++++++-
->  1 files changed, 10 insertions(+), 1 deletions(-)
+>  input/device.c   |    4 ++--
+>  plugins/hciops.c |    2 +-
+>  serial/port.c    |    2 ++
+>  src/storage.c    |   40 ++++++++++++++++++++++++++++++++++++++++
+>  src/storage.h    |    3 +++
+>  5 files changed, 48 insertions(+), 3 deletions(-)
 
-This one doesn't apply, probably because I didn't apply 3/18. Please
-resend a fixed 3/18 and then I'll proceed with processing this patch
-set.
+Pushed upstream. Thanks.
 
 Johan
