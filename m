@@ -1,31 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Dec 2010 00:41:34 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/18] Move primary service storage to device.c
-Message-ID: <20101222224134.GA10702@jh-x301>
-References: <20101222115722.GC27483@jh-x301>
- <1293055273-21076-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293055273-21076-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1292626132-30029-2-git-send-email-bgix@codeaurora.org>
+References: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
+	<1292626132-30029-2-git-send-email-bgix@codeaurora.org>
+Date: Wed, 22 Dec 2010 19:29:05 -0300
+Message-ID: <AANLkTinnsNX_9ENWvBcnN7j8_kmBhbSoL6cCWJ8-Lzgh@mail.gmail.com>
+Subject: Re: [RFC 1/2] Add g_attrib_send_seq()
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: rshaffer@codeaurora.org, padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi Brian,
 
-On Wed, Dec 22, 2010, Sheldon Demario wrote:
-> Discover All Primary Services has beed moved to device.c in order
-> to follow a similar approach of BR/EDR service records.
+On Fri, Dec 17, 2010 at 7:48 PM, Brian Gix <bgix@codeaurora.org> wrote:
+> Add g_attrib_send_seq() as an extension to g_attrib_send().
+>        g_attrib_send_seq() functionally queues an entire
+>        "GATT Procedure" as defined in the BT Core v4.0.
+>        The intention is that the full procedure is run
+>        to completion before the next GATT Procedure is
+>        started. Subsequent ATT requests to a continuing
+>        procedure are added to the head of the Attrib queue.
+>
+> Fix g_attrib_send() to be the degenerative case of g_attrib_send_seq()
+>        This function now chains to g_attrib_send_seq() with arguments
+>        indicating that it is *not* a compound (multi-step) GATT
+>        procedure, but rather that the entire procedure is performed
+>        with a single ATT opcode request/response.
+>
+> Fix received_data() to recognize that incoming response is (or isn't)
+>        part of a compound Procedure, so that it waits for additional
+>        requests before servicing the Attrib queue.
 > ---
->  attrib/att.h      |    6 ++++++
->  attrib/client.c   |   41 -----------------------------------------
->  attrib/gattrib.c  |    1 +
->  src/device.c      |   44 +++++++++++++++++++++++++++++++++++++++++++-
->  src/glib-helper.c |   24 ++++++++++++++++--------
->  5 files changed, 66 insertions(+), 50 deletions(-)
+>  attrib/gattrib.c |   44 ++++++++++++++++++++++++++++++++++++--------
+>  attrib/gattrib.h |    4 ++++
+>  2 files changed, 40 insertions(+), 8 deletions(-)
+>
+> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+> index eace01b..8ef5d92 100644
+> --- a/attrib/gattrib.c
+> +++ b/attrib/gattrib.c
+> @@ -58,6 +58,7 @@ struct command {
+>        guint16 len;
+>        guint8 expected;
+>        gboolean sent;
+> +       gboolean compound;
+>        GAttribResultFunc func;
+>        gpointer user_data;
+>        GDestroyNotify notify;
+> @@ -285,6 +286,7 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+>        uint8_t buf[512], status;
+>        gsize len;
+>        GIOStatus iostat;
+> +       gboolean compound = FALSE;
+Intialization is not necessary.
 
-Pushed upstream. Thanks.
+>
+>        if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+>                attrib->read_watch = 0;
+> @@ -319,6 +321,8 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+>                return attrib->events != NULL;
+>        }
+>
+> +       compound = cmd->compound;
+> +
+>        if (buf[0] == ATT_OP_ERROR) {
+>                status = buf[4];
+>                goto done;
+> @@ -332,7 +336,8 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+>        status = 0;
+>
+>  done:
+> -       if (attrib->queue && g_queue_is_empty(attrib->queue) == FALSE)
+> +       if (!compound && attrib->queue &&
+> +                       g_queue_is_empty(attrib->queue) == FALSE)
+>                wake_up_sender(attrib);
+>
+>        if (cmd) {
+> @@ -340,6 +345,11 @@ done:
+>                        cmd->func(status, buf, len, cmd->user_data);
+>
+>                command_destroy(cmd);
+> +
+> +               if (compound && attrib->queue &&
+> +                       g_queue_is_empty(attrib->queue) == FALSE)
+> +                       wake_up_sender(attrib);
+> +
+Any chance to change the logic to avoid duplicated verification?
+No mater the value of "compound" wake_up_sender() is always called. Is
+the order important?
 
-Johan
+>        }
+>
+>        return TRUE;
+> @@ -367,12 +377,16 @@ GAttrib *g_attrib_new(GIOChannel *io)
+>        return g_attrib_ref(attrib);
+>  }
+>
+> -guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
+> -                               guint16 len, GAttribResultFunc func,
+> -                               gpointer user_data, GDestroyNotify notify)
+> +guint g_attrib_send_seq(GAttrib *attrib, gboolean compound, guint id,
+> +                               guint8 opcode, const guint8 *pdu, guint16 len,
+> +                               GAttribResultFunc func, gpointer user_data,
+> +                               GDestroyNotify notify)
+>  {
+>        struct command *c;
+>
+> +       if (attrib == NULL || attrib->queue == NULL)
+> +               return 0;
+> +
+Is it necessary to check if queue is NULL?
+
+>        c = g_try_new0(struct command, 1);
+>        if (c == NULL)
+>                return 0;
+> @@ -385,16 +399,30 @@ guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
+>        c->func = func;
+>        c->user_data = user_data;
+>        c->notify = notify;
+> -       c->id = ++attrib->next_cmd_id;
+> +       c->compound = compound;
+>
+> -       g_queue_push_tail(attrib->queue, c);
+> +       if (id) {
+> +               c->id = id;
+> +               g_queue_push_head(attrib->queue, c);
+> +       } else {
+> +               c->id = ++attrib->next_cmd_id;
+> +               g_queue_push_tail(attrib->queue, c);
+>
+> -       if (g_queue_get_length(attrib->queue) == 1)
+> -               wake_up_sender(attrib);
+> +               if (g_queue_get_length(attrib->queue) == 1)
+> +                       wake_up_sender(attrib);
+> +       }
+>
+>        return c->id;
+>  }
+>
+> +guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
+> +                               guint16 len, GAttribResultFunc func,
+> +                               gpointer user_data, GDestroyNotify notify)
+> +{
+> +       return g_attrib_send_seq(attrib, FALSE, 0, opcode,
+> +                               pdu, len, func, user_data, notify);
+Coding style issue here.
+
+Claudio
