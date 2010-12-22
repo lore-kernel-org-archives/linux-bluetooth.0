@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Dec 2010 00:50:54 +0200
+Date: Thu, 23 Dec 2010 00:44:24 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 07/18] Add support for creating devices from stored
- primary services
-Message-ID: <20101222225054.GD10702@jh-x301>
-References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
- <1292966800-6264-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH v3] sbc: detect when bitpool has changed
+Message-ID: <20101222224424.GC10702@jh-x301>
+References: <1293010548-25151-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292966800-6264-8-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1293010548-25151-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Luiz,
 
-On Tue, Dec 21, 2010, Vinicius Costa Gomes wrote:
-> From what we can retrieve from storage we are able to create the devices
-> and probe the device drivers.
+On Wed, Dec 22, 2010, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> A2DP spec allow bitpool changes midstream which is why sbc configuration
+> has a range of values for bitpool that the encoder can use and decoder
+> must support.
+> 
+> Bitpool changes do not affect the state of encoder/decoder so they don't
+> need to be reinitialize when this happens, so the impact is fairly small,
+> what it does change is the frame length so encoders may change the
+> bitpool to use the link more efficiently.
 > ---
->  src/adapter.c |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 77 insertions(+), 0 deletions(-)
+>  sbc/sbc.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
 
-Patches 5 and 6 have been pushed upstream, but this one doesn't compile:
-
-src/adapter.c: In function 'string_to_primary_list':
-src/adapter.c:1958: error: implicit declaration of function 'att_primary_free'
-src/adapter.c: In function 'create_stored_device_from_primary':
-src/adapter.c:2003: error: 'att_primary_free' undeclared (first use in this function)
-src/adapter.c:2003: error: (Each undeclared identifier is reported only once
-src/adapter.c:2003: error: for each function it appears in.)
-make[1]: *** [src/adapter.o] Error 1
-
-Please fix and resubmit.
+The patch has been pushed upstream. Thanks. Could you also make sure
+that it gets applied to PulseAudio's copy of libsbc?
 
 Johan
