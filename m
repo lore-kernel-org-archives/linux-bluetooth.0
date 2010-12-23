@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Dec 2010 00:40:10 +0200
+Date: Fri, 24 Dec 2010 00:37:17 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add Broadcaster property in DeviceFound signal
-Message-ID: <20101223224010.GB32310@jh-x301>
-References: <1293139987-17536-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: Re: [PATCH v5 2/5] Change CreatePairedDevice to support LE devices
+Message-ID: <20101223223717.GA32310@jh-x301>
+References: <20101221084243.GA14108@jh-x301>
+ <1293139790-9646-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293139987-17536-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1293139790-9646-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sheldon,
 
 On Thu, Dec 23, 2010, Sheldon Demario wrote:
-> Broadcaster property is required to distinguish the device role. If the remote
-> is sending an advertising event, two possible roles are possible: Peripheral or
-> Broadcaster.
+> CreatePairedDevice implements now the same behaviour of CreateDevice,
+> triggering Discover All Primary Services when needed. SMP negotiation
+> starts when the link is established. LE capable kernel is required to
+> test this method properly.
 > 
-> This change is required to pass on qualification tests which require filtering
-> Broadcasting devices during General Discovery Procedure.
+> Limitation: For dual mode devices, Discover All Primary Services is not
+> being executed after SDP search if GATT record is found.
 > ---
->  doc/adapter-api.txt |    3 ++-
->  src/adapter.c       |    8 ++++++++
->  2 files changed, 10 insertions(+), 1 deletions(-)
+>  src/adapter.c     |  102 +++++++++++++++++++++++++++++++++++++----------------
+>  src/device.c      |   89 ++++++++++++++++++++++++----------------------
+>  src/device.h      |    5 ++-
+>  src/glib-helper.c |   12 +++++-
+>  src/glib-helper.h |    1 +
+>  5 files changed, 132 insertions(+), 77 deletions(-)
 
-Pushed upstream after I reformated your commit message to properly fit a
-80 column wide terminal. Please pay attention to that in the future.
+Pushed upstream. Thanks.
 
 Johan
