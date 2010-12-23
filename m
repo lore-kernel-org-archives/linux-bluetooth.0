@@ -1,68 +1,275 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Dec 2010 01:05:13 -0200
+Date: Thu, 23 Dec 2010 00:06:15 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next-2.6 2010-12-23
-Message-ID: <20101223030513.GB26284@vigoh>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2] Bluetooth: Use non-flushable by default L2CAP data
+ packets
+Message-ID: <20101223020615.GA26284@vigoh>
+References: <1292511266-826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1292511266-826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Andrei,
 
-Here are my last set of patches to 2.6.38. Biggest feature is the new
-Bluetooth Management Interface, which intends to replace all HCI raw access
-from bluetoothd. That interface is still disabled by default. However you can
-enable it via a module parameter.
-The other two patches from me is simple fixes in the stack. Tracey's patch is
-already in net-next and I only pushed it to solve a merge conflict.
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2010-12-16 16:54:26 +0200]:
 
-This time I'm using a link to my git tree inside master.kernel.org,
-git.kernel.org is really slow today.
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> 
+> Modification of Nick Pelly <npelly@google.com> patch.
+> 
+> With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
+> makes ACL data packets non-flushable by default on compatible chipsets, and
+> adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
+> data packets for a given L2CAP socket. This is useful for A2DP data which can
+> be safely discarded if it can not be delivered within a short time (while
+> other ACL data should not be discarded).
+> 
+> Note that making ACL data flushable has no effect unless the automatic flush
+> timeout for that ACL link is changed from its default of 0 (infinite).
+> 
+> Default packet types (for compatible chipsets):
+> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+> Bluetooth HCI H4
+> Bluetooth HCI ACL Packet
+>     .... 0000 0000 0010 = Connection Handle: 0x0002
+>     ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
+>     00.. .... .... .... = BC Flag: Point-To-Point (0)
+>     Data Total Length: 8
+> Bluetooth L2CAP Packet
+> 
+> After setting BT_FLUSHABLE
+> (sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
+> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+> Bluetooth HCI H4
+> Bluetooth HCI ACL Packet
+>     .... 0000 0000 0010 = Connection Handle: 0x0002
+>     ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
+>     00.. .... .... .... = BC Flag: Point-To-Point (0)
+>     Data Total Length: 8
+> Bluetooth L2CAP Packet
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |    5 ++++
+>  include/net/bluetooth/hci.h       |    2 +
+>  include/net/bluetooth/hci_core.h  |    1 +
+>  include/net/bluetooth/l2cap.h     |    2 +
+>  net/bluetooth/hci_core.c          |    6 +++-
+>  net/bluetooth/l2cap.c             |   48 ++++++++++++++++++++++++++++++++++--
+>  6 files changed, 59 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 0c5e725..ed7d775 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -64,6 +64,11 @@ struct bt_security {
+>  
+>  #define BT_DEFER_SETUP	7
+>  
+> +#define BT_FLUSHABLE	8
+> +
+> +#define BT_FLUSHABLE_OFF	0
+> +#define BT_FLUSHABLE_ON		1
+> +
+>  #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+>  #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+>  #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 29a7a8c..333d5cb 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -150,6 +150,7 @@ enum {
+>  #define EDR_ESCO_MASK  (ESCO_2EV3 | ESCO_3EV3 | ESCO_2EV5 | ESCO_3EV5)
+>  
+>  /* ACL flags */
+> +#define ACL_START_NO_FLUSH	0x00
+>  #define ACL_CONT		0x01
+>  #define ACL_START		0x02
+>  #define ACL_ACTIVE_BCAST	0x04
+> @@ -193,6 +194,7 @@ enum {
+>  #define LMP_EDR_ESCO_3M	0x40
+>  #define LMP_EDR_3S_ESCO	0x80
+>  
+> +#define LMP_NO_FLUSH	0x01
 
-Please pull or let me know any problems. Thanks.
+Isn't this 0x40? As stated on Core v4.0 (Volume 2, part C, 3.3 Feature Mask
+Definition)
 
+>  #define LMP_SIMPLE_PAIR	0x08
+>  
+>  /* Connection modes */
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 1992fac..9778bc8 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -456,6 +456,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>  #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+>  #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+>  #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
+> +#define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+>  
+>  /* ----- HCI protocols ----- */
+>  struct hci_proto {
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 7ad25ca..af35711 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -75,6 +75,7 @@ struct l2cap_conninfo {
+>  #define L2CAP_LM_TRUSTED	0x0008
+>  #define L2CAP_LM_RELIABLE	0x0010
+>  #define L2CAP_LM_SECURE		0x0020
+> +#define L2CAP_LM_FLUSHABLE	0x0040
 
-The following changes since commit 5c4bc1ce917d93ce8f7dd498fbec6881b3d7743a:
+Not using this flag in the code.
 
-  rtlwifi: Fix large packet issue (2010-12-22 15:45:52 -0500)
+>  
+>  /* L2CAP command codes */
+>  #define L2CAP_COMMAND_REJ	0x01
+> @@ -327,6 +328,7 @@ struct l2cap_pinfo {
+>  	__u8		sec_level;
+>  	__u8		role_switch;
+>  	__u8		force_reliable;
+> +	__u8		flushable;
+>  
+>  	__u8		conf_req[64];
+>  	__u8		conf_len;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 51c61f7..c0d776b 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1380,7 +1380,7 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+>  
+>  	skb->dev = (void *) hdev;
+>  	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+> -	hci_add_acl_hdr(skb, conn->handle, flags | ACL_START);
+> +	hci_add_acl_hdr(skb, conn->handle, flags);
+>  
+>  	list = skb_shinfo(skb)->frag_list;
+>  	if (!list) {
+> @@ -1398,12 +1398,14 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
+>  		spin_lock_bh(&conn->data_q.lock);
+>  
+>  		__skb_queue_tail(&conn->data_q, skb);
 
-are available in the git repository at:
-  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+add an empty line here.
 
-Gustavo F. Padovan (2):
-      Bluetooth: Don't accept ConfigReq if we aren't in the BT_CONFIG state
-      Bluetooth: Improve handling of HCI control channel in bind
+> +		flags &= ~ACL_START;
+> +		flags |= ACL_CONT;
+>  		do {
+>  			skb = list; list = list->next;
+>  
+>  			skb->dev = (void *) hdev;
+>  			bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
+> -			hci_add_acl_hdr(skb, conn->handle, flags | ACL_CONT);
+> +			hci_add_acl_hdr(skb, conn->handle, flags);
+>  
+>  			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
+>  
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index c791fcd..efa60eb 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
+>  static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+>  {
+>  	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
+> +	u8 flags;
+>  
+>  	BT_DBG("code 0x%2.2x", code);
+>  
+>  	if (!skb)
+>  		return;
+>  
+> -	hci_send_acl(conn->hcon, skb, 0);
+> +	if (lmp_no_flush_capable(conn->hcon->hdev))
+> +		flags = ACL_START_NO_FLUSH;
+> +	else
+> +		flags = ACL_START;
+> +
+> +	hci_send_acl(conn->hcon, skb, flags);
+>  }
+>  
+>  static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+> @@ -900,6 +906,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+>  		pi->sec_level = l2cap_pi(parent)->sec_level;
+>  		pi->role_switch = l2cap_pi(parent)->role_switch;
+>  		pi->force_reliable = l2cap_pi(parent)->force_reliable;
+> +		pi->flushable = l2cap_pi(parent)->flushable;
+>  	} else {
+>  		pi->imtu = L2CAP_DEFAULT_MTU;
+>  		pi->omtu = 0;
+> @@ -915,6 +922,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+>  		pi->sec_level = BT_SECURITY_LOW;
+>  		pi->role_switch = 0;
+>  		pi->force_reliable = 0;
+> +		pi->flushable = BT_FLUSHABLE_OFF;
 
-Johan Hedberg (9):
-      Bluetooth: Add Bluetooth Management interface definitions
-      Bluetooth: Add initial Bluetooth Management interface callbacks
-      Bluetooth: Make hci_send_to_sock usable for management control sockets
-      Bluetooth: Add error handling for managment command handlers
-      Bluetooth: Add read_version management command
-      Bluetooth: Add read_index_list management command
-      Bluetooth: Add read_info management command
-      Bluetooth: Add management events for controller addition & removal
-      Bluetooth: Fix __hci_request synchronization for hci_open_dev
+You need to check for the no_flush feature here, right?
 
-Tracey Dent (1):
-      Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
+>  	}
+>  
+>  	/* Default config options */
+> @@ -1450,10 +1458,17 @@ static void l2cap_drop_acked_frames(struct sock *sk)
+>  static inline void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
+>  {
+>  	struct l2cap_pinfo *pi = l2cap_pi(sk);
+> +	struct hci_conn *hcon = pi->conn->hcon;
+> +	u16 flags;
+>  
+>  	BT_DBG("sk %p, skb %p len %d", sk, skb, skb->len);
+>  
+> -	hci_send_acl(pi->conn->hcon, skb, 0);
+> +	if (lmp_no_flush_capable(hcon->hdev) && !l2cap_pi(sk)->flushable)
+> +		flags = ACL_START_NO_FLUSH;
+> +	else
+> +		flags = ACL_START;
+> +
+> +	hci_send_acl(hcon, skb, flags);
 
- include/net/bluetooth/bluetooth.h |    1 +
- include/net/bluetooth/hci.h       |    4 +
- include/net/bluetooth/hci_core.h  |    9 +-
- include/net/bluetooth/mgmt.h      |   87 +++++++++++
- net/bluetooth/Makefile            |    2 +-
- net/bluetooth/hci_core.c          |   17 ++-
- net/bluetooth/hci_event.c         |   33 +++--
- net/bluetooth/hci_sock.c          |   52 ++++++-
- net/bluetooth/l2cap.c             |    8 +-
- net/bluetooth/mgmt.c              |  308 +++++++++++++++++++++++++++++++++++++
- 10 files changed, 498 insertions(+), 23 deletions(-)
- create mode 100644 include/net/bluetooth/mgmt.h
- create mode 100644 net/bluetooth/mgmt.c
+There is another call to hci_send_acl() in l2cap. It is in
+l2cap_send_sframe(), but I'm still wondering if we shall flush those packets
+or not in the  case flushable was set. Now I'm thinking that don't.
+
+Then you need to add the same check in l2cap_send_cmd to l2cap_send_sframe().
+
+>  }
+>  
+>  static void l2cap_streaming_send(struct sock *sk)
+> @@ -2045,6 +2060,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+>  static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+>  {
+>  	struct sock *sk = sock->sk;
+> +	struct hci_conn *hcon = l2cap_pi(sk)->conn->hcon;
+>  	struct bt_security sec;
+>  	int len, err = 0;
+>  	u32 opt;
+> @@ -2098,6 +2114,26 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+>  		bt_sk(sk)->defer_setup = opt;
+>  		break;
+>  
+> +	case BT_FLUSHABLE:
+> +		if (get_user(opt, (u32 __user *) optval)) {
+> +			err = -EFAULT;
+> +			break;
+> +		}
+> +
+> +		if (opt > BT_FLUSHABLE_ON) {
+> +			err = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		if (opt == BT_FLUSHABLE_OFF &&
+> +				!lmp_no_flush_capable(hcon->hdev)) {
+
+I'm not really happy with !lmp_no_flush... 2 negatives in the same place, but
+that is the feature name. So we can't do too much here. Btw, the "No" in the
+feature name is making my brain hurt. ;)
+
+regards,
 
 -- 
 Gustavo F. Padovan
