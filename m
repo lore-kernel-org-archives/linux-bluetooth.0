@@ -1,28 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Dec 2010 10:33:52 +0200
+Date: Thu, 23 Dec 2010 10:27:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 18/18] Add a "services" command to test-device
-Message-ID: <20101223083352.GC15764@jh-x301>
-References: <1292966800-6264-1-git-send-email-vinicius.gomes@openbossa.org>
- <1292966800-6264-19-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH] Add a way to retrieve ATT primary services
+Message-ID: <20101223082710.GB15764@jh-x301>
+References: <20101222225258.GE10702@jh-x301>
+ <1293063673-25058-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1292966800-6264-19-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1293063673-25058-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
-On Tue, Dec 21, 2010, Vinicius Costa Gomes wrote:
-> This command adds a way to retrieve the Services property that each
-> device has.
+On Wed, Dec 22, 2010, Vinicius Costa Gomes wrote:
+> As the primary services were discovered by the core bluetoothd, we need
+> a way to export that information.
+> 
+> The service discovery uses the same primary list as the device, there's no
+> need to free that list when the discovery finishes. That list will be removed
+> when the device is free'd.
 > ---
->  test/test-device |   13 +++++++++++++
->  1 files changed, 13 insertions(+), 0 deletions(-)
+>  src/adapter.c     |    6 +++---
+>  src/device.c      |   15 +++++++++++++++
+>  src/device.h      |    3 +++
+>  src/glib-helper.c |    1 -
+>  4 files changed, 21 insertions(+), 4 deletions(-)
 
-I've finished pushing all the patches in this set to the upstream tree.
-Please double check that I didn't miss anything.
+This one has also been pushed upstream. Thanks.
 
 Johan
