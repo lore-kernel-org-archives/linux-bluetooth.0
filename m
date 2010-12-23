@@ -2,130 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Add a way to retrieve ATT primary services
-Date: Wed, 22 Dec 2010 22:21:13 -0200
-Message-Id: <1293063673-25058-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <20101222225258.GE10702@jh-x301>
-References: <20101222225258.GE10702@jh-x301>
+Subject: [PATCH] Add support for creating devices from stored primary services
+Date: Wed, 22 Dec 2010 22:16:37 -0200
+Message-Id: <1293063397-24958-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <20101222225054.GD10702@jh-x301>
+References: <20101222225054.GD10702@jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the primary services were discovered by the core bluetoothd, we need
-a way to export that information.
-
-The service discovery uses the same primary list as the device, there's no
-need to free that list when the discovery finishes. That list will be removed
-when the device is free'd.
+>From what we can retrieve from storage we are able to create the devices
+and probe the device drivers.
 ---
- src/adapter.c     |    6 +++---
- src/device.c      |   15 +++++++++++++++
- src/device.h      |    3 +++
- src/glib-helper.c |    1 -
- 4 files changed, 21 insertions(+), 4 deletions(-)
+ src/adapter.c |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 77 insertions(+), 0 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 77a04f0..ff1f0a4 100644
+index 9c57bea..77a04f0 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -1994,14 +1994,14 @@ static void create_stored_device_from_primary(char *key, char *value,
- 	for (l = services, uuids = NULL; l; l = l->next) {
- 		struct att_primary *prim = l->data;
- 		uuids = g_slist_append(uuids, prim->uuid);
-+
-+		device_add_primary(device, prim);
+@@ -55,6 +55,7 @@
+ #include "glib-helper.h"
+ #include "agent.h"
+ #include "storage.h"
++#include "att.h"
+ 
+ /* Flags Descriptions */
+ #define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
+@@ -1931,6 +1932,78 @@ static void create_stored_device_from_types(char *key, char *value,
  	}
+ }
  
- 	device_probe_drivers(device, uuids);
- 
--	g_slist_free(uuids);
--
--	g_slist_foreach(services, (GFunc) g_free, NULL);
- 	g_slist_free(services);
++static GSList *string_to_primary_list(char *str)
++{
++	GSList *l = NULL;
++	char **services;
++	int i;
++
++	if (str == NULL)
++		return NULL;
++
++	services = g_strsplit(str, " ", 0);
++	if (services == NULL)
++		return NULL;
++
++	for (i = 0; services[i]; i++) {
++		struct att_primary *prim;
++		int ret;
++
++		prim = g_new0(struct att_primary, 1);
++
++		ret = sscanf(services[i], "%04hX#%04hX#%s", &prim->start,
++							&prim->end, prim->uuid);
++
++		if (ret < 3) {
++			g_free(prim);
++			continue;
++		}
++
++		l = g_slist_append(l, prim);
++	}
++
++	g_strfreev(services);
++
++	return l;
++}
++
++static void create_stored_device_from_primary(char *key, char *value,
++							void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	struct btd_device *device;
++	GSList *services, *uuids, *l;
++
++	l = g_slist_find_custom(adapter->devices,
++				key, (GCompareFunc) device_address_cmp);
++	if (l)
++		device = l->data;
++	else {
++		device = device_create(connection, adapter, key, DEVICE_TYPE_BREDR);
++		if (!device)
++			return;
++
++		device_set_temporary(device, FALSE);
++		adapter->devices = g_slist_append(adapter->devices, device);
++	}
++
++	services = string_to_primary_list(value);
++	if (services == NULL)
++		return;
++
++	for (l = services, uuids = NULL; l; l = l->next) {
++		struct att_primary *prim = l->data;
++		uuids = g_slist_append(uuids, prim->uuid);
++	}
++
++	device_probe_drivers(device, uuids);
++
 +	g_slist_free(uuids);
- }
- 
++
++	g_slist_foreach(services, (GFunc) g_free, NULL);
++	g_slist_free(services);
++}
++
  static void load_devices(struct btd_adapter *adapter)
-diff --git a/src/device.c b/src/device.c
-index d67f804..ae399f3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -115,6 +115,7 @@ struct btd_device {
- 	struct btd_adapter	*adapter;
- 	GSList		*uuids;
- 	GSList		*services;		/* Primary services path */
-+	GSList		*primaries;		/* List of primary services */
- 	GSList		*drivers;		/* List of driver_data */
- 	GSList		*watches;		/* List of disconnect_data */
- 	gboolean	temporary;
-@@ -209,6 +210,9 @@ static void device_free(gpointer user_data)
- 	g_slist_foreach(device->uuids, (GFunc) g_free, NULL);
- 	g_slist_free(device->uuids);
- 
-+	g_slist_foreach(device->primaries, (GFunc) g_free, NULL);
-+	g_slist_free(device->primaries);
-+
- 	if (device->tmp_records)
- 		sdp_list_free(device->tmp_records,
- 					(sdp_free_func_t) sdp_record_free);
-@@ -1571,6 +1575,7 @@ static void primary_cb(GSList *services, int err, gpointer user_data)
- 	for (l = services; l; l = l->next) {
- 		struct att_primary *prim = l->data;
- 		uuids = g_slist_append(uuids, prim->uuid);
-+		device_add_primary(device, prim);
- 	}
- 
- 	device_probe_drivers(device, uuids);
-@@ -2383,6 +2388,16 @@ void device_add_service(struct btd_device *device, const char *path)
- 	device->services = g_slist_append(device->services, g_strdup(path));
- }
- 
-+void device_add_primary(struct btd_device *device, struct att_primary *prim)
-+{
-+	device->primaries = g_slist_append(device->primaries, prim);
-+}
-+
-+GSList *btd_device_get_primaries(struct btd_device *device)
-+{
-+	return device->primaries;
-+}
-+
- void btd_device_add_uuid(struct btd_device *device, const char *uuid)
  {
- 	GSList *uuid_list;
-diff --git a/src/device.h b/src/device.h
-index 7820636..0bd6fff 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -25,6 +25,7 @@
- #define DEVICE_INTERFACE	"org.bluez.Device"
+ 	char filename[PATH_MAX + 1];
+@@ -1944,6 +2017,10 @@ static void load_devices(struct btd_adapter *adapter)
+ 	textfile_foreach(filename, create_stored_device_from_profiles,
+ 								adapter);
  
- struct btd_device;
-+struct att_primary;
++	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "primary");
++	textfile_foreach(filename, create_stored_device_from_primary,
++								adapter);
++
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "linkkeys");
+ 	textfile_foreach(filename, create_stored_device_from_linkkeys, &keys);
  
- typedef enum {
- 	AUTH_TYPE_PINCODE,
-@@ -53,7 +54,9 @@ int device_browse(struct btd_device *device, DBusConnection *conn,
- void device_probe_drivers(struct btd_device *device, GSList *profiles);
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 						const char *uuid);
-+GSList *btd_device_get_primaries(struct btd_device *device);
- void device_add_service(struct btd_device *device, const char *path);
-+void device_add_primary(struct btd_device *device, struct att_primary *prim);
- void btd_device_add_uuid(struct btd_device *device, const char *uuid);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
- void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
-diff --git a/src/glib-helper.c b/src/glib-helper.c
-index 60248cf..648dd62 100644
---- a/src/glib-helper.c
-+++ b/src/glib-helper.c
-@@ -75,7 +75,6 @@ static void gattrib_context_free(struct gattrib_context *ctxt)
- 	if (ctxt->destroy)
- 		ctxt->destroy(ctxt->user_data);
- 
--	g_slist_foreach(ctxt->primaries, (GFunc) g_free, NULL);
- 	g_slist_free(ctxt->primaries);
- 	g_attrib_unref(ctxt->attrib);
- 	if (ctxt->io) {
 -- 
 1.7.3.4
 
