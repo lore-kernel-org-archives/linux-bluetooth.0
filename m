@@ -1,39 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: pavan_savoy@ti.com
-To: gregkh@suse.de, linux-kernel@vger.kernel.org
-Cc: padovan@profusion.mobi, marcel@holtmann.org,
-        linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@ti.com>
-Subject: [PATCH 0/2] drivers:staging:ti-st: keep updated
-Date: Thu, 23 Dec 2010 01:23:55 -0600
-Message-Id: <1293089037-23130-1-git-send-email-pavan_savoy@ti.com>
+Date: Thu, 23 Dec 2010 01:05:13 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next-2.6 2010-12-23
+Message-ID: <20101223030513.GB26284@vigoh>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Pavan Savoy <pavan_savoy@ti.com>
+Hi John,
 
-Greg,
+Here are my last set of patches to 2.6.38. Biggest feature is the new
+Bluetooth Management Interface, which intends to replace all HCI raw access
+from bluetoothd. That interface is still disabled by default. However you can
+enable it via a module parameter.
+The other two patches from me is simple fixes in the stack. Tracey's patch is
+already in net-next and I only pushed it to solve a merge conflict.
 
-Happy Holidays.
-Re-ordering the patches as you suggested.
+This time I'm using a link to my git tree inside master.kernel.org,
+git.kernel.org is really slow today.
 
-1. Adds the new btwilink driver
-2. deletes the old driver and points it to new one.
+Please pull or let me know any problems. Thanks.
 
-This is all to keep the drivers/staging/ti-st/ directory updated,
-and since the btwilink driver has undergone huge modifications,
-there was an update required.
 
-So parking the most recent version of driver here, while
-underlying TI-ST driver modifications are carried out.
+The following changes since commit 5c4bc1ce917d93ce8f7dd498fbec6881b3d7743a:
 
-Pavan Savoy (2):
-  drivers:staging: ti-st: add the v7 btwilink driver
-  drivers:staging: ti-st: delete old bt_drv driver
+  rtlwifi: Fix large packet issue (2010-12-22 15:45:52 -0500)
 
- drivers/staging/ti-st/Makefile   |    2 +-
- drivers/staging/ti-st/bt_drv.c   |  509 --------------------------------------
- drivers/staging/ti-st/bt_drv.h   |   61 -----
- drivers/staging/ti-st/btwilink.c |  363 +++++++++++++++++++++++++++
- 4 files changed, 364 insertions(+), 571 deletions(-)
- delete mode 100644 drivers/staging/ti-st/bt_drv.c
- delete mode 100644 drivers/staging/ti-st/bt_drv.h
- create mode 100644 drivers/staging/ti-st/btwilink.c
+are available in the git repository at:
+  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+
+Gustavo F. Padovan (2):
+      Bluetooth: Don't accept ConfigReq if we aren't in the BT_CONFIG state
+      Bluetooth: Improve handling of HCI control channel in bind
+
+Johan Hedberg (9):
+      Bluetooth: Add Bluetooth Management interface definitions
+      Bluetooth: Add initial Bluetooth Management interface callbacks
+      Bluetooth: Make hci_send_to_sock usable for management control sockets
+      Bluetooth: Add error handling for managment command handlers
+      Bluetooth: Add read_version management command
+      Bluetooth: Add read_index_list management command
+      Bluetooth: Add read_info management command
+      Bluetooth: Add management events for controller addition & removal
+      Bluetooth: Fix __hci_request synchronization for hci_open_dev
+
+Tracey Dent (1):
+      Net: bluetooth: Makefile: Remove deprecated kbuild goal definitions
+
+ include/net/bluetooth/bluetooth.h |    1 +
+ include/net/bluetooth/hci.h       |    4 +
+ include/net/bluetooth/hci_core.h  |    9 +-
+ include/net/bluetooth/mgmt.h      |   87 +++++++++++
+ net/bluetooth/Makefile            |    2 +-
+ net/bluetooth/hci_core.c          |   17 ++-
+ net/bluetooth/hci_event.c         |   33 +++--
+ net/bluetooth/hci_sock.c          |   52 ++++++-
+ net/bluetooth/l2cap.c             |    8 +-
+ net/bluetooth/mgmt.c              |  308 +++++++++++++++++++++++++++++++++++++
+ 10 files changed, 498 insertions(+), 23 deletions(-)
+ create mode 100644 include/net/bluetooth/mgmt.h
+ create mode 100644 net/bluetooth/mgmt.c
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
