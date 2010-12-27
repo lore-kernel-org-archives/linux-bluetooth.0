@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Dec 2010 17:08:22 +0200
+Date: Mon, 27 Dec 2010 17:07:54 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] Remove ancient NAME_SENT name resolution status
-Message-ID: <20101227150822.GB17203@jh-x301>
-References: <1293456068-11615-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH] Fix printing D-Bus errors when headset record could
+ not be found
+Message-ID: <20101227150754.GA17203@jh-x301>
+References: <1293452841-7141-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293456068-11615-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1293452841-7141-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Luiz,
 
-On Mon, Dec 27, 2010, Anderson Lizardo wrote:
-> The NAME_SENT status was introduced on commit
-> d6a16516a9f6deae8342f00e8186b02d0019a1e1, when there was a
-> "RemoteNameUpdate" D-Bus signal. Nowadays, there is no such signal, and
-> the device name (if any) is always sent on "DeviceFound" signal.
+On Mon, Dec 27, 2010, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> When connection is started via headset_config_stream there is no D-Bus
+> message to reply to.
 > ---
->  src/adapter.h |    1 -
->  src/event.c   |   19 -------------------
->  2 files changed, 0 insertions(+), 20 deletions(-)
+>  audio/headset.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
-Thanks. The patch has been pushed upstream.
+Pushed upstream. Thanks.
 
 Johan
