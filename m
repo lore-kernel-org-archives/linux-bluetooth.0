@@ -1,28 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3] Bluetooth: Use non-flushable by default L2CAP data packets
-Date: Tue, 28 Dec 2010 17:16:06 +0200
-Message-Id: <1293549367-2516-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <4D19CCC2.3070903@atheros.com>
+Date: Tue, 28 Dec 2010 17:10:50 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
+MIME-Version: 1.0
+To: "dwmw2@infradead.org" <dwmw2@infradead.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Luis Rodriguez" <Luis.Rodriguez@Atheros.com>
+Subject: Re: [PATCH] ath3k-2.fw is obsolete and is not used by Atheros chipsets.
+References: <1292922606-32255-1-git-send-email-sbalashanmugam@atheros.com>
+In-Reply-To: <1292922606-32255-1-git-send-email-sbalashanmugam@atheros.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+Hi David,
 
-Modification of Nick Pelly <npelly@google.com> patch.
+Can you please upstream this patch.
 
-Changes to previous releases:
-- rebasing, simplifying logic, using SOL_BLUETOOTH instead of SOL_L2CAP.
-- LMP_NO_FLUSH feature mask corrected, added check to l2cap_send_sframe
-
-Andrei Emeltchenko (1):
-  Bluetooth: Use non-flushable by default L2CAP data packets
-
- include/net/bluetooth/bluetooth.h |    5 +++
- include/net/bluetooth/hci.h       |    2 +
- include/net/bluetooth/hci_core.h  |    1 +
- include/net/bluetooth/l2cap.h     |    1 +
- net/bluetooth/hci_core.c          |    7 +++-
- net/bluetooth/l2cap.c             |   57 ++++++++++++++++++++++++++++++++++--
- 6 files changed, 67 insertions(+), 6 deletions(-)
-
+Regards,
+Bala.
