@@ -1,21 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D19CCC2.3070903@atheros.com>
-Date: Tue, 28 Dec 2010 17:10:50 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
+From: <Michal.Labedzki@tieto.com>
+To: <anderson.lizardo@openbossa.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Tue, 28 Dec 2010 11:34:27 +0200
+Subject: Re: [PATCH 3/4] Fix memory leaks after using strtoba, batostr
+Message-ID: <E50901D4F2CF69428D43141B7C8586790B4B2D0570@EXMB03.eu.tieto.com>
+References: <1293447745-8697-1-git-send-email-michal.labedzki@tieto.com>
+	<1293447745-8697-3-git-send-email-michal.labedzki@tieto.com>,<AANLkTikD4S-rD+NCXs7URSYv3Ah=-uToEw4YyCP4cA5x@mail.gmail.com>
+In-Reply-To: <AANLkTikD4S-rD+NCXs7URSYv3Ah=-uToEw4YyCP4cA5x@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: "dwmw2@infradead.org" <dwmw2@infradead.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Luis Rodriguez" <Luis.Rodriguez@Atheros.com>
-Subject: Re: [PATCH] ath3k-2.fw is obsolete and is not used by Atheros chipsets.
-References: <1292922606-32255-1-git-send-email-sbalashanmugam@atheros.com>
-In-Reply-To: <1292922606-32255-1-git-send-email-sbalashanmugam@atheros.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
 
-Can you please upstream this patch.
+>Hi,
+>
+>This patch would not be necessary if you keep only str2ba() and
+>ba2str() (like I commented on patch 2/4).
+>
+>Regards,
 
-Regards,
-Bala.
+Cannot keep only *2*() functions, because for two reason. Firstly, these functions are different (see discussion at patch 2/4). 
+Secondly, for example, "ba2str" use external buffer, while "batostr" create it internal. So simpler is using "batostr", 
+because there is no need to create temporary buffer.
+
+So I think patch is (quite) useful.
+
+Regards
