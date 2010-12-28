@@ -1,30 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Dec 2010 20:42:12 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix crash due to misplaced parameter in
- emit_device_found() call
-Message-ID: <20101228184212.GA18053@jh-x301>
-References: <1293555150-9979-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293555150-9979-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <AANLkTi=dsEwvjAOGM7eFdDDZSXUrPuA5wjQw8VcWH8N5@mail.gmail.com>
+References: <1293456068-11615-4-git-send-email-anderson.lizardo@openbossa.org>
+	<1293473827-26418-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20101227214841.GA22777@jh-x301>
+	<AANLkTi=dsEwvjAOGM7eFdDDZSXUrPuA5wjQw8VcWH8N5@mail.gmail.com>
+Date: Tue, 28 Dec 2010 14:16:47 -0400
+Message-ID: <AANLkTikPRjKGc3qX-t7kwJgXPdMjCmTqBSi0Tjfc8bW-@mail.gmail.com>
+Subject: Re: [PATCH v2] Fix leak of EIR data if RSSI does not change
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-On Tue, Dec 28, 2010, Anderson Lizardo wrote:
-> To avoid related mistakes, dev->uuid_count was shortened to uuid_count
-> and kept on the same line.
-> ---
-> Note that there is a 82-column line on this patch. I chose to put it
-> on the same line to avoid a similar mistake in future.
-> ---
->  src/adapter.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+On Mon, Dec 27, 2010 at 6:24 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> On Mon, Dec 27, 2010 at 5:48 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Beware of words like "also" and "and" in commit messages. Often they are
+>> a good indication that the patch shold be split into multiple ones.
+>> Though in this case I can't really make up my mind if it's fine since
+>> the changes are so strongly related. I'll leave it up to you to think
+>> about it and decide if you can cleanly split this into two patches or
+>> not.
+>
+> I can split into two patches without problem.
 
-The patch has been pushed upstream. Thanks.
+I just sent a v3 of this patch, which I hope fix all issues. It is
+bigger than previous versions, but I assure it is solely to fix the
+leak of EIR data. The other benefits are just "side effects":
 
-Johan
+* That if() clause which handles EIR name has been simplified, by
+removing free()/g_free()
+* I avoid passing ownership of memory allocated in src/event.c to
+src/adapter.c, which would potentially become memory leaks if not
+managed carefully.
+
+I hope these side effects are not of a big issue to be kept in a single patch.
+
+Regards,
+-- 
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
