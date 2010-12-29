@@ -1,133 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: gene heskett <gheskett@wdtv.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Add LE read supported states for hciconfig
-Date: Wed, 29 Dec 2010 18:17:24 -0300
-Message-Id: <1293657444-9911-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Bluez DOA after reboot(s)
+Date: Wed, 29 Dec 2010 10:23:50 -0500
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <201012291023.50971.gheskett@wdtv.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Displays the states and state combinations that the link layer
-supports. Usage: hciconfig hcix lestates
----
- tools/hciconfig.c |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 89 insertions(+), 0 deletions(-)
+Greetings;
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index f0ae11c..6e5117f 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -120,6 +120,51 @@ static void print_dev_features(struct hci_dev_info *di, int format)
- 	}
- }
- 
-+static void print_le_states(uint64_t states)
-+{
-+	int i;
-+	const char *le_states[] = {
-+		"Non-connectable Advertising State" ,
-+		"Scannable Advertising State",
-+		"Connectable Advertising State",
-+		"Directed Advertising State",
-+		"Passive Scanning State",
-+		"Active Scanning State",
-+		"Initiating State/Connection State in Master Role",
-+		"Connection State in the Slave Role",
-+		"Non-connectable Advertising State and Passive Scanning State combination",
-+		"Scannable Advertising State and Passive Scanning State combination",
-+		"Connectable Advertising State and Passive Scanning State combination",
-+		"Directed Advertising State and Passive Scanning State combination",
-+		"Non-connectable Advertising State and Active Scanning State combination",
-+		"Scannable Advertising State and Active Scanning State combination",
-+		"Connectable Advertising State and Active Scanning State combination",
-+		"Directed Advertising State and Active Scanning State combination",
-+		"Non-connectable Advertising State and Initiating State combination",
-+		"Scannable Advertising State and Initiating State combination",
-+		"Non-connectable Advertising State and Master Role combination",
-+		"Scannable Advertising State and Master Role combination",
-+		"Non-connectable Advertising State and Slave Role combination",
-+		"Scannable Advertising State and Slave Role combination",
-+		"Passive Scanning State and Initiating State combination",
-+		"Active Scanning State and Initiating State combination",
-+		"Passive Scanning State and Master Role combination",
-+		"Active Scanning State and Master Role combination",
-+		"Passive Scanning State and Slave Role combination",
-+		"Active Scanning State and Slave Role combination",
-+		"Initiating State and Master Role combination/Master Role and Master Role combination",
-+		NULL
-+	};
-+
-+	printf("Supported link layer states:\n");
-+	for (i = 0; le_states[i]; i++) {
-+		const char *status;
-+
-+		status = states & (1 << i) ? "YES" : "NO ";
-+		printf("\t%s %s\n", status, le_states[i]);
-+	}
-+}
-+
- static void cmd_rstat(int ctl, int hdev, char *opt)
- {
- 	/* Reset HCI device stat counters */
-@@ -188,6 +233,49 @@ static void cmd_le_adv(int ctl, int hdev, char *opt)
- 	hci_close_dev(dd);
- }
- 
-+static void cmd_le_states(int ctl, int hdev, char *opt)
-+{
-+	le_read_supported_states_rp rp;
-+	struct hci_request rq;
-+	int err, dd;
-+
-+	if (hdev < 0)
-+		hdev = hci_get_route(NULL);
-+
-+	dd = hci_open_dev(hdev);
-+	if (dd < 0) {
-+		fprintf(stderr, "Can't open device hci%d: %s (%d)\n",
-+						hdev, strerror(errno), errno);
-+		exit(1);
-+	}
-+
-+	memset(&rp, 0, sizeof(rp));
-+	memset(&rq, 0, sizeof(rq));
-+
-+	rq.ogf    = OGF_LE_CTL;
-+	rq.ocf    = OCF_LE_READ_SUPPORTED_STATES;
-+	rq.rparam = &rp;
-+	rq.rlen   = LE_READ_SUPPORTED_STATES_RP_SIZE;
-+
-+	err = hci_send_req(dd, &rq, 1000);
-+
-+	close(dd);
-+
-+	if (err < 0) {
-+		fprintf(stderr, "Can't read LE supported states on hci%d:"
-+				" %s(%d)\n", hdev, strerror(errno), errno);
-+		exit(1);
-+	}
-+
-+	if (rp.status) {
-+		fprintf(stderr, "Read LE supported states on hci%d"
-+				" returned status %d\n", hdev, rp.status);
-+		exit(1);
-+	}
-+
-+	print_le_states(rp.states);
-+}
-+
- static void cmd_iac(int ctl, int hdev, char *opt)
- {
- 	int s = hci_open_dev(hdev);
-@@ -1793,6 +1881,7 @@ static struct {
- 	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the blacklist" },
- 	{ "leadv",	cmd_le_adv,	0,		"Enable LE advertising" },
- 	{ "noleadv",	cmd_le_adv,	0,		"Disable LE advertising" },
-+	{ "lestates",	cmd_le_states,	0,		"Display the supported LE states" },
- 	{ NULL, NULL, 0 }
- };
- 
+I had a Broadcom button linked to an a7 brand eb-101 that worked great,
+for about a week, then rebooted to a newer 2.6.37-rc8 kernel where it 
+fails.  Rebooting to the old kernel, 2.6.36.1, now fails also.
+
+Starting blueman-manager from a root terminal gets this return.
+[root@coyote ~]# blueman-manager
+Loading configuration plugins
+Using gconf config backend
+_________
+on_bluez_name_owner_changed (/usr/bin/blueman-manager:104)
+org.bluez owner changed to
+
+
+at which point a small window opens and advises me
+
+Connection to Bluez failed
+
+and only has one option, close.
+
+I have looked at line 104, and its apparent that 'owner' is not set, hence
+the apparent null after 'to' above.  But I don't know enough about python
+to even be dangerous.
+
+Running kde-4.5.latest here, on 32 bit pclos-2010 uptodate except for the
+newer, badly broken for amanda's usage, tar.
+
+Fixes anyone, please?
+
+Where is this bluez started in the boot sequence?
+
+I have looked at the logs (dmesg etc) and the device is discovered just 
+fine.  Everything for bluetooth is enabled in the kernel's .config.
+
+>From /var/log/messages
+
+Dec 29 06:30:05 coyote klogd: [    6.234467] usb 1-10.4.4: new full speed USB device using ehci_hcd and 
+address 14
+Dec 29 06:30:05 coyote klogd: [    6.327964] usb 1-10.4.4: New USB device found, idVendor=0a5c, idProduct=4500
+Dec 29 06:30:05 coyote klogd: [    6.334330] usb 1-10.4.4: New USB device strings: Mfr=1, Product=2, 
+SerialNumber=0
+Dec 29 06:30:05 coyote klogd: [    6.340660] usb 1-10.4.4: Product: BCM2046B1
+Dec 29 06:30:05 coyote klogd: [    6.346950] usb 1-10.4.4: Manufacturer: Broadcom
+Dec 29 06:30:05 coyote klogd: [    6.647365] usb 1-10.4.4.1: new full speed USB device using ehci_hcd and 
+address 16
+Dec 29 06:30:05 coyote klogd: [    6.748240] usb 1-10.4.4.1: New USB device found, idVendor=0a5c, 
+idProduct=4502
+Dec 29 06:30:05 coyote klogd: [    6.748244] usb 1-10.4.4.1: New USB device strings: Mfr=0, Product=0, 
+SerialNumber=0
+Dec 29 06:30:05 coyote klogd: [    6.837371] usb 1-10.4.4.2: new full speed USB device using ehci_hcd and 
+address 17
+Dec 29 06:30:05 coyote klogd: [    6.924252] usb 1-10.4.4.2: New USB device found, idVendor=0a5c, 
+idProduct=4503
+Dec 29 06:30:05 coyote klogd: [    6.924257] usb 1-10.4.4.2: New USB device strings: Mfr=0, Product=0, 
+SerialNumber=0
+Dec 29 06:30:05 coyote klogd: [    6.997390] usb 1-10.4.4.3: new full speed USB device using ehci_hcd and 
+address 18
+Dec 29 06:30:05 coyote klogd: [    7.089511] usb 1-10.4.4.3: New USB device found, idVendor=0a5c, 
+idProduct=2148
+Dec 29 06:30:05 coyote klogd: [    7.089515] usb 1-10.4.4.3: New USB device strings: Mfr=1, Product=2, 
+SerialNumber=3
+Dec 29 06:30:05 coyote klogd: [    7.089518] usb 1-10.4.4.3: Product: BCM92046DG-CL1ROM
+Dec 29 06:30:05 coyote klogd: [    7.089520] usb 1-10.4.4.3: Manufacturer: Broadcom Corp
+Dec 29 06:30:05 coyote klogd: [    7.089531] usb 1-10.4.4.3: SerialNumber: 000272A176A4
+
+But now bluez isn't running, and of course /dev/rfcomm0 is not being 
+created.  Even on the 2.6.36.1 kernel it was running well with yesterday.
+
+Thank you.
+
 -- 
-1.7.3.4
-
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+He looked at me as if I were a side dish he hadn't ordered.
+		-- Ring Lardner
