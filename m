@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+From: gene heskett <gheskett@wdtv.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: reliable bluetooth rfcomm0?
+Date: Wed, 29 Dec 2010 21:51:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=c-2_BB--GnTDqfCqhsttTTKYj0b5BU=errAD+@mail.gmail.com>
-References: <AANLkTi=c-2_BB--GnTDqfCqhsttTTKYj0b5BU=errAD+@mail.gmail.com>
-From: haijun liu <liuhaijun.er@gmail.com>
-Date: Thu, 30 Dec 2010 13:56:45 +0800
-Message-ID: <AANLkTinnnqRsfB=bRD4Q2GT6KAAd3UsnfaCt--J4s9R5@mail.gmail.com>
-Subject: Re: Support for Bluetooth 3.0 HS in BlueZ.
-To: Gregory Greenman <gregory.greenman@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <201012292151.21118.gheskett@wdtv.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gregory,
+Greetings again;
 
-On Wed, Dec 29, 2010 at 11:00 PM, Gregory Greenman
-<gregory.greenman@gmail.com> wrote:
-> Hello all,
->
-> Does anybody know if there is support for the High Speed feature of
-> the Bluetooth 3.0 spec in BlueZ? If not, is there anybody working on
-> that already?
->
-> Thank you,
-> Gregory
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+by blindly modprobing just about everything in /lib/modules/`uname -
+r`/kernel/drivers/bluetooth and retrying blueman-manager, I finally hit the 
+magic twanger in the right place and its working.
 
-Atheros and Qualcomm both have made BT3.0 feature for BlueZ
-independently several months ago.
-And now we are trying to merge them into one codebase then make it upstream.
+Now, it seems to me I should be able to add a stanza in 
+/etc/udev/rules.d/bluetooth-serial.rules to make this completely automatic 
+on boot.
 
-Thanks.
+Here is what I have modprobed now that makes it work:
+[root@coyote bluetooth]# lsmod |grep rfcomm
+rfcomm                 23697  23 
+l2cap                  32434  18 rfcomm,bnep
+bluetooth              39235  11 btsdio,hci_uart,rfcomm,sco,bnep,l2cap,btusb
+
+What would a new stanza for udev/rules.d/bluetooth-serial.rules that will 
+make this work for every boot look like for this bt button/dongle?
+
+[    6.997390] usb 1-10.4.4.3: new full speed USB device using ehci_hcd and address 18
+[    7.089511] usb 1-10.4.4.3: New USB device found, idVendor=0a5c, idProduct=2148
+[    7.089515] usb 1-10.4.4.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[    7.089518] usb 1-10.4.4.3: Product: BCM92046DG-CL1ROM
+[    7.089520] usb 1-10.4.4.3: Manufacturer: Broadcom Corp
+[    7.089531] usb 1-10.4.4.3: SerialNumber: 000272A176A4
+
+Thanks all;
 
 -- 
-Haijun Liu
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+If you give a man enough rope, he'll claim he's tied up at the office.
