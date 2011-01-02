@@ -1,79 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: gene heskett <gheskett@wdtv.com>
-To: linux-hotplug@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: At wits end with a Broadcom Corp BCM92046DG-CL1ROM
-Date: Sun, 2 Jan 2011 13:27:41 -0500
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201101021327.41699.gheskett@wdtv.com>
-Sender: linux-hotplug-owner@vger.kernel.org
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 4/4 v2] Code clean-up: unused and unnecessary code removed
+Date: Sun,  2 Jan 2011 19:20:41 +0200
+Message-Id: <1293988841-10325-5-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings all;
+destroy function is not used anymore and therefore removed pending_reply.
+obj->request = NULL is removed from vobject_close as unnecessary.
+---
+ plugins/pbap.c              |    4 +---
+ plugins/phonebook-tracker.c |   18 +++++-------------
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
-This device, a bluetooth button/dongle, or the a7 eb101 it pairs with to 
-create a virtual rs232 cable, have to be the most obstinate inanimate 
-devices ever.
-
-AIUI the BT specs, 2 devices once paired, are to remain so, even after 
-powerdowns, until such time as a new pairing is performed.  Right?  Or does 
-linux impose its own rules for low traffic, slow (9600 baud) bluetooth 
-links?
-
-It takes about a days messing around to finally get it to work, usually 
-accomplished by unplugging it long enough for linux to detect and do the 
-cleanup.  Then when plugging it back in, if one is quick enough to catch it 
-before bluetoothd times out and goes away and gets blueman-manager running 
-within this timeout, which appears to be in the 5 second range after its 
-rediscovery, then, 1 time only per reboot of this machine, I can get it to 
-work, and it works error free, with good signal strength showing in 
-blueman-manager.  For possibly 12 hours or so.  At some point, blueman-
-manager goes away silently, and the link is dropped and cannot be re-
-established by the same procedure until I have rebooted this box again.
-
-Pertinent (maybe) info:
-current kernel: 2.6.37-rc8
-current distro:	PClos, 32 bit, 100% uptodate
-current hdwe:   AMD quad core phenom, 4Gb dram, 4 Tb of drives
-current gui:    KDE-4.5.4
-
-I have edited /etc/bluetooth/rfcomm.conf to:
-#
-# RFCOMM configuration file.
-#
-# this was ALL commented out
-rfcomm0 {
-#	# Automatically bind the device at startup
-	bind yes;
-#
-#	# Bluetooth address of the device
-	device 00:0C:84:00:86:F8;
-#
-#	# RFCOMM channel for the connection
-	channel	1;
-#
-#	# Description of the connection
-#	comment "Example Bluetooth device";
-	comment "connection to coco3's eb-301 device";
-}
-
-And as of this instant /dev/rfcomm0 has not been removed.  And the link is 
-dead.
-
-It seems to me there should be a foolproof method that will accomplish this 
-from reboot to reboot, but I haven't found the method yet despite warming 
-up googles servers searching for instructional material that does NOT 
-appear to exist.
-
-What can I do, or better yet, where can I find the info that makes this 
-Just Work(TM)?
-
-Thanks all.
-
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index b6474ee..4180611 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -829,10 +829,8 @@ static int vobject_close(void *object)
+ 	if (obj->aparams)
+ 		g_byte_array_free(obj->aparams, TRUE);
+ 
+-	if (obj->request) {
++	if (obj->request)
+ 		phonebook_req_finalize(obj->request);
+-		obj->request = NULL;
+-	}
+ 
+ 	g_free(obj);
+ 
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index a6a2e47..a5cd8a7 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -961,7 +961,6 @@ struct pending_reply {
+ 	reply_list_foreach_t callback;
+ 	void *user_data;
+ 	int num_fields;
+-	GDestroyNotify destroy;
+ };
+ 
+ struct contact_data {
+@@ -1158,15 +1157,11 @@ static void query_free_data(void *user_data)
+ 	if (!pending)
+ 		return;
+ 
+-	if (pending->destroy)
+-		pending->destroy(pending->user_data);
+-
+ 	g_free(pending);
+ }
+ 
+ static DBusPendingCall *query_tracker(const char *query, int num_fields,
+-				reply_list_foreach_t callback, void *user_data,
+-				GDestroyNotify destroy, int *err)
++		reply_list_foreach_t callback, void *user_data, int *err)
+ {
+ 	struct pending_reply *pending;
+ 	DBusPendingCall *call;
+@@ -1195,7 +1190,6 @@ static DBusPendingCall *query_tracker(const char *query, int num_fields,
+ 	pending->callback = callback;
+ 	pending->user_data = user_data;
+ 	pending->num_fields = num_fields;
+-	pending->destroy = destroy;
+ 
+ 	dbus_pending_call_set_notify(call, query_reply, pending,
+ 							query_free_data);
+@@ -1938,8 +1932,7 @@ done:
+ 	}
+ 
+ 	dbus_pending_call_unref(data->call);
+-	data->call = query_tracker(query, col_amount, pull_cb, data, NULL,
+-								&err);
++	data->call = query_tracker(query, col_amount, pull_cb, data, &err);
+ 	if (err < 0)
+ 		data->cb(NULL, 0, err, 0, data->user_data);
+ }
+@@ -1978,8 +1971,7 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
+ 	data->params = params;
+ 	data->user_data = user_data;
+ 	data->cb = cb;
+-	data->call = query_tracker(query, col_amount, pull_cb, data, NULL,
+-									err);
++	data->call = query_tracker(query, col_amount, pull_cb, data, err);
+ 
+ 	return data;
+ }
+@@ -2008,7 +2000,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
+ 								id, id, id);
+ 
+ 	data->call = query_tracker(query, PULL_QUERY_COL_AMOUNT, pull_contacts,
+-							data, NULL, err);
++								data, err);
+ 
+ 	g_free(query);
+ 
+@@ -2034,7 +2026,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 	data->entry_cb = entry_cb;
+ 	data->ready_cb = ready_cb;
+ 	data->user_data = user_data;
+-	data->call = query_tracker(query, 7, add_to_cache, data, NULL, err);
++	data->call = query_tracker(query, 7, add_to_cache, data, err);
+ 
+ 	return data;
+ }
 -- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-New Microsoft PnP documents released: http://www.microsoft.eu.org/PnP.html
+1.7.0.4
+
