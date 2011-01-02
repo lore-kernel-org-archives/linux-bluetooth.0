@@ -1,27 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-Date: Mon, 03 Jan 2011 05:10:33 +0100
-From: "Jason Gooner" <jgoonerz@gmx.com>
-Message-ID: <20110103041034.193140@gmx.com>
+From: gene heskett <gheskett@wdtv.com>
+To: linux-hotplug@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: At wits end with a Broadcom Corp BCM92046DG-CL1ROM
+Date: Sun, 2 Jan 2011 13:27:41 -0500
 MIME-Version: 1.0
-Subject: hciemu / VHCI bluetooth module query
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201101021327.41699.gheskett@wdtv.com>
+Sender: linux-hotplug-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Greetings all;
 
-I have a couple of questions on hciemu and the Bluetooth Virtual HCI kernel module. Basically, I am trying to work out how much emulation for Bluetooth is already in place at the kernel level. My project essentially needs to fake a Bluetooth session i.e. emulate a device by injecting raw HCI packets into the kernel so that they get passed on to the higher level Bluez Bluetooth stack.
+This device, a bluetooth button/dongle, or the a7 eb101 it pairs with to 
+create a virtual rs232 cable, have to be the most obstinate inanimate 
+devices ever.
 
-Would I be correct in thinking that the VHCI kernel module provides complete functionality for sending and receiving HCI frames? So, to emulate a Bluetooth device I could make a tool (adapt hciemu) to pass HCI packets into this module and they should get passed to Bluez somewhere along the line?
+AIUI the BT specs, 2 devices once paired, are to remain so, even after 
+powerdowns, until such time as a new pairing is performed.  Right?  Or does 
+linux impose its own rules for low traffic, slow (9600 baud) bluetooth 
+links?
 
-I want to simulate things like a file transfer with a Bluetooth device and I think im correct in saying it will all boil down to HCI packets which will encapsulate all other Bluetooth layers, so if I can pass these HCI packets into the kernel via the VHCI module that would be perfect. Is this the purpose of VHCI and is it complete enough in it's current state to send and receive HCI data?
+It takes about a days messing around to finally get it to work, usually 
+accomplished by unplugging it long enough for linux to detect and do the 
+cleanup.  Then when plugging it back in, if one is quick enough to catch it 
+before bluetoothd times out and goes away and gets blueman-manager running 
+within this timeout, which appears to be in the 5 second range after its 
+rediscovery, then, 1 time only per reboot of this machine, I can get it to 
+work, and it works error free, with good signal strength showing in 
+blueman-manager.  For possibly 12 hours or so.  At some point, blueman-
+manager goes away silently, and the link is dropped and cannot be re-
+established by the same procedure until I have rebooted this box again.
 
-I have tried using the HCIEmu tool with the VHCI module and it would be perfect if it worked, but I can't ping the created virtual device with l2ping. Does anyone know why? Surely the l2pings should just be passed up into bluez, if I knew what functionality was missing from hciemu/bluez that prevents the use of things like l2ping then I can work on adding them in.
+Pertinent (maybe) info:
+current kernel: 2.6.37-rc8
+current distro:	PClos, 32 bit, 100% uptodate
+current hdwe:   AMD quad core phenom, 4Gb dram, 4 Tb of drives
+current gui:    KDE-4.5.4
 
-So to paraphrase - I would like the device created by HCIEMU to respond appropriatly to all HCI commands it recieves - my understanding is this should just be a case of the hci packets being passed into bluez and sending back the response. It seems fairly near being complete, but I don't know what's pissing and preventing l2ping from working (and presumably other higher level bluetooth profiles e.g file transfer).
+I have edited /etc/bluetooth/rfcomm.conf to:
+#
+# RFCOMM configuration file.
+#
+# this was ALL commented out
+rfcomm0 {
+#	# Automatically bind the device at startup
+	bind yes;
+#
+#	# Bluetooth address of the device
+	device 00:0C:84:00:86:F8;
+#
+#	# RFCOMM channel for the connection
+	channel	1;
+#
+#	# Description of the connection
+#	comment "Example Bluetooth device";
+	comment "connection to coco3's eb-301 device";
+}
 
+And as of this instant /dev/rfcomm0 has not been removed.  And the link is 
+dead.
 
-Thanks for any help,
+It seems to me there should be a foolproof method that will accomplish this 
+from reboot to reboot, but I haven't found the method yet despite warming 
+up googles servers searching for instructional material that does NOT 
+appear to exist.
 
-Jason
+What can I do, or better yet, where can I find the info that makes this 
+Just Work(TM)?
+
+Thanks all.
+
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+New Microsoft PnP documents released: http://www.microsoft.eu.org/PnP.html
