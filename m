@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH v2] Fix phonebook size issue
-Date: Mon,  3 Jan 2011 14:34:04 +0100
-Message-Id: <1294061644-7661-1-git-send-email-michalski.raf@gmail.com>
+Date: Mon, 3 Jan 2011 12:39:00 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/4 v2] NewMissedCalls added for phonebook_pull
+Message-ID: <20110103103900.GA9742@jh-x301>
+References: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously, when only empty default owner vCard was available, phonebook
-default size equal to 1 was received and it was always counted when
-phonebook size requested. This patch makes that it is equal to 0 as it
-should be and it is not counted anymore when phonebook size requested.
----
- plugins/phonebook-tracker.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+Hi Dmitriy,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index a5cd8a7..d211660 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -870,8 +870,7 @@
- 	"SELECT COUNT(?c) "						\
- 	"WHERE {"							\
- 		"?c a nco:PersonContact ."				\
--		"FILTER (regex(str(?c), \"contact:\") || "		\
--		"regex(str(?c), \"nco#default-contact-me\"))"		\
-+		"FILTER (regex(str(?c), \"contact:\"))"			\
- 	"}"
- 
- #define MISSED_CALLS_COUNT_QUERY					\
--- 
-1.6.3.3
+On Sun, Jan 02, 2011, Dmitriy Paliy wrote:
+> This is updated version of previous sebmission. New attribute
+> uint16_t write_offset is added in this patch to struct obex_session
+> in obex-priv.h.
+> 
+> Meaning of write_offset is an offset within TX OBEX packet w.r.t.
+> begining of the send buffer. Naturally, this offset cannot be larger
+> than tx_mtu and therefore it is of the same type.
+> 
+> It is used only for OBEX packets that are assembled from headers of
+> different types. Those headers are marked with OBEX_FL_FIT_ONE_PACKET
+> flag.
 
+All four patches (v3 of 2/4) have been pushed upstream. Thanks.
+
+Johan
