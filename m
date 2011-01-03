@@ -1,90 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-To: linux-hotplug@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: At wits end with a Broadcom Corp BCM92046DG-CL1ROM
-From: gene heskett <gheskett@wdtv.com>
-Date: Mon, 3 Jan 2011 15:52:14 -0500
+Date: Mon, 3 Jan 2011 14:29:27 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Jason Gooner <jgoonerz@gmx.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: hciemu / VHCI bluetooth module query
+Message-ID: <20110103172926.GA2660@piper>
+References: <20110103041034.193140@gmx.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201101031552.15059.gheskett@wdtv.com>
-Sender: linux-hotplug-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110103041034.193140@gmx.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings all;
+Hi Jason,
 
-Ping?  Repeat post with a few additions.
+On 05:10 Mon 03 Jan, Jason Gooner wrote:
+> Hi,
+> 
+> I have a couple of questions on hciemu and the Bluetooth Virtual HCI kernel module. Basically, I am trying to work out how much emulation for Bluetooth is already in place at the kernel level. My project essentially needs to fake a Bluetooth session i.e. emulate a device by injecting raw HCI packets into the kernel so that they get passed on to the higher level Bluez Bluetooth stack.
+> 
+> Would I be correct in thinking that the VHCI kernel module provides complete functionality for sending and receiving HCI frames? So, to emulate a Bluetooth device I could make a tool (adapt hciemu) to pass HCI packets into this module and they should get passed to Bluez somewhere along the line?
+> 
 
-This device, a bluetooth button/dongle, or the a7 eb101 it pairs with to 
-create a virtual rs232 cable, have to be the most obstinate inanimate 
-devices ever.
+The VHCI driver is pretty simple (and complete) implementation of a HCI 
+Transport driver. I think that you are missing just one thing, the point of
+VHCI is to emulate a Bluetooth controller i.e. a Bluetooth adapter.
 
-AIUI the BT specs, 2 devices once paired, are to remain so, even after 
-powerdowns, until such time as a new pairing is performed.  Right/wrong?  
+> I want to simulate things like a file transfer with a Bluetooth device and I think im correct in saying it will all boil down to HCI packets which will encapsulate all other Bluetooth layers, so if I can pass these HCI packets into the kernel via the VHCI module that would be perfect. Is this the purpose of VHCI and is it complete enough in it's current state to send and receive HCI data?
+> 
 
-It takes about a days messing around to finally get it to work, usually 
-accomplished by unplugging it long enough for linux to detect and do the 
-cleanup.  Then when plugging it back in, if one is quick enough to catch it 
-before bluetoothd times out and goes away and gets blueman-manager running 
-within this timeout, which appears to be in the 5 second range after its 
-rediscovery, then, 1 time only per reboot of this machine, I can get it to 
-work, and it works error free, with good signal strength showing in 
-blueman-manager.  For possibly 12 hours or so.  At some point, blueman-
-manager goes away silently, and the link is dropped and cannot be re-
-established by the same procedure until I have rebooted both boxes again.
+I think that the purpose of VHCI was to do tests without access to actual
+hardware. The utopia would be a Bluetooth controller implemented entirely in
+software that we could use to test BlueZ.
 
-Pertinent (maybe) info:
-current kernel: 2.6.37-rc8
-current distro:	PClos, 32 bit, 100% uptodate
-current hdwe:   AMD quad core phenom, 4Gb dram, 4 Tb of drives
-current gui:    KDE-4.5.4
+> I have tried using the HCIEmu tool with the VHCI module and it would be perfect if it worked, but I can't ping the created virtual device with l2ping. Does anyone know why? Surely the l2pings should just be passed up into bluez, if I knew what functionality was missing from hciemu/bluez that prevents the use of things like l2ping then I can work on adding them in.
+> 
 
-I have edited /etc/bluetooth/rfcomm.conf to:
-#
-# RFCOMM configuration file.
-#
-# this was ALL commented out
-rfcomm0 {
-#	# Automatically bind the device at startup
-	bind yes;
-#
-#	# Bluetooth address of the device
-	device 00:0C:84:00:86:F8;
-#
-#	# RFCOMM channel for the connection
-	channel	1;
-#
-#	# Description of the connection
-#	comment "Example Bluetooth device";
-	comment "connection to coco3's eb-301 device";
-}
+l2ping doesn't work because the virtual adapter can't be found by real
+adapters. 
 
-Added question: Pin seems to be a problem as I have to answer several 
-requests for it, and it seems to work only if I press the enter key in the 
-requester box, which seemingly has no effect, and then click the ok button, 
-which puts 5 bytes in the buffer.  And FWIW, I have noted that the 4 digit 
-pin is stored as 5 bytes long no matter how I generate it, including 
-deleting the file and building a new one.  So my added question is, why is 
-the return key not being accepted as the "go do it" key?
+> So to paraphrase - I would like the device created by HCIEMU to respond appropriatly to all HCI commands it recieves - my understanding is this should just be a case of the hci packets being passed into bluez and sending back the response. It seems fairly near being complete, but I don't know what's pissing and preventing l2ping from working (and presumably other higher level bluetooth profiles e.g file transfer).
+> 
+> 
+> Thanks for any help,
+> 
+> Jason
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-And as of this instant /dev/rfcomm0 has not been removed.  And the link is 
-dead.  And is again working after a reboot of both machines.  No clue how 
-long though.
-
-It seems to me there should be a foolproof method that will accomplish this 
-from reboot to reboot, but I haven't found the method yet despite warming 
-up googles servers searching for instructional material that does NOT 
-appear to exist or is so dated that the 2nd or third example in any of 
-those tuts is no longer valid.
-
-What can I do, or better yet, URL's where can I find the info that makes 
-this Just Work(TM) for a more modern 2010-2011 distribution using todays 
-kernels?
-
-Thanks all.
-
+Cheers,
 -- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-
+Vinicius
