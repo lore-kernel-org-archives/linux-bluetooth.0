@@ -1,32 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Jan 2011 12:39:00 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/4 v2] NewMissedCalls added for phonebook_pull
-Message-ID: <20110103103900.GA9742@jh-x301>
-References: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293988841-10325-1-git-send-email-dmitriy.paliy@nokia.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/4 v3] Add aparams to pbap_object in pbap.c
+Date: Mon,  3 Jan 2011 12:05:18 +0200
+Message-Id: <1294049118-5835-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1294049118-5835-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1294049118-5835-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+aparams is added to pbap_object to handle application parameters
+header separately from body header when assembling OBEX packet.
+This modification is used in successive patch where headers of
+different types can be added to a single OBEX packet.
 
-On Sun, Jan 02, 2011, Dmitriy Paliy wrote:
-> This is updated version of previous sebmission. New attribute
-> uint16_t write_offset is added in this patch to struct obex_session
-> in obex-priv.h.
-> 
-> Meaning of write_offset is an offset within TX OBEX packet w.r.t.
-> begining of the send buffer. Naturally, this offset cannot be larger
-> than tx_mtu and therefore it is of the same type.
-> 
-> It is used only for OBEX packets that are assembled from headers of
-> different types. Those headers are marked with OBEX_FL_FIT_ONE_PACKET
-> flag.
+append_aparam_header and array_read functions are created as a result
+of such modification.
+---
+ plugins/pbap.c |   80 +++++++++++++++++++++++++++++++++++++++-----------------
+ 1 files changed, 56 insertions(+), 24 deletions(-)
 
-All four patches (v3 of 2/4) have been pushed upstream. Thanks.
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 3ebfbe8..e71a03d 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -146,6 +146,7 @@ struct pbap_session {
+ 
+ struct pbap_object {
+ 	GString *buffer;
++	GByteArray *aparams;
+ 	struct pbap_session *session;
+ 	void *request;
+ };
+@@ -224,12 +225,30 @@ static void cache_clear(struct cache *cache)
+ 	cache->entries = NULL;
+ }
+ 
++static GByteArray *append_aparam_header(GByteArray *buf, uint8_t tag,
++							const void *val)
++{
++	/* largest aparam is for phonebooksize (4 bytes) */
++	uint8_t aparam[sizeof(struct aparam_header) + PHONEBOOKSIZE_LEN];
++	struct aparam_header *hdr = (struct aparam_header *) aparam;
++
++	switch (tag) {
++	case PHONEBOOKSIZE_TAG:
++		hdr->tag = PHONEBOOKSIZE_TAG;
++		hdr->len = PHONEBOOKSIZE_LEN;
++		memcpy(hdr->val, val, PHONEBOOKSIZE_LEN);
++
++		return g_byte_array_append(buf,	aparam,
++			sizeof(struct aparam_header) + PHONEBOOKSIZE_LEN);
++	default:
++		return buf;
++	}
++}
++
+ static void phonebook_size_result(const char *buffer, size_t bufsize,
+ 				int vcards, int missed, void *user_data)
+ {
+ 	struct pbap_session *pbap = user_data;
+-	char aparam[4];
+-	struct aparam_header *hdr = (struct aparam_header *) aparam;
+ 	uint16_t phonebooksize;
+ 
+ 	if (pbap->obj->request) {
+@@ -244,11 +263,9 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
+ 
+ 	phonebooksize = htons(vcards);
+ 
+-	hdr->tag = PHONEBOOKSIZE_TAG;
+-	hdr->len = PHONEBOOKSIZE_LEN;
+-	memcpy(hdr->val, &phonebooksize, sizeof(phonebooksize));
+-
+-	pbap->obj->buffer = g_string_new_len(aparam, sizeof(aparam));
++	pbap->obj->aparams = g_byte_array_new();
++	pbap->obj->aparams = append_aparam_header(pbap->obj->aparams,
++					PHONEBOOKSIZE_TAG, &phonebooksize);
+ 
+ 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
+ }
+@@ -400,15 +417,11 @@ static int generate_response(void *user_data)
+ 
+ 	if (max == 0) {
+ 		/* Ignore all other parameter and return PhoneBookSize */
+-		char aparam[4];
+-		struct aparam_header *hdr = (struct aparam_header *) aparam;
+ 		uint16_t size = htons(g_slist_length(pbap->cache.entries));
+ 
+-		hdr->tag = PHONEBOOKSIZE_TAG;
+-		hdr->len = PHONEBOOKSIZE_LEN;
+-		memcpy(hdr->val, &size, sizeof(size));
+-
+-		pbap->obj->buffer = g_string_new_len(aparam, sizeof(aparam));
++		pbap->obj->aparams = g_byte_array_new();
++		pbap->obj->aparams = append_aparam_header(pbap->obj->aparams,
++						PHONEBOOKSIZE_TAG, &size);
+ 
+ 		return 0;
+ 	}
+@@ -790,6 +803,9 @@ static int vobject_close(void *object)
+ 	if (obj->buffer)
+ 		g_string_free(obj->buffer, TRUE);
+ 
++	if (obj->aparams)
++		g_byte_array_free(obj->aparams, TRUE);
++
+ 	if (obj->request) {
+ 		phonebook_req_finalize(obj->request);
+ 		obj->request = NULL;
+@@ -902,6 +918,20 @@ fail:
+ 	return NULL;
+ }
+ 
++static ssize_t array_read(GByteArray *array, void *buf, size_t count)
++{
++	ssize_t len;
++
++	if (array->len == 0)
++		return 0;
++
++	len = MIN(array->len, count);
++	memcpy(buf, array->data, len);
++	array = g_byte_array_remove_range(array, 0, len);
++
++	return len;
++}
++
+ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
+ 								uint8_t *hi)
+ {
+@@ -911,17 +941,18 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
+ 	DBG("buffer %p maxlistcount %d", obj->buffer,
+ 						pbap->params->maxlistcount);
+ 
+-	if (!obj->buffer)
++	if (!obj->buffer && !obj->aparams)
+ 		return -EAGAIN;
+ 
+-	/* PhoneBookSize */
+-	if (pbap->params->maxlistcount == 0)
++	if (pbap->params->maxlistcount == 0) {
++		/* PhoneBookSize */
+ 		*hi = OBEX_HDR_APPARAM;
+-	else
++		return array_read(obj->aparams, buf, count);
++	} else {
+ 		/* Stream data */
+ 		*hi = OBEX_HDR_BODY;
+-
+-	return string_read(obj->buffer, buf, count);
++		return string_read(obj->buffer, buf, count);
++	}
+ }
+ 
+ static ssize_t vobject_list_read(void *object, void *buf, size_t count,
+@@ -937,12 +968,13 @@ static ssize_t vobject_list_read(void *object, void *buf, size_t count,
+ 	if (!pbap->cache.valid)
+ 		return -EAGAIN;
+ 
+-	if (pbap->params->maxlistcount == 0)
++	if (pbap->params->maxlistcount == 0) {
+ 		*hi = OBEX_HDR_APPARAM;
+-	else
++		return array_read(obj->aparams, buf, count);
++	} else {
+ 		*hi = OBEX_HDR_BODY;
+-
+-	return string_read(obj->buffer, buf, count);
++		return string_read(obj->buffer, buf, count);
++	}
+ }
+ 
+ static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
+-- 
+1.7.0.4
 
-Johan
