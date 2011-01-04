@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 1/2 v2] Fix for handling fax and cell phone numbers in PBAP
-Date: Tue,  4 Jan 2011 14:23:56 +0200
-Message-Id: <1294143837-19059-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH] Fix for handling fax and cell phone numbers in PBAP
+Date: Tue,  4 Jan 2011 13:35:11 +0200
+Message-Id: <1294140911-18377-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -15,11 +15,11 @@ phonebook-tracker need to be changed to handle this properly.
 Without that cell and fax phone numbers are not listed in pull
 phonebook results.
 ---
- plugins/phonebook-tracker.c |   61 ++++++++++++++++++++----------------------
- 1 files changed, 29 insertions(+), 32 deletions(-)
+ plugins/phonebook-tracker.c |   71 +++++++++++++++++-------------------------
+ 1 files changed, 29 insertions(+), 42 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d211660..eda5d38 100644
+index b7acead..70db5bd 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
 @@ -86,10 +86,10 @@
@@ -46,7 +46,23 @@ index d211660..eda5d38 100644
  	"WHERE {"							\
  	"?_role nco:hasPhoneNumber ?role_number "			\
  	"FILTER (?role_number = ?_number)"				\
-@@ -314,10 +315,11 @@
+@@ -247,7 +248,6 @@
+ 	"?_contact a nco:PersonContact ; "				\
+ 	"nco:hasPhoneNumber ?_number . "				\
+ 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
+-	"?_contact nco:nameFamily ?_key ."				\
+ "} UNION { "								\
+ 	"?_ncontact a nco:Contact . "					\
+ 	"?_ncontact nco:hasPhoneNumber ?_number . "			\
+@@ -256,7 +256,6 @@
+ 	"nmo:isAnswered false ;"					\
+ 	"nmo:isSent false . "						\
+ 	"?_contact a nco:PersonContact . "				\
+-	"?_contact nco:nameFamily ?_key . "				\
+ 	"?_contact nco:hasAffiliation ?_role . "			\
+ 	"?_role nco:hasPhoneNumber ?_number . "				\
+ "} UNION { "								\
+@@ -314,10 +313,11 @@
  
  #define INCOMING_CALLS_QUERY						\
  "SELECT "								\
@@ -61,7 +77,23 @@ index d211660..eda5d38 100644
  "} GROUP BY nco:phoneNumber(?role_number) ) "				\
  	"nco:fullname(?_contact) "					\
  	"nco:nameFamily(?_contact) "					\
-@@ -459,10 +461,11 @@
+@@ -393,7 +393,6 @@
+ 	"?_contact a nco:PersonContact ; "				\
+ 	"nco:hasPhoneNumber ?_number . "				\
+ 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
+-	"?_contact nco:nameFamily ?_key ."				\
+ "} UNION { "								\
+ 	"?_ncontact a nco:Contact . "					\
+ 	"?_ncontact nco:hasPhoneNumber ?_number . "			\
+@@ -402,7 +401,6 @@
+ 	"nmo:isAnswered true ;"						\
+ 	"nmo:isSent false . "						\
+ 	"?_contact a nco:PersonContact . "				\
+-	"?_contact nco:nameFamily ?_key . "				\
+ 	"?_contact nco:hasAffiliation ?_role . "			\
+ 	"?_role nco:hasPhoneNumber ?_number . "				\
+ "} UNION { "								\
+@@ -459,10 +457,11 @@
  
  #define OUTGOING_CALLS_QUERY						\
  "SELECT "								\
@@ -76,7 +108,23 @@ index d211660..eda5d38 100644
  "} GROUP BY nco:phoneNumber(?role_number) ) "				\
  	"nco:fullname(?_contact) "					\
  	"nco:nameFamily(?_contact) "					\
-@@ -598,10 +601,11 @@
+@@ -537,7 +536,6 @@
+ 	"?_contact a nco:PersonContact ; "				\
+ 	"nco:hasPhoneNumber ?_number . "				\
+ 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
+-	"?_contact nco:nameFamily ?_key ."				\
+ "} UNION { "								\
+ 	"?_ncontact a nco:Contact . "					\
+ 	"?_ncontact nco:hasPhoneNumber ?_number . "			\
+@@ -545,7 +543,6 @@
+ 	"nmo:to ?_ncontact ; "						\
+ 	"nmo:isSent true . "						\
+ 	"?_contact a nco:PersonContact . "				\
+-	"?_contact nco:nameFamily ?_key . "				\
+ 	"?_contact nco:hasAffiliation ?_role . "			\
+ 	"?_role nco:hasPhoneNumber ?_number . "				\
+ "} UNION { "								\
+@@ -598,10 +595,11 @@
  
  #define COMBINED_CALLS_QUERY						\
  "SELECT "								\
@@ -91,7 +139,39 @@ index d211660..eda5d38 100644
  "} GROUP BY nco:phoneNumber(?role_number) ) "				\
  	"nco:fullname(?_contact) "					\
  	"nco:nameFamily(?_contact) "					\
-@@ -791,10 +795,10 @@
+@@ -676,7 +674,6 @@
+ 	"?_contact a nco:PersonContact ; "				\
+ 	"nco:hasPhoneNumber ?_number . "				\
+ 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
+-	"?_contact nco:nameFamily ?_key ."				\
+ "} UNION { "								\
+ 	"?_ncontact a nco:Contact . "					\
+ 	"?_ncontact nco:hasPhoneNumber ?_number . "			\
+@@ -684,7 +681,6 @@
+ 	"nmo:to ?_ncontact ; "						\
+ 	"nmo:isSent true . "						\
+ 	"?_contact a nco:PersonContact . "				\
+-	"?_contact nco:nameFamily ?_key . "				\
+ 	"?_contact nco:hasAffiliation ?_role . "			\
+ 	"?_role nco:hasPhoneNumber ?_number . "				\
+ "} UNION { "								\
+@@ -708,7 +704,6 @@
+ 	"?_contact a nco:PersonContact ; "				\
+ 	"nco:hasPhoneNumber ?_number . "				\
+ 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
+-	"?_contact nco:nameFamily ?_key ."				\
+ "} UNION { "								\
+ 	"?_ncontact a nco:Contact . "					\
+ 	"?_ncontact nco:hasPhoneNumber ?_number . "			\
+@@ -716,7 +711,6 @@
+ 	"nmo:from ?_ncontact ; "					\
+ 	"nmo:isSent false . "						\
+ 	"?_contact a nco:PersonContact . "				\
+-	"?_contact nco:nameFamily ?_key . "				\
+ 	"?_contact nco:hasAffiliation ?_role . "			\
+ 	"?_role nco:hasPhoneNumber ?_number . "				\
+ "} UNION { "								\
+@@ -791,10 +785,10 @@
  
  #define CONTACTS_QUERY_FROM_URI						\
  "SELECT "								\
@@ -105,7 +185,7 @@ index d211660..eda5d38 100644
  "}) "									\
  "nco:fullname(<%s>) "							\
  "nco:nameFamily(<%s>) "							\
-@@ -1469,7 +1473,8 @@ static enum phonebook_number_type get_phone_type(const char *affilation)
+@@ -1452,7 +1446,8 @@ static enum phonebook_number_type get_phone_type(const char *affilation)
  	return TEL_TYPE_OTHER;
  }
  
@@ -115,7 +195,7 @@ index d211660..eda5d38 100644
  {
  	char **num_parts;
  	char *type, *number;
-@@ -1497,7 +1502,9 @@ static void add_main_number(struct phonebook_contact *contact, char *pnumber)
+@@ -1480,7 +1475,9 @@ static void add_main_number(struct phonebook_contact *contact, char *pnumber)
  	else if (g_strrstr(type, MOBILE_NUM_TYPE))
  		add_phone_number(contact, number, TEL_TYPE_MOBILE);
  	else
@@ -126,7 +206,7 @@ index d211660..eda5d38 100644
  
  failed:
  	g_strfreev(num_parts);
-@@ -1506,28 +1513,18 @@ failed:
+@@ -1489,28 +1486,18 @@ failed:
  static void contact_add_numbers(struct phonebook_contact *contact,
  								char **reply)
  {
