@@ -1,223 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/11] Bluetooth: Implement automatic setup procedure for local adapters
-Date: Tue,  4 Jan 2011 12:08:42 +0200
-Message-Id: <1294135732-26765-1-git-send-email-johan.hedberg@gmail.com>
+From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"arunkat@gmail.com" <arunkat@gmail.com>
+Date: Tue, 4 Jan 2011 06:41:09 +0100
+Subject: FW: [PATCH] Updated TODO list for LE HCI Scan, Advertise and
+ Connect commands.
+Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA3706438@EXDCVYMBSTM005.EQ1STM.local>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
-
-This patch implements automatic initialization of basic information
-about newly registered Bluetooth adapters. E.g. the address and features
-are always needed so it makes sense for the kernel to automatically
-power on adapters and read this information. A new HCI_SETUP flag is
-added to track this state.
-
-In order to not consume unnecessary amounts of power if there isn't a
-user space available that could switch the adapter back off, a timer is
-added to do this automatically as long as no Bluetooth user space seems
-to be present. A new HCI_AUTO_OFF flag is added that user space needs to
-clear to avoid the automatic power off.
-
-Additionally, the management interface index_added event is moved to the
-end of the HCI_SETUP stage so a user space supporting the managment
-inteface has all the necessary information available for fetching when
-it gets notified of a new adapter. The HCI_DEV_REG event is kept in the
-same place as before since existing HCI raw socket based user space
-versions depend on seeing the kernels initialization sequence
-(hci_init_req) to determine when the adapter is ready for use.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- include/net/bluetooth/hci.h      |    3 ++
- include/net/bluetooth/hci_core.h |    6 +++
- net/bluetooth/hci_core.c         |   64 ++++++++++++++++++++++++++++++++++++-
- net/bluetooth/mgmt.c             |    8 +++++
- 4 files changed, 79 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 29a7a8c..6469d67 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -76,6 +76,9 @@ enum {
- 	HCI_INQUIRY,
- 
- 	HCI_RAW,
-+
-+	HCI_SETUP,
-+	HCI_AUTO_OFF,
- };
- 
- /* HCI ioctl defines */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a29feb0..dfbb325 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -114,6 +114,10 @@ struct hci_dev {
- 
- 	struct workqueue_struct	*workqueue;
- 
-+	struct work_struct	power_on;
-+	struct work_struct	power_off;
-+	struct timer_list	off_timer;
-+
- 	struct tasklet_struct	cmd_task;
- 	struct tasklet_struct	rx_task;
- 	struct tasklet_struct	tx_task;
-@@ -436,6 +440,8 @@ int hci_inquiry(void __user *arg);
- struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int hci_blacklist_clear(struct hci_dev *hdev);
- 
-+void hci_del_off_timer(struct hci_dev *hdev);
-+
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- int hci_recv_frame(struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8b602d8..d5a315c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -50,6 +50,8 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+#define AUTO_OFF_TIMEOUT 2000
-+
- static void hci_cmd_task(unsigned long arg);
- static void hci_rx_task(unsigned long arg);
- static void hci_tx_task(unsigned long arg);
-@@ -794,6 +796,7 @@ int hci_get_dev_list(void __user *arg)
- 	list_for_each(p, &hci_dev_list) {
- 		struct hci_dev *hdev;
- 		hdev = list_entry(p, struct hci_dev, list);
-+		hci_del_off_timer(hdev);
- 		(dr + n)->dev_id  = hdev->id;
- 		(dr + n)->dev_opt = hdev->flags;
- 		if (++n >= dev_num)
-@@ -823,6 +826,8 @@ int hci_get_dev_info(void __user *arg)
- 	if (!hdev)
- 		return -ENODEV;
- 
-+	hci_del_off_timer(hdev);
-+
- 	strcpy(di.name, hdev->name);
- 	di.bdaddr   = hdev->bdaddr;
- 	di.type     = (hdev->bus & 0x0f) | (hdev->dev_type << 4);
-@@ -891,6 +896,51 @@ void hci_free_dev(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL(hci_free_dev);
- 
-+static void hci_power_on(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (hci_dev_open(hdev->id) < 0)
-+		return;
-+
-+	if (test_bit(HCI_AUTO_OFF, &hdev->flags))
-+		mod_timer(&hdev->off_timer,
-+				jiffies + msecs_to_jiffies(AUTO_OFF_TIMEOUT));
-+
-+	if (test_and_clear_bit(HCI_SETUP, &hdev->flags))
-+		mgmt_index_added(hdev->id);
-+}
-+
-+static void hci_power_off(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, power_off);
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_close(hdev->id);
-+}
-+
-+static void hci_auto_off(unsigned long data)
-+{
-+	struct hci_dev *hdev = (struct hci_dev *) data;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	clear_bit(HCI_AUTO_OFF, &hdev->flags);
-+
-+	queue_work(hdev->workqueue, &hdev->power_off);
-+}
-+
-+void hci_del_off_timer(struct hci_dev *hdev)
-+{
-+	BT_DBG("%s", hdev->name);
-+
-+	clear_bit(HCI_AUTO_OFF, &hdev->flags);
-+	del_timer(&hdev->off_timer);
-+}
-+
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
-@@ -948,6 +998,10 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	INIT_LIST_HEAD(&hdev->blacklist);
- 
-+	INIT_WORK(&hdev->power_on, hci_power_on);
-+	INIT_WORK(&hdev->power_off, hci_power_off);
-+	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
-+
- 	memset(&hdev->stat, 0, sizeof(struct hci_dev_stats));
- 
- 	atomic_set(&hdev->promisc, 0);
-@@ -969,7 +1023,10 @@ int hci_register_dev(struct hci_dev *hdev)
- 		}
- 	}
- 
--	mgmt_index_added(hdev->id);
-+	set_bit(HCI_AUTO_OFF, &hdev->flags);
-+	set_bit(HCI_SETUP, &hdev->flags);
-+	queue_work(hdev->workqueue, &hdev->power_on);
-+
- 	hci_notify(hdev, HCI_DEV_REG);
- 
- 	return id;
-@@ -999,7 +1056,10 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 	for (i = 0; i < NUM_REASSEMBLY; i++)
- 		kfree_skb(hdev->reassembly[i]);
- 
--	mgmt_index_removed(hdev->id);
-+	if (!test_bit(HCI_INIT, &hdev->flags) &&
-+					!test_bit(HCI_SETUP, &hdev->flags))
-+		mgmt_index_removed(hdev->id);
-+
- 	hci_notify(hdev, HCI_DEV_UNREG);
- 
- 	if (hdev->rfkill) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f827fd9..2a88b35 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -127,6 +127,12 @@ static int read_index_list(struct sock *sk)
- 	i = 0;
- 	list_for_each(p, &hci_dev_list) {
- 		struct hci_dev *d = list_entry(p, struct hci_dev, list);
-+
-+		hci_del_off_timer(d);
-+
-+		if (test_bit(HCI_SETUP, &d->flags))
-+			continue;
-+
- 		put_unaligned_le16(d->id, &rp->index[i++]);
- 		BT_DBG("Added hci%u", d->id);
- 	}
-@@ -178,6 +184,8 @@ static int read_controller_info(struct sock *sk, unsigned char *data, u16 len)
- 		return cmd_status(sk, MGMT_OP_READ_INFO, ENODEV);
- 	}
- 
-+	hci_del_off_timer(hdev);
-+
- 	hci_dev_lock_bh(hdev);
- 
- 	put_unaligned_le16(hdev->id, &rp->index);
--- 
-1.7.2.3
-
+SGkgQ2xhdWRpbywgDQoNCkhpIFN1bWl0LA0KDQpPbiBUaHUsIERlYyAyMywgMjAxMCBhdCA3OjA3
+IEFNLCBTdW1pdCBLdW1hciBCQUpQQUkNCjxzdW1pdGt1bWFyLmJhanBhaUBzdGVyaWNzc29uLmNv
+bT4gd3JvdGU6DQo+IFVwZGF0ZWQgVE9ETyBsaXN0IGZvciBIQ0kgY29tbWFuZHMgZm9yIExFIHRo
+YXQgU1QtRXJpY3Nzb24gcGxhbnMgdG8NCj4gaW1wbGVtZW50IGFuZCBjb250cmlidXRlIGJhY2su
+DQo+DQo+IC0tLQ0KPiDCoFRPRE8gfCDCoCA5MyArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gwqAxIGZpbGVzIGNoYW5n
+ZWQsIDkzIGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9U
+T0RPIGIvVE9ETw0KPiBpbmRleCA0OWE5ZTc2Li5lNjJjNmU1IDEwMDY0NA0KPiAtLS0gYS9UT0RP
+DQo+ICsrKyBiL1RPRE8NCj4gQEAgLTY2LDYgKzY2LDk5IEBAIExvdyBFbmVyZ3kNCj4gwqAgUHJp
+b3JpdHk6IExvdw0KPiDCoCBDb21wbGV4aXR5OiBDMg0KPg0KPiArLSBJbXBsZW1lbnQgU2V0IEFk
+dmVydGlzZSBkYXRhIHZpYSBIb3N0IGludGVyZmFjZS4gVGhpcyBTZXQgQWR2ZXJ0aXNlIERhdGEg
+aXMNCj4gKyDCoHVzZWQgYnkgYWR2ZXJ0aXNpbmcgZGV2aWNlIHRvIGFkdmVydGlzZSB3aXRoIHNv
+bWUgZGF0YSBmaWVsZC4gVGhpcyBpcyB2aWENCj4gKyDCoHVuZGlyZWN0ZWQgYW5kIGNvbm5lY3Rh
+YmxlIGV2ZW50cy4gRGF0YSBmaWVsZCBpcyBtYXhpbXVtIG9mIDMwIG9jdGV0cywgYW5kIGlzDQo+
+ICsgwqBwcmltYXJpbHkgdXNlZCBmb3Igc21hbGwgZGF0YSBhZHZlcnRpc2VtZW50LiBTY2Fubmlu
+ZyBkZXZpY2UgY2FuIHNlZSBpbiBzY2FuDQo+ICsgwqByZXN1bHRzIHRoZSBhZHZlcnRpc2VkIGRh
+dGEgYXMgc2V0IGJ5IHRoZSBhZHZlcnRpc2luZyBkZXZpY2UuDQo+ICsgwqBTZWUgVm9sdW1lIDIs
+IFBhcnQgRSwgc2VjdGlvbiA3LjguNyBmb3IgbW9yZSBpbmZvcm1hdGlvbi4NCj4gKw0KPiArIMKg
+UHJpb3JpdHk6IExvdw0KPiArIMKgQ29tcGxleGl0eTogQzENCj4gKw0KPiArLSBJbXBsZW1lbnQg
+U2V0IEFkdmVydGlzZSBwYXJhbWV0ZXJzIHZpYSBIb3N0IGludGVyZmFjZS4gVGhpcyBTZXQgQWR2
+ZXJ0aXNlDQo+ICsgwqBwYXJhbWV0ZXJzIGlzIHVzZWQgYnkgYWR2ZXJ0aXNpbmcgZGV2aWNlIHRv
+IHNldCBhZHZlcnRpc2luZyBwYXJhbWV0ZXJzLiBUaGUNCj4gKyDCoEhvc3Qgc2hhbGwgbm90IGlz
+c3VlIHRoaXMgY29tbWFuZCB3aGVuIGFkdmVydGlzaW5nIGlzIGVuYWJsZWQgaW4gdGhlDQo+ICsg
+wqBDb250cm9sbGVyOyBpZiBpdCBpcyB0aGUgQ29tbWFuZCBEaXNhbGxvd2VkIGVycm9yIGNvZGUg
+c2hhbGwgYmUgdXNlZC4NCj4gKyDCoFNlZSBWb2x1bWUgMiwgUGFydCBFLCBzZWN0aW9uIDcuOC41
+IGZvciBtb3JlIGluZm9ybWF0aW9uLg0KPiArDQo+ICsgwqBQcmlvcml0eTogTG93DQo+ICsgwqBD
+b21wbGV4aXR5OiBDMQ0KPiArDQo+ICstIEltcGxlbWVudCBTZXQgU2NhbiBSZXNwb25zZSBEYXRh
+IHZpYSBob3N0IGludGVyZmFjZS4gVGhpcyBkYXRhIGlzIHNldCBieSB0aGUNCj4gKyDCoGFkdmVy
+dGlzZXIgaW4gY2FzZSBpdCB3YW50cyB0byBzZW5kIGRhdGEgb25seSB0byB0aG9zZSBkZXZpY2Vz
+IHRoYXQgYXJlDQo+ICsgwqBjdXJyZW50bHkgYWN0aXZlbHkgc2Nhbm5pbmcuIFRoaXMgaXMgdmlh
+IHVuZGlyZWN0ZWQgYW5kIGNvbm5lY3RhYmxlIGV2ZW50cy4NCj4gKyDCoERhdGEgY2FuIGJlIHNl
+dCBiZWZvcmUgb3IgYWZ0ZXIgYWR2ZXJ0aXNpbmcgYW5kIGNhbiBiZSBtYXhpbXVtIG9mIDMwIG9j
+dGV0cy4NCj4gKyDCoFNlZSBWb2x1bWUgMiwgUGFydCBFLCBzZWN0aW9uIDcuOC44IGZvciBtb3Jl
+IGluZm9ybWF0aW9uLg0KPiArDQo+ICsgwqBQcmlvcml0eTogTG93DQo+ICsgwqBDb21wbGV4aXR5
+OiBDMQ0KDQpXZSBkb24ndCBuZWVkIHRvIGV4cG9zZSBhIG1ldGhvZCB0byBhbGxvdyB0aGUgYXBw
+bGljYXRpb25zIHRvIGNoYW5nZQ0KdGhlIGFkdmVydGlzaW5nIHBhcmFtZXRlcnMuIFRoZSBpZGVh
+IGlzIHRvIG1hbmFnZSB0aGVtIGF1dG9tYXRpY2FsbHkNCmJhc2VkIG9uIHRoZSByZWdpc3RlcmVk
+IGdhdHQgc2VydmVycy4NCg0KVGhhdCdzIG91ciBpbnRlbnQgdG9vLiB3ZSBkb250IHByb3Bvc2Ug
+dG8gZXhwb3NlIEFQSSdzIGZvciB0aGVzZSBwYXJhbWV0ZXJzIHJhdGhlciBvbmx5IGltcGxlbWVu
+dCB0aGUgSENJIGNvbW1hbmRzIGFuZCBsZXQgR0FQL0dBVFQgdXNlIHRoZW0gc3VpdGFibHkuDQoN
+CkJyb2FkY2FzdGVyIFJvbGUgaXMgb3V0IG9mIHNjb3BlIGF0IHRoZSBtb21lbnQuIFBlcmlwaGVy
+YWwsIHdlIGFyZQ0KcGxhbm5pbmcgdG8gc3RhcnQgdGhlIGltcGxlbWVudGF0aW9uIHNvb24sIGJ1
+dCBmaXJzdCB3ZSBuZWVkIHRvIGRlZmluZQ0KdGhlIEdBVFQgc2VydmVyIEFQSS4NCklNSE8gd2Ug
+bmVlZCB0byBhbGlnbiB0aGUgYWR2ZXJ0aXNpbmcgcGFyYW1ldGVyIHNldHRpbmdzIHdpdGggdGhl
+DQpBZGFwdGVyICJEaXNjb3ZlcmFibGUiIHByb3BlcnR5IGFuZCB0aGUgcmVnaXN0ZXJlZCBHQVRU
+IHNlcnZlcnMuDQoNCkVuYWJsZS9EaXNhYmxlIG9mIFNldCBTY2FuIFJlc3BvbnNlIGRhdGEgYW5k
+IEFkdmVydGlzaW5nIGRhdGEgY291bGQgYmUgbW92ZWQgdG8gQWRhcHRlciAiRGlzY292ZXJhYmxl
+IFByb3BlcnR5Ii4gRXZlbiBTZXQgc2NhbiBSZXNwb25zZSBkYXRhL0FkdmVydGlzaW5nIGRhdGEg
+Y291bGQgYmUgdGhvdWdodCBvZiBhcyBwYXJ0IG9mIERpc2NvdmVyYWJsZSBwcm9wZXJ0aWVzLg0K
+DQpTZXQgU2NhbiBSZXNwb25zZSBEYXRhOiBJIGRvbid0IGFuIGFuc3dlciBhdCB0aGUgbW9tZW50
+Lg0KDQpTZXQgU2NhbiBSZXNwb25zZSBkYXRhIGZpbmRzIGl0cyB1c2VzIHdoaWxlIGltcGxlbWVu
+dGluZyBBZHZlcnRpc2luZyBGaWx0ZXIgUG9saWN5IGF0IEFkdmVydGlzZXIncyBMaW5rIExheWVy
+LiBCYXNpY2FsbHkgaXQgbGV0cyB0aGlzIGRhdGEgdG8gYmUgaGlkZGVuIGZyb20gZGV2aWNlIGFk
+ZHJlc3NlcyBub3QgcHJlc2VudCBpbiBjb250cm9sbGVyICJXaGl0ZSBMaXN0Ii4NCg0KPiArDQo+
+ICstIEltcGxlbWVudCBSZWFkIEFkdmVydGlzZSBDaGFubmVsIFR4IFBvd2VyIHZpYSBIb3N0IGlu
+dGVyZmFjZS4gVGhpcyBSZWFkDQo+ICsgwqBBZHZlcnRpc2UgQ2hhbm5lbCBUeCBwb3dlciBpcyB1
+c2VkIGJ5IGFkdmVydGlzaW5nIGhvc3QgdG8gcmVhZCB0aGUgdHJhbnNtaXQNCj4gKyDCoHBvd2Vy
+IGxldmVsIHVzZWQgZm9yIExFIGFkdmVydGlzaW5nIGNoYW5uZWwgcGFja2V0cy4NCj4gKyDCoFNl
+ZSBWb2x1bWUgMiwgUGFydCBFLCBzZWN0aW9uIDcuOC42IGZvciBtb3JlIGluZm9ybWF0aW9uLg0K
+PiArDQo+ICsgwqBQcmlvcml0eTogTG93DQo+ICsgwqBDb21wbGV4aXR5OiBDMQ0KQ291bGQgeW91
+IHBsZWFzZSBnaXZlIGFuIHVzYWdlIGV4YW1wbGU/DQoNClByb3hpbWl0eSBNb25pdG9yPw0KDQpJ
+ZiBJIHVuZGVyc3Rvb2QgY29ycmVjdGx5IHdlIHdpbGwgbmVlZCBhIGZ1bmN0aW9uDQpoY2lfbGVf
+cmVhZF94eHhfdHhfcG93ZXIoKSB0byBmaWxsIHRoZSBUWCBQb3dlciBMZXZlbCBpbiB0aGUNCmFk
+dmVydGlzaW5nIGRhdGEsIHJpZ2h0Pw0KDQogWWVzLg0KDQoNCj4gKw0KPiArLSBJbXBsZW1lbnQg
+QWRkIERldmljZSB0byBXaGl0ZSBMaXN0IGluIExFIGNvbnRyb2xsZXIgdmlhIGhvc3QgaW50ZXJm
+YWNlLg0KPiArIMKgVGhpcyBjb21tYW5kIGlzIHVzZWQgdG8gYWRkIGEgc2luZ2xlIGRldmljZSB0
+byB3aGl0ZSBsaXN0IHN0b3JlZCBpbiB0aGUNCj4gKyDCoGNvbnRyb2xsZXIuIE9uY2UgdGhlIGRl
+dmljZSBpcyBpbiB3aGl0ZSBsaXN0IGl0IHNob3VsZCBmb2xsb3cgc2NhbiBhbmQNCj4gKyDCoGNv
+bm5lY3QgcnVsZXMgYXMgc3RhdGVkIGluIGFkdmVydGlzaW5nIGZpbHRlciBwb2xpY3kuDQo+ICsg
+wqBTZWUgVm9sdW1lIDIsIFBhcnQgRSwgc2VjdGlvbiA3LjguMTYgZm9yIG1vcmUgaW5mb3JtYXRp
+b24uDQo+ICsNCj4gKyDCoFByaW9yaXR5OiBMb3cNCj4gKyDCoENvbXBsZXhpdHk6IEMxDQo+ICsN
+Cj4gKy0gSW1wbGVtZW50IFJlbW92ZSBEZXZpY2UgZnJvbSBXaGl0ZSBMaXN0IGluIExFIGNvbnRy
+b2xsZXIgdmlhIGhvc3QgaW50ZXJmYWNlLg0KPiArIMKgVGhpcyBjb21tYW5kIGlzIHVzZWQgdG8g
+cmVtb3ZlIGEgc2luZ2xlIGRldmljZSBmcm9tIHdoaXRlIGxpc3Qgc3RvcmVkIGluIHRoZQ0KPiAr
+IMKgY29udHJvbGxlci4gVGhpcyBjb21tYW5kIGhhcyBjZXJ0YWluIHJlc3RyaWN0aW9ucyBvbiBp
+dHMgdXNhZ2UuIENvbW1hbmQNCj4gKyDCoGNvbXBsZXRlIGV2ZW50IGlzIGdlbmVyYXRlZCBvbiBj
+b21wbGV0aW9uLg0KPiArIMKgU2VlIFZvbHVtZSAyLCBQYXJ0IEUsIHNlY3Rpb24gNy44LjE3IGZv
+ciBtb3JlIGluZm9ybWF0aW9uLg0KPiArDQo+ICsgwqBQcmlvcml0eTogTG93DQo+ICsgwqBDb21w
+bGV4aXR5OiBDMQ0KPiArDQo+ICstIEltcGxlbWVudCBDbGVhciBXaGl0ZSBMaXN0IGluIExFIGNv
+bnRyb2xsZXIgdmlhIGhvc3QgaW50ZXJmYWNlLiBUaGlzIGNvbW1hbmQNCj4gKyDCoGlzIHVzZWQg
+dG8gY2xlYXIgdGhlIHdoaXRlIGxpc3Qgc3RvcmVkIGluIHRoZSBjb250cm9sbGVyLiBUaGlzIGNv
+bW1hbmQgaGFzDQo+ICsgwqBjZXJ0YWluIHJlc3RyaWN0aW9ucyDCoG9uIGl0cyB1c2FnZS4gVGhp
+cyBjb21tYW5kIGhhcyBubyBjb21tYW5kIHBhcmFtZXRlcnMNCj4gKyDCoHRvIGJlIHB1c2hlZCBv
+biDCoGNvbnRyb2xsZXIuIENvbW1hbmQgY29tcGxldGUgZXZlbnQgaXMgZ2VuZXJhdGVkIG9uIGNv
+bXBsZXRpb24uDQo+ICsgwqBTZWUgVm9sdW1lIDIsIFBhcnQgRSwgc2VjdGlvbiA3LjguMTUgZm9y
+IG1vcmUgaW5mb3JtYXRpb24uDQo+ICsNCj4gKyDCoFByaW9yaXR5OiBMb3cNCj4gKyDCoENvbXBs
+ZXhpdHk6IEMxDQo+ICsNCj4gKy0gSW1wbGVtZW50IFJlYWQgV2hpdGUgTGlzdCBTaXplIGluIExF
+IGNvbnRyb2xsZXIgdmlhIGhvc3QgaW50ZXJmYWNlLiBUaGlzDQo+ICsgwqBjb21tYW5kIGlzIHVz
+ZWQgdG8gcmVhZCB0aGUgbWF4aW11bSBzaXplIG9mIHRoZSB3aGl0ZSBsaXN0IHN1cHBvcnRlZCBi
+eSB0aGUNCj4gKyDCoGNvbnRyb2xsZXIuDQo+ICsgwqBTZWUgVm9sdW1lIDIsIFBhcnQgRSwgc2Vj
+dGlvbiA3LjguMTQgZm9yIG1vcmUgaW5mb3JtYXRpb24uDQo+ICsNCj4gKyDCoFByaW9yaXR5OiBM
+b3cNCj4gKyDCoENvbXBsZXhpdHk6IEMxDQoNCk1heWJlIHdlIHdpbGwgbmVlZCB0aGlzIGZlYXR1
+cmUgdG8gaW1wbGVtZW50IHRoZSBSZWdpc3RlciBBcHBsaWNhdGlvbg0KQVBJLiBBdXRvbWF0aWMg
+Y29ubmVjdGlvbnMgYXJlIHBsYW5uZWQsIGJ1dCBpdCBjYW4gYmUgdXNlZnVsIHRvDQpyZWR1Y2Uv
+ZmlsdGVyIHRoZSBhbW91bnQgb2YgYWR2ZXJ0aXNpbmcgcmVwb3J0cy4NCg0KTm90IG9ubHkgdGhl
+IFdoaXRlLUxpc3RzIHdvdWxkIGJlIG5lZWRlZCBmb3IgQXV0byBjb25uZWN0aW9uIGVzdGFibGlz
+aG1lbnQsIGJ1dCB0aGV5IGFyZSB1bHRpbWF0ZWx5IHJlcXVpcmVkIGZvciBzZXR0aW5nIEFkdmVy
+dGlzaW5nIEZpbHRlciBQb2xpY3ksIFNjYW5uZXIgRmlsdGVyIHBvbGljaWVzIGFuZCBJbml0aWF0
+b3IgRmlsdGVyIFBvbGljaWVzLiBJIHRoaW5rIGl0IHdvdWxkIGJlIGEgZ29vZCB2YWx1ZSBhZGQg
+dG8gQmx1ZXouDQoNCj4gKw0KPiArLSBJbXBsZW1lbnQgUmVhZCBMRSBidWZmZXIgU2l6ZSB2aWEg
+aG9zdCBpbnRlcmZhY2UuIFRoaXMgZGF0YSBpcyB1c2VkIHRvIHJlYWQNCj4gKyDCoHRoZSBtYXhp
+bXVtIHNpemUgb2YgZGF0YSBwb3J0aW9uIG9mIEhDSSBMRSBBQ0wgRGF0YSBQYWNrZXRzIHNlbnQg
+ZnJvbSB0aGUNCj4gKyDCoEhvc3QgdG8gdGhlIENvbnRyb2xsZXIuIFRoZSBIb3N0IHdpbGwgc2Vn
+bWVudCB0aGUgZGF0YSB0cmFuc21pdHRlZCB0byB0aGUNCj4gKyDCoENvbnRyb2xsZXIgYWNjb3Jk
+aW5nIHRvIHRoZXNlIHZhbHVlcywgc28gdGhhdCB0aGUgSENJIERhdGEgUGFja2V0cyB3aWxsDQo+
+ICsgwqBjb250YWluIGRhdGEgd2l0aCB1cCB0byB0aGlzIHNpemUuIFRoZSBMRV9SZWFkX0J1ZmZl
+cl9TaXplIGNvbW1hbmQgYWxzbw0KPiArIMKgcmV0dXJucyB0aGUgdG90YWwgbnVtYmVyIG9mIEhD
+SSBMRSBBQ0wgRGF0YSBQYWNrZXRzIHRoYXQgY2FuIGJlIHN0b3JlZCBpbg0KPiArIMKgdGhlIGRh
+dGEgYnVmZmVycyBvZiB0aGUgQ29udHJvbGxlci4gVGhlIExFX1JlYWRfQnVmZmVyX1NpemUgY29t
+bWFuZCBtdXN0IGJlDQo+ICsgwqBpc3N1ZWQgYnkgdGhlIEhvc3QgYmVmb3JlIGl0IHNlbmRzIGFu
+eSBkYXRhIHRvIGFuIExFIENvbnRyb2xsZXIuDQo+ICsgwqBTZWUgVm9sdW1lIDIsIFBhcnQgRSwg
+c2VjdGlvbiA3LjguMiBmb3IgbW9yZSBpbmZvcm1hdGlvbi4NCj4gKw0KPiArIMKgUHJpb3JpdHk6
+IExvdw0KPiArIMKgQ29tcGxleGl0eTogQzENCj4gKw0KPiArLSBJbXBsZW1lbnQgTEUgQ29ubmVj
+dGlvbiBVcGRhdGUgY29tbWFuZCB2aWEgSG9zdCBpbnRlcmZhY2UuIFRoZQ0KPiArIMKgTEVfQ29u
+bmVjdGlvbl9VcGRhdGUgY29tbWFuZCBpcyB1c2VkIHRvIGNoYW5nZSB0aGUgTGluayBMYXllciBj
+b25uZWN0aW9uDQo+ICsgwqBwYXJhbWV0ZXJzIG9mIGEgY29ubmVjdGlvbi4gVGhpcyBjb21tYW5k
+IHNoYWxsIG9ubHkgYmUgdXNlZCB3aGVuIHRoZSBsb2NhbA0KPiArIMKgZGV2aWNlJ3Mgcm9sZSBp
+cyBNYXN0ZXIuDQo+ICsgwqBTZWUgVm9sdW1lIDIsIFBhcnQgRSwgc2VjdGlvbiA3LjguMTggZm9y
+IG1vcmUgaW5mb3JtYXRpb24uDQo+ICsNCj4gKyDCoFByaW9yaXR5OiBNZWRpdW0NCj4gKyDCoENv
+bXBsZXhpdHk6IEMxDQoNCklzIGl0IG5lY2Vzc2FyeSB0byBub3RpZnkgdGhlIHVzZXJwYWNlIG9y
+IGl0IGlzIGEga2VybmVsIHRhc2sgb25seT8NClBsZWFzZSByZW1vdmUgaXQgaWYgaXQgaXMgYSBr
+ZXJuZWwgdGFzay4NCg0KSSBndWVzcyBmZXcgb2YgZGV2aWNlIHByb2ZpbGVzIHdvdWxkIG5lZWQg
+bm90aWZpY2F0aW9ucyByZWxhdGVkIHRvIHN1cGVydmlzaW9uIHRpbWVvdXQgZXRjLiBTbywgdGhp
+cyB3aWxsIGJlIG5lZWRlZCBpbiB1c2VyIHNwYWNlLiANCg0KRm9yIHRoZSBvdGhlciB0YXNrcyBJ
+IHN1Z2dlc3QgdG8ga2VlcCB0aGVtIGluIHRoZSBUT0RPIGZpbGUgdG8gdHJhY2sNCnRoZSBtaXNz
+aW5nIGZlYXR1cmVzLCBubyBtYXR0ZXIgaWYgd2Ugd2lsbCB1c2UgdGhlbSBkaXJlY3RseShlZzoN
+CmhjaXRvb2wsIGhjaWNvbmZpZykgb3IgaW4gdGhlIEFQSS9zZXJ2aWNlcyBpbXBsZW1lbnRhdGlv
+bi4NCg0KQWdyZWVkLiB0aGF0J3MgdGhlIGludGVudCBoZXJlIHRvIGFwcGVuZCB0aGVzZSB0byBj
+b21tb24gQmx1ZXogVE9ETyBsaXN0Lg0KDQpJZiBwb3NzaWJsZSBwbGVhc2UgYWRkIHRoZSBleHBl
+Y3RlZCBkZWxpdmVyYWJsZSBmb3IgZWFjaCB0YXNrLCBpdCB3aWxsDQptYWtlIGVhc2llciB0byBv
+dGhlciBkZXZlbG9wZXJzIHRvIGNvbnRyaWJ1dGUuDQoNCldlIGhhdmUgZmluaXNoZWQgY29kaW5n
+IGZvciBtb3N0IG9mIHRoZSBhYm92ZSBmZWF0dXJlcyBhbmQgdGVzdGluZyBpcyBpbiBwcm9ncmVz
+cy4gWW91IG1heSBleHBlY3QgYWxsIHRvIGJlIHN1Ym1pdHRlZCB0byB0aGlzIGZvcnVtIGJ5IG5l
+eHQgZm9ydG5pZ2h0Lg0KWW91IGNhbiBhZGRyZXNzIGZ1cnRoZXIgcXVlcmllcyB0byBBcnVuIGFu
+ZCBtZS4NCg0KDQpSZWdhcmRzLg0KQ2xhdWRpbw0KDQoNClRoYW5rcywgDQpTdW1pdA0K
