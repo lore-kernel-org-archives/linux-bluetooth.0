@@ -1,130 +1,184 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 1/2] Add g_attrib_send_seq()
-From: bgix <bgix@codeaurora.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	rshaffer@codeaurora.org, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20101228214722.GA30135@piper.indt.org>
-References: <1292626132-30029-1-git-send-email-bgix@codeaurora.org>
-	 <1292626132-30029-2-git-send-email-bgix@codeaurora.org>
-	 <AANLkTinnsNX_9ENWvBcnN7j8_kmBhbSoL6cCWJ8-Lzgh@mail.gmail.com>
-	 <1293059620.7281.43.camel@sealablnx02.qualcomm.com>
-	 <20101228214722.GA30135@piper.indt.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 04 Jan 2011 17:07:17 -0800
-Message-ID: <1294189637.20505.61.camel@ubuntuLab1>
-Mime-Version: 1.0
+From: Brian Gix <bgix@codeaurora.org>
+Cc: claudio.takahasi@openbossa.org, padovan@profusion.mobi,
+	rshaffer@codeaurora.org, linux-bluetooth@vger.kernel.org,
+	Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH 2/2] Fix gatt_read_char() to support long Attrib Values
+Date: Tue,  4 Jan 2011 16:01:38 -0800
+Message-Id: <1294185698-1499-3-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1294185698-1499-1-git-send-email-bgix@codeaurora.org>
+References: <1294185698-1499-1-git-send-email-bgix@codeaurora.org>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Fix gatt_read_char() to support long Attribute Values by recognizing
+	that results longer that 21 octets may include data beyond
+	what has been returned with the first read. Extra data is
+	obtained by issuing READ_BLOB requests until either a
+	result is returned shorter than 22 octets, or an error
+	is recieved indicating that no further data is available.
+	The API for this function has not changed.
+---
+ attrib/gatt.c |  134 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 132 insertions(+), 2 deletions(-)
 
-I'm sorry, but I submitted patches before I was aware that you had
-responded.
-
-On Tue, 2010-12-28 at 18:48 -0300, Vinicius Costa Gomes wrote:
-> Hi Brian,
-> 
-> First of all, sorry for the delay.
-> 
-[...]
-> > I wanted to delay the call to wake_up_sender() until *after* the
-> > invocation of the cmd->func() callback, because if the the subsequent
-> > ATT command is to be sent next, it needs to be added to the head of the
-> > queue before the sender is woken up. wake_up_sender calls
-> > g_io_add_watch_full(), and I am unsure how the process threading works
-> > here, so I don't know if received_data() is going to be preempted (and
-> > send the current queue head) by that call.
-> 
-> It is really simple, it was not meant to work on multi-threaded enviroments.
-> receeived_data() is going to be called after control is back to the mainloop. 
-> It is not meant to be reentrant.
-
-Understood.
-
-> 
-> > 
-> > I do see that the call to wake_up_sender is called by the g_attrib_send*
-> > function, but only if the addition was to a previously empty queue (so
-> > that the count is now 1).  It appeared to me that care was taken by the
-> > original coder to make sure wake_up_sender() was called exactly once for
-> > each ATT command that was queued, and since only a single ATT command
-> > can be outstanding at a time, I believe this is the correct
-> > functionality.
-> 
-> I think that Claudio was referring just to the changes that you made to
-> received_data(). And considering what I said above (that it's not meant to be
-> thread-safe) I think that received_data could stay unchanged.
-> 
-> And g_attrib_send_seq() could have a bug when the command at the head was 
-> already sent but is waiting for a response. If the command is always added to
-> the head of the queue, could it be so the order of the command of a compound 
-> procedure is inverted?
-
-In the patches I resent, I eliminated g_attrib_send_seq in favour of a
-single API with the original name (g_attrib_send) which has an
-additional parameter.
-
-The intention of the version of the call to enqueue at the head of the
-queue, is that it take place within the scope of the cmd->func()
-callback.  Perhaps there is a way to code for that, by checking within
-g_attrib_send that the head of the queue has not been sent, but from
-within cmd->func() it should definitely not have sent the next pkt,
-assuming what you stated about re-entrancy above holds true.
-
-> 
-> And taking a closer look at the spec, it was clear to me that only a higher
-> level profile (above GATT) is able to know that a characteristic needs to be
-> read by using the "Read Long Characteristic Value" procedure -- which I think is
-> what brought this discussion, right? or you already have another need for 
-> these procedures? -- Which gives me the impression that this should
-> be dealt by the profile implementation. Which gives us more time to think about
-> how to implement this correctly ;-) in case the need arrise.
-
-I don't believe this is correct. Reading a Characteristic Value is a
-GATT procedure, not a Profile procedure.  And any String based
-Characteristic is a candidate for being longer than the LE default MTU.
-The Reading of Long characteristics as a procedure is enumerated in the
-GATT specification.
-
-> 
-[...]
-> > 
-> > I don't know.  What happens if g_queue_push_head or g_queue_push_tail is
-> > passed a NULL pointer for the queue? I noticed that it is checked by
-> > g_attrib_cancel, and was unsure as to why it would be different.
-> > 
-> 
-> It would not crash, but I think that GLib would give an warning. Doing the
-> check is correct.
-
-And I just removed it from my patch.  oops.
-
-> 
-[...]
-> > > > +guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
-> > > > +                               guint16 len, GAttribResultFunc func,
-> > > > +                               gpointer user_data, GDestroyNotify notify)
-> > > > +{
-> > > > +       return g_attrib_send_seq(attrib, FALSE, 0, opcode,
-> > > > +                               pdu, len, func, user_data, notify);
-> > > Coding style issue here.
-> > 
-> > What is the issue?  I saw in g_attrib_new() that a return of a call to
-> > g_attrib_ref was tail-chain-returned.
-> 
-> I think it was more about indentation, something like this looks better:
-> 
-> return g_attrib_send_seq(attrib, FALSE, 0, opcode, pdu, len, func,
-> 						user_data, notify);
-> 
-
-OK.
-
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 320759f..304c2b1 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -97,15 +97,145 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					pdu, plen, func, user_data, NULL);
+ }
+ 
++struct read_long_data {
++	GAttrib *attrib;
++	GAttribResultFunc func;
++	gpointer user_data;
++	guint8 *buffer;
++	guint16 size;
++	guint16 handle;
++	guint id;
++	guint8 ref;
++};
++
++static void read_long_destroy(gpointer user_data)
++{
++	struct read_long_data *long_read = user_data;
++
++	if (--long_read->ref)
++		return;
++
++	if (long_read->buffer != NULL)
++		g_free(long_read->buffer);
++
++	g_free(long_read);
++}
++
++static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
++							gpointer user_data)
++{
++	struct read_long_data *long_read = user_data;
++	uint8_t pdu[ATT_DEFAULT_MTU];
++	guint8 *tmp;
++	guint16 plen;
++	guint id;
++
++	if (status == ATT_ECODE_ATTR_NOT_LONG ||
++					status == ATT_ECODE_INVALID_OFFSET) {
++		status = 0;
++		goto done;
++	}
++
++	if (status != 0 || rlen == 1)
++		goto done;
++
++	tmp = g_try_realloc(long_read->buffer, long_read->size + rlen - 1);
++
++	if (tmp == NULL) {
++		status = ATT_ECODE_INSUFF_RESOURCES;
++		goto done;
++	}
++
++	memcpy(&tmp[long_read->size], &rpdu[1], rlen - 1);
++	long_read->buffer = tmp;
++	long_read->size += rlen - 1;
++
++	if (rlen < ATT_DEFAULT_MTU)
++		goto done;
++
++	plen = enc_read_blob_req(long_read->handle, long_read->size - 1,
++							pdu, sizeof(pdu));
++	id = g_attrib_send(long_read->attrib, long_read->id,
++				ATT_OP_READ_BLOB_REQ, pdu, plen,
++				read_blob_helper, long_read, read_long_destroy);
++
++	if (id != 0) {
++		long_read->ref++;
++		return;
++	}
++
++	status = ATT_ECODE_IO;
++
++done:
++	long_read->func(status, long_read->buffer, long_read->size,
++							long_read->user_data);
++}
++
++static void read_char_helper(guint8 status, const guint8 *rpdu,
++					guint16 rlen, gpointer user_data)
++{
++	struct read_long_data *long_read = user_data;
++	uint8_t pdu[ATT_DEFAULT_MTU];
++	guint16 plen;
++	guint id;
++
++	if (status != 0 || rlen < ATT_DEFAULT_MTU)
++		goto done;
++
++	long_read->buffer = g_malloc(rlen);
++
++	if (long_read->buffer == NULL)
++		goto done;
++
++	memcpy(long_read->buffer, rpdu, rlen);
++	long_read->size = rlen;
++
++	plen = enc_read_blob_req(long_read->handle, rlen - 1, pdu, sizeof(pdu));
++	id = g_attrib_send(long_read->attrib, long_read->id,
++			ATT_OP_READ_BLOB_REQ, pdu, plen, read_blob_helper,
++			long_read, read_long_destroy);
++
++	if (id != 0) {
++		long_read->ref++;
++		return;
++	}
++
++	status = ATT_ECODE_IO;
++
++done:
++	long_read->func(status, rpdu, rlen, long_read->user_data);
++}
++
+ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+ 							gpointer user_data)
+ {
+ 	uint8_t pdu[ATT_DEFAULT_MTU];
+ 	guint16 plen;
++	guint id;
++	struct read_long_data *long_read;
++
++	long_read = g_try_new0(struct read_long_data, 1);
++
++	if (long_read == NULL)
++		return 0;
++
++	long_read->attrib = attrib;
++	long_read->func = func;
++	long_read->user_data = user_data;
++	long_read->handle = handle;
+ 
+ 	plen = enc_read_req(handle, pdu, sizeof(pdu));
+-	return g_attrib_send(attrib, 0, ATT_OP_READ_REQ, pdu, plen, func,
+-							user_data, NULL);
++	id = g_attrib_send(attrib, 0, ATT_OP_READ_REQ, pdu, plen,
++				read_char_helper, long_read, read_long_destroy);
++
++	if (id == 0)
++		g_free(long_read);
++	else {
++		long_read->ref++;
++		long_read->id = id;
++	}
++
++	return id;
+ }
+ 
+ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+-- 
+1.7.1
 -- 
 Brian Gix
 bgix@codeaurora.org
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
