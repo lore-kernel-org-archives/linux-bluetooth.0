@@ -1,34 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Jan 2011 14:10:05 +0200
+Date: Wed, 5 Jan 2011 14:01:48 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Change security level on demand when reading
- characteristic value
-Message-ID: <20110105121005.GB18929@jh-x301>
-References: <1293744130-21124-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Add option to set leadv peripheral role for hciconfig
+Message-ID: <20110105120148.GA18929@jh-x301>
+References: <1294090797-20456-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1293744130-21124-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1294090797-20456-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Sheldon,
 
-On Thu, Dec 30, 2010, Claudio Takahasi wrote:
-> If a characteristic requires a higher security level, change it on
-> demand and re-send the GATT Charateristic Value Read. Request will not
-> be sent until the SMP negotiation finishes. This change doesn't affect
-> GATT over BR/EDR, since encryption is mandatory for BR/EDR.
-> ---
->  attrib/client.c  |   11 +++++++++++
->  attrib/gattrib.c |    8 ++++++++
->  attrib/gattrib.h |    2 ++
->  3 files changed, 21 insertions(+), 0 deletions(-)
+On Mon, Jan 03, 2011, Sheldon Demario wrote:
+> --- a/lib/sdp.h
+> +++ b/lib/sdp.h
+> @@ -407,6 +407,15 @@ extern "C" {
+>  #define SDP_INVALID_PDU_SIZE		0x0004
+>  #define SDP_INVALID_CSTATE		0x0005
+>  
+> +/* EIR and Advertising flags descriptions (Vol 3/Part C/Appendix C) */
+> +#define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
+> +#define EIR_GEN_DISC                0x02 /* LE General Discoverable Mode */
+> +#define EIR_BREDR_UNSUP             0x04 /* BR/EDR Not Supported */
+> +#define EIR_SIM_CONTROLLER          0x08 /* Simultaneous LE and BR/EDR to Same
+> +					    Device Capable (Controller) */
+> +#define EIR_SIM_HOST                0x10 /* Simultaneous LE and BR/EDR to Same
+> +					    Device Capable (Host) */
 
-I went ahead and pushed these two patches upstream, but like I said it'd
-be nice to get some proper BtIO abstraction for all this including also
-BR/EDR support. And even before that I wouldn't mind a patch to add a
-proper code comment that explains how this works (with the POLLOUT).
+Since these are not really SDP related I don't think sdp.h is the right
+place for them. Probably hci.h would be better.
 
 Johan
