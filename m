@@ -1,42 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/10] Update telephony-ofono driver
-Date: Wed,  5 Jan 2011 17:59:37 +0200
-Message-Id: <1294243187-1849-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 5 Jan 2011 16:34:35 +0300
+From: Ilya Basin <basinilya@gmail.com>
+Reply-To: Ilya Basin <basinilya@gmail.com>
+Message-ID: <74438513.20110105163435@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re[2]: listening socket not notified when bluetoothd stops, but becomes unusable
+In-Reply-To: <AANLkTi=mncb6yoZECV8Rc3sXVvMcKkT=gGGyLN0nu+8k@mail.gmail.com>
+References: <1769727890.20110105144834@gmail.com> <AANLkTi=mncb6yoZECV8Rc3sXVvMcKkT=gGGyLN0nu+8k@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi.
+LAvD> If you are using BDADDR_ANY than that is probably ok, now for specific
+LAvD> adapter this could be a bug
+I just copied the code from someone else's project:
+sdpSession = sdp_connect(BDADDR_ANY, BDADDR_LOCAL, SDP_RETRY_IF_BUSY);
 
-This patches update the ofono backend so it can be used with recent
-versions of ofono (> 0.28), it can be tested by compiling bluetoothd with
---with-telephony=ofono
+I understand now, why select() doesn't return, but I still can't
+connect.
 
-Since the hfp doesn't really support multiple modems, at least not in the
-same record/connection, the driver will pick the first modem that has
-org.ofono.NetworkRegistration since that is what hfp expect as indicator.
+LAvD> adapter is powered off after bluetoothd restart than you won't be able
+LAvD> to accept connections.
+If I restart my program after restarting bluetoothd, it accepts
+connections.
 
-Calls are only picked/indicated if they belong to the modem in use
-otherwise they are ignored.
-
-Note that there is still a plan to integrate hfp inside ofono and this
-changes doesn't change anything, it basically add the possibility to use
-ofono with BlueZ 4.x since 5.x probably will change this entirely.
-
-Luiz Augusto von Dentz (10):
-  telephony-ofono: notify alerting calls when headset connects
-  telephony-ofono: fix not being able to answer alerting/waiting calls
-  telephony-ofono: fix not setting originating when status property
-    changes
-  telephony-ofono: make use of GetModems method
-  telephony-ofono: make use of GetCalls method
-  telephony-ofono: fix not canceling pending calls on exit
-  telephony-ofono: simplify watches handling logic
-  telephony-ofono: handle ofono appearing/disappearing from bus
-  telephony-ofono: add handling for Modem.Interfaces property
-  telephony-ofono: fix not updating indicators when a call is removed
-
- audio/telephony-ofono.c |  916 +++++++++++++++++++++++++++++++----------------
- 1 files changed, 604 insertions(+), 312 deletions(-)
 
