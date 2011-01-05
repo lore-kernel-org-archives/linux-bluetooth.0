@@ -1,30 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1769727890.20110105144834@gmail.com>
-References: <1769727890.20110105144834@gmail.com>
-Date: Wed, 5 Jan 2011 14:56:03 +0200
-Message-ID: <AANLkTi=mncb6yoZECV8Rc3sXVvMcKkT=gGGyLN0nu+8k@mail.gmail.com>
-Subject: Re: listening socket not notified when bluetoothd stops, but becomes unusable
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ilya Basin <basinilya@gmail.com>
+Date: Wed, 5 Jan 2011 14:12:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/5] TODO: Setup advertising parameters and data
+Message-ID: <20110105121248.GC18929@jh-x301>
+References: <1294091154-7367-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1294091154-7367-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-On Wed, Jan 5, 2011 at 1:48 PM, Ilya Basin <basinilya@gmail.com> wrote:
-> I use nonblocking sockets and select(). When I restart bluetoothd,
-> select() doen't return, but the listening socket won't accept
-> connections anymore. How to handle this correctly?
+On Mon, Jan 03, 2011, Claudio Takahasi wrote:
+> ---
+>  TODO |   11 +++++++++++
+>  1 files changed, 11 insertions(+), 0 deletions(-)
 
-If you are using BDADDR_ANY than that is probably ok, now for specific
-adapter this could be a bug but Im not sure about the powered state
-before you restart and if RememberPowered is set, it could be that the
-adapter is powered off after bluetoothd restart than you won't be able
-to accept connections.
+All 5 TODO patches have been pushed upstream.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
