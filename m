@@ -1,429 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar HJALMDAHL" <par-gunnar.p.hjalmdahl@stericsson.com>
+Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 support
+Date: Thu, 6 Jan 2011 19:46:04 +0100
+Cc: Pavan Savoy <pavan_savoy@sify.com>,
+ Vitaly Wool <vitalywool@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ Samuel Ortiz <sameo@linux.intel.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+ "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <AANLkTikxnWZNwf7AO0XnD0Y59Sdk9DMCsGtmap=H_gNk@mail.gmail.com> <AFCDDB4A3EA003429EEF1E7B211FDBBA3348BA7DD2@EXDCVYMBSTM005.EQ1STM.local>
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3348BA7DD2@EXDCVYMBSTM005.EQ1STM.local>
 MIME-Version: 1.0
-In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-Date: Fri, 7 Jan 2011 14:05:07 -0300
-Message-ID: <AANLkTimZk4FrRBGSp=W1LciZnrwjAqmm3k71tLA4AEYV@mail.gmail.com>
-Subject: Re: [PATCH] HCI Commands for LE White List
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201101061946.04790.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sumit,
+On Wednesday 05 January 2011, Par-Gunnar HJALMDAHL wrote:
 
-Could you please split this patch into minor functional patches?
+> Sorry for not answering sooner. I've been on Christmas and New Year vacation.
 
-On Thu, Jan 6, 2011 at 12:52 AM, Sumit Kumar BAJPAI
-<sumitkumar.bajpai@stericsson.com> wrote:
-> Added HCI commands for LE White List support.
-> These LE White List Commands can be tested from
-> hcitool.
+I'm also still catching up with email that has accumulated over my
+vacation, including your previous response.
+
+> > -----Original Message-----
+
+> > >
+> > > I would say our design would map like this:
+> > > common-hci-module: cg2900_core
+> > > serial, spi, i2c,... : cg2900_uart together with hci_ldisc (for other
+> > transports it would be different files)
+> > > bt, ti-radio, st-e-radio,...: cg2900_chip together with btcg2900 and
+> > other users per channel (cg2900_char_devices for users in User space)
+> > > So it is not a 1-to-1 mapping for the upper parts. I would draw it
+> > like this:
+> > >
+> > >                               bt   st-e-radio  st-e-gps
+> > >                                |         |          |
+> > >                                +---------+----------+
+> > >                                          |
+> > >                   ti-xx                st-e cg2900...
+> > >                     |                    |
+> > >                     +---------+----------+
+> > >                               |
+> > >                       common-hci-module
+> > >                               |
+> > >                   +-----------+-----------+
+> > >                   |        |       |      |
+> > >                 serial    spi     i2c    ...
+
+Even if the cg2900 based drivers (bt, st-e-radio, ...) have things in common
+that are not true in general, I'd still advocate a model where they all
+register directly to the hardware-independent layer. Your base cg2900
+driver can then become a library module that is used by some drivers that
+use the cg2900 specific functionality, just like there can be other similar
+libraries.
+
+> > regarding the architecture above suggested...
+> > Is having the common-hci-module, only way ?
+> > Why is this dependency on bluetooth at all?
+> > 
+> 
+> The reason I use Bluetooth is that it is the only standardized Host-Controller
+> interface in these controllers (at least in the CG2900 which I'm primarily addressing).
+
+That doesn't seem to make any sense if you don't present the standard interface
+to Linux but basically still need to come up with your own abstraction layer
+for it. It may have been the intention to use a standard HC interface, but either
+the HW guys screwed up completely by making it impossible to use it that way,
+or you haven't found the right way to integrate with the standard code.
+
+> > for example: today I don't compile my kernel with BT support, but
+> > still want to use
+> > the chip for FM & GPS, It should be possible correct ?
+> 
+> Yes, I use the header files from the Bluetooth files inside the driver (for
+> packet structures and protocol IDs). I do not use the BT binaries at all in
+> the common-hci-module or in the st-e cg2900 module. So it should be OK to
+> configure this out. The header files will be there any way.
+
+This proves the point I just made: If it's a standard hardware interface, you
+should be able to use the same driver module for a regular bluetooth HCI and
+for a cf2900 without bluetooth. There is nothing wrong with requiring kernel
+support for HCI if what you have is actually an HCI. Contrary to what Pavan
+said, I would not require these to be independent implementations. Of course
+in this case you would only require the base hci module to do this, not any of
+the upper-level BT modules.
+
+> > Even in TI case, although the firmware download is HCI-VS way, we
+> > don't use hci_core
+> > to interpret the responses...
+> > 
+> 
+> We don't use that either. We just use the structs and defines in the BT
+> headers. The dependency is only in btcg2900.c which is only included if
+> BT is configuration enabled.
+
+This sounds wrong for both TI and ST-E: AFAICT they are actually built
+around an HCI interface. It's unfortunate that the TI code actually got
+merged into the kernel like this.
+
+> > instead of common-hci-module, why not create a algo-driver layer 'ala
+> > i2c ? where individual drivers can register their receive handlers for
+> > data interpretation ?
+
+That would be what I suggested ;-)
+
+> In some way you then run into the same problem has I had in previous patch
+> sets. The functionalities supported is really determined by each chip.
+> You might or might not have for example GPS in a certain chip. So you do not
+> want a central module to expose all possible channels to the stacks on top.
 >
->
-> ---
->  lib/hci.c       |  107 +++++++++++++++++++++++++++++++
->  lib/hci_lib.h   |    4 +
->  tools/hcitool.c |  186 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 297 insertions(+), 0 deletions(-)
->  mode change 100644 => 100755 lib/hci.c
->  mode change 100644 => 100755 lib/hci_lib.h
->
-> diff --git a/lib/hci.c b/lib/hci.c
-> old mode 100644
-> new mode 100755
-> index 048fda4..5a0275c
-> --- a/lib/hci.c
-> +++ b/lib/hci.c
-> @@ -1291,6 +1291,113 @@ int hci_disconnect(int dd, uint16_t handle, uint8_t reason, int to)
->        return 0;
->  }
->
-> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type)
-Use pointer for bdaddr_t
-address types have defined values in the BT spec, declare an enum in hci.h
+> You only want the actually supported features to be exposed to upper layers.
+> Then the MFD system is pretty nice. It's easy and modularized to expose the
+> different channels as MFD cells.
 
-> +{
-> +       struct hci_request rq;
-> +       le_add_device_to_white_list_cp param_cp;
-It seems that you copied this declaration from set scan parameters
-function. Use only "cp", it is short for command parameters.
+But as soon as you have the concept of channels with a clearly defined
+interface, you have almost abstracted it enough to go all the way.
+ 
+> Also note that the common-hci-module is only really used until the connected
+> chip has been detected. The chip handler will then set the callback functions
+> so actual data transmissions never pass the common-hci-module. They go directly
+> from transport to chip handler. That is not really shown in the picture above.
+> Just imagine that common-hci-module is removed after a chip has been connected
+> and a chip handler has been determined.
+> 
+> I hope I haven't misunderstood your question. I do not know much about the I2C
+> system, but I tried to understand your question as best as I could.
 
-> +       uint8_t status;
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.bdaddr_type = type;
-> +       param_cp.bdaddr= addr;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_ADD_DEVICE_TO_WHITE_LIST;
-> +       rq.cparam = &param_cp;
-> +       rq.clen = LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-Use 1000, we are noticing timeout on some LE hardwares.
+I think there is a disconnect when talking about hierarchies, as it can be applied
+to different areas:
 
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type)
-> +{
-Same comment about address type and bdaddr_t pointer
+* module dependencies
+* device detection
+* sysfs object hierarchy
+* data flow
 
-> +       struct hci_request rq;
-> +       le_remove_device_from_white_list_cp param_cp;
-Same comment about param_cp: s/param_cp/cp
+These are often the same or at least related, but we may be talking about different
+aspects here. One issue that is often confusing is that from a module layering,
+you typically have a common module at the bottom and have both providers (e.g. hosts
+controller) and consumers of data (e.g. protocol drivers) on the top, where in a
+data flow chart, you typically have the provider below the common code and the
+consumer above if (or the other way round, if you prefer).
 
-> +       uint8_t status;
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.bdaddr_type = type;
-> +       param_cp.bdaddr= addr;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST;
-> +       rq.cparam = &param_cp;
-> +       rq.clen = LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-Use 1000
+Since the HCI code in this case is the common component, it really needs to be the
+module that everything else registers with in some way. You can have multiple
+modules providing HCIs to that, and I suppose a module that provides an HCI should
+also be the one that identifies the channels that are present.
 
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_read_white_list_size(int dd)
-> +{
-> +       struct hci_request rq;
-> +       le_read_white_list_size_rp param_cp;
-Rename param_cp to rp
+The consumers of those channels however should not interface with the module that
+provides the channels, but use the HCI code or something on top of it as an
+abstraction.
 
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.size=0;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
-> +       rq.rparam = &param_cp;
-> +       rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-> +
-> +       if (param_cp.status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       printf("LE White list size= %d\n", param_cp.size);
-printf? the size should be returned to the caller.
-Suggestion: add a pointer in the function parameters
-if (size)
-    *size = param_cp.size;
-
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_clear_white_list(int dd)
-> +{
-> +       struct hci_request rq;
-> +       uint8_t status;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-Use 1000
-
-> +               return -1;
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  int hci_read_local_name(int dd, int len, char *name, int to)
->  {
->        read_local_name_rp rp;
-> diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-> old mode 100644
-> new mode 100755
-> index b63a2a4..ed74dfc
-> --- a/lib/hci_lib.h
-> +++ b/lib/hci_lib.h
-> @@ -127,6 +127,10 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
->                uint16_t latency, uint16_t supervision_timeout,
->                uint16_t min_ce_length, uint16_t max_ce_length,
->                uint16_t *handle, int to);
-> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type);
-> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type);
-> +int hci_le_read_white_list_size(int dd);
-> +int hci_le_clear_white_list(int dd);
->
->  int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
->  int hci_get_route(bdaddr_t *bdaddr);
-> diff --git a/tools/hcitool.c b/tools/hcitool.c
-> index d50adaf..387c47c 100644
-> --- a/tools/hcitool.c
-> +++ b/tools/hcitool.c
-> @@ -2471,6 +2471,188 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
->        hci_close_dev(dd);
->  }
->
-> +static struct option leaddwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *leaddwl_help =
-> +       "Usage:\n"
-> +       "\tleaddwl <bdaddr>\n";
-> +
-> +static void cmd_leaddwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err, opt, dd;
-> +       bdaddr_t bdaddr;
-> +       uint8_t bdaddr_type;
-> +
-> +       for_each_opt(opt, leaddwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", leaddwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(1, 1, &argc, &argv, leaddwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       str2ba(argv[1], &bdaddr);
-> +       bdaddr_type = 0x00;
-Use enum
-
-> +
-> +       err = hci_le_add_to_white_list(dd, bdaddr ,bdaddr_type);
-Missing space before bdaddr_type
-
-> +       if (err < 0) {
-> +               perror("Cant add to white list");
-> +               exit(1);
-> +       }
-wrong coding style
-
-> +       else {
-> +               printf("Device added to white list");
-> +       }
-"{" not necessary
-
-> +
-> +       hci_close_dev(dd);
-Move this line after "hci_le_add_to_white_list()" call, otherwise dd
-will not be closed if the cmd fails
-
-> +
-remove empty line
-> +}
-> +
-> +static struct option lermwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *lermwl_help =
-> +       "Usage:\n"
-> +       "\tlermwl <bdaddr>\n";
-> +
-> +static void cmd_lermwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err, opt, dd;
-> +       bdaddr_t bdaddr;
-> +       uint8_t bdaddr_type;
-> +
-> +       for_each_opt(opt, lermwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", lermwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(1, 1, &argc, &argv, lermwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       str2ba(argv[1], &bdaddr);
-> +       bdaddr_type = 0x00;
-> +
-> +       err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
-> +       if (err < 0) {
-> +               perror("Cant remove from white list");
-> +               exit(1);
-> +       }
-> +        else {
-> +               printf("Device removed from white list");
-> +       }
-> +
-> +       hci_close_dev(dd);
-Same coding style issue and close "dd"
-
-> +
-> +}
-> +
-> +static struct option lerdwlsz_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *lerdwlsz_help =
-> +       "Usage:\n"
-> +       "\tlerdwlsz\n";
-> +
-> +static void cmd_lerdwlsz(int dev_id, int argc,char **argv)
-> +{
-> +       int err,dd, opt;
-> +
-> +       for_each_opt(opt, lerdwlsz_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", lerdwlsz_help);
-> +                       return;
-> +               }
-> +       }
-Add empty line here
-> +       helper_arg(0, 0, &argc, &argv, lermwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       err = hci_le_read_white_list_size(dd);
-> +       if (err < 0) {
-> +               perror("Cant read white list size");
-> +               exit(1);
-> +       }
-> +
-> +       hci_close_dev(dd);
-Missing close dd if the cmd fails
-Remove empty line here
-> +
-> +}
-> +
-> +
-Remove empty line here
-> +static struct option leclrwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *leclrwl_help =
-> +       "Usage:\n"
-> +       "\tleclrwl\n";
-> +
-> +static void cmd_leclrwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err,dd, opt;
-> +
-> +       for_each_opt(opt, leclrwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", leclrwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(0, 0, &argc, &argv, leclrwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       err = hci_le_clear_white_list(dd);
-> +       if (err < 0) {
-> +               perror("Cant clear white list");
-> +               exit(1);
-> +       }
-> +
-> +       hci_close_dev(dd);
-Missing close dd when the cmd fails
-Remove empty line here
-
-Claudio
-> +
-> +}
-> +
-> +
-Remove empty line here
->  static struct option ledc_options[] = {
->        { "help",       0, 0, 'h' },
->        { 0, 0, 0, 0 }
-> @@ -2547,6 +2729,10 @@ static struct {
->        { "clkoff", cmd_clkoff, "Read clock offset"                    },
->        { "clock",  cmd_clock,  "Read local or remote clock"           },
->        { "lescan", cmd_lescan, "Start LE scan"                        },
-> +       { "leaddwl", cmd_leaddwl, "Add this device to white list"          },
-> +       { "lermwl", cmd_lermwl, "Remove this device from white list"   },
-> +       { "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"               },
-> +       { "leclrwl",   cmd_leclrwl,   "Clear white list"                   },
->        { "lecc",   cmd_lecc,   "Create a LE Connection",              },
->        { "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
->        { NULL, NULL, 0 }
-> --
-> 1.6.5
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+	Arnd
