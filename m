@@ -1,554 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Jan 2011 23:32:45 +0100 (CET)
-From: Jesper Juhl <jj@chaosbits.net>
-To: Pavan Savoy <pavan_savoy@ti.com>
-cc: Raja Mani <raja_mani@ti.com>, marcel@holtmann.org, padovan@profusion.mobi,
-    linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5] Bluetooth: btwilink driver
-In-Reply-To: <AANLkTi=qaVEOpCVo5c-FOvOu-b8P-v0=nra4zCgCS=Mk@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1101062325490.13988@swampdragon.chaosbits.net>
-References: <1289394446-14021-1-git-send-email-pavan_savoy@ti.com> <AANLkTi=qaVEOpCVo5c-FOvOu-b8P-v0=nra4zCgCS=Mk@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-1886790196-1294353054=:13988"
+In-Reply-To: <1294185698-1499-3-git-send-email-bgix@codeaurora.org>
+References: <1294185698-1499-1-git-send-email-bgix@codeaurora.org>
+	<1294185698-1499-3-git-send-email-bgix@codeaurora.org>
+Date: Thu, 6 Jan 2011 14:31:45 -0300
+Message-ID: <AANLkTikm9zrZTSefZOEdETxEvrbFgkZHUmRu4i-jjVB5@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Fix gatt_read_char() to support long Attrib Values
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: padovan@profusion.mobi, rshaffer@codeaurora.org,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---8323328-1886790196-1294353054=:13988
-Content-Type: TEXT/PLAIN; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <alpine.LNX.2.00.1101062331031.13988@swampdragon.chaosbits.net>
-
-On Tue, 16 Nov 2010, Pavan Savoy wrote:
-
-> On Wed, Nov 10, 2010 at 6:37 PM,  <pavan_savoy@ti.com> wrote:
-> > From: Pavan Savoy <pavan_savoy@ti.com>
-> >
-> Marcel,
-> 
-> Any comments? on this version 5 patch?
-> 
-> > Thanks for the comments...
-> > This patch contains,
-> > v5 comments :-
-> > declaration and assiging of variables and private data fixed up.
-> > proper casting.
-> > removed redundant un-necessary checks in send_frame.
-> > HCI_RUNNING fixes in terms of test_and_set/clear bit instead of set and
-> > clear.
-> > removed redundant checks for hdev, skb being NULL.
-> > removed module_param of reset, also WiLink don't need HCI_RESET anyways.
-> > removed ti_st_register_dev function and functionality moved to _probe.
-> > module_init/exit function names fixed up.
-> >
-> > stat byte counter increments and tx_complete is similar to hci_ldisc.
-> > Also I have not implemented the flush routine, since the functionality
-> > which needs to be done in flush routine is done in the underlying driver
-> > which is the shared transport driver and moreover the btwilink driver by
-> > itself doesn't maintains queue or data relevant to transport, so nothing
-> > to do.
-> >
-> > And Yes, I have verified this driver with multiple up/down reset on
-> > hci0.
-> > Also I generally test a2dp/ftp to verify large data transfers.
-> >
-> > Please review and comment.
-> >
-> > Thanks,
-> > Pavan
-> >
-> > v4 comments :-
-> > module init now returns what platform_driver_register returns.
-> > type casting of void* private data has been removed
-> >
-> > v3 comments :-
-> > Lizardo,
-> > I have taken care of most of the comments you had.
-> > Have re-wrote some of the code commenting you've mentioned.
-> > Thanks for the comments,
-> >
-> > The other few like -EPERM for platform driver registration is to keep
-> > it similar to other drivers, type casting is maintained just to feel safe
-> > and have style similar to other drivers.
-> > BT_WILINK in Kconfig is similar to BT_MRVL.
-> > I hope those aren't too critical.
-> >
-> > -- patch description --
-> >
-> > This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> > Texas Instrument's WiLink chipsets combine wireless technologies
-> > like BT, FM, GPS and WLAN onto a single chip.
-> >
-> > This Bluetooth driver works on top of the TI_ST shared transport
-> > line discipline driver which also allows other drivers like
-> > FM V4L2 and GPS character driver to make use of the same UART interface.
-> >
-> > Kconfig and Makefile modifications to enable the Bluetooth
-> > driver for Texas Instrument's WiLink 7 chipset.
-> >
-> > Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> > ---
-> >  drivers/bluetooth/Kconfig    |   10 +
-> >  drivers/bluetooth/Makefile   |    1 +
-> >  drivers/bluetooth/btwilink.c |  379 ++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 390 insertions(+), 0 deletions(-)
-> >  create mode 100644 drivers/bluetooth/btwilink.c
-> >
-> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> > index 02deef4..8e0de9a 100644
-> > --- a/drivers/bluetooth/Kconfig
-> > +++ b/drivers/bluetooth/Kconfig
-> > @@ -219,4 +219,14 @@ config BT_ATH3K
-> >          Say Y here to compile support for "Atheros firmware download driver"
-> >          into the kernel or say M to compile it as module (ath3k).
-> >
-> > +config BT_WILINK
-> > +       tristate "Texas Instruments WiLink7 driver"
-> > +       depends on TI_ST
-> > +       help
-> > +         This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
-> > +         combo devices. This makes use of shared transport line discipline
-> > +         core driver to communicate with the BT core of the combo chip.
-> > +
-> > +         Say Y here to compile support for Texas Instrument's WiLink7 driver
-> > +         into the kernel or say M to compile it as module.
-> >  endmenu
-> > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> > index 71bdf13..f4460f4 100644
-> > --- a/drivers/bluetooth/Makefile
-> > +++ b/drivers/bluetooth/Makefile
-> > @@ -18,6 +18,7 @@ obj-$(CONFIG_BT_HCIBTSDIO)    += btsdio.o
-> >  obj-$(CONFIG_BT_ATH3K)         += ath3k.o
-> >  obj-$(CONFIG_BT_MRVL)          += btmrvl.o
-> >  obj-$(CONFIG_BT_MRVL_SDIO)     += btmrvl_sdio.o
-> > +obj-$(CONFIG_BT_WILINK)                += btwilink.o
-> >
-> >  btmrvl-y                       := btmrvl_main.o
-> >  btmrvl-$(CONFIG_DEBUG_FS)      += btmrvl_debugfs.o
-> > diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-> > new file mode 100644
-> > index 0000000..1b1c4bc
-> > --- /dev/null
-> > +++ b/drivers/bluetooth/btwilink.c
-> > @@ -0,0 +1,379 @@
-> > +/*
-> > + *  Texas Instrument's Bluetooth Driver For Shared Transport.
-> > + *
-> > + *  Bluetooth Driver acts as interface between HCI core and
-> > + *  TI Shared Transport Layer.
-> > + *
-> > + *  Copyright (C) 2009-2010 Texas Instruments
-> > + *  Author: Raja Mani <raja_mani@ti.com>
-> > + *     Pavan Savoy <pavan_savoy@ti.com>
-> > + *
-> > + *  This program is free software; you can redistribute it and/or modify
-> > + *  it under the terms of the GNU General Public License version 2 as
-> > + *  published by the Free Software Foundation.
-> > + *
-> > + *  This program is distributed in the hope that it will be useful,
-> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + *  GNU General Public License for more details.
-> > + *
-> > + *  You should have received a copy of the GNU General Public License
-> > + *  along with this program; if not, write to the Free Software
-> > + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-> > + *
-> > + */
-> > +
-> > +#include <linux/platform_device.h>
-> > +#include <net/bluetooth/bluetooth.h>
-> > +#include <net/bluetooth/hci_core.h>
-> > +
-> > +#include <linux/ti_wilink_st.h>
-> > +
-> > +/* Bluetooth Driver Version */
-> > +#define VERSION               "1.0"
-> > +
-> > +/* Number of seconds to wait for registration completion
-> > + * when ST returns PENDING status.
-> > + */
-> > +#define BT_REGISTER_TIMEOUT   6000     /* 6 sec */
-> > +
-> > +/**
-> > + * struct ti_st - driver operation structure
-> > + * @hdev: hci device pointer which binds to bt driver
-> > + * @reg_status: ST registration callback status
-> > + * @st_write: write function provided by the ST driver
-> > + *     to be used by the driver during send_frame.
-> > + * @wait_reg_completion - completion sync between ti_st_open
-> > + *     and ti_st_registration_completion_cb.
-> > + */
-> > +struct ti_st {
-> > +       struct hci_dev *hdev;
-> > +       char reg_status;
-> > +       long (*st_write) (struct sk_buff *);
-> > +       struct completion wait_reg_completion;
-> > +};
-> > +
-> > +/* Increments HCI counters based on pocket ID (cmd,acl,sco) */
-> > +static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
-> > +{
-> > +       struct hci_dev *hdev = hst->hdev;
-> > +
-> > +       /* Update HCI stat counters */
-> > +       switch (pkt_type) {
-> > +       case HCI_COMMAND_PKT:
-> > +               hdev->stat.cmd_tx++;
-> > +               break;
-> > +
-> > +       case HCI_ACLDATA_PKT:
-> > +               hdev->stat.acl_tx++;
-> > +               break;
-> > +
-> > +       case HCI_SCODATA_PKT:
-> > +               hdev->stat.sco_tx++;
-> > +               break;
-> > +       }
-> > +}
-> > +
-> > +/* ------- Interfaces to Shared Transport ------ */
-> > +
-> > +/* Called by ST layer to indicate protocol registration completion
-> > + * status.ti_st_open() function will wait for signal from this
-> > + * API when st_register() function returns ST_PENDING.
-> > + */
-> > +static void st_registration_completion_cb(void *priv_data, char data)
-> > +{
-> > +       struct ti_st *lhst = priv_data;
-> > +
-> > +       /* Save registration status for use in ti_st_open() */
-> > +       lhst->reg_status = data;
-> > +       /* complete the wait in ti_st_open() */
-> > +       complete(&lhst->wait_reg_completion);
-> > +}
-> > +
-> > +/* Called by Shared Transport layer when receive data is
-> > + * available */
-> > +static long st_receive(void *priv_data, struct sk_buff *skb)
-> > +{
-> > +       struct ti_st *lhst = priv_data;
-> > +       int err;
-> > +
-> > +       if (!skb)
-> > +               return -EFAULT;
-> > +
-> > +       if (!lhst) {
-> > +               kfree_skb(skb);
-> > +               return -EFAULT;
-> > +       }
-> > +
-> > +       skb->dev = (void *) lhst->hdev;
-> > +
-> > +       /* Forward skb to HCI core layer */
-> > +       err = hci_recv_frame(skb);
-> > +       if (err < 0) {
-> > +               BT_ERR("Unable to push skb to HCI core(%d)", err);
-> > +               return err;
-> > +       }
-> > +
-> > +       lhst->hdev->stat.byte_rx += skb->len;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +/* ------- Interfaces to HCI layer ------ */
-> > +/* protocol structure registered with shared transport */
-> > +static struct st_proto_s ti_st_proto = {
-> > +       .type = ST_BT,
-> > +       .recv = st_receive,
-> > +       .reg_complete_cb = st_registration_completion_cb,
-> > +};
-> > +
-> > +/* Called from HCI core to initialize the device */
-> > +static int ti_st_open(struct hci_dev *hdev)
-> > +{
-> > +       unsigned long timeleft;
-> > +       struct ti_st *hst;
-> > +       int err;
-> > +
-> > +       BT_DBG("%s %p", hdev->name, hdev);
-> > +
-> > +       /* provide contexts for callbacks from ST */
-> > +       hst = hdev->driver_data;
-> > +       ti_st_proto.priv_data = hst;
-> > +
-> > +       err = st_register(&ti_st_proto);
-> > +       if (err == -EINPROGRESS) {
-> > +               /* Prepare wait-for-completion handler data structures.
-> > +                * Needed to synchronize this and
-> > +                * st_registration_completion_cb() functions.
-> > +                */
-> > +               init_completion(&hst->wait_reg_completion);
-> > +
-> > +               /* Reset ST registration callback status flag , this value
-> > +                * will be updated in ti_st_registration_completion_cb()
-> > +                * function whenever it called from ST driver.
-> > +                */
-> > +               hst->reg_status = -EINPROGRESS;
-> > +
-> > +               /* ST is busy with either protocol registration or firmware
-> > +                * download. Wait until the registration callback is called
-> > +                */
-> > +               BT_DBG(" waiting for registration completion signal from ST");
-> > +
-> > +               timeleft = wait_for_completion_timeout
-> > +                       (&hst->wait_reg_completion,
-> > +                        msecs_to_jiffies(BT_REGISTER_TIMEOUT));
-> > +               if (!timeleft) {
-> > +                       BT_ERR("Timeout(%d sec),didn't get reg "
-> > +                                       "completion signal from ST",
-> > +                                       BT_REGISTER_TIMEOUT / 1000);
-> > +                       return -ETIMEDOUT;
-> > +               }
-> > +
-> > +               /* Is ST registration callback called with ERROR status? */
-> > +               if (hst->reg_status != 0) {
-> > +                       BT_ERR("ST registration completed with invalid "
-> > +                                       "status %d", hst->reg_status);
-> > +                       return -EAGAIN;
-> > +               }
-> > +               err = 0;
-> > +       } else if (err == -EPERM) {
-> > +               BT_ERR("st_register failed %d", err);
-> > +               return err;
-> > +       }
-> > +
-> > +       /* ti_st_proto.write is filled up by the underlying shared
-> > +        * transport driver upon registration
-> > +        */
-> > +       hst->st_write = ti_st_proto.write;
-> > +       if (!hst->st_write) {
-> > +               BT_ERR("undefined ST write function");
-> > +
-> > +               /* Undo registration with ST */
-> > +               err = st_unregister(ST_BT);
-> > +               if (err)
-> > +                       BT_ERR("st_unregister() failed with error %d", err);
-> > +
-> > +               hst->st_write = NULL;
-> > +               return err;
-> > +       }
-> > +
-> > +       /* Registration with ST layer is successful,
-> > +        * hardware is ready to accept commands from HCI core.
-> > +        */
-> > +       if (test_and_set_bit(HCI_RUNNING, &hdev->flags)) {
-> > +               clear_bit(HCI_RUNNING, &hdev->flags);
-> > +               err = st_unregister(ST_BT);
-> > +               if (err)
-> > +                       BT_ERR("st_unregister() failed with error %d", err);
-> > +               hst->st_write = NULL;
-> > +       }
-> > +
-> > +       return err;
-> > +}
-> > +
-> > +/* Close device */
-> > +static int ti_st_close(struct hci_dev *hdev)
-> > +{
-> > +       int err;
-> > +       struct ti_st *hst = hdev->driver_data;
-> > +
-> > +       /* continue to unregister from transport */
-> > +       err = st_unregister(ST_BT);
-> > +       if (err)
-> > +               BT_ERR("st_unregister() failed with error %d", err);
-> > +
-> > +       hst->st_write = NULL;
-> > +
-> > +       if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
-> > +               return 0;
-> > +
-> > +       return err;
-> > +}
-> > +
-> > +static int ti_st_send_frame(struct sk_buff *skb)
-> > +{
-> > +       struct hci_dev *hdev;
-> > +       struct ti_st *hst;
-> > +       long len;
-> > +
-> > +       hdev = (struct hci_dev *)skb->dev;
-> > +
-> > +       if (!test_bit(HCI_RUNNING, &hdev->flags))
-> > +               return -EBUSY;
-> > +
-> > +       hst = hdev->driver_data;
-> > +
-> > +       /* Prepend skb with frame type */
-> > +       memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-> > +
-> > +       BT_DBG(" %s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type,
-> > +                       skb->len);
-> > +
-> > +       /* Insert skb to shared transport layer's transmit queue.
-> > +        * Freeing skb memory is taken care in shared transport layer,
-> > +        * so don't free skb memory here.
-> > +        */
-> > +       len = hst->st_write(skb);
-> > +       if (len < 0) {
-> > +               kfree_skb(skb);
-> > +               BT_ERR(" ST write failed (%ld)", len);
-> > +               return -EAGAIN;
-> > +       }
-> > +
-> > +       /* ST accepted our skb. So, Go ahead and do rest */
-> > +       hdev->stat.byte_tx += len;
-> > +       ti_st_tx_complete(hst, bt_cb(skb)->pkt_type);
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static void ti_st_destruct(struct hci_dev *hdev)
-> > +{
-> > +       BT_DBG("%s", hdev->name);
-> > +
-> > +       /* free ti_st memory */
-> > +       kfree(hdev->driver_data);
-> > +
-> > +       return;
-> > +}
-> > +
-> > +static int bt_ti_probe(struct platform_device *pdev)
-> > +{
-> > +       static struct ti_st *hst;
-> > +       struct hci_dev *hdev;
-> > +       int err;
-> > +
-> > +       hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
-> > +       if (!hst)
-> > +               return -ENOMEM;
-> > +
-> > +       /* Expose "hciX" device to user space */
-> > +       hdev = hci_alloc_dev();
-> > +       if (!hdev)
-> > +               return -ENOMEM;
-> > +
-> > +       BT_DBG("hdev %p", hdev);
-> > +
-> > +       hst->hdev = hdev;
-> > +       hdev->bus = HCI_UART;
-> > +       hdev->driver_data = hst;
-> > +       hdev->open = ti_st_open;
-> > +       hdev->close = ti_st_close;
-> > +       hdev->flush = NULL;
-> > +       hdev->send = ti_st_send_frame;
-> > +       hdev->destruct = ti_st_destruct;
-> > +       hdev->owner = THIS_MODULE;
-> > +
-> > +       err = hci_register_dev(hdev);
-> > +       if (err < 0) {
-> > +               BT_ERR("Can't register HCI device error %d", err);
-> > +               hci_free_dev(hdev);
-> > +               return err;
-> > +       }
-> > +
-> > +       BT_DBG(" HCI device registered (hdev %p)", hdev);
-> > +
-> > +       dev_set_drvdata(&pdev->dev, hst);
-> > +       return err;
-> > +}
-> > +
-> > +static int bt_ti_remove(struct platform_device *pdev)
-> > +{
-> > +       struct hci_dev *hdev;
-> > +       struct ti_st *hst = dev_get_drvdata(&pdev->dev);
-> > +
-> > +       if (!hst)
-> > +               return -EFAULT;
-> > +
-> > +       hdev = hst->hdev;
-> > +       ti_st_close(hdev);
-> > +       hci_unregister_dev(hdev);
-> > +
-> > +       /* Free HCI device memory */
-> > +       hci_free_dev(hdev);
-> > +
-> > +       /* Free driver data memory */
-> > +       kfree(hst);
-> > +
-> > +       dev_set_drvdata(&pdev->dev, NULL);
-> > +       return 0;
-> > +}
-> > +
-> > +static struct platform_driver btwilink_driver = {
-> > +       .probe = bt_ti_probe,
-> > +       .remove = bt_ti_remove,
-> > +       .driver = {
-> > +               .name = "btwilink",
-> > +               .owner = THIS_MODULE,
-> > +       },
-> > +};
-> > +
-> > +/* ------- Module Init/Exit interfaces ------ */
-> > +static int __init btwilink_init(void)
-> > +{
-> > +       long ret;
-> > +
-> > +       BT_INFO(" Bluetooth Driver for TI WiLink - Version %s", VERSION);
-> > +
-> > +       ret = platform_driver_register(&btwilink_driver);
-> > +       if (ret != 0) {
-> > +               BT_ERR("btwilink platform driver registration failed");
-> > +               return ret;
-> > +       }
-> > +       return 0;
-> > +}
-
-Personally I would prefer
-
-static int __init btwilink_init(void)
-{
-       int ret;
-
-       BT_INFO("Bluetooth Driver for TI WiLink - Version %s", VERSION);
-
-       ret = platform_driver_register(&btwilink_driver);
-       if (ret != 0)
-               BT_ERR("btwilink platform driver registration failed"); 
-       return ret;
-}
-
-The source is shorter. 'ret' is actually of the same type as returned by 
-'platform_driver_register()' and the function itself. There's no space at 
-the beginning of the BT_INFO() line (perhaps there's a reason for it, but 
-I don't see it).
-
-
-> > +
-> > +static void __exit btwilink_exit(void)
-> > +{
-> > +       platform_driver_unregister(&btwilink_driver);
-> > +}
-> > +
-> > +module_init(btwilink_init);
-> > +module_exit(btwilink_exit);
-> > +
-> > +/* ------ Module Info ------ */
-> > +
-> > +MODULE_AUTHOR("Raja Mani <raja_mani@ti.com>");
-> > +MODULE_DESCRIPTION("Bluetooth Driver for TI Shared Transport" VERSION);
-> > +MODULE_VERSION(VERSION);
-> > +MODULE_LICENSE("GPL");
-> > --
-> > 1.5.6.3
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
-> 
-
--- 
-Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
-Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
-Plain text mails only, please.
---8323328-1886790196-1294353054=:13988--
+SGkgQnJpYW4sCgpPbiBUdWUsIEphbiA0LCAyMDExIGF0IDk6MDEgUE0sIEJyaWFuIEdpeCA8Ymdp
+eEBjb2RlYXVyb3JhLm9yZz4gd3JvdGU6Cj4gRml4IGdhdHRfcmVhZF9jaGFyKCkgdG8gc3VwcG9y
+dCBsb25nIEF0dHJpYnV0ZSBWYWx1ZXMgYnkgcmVjb2duaXppbmcKPiDCoCDCoCDCoCDCoHRoYXQg
+cmVzdWx0cyBsb25nZXIgdGhhdCAyMSBvY3RldHMgbWF5IGluY2x1ZGUgZGF0YSBiZXlvbmQKPiDC
+oCDCoCDCoCDCoHdoYXQgaGFzIGJlZW4gcmV0dXJuZWQgd2l0aCB0aGUgZmlyc3QgcmVhZC4gRXh0
+cmEgZGF0YSBpcwo+IMKgIMKgIMKgIMKgb2J0YWluZWQgYnkgaXNzdWluZyBSRUFEX0JMT0IgcmVx
+dWVzdHMgdW50aWwgZWl0aGVyIGEKPiDCoCDCoCDCoCDCoHJlc3VsdCBpcyByZXR1cm5lZCBzaG9y
+dGVyIHRoYW4gMjIgb2N0ZXRzLCBvciBhbiBlcnJvcgo+IMKgIMKgIMKgIMKgaXMgcmVjaWV2ZWQg
+aW5kaWNhdGluZyB0aGF0IG5vIGZ1cnRoZXIgZGF0YSBpcyBhdmFpbGFibGUuCj4gwqAgwqAgwqAg
+wqBUaGUgQVBJIGZvciB0aGlzIGZ1bmN0aW9uIGhhcyBub3QgY2hhbmdlZC4KTm8gdGFicyBoZXJl
+LgoKPiAtLS0KPiDCoGF0dHJpYi9nYXR0LmMgfCDCoDEzNCArKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KPiDCoDEgZmlsZXMgY2hhbmdlZCwg
+MTMyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvYXR0cmli
+L2dhdHQuYyBiL2F0dHJpYi9nYXR0LmMKPiBpbmRleCAzMjA3NTlmLi4zMDRjMmIxIDEwMDY0NAo+
+IC0tLSBhL2F0dHJpYi9nYXR0LmMKPiArKysgYi9hdHRyaWIvZ2F0dC5jCj4gQEAgLTk3LDE1ICs5
+NywxNDUgQEAgZ3VpbnQgZ2F0dF9yZWFkX2NoYXJfYnlfdXVpZChHQXR0cmliICphdHRyaWIsIHVp
+bnQxNl90IHN0YXJ0LCB1aW50MTZfdCBlbmQsCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBwZHUsIHBsZW4sIGZ1bmMsIHVzZXJfZGF0
+YSwgTlVMTCk7Cj4gwqB9Cj4KPiArc3RydWN0IHJlYWRfbG9uZ19kYXRhIHsKPiArIMKgIMKgIMKg
+IEdBdHRyaWIgKmF0dHJpYjsKPiArIMKgIMKgIMKgIEdBdHRyaWJSZXN1bHRGdW5jIGZ1bmM7Cj4g
+KyDCoCDCoCDCoCBncG9pbnRlciB1c2VyX2RhdGE7Cj4gKyDCoCDCoCDCoCBndWludDggKmJ1ZmZl
+cjsKPiArIMKgIMKgIMKgIGd1aW50MTYgc2l6ZTsKPiArIMKgIMKgIMKgIGd1aW50MTYgaGFuZGxl
+Owo+ICsgwqAgwqAgwqAgZ3VpbnQgaWQ7Cj4gKyDCoCDCoCDCoCBndWludDggcmVmOwo+ICt9Owo+
+ICsKPiArc3RhdGljIHZvaWQgcmVhZF9sb25nX2Rlc3Ryb3koZ3BvaW50ZXIgdXNlcl9kYXRhKQo+
+ICt7Cj4gKyDCoCDCoCDCoCBzdHJ1Y3QgcmVhZF9sb25nX2RhdGEgKmxvbmdfcmVhZCA9IHVzZXJf
+ZGF0YTsKPiArCj4gKyDCoCDCoCDCoCBpZiAoLS1sb25nX3JlYWQtPnJlZikKPiArIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIHJldHVybjsKdXNlIGdfYXRvbWljX2ludF9kZWNfYW5kX3Rlc3QKCj4gKwo+
+ICsgwqAgwqAgwqAgaWYgKGxvbmdfcmVhZC0+YnVmZmVyICE9IE5VTEwpCj4gKyDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCBnX2ZyZWUobG9uZ19yZWFkLT5idWZmZXIpOwo+ICsKPiArIMKgIMKgIMKgIGdf
+ZnJlZShsb25nX3JlYWQpOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCByZWFkX2Jsb2JfaGVscGVy
+KGd1aW50OCBzdGF0dXMsIGNvbnN0IGd1aW50OCAqcnBkdSwgZ3VpbnQxNiBybGVuLAo+ICsgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgZ3BvaW50ZXIgdXNlcl9kYXRhKQo+ICt7Cj4gKyDCoCDCoCDC
+oCBzdHJ1Y3QgcmVhZF9sb25nX2RhdGEgKmxvbmdfcmVhZCA9IHVzZXJfZGF0YTsKPiArIMKgIMKg
+IMKgIHVpbnQ4X3QgcGR1W0FUVF9ERUZBVUxUX01UVV07Cj4gKyDCoCDCoCDCoCBndWludDggKnRt
+cDsKPiArIMKgIMKgIMKgIGd1aW50MTYgcGxlbjsKPiArIMKgIMKgIMKgIGd1aW50IGlkOwo+ICsK
+PiArIMKgIMKgIMKgIGlmIChzdGF0dXMgPT0gQVRUX0VDT0RFX0FUVFJfTk9UX0xPTkcgfHwKPiAr
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IHN0YXR1cyA9PSBBVFRfRUNPREVfSU5WQUxJRF9PRkZTRVQpIHsKPiArIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIHN0YXR1cyA9IDA7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBnb3RvIGRvbmU7Cj4g
+KyDCoCDCoCDCoCB9Cj4gKwo+ICsgwqAgwqAgwqAgaWYgKHN0YXR1cyAhPSAwIHx8IHJsZW4gPT0g
+MSkKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gZG9uZTsKPiArCj4gKyDCoCDCoCDCoCB0
+bXAgPSBnX3RyeV9yZWFsbG9jKGxvbmdfcmVhZC0+YnVmZmVyLCBsb25nX3JlYWQtPnNpemUgKyBy
+bGVuIC0gMSk7Cj4gKwo+ICsgwqAgwqAgwqAgaWYgKHRtcCA9PSBOVUxMKSB7Cj4gKyDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCBzdGF0dXMgPSBBVFRfRUNPREVfSU5TVUZGX1JFU09VUkNFUzsKPiArIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gZG9uZTsKPiArIMKgIMKgIMKgIH0KPiArCj4gKyDCoCDC
+oCDCoCBtZW1jcHkoJnRtcFtsb25nX3JlYWQtPnNpemVdLCAmcnBkdVsxXSwgcmxlbiAtIDEpOwo+
+ICsgwqAgwqAgwqAgbG9uZ19yZWFkLT5idWZmZXIgPSB0bXA7Cj4gKyDCoCDCoCDCoCBsb25nX3Jl
+YWQtPnNpemUgKz0gcmxlbiAtIDE7Ck1heWJlIHVzaW5nIEdCeXRlQXJyYXkgd2lsbCBtYWtlIHlv
+dXIgY29kZSBzaW1wbGVyLgoKPiArCj4gKyDCoCDCoCDCoCBpZiAocmxlbiA8IEFUVF9ERUZBVUxU
+X01UVSkKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gZG9uZTsKCkZvciBub3cgaXQgaXMg
+ZmluZSBmb3IgdGVzdGluZy4gQnV0IGl0IG5lZWRzIHRvIGJlIGZpeGVkIGxhdGVyLCBNVFUKY2Fu
+IGNoYW5nZSBhZnRlciB0aGUgTVRVIG5lZ290aWF0aW9uLCB0aGUgbmV3IHZhbHVlIGNvdWxkIGJl
+IGFjY2Vzc2VkCnVzaW5nIGEgZ2V0c29ja29wdCwgcGFzc2luZyB0aGUgdmFsdWUgdG8gZ2F0dF8q
+IGZ1bmN0aW9ucyBvciB1c2luZyBhCkdBdHRyaWIgZnVuY3Rpb24uCgo+ICsKPiArIMKgIMKgIMKg
+IHBsZW4gPSBlbmNfcmVhZF9ibG9iX3JlcShsb25nX3JlYWQtPmhhbmRsZSwgbG9uZ19yZWFkLT5z
+aXplIC0gMSwKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHBkdSwgc2l6ZW9mKHBkdSkpOwo+
+ICsgwqAgwqAgwqAgaWQgPSBnX2F0dHJpYl9zZW5kKGxvbmdfcmVhZC0+YXR0cmliLCBsb25nX3Jl
+YWQtPmlkLAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+QVRUX09QX1JFQURfQkxPQl9SRVEsIHBkdSwgcGxlbiwKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJlYWRfYmxvYl9oZWxwZXIsIGxvbmdfcmVhZCwgcmVh
+ZF9sb25nX2Rlc3Ryb3kpOwo+ICsKPiArIMKgIMKgIMKgIGlmIChpZCAhPSAwKSB7Cj4gKyDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCBsb25nX3JlYWQtPnJlZisrOwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgcmV0dXJuOwo+ICsgwqAgwqAgwqAgfQo+ICsKPiArIMKgIMKgIMKgIHN0YXR1cyA9IEFUVF9F
+Q09ERV9JTzsKPiArCj4gK2RvbmU6Cj4gKyDCoCDCoCDCoCBsb25nX3JlYWQtPmZ1bmMoc3RhdHVz
+LCBsb25nX3JlYWQtPmJ1ZmZlciwgbG9uZ19yZWFkLT5zaXplLAo+ICsgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgbG9uZ19yZWFkLT51c2VyX2RhdGEpOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9pZCBy
+ZWFkX2NoYXJfaGVscGVyKGd1aW50OCBzdGF0dXMsIGNvbnN0IGd1aW50OCAqcnBkdSwKPiArIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGd1
+aW50MTYgcmxlbiwgZ3BvaW50ZXIgdXNlcl9kYXRhKQo+ICt7Cj4gKyDCoCDCoCDCoCBzdHJ1Y3Qg
+cmVhZF9sb25nX2RhdGEgKmxvbmdfcmVhZCA9IHVzZXJfZGF0YTsKPiArIMKgIMKgIMKgIHVpbnQ4
+X3QgcGR1W0FUVF9ERUZBVUxUX01UVV07Cj4gKyDCoCDCoCDCoCBndWludDE2IHBsZW47Cj4gKyDC
+oCDCoCDCoCBndWludCBpZDsKPiArCj4gKyDCoCDCoCDCoCBpZiAoc3RhdHVzICE9IDAgfHwgcmxl
+biA8IEFUVF9ERUZBVUxUX01UVSkKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGdvdG8gZG9uZTsK
+PiArCj4gKyDCoCDCoCDCoCBsb25nX3JlYWQtPmJ1ZmZlciA9IGdfbWFsbG9jKHJsZW4pOwo+ICsK
+PiArIMKgIMKgIMKgIGlmIChsb25nX3JlYWQtPmJ1ZmZlciA9PSBOVUxMKQo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgZ290byBkb25lOwo+ICsKPiArIMKgIMKgIMKgIG1lbWNweShsb25nX3JlYWQt
+PmJ1ZmZlciwgcnBkdSwgcmxlbik7Cj4gKyDCoCDCoCDCoCBsb25nX3JlYWQtPnNpemUgPSBybGVu
+Owo+ICsKPiArIMKgIMKgIMKgIHBsZW4gPSBlbmNfcmVhZF9ibG9iX3JlcShsb25nX3JlYWQtPmhh
+bmRsZSwgcmxlbiAtIDEsIHBkdSwgc2l6ZW9mKHBkdSkpOwo+ICsgwqAgwqAgwqAgaWQgPSBnX2F0
+dHJpYl9zZW5kKGxvbmdfcmVhZC0+YXR0cmliLCBsb25nX3JlYWQtPmlkLAo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgQVRUX09QX1JFQURfQkxPQl9SRVEsIHBkdSwgcGxlbiwg
+cmVhZF9ibG9iX2hlbHBlciwKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGxv
+bmdfcmVhZCwgcmVhZF9sb25nX2Rlc3Ryb3kpOwo+ICsKPiArIMKgIMKgIMKgIGlmIChpZCAhPSAw
+KSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBsb25nX3JlYWQtPnJlZisrOwpVc2UgZ19hdG9t
+aWNfaW50X3ggZnVuY3Rpb24KCgo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmV0dXJuOwo+ICsg
+wqAgwqAgwqAgfQo+ICsKPiArIMKgIMKgIMKgIHN0YXR1cyA9IEFUVF9FQ09ERV9JTzsKPiArCj4g
+K2RvbmU6Cj4gKyDCoCDCoCDCoCBsb25nX3JlYWQtPmZ1bmMoc3RhdHVzLCBycGR1LCBybGVuLCBs
+b25nX3JlYWQtPnVzZXJfZGF0YSk7Cj4gK30KPiArCj4gwqBndWludCBnYXR0X3JlYWRfY2hhcihH
+QXR0cmliICphdHRyaWIsIHVpbnQxNl90IGhhbmRsZSwgR0F0dHJpYlJlc3VsdEZ1bmMgZnVuYywK
+PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGdwb2ludGVyIHVzZXJfZGF0YSkKPiDCoHsKPiDC
+oCDCoCDCoCDCoHVpbnQ4X3QgcGR1W0FUVF9ERUZBVUxUX01UVV07Cj4gwqAgwqAgwqAgwqBndWlu
+dDE2IHBsZW47Cj4gKyDCoCDCoCDCoCBndWludCBpZDsKPiArIMKgIMKgIMKgIHN0cnVjdCByZWFk
+X2xvbmdfZGF0YSAqbG9uZ19yZWFkOwo+ICsKPiArIMKgIMKgIMKgIGxvbmdfcmVhZCA9IGdfdHJ5
+X25ldzAoc3RydWN0IHJlYWRfbG9uZ19kYXRhLCAxKTsKPiArCj4gKyDCoCDCoCDCoCBpZiAobG9u
+Z19yZWFkID09IE5VTEwpCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCByZXR1cm4gMDsKPiArCj4g
+KyDCoCDCoCDCoCBsb25nX3JlYWQtPmF0dHJpYiA9IGF0dHJpYjsKPiArIMKgIMKgIMKgIGxvbmdf
+cmVhZC0+ZnVuYyA9IGZ1bmM7Cj4gKyDCoCDCoCDCoCBsb25nX3JlYWQtPnVzZXJfZGF0YSA9IHVz
+ZXJfZGF0YTsKPiArIMKgIMKgIMKgIGxvbmdfcmVhZC0+aGFuZGxlID0gaGFuZGxlOwo+Cj4gwqAg
+wqAgwqAgwqBwbGVuID0gZW5jX3JlYWRfcmVxKGhhbmRsZSwgcGR1LCBzaXplb2YocGR1KSk7Cj4g
+LSDCoCDCoCDCoCByZXR1cm4gZ19hdHRyaWJfc2VuZChhdHRyaWIsIDAsIEFUVF9PUF9SRUFEX1JF
+USwgcGR1LCBwbGVuLCBmdW5jLAo+IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgdXNlcl9kYXRh
+LCBOVUxMKTsKPiArIMKgIMKgIMKgIGlkID0gZ19hdHRyaWJfc2VuZChhdHRyaWIsIDAsIEFUVF9P
+UF9SRUFEX1JFUSwgcGR1LCBwbGVuLAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgcmVhZF9jaGFyX2hlbHBlciwgbG9uZ19yZWFkLCByZWFkX2xvbmdfZGVz
+dHJveSk7Cj4gKwo+ICsgwqAgwqAgwqAgaWYgKGlkID09IDApCj4gKyDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCBnX2ZyZWUobG9uZ19yZWFkKTsKPiArIMKgIMKgIMKgIGVsc2Ugewo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgbG9uZ19yZWFkLT5yZWYrKzsKc2FtZSBoZXJlLgoKQ2xhdWRpbwo+ICsgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgbG9uZ19yZWFkLT5pZCA9IGlkOwo+ICsgwqAgwqAgwqAgfQo+ICsK
+PiArIMKgIMKgIMKgIHJldHVybiBpZDsKPiDCoH0KPgo+IMKgZ3VpbnQgZ2F0dF93cml0ZV9jaGFy
+KEdBdHRyaWIgKmF0dHJpYiwgdWludDE2X3QgaGFuZGxlLCB1aW50OF90ICp2YWx1ZSwKPiAtLQo+
+IDEuNy4xCj4gLS0KPiBCcmlhbiBHaXgKPiBiZ2l4QGNvZGVhdXJvcmEub3JnCj4gRW1wbG95ZWUg
+b2YgUXVhbGNvbW0gSW5ub3ZhdGlvbiBDZW50ZXIsIEluYy4KPiBRdWFsY29tbSBJbm5vdmF0aW9u
+IENlbnRlciwgSW5jLiBpcyBhIG1lbWJlciBvZiBDb2RlIEF1cm9yYSBGb3J1bQo+Cg==
