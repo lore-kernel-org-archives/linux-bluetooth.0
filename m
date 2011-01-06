@@ -1,246 +1,369 @@
 Return-Path: <cyrus@holtmann.org>
+From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 6 Jan 2011 04:52:37 +0100
+Subject: [PATCH] HCI Commands for LE White List
+Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <1294185698-1499-2-git-send-email-bgix@codeaurora.org>
-References: <1294185698-1499-1-git-send-email-bgix@codeaurora.org>
-	<1294185698-1499-2-git-send-email-bgix@codeaurora.org>
-Date: Thu, 6 Jan 2011 14:17:43 -0300
-Message-ID: <AANLkTim=Xu2YtwoUqU+GvS_5Kj059kbOubxdnO4H9XGa@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Fix g_attrib_send() to include a new ID parameter
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: padovan@profusion.mobi, rshaffer@codeaurora.org,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Added HCI commands for LE White List support.
+These LE White List Commands can be tested from
+hcitool.
 
-On Tue, Jan 4, 2011 at 9:01 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> Overall purpose of change is to enable a GATT procedure to be
->        executed atomically, even if it requires multiple ATT
->        request/response transactions.
->
-> Fix g_attrib_send() to include an ID parameter, if the pkt to
->        be sent should be added to the Head of the pkt queue.
->        If the ID is Zero, legacy functionality is maintained,
->        and the pkt will be added at the tail of the queuer, and
->        a new ID will be generated, and returned to the caller. If
->        ID is non-zero, the pkt will be added to the head of the
->        queue, with the ID value requested, which will also be
->        returned to the caller.
->
-> Fix received_data() to not service the send queue until after the
->        received data has been processed by calling the cmd->func()
->        callback, to allow the callback to insert another pkt on
->        the head of the queue.
->
 
-We don't use tabs in the comments.
+---
+ lib/hci.c       |  107 +++++++++++++++++++++++++++++++
+ lib/hci_lib.h   |    4 +
+ tools/hcitool.c |  186 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 297 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 lib/hci.c
+ mode change 100644 => 100755 lib/hci_lib.h
 
-> Fix all callers of g_attrib_send() to include new parameter.
-> ---
->  attrib/client.c     |    2 +-
->  attrib/gatt.c       |   12 ++++++------
->  attrib/gattrib.c    |   22 +++++++++++++++-------
->  attrib/gattrib.h    |    7 ++++---
->  attrib/gatttool.c   |    2 +-
->  src/attrib-server.c |    2 +-
->  6 files changed, 28 insertions(+), 19 deletions(-)
->
-> diff --git a/attrib/client.c b/attrib/client.c
-> index 10bbf7d..4301082 100644
-> --- a/attrib/client.c
-> +++ b/attrib/client.c
-> @@ -295,7 +295,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len,
->        switch (pdu[0]) {
->        case ATT_OP_HANDLE_IND:
->                olen = enc_confirmation(opdu, sizeof(opdu));
-> -               g_attrib_send(gatt->attrib, opdu[0], opdu, olen,
-> +               g_attrib_send(gatt->attrib, 0, opdu[0], opdu, olen,
->                                                NULL, NULL, NULL);
->        case ATT_OP_HANDLE_NOTIFY:
->                if (characteristic_set_value(chr, &pdu[3], len - 3) < 0)
-> diff --git a/attrib/gatt.c b/attrib/gatt.c
-> index bca8b49..320759f 100644
-> --- a/attrib/gatt.c
-> +++ b/attrib/gatt.c
-> @@ -68,7 +68,7 @@ guint gatt_discover_primary(GAttrib *attrib, uint16_t start, uint16_t end,
->        if (plen == 0)
->                return 0;
->
-> -       return g_attrib_send(attrib, op, pdu, plen, func, user_data, NULL);
-> +       return g_attrib_send(attrib, 0, op, pdu, plen, func, user_data, NULL);
->  }
->
->  guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
-> @@ -93,7 +93,7 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
->        if (plen == 0)
->                return 0;
->
-> -       return g_attrib_send(attrib, ATT_OP_READ_BY_TYPE_REQ,
-> +       return g_attrib_send(attrib, 0, ATT_OP_READ_BY_TYPE_REQ,
->                                        pdu, plen, func, user_data, NULL);
->  }
->
-> @@ -104,7 +104,7 @@ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
->        guint16 plen;
->
->        plen = enc_read_req(handle, pdu, sizeof(pdu));
-> -       return g_attrib_send(attrib, ATT_OP_READ_REQ, pdu, plen, func,
-> +       return g_attrib_send(attrib, 0, ATT_OP_READ_REQ, pdu, plen, func,
->                                                        user_data, NULL);
->  }
->
-> @@ -115,7 +115,7 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
->        guint16 plen;
->
->        plen = enc_write_req(handle, value, vlen, pdu, sizeof(pdu));
-> -       return g_attrib_send(attrib, ATT_OP_WRITE_REQ, pdu, plen, func,
-> +       return g_attrib_send(attrib, 0, ATT_OP_WRITE_REQ, pdu, plen, func,
->                                                        user_data, NULL);
->  }
->
-> @@ -129,7 +129,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
->        if (plen == 0)
->                return 0;
->
-> -       return g_attrib_send(attrib, ATT_OP_FIND_INFO_REQ, pdu, plen, func,
-> +       return g_attrib_send(attrib, 0, ATT_OP_FIND_INFO_REQ, pdu, plen, func,
->                                                        user_data, NULL);
->  }
->
-> @@ -140,6 +140,6 @@ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
->        guint16 plen;
->
->        plen = enc_write_cmd(handle, value, vlen, pdu, sizeof(pdu));
-> -       return g_attrib_send(attrib, ATT_OP_WRITE_CMD, pdu, plen, NULL,
-> +       return g_attrib_send(attrib, 0, ATT_OP_WRITE_CMD, pdu, plen, NULL,
->                                                        user_data, notify);
->  }
-> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-> index 9268001..79ee2e9 100644
-> --- a/attrib/gattrib.c
-> +++ b/attrib/gattrib.c
-> @@ -286,6 +286,7 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
->        uint8_t buf[512], status;
->        gsize len;
->        GIOStatus iostat;
-> +       gboolean qempty;
->
->        if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
->                attrib->read_watch = 0;
-> @@ -333,8 +334,7 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
->        status = 0;
->
->  done:
-> -       if (attrib->queue && g_queue_is_empty(attrib->queue) == FALSE)
-> -               wake_up_sender(attrib);
-> +       qempty = attrib->queue == NULL || g_queue_is_empty(attrib->queue);
->
->        if (cmd) {
->                if (cmd->func)
-> @@ -343,6 +343,9 @@ done:
->                command_destroy(cmd);
->        }
->
-> +       if (!qempty)
-> +               wake_up_sender(attrib);
-> +
->        return TRUE;
->  }
->
-> @@ -368,9 +371,9 @@ GAttrib *g_attrib_new(GIOChannel *io)
->        return g_attrib_ref(attrib);
->  }
->
-> -guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
-> -                               guint16 len, GAttribResultFunc func,
-> -                               gpointer user_data, GDestroyNotify notify)
-> +guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
-> +               const guint8 *pdu, guint16 len, GAttribResultFunc func,
-> +               gpointer user_data, GDestroyNotify notify)
-Missing tab here.
+diff --git a/lib/hci.c b/lib/hci.c
+old mode 100644
+new mode 100755
+index 048fda4..5a0275c
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -1291,6 +1291,113 @@ int hci_disconnect(int dd, uint16_t handle, uint8_t reason, int to)
+ 	return 0;
+ }
+ 
++int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type)
++{
++	struct hci_request rq;
++	le_add_device_to_white_list_cp param_cp;
++	uint8_t status;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.bdaddr_type = type;
++	param_cp.bdaddr= addr;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_ADD_DEVICE_TO_WHITE_LIST;
++	rq.cparam = &param_cp;
++	rq.clen = LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, 100) < 0)
++		return -1;
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
++int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type)
++{
++	struct hci_request rq;
++	le_remove_device_from_white_list_cp param_cp;
++	uint8_t status;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.bdaddr_type = type;
++	param_cp.bdaddr= addr;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST;
++	rq.cparam = &param_cp;
++	rq.clen = LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, 100) < 0)
++		return -1;
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
++int hci_le_read_white_list_size(int dd)
++{
++	struct hci_request rq;
++	le_read_white_list_size_rp param_cp;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.size=0;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
++	rq.rparam = &param_cp;
++	rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
++
++	if (hci_send_req(dd, &rq, 100) < 0)
++		return -1;
++	
++	if (param_cp.status) {
++		errno = EIO;
++		return -1;
++	}
++
++	printf("LE White list size= %d\n", param_cp.size);
++
++	return 0;
++}
++
++int hci_le_clear_white_list(int dd)
++{
++	struct hci_request rq;
++	uint8_t status;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, 100) < 0)
++		return -1;
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
+ int hci_read_local_name(int dd, int len, char *name, int to)
+ {
+ 	read_local_name_rp rp;
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+old mode 100644
+new mode 100755
+index b63a2a4..ed74dfc
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -127,6 +127,10 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ 		uint16_t latency, uint16_t supervision_timeout,
+ 		uint16_t min_ce_length, uint16_t max_ce_length,
+ 		uint16_t *handle, int to);
++int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type);
++int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type);
++int hci_le_read_white_list_size(int dd);
++int hci_le_clear_white_list(int dd);
 
->  {
->        struct command *c;
->
-> @@ -386,9 +389,14 @@ guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
->        c->func = func;
->        c->user_data = user_data;
->        c->notify = notify;
-> -       c->id = ++attrib->next_cmd_id;
->
-> -       g_queue_push_tail(attrib->queue, c);
-> +       if (id) {
-> +               c->id = id;
-> +               g_queue_push_head(attrib->queue, c);
-> +       } else {
-> +               c->id = ++attrib->next_cmd_id;
-> +               g_queue_push_tail(attrib->queue, c);
-> +       }
->
->        if (g_queue_get_length(attrib->queue) == 1)
->                wake_up_sender(attrib);
-> diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-> index 0940289..1a966a7 100644
-> --- a/attrib/gattrib.h
-> +++ b/attrib/gattrib.h
-> @@ -50,9 +50,10 @@ gboolean g_attrib_set_disconnect_function(GAttrib *attrib,
->  gboolean g_attrib_set_destroy_function(GAttrib *attrib,
->                GDestroyNotify destroy, gpointer user_data);
->
-> -guint g_attrib_send(GAttrib *attrib, guint8 opcode, const guint8 *pdu,
-> -                               guint16 len, GAttribResultFunc func,
-> -                               gpointer user_data, GDestroyNotify notify);
-> +guint g_attrib_send(GAttrib *attrib, guint id, guint8 opcode,
-> +                       const guint8 *pdu, guint16 len, GAttribResultFunc func,
-> +                       gpointer user_data, GDestroyNotify notify);
-> +
-Missing tab here.
+ int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
+ int hci_get_route(bdaddr_t *bdaddr);
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index d50adaf..387c47c 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2471,6 +2471,188 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 	hci_close_dev(dd);
+ }
+ 
++static struct option leaddwl_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *leaddwl_help =
++	"Usage:\n"
++	"\tleaddwl <bdaddr>\n";
++
++static void cmd_leaddwl(int dev_id, int argc,char **argv)
++{
++	int err, opt, dd;
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++
++	for_each_opt(opt, leaddwl_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", leaddwl_help);
++			return;
++		}
++	}
++	helper_arg(1, 1, &argc, &argv, leaddwl_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	str2ba(argv[1], &bdaddr);
++	bdaddr_type = 0x00;
++
++	err = hci_le_add_to_white_list(dd, bdaddr ,bdaddr_type);
++	if (err < 0) {
++		perror("Cant add to white list");
++		exit(1);
++	}
++	else {
++		printf("Device added to white list"); 
++	}
++
++	hci_close_dev(dd);
++
++}
++
++static struct option lermwl_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *lermwl_help =
++	"Usage:\n"
++	"\tlermwl <bdaddr>\n";
++
++static void cmd_lermwl(int dev_id, int argc,char **argv)
++{
++	int err, opt, dd;
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++
++	for_each_opt(opt, lermwl_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", lermwl_help);
++			return;
++		}
++	}
++	helper_arg(1, 1, &argc, &argv, lermwl_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	str2ba(argv[1], &bdaddr);
++	bdaddr_type = 0x00;
++
++	err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
++	if (err < 0) {
++		perror("Cant remove from white list");
++		exit(1);
++	}
++        else {
++		printf("Device removed from white list"); 
++	}
++
++	hci_close_dev(dd);
++
++}
++
++static struct option lerdwlsz_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *lerdwlsz_help =
++	"Usage:\n"
++	"\tlerdwlsz\n";
++
++static void cmd_lerdwlsz(int dev_id, int argc,char **argv)
++{
++	int err,dd, opt;
++
++	for_each_opt(opt, lerdwlsz_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", lerdwlsz_help);
++			return;
++		}
++	}
++	helper_arg(0, 0, &argc, &argv, lermwl_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	err = hci_le_read_white_list_size(dd);
++	if (err < 0) {
++		perror("Cant read white list size");
++		exit(1);
++	}
++
++	hci_close_dev(dd);
++
++}	
++
++
++static struct option leclrwl_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *leclrwl_help =
++	"Usage:\n"
++	"\tleclrwl\n";
++
++static void cmd_leclrwl(int dev_id, int argc,char **argv)
++{
++	int err,dd, opt;
++
++	for_each_opt(opt, leclrwl_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", leclrwl_help);
++			return;
++		}
++	}
++	helper_arg(0, 0, &argc, &argv, leclrwl_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	err = hci_le_clear_white_list(dd);
++	if (err < 0) {
++		perror("Cant clear white list");
++		exit(1);
++	}
++
++	hci_close_dev(dd);
++
++}
++
++
+ static struct option ledc_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+@@ -2547,6 +2729,10 @@ static struct {
+ 	{ "clkoff", cmd_clkoff, "Read clock offset"                    },
+ 	{ "clock",  cmd_clock,  "Read local or remote clock"           },
+ 	{ "lescan", cmd_lescan, "Start LE scan"                        },
++	{ "leaddwl", cmd_leaddwl, "Add this device to white list"	   },
++	{ "lermwl", cmd_lermwl, "Remove this device from white list"   },
++	{ "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"		   },
++	{ "leclrwl",   cmd_leclrwl,   "Clear white list"		   },
+ 	{ "lecc",   cmd_lecc,   "Create a LE Connection",              },
+ 	{ "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
+ 	{ NULL, NULL, 0 }
+-- 
+1.6.5
 
->  gboolean g_attrib_cancel(GAttrib *attrib, guint id);
->  gboolean g_attrib_cancel_all(GAttrib *attrib);
->
-> diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-> index a234e36..a6f92db 100644
-> --- a/attrib/gatttool.c
-> +++ b/attrib/gatttool.c
-> @@ -272,7 +272,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
->        olen = enc_confirmation(opdu, sizeof(opdu));
->
->        if (olen > 0)
-> -               g_attrib_send(attrib, opdu[0], opdu, olen, NULL, NULL, NULL);
-> +               g_attrib_send(attrib, 0, opdu[0], opdu, olen, NULL, NULL, NULL);
->  }
->
->  static gboolean listen_start(gpointer user_data)
-> diff --git a/src/attrib-server.c b/src/attrib-server.c
-> index cbc01ee..aee2ace 100644
-> --- a/src/attrib-server.c
-> +++ b/src/attrib-server.c
-> @@ -694,7 +694,7 @@ done:
->        if (status)
->                length = enc_error_resp(ipdu[0], 0x0000, status, opdu, channel->mtu);
->
-> -       g_attrib_send(channel->attrib, opdu[0], opdu, length,
-> +       g_attrib_send(channel->attrib, 0, opdu[0], opdu, length,
->                                                        NULL, NULL, NULL);
->  }
->
-> --
-> 1.7.1
-> --
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
->
 
-We need only to avoid calling g_attrib_send outside gatt.c passing id
-!=0, otherwise it may break the commands sequence.
-Could you please change the the attribute server adding a service with
-long attributes?
-
-Regards,
-Claudio.
