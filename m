@@ -1,27 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
-Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
-	johan.hedberg@nokia.com, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Implement Compound GATT procedures, Long Reads
-Date: Thu,  6 Jan 2011 16:39:41 -0800
-Message-Id: <1294360783-13252-1-git-send-email-bgix@codeaurora.org>
-To: unlisted-recipients:; (no To-header on input)
+Date: Fri, 7 Jan 2011 00:39:20 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/10] Update telephony-ofono driver
+Message-ID: <20110106223920.GA9398@jh-x301>
+References: <1294243187-1849-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1294243187-1849-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-These patches address the concerns raised by Vinicius and Claudio.
+On Wed, Jan 05, 2011, Luiz Augusto von Dentz wrote:
+> This patches update the ofono backend so it can be used with recent
+> versions of ofono (> 0.28), it can be tested by compiling bluetoothd with
+> --with-telephony=ofono
+> 
+> Since the hfp doesn't really support multiple modems, at least not in the
+> same record/connection, the driver will pick the first modem that has
+> org.ofono.NetworkRegistration since that is what hfp expect as indicator.
+> 
+> Calls are only picked/indicated if they belong to the modem in use
+> otherwise they are ignored.
+> 
+> Note that there is still a plan to integrate hfp inside ofono and this
+> changes doesn't change anything, it basically add the possibility to use
+> ofono with BlueZ 4.x since 5.x probably will change this entirely.
+> 
+> Luiz Augusto von Dentz (10):
+>   telephony-ofono: notify alerting calls when headset connects
+>   telephony-ofono: fix not being able to answer alerting/waiting calls
+>   telephony-ofono: fix not setting originating when status property
+>     changes
+>   telephony-ofono: make use of GetModems method
+>   telephony-ofono: make use of GetCalls method
+>   telephony-ofono: fix not canceling pending calls on exit
+>   telephony-ofono: simplify watches handling logic
+>   telephony-ofono: handle ofono appearing/disappearing from bus
+>   telephony-ofono: add handling for Modem.Interfaces property
+>   telephony-ofono: fix not updating indicators when a call is removed
+> 
+>  audio/telephony-ofono.c |  916 +++++++++++++++++++++++++++++++----------------
+>  1 files changed, 604 insertions(+), 312 deletions(-)
 
-They are based on a rebase as of:
+All 10 patches have been pushed upstream. Thanks.
 
-commit 3fd5fa3890e3db3857f212ef6a187f7744d07cba
-Author: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Date:   Mon Jan 3 18:45:54 2011 -0300
-
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Johan
