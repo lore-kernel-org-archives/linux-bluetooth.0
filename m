@@ -1,189 +1,389 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Fix for handling emails in pull call history queries
-Date: Fri,  7 Jan 2011 10:19:57 +0200
-Message-Id: <1294388397-1642-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
+References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
+From: "Arun K. Singh" <arunkat@gmail.com>
+Date: Fri, 7 Jan 2011 13:08:58 +0530
+Message-ID: <AANLkTimttxc6L5v-ibb8A-k1ySgazn7tOsut54OUtgvP@mail.gmail.com>
+Subject: Re: [PATCH] HCI Commands for LE White List
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously only emails of one type at a time were listed
-in call history for given contact. With this fix every
-email for contact will be displayed in pull call history
-result.
----
- plugins/phonebook-tracker.c |   99 ++++++++++++++++++++++++++++++-------------
- 1 files changed, 69 insertions(+), 30 deletions(-)
+Hi Claudio,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 3dcf818..936ff03 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -141,10 +141,13 @@
- "rdfs:label(?_role) "							\
- "nco:fullname(nco:org(?_role))"						\
- "nco:department(?_role) "						\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\")"				\
--"WHERE {"								\
--"	?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ]"	\
--"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?_role)),"						\
-+	"\"\30\") "							\
-+	"WHERE { "							\
-+	"?_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
-+	"}) "								\
- "\"NOTACALL\" \"false\" \"false\" "					\
- "?_contact "								\
- "WHERE {"								\
-@@ -232,9 +235,13 @@
- 	"rdfs:label(?_role) "						\
- 	"nco:fullname(nco:org(?_role)) "				\
- 	"nco:department(?_role) "					\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?c_role)),"						\
-+	"\"\30\") "							\
- 	"WHERE { "							\
--	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"?_contact nco:hasAffiliation ?c_role . "			\
-+	"?c_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
- 	"}) "								\
- 	"nmo:receivedDate(?_call) "					\
- 	"nmo:isSent(?_call) "						\
-@@ -380,9 +387,13 @@
- 	"rdfs:label(?_role) "						\
- 	"nco:fullname(nco:org(?_role)) "				\
- 	"nco:department(?_role) "					\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?c_role)),"						\
-+	"\"\30\") "							\
- 	"WHERE { "							\
--	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"?_contact nco:hasAffiliation ?c_role . "			\
-+	"?c_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
- 	"}) "								\
- 	"nmo:receivedDate(?_call) "					\
- 	"nmo:isSent(?_call) "						\
-@@ -527,9 +538,13 @@
- 	"rdfs:label(?_role) "						\
- 	"nco:fullname(nco:org(?_role)) "				\
- 	"nco:department(?_role) "					\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?c_role)),"						\
-+	"\"\30\") "							\
- 	"WHERE { "							\
--	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"?_contact nco:hasAffiliation ?c_role . "			\
-+	"?c_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
- 	"}) "								\
- 	"nmo:receivedDate(?_call) "					\
- 	"nmo:isSent(?_call) "						\
-@@ -668,9 +683,13 @@
- 	"rdfs:label(?_role) "						\
- 	"nco:fullname(nco:org(?_role)) "				\
- 	"nco:department(?_role) "					\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\") "				\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?c_role)),"						\
-+	"\"\30\") "							\
- 	"WHERE { "							\
--	"?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ] "\
-+	"?_contact nco:hasAffiliation ?c_role . "			\
-+	"?c_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
- 	"}) "								\
- 	"nmo:receivedDate(?_call) "					\
- 	"nmo:isSent(?_call) "						\
-@@ -853,10 +872,13 @@
- "rdfs:label(?_role) "							\
- "nco:fullname(nco:org(?_role))"						\
- "nco:department(?_role) "						\
--"(SELECT GROUP_CONCAT(?emailaddress, \"\30\")"				\
--"WHERE {"								\
--"	?_role nco:hasEmailAddress [ nco:emailAddress ?emailaddress ]"	\
--"}) "									\
-+"(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
-+	"rdfs:label(?_role)),"						\
-+	"\"\30\") "							\
-+	"WHERE { "							\
-+	"?_role nco:hasEmailAddress "					\
-+	"		[ nco:emailAddress ?emailaddress ] "		\
-+	"}) "								\
- "\"NOTACALL\" \"false\" \"false\" "					\
- "<%s> "									\
- "WHERE {"								\
-@@ -1543,10 +1565,39 @@ static enum phonebook_email_type get_email_type(const char *affilation)
- 	return EMAIL_TYPE_OTHER;
- }
- 
-+static void add_aff_email(struct phonebook_contact *contact, char *aff_email)
-+{
-+	char **email_parts;
-+	char *type, *email;
-+
-+	/* Emails from affilation data, are represented as real email
-+	 * string and affilation type - those strings are separated by
-+	 * SUB_DELIM string */
-+	email_parts = g_strsplit(aff_email, SUB_DELIM, 2);
-+
-+	if (!email_parts)
-+		return;
-+
-+	if (email_parts[0])
-+		email = email_parts[0];
-+	else
-+		goto failed;
-+
-+	if (email_parts[1])
-+		type = email_parts[1];
-+	else
-+		goto failed;
-+
-+	add_email(contact, email, get_email_type(type));
-+
-+failed:
-+	g_strfreev(email_parts);
-+}
-+
- static void contact_add_emails(struct phonebook_contact *contact,
- 								char **reply)
- {
--	char **aff_emails, **con_emails;
-+	char **aff_emails;
- 	int i;
- 
- 	/* Emails from affilation */
-@@ -1554,21 +1605,9 @@ static void contact_add_emails(struct phonebook_contact *contact,
- 
- 	if (aff_emails)
- 		for(i = 0; aff_emails[i] != NULL; ++i)
--			add_email(contact, aff_emails[i],
--					get_email_type(reply[COL_AFF_TYPE]));
-+			add_aff_email(contact, aff_emails[i]);
- 
- 	g_strfreev(aff_emails);
--
--	/* Emails taken directly from contact's data have always type OTHER */
--	con_emails = g_strsplit(reply[COL_EMAIL_CONTACT], MAIN_DELIM,
--								MAX_FIELDS);
--
--	if (con_emails)
--		for(i = 0; con_emails[i] != NULL; ++i)
--			add_email(contact, con_emails[i], EMAIL_TYPE_OTHER);
--
--	g_strfreev(con_emails);
--
- }
- 
- static enum phonebook_address_type get_addr_type(const char *affilation)
--- 
-1.7.0.4
 
+On Thu, Jan 6, 2011 at 9:22 AM, Sumit Kumar BAJPAI
+<sumitkumar.bajpai@stericsson.com> wrote:
+>
+> Added HCI commands for LE White List support.
+> These LE White List Commands can be tested from
+> hcitool.
+>
+>
+> ---
+>  lib/hci.c       |  107 +++++++++++++++++++++++++++++++
+>  lib/hci_lib.h   |    4 +
+>  tools/hcitool.c |  186 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 297 insertions(+), 0 deletions(-)
+>  mode change 100644 => 100755 lib/hci.c
+>  mode change 100644 => 100755 lib/hci_lib.h
+>
+> diff --git a/lib/hci.c b/lib/hci.c
+> old mode 100644
+> new mode 100755
+> index 048fda4..5a0275c
+> --- a/lib/hci.c
+> +++ b/lib/hci.c
+> @@ -1291,6 +1291,113 @@ int hci_disconnect(int dd, uint16_t handle, uint8_t reason, int to)
+>        return 0;
+>  }
+>
+> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type)
+> +{
+> +       struct hci_request rq;
+> +       le_add_device_to_white_list_cp param_cp;
+> +       uint8_t status;
+> +
+> +       memset(&param_cp, 0, sizeof(param_cp));
+> +       param_cp.bdaddr_type = type;
+> +       param_cp.bdaddr= addr;
+> +
+> +       memset(&rq, 0, sizeof(rq));
+> +       rq.ogf = OGF_LE_CTL;
+> +       rq.ocf = OCF_LE_ADD_DEVICE_TO_WHITE_LIST;
+> +       rq.cparam = &param_cp;
+> +       rq.clen = LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE;
+> +       rq.rparam = &status;
+> +       rq.rlen = 1;
+> +
+> +       if (hci_send_req(dd, &rq, 100) < 0)
+> +               return -1;
+> +
+> +       if (status) {
+> +               errno = EIO;
+> +               return -1;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type)
+> +{
+> +       struct hci_request rq;
+> +       le_remove_device_from_white_list_cp param_cp;
+> +       uint8_t status;
+> +
+> +       memset(&param_cp, 0, sizeof(param_cp));
+> +       param_cp.bdaddr_type = type;
+> +       param_cp.bdaddr= addr;
+> +
+> +       memset(&rq, 0, sizeof(rq));
+> +       rq.ogf = OGF_LE_CTL;
+> +       rq.ocf = OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST;
+> +       rq.cparam = &param_cp;
+> +       rq.clen = LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE;
+> +       rq.rparam = &status;
+> +       rq.rlen = 1;
+> +
+> +       if (hci_send_req(dd, &rq, 100) < 0)
+> +               return -1;
+> +
+> +       if (status) {
+> +               errno = EIO;
+> +               return -1;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +int hci_le_read_white_list_size(int dd)
+> +{
+> +       struct hci_request rq;
+> +       le_read_white_list_size_rp param_cp;
+> +
+> +       memset(&param_cp, 0, sizeof(param_cp));
+> +       param_cp.size=0;
+> +
+> +       memset(&rq, 0, sizeof(rq));
+> +       rq.ogf = OGF_LE_CTL;
+> +       rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
+> +       rq.rparam = &param_cp;
+> +       rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
+> +
+> +       if (hci_send_req(dd, &rq, 100) < 0)
+> +               return -1;
+> +
+> +       if (param_cp.status) {
+> +               errno = EIO;
+> +               return -1;
+> +       }
+> +
+> +       printf("LE White list size= %d\n", param_cp.size);
+> +
+> +       return 0;
+> +}
+> +
+> +int hci_le_clear_white_list(int dd)
+> +{
+> +       struct hci_request rq;
+> +       uint8_t status;
+> +
+> +       memset(&rq, 0, sizeof(rq));
+> +       rq.ogf = OGF_LE_CTL;
+> +       rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
+> +       rq.rparam = &status;
+> +       rq.rlen = 1;
+> +
+> +       if (hci_send_req(dd, &rq, 100) < 0)
+> +               return -1;
+> +
+> +       if (status) {
+> +               errno = EIO;
+> +               return -1;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  int hci_read_local_name(int dd, int len, char *name, int to)
+>  {
+>        read_local_name_rp rp;
+> diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+> old mode 100644
+> new mode 100755
+> index b63a2a4..ed74dfc
+> --- a/lib/hci_lib.h
+> +++ b/lib/hci_lib.h
+> @@ -127,6 +127,10 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+>                uint16_t latency, uint16_t supervision_timeout,
+>                uint16_t min_ce_length, uint16_t max_ce_length,
+>                uint16_t *handle, int to);
+> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type);
+> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type);
+> +int hci_le_read_white_list_size(int dd);
+> +int hci_le_clear_white_list(int dd);
+>
+>  int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
+>  int hci_get_route(bdaddr_t *bdaddr);
+> diff --git a/tools/hcitool.c b/tools/hcitool.c
+> index d50adaf..387c47c 100644
+> --- a/tools/hcitool.c
+> +++ b/tools/hcitool.c
+> @@ -2471,6 +2471,188 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+>        hci_close_dev(dd);
+>  }
+>
+> +static struct option leaddwl_options[] = {
+> +       { "help",       0, 0, 'h' },
+> +       { 0, 0, 0, 0 }
+> +};
+> +
+> +static const char *leaddwl_help =
+> +       "Usage:\n"
+> +       "\tleaddwl <bdaddr>\n";
+> +
+> +static void cmd_leaddwl(int dev_id, int argc,char **argv)
+> +{
+> +       int err, opt, dd;
+> +       bdaddr_t bdaddr;
+> +       uint8_t bdaddr_type;
+> +
+> +       for_each_opt(opt, leaddwl_options, NULL) {
+> +               switch (opt) {
+> +               default:
+> +                       printf("%s", leaddwl_help);
+> +                       return;
+> +               }
+> +       }
+> +       helper_arg(1, 1, &argc, &argv, leaddwl_help);
+> +
+> +       if (dev_id < 0)
+> +               dev_id = hci_get_route(NULL);
+> +
+> +       dd = hci_open_dev(dev_id);
+> +       if (dd < 0) {
+> +               perror("Could not open device");
+> +               exit(1);
+> +       }
+> +
+> +       str2ba(argv[1], &bdaddr);
+> +       bdaddr_type = 0x00;
+> +
+> +       err = hci_le_add_to_white_list(dd, bdaddr ,bdaddr_type);
+> +       if (err < 0) {
+> +               perror("Cant add to white list");
+> +               exit(1);
+> +       }
+> +       else {
+> +               printf("Device added to white list");
+> +       }
+> +
+> +       hci_close_dev(dd);
+> +
+> +}
+> +
+> +static struct option lermwl_options[] = {
+> +       { "help",       0, 0, 'h' },
+> +       { 0, 0, 0, 0 }
+> +};
+> +
+> +static const char *lermwl_help =
+> +       "Usage:\n"
+> +       "\tlermwl <bdaddr>\n";
+> +
+> +static void cmd_lermwl(int dev_id, int argc,char **argv)
+> +{
+> +       int err, opt, dd;
+> +       bdaddr_t bdaddr;
+> +       uint8_t bdaddr_type;
+> +
+> +       for_each_opt(opt, lermwl_options, NULL) {
+> +               switch (opt) {
+> +               default:
+> +                       printf("%s", lermwl_help);
+> +                       return;
+> +               }
+> +       }
+> +       helper_arg(1, 1, &argc, &argv, lermwl_help);
+> +
+> +       if (dev_id < 0)
+> +               dev_id = hci_get_route(NULL);
+> +
+> +       dd = hci_open_dev(dev_id);
+> +       if (dd < 0) {
+> +               perror("Could not open device");
+> +               exit(1);
+> +       }
+> +
+> +       str2ba(argv[1], &bdaddr);
+> +       bdaddr_type = 0x00;
+> +
+> +       err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
+> +       if (err < 0) {
+> +               perror("Cant remove from white list");
+> +               exit(1);
+> +       }
+> +        else {
+> +               printf("Device removed from white list");
+> +       }
+> +
+> +       hci_close_dev(dd);
+> +
+> +}
+> +
+> +static struct option lerdwlsz_options[] = {
+> +       { "help",       0, 0, 'h' },
+> +       { 0, 0, 0, 0 }
+> +};
+> +
+> +static const char *lerdwlsz_help =
+> +       "Usage:\n"
+> +       "\tlerdwlsz\n";
+> +
+> +static void cmd_lerdwlsz(int dev_id, int argc,char **argv)
+> +{
+> +       int err,dd, opt;
+> +
+> +       for_each_opt(opt, lerdwlsz_options, NULL) {
+> +               switch (opt) {
+> +               default:
+> +                       printf("%s", lerdwlsz_help);
+> +                       return;
+> +               }
+> +       }
+> +       helper_arg(0, 0, &argc, &argv, lermwl_help);
+> +
+> +       if (dev_id < 0)
+> +               dev_id = hci_get_route(NULL);
+> +
+> +       dd = hci_open_dev(dev_id);
+> +       if (dd < 0) {
+> +               perror("Could not open device");
+> +               exit(1);
+> +       }
+> +
+> +       err = hci_le_read_white_list_size(dd);
+> +       if (err < 0) {
+> +               perror("Cant read white list size");
+> +               exit(1);
+> +       }
+> +
+> +       hci_close_dev(dd);
+> +
+> +}
+> +
+> +
+> +static struct option leclrwl_options[] = {
+> +       { "help",       0, 0, 'h' },
+> +       { 0, 0, 0, 0 }
+> +};
+> +
+> +static const char *leclrwl_help =
+> +       "Usage:\n"
+> +       "\tleclrwl\n";
+> +
+> +static void cmd_leclrwl(int dev_id, int argc,char **argv)
+> +{
+> +       int err,dd, opt;
+> +
+> +       for_each_opt(opt, leclrwl_options, NULL) {
+> +               switch (opt) {
+> +               default:
+> +                       printf("%s", leclrwl_help);
+> +                       return;
+> +               }
+> +       }
+> +       helper_arg(0, 0, &argc, &argv, leclrwl_help);
+> +
+> +       if (dev_id < 0)
+> +               dev_id = hci_get_route(NULL);
+> +
+> +       dd = hci_open_dev(dev_id);
+> +       if (dd < 0) {
+> +               perror("Could not open device");
+> +               exit(1);
+> +       }
+> +
+> +       err = hci_le_clear_white_list(dd);
+> +       if (err < 0) {
+> +               perror("Cant clear white list");
+> +               exit(1);
+> +       }
+> +
+> +       hci_close_dev(dd);
+> +
+> +}
+> +
+> +
+>  static struct option ledc_options[] = {
+>        { "help",       0, 0, 'h' },
+>        { 0, 0, 0, 0 }
+> @@ -2547,6 +2729,10 @@ static struct {
+>        { "clkoff", cmd_clkoff, "Read clock offset"                    },
+>        { "clock",  cmd_clock,  "Read local or remote clock"           },
+>        { "lescan", cmd_lescan, "Start LE scan"                        },
+> +       { "leaddwl", cmd_leaddwl, "Add this device to white list"          },
+> +       { "lermwl", cmd_lermwl, "Remove this device from white list"   },
+> +       { "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"               },
+> +       { "leclrwl",   cmd_leclrwl,   "Clear white list"                   },
+>        { "lecc",   cmd_lecc,   "Create a LE Connection",              },
+>        { "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
+>        { NULL, NULL, 0 }
+> --
+> 1.6.5
+>
+
+Did you get some time to review our patches?
+
+
+Thanks,
+Arun
+
+
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
