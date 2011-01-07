@@ -1,389 +1,264 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-From: "Arun K. Singh" <arunkat@gmail.com>
-Date: Fri, 7 Jan 2011 13:08:58 +0530
-Message-ID: <AANLkTimttxc6L5v-ibb8A-k1ySgazn7tOsut54OUtgvP@mail.gmail.com>
-Subject: Re: [PATCH] HCI Commands for LE White List
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Thu, 6 Jan 2011 18:08:09 -0800
+Message-ID: <AANLkTi=uN+36+Mox9y2bZvDD9Y=wb7wnQt0FPqdVkOB5@mail.gmail.com>
+Subject: [ANN] compat-wireless for 2.6.37
+To: linux-kernel@vger.kernel.org
+Cc: linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Its time for a 2.6.37 based release for upgrading your 802.11 /
+Bluetooth / Ethernet drivers on older kernels now that 2.6.37 has been
+released.
 
+The good stuff:
 
-On Thu, Jan 6, 2011 at 9:22 AM, Sumit Kumar BAJPAI
-<sumitkumar.bajpai@stericsson.com> wrote:
->
-> Added HCI commands for LE White List support.
-> These LE White List Commands can be tested from
-> hcitool.
->
->
-> ---
->  lib/hci.c       |  107 +++++++++++++++++++++++++++++++
->  lib/hci_lib.h   |    4 +
->  tools/hcitool.c |  186 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 297 insertions(+), 0 deletions(-)
->  mode change 100644 => 100755 lib/hci.c
->  mode change 100644 => 100755 lib/hci_lib.h
->
-> diff --git a/lib/hci.c b/lib/hci.c
-> old mode 100644
-> new mode 100755
-> index 048fda4..5a0275c
-> --- a/lib/hci.c
-> +++ b/lib/hci.c
-> @@ -1291,6 +1291,113 @@ int hci_disconnect(int dd, uint16_t handle, uint8_t reason, int to)
->        return 0;
->  }
->
-> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type)
-> +{
-> +       struct hci_request rq;
-> +       le_add_device_to_white_list_cp param_cp;
-> +       uint8_t status;
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.bdaddr_type = type;
-> +       param_cp.bdaddr= addr;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_ADD_DEVICE_TO_WHITE_LIST;
-> +       rq.cparam = &param_cp;
-> +       rq.clen = LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type)
-> +{
-> +       struct hci_request rq;
-> +       le_remove_device_from_white_list_cp param_cp;
-> +       uint8_t status;
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.bdaddr_type = type;
-> +       param_cp.bdaddr= addr;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST;
-> +       rq.cparam = &param_cp;
-> +       rq.clen = LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_read_white_list_size(int dd)
-> +{
-> +       struct hci_request rq;
-> +       le_read_white_list_size_rp param_cp;
-> +
-> +       memset(&param_cp, 0, sizeof(param_cp));
-> +       param_cp.size=0;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
-> +       rq.rparam = &param_cp;
-> +       rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-> +
-> +       if (param_cp.status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       printf("LE White list size= %d\n", param_cp.size);
-> +
-> +       return 0;
-> +}
-> +
-> +int hci_le_clear_white_list(int dd)
-> +{
-> +       struct hci_request rq;
-> +       uint8_t status;
-> +
-> +       memset(&rq, 0, sizeof(rq));
-> +       rq.ogf = OGF_LE_CTL;
-> +       rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
-> +       rq.rparam = &status;
-> +       rq.rlen = 1;
-> +
-> +       if (hci_send_req(dd, &rq, 100) < 0)
-> +               return -1;
-> +
-> +       if (status) {
-> +               errno = EIO;
-> +               return -1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  int hci_read_local_name(int dd, int len, char *name, int to)
->  {
->        read_local_name_rp rp;
-> diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-> old mode 100644
-> new mode 100755
-> index b63a2a4..ed74dfc
-> --- a/lib/hci_lib.h
-> +++ b/lib/hci_lib.h
-> @@ -127,6 +127,10 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
->                uint16_t latency, uint16_t supervision_timeout,
->                uint16_t min_ce_length, uint16_t max_ce_length,
->                uint16_t *handle, int to);
-> +int hci_le_add_to_white_list(int dd, bdaddr_t addr, uint8_t type);
-> +int hci_le_remove_from_white_list(int dd, bdaddr_t addr, uint8_t type);
-> +int hci_le_read_white_list_size(int dd);
-> +int hci_le_clear_white_list(int dd);
->
->  int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
->  int hci_get_route(bdaddr_t *bdaddr);
-> diff --git a/tools/hcitool.c b/tools/hcitool.c
-> index d50adaf..387c47c 100644
-> --- a/tools/hcitool.c
-> +++ b/tools/hcitool.c
-> @@ -2471,6 +2471,188 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
->        hci_close_dev(dd);
->  }
->
-> +static struct option leaddwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *leaddwl_help =
-> +       "Usage:\n"
-> +       "\tleaddwl <bdaddr>\n";
-> +
-> +static void cmd_leaddwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err, opt, dd;
-> +       bdaddr_t bdaddr;
-> +       uint8_t bdaddr_type;
-> +
-> +       for_each_opt(opt, leaddwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", leaddwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(1, 1, &argc, &argv, leaddwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       str2ba(argv[1], &bdaddr);
-> +       bdaddr_type = 0x00;
-> +
-> +       err = hci_le_add_to_white_list(dd, bdaddr ,bdaddr_type);
-> +       if (err < 0) {
-> +               perror("Cant add to white list");
-> +               exit(1);
-> +       }
-> +       else {
-> +               printf("Device added to white list");
-> +       }
-> +
-> +       hci_close_dev(dd);
-> +
-> +}
-> +
-> +static struct option lermwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *lermwl_help =
-> +       "Usage:\n"
-> +       "\tlermwl <bdaddr>\n";
-> +
-> +static void cmd_lermwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err, opt, dd;
-> +       bdaddr_t bdaddr;
-> +       uint8_t bdaddr_type;
-> +
-> +       for_each_opt(opt, lermwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", lermwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(1, 1, &argc, &argv, lermwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       str2ba(argv[1], &bdaddr);
-> +       bdaddr_type = 0x00;
-> +
-> +       err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
-> +       if (err < 0) {
-> +               perror("Cant remove from white list");
-> +               exit(1);
-> +       }
-> +        else {
-> +               printf("Device removed from white list");
-> +       }
-> +
-> +       hci_close_dev(dd);
-> +
-> +}
-> +
-> +static struct option lerdwlsz_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *lerdwlsz_help =
-> +       "Usage:\n"
-> +       "\tlerdwlsz\n";
-> +
-> +static void cmd_lerdwlsz(int dev_id, int argc,char **argv)
-> +{
-> +       int err,dd, opt;
-> +
-> +       for_each_opt(opt, lerdwlsz_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", lerdwlsz_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(0, 0, &argc, &argv, lermwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       err = hci_le_read_white_list_size(dd);
-> +       if (err < 0) {
-> +               perror("Cant read white list size");
-> +               exit(1);
-> +       }
-> +
-> +       hci_close_dev(dd);
-> +
-> +}
-> +
-> +
-> +static struct option leclrwl_options[] = {
-> +       { "help",       0, 0, 'h' },
-> +       { 0, 0, 0, 0 }
-> +};
-> +
-> +static const char *leclrwl_help =
-> +       "Usage:\n"
-> +       "\tleclrwl\n";
-> +
-> +static void cmd_leclrwl(int dev_id, int argc,char **argv)
-> +{
-> +       int err,dd, opt;
-> +
-> +       for_each_opt(opt, leclrwl_options, NULL) {
-> +               switch (opt) {
-> +               default:
-> +                       printf("%s", leclrwl_help);
-> +                       return;
-> +               }
-> +       }
-> +       helper_arg(0, 0, &argc, &argv, leclrwl_help);
-> +
-> +       if (dev_id < 0)
-> +               dev_id = hci_get_route(NULL);
-> +
-> +       dd = hci_open_dev(dev_id);
-> +       if (dd < 0) {
-> +               perror("Could not open device");
-> +               exit(1);
-> +       }
-> +
-> +       err = hci_le_clear_white_list(dd);
-> +       if (err < 0) {
-> +               perror("Cant clear white list");
-> +               exit(1);
-> +       }
-> +
-> +       hci_close_dev(dd);
-> +
-> +}
-> +
-> +
->  static struct option ledc_options[] = {
->        { "help",       0, 0, 'h' },
->        { 0, 0, 0, 0 }
-> @@ -2547,6 +2729,10 @@ static struct {
->        { "clkoff", cmd_clkoff, "Read clock offset"                    },
->        { "clock",  cmd_clock,  "Read local or remote clock"           },
->        { "lescan", cmd_lescan, "Start LE scan"                        },
-> +       { "leaddwl", cmd_leaddwl, "Add this device to white list"          },
-> +       { "lermwl", cmd_lermwl, "Remove this device from white list"   },
-> +       { "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"               },
-> +       { "leclrwl",   cmd_leclrwl,   "Clear white list"                   },
->        { "lecc",   cmd_lecc,   "Create a LE Connection",              },
->        { "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
->        { NULL, NULL, 0 }
-> --
-> 1.6.5
->
+http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-2.tar.bz2
+http://www.orbit-lab.org/kernel/compat-wireless-2.6-stable/v2.6.37/compat-wireless-2.6.37-2-sn.tar.bz2
 
-Did you get some time to review our patches?
+compat-wireless provides a backport of a few Linux kernel subsystems down to
+older kernels:
 
+  * 802.11
+  * Bluetooth
+  * Ethernet
 
-Thanks,
-Arun
+For more details refer to the home page:
 
+http://wireless.kernel.org/en/users/Download/stable/
 
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The compat-wireless project consists of code from three projects:
+
+  * The Linux kernel: linux-2.6-allstable.git
+  * Compat-wirelesS: compat-wireless.git
+  * Compat: compat.git
+
+The compat-wireless stable releases incorporates code from from
+each of these git trees for the respective upstream Linux kernel
+stable release. A branch called linux-2.6.3x.y exists for each
+stable release. Below we provide the ChangeLog of changes from
+the previous branched release to the new branched release.
+
+Release: linux-2.6.37
+
+Updates from the compat.git project:
+====================================
+
+git shortlog linux-2.6.36.y..linux-2.6.37.y
+
+Blaise Gassend (1):
+      compat: Fixes missing sem member in struct device for RT PREEMPT
+prior to 2.6.34
+
+Felix Fietkau (4):
+      compat: backport netlink changes used in the nl80211 cleanup
+      compat: fix a crash in the netlink backport
+      compat: backport pm_qos_*_request
+      compat: backport pm_qos_request
+
+Hauke Mehrtens (22):
+      compat: backport init_dummy_netdev
+      compat: backport net_ns_type_operations
+      compat: fix warning in device_rename
+      compat: backport linux/pci-aspm.h
+      compat: backport skb_checksum_none_assert
+      compat: backport printk_once
+      compat: backport loff_t noop_llseek
+      compat: backport list_for_each_entry_continue_rcu
+      compat: backport PCMCIA API changes.
+      compat: backport some usb urb functions
+      compat: move pmcia backport code into compat-2.6.36.h
+      compat: pcmcia/cs.h is removed form new kernels
+      compat: fix build error in init_dummy_netdev
+      compat: backport some more kfifo stuff
+      compat: rename member in struct mmc_host.
+      compat: backport sock_recv_ts_and_drops
+      compat: fix device_lock functions on non rt kernel
+      compat: lock correct mutex in device_lock
+      compat: add empty implementation for usb_enable_autosuspend
+      compat: fix build with kernel 2.6.37rc1
+      compat: remove unnecessary ifdefs and empty file
+      compat: add missing pm_runtime.h
+
+Luis R. Rodriguez (5):
+      compat: define PM_EVENT_SLEEP only if not defined
+      compat: add support for ndo_init backport
+      compat: backport upstream firmware_class bug through f45f3c1f
+      compat: annotate release for v2.6.37-rc1
+      compat: backport PCI_EXP_LNKCTL_ES added for on 2.6.29
+
+Updates from the compat-wireless.git project:
+=============================================
+
+git shortlog linux-2.6.36.y..linux-2.6.37.y
+
+Bala Shanmugam (2):
+      compat-wireless: Added ath3k sflash workaround to crap directory
+      Do not compile staging directory for bt target. Signed-off-by:
+Bala Shanmugam <sbalashanmugam@atheros.com>
+
+Hauke Mehrtens (39):
+      compat-wireless: make patches apply again.
+      compat-wireless: deactivate namespace
+      compat-wireless: make compat-2.6.37.c build
+      compat-wireless: fix hidp_output_raw_report
+      compat-wireless: do not use needed_headroom
+      compat-wireless: fix patch stile.
+      compat-wireless: remove linux/gpio.h include
+      compat-wireless: multiple changes to config file
+      compat-wireless: rename CONFIG_IWLWIFI config symbol
+      compat-wireless: add ifdefs into compat_autoconf.h
+      compat-wireless: add support for kernel 2.6.24
+      compat-wireless: convert ifndef for compat_autoconf.h
+      compat-wireless: replace name CONFIG_IWLWIFI
+      compat-wireless: fix generation of compat_autoconf.h
+      compat-wireless: fix patch style
+      compat-wireless: handle depending on something build as module
+      compat-wireless: make atk6kl build with older kernels
+      compat-wireless: fix for CONFIG_WIRELESS_EXT=n
+      compat-wireless: build if kernel does not have mac80211
+      compat-wireless: add conditions form config into compat_autoconf.h
+      compat-wireless: Add warning if wext is deactivated
+      compat-wireless: remove special handling for CONFIG_CFG80211_WEXT
+      compat-wireless: add brcm80211 driver
+      compat-wireless: make patch apply again.
+      compat-wireless: make patch apply again.
+      compat-wireless: make patches apply again
+      compat-wirelsss: add carl9170
+      compat-wireless: fix unresolved symbols with old kernels
+      compat-wireless: "backport" pcmcia api changes.
+      compat-wirelsss: refresh patches
+      compat-wireless: fix wl12xx driver
+      compat-wireless: remove already applied patches
+      compat-wireless: make patch apply again
+      compat-wireless: backport kfifo for rt2x00
+      compat-wireless: backport sock_recv_ts_and_drops in compat
+      compat-wireless: make patches apply again
+      compat-wireless: fix regression:
+      compat-wireless: revert workqueue patch
+      compat-wireless: make patch apply again
+
+Helmut Schaa (1):
+      compat-wireless: Select minstrel_ht as default rc algo
+
+Luis R. Rodriguez (87):
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: make gen-stable-release.sh use new release
+number for dirs
+      compat-wireless: remove the v from the release name
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: enable compilation of ath9k on >= 2.6.24
+      compat-wireless: fix driver select for ath9k
+      compat-wireless: fix unintended merge of changes
+      compat-wireless: fix enabling of 2.6.24
+      compat-wireless: fix multiqueue patches
+      compat-wireless: fix patches/25-multicast-list_head.patch
+      compat-wireless: refresh patches
+      compat-wireless: fix compilation on iface.c
+      compat-wireless: enable ath6kl from being included
+      compat-wireless: enable ath6kl only for >= 2.6.32
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: update the atheros defconfigs/atheros-debug.mk
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: propagate config.mk changes to atheros defconfig
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: add CONFIG_ATH9K_RATE_CONTROL=y
+      compat-wireless: update defconfigs/atheros-debug.mk
+      compat-wireless: update broadcom staging Makefile
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: add support for generating pending-stable/ fixes
+      compat-wireless: add support for -s for gen-stable-release.sh
+      compat-wireless: fix -s usage on generation stable tarballs
+      compat-wireless: add support for printing stats for pending-stable
+      compat-wireless: update code-metrics to reflect extra patches applied
+      compat-wireless: fix to include net/mac80211.h for pending-stable
+      compat-wireless: fix uninstall for compat
+      compat-wireless: patch refresh
+      compat-wireless: Add the pending mac80211 reset work patch
+      compat-wireless: replace ar9170 with carl9170
+      compat-wireless: add key.o to driver-select for ath drivers
+      compat-wireless: disable staging for most driver-select options
+      compat-wireless: add driver-select for brcm80211
+      compat-wireless: fix driver-select for brcm80211
+      compat-wireless: add rx filter carl9170 patch to linux-next-pending/
+      compat-wireless: fix patches for new wl1251 changes
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: add driver-select for wl1251 and wl1271
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: refresh patches
+      compat-wireless: refresh crap patches
+      compat-wireless: allow skipping updating the local tree
+      compat-wireless: support ignoring some stable linux-next patches
+      Revert "compat-wireless: fix update-initramfs script"
+      compat-wireless: fix initramfs update
+      compat-wireless: refresh patches for 2.6.37-rc1 release
+      compat-wireless: refresh crap patches
+      compat-wireless: move fwload btusb ath3k patch to linux-next-pending
+      compat-wireless: refresh patches for 2.6.37-rc2
+      compat-wireless: refresh patches for 2.6.37-rc3
+      compat-wireless: refresh crap patches for 2.6.37-rc3
+      compat-wireless: simple file change to annotate change
+      compat-wireless: simple file change to annotate change for rc5
+      compat-wireless: simple file change to annotate change for rc5 release v2
+      compat-wireless: add a few linux-next cherry pick patches
+      compat-wireless: cherry pick ath3k's new PID patch
+      compat-wireless: remove
+linux-next-pending/0001-btusb-Add-fw-load-support.patch
+      compat-wireless: fix admin-update.sh for stable cherry picks
+      compat-wireless: remove failed stable patches and backport one
+      compat-wireless: backport stable:
+ath9k-content-DMA-start-stop-through-the-PCU-lock.patch
+      compat-wireless: backport stable patch:
+ath9k-Fix-STA-disconnect-issue-due-to-received-MIC-f.patch
+      compat-wireless: backport stable patch:
+orinoco-initialise-priv-hw-before-assigning-the-inte.patch
+      compat-wireless: suck in all pending-stable patches
+      compat-wireless: refresh linux-next-cherry-pick/ patches
+      compat-wireless: refresh crap patches after stable/cherry-pick
+      compat-wireless: remove no-aggregation on VO patches
+      compat-wireless: fix stable patch pull count
+      compat-wireless: refresh patches for 2.6.37-rc6
+      compat-wireless: refresh crap patches for 2.6.37-rc6
+      compat-wireless: pending-stable updates for 2.6.37-rc6
+      compat-wireless: refresh pending-stable patches
+      compat-wireless: refresh crap patches after applying
+pending-stable patches
+      compat-wireless: Fix radio_enable patch for backports
+      compat-wireless: remove the ath3k/btusb cherry picked patch now upstream
+      compat-wireless: refresh patches for 2.6.37 first release
+      compat-wireless: synch pending-stable patches
+
+Senthil Balasubramanian (1):
+      compat-wireless: fix scripts/driver-select for ath9k
+
+Sven-Haegar Koch (1):
+      compat-wireless: fix activesync devices
+
+Tim Gardner (1):
+      compat-wireless linux-2.6.37.y, fix compile error for pm_qos_add_request()
+
+Walter Goldens (12):
+      compat-wireless: introduce driver-select group for atlxx
+      compat-wireless: update unload/wlunload scripts
+      compat-wireless: unload modules list updated
+      compat-wireless: update Makefile modules
+      compat-wireless: enable uninstall for staging & atlxx
+      compat-wireless: update bluetooth in Makefile
+      compat-wireless: enable bluetooth via driver-select
+      compat-wireless: update unloading scripts for bt
+      compat-wireless: remove obsolete load scripts
+      compat-wireless: update README file
+      compat-wireless: disable update-initramfs except for b4xx/ssb
+      compat-wireless: fix update-initramfs script
