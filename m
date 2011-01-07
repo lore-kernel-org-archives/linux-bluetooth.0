@@ -1,32 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: running attrib/example.c server code
-From: Brian Gix <bgix@codeaurora.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Vinicius Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 07 Jan 2011 14:19:39 -0800
-Message-ID: <1294438779.1615.12.camel@ubuntuLab1>
-Mime-Version: 1.0
+Date: Fri, 7 Jan 2011 22:29:13 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Refactor example server to use att_put_u16()
+Message-ID: <20110107202913.GA6870@jh-x301>
+References: <1294431133-8847-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1294431133-8847-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Lizardo,
 
-I am implementing the READ_BLOB functionality in the attrib-server, and
-I am trying to figure out how to run it.
+On Fri, Jan 07, 2011, Anderson Lizardo wrote:
+> The original code was written before att_put_u16() was implemented.
+> ---
+>  attrib/example.c |  162 +++++++++++++++---------------------------------------
+>  1 files changed, 45 insertions(+), 117 deletions(-)
 
-The example.c has a built-in Attribute that will work for testing (the
-Thermometer: characteristic user description -- size 25 octets) but I
-can't discern what I need to run from the command line to activate these
-example services. The code is compiling, but I don't find any clues for
-invocation.
+All three patches have been pushed upstream. Thanks.
 
-Thanks for any help.
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Johan
