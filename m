@@ -1,400 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] telephony-ofono: add support for multiparty calls
-Date: Mon, 10 Jan 2011 13:42:12 +0200
-Message-Id: <1294659732-31556-1-git-send-email-luiz.dentz@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Subject: Re: [PATCH 00/11] mfd and bluetooth: Add CG2900 suppor
+Date: Sun, 9 Jan 2011 19:55:05 +0100
+Cc: "Par-Gunnar HJALMDAHL" <par-gunnar.p.hjalmdahl@stericsson.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Samuel Ortiz <sameo@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	"Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>
+References: <1292584829-28279-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <201101061946.04790.arnd@arndb.de> <AANLkTikJMx2QxYwXS_TrKK5hcnD3G0MNvEiDO+xAZrpo@mail.gmail.com>
+In-Reply-To: <AANLkTikJMx2QxYwXS_TrKK5hcnD3G0MNvEiDO+xAZrpo@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201101091955.05174.arnd@arndb.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+On Sunday 09 January 2011, Pavan Savoy wrote:
+> On Fri, Jan 7, 2011 at 12:16 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > On Wednesday 05 January 2011, Par-Gunnar HJALMDAHL wrote:
+> >
+> >> Sorry for not answering sooner. I've been on Christmas and New Year vacation.
+> >
+> > I'm also still catching up with email that has accumulated over my
+> > vacation, including your previous response.
+> >
+> > This sounds wrong for both TI and ST-E: AFAICT they are actually built
+> > around an HCI interface. It's unfortunate that the TI code actually got
+> > merged into the kernel like this.
+> 
+> I am not sure what does built around HCI Interface mean? Also yes, in TI- code
+> we do refer to Bluetooth headers.
+> However the fact that I wanted to point out to Par-Gunnar was, that we
+> don't want to use
+> hciattach and enable HCI-UART + HCI-H4 for enabling our driver or our
+> driver should not
+> depend on those modules as such...
 
----
- audio/telephony-ofono.c |  279 +++++++++++++++++++++++++++++++++++++++++------
- 1 files changed, 247 insertions(+), 32 deletions(-)
+Good point about hciattach, you certainly shouldn't need to use that if
+the kernel already knows that a tty is connected to an HCI and what the
+parameters are. Even more so if the HCI is not actually on a rs232 line
+but something like i2c or spi. Automatically binding to the right line
+discipline should be easily doable in the drivers though.
 
-diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
-index ae8f56a..1b6a290 100644
---- a/audio/telephony-ofono.c
-+++ b/audio/telephony-ofono.c
-@@ -48,6 +48,7 @@ struct voice_call {
- 	char *obj_path;
- 	int status;
- 	gboolean originating;
-+	gboolean conference;
- 	char *number;
- 	guint watch;
- };
-@@ -127,6 +128,20 @@ static struct voice_call *find_vc_with_status(int status)
- 	return NULL;
- }
- 
-+static struct voice_call *find_vc_without_status(int status)
-+{
-+	GSList *l;
-+
-+	for (l = calls; l != NULL; l = l->next) {
-+		struct voice_call *call = l->data;
-+
-+		if (call->status != status)
-+			return call;
-+	}
-+
-+	return NULL;
-+}
-+
- static int number_type(const char *number)
- {
- 	if (number == NULL)
-@@ -228,36 +243,110 @@ static int send_method_call(const char *dest, const char *path,
- 	return 0;
- }
- 
-+static int answer_call(struct voice_call *vc)
-+{
-+	DBG("%s", vc->number);
-+	return send_method_call(OFONO_BUS_NAME, vc->obj_path,
-+						OFONO_VC_INTERFACE, "Answer",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int release_call(struct voice_call *vc)
-+{
-+	DBG("%s", vc->number);
-+	return send_method_call(OFONO_BUS_NAME, vc->obj_path,
-+						OFONO_VC_INTERFACE, "Hangup",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int release_answer_calls()
-+{
-+	DBG("");
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"ReleaseAndAnswer",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int split_call(struct voice_call *call)
-+{
-+	DBG("%s", call->number);
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"PrivateChat",
-+						NULL, NULL,
-+						DBUS_TYPE_OBJECT_PATH,
-+						call->obj_path,
-+						DBUS_TYPE_INVALID);
-+	return -1;
-+}
-+
-+static int swap_calls(void)
-+{
-+	DBG("");
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"SwapCalls",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int create_conference(void)
-+{
-+	DBG("");
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"CreateMultiparty",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int release_conference(void)
-+{
-+	DBG("");
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"HangupMultiparty",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
-+static int call_transfer(void)
-+{
-+	DBG("");
-+	return send_method_call(OFONO_BUS_NAME, modem_obj_path,
-+						OFONO_VCMANAGER_INTERFACE,
-+						"Transfer",
-+						NULL, NULL, DBUS_TYPE_INVALID);
-+}
-+
- void telephony_terminate_call_req(void *telephony_device)
- {
--	struct voice_call *vc;
--	int ret;
-+	struct voice_call *call;
-+	struct voice_call *alerting;
-+	int err;
- 
--	if ((vc = find_vc_with_status(CALL_STATUS_ACTIVE))) {
--	} else if ((vc = find_vc_with_status(CALL_STATUS_DIALING))) {
--	} else if ((vc = find_vc_with_status(CALL_STATUS_ALERTING))) {
--	} else if ((vc = find_vc_with_status(CALL_STATUS_INCOMING))) {
--	}
-+	call = find_vc_with_status(CALL_STATUS_ACTIVE);
-+	if (!call)
-+		call = calls->data;
- 
--	if (!vc) {
--		error("in telephony_terminate_call_req, no active call");
-+	if (!call) {
-+		error("No active call");
- 		telephony_terminate_call_rsp(telephony_device,
--					CME_ERROR_NOT_ALLOWED);
-+						CME_ERROR_NOT_ALLOWED);
- 		return;
- 	}
- 
--	ret = send_method_call(OFONO_BUS_NAME, vc->obj_path,
--					OFONO_VC_INTERFACE,
--					"Hangup", NULL,
--					NULL, DBUS_TYPE_INVALID);
--
--	if (ret < 0) {
--		telephony_answer_call_rsp(telephony_device,
--					CME_ERROR_AG_FAILURE);
--		return;
--	}
-+	alerting = find_vc_with_status(CALL_STATUS_ALERTING);
-+	if (call->status == CALL_STATUS_HELD && alerting)
-+		err = release_call(alerting);
-+	else if (call->conference)
-+		err = release_conference();
-+	else
-+		err = release_call(call);
- 
--	telephony_answer_call_rsp(telephony_device, CME_ERROR_NONE);
-+	if (err < 0)
-+		telephony_terminate_call_rsp(telephony_device,
-+						CME_ERROR_AG_FAILURE);
-+	else
-+		telephony_terminate_call_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
- void telephony_answer_call_req(void *telephony_device)
-@@ -278,11 +367,7 @@ void telephony_answer_call_req(void *telephony_device)
- 		return;
- 	}
- 
--	ret = send_method_call(OFONO_BUS_NAME, vc->obj_path,
--			OFONO_VC_INTERFACE,
--			"Answer", NULL,
--			NULL, DBUS_TYPE_INVALID);
--
-+	ret = answer_call(vc);
- 	if (ret < 0) {
- 		telephony_answer_call_rsp(telephony_device,
- 					CME_ERROR_AG_FAILURE);
-@@ -376,15 +461,22 @@ void telephony_list_current_calls_req(void *telephony_device)
- 
- 	for (l = calls, i = 1; l != NULL; l = l->next, i++) {
- 		struct voice_call *vc = l->data;
--		int direction;
-+		int direction, multiparty;
- 
- 		direction = vc->originating ?
- 				CALL_DIR_OUTGOING : CALL_DIR_INCOMING;
- 
-+		multiparty = vc->conference ?
-+				CALL_MULTIPARTY_YES : CALL_MULTIPARTY_NO;
-+
-+		DBG("call %s direction %d multiparty %d", vc->number,
-+							direction, multiparty);
-+
- 		telephony_list_current_call_ind(i, direction, vc->status,
--					CALL_MODE_VOICE, CALL_MULTIPARTY_NO,
--					vc->number, NUMBER_TYPE_TELEPHONY);
-+					CALL_MODE_VOICE, multiparty,
-+					vc->number, number_type(vc->number));
- 	}
-+
- 	telephony_list_current_calls_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
-@@ -397,10 +489,86 @@ void telephony_operator_selection_req(void *telephony_device)
- 	telephony_operator_selection_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
-+static void foreach_vc_with_status(int status,
-+					int (*func)(struct voice_call *vc))
-+{
-+	GSList *l;
-+
-+	for (l = calls; l != NULL; l = l->next) {
-+		struct voice_call *call = l->data;
-+
-+		if (call->status == status)
-+			func(call);
-+	}
-+}
-+
- void telephony_call_hold_req(void *telephony_device, const char *cmd)
- {
-+	const char *idx;
-+	struct voice_call *call;
-+	int err = 0;
-+
- 	DBG("telephony-ofono: got call hold request %s", cmd);
--	telephony_call_hold_rsp(telephony_device, CME_ERROR_NONE);
-+
-+	if (strlen(cmd) > 1)
-+		idx = &cmd[1];
-+	else
-+		idx = NULL;
-+
-+	if (idx)
-+		call = g_slist_nth_data(calls, strtol(idx, NULL, 0) - 1);
-+	else
-+		call = NULL;
-+
-+	switch (cmd[0]) {
-+	case '0':
-+		if (find_vc_with_status(CALL_STATUS_WAITING))
-+			foreach_vc_with_status(CALL_STATUS_WAITING,
-+								release_call);
-+		else
-+			foreach_vc_with_status(CALL_STATUS_HELD, release_call);
-+		break;
-+	case '1':
-+		if (idx) {
-+			if (call)
-+				err = release_call(call);
-+			break;
-+		}
-+		err = release_answer_calls();
-+		break;
-+	case '2':
-+		if (idx) {
-+			if (call)
-+				err = split_call(call);
-+		} else {
-+			struct voice_call *wait;
-+
-+			wait = find_vc_with_status(CALL_STATUS_WAITING);
-+
-+			if (wait)
-+				err = answer_call(call);
-+			else
-+				err = swap_calls();
-+		}
-+		break;
-+	case '3':
-+		if (find_vc_with_status(CALL_STATUS_HELD) ||
-+				find_vc_with_status(CALL_STATUS_WAITING))
-+			err = create_conference();
-+		break;
-+	case '4':
-+		err = call_transfer();
-+		break;
-+	default:
-+		DBG("Unknown call hold request");
-+		break;
-+	}
-+
-+	if (err)
-+		telephony_call_hold_rsp(telephony_device,
-+					CME_ERROR_AG_FAILURE);
-+	else
-+		telephony_call_hold_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
- void telephony_nr_and_ec_req(void *telephony_device, gboolean enable)
-@@ -413,8 +581,29 @@ void telephony_nr_and_ec_req(void *telephony_device, gboolean enable)
- 
- void telephony_key_press_req(void *telephony_device, const char *keys)
- {
-+	struct voice_call *active, *waiting;
-+	int err;
-+
- 	DBG("telephony-ofono: got key press request for %s", keys);
--	telephony_key_press_rsp(telephony_device, CME_ERROR_NONE);
-+
-+	waiting = find_vc_with_status(CALL_STATUS_INCOMING);
-+	if (!waiting)
-+		waiting = find_vc_with_status(CALL_STATUS_DIALING);
-+
-+	active = find_vc_with_status(CALL_STATUS_ACTIVE);
-+
-+	if (waiting)
-+		err = answer_call(waiting);
-+	else if (active)
-+		err = release_call(active);
-+	else
-+		err = 0;
-+
-+	if (err < 0)
-+		telephony_key_press_rsp(telephony_device,
-+							CME_ERROR_AG_FAILURE);
-+	else
-+		telephony_key_press_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
- void telephony_voice_dial_req(void *telephony_device, gboolean enable)
-@@ -523,7 +712,23 @@ static gboolean handle_vc_property_changed(DBusConnection *conn,
- 						NUMBER_TYPE_TELEPHONY);
- 			vc->status = CALL_STATUS_INCOMING;
- 			vc->originating = FALSE;
-+		} else if (g_str_equal(state, "held")) {
-+			vc->status = CALL_STATUS_HELD;
-+			if (find_vc_without_status(CALL_STATUS_HELD))
-+				telephony_update_indicator(ofono_indicators,
-+							"callheld",
-+							EV_CALLHELD_MULTIPLE);
-+			else
-+				telephony_update_indicator(ofono_indicators,
-+							"callheld",
-+							EV_CALLHELD_ON_HOLD);
- 		}
-+	} else if (g_str_equal(property, "Multiparty")) {
-+		dbus_bool_t multiparty;
-+
-+		dbus_message_iter_get_basic(&sub, &multiparty);
-+		DBG("Multiparty %s", multiparty ? "True" : "False");
-+		vc->conference = multiparty;
- 	}
- 
- 	return TRUE;
-@@ -545,6 +750,7 @@ static struct voice_call *call_new(const char *path, DBusMessageIter *properties
- 						== DBUS_TYPE_DICT_ENTRY) {
- 		DBusMessageIter entry, value;
- 		const char *property, *cli, *state;
-+		dbus_bool_t multiparty;
- 
- 		dbus_message_iter_recurse(properties, &entry);
- 		dbus_message_iter_get_basic(&entry, &property);
-@@ -567,6 +773,12 @@ static struct voice_call *call_new(const char *path, DBusMessageIter *properties
- 				vc->status = CALL_STATUS_ALERTING;
- 			else if (g_str_equal(state, "waiting"))
- 				vc->status = CALL_STATUS_WAITING;
-+			else if (g_str_equal(state, "held"))
-+				vc->status = CALL_STATUS_HELD;
-+		} else if (g_str_equal(property, "Multiparty")) {
-+			dbus_message_iter_get_basic(&value, &multiparty);
-+			DBG("Multipary %s", multiparty ? "True" : "False");
-+			vc->conference = multiparty;
- 		}
- 
- 		dbus_message_iter_next(properties);
-@@ -719,9 +931,12 @@ static void handle_network_property(const char *property, DBusMessageIter *varia
- static int parse_network_properties(DBusMessageIter *properties)
- {
- 	uint32_t features = AG_FEATURE_EC_ANDOR_NR |
-+				AG_FEATURE_INBAND_RINGTONE |
- 				AG_FEATURE_REJECT_A_CALL |
- 				AG_FEATURE_ENHANCED_CALL_STATUS |
--				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES;
-+				AG_FEATURE_ENHANCED_CALL_CONTROL |
-+				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
-+				AG_FEATURE_THREE_WAY_CALLING;
- 
- 	while (dbus_message_iter_get_arg_type(properties)
- 						== DBUS_TYPE_DICT_ENTRY) {
--- 
-1.7.1
+I don't understand the problem with relying on the hci-uart or hci-h4
+modules. If the hardware uses the H4 protocol, we certainly should use
+the kernel module that knows how to deal with H4, and we don't want
+to have two modules implementing the same protocol.
 
+> >> > instead of common-hci-module, why not create a algo-driver layer 'ala
+> >> > i2c ? where individual drivers can register their receive handlers for
+> >> > data interpretation ?
+> >
+> > That would be what I suggested ;-)
+> 
+> But even here too, the algos layer if you imagine which can be the
+> sort of the first
+> receiver of data from the transport would refer to BT headers to
+> interpret the data (not just BT, but FM/GPS)
+> and pass it onto other protocol/client drivers,
+
+Right, that is the entire idea, and I don't see a problem here.
+If you do this, you use the headers of the two subsystems you
+interface with. What you should /not/ instead is use header
+files of a subsystem you don't interface with and reinterprete
+the definitions in creative ways, which is what I understood
+was being discussed earlier.
+
+> >> In some way you then run into the same problem has I had in previous patch
+> >> sets. The functionalities supported is really determined by each chip.
+> >> You might or might not have for example GPS in a certain chip. So you do not
+> >> want a central module to expose all possible channels to the stacks on top.
+> >>
+> >> You only want the actually supported features to be exposed to upper layers.
+> >> Then the MFD system is pretty nice. It's easy and modularized to expose the
+> >> different channels as MFD cells.
+> >
+> > But as soon as you have the concept of channels with a clearly defined
+> > interface, you have almost abstracted it enough to go all the way.
+> 
+> Something like this is what the recent RFC posted to
+> lkml/linux-bluetooth
+> http://www.spinics.net/lists/linux-bluetooth/msg09990.html,
+> it kinda looks clumsy
+> but what I feel is we shouldn't shy away from not referencing
+> Bluetooth, (or may be tomorrow GPS
+> with NMEA headers)....
+
+The one important goal here should be to avoid code duplication.
+Using the header to get the data structures from separate code
+means you need to have similar parsing functions in each of the modules
+using it. Not sharing the header wouldn't help, because then you end
+up duplicating even more. The real solution, speaking very broadly,
+must be to have a general module that deals with whatever the more
+specific modules have in common, and have a header file that defines
+the interface to it.
+
+> >> Also note that the common-hci-module is only really used until the connected
+> >> chip has been detected. The chip handler will then set the callback functions
+> >> so actual data transmissions never pass the common-hci-module. They go directly
+> >> from transport to chip handler. That is not really shown in the picture above.
+> >> Just imagine that common-hci-module is removed after a chip has been connected
+> >> and a chip handler has been determined.
+> >>
+> >> I hope I haven't misunderstood your question. I do not know much about the I2C
+> >> system, but I tried to understand your question as best as I could.
+> >
+> > I think there is a disconnect when talking about hierarchies, as it can be applied
+> > to different areas:
+> >
+> > * module dependencies
+> > * device detection
+> > * sysfs object hierarchy
+> > * data flow
+> 
+> module dependecy-wise I agree,
+> I would want FM-V4L2 without BT or I might want GPS simplistic char
+> driver without BT or FM V4L2.
+
+But you'd still need to have an HCI module. I believe right now, the
+hci module depends on the bluetooth module, and you are right that this
+is an undesirable dependency to have for a GPS module. However, the solution
+to this should not be to make GPS independent of HCI, but to make parts
+of HCI independent of bluetooth.
+
+> device detection wise, It is a problem, there is not "_probe"
+> mechanism for UART based transport as it is
+> understandable, and pretty much the driver would end up being platform
+> device driver ...
+
+The platform device is just the lowest level in the device hierarchy.
+
+If each HCI channel is a device, you can stack bt, gps, audio, ...
+devices all on top of the HCI device, which is either stacked on top
+of a serial port or in some other way connected to the underying transport.
+
+In this case, the channels themselves are not platform devices, but
+would get a new bus for them. That bus is populated by a driver that
+owns the HCI and that knows (e.g. from its platform data, hardware
+registers, user config or device tree) what channels are present.
+
+> data flow is where I guess the abstraction has to lie in, for
+> different vendors...
+
+I don't know what you mean with that. My point was that we need to
+consider all the hierarchies, and that they might be different.
+
+	Arnd
