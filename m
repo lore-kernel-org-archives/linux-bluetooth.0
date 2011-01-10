@@ -1,95 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D2B39B1.8010404@ahsoftware.de>
-Date: Mon, 10 Jan 2011 17:54:09 +0100
-From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-CC: Marcel Holtmann <marcel@holtmann.org>, Alicke Xu <sxu@atheros.com>,
- "Luis R. Rodriguez" <lrodriguez@atheros.com>,
- Vikram Kandukuri <vikram.kandukuri@atheros.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ath3k: reduce memory usage
-References: <1290456541-3812-1-git-send-email-holler@ahsoftware.de> <20101130015200.GD5919@vigoh>
-In-Reply-To: <20101130015200.GD5919@vigoh>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1294046076-3712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 10 Jan 2011 12:38:38 -0400
+Message-ID: <AANLkTik_xC9M+MneZnnozXdwYYJ+keSVoxmCreg9TkQz@mail.gmail.com>
+Subject: Re: [PATCHv4] Bluetooth: Use non-flushable by default L2CAP data packets
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Andrei,
 
-because the merge window is currently open, should I resend that patch 
-or post it on another mailing list too?
+On Mon, Jan 3, 2011 at 5:14 AM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index c791fcd..ff191b9 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
+>  static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+>  {
+>        struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
+> +       u8 flags;
+>
+>        BT_DBG("code 0x%2.2x", code);
+>
+>        if (!skb)
+>                return;
+>
+> -       hci_send_acl(conn->hcon, skb, 0);
+> +       if (lmp_no_flush_capable(conn->hcon->hdev))
+> +               flags = ACL_START_NO_FLUSH;
+> +       else
+> +               flags = ACL_START;
+> +
+> +       hci_send_acl(conn->hcon, skb, flags);
+>  }
 
-I still think that driver should not waste about 250kb of memory. ;)
+Looks like you can't control the "no flush" flag here using the new
+BT_FLUSHABLE setsockopt() option.
+
+> @@ -414,7 +421,12 @@ static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
+>                put_unaligned_le16(fcs, skb_put(skb, 2));
+>        }
+>
+> -       hci_send_acl(pi->conn->hcon, skb, 0);
+> +       if (lmp_no_flush_capable(conn->hcon->hdev))
+> +               flags = ACL_START_NO_FLUSH;
+> +       else
+> +               flags = ACL_START;
+> +
+> +       hci_send_acl(pi->conn->hcon, skb, flags);
+>  }
+
+Same here.
 
 Regards,
-
-Alexander
-
-Am 30.11.2010 02:52, schrieb Gustavo F. Padovan:
-> Hi Alexander,
->
-> * Alexander Holler<holler@ahsoftware.de>  [2010-11-22 21:09:01 +0100]:
->
->> There is no need to hold the firmware in memory.
->>
->> Signed-off-by: Alexander Holler<holler@ahsoftware.de>
->> ---
->>   drivers/bluetooth/ath3k.c |   75 ++++++++++++---------------------------------
->>   1 files changed, 20 insertions(+), 55 deletions(-)
->>
->> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
->> index 128cae4..81cd1ed 100644
->> --- a/drivers/bluetooth/ath3k.c
->> +++ b/drivers/bluetooth/ath3k.c
->> @@ -43,46 +43,40 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
->>   #define USB_REQ_DFU_DNLOAD	1
->>   #define BULK_SIZE		4096
->>
->> -struct ath3k_data {
->> -	struct usb_device *udev;
->> -	u8 *fw_data;
->> -	u32 fw_size;
->> -	u32 fw_sent;
->> -};
->> -
->> -static int ath3k_load_firmware(struct ath3k_data *data,
->> -				unsigned char *firmware,
->> -				int count)
->> +static int ath3k_load_firmware(struct usb_device *udev,
->> +				const struct firmware *firmware)
->>   {
->>   	u8 *send_buf;
->>   	int err, pipe, len, size, sent = 0;
->> +	int count = firmware->size;
->>
->> -	BT_DBG("ath3k %p udev %p", data, data->udev);
->> +	BT_DBG("udev %p", udev);
->>
->> -	pipe = usb_sndctrlpipe(data->udev, 0);
->> +	pipe = usb_sndctrlpipe(udev, 0);
->>
->> -	if ((usb_control_msg(data->udev, pipe,
->> +	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
->> +	if (!send_buf) {
->> +		BT_ERR("Can't allocate memory chunk for firmware");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	memcpy(send_buf, firmware->data, 20);
->> +	if ((err = usb_control_msg(udev, pipe,
->>   				USB_REQ_DFU_DNLOAD,
->>   				USB_TYPE_VENDOR, 0, 0,
->> -				firmware, 20, USB_CTRL_SET_TIMEOUT))<  0) {
->> +				send_buf, 20, USB_CTRL_SET_TIMEOUT))<  0) {
->>   		BT_ERR("Can't change to loading configuration err");
->> -		return -EBUSY;
->> +		goto error;
->>   	}
->>   	sent += 20;
->>   	count -= 20;
->
-> Patch looks good to me,  but I have a question here: what's 20 here? I
-> didn't figured out.
->
-> Vikram, what's your opinion on this patch? Can you ack/nack it?
->
+-- 
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
