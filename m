@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2 v2] Fix memory leak when calling endpoint method
-Date: Tue, 11 Jan 2011 14:21:51 +0200
-Message-Id: <1294748511-8393-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/2] Fix memory leak when calling endpoint method
+Date: Tue, 11 Jan 2011 13:54:17 +0200
+Message-Id: <1294746858-27973-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -15,7 +15,7 @@ The pending call must be unrefed in those cases
  1 files changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/audio/media.c b/audio/media.c
-index 97a60a1..402709a 100644
+index 97a60a1..03647f5 100644
 --- a/audio/media.c
 +++ b/audio/media.c
 @@ -87,12 +87,23 @@ static GSList *adapters = NULL;
@@ -34,7 +34,7 @@ index 97a60a1..402709a 100644
 +	struct endpoint_request *request = endpoint->request;
 +
 +	if (request->call)
-+		dbus_pending_call_cancel(request->call);
++		dbus_pending_call_unref(request->call);
 +
 +	endpoint_request_free(request);
 +	endpoint->request = NULL;
