@@ -1,86 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH] Fix history queries for contacts outside pb
-Date: Tue, 11 Jan 2011 15:35:51 +0200
-Message-Id: <1294752951-27299-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 1/2 v2] Fix memory leak when calling endpoint method
+Date: Tue, 11 Jan 2011 14:21:51 +0200
+Message-Id: <1294748511-8393-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Phone number for contacts outside phonebook need to
-be fetched differently - application which saves call data
-saves this number directly in "nco:Contact" now.
-Without this fix, calls to/from numbers outside phonebook
-won't be listed in call history results
----
- plugins/phonebook-tracker.c |   32 ++++++++++++++++++++++++--------
- 1 files changed, 24 insertions(+), 8 deletions(-)
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 25eca62..237fb33 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -152,8 +152,12 @@
- "(SELECT fn:concat(rdf:type(?role_number),"				\
- 	"\"\31\", nco:phoneNumber(?role_number))"			\
- 	"WHERE {"							\
--	"?_role nco:hasPhoneNumber ?role_number "			\
--	"FILTER (?role_number = ?_number)"				\
-+	"{"								\
-+	"	?_role nco:hasPhoneNumber ?role_number "		\
-+	"	FILTER (?role_number = ?_number)"			\
-+	"} UNION { "							\
-+		"?_unb_contact nco:hasPhoneNumber ?role_number . "	\
-+	"}"								\
- "} GROUP BY nco:phoneNumber(?role_number) ) "				\
- 	"nco:fullname(?_contact) "					\
- 	"nco:nameFamily(?_contact) "					\
-@@ -278,8 +282,12 @@
- "(SELECT fn:concat(rdf:type(?role_number),"				\
- 	"\"\31\", nco:phoneNumber(?role_number))"			\
- 	"WHERE {"							\
--	"?_role nco:hasPhoneNumber ?role_number "			\
--	"FILTER (?role_number = ?_number)"				\
-+	"{"								\
-+	"	?_role nco:hasPhoneNumber ?role_number "		\
-+	"	FILTER (?role_number = ?_number)"			\
-+	"} UNION { "							\
-+		"?_unb_contact nco:hasPhoneNumber ?role_number . "	\
-+	"}"								\
- "} GROUP BY nco:phoneNumber(?role_number) ) "				\
- 	"nco:fullname(?_contact) "					\
- 	"nco:nameFamily(?_contact) "					\
-@@ -403,8 +411,12 @@
- "(SELECT fn:concat(rdf:type(?role_number),"				\
- 	"\"\31\", nco:phoneNumber(?role_number))"			\
- 	"WHERE {"							\
--	"?_role nco:hasPhoneNumber ?role_number "			\
--	"FILTER (?role_number = ?_number)"				\
-+	"{"								\
-+	"	?_role nco:hasPhoneNumber ?role_number "		\
-+	"	FILTER (?role_number = ?_number)"			\
-+	"} UNION { "							\
-+		"?_unb_contact nco:hasPhoneNumber ?role_number . "	\
-+	"}"								\
- "} GROUP BY nco:phoneNumber(?role_number) ) "				\
- 	"nco:fullname(?_contact) "					\
- 	"nco:nameFamily(?_contact) "					\
-@@ -522,8 +534,12 @@
- "(SELECT fn:concat(rdf:type(?role_number),"				\
- 	"\"\31\", nco:phoneNumber(?role_number))"			\
- 	"WHERE {"							\
--	"?_role nco:hasPhoneNumber ?role_number "			\
--	"FILTER (?role_number = ?_number)"				\
-+	"{"								\
-+	"	?_role nco:hasPhoneNumber ?role_number "		\
-+	"	FILTER (?role_number = ?_number)"			\
-+	"} UNION { "							\
-+		"?_unb_contact nco:hasPhoneNumber ?role_number . "	\
-+	"}"								\
- "} GROUP BY nco:phoneNumber(?role_number) ) "				\
- 	"nco:fullname(?_contact) "					\
- 	"nco:nameFamily(?_contact) "					\
+The pending call must be unrefed in those cases
+---
+ audio/media.c |   21 +++++++++++++++------
+ 1 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/audio/media.c b/audio/media.c
+index 97a60a1..402709a 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -87,12 +87,23 @@ static GSList *adapters = NULL;
+ static void endpoint_request_free(struct endpoint_request *request)
+ {
+ 	if (request->call)
+-		dbus_pending_call_cancel(request->call);
++		dbus_pending_call_unref(request->call);
+ 
+ 	dbus_message_unref(request->msg);
+ 	g_free(request);
+ }
+ 
++static void media_endpoint_cancel(struct media_endpoint *endpoint)
++{
++	struct endpoint_request *request = endpoint->request;
++
++	if (request->call)
++		dbus_pending_call_cancel(request->call);
++
++	endpoint_request_free(request);
++	endpoint->request = NULL;
++}
++
+ static void media_endpoint_remove(struct media_endpoint *endpoint)
+ {
+ 	struct media_adapter *adapter = endpoint->adapter;
+@@ -109,7 +120,7 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
+ 		headset_remove_state_cb(endpoint->hs_watch);
+ 
+ 	if (endpoint->request)
+-		endpoint_request_free(endpoint->request);
++		media_endpoint_cancel(endpoint);
+ 
+ 	if (endpoint->transport)
+ 		media_transport_remove(endpoint->transport);
+@@ -613,10 +624,8 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 	if (endpoint->transport == NULL)
+ 		return;
+ 
+-	if (endpoint->request) {
+-		endpoint_request_free(endpoint->request);
+-		endpoint->request = NULL;
+-	}
++	if (endpoint->request)
++		media_endpoint_cancel(endpoint);
+ 
+ 	conn = endpoint->adapter->conn;
+ 
 -- 
-1.7.0.4
+1.7.1
 
