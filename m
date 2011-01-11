@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 11 Jan 2011 22:14:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix possible memory leak on each a2dp stream setup
+Message-ID: <20110111201424.GB20820@jh-x301>
+References: <1294756947-11714-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Date: Wed, 12 Jan 2011 02:02:01 -0500
-Message-ID: <AANLkTinFt0Rsbk6LoTk8YnYeqGqzxwTwrWgRakCaQoWo@mail.gmail.com>
-Subject: Any flag indicating bt/fm is ready to run "hcitool cmd"
-From: zhangfei gao <zhangfei.gao@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1294756947-11714-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there any flag indicating bt/fm is ready to run "hcitool cmd", ie,
-"hciconfig hci0 up" is really finished.
+Hi Luiz,
 
-We met error "Send failed: File descriptor in bad state", if run
-hcitool immediately after "hciconfig hci0 up"
-For example:
-hciconfig hci0 up
-hcitool cmd 3f 66 02 26 00 00 00 30
+On Tue, Jan 11, 2011, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> Setup capabilities were not freed when capabilities were automatically
+> generated and not just taken as it used to be with old unix socket
+> clients.
+> ---
+>  audio/a2dp.c |   29 ++++++++++++++++++-----------
+>  audio/unix.c |    2 ++
+>  2 files changed, 20 insertions(+), 11 deletions(-)
 
-And it could be workaround adding sleep.
-The reason is "hciconfig hci0 up" is asynchronous, when it return,
-bt/fm is not ready in fact, so add sleep could solve the issue, but
-still may fail in stress test since race condition.
-We have test bit HCI_UP, but hcitool cmd still would failed, when
-HCI_UP=1, which is set in hci_dev_open instead of handler.
-How about HCI_RAW?
+These two patches have also been pushed upstream. Thanks.
 
-The question is any bit user place could check and then safe to send
-any command via hcitool cmd.
-
-Thanks in advance.
+Johan
