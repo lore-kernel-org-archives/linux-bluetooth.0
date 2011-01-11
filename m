@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTik_xC9M+MneZnnozXdwYYJ+keSVoxmCreg9TkQz@mail.gmail.com>
-References: <1294046076-3712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<AANLkTik_xC9M+MneZnnozXdwYYJ+keSVoxmCreg9TkQz@mail.gmail.com>
-Date: Tue, 11 Jan 2011 10:40:00 +0200
-Message-ID: <AANLkTindoD8_WMdg_2QHNkMF-1vbv9pm9y-09D4WR1tm@mail.gmail.com>
-Subject: Re: [PATCHv4] Bluetooth: Use non-flushable by default L2CAP data packets
+In-Reply-To: <AANLkTimoBiCHAgyLVEin4C_kFnzqGF_LyG312h-wM5fP@mail.gmail.com>
+References: <1294672348-5619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<AANLkTimoBiCHAgyLVEin4C_kFnzqGF_LyG312h-wM5fP@mail.gmail.com>
+Date: Tue, 11 Jan 2011 10:21:20 +0200
+Message-ID: <AANLkTin77GKkC88He8rJ5FkCQHnEDmzCtSznx1GnfChz@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Do not use assignments in IF conditions
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -16,59 +15,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Anderson,
 
-On Mon, Jan 10, 2011 at 6:38 PM, Anderson Lizardo
+On Mon, Jan 10, 2011 at 6:25 PM, Anderson Lizardo
 <anderson.lizardo@openbossa.org> wrote:
 > Hi Andrei,
 >
-> On Mon, Jan 3, 2011 at 5:14 AM, Emeltchenko Andrei
+> On Mon, Jan 10, 2011 at 11:12 AM, Emeltchenko Andrei
 > <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> @@ -224,7 +226,8 @@ static void cmtp_process_transmit(struct cmtp_session *session)
+>>        while ((skb = skb_dequeue(&session->transmit))) {
+>>                struct cmtp_scb *scb = (void *) skb->cb;
+>>
+>> -               if ((tail = (session->mtu - nskb->len)) < 5) {
+>> +               tail = (session->mtu - nskb->len);
+>
+> You can drop the parenthesis above.
+>
+>> +               if (tail < 5) {
+>>                        cmtp_send_frame(session, nskb->data, nskb->len);
+>>                        skb_trim(nskb, 0);
+>>                        tail = session->mtu;
+>
 >> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
->> index c791fcd..ff191b9 100644
+>> index c791fcd..3f080fa 100644
 >> --- a/net/bluetooth/l2cap.c
 >> +++ b/net/bluetooth/l2cap.c
->> @@ -362,13 +362,19 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
->>  static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+>> @@ -4692,7 +4692,11 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
 >>  {
->>        struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
->> +       u8 flags;
+>>        struct l2cap_conn *conn = hcon->l2cap_data;
 >>
->>        BT_DBG("code 0x%2.2x", code);
->>
->>        if (!skb)
->>                return;
->>
->> -       hci_send_acl(conn->hcon, skb, 0);
->> +       if (lmp_no_flush_capable(conn->hcon->hdev))
->> +               flags = ACL_START_NO_FLUSH;
->> +       else
->> +               flags = ACL_START;
+>> -       if (!conn && !(conn = l2cap_conn_add(hcon, 0)))
+>> +       if (!conn)
+>> +               goto drop;
 >> +
->> +       hci_send_acl(conn->hcon, skb, flags);
->>  }
+>> +       conn = l2cap_conn_add(hcon, 0);
+>> +       if (!conn)
+>>                goto drop;
 >
-> Looks like you can't control the "no flush" flag here using the new
-> BT_FLUSHABLE setsockopt() option.
+> I think the logic has been changed here. If hcon->l2cap_data is NULL,
+> it should try  l2cap_conn_add(hcon, 0), and if that fails, it goes to
+> drop. E.g.:
+>
+> ###
+> if (!conn)
+>     conn = l2cap_conn_add(hcon, 0);
+>
+> if (!conn)
+>    goto drop;
+> ###
 
-The flag is used when sending data packets, when sending l2cap commands we
-set ACL_START_NO_FLUSH when host supports it.
+will fix this, thanks for the review.
 
 Regards,
 Andrei
 
->> @@ -414,7 +421,12 @@ static inline void l2cap_send_sframe(struct l2cap_pinfo *pi, u16 control)
->>                put_unaligned_le16(fcs, skb_put(skb, 2));
->>        }
->>
->> -       hci_send_acl(pi->conn->hcon, skb, 0);
->> +       if (lmp_no_flush_capable(conn->hcon->hdev))
->> +               flags = ACL_START_NO_FLUSH;
->> +       else
->> +               flags = ACL_START;
->> +
->> +       hci_send_acl(pi->conn->hcon, skb, flags);
->>  }
->
-> Same here.
 >
 > Regards,
 > --
