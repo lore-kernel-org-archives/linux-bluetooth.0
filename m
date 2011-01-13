@@ -2,110 +2,119 @@ Return-Path: <cyrus@holtmann.org>
 From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 3/3] Remove redundant functions for adding addressess and emails
-Date: Thu, 13 Jan 2011 09:39:01 +0200
-Message-Id: <1294904341-16047-3-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 2/3] Simplify add numbers/emails/addresses logic in PBAP
+Date: Thu, 13 Jan 2011 09:39:00 +0200
+Message-Id: <1294904341-16047-2-git-send-email-ext-jablonski.radoslaw@nokia.com>
 In-Reply-To: <y>
 References: <y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Functions "add_aff_email" and "add_aff_address" were doing
-basically the same thing. Now for splitting fields and
-adding them to contact structure "add_aff_field" is used.
+There was 3 diffent functions for doing the same -
+checking if some field is already added. Now using only
+function named "find_field" for that purpose.
 ---
- plugins/phonebook-tracker.c |   42 ++++++++----------------------------------
- 1 files changed, 8 insertions(+), 34 deletions(-)
+ plugins/phonebook-tracker.c |   46 +++++++-----------------------------------
+ 1 files changed, 8 insertions(+), 38 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 204f0fd..67e4d40 100644
+index 9354a47..204f0fd 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -856,6 +856,9 @@
- typedef void (*reply_list_foreach_t) (char **reply, int num_fields,
- 							void *user_data);
- 
-+typedef void (*add_field_t) (struct phonebook_contact *contact,
-+						const char *value, int type);
-+
- struct pending_reply {
- 	reply_list_foreach_t callback;
- 	void *user_data;
-@@ -1403,7 +1406,8 @@ static enum phonebook_field_type get_field_type(const char *affilation)
- 	return FIELD_TYPE_OTHER;
+@@ -1178,17 +1178,17 @@ static struct phonebook_contact *find_contact(GSList *contacts, const char *id)
+ 	return NULL;
  }
  
--static void add_aff_email(struct phonebook_contact *contact, char *aff_email)
-+static void add_aff_field(struct phonebook_contact *contact, char *aff_email,
-+						add_field_t add_field_cb)
+-static struct phonebook_field *find_phone(GSList *numbers, const char *phone,
++static struct phonebook_field *find_field(GSList *fields, const char *value,
+ 								int type)
  {
- 	char **email_parts;
- 	char *type, *email;
-@@ -1426,7 +1430,7 @@ static void add_aff_email(struct phonebook_contact *contact, char *aff_email)
- 	else
- 		goto failed;
+ 	GSList *l;
  
--	add_email(contact, email, get_field_type(type));
-+	add_field_cb(contact, email, get_field_type(type));
+-	for (l = numbers; l; l = l->next) {
+-		struct phonebook_field *pb_num = l->data;
++	for (l = fields; l; l = l->next) {
++		struct phonebook_field *field = l->data;
+ 		/* Returning phonebook number if phone values and type values
+ 		 * are equal */
+-		if (g_strcmp0(pb_num->text, phone) == 0 && pb_num->type == type)
+-			return pb_num;
++		if (g_strcmp0(field->text, value) == 0 && field->type == type)
++			return field;
+ 	}
  
- failed:
- 	g_strfreev(email_parts);
-@@ -1443,40 +1447,11 @@ static void contact_add_emails(struct phonebook_contact *contact,
+ 	return NULL;
+@@ -1203,7 +1203,7 @@ static void add_phone_number(struct phonebook_contact *contact,
+ 		return;
  
- 	if (aff_emails)
- 		for(i = 0; aff_emails[i] != NULL; ++i)
--			add_aff_email(contact, aff_emails[i]);
-+			add_aff_field(contact, aff_emails[i], add_email);
+ 	/* Not adding number if there is already added with the same value */
+-	if (find_phone(contact->numbers, phone, type))
++	if (find_field(contact->numbers, phone, type))
+ 		return;
  
- 	g_strfreev(aff_emails);
+ 	number = g_new0(struct phonebook_field, 1);
+@@ -1213,21 +1213,6 @@ static void add_phone_number(struct phonebook_contact *contact,
+ 	contact->numbers = g_slist_append(contact->numbers, number);
  }
  
--static void add_aff_address(struct phonebook_contact *contact, char *aff_addr)
+-static struct phonebook_field *find_email(GSList *emails, const char *address,
+-								int type)
 -{
--	char **addr_parts;
--	char *type, *address;
+-	GSList *l;
 -
--	/* Addresses from affilation data, are represented as real address
--	 * string and affilation type - those strings are separated by
--	 * SUB_DELIM string */
--	addr_parts = g_strsplit(aff_addr, SUB_DELIM, 2);
+-	for (l = emails; l; l = l->next) {
+-		struct phonebook_field *email = l->data;
+-		if (g_strcmp0(email->text, address) == 0 &&
+-						email->type == type)
+-			return email;
+-	}
 -
--	if (!addr_parts)
--		return;
--
--	if (addr_parts[0])
--		address = addr_parts[0];
--	else
--		goto failed;
--
--	if (addr_parts[1])
--		type = addr_parts[1];
--	else
--		goto failed;
--
--	add_address(contact, address, get_field_type(type));
--
--failed:
--	g_strfreev(addr_parts);
+-	return NULL;
 -}
 -
- static void contact_add_addresses(struct phonebook_contact *contact,
- 								char **reply)
+ static void add_email(struct phonebook_contact *contact, const char *address,
+ 								int type)
  {
-@@ -1489,12 +1464,11 @@ static void contact_add_addresses(struct phonebook_contact *contact,
+@@ -1237,7 +1222,7 @@ static void add_email(struct phonebook_contact *contact, const char *address,
+ 		return;
  
- 	if (aff_addr)
- 		for(i = 0; aff_addr[i] != NULL; ++i)
--			add_aff_address(contact, aff_addr[i]);
-+			add_aff_field(contact, aff_addr[i], add_address);
+ 	/* Not adding email if there is already added with the same value */
+-	if (find_email(contact->emails, address, type))
++	if (find_field(contact->emails, address, type))
+ 		return;
  
- 	g_strfreev(aff_addr);
+ 	email = g_new0(struct phonebook_field, 1);
+@@ -1247,21 +1232,6 @@ static void add_email(struct phonebook_contact *contact, const char *address,
+ 	contact->emails = g_slist_append(contact->emails, email);
  }
  
+-static struct phonebook_field *find_address(GSList *addresses,
+-					const char *address, int type)
+-{
+-	GSList *l;
 -
- static void contact_add_organization(struct phonebook_contact *contact,
- 								char **reply)
+-	for (l = addresses; l; l = l->next) {
+-		struct phonebook_field *addr = l->data;
+-		if (g_strcmp0(addr->text, address) == 0 &&
+-						addr->type == type)
+-			return addr;
+-	}
+-
+-	return NULL;
+-}
+-
+ static void add_address(struct phonebook_contact *contact,
+ 					const char *address, int type)
  {
+@@ -1271,7 +1241,7 @@ static void add_address(struct phonebook_contact *contact,
+ 		return;
+ 
+ 	/* Not adding address if there is already added with the same value */
+-	if (find_address(contact->addresses, address, type))
++	if (find_field(contact->addresses, address, type))
+ 		return;
+ 
+ 	addr = g_new0(struct phonebook_field, 1);
 -- 
 1.7.0.4
 
