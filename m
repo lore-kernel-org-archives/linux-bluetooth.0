@@ -1,74 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 13 Jan 2011 14:26:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: zhangfei gao <zhangfei.gao@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Any flag indicating bt/fm is ready to run "hcitool cmd"
+Message-ID: <20110113122622.GA31759@jh-x301>
+References: <AANLkTinFt0Rsbk6LoTk8YnYeqGqzxwTwrWgRakCaQoWo@mail.gmail.com>
+ <20110112083726.GA28156@jh-x301>
+ <AANLkTi=TREFQbrwpt1QacoM+ehgJK9uZjBHib6t1pk7-@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20101210071716.GK874@null>
-References: <e98b2c6fd02b11300d82577cb54cfdb63e8400d2.1290678703.git.ext-yuri.ershov@nokia.com>
-	<20101206211516.GH883@vigoh>
-	<4CFE32A0.6090601@nokia.com>
-	<20101207155037.GA2944@vigoh>
-	<4CFF6359.7000305@nokia.com>
-	<20101210071716.GK874@null>
-Date: Thu, 13 Jan 2011 16:37:37 +0200
-Message-ID: <AANLkTikujeb2tF-eU7mXhfuKtswBQGNXS8BZBDxkouE0@mail.gmail.com>
-Subject: Re: [PATCH 1/1] bluetooth: Fix NULL pointer dereference issue
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: Yuri Ershov <ext-yuri.ershov@nokia.com>,
-	"ext Gustavo F. Padovan" <padovan@profusion.mobi>,
-	andrei.emeltchenko@nokia.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=TREFQbrwpt1QacoM+ehgJK9uZjBHib6t1pk7-@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Dec 10, 2010 at 9:17 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> Hi Yuri,
->
-> On Wed, Dec 08, 2010 at 01:52:09PM +0300, Yuri Ershov wrote:
->
->
->> >>>So in which situations (n == p), or (p == p->next)? That should happen only
->> >>>when p is the only element in the list, then p == head, right?
->> >>The (n == p) is in situation, when sk is unlinked by task
->> >>responsible for handling connect/disconnect requests while the
->> >>"bt_accept_dequeue". This condition is indirect checking of sk
->> >>validity.
->> >
->> >Why not using a list lock here instead? Fits a way better.
->> >
->> Yes, it's better. I tried to use the locks in this function, but it
->> slows down the task handling connect/disconnect/etc. events and the
->> task skips some events from fast clients.
+On Thu, Jan 13, 2011, zhangfei gao wrote:
+> > The HCIDEVUP ioctl is at least synchronized with the open() callback for
+> > the HCI driver so in that sense if the driver is working fine it should
+> > be possible to send commands when it returns. There is however an issue
+> > with existing kernels that HCIDEVUP doesn't wait for all of the kernels
+> > own HCI commands to finish before returning to user space. There was a
+> > patch sent for this some time ago which you might be interested in
+> > trying: http://marc.info/?l=linux-bluetooth&m=129296529630642&w=4
+> 
+> Really thanks Johan,
+> The patch synchronize hci_dev_open, it solve the problem we met, and
+> "hcitool cmd" could immediately send after "hciconfig hci0 up" without
+> problem.
 
-What about preventing tasklet from removing socket with disabling bh?
+Good to hear that it's working now.
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 8cfb5a8..7ac4ba5 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -199,6 +199,7 @@ struct sock *bt_accept_dequeue(struct sock
-*parent, struct socket *newsock)
+> By the way, is this patch already in the kernel?
 
-        BT_DBG("parent %p", parent);
+At least it's in the bluetooth-next tree:
+http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git;a=commitdiff;h=23bb57633df97ede067ea26f3cdc8a7ba2cd8109
 
-+       local_bh_disable();
-        list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
-                sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
-
-@@ -217,11 +218,14 @@ struct sock *bt_accept_dequeue(struct sock
-*parent, struct socket *newsock)
-                        if (newsock)
-                                sock_graft(sk, newsock);
-                        release_sock(sk);
-+                       local_bh_enable();
-                        return sk;
-                }
-
-                release_sock(sk);
-        }
-+       local_bh_enable();
-+
-        return NULL;
- }
- EXPORT_SYMBOL(bt_accept_dequeue);
+Johan
