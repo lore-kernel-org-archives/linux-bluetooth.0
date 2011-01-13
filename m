@@ -1,45 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Jan 2011 00:18:49 +0100 (CET)
-From: Jesper Juhl <jj@chaosbits.net>
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
 To: linux-bluetooth@vger.kernel.org
-cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-    "David S. Miller" <davem@davemloft.net>,
-    "Gustavo F. Padovan" <padovan@profusion.mobi>,
-    Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] bluetooth: Fix failure to release lock in read_index_list()
- when mem alloc fails.
-Message-ID: <alpine.LNX.2.00.1101140000541.11347@swampdragon.chaosbits.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: epx@signove.com
+Subject: [PATCH] [RFC] HDP: reject MDL reconnection with different MTU
+Date: Thu, 13 Jan 2011 21:11:04 -0200
+Message-Id: <1294960264-7622-1-git-send-email-epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If alloc_skb() fails in read_index_list() we'll return -ENOMEM without 
-releasing 'hci_dev_list_lock'.
+From: Elvis Pfutzenreuter <epx@signove.com>
 
-Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+This patch implements refusal of a MDL reconnection if the new L2CAP
+connection presents a different MTU. Accordingly to HDP spec. item 3.5.
+
+It aims to pass the TC_SNK_HCT_BV_07_C PTS test. (It does not pass yet
+because PTS itself seems to have issues. See ticket 7121 for details.)
 ---
- mgmt.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ health/hdp.c       |   17 +++++++++++++++--
+ health/hdp_types.h |    1 +
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f827fd9..ace8726 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -111,8 +111,10 @@ static int read_index_list(struct sock *sk)
+diff --git a/health/hdp.c b/health/hdp.c
+index dc1f803..4f89958 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -874,6 +874,7 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
+ 	GError *err = NULL;
+ 	GIOChannel *io;
+ 	uint8_t mode;
++	uint16_t mtu;
+ 	int fd;
  
- 	body_len = sizeof(*ev) + sizeof(*rp) + (2 * count);
- 	skb = alloc_skb(sizeof(*hdr) + body_len, GFP_ATOMIC);
--	if (!skb)
-+	if (!skb) {
-+		read_unlock(&hci_dev_list_lock);
- 		return -ENOMEM;
-+	}
+ 	fd = mcap_mdl_get_fd(chan->mdl);
+@@ -883,6 +884,7 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
  
- 	hdr = (void *) skb_put(skb, sizeof(*hdr));
- 	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_COMPLETE);
-
-
+ 	if (!bt_io_get(io, BT_IO_L2CAP, &err,
+ 			BT_IO_OPT_MODE, &mode,
++			BT_IO_OPT_OMTU, &mtu,
+ 			BT_IO_OPT_INVALID)) {
+ 		error("Error: %s", err->message);
+ 		g_io_channel_unref(io);
+@@ -894,13 +896,24 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
+ 
+ 	switch (chan->config) {
+ 	case HDP_RELIABLE_DC:
+-		return mode == L2CAP_MODE_ERTM;
++		if (mode != L2CAP_MODE_ERTM)
++			return FALSE;
++		break;
+ 	case HDP_STREAMING_DC:
+-		return mode == L2CAP_MODE_STREAMING;
++		if (mode != L2CAP_MODE_STREAMING)
++			return FALSE;
++		break;
+ 	default:
+ 		error("Error: Connected with unknown configuration");
+ 		return FALSE;
+ 	}
++
++	DBG("MDL MTU: %d; Channel MTU: %d", mtu, chan->mtu);
++
++	if (!chan->mtu)
++		chan->mtu = mtu;
++
++	return chan->mtu == mtu;
+ }
+ 
+ static void hdp_mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+diff --git a/health/hdp_types.h b/health/hdp_types.h
+index fffdb32..714cf9a 100644
+--- a/health/hdp_types.h
++++ b/health/hdp_types.h
+@@ -120,6 +120,7 @@ struct hdp_channel {
+ 	uint8_t			config;		/* Channel configuration */
+ 	uint8_t			mdep;		/* Remote MDEP */
+ 	uint16_t		mdlid;		/* Data channel Id */
++	uint16_t		mtu;		/* Channel MTU */
+ 	struct hdp_echo_data	*edata;		/* private data used by echo channels */
+ 	gint			ref;		/* Reference counter */
+ };
 -- 
-Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
-Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
-Plain text mails only, please.
+1.7.0.4
+
