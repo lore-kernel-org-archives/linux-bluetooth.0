@@ -1,44 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: lkslawek@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH] Fix plugin close & disconnect functions call order
-Date: Thu, 13 Jan 2011 11:52:04 +0100
-Message-Id: <1294915924-17068-1-git-send-email-lkslawek@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check authorization when sec_level goes
+ high.
+From: "Matti J. Aaltonen" <matti.j.aaltonen@nokia.com>
+Reply-To: matti.j.aaltonen@nokia.com
+To: ext Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        padovan@profusion.mobi
+In-Reply-To: <AANLkTikm8_spOCzLAFytNfNEFxxaqNhTxK__YVjkSxe-@mail.gmail.com>
+References: <1294834111-29658-1-git-send-email-matti.j.aaltonen@nokia.com>
+	 <AANLkTikm8_spOCzLAFytNfNEFxxaqNhTxK__YVjkSxe-@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 13 Jan 2011 10:08:31 +0200
+Message-ID: <1294906111.17385.2.camel@masi.mnp.nokia.com>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Slawomir Bochenski <lkslawek@gmail.com>
+Hello
 
-Normally during an OBEX session, calling sequence
+On Thu, 2011-01-13 at 00:31 +0200, ext Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Wed, Jan 12, 2011 at 2:08 PM, Matti J. Aaltonen
+> <matti.j.aaltonen@nokia.com> wrote:
+> > Initiate authorization check also in cases where the
+> > security level of an existing connection changes to
+> > BT_SECURITY_HIGH.
+> >
+> > This patch fixes a bug which makes commands bluez-test-device and
+> > bluez-simple-agent fail, if the latter is given before the connection
+> > created by bluez-test-device has expired.
+> >
+> I don't think this fixes the problem properly, the authentication
+> request could have been sent before because other levels might require
+> it, also Im afraid this can break sockets using the same link since
+> the state got reseted to BT_CONFIG when it could previously be
+> BT_CONNECTED, what happens if there a socket in use and the link is
+> set back to BT_CONFIG after connected?
 
-service->connect - [driver->open - driver->close]* - service->disconnect
+Yes. One of our bluetooth specialists suggested a simpler and probably
+better fix for this. He'll probably send his patch shortly...
 
-is kept. The only exception to this when the connection is reset
-(when no ABORT was sent) during transfer. Then the sequence is:
-
-service->connect - [driver->open - driver->close]* - driver->open -
-service->disconnect - driver->close
-
-This patch fixes it, so memory managament of session/transfer data in
-service plugin can be easier.
----
- src/obex.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
-
-diff --git a/src/obex.c b/src/obex.c
-index 65f17fc..67684fa 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -1231,6 +1231,8 @@ static void obex_handle_destroy(void *user_data)
- 
- 	os = OBEX_GetUserData(obex);
- 
-+	os_reset_session(os);
-+
- 	if (os->service && os->service->disconnect)
- 		os->service->disconnect(os, os->service_data);
- 
--- 
-1.7.1
-
+Thanks,
+Matti
