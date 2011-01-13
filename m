@@ -1,84 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] [RFC] HDP: reject MDL reconnection with different MTU
-Date: Thu, 13 Jan 2011 21:11:04 -0200
-Message-Id: <1294960264-7622-1-git-send-email-epx@signove.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4D2F6DE5.5090109@ahsoftware.de>
+Date: Thu, 13 Jan 2011 22:25:57 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: Marcel Holtmann <marcel@holtmann.org>, Alicke Xu <sxu@atheros.com>,
+ "Luis R. Rodriguez" <lrodriguez@atheros.com>,
+ Vikram Kandukuri <vikram.kandukuri@atheros.com>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] ath3k: reduce memory usage
+References: <1290456541-3812-1-git-send-email-holler@ahsoftware.de> <20110113190800.GA13675@vigoh>
+In-Reply-To: <20110113190800.GA13675@vigoh>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Elvis Pfutzenreuter <epx@signove.com>
+Hello,
 
-This patch implements refusal of a MDL reconnection if the new L2CAP
-connection presents a different MTU. Accordingly to HDP spec. item 3.5.
+On 13.01.2011 20:08, Gustavo F. Padovan wrote:
+> Hi Alexander,
+>
+> * Alexander Holler<holler@ahsoftware.de>  [2010-11-22 21:09:01 +0100]:
+>
+>> There is no need to hold the firmware in memory.
+>>
+>> Signed-off-by: Alexander Holler<holler@ahsoftware.de>
+>> ---
+>>   drivers/bluetooth/ath3k.c |   75 ++++++++++++---------------------------------
+>>   1 files changed, 20 insertions(+), 55 deletions(-)
+>
+> I'm assuming you tested it a lot. Patch has been applied. Thanks.
 
-It aims to pass the TC_SNK_HCT_BV_07_C PTS test. (It does not pass yet
-because PTS itself seems to have issues. See ticket 7121 for details.)
----
- health/hdp.c       |   17 +++++++++++++++--
- health/hdp_types.h |    1 +
- 2 files changed, 16 insertions(+), 2 deletions(-)
+Yes, I'm using it here haven't had a problem with that patch.
 
-diff --git a/health/hdp.c b/health/hdp.c
-index dc1f803..4f89958 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -874,6 +874,7 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
- 	GError *err = NULL;
- 	GIOChannel *io;
- 	uint8_t mode;
-+	uint16_t mtu;
- 	int fd;
- 
- 	fd = mcap_mdl_get_fd(chan->mdl);
-@@ -883,6 +884,7 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
- 
- 	if (!bt_io_get(io, BT_IO_L2CAP, &err,
- 			BT_IO_OPT_MODE, &mode,
-+			BT_IO_OPT_OMTU, &mtu,
- 			BT_IO_OPT_INVALID)) {
- 		error("Error: %s", err->message);
- 		g_io_channel_unref(io);
-@@ -894,13 +896,24 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
- 
- 	switch (chan->config) {
- 	case HDP_RELIABLE_DC:
--		return mode == L2CAP_MODE_ERTM;
-+		if (mode != L2CAP_MODE_ERTM)
-+			return FALSE;
-+		break;
- 	case HDP_STREAMING_DC:
--		return mode == L2CAP_MODE_STREAMING;
-+		if (mode != L2CAP_MODE_STREAMING)
-+			return FALSE;
-+		break;
- 	default:
- 		error("Error: Connected with unknown configuration");
- 		return FALSE;
- 	}
-+
-+	DBG("MDL MTU: %d; Channel MTU: %d", mtu, chan->mtu);
-+
-+	if (!chan->mtu)
-+		chan->mtu = mtu;
-+
-+	return chan->mtu == mtu;
- }
- 
- static void hdp_mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
-diff --git a/health/hdp_types.h b/health/hdp_types.h
-index fffdb32..714cf9a 100644
---- a/health/hdp_types.h
-+++ b/health/hdp_types.h
-@@ -120,6 +120,7 @@ struct hdp_channel {
- 	uint8_t			config;		/* Channel configuration */
- 	uint8_t			mdep;		/* Remote MDEP */
- 	uint16_t		mdlid;		/* Data channel Id */
-+	uint16_t		mtu;		/* Channel MTU */
- 	struct hdp_echo_data	*edata;		/* private data used by echo channels */
- 	gint			ref;		/* Reference counter */
- };
--- 
-1.7.0.4
+Thanks,
 
+Alexander
