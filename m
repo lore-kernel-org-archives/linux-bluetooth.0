@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Fri, 14 Jan 2011 14:30:56 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: David Sterba <dsterba@suse.cz>
+Cc: akpm@linux-foundation.org, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@profusion.mobi>
+Subject: Re: [PATCH resend] Bluetooth: l2cap: fix misuse of logical
+ operation in place of bitop
+Message-ID: <20110114163056.GA3736@vigoh>
+References: <1295013584-15592-1-git-send-email-dsterba@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1295018061-5849-1-git-send-email-wagi@monom.org>
-References: <1295018061-5849-1-git-send-email-wagi@monom.org>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Sat, 15 Jan 2011 14:05:13 +0100
-Message-ID: <AANLkTimj_-AjrC16MzTb+6kMjtkXQkbKjOb5NO9jXCSa@mail.gmail.com>
-Subject: Re: [PATCH v0 0/2] gdbus introspection fixes
-To: Daniel Wagner <wagi@monom.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Daniel Wagner <daniel.wagner@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1295013584-15592-1-git-send-email-dsterba@suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi all,
 
-2011/1/14 Daniel Wagner <wagi@monom.org>:
-> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
->
-> Hi Johan,
->
-> During some connman debug session I found some small hickups in the
-> introspection code in gdbus. Marcel ask me to check with you first.
->
+* David Sterba <dsterba@suse.cz> [2011-01-14 14:59:44 +0100]:
 
-I've been thinking about the way that dbus is used in BlueZ and I am
-concerned about why we don't use glib-dbus instead of dbus directly.
-This way the dbus specific code will be maintained by glib-dbus.
+> CC: Marcel Holtmann <marcel@holtmann.org>
+> CC: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> CC: Jo=E3o Paulo Rechi Vita <jprvita@profusion.mobi>
+> Signed-off-by: David Sterba <dsterba@suse.cz>
+> ---
+>=20
+> Andrew, this has not been picked up by maintainers since 27.12., please c=
+onsider it for -mm.
+>=20
+>  net/bluetooth/l2cap.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 
-I've thought it several times and I've never said anything because is
-a big change and as everything was working I preferred not to make
-noise with this. But now that some bugs appeared we can probably think
-on this changing the BlueZ DBus code and all the plugins interfaces.
-The only problem I see is that this will probably require a version
-change because the way plugins expose their interface will change.
+I'm taking care of this. Sorry for the delay, I've been away a bit.
+Patch is now applied to Bluetooth tree. Thanks.
 
-> cheers,
-> daniel
-
-Regards.
-
-Jose.
+--=20
+Gustavo F. Padovan
+http://profusion.mobi
