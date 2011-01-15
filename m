@@ -2,15 +2,13 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: <E5842985-417B-4ECF-9611-89E4B288B882@signove.com>
 References: <1295018061-5849-1-git-send-email-wagi@monom.org>
-	<AANLkTimj_-AjrC16MzTb+6kMjtkXQkbKjOb5NO9jXCSa@mail.gmail.com>
-	<E5842985-417B-4ECF-9611-89E4B288B882@signove.com>
-Date: Sat, 15 Jan 2011 16:34:16 +0200
-Message-ID: <AANLkTimSp9bYy24ScN3_fc+dS6wPLPeLgNQsWEQft-7_@mail.gmail.com>
+ <AANLkTimj_-AjrC16MzTb+6kMjtkXQkbKjOb5NO9jXCSa@mail.gmail.com> <E5842985-417B-4ECF-9611-89E4B288B882@signove.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Sat, 15 Jan 2011 15:31:17 +0100
+Message-ID: <AANLkTineUhE46UhyFX=MY_-D6PbniHYCz9u7gGF5Cg4Q@mail.gmail.com>
 Subject: Re: [PATCH v0 0/2] gdbus introspection fixes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-Cc: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>,
-	Daniel Wagner <wagi@monom.org>,
+Cc: Daniel Wagner <wagi@monom.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Daniel Wagner <daniel.wagner@bmw-carit.de>
@@ -18,9 +16,9 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Elvis,
 
-On Sat, Jan 15, 2011 at 3:31 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
+2011/1/15 Elvis Pfützenreuter <epx@signove.com>:
 >
 > On Jan 15, 2011, at 11:05 AM, Jose Antonio Santos Cadenas wrote:
 >
@@ -49,21 +47,19 @@ On Sat, Jan 15, 2011 at 3:31 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
 >
 > One (big) thing that makes me not to like glib-dbus is having to cope with GObject. ALso, it makes certain things more complicated and convoluted than they are in low-level API (e.g passing an array), it is poorly documented, and, incredibly enough, lacks things like the uint16 type.
 
-Exactly, GObject code doesn't really helps us, in fact I consider
-glib-dbus very bad for using in a daemon/server code. Also there is
-another nice thing about gdbus, it keeps us away of wrappers libraries
-to use other D-Bus services because our mainloop integration is not
-compatible with glib-dbus nor QDbus.
+I've been studying the problem of types, specially uint16. You are
+right, they are not implemented, and they never will because GObject
+will never support them, nevertheless it is not very important since
+other types like unit32 can hold them (read this email thread for more
+info http://mail.gnome.org/archives/gtk-devel-list/2001-August/msg00492.html).
+The array issue that you mentioned I think is not as complicated, it
+uses specific Glib types, you only have to learn how to use them (and
+the Glib documentation is quite good).
 
-> My feeling goes the other way round: I wish we had the gdbus API *outside* BlueZ, as a library, so any C application could enjoy it
+>
+> My feeling goes the other way round: I wish we had the gdbus API *outside* BlueZ, as a library, so any C application could enjoy it.
 
-It probably easier to maintain this way, less build dependencies and
-no compromise with API changes, besides iirc gdbus name has been taken
-by the new GObject binding. If gnome guys could take it as part of
-glib's code and build GObject binding on top of our gdbus, IMO that
-would be very convenient for everybody.
+It's a different view of the problem :), let's see if they are more
+opinions out there.
 
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Regards
