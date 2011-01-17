@@ -1,43 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Vasiliy Kulikov <segooon@gmail.com>
-From: Vasiliy Kulikov <segoon@openwall.com>
-To: kernel-janitors@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org> ,
-	"Gustavo F. Padovan" <padovan@profusion.mobi> ,
-	"David S. Miller" <davem@davemloft.net> ,
-	linux-bluetooth@vger.kernel.org ,
-	netdev@vger.kernel.org ,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: bluetooth: fix locking problem
-Date: Mon, 17 Jan 2011 13:08:37 +0300
-Message-Id: <1295258917-31092-1-git-send-email-segoon@openwall.com>
+Date: Mon, 17 Jan 2011 14:50:27 +0530
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Angela Bartholomaus <angelab@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, rshaffer@codeaurora.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 1/4] Bluetooth: Send an Invalid PDU Size Error Response
+ for Service Search Req
+Message-ID: <20110117092027.GA28815@jh-x301>
+References: <1282755705-28400-1-git-send-email-angelab@codeaurora.org>
+ <1282755705-28400-2-git-send-email-angelab@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1282755705-28400-2-git-send-email-angelab@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If alloc_skb() failed we still hold hci_dev_list_lock.  The code should
-unlock it before exit.
+Hi Angela,
 
-Signed-off-by: Vasiliy Kulikov <segoon@openwall.com>
----
- Compile tested only.
+On Wed, Aug 25, 2010, Angela Bartholomaus wrote:
+> Send error code 0x04 per CoreSpecv2.1, sec 4.4 for TP/SERVER/SS/BI-01-C
+> ---
+>  src/sdpd-request.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+> index d56ffc2..cc9fe82 100644
+> --- a/src/sdpd-request.c
+> +++ b/src/sdpd-request.c
+> @@ -367,7 +367,7 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+>  	mlen = scanned + sizeof(uint16_t) + 1;
+>  	// ensure we don't read past buffer
+>  	if (plen < mlen || plen != mlen + *(uint8_t *)(pdata+sizeof(uint16_t))) {
+> -		status = SDP_INVALID_SYNTAX;
+> +		status = SDP_INVALID_PDU_SIZE;
+>  		goto done;
+>  	}
 
- net/bluetooth/mgmt.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+I'm not sure exactly what test system you tested this with, but it
+breaks TP/SERVER/SS/BI-02-C with the BITE tester with test vector
+1.0.40.0. Also, this code path doesn't seem to be traversed at all for
+TP/SERVER/SS/BI-01-C which the patch claims to fix. In order to get a
+clean test report again from the BITE I went ahead and reverted[1] this
+patch. Now both SS/BI-01-C and SS/BI-02-C are passing with the BITE.
+Your other SDP patches don't seem to have any issues.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f827fd9..ace8726 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -111,8 +111,10 @@ static int read_index_list(struct sock *sk)
- 
- 	body_len = sizeof(*ev) + sizeof(*rp) + (2 * count);
- 	skb = alloc_skb(sizeof(*hdr) + body_len, GFP_ATOMIC);
--	if (!skb)
-+	if (!skb) {
-+		read_unlock(&hci_dev_list_lock);
- 		return -ENOMEM;
-+	}
- 
- 	hdr = (void *) skb_put(skb, sizeof(*hdr));
- 	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_COMPLETE);
--- 
-1.7.0.4
+Johan
+
+[1] http://git.kernel.org/?p=bluetooth/bluez.git;a=commitdiff;h=24dbc52388f1ef2e759d24d74cd32f93531c8857
