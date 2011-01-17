@@ -1,58 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 1/2] Rename gatt_primary_t to more generic name
-Date: Mon, 17 Jan 2011 15:37:48 -0400
-Message-Id: <1295293069-29637-1-git-send-email-bruna.moreira@openbossa.org>
+Date: Mon, 17 Jan 2011 16:25:46 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 09/11] Bluetooth: Fix leaking blacklist when
+ unregistering a hci device
+Message-ID: <20110117182546.GB2885@vigoh>
+References: <1294135732-26765-1-git-send-email-johan.hedberg@gmail.com>
+ <1294135732-26765-9-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1294135732-26765-9-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The gatt_primary_t typedef was renamed to gatt_cb_t because it will be
-used for primary and characteristic callbacks.
----
- attrib/gatt.c |    4 ++--
- attrib/gatt.h |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Hi Johan,
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 7d09689..79d8b9d 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -35,7 +35,7 @@ struct discover_primary {
- 	GAttrib *attrib;
- 	uuid_t uuid;
- 	GSList *primaries;
--	gatt_primary_t cb;
-+	gatt_cb_t cb;
- 	void *user_data;
- };
- 
-@@ -193,7 +193,7 @@ done:
- 	discover_primary_free(dp);
- }
- 
--guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_primary_t func,
-+guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_cb_t func,
- 							gpointer user_data)
- {
- 	struct discover_primary *dp;
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 936c592..0bdac77 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -24,9 +24,9 @@
- 
- #define GATT_CID 4
- 
--typedef void (*gatt_primary_t) (GSList *l, guint8 status, gpointer user_data);
-+typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
- 
--guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_primary_t func,
-+guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_cb_t func,
- 							gpointer user_data);
- 
- guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-01-04 12:08:50 +0200]:
+
+> From: Johan Hedberg <johan.hedberg@nokia.com>
+> 
+> The blacklist should be freed before the hci device gets unregistered.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> ---
+>  net/bluetooth/hci_core.c |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
+
+This one is applied. Thanks.
+
 -- 
-1.7.0.4
-
+Gustavo F. Padovan
+http://profusion.mobi
