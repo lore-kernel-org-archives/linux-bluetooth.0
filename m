@@ -1,61 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 17 Jan 2011 14:13:59 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Jesper Juhl <jj@chaosbits.net>
+Cc: linux-kernel@vger.kernel.org, trivial@kernel.org,
+	alsa-devel@alsa-project.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+	linux-edac@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	oprofile-list@lists.sf.net, Andi Kleen <ak@linux.intel.com>,
+	David Teigland <teigland@redhat.com>,
+	Jens Axboe <jens.axboe@oracle.com>,
+	Stephen Hemminger <shemminger@vyatta.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, Takashi Iwai <tiwai@suse.de>,
+	Jaroslav Kysela <perex@perex.cz>,
+	"John W. Linville" <linville@tuxdriver.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Patrick McHardy <kaber@trash.net>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	James Morris <jmorris@namei.org>,
+	"Pekka Savola (ipv6)" <pekkas@netcore.fi>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Frederic Weisbecker <fweisbec@gmail.com>,
+	Joel Becker <jlbec@evilplan.org>, Mark Fasheh <mfasheh@suse.com>,
+	Mauro Carvalho Chehab <mchehab@redhat.com>,
+	Marcel Holtmann <marcel@holtmann.org>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Robert Richter <robert.richter@amd.com>
+Subject: Re: [Patch] Kill off =?utf-8?Q?warning=3A_?=
+ =?utf-8?B?4oCYaW5saW5l4oCZ?= is not at beginning of declaration
+Message-ID: <20110117161359.GA2885@vigoh>
+References: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
 MIME-Version: 1.0
-In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
-References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-	<AANLkTimZk4FrRBGSp=W1LciZnrwjAqmm3k71tLA4AEYV@mail.gmail.com>
-	<4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
-Date: Mon, 17 Jan 2011 14:27:43 -0300
-Message-ID: <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
-Subject: Re: [PATCH] HCI Commands for LE White List
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sumit,
+* Jesper Juhl <jj@chaosbits.net> [2011-01-17 00:09:38 +0100]:
 
-<snip>
+> Fix a bunch of=20
+> 	warning: =E2=80=98inline=E2=80=99 is not at beginning of declaration
+> messages when building a 'make allyesconfig' kernel with -Wextra.
+>=20
+> These warnings are trivial to kill, yet rather annoying when building wit=
+h=20
+> -Wextra.
+> The more we can cut down on pointless crap like this the better (IMHO).
+>=20
+> A previous patch to do this for a 'allnoconfig' build has already been=20
+> merged. This just takes the cleanup a little further.
+>=20
+> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+> ---
+>  arch/x86/oprofile/op_model_p4.c |    2 +-
+>  drivers/bluetooth/btusb.c       |    4 ++--
+>  drivers/cpuidle/sysfs.c         |    2 +-
+>  drivers/edac/i7300_edac.c       |    2 +-
+>  fs/ocfs2/dir.c                  |    2 +-
+>  kernel/trace/ring_buffer.c      |    2 +-
+>  net/ipv6/inet6_hashtables.c     |    2 +-
+>  net/mac80211/tx.c               |    2 +-
+>  sound/pci/au88x0/au88x0.h       |    4 ++--
+>  sound/pci/au88x0/au88x0_core.c  |    4 ++--
+>  10 files changed, 13 insertions(+), 13 deletions(-)
 
-> Is using a separate variable err for return type of a function problem here?
-I didn't understand your question here.
-hci_* functions return 0 on success or -1 on failure. On failure errno
-can be read to get the error number.
+For drivers/bluetooth
 
-> I could see same coding style of defining a variable to carry the error status in hcitool.c function cmd_lecc.
-> Please confirm.
-The coding style issue is the if else:
-At this point "else" is not needed: there is a "exit(1)" inside the
-"if" block. But if you need else the correct coding style is:
-...
-} else {
-...
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
-Instead of
-...
-}
-else {
-...
-
-<snip>
-
->> > +       err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
->> > +       if (err < 0) {
->> > +               perror("Cant remove from white list");
->> > +               exit(1);
->> > +       }
->> > +        else {
->> > +               printf("Device removed from white list");
->> > +       }
->> > +
->> > +       hci_close_dev(dd);
->> Same coding style issue and close "dd"
->>
->
->
-> Ok. Good point. But I could still find premature returns on error conditions via exits at several places in hcitool.c. Can I submit a separate patch for rectifying all such error conditions too?
-
-sure!
-
-Claudio
+--=20
+Gustavo F. Padovan
+http://profusion.mobi
