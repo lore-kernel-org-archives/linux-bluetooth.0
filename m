@@ -1,34 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Jan 2011 16:25:46 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 09/11] Bluetooth: Fix leaking blacklist when
- unregistering a hci device
-Message-ID: <20110117182546.GB2885@vigoh>
-References: <1294135732-26765-1-git-send-email-johan.hedberg@gmail.com>
- <1294135732-26765-9-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1294135732-26765-9-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
+References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
+	<AANLkTimZk4FrRBGSp=W1LciZnrwjAqmm3k71tLA4AEYV@mail.gmail.com>
+	<4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 17 Jan 2011 14:27:43 -0300
+Message-ID: <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
+Subject: Re: [PATCH] HCI Commands for LE White List
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Sumit,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-01-04 12:08:50 +0200]:
+<snip>
 
-> From: Johan Hedberg <johan.hedberg@nokia.com>
-> 
-> The blacklist should be freed before the hci device gets unregistered.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-> ---
->  net/bluetooth/hci_core.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+> Is using a separate variable err for return type of a function problem here?
+I didn't understand your question here.
+hci_* functions return 0 on success or -1 on failure. On failure errno
+can be read to get the error number.
 
-This one is applied. Thanks.
+> I could see same coding style of defining a variable to carry the error status in hcitool.c function cmd_lecc.
+> Please confirm.
+The coding style issue is the if else:
+At this point "else" is not needed: there is a "exit(1)" inside the
+"if" block. But if you need else the correct coding style is:
+...
+} else {
+...
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Instead of
+...
+}
+else {
+...
+
+<snip>
+
+>> > +       err = hci_le_remove_from_white_list(dd, bdaddr ,bdaddr_type);
+>> > +       if (err < 0) {
+>> > +               perror("Cant remove from white list");
+>> > +               exit(1);
+>> > +       }
+>> > +        else {
+>> > +               printf("Device removed from white list");
+>> > +       }
+>> > +
+>> > +       hci_close_dev(dd);
+>> Same coding style issue and close "dd"
+>>
+>
+>
+> Ok. Good point. But I could still find premature returns on error conditions via exits at several places in hcitool.c. Can I submit a separate patch for rectifying all such error conditions too?
+
+sure!
+
+Claudio
