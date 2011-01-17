@@ -1,60 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Jan 2011 08:55:21 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Jesper Juhl <jj@chaosbits.net>
-Cc: linux-kernel@vger.kernel.org, trivial@kernel.org,
-        alsa-devel@alsa-project.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-edac@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        oprofile-list@lists.sf.net, Andi Kleen <ak@linux.intel.com>,
-        David Teigland <teigland@redhat.com>,
-        Jens Axboe <jens.axboe@oracle.com>,
-        Stephen Hemminger <shemminger@vyatta.com>,
-        Greg Kroah-Hartman <gregkh@suse.de>, Takashi Iwai <tiwai@suse.de>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Patrick McHardy <kaber@trash.net>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        James Morris <jmorris@namei.org>,
-        "Pekka Savola (ipv6)" <pekkas@netcore.fi>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        "David S. Miller" <davem@davemloft.net>,
-        Frederic Weisbecker <fweisbec@gmail.com>,
-        Joel Becker <jlbec@evilplan.org>, Mark Fasheh <mfasheh@suse.com>,
-        Mauro Carvalho Chehab <mchehab@redhat.com>,
-        "Gustavo F. Padovan" <padovan@profusion.mobi>,
-        Marcel Holtmann <marcel@holtmann.org>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Robert Richter <robert.richter@amd.com>
-Subject: Re: [Patch] Kill off =?utf-8?Q?warning=3A_?=
- =?utf-8?B?4oCYaW5saW5l4oCZ?= is not at beginning of declaration
-Message-ID: <20110117135520.GA5430@tuxdriver.com>
-References: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
+In-Reply-To: <1295258917-31092-1-git-send-email-segoon@openwall.com>
+References: <1295258917-31092-1-git-send-email-segoon@openwall.com>
+Date: Mon, 17 Jan 2011 12:28:29 +0200
+Message-ID: <AANLkTi=5GpSEsGNMcfTVDyo_cHoELPaD8EmJGUhPxPw2@mail.gmail.com>
+Subject: Re: [PATCH] net: bluetooth: fix locking problem
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Vasiliy Kulikov <segoon@openwall.com>
+Cc: kernel-janitors@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>, "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 17, 2011 at 12:09:38AM +0100, Jesper Juhl wrote:
-> Fix a bunch of 
-> 	warning: ‘inline’ is not at beginning of declaration
-> messages when building a 'make allyesconfig' kernel with -Wextra.
-> 
-> These warnings are trivial to kill, yet rather annoying when building with 
-> -Wextra.
-> The more we can cut down on pointless crap like this the better (IMHO).
-> 
-> A previous patch to do this for a 'allnoconfig' build has already been 
-> merged. This just takes the cleanup a little further.
-> 
-> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+On Mon, Jan 17, 2011 at 12:08 PM, Vasiliy Kulikov <segoon@openwall.com> wro=
+te:
+> If alloc_skb() failed we still hold hci_dev_list_lock. =A0The code should
+> unlock it before exit.
+>
+> Signed-off-by: Vasiliy Kulikov <segoon@openwall.com>
 > ---
+> =A0Compile tested only.
+>
+> =A0net/bluetooth/mgmt.c | =A0 =A04 +++-
+> =A01 files changed, 3 insertions(+), 1 deletions(-)
+>
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index f827fd9..ace8726 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -111,8 +111,10 @@ static int read_index_list(struct sock *sk)
+>
+> =A0 =A0 =A0 =A0body_len =3D sizeof(*ev) + sizeof(*rp) + (2 * count);
+> =A0 =A0 =A0 =A0skb =3D alloc_skb(sizeof(*hdr) + body_len, GFP_ATOMIC);
+> - =A0 =A0 =A0 if (!skb)
+> + =A0 =A0 =A0 if (!skb) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_unlock(&hci_dev_list_lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
+> + =A0 =A0 =A0 }
 
->  net/mac80211/tx.c               |    2 +-
+patch was send already on weekend
 
-ack
-
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+>
+> =A0 =A0 =A0 =A0hdr =3D (void *) skb_put(skb, sizeof(*hdr));
+> =A0 =A0 =A0 =A0hdr->opcode =3D cpu_to_le16(MGMT_EV_CMD_COMPLETE);
+> --
+> 1.7.0.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at =A0http://www.tux.org/lkml/
+>
