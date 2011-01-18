@@ -1,161 +1,250 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Remove IMTU and OMTU properties and return its values on Acquire reply
-Date: Tue, 18 Jan 2011 12:00:12 +0200
-Message-Id: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alan Ott <alan@signal11.us>
+To: Jiri Kosina <jkosina@suse.cz>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>, Alan Ott <alan@signal11.us>,
+	Michael Poole <mdpoole@troilus.org>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Cc: Alan Ott <alan@signal11.us>
+Subject: [PATCH v5 4/4] bt hidp: Add support for hidraw HIDIOCGFEATURE and HIDIOCSFEATURE
+Date: Tue, 18 Jan 2011 03:04:40 -0500
+Message-Id: <1295337880-12452-5-git-send-email-alan@signal11.us>
+In-Reply-To: <1295337880-12452-1-git-send-email-alan@signal11.us>
+References: <1295337880-12452-1-git-send-email-alan@signal11.us>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+This patch adds support or getting and setting feature reports for bluetooth
+HID devices from HIDRAW.
 
-This should make Acquire blocking friendly since the client no longer has
-to call GetProperties to discover how much it can write/read when using
-the acquired file descriptor.
+Signed-off-by: Alan Ott <alan@signal11.us>
 ---
- audio/transport.c |   56 +++++++++++++++++++++++++++++++---------------------
- doc/media-api.txt |   13 ++---------
- 2 files changed, 36 insertions(+), 33 deletions(-)
+ net/bluetooth/hidp/core.c |  113 +++++++++++++++++++++++++++++++++++++++++++--
+ net/bluetooth/hidp/hidp.h |    8 +++
+ 2 files changed, 117 insertions(+), 4 deletions(-)
 
-diff --git a/audio/transport.c b/audio/transport.c
-index bdec157..d575590 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -181,14 +181,6 @@ static gboolean media_transport_set_fd(struct media_transport *transport,
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 5383e6c..6df8ea1 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -36,6 +36,7 @@
+ #include <linux/file.h>
+ #include <linux/init.h>
+ #include <linux/wait.h>
++#include <linux/mutex.h>
+ #include <net/sock.h>
  
- 	info("%s: fd(%d) ready", transport->path, fd);
- 
--	emit_property_changed(transport->conn, transport->path,
--				MEDIA_TRANSPORT_INTERFACE, "IMTU",
--				DBUS_TYPE_UINT16, &transport->imtu);
--
--	emit_property_changed(transport->conn, transport->path,
--				MEDIA_TRANSPORT_INTERFACE, "OMTU",
--				DBUS_TYPE_UINT16, &transport->omtu);
--
- 	return TRUE;
+ #include <linux/input.h>
+@@ -313,6 +314,86 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
+ 	return hidp_queue_report(session, buf, rsize);
  }
  
-@@ -209,6 +201,7 @@ static void a2dp_resume_complete(struct avdtp *session,
- 	struct avdtp_stream *stream;
- 	int fd;
- 	uint16_t imtu, omtu;
-+	gboolean ret;
- 
- 	req->id = 0;
- 
-@@ -219,15 +212,24 @@ static void a2dp_resume_complete(struct avdtp *session,
- 	if (stream == NULL)
- 		goto fail;
- 
--	if (avdtp_stream_get_transport(stream, &fd, &imtu, &omtu, NULL) ==
--			FALSE)
-+	ret = avdtp_stream_get_transport(stream, &fd, &imtu, &omtu, NULL);
-+	if (ret == FALSE)
- 		goto fail;
- 
- 	media_transport_set_fd(transport, fd, imtu, omtu);
- 
--	if (g_dbus_send_reply(transport->conn, req->msg,
--				DBUS_TYPE_UNIX_FD, &fd,
--				DBUS_TYPE_INVALID) == FALSE)
-+	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
-+		imtu = 0;
++static int hidp_get_raw_report(struct hid_device *hid,
++		unsigned char report_number,
++		unsigned char *data, size_t count,
++		unsigned char report_type)
++{
++	struct hidp_session *session = hid->driver_data;
++	struct sk_buff *skb;
++	size_t len;
++	int numbered_reports = hid->report_enum[report_type].numbered;
 +
-+	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
-+		omtu = 0;
++	switch (report_type) {
++	case HID_FEATURE_REPORT:
++		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_FEATURE;
++		break;
++	case HID_INPUT_REPORT:
++		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_INPUT;
++		break;
++	case HID_OUTPUT_REPORT:
++		report_type = HIDP_TRANS_GET_REPORT | HIDP_DATA_RTYPE_OUPUT;
++		break;
++	default:
++		return -EINVAL;
++	}
 +
-+	ret = g_dbus_send_reply(transport->conn, req->msg,
-+						DBUS_TYPE_UNIX_FD, &fd,
-+						DBUS_TYPE_UINT16, &imtu,
-+						DBUS_TYPE_UINT16, &omtu,
-+						DBUS_TYPE_INVALID);
-+	if (ret == FALSE)
- 		goto fail;
- 
- 	return;
-@@ -282,6 +284,8 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
- 	struct acquire_request *req = owner->request;
- 	struct media_transport *transport = owner->transport;
- 	int fd;
-+	uint16_t imtu, omtu;
-+	gboolean ret;
- 
- 	req->id = 0;
- 
-@@ -292,11 +296,23 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
- 	if (fd < 0)
- 		goto fail;
- 
--	media_transport_set_fd(transport, fd, 48, 48);
-+	imtu = 48;
-+	omtu = 48;
- 
--	if (g_dbus_send_reply(transport->conn, req->msg,
--				DBUS_TYPE_UNIX_FD, &fd,
--				DBUS_TYPE_INVALID) == FALSE)
-+	media_transport_set_fd(transport, fd, imtu, omtu);
++	if (mutex_lock_interruptible(&session->report_mutex))
++		return -ERESTARTSYS;
 +
-+	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
-+		imtu = 0;
++	/* Set up our wait, and send the report request to the device. */
++	session->waiting_report_type = report_type & HIDP_DATA_RTYPE_MASK;
++	session->waiting_report_number = numbered_reports ? report_number : -1;
++	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++	data[0] = report_number;
++	if (hidp_send_ctrl_message(hid->driver_data, report_type, data, 1))
++		goto err_eio;
 +
-+	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
-+		omtu = 0;
++	/* Wait for the return of the report. The returned report
++	   gets put in session->report_return.  */
++	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
++		int res;
 +
-+	ret = g_dbus_send_reply(transport->conn, req->msg,
-+						DBUS_TYPE_UNIX_FD, &fd,
-+						DBUS_TYPE_UINT16, &imtu,
-+						DBUS_TYPE_UINT16, &omtu,
-+						DBUS_TYPE_INVALID);
-+	if (ret == FALSE)
- 		goto fail;
++		res = wait_event_interruptible_timeout(session->report_queue,
++			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags),
++			5*HZ);
++		if (res == 0) {
++			/* timeout */
++			goto err_eio;
++		}
++		if (res < 0) {
++			/* signal */
++			goto err_restartsys;
++		}
++	}
++
++	skb = session->report_return;
++	if (skb) {
++		len = skb->len < count ? skb->len : count;
++		memcpy(data, skb->data, len);
++
++		kfree_skb(skb);
++		session->report_return = NULL;
++	} else {
++		/* Device returned a HANDSHAKE, indicating  protocol error. */
++		len = -EIO;
++	}
++
++	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++	mutex_unlock(&session->report_mutex);
++
++	return len;
++
++err_restartsys:
++	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++	mutex_unlock(&session->report_mutex);
++	return -ERESTARTSYS;
++err_eio:
++	clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++	mutex_unlock(&session->report_mutex);
++	return -EIO;
++}
++
+ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count,
+ 		unsigned char report_type)
+ {
+@@ -409,6 +490,10 @@ static void hidp_process_handshake(struct hidp_session *session,
+ 	case HIDP_HSHK_ERR_INVALID_REPORT_ID:
+ 	case HIDP_HSHK_ERR_UNSUPPORTED_REQUEST:
+ 	case HIDP_HSHK_ERR_INVALID_PARAMETER:
++		if (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
++			clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++			wake_up_interruptible(&session->report_queue);
++		}
+ 		/* FIXME: Call into SET_ GET_ handlers here */
+ 		break;
  
- 	return;
-@@ -607,12 +623,6 @@ void transport_get_properties(struct media_transport *transport,
- 	dict_append_entry(&dict, "Device", DBUS_TYPE_OBJECT_PATH,
- 						&transport->device->path);
+@@ -451,9 +536,11 @@ static void hidp_process_hid_control(struct hidp_session *session,
+ 	}
+ }
  
--	dict_append_entry(&dict, "IMTU", DBUS_TYPE_UINT16,
--						&transport->imtu);
+-static void hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
++/* Returns true if the passed-in skb should be freed by the caller. */
++static int hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
+ 				unsigned char param)
+ {
++	int done_with_skb = 1;
+ 	BT_DBG("session %p skb %p len %d param 0x%02x", session, skb, skb->len, param);
+ 
+ 	switch (param) {
+@@ -465,7 +552,6 @@ static void hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
+ 
+ 		if (session->hid)
+ 			hid_input_report(session->hid, HID_INPUT_REPORT, skb->data, skb->len, 0);
 -
--	dict_append_entry(&dict, "OMTU", DBUS_TYPE_UINT16,
--						&transport->omtu);
--
- 	uuid = media_endpoint_get_uuid(transport->endpoint);
- 	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
+ 		break;
  
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 5338974..92b8b3f 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -86,9 +86,10 @@ Methods		dict GetProperties()
- 			Returns all properties for the interface. See the
- 			properties section for available properties.
+ 	case HIDP_DATA_RTYPE_OTHER:
+@@ -477,12 +563,27 @@ static void hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
+ 		__hidp_send_ctrl_message(session,
+ 			HIDP_TRANS_HANDSHAKE | HIDP_HSHK_ERR_INVALID_PARAMETER, NULL, 0);
+ 	}
++
++	if (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags) &&
++				param == session->waiting_report_type) {
++		if (session->waiting_report_number < 0 ||
++		    session->waiting_report_number == skb->data[0]) {
++			/* hidp_get_raw_report() is waiting on this report. */
++			session->report_return = skb;
++			done_with_skb = 0;
++			clear_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
++			wake_up_interruptible(&session->report_queue);
++		}
++	}
++
++	return done_with_skb;
+ }
  
--		fd Acquire(string accesstype)
-+		fd, uint16, uint16 Acquire(string accesstype)
+ static void hidp_recv_ctrl_frame(struct hidp_session *session,
+ 					struct sk_buff *skb)
+ {
+ 	unsigned char hdr, type, param;
++	int free_skb = 1;
  
--			Acquire transport file descriptor.
-+			Acquire transport file descriptor and the MTU for read
-+			and write respectively.
+ 	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
  
- 			possible accesstype:
+@@ -502,7 +603,7 @@ static void hidp_recv_ctrl_frame(struct hidp_session *session,
+ 		break;
  
-@@ -118,14 +119,6 @@ Properties	object Device [readonly]
+ 	case HIDP_TRANS_DATA:
+-		hidp_process_data(session, skb, param);
++		free_skb = hidp_process_data(session, skb, param);
+ 		break;
  
- 			Device object which the transport is connected to.
+ 	default:
+@@ -511,7 +612,8 @@ static void hidp_recv_ctrl_frame(struct hidp_session *session,
+ 		break;
+ 	}
  
--		uint16 IMTU [readonly]
--
--			Transport input MTU.
--
--		uint16 OMTU [readonly]
--
--			Transport output MTU.
--
- 		string UUID [readonly]
+-	kfree_skb(skb);
++	if (free_skb)
++		kfree_skb(skb);
+ }
  
- 			UUID of the profile which the transport is for.
+ static void hidp_recv_intr_frame(struct hidp_session *session,
+@@ -845,6 +947,7 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	hid->dev.parent = hidp_get_device(session);
+ 	hid->ll_driver = &hidp_hid_driver;
+ 
++	hid->hid_get_raw_report = hidp_get_raw_report;
+ 	hid->hid_output_raw_report = hidp_output_raw_report;
+ 
+ 	return 0;
+@@ -897,6 +1000,8 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	skb_queue_head_init(&session->ctrl_transmit);
+ 	skb_queue_head_init(&session->intr_transmit);
+ 
++	mutex_init(&session->report_mutex);
++	init_waitqueue_head(&session->report_queue);
+ 	init_waitqueue_head(&session->startup_queue);
+ 	session->waiting_for_startup = 1;
+ 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
+diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
+index 92e093e..13de5fa 100644
+--- a/net/bluetooth/hidp/hidp.h
++++ b/net/bluetooth/hidp/hidp.h
+@@ -80,6 +80,7 @@
+ #define HIDP_VIRTUAL_CABLE_UNPLUG	0
+ #define HIDP_BOOT_PROTOCOL_MODE		1
+ #define HIDP_BLUETOOTH_VENDOR_ID	9
++#define	HIDP_WAITING_FOR_RETURN		10
+ #define HIDP_WAITING_FOR_SEND_ACK	11
+ 
+ struct hidp_connadd_req {
+@@ -155,6 +156,13 @@ struct hidp_session {
+ 	struct sk_buff_head ctrl_transmit;
+ 	struct sk_buff_head intr_transmit;
+ 
++	/* Used in hidp_get_raw_report() */
++	int waiting_report_type; /* HIDP_DATA_RTYPE_* */
++	int waiting_report_number; /* -1 for not numbered */
++	struct mutex report_mutex;
++	struct sk_buff *report_return;
++	wait_queue_head_t report_queue;
++
+ 	/* Used in hidp_output_raw_report() */
+ 	int output_report_success; /* boolean */
+ 
 -- 
-1.7.1
-
+1.7.0.4
