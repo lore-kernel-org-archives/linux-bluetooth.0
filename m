@@ -1,70 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Updade a2dpsink to use new Acquire API
-Date: Tue, 18 Jan 2011 12:00:13 +0200
-Message-Id: <1295344815-1404-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
-References: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/4] Remove IMTU and OMTU properties and return its values on Acquire reply
+Date: Tue, 18 Jan 2011 12:00:12 +0200
+Message-Id: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
+This should make Acquire blocking friendly since the client no longer has
+to call GetProperties to discover how much it can write/read when using
+the acquired file descriptor.
 ---
- audio/gstavdtpsink.c |   19 +++++++------------
- 1 files changed, 7 insertions(+), 12 deletions(-)
+ audio/transport.c |   56 +++++++++++++++++++++++++++++++---------------------
+ doc/media-api.txt |   13 ++---------
+ 2 files changed, 36 insertions(+), 33 deletions(-)
 
-diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
-index 95c4811..f3b15b3 100644
---- a/audio/gstavdtpsink.c
-+++ b/audio/gstavdtpsink.c
-@@ -1281,16 +1281,7 @@ static gboolean gst_avdtp_sink_transport_parse_property(GstAvdtpSink *self,
+diff --git a/audio/transport.c b/audio/transport.c
+index bdec157..d575590 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -181,14 +181,6 @@ static gboolean media_transport_set_fd(struct media_transport *transport,
  
- 		break;
- 	}
--	case DBUS_TYPE_UINT16: {
--		uint16_t value;
--		dbus_message_iter_get_basic(&variant_i, &value);
--
--		if (g_str_equal(key, "OMTU") == TRUE)
--			self->data->link_mtu = value;
--
--		break;
--	}
--        case DBUS_TYPE_STRING: {
-+	case DBUS_TYPE_STRING: {
- 		const char *value;
- 		dbus_message_iter_get_basic(&variant_i, &value);
+ 	info("%s: fd(%d) ready", transport->path, fd);
  
-@@ -1329,6 +1320,7 @@ static gboolean gst_avdtp_sink_transport_acquire(GstAvdtpSink *self)
- 	DBusError err;
- 	const char *access_type = "w";
+-	emit_property_changed(transport->conn, transport->path,
+-				MEDIA_TRANSPORT_INTERFACE, "IMTU",
+-				DBUS_TYPE_UINT16, &transport->imtu);
+-
+-	emit_property_changed(transport->conn, transport->path,
+-				MEDIA_TRANSPORT_INTERFACE, "OMTU",
+-				DBUS_TYPE_UINT16, &transport->omtu);
+-
+ 	return TRUE;
+ }
+ 
+@@ -209,6 +201,7 @@ static void a2dp_resume_complete(struct avdtp *session,
+ 	struct avdtp_stream *stream;
  	int fd;
-+	uint16_t imtu, omtu;
+ 	uint16_t imtu, omtu;
++	gboolean ret;
  
- 	dbus_error_init(&err);
+ 	req->id = 0;
  
-@@ -1349,14 +1341,17 @@ static gboolean gst_avdtp_sink_transport_acquire(GstAvdtpSink *self)
+@@ -219,15 +212,24 @@ static void a2dp_resume_complete(struct avdtp *session,
+ 	if (stream == NULL)
  		goto fail;
  
- 	if (dbus_message_get_args(reply, &err, DBUS_TYPE_UNIX_FD, &fd,
--					DBUS_TYPE_INVALID) == FALSE)
+-	if (avdtp_stream_get_transport(stream, &fd, &imtu, &omtu, NULL) ==
+-			FALSE)
++	ret = avdtp_stream_get_transport(stream, &fd, &imtu, &omtu, NULL);
++	if (ret == FALSE)
+ 		goto fail;
+ 
+ 	media_transport_set_fd(transport, fd, imtu, omtu);
+ 
+-	if (g_dbus_send_reply(transport->conn, req->msg,
+-				DBUS_TYPE_UNIX_FD, &fd,
+-				DBUS_TYPE_INVALID) == FALSE)
++	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
++		imtu = 0;
++
++	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
++		omtu = 0;
++
++	ret = g_dbus_send_reply(transport->conn, req->msg,
++						DBUS_TYPE_UNIX_FD, &fd,
 +						DBUS_TYPE_UINT16, &imtu,
 +						DBUS_TYPE_UINT16, &omtu,
-+						DBUS_TYPE_INVALID) == FALSE)
++						DBUS_TYPE_INVALID);
++	if (ret == FALSE)
  		goto fail;
  
- 	dbus_message_unref(reply);
+ 	return;
+@@ -282,6 +284,8 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
+ 	struct acquire_request *req = owner->request;
+ 	struct media_transport *transport = owner->transport;
+ 	int fd;
++	uint16_t imtu, omtu;
++	gboolean ret;
  
- 	self->stream = g_io_channel_unix_new(fd);
- 	g_io_channel_set_close_on_unref(self->stream, TRUE);
--	GST_DEBUG_OBJECT(self, "stream_fd=%d", fd);
-+	self->data->link_mtu = omtu;
-+	GST_DEBUG_OBJECT(self, "stream_fd=%d mtu=%d", fd, omtu);
+ 	req->id = 0;
  
- 	return TRUE;
+@@ -292,11 +296,23 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
+ 	if (fd < 0)
+ 		goto fail;
  
+-	media_transport_set_fd(transport, fd, 48, 48);
++	imtu = 48;
++	omtu = 48;
+ 
+-	if (g_dbus_send_reply(transport->conn, req->msg,
+-				DBUS_TYPE_UNIX_FD, &fd,
+-				DBUS_TYPE_INVALID) == FALSE)
++	media_transport_set_fd(transport, fd, imtu, omtu);
++
++	if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
++		imtu = 0;
++
++	if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
++		omtu = 0;
++
++	ret = g_dbus_send_reply(transport->conn, req->msg,
++						DBUS_TYPE_UNIX_FD, &fd,
++						DBUS_TYPE_UINT16, &imtu,
++						DBUS_TYPE_UINT16, &omtu,
++						DBUS_TYPE_INVALID);
++	if (ret == FALSE)
+ 		goto fail;
+ 
+ 	return;
+@@ -607,12 +623,6 @@ void transport_get_properties(struct media_transport *transport,
+ 	dict_append_entry(&dict, "Device", DBUS_TYPE_OBJECT_PATH,
+ 						&transport->device->path);
+ 
+-	dict_append_entry(&dict, "IMTU", DBUS_TYPE_UINT16,
+-						&transport->imtu);
+-
+-	dict_append_entry(&dict, "OMTU", DBUS_TYPE_UINT16,
+-						&transport->omtu);
+-
+ 	uuid = media_endpoint_get_uuid(transport->endpoint);
+ 	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
+ 
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 5338974..92b8b3f 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -86,9 +86,10 @@ Methods		dict GetProperties()
+ 			Returns all properties for the interface. See the
+ 			properties section for available properties.
+ 
+-		fd Acquire(string accesstype)
++		fd, uint16, uint16 Acquire(string accesstype)
+ 
+-			Acquire transport file descriptor.
++			Acquire transport file descriptor and the MTU for read
++			and write respectively.
+ 
+ 			possible accesstype:
+ 
+@@ -118,14 +119,6 @@ Properties	object Device [readonly]
+ 
+ 			Device object which the transport is connected to.
+ 
+-		uint16 IMTU [readonly]
+-
+-			Transport input MTU.
+-
+-		uint16 OMTU [readonly]
+-
+-			Transport output MTU.
+-
+ 		string UUID [readonly]
+ 
+ 			UUID of the profile which the transport is for.
 -- 
 1.7.1
 
