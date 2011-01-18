@@ -9,136 +9,114 @@ To: Jiri Kosina <jkosina@suse.cz>,
 	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Cc: Alan Ott <alan@signal11.us>
-Subject: [PATCH v5 2/4] bt hidp: Wait for ACK on Sent Reports
-Date: Tue, 18 Jan 2011 03:04:38 -0500
-Message-Id: <1295337880-12452-3-git-send-email-alan@signal11.us>
+Subject: [PATCH v5 1/4] bt hidp: Move hid_add_device() call to after hidp_session() has started.
+Date: Tue, 18 Jan 2011 03:04:37 -0500
+Message-Id: <1295337880-12452-2-git-send-email-alan@signal11.us>
 In-Reply-To: <1295337880-12452-1-git-send-email-alan@signal11.us>
 References: <1295337880-12452-1-git-send-email-alan@signal11.us>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Wait for an ACK from the device before returning from
-hidp_output_raw_report(). This way, failures can be returned to the user
-application. Also, it prevents ACK/NAK packets from an output packet from
-being confused with ACK/NAK packets from an input request packet.
+Move the call to hid_add_device() (which calls a device's probe() function)
+to after the kernel_thread() call which starts the hidp_session() thread.
+This ensures the Bluetooth receive socket is fully running by the time a
+device's probe() function is called. This way, a device can communicate
+(send and receive) with the Bluetooth device from its probe() function.
 
 Signed-off-by: Alan Ott <alan@signal11.us>
 ---
- net/bluetooth/hidp/core.c |   54 ++++++++++++++++++++++++++++++++++++++++++--
- net/bluetooth/hidp/hidp.h |    4 +++
- 2 files changed, 55 insertions(+), 3 deletions(-)
+ net/bluetooth/hidp/core.c |   28 ++++++++++++++++++++--------
+ net/bluetooth/hidp/hidp.h |    3 +++
+ 2 files changed, 23 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 67cc4bc..5383e6c 100644
+index 29544c2..67cc4bc 100644
 --- a/net/bluetooth/hidp/core.c
 +++ b/net/bluetooth/hidp/core.c
-@@ -316,6 +316,9 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
- static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, size_t count,
- 		unsigned char report_type)
+@@ -563,6 +563,8 @@ static int hidp_session(void *arg)
+ 	init_waitqueue_entry(&intr_wait, current);
+ 	add_wait_queue(sk_sleep(ctrl_sk), &ctrl_wait);
+ 	add_wait_queue(sk_sleep(intr_sk), &intr_wait);
++	session->waiting_for_startup = 0;
++	wake_up_interruptible(&session->startup_queue);
+ 	while (!atomic_read(&session->terminate)) {
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 
+@@ -754,6 +756,8 @@ static struct hid_ll_driver hidp_hid_driver = {
+ 	.hidinput_input_event = hidp_hidinput_event,
+ };
+ 
++/* This function sets up the hid device. It does not add it
++   to the HID system. That is done in hidp_add_connection(). */
+ static int hidp_setup_hid(struct hidp_session *session,
+ 				struct hidp_connadd_req *req)
  {
-+	struct hidp_session *session = hid->driver_data;
-+	int ret;
-+
- 	switch (report_type) {
- 	case HID_FEATURE_REPORT:
- 		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
-@@ -327,10 +330,47 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
- 		return -EINVAL;
- 	}
+@@ -795,16 +799,8 @@ static int hidp_setup_hid(struct hidp_session *session,
  
-+	if (mutex_lock_interruptible(&session->report_mutex))
-+		return -ERESTARTSYS;
-+
-+	/* Set up our wait, and send the report request to the device. */
-+	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
- 	if (hidp_send_ctrl_message(hid->driver_data, report_type,
--			data, count))
--		return -ENOMEM;
--	return count;
-+			data, count)) {
-+		ret = -ENOMEM;
-+		goto err;
+ 	hid->hid_output_raw_report = hidp_output_raw_report;
+ 
+-	err = hid_add_device(hid);
+-	if (err < 0)
+-		goto failed;
+-
+ 	return 0;
+ 
+-failed:
+-	hid_destroy_device(hid);
+-	session->hid = NULL;
+-
+ fault:
+ 	kfree(session->rd_data);
+ 	session->rd_data = NULL;
+@@ -853,6 +849,8 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	skb_queue_head_init(&session->ctrl_transmit);
+ 	skb_queue_head_init(&session->intr_transmit);
+ 
++	init_waitqueue_head(&session->startup_queue);
++	session->waiting_for_startup = 1;
+ 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
+ 	session->idle_to = req->idle_to;
+ 
+@@ -875,6 +873,14 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	err = kernel_thread(hidp_session, session, CLONE_KERNEL);
+ 	if (err < 0)
+ 		goto unlink;
++	while (session->waiting_for_startup) {
++		wait_event_interruptible(session->startup_queue,
++			!session->waiting_for_startup);
 +	}
 +
-+	/* Wait for the ACK from the device. */
-+	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)) {
-+		int res;
-+
-+		res = wait_event_interruptible_timeout(session->report_queue,
-+			!test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags),
-+			10*HZ);
-+		if (res == 0) {
-+			/* timeout */
-+			ret = -EIO;
-+			goto err;
-+		}
-+		if (res < 0) {
-+			/* signal */
-+			ret = -ERESTARTSYS;
-+			goto err;
-+		}
-+	}
-+
-+	if (!session->output_report_success) {
-+		ret = -EIO;
-+		goto err;
-+	}
-+
-+	ret = count;
-+
-+err:
-+	clear_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
-+	mutex_unlock(&session->report_mutex);
-+	return ret;
- }
++	err = hid_add_device(session->hid);
++	if (err < 0)
++		goto err_add_device;
  
- static void hidp_idle_timeout(unsigned long arg)
-@@ -357,10 +397,12 @@ static void hidp_process_handshake(struct hidp_session *session,
- 					unsigned char param)
- {
- 	BT_DBG("session %p param 0x%02x", session, param);
-+	session->output_report_success = 0; /* default condition */
+ 	if (session->input) {
+ 		hidp_send_ctrl_message(session,
+@@ -888,6 +894,12 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	up_write(&hidp_session_sem);
+ 	return 0;
  
- 	switch (param) {
- 	case HIDP_HSHK_SUCCESSFUL:
- 		/* FIXME: Call into SET_ GET_ handlers here */
-+		session->output_report_success = 1;
- 		break;
- 
- 	case HIDP_HSHK_NOT_READY:
-@@ -385,6 +427,12 @@ static void hidp_process_handshake(struct hidp_session *session,
- 			HIDP_TRANS_HANDSHAKE | HIDP_HSHK_ERR_INVALID_PARAMETER, NULL, 0);
- 		break;
- 	}
++err_add_device:
++	hid_destroy_device(session->hid);
++	session->hid = NULL;
++	atomic_inc(&session->terminate);
++	hidp_schedule(session);
 +
-+	/* Wake up the waiting thread. */
-+	if (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)) {
-+		clear_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
-+		wake_up_interruptible(&session->report_queue);
-+	}
- }
+ unlink:
+ 	hidp_del_timer(session);
  
- static void hidp_process_hid_control(struct hidp_session *session,
 diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
-index 2cc35dc..92e093e 100644
+index 8d934a1..2cc35dc 100644
 --- a/net/bluetooth/hidp/hidp.h
 +++ b/net/bluetooth/hidp/hidp.h
-@@ -80,6 +80,7 @@
- #define HIDP_VIRTUAL_CABLE_UNPLUG	0
- #define HIDP_BOOT_PROTOCOL_MODE		1
- #define HIDP_BLUETOOTH_VENDOR_ID	9
-+#define HIDP_WAITING_FOR_SEND_ACK	11
- 
- struct hidp_connadd_req {
- 	int   ctrl_sock;	// Connected control socket
-@@ -154,6 +155,9 @@ struct hidp_session {
- 	struct sk_buff_head ctrl_transmit;
- 	struct sk_buff_head intr_transmit;
- 
-+	/* Used in hidp_output_raw_report() */
-+	int output_report_success; /* boolean */
-+
+@@ -157,6 +157,9 @@ struct hidp_session {
  	/* Report descriptor */
  	__u8 *rd_data;
  	uint rd_size;
++
++	wait_queue_head_t startup_queue;
++	int waiting_for_startup;
+ };
+ 
+ static inline void hidp_schedule(struct hidp_session *session)
 -- 
 1.7.0.4
