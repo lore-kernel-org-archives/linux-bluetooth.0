@@ -1,46 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D357014.8020600@atheros.com>
-Date: Tue, 18 Jan 2011 16:18:52 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-To: Alexander Holler <holler@ahsoftware.de>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>, Marcel Holtmann
-	<marcel@holtmann.org>, SongXing Xu <SongXing.Xu@Atheros.com>, Luis Rodriguez
-	<Luis.Rodriguez@Atheros.com>, Vikram Kandukuri
-	<Vikram.Kandukuri@Atheros.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] ath3k: reduce memory usage
-References: <1290456541-3812-1-git-send-email-holler@ahsoftware.de> <20110113190800.GA13675@vigoh> <4D2F6DE5.5090109@ahsoftware.de>
-In-Reply-To: <4D2F6DE5.5090109@ahsoftware.de>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/4] Add Routing property to MediaTransport interface
+Date: Tue, 18 Jan 2011 12:00:14 +0200
+Message-Id: <1295344815-1404-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
+References: <1295344815-1404-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 1/14/2011 2:55 AM, Alexander Holler wrote:
-> Hello,
->
-> On 13.01.2011 20:08, Gustavo F. Padovan wrote:
->> Hi Alexander,
->>
->> * Alexander Holler<holler@ahsoftware.de>   [2010-11-22 21:09:01 +0100]:
->>
->>> There is no need to hold the firmware in memory.
->>>
->>> Signed-off-by: Alexander Holler<holler@ahsoftware.de>
->>> ---
->>>    drivers/bluetooth/ath3k.c |   75 ++++++++++++---------------------------------
->>>    1 files changed, 20 insertions(+), 55 deletions(-)
->> I'm assuming you tested it a lot. Patch has been applied. Thanks.
-> Yes, I'm using it here haven't had a problem with that patch.
->
-> Thanks,
->
-> Alexander
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-Thanks Alex for the patch.
-Its working.
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Regards,
-Bala.
+This should indicate to the endpoint what routing the transport is using
+---
+ audio/transport.c |    4 ++++
+ doc/media-api.txt |    6 ++++++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/audio/transport.c b/audio/transport.c
+index d575590..b5a9e48 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -599,12 +599,16 @@ static void get_properties_headset(struct media_transport *transport,
+ 						DBusMessageIter *dict)
+ {
+ 	gboolean nrec, inband;
++	const char *routing;
+ 
+ 	nrec = headset_get_nrec(transport->device);
+ 	dict_append_entry(dict, "NREC", DBUS_TYPE_BOOLEAN, &nrec);
+ 
+ 	inband = headset_get_inband(transport->device);
+ 	dict_append_entry(dict, "InbandRingtone", DBUS_TYPE_BOOLEAN, &inband);
++
++	routing = headset_get_sco_hci(transport->device) ? "HCI" : "PCM";
++	dict_append_entry(dict, "Routing", DBUS_TYPE_STRING, &routing);
+ }
+ 
+ void transport_get_properties(struct media_transport *transport,
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 92b8b3f..84903d6 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -152,3 +152,9 @@ Properties	object Device [readonly]
+ 			Optional. Indicates if the transport support sending
+ 			ringtones, this property is only writeable when the
+ 			transport was acquired by the sender.
++
++		string Routing [readonly]
++
++			Optional. Indicates where is the transport being routed
++
++			Possible Values: "HCI" or "PCM"
+-- 
+1.7.1
+
