@@ -1,55 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: tim.bao@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Bao Liang <tim.bao@gmail.com>
-Subject: [PATCH] Set connection state to BT_DISCONN to avoid multiple responses
-Date: Wed, 19 Jan 2011 21:22:09 +0800
-Message-Id: <1295443329-26860-1-git-send-email-tim.bao@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1295436312.3873.240.camel@aeonflux>
+References: <1295377703.1774.6.camel@ubuntuLab1>
+	<1295436312.3873.240.camel@aeonflux>
+Date: Wed, 19 Jan 2011 14:17:13 +0200
+Message-ID: <AANLkTi=GcxQJFGfkv8fbLN4PCGsUXLCr=9=q5VsfUEQR@mail.gmail.com>
+Subject: Re: -DG_DISABLE_DEPRECATED and g_io_channel_*()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Brian Gix <bgix@codeaurora.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bao Liang <tim.bao@gmail.com>
+Hi,
 
-This patch fixes a minor issue that two connection responses will be sent
-for one L2CAP connection request. If the L2CAP connection request is first
-blocked due to security reason and responded with reason "security block",
-the state of the connection remains BT_CONNECT2. If a pairing procedure
-completes successfully before the ACL connection is down, local host will
-send another connection complete response. See the following packets
-captured by hcidump.
+On Wed, Jan 19, 2011 at 1:25 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Brian,
+>
+>> There appears to be a number of deprecated g_io_channel_* functions
+>> being called from the bluez tip, which are breaking the build due to
+>> Marcel's latest commit today:
+>>
+>> commit effe770cd43cf53fa5842291941dbfc82beab645
+>> Author: Marcel Holtmann <marcel@holtmann.org>
+>> Date: =A0 Tue Jan 18 14:56:31 2011 +0100
+>>
+>> =A0 =A0 Use -DG_DISABLE_DEPRECATED compiler define
+>>
+>>
+>> Should this commit be backed out until these deprecated usages have been
+>> fixed, or is this the general way that the issue is forced?
+>>
+>> Obviously deprecated functions should not be used, but it creates an
+>> unbuildable bluez in the meantime.
+>
+> I broke it on purpose to draw some attention to this ;)
 
-2010-12-07 22:21:24.928096 < ACL data: handle 12 flags 0x00 dlen 16
-    0000: 0c 00 01 00 03 19 08 00  41 00 53 00 03 00 00 00  ........A.S.....
-... ...
+I have just send a pull request to fix those problems.
 
-2010-12-07 22:21:35.791747 > HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 12
-... ...
 
-2010-12-07 22:21:35.872372 > ACL data: handle 12 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0054 scid 0x0040 result 0 status 0
-      Connection successful
----
- net/bluetooth/l2cap.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index fadf26b..40d70db 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -844,9 +844,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
- 			struct l2cap_conn_rsp rsp;
- 			__u16 result;
- 
--			if (bt_sk(sk)->defer_setup)
-+			if (bt_sk(sk)->defer_setup) {
-+				sk->sk_state = BT_DISCONN;
- 				result = L2CAP_CR_SEC_BLOCK;
--			else
-+			} else
- 				result = L2CAP_CR_BAD_PSM;
- 
- 			rsp.scid   = cpu_to_le16(l2cap_pi(sk)->dcid);
--- 
-1.7.1
-
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
