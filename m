@@ -1,45 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 19 Jan 2011 13:17:00 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Alan Ott <alan@signal11.us>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	Michael Poole <mdpoole@troilus.org>,
+	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 0/4] Adding HID Feature Report Support to hidraw
+In-Reply-To: <1295337880-12452-1-git-send-email-alan@signal11.us>
+Message-ID: <alpine.LNX.2.00.1101191316230.26685@pobox.suse.cz>
+References: <1295337880-12452-1-git-send-email-alan@signal11.us>
 MIME-Version: 1.0
-In-Reply-To: <1295436312.3873.240.camel@aeonflux>
-References: <1295377703.1774.6.camel@ubuntuLab1>
-	<1295436312.3873.240.camel@aeonflux>
-Date: Wed, 19 Jan 2011 14:17:13 +0200
-Message-ID: <AANLkTi=GcxQJFGfkv8fbLN4PCGsUXLCr=9=q5VsfUEQR@mail.gmail.com>
-Subject: Re: -DG_DISABLE_DEPRECATED and g_io_channel_*()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Brian Gix <bgix@codeaurora.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, 18 Jan 2011, Alan Ott wrote:
 
-On Wed, Jan 19, 2011 at 1:25 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Brian,
->
->> There appears to be a number of deprecated g_io_channel_* functions
->> being called from the bluez tip, which are breaking the build due to
->> Marcel's latest commit today:
->>
->> commit effe770cd43cf53fa5842291941dbfc82beab645
->> Author: Marcel Holtmann <marcel@holtmann.org>
->> Date: =A0 Tue Jan 18 14:56:31 2011 +0100
->>
->> =A0 =A0 Use -DG_DISABLE_DEPRECATED compiler define
->>
->>
->> Should this commit be backed out until these deprecated usages have been
->> fixed, or is this the general way that the issue is forced?
->>
->> Obviously deprecated functions should not be used, but it creates an
->> unbuildable bluez in the meantime.
->
-> I broke it on purpose to draw some attention to this ;)
+> This patch adds Feature Report support for USB and Bluetooth HID devices
+> through hidraw.
+> 
+> The first two patches prepare the bluetooth side for the change.
+> 	a. Make sure the hidp_session() thread is started before
+> 	   device's probe() functions are called.
+> 	b. Wait for ACK/NAK on sent reports, and return proper
+> 	   error codes.
+> The third patch is the hidraw core and USB changes.
+> The fourth patch is the Bluetooth changes.
+> 
+> Thanks to Antonio Ospite and Bill Good for providing testing and feedback.
+> 
+> 
+> Alan Ott (4):
+>   bt hidp: Move hid_add_device() call to after hidp_session() has
+>     started.
+>   bt hidp: Wait for ACK on Sent Reports
+>   HID: Add Support for Setting and Getting Feature Reports from hidraw
+>   Bluetooth hidp: Add support for hidraw HIDIOCGFEATURE and
+>     HIDIOCSFEATURE
+> 
+>  drivers/hid/hidraw.c          |  106 +++++++++++++++++++-
+>  drivers/hid/usbhid/hid-core.c |   35 +++++++
+>  include/linux/hid.h           |    3 +
+>  include/linux/hidraw.h        |    3 +
+>  net/bluetooth/hidp/core.c     |  214 ++++++++++++++++++++++++++++++++++++++---
+>  net/bluetooth/hidp/hidp.h     |   15 +++
 
-I have just send a pull request to fix those problems.
+Before proceeding with these patches, I'd really like to have comment 
+(ideally 'Acked-by') from Marcel on the net/bluetooth/hidp part, 
+obviously.
 
+Marcel?
 
---=20
-Luiz Augusto von Dentz
-Computer Engineer
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
