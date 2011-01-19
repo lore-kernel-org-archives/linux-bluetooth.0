@@ -1,36 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-Content-Type: text/plain; charset=us-ascii
-Subject: Problems with L2CAP: deferred setup and MTU
-Date: Wed, 19 Jan 2011 17:10:51 -0200
-Message-Id: <5E5308B0-BA11-46A2-B7A9-22CD4ADBCF80@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Apple Message framework v1082)
+MIME-Version: 1.0
+In-Reply-To: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
+References: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
+Date: Wed, 19 Jan 2011 23:56:29 +0530
+Message-ID: <AANLkTinPC-i2xi9pCQ-RzGWuwZ5uTM3NXG7y6gwTnPYv@mail.gmail.com>
+Subject: Re: [RFC 0/2] remove BT references from TI_ST
+From: Pavan Savoy <pavan_savoy@sify.com>
+To: padovan@profusion.mobi, marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@ti.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am currently investigating two problems with L2CAP sockets. Since I am not a kernel guy, I will take an indefinite amount of time to find and fix them; perhaps someone else can find and fix it in 5 minutes, so I think it is worth reporting.
+Gustavo,
 
-First problem is ERTM x MTU, sockets configured with a MTU != 672. Normal sockets exchange MTU in initialization:
+On Tue, Jan 4, 2011 at 4:29 PM,  <pavan_savoy@ti.com> wrote:
+> From: Pavan Savoy <pavan_savoy@ti.com>
+>
+> Gustavo,
+>
+> Based on your comments, that the underlying shared transport driver
+> for btwilink driver made use of the BT references to peek into the packets
+> I have modified the TI_ST.
 
-./l2test -P 4099 -I 1000 -O 1000
-l2test[3211]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 1000, flush_to 65535, mode 0, handle 12, class 0x480100]
+Since there lacks a generic way to parse the packets coming in from the
+UART into BT, FM or GPS, we have to look into the data to fragment assembled
+data or assemble fragmented data.
 
-but ERTM sockets seem to ignore the setsockopt() value and exchange the default size (672):
+Please have a look, Please suggest whether something like this is required,
+If not, please also suggest, if including BT headers is a problem ?
 
-./l2test -P 4099 -I 1000 -O 1000 -X ERTM
-l2test[3228]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 672, flush_to 65535, mode 3, handle 11, class 0x480100]
+Because I just include the BT headers and don't have a build
+dependency as such on
+BT/HCI and don't use any functions from hci_core in my shared transport driver.
 
-(obviously the initiator side uses the same parameters)
-
-
-Second problem is about deferred setup in accept()ed sockets. Sometimes POLLOUT times out (or waits forever if timeout is 0). The following read(buf, 1) works, and the connection works normally after this. 
-
-The pattern seems to be: the first accept()ed socket of a process works ok regarding POLLOUT; the following connections do not.
-
-This is normally not a problem, but if you try to read MTU using getsockopt() right after connection is set up, and if POLLOUT failed, MTU values are not updated. If you sleep a small amount of time like 0.1s then getsockopt() returns the expected values.
-
-Finally, I have noted that playing with deferred setup sockets yields frequent kernel panics, like 1 in 3 rounds. This has prevented me to find more elaborate patterns (like ERTM x normal sockets etc.). The panics happen at listen() side; the connect() side is not affected. (Tested with 2.6.36 stock and bluetooth-next).
-
---
-Elvis
+> For this reason, Now the above lying protocol drivers like BT, FM and GPS
+> would send details about their packet types and header information which
+> would assist shared transport driver to parse the data.
+>
+> Gustavo, please also notice the change in btwilink driver in and around,
+> st_register and suggest if something like this is OK.
+> btwilink can also be modified to send in all the packet specific data
+> in one shot, if that is preferred.
+>
+> Please review and provide comments..
+>
+> Note:
+> If this is alright, I will send out a modified patch with updated
+> subject to lkml/Greg for linux-next.
+>
+> Thanks & Regards,
+> Pavan Savoy.
+>
+> Pavan Savoy (2):
+>  drivers:misc:ti-st: change protocol parse logic
+>  Bluetooth: btwilink driver
+>
+>  drivers/bluetooth/Kconfig    |   10 +
+>  drivers/bluetooth/Makefile   |    1 +
+>  drivers/bluetooth/btwilink.c |  397 ++++++++++++++++++++++++++++++++++++++++++
+>  drivers/misc/ti-st/st_core.c |  355 ++++++++++++--------------------------
+>  drivers/misc/ti-st/st_kim.c  |   56 +++---
+>  include/linux/ti_wilink_st.h |   40 +++--
+>  6 files changed, 575 insertions(+), 284 deletions(-)
+>  create mode 100644 drivers/bluetooth/btwilink.c
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
