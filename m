@@ -1,65 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Jan 2011 17:27:40 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2011-01-19
-Message-ID: <20110119192739.GF11083@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Content-Type: text/plain; charset=us-ascii
+Subject: Problems with L2CAP: deferred setup and MTU
+Date: Wed, 19 Jan 2011 17:10:51 -0200
+Message-Id: <5E5308B0-BA11-46A2-B7A9-22CD4ADBCF80@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Apple Message framework v1082)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+I am currently investigating two problems with L2CAP sockets. Since I am not a kernel guy, I will take an indefinite amount of time to find and fix them; perhaps someone else can find and fix it in 5 minutes, so I think it is worth reporting.
 
-Here is the first set of Bluetooth fixes for 2.6.38. It includes a patch from
-Alexander Holler to reduce memory usage by the ath3k bluetooth driver. A
-misusu of logical operation in L2CAP by David Sterba. There is also a fix to a
-RFCOMM crash by Lukáš Turek.
+First problem is ERTM x MTU, sockets configured with a MTU != 672. Normal sockets exchange MTU in initialization:
 
-Last we have six patches from Johan Hedberg, the first fix a leak in the
-HCI blacklist feature. The other 5 patches, are fixes created against the BITE
-tester (used in the Bluetooth qualification process). All of them are very
-simple. Worth to note that one of them is a revert and "Bluetooth: Create a
-unified auth_type evaluation function" is a very simple refactoring. These
-patches makes 2.6.38 ready for the Bluetooth qualification process.
+./l2test -P 4099 -I 1000 -O 1000
+l2test[3211]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 1000, flush_to 65535, mode 0, handle 12, class 0x480100]
 
-Please merge, or let me know any doubts or problems you find. Thanks.
+but ERTM sockets seem to ignore the setsockopt() value and exchange the default size (672):
+
+./l2test -P 4099 -I 1000 -O 1000 -X ERTM
+l2test[3228]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 672, flush_to 65535, mode 3, handle 11, class 0x480100]
+
+(obviously the initiator side uses the same parameters)
 
 
-The following changes since commit 38d59392b29437af3a702209b6a5196ef01f79a8:
+Second problem is about deferred setup in accept()ed sockets. Sometimes POLLOUT times out (or waits forever if timeout is 0). The following read(buf, 1) works, and the connection works normally after this. 
 
-  iwlwifi: fix valid chain reading from EEPROM (2011-01-18 15:10:31 -0500)
+The pattern seems to be: the first accept()ed socket of a process works ok regarding POLLOUT; the following connections do not.
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+This is normally not a problem, but if you try to read MTU using getsockopt() right after connection is set up, and if POLLOUT failed, MTU values are not updated. If you sleep a small amount of time like 0.1s then getsockopt() returns the expected values.
 
-Alexander Holler (1):
-      Bluetooth: ath3k: reduce memory usage
+Finally, I have noted that playing with deferred setup sockets yields frequent kernel panics, like 1 in 3 rounds. This has prevented me to find more elaborate patterns (like ERTM x normal sockets etc.). The panics happen at listen() side; the connect() side is not affected. (Tested with 2.6.36 stock and bluetooth-next).
 
-David Sterba (1):
-      Bluetooth: l2cap: fix misuse of logical operation in place of bitop
-
-Johan Hedberg (6):
-      Bluetooth: Fix leaking blacklist when unregistering a hci device
-      Revert "Bluetooth: Update sec_level/auth_type for already existing connections"
-      Bluetooth: Fix MITM protection requirement preservation
-      Bluetooth: Create a unified auth_type evaluation function
-      Bluetooth: Fix authentication request for L2CAP raw sockets
-      Bluetooth: Fix race condition with conn->sec_level
-
-Lukáš Turek (1):
-      Bluetooth: Never deallocate a session when some DLC points to it
-
- drivers/bluetooth/ath3k.c        |   75 +++++++++-------------------------
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_conn.c         |   16 ++++---
- net/bluetooth/hci_core.c         |    4 ++
- net/bluetooth/hci_event.c        |    9 ++--
- net/bluetooth/l2cap.c            |   84 ++++++++++++++-----------------------
- net/bluetooth/rfcomm/core.c      |    3 +-
- 7 files changed, 73 insertions(+), 119 deletions(-)
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+--
+Elvis
