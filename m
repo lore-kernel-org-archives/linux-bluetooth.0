@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Cc: ville.tervo@nokia.com
-Subject: [PATCH 1/5] Revert "Bluetooth: Update sec_level/auth_type for already existing connections"
-Date: Wed, 19 Jan 2011 12:06:48 +0530
-Message-Id: <1295419012-25717-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/5] Bluetooth: Create a unified auth_type evaluation function
+Date: Wed, 19 Jan 2011 12:06:50 +0530
+Message-Id: <1295419012-25717-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1295419012-25717-1-git-send-email-johan.hedberg@gmail.com>
 References: <1295419012-25717-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,40 +12,125 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-This reverts commit 045309820afe047920a50de25634dab46a1e851d. That
-commit is wrong for two reasons:
-
-- The conn->sec_level should be updated without performing
-authentication first (as it's supposed to represent the level of
-security that the existing connection has)
-
-- A higher auth_type value doesn't mean "more secure" like the commit
-seems to assume. E.g. dedicated bonding with MITM protection is 0x03
-whereas general bonding without MITM protection is 0x04. hci_conn_auth
-already takes care of updating conn->auth_type so hci_connect doesn't
-need to do it.
+The logic for determining the needed auth_type for an L2CAP socket is
+rather complicated and has so far been duplicated in
+l2cap_check_security as well as l2cap_do_connect. Additionally the
+l2cap_check_security code was completely missing the handling of
+SOCK_RAW type sockets. This patch creates a unified function for the
+evaluation and makes l2cap_do_connect and l2cap_check_security use that
+function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- net/bluetooth/hci_conn.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+ net/bluetooth/l2cap.c |   77 ++++++++++++++++++-------------------------------
+ 1 files changed, 28 insertions(+), 49 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6b90a41..65a3fb5 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -382,11 +382,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		acl->sec_level = sec_level;
- 		acl->auth_type = auth_type;
- 		hci_acl_connect(acl);
--	} else {
--		if (acl->sec_level < sec_level)
--			acl->sec_level = sec_level;
--		if (acl->auth_type < auth_type)
--			acl->auth_type = auth_type;
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 4fd88eb..ae227bf 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -305,33 +305,44 @@ static void l2cap_chan_del(struct sock *sk, int err)
  	}
+ }
  
- 	if (type == ACL_LINK)
+-/* Service level security */
+-static inline int l2cap_check_security(struct sock *sk)
++static inline u8 l2cap_get_auth_type(struct sock *sk)
+ {
+-	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+-	__u8 auth_type;
++	if (sk->sk_type == SOCK_RAW) {
++		switch (l2cap_pi(sk)->sec_level) {
++		case BT_SECURITY_HIGH:
++			return HCI_AT_DEDICATED_BONDING_MITM;
++		case BT_SECURITY_MEDIUM:
++			return HCI_AT_DEDICATED_BONDING;
++		default:
++			return HCI_AT_NO_BONDING;
++		}
++	} else if (l2cap_pi(sk)->psm == cpu_to_le16(0x0001)) {
++		if (l2cap_pi(sk)->sec_level == BT_SECURITY_LOW)
++			l2cap_pi(sk)->sec_level = BT_SECURITY_SDP;
+ 
+-	if (l2cap_pi(sk)->psm == cpu_to_le16(0x0001)) {
+ 		if (l2cap_pi(sk)->sec_level == BT_SECURITY_HIGH)
+-			auth_type = HCI_AT_NO_BONDING_MITM;
++			return HCI_AT_NO_BONDING_MITM;
+ 		else
+-			auth_type = HCI_AT_NO_BONDING;
+-
+-		if (l2cap_pi(sk)->sec_level == BT_SECURITY_LOW)
+-			l2cap_pi(sk)->sec_level = BT_SECURITY_SDP;
++			return HCI_AT_NO_BONDING;
+ 	} else {
+ 		switch (l2cap_pi(sk)->sec_level) {
+ 		case BT_SECURITY_HIGH:
+-			auth_type = HCI_AT_GENERAL_BONDING_MITM;
+-			break;
++			return HCI_AT_GENERAL_BONDING_MITM;
+ 		case BT_SECURITY_MEDIUM:
+-			auth_type = HCI_AT_GENERAL_BONDING;
+-			break;
++			return HCI_AT_GENERAL_BONDING;
+ 		default:
+-			auth_type = HCI_AT_NO_BONDING;
+-			break;
++			return HCI_AT_NO_BONDING;
+ 		}
+ 	}
++}
++
++/* Service level security */
++static inline int l2cap_check_security(struct sock *sk)
++{
++	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
++	__u8 auth_type;
++
++	auth_type = l2cap_get_auth_type(sk);
+ 
+ 	return hci_conn_security(conn->hcon, l2cap_pi(sk)->sec_level,
+ 								auth_type);
+@@ -1068,39 +1079,7 @@ static int l2cap_do_connect(struct sock *sk)
+ 
+ 	err = -ENOMEM;
+ 
+-	if (sk->sk_type == SOCK_RAW) {
+-		switch (l2cap_pi(sk)->sec_level) {
+-		case BT_SECURITY_HIGH:
+-			auth_type = HCI_AT_DEDICATED_BONDING_MITM;
+-			break;
+-		case BT_SECURITY_MEDIUM:
+-			auth_type = HCI_AT_DEDICATED_BONDING;
+-			break;
+-		default:
+-			auth_type = HCI_AT_NO_BONDING;
+-			break;
+-		}
+-	} else if (l2cap_pi(sk)->psm == cpu_to_le16(0x0001)) {
+-		if (l2cap_pi(sk)->sec_level == BT_SECURITY_HIGH)
+-			auth_type = HCI_AT_NO_BONDING_MITM;
+-		else
+-			auth_type = HCI_AT_NO_BONDING;
+-
+-		if (l2cap_pi(sk)->sec_level == BT_SECURITY_LOW)
+-			l2cap_pi(sk)->sec_level = BT_SECURITY_SDP;
+-	} else {
+-		switch (l2cap_pi(sk)->sec_level) {
+-		case BT_SECURITY_HIGH:
+-			auth_type = HCI_AT_GENERAL_BONDING_MITM;
+-			break;
+-		case BT_SECURITY_MEDIUM:
+-			auth_type = HCI_AT_GENERAL_BONDING;
+-			break;
+-		default:
+-			auth_type = HCI_AT_NO_BONDING;
+-			break;
+-		}
+-	}
++	auth_type = l2cap_get_auth_type(sk);
+ 
+ 	hcon = hci_connect(hdev, ACL_LINK, dst,
+ 					l2cap_pi(sk)->sec_level, auth_type);
 -- 
 1.7.2.3
 
