@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 19 Jan 2011 01:38:31 -0200
+Date: Tue, 18 Jan 2011 23:11:04 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jesper Juhl <jj@chaosbits.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] bluetooth: Fix failure to release lock in
- read_index_list() when mem alloc fails.
-Message-ID: <20110119033831.GB7762@joana>
-References: <alpine.LNX.2.00.1101140000541.11347@swampdragon.chaosbits.net>
+To: =?utf-8?B?THVrw6HFoQ==?= Turek <8an@praha12.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Never deallocate a session when some DLC
+ points to it
+Message-ID: <20110119011104.GA7762@joana>
+References: <201101050243.59801.8an@praha12.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LNX.2.00.1101140000541.11347@swampdragon.chaosbits.net>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <201101050243.59801.8an@praha12.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jesper,
+Hi Lukáš,
 
-* Jesper Juhl <jj@chaosbits.net> [2011-01-14 00:18:49 +0100]:
+* Lukáš Turek <8an@praha12.net> [2011-01-05 02:43:59 +0100]:
 
-> If alloc_skb() fails in read_index_list() we'll return -ENOMEM without 
-> releasing 'hci_dev_list_lock'.
+> Fix a bug introduced in commit 9cf5b0ea3a7f1432c61029f7aaf4b8b338628884:
+> function rfcomm_recv_ua calls rfcomm_session_put without checking that
+> the session is not referenced by some DLC. If the session is freed, that
+> DLC would refer to deallocated memory, causing an oops later, as shown
+> in this bug report: https://bugzilla.kernel.org/show_bug.cgi?id=15994
 > 
-> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+> Signed-off-by: Lukas Turek <8an@praha12.net>
 > ---
->  mgmt.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  net/bluetooth/rfcomm/core.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
 Patch has been applied. Thanks.
 
