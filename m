@@ -1,191 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
-	johan.hedberg@nokia.com, padovan@profusion.mobi,
-	rshaffer@codeaurora.org, Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH 1/3] Fix default GATT/ATT MTU sizes
-Date: Wed, 19 Jan 2011 14:00:51 -0800
-Message-Id: <1295474453-8495-2-git-send-email-bgix@codeaurora.org>
-In-Reply-To: <1295474453-8495-1-git-send-email-bgix@codeaurora.org>
-References: <1295474453-8495-1-git-send-email-bgix@codeaurora.org>
+Date: Wed, 19 Jan 2011 17:27:40 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-2.6 2011-01-19
+Message-ID: <20110119192739.GF11083@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-LE and BR/EDR (standard L2CAP) have different default MTU sizes.
-The LE deafult is 23, and the L2CAP default is 48. The LE default is
-properly used for all GATT Commands, as they have all been designed
-to fit within that constraint. However the attribute server should
-use the actual MTU of the transport being used.
----
- attrib/att.h        |    3 ++-
- attrib/gatt.c       |   28 ++++++++++++++--------------
- src/attrib-server.c |    6 +++++-
- 3 files changed, 21 insertions(+), 16 deletions(-)
+Hi John,
 
-diff --git a/attrib/att.h b/attrib/att.h
-index a1e0b62..a4f6ab1 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -107,7 +107,8 @@
- 
- 
- #define ATT_MAX_MTU				256
--#define ATT_DEFAULT_MTU				23
-+#define ATT_DEFAULT_LE_MTU			23
-+#define ATT_DEFAULT_L2CAP_MTU			48
- 
- /* Requirements for read/write operations */
- enum {
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 5d7887e..f3b513e 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -105,7 +105,7 @@ static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
- 	struct discover_primary *dp = user_data;
- 	GSList *ranges, *last;
- 	struct att_range *range;
--	uint8_t opdu[ATT_DEFAULT_MTU];
-+	uint8_t opdu[ATT_DEFAULT_LE_MTU];
- 	guint16 oplen;
- 	int err = 0;
- 
-@@ -195,7 +195,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	err = 0;
- 
- 	if (end != 0xffff) {
--		uint8_t opdu[ATT_DEFAULT_MTU];
-+		uint8_t opdu[ATT_DEFAULT_LE_MTU];
- 		guint16 oplen = encode_discover_primary(end + 1, 0xffff, NULL,
- 							opdu, sizeof(opdu));
- 
-@@ -214,7 +214,7 @@ guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_cb_t func,
- 							gpointer user_data)
- {
- 	struct discover_primary *dp;
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	GAttribResultFunc cb;
- 	guint16 plen;
- 
-@@ -245,7 +245,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	struct discover_char *dc = user_data;
- 	struct att_data_list *list;
- 	unsigned int i, err;
--	uint8_t opdu[ATT_DEFAULT_MTU];
-+	uint8_t opdu[ATT_DEFAULT_LE_MTU];
- 	guint16 oplen;
- 	uuid_t uuid;
- 	uint16_t last = 0;
-@@ -314,7 +314,7 @@ done:
- guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
- 					gatt_cb_t func, gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	struct discover_char *dc;
- 	guint16 plen;
- 	uuid_t uuid;
-@@ -342,7 +342,7 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
- 					uuid_t *uuid, GAttribResultFunc func,
- 					gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 
- 	plen = enc_read_by_type_req(start, end, uuid, pdu, sizeof(pdu));
-@@ -381,7 +381,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
- 							gpointer user_data)
- {
- 	struct read_long_data *long_read = user_data;
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint8 *tmp;
- 	guint16 plen;
- 	guint id;
-@@ -402,7 +402,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
- 	long_read->buffer = tmp;
- 	long_read->size += rlen - 1;
- 
--	if (rlen < ATT_DEFAULT_MTU)
-+	if (rlen < ATT_DEFAULT_LE_MTU)
- 		goto done;
- 
- 	plen = enc_read_blob_req(long_read->handle, long_read->size - 1,
-@@ -427,11 +427,11 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
- 					guint16 rlen, gpointer user_data)
- {
- 	struct read_long_data *long_read = user_data;
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 	guint id;
- 
--	if (status != 0 || rlen < ATT_DEFAULT_MTU)
-+	if (status != 0 || rlen < ATT_DEFAULT_LE_MTU)
- 		goto done;
- 
- 	long_read->buffer = g_malloc(rlen);
-@@ -461,7 +461,7 @@ done:
- guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
- 							gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 	guint id;
- 	struct read_long_data *long_read;
-@@ -493,7 +493,7 @@ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
- guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
- 			int vlen, GAttribResultFunc func, gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 
- 	plen = enc_write_req(handle, value, vlen, pdu, sizeof(pdu));
-@@ -504,7 +504,7 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
- guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
- 				GAttribResultFunc func, gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 
- 	plen = enc_find_info_req(start, end, pdu, sizeof(pdu));
-@@ -518,7 +518,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
- guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
- 				GDestroyNotify notify, gpointer user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_MTU];
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	guint16 plen;
- 
- 	plen = enc_write_cmd(handle, value, vlen, pdu, sizeof(pdu));
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 7e85d17..04bc1ec 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -722,8 +722,12 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- 		return;
- 	}
- 
-+	if (io == le_io)
-+		channel->mtu = ATT_DEFAULT_LE_MTU;
-+	else
-+		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
-+
- 	channel->attrib = g_attrib_new(io);
--	channel->mtu = ATT_DEFAULT_MTU;
- 	g_io_channel_unref(io);
- 
- 	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_EVENTS,
+Here is the first set of Bluetooth fixes for 2.6.38. It includes a patch from
+Alexander Holler to reduce memory usage by the ath3k bluetooth driver. A
+misusu of logical operation in L2CAP by David Sterba. There is also a fix to a
+RFCOMM crash by Lukáš Turek.
+
+Last we have six patches from Johan Hedberg, the first fix a leak in the
+HCI blacklist feature. The other 5 patches, are fixes created against the BITE
+tester (used in the Bluetooth qualification process). All of them are very
+simple. Worth to note that one of them is a revert and "Bluetooth: Create a
+unified auth_type evaluation function" is a very simple refactoring. These
+patches makes 2.6.38 ready for the Bluetooth qualification process.
+
+Please merge, or let me know any doubts or problems you find. Thanks.
+
+
+The following changes since commit 38d59392b29437af3a702209b6a5196ef01f79a8:
+
+  iwlwifi: fix valid chain reading from EEPROM (2011-01-18 15:10:31 -0500)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Alexander Holler (1):
+      Bluetooth: ath3k: reduce memory usage
+
+David Sterba (1):
+      Bluetooth: l2cap: fix misuse of logical operation in place of bitop
+
+Johan Hedberg (6):
+      Bluetooth: Fix leaking blacklist when unregistering a hci device
+      Revert "Bluetooth: Update sec_level/auth_type for already existing connections"
+      Bluetooth: Fix MITM protection requirement preservation
+      Bluetooth: Create a unified auth_type evaluation function
+      Bluetooth: Fix authentication request for L2CAP raw sockets
+      Bluetooth: Fix race condition with conn->sec_level
+
+Lukáš Turek (1):
+      Bluetooth: Never deallocate a session when some DLC points to it
+
+ drivers/bluetooth/ath3k.c        |   75 +++++++++-------------------------
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   16 ++++---
+ net/bluetooth/hci_core.c         |    4 ++
+ net/bluetooth/hci_event.c        |    9 ++--
+ net/bluetooth/l2cap.c            |   84 ++++++++++++++-----------------------
+ net/bluetooth/rfcomm/core.c      |    3 +-
+ 7 files changed, 73 insertions(+), 119 deletions(-)
+
 -- 
-1.7.1
-
---
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Gustavo F. Padovan
+http://profusion.mobi
