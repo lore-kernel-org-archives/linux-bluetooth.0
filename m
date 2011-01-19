@@ -1,96 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Jan 2011 16:45:12 +0100 (CET)
-From: Jesper Juhl <jj@chaosbits.net>
-To: Jiri Kosina <jkosina@suse.cz>
-cc: linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
-    linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-    ocfs2-devel@oss.oracle.com, linux-edac@vger.kernel.org,
-    linux-bluetooth@vger.kernel.org, oprofile-list@lists.sf.net,
-    Andi Kleen <ak@linux.intel.com>, David Teigland <teigland@redhat.com>,
-    Jens Axboe <jens.axboe@oracle.com>,
-    Stephen Hemminger <shemminger@vyatta.com>,
-    Greg Kroah-Hartman <gregkh@suse.de>, Takashi Iwai <tiwai@suse.de>,
-    Jaroslav Kysela <perex@perex.cz>,
-    "John W. Linville" <linville@tuxdriver.com>,
-    Johannes Berg <johannes@sipsolutions.net>,
-    Patrick McHardy <kaber@trash.net>,
-    Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-    James Morris <jmorris@namei.org>,
-    "Pekka Savola (ipv6)" <pekkas@netcore.fi>,
-    Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-    "David S. Miller" <davem@davemloft.net>,
-    Frederic Weisbecker <fweisbec@gmail.com>,
-    Frederic Weisbecker <fweisbec@gmail.com>, Joel Becker <jlbec@evilplan.org>,
-    Mark Fasheh <mfasheh@suse.com>, Mauro Carvalho Chehab <mchehab@redhat.com>,
-    "Gustavo F. Padovan" <padovan@profusion.mobi>,
-    Marcel Holtmann <marcel@holtmann.org>, x86@kernel.org,
-    "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-    Thomas Gleixner <tglx@linutronix.de>,
-    Robert Richter <robert.richter@amd.com>
-Subject: =?ISO-8859-7?Q?Re=3A_=5BPatch=5D_Kill_off_warning=3A_=A1inline=A2_is_not_at_beginning_of_declaration?=
-In-Reply-To: <alpine.LNX.2.00.1101191543110.26685@pobox.suse.cz>
-Message-ID: <alpine.LNX.2.00.1101191643070.15798@swampdragon.chaosbits.net>
-References: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net> <alpine.LNX.2.00.1101191543110.26685@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-969819006-1295451912=:15798"
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Reply-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: fix crash by disabling tasklet in sock
+	accept
+References: <1295351698-8096-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1295351698-8096-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Date: Wed, 19 Jan 2011 17:37:50 +0200
+Message-Id: <1295451471.9558.2.camel@Nokia-N900>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hi,
 
---8323328-969819006-1295451912=:15798
-Content-Type: TEXT/PLAIN; charset=ISO-8859-7
-Content-Transfer-Encoding: 8BIT
-
-On Wed, 19 Jan 2011, Jiri Kosina wrote:
-
-> On Mon, 17 Jan 2011, Jesper Juhl wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> > Fix a bunch of 
-> > 	warning: �inline� is not at beginning of declaration
-> > messages when building a 'make allyesconfig' kernel with -Wextra.
-> > 
-> > These warnings are trivial to kill, yet rather annoying when building with 
-> > -Wextra.
-> > The more we can cut down on pointless crap like this the better (IMHO).
-> > 
-> > A previous patch to do this for a 'allnoconfig' build has already been 
-> > merged. This just takes the cleanup a little further.
-> > 
-> > Signed-off-by: Jesper Juhl <jj@chaosbits.net>
-> > ---
-> >  arch/x86/oprofile/op_model_p4.c |    2 +-
-> >  drivers/bluetooth/btusb.c       |    4 ++--
-> >  drivers/cpuidle/sysfs.c         |    2 +-
-> >  drivers/edac/i7300_edac.c       |    2 +-
-> >  fs/ocfs2/dir.c                  |    2 +-
-> >  kernel/trace/ring_buffer.c      |    2 +-
-> >  net/ipv6/inet6_hashtables.c     |    2 +-
-> >  net/mac80211/tx.c               |    2 +-
-> >  sound/pci/au88x0/au88x0.h       |    4 ++--
-> >  sound/pci/au88x0/au88x0_core.c  |    4 ++--
-> >  10 files changed, 13 insertions(+), 13 deletions(-)
-> > 
->
-> Wow, what a huge CC list for such a simple change. Jesper, I think you 
-> should re-consider this next time. I bet you used get_maintainer script, 
-> didn't you? :)
+> Crash can happen when tasklet handling connect/disconnect requests
+> preempts socket accept. Can be reproduced with "l2test -r" on one
+> side and several "l2test -c -b 1000 -i hci0 -P 10 <bdaddr>" on the
+> other side.
 > 
-
-Yes, I did. I wanted to be sure that everyone whoes code I was modifying 
-got the mail. I guess I should have broken it up into smaller pieces and 
-submitted them as a series instead.
-
-
-> I have applied it to my tree now. If anyone has objections/has already 
-> applied part of the patch to subsystem tree, please let me know.
+> ...
+> [ 3555.897247] Unable to handle kernel NULL pointer dereference at
+> virtual address 000000bc
+> [ 3555.915039] pgd = cab9c000
+> [ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
+> [ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
+> [ 3555.999786] CPU: 0       Not tainted   (2.6.32.21-13874-g67918ef #65)
+> ...
+> [ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+> [ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+> ...
+> [ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+> [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+> [ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+> from [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap])
+> [ 3556.184082] [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
+> [<c026a0a8>] (sys_accept4+0x120/0x1e0)
+> [ 3556.193969] [<c026a0a8>] (sys_accept4+0x120/0x1e0) from [<c002c9a0>]
+> (ret_fast_syscall+0x0/0x2c)
+> [ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc)
+> ...
 > 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>   net/bluetooth/af_bluetooth.c |       4 ++++
+>   1 files changed, 4 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index a6732b5..86386e9 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -199,6 +199,7 @@ struct sock *bt_accept_dequeue(struct sock *parent,
+> struct socket *newsock) 
+>       BT_DBG("parent %p", parent);
+>   
+> +    local_bh_disable();
+>       list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
+>           sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
+>   
+> @@ -217,11 +218,14 @@ struct sock *bt_accept_dequeue(struct sock
+> *parent, struct socket *newsock)             if (newsock)
+>                   sock_graft(sk, newsock);
+>               release_sock(sk);
 
-Thank you.
+I will change lock,release_sock to bh_lock,unlock_sock
 
--- 
-Jesper Juhl <jj@chaosbits.net>            http://www.chaosbits.net/
-Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
-Plain text mails only, please.
+when bh are disabled we do not need to mark
+socket as owned.
 
---8323328-969819006-1295451912=:15798--
+Other comments about the patch?
+
+> +            local_bh_enable();
+>               return sk;
+>           }
+>   
+>           release_sock(sk);
+>       }
+> +    local_bh_enable();
+> +
+>       return NULL;
+>   }
+>   EXPORT_SYMBOL(bt_accept_dequeue);
+> -- 
+> 1.7.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at   http://vger.kernel.org/majordomo-info.html
+
