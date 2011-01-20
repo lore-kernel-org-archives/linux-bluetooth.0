@@ -1,31 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Jan 2011 15:02:32 +0530
+Date: Thu, 20 Jan 2011 14:59:03 +0530
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, vinicius.gomes@openbossa.org,
-	claudio.takahasi@openbossa.org, padovan@profusion.mobi,
-	rshaffer@codeaurora.org
-Subject: Re: [PATCH 1/3] Fix default GATT/ATT MTU sizes
-Message-ID: <20110120093232.GB540@jh-x301>
-References: <1295474453-8495-1-git-send-email-bgix@codeaurora.org>
- <1295474453-8495-2-git-send-email-bgix@codeaurora.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update a2dpsink to use new Acquire API
+Message-ID: <20110120092903.GA540@jh-x301>
+References: <1295515781-16658-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1295474453-8495-2-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1295515781-16658-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Luiz,
 
-On Wed, Jan 19, 2011, Brian Gix wrote:
-> +	if (io == le_io)
-> +		channel->mtu = ATT_DEFAULT_LE_MTU;
-> +	else
-> +		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
-> +
+On Thu, Jan 20, 2011, Luiz Augusto von Dentz wrote:
+> ---
+>  audio/gstavdtpsink.c |   19 +++++++------------
+>  1 files changed, 7 insertions(+), 12 deletions(-)
 
-I don't think that will work. le_io is the server socket and io is the
-new client socket. So they will never be one and the same. Did you
-actually test this code?
+Thanks. Pushed upstream.
 
 Johan
