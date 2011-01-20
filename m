@@ -1,282 +1,229 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Andr=C3=A9=20Dieb=20Martins?= <andre.dieb@signove.com>
+From: Brian Gix <bgix@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Andr=C3=A9=20Dieb=20Martins?= <andre.dieb@signove.com>
-Subject: [PATCH] Partial implementation of LE events and commands dump.
-Date: Thu, 20 Jan 2011 16:18:13 -0300
-Message-Id: <1295551093-6718-1-git-send-email-andre.dieb@signove.com>
+Cc: vinicius.gomes@openbossa.org, claudio.takahasi@openbossa.org,
+	johan.hedberg@nokia.com, padovan@profusion.mobi,
+	Brian Gix <bgix@codeaurora.org>
+Subject: [PATCH] Fix incoming attrib-server connection MTUs
+Date: Thu, 20 Jan 2011 11:09:01 -0800
+Message-Id: <1295550541-30535-2-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1295550541-30535-1-git-send-email-bgix@codeaurora.org>
+References: <1295550541-30535-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- parser/hci.c |  226 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 226 insertions(+), 0 deletions(-)
+It is important for the Attribute Server to be aware of and
+completely fill response packets up to the full MTU when
+reading long attributes.  Some remote devices will only request
+additional (READ_BLOB) data if the preceding read sent the
+maximum amount of data.
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 014c8cd..d9bac9b 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -704,6 +704,59 @@ static char *authentication2str(uint8_t authentication)
- 	}
- }
+Incoming connections are identified as L2CAP or LE by pointers
+to the Service IO channel the incoming connection was recieved on
+in the user_data parameter. L2CAP channels are set to the BR/EDR minimum
+MTU of 48, and LE channels to the LE payload size of 23.
+---
+ attrib/att.h        |    3 ++-
+ attrib/gatt.c       |   28 ++++++++++++++--------------
+ src/attrib-server.c |   13 +++++++++----
+ 3 files changed, 25 insertions(+), 19 deletions(-)
+
+diff --git a/attrib/att.h b/attrib/att.h
+index 29ab0e6..1caa62a 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -107,7 +107,8 @@
  
-+static char *eventmask2str(uint8_t mask[8])
-+{
-+	int i;
-+
-+	for (i = 0; i < 7; i++) {
-+		if (mask[i] != 0x00)
-+			return "Reserved";
-+	}
-+
-+	switch (mask[7]) {
-+	case 0x00:
-+		return "No LE events specified";
-+	case 0x01:
-+		return "LE Connection Complete Event";
-+	case 0x02:
-+		return "LE Advertising Report Event";
-+	case 0x04:
-+		return "LE Connection Update Complete Event";
-+	case 0x08:
-+		return "LE Read Remote Used Features Complete Event";
-+	case 0x10:
-+		return "LE Long Term Key Request Event";
-+	case 0x1F:
-+		return "Default";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
-+static char *lefeatures2str(uint8_t features[8])
-+{
-+	if (features[0] & 0x01)
-+		return "Link Layer supports LE Encryption";
-+
-+	return "RFU";
-+}
-+
-+static char *filterpolicy2str(uint8_t policy)
-+{
-+	switch (policy) {
-+	case 0x00:
-+		return "Allow scan from any, connection from any";
-+	case 0x01:
-+		return "Allow scan from white list, connection from any";
-+	case 0x02:
-+		return "Allow scan from any, connection from white list";
-+	case 0x03:
-+		return "Allow scan and connection from white list";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
- static inline void ext_inquiry_response_dump(int level, struct frame *frm)
+ 
+ #define ATT_MAX_MTU				256
+-#define ATT_DEFAULT_MTU				23
++#define ATT_DEFAULT_L2CAP_MTU			48
++#define ATT_DEFAULT_LE_MTU			23
+ 
+ /* Requirements for read/write operations */
+ enum {
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 5d7887e..f3b513e 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -105,7 +105,7 @@ static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
+ 	struct discover_primary *dp = user_data;
+ 	GSList *ranges, *last;
+ 	struct att_range *range;
+-	uint8_t opdu[ATT_DEFAULT_MTU];
++	uint8_t opdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 oplen;
+ 	int err = 0;
+ 
+@@ -195,7 +195,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	err = 0;
+ 
+ 	if (end != 0xffff) {
+-		uint8_t opdu[ATT_DEFAULT_MTU];
++		uint8_t opdu[ATT_DEFAULT_LE_MTU];
+ 		guint16 oplen = encode_discover_primary(end + 1, 0xffff, NULL,
+ 							opdu, sizeof(opdu));
+ 
+@@ -214,7 +214,7 @@ guint gatt_discover_primary(GAttrib *attrib, uuid_t *uuid, gatt_cb_t func,
+ 							gpointer user_data)
  {
- 	void *ptr = frm->ptr;
-@@ -1499,6 +1552,85 @@ static inline void le_create_connection_dump(int level, struct frame *frm)
- 	printf("bdaddr %s type %d\n", addr, cp->peer_bdaddr_type);
- }
+ 	struct discover_primary *dp;
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	GAttribResultFunc cb;
+ 	guint16 plen;
  
-+static inline void le_set_event_mask_dump(int level, struct frame *frm)
-+{
-+	int i;
-+	le_set_event_mask_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("mask 0x");
-+	for (i = 0; i < 8; i++)
-+		printf("%.2x", cp->mask[i]);
-+
-+	printf(" (%s)\n", eventmask2str(cp->mask));
-+}
-+
-+static inline void le_set_random_address_dump(int level, struct frame *frm)
-+{
-+	char addr[18];
-+	le_set_random_address_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	p_ba2str(&cp->bdaddr, addr);
-+	printf("bdaddr %s\n", addr);
-+}
-+
-+
-+static inline void le_set_advertising_parameters_dump(int level, struct frame *frm)
-+{
-+	char addr[18];
-+	le_set_advertising_parameters_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("min 0x%04xms max 0x%04xms\n", cp->min_interval, cp->max_interval);
-+
-+	p_indent(level, frm);
-+	printf("type 0x%02x (%s) ownbdaddr 0x%02x (%s)\n", cp->advtype,
-+			evttype2str(cp->advtype), cp->own_bdaddr_type,
-+			bdaddrtype2str(cp->own_bdaddr_type));
-+
-+	p_indent(level, frm);
-+	p_ba2str(&cp->direct_bdaddr, addr);
-+	printf("directbdaddr 0x%02x (%s) %s\n", cp->direct_bdaddr_type,
-+			bdaddrtype2str(cp->direct_bdaddr_type), addr);
-+
-+	p_indent(level, frm);
-+	printf("channelmap 0x%02x filterpolicy 0x%02x (%s)\n",
-+			cp->chan_map, cp->filter, filterpolicy2str(cp->filter));
-+}
-+
-+static inline void le_set_scan_parameters_dump(int level, struct frame *frm)
-+{
-+	le_set_scan_parameters_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("type 0x%02x (%s)\n", cp->type,
-+		cp->type == 0x00 ? "passive" : "active");
-+
-+	p_indent(level, frm);
-+	printf("interval %04xms window %04xms\n", cp->interval, cp->window);
-+
-+	p_indent(level, frm);
-+	printf("own address: 0x%02x (%s) policy: %s\n", cp->own_bdaddr_type,
-+			bdaddrtype2str(cp->own_bdaddr_type),
-+		(cp->filter == 0x00 ? "All" :
-+			(cp->filter == 0x01 ? "white list only" : "reserved")));
-+}
-+
-+static inline void le_set_scan_enable_dump(int level, struct frame *frm)
-+{
-+	le_set_scan_enable_cp *cp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("value 0x%02x (%s)\n", cp->enable,
-+		(cp->enable == 0x00 ? "scanning disabled" :
-+		"scanning enabled"));
-+
-+	p_indent(level, frm);
-+	printf("filter duplicates 0x%02x (%s)\n", cp->filter_dup,
-+		(cp->filter_dup == 0x00 ? "disabled" : "enabled"));
-+}
-+
- static inline void command_dump(int level, struct frame *frm)
+@@ -245,7 +245,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	struct discover_char *dc = user_data;
+ 	struct att_data_list *list;
+ 	unsigned int i, err;
+-	uint8_t opdu[ATT_DEFAULT_MTU];
++	uint8_t opdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 oplen;
+ 	uuid_t uuid;
+ 	uint16_t last = 0;
+@@ -314,7 +314,7 @@ done:
+ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					gatt_cb_t func, gpointer user_data)
  {
- 	hci_command_hdr *hdr = frm->ptr;
-@@ -1790,6 +1922,25 @@ static inline void command_dump(int level, struct frame *frm)
- 
- 	case OGF_LE_CTL:
- 		switch (ocf) {
-+		case OCF_LE_SET_EVENT_MASK:
-+			le_set_event_mask_dump(level + 1, frm);
-+			return;
-+		case OCF_LE_READ_BUFFER_SIZE:
-+		case OCF_LE_READ_LOCAL_SUPPORTED_FEATURES:
-+		case OCF_LE_READ_ADVERTISING_CHANNEL_TX_POWER:
-+			return;
-+		case OCF_LE_SET_RANDOM_ADDRESS:
-+			le_set_random_address_dump(level + 1, frm);
-+			return;
-+		case OCF_LE_SET_ADVERTISING_PARAMETERS:
-+			le_set_advertising_parameters_dump(level + 1, frm);
-+			return;
-+		case OCF_LE_SET_SCAN_PARAMETERS:
-+			le_set_scan_parameters_dump(level + 1, frm);
-+			return;
-+		case OCF_LE_SET_SCAN_ENABLE:
-+			le_set_scan_enable_dump(level + 1, frm);
-+			return;
- 		case OCF_LE_CREATE_CONN:
- 			le_create_connection_dump(level + 1, frm);
- 			return;
-@@ -2455,6 +2606,50 @@ static inline void write_remote_amp_assoc_dump(int level, struct frame *frm)
- 	}
- }
- 
-+static inline void le_read_buffer_size_response_dump(int level, struct frame *frm)
-+{
-+	le_read_buffer_size_rp *rp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("status 0x%2.2x pktlen 0x%4.4x maxpkt 0x%2.2x\n", rp->status,
-+			rp->pkt_len, rp->max_pkt);
-+
-+	if (rp->status > 0) {
-+		p_indent(level, frm);
-+		printf("Error: %s\n", status2str(rp->status));
-+	}
-+}
-+
-+static inline void le_read_local_supported_features_dump(int level, struct frame *frm)
-+{
-+	int i;
-+	le_read_local_supported_features_rp *rp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("status 0x%2.2x features 0x", rp->status);
-+	for (i = 0; i < 8; i++)
-+		printf("%2.2x", rp->features[i]);
-+	printf(" (%s)\n", lefeatures2str(rp->features));
-+
-+	if (rp->status > 0) {
-+		p_indent(level, frm);
-+		printf("Error: %s\n", status2str(rp->status));
-+	}
-+}
-+
-+static inline void le_read_advertising_channel_tx_power_dump(int level, struct frame *frm)
-+{
-+	le_read_advertising_channel_tx_power_rp *rp = frm->ptr;
-+
-+	p_indent(level, frm);
-+	printf("status 0x%2.2x level 0x%x (dBm)\n", rp->status, rp->level);
-+
-+	if (rp->status > 0) {
-+		p_indent(level, frm);
-+		printf("Error: %s\n", status2str(rp->status));
-+	}
-+}
-+
- static inline void cmd_complete_dump(int level, struct frame *frm)
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	struct discover_char *dc;
+ 	guint16 plen;
+ 	uuid_t uuid;
+@@ -342,7 +342,7 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					uuid_t *uuid, GAttribResultFunc func,
+ 					gpointer user_data)
  {
- 	evt_cmd_complete *evt = frm->ptr;
-@@ -2700,6 +2895,37 @@ static inline void cmd_complete_dump(int level, struct frame *frm)
- 			return;
- 		}
- 		break;
-+
-+	case OGF_LE_CTL:
-+		switch (ocf) {
-+		case OCF_LE_SET_EVENT_MASK:
-+		case OCF_LE_SET_RANDOM_ADDRESS:
-+		case OCF_LE_SET_ADVERTISING_PARAMETERS:
-+		case OCF_LE_SET_ADVERTISING_DATA:
-+		case OCF_LE_SET_SCAN_RESPONSE_DATA:
-+		case OCF_LE_SET_ADVERTISE_ENABLE:
-+		case OCF_LE_SET_SCAN_PARAMETERS:
-+		case OCF_LE_SET_SCAN_ENABLE:
-+		case OCF_LE_CREATE_CONN:
-+		case OCF_LE_CLEAR_WHITE_LIST:
-+		case OCF_LE_ADD_DEVICE_TO_WHITE_LIST:
-+		case OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST:
-+		case OCF_LE_SET_HOST_CHANNEL_CLASSIFICATION:
-+		case OCF_LE_RECEIVER_TEST:
-+		case OCF_LE_TRANSMITTER_TEST:
-+			status_response_dump(level, frm);
-+			return;
-+		case OCF_LE_READ_BUFFER_SIZE:
-+			le_read_buffer_size_response_dump(level, frm);
-+			return;
-+		case OCF_LE_READ_LOCAL_SUPPORTED_FEATURES:
-+			le_read_local_supported_features_dump(level, frm);
-+			return;
-+		case OCF_LE_READ_ADVERTISING_CHANNEL_TX_POWER:
-+			le_read_advertising_channel_tx_power_dump(level, frm);
-+			return;
-+		}
-+		break;
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 
+ 	plen = enc_read_by_type_req(start, end, uuid, pdu, sizeof(pdu));
+@@ -381,7 +381,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
+ 							gpointer user_data)
+ {
+ 	struct read_long_data *long_read = user_data;
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint8 *tmp;
+ 	guint16 plen;
+ 	guint id;
+@@ -402,7 +402,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
+ 	long_read->buffer = tmp;
+ 	long_read->size += rlen - 1;
+ 
+-	if (rlen < ATT_DEFAULT_MTU)
++	if (rlen < ATT_DEFAULT_LE_MTU)
+ 		goto done;
+ 
+ 	plen = enc_read_blob_req(long_read->handle, long_read->size - 1,
+@@ -427,11 +427,11 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
+ 					guint16 rlen, gpointer user_data)
+ {
+ 	struct read_long_data *long_read = user_data;
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 	guint id;
+ 
+-	if (status != 0 || rlen < ATT_DEFAULT_MTU)
++	if (status != 0 || rlen < ATT_DEFAULT_LE_MTU)
+ 		goto done;
+ 
+ 	long_read->buffer = g_malloc(rlen);
+@@ -461,7 +461,7 @@ done:
+ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+ 							gpointer user_data)
+ {
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 	guint id;
+ 	struct read_long_data *long_read;
+@@ -493,7 +493,7 @@ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ 			int vlen, GAttribResultFunc func, gpointer user_data)
+ {
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 
+ 	plen = enc_write_req(handle, value, vlen, pdu, sizeof(pdu));
+@@ -504,7 +504,7 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data)
+ {
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 
+ 	plen = enc_find_info_req(start, end, pdu, sizeof(pdu));
+@@ -518,7 +518,7 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+ 				GDestroyNotify notify, gpointer user_data)
+ {
+-	uint8_t pdu[ATT_DEFAULT_MTU];
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	guint16 plen;
+ 
+ 	plen = enc_write_cmd(handle, value, vlen, pdu, sizeof(pdu));
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 923bde7..f03a5b9 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -737,6 +737,7 @@ done:
+ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ {
+ 	struct gatt_channel *channel;
++	GIOChannel **server_io = user_data;
+ 	GError *gerr = NULL;
+ 
+ 	if (err) {
+@@ -758,8 +759,12 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 		return;
  	}
  
- 	raw_dump(level, frm);
++	if (server_io == &l2cap_io)
++		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
++	else
++		channel->mtu = ATT_DEFAULT_LE_MTU;
++
+ 	channel->attrib = g_attrib_new(io);
+-	channel->mtu = ATT_DEFAULT_MTU;
+ 	g_io_channel_unref(io);
+ 
+ 	channel->id = g_attrib_register(channel->attrib, GATTRIB_ALL_EVENTS,
+@@ -775,7 +780,7 @@ static void confirm_event(GIOChannel *io, void *user_data)
+ {
+ 	GError *gerr = NULL;
+ 
+-	if (bt_io_accept(io, connect_event, NULL, NULL, &gerr) == FALSE) {
++	if (bt_io_accept(io, connect_event, user_data, NULL, &gerr) == FALSE) {
+ 		error("bt_io_accept: %s", gerr->message);
+ 		g_error_free(gerr);
+ 		g_io_channel_unref(io);
+@@ -824,7 +829,7 @@ int attrib_server_init(void)
+ 
+ 	/* BR/EDR socket */
+ 	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+-					NULL, NULL, &gerr,
++					&l2cap_io, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
+ 					BT_IO_OPT_PSM, GATT_PSM,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+@@ -857,7 +862,7 @@ int attrib_server_init(void)
+ 
+ 	/* LE socket */
+ 	le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+-					NULL, NULL, &gerr,
++					&le_io, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
+ 					BT_IO_OPT_CID, GATT_CID,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
 -- 
 1.7.1
-
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
