@@ -1,94 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Jan 2011 14:11:34 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: fix crash by disabling tasklet in sock
- accept
-Message-ID: <20110121161133.GA2400@joana>
-References: <1295512687-30352-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1295512687-30352-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <AANLkTi=z1DPguiO7B39CRoj-wqi5r3nXLixCe3Yo34aV@mail.gmail.com>
+References: <AANLkTi=z1DPguiO7B39CRoj-wqi5r3nXLixCe3Yo34aV@mail.gmail.com>
+Date: Fri, 21 Jan 2011 09:38:11 -0500
+Message-ID: <AANLkTimFqxYJ_wNgfthjCRfarF83+o5F4KZFjQ7hz3P_@mail.gmail.com>
+Subject: Re: How to close bluetooth? Using rfkill?
+From: zhangfei gao <zhangfei.gao@gmail.com>
+To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Fri, Jan 21, 2011 at 12:51 AM, zhangfei gao <zhangfei.gao@gmail.com> wrote:
+> Hi Johan,
+>
+> Is there any general method to open/close bluetooth, using rfkill or
+> pm_runtime_get/put_* API.
+>
+> Currently we use rfkill to close bluetooth, however we met dead lock
+> issue, for mutex_lock(&rfkill_global_mutex).
+> So we use workaround to rmmod bt.ko first, or revert the rfkill patch
+> in hci_core.c.
+>
+> BT/WIFI device have chip select pin, we register one rfkill with
+> sd8x_set_block, and control chip select pin to open/close bt/wifi/fm.
+> for example:
+> rfkill unblock bluetooth to open bt
+> rfkill block bluetooth to close bt
+>
+> When "rfkill block bluetooth",
+> rfkill_fop_write->mutex_lock(&rfkill_global_mutex)->rfkill_set_block->sd8x_set_block->waiting
+> for card is freed.
+> BT driver will call
+> hci_unregister_dev->rfkill_unregister->mutex_lock(&rfkill_global_mutex);
+> So mutex_lock(&rfkill_global_mutex) will be dead locked.
+>
+> If so, do we have to use other method to control chip select pin to
+> control bt power, such as pm_runtime_get/put_* API.
+>
+> Thanks in advance.
+>
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-01-20 10:38:07 +0200]:
+Hi, Marcel
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> 
-> Crash can happen when tasklet handling connect/disconnect requests
-> preempts socket accept. Can be reproduced with "l2test -r" on one
-> side and several "l2test -c -b 1000 -i hci0 -P 10 <bdaddr>" on the
-> other side.
-> 
-> disable taskets in socket accept and change lock_sock and release_sock
-> to bh_lock_sock and bh_unlock_sock since we have to use spinlocks and
-> there is no need to mark sock as owned by user.
-> 
-> ...
-> [ 3555.897247] Unable to handle kernel NULL pointer dereference at virtual
-> address 000000bc
-> [ 3555.915039] pgd = cab9c000
-> [ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
-> [ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
-> [ 3555.999786] CPU: 0    Not tainted  (2.6.32.21-13874-g67918ef #65)
-> ...
-> [ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
-> [ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
-> ...
-> [ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
-> [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
-> [ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
-> [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap])
-> [ 3556.184082] [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
-> [<c026a0a8>] (sys_accept4+0x120/0x1e0)
-> [ 3556.193969] [<c026a0a8>] (sys_accept4+0x120/0x1e0) from [<c002c9a0>]
-> (ret_fast_syscall+0x0/0x2c)
-> [ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc)
-> ...
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/af_bluetooth.c |   12 ++++++++----
->  1 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index a6732b5..f545566 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -199,14 +199,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
->  
->  	BT_DBG("parent %p", parent);
->  
-> +	local_bh_disable();
->  	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
->  		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
->  
-> -		lock_sock(sk);
-> +		bh_lock_sock(sk);
->  
->  		/* FIXME: Is this check still needed */
->  		if (sk->sk_state == BT_CLOSED) {
-> -			release_sock(sk);
-> +			bh_unlock_sock(sk);
->  			bt_accept_unlink(sk);
->  			continue;
->  		}
-> @@ -216,12 +217,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
->  			bt_accept_unlink(sk);
->  			if (newsock)
->  				sock_graft(sk, newsock);
-> -			release_sock(sk);
+Do you have some suggestion?
+When we use "rfkill block bluetooth" to disable bt, bt driver call
+hci_unregister_dev to free driver.
+The dead lock happens for acquiring mutex_lock(&rfkill_global_mutex).
+One in rfkill_unregister from hci_unregister_dev, the other in
+rfkill_fop_write from "rfkill block bluetooth" .
+Is this the correct method to open/close bluetooth.
 
-Please add an extra line here, them patch should be ok to upstream.
-
-> +			bh_unlock_sock(sk);
-> +			local_bh_enable();
->  			return sk;
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Thanks
