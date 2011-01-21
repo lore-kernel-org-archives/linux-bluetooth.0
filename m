@@ -1,54 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTi=z1DPguiO7B39CRoj-wqi5r3nXLixCe3Yo34aV@mail.gmail.com>
-References: <AANLkTi=z1DPguiO7B39CRoj-wqi5r3nXLixCe3Yo34aV@mail.gmail.com>
-Date: Fri, 21 Jan 2011 09:38:11 -0500
-Message-ID: <AANLkTimFqxYJ_wNgfthjCRfarF83+o5F4KZFjQ7hz3P_@mail.gmail.com>
-Subject: Re: How to close bluetooth? Using rfkill?
-From: zhangfei gao <zhangfei.gao@gmail.com>
-To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 6/7] Add autoconf macro for interactive gatttool
+Date: Fri, 21 Jan 2011 10:46:25 -0300
+Message-Id: <1295617586-3398-6-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1295617586-3398-1-git-send-email-sheldon.demario@openbossa.org>
+References: <1295617586-3398-1-git-send-email-sheldon.demario@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 21, 2011 at 12:51 AM, zhangfei gao <zhangfei.gao@gmail.com> wrote:
-> Hi Johan,
->
-> Is there any general method to open/close bluetooth, using rfkill or
-> pm_runtime_get/put_* API.
->
-> Currently we use rfkill to close bluetooth, however we met dead lock
-> issue, for mutex_lock(&rfkill_global_mutex).
-> So we use workaround to rmmod bt.ko first, or revert the rfkill patch
-> in hci_core.c.
->
-> BT/WIFI device have chip select pin, we register one rfkill with
-> sd8x_set_block, and control chip select pin to open/close bt/wifi/fm.
-> for example:
-> rfkill unblock bluetooth to open bt
-> rfkill block bluetooth to close bt
->
-> When "rfkill block bluetooth",
-> rfkill_fop_write->mutex_lock(&rfkill_global_mutex)->rfkill_set_block->sd8x_set_block->waiting
-> for card is freed.
-> BT driver will call
-> hci_unregister_dev->rfkill_unregister->mutex_lock(&rfkill_global_mutex);
-> So mutex_lock(&rfkill_global_mutex) will be dead locked.
->
-> If so, do we have to use other method to control chip select pin to
-> control bt power, such as pm_runtime_get/put_* API.
->
-> Thanks in advance.
->
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-Hi, Marcel
+Interactive gatttool will be built automatically if readline library
+is found and attribute plugin is enabled.
+---
+ Makefile.am  |    8 ++++++--
+ acinclude.m4 |    8 ++++++++
+ configure.ac |    1 +
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-Do you have some suggestion?
-When we use "rfkill block bluetooth" to disable bt, bt driver call
-hci_unregister_dev to free driver.
-The dead lock happens for acquiring mutex_lock(&rfkill_global_mutex).
-One in rfkill_unregister from hci_unregister_dev, the other in
-rfkill_fop_write from "rfkill block bluetooth" .
-Is this the correct method to open/close bluetooth.
+diff --git a/Makefile.am b/Makefile.am
+index 79365ad..f9e05fd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -175,7 +175,7 @@ builtin_sources += plugins/service.c
+ endif
+ 
+ if ATTRIBPLUGIN
+-bin_PROGRAMS += attrib/gatttool attrib/igatttool
++bin_PROGRAMS += attrib/gatttool
+ 
+ attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+ 			  attrib/gattrib.c btio/btio.c \
+@@ -183,10 +183,14 @@ attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+ 			  attrib/gtcommon.h attrib/gtcommon.c
+ attrib_gatttool_LDADD = lib/libbluetooth.la @GLIB_LIBS@
+ 
++if IGATTTOOL
++bin_PROGRAMS += attrib/igatttool
++
+ attrib_igatttool_SOURCES = attrib/igatttool.c btio/btio.c \
+ 			   attrib/gtcommon.h attrib/gtcommon.c \
+ 			  src/glib-helper.h src/glib-helper.c
+-attrib_igatttool_LDADD =  lib/libbluetooth.la @GLIB_LIBS@ -lreadline
++attrib_igatttool_LDADD =  lib/libbluetooth.la @GLIB_LIBS@ @READLINE_LIBS@
++endif
+ 
+ builtin_modules += attrib
+ builtin_sources += attrib/main.c \
+diff --git a/acinclude.m4 b/acinclude.m4
+index ecf4b4b..2b4b515 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -153,6 +153,13 @@ AC_DEFUN([AC_PATH_SNDFILE], [
+ 	AC_SUBST(SNDFILE_LIBS)
+ ])
+ 
++AC_DEFUN([AC_PATH_READLINE], [
++	AC_CHECK_LIB(readline, main,
++		[ readline_found=yes
++		 AC_SUBST(READLINE_LIBS, "-lreadline")
++		], readline_found=no)
++])
++
+ AC_DEFUN([AC_PATH_OUI], [
+ 	AC_ARG_WITH(ouifile,
+ 		    AS_HELP_STRING([--with-ouifile=PATH],[Path to the oui.txt file @<:@auto@:>@]),
+@@ -357,6 +364,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(HAL, test "${hal_enable}" = "yes")
+ 	AM_CONDITIONAL(ATTRIBPLUGIN, test "${attrib_enable}" = "yes")
++	AM_CONDITIONAL(IGATTTOOL, test "${attrib_enable}" = "yes" && test "${readline_found}" = "yes")
+ 	AM_CONDITIONAL(ECHOPLUGIN, test "no" = "yes")
+ 	AM_CONDITIONAL(PNATPLUGIN, test "${pnat_enable}" = "yes")
+ 	AM_CONDITIONAL(TRACER, test "${tracer_enable}" = "yes")
+diff --git a/configure.ac b/configure.ac
+index 4a979f0..6925344 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -41,6 +41,7 @@ AC_PATH_ALSA
+ AC_PATH_GSTREAMER
+ AC_PATH_USB
+ AC_PATH_SNDFILE
++AC_PATH_READLINE
+ AC_PATH_OUI
+ 
+ AC_ARG_BLUEZ
+-- 
+1.7.1
 
-Thanks
