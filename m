@@ -1,69 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Jan 2011 15:10:26 -0200
+Date: Fri, 21 Jan 2011 14:11:34 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4] Bluetooth: Use non-flushable by default L2CAP data
- packets
-Message-ID: <20110121171026.GB2400@joana>
-References: <1294046076-3712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv2] Bluetooth: fix crash by disabling tasklet in sock
+ accept
+Message-ID: <20110121161133.GA2400@joana>
+References: <1295512687-30352-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1295512687-30352-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-01-03 11:14:36 +0200]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-01-20 10:38:07 +0200]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> Modification of Nick Pelly <npelly@google.com> patch.
+> Crash can happen when tasklet handling connect/disconnect requests
+> preempts socket accept. Can be reproduced with "l2test -r" on one
+> side and several "l2test -c -b 1000 -i hci0 -P 10 <bdaddr>" on the
+> other side.
 > 
-> With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
-> makes ACL data packets non-flushable by default on compatible chipsets, and
-> adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
-> data packets for a given L2CAP socket. This is useful for A2DP data which can
-> be safely discarded if it can not be delivered within a short time (while
-> other ACL data should not be discarded).
+> disable taskets in socket accept and change lock_sock and release_sock
+> to bh_lock_sock and bh_unlock_sock since we have to use spinlocks and
+> there is no need to mark sock as owned by user.
 > 
-> Note that making ACL data flushable has no effect unless the automatic flush
-> timeout for that ACL link is changed from its default of 0 (infinite).
-> 
-> Default packet types (for compatible chipsets):
-> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
-> Bluetooth HCI H4
-> Bluetooth HCI ACL Packet
->     .... 0000 0000 0010 = Connection Handle: 0x0002
->     ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
->     00.. .... .... .... = BC Flag: Point-To-Point (0)
->     Data Total Length: 8
-> Bluetooth L2CAP Packet
-> 
-> After setting BT_FLUSHABLE
-> (sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
-> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
-> Bluetooth HCI H4
-> Bluetooth HCI ACL Packet
->     .... 0000 0000 0010 = Connection Handle: 0x0002
->     ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
->     00.. .... .... .... = BC Flag: Point-To-Point (0)
->     Data Total Length: 8
-> Bluetooth L2CAP Packet
+> ...
+> [ 3555.897247] Unable to handle kernel NULL pointer dereference at virtual
+> address 000000bc
+> [ 3555.915039] pgd = cab9c000
+> [ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
+> [ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
+> [ 3555.999786] CPU: 0    Not tainted  (2.6.32.21-13874-g67918ef #65)
+> ...
+> [ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+> [ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+> ...
+> [ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+> [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+> [ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
+> [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap])
+> [ 3556.184082] [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
+> [<c026a0a8>] (sys_accept4+0x120/0x1e0)
+> [ 3556.193969] [<c026a0a8>] (sys_accept4+0x120/0x1e0) from [<c002c9a0>]
+> (ret_fast_syscall+0x0/0x2c)
+> [ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc)
+> ...
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > ---
->  include/net/bluetooth/bluetooth.h |    5 +++
->  include/net/bluetooth/hci.h       |    2 +
->  include/net/bluetooth/hci_core.h  |    1 +
->  include/net/bluetooth/l2cap.h     |    1 +
->  net/bluetooth/hci_core.c          |    7 +++-
->  net/bluetooth/l2cap.c             |   59 ++++++++++++++++++++++++++++++++++--
->  6 files changed, 69 insertions(+), 6 deletions(-)
+>  net/bluetooth/af_bluetooth.c |   12 ++++++++----
+>  1 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> index a6732b5..f545566 100644
+> --- a/net/bluetooth/af_bluetooth.c
+> +++ b/net/bluetooth/af_bluetooth.c
+> @@ -199,14 +199,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+>  
+>  	BT_DBG("parent %p", parent);
+>  
+> +	local_bh_disable();
+>  	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
+>  		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
+>  
+> -		lock_sock(sk);
+> +		bh_lock_sock(sk);
+>  
+>  		/* FIXME: Is this check still needed */
+>  		if (sk->sk_state == BT_CLOSED) {
+> -			release_sock(sk);
+> +			bh_unlock_sock(sk);
+>  			bt_accept_unlink(sk);
+>  			continue;
+>  		}
+> @@ -216,12 +217,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+>  			bt_accept_unlink(sk);
+>  			if (newsock)
+>  				sock_graft(sk, newsock);
+> -			release_sock(sk);
 
-Patch has been applied to bluetooth-next-2.6. Thanks.
+Please add an extra line here, them patch should be ok to upstream.
+
+> +			bh_unlock_sock(sk);
+> +			local_bh_enable();
+>  			return sk;
 
 -- 
 Gustavo F. Padovan
