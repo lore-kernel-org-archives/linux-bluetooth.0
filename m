@@ -1,381 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 21 Jan 2011 15:57:18 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: pavan_savoy@ti.com
-Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 2/2] Bluetooth: btwilink driver
-Message-ID: <20110121175718.GD2400@joana>
-References: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
- <1294138788-10307-2-git-send-email-pavan_savoy@ti.com>
- <1294138788-10307-3-git-send-email-pavan_savoy@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1294138788-10307-3-git-send-email-pavan_savoy@ti.com>
+In-Reply-To: <1295617586-3398-5-git-send-email-sheldon.demario@openbossa.org>
+References: <1295617586-3398-1-git-send-email-sheldon.demario@openbossa.org>
+	<1295617586-3398-5-git-send-email-sheldon.demario@openbossa.org>
+Date: Fri, 21 Jan 2011 13:50:56 -0400
+Message-ID: <AANLkTi=efT4PZ4T_Ns0xQWcEZgdzkD-ZBO4AhnyF6QnH@mail.gmail.com>
+Subject: Re: [PATCH 5/7] Add transport option to interactive gatttool
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
-
-* pavan_savoy@ti.com <pavan_savoy@ti.com> [2011-01-04 04:59:48 -0600]:
-
-> From: Pavan Savoy <pavan_savoy@ti.com>
-> 
-> -- patch description --
-> 
-> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> Texas Instrument's WiLink chipsets combine wireless technologies
-> like BT, FM, GPS and WLAN onto a single chip.
-> 
-> This Bluetooth driver works on top of the TI_ST shared transport
-> line discipline driver which also allows other drivers like
-> FM V4L2 and GPS character driver to make use of the same UART interface.
-> 
-> Kconfig and Makefile modifications to enable the Bluetooth
-> driver for Texas Instrument's WiLink 7 chipset.
-> 
-> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
+On Fri, Jan 21, 2011 at 9:46 AM, Sheldon Demario
+<sheldon.demario@openbossa.org> wrote:
 > ---
->  drivers/bluetooth/Kconfig    |   10 +
->  drivers/bluetooth/Makefile   |    1 +
->  drivers/bluetooth/btwilink.c |  397 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 408 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/bluetooth/btwilink.c
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 02deef4..8e0de9a 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -219,4 +219,14 @@ config BT_ATH3K
->  	  Say Y here to compile support for "Atheros firmware download driver"
->  	  into the kernel or say M to compile it as module (ath3k).
->  
-> +config BT_WILINK
-> +	tristate "Texas Instruments WiLink7 driver"
-> +	depends on TI_ST
-> +	help
-> +	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
-> +	  combo devices. This makes use of shared transport line discipline
-> +	  core driver to communicate with the BT core of the combo chip.
-> +
-> +	  Say Y here to compile support for Texas Instrument's WiLink7 driver
-> +	  into the kernel or say M to compile it as module.
->  endmenu
-> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> index 71bdf13..f4460f4 100644
-> --- a/drivers/bluetooth/Makefile
-> +++ b/drivers/bluetooth/Makefile
-> @@ -18,6 +18,7 @@ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
->  obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
->  obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
->  obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-> +obj-$(CONFIG_BT_WILINK)		+= btwilink.o
->  
->  btmrvl-y			:= btmrvl_main.o
->  btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-> diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-> new file mode 100644
-> index 0000000..0201aca
-> --- /dev/null
-> +++ b/drivers/bluetooth/btwilink.c
-> @@ -0,0 +1,397 @@
-> +/*
-> + *  Texas Instrument's Bluetooth Driver For Shared Transport.
-> + *
-> + *  Bluetooth Driver acts as interface between HCI core and
-> + *  TI Shared Transport Layer.
-> + *
-> + *  Copyright (C) 2009-2010 Texas Instruments
-> + *  Author: Raja Mani <raja_mani@ti.com>
-> + *	Pavan Savoy <pavan_savoy@ti.com>
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License version 2 as
-> + *  published by the Free Software Foundation.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-> + *
-> + */
-> +
-> +#include <linux/platform_device.h>
-> +#include <net/bluetooth/bluetooth.h>
-> +#include <net/bluetooth/hci_core.h>
-> +
-> +#include <linux/ti_wilink_st.h>
-> +
-> +/* Bluetooth Driver Version */
-> +#define VERSION               "1.0"
-> +
-> +/* Number of seconds to wait for registration completion
-> + * when ST returns PENDING status.
-> + */
-> +#define BT_REGISTER_TIMEOUT   6000	/* 6 sec */
-> +
-> +/**
-> + * struct ti_st - driver operation structure
-> + * @hdev: hci device pointer which binds to bt driver
-> + * @reg_status: ST registration callback status
-> + * @st_write: write function provided by the ST driver
-> + *	to be used by the driver during send_frame.
-> + * @wait_reg_completion - completion sync between ti_st_open
-> + *	and ti_st_registration_completion_cb.
-> + */
-> +struct ti_st {
-> +	struct hci_dev *hdev;
-> +	char reg_status;
-> +	long (*st_write) (struct sk_buff *);
-> +	struct completion wait_reg_completion;
-> +};
-> +
-> +/* Increments HCI counters based on pocket ID (cmd,acl,sco) */
-> +static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
+>  attrib/igatttool.c |   18 ++++++++++++++++++
+>  1 files changed, 18 insertions(+), 0 deletions(-)
+>
+> diff --git a/attrib/igatttool.c b/attrib/igatttool.c
+> index 29290ed..e0d8b44 100644
+> --- a/attrib/igatttool.c
+> +++ b/attrib/igatttool.c
+> @@ -137,6 +137,23 @@ static void cmd_exit(char **cmd)
+>        g_main_loop_quit(main_loop);
+>  }
+>
+> +static void cmd_transport(char **cmd)
+
+You can call this parameter "opt" for consistency with other commands.
+
 > +{
-> +	struct hci_dev *hdev = hst->hdev;
+> +       if (cmd[1] == NULL)
+> +               return;
 > +
-> +	/* Update HCI stat counters */
-> +	switch (pkt_type) {
-> +	case HCI_COMMAND_PKT:
-> +		hdev->stat.cmd_tx++;
-> +		break;
+> +       if (conn_state != STATE_DISCONNECTED)
+> +               return;
 > +
-> +	case HCI_ACLDATA_PKT:
-> +		hdev->stat.acl_tx++;
-> +		break;
+> +       if (strcasecmp(cmd[1], "le") == 0)
+> +               opt_le = TRUE;
+> +       else if (strcasecmp(cmd[1], "br") == 0)
+> +               opt_le = FALSE;
+
+I've noticed every command callback has the two lines below. Would be
+possible to move them to after the callback is called ?
+
 > +
-> +	case HCI_SCODATA_PKT:
-> +		hdev->stat.sco_tx++;
-> +		break;
-> +	}
+> +       rl_set_prompt(get_prompt());
+> +       rl_redisplay();
 > +}
 > +
-> +/* ------- Interfaces to Shared Transport ------ */
-> +
-> +/* Called by ST layer to indicate protocol registration completion
-> + * status.ti_st_open() function will wait for signal from this
-> + * API when st_register() function returns ST_PENDING.
-> + */
-> +static void st_registration_completion_cb(void *priv_data, char data)
-> +{
-> +	struct ti_st *lhst = priv_data;
-> +
-> +	/* Save registration status for use in ti_st_open() */
-> +	lhst->reg_status = data;
-> +	/* complete the wait in ti_st_open() */
-> +	complete(&lhst->wait_reg_completion);
-> +}
-> +
-> +/* Called by Shared Transport layer when receive data is
-> + * available */
-> +static long st_receive(void *priv_data, struct sk_buff *skb)
-> +{
-> +	struct ti_st *lhst = priv_data;
-> +	int err;
-> +
-> +	if (!skb)
-> +		return -EFAULT;
-> +
-> +	if (!lhst) {
-> +		kfree_skb(skb);
-> +		return -EFAULT;
-> +	}
-> +
-> +	skb->dev = (void *) lhst->hdev;
-> +
-> +	/* Forward skb to HCI core layer */
-> +	err = hci_recv_frame(skb);
-> +	if (err < 0) {
-> +		BT_ERR("Unable to push skb to HCI core(%d)", err);
-> +		return err;
-> +	}
-> +
-> +	lhst->hdev->stat.byte_rx += skb->len;
-> +
-> +	return 0;
-> +}
-> +
-> +/* ------- Interfaces to HCI layer ------ */
-> +/* protocol structure registered with shared transport */
-> +static struct st_proto_s ti_st_proto[3] = {
-> +	{
-> +		.chnl_id = 0x02, /* ACL */
 
-Please create macros for the chnl_id in the core driver.
-
-> +		.recv = st_receive,
-> +		.reg_complete_cb = st_registration_completion_cb,
-> +		.hdr_len = 4,
-> +		.offset_len_in_hdr = 2,
-> +		.len_size = 2,
-> +		.reserve = 8,
-> +	},
-> +	{
-> +		.chnl_id = 0x03, /* SCO */
-> +		.recv = st_receive,
-> +		.reg_complete_cb = st_registration_completion_cb,
-> +		.hdr_len = 3,
-> +		.offset_len_in_hdr = 2,
-> +		.len_size = 1,
-> +		.reserve = 8,
-> +	},
-> +	{
-> +		.chnl_id = 0x04, /* HCI Events */
-> +		.recv = st_receive,
-> +		.reg_complete_cb = st_registration_completion_cb,
-> +		.hdr_len = 2,
-> +		.offset_len_in_hdr = 1,
-> +		.len_size = 1,
-> +		.reserve = 8,
-> +	},
-> +};
-> +
-> +/* Called from HCI core to initialize the device */
-> +static int ti_st_open(struct hci_dev *hdev)
-> +{
-> +	unsigned long timeleft;
-> +	struct ti_st *hst;
-> +	int err, i;
-> +
-> +	BT_DBG("%s %p", hdev->name, hdev);
-
-Blank line here.
-
-> +	if (test_and_set_bit(HCI_RUNNING, &hdev->flags)) {
-> +		BT_ERR("btwilink already opened");
-
-No need for this BT_ERR. It already returns -EBUSY.
-
-> +		return -EBUSY;
-> +	}
-> +
-> +	/* provide contexts for callbacks from ST */
-> +	hst = hdev->driver_data;
-> +
-> +	for (i = 0; i < 3; i++) {
-> +		ti_st_proto[i].priv_data = hst;
-> +		ti_st_proto[i].max_frame_size = HCI_MAX_FRAME_SIZE;
-> +
-> +		err = st_register(&ti_st_proto[i]);
-
-Let's change the order here. First
-
-		if (!err)
-			goto to "hst->st_write = ti_st_proto[i].write"
-
-		if (err != -EINPROGRESS) {
-		}
-
-		then here code for err == -EINPROGRESS
-
-
-> +		if (err == -EINPROGRESS) {
-> +			/* ST is busy with either protocol
-> +			 * registration or firmware download.
-> +			 */
-> +			/* Prepare wait-for-completion handler data structures.
-> +			*/
-> +			init_completion(&hst->wait_reg_completion);
-> +
-> +			/* Reset ST registration callback status flag,
-> +			 * this value will be updated in
-> +			 * ti_st_registration_completion_cb()
-> +			 * function whenever it called from ST driver.
-> +			 */
-> +			hst->reg_status = -EINPROGRESS;
-> +
-> +			BT_DBG("waiting for registration "
-> +			"completion signal from ST");
-> +			timeleft = wait_for_completion_timeout
-> +				(&hst->wait_reg_completion,
-> +				 msecs_to_jiffies(BT_REGISTER_TIMEOUT));
-> +			if (!timeleft) {
-> +				clear_bit(HCI_RUNNING, &hdev->flags);
-> +				BT_ERR("Timeout(%d sec),didn't get reg "
-> +						"completion signal from ST",
-> +						BT_REGISTER_TIMEOUT / 1000);
-> +				return -ETIMEDOUT;
-> +			}
-> +
-> +			/* Is ST registration callback
-> +			 * called with ERROR status? */
-> +			if (hst->reg_status != 0) {
-> +				clear_bit(HCI_RUNNING, &hdev->flags);
-> +				BT_ERR("ST registration completed with invalid "
-> +						"status %d", hst->reg_status);
-> +				return -EAGAIN;
-> +			}
-> +			err = 0;
-
-remove this err = 0; and return 0 in the end of the function.
-
-> +		} else if (err != 0) {
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +			BT_ERR("st_register failed %d", err);
-> +			return err;
-> +		}
-
-Blank line here.
-
-> +		hst->st_write = ti_st_proto[i].write;
-> +		if (!hst->st_write) {
-> +			BT_ERR("undefined ST write function");
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +
-> +			/* Undo registration with ST */
-> +			err = st_unregister(&ti_st_proto[i]);
-> +			if (err)
-> +				BT_ERR("st_unregister() failed with "
-> +				"error %d", err);
-
-
-You are unregistering only one protocol here, if the fail happens in the third
-one you will leak two of them.
-
-> +
-> +			hst->st_write = NULL;
-> +			/* ti_st_proto.write is filled up by the
-> +			 * underlying shared transport driver
-> +			 * upon registration
-> +			 */
-> +			return err;
-> +		}
-> +	}
-> +
-> +	return err;
-> +}
-> +
-> +/* Close device */
-> +static int ti_st_close(struct hci_dev *hdev)
-> +{
-> +	int err, i;
-> +	struct ti_st *hst = hdev->driver_data;
-> +
-> +	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
-> +		return 0;
-> +
-> +	for (i = 0; i < 3; i++) {
-> +		/* continue to unregister from transport */
-
-This comment is pointless.
-
-> +		err = st_unregister(&ti_st_proto[i]);
-> +		if (err)
-> +			BT_ERR("st_unregister() failed with error %d", err);
-> +	}
-> +
-> +	hst->st_write = NULL;
-> +
-> +	return err;
-
-err is will report the error if it happens in the first or second unregister.
-
-
+Regards,
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
