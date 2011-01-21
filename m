@@ -1,70 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 21 Jan 2011 15:18:57 -0200
+Date: Fri, 21 Jan 2011 15:10:26 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Pavan Savoy <pavan_savoy@sify.com>
-Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@ti.com>
-Subject: Re: [RFC 0/2] remove BT references from TI_ST
-Message-ID: <20110121171857.GC2400@joana>
-References: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
- <AANLkTinPC-i2xi9pCQ-RzGWuwZ5uTM3NXG7y6gwTnPYv@mail.gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv4] Bluetooth: Use non-flushable by default L2CAP data
+ packets
+Message-ID: <20110121171026.GB2400@joana>
+References: <1294046076-3712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTinPC-i2xi9pCQ-RzGWuwZ5uTM3NXG7y6gwTnPYv@mail.gmail.com>
+In-Reply-To: <1294046076-3712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Hi Andrei,
 
-* Pavan Savoy <pavan_savoy@sify.com> [2011-01-19 23:56:29 +0530]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-01-03 11:14:36 +0200]:
 
-> Gustavo,
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> On Tue, Jan 4, 2011 at 4:29 PM,  <pavan_savoy@ti.com> wrote:
-> > From: Pavan Savoy <pavan_savoy@ti.com>
-> >
-> > Gustavo,
-> >
-> > Based on your comments, that the underlying shared transport driver
-> > for btwilink driver made use of the BT references to peek into the packets
-> > I have modified the TI_ST.
+> Modification of Nick Pelly <npelly@google.com> patch.
 > 
-> Since there lacks a generic way to parse the packets coming in from the
-> UART into BT, FM or GPS, we have to look into the data to fragment assembled
-> data or assemble fragmented data.
+> With Bluetooth 2.1 ACL packets can be flushable or non-flushable. This commit
+> makes ACL data packets non-flushable by default on compatible chipsets, and
+> adds the BT_FLUSHABLE socket option to explicitly request flushable ACL
+> data packets for a given L2CAP socket. This is useful for A2DP data which can
+> be safely discarded if it can not be delivered within a short time (while
+> other ACL data should not be discarded).
 > 
-> Please have a look, Please suggest whether something like this is required,
-> If not, please also suggest, if including BT headers is a problem ?
-
-Not really. The real problem is to break the abstraction between drivers
-layers (core and bluetooth drivers in this case)
-
+> Note that making ACL data flushable has no effect unless the automatic flush
+> timeout for that ACL link is changed from its default of 0 (infinite).
 > 
-> Because I just include the BT headers and don't have a build
-> dependency as such on
-> BT/HCI and don't use any functions from hci_core in my shared transport driver.
+> Default packet types (for compatible chipsets):
+> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+> Bluetooth HCI H4
+> Bluetooth HCI ACL Packet
+>     .... 0000 0000 0010 = Connection Handle: 0x0002
+>     ..00 .... .... .... = PB Flag: First Non-automatically Flushable Packet (0)
+>     00.. .... .... .... = BC Flag: Point-To-Point (0)
+>     Data Total Length: 8
+> Bluetooth L2CAP Packet
 > 
-> > For this reason, Now the above lying protocol drivers like BT, FM and GPS
-> > would send details about their packet types and header information which
-> > would assist shared transport driver to parse the data.
+> After setting BT_FLUSHABLE
+> (sock.setsockopt(274 /*SOL_BLUETOOTH*/, 8 /* BT_FLUSHABLE */, 1 /* flush */))
+> Frame 34: 13 bytes on wire (104 bits), 13 bytes captured (104 bits)
+> Bluetooth HCI H4
+> Bluetooth HCI ACL Packet
+>     .... 0000 0000 0010 = Connection Handle: 0x0002
+>     ..10 .... .... .... = PB Flag: First Automatically Flushable Packet (2)
+>     00.. .... .... .... = BC Flag: Point-To-Point (0)
+>     Data Total Length: 8
+> Bluetooth L2CAP Packet
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |    5 +++
+>  include/net/bluetooth/hci.h       |    2 +
+>  include/net/bluetooth/hci_core.h  |    1 +
+>  include/net/bluetooth/l2cap.h     |    1 +
+>  net/bluetooth/hci_core.c          |    7 +++-
+>  net/bluetooth/l2cap.c             |   59 ++++++++++++++++++++++++++++++++++--
+>  6 files changed, 69 insertions(+), 6 deletions(-)
 
-Fair enough. This new approach is way better.
-
-> >
-> > Gustavo, please also notice the change in btwilink driver in and around,
-> > st_register and suggest if something like this is OK.
-> > btwilink can also be modified to send in all the packet specific data
-> > in one shot, if that is preferred.
-> >
-> > Please review and provide comments..
-> >
-> > Note:
-> > If this is alright, I will send out a modified patch with updated
-> > subject to lkml/Greg for linux-next.
-
-Ok. Go ahead. Then tell me when I'll be able to apply your patch. (I need to
-have the core modifications in my tree first). Or I just ack the patch and it
-finds its way to mainline through Greg's tree.
+Patch has been applied to bluetooth-next-2.6. Thanks.
 
 -- 
 Gustavo F. Padovan
