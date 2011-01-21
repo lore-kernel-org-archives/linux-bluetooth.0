@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Attribute Server and Client TODOs
-From: Brian Gix <bgix@codeaurora.org>
-To: claudio.takahasi@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 21 Jan 2011 16:07:56 -0800
-Message-ID: <1295654876.1774.24.camel@ubuntuLab1>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: pavan_savoy@sify.com
+In-Reply-To: <20110121182749.GE2400@joana>
+References: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
+	<AANLkTinPC-i2xi9pCQ-RzGWuwZ5uTM3NXG7y6gwTnPYv@mail.gmail.com>
+	<20110121171857.GC2400@joana>
+	<AANLkTimGNjfMtf+6XBMfKHo_F0sEnAJVdWjobfxDWoe7@mail.gmail.com>
+	<20110121182749.GE2400@joana>
+Date: Sat, 22 Jan 2011 02:40:01 +0530
+Message-ID: <AANLkTikNYCYN93UsRoL4jD+pNoOjrb70NE77QFOCbAYW@mail.gmail.com>
+Subject: Re: [RFC 0/2] remove BT references from TI_ST
+From: Pavan Savoy <pavan_savoy@ti.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>, Pavan Savoy <pavan_savoy@ti.com>
+Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio, etc,
+Gustavo,
 
-Sorry for the repeat --> I sent it to the incorrect list the first time.
+On Fri, Jan 21, 2011 at 11:57 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi Pavan,
+>
+> * Pavan Savoy <pavan_savoy@sify.com> [2011-01-21 23:10:28 +0530]:
+>
+>> >> > If this is alright, I will send out a modified patch with updated
+>> >> > subject to lkml/Greg for linux-next.
+>> >
+>> > Ok. Go ahead. Then tell me when I'll be able to apply your patch. (I need to
+>> > have the core modifications in my tree first). Or I just ack the patch and it
+>> > finds its way to mainline through Greg's tree.
+>>
+>> Yes, I will post a patch to lkml against linux-next to greg KH, and
+>> based on that send a
+>> separate patch to linux-bluetooth for the btwilink..
+>
+> Actually send everything to Greg KH, will work out better. Otherwise you will
+> have to one release cycle to merge it here (until the other patches reach my
+> tree). Then I just Ack it.
 
-We are starting to look at the adopted LE profiles, and it is becoming
-clear that Higher layer (Applications etc) server support will be needed
-for some of the significant use cases such as Proximity.  Is anybody
-currently working on a D-Bus interface to the Attribute Server?  I know
-there is nothing in code that has been up-streamed yet, but I was
-wondering if anyone has put some thought into what a D-Bus interface for
-the Attribute Server might look like?
+Thanks, I will do that.
+I will fix up the btwilink comments too...
+I have few other patches on TI ST lined up as well. (kind of reviewed
+by Samuel Ortiz too...).
+So I will put them all together and post them within couple of days.
 
-Also, one of my compatriots is telling me that she cannot get the GATT
-Client D-Bus interface to work.  I don't know if this is a simple lack
-of Introspection Data (required by d-feet), or if there is a build or
-configuration parameter that needs to be setup.  I have just been using
-the gatttool to run my tests, and not going through D-Bus.  If anybody
-has been using D-Bus for GATT Client testing, I would be interested in
-finding out if there is some setup requirements that I am missing.
+Thanks a lot.
 
 
-Thanks for your time.
-
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+> --
+> Gustavo F. Padovan
+> http://profusion.mobi
+>
