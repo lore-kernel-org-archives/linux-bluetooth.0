@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Jan 2011 12:16:02 +0530
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix duplicate characteristics
-Message-ID: <20110121064602.GA1789@jh-x301>
-References: <1295530067-6022-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1295530067-6022-1-git-send-email-bruna.moreira@openbossa.org>
+Date: Fri, 21 Jan 2011 00:51:34 -0500
+Message-ID: <AANLkTi=z1DPguiO7B39CRoj-wqi5r3nXLixCe3Yo34aV@mail.gmail.com>
+Subject: How to close bluetooth? Using rfkill?
+From: zhangfei gao <zhangfei.gao@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+Hi Johan,
 
-On Thu, Jan 20, 2011, Bruna Moreira wrote:
-> The Discover() operation (from DBus API) was registering the same
-> characteristics after running several times. This can be checked using
-> test-attrib.
-> ---
->  attrib/client.c |    7 +++++++
->  1 files changed, 7 insertions(+), 0 deletions(-)
+Is there any general method to open/close bluetooth, using rfkill or
+pm_runtime_get/put_* API.
 
-Pushed upstream. Thanks.
+Currently we use rfkill to close bluetooth, however we met dead lock
+issue, for mutex_lock(&rfkill_global_mutex).
+So we use workaround to rmmod bt.ko first, or revert the rfkill patch
+in hci_core.c.
 
-Johan
+BT/WIFI device have chip select pin, we register one rfkill with
+sd8x_set_block, and control chip select pin to open/close bt/wifi/fm.
+for example:
+rfkill unblock bluetooth to open bt
+rfkill block bluetooth to close bt
+
+When "rfkill block bluetooth",
+rfkill_fop_write->mutex_lock(&rfkill_global_mutex)->rfkill_set_block->sd8x_set_block->waiting
+for card is freed.
+BT driver will call
+hci_unregister_dev->rfkill_unregister->mutex_lock(&rfkill_global_mutex);
+So mutex_lock(&rfkill_global_mutex) will be dead locked.
+
+If so, do we have to use other method to control chip select pin to
+control bt power, such as pm_runtime_get/put_* API.
+
+Thanks in advance.
