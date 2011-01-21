@@ -1,107 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 21 Jan 2011 17:31:30 +0000
+From: Joel Becker <jlbec@evilplan.org>
+To: Jesper Juhl <jj@chaosbits.net>
+Cc: linux-kernel@vger.kernel.org, trivial@kernel.org,
+	alsa-devel@alsa-project.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+	linux-edac@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	oprofile-list@lists.sf.net, Andi Kleen <ak@linux.intel.com>,
+	David Teigland <teigland@redhat.com>,
+	Jens Axboe <jens.axboe@oracle.com>,
+	Stephen Hemminger <shemminger@vyatta.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, Takashi Iwai <tiwai@suse.de>,
+	Jaroslav Kysela <perex@perex.cz>,
+	"John W. Linville" <linville@tuxdriver.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Patrick McHardy <kaber@trash.net>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	James Morris <jmorris@namei.org>,
+	"Pekka Savola (ipv6)" <pekkas@netcore.fi>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Frederic Weisbecker <fweisbec@gmail.com>,
+	Mark Fasheh <mfasheh@suse.com>,
+	Mauro Carvalho Chehab <mchehab@redhat.com>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Robert Richter <robert.richter@amd.com>
+Subject: Re: [Patch] Kill off =?utf-8?Q?warning=3A_?=
+ =?utf-8?B?4oCYaW5saW5l4oCZ?= is not at beginning of declaration
+Message-ID: <20110121173130.GD8323@ZenIV.linux.org.uk>
+References: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
 MIME-Version: 1.0
-In-Reply-To: <20110121171857.GC2400@joana>
-References: <1294138788-10307-1-git-send-email-pavan_savoy@ti.com>
-	<AANLkTinPC-i2xi9pCQ-RzGWuwZ5uTM3NXG7y6gwTnPYv@mail.gmail.com>
-	<20110121171857.GC2400@joana>
-Date: Fri, 21 Jan 2011 23:10:28 +0530
-Message-ID: <AANLkTimGNjfMtf+6XBMfKHo_F0sEnAJVdWjobfxDWoe7@mail.gmail.com>
-Subject: Re: [RFC 0/2] remove BT references from TI_ST
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <alpine.LNX.2.00.1101170000270.13377@swampdragon.chaosbits.net>
+Sender: Joel Becker <jlbec@ftp.linux.org.uk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo,
+On Mon, Jan 17, 2011 at 12:09:38AM +0100, Jesper Juhl wrote:
+> Fix a bunch of 
+> 	warning: ‘inline’ is not at beginning of declaration
+> messages when building a 'make allyesconfig' kernel with -Wextra.
+> 
+> These warnings are trivial to kill, yet rather annoying when building with 
+> -Wextra.
+> The more we can cut down on pointless crap like this the better (IMHO).
+> 
+> A previous patch to do this for a 'allnoconfig' build has already been 
+> merged. This just takes the cleanup a little further.
+> 
+> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
 
-On Fri, Jan 21, 2011 at 10:48 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Pavan,
->
-> * Pavan Savoy <pavan_savoy@sify.com> [2011-01-19 23:56:29 +0530]:
->
->> Gustavo,
->>
->> On Tue, Jan 4, 2011 at 4:29 PM, =C2=A0<pavan_savoy@ti.com> wrote:
->> > From: Pavan Savoy <pavan_savoy@ti.com>
->> >
->> > Gustavo,
->> >
->> > Based on your comments, that the underlying shared transport driver
->> > for btwilink driver made use of the BT references to peek into the pac=
-kets
->> > I have modified the TI_ST.
->>
->> Since there lacks a generic way to parse the packets coming in from the
->> UART into BT, FM or GPS, we have to look into the data to fragment assem=
-bled
->> data or assemble fragmented data.
->>
->> Please have a look, Please suggest whether something like this is requir=
-ed,
->> If not, please also suggest, if including BT headers is a problem ?
->
-> Not really. The real problem is to break the abstraction between drivers
-> layers (core and bluetooth drivers in this case)
+Acked for fs/ocfs2
 
-ok, fine. Although I myself personally would prefer the older way ...
-But its fine, I understand why references to bluetooth headers doesn't look=
- good
-at shared transport level...
+Joel
 
->>
->> Because I just include the BT headers and don't have a build
->> dependency as such on
->> BT/HCI and don't use any functions from hci_core in my shared transport =
-driver.
->>
->> > For this reason, Now the above lying protocol drivers like BT, FM and =
-GPS
->> > would send details about their packet types and header information whi=
-ch
->> > would assist shared transport driver to parse the data.
->
-> Fair enough. This new approach is way better.
-
-Ok, So there is no problem with BT driver doing this multiple calls to
-st_register (or a single call
-with info array of ACL, SCO, Event to st_register) ?
-This would only hold true for BT.
-For FM or GPS there would be only 1 set of info sent across from protocol
-drivers to the shared transport drivers...
-
-Also, during firmware download, is hard-coding of few parameters
-pertaining to HCI-Event alright ?
-because this needs to happen even if say BT doesn't plan to use the
-shared transport and only FM
-V4L2 is at works..
-
->> >
->> > Gustavo, please also notice the change in btwilink driver in and aroun=
-d,
->> > st_register and suggest if something like this is OK.
->> > btwilink can also be modified to send in all the packet specific data
->> > in one shot, if that is preferred.
->> >
->> > Please review and provide comments..
->> >
->> > Note:
->> > If this is alright, I will send out a modified patch with updated
->> > subject to lkml/Greg for linux-next.
->
-> Ok. Go ahead. Then tell me when I'll be able to apply your patch. (I need=
- to
-> have the core modifications in my tree first). Or I just ack the patch an=
-d it
-> finds its way to mainline through Greg's tree.
-
-Yes, I will post a patch to lkml against linux-next to greg KH, and
-based on that send a
-separate patch to linux-bluetooth for the btwilink..
-
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+-- 
