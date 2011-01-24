@@ -1,79 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
-From: Brian Gix <bgix@codeaurora.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20101203220534.GA16709@eris>
-References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
-	 <20101203220534.GA16709@eris>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 24 Jan 2011 11:03:37 -0800
-Message-ID: <1295895817.2656.26.camel@ubuntuLab1>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <4765B7BC10CB4C488A56C73E15D6FBA31DA570022B@EXDCVYMBSTM005.EQ1STM.local>
+References: <Acu7rVNvOBedYcdARMSYulxGD8ZxFg==>
+	<4765B7BC10CB4C488A56C73E15D6FBA31DA570022B@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 24 Jan 2011 07:52:18 -0400
+Message-ID: <AANLkTinuSJTq+QSXChjROqC19_+dZdP5TWqgkMj-MkwZ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] HCI command to read size of LE White List
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+On Mon, Jan 24, 2011 at 5:59 AM, Sumit Kumar BAJPAI
+<sumitkumar.bajpai@stericsson.com> wrote:
+> diff --git a/tools/hcitool.c b/tools/hcitool.c
+> index 038d05e..e80c7a3 100755
+> --- a/tools/hcitool.c
+> +++ b/tools/hcitool.c
+> @@ -2563,6 +2563,46 @@ static void cmd_lermwl(int dev_id, int argc, char **argv)
+>        }
+>  }
+>
+> +static struct option lerdwlsz_options[] = {
+> +       { "help",       0, 0, 'h' },
+> +       { 0, 0, 0, 0 }
+> +};
+> +
+> +static const char *lerdwlsz_help =
+> +       "Usage:\n"
+> +       "\tlerdwlsz\n";
+> +
+> +static void cmd_lerdwlsz(int dev_id, int argc, char **argv)
+> +{
+> +       int err, dd, opt, size;
+> +
+> +       for_each_opt(opt, lerdwlsz_options, NULL) {
+> +               switch (opt) {
+> +               default:
+> +                       printf("%s", lerdwlsz_help);
+> +                       return;
+> +               }
+> +       }
+> +       helper_arg(0, 0, &argc, &argv, lermwl_help);
 
-I am sorry that it has taken so long to test the snapshot that you
-placed on gitorious, but I have now done so.
+You are using the wrong *_help variable above.
 
-On Fri, 2010-12-03 at 19:05 -0300, Vinicius Costa Gomes wrote:
-> Hi Brian,
-> 
-> On 11:11 Fri 03 Dec, Brian Gix wrote:
-> > 
-> > Hi Claudio, Johan & All,
-> > 
-> > Is this LE capable kernel that Ville is working on, the development stream
-> > for the LE Security Manager?  And if so, is it in a partial fleshed out
-> > state?
-> 
-> There is a simple implementation of SMP here[1] on my "devel" branch. I am 
-> cleaning it up for sending it for review.
-> 
-> If you want to help, have any comments or just want to tell us what you are
-> working on, please drop by #bluez on freenode, or send an email.
-
-I have been able to verify that the Just Works negotiation of the Short
-Term Key does work against an independent implementation of the LE
-Security Manager, as long as I have requested no MITM protection.  I
-have the following comments:
-
-1. You currently reject security if I *do* request MITM protection.
-This should not be done.  The correct functionality should be to
-continue the negotiation.  Even though I requested MITM, it will be
-clear to both sides that JUST_WORKS methodology has been used, and so
-when the Keys are generated and exchanged, both sides will indicate in
-their Key Database that they are no-MITM keys. If I then actually
-*needed* MITM protection, then whatever functionality requiring that
-level of security will fail with an insufficient security error code.
-However, security should *never* be rejected unless there is a
-fundamental incompatibility such as no level of security actually
-supported.  This is the only functionality that I found to be actually
-incorrect.
-
-2. Currently, you are not exchanging any permanent keys, which I am sure
-you are aware.  This makes it impossible to test much else, such as
-command signing, or security requests that use the generated keys.
-
-If you have a later version of SM that could be uploaded to your devel
-branch on gitorious, I would be more than happy (and in fact would love
-to be able) to test that for you as well.
-
-This is the git configuration I used for testing, which only has your SM
-up to the end of last December, and is so about a month old:
-
-remote.origin.url=git://gitorious.org/bluetooth-next/bluetooth-next.git
-branch.devel.remote=origin
-branch.devel.merge=refs/heads/devel
+> +
+> +       if (dev_id < 0)
+> +               dev_id = hci_get_route(NULL);
+> +
+> +       dd = hci_open_dev(dev_id);
+> +       if (dd < 0) {
+> +               perror("Could not open device");
+> +               exit(1);
+> +       }
+> +
+> +       err = hci_le_read_white_list_size(dd, &size);
+> +       hci_close_dev(dd);
+> +
+> +       if (err < 0) {
+> +               perror("Cant read white list size");
+> +               exit(1);
+> +       }
+> +}
+> +
+>  static struct option ledc_options[] = {
+>        { "help",       0, 0, 'h' },
+>        { 0, 0, 0, 0 }
+> @@ -2641,6 +2681,7 @@ static struct {
+>        { "lescan", cmd_lescan, "Start LE scan"                        },
+>        { "leaddwl", cmd_leaddwl, "Add this device to white list"          },
+>        { "lermwl", cmd_lermwl, "Remove this device from white list"   },
+> +       { "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"               },
+>        { "lecc",   cmd_lecc,   "Create a LE Connection",              },
+>        { "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
+>        { NULL, NULL, 0 }
+> --
+> 1.6.5
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
-Thanks for doing the SM,
 
 -- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
