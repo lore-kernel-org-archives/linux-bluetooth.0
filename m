@@ -1,114 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Jan 2011 18:34:29 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
+Message-ID: <20110124213429.GA15121@piper>
+References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
+ <20101203220534.GA16709@eris>
+ <1295895817.2656.26.camel@ubuntuLab1>
 MIME-Version: 1.0
-Date: Tue, 25 Jan 2011 04:05:33 +0200
-Message-ID: <AANLkTim-w9rFa-W4HTGW7RBMoMyFUT9-cZ4NnFj0LsaV@mail.gmail.com>
-Subject: Bluetooth Help Needed Please
-From: =?ISO-8859-1?Q?Morn=E9_Liebenberg?= <dtsnamibia@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1295895817.2656.26.camel@ubuntuLab1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To whom it may concern;
+Hi Brian,
 
-Hi may name is Morne and I'm trying to update my Bluez software but
-get the following errors:
+On 11:03 Mon 24 Jan, Brian Gix wrote:
+> Hi Vinicius,
+> 
+> I am sorry that it has taken so long to test the snapshot that you
+> placed on gitorious, but I have now done so.
+> 
+> On Fri, 2010-12-03 at 19:05 -0300, Vinicius Costa Gomes wrote:
+> > Hi Brian,
+> > 
+> > On 11:11 Fri 03 Dec, Brian Gix wrote:
+> > > 
+> > > Hi Claudio, Johan & All,
+> > > 
+> > > Is this LE capable kernel that Ville is working on, the development stream
+> > > for the LE Security Manager?  And if so, is it in a partial fleshed out
+> > > state?
+> > 
+> > There is a simple implementation of SMP here[1] on my "devel" branch. I am 
+> > cleaning it up for sending it for review.
+> > 
+> > If you want to help, have any comments or just want to tell us what you are
+> > working on, please drop by #bluez on freenode, or send an email.
+> 
+> I have been able to verify that the Just Works negotiation of the Short
+> Term Key does work against an independent implementation of the LE
+> Security Manager, as long as I have requested no MITM protection.  I
+> have the following comments:
+> 
+> 1. You currently reject security if I *do* request MITM protection.
+> This should not be done.  The correct functionality should be to
+> continue the negotiation.  Even though I requested MITM, it will be
+> clear to both sides that JUST_WORKS methodology has been used, and so
+> when the Keys are generated and exchanged, both sides will indicate in
+> their Key Database that they are no-MITM keys. If I then actually
+> *needed* MITM protection, then whatever functionality requiring that
+> level of security will fail with an insufficient security error code.
+> However, security should *never* be rejected unless there is a
+> fundamental incompatibility such as no level of security actually
+> supported.  This is the only functionality that I found to be actually
+> incorrect.
+> 
 
-gmg@GMG:~/Downloads/bluez-4.86$ ./configure --prefix=/usr
---mandir=/usr/share/man \
-> --sysconfdir=/etc --localstatedir=/var --libexecdir=/lib
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether build environment is sane... yes
-checking for a thread-safe mkdir -p... /bin/mkdir -p
-checking for gawk... no
-checking for mawk... mawk
-checking whether make sets $(MAKE)... yes
-checking whether to enable maintainer-specific portions of Makefiles... no
-checking for pkg-config... /usr/bin/pkg-config
-checking pkg-config is at least version 0.9.0... yes
-checking for gcc... gcc
-checking for C compiler default output file name... a.out
-checking whether the C compiler works... yes
-checking whether we are cross compiling... no
-checking for suffix of executables...
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether gcc accepts -g... yes
-checking for gcc option to accept ISO C89... none needed
-checking for style of include used by make... GNU
-checking dependency style of gcc... gcc3
-checking whether gcc and cc understand -c and -o together... yes
-checking whether gcc accepts -fPIE... yes
-checking for a BSD-compatible install... /usr/bin/install -c
-checking for bison... no
-checking for byacc... no
-checking for flex... no
-checking for lex... no
-checking build system type... i686-pc-linux-gnu
-checking host system type... i686-pc-linux-gnu
-checking for a sed that does not truncate output... /bin/sed
-checking for grep that handles long lines and -e... /bin/grep
-checking for egrep... /bin/grep -E
-checking for fgrep... /bin/grep -F
-checking for ld used by gcc... /usr/bin/ld
-checking if the linker (/usr/bin/ld) is GNU ld... yes
-checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
-checking the name lister (/usr/bin/nm -B) interface... BSD nm
-checking whether ln -s works... yes
-checking the maximum length of command line arguments... 1572864
-checking whether the shell understands some XSI constructs... yes
-checking whether the shell understands "+="... yes
-checking for /usr/bin/ld option to reload object files... -r
-checking for objdump... objdump
-checking how to recognize dependent libraries... pass_all
-checking for ar... ar
-checking for strip... strip
-checking for ranlib... ranlib
-checking command to parse /usr/bin/nm -B output from gcc object... ok
-checking how to run the C preprocessor... gcc -E
-checking for ANSI C header files... yes
-checking for sys/types.h... yes
-checking for sys/stat.h... yes
-checking for stdlib.h... yes
-checking for string.h... yes
-checking for memory.h... yes
-checking for strings.h... yes
-checking for inttypes.h... yes
-checking for stdint.h... yes
-checking for unistd.h... yes
-checking for dlfcn.h... yes
-checking for objdir... .libs
-checking if gcc supports -fno-rtti -fno-exceptions... no
-checking for gcc option to produce PIC... -fPIC -DPIC
-checking if gcc PIC flag -fPIC -DPIC works... yes
-checking if gcc static flag -static works... yes
-checking if gcc supports -c -o file.o... yes
-checking if gcc supports -c -o file.o... (cached) yes
-checking whether the gcc linker (/usr/bin/ld) supports shared libraries... yes
-checking whether -lc should be explicitly linked in... no
-checking dynamic linker characteristics... GNU/Linux ld.so
-checking how to hardcode library paths into programs... immediate
-checking whether stripping libraries is possible... yes
-checking if libtool supports shared libraries... yes
-checking whether to build shared libraries... yes
-checking whether to build static libraries... no
-checking for ppoll... yes
-checking for dlopen in -ldl... yes
-checking for DBUS... no
-configure: error: D-Bus library is required
-gmg@GMG:~/Downloads/bluez-4.86$
+I was assuming that the meaning of setting the MITM protection bit, was that 
+it was *requiring* MITM protection, and when that couldn't be fulfilled the
+Pairing Request should be rejected.
 
-Could you perhaps help me with this update issue...
+So my assumption was incorrect, going to fix it soon.
 
-The other issue I am having is receiving calls to my cellphone and
-playing the person who is calling via my computer speakers using a
-blue-tooth dongle.
-Otherwise if it's not possible then I could just might as well buy a
-blue-tooth earpiece, disconnect it's small speaker and connect it to
-my amp but will only have mono sound
+> 2. Currently, you are not exchanging any permanent keys, which I am sure
+> you are aware.  This makes it impossible to test much else, such as
+> command signing, or security requests that use the generated keys.
+> 
 
-Anyways please help me on this issue...i would be gratefull if any
-good news came back
+This is being worked on, but nothing ready for testing yet.
 
-Thank you
-Morne
+> If you have a later version of SM that could be uploaded to your devel
+> branch on gitorious, I would be more than happy (and in fact would love
+> to be able) to test that for you as well.
+> 
+> This is the git configuration I used for testing, which only has your SM
+> up to the end of last December, and is so about a month old:
+> 
+> remote.origin.url=git://gitorious.org/bluetooth-next/bluetooth-next.git
+> branch.devel.remote=origin
+> branch.devel.merge=refs/heads/devel
+> 
+> 
+> Thanks for doing the SM,
+> 
+> -- 
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> 
+
+
+Cheers,
+-- 
+Vinicius
