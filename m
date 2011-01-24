@@ -1,129 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 24 Jan 2011 10:59:01 +0100
-Subject: [PATCH 3/4] HCI command to read size of LE White List
-Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA570022B@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="us-ascii"
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 24 Jan 2011 10:56:04 +0100
+Subject: RE: [PATCH] HCI Commands for LE White List
+Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA5700218@EXDCVYMBSTM005.EQ1STM.local>
+References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
+	<AANLkTimZk4FrRBGSp=W1LciZnrwjAqmm3k71tLA4AEYV@mail.gmail.com>
+	<4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
+ <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
+In-Reply-To: <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/hci.c       |   28 ++++++++++++++++++++++++++++
- lib/hci_lib.h   |    1 +
- tools/hcitool.c |   41 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 70 insertions(+), 0 deletions(-)
-
-diff --git a/lib/hci.c b/lib/hci.c
-index 11b47b3..ec8d48e 100755
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -1349,6 +1349,34 @@ int hci_le_remove_from_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type)
- 	return 0;
- }
- 
-+int hci_le_read_white_list_size(int dd, int* size)
-+{
-+	struct hci_request rq;
-+	le_read_white_list_size_rp rp;
-+
-+	memset(&rp, 0, sizeof(rp));
-+	rp.size=0;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
-+	rq.rparam = &rp;
-+	rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
-+
-+	if (hci_send_req(dd, &rq, 1000) < 0)
-+		return -1;
-+	
-+	if (rp.status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	if(size)
-+		*size=rp.size;
-+
-+	return 0;
-+}
-+
- int hci_read_local_name(int dd, int len, char *name, int to)
- {
- 	read_local_name_rp rp;
-diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-index e64a431..f0325b2 100755
---- a/lib/hci_lib.h
-+++ b/lib/hci_lib.h
-@@ -129,6 +129,7 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint16_t *handle, int to);
- int hci_le_add_to_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type);
- int hci_le_remove_from_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type);
-+int hci_le_read_white_list_size(int dd, int* size);
- 
- int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
- int hci_get_route(bdaddr_t *bdaddr);
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 038d05e..e80c7a3 100755
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2563,6 +2563,46 @@ static void cmd_lermwl(int dev_id, int argc, char **argv)
- 	}
- }
- 
-+static struct option lerdwlsz_options[] = {
-+	{ "help",	0, 0, 'h' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+static const char *lerdwlsz_help =
-+	"Usage:\n"
-+	"\tlerdwlsz\n";
-+
-+static void cmd_lerdwlsz(int dev_id, int argc, char **argv)
-+{
-+	int err, dd, opt, size;
-+	
-+	for_each_opt(opt, lerdwlsz_options, NULL) {
-+		switch (opt) {
-+		default:
-+			printf("%s", lerdwlsz_help);
-+			return;
-+		}
-+	}
-+	helper_arg(0, 0, &argc, &argv, lermwl_help);
-+	
-+	if (dev_id < 0)
-+		dev_id = hci_get_route(NULL);
-+	
-+	dd = hci_open_dev(dev_id);
-+	if (dd < 0) {
-+		perror("Could not open device");
-+		exit(1);
-+	}
-+
-+	err = hci_le_read_white_list_size(dd, &size);
-+	hci_close_dev(dd);
-+
-+	if (err < 0) {
-+		perror("Cant read white list size");
-+		exit(1);
-+	} 
-+}
-+
- static struct option ledc_options[] = {
- 	{ "help",	0, 0, 'h' },
- 	{ 0, 0, 0, 0 }
-@@ -2641,6 +2681,7 @@ static struct {
- 	{ "lescan", cmd_lescan, "Start LE scan"                        },
- 	{ "leaddwl", cmd_leaddwl, "Add this device to white list"	   },
- 	{ "lermwl", cmd_lermwl, "Remove this device from white list"   },
-+	{ "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"		   },
- 	{ "lecc",   cmd_lecc,   "Create a LE Connection",              },
- 	{ "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
- 	{ NULL, NULL, 0 }
--- 
-1.6.5
+SGkgQ2xhdWRpbywgDQoNCg0KIA0KPiA8c25pcD4NCj4gDQo+ID4gSXMgdXNpbmcgYSBzZXBhcmF0
+ZSB2YXJpYWJsZSBlcnIgZm9yIHJldHVybiB0eXBlIG9mIGEgZnVuY3Rpb24NCj4gcHJvYmxlbSBo
+ZXJlPw0KPiBJIGRpZG4ndCB1bmRlcnN0YW5kIHlvdXIgcXVlc3Rpb24gaGVyZS4NCj4gaGNpXyog
+ZnVuY3Rpb25zIHJldHVybiAwIG9uIHN1Y2Nlc3Mgb3IgLTEgb24gZmFpbHVyZS4gT24gZmFpbHVy
+ZSBlcnJubw0KPiBjYW4gYmUgcmVhZCB0byBnZXQgdGhlIGVycm9yIG51bWJlci4NCj4gDQo+ID4g
+SSBjb3VsZCBzZWUgc2FtZSBjb2Rpbmcgc3R5bGUgb2YgZGVmaW5pbmcgYSB2YXJpYWJsZSB0byBj
+YXJyeSB0aGUNCj4gZXJyb3Igc3RhdHVzIGluIGhjaXRvb2wuYyBmdW5jdGlvbiBjbWRfbGVjYy4N
+Cj4gPiBQbGVhc2UgY29uZmlybS4NCj4gVGhlIGNvZGluZyBzdHlsZSBpc3N1ZSBpcyB0aGUgaWYg
+ZWxzZToNCj4gQXQgdGhpcyBwb2ludCAiZWxzZSIgaXMgbm90IG5lZWRlZDogdGhlcmUgaXMgYSAi
+ZXhpdCgxKSIgaW5zaWRlIHRoZQ0KPiAiaWYiIGJsb2NrLiBCdXQgaWYgeW91IG5lZWQgZWxzZSB0
+aGUgY29ycmVjdCBjb2Rpbmcgc3R5bGUgaXM6DQo+IC4uLg0KPiB9IGVsc2Ugew0KPiAuLi4NCj4g
+DQo+IEluc3RlYWQgb2YNCj4gLi4uDQo+IH0NCj4gZWxzZSB7DQo+IC4uLg0KPiANCj4gPHNuaXA+
+DQo+IA0KPiA+PiA+ICsgwqAgwqAgwqAgZXJyID0gaGNpX2xlX3JlbW92ZV9mcm9tX3doaXRlX2xp
+c3QoZGQsIGJkYWRkcg0KPiAsYmRhZGRyX3R5cGUpOw0KPiA+PiA+ICsgwqAgwqAgwqAgaWYgKGVy
+ciA8IDApIHsNCj4gPj4gPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHBlcnJvcigiQ2FudCByZW1v
+dmUgZnJvbSB3aGl0ZSBsaXN0Iik7DQo+ID4+ID4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBleGl0
+KDEpOw0KPiA+PiA+ICsgwqAgwqAgwqAgfQ0KPiA+PiA+ICsgwqAgwqAgwqAgwqBlbHNlIHsNCj4g
+Pj4gPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHByaW50ZigiRGV2aWNlIHJlbW92ZWQgZnJvbSB3
+aGl0ZSBsaXN0Iik7DQo+ID4+ID4gKyDCoCDCoCDCoCB9DQo+ID4+ID4gKw0KPiA+PiA+ICsgwqAg
+wqAgwqAgaGNpX2Nsb3NlX2RldihkZCk7DQo+ID4+IFNhbWUgY29kaW5nIHN0eWxlIGlzc3VlIGFu
+ZCBjbG9zZSAiZGQiDQo+ID4+DQo+ID4NCj4gPg0KPiA+IE9rLiBHb29kIHBvaW50LiBCdXQgSSBj
+b3VsZCBzdGlsbCBmaW5kIHByZW1hdHVyZSByZXR1cm5zIG9uIGVycm9yDQo+IGNvbmRpdGlvbnMg
+dmlhIGV4aXRzIGF0IHNldmVyYWwgcGxhY2VzIGluIGhjaXRvb2wuYy4gQ2FuIEkgc3VibWl0IGEN
+Cj4gc2VwYXJhdGUgcGF0Y2ggZm9yIHJlY3RpZnlpbmcgYWxsIHN1Y2ggZXJyb3IgY29uZGl0aW9u
+cyB0b28/DQo+IA0KPiBzdXJlIQ0KPiANCg0KQXMgcGVyIHlvdXIgY29tbWVudHMsIEkgYW0gcG9z
+dGluZyA0IHBhdGNoZXMgc2VwYXJhdGVseS4gDQo=
