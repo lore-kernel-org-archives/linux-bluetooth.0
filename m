@@ -1,43 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 24 Jan 2011 10:58:10 +0100
-Subject: [PATCH 2/4] HCI command to remove device from LE White List
-Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA5700224@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 24 Jan 2011 10:59:43 +0100
+Subject: [PATCH 4/4] HCI command to clear LE White List
+Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA570022E@EXDCVYMBSTM005.EQ1STM.local>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- lib/hci.c       |   29 +++++++++++++++++++++++++++++
+ lib/hci.c       |   22 ++++++++++++++++++++++
  lib/hci_lib.h   |    1 +
- tools/hcitool.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+), 0 deletions(-)
+ tools/hcitool.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 0 deletions(-)
 
 diff --git a/lib/hci.c b/lib/hci.c
-index b75f612..11b47b3 100755
+index ec8d48e..71a96ea 100755
 --- a/lib/hci.c
 +++ b/lib/hci.c
-@@ -1320,6 +1320,35 @@ int hci_le_add_to_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type)
+@@ -1377,6 +1377,28 @@ int hci_le_read_white_list_size(int dd, int* size)
  	return 0;
  }
  
-+int hci_le_remove_from_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type)
++int hci_le_clear_white_list(int dd)
 +{
 +	struct hci_request rq;
-+	le_remove_device_from_white_list_cp cp;
 +	uint8_t status;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.bdaddr_type = type;
-+	bacpy(&cp.bdaddr,bdaddr);
-+
++	
 +	memset(&rq, 0, sizeof(rq));
 +	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_REMOVE_DEVICE_FROM_WHITE_LIST;
-+	rq.cparam = &cp;
-+	rq.clen = LE_REMOVE_DEVICE_FROM_WHITE_LIST_CP_SIZE;
++	rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
 +	rq.rparam = &status;
 +	rq.rlen = 1;
 +
@@ -48,7 +41,7 @@ index b75f612..11b47b3 100755
 +		errno = EIO;
 +		return -1;
 +	}
-+
++	
 +	return 0;
 +}
 +
@@ -56,50 +49,48 @@ index b75f612..11b47b3 100755
  {
  	read_local_name_rp rp;
 diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-index dd995dd..e64a431 100755
+index f0325b2..718e8a6 100755
 --- a/lib/hci_lib.h
 +++ b/lib/hci_lib.h
-@@ -128,6 +128,7 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint16_t min_ce_length, uint16_t max_ce_length,
- 		uint16_t *handle, int to);
+@@ -130,6 +130,7 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
  int hci_le_add_to_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type);
-+int hci_le_remove_from_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type);
+ int hci_le_remove_from_white_list(int dd, const bdaddr_t* bdaddr, uint8_t type);
+ int hci_le_read_white_list_size(int dd, int* size);
++int hci_le_clear_white_list(int dd);
  
  int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
  int hci_get_route(bdaddr_t *bdaddr);
 diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 9147995..038d05e 100755
+index e80c7a3..f29bb47 100755
 --- a/tools/hcitool.c
 +++ b/tools/hcitool.c
-@@ -2517,6 +2517,52 @@ static void cmd_leaddwl(int dev_id, int argc, char **argv)
- 	}
+@@ -2603,6 +2603,47 @@ static void cmd_lerdwlsz(int dev_id, int argc, char **argv)
+ 	} 
  }
  
-+static struct option lermwl_options[] = {
++static struct option leclrwl_options[] = {
 +	{ "help",	0, 0, 'h' },
 +	{ 0, 0, 0, 0 }
 +};
 +
-+static const char *lermwl_help =
++static const char *leclrwl_help =
 +	"Usage:\n"
-+	"\tlermwl <bdaddr>\n";
++	"\tleclrwl\n";
 +
-+static void cmd_lermwl(int dev_id, int argc, char **argv)
++static void cmd_leclrwl(int dev_id, int argc, char **argv)
 +{
-+	int err, opt, dd;
-+	bdaddr_t bdaddr;
-+	le_device_addr_type bdaddr_type;
++	int err, dd, opt;
 +
-+	for_each_opt(opt, lermwl_options, NULL) {
++	for_each_opt(opt, leclrwl_options, NULL) {
 +		switch (opt) {
 +		default:
-+			printf("%s", lermwl_help);
++			printf("%s", leclrwl_help);
 +			return;
 +		}
 +	}
 +
-+	helper_arg(1, 1, &argc, &argv, lermwl_help);
-+	
++	helper_arg(0, 0, &argc, &argv, leclrwl_help);
++
 +	if (dev_id < 0)
 +		dev_id = hci_get_route(NULL);
 +
@@ -108,27 +99,24 @@ index 9147995..038d05e 100755
 +		perror("Could not open device");
 +		exit(1);
 +	}
-+	
-+	str2ba(argv[0], &bdaddr);
-+	bdaddr_type = LE_PUBLIC_DEVICE_ADDR;
 +
-+	err = hci_le_remove_from_white_list(dd, &bdaddr, bdaddr_type);
++	err = hci_le_clear_white_list(dd);
 +	hci_close_dev(dd);
 +
 +	if (err < 0) {
-+		perror("Cant remove from white list");
++		perror("Cant clear white list");
 +		exit(1);
-+	}
++	}    		
 +}
 +
  static struct option ledc_options[] = {
  	{ "help",	0, 0, 'h' },
  	{ 0, 0, 0, 0 }
-@@ -2594,6 +2640,7 @@ static struct {
- 	{ "clock",  cmd_clock,  "Read local or remote clock"           },
- 	{ "lescan", cmd_lescan, "Start LE scan"                        },
+@@ -2682,6 +2723,7 @@ static struct {
  	{ "leaddwl", cmd_leaddwl, "Add this device to white list"	   },
-+	{ "lermwl", cmd_lermwl, "Remove this device from white list"   },
+ 	{ "lermwl", cmd_lermwl, "Remove this device from white list"   },
+ 	{ "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"		   },
++	{ "leclrwl",   cmd_leclrwl,   "Clear white list"			   },
  	{ "lecc",   cmd_lecc,   "Create a LE Connection",              },
  	{ "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
  	{ NULL, NULL, 0 }
