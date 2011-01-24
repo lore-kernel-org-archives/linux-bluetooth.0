@@ -1,43 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 24 Jan 2011 10:56:04 +0100
-Subject: RE: [PATCH] HCI Commands for LE White List
-Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA5700218@EXDCVYMBSTM005.EQ1STM.local>
-References: <4765B7BC10CB4C488A56C73E15D6FBA31DA376A45B@EXDCVYMBSTM005.EQ1STM.local>
-	<AANLkTimZk4FrRBGSp=W1LciZnrwjAqmm3k71tLA4AEYV@mail.gmail.com>
-	<4765B7BC10CB4C488A56C73E15D6FBA31DA381A6A5@EXDCVYMBSTM005.EQ1STM.local>
- <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
-In-Reply-To: <AANLkTinjXceSM7NDVqWyyDGfgvtmAaFbMXdz829g311c@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 24 Jan 2011 11:56:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH] Fix initialization when adapter is already up
+Message-ID: <20110124095623.GA13189@jh-x301>
+References: <1295860387-10608-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1295860387-10608-1-git-send-email-luiz.dentz@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywgDQoNCg0KIA0KPiA8c25pcD4NCj4gDQo+ID4gSXMgdXNpbmcgYSBzZXBhcmF0
-ZSB2YXJpYWJsZSBlcnIgZm9yIHJldHVybiB0eXBlIG9mIGEgZnVuY3Rpb24NCj4gcHJvYmxlbSBo
-ZXJlPw0KPiBJIGRpZG4ndCB1bmRlcnN0YW5kIHlvdXIgcXVlc3Rpb24gaGVyZS4NCj4gaGNpXyog
-ZnVuY3Rpb25zIHJldHVybiAwIG9uIHN1Y2Nlc3Mgb3IgLTEgb24gZmFpbHVyZS4gT24gZmFpbHVy
-ZSBlcnJubw0KPiBjYW4gYmUgcmVhZCB0byBnZXQgdGhlIGVycm9yIG51bWJlci4NCj4gDQo+ID4g
-SSBjb3VsZCBzZWUgc2FtZSBjb2Rpbmcgc3R5bGUgb2YgZGVmaW5pbmcgYSB2YXJpYWJsZSB0byBj
-YXJyeSB0aGUNCj4gZXJyb3Igc3RhdHVzIGluIGhjaXRvb2wuYyBmdW5jdGlvbiBjbWRfbGVjYy4N
-Cj4gPiBQbGVhc2UgY29uZmlybS4NCj4gVGhlIGNvZGluZyBzdHlsZSBpc3N1ZSBpcyB0aGUgaWYg
-ZWxzZToNCj4gQXQgdGhpcyBwb2ludCAiZWxzZSIgaXMgbm90IG5lZWRlZDogdGhlcmUgaXMgYSAi
-ZXhpdCgxKSIgaW5zaWRlIHRoZQ0KPiAiaWYiIGJsb2NrLiBCdXQgaWYgeW91IG5lZWQgZWxzZSB0
-aGUgY29ycmVjdCBjb2Rpbmcgc3R5bGUgaXM6DQo+IC4uLg0KPiB9IGVsc2Ugew0KPiAuLi4NCj4g
-DQo+IEluc3RlYWQgb2YNCj4gLi4uDQo+IH0NCj4gZWxzZSB7DQo+IC4uLg0KPiANCj4gPHNuaXA+
-DQo+IA0KPiA+PiA+ICsgwqAgwqAgwqAgZXJyID0gaGNpX2xlX3JlbW92ZV9mcm9tX3doaXRlX2xp
-c3QoZGQsIGJkYWRkcg0KPiAsYmRhZGRyX3R5cGUpOw0KPiA+PiA+ICsgwqAgwqAgwqAgaWYgKGVy
-ciA8IDApIHsNCj4gPj4gPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHBlcnJvcigiQ2FudCByZW1v
-dmUgZnJvbSB3aGl0ZSBsaXN0Iik7DQo+ID4+ID4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBleGl0
-KDEpOw0KPiA+PiA+ICsgwqAgwqAgwqAgfQ0KPiA+PiA+ICsgwqAgwqAgwqAgwqBlbHNlIHsNCj4g
-Pj4gPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHByaW50ZigiRGV2aWNlIHJlbW92ZWQgZnJvbSB3
-aGl0ZSBsaXN0Iik7DQo+ID4+ID4gKyDCoCDCoCDCoCB9DQo+ID4+ID4gKw0KPiA+PiA+ICsgwqAg
-wqAgwqAgaGNpX2Nsb3NlX2RldihkZCk7DQo+ID4+IFNhbWUgY29kaW5nIHN0eWxlIGlzc3VlIGFu
-ZCBjbG9zZSAiZGQiDQo+ID4+DQo+ID4NCj4gPg0KPiA+IE9rLiBHb29kIHBvaW50LiBCdXQgSSBj
-b3VsZCBzdGlsbCBmaW5kIHByZW1hdHVyZSByZXR1cm5zIG9uIGVycm9yDQo+IGNvbmRpdGlvbnMg
-dmlhIGV4aXRzIGF0IHNldmVyYWwgcGxhY2VzIGluIGhjaXRvb2wuYy4gQ2FuIEkgc3VibWl0IGEN
-Cj4gc2VwYXJhdGUgcGF0Y2ggZm9yIHJlY3RpZnlpbmcgYWxsIHN1Y2ggZXJyb3IgY29uZGl0aW9u
-cyB0b28/DQo+IA0KPiBzdXJlIQ0KPiANCg0KQXMgcGVyIHlvdXIgY29tbWVudHMsIEkgYW0gcG9z
-dGluZyA0IHBhdGNoZXMgc2VwYXJhdGVseS4gDQo=
+Hi Luiz,
+
+On Mon, Jan 24, 2011, Luiz Augusto von Dentz wrote:
+> When handling HCI_DEV_REG event it should not be necessary to generate a
+> HCI_DEV_UP since init_known_adapters already does it in case the adapter
+> is ulready up.
+> ---
+>  plugins/hciops.c |   26 ++------------------------
+>  1 files changed, 2 insertions(+), 24 deletions(-)
+
+Thanks for the patch. It has been pushed upstream with a minor typo fix
+in the commit message.
+
+Marcel, I think this would be reason enough to make another release.
+
+Johan
