@@ -1,67 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Jan 2011 17:09:13 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
+Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
+From: Brian Gix <bgix@codeaurora.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Problems with L2CAP: deferred setup and MTU
-Message-ID: <20110124190913.GB4300@joana>
-References: <5E5308B0-BA11-46A2-B7A9-22CD4ADBCF80@signove.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <5E5308B0-BA11-46A2-B7A9-22CD4ADBCF80@signove.com>
+In-Reply-To: <20101203220534.GA16709@eris>
+References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
+	 <20101203220534.GA16709@eris>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 24 Jan 2011 11:03:37 -0800
+Message-ID: <1295895817.2656.26.camel@ubuntuLab1>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Vinicius,
 
-* Elvis Pfützenreuter <epx@signove.com> [2011-01-19 17:10:51 -0200]:
+I am sorry that it has taken so long to test the snapshot that you
+placed on gitorious, but I have now done so.
 
-> I am currently investigating two problems with L2CAP sockets. Since I am not a kernel guy, I will take an indefinite amount of time to find and fix them; perhaps someone else can find and fix it in 5 minutes, so I think it is worth reporting.
+On Fri, 2010-12-03 at 19:05 -0300, Vinicius Costa Gomes wrote:
+> Hi Brian,
 > 
-> First problem is ERTM x MTU, sockets configured with a MTU != 672. Normal sockets exchange MTU in initialization:
+> On 11:11 Fri 03 Dec, Brian Gix wrote:
+> > 
+> > Hi Claudio, Johan & All,
+> > 
+> > Is this LE capable kernel that Ville is working on, the development stream
+> > for the LE Security Manager?  And if so, is it in a partial fleshed out
+> > state?
 > 
-> ./l2test -P 4099 -I 1000 -O 1000
-> l2test[3211]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 1000, flush_to 65535, mode 0, handle 12, class 0x480100]
+> There is a simple implementation of SMP here[1] on my "devel" branch. I am 
+> cleaning it up for sending it for review.
 > 
-> but ERTM sockets seem to ignore the setsockopt() value and exchange the default size (672):
-> 
-> ./l2test -P 4099 -I 1000 -O 1000 -X ERTM
-> l2test[3228]: Connect from 00:1B:DC:0F:C8:A9 [imtu 1000, omtu 672, flush_to 65535, mode 3, handle 11, class 0x480100]
-> 
-> (obviously the initiator side uses the same parameters)
+> If you want to help, have any comments or just want to tell us what you are
+> working on, please drop by #bluez on freenode, or send an email.
 
-I pushed I fix for this to bluetooth-next-2.6
+I have been able to verify that the Just Works negotiation of the Short
+Term Key does work against an independent implementation of the LE
+Security Manager, as long as I have requested no MITM protection.  I
+have the following comments:
 
-Author: Gustavo F. Padovan <padovan@profusion.mobi>
-Date:   Mon Jan 24 16:01:43 2011 -0200
+1. You currently reject security if I *do* request MITM protection.
+This should not be done.  The correct functionality should be to
+continue the negotiation.  Even though I requested MITM, it will be
+clear to both sides that JUST_WORKS methodology has been used, and so
+when the Keys are generated and exchanged, both sides will indicate in
+their Key Database that they are no-MITM keys. If I then actually
+*needed* MITM protection, then whatever functionality requiring that
+level of security will fail with an insufficient security error code.
+However, security should *never* be rejected unless there is a
+fundamental incompatibility such as no level of security actually
+supported.  This is the only functionality that I found to be actually
+incorrect.
 
-    Bluetooth: Fix setting of MTU for ERTM and Streaming Mode
-    
-    The desired MTU should be sent in an Config_Req for all modes.
-    
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+2. Currently, you are not exchanging any permanent keys, which I am sure
+you are aware.  This makes it impossible to test much else, such as
+command signing, or security requests that use the generated keys.
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index ff191b9..1ee18c6 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -2588,11 +2588,11 @@ static int l2cap_build_conf_req(struct sock *sk, void *data)
-        }
- 
- done:
-+       if (pi->imtu != L4CAP_DEFAULT_MTU)
-+               l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
-+
-        switch (pi->mode) {
-        case L2CAP_MODE_BASIC:
--               if (pi->imtu != L2CAP_DEFAULT_MTU)
--                       l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
--
-                if (!(pi->conn->feat_mask & L2CAP_FEAT_ERTM) &&
-                                !(pi->conn->feat_mask & L2CAP_FEAT_STREAMING))
-                        break;
+If you have a later version of SM that could be uploaded to your devel
+branch on gitorious, I would be more than happy (and in fact would love
+to be able) to test that for you as well.
 
+This is the git configuration I used for testing, which only has your SM
+up to the end of last December, and is so about a month old:
+
+remote.origin.url=git://gitorious.org/bluetooth-next/bluetooth-next.git
+branch.devel.remote=origin
+branch.devel.merge=refs/heads/devel
+
+
+Thanks for doing the SM,
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
