@@ -1,72 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix initialization when adapter is already up
-Date: Mon, 24 Jan 2011 11:13:07 +0200
-Message-Id: <1295860387-10608-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv3] Bluetooth: fix crash by disabling tasklet in sock accept
+Date: Mon, 24 Jan 2011 10:53:24 +0200
+Message-Id: <1295859204-20599-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-When handling HCI_DEV_REG event it should not be necessary to generate a
-HCI_DEV_UP since init_known_adapters already does it in case the adapter
-is ulready up.
+Crash can happen when tasklet handling connect/disconnect requests
+preempts socket accept. Can be reproduced with "l2test -r" on one
+side and several "l2test -c -b 1000 -i hci0 -P 10 <bdaddr>" on the
+other side.
+
+disable taskets in socket accept and change lock_sock and release_sock
+to bh_lock_sock and bh_unlock_sock since we have to use spinlocks and
+there is no need to mark sock as owned by user.
+
+...
+[ 3555.897247] Unable to handle kernel NULL pointer dereference at virtual
+address 000000bc
+[ 3555.915039] pgd = cab9c000
+[ 3555.917785] [000000bc] *pgd=8bf3d031, *pte=00000000, *ppte=00000000
+[ 3555.928314] Internal error: Oops: 17 [#1] PREEMPT
+[ 3555.999786] CPU: 0    Not tainted  (2.6.32.21-13874-g67918ef #65)
+...
+[ 3556.005981] PC is at bt_accept_unlink+0x20/0x58 [bluetooth]
+[ 3556.011627] LR is at bt_accept_dequeue+0x3c/0xe8 [bluetooth]
+...
+[ 3556.161285] [<bf0007fc>] (bt_accept_unlink+0x20/0x58 [bluetooth]) from
+[<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth])
+[ 3556.172729] [<bf000870>] (bt_accept_dequeue+0x3c/0xe8 [bluetooth]) from
+[<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap])
+[ 3556.184082] [<bf324df8>] (l2cap_sock_accept+0x100/0x15c [l2cap]) from
+[<c026a0a8>] (sys_accept4+0x120/0x1e0)
+[ 3556.193969] [<c026a0a8>] (sys_accept4+0x120/0x1e0) from [<c002c9a0>]
+(ret_fast_syscall+0x0/0x2c)
+[ 3556.202819] Code: e5813000 e5901164 e580c160 e580c15c (e1d13bbc)
+...
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 ---
- plugins/hciops.c |   26 ++------------------------
- 1 files changed, 2 insertions(+), 24 deletions(-)
+ net/bluetooth/af_bluetooth.c |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 7240d51..260ac7d 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -2253,25 +2253,6 @@ fail:
- 	exit(1);
- }
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index a6732b5..2abfe2f 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -199,14 +199,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
  
--static void device_devreg_setup(int index)
--{
--	struct hci_dev_info di;
--
--	DBG("hci%d", index);
--
--	init_device(index);
--
--	memset(&di, 0, sizeof(di));
--
--	if (hci_devinfo(index, &di) < 0)
--		return;
--
--	if (ignore_device(&di))
--		return;
--
--	devs[index].already_up = hci_test_bit(HCI_UP, &di.flags);
--}
--
- static void init_conn_list(int index)
- {
- 	struct dev_info *dev = &devs[index];
-@@ -2318,11 +2299,7 @@ static void device_event(int event, int index)
- 	switch (event) {
- 	case HCI_DEV_REG:
- 		info("HCI dev %d registered", index);
--		device_devreg_setup(index);
--		if (devs[index].already_up) {
--			init_conn_list(index);
--			device_event(HCI_DEV_UP, index);
--		}
-+		init_device(index);
- 		break;
+ 	BT_DBG("parent %p", parent);
  
- 	case HCI_DEV_UNREG:
-@@ -2418,6 +2395,7 @@ static gboolean init_known_adapters(gpointer user_data)
- 		if (!dev->already_up)
++	local_bh_disable();
+ 	list_for_each_safe(p, n, &bt_sk(parent)->accept_q) {
+ 		sk = (struct sock *) list_entry(p, struct bt_sock, accept_q);
+ 
+-		lock_sock(sk);
++		bh_lock_sock(sk);
+ 
+ 		/* FIXME: Is this check still needed */
+ 		if (sk->sk_state == BT_CLOSED) {
+-			release_sock(sk);
++			bh_unlock_sock(sk);
+ 			bt_accept_unlink(sk);
  			continue;
+ 		}
+@@ -216,12 +217,16 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 			bt_accept_unlink(sk);
+ 			if (newsock)
+ 				sock_graft(sk, newsock);
+-			release_sock(sk);
++
++			bh_unlock_sock(sk);
++			local_bh_enable();
+ 			return sk;
+ 		}
  
-+		init_conn_list(dr->dev_id);
- 		hciops_stop_inquiry(dr->dev_id);
- 
- 		dev->pending = 0;
+-		release_sock(sk);
++		bh_unlock_sock(sk);
+ 	}
++	local_bh_enable();
++
+ 	return NULL;
+ }
+ EXPORT_SYMBOL(bt_accept_dequeue);
 -- 
 1.7.1
 
