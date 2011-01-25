@@ -1,120 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
-From: Brian Gix <bgix@codeaurora.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <AANLkTi=uByqBUVKD8UYwt5ZByvHwu6WpapG=BtUrFkzE@mail.gmail.com>
-References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
-	 <20101203220534.GA16709@eris> <1295895817.2656.26.camel@ubuntuLab1>
-	 <20110124213429.GA15121@piper>
-	 <AANLkTi=uByqBUVKD8UYwt5ZByvHwu6WpapG=BtUrFkzE@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 25 Jan 2011 08:58:47 -0800
-Message-ID: <1295974727.2656.57.camel@ubuntuLab1>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1295973136-30908-1-git-send-email-pavan_savoy@sify.com>
+References: <1295973136-30908-1-git-send-email-pavan_savoy@sify.com>
+Date: Tue, 25 Jan 2011 22:03:39 +0530
+Message-ID: <AANLkTinGAorqPagx_hLakiSoadbOQKv5OE4KBSa1fr5q@mail.gmail.com>
+Subject: [PATCH] plugins: hciops: remove scan disable on poweroff
+From: Pavan Savoy <pavan_savoy@sify.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2011-01-25 at 10:35 +0200, Luiz Augusto von Dentz wrote:
-> Hi Vinicius,
-> 
-> On Mon, Jan 24, 2011 at 11:34 PM, Vinicius Costa Gomes
-> <vinicius.gomes@openbossa.org> wrote:
-> > Hi Brian,
-> >
-> > On 11:03 Mon 24 Jan, Brian Gix wrote:
-> >> Hi Vinicius,
-> >>
-> >> I am sorry that it has taken so long to test the snapshot that you
-> >> placed on gitorious, but I have now done so.
-> >>
-> >> On Fri, 2010-12-03 at 19:05 -0300, Vinicius Costa Gomes wrote:
-> >> > Hi Brian,
-> >> >
-> >> > On 11:11 Fri 03 Dec, Brian Gix wrote:
-> >> > >
-> >> > > Hi Claudio, Johan & All,
-> >> > >
-> >> > > Is this LE capable kernel that Ville is working on, the development stream
-> >> > > for the LE Security Manager?  And if so, is it in a partial fleshed out
-> >> > > state?
-> >> >
-> >> > There is a simple implementation of SMP here[1] on my "devel" branch. I am
-> >> > cleaning it up for sending it for review.
-> >> >
-> >> > If you want to help, have any comments or just want to tell us what you are
-> >> > working on, please drop by #bluez on freenode, or send an email.
-> >>
-> >> I have been able to verify that the Just Works negotiation of the Short
-> >> Term Key does work against an independent implementation of the LE
-> >> Security Manager, as long as I have requested no MITM protection.  I
-> >> have the following comments:
-> >>
-> >> 1. You currently reject security if I *do* request MITM protection.
-> >> This should not be done.  The correct functionality should be to
-> >> continue the negotiation.  Even though I requested MITM, it will be
-> >> clear to both sides that JUST_WORKS methodology has been used, and so
-> >> when the Keys are generated and exchanged, both sides will indicate in
-> >> their Key Database that they are no-MITM keys. If I then actually
-> >> *needed* MITM protection, then whatever functionality requiring that
-> >> level of security will fail with an insufficient security error code.
-> >> However, security should *never* be rejected unless there is a
-> >> fundamental incompatibility such as no level of security actually
-> >> supported.  This is the only functionality that I found to be actually
-> >> incorrect.
-> >>
-> >
-> > I was assuming that the meaning of setting the MITM protection bit, was that
-> > it was *requiring* MITM protection, and when that couldn't be fulfilled the
-> > Pairing Request should be rejected.
-> >
-> > So my assumption was incorrect, going to fix it soon.
-> 
-> Well the spec says it is a requirement:
-> 
-> "If the STK generation method does not result in an STK that provides
-> sufficient security properties then the device shall send the Pairing
-> Failed command with the error code “Authentication Requirements”" -
-> 2.3.5.1 Selecting STK Generation Method - Page 608
+From: Pavan Savoy <pavan_savoy@sify.com>
 
->>From Page 607:
-"If both devices have out of band authentication data, then the
-Authentication Requirements Flags shall be ignored when selecting the
-pairing method and the Out of Band pairing method shall be used. If both
-devices have not set the MITM option in the Authentication Requirements
-Flags, then the IO capabilities shall be ignored and the Just Works
-association model shall be used. Otherwise the IO capabilities of the
-devices shall be used to determine the pairing method as defined in
-Table 2.4."
+remove sending of the scan disable command when the
+device is being powered off.
 
-In the test case I ran, only One device (i.e. NOT BOTH) had the MITM
-option set. So my reading is that the IO Capabilities should be ignored,
-and JUST_WORKS used.
+Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
+---
+ plugins/hciops.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
 
-Remember the phone use case: When it needs to pair with a remote device,
-it is usually a GATT client that can support any level of security. It
-does not know if this new remote device requires MITM security, or No
-security.  However as the link Master and Initiator, it has to choose
-one.  It Chooses MITM, and if the remote side supports MITM, then
-pairing proceeds with a resulting MITM protection level. If the remote
-device is a simple dumb device with no security, it also needs to
-proceed without failing, but this time it completes with NO-MITM as the
-protection level. If it fails because the remote doesn't require
-security, then there is a fundamental incompatibility between the
-devices, which in the SIG we have tried to avoid.
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 719ef01..59a15a0 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -335,14 +335,9 @@ static int hciops_set_pairable(int index,
+gboolean pairable)
+ static int hciops_power_off(int index)
+ {
+       struct dev_info *dev = &devs[index];
+-       uint8_t mode = SCAN_DISABLED;
 
-> 
-> In my interpretation this is exactly what should happen when MITM is
-> set but there is no way to generate an authenticated key as Table 2.4:
-> Mapping of IO Capabilities to STK Generation Method suggest, in other
-> words if one of sides has NoInputNoOutput and MITM is set we should
-> return "Authentication Requirements" error.
-> 
+       DBG("hci%d", index);
 
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+-       if (hci_send_cmd(dev->sk, OGF_HOST_CTL,
+-                                       OCF_WRITE_SCAN_ENABLE, 1, &mode) < 0)
+-               return -errno;
+-
+       if (ioctl(dev->sk, HCIDEVDOWN, index) < 0 && errno != EALREADY)
+               return -errno;
 
+--
+1.7.0.4
