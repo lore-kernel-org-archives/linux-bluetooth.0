@@ -1,32 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 25 Jan 2011 18:42:09 +0530
-Message-ID: <AANLkTinQdwaAQk6LU_uLJ60YFOthhuwu5rL2gzZUXZ-k@mail.gmail.com>
-Subject: why scan_disable during hciops_power_off
-From: Pavan Savoy <pavan_savoy@sify.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCHv2] Bluetooth: flushable packet supports headers
+Date: Tue, 25 Jan 2011 11:45:47 +0200
+Message-Id: <1295948747-11094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-when hciops gets a set_powered with powered=0, then hciops_power_off is called.
-However in here we write the SCAN_ENABLE (=0) to the device and then
-do the HCIDEVDOWN...
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-so couple of questions,
-1. are there controllers there which even after doing hci0 down,
-allows other devices to be scanned?
-for those what do hci0 down mean ? radio not switched off ?
+Modify headers to enable support for flushable packets. Following
+commit: 8bcbd526c84724d8de087130d53e79da256e34bf to linux kernel
+implements functionality on kernel side.
+---
+ lib/bluetooth.h |    5 +++++
+ lib/hci.h       |    1 +
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-2. what happens to the response? in case hci0 down is considered as
-say close of UART?
-There is a case I have a combo chip, and I need to keep UART opened,
-because someone else is using the UART, and then
-I do this power_off, the hci0 interface is down, and bluetooth just
-dumps down the scan_disable and quits, but the response
-which comes from the device has no takers....
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index a0486c7..bc0921e 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -70,6 +70,11 @@ struct bt_security {
+ 
+ #define BT_DEFER_SETUP	7
+ 
++#define BT_FLUSHABLE	8
++
++#define BT_FLUSHABLE_OFF	0
++#define BT_FLUSHABLE_ON		1
++
+ /* Connection and socket states */
+ enum {
+ 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
+diff --git a/lib/hci.h b/lib/hci.h
+index 0cb120f..9b5388b 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -196,6 +196,7 @@ enum {
+ #define HCI_HOST_BUSY_PAIRING			0x38
+ 
+ /* ACL flags */
++#define ACL_START_NO_FLUSH	0x00
+ #define ACL_CONT		0x01
+ #define ACL_START		0x02
+ #define ACL_ACTIVE_BCAST	0x04
+-- 
+1.7.1
 
-so shouldn't hciops use a hci_send_req before HCIDEVDOWN ?
-
-regards,
-Pavan
