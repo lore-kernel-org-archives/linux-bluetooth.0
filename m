@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1295973136-30908-1-git-send-email-pavan_savoy@sify.com>
-References: <1295973136-30908-1-git-send-email-pavan_savoy@sify.com>
-Date: Tue, 25 Jan 2011 22:03:39 +0530
-Message-ID: <AANLkTinGAorqPagx_hLakiSoadbOQKv5OE4KBSa1fr5q@mail.gmail.com>
-Subject: [PATCH] plugins: hciops: remove scan disable on poweroff
+In-Reply-To: <1295971902.1520.52.camel@aeonflux>
+References: <AANLkTinQdwaAQk6LU_uLJ60YFOthhuwu5rL2gzZUXZ-k@mail.gmail.com>
+	<AANLkTimUJoUmYorKNdNJPke_GJbAr6AK-ercNGr1uRRA@mail.gmail.com>
+	<AANLkTimxHnqd9hp_Uu9DCXokq2Zj0bBb-3aJqRXE_AdE@mail.gmail.com>
+	<20110125160830.GA14610@jh-x301>
+	<1295971902.1520.52.camel@aeonflux>
+Date: Tue, 25 Jan 2011 21:47:41 +0530
+Message-ID: <AANLkTikm4nn8Y-89U7Rzvyr+csLR-t2_6WOjQGe1J-2M@mail.gmail.com>
+Subject: Re: why scan_disable during hciops_power_off
 From: Pavan Savoy <pavan_savoy@sify.com>
-To: linux-bluetooth@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Pavan Savoy <pavan_savoy@sify.com>
+On Tue, Jan 25, 2011 at 9:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+>> > >> 1. are there controllers there which even after doing hci0 down,
+>> > >> allows other devices to be scanned?
+>> > >> for those what do hci0 down mean ? radio not switched off ?
+>> > >
+>> > > Good point, perhaps this is driver dependent, so we do it just be safe guard.
+>> >
+>> > I hope all devices and drivers out there consider the hci0 down as the
+>> > radio OFF,
+>> > I don't think there is a reason for it to be otherwise....
+>> > so why the safe-guard ?
+>>
+>> IIRC Marcel added this due to paranoia with the non-connectable GAP test
+>> case with the BITE tester. The test kept failing even though the device
+>> was in DOWN state.
+>
+> we also had the case where we considered non-connectable as off when the
+> HCI devdown was not working properly. However this is a long time ago
+> and has been fixed properly. So we might can remove this now.
 
-remove sending of the scan disable command when the
-device is being powered off.
+Oo...
+I want to send the patch, I want to send the patch ..
+Can I please .....
 
-Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
----
- plugins/hciops.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 719ef01..59a15a0 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -335,14 +335,9 @@ static int hciops_set_pairable(int index,
-gboolean pairable)
- static int hciops_power_off(int index)
- {
-       struct dev_info *dev = &devs[index];
--       uint8_t mode = SCAN_DISABLED;
-
-       DBG("hci%d", index);
-
--       if (hci_send_cmd(dev->sk, OGF_HOST_CTL,
--                                       OCF_WRITE_SCAN_ENABLE, 1, &mode) < 0)
--               return -errno;
--
-       if (ioctl(dev->sk, HCIDEVDOWN, index) < 0 && errno != EALREADY)
-               return -errno;
-
---
-1.7.0.4
+> Regards
+>
+> Marcel
+>
+>
+>
