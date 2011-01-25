@@ -1,59 +1,274 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: flushable packet supports headers
-Date: Tue, 25 Jan 2011 11:36:19 +0200
-Message-Id: <1295948179-10942-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 10/11 v2] Bluetooth: Implement UUID handling through the management interface
+Date: Tue, 25 Jan 2011 11:12:48 +0200
+Message-Id: <1295946768-4623-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1294135732-26765-10-git-send-email-johan.hedberg@gmail.com>
+References: <1294135732-26765-10-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-Modify headers to enable support for flushable packets. Following
-commit: 8bcbd526c84724d8de087130d53e79da256e34bf to linux kernel
-implements functionality on kernel side.
+This patch adds methods to the management interface for userspace to
+notify the kernel of which services have been registered for specific
+adapters. This information is needed for setting the appropriate Class
+of Device value as well as the Extended Inquiry Response value. This
+patch doesn't actually implement setting of these values but just
+provides the storage of the UUIDs so the needed functionality can be
+built on top of it.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- lib/bluetooth.h |    5 +++++
- lib/hci.h       |    3 ++-
- 2 files changed, 7 insertions(+), 1 deletions(-)
+v2: Fix compiler warning due to potentially uninitialized variable.
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index a0486c7..bc0921e 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -70,6 +70,11 @@ struct bt_security {
- 
- #define BT_DEFER_SETUP	7
- 
-+#define BT_FLUSHABLE	8
+ include/net/bluetooth/hci_core.h |   10 +++
+ include/net/bluetooth/mgmt.h     |   12 ++++
+ net/bluetooth/hci_core.c         |   19 ++++++
+ net/bluetooth/mgmt.c             |  120 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 161 insertions(+), 0 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ba3dbe3..8ee0b8b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -66,6 +66,12 @@ struct bdaddr_list {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+ };
 +
-+#define BT_FLUSHABLE_OFF	0
-+#define BT_FLUSHABLE_ON		1
++struct bt_uuid {
++	struct list_head list;
++	u8 uuid[16];
++};
 +
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-diff --git a/lib/hci.h b/lib/hci.h
-index 0cb120f..d8d62b0 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -196,6 +196,7 @@ enum {
- #define HCI_HOST_BUSY_PAIRING			0x38
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -139,6 +145,8 @@ struct hci_dev {
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
  
- /* ACL flags */
-+#define ACL_START_NO_FLUSH	0x00
- #define ACL_CONT		0x01
- #define ACL_START		0x02
- #define ACL_ACTIVE_BCAST	0x04
-@@ -261,7 +262,7 @@ enum {
- #define LMP_SIMPLE_PAIR	0x08
- #define LMP_ENCAPS_PDU	0x10
- #define LMP_ERR_DAT_REP	0x20
--#define LMP_NFLUSH_PKTS	0x40
-+#define LMP_NO_FLUSH	0x40
++	struct list_head	uuids;
++
+ 	struct hci_dev_stats	stat;
  
- #define LMP_LSTO	0x01
- #define LMP_INQ_TX_PWR	0x02
+ 	struct sk_buff_head	driver_init;
+@@ -441,6 +449,8 @@ int hci_inquiry(void __user *arg);
+ struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_blacklist_clear(struct hci_dev *hdev);
+ 
++int hci_uuids_clear(struct hci_dev *hdev);
++
+ void hci_del_off_timer(struct hci_dev *hdev);
+ 
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index a554802..c118ad3 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -72,6 +72,18 @@ struct mgmt_mode {
+ 
+ #define MGMT_OP_SET_PAIRABLE		0x0008
+ 
++#define MGMT_OP_ADD_UUID		0x0009
++struct mgmt_cp_add_uuid {
++	__le16 index;
++	__u8 uuid[16];
++} __packed;
++
++#define MGMT_OP_REMOVE_UUID		0x000A
++struct mgmt_cp_remove_uuid {
++	__le16 index;
++	__u8 uuid[16];
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 13eb5a8..b99248d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -955,6 +955,22 @@ void hci_del_off_timer(struct hci_dev *hdev)
+ 	del_timer(&hdev->off_timer);
+ }
+ 
++int hci_uuids_clear(struct hci_dev *hdev)
++{
++	struct list_head *p, *n;
++
++	list_for_each_safe(p, n, &hdev->uuids) {
++		struct bt_uuid *uuid;
++
++		uuid = list_entry(p, struct bt_uuid, list);
++
++		list_del(p);
++		kfree(uuid);
++	}
++
++	return 0;
++}
++
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+@@ -1012,6 +1028,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	INIT_LIST_HEAD(&hdev->blacklist);
+ 
++	INIT_LIST_HEAD(&hdev->uuids);
++
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
+ 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
+@@ -1087,6 +1105,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 	hci_blacklist_clear(hdev);
++	hci_uuids_clear(hdev);
+ 	hci_dev_unlock_bh(hdev);
+ 
+ 	__hci_dev_put(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d107350..0854c2f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -571,6 +571,120 @@ failed:
+ 	return err;
+ }
+ 
++static int uuid_rsp(struct sock *sk, u16 opcode, u16 index)
++{
++	struct mgmt_hdr *hdr;
++	struct mgmt_ev_cmd_complete *ev;
++	struct sk_buff *skb;
++
++	skb = alloc_skb(sizeof(*hdr) + sizeof(*ev) + sizeof(index), GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = (void *) skb_put(skb, sizeof(*hdr));
++	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_COMPLETE);
++	hdr->len = cpu_to_le16(sizeof(*ev) + sizeof(index));
++
++	ev = (void *) skb_put(skb, sizeof(*ev));
++	put_unaligned_le16(opcode, &ev->opcode);
++
++	put_unaligned_le16(index, skb_put(skb, sizeof(index)));
++
++	if (sock_queue_rcv_skb(sk, skb) < 0)
++		kfree_skb(skb);
++
++	return 0;
++}
++
++static int add_uuid(struct sock *sk, unsigned char *data, u16 len)
++{
++	struct mgmt_cp_add_uuid *cp;
++	struct hci_dev *hdev;
++	struct bt_uuid *uuid;
++	u16 dev_id;
++	int err;
++
++	cp = (void *) data;
++	dev_id = get_unaligned_le16(&cp->index);
++
++	BT_DBG("request for hci%u", dev_id);
++
++	hdev = hci_dev_get(dev_id);
++	if (!hdev)
++		return cmd_status(sk, MGMT_OP_ADD_UUID, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	uuid = kmalloc(sizeof(*uuid), GFP_ATOMIC);
++	if (!uuid) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
++	memcpy(uuid->uuid, cp->uuid, 16);
++
++	list_add(&uuid->list, &hdev->uuids);
++
++	err = uuid_rsp(sk, MGMT_OP_ADD_UUID, dev_id);
++
++failed:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
++static int remove_uuid(struct sock *sk, unsigned char *data, u16 len)
++{
++	struct list_head *p, *n;
++	struct mgmt_cp_add_uuid *cp;
++	struct hci_dev *hdev;
++	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
++	u16 dev_id;
++	int err, found;
++
++	cp = (void *) data;
++	dev_id = get_unaligned_le16(&cp->index);
++
++	BT_DBG("request for hci%u", dev_id);
++
++	hdev = hci_dev_get(dev_id);
++	if (!hdev)
++		return cmd_status(sk, MGMT_OP_REMOVE_UUID, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	if (memcmp(cp->uuid, bt_uuid_any, 16) == 0) {
++		err = hci_uuids_clear(hdev);
++		goto unlock;
++	}
++
++	found = 0;
++
++	list_for_each_safe(p, n, &hdev->uuids) {
++		struct bt_uuid *match = list_entry(p, struct bt_uuid, list);
++
++		if (memcmp(match->uuid, cp->uuid, 16) != 0)
++			continue;
++
++		list_del(&match->list);
++		found++;
++	}
++
++	if (found == 0) {
++		err = cmd_status(sk, MGMT_OP_REMOVE_UUID, ENOENT);
++		goto unlock;
++	}
++
++	err = uuid_rsp(sk, MGMT_OP_REMOVE_UUID, dev_id);
++
++unlock:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -623,6 +737,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_SET_PAIRABLE:
+ 		err = set_pairable(sk, buf + sizeof(*hdr), len);
+ 		break;
++	case MGMT_OP_ADD_UUID:
++		err = add_uuid(sk, buf + sizeof(*hdr), len);
++		break;
++	case MGMT_OP_REMOVE_UUID:
++		err = remove_uuid(sk, buf + sizeof(*hdr), len);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, opcode, 0x01);
 -- 
-1.7.1
+1.7.2.3
 
