@@ -1,170 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 25 Jan 2011 06:17:29 +0100
-Subject: [PATCH 1/4] HCI command to add device in LE White List
-Message-ID: <4765B7BC10CB4C488A56C73E15D6FBA31DA579F205@EXDCVYMBSTM005.EQ1STM.local>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <4D3E3EC4.3010304@trelane.net>
+References: <AANLkTim-w9rFa-W4HTGW7RBMoMyFUT9-cZ4NnFj0LsaV@mail.gmail.com> <4D3E3EC4.3010304@trelane.net>
+From: "Arun K. Singh" <arunkat@gmail.com>
+Date: Tue, 25 Jan 2011 10:25:05 +0530
+Message-ID: <AANLkTimAKkg2Px-Z0N7SLx_p+Se3yNSQpZy33V1G8_pa@mail.gmail.com>
+Subject: Re: Bluetooth Help Needed Please
+To: Andrew Kirch <trelane@trelane.net>
+Cc: =?UTF-8?Q?Morn=C3=A9_Liebenberg?= <dtsnamibia@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+or may be just the dbus header [libdbus-1-dev] - as most of the
+contemporary linux hosts have dbus pre-installed ...
 
----
- lib/hci.c       |   29 +++++++++++++++++++++++++++++
- lib/hci.h       |    5 +++++
- lib/hci_lib.h   |    1 +
- tools/hcitool.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 82 insertions(+), 0 deletions(-)
- mode change 100644 => 100755 lib/hci.c
- mode change 100644 => 100755 lib/hci.h
- mode change 100644 => 100755 lib/hci_lib.h
- mode change 100644 => 100755 tools/hcitool.c
-
-diff --git a/lib/hci.c b/lib/hci.c
-old mode 100644
-new mode 100755
-index 048fda4..a85f193
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -1291,6 +1291,35 @@ int hci_disconnect(int dd, uint16_t handle, uint8_t reason, int to)
- 	return 0;
- }
- 
-+int hci_le_add_to_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type)
-+{
-+	struct hci_request rq;
-+	le_add_device_to_white_list_cp cp;
-+	uint8_t status;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.bdaddr_type = type;
-+	bacpy(&cp.bdaddr, bdaddr);
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_ADD_DEVICE_TO_WHITE_LIST;
-+	rq.cparam = &cp;
-+	rq.clen = LE_ADD_DEVICE_TO_WHITE_LIST_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, 1000) < 0)
-+		return -1;
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- int hci_read_local_name(int dd, int len, char *name, int to)
- {
- 	read_local_name_rp rp;
-diff --git a/lib/hci.h b/lib/hci.h
-old mode 100644
-new mode 100755
-index 0cb120f..de0eaa0
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1522,6 +1522,11 @@ typedef struct {
- 
- #define OCF_LE_CREATE_CONN_CANCEL		0x000E
- 
-+typedef enum {
-+	LE_PUBLIC_DEVICE_ADDR = 0x00,
-+	LE_RANDOM_DEVICE_ADDR =	0x01,
-+}le_device_addr_type;
-+
- #define OCF_LE_READ_WHITE_LIST_SIZE		0x000F
- typedef struct {
- 	uint8_t		status;
-diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-old mode 100644
-new mode 100755
-index b63a2a4..7127d70
---- a/lib/hci_lib.h
-+++ b/lib/hci_lib.h
-@@ -127,6 +127,7 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint16_t latency, uint16_t supervision_timeout,
- 		uint16_t min_ce_length, uint16_t max_ce_length,
- 		uint16_t *handle, int to);
-+int hci_le_add_to_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type);
- 
- int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
- int hci_get_route(bdaddr_t *bdaddr);
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-old mode 100644
-new mode 100755
-index d50adaf..9147995
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2471,6 +2471,52 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 	hci_close_dev(dd);
- }
- 
-+static struct option leaddwl_options[] = {
-+	{ "help",	0, 0, 'h' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+static const char *leaddwl_help =
-+	"Usage:\n"
-+	"\tleaddwl\n";
-+
-+static void cmd_leaddwl(int dev_id, int argc, char **argv)
-+{
-+	int err, opt, dd;
-+	bdaddr_t bdaddr;
-+	le_device_addr_type bdaddr_type;
-+		
-+	for_each_opt(opt, leaddwl_options, NULL) {
-+		switch (opt) {
-+		default:
-+			printf("%s", leaddwl_help);
-+			return;
-+		}
-+	}
-+
-+	helper_arg(1, 1, &argc, &argv, leaddwl_help);
-+		
-+	if (dev_id < 0)
-+		dev_id = hci_get_route(NULL);
-+
-+	dd = hci_open_dev(dev_id);
-+	if (dd < 0) {
-+		perror("Could not open device");
-+		exit(1);
-+	}
-+	
-+	str2ba(argv[0], &bdaddr);
-+	bdaddr_type = LE_PUBLIC_DEVICE_ADDR;
-+	
-+	err = hci_le_add_to_white_list(dd, &bdaddr, bdaddr_type);
-+	hci_close_dev(dd);
-+
-+	if (err < 0) {
-+		perror("Cant add to white list");
-+		exit(1);
-+	}
-+}
-+
- static struct option ledc_options[] = {
- 	{ "help",	0, 0, 'h' },
- 	{ 0, 0, 0, 0 }
-@@ -2547,6 +2593,7 @@ static struct {
- 	{ "clkoff", cmd_clkoff, "Read clock offset"                    },
- 	{ "clock",  cmd_clock,  "Read local or remote clock"           },
- 	{ "lescan", cmd_lescan, "Start LE scan"                        },
-+	{ "leaddwl", cmd_leaddwl, "Add this device to white list"	   },
- 	{ "lecc",   cmd_lecc,   "Create a LE Connection",              },
- 	{ "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
- 	{ NULL, NULL, 0 }
--- 
-1.6.5
+Best Regards,
+Arun
+www.crazydaks.com
 
 
-Thanks,
-Sumit
+
+
+On Tue, Jan 25, 2011 at 8:38 AM, Andrew Kirch <trelane@trelane.net> wrote:
+> install dbus-dev dbus-devel libdbus, etc
+>
+> Andrew
+>
+> On 1/24/2011 9:05 PM, Morné Liebenberg wrote:
+>> To whom it may concern;
+>>
+>> Hi may name is Morne and I'm trying to update my Bluez software but
+>> get the following errors:
+>>
+>> gmg@GMG:~/Downloads/bluez-4.86$ ./configure --prefix=/usr
+>> --mandir=/usr/share/man \
+>>> --sysconfdir=/etc --localstatedir=/var --libexecdir=/lib
+>> checking for a BSD-compatible install... /usr/bin/install -c
+>> checking whether build environment is sane... yes
+>> checking for a thread-safe mkdir -p... /bin/mkdir -p
+>> checking for gawk... no
+>> checking for mawk... mawk
+>> checking whether make sets $(MAKE)... yes
+>> checking whether to enable maintainer-specific portions of Makefiles... no
+>> checking for pkg-config... /usr/bin/pkg-config
+>> checking pkg-config is at least version 0.9.0... yes
+>> checking for gcc... gcc
+>> checking for C compiler default output file name... a.out
+>> checking whether the C compiler works... yes
+>> checking whether we are cross compiling... no
+>> checking for suffix of executables...
+>> checking for suffix of object files... o
+>> checking whether we are using the GNU C compiler... yes
+>> checking whether gcc accepts -g... yes
+>> checking for gcc option to accept ISO C89... none needed
+>> checking for style of include used by make... GNU
+>> checking dependency style of gcc... gcc3
+>> checking whether gcc and cc understand -c and -o together... yes
+>> checking whether gcc accepts -fPIE... yes
+>> checking for a BSD-compatible install... /usr/bin/install -c
+>> checking for bison... no
+>> checking for byacc... no
+>> checking for flex... no
+>> checking for lex... no
+>> checking build system type... i686-pc-linux-gnu
+>> checking host system type... i686-pc-linux-gnu
+>> checking for a sed that does not truncate output... /bin/sed
+>> checking for grep that handles long lines and -e... /bin/grep
+>> checking for egrep... /bin/grep -E
+>> checking for fgrep... /bin/grep -F
+>> checking for ld used by gcc... /usr/bin/ld
+>> checking if the linker (/usr/bin/ld) is GNU ld... yes
+>> checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+>> checking the name lister (/usr/bin/nm -B) interface... BSD nm
+>> checking whether ln -s works... yes
+>> checking the maximum length of command line arguments... 1572864
+>> checking whether the shell understands some XSI constructs... yes
+>> checking whether the shell understands "+="... yes
+>> checking for /usr/bin/ld option to reload object files... -r
+>> checking for objdump... objdump
+>> checking how to recognize dependent libraries... pass_all
+>> checking for ar... ar
+>> checking for strip... strip
+>> checking for ranlib... ranlib
+>> checking command to parse /usr/bin/nm -B output from gcc object... ok
+>> checking how to run the C preprocessor... gcc -E
+>> checking for ANSI C header files... yes
+>> checking for sys/types.h... yes
+>> checking for sys/stat.h... yes
+>> checking for stdlib.h... yes
+>> checking for string.h... yes
+>> checking for memory.h... yes
+>> checking for strings.h... yes
+>> checking for inttypes.h... yes
+>> checking for stdint.h... yes
+>> checking for unistd.h... yes
+>> checking for dlfcn.h... yes
+>> checking for objdir... .libs
+>> checking if gcc supports -fno-rtti -fno-exceptions... no
+>> checking for gcc option to produce PIC... -fPIC -DPIC
+>> checking if gcc PIC flag -fPIC -DPIC works... yes
+>> checking if gcc static flag -static works... yes
+>> checking if gcc supports -c -o file.o... yes
+>> checking if gcc supports -c -o file.o... (cached) yes
+>> checking whether the gcc linker (/usr/bin/ld) supports shared libraries... yes
+>> checking whether -lc should be explicitly linked in... no
+>> checking dynamic linker characteristics... GNU/Linux ld.so
+>> checking how to hardcode library paths into programs... immediate
+>> checking whether stripping libraries is possible... yes
+>> checking if libtool supports shared libraries... yes
+>> checking whether to build shared libraries... yes
+>> checking whether to build static libraries... no
+>> checking for ppoll... yes
+>> checking for dlopen in -ldl... yes
+>> checking for DBUS... no
+>> configure: error: D-Bus library is required
+>> gmg@GMG:~/Downloads/bluez-4.86$
+>>
+>> Could you perhaps help me with this update issue...
+>>
+>> The other issue I am having is receiving calls to my cellphone and
+>> playing the person who is calling via my computer speakers using a
+>> blue-tooth dongle.
+>> Otherwise if it's not possible then I could just might as well buy a
+>> blue-tooth earpiece, disconnect it's small speaker and connect it to
+>> my amp but will only have mono sound
+>>
+>> Anyways please help me on this issue...i would be gratefull if any
+>> good news came back
+>>
+>> Thank you
+>> Morne
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
