@@ -1,303 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <linus.walleij@stericsson.com>, <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<padovan@profusion.mobi>, <marcel@holtmann.org>, Lukasz Rymanowski
+	<lukasz.rymanowski@tieto.com>
+Subject: [PATCH] bluetooth: Fix for security block issue.
+Date: Tue, 25 Jan 2011 15:27:19 +0100
+Message-ID: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinwD7W66qfpxQWJ62UPwSJjF+msYNwac90SEEu=@mail.gmail.com>
-References: <AANLkTi=CufNvvAr0w2JfsG8b3ddgAsHh31pRANoW+z1r@mail.gmail.com>
-	<20110125030703.GA2833@joana>
-	<AANLkTinkEr1FcmZAyvS68=nU-SR8QpfYi5z=Pmqe6V-H@mail.gmail.com>
-	<AANLkTinwD7W66qfpxQWJ62UPwSJjF+msYNwac90SEEu=@mail.gmail.com>
-Date: Tue, 25 Jan 2011 08:54:55 -0600
-Message-ID: <AANLkTimsOmtL3tKBLSXNR1b96-BiLvAYBcCQYxHomDZk@mail.gmail.com>
-Subject: Re: Refusing SCO from non-connected headset
-From: Mike <puffy.taco@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 24, 2011 at 9:38 PM, Mike <puffy.taco@gmail.com> wrote:
-> On Mon, Jan 24, 2011 at 9:07 PM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
->> Hi Mike,
->>
->> * Mike <puffy.taco@gmail.com> [2011-01-24 20:35:51 -0600]:
->>
->>> I get the following error when I try to dial a phone number from my
->>> cell phone and am connected using HFP:
->>>
->>> bluetoothd[14651]: audio/main.c:sco_server_cb() Refusing SCO from
->>> non-connected headset
->>
->> Please post full logs of bluetoothd -nd
->
-> Log is pasted below.  One thing to note, if I comment out the section
-> of audio/main.c that is the "if (device->headset) {" block (around
-> line 102), then the connection goes through as a gateway.  I can then
-> see SCO packets scroll by in hcidump, though pulseaudio does not seem
-> to notice so I have no way of playing that audio.  The log though is
-> of unaltered source.
->
+It can happen that controller will schedule ACL data
+containing L2CAP connect request to host just before
+encryption change event, even though link is encrypted on
+LMP level before L2CAP connect request come.
+With this fix, L2CAP layer will handle such scenario.
 
-Here is a log of sdptool browse on the device.  Still trying to figure
-out why "device->headset" is set, because it doesn't support that
-profile.  A grep through this log for 1108 only shows up under a
-"Profile Descriptor List" category.
+Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+---
+ include/net/bluetooth/l2cap.h |    8 +++++++
+ net/bluetooth/l2cap.c         |   46 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+), 0 deletions(-)
 
-Browsing 00:17:E3:3B:4F:DD ...
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "SDP" (0x0001)
-Profile Descriptor List:
-  "SDP Server" (0x1000)
-    Version: 0x0100
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 7f88a87..f1a5bd8 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -262,6 +262,11 @@ struct l2cap_chan_list {
+ 	long		num;
+ };
+ 
++struct l2cap_pend_conn_req {
++	struct l2cap_cmd_hdr cmd;
++	struct l2cap_conn_req conn_req;
++};
++
+ struct l2cap_conn {
+ 	struct hci_conn	*hcon;
+ 
+@@ -276,6 +281,9 @@ struct l2cap_conn {
+ 	__u8		info_ident;
+ 
+ 	struct timer_list info_timer;
++	struct timer_list encrypt_timer;
++
++	struct l2cap_pend_conn_req *p_req;
+ 
+ 	spinlock_t	lock;
+ 
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index d99b6b7..09181c7 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -57,6 +57,7 @@
+ 
+ #define VERSION "2.15"
+ 
++#define ENCRYPT_TIMEOUT (20) /* 20 ms */
+ static int disable_ertm;
+ 
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+@@ -75,6 +76,7 @@ static void l2cap_busy_work(struct work_struct *work);
+ static void __l2cap_sock_close(struct sock *sk, int reason);
+ static void l2cap_sock_close(struct sock *sk);
+ static void l2cap_sock_kill(struct sock *sk);
++static void l2cap_encrypt_timeout(unsigned long arg);
+ 
+ static int l2cap_build_conf_req(struct sock *sk, void *data);
+ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+@@ -707,6 +709,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 	setup_timer(&conn->info_timer, l2cap_info_timeout,
+ 						(unsigned long) conn);
+ 
++	setup_timer(&conn->encrypt_timer, l2cap_encrypt_timeout,
++						(unsigned long) conn);
+ 	conn->disc_reason = 0x13;
+ 
+ 	return conn;
+@@ -735,6 +739,11 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+ 		del_timer_sync(&conn->info_timer);
+ 
++	if (conn->p_req)
++		del_timer_sync(&conn->encrypt_timer);
++
++	kfree(conn->p_req);
++
+ 	hcon->l2cap_data = NULL;
+ 	kfree(conn);
+ }
+@@ -2982,6 +2991,28 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	/* Check if the ACL is secure enough (if not SDP) */
+ 	if (psm != cpu_to_le16(0x0001) &&
+ 				!hci_conn_check_link_mode(conn->hcon)) {
++		/* Let's give a chance to Encryption Change Evt.*/
++		if (!conn->p_req) {
++			conn->p_req = kzalloc(sizeof(*conn->p_req), GFP_KERNEL);
++			if (conn->p_req) {
++				BT_DBG("Create pending connection req %p.",
++								conn->p_req);
++
++				memcpy(&conn->p_req->cmd, cmd, sizeof(*cmd));
++				memcpy(&conn->p_req->conn_req, req,
++								sizeof(*req));
++
++				mod_timer(&conn->encrypt_timer, jiffies +
++					msecs_to_jiffies(ENCRYPT_TIMEOUT));
++
++				/*
++				 * We will restart l2cap_conn_req in
++				 *  l2cap_encrypt_timeout.
++				 */
++				bh_unlock_sock(parent);
++				return 0;
++			}
++		}
+ 		conn->disc_reason = 0x05;
+ 		result = L2CAP_CR_SEC_BLOCK;
+ 		goto response;
+@@ -3147,6 +3178,21 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	return 0;
+ }
+ 
++static void l2cap_encrypt_timeout(unsigned long arg)
++{
++	struct l2cap_conn *conn = (void *) arg;
++
++	BUG_ON(conn->p_req == NULL);
++
++	BT_DBG("conn %p, p_req %p", conn, conn->p_req);
++
++	(void)l2cap_connect_req(conn, &conn->p_req->cmd,
++					(u8 *)&conn->p_req->conn_req);
++
++	kfree(conn->p_req);
++	conn->p_req = NULL;
++}
++
+ static inline void set_default_fcs(struct l2cap_pinfo *pi)
+ {
+ 	/* FCS is enabled only in ERTM or streaming mode, if one or both
+-- 
+1.7.0.4
 
-Service Name: Dialup Networking Gateway
-Service Description: Dialup Networking Gateway
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10001
-Service Class ID List:
-  "Dialup Networking" (0x1103)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 1
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "Dialup Networking" (0x1103)
-    Version: 0x0100
-
-Service Name: Voice Gateway
-Service Description: Headset Audio Gateway
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10003
-Service Class ID List:
-  "Headset Audio Gateway" (0x1112)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 3
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "Headset" (0x1108)
-    Version: 0x0100
-
-Service Name: Handsfree Voice Gateway
-Service Description: Handsfree Voice Gateway
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10007
-Service Class ID List:
-  "Handsfree Audio Gateway" (0x111f)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 7
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "Handsfree" (0x111e)
-    Version: 0x0105
-
-Service Name: OBEX Object Push
-Service Description: OBEX Object Push
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10008
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 8
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
-
-Service Name: OBEX File Transfer
-Service Description: OBEX File Transfer
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10009
-Service Class ID List:
-  "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "OBEX File Transfer" (0x1106)
-    Version: 0x0100
-
-Service Name: Image Push
-Service Description: Image Push
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x1000a
-Service Class ID List:
-  "Imaging Responder" (0x111b)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 10
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "Imaging" (0x111a)
-    Version: 0x0100
-
-Service Name: Audio Source
-Service Description: Audio Source
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x1000d
-Service Class ID List:
-  "Audio Source" (0x110a)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 25
-  "AVDTP" (0x0019)
-    uint16: 0x100
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "Advanced Audio" (0x110d)
-    Version: 0x0100
-
-Service Name: Audio Video Remote Control Target
-Service Description: Audio Video Remote Control Target
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x1000e
-Service Class ID List:
-  "AV Remote Target" (0x110c)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 23
-  "AVCTP" (0x0017)
-    uint16: 0x100
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
-Profile Descriptor List:
-  "AV Remote Target" (0x110c)
-    Version: 0x0100
-
-Service Name: SyncML Data Synchronization
-Service Description: SyncML Data Synchronization
-Service Provider: /a/mobile/system/cl.gif
-Service RecHandle: 0x10010
-Service Class ID List:
-  UUID 128: 00000002-0000-1000-8000-0002ee000002
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 12
-  "OBEX" (0x0008)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-  code_ISO639: 0x6672
-  encoding:    0x6a
-  base_offset: 0xc800
-  code_ISO639: 0x6573
-  encoding:    0x6a
-  base_offset: 0xc803
-  code_ISO639: 0x7074
-  encoding:    0x6a
-  base_offset: 0xc806
+/Lukasz
+on behalf of STEricsson
