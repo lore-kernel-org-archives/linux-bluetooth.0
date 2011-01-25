@@ -1,121 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1295980540.2656.85.camel@ubuntuLab1>
-References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
-	<20101203220534.GA16709@eris>
-	<1295895817.2656.26.camel@ubuntuLab1>
-	<20110124213429.GA15121@piper>
-	<AANLkTi=uByqBUVKD8UYwt5ZByvHwu6WpapG=BtUrFkzE@mail.gmail.com>
-	<1295974727.2656.57.camel@ubuntuLab1>
-	<20110125175922.GA16442@jh-x301>
-	<1295980540.2656.85.camel@ubuntuLab1>
-Date: Tue, 25 Jan 2011 23:44:02 +0200
-Message-ID: <AANLkTimir1fqsO5EfuHN2dQtsJQ2SVDajpuANo8C05EF@mail.gmail.com>
-Subject: Re: LE Kernel (bluetooth-le-2.6) and LE Security Manager
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Read Characteristic Value vs. Read Long Characteristic Values
+From: Brian Gix <bgix@codeaurora.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
+References: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 25 Jan 2011 11:46:25 -0800
+Message-ID: <1295984785.2656.98.camel@ubuntuLab1>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Anderson,
 
-On Tue, Jan 25, 2011 at 8:35 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> Hi Johan,
->
-> On Tue, 2011-01-25 at 19:59 +0200, Johan Hedberg wrote:
->> Hi Brian,
->>
->> On Tue, Jan 25, 2011, Brian Gix wrote:
->> > >From Page 607:
->> > "If both devices have out of band authentication data, then the
->> > Authentication Requirements Flags shall be ignored when selecting the
->> > pairing method and the Out of Band pairing method shall be used. If both
->> > devices have not set the MITM option in the Authentication Requirements
->> > Flags, then the IO capabilities shall be ignored and the Just Works
->> > association model shall be used. Otherwise the IO capabilities of the
->> > devices shall be used to determine the pairing method as defined in
->> > Table 2.4."
->> >
->> > In the test case I ran, only One device (i.e. NOT BOTH) had the MITM
->> > option set. So my reading is that the IO Capabilities should be ignored,
->> > and JUST_WORKS used.
->>
->> It certainly is an unusual form of English. It's saying "If both devices
->> have <x>", i.e. the condition <x> needs to be fulfilled by both devices
->> for the statement to be true. In this case the condition is "not set the
->> MITM option", i.e. both devices need to fulfill the condition "not set
->> the MITM option". Doesn't that then mean that it's not enough for one
->> device to not set the MITM flag, but both devices need to have it unset
->> for just-works to take place?
->
-> Yes, it is very unfortunate and awkward English.
->
-> I am going to look for any errata that might be more explicit, so that
-> an absolute truth table based on: MITM, OOB, and IO-Caps can be
-> constructed.
->
-> But the Truth table as I understood it from conversations at UPFs and
-> WGs and in my notes was:
->
-> 1. If BOTH devices have OOB available, it is used and results in MITM
-> 2. If NEITHER device wants MITM, JUST_WORKS used resulting in no MITM
-> 3, If One or more want MITM, the IO Caps Table 2.4 on page 608 is used
-> and MAY or MAY NOT result in MITM.
+On Tue, 2011-01-25 at 15:07 -0400, Anderson Lizardo wrote:
+> Hi Brian,
+> 
+> On the implementation you did for Long Characteristic value read, you
+> integrated the Read Blob Request handling into the existing "Read
+> Characteristic Value" implementation. From my understanding of the
+> code, the read blob request is issued if the response PDU size is
+> greater than or equal to LE ATT_MTU (23).
+> 
+> The problem I see with this approach is that if the client knows that
+> the characteristic value is exactly 22 bytes (which makes total PDU
+> size equal to 23 with the opcode), a spurious read blob request (and
+> corresponding response) is sent. How could we avoid this overhead?
+> 
+> My idea was to separate the procedures, having a "Read Long
+> Characteristic Value" and revert Read Characteristic Value to read
+> only the first ATT_MTU - 1 bytes as before. For characteristic values
+> which the client knows to be within ATT_MTU - 1 bytes (of if it only
+> cares about these bytes at the time) it would use the latter. For
+> cases where value length is unknown, it would use the former.
+> 
+> This would also allow us to better map to GATT procedures and have
+> fine control on the client implementation and on our test tool
+> (igatttool).
+> 
 
-At least for ssp yapparently you are right that may or may not result
-on MITM being used, this is the code we use on BlueZ:
+>>From a practical perspective, the only attributes that would be
+*exactly* 22 octets would be strings which defy attempts for a client to
+predict their length without knowing what the content is ahead of time.
 
-        if (*auth == 0x00 || *auth == 0x04) {
-                 /* If remote requests dedicated bonding follow that lead */
-                 if (device_get_auth(device) == 0x02 ||
-                                 device_get_auth(device) == 0x03) {
+You are correct that if a *profile* defines a particular characteristic
+attribute value to be exactly 22 octets, that this would result in
+result it a harmless extra read.
 
-                         /* If both remote and local IO capabilities allow MITM
-                          * then require it, otherwise don't */
-                         if (device_get_cap(device) == 0x03 ||
-                                                         agent_cap == 0x03)
-                                *auth = 0x02;
-                         else
-                                 *auth = 0x03;
-                 }
+For string reads this is not really a useless extra operation, because
+it does supply definitive termination of the string, which per ATT
+protocol cannot be provided any other way.
 
-                 /* If remote indicates no bonding then follow that. This
-                  * is important since the kernel might give general bonding
-                  * as default. */
-                 if (device_get_auth(device) == 0x00 ||
-                                         device_get_auth(device) == 0x01)
-                         *auth = 0x00;
+As far as test case coverage per the qualification test specification, I
+do not believe that there is a problem.  Any non long "Reads" can be
+tested by reading < 22 octet attributes, and long read tests by reading
+>= 22 octet attributes. 
 
-                 /* If remote requires MITM then also require it, unless
-                  * our IO capability is NoInputNoOutput (so some
-                  * just-works security cases can be tested) */
-                 if (device_get_auth(device) != 0xff &&
-                                         (device_get_auth(device) & 0x01) &&
-                                         agent_cap != 0x03)
-                         *auth |= 0x01;
-         }
-
-So we only set MITM if the other side also support it, hopefully it
-works the same way on LE. I still think it is a waste of time for no
-bonding case to use just-works when MITM was marked as required by one
-of parties, but I guess pretty everybody does that way.
-
-> In every case, MITM outcome is known, and propagated up the stack.
->
-> I have nothing to prove this, but it appears to be what the mature
-> stacks were using at UPF in Barcelona. But it is apparent that the spec
-> is not 100% clear, and that an errata is required to explicitly spell it
-> out.
->
-> I am going to either find the errata if it exists, or propose one to the
-> Core Working Group if it doesn't. Whatever the outcome, I will post it
-> here.
 
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
