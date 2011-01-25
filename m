@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Jan 2011 01:07:03 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mike <puffy.taco@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Refusing SCO from non-connected headset
-Message-ID: <20110125030703.GA2833@joana>
-References: <AANLkTi=CufNvvAr0w2JfsG8b3ddgAsHh31pRANoW+z1r@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=CufNvvAr0w2JfsG8b3ddgAsHh31pRANoW+z1r@mail.gmail.com>
+Date: Mon, 24 Jan 2011 20:35:51 -0600
+Message-ID: <AANLkTi=CufNvvAr0w2JfsG8b3ddgAsHh31pRANoW+z1r@mail.gmail.com>
+Subject: Refusing SCO from non-connected headset
+From: Mike <puffy.taco@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mike,
+I get the following error when I try to dial a phone number from my
+cell phone and am connected using HFP:
 
-* Mike <puffy.taco@gmail.com> [2011-01-24 20:35:51 -0600]:
+bluetoothd[14651]: audio/main.c:sco_server_cb() Refusing SCO from
+non-connected headset
 
-> I get the following error when I try to dial a phone number from my
-> cell phone and am connected using HFP:
-> 
-> bluetoothd[14651]: audio/main.c:sco_server_cb() Refusing SCO from
-> non-connected headset
+Here are my versions:
 
-Please post full logs of bluetoothd -nd
+2.6.35-24-generic
+bluez 4.86
+ofono 0.39
+dbus 1.4.0
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Is this something that is supposed to work?  Known to almost work?  Do
+I need a newer kernel?  Something that doesn't work that I can fix
+given a pointer of what to look at?
+
+Let me know if there is any more helpful debug information I can provide.
+
+Thanks,
+
+Mike
