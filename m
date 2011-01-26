@@ -1,48 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH 1/2 v2] Remove unnecessary ordering from single vCard query
-Date: Wed, 26 Jan 2011 13:33:06 +0100
-Message-Id: <1296045187-28072-1-git-send-email-michalski.raf@gmail.com>
+Date: Wed, 26 Jan 2011 13:36:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: pavan.savoy@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@sify.com>
+Subject: Re: [PATCH] plugins: hciops: remove scan disable on poweroff
+Message-ID: <20110126113608.GA9658@jh-x301>
+References: <1296040915-5519-1-git-send-email-pavan_savoy@sify.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296040915-5519-1-git-send-email-pavan_savoy@sify.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously ordering for query called CONTACTS_QUERY_FROM_URI was applied.
-It is not needed since always only one vCard (with id specified)
-is fetched.
----
- plugins/phonebook-tracker.c |    9 +++------
- 1 files changed, 3 insertions(+), 6 deletions(-)
+Hi Pavan,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index e60cf74..4e37f1c 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -788,11 +788,9 @@
- "\"NOTACALL\" \"false\" \"false\" "					\
- "<%s> "									\
- "WHERE {"								\
--"	<%s> a nco:PersonContact ;"					\
--"	nco:nameFamily ?_key ."						\
-+"	<%s> a nco:PersonContact ."					\
- "	OPTIONAL {<%s> nco:hasAffiliation ?_role .}"			\
--"}"									\
--"ORDER BY ?_key tracker:id(<%s>)"
-+"}"
- 
- #define CONTACTS_OTHER_QUERY_FROM_URI					\
- 	"SELECT fn:concat(\"TYPE_OTHER\", \"\31\", nco:phoneNumber(?t))"\
-@@ -1926,8 +1924,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
- 
- 	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0)
- 		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
--						id, id, id, id, id, id, id, id,
--						id, id);
-+					id, id, id, id, id, id, id, id, id);
- 	else
- 		query = g_strdup_printf(CONTACTS_OTHER_QUERY_FROM_URI,
- 								id, id, id);
--- 
-1.6.3.3
+On Wed, Jan 26, 2011, pavan.savoy@gmail.com wrote:
+> From: Pavan Savoy <pavan_savoy@sify.com>
+> 
+> remove sending of the scan disable command when the
+> device is being powered off.
+> 
+> Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
+> ---
+>  plugins/hciops.c |    5 -----
+>  1 files changed, 0 insertions(+), 5 deletions(-)
 
+Pushed upstream after I added some extra info to the commit message and
+removed the signed-off-by line (since we don't use that in user space).
+
+Johan
