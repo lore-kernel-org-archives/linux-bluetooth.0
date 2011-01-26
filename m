@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Jan 2011 14:46:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2 v2] Remove unnecessary ordering from single vCard
- query
-Message-ID: <20110126124648.GA11799@jh-x301>
-References: <1296045187-28072-1-git-send-email-michalski.raf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296045187-28072-1-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <20110126113608.GA9658@jh-x301>
+References: <1296040915-5519-1-git-send-email-pavan_savoy@sify.com>
+	<20110126113608.GA9658@jh-x301>
+Date: Wed, 26 Jan 2011 18:09:38 +0530
+Message-ID: <AANLkTimi44zSy2-1Z+A6RMtvj01NY-9_EeTxnWZFU=TQ@mail.gmail.com>
+Subject: Re: [PATCH] plugins: hciops: remove scan disable on poweroff
+From: Pavan Savoy <pavan_savoy@sify.com>
+To: pavan.savoy@gmail.com, linux-bluetooth@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@sify.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+On Wed, Jan 26, 2011 at 5:06 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Pavan,
+>
+> On Wed, Jan 26, 2011, pavan.savoy@gmail.com wrote:
+>> From: Pavan Savoy <pavan_savoy@sify.com>
+>>
+>> remove sending of the scan disable command when the
+>> device is being powered off.
+>>
+>> Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
+>> ---
+>>  plugins/hciops.c |    5 -----
+>>  1 files changed, 0 insertions(+), 5 deletions(-)
+>
+> Pushed upstream after I added some extra info to the commit message and
+> removed the signed-off-by line (since we don't use that in user space).
 
-On Wed, Jan 26, 2011, Rafal Michalski wrote:
-> Previously ordering for query called CONTACTS_QUERY_FROM_URI was applied.
-> It is not needed since always only one vCard (with id specified)
-> is fetched.
-> ---
->  plugins/phonebook-tracker.c |    9 +++------
->  1 files changed, 3 insertions(+), 6 deletions(-)
+Thanks Johan..
 
-Pushed upstream. Thanks.
-
-Johan
+> Johan
+>
