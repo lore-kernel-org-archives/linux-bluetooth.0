@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1295984785.2656.98.camel@ubuntuLab1>
-References: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
-	<1295984785.2656.98.camel@ubuntuLab1>
-Date: Wed, 26 Jan 2011 09:33:22 -0400
-Message-ID: <AANLkTi=4HoUKdda-GCrTQEtLSScuxB4D+btoRy+QsMG_@mail.gmail.com>
-Subject: Re: Read Characteristic Value vs. Read Long Characteristic Values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH 2/2 v3] Fix fetching non-empty single owner vCard
+Date: Wed, 26 Jan 2011 14:26:27 +0100
+Message-Id: <1296048387-2854-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jan 25, 2011 at 3:46 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> As far as test case coverage per the qualification test specification, I
-> do not believe that there is a problem.  Any non long "Reads" can be
-> tested by reading < 22 octet attributes, and long read tests by reading
->>= 22 octet attributes.
+Previously only empty owner vCard fetching was handled.
+This patch makes that fetching empty (by default) and non-empty
+(filled somehow by the user) single owner vCard is handled.
+---
+ plugins/phonebook-tracker.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-Now that you mentioned this topic, the issue that brought this thread
-is that there is a specific qualification test where PTS sends a 22
-bytes characteristic value, expecting a single Read Request to be
-sent, and it refuses to answer to any further Read Blob Requests (i.e.
-it does not send any response PDUs). This makes the client (e.g.
-igatttool) wait forever for a answer or timeout.
-
-Looks like more a PTS bug, but makes me wonder if it is not better for
-BlueZ to have separate procedures instead of this "automatic" usage of
-read blob request ?
-
-Regards,
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 4e37f1c..ceaef81 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1922,7 +1922,8 @@ void *phonebook_get_entry(const char *folder, const char *id,
+ 	data->cb = cb;
+ 	data->vcardentry = TRUE;
+ 
+-	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0)
++	if (g_str_has_prefix(id, CONTACT_ID_PREFIX) == TRUE ||
++				g_strcmp0(id, TRACKER_DEFAULT_CONTACT_ME) == 0)
+ 		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
+ 					id, id, id, id, id, id, id, id, id);
+ 	else
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.6.3.3
+
