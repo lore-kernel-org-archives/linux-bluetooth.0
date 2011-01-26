@@ -1,38 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH 1/2] Remove unnecessary ordering from single vCard query
-Date: Wed, 26 Jan 2011 12:01:04 +0100
-Message-Id: <1296039665-3948-1-git-send-email-michalski.raf@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <AANLkTikm4nn8Y-89U7Rzvyr+csLR-t2_6WOjQGe1J-2M@mail.gmail.com>
+References: <AANLkTinQdwaAQk6LU_uLJ60YFOthhuwu5rL2gzZUXZ-k@mail.gmail.com>
+	<AANLkTimUJoUmYorKNdNJPke_GJbAr6AK-ercNGr1uRRA@mail.gmail.com>
+	<AANLkTimxHnqd9hp_Uu9DCXokq2Zj0bBb-3aJqRXE_AdE@mail.gmail.com>
+	<20110125160830.GA14610@jh-x301>
+	<1295971902.1520.52.camel@aeonflux>
+	<AANLkTikm4nn8Y-89U7Rzvyr+csLR-t2_6WOjQGe1J-2M@mail.gmail.com>
+Date: Wed, 26 Jan 2011 16:21:41 +0530
+Message-ID: <AANLkTi=iqwxyN4u3XXGdzi0bam7EX_YdMHRP=mg90gn8@mail.gmail.com>
+Subject: Re: why scan_disable during hciops_power_off
+From: Pavan Savoy <pavan_savoy@sify.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously ordering for query called CONTACTS_QUERY_FROM_URI was applied.
-It is not needed since always only one vCard (with id specified)
-is fetched.
----
- plugins/phonebook-tracker.c |    6 ++----
- 1 files changed, 2 insertions(+), 4 deletions(-)
+On Tue, Jan 25, 2011 at 9:47 PM, Pavan Savoy <pavan_savoy@sify.com> wrote:
+> On Tue, Jan 25, 2011 at 9:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Johan,
+>>
+>>> > >> 1. are there controllers there which even after doing hci0 down,
+>>> > >> allows other devices to be scanned?
+>>> > >> for those what do hci0 down mean ? radio not switched off ?
+>>> > >
+>>> > > Good point, perhaps this is driver dependent, so we do it just be safe guard.
+>>> >
+>>> > I hope all devices and drivers out there consider the hci0 down as the
+>>> > radio OFF,
+>>> > I don't think there is a reason for it to be otherwise....
+>>> > so why the safe-guard ?
+>>>
+>>> IIRC Marcel added this due to paranoia with the non-connectable GAP test
+>>> case with the BITE tester. The test kept failing even though the device
+>>> was in DOWN state.
+>>
+>> we also had the case where we considered non-connectable as off when the
+>> HCI devdown was not working properly. However this is a long time ago
+>> and has been fixed properly. So we might can remove this now.
+>
+> Oo...
+> I want to send the patch, I want to send the patch ..
+> Can I please .....
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index e60cf74..aee159c 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -788,11 +788,9 @@
- "\"NOTACALL\" \"false\" \"false\" "					\
- "<%s> "									\
- "WHERE {"								\
--"	<%s> a nco:PersonContact ;"					\
--"	nco:nameFamily ?_key ."						\
-+"	<%s> a nco:PersonContact ."					\
- "	OPTIONAL {<%s> nco:hasAffiliation ?_role .}"			\
--"}"									\
--"ORDER BY ?_key tracker:id(<%s>)"
-+"}"
- 
- #define CONTACTS_OTHER_QUERY_FROM_URI					\
- 	"SELECT fn:concat(\"TYPE_OTHER\", \"\31\", nco:phoneNumber(?t))"\
--- 
-1.6.3.3
+i've posted the patch..
 
+>
+>> Regards
+>>
+>> Marcel
+>>
+>>
+>>
+>
