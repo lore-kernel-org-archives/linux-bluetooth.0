@@ -1,39 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Jan 2011 15:09:55 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: Do not use assignments in IF conditions
-Message-ID: <20110126170955.GA27017@joana>
-References: <1294759220-5002-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1294759220-5002-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1294759220-5002-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <AANLkTi=gZQ2Ps2yoXT7+08E3AruB5pAAy+ib+wBcQY4S@mail.gmail.com>
+References: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
+	<1295984785.2656.98.camel@ubuntuLab1>
+	<AANLkTi=4HoUKdda-GCrTQEtLSScuxB4D+btoRy+QsMG_@mail.gmail.com>
+	<AANLkTi=gZQ2Ps2yoXT7+08E3AruB5pAAy+ib+wBcQY4S@mail.gmail.com>
+Date: Wed, 26 Jan 2011 10:54:15 -0400
+Message-ID: <AANLkTik-rGVEPwPOO8iV8SM0JUTdEHMFoJvFGnRGTRc5@mail.gmail.com>
+Subject: Re: Read Characteristic Value vs. Read Long Characteristic Values
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Brian,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-01-11 17:20:20 +0200]:
+On Wed, Jan 26, 2011 at 9:58 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> On Wed, Jan 26, 2011 at 9:33 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Looks like more a PTS bug, but makes me wonder if it is not better for
+>> BlueZ to have separate procedures instead of this "automatic" usage of
+>> read blob request ?
+>
+> BTW, the test which presented this issue with sending spurious read
+> blob request is named "Read Characteristic Descriptors – by client". I
+> also can see that the behavior you implemented satisfies both "Read
+> Long Characteristic Value - by client" and "Read Long Characteristic
+> Descriptor - by client" tests. All theses tests come from the GATT TS
+> document.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> 
-> Fix checkpatch warnings concerning assignments in if conditions.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/af_bluetooth.c |    6 ++++--
->  net/bluetooth/cmtp/capi.c    |    3 ++-
->  net/bluetooth/cmtp/core.c    |    9 ++++++---
->  net/bluetooth/hci_core.c     |   12 +++++++++---
->  net/bluetooth/hci_event.c    |   22 ++++++++++++++--------
->  net/bluetooth/hidp/core.c    |    9 ++++++---
->  net/bluetooth/l2cap.c        |    5 ++++-
->  7 files changed, 45 insertions(+), 21 deletions(-)
+Another update... Test "Read Long Characteristic Value – Invalid
+handle" expects a Read Blob request specifically. The only way I see
+to satisfy it is to provide a separate "read long characteristic
+value" procedure separate from the "read characteristic value". Any
+other ideas?
 
-Patch has been applied. Thanks.
-
+Regards,
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Anderson Lizardo
+OpenBossa Labs - INdT
+Manaus - Brazil
