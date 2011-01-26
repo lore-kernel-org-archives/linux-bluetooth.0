@@ -1,50 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1296039665-3948-2-git-send-email-michalski.raf@gmail.com>
-References: <1296039665-3948-1-git-send-email-michalski.raf@gmail.com>
-	<1296039665-3948-2-git-send-email-michalski.raf@gmail.com>
-Date: Wed, 26 Jan 2011 13:19:43 +0200
-Message-ID: <AANLkTik4Rt-XPkiaFucaVp1aEQsgs6ND0WQzi7J-Pn+M@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Fix fetching non-empty single owner vCard
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
+Date: Wed, 26 Jan 2011 13:16:17 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] plugins: hciops: remove scan disable on poweroff
+Message-ID: <20110126111617.GA31721@jh-x301>
+References: <1295973136-30908-1-git-send-email-pavan_savoy@sify.com>
+ <AANLkTinGAorqPagx_hLakiSoadbOQKv5OE4KBSa1fr5q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTinGAorqPagx_hLakiSoadbOQKv5OE4KBSa1fr5q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Pavan,
 
-On Wed, Jan 26, 2011 at 1:01 PM, Rafal Michalski
-<michalski.raf@gmail.com> wrote:
-> Previously only empty owner vCard fetching was handled.
-> This patch makes that fetching empty (by default) and non-empty
-> (filled somehow by the user) single owner vCard is handled.
+On Tue, Jan 25, 2011, Pavan Savoy wrote:
+> From: Pavan Savoy <pavan_savoy@sify.com>
+> 
+> remove sending of the scan disable command when the
+> device is being powered off.
+> 
+> Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
 > ---
->  plugins/phonebook-tracker.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
->
-> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-> index aee159c..8fe8ade 100644
-> --- a/plugins/phonebook-tracker.c
-> +++ b/plugins/phonebook-tracker.c
-> @@ -1922,7 +1922,9 @@ void *phonebook_get_entry(const char *folder, const char *id,
->        data->cb = cb;
->        data->vcardentry = TRUE;
->
-> -       if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0)
-> +       if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0 ||
-> +               strncmp(id, TRACKER_DEFAULT_CONTACT_ME,
-> +               strlen(TRACKER_DEFAULT_CONTACT_ME)) == 0)
->                query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
->                                                id, id, id, id, id, id, id, id,
->                                                id, id);
+>  plugins/hciops.c |    5 -----
+>  1 files changed, 0 insertions(+), 5 deletions(-)
 
-The strncmp combine with strlen looks like it could be replaced by
-g_str_has_prefix, also the code that you are adding it probably need
-to be a full match not just the prefix than use g_strcmp0 otherwise
-g_str_has_prefix can probably be used there too.
+The patch seems to be corrupted (looks like the whitespace is messed
+up):
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Applying: plugins: hciops: remove scan disable on poweroff
+fatal: corrupt patch at line 10
+Patch failed at 0001 plugins: hciops: remove scan disable on poweroff
+
+Could you try re-sending it e.g. with git send-email?
+
+Johan
