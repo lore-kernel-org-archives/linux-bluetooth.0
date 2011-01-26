@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110126113608.GA9658@jh-x301>
-References: <1296040915-5519-1-git-send-email-pavan_savoy@sify.com>
-	<20110126113608.GA9658@jh-x301>
-Date: Wed, 26 Jan 2011 18:09:38 +0530
-Message-ID: <AANLkTimi44zSy2-1Z+A6RMtvj01NY-9_EeTxnWZFU=TQ@mail.gmail.com>
-Subject: Re: [PATCH] plugins: hciops: remove scan disable on poweroff
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: pavan.savoy@gmail.com, linux-bluetooth@vger.kernel.org,
-	Pavan Savoy <pavan_savoy@sify.com>
-Content-Type: text/plain; charset=UTF-8
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH 2/2 v2] Fix fetching non-empty single owner vCard
+Date: Wed, 26 Jan 2011 13:33:07 +0100
+Message-Id: <1296045187-28072-2-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1296045187-28072-1-git-send-email-michalski.raf@gmail.com>
+References: <1296045187-28072-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jan 26, 2011 at 5:06 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Pavan,
->
-> On Wed, Jan 26, 2011, pavan.savoy@gmail.com wrote:
->> From: Pavan Savoy <pavan_savoy@sify.com>
->>
->> remove sending of the scan disable command when the
->> device is being powered off.
->>
->> Signed-off-by: Pavan Savoy <pavan_savoy@sify.com>
->> ---
->>  plugins/hciops.c |    5 -----
->>  1 files changed, 0 insertions(+), 5 deletions(-)
->
-> Pushed upstream after I added some extra info to the commit message and
-> removed the signed-off-by line (since we don't use that in user space).
+Previously only empty owner vCard fetching was handled.
+This patch makes that fetching empty (by default) and non-empty
+(filled somehow by the user) single owner vCard is handled.
+---
+ plugins/phonebook-tracker.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-Thanks Johan..
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 4e37f1c..353b5cb 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1922,7 +1922,8 @@ void *phonebook_get_entry(const char *folder, const char *id,
+ 	data->cb = cb;
+ 	data->vcardentry = TRUE;
+ 
+-	if (strncmp(id, CONTACT_ID_PREFIX, strlen(CONTACT_ID_PREFIX)) == 0)
++	if (g_str_has_prefix(id, CONTACT_ID_PREFIX) == TRUE ||
++		g_strcmp0(id, TRACKER_DEFAULT_CONTACT_ME) == 0)
+ 		query = g_strdup_printf(CONTACTS_QUERY_FROM_URI, id, id, id, id,
+ 					id, id, id, id, id, id, id, id, id);
+ 	else
+-- 
+1.6.3.3
 
-> Johan
->
