@@ -1,45 +1,260 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=gZQ2Ps2yoXT7+08E3AruB5pAAy+ib+wBcQY4S@mail.gmail.com>
-References: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
-	<1295984785.2656.98.camel@ubuntuLab1>
-	<AANLkTi=4HoUKdda-GCrTQEtLSScuxB4D+btoRy+QsMG_@mail.gmail.com>
-	<AANLkTi=gZQ2Ps2yoXT7+08E3AruB5pAAy+ib+wBcQY4S@mail.gmail.com>
-Date: Wed, 26 Jan 2011 10:54:15 -0400
-Message-ID: <AANLkTik-rGVEPwPOO8iV8SM0JUTdEHMFoJvFGnRGTRc5@mail.gmail.com>
-Subject: Re: Read Characteristic Value vs. Read Long Characteristic Values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+Date: Wed, 26 Jan 2011 12:34:02 -0200
+Message-ID: <AANLkTimqtWzKS4H+veJE2PCXH0o5CLJwrspMTfQyd=AR@mail.gmail.com>
+Subject: [RFC 1/1] Device initialization and controller type resolving
+From: =?UTF-8?Q?Andr=C3=A9_Dieb?= <andre.dieb@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+From: Andr√© Dieb Martins <andre.dieb@signove.com>
 
-On Wed, Jan 26, 2011 at 9:58 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> On Wed, Jan 26, 2011 at 9:33 AM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->> Looks like more a PTS bug, but makes me wonder if it is not better for
->> BlueZ to have separate procedures instead of this "automatic" usage of
->> read blob request ?
->
-> BTW, the test which presented this issue with sending spurious read
-> blob request is named "Read Characteristic Descriptors ñ by client". I
-> also can see that the behavior you implemented satisfies both "Read
-> Long Characteristic Value - by client" and "Read Long Characteristic
-> Descriptor - by client" tests. All theses tests come from the GATT TS
-> document.
+This patch proposes to use LMP features in order to resolve the controller
+type. Currently there's very few code (mostly inside drivers) that cares
+about differentiating controller types (BR/EDR, BR/EDR/LE, LE only, AMP).
 
-Another update... Test "Read Long Characteristic Value ñ Invalid
-handle" expects a Read Blob request specifically. The only way I see
-to satisfy it is to provide a separate "read long characteristic
-value" procedure separate from the "read characteristic value". Any
-other ideas?
+Once determined dev_type, the idea would be to implement controller-type
+specific initialization procedures. There's an initialization code for BR/EDR
+devices and some early adaptation for BR/EDR/LE, but nothing regarding
+LE-only - and I'm willing to tackle that, based on your pointers.
 
-Regards,
+Would it be better to always let drivers modify their device's dev_type?
+
+What would be the correct approach?
+
+PS: Please don't bother the CC2540 hack. Consider it a joke :-).
+
+Signed-off-by: Andr√© Dieb Martins <andre.dieb@signove.com>
+---
+ include/net/bluetooth/hci.h      |   78 ++++++++++++++++++++++++++++++-------
+ include/net/bluetooth/hci_core.h |    3 +
+ net/bluetooth/hci_core.c         |    8 ++--
+ net/bluetooth/hci_event.c        |   24 ++++++++++++
+ net/bluetooth/hci_sysfs.c        |    4 ++
+ 5 files changed, 98 insertions(+), 19 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 036fdae..ae9f095 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -55,6 +55,8 @@
+ /* HCI controller types */
+ #define HCI_BREDR	0x00
+ #define HCI_AMP		0x01
++#define HCI_BREDRLE 0x02
++#define HCI_LE 		0x03
+
+ /* HCI device quirks */
+ enum {
+@@ -163,6 +165,8 @@ enum {
+ #define LE_LINK		0x80
+
+ /* LMP features */
++
++/* byte 0 */
+ #define LMP_3SLOT	0x01
+ #define LMP_5SLOT	0x02
+ #define LMP_ENCRYPT	0x04
+@@ -172,6 +176,7 @@ enum {
+ #define LMP_HOLD	0x40
+ #define LMP_SNIFF	0x80
+
++/* byte 1 */
+ #define LMP_PARK	0x01
+ #define LMP_RSSI	0x02
+ #define LMP_QUALITY	0x04
+@@ -181,22 +186,65 @@ enum {
+ #define LMP_ULAW	0x40
+ #define LMP_ALAW	0x80
+
+-#define LMP_CVSD	0x01
+-#define LMP_PSCHEME	0x02
++/* byte 2 */
++#define LMP_CVSD		0x01
++#define LMP_PSCHEME		0x02
+ #define LMP_PCONTROL	0x04
+-
+-#define LMP_ESCO	0x80
+-
+-#define LMP_EV4		0x01
+-#define LMP_EV5		0x02
+-#define LMP_LE		0x40
+-
+-#define LMP_SNIFF_SUBR	0x02
+-#define LMP_EDR_ESCO_2M	0x20
+-#define LMP_EDR_ESCO_3M	0x40
+-#define LMP_EDR_3S_ESCO	0x80
+-
+-#define LMP_SIMPLE_PAIR	0x08
++#define LMP_TSYNC 		0x08
++#define LMP_FLOWLAGLSB  0x10
++#define LMP_FLOWLAGMB	0x20
++#define LMP_FLOWLAGMSB 	0x40
++#define LMP_BROADCAST_ENCRYPTION 0x80
++
++/* byte 3 */
++// 0x01 reserved
++#define LMP_ENHANCED_DATA_RATE_2MBPS 0x02
++#define LMP_ENHANCED_DATA_RATE_3MBPS 0x04
++#define LMP_ENHANCED_INQUIRY_SCAN	0x08
++#define LMP_INTERLACED_INQUIRY_SCAN	0x10
++#define LMP_INTERLACED_PAGE_SCAN	0x20
++#define LMP_RSSI_WITH_INQUIRY_RES 	0x40
++#define LMP_ESCO					0x80
++
++/* byte 4 */
++#define LMP_EV4					0x01
++#define LMP_EV5					0x02
++// 0x04 reserved
++#define LMP_AFH_CAPABLE_SLAVE 	0x08
++#define LMP_AFH_CLASSIF_SLAVE 	0x10
++#define LMP_NOT_BREDR 			0x20
++#define LMP_LE					0x40
++#define LMP_3EDR	 			0x80
++
++/* byte 5 */
++#define LMP_5EDR				0x01
++#define LMP_SNIFF_SUBR			0x02
++#define LMP_PAUSE_ENCRYP 		0x04
++#define LMP_AFH_CAPABLE_MASTER 	0x08
++#define LMP_AFH_CLASSIF_MASTER 	0x10
++#define LMP_EDR_ESCO_2M			0x20
++#define LMP_EDR_ESCO_3M			0x40
++#define LMP_EDR_3S_ESCO			0x80
++
++/* byte 6 */
++#define LMP_EXT_INQ_RESPONSE				0x01
++#define LMP_SIMUL_LE_BREDR_SAME_DEVICE 		0x02
++// 0x04 reserved for Core V4.0
++#define LMP_SIMPLE_PAIR						0x08
++#define LMP_ENCAPSULATED_PDU 				0x10
++#define LMP_ERR_DATA_REPORT 				0x20
++#define LMP_NONFLUSH_PACKET_BOUNDARY_FLAG 	0x40
++// 0x80 reserved for Core V4.0
++
++/* byte 7 */
++#define LMP_LINK_SUPERVISION_TIMEOUT_CHANGED_EVENT 	0x01
++#define LMP_INQ_TX_POWER_LEVEL 					 	0x02
++#define LMP_ENHANCED_POWER_CONTROL 					0x04
++// 0x08 reserved
++// 0x10 reserved
++// 0x20 reserved
++// 0x40 reserved
++// 0x80 reserved
+
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cfbe56c..9a86281 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -480,7 +480,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_sniffsubr_capable(dev) ((dev)->features[5] & LMP_SNIFF_SUBR)
+ #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+ #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
++
+ #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
++#define lmp_bredr_unsupported(dev)   ((dev)->features[4] & LMP_NOT_BREDR)
++#define lmp_le_only(dev)		   (lmp_le_capable(dev) &&
+lmp_bredr_unsupported(dev))
+
+ /* ----- HCI protocols ----- */
+ struct hci_proto {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0e98ffb..b110114 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -259,6 +259,8 @@ static void hci_le_init_req(struct hci_dev *hdev,
+unsigned long opt)
+ {
+ 	BT_DBG("%s", hdev->name);
+
++	BT_INFO("%s LE-specific initialization", hdev->name);
++
+ 	/* Read LE buffer size */
+ 	hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
+ }
+@@ -501,10 +503,6 @@ int hci_dev_open(__u16 dev)
+ 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
+ 		set_bit(HCI_RAW, &hdev->flags);
+
+-	/* Treat all non BR/EDR controllers as raw devices for now */
+-	if (hdev->dev_type != HCI_BREDR)
+-		set_bit(HCI_RAW, &hdev->flags);
+-
+ 	if (hdev->open(hdev)) {
+ 		ret = -EIO;
+ 		goto done;
+@@ -514,6 +512,8 @@ int hci_dev_open(__u16 dev)
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		set_bit(HCI_INIT, &hdev->flags);
+
++		BT_INFO("Initializing %s", hdev->name);
++
+ 		//__hci_request(hdev, hci_reset_req, 0, HZ);
+ 		ret = __hci_request(hdev, hci_init_req, 0,
+ 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 57560fb..18932a2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -445,6 +445,16 @@ static void hci_cc_read_local_commands(struct
+hci_dev *hdev, struct sk_buff *skb
+ 	memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
+ }
+
++#define is_texas_dongle(hdev) \
++	(hdev->features[0] == 0x00 && \
++	 hdev->features[1] == 0x00 && \
++	 hdev->features[2] == 0x00 && \
++	 hdev->features[3] == 0x60 && \
++	 hdev->features[4] == 0x00 && \
++	 hdev->features[5] == 0x00 && \
++	 hdev->features[6] == 0x00 && \
++	 hdev->features[7] == 0x00)
++
+ static void hci_cc_read_local_features(struct hci_dev *hdev, struct
+sk_buff *skb)
+ {
+ 	struct hci_rp_read_local_features *rp = (void *) skb->data;
+@@ -498,6 +508,20 @@ static void hci_cc_read_local_features(struct
+hci_dev *hdev, struct sk_buff *skb
+ 					hdev->features[2], hdev->features[3],
+ 					hdev->features[4], hdev->features[5],
+ 					hdev->features[6], hdev->features[7]);
++
++	/* Fix features endianess bug on CC2540 firmware */
++	if (is_texas_dongle(hdev)) {
++		hdev->features[3] = 0x00;
++		hdev->features[4] = 0x60;
++	}
++
++	if (lmp_le_capable(hdev) && lmp_bredr_unsupported(hdev)) {
++		hdev->dev_type = HCI_LE;
++		BT_INFO("%s is a LE-only controller", hdev->name);
++	} else if (lmp_le_capable(hdev)) {
++		hdev->dev_type = HCI_BREDRLE;
++		BT_INFO("%s is a BR/EDR/LE controller", hdev->name);
++	}
+ }
+
+ static void hci_cc_read_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 5fce3d6..5846297 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -196,6 +196,10 @@ static inline char *host_typetostr(int type)
+ 		return "BR/EDR";
+ 	case HCI_AMP:
+ 		return "AMP";
++	case HCI_BREDRLE:
++		return "BR/EDR/LE";
++	case HCI_LE:
++		return "LE";
+ 	default:
+ 		return "UNKNOWN";
+ 	}
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.6.1
