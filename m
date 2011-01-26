@@ -1,51 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Jan 2011 15:37:14 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 26 Jan 2011 15:30:01 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: =?iso-8859-1?Q?Andr=E9?= Dieb <andre.dieb@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/1] Device initialization and controller type resolving
-Message-ID: <20110126173714.GF27017@joana>
-References: <AANLkTimqtWzKS4H+veJE2PCXH0o5CLJwrspMTfQyd=AR@mail.gmail.com>
+To: "Cho, Yu-Chen" <acho@novell.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jlee@novell.com
+Subject: Re: [PATCH] add Atheros BT AR9285 fw supported
+Message-ID: <20110126173001.GE27017@joana>
+References: <edc8dae4f78c3c93397e1bd34a7e2337c4aaeb88.1296032839.git.acho@novell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimqtWzKS4H+veJE2PCXH0o5CLJwrspMTfQyd=AR@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <edc8dae4f78c3c93397e1bd34a7e2337c4aaeb88.1296032839.git.acho@novell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi André,
+Hi Cho,
 
-* André Dieb <andre.dieb@signove.com> [2011-01-26 12:34:02 -0200]:
+* Cho, Yu-Chen <acho@novell.com> [2011-01-26 17:10:59 +0800]:
 
-> From: André Dieb Martins <andre.dieb@signove.com>
+> Add the btusb.c blacklist [03f0:311d] for Atheros AR9285 Malbec BT
+> and add to ath3k.c ath3-1.fw (md5:1211fa34c09e10ba48381586b7c3883d)
+> supported this device.
 > 
-> This patch proposes to use LMP features in order to resolve the controller
-> type. Currently there's very few code (mostly inside drivers) that cares
-> about differentiating controller types (BR/EDR, BR/EDR/LE, LE only, AMP).
-> 
-> Once determined dev_type, the idea would be to implement controller-type
-> specific initialization procedures. There's an initialization code for BR/EDR
-> devices and some early adaptation for BR/EDR/LE, but nothing regarding
-> LE-only - and I'm willing to tackle that, based on your pointers.
-> 
-> Would it be better to always let drivers modify their device's dev_type?
-> 
-> What would be the correct approach?
-> 
-> PS: Please don't bother the CC2540 hack. Consider it a joke :-).
-> 
-> Signed-off-by: André Dieb Martins <andre.dieb@signove.com>
+> Signed-off-by: Cho, Yu-Chen <acho@novell.com>
 > ---
->  include/net/bluetooth/hci.h      |   78 ++++++++++++++++++++++++++++++-------
->  include/net/bluetooth/hci_core.h |    3 +
->  net/bluetooth/hci_core.c         |    8 ++--
->  net/bluetooth/hci_event.c        |   24 ++++++++++++
->  net/bluetooth/hci_sysfs.c        |    4 ++
->  5 files changed, 98 insertions(+), 19 deletions(-)
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    3 +++
+>  2 files changed, 5 insertions(+), 0 deletions(-)
 
-
-Please rebase your patch against bluetooth-next-2.6. And run your patch
-against the scripts/checkpatch.pl, it does not follow the styles requirements
-for the Linux Kernel.
+applied. Thanks.
 
 -- 
 Gustavo F. Padovan
