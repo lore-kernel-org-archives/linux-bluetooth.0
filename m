@@ -1,98 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Apple Message framework v1082)
-Subject: Re: [PATCH v2] HDP: reject MDL reconnection with different MTU
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <1295005808-9885-1-git-send-email-epx@signove.com>
-Date: Thu, 27 Jan 2011 16:55:25 -0200
-Message-Id: <9266DF8F-2630-4001-827D-00A000922472@signove.com>
-References: <1295005808-9885-1-git-send-email-epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
+Date: Thu, 27 Jan 2011 14:03:15 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: "ext tim.bao@gmail.com" <tim.bao@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Set connection state to BT_DISCONN to avoid multiple
+ responses
+Message-ID: <20110127160315.GA2163@joana>
+References: <1296091276-2238-1-git-send-email-tim.bao@gmail.com>
+ <20110127074034.GI874@null>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110127074034.GI874@null>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just to remember that this one's still in the line:
+Hi Ville,
 
-On 14 Jan 2011, at 09:50 , Elvis Pfützenreuter wrote:
+* Ville Tervo <ville.tervo@nokia.com> [2011-01-27 09:40:34 +0200]:
 
-> From: Elvis Pfutzenreuter <epx@signove.com>
+> Hi,
 > 
-> This patch implements refusal of a MDL reconnection if the new L2CAP
-> connection presents a different MTU. Accordingly to HDP spec. item 3.5.
+> On Thu, Jan 27, 2011 at 09:21:16AM +0800, ext tim.bao@gmail.com wrote:
+> > From: Bao Liang <tim.bao@gmail.com>
+> > 
+> > This patch fixes a minor issue that two connection responses will be sent
+> > for one L2CAP connection request. If the L2CAP connection request is first
+> > blocked due to security reason and responded with reason "security block",
+> > the state of the connection remains BT_CONNECT2. If a pairing procedure
+> > completes successfully before the ACL connection is down, local host will
+> > send another connection complete response. See the following packets
+> > captured by hcidump.
+> > 
+> > 2010-12-07 22:21:24.928096 < ACL data: handle 12 flags 0x00 dlen 16
+> >     0000: 0c 00 01 00 03 19 08 00  41 00 53 00 03 00 00 00  ........A.S.....
+> > ... ...
+> > 
+> > 2010-12-07 22:21:35.791747 > HCI Event: Auth Complete (0x06) plen 3
+> >     status 0x00 handle 12
+> > ... ...
+> > 
+> > 2010-12-07 22:21:35.872372 > ACL data: handle 12 flags 0x02 dlen 16
+> >     L2CAP(s): Connect rsp: dcid 0x0054 scid 0x0040 result 0 status 0
+> >       Connection successful
+> > 
+> > Signed-off-by: Bao Liang <tim.bao@gmail.com>
+> > ---
+> >  net/bluetooth/l2cap.c |    5 +++--
+> >  1 files changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index fadf26b..40d70db 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -844,9 +844,10 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
+> >  			struct l2cap_conn_rsp rsp;
+> >  			__u16 result;
+> >  
+> > -			if (bt_sk(sk)->defer_setup)
+> > +			if (bt_sk(sk)->defer_setup) {
+> > +				sk->sk_state = BT_DISCONN;
+> >  				result = L2CAP_CR_SEC_BLOCK;
+> > -			else
+> > +			} else
+> >  				result = L2CAP_CR_BAD_PSM;
+> >  
+> >  			rsp.scid   = cpu_to_le16(l2cap_pi(sk)->dcid);
 > 
-> It aims to pass the TC_SNK_HCT_BV_07_C PTS test. (It does not pass yet
-> because PTS itself seems to have issues. See tickets 7212, 7214 and
-> 7244 for details.)
-> ---
-> health/hdp.c       |   21 +++++++++++++++++++--
-> health/hdp_types.h |    2 ++
-> 2 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/health/hdp.c b/health/hdp.c
-> index dc1f803..278db68 100644
-> --- a/health/hdp.c
-> +++ b/health/hdp.c
-> @@ -874,6 +874,7 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
-> 	GError *err = NULL;
-> 	GIOChannel *io;
-> 	uint8_t mode;
-> +	uint16_t imtu, omtu;
-> 	int fd;
-> 
-> 	fd = mcap_mdl_get_fd(chan->mdl);
-> @@ -883,6 +884,8 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
-> 
-> 	if (!bt_io_get(io, BT_IO_L2CAP, &err,
-> 			BT_IO_OPT_MODE, &mode,
-> +			BT_IO_OPT_IMTU, &imtu,
-> +			BT_IO_OPT_OMTU, &omtu,
-> 			BT_IO_OPT_INVALID)) {
-> 		error("Error: %s", err->message);
-> 		g_io_channel_unref(io);
-> @@ -894,13 +897,27 @@ static gboolean check_channel_conf(struct hdp_channel *chan)
-> 
-> 	switch (chan->config) {
-> 	case HDP_RELIABLE_DC:
-> -		return mode == L2CAP_MODE_ERTM;
-> +		if (mode != L2CAP_MODE_ERTM)
-> +			return FALSE;
-> +		break;
-> 	case HDP_STREAMING_DC:
-> -		return mode == L2CAP_MODE_STREAMING;
-> +		if (mode != L2CAP_MODE_STREAMING)
-> +			return FALSE;
-> +		break;
-> 	default:
-> 		error("Error: Connected with unknown configuration");
-> 		return FALSE;
-> 	}
-> +
-> +	DBG("MDL imtu %d omtu %d Channel imtu %d omtu %d", imtu, omtu,
-> +						chan->imtu, chan->omtu);
-> +
-> +	if (!chan->imtu)
-> +		chan->imtu = imtu;
-> +	if (!chan->omtu)
-> +		chan->omtu = omtu;
-> +
-> +	return chan->imtu == imtu && chan->omtu == omtu;
-> }
-> 
-> static void hdp_mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
-> diff --git a/health/hdp_types.h b/health/hdp_types.h
-> index fffdb32..7d23293 100644
-> --- a/health/hdp_types.h
-> +++ b/health/hdp_types.h
-> @@ -120,6 +120,8 @@ struct hdp_channel {
-> 	uint8_t			config;		/* Channel configuration */
-> 	uint8_t			mdep;		/* Remote MDEP */
-> 	uint16_t		mdlid;		/* Data channel Id */
-> +	uint16_t		imtu;		/* Channel incoming MTU */
-> +	uint16_t		omtu;		/* Channel outgoing MTU */
-> 	struct hdp_echo_data	*edata;		/* private data used by echo channels */
-> 	gint			ref;		/* Reference counter */
-> };
-> -- 
-> 1.7.0.4
-> 
+> Shouldn't sk->sk_state be changed in all cases and not only when socket is
+> waiting for authorization?
 
+I agree with you here. It's better treat all cases. 
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
