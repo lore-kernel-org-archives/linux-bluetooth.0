@@ -1,38 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Inga Stotland" <ingas@codeaurora.org>
-To: "'Vinicius Costa Gomes'" <vinicius.gomes@openbossa.org>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <001c01cb931d$dc4cb3a0$94e61ae0$@org> <20101203220534.GA16709@eris> <1295895817.2656.26.camel@ubuntuLab1> <20110124213429.GA15121@piper>
-In-Reply-To: <20110124213429.GA15121@piper>
-Subject: GATT and D-Bus
-Date: Fri, 28 Jan 2011 15:19:22 -0800
-Message-ID: <000101cbbf41$cc0cee10$6426ca30$@org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 2/2] Add option to enable privacy during scanning to hcitool
+Date: Fri, 28 Jan 2011 19:33:37 -0300
+Message-Id: <1296254017-3381-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1296254017-3381-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1296254017-3381-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicus,
+When privacy is enabled, random address is used during active scanning.
+The non-resolvable private address shall be set using hciconfig.
+---
+ tools/hcitool.c |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
-Not sure who to ask, but it seems that you are the active contributor to the
-part of the code that I am interested in :)
-I am looking at using D-Bus to talk to GATT just over BR/EDR. The support
-for that seems to be partially there ( I am working off the current bluez
-tip). However, in the current code it does not seem possible to get GATT
-over D-Bus working if the device is not LE. Am I missing something here?
-Also, I can see that you were sending GATT patches upstream: "[PATCH 00/18]
-Making GATT a first class citizen", not all of them have been pushed
-through. Are you planning on re-submitting the changes?
-
-Thank you,
-
-Inga Stotland
-
-ingas@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-
-
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index d50adaf..536d407 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2349,25 +2349,30 @@ done:
+ 
+ static struct option lescan_options[] = {
+ 	{ "help",	0, 0, 'h' },
++	{ "privacy",	0, 0, 'p' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+ static const char *lescan_help =
+ 	"Usage:\n"
+-	"\tlescan\n";
++	"\tlescan [--privacy] enable privacy\n";
+ 
+ static void cmd_lescan(int dev_id, int argc, char **argv)
+ {
+ 	int err, opt, dd;
++	uint8_t own_type = 0x00;
+ 
+ 	for_each_opt(opt, lescan_options, NULL) {
+ 		switch (opt) {
++		case 'p':
++			own_type = 0x01; /* Random */
++			break;
+ 		default:
+ 			printf("%s", lescan_help);
+ 			return;
+ 		}
+ 	}
+-	helper_arg(0, 0, &argc, &argv, lescan_help);
++	helper_arg(0, 1, &argc, &argv, lescan_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2378,8 +2383,8 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ 		exit(1);
+ 	}
+ 
+-	err = hci_le_set_scan_parameters(dd, 0x01, htobs(0x0010), htobs(0x0010),
+-								0x00, 0x00);
++	err = hci_le_set_scan_parameters(dd, 0x01, htobs(0x0010),
++					htobs(0x0010), own_type, 0x00);
+ 	if (err < 0) {
+ 		perror("Set scan parameters failed");
+ 		exit(1);
+-- 
+1.7.4.rc2
 
