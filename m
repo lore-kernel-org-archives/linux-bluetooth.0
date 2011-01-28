@@ -1,60 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH] Bluetooth: Support SCO over HCI for Atheros AR300x Bluetooth device
-Date: Fri, 28 Jan 2011 16:19:04 +0530
-Message-ID: <1296211744-2487-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <000001cbbe58$982b5fd0$c8821f70$@org>
+References: <1295654876.1774.24.camel@ubuntuLab1>
+	<AANLkTi=gLKMvWuUeyjqGBQuWd5ztjjr10d44H4A1fFfZ@mail.gmail.com>
+	<000001cbbe58$982b5fd0$c8821f70$@org>
+Date: Fri, 28 Jan 2011 14:03:06 +0800
+Message-ID: <AANLkTinm=56sTExsyMgQSFkKCe5Ere8X4RY6aYxQugfS@mail.gmail.com>
+Subject: Re: Attribute Server and Client TODOs
+From: Erin Yueh <erinyueh@gmail.com>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: Brian Gix <bgix@codeaurora.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds SCO over HCI support to Atheros AR300x HCI transport
-driver.
+Hi Inga,
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- drivers/bluetooth/hci_ath.c |   18 +++++++++---------
- 1 files changed, 9 insertions(+), 9 deletions(-)
+On Fri, Jan 28, 2011 at 03:30, Inga Stotland <ingas@codeaurora.org> wrote:
+[...]
+> Thank you for your response about enabling GATT over D-Bus.
+> I was following the instructions from your notes.
+> However, when trying to test D-Bus operations for GATT, I cannot seem to get
+> org.bluez.Characteristic interface to register...
+> Have you been able to get GATT D-Bus interface to work just with BR/EDR (no LE)?
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index 6a160c1..161bd20 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -162,11 +162,6 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- {
- 	struct ath_struct *ath = hu->priv;
- 
--	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
--		kfree_skb(skb);
--		return 0;
--	}
--
- 	/*
- 	 * Update power management enable flag with parameters of
- 	 * HCI sleep enable vendor specific HCI command.
-@@ -183,10 +178,15 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
- 
--	skb_queue_tail(&ath->txq, skb);
--	set_bit(HCI_UART_SENDING, &hu->tx_state);
--
--	schedule_work(&ath->ctxtsw);
-+	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-+		skb_queue_head(&ath->txq, skb);
-+		clear_bit(HCI_UART_SENDING, &hu->tx_state);
-+		hci_uart_tx_wakeup(hu);
-+	} else {
-+		skb_queue_tail(&ath->txq, skb);
-+		set_bit(HCI_UART_SENDING, &hu->tx_state);
-+		schedule_work(&ath->ctxtsw);
-+	}
- 
- 	return 0;
- }
--- 
-1.7.0.4
+yup! I am able to use GATT related D-Bus interface to work with
+BR/EDR. In the beginning, back to Bluez release 4.80, we can trigger
+the discovering service when registering the client. Then it can store
+few files in /var/lib/bluetooth/BT_ADDR. When we start bluetooth
+daemon, it would register GATT D-Bus interface based on those files.
+If you'd like to see those D-Bus interface, you could rollback to
+release 4.80. You can use gatttoool to discover the primary service,
+and copy 'primary', 'attributes' and 'characteristic' files. Then you
+could use the latest Bluez, but move those files to the same folder.
+You should be able to see the GATT D-Bus interface.
 
+>
+> Thanks,
+>
+> Inga Stotland
+>
+> ingas@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+
+Regards,
+Erin Yueh
