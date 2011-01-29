@@ -1,52 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Liang Bao <tim.bao@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bao Liang <tim.bao@gmail.com>
-Subject: [PATCH] Set connection state to BT_DISCONN to avoid multiple responses
-Date: Sat, 29 Jan 2011 21:39:37 +0800
-Message-Id: <1296308377-2207-1-git-send-email-tim.bao@gmail.com>
+Date: Fri, 28 Jan 2011 21:07:52 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Inga Stotland <ingas@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: GATT and D-Bus
+Message-ID: <20110129000752.GA23931@piper>
+References: <001c01cb931d$dc4cb3a0$94e61ae0$@org>
+ <20101203220534.GA16709@eris>
+ <1295895817.2656.26.camel@ubuntuLab1>
+ <20110124213429.GA15121@piper>
+ <000101cbbf41$cc0cee10$6426ca30$@org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <000101cbbf41$cc0cee10$6426ca30$@org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bao Liang <tim.bao@gmail.com>
+Hi Inga,
 
-This patch fixes a minor issue that two connection responses will be sent
-for one L2CAP connection request. If the L2CAP connection request is first
-blocked due to security reason and responded with reason "security block",
-the state of the connection remains BT_CONNECT2. If a pairing procedure
-completes successfully before the ACL connection is down, local host will
-send another connection complete response. See the following packets
-captured by hcidump.
+On 15:19 Fri 28 Jan, Inga Stotland wrote:
+> Hi Vinicus,
+> 
+> Not sure who to ask, but it seems that you are the active contributor to the
+> part of the code that I am interested in :)
+> I am looking at using D-Bus to talk to GATT just over BR/EDR. The support
+> for that seems to be partially there ( I am working off the current bluez
+> tip). However, in the current code it does not seem possible to get GATT
+> over D-Bus working if the device is not LE. Am I missing something here?
+> Also, I can see that you were sending GATT patches upstream: "[PATCH 00/18]
+> Making GATT a first class citizen", not all of them have been pushed
+> through. Are you planning on re-submitting the changes?
 
-2010-12-07 22:21:24.928096 < ACL data: handle 12 flags 0x00 dlen 16
-    0000: 0c 00 01 00 03 19 08 00  41 00 53 00 03 00 00 00  ........A.S.....
-... ...
+Those patches are already upstream, it was just that the "applied" message 
+came via IRC.
 
-2010-12-07 22:21:35.791747 > HCI Event: Auth Complete (0x06) plen 3
-    status 0x00 handle 12
-... ...
+What is missing for the BR/EDR case is that we need to trigger GATT Service
+Discovery after the SDP Browse, if the Device has the GATT Service Record.
 
-2010-12-07 22:21:35.872372 > ACL data: handle 12 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0054 scid 0x0040 result 0 status 0
-      Connection successful
+SMP is still taking a lot of my time, that I didn't have the time to go back
+and solve this issue, but it is still on the top of my todo list ;-)
 
-Signed-off-by: Liang Bao <tim.bao@gmail.com>
----
- net/bluetooth/l2cap.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> Thank you,
+> 
+> Inga Stotland
+> 
+> ingas@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> 
+> 
+> 
+> 
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index fadf26b..364197d 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -848,6 +848,7 @@ static void __l2cap_sock_close(struct sock *sk, int reason)
- 				result = L2CAP_CR_SEC_BLOCK;
- 			else
- 				result = L2CAP_CR_BAD_PSM;
-+			sk->sk_state = BT_DISCONN;
- 
- 			rsp.scid   = cpu_to_le16(l2cap_pi(sk)->dcid);
- 			rsp.dcid   = cpu_to_le16(l2cap_pi(sk)->scid);
+Cheers,
 -- 
-1.7.1
-
+Vinicius
