@@ -1,72 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [RFC] Bluetooth: process received S-frames when socket is locked by user process
-Date: Mon, 31 Jan 2011 18:42:51 +0530
-Message-ID: <1296479571-2971-1-git-send-email-suraj@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Fix creating device object when device disconnects
+Date: Mon, 31 Jan 2011 14:56:36 +0200
+Message-Id: <1296478596-18269-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1296478596-18269-1-git-send-email-luiz.dentz@gmail.com>
+References: <1296478596-18269-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch lets L2CAP process received S-frames even when socket is
-continuously being locked by user process.
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-This issue was seen when testing with l2test without using "-D" option.
-
-Since the user process does not expect any Rx packets,
-it hogs the socket with continuous call to "send()".
-
-When the TxWindow is full Tx stops untill the I-frames are acked by the receiver.
-
-But the Rx S-Frame acknowleding the Tx frames will stay in the backlog queue
-because the "sock_owned_by_user()" call in l2cap_data_channel()
-will always return true.
-
-The user process does not have an idea about this
-mechanism and keep pumping data and locking the socket and cause a deadlock.
-
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+If object doesn't exist the device is not permanent so there is no need
+to create a new object just to handle disconnect event.
 ---
- net/bluetooth/l2cap.c |   16 ++++++++++------
- 1 files changed, 10 insertions(+), 6 deletions(-)
+ src/event.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 1761558..dc22291 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4336,6 +4336,15 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
- 	int len, next_tx_seq_offset, req_seq_offset;
+diff --git a/src/event.c b/src/event.c
+index 166e401..5060e84 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -692,7 +692,7 @@ void btd_event_disconn_complete(bdaddr_t *local, bdaddr_t *peer)
  
- 	control = get_unaligned_le16(skb->data);
-+
-+	if (sock_owned_by_user(sk)) {
-+		if (__is_iframe(control)) {
-+			if (sk_add_backlog(sk, skb))
-+				goto drop;
-+
-+			return 0;
-+		}
-+	}
- 	skb_pull(skb, 2);
- 	len = skb->len;
+ 	DBG("");
  
-@@ -4434,12 +4443,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 		break;
+-	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
++	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
+ 		return;
  
- 	case L2CAP_MODE_ERTM:
--		if (!sock_owned_by_user(sk)) {
--			l2cap_ertm_data_rcv(sk, skb);
--		} else {
--			if (sk_add_backlog(sk, skb))
--				goto drop;
--		}
-+		l2cap_ertm_data_rcv(sk, skb);
- 
- 		goto done;
- 
+ 	adapter_remove_connection(adapter, device);
 -- 
-1.7.0.4
+1.7.1
 
