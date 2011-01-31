@@ -1,37 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D46F155.6090709@Atheros.com>
-Date: Mon, 31 Jan 2011 22:58:53 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: Suraj Sumangala <Suraj.Sumangala@Atheros.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-Subject: Re: [PATCH] Bluetooth: Support SCO over HCI for Atheros AR300x Bluetooth
- device
-References: <1296211744-2487-1-git-send-email-suraj@atheros.com>
-In-Reply-To: <1296211744-2487-1-git-send-email-suraj@atheros.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 1/6 v2] Include check to readline lib on acinlude.m4
+Date: Mon, 31 Jan 2011 14:23:46 -0300
+Message-Id: <1296494626-26949-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1296155342-31956-1-git-send-email-sheldon.demario@openbossa.org>
+References: <1296155342-31956-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ acinclude.m4 |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-On 1/28/2011 4:19 PM, Suraj Sumangala wrote:
-> This patch adds SCO over HCI support to Atheros AR300x HCI transport
-> driver.
->
-> Signed-off-by: Suraj Sumangala<suraj@atheros.com>
-> ---
->   drivers/bluetooth/hci_ath.c |   18 +++++++++---------
->   1 files changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> index 6a160c1..161bd20 100644
-> --- a/drivers/bluetooth/hci_ath.c
-> +++ b/drivers/bluetooth/hci_ath.c
-
-*ping*
-
-Regards
-Suraj
+diff --git a/acinclude.m4 b/acinclude.m4
+index ecf4b4b..517684c 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -153,6 +153,15 @@ AC_DEFUN([AC_PATH_SNDFILE], [
+ 	AC_SUBST(SNDFILE_LIBS)
+ ])
+ 
++AC_DEFUN([AC_PATH_READLINE], [
++	AC_CHECK_HEADER(readline/readline.h,
++		AC_CHECK_LIB(readline, main,
++			[ readline_found=yes
++			AC_SUBST(READLINE_LIBS, "-lreadline")
++			], readline_found=no),
++		[])
++])
++
+ AC_DEFUN([AC_PATH_OUI], [
+ 	AC_ARG_WITH(ouifile,
+ 		    AS_HELP_STRING([--with-ouifile=PATH],[Path to the oui.txt file @<:@auto@:>@]),
+@@ -356,6 +365,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(HAL, test "${hal_enable}" = "yes")
++	AM_CONDITIONAL(READLINE, test "${readline_found}" = "yes")
+ 	AM_CONDITIONAL(ATTRIBPLUGIN, test "${attrib_enable}" = "yes")
+ 	AM_CONDITIONAL(ECHOPLUGIN, test "no" = "yes")
+ 	AM_CONDITIONAL(PNATPLUGIN, test "${pnat_enable}" = "yes")
+-- 
+1.7.1
 
