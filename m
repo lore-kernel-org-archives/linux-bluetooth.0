@@ -1,47 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH 1/6 v2] Include check to readline lib on acinlude.m4
-Date: Mon, 31 Jan 2011 14:23:46 -0300
-Message-Id: <1296494626-26949-1-git-send-email-sheldon.demario@openbossa.org>
-In-Reply-To: <1296155342-31956-1-git-send-email-sheldon.demario@openbossa.org>
-References: <1296155342-31956-1-git-send-email-sheldon.demario@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <AANLkTinUQozBxDAUH4yKW93h6bEKy=WtWWwkJumYYYHA@mail.gmail.com>
+References: <1296254017-3381-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1296254017-3381-2-git-send-email-claudio.takahasi@openbossa.org>
+	<20110131084038.GB10034@jh-x301>
+	<AANLkTinUQozBxDAUH4yKW93h6bEKy=WtWWwkJumYYYHA@mail.gmail.com>
+Date: Mon, 31 Jan 2011 17:46:58 +0200
+Message-ID: <AANLkTimic7tgjGbsnzunHZN=KOu5kKoDzh45FfusKh=e@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Add option to enable privacy during scanning to hcitool
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- acinclude.m4 |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+Hi Claudio,
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index ecf4b4b..517684c 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -153,6 +153,15 @@ AC_DEFUN([AC_PATH_SNDFILE], [
- 	AC_SUBST(SNDFILE_LIBS)
- ])
- 
-+AC_DEFUN([AC_PATH_READLINE], [
-+	AC_CHECK_HEADER(readline/readline.h,
-+		AC_CHECK_LIB(readline, main,
-+			[ readline_found=yes
-+			AC_SUBST(READLINE_LIBS, "-lreadline")
-+			], readline_found=no),
-+		[])
-+])
-+
- AC_DEFUN([AC_PATH_OUI], [
- 	AC_ARG_WITH(ouifile,
- 		    AS_HELP_STRING([--with-ouifile=PATH],[Path to the oui.txt file @<:@auto@:>@]),
-@@ -356,6 +365,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
- 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
- 	AM_CONDITIONAL(HAL, test "${hal_enable}" = "yes")
-+	AM_CONDITIONAL(READLINE, test "${readline_found}" = "yes")
- 	AM_CONDITIONAL(ATTRIBPLUGIN, test "${attrib_enable}" = "yes")
- 	AM_CONDITIONAL(ECHOPLUGIN, test "no" = "yes")
- 	AM_CONDITIONAL(PNATPLUGIN, test "${pnat_enable}" = "yes")
+On Mon, Jan 31, 2011 at 3:50 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Mon, Jan 31, 2011 at 6:40 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Claudio,
+>>
+>> On Fri, Jan 28, 2011, Claudio Takahasi wrote:
+>>> When privacy is enabled, random address is used during active scanning.
+>>> The non-resolvable private address shall be set using hciconfig.
+>>> ---
+>>>  tools/hcitool.c |   13 +++++++++----
+>>>  1 files changed, 9 insertions(+), 4 deletions(-)
+>>
+>> Both patches have been pushed upstream. Thanks.
+>>
+>> Any plans how to represent this feature in the official APIs? I suppose
+>> the random address can be generated automatically using some appropriate
+>> source such as the HCI_LE_Rand command but how do we represent the
+>> public vs random address selection using the D-Bus API? Or do we even
+>> need to do that?
+>>
+>> Johan
+>>
+>
+> I added these changes to investigate the PTS  test result, it is not
+> mandatory. I am was planning to focus on Register Application API
+> first instead of privacy for central. The implementation is simple, if
+> someone in the community wants to help us, here are some guidelines:
+>
+> My idea is add a new property in the adapter interface called:
+> Privacy. The changes will be:
+> 1. Add Privacy property with persistent storage =>
+> adapter.SetProperty("Privacy", True/False)
+
+Can this be unset, I mean can a device really use a random/private and
+than latter switch to public? For what I understand if anyone pair
+using the random/private address they don't store the actual address
+but a key to resolve the address, so switching on runtime is IMO not a
+good idea, perhaps a parameter on main.conf is enough?
+
+Actually the spec say that there could be at least 3 types of random address:
+
+- Static
+- Private Non-resolvable
+- Private Resolvable
+
+> 2. Generate a non-resolvable private address. My suggestion is to read
+> the data directly from "/dev/random" instead of use HCI_LE_Rand
+> command(needs to wait for command complete).
+
+I remember someone saying that the controller should be able to
+generate a more random number because it uses the RF signal
+interference for that, but Im not sure if this is actually true or
+not, or if enough to give up the idea of using /dev/random.
+
+> 3. Trigger the LE scanning based on this property.
+>
+> PS: For LE Create Connection command the own address type must be set
+> based on privacy value, however this change requires changes in the
+> kernel. Currently, Own_Address_Type is hard-coded in the kernel(public
+> address only).
+
+Yep, we probably need to start by fixing this, it seems some device
+will already come with random addresses so it will be nice to have
+this fixed asap.
+
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
+Computer Engineer
