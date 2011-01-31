@@ -2,11 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Dieb Martins <andre.dieb@signove.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 2/2] Add missing const to utility functions.
-Date: Mon, 31 Jan 2011 16:09:32 -0300
-Message-Id: <1296500972-14105-2-git-send-email-andre.dieb@signove.com>
-In-Reply-To: <1296500972-14105-1-git-send-email-andre.dieb@signove.com>
-References: <1296500972-14105-1-git-send-email-andre.dieb@signove.com>
+Subject: [PATCH 1/2] Implement dump for event LE Read Remote Used Features Complete.
+Date: Mon, 31 Jan 2011 16:09:31 -0300
+Message-Id: <1296500972-14105-1-git-send-email-andre.dieb@signove.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,31 +13,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: André Dieb Martins <andre.dieb@signove.com>
 
 ---
- parser/hci.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ parser/hci.c |   23 +++++++++++++++++++++++
+ 1 files changed, 23 insertions(+), 0 deletions(-)
 
 diff --git a/parser/hci.c b/parser/hci.c
-index 8b45376..183fa66 100644
+index 6f9e2a3..8b45376 100644
 --- a/parser/hci.c
 +++ b/parser/hci.c
-@@ -704,7 +704,7 @@ static char *authentication2str(uint8_t authentication)
- 	}
+@@ -3546,6 +3546,26 @@ static inline void evt_le_conn_update_complete_dump(int level,
+ 			btohs(uevt->supervision_timeout) * 10.0);
  }
  
--static char *eventmask2str(uint8_t mask[8])
-+static char *eventmask2str(const uint8_t mask[8])
++static inline void evt_le_read_remote_used_features_complete_dump(int level, struct frame *frm)
++{
++	int i;
++	evt_le_read_remote_used_features_complete *revt = frm->ptr;
++
++	p_indent(level, frm);
++	printf("status 0x%2.2x handle %d\n", revt->status, btohs(revt->handle));
++
++	if (revt->status > 0) {
++		p_indent(level, frm);
++		printf("Error: %s\n", status2str(revt->status));
++	} else {
++		p_indent(level, frm);
++		printf("Features:");
++		for (i = 0; i < 8; i++)
++			printf(" 0x%2.2x", revt->features[i]);
++		printf("\n");
++	}
++}
++
+ static inline void le_meta_ev_dump(int level, struct frame *frm)
  {
- 	int i;
- 
-@@ -733,7 +733,7 @@ static char *eventmask2str(uint8_t mask[8])
- 	}
- }
- 
--static char *lefeatures2str(uint8_t features[8])
-+static char *lefeatures2str(const uint8_t features[8])
- {
- 	if (features[0] & 0x01)
- 		return "Link Layer supports LE Encryption";
+ 	evt_le_meta_event *mevt = frm->ptr;
+@@ -3569,6 +3589,9 @@ static inline void le_meta_ev_dump(int level, struct frame *frm)
+ 	case EVT_LE_CONN_UPDATE_COMPLETE:
+ 		evt_le_conn_update_complete_dump(level + 1, frm);
+ 		break;
++	case EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE:
++		evt_le_read_remote_used_features_complete_dump(level + 1, frm);
++		break;
+ 	default:
+ 		raw_dump(level, frm);
+ 		break;
 -- 
 1.7.1
 
