@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Fix creating device object when connection fails
-Date: Mon, 31 Jan 2011 14:56:35 +0200
-Message-Id: <1296478596-18269-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 31 Jan 2011 10:40:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Add option to enable privacy during scanning to
+ hcitool
+Message-ID: <20110131084038.GB10034@jh-x301>
+References: <1296254017-3381-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1296254017-3381-2-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296254017-3381-2-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Claudio,
 
-There is no need to create a new object since there is no connection and
-the device is not permanent/paired.
----
- src/event.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+On Fri, Jan 28, 2011, Claudio Takahasi wrote:
+> When privacy is enabled, random address is used during active scanning.
+> The non-resolvable private address shall be set using hciconfig.
+> ---
+>  tools/hcitool.c |   13 +++++++++----
+>  1 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index ff768c0..166e401 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -676,7 +676,9 @@ void btd_event_conn_failed(bdaddr_t *local, bdaddr_t *peer, uint8_t status)
- 	struct btd_device *device;
- 	DBusConnection *conn = get_dbus_connection();
- 
--	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
-+	DBG("");
-+
-+	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
- 		return;
- 
- 	if (device_is_temporary(device))
--- 
-1.7.1
+Both patches have been pushed upstream. Thanks.
 
+Any plans how to represent this feature in the official APIs? I suppose
+the random address can be generated automatically using some appropriate
+source such as the HCI_LE_Rand command but how do we represent the
+public vs random address selection using the D-Bus API? Or do we even
+need to do that?
+
+Johan
