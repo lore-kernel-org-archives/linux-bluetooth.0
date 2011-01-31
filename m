@@ -1,60 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+From: Suraj Sumangala <suraj@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <Jothikumar.Mothilal@Atheros.com>,
+	Suraj Sumangala <suraj@atheros.com>
+Subject: [RFC] Bluetooth: process received S-frames when socket is locked by user process
+Date: Mon, 31 Jan 2011 18:42:51 +0530
+Message-ID: <1296479571-2971-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <20110131084038.GB10034@jh-x301>
-References: <1296254017-3381-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1296254017-3381-2-git-send-email-claudio.takahasi@openbossa.org>
-	<20110131084038.GB10034@jh-x301>
-Date: Mon, 31 Jan 2011 11:50:30 -0200
-Message-ID: <AANLkTinUQozBxDAUH4yKW93h6bEKy=WtWWwkJumYYYHA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Add option to enable privacy during scanning to hcitool
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch lets L2CAP process received S-frames even when socket is
+continuously being locked by user process.
 
-On Mon, Jan 31, 2011 at 6:40 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Fri, Jan 28, 2011, Claudio Takahasi wrote:
->> When privacy is enabled, random address is used during active scanning.
->> The non-resolvable private address shall be set using hciconfig.
->> ---
->>  tools/hcitool.c |   13 +++++++++----
->>  1 files changed, 9 insertions(+), 4 deletions(-)
->
-> Both patches have been pushed upstream. Thanks.
->
-> Any plans how to represent this feature in the official APIs? I suppose
-> the random address can be generated automatically using some appropriate
-> source such as the HCI_LE_Rand command but how do we represent the
-> public vs random address selection using the D-Bus API? Or do we even
-> need to do that?
->
-> Johan
->
+This issue was seen when testing with l2test without using "-D" option.
 
-I added these changes to investigate the PTS  test result, it is not
-mandatory. I am was planning to focus on Register Application API
-first instead of privacy for central. The implementation is simple, if
-someone in the community wants to help us, here are some guidelines:
+Since the user process does not expect any Rx packets,
+it hogs the socket with continuous call to "send()".
 
-My idea is add a new property in the adapter interface called:
-Privacy. The changes will be:
-1. Add Privacy property with persistent storage =>
-adapter.SetProperty("Privacy", True/False)
-2. Generate a non-resolvable private address. My suggestion is to read
-the data directly from "/dev/random" instead of use HCI_LE_Rand
-command(needs to wait for command complete).
-3. Trigger the LE scanning based on this property.
+When the TxWindow is full Tx stops untill the I-frames are acked by the receiver.
 
-PS: For LE Create Connection command the own address type must be set
-based on privacy value, however this change requires changes in the
-kernel. Currently, Own_Address_Type is hard-coded in the kernel(public
-address only).
+But the Rx S-Frame acknowleding the Tx frames will stay in the backlog queue
+because the "sock_owned_by_user()" call in l2cap_data_channel()
+will always return true.
 
-Regards,
-Claudio.
+The user process does not have an idea about this
+mechanism and keep pumping data and locking the socket and cause a deadlock.
+
+Signed-off-by: Suraj Sumangala <suraj@atheros.com>
+---
+ net/bluetooth/l2cap.c |   16 ++++++++++------
+ 1 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+index 1761558..dc22291 100644
+--- a/net/bluetooth/l2cap.c
++++ b/net/bluetooth/l2cap.c
+@@ -4336,6 +4336,15 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 	int len, next_tx_seq_offset, req_seq_offset;
+ 
+ 	control = get_unaligned_le16(skb->data);
++
++	if (sock_owned_by_user(sk)) {
++		if (__is_iframe(control)) {
++			if (sk_add_backlog(sk, skb))
++				goto drop;
++
++			return 0;
++		}
++	}
+ 	skb_pull(skb, 2);
+ 	len = skb->len;
+ 
+@@ -4434,12 +4443,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
+-		if (!sock_owned_by_user(sk)) {
+-			l2cap_ertm_data_rcv(sk, skb);
+-		} else {
+-			if (sk_add_backlog(sk, skb))
+-				goto drop;
+-		}
++		l2cap_ertm_data_rcv(sk, skb);
+ 
+ 		goto done;
+ 
+-- 
+1.7.0.4
+
