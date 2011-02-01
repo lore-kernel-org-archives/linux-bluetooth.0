@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/2] Code cleanup: unnesessary line removed in avdtp.c
-Date: Wed,  2 Feb 2011 09:42:18 +0200
-Message-Id: <1296632538-2784-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Wed, 2 Feb 2011 01:22:13 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix sending HCIDEVUP when adapter is already up
+Message-ID: <20110201232213.GA6375@jh-x301>
+References: <1296575248-20185-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296575248-20185-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/avdtp.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+Hi Luiz,
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 88e3e8a..cd57747 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -2666,7 +2666,6 @@ static int send_req(struct avdtp *session, gboolean priority,
- 		goto failed;
- 	}
- 
--
- 	session->req = req;
- 
- 	req->timeout = g_timeout_add_seconds(req->signal_id == AVDTP_ABORT ?
--- 
-1.7.0.4
+On Tue, Feb 01, 2011, Luiz Augusto von Dentz wrote:
+> There is no need for HCIDEVUP/fork in such cases it will just consume
+> more resources for no reason.
+> 
+> To fix this HCI_DEV_REG is no longer generate for adapter already up
+> instead init_device is called directly which simplify the code path.
+> ---
+>  plugins/hciops.c |   15 +++++++++++----
+>  1 files changed, 11 insertions(+), 4 deletions(-)
 
+Both patches have been pushed upstream. Thanks.
+
+Johan
