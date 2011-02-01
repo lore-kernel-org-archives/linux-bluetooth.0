@@ -1,36 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2ec0d2a2febdbcf4ab73812ad709f542.squirrel@www.codeaurora.org>
-References: <3b53a90114d801b0adba526895deed74.squirrel@www.codeaurora.org>
-	<20101209144103.GA30557@jh-x301>
-	<AANLkTik78DiC7TgWtR0q=xPs+ZZq470_md-gJWv8tB8f@mail.gmail.com>
-	<20101210103242.GA21860@jh-x301>
-	<c2cb901974d908ed9f808324e4b4f6fb.squirrel@www.codeaurora.org>
-	<2ec0d2a2febdbcf4ab73812ad709f542.squirrel@www.codeaurora.org>
-Date: Tue, 1 Feb 2011 15:16:42 +0100
-Message-ID: <AANLkTinQ2heJzG_8u_2ZPoqiSy0tGzQCCZO=BZgE7A=Y@mail.gmail.com>
-Subject: Re: A2DP reconfigure with BMW Carkit (supporting multi streams) timeouts.
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: roystonr@codeaurora.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, skrovvid@codeaurora.org,
-	rshaffer@codeaurora.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 1 Feb 2011 12:47:30 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Alan Ott <alan@signal11.us>
+Cc: Jiri Kosina <jkosina@suse.cz>, Marcel Holtmann <marcel@holtmann.org>,
+ "Gustavo F. Padovan" <padovan@profusion.mobi>, "David S. Miller"
+ <davem@davemloft.net>, Michael Poole <mdpoole@troilus.org>, Eric Dumazet
+ <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Bastien Nocera
+ <hadess@hadess.net>
+Subject: Re: [PATCH v5 0/4] Adding HID Feature Report Support to hidraw
+Message-Id: <20110201124730.ac1faf74.ospite@studenti.unina.it>
+In-Reply-To: <1295337880-12452-1-git-send-email-alan@signal11.us>
+References: <1295337880-12452-1-git-send-email-alan@signal11.us>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Tue__1_Feb_2011_12_47_30_+0100_SyiR/gWZILtkceNC"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Roystonr,
+--Signature=_Tue__1_Feb_2011_12_47_30_+0100_SyiR/gWZILtkceNC
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Have provided the patch to the tester to verify as we don't have the BMW
-> CK available locally. Would update the feedback received.
+On Tue, 18 Jan 2011 03:04:36 -0500
+Alan Ott <alan@signal11.us> wrote:
 
-I'm just wondering, Is it working for you ?
+> This patch adds Feature Report support for USB and Bluetooth HID devices
+> through hidraw.
+>=20
+> The first two patches prepare the bluetooth side for the change.
+> 	a. Make sure the hidp_session() thread is started before
+> 	   device's probe() functions are called.
+> 	b. Wait for ACK/NAK on sent reports, and return proper
+> 	   error codes.
+> The third patch is the hidraw core and USB changes.
 
->
-> Regards,
-> Royston Rodrigues
->
+In particular, this third patch is a prerequisite for the bluez
+sixaxis-cable plugin, originally written by Bastien Nocera (added to
+CC) which I plan to submit when these changes are merged in mainline
+linux.
 
-Regards
-\Lukasz
+[...]
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Tue__1_Feb_2011_12_47_30_+0100_SyiR/gWZILtkceNC
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk1H8tIACgkQ5xr2akVTsAHjwACeOTUYIzHZTiJUum+6V7FtMEvN
+C+sAnjeBZ1nBbI+A7/ZZo6fGluN39I68
+=aGvS
+-----END PGP SIGNATURE-----
+
+--Signature=_Tue__1_Feb_2011_12_47_30_+0100_SyiR/gWZILtkceNC--
