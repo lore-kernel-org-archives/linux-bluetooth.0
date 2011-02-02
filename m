@@ -1,73 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 2 Feb 2011 12:49:29 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Liang Bao <tim.bao@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Set connection state to BT_DISCONN to avoid multiple
+ responses
+Message-ID: <20110202144929.GB2273@joana>
+References: <1296308377-2207-1-git-send-email-tim.bao@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
-References: <AANLkTinQOKoBCXgh1=wb9Z7w8A4w7vYFkSCoZvkspyYo@mail.gmail.com>
- <AANLkTi=aX_XQqEwa3q=1krNfpYxGFbkc2V4wEGcT9oHA@mail.gmail.com>
- <AANLkTi==cFMZfr-achvT=5HNpR5p_36mC7=ybHTYcQc=@mail.gmail.com> <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
-From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
-Date: Wed, 2 Feb 2011 16:11:07 +0100
-Message-ID: <AANLkTimKKmLBCUmbhP3-5tsLoGkfm_=whtzyV_=EQVpG@mail.gmail.com>
-Subject: Re: Support for Device ID profile
-To: steven bluez <steven.bluez@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296308377-2207-1-git-send-email-tim.bao@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steven,
+Hi Liang,
 
-Bringing back this thread with some questions.
+* Liang Bao <tim.bao@gmail.com> [2011-01-29 21:39:37 +0800]:
 
-2010/9/28 steven bluez <steven.bluez@gmail.com>:
-> Hi Jose,
->> Hi,
->>
->> 2010/9/24 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->>> Hi Steven,
->>>
->>> Yes, you can use DeviceID on main.conf to add that, but as you see it
->>> is pretty limited so we are planning to have a better support for
->>> this, perhaps extend adapter driver interface where you can write a
->>> plugin to fill this information.
->>
->
-> I have started to work on it thats why I cleared up my doubts.
+> From: Bao Liang <tim.bao@gmail.com>
+> 
+> This patch fixes a minor issue that two connection responses will be sent
+> for one L2CAP connection request. If the L2CAP connection request is first
+> blocked due to security reason and responded with reason "security block",
+> the state of the connection remains BT_CONNECT2. If a pairing procedure
+> completes successfully before the ACL connection is down, local host will
+> send another connection complete response. See the following packets
+> captured by hcidump.
+> 
+> 2010-12-07 22:21:24.928096 < ACL data: handle 12 flags 0x00 dlen 16
+>     0000: 0c 00 01 00 03 19 08 00  41 00 53 00 03 00 00 00  ........A.S.....
+> ... ...
+> 
+> 2010-12-07 22:21:35.791747 > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x00 handle 12
+> ... ...
+> 
+> 2010-12-07 22:21:35.872372 > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0054 scid 0x0040 result 0 status 0
+>       Connection successful
+> 
+> Signed-off-by: Liang Bao <tim.bao@gmail.com>
+> ---
+>  net/bluetooth/l2cap.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-Have you done something here? I'd like to contribute or continue the
-project if you've abandoned it.
+Patch has been applied. Thanks.
 
-Regards.
-
->> Is anyone working on this plugin now. I'd like to work on it if nobody
->> is working yet.
->>
->> Regards.
->>
->>>
->>> Regards,
->>>
->>> On Fri, Sep 24, 2010 at 11:54 AM, steven bluez <steven.bluez@gmail.com> wrote:
->>>> Hi all,
->>>>       Is there any support for Device ID Profile in Bluez 4.XX? versions ?\
->>>>
->>>> Regards,
->>>> Steven
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>> Computer Engineer
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>
->
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
