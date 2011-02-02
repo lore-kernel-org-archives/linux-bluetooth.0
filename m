@@ -1,50 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Feb 2011 12:49:29 -0200
+Date: Wed, 2 Feb 2011 12:45:35 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Liang Bao <tim.bao@gmail.com>
+To: Vivek N <mail@vivekn.co.cc>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Set connection state to BT_DISCONN to avoid multiple
- responses
-Message-ID: <20110202144929.GB2273@joana>
-References: <1296308377-2207-1-git-send-email-tim.bao@gmail.com>
+Subject: Re: Interested in Contributing to BlueZ
+Message-ID: <20110202144535.GA2273@joana>
+References: <AANLkTikpZUi8ocU4Ntbn=ayX141ptTTY7zMOahuyxrTs@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296308377-2207-1-git-send-email-tim.bao@gmail.com>
+In-Reply-To: <AANLkTikpZUi8ocU4Ntbn=ayX141ptTTY7zMOahuyxrTs@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Liang,
+Hi Vivek,
 
-* Liang Bao <tim.bao@gmail.com> [2011-01-29 21:39:37 +0800]:
+* Vivek N <mail@vivekn.co.cc> [2011-02-02 19:29:53 +0530]:
 
-> From: Bao Liang <tim.bao@gmail.com>
+> Hi,
 > 
-> This patch fixes a minor issue that two connection responses will be sent
-> for one L2CAP connection request. If the L2CAP connection request is first
-> blocked due to security reason and responded with reason "security block",
-> the state of the connection remains BT_CONNECT2. If a pairing procedure
-> completes successfully before the ACL connection is down, local host will
-> send another connection complete response. See the following packets
-> captured by hcidump.
-> 
-> 2010-12-07 22:21:24.928096 < ACL data: handle 12 flags 0x00 dlen 16
->     0000: 0c 00 01 00 03 19 08 00  41 00 53 00 03 00 00 00  ........A.S.....
-> ... ...
-> 
-> 2010-12-07 22:21:35.791747 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x00 handle 12
-> ... ...
-> 
-> 2010-12-07 22:21:35.872372 > ACL data: handle 12 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0054 scid 0x0040 result 0 status 0
->       Connection successful
-> 
-> Signed-off-by: Liang Bao <tim.bao@gmail.com>
-> ---
->  net/bluetooth/l2cap.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+> I am Vivek Narayanan, a sophomore undergraduate student from India. I
+> am interested in contributing to BlueZ, the linux bluetooth project
+> through GSoC (Google Summer of Code) or otherwise. I am really
+> interested in working on a kernel and know C and Python quite well. I
+> am downloading the git repository right now and am looking for some
+> pointers on where to start first.
 
-Patch has been applied. Thanks.
+Nice that you want to contribute to BlueZ. :-)
+
+To work with BlueZ you have first to have a good understanding of the
+Bluetooth technology. For good reads are [0], [1], and many other stuff under
+[2], like Profiles Overview and Architecture of many layers.
+
+Unfortunately the only documentation we have is the source code and the git
+history.
+
+Then you have to choose some part that you want to focus on, BlueZ is a very
+big project with extensive Bluetooth specifications. You won't understand all
+of then easily.
+
+We are going to setup a web page soon with project proposals for the Google
+Summer of Code. It will help students choose an area in BlueZ to work on.
+
+And a very quick overview of Bluetooth Stack in Linux: Many core parts of the
+Bluetooth stack is implemented in the Linux Kernel, the HCI; L2CAP and SCO
+(synchronous audio) layers; and the BNEP and RFCOMM protocols. All the rest is
+done by the bluetoothd daemon in the userspace, or the obexd daemon (which is
+also part of the BLueZ project, but resides in another git though).
+
+Besides that, you have to know a bit about DBus and glib. They are two important
+parts of the BlueZ.
+
+
+[0] http://en.wikipedia.org/wiki/Bluetooth
+[1] http://bluetooth.com/English/Technology/Works/Pages/Overview_of_Operation.aspx
+[2] http://bluetooth.com/English/Technology/Works/Pages/default.aspx
+
+Regards,
 
 -- 
 Gustavo F. Padovan
