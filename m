@@ -1,61 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Feb 2011 14:16:41 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Suraj Sumangala <suraj@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org, Jothikumar.Mothilal@Atheros.com
-Subject: Re: [PATCH] Bluetooth: Support SCO over HCI for Atheros AR300x
- Bluetooth device
-Message-ID: <20110202161641.GC2273@joana>
-References: <1296211744-2487-1-git-send-email-suraj@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296211744-2487-1-git-send-email-suraj@atheros.com>
+In-Reply-To: <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
+References: <AANLkTinQOKoBCXgh1=wb9Z7w8A4w7vYFkSCoZvkspyYo@mail.gmail.com>
+ <AANLkTi=aX_XQqEwa3q=1krNfpYxGFbkc2V4wEGcT9oHA@mail.gmail.com>
+ <AANLkTi==cFMZfr-achvT=5HNpR5p_36mC7=ybHTYcQc=@mail.gmail.com> <AANLkTimVPFppVjbdmJSmcjeeNn7jwRf+uvLVC67xPjav@mail.gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Wed, 2 Feb 2011 16:11:07 +0100
+Message-ID: <AANLkTimKKmLBCUmbhP3-5tsLoGkfm_=whtzyV_=EQVpG@mail.gmail.com>
+Subject: Re: Support for Device ID profile
+To: steven bluez <steven.bluez@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Steven,
 
-* Suraj Sumangala <suraj@atheros.com> [2011-01-28 16:19:04 +0530]:
+Bringing back this thread with some questions.
 
-> This patch adds SCO over HCI support to Atheros AR300x HCI transport
-> driver.
-> 
-> Signed-off-by: Suraj Sumangala <suraj@atheros.com>
-> ---
->  drivers/bluetooth/hci_ath.c |   18 +++++++++---------
->  1 files changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> index 6a160c1..161bd20 100644
-> --- a/drivers/bluetooth/hci_ath.c
-> +++ b/drivers/bluetooth/hci_ath.c
-> @@ -162,11 +162,6 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
->  {
->  	struct ath_struct *ath = hu->priv;
->  
-> -	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-> -		kfree_skb(skb);
-> -		return 0;
-> -	}
-> -
->  	/*
->  	 * Update power management enable flag with parameters of
->  	 * HCI sleep enable vendor specific HCI command.
-> @@ -183,10 +178,15 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
->  	/* Prepend skb with frame type */
->  	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
->  
-> -	skb_queue_tail(&ath->txq, skb);
-> -	set_bit(HCI_UART_SENDING, &hu->tx_state);
-> -
-> -	schedule_work(&ath->ctxtsw);
-> +	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-> +		skb_queue_head(&ath->txq, skb);
-> +		clear_bit(HCI_UART_SENDING, &hu->tx_state);
-> +		hci_uart_tx_wakeup(hu);
+2010/9/28 steven bluez <steven.bluez@gmail.com>:
+> Hi Jose,
+>> Hi,
+>>
+>> 2010/9/24 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>> Hi Steven,
+>>>
+>>> Yes, you can use DeviceID on main.conf to add that, but as you see it
+>>> is pretty limited so we are planning to have a better support for
+>>> this, perhaps extend adapter driver interface where you can write a
+>>> plugin to fill this information.
+>>
+>
+> I have started to work on it thats why I cleared up my doubts.
 
-Seems you are giving priority to SCO packets, right? why?
+Have you done something here? I'd like to contribute or continue the
+project if you've abandoned it.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Regards.
+
+>> Is anyone working on this plugin now. I'd like to work on it if nobody
+>> is working yet.
+>>
+>> Regards.
+>>
+>>>
+>>> Regards,
+>>>
+>>> On Fri, Sep 24, 2010 at 11:54 AM, steven bluez <steven.bluez@gmail.com> wrote:
+>>>> Hi all,
+>>>>       Is there any support for Device ID Profile in Bluez 4.XX? versions ?\
+>>>>
+>>>> Regards,
+>>>> Steven
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> Computer Engineer
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+>
