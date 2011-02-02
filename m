@@ -1,38 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Feb 2011 12:10:58 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix possible crash on AVDTP Suspend req timeout
-Message-ID: <20110202101058.GA15303@jh-x301>
-References: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 1/3] Add libtracker-sparql to obexd dependencies
+Date: Wed,  2 Feb 2011 10:15:29 +0200
+Message-Id: <1296634531-32164-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+In PBAP tracker is used only for reading and returns rather big
+parts of data, so using direct access libtracker-sparql is better
+solution than tracker D-Bus API(libtracker-sparql in most PBAP
+scenarios should be faster).
+---
+ Makefile.am  |    4 +++-
+ configure.ac |    7 +++++++
+ 2 files changed, 10 insertions(+), 1 deletions(-)
 
-On Wed, Feb 02, 2011, Dmitriy Paliy wrote:
-> This fixes possible bluetoothd crash on AVDTP Suspend request timeout
-> if A2DP client was destroyed after the request was sent but before its
-> timeout handled.
-> 
-> If Suspend request times out due to any reason, then references to A2DP
-> session and stream are cleared in unix_client. Therefore, callback cannot
-> be removed when unix_client is destroyed (e.g. on incomming call).
-> 
-> After that, consequent Abort request is sent. If the request times out
-> as well, than stream_state_changed callback is invoked to change AVDTP
-> state to Idle, which causes crash due to NULL dereferencing.
-> 
-> Therefore, it is important to keep references to AVDTP session and stream
-> in unix_client until it is destroyed.
-> ---
->  audio/unix.c |   15 ++++-----------
->  1 files changed, 4 insertions(+), 11 deletions(-)
+diff --git a/Makefile.am b/Makefile.am
+index a317556..fc996ec 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -79,7 +79,8 @@ src_obexd_SOURCES = $(gdbus_sources) $(builtin_sources) $(btio_sources) \
+ 
+ src_obexd_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@ \
+ 					@EBOOK_LIBS@ @OPENOBEX_LIBS@ \
+-					@BLUEZ_LIBS@ @LIBICAL_LIBS@ -ldl
++					@BLUEZ_LIBS@ @LIBICAL_LIBS@ \
++					@TRACKER_SPARQL_LIBS@ -ldl
+ 
+ src_obexd_LDFLAGS = -Wl,--export-dynamic
+ 
+@@ -124,6 +125,7 @@ service_DATA = $(service_in_files:.service.in=.service)
+ AM_CFLAGS = @OPENOBEX_CFLAGS@ @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ \
+ 			@GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
+ 			@LIBICAL_CFLAGS@ -D_FILE_OFFSET_BITS=64 \
++			@TRACKER_SPARQL_CFLAGS@ \
+ 			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\"
+ 
+ INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
+diff --git a/configure.ac b/configure.ac
+index e48a3cc..aa8bfb0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -136,6 +136,13 @@ if (test "${phonebook_driver}" = "ebook"); then
+ 	AC_SUBST(GTHREAD_LIBS)
+ fi
+ 
++if (test "${phonebook_driver}" = "tracker"); then
++	PKG_CHECK_MODULES(TRACKER_SPARQL, tracker-sparql-0.9, dummy=yes,
++				AC_MSG_ERROR(libtracker-sparql is required))
++	AC_SUBST(TRACKER_SPARQL_CFLAGS)
++	AC_SUBST(TRACKER_SPARQL_LIBS)
++fi
++
+ AC_SUBST([PHONEBOOK_DRIVER], [phonebook-${phonebook_driver}.c])
+ 
+ AC_ARG_ENABLE(server, AC_HELP_STRING([--disable-server],
+-- 
+1.7.0.4
 
-Thanks. Both patches have been pushed upstream.
-
-Johan
