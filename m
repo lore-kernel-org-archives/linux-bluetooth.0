@@ -1,63 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 2/3 v2] Move freeing contacts data to phonebook_req_finalize
-Date: Wed,  2 Feb 2011 12:21:47 +0200
-Message-Id: <1296642108-14063-2-git-send-email-ext-jablonski.radoslaw@nokia.com>
-In-Reply-To: <1296642108-14063-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
-References: <1296642108-14063-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Date: Wed, 2 Feb 2011 12:10:58 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix possible crash on AVDTP Suspend req timeout
+Message-ID: <20110202101058.GA15303@jh-x301>
+References: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296632538-2784-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously data used for generating vcards was freed only in
-gen_vcards body. This may result a memory leak, if fetching data
-from tracker was cancelled in the middle of process and gen_vcards
-wasn't called. Phonebook_req_finalize is better place for this
-kind of cleanup.
----
- plugins/phonebook-tracker.c |   14 ++++++++++----
- 1 files changed, 10 insertions(+), 4 deletions(-)
+Hi Dmitriy,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index e60cf74..3b61d6b 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1326,10 +1326,6 @@ static GString *gen_vcards(GSList *contacts,
- 		struct contact_data *c_data = l->data;
- 		phonebook_add_contact(vcards, c_data->contact,
- 					params->filter, params->format);
--
--		g_free(c_data->id);
--		phonebook_contact_free(c_data->contact);
--		g_free(c_data);
- 	}
- 
- 	return vcards;
-@@ -1789,6 +1785,7 @@ done:
- void phonebook_req_finalize(void *request)
- {
- 	struct phonebook_data *data = request;
-+	GSList *l;
- 
- 	DBG("");
- 
-@@ -1800,6 +1797,15 @@ void phonebook_req_finalize(void *request)
- 
- 	dbus_pending_call_unref(data->call);
- 
-+	/* freeing list of contacts used for generating vcards */
-+	for (l = data->contacts; l; l = l->next) {
-+		struct contact_data *c_data = l->data;
-+
-+		g_free(c_data->id);
-+		phonebook_contact_free(c_data->contact);
-+		g_free(c_data);
-+	}
-+
- 	g_slist_free(data->contacts);
- 	g_free(data);
- }
--- 
-1.7.0.4
+On Wed, Feb 02, 2011, Dmitriy Paliy wrote:
+> This fixes possible bluetoothd crash on AVDTP Suspend request timeout
+> if A2DP client was destroyed after the request was sent but before its
+> timeout handled.
+> 
+> If Suspend request times out due to any reason, then references to A2DP
+> session and stream are cleared in unix_client. Therefore, callback cannot
+> be removed when unix_client is destroyed (e.g. on incomming call).
+> 
+> After that, consequent Abort request is sent. If the request times out
+> as well, than stream_state_changed callback is invoked to change AVDTP
+> state to Idle, which causes crash due to NULL dereferencing.
+> 
+> Therefore, it is important to keep references to AVDTP session and stream
+> in unix_client until it is destroyed.
+> ---
+>  audio/unix.c |   15 ++++-----------
+>  1 files changed, 4 insertions(+), 11 deletions(-)
 
+Thanks. Both patches have been pushed upstream.
+
+Johan
