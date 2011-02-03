@@ -1,75 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D4A5038.2050404@Atheros.com>
-Date: Thu, 3 Feb 2011 12:20:32 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
+Message-ID: <4D4A4AF4.3030200@atheros.com>
+Date: Thu, 3 Feb 2011 11:58:04 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-CC: Suraj Sumangala <Suraj.Sumangala@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-Subject: Re: [RFC] Bluetooth: process received S-frames when socket is locked
- by user process
-References: <1296479571-2971-1-git-send-email-suraj@atheros.com> <20110202162818.GD2273@joana> <4D49879F.8020000@Atheros.com> <20110202165112.GG2273@joana> <4D4995D7.6070408@Atheros.com> <20110202174114.GI2273@joana>
-In-Reply-To: <20110202174114.GI2273@joana>
+To: "dwmw2@infradead.org" <dwmw2@infradead.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<jkumar@atheros.com>, Luis Rodriguez <Luis.Rodriguez@Atheros.com>
+Subject: Re: [PATCH] linux-firmware: Remove ath3k-2.fw
+References: <1296207208-4465-1-git-send-email-sbalashanmugam@atheros.com>
+In-Reply-To: <1296207208-4465-1-git-send-email-sbalashanmugam@atheros.com>
 Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+On 1/28/2011 3:03 PM, Shanmugamkamatchi Balashanmugam wrote:
+> ath3k-2.fw is obsolete and not use by Atheros chipsets
+> anymore.
+>
+> Signed-off-by: Bala Shanmugam<sbalashanmugam@atheros.com>
+> ---
+>   WHENCE     |    9 ---------
+>   ath3k-2.fw |  Bin 246804 ->  0 bytes
+>   2 files changed, 0 insertions(+), 9 deletions(-)
+>   delete mode 100644 ath3k-2.fw
+>
+> diff --git a/WHENCE b/WHENCE
+> index 1cbd0a6..c022b4a 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -1306,15 +1306,6 @@ Licence: Redistributable, provided by Realtek in their driver
+>
+>   --------------------------------------------------------------------------
+>
+> -Driver: DFU Driver for Atheros bluetooth chipset AR3011
+> -
+> -File: ath3k-2.fw
+> -Info: v2.0
+> -
+> -Licence: Redistributable. See LICENCE.atheros_firmware for details
+> -
+> ---------------------------------------------------------------------------
+> -
+>   Driver: lgs8gxx - Legend Silicon GB20600 demodulator driver
+>
+>   File: lgs8g75.fw
+> diff --git a/ath3k-2.fw b/ath3k-2.fw
+> deleted file mode 100644
+> index 3fa8cff36301a7005936d54a407d6879923aa354..0000000000000000000000000000000000000000
+> GIT binary patch
+> literal 0
+> HcmV?d00001
+>
+> literal 246804
+>
+Hi David,
 
-On 2/2/2011 11:11 PM, Gustavo F. Padovan wrote:
-> Hi Suraj,
->
-> * Suraj Sumangala<suraj@Atheros.com>  [2011-02-02 23:05:19 +0530]:
->
->> Hi Gustavo,
->>
->> On 2/2/2011 10:21 PM, Gustavo F. Padovan wrote:
->>> This one: e454c844644683571617896ab2a4ce0109c1943e
->>>
->>> The issue fixed by this patch is very similar to what you reported
->>
->> Is this commit available in
->> "git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git"
->> tree?
->
-> Yes, it is also available in Linus' tree.
->
-> commit e454c844644683571617896ab2a4ce0109c1943e
-> Author: Gustavo F. Padovan<padovan@profusion.mobi>
-> Date:   Tue Sep 21 16:31:11 2010 -0300
->
->      Bluetooth: Fix deadlock in the ERTM logic
->
->      The Enhanced Retransmission Mode(ERTM) is a realiable mode of operation
->      of the Bluetooth L2CAP layer. Think on it like a simplified version of
->      TCP.
->      The problem we were facing here was a deadlock. ERTM uses a backlog
->      queue to queue incomimg packets while the user is helding the lock. At
->      some moment the sk_sndbuf can be exceeded and we can't alloc new skbs
->      then the code sleep with the lock to wait for memory, that stalls the
->      ERTM connection once we can't read the acknowledgements packets in the
->      backlog queue to free memory and make the allocation of outcoming skb
->      successful.
->      successful.
->
->      This patch actually affect all users of bt_skb_send_alloc(), i.e., all
->      L2CAP modes and SCO.
->
->      We are safe against socket states changes or channels deletion while the
->      we are sleeping wait memory. Checking for the sk->sk_err and
->      sk->sk_shutdown make the code safe, since any action that can leave the
->      socket or the channel in a not usable state set one of the struct
->      members at least. Then we can check both of them when getting the lock
->      again and return with the proper error if something unexpected happens.
->
->      Signed-off-by: Gustavo F. Padovan<padovan@profusion.mobi>
->      Signed-off-by: Ulisses Furquim<ulisses@profusion.mobi>
->
->
->
+Can you please upload this patch sent before.
 
-Thanks,this patch solved my issue.
+Regards,
+Bala.
 
-Regards
-Suraj
