@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next 15/16] Bluetooth: move l2cap_sock_kill() to l2cap_sock.c
-Date: Fri,  4 Feb 2011 04:01:57 -0200
-Message-Id: <1296799318-5517-16-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1296799318-5517-15-git-send-email-padovan@profusion.mobi>
+Subject: [bluetooth-next 14/16] Bluetooth: move L2CAP sock timers function to l2cap_sock.c
+Date: Fri,  4 Feb 2011 04:01:56 -0200
+Message-Id: <1296799318-5517-15-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1296799318-5517-14-git-send-email-padovan@profusion.mobi>
 References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-2-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-3-git-send-email-padovan@profusion.mobi>
@@ -19,70 +19,70 @@ References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-12-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-13-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-14-git-send-email-padovan@profusion.mobi>
- <1296799318-5517-15-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/l2cap_core.c |   16 ----------------
- net/bluetooth/l2cap_sock.c |   16 ++++++++++++++++
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ net/bluetooth/l2cap_core.c |   13 -------------
+ net/bluetooth/l2cap_sock.c |   13 +++++++++++++
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1baa16c..0ba097d 100644
+index 4e3a06e..1baa16c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -753,22 +753,6 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
- 	sock_set_flag(parent, SOCK_ZAPPED);
- }
+@@ -77,19 +77,6 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
  
--/* Kill socket (only if zapped and orphan)
-- * Must be called on unlocked socket.
-- */
--void l2cap_sock_kill(struct sock *sk)
+ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+ 
+-/* ---- L2CAP timers ---- */
+-void l2cap_sock_set_timer(struct sock *sk, long timeout)
 -{
--	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
--		return;
--
--	BT_DBG("sk %p state %d", sk, sk->sk_state);
--
--	/* Kill poor orphan */
--	bt_sock_unlink(&l2cap_sk_list, sk);
--	sock_set_flag(sk, SOCK_DEAD);
--	sock_put(sk);
+-	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
+-	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
 -}
 -
- void __l2cap_sock_close(struct sock *sk, int reason)
+-void l2cap_sock_clear_timer(struct sock *sk)
+-{
+-	BT_DBG("sock %p state %d", sk, sk->sk_state);
+-	sk_stop_timer(sk, &sk->sk_timer);
+-}
+-
+ /* ---- L2CAP channels ---- */
+ static struct sock *__l2cap_get_chan_by_dcid(struct l2cap_chan_list *l, u16 cid)
  {
- 	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 23bb968..4b4e020 100644
+index fe4f834..23bb968 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -838,6 +838,22 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+@@ -30,6 +30,7 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
+ 
++/* ---- L2CAP timers ---- */
+ static void l2cap_sock_timeout(unsigned long arg)
+ {
+ 	struct sock *sk = (struct sock *) arg;
+@@ -63,6 +64,18 @@ static void l2cap_sock_timeout(unsigned long arg)
+ 	sock_put(sk);
  }
  
-+/* Kill socket (only if zapped and orphan)
-+ * Must be called on unlocked socket.
-+ */
-+void l2cap_sock_kill(struct sock *sk)
++void l2cap_sock_set_timer(struct sock *sk, long timeout)
 +{
-+	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-+		return;
-+
-+	BT_DBG("sk %p state %d", sk, sk->sk_state);
-+
-+	/* Kill poor orphan */
-+	bt_sock_unlink(&l2cap_sk_list, sk);
-+	sock_set_flag(sk, SOCK_DEAD);
-+	sock_put(sk);
++	BT_DBG("sk %p state %d timeout %ld", sk, sk->sk_state, timeout);
++	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
 +}
 +
- static int l2cap_sock_shutdown(struct socket *sock, int how)
++void l2cap_sock_clear_timer(struct sock *sk)
++{
++	BT_DBG("sock %p state %d", sk, sk->sk_state);
++	sk_stop_timer(sk, &sk->sk_timer);
++}
++
+ static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
  {
- 	struct sock *sk = sock->sk;
+ 	struct sock *sk;
 -- 
 1.7.4.rc3
 
