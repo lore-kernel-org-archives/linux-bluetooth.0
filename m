@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next 12/16] Bluetooth: move l2cap_sock_shutdown() to l2cap_sock.c
-Date: Fri,  4 Feb 2011 04:01:54 -0200
-Message-Id: <1296799318-5517-13-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1296799318-5517-12-git-send-email-padovan@profusion.mobi>
+Subject: [bluetooth-next 11/16] Bluetooth: move l2cap_sock_recvmsg() to l2cap_sock.c
+Date: Fri,  4 Feb 2011 04:01:53 -0200
+Message-Id: <1296799318-5517-12-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1296799318-5517-11-git-send-email-padovan@profusion.mobi>
 References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-2-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-3-git-send-email-padovan@profusion.mobi>
@@ -16,139 +16,178 @@ References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-9-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-10-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-11-git-send-email-padovan@profusion.mobi>
- <1296799318-5517-12-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Declare __l2cap_wait_ack() and  l2cap_sock_clear_timer() in l2cap.h
+It causes the move of the declaration of 3 functions to l2cap.h:
+l2cap_get_ident(), l2cap_send_cmd(), l2cap_build_conf_req()
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    3 ++-
- net/bluetooth/l2cap_core.c    |   35 ++---------------------------------
- net/bluetooth/l2cap_sock.c    |   31 +++++++++++++++++++++++++++++++
- 3 files changed, 35 insertions(+), 34 deletions(-)
+ include/net/bluetooth/l2cap.h |    5 +++-
+ net/bluetooth/l2cap_core.c    |   49 ++--------------------------------------
+ net/bluetooth/l2cap_sock.c    |   42 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+), 47 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 336b2af7..c9df0ef 100644
+index b5ebf87..336b2af7 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -434,8 +434,10 @@ void l2cap_cleanup_sockets(void);
- u8 l2cap_get_ident(struct l2cap_conn *conn);
- void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data);
- int l2cap_build_conf_req(struct sock *sk, void *data);
-+int __l2cap_wait_ack(struct sock *sk);
+@@ -431,6 +431,10 @@ extern struct bt_sock_list l2cap_sk_list;
+ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
  
++u8 l2cap_get_ident(struct l2cap_conn *conn);
++void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data);
++int l2cap_build_conf_req(struct sock *sk, void *data);
++
  void l2cap_sock_set_timer(struct sock *sk, long timeout);
-+void l2cap_sock_clear_timer(struct sock *sk);
  void __l2cap_sock_close(struct sock *sk, int reason);
  void l2cap_sock_kill(struct sock *sk);
- void l2cap_sock_init(struct sock *sk, struct sock *parent);
-@@ -444,7 +446,6 @@ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+@@ -440,7 +444,6 @@ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
  int l2cap_do_connect(struct sock *sk);
  
  int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len);
--int l2cap_sock_shutdown(struct socket *sock, int how);
+-int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags);
+ int l2cap_sock_shutdown(struct socket *sock, int how);
  
  
- void l2cap_load(void);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8184d54..0368a2e 100644
+index 2d141fc..8184d54 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -84,7 +84,7 @@ void l2cap_sock_set_timer(struct sock *sk, long timeout)
- 	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
+@@ -72,7 +72,6 @@ static void l2cap_busy_work(struct work_struct *work);
+ 
+ static void l2cap_sock_close(struct sock *sk);
+ 
+-static int l2cap_build_conf_req(struct sock *sk, void *data);
+ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+ 				u8 code, u8 ident, u16 dlen, void *data);
+ 
+@@ -311,7 +310,7 @@ static inline int l2cap_check_security(struct sock *sk)
+ 								auth_type);
  }
  
--static void l2cap_sock_clear_timer(struct sock *sk)
-+void l2cap_sock_clear_timer(struct sock *sk)
+-static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
++u8 l2cap_get_ident(struct l2cap_conn *conn)
  {
- 	BT_DBG("sock %p state %d", sk, sk->sk_state);
- 	sk_stop_timer(sk, &sk->sk_timer);
-@@ -906,7 +906,7 @@ done:
+ 	u8 id;
+ 
+@@ -333,7 +332,7 @@ static inline u8 l2cap_get_ident(struct l2cap_conn *conn)
+ 	return id;
+ }
+ 
+-static inline void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
++void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+ {
+ 	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
+ 	u8 flags;
+@@ -1468,48 +1467,6 @@ done:
  	return err;
  }
  
--static int __l2cap_wait_ack(struct sock *sk)
-+int __l2cap_wait_ack(struct sock *sk)
- {
- 	DECLARE_WAITQUEUE(wait, current);
- 	int err = 0;
-@@ -1467,37 +1467,6 @@ done:
- 	return err;
- }
- 
--int l2cap_sock_shutdown(struct socket *sock, int how)
+-int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags)
 -{
 -	struct sock *sk = sock->sk;
--	int err = 0;
--
--	BT_DBG("sock %p, sk %p", sock, sk);
--
--	if (!sk)
--		return 0;
 -
 -	lock_sock(sk);
--	if (!sk->sk_shutdown) {
--		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
--			err = __l2cap_wait_ack(sk);
 -
--		sk->sk_shutdown = SHUTDOWN_MASK;
--		l2cap_sock_clear_timer(sk);
--		__l2cap_sock_close(sk, 0);
+-	if (sk->sk_state == BT_CONNECT2 && bt_sk(sk)->defer_setup) {
+-		struct l2cap_conn_rsp rsp;
+-		struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+-		u8 buf[128];
 -
--		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
--			err = bt_sock_wait_state(sk, BT_CLOSED,
--							sk->sk_lingertime);
+-		sk->sk_state = BT_CONFIG;
+-
+-		rsp.scid   = cpu_to_le16(l2cap_pi(sk)->dcid);
+-		rsp.dcid   = cpu_to_le16(l2cap_pi(sk)->scid);
+-		rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+-		rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+-		l2cap_send_cmd(l2cap_pi(sk)->conn, l2cap_pi(sk)->ident,
+-					L2CAP_CONN_RSP, sizeof(rsp), &rsp);
+-
+-		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT) {
+-			release_sock(sk);
+-			return 0;
+-		}
+-
+-		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
+-		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
+-				l2cap_build_conf_req(sk, buf), buf);
+-		l2cap_pi(sk)->num_conf_req++;
+-
+-		release_sock(sk);
+-		return 0;
 -	}
 -
--	if (!err && sk->sk_err)
--		err = -sk->sk_err;
--
 -	release_sock(sk);
--	return err;
+-
+-	if (sock->type == SOCK_STREAM)
+-		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
+-
+-	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
 -}
 -
- static void l2cap_chan_ready(struct sock *sk)
+ int l2cap_sock_shutdown(struct socket *sock, int how)
  {
- 	struct sock *parent = bt_sk(sk)->parent;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index fa2bc5d..93af233 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -723,6 +723,37 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
+ 	struct sock *sk = sock->sk;
+@@ -1759,7 +1716,7 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
+ 	}
  }
  
-+static int l2cap_sock_shutdown(struct socket *sock, int how)
+-static int l2cap_build_conf_req(struct sock *sk, void *data)
++int l2cap_build_conf_req(struct sock *sk, void *data)
+ {
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
+ 	struct l2cap_conf_req *req = data;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index e2f14f1..fa2bc5d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -681,6 +681,48 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 	return err;
+ }
+ 
++static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags)
 +{
 +	struct sock *sk = sock->sk;
-+	int err = 0;
-+
-+	BT_DBG("sock %p, sk %p", sock, sk);
-+
-+	if (!sk)
-+		return 0;
 +
 +	lock_sock(sk);
-+	if (!sk->sk_shutdown) {
-+		if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM)
-+			err = __l2cap_wait_ack(sk);
 +
-+		sk->sk_shutdown = SHUTDOWN_MASK;
-+		l2cap_sock_clear_timer(sk);
-+		__l2cap_sock_close(sk, 0);
++	if (sk->sk_state == BT_CONNECT2 && bt_sk(sk)->defer_setup) {
++		struct l2cap_conn_rsp rsp;
++		struct l2cap_conn *conn = l2cap_pi(sk)->conn;
++		u8 buf[128];
 +
-+		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
-+			err = bt_sock_wait_state(sk, BT_CLOSED,
-+							sk->sk_lingertime);
++		sk->sk_state = BT_CONFIG;
++
++		rsp.scid   = cpu_to_le16(l2cap_pi(sk)->dcid);
++		rsp.dcid   = cpu_to_le16(l2cap_pi(sk)->scid);
++		rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
++		rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++		l2cap_send_cmd(l2cap_pi(sk)->conn, l2cap_pi(sk)->ident,
++					L2CAP_CONN_RSP, sizeof(rsp), &rsp);
++
++		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_REQ_SENT) {
++			release_sock(sk);
++			return 0;
++		}
++
++		l2cap_pi(sk)->conf_state |= L2CAP_CONF_REQ_SENT;
++		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
++				l2cap_build_conf_req(sk, buf), buf);
++		l2cap_pi(sk)->num_conf_req++;
++
++		release_sock(sk);
++		return 0;
 +	}
 +
-+	if (!err && sk->sk_err)
-+		err = -sk->sk_err;
-+
 +	release_sock(sk);
-+	return err;
++
++	if (sock->type == SOCK_STREAM)
++		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
++
++	return bt_sock_recvmsg(iocb, sock, msg, len, flags);
 +}
 +
  static int l2cap_sock_release(struct socket *sock)
