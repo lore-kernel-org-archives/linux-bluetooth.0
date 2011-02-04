@@ -1,44 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Feb 2011 06:58:48 +0200
+Date: Fri, 4 Feb 2011 06:57:47 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix refcount in btd_adapter_any_request_path()
-Message-ID: <20110204045848.GD1551@jh-x301>
-References: <1296792331-467-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH] rename: tools/main.c to tools/rfcomm.c
+Message-ID: <20110204045747.GC1551@jh-x301>
+References: <1296763379-13291-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296792331-467-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1296763379-13291-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Gustavo,
 
-On Fri, Feb 04, 2011, Anderson Lizardo wrote:
-> adapter_any_refcount was not being incremented when a pointer to
-> allocated buffer was returned.
+On Thu, Feb 03, 2011, Gustavo F. Padovan wrote:
 > ---
->  src/adapter.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 08098a5..3e609c1 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3428,11 +3428,10 @@ const char *adapter_any_get_path(void)
->  
->  const char *btd_adapter_any_request_path(void)
->  {
-> -	if (adapter_any_refcount > 0)
-> +	if (adapter_any_refcount++ > 0)
->  		return adapter_any_path;
->  
->  	adapter_any_path = g_strdup_printf("%s/any", manager_get_base_path());
-> -	adapter_any_refcount++;
->  
->  	return adapter_any_path;
->  }
+>  Makefile.tools |    2 +-
+>  tools/main.c   |  849 --------------------------------------------------------
+>  tools/rfcomm.c |  849 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 850 insertions(+), 850 deletions(-)
+>  delete mode 100644 tools/main.c
+>  create mode 100644 tools/rfcomm.c
 
-Nice catch. The patch has been pushed upstream. Thanks.
+The patch has been pushed upstream. Thanks.
 
 Johan
