@@ -1,99 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 4 Feb 2011 11:44:38 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth-next 00/16] l2cap.c split
+Message-ID: <20110204134438.GA2151@joana>
+References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
+ <AANLkTi=P8dnzL9O-SatX_-zddHKndOLxA1vm3V1K+oji@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinVkr3ivG0-Jt-sCJe0VLpPFTUAgDaTTiM5U51A@mail.gmail.com>
-References: <AANLkTi=652bHGqL841fp1ufO1_7C3iTq+tZ4eBcGtEiO@mail.gmail.com>
-	<4D4BED6C.3040506@nokia.com>
-	<AANLkTinVkr3ivG0-Jt-sCJe0VLpPFTUAgDaTTiM5U51A@mail.gmail.com>
-Date: Fri, 4 Feb 2011 15:45:32 +0200
-Message-ID: <AANLkTimhUD74h=QDKQu=EGfPXYHafuTMnwQ-RbGeaUFp@mail.gmail.com>
-Subject: Re: Not able to test GATT on ubuntu
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vijayalakshmi N <vijayalakshmi.nk@gmail.com>
-Cc: Mika Linnanoja <mika.linnanoja@nokia.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=P8dnzL9O-SatX_-zddHKndOLxA1vm3V1K+oji@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Fri, Feb 4, 2011 at 2:33 PM, Vijayalakshmi N
-<vijayalakshmi.nk@gmail.com> wrote:
-> Hi Mika,
->
-> I did use --le option but I get that the socket cannot bind error:
->
-> l2cap_bind: Address already in use (98)
->
-> I did take Vinicius Gomes'  kernel patches for LE and compile it.
->
-> I will get the hcidump for LE as you have said.
->
-> Could you pls. tell me why I'm getting the l2cap error.
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-02-04 14:38:13 +0200]:
 
-Well that normally indicate that there is some other application
-listen on the same psm, but I doubt that could happen in this case
-since normally you are not able to run multiple instances of
-bluetoothd simultaneously, so perhaps this could be caused by LE not
-enabled in the kernel or something like that.
+> Hi,
+> 
+> On Fri, Feb 4, 2011 at 8:01 AM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Here is the first real split of l2cap.c file. That file was getting so big that
+> > we really need to split it in two or more. By now we have two file:
+> > l2cap_sock.c and l2cap_core.c. In l2cap_sock.c we have all functions that deals
+> > with sockets, in l2cap_core.c the rest.
+> >
+> > Side efects are that I had to move the declaration of many functions to l2cap.h
+> > along the l2cap socket list.
+> >
+> > There are more steps on this, but this is surely a big one.
+> 
+> What about creating a l2cap directory like rfcomm? Or that would cause
+> too much hassle with building system?
 
-> Thanks,
-> Vijayalakshmi
->
->
->
-> On Fri, Feb 4, 2011 at 5:43 PM, Mika Linnanoja <mika.linnanoja@nokia.com> wrote:
->> On 02/04/2011 01:59 PM, ext Vijayalakshmi N wrote:
->>>
->>> Dear all,
->>>
->>> I have taken the bluetooth code with BLE changes  (net/bluetooth and
->>> include/net/bluetooth) from
->>>
->>>
->>> http://git.infradead.org/users/vcgomes/linux-2.6.git/tree/refs/heads/le-l2cap
->>> to my 2.6.35 kernel and built the kernel.
->>>
->>> and also built bluez 4.84 on ubuntu 10.10.
->>>
->>> Tried testing GATT with the gatttool that is available with the bluez.
->>>
->>> gatttool --primary -b<bd-address>
->>
->> Hi.
->>
->> If you want to use LE add "--le" to gatttool options. Otherwise (and evident
->> from your hcidump) it tries to create classic BT connection.
->>
->> We haven't tried adding LE kernel patches to .35 kernels (stock ubuntu one),
->> why don't you checkout whole vcgomes' kernel and compile it for your ubuntu
->> box instead?
->>
->> Boots fine in Ubuntu 10.10. Used "make oldconfig" with .config from /boot/
->> for stock kernel and answered defaults to most questions and "Y" to the one
->> asking about enabling SMP for BT LE.
->>
->>> Please see the log (hcidump) of the Master BT device below followed by
->>> the hcidump of Slave (GATT Server).
->>
->> Also, upgrade to hcidump 2.0 it has LE stuff in it, logs will be more
->> useful. Ie get git version and compile and run from compile dir, no need to
->> install.
->>
->>> Thanks,
->>> Vijayalakshmi
->>
->> BR,
->> Mika
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+We plan to merge l2cap.ko and sco.ko modules into bluetooth.ko. That is the
+reason why I'm doing it the net/bluetooth/ directory. There isn't a good use
+case where one won't want to use the l2cap.ko and sco.ko modules and it will
+be always possible to disable L2CAP and SCO in the menuconfig.
 
-
+Regards,
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Gustavo F. Padovan
+http://profusion.mobi
