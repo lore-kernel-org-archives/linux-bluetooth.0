@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Feb 2011 06:54:19 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix parameter type in att_put_u32
-Message-ID: <20110204045419.GA1551@jh-x301>
-References: <1296740222-27174-1-git-send-email-epx@signove.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1296740222-27174-1-git-send-email-epx@signove.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Fix refcount in btd_adapter_any_request_path()
+Date: Fri,  4 Feb 2011 00:05:31 -0400
+Message-Id: <1296792331-467-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+adapter_any_refcount was not being incremented when a pointer to
+allocated buffer was returned.
+---
+ src/adapter.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-On Thu, Feb 03, 2011, Elvis Pfützenreuter wrote:
-> ---
->  attrib/att.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/attrib/att.h b/attrib/att.h
-> index 1caa62a..7e81dc4 100644
-> --- a/attrib/att.h
-> +++ b/attrib/att.h
-> @@ -180,7 +180,7 @@ static inline void att_put_u16(uint16_t src, void *dst)
->  	bt_put_unaligned(htobs(src), (uint16_t *) dst);
->  }
->  
-> -static inline void att_put_u32(uint16_t src, void *dst)
-> +static inline void att_put_u32(uint32_t src, void *dst)
->  {
->  	bt_put_unaligned(htobl(src), (uint32_t *) dst);
->  }
+diff --git a/src/adapter.c b/src/adapter.c
+index 08098a5..3e609c1 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3428,11 +3428,10 @@ const char *adapter_any_get_path(void)
+ 
+ const char *btd_adapter_any_request_path(void)
+ {
+-	if (adapter_any_refcount > 0)
++	if (adapter_any_refcount++ > 0)
+ 		return adapter_any_path;
+ 
+ 	adapter_any_path = g_strdup_printf("%s/any", manager_get_base_path());
+-	adapter_any_refcount++;
+ 
+ 	return adapter_any_path;
+ }
+-- 
+1.7.0.4
 
-Pushed upstream. Thanks.
-
-Johan
