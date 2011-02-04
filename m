@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Feb 2011 06:57:47 +0200
+Date: Fri, 4 Feb 2011 06:55:27 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] rename: tools/main.c to tools/rfcomm.c
-Message-ID: <20110204045747.GC1551@jh-x301>
-References: <1296763379-13291-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH] Fix invalid read after list concatenation
+Message-ID: <20110204045527.GB1551@jh-x301>
+References: <1296758628-15202-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296763379-13291-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1296758628-15202-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Bruna,
 
-On Thu, Feb 03, 2011, Gustavo F. Padovan wrote:
+On Thu, Feb 03, 2011, Bruna Moreira wrote:
+> g_slist_concat uses the items from second list directly so they should
+> not be freed.
 > ---
->  Makefile.tools |    2 +-
->  tools/main.c   |  849 --------------------------------------------------------
->  tools/rfcomm.c |  849 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 850 insertions(+), 850 deletions(-)
->  delete mode 100644 tools/main.c
->  create mode 100644 tools/rfcomm.c
+>  attrib/gatt.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
 
-The patch has been pushed upstream. Thanks.
+Pushed upstream. Thanks.
 
 Johan
