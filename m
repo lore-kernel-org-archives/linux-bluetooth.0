@@ -1,102 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next 07/16] Bluetooth: move l2cap_sock_getname() to l2cap_sock.c
-Date: Fri,  4 Feb 2011 04:01:49 -0200
-Message-Id: <1296799318-5517-8-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1296799318-5517-7-git-send-email-padovan@profusion.mobi>
+Subject: [bluetooth-next 06/16] Bluetooth: move l2cap_sock_accept() to l2cap_sock.c
+Date: Fri,  4 Feb 2011 04:01:48 -0200
+Message-Id: <1296799318-5517-7-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1296799318-5517-6-git-send-email-padovan@profusion.mobi>
 References: <1296799318-5517-1-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-2-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-3-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-4-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-5-git-send-email-padovan@profusion.mobi>
  <1296799318-5517-6-git-send-email-padovan@profusion.mobi>
- <1296799318-5517-7-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
  include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/l2cap_core.c    |   23 -----------------------
- net/bluetooth/l2cap_sock.c    |   23 +++++++++++++++++++++++
- 3 files changed, 23 insertions(+), 24 deletions(-)
+ net/bluetooth/l2cap_core.c    |   56 -----------------------------------------
+ net/bluetooth/l2cap_sock.c    |   56 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 56 insertions(+), 57 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7921b6b..0d0c180 100644
+index 3ca4fe3..7921b6b 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
 @@ -439,7 +439,6 @@ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
  							int proto, gfp_t prio);
  
  int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int alen, int flags);
--int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer);
+-int l2cap_sock_accept(struct socket *sock, struct socket *newsock, int flags);
+ int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer);
  int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len);
  int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags);
- int l2cap_sock_shutdown(struct socket *sock, int how);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 32a615a..6d0d81d 100644
+index c4a90c5..32a615a 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -992,29 +992,6 @@ done:
+@@ -992,62 +992,6 @@ done:
  	return err;
  }
  
--int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer)
+-int l2cap_sock_accept(struct socket *sock, struct socket *newsock, int flags)
 -{
--	struct sockaddr_l2 *la = (struct sockaddr_l2 *) addr;
--	struct sock *sk = sock->sk;
+-	DECLARE_WAITQUEUE(wait, current);
+-	struct sock *sk = sock->sk, *nsk;
+-	long timeo;
+-	int err = 0;
 -
--	BT_DBG("sock %p, sk %p", sock, sk);
+-	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
 -
--	addr->sa_family = AF_BLUETOOTH;
--	*len = sizeof(struct sockaddr_l2);
--
--	if (peer) {
--		la->l2_psm = l2cap_pi(sk)->psm;
--		bacpy(&la->l2_bdaddr, &bt_sk(sk)->dst);
--		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->dcid);
--	} else {
--		la->l2_psm = l2cap_pi(sk)->sport;
--		bacpy(&la->l2_bdaddr, &bt_sk(sk)->src);
--		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->scid);
+-	if (sk->sk_state != BT_LISTEN) {
+-		err = -EBADFD;
+-		goto done;
 -	}
 -
--	return 0;
+-	timeo = sock_rcvtimeo(sk, flags & O_NONBLOCK);
+-
+-	BT_DBG("sk %p timeo %ld", sk, timeo);
+-
+-	/* Wait for an incoming connection. (wake-one). */
+-	add_wait_queue_exclusive(sk_sleep(sk), &wait);
+-	while (!(nsk = bt_accept_dequeue(sk, newsock))) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-		if (!timeo) {
+-			err = -EAGAIN;
+-			break;
+-		}
+-
+-		release_sock(sk);
+-		timeo = schedule_timeout(timeo);
+-		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+-
+-		if (sk->sk_state != BT_LISTEN) {
+-			err = -EBADFD;
+-			break;
+-		}
+-
+-		if (signal_pending(current)) {
+-			err = sock_intr_errno(timeo);
+-			break;
+-		}
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(sk_sleep(sk), &wait);
+-
+-	if (err)
+-		goto done;
+-
+-	newsock->state = SS_CONNECTED;
+-
+-	BT_DBG("new socket %p", nsk);
+-
+-done:
+-	release_sock(sk);
+-	return err;
 -}
 -
- static int __l2cap_wait_ack(struct sock *sk)
+ int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer)
  {
- 	DECLARE_WAITQUEUE(wait, current);
+ 	struct sockaddr_l2 *la = (struct sockaddr_l2 *) addr;
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index b19a386..4c13f8b 100644
+index ef9a60f..b19a386 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -253,6 +253,29 @@ done:
+@@ -197,6 +197,62 @@ done:
  	return err;
  }
  
-+static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer)
++static int l2cap_sock_accept(struct socket *sock, struct socket *newsock, int flags)
 +{
-+	struct sockaddr_l2 *la = (struct sockaddr_l2 *) addr;
-+	struct sock *sk = sock->sk;
++	DECLARE_WAITQUEUE(wait, current);
++	struct sock *sk = sock->sk, *nsk;
++	long timeo;
++	int err = 0;
 +
-+	BT_DBG("sock %p, sk %p", sock, sk);
++	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
 +
-+	addr->sa_family = AF_BLUETOOTH;
-+	*len = sizeof(struct sockaddr_l2);
-+
-+	if (peer) {
-+		la->l2_psm = l2cap_pi(sk)->psm;
-+		bacpy(&la->l2_bdaddr, &bt_sk(sk)->dst);
-+		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->dcid);
-+	} else {
-+		la->l2_psm = l2cap_pi(sk)->sport;
-+		bacpy(&la->l2_bdaddr, &bt_sk(sk)->src);
-+		la->l2_cid = cpu_to_le16(l2cap_pi(sk)->scid);
++	if (sk->sk_state != BT_LISTEN) {
++		err = -EBADFD;
++		goto done;
 +	}
 +
-+	return 0;
++	timeo = sock_rcvtimeo(sk, flags & O_NONBLOCK);
++
++	BT_DBG("sk %p timeo %ld", sk, timeo);
++
++	/* Wait for an incoming connection. (wake-one). */
++	add_wait_queue_exclusive(sk_sleep(sk), &wait);
++	while (!(nsk = bt_accept_dequeue(sk, newsock))) {
++		set_current_state(TASK_INTERRUPTIBLE);
++		if (!timeo) {
++			err = -EAGAIN;
++			break;
++		}
++
++		release_sock(sk);
++		timeo = schedule_timeout(timeo);
++		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
++
++		if (sk->sk_state != BT_LISTEN) {
++			err = -EBADFD;
++			break;
++		}
++
++		if (signal_pending(current)) {
++			err = sock_intr_errno(timeo);
++			break;
++		}
++	}
++	set_current_state(TASK_RUNNING);
++	remove_wait_queue(sk_sleep(sk), &wait);
++
++	if (err)
++		goto done;
++
++	newsock->state = SS_CONNECTED;
++
++	BT_DBG("new socket %p", nsk);
++
++done:
++	release_sock(sk);
++	return err;
 +}
 +
  static int l2cap_sock_release(struct socket *sock)
