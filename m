@@ -1,52 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sat, 5 Feb 2011 16:47:41 +0100
-Message-ID: <AANLkTin6NsxR9UBDi2fbPOQ8yjL8L1RbQZX+G+VLma82@mail.gmail.com>
-Subject: Inconsistent fake-hid-input callback behaviour
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AANLkTi=qXPsLwAd96i5Okw_sh-PFKPy6chnEJ6zb9nu7@mail.gmail.com>
+References: <AANLkTimT8sHND7PtKszFntj-b-BjmJORtijqOh_Bu3vP@mail.gmail.com>
+ <AANLkTin60Z53M=vYA37tU7=7mQzv_Y+aeZp7ZeODSvaU@mail.gmail.com>
+ <AANLkTimesBP5-KineuPYB6-uPEa+-=yBpbZmVo+SEW5=@mail.gmail.com> <AANLkTi=qXPsLwAd96i5Okw_sh-PFKPy6chnEJ6zb9nu7@mail.gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Sat, 5 Feb 2011 12:39:50 +0100
+Message-ID: <AANLkTin35v-OpSW34PMiG2qqBLPckcjhLv5GVKnsqQ49@mail.gmail.com>
+Subject: Re: Health interfaces
+To: Zahirul Islam <zahir1976@gmail.com>
+Cc: sancane@gmail.com, epx@signove.com, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The fake-hid-input API (bluez/input/ plugin) calls the ->connect
-callback quite randomly.
+Hi Zahirul,
 
-The ->connect callback (inside struct fake_hid, NOT struct fake_input)
-is called inside input_device_connect() and fake_hid_connadd().
-However, input_device_connect() calls it only if the "fake" member is
-set, which actually is NEVER set at this point, because the "fake"
-member is set on "hsp" connections only and never on "hid"
-connections. input_device_connect() works only on "hid" connections
-(which is actually written in uppercase "HID" and the device creation
-uses lowercase "hid" which should be fixed for consistency (although
-it might be case insensitive, I don't know)).
-So input_device_connect() never calls this ->connect callback.
-fake_hid_connadd() calls the callback only if a second connection is
-created on the same device (which never happens because
-fake_hid_connadd is only called on PSM 0x11/0x13 HID connections and
-there can only be ONE connection on this PSM). So the whole ->connect
-callback in struct fake_hid seems useless, same as the code testing
-whether fake_hid_connadd() already has an open connection.
+First, please do not do top posting in this mailing list.
 
-All in all it is quite confusing reading input/device.c because the
-fake_input structure is used for two purposes, once rfcomm connections
-of "hsp" connections and second for HID-fake connections which is
-l2cap.
+2011/2/4 Zahirul Islam <zahir1976@gmail.com>:
+> Hi Jose,
+> Thank you for your mail. I really appreciate it.
+> Let me explain little more. I am trying to read data from Health device
+> (blood pressure monitor) and for this trying to create a sink in D-bus using
+> python.
+> I downloaded python script from there and ran deb packages.
 
-It is not clear to me, why devices registered with fake_input_register
-use the same structure (struct fake_input) as fake-HID devices
-registered with input_device_register(and then fake_hid_connadd). The
-latter one only need the "uinput" member of this structure while all
-other members are redundant.
+What python script do you mean? and what deb packages?
 
-I try to implement a Wii-Remote driver as fake-hid input driver which
-actually works and allows the remote to establish connections to my
-host and vice-versa, however, trying to understand input/device.c code
-is quite impossible and getting this ->connect callback to work is
-also not possible. I would be glad to get some help here because my
-wiimote-uinput driver needs some initialization before the ->event
-callback can be called and doing this inside the uinput_setup callback
-seems misplaced as long as there is a ->connect callback.
+> Now python script can create channel in MCAP as follows:
+>
+> Discovering device 00:15:83:43:36:EC CSR - bc4
+>
+> Discovering device 00:09:1F:80:07:E4 AND BP5091101130
+>
+> Handle 00010001:
+>
+> [{'mcap_procedures': ('reconnect_init', 'reconnect_accept'), 'handle':
+> 65537, 'features': [{'mdep_id': 17, 'role': 'source', 'description': u'Blood
+> Pressure Monitor ', 'data_type': 4103}], 'description': '', 'mcap_data_psm':
+> 4099, 'mcap_control_psm': 4097, 'data_spec': 1, 'provider': '', 'name': ''}]
+>
+> Discovering device 00:09:1F:80:0F:0B AND SC5091150921
+>
+> Handle 00010001:
+>
+> [{'mcap_procedures': ('reconnect_init', 'reconnect_accept'), 'handle':
+> 65537, 'features': [{'mdep_id': 17, 'role': 'source', 'description':
+> u'Weighing Scale ', 'data_type': 4111}], 'description': '', 'mcap_data_psm':
+> 4099, 'mcap_control_psm': 4097, 'data_spec': 1, 'provider': '', 'name': ''}]
 
-David
+
+I've got no idea about what this dictionaries are. I recognize some of
+the data there, but I've never seen this dictionaries. Where did you
+get them? Can you give more details.
+
+
+>
+> but I guess I need HealthManager interface (CreateApplication method) to
+> establish connection. I dont see that interface in my qt dbus viewer.
+> I am doing right things? I will appreciate any advice.
+
+I thing that you are mixing things. As I told you in my previous email
+you don't need to use anything from hdpy (wich is a different
+implementation for HDP that was performed just for testing purposes).
+You just have to use D-Bus interfaces.
+
+Regards.
+
+>
+> Thanks again.
+>
+> On Fri, Feb 4, 2011 at 10:49 AM, Jose Antonio Santos Cadenas
+> <santoscadenas@gmail.com> wrote:
+>>
+>> Hi Zahirul,
+>>
+>> 2011/2/4 Zahirul Islam <zahir1976@gmail.com>
+>> >
+>> > I am using ubuntu kernel 2.6.36 (enhanced transmission enabled) and
+>> > qdbusviewer to browse bluez services ..
+>> >
+>> > Thanks in advance.
+>> >
+>> > Regards
+>> > Zahir
+>> >
+>> > On Fri, Feb 4, 2011 at 10:31 AM, Zahirul Islam <zahir1976@gmail.com>
+>> > wrote:
+>> >>
+>> >> Hello,
+>> >>
+>> >>
+>> >> I have installed bluez 4.85 on my Ubuntu and was expecting following Health Interfaces
+>> >> (according to http://gitorious.org/hdpy) in service org.bluez:
+>> >>
+>> >> Org.bluez.HealthManager
+>> >> Org.bluez.HealthApplication
+>> >> Org.bluez.HealthService
+>> >> Org.bluez.HealthAgent
+>> >>
+>> >>
+>> >> I can see only org.bluez.Manager interface available. How could I get those interfaces.
+>> >>
+>> >> I will appreciate any advice.
+>> >>
+>> >>
+>> >> Regards
+>> >>
+>> >> Zahir
+>>
+>> Adding the bluez mail list in CC because this kind of questions should
+>> be reported there.
+>>
+>> I think that your are mixing thing a little bit. If you are using
+>> BlueZ you don't need hdpy. BlueZ implements MCAP and HDP since version
+>> 4.76. The interface is exposed in D-Bus and this should be the unique
+>> way to access HDP.
+>>
+>> You can find the API documentation of the HDP profile in the "docs"
+>> folder of the BlueZ project.
+>>
+>> Regards.
+>>
+>> Jose.
+>
+>
