@@ -1,73 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D4FE85E.4010108@hschmitt.de>
-Date: Mon, 07 Feb 2011 13:41:02 +0100
-From: Harald Schmitt <linux@hschmitt.de>
-MIME-Version: 1.0
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Sim Access Profile API
-Content-Type: text/plain; charset=ISO-8859-15
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 3/3] Support for stop fetching data when maxlistcount is achieved
+Date: Mon,  7 Feb 2011 14:27:38 +0200
+Message-Id: <1297081658-30573-3-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+References: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-New API for Sim Access Profile by Waldemar Rymarkiewicz
+When desired number of results has been already processed,
+then sending already collected data and stopping fetching
+more results from tracker (previously in this scenario
+unnecessarily processing data continued untill end of results
+in db)
 ---
- Makefile.am     |    3 ++-
- doc/sap-api.txt |   34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 1 deletions(-)
- create mode 100644 doc/sap-api.txt
+ plugins/phonebook-tracker.c |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index e6639a7..7975dfa 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -354,7 +354,8 @@ EXTRA_DIST += doc/manager-api.txt \
- 		doc/service-api.txt doc/agent-api.txt doc/attribute-api.txt \
- 		doc/serial-api.txt doc/network-api.txt \
- 		doc/input-api.txt doc/audio-api.txt doc/control-api.txt \
--		doc/hfp-api.txt doc/health-api.txt doc/assigned-numbers.txt
-+		doc/hfp-api.txt doc/health-api.txt doc/sap-api.txt \
-+		doc/assigned-numbers.txt
-  AM_YFLAGS = -d
- diff --git a/doc/sap-api.txt b/doc/sap-api.txt
-new file mode 100644
-index 0000000..b8b7253
---- /dev/null
-+++ b/doc/sap-api.txt
-@@ -0,0 +1,34 @@
-+BlueZ D-Bus Sim Access Profile API description
-+***********************************
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 61c7e90..f00d23c 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1610,11 +1610,17 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+ 
+ 	last_index = params->liststartoffset + params->maxlistcount;
+ 
+-	if ((data->index <= params->liststartoffset ||
+-						data->index > last_index) &&
+-						params->maxlistcount > 0)
++	if (data->index <= params->liststartoffset)
+ 		return 0;
+ 
++	/* max number of results achieved - need send vcards data that was
++	 * already collected and stop further data processing (these operations
++	 * will be invoked in "done" section) */
++	if (data->index > last_index && params->maxlistcount > 0) {
++		DBG("Maxlistcount achieved");
++		goto done;
++	}
 +
-+Copyright (C) 2010 ST-Ericsson SA
-+
-+
-+Sim Access Profile hierarchy
-+============================
-+
-+Service		org.bluez
-+Interface	org.bluez.SimAccess
-+Object path	[variable prefix]/{hci0,hci1,...}
-+
-+Methods		void Disconnect()
-+
-+			Disconnects SAP client from the server.
-+
-+			Possible errors: org.bluez.Error.Failed
-+
-+		dict GetProperties()
-+
-+			Return all properties for the interface. See the
-+			properties section for available properties.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	boolean Connected [readonly]
-+
-+			Indicates if SAP client is connected to the server.
+ add_entry:
+ 	contact = g_new0(struct phonebook_contact, 1);
+ 	contact_init(contact, reply);
 -- 
-1.7.1
+1.7.0.4
 
