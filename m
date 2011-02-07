@@ -1,30 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Feb 2011 15:41:27 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: jaikumar@google.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix control channel shutdown in case of errors.
-Message-ID: <20110207234127.GA28215@jh-x301>
-References: <1296856305-54896-1-git-send-email-jaikumar@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1296856305-54896-1-git-send-email-jaikumar@google.com>
+From: Andre Dieb Martins <andre.dieb@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH] Update gatt listen mode.
+Date: Mon,  7 Feb 2011 17:11:36 -0300
+Message-Id: <1297109496-26609-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+Update gatt's listen-mode flag whenever connect_cb() is called again.
+---
+ attrib/client.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-On Fri, Feb 04, 2011, jaikumar@google.com wrote:
-> When there are connection errors, like host is down, when
-> establishing the control channel connection, the control io
-> channel was not being shutdown. This will cause future
-> connections to fail.
-> ---
->  input/device.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+diff --git a/attrib/client.c b/attrib/client.c
+index 44638d3..ec5fcf2 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -356,6 +356,7 @@ static int l2cap_connect(struct gatt_service *gatt, GError **gerr,
+ 
+ 	if (gatt->attrib != NULL) {
+ 		gatt->attrib = g_attrib_ref(gatt->attrib);
++		gatt->listen = listen;
+ 		return 0;
+ 	}
+ 
+-- 
+1.7.1
 
-Thanks, there were several other issues present (which we already
-discussed) so a little bit different (and more comprehensive) patch has
-now been pushed upstream.
-
-Johan
