@@ -2,48 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 3/3] Support for stop fetching data when maxlistcount is achieved
-Date: Mon,  7 Feb 2011 14:27:38 +0200
-Message-Id: <1297081658-30573-3-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 2/3] Remove unnecessary checking for num_fields in pull_contact
+Date: Mon,  7 Feb 2011 14:27:37 +0200
+Message-Id: <1297081658-30573-2-git-send-email-ext-jablonski.radoslaw@nokia.com>
 In-Reply-To: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 References: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When desired number of results has been already processed,
-then sending already collected data and stopping fetching
-more results from tracker (previously in this scenario
-unnecessarily processing data continued untill end of results
-in db)
+This check is no longer needed - it was used to ensure that no
+error occured in querying tracker. This is redundant because
+checking for that case is located in the beginning of pull_contacts
+function.
 ---
- plugins/phonebook-tracker.c |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
+ plugins/phonebook-tracker.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 61c7e90..f00d23c 100644
+index 44cedfc..61c7e90 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -1610,11 +1610,17 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+@@ -1642,9 +1642,7 @@ add_numbers:
+ done:
+ 	vcards = gen_vcards(data->contacts, params);
  
- 	last_index = params->liststartoffset + params->maxlistcount;
+-	if (num_fields == 0)
+-		data->cb(vcards->str, vcards->len,
+-					g_slist_length(data->contacts),
++	data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
+ 					data->newmissedcalls, data->user_data);
  
--	if ((data->index <= params->liststartoffset ||
--						data->index > last_index) &&
--						params->maxlistcount > 0)
-+	if (data->index <= params->liststartoffset)
- 		return 0;
- 
-+	/* max number of results achieved - need send vcards data that was
-+	 * already collected and stop further data processing (these operations
-+	 * will be invoked in "done" section) */
-+	if (data->index > last_index && params->maxlistcount > 0) {
-+		DBG("Maxlistcount achieved");
-+		goto done;
-+	}
-+
- add_entry:
- 	contact = g_new0(struct phonebook_contact, 1);
- 	contact_init(contact, reply);
+ 	g_string_free(vcards, TRUE);
 -- 
 1.7.0.4
 
