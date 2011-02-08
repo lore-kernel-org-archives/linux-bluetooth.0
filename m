@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Feb 2011 15:09:09 -0800
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Andre Dieb Martins <andre.dieb@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Update gatt listen mode.
-Message-ID: <20110208230909.GC17287@jh-x301>
-References: <1297109496-26609-1-git-send-email-andre.dieb@signove.com>
+Date: Tue, 8 Feb 2011 15:00:58 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add UUID property to GATT service object
+Message-ID: <20110208225958.GA17287@jh-x301>
+References: <1296828067-20496-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1297109496-26609-1-git-send-email-andre.dieb@signove.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1296828067-20496-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi André,
+Hi Elvis,
 
-On Mon, Feb 07, 2011, Andre Dieb Martins wrote:
-> Update gatt's listen-mode flag whenever connect_cb() is called again.
-> ---
->  attrib/client.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/attrib/client.c b/attrib/client.c
-> index 44638d3..ec5fcf2 100644
-> --- a/attrib/client.c
-> +++ b/attrib/client.c
-> @@ -356,6 +356,7 @@ static int l2cap_connect(struct gatt_service *gatt, GError **gerr,
+On Fri, Feb 04, 2011, Elvis Pf??tzenreuter wrote:
+> @@ -962,6 +963,10 @@ static DBusMessage *prim_get_properties(DBusConnection *conn, DBusMessage *msg,
 >  
->  	if (gatt->attrib != NULL) {
->  		gatt->attrib = g_attrib_ref(gatt->attrib);
-> +		gatt->listen = listen;
->  		return 0;
->  	}
+>  	dict_append_array(&dict, "Characteristics", DBUS_TYPE_OBJECT_PATH,
+>  								&chars, i);
+> +	uuid = g_strdup(prim->att->uuid);
+> +	dict_append_entry(&dict, "UUID", DBUS_TYPE_STRING, &uuid);
+> +
+> +	g_free(uuid);
+>  	g_free(chars);
+>  
+>  	dbus_message_iter_close_container(&iter, &dict);
 
-Thanks. The patch has been pushed upstream.
+I'd rather avoid the unnecessary memory allocation here. The following
+should be enough:
+
+const char *uuid;
+...
+uuid = prim->att->uuid;
+dict_append_entry(..., DBUS_TYPE_STRING, &uuid);
 
 Johan
