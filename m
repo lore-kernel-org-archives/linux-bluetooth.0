@@ -1,63 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: update L2CAP SCO, and bluetooth.ko versions
-Date: Tue,  8 Feb 2011 16:51:01 -0200
-Message-Id: <1297191061-8246-3-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1297191061-8246-2-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 2/3] Bluetooth: remove l2cap_load() hack
+Date: Tue,  8 Feb 2011 16:51:00 -0200
+Message-Id: <1297191061-8246-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1297191061-8246-1-git-send-email-padovan@profusion.mobi>
 References: <1297191061-8246-1-git-send-email-padovan@profusion.mobi>
- <1297191061-8246-2-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Update to reflect the l2cap.ko sco.ko and bluetooth.ko modules merge.
+l2cap_load() was added to trigger l2cap.ko module loading from the RFCOMM
+and BNEP modules. Now that L2CAP module is gone, we don't need it anymore.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/af_bluetooth.c |    2 +-
- net/bluetooth/l2cap_core.c   |    2 +-
- net/bluetooth/sco.c          |    2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/bnep/core.c   |    2 --
+ net/bluetooth/l2cap_core.c  |    8 --------
+ net/bluetooth/rfcomm/core.c |    2 --
+ 3 files changed, 0 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index d1413d4..c258027 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -40,7 +40,7 @@
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 5868597..03d4d12 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -708,8 +708,6 @@ static int __init bnep_init(void)
+ {
+ 	char flt[50] = "";
  
- #include <net/bluetooth/bluetooth.h>
- 
--#define VERSION "2.15"
-+#define VERSION "2.16"
- 
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
+-	l2cap_load();
+-
+ #ifdef CONFIG_BT_BNEP_PROTO_FILTER
+ 	strcat(flt, "protocol ");
+ #endif
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d4cf883..51672ed 100644
+index 518d940..d4cf883 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -55,7 +55,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
+@@ -3858,13 +3858,5 @@ void l2cap_exit(void)
+ 	l2cap_cleanup_sockets();
+ }
  
--#define VERSION "2.15"
-+#define VERSION "2.16"
+-void l2cap_load(void)
+-{
+-	/* Dummy function to trigger automatic L2CAP module loading by
+-	 * other modules that use L2CAP sockets but don't use any other
+-	 * symbols from it. */
+-}
+-EXPORT_SYMBOL(l2cap_load);
+-
+ module_param(disable_ertm, bool, 0644);
+ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 6b83776..c997393 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2154,8 +2154,6 @@ static int __init rfcomm_init(void)
+ {
+ 	int err;
  
- int disable_ertm;
+-	l2cap_load();
+-
+ 	hci_register_cb(&rfcomm_cb);
  
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index db40a35..3520938 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -50,7 +50,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/sco.h>
- 
--#define VERSION "0.6"
-+#define VERSION "0.7"
- 
- static int disable_esco;
- 
+ 	rfcomm_thread = kthread_run(rfcomm_run, NULL, "krfcommd");
 -- 
 1.7.4
 
