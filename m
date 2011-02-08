@@ -1,32 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D51D8AE.9020005@codeaurora.org>
-Date: Tue, 08 Feb 2011 15:58:38 -0800
+Message-ID: <4D51D70F.9050703@codeaurora.org>
+Date: Tue, 08 Feb 2011 15:51:43 -0800
 From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Kernal/User space change for LE Random Addresses
+Subject: GATT Attribute Server changes coming.
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-One other change that is needed, which I don't really know how to attack 
-is remote devices with Random Addresses.  There is at least one team 
-here at UPF with a device with a Random Address which cannot be 
-connected to with either Vinicius' or the bluetooth-next kernal tips, 
-because the connection HCI command only specifies Public Addresses as 
-the remote address type.
+Due to some observations at UPF, I have made some on the fly 
+modifications to the attribute-server.c and example.c files.  The 
+changes appear to work, but I am cleaning up the changes and will submit 
+them as potential patches probably early next week.
 
-I am not at all knowledgable about sockets, but I assume that a new 
-Socket option needs to be defined that specifies address type.
+Specifically, they pertain to how Primary Services are discovered by 
+BR/EDR GATT Clients.  The relevant spec section is 4.4 of Part G (GATT), 
+Volume 3, Core Revision 4.0.  It states that Primary Services SHALL be 
+discovered on BR/EDR links via SDP.
 
-I can get around this inelegantly by building a secondary kernel which 
-hard-codes the address type to Random, and then dual booting into that 
-kernel for random address only remote devices.
+So I have staged the following changes in my personal workspace:
 
-I would love if someone who knows the bluez socket option handling (both 
-kernel and user space) could fix this, otherwise I will try to muddle 
-along on my own.
+1. Modified the ATT_UUID to be 0x0007 instead of 0x1801, which is the 
+GATT UUID.  The ATT Protocol UUID is now publiched in BT Assigned Numbers.
+
+2. I have added a new "end" parameter to attrib_db_add() to indicate the 
+end of a Attribute Handle Range (which may be Zero if not appropriate) 
+which when combined with a Primary Service Attribute, will register a 
+correctly formatted SDP service Record for BR/EDR purposes. I will 
+probably also add yet one more Parameter that will be a string value 
+description for the SDP record.
+
+3. I have tested against two other teams so far to shake out the bugs, 
+and it looks promising.  There is one team that depends on these SDP 
+records, and I will be testing against them again tomorrow.
 
 
 -- 
