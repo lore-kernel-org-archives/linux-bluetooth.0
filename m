@@ -1,36 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1296071867.2656.202.camel@ubuntuLab1>
-References: <AANLkTikrjgmAK9pzoJtnNJwQHraiaCnb8XVP55gAEKeH@mail.gmail.com>
-	<1295984785.2656.98.camel@ubuntuLab1>
-	<AANLkTi=4HoUKdda-GCrTQEtLSScuxB4D+btoRy+QsMG_@mail.gmail.com>
-	<AANLkTi=gZQ2Ps2yoXT7+08E3AruB5pAAy+ib+wBcQY4S@mail.gmail.com>
-	<1296064762.2656.137.camel@ubuntuLab1>
-	<AANLkTinbmiew-MBN7PxK5ePuObzBbHbqdteaB2nS3nty@mail.gmail.com>
-	<1296071867.2656.202.camel@ubuntuLab1>
-Date: Tue, 8 Feb 2011 17:46:13 -0300
-Message-ID: <AANLkTi=6fNu_2jH8_KijR-a_U+DbkRiz6C667N7NBQLV@mail.gmail.com>
-Subject: Re: Read Characteristic Value vs. Read Long Characteristic Values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH] [RFC] Add generic descriptor support to Attribute API
+Date: Tue,  8 Feb 2011 17:38:31 -0200
+Message-Id: <1297193911-26665-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+This patch proposes extensions to Attribute API, giving access to all
+characteristic descriptors (beyond 'Description' and 'Format').
+---
+ doc/attribute-api.txt |   25 +++++++++++++++++++++++++
+ 1 files changed, 25 insertions(+), 0 deletions(-)
 
-On Wed, Jan 26, 2011 at 4:57 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> I will talk to the PTS guys at UPF, and make sure that the PIXIT lists
-> are setup such that the tests required for qualification correctly
-> mandate the correct subset of test cases as required by the ruling
-> specification.
-
-Did you manage to get some input from PTS guys on these tests? I did
-not check the recently released 4.2.0 yet.
-
-Regards,
+diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
+index 23808e6..eff49b2 100644
+--- a/doc/attribute-api.txt
++++ b/doc/attribute-api.txt
+@@ -104,6 +104,13 @@ Methods		dict GetProperties()
+ 
+ 			Possible Errors: org.bluez.Error.InvalidArguments
+ 
++		void SetDescriptorValue(object descriptor, array{byte} value)
++
++			Sets descriptor value, provided that it is writable.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotAuthorized
++
+ Properties 	string UUID [readonly]
+ 
+ 			UUID128 of this characteristic.
+@@ -143,6 +150,24 @@ Properties 	string UUID [readonly]
+ 			Friendly representation of the Characteristic Value
+ 			based on the format attribute.
+ 
++		dict Descriptors [readonly]
++
++			List of descriptors for this characteristic.
++
++			This list contains only the descriptors not already
++			covered by other properties (v.g. Description, Format).
++
++			Each descriptor is mapped to an unique object path,
++			which is the key for the dict.
++
++			Each dict value is, in turn, a dict with at least
++			the following keys:
++
++			{
++				"UUID": string (descriptor UUID),
++				"Value": array of bytes (raw descriptor value)
++			}
++
+ 
+ Characteristic Watcher hierarchy
+ ===============================
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.7.1
+
