@@ -1,54 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: Oliver Neukum <oneukum@suse.de>
-Subject: Re: [BUG] usb problems in .38-rc3+
-Date: Mon, 7 Feb 2011 21:15:20 -0500
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-usb@vger.kernel.org
-References: <201102051417.58953.edt@aei.ca> <201102071009.51238.oneukum@suse.de> <201102071920.22543.edt@aei.ca>
-In-Reply-To: <201102071920.22543.edt@aei.ca>
+Message-ID: <4D509ABA.1010909@codeaurora.org>
+Date: Mon, 07 Feb 2011 17:22:02 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201102072115.20858.edt@aei.ca>
-Sender: linux-kernel-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org, vinicius.gomes@openbossa.org
+Subject: Re: Frequent SM test failure at UPF
+References: <4D508DC2.60003@codeaurora.org>
+In-Reply-To: <4D508DC2.60003@codeaurora.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 07 February 2011 19:20:21 Ed Tomlinson wrote:
-> On Monday 07 February 2011 04:09:51 Oliver Neukum wrote:
-> > Am Samstag, 5. Februar 2011, 20:17:57 schrieb Ed Tomlinson:
-> > > Hi,
-> > > 
-> > > My bluetooth usb dongle has stopped working in .38-rc3+
-> > > 
-> > > Bus 002 Device 008: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-> > > 
-> > > and in dmesg
-> > > 
-> > > [108495.369056] usb 5-1: new full speed USB device using ohci_hcd and address 3
-> > > [108495.573077] usb 5-1: New USB device found, idVendor=0a12, idProduct=0001
-> > > [108495.580099] usb 5-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> > > [108652.971977] usb 5-1: USB disconnect, address 3
-> > > [108652.972718] btusb_bulk_complete: hci0 urb ffff8800684e99c0 failed to resubmit (19)
-> > > [108652.973725] btusb_bulk_complete: hci0 urb ffff8800684e9c00 failed to resubmit (19)
-> > > [108652.974707] btusb_intr_complete: hci0 urb ffff8800684e9840 failed to resubmit (19)
-> > > [108653.001690] btusb_send_frame: hci0 urb ffff8800bb42a240 submission failed
-> > > [108657.007541] usb 2-4.7: new full speed USB device using ehci_hcd and address 8
-> > > [108657.147736] usb 2-4.7: New USB device found, idVendor=0a12, idProduct=0001
-> > > [108657.154954] usb 2-4.7: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> > > 
-> > > Its been working for years here.
-> > > 
-> > > Any ideas on what to try or additional info to gather?
-> > 
-> > Please test what happens if you disable runtime power management.
-> 
-> After a pointer from Oliver I booted with usbcore.autosuspend=30000 and verified the device used
-> the parm via /sys/bus...   Still did not work.  Bisect or are there some other things to try?
+On 2/7/2011 4:26 PM, Brian Gix wrote:
+>
+> Testing of Shorter than 16 octet keys.
+>
+> In smp_cmd_pairing_random() when the STK is generated, it needs to be
+> truncated to the MIN of conn->preq[4] and conn->pres[4].
+>
+> This Min value may need to be saved for later as well, because it needs
+> to also limit the LTK key exchange.
+>
+> This failure showed up with the PTS tool, and at least one other device
+> during the days testing. I have mocked up a fix, but have not had a
+> chance to test it yet.
+>
+>
 
-I tried bisecting without much luck.  It started with about 4000 commits to check.  It was still bad
-when it reached the first 1000 commits post .37.  Then all boots started crashing.  I think its possible
-to restrict a bisect to a directory - if so, what dir should I try?
+PTS also did not like that we request No Bonding, but request to 
+exchange keys.  I am not sure who is at fault there. At first glance, 
+exchanging keys insinuates a bonded relationship, so I don't know what 
+it means to request key exchange but not bond.  I think both sides need 
+to agree to bond (bit 0x01 in offset 3 (4th octet) of the req and res) 
+to remember the exchanged keys, but exchanging keys should still be OK 
+for the duration of that session at least.  They would then be discarded 
+when the connection ended.
 
-TIA
-Ed
+It also may not make sense to request Bonding, but not have keys to 
+exchange, because I am not sure if you are really bonded if you have no 
+keys exchanged with the remote device.  You could always just remember 
+the remote device's BD Addr, I suppose and choose to accept or reject 
+no-security connections based on that.
+
+I am sorry, the above is mostly just me thinking out loud. I don't know 
+for sure if any of that is actually correct.
+
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
