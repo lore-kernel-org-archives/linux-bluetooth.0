@@ -1,25 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Obexd client question
-From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Message-Id: <51E531A4-C9E5-4291-8078-FFD4C0656CD3@gmail.com>
-Date: Wed, 9 Feb 2011 10:38:23 +0900
-Cc: "luiz.dentz-von@nokia.com" <luiz.dentz-von@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (iPhone Mail 8C148a)
+Message-ID: <4D51D8AE.9020005@codeaurora.org>
+Date: Tue, 08 Feb 2011 15:58:38 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Kernal/User space change for LE Random Addresses
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- Hello Bluetooth developer!
 
-I try to use obexd client(the latest version). 
-I have a few question while using ftp client.
+One other change that is needed, which I don't really know how to attack 
+is remote devices with Random Addresses.  There is at least one team 
+here at UPF with a device with a Random Address which cannot be 
+connected to with either Vinicius' or the bluetooth-next kernal tips, 
+because the connection HCI command only specifies Public Addresses as 
+the remote address type.
 
-1. Listfolder
-After I dbus call it("ListFolder"), "ChangeFolder" dbus method call doesn't work well. I think because session_transfer() is just returned transfer_unregister() is not called and they block another dbus call. If you find mistake in my usage, please tell me.
+I am not at all knowledgable about sockets, but I assume that a new 
+Socket option needs to be defined that specifies address type.
 
-2. Agen Cancel
-If we call Agent Cancel While transfer is going on, connection is removed unexpectfully. Is this original concept? I think it could only stop transfer. 
+I can get around this inelegantly by building a secondary kernel which 
+hard-codes the address type to Random, and then dual booting into that 
+kernel for random address only remote devices.
 
-Finally could you tell me who use obexd server, obexd client respectively?
+I would love if someone who knows the bluez socket option handling (both 
+kernel and user space) could fix this, otherwise I will try to muddle 
+along on my own.
+
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
