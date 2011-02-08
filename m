@@ -1,445 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 8 Feb 2011 16:16:59 -0200
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: pavan_savoy@ti.com
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH v9] Bluetooth: btwilink driver
-Message-ID: <20110208181659.GB2160@joana>
-References: <1297080737-21032-1-git-send-email-pavan_savoy@ti.com>
+Message-ID: <4D517EE1.8040408@codeaurora.org>
+Date: Tue, 08 Feb 2011 09:35:29 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297080737-21032-1-git-send-email-pavan_savoy@ti.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Frequent SM test failure at UPF
+References: <4D508DC2.60003@codeaurora.org> <4D509ABA.1010909@codeaurora.org> <20110208135849.GA31237@piper>
+In-Reply-To: <20110208135849.GA31237@piper>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavan,
+Hi Vinicius,
 
-* pavan_savoy@ti.com <pavan_savoy@ti.com> [2011-02-07 06:12:17 -0600]:
+On 2/8/2011 5:58 AM, Vinicius Costa Gomes wrote:
+> Hi Brian,
+>
+> On 17:22 Mon 07 Feb, Brian Gix wrote:
+>> On 2/7/2011 4:26 PM, Brian Gix wrote:
+>>>
+>>> Testing of Shorter than 16 octet keys.
+>>>
+>>> In smp_cmd_pairing_random() when the STK is generated, it needs to be
+>>> truncated to the MIN of conn->preq[4] and conn->pres[4].
+>>>
+>>> This Min value may need to be saved for later as well, because it needs
+>>> to also limit the LTK key exchange.
+>>>
+>>> This failure showed up with the PTS tool, and at least one other device
+>>> during the days testing. I have mocked up a fix, but have not had a
+>>> chance to test it yet.
+>>>
+>>>
+>
+> First, thanks for the reports. This particular issue should be fixed soon.
+>
 
-> From: Pavan Savoy <pavan_savoy@ti.com>
-> 
-> Gustavo,
-> 
-> Find below the patch version v9.
-> Have taken care of Ville's comments.
-> In addition fixed the issue seen when built as module, with
-> repeated probe/remove of the platform driver.
-> 
-> patch v8 comments taken care,
-> 
-> As suggested, the modifications to TI ST driver to remove the bluetooth
-> references have been made and the changes have been merged to the
-> linux-next tree.
-> 
-> Find below the patch for the btwilink driver,
-> I have taken care of your following comments,
-> 1. channel IDs and the offsets are now being taken from the
-> header file hci.h.
-> 2. removed the un-necessary BT_ERR.
-> 3. changed the order during return from st_register.
-> 4. continue to unregister even if 1st unregister fails.
-> 
-> Please review and provide comments,
-> 
-> Thanks & Regards,
-> Pavan Savoy
-> 
-> -- patch description --
-> 
-> This is the bluetooth protocol driver for the TI WiLink7 chipsets.
-> Texas Instrument's WiLink chipsets combine wireless technologies
-> like BT, FM, GPS and WLAN onto a single chip.
-> 
-> This Bluetooth driver works on top of the TI_ST shared transport
-> line discipline driver which also allows other drivers like
-> FM V4L2 and GPS character driver to make use of the same UART interface.
-> 
-> Kconfig and Makefile modifications to enable the Bluetooth
-> driver for Texas Instrument's WiLink 7 chipset.
-> 
-> Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
-> ---
->  drivers/bluetooth/Kconfig    |   10 +
->  drivers/bluetooth/Makefile   |    1 +
->  drivers/bluetooth/btwilink.c |  397 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 408 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/bluetooth/btwilink.c
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 02deef4..8e0de9a 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -219,4 +219,14 @@ config BT_ATH3K
->  	  Say Y here to compile support for "Atheros firmware download driver"
->  	  into the kernel or say M to compile it as module (ath3k).
->  
-> +config BT_WILINK
-> +	tristate "Texas Instruments WiLink7 driver"
-> +	depends on TI_ST
-> +	help
-> +	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
-> +	  combo devices. This makes use of shared transport line discipline
-> +	  core driver to communicate with the BT core of the combo chip.
-> +
-> +	  Say Y here to compile support for Texas Instrument's WiLink7 driver
-> +	  into the kernel or say M to compile it as module.
->  endmenu
-> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> index 71bdf13..f4460f4 100644
-> --- a/drivers/bluetooth/Makefile
-> +++ b/drivers/bluetooth/Makefile
-> @@ -18,6 +18,7 @@ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
->  obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
->  obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
->  obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-> +obj-$(CONFIG_BT_WILINK)		+= btwilink.o
->  
->  btmrvl-y			:= btmrvl_main.o
->  btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-> diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-> new file mode 100644
-> index 0000000..79c70c2
-> --- /dev/null
-> +++ b/drivers/bluetooth/btwilink.c
-> @@ -0,0 +1,397 @@
-> +/*
-> + *  Texas Instrument's Bluetooth Driver For Shared Transport.
-> + *
-> + *  Bluetooth Driver acts as interface between HCI core and
-> + *  TI Shared Transport Layer.
-> + *
-> + *  Copyright (C) 2009-2010 Texas Instruments
-> + *  Author: Raja Mani <raja_mani@ti.com>
-> + *	Pavan Savoy <pavan_savoy@ti.com>
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License version 2 as
-> + *  published by the Free Software Foundation.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-> + *
-> + */
-> +#define DEBUG
-> +#include <linux/platform_device.h>
-> +#include <net/bluetooth/bluetooth.h>
-> +#include <net/bluetooth/hci_core.h>
-> +#include <net/bluetooth/hci.h>
-> +
-> +#include <linux/ti_wilink_st.h>
-> +
-> +/* Bluetooth Driver Version */
-> +#define VERSION               "1.0"
-> +#define MAX_BT_CHNL_IDS		3
-> +
-> +/* Number of seconds to wait for registration completion
-> + * when ST returns PENDING status.
-> + */
-> +#define BT_REGISTER_TIMEOUT   6000	/* 6 sec */
-> +
-> +/**
-> + * struct ti_st - driver operation structure
-> + * @hdev: hci device pointer which binds to bt driver
-> + * @reg_status: ST registration callback status
-> + * @st_write: write function provided by the ST driver
-> + *	to be used by the driver during send_frame.
-> + * @wait_reg_completion - completion sync between ti_st_open
-> + *	and st_reg_completion_cb.
-> + */
-> +struct ti_st {
-> +	struct hci_dev *hdev;
-> +	char reg_status;
-> +	long (*st_write) (struct sk_buff *);
-> +	struct completion wait_reg_completion;
-> +};
-> +
-> +/* Increments HCI counters based on pocket ID (cmd,acl,sco) */
-> +static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
-> +{
-> +	struct hci_dev *hdev = hst->hdev;
-> +
-> +	/* Update HCI stat counters */
-> +	switch (pkt_type) {
-> +	case HCI_COMMAND_PKT:
-> +		hdev->stat.cmd_tx++;
-> +		break;
-> +
-> +	case HCI_ACLDATA_PKT:
-> +		hdev->stat.acl_tx++;
-> +		break;
-> +
-> +	case HCI_SCODATA_PKT:
-> +		hdev->stat.sco_tx++;
-> +		break;
-> +	}
-> +}
-> +
-> +/* ------- Interfaces to Shared Transport ------ */
-> +
-> +/* Called by ST layer to indicate protocol registration completion
-> + * status.ti_st_open() function will wait for signal from this
-> + * API when st_register() function returns ST_PENDING.
-> + */
-> +static void st_reg_completion_cb(void *priv_data, char data)
-> +{
-> +	struct ti_st *lhst = priv_data;
-> +
-> +	/* Save registration status for use in ti_st_open() */
-> +	lhst->reg_status = data;
-> +	/* complete the wait in ti_st_open() */
-> +	complete(&lhst->wait_reg_completion);
-> +}
-> +
-> +/* Called by Shared Transport layer when receive data is
-> + * available */
-> +static long st_receive(void *priv_data, struct sk_buff *skb)
-> +{
-> +	struct ti_st *lhst = priv_data;
-> +	int err;
-> +
-> +	if (!skb)
-> +		return -EFAULT;
-> +
-> +	if (!lhst) {
-> +		kfree_skb(skb);
-> +		return -EFAULT;
-> +	}
-> +
-> +	skb->dev = (void *) lhst->hdev;
-> +
-> +	/* Forward skb to HCI core layer */
-> +	err = hci_recv_frame(skb);
-> +	if (err < 0) {
-> +		BT_ERR("Unable to push skb to HCI core(%d)", err);
-> +		return err;
-> +	}
-> +
-> +	lhst->hdev->stat.byte_rx += skb->len;
-> +
-> +	return 0;
-> +}
-> +
-> +/* ------- Interfaces to HCI layer ------ */
-> +/* protocol structure registered with shared transport */
-> +static struct st_proto_s ti_st_proto[MAX_BT_CHNL_IDS] = {
-> +	{
-> +		.chnl_id = HCI_ACLDATA_PKT, /* ACL */
-> +		.hdr_len = sizeof(struct hci_acl_hdr),
-> +		.offset_len_in_hdr = offsetof(struct hci_acl_hdr, dlen),
-> +		.len_size = 2,	/* sizeof(dlen) in struct hci_acl_hdr */
-> +		.reserve = 8,
-> +	},
-> +	{
-> +		.chnl_id = HCI_SCODATA_PKT, /* SCO */
-> +		.hdr_len = sizeof(struct hci_sco_hdr),
-> +		.offset_len_in_hdr = offsetof(struct hci_sco_hdr, dlen),
-> +		.len_size = 1, /* sizeof(dlen) in struct hci_sco_hdr */
-> +		.reserve = 8,
-> +	},
-> +	{
-> +		.chnl_id = HCI_EVENT_PKT, /* HCI Events */
-> +		.hdr_len = sizeof(struct hci_event_hdr),
-> +		.offset_len_in_hdr = offsetof(struct hci_event_hdr, plen),
-> +		.len_size = 1, /* sizeof(plen) in struct hci_event_hdr */
-> +		.reserve = 8,
-> +	},
-> +};
-> +
-> +/* Called from HCI core to initialize the device */
-> +static int ti_st_open(struct hci_dev *hdev)
-> +{
-> +	unsigned long timeleft;
-> +	struct ti_st *hst;
-> +	int err, i;
-> +
-> +	BT_DBG("%s %p", hdev->name, hdev);
-> +
-> +	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
-> +		return -EBUSY;
-> +
-> +	/* provide contexts for callbacks from ST */
-> +	hst = hdev->driver_data;
-> +
-> +	for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
-> +		ti_st_proto[i].priv_data = hst;
-> +		ti_st_proto[i].max_frame_size = HCI_MAX_FRAME_SIZE;
-> +		ti_st_proto[i].recv = st_receive;
-> +		ti_st_proto[i].reg_complete_cb = st_reg_completion_cb;
-> +
-> +		/* Prepare wait-for-completion handler */
-> +		init_completion(&hst->wait_reg_completion);
-> +
-> +		err = st_register(&ti_st_proto[i]);
-> +		if (!err)
-> +			goto done_downloading_firmware;
-> +
-> +		if (err != -EINPROGRESS) {
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +			BT_ERR("st_register failed %d", err);
-> +			return err;
-> +		}
-> +
-> +		/* ST is busy with either protocol
-> +		 * registration or firmware download.
-> +		 */
-> +
-> +		/* Reset ST registration callback status flag,
-> +		 * this value will be updated in
-> +		 * st_reg_completion_cb()
-> +		 * function whenever it called from ST driver.
-> +		 */
-> +		hst->reg_status = -EINPROGRESS;
-> +
-> +		BT_DBG("waiting for registration "
-> +				"completion signal from ST");
-> +		timeleft = wait_for_completion_timeout
-> +			(&hst->wait_reg_completion,
-> +			 msecs_to_jiffies(BT_REGISTER_TIMEOUT));
-> +		if (!timeleft) {
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +			BT_ERR("Timeout(%d sec),didn't get reg "
-> +					"completion signal from ST",
-> +					BT_REGISTER_TIMEOUT / 1000);
-> +			return -ETIMEDOUT;
-> +		}
-> +
-> +		/* Is ST registration callback
-> +		 * called with ERROR status? */
-> +		if (hst->reg_status != 0) {
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +			BT_ERR("ST registration completed with invalid "
-> +					"status %d", hst->reg_status);
-> +			return -EAGAIN;
-> +		}
-> +
-> +done_downloading_firmware:
+When testing this morning, I successfully negotiated and paired with a 
+device, where we both said that we could accept and produce all keys 
+(key mask 0x07).  We were the responder, and sent all keys (0x06 through 
+0x0A) then we received all keys from remote device (0x06 through 0x0A). 
+  The apparent problem was that we sent the all of our keys a second 
+time.  This caused no problems, but was noticable on the hcidump trace:
 
-done_downloading_firmware is way too big, please use just "done".
+ > ACL data: handle 10 flags 0x02 dlen 11
+     L2CAP(d): cid 0x0006 len 7 [psm 0]
+       0000: 01 03 00 00 10 07 07                              .......
+< ACL data: handle 10 flags 0x00 dlen 11
+     0000: 07 00 06 00 02 03 00 00  10 07 07                 ...........
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > ACL data: handle 10 flags 0x02 dlen 21
+     L2CAP(d): cid 0x0006 len 17 [psm 0]
+       0000: 03 de 36 99 3f ed 4a 13  78 2c 3e dd 6f 3c 0f 2f 
+..6.?.J.x,>.o<./
+       0010: 6e                                                n
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 03 df 4b f0  b0 f1 8e 1c 5e b6 f9 9c 
+......K.....^...
+     0010: c4 65 c3 9e 3d                                    .e..=
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > ACL data: handle 10 flags 0x02 dlen 21
+     L2CAP(d): cid 0x0006 len 17 [psm 0]
+       0000: 04 91 91 91 91 91 91 91  91 91 91 91 91 91 91 91 
+................
+       0010: 91                                                .
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 04 56 54 2b  45 81 16 6a d4 58 5c 73 
+.....VT+E..j.X\s
+     0010: 77 08 43 e5 6f                                    w.C.o
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > HCI Event: LE Meta Event (0x3e) plen 13
+     LE Long Term Key Request
+     0000: 0a 00 00 00 00 00 00 00  00 00 00 00              ............
+< HCI Command: LE Long Term Key Request Reply (0x08|0x001a) plen 18
+   0000: 0a 00 16 51 6d 0c c3 59  fc 71 e2 e1 64 59 a7 81  ...Qm..Y.q..dY..
+   0010: c1 72                                             .r
+ > HCI Event: Command Complete (0x0e) plen 6
+     LE Long Term Key Request Reply (0x08|0x001a) ncmd 1
+     0000: 00 0a 00                                          ...
+ > HCI Event: Encrypt Change (0x08) plen 4
+     status 0x00 handle 10 encrypt 0x01
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 06 01 01 01  01 01 01 01 01 01 01 01 
+................
+     0010: 01 01 01 01 01                                    .....
+< ACL data: handle 10 flags 0x00 dlen 15
+     0000: 0b 00 06 00 07 02 02 02  02 02 02 02 02 02 02     ...............
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 08 04 04 04  04 04 04 04 04 04 04 04 
+................
+     0010: 04 04 04 04 04                                    .....
+< ACL data: handle 10 flags 0x00 dlen 12
+     0000: 08 00 06 00 09 00 53 53  53 53 53 53              ......SSSSSS
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 0a 05 05 05  05 05 05 05 05 05 05 05 
+................
+     0010: 05 05 05 05 05                                    .....
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 4
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > ACL data: handle 10 flags 0x02 dlen 21
+     L2CAP(d): cid 0x0006 len 17 [psm 0]
+       0000: 06 87 87 87 87 87 87 87  87 87 87 87 87 87 87 87 
+................
+       0010: 87                                                .
+ > ACL data: handle 10 flags 0x02 dlen 15
+     L2CAP(d): cid 0x0006 len 11 [psm 0]
+       0000: 07 33 22 91 91 91 91 91  91 91 91                 .3"........
+ > ACL data: handle 10 flags 0x02 dlen 21
+     L2CAP(d): cid 0x0006 len 17 [psm 0]
+       0000: 08 98 98 98 98 98 98 98  98 98 98 98 98 98 98 98 
+................
+       0010: 98                                                .
+ > ACL data: handle 10 flags 0x02 dlen 12
+     L2CAP(d): cid 0x0006 len 8 [psm 0]
+       0000: 09 00 45 98 76 98 34 67                           ..E.v.4g
+ > ACL data: handle 10 flags 0x02 dlen 21
+     L2CAP(d): cid 0x0006 len 17 [psm 0]
+       0000: 0a 99 99 99 99 99 99 99  99 99 99 99 99 99 99 99 
+................
+       0010: 99                                                .
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 06 01 01 01  01 01 01 01 01 01 01 01 
+................
+     0010: 01 01 01 01 01                                    .....
+< ACL data: handle 10 flags 0x00 dlen 15
+     0000: 0b 00 06 00 07 02 02 02  02 02 02 02 02 02 02     ...............
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 08 04 04 04  04 04 04 04 04 04 04 04 
+................
+     0010: 04 04 04 04 04                                    .....
+< ACL data: handle 10 flags 0x00 dlen 12
+     0000: 08 00 06 00 09 00 53 53  53 53 53 53              ......SSSSSS
+< ACL data: handle 10 flags 0x00 dlen 21
+     0000: 11 00 06 00 0a 05 05 05  05 05 05 05 05 05 05 05 
+................
+     0010: 05 05 05 05 05                                    .....
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 3
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 10 packets 1
+ > HCI Event: Disconn Complete (0x05) plen 4
+     status 0x00 handle 10 reason 0x13
+     Reason: Remote User Terminated Connection
 
-> +		hst->st_write = ti_st_proto[i].write;
-> +		if (!hst->st_write) {
-> +			BT_ERR("undefined ST write function");
-> +			clear_bit(HCI_RUNNING, &hdev->flags);
-> +			for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
-> +				/* Undo registration with ST */
-> +				err = st_unregister(&ti_st_proto[i]);
-> +				if (err)
-> +					BT_ERR("st_unregister() failed with "
-> +							"error %d", err);
-> +				hst->st_write = NULL;
-> +			}
-> +			return -EIO;
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +
-> +/* Close device */
-> +static int ti_st_close(struct hci_dev *hdev)
-> +{
-> +	int err, i;
-> +	struct ti_st *hst = hdev->driver_data;
-> +
-> +	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
-> +		return 0;
-> +
-> +	for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
-> +		err = st_unregister(&ti_st_proto[i]);
-> +		if (err)
-> +			BT_ERR("st_unregister(%d) failed with error %d",
-> +					ti_st_proto[i].chnl_id, err);
-> +	}
-> +
-> +	hst->st_write = NULL;
-> +
-> +	return err;
-> +}
-> +
-> +static int ti_st_send_frame(struct sk_buff *skb)
-> +{
-> +	struct hci_dev *hdev;
-> +	struct ti_st *hst;
-> +	long len;
-> +
-> +	hdev = (struct hci_dev *)skb->dev;
-> +
-> +	if (!test_bit(HCI_RUNNING, &hdev->flags))
-> +		return -EBUSY;
-> +
-> +	hst = hdev->driver_data;
-> +
-> +	/* Prepend skb with frame type */
-> +	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-> +
-> +	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type,
-> +			skb->len);
-> +
-> +	/* Insert skb to shared transport layer's transmit queue.
-> +	 * Freeing skb memory is taken care in shared transport layer,
-> +	 * so don't free skb memory here.
-> +	 */
-> +	len = hst->st_write(skb);
-> +	if (len < 0) {
-> +		kfree_skb(skb);
-> +		BT_ERR("ST write failed (%ld)", len);
-> +		/* Try Again, would only fail if UART has gone bad */
-> +		return -EAGAIN;
-> +	}
-> +
-> +	/* ST accepted our skb. So, Go ahead and do rest */
-> +	hdev->stat.byte_tx += len;
-> +	ti_st_tx_complete(hst, bt_cb(skb)->pkt_type);
-> +
-> +	return 0;
-> +}
-> +
-> +static void ti_st_destruct(struct hci_dev *hdev)
-> +{
-> +	BT_DBG("%s", hdev->name);
-> +	/* do nothing here, since platform remove
-> +	 * would free the hdev->driver_data
-> +	 */
-> +}
 
-Then remove this function...
 
-> +
-> +static int bt_ti_probe(struct platform_device *pdev)
-> +{
-> +	static struct ti_st *hst;
-> +	struct hci_dev *hdev;
-> +	int err;
-> +
-> +	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
-> +	if (!hst)
-> +		return -ENOMEM;
-> +
-> +	/* Expose "hciX" device to user space */
-> +	hdev = hci_alloc_dev();
-> +	if (!hdev) {
-> +		kfree(hst);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	BT_DBG("hdev %p", hdev);
-> +
-> +	hst->hdev = hdev;
-> +	hdev->bus = HCI_UART;
-> +	hdev->driver_data = hst;
-> +	hdev->open = ti_st_open;
-> +	hdev->close = ti_st_close;
-> +	hdev->flush = NULL;
-> +	hdev->send = ti_st_send_frame;
-> +	hdev->destruct = ti_st_destruct;
 
-...and also the line that sets it.
+
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
