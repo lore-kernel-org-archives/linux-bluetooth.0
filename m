@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D51D70F.9050703@codeaurora.org>
-Date: Tue, 08 Feb 2011 15:51:43 -0800
+Message-ID: <4D51D1DE.7010309@codeaurora.org>
+Date: Tue, 08 Feb 2011 15:29:34 -0800
 From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: GATT Attribute Server changes coming.
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: SM Key Distribution
+References: <4D508DC2.60003@codeaurora.org> <4D509ABA.1010909@codeaurora.org> <20110208135849.GA31237@piper> <4D517EE1.8040408@codeaurora.org>
+In-Reply-To: <4D517EE1.8040408@codeaurora.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Vinicius,
 
-Due to some observations at UPF, I have made some on the fly 
-modifications to the attribute-server.c and example.c files.  The 
-changes appear to work, but I am cleaning up the changes and will submit 
-them as potential patches probably early next week.
+More on Key Distribution:
 
-Specifically, they pertain to how Primary Services are discovered by 
-BR/EDR GATT Clients.  The relevant spec section is 4.4 of Part G (GATT), 
-Volume 3, Core Revision 4.0.  It states that Primary Services SHALL be 
-discovered on BR/EDR links via SDP.
 
-So I have staged the following changes in my personal workspace:
+When we are an SM responder, we are suppose to AND the requested key 
+distribution values with our values (what we expect, and what we 
+generate).  So for instance, if we have 07 07 as our prefered key 
+distribution values, and we receive 00 01, then we should mask 
+everything out except for the Responder LTK distribution PRIOR to 
+responding with the Pairing Response, and then of course only distribute 
+that one LTK key after link encryption.
 
-1. Modified the ATT_UUID to be 0x0007 instead of 0x1801, which is the 
-GATT UUID.  The ATT Protocol UUID is now publiched in BT Assigned Numbers.
 
-2. I have added a new "end" parameter to attrib_db_add() to indicate the 
-end of a Attribute Handle Range (which may be Zero if not appropriate) 
-which when combined with a Primary Service Attribute, will register a 
-correctly formatted SDP service Record for BR/EDR purposes. I will 
-probably also add yet one more Parameter that will be a string value 
-description for the SDP record.
+Currently, we are always responding with 07 07 regardless of what the 
+Initiator requested, and then always distribute all possible keys.
 
-3. I have tested against two other teams so far to shake out the bugs, 
-and it looks promising.  There is one team that depends on these SDP 
-records, and I will be testing against them again tomorrow.
+
+Regards,
 
 
 -- 
