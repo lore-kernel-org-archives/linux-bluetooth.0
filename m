@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D51D1DE.7010309@codeaurora.org>
-Date: Tue, 08 Feb 2011 15:29:34 -0800
-From: Brian Gix <bgix@codeaurora.org>
+Date: Tue, 8 Feb 2011 15:09:09 -0800
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Andre Dieb Martins <andre.dieb@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update gatt listen mode.
+Message-ID: <20110208230909.GC17287@jh-x301>
+References: <1297109496-26609-1-git-send-email-andre.dieb@signove.com>
 MIME-Version: 1.0
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: SM Key Distribution
-References: <4D508DC2.60003@codeaurora.org> <4D509ABA.1010909@codeaurora.org> <20110208135849.GA31237@piper> <4D517EE1.8040408@codeaurora.org>
-In-Reply-To: <4D517EE1.8040408@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1297109496-26609-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi André,
 
-More on Key Distribution:
+On Mon, Feb 07, 2011, Andre Dieb Martins wrote:
+> Update gatt's listen-mode flag whenever connect_cb() is called again.
+> ---
+>  attrib/client.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/attrib/client.c b/attrib/client.c
+> index 44638d3..ec5fcf2 100644
+> --- a/attrib/client.c
+> +++ b/attrib/client.c
+> @@ -356,6 +356,7 @@ static int l2cap_connect(struct gatt_service *gatt, GError **gerr,
+>  
+>  	if (gatt->attrib != NULL) {
+>  		gatt->attrib = g_attrib_ref(gatt->attrib);
+> +		gatt->listen = listen;
+>  		return 0;
+>  	}
 
+Thanks. The patch has been pushed upstream.
 
-When we are an SM responder, we are suppose to AND the requested key 
-distribution values with our values (what we expect, and what we 
-generate).  So for instance, if we have 07 07 as our prefered key 
-distribution values, and we receive 00 01, then we should mask 
-everything out except for the Responder LTK distribution PRIOR to 
-responding with the Pairing Response, and then of course only distribute 
-that one LTK key after link encryption.
-
-
-Currently, we are always responding with 07 07 regardless of what the 
-Initiator requested, and then always distribute all possible keys.
-
-
-Regards,
-
-
--- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Johan
