@@ -1,74 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6027B6444B774B019847152FB098B13F@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: <dsaxena@plexity.net>,
-	"BlueZ devel list" <linux-bluetooth@vger.kernel.org>
-References: <20110207090836.GA26064@plexity.net>
-In-Reply-To: <20110207090836.GA26064@plexity.net>
-Subject: Re: Status of MAP and AVRCP
-Date: Tue, 8 Feb 2011 08:42:47 -0600
+Date: Tue, 8 Feb 2011 10:58:49 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Frequent SM test failure at UPF
+Message-ID: <20110208135849.GA31237@piper>
+References: <4D508DC2.60003@codeaurora.org>
+ <4D509ABA.1010909@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4D509ABA.1010909@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Deepak,
+Hi Brian,
 
+On 17:22 Mon 07 Feb, Brian Gix wrote:
+> On 2/7/2011 4:26 PM, Brian Gix wrote:
+> >
+> >Testing of Shorter than 16 octet keys.
+> >
+> >In smp_cmd_pairing_random() when the STK is generated, it needs to be
+> >truncated to the MIN of conn->preq[4] and conn->pres[4].
+> >
+> >This Min value may need to be saved for later as well, because it needs
+> >to also limit the LTK key exchange.
+> >
+> >This failure showed up with the PTS tool, and at least one other device
+> >during the days testing. I have mocked up a fix, but have not had a
+> >chance to test it yet.
+> >
+> >
 
-Hi,
+First, thanks for the reports. This particular issue should be fixed soon.
 
-I am wondering about the status of AVRCP and MAP profile support
-in the current BlueZ tree. It looks like ther were a few GSOC
-projects related to adding/extending these last year, but from
-my quick skim, it does not look like these were integrated
-upstream. Was an attempt made to push these changes and did
-they get reject? Is someone still driving this work within the
-BlueZ community to make sure it goes upstream?
+> 
+> PTS also did not like that we request No Bonding, but request to
+> exchange keys.  I am not sure who is at fault there. At first
+> glance, exchanging keys insinuates a bonded relationship, so I don't
+> know what it means to request key exchange but not bond.  I think
+> both sides need to agree to bond (bit 0x01 in offset 3 (4th octet)
+> of the req and res) to remember the exchanged keys, but exchanging
+> keys should still be OK for the duration of that session at least.
+> They would then be discarded when the connection ended.
+> 
+> It also may not make sense to request Bonding, but not have keys to
+> exchange, because I am not sure if you are really bonded if you have
+> no keys exchanged with the remote device.  You could always just
+> remember the remote device's BD Addr, I suppose and choose to accept
+> or reject no-security connections based on that.
+> 
+> I am sorry, the above is mostly just me thinking out loud. I don't
+> know for sure if any of that is actually correct.
+> 
 
-+++++
+So, I will add something to the thinking out loud session ;-) seems to me that
+the tests were written assuming that most of the limitations are in the slave,
+when some of them find a limited (for now) SM implementation in the master 
+side some things are not so clear.
 
-I restarted work-in-earnest on an AVRCP layer a bit over two months ago (I 
-also have a full-time day-job that has nothing to do with Bluetooth, Linux, 
-Open Source, etc.). I am now resolving some issues in connecting from my 
-custom built AVRCP remote (hardware and firmware), which connects, pairs, 
-and connects with full AVRCP with my BlackBerry Torch, and the AVRCP stack 
-on my laptop.  After working through that issue (I expect, by later this 
-week), and verifying that the BB Torch can connect with my changes in place, 
-I will complete fairly extensive testing and begin submitting patches with 
-major surgery to audio/control.c, supporting the API doc worked out in the 
-Portland meeting, with a couple of minor extensions.  This will bring BlueZ 
-to AVRCP 1.3, figure by the end of this month.
+> 
+> -- 
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-I will also include message fragmentation support, which will be needed for 
-1.4 (not really needed for 1.3, although it is in the 1.3 spec).  However, 
-there are a number of issues with 1.4, the biggest being the amount of 
-integration between the BlueZ stack/profile (which should remain pure) and 
-the player(s), that are required to respond to queries for browsing track 
-metadata, etc.  I think there will need to be a discussion about how much of 
-1.4, if any, to support, and how.  I think Sander van Grieken's work with 
-MPRIS may be a guide.  Also, I understand ST Ericsson (Shivendra Agrawal) is 
-also proposing to provide 1.4 support.
-
-Just my two cents...questions, please do not hesitate.
-
-David Stockwell
-
-+++++
-
-Thanks,
-~Deepak
-
-
+Cheers,
 -- 
-"People think all we need to fix our predicament is a free source of
-energy, but I think we need to change out behaviour. More energy would
-just deplete the Earth's lifeblood faster." - Janine Benyius
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html 
-
+Vinicius
