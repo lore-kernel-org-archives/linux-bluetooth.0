@@ -1,25 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 16:28:50 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] use a valid PSM value in l2test.
-Message-ID: <20110209182850.GG1995@joana>
-References: <1297275997-15274-1-git-send-email-padovan@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297275997-15274-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH] use a valid PSM value in l2test.
+Date: Wed,  9 Feb 2011 16:26:37 -0200
+Message-Id: <1297275997-15274-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2011-02-09 16:26:37 -0200]:
+---
+ test/l2test.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> ---
->  test/l2test.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-
-Gah, this is wrong. L2CAP doesn't accept this value
-
-
+diff --git a/test/l2test.c b/test/l2test.c
+index 17883a9..00d31dc 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -87,7 +87,7 @@ static long buffer_size = 2048;
+ 
+ /* Default addr and psm and cid */
+ static bdaddr_t bdaddr;
+-static unsigned short psm = 10;
++static unsigned short psm = 1011;
+ static unsigned short cid = 0;
+ 
+ /* Default number of frames to send (-1 = infinite) */
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.4
+
