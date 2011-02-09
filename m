@@ -2,50 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Dieb Martins <andre.dieb@signove.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 6/7] Add ATT dump for read req/resp
-Date: Wed,  9 Feb 2011 11:01:49 -0300
-Message-Id: <1297260110-10515-6-git-send-email-andre.dieb@signove.com>
+Subject: [PATCH 5/7] Better ATT dump format
+Date: Wed,  9 Feb 2011 11:01:48 -0300
+Message-Id: <1297260110-10515-5-git-send-email-andre.dieb@signove.com>
 In-Reply-To: <1297260110-10515-1-git-send-email-andre.dieb@signove.com>
 References: <1297260110-10515-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- parser/att.c |   14 ++++++++++++++
- 1 files changed, 14 insertions(+), 0 deletions(-)
+ parser/att.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/parser/att.c b/parser/att.c
-index b172f95..2a9da30 100644
+index 79a74b5..b172f95 100644
 --- a/parser/att.c
 +++ b/parser/att.c
-@@ -331,6 +331,14 @@ static void att_find_info_resp_dump(int level, struct frame *frm)
- 	}
+@@ -265,10 +265,10 @@ static void att_error_dump(int level, struct frame *frm)
+ 	uint8_t err = get_u8(frm);
+ 
+ 	p_indent(level, frm);
+-	printf("Error: %s 0x%.2x\n", atterror2str(err), err);
++	printf("Error: %s (%d)\n", atterror2str(err), err);
+ 
+ 	p_indent(level, frm);
+-	printf("opcode %d (%s) on handle 0x%2.2x\n", op, attop2str(op), handle);
++	printf("%s (0x%.2x) on handle 0x%2.2x\n", attop2str(op), op, handle);
  }
  
-+static void att_read_req_dump(int level, struct frame *frm)
-+{
-+	uint16_t handle = btohs(htons(get_u16(frm)));
-+
-+	p_indent(level, frm);
-+	printf("handle 0x%2.2x\n", handle);
-+}
-+
- static void att_handle_notify_dump(int level, struct frame *frm)
- {
- 	uint16_t handle = btohs(htons(get_u16(frm)));
-@@ -371,6 +379,12 @@ void att_dump(int level, struct frame *frm)
- 		case ATT_OP_FIND_INFO_RESP:
- 			att_find_info_resp_dump(level + 1, frm);
- 			break;
-+		case ATT_OP_READ_REQ:
-+			att_read_req_dump(level + 1, frm);
-+			break;
-+		case ATT_OP_READ_RESP:
-+			raw_dump(level + 1, frm);
-+			break;
- 		case ATT_OP_HANDLE_NOTIFY:
- 			att_handle_notify_dump(level + 1, frm);
- 			break;
+ static void att_mtu_req_dump(int level, struct frame *frm)
+@@ -353,7 +353,7 @@ void att_dump(int level, struct frame *frm)
+ 	op = get_u8(frm);
+ 
+ 	p_indent(level, frm);
+-	printf("Opcode %d (%s)\n", op, attop2str(op));
++	printf("ATT: %s (0x%.2x)\n", attop2str(op), op);
+ 
+ 	switch (op) {
+ 		case ATT_OP_ERROR:
 -- 
 1.7.1
 
