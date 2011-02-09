@@ -2,122 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Dieb Martins <andre.dieb@signove.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 2/6] Add ATT error pdu dump
-Date: Wed,  9 Feb 2011 10:53:35 -0300
-Message-Id: <1297259619-10325-2-git-send-email-andre.dieb@signove.com>
-In-Reply-To: <1297259619-10325-1-git-send-email-andre.dieb@signove.com>
-References: <1297259619-10325-1-git-send-email-andre.dieb@signove.com>
+Subject: [PATCH 1/6] Add dump for ATT MTU req/resp and notify value
+Date: Wed,  9 Feb 2011 10:53:34 -0300
+Message-Id: <1297259619-10325-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- parser/att.c |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 80 insertions(+), 0 deletions(-)
+ parser/att.c |   31 ++++++++++++++++++++++++++++++-
+ 1 files changed, 30 insertions(+), 1 deletions(-)
 
 diff --git a/parser/att.c b/parser/att.c
-index 05f9c23..526b7bf 100644
+index b670694..05f9c23 100644
 --- a/parser/att.c
 +++ b/parser/att.c
-@@ -66,6 +66,26 @@
- #define ATT_OP_HANDLE_CNF		0x1E
- #define ATT_OP_SIGNED_WRITE_CMD		0xD2
- 
-+/* Error codes for Error response PDU */
-+#define ATT_ECODE_INVALID_HANDLE		0x01
-+#define ATT_ECODE_READ_NOT_PERM			0x02
-+#define ATT_ECODE_WRITE_NOT_PERM		0x03
-+#define ATT_ECODE_INVALID_PDU			0x04
-+#define ATT_ECODE_INSUFF_AUTHEN			0x05
-+#define ATT_ECODE_REQ_NOT_SUPP			0x06
-+#define ATT_ECODE_INVALID_OFFSET		0x07
-+#define ATT_ECODE_INSUFF_AUTHO			0x08
-+#define ATT_ECODE_PREP_QUEUE_FULL		0x09
-+#define ATT_ECODE_ATTR_NOT_FOUND		0x0A
-+#define ATT_ECODE_ATTR_NOT_LONG			0x0B
-+#define ATT_ECODE_INSUFF_ENCR_KEY_SIZE		0x0C
-+#define ATT_ECODE_INVAL_ATTR_VALUE_LEN		0x0D
-+#define ATT_ECODE_UNLIKELY			0x0E
-+#define ATT_ECODE_INSUFF_ENC			0x0F
-+#define ATT_ECODE_UNSUPP_GRP_TYPE		0x10
-+#define ATT_ECODE_INSUFF_RESOURCES		0x11
-+#define ATT_ECODE_IO				0xFF
-+
- 
- /* Attribute Protocol Opcodes */
- static const char *attop2str(uint8_t op)
-@@ -132,6 +152,63 @@ static const char *attop2str(uint8_t op)
+@@ -132,12 +132,35 @@ static const char *attop2str(uint8_t op)
  	}
  }
  
-+static const char * atterror2str(uint8_t err)
++static void att_mtu_req_dump(int level, struct frame *frm)
 +{
-+	switch (err) {
-+	case ATT_ECODE_INVALID_HANDLE:
-+		return "Invalid handle";
-+	case ATT_ECODE_READ_NOT_PERM:
-+		return "Read not permitted";
-+	case ATT_ECODE_WRITE_NOT_PERM:
-+		return "Write not permitted";
-+	case ATT_ECODE_INVALID_PDU:
-+		return "Invalid PDU";
-+	case ATT_ECODE_INSUFF_AUTHEN:
-+		return "Insufficient authentication";
-+	case ATT_ECODE_REQ_NOT_SUPP:
-+		return "Request not supported";
-+	case ATT_ECODE_INVALID_OFFSET:
-+		return "Invalid offset";
-+	case ATT_ECODE_INSUFF_AUTHO:
-+		return "Insufficient authorization";
-+	case ATT_ECODE_PREP_QUEUE_FULL:
-+		return "Prepare queue full";
-+	case ATT_ECODE_ATTR_NOT_FOUND:
-+		return "Attribute not found";
-+	case ATT_ECODE_ATTR_NOT_LONG:
-+		return "Attribute not long";
-+	case ATT_ECODE_INSUFF_ENCR_KEY_SIZE:
-+		return "Insufficient encryption key size";
-+	case ATT_ECODE_INVAL_ATTR_VALUE_LEN:
-+		return "Invalid attribute value length";
-+	case ATT_ECODE_UNLIKELY:
-+		return "Unlikely error";
-+	case ATT_ECODE_INSUFF_ENC:
-+		return "Insufficient encryption";
-+	case ATT_ECODE_UNSUPP_GRP_TYPE:
-+		return "Unsupported group type";
-+	case ATT_ECODE_INSUFF_RESOURCES:
-+		return "Insufficient resources";
-+	case ATT_ECODE_IO:
-+		return "Application Error";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
-+static void att_error_dump(int level, struct frame *frm)
-+{
-+	uint8_t op = get_u8(frm);
-+	uint16_t handle = btohs(htons(get_u16(frm)));
-+	uint8_t err = get_u8(frm);
++	uint16_t client_rx_mtu = btohs(htons(get_u16(frm)));
 +
 +	p_indent(level, frm);
-+	printf("Error: %s 0x%.2x\n", atterror2str(err), err);
-+
-+	p_indent(level, frm);
-+	printf("opcode %d (%s) on handle 0x%2.2x\n", op, attop2str(op), handle);
++	printf("client rx mtu %d\n", client_rx_mtu);
 +}
 +
- static void att_mtu_req_dump(int level, struct frame *frm)
++static void att_mtu_resp_dump(int level, struct frame *frm)
++{
++	uint16_t server_rx_mtu = btohs(htons(get_u16(frm)));
++
++	p_indent(level, frm);
++	printf("server rx mtu %d\n", server_rx_mtu);
++}
++
+ static void att_handle_notify_dump(int level, struct frame *frm)
  {
- 	uint16_t client_rx_mtu = btohs(htons(get_u16(frm)));
-@@ -173,6 +250,9 @@ void att_dump(int level, struct frame *frm)
- 	printf("Opcode %d (%s)\n", op, attop2str(op));
+ 	uint16_t handle = btohs(htons(get_u16(frm)));
+ 
+ 	p_indent(level, frm);
+ 	printf("handle 0x%2.2x\n", handle);
++
++	p_indent(level, frm);
++	printf("value ");
++	while (frm->len > 0) {
++		printf("0x%.2x ", get_u8(frm));
++	}
++	printf("\n");
+ }
+ 
+ void att_dump(int level, struct frame *frm)
+@@ -147,9 +170,15 @@ void att_dump(int level, struct frame *frm)
+ 	op = get_u8(frm);
+ 
+ 	p_indent(level, frm);
+-	printf("Opcode: %d (%s)\n", op, attop2str(op));
++	printf("Opcode %d (%s)\n", op, attop2str(op));
  
  	switch (op) {
-+		case ATT_OP_ERROR:
-+			att_error_dump(level + 1, frm);
++		case ATT_OP_MTU_REQ:
++			att_mtu_req_dump(level + 1, frm);
 +			break;
- 		case ATT_OP_MTU_REQ:
- 			att_mtu_req_dump(level + 1, frm);
++		case ATT_OP_MTU_RESP:
++			att_mtu_resp_dump(level + 1, frm);
++			break;
+ 		case ATT_OP_HANDLE_NOTIFY:
+ 			att_handle_notify_dump(level + 1, frm);
  			break;
 -- 
 1.7.1
