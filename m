@@ -1,48 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AANLkTinRHYs+W+os7xn1O9cehqFnzOzhnedsqXWiNAcN@mail.gmail.com>
-References: <AANLkTi=652bHGqL841fp1ufO1_7C3iTq+tZ4eBcGtEiO@mail.gmail.com>
-	<4D4BED6C.3040506@nokia.com>
-	<AANLkTinVkr3ivG0-Jt-sCJe0VLpPFTUAgDaTTiM5U51A@mail.gmail.com>
-	<AANLkTimhUD74h=QDKQu=EGfPXYHafuTMnwQ-RbGeaUFp@mail.gmail.com>
-	<AANLkTinRHYs+W+os7xn1O9cehqFnzOzhnedsqXWiNAcN@mail.gmail.com>
-Date: Wed, 9 Feb 2011 14:56:19 -0300
-Message-ID: <AANLkTimh+8zf2t2u==S4ZG1uiirzZZZt+u2pPk8nivXF@mail.gmail.com>
-Subject: Re: Not able to test GATT on ubuntu
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Vijayalakshmi N <vijayalakshmi.nk@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Mika Linnanoja <mika.linnanoja@nokia.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andre Dieb Martins <andre.dieb@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH -v3 6/6] Add ATT read by type req/resp dump
+Date: Wed,  9 Feb 2011 14:28:55 -0300
+Message-Id: <1297272535-14890-6-git-send-email-andre.dieb@signove.com>
+In-Reply-To: <1297272535-14890-1-git-send-email-andre.dieb@signove.com>
+References: <1297272535-14890-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ parser/att.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 54 insertions(+), 0 deletions(-)
 
-On Wed, Feb 9, 2011 at 8:47 AM, Vijayalakshmi N
-<vijayalakshmi.nk@gmail.com> wrote:
-> Now I have an updated setup where the bluetooth kernel code with BLE
-> patches are taken from
-> http://git.infradead.org/users/vcgomes/linux-2.6.git/tree/refs/heads/devel
-> and hcidump 2.0
-
-May I suggest you test first with two BR/EDR dongles to make sure the
-GATT part is ok?
-
-1) Make sure "AttributeServer = true" is added to
-/etc/bluetooth/main.conf and start bluetoothd on the server
-2) Make sure bluetoothd is started on the client as well (at least for
-me this is required), if server/client are on different machines
-3) On client, run:
-
-gatttool -i <adapter> -b <server_bdaddr>  --primary
-
-The rest of the parameters already have sane defaults. If that still
-does not work, send us the server and client hcidump logs
-
-HTH,
+diff --git a/parser/att.c b/parser/att.c
+index 887cdac..a0fb135 100644
+--- a/parser/att.c
++++ b/parser/att.c
+@@ -330,6 +330,54 @@ static void att_find_info_resp_dump(int level, struct frame *frm)
+ 	}
+ }
+ 
++static void att_read_by_type_req_dump(int level, struct frame *frm)
++{
++	uint16_t start = btohs(htons(get_u16(frm)));
++	uint16_t end = btohs(htons(get_u16(frm)));
++	int i;
++
++	p_indent(level, frm);
++	printf("start 0x%2.2x, end 0x%2.2x\n", start, end);
++
++	p_indent(level, frm);
++	if (frm->len == 2) {
++		printf("type-uuid 0x%2.2x\n", btohs(htons(get_u16(frm))));
++	} else if (frm->len == 16) {
++		printf("type-uuid ");
++		for (i = 0; i < 16; i++) {
++			printf("%02x", get_u8(frm));
++			if (i == 3 || i == 5 || i == 7 || i == 9)
++				printf("-");
++		}
++		printf("\n");
++	} else {
++		printf("malformed uuid (expected 2 or 16 octets)\n");
++		p_indent(level, frm);
++		raw_dump(level, frm);
++	}
++}
++
++static void att_read_by_type_resp_dump(int level, struct frame *frm)
++{
++	uint8_t length = get_u8(frm);
++
++	p_indent(level, frm);
++	printf("length: %d\n", length);
++
++	while (frm->len > 0) {
++		uint16_t handle = btohs(htons(get_u16(frm)));
++		int val_len = length - 2;
++		int i;
++
++		p_indent(level + 1, frm);
++		printf("handle 0x%2.2x, value ", handle);
++		for (i = 0; i < val_len; i++) {
++			printf("0x%.2x ", get_u8(frm));
++		}
++		printf("\n");
++	}
++}
++
+ static void att_read_req_dump(int level, struct frame *frm)
+ {
+ 	uint16_t handle = btohs(htons(get_u16(frm)));
+@@ -378,6 +426,12 @@ void att_dump(int level, struct frame *frm)
+ 		case ATT_OP_FIND_INFO_RESP:
+ 			att_find_info_resp_dump(level + 1, frm);
+ 			break;
++		case ATT_OP_READ_BY_TYPE_REQ:
++			att_read_by_type_req_dump(level + 1, frm);
++			break;
++		case ATT_OP_READ_BY_TYPE_RESP:
++			att_read_by_type_resp_dump(level + 1, frm);
++			break;
+ 		case ATT_OP_READ_REQ:
+ 			att_read_req_dump(level + 1, frm);
+ 			break;
 -- 
-Anderson Lizardo
-OpenBossa Labs - INdT
-Manaus - Brazil
+1.7.1
+
