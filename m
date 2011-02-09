@@ -1,55 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: "Gadiyar, Anand" <gadiyar@ti.com>
-Subject: Re: [BUG] usb problems in .38-rc3+
-Date: Tue, 8 Feb 2011 23:31:26 -0500
-Cc: Oliver Neukum <oneukum@suse.de>, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-References: <201102051417.58953.edt@aei.ca> <201102072115.20858.edt@aei.ca> <AANLkTinpKwe2vWH3=Ur+N76a6KyfuFp0V-EznXXS7m+p@mail.gmail.com>
-In-Reply-To: <AANLkTinpKwe2vWH3=Ur+N76a6KyfuFp0V-EznXXS7m+p@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201102082331.27644.edt@aei.ca>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: Obexd client question
+From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@gmail.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Message-Id: <51E531A4-C9E5-4291-8078-FFD4C0656CD3@gmail.com>
+Date: Wed, 9 Feb 2011 10:38:23 +0900
+Cc: "luiz.dentz-von@nokia.com" <luiz.dentz-von@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (iPhone Mail 8C148a)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 08 February 2011 01:46:16 Gadiyar, Anand wrote:
-> On Tue, Feb 8, 2011 at 7:45 AM, Ed Tomlinson <edt@aei.ca> wrote:
-> > I tried bisecting without much luck.  It started with about 4000 commits to check.  It was still bad
-> > when it reached the first 1000 commits post .37.  Then all boots started crashing.  I think its possible
-> > to restrict a bisect to a directory - if so, what dir should I try?
-> >
-> 
-> Maybe drivers/ or drivers/usb would be enough for a first attempt?
-> I usually start there.
-> 
-> You could just do:
-> 
-> git bisect start -- [path]
-> 
-> to restrict bisection to commits that touch [path].
+ Hello Bluetooth developer!
 
-This is as far as I can get:
+I try to use obexd client(the latest version). 
+I have a few question while using ftp client.
 
-# bad: [100b33c8bd8a3235fd0b7948338d6cbb3db3c63d] Linux 2.6.38-rc4
-# good: [3c0eee3fe6a3a1c745379547c7e7c904aa64f6d5] Linux 2.6.37
-# good: [387c31c7e5c9805b0aef8833d1731a5fe7bdea14] Linux 2.6.37-rc8
-# good: [90a8a73c06cc32b609a880d48449d7083327e11a] Linux 2.6.37-rc7
-# good: [c8ddb2713c624f432fa5fe3c7ecffcdda46ea0d4] Linux 2.6.37-rc1
-git bisect start 'v2.6.38-rc4' 'v2.6.37' 'v2.6.37-rc8' 'v2.6.37-rc7' 'v2.6.37-rc1' '--' 'drivers/usb' 'drivers/bluetooth'
-# good: [5cdc5bd8b2b1190cb54548c03194b154b4892e2a] Merge branch 'musb-hw' of git://gitorious.org/usb/usb into musb
-git bisect good 5cdc5bd8b2b1190cb54548c03194b154b4892e2a
-# bad: [f2c565e223af39ed38be5c84b1a37b591b22db83] xHCI: replace dev_dbg() with xhci_dbg()
-git bisect bad f2c565e223af39ed38be5c84b1a37b591b22db83
-# good: [2af10844eb6ed104f9505bf3a7ba3ceb02264f31] USB: Merge 2.6.37-rc5 into usb-next
-git bisect good 2af10844eb6ed104f9505bf3a7ba3ceb02264f31
-# bad: [3e5b08cbbf78bedd316904ab0cf3b27119433ee5] Merge branch 'usb-next' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6
-git bisect bad 3e5b08cbbf78bedd316904ab0cf3b27119433ee5
-# good: [1051b9f0f9eab8091fe3bf98320741adf36b4cfa] Merge branch 'for-rmk' of git://git.pengutronix.de/git/imx/linux-2.6 into devel-stable
-git bisect good 1051b9f0f9eab8091fe3bf98320741adf36b4cfa
+1. Listfolder
+After I dbus call it("ListFolder"), "ChangeFolder" dbus method call doesn't work well. I think because session_transfer() is just returned transfer_unregister() is not called and they block another dbus call. If you find mistake in my usage, please tell me.
 
-After this the kernel does not build.
+2. Agen Cancel
+If we call Agent Cancel While transfer is going on, connection is removed unexpectfully. Is this original concept? I think it could only stop transfer. 
 
-Any clues?
-Ed
+Finally could you tell me who use obexd server, obexd client respectively?
