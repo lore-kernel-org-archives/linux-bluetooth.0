@@ -1,38 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 14:04:26 -0800
+Date: Wed, 9 Feb 2011 14:03:31 -0800
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andre Dieb Martins <andre.dieb@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] use a valid PSM value in l2test.
-Message-ID: <20110209220426.GF11911@jh-x301>
-References: <1297276920-15467-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH -v3 1/6] Partial dump of ATT PDUs
+Message-ID: <20110209220331.GE11911@jh-x301>
+References: <1297272535-14890-1-git-send-email-andre.dieb@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297276920-15467-1-git-send-email-padovan@profusion.mobi>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1297272535-14890-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi André,
 
-On Wed, Feb 09, 2011, Gustavo F. Padovan wrote:
+On Wed, Feb 09, 2011, Andre Dieb Martins wrote:
+> Starts implementing dumping for ATT/GATT pdus.
 > ---
->  test/l2test.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/test/l2test.c b/test/l2test.c
-> index 17883a9..3ac332f 100644
-> --- a/test/l2test.c
-> +++ b/test/l2test.c
-> @@ -87,7 +87,7 @@ static long buffer_size = 2048;
->  
->  /* Default addr and psm and cid */
->  static bdaddr_t bdaddr;
-> -static unsigned short psm = 10;
-> +static unsigned short psm = 0x1011;
->  static unsigned short cid = 0;
->  
->  /* Default number of frames to send (-1 = infinite) */
+>  Makefile.am     |    1 +
+>  parser/att.c    |  161 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  parser/l2cap.c  |    7 +++
+>  parser/parser.h |    2 +
+>  src/hcidump.c   |    1 +
+>  5 files changed, 172 insertions(+), 0 deletions(-)
+>  create mode 100644 parser/att.c
 
-Pushed upstream. Thanks.
+All six patches have been pushed upstream. Thanks.
 
 Johan
