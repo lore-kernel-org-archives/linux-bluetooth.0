@@ -1,79 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+From: Anand Gadiyar <gadiyar@ti.com>
+References: <201102051417.58953.edt@aei.ca> <201102072115.20858.edt@aei.ca>
+ <AANLkTinpKwe2vWH3=Ur+N76a6KyfuFp0V-EznXXS7m+p@mail.gmail.com> <201102082331.27644.edt@aei.ca>
 MIME-Version: 1.0
-In-Reply-To: <20110208181659.GB2160@joana>
-References: <1297080737-21032-1-git-send-email-pavan_savoy@ti.com>
-	<20110208181659.GB2160@joana>
-Date: Wed, 9 Feb 2011 11:48:30 +0530
-Message-ID: <AANLkTimV3ojyTqgvBnpN8+xgMTYpVeJn2+OriGW3Bed0@mail.gmail.com>
-Subject: Re: [PATCH v9] Bluetooth: btwilink driver
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <201102082331.27644.edt@aei.ca>
+Date: Wed, 9 Feb 2011 11:47:40 +0530
+Message-ID: <c037b856cfa01b5c7014873850cd07a9@mail.gmail.com>
+Subject: RE: [BUG] usb problems in .38-rc3+
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Oliver Neukum <oneukum@suse.de>, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo,
-
-On Tue, Feb 8, 2011 at 11:46 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Pavan,
+Ed Tomlinson wrote:
+> On Tuesday 08 February 2011 01:46:16 Gadiyar, Anand wrote:
+> > On Tue, Feb 8, 2011 at 7:45 AM, Ed Tomlinson <edt@aei.ca> wrote:
+> > > I tried bisecting without much luck.  It started with about 4000
+commits to check.  It was still bad
+> > > when it reached the first 1000 commits post .37.  Then all boots
+started crashing.  I think its possible
+> > > to restrict a bisect to a directory - if so, what dir should I try?
+> > >
+> >
+> > Maybe drivers/ or drivers/usb would be enough for a first attempt?
+> > I usually start there.
+> >
+> > You could just do:
+> >
+> > git bisect start -- [path]
+> >
+> > to restrict bisection to commits that touch [path].
 >
-> * pavan_savoy@ti.com <pavan_savoy@ti.com> [2011-02-07 06:12:17 -0600]:
+> This is as far as I can get:
 >
->> From: Pavan Savoy <pavan_savoy@ti.com>
->>
->> Gustavo,
->>
->> Find below the patch version v9.
->> Have taken care of Ville's comments.
->> In addition fixed the issue seen when built as module, with
->> repeated probe/remove of the platform driver.
-
-> Then remove this function...
-
-hci_core fails the register if the destruct function is not set.
-So I had kept the function.....
-
-I will shorten the goto label and re-submit.
-I hope that should be fine...
-
-
->> +static int bt_ti_probe(struct platform_device *pdev)
->> +{
->> + =C2=A0 =C2=A0 static struct ti_st *hst;
->> + =C2=A0 =C2=A0 struct hci_dev *hdev;
->> + =C2=A0 =C2=A0 int err;
->> +
->> + =C2=A0 =C2=A0 hst =3D kzalloc(sizeof(struct ti_st), GFP_KERNEL);
->> + =C2=A0 =C2=A0 if (!hst)
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -ENOMEM;
->> +
->> + =C2=A0 =C2=A0 /* Expose "hciX" device to user space */
->> + =C2=A0 =C2=A0 hdev =3D hci_alloc_dev();
->> + =C2=A0 =C2=A0 if (!hdev) {
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kfree(hst);
->> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -ENOMEM;
->> + =C2=A0 =C2=A0 }
->> +
->> + =C2=A0 =C2=A0 BT_DBG("hdev %p", hdev);
->> +
->> + =C2=A0 =C2=A0 hst->hdev =3D hdev;
->> + =C2=A0 =C2=A0 hdev->bus =3D HCI_UART;
->> + =C2=A0 =C2=A0 hdev->driver_data =3D hst;
->> + =C2=A0 =C2=A0 hdev->open =3D ti_st_open;
->> + =C2=A0 =C2=A0 hdev->close =3D ti_st_close;
->> + =C2=A0 =C2=A0 hdev->flush =3D NULL;
->> + =C2=A0 =C2=A0 hdev->send =3D ti_st_send_frame;
->> + =C2=A0 =C2=A0 hdev->destruct =3D ti_st_destruct;
+> # bad: [100b33c8bd8a3235fd0b7948338d6cbb3db3c63d] Linux 2.6.38-rc4
+> # good: [3c0eee3fe6a3a1c745379547c7e7c904aa64f6d5] Linux 2.6.37
+> # good: [387c31c7e5c9805b0aef8833d1731a5fe7bdea14] Linux 2.6.37-rc8
+> # good: [90a8a73c06cc32b609a880d48449d7083327e11a] Linux 2.6.37-rc7
+> # good: [c8ddb2713c624f432fa5fe3c7ecffcdda46ea0d4] Linux 2.6.37-rc1
+> git bisect start 'v2.6.38-rc4' 'v2.6.37' 'v2.6.37-rc8' 'v2.6.37-rc7'
+'v2.6.37-rc1' '--' 'drivers/usb' 'drivers/bluetooth'
+> # good: [5cdc5bd8b2b1190cb54548c03194b154b4892e2a] Merge branch
+'musb-hw' of git://gitorious.org/usb/usb into musb
+> git bisect good 5cdc5bd8b2b1190cb54548c03194b154b4892e2a
+> # bad: [f2c565e223af39ed38be5c84b1a37b591b22db83] xHCI: replace
+dev_dbg() with xhci_dbg()
+> git bisect bad f2c565e223af39ed38be5c84b1a37b591b22db83
+> # good: [2af10844eb6ed104f9505bf3a7ba3ceb02264f31] USB: Merge 2.6.37-rc5
+into usb-next
+> git bisect good 2af10844eb6ed104f9505bf3a7ba3ceb02264f31
+> # bad: [3e5b08cbbf78bedd316904ab0cf3b27119433ee5] Merge branch
+'usb-next' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb-2.6
+> git bisect bad 3e5b08cbbf78bedd316904ab0cf3b27119433ee5
+> # good: [1051b9f0f9eab8091fe3bf98320741adf36b4cfa] Merge branch
+'for-rmk' of git://git.pengutronix.de/git/imx/linux-2.6 into devel-stable
+> git bisect good 1051b9f0f9eab8091fe3bf98320741adf36b4cfa
 >
-> ...and also the line that sets it.
+> After this the kernel does not build.
 >
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.html
->
+> Any clues?
+
+Is it easier to just fix the build break locally and proceed?
+
+I'm afraid I don't know how to skip a step during bisection.
+I try narrowing things down manually.
+
+Given that 2.6.37 is fine, can you check if v2.6.38-rc1 works?
+If it doesn't work, then this break was caused by something that
+went in during the merge window (which I believe is most likely).
+
+You may be able to get somewhere by using snapshots of
+linux-next as of particular days. They are available at [1]
+as a single patch against a tag from Linus' tree.
+
+Warning: This could be tedious, maybe not much more than a
+git-bisect. Maybe easier to try and work it out from the
+code.
+
+
+- Anand
