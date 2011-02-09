@@ -1,411 +1,496 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Bala Shanmugam <sbalashanmugam@atheros.com>
-Subject: [PATCH] Bluetooth: Add firmware support for Atheros 3012
-Date: Wed, 9 Feb 2011 17:45:15 +0530
-Message-ID: <1297253715-15142-1-git-send-email-sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: pavan_savoy@ti.com
+To: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Cc: marcel@holtmann.org, Pavan Savoy <pavan_savoy@ti.com>
+Subject: [PATCH v10] Bluetooth: btwilink driver
+Date: Wed,  9 Feb 2011 06:14:40 -0600
+Message-Id: <1297253680-4412-1-git-send-email-pavan_savoy@ti.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Blacklisted AR3012 PID in btusb and added the same
-in ath3k to load patch and sysconfig files.
+From: Pavan Savoy <pavan_savoy@ti.com>
 
-Signed-off-by: Bala Shanmugam <sbalashanmugam@atheros.com>
+Gustavo,
+
+reposting v10,
+fixing the really long goto label.
+(from Ville) moving the reg_status before register.
+
+Find below the patch version v9.
+Have taken care of Ville's comments.
+In addition fixed the issue seen when built as module, with
+repeated probe/remove of the platform driver.
+
+patch v8 comments taken care,
+
+As suggested, the modifications to TI ST driver to remove the bluetooth
+references have been made and the changes have been merged to the
+linux-next tree.
+
+Find below the patch for the btwilink driver,
+I have taken care of your following comments,
+1. channel IDs and the offsets are now being taken from the
+header file hci.h.
+2. removed the un-necessary BT_ERR.
+3. changed the order during return from st_register.
+4. continue to unregister even if 1st unregister fails.
+
+Please review and provide comments,
+
+Thanks & Regards,
+Pavan Savoy
+
+-- patch description --
+
+This is the bluetooth protocol driver for the TI WiLink7 chipsets.
+Texas Instrument's WiLink chipsets combine wireless technologies
+like BT, FM, GPS and WLAN onto a single chip.
+
+This Bluetooth driver works on top of the TI_ST shared transport
+line discipline driver which also allows other drivers like
+FM V4L2 and GPS character driver to make use of the same UART interface.
+
+Kconfig and Makefile modifications to enable the Bluetooth
+driver for Texas Instrument's WiLink 7 chipset.
+
+Signed-off-by: Pavan Savoy <pavan_savoy@ti.com>
 ---
- drivers/bluetooth/ath3k.c |  326 ++++++++++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btusb.c |    3 +
- 2 files changed, 325 insertions(+), 4 deletions(-)
+ drivers/bluetooth/Kconfig    |   10 +
+ drivers/bluetooth/Makefile   |    1 +
+ drivers/bluetooth/btwilink.c |  395 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 406 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/bluetooth/btwilink.c
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 41dadac..37e7cb4 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -31,6 +31,33 @@
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 02deef4..8e0de9a 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -219,4 +219,14 @@ config BT_ATH3K
+ 	  Say Y here to compile support for "Atheros firmware download driver"
+ 	  into the kernel or say M to compile it as module (ath3k).
  
- #define VERSION "1.0"
++config BT_WILINK
++	tristate "Texas Instruments WiLink7 driver"
++	depends on TI_ST
++	help
++	  This enables the Bluetooth driver for Texas Instrument's BT/FM/GPS
++	  combo devices. This makes use of shared transport line discipline
++	  core driver to communicate with the BT core of the combo chip.
++
++	  Say Y here to compile support for Texas Instrument's WiLink7 driver
++	  into the kernel or say M to compile it as module.
+ endmenu
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 71bdf13..f4460f4 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -18,6 +18,7 @@ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
+ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
+ obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
+ obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
++obj-$(CONFIG_BT_WILINK)		+= btwilink.o
  
-+#define ATH3K_DNLOAD				0x01
-+#define ATH3K_GETSTATE				0x05
-+#define ATH3K_SET_NORMAL_MODE			0x07
-+#define ATH3K_SET_PREBOOT_MODE			0x08
-+#define ATH3K_GETVERSION			0x09
-+#define USB_REG_SWITCH_VID_PID			0x0a
+ btmrvl-y			:= btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
+diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
+new file mode 100644
+index 0000000..65d27af
+--- /dev/null
++++ b/drivers/bluetooth/btwilink.c
+@@ -0,0 +1,395 @@
++/*
++ *  Texas Instrument's Bluetooth Driver For Shared Transport.
++ *
++ *  Bluetooth Driver acts as interface between HCI core and
++ *  TI Shared Transport Layer.
++ *
++ *  Copyright (C) 2009-2010 Texas Instruments
++ *  Author: Raja Mani <raja_mani@ti.com>
++ *	Pavan Savoy <pavan_savoy@ti.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 as
++ *  published by the Free Software Foundation.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++#define DEBUG
++#include <linux/platform_device.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci.h>
 +
-+#define ATH3K_MODE_MASK				0x3F
-+#define ATH3K_NORMAL_MODE			0x0E
-+#define ATH3K_PREBOOT_MODE			0x0D
++#include <linux/ti_wilink_st.h>
 +
-+#define ATH3K_UPDATE_MASK			0xC0
-+#define ATH3K_PATCH_UPDATE			0x80
-+#define ATH3K_SYSCFG_UPDATE			0x40
++/* Bluetooth Driver Version */
++#define VERSION               "1.0"
++#define MAX_BT_CHNL_IDS		3
 +
-+#define ATH3K_XTAL_FREQ_26M			0x00
-+#define ATH3K_XTAL_FREQ_40M			0x01
-+#define ATH3K_XTAL_FREQ_19P2			0x02
-+#define ATH3K_NAME_LEN				0xFF
++/* Number of seconds to wait for registration completion
++ * when ST returns PENDING status.
++ */
++#define BT_REGISTER_TIMEOUT   6000	/* 6 sec */
 +
-+struct ath3k_version {
-+	unsigned int	rom_version;
-+	unsigned int	build_version;
-+	unsigned int	ram_version;
-+	unsigned char	ref_clock;
-+	unsigned char	reserved[0x07];
++/**
++ * struct ti_st - driver operation structure
++ * @hdev: hci device pointer which binds to bt driver
++ * @reg_status: ST registration callback status
++ * @st_write: write function provided by the ST driver
++ *	to be used by the driver during send_frame.
++ * @wait_reg_completion - completion sync between ti_st_open
++ *	and st_reg_completion_cb.
++ */
++struct ti_st {
++	struct hci_dev *hdev;
++	char reg_status;
++	long (*st_write) (struct sk_buff *);
++	struct completion wait_reg_completion;
 +};
- 
- static struct usb_device_id ath3k_table[] = {
- 	/* Atheros AR3011 */
-@@ -41,13 +68,29 @@ static struct usb_device_id ath3k_table[] = {
- 
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03F0, 0x311D) },
 +
-+	/* Atheros AR3012 with sflash firmware*/
-+	{ USB_DEVICE(0x0CF3, 0x3004) },
++/* Increments HCI counters based on pocket ID (cmd,acl,sco) */
++static inline void ti_st_tx_complete(struct ti_st *hst, int pkt_type)
++{
++	struct hci_dev *hdev = hst->hdev;
 +
- 	{ }	/* Terminating entry */
- };
- 
- MODULE_DEVICE_TABLE(usb, ath3k_table);
- 
-+#define BTUSB_ATH3012		0x80
-+/* This table is to load patch and sysconfig files
-+ * for AR3012 */
-+static struct usb_device_id ath3k_blist_tbl[] = {
++	/* Update HCI stat counters */
++	switch (pkt_type) {
++	case HCI_COMMAND_PKT:
++		hdev->stat.cmd_tx++;
++		break;
 +
-+	/* Atheros AR3012 with sflash firmware*/
-+	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	case HCI_ACLDATA_PKT:
++		hdev->stat.acl_tx++;
++		break;
 +
-+	{ }	/* Terminating entry */
-+};
++	case HCI_SCODATA_PKT:
++		hdev->stat.sco_tx++;
++		break;
++	}
++}
 +
- #define USB_REQ_DFU_DNLOAD	1
- #define BULK_SIZE		4096
-+#define FW_HDR_SIZE		20
- 
- static int ath3k_load_firmware(struct usb_device *udev,
- 				const struct firmware *firmware)
-@@ -67,10 +110,10 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 	}
- 
- 	memcpy(send_buf, firmware->data, 20);
--	if ((err = usb_control_msg(udev, pipe,
--				USB_REQ_DFU_DNLOAD,
--				USB_TYPE_VENDOR, 0, 0,
--				send_buf, 20, USB_CTRL_SET_TIMEOUT)) < 0) {
-+	err = usb_control_msg(udev, pipe, USB_REQ_DFU_DNLOAD,
-+			USB_TYPE_VENDOR, 0, 0,
-+			send_buf, 20, USB_CTRL_SET_TIMEOUT);
++/* ------- Interfaces to Shared Transport ------ */
++
++/* Called by ST layer to indicate protocol registration completion
++ * status.ti_st_open() function will wait for signal from this
++ * API when st_register() function returns ST_PENDING.
++ */
++static void st_reg_completion_cb(void *priv_data, char data)
++{
++	struct ti_st *lhst = priv_data;
++
++	/* Save registration status for use in ti_st_open() */
++	lhst->reg_status = data;
++	/* complete the wait in ti_st_open() */
++	complete(&lhst->wait_reg_completion);
++}
++
++/* Called by Shared Transport layer when receive data is
++ * available */
++static long st_receive(void *priv_data, struct sk_buff *skb)
++{
++	struct ti_st *lhst = priv_data;
++	int err;
++
++	if (!skb)
++		return -EFAULT;
++
++	if (!lhst) {
++		kfree_skb(skb);
++		return -EFAULT;
++	}
++
++	skb->dev = (void *) lhst->hdev;
++
++	/* Forward skb to HCI core layer */
++	err = hci_recv_frame(skb);
 +	if (err < 0) {
- 		BT_ERR("Can't change to loading configuration err");
- 		goto error;
- 	}
-@@ -103,6 +146,255 @@ error:
- 	return err;
- }
- 
-+static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
-+{
-+	int pipe = 0, ret;
++		BT_ERR("Unable to push skb to HCI core(%d)", err);
++		return err;
++	}
 +
-+	pipe = usb_rcvctrlpipe(udev, 0);
-+	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
-+			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-+			state, 0x01, USB_CTRL_SET_TIMEOUT);
-+	return ret;
++	lhst->hdev->stat.byte_rx += skb->len;
++
++	return 0;
 +}
 +
-+static int ath3k_get_version(struct usb_device *udev,
-+			struct ath3k_version *version)
-+{
-+	int pipe = 0, ret;
++/* ------- Interfaces to HCI layer ------ */
++/* protocol structure registered with shared transport */
++static struct st_proto_s ti_st_proto[MAX_BT_CHNL_IDS] = {
++	{
++		.chnl_id = HCI_ACLDATA_PKT, /* ACL */
++		.hdr_len = sizeof(struct hci_acl_hdr),
++		.offset_len_in_hdr = offsetof(struct hci_acl_hdr, dlen),
++		.len_size = 2,	/* sizeof(dlen) in struct hci_acl_hdr */
++		.reserve = 8,
++	},
++	{
++		.chnl_id = HCI_SCODATA_PKT, /* SCO */
++		.hdr_len = sizeof(struct hci_sco_hdr),
++		.offset_len_in_hdr = offsetof(struct hci_sco_hdr, dlen),
++		.len_size = 1, /* sizeof(dlen) in struct hci_sco_hdr */
++		.reserve = 8,
++	},
++	{
++		.chnl_id = HCI_EVENT_PKT, /* HCI Events */
++		.hdr_len = sizeof(struct hci_event_hdr),
++		.offset_len_in_hdr = offsetof(struct hci_event_hdr, plen),
++		.len_size = 1, /* sizeof(plen) in struct hci_event_hdr */
++		.reserve = 8,
++	},
++};
 +
-+	pipe = usb_rcvctrlpipe(udev, 0);
-+	ret = usb_control_msg(udev, pipe, ATH3K_GETVERSION,
-+			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0, version,
-+			sizeof(struct ath3k_version),
-+			USB_CTRL_SET_TIMEOUT);
-+	return ret;
++/* Called from HCI core to initialize the device */
++static int ti_st_open(struct hci_dev *hdev)
++{
++	unsigned long timeleft;
++	struct ti_st *hst;
++	int err, i;
++
++	BT_DBG("%s %p", hdev->name, hdev);
++
++	if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
++		return -EBUSY;
++
++	/* provide contexts for callbacks from ST */
++	hst = hdev->driver_data;
++
++	for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
++		ti_st_proto[i].priv_data = hst;
++		ti_st_proto[i].max_frame_size = HCI_MAX_FRAME_SIZE;
++		ti_st_proto[i].recv = st_receive;
++		ti_st_proto[i].reg_complete_cb = st_reg_completion_cb;
++
++		/* Prepare wait-for-completion handler */
++		init_completion(&hst->wait_reg_completion);
++		/* Reset ST registration callback status flag,
++		 * this value will be updated in
++		 * st_reg_completion_cb()
++		 * function whenever it called from ST driver.
++		 */
++		hst->reg_status = -EINPROGRESS;
++
++		err = st_register(&ti_st_proto[i]);
++		if (!err)
++			goto done;
++
++		if (err != -EINPROGRESS) {
++			clear_bit(HCI_RUNNING, &hdev->flags);
++			BT_ERR("st_register failed %d", err);
++			return err;
++		}
++
++		/* ST is busy with either protocol
++		 * registration or firmware download.
++		 */
++		BT_DBG("waiting for registration "
++				"completion signal from ST");
++		timeleft = wait_for_completion_timeout
++			(&hst->wait_reg_completion,
++			 msecs_to_jiffies(BT_REGISTER_TIMEOUT));
++		if (!timeleft) {
++			clear_bit(HCI_RUNNING, &hdev->flags);
++			BT_ERR("Timeout(%d sec),didn't get reg "
++					"completion signal from ST",
++					BT_REGISTER_TIMEOUT / 1000);
++			return -ETIMEDOUT;
++		}
++
++		/* Is ST registration callback
++		 * called with ERROR status? */
++		if (hst->reg_status != 0) {
++			clear_bit(HCI_RUNNING, &hdev->flags);
++			BT_ERR("ST registration completed with invalid "
++					"status %d", hst->reg_status);
++			return -EAGAIN;
++		}
++
++done:
++		hst->st_write = ti_st_proto[i].write;
++		if (!hst->st_write) {
++			BT_ERR("undefined ST write function");
++			clear_bit(HCI_RUNNING, &hdev->flags);
++			for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
++				/* Undo registration with ST */
++				err = st_unregister(&ti_st_proto[i]);
++				if (err)
++					BT_ERR("st_unregister() failed with "
++							"error %d", err);
++				hst->st_write = NULL;
++			}
++			return -EIO;
++		}
++	}
++	return 0;
 +}
 +
-+static int ath3k_load_fwfile(struct usb_device *udev,
-+		const struct firmware *firmware)
++/* Close device */
++static int ti_st_close(struct hci_dev *hdev)
 +{
-+	u8 *send_buf;
-+	int err, pipe, len, size, count, sent = 0;
-+	int ret;
++	int err, i;
++	struct ti_st *hst = hdev->driver_data;
 +
-+	count = firmware->size;
++	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
++		return 0;
 +
-+	send_buf = kmalloc(BULK_SIZE, GFP_ATOMIC);
-+	if (!send_buf) {
-+		BT_ERR("Can't allocate memory chunk for firmware");
++	for (i = 0; i < MAX_BT_CHNL_IDS; i++) {
++		err = st_unregister(&ti_st_proto[i]);
++		if (err)
++			BT_ERR("st_unregister(%d) failed with error %d",
++					ti_st_proto[i].chnl_id, err);
++	}
++
++	hst->st_write = NULL;
++
++	return err;
++}
++
++static int ti_st_send_frame(struct sk_buff *skb)
++{
++	struct hci_dev *hdev;
++	struct ti_st *hst;
++	long len;
++
++	hdev = (struct hci_dev *)skb->dev;
++
++	if (!test_bit(HCI_RUNNING, &hdev->flags))
++		return -EBUSY;
++
++	hst = hdev->driver_data;
++
++	/* Prepend skb with frame type */
++	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
++
++	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type,
++			skb->len);
++
++	/* Insert skb to shared transport layer's transmit queue.
++	 * Freeing skb memory is taken care in shared transport layer,
++	 * so don't free skb memory here.
++	 */
++	len = hst->st_write(skb);
++	if (len < 0) {
++		kfree_skb(skb);
++		BT_ERR("ST write failed (%ld)", len);
++		/* Try Again, would only fail if UART has gone bad */
++		return -EAGAIN;
++	}
++
++	/* ST accepted our skb. So, Go ahead and do rest */
++	hdev->stat.byte_tx += len;
++	ti_st_tx_complete(hst, bt_cb(skb)->pkt_type);
++
++	return 0;
++}
++
++static void ti_st_destruct(struct hci_dev *hdev)
++{
++	BT_DBG("%s", hdev->name);
++	/* do nothing here, since platform remove
++	 * would free the hdev->driver_data
++	 */
++}
++
++static int bt_ti_probe(struct platform_device *pdev)
++{
++	static struct ti_st *hst;
++	struct hci_dev *hdev;
++	int err;
++
++	hst = kzalloc(sizeof(struct ti_st), GFP_KERNEL);
++	if (!hst)
++		return -ENOMEM;
++
++	/* Expose "hciX" device to user space */
++	hdev = hci_alloc_dev();
++	if (!hdev) {
++		kfree(hst);
 +		return -ENOMEM;
 +	}
 +
-+	size = min_t(uint, count, FW_HDR_SIZE);
-+	memcpy(send_buf, firmware->data, size);
++	BT_DBG("hdev %p", hdev);
 +
-+	pipe = usb_sndctrlpipe(udev, 0);
-+	ret = usb_control_msg(udev, pipe, ATH3K_DNLOAD,
-+			USB_TYPE_VENDOR, 0, 0, send_buf,
-+			size, USB_CTRL_SET_TIMEOUT);
-+	if (ret < 0) {
-+		BT_ERR("Can't change to loading configuration err");
-+		kfree(send_buf);
-+		return ret;
++	hst->hdev = hdev;
++	hdev->bus = HCI_UART;
++	hdev->driver_data = hst;
++	hdev->open = ti_st_open;
++	hdev->close = ti_st_close;
++	hdev->flush = NULL;
++	hdev->send = ti_st_send_frame;
++	hdev->destruct = ti_st_destruct;
++	hdev->owner = THIS_MODULE;
++
++	err = hci_register_dev(hdev);
++	if (err < 0) {
++		BT_ERR("Can't register HCI device error %d", err);
++		kfree(hst);
++		hci_free_dev(hdev);
++		return err;
 +	}
 +
-+	sent += size;
-+	count -= size;
++	BT_DBG("HCI device registered (hdev %p)", hdev);
 +
-+	while (count) {
-+		size = min_t(uint, count, BULK_SIZE);
-+		pipe = usb_sndbulkpipe(udev, 0x02);
++	dev_set_drvdata(&pdev->dev, hst);
++	return err;
++}
 +
-+		memcpy(send_buf, firmware->data + sent, size);
++static int bt_ti_remove(struct platform_device *pdev)
++{
++	struct hci_dev *hdev;
++	struct ti_st *hst = dev_get_drvdata(&pdev->dev);
 +
-+		err = usb_bulk_msg(udev, pipe, send_buf, size,
-+					&len, 3000);
-+		if (err || (len != size)) {
-+			BT_ERR("Error in firmware loading err = %d,"
-+				"len = %d, size = %d", err, len, size);
-+			kfree(send_buf);
-+			return err;
-+		}
-+		sent  += size;
-+		count -= size;
-+	}
++	if (!hst)
++		return -EFAULT;
 +
-+	kfree(send_buf);
++	BT_DBG("%s", hst->hdev->name);
++
++	hdev = hst->hdev;
++	ti_st_close(hdev);
++	hci_unregister_dev(hdev);
++
++	hci_free_dev(hdev);
++	kfree(hst);
++
++	dev_set_drvdata(&pdev->dev, NULL);
 +	return 0;
 +}
 +
-+static int ath3k_switch_pid(struct usb_device *udev)
-+{
-+	int pipe = 0, ret;
++static struct platform_driver btwilink_driver = {
++	.probe = bt_ti_probe,
++	.remove = bt_ti_remove,
++	.driver = {
++		.name = "btwilink",
++		.owner = THIS_MODULE,
++	},
++};
 +
-+	pipe = usb_sndctrlpipe(udev, 0);
-+	ret = usb_control_msg(udev, pipe, USB_REG_SWITCH_VID_PID,
-+			USB_TYPE_VENDOR, 0, 0,
-+			NULL, 0, USB_CTRL_SET_TIMEOUT);
-+	return ret;
++/* ------- Module Init/Exit interfaces ------ */
++static int __init btwilink_init(void)
++{
++	BT_INFO("Bluetooth Driver for TI WiLink - Version %s", VERSION);
++
++	return platform_driver_register(&btwilink_driver);
 +}
 +
-+static int ath3k_set_normal_mode(struct usb_device *udev)
++static void __exit btwilink_exit(void)
 +{
-+	unsigned char fw_state;
-+	int pipe = 0, ret;
-+
-+	ret = ath3k_get_state(udev, &fw_state);
-+	if (ret < 0) {
-+		BT_ERR("Can't get state to change to normal mode err");
-+		return ret;
-+	}
-+
-+	if ((fw_state & ATH3K_MODE_MASK) == ATH3K_NORMAL_MODE) {
-+		BT_DBG("firmware was already in normal mode");
-+		return 0;
-+	}
-+
-+	pipe = usb_sndctrlpipe(udev, 0);
-+	ret = usb_control_msg(udev, pipe, ATH3K_SET_NORMAL_MODE,
-+			USB_TYPE_VENDOR, 0, 0,
-+			NULL, 0, USB_CTRL_SET_TIMEOUT);
-+	if (ret < 0)
-+		BT_ERR("Can't set normal mode err");
-+
-+	return ret;
++	platform_driver_unregister(&btwilink_driver);
 +}
 +
-+static int ath3k_load_patch(struct usb_device *udev)
-+{
-+	unsigned char fw_state;
-+	char filename[ATH3K_NAME_LEN] = {0};
-+	const struct firmware *firmware;
-+	struct ath3k_version fw_version, pt_version;
-+	int delay = 0, ret;
++module_init(btwilink_init);
++module_exit(btwilink_exit);
 +
-+	ret = ath3k_get_state(udev, &fw_state);
-+	if (ret < 0) {
-+		BT_ERR("Can't get state to change to load ram patch err");
-+		return ret;
-+	}
++/* ------ Module Info ------ */
 +
-+	if (fw_state & ATH3K_PATCH_UPDATE) {
-+		BT_DBG("Patch was already downloaded");
-+		return 0;
-+	}
-+
-+	ret = ath3k_get_version(udev, &fw_version);
-+	if (ret < 0) {
-+		BT_ERR("Can't get version to change to load ram patch err");
-+		return ret;
-+	}
-+
-+	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
-+		fw_version.rom_version);
-+
-+	ret = request_firmware(&firmware, filename, &udev->dev);
-+	if (ret < 0) {
-+		BT_ERR("Patch file not found %s", filename);
-+		return ret;
-+	}
-+
-+	pt_version.rom_version = *(int *)(firmware->data + firmware->size - 8);
-+	pt_version.build_version = *(int *)
-+		(firmware->data + firmware->size - 4);
-+
-+	if ((pt_version.rom_version != fw_version.rom_version) ||
-+		(pt_version.build_version <= fw_version.build_version)) {
-+		BT_ERR("Patch file version did not match with firmware");
-+		release_firmware(firmware);
-+		return -EINVAL;
-+	}
-+
-+	ret = ath3k_load_fwfile(udev, firmware);
-+	if (ret < 0) {
-+		BT_ERR("Patch loading failed - %s", filename);
-+		release_firmware(firmware);
-+		return ret;
-+	}
-+
-+	release_firmware(firmware);
-+
-+	do {
-+		ret = ath3k_get_state(udev, &fw_state);
-+		if (ret < 0)
-+			continue;
-+
-+		if (fw_state & ATH3K_PATCH_UPDATE) {
-+			BT_DBG("Patch has been downloaded successfully");
-+			break;
-+		}
-+		delay++;
-+	} while (delay < 3);
-+
-+	return 0;
-+}
-+
-+static int ath3k_load_syscfg(struct usb_device *udev)
-+{
-+	unsigned char fw_state;
-+	char filename[ATH3K_NAME_LEN] = {0};
-+	const struct firmware *firmware;
-+	struct ath3k_version fw_version;
-+	int clk_value, delay = 0, ret;
-+
-+	if (ath3k_get_state(udev, &fw_state) < 0) {
-+		BT_ERR("Can't get state to change to load configration err");
-+		return -EBUSY;
-+	}
-+
-+	ret = ath3k_get_version(udev, &fw_version);
-+	if (ret < 0) {
-+		BT_ERR("Can't get version to change to load ram patch err");
-+		return ret;
-+	}
-+
-+	switch (fw_version.ref_clock) {
-+
-+	case ATH3K_XTAL_FREQ_26M:
-+		clk_value = 26;
-+		break;
-+	case ATH3K_XTAL_FREQ_40M:
-+		clk_value = 40;
-+		break;
-+	case ATH3K_XTAL_FREQ_19P2:
-+		clk_value = 19;
-+		break;
-+	default:
-+		clk_value = 0;
-+		break;
-+	}
-+
-+	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
-+		fw_version.rom_version, clk_value, ".dfu");
-+
-+	ret = request_firmware(&firmware, filename, &udev->dev);
-+	if (ret < 0) {
-+		BT_ERR("Configuration file not found %s", filename);
-+		return ret;
-+	}
-+
-+	ret = ath3k_load_fwfile(udev, firmware);
-+	if (ret < 0) {
-+		BT_ERR("Configuration loading failed - %s", filename);
-+		release_firmware(firmware);
-+		return ret;
-+	}
-+
-+	release_firmware(firmware);
-+
-+	do {
-+		ret = ath3k_get_state(udev, &fw_state);
-+		if (ret < 0)
-+			continue;
-+
-+		if (fw_state & ATH3K_SYSCFG_UPDATE)
-+			break;
-+		delay++;
-+	} while (delay < 3);
-+
-+	return 0;
-+}
-+
- static int ath3k_probe(struct usb_interface *intf,
- 			const struct usb_device_id *id)
- {
-@@ -115,7 +407,33 @@ static int ath3k_probe(struct usb_interface *intf,
- 	if (intf->cur_altsetting->desc.bInterfaceNumber != 0)
- 		return -ENODEV;
- 
-+	/* match device ID in ath3k blacklist table */
-+	if (!id->driver_info) {
-+		const struct usb_device_id *match;
-+		match = usb_match_id(intf, ath3k_blist_tbl);
-+		if (match)
-+			id = match;
-+	}
-+
-+	/* load patch and sysconfig files for AR3012 */
-+	if (id->driver_info & BTUSB_ATH3012) {
-+		ret = ath3k_load_patch(udev);
-+		if (ret < 0) {
-+			BT_ERR("Loading patch file failed");
-+			return ret;
-+		}
-+		ret = ath3k_load_syscfg(udev);
-+		if (ret < 0) {
-+			BT_ERR("Loading sysconfig file failed");
-+			return ret;
-+		}
-+		ath3k_set_normal_mode(udev);
-+		ath3k_switch_pid(udev);
-+		return 0;
-+	}
-+
- 	if (request_firmware(&firmware, "ath3k-1.fw", &udev->dev) < 0) {
-+		BT_ERR("Error loading firmware");
- 		return -EIO;
- 	}
- 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4cefa91..fa84109 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -105,6 +105,9 @@ static struct usb_device_id blacklist_table[] = {
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
- 
-+	/* Atheros 3012 with sflash firmware */
-+	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_IGNORE },
-+
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
++MODULE_AUTHOR("Raja Mani <raja_mani@ti.com>");
++MODULE_DESCRIPTION("Bluetooth Driver for TI Shared Transport" VERSION);
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
 -- 
 1.6.3.3
-
