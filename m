@@ -1,38 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 13:26:42 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/5] Add an initial interactive mode to gatttool
-Message-ID: <20110209212642.GA11368@jh-x301>
-References: <1297179136-14750-1-git-send-email-sheldon.demario@openbossa.org>
- <1297179136-14750-3-git-send-email-sheldon.demario@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297179136-14750-3-git-send-email-sheldon.demario@openbossa.org>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] use a valid PSM value in l2test.
+Date: Wed,  9 Feb 2011 16:42:00 -0200
+Message-Id: <1297276920-15467-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Feb 08, 2011, Sheldon Demario wrote:
-> +int do_interactive(void);
+---
+ test/l2test.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-I don't really like having an exported function called do_*. The places
-I've seen this naming convention have usually been when there's some
-other function already with the name you want and in all places the do_
-variant is static. How about simply interactive() or interactive_mode().
-Also, shouldn't you be passing the minimum config options as parameters
-to this function? Otherwise you'll have to have some sort of global
-config variables.
+diff --git a/test/l2test.c b/test/l2test.c
+index 17883a9..3ac332f 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -87,7 +87,7 @@ static long buffer_size = 2048;
+ 
+ /* Default addr and psm and cid */
+ static bdaddr_t bdaddr;
+-static unsigned short psm = 10;
++static unsigned short psm = 0x1011;
+ static unsigned short cid = 0;
+ 
+ /* Default number of frames to send (-1 = infinite) */
+-- 
+1.7.4
 
-> +++ b/attrib/igatttool.c
-
-Since we don't have igattool anymore, how about calling this
-interactive.c?
-
-> +static void cmd_help(int argcp, char **argvp);
-> +static void cmd_exit(int argcp, char **argvp);
-
-No forward-declarations please. Just reorder the functions so that you
-don't need to do this.
-
-Johan
