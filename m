@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 14:00:28 -0800
+Date: Wed, 9 Feb 2011 13:58:23 -0800
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add support for notyfying pbap about more parts
- from backend
-Message-ID: <20110209220028.GC11911@jh-x301>
-References: <1297237127-16286-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: Re: [PATCH] Fix small typo
+Message-ID: <20110209215823.GB11911@jh-x301>
+References: <1297193877-26625-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297237127-16286-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1297193877-26625-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Elvis,
 
-On Wed, Feb 09, 2011, Radoslaw Jablonski wrote:
-> Added new parameter to phonebook_cb - lastpart variable.
-> If backend want to notify that more parts of current
-> request will be delivered later, it should use lastpart=FALSE.
-> Because of that, PBAP core will 'know' that should not finalize
-> request immediately after receiving data and wait for more
-> parts to come.
-> If result is returned in one part and no more responses part
-> will be sent later, then backend should use lastparam=TRUE.
-> Previously results of request from backend was always returned
-> in one part to PBAP core.
+On Tue, Feb 08, 2011, Elvis Pfützenreuter wrote:
 > ---
->  plugins/irmc.c              |    5 +++--
->  plugins/pbap.c              |   10 +++++++---
->  plugins/phonebook-dummy.c   |    4 ++--
->  plugins/phonebook-ebook.c   |    7 ++++---
->  plugins/phonebook-tracker.c |   13 +++++++------
->  plugins/phonebook.h         |    2 +-
->  6 files changed, 24 insertions(+), 17 deletions(-)
+>  doc/health-api.txt |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/doc/health-api.txt b/doc/health-api.txt
+> index a0a1685..3d0a717 100644
+> --- a/doc/health-api.txt
+> +++ b/doc/health-api.txt
+> @@ -18,7 +18,7 @@ Methods:
+>  
+>  		Returns the path of the new registered application.
+>  
+> -		Dict is defined as bellow:
+> +		Dict is defined as below:
+>  		{
+>  			"DataType": uint16, (mandatory)
+>  			"Role" : ("Source" or "Sink"), (mandatory)
 
-It seems these patches depend on your previous ones which weren't ready
-for upstream, so I suppose they'll need to be fixed and resent (once
-you've done the necessary changes to the first ones).
+Pushed upstream. Thanks.
 
 Johan
