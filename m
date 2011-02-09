@@ -1,71 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110209142118.GD1995@joana>
-References: <1297260110-10515-1-git-send-email-andre.dieb@signove.com>
-	<1297260110-10515-6-git-send-email-andre.dieb@signove.com>
-	<20110209142118.GD1995@joana>
-Date: Wed, 9 Feb 2011 12:28:50 -0200
-Message-ID: <AANLkTimeyZ+45d+nQjHU+JumELzvYEgZYf8zx-ZgCe1a@mail.gmail.com>
-Subject: Re: [PATCH 6/7] Add ATT dump for read req/resp
-From: =?UTF-8?Q?Andr=C3=A9_Dieb?= <andre.dieb@signove.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Wed, 9 Feb 2011 12:24:20 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andre Dieb Martins <andre.dieb@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 1/6] Add dump for ATT MTU req/resp and notify value
+Message-ID: <20110209142420.GE1995@joana>
+References: <1297259619-10325-1-git-send-email-andre.dieb@signove.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1297259619-10325-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Besides its opcode (which was already parsed), read response contains
-only the attribute value octets.
+Hi Andre,
 
-To further parse it, I think we'd need to store the handle of the read
-request, match it against a UUID table and maybe parse the read
-response format, if any. Maybe too much work?
+* Andre Dieb Martins <andre.dieb@signove.com> [2011-02-09 10:53:34 -0300]:
 
-I must note I liked raw_dump() for this because it also prints out
-chars, which make attribs. like device name have a nice dump.
+> ---
+>  parser/att.c |   31 ++++++++++++++++++++++++++++++-
+>  1 files changed, 30 insertions(+), 1 deletions(-)
+> 
+> diff --git a/parser/att.c b/parser/att.c
+> index b670694..05f9c23 100644
+> --- a/parser/att.c
+> +++ b/parser/att.c
+> @@ -132,12 +132,35 @@ static const char *attop2str(uint8_t op)
+>  	}
+>  }
+>  
+> +static void att_mtu_req_dump(int level, struct frame *frm)
+> +{
+> +	uint16_t client_rx_mtu = btohs(htons(get_u16(frm)));
+> +
+> +	p_indent(level, frm);
+> +	printf("client rx mtu %d\n", client_rx_mtu);
+> +}
+> +
+> +static void att_mtu_resp_dump(int level, struct frame *frm)
+> +{
+> +	uint16_t server_rx_mtu = btohs(htons(get_u16(frm)));
+> +
+> +	p_indent(level, frm);
+> +	printf("server rx mtu %d\n", server_rx_mtu);
+> +}
+> +
+>  static void att_handle_notify_dump(int level, struct frame *frm)
+>  {
+>  	uint16_t handle = btohs(htons(get_u16(frm)));
+>  
+>  	p_indent(level, frm);
+>  	printf("handle 0x%2.2x\n", handle);
+> +
+> +	p_indent(level, frm);
+> +	printf("value ");
+> +	while (frm->len > 0) {
+> +		printf("0x%.2x ", get_u8(frm));
+> +	}
+> +	printf("\n");
+>  }
+>  
+>  void att_dump(int level, struct frame *frm)
+> @@ -147,9 +170,15 @@ void att_dump(int level, struct frame *frm)
+>  	op = get_u8(frm);
+>  
+>  	p_indent(level, frm);
+> -	printf("Opcode: %d (%s)\n", op, attop2str(op));
+> +	printf("Opcode %d (%s)\n", op, attop2str(op));
 
-On Wed, Feb 9, 2011 at 12:21 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Andre,
->
-> * Andre Dieb Martins <andre.dieb@signove.com> [2011-02-09 11:01:49 -0300]:
->
->> ---
->>  parser/att.c |   14 ++++++++++++++
->>  1 files changed, 14 insertions(+), 0 deletions(-)
->>
->> diff --git a/parser/att.c b/parser/att.c
->> index b172f95..2a9da30 100644
->> --- a/parser/att.c
->> +++ b/parser/att.c
->> @@ -331,6 +331,14 @@ static void att_find_info_resp_dump(int level, struct frame *frm)
->>       }
->>  }
->>
->> +static void att_read_req_dump(int level, struct frame *frm)
->> +{
->> +     uint16_t handle = btohs(htons(get_u16(frm)));
->> +
->> +     p_indent(level, frm);
->> +     printf("handle 0x%2.2x\n", handle);
->> +}
->> +
->>  static void att_handle_notify_dump(int level, struct frame *frm)
->>  {
->>       uint16_t handle = btohs(htons(get_u16(frm)));
->> @@ -371,6 +379,12 @@ void att_dump(int level, struct frame *frm)
->>               case ATT_OP_FIND_INFO_RESP:
->>                       att_find_info_resp_dump(level + 1, frm);
->>                       break;
->> +             case ATT_OP_READ_REQ:
->> +                     att_read_req_dump(level + 1, frm);
->> +                     break;
->> +             case ATT_OP_READ_RESP:
->> +                     raw_dump(level + 1, frm);
->
-> raw_dump?
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+-v2 delivered a blank email to me for this one, so replying here.
+
+Please move this change to the patch that introduced it.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
