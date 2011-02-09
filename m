@@ -1,62 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 13:56:50 -0800
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Date: Wed, 9 Feb 2011 13:26:42 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add return value to reply_list_foreach_t in
- phonebook-tracker
-Message-ID: <20110209215650.GA11911@jh-x301>
-References: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: Re: [PATCH 3/5] Add an initial interactive mode to gatttool
+Message-ID: <20110209212642.GA11368@jh-x301>
+References: <1297179136-14750-1-git-send-email-sheldon.demario@openbossa.org>
+ <1297179136-14750-3-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297081658-30573-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1297179136-14750-3-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+On Tue, Feb 08, 2011, Sheldon Demario wrote:
+> +int do_interactive(void);
 
-On Mon, Feb 07, 2011, Radoslaw Jablonski wrote:
-> +	return -1;
+I don't really like having an exported function called do_*. The places
+I've seen this naming convention have usually been when there's some
+other function already with the name you want and in all places the do_
+variant is static. How about simply interactive() or interactive_mode().
+Also, shouldn't you be passing the minimum config options as parameters
+to this function? Otherwise you'll have to have some sort of global
+config variables.
 
-Could you please use some more meaningful POSIX error codes here,
--EINVAL, etc.
+> +++ b/attrib/igatttool.c
 
-> @@ -1645,13 +1652,14 @@ fail:
->  	g_free(temp_id);
->  	temp_id = NULL;
->  
-> +	return -1;
+Since we don't have igattool anymore, how about calling this
+interactive.c?
 
-Same here.
+> +static void cmd_help(int argcp, char **argvp);
+> +static void cmd_exit(int argcp, char **argvp);
 
->  done:
->  	if (num_fields <= 0)
->  		data->ready_cb(data->user_data);
->  
-> +	return -1;
-
-And here.
-
->  	if (num_fields < 0) {
->  		data->cb(NULL, 0, num_fields, 0, data->user_data);
-> -		return;
-> +		return -1;
-
-And here.
-
->  	}
->  
->  	if (data->params->maxlistcount == 0) {
-> @@ -1880,6 +1889,8 @@ done:
->  	query_tracker(query, col_amount, pull_cb, data, &err);
->  	if (err < 0)
->  		data->cb(NULL, 0, err, 0, data->user_data);
-> +
-> +	return -1;
->  }
-
-This looks a bit strange. Is it really a failure even if err is 0? I'd
-expect the return statement to look like "return err;". Btw, why doesn't
-query_tracker return the error in its return value?
+No forward-declarations please. Just reorder the functions so that you
+don't need to do this.
 
 Johan
