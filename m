@@ -1,40 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 07:38:58 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Brian Gix <bgix@codeaurora.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Kernal/User space change for LE Random Addresses
-Message-ID: <20110209153858.GA27340@jh-x301>
-References: <4D51D8AE.9020005@codeaurora.org>
- <AANLkTimiJ2sP8yrpnk3=Hjo6XrVoEuRbmYE2H=UsKAA7@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTimiJ2sP8yrpnk3=Hjo6XrVoEuRbmYE2H=UsKAA7@mail.gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH v2] Fix blutoothd exit on badly formated AT+VTS
+Date: Wed,  9 Feb 2011 16:55:46 +0200
+Message-Id: <1297263346-29728-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+This fixes bluetoothd exit when AT+VTS command is badly formatted,
+e.g. as AT+VTS\xfe\xfe[...]=1
 
-On Wed, Feb 09, 2011, Claudio Takahasi wrote:
-> An address/advertising cache will be added in the kernel, if the given
-> address is found in the cache the two most significant bits will be
-> checked to infer the address type,
+Verification it done for the numeric value to be larger than 0x23,
+that corresponds to the hash '#', and to be lower than 0x44, that
+corresponds to 'D', such that the tone is in {0-9, *, #, A, B, C, D}.
+---
+ audio/headset.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-For the public vs random address detection you need to use the address
-type info in the advertising report. Only when you've determined that
-the address is random will the two bits make sense. So far the only use
-I can think of for these bits is to determine whether it's useful to try
-to perform a lookup in our IRK list (e.g. for a non-resolvable private
-key that wouldn't make sense). Are there any other uses?
+diff --git a/audio/headset.c b/audio/headset.c
+index 0270e2c..bdaa8da 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -1015,12 +1015,18 @@ int telephony_transmit_dtmf_rsp(void *telephony_device, cme_error_t err)
+ 
+ static int dtmf_tone(struct audio_device *device, const char *buf)
+ {
++	char tone;
++
+ 	if (strlen(buf) < 8) {
+ 		error("Too short string for DTMF tone");
+ 		return -EINVAL;
+ 	}
+ 
+-	telephony_transmit_dtmf_req(device, buf[7]);
++	tone = buf[7];
++	if (tone >= '#' && tone <= 'D')
++		telephony_transmit_dtmf_req(device, tone);
++	else
++		return -EINVAL;
+ 
+ 	return 0;
+ }
+-- 
+1.7.1
 
-> otherwise the fallback will be BR/EDR. For BR/EDR L2CAP SOCK_SEQPACKET
-> sockets PSM is always provided, we can also use this information to
-> distinguish BR/EDR from LE address if an advertising has not been
-> detected previously.
-
-I think we could still keep the current CID based decision on the kernel
-side. If the CID implies LE but we don't have a match for the address in
-the cache we just return an error to user space.
-
-Johan
