@@ -1,17 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Feb 2011 12:15:36 -0200
+Date: Wed, 9 Feb 2011 12:13:00 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Andre Dieb Martins <andre.dieb@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH 4/7] Add ATT find info req/resp dump
-Message-ID: <20110209141536.GB1995@joana>
+Message-ID: <20110209141300.GA1995@joana>
 References: <1297260110-10515-1-git-send-email-andre.dieb@signove.com>
  <1297260110-10515-4-git-send-email-andre.dieb@signove.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 In-Reply-To: <1297260110-10515-4-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+Hi André, 
 
 * Andre Dieb Martins <andre.dieb@signove.com> [2011-02-09 11:01:47 -0300]:
 
@@ -96,8 +98,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 > +}
 > +
 > +
+>  static void att_error_dump(int level, struct frame *frm)
+>  {
+>  	uint8_t op = get_u8(frm);
+> @@ -225,6 +287,50 @@ static void att_mtu_resp_dump(int level, struct frame *frm)
+>  	printf("server rx mtu %d\n", server_rx_mtu);
+>  }
+>  
+> +static void att_find_info_req_dump(int level, struct frame *frm)
+> +{
+> +	uint16_t start = btohs(htons(get_u16(frm)));
+> +	uint16_t end = btohs(htons(get_u16(frm)));
+> +
+> +	p_indent(level, frm);
+> +	printf("start 0x%2.2x, end 0x%2.2x\n", start, end);
+> +}
+> +
+> +static void att_find_info_resp_dump(int level, struct frame *frm)
+> +{
+> +	uint8_t fmt = get_u8(frm);
+> +
+> +	p_indent(level, frm);
+> +
+> +	if (fmt == 0x01) {
+> +		printf("format: uuid-16\n");
+> +
+> +		while (frm->len > 0) {
+> +			uint16_t handle = btohs(htons(get_u16(frm)));
+> +			uint16_t uuid = btohs(htons(get_u16(frm)));
+> +			p_indent(level + 1, frm);
+> +			printf("handle 0x%2.2x, uuid 0x%2.2x (%s)\n", handle, uuid,
+> +					uuid2str(uuid));
+> +		}
+> +	} else {
+> +		printf("format: uuid-128\n");
+> +
+> +		while (frm->len > 0) {
+> +			uint16_t handle = btohs(htons(get_u16(frm)));
+> +			int i;
+> +
+> +			p_indent(level + 1, frm);
+> +			printf("handle 0x%2.2x, uuid ", handle);
+> +			for (i = 0; i < 16; i++) {
+> +				printf("%02x", get_u8(frm));
+> +				if (i == 3 || i == 5 || i == 7 || i == 9)
+> +					printf("-");
+> +			}
+> +			printf("\n");
+> +		}
+> +	}
+> +}
+> +
+>  static void att_handle_notify_dump(int level, struct frame *frm)
+>  {
+>  	uint16_t handle = btohs(htons(get_u16(frm)));
+> @@ -259,10 +365,15 @@ void att_dump(int level, struct frame *frm)
+>  		case ATT_OP_MTU_RESP:
+>  			att_mtu_resp_dump(level + 1, frm);
+>  			break;
+> +		case ATT_OP_FIND_INFO_REQ:
+> +			att_find_info_req_dump(level + 1, frm);
+> +			break;
+> +		case ATT_OP_FIND_INFO_RESP:
+> +			att_find_info_resp_dump(level + 1, frm);
+> +			break;
+>  		case ATT_OP_HANDLE_NOTIFY:
+>  			att_handle_notify_dump(level + 1, frm);
+>  			break;
+> -
 
-And a extra blank line here. ;)
+Extra change in your patch. Otherwise look all good.
 
 -- 
 Gustavo F. Padovan
