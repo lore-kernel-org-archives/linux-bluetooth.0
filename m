@@ -1,56 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hcitool: add bdaddr type option to lecc
-Date: Wed,  9 Feb 2011 21:48:47 -0800
-Message-Id: <1297316927-12151-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [bluetooth-next 24/24] Bluetooth: Add key size checks for SMP
+Date: Wed,  9 Feb 2011 22:18:24 -0300
+Message-Id: <1297300704-30006-25-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+This patch implements a check in smp cmd pairing request and pairing
+response to verify if encryption key maximum size is compatible in both
+slave and master when SMP Pairing is requested. Keys are also masked to
+the correct negotiated size.
 
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- tools/hcitool.c |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ include/net/bluetooth/smp.h   |    3 ++
+ net/bluetooth/smp.c           |   52 +++++++++++++++++++++++++++++++---------
+ 3 files changed, 44 insertions(+), 12 deletions(-)
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 536d407..c097526 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2420,7 +2420,7 @@ static struct option lecc_options[] = {
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index e2712b0..420981c 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -295,6 +295,7 @@ struct l2cap_conn {
+ 	__u8		prnd[16];
+ 	__u8		pcnf[16];
+ 	__u8		tk[16];
++	__u8		smp_key_size;
  
- static const char *lecc_help =
- 	"Usage:\n"
--	"\tlecc <bdaddr>\n";
-+	"\tlecc <bdaddr> [conn type]\n";
+ 	struct timer_list security_timer;
  
- static void cmd_lecc(int dev_id, int argc, char **argv)
- {
-@@ -2437,7 +2437,7 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 			return;
- 		}
- 	}
--	helper_arg(1, 1, &argc, &argv, lecc_help);
-+	helper_arg(1, 2, &argc, &argv, lecc_help);
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index 111853a..4fb7d19 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -112,6 +112,9 @@ struct smp_cmd_security_req {
+ #define SMP_UNSPECIFIED		0x08
+ #define SMP_REPEATED_ATTEMPTS		0x09
  
- 	if (dev_id < 0)
- 		dev_id = hci_get_route(NULL);
-@@ -2450,10 +2450,14 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 
- 	str2ba(argv[0], &bdaddr);
- 
-+	if (argc == 2)
-+		peer_bdaddr_type = atoi(argv[1]);
-+	else	
-+		peer_bdaddr_type = 0;
++#define SMP_MIN_ENC_KEY_SIZE		7
++#define SMP_MAX_ENC_KEY_SIZE		16
 +
- 	interval = htobs(0x0004);
- 	window = htobs(0x0004);
- 	initiator_filter = 0x00;
--	peer_bdaddr_type = 0x00;
- 	own_bdaddr_type = 0x00;
- 	min_interval = htobs(0x000F);
- 	max_interval = htobs(0x000F);
+ /* SMP Commands */
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
+ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 00c1c9c..f9bf34f 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -206,35 +206,51 @@ static void build_pairing_cmd(struct l2cap_conn *conn, struct smp_cmd_pairing *c
+ {
+ 	cmd->io_capability = SMP_IO_NO_INPUT_OUTPUT;
+ 	cmd->oob_flag = SMP_OOB_NOT_PRESENT;
+-	cmd->max_key_size = 16;
++	cmd->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+ 	cmd->init_key_dist = 0x00;
+ 	cmd->resp_key_dist = 0x00;
+ 	cmd->auth_req = authreq;
+ }
+ 
++static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
++{
++	if ((max_key_size > SMP_MAX_ENC_KEY_SIZE) ||
++			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
++		return SMP_ENC_KEY_SIZE;
++
++	conn->smp_key_size = max_key_size;
++
++	return 0;
++}
++
+ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_cmd_pairing *rp = (void *) skb->data;
++	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
++	u8 key_size;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+ 	conn->preq[0] = SMP_CMD_PAIRING_REQ;
+-	memcpy(&conn->preq[1], rp, sizeof(*rp));
+-	skb_pull(skb, sizeof(*rp));
++	memcpy(&conn->preq[1], req, sizeof(*req));
++	skb_pull(skb, sizeof(*req));
+ 
+-	if (rp->oob_flag)
++	if (req->oob_flag)
+ 		return SMP_OOB_NOT_AVAIL;
+ 
+ 	/* We didn't start the pairing, so no requirements */
+-	build_pairing_cmd(conn, rp, SMP_AUTH_NONE);
++	build_pairing_cmd(conn, &rsp, SMP_AUTH_NONE);
++
++	key_size = min(req->max_key_size, rsp.max_key_size);
++	if (check_enc_key_size(conn, key_size))
++		return SMP_ENC_KEY_SIZE;
+ 
+ 	/* Just works */
+ 	memset(conn->tk, 0, sizeof(conn->tk));
+ 
+ 	conn->pres[0] = SMP_CMD_PAIRING_RSP;
+-	memcpy(&conn->pres[1], rp, sizeof(*rp));
++	memcpy(&conn->pres[1], &rsp, sizeof(rsp));
+ 
+-	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
++	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(rsp), &rsp);
+ 
+ 	mod_timer(&conn->security_timer, jiffies +
+ 					msecs_to_jiffies(SMP_TIMEOUT));
+@@ -244,21 +260,27 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_cmd_pairing *rp = (void *) skb->data;
++	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
+ 	struct smp_cmd_pairing_confirm cp;
+ 	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+ 	int ret;
+-	u8 res[16];
++	u8 res[16], key_size;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+-	skb_pull(skb, sizeof(*rp));
++	skb_pull(skb, sizeof(*rsp));
++
++	req = (void *) &conn->preq[1];
++
++	key_size = min(req->max_key_size, rsp->max_key_size);
++	if (check_enc_key_size(conn, key_size))
++		return SMP_ENC_KEY_SIZE;
+ 
+ 	/* Just works */
+ 	memset(conn->tk, 0, sizeof(conn->tk));
+ 
+ 	conn->pres[0] = SMP_CMD_PAIRING_RSP;
+-	memcpy(&conn->pres[1], rp, sizeof(*rp));
++	memcpy(&conn->pres[1], rsp, sizeof(*rsp));
+ 
+ 	ret = smp_rand(conn->prnd);
+ 	if (ret)
+@@ -349,6 +371,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
+ 		swap128(key, hcon->ltk);
+ 
++		memset(hcon->ltk + conn->smp_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++
+ 		hci_le_start_enc(hcon, hcon->ltk);
+ 
+ 		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
+@@ -362,6 +387,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+ 		swap128(key, hcon->ltk);
+ 
++		memset(hcon->ltk + conn->smp_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++
+ 		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
+ 		BT_DBG("key %s", buf);
+ 	}
 -- 
-1.7.1
+1.7.4
 
