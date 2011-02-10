@@ -1,67 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 10 Feb 2011 16:14:41 -0200
+Date: Thu, 10 Feb 2011 16:11:33 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Alan Ott <alan@signal11.us>, Marcel Holtmann <marcel@holtmann.org>,
+To: Vasiliy Kulikov <segoon@openwall.com>
+Cc: linux-kernel@vger.kernel.org, security@kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Michael Poole <mdpoole@troilus.org>,
-	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v5 0/4] Adding HID Feature Report Support to hidraw
-Message-ID: <20110210181441.GB2173@joana>
-References: <1295337880-12452-1-git-send-email-alan@signal11.us>
- <alpine.LNX.2.00.1101191316230.26685@pobox.suse.cz>
+Subject: Re: [PATCH] bluetooth: l2cap: fix 1 byte infoleak to userspace
+Message-ID: <20110210181133.GA2173@joana>
+References: <1297360783-21452-1-git-send-email-segoon@openwall.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LNX.2.00.1101191316230.26685@pobox.suse.cz>
+In-Reply-To: <1297360783-21452-1-git-send-email-segoon@openwall.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+Hi Vasiliy,
 
-* Jiri Kosina <jkosina@suse.cz> [2011-01-19 13:17:00 +0100]:
+* Vasiliy Kulikov <segoon@openwall.com> [2011-02-10 20:59:42 +0300]:
 
-> On Tue, 18 Jan 2011, Alan Ott wrote:
+> Structure l2cap_options has one padding byte between max_tx and
+> txwin_size fields.  This byte in "opts" is copied to userspace
+> uninitialized.
 > 
-> > This patch adds Feature Report support for USB and Bluetooth HID devices
-> > through hidraw.
-> > 
-> > The first two patches prepare the bluetooth side for the change.
-> > 	a. Make sure the hidp_session() thread is started before
-> > 	   device's probe() functions are called.
-> > 	b. Wait for ACK/NAK on sent reports, and return proper
-> > 	   error codes.
-> > The third patch is the hidraw core and USB changes.
-> > The fourth patch is the Bluetooth changes.
-> > 
-> > Thanks to Antonio Ospite and Bill Good for providing testing and feedback.
-> > 
-> > 
-> > Alan Ott (4):
-> >   bt hidp: Move hid_add_device() call to after hidp_session() has
-> >     started.
-> >   bt hidp: Wait for ACK on Sent Reports
-> >   HID: Add Support for Setting and Getting Feature Reports from hidraw
-> >   Bluetooth hidp: Add support for hidraw HIDIOCGFEATURE and
-> >     HIDIOCSFEATURE
-> > 
-> >  drivers/hid/hidraw.c          |  106 +++++++++++++++++++-
-> >  drivers/hid/usbhid/hid-core.c |   35 +++++++
-> >  include/linux/hid.h           |    3 +
-> >  include/linux/hidraw.h        |    3 +
-> >  net/bluetooth/hidp/core.c     |  214 ++++++++++++++++++++++++++++++++++++++---
-> >  net/bluetooth/hidp/hidp.h     |   15 +++
+> Signed-off-by: Vasiliy Kulikov <segoon@openwall.com>
+> ---
+>  Compile tested only.
 > 
-> Before proceeding with these patches, I'd really like to have comment 
-> (ideally 'Acked-by') from Marcel on the net/bluetooth/hidp part, 
-> obviously.
+>  net/bluetooth/l2cap_sock.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-I have tested it and it seems ok to me and to Marcel. For net/bluetooth/
-
-Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
-
-Regards,
+Patch has been applied, thanks.
 
 -- 
 Gustavo F. Padovan
