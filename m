@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Wagner <wagi@monom.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Subject: [PATCH] hfp: gateway_suspend_stream should trigger a state change
-Date: Thu, 10 Feb 2011 11:41:01 +0100
-Message-Id: <1297334461-23077-1-git-send-email-wagi@monom.org>
+Date: Thu, 10 Feb 2011 08:57:27 +0200
+From: Ville Tervo <ville.tervo@nokia.com>
+To: ext Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth-next 00/24] Just Works SMP implementation
+Message-ID: <20110210065727.GL874@null>
+References: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Hi Vinicius,
 
-When gateway_suspend_stream is called it should change the
-gateway state machine from PLAYING to CONNECTED.
----
- audio/gateway.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+On Wed, Feb 09, 2011 at 10:18:00PM -0300, ext Vinicius Costa Gomes wrote:
+> Hi,
+> 
+> This patch series adds support for making (and receiving) LE connections
+> and the simplest SMP pairing method.
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 43a4b02..ec0ec5d 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -707,4 +707,5 @@ void gateway_suspend_stream(struct audio_device *dev)
- 	gw->sco = NULL;
- 	gw->sco_start_cb = NULL;
- 	gw->sco_start_cb_data = NULL;
-+	change_state(dev, GATEWAY_STATE_CONNECTED);
- }
+I found only minor cosmetic suggestions so far. We'll have more knowledge about
+the functionality after UPF.
+
 -- 
-1.7.4
-
+Ville
