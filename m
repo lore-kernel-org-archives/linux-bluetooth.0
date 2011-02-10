@@ -1,171 +1,244 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [bluetooth-next 24/24] Bluetooth: Add key size checks for SMP
-Date: Wed,  9 Feb 2011 22:18:24 -0300
-Message-Id: <1297300704-30006-25-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next 19/24] Bluetooth: Add support for resuming socket when SMP is finished
+Date: Wed,  9 Feb 2011 22:18:19 -0300
+Message-Id: <1297300704-30006-20-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements a check in smp cmd pairing request and pairing
-response to verify if encryption key maximum size is compatible in both
-slave and master when SMP Pairing is requested. Keys are also masked to
-the correct negotiated size.
+This adds support for resuming the user space traffic when SMP
+negotiation is complete.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- include/net/bluetooth/smp.h   |    3 ++
- net/bluetooth/smp.c           |   52 +++++++++++++++++++++++++++++++---------
- 3 files changed, 44 insertions(+), 12 deletions(-)
+ net/bluetooth/l2cap_core.c |   61 ++++++++++++++++++++++---------------------
+ net/bluetooth/l2cap_sock.c |   17 ++++++++++++
+ net/bluetooth/smp.c        |   44 +++++++++++++++++++++++--------
+ 3 files changed, 80 insertions(+), 42 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e2712b0..420981c 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -295,6 +295,7 @@ struct l2cap_conn {
- 	__u8		prnd[16];
- 	__u8		pcnf[16];
- 	__u8		tk[16];
-+	__u8		smp_key_size;
- 
- 	struct timer_list security_timer;
- 
-diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
-index 111853a..4fb7d19 100644
---- a/include/net/bluetooth/smp.h
-+++ b/include/net/bluetooth/smp.h
-@@ -112,6 +112,9 @@ struct smp_cmd_security_req {
- #define SMP_UNSPECIFIED		0x08
- #define SMP_REPEATED_ATTEMPTS		0x09
- 
-+#define SMP_MIN_ENC_KEY_SIZE		7
-+#define SMP_MAX_ENC_KEY_SIZE		16
-+
- /* SMP Commands */
- int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
- int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 00c1c9c..f9bf34f 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -206,35 +206,51 @@ static void build_pairing_cmd(struct l2cap_conn *conn, struct smp_cmd_pairing *c
- {
- 	cmd->io_capability = SMP_IO_NO_INPUT_OUTPUT;
- 	cmd->oob_flag = SMP_OOB_NOT_PRESENT;
--	cmd->max_key_size = 16;
-+	cmd->max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 	cmd->init_key_dist = 0x00;
- 	cmd->resp_key_dist = 0x00;
- 	cmd->auth_req = authreq;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 26d4c72..9a4e7d7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -635,6 +635,22 @@ clean:
+ 	bh_unlock_sock(parent);
  }
  
-+static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
++static void l2cap_chan_ready(struct sock *sk)
 +{
-+	if ((max_key_size > SMP_MAX_ENC_KEY_SIZE) ||
-+			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
-+		return SMP_ENC_KEY_SIZE;
++	struct sock *parent = bt_sk(sk)->parent;
 +
-+	conn->smp_key_size = max_key_size;
++	BT_DBG("sk %p, parent %p", sk, parent);
 +
-+	return 0;
++	l2cap_pi(sk)->conf_state = 0;
++	l2cap_sock_clear_timer(sk);
++
++	sk->sk_state = BT_CONNECTED;
++	sk->sk_state_change(sk);
++
++	if (parent)
++		parent->sk_data_ready(parent, 0);
 +}
 +
- static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
  {
--	struct smp_cmd_pairing *rp = (void *) skb->data;
-+	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
-+	u8 key_size;
+ 	struct l2cap_chan_list *l = &conn->chan_list;
+@@ -650,15 +666,11 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
+ 
+-		if (conn->hcon->type == LE_LINK) {
+-			l2cap_sock_clear_timer(sk);
+-			sk->sk_state = BT_CONNECTED;
+-			sk->sk_state_change(sk);
++		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+ 			if (smp_conn_security(conn, l2cap_pi(sk)->sec_level))
+-				BT_DBG("Insufficient security");
+-		}
++				l2cap_chan_ready(sk);
+ 
+-		if (sk->sk_type != SOCK_SEQPACKET &&
++		} else if (sk->sk_type != SOCK_SEQPACKET &&
+ 				sk->sk_type != SOCK_STREAM) {
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+@@ -1329,29 +1341,6 @@ int l2cap_sar_segment_sdu(struct sock *sk, struct msghdr *msg, size_t len)
+ 	return size;
+ }
+ 
+-static void l2cap_chan_ready(struct sock *sk)
+-{
+-	struct sock *parent = bt_sk(sk)->parent;
+-
+-	BT_DBG("sk %p, parent %p", sk, parent);
+-
+-	l2cap_pi(sk)->conf_state = 0;
+-	l2cap_sock_clear_timer(sk);
+-
+-	if (!parent) {
+-		/* Outgoing channel.
+-		 * Wake up socket sleeping on connect.
+-		 */
+-		sk->sk_state = BT_CONNECTED;
+-		sk->sk_state_change(sk);
+-	} else {
+-		/* Incoming channel.
+-		 * Wake up socket sleeping on accept.
+-		 */
+-		parent->sk_data_ready(parent, 0);
+-	}
+-}
+-
+ /* Copy frame to all raw sockets on that connection */
+ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+@@ -3672,6 +3661,18 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+ 		bh_lock_sock(sk);
+ 
++		BT_DBG("sk->scid %d", l2cap_pi(sk)->scid);
++
++		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
++			if (!status && encrypt) {
++				l2cap_pi(sk)->sec_level = hcon->sec_level;
++				l2cap_chan_ready(sk);
++			}
++
++			bh_unlock_sock(sk);
++			continue;
++		}
++
+ 		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND) {
+ 			bh_unlock_sock(sk);
+ 			continue;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a7eeacc..32211db 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -29,6 +29,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/smp.h>
+ 
+ /* ---- L2CAP timers ---- */
+ static void l2cap_sock_timeout(unsigned long arg)
+@@ -613,6 +614,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct bt_security sec;
++	struct l2cap_conn *conn;
+ 	int len, err = 0;
+ 	u32 opt;
+ 
+@@ -649,6 +651,21 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 		}
+ 
+ 		l2cap_pi(sk)->sec_level = sec.level;
++
++		conn = l2cap_pi(sk)->conn;
++		if (conn && l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
++			if (!conn->hcon->out) {
++				err = -EINVAL;
++				break;
++			}
++
++			if (!smp_conn_security(conn, sec.level)) {
++				err = -EINVAL;
++				break;
++			}
++
++			sk->sk_state = BT_CONFIG;
++		}
+ 		break;
+ 
+ 	case BT_DEFER_SETUP:
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 49a6372..35ceba6 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -337,9 +337,13 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_security_req *rp = (void *) skb->data;
+ 	struct smp_cmd_pairing cp;
++	struct hci_conn *hcon = conn->hcon;
  
  	BT_DBG("conn %p", conn);
  
- 	conn->preq[0] = SMP_CMD_PAIRING_REQ;
--	memcpy(&conn->preq[1], rp, sizeof(*rp));
--	skb_pull(skb, sizeof(*rp));
-+	memcpy(&conn->preq[1], req, sizeof(*req));
-+	skb_pull(skb, sizeof(*req));
- 
--	if (rp->oob_flag)
-+	if (req->oob_flag)
- 		return SMP_OOB_NOT_AVAIL;
- 
- 	/* We didn't start the pairing, so no requirements */
--	build_pairing_cmd(conn, rp, SMP_AUTH_NONE);
-+	build_pairing_cmd(conn, &rsp, SMP_AUTH_NONE);
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
++		return;
 +
-+	key_size = min(req->max_key_size, rsp.max_key_size);
-+	if (check_enc_key_size(conn, key_size))
-+		return SMP_ENC_KEY_SIZE;
+ 	skb_pull(skb, sizeof(*rp));
+ 	memset(&cp, 0, sizeof(cp));
  
- 	/* Just works */
- 	memset(conn->tk, 0, sizeof(conn->tk));
+@@ -354,6 +358,24 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&conn->preq[1], &cp, sizeof(cp));
  
- 	conn->pres[0] = SMP_CMD_PAIRING_RSP;
--	memcpy(&conn->pres[1], rp, sizeof(*rp));
-+	memcpy(&conn->pres[1], &rsp, sizeof(rsp));
- 
--	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
-+	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(rsp), &rsp);
- 
- 	mod_timer(&conn->security_timer, jiffies +
- 					msecs_to_jiffies(SMP_TIMEOUT));
-@@ -244,21 +260,27 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- {
--	struct smp_cmd_pairing *rp = (void *) skb->data;
-+	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
- 	struct smp_cmd_pairing_confirm cp;
- 	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
- 	int ret;
--	u8 res[16];
-+	u8 res[16], key_size;
- 
- 	BT_DBG("conn %p", conn);
- 
--	skb_pull(skb, sizeof(*rp));
-+	skb_pull(skb, sizeof(*rsp));
+ 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
 +
-+	req = (void *) &conn->preq[1];
++	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
++}
 +
-+	key_size = min(req->max_key_size, rsp->max_key_size);
-+	if (check_enc_key_size(conn, key_size))
-+		return SMP_ENC_KEY_SIZE;
- 
- 	/* Just works */
- 	memset(conn->tk, 0, sizeof(conn->tk));
- 
- 	conn->pres[0] = SMP_CMD_PAIRING_RSP;
--	memcpy(&conn->pres[1], rp, sizeof(*rp));
-+	memcpy(&conn->pres[1], rsp, sizeof(*rsp));
- 
- 	ret = smp_rand(conn->prnd);
- 	if (ret)
-@@ -349,6 +371,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
- 		swap128(key, hcon->ltk);
- 
-+		memset(hcon->ltk + conn->smp_key_size, 0,
-+				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++static __u8 seclevel_to_authreq(__u8 seclevel)
++{
++	switch (seclevel) {
++	case BT_SECURITY_MEDIUM:
++		/* Encrypted, no MITM protection */
++		return HCI_AT_NO_BONDING_MITM;
 +
- 		hci_le_start_enc(hcon, hcon->ltk);
- 
- 		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
-@@ -362,6 +387,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
- 		swap128(key, hcon->ltk);
- 
-+		memset(hcon->ltk + conn->smp_key_size, 0,
-+				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++	case BT_SECURITY_HIGH:
++		/* Bonding, MITM protection */
++		return HCI_AT_GENERAL_BONDING_MITM;
 +
- 		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
- 		BT_DBG("key %s", buf);
++	default:
++		return HCI_AT_NO_BONDING;
++	}
+ }
+ 
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+@@ -366,21 +388,16 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 	if (IS_ERR(hcon->hdev->tfm))
+ 		return PTR_ERR(hcon->hdev->tfm);
+ 
+-	switch (sec_level) {
+-	case BT_SECURITY_MEDIUM:
+-		/* Encrypted, no MITM protection */
+-		authreq = HCI_AT_NO_BONDING_MITM;
+-		break;
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
++		return -EINPROGRESS;
+ 
+-	case BT_SECURITY_HIGH:
+-		/* Bonding, MITM protection */
+-		authreq = HCI_AT_GENERAL_BONDING_MITM;
+-		break;
++	if (sec_level == BT_SECURITY_LOW)
++		return 1;
+ 
+-	case BT_SECURITY_LOW:
+-	default:
++	if (hcon->sec_level > sec_level)
+ 		return 1;
+-	}
++
++	authreq = seclevel_to_authreq(sec_level);
+ 
+ 	if (hcon->link_mode & HCI_LM_MASTER) {
+ 		struct smp_cmd_pairing cp;
+@@ -401,6 +418,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
  	}
+ 
++	hcon->pending_sec_level = sec_level;
++	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
++
+ 	return 0;
+ }
+ 
 -- 
 1.7.4
 
