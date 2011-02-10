@@ -1,160 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [bluetooth-next 14/24] Bluetooth: Add support for using the crypto subsystem
-Date: Wed,  9 Feb 2011 22:18:14 -0300
-Message-Id: <1297300704-30006-15-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Bruna Moreira <bruna.moreira@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next 13/24] Bluetooth: LE SMP Cryptoolbox functions
+Date: Wed,  9 Feb 2011 22:18:13 -0300
+Message-Id: <1297300704-30006-14-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow using the crypto subsystem for encrypting data. As SMP
-(Security Manager Protocol) is implemented almost entirely on the host
-side and the crypto module already implements the needed methods
-(AES-128), it makes sense to use it.
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-This patch also adds a new Kconfig option to toggle the SMP support.
+This patch implements SMP crypto functions called ah, c1, s1 and e.
+It also implements auxiliary functions. All These functions are needed
+for SMP keys generation.
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/Kconfig            |   12 ++++++++++++
- net/bluetooth/hci_core.c         |   17 +++++++++++++++++
- net/bluetooth/smp.c              |   15 ++++++++++++++-
- 4 files changed, 45 insertions(+), 1 deletions(-)
+ net/bluetooth/smp.c |  122 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 122 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index d30b93c..4bfe38d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -161,6 +161,8 @@ struct hci_dev {
- 
- 	__u16			init_last_cmd;
- 
-+	struct crypto_blkcipher	*tfm;
-+
- 	struct inquiry_cache	inq_cache;
- 	struct hci_conn_hash	conn_hash;
- 	struct list_head	blacklist;
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index e45eae6..b08293b 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -43,6 +43,18 @@ config BT_L2CAP
- 	  Say Y here to compile L2CAP support into the kernel or say M to
- 	  compile it as module (l2cap).
- 
-+config BT_SMP
-+	bool "Security Manager Protocol support"
-+	depends on BT_L2CAP
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_AES
-+	help
-+	  The Security Manager Protocol (SMP) is used for pairing and
-+	  transport specific key distribution. The SMP is used on Low
-+	  Energy devices to handle encrypted connections.
-+
-+	  Say Y here to compile SMP support into the kernel.
-+
- config BT_SCO
- 	tristate "SCO links support"
- 	depends on BT
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 173bebd..c81dc17 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -41,6 +41,7 @@
- #include <linux/interrupt.h>
- #include <linux/notifier.h>
- #include <linux/rfkill.h>
-+#include <linux/crypto.h>
- #include <net/sock.h>
- 
- #include <asm/system.h>
-@@ -1066,6 +1067,14 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return 0;
- }
- 
-+static struct crypto_blkcipher *alloc_cypher(void)
-+{
-+#ifndef CONFIG_BT_SMP
-+	return ERR_PTR(-ENOTSUPP);
-+#endif
-+	return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
-+}
-+
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
-@@ -1142,6 +1151,11 @@ int hci_register_dev(struct hci_dev *hdev)
- 	if (!hdev->workqueue)
- 		goto nomem;
- 
-+	hdev->tfm = alloc_cypher();
-+	if (IS_ERR(hdev->tfm))
-+		BT_INFO("Failed to load transform for ecb(aes): %ld",
-+							PTR_ERR(hdev->tfm));
-+
- 	hci_register_sysfs(hdev);
- 
- 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
-@@ -1190,6 +1204,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 					!test_bit(HCI_SETUP, &hdev->flags))
- 		mgmt_index_removed(hdev->id);
- 
-+	if (!IS_ERR(hdev->tfm))
-+		crypto_free_blkcipher(hdev->tfm);
-+
- 	hci_notify(hdev, HCI_DEV_UNREG);
- 
- 	if (hdev->rfkill) {
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index f34d45e..870a431 100644
+index a302bba..f34d45e 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -279,6 +279,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 
- 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, conn->hcon, sec_level);
- 
-+	if (IS_ERR(conn->hcon->hdev->tfm))
-+		return PTR_ERR(conn->hcon->hdev->tfm);
+@@ -24,6 +24,128 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/smp.h>
++#include <linux/crypto.h>
++#include <crypto/b128ops.h>
 +
- 	switch (sec_level) {
- 	case BT_SECURITY_MEDIUM:
- 		/* Encrypted, no MITM protection */
-@@ -319,6 +322,12 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 	__u8 reason;
- 	int err = 0;
- 
-+	if (IS_ERR(conn->hcon->hdev->tfm)) {
-+		err = PTR_ERR(conn->hcon->hdev->tfm);
-+		reason = SMP_PAIRING_NOTSUPP;
-+		goto done;
++static inline void swap128(u8 src[16], u8 dst[16])
++{
++	int i;
++	for (i = 0; i < 16; i++)
++		dst[15 - i] = src[i];
++}
++
++static inline void swap56(u8 src[7], u8 dst[7])
++{
++	int i;
++	for (i = 0; i < 7; i++)
++		dst[6 - i] = src[i];
++}
++
++static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
++{
++	struct blkcipher_desc desc;
++	struct scatterlist sg;
++	int err, iv_len;
++	unsigned char iv[128];
++
++	if (tfm == NULL) {
++		BT_ERR("tfm %p", tfm);
++		return -EINVAL;
 +	}
 +
- 	skb_pull(skb, 1);
- 
- 	switch (code) {
-@@ -354,10 +363,14 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 		BT_DBG("Unknown command code 0x%2.2x", code);
- 
- 		reason = SMP_CMD_NOTSUPP;
--		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
- 		err = -EOPNOTSUPP;
-+		goto done;
- 	}
- 
-+done:
-+	if (reason)
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
++	desc.tfm = tfm;
++	desc.flags = 0;
 +
- 	kfree_skb(skb);
- 	return err;
- }
++	err = crypto_blkcipher_setkey(tfm, k, 16);
++	if (err) {
++		BT_ERR("cipher setkey failed: %d", err);
++		return err;
++	}
++
++	sg_init_one(&sg, r, 16);
++
++	iv_len = crypto_blkcipher_ivsize(tfm);
++	if (iv_len) {
++		memset(&iv, 0xff, iv_len);
++		crypto_blkcipher_set_iv(tfm, iv, iv_len);
++	}
++
++	err = crypto_blkcipher_encrypt(&desc, &sg, &sg, 16);
++	if (err)
++		BT_ERR("Encrypt data error %d", err);
++
++	return err;
++}
++
++static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
++		u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
++		u8 _rat, bdaddr_t *ra, u8 res[16])
++{
++	u8 p1[16], p2[16], pair[7];
++	bdaddr_t addr;
++	int err;
++
++	/* p1 = pres || preq || _rat || _iat */
++	memset(p1, 0, 16);
++	swap56(pres, pair);
++
++	memcpy(p1, pair, 7);
++	swap56(preq, pair);
++
++	memcpy(p1 + 7, pair, 7);
++	*(p1 + 14) = _rat;
++	*(p1 + 15) = _iat;
++
++	/* p2 = padding || ia || ra */
++	memset(p2, 0, 16);
++	baswap(&addr, ia);
++	memcpy(p2 + 4, &addr, 6);
++	baswap(&addr, ra);
++	memcpy(p2 + 10, &addr, 6);
++
++	/* res = r XOR p1 */
++	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
++
++	/* res = e(k, res) */
++	err = smp_e(tfm, k, res);
++	if (err) {
++		BT_ERR("Encrypt data error");
++		return err;
++	}
++
++	/* res = res XOR p2 */
++	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
++
++	/* res = e(k, res) */
++	err = smp_e(tfm, k, res);
++	if (err)
++		BT_ERR("Encrypt data error");
++
++	return err;
++}
++
++static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16],
++			u8 r1[16], u8 r2[16], u8 _r[16])
++{
++	int err;
++
++	/* Just least significant octets from r1 and r2 are considered */
++	memcpy(_r, r1 + 8, 8);
++	memcpy(_r + 8, r2 + 8, 8);
++
++	err = smp_e(tfm, k, _r);
++	if (err)
++		BT_ERR("Encrypt data error");
++
++	return err;
++}
++
++static int smp_rand(u8 *buf)
++{
++	get_random_bytes(buf, 16);
++
++	return 0;
++}
+ 
+ static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+ 		u16 dlen, void *data)
 -- 
 1.7.4
 
