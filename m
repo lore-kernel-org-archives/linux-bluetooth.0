@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: hcitool: add bdaddr type option to lecc
-Date: Wed,  9 Feb 2011 16:59:11 -0800
-Message-Id: <1297299551-10297-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed,  9 Feb 2011 21:48:47 -0800
+Message-Id: <1297316927-12151-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
