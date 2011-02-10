@@ -1,230 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 10/24] Bluetooth: Implement the first SMP commands
-Date: Wed,  9 Feb 2011 22:18:10 -0300
-Message-Id: <1297300704-30006-11-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>
+Subject: [bluetooth-next 09/24] Bluetooth: Add SMP command structures
+Date: Wed,  9 Feb 2011 22:18:09 -0300
+Message-Id: <1297300704-30006-10-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1297300704-30006-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+From: Ville Tervo <ville.tervo@nokia.com>
 
-These simple commands will allow the SMP procedure to be started
-and terminated with a not supported error. This is the first step
-toward something useful.
+Add command structures for security manager protocol.
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 ---
- include/net/bluetooth/smp.h |   26 ++++++++
- net/bluetooth/Makefile      |    2 +-
- net/bluetooth/smp.c         |  144 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 171 insertions(+), 1 deletions(-)
- create mode 100644 net/bluetooth/smp.c
+ include/net/bluetooth/smp.h |   76 +++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 76 insertions(+), 0 deletions(-)
+ create mode 100644 include/net/bluetooth/smp.h
 
 diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
-index 8f2edbf..36bdd6e 100644
---- a/include/net/bluetooth/smp.h
-+++ b/include/net/bluetooth/smp.h
-@@ -1,3 +1,25 @@
-+/*
-+   BlueZ - Bluetooth protocol stack for Linux
-+   Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
-+
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 as
-+   published by the Free Software Foundation;
-+
-+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-+   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-+   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-+
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-+   SOFTWARE IS DISCLAIMED.
-+*/
-+
- #ifndef __SMP_H
- #define __SMP_H
- 
-@@ -73,4 +95,8 @@ struct smp_cmd_security_req {
- #define SMP_UNSPECIFIED		0x08
- #define SMP_REPEATED_ATTEMPTS		0x09
- 
-+/* SMP Commands */
-+int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
-+int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
-+
- #endif /* __SMP_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 339b429..cf6183c 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -11,4 +11,4 @@ obj-$(CONFIG_BT_CMTP)	+= cmtp/
- obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o hci_sock.o hci_sysfs.o lib.o
--l2cap-y := l2cap_core.o l2cap_sock.o
-+l2cap-y := l2cap_core.o l2cap_sock.o smp.o
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
 new file mode 100644
-index 0000000..c92c1f9
+index 0000000..8f2edbf
 --- /dev/null
-+++ b/net/bluetooth/smp.c
-@@ -0,0 +1,144 @@
-+/*
-+   BlueZ - Bluetooth protocol stack for Linux
-+   Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
++++ b/include/net/bluetooth/smp.h
+@@ -0,0 +1,76 @@
++#ifndef __SMP_H
++#define __SMP_H
 +
-+   This program is free software; you can redistribute it and/or modify
-+   it under the terms of the GNU General Public License version 2 as
-+   published by the Free Software Foundation;
++struct smp_command_hdr {
++	__u8	code;
++} __packed;
 +
-+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-+   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
-+   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
-+   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-+   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-+   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++#define SMP_CMD_PAIRING_REQ	0x01
++#define SMP_CMD_PAIRING_RSP	0x02
++struct smp_cmd_pairing {
++	__u8	io_capability;
++	__u8	oob_flag;
++	__u8	auth_req;
++	__u8	max_key_size;
++	__u8	init_key_dist;
++	__u8	resp_key_dist;
++} __packed;
 +
-+   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
-+   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
-+   SOFTWARE IS DISCLAIMED.
-+*/
++#define SMP_CMD_PAIRING_CONFIRM	0x03
++struct smp_cmd_pairing_confirm {
++	__u8	confirm_val[16];
++} __packed;
 +
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/smp.h>
++#define SMP_CMD_PAIRING_RANDOM	0x04
++struct smp_cmd_pairing_random {
++	__u8	rand_val[16];
++} __packed;
 +
-+static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
-+		u16 dlen, void *data)
-+{
-+	struct sk_buff *skb;
-+	struct l2cap_hdr *lh;
-+	int len;
++#define SMP_CMD_PAIRING_FAIL	0x05
++struct smp_cmd_pairing_fail {
++	__u8	reason;
++} __packed;
 +
-+	len = L2CAP_HDR_SIZE + 1 + dlen;
++#define SMP_CMD_ENCRYPT_INFO	0x06
++struct smp_cmd_encrypt_info {
++	__u8	ltk[16];
++} __packed;
 +
-+	if (len > conn->mtu)
-+		return NULL;
++#define SMP_CMD_MASTER_IDENT	0x07
++struct smp_cmd_master_ident {
++	__u16	ediv;
++	__u8	rand[8];
++} __packed;
 +
-+	skb = bt_skb_alloc(len, GFP_ATOMIC);
-+	if (!skb)
-+		return NULL;
++#define SMP_CMD_IDENT_INFO	0x08
++struct smp_cmd_ident_info {
++	__u8	irk[16];
++} __packed;
 +
-+	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
-+	lh->len = cpu_to_le16(1 + dlen);
-+	lh->cid = cpu_to_le16(L2CAP_CID_SMP);
++#define SMP_CMD_IDENT_ADDR_INFO	0x09
++struct smp_cmd_ident_addr_info {
++	__u8	addr_type;
++	bdaddr_t bdaddr;
++} __packed;
 +
-+	memcpy(skb_put(skb, 1), &code, 1);
++#define SMP_CMD_SIGN_INFO	0x0a
++struct smp_cmd_sign_info {
++	__u8	csrk[16];
++} __packed;
 +
-+	memcpy(skb_put(skb, dlen), data, dlen);
++#define SMP_CMD_SECURITY_REQ	0x0b
++struct smp_cmd_security_req {
++	__u8	auth_req;
++} __packed;
 +
-+	return skb;
-+}
++#define SMP_PASSKEY_ENTRY_FAILED	0x01
++#define SMP_OOB_NOT_AVAIL		0x02
++#define SMP_AUTH_REQUIREMENTS		0x03
++#define SMP_CONFIRM_FAILED		0x04
++#define SMP_PAIRING_NOTSUPP		0x05
++#define SMP_ENC_KEY_SIZE		0x06
++#define SMP_CMD_NOTSUPP		0x07
++#define SMP_UNSPECIFIED		0x08
++#define SMP_REPEATED_ATTEMPTS		0x09
 +
-+static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
-+{
-+	struct sk_buff *skb = smp_build_cmd(conn, code, len, data);
-+
-+	BT_DBG("code 0x%2.2x", code);
-+
-+	if (!skb)
-+		return;
-+
-+	hci_send_acl(conn->hcon, skb, 0);
-+}
-+
-+int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
-+{
-+	__u8 authreq;
-+
-+	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, conn->hcon, sec_level);
-+
-+	switch (sec_level) {
-+	case BT_SECURITY_MEDIUM:
-+		/* Encrypted, no MITM protection */
-+		authreq = HCI_AT_NO_BONDING_MITM;
-+		break;
-+
-+	case BT_SECURITY_HIGH:
-+		/* Bonding, MITM protection */
-+		authreq = HCI_AT_GENERAL_BONDING_MITM;
-+		break;
-+
-+	case BT_SECURITY_LOW:
-+	default:
-+		return 1;
-+	}
-+
-+	if (conn->hcon->link_mode & HCI_LM_MASTER) {
-+		struct smp_cmd_pairing cp;
-+		cp.io_capability = 0x00;
-+		cp.oob_flag = 0x00;
-+		cp.max_key_size = 16;
-+		cp.init_key_dist = 0x00;
-+		cp.resp_key_dist = 0x00;
-+		cp.auth_req = authreq;
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
-+	} else {
-+		struct smp_cmd_security_req cp;
-+		cp.auth_req = authreq;
-+		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
-+	}
-+
-+	return 0;
-+}
-+
-+int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
-+{
-+	__u8 code = skb->data[0];
-+	__u8 reason;
-+	int err = 0;
-+
-+	skb_pull(skb, 1);
-+
-+	switch (code) {
-+	case SMP_CMD_PAIRING_REQ:
-+		reason = SMP_PAIRING_NOTSUPP;
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
-+		err = -EOPNOTSUPP;
-+		break;
-+
-+	case SMP_CMD_PAIRING_FAIL:
-+		break;
-+
-+	case SMP_CMD_PAIRING_RSP:
-+	case SMP_CMD_PAIRING_CONFIRM:
-+	case SMP_CMD_PAIRING_RANDOM:
-+	case SMP_CMD_ENCRYPT_INFO:
-+	case SMP_CMD_MASTER_IDENT:
-+	case SMP_CMD_IDENT_INFO:
-+	case SMP_CMD_IDENT_ADDR_INFO:
-+	case SMP_CMD_SIGN_INFO:
-+	case SMP_CMD_SECURITY_REQ:
-+	default:
-+		BT_DBG("Unknown command code 0x%2.2x", code);
-+
-+		reason = SMP_CMD_NOTSUPP;
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, 1, &reason);
-+		err = -EOPNOTSUPP;
-+	}
-+
-+	kfree_skb(skb);
-+	return err;
-+}
++#endif /* __SMP_H */
 -- 
 1.7.4
 
