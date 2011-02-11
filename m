@@ -2,226 +2,179 @@ Return-Path: <cyrus@holtmann.org>
 From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 5/7 v2] Add support for notyfying pbap about more parts from backend
-Date: Fri, 11 Feb 2011 16:05:37 +0200
-Message-Id: <1297433139-10923-5-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH 7/7 v2] Support for multipart response sending from phonebook-tracker
+Date: Fri, 11 Feb 2011 16:05:39 +0200
+Message-Id: <1297433139-10923-7-git-send-email-ext-jablonski.radoslaw@nokia.com>
 In-Reply-To: <1297433139-10923-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 References: <1297433139-10923-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added new parameter to phonebook_cb - lastpart variable.
-If backend want to notify that more parts of current
-request will be delivered later, it should use lastpart=FALSE.
-Because of that, PBAP core will 'know' that should not finalize
-request immediately after receiving data and wait for more
-parts to come.
-If result is returned in one part and no more responses part
-will be sent later, then backend should use lastparam=TRUE.
-Previously results of request from backend was always returned
-in one part to PBAP core.
+Now data are being sent with smaller parts - vcard amount for
+one part is defined in VCARDS_PART_COUNT. When one part of
+data is sent, then data download from tracker is stopped.
+It will be resumed when phonebook_pull_read will be called again.
+This is needed to start sending data from PBAP quicker - now
+transfer can be started when first part of data is processed.
+Previously transfer was started when all results for response
+were downloaded, and (for large responses) some PBAP clients
+were disconnecting due to timeout.
 ---
- plugins/irmc.c              |    5 +++--
- plugins/pbap.c              |   10 +++++++---
- plugins/phonebook-dummy.c   |    4 ++--
- plugins/phonebook-ebook.c   |    7 ++++---
- plugins/phonebook-tracker.c |   13 +++++++------
- plugins/phonebook.h         |    2 +-
- 6 files changed, 24 insertions(+), 17 deletions(-)
+ plugins/phonebook-tracker.c |   81 +++++++++++++++++++++++++++++++++---------
+ 1 files changed, 63 insertions(+), 18 deletions(-)
 
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-index 0488cae..e1e83f9 100644
---- a/plugins/irmc.c
-+++ b/plugins/irmc.c
-@@ -133,7 +133,8 @@ static const char *owner_vcard =
- 		"END:VCARD\r\n";
- 
- static void phonebook_size_result(const char *buffer, size_t bufsize,
--				int vcards, int missed, void *user_data)
-+					int vcards, int missed,
-+					gboolean lastpart, void *user_data)
- {
- 	struct irmc_session *irmc = user_data;
- 
-@@ -148,7 +149,7 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- }
- 
- static void query_result(const char *buffer, size_t bufsize, int vcards,
--					int missed, void *user_data)
-+				int missed, gboolean lastpart, void *user_data)
- {
- 	struct irmc_session *irmc = user_data;
- 	const char *s, *t;
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 6579d09..5775eea 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -148,6 +148,7 @@ struct pbap_object {
- 	GString *buffer;
- 	GByteArray *aparams;
- 	gboolean firstpacket;
-+	gboolean lastpart;
- 	struct pbap_session *session;
- 	void *request;
- };
-@@ -254,7 +255,8 @@ static GByteArray *append_aparam_header(GByteArray *buf, uint8_t tag,
- }
- 
- static void phonebook_size_result(const char *buffer, size_t bufsize,
--				int vcards, int missed, void *user_data)
-+					int vcards, int missed,
-+					gboolean lastpart, void *user_data)
- {
- 	struct pbap_session *pbap = user_data;
- 	uint16_t phonebooksize;
-@@ -286,17 +288,19 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- }
- 
- static void query_result(const char *buffer, size_t bufsize, int vcards,
--					int missed, void *user_data)
-+				int missed, gboolean lastpart, void *user_data)
- {
- 	struct pbap_session *pbap = user_data;
- 
- 	DBG("");
- 
--	if (pbap->obj->request) {
-+	if (pbap->obj->request && lastpart) {
- 		phonebook_req_finalize(pbap->obj->request);
- 		pbap->obj->request = NULL;
- 	}
- 
-+	pbap->obj->lastpart = lastpart;
-+
- 	if (vcards <= 0) {
- 		obex_object_set_io_flags(pbap->obj, G_IO_ERR, -ENOENT);
- 		return;
-diff --git a/plugins/phonebook-dummy.c b/plugins/phonebook-dummy.c
-index 60b7640..76dd550 100644
---- a/plugins/phonebook-dummy.c
-+++ b/plugins/phonebook-dummy.c
-@@ -248,7 +248,7 @@ static gboolean read_dir(void *user_data)
- 	closedir(dp);
- done:
- 	/* FIXME: Missing vCards fields filtering */
--	dummy->cb(buffer->str, buffer->len, count, 0, dummy->user_data);
-+	dummy->cb(buffer->str, buffer->len, count, 0, TRUE, dummy->user_data);
- 
- 	g_string_free(buffer, TRUE);
- 
-@@ -346,7 +346,7 @@ static gboolean read_entry(void *user_data)
- 
- 	/* FIXME: Missing vCards fields filtering */
- 
--	dummy->cb(buffer, count, 1, 0, dummy->user_data);
-+	dummy->cb(buffer, count, 1, 0, TRUE, dummy->user_data);
- 
- 	return FALSE;
- }
-diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index 70b9c02..6cc4f31 100644
---- a/plugins/phonebook-ebook.c
-+++ b/plugins/phonebook-ebook.c
-@@ -186,7 +186,8 @@ static void ebookpull_cb(EBook *book, EBookStatus estatus, GList *contacts,
- 
- done:
- 	data->completed = TRUE;
--	data->contacts_cb(string->str, string->len, count, 0, data->user_data);
-+	data->contacts_cb(string->str, string->len, count, 0, TRUE,
-+							data->user_data);
- 
- fail:
- 	g_string_free(string, TRUE);
-@@ -212,7 +213,7 @@ static void ebook_entry_cb(EBook *book, EBookStatus estatus,
- 
- 	if (estatus != E_BOOK_ERROR_OK) {
- 		error("E-Book query failed: status %d", estatus);
--		data->contacts_cb(NULL, 0, 1, 0, data->user_data);
-+		data->contacts_cb(NULL, 0, 1, 0, TRUE, data->user_data);
- 		goto fail;
- 	}
- 
-@@ -223,7 +224,7 @@ static void ebook_entry_cb(EBook *book, EBookStatus estatus,
- 
- 	len = vcard ? strlen(vcard) : 0;
- 
--	data->contacts_cb(vcard, len, 1, 0, data->user_data);
-+	data->contacts_cb(vcard, len, 1, 0, TRUE, data->user_data);
- 
- 	g_free(vcard);
- 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index afd738c..0762787 100644
+index 48748f3..ab8d428 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -1334,7 +1334,7 @@ static int pull_contacts_size(const char **reply, int num_fields,
+@@ -81,6 +81,8 @@
+ #define MAIN_DELIM "\30" /* Main delimiter between phones, addresses, emails*/
+ #define SUB_DELIM "\31" /* Delimiter used in telephone number strings*/
+ #define MAX_FIELDS 100 /* Max amount of fields to be concatenated at once*/
++#define VCARDS_PART_COUNT 50 /* amount of vcards sent at once to PBAP core */
++#define QUERY_OFFSET_FORMAT "%s OFFSET %d"
+ 
+ #define CONTACTS_QUERY_ALL						\
+ "SELECT "								\
+@@ -919,6 +921,8 @@ struct phonebook_data {
+ 	int newmissedcalls;
+ 	GCancellable *query_canc;
+ 	char *req_name;
++	int vcard_part_count;
++	int tracker_index;
+ };
+ 
+ struct phonebook_index {
+@@ -1551,15 +1555,45 @@ static void contact_add_organization(struct phonebook_contact *contact,
+ 	add_affiliation(&contact->role, reply[COL_ORG_ROLE]);
+ }
+ 
++static void free_data_contacts(struct phonebook_data *data)
++{
++	GSList *l;
++
++	/* freeing contacts */
++	for (l = data->contacts; l; l = l->next) {
++		struct contact_data *c_data = l->data;
++
++		g_free(c_data->id);
++		phonebook_contact_free(c_data->contact);
++		g_free(c_data);
++	}
++
++	g_slist_free(data->contacts);
++	data->contacts = NULL;
++}
++
++static void send_pull_part(struct phonebook_data *data,
++			const struct apparam_field *params, gboolean lastpart)
++{
++	GString *vcards;
++
++	DBG("");
++	vcards = gen_vcards(data->contacts, params);
++	data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
++			data->newmissedcalls, lastpart, data->user_data);
++
++	free_data_contacts(data);
++	g_string_free(vcards, TRUE);
++}
++
+ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+ {
  	struct phonebook_data *data = user_data;
- 
- 	if (num_fields < 0) {
--		data->cb(NULL, 0, num_fields, 0, data->user_data);
-+		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
- 		return -EINTR;
- 	}
- 
-@@ -1343,7 +1343,8 @@ static int pull_contacts_size(const char **reply, int num_fields,
- 		return 0;
- 	}
- 
--	data->cb(NULL, 0, data->index, data->newmissedcalls, data->user_data);
-+	data->cb(NULL, 0, data->index, data->newmissedcalls, TRUE,
-+							data->user_data);
- 
- 	return 0;
- 	/*
-@@ -1561,7 +1562,7 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+ 	const struct apparam_field *params = data->params;
+ 	struct phonebook_contact *contact;
+ 	struct contact_data *contact_data;
+-	GString *vcards;
+ 	int last_index, i;
+-	gboolean cdata_present = FALSE;
++	gboolean cdata_present = FALSE, part_sent = FALSE;
  	static char *temp_id = NULL;
  
  	if (num_fields < 0) {
--		data->cb(NULL, 0, num_fields, 0, data->user_data);
-+		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
- 		goto fail;
+@@ -1568,6 +1602,7 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
  	}
  
-@@ -1641,7 +1642,7 @@ done:
- 	vcards = gen_vcards(data->contacts, params);
+ 	DBG("reply %p", reply);
++	data->tracker_index++;
  
- 	data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
--					data->newmissedcalls, data->user_data);
-+				data->newmissedcalls, TRUE, data->user_data);
+ 	if (reply == NULL)
+ 		goto done;
+@@ -1600,6 +1635,25 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+ 		data->index++;
+ 		g_free(temp_id);
+ 		temp_id = g_strdup(reply[CONTACTS_ID_COL]);
++
++		/* Incrementing counter for vcards in current part of data,
++		 * but only if liststartoffset has been already reached */
++		if (data->index > params->liststartoffset)
++			data->vcard_part_count++;
++	}
++
++	if (data->vcard_part_count > VCARDS_PART_COUNT) {
++		DBG("Part of vcard data ready for sending...");
++		data->vcard_part_count = 0;
++		/* Sending part of data to PBAP core - more data can be still
++		 * fetched, so marking lastpart as FALSE */
++		send_pull_part(data, params, FALSE);
++
++		/* Later, after adding contact data, need to return -EINTR to
++		 * stop fetching more data for this request. Data will be
++		 * downloaded again from this point, when phonebook_pull_read
++		 * will be called again with current request as a parameter*/
++		part_sent = TRUE;
+ 	}
  
- 	g_string_free(vcards, TRUE);
+ 	last_index = params->liststartoffset + params->maxlistcount;
+@@ -1637,15 +1691,16 @@ add_numbers:
+ 		data->contacts = g_slist_append(data->contacts, contact_data);
+ 	}
+ 
++	if (part_sent)
++		return -EINTR;
++
+ 	return 0;
+ 
+ done:
+-	vcards = gen_vcards(data->contacts, params);
++	/* Processing is end, this is definitely last part of transmission
++	 * (marking lastpart as TRUE) */
++	send_pull_part(data, params, TRUE);
+ 
+-	data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
+-				data->newmissedcalls, TRUE, data->user_data);
+-
+-	g_string_free(vcards, TRUE);
  fail:
-@@ -1868,7 +1869,7 @@ done:
- 	data->contacts = NULL;
+ 	g_free(temp_id);
+ 	temp_id = NULL;
+@@ -1797,7 +1852,6 @@ done:
+ void phonebook_req_finalize(void *request)
+ {
+ 	struct phonebook_data *data = request;
+-	GSList *l;
  
- 	if (num_fields < 0) {
--		data->cb(NULL, 0, num_fields, 0, data->user_data);
-+		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
- 		return -EINTR;
+ 	DBG("");
+ 
+@@ -1810,16 +1864,7 @@ void phonebook_req_finalize(void *request)
+ 		g_object_unref(data->query_canc);
  	}
  
-@@ -1884,7 +1885,7 @@ done:
- 
- 	err = query_tracker(query, col_amount, pull_cb, data);
- 	if (err < 0) {
--		data->cb(NULL, 0, err, 0, data->user_data);
-+		data->cb(NULL, 0, err, 0, TRUE, data->user_data);
- 
- 		return -EINTR;
- 	}
-diff --git a/plugins/phonebook.h b/plugins/phonebook.h
-index bfbae0f..f6df164 100644
---- a/plugins/phonebook.h
-+++ b/plugins/phonebook.h
-@@ -50,7 +50,7 @@ struct apparam_field {
-  * Contacts will be returned in the vcard format.
-  */
- typedef void (*phonebook_cb) (const char *buffer, size_t bufsize,
--		int vcards, int missed, void *user_data);
-+		int vcards, int missed, gboolean lastpart, void *user_data);
- 
- /*
-  * Interface between the PBAP core and backends to
+-	/* freeing contacts */
+-	for (l = data->contacts; l; l = l->next) {
+-		struct contact_data *c_data = l->data;
+-
+-		g_free(c_data->id);
+-		phonebook_contact_free(c_data->contact);
+-		g_free(c_data);
+-	}
+-
+-	g_slist_free(data->contacts);
++	free_data_contacts(data);
+ 	g_free(data->req_name);
+ 	g_free(data);
+ }
 -- 
 1.7.0.4
 
