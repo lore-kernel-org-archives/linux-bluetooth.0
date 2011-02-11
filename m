@@ -1,40 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next -v2 07/24] Bluetooth: Fix initiated LE connections
-Date: Thu, 10 Feb 2011 22:38:52 -0300
-Message-Id: <1297388349-14878-8-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1297388349-14878-7-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>
+Subject: [bluetooth-next -v2 06/24] Bluetooth: Do not send disconn comand over LE links
+Date: Thu, 10 Feb 2011 22:38:51 -0300
+Message-Id: <1297388349-14878-7-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1297388349-14878-6-git-send-email-vinicius.gomes@openbossa.org>
 References: <1297388349-14878-1-git-send-email-vinicius.gomes@openbossa.org>
  <1297388349-14878-2-git-send-email-vinicius.gomes@openbossa.org>
  <1297388349-14878-3-git-send-email-vinicius.gomes@openbossa.org>
  <1297388349-14878-4-git-send-email-vinicius.gomes@openbossa.org>
  <1297388349-14878-5-git-send-email-vinicius.gomes@openbossa.org>
  <1297388349-14878-6-git-send-email-vinicius.gomes@openbossa.org>
- <1297388349-14878-7-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix LE connections not being marked as master.
+From: Ville Tervo <ville.tervo@nokia.com>
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+l2cap over LE links can be disconnected without sending
+disconnect command first.
+
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 ---
- net/bluetooth/hci_conn.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_sock.c |   15 ++++++++-------
+ 1 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index aecd78e..efcd2b5 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -52,6 +52,7 @@ static void hci_le_connect(struct hci_conn *conn)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 0c695be..a7eeacc 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -884,6 +884,8 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
  
- 	conn->state = BT_CONNECT;
- 	conn->out = 1;
-+	conn->link_mode |= HCI_LM_MASTER;
+ void __l2cap_sock_close(struct sock *sk, int reason)
+ {
++	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
++
+ 	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
  
- 	memset(&cp, 0, sizeof(cp));
- 	cp.scan_interval = cpu_to_le16(0x0004);
+ 	switch (sk->sk_state) {
+@@ -893,10 +895,9 @@ void __l2cap_sock_close(struct sock *sk, int reason)
+ 
+ 	case BT_CONNECTED:
+ 	case BT_CONFIG:
+-		if (sk->sk_type == SOCK_SEQPACKET ||
+-				sk->sk_type == SOCK_STREAM) {
+-			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
+-
++		if ((sk->sk_type == SOCK_SEQPACKET ||
++					sk->sk_type == SOCK_STREAM) &&
++					conn->hcon->type == ACL_LINK) {
+ 			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
+ 			l2cap_send_disconn_req(conn, sk, reason);
+ 		} else
+@@ -904,9 +905,9 @@ void __l2cap_sock_close(struct sock *sk, int reason)
+ 		break;
+ 
+ 	case BT_CONNECT2:
+-		if (sk->sk_type == SOCK_SEQPACKET ||
+-				sk->sk_type == SOCK_STREAM) {
+-			struct l2cap_conn *conn = l2cap_pi(sk)->conn;
++		if ((sk->sk_type == SOCK_SEQPACKET ||
++					sk->sk_type == SOCK_STREAM) &&
++					conn->hcon->type == ACL_LINK) {
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 result;
+ 
 -- 
 1.7.4
 
