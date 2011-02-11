@@ -1,33 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Feb 2011 13:03:56 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Westerlund <dwesterl@cc.hut.fi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add check for ACL_START_NO_FLUSH
-Message-ID: <20110211210356.GA26894@jh-x301>
-References: <AANLkTinUUNTzRf767irg3qSK8iefjn=pKMCknQ8f9=u-@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTinUUNTzRf767irg3qSK8iefjn=pKMCknQ8f9=u-@mail.gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC 7/7] Convert from host order to network order before to print UUID128
+Date: Fri, 11 Feb 2011 18:37:06 -0200
+Message-Id: <1297456626-22837-8-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1297456626-22837-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1297456626-22837-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+---
+ lib/sdp.c         |   30 +++++++++++++++++-------------
+ src/glib-helper.c |   14 ++++++++------
+ tools/sdptool.c   |   16 +++++++++-------
+ 3 files changed, 34 insertions(+), 26 deletions(-)
 
-On Thu, Feb 10, 2011, Daniel ??rstadius wrote:
-> In addition to ACL_START, hcidump should check for the flag
-> ACL_START_NO_FLUSH to indicate the start of a frame.
-> 
-> Using '==' instead of '&' for the comparison since
-> ACL_START_NO_FLUSH is defined to zero.
-> 
-> The flag was introduced in BlueZ commit
-> 2430512c983cad8c20252f1df8f297399993ca3d
-> ---
->  parser/l2cap.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 3c4cd50..75154e9 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -285,13 +285,15 @@ int sdp_uuid2strn(const uuid_t *uuid, char *str, size_t n)
+ 		unsigned short data3;
+ 		unsigned int   data4;
+ 		unsigned short data5;
++		uint128_t n128;
+ 
+-		memcpy(&data0, &uuid->value.uuid128.data[0], 4);
+-		memcpy(&data1, &uuid->value.uuid128.data[4], 2);
+-		memcpy(&data2, &uuid->value.uuid128.data[6], 2);
+-		memcpy(&data3, &uuid->value.uuid128.data[8], 2);
+-		memcpy(&data4, &uuid->value.uuid128.data[10], 4);
+-		memcpy(&data5, &uuid->value.uuid128.data[14], 2);
++		hton128(&uuid->value.uuid128, &n128);
++		memcpy(&data0, &n128.data[0], 4);
++		memcpy(&data1, &n128.data[4], 2);
++		memcpy(&data2, &n128.data[6], 2);
++		memcpy(&data3, &n128.data[8], 2);
++		memcpy(&data4, &n128.data[10], 4);
++		memcpy(&data5, &n128.data[14], 2);
+ 
+ 		snprintf(str, n, "%.8x-%.4x-%.4x-%.4x-%.8x%.4x",
+ 				ntohl(data0), ntohs(data1),
+@@ -333,13 +335,15 @@ void sdp_uuid_print(const uuid_t *uuid)
+ 		unsigned short data3;
+ 		unsigned int data4;
+ 		unsigned short data5;
+-
+-		memcpy(&data0, &uuid->value.uuid128.data[0], 4);
+-		memcpy(&data1, &uuid->value.uuid128.data[4], 2);
+-		memcpy(&data2, &uuid->value.uuid128.data[6], 2);
+-		memcpy(&data3, &uuid->value.uuid128.data[8], 2);
+-		memcpy(&data4, &uuid->value.uuid128.data[10], 4);
+-		memcpy(&data5, &uuid->value.uuid128.data[14], 2);
++		uint128_t n128;
++
++		hton128(&uuid->value.uuid128, &n128);
++		memcpy(&data0, &n128.data[0], 4);
++		memcpy(&data1, &n128.data[4], 2);
++		memcpy(&data2, &n128.data[6], 2);
++		memcpy(&data3, &n128.data[8], 2);
++		memcpy(&data4, &n128.data[10], 4);
++		memcpy(&data5, &n128.data[14], 2);
+ 
+ 		SDPDBG("  uint128_t : 0x%.8x-", ntohl(data0));
+ 		SDPDBG("%.4x-", ntohs(data1));
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 22c14e7..2b7e1b3 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -372,6 +372,7 @@ char *bt_uuid2string(uuid_t *uuid)
+ {
+ 	gchar *str;
+ 	uuid_t uuid128;
++	uint128_t n128;
+ 	unsigned int data0;
+ 	unsigned short data1;
+ 	unsigned short data2;
+@@ -397,12 +398,13 @@ char *bt_uuid2string(uuid_t *uuid)
+ 		return NULL;
+ 	}
+ 
+-	memcpy(&data0, &uuid128.value.uuid128.data[0], 4);
+-	memcpy(&data1, &uuid128.value.uuid128.data[4], 2);
+-	memcpy(&data2, &uuid128.value.uuid128.data[6], 2);
+-	memcpy(&data3, &uuid128.value.uuid128.data[8], 2);
+-	memcpy(&data4, &uuid128.value.uuid128.data[10], 4);
+-	memcpy(&data5, &uuid128.value.uuid128.data[14], 2);
++	hton128(&uuid128.value.uuid128, &n128);
++	memcpy(&data0, &n128.data[0], 4);
++	memcpy(&data1, &n128.data[4], 2);
++	memcpy(&data2, &n128.data[6], 2);
++	memcpy(&data3, &n128.data[8], 2);
++	memcpy(&data4, &n128.data[10], 4);
++	memcpy(&data5, &n128.data[14], 2);
+ 
+ 	str = g_try_malloc0(MAX_LEN_UUID_STR);
+ 	if (!str)
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 140a46a..341e258 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -389,13 +389,15 @@ static void sdp_uuid_printf(uuid_t *uuid, struct attrib_context *context, int in
+ 			unsigned short data3;
+ 			unsigned int data4;
+ 			unsigned short data5;
+-
+-			memcpy(&data0, &uuid->value.uuid128.data[0], 4);
+-			memcpy(&data1, &uuid->value.uuid128.data[4], 2);
+-			memcpy(&data2, &uuid->value.uuid128.data[6], 2);
+-			memcpy(&data3, &uuid->value.uuid128.data[8], 2);
+-			memcpy(&data4, &uuid->value.uuid128.data[10], 4);
+-			memcpy(&data5, &uuid->value.uuid128.data[14], 2);
++			uint128_t n128;
++
++			hton128(&uuid->value.uuid128, &n128);
++			memcpy(&data0, &n128.data[0], 4);
++			memcpy(&data1, &n128.data[4], 2);
++			memcpy(&data2, &n128.data[6], 2);
++			memcpy(&data3, &n128.data[8], 2);
++			memcpy(&data4, &n128.data[10], 4);
++			memcpy(&data5, &n128.data[14], 2);
+ 
+ 			printf("%.*sUUID128 : 0x%.8x-%.4x-%.4x-%.4x-%.8x-%.4x\n",
+ 				indent, indent_spaces,
+-- 
+1.7.4
 
-Pushed upstream after obvious coding-style fixes. Please pay attention
-to those.
-
-Johan
