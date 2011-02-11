@@ -1,65 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Feb 2011 15:02:45 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Alan Ott <alan@signal11.us>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Michael Poole <mdpoole@troilus.org>,
-	Eric Dumazet <eric.dumazet@gmail.com>, linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v5 0/4] Adding HID Feature Report Support to hidraw
-In-Reply-To: <20110210181441.GB2173@joana>
-Message-ID: <alpine.LNX.2.00.1102111501580.2160@pobox.suse.cz>
-References: <1295337880-12452-1-git-send-email-alan@signal11.us> <alpine.LNX.2.00.1101191316230.26685@pobox.suse.cz> <20110210181441.GB2173@joana>
+From: Oliver Neukum <oneukum@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	stable@kernel.org, ensonic@sonicpulse.de
+Subject: [PATCH] btusb:fix crash with quirky dongles doing sound
+Date: Fri, 11 Feb 2011 13:00:06 +0100
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201102111300.06470.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 10 Feb 2011, Gustavo F. Padovan wrote:
+=46rom befd2cd1a7875d395f72b38f2cb89a03f16edaba Mon Sep 17 00:00:00 2001
+=46rom: Oliver Neukum <oliver@neukum.org>
+Date: Fri, 11 Feb 2011 12:35:05 +0100
+Subject: [PATCH] btusb:fix crash with quirky dongles doing sound
 
-> > > This patch adds Feature Report support for USB and Bluetooth HID devices
-> > > through hidraw.
-> > > 
-> > > The first two patches prepare the bluetooth side for the change.
-> > > 	a. Make sure the hidp_session() thread is started before
-> > > 	   device's probe() functions are called.
-> > > 	b. Wait for ACK/NAK on sent reports, and return proper
-> > > 	   error codes.
-> > > The third patch is the hidraw core and USB changes.
-> > > The fourth patch is the Bluetooth changes.
-> > > 
-> > > Thanks to Antonio Ospite and Bill Good for providing testing and feedback.
-> > > 
-> > > 
-> > > Alan Ott (4):
-> > >   bt hidp: Move hid_add_device() call to after hidp_session() has
-> > >     started.
-> > >   bt hidp: Wait for ACK on Sent Reports
-> > >   HID: Add Support for Setting and Getting Feature Reports from hidraw
-> > >   Bluetooth hidp: Add support for hidraw HIDIOCGFEATURE and
-> > >     HIDIOCSFEATURE
-> > > 
-> > >  drivers/hid/hidraw.c          |  106 +++++++++++++++++++-
-> > >  drivers/hid/usbhid/hid-core.c |   35 +++++++
-> > >  include/linux/hid.h           |    3 +
-> > >  include/linux/hidraw.h        |    3 +
-> > >  net/bluetooth/hidp/core.c     |  214 ++++++++++++++++++++++++++++++++++++++---
-> > >  net/bluetooth/hidp/hidp.h     |   15 +++
-> > 
-> > Before proceeding with these patches, I'd really like to have comment 
-> > (ideally 'Acked-by') from Marcel on the net/bluetooth/hidp part, 
-> > obviously.
-> 
-> I have tested it and it seems ok to me and to Marcel. For net/bluetooth/
-> 
-> Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Quirky dongles sometimes do not use the iso interface which
+causes a crash with runtime PM
 
-Awesome, thanks a lot everyone for having this sorted out finally!
+Signed-off-by: Oliver Neukum <oneukum@suse.de>
+=2D--
+ drivers/bluetooth/btusb.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-I will be taking the patchset through my tree.
-
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1da773f..08c8629 100644
+=2D-- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -826,7 +826,7 @@ static void btusb_work(struct work_struct *work)
+=20
+ 	if (hdev->conn_hash.sco_num > 0) {
+ 		if (!test_bit(BTUSB_DID_ISO_RESUME, &data->flags)) {
+=2D			err =3D usb_autopm_get_interface(data->isoc);
++			err =3D usb_autopm_get_interface(data->isoc ? data->isoc : data->intf);
+ 			if (err < 0) {
+ 				clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 				usb_kill_anchored_urbs(&data->isoc_anchor);
+@@ -855,7 +855,7 @@ static void btusb_work(struct work_struct *work)
+=20
+ 		__set_isoc_interface(hdev, 0);
+ 		if (test_and_clear_bit(BTUSB_DID_ISO_RESUME, &data->flags))
+=2D			usb_autopm_put_interface(data->isoc);
++			usb_autopm_put_interface(data->isoc ? data->isoc : data->intf);
+ 	}
+ }
+=20
+=2D-=20
+1.7.1
