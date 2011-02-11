@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 1/2] Fix wrong parameter order for memcpy in btoh128 function
-Date: Fri, 11 Feb 2011 15:51:38 -0200
-Message-Id: <1297446699-17349-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Fri, 11 Feb 2011 15:43:05 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	linux-usb@vger.kernel.org, stable@kernel.org, ensonic@sonicpulse.de
+Subject: Re: [PATCH] btusb:fix crash with quirky dongles doing sound
+Message-ID: <20110211174305.GB2173@joana>
+References: <201102111300.06470.oneukum@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201102111300.06470.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/sdp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Oliver,
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 8a31b55..d5b99d4 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -96,7 +96,7 @@ static inline void ntoh128(uint128_t *src, uint128_t *dst)
- 
- static inline void btoh128(uint128_t *src, uint128_t *dst)
- {
--	memcpy(src, dst, sizeof(uint128_t));
-+	memcpy(dst, src, sizeof(uint128_t));
- }
- 
- #endif
+* Oliver Neukum <oneukum@suse.de> [2011-02-11 13:00:06 +0100]:
+
+> From befd2cd1a7875d395f72b38f2cb89a03f16edaba Mon Sep 17 00:00:00 2001
+> From: Oliver Neukum <oliver@neukum.org>
+> Date: Fri, 11 Feb 2011 12:35:05 +0100
+> Subject: [PATCH] btusb:fix crash with quirky dongles doing sound
+> 
+> Quirky dongles sometimes do not use the iso interface which
+> causes a crash with runtime PM
+> 
+> Signed-off-by: Oliver Neukum <oneukum@suse.de>
+> ---
+>  drivers/bluetooth/btusb.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+
+Applied. It should be in mainline soon. Thanks.
+
 -- 
-1.7.4
-
+Gustavo F. Padovan
+http://profusion.mobi
