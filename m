@@ -1,40 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC 0/3] LE Connection Parameter Update Procedure
-Date: Fri, 11 Feb 2011 19:28:53 -0200
-Message-Id: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 11 Feb 2011 13:14:51 -0800
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/7 v2] Introduction of phonebook_pull_read
+Message-ID: <20110211211451.GE26894@jh-x301>
+References: <1297433139-10923-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+ <1297433139-10923-6-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1297433139-10923-6-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patches implement the support for LE Connection Parameter
-Update procedure started by the LE slave/peripheral device. Procedure
-started by the master will be addressed later when the requirements
-become more clear, Bluetooth Core SPEC and GAP test specification are
-not matching.
+Hi Radek,
 
-Patches are rebased using Vinicius SMP patches, repo:
-git://git.infradead.org/users/vcgomes/linux-2.6.git for-next
+On Fri, Feb 11, 2011, Radoslaw Jablonski wrote:
+> +	ret = phonebook_pull_read(irmc->request);
+> +
+> +	if (err) {
+> +		*err = ret;
+> +	}
 
-LE signaling channel can receive the following L2CAP commands(only):
-  - Command Reject
-  - Connection Parameter Update request
-  - Connection Parameter Update response
+No empty line before the if-statement and no {} for one-line sections.
 
-Claudio Takahasi (3):
-  Bluetooth: Add LE signaling commands handling
-  Bluetooth: Add connection parameter update response
-  Bluetooth: Send LE Connection Update Command
+> +		ret = phonebook_pull_read(irmc->request);
+> +
+> +		if (ret < 0) {
 
- include/net/bluetooth/hci.h      |   11 ++
- include/net/bluetooth/hci_core.h |    2 +
- include/net/bluetooth/l2cap.h    |   17 +++
- net/bluetooth/hci_conn.c         |   20 ++++
- net/bluetooth/l2cap_core.c       |  213 ++++++++++++++++++++++++++++---------
- 5 files changed, 211 insertions(+), 52 deletions(-)
+No empty line here, like above.
 
--- 
-1.7.4
+> +	ret = phonebook_pull_read(request);
+> +
+> +	if (ret < 0)
 
+Same here.
+
+> +		len = string_read(obj->buffer, buf, count);
+> +
+> +		if (len == 0 && !obj->lastpart) {
+
+And here.
+
+Johan
