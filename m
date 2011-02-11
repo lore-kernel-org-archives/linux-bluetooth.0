@@ -1,24 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Feb 2011 14:08:05 -0800
+Date: Fri, 11 Feb 2011 14:06:44 -0800
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: hcitool: add bdaddr type option to lecc
-Message-ID: <20110211220805.GB13718@jh-x301>
-References: <1297449064-32164-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/2] Fix wrong parameter order for memcpy in btoh128
+ function
+Message-ID: <20110211220644.GA13718@jh-x301>
+References: <1297446699-17349-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297449064-32164-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1297446699-17349-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Claudio,
 
-On Fri, Feb 11, 2011, Emeltchenko Andrei wrote:
+On Fri, Feb 11, 2011, Claudio Takahasi wrote:
 > ---
->  tools/hcitool.c |    9 +++++++--
->  1 files changed, 7 insertions(+), 2 deletions(-)
+>  lib/sdp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Pushed upstream. Thanks.
+Both patches have been pushed upstream. Thanks.
 
 Johan
