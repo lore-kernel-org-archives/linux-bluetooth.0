@@ -3,116 +3,135 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi,
 	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC 3/3] Bluetooth: Send LE Connection Update Command
-Date: Fri, 11 Feb 2011 19:28:56 -0200
-Message-Id: <1297459736-24514-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC 2/3] Bluetooth: Add connection parameter update response
+Date: Fri, 11 Feb 2011 19:28:55 -0200
+Message-Id: <1297459736-24514-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the new connection update parameter are accepted, the LE master
-host sends the LE Connection Update Command to its controller informing
-the new requested parameters.
+Implements L2CAP Connection Parameter Update Response defined in
+the Bluetooth Core Specification, Volume 3, Part A, section 4.21.
+Address the LE Connection Parameter Procedure initiated by the slave.
+
+Connection Interval Minimum and Maximum have the same range: 6 to
+3200. Time = N * 1.25ms. Minimum shall be less or equal to Maximum.
+The Slave Latency field shall have a value in the range of 0 to
+((connSupervisionTimeout / connIntervalMax) - 1). Latency field shall
+be less than 500. connSupervisionTimeout = Timeout Multiplier * 10 ms.
+Multiplier field shall have a value in the range of 10 to 3200.
 
 Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
 ---
- include/net/bluetooth/hci.h      |   11 +++++++++++
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_conn.c         |   20 ++++++++++++++++++++
- net/bluetooth/l2cap_core.c       |    7 ++++++-
- 4 files changed, 39 insertions(+), 1 deletions(-)
+ include/net/bluetooth/l2cap.h |   15 ++++++++++
+ net/bluetooth/l2cap_core.c    |   60 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 74 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 46438f4..12417e1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -701,6 +701,17 @@ struct hci_rp_le_ltk_neg_reply {
- 	__le16	handle;
- } __packed;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6aa70e9..be0116b 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -261,6 +261,21 @@ struct l2cap_info_rsp {
+ #define L2CAP_IR_SUCCESS    0x0000
+ #define L2CAP_IR_NOTSUPP    0x0001
  
-+#define HCI_OP_LE_CONN_UPDATE		0x2013
-+struct hci_cp_le_conn_update {
-+	__le16   handle;
-+	__le16   conn_interval_min;
-+	__le16   conn_interval_max;
-+	__le16   conn_latency;
-+	__le16   supervision_timeout;
-+	__le16   min_ce_len;
-+	__le16   max_ce_len;
++struct l2cap_conn_param_update_req {
++	__le16      min;
++	__le16      max;
++	__le16      latency;
++	__le16      to_multiplier;
 +} __packed;
 +
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5114122..f6c61d2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -786,5 +786,7 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result);
- void hci_le_start_enc(struct hci_conn *conn, u8 ltk[16]);
- void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
- void hci_le_ltk_neg_reply(struct hci_conn *conn);
-+void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
-+					u16 latency, u16 to_multiplier);
- 
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ee7dcdd..d646037 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -231,6 +231,26 @@ void hci_le_ltk_neg_reply(struct hci_conn *conn)
- }
- EXPORT_SYMBOL(hci_le_ltk_neg_reply);
- 
-+void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
-+					u16 latency, u16 to_multiplier)
-+{
-+	struct hci_cp_le_conn_update cp;
-+	struct hci_dev *hdev = conn->hdev;
++struct l2cap_conn_param_update_rsp {
++	__le16      result;
++} __packed;
 +
-+	memset(&cp, 0, sizeof(cp));
++/* Connection Parameters result */
++#define L2CAP_CONN_PARAM_ACCEPTED	0x0000
++#define L2CAP_CONN_PARAM_REJECTED	0x0001
 +
-+	cp.handle		= cpu_to_le16(conn->handle);
-+	cp.conn_interval_min	= cpu_to_le16(min);
-+	cp.conn_interval_max	= cpu_to_le16(max);
-+	cp.conn_latency		= cpu_to_le16(latency);
-+	cp.supervision_timeout	= cpu_to_le16(to_multiplier);
-+	cp.min_ce_len		= cpu_to_le16(0x0001);
-+	cp.max_ce_len		= cpu_to_le16(0x0001);
-+
-+	hci_send_cmd(hdev, HCI_OP_LE_CONN_UPDATE, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_le_conn_update);
-+
- /* Device _must_ be locked */
- void hci_sco_setup(struct hci_conn *conn, __u8 status)
- {
+ /* ----- L2CAP connections ----- */
+ struct l2cap_chan_list {
+ 	struct sock	*head;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8b76a72..66c4d80 100644
+index 122fc1c..8b76a72 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2555,7 +2555,9 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 						min, max, latency, to_multiplier);
- 
- 	memset(&rsp, 0, sizeof(rsp));
--	if (l2cap_check_conn_param(min, max, latency, to_multiplier))
-+
-+	err = l2cap_check_conn_param(min, max, latency, to_multiplier);
-+	if (err)
- 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
- 	else
- 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_ACCEPTED);
-@@ -2563,6 +2565,9 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_PARAM_UPDATE_RSP,
- 							sizeof(rsp), &rsp);
- 
-+	if (!err)
-+		hci_le_conn_update(hcon, min, max, latency, to_multiplier);
-+
+@@ -2508,6 +2508,64 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
  	return 0;
  }
  
++static int inline l2cap_check_conn_param(u16 min, u16 max, u16 latency,
++							u16 to_multiplier)
++{
++	u16 max_latency;
++
++	if (min > max || min < 6 || max > 3200)
++		return -EINVAL;
++
++	if (to_multiplier < 10 || to_multiplier > 3200)
++		return -EINVAL;
++
++	if (max >= to_multiplier * 8)
++		return -EINVAL;
++
++	max_latency = (to_multiplier * 8 / max) - 1;
++	if (latency > 499 || latency > max_latency)
++		return -EINVAL;
++
++	return 0;
++}
++
++static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
++					struct l2cap_cmd_hdr *cmd, u8 *data)
++{
++	struct hci_conn *hcon = conn->hcon;
++	struct l2cap_conn_param_update_req *req;
++	struct l2cap_conn_param_update_rsp rsp;
++	u16 min, max, latency, to_multiplier, cmd_len;
++	int err;
++
++	if (!(hcon->link_mode & HCI_LM_MASTER))
++		return -EINVAL;
++
++	cmd_len = __le16_to_cpu(cmd->len);
++	if (cmd_len != sizeof(struct l2cap_conn_param_update_req))
++		return -EPROTO;
++
++	req = (struct l2cap_conn_param_update_req *) data;
++	min 		= __le16_to_cpu(req->min);
++	max 		= __le16_to_cpu(req->max);
++	latency		= __le16_to_cpu(req->latency);
++	to_multiplier	= __le16_to_cpu(req->to_multiplier);
++
++	BT_DBG("min 0x%4.4x max 0x%4.4x latency: 0x%4.4x Timeout: 0x%4.4x",
++						min, max, latency, to_multiplier);
++
++	memset(&rsp, 0, sizeof(rsp));
++	if (l2cap_check_conn_param(min, max, latency, to_multiplier))
++		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
++	else
++		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_ACCEPTED);
++
++	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_PARAM_UPDATE_RSP,
++							sizeof(rsp), &rsp);
++
++	return 0;
++}
++
+ static inline int bredr_sig_cmd(struct l2cap_conn *conn,
+ 			struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
+ {
+@@ -2577,7 +2635,7 @@ static inline int le_sig_cmd(struct l2cap_conn *conn,
+ 		break;
+ 
+ 	case L2CAP_CONN_PARAM_UPDATE_REQ:
+-		err = -EINVAL;
++		err = l2cap_conn_param_update_req(conn, cmd, data);
+ 		break;
+ 
+ 	case L2CAP_CONN_PARAM_UPDATE_RSP:
 -- 
 1.7.4
 
