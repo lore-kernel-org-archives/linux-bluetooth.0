@@ -1,59 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] Bluetooth: hcitool: add bdaddr type option to lecc
-Date: Fri, 11 Feb 2011 10:31:04 -0800
-Message-Id: <1297449064-32164-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 2/2] Add const modifier to avoid wrong usage of byte order functions
+Date: Fri, 11 Feb 2011 15:51:39 -0200
+Message-Id: <1297446699-17349-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1297446699-17349-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1297446699-17349-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-
 ---
- tools/hcitool.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+ lib/sdp.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 6883b28..d7a82cc 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -2421,12 +2421,13 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+diff --git a/lib/sdp.c b/lib/sdp.c
+index d5b99d4..3e3a8f8 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -62,14 +62,14 @@
  
- static struct option lecc_options[] = {
- 	{ "help",	0, 0, 'h' },
-+	{ "random",	0, 0, 'r' },
- 	{ 0, 0, 0, 0 }
- };
- 
- static const char *lecc_help =
- 	"Usage:\n"
--	"\tlecc <bdaddr>\n";
-+	"\tlecc [--random] <bdaddr>\n";
- 
- static void cmd_lecc(int dev_id, int argc, char **argv)
+ #if __BYTE_ORDER == __BIG_ENDIAN
+ #define ntoh64(x) (x)
+-static inline void ntoh128(uint128_t *src, uint128_t *dst)
++static inline void ntoh128(const uint128_t *src, uint128_t *dst)
  {
-@@ -2436,8 +2437,13 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 	uint16_t min_interval, supervision_timeout, window, handle;
- 	uint8_t initiator_filter, own_bdaddr_type, peer_bdaddr_type;
+ 	int i;
+ 	for (i = 0; i < 16; i++)
+ 		dst->data[i] = src->data[i];
+ }
  
-+	peer_bdaddr_type = 0x00; /* Public device address */
-+
- 	for_each_opt(opt, lecc_options, NULL) {
- 		switch (opt) {
-+		case 'r':
-+			peer_bdaddr_type = 0x01; /* Random */
-+			break;
- 		default:
- 			printf("%s", lecc_help);
- 			return;
-@@ -2459,7 +2465,6 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
- 	interval = htobs(0x0004);
- 	window = htobs(0x0004);
- 	initiator_filter = 0x00;
--	peer_bdaddr_type = 0x00;
- 	own_bdaddr_type = 0x00;
- 	min_interval = htobs(0x000F);
- 	max_interval = htobs(0x000F);
+-static inline void btoh128(uint128_t *src, uint128_t *dst)
++static inline void btoh128(const uint128_t *src, uint128_t *dst)
+ {
+ 	int i;
+ 	for (i = 0; i < 16; i++)
+@@ -87,14 +87,14 @@ static inline uint64_t ntoh64(uint64_t n)
+ 	return h;
+ }
+ 
+-static inline void ntoh128(uint128_t *src, uint128_t *dst)
++static inline void ntoh128(const uint128_t *src, uint128_t *dst)
+ {
+ 	int i;
+ 	for (i = 0; i < 16; i++)
+ 		dst->data[15 - i] = src->data[i];
+ }
+ 
+-static inline void btoh128(uint128_t *src, uint128_t *dst)
++static inline void btoh128(const uint128_t *src, uint128_t *dst)
+ {
+ 	memcpy(dst, src, sizeof(uint128_t));
+ }
 -- 
-1.7.1
+1.7.4
 
