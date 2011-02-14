@@ -1,139 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Message-Id: <1A8743E5-65EA-4625-82FD-658C9722629F@gmail.com>
+From: Justin Mattock <justinmattock@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Subject: [PATCH 1/7 v3] Add return value to query tracker
-Date: Mon, 14 Feb 2011 11:19:45 +0200
-Message-Id: <1297675191-8046-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
+Subject: bluetooth disabled with current 2.6.38-rc4
+Date: Sun, 13 Feb 2011 17:30:04 -0800
+Cc: "linux-kernel@vger.kernel.org Mailing List"
+	<linux-kernel@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously errors were returned via parameter err - it was needed
-because some time ago query_tracker was returning newly allocated
-structure. Now returning error through return value has more
-sense.
----
- plugins/phonebook-tracker.c |   37 ++++++++++++++++++-------------------
- 1 files changed, 18 insertions(+), 19 deletions(-)
+maybe I missed something, but my bluetooth is just not functioning with
+2.6.38-rc4(works with 2.6.37-rc4)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index e116175..8044395 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1078,9 +1078,8 @@ failed:
- 	g_free(pending);
- }
- 
--static void query_tracker(const char *query, int num_fields,
--				reply_list_foreach_t callback, void *user_data,
--				int *err)
-+static int query_tracker(const char *query, int num_fields,
-+				reply_list_foreach_t callback, void *user_data)
- {
- 	struct pending_reply *pending;
- 	GCancellable *cancellable;
-@@ -1099,7 +1098,7 @@ static void query_tracker(const char *query, int num_fields,
- 			g_error_free(error);
- 		}
- 
--		goto failed;
-+		return -EINTR;
- 	}
- 
- 	cancellable = g_cancellable_new();
-@@ -1115,7 +1114,7 @@ static void query_tracker(const char *query, int num_fields,
- 
- 		g_object_unref(cancellable);
- 
--		goto failed;
-+		return -EINTR;
- 	}
- 
- 	pending = g_new0(struct pending_reply, 1);
-@@ -1130,14 +1129,7 @@ static void query_tracker(const char *query, int num_fields,
- 						async_query_cursor_next_cb,
- 						pending);
- 
--	if (err)
--		*err = 0;
--
--	return;
--
--failed:
--	if (err)
--		*err = -EPERM;
-+	return 0;
- }
- 
- static char *iso8601_utc_to_localtime(const char *datetime)
-@@ -1877,7 +1869,7 @@ done:
- 		pull_cb = pull_contacts;
- 	}
- 
--	query_tracker(query, col_amount, pull_cb, data, &err);
-+	err = query_tracker(query, col_amount, pull_cb, data);
- 	if (err < 0)
- 		data->cb(NULL, 0, err, 0, data->user_data);
- }
-@@ -1888,7 +1880,7 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
- 	struct phonebook_data *data;
- 	const char *query;
- 	reply_list_foreach_t pull_cb;
--	int col_amount;
-+	int col_amount, ret;
- 
- 	DBG("name %s", name);
- 
-@@ -1916,7 +1908,9 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
- 	data->params = params;
- 	data->user_data = user_data;
- 	data->cb = cb;
--	query_tracker(query, col_amount, pull_cb, data, err);
-+	ret = query_tracker(query, col_amount, pull_cb, data);
-+	if (err)
-+		*err = ret;
- 
- 	return data;
- }
-@@ -1927,6 +1921,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
- {
- 	struct phonebook_data *data;
- 	char *query;
-+	int ret;
- 
- 	DBG("folder %s id %s", folder, id);
- 
-@@ -1944,8 +1939,9 @@ void *phonebook_get_entry(const char *folder, const char *id,
- 		query = g_strdup_printf(CONTACTS_OTHER_QUERY_FROM_URI,
- 								id, id, id);
- 
--	query_tracker(query, PULL_QUERY_COL_AMOUNT,
--						pull_contacts, data, err);
-+	ret = query_tracker(query, PULL_QUERY_COL_AMOUNT, pull_contacts, data);
-+	if (err)
-+		*err = ret;
- 
- 	g_free(query);
- 
-@@ -1957,6 +1953,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- {
- 	struct phonebook_data *data;
- 	const char *query;
-+	int ret;
- 
- 	DBG("name %s", name);
- 
-@@ -1971,7 +1968,9 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 	data->entry_cb = entry_cb;
- 	data->ready_cb = ready_cb;
- 	data->user_data = user_data;
--	query_tracker(query, 7, add_to_cache, data, err);
-+	ret = query_tracker(query, 7, add_to_cache, data);
-+	if (err)
-+		*err = ret;
- 
- 	return data;
- }
--- 
-1.7.0.4
+I've done a bisect on this, but was pointed to:
+c0e45c1ca3162acb2e77b3d9e152ce6e7b6fa3f5
+but doesn't look correct to me
 
+here is what I am seeing with the bluetooth-applet etc..:
+
+working correctly:
+http://www.flickr.com/photos/44066293@N08/5443727238/
+
+not working:
+http://www.flickr.com/photos/44066293@N08/5443124859/
+
+my /var/log/daemon.log shows:
+
+Feb 13 17:12:22 Linux-2 acpid: 1 client rule loaded
+Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 registered
+Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Listening for HCI events on  
+hci0
+Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 up
+Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Unable to find matching  
+adapter
+
+I can try at another bisect, but might take some time.. let me know if  
+there is something I can test
+or do.
+
+Justin P. Mattock
