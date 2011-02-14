@@ -1,43 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Feb 2011 12:40:03 -0200
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 14 Feb 2011 12:36:47 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: ville.tervo@nokia.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Use proper timer for hci command timout
-Message-ID: <20110214144003.GC2597@joana>
-References: <1297683372-28351-1-git-send-email-ville.tervo@nokia.com>
+To: Vasiliy Kulikov <segoon@openwall.com>
+Cc: linux-kernel@vger.kernel.org, security@kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] bluethooth: sco: fix information leak to userspace
+Message-ID: <20110214143647.GB2597@joana>
+References: <1297680867-11551-1-git-send-email-segoon@openwall.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297683372-28351-1-git-send-email-ville.tervo@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1297680867-11551-1-git-send-email-segoon@openwall.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+Hi Vasiliy,
 
-* ville.tervo@nokia.com <ville.tervo@nokia.com> [2011-02-14 13:36:12 +0200]:
+* Vasiliy Kulikov <segoon@openwall.com> [2011-02-14 13:54:26 +0300]:
 
-> From: Ville Tervo <ville.tervo@nokia.com>
+> struct sco_conninfo has one padding byte in the end.  Local variable
+> cinfo of type sco_conninfo is copied to userspace with this uninizialized
+> one byte, leading to old stack contents leak.
 > 
-> Use proper timer instead of hci command flow control to timeout
-> failed hci commands. Otherwise stack ends up sending commands
-> when flow control is used to block new commands.
-> 
-> 2010-09-01 18:29:41.592132 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:16:CF:E1:C7:D7 mode 2 clkoffset 0x0000
-> 2010-09-01 18:29:41.592681 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
-> 2010-09-01 18:29:51.022033 < HCI Command: Remote Name Request Cancel (0x01|0x001a) plen 6
->     bdaddr 00:16:CF:E1:C7:D7
-> 
-> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> Signed-off-by: Vasiliy Kulikov <segoon@openwall.com>
 > ---
->  include/net/bluetooth/hci.h      |    3 +++
->  include/net/bluetooth/hci_core.h |    2 +-
->  net/bluetooth/hci_core.c         |   22 ++++++++++++++++------
->  net/bluetooth/hci_event.c        |    6 ++++++
->  4 files changed, 26 insertions(+), 7 deletions(-)
+>  Compile tested.
+> 
+>  net/bluetooth/sco.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-Patch has been applied. Thanks.
+Applied as well, thanks.
 
 -- 
 Gustavo F. Padovan
