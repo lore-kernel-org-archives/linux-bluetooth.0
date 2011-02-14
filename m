@@ -1,43 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110214145649.GE2597@joana>
-References: <20110211035309.GA22204@spacedout.fries.net>
-	<20110214145649.GE2597@joana>
-Date: Mon, 14 Feb 2011 15:40:46 -0600
-Message-ID: <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
-Subject: Re: [HACK PATCH] N900 l2cap connect crash, NULL parent
+In-Reply-To: <AANLkTinsnjed16owx=JqCCPa3AMC3P_Z9qLNd8AZ4jyf@mail.gmail.com>
+References: <AANLkTi=yuqTG1MiqN3FHM+2m0OX9QNajq8+xJG_D1-EG@mail.gmail.com>
+	<AANLkTi=qB6WcjkQcp0teuL5DTKKBSSK0ydWD1EtwCh=n@mail.gmail.com>
+	<AANLkTinsnjed16owx=JqCCPa3AMC3P_Z9qLNd8AZ4jyf@mail.gmail.com>
+Date: Mon, 14 Feb 2011 16:23:10 -0600
+Message-ID: <AANLkTi=Z0jaFfeLsNzx9SDJvz-2XCzzTJ++L56rLGZt3@mail.gmail.com>
+Subject: Re: HCI core error recovery.
 From: Andrei Warkentin <andreiw@motorola.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: David Fries <david@fries.net>, linux-bluetooth@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-FWIW still need it in 2.6.36.
+On Sat, Feb 12, 2011 at 12:47 AM, Andrei Warkentin <andreiw@motorola.com> wrote:
+> On Fri, Feb 11, 2011 at 5:07 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
+>> Dear List,
+>>
+>> I've run into an interesting problem. Excuse me in advance if this was
+>> already covered here, or for my explanations, since I'm not too
+>> familiar with overall flow within BlueZ or Bluetooth specifics...
+>> We've had some hardware config issues that resulted in garbage/malformed
+>> messages arriving via H4 into the HCI layer. We've since resolved
+>> these, but it got me thinking. The issues would result in certain HCI
+>> messages being missed, including occasionally disconnect events being
+>> missed, and a subsequent connect event would result in a double add.
+>>
+>> I was thinking about how to fix at the very least the crash. The sysfs
+>> object is created as a last step after getting a "connection
+>> completed" HCI message, I think. What I am unsure about is if it's
+>> safe to just ignore the add if there is already a sysfs entry...
+>>
+>> So I would think the HCI core needs some resiliency against
+>> bad/malignant bluetooth controllers, and perform error
+>> recovery/resynchronization. Perhaps maybe there is room for a virtual
+>> hci controller that just injects various message types to see how well
+>> the core can cope?
+>>
+>> Thanks in advance,
+>> A
+>
+> To further explain the issue, here is what was happening -
+>
+> 0) A BT device is paired.
+> 1) Host goes into sleep mode.
+> 2) BT device turns off.
+> 3) Host wakes up due to BT waking the host. Due to UART resume issues,
+> HCI message corrupted. hci_disconn_complete_evt never gets called.
+> 4) BT device turns on.
+> 5) devref gets incremented in  hci_conn_complete_evt, and is now 2.
+> 6) BT device turns off. hci_disconn_complete_evt is called, conn hash
+> is deleted, but sysfs entry not cleaned up since
+> atomic_dec_and_test(&conn->devref) != 0.
+> 7) BT device turns on. sysfs add fails since it never was cleaned up.
+>
+> The attached patch takes care of that. I'm not too familiar with BlueZ
+> (or bluetooth :-(), so I would like your feedback. In particular, I am
+> unsure about sync connections.
+> The primary issue overall is that HCI core doesn't handle HCI issues
+> (whether caused by transport issues, or bad/malicious BT controller).
+> I am curious if there are other ways to break the core.
+>
+> Thanks,
+> A
+>
 
-On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi David,
->
-> * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
->
->> Here's a patch to avoid a very repeatable crash in the N900.  If I
->> take a Motorola S305 bluetooth headset that was previously paried with
->> the N900, turn it on, and press the play button before the headphones
->> automatically pair with the cell phone, the N900 will crash (and
->> reboot) in pairing.  If I wait until after they have paired there
->> isn't any problem.  The patch is against the kernel-power
->> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
->> the same, I just haven't gone back to that kernel.
->
-> This is a very old kernel. You need to check this issue against
-> bluetooth-next-2.6.
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Anyone?
