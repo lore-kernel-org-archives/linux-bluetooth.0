@@ -1,54 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Al Cho <alcho.novell@gmail.com>
-From: "Cho, Yu-Chen" <acho@novell.com>
-To: marcel@holtmann.org,
-	padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: acho@novell.com,
-	jlee@novell.com
-Subject: [PATCH] Add Atheros BT AR5BBU12 fw supported
-Date: Tue, 15 Feb 2011 09:58:54 +0800
-Message-Id: <ce34a9f1d05bc28c97d7de0c2a99225f56b11953.1297735066.git.acho@novell.com>
+MIME-Version: 1.0
+In-Reply-To: <20110214145649.GE2597@joana>
+References: <20110211035309.GA22204@spacedout.fries.net>
+	<20110214145649.GE2597@joana>
+Date: Mon, 14 Feb 2011 15:40:46 -0600
+Message-ID: <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
+Subject: Re: [HACK PATCH] N900 l2cap connect crash, NULL parent
+From: Andrei Warkentin <andreiw@motorola.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: David Fries <david@fries.net>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the btusb.c blacklist [0489:e02c] for Atheros AR5BBU12 BT
-and add to ath3k.c supported this device.
+FWIW still need it in 2.6.36.
 
-Signed-off-by: Cho, Yu-Chen <acho@novell.com>
----
- drivers/bluetooth/ath3k.c |    4 ++++
- drivers/bluetooth/btusb.c |    3 +++
- 2 files changed, 7 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 333c212..d4065c0 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -41,6 +41,10 @@ static struct usb_device_id ath3k_table[] = {
- 
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03F0, 0x311D) },
-+
-+	/* Atheros AR5BBU12 with sflash firmware */
-+	{ USB_DEVICE(0x0489, 0xE02C) },
-+
- 	{ }	/* Terminating entry */
- };
- 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4cefa91..0ae22fd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -105,6 +105,9 @@ static struct usb_device_id blacklist_table[] = {
- 	/* Atheros AR9285 Malbec with sflash firmware */
- 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
- 
-+	/* Atheros AR5BBU12 with sflash firmware */
-+	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-+
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
--- 
-1.7.1
+On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi David,
+>
+> * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
+>
+>> Here's a patch to avoid a very repeatable crash in the N900.  If I
+>> take a Motorola S305 bluetooth headset that was previously paried with
+>> the N900, turn it on, and press the play button before the headphones
+>> automatically pair with the cell phone, the N900 will crash (and
+>> reboot) in pairing.  If I wait until after they have paired there
+>> isn't any problem.  The patch is against the kernel-power
+>> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
+>> the same, I just haven't gone back to that kernel.
+>
+> This is a very old kernel. You need to check this issue against
+> bluetooth-next-2.6.
+>
+> --
+> Gustavo F. Padovan
+> http://profusion.mobi
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
