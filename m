@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1297891081-27976-3-git-send-email-bgix@codeaurora.org>
+In-Reply-To: <1297891081-27976-4-git-send-email-bgix@codeaurora.org>
 References: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>
-	<1297891081-27976-3-git-send-email-bgix@codeaurora.org>
-Date: Mon, 14 Feb 2011 18:53:01 -0300
-Message-ID: <AANLkTikCnorqDid1cRYmCm=-Jq04K67wJOHpOdWE8Pn+@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Add SDP registration of Primary GATT services
+	<1297891081-27976-4-git-send-email-bgix@codeaurora.org>
+Date: Mon, 14 Feb 2011 18:41:06 -0300
+Message-ID: <AANLkTi=dwj0Bc_509JW8-HfkYBfzmfSzR0GJxNqoLXye@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Add gatttool enhancements for UPF
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com,
@@ -14,72 +14,135 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Brian,
+
 On Wed, Feb 16, 2011 at 6:18 PM, Brian Gix <bgix@codeaurora.org> wrote:
-> SDP registration can be supressed by passing Zero as the end
-> handle argument to attrib_db_add().
-> ---
->  attrib/example.c    |  119 +++++++++++++++++++++++++++++++------------
->  src/attrib-server.c |  139 +++++++++++++++++++++++++++++++++++----------------
->  src/attrib-server.h |    6 ++-
->  3 files changed, 184 insertions(+), 80 deletions(-)
+> @@ -90,9 +91,9 @@ static GIOChannel *do_connect(gboolean le)
 >
-> diff --git a/attrib/example.c b/attrib/example.c
-> index 1911912..eab3c0f 100644
-> --- a/attrib/example.c
-> +++ b/attrib/example.c
-> @@ -31,6 +31,7 @@
->
->  #include <bluetooth/sdp.h>
->  #include <bluetooth/sdp_lib.h>
-> +#include <src/sdpd.h>
->
->  #include <glib.h>
->
-> @@ -59,6 +60,9 @@
->  #define FMT_KILOGRAM_UUID              0xA010
->  #define FMT_HANGING_UUID               0xA011
->
-> +#define SDP_RECORD_COUNT 10
-> +sdp_record_t *sdp_records[SDP_RECORD_COUNT];
-> +
->  static int register_attributes(void)
->  {
->        const char *desc_out_temp = "Outside Temperature";
-> @@ -77,59 +81,73 @@ static int register_attributes(void)
->        uint8_t atval[256];
->        uuid_t uuid;
->        int len;
-> +       int i = 0;
->
->        /* Battery state service: primary service definition */
->        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->        att_put_u16(BATTERY_STATE_SVC_UUID, &atval[0]);
-> -       attrib_db_add(0x0100, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
-> +       sdp_records[i++] = attrib_db_add(0x0100, 0x0111, &uuid,
-> +                                               "Battery State Service",
-> +                                               ATT_NONE, ATT_NOT_PERMITTED,
-> +                                               atval, 2);
+>        /* This check is required because currently setsockopt() returns no
+>         * errors for MTU values smaller than the allowed minimum. */
+> -       if (opt_mtu != 0 && opt_mtu < ATT_MIN_MTU_L2CAP) {
+> +       if (opt_mtu != 0 && opt_mtu < 23) {
+>                g_printerr("MTU cannot be smaller than %d\n",
+> -                                                       ATT_MIN_MTU_L2CAP);
+> +                                                       23);
+>                return NULL;
+>        }
 
-What if instead of changing attrib_db_add() signature to return a SDP
-record, you create a "sdp_record_from_attrib()" for this purpose? This
-function could get the struct attribute * pointers for start/end.
+The changes above seem unrelated to this patch.
 
-There are plans for attrib_db_add() to return the created struct
-attribute *a (as shown in a patch I sent sometime ago which I still
-need to resend), I can send an updated version of that patch if you
-agree to this approach.
-
-> @@ -609,7 +603,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
->  static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
->                uint8_t *pdu, int len)
->  {
-> -       channel->mtu = MIN(mtu, ATT_MAX_MTU);
-> +       channel->mtu = MIN(mtu, channel->mtu);
 >
->        return enc_mtu_resp(channel->mtu, pdu, len);
+> @@ -277,6 +278,14 @@ static gboolean characteristics(gpointer user_data)
+>        return FALSE;
 >  }
+>
+> +static void char_write_cb(guint8 status, const guint8 *pdu, guint16 plen,
+> +                                                       gpointer user_data)
+> +{
+> +       if (plen == 1)
+> +               g_print("Attrib Write Succeeded\n");
+> +       else
+> +               g_printerr("Attrib Write failed: %s\n", att_ecode2str(status));
 
-This change looks unrelated to the patch.
+Why not check by the status instead of plen ?
+
+Also, I'd suggest "Characteristic write" instead of "Attrib Write".
+
+> +}
+>  static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>                                                        gpointer user_data)
+>  {
+> @@ -427,7 +436,40 @@ static gboolean characteristics_write(gpointer user_data)
+>                goto error;
+>        }
+>
+> +       gatt_write_char(attrib, opt_handle, value, len, char_write_cb, value);
+> +       gatt_read_char(attrib, opt_handle, char_read_cb, attrib);
+
+Why both read and write ?
+
+> +
+> +       return FALSE;
+> +
+> +error:
+> +       g_main_loop_quit(event_loop);
+> +       return FALSE;
+> +}
+> +
+> +static gboolean characteristics_cmd(gpointer user_data)
+> +{
+> +       GAttrib *attrib = user_data;
+> +       uint8_t *value;
+> +       size_t len;
+> +
+> +       if (opt_handle <= 0) {
+> +               g_printerr("A valid handle is required\n");
+> +               goto error;
+> +       }
+> +
+> +       if (opt_value == NULL || opt_value[0] == '\0') {
+> +               g_printerr("A value is required\n");
+> +               goto error;
+> +       }
+> +
+> +       len = attr_data_from_string(opt_value, &value);
+> +       if (len == 0) {
+> +               g_printerr("Invalid value\n");
+> +               goto error;
+> +       }
+> +
+>        gatt_write_cmd(attrib, opt_handle, value, len, mainloop_quit, value);
+> +       gatt_read_char(attrib, opt_handle, char_read_cb, attrib);
+
+Same question here.
+
+>
+>        return FALSE;
+>
+> @@ -531,6 +573,8 @@ static GOptionEntry gatt_options[] = {
+>                "Characteristics Value/Descriptor Read", NULL },
+>        { "char-write", 0, 0, G_OPTION_ARG_NONE, &opt_char_write,
+>                "Characteristics Value Write", NULL },
+> +       { "char-cmd", 0, 0, G_OPTION_ARG_NONE, &opt_char_cmd,
+> +               "Characteristics Value Cmd", NULL },
+
+Suggestion:  "Characteristic Value write using Write Command" (or
+something similar).
+
+>        { "char-desc", 0, 0, G_OPTION_ARG_NONE, &opt_char_desc,
+>                "Characteristics Descriptor Discovery", NULL },
+>        { "listen", 0, 0, G_OPTION_ARG_NONE, &opt_listen,
+> @@ -561,7 +605,7 @@ int main(int argc, char *argv[])
+>        GError *gerr = NULL;
+>        GAttrib *attrib;
+>        GIOChannel *chan;
+> -       GSourceFunc callback;
+> +       GSourceFunc callback = NULL;
+>
+>        context = g_option_context_new(NULL);
+>        g_option_context_add_main_entries(context, options, NULL);
+> @@ -602,9 +646,11 @@ int main(int argc, char *argv[])
+>                callback = characteristics_read;
+>        else if (opt_char_write)
+>                callback = characteristics_write;
+> +       else if (opt_char_cmd)
+> +               callback = characteristics_cmd;
+>        else if (opt_char_desc)
+>                callback = characteristics_desc;
+> -       else {
+> +       else if (!opt_listen) {
+>                gchar *help = g_option_context_get_help(context, TRUE, NULL);
+>                g_print("%s\n", help);
+>                g_free(help);
+> @@ -625,7 +671,8 @@ int main(int argc, char *argv[])
+>        if (opt_listen)
+>                g_idle_add(listen_start, attrib);
+>
+> -       g_idle_add(callback, attrib);
+> +       if (callback)
+> +               g_idle_add(callback, attrib);
+>
+>        g_main_loop_run(event_loop);
 
 Regards,
 -- 
