@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Fix not resetting indicators whenever the driver is initialized
-Date: Mon, 14 Feb 2011 12:21:21 +0200
-Message-Id: <1297678882-26893-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
-References: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/3] Fix not stopping name resolving when discovery is suspended
+Date: Mon, 14 Feb 2011 12:21:20 +0200
+Message-Id: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-This may cause invalid values to be reported since the status of call can
-change during the time adaptor was off.
+During device creation if discovery is active we suspend it to avoid
+interfering with pairing, but although it attempt to cancel name request
+there could be one already completed which would cause next name on the
+list to be requested.
 ---
- audio/telephony-maemo6.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ src/adapter.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 0c99c34..0ab1a77 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -1981,6 +1981,15 @@ int telephony_init(void)
- 	DBG("telephony-maemo6 registering %s interface on path %s",
- 			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
+diff --git a/src/adapter.c b/src/adapter.c
+index 3e609c1..fd4b685 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -268,6 +268,10 @@ int adapter_resolve_names(struct btd_adapter *adapter)
+ 	struct remote_dev_info *dev, match;
+ 	int err;
  
-+	/* Reset indicators */
-+	telephony_update_indicator(maemo_indicators, "battchg", 5);
-+	telephony_update_indicator(maemo_indicators, "signal", 0);
-+	telephony_update_indicator(maemo_indicators, "service", 0);
-+	telephony_update_indicator(maemo_indicators, "call", 0);
-+	telephony_update_indicator(maemo_indicators, "callsetup", 0);
-+	telephony_update_indicator(maemo_indicators, "callhelp", 0);
-+	telephony_update_indicator(maemo_indicators, "roam", 0);
++	/* Do not attempt to resolve more names if on suspended state */
++	if (adapter->state & STATE_SUSPENDED)
++		return 0;
 +
- 	telephony_ready_ind(features, maemo_indicators, BTRH_NOT_SUPPORTED,
- 								chld_str);
- 	if (send_method_call("org.freedesktop.Hal",
+ 	memset(&match, 0, sizeof(struct remote_dev_info));
+ 	bacpy(&match.bdaddr, BDADDR_ANY);
+ 	match.name_status = NAME_REQUIRED;
 -- 
 1.7.1
 
