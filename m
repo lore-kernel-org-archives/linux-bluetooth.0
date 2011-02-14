@@ -1,58 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Feb 2011 12:49:31 -0200
+Date: Mon, 14 Feb 2011 12:40:03 -0200
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: =?utf-8?B?0JLQu9Cw0LTQuNGB0LvQsNCy?= <vladisslav@inbox.ru>
+To: ville.tervo@nokia.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: rfcomm: Release BTM while sleeping to avoid
- deadlock.
-Message-ID: <20110214144931.GD2597@joana>
-References: <E1PoQLR-0008E5-00.vladisslav-inbox-ru@f68.mail.ru>
+Subject: Re: [PATCH v2] Bluetooth: Use proper timer for hci command timout
+Message-ID: <20110214144003.GC2597@joana>
+References: <1297683372-28351-1-git-send-email-ville.tervo@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <E1PoQLR-0008E5-00.vladisslav-inbox-ru@f68.mail.ru>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1297683372-28351-1-git-send-email-ville.tervo@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi 
+Hi Ville,
 
-* Владислав <vladisslav@inbox.ru> [2011-02-13 04:01:45 +0300]:
+* ville.tervo@nokia.com <ville.tervo@nokia.com> [2011-02-14 13:36:12 +0200]:
 
-> Bug description:
-> Kernel freezes for ~2 seconds after trying to access /dev/rfcommX device.
-> Steps to reproduce:
-> 1. Edit /etc/bluetooth/rfcomm.conf - uncomment default config, set "bind" to "yes".
-> 2. Issue "sudo rfcomm bind all" to create /dev/rfcomm0 device node.
-> 3. Issue "cat /dev/rfcomm0" to trigger a bug.
-> Everything freezes (at least GUI): cursor does not move, no response from
-> keypresses, no gui redraw for 2~3 seconds.
-> Then cat displays expected error message "cat: /dev/rfcomm0: Host is down"
-> and system starts to respond again.
-> What expected (and occurs with 2.6.35) : no freeze between cat and error message.
-> Things goes worse when device, mentioned in /etc/bluetooth/rfcomm.conf
-> is in range and not paired - system displays pairing request and locks
-> up for a longer time, maybe completely - I did not wait longer than ~30
-> seconds and turned off bluetooth device.
+> From: Ville Tervo <ville.tervo@nokia.com>
 > 
-> Fix:
-> Release BTM while sleeping to avoid deadlock.
+> Use proper timer instead of hci command flow control to timeout
+> failed hci commands. Otherwise stack ends up sending commands
+> when flow control is used to block new commands.
 > 
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index 2575c2d..d7b9af4 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -727,7 +727,9 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
->  			break;
->  		}
->  
-> +		tty_unlock();
->  		schedule();
-> +		tty_lock();
->  	}
->  	set_current_state(TASK_RUNNING);
->  	remove_wait_queue(&dev->wait, &wait);
+> 2010-09-01 18:29:41.592132 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:16:CF:E1:C7:D7 mode 2 clkoffset 0x0000
+> 2010-09-01 18:29:41.592681 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
+> 2010-09-01 18:29:51.022033 < HCI Command: Remote Name Request Cancel (0x01|0x001a) plen 6
+>     bdaddr 00:16:CF:E1:C7:D7
+> 
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> ---
+>  include/net/bluetooth/hci.h      |    3 +++
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++------
+>  net/bluetooth/hci_event.c        |    6 ++++++
+>  4 files changed, 26 insertions(+), 7 deletions(-)
 
-I've faced this issue some days ago and your patch looks good. But I need
-proper git patch with your Signed-off-by line.
+Patch has been applied. Thanks.
 
 -- 
 Gustavo F. Padovan
