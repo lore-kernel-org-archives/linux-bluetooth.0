@@ -1,47 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH v3 1/3] Include check to readline lib on acinlude.m4
-Date: Mon, 14 Feb 2011 12:07:18 -0300
-Message-Id: <1297696040-16453-1-git-send-email-sheldon.demario@openbossa.org>
-In-Reply-To: <20110209212642.GA11368@jh-x301>
-References: <20110209212642.GA11368@jh-x301>
+Date: Mon, 14 Feb 2011 12:56:49 -0200
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: David Fries <david@fries.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [HACK PATCH] N900 l2cap connect crash, NULL parent
+Message-ID: <20110214145649.GE2597@joana>
+References: <20110211035309.GA22204@spacedout.fries.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110211035309.GA22204@spacedout.fries.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- acinclude.m4 |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+Hi David,
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 9d3f6b2..91e0956 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -153,6 +153,15 @@ AC_DEFUN([AC_PATH_SNDFILE], [
- 	AC_SUBST(SNDFILE_LIBS)
- ])
- 
-+AC_DEFUN([AC_PATH_READLINE], [
-+	AC_CHECK_HEADER(readline/readline.h,
-+		AC_CHECK_LIB(readline, main,
-+			[ readline_found=yes
-+			AC_SUBST(READLINE_LIBS, "-lreadline")
-+			], readline_found=no),
-+		[])
-+])
-+
- AC_DEFUN([AC_PATH_OUI], [
- 	AC_ARG_WITH(ouifile,
- 		    AS_HELP_STRING([--with-ouifile=PATH],[Path to the oui.txt file @<:@auto@:>@]),
-@@ -356,6 +365,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
- 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
- 	AM_CONDITIONAL(HAL, test "${hal_enable}" = "yes")
-+	AM_CONDITIONAL(READLINE, test "${readline_found}" = "yes")
- 	AM_CONDITIONAL(ATTRIBPLUGIN, test "${attrib_enable}" = "yes")
- 	AM_CONDITIONAL(ECHOPLUGIN, test "no" = "yes")
- 	AM_CONDITIONAL(PNATPLUGIN, test "${pnat_enable}" = "yes")
+* David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
+
+> Here's a patch to avoid a very repeatable crash in the N900.  If I
+> take a Motorola S305 bluetooth headset that was previously paried with
+> the N900, turn it on, and press the play button before the headphones
+> automatically pair with the cell phone, the N900 will crash (and
+> reboot) in pairing.  If I wait until after they have paired there
+> isn't any problem.  The patch is against the kernel-power
+> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
+> the same, I just haven't gone back to that kernel.
+
+This is a very old kernel. You need to check this issue against
+bluetooth-next-2.6.
+
 -- 
-1.7.1
-
+Gustavo F. Padovan
+http://profusion.mobi
