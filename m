@@ -1,60 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1297678882-26893-2-git-send-email-luiz.dentz@gmail.com>
-References: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
-	<1297678882-26893-2-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 14 Feb 2011 12:26:47 +0200
-Message-ID: <AANLkTi=m8oMC_13XzC2sC=5ZGUmoZ-Dp88kstfyxnJ3H@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Fix not resetting indicators whenever the driver is initialized
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH 3/3] Fix not updating call indicator when parsing call info reply
+Date: Mon, 14 Feb 2011 12:21:22 +0200
+Message-Id: <1297678882-26893-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
+References: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Mon, Feb 14, 2011 at 12:21 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
->
-> This may cause invalid values to be reported since the status of call can
-> change during the time adaptor was off.
-> ---
->  audio/telephony-maemo6.c |    9 +++++++++
->  1 files changed, 9 insertions(+), 0 deletions(-)
->
-> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-> index 0c99c34..0ab1a77 100644
-> --- a/audio/telephony-maemo6.c
-> +++ b/audio/telephony-maemo6.c
-> @@ -1981,6 +1981,15 @@ int telephony_init(void)
->        DBG("telephony-maemo6 registering %s interface on path %s",
->                        TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
->
-> +       /* Reset indicators */
-> +       telephony_update_indicator(maemo_indicators, "battchg", 5);
-> +       telephony_update_indicator(maemo_indicators, "signal", 0);
-> +       telephony_update_indicator(maemo_indicators, "service", 0);
-> +       telephony_update_indicator(maemo_indicators, "call", 0);
-> +       telephony_update_indicator(maemo_indicators, "callsetup", 0);
-> +       telephony_update_indicator(maemo_indicators, "callhelp", 0);
-> +       telephony_update_indicator(maemo_indicators, "roam", 0);
-> +
->        telephony_ready_ind(features, maemo_indicators, BTRH_NOT_SUPPORTED,
->                                                                chld_str);
->        if (send_method_call("org.freedesktop.Hal",
-> --
-> 1.7.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+This can happen if there is a call with a status different than idle when
+adaptor is turned on the call indicators weren't updated.
+---
+ audio/telephony-maemo6.c |   63 ++++++++++++++++++++++++++-------------------
+ 1 files changed, 36 insertions(+), 27 deletions(-)
 
-Please ignore this, it is probably better to just reset the fields
-directly and not call telephony_update_indicator.
-
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 0ab1a77..0ba21b8 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -973,35 +973,13 @@ static void handle_create_requested(DBusMessage *msg)
+ 					EV_CALLSETUP_OUTGOING);
+ }
+ 
+-static void handle_call_status(DBusMessage *msg, const char *call_path)
++static void call_set_status(struct csd_call *call, dbus_uint32_t status)
+ {
+-	struct csd_call *call;
+-	dbus_uint32_t status, cause_type, cause, prev_status;
++	dbus_uint32_t prev_status;
+ 	int callheld = telephony_get_indicator(maemo_indicators, "callheld");
+ 
+-	if (!dbus_message_get_args(msg, NULL,
+-					DBUS_TYPE_UINT32, &status,
+-					DBUS_TYPE_UINT32, &cause_type,
+-					DBUS_TYPE_UINT32, &cause,
+-					DBUS_TYPE_INVALID)) {
+-		error("Unexpected paramters in Instance.CallStatus() signal");
+-		return;
+-	}
+-
+-	call = find_call(call_path);
+-	if (!call) {
+-		error("Didn't find any matching call object for %s",
+-				call_path);
+-		return;
+-	}
+-
+-	if (status > 16) {
+-		error("Invalid call status %u", status);
+-		return;
+-	}
+-
+ 	prev_status = call->status;
+-	DBG("Call %s changed from %s to %s", call_path,
++	DBG("Call %s changed from %s to %s", call->object_path,
+ 		call_status_str[prev_status], call_status_str[status]);
+ 
+ 	if (prev_status == status) {
+@@ -1132,6 +1110,35 @@ static void handle_call_status(DBusMessage *msg, const char *call_path)
+ 	}
+ }
+ 
++static void handle_call_status(DBusMessage *msg, const char *call_path)
++{
++	struct csd_call *call;
++	dbus_uint32_t status, cause_type, cause;
++
++	if (!dbus_message_get_args(msg, NULL,
++					DBUS_TYPE_UINT32, &status,
++					DBUS_TYPE_UINT32, &cause_type,
++					DBUS_TYPE_UINT32, &cause,
++					DBUS_TYPE_INVALID)) {
++		error("Unexpected paramters in Instance.CallStatus() signal");
++		return;
++	}
++
++	call = find_call(call_path);
++	if (!call) {
++		error("Didn't find any matching call object for %s",
++				call_path);
++		return;
++	}
++
++	if (status > 16) {
++		error("Invalid call status %u", status);
++		return;
++	}
++
++	call_set_status(call, status);
++}
++
+ static void handle_conference(DBusMessage *msg, gboolean joined)
+ {
+ 	const char *path;
+@@ -1470,13 +1477,12 @@ static void parse_call_list(DBusMessageIter *iter)
+ 		if (!call) {
+ 			call = g_new0(struct csd_call, 1);
+ 			call->object_path = g_strdup(object_path);
+-			call->status = (int) status;
+ 			calls = g_slist_append(calls, call);
+ 			DBG("telephony-maemo6: new csd call instance at %s",
+ 								object_path);
+ 		}
+ 
+-		if (call->status == CSD_CALL_STATUS_IDLE)
++		if (status == CSD_CALL_STATUS_IDLE)
+ 			continue;
+ 
+ 		/* CSD gives incorrect call_hold property sometimes */
+@@ -1493,6 +1499,9 @@ static void parse_call_list(DBusMessageIter *iter)
+ 		g_free(call->number);
+ 		call->number = g_strdup(number);
+ 
++		/* Update indicators */
++		call_set_status(call, status);
++
+ 	} while (dbus_message_iter_next(iter));
+ }
+ 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.1
+
