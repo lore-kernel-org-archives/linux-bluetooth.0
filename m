@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3 v2] Fix not resetting indicators whenever the driver is initialized
-Date: Mon, 14 Feb 2011 13:02:31 +0200
-Message-Id: <1297681351-12277-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: Vasiliy Kulikov <segooon@gmail.com>
+From: Vasiliy Kulikov <segoon@openwall.com>
+To: linux-kernel@vger.kernel.org
+Cc: security@kernel.org,
+	Marcel Holtmann <marcel@holtmann.org> ,
+	"Gustavo F. Padovan" <padovan@profusion.mobi> ,
+	"David S. Miller" <davem@davemloft.net> ,
+	Tejun Heo <tj@kernel.org> ,
+	linux-bluetooth@vger.kernel.org ,
+	netdev@vger.kernel.org
+Subject: [PATCH] bluetooth: bnep: fix buffer overflow
+Date: Mon, 14 Feb 2011 13:54:31 +0300
+Message-Id: <1297680871-11617-1-git-send-email-segoon@openwall.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Struct ca is copied from userspace.  It is not checked whether the "device"
+field is NULL terminated.  This potentially leads to BUG() inside of
+alloc_netdev_mqs() and/or information leak by creating a device with a name
+made of contents of kernel stack.
 
-This may cause invalid values to be reported since the status of call can
-change during the time adaptor was off.
+Signed-off-by: Vasiliy Kulikov <segoon@openwall.com>
 ---
- audio/telephony-maemo6.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ Compile tested.
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 0c99c34..86405fc 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -1950,6 +1950,7 @@ int telephony_init(void)
- 				AG_FEATURE_ENHANCED_CALL_CONTROL |
- 				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
- 				AG_FEATURE_THREE_WAY_CALLING;
-+	int i;
+ net/bluetooth/bnep/sock.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+index 2862f53..30faaf1 100644
+--- a/net/bluetooth/bnep/sock.c
++++ b/net/bluetooth/bnep/sock.c
+@@ -88,6 +88,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+ 			sockfd_put(nsock);
+ 			return -EBADFD;
+ 		}
++		ca.device[sizeof(ca.device)-1] = 0;
  
- 	DBG("");
- 
-@@ -1981,6 +1982,14 @@ int telephony_init(void)
- 	DBG("telephony-maemo6 registering %s interface on path %s",
- 			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
- 
-+	/* Reset indicators */
-+	for (i = 0; maemo_indicators[i].desc != NULL; i++) {
-+		if (g_str_equal(maemo_indicators[i].desc, "battchg"))
-+			maemo_indicators[i].val = 5;
-+		else
-+			maemo_indicators[i].val = 0;
-+	}
-+
- 	telephony_ready_ind(features, maemo_indicators, BTRH_NOT_SUPPORTED,
- 								chld_str);
- 	if (send_method_call("org.freedesktop.Hal",
+ 		err = bnep_add_connection(&ca, nsock);
+ 		if (!err) {
 -- 
-1.7.1
-
+1.7.0.4
