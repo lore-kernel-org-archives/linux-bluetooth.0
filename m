@@ -1,141 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D5A4625.4060104@atheros.com>
+Date: Tue, 15 Feb 2011 14:53:49 +0530
+From: Bala Shanmugam <sbalashanmugam@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTikhs5uwFgeF0BT_5R_=8sM5Z+eQ_y2kxZ_oWj1V@mail.gmail.com>
-References: <4d59a5ff.859ddc0a.46cb.5143@mx.google.com> <AANLkTikhs5uwFgeF0BT_5R_=8sM5Z+eQ_y2kxZ_oWj1V@mail.gmail.com>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Tue, 15 Feb 2011 10:10:12 -0300
-Message-ID: <AANLkTikEtO+jF-S9SDziueGh1rDUYhYeATT6_g84++0B@mail.gmail.com>
-Subject: Re: [RFC 1/5] Bluetooth: Implement advertising report meta event
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+CC: "dwmw2@infradead.org" <dwmw2@infradead.org>,
+	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] linux-firmware: Add patch and sysconfig files for AR3012.
+References: <1297248851-14996-1-git-send-email-sbalashanmugam@atheros.com>
+In-Reply-To: <1297248851-14996-1-git-send-email-sbalashanmugam@atheros.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for reviewing. I'll add that missing "break", but the other
-tips are not so relevant since we should gain just 2 characters.
+Hi David,
 
-On Mon, Feb 14, 2011 at 7:23 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
+On 2/9/2011 4:24 PM, Shanmugamkamatchi Balashanmugam wrote:
+> Signed-off-by: Bala Shanmugam<sbalashanmugam@atheros.com>
+> ---
+>   WHENCE                       |    9 +++++++++
+>   ar3k/AthrBT_0x01020001.dfu   |  Bin 0 ->  55244 bytes
+>   ar3k/ramps_0x01020001_26.dfu |  Bin 0 ->  1224 bytes
+>   3 files changed, 9 insertions(+), 0 deletions(-)
+>   create mode 100644 ar3k/AthrBT_0x01020001.dfu
+>   create mode 100644 ar3k/ramps_0x01020001_26.dfu
 >
-> Hi Briglia,
+> diff --git a/WHENCE b/WHENCE
+> index 1cbd0a6..2de0bea 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -1534,3 +1534,12 @@ Driver: vt6656 - VIA VT6656 USB wireless driver
+>   File: vntwusb.fw
 >
-> On Mon, Feb 14, 2011 at 6:59 PM,  <anderson.briglia@openbossa.org> wrote:
-> > From: Anderson Briglia <anderson.briglia@openbossa.org>
-> >
-> > This patch implements new LE meta event in order to handle advertising
-> > reports.
-> >
-> > Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-> > ---
-> >  include/net/bluetooth/hci.h |   18 ++++++++++++++++++
-> >  net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
-> >  2 files changed, 40 insertions(+), 0 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 46438f4..5180555 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -980,6 +980,24 @@ struct hci_ev_le_conn_complete {
-> >        __u8     clk_accurancy;
-> >  } __packed;
-> >
-> > +#define ADV_IND                0x00
-> > +#define ADV_DIRECT_IND 0x01
-> > +#define ADV_SCAN_IND   0x02
-> > +#define ADV_NONCONN_IND        0x03
-> > +#define SCAN_RSP       0x04
-> > +
-> > +#define ADDR_DEV_PUBLIC        0x00
-> > +#define ADDR_DEV_RANDOM        0x01
-> > +
-> > +#define HCI_EV_LE_ADVERTISING_REPORT   0x02
-> > +struct hci_ev_le_advertising_info {
-> > +       __u8     evt_type;
-> > +       __u8     bdaddr_type;
-> > +       bdaddr_t bdaddr;
-> > +       __u8     length;
-> > +       __u8     data[0];
-> > +} __packed;
-> > +
-> >  #define HCI_EV_LE_LTK_REQ              0x05
-> >  struct hci_ev_le_ltk_req {
-> >        __le16  handle;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 99c75f4..987f5de 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -2498,6 +2498,25 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
-> >        hci_dev_unlock(hdev);
-> >  }
-> >
-> > +static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
-> > +                                               struct sk_buff *skb)
-> > +{
-> > +       struct hci_ev_le_advertising_info *ev;
-> > +       u8 num_reports, i;
-> > +
-> > +       num_reports = (u8) skb->data[0];
->
-> I think this cast is unnecessary.
->
-> > +
-> > +       ev = (struct hci_ev_le_advertising_info *) (skb->data + 1);
->
-> What about a slightly shorter line (well I didn't count the chars):
->
-> ev = (struct hci_ev_le_advertising_info *) &skb->data[1];
->
-> > +
-> > +       BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-> > +
-> > +       for (i = 1; i < num_reports; i++) {
-> > +               ev = (struct hci_ev_le_advertising_info *)
-> > +                                       (ev->data + ev->length + 1);
-> > +               BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-> > +       }
->
-> What about (not sure if it is shorter, just a suggestion):
->
-> ev = (struct hci_ev_le_advertising_info *) &ev->data[ev->length + 1];
->
-> > +}
-> > +
-> >  static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> >  {
-> >        struct hci_ev_le_meta *le_ev = (void *) skb->data;
-> > @@ -2513,6 +2532,9 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> >                hci_le_ltk_request_evt(hdev, skb);
-> >                break;
-> >
-> > +       case HCI_EV_LE_ADVERTISING_REPORT:
-> > +               hci_le_adv_report_evt(hdev, skb);
-> > +
->
-> missing a "break" here.
->
-> >        default:
-> >                break;
-> >        }
-> > --
-> > 1.7.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >
->
->
->
-> --
-> Anderson Lizardo
-> OpenBossa Labs - INdT
-> Manaus - Brazil
+>   Licence: Redistributable. See LICENCE.via_vt6656 for details.
+> +
+> +--------------------------------------------------------------------------
+> +
+> +Driver: DFU Driver for Atheros bluetooth chipset AR3012
+> +
+> +File: ar3k/AthrBT_0x01020001.dfu
+> +File: ar3k/ramps_0x01020001_26.dfu
+> +
 
+Driver changes for AR3012 have been upstreamed.
+Can you please upstream above patch?
 
-
---
-INdT - Instituto Nokia de tecnologia
-+55 2126 1122
-http://techblog.briglia.net
+Regards,
+Bala.
