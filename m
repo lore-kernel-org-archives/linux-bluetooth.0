@@ -1,65 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC -v2] Bluetooth: add BT_CONNINFO socketopt
-Date: Tue, 15 Feb 2011 11:23:26 -0300
-Message-Id: <1297779806-7165-1-git-send-email-padovan@profusion.mobi>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH 2/2] Add Write Request operation in gatttool
+Date: Tue, 15 Feb 2011 10:16:49 -0400
+Message-Id: <1297779409-32597-2-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1297779409-32597-1-git-send-email-bruna.moreira@openbossa.org>
+References: <1297779409-32597-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ATT needs to know to link key type before run some of it procedures.
-Using the socket sec_level doesn't work because the socket may not reflect
-the real sec_level of the link.
-
-Reported-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Add option and callbacks for Write Request operation in gatttool.
 ---
- include/net/bluetooth/bluetooth.h |    2 ++
- net/bluetooth/l2cap_sock.c        |   11 +++++++++++
- 2 files changed, 13 insertions(+), 0 deletions(-)
+ attrib/gatttool.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 60 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 4375043..dea93df 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -66,6 +66,8 @@ struct bt_security {
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 8e8ed8e..b9f0087 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -63,6 +63,7 @@ static gboolean opt_listen = FALSE;
+ static gboolean opt_char_desc = FALSE;
+ static gboolean opt_le = FALSE;
+ static gboolean opt_char_write = FALSE;
++static gboolean opt_char_write_req = FALSE;
+ static GMainLoop *event_loop;
+ static gboolean got_error = FALSE;
  
- #define BT_FLUSHABLE	8
+@@ -436,6 +437,59 @@ error:
+ 	return FALSE;
+ }
  
-+#define BT_CONNINFO	9
++static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	if (status != 0) {
++		g_printerr("Characteristic Write Request failed: "
++						"%s\n", att_ecode2str(status));
++		goto done;
++	}
 +
- #define BT_FLUSHABLE_OFF	0
- #define BT_FLUSHABLE_ON		1
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 484e717..c249617 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -468,6 +468,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
++	if (!dec_write_resp(pdu, plen)) {
++		g_printerr("Protocol error\n");
++		goto done;
++	}
++
++	g_print("Characteristic value was written sucessfully\n");
++
++done:
++	if (opt_listen == FALSE)
++		g_main_loop_quit(event_loop);
++}
++
++static gboolean characteristics_write_req(gpointer user_data)
++{
++	GAttrib *attrib = user_data;
++	uint8_t *value;
++	size_t len;
++
++	if (opt_handle <= 0) {
++		g_printerr("A valid handle is required\n");
++		goto error;
++	}
++
++	if (opt_value == NULL || opt_value[0] == '\0') {
++		g_printerr("A value is required\n");
++		goto error;
++	}
++
++	len = attr_data_from_string(opt_value, &value);
++	if (len == 0) {
++		g_printerr("Invalid value\n");
++		goto error;
++	}
++
++	gatt_write_char(attrib, opt_handle, value, len, char_write_req_cb,
++									NULL);
++
++	return FALSE;
++
++error:
++	g_main_loop_quit(event_loop);
++	return FALSE;
++}
++
+ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
  {
- 	struct sock *sk = sock->sk;
- 	struct bt_security sec;
-+	struct hci_conn *hconn = (void *)l2cap_pi(sk)->conn;
- 	int len, err = 0;
- 
- 	BT_DBG("sk %p", sk);
-@@ -516,6 +517,16 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 
- 		break;
- 
-+	case BT_CONNINFO:
-+		if (sk->sk_state != BT_CONNECTED) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		if (put_user(hconn->sec_level, (u32 __user *) optval))
-+			err = -EFAULT;
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
+@@ -530,7 +584,10 @@ static GOptionEntry gatt_options[] = {
+ 	{ "char-read", 0, 0, G_OPTION_ARG_NONE, &opt_char_read,
+ 		"Characteristics Value/Descriptor Read", NULL },
+ 	{ "char-write", 0, 0, G_OPTION_ARG_NONE, &opt_char_write,
+-		"Characteristics Value Write", NULL },
++		"Characteristics Value Write Without Response (Write Command)",
++		NULL },
++	{ "char-write-req", 0, 0, G_OPTION_ARG_NONE, &opt_char_write_req,
++		"Characteristics Value Write (Write Request)", NULL },
+ 	{ "char-desc", 0, 0, G_OPTION_ARG_NONE, &opt_char_desc,
+ 		"Characteristics Descriptor Discovery", NULL },
+ 	{ "listen", 0, 0, G_OPTION_ARG_NONE, &opt_listen,
+@@ -602,6 +659,8 @@ int main(int argc, char *argv[])
+ 		callback = characteristics_read;
+ 	else if (opt_char_write)
+ 		callback = characteristics_write;
++	else if (opt_char_write_req)
++		callback = characteristics_write_req;
+ 	else if (opt_char_desc)
+ 		callback = characteristics_desc;
+ 	else {
 -- 
-1.7.4
+1.7.0.4
 
