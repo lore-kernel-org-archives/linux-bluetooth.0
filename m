@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Feb 2011 18:17:38 -0300
+Date: Tue, 15 Feb 2011 18:15:55 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [RFC 2/3] Bluetooth: Add connection parameter update response
-Message-ID: <20110215211738.GF7219@joana>
+Message-ID: <20110215211555.GE7219@joana>
 References: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
  <1297459736-24514-3-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
@@ -34,7 +34,8 @@ Hi Claudio,
 >  net/bluetooth/l2cap_core.c    |   60 ++++++++++++++++++++++++++++++++++++++++-
 >  2 files changed, 74 insertions(+), 1 deletions(-)
 
-This one doesn't apply to my tree. Please rebase.
+Applied, after fix the conflict caused by the changes I did in the previous
+patch. Thanks.
 
 -- 
 Gustavo F. Padovan
