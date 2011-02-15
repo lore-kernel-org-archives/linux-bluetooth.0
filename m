@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D5A4625.4060104@atheros.com>
-Date: Tue, 15 Feb 2011 14:53:49 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-To: Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
-CC: "dwmw2@infradead.org" <dwmw2@infradead.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] linux-firmware: Add patch and sysconfig files for AR3012.
-References: <1297248851-14996-1-git-send-email-sbalashanmugam@atheros.com>
-In-Reply-To: <1297248851-14996-1-git-send-email-sbalashanmugam@atheros.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: Al Cho <alcho.novell@gmail.com>
+From: "Cho, Yu-Chen" <acho@novell.com>
+To: marcel@holtmann.org,
+	padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: acho@novell.com,
+	jlee@novell.com
+Subject: [PATCH] Add Atheros BT AR5BBU12 fw supported
+Date: Tue, 15 Feb 2011 10:20:07 +0800
+Message-Id: <967f2d5b2d6382f4aa698a549d4bfa74f35c171f.1297736230.git.acho@novell.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Add the btusb.c blacklist [0489:e02c] for Atheros AR5BBU12 BT
+and add to ath3k.c supported this device.
 
-On 2/9/2011 4:24 PM, Shanmugamkamatchi Balashanmugam wrote:
-> Signed-off-by: Bala Shanmugam<sbalashanmugam@atheros.com>
-> ---
->   WHENCE                       |    9 +++++++++
->   ar3k/AthrBT_0x01020001.dfu   |  Bin 0 ->  55244 bytes
->   ar3k/ramps_0x01020001_26.dfu |  Bin 0 ->  1224 bytes
->   3 files changed, 9 insertions(+), 0 deletions(-)
->   create mode 100644 ar3k/AthrBT_0x01020001.dfu
->   create mode 100644 ar3k/ramps_0x01020001_26.dfu
->
-> diff --git a/WHENCE b/WHENCE
-> index 1cbd0a6..2de0bea 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -1534,3 +1534,12 @@ Driver: vt6656 - VIA VT6656 USB wireless driver
->   File: vntwusb.fw
->
->   Licence: Redistributable. See LICENCE.via_vt6656 for details.
-> +
-> +--------------------------------------------------------------------------
-> +
-> +Driver: DFU Driver for Atheros bluetooth chipset AR3012
-> +
-> +File: ar3k/AthrBT_0x01020001.dfu
-> +File: ar3k/ramps_0x01020001_26.dfu
-> +
+Signed-off-by: Cho, Yu-Chen <acho@novell.com>
+---
+ drivers/bluetooth/ath3k.c |    3 +++
+ drivers/bluetooth/btusb.c |    3 +++
+ 2 files changed, 6 insertions(+), 0 deletions(-)
 
-Driver changes for AR3012 have been upstreamed.
-Can you please upstream above patch?
-
-Regards,
-Bala.
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 333c212..6dcd55a 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -41,6 +41,9 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03F0, 0x311D) },
++
++	/* Atheros AR5BBU12 with sflash firmware */
++	{ USB_DEVICE(0x0489, 0xE02C) },
+ 	{ }	/* Terminating entry */
+ };
+ 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 664f1cc..b7f2f37 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -105,6 +105,9 @@ static struct usb_device_id blacklist_table[] = {
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+ 
++	/* Atheros AR5BBU12 with sflash firmware */
++	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
++
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = BTUSB_WRONG_SCO_MTU },
+ 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+-- 
+1.7.1
