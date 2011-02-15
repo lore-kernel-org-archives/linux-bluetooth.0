@@ -1,137 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Feb 2011 18:14:51 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/3] Bluetooth: Add LE signaling commands handling
-Message-ID: <20110215211451.GD7219@joana>
-References: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
- <1297459736-24514-2-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297459736-24514-2-git-send-email-claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH -v2] Move HealthManager Interface to "/" path
+Date: Tue, 15 Feb 2011 17:12:01 -0300
+Message-Id: <1297800721-32742-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Yeah, this breaks the API, but health is still disabled by default and it
+is not a good idea create a new path only for it. So moving it to "/"
+---
+ doc/health-api.txt    |    2 +-
+ health/hdp.c          |    6 +++---
+ health/hdp_types.h    |    2 --
+ test/test-health      |    2 +-
+ test/test-health-sink |    2 +-
+ 5 files changed, 6 insertions(+), 8 deletions(-)
 
-* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-02-11 19:28:54 -0200]:
-
-> This patch splits the L2CAP command handling function in order to
-> have a clear separation between the commands related to BR/EDR and
-> LE. Commands and responses in the LE signaling channel are not being
-> handled yet, command reject is sent to all received requests. Bluetooth
-> Core Specification, Volume 3, Part A, section 4 defines the signaling
-> packets formats and allowed commands/responses over the LE signaling
-> channel.
-> 
-> Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> ---
->  include/net/bluetooth/l2cap.h |    2 +
->  net/bluetooth/l2cap_core.c    |  150 +++++++++++++++++++++++++++--------------
->  2 files changed, 100 insertions(+), 52 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 420981c..6aa70e9 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -89,6 +89,8 @@ struct l2cap_conninfo {
->  #define L2CAP_ECHO_RSP		0x09
->  #define L2CAP_INFO_REQ		0x0a
->  #define L2CAP_INFO_RSP		0x0b
-> +#define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
-> +#define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
->  
->  /* L2CAP feature mask */
->  #define L2CAP_FEAT_FLOWCTL	0x00000001
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 0ca54d8..122fc1c 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1435,7 +1435,11 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
->  
->  	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
->  	lh->len = cpu_to_le16(L2CAP_CMD_HDR_SIZE + dlen);
-> -	lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
-> +
-> +	if (conn->hcon->type == LE_LINK)
-> +		lh->cid = cpu_to_le16(L2CAP_CID_LE_SIGNALING);
-> +	else
-> +		lh->cid = cpu_to_le16(L2CAP_CID_SIGNALING);
->  
->  	cmd = (struct l2cap_cmd_hdr *) skb_put(skb, L2CAP_CMD_HDR_SIZE);
->  	cmd->code  = code;
-> @@ -2504,12 +2508,98 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
->  	return 0;
->  }
->  
-> -static inline void l2cap_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
-> +static inline int bredr_sig_cmd(struct l2cap_conn *conn,
-> +			struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *data)
-> +{
-> +	int err = 0;
-> +
-> +	switch (cmd->code) {
-> +	case L2CAP_COMMAND_REJ:
-> +		l2cap_command_rej(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_CONN_REQ:
-> +		err = l2cap_connect_req(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_CONN_RSP:
-> +		err = l2cap_connect_rsp(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_CONF_REQ:
-> +		err = l2cap_config_req(conn, cmd, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_CONF_RSP:
-> +		err = l2cap_config_rsp(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_DISCONN_REQ:
-> +		err = l2cap_disconnect_req(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_DISCONN_RSP:
-> +		err = l2cap_disconnect_rsp(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_ECHO_REQ:
-> +		l2cap_send_cmd(conn, cmd->ident, L2CAP_ECHO_RSP, cmd_len, data);
-> +		break;
-> +
-> +	case L2CAP_ECHO_RSP:
-> +		break;
-> +
-> +	case L2CAP_INFO_REQ:
-> +		err = l2cap_information_req(conn, cmd, data);
-> +		break;
-> +
-> +	case L2CAP_INFO_RSP:
-> +		err = l2cap_information_rsp(conn, cmd, data);
-> +		break;
-> +
-> +	default:
-> +		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
-> +		err = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	return err;
-> +}
-> +
-> +static inline int le_sig_cmd(struct l2cap_conn *conn,
-> +					struct l2cap_cmd_hdr *cmd, u8 *data)
-> +{
-> +	int err;
-
-This var can be removed, I went ahead and removed it for you. Patch is now
-applied. I also added a l2cap_ prefix to the new functions you added.
-
+diff --git a/doc/health-api.txt b/doc/health-api.txt
+index 3d0a717..9d5a54d 100644
+--- a/doc/health-api.txt
++++ b/doc/health-api.txt
+@@ -10,7 +10,7 @@ Health Device Profile hierarchy
+ 
+ Service		org.bluez
+ Interface	org.bluez.HealthManager
+-Object path	/org/bluez/
++Object path	/
+ 
+ Methods:
+ 
+diff --git a/health/hdp.c b/health/hdp.c
+index d4a2a30..ae20a1f 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -290,7 +290,7 @@ static gboolean set_app_path(struct hdp_application *app)
+ 	app->id = get_app_id();
+ 	if (!app->id)
+ 		return FALSE;
+-	app->path = g_strdup_printf(MANAGER_PATH "/health_app_%d", app->id);
++	app->path = g_strdup_printf("/health_app_%d", app->id);
+ 
+ 	return TRUE;
+ };
+@@ -2171,7 +2171,7 @@ int hdp_manager_start(DBusConnection *conn)
+ {
+ 	DBG("Starting Health manager");
+ 
+-	if (!g_dbus_register_interface(conn, MANAGER_PATH,
++	if (!g_dbus_register_interface(conn, "/",
+ 					HEALTH_MANAGER,
+ 					health_manager_methods, NULL, NULL,
+ 					NULL, manager_path_unregister)) {
+@@ -2186,7 +2186,7 @@ int hdp_manager_start(DBusConnection *conn)
+ 
+ void hdp_manager_stop()
+ {
+-	g_dbus_unregister_interface(connection, MANAGER_PATH, HEALTH_MANAGER);
++	g_dbus_unregister_interface(connection, "/", HEALTH_MANAGER);
+ 
+ 	dbus_connection_unref(connection);
+ 	DBG("Stopped Health manager");
+diff --git a/health/hdp_types.h b/health/hdp_types.h
+index 7d23293..466f8c6 100644
+--- a/health/hdp_types.h
++++ b/health/hdp_types.h
+@@ -30,8 +30,6 @@
+ #define HDP_SOURCE_UUID		"00001401-0000-1000-8000-00805F9B34FB"
+ #define HDP_SINK_UUID		"00001402-0000-1000-8000-00805F9B34FB"
+ 
+-#define MANAGER_PATH		"/org/bluez"
+-
+ #define HEALTH_MANAGER		"org.bluez.HealthManager"
+ #define HEALTH_DEVICE		"org.bluez.HealthDevice"
+ #define HEALTH_CHANNEL		"org.bluez.HealthChannel"
+diff --git a/test/test-health b/test/test-health
+index 28cc894..7820a24 100755
+--- a/test/test-health
++++ b/test/test-health
+@@ -47,7 +47,7 @@ def enter_mainloop():
+ 	finally:
+ 		print "Exiting, bye"
+ 
+-hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
++hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+ 						"org.bluez.HealthManager")
+ 
+ role = None
+diff --git a/test/test-health-sink b/test/test-health-sink
+index cb9d434..50eb74c 100755
+--- a/test/test-health-sink
++++ b/test/test-health-sink
+@@ -12,7 +12,7 @@ loop = gobject.MainLoop()
+ 
+ bus = dbus.SystemBus()
+ 
+-hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
++hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+ 						"org.bluez.HealthManager")
+ app_path = hdp_manager.CreateApplication({"DataType": dbus.types.UInt16(4103),
+ 					"Role": "sink"})
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.4
+
