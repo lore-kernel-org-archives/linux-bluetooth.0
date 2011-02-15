@@ -1,29 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Feb 2011 11:14:55 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix not stopping name resolving when discovery is
- suspended
-Message-ID: <20110215141455.GA18768@jh-x301>
-References: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297678882-26893-1-git-send-email-luiz.dentz@gmail.com>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: add BT_CONNINFO socketopt
+Date: Tue, 15 Feb 2011 11:01:29 -0300
+Message-Id: <1297778489-5337-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+ATT needs to know to link key type before run some of it procedures.
+Using the socket sec_level doesn't work because the socket may not reflect
+the real sec_level of the link.
 
-On Mon, Feb 14, 2011, Luiz Augusto von Dentz wrote:
-> During device creation if discovery is active we suspend it to avoid
-> interfering with pairing, but although it attempt to cancel name request
-> there could be one already completed which would cause next name on the
-> list to be requested.
-> ---
->  src/adapter.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+Reported-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ include/net/bluetooth/bluetooth.h |    2 ++
+ net/bluetooth/l2cap_sock.c        |   11 +++++++++++
+ 2 files changed, 13 insertions(+), 0 deletions(-)
 
-All three patches (v2 of 2/3) have been pushed upstream. Thanks.
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 4375043..dea93df 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -66,6 +66,8 @@ struct bt_security {
+ 
+ #define BT_FLUSHABLE	8
+ 
++#define BT_CONNINFO	9
++
+ #define BT_FLUSHABLE_OFF	0
+ #define BT_FLUSHABLE_ON		1
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 484e717..c249617 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -468,6 +468,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct bt_security sec;
++	struct hci_conn *hconn = (void *)l2cap_pi(sk)->conn;
+ 	int len, err = 0;
+ 
+ 	BT_DBG("sk %p", sk);
+@@ -516,6 +517,16 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 
+ 		break;
+ 
++	case BT_CONNINFO:
++		if (sk->sk_state != BT_CONNECTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (put_user(hconn->sec_level, (u32 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+1.7.4
 
-Johan
