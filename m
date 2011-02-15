@@ -1,35 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Feb 2011 18:20:22 -0300
+Date: Tue, 15 Feb 2011 18:17:38 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 3/3] Bluetooth: Send LE Connection Update Command
-Message-ID: <20110215212022.GG7219@joana>
+Subject: Re: [RFC 2/3] Bluetooth: Add connection parameter update response
+Message-ID: <20110215211738.GF7219@joana>
 References: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
- <1297459736-24514-4-git-send-email-claudio.takahasi@openbossa.org>
+ <1297459736-24514-3-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297459736-24514-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1297459736-24514-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Claudio,
 
-* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-02-11 19:28:56 -0200]:
+* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-02-11 19:28:55 -0200]:
 
-> If the new connection update parameter are accepted, the LE master
-> host sends the LE Connection Update Command to its controller informing
-> the new requested parameters.
+> Implements L2CAP Connection Parameter Update Response defined in
+> the Bluetooth Core Specification, Volume 3, Part A, section 4.21.
+> Address the LE Connection Parameter Procedure initiated by the slave.
+> 
+> Connection Interval Minimum and Maximum have the same range: 6 to
+> 3200. Time = N * 1.25ms. Minimum shall be less or equal to Maximum.
+> The Slave Latency field shall have a value in the range of 0 to
+> ((connSupervisionTimeout / connIntervalMax) - 1). Latency field shall
+> be less than 500. connSupervisionTimeout = Timeout Multiplier * 10 ms.
+> Multiplier field shall have a value in the range of 10 to 3200.
 > 
 > Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
 > ---
->  include/net/bluetooth/hci.h      |   11 +++++++++++
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_conn.c         |   20 ++++++++++++++++++++
->  net/bluetooth/l2cap_core.c       |    7 ++++++-
->  4 files changed, 39 insertions(+), 1 deletions(-)
+>  include/net/bluetooth/l2cap.h |   15 ++++++++++
+>  net/bluetooth/l2cap_core.c    |   60 ++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 74 insertions(+), 1 deletions(-)
 
-Actually it is this one that doesn't apply, not 2 of 3.
+This one doesn't apply to my tree. Please rebase.
 
 -- 
 Gustavo F. Padovan
