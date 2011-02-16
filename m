@@ -1,28 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Feb 2011 12:00:32 -0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Date: Wed, 16 Feb 2011 11:54:02 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: ville.tervo@nokia.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add increasing query OFFSET in phonebook_pull_read
-Message-ID: <20110216150032.GA21777@jh-x301>
-References: <1297848855-29991-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Subject: Re: [PATCH v3] Bluetooth: Use proper timer for hci command timout
+Message-ID: <20110216145402.GF14085@joana>
+References: <1297866761-11270-1-git-send-email-ville.tervo@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297848855-29991-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1297866761-11270-1-git-send-email-ville.tervo@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Ville,
 
-On Wed, Feb 16, 2011, Radoslaw Jablonski wrote:
-> It is needed to properly move starting index in tracker
-> for next invocations of phonebook_pull_read - without that
-> pull result for bigger queries (over one part of data) will
-> be wrong (it will include duplicate vcard entries).
+* ville.tervo@nokia.com <ville.tervo@nokia.com> [2011-02-16 16:32:41 +0200]:
+
+> From: Ville Tervo <ville.tervo@nokia.com>
+> 
+> Use proper timer instead of hci command flow control to timeout
+> failed hci commands. Otherwise stack ends up sending commands
+> when flow control is used to block new commands.
+> 
+> 2010-09-01 18:29:41.592132 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:16:CF:E1:C7:D7 mode 2 clkoffset 0x0000
+> 2010-09-01 18:29:41.592681 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
+> 2010-09-01 18:29:51.022033 < HCI Command: Remote Name Request Cancel (0x01|0x001a) plen 6
+>     bdaddr 00:16:CF:E1:C7:D7
+> 
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 > ---
->  plugins/phonebook-tracker.c |   14 ++++++++++++++
->  1 files changed, 14 insertions(+), 0 deletions(-)
+>  include/net/bluetooth/hci.h      |    3 +++
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++------
+>  net/bluetooth/hci_event.c        |    6 ++++++
+>  4 files changed, 26 insertions(+), 7 deletions(-)
 
-Pushed upstream. Thanks.
+Applied to bluetooth-next, thanks.
 
-Johan
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
