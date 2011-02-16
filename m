@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Brian Gix <bgix@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@nokia.com, padovan@profusion.mobi,
-	Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH 1/3] Fixed def of ATT_UUID per BT Assigned Numbers
-Date: Wed, 16 Feb 2011 13:17:59 -0800
-Message-Id: <1297891081-27976-2-git-send-email-bgix@codeaurora.org>
-In-Reply-To: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>
-References: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>
+Cc: johan.hedberg@nokia.com, padovan@profusion.mobi
+Subject: [PATCH 0/3] Modifications composed during UPF38
+Date: Wed, 16 Feb 2011 13:17:58 -0800
+Message-Id: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/sdp.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index 16b59fc..e901b2a 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -55,6 +55,7 @@ extern "C" {
- #define TCS_BIN_UUID	0x0005
- #define TCS_AT_UUID	0x0006
- #define OBEX_UUID	0x0008
-+#define ATT_UUID	0x0007
- #define IP_UUID		0x0009
- #define FTP_UUID	0x000a
- #define HTTP_UUID	0x000c
-@@ -72,7 +73,6 @@ extern "C" {
- #define MCAP_CTRL_UUID	0x001e
- #define MCAP_DATA_UUID	0x001f
- #define L2CAP_UUID	0x0100
--#define ATT_UUID	0x1801
- 
- /*
-  * Service class identifiers of standard services and service groups
+
+The major change in these patches is to register Primary Services
+into the SDP databases as required when registering them
+into the attrib-server's database. The Core v4.0 specification
+indicates that the only valid/foolproof way for a BR/EDR
+client to query a server for Primary Services is to do so via
+an SDP query. This is from Core v4.0, Vol 3, Part G, Sec 4.4:
+
+"GATT service discovery over BR/EDR transport will list services that only run
+over an LE transport and therefore only SDP service discovery shall be used
+on BR/EDR."
+
+This also means that there can be "LE Only" primary services that do NOT
+need to be in the SDP database, so if a valid range is not specified
+when registering a Primary Service, it will be omitted from SDP, and
+only appear when performing a GATT based Primary Service Discover.
+
+Also -- The ATT_UUID we were using was incorrect, and I extended the
+functionality of the gatttool to allow for listening without sending
+anything, and ability to perform both a char-write and char-cmd.
+
+
 -- 
-1.7.1
-
---
 Brian Gix
 bgix@codeaurora.org
 Employee of Qualcomm Innovation Center, Inc.
