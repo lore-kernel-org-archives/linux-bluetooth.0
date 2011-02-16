@@ -1,346 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alan Ott <alan@signal11.us>
-To: Randy Dunlap <rdunlap@xenotime.net>, Alan Ott <alan@signal11.us>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jkosina@suse.cz, ospite@studenti.unina.it,
-	linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Cc: Alan Ott <alan@signal11.us>
-Subject: [PATCH v2 1/1] HID: Documentation for hidraw
-Date: Tue, 15 Feb 2011 22:53:03 -0500
-Message-Id: <1297828383-9527-1-git-send-email-alan@signal11.us>
-Sender: linux-input-owner@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1ADFED1F-912D-4DF9-A3BB-795F9AB1D1F8@gmail.com>
+From: Justin Mattock <justinmattock@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <20110215135245.GA11561@jh-x301>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
+Subject: Re: bluetooth disabled with current 2.6.38-rc4
+Date: Tue, 15 Feb 2011 19:26:12 -0800
+References: <1A8743E5-65EA-4625-82FD-658C9722629F@gmail.com> <20110215135245.GA11561@jh-x301>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Documenation for the hidraw driver, with example program.
 
-Signed-off-by: Alan Ott <alan@signal11.us>
----
+On Feb 15, 2011, at 5:52 AM, Johan Hedberg wrote:
 
- Now that my feature report patches have made it into -next. It seems         
- the time is right for the documentation to go in as well.
+> Hi Justin,
+>
+> On Sun, Feb 13, 2011, Justin Mattock wrote:
+>> maybe I missed something, but my bluetooth is just not functioning  
+>> with
+>> 2.6.38-rc4(works with 2.6.37-rc4)
+>>
+>> I've done a bisect on this, but was pointed to:
+>> c0e45c1ca3162acb2e77b3d9e152ce6e7b6fa3f5
+>> but doesn't look correct to me
+>>
+>> here is what I am seeing with the bluetooth-applet etc..:
+>>
+>> working correctly:
+>> http://www.flickr.com/photos/44066293@N08/5443727238/
+>>
+>> not working:
+>> http://www.flickr.com/photos/44066293@N08/5443124859/
+>>
+>> my /var/log/daemon.log shows:
+>>
+>> Feb 13 17:12:22 Linux-2 acpid: 1 client rule loaded
+>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 registered
+>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Listening for HCI events
+>> on hci0
+>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 up
+>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Unable to find matching
+>> adapter
+>>
+>> I can try at another bisect, but might take some time.. let me know
+>> if there is something I can test
+>> or do.
+>
+> Are you sure this is a kernel problem? There was a similar issue with
+> BlueZ 4.86 or 4.87 which was already fixed. Could you try with 4.88?
+>
+> Johan
+
+o.k. I built 4.88 and still had the issue show up, except this time no  
+icon(instead of the icon, that is not lit up)..
 
 
- Documentation/hid/Makefile      |    8 ++
- Documentation/hid/hid-example.c |  167 +++++++++++++++++++++++++++++++++++++++
- Documentation/hid/hidraw.txt    |  119 ++++++++++++++++++++++++++++
- 3 files changed, 294 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/hid/Makefile
- create mode 100644 Documentation/hid/hid-example.c
- create mode 100644 Documentation/hid/hidraw.txt
+anyways I did do another bisect and had better results(hopefully)this  
+time..:
 
-diff --git a/Documentation/hid/Makefile b/Documentation/hid/Makefile
-new file mode 100644
-index 0000000..7811cb0
---- /dev/null
-+++ b/Documentation/hid/Makefile
-@@ -0,0 +1,8 @@
-+# kbuild trick to avoid linker error. Can be omitted if a module is built.
-+obj- := dummy.o
-+
-+# List of programs to build
-+hostprogs-y := hid-example
-+
-+# Tell kbuild to always build the programs
-+always := $(hostprogs-y)
-diff --git a/Documentation/hid/hid-example.c b/Documentation/hid/hid-example.c
-new file mode 100644
-index 0000000..40e3d62
---- /dev/null
-+++ b/Documentation/hid/hid-example.c
-@@ -0,0 +1,167 @@
-+/*
-+ * Hidraw Userspace Example
-+ *
-+ * Copyright (c) 2010 Alan Ott <alan@signal11.us>
-+ * Copyright (c) 2010 Signal 11 Software
-+ *
-+ * The code may be used by anyone for any purpose,
-+ * and can serve as a starting point for developing
-+ * applications using hidraw.
-+ */
-+
-+/* Linux */
-+#include <linux/types.h>
-+#include <linux/input.h>
-+#include <linux/hidraw.h>
-+
-+/* Unix */
-+#include <sys/ioctl.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+
-+/* C */
-+#include <stdio.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+
-+const char *bus_str(int bus);
-+
-+int main(int argc, char **argv)
-+{
-+	int fd;
-+	int i, res, desc_size = 0;
-+	char buf[256];
-+	struct hidraw_report_descriptor rpt_desc;
-+	struct hidraw_devinfo info;
-+
-+	/* Open the Device with non-blocking reads. In real life,
-+	   don't use a hard coded path; use libudev instead. */
-+	fd = open("/dev/hidraw0", O_RDWR|O_NONBLOCK);
-+
-+	if (fd < 0) {
-+		perror("Unable to open device");
-+		return 1;
-+	}
-+
-+	memset(&rpt_desc, 0x0, sizeof(rpt_desc));
-+	memset(&info, 0x0, sizeof(info));
-+	memset(buf, 0x0, sizeof(buf));
-+
-+	/* Get Report Descriptor Size */
-+	res = ioctl(fd, HIDIOCGRDESCSIZE, &desc_size);
-+	if (res < 0)
-+		perror("HIDIOCGRDESCSIZE");
-+	else
-+		printf("Report Descriptor Size: %d\n", desc_size);
-+
-+	/* Get Report Descriptor */
-+	rpt_desc.size = desc_size;
-+	res = ioctl(fd, HIDIOCGRDESC, &rpt_desc);
-+	if (res < 0) {
-+		perror("HIDIOCGRDESC");
-+	} else {
-+		printf("Report Descriptor:\n");
-+		for (i = 0; i < rpt_desc.size; i++)
-+			printf("%hhx ", rpt_desc.value[i]);
-+		puts("\n");
-+	}
-+
-+	/* Get Raw Name */
-+	res = ioctl(fd, HIDIOCGRAWNAME(256), buf);
-+	if (res < 0)
-+		perror("HIDIOCGRAWNAME");
-+	else
-+		printf("Raw Name: %s\n", buf);
-+
-+	/* Get Physical Location */
-+	res = ioctl(fd, HIDIOCGRAWPHYS(256), buf);
-+	if (res < 0)
-+		perror("HIDIOCGRAWPHYS");
-+	else
-+		printf("Raw Phys: %s\n", buf);
-+
-+	/* Get Raw Info */
-+	res = ioctl(fd, HIDIOCGRAWINFO, &info);
-+	if (res < 0) {
-+		perror("HIDIOCGRAWINFO");
-+	} else {
-+		printf("Raw Info:\n");
-+		printf("\tbustype: %d (%s)\n",
-+			info.bustype, bus_str(info.bustype));
-+		printf("\tvendor: 0x%04hx\n", info.vendor);
-+		printf("\tproduct: 0x%04hx\n", info.product);
-+	}
-+
-+	/* Set Feature */
-+	buf[0] = 0x9; /* Report Number */
-+	buf[1] = 0xff;
-+	buf[2] = 0xff;
-+	buf[3] = 0xff;
-+	res = ioctl(fd, HIDIOCSFEATURE(4), buf);
-+	if (res < 0)
-+		perror("HIDIOCSFEATURE");
-+	else
-+		printf("ioctl HIDIOCGFEATURE returned: %d\n", res);
-+
-+	/* Get Feature */
-+	buf[0] = 0x9; /* Report Number */
-+	res = ioctl(fd, HIDIOCGFEATURE(256), buf);
-+	if (res < 0) {
-+		perror("HIDIOCGFEATURE");
-+	} else {
-+		printf("ioctl HIDIOCGFEATURE returned: %d\n", res);
-+		printf("Report data (not containing the report number):\n\t");
-+		for (i = 0; i < res; i++)
-+			printf("%hhx ", buf[i]);
-+		puts("\n");
-+	}
-+
-+	/* Send a Report to the Device */
-+	buf[0] = 0x1; /* Report Number */
-+	buf[1] = 0x77;
-+	res = write(fd, buf, 2);
-+	if (res < 0) {
-+		printf("Error: %d\n", errno);
-+		perror("write");
-+	} else {
-+		printf("write() wrote %d bytes\n", res);
-+	}
-+
-+	/* Get a report from the device */
-+	res = read(fd, buf, 16);
-+	if (res < 0) {
-+		perror("read");
-+	} else {
-+		printf("read() read %d bytes:\n\t", res);
-+		for (i = 0; i < res; i++)
-+			printf("%hhx ", buf[i]);
-+		puts("\n");
-+	}
-+	close(fd);
-+	return 0;
-+}
-+
-+const char *
-+bus_str(int bus)
-+{
-+	switch (bus) {
-+	case BUS_USB:
-+		return "USB";
-+		break;
-+	case BUS_HIL:
-+		return "HIL";
-+		break;
-+	case BUS_BLUETOOTH:
-+		return "Bluetooth";
-+		break;
-+	case BUS_VIRTUAL:
-+		return "Virtual";
-+		break;
-+	default:
-+		return "Other";
-+		break;
-+	}
-+}
-diff --git a/Documentation/hid/hidraw.txt b/Documentation/hid/hidraw.txt
-new file mode 100644
-index 0000000..2e0d39a
---- /dev/null
-+++ b/Documentation/hid/hidraw.txt
-@@ -0,0 +1,119 @@
-+      HIDRAW - Raw Access to USB and Bluetooth Human Interface Devices
-+     ==================================================================
-+
-+The hidraw driver provides a raw interface to USB and Bluetooth Human
-+Interface Devices (HIDs).  It differs from hiddev in that reports sent and
-+received are not parsed by the HID parser, but are sent to and received from
-+the device unmodified.
-+
-+Hidraw should be used if the userspace application knows exactly how to
-+communicate with the hardware device, and is able to construct the HID
-+reports manually.  This is often the case when making userspace drivers for
-+custom HID devices.
-+
-+Hidraw is also useful for communicating with non-conformant HID devices
-+which send and receive data in a way that is inconsistent with their report
-+descriptors.  Because hiddev parses reports which are sent and received
-+through it, checking them against the device's report descriptor, such
-+communication with these non-conformant devices is impossible using hiddev.
-+Hidraw is the only alternative, short of writing a custom kernel driver, for
-+these non-conformant devices.
-+
-+A benefit of hidraw is that its use by userspace applications is independent
-+of the underlying hardware type.  Currently, Hidraw is implemented for USB
-+and Bluetooth.  In the future, as new hardware bus types are developed which
-+use the HID specification, hidraw will be expanded to add support for these
-+new bus types.
-+
-+Hidraw uses a dynamic major number, meaning that udev should be relied on to
-+create hidraw device nodes.  Udev will typically create the device nodes
-+directly under /dev (eg: /dev/hidraw0).  As this location is distribution-
-+and udev rule-dependent, applications should use libudev to locate hidraw
-+devices attached to the system.  There is a tutorial on libudev with a
-+working example at:
-+	http://www.signal11.us/oss/udev/
-+
-+The HIDRAW API
-+---------------
-+
-+read()
-+-------
-+read() will read a queued report received from the HID device. On USB
-+devices, the reports read using read() are the reports sent from the device
-+on the INTERRUPT IN endpoint.  By default, read() will block until there is
-+a report available to be read.  read() can be made non-blocking, by passing
-+the O_NONBLOCK flag to open(), or by setting the O_NONBLOCK flag using
-+fcntl().
-+
-+On a device which uses numbered reports, the first byte of the returned data
-+will be the report number; the report data follows, beginning in the second
-+byte.  For devices which do not use numbered reports, the report data
-+will begin at the first byte.
-+
-+write()
-+--------
-+The write() function will write a report to the device. For USB devices, if
-+the device has an INTERRUPT OUT endpoint, the report will be sent on that
-+endpoint. If it does not, the report will be sent over the control endpoint,
-+using a SET_REPORT transfer.
-+
-+The first byte of the buffer passed to write() should be set to the report
-+number.  If the device does not use numbered reports, the first byte should
-+be set to 0. The report data itself should begin at the second byte.
-+
-+ioctl()
-+--------
-+Hidraw supports the following ioctls:
-+
-+HIDIOCGRDESCSIZE: Get Report Descriptor Size
-+This ioctl will get the size of the device's report descriptor.
-+
-+HIDIOCGRDESC: Get Report Descriptor
-+This ioctl returns the device's report descriptor using a
-+hidraw_report_descriptor struct.  Make sure to set the size field of the
-+hidraw_report_descriptor struct to the size returned from HIDIOCGRDESCSIZE.
-+
-+HIDIOCGRAWINFO: Get Raw Info
-+This ioctl will return a hidraw_devinfo struct containing the bus type, the
-+vendor ID (VID), and product ID (PID) of the device. The bus type can be one
-+of:
-+	BUS_USB
-+	BUS_HIL
-+	BUS_BLUETOOTH
-+	BUS_VIRTUAL
-+which are defined in linux/input.h.
-+
-+HIDIOCGRAWNAME(len): Get Raw Name
-+This ioctl returns a string containing the vendor and product strings of
-+the device.  The returned string is Unicode, UTF-8 encoded.
-+
-+HIDIOCGRAWPHYS(len): Get Physical Address
-+This ioctl returns a string representing the physical address of the device.
-+For USB devices, the string contains the physical path to the device (the
-+USB controller, hubs, ports, etc).  For Bluetooth devices, the string
-+contains the hardware (MAC) address of the device.
-+
-+HIDIOCSFEATURE(len): Send a Feature Report
-+This ioctl will send a feature report to the device.  Per the HID
-+specification, feature reports are always sent using the control endpoint.
-+Set the first byte of the supplied buffer to the report number.  For devices
-+which do not use numbered reports, set the first byte to 0. The report data
-+begins in the second byte. Make sure to set len accordingly, to one more
-+than the length of the report (to account for the report number).
-+
-+HIDIOCGFEATURE(len): Get a Feature Report
-+This ioctl will request a feature report from the device using the control
-+endpoint.  The first byte of the supplied buffer should be set to the report
-+number of the requested report.  For devices which do not use numbered
-+reports, set the first byte to 0.  The report will be returned starting at
-+the first byte of the buffer (ie: the report number is not returned).
-+
-+Example
-+---------
-+In this directory, find hid-example.c, which shows examples of read(),
-+write(), and all the ioctls for hidraw.  The code may be used by anyone for
-+any purpose, and can serve as a starting point for developing applications
-+using hidraw.
-+
-+Document by:
-+	Alan Ott <alan@signal11.us>, Signal 11 Software
--- 
-1.7.0.4
+23bb57633df97ede067ea26f3cdc8a7ba2cd8109 is the first bad commit
+commit 23bb57633df97ede067ea26f3cdc8a7ba2cd8109
+Author: Johan Hedberg <johan.hedberg@nokia.com>
+Date:   Tue Dec 21 23:01:27 2010 +0200
 
+    Bluetooth: Fix __hci_request synchronization for hci_open_dev
+
+    The initialization function used by hci_open_dev (hci_init_req)  
+sends
+    many different HCI commands. The __hci_request function should only
+    return when all of these commands have completed (or a timeout  
+occurs).
+    Several of these commands cause hci_req_complete to be called which
+    causes __hci_request to return prematurely.
+
+    This patch fixes the issue by adding a new hdev->req_last_cmd  
+variable
+    which is set during the initialization procedure. The  
+hci_req_complete
+    function will no longer mark the request as complete until the  
+command
+    matching hdev->req_last_cmd completes.
+
+    Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+    Acked-by: Marcel Holtmann <marcel@holtmann.org>
+    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+
+:040000 040000 e8d8ae5fab74b2ba73d0c52e7e09b30e5df8484e  
+8d1409e8dc2206492cb86e8848c8c23aff182e2a M      include
+:040000 040000 07fdb5f6ceadcfde12c46a3b5c82937b7dac892c  
+8f3b08fbbc9fcd078d0f5224b8bc818eeb072dc4 M      net
+
+
+
+git bisect log
+git bisect start
+# bad: [c56eb8fb6dccb83d9fe62fd4dc00c834de9bc470] Linux 2.6.38-rc1
+git bisect bad c56eb8fb6dccb83d9fe62fd4dc00c834de9bc470
+# good: [d9a1abe4844e7591cd82e167a1a09e6546f6c45e] arch/mn10300/kernel/ 
+irq.c: fix build
+git bisect good d9a1abe4844e7591cd82e167a1a09e6546f6c45e
+# bad: [76d9cc454a8d0bb7484616a4b8136280068c8a8b] spi: tegra: don't  
+treat NULL clk as an error
+git bisect bad 76d9cc454a8d0bb7484616a4b8136280068c8a8b
+# bad: [f70f5b9dc74ca7d0a64c4ead3fb28da09dc1b234] Merge git:// 
+git.kernel.org/pub/scm/linux/kernel/git/davem/sparc-next-2.6
+git bisect bad f70f5b9dc74ca7d0a64c4ead3fb28da09dc1b234
+# good: [1d212aa96e1b63459486f729af9a3fa38768b801] Merge branch  
+'master' of git://git.kernel.org/pub/scm/linux/kernel/git/linville/ 
+wireless-next-2.6 into for-davem
+git bisect good 1d212aa96e1b63459486f729af9a3fa38768b801
+# bad: [4e3dbdb1392a83bd21a6ff8f6bc785495058d37c] cassini: Use local- 
+mac-address prom property for Cassini MAC address
+git bisect bad 4e3dbdb1392a83bd21a6ff8f6bc785495058d37c
+# good: [65a6538a56d4c7ae8465f2a8420ddc65877b6779] mac80211: check for  
+CONFIG_MAC80211_LEDS in the tpt_led_trigger declaration
+git bisect good 65a6538a56d4c7ae8465f2a8420ddc65877b6779
+# good: [dbbe68bb12b34f3e450da7a73c20e6fa1f85d63a] Merge branch  
+'master' of master.kernel.org:/pub/scm/linux/kernel/git/davem/net-2.6
+git bisect good dbbe68bb12b34f3e450da7a73c20e6fa1f85d63a
+# bad: [c9e57f0fdccf74ef7884fed61d212e524b9c4bcd] carl9170: add  
+missing return-value check
+git bisect bad c9e57f0fdccf74ef7884fed61d212e524b9c4bcd
+# good: [a3463a1fdc9aa0881760e54efbd62742275601a5] rndis_wlan: remove  
+unused variable from priv structure
+git bisect good a3463a1fdc9aa0881760e54efbd62742275601a5
+# bad: [17f9cc3124c97f50a19a7597e5f29f915b5b835c] Bluetooth: Improve  
+handling of HCI control channel in bind
+git bisect bad 17f9cc3124c97f50a19a7597e5f29f915b5b835c
+# good: [e41d8b4e131a41f2a3b74aaa783b16aa46376d8e] Bluetooth: Add  
+error handling for managment command handlers
+git bisect good e41d8b4e131a41f2a3b74aaa783b16aa46376d8e
+# good: [f7b64e69c7c75c8e9f2d5e23edec8de1ce883bcc] Bluetooth: Add  
+read_info management command
+git bisect good f7b64e69c7c75c8e9f2d5e23edec8de1ce883bcc
+# bad: [23bb57633df97ede067ea26f3cdc8a7ba2cd8109] Bluetooth: Fix  
+__hci_request synchronization for hci_open_dev
+git bisect bad 23bb57633df97ede067ea26f3cdc8a7ba2cd8109
+# good: [c71e97bfaadfa727669fcfcf12301744fd169091] Bluetooth: Add  
+management events for controller addition & removal
+git bisect good c71e97bfaadfa727669fcfcf12301744fd169091
+
+
+reverting that commit gets the icon to show up, as well as the mouse  
+to connect..
+(hardware is a MacBookPro2,2 and the mouse is a mightmouse) let me  
+know if there is anything I can supply
+
+Justin P. Mattock
 
