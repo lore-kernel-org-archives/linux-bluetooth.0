@@ -1,43 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Feb 2011 16:56:03 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
-To: Alan Ott <alan@signal11.us>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jkosina@suse.cz,
-	ospite@studenti.unina.it, linux-input@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, bgood@velocity.net
-Subject: Re: [PATCH v4 1/2] HID: Documentation for hidraw
-Message-Id: <20110216165603.fe8c342d.rdunlap@xenotime.net>
-In-Reply-To: <4D5C202B.5030403@signal11.us>
-References: <1297829209-10511-1-git-send-email-alan@signal11.us>
-	<1297829209-10511-2-git-send-email-alan@signal11.us>
-	<20110216071200.02ccdaa5@bike.lwn.net>
-	<4D5C202B.5030403@signal11.us>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Wed, 16 Feb 2011 20:15:01 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3 v2] Bluetooth: Send LE Connection Update Command
+Message-ID: <20110216231501.GJ14085@joana>
+References: <AANLkTinJmoaepBp+C6VnXSZ1P06CNYzJwJiTFJ7bAFDm@mail.gmail.com>
+ <1297896293-6057-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1297896293-6057-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 16 Feb 2011 14:06:19 -0500 Alan Ott wrote:
+Hi Claudio,
 
-> On 02/16/2011 09:12 AM, Jonathan Corbet wrote:
-> >>   Documentation/hid/Makefile      |    8 ++
-> >>   Documentation/hid/hid-example.c |  167 +++++++++++++++++++++++++++++++++++++++
-> >>      
-> > I believe we're trying to get code - especially runnable code - out of the
-> > Documentation tree.  Should this go under samples/ or, if it's useful
-> > enough, under tools/?
-> >    
+* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-02-16 20:44:53 -0200]:
+
+> If the new connection update parameter are accepted, the LE master
+> host sends the LE Connection Update Command to its controller informing
+> the new requested parameters.
 > 
-> Hi Jon,
-> 
-> Not a problem. I'd say samples/ over tools/ for this stuff. I'll re-spin 
-> and re-submit.
+> Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+> ---
+>  include/net/bluetooth/hci.h      |   11 +++++++++++
+>  include/net/bluetooth/hci_core.h |    2 ++
+>  net/bluetooth/hci_conn.c         |   20 ++++++++++++++++++++
+>  net/bluetooth/l2cap_core.c       |    8 +++++++-
+>  4 files changed, 40 insertions(+), 1 deletions(-)
 
-and then
-Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+Applied, thanks.
 
-Thanks.
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
