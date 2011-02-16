@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] telephony-maemo6: fix not cleaning up active calls list on exit
-Date: Wed, 16 Feb 2011 16:37:18 +0200
-Message-Id: <1297867038-7221-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 16 Feb 2011 07:12:00 -0700
+From: Jonathan Corbet <corbet@lwn.net>
+To: Alan Ott <alan@signal11.us>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jkosina@suse.cz,
+	ospite@studenti.unina.it, linux-input@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, bgood@velocity.net
+Subject: Re: [PATCH v4 1/2] HID: Documentation for hidraw
+Message-ID: <20110216071200.02ccdaa5@bike.lwn.net>
+In-Reply-To: <1297829209-10511-2-git-send-email-alan@signal11.us>
+References: <1297829209-10511-1-git-send-email-alan@signal11.us>
+	<1297829209-10511-2-git-send-email-alan@signal11.us>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+On Tue, 15 Feb 2011 23:06:48 -0500
+Alan Ott <alan@signal11.us> wrote:
 
-This can cause problem if the adapter is reset in the middle of a call
-the indicators won't be update properly.
----
- audio/telephony-maemo6.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+>  Documentation/hid/Makefile      |    8 ++
+>  Documentation/hid/hid-example.c |  167 +++++++++++++++++++++++++++++++++++++++
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index dfa06d9..bf1e0c4 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -2028,6 +2028,9 @@ void telephony_exit(void)
- 	g_free(last_dialed_number);
- 	last_dialed_number = NULL;
- 
-+	g_slist_free(active_calls);
-+	active_calls = NULL;
-+
- 	g_slist_foreach(calls, (GFunc) csd_call_free, NULL);
- 	g_slist_free(calls);
- 	calls = NULL;
--- 
-1.7.1
+I believe we're trying to get code - especially runnable code - out of the
+Documentation tree.  Should this go under samples/ or, if it's useful
+enough, under tools/?
 
+Thanks,
+
+jon
