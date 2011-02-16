@@ -1,130 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D5BFAB8.7030608@codeaurora.org>
-Date: Wed, 16 Feb 2011 08:26:32 -0800
+Message-ID: <4D5BF2E1.6070102@codeaurora.org>
+Date: Wed, 16 Feb 2011 07:53:05 -0800
 From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 CC: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com,
 	padovan@profusion.mobi
-Subject: Re: [PATCH 2/3] Add SDP registration of Primary GATT services
-References: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>	<1297891081-27976-3-git-send-email-bgix@codeaurora.org> <AANLkTikCnorqDid1cRYmCm=-Jq04K67wJOHpOdWE8Pn+@mail.gmail.com>
-In-Reply-To: <AANLkTikCnorqDid1cRYmCm=-Jq04K67wJOHpOdWE8Pn+@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Add gatttool enhancements for UPF
+References: <1297891081-27976-1-git-send-email-bgix@codeaurora.org>	<1297891081-27976-4-git-send-email-bgix@codeaurora.org> <AANLkTi=dwj0Bc_509JW8-HfkYBfzmfSzR0GJxNqoLXye@mail.gmail.com>
+In-Reply-To: <AANLkTi=dwj0Bc_509JW8-HfkYBfzmfSzR0GJxNqoLXye@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Anderson,
 
-On 2/14/2011 1:53 PM, Anderson Lizardo wrote:
+The modifications to gatttool were largely organic in nature and on the 
+fly responses to the needs of my UPF testing. Also, it is of course just 
+a test tool.
+
+More inline.
+
+On 2/14/2011 1:41 PM, Anderson Lizardo wrote:
+> Hi Brian,
+>
 > On Wed, Feb 16, 2011 at 6:18 PM, Brian Gix<bgix@codeaurora.org>  wrote:
->> SDP registration can be supressed by passing Zero as the end
->> handle argument to attrib_db_add().
->> ---
->>   attrib/example.c    |  119 +++++++++++++++++++++++++++++++------------
->>   src/attrib-server.c |  139 +++++++++++++++++++++++++++++++++++----------------
->>   src/attrib-server.h |    6 ++-
->>   3 files changed, 184 insertions(+), 80 deletions(-)
+>> @@ -90,9 +91,9 @@ static GIOChannel *do_connect(gboolean le)
 >>
->> diff --git a/attrib/example.c b/attrib/example.c
->> index 1911912..eab3c0f 100644
->> --- a/attrib/example.c
->> +++ b/attrib/example.c
->> @@ -31,6 +31,7 @@
->>
->>   #include<bluetooth/sdp.h>
->>   #include<bluetooth/sdp_lib.h>
->> +#include<src/sdpd.h>
->>
->>   #include<glib.h>
->>
->> @@ -59,6 +60,9 @@
->>   #define FMT_KILOGRAM_UUID              0xA010
->>   #define FMT_HANGING_UUID               0xA011
->>
->> +#define SDP_RECORD_COUNT 10
->> +sdp_record_t *sdp_records[SDP_RECORD_COUNT];
->> +
->>   static int register_attributes(void)
->>   {
->>         const char *desc_out_temp = "Outside Temperature";
->> @@ -77,59 +81,73 @@ static int register_attributes(void)
->>         uint8_t atval[256];
->>         uuid_t uuid;
->>         int len;
->> +       int i = 0;
->>
->>         /* Battery state service: primary service definition */
->>         sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
->>         att_put_u16(BATTERY_STATE_SVC_UUID,&atval[0]);
->> -       attrib_db_add(0x0100,&uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
->> +       sdp_records[i++] = attrib_db_add(0x0100, 0x0111,&uuid,
->> +                                               "Battery State Service",
->> +                                               ATT_NONE, ATT_NOT_PERMITTED,
->> +                                               atval, 2);
+>>         /* This check is required because currently setsockopt() returns no
+>>          * errors for MTU values smaller than the allowed minimum. */
+>> -       if (opt_mtu != 0&&  opt_mtu<  ATT_MIN_MTU_L2CAP) {
+>> +       if (opt_mtu != 0&&  opt_mtu<  23) {
+>>                 g_printerr("MTU cannot be smaller than %d\n",
+>> -                                                       ATT_MIN_MTU_L2CAP);
+>> +                                                       23);
+>>                 return NULL;
+>>         }
 >
-> What if instead of changing attrib_db_add() signature to return a SDP
-> record, you create a "sdp_record_from_attrib()" for this purpose? This
-> function could get the struct attribute * pointers for start/end.
->
-> There are plans for attrib_db_add() to return the created struct
-> attribute *a (as shown in a patch I sent sometime ago which I still
-> need to resend), I can send an updated version of that patch if you
-> agree to this approach.
+> The changes above seem unrelated to this patch.
 
-I was considering an approach like this during UPF but abandoned it for 
-lack of time. There are few hours available to make hot fixes during 
-these events, and I just learned of the requirement for SDP records in 
-"real time".
-
-However, here are the issues as I see them:
-
-1. We currently register everything into the attribute database a single 
-attribute at a time.  The current attrib_db_add therefore has no 
-inherent knowledge of entire "Service" objects, and lacks the start-end 
-range that is required not only by the SDP record, but also the ATT 
-driven GATT Service Discovery. Ideally I would like to see a "Register 
-Service" API which internally would register all INCLUDES, 
-CHARACTERISTICS, and SDP Records, but this would be a significant 
-departure from the current code.
-
-2. A less significant change would be to create an 
-sdp_record_from_attrib() API, but it would need to be called after all 
-attributes for the service have been registered, because it needs to 
-calculate the "end" handle of the service, much like the current GATT 
-procedures to Discover and Find Services. This would probably constitute 
-the "least change necessary" to the current paradigm.
-
-3. I'm not sure that the "struct attrib *a" would add anything here, 
-except as a way to prevent having to explicitly specify the attribute 
-handle value in the first place.  We should eventually get away from 
-specifying explicit attribute handle values, because that makes it hard 
-to have mix-and-match services.  A service app writer should not be 
-expected to know the remaining 0-65535 "number space" that is available 
-on every device that they want to target there service app to.  In that 
-respect, having attrib_db_add assign an available handle, and return a 
-"struct attrib *" pointer could then be used instead of a handle when 
-registering the SDP of a completely registered primary service.
-
-
-I propose that I change this patch set to follow plan "2" above.  If you 
-want to subsequently change the return of attrib_db_add() as you have 
-described, it should then be trivial to change the arguments to the new 
-sdp_record_from_attrib() API to accept the attrib struct pointer rather 
-than the explicit start handle.
-
+The code was incorrect in that it limited it to 48 instead of 23. 
+However, I should have used the ATT_MIN_MTU_LE define. This will be fixed.
 
 >
->> @@ -609,7 +603,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
->>   static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
->>                 uint8_t *pdu, int len)
->>   {
->> -       channel->mtu = MIN(mtu, ATT_MAX_MTU);
->> +       channel->mtu = MIN(mtu, channel->mtu);
 >>
->>         return enc_mtu_resp(channel->mtu, pdu, len);
+>> @@ -277,6 +278,14 @@ static gboolean characteristics(gpointer user_data)
+>>         return FALSE;
 >>   }
+>>
+>> +static void char_write_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>> +                                                       gpointer user_data)
+>> +{
+>> +       if (plen == 1)
+>> +               g_print("Attrib Write Succeeded\n");
+>> +       else
+>> +               g_printerr("Attrib Write failed: %s\n", att_ecode2str(status));
 >
-> This change looks unrelated to the patch.
+> Why not check by the status instead of plen ?
+
+During testing, it was apparent that status did not contain Zero. This 
+may be due to there being no status octet in the WRITE_RSP packet. I 
+didn't have time to trace this back into the gatt code, but will do so now.
+
+>
+> Also, I'd suggest "Characteristic write" instead of "Attrib Write".
+>
+>> +}
+>>   static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                                                         gpointer user_data)
+>>   {
+>> @@ -427,7 +436,40 @@ static gboolean characteristics_write(gpointer user_data)
+>>                 goto error;
+>>         }
+>>
+>> +       gatt_write_char(attrib, opt_handle, value, len, char_write_cb, value);
+>> +       gatt_read_char(attrib, opt_handle, char_read_cb, attrib);
+>
+> Why both read and write ?
+
+I needed to do this to confirm that the write actually succeeded within 
+the bounds of the testing, which included not dropping the connection 
+between the two procedures. This will not be needed for the forthcoming 
+interactive gatttool, but that was not available for UPF.  As it is, I 
+would argue that this is more useful in a test tool than superfluous.
+
+>
+>> +
+>> +       return FALSE;
+>> +
+>> +error:
+>> +       g_main_loop_quit(event_loop);
+>> +       return FALSE;
+>> +}
+>> +
+>> +static gboolean characteristics_cmd(gpointer user_data)
+>> +{
+>> +       GAttrib *attrib = user_data;
+>> +       uint8_t *value;
+>> +       size_t len;
+>> +
+>> +       if (opt_handle<= 0) {
+>> +               g_printerr("A valid handle is required\n");
+>> +               goto error;
+>> +       }
+>> +
+>> +       if (opt_value == NULL || opt_value[0] == '\0') {
+>> +               g_printerr("A value is required\n");
+>> +               goto error;
+>> +       }
+>> +
+>> +       len = attr_data_from_string(opt_value,&value);
+>> +       if (len == 0) {
+>> +               g_printerr("Invalid value\n");
+>> +               goto error;
+>> +       }
+>> +
+>>         gatt_write_cmd(attrib, opt_handle, value, len, mainloop_quit, value);
+>> +       gatt_read_char(attrib, opt_handle, char_read_cb, attrib);
+>
+> Same question here.
+
+Same response here.
+
+>
+>>
+>>         return FALSE;
+>>
+>> @@ -531,6 +573,8 @@ static GOptionEntry gatt_options[] = {
+>>                 "Characteristics Value/Descriptor Read", NULL },
+>>         { "char-write", 0, 0, G_OPTION_ARG_NONE,&opt_char_write,
+>>                 "Characteristics Value Write", NULL },
+>> +       { "char-cmd", 0, 0, G_OPTION_ARG_NONE,&opt_char_cmd,
+>> +               "Characteristics Value Cmd", NULL },
+>
+> Suggestion:  "Characteristic Value write using Write Command" (or
+> something similar).
+>
+>>         { "char-desc", 0, 0, G_OPTION_ARG_NONE,&opt_char_desc,
+>>                 "Characteristics Descriptor Discovery", NULL },
+>>         { "listen", 0, 0, G_OPTION_ARG_NONE,&opt_listen,
+>> @@ -561,7 +605,7 @@ int main(int argc, char *argv[])
+>>         GError *gerr = NULL;
+>>         GAttrib *attrib;
+>>         GIOChannel *chan;
+>> -       GSourceFunc callback;
+>> +       GSourceFunc callback = NULL;
+>>
+>>         context = g_option_context_new(NULL);
+>>         g_option_context_add_main_entries(context, options, NULL);
+>> @@ -602,9 +646,11 @@ int main(int argc, char *argv[])
+>>                 callback = characteristics_read;
+>>         else if (opt_char_write)
+>>                 callback = characteristics_write;
+>> +       else if (opt_char_cmd)
+>> +               callback = characteristics_cmd;
+>>         else if (opt_char_desc)
+>>                 callback = characteristics_desc;
+>> -       else {
+>> +       else if (!opt_listen) {
+>>                 gchar *help = g_option_context_get_help(context, TRUE, NULL);
+>>                 g_print("%s\n", help);
+>>                 g_free(help);
+>> @@ -625,7 +671,8 @@ int main(int argc, char *argv[])
+>>         if (opt_listen)
+>>                 g_idle_add(listen_start, attrib);
+>>
+>> -       g_idle_add(callback, attrib);
+>> +       if (callback)
+>> +               g_idle_add(callback, attrib);
+>>
+>>         g_main_loop_run(event_loop);
 >
 > Regards,
 
