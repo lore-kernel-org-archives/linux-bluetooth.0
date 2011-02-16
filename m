@@ -1,47 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Feb 2011 10:19:25 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andrei Warkentin <andreiw@motorola.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] BlueZ: HCI_LDISC: Make hci a child of the
- corresponding tty device.
-Message-ID: <20110216131925.GC14085@joana>
-References: <AANLkTi=77xywyVZmUFrDaRPNnUne+52YYJ5Zh7jAd_3W@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=77xywyVZmUFrDaRPNnUne+52YYJ5Zh7jAd_3W@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix creating device object on disconnect complete event
+Date: Wed, 16 Feb 2011 15:23:49 +0200
+Message-Id: <1297862629-27805-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-* Andrei Warkentin <andreiw@motorola.com> [2011-02-11 17:19:26 -0600]:
+There is no need to create a new object if disconnected and the device is
+not permanent/paired.
+---
+ src/event.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-> Dear List,
-> 
-> This depends on Dmitry Eremin-Solenikov's "Tty: add tty_struct->dev
-> pointer to corresponding device instance" patch,
-> which is in 2.6.37.
-> 
-> Thanks,
-> A
-
-> From 3ae2156afa420f3ba5cb73295037680bdca340f1 Mon Sep 17 00:00:00 2001
-> From: Andrei Warkentin <andreiw@motorola.com>
-> Date: Fri, 11 Feb 2011 17:59:52 -0600
-> Subject: [PATCH] BlueZ: HCI_LDISC: Make hci a child of the corresponding tty device.
-> 
-> Makes /sys/class/bluetooth/hciX a symlink to
-> path under corresponding tty.
-> 
-> Change-Id: I297361c13c61e2ad82293030553d9f0653e1273a
-> Signed-off-by: Andrei Warkentin <andreiw@motorola.com>
-> ---
->  drivers/bluetooth/hci_ldisc.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-
-Patch has been applied.
-
+diff --git a/src/event.c b/src/event.c
+index b979a8e..ba8f84a 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -697,7 +697,10 @@ void btd_event_disconn_complete(bdaddr_t *local, bdaddr_t *peer)
+ 
+ 	DBG("");
+ 
+-	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
++	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
++		return;
++
++	if (!device)
+ 		return;
+ 
+ 	adapter_remove_connection(adapter, device);
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.1
+
