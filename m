@@ -1,21 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Gix <bgix@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@nokia.com, padovan@profusion.mobi,
-	anderson.lizardo@openbossa.org
-Subject: [PATCH 0/1] Fix Minimum gatttool MTU
-Date: Wed, 16 Feb 2011 13:16:23 -0800
-Message-Id: <1297890984-7809-1-git-send-email-bgix@codeaurora.org>
+Date: Wed, 16 Feb 2011 17:04:08 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-2.6 2011-02-16
+Message-ID: <20110216200407.GI14085@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am satisfied with the rest of the functionality added
-to the now "interactive" gatttool, so this patch fixes
-the one remaining deficiency from my earlier patch.
+Hi John,
 
+Here goes new fixes to the Bluetooth subsystem for 2.6.38. We have here
+support for firmware dowloading for the Atheros AR5BBU12 device. Also a fix
+for btusb a crash from Oliver Neukum and a system freeze fix due to not
+releasing the Big TTY Mutex in RFCOMM from Vladislav P.
+
+Please pull! :)
+
+The following changes since commit a7b545f7fe753ca3dc1b51ca57f90cd59d974e44:
+
+  mac80211: add missing locking in ieee80211_reconfig (2011-02-09 15:35:13 -0500)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Cho, Yu-Chen (1):
+      Bluetooth: Add Atheros BT AR5BBU12 fw supported
+
+Oliver Neukum (1):
+      Bluetooth: fix crash with quirky dongles doing sound
+
+Vladislav P (1):
+      Bluetooth: Release BTM while sleeping to avoid deadlock
+
+ drivers/bluetooth/ath3k.c  |    3 +++
+ drivers/bluetooth/btusb.c  |    7 +++++--
+ net/bluetooth/rfcomm/tty.c |    2 ++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
 -- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Gustavo F. Padovan
+http://profusion.mobi
