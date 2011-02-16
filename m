@@ -1,48 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110215212022.GG7219@joana>
-References: <1297459736-24514-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1297459736-24514-4-git-send-email-claudio.takahasi@openbossa.org>
-	<20110215212022.GG7219@joana>
-Date: Wed, 16 Feb 2011 11:09:50 -0200
-Message-ID: <AANLkTinJmoaepBp+C6VnXSZ1P06CNYzJwJiTFJ7bAFDm@mail.gmail.com>
-Subject: Re: [RFC 3/3] Bluetooth: Send LE Connection Update Command
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Wed, 16 Feb 2011 14:07:47 +0100
+Message-ID: <AANLkTinBBdyyUR5-f=HMBNZ-38KnGdnU_M38kzcLuoBg@mail.gmail.com>
+Subject: PATCH [1/2] batostr(): Switch byte order before converting
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=001636284618a21d54049c65f72f
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+--001636284618a21d54049c65f72f
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Tue, Feb 15, 2011 at 7:20 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Claudio,
->
-> * Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-02-11 19:28:56 -0200]:
->
->> If the new connection update parameter are accepted, the LE master
->> host sends the LE Connection Update Command to its controller informing
->> the new requested parameters.
->>
->> Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
->> ---
->>  include/net/bluetooth/hci.h      |   11 +++++++++++
->>  include/net/bluetooth/hci_core.h |    2 ++
->>  net/bluetooth/hci_conn.c         |   20 ++++++++++++++++++++
->>  net/bluetooth/l2cap_core.c       |    7 ++++++-
->>  4 files changed, 39 insertions(+), 1 deletions(-)
->
-> Actually it is this one that doesn't apply, not 2 of 3.
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+The library function batostr() computes incorrect results because it
+does not swap byte-ordering before converting the address. This patch
+fixes this behaviour. It tries to make batostr() look like ba2str() to
+be consistent.
 
-I will rebase it against bluetooth-next. All patches were using
-Vinicius SMP branch as baseline.
+Patch is also attached as x-patch file. Patch is done against most
+recent git version.
 
-Br,
-Claudio
+
+diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+index 4af2ef6..dd7ca06 100644
+--- a/lib/bluetooth.c
++++ b/lib/bluetooth.c
+@@ -50,13 +50,14 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src)
+
+ char *batostr(const bdaddr_t *ba)
+ {
++	uint8_t b[6];
+ 	char *str = bt_malloc(18);
+ 	if (!str)
+ 		return NULL;
+
++	baswap((bdaddr_t *) b, ba);
+ 	sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+-		ba->b[0], ba->b[1], ba->b[2],
+-		ba->b[3], ba->b[4], ba->b[5]);
++		b[0], b[1], b[2], b[3], b[4], b[5]);
+
+ 	return str;
+ }
+
+--001636284618a21d54049c65f72f
+Content-Type: text/x-patch; charset=US-ASCII; name="bluez1.diff"
+Content-Disposition: attachment; filename="bluez1.diff"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gk89ccs40
+
+ZGlmZiAtLWdpdCBhL2xpYi9ibHVldG9vdGguYyBiL2xpYi9ibHVldG9vdGguYwppbmRleCA0YWYy
+ZWY2Li5kZDdjYTA2IDEwMDY0NAotLS0gYS9saWIvYmx1ZXRvb3RoLmMKKysrIGIvbGliL2JsdWV0
+b290aC5jCkBAIC01MCwxMyArNTAsMTQgQEAgdm9pZCBiYXN3YXAoYmRhZGRyX3QgKmRzdCwgY29u
+c3QgYmRhZGRyX3QgKnNyYykKIAogY2hhciAqYmF0b3N0cihjb25zdCBiZGFkZHJfdCAqYmEpCiB7
+CisJdWludDhfdCBiWzZdOwogCWNoYXIgKnN0ciA9IGJ0X21hbGxvYygxOCk7CiAJaWYgKCFzdHIp
+CiAJCXJldHVybiBOVUxMOwogCisJYmFzd2FwKChiZGFkZHJfdCAqKSBiLCBiYSk7CiAJc3ByaW50
+ZihzdHIsICIlMi4yWDolMi4yWDolMi4yWDolMi4yWDolMi4yWDolMi4yWCIsCi0JCWJhLT5iWzBd
+LCBiYS0+YlsxXSwgYmEtPmJbMl0sCi0JCWJhLT5iWzNdLCBiYS0+Yls0XSwgYmEtPmJbNV0pOwor
+CQliWzBdLCBiWzFdLCBiWzJdLCBiWzNdLCBiWzRdLCBiWzVdKTsKIAogCXJldHVybiBzdHI7CiB9
+Cg==
+--001636284618a21d54049c65f72f--
