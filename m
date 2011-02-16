@@ -1,95 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1297782328-25706-1-git-send-email-padovan@profusion.mobi>
-References: <1297782328-25706-1-git-send-email-padovan@profusion.mobi>
-Date: Wed, 16 Feb 2011 04:48:53 -0800
-Message-ID: <AANLkTikcJWWbHEuNX9YMDSYqWt=nAeGh3-+nYXOgXRhS@mail.gmail.com>
-Subject: Re: [RFC -v3] Bluetooth: add BT_CONNINFO socketopt
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+In-Reply-To: <AANLkTi=DeXueKxyN23jT3LNd-iqD1mTO+PB-5H4=Scr+@mail.gmail.com>
+References: <1297798306-32591-1-git-send-email-padovan@profusion.mobi> <AANLkTi=DeXueKxyN23jT3LNd-iqD1mTO+PB-5H4=Scr+@mail.gmail.com>
+From: Jose Antonio Santos Cadenas <santoscadenas@gmail.com>
+Date: Wed, 16 Feb 2011 13:32:04 +0100
+Message-ID: <AANLkTi=fPJEHT4KbS=xrB9=CV=aFVnHNADcdawb4_Xcs@mail.gmail.com>
+Subject: Re: [PATCH] Move HealthManager Interface to "/" path
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+2011/2/16 Jose Antonio Santos Cadenas <santoscadenas@gmail.com>:
+> Hi all,
+>
+> 2011/2/15 Gustavo F. Padovan <padovan@profusion.mobi>:
+>> Yeah, this breaks the API, but health is still disabled by default and it
+>> is not a good idea create a new path only for it. So moving it to "/"
+>
+> First I'd like to say that I completely agree with this patch, is
+> something that I've always thought, but when we sent this patches we
+> used  the other path because is what we agree when we designed the
+> API, I think that Marcel said something like that the path for
+> applications
 
-On Tue, Feb 15, 2011 at 7:05 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> ATT needs to know to link key type before run some of it procedures.
-> Using the socket sec_level doesn't work because the socket may not reflect
-> the real sec_level of the link.
->
-> Reported-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  include/net/bluetooth/bluetooth.h |    5 +++++
->  net/bluetooth/l2cap_sock.c        |   16 ++++++++++++++++
->  2 files changed, 21 insertions(+), 0 deletions(-)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 4375043..be7a8ee 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -66,6 +66,11 @@ struct bt_security {
->
->  #define BT_FLUSHABLE   8
->
-> +#define BT_CONNINFO    9
-> +struct bt_conninfo {
-> +       __u8 sec_level;
-> +};
-> +
->  #define BT_FLUSHABLE_OFF       0
->  #define BT_FLUSHABLE_ON                1
->
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 484e717..f09fd97 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -467,7 +467,9 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
->  static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, char __user *optval, int __user *optlen)
->  {
->        struct sock *sk = sock->sk;
-> +       struct hci_conn *hcon = l2cap_pi(sk)->conn->hcon;
+Sorry, I mean the path of the Manager
 
-This may crash if you try with not connected socket, shall we check
-for (!conn) ?
-
-Regards,
-Andrei
-
->        struct bt_security sec;
-> +       struct bt_conninfo conninfo;
->        int len, err = 0;
+> will be changed or something like that, but I is possible
+> that I misunderstood something. The end of this is that we register
+> HealthManager in path that I'm not completely agree with.
 >
->        BT_DBG("sk %p", sk);
-> @@ -516,6 +518,20 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+> The problem is that the Health API is being alredy used in some
+> devices, HDP has been quickly integrated in health systems and I don't
+> know if changing the API now is a good idea. I've received many emails
+> asking for the API usage from people that was integrating BlueZ on
+> their systems in order to be able to use HDP.
 >
->                break;
+> Some of the devices that integrate BlueZ are also certified, like this:
 >
-> +       case BT_CONNINFO:
-> +               if (sk->sk_state != BT_CONNECTED) {
-> +                       err = -EINVAL;
-> +                       break;
-> +               }
-> +
-> +               conninfo.sec_level = hcon->sec_level;
-> +
-> +               len = min_t(unsigned int, len, sizeof(conninfo));
-> +               if (copy_to_user(optval, (char *) &conninfo, len))
-> +                       err = -EFAULT;
-> +
-> +               break;
-> +
->        default:
->                err = -ENOPROTOOPT;
->                break;
-> --
-> 1.7.4
+> http://continuaalliance.org/products/certified-products/texasinstrumentsamdm37xlinuxreferenceplatform.html
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> But it is possible that BlueZ with HDP is integrated in many other
+> devices and systems that we don't know. So even thinking that the path
+> change is a good Idea I disagree with this path because it breaks the
+> API and it's being already in use.
+>
+> Regards
+>
+>> ---
+>>  doc/health-api.txt    |    2 +-
+>>  health/hdp.c          |    4 ++--
+>>  test/test-health      |    2 +-
+>>  test/test-health-sink |    2 +-
+>>  4 files changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/doc/health-api.txt b/doc/health-api.txt
+>> index 3d0a717..9d5a54d 100644
+>> --- a/doc/health-api.txt
+>> +++ b/doc/health-api.txt
+>> @@ -10,7 +10,7 @@ Health Device Profile hierarchy
+>>
+>>  Service                org.bluez
+>>  Interface      org.bluez.HealthManager
+>> -Object path    /org/bluez/
+>> +Object path    /
+>>
+>>  Methods:
+>>
+>> diff --git a/health/hdp.c b/health/hdp.c
+>> index d4a2a30..e58bd55 100644
+>> --- a/health/hdp.c
+>> +++ b/health/hdp.c
+>> @@ -2171,7 +2171,7 @@ int hdp_manager_start(DBusConnection *conn)
+>>  {
+>>        DBG("Starting Health manager");
+>>
+>> -       if (!g_dbus_register_interface(conn, MANAGER_PATH,
+>> +       if (!g_dbus_register_interface(conn, "/",
+>>                                        HEALTH_MANAGER,
+>>                                        health_manager_methods, NULL, NULL,
+>>                                        NULL, manager_path_unregister)) {
+>> @@ -2186,7 +2186,7 @@ int hdp_manager_start(DBusConnection *conn)
+>>
+>>  void hdp_manager_stop()
+>>  {
+>> -       g_dbus_unregister_interface(connection, MANAGER_PATH, HEALTH_MANAGER);
+>> +       g_dbus_unregister_interface(connection, "/", HEALTH_MANAGER);
+>>
+>>        dbus_connection_unref(connection);
+>>        DBG("Stopped Health manager");
+>> diff --git a/test/test-health b/test/test-health
+>> index 28cc894..7820a24 100755
+>> --- a/test/test-health
+>> +++ b/test/test-health
+>> @@ -47,7 +47,7 @@ def enter_mainloop():
+>>        finally:
+>>                print "Exiting, bye"
+>>
+>> -hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
+>> +hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+>>                                                "org.bluez.HealthManager")
+>>
+>>  role = None
+>> diff --git a/test/test-health-sink b/test/test-health-sink
+>> index cb9d434..50eb74c 100755
+>> --- a/test/test-health-sink
+>> +++ b/test/test-health-sink
+>> @@ -12,7 +12,7 @@ loop = gobject.MainLoop()
+>>
+>>  bus = dbus.SystemBus()
+>>
+>> -hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"),
+>> +hdp_manager = dbus.Interface(bus.get_object("org.bluez", "/"),
+>>                                                "org.bluez.HealthManager")
+>>  app_path = hdp_manager.CreateApplication({"DataType": dbus.types.UInt16(4103),
+>>                                        "Role": "sink"})
+>> --
+>> 1.7.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
 >
