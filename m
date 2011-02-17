@@ -4,11 +4,11 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Bluetooth: Fix some code style issues in hci_event.c
-Date: Thu, 17 Feb 2011 16:44:23 +0100
-Message-ID: <1297957463-15223-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1297948601-12723-10-git-send-email-szymon.janc@tieto.com>
-References: <1297948601-12723-10-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix some code style issues in hci_core.h
+Date: Thu, 17 Feb 2011 16:42:00 +0100
+Message-ID: <1297957320-14790-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <20110217144340.GE10543@joana>
+References: <20110217144340.GE10543@joana>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,60 +16,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
- net/bluetooth/hci_event.c |   18 ++++++++++--------
- 1 files changed, 10 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h |   58 +++++++++++++++++++-------------------
+ 1 files changed, 29 insertions(+), 29 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b39c9bb..a7c7349 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -949,7 +949,7 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e4f370f..2893288 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -208,37 +208,37 @@ struct hci_dev {
+ struct hci_conn {
+ 	struct list_head list;
+ 
+-	atomic_t	 refcnt;
+-	spinlock_t	 lock;
+-
+-	bdaddr_t	 dst;
+-	__u16		 handle;
+-	__u16		 state;
+-	__u8             mode;
+-	__u8		 type;
+-	__u8		 out;
+-	__u8		 attempt;
+-	__u8		 dev_class[3];
+-	__u8             features[8];
+-	__u8             ssp_mode;
+-	__u16            interval;
+-	__u16            pkt_type;
+-	__u16            link_policy;
+-	__u32		 link_mode;
+-	__u8             auth_type;
+-	__u8             sec_level;
+-	__u8		 pending_sec_level;
+-	__u8		 pin_length;
+-	__u8		 io_capability;
+-	__u8             power_save;
+-	__u16            disc_timeout;
+-	unsigned long	 pend;
++	atomic_t	refcnt;
++	spinlock_t	lock;
++
++	bdaddr_t	dst;
++	__u16		handle;
++	__u16		state;
++	__u8		mode;
++	__u8		type;
++	__u8		out;
++	__u8		attempt;
++	__u8		dev_class[3];
++	__u8		features[8];
++	__u8		ssp_mode;
++	__u16		interval;
++	__u16		pkt_type;
++	__u16		link_policy;
++	__u32		link_mode;
++	__u8		auth_type;
++	__u8		sec_level;
++	__u8		pending_sec_level;
++	__u8		pin_length;
++	__u8		io_capability;
++	__u8		power_save;
++	__u16		disc_timeout;
++	unsigned long	pend;
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_oob;
+ 	__u8		remote_auth;
+ 
+-	unsigned int	 sent;
++	unsigned int	sent;
+ 
+ 	struct sk_buff_head data_q;
+ 
+@@ -356,7 +356,7 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
  }
  
- static int hci_outgoing_auth_needed(struct hci_dev *hdev,
--						struct hci_conn *conn)
-+							struct hci_conn *conn)
+ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+-					__u16 handle)
++								__u16 handle)
  {
- 	if (conn->state != BT_CONFIG || !conn->out)
- 		return 0;
-@@ -1304,7 +1304,8 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct list_head *p;
+@@ -371,7 +371,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+ }
  
- 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
+ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
+-					__u8 type, bdaddr_t *ba)
++							__u8 type, bdaddr_t *ba)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct list_head *p;
+@@ -386,7 +386,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
+ }
  
--	if ((mask & HCI_LM_ACCEPT) && !hci_blacklist_lookup(hdev, &ev->bdaddr)) {
-+	if ((mask & HCI_LM_ACCEPT) &&
-+			!hci_blacklist_lookup(hdev, &ev->bdaddr)) {
- 		/* Connection accepted */
- 		struct inquiry_entry *ie;
- 		struct hci_conn *conn;
-@@ -2116,7 +2117,8 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
- 	hci_dev_lock(hdev);
- 
- 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
--		struct inquiry_info_with_rssi_and_pscan_mode *info = (void *) (skb->data + 1);
-+		struct inquiry_info_with_rssi_and_pscan_mode *info;
-+		info = (void *) (skb->data + 1);
- 
- 		for (; num_rsp; num_rsp--) {
- 			bacpy(&data.bdaddr, &info->bdaddr);
-@@ -2276,12 +2278,12 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 
- 	for (; num_rsp; num_rsp--) {
- 		bacpy(&data.bdaddr, &info->bdaddr);
--		data.pscan_rep_mode     = info->pscan_rep_mode;
--		data.pscan_period_mode  = info->pscan_period_mode;
--		data.pscan_mode         = 0x00;
-+		data.pscan_rep_mode	= info->pscan_rep_mode;
-+		data.pscan_period_mode	= info->pscan_period_mode;
-+		data.pscan_mode		= 0x00;
- 		memcpy(data.dev_class, info->dev_class, 3);
--		data.clock_offset       = info->clock_offset;
--		data.rssi               = info->rssi;
-+		data.clock_offset	= info->clock_offset;
-+		data.rssi		= info->rssi;
- 		data.ssp_mode		= 0x01;
- 		info++;
- 		hci_inquiry_cache_update(hdev, &data);
+ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+-					__u8 type, __u16 state)
++							__u8 type, __u16 state)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct list_head *p;
 -- 
 1.7.0.4
 
