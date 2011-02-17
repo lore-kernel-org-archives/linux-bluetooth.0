@@ -1,31 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110217190401.GA22042@jh-x301>
-References: <AANLkTinBBdyyUR5-f=HMBNZ-38KnGdnU_M38kzcLuoBg@mail.gmail.com>
-	<20110217190401.GA22042@jh-x301>
-Date: Fri, 18 Feb 2011 00:10:48 +0100
-Message-ID: <AANLkTimcP5Km2Nb2HhapDyTO_qmPzBFUC_1GbkYdVwy7@mail.gmail.com>
-Subject: Re: PATCH [1/2] batostr(): Switch byte order before converting
 From: David Herrmann <dh.herrmann@googlemail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@gmail.com, David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH] Replace batostr() with ba2str() to avoid memleaks
+Date: Fri, 18 Feb 2011 00:06:26 +0100
+Message-Id: <1297983986-10131-1-git-send-email-dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+batostr() returns dynamically allocated strings. Replace it with
+ba2str() wherever possible to avoid heap allocations and fix
+memleaks.
+---
+ compat/bnep.c |    5 +++--
+ test/hciemu.c |    4 +++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-On Thu, Feb 17, 2011 at 8:04 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> We can't go ahead and change the behavior of existing libbluetooth
-> functions like that since it would break any applications relying on the
-> old behavior (without baswap). So this patch isn't acceptable upstream.
+diff --git a/compat/bnep.c b/compat/bnep.c
+index 9b0d8b8..3617e0e 100644
+--- a/compat/bnep.c
++++ b/compat/bnep.c
+@@ -128,6 +128,7 @@ int bnep_show_connections(void)
+ 	struct bnep_connlist_req req;
+ 	struct bnep_conninfo ci[48];
+ 	unsigned int i;
++	char buf[18];
+ 
+ 	req.cnum = 48;
+ 	req.ci   = ci;
+@@ -137,9 +138,9 @@ int bnep_show_connections(void)
+ 	}
+ 
+ 	for (i = 0; i < req.cnum; i++) {
++		ba2str((bdaddr_t*)ci[i].dst, buf);
+ 		printf("%s %s %s\n", ci[i].device,
+-			batostr((bdaddr_t *) ci[i].dst),
+-			bnep_svc2str(ci[i].role));
++			buf, bnep_svc2str(ci[i].role));
+ 	}
+ 	return 0;
+ }
+diff --git a/test/hciemu.c b/test/hciemu.c
+index ba9b89d..db7c613 100644
+--- a/test/hciemu.c
++++ b/test/hciemu.c
+@@ -499,8 +499,10 @@ static void accept_connection(uint8_t *data)
+ 
+ static void close_connection(struct vhci_conn *conn)
+ {
++	char buf[18];
++	ba2str(&conn->dest, buf);
+ 	syslog(LOG_INFO, "Closing connection %s handle %d",
+-					batostr(&conn->dest), conn->handle);
++					buf, conn->handle);
+ 
+ 	g_io_channel_shutdown(conn->chan, TRUE, NULL);
+ 	g_io_channel_unref(conn->chan);
+-- 
+1.7.4.1
 
-I thought of this more like a bug because it doesn't make sense to me
-why there should be a function returning the string without swapping
-the bytes first. So I didn't think of this as breaking the API, but
-more like fixing a function that is not used because it produces
-incorrect results.
-Anyway, your explanation makes sense and I don't use this function so
-I am totally ok with that.
-
-David
