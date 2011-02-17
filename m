@@ -1,35 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110217174806.GK10543@joana>
-References: <4d5d2585.8f7edc0a.5af6.27d8@mx.google.com>
-	<20110217174806.GK10543@joana>
-Date: Thu, 17 Feb 2011 15:09:12 -0300
-Message-ID: <AANLkTikmWhzcwAOs18uDV+KCH1LS9HYsHvQT1UUvK77O@mail.gmail.com>
-Subject: Re: [RFCv2 1/4] Bluetooth: Implement advertising report meta event
+In-Reply-To: <20110217172531.GJ10543@joana>
+References: <4d5d2589.8f7edc0a.5af6.27dd@mx.google.com>
+	<20110217172531.GJ10543@joana>
+Date: Thu, 17 Feb 2011 15:04:03 -0300
+Message-ID: <AANLkTin=WAPByfnx6HbcCPy+82u1e=XkPgcNdPENTogA@mail.gmail.com>
+Subject: Re: [RFCv2 3/4] Bluetooth: Use ERR_PTR to return error from hci_connect
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: anderson.briglia@openbossa.org, linux-bluetooth@vger.kernel.org
+Cc: anderson.briglia@openbossa.org, linux-bluetooth@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-On Thu, Feb 17, 2011 at 2:48 PM, Gustavo F. Padovan
+On Thu, Feb 17, 2011 at 2:25 PM, Gustavo F. Padovan
 <padovan@profusion.mobi> wrote:
->> +     for (i = 1; i < num_reports; i++) {
->> +             ev = (void *) (ev->data + ev->length + 1);
+>> @@ -459,8 +459,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+>>               le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+>>               if (!le)
+>>                       le = hci_conn_add(hdev, LE_LINK, dst);
+>> -             if (!le)
+>> -                     return NULL;
+>> +             else
+>> +                     return ERR_PTR(-EBUSY);
+>> +             if (IS_ERR(le))
+>> +                     return le;
 >
-> You are not using i anywhere here.
+> I prefer this instead:
+>
+>                le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+>                if (le)
+>                        return ERR_PTR(-EBUSY);
+>
+>                le = hci_conn_add(hdev, LE_LINK, dst);
+>                if (!le)
+>                        return ERR_PTR(-ENOMEM);
 
-It's used to iterate the for() itself, but it could be changed to e.g.:
+I think the code above (besides the "if (le)" typo) is not equivalent
+to the original one. See:
 
-while (--num_reports) {
-...
-}
+>>               le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+>>               if (!le)
+>>                       le = hci_conn_add(hdev, LE_LINK, dst);
+>> -             if (!le)
+>> -                     return NULL;
 
-It is pre-incremented to skip the first report as it was already
-processed outside the loop.
+if hci_conn_hash_lookup_ba() returns NULL, it should call
+hci_conn_add(), and if that fails, then return NULL (or some
+ERR_PTR()).
 
 Regards,
 -- 
