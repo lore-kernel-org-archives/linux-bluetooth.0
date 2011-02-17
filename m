@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Feb 2011 15:36:59 -0300
+Date: Thu, 17 Feb 2011 15:35:26 -0300
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] Add static Device Appearance Characteristic
-Message-ID: <20110217183659.GB16290@jh-x301>
-References: <1297897651-27731-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: Re: [PATCH v2] Fix no SEP if corresponding interface is disabled
+Message-ID: <20110217183526.GA16290@jh-x301>
+References: <1297935077-25540-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1297935077-25540-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297897651-27731-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1297935077-25540-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Dmitriy,
 
-On Wed, Feb 16, 2011, Claudio Takahasi wrote:
-> Declaration and definition of the Device Appearance Characteristic
-> defined in the GAP Characteristics for Low Energy section: Bluetooth
-> Core Specification, Volume 3, Part C, section 12.2.
+On Thu, Feb 17, 2011, Dmitriy Paliy wrote:
+> A2DP sink endpoint shall not be created if A2DP sink interface is disabled.
+> Same holds for A2DP source endpoint and A2DP source interface.
+> 
+> Such fixes bluetoothd crash when SDP record is registered and remote
+> device tries to connect and stream to A2DP sink which is not initialized.
+> Dereferencing of NULL happens in source_new_stream since device->source
+> was not created.
 > ---
->  src/attrib-server.c |   14 ++++++++++++--
->  1 files changed, 12 insertions(+), 2 deletions(-)
+>  audio/a2dp.c |   11 ++++++++++-
+>  1 files changed, 10 insertions(+), 1 deletions(-)
 
-All four patches have been pushed upstream. Thanks.
+Pushed upstream. Thanks.
 
 Johan
