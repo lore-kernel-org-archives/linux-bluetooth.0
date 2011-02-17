@@ -1,43 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [PATCH 04/10] Bluetooth: Use EIO code to report HCI error to userpace
-Date: Thu, 17 Feb 2011 15:23:10 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com"
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-References: <1297948601-12723-1-git-send-email-szymon.janc@tieto.com> <1297948601-12723-5-git-send-email-szymon.janc@tieto.com> <20110217134946.GY874@null>
-In-Reply-To: <20110217134946.GY874@null>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201102171523.10461.szymon.janc@tieto.com>
+Date: Thu, 17 Feb 2011 15:19:31 +0100
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: "pascal@pabr.org" <pascal@pabr.org>
+Cc: linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Jiri Kosina <jkosina@suse.cz>, Alan Ott <alan@signal11.us>
+Subject: Re: hidp_output_raw_report, HID_OUTPUT_REPORT and Sixaxis
+Message-Id: <20110217151931.d7ee7e29.ospite@studenti.unina.it>
+In-Reply-To: <id3cua$12v$2@dough.gmane.org>
+References: <20101130145405.d8142bc3.ospite@studenti.unina.it>
+	<id3cua$12v$2@dough.gmane.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__17_Feb_2011_15_19_31_+0100_GHNHvhdWrBsK0iEB"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--Signature=_Thu__17_Feb_2011_15_19_31_+0100_GHNHvhdWrBsK0iEB
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, Feb 17, 2011 at 02:16:35PM +0100, ext Szymon Janc wrote:
-> > Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> > ---
-> >  net/bluetooth/mgmt.c |    7 +++----
-> >  1 files changed, 3 insertions(+), 4 deletions(-)
-> 
-> Some kind of explanation why EIO is better than status would be nice.
+On Tue, 30 Nov 2010 18:40:03 +0100
+"pascal@pabr.org" <pascal@pabr.org> wrote:
 
-As I've mentioned in cover letter:
-It is not possible to distinguish in cmd status if error was from kernel
-or from HCI. Since in mgmt only kernel sends HCI commands their errors
-shouldn't be needed for userspace so report EIO to userspace on HCI error
-(if HCI error is needed for debugging, logs can be added on kernel side)
+Pascal, you were replying to linux-input only so some of the original
+recipients missed your comments.
 
-HCI status codes and kernel error codes overlaps  i.e. one can't distinguish
-if error was ENOMEM or HCI Command Disallowed as both have value 12.
+> Antonio Ospite wrote:
+> > +++ b/net/bluetooth/hidp/core.c
+> >  	case HID_OUTPUT_REPORT:
+> > -		report_type =3D HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+> > +		report_type =3D HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT;
+>=20
+> > Is it only the Sixaxis which needs the output report as a SET_REPORT
+> > operation, or the change above is an actual fix?
+>=20
+> My understanding of the Bluetooth HID Profile specification [1],
+> section 7.4.9, is that on the control channel DATA is only for
+> responding to an incoming GET_REPORT.  Since Linux is the HID
+> Host, it will probably never need to reply to a GET_REPORT.
+> So your patch looks good.
+>
 
-For userspace is should be enough to just know that HCI failed, not why.
-(in fact, currently userspace is not able to determine error too...)
+OK, I managed to study [1] a little bit, so yes, I also think my patch
+is acceptable right now, but just because as you note in another
+message hidp_output_raw_report() is relying only on the control channel.
+In section 7.9.1 there's no mention of DATA for Output reports on the
+Control channel (see also Figure 11: SET_ Flow Chart).
 
--- 
-br
-Szymon Janc
+So I am resending it, it shouldn't hurt.
+
+> Note that usbhid_output_raw_report() seems to send OUTPUT
+> reports as USB interrupt messages and FEATURE reports as
+> USB SET_REPORT control messages, which makes sense too.
+> It would be nice if hidraw behaved the same over USB and
+> over Bluetooth.  Unfortunately I don't think you can drive
+> the sixaxis leds with DATA on the Bluetooth interrupt channel.
+>
+
+However, even if my patch gets is, Output reports on the Sixaxis will
+stop working again as soon as someone implements the behavior you are
+suggesting, that is:
+  Feature Report -> SET_REPORT on the Control channel
+  Output Report  -> DATA on the Interrupt channel
+
+So I am going to submit the hidp_output_raw_report() override in
+hid-sony.c as well, does this sound OK?
+
+>=20
+> [1] http://www.bluetooth.com/Specification%20Documents/HID_SPEC_V10.pdf
+>=20
+
+Regards,
+  Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Thu__17_Feb_2011_15_19_31_+0100_GHNHvhdWrBsK0iEB
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk1dLnMACgkQ5xr2akVTsAHGkQCdG2MlsjDWOkrIV16UbZF4WT5a
+lMkAnjRFt1dQcD82kUVhmYVZDxTF+r0f
+=TNpi
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__17_Feb_2011_15_19_31_+0100_GHNHvhdWrBsK0iEB--
