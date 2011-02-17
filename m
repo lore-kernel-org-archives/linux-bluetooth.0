@@ -1,131 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
 From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Ville Tervo <ville.tervo@nokia.com>
-Subject: [RFCv2 3/4] Bluetooth: Use ERR_PTR to return error from hci_connect
-Date: Thu, 17 Feb 2011 10:39:55 -0300
-Message-Id: <4d5d2589.8f7edc0a.5af6.27dd@mx.google.com>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [RFCv2 1/4] Bluetooth: Implement advertising report meta event
+Date: Thu, 17 Feb 2011 10:39:53 -0300
+Message-Id: <4d5d2585.8f7edc0a.5af6.27d8@mx.google.com>
 In-Reply-To: <n>
 References: <n>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ville Tervo <ville.tervo@nokia.com>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-Use ERR_PRT mechanism to return error from hci_connect. This patch also
-includes a change to return error if LE link exists already to remote host.
+This patch implements new LE meta event in order to handle advertising
+reports.
 
-Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- net/bluetooth/hci_conn.c   |   12 +++++++-----
- net/bluetooth/l2cap_core.c |   10 ++++------
- net/bluetooth/sco.c        |    6 +++---
- 3 files changed, 14 insertions(+), 14 deletions(-)
+ include/net/bluetooth/hci.h |   18 ++++++++++++++++++
+ net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
+ 2 files changed, 40 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ee7dcdd..e06b856 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -305,7 +305,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 46438f4..5180555 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -980,6 +980,24 @@ struct hci_ev_le_conn_complete {
+ 	__u8     clk_accurancy;
+ } __packed;
  
- 	conn = kzalloc(sizeof(struct hci_conn), GFP_ATOMIC);
- 	if (!conn)
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
++#define ADV_IND		0x00
++#define ADV_DIRECT_IND	0x01
++#define ADV_SCAN_IND	0x02
++#define ADV_NONCONN_IND	0x03
++#define SCAN_RSP	0x04
++
++#define ADDR_DEV_PUBLIC	0x00
++#define ADDR_DEV_RANDOM	0x01
++
++#define HCI_EV_LE_ADVERTISING_REPORT	0x02
++struct hci_ev_le_advertising_info {
++	__u8	 evt_type;
++	__u8	 bdaddr_type;
++	bdaddr_t bdaddr;
++	__u8	 length;
++	__u8	 data[0];
++} __packed;
++
+ #define HCI_EV_LE_LTK_REQ		0x05
+ struct hci_ev_le_ltk_req {
+ 	__le16	handle;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 99c75f4..1c8d888 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2498,6 +2498,24 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
  
- 	bacpy(&conn->dst, dst);
- 	conn->hdev  = hdev;
-@@ -459,8 +459,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 		if (!le)
- 			le = hci_conn_add(hdev, LE_LINK, dst);
--		if (!le)
--			return NULL;
-+		else
-+			return ERR_PTR(-EBUSY);
-+		if (IS_ERR(le))
-+			return le;
- 		if (le->state == BT_OPEN)
- 			hci_le_connect(le);
- 
-@@ -472,8 +474,8 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
- 	if (!acl) {
- 		acl = hci_conn_add(hdev, ACL_LINK, dst);
--		if (!acl)
--			return NULL;
-+		if (IS_ERR(acl))
-+			return acl;
- 	}
- 
- 	hci_conn_hold(acl);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7f30c53..f85be1a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -869,7 +869,7 @@ int l2cap_do_connect(struct sock *sk)
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
- 	__u8 auth_type;
--	int err;
-+	int err = 0;
- 
- 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
- 							l2cap_pi(sk)->psm);
-@@ -880,8 +880,6 @@ int l2cap_do_connect(struct sock *sk)
- 
- 	hci_dev_lock_bh(hdev);
- 
--	err = -ENOMEM;
--
- 	auth_type = l2cap_get_auth_type(sk);
- 
- 	if (l2cap_pi(sk)->dcid == L2CAP_CID_LE_DATA)
-@@ -891,8 +889,10 @@ int l2cap_do_connect(struct sock *sk)
- 		hcon = hci_connect(hdev, ACL_LINK, dst,
- 					l2cap_pi(sk)->sec_level, auth_type);
- 
--	if (!hcon)
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
- 		goto done;
++static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	struct hci_ev_le_advertising_info *ev;
++	u8 num_reports, i;
++
++	num_reports = skb->data[0];
++
++	ev = (void *) &skb->data[1];
++
++	BT_DBG("adv from: %s", batostr(&ev->bdaddr));
++
++	for (i = 1; i < num_reports; i++) {
++		ev = (void *) (ev->data + ev->length + 1);
++		BT_DBG("adv from: %s", batostr(&ev->bdaddr));
 +	}
++}
++
+ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
+@@ -2513,6 +2531,10 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_le_ltk_request_evt(hdev, skb);
+ 		break;
  
- 	conn = l2cap_conn_add(hcon, 0);
- 	if (!conn) {
-@@ -900,8 +900,6 @@ int l2cap_do_connect(struct sock *sk)
- 		goto done;
++	case HCI_EV_LE_ADVERTISING_REPORT:
++		hci_le_adv_report_evt(hdev, skb);
++		break;
++
+ 	default:
+ 		break;
  	}
- 
--	err = 0;
--
- 	/* Update source addr of the socket */
- 	bacpy(src, conn->src);
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c9348dd..26f2f04 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -190,16 +190,16 @@ static int sco_connect(struct sock *sk)
- 
- 	hci_dev_lock_bh(hdev);
- 
--	err = -ENOMEM;
--
- 	if (lmp_esco_capable(hdev) && !disable_esco)
- 		type = ESCO_LINK;
- 	else
- 		type = SCO_LINK;
- 
- 	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
--	if (!hcon)
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
- 		goto done;
-+	}
- 
- 	conn = sco_conn_add(hcon, 0);
- 	if (!conn) {
 -- 
 1.7.1
 
