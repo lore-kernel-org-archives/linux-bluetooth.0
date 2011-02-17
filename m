@@ -1,35 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Feb 2011 15:50:59 -0300
+Date: Thu, 17 Feb 2011 15:45:44 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] Clean up in the minimum mtu check
-Message-ID: <20110217185059.GB18025@jh-x301>
-References: <1297952321-12523-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: Re: [PATCH 1/2] Fix not responding to pbap GET when data is
+ already cached
+Message-ID: <20110217184544.GA18025@jh-x301>
+References: <1297932809-3460-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297952321-12523-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1297932809-3460-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi Luiz,
 
-On Thu, Feb 17, 2011, Sheldon Demario wrote:
-> Just a little clean up in the minimum mtu check
-> 
-> Sheldon Demario (2):
->   Move do_connect() to a common file between interactive.c and
->     gatttool.c
->   Use PSM value to select LE or BR/EDR transport on gatttool
-> 
->  Makefile.am          |    3 +-
->  attrib/gatttool.c    |   83 ++++-----------------------------------
->  attrib/gatttool.h    |    4 +-
->  attrib/interactive.c |   25 ++++++++----
->  attrib/utils.c       |  107 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 137 insertions(+), 85 deletions(-)
->  create mode 100644 attrib/utils.c
+On Thu, Feb 17, 2011, Luiz Augusto von Dentz wrote:
+> When data is cached but no stream/body is set the driver .write is never
+> called so no response is generated.
+> ---
+>  src/obex.c |   35 +++++++++++++++--------------------
+>  1 files changed, 15 insertions(+), 20 deletions(-)
 
-Both patches have been pushed upstream. Thanks.
+Thanks. Both patches have been pushed upstream.
 
 Johan
