@@ -1,119 +1,200 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Add workaround for devices which use absolute path in pbap Name header
-Date: Thu, 17 Feb 2011 10:53:29 +0200
-Message-Id: <1297932809-3460-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1297932809-3460-1-git-send-email-luiz.dentz@gmail.com>
-References: <1297932809-3460-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <9E5B44E9-A8D4-49AB-9D2E-0465BF74ACA1@gmail.com>
+From: Justin Mattock <justinmattock@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+In-Reply-To: <20110216193504.GH14085@joana>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
+Subject: Re: bluetooth disabled with current 2.6.38-rc4
+Date: Wed, 16 Feb 2011 21:19:36 -0800
+References: <1A8743E5-65EA-4625-82FD-658C9722629F@gmail.com> <20110215135245.GA11561@jh-x301> <1ADFED1F-912D-4DF9-A3BB-795F9AB1D1F8@gmail.com> <20110216133411.GD14085@joana> <5C042A85-6D54-451D-8BAC-CE24D61907CA@gmail.com> <20110216193504.GH14085@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-The pbap spec says:
+On Feb 16, 2011, at 11:35 AM, Gustavo F. Padovan wrote:
 
-"5.1.2 Name
-The Name header shall contain the absolute path in the virtual folders
-architecture of the PSE, appended with the name of the file representation of
-one of the Phone Book Objects.
-Example: telecom/pb.vcf or SIM1/telecom/pb.vcf for the main phone book
-objects."
+> Hi Justin,
+>
+> * Justin Mattock <justinmattock@gmail.com> [2011-02-16 07:34:52  
+> -0800]:
+>
+>>
+>> On Feb 16, 2011, at 5:34 AM, Gustavo F. Padovan wrote:
+>>
+>>> Hi Justin,
+>>>
+>>> * Justin Mattock <justinmattock@gmail.com> [2011-02-15 19:26:12
+>>> -0800]:
+>>>
+>>>>
+>>>> On Feb 15, 2011, at 5:52 AM, Johan Hedberg wrote:
+>>>>
+>>>>> Hi Justin,
+>>>>>
+>>>>> On Sun, Feb 13, 2011, Justin Mattock wrote:
+>>>>>> maybe I missed something, but my bluetooth is just not  
+>>>>>> functioning
+>>>>>> with
+>>>>>> 2.6.38-rc4(works with 2.6.37-rc4)
+>>>>>>
+>>>>>> I've done a bisect on this, but was pointed to:
+>>>>>> c0e45c1ca3162acb2e77b3d9e152ce6e7b6fa3f5
+>>>>>> but doesn't look correct to me
+>>>>>>
+>>>>>> here is what I am seeing with the bluetooth-applet etc..:
+>>>>>>
+>>>>>> working correctly:
+>>>>>> http://www.flickr.com/photos/44066293@N08/5443727238/
+>>>>>>
+>>>>>> not working:
+>>>>>> http://www.flickr.com/photos/44066293@N08/5443124859/
+>>>>>>
+>>>>>> my /var/log/daemon.log shows:
+>>>>>>
+>>>>>> Feb 13 17:12:22 Linux-2 acpid: 1 client rule loaded
+>>>>>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 registered
+>>>>>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Listening for HCI  
+>>>>>> events
+>>>>>> on hci0
+>>>>>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: HCI dev 0 up
+>>>>>> Feb 13 17:12:23 Linux-2 bluetoothd[1950]: Unable to find matching
+>>>>>> adapter
+>>>>>>
+>>>>>> I can try at another bisect, but might take some time.. let me  
+>>>>>> know
+>>>>>> if there is something I can test
+>>>>>> or do.
+>>>>>
+>>>>> Are you sure this is a kernel problem? There was a similar issue
+>>>>> with
+>>>>> BlueZ 4.86 or 4.87 which was already fixed. Could you try with  
+>>>>> 4.88?
+>>>>>
+>>>>> Johan
+>>>>
+>>>> o.k. I built 4.88 and still had the issue show up, except this time
+>>>> no
+>>>> icon(instead of the icon, that is not lit up)..
+>>>>
+>>>>
+>>>> anyways I did do another bisect and had better  
+>>>> results(hopefully)this
+>>>> time..:
+>>>>
+>>>> 23bb57633df97ede067ea26f3cdc8a7ba2cd8109 is the first bad commit
+>>>> commit 23bb57633df97ede067ea26f3cdc8a7ba2cd8109
+>>>> Author: Johan Hedberg <johan.hedberg@nokia.com>
+>>>> Date:   Tue Dec 21 23:01:27 2010 +0200
+>>>>
+>>>>   Bluetooth: Fix __hci_request synchronization for hci_open_dev
+>>>>
+>>>>   The initialization function used by hci_open_dev (hci_init_req)
+>>>> sends
+>>>>   many different HCI commands. The __hci_request function should
+>>>> only
+>>>>   return when all of these commands have completed (or a timeout
+>>>> occurs).
+>>>>   Several of these commands cause hci_req_complete to be called
+>>>> which
+>>>>   causes __hci_request to return prematurely.
+>>>>
+>>>>   This patch fixes the issue by adding a new hdev->req_last_cmd
+>>>> variable
+>>>>   which is set during the initialization procedure. The
+>>>> hci_req_complete
+>>>>   function will no longer mark the request as complete until the
+>>>> command
+>>>>   matching hdev->req_last_cmd completes.
+>>>>
+>>>>   Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+>>>>   Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>>>>   Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+>>>>
+>>>> :040000 040000 e8d8ae5fab74b2ba73d0c52e7e09b30e5df8484e
+>>>> 8d1409e8dc2206492cb86e8848c8c23aff182e2a M      include
+>>>> :040000 040000 07fdb5f6ceadcfde12c46a3b5c82937b7dac892c
+>>>> 8f3b08fbbc9fcd078d0f5224b8bc818eeb072dc4 M      net
+>>>
+>>> Can you please send the hcidump output? There should be a package
+>>> for it in
+>>> your distribution, if not get the bluez-hcidump from git.kernel.org
+>>>
+>>> -- 
+>>> Gustavo F. Padovan
+>>> http://profusion.mobi
+>>
+>>
+>>
+>> o.k...keep in mind I hve never really used that tool, but here goes:
+>>
+>> HCI sniffer - Bluetooth packet analyzer ver 2.0
+>> device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 11 FD 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 0A FF 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 1B FC 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 22 FE 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 27 FF 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 15 FF 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 2C 00 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 2B 00 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 14 FF 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 21 FD 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 18 FB 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 09 FD 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 0C FC 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>      A1 02 00 04 FE 00 00 00
+>>> ACL data: handle 46 flags 0x02 dlen 12
+>>    L2CAP(d): cid 0x0041 len 8 [psm 0]
+>>
+>> Justin P. Mattock
+>>
+>
+> It seems that Bluetooth is working for you. If you really have an  
+> issue,
+> please run "bluetooth -nd" by hand and get the full debugs logs.  
+> Also check
+> if you can run "hciconfig -a".
+>
+>
+> -- 
+> Gustavo F. Padovan
+> http://profusion.mobi
 
-The example actually uses relative paths but text state absolute paths although
-the OBEX specification says that the Name header is always relative to the
-current path.
----
- plugins/pbap.c              |    6 +++++-
- plugins/phonebook-tracker.c |   26 +++++++++++++-------------
- 2 files changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index b04dca9..61e7e42 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -658,7 +658,11 @@ static int pbap_get(struct obex_session *os, obex_object_t *obj,
- 
- 	if (strcmp(type, PHONEBOOK_TYPE) == 0) {
- 		/* Always contains the absolute path */
--		path = g_strdup(name);
-+		if (g_path_is_absolute(name))
-+			path = g_strdup(name);
-+		else
-+			path = g_build_filename("/", name, NULL);
-+
- 		*stream = (params->maxlistcount == 0 ? FALSE : TRUE);
- 	} else if (strcmp(type, VCARDLISTING_TYPE) == 0) {
- 		/* Always relative */
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index eb38a46..8a0246a 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -934,15 +934,15 @@ static TrackerSparqlConnection *connection = NULL;
- 
- static const char *name2query(const char *name)
- {
--	if (g_str_equal(name, "telecom/pb.vcf"))
-+	if (g_str_equal(name, "/telecom/pb.vcf"))
- 		return CONTACTS_QUERY_ALL;
--	else if (g_str_equal(name, "telecom/ich.vcf"))
-+	else if (g_str_equal(name, "/telecom/ich.vcf"))
- 		return INCOMING_CALLS_QUERY;
--	else if (g_str_equal(name, "telecom/och.vcf"))
-+	else if (g_str_equal(name, "/telecom/och.vcf"))
- 		return OUTGOING_CALLS_QUERY;
--	else if (g_str_equal(name, "telecom/mch.vcf"))
-+	else if (g_str_equal(name, "/telecom/mch.vcf"))
- 		return MISSED_CALLS_QUERY;
--	else if (g_str_equal(name, "telecom/cch.vcf"))
-+	else if (g_str_equal(name, "/telecom/cch.vcf"))
- 		return COMBINED_CALLS_QUERY;
- 
- 	return NULL;
-@@ -950,15 +950,15 @@ static const char *name2query(const char *name)
- 
- static const char *name2count_query(const char *name)
- {
--	if (g_str_equal(name, "telecom/pb.vcf"))
-+	if (g_str_equal(name, "/telecom/pb.vcf"))
- 		return CONTACTS_COUNT_QUERY;
--	else if (g_str_equal(name, "telecom/ich.vcf"))
-+	else if (g_str_equal(name, "/telecom/ich.vcf"))
- 		return INCOMING_CALLS_COUNT_QUERY;
--	else if (g_str_equal(name, "telecom/och.vcf"))
-+	else if (g_str_equal(name, "/telecom/och.vcf"))
- 		return OUTGOING_CALLS_COUNT_QUERY;
--	else if (g_str_equal(name, "telecom/mch.vcf"))
-+	else if (g_str_equal(name, "/telecom/mch.vcf"))
- 		return MISSED_CALLS_COUNT_QUERY;
--	else if (g_str_equal(name, "telecom/cch.vcf"))
-+	else if (g_str_equal(name, "/telecom/cch.vcf"))
- 		return COMBINED_CALLS_COUNT_QUERY;
- 
- 	return NULL;
-@@ -1921,11 +1921,11 @@ done:
- 	}
- 
- 	if (data->params->maxlistcount == 0) {
--		query = name2count_query("telecom/mch.vcf");
-+		query = name2count_query("/telecom/mch.vcf");
- 		col_amount = COUNT_QUERY_COL_AMOUNT;
- 		pull_cb = pull_contacts_size;
- 	} else {
--		query = name2query("telecom/mch.vcf");
-+		query = name2query("/telecom/mch.vcf");
- 		col_amount = PULL_QUERY_COL_AMOUNT;
- 		pull_cb = pull_contacts;
- 	}
-@@ -1970,7 +1970,7 @@ int phonebook_pull_read(void *request)
- 	if(!data)
- 		return -ENOENT;
- 
--	if (g_strcmp0(data->req_name, "telecom/mch.vcf") == 0) {
-+	if (g_strcmp0(data->req_name, "/telecom/mch.vcf") == 0) {
- 		query = NEW_MISSED_CALLS_LIST;
- 		col_amount = PULL_QUERY_COL_AMOUNT;
- 		pull_cb = pull_newmissedcalls;
--- 
-1.7.1
+yeah it is working when I revert the commit that I bisected down to..
+I will post what hcidump gives with the bad kernel then!!(as well as  
+an other info that I can supply)
+
+Justin P. Mattock
 
