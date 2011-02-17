@@ -1,61 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH] Replace batostr() with ba2str() to avoid memleaks
-Date: Fri, 18 Feb 2011 00:06:26 +0100
-Message-Id: <1297983986-10131-1-git-send-email-dh.herrmann@gmail.com>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Add Primary Discovery Services option to interactive gatttool
+Date: Thu, 17 Feb 2011 17:20:30 -0300
+Message-Id: <1297974030-20497-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-batostr() returns dynamically allocated strings. Replace it with
-ba2str() wherever possible to avoid heap allocations and fix
-memleaks.
 ---
- compat/bnep.c |    5 +++--
- test/hciemu.c |    4 +++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ attrib/interactive.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 70 insertions(+), 0 deletions(-)
 
-diff --git a/compat/bnep.c b/compat/bnep.c
-index 9b0d8b8..3617e0e 100644
---- a/compat/bnep.c
-+++ b/compat/bnep.c
-@@ -128,6 +128,7 @@ int bnep_show_connections(void)
- 	struct bnep_connlist_req req;
- 	struct bnep_conninfo ci[48];
- 	unsigned int i;
-+	char buf[18];
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 1df2b69..edc465a 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -25,11 +25,17 @@
+ #include <stdio.h>
+ #include <glib.h>
  
- 	req.cnum = 48;
- 	req.ci   = ci;
-@@ -137,9 +138,9 @@ int bnep_show_connections(void)
- 	}
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
++
+ #include <readline/readline.h>
+ #include <readline/history.h>
  
- 	for (i = 0; i < req.cnum; i++) {
-+		ba2str((bdaddr_t*)ci[i].dst, buf);
- 		printf("%s %s %s\n", ci[i].device,
--			batostr((bdaddr_t *) ci[i].dst),
--			bnep_svc2str(ci[i].role));
-+			buf, bnep_svc2str(ci[i].role));
- 	}
- 	return 0;
++#include "att.h"
+ #include "btio.h"
+ #include "gattrib.h"
++#include "glib-helper.h"
++#include "gatt.h"
+ #include "gatttool.h"
+ 
+ static GIOChannel *iochannel = NULL;
+@@ -98,6 +104,47 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	set_state(STATE_CONNECTED);
  }
-diff --git a/test/hciemu.c b/test/hciemu.c
-index ba9b89d..db7c613 100644
---- a/test/hciemu.c
-+++ b/test/hciemu.c
-@@ -499,8 +499,10 @@ static void accept_connection(uint8_t *data)
  
- static void close_connection(struct vhci_conn *conn)
++static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
++{
++	GSList *l;
++
++	if (status) {
++		printf("Discover all primary services failed: %s\n",
++							att_ecode2str(status));
++		return;
++	}
++
++	printf("\n");
++	for (l = services; l; l = l->next) {
++		struct att_primary *prim = l->data;
++		printf("attr handle: 0x%04x, end grp handle: 0x%04x "
++			"uuid: %s\n", prim->start, prim->end, prim->uuid);
++	}
++
++	rl_forced_update_display();
++}
++
++static void primary_by_uuid_cb(GSList *ranges, guint8 status,
++							gpointer user_data)
++{
++	GSList *l;
++
++	if (status) {
++		printf("Discover primary services by UUID failed: %s\n",
++							att_ecode2str(status));
++		return;
++	}
++
++	printf("\n");
++	for (l = ranges; l; l = l->next) {
++		struct att_range *range = l->data;
++		g_print("Starting handle: 0x%04x Ending handle: 0x%04x\n",
++						range->start, range->end);
++	}
++
++	rl_forced_update_display();
++}
++
+ static void cmd_exit(int argcp, char **argvp)
  {
-+	char buf[18];
-+	ba2str(&conn->dest, buf);
- 	syslog(LOG_INFO, "Closing connection %s handle %d",
--					batostr(&conn->dest), conn->handle);
-+					buf, conn->handle);
+ 	rl_callback_handler_remove();
+@@ -145,6 +192,28 @@ static void cmd_disconnect(int argcp, char **argvp)
+ 	return;
+ }
  
- 	g_io_channel_shutdown(conn->chan, TRUE, NULL);
- 	g_io_channel_unref(conn->chan);
++static void cmd_primary(int argcp, char **argvp)
++{
++	uuid_t uuid;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
++		return;
++	}
++
++	if (argcp == 1) {
++		gatt_discover_primary(attrib, NULL, primary_all_cb, NULL);
++		return;
++	}
++
++	if (bt_string2uuid(&uuid, argvp[1]) < 0) {
++		printf("Invalid UUID\n");
++		return;
++	}
++
++	gatt_discover_primary(attrib, &uuid, primary_by_uuid_cb, NULL);
++}
++
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
+@@ -154,6 +223,7 @@ static struct {
+ 	{ "exit",	cmd_exit,	"Exit interactive mode"},
+ 	{ "connect",	cmd_connect,	"Connect to a remote device"},
+ 	{ "disconnect",	cmd_disconnect,	"Disconnect from a remote device"},
++	{ "primary",	cmd_primary,	"Primary Service Discovery"},
+ 	{ NULL, NULL, NULL}
+ };
+ 
 -- 
-1.7.4.1
+1.7.1
 
