@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Feb 2011 16:04:01 -0300
+Date: Thu, 17 Feb 2011 15:53:09 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: PATCH [1/2] batostr(): Switch byte order before converting
-Message-ID: <20110217190401.GA22042@jh-x301>
-References: <AANLkTinBBdyyUR5-f=HMBNZ-38KnGdnU_M38kzcLuoBg@mail.gmail.com>
+Subject: Re: [PATCH] Use memcpy for network to host order function on BE
+ hosts
+Message-ID: <20110217185309.GA19484@jh-x301>
+References: <1297964368-23733-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTinBBdyyUR5-f=HMBNZ-38KnGdnU_M38kzcLuoBg@mail.gmail.com>
+In-Reply-To: <1297964368-23733-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Claudio,
 
-On Wed, Feb 16, 2011, David Herrmann wrote:
-> The library function batostr() computes incorrect results because it
-> does not swap byte-ordering before converting the address. This patch
-> fixes this behaviour. It tries to make batostr() look like ba2str() to
-> be consistent.
+On Thu, Feb 17, 2011, Claudio Takahasi wrote:
+> Harmless change replacing "for" by "memcpy". Note that this change
+> is inside the block reserved to big endian functions.
+> ---
+>  lib/sdp.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
 
-We can't go ahead and change the behavior of existing libbluetooth
-functions like that since it would break any applications relying on the
-old behavior (without baswap). So this patch isn't acceptable upstream.
+Applied. Thanks.
 
 Johan
