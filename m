@@ -1,32 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Feb 2011 15:35:26 -0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: Re: [PATCH v2] Fix no SEP if corresponding interface is disabled
-Message-ID: <20110217183526.GA16290@jh-x301>
-References: <1297935077-25540-1-git-send-email-dmitriy.paliy@nokia.com>
- <1297935077-25540-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297935077-25540-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <20110217174806.GK10543@joana>
+References: <4d5d2585.8f7edc0a.5af6.27d8@mx.google.com>
+	<20110217174806.GK10543@joana>
+Date: Thu, 17 Feb 2011 15:09:12 -0300
+Message-ID: <AANLkTikmWhzcwAOs18uDV+KCH1LS9HYsHvQT1UUvK77O@mail.gmail.com>
+Subject: Re: [RFCv2 1/4] Bluetooth: Implement advertising report meta event
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: anderson.briglia@openbossa.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Gustavo,
 
-On Thu, Feb 17, 2011, Dmitriy Paliy wrote:
-> A2DP sink endpoint shall not be created if A2DP sink interface is disabled.
-> Same holds for A2DP source endpoint and A2DP source interface.
-> 
-> Such fixes bluetoothd crash when SDP record is registered and remote
-> device tries to connect and stream to A2DP sink which is not initialized.
-> Dereferencing of NULL happens in source_new_stream since device->source
-> was not created.
-> ---
->  audio/a2dp.c |   11 ++++++++++-
->  1 files changed, 10 insertions(+), 1 deletions(-)
+On Thu, Feb 17, 2011 at 2:48 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+>> +     for (i = 1; i < num_reports; i++) {
+>> +             ev = (void *) (ev->data + ev->length + 1);
+>
+> You are not using i anywhere here.
 
-Pushed upstream. Thanks.
+It's used to iterate the for() itself, but it could be changed to e.g.:
 
-Johan
+while (--num_reports) {
+...
+}
+
+It is pre-incremented to skip the first report as it was already
+processed outside the loop.
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
