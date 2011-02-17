@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 07/10] Bluetooth: Fix code style issues and make checkpatch silent about hci_core.h
-Date: Thu, 17 Feb 2011 14:16:38 +0100
-Message-ID: <1297948601-12723-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 05/10] Bluetooth: Add read_local_oob_data management command
+Date: Thu, 17 Feb 2011 14:16:36 +0100
+Message-ID: <1297948601-12723-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1297948601-12723-1-git-send-email-szymon.janc@tieto.com>
 References: <1297948601-12723-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,201 +14,221 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch adds a command to read local OOB data to the managment interface.
+The command maps directly to the Read Local OOB Data HCI command.
+
 Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
- include/net/bluetooth/hci_core.h |   91 +++++++++++++++++++++-----------------
- 1 files changed, 51 insertions(+), 40 deletions(-)
+ include/net/bluetooth/hci.h      |    7 +++
+ include/net/bluetooth/hci_core.h |    2 +
+ include/net/bluetooth/mgmt.h     |   14 ++++++
+ net/bluetooth/hci_event.c        |   15 ++++++
+ net/bluetooth/mgmt.c             |   92 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 130 insertions(+), 0 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a5f8c46..7d1aef9 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -600,6 +600,13 @@ struct hci_cp_write_ssp_mode {
+ 	__u8     mode;
+ } __packed;
+ 
++#define HCI_OP_READ_LOCAL_OOB_DATA		0x0c57
++struct hci_rp_read_local_oob_data {
++	__u8     status;
++	__u8     hash[16];
++	__u8     randomizer[16];
++} __packed;
++
+ #define HCI_OP_READ_INQ_RSP_TX_POWER	0x0c58
+ 
+ #define HCI_OP_READ_LOCAL_VERSION	0x1001
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e4f370f..a8a5ecb 100644
+index 7ee921d..704f265 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -208,37 +208,37 @@ struct hci_dev {
- struct hci_conn {
- 	struct list_head list;
+@@ -746,6 +746,8 @@ int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
+ int mgmt_pin_code_request(u16 index, bdaddr_t *bdaddr);
+ int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
+ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
++int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
++								u8 status);
  
--	atomic_t	 refcnt;
--	spinlock_t	 lock;
--
--	bdaddr_t	 dst;
--	__u16		 handle;
--	__u16		 state;
--	__u8             mode;
--	__u8		 type;
--	__u8		 out;
--	__u8		 attempt;
--	__u8		 dev_class[3];
--	__u8             features[8];
--	__u8             ssp_mode;
--	__u16            interval;
--	__u16            pkt_type;
--	__u16            link_policy;
--	__u32		 link_mode;
--	__u8             auth_type;
--	__u8             sec_level;
--	__u8		 pending_sec_level;
--	__u8		 pin_length;
--	__u8		 io_capability;
--	__u8             power_save;
--	__u16            disc_timeout;
--	unsigned long	 pend;
-+	atomic_t	refcnt;
-+	spinlock_t	lock;
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index a5cc1e0..18e2fb6 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -160,6 +160,20 @@ struct mgmt_cp_set_io_capability {
+ 	__u8 io_capability;
+ } __packed;
+ 
 +
-+	bdaddr_t	dst;
-+	__u16		handle;
-+	__u16		state;
-+	__u8		mode;
-+	__u8		type;
-+	__u8		out;
-+	__u8		attempt;
-+	__u8		dev_class[3];
-+	__u8		features[8];
-+	__u8		ssp_mode;
-+	__u16		interval;
-+	__u16		pkt_type;
-+	__u16		link_policy;
-+	__u32		link_mode;
-+	__u8		auth_type;
-+	__u8		sec_level;
-+	__u8		pending_sec_level;
-+	__u8		pin_length;
-+	__u8		io_capability;
-+	__u8		power_save;
-+	__u16		disc_timeout;
-+	unsigned long	pend;
- 
- 	__u8		remote_cap;
- 	__u8		remote_oob;
- 	__u8		remote_auth;
- 
--	unsigned int	 sent;
-+	unsigned int	sent;
- 
- 	struct sk_buff_head data_q;
- 
-@@ -298,7 +298,8 @@ static inline long inquiry_entry_age(struct inquiry_entry *e)
- 	return jiffies - e->timestamp;
++#define MGMT_OP_READ_LOCAL_OOB_DATA	0x0017
++struct mgmt_cp_read_local_oob_data {
++	__le16 index;
++} __packed;
++struct mgmt_rp_read_local_oob_data {
++	__le16 index;
++	__u8 hash[16];
++	__u8 randomizer[16];
++} __packed;
++struct mgmt_rp_read_local_oob_data_failed {
++	__le16 index;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1741936..053fcf7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -796,6 +796,17 @@ static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
+ 	hci_req_complete(hdev, HCI_OP_LE_READ_BUFFER_SIZE, rp->status);
  }
  
--struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
-+							bdaddr_t *bdaddr);
- void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data);
++static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++	mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
++						rp->randomizer, rp->status);
++}
++
+ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+@@ -1723,6 +1734,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_pin_code_neg_reply(hdev, skb);
+ 		break;
  
- /* ----- HCI Connections ----- */
-@@ -356,7 +357,7 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
++	case HCI_OP_READ_LOCAL_OOB_DATA:
++		hci_cc_read_local_oob_data_reply(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_READ_BUFFER_SIZE:
+ 		hci_cc_le_read_buffer_size(hdev, skb);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index dee82fe..2847934 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1058,6 +1058,60 @@ static int set_io_capability(struct sock *sk, unsigned char *data, u16 len)
+ 						&dev_id, sizeof(dev_id));
  }
  
- static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
--					__u16 handle)
-+								__u16 handle)
++static int read_local_oob_data(struct sock *sk, unsigned char *data, u16 len)
++{
++	struct hci_dev *hdev;
++	struct mgmt_cp_read_local_oob_data *cp;
++	struct mgmt_rp_read_local_oob_data_failed rp;
++	u16 dev_id;
++	int err;
++
++	cp = (void *) data;
++	dev_id = get_unaligned_le16(&cp->index);
++	rp.index = cp->index;
++
++	BT_DBG("hci%u", dev_id);
++
++	hdev = hci_dev_get(dev_id);
++	if (!hdev)
++		return cmd_status(sk, MGMT_OP_READ_LOCAL_OOB_DATA, ENODEV, &rp,
++								sizeof(rp));
++
++	hci_dev_lock_bh(hdev);
++
++	if (!test_bit(HCI_UP, &hdev->flags)) {
++		err = -ENETDOWN;
++		goto unlock;
++	}
++
++	if (!(hdev->features[6] & LMP_SIMPLE_PAIR)) {
++		err = -EPERM;
++		goto unlock;
++	}
++
++	if (mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, dev_id)) {
++		err = -EBUSY;
++		goto unlock;
++	}
++
++	err = mgmt_pending_add(sk, MGMT_OP_READ_LOCAL_OOB_DATA, dev_id, data,
++									len);
++	if (err == 0)
++		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
++
++unlock:
++	if (err < 0) {
++		err = cmd_status(sk, MGMT_OP_READ_LOCAL_OOB_DATA, -err, &rp,
++								sizeof(rp));
++		mgmt_pending_remove(MGMT_OP_READ_LOCAL_OOB_DATA, dev_id);
++	}
++
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
  {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	struct list_head *p;
-@@ -371,7 +372,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+ 	unsigned char *buf;
+@@ -1143,6 +1197,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_SET_IO_CAPABILITY:
+ 		err = set_io_capability(sk, buf + sizeof(*hdr), len);
+ 		break;
++	case MGMT_OP_READ_LOCAL_OOB_DATA:
++		err = read_local_oob_data(sk, buf + sizeof(*hdr), len);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, opcode, 0x01, NULL, 0);
+@@ -1404,3 +1461,38 @@ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
+ 
+ 	return err;
  }
- 
- static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
--					__u8 type, bdaddr_t *ba)
-+							__u8 type, bdaddr_t *ba)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	struct list_head *p;
-@@ -386,7 +387,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_ba(struct hci_dev *hdev,
- }
- 
- static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
--					__u8 type, __u16 state)
-+							__u8 type, __u16 state)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
- 	struct list_head *p;
-@@ -411,7 +412,8 @@ int hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
- 
--struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type);
-+struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+						__u8 sec_level, __u8 auth_type);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
- int hci_conn_change_link_key(struct hci_conn *conn);
-@@ -499,7 +501,8 @@ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
- int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
- int hci_inquiry(void __user *arg);
- 
--struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev,
-+							bdaddr_t *bdaddr);
- int hci_blacklist_clear(struct hci_dev *hdev);
- 
- int hci_uuids_clear(struct hci_dev *hdev);
-@@ -551,16 +554,20 @@ struct hci_proto {
- 
- 	void		*priv;
- 
--	int (*connect_ind)	(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type);
-+	int (*connect_ind)	(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+								__u8 type);
- 	int (*connect_cfm)	(struct hci_conn *conn, __u8 status);
- 	int (*disconn_ind)	(struct hci_conn *conn);
- 	int (*disconn_cfm)	(struct hci_conn *conn, __u8 reason);
--	int (*recv_acldata)	(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
-+	int (*recv_acldata)	(struct hci_conn *conn, struct sk_buff *skb,
-+								__u16 flags);
- 	int (*recv_scodata)	(struct hci_conn *conn, struct sk_buff *skb);
--	int (*security_cfm)	(struct hci_conn *conn, __u8 status, __u8 encrypt);
-+	int (*security_cfm)	(struct hci_conn *conn, __u8 status,
-+								__u8 encrypt);
- };
- 
--static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type)
-+static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+								__u8 type)
- {
- 	register struct hci_proto *hp;
- 	int mask = 0;
-@@ -637,7 +644,8 @@ static inline void hci_proto_auth_cfm(struct hci_conn *conn, __u8 status)
- 		hp->security_cfm(conn, status, encrypt);
- }
- 
--static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encrypt)
-+static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status,
-+								__u8 encrypt)
- {
- 	register struct hci_proto *hp;
- 
-@@ -659,7 +667,8 @@ struct hci_cb {
- 
- 	char *name;
- 
--	void (*security_cfm)	(struct hci_conn *conn, __u8 status, __u8 encrypt);
-+	void (*security_cfm)	(struct hci_conn *conn, __u8 status,
-+								__u8 encrypt);
- 	void (*key_change_cfm)	(struct hci_conn *conn, __u8 status);
- 	void (*role_switch_cfm)	(struct hci_conn *conn, __u8 status, __u8 role);
- };
-@@ -685,7 +694,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 	read_unlock_bh(&hci_cb_list_lock);
- }
- 
--static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encrypt)
-+static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
-+								__u8 encrypt)
- {
- 	struct list_head *p;
- 
-@@ -716,7 +726,8 @@ static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
- 	read_unlock_bh(&hci_cb_list_lock);
- }
- 
--static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status, __u8 role)
-+static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
-+								__u8 role)
- {
- 	struct list_head *p;
- 
++
++int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
++								u8 status)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	BT_DBG("hci%u status %u", index, status);
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, index);
++	if (!cmd)
++		return -ENOENT;
++
++	if (status) {
++		struct mgmt_rp_read_local_oob_data_failed rp;
++		put_unaligned_le16(index, &rp.index);
++
++		err = cmd_status(cmd->sk, MGMT_OP_READ_LOCAL_OOB_DATA, EIO, &rp,
++								sizeof(rp));
++	} else {
++		struct mgmt_rp_read_local_oob_data rp;
++
++		put_unaligned_le16(index, &rp.index);
++		memcpy(rp.hash, hash, 16);
++		memcpy(rp.randomizer, randomizer, 16);
++
++		err = cmd_complete(cmd->sk, MGMT_OP_READ_LOCAL_OOB_DATA, &rp,
++								sizeof(rp));
++	}
++
++	list_del(&cmd->list);
++	mgmt_pending_free(cmd);
++
++	return err;
++}
 -- 
 1.7.0.4
 
