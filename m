@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFCv2 1/4] Bluetooth: Implement advertising report meta event
-Date: Thu, 17 Feb 2011 10:39:53 -0300
-Message-Id: <4d5d2585.8f7edc0a.5af6.27d8@mx.google.com>
+Subject: [RFCv2 0/4] Advertising reports cache
+Date: Thu, 17 Feb 2011 10:39:52 -0300
+Message-Id: <4d5d2583.8f7edc0a.5af6.27d7@mx.google.com>
 In-Reply-To: <n>
 References: <n>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,84 +12,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-This patch implements new LE meta event in order to handle advertising
-reports.
+The following patches implement a list for advertising report events from LE
+devices in order to store the bdaddr and bdaddr type.
+Next steps include remove all advertising reports cache from userspace and
+implement a mechanism to sync kernel advertising cache and userspace adv cache.
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
----
- include/net/bluetooth/hci.h |   18 ++++++++++++++++++
- net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
- 2 files changed, 40 insertions(+), 0 deletions(-)
+Patches are rebased using Vinicius SMP patches, repo:
+git://git.infradead.org/users/vcgomes/linux-2.6.git for-next
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 46438f4..5180555 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -980,6 +980,24 @@ struct hci_ev_le_conn_complete {
- 	__u8     clk_accurancy;
- } __packed;
- 
-+#define ADV_IND		0x00
-+#define ADV_DIRECT_IND	0x01
-+#define ADV_SCAN_IND	0x02
-+#define ADV_NONCONN_IND	0x03
-+#define SCAN_RSP	0x04
-+
-+#define ADDR_DEV_PUBLIC	0x00
-+#define ADDR_DEV_RANDOM	0x01
-+
-+#define HCI_EV_LE_ADVERTISING_REPORT	0x02
-+struct hci_ev_le_advertising_info {
-+	__u8	 evt_type;
-+	__u8	 bdaddr_type;
-+	bdaddr_t bdaddr;
-+	__u8	 length;
-+	__u8	 data[0];
-+} __packed;
-+
- #define HCI_EV_LE_LTK_REQ		0x05
- struct hci_ev_le_ltk_req {
- 	__le16	handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 99c75f4..1c8d888 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2498,6 +2498,24 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
- }
- 
-+static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
-+						struct sk_buff *skb)
-+{
-+	struct hci_ev_le_advertising_info *ev;
-+	u8 num_reports, i;
-+
-+	num_reports = skb->data[0];
-+
-+	ev = (void *) &skb->data[1];
-+
-+	BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-+
-+	for (i = 1; i < num_reports; i++) {
-+		ev = (void *) (ev->data + ev->length + 1);
-+		BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-+	}
-+}
-+
- static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-@@ -2513,6 +2531,10 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_ltk_request_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_LE_ADVERTISING_REPORT:
-+		hci_le_adv_report_evt(hdev, skb);
-+		break;
-+
- 	default:
- 		break;
- 	}
--- 
-1.7.1
+Anderson Briglia (1):
+  Bluetooth: Implement advertising report meta event
+
+Andre Guedes (2):
+  Bluetooth: LE advertising info caching
+  Bluetooth: check adv_entries in hci_connect() for LE devices
+
+Ville Tervo (1):
+  Bluetooth: Use ERR_PTR to return error from hci_connect
+
+ include/net/bluetooth/hci.h      |   18 +++++++++
+ include/net/bluetooth/hci_core.h |   17 +++++++++
+ net/bluetooth/hci_conn.c         |   24 ++++++++----
+ net/bluetooth/hci_core.c         |   75 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   21 +++++++++++
+ net/bluetooth/l2cap_core.c       |   10 ++---
+ net/bluetooth/sco.c              |    6 ++--
+ 7 files changed, 154 insertions(+), 17 deletions(-)
 
