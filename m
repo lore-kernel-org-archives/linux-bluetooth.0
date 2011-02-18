@@ -2,78 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC v2 14/14] Change Attribute example to create UUID128 on host order
-Date: Fri, 18 Feb 2011 20:29:33 -0200
-Message-Id: <1298068173-16518-15-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC v2 13/14] Add att_put_u128
+Date: Fri, 18 Feb 2011 20:29:32 -0200
+Message-Id: <1298068173-16518-14-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+ATT protocol uses little endian byte order, before to add a UUID128
+value in the PDU it needs to converted from host order to little endian.
 ---
- attrib/example.c |   23 ++++++++++++++---------
- 1 files changed, 14 insertions(+), 9 deletions(-)
+ attrib/att.c |    4 ++--
+ attrib/att.h |    7 +++++++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/attrib/example.c b/attrib/example.c
-index f5fcf1b..6e39a68 100644
---- a/attrib/example.c
-+++ b/attrib/example.c
-@@ -60,6 +60,14 @@
- #define FMT_KILOGRAM_UUID		0xA010
- #define FMT_HANGING_UUID		0xA011
+diff --git a/attrib/att.c b/attrib/att.c
+index 78ee254..d5374fc 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -115,7 +115,7 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, uuid_t *uuid,
+ 	if (uuid->type == SDP_UUID16)
+ 		att_put_u16(uuid->value.uuid16, &pdu[5]);
+ 	else
+-		memcpy(&pdu[5], &uuid->value.uuid128, length);
++		att_put_u128(uuid->value.uuid128, &pdu[5]);
  
-+#define CHAR_WEIGHT_UUID (&(uint128_t) {{ \
-+			0x80, 0x88, 0xF2, 0x18, 0x90, 0x2C, 0x45, 0x0B, \
-+			0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25, 0xE9 }})
+ 	return min_len + length;
+ }
+@@ -345,7 +345,7 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, uuid_t *uuid,
+ 	if (uuid->type == SDP_UUID16)
+ 		att_put_u16(uuid->value.uuid16, &pdu[5]);
+ 	else
+-		memcpy(&pdu[5], &uuid->value.uuid128, length);
++		att_put_u128(uuid->value.uuid128, &pdu[5]);
+ 
+ 	return min_len + length;
+ }
+diff --git a/attrib/att.h b/attrib/att.h
+index 49788eb..c7766c8 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -195,6 +195,13 @@ static inline void att_put_u32(uint32_t src, void *dst)
+ 	bt_put_unaligned(htobl(src), (uint32_t *) dst);
+ }
+ 
++static inline void att_put_u128(uint128_t src, void *dst)
++{
++	uint128_t *d128 = dst;
 +
-+#define PRIM_WEIGHT_UUID (&(uint128_t) {{ \
-+			0x4F, 0x0A, 0xC0, 0x96, 0x35, 0xD4, 0x49, 0x11, \
-+			0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE, 0xFE }})
++	htob128(&src, d128);
++}
 +
- static int register_attributes(void)
- {
- 	const char *desc_out_temp = "Outside Temperature";
-@@ -69,14 +77,9 @@ static int register_attributes(void)
- 	const char *manufacturer_name2 = "ACME Weighing Scales";
- 	const char *serial1 = "237495-3282-A";
- 	const char *serial2 = "11267-2327A00239";
--	const unsigned char char_weight_uuid[] = { 0x80, 0x88, 0xF2, 0x18, 0x90,
--		0x2C, 0x45, 0x0B, 0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25,
--		0xE9 };
--	const unsigned char prim_weight_uuid[] = { 0x4F, 0x0A, 0xC0, 0x96, 0x35,
--		0xD4, 0x49, 0x11, 0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE,
--		0xFE };
- 	uint8_t atval[256];
- 	uuid_t uuid;
-+	uint128_t h128;
- 	int len;
+ void att_data_list_free(struct att_data_list *list);
  
- 	/* Battery state service: primary service definition */
-@@ -260,7 +263,8 @@ static int register_attributes(void)
- 
- 	/* Weight service: primary service definition */
- 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
--	memcpy(atval, prim_weight_uuid, 16);
-+	ntoh128(PRIM_WEIGHT_UUID, &h128);
-+	att_put_u128(h128, atval);
- 	attrib_db_add(0x0680, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 16);
- 
- 	/* Weight: include */
-@@ -274,11 +278,12 @@ static int register_attributes(void)
- 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
- 	atval[0] = ATT_CHAR_PROPER_READ;
- 	att_put_u16(0x0683, &atval[1]);
--	memcpy(&atval[3], char_weight_uuid, 16);
-+	att_put_u128(h128, &atval[3]);
- 	attrib_db_add(0x0682, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 19);
- 
- 	/* Weight: characteristic value */
--	sdp_uuid128_create(&uuid, char_weight_uuid);
-+	ntoh128(CHAR_WEIGHT_UUID, &h128);
-+	sdp_uuid128_create(&uuid, &h128);
- 	atval[0] = 0x82;
- 	atval[1] = 0x55;
- 	atval[2] = 0x00;
+ const char *att_ecode2str(uint8_t status);
 -- 
 1.7.4.1
 
