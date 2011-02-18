@@ -1,54 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Bluetooth: Use EIO code to report HCI error to userpace
-Date: Fri, 18 Feb 2011 10:15:47 +0100
-Message-ID: <1298020547-19162-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <20110218073400.GA874@null>
-References: <20110218073400.GA874@null>
+Date: Fri, 18 Feb 2011 09:45:49 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: "pascal@pabr.org" <pascal@pabr.org>, linux-input@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>,
+	Marcel Holtmann <marcel@holtmann.org>, Alan Ott <alan@signal11.us>
+Subject: Re: hidp_output_raw_report, HID_OUTPUT_REPORT and Sixaxis
+In-Reply-To: <20110217151931.d7ee7e29.ospite@studenti.unina.it>
+Message-ID: <alpine.LNX.2.00.1102180944590.2160@pobox.suse.cz>
+References: <20101130145405.d8142bc3.ospite@studenti.unina.it> <id3cua$12v$2@dough.gmane.org> <20110217151931.d7ee7e29.ospite@studenti.unina.it>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is not possible to distinguish in cmd_status if error was from kernel or
-from HCI (because HCI status codes and kernel error codes overlaps). Since
-in mgmt only kernel sends HCI commands HCI errors shouldn't be needed for
-userspace at all so report EIO to userspace on HCI error.
+On Thu, 17 Feb 2011, Antonio Ospite wrote:
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/mgmt.c |    7 +++----
- 1 files changed, 3 insertions(+), 4 deletions(-)
+> However, even if my patch gets is, Output reports on the Sixaxis will
+> stop working again as soon as someone implements the behavior you are
+> suggesting, that is:
+>   Feature Report -> SET_REPORT on the Control channel
+>   Output Report  -> DATA on the Interrupt channel
+> 
+> So I am going to submit the hidp_output_raw_report() override in
+> hid-sony.c as well, does this sound OK?
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index aee1da6..dee82fe 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1372,8 +1372,7 @@ int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 		return -ENOENT;
- 
- 	if (status != 0)
--		err = cmd_status(cmd->sk, MGMT_OP_PIN_CODE_REPLY, status, NULL,
--									0);
-+		err = cmd_status(cmd->sk, MGMT_OP_PIN_CODE_REPLY, EIO, NULL, 0);
- 	else
- 		err = cmd_complete(cmd->sk, MGMT_OP_PIN_CODE_REPLY,
- 						bdaddr, sizeof(*bdaddr));
-@@ -1394,8 +1393,8 @@ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 		return -ENOENT;
- 
- 	if (status != 0)
--		err = cmd_status(cmd->sk, MGMT_OP_PIN_CODE_NEG_REPLY, status,
--								NULL, 0);
-+		err = cmd_status(cmd->sk, MGMT_OP_PIN_CODE_NEG_REPLY, EIO, NULL,
-+									0);
- 	else
- 		err = cmd_complete(cmd->sk, MGMT_OP_PIN_CODE_NEG_REPLY,
- 						bdaddr, sizeof(*bdaddr));
+That makes sense to me.
+
+Could you please repost all the patches that are currently being discussed 
+are flying around in the air?
+
+I feel I haven't been CCed on all of them, so I don't have the complete 
+picture.
+
+Thanks,
+
 -- 
-1.7.0.4
-
+Jiri Kosina
+SUSE Labs, Novell Inc.
