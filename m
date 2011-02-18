@@ -1,25 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Feb 2011 11:57:31 -0300
+Date: Fri, 18 Feb 2011 12:02:09 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add Primary Discovery Services option to interactive
- gatttool
-Message-ID: <20110218145731.GA31689@jh-x301>
-References: <1297974030-20497-1-git-send-email-sheldon.demario@openbossa.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: Re: [PATCH] Replace batostr() with ba2str() to avoid memleaks
+Message-ID: <20110218150209.GB31689@jh-x301>
+References: <1297983986-10131-1-git-send-email-dh.herrmann@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297974030-20497-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1297983986-10131-1-git-send-email-dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi David,
 
-On Thu, Feb 17, 2011, Sheldon Demario wrote:
+On Fri, Feb 18, 2011, David Herrmann wrote:
+> batostr() returns dynamically allocated strings. Replace it with
+> ba2str() wherever possible to avoid heap allocations and fix
+> memleaks.
 > ---
->  attrib/interactive.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 70 insertions(+), 0 deletions(-)
+>  compat/bnep.c |    5 +++--
+>  test/hciemu.c |    4 +++-
+>  2 files changed, 6 insertions(+), 3 deletions(-)
 
-Pushed upstream. Thanks.
+Thanks. The patch has been pushed upstream with a couple of minor coding
+style corrections.
 
 Johan
