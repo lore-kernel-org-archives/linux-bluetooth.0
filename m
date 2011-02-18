@@ -2,166 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC v2 11/14] Change SDP XML parser to create UUID128 values on host order
-Date: Fri, 18 Feb 2011 20:29:30 -0200
-Message-Id: <1298068173-16518-12-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC v2 14/14] Change Attribute example to create UUID128 on host order
+Date: Fri, 18 Feb 2011 20:29:33 -0200
+Message-Id: <1298068173-16518-15-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sdp-xml.c |   73 +++++++++++++++++++++++++--------------------------------
- 1 files changed, 32 insertions(+), 41 deletions(-)
+ attrib/example.c |   23 ++++++++++++++---------
+ 1 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 48a3808..9c029d6 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -46,6 +46,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 		void *data, void (*appender)(void *, const char *))
- {
- 	int i, hex;
-+	uint128_t n128;
- 	char buf[STRBUFSIZE];
- 	char indent[MAXINDENT];
- 	char next_indent[MAXINDENT];
-@@ -116,9 +117,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 		appender(data, indent);
- 		appender(data, "<uint128 value=\"");
+diff --git a/attrib/example.c b/attrib/example.c
+index f5fcf1b..6e39a68 100644
+--- a/attrib/example.c
++++ b/attrib/example.c
+@@ -60,6 +60,14 @@
+ #define FMT_KILOGRAM_UUID		0xA010
+ #define FMT_HANGING_UUID		0xA011
  
-+		hton128(&value->val.uint128, &n128);
- 		for (i = 0; i < 16; i++) {
- 			sprintf(&buf[i * 2], "%02x",
--				(unsigned char) value->val.uint128.data[i]);
-+					(unsigned char) n128.data[i]);
- 		}
- 
- 		appender(data, buf);
-@@ -161,9 +163,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 		appender(data, indent);
- 		appender(data, "<int128 value=\"");
- 
-+		hton128(&value->val.uint128, &n128);
- 		for (i = 0; i < 16; i++) {
- 			sprintf(&buf[i * 2], "%02x",
--				(unsigned char) value->val.int128.data[i]);
-+				(unsigned char) n128.data[i]);
- 		}
- 		appender(data, buf);
- 
-@@ -190,40 +193,26 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 		appender(data, indent);
- 		appender(data, "<uuid value=\"");
- 
-+		hton128(&value->val.uint128, &n128);
++#define CHAR_WEIGHT_UUID (&(uint128_t) {{ \
++			0x80, 0x88, 0xF2, 0x18, 0x90, 0x2C, 0x45, 0x0B, \
++			0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25, 0xE9 }})
 +
- 		snprintf(buf, STRBUFSIZE - 1,
- 			 "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[0],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[1],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[2],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[3],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[4],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[5],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[6],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[7],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[8],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[9],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[10],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[11],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[12],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[13],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[14],
--			 (unsigned char) value->val.uuid.value.
--			 uuid128.data[15]);
-+			 (unsigned char) n128.data[0],
-+			 (unsigned char) n128.data[1],
-+			 (unsigned char) n128.data[2],
-+			 (unsigned char) n128.data[3],
-+			 (unsigned char) n128.data[4],
-+			 (unsigned char) n128.data[5],
-+			 (unsigned char) n128.data[6],
-+			 (unsigned char) n128.data[7],
-+			 (unsigned char) n128.data[8],
-+			 (unsigned char) n128.data[9],
-+			 (unsigned char) n128.data[10],
-+			 (unsigned char) n128.data[11],
-+			 (unsigned char) n128.data[12],
-+			 (unsigned char) n128.data[13],
-+			 (unsigned char) n128.data[14],
-+			 (unsigned char) n128.data[15]);
- 
- 		appender(data, buf);
- 		appender(data, "\" />\n");
-@@ -417,12 +406,12 @@ void convert_sdp_record_to_xml(sdp_record_t *rec,
- 
- static sdp_data_t *sdp_xml_parse_uuid128(const char *data)
++#define PRIM_WEIGHT_UUID (&(uint128_t) {{ \
++			0x4F, 0x0A, 0xC0, 0x96, 0x35, 0xD4, 0x49, 0x11, \
++			0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE, 0xFE }})
++
+ static int register_attributes(void)
  {
--	uint128_t val;
-+	uint128_t n128, h128;
- 	unsigned int i, j;
+ 	const char *desc_out_temp = "Outside Temperature";
+@@ -69,14 +77,9 @@ static int register_attributes(void)
+ 	const char *manufacturer_name2 = "ACME Weighing Scales";
+ 	const char *serial1 = "237495-3282-A";
+ 	const char *serial2 = "11267-2327A00239";
+-	const unsigned char char_weight_uuid[] = { 0x80, 0x88, 0xF2, 0x18, 0x90,
+-		0x2C, 0x45, 0x0B, 0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25,
+-		0xE9 };
+-	const unsigned char prim_weight_uuid[] = { 0x4F, 0x0A, 0xC0, 0x96, 0x35,
+-		0xD4, 0x49, 0x11, 0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE,
+-		0xFE };
+ 	uint8_t atval[256];
+ 	uuid_t uuid;
++	uint128_t h128;
+ 	int len;
  
- 	char buf[3];
+ 	/* Battery state service: primary service definition */
+@@ -260,7 +263,8 @@ static int register_attributes(void)
  
--	memset(&val, 0, sizeof(val));
-+	memset(&n128, 0, sizeof(n128));
+ 	/* Weight service: primary service definition */
+ 	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+-	memcpy(atval, prim_weight_uuid, 16);
++	ntoh128(PRIM_WEIGHT_UUID, &h128);
++	att_put_u128(h128, atval);
+ 	attrib_db_add(0x0680, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 16);
  
- 	buf[2] = '\0';
+ 	/* Weight: include */
+@@ -274,11 +278,12 @@ static int register_attributes(void)
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0683, &atval[1]);
+-	memcpy(&atval[3], char_weight_uuid, 16);
++	att_put_u128(h128, &atval[3]);
+ 	attrib_db_add(0x0682, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 19);
  
-@@ -435,11 +424,12 @@ static sdp_data_t *sdp_xml_parse_uuid128(const char *data)
- 		buf[0] = data[i];
- 		buf[1] = data[i + 1];
- 
--		val.data[j++] = strtoul(buf, 0, 16);
-+		n128.data[j++] = strtoul(buf, 0, 16);
- 		i += 2;
- 	}
- 
--	return sdp_data_alloc(SDP_UUID128, &val);
-+	ntoh128(&n128, &h128);
-+	return sdp_data_alloc(SDP_UUID128, &h128);
- }
- 
- sdp_data_t *sdp_xml_parse_uuid(const char *data, sdp_record_t *record)
-@@ -603,7 +593,7 @@ sdp_data_t *sdp_xml_parse_int(const char * data, uint8_t dtd)
- 	case SDP_INT128:
- 	case SDP_UINT128:
- 	{
--		uint128_t val;
-+		uint128_t n128, h128;
- 		int i = 0;
- 		char buf[3];
- 
-@@ -613,10 +603,11 @@ sdp_data_t *sdp_xml_parse_int(const char * data, uint8_t dtd)
- 			buf[0] = data[i];
- 			buf[1] = data[i + 1];
- 
--			val.data[i >> 1] = strtoul(buf, 0, 16);
-+			n128.data[i >> 1] = strtoul(buf, 0, 16);
- 		}
- 
--		ret = sdp_data_alloc(dtd, &val);
-+		ntoh128(&n128, &h128);
-+		ret = sdp_data_alloc(dtd, &h128);
- 		break;
- 	}
- 
+ 	/* Weight: characteristic value */
+-	sdp_uuid128_create(&uuid, char_weight_uuid);
++	ntoh128(CHAR_WEIGHT_UUID, &h128);
++	sdp_uuid128_create(&uuid, &h128);
+ 	atval[0] = 0x82;
+ 	atval[1] = 0x55;
+ 	atval[2] = 0x00;
 -- 
 1.7.4.1
 
