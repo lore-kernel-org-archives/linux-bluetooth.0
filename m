@@ -1,62 +1,455 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC v2 00/14] Store UUID-128 on host order
-Date: Fri, 18 Feb 2011 20:29:19 -0200
-Message-Id: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1298061379-4816-2-git-send-email-bgix@codeaurora.org>
+References: <1298061379-4816-1-git-send-email-bgix@codeaurora.org>
+	<1298061379-4816-2-git-send-email-bgix@codeaurora.org>
+Date: Fri, 18 Feb 2011 19:03:45 -0300
+Message-ID: <AANLkTik8KQujEk48_h0tJiBhLuqHJgaD+BtCMJMw=0Cz@mail.gmail.com>
+Subject: Re: [PATCH 1/1 rev2] Add SDP registration of Primary GATT services
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com,
+	padovan@profusion.mobi
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It must NOT be included in the next release until proper testing.
+Hi Brian,
 
-Any good soul wants to test it if I am not breaking SDP?
+On Fri, Feb 18, 2011 at 5:36 PM, Brian Gix <bgix@codeaurora.org> wrote:
+> Add capability to register SDP record for Primary Services.
+> ---
+>  attrib/example.c    |   29 +++++++++-
+>  src/attrib-server.c |  162 +++++++++++++++++++++++++++++++++++++++------------
+>  src/attrib-server.h |    3 +-
+>  3 files changed, 155 insertions(+), 39 deletions(-)
+>
+> diff --git a/attrib/example.c b/attrib/example.c
+> index 1911912..f0648e4 100644
+> --- a/attrib/example.c
+> +++ b/attrib/example.c
+> @@ -59,6 +59,9 @@
+>  #define FMT_KILOGRAM_UUID              0xA010
+>  #define FMT_HANGING_UUID               0xA011
+>
+> +#define SDP_RECORD_COUNT 10
+> +uint32_t sdp_handles[SDP_RECORD_COUNT];
+> +
 
-The following patches convert the internal UUID128 values representation
-to host order. Currently, SDP functions use host order to store UUID-16
-/UUID32 and network order to store UUID-128 values. The reason is to
-keep the consistency and re-use the UUID functions for ATT protocol
-which uses little endian.
+This should be static, right?
 
-Changes from the first RFC:
- - Changes sdptool
- - Changes SDP XML parsing function
- - Changes attribute example
+What about using a GSList *, instead of a statically allocated structure?
 
-Claudio Takahasi (14):
-  Move 64 and 128 bits byte order functions to bluetooth.h
-  Use host byte order when converting UUID16/32 to UUID128
-  Add att_get_u128
-  Convert UUID128 value to host order when extracting SDP data
-  Convert to network order before use it on sdp_uuid128_to_uuid
-  Convert from host to network order before to print UUID128 values
-  Convert from network to host order on bt_string2uuid function
-  Change UUID128 host order on SDP PDU generation function
-  Replace UUID128 values from char array to uint128_t on sdptool
-  Create UUID128 on host order on sdptool
-  Change SDP XML parser to create UUID128 values on host order
-  Convert from little endian to host order when parsing EIR data
-  Add att_put_u128
-  Change Attribute example to create UUID128 on host order
+>  static int register_attributes(void)
+>  {
+>        const char *desc_out_temp = "Outside Temperature";
+> @@ -77,6 +80,7 @@ static int register_attributes(void)
+>        uint8_t atval[256];
+>        uuid_t uuid;
+>        int len;
+> +       int i = 0;
+>
+>        /* Battery state service: primary service definition */
+>        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+> @@ -101,6 +105,11 @@ static int register_attributes(void)
+>        atval[1] = 0x00;
+>        attrib_db_add(0x0111, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval, 2);
+>
+> +       /* Add an SDP record for the above service */
+> +       sdp_handles[i] = attrib_create_sdp(0x0100, "Battery State Service");
+> +       if (sdp_handles[i])
+> +               i++;
+> +
+>        /* Thermometer: primary service definition */
+>        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+>        att_put_u16(THERM_HUMIDITY_SVC_UUID, &atval[0]);
+> @@ -116,7 +125,8 @@ static int register_attributes(void)
+>        /* Thermometer: Include */
+>        att_put_u16(0x0550, &atval[0]);
+>        att_put_u16(0x0568, &atval[2]);
+> -       attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 4);
+> +       att_put_u16(VENDOR_SPECIFIC_SVC_UUID, &atval[4]);
+> +       attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
 
- attrib/att.c         |   16 ++++--
- attrib/att.h         |   17 ++++++
- attrib/example.c     |   24 +++++---
- attrib/gatt.c        |   14 +++--
- attrib/gatttool.c    |    6 ++-
- attrib/interactive.c |    1 +
- health/hdp_manager.c |    1 +
- health/mcap_sync.c   |   17 ------
- lib/bluetooth.h      |   41 ++++++++++++++
- lib/sdp.c            |  108 ++++++++++++++-----------------------
- lib/sdp.h            |    4 --
- src/event.c          |    6 +--
- src/glib-helper.c    |   31 ++++++-----
- src/sdp-xml.c        |   74 +++++++++++--------------
- test/hciemu.c        |   16 ------
- tools/sdptool.c      |  145 ++++++++++++++++++++++++++++++-------------------
- 16 files changed, 280 insertions(+), 241 deletions(-)
+This change does not seem realted to the patch.
 
+>
+>        /* Thermometer: temperature characteristic */
+>        sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+> @@ -173,6 +183,11 @@ static int register_attributes(void)
+>        strncpy((char *) atval, desc_out_hum, len);
+>        attrib_db_add(0x0214, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+>
+> +       /* Add an SDP record for the above service */
+> +       sdp_handles[i] = attrib_create_sdp(0x0200, "Thermometer");
+> +       if (sdp_handles[i])
+> +               i++;
+> +
+>        /* Secondary Service: Manufacturer Service */
+>        sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+>        att_put_u16(MANUFACTURER_SVC_UUID, &atval[0]);
+> @@ -299,6 +314,11 @@ static int register_attributes(void)
+>        strncpy((char *) atval, desc_weight, len);
+>        attrib_db_add(0x0685, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+>
+> +       /* Add an SDP record for the above service */
+> +       sdp_handles[i] = attrib_create_sdp(0x0680, "Weight Service");
+> +       if (sdp_handles[i])
+> +               i++;
+> +
+>        return 0;
+>  }
+>
+> @@ -309,4 +329,11 @@ int server_example_init(void)
+>
+>  void server_example_exit(void)
+>  {
+> +       int i;
+> +
+> +       for (i = 0; i < SDP_RECORD_COUNT; i++)
+> +               if (sdp_handles[i]) {
+> +                       attrib_free_sdp(sdp_handles[i]);
+> +                       sdp_handles[i] = 0;
+> +               }
+
+Again, using GSList will make this simpler.
+
+>  }
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index 5e00601..78e347c 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -70,7 +70,8 @@ struct group_elem {
+>  static GIOChannel *l2cap_io = NULL;
+>  static GIOChannel *le_io = NULL;
+>  static GSList *clients = NULL;
+> -static uint32_t sdp_handle = 0;
+> +static uint32_t gatt_sdp_handle = 0;
+> +static uint32_t gap_sdp_handle = 0;
+>
+>  /* GAP attribute handles */
+>  static uint16_t name_handle = 0x0000;
+> @@ -85,14 +86,19 @@ static uuid_t snd_uuid = {
+>                        .value.uuid16 = GATT_SND_SVC_UUID
+>  };
+>
+> -static sdp_record_t *server_record_new(void)
+> +static sdp_record_t *server_record_new(uuid_t *uuid, uint16_t start, uint16_t end)
+>  {
+> -       sdp_list_t *svclass_id, *apseq, *proto[2], *profiles, *root, *aproto;
+> +       sdp_list_t *svclass_id, *apseq, *proto[2], *root, *aproto;
+>        uuid_t root_uuid, proto_uuid, gatt_uuid, l2cap;
+> -       sdp_profile_desc_t profile;
+>        sdp_record_t *record;
+>        sdp_data_t *psm, *sh, *eh;
+> -       uint16_t lp = GATT_PSM, start = 0x0001, end = 0xffff;
+> +       uint16_t lp = GATT_PSM;
+> +
+> +       if (uuid == NULL)
+> +               return NULL;
+> +
+> +       if (start > end)
+> +               return NULL;
+>
+>        record = sdp_record_alloc();
+>        if (record == NULL)
+> @@ -103,17 +109,10 @@ static sdp_record_t *server_record_new(void)
+>        sdp_set_browse_groups(record, root);
+>        sdp_list_free(root, NULL);
+>
+> -       sdp_uuid16_create(&gatt_uuid, GENERIC_ATTRIB_SVCLASS_ID);
+> -       svclass_id = sdp_list_append(NULL, &gatt_uuid);
+> +       svclass_id = sdp_list_append(NULL, uuid);
+>        sdp_set_service_classes(record, svclass_id);
+>        sdp_list_free(svclass_id, NULL);
+>
+> -       sdp_uuid16_create(&profile.uuid, GENERIC_ATTRIB_PROFILE_ID);
+> -       profile.version = 0x0100;
+> -       profiles = sdp_list_append(NULL, &profile);
+> -       sdp_set_profile_descs(record, profiles);
+> -       sdp_list_free(profiles, NULL);
+> -
+>        sdp_uuid16_create(&l2cap, L2CAP_UUID);
+>        proto[0] = sdp_list_append(NULL, &l2cap);
+>        psm = sdp_data_alloc(SDP_UINT16, &lp);
+> @@ -131,11 +130,6 @@ static sdp_record_t *server_record_new(void)
+>        aproto = sdp_list_append(NULL, apseq);
+>        sdp_set_access_protos(record, aproto);
+>
+> -       sdp_set_info_attr(record, "Generic Attribute Profile", "BlueZ", NULL);
+> -
+> -       sdp_set_url_attr(record, "http://www.bluez.org/",
+> -                       "http://www.bluez.org/", "http://www.bluez.org/");
+> -
+>        sdp_set_service_id(record, gatt_uuid);
+>
+>        sdp_data_free(psm);
+> @@ -180,6 +174,40 @@ static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
+>        return 0;
+>  }
+>
+> +static struct attribute *find_primary_range(uint16_t start, uint16_t *end)
+> +{
+> +       struct attribute *a, *attrib = NULL;
+
+Move declaration of "struct attribute *a" to the for(), because it is
+used only there.
+
+> +       GSList *l;
+> +       gboolean found = FALSE;
+> +
+> +       if (end == NULL)
+> +               return NULL;
+> +
+> +       for (l = database; l; l = l->next) {
+> +               a = l->data;
+> +
+> +               if (a->handle < start)
+> +                       continue;
+
+I find the logic of this loop too complex.
+
+What about using g_slist_find_custom() (like in other places of GATT
+code) to find the attribute with the given handle, them check it is a
+primary service definition? You can then iterate directly from the
+next attribute, e.g.:
+
+guint h = handle;
+
+l = g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp);
+if (!l)
+    return NULL;
+
+attrib = found_prim->data;
+*end = start; // a sane default
+
+for (l = found_prim->next; l; l = l->next) {
+
+Then, you could the check for primary/secondary service to know if the
+service has ended (just pasting your own code):
+
+> +               if (sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
+> +                               sdp_uuid_cmp(&a->uuid, &snd_uuid) == 0)
+> +                       break;
+
+You can then update the *end:
+
+*end = a->handle;
+
+} // end of for()
+
+return attrib;
+
+At this point *end should contain the corrent *end. Not tested :)
+Next, you could check if the iteration was until the end of the list:
+
+> +
+> +               if ((a->handle == start) &&
+> +                               sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0) {
+> +                       found = TRUE;
+> +                       *end = start;
+> +                       attrib = a;
+> +                       continue;
+> +               } else if (!found)
+> +                       break;
+> +
+> +               if (sdp_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
+> +                               sdp_uuid_cmp(&a->uuid, &snd_uuid) == 0)
+> +                       break;
+> +               else
+> +                       *end = a->handle;
+> +       }
+> +
+> +       return attrib;
+> +}
+> +
+>  static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+>                                                uint16_t end, uuid_t *uuid,
+>                                                uint8_t *pdu, int len)
+> @@ -611,7 +639,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
+>  static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+>                uint8_t *pdu, int len)
+>  {
+> -       channel->mtu = MIN(mtu, ATT_MAX_MTU);
+> +       channel->mtu = MIN(mtu, channel->mtu);
+>
+>        return enc_mtu_resp(channel->mtu, pdu, len);
+>  }
+
+I still think this change should go in a separate patch, as it fixes
+another bug.
+
+> @@ -798,7 +826,7 @@ static void confirm_event(GIOChannel *io, void *user_data)
+>        return;
+>  }
+>
+> -static void register_core_services(void)
+> +static gboolean register_core_services(void)
+>  {
+>        uint8_t atval[256];
+>        uuid_t uuid;
+> @@ -835,17 +863,37 @@ static void register_core_services(void)
+>        att_put_u16(appearance, &atval[0]);
+>        attrib_db_add(appearance_handle, &uuid, ATT_NONE, ATT_NOT_PERMITTED,
+>                                                                atval, 2);
+> +       gap_sdp_handle = attrib_create_sdp(0x0001, "Generic Access Profile");
+> +
+> +       if (gap_sdp_handle == 0) {
+> +               error("Failed to register GAP service record");
+> +               goto failed;
+> +       }
+>
+>        /* GATT service: primary service definition */
+>        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+>        att_put_u16(GENERIC_ATTRIB_PROFILE_ID, &atval[0]);
+>        attrib_db_add(0x0010, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+> +
+> +       gatt_sdp_handle = attrib_create_sdp(0x0010,
+> +                                               "Generic Attribute Profile");
+> +       if (gatt_sdp_handle == 0) {
+> +               error("Failed to register GATT service record");
+> +               goto failed;
+> +       }
+> +
+> +       return TRUE;
+> +
+> +failed:
+> +       if (gap_sdp_handle)
+> +               remove_record_from_server(gap_sdp_handle);
+> +
+> +       return FALSE;
+>  }
+>
+>  int attrib_server_init(void)
+>  {
+>        GError *gerr = NULL;
+> -       sdp_record_t *record;
+>
+>        /* BR/EDR socket */
+>        l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+> @@ -861,21 +909,8 @@ int attrib_server_init(void)
+>                return -1;
+>        }
+>
+> -       record = server_record_new();
+> -       if (record == NULL) {
+> -               error("Unable to create GATT service record");
+> +       if (!register_core_services())
+>                goto failed;
+> -       }
+> -
+> -       if (add_record_to_server(BDADDR_ANY, record) < 0) {
+> -               error("Failed to register GATT service record");
+> -               sdp_record_free(record);
+> -               goto failed;
+> -       }
+> -
+> -       sdp_handle = record->handle;
+> -
+> -       register_core_services();
+>
+>        if (!main_opts.le)
+>                return 0;
+> @@ -934,8 +969,61 @@ void attrib_server_exit(void)
+>
+>        g_slist_free(clients);
+>
+> -       if (sdp_handle)
+> -               remove_record_from_server(sdp_handle);
+> +       if (gatt_sdp_handle)
+> +               remove_record_from_server(gatt_sdp_handle);
+> +
+> +       if (gap_sdp_handle)
+> +               remove_record_from_server(gap_sdp_handle);
+> +}
+> +
+> +uint32_t attrib_create_sdp(uint16_t handle, const char *name)
+> +{
+> +       sdp_record_t *record;
+> +       struct attribute *a;
+> +       uint16_t end = 0;
+> +       uuid_t svc;
+> +
+> +       a = find_primary_range(handle, &end);
+> +
+> +       if (a == NULL)
+> +               goto failed;
+> +
+> +       if (a->len == 2) {
+> +               svc.type = SDP_UUID16;
+> +               svc.value.uuid16 = att_get_u16(a->data);
+
+You should use "sdp_uuid16_create(&svc, att_get_u16(a->data))" here
+
+> +       } else if (a->len == 16) {
+> +               svc.type = SDP_UUID128;
+> +               memcpy(&svc.value.uuid128, a->data, sizeof(uint128_t));
+
+And sdp_uuid128_create() here.
+
+> +       } else
+> +               goto failed;
+> +
+> +       record = server_record_new(&svc, handle, end);
+> +
+> +       if (record == NULL)
+> +               goto failed;
+> +
+> +       if (name)
+> +               sdp_set_info_attr(record, name, "BlueZ", NULL);
+> +
+> +       if (svc.type == SDP_UUID16 &&
+> +                       svc.value.uuid16 == GENERIC_ACCESS_PROFILE_ID) {
+
+Usually you would create a temporary uuid16 containing
+GENERIC_ACCESS_PROFILE_ID and then compare with sdp_uuid_cmp().
+
+> +               sdp_set_url_attr(record, "http://www.bluez.org/",
+> +                               "http://www.bluez.org/",
+> +                               "http://www.bluez.org/");
+> +       }
+> +
+> +       if (add_record_to_server(BDADDR_ANY, record) < 0)
+> +               sdp_record_free(record);
+> +       else
+> +               return record->handle;
+> +failed:
+
+This label (and the goto's) look unnecessary.
+
+> +       return 0;
+> +}
+> +
+> +void attrib_free_sdp(uint32_t sdp_handle)
+> +{
+> +       remove_record_from_server(sdp_handle);
+>  }
+>
+>  int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
+> diff --git a/src/attrib-server.h b/src/attrib-server.h
+> index 252700f..ecd695c 100644
+> --- a/src/attrib-server.h
+> +++ b/src/attrib-server.h
+> @@ -30,5 +30,6 @@ int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
+>  int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
+>                                                                int len);
+>  int attrib_db_del(uint16_t handle);
+> -
+>  int attrib_gap_set(uint16_t uuid, const uint8_t *value, int len);
+> +uint32_t attrib_create_sdp(uint16_t handle, const char *name);
+> +void attrib_free_sdp(uint32_t sdp_handle);
+> --
+> 1.7.1
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+
+
+Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
