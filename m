@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 18 Feb 2011 13:51:30 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] telephony-ofono: reset indicators when a network
+ is found
+Message-ID: <20110218165130.GA8010@jh-x301>
+References: <1298046241-8655-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <9E5B44E9-A8D4-49AB-9D2E-0465BF74ACA1@gmail.com>
-References: <1A8743E5-65EA-4625-82FD-658C9722629F@gmail.com>
-	<20110215135245.GA11561@jh-x301>
-	<1ADFED1F-912D-4DF9-A3BB-795F9AB1D1F8@gmail.com>
-	<20110216133411.GD14085@joana>
-	<5C042A85-6D54-451D-8BAC-CE24D61907CA@gmail.com>
-	<20110216193504.GH14085@joana>
-	<9E5B44E9-A8D4-49AB-9D2E-0465BF74ACA1@gmail.com>
-Date: Fri, 18 Feb 2011 11:09:00 -0800
-Message-ID: <AANLkTimaJJp4PH6kWWNM8znnbhnGWU1d4WbkyxeJWs5q@mail.gmail.com>
-Subject: Re: bluetooth disabled with current 2.6.38-rc4
-From: Justin Mattock <justinmattock@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298046241-8655-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-well.. I've looked at this issue a little bit more, and am noticing
-that the hci0 device is not being brought up when the daemon is being
-called.(udev seems to not being loading for me at boot) Im going to
-look and check my configurations to make sure everything is correct.
+Hi Luiz,
 
-Justin P. Mattock
+On Fri, Feb 18, 2011, Luiz Augusto von Dentz wrote:
+> Indicators may have invalid values set from the last time they were used
+> ---
+>  audio/telephony-ofono.c |    9 +++++++++
+>  1 files changed, 9 insertions(+), 0 deletions(-)
+
+Pushed upstream. Thanks.
+
+Be careful with the commit message line lengths. The summary line of
+your second patch was too long for git log on a 80-character wide
+terminal (I fixed this manually).
+
+Johan
