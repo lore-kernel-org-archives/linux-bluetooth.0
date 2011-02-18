@@ -1,24 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Feb 2011 12:10:41 -0300
+Date: Fri, 18 Feb 2011 11:57:31 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Add UUID property to GATT service object
-Message-ID: <20110218151041.GA301@jh-x301>
-References: <1297880021-31728-1-git-send-email-epx@signove.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add Primary Discovery Services option to interactive
+ gatttool
+Message-ID: <20110218145731.GA31689@jh-x301>
+References: <1297974030-20497-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1297880021-31728-1-git-send-email-epx@signove.com>
+In-Reply-To: <1297974030-20497-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Sheldon,
 
-On Wed, Feb 16, 2011, Elvis Pf??tzenreuter wrote:
+On Thu, Feb 17, 2011, Sheldon Demario wrote:
 > ---
->  attrib/client.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+>  attrib/interactive.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 70 insertions(+), 0 deletions(-)
 
-This patch has been pushed upstream. For the others I'm still waiting
-for some feedback from the other LE developers.
+Pushed upstream. Thanks.
 
 Johan
