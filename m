@@ -2,33 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Brian Gix <bgix@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Brian Gix <bgix@codeaurora.org>
-Subject: [PATCH 2/2] Fix Crash where MTU allowed to be set too large
-Date: Sat, 19 Feb 2011 12:45:43 -0800
-Message-Id: <1298148343-10535-3-git-send-email-bgix@codeaurora.org>
+Subject: [PATCH 1/2] Add missing UUID16 field to Included Svc Attribute
+Date: Sat, 19 Feb 2011 12:45:42 -0800
+Message-Id: <1298148343-10535-2-git-send-email-bgix@codeaurora.org>
 In-Reply-To: <1298148343-10535-1-git-send-email-bgix@codeaurora.org>
 References: <1298148343-10535-1-git-send-email-bgix@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As previously written, a remote device could request, and we would
-accept an MTU larger than what we could support.
 ---
- src/attrib-server.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ attrib/example.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 6966ad0..4285f6e 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -639,7 +639,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
- 		uint8_t *pdu, int len)
- {
--	channel->mtu = MIN(mtu, ATT_MAX_MTU);
-+	channel->mtu = MIN(mtu, channel->mtu);
+diff --git a/attrib/example.c b/attrib/example.c
+index cd18168..395650a 100644
+--- a/attrib/example.c
++++ b/attrib/example.c
+@@ -124,7 +124,8 @@ static int register_attributes(void)
+ 	/* Thermometer: Include */
+ 	att_put_u16(0x0550, &atval[0]);
+ 	att_put_u16(0x0568, &atval[2]);
+-	attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 4);
++	att_put_u16(VENDOR_SPECIFIC_SVC_UUID, &atval[4]);
++	attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
  
- 	return enc_mtu_resp(channel->mtu, pdu, len);
- }
+ 	/* Thermometer: temperature characteristic */
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
 -- 
 1.7.1
 --
