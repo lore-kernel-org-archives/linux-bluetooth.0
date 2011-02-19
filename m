@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1298068173-16518-15-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298068173-16518-11-git-send-email-claudio.takahasi@openbossa.org>
 References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1298068173-16518-15-git-send-email-claudio.takahasi@openbossa.org>
-Date: Fri, 18 Feb 2011 22:24:51 -0300
-Message-ID: <AANLkTim4ieVO2mwXo=hOgVwi1wFs9KTznfxSMsaZ2K1v@mail.gmail.com>
-Subject: Re: [RFC v2 14/14] Change Attribute example to create UUID128 on host order
+	<1298068173-16518-11-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 18 Feb 2011 21:57:30 -0300
+Message-ID: <AANLkTikGgA+L2M8VrTMA8jPu=run1QMRbQNUoRAJ1kUB@mail.gmail.com>
+Subject: Re: [RFC v2 10/14] Create UUID128 on host order on sdptool
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,82 +17,159 @@ Hi Claudio,
 
 On Fri, Feb 18, 2011 at 7:29 PM, Claudio Takahasi
 <claudio.takahasi@openbossa.org> wrote:
+> Converts from network to host order UUID128 values before to call
+> sdp_uuid128_create function. Internally, SDP library now stores the
+> UUID128 values on host order.
 > ---
->  attrib/example.c |   23 ++++++++++++++---------
->  1 files changed, 14 insertions(+), 9 deletions(-)
+>  tools/sdptool.c |   36 +++++++++++++++++++++++++++---------
+>  1 files changed, 27 insertions(+), 9 deletions(-)
 >
-> diff --git a/attrib/example.c b/attrib/example.c
-> index f5fcf1b..6e39a68 100644
-> --- a/attrib/example.c
-> +++ b/attrib/example.c
-> @@ -60,6 +60,14 @@
->  #define FMT_KILOGRAM_UUID              0xA010
->  #define FMT_HANGING_UUID               0xA011
->
-> +#define CHAR_WEIGHT_UUID (&(uint128_t) {{ \
-> +                       0x80, 0x88, 0xF2, 0x18, 0x90, 0x2C, 0x45, 0x0B, \
-> +                       0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25, 0xE9 }})
-> +
-> +#define PRIM_WEIGHT_UUID (&(uint128_t) {{ \
-> +                       0x4F, 0x0A, 0xC0, 0x96, 0x35, 0xD4, 0x49, 0x11, \
-> +                       0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE, 0xFE }})
-> +
->  static int register_attributes(void)
->  {
->        const char *desc_out_temp = "Outside Temperature";
-> @@ -69,14 +77,9 @@ static int register_attributes(void)
->        const char *manufacturer_name2 = "ACME Weighing Scales";
->        const char *serial1 = "237495-3282-A";
->        const char *serial2 = "11267-2327A00239";
-> -       const unsigned char char_weight_uuid[] = { 0x80, 0x88, 0xF2, 0x18, 0x90,
-> -               0x2C, 0x45, 0x0B, 0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25,
-> -               0xE9 };
-> -       const unsigned char prim_weight_uuid[] = { 0x4F, 0x0A, 0xC0, 0x96, 0x35,
-> -               0xD4, 0x49, 0x11, 0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE,
-> -               0xFE };
->        uint8_t atval[256];
->        uuid_t uuid;
+> diff --git a/tools/sdptool.c b/tools/sdptool.c
+> index ae56ebf..55e5dab 100644
+> --- a/tools/sdptool.c
+> +++ b/tools/sdptool.c
+> @@ -3022,6 +3022,7 @@ static int add_sr1(sdp_session_t *session, svc_info_t *si)
+>        sdp_record_t record;
+>        sdp_list_t *root, *svclass;
+>        uuid_t root_uuid, svclass_uuid;
 > +       uint128_t h128;
->        int len;
 >
->        /* Battery state service: primary service definition */
-> @@ -260,7 +263,8 @@ static int register_attributes(void)
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3030,7 +3031,8 @@ static int add_sr1(sdp_session_t *session, svc_info_t *si)
+>        root = sdp_list_append(NULL, &root_uuid);
+>        sdp_set_browse_groups(&record, root);
 >
->        /* Weight service: primary service definition */
->        sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-> -       memcpy(atval, prim_weight_uuid, 16);
-> +       ntoh128(PRIM_WEIGHT_UUID, &h128);
-> +       att_put_u128(h128, atval);
->        attrib_db_add(0x0680, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 16);
+> -       sdp_uuid128_create(&svclass_uuid, SR1_UUID);
+> +       ntoh128(SR1_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
 >
->        /* Weight: include */
-> @@ -274,11 +278,12 @@ static int register_attributes(void)
->        sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
->        atval[0] = ATT_CHAR_PROPER_READ;
->        att_put_u16(0x0683, &atval[1]);
-> -       memcpy(&atval[3], char_weight_uuid, 16);
+> @@ -3061,6 +3063,7 @@ static int add_syncml(sdp_session_t *session, svc_info_t *si)
+>        sdp_list_t *root, *svclass, *proto;
+>        uuid_t root_uuid, svclass_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
+>        uint8_t channel = si->channel ? si->channel: 15;
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3069,7 +3072,8 @@ static int add_syncml(sdp_session_t *session, svc_info_t *si)
+>        root = sdp_list_append(NULL, &root_uuid);
+>        sdp_set_browse_groups(&record, root);
+>
+> -       sdp_uuid128_create(&svclass_uuid, SYNCMLC_UUID);
+> +       ntoh128(SYNCMLC_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -3107,6 +3111,7 @@ static int add_activesync(sdp_session_t *session, svc_info_t *si)
+>        sdp_list_t *root, *svclass, *proto;
+>        uuid_t root_uuid, svclass_uuid, l2cap_uuid, rfcomm_uuid;
+>        uint8_t channel = si->channel ? si->channel: 21;
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3124,7 +3129,8 @@ static int add_activesync(sdp_session_t *session, svc_info_t *si)
+>
+>        sdp_set_access_protos(&record, sdp_list_append(NULL, proto));
+>
+> -       sdp_uuid128_create(&svclass_uuid, ASYNC_UUID);
+> +       ntoh128(ASYNC_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -3150,6 +3156,7 @@ static int add_hotsync(sdp_session_t *session, svc_info_t *si)
+>        sdp_list_t *root, *svclass, *proto;
+>        uuid_t root_uuid, svclass_uuid, l2cap_uuid, rfcomm_uuid;
+>        uint8_t channel = si->channel ? si->channel: 22;
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3167,7 +3174,8 @@ static int add_hotsync(sdp_session_t *session, svc_info_t *si)
+>
+>        sdp_set_access_protos(&record, sdp_list_append(NULL, proto));
+>
+> -       sdp_uuid128_create(&svclass_uuid, HOTSYNC_UUID);
+> +       ntoh128(HOTSYNC_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -3192,6 +3200,7 @@ static int add_palmos(sdp_session_t *session, svc_info_t *si)
+>        sdp_record_t record;
+>        sdp_list_t *root, *svclass;
+>        uuid_t root_uuid, svclass_uuid;
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3200,7 +3209,8 @@ static int add_palmos(sdp_session_t *session, svc_info_t *si)
+>        root = sdp_list_append(NULL, &root_uuid);
+>        sdp_set_browse_groups(&record, root);
+>
+> -       sdp_uuid128_create(&svclass_uuid, PALMOS_UUID);
+> +       ntoh128(PALMOS_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -3225,6 +3235,7 @@ static int add_nokiaid(sdp_session_t *session, svc_info_t *si)
+>        uuid_t root_uuid, svclass_uuid;
+>        uint16_t verid = 0x005f;
+>        sdp_data_t *version = sdp_data_alloc(SDP_UINT16, &verid);
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3233,7 +3244,8 @@ static int add_nokiaid(sdp_session_t *session, svc_info_t *si)
+>        root = sdp_list_append(NULL, &root_uuid);
+>        sdp_set_browse_groups(&record, root);
+>
+> -       sdp_uuid128_create(&svclass_uuid, NOKID_UUID);
+> +       ntoh128(NOKID_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -3260,6 +3272,7 @@ static int add_pcsuite(sdp_session_t *session, svc_info_t *si)
+>        sdp_list_t *root, *svclass, *proto;
+>        uuid_t root_uuid, svclass_uuid, l2cap_uuid, rfcomm_uuid;
+>        uint8_t channel = si->channel ? si->channel: 14;
+> +       uint128_t h128;
+>
+>        memset(&record, 0, sizeof(record));
+>        record.handle = si->handle;
+> @@ -3277,7 +3290,8 @@ static int add_pcsuite(sdp_session_t *session, svc_info_t *si)
+>
+>        sdp_set_access_protos(&record, sdp_list_append(NULL, proto));
+>
+> -       sdp_uuid128_create(&svclass_uuid, PCSUITE_UUID);
+> +       ntoh128(PCSUITE_UUID, &h128);
+> +       sdp_uuid128_create(&svclass_uuid, &h128);
+>        svclass = sdp_list_append(NULL, &svclass_uuid);
+>        sdp_set_service_classes(&record, svclass);
+>
+> @@ -4004,8 +4018,12 @@ static int cmd_search(int argc, char **argv)
+>                        uint16_t class16 = class & 0xffff;
+>                        sdp_uuid16_create(&context.group, class16);
+>                }
+> -       } else
+> -               sdp_uuid128_create(&context.group, &n128);
+> +       } else {
+> +               uint128_t h128;
+> +
+> +               ntoh128(n128, &h128);
+> +               sdp_uuid128_create(&context.group, &h128);
+> +       }
 
-You missed a "ntoh128(CHAR_WEIGHT_UUID, &h128);" right here.
-
-> +       att_put_u128(h128, &atval[3]);
->        attrib_db_add(0x0682, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 19);
->
->        /* Weight: characteristic value */
-> -       sdp_uuid128_create(&uuid, char_weight_uuid);
-> +       ntoh128(CHAR_WEIGHT_UUID, &h128);
-> +       sdp_uuid128_create(&uuid, &h128);
->        atval[0] = 0x82;
->        atval[1] = 0x55;
->        atval[2] = 0x00;
-> --
-> 1.7.4.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
+Just to note that on this patch it is now correct to use &h128, as
+h128 is not a pointer. Only the "intermediary" patch that is
+incorrect.
 
 Regards,
 -- 
