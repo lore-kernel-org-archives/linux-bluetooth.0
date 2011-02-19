@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] Bluetooth: Add management support for user confirmation request
-Date: Sat, 19 Feb 2011 12:05:57 -0300
-Message-Id: <1298127962-18576-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/8] Bluetooth: Add mgmt_pair_device command
+Date: Sat, 19 Feb 2011 12:05:56 -0300
+Message-Id: <1298127962-18576-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
 References: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,236 +11,235 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-This patch adds support for the user confirmation (numeric comparison)
-Secure Simple Pairing authentication method.
+This patch adds a new mgmt_pair_device which can be used to initiate a
+dedicated bonding procedure. Some extra callbacks are added to the
+hci_conn struct so that the pairing code can get notified of the
+completion of the procedure.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- include/net/bluetooth/hci.h      |   17 ++++++
- include/net/bluetooth/hci_core.h |    4 ++
- include/net/bluetooth/mgmt.h     |   20 +++++++
- net/bluetooth/hci_event.c        |   50 ++++++++++++++++++
- net/bluetooth/mgmt.c             |  103 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 194 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |   16 +++++
+ include/net/bluetooth/mgmt.h     |   12 ++++
+ net/bluetooth/mgmt.c             |  133 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 161 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index a5f8c46..ec6acf2 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -415,6 +415,17 @@ struct hci_cp_io_capability_reply {
- 	__u8     authentication;
- } __packed;
- 
-+#define HCI_OP_USER_CONFIRM_REPLY		0x042c
-+struct hci_cp_user_confirm_reply {
-+	bdaddr_t bdaddr;
-+} __packed;
-+struct hci_rp_user_confirm_reply {
-+	__u8     status;
-+	bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HCI_OP_USER_CONFIRM_NEG_REPLY	0x042d
-+
- #define HCI_OP_IO_CAPABILITY_NEG_REPLY	0x0434
- struct hci_cp_io_capability_neg_reply {
- 	bdaddr_t bdaddr;
-@@ -936,6 +947,12 @@ struct hci_ev_io_capa_reply {
- 	__u8     authentication;
- } __packed;
- 
-+#define HCI_EV_USER_CONFIRM_REQUEST	0x33
-+struct hci_ev_user_confirm_req {
-+	bdaddr_t	bdaddr;
-+	__le32		passkey;
-+} __packed;
-+
- #define HCI_EV_SIMPLE_PAIR_COMPLETE	0x36
- struct hci_ev_simple_pair_complete {
- 	__u8     status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 506f250..05f4706 100644
+index d5d8454..506f250 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -762,6 +762,10 @@ int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_pin_code_request(u16 index, bdaddr_t *bdaddr);
- int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
-+int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value);
-+int mgmt_user_confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
-+int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
-+								u8 status);
+@@ -248,6 +248,10 @@ struct hci_conn {
+ 	void		*priv;
  
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
+ 	struct hci_conn	*link;
++
++	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
++	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
++	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
+ };
+ 
+ extern struct hci_proto *hci_proto[];
+@@ -571,6 +575,9 @@ static inline void hci_proto_connect_cfm(struct hci_conn *conn, __u8 status)
+ 	hp = hci_proto[HCI_PROTO_SCO];
+ 	if (hp && hp->connect_cfm)
+ 		hp->connect_cfm(conn, status);
++
++	if (conn->connect_cfm_cb)
++		conn->connect_cfm_cb(conn, status);
+ }
+ 
+ static inline int hci_proto_disconn_ind(struct hci_conn *conn)
+@@ -600,6 +607,9 @@ static inline void hci_proto_disconn_cfm(struct hci_conn *conn, __u8 reason)
+ 	hp = hci_proto[HCI_PROTO_SCO];
+ 	if (hp && hp->disconn_cfm)
+ 		hp->disconn_cfm(conn, reason);
++
++	if (conn->disconn_cfm_cb)
++		conn->disconn_cfm_cb(conn, reason);
+ }
+ 
+ static inline void hci_proto_auth_cfm(struct hci_conn *conn, __u8 status)
+@@ -619,6 +629,9 @@ static inline void hci_proto_auth_cfm(struct hci_conn *conn, __u8 status)
+ 	hp = hci_proto[HCI_PROTO_SCO];
+ 	if (hp && hp->security_cfm)
+ 		hp->security_cfm(conn, status, encrypt);
++
++	if (conn->security_cfm_cb)
++		conn->security_cfm_cb(conn, status);
+ }
+ 
+ static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encrypt)
+@@ -632,6 +645,9 @@ static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status, __u
+ 	hp = hci_proto[HCI_PROTO_SCO];
+ 	if (hp && hp->security_cfm)
+ 		hp->security_cfm(conn, status, encrypt);
++
++	if (conn->security_cfm_cb)
++		conn->security_cfm_cb(conn, status);
+ }
+ 
+ int hci_register_proto(struct hci_proto *hproto);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 1d25c59..52376a3 100644
+index 44ac55c..1d25c59 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -172,6 +172,19 @@ struct mgmt_rp_pair_device {
- 	__u8 status;
+@@ -160,6 +160,18 @@ struct mgmt_cp_set_io_capability {
+ 	__u8 io_capability;
  } __packed;
  
-+#define MGMT_OP_USER_CONFIRM_REPLY	0x0015
-+struct mgmt_cp_user_confirm_reply {
++#define MGMT_OP_PAIR_DEVICE		0x0014
++struct mgmt_cp_pair_device {
 +	__le16 index;
 +	bdaddr_t bdaddr;
++	__u8 io_cap;
 +} __packed;
-+struct mgmt_rp_user_confirm_reply {
++struct mgmt_rp_pair_device {
 +	__le16 index;
 +	bdaddr_t bdaddr;
 +	__u8 status;
 +} __packed;
 +
-+#define MGMT_OP_USER_CONFIRM_NEG_REPLY	0x0016
-+
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	__le16 opcode;
-@@ -239,3 +252,10 @@ struct mgmt_ev_pin_code_request {
- 	__le16 index;
- 	bdaddr_t bdaddr;
- } __packed;
-+
-+#define MGMT_EV_USER_CONFIRM_REQUEST	0x000F
-+struct mgmt_ev_user_confirm_request {
-+	__le16 index;
-+	bdaddr_t bdaddr;
-+	__le32 value;
-+} __packed;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 98b5764..604c7b5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -796,6 +796,29 @@ static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
- 	hci_req_complete(hdev, HCI_OP_LE_READ_BUFFER_SIZE, rp->status);
- }
- 
-+static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-+
-+	if (test_bit(HCI_MGMT, &hdev->flags))
-+		mgmt_user_confirm_reply_complete(hdev->id, &rp->bdaddr,
-+								rp->status);
-+}
-+
-+static void hci_cc_user_confirm_neg_reply(struct hci_dev *hdev,
-+							struct sk_buff *skb)
-+{
-+	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-+
-+	if (test_bit(HCI_MGMT, &hdev->flags))
-+		mgmt_user_confirm_neg_reply_complete(hdev->id, &rp->bdaddr,
-+								rp->status);
-+}
-+
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-@@ -1728,6 +1751,14 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_le_read_buffer_size(hdev, skb);
- 		break;
- 
-+	case HCI_OP_USER_CONFIRM_REPLY:
-+		hci_cc_user_confirm_reply(hdev, skb);
-+		break;
-+
-+	case HCI_OP_USER_CONFIRM_NEG_REPLY:
-+		hci_cc_user_confirm_neg_reply(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
-@@ -2362,6 +2393,21 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-+static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
-+							struct sk_buff *skb)
-+{
-+	struct hci_ev_user_confirm_req *ev = (void *) skb->data;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (test_bit(HCI_MGMT, &hdev->flags))
-+		mgmt_user_confirm_request(hdev->id, &ev->bdaddr, ev->passkey);
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_simple_pair_complete *ev = (void *) skb->data;
-@@ -2580,6 +2626,10 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_io_capa_reply_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_USER_CONFIRM_REQUEST:
-+		hci_user_confirm_request_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_SIMPLE_PAIR_COMPLETE:
- 		hci_simple_pair_complete_evt(hdev, skb);
- 		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d7fc54d..fdcc974 100644
+index 52e5f88..d7fc54d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1193,6 +1193,55 @@ unlock:
- 	return err;
+@@ -38,6 +38,7 @@ struct pending_cmd {
+ 	int index;
+ 	void *cmd;
+ 	struct sock *sk;
++	void *user_data;
+ };
+ 
+ LIST_HEAD(cmd_list);
+@@ -1063,6 +1064,135 @@ static int set_io_capability(struct sock *sk, unsigned char *data, u16 len)
+ 						&dev_id, sizeof(dev_id));
  }
  
-+static int user_confirm_reply(struct sock *sk, unsigned char *data, u16 len,
-+								int success)
++static inline struct pending_cmd *find_pairing(struct hci_conn *conn)
 +{
-+	struct mgmt_cp_user_confirm_reply *cp = (void *) data;
-+	u16 dev_id, mgmt_op, hci_op;
++	struct hci_dev *hdev = conn->hdev;
++	struct list_head *p;
++
++	list_for_each(p, &cmd_list) {
++		struct pending_cmd *cmd;
++
++		cmd = list_entry(p, struct pending_cmd, list);
++
++		if (cmd->opcode != MGMT_OP_PAIR_DEVICE)
++			continue;
++
++		if (cmd->index != hdev->id)
++			continue;
++
++		if (cmd->user_data != conn)
++			continue;
++
++		return cmd;
++	}
++
++	return NULL;
++}
++
++static void pairing_complete(struct pending_cmd *cmd, u8 status)
++{
++	struct mgmt_rp_pair_device rp;
++	struct hci_conn *conn = cmd->user_data;
++
++	rp.index = cmd->index;
++	bacpy(&rp.bdaddr, &conn->dst);
++	rp.status = status;
++
++	cmd_complete(cmd->sk, MGMT_OP_PAIR_DEVICE, &rp, sizeof(rp));
++
++	/* So we don't get further callbacks for this connection */
++	conn->connect_cfm_cb = NULL;
++	conn->security_cfm_cb = NULL;
++	conn->disconn_cfm_cb = NULL;
++
++	hci_conn_put(conn);
++
++	list_del(&cmd->list);
++	mgmt_pending_free(cmd);
++}
++
++static void pairing_complete_cb(struct hci_conn *conn, u8 status)
++{
 +	struct pending_cmd *cmd;
++
++	BT_DBG("status %u", status);
++
++	cmd = find_pairing(conn);
++	if (!cmd) {
++		BT_DBG("Unable to find a pending command");
++		return;
++	}
++
++	pairing_complete(cmd, status);
++}
++
++static int pair_device(struct sock *sk, unsigned char *data, u16 len)
++{
 +	struct hci_dev *hdev;
++	struct mgmt_cp_pair_device *cp;
++	struct pending_cmd *cmd;
++	u8 sec_level, auth_type;
++	struct hci_conn *conn;
++	u16 dev_id;
 +	int err;
 +
 +	BT_DBG("");
 +
++	cp = (void *) data;
 +	dev_id = get_unaligned_le16(&cp->index);
-+
-+	if (success) {
-+		mgmt_op = MGMT_OP_USER_CONFIRM_REPLY;
-+		hci_op = HCI_OP_USER_CONFIRM_REPLY;
-+	} else {
-+		mgmt_op = MGMT_OP_USER_CONFIRM_NEG_REPLY;
-+		hci_op = HCI_OP_USER_CONFIRM_NEG_REPLY;
-+	}
 +
 +	hdev = hci_dev_get(dev_id);
 +	if (!hdev)
-+		return cmd_status(sk, mgmt_op, ENODEV);
++		return cmd_status(sk, MGMT_OP_PAIR_DEVICE, ENODEV);
 +
-+	if (!test_bit(HCI_UP, &hdev->flags)) {
-+		err = cmd_status(sk, mgmt_op, ENETDOWN);
-+		goto failed;
++	hci_dev_lock_bh(hdev);
++
++	if (cp->io_cap == 0x03) {
++		sec_level = BT_SECURITY_MEDIUM;
++		auth_type = HCI_AT_DEDICATED_BONDING;
++	} else {
++		sec_level = BT_SECURITY_HIGH;
++		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
 +	}
 +
-+	cmd = mgmt_pending_add(sk, mgmt_op, dev_id, data, len);
++	conn = hci_connect(hdev, ACL_LINK, &cp->bdaddr, sec_level, auth_type);
++	if (!conn) {
++		err = -ENOMEM;
++		goto unlock;
++	}
++
++	if (conn->connect_cfm_cb) {
++		hci_conn_put(conn);
++		err = cmd_status(sk, MGMT_OP_PAIR_DEVICE, EBUSY);
++		goto unlock;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_PAIR_DEVICE, dev_id, data, len);
 +	if (!cmd) {
 +		err = -ENOMEM;
-+		goto failed;
++		hci_conn_put(conn);
++		goto unlock;
 +	}
 +
-+	err = hci_send_cmd(hdev, hci_op, sizeof(cp->bdaddr), &cp->bdaddr);
-+	if (err < 0) {
-+		list_del(&cmd->list);
-+		mgmt_pending_free(cmd);
-+	}
++	conn->connect_cfm_cb = pairing_complete_cb;
++	conn->security_cfm_cb = pairing_complete_cb;
++	conn->disconn_cfm_cb = pairing_complete_cb;
++	conn->io_capability = cp->io_cap;
++	cmd->user_data = conn;
 +
-+failed:
++	if (conn->state == BT_CONNECTED &&
++				hci_conn_security(conn, sec_level, auth_type))
++		pairing_complete(cmd, 0);
++
++	err = 0;
++
++unlock:
 +	hci_dev_unlock_bh(hdev);
 +	hci_dev_put(hdev);
 +
@@ -250,71 +249,16 @@ index d7fc54d..fdcc974 100644
  int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
  {
  	unsigned char *buf;
-@@ -1281,6 +1330,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_PAIR_DEVICE:
- 		err = pair_device(sk, buf + sizeof(*hdr), len);
+@@ -1148,6 +1278,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_SET_IO_CAPABILITY:
+ 		err = set_io_capability(sk, buf + sizeof(*hdr), len);
  		break;
-+	case MGMT_OP_USER_CONFIRM_REPLY:
-+		err = user_confirm_reply(sk, buf + sizeof(*hdr), len, 1);
-+		break;
-+	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
-+		err = user_confirm_reply(sk, buf + sizeof(*hdr), len, 0);
++	case MGMT_OP_PAIR_DEVICE:
++		err = pair_device(sk, buf + sizeof(*hdr), len);
 +		break;
  	default:
  		BT_DBG("Unknown op %u", opcode);
  		err = cmd_status(sk, opcode, 0x01);
-@@ -1541,3 +1596,51 @@ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 
- 	return err;
- }
-+
-+int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value)
-+{
-+	struct mgmt_ev_user_confirm_request ev;
-+
-+	BT_DBG("hci%u", index);
-+
-+	put_unaligned_le16(index, &ev.index);
-+	bacpy(&ev.bdaddr, bdaddr);
-+	put_unaligned_le32(value, &ev.value);
-+
-+	return mgmt_event(MGMT_EV_USER_CONFIRM_REQUEST, &ev, sizeof(ev), NULL);
-+}
-+
-+static int confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status,
-+								u8 opcode)
-+{
-+	struct pending_cmd *cmd;
-+	struct mgmt_rp_user_confirm_reply rp;
-+	int err;
-+
-+	cmd = mgmt_pending_find(opcode, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	put_unaligned_le16(index, &rp.index);
-+	bacpy(&rp.bdaddr, bdaddr);
-+	rp.status = status;
-+	err = cmd_complete(cmd->sk, opcode, &rp, sizeof(rp));
-+
-+	list_del(&cmd->list);
-+	mgmt_pending_free(cmd);
-+
-+	return err;
-+}
-+
-+int mgmt_user_confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
-+{
-+	return confirm_reply_complete(index, bdaddr, status,
-+						MGMT_OP_USER_CONFIRM_REPLY);
-+}
-+
-+int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
-+								u8 status)
-+{
-+	return confirm_reply_complete(index, bdaddr, status,
-+					MGMT_OP_USER_CONFIRM_NEG_REPLY);
-+}
 -- 
 1.7.4.1
 
