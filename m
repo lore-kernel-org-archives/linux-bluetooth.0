@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/8] Bluetooth: Fix unnecessary list traversal in mgmt_pending_remove
-Date: Sat, 19 Feb 2011 12:06:02 -0300
-Message-Id: <1298127962-18576-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/8] Bluetooth: Add mgmt_auth_failed event
+Date: Sat, 19 Feb 2011 12:06:00 -0300
+Message-Id: <1298127962-18576-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
 References: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,155 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-All of the places that need to call mgmt_pending_remove already have a
-pointer to the pending command, so searching for the command in the list
-doesn't make sense. The added benefit is that many places that
-previously had to call list_del + mgmt_pending_free can just call
-mgmt_pending_remove now.
+To properly track bonding completion an event to indicate authentication
+failure is needed. This event will be sent whenever an authentication
+complete HCI event with a non-zero status comes. It will also be sent
+when we're acting in acceptor role for SSP authentication in which case
+the controller will send a Simple Pairing Complete event.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- net/bluetooth/mgmt.c |   42 ++++++++++++++----------------------------
- 1 files changed, 14 insertions(+), 28 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |    7 +++++++
+ net/bluetooth/hci_event.c        |   19 ++++++++++++++++---
+ net/bluetooth/mgmt.c             |   11 +++++++++++
+ 4 files changed, 35 insertions(+), 3 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 05f4706..441dadb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -766,6 +766,7 @@ int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value);
+ int mgmt_user_confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
+ int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
+ 								u8 status);
++int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 5aee200..1e63c31 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -264,3 +264,10 @@ struct mgmt_ev_user_confirm_request {
+ 	bdaddr_t bdaddr;
+ 	__le32 value;
+ } __packed;
++
++#define MGMT_EV_AUTH_FAILED		0x0010
++struct mgmt_ev_auth_failed {
++	__le16 index;
++	bdaddr_t bdaddr;
++	__u8 status;
++} __packed;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 604c7b5..3fbfa50 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1424,8 +1424,10 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 		if (!ev->status) {
+ 			conn->link_mode |= HCI_LM_AUTH;
+ 			conn->sec_level = conn->pending_sec_level;
+-		} else
++		} else {
++			mgmt_auth_failed(hdev->id, &conn->dst, ev->status);
+ 			conn->sec_level = BT_SECURITY_LOW;
++		}
+ 
+ 		clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
+ 
+@@ -2418,9 +2420,20 @@ static inline void hci_simple_pair_complete_evt(struct hci_dev *hdev, struct sk_
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (conn)
+-		hci_conn_put(conn);
++	if (!conn)
++		goto unlock;
++
++	/* To avoid duplicate auth_failed events to user space we check
++	 * the HCI_CONN_AUTH_PEND flag which will be set if we
++	 * initiated the authentication. A traditional auth_complete
++	 * event gets always produced as initiator and is also mapped to
++	 * the mgmt_auth_failed event */
++	if (!test_bit(HCI_CONN_AUTH_PEND, &conn->pend) && ev->status != 0)
++		mgmt_auth_failed(hdev->id, &conn->dst, ev->status);
+ 
++	hci_conn_put(conn);
++
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 46e2c39..982becd 100644
+index 0d3d613..46e2c39 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -290,14 +290,8 @@ static struct pending_cmd *mgmt_pending_find(u16 opcode, int index)
- 	return NULL;
+@@ -1647,3 +1647,14 @@ int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
+ 	return confirm_reply_complete(index, bdaddr, status,
+ 					MGMT_OP_USER_CONFIRM_NEG_REPLY);
  }
- 
--static void mgmt_pending_remove(u16 opcode, int index)
-+static void mgmt_pending_remove(struct pending_cmd *cmd)
- {
--	struct pending_cmd *cmd;
--
--	cmd = mgmt_pending_find(opcode, index);
--	if (cmd == NULL)
--		return;
--
- 	list_del(&cmd->list);
- 	mgmt_pending_free(cmd);
- }
-@@ -401,7 +395,7 @@ static int set_discoverable(struct sock *sk, unsigned char *data, u16 len)
- 
- 	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- 	if (err < 0)
--		mgmt_pending_remove(MGMT_OP_SET_DISCOVERABLE, dev_id);
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -459,7 +453,7 @@ static int set_connectable(struct sock *sk, unsigned char *data, u16 len)
- 
- 	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- 	if (err < 0)
--		mgmt_pending_remove(MGMT_OP_SET_CONNECTABLE, dev_id);
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -881,7 +875,7 @@ static int disconnect(struct sock *sk, unsigned char *data, u16 len)
- 
- 	err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
- 	if (err < 0)
--		mgmt_pending_remove(MGMT_OP_DISCONNECT, dev_id);
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -983,7 +977,7 @@ static int pin_code_reply(struct sock *sk, unsigned char *data, u16 len)
- 
- 	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_REPLY, sizeof(reply), &reply);
- 	if (err < 0)
--		mgmt_pending_remove(MGMT_OP_PIN_CODE_REPLY, dev_id);
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -1026,7 +1020,7 @@ static int pin_code_neg_reply(struct sock *sk, unsigned char *data, u16 len)
- 	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY, sizeof(bdaddr_t),
- 								&cp->bdaddr);
- 	if (err < 0)
--		mgmt_pending_remove(MGMT_OP_PIN_CODE_NEG_REPLY, dev_id);
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -1107,8 +1101,7 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
- 
- 	hci_conn_put(conn);
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- }
- 
- static void pairing_complete_cb(struct hci_conn *conn, u8 status)
-@@ -1230,10 +1223,8 @@ static int user_confirm_reply(struct sock *sk, unsigned char *data, u16 len,
- 	}
- 
- 	err = hci_send_cmd(hdev, hci_op, sizeof(cp->bdaddr), &cp->bdaddr);
--	if (err < 0) {
--		list_del(&cmd->list);
--		mgmt_pending_free(cmd);
--	}
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
- 
- failed:
- 	hci_dev_unlock_bh(hdev);
-@@ -1494,8 +1485,7 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
- 	*sk = cmd->sk;
- 	sock_hold(*sk);
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- }
- 
- int mgmt_disconnected(u16 index, bdaddr_t *bdaddr)
-@@ -1528,8 +1518,7 @@ int mgmt_disconnect_failed(u16 index)
- 
- 	err = cmd_status(cmd->sk, MGMT_OP_DISCONNECT, EIO);
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	return err;
- }
-@@ -1571,8 +1560,7 @@ int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 
- 	err = cmd_complete(cmd->sk, MGMT_OP_PIN_CODE_REPLY, &rp, sizeof(rp));
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	return err;
- }
-@@ -1594,8 +1582,7 @@ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 	err = cmd_complete(cmd->sk, MGMT_OP_PIN_CODE_NEG_REPLY,
- 							&rp, sizeof(rp));
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	return err;
- }
-@@ -1629,8 +1616,7 @@ static int confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status,
- 	rp.status = status;
- 	err = cmd_complete(cmd->sk, opcode, &rp, sizeof(rp));
- 
--	list_del(&cmd->list);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	return err;
- }
++
++int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status)
++{
++	struct mgmt_ev_auth_failed ev;
++
++	put_unaligned_le16(index, &ev.index);
++	bacpy(&ev.bdaddr, bdaddr);
++	ev.status = status;
++
++	return mgmt_event(MGMT_EV_AUTH_FAILED, &ev, sizeof(ev), NULL);
++}
 -- 
 1.7.4.1
 
