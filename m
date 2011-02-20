@@ -1,58 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-input@vger.kernel.org
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	linux-bluetooth@vger.kernel.org, Jiri Kosina <jkosina@suse.cz>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Bastien Nocera <hadess@hadess.net>,
-	Alan Ott <alan@signal11.us>, Jim Paris <jim@jtan.com>,
-	"pascal@pabr.org" <pascal@pabr.org>
-Subject: [PATCH 2/2] bt hidp: send Output reports using SET_REPORT on the Control channel
-Date: Sun, 20 Feb 2011 18:26:46 +0100
-Message-Id: <1298222806-19433-3-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1298222806-19433-1-git-send-email-ospite@studenti.unina.it>
-References: <alpine.LNX.2.00.1102180944590.2160@pobox.suse.cz>
- <1298222806-19433-1-git-send-email-ospite@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Sun, 20 Feb 2011 08:26:09 -0700
+Message-ID: <AANLkTimbj=p1ecddQsTiun6LUeP8+wPnT0VLCsvsWNRb@mail.gmail.com>
+Subject: bluetooth kernel to bluez userspace relationship
+From: Viswanathan Sankararam <developervishwa@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current implementation of hidp_output_raw_report() relies only on
-the Control channel even for Output reports, and the BT HID
-specification [1] does not mention using the DATA message for Output
-reports on the Control channel (see section 7.9.1 and also Figure 11:
-SET_ Flow Chart), so let us just use SET_REPORT.
+All,
+I'm new to bluetooth so please forgive me for asking this question if
+its already been answered. I understand that the linux kernel has part
+of the bluetooth stack and there is also the rest of it called Bluez
+in userspace which consists of a daemon and library. How would one
+correlate linux kernel version with the bluez userspace version?
+Meaning, how would l know say, linux-2.6.35 would work with
+Bluez-4.68.
 
-This also fixes sending Output reports to some devices (like Sony
-Sixaxis) which are not able to handle DATA messages on the Control
-channel.
+Any response would be appreciated.
 
-Ideally hidp_output_raw_report() could be improved to use this scheme:
-  Feature Report -- SET_REPORT on the Control channel
-  Output Report  -- DATA on the Interrupt channel
-for more efficiency, but as said above, right now only the Control
-channel is used.
-
-[1] http://www.bluetooth.com/Specification%20Documents/HID_SPEC_V10.pdf
-
-Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
----
- net/bluetooth/hidp/core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 6df8ea1..3c036b0 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -405,7 +405,7 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
- 		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
- 		break;
- 	case HID_OUTPUT_REPORT:
--		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
-+		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT;
- 		break;
- 	default:
- 		return -EINVAL;
--- 
-1.7.4.1
-
+Thanks
+Vish
