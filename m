@@ -1,27 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 20 Feb 2011 15:29:14 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Fix Crash where MTU allowed to be set too large
-Message-ID: <20110220182914.GA29936@jh-x301>
-References: <1298148343-10535-1-git-send-email-bgix@codeaurora.org>
- <1298148343-10535-3-git-send-email-bgix@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298148343-10535-3-git-send-email-bgix@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-input@vger.kernel.org
+Cc: Antonio Ospite <ospite@studenti.unina.it>,
+	linux-bluetooth@vger.kernel.org,
+	Jiri Kosina <jkosina@suse.cz>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Bastien Nocera <hadess@hadess.net>,
+	Alan Ott <alan@signal11.us>,
+	Jim Paris <jim@jtan.com>,
+	"pascal@pabr.org" <pascal@pabr.org>
+Subject: [PATCH 1/2] hid-sony.c: Fix sending Output reports to the Sixaxis
+Date: Sun, 20 Feb 2011 18:26:45 +0100
+Message-Id: <1298222806-19433-2-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1298222806-19433-1-git-send-email-ospite@studenti.unina.it>
+References: <alpine.LNX.2.00.1102180944590.2160@pobox.suse.cz>
+ <1298222806-19433-1-git-send-email-ospite@studenti.unina.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+The Sixaxis does not want the report_id as part of the data packet in
+Output reports, so we have to discard buf[0] when sending the actual
+control message.
 
-On Sat, Feb 19, 2011, Brian Gix wrote:
-> As previously written, a remote device could request, and we would
-> accept an MTU larger than what we could support.
-> ---
->  src/attrib-server.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Add also some documentation about that and about why
+hdev->hid_output_raw_report needs to be overridden.
 
-Both patches have been pushed upstream. Thanks.
+Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+---
+ drivers/hid/hid-sony.c |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
-Johan
+diff --git a/drivers/hid/hid-sony.c b/drivers/hid/hid-sony.c
+index 68d7b36..93819a0 100644
+--- a/drivers/hid/hid-sony.c
++++ b/drivers/hid/hid-sony.c
+@@ -46,6 +46,16 @@ static __u8 *sony_report_fixup(struct hid_device *hdev, __u8 *rdesc,
+ 	return rdesc;
+ }
+ 
++/*
++ * The Sony Sixaxis does not handle HID Output Reports on the Interrupt EP
++ * like it should according to usbhid/hid-core.c::usbhid_output_raw_report()
++ * so we need to override that forcing HID Output Reports on the Control EP.
++ *
++ * There is also another issue about HID Output Reports via USB, the Sixaxis
++ * does not want the report_id as part of the data packet, so we have to
++ * discard buf[0] when sending the actual control message, even for numbered
++ * reports, humpf!
++ */
+ static int sixaxis_usb_output_raw_report(struct hid_device *hid, __u8 *buf,
+ 		size_t count, unsigned char report_type)
+ {
+@@ -55,6 +65,12 @@ static int sixaxis_usb_output_raw_report(struct hid_device *hid, __u8 *buf,
+ 	int report_id = buf[0];
+ 	int ret;
+ 
++	if (report_type == HID_OUTPUT_REPORT) {
++		/* Don't send the Report ID */
++		buf++;
++		count--;
++	}
++
+ 	ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+ 		HID_REQ_SET_REPORT,
+ 		USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
+@@ -62,6 +78,10 @@ static int sixaxis_usb_output_raw_report(struct hid_device *hid, __u8 *buf,
+ 		interface->desc.bInterfaceNumber, buf, count,
+ 		USB_CTRL_SET_TIMEOUT);
+ 
++	/* Count also the Report ID, in case of an Output report. */
++	if (ret > 0 && report_type == HID_OUTPUT_REPORT)
++		ret++;
++
+ 	return ret;
+ }
+ 
+-- 
+1.7.4.1
