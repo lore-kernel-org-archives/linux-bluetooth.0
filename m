@@ -1,43 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimjYJTVq5dgmisV8c74rZAvpmpHL=g78feOG-_T@mail.gmail.com>
-References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
-	<AANLkTinzZ+nNSx6qq0xMXO8ZVLt5r-r0pgcjRBa7MaxY@mail.gmail.com>
-	<AANLkTimjYJTVq5dgmisV8c74rZAvpmpHL=g78feOG-_T@mail.gmail.com>
-Date: Mon, 21 Feb 2011 10:43:53 -0300
-Message-ID: <AANLkTi=ghX3SS0CUZDKM4pwOt9bPJBnRZGA3cRojwOgs@mail.gmail.com>
-Subject: Re: [RFC v2 00/14] Store UUID-128 on host order
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20110131082853.GA10011@jh-x301>
+References: <4765B7BC10CB4C488A56C73E15D6FBA31DA5700224@EXDCVYMBSTM005.EQ1STM.local>
+	<AANLkTi=B8rXLVuYDHMCjFCQ1XEpFJaWE9Jg2o7ptqB-K@mail.gmail.com>
+	<4765B7BC10CB4C488A56C73E15D6FBA31DA579F208@EXDCVYMBSTM005.EQ1STM.local>
+	<20110131082853.GA10011@jh-x301>
+Date: Mon, 21 Feb 2011 13:29:52 +0000
+Message-ID: <AANLkTikHJSoXKdSOXNObFRMquFDZ_Pwxa+ZJhtmnQLKZ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] HCI command to remove device from LE White List
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Sumit Kumar BAJPAI <sumitkumar.bajpai@stericsson.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sumit,
 
-On Mon, Feb 21, 2011 at 10:14 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> On Sat, Feb 19, 2011 at 6:07 PM, Luiz Augusto von Dentz
->> IMO it would be easier to have specific functions for uuid128 that can
->> take data in host order, so that we don't break existing API. Note
->> that the internal representation could be changed to host order, that
->> is fine, but then you convert the existing function to do the
->> conversion internally without breaking compatibility.
+On Mon, Jan 31, 2011 at 8:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
 >
-> Yes, it is easier. It will be necessary to add a function to convert
-> from little endian to big endian for ATT when the data is received.
-> I am not changing the API, it changes only the internal
-> representation(to host order) of the UUID128 values.
+> On Tue, Jan 25, 2011, Sumit Kumar BAJPAI wrote:
+>> Thanks Anderson for review comments.
+>> Posting patch again.
+>
+> The latest versions of these patches seem to be scattered around and not
+> formated properly as something that could be applied with git am (at
+> least the commit messages aren't right). Could you resend the latest
+> versions of all of the patches in a new thread using git send-email?
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-Just throwing my own bits on this: I think making the internal
-representation for uuid_t consistent is important to avoid bugs when
-handling the different UUID types.
+Could you please resend the patches? We need the white list patches for testing.
 
-currently uuid_t stores 16/32-bit uuids and 128-bit uuid differently.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+BR,
+Claudio
