@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 12/15] Bluetooth: Update the security level when link is encrypted
-Date: Mon, 21 Feb 2011 14:23:59 -0300
-Message-Id: <d61523d4112fdc90c4f84cac6762990b1d76f20e.1298307667.git.vinicius.gomes@openbossa.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next 02/15] Bluetooth: Start SMP procedure
+Date: Mon, 21 Feb 2011 14:23:49 -0300
+Message-Id: <af31ae4cc4ee50df8f49bfb5fd2778568afa2f32.1298307667.git.vinicius.gomes@openbossa.org>
 In-Reply-To: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 In-Reply-To: <cover.1298307667.git.vinicius.gomes@openbossa.org>
@@ -12,30 +13,51 @@ References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the pending security level is greater than the current security
-level and the link is now encrypted, we should update the link
-security level.
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-This is only useful for LE links, when the only event generated
-when SMP is sucessful in the Encrypt Change event.
+Start SMP procedure for LE connections. This modification intercepts
+l2cap received frames and call proper SMP functions to start the SMP
+procedure. By now, no keys are being used.
+
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index aeae4b4..c949073 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -679,6 +679,9 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encr
- 	if (conn->sec_level == BT_SECURITY_SDP)
- 		conn->sec_level = BT_SECURITY_LOW;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index efcef0d..66988b8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -54,6 +54,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/smp.h>
  
-+	if (conn->pending_sec_level > conn->sec_level)
-+		conn->sec_level = conn->pending_sec_level;
+ int disable_ertm;
+ 
+@@ -684,6 +685,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 			l2cap_sock_clear_timer(sk);
+ 			sk->sk_state = BT_CONNECTED;
+ 			sk->sk_state_change(sk);
++			if (smp_conn_security(conn, l2cap_pi(sk)->sec_level))
++				BT_DBG("Insufficient security");
+ 		}
+ 
+ 		if (sk->sk_type != SOCK_SEQPACKET &&
+@@ -3673,6 +3676,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		l2cap_conless_channel(conn, psm, skb);
+ 		break;
+ 
++	case L2CAP_CID_SMP:
++		if (smp_sig_channel(conn, skb))
++			l2cap_conn_del(conn->hcon, EACCES);
++		break;
 +
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
- 
- 	read_lock_bh(&hci_cb_list_lock);
+ 	default:
+ 		l2cap_data_channel(conn, cid, skb);
+ 		break;
 -- 
 1.7.4.1
 
