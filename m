@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 7/7] Add Write Request in interactive gatttool
-Date: Mon, 21 Feb 2011 19:50:06 -0300
-Message-Id: <1298328606-7993-7-git-send-email-sheldon.demario@openbossa.org>
+Subject: [PATCH 6/7] Move attr_data_from_string() to utils.c
+Date: Mon, 21 Feb 2011 19:50:05 -0300
+Message-Id: <1298328606-7993-6-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
 References: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,75 +12,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
+The attr_data_from_string() function will be used in interactive and
+usual gatttool so this function was moved to common file utils.c.
 ---
- attrib/interactive.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 47 insertions(+), 0 deletions(-)
+ attrib/gatttool.c |   23 ++---------------------
+ attrib/gatttool.h |    1 +
+ attrib/utils.c    |   19 +++++++++++++++++++
+ 3 files changed, 22 insertions(+), 21 deletions(-)
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index e9d74b9..30e9f60 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -482,6 +482,51 @@ static void cmd_read_uuid(int argcp, char **argvp)
- 	return;
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 7478043..d7887c6 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -313,25 +313,6 @@ static gboolean characteristics_read(gpointer user_data)
+ 	return FALSE;
  }
  
-+static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
-+							gpointer user_data)
-+{
-+	if (status != 0) {
-+		printf("Characteristic Write Request failed: "
-+						"%s\n", att_ecode2str(status));
-+		return;
-+	}
-+
-+	if (!dec_write_resp(pdu, plen)) {
-+		printf("Protocol error\n");
-+		return;
-+	}
-+
-+	printf("Characteristic value was written successfully\n");
-+}
-+
-+static void cmd_char_write_req(int argcp, char **argvp)
-+{
-+	uint8_t *value;
-+	size_t plen;
-+	int handle;
-+
-+	if (argcp < 3) {
-+		printf("Usage: char-write-req <handle> <new value>\n");
-+		return;
-+	}
-+
-+	handle = strtoll(argvp[1], NULL, 16);
-+	if (errno != 0 || handle <= 0) {
-+		printf("A valid handle is required\n");
-+		return;
-+	}
-+
-+	plen = gatt_attr_data_from_string(argvp[2], &value);
-+	if (plen == 0) {
-+		g_printerr("Invalid value\n");
-+		return;
-+	}
-+
-+	gatt_write_char(attrib, handle, value, plen, char_write_req_cb, NULL);
-+
-+	g_free(value);
-+}
-+
- static struct {
- 	const char *cmd;
- 	void (*func)(int argcp, char **argvp);
-@@ -506,6 +551,8 @@ static struct {
- 		"Characteristics Value/Descriptor Read by handle" },
- 	{ "char-read-uuid",	cmd_read_uuid,	"<UUID> [start hnd] [end hnd]",
- 		"Characteristics Value/Descriptor Read by UUID" },
-+	{ "char-write-req",	cmd_char_write_req,	"<handle> <new value>",
-+		"Characteristic Value Write (Write Request)"},
- 	{ NULL, NULL, NULL}
- };
+-static size_t attr_data_from_string(const char *str, uint8_t **data)
+-{
+-	char tmp[3];
+-	size_t size, i;
+-
+-	size = strlen(str) / 2;
+-	*data = g_try_malloc0(size);
+-	if (*data == NULL)
+-		return 0;
+-
+-	tmp[2] = '\0';
+-	for (i = 0; i < size; i++) {
+-		memcpy(tmp, str + (i * 2), 2);
+-		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
+-	}
+-
+-	return size;
+-}
+-
+ static void mainloop_quit(gpointer user_data)
+ {
+ 	uint8_t *value = user_data;
+@@ -356,7 +337,7 @@ static gboolean characteristics_write(gpointer user_data)
+ 		goto error;
+ 	}
  
+-	len = attr_data_from_string(opt_value, &value);
++	len = gatt_attr_data_from_string(opt_value, &value);
+ 	if (len == 0) {
+ 		g_printerr("Invalid value\n");
+ 		goto error;
+@@ -408,7 +389,7 @@ static gboolean characteristics_write_req(gpointer user_data)
+ 		goto error;
+ 	}
+ 
+-	len = attr_data_from_string(opt_value, &value);
++	len = gatt_attr_data_from_string(opt_value, &value);
+ 	if (len == 0) {
+ 		g_printerr("Invalid value\n");
+ 		goto error;
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 7eae18d..2fd4a46 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -25,3 +25,4 @@ int interactive(gchar *dst, gboolean le);
+ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 			const gchar *sec_level, int psm, int mtu,
+ 			BtIOConnect connect_cb);
++size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+diff --git a/attrib/utils.c b/attrib/utils.c
+index 4d0000d..8d1ca74 100644
+--- a/attrib/utils.c
++++ b/attrib/utils.c
+@@ -104,3 +104,22 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 
+ 	return chan;
+ }
++
++size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
++{
++	char tmp[3];
++	size_t size, i;
++
++	size = strlen(str) / 2;
++	*data = g_try_malloc0(size);
++	if (*data == NULL)
++		return 0;
++
++	tmp[2] = '\0';
++	for (i = 0; i < size; i++) {
++		memcpy(tmp, str + (i * 2), 2);
++		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
++	}
++
++	return size;
++}
 -- 
 1.7.1
 
