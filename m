@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 07/15] Bluetooth: Add SMP confirmation checks methods
-Date: Mon, 21 Feb 2011 14:23:54 -0300
-Message-Id: <a381a6725813e1464462a817bda1a9ae7b29a194.1298307667.git.vinicius.gomes@openbossa.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [bluetooth-next 04/15] Bluetooth: Add support for using the crypto subsystem
+Date: Mon, 21 Feb 2011 14:23:51 -0300
+Message-Id: <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
 In-Reply-To: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 In-Reply-To: <cover.1298307667.git.vinicius.gomes@openbossa.org>
@@ -13,173 +13,174 @@ References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+This will allow using the crypto subsystem for encrypting data. As SMP
+(Security Manager Protocol) is implemented almost entirely on the host
+side and the crypto module already implements the needed methods
+(AES-128), it makes sense to use it.
 
-This patch includes support for generating and sending the random value
-used to produce the confirmation value.
+This patch also adds a new Kconfig option to toggle the SMP support.
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- net/bluetooth/smp.c           |   92 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 79 insertions(+), 14 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/Kconfig            |    6 ++++++
+ net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
+ net/bluetooth/smp.c              |   17 +++++++++++++++--
+ 4 files changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 82508ed..ed65d65 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -311,6 +311,7 @@ struct l2cap_conn {
- 	__u8		prsp[7]; /* SMP Pairing Response */
- 	__u8		prnd[16]; /* SMP Pairing Random */
- 	__u8		pcnf[16]; /* SMP Pairing Confirm */
-+	__u8		tk[16]; /* SMP Temporary Key */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d5d8454..e8dbde8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -161,6 +161,8 @@ struct hci_dev {
  
- 	struct l2cap_chan_list chan_list;
- };
+ 	__u16			init_last_cmd;
+ 
++	struct crypto_blkcipher	*tfm;
++
+ 	struct inquiry_cache	inq_cache;
+ 	struct hci_conn_hash	conn_hash;
+ 	struct list_head	blacklist;
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index c6f9c2f..e9f40af 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -22,6 +22,7 @@ menuconfig BT
+ 	     BNEP Module (Bluetooth Network Encapsulation Protocol)
+ 	     CMTP Module (CAPI Message Transport Protocol)
+ 	     HIDP Module (Human Interface Device Protocol)
++	     SMP Module (Security Manager Protocol)
+ 
+ 	  Say Y here to compile Bluetooth support into the kernel or say M to
+ 	  compile it as module (bluetooth).
+@@ -35,11 +36,16 @@ config BT_L2CAP
+ 	bool "L2CAP protocol support"
+ 	depends on BT
+ 	select CRC16
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_AES
+ 	help
+ 	  L2CAP (Logical Link Control and Adaptation Protocol) provides
+ 	  connection oriented and connection-less data transport.  L2CAP
+ 	  support is required for most Bluetooth applications.
+ 
++	  Also included is support for SMP (Security Manager Protocol) which
++	  is the security layer on top of LE (Low Energy) links.
++
+ config BT_SCO
+ 	bool "SCO links support"
+ 	depends on BT
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b372fb8..ff67843 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -42,6 +42,7 @@
+ #include <linux/notifier.h>
+ #include <linux/rfkill.h>
+ #include <linux/timer.h>
++#include <linux/crypto.h>
+ #include <net/sock.h>
+ 
+ #include <asm/system.h>
+@@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
+ 
+ static DEFINE_RWLOCK(hci_task_lock);
+ 
++static int enable_smp;
++
+ /* HCI device list */
+ LIST_HEAD(hci_dev_list);
+ DEFINE_RWLOCK(hci_dev_list_lock);
+@@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
+ 	tasklet_schedule(&hdev->cmd_task);
+ }
+ 
++static struct crypto_blkcipher *alloc_cypher(void)
++{
++	if (enable_smp)
++		return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++
++	return ERR_PTR(-ENOTSUPP);
++}
++
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+@@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (!hdev->workqueue)
+ 		goto nomem;
+ 
++	hdev->tfm = alloc_cypher();
++	if (IS_ERR(hdev->tfm))
++		BT_INFO("Failed to load transform for ecb(aes): %ld",
++							PTR_ERR(hdev->tfm));
++
+ 	hci_register_sysfs(hdev);
+ 
+ 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+@@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 					!test_bit(HCI_SETUP, &hdev->flags))
+ 		mgmt_index_removed(hdev->id);
+ 
++	if (!IS_ERR(hdev->tfm))
++		crypto_free_blkcipher(hdev->tfm);
++
+ 	hci_notify(hdev, HCI_DEV_UNREG);
+ 
+ 	if (hdev->rfkill) {
+@@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
+ 		}
+ 	}
+ }
++
++module_param(enable_smp, bool, 0644);
++MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 31ee1c0..37224a7 100644
+index 0d04c7a..7f275bf 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -203,6 +203,9 @@ static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	rp->resp_key_dist = 0x00;
- 	rp->auth_req &= (SMP_AUTH_BONDING | SMP_AUTH_MITM);
+@@ -157,6 +157,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
  
-+	/* Just works */
-+	memset(conn->tk, 0, sizeof(conn->tk));
+ 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, conn->hcon, sec_level);
+ 
++	if (IS_ERR(conn->hcon->hdev->tfm))
++		return PTR_ERR(conn->hcon->hdev->tfm);
 +
- 	conn->prsp[0] = SMP_CMD_PAIRING_RSP;
- 	memcpy(&conn->prsp[1], rp, sizeof(*rp));
+ 	switch (sec_level) {
+ 	case BT_SECURITY_MEDIUM:
+ 		/* Encrypted, no MITM protection */
+@@ -197,6 +200,12 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	__u8 reason;
+ 	int err = 0;
  
-@@ -213,53 +216,114 @@ static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_pairing *rp = (void *) skb->data;
- 	struct smp_cmd_pairing_confirm cp;
-+	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
-+	int ret;
-+	u8 res[16];
- 
- 	BT_DBG("conn %p", conn);
- 
--	memset(&cp, 0, sizeof(cp));
-+	/* Just works */
-+	memset(conn->tk, 0, sizeof(conn->tk));
- 
- 	conn->prsp[0] = SMP_CMD_PAIRING_RSP;
- 	memcpy(&conn->prsp[1], rp, sizeof(*rp));
- 	skb_pull(skb, sizeof(*rp));
- 
-+	ret = smp_rand(conn->prnd);
-+	if (ret)
-+		return;
-+
-+	ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp, 0,
-+			conn->src, 0, conn->dst, res);
-+	if (ret)
-+		return;
-+
-+	swap128(res, cp.confirm_val);
-+
- 	smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
- }
- 
- static void smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
- {
-+	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
-+
- 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
- 
--	if (conn->hcon->out) {
--		struct smp_cmd_pairing_random random;
-+	memcpy(conn->pcnf, skb->data, sizeof(conn->pcnf));
-+	skb_pull(skb, sizeof(conn->pcnf));
- 
--		memset(&random, 0, sizeof(random));
-+	if (conn->hcon->out) {
-+		u8 random[16];
- 
-+		swap128(conn->prnd, random);
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(random),
--								&random);
-+								random);
- 	} else {
--		struct smp_cmd_pairing_confirm confirm;
-+		struct smp_cmd_pairing_confirm cp;
-+		int ret;
-+		u8 res[16];
- 
--		memset(&confirm, 0, sizeof(confirm));
-+		ret = smp_rand(conn->prnd);
-+		if (ret)
-+			return;
- 
--		smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(confirm),
--								&confirm);
-+		ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp,
-+					0, conn->dst, 0, conn->src, res);
-+		if (ret)
-+			return;
-+
-+		swap128(res, cp.confirm_val);
-+
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
- 	}
- }
- 
- static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- {
--	struct smp_cmd_pairing_random cp;
-+	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
-+	int ret;
-+	u8 key[16], res[16], random[16], confirm[16], buf[128];
-+
-+	swap128(skb->data, random);
-+	skb_pull(skb, sizeof(random));
-+
-+	if (conn->hcon->out)
-+		ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
-+				conn->src, 0, conn->dst, res);
-+	else
-+		ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
-+				conn->dst, 0, conn->src, res);
-+	if (ret)
-+		return;
- 
- 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
- 
--	skb_pull(skb, sizeof(cp));
-+	swap128(res, confirm);
-+
-+	if (memcmp(conn->pcnf, confirm, sizeof(conn->pcnf)) != 0) {
-+		struct smp_cmd_pairing_fail cp;
-+
-+		BT_ERR("Pairing failed (confirmation values mismatch)");
-+		cp.reason = SMP_CONFIRM_FAILED;
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(cp), &cp);
-+		return;
++	if (IS_ERR(conn->hcon->hdev->tfm)) {
++		err = PTR_ERR(conn->hcon->hdev->tfm);
++		reason = SMP_PAIRING_NOTSUPP;
++		goto done;
 +	}
++
+ 	skb_pull(skb, sizeof(code));
  
- 	if (conn->hcon->out) {
--		/* FIXME: start encryption */
-+		smp_s1(tfm, conn->tk, random, conn->prnd, key);
-+
-+		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
-+		BT_DBG("key %s", buf);
- 	} else {
--		memset(&cp, 0, sizeof(cp));
-+		u8 r[16];
-+
-+		swap128(conn->prnd, r);
-+		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(r), r);
-+
-+		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+ 	switch (code) {
+@@ -232,11 +241,15 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		BT_DBG("Unknown command code 0x%2.2x", code);
  
--		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(cp), &cp);
-+		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf, sizeof(buf), 0);
-+		BT_DBG("key %s", buf);
+ 		reason = SMP_CMD_NOTSUPP;
+-		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+-								&reason);
+ 		err = -EOPNOTSUPP;
++		goto done;
  	}
- }
  
++done:
++	if (reason)
++		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
++								&reason);
++
+ 	kfree_skb(skb);
+ 	return err;
+ }
 -- 
 1.7.4.1
 
