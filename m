@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Daniel O'Connor" <doconnor@gsoft.com.au>
+From: "Daniel O'Connor" <darius@dons.net.au>
 Content-Type: text/plain; charset=windows-1252
+Date: Tue, 22 Feb 2011 00:15:06 +1030
 Subject: Problem with an Apple bluetooth keyboard
-Date: Tue, 22 Feb 2011 00:28:17 +1030
-Message-Id: <AA50FBAC-6B8B-4D61-83A0-0B8D4B24B967@gsoft.com.au>
 To: linux-bluetooth@vger.kernel.org
+Message-Id: <4802E883-C072-4FD5-B7EB-A8221C569959@dons.net.au>
 Mime-Version: 1.0 (Apple Message framework v1082)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -39,6 +39,11 @@ Daniel O'Connor software and network engineer
 for Genesis Software - http://www.gsoft.com.au
 "The nice thing about standards is that there
 are so many of them to choose from."
- -- Andrew Tanenbaum
+  -- Andrew Tanenbaum
 GPG Fingerprint - 5596 B766 97C0 0E94 4347 295E E593 DC20 7B3F CE8C
+
+
+
+
+
 
