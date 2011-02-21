@@ -1,60 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 00/15] SMP Just Works Implementation
-Date: Mon, 21 Feb 2011 14:23:47 -0300
-Message-Id: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+Date: Mon, 21 Feb 2011 13:57:46 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix Find by Type Response with start == end grp
+ handle
+Message-ID: <20110221165746.GB9130@jh-x301>
+References: <1298299014-31175-1-git-send-email-bruna.moreira@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298299014-31175-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bruna,
 
-This patch series implement the Just Works SMP procedures for LE links.
+On Mon, Feb 21, 2011, Bruna Moreira wrote:
+> Find by type value response in attribute server was in loop when the
+> start/end grp handles from a primary service had same values.
+> 
+> Initializing end grp handle with start handle makes the special check
+> when end grp handle was zero unnecessary so it was removed.
+> ---
+>  src/attrib-server.c |    9 +++------
+>  1 files changed, 3 insertions(+), 6 deletions(-)
 
-These patches can also be reached from here[1].
+Both patches have been pushed upstream. Thanks.
 
-
-Cheers,
---
-Vinicius
-
-[1] http://git.infradead.org/users/vcgomes/linux-2.6.git (for-next branch)
-
-Anderson Briglia (7):
-  Bluetooth: Implement the first SMP commands
-  Bluetooth: Start SMP procedure
-  Bluetooth: simple SMP pairing negotiation
-  Bluetooth: LE SMP Cryptoolbox functions
-  Bluetooth: Add SMP confirmation structs
-  Bluetooth: Add SMP confirmation checks methods
-  Bluetooth: Minor fix in SMP methods
-
-Vinicius Costa Gomes (8):
-  Bluetooth: Add support for using the crypto subsystem
-  Bluetooth: Add support for LE Start Encryption
-  Bluetooth: Add support for resuming socket when SMP is finished
-  Bluetooth: Fix initial security level of LE links
-  Bluetooth: Update the security level when link is encrypted
-  Bluetooth: Add support for Pairing features exchange
-  Bluetooth: Add support for SMP timeout
-  Bluetooth: Add key size checks for SMP
-
- include/net/bluetooth/hci.h      |   34 +++
- include/net/bluetooth/hci_core.h |   10 +
- include/net/bluetooth/l2cap.h    |    9 +
- include/net/bluetooth/smp.h      |   46 ++++
- net/bluetooth/Kconfig            |    6 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/hci_conn.c         |   47 ++++
- net/bluetooth/hci_core.c         |   22 ++
- net/bluetooth/hci_event.c        |   69 +++++
- net/bluetooth/l2cap_core.c       |  137 ++++++----
- net/bluetooth/l2cap_sock.c       |   17 ++
- net/bluetooth/smp.c              |  535 ++++++++++++++++++++++++++++++++++++++
- 12 files changed, 876 insertions(+), 58 deletions(-)
- create mode 100644 net/bluetooth/smp.c
-
---
-1.7.4.1
-
+Johan
