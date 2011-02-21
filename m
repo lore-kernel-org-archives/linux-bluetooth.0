@@ -1,69 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 20 Feb 2011 22:36:01 -0600
-From: David Fries <david@fries.net>
-To: Andrei Warkentin <andreiw@motorola.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] work around for l2cap NULL dereference in l2cap_conn_start
-Message-ID: <20110221043601.GB22204@spacedout.fries.net>
-References: <20110211035309.GA22204@spacedout.fries.net>
- <20110214145649.GE2597@joana>
- <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
+Message-ID: <4D61DFE0.5020400@signal11.us>
+Date: Sun, 20 Feb 2011 22:45:36 -0500
+From: Alan Ott <alan@signal11.us>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Jiri Kosina <jkosina@suse.cz>, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Bastien Nocera <hadess@hadess.net>, Jim Paris <jim@jtan.com>,
+	"pascal@pabr.org" <pascal@pabr.org>
+Subject: Re: [PATCH 2/2] bt hidp: send Output reports using SET_REPORT on  the Control channel
+References: <alpine.LNX.2.00.1102180944590.2160@pobox.suse.cz> <1298222806-19433-1-git-send-email-ospite@studenti.unina.it> <1298222806-19433-3-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1298222806-19433-3-git-send-email-ospite@studenti.unina.it>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-bt_sk(sk)->parent can be NULL in l2cap_conn_start in state BT_CONNECT2
-at least when a headset device pairs and the play button was pressed
-right before pairing.
+On 02/20/2011 12:26 PM, Antonio Ospite wrote:
+> The current implementation of hidp_output_raw_report() relies only on
+> the Control channel even for Output reports, and the BT HID
+> specification [1] does not mention using the DATA message for Output
+> reports on the Control channel (see section 7.9.1 and also Figure 11:
+> SET_ Flow Chart), so let us just use SET_REPORT.
+>
+> This also fixes sending Output reports to some devices (like Sony
+> Sixaxis) which are not able to handle DATA messages on the Control
+> channel.
+>
+> Ideally hidp_output_raw_report() could be improved to use this scheme:
+>    Feature Report -- SET_REPORT on the Control channel
+>    Output Report  -- DATA on the Interrupt channel
+> for more efficiency, but as said above, right now only the Control
+> channel is used.
+>
+> [1] http://www.bluetooth.com/Specification%20Documents/HID_SPEC_V10.pdf
+>
+>   	case HID_OUTPUT_REPORT:
+> -		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+> +		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT;
+>    
 
-Signed-off-by: David Fries <david@fries.net>
----
-I removed the printk, can this be merged to the bluetooth next tree?
+I think this is right. Section 7.4[.0] says that SET_ and GET_ requests 
+return with HANDSHAKE. Section 7.4.9 says that DATA does _not_ return a 
+HANDSHAKE. My patch to hidp_output_raw_report() relies on getting a 
+HANDSHAKE back, so it wouldn't have worked with BT devices that take 
+output reports. Since I don't have any that do, I couldn't test it. (And 
+it was like that when I got here :) )
 
-On Mon, Feb 14, 2011 at 03:40:46PM -0600, Andrei Warkentin wrote:
-> FWIW still need it in 2.6.36.
+For the whole set:
+Acked-by: Alan Ott <alan@signal11.us>
 
-Andrei, I'm curious, what's your hardware hardware and bluetooth
-device that's trigginer the crash?
-
-> On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
-> > Hi David,
-> >
-> > * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
-> >
-> >> Here's a patch to avoid a very repeatable crash in the N900.  If I
-> >> take a Motorola S305 bluetooth headset that was previously paried with
-> >> the N900, turn it on, and press the play button before the headphones
-> >> automatically pair with the cell phone, the N900 will crash (and
-> >> reboot) in pairing.  If I wait until after they have paired there
-> >> isn't any problem.  The patch is against the kernel-power
-> >> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
-> >> the same, I just haven't gone back to that kernel.
-> >
-> > This is a very old kernel. You need to check this issue against
-> > bluetooth-next-2.6.
-
- net/bluetooth/l2cap.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index ed83c1f..a7aa4d9 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -408,7 +408,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 					struct sock *parent = bt_sk(sk)->parent;
- 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
--					parent->sk_data_ready(parent, 0);
-+					if(parent)
-+						parent->sk_data_ready(parent,0);
- 
- 				} else {
- 					sk->sk_state = BT_CONFIG;
--- 
-1.7.2.3
-
+Alan.
