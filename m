@@ -1,149 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 1/5] Add read/write callbacks to attribute server
-Date: Mon, 21 Feb 2011 18:30:39 -0300
-Message-Id: <1298323843-31106-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH 2/3] Add generic descriptor support to Attribute API document
+Mime-Version: 1.0 (Apple Message framework v1082)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <AANLkTimDdtdSUFqoVyGUy-UC_r3y_pu9N5dO9CBD9dfi@mail.gmail.com>
+Date: Mon, 21 Feb 2011 18:24:18 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4604BFBC-2A92-4885-BC7B-16A9E6856603@signove.com>
+References: <1297880021-31728-1-git-send-email-epx@signove.com> <1297880021-31728-2-git-send-email-epx@signove.com> <AANLkTi=X=E_VA7p0J6aj+kcJYPA7mUJiqjs+xySKJ6EE@mail.gmail.com> <F8CC68A2-1854-466D-AC84-37B50D05F847@signove.com> <AANLkTimDdtdSUFqoVyGUy-UC_r3y_pu9N5dO9CBD9dfi@mail.gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These callbacks will allow profiles to act before an attribute is read
-and after it is written, to e.g. update the attribute value to/from an
-external source.
 
-Note that by the time the callback is called, the necessary security
-checks (attribute permissions, authentication and encryption) were
-already performed by the core attribute server.
+On 21 Feb 2011, at 18:14 , Claudio Takahasi wrote:
 
-The callback can optionally return an ATT status code, which will be
-sent to the client using an Error Response PDU.
----
- attrib/att.h        |    7 +++++++
- src/attrib-server.c |   29 ++++++++++++++++++++++++++---
- src/attrib-server.h |    4 ++--
- 3 files changed, 35 insertions(+), 5 deletions(-)
+> Hi Elvis,
+> 
+> On Mon, Feb 21, 2011 at 7:39 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
+>> 
+>> On 21 Feb 2011, at 16:14 , Claudio Takahasi wrote:
+>> 
+>>> Hi,
+>>> 
+>>> 
+>>> On Wed, Feb 16, 2011 at 6:13 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
+>>>> This patch proposes extensions to Attribute API, giving access to all
+>>>> characteristic descriptors (beyond 'Description' and 'Format').
+>>>> ---
+>>>>  doc/attribute-api.txt |   28 ++++++++++++++++++++++++++++
+>>>>  1 files changed, 28 insertions(+), 0 deletions(-)
+>>>> 
+>>>> diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
+>>>> index 23808e6..5ee189e 100644
+>>>> --- a/doc/attribute-api.txt
+>>>> +++ b/doc/attribute-api.txt
+>>>> @@ -104,6 +104,14 @@ Methods            dict GetProperties()
+>>>> 
+>>>>                        Possible Errors: org.bluez.Error.InvalidArguments
+>>>> 
+>>>> +               void SetDescriptorValue(object descriptor, array{byte} value)
+>>>> +
+>>>> +                       Sets descriptor value, provided that it is writable.
+>>>> +
+>>>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>>>> +                                       org.bluez.Error.NotAuthorized
+>>>> +
+>>>> +
+>>>>  Properties     string UUID [readonly]
+>>>> 
+>>>>                        UUID128 of this characteristic.
+>>>> @@ -143,6 +151,26 @@ Properties         string UUID [readonly]
+>>>>                        Friendly representation of the Characteristic Value
+>>>>                        based on the format attribute.
+>>>> 
+>>>> +               dict Descriptors [readonly]
+>>>> +
+>>>> +                       List of descriptors for this characteristic.
+>>>> +
+>>>> +                       This list contains only the descriptors not already
+>>>> +                       covered by other properties (v.g. Description, Format).
+>>>> +
+>>>> +                       Each descriptor is mapped to an unique object path,
+>>>> +                       which is the key for the dict.
+>>>> +
+>>>> +                       Each dict value is, in turn, a dict with at least
+>>>> +                       the following keys:
+>>>> +
+>>>> +                       {
+>>>> +                               "UUID": string (descriptor UUID - mandatory),
+>>>> +                               "Value": array of bytes (raw descriptor value -
+>>>> +                                        optional, shows up when value can be
+>>>> +                                        fetched)
+>>>> +                       }
+>>>> +
+>>>> 
+>>>>  Characteristic Watcher hierarchy
+>>>>  ===============================
+>>>> --
+>>>> 1.7.1
+>>>> 
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>> 
+>>> 
+>>> In my opinion is not a good approach to allow applications(D-Bus
+>>> clients) to change a behavior/value of the same characteristic
+>>> descriptor. bluetoothd could manage automatically writing the client
+>>> characteristic configuration and server characteristic configuration
+>>> based on the registered watchers and supported client profiles.
+>> 
+>> I'm not sure I follow, but let's break it down:
+>> 
+>> 1) Note that this API is not just for client (and server) characteristic configuration descriptors. It is good for any kind of descriptor (like Valid Range, that client is supposed to be able to read, and set the related characteristic within its limits).
+> 
+> The API already has SetProperty and GetProperties that could expose
+> the descriptors that you need.
 
-diff --git a/attrib/att.h b/attrib/att.h
-index 7d9afeb..05ae606 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -118,11 +118,18 @@ enum {
- 	ATT_NOT_PERMITTED,	/* Operation not permitted */
- };
- 
-+struct attribute;
-+
-+typedef uint8_t (*att_cb_t)(struct attribute *, gpointer);
-+
- struct attribute {
- 	uint16_t handle;
- 	uuid_t uuid;
- 	int read_reqs;
- 	int write_reqs;
-+	att_cb_t read_cb;
-+	att_cb_t write_cb;
-+	gpointer cb_user_data;
- 	int len;
- 	uint8_t data[0];
- };
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 7ec0f56..28649f1 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -229,6 +229,10 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_GROUP_REQ,
- 								a->read_reqs);
-+
-+		if (status == 0x00 && a->read_cb)
-+			status = a->read_cb(a, a->cb_user_data);
-+
- 		if (status) {
- 			g_slist_foreach(groups, (GFunc) g_free, NULL);
- 			g_slist_free(groups);
-@@ -317,6 +321,10 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
- 
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_TYPE_REQ,
- 								a->read_reqs);
-+
-+		if (status == 0x00 && a->read_cb)
-+			status = a->read_cb(a, a->cb_user_data);
-+
- 		if (status) {
- 			g_slist_free(types);
- 			return enc_error_resp(ATT_OP_READ_BY_TYPE_REQ,
-@@ -564,6 +572,10 @@ static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
- 	a = l->data;
- 
- 	status = att_check_reqs(channel, ATT_OP_READ_REQ, a->read_reqs);
-+
-+	if (status == 0x00 && a->read_cb)
-+		status = a->read_cb(a, a->cb_user_data);
-+
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_REQ, handle, status, pdu,
- 									len);
-@@ -591,6 +603,10 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
- 					ATT_ECODE_INVALID_OFFSET, pdu, len);
- 
- 	status = att_check_reqs(channel, ATT_OP_READ_BLOB_REQ, a->read_reqs);
-+
-+	if (status == 0x00 && a->read_cb)
-+		status = a->read_cb(a, a->cb_user_data);
-+
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_BLOB_REQ, handle, status,
- 								pdu, len);
-@@ -623,6 +639,13 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- 	memcpy(&uuid, &a->uuid, sizeof(uuid_t));
- 	attrib_db_update(handle, &uuid, value, vlen);
- 
-+	if (a->write_cb) {
-+		status = a->write_cb(a, a->cb_user_data);
-+		if (status)
-+			return enc_error_resp(ATT_OP_WRITE_REQ, handle, status,
-+								pdu, len);
-+	}
-+
- 	return enc_write_resp(pdu, len);
- }
- 
-@@ -1013,8 +1036,8 @@ void attrib_free_sdp(uint32_t sdp_handle)
- 	remove_record_from_server(sdp_handle);
- }
- 
--int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
--						const uint8_t *value, int len)
-+struct attribute *attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs,
-+				int write_reqs, const uint8_t *value, int len)
- {
- 	struct attribute *a;
- 
-@@ -1030,7 +1053,7 @@ int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
- 
- 	database = g_slist_insert_sorted(database, a, attribute_cmp);
- 
--	return 0;
-+	return a;
- }
- 
- int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
-diff --git a/src/attrib-server.h b/src/attrib-server.h
-index ecd695c..85f3bdb 100644
---- a/src/attrib-server.h
-+++ b/src/attrib-server.h
-@@ -25,8 +25,8 @@
- int attrib_server_init(void);
- void attrib_server_exit(void);
- 
--int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
--						const uint8_t *value, int len);
-+struct attribute *attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs,
-+				int write_reqs, const uint8_t *value, int len);
- int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
- 								int len);
- int attrib_db_del(uint16_t handle);
--- 
-1.7.0.4
+Yes, but note that biggest part of proposal is exactly to add one more
+item to be returned by GetProperties() :)
 
+If you mean that a separate method to update descriptors is not ok, and
+using SetProperty() to do that is the way, I understand.
+
+> 
+>> 
+>> 2) Updating automatically CCC/SCC descriptors based on Watchers sounds nice. We just need to add some kind of flag to agent registering in order to tell if we want notification or indication.
+> 
+> This is our initial ideia, but it is not written in the stone yet. We
+> need to investigate a little bit more and see which/how the Profiles
+> are using these characteristics descriptors.
+
+Ok, but I think it is near perfect.
+
+>> 
+>> 3) In terms of client profiles, the GATT API looks generic to me, not profile-specific. As there is a way to access characteristic values in a generic way, so there is a need to do the same for descriptors.
+> 
+> For some descriptors I agree that we need to expose through the D-Bus
+> API. However for others such as CCC and SCC I don't think that we need
+> to allow the apps to change it. If necessary we will also have a
+> plugin or a service specific interface, one example is Proximity
+> Profile. Do you have a good use case/example in health profiles using
+> CCC and SCC?
+
+Yes, I will send you the details.
