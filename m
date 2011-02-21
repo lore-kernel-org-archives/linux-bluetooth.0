@@ -1,49 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Daniel O'Connor" <darius@dons.net.au>
-Content-Type: text/plain; charset=windows-1252
-Date: Tue, 22 Feb 2011 00:15:06 +1030
-Subject: Problem with an Apple bluetooth keyboard
-To: linux-bluetooth@vger.kernel.org
-Message-Id: <4802E883-C072-4FD5-B7EB-A8221C569959@dons.net.au>
-Mime-Version: 1.0 (Apple Message framework v1082)
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <AANLkTi=ghX3SS0CUZDKM4pwOt9bPJBnRZGA3cRojwOgs@mail.gmail.com>
+References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
+	<AANLkTinzZ+nNSx6qq0xMXO8ZVLt5r-r0pgcjRBa7MaxY@mail.gmail.com>
+	<AANLkTimjYJTVq5dgmisV8c74rZAvpmpHL=g78feOG-_T@mail.gmail.com>
+	<AANLkTi=ghX3SS0CUZDKM4pwOt9bPJBnRZGA3cRojwOgs@mail.gmail.com>
+Date: Mon, 21 Feb 2011 15:52:58 +0200
+Message-ID: <AANLkTimR3cpHEVBUOrPH9LRnmszNdmfg37hN__PWkYUQ@mail.gmail.com>
+Subject: Re: [RFC v2 00/14] Store UUID-128 on host order
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
-I have an Apple BT keyboard talking to Ubuntu 10.04 and it only works if I unplug and replug the dongle.
 
-dmesg shows the following :-
+On Mon, Feb 21, 2011 at 3:43 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi,
+>
+> On Mon, Feb 21, 2011 at 10:14 AM, Claudio Takahasi
+> <claudio.takahasi@openbossa.org> wrote:
+>> On Sat, Feb 19, 2011 at 6:07 PM, Luiz Augusto von Dentz
+>>> IMO it would be easier to have specific functions for uuid128 that can
+>>> take data in host order, so that we don't break existing API. Note
+>>> that the internal representation could be changed to host order, that
+>>> is fine, but then you convert the existing function to do the
+>>> conversion internally without breaking compatibility.
+>>
+>> Yes, it is easier. It will be necessary to add a function to convert
+>> from little endian to big endian for ATT when the data is received.
+>> I am not changing the API, it changes only the internal
+>> representation(to host order) of the UUID128 values.
+>
+> Just throwing my own bits on this: I think making the internal
+> representation for uuid_t consistent is important to avoid bugs when
+> handling the different UUID types.
+>
+> currently uuid_t stores 16/32-bit uuids and 128-bit uuid differently.
 
-[22723.580234] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
-[22723.697163] apple 0005:05AC:0239.0002: parse failed
-[22723.697172] apple: probe of 0005:05AC:0239.0002 failed with error -14
+The problem is not the internal representation, but things like this:
 
-<unplug/replug USB BT dongle.
+-       sdp_uuid128_create(&svclass_uuid, SYNCMLC_UUID);
++       ntoh128(SYNCMLC_UUID, &h128);
++       sdp_uuid128_create(&svclass_uuid, &h128);
 
-[22727.040345] usb 3-1: USB disconnect, address 2
-[22727.041256] btusb_intr_complete: hci0 urb ffff880037286840 failed to resubmit (19)
-[22727.041272] btusb_bulk_complete: hci0 urb ffff8800372860c0 failed to resubmit (19)
-[22727.042257] btusb_bulk_complete: hci0 urb ffff880037286900 failed to resubmit (19)
-[22727.042574] btusb_send_frame: hci0 urb ffff88002bf97a80 submission failed
-[22728.784680] usb 3-1: new full speed USB device using uhci_hcd and address 3
-[22729.170802] usb 3-1: configuration #1 chosen from 1 choice
-[22733.044904] input: darius’s keyboard as /devices/pci0000:00/0000:00:1a.0/usb3/3-1/3-1:1.0/bluetooth/hci0/hci0:40/input8
-[22733.045006] apple 0005:05AC:0239.0003: input,hidraw1: BLUETOOTH HID v0.50 Keyboard [darius’s keyboard] on 00:10:DC:57:76:BE
+This means the API has changed, it now takes host order where it used
+to be network order. We could have a new function e.g.
+sdp_uuid128h_create to handle such cases and not break existing
+applications using this API.
 
-Is there some command I can run to re-probe it as a work around? Or perhaps some debugging I can enable to find out exactly what is going wrong.
-
-Thanks.
-
---
-Daniel O'Connor software and network engineer
-for Genesis Software - http://www.gsoft.com.au
-"The nice thing about standards is that there
-are so many of them to choose from."
-  -- Andrew Tanenbaum
-GPG Fingerprint - 5596 B766 97C0 0E94 4347 295E E593 DC20 7B3F CE8C
-
-
-
-
-
-
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
