@@ -1,58 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110221165431.GA9130@jh-x301>
-References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
-	<AANLkTinzZ+nNSx6qq0xMXO8ZVLt5r-r0pgcjRBa7MaxY@mail.gmail.com>
-	<AANLkTimjYJTVq5dgmisV8c74rZAvpmpHL=g78feOG-_T@mail.gmail.com>
-	<AANLkTi=ghX3SS0CUZDKM4pwOt9bPJBnRZGA3cRojwOgs@mail.gmail.com>
-	<AANLkTimR3cpHEVBUOrPH9LRnmszNdmfg37hN__PWkYUQ@mail.gmail.com>
-	<20110221165431.GA9130@jh-x301>
-Date: Mon, 21 Feb 2011 20:37:50 +0200
-Message-ID: <AANLkTind73aFXZOo0NgLPYknuUmyNoU4amUDid6bLAWj@mail.gmail.com>
-Subject: Re: [RFC v2 00/14] Store UUID-128 on host order
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: anderson.briglia@openbossa.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Use ERR_PTR as return error from hci_connect
+Date: Mon, 21 Feb 2011 15:16:00 -0300
+Message-Id: <4d62abea.8937e30a.373e.ffff9546@mx.google.com>
+In-Reply-To: <y>
+References: <y>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Ville Tervo <ville.tervo@nokia.com>
 
-On Mon, Feb 21, 2011 at 6:54 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
-ote:
-> Hi Luiz,
->
-> On Mon, Feb 21, 2011, Luiz Augusto von Dentz wrote:
->> > Just throwing my own bits on this: I think making the internal
->> > representation for uuid_t consistent is important to avoid bugs when
->> > handling the different UUID types.
->> >
->> > currently uuid_t stores 16/32-bit uuids and 128-bit uuid differently.
->>
->> The problem is not the internal representation, but things like this:
->>
->> - =A0 =A0 =A0 sdp_uuid128_create(&svclass_uuid, SYNCMLC_UUID);
->> + =A0 =A0 =A0 ntoh128(SYNCMLC_UUID, &h128);
->> + =A0 =A0 =A0 sdp_uuid128_create(&svclass_uuid, &h128);
->>
->> This means the API has changed, it now takes host order where it used
->> to be network order. We could have a new function e.g.
->> sdp_uuid128h_create to handle such cases and not break existing
->> applications using this API.
->
-> In this particular case the prefix sdp_ already implies that this is for
-> SDP and shouldn't be used in other code. I think what makes sense (and
-> Marcel supported it in IRC) is to a new bt_uuid_t struct and bt_uuid_*
-> helper functions which internally store everything in host byte order.
-> Then in the first phase we can make the ATT code use the new API and
-> later in a second phase start converting existing SDP code to use it.
+Use ERR_PTR mechanism to return error from hci_connect.
 
-Sound good to me.
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ net/bluetooth/hci_conn.c   |    8 ++++----
+ net/bluetooth/l2cap_core.c |   10 ++++------
+ net/bluetooth/sco.c        |    6 +++---
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d401775..06af539 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -430,10 +430,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	if (type == LE_LINK) {
+ 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+ 		if (le)
+-			return NULL;
++			return ERR_PTR(-EBUSY);
+ 		le = hci_conn_add(hdev, LE_LINK, dst);
+ 		if (!le)
+-			return NULL;
++			return ERR_PTR(-ENOMEM);
+ 		if (le->state == BT_OPEN)
+ 			hci_le_connect(le);
+ 
+@@ -445,8 +445,8 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
+ 	if (!acl) {
+ 		acl = hci_conn_add(hdev, ACL_LINK, dst);
+-		if (!acl)
+-			return NULL;
++		if (IS_ERR(acl))
++			return acl;
+ 	}
+ 
+ 	hci_conn_hold(acl);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index efcef0d..e76e9e5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -841,7 +841,7 @@ int l2cap_do_connect(struct sock *sk)
+ 	struct hci_conn *hcon;
+ 	struct hci_dev *hdev;
+ 	__u8 auth_type;
+-	int err;
++	int err = 0;
+ 
+ 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+ 							l2cap_pi(sk)->psm);
+@@ -852,8 +852,6 @@ int l2cap_do_connect(struct sock *sk)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 
+-	err = -ENOMEM;
+-
+ 	auth_type = l2cap_get_auth_type(sk);
+ 
+ 	if (l2cap_pi(sk)->dcid == L2CAP_CID_LE_DATA)
+@@ -863,8 +861,10 @@ int l2cap_do_connect(struct sock *sk)
+ 		hcon = hci_connect(hdev, ACL_LINK, dst,
+ 					l2cap_pi(sk)->sec_level, auth_type);
+ 
+-	if (!hcon)
++	if (IS_ERR(hcon)) {
++		err = PTR_ERR(hcon);
+ 		goto done;
++	}
+ 
+ 	conn = l2cap_conn_add(hcon, 0);
+ 	if (!conn) {
+@@ -872,8 +872,6 @@ int l2cap_do_connect(struct sock *sk)
+ 		goto done;
+ 	}
+ 
+-	err = 0;
+-
+ 	/* Update source addr of the socket */
+ 	bacpy(src, conn->src);
+ 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index c9348dd..26f2f04 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -190,16 +190,16 @@ static int sco_connect(struct sock *sk)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 
+-	err = -ENOMEM;
+-
+ 	if (lmp_esco_capable(hdev) && !disable_esco)
+ 		type = ESCO_LINK;
+ 	else
+ 		type = SCO_LINK;
+ 
+ 	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
+-	if (!hcon)
++	if (IS_ERR(hcon)) {
++		err = PTR_ERR(hcon);
+ 		goto done;
++	}
+ 
+ 	conn = sco_conn_add(hcon, 0);
+ 	if (!conn) {
+-- 
+1.7.1
 
-
---=20
-Luiz Augusto von Dentz
-Computer Engineer
