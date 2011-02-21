@@ -1,109 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 6/7] Move attr_data_from_string() to utils.c
-Date: Mon, 21 Feb 2011 19:50:05 -0300
-Message-Id: <1298328606-7993-6-git-send-email-sheldon.demario@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 4/7] Add Characteristics Descriptor Discovery option in interactive gatttool
+Date: Mon, 21 Feb 2011 19:50:03 -0300
+Message-Id: <1298328606-7993-4-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
 References: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-
-The attr_data_from_string() function will be used in interactive and
-usual gatttool so this function was moved to common file utils.c.
 ---
- attrib/gatttool.c |   23 ++---------------------
- attrib/gatttool.h |    1 +
- attrib/utils.c    |   19 +++++++++++++++++++
- 3 files changed, 22 insertions(+), 21 deletions(-)
+ attrib/interactive.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 61 insertions(+), 0 deletions(-)
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 7478043..d7887c6 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -313,25 +313,6 @@ static gboolean characteristics_read(gpointer user_data)
- 	return FALSE;
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index e9f6019..9389686 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -169,6 +169,47 @@ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ 	rl_forced_update_display();
  }
  
--static size_t attr_data_from_string(const char *str, uint8_t **data)
--{
--	char tmp[3];
--	size_t size, i;
--
--	size = strlen(str) / 2;
--	*data = g_try_malloc0(size);
--	if (*data == NULL)
--		return 0;
--
--	tmp[2] = '\0';
--	for (i = 0; i < size; i++) {
--		memcpy(tmp, str + (i * 2), 2);
--		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
--	}
--
--	return size;
--}
--
- static void mainloop_quit(gpointer user_data)
- {
- 	uint8_t *value = user_data;
-@@ -356,7 +337,7 @@ static gboolean characteristics_write(gpointer user_data)
- 		goto error;
- 	}
- 
--	len = attr_data_from_string(opt_value, &value);
-+	len = gatt_attr_data_from_string(opt_value, &value);
- 	if (len == 0) {
- 		g_printerr("Invalid value\n");
- 		goto error;
-@@ -408,7 +389,7 @@ static gboolean characteristics_write_req(gpointer user_data)
- 		goto error;
- 	}
- 
--	len = attr_data_from_string(opt_value, &value);
-+	len = gatt_attr_data_from_string(opt_value, &value);
- 	if (len == 0) {
- 		g_printerr("Invalid value\n");
- 		goto error;
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-index 7eae18d..2fd4a46 100644
---- a/attrib/gatttool.h
-+++ b/attrib/gatttool.h
-@@ -25,3 +25,4 @@ int interactive(gchar *dst, gboolean le);
- GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 			const gchar *sec_level, int psm, int mtu,
- 			BtIOConnect connect_cb);
-+size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
-diff --git a/attrib/utils.c b/attrib/utils.c
-index 4d0000d..8d1ca74 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -104,3 +104,22 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 
- 	return chan;
- }
-+
-+size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
++static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
 +{
-+	char tmp[3];
-+	size_t size, i;
++	struct att_data_list *list;
++	guint8 format;
++	int i;
 +
-+	size = strlen(str) / 2;
-+	*data = g_try_malloc0(size);
-+	if (*data == NULL)
-+		return 0;
-+
-+	tmp[2] = '\0';
-+	for (i = 0; i < size; i++) {
-+		memcpy(tmp, str + (i * 2), 2);
-+		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
++	if (status != 0) {
++		printf("Discover all characteristic descriptors failed: "
++						"%s\n", att_ecode2str(status));
++		return;
 +	}
 +
-+	return size;
++	list = dec_find_info_resp(pdu, plen, &format);
++	if (list == NULL)
++		return;
++
++	printf("\n");
++	for (i = 0; i < list->num; i++) {
++		char uuidstr[MAX_LEN_UUID_STR];
++		uint16_t handle;
++		uint8_t *value;
++		uuid_t uuid;
++
++		value = list->data[i];
++		handle = att_get_u16(value);
++
++		if (format == 0x01)
++			sdp_uuid16_create(&uuid, att_get_u16(&value[2]));
++		else
++			sdp_uuid128_create(&uuid, &value[2]);
++
++		sdp_uuid2strn(&uuid, uuidstr, MAX_LEN_UUID_STR);
++		printf("handle: 0x%04x, uuid: %s\n", handle, uuidstr);
++	}
++
++	att_data_list_free(list);
++
++	rl_forced_update_display();
 +}
++
+ static void cmd_exit(int argcp, char **argvp)
+ {
+ 	rl_callback_handler_remove();
+@@ -287,6 +328,24 @@ static void cmd_char(int argcp, char **argvp)
+ 	return;
+ }
+ 
++static void cmd_char_desc(int argcp, char **argvp)
++{
++	int start = 0x0001;
++	int end = 0xffff;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
++		return;
++	}
++
++	if (set_handles(&start, &end, argcp, argvp))
++		return;
++
++	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
++
++	return;
++}
++
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
+@@ -305,6 +364,8 @@ static struct {
+ 		"Primary Service Discovery" },
+ 	{ "characteristics",	cmd_char,	"[start hnd] [end hnd]",
+ 		"Characteristics Discovery" },
++	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
++		"Characteristics Descriptor Discovery" },
+ 	{ NULL, NULL, NULL}
+ };
+ 
 -- 
 1.7.1
 
