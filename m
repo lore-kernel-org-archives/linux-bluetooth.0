@@ -4,8 +4,8 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Ville Tervo <ville.tervo@nokia.com>,
 	Anderson Briglia <anderson.briglia@openbossa.org>
 Subject: [PATCH 2/2] Bluetooth: Use ERR_PTR as return error from hci_connect
-Date: Mon, 21 Feb 2011 15:16:00 -0300
-Message-Id: <4d62abea.8937e30a.373e.ffff9546@mx.google.com>
+Date: Mon, 21 Feb 2011 15:09:24 -0300
+Message-Id: <4d62aa7a.47f3d80a.5ea1.ffffd992@mx.google.com>
 In-Reply-To: <y>
 References: <y>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,7 +13,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Ville Tervo <ville.tervo@nokia.com>
 
-Use ERR_PTR mechanism to return error from hci_connect.
+Use ERR_PRT mechanism to return error from hci_connect.
 
 Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
