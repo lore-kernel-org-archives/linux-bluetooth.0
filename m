@@ -1,120 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 21 Feb 2011 18:09:06 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Alan Ott <alan@signal11.us>, Antonio Ospite <ospite@studenti.unina.it>,
+	linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Bastien Nocera <hadess@hadess.net>, Jim Paris <jim@jtan.com>,
+	"pascal@pabr.org" <pascal@pabr.org>
+Subject: Re: [PATCH 2/2] bt hidp: send Output reports using SET_REPORT on the
+ Control channel
+Message-ID: <20110221210906.GI2965@joana>
+References: <alpine.LNX.2.00.1102180944590.2160@pobox.suse.cz>
+ <1298222806-19433-1-git-send-email-ospite@studenti.unina.it>
+ <1298222806-19433-3-git-send-email-ospite@studenti.unina.it>
+ <4D61DFE0.5020400@signal11.us>
+ <alpine.LNX.2.00.1102211349550.2160@pobox.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <F8CC68A2-1854-466D-AC84-37B50D05F847@signove.com>
-References: <1297880021-31728-1-git-send-email-epx@signove.com>
-	<1297880021-31728-2-git-send-email-epx@signove.com>
-	<AANLkTi=X=E_VA7p0J6aj+kcJYPA7mUJiqjs+xySKJ6EE@mail.gmail.com>
-	<F8CC68A2-1854-466D-AC84-37B50D05F847@signove.com>
-Date: Mon, 21 Feb 2011 21:14:15 +0000
-Message-ID: <AANLkTimDdtdSUFqoVyGUy-UC_r3y_pu9N5dO9CBD9dfi@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Add generic descriptor support to Attribute API document
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: =?UTF-8?Q?Elvis_Pf=C3=BCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.LNX.2.00.1102211349550.2160@pobox.suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+Hi Jiri,
 
-On Mon, Feb 21, 2011 at 7:39 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
->
-> On 21 Feb 2011, at 16:14 , Claudio Takahasi wrote:
->
->> Hi,
->>
->>
->> On Wed, Feb 16, 2011 at 6:13 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
->>> This patch proposes extensions to Attribute API, giving access to all
->>> characteristic descriptors (beyond 'Description' and 'Format').
->>> ---
->>>  doc/attribute-api.txt |   28 ++++++++++++++++++++++++++++
->>>  1 files changed, 28 insertions(+), 0 deletions(-)
->>>
->>> diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
->>> index 23808e6..5ee189e 100644
->>> --- a/doc/attribute-api.txt
->>> +++ b/doc/attribute-api.txt
->>> @@ -104,6 +104,14 @@ Methods            dict GetProperties()
->>>
->>>                        Possible Errors: org.bluez.Error.InvalidArguments
->>>
->>> +               void SetDescriptorValue(object descriptor, array{byte} value)
->>> +
->>> +                       Sets descriptor value, provided that it is writable.
->>> +
->>> +                       Possible Errors: org.bluez.Error.InvalidArguments
->>> +                                       org.bluez.Error.NotAuthorized
->>> +
->>> +
->>>  Properties     string UUID [readonly]
->>>
->>>                        UUID128 of this characteristic.
->>> @@ -143,6 +151,26 @@ Properties         string UUID [readonly]
->>>                        Friendly representation of the Characteristic Value
->>>                        based on the format attribute.
->>>
->>> +               dict Descriptors [readonly]
->>> +
->>> +                       List of descriptors for this characteristic.
->>> +
->>> +                       This list contains only the descriptors not already
->>> +                       covered by other properties (v.g. Description, Format).
->>> +
->>> +                       Each descriptor is mapped to an unique object path,
->>> +                       which is the key for the dict.
->>> +
->>> +                       Each dict value is, in turn, a dict with at least
->>> +                       the following keys:
->>> +
->>> +                       {
->>> +                               "UUID": string (descriptor UUID - mandatory),
->>> +                               "Value": array of bytes (raw descriptor value -
->>> +                                        optional, shows up when value can be
->>> +                                        fetched)
->>> +                       }
->>> +
->>>
->>>  Characteristic Watcher hierarchy
->>>  ===============================
->>> --
->>> 1.7.1
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>
->> In my opinion is not a good approach to allow applications(D-Bus
->> clients) to change a behavior/value of the same characteristic
->> descriptor. bluetoothd could manage automatically writing the client
->> characteristic configuration and server characteristic configuration
->> based on the registered watchers and supported client profiles.
->
-> I'm not sure I follow, but let's break it down:
->
-> 1) Note that this API is not just for client (and server) characteristic configuration descriptors. It is good for any kind of descriptor (like Valid Range, that client is supposed to be able to read, and set the related characteristic within its limits).
+* Jiri Kosina <jkosina@suse.cz> [2011-02-21 13:50:40 +0100]:
 
-The API already has SetProperty and GetProperties that could expose
-the descriptors that you need.
+> On Sun, 20 Feb 2011, Alan Ott wrote:
+> 
+> > On 02/20/2011 12:26 PM, Antonio Ospite wrote:
+> > > The current implementation of hidp_output_raw_report() relies only on
+> > > the Control channel even for Output reports, and the BT HID
+> > > specification [1] does not mention using the DATA message for Output
+> > > reports on the Control channel (see section 7.9.1 and also Figure 11:
+> > > SET_ Flow Chart), so let us just use SET_REPORT.
+> > > 
+> > > This also fixes sending Output reports to some devices (like Sony
+> > > Sixaxis) which are not able to handle DATA messages on the Control
+> > > channel.
+> > > 
+> > > Ideally hidp_output_raw_report() could be improved to use this scheme:
+> > >    Feature Report -- SET_REPORT on the Control channel
+> > >    Output Report  -- DATA on the Interrupt channel
+> > > for more efficiency, but as said above, right now only the Control
+> > > channel is used.
+> > > 
+> > > [1] http://www.bluetooth.com/Specification%20Documents/HID_SPEC_V10.pdf
+> > > 
+> > >   	case HID_OUTPUT_REPORT:
+> > > -		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+> > > +		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT;
+> > >    
+> > 
+> > I think this is right. Section 7.4[.0] says that SET_ and GET_ requests return
+> > with HANDSHAKE. Section 7.4.9 says that DATA does _not_ return a HANDSHAKE. My
+> > patch to hidp_output_raw_report() relies on getting a HANDSHAKE back, so it
+> > wouldn't have worked with BT devices that take output reports. Since I don't
+> > have any that do, I couldn't test it. (And it was like that when I got here :)
+> > )
+> > 
+> > For the whole set:
+> > Acked-by: Alan Ott <alan@signal11.us>
+> 
+> Agreed.
+> 
+> As an author of the original code, I agree with the change. But as it is 
+> in net/bluetooth, I'd at least have Acked-by from some of the Bluetooth 
+> folks before I take it through my tree.
+> 
+> Marcel? Gustavo?
 
->
-> 2) Updating automatically CCC/SCC descriptors based on Watchers sounds nice. We just need to add some kind of flag to agent registering in order to tell if we want notification or indication.
+Acked-by: Gustavo F. Padovan <padovan@profusion.mobi>
 
-This is our initial ideia, but it is not written in the stone yet. We
-need to investigate a little bit more and see which/how the Profiles
-are using these characteristics descriptors.
-
->
-> 3) In terms of client profiles, the GATT API looks generic to me, not profile-specific. As there is a way to access characteristic values in a generic way, so there is a need to do the same for descriptors.
-
-For some descriptors I agree that we need to expose through the D-Bus
-API. However for others such as CCC and SCC I don't think that we need
-to allow the apps to change it. If necessary we will also have a
-plugin or a service specific interface, one example is Proximity
-Profile. Do you have a good use case/example in health profiles using
-CCC and SCC?
-
-BR,
-Claudio.
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
