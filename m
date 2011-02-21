@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Feb 2011 15:48:00 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next-2.6 2011-02-17
-Message-ID: <20110221204759.GL9650@tuxdriver.com>
-References: <20110218135956.GA2256@joana>
- <20110221201645.GC2965@joana>
+Date: Mon, 21 Feb 2011 18:00:45 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: anderson.briglia@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix LE conn creation
+Message-ID: <20110221210045.GG2965@joana>
+References: <y>
+ <4d62aa6e.47f3d80a.5ea1.ffffd98d@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110221201645.GC2965@joana>
+In-Reply-To: <4d62aa6e.47f3d80a.5ea1.ffffd98d@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 21, 2011 at 05:16:45PM -0300, Gustavo F. Padovan wrote:
-> Hi John,
-> 
-> * Gustavo F. Padovan <padovan@profusion.mobi> [2011-02-18 10:59:56 -0300]:
-> 
-> > Hi John,
-> > 
-> > Busy times at the Bluetooth subsystem. Here is another big set of patches
-> > intended to 2.6.39. ;)
-> > 
-> > One of the changes is the end of the L2CAP and SCO kernel modules. We just
-> > merged them into the main bluetooth.ko module. It really never made sense to
-> > have them separated. 
-> > 
-> > Then we have firmware support to a new Atheros device by Bala Shanmugam.
-> > The First set of patches for Bluetooth Low Energy(LE) support, by Ville Tervo.
-> > Low Energy is a new Bluetooth radio that will bring many new use cases to the
-> > Bluetooth technology. Finally, LE connection update command support by Claudio
-> > Takahasi. The rest is just bugs fixes and cleanups. 
-> > 
-> > Please pull, or let me know any doubts you have. Thanks.
-> 
-> I saw you had a merge conflict between bluetooth-2.6 and bluetooth-next-2.6
-> and I want to apologize for the extra work I caused to you. It was all my
-> fault by not testing the merge of the my own trees. It won't happen again. ;)
+Hi Briglia,
 
-Cool, thanks!  It wasn't a big deal, but better if I can avoid it! :-)
+* anderson.briglia@openbossa.org <anderson.briglia@openbossa.org> [2011-02-21 15:09:23 -0300]:
 
-John
+> From: Anderson Briglia <anderson.briglia@openbossa.org>
+> 
+> This patch prevents a crash when remote host tries to create a LE
+> link which already exists. i.e.: call l2test twice passing the
+> same parameters.
+> 
+> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> ---
+>  net/bluetooth/hci_conn.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+
+Applied, thanks.
+
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Gustavo F. Padovan
+http://profusion.mobi
