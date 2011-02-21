@@ -1,70 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1297880021-31728-2-git-send-email-epx@signove.com>
-References: <1297880021-31728-1-git-send-email-epx@signove.com>
-	<1297880021-31728-2-git-send-email-epx@signove.com>
-Date: Mon, 21 Feb 2011 19:14:20 +0000
-Message-ID: <AANLkTi=X=E_VA7p0J6aj+kcJYPA7mUJiqjs+xySKJ6EE@mail.gmail.com>
-Subject: Re: [PATCH 2/3] Add generic descriptor support to Attribute API document
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: =?UTF-8?Q?Elvis_Pf=C3=BCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20110221165431.GA9130@jh-x301>
+References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
+	<AANLkTinzZ+nNSx6qq0xMXO8ZVLt5r-r0pgcjRBa7MaxY@mail.gmail.com>
+	<AANLkTimjYJTVq5dgmisV8c74rZAvpmpHL=g78feOG-_T@mail.gmail.com>
+	<AANLkTi=ghX3SS0CUZDKM4pwOt9bPJBnRZGA3cRojwOgs@mail.gmail.com>
+	<AANLkTimR3cpHEVBUOrPH9LRnmszNdmfg37hN__PWkYUQ@mail.gmail.com>
+	<20110221165431.GA9130@jh-x301>
+Date: Mon, 21 Feb 2011 20:37:50 +0200
+Message-ID: <AANLkTind73aFXZOo0NgLPYknuUmyNoU4amUDid6bLAWj@mail.gmail.com>
+Subject: Re: [RFC v2 00/14] Store UUID-128 on host order
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksCgoKT24gV2VkLCBGZWIgMTYsIDIwMTEgYXQgNjoxMyBQTSwgRWx2aXMgUGbDvHR6ZW5yZXV0
-ZXIgPGVweEBzaWdub3ZlLmNvbT4gd3JvdGU6Cj4gVGhpcyBwYXRjaCBwcm9wb3NlcyBleHRlbnNp
-b25zIHRvIEF0dHJpYnV0ZSBBUEksIGdpdmluZyBhY2Nlc3MgdG8gYWxsCj4gY2hhcmFjdGVyaXN0
-aWMgZGVzY3JpcHRvcnMgKGJleW9uZCAnRGVzY3JpcHRpb24nIGFuZCAnRm9ybWF0JykuCj4gLS0t
-Cj4gwqBkb2MvYXR0cmlidXRlLWFwaS50eHQgfCDCoCAyOCArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrCj4gwqAxIGZpbGVzIGNoYW5nZWQsIDI4IGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25z
-KC0pCj4KPiBkaWZmIC0tZ2l0IGEvZG9jL2F0dHJpYnV0ZS1hcGkudHh0IGIvZG9jL2F0dHJpYnV0
-ZS1hcGkudHh0Cj4gaW5kZXggMjM4MDhlNi4uNWVlMTg5ZSAxMDA2NDQKPiAtLS0gYS9kb2MvYXR0
-cmlidXRlLWFwaS50eHQKPiArKysgYi9kb2MvYXR0cmlidXRlLWFwaS50eHQKPiBAQCAtMTA0LDYg
-KzEwNCwxNCBAQCBNZXRob2RzIMKgIMKgIMKgIMKgIMKgIMKgZGljdCBHZXRQcm9wZXJ0aWVzKCkK
-Pgo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgUG9zc2libGUgRXJyb3JzOiBv
-cmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cwo+Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCB2b2lkIFNldERlc2NyaXB0b3JWYWx1ZShvYmplY3QgZGVzY3JpcHRvciwgYXJyYXl7Ynl0ZX0g
-dmFsdWUpCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgU2V0cyBkZXNj
-cmlwdG9yIHZhbHVlLCBwcm92aWRlZCB0aGF0IGl0IGlzIHdyaXRhYmxlLgo+ICsKPiArIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFBvc3NpYmxlIEVycm9yczogb3JnLmJsdWV6LkVy
-cm9yLkludmFsaWRBcmd1bWVudHMKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG9yZy5ibHVlei5FcnJvci5Ob3RBdXRob3JpemVkCj4g
-Kwo+ICsKPiDCoFByb3BlcnRpZXMgwqAgwqAgc3RyaW5nIFVVSUQgW3JlYWRvbmx5XQo+Cj4gwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBVVUlEMTI4IG9mIHRoaXMgY2hhcmFjdGVy
-aXN0aWMuCj4gQEAgLTE0Myw2ICsxNTEsMjYgQEAgUHJvcGVydGllcyDCoCDCoCDCoCDCoCBzdHJp
-bmcgVVVJRCBbcmVhZG9ubHldCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBG
-cmllbmRseSByZXByZXNlbnRhdGlvbiBvZiB0aGUgQ2hhcmFjdGVyaXN0aWMgVmFsdWUKPiDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGJhc2VkIG9uIHRoZSBmb3JtYXQgYXR0cmli
-dXRlLgo+Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBkaWN0IERlc2NyaXB0b3JzIFtyZWFkb25s
-eV0KPiArCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBMaXN0IG9mIGRlc2Ny
-aXB0b3JzIGZvciB0aGlzIGNoYXJhY3RlcmlzdGljLgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIFRoaXMgbGlzdCBjb250YWlucyBvbmx5IHRoZSBkZXNjcmlwdG9ycyBu
-b3QgYWxyZWFkeQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgY292ZXJlZCBi
-eSBvdGhlciBwcm9wZXJ0aWVzICh2LmcuIERlc2NyaXB0aW9uLCBGb3JtYXQpLgo+ICsKPiArIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIEVhY2ggZGVzY3JpcHRvciBpcyBtYXBwZWQg
-dG8gYW4gdW5pcXVlIG9iamVjdCBwYXRoLAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgd2hpY2ggaXMgdGhlIGtleSBmb3IgdGhlIGRpY3QuCj4gKwo+ICsgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgRWFjaCBkaWN0IHZhbHVlIGlzLCBpbiB0dXJuLCBhIGRpY3Qg
-d2l0aCBhdCBsZWFzdAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgdGhlIGZv
-bGxvd2luZyBrZXlzOgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHsK
-PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgICJVVUlEIjog
-c3RyaW5nIChkZXNjcmlwdG9yIFVVSUQgLSBtYW5kYXRvcnkpLAo+ICsgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgIlZhbHVlIjogYXJyYXkgb2YgYnl0ZXMgKHJh
-dyBkZXNjcmlwdG9yIHZhbHVlIC0KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgb3B0aW9uYWwsIHNob3dzIHVwIHdoZW4gdmFsdWUg
-Y2FuIGJlCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoGZldGNoZWQpCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCB9Cj4gKwo+Cj4gwqBDaGFyYWN0ZXJpc3RpYyBXYXRjaGVyIGhpZXJhcmNoeQo+IMKgPT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PQo+IC0tCj4gMS43LjEKPgo+IC0tCj4gVG8gdW5zdWJz
-Y3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJs
-dWV0b290aCIgaW4KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2Vy
-bmVsLm9yZwo+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgwqBodHRwOi8vdmdlci5rZXJuZWwub3Jn
-L21ham9yZG9tby1pbmZvLmh0bWwKPgoKSW4gbXkgb3BpbmlvbiBpcyBub3QgYSBnb29kIGFwcHJv
-YWNoIHRvIGFsbG93IGFwcGxpY2F0aW9ucyhELUJ1cwpjbGllbnRzKSB0byBjaGFuZ2UgYSBiZWhh
-dmlvci92YWx1ZSBvZiB0aGUgc2FtZSBjaGFyYWN0ZXJpc3RpYwpkZXNjcmlwdG9yLiBibHVldG9v
-dGhkIGNvdWxkIG1hbmFnZSBhdXRvbWF0aWNhbGx5IHdyaXRpbmcgdGhlIGNsaWVudApjaGFyYWN0
-ZXJpc3RpYyBjb25maWd1cmF0aW9uIGFuZCBzZXJ2ZXIgY2hhcmFjdGVyaXN0aWMgY29uZmlndXJh
-dGlvbgpiYXNlZCBvbiB0aGUgcmVnaXN0ZXJlZCB3YXRjaGVycyBhbmQgc3VwcG9ydGVkIGNsaWVu
-dCBwcm9maWxlcy4KCkJSLApDbGF1ZGlvLgo=
+Hi,
+
+On Mon, Feb 21, 2011 at 6:54 PM, Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
+> Hi Luiz,
+>
+> On Mon, Feb 21, 2011, Luiz Augusto von Dentz wrote:
+>> > Just throwing my own bits on this: I think making the internal
+>> > representation for uuid_t consistent is important to avoid bugs when
+>> > handling the different UUID types.
+>> >
+>> > currently uuid_t stores 16/32-bit uuids and 128-bit uuid differently.
+>>
+>> The problem is not the internal representation, but things like this:
+>>
+>> - =A0 =A0 =A0 sdp_uuid128_create(&svclass_uuid, SYNCMLC_UUID);
+>> + =A0 =A0 =A0 ntoh128(SYNCMLC_UUID, &h128);
+>> + =A0 =A0 =A0 sdp_uuid128_create(&svclass_uuid, &h128);
+>>
+>> This means the API has changed, it now takes host order where it used
+>> to be network order. We could have a new function e.g.
+>> sdp_uuid128h_create to handle such cases and not break existing
+>> applications using this API.
+>
+> In this particular case the prefix sdp_ already implies that this is for
+> SDP and shouldn't be used in other code. I think what makes sense (and
+> Marcel supported it in IRC) is to a new bt_uuid_t struct and bt_uuid_*
+> helper functions which internally store everything in host byte order.
+> Then in the first phase we can make the ATT code use the new API and
+> later in a second phase start converting existing SDP code to use it.
+
+Sound good to me.
+
+
+
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
