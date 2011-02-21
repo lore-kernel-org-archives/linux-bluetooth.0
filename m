@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 3/5] Check permissions before setting client configs
-Date: Mon, 21 Feb 2011 18:30:41 -0300
-Message-Id: <1298323843-31106-3-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 4/5] Implement server-side ATT handle notification
+Date: Mon, 21 Feb 2011 18:30:42 -0300
+Message-Id: <1298323843-31106-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1298323843-31106-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1298323843-31106-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,52 +12,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andre Dieb Martins <andre.dieb@signove.com>
 
-Only enable notification/indication if the descriptor allows it.
+Adds an initial version of ATT handle notification. Notifications are sent to
+interested clients (based on the Client Characteristic Configuration) always
+when the attribute is updated.
+
+This enables services to call db_attrib_update() and send notifications on their
+own terms.
 ---
- src/attrib-server.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
+ src/attrib-server.c |   29 +++++++++++++++++++++++++++++
+ 1 files changed, 29 insertions(+), 0 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index be71621..5675a1b 100644
+index 5675a1b..585e1f3 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -197,19 +197,21 @@ static uint8_t client_set_notifications(struct attribute *attr,
- 	struct gatt_channel *channel = user_data;
- 	struct attribute *a, *last_chr_val = NULL;
- 	uint16_t handle, cfg_val;
-+	uint8_t perm;
- 	uuid_t uuid;
- 	GSList *l;
+@@ -961,6 +961,33 @@ static void confirm_event(GIOChannel *io, void *user_data)
+ 	return;
+ }
  
- 	cfg_val = att_get_u16(attr->data);
- 
- 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
--	for (l = database, handle = 0; l != NULL; l = l->next) {
-+	for (l = database, handle = 0, perm = 0; l != NULL; l = l->next) {
- 		a = l->data;
- 
- 		if (a->handle >= attr->handle)
- 			break;
- 
- 		if (sdp_uuid_cmp(&a->uuid, &uuid) == 0) {
-+			perm = att_get_u8(&a->data[0]);
- 			handle = att_get_u16(&a->data[1]);
- 			continue;
- 		}
-@@ -221,8 +223,11 @@ static uint8_t client_set_notifications(struct attribute *attr,
- 	if (last_chr_val == NULL)
- 		return 0;
- 
--	/* FIXME: Characteristic properties shall be checked for
--	 * Notification/Indication permissions. */
-+	if ((cfg_val & 0x0001) && !(perm & ATT_CHAR_PROPER_NOTIFY))
-+		return ATT_ECODE_WRITE_NOT_PERM;
++static void attrib_notify_clients(struct attribute *attr)
++{
++	uint8_t pdu[ATT_MAX_MTU];
++	guint mtu, handle = attr->handle;
++	uint16_t len;
++	GSList *l;
 +
-+	if ((cfg_val & 0x0002) && !(perm & ATT_CHAR_PROPER_INDICATE))
-+		return ATT_ECODE_WRITE_NOT_PERM;
++	for (l = clients, mtu = 0, len = 0; l; l = l->next) {
++		struct gatt_channel *channel = l->data;
++
++		mtu = channel->mtu;
++		if (mtu == 0)
++			continue;
++
++		/* Notification */
++		if (g_slist_find_custom(channel->notify,
++					GUINT_TO_POINTER(handle), handle_cmp)) {
++			len = enc_notification(attr, pdu, mtu);
++			if (len == 0)
++				return;
++
++			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
++							NULL, NULL, NULL);
++		}
++	}
++}
++
+ static gboolean register_core_services(void)
+ {
+ 	uint8_t atval[256];
+@@ -1205,6 +1232,8 @@ int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
+ 	a->len = len;
+ 	memcpy(a->data, value, len);
  
- 	if (cfg_val & 0x0001)
- 		channel->notify = g_slist_append(channel->notify, last_chr_val);
++	attrib_notify_clients(a);
++
+ 	return 0;
+ }
+ 
 -- 
 1.7.0.4
 
