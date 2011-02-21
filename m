@@ -1,30 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Feb 2011 17:53:59 -0300
+Date: Mon, 21 Feb 2011 17:16:45 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/8] More Management interface patches
-Message-ID: <20110221205359.GE2965@joana>
-References: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next-2.6 2011-02-17
+Message-ID: <20110221201645.GC2965@joana>
+References: <20110218135956.GA2256@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298127962-18576-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <20110218135956.GA2256@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi John,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-02-19 12:05:54 -0300]:
+* Gustavo F. Padovan <padovan@profusion.mobi> [2011-02-18 10:59:56 -0300]:
 
-> Hi,
+> Hi John,
 > 
-> Here's a new set of patches for the Management interface. Combined with
-> the latest user space git these patches enable both legacy and Secure
-> Simple Pairing procedures. After these the only big missing feature in
-> the management interface is device discovery which I'm just about to
-> start working on.
+> Busy times at the Bluetooth subsystem. Here is another big set of patches
+> intended to 2.6.39. ;)
+> 
+> One of the changes is the end of the L2CAP and SCO kernel modules. We just
+> merged them into the main bluetooth.ko module. It really never made sense to
+> have them separated. 
+> 
+> Then we have firmware support to a new Atheros device by Bala Shanmugam.
+> The First set of patches for Bluetooth Low Energy(LE) support, by Ville Tervo.
+> Low Energy is a new Bluetooth radio that will bring many new use cases to the
+> Bluetooth technology. Finally, LE connection update command support by Claudio
+> Takahasi. The rest is just bugs fixes and cleanups. 
+> 
+> Please pull, or let me know any doubts you have. Thanks.
 
-All 8 patches are in my tree now, Thanks.
+I saw you had a merge conflict between bluetooth-2.6 and bluetooth-next-2.6
+and I want to apologize for the extra work I caused to you. It was all my
+fault by not testing the merge of the my own trees. It won't happen again. ;)
+
+Regards,
 
 -- 
 Gustavo F. Padovan
