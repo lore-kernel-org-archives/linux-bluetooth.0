@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How to config bluetooth headset ?
-Mime-Version: 1.0 (Apple Message framework v1082)
-Content-Type: text/plain; charset=us-ascii
-From: "Daniel O'Connor" <doconnor@gsoft.com.au>
-In-Reply-To: <AANLkTinC4JqX627rv7PUWrhOZwmerCEQJ_jeZ0w29LW9@mail.gmail.com>
-Date: Tue, 22 Feb 2011 19:51:28 +1030
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5BC4F68C-A168-4C70-8FB2-A4D2BFBB347D@gsoft.com.au>
-References: <AANLkTinC4JqX627rv7PUWrhOZwmerCEQJ_jeZ0w29LW9@mail.gmail.com>
-To: Bob Liu <lliubbo@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix not setting global mode when SetProperty is used
+Date: Tue, 22 Feb 2011 11:26:13 +0200
+Message-Id: <1298366773-5781-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On 22/02/2011, at 18:09, Bob Liu wrote:
-> Cureently I can scan the device:
-> # hcitool scan
-> Scanning ...
->        00:1A:45:4A:EA:39       Jabra BT125
-> #
-> 
-> How to make aplay can use that device?
+Global mode should be overwrite if user application change the adapter
+mode by using SetProperty while there are sessions active, otherwise when
+this sessions are released the mode restored will be the global mode from
+before the sessions were created and not the mode set with SetProperty.
+---
+ src/adapter.c |   14 +++++++++++---
+ 1 files changed, 11 insertions(+), 3 deletions(-)
 
-Does bluetooth-wizard help you?
-
-I don't know if there is a command line equivalent though, or what happens afterward - eg if bluetoothd stores the connection info for later use or something else must be run..
-
---
-Daniel O'Connor software and network engineer
-for Genesis Software - http://www.gsoft.com.au
-"The nice thing about standards is that there
-are so many of them to choose from."
-  -- Andrew Tanenbaum
-GPG Fingerprint - 5596 B766 97C0 0E94 4347 295E E593 DC20 7B3F CE8C
-
-
-
-
-
+diff --git a/src/adapter.c b/src/adapter.c
+index dbae219..2e11832 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -516,8 +516,10 @@ static DBusMessage *set_discoverable(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	mode = discoverable ? MODE_DISCOVERABLE : MODE_CONNECTABLE;
+ 
+-	if (mode == adapter->mode)
++	if (mode == adapter->mode) {
++		adapter->global_mode = mode;
+ 		return dbus_message_new_method_return(msg);
++	}
+ 
+ 	err = set_mode(adapter, mode, msg);
+ 	if (err < 0)
+@@ -541,8 +543,10 @@ static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	mode = MODE_OFF;
+ 
+-	if (mode == adapter->mode)
++	if (mode == adapter->mode) {
++		adapter->global_mode = mode;
+ 		return dbus_message_new_method_return(msg);
++	}
+ 
+ 	err = set_mode(adapter, mode, msg);
+ 	if (err < 0)
+@@ -2477,8 +2481,12 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 		if (err < 0)
+ 			reply = btd_error_failed(msg, strerror(-err));
+-		else
++		else {
++			if (strcmp(dbus_message_get_member(msg),
++						"SetProperty") == 0)
++				adapter->global_mode = adapter->mode;
+ 			reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++		}
+ 
+ 		g_dbus_send_message(connection, reply);
+ 	}
+-- 
+1.7.1
 
