@@ -1,128 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ville Tervo <ville.tervo@nokia.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v2] Bluetooth: Use ERR_PTR as return error from hci_connect
-Date: Tue, 22 Feb 2011 16:10:53 -0300
-Message-Id: <4d640a47.a21fec0a.065e.466f@mx.google.com>
-In-Reply-To: <y>
-References: <y>
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [PATCH] Fix potential bug in le_advertising_report()
+Date: Tue, 22 Feb 2011 14:44:29 -0300
+Message-Id: <1298396669-5530-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ville Tervo <ville.tervo@nokia.com>
+In the current implementation of le_advertising_report(), the variable
+'info' has an invalid memory address after the 'for' loop. If 'info'
+is dereferenced it will access invalid memory.
 
-Use ERR_PTR mechanism to return error from hci_connect.
-
-Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+This patch fixes this potential bug and improves the code's readability.
 ---
- net/bluetooth/hci_conn.c   |    4 ++--
- net/bluetooth/l2cap_core.c |   10 ++++------
- net/bluetooth/mgmt.c       |    4 ++--
- net/bluetooth/sco.c        |    6 +++---
- 4 files changed, 11 insertions(+), 13 deletions(-)
+ plugins/hciops.c |   15 ++++++++++-----
+ 1 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4504cb6..7a6f56b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -431,10 +431,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 	if (type == LE_LINK) {
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 		if (le)
--			return NULL;
-+			return ERR_PTR(-EBUSY);
- 		le = hci_conn_add(hdev, LE_LINK, dst);
- 		if (!le)
--			return NULL;
-+			return ERR_PTR(-ENOMEM);
- 		if (le->state == BT_OPEN)
- 			hci_le_connect(le);
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index c3d6290..fd19ef4 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -2184,14 +2184,19 @@ static inline void le_advertising_report(int index, evt_le_meta_event *meta)
+ {
+ 	struct dev_info *dev = &devs[index];
+ 	le_advertising_info *info;
+-	uint8_t num, i;
++	uint8_t num_reports;
++	const uint8_t RSSI_SIZE = 1;
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index efcef0d..e76e9e5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -841,7 +841,7 @@ int l2cap_do_connect(struct sock *sk)
- 	struct hci_conn *hcon;
- 	struct hci_dev *hdev;
- 	__u8 auth_type;
--	int err;
-+	int err = 0;
+-	num = meta->data[0];
+-	info = (le_advertising_info *) (meta->data + 1);
++	num_reports = meta->data[0];
  
- 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
- 							l2cap_pi(sk)->psm);
-@@ -852,8 +852,6 @@ int l2cap_do_connect(struct sock *sk)
- 
- 	hci_dev_lock_bh(hdev);
- 
--	err = -ENOMEM;
--
- 	auth_type = l2cap_get_auth_type(sk);
- 
- 	if (l2cap_pi(sk)->dcid == L2CAP_CID_LE_DATA)
-@@ -863,8 +861,10 @@ int l2cap_do_connect(struct sock *sk)
- 		hcon = hci_connect(hdev, ACL_LINK, dst,
- 					l2cap_pi(sk)->sec_level, auth_type);
- 
--	if (!hcon)
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
- 		goto done;
-+	}
- 
- 	conn = l2cap_conn_add(hcon, 0);
- 	if (!conn) {
-@@ -872,8 +872,6 @@ int l2cap_do_connect(struct sock *sk)
- 		goto done;
+-	for (i = 0; i < num; i++) {
++	info = (le_advertising_info *) &meta->data[1];
++	btd_event_advertising_report(&dev->bdaddr, info);
++	num_reports--;
++
++	while (num_reports--) {
++		info = (le_advertising_info *) (info->data + info->length +
++								RSSI_SIZE);
+ 		btd_event_advertising_report(&dev->bdaddr, info);
+-		info = (le_advertising_info *) (info->data + info->length + 1);
  	}
+ }
  
--	err = 0;
--
- 	/* Update source addr of the socket */
- 	bacpy(src, conn->src);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 982becd..37cabb5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1149,8 +1149,8 @@ static int pair_device(struct sock *sk, unsigned char *data, u16 len)
- 	}
- 
- 	conn = hci_connect(hdev, ACL_LINK, &cp->bdaddr, sec_level, auth_type);
--	if (!conn) {
--		err = -ENOMEM;
-+	if (IS_ERR(conn)) {
-+		err = PTR_ERR(conn);
- 		goto unlock;
- 	}
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index c9348dd..26f2f04 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -190,16 +190,16 @@ static int sco_connect(struct sock *sk)
- 
- 	hci_dev_lock_bh(hdev);
- 
--	err = -ENOMEM;
--
- 	if (lmp_esco_capable(hdev) && !disable_esco)
- 		type = ESCO_LINK;
- 	else
- 		type = SCO_LINK;
- 
- 	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
--	if (!hcon)
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
- 		goto done;
-+	}
- 
- 	conn = sco_conn_add(hcon, 0);
- 	if (!conn) {
 -- 
 1.7.1
 
