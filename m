@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH] Fix potential bug in le_advertising_report()
-Date: Tue, 22 Feb 2011 14:44:29 -0300
-Message-Id: <1298396669-5530-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1298068173-16518-14-git-send-email-claudio.takahasi@openbossa.org>
+References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1298068173-16518-14-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 22 Feb 2011 14:27:50 -0300
+Message-ID: <AANLkTikX6ajkK8J9W8K5HqQFiTvt1YwJw3w03oRh-=dc@mail.gmail.com>
+Subject: Re: [RFC v2 13/14] Add att_put_u128
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In the current implementation of le_advertising_report(), the variable
-'info' has an invalid memory address after the 'for' loop. If 'info'
-is dereferenced it will access invalid memory.
+Hi Claudio,
 
-This patch fixes this potential bug and improves the code's readability.
----
- plugins/hciops.c |   15 ++++++++++-----
- 1 files changed, 10 insertions(+), 5 deletions(-)
+On Fri, Feb 18, 2011 at 7:29 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> ATT protocol uses little endian byte order, before to add a UUID128
+> value in the PDU it needs to converted from host order to little endian.
+> ---
+>  attrib/att.c |    4 ++--
+>  attrib/att.h |    7 +++++++
+>  2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index c3d6290..fd19ef4 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -2184,14 +2184,19 @@ static inline void le_advertising_report(int index, evt_le_meta_event *meta)
- {
- 	struct dev_info *dev = &devs[index];
- 	le_advertising_info *info;
--	uint8_t num, i;
-+	uint8_t num_reports;
-+	const uint8_t RSSI_SIZE = 1;
- 
--	num = meta->data[0];
--	info = (le_advertising_info *) (meta->data + 1);
-+	num_reports = meta->data[0];
- 
--	for (i = 0; i < num; i++) {
-+	info = (le_advertising_info *) &meta->data[1];
-+	btd_event_advertising_report(&dev->bdaddr, info);
-+	num_reports--;
-+
-+	while (num_reports--) {
-+		info = (le_advertising_info *) (info->data + info->length +
-+								RSSI_SIZE);
- 		btd_event_advertising_report(&dev->bdaddr, info);
--		info = (le_advertising_info *) (info->data + info->length + 1);
- 	}
- }
- 
+Similarly, this part of the original code is still buggy and we need a
+ntoh128() call before att_put_u128().
+
+Regards,
 -- 
-1.7.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
