@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anand Gadiyar <gadiyar@ti.com>
-To: linux-bluetooth@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org, linux-next@vger.kernel.org
 Cc: Anand Gadiyar <gadiyar@ti.com>,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] bluetooth: remove unnecessary call to hci_sock_cleanup
-Date: Tue, 22 Feb 2011 12:43:26 +0530
-Message-Id: <1298358806-13257-1-git-send-email-gadiyar@ti.com>
+Subject: [PATCH -next] bluetooth: fix build break
+Date: Tue, 22 Feb 2011 12:43:09 +0530
+Message-Id: <1298358789-13202-1-git-send-email-gadiyar@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_sock_cleanup is already called after the sock_err label.
-It appears that we can drop this call.
+Linux-next as of 20110217 complains when building for OMAP1.
+
+  LD      vmlinux
+`hci_sock_cleanup' referenced in section `.init.text' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
+`hci_sock_cleanup' referenced in section `.init.text' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
+make: *** [vmlinux] Error 1
+
+A recent patch by Gustavo (Bluetooth: Merge L2CAP and SCO modules
+into bluetooth.ko) introduced this by calling the hci_sock_cleanup
+function in the error path of bt_init.
+
+Fix this by dropping the __exit marking for hci_sock_cleanup.
 
 Signed-off-by: Anand Gadiyar <gadiyar@ti.com>
 Cc: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- net/bluetooth/af_bluetooth.c |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ net/bluetooth/hci_sock.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: linux-omap-usb/net/bluetooth/af_bluetooth.c
+Index: linux-omap-usb/net/bluetooth/hci_sock.c
 ===================================================================
---- linux-omap-usb.orig/net/bluetooth/af_bluetooth.c
-+++ linux-omap-usb/net/bluetooth/af_bluetooth.c
-@@ -550,10 +550,8 @@ static int __init bt_init(void)
- 		goto error;
+--- linux-omap-usb.orig/net/bluetooth/hci_sock.c
++++ linux-omap-usb/net/bluetooth/hci_sock.c
+@@ -861,7 +861,7 @@ error:
+ 	return err;
+ }
  
- 	err = l2cap_init();
--	if (err < 0) {
--		hci_sock_cleanup();
-+	if (err < 0)
- 		goto sock_err;
--	}
- 
- 	err = sco_init();
- 	if (err < 0) {
+-void __exit hci_sock_cleanup(void)
++void hci_sock_cleanup(void)
+ {
+ 	if (bt_sock_unregister(BTPROTO_HCI) < 0)
+ 		BT_ERR("HCI socket unregistration failed");
