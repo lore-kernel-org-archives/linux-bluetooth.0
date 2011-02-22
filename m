@@ -1,114 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH v2 2/7] Add Characteristics Discovery option to interactive gatttool
-Date: Tue, 22 Feb 2011 16:11:59 -0300
-Message-Id: <1298401924-20094-2-git-send-email-sheldon.demario@openbossa.org>
-In-Reply-To: <1298401924-20094-1-git-send-email-sheldon.demario@openbossa.org>
-References: <1298401924-20094-1-git-send-email-sheldon.demario@openbossa.org>
-In-Reply-To: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
-References: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
+Cc: Ville Tervo <ville.tervo@nokia.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH v2] Bluetooth: Use ERR_PTR as return error from hci_connect
+Date: Tue, 22 Feb 2011 16:10:53 -0300
+Message-Id: <4d640a47.a21fec0a.065e.466f@mx.google.com>
+In-Reply-To: <y>
+References: <y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/interactive.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 61 insertions(+), 0 deletions(-)
+From: Ville Tervo <ville.tervo@nokia.com>
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index b491314..7cc03bc 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -22,6 +22,7 @@
-  */
- #include <string.h>
- #include <stdlib.h>
-+#include <errno.h>
- #include <stdio.h>
- #include <glib.h>
+Use ERR_PTR mechanism to return error from hci_connect.
+
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ net/bluetooth/hci_conn.c   |    4 ++--
+ net/bluetooth/l2cap_core.c |   10 ++++------
+ net/bluetooth/mgmt.c       |    4 ++--
+ net/bluetooth/sco.c        |    6 +++---
+ 4 files changed, 11 insertions(+), 13 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4504cb6..7a6f56b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -431,10 +431,10 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	if (type == LE_LINK) {
+ 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+ 		if (le)
+-			return NULL;
++			return ERR_PTR(-EBUSY);
+ 		le = hci_conn_add(hdev, LE_LINK, dst);
+ 		if (!le)
+-			return NULL;
++			return ERR_PTR(-ENOMEM);
+ 		if (le->state == BT_OPEN)
+ 			hci_le_connect(le);
  
-@@ -145,6 +146,29 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
- 	rl_forced_update_display();
- }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index efcef0d..e76e9e5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -841,7 +841,7 @@ int l2cap_do_connect(struct sock *sk)
+ 	struct hci_conn *hcon;
+ 	struct hci_dev *hdev;
+ 	__u8 auth_type;
+-	int err;
++	int err = 0;
  
-+static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
-+{
-+	GSList *l;
-+
-+	if (status) {
-+		printf("Discover all characteristics failed: %s\n",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	printf("\n");
-+	for (l = characteristics; l; l = l->next) {
-+		struct att_char *chars = l->data;
-+
-+		printf("handle: 0x%04x, char properties: 0x%02x, char value "
-+				"handle: 0x%04x, uuid: %s\n", chars->handle,
-+				chars->properties, chars->value_handle,
-+				chars->uuid);
-+	}
-+
-+	rl_forced_update_display();
-+}
-+
- static void cmd_exit(int argcp, char **argvp)
- {
- 	rl_callback_handler_remove();
-@@ -214,6 +238,41 @@ static void cmd_primary(int argcp, char **argvp)
- 	gatt_discover_primary(attrib, &uuid, primary_by_uuid_cb, NULL);
- }
+ 	BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+ 							l2cap_pi(sk)->psm);
+@@ -852,8 +852,6 @@ int l2cap_do_connect(struct sock *sk)
  
-+static void cmd_char(int argcp, char **argvp)
-+{
-+	int start = 0x0001;
-+	int end = 0xffff;
-+
-+	if (conn_state != STATE_CONNECTED) {
-+		printf("Command failed: disconnected\n");
-+		return;
-+	}
-+
-+	if (argcp > 1) {
-+		char *e;
-+
-+		start = strtoll(argvp[1], &e, 16);
-+		if (errno != 0 || *e != '\0') {
-+			printf("Invalid start handle: %s\n", argvp[1]);
-+			return;
-+		}
-+	}
-+
-+	if (argcp > 2) {
-+		char *e;
-+
-+		end = strtoll(argvp[2], &e, 16);
-+		if (errno != 0 || *e != '\0') {
-+			printf("Invalid end handle: %s\n", argvp[2]);
-+			return;
-+		}
-+	}
-+
-+	gatt_discover_char(attrib, start, end, char_cb, NULL);
-+
-+	return;
-+}
-+
- static struct {
- 	const char *cmd;
- 	void (*func)(int argcp, char **argvp);
-@@ -230,6 +289,8 @@ static struct {
- 		"Disconnect from a remote device" },
- 	{ "primary",		cmd_primary,	"[UUID]",
- 		"Primary Service Discovery" },
-+	{ "characteristics",	cmd_char,	"[start hnd] [end hnd]",
-+		"Characteristics Discovery" },
- 	{ NULL, NULL, NULL}
- };
+ 	hci_dev_lock_bh(hdev);
  
+-	err = -ENOMEM;
+-
+ 	auth_type = l2cap_get_auth_type(sk);
+ 
+ 	if (l2cap_pi(sk)->dcid == L2CAP_CID_LE_DATA)
+@@ -863,8 +861,10 @@ int l2cap_do_connect(struct sock *sk)
+ 		hcon = hci_connect(hdev, ACL_LINK, dst,
+ 					l2cap_pi(sk)->sec_level, auth_type);
+ 
+-	if (!hcon)
++	if (IS_ERR(hcon)) {
++		err = PTR_ERR(hcon);
+ 		goto done;
++	}
+ 
+ 	conn = l2cap_conn_add(hcon, 0);
+ 	if (!conn) {
+@@ -872,8 +872,6 @@ int l2cap_do_connect(struct sock *sk)
+ 		goto done;
+ 	}
+ 
+-	err = 0;
+-
+ 	/* Update source addr of the socket */
+ 	bacpy(src, conn->src);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 982becd..37cabb5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1149,8 +1149,8 @@ static int pair_device(struct sock *sk, unsigned char *data, u16 len)
+ 	}
+ 
+ 	conn = hci_connect(hdev, ACL_LINK, &cp->bdaddr, sec_level, auth_type);
+-	if (!conn) {
+-		err = -ENOMEM;
++	if (IS_ERR(conn)) {
++		err = PTR_ERR(conn);
+ 		goto unlock;
+ 	}
+ 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index c9348dd..26f2f04 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -190,16 +190,16 @@ static int sco_connect(struct sock *sk)
+ 
+ 	hci_dev_lock_bh(hdev);
+ 
+-	err = -ENOMEM;
+-
+ 	if (lmp_esco_capable(hdev) && !disable_esco)
+ 		type = ESCO_LINK;
+ 	else
+ 		type = SCO_LINK;
+ 
+ 	hcon = hci_connect(hdev, type, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
+-	if (!hcon)
++	if (IS_ERR(hcon)) {
++		err = PTR_ERR(hcon);
+ 		goto done;
++	}
+ 
+ 	conn = sco_conn_add(hcon, 0);
+ 	if (!conn) {
 -- 
 1.7.1
 
