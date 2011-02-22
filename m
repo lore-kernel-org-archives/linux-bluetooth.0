@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1298068173-16518-14-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298068173-16518-4-git-send-email-claudio.takahasi@openbossa.org>
 References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1298068173-16518-14-git-send-email-claudio.takahasi@openbossa.org>
-Date: Tue, 22 Feb 2011 14:27:50 -0300
-Message-ID: <AANLkTikX6ajkK8J9W8K5HqQFiTvt1YwJw3w03oRh-=dc@mail.gmail.com>
-Subject: Re: [RFC v2 13/14] Add att_put_u128
+	<1298068173-16518-4-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 22 Feb 2011 14:24:16 -0300
+Message-ID: <AANLkTik7JOK6Hiatt=MC-Vg1DRKDWYOTEHFsNv6ZuaHA@mail.gmail.com>
+Subject: Re: [RFC v2 03/14] Add att_get_u128
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,15 +17,22 @@ Hi Claudio,
 
 On Fri, Feb 18, 2011 at 7:29 PM, Claudio Takahasi
 <claudio.takahasi@openbossa.org> wrote:
-> ATT protocol uses little endian byte order, before to add a UUID128
-> value in the PDU it needs to converted from host order to little endian.
+> Function to convert 128-bits values from little endian to host
+> order. Different than SDP, ATT uses little endian format.
 > ---
->  attrib/att.c |    4 ++--
->  attrib/att.h |    7 +++++++
->  2 files changed, 9 insertions(+), 2 deletions(-)
+>  attrib/att.c      |   12 ++++++++----
+>  attrib/att.h      |   10 ++++++++++
+>  attrib/gatt.c     |   13 ++++++++-----
+>  attrib/gatttool.c |    6 ++++--
+>  4 files changed, 30 insertions(+), 11 deletions(-)
 
-Similarly, this part of the original code is still buggy and we need a
-ntoh128() call before att_put_u128().
+This patch could be refactored by adding a hton128() call before
+calling sdp_uuid128_create(). This way we fix the valid bug where we
+are not passing big-endian ordered bytes to sdp_uuid28_create(). What
+do you think?
+
+At least the att_get_u128() function is still valid and needs to be
+applied IMHO.
 
 Regards,
 -- 
