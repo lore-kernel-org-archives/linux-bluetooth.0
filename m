@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Feng Tang <feng.tang@intel.com>
-To: marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Feng Tang <feng.tang@intel.com>
-Subject: [PATCH] Bluetooth: l2cap: fix a NULL pointer oops in l2cap_conn_start
-Date: Tue, 22 Feb 2011 16:03:24 +0800
-Message-Id: <1298361804-11733-1-git-send-email-feng.tang@intel.com>
+MIME-Version: 1.0
+Date: Tue, 22 Feb 2011 15:39:11 +0800
+Message-ID: <AANLkTinC4JqX627rv7PUWrhOZwmerCEQJ_jeZ0w29LW9@mail.gmail.com>
+Subject: How to config bluetooth headset ?
+From: Bob Liu <lliubbo@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When I try to setup a PAND connection between the sever and client,
-the server side always get a NULL pointer oops in l2cap_conn_start()
-right after the client run "pand -r PANU -c sever_addr". Don't have
-the boot log as it's an immediate hang.
+Hi, folks
 
-Simply adding this "if (parent)" check will fix it, don't know whether
-it fix the real problem. Anyway, send it as a hint.
+Since  I can't open the wiki: http://wiki.bluez.org/wiki/HOWTO/AudioDevices.
+Is there any guide how to config bluetooth headset ?
 
-Signed-off-by: Feng Tang <feng.tang@intel.com>
----
- net/bluetooth/l2cap.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+I used to use
+root:/> hcid -n &
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 675614e..150366f 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -583,8 +583,9 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 					struct sock *parent = bt_sk(sk)->parent;
- 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
--					parent->sk_data_ready(parent, 0);
- 
-+					if (parent)
-+						parent->sk_data_ready(parent, 0);
- 				} else {
- 					sk->sk_state = BT_CONFIG;
- 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
+root:/> sdpd &
+
+root:/> headsetd -n &
+But it seems that things have changed a lot now, there is only bluetoothd ?
+
+Cureently I can scan the device:
+# hcitool scan
+Scanning ...
+        00:1A:45:4A:EA:39       Jabra BT125
+#
+
+How to make aplay can use that device?
+
+Thanks a lot.
+
 -- 
-1.7.0.4
+Regards,
+--Bob
