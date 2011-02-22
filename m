@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Feb 2011 14:20:55 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix not setting global mode when SetProperty is used
-Message-ID: <20110222172055.GA2737@jh-x301>
-References: <1298366773-5781-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298366773-5781-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1298068173-16518-2-git-send-email-claudio.takahasi@openbossa.org>
+References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1298068173-16518-2-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 22 Feb 2011 14:16:08 -0300
+Message-ID: <AANLkTi=3xxs5DGCt5uLrHHMhEBAgO0mQczRoOorfX7gM@mail.gmail.com>
+Subject: Re: [RFC v2 01/14] Move 64 and 128 bits byte order functions to bluetooth.h
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Claudio,
 
-On Tue, Feb 22, 2011, Luiz Augusto von Dentz wrote:
-> Global mode should be overwrite if user application change the adapter
-> mode by using SetProperty while there are sessions active, otherwise
-> when this sessions are released the mode restored will be the global
-> mode from before the sessions were created and not the mode set with
-> SetProperty.
+On Fri, Feb 18, 2011 at 7:29 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
 > ---
->  src/adapter.c |   14 +++++++++++---
->  1 files changed, 11 insertions(+), 3 deletions(-)
+>  attrib/example.c     |    1 +
+>  attrib/gatt.c        |    1 +
+>  attrib/interactive.c |    1 +
+>  health/hdp_manager.c |    1 +
+>  health/mcap_sync.c   |   17 -----------------
+>  lib/bluetooth.h      |   41 +++++++++++++++++++++++++++++++++++++++++
+>  lib/sdp.c            |   43 -------------------------------------------
+>  lib/sdp.h            |    4 ----
+>  src/sdp-xml.c        |    1 +
+>  test/hciemu.c        |   16 ----------------
+>  10 files changed, 46 insertions(+), 80 deletions(-)
 
-Pushed upstream. Thanks.
+Can we have this patch applied upstream? It seems a good refactoring
+because removes duplicated code.
 
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
