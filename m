@@ -1,43 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110222191419.GA5469@jh-x301>
-References: <1298367822-27766-1-git-send-email-luiz.dentz@gmail.com>
-	<20110222191419.GA5469@jh-x301>
-Date: Tue, 22 Feb 2011 22:23:54 +0200
-Message-ID: <AANLkTinRmg+uuQcfUnK4pH34MHjSbq2hqcnvqtT25WFc@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Add support for pcsuite lock file
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH v2 1/7] Improve help messages in interactive gatttool
+Date: Tue, 22 Feb 2011 16:11:58 -0300
+Message-Id: <1298401924-20094-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
+References: <1298328606-7993-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Includes the parameters info on help.
+---
+ attrib/interactive.c |   19 +++++++++++++------
+ 1 files changed, 13 insertions(+), 6 deletions(-)
 
-On Tue, Feb 22, 2011 at 9:14 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Tue, Feb 22, 2011, Luiz Augusto von Dentz wrote:
->> This should make others applications able to detect when pcsuite is
->> connected.
->> ---
->>  plugins/ftp.c |  160 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  1 files changed, 154 insertions(+), 6 deletions(-)
->
-> Doesn't compile (ssize_t correct format string is %zd):
->
-> plugins/ftp.c: In function 'ftp_put':
-> plugins/ftp.c:288: error: format '%d' expects type 'int', but argument 6 has type 'ssize_t'
-
-Will fix it and send a new version.
-
-> Also, all the added debug prints don't seem to relate to the commit
-> message in anyway. Probably better to split into a separate patch?
-
-Yep, will do it too.
-
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index edc465a..b491314 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -217,13 +217,19 @@ static void cmd_primary(int argcp, char **argvp)
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
++	const char *params;
+ 	const char *desc;
+ } commands[] = {
+-	{ "help",	cmd_help,	"Show this help"},
+-	{ "exit",	cmd_exit,	"Exit interactive mode"},
+-	{ "connect",	cmd_connect,	"Connect to a remote device"},
+-	{ "disconnect",	cmd_disconnect,	"Disconnect from a remote device"},
+-	{ "primary",	cmd_primary,	"Primary Service Discovery"},
++	{ "help",		cmd_help,	"",
++		"Show this help"},
++	{ "exit",		cmd_exit,	"",
++		"Exit interactive mode" },
++	{ "connect",		cmd_connect,	"[address]",
++		"Connect to a remote device" },
++	{ "disconnect",		cmd_disconnect,	"",
++		"Disconnect from a remote device" },
++	{ "primary",		cmd_primary,	"[UUID]",
++		"Primary Service Discovery" },
+ 	{ NULL, NULL, NULL}
+ };
+ 
+@@ -232,7 +238,8 @@ static void cmd_help(int argcp, char **argvp)
+ 	int i;
+ 
+ 	for (i = 0; commands[i].cmd; i++)
+-		printf("%-12s\t%s\n", commands[i].cmd, commands[i].desc);
++		printf("%-15s %-25s %s\n", commands[i].cmd,
++				commands[i].params, commands[i].desc);
+ }
+ 
+ static void parse_line(char *line_read)
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.1
+
