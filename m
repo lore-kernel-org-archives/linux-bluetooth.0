@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1298068173-16518-4-git-send-email-claudio.takahasi@openbossa.org>
-References: <1298068173-16518-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1298068173-16518-4-git-send-email-claudio.takahasi@openbossa.org>
-Date: Tue, 22 Feb 2011 14:24:16 -0300
-Message-ID: <AANLkTik7JOK6Hiatt=MC-Vg1DRKDWYOTEHFsNv6ZuaHA@mail.gmail.com>
-Subject: Re: [RFC v2 03/14] Add att_get_u128
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Date: Tue, 22 Feb 2011 14:20:55 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Fix not setting global mode when SetProperty is used
+Message-ID: <20110222172055.GA2737@jh-x301>
+References: <1298366773-5781-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298366773-5781-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Luiz,
 
-On Fri, Feb 18, 2011 at 7:29 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Function to convert 128-bits values from little endian to host
-> order. Different than SDP, ATT uses little endian format.
+On Tue, Feb 22, 2011, Luiz Augusto von Dentz wrote:
+> Global mode should be overwrite if user application change the adapter
+> mode by using SetProperty while there are sessions active, otherwise
+> when this sessions are released the mode restored will be the global
+> mode from before the sessions were created and not the mode set with
+> SetProperty.
 > ---
->  attrib/att.c      |   12 ++++++++----
->  attrib/att.h      |   10 ++++++++++
->  attrib/gatt.c     |   13 ++++++++-----
->  attrib/gatttool.c |    6 ++++--
->  4 files changed, 30 insertions(+), 11 deletions(-)
+>  src/adapter.c |   14 +++++++++++---
+>  1 files changed, 11 insertions(+), 3 deletions(-)
 
-This patch could be refactored by adding a hton128() call before
-calling sdp_uuid128_create(). This way we fix the valid bug where we
-are not passing big-endian ordered bytes to sdp_uuid28_create(). What
-do you think?
+Pushed upstream. Thanks.
 
-At least the att_get_u128() function is still valid and needs to be
-applied IMHO.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
