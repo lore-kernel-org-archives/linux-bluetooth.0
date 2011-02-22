@@ -1,28 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 22 Feb 2011 09:26:41 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Anand Gadiyar <gadiyar@ti.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: remove unnecessary call to hci_sock_cleanup
+Message-ID: <20110222122641.GC2249@joana>
+References: <1298358806-13257-1-git-send-email-gadiyar@ti.com>
 MIME-Version: 1.0
-Date: Tue, 22 Feb 2011 09:43:48 -0300
-Message-ID: <AANLkTin7W9jtfAmV4vo9E+YOrkUfrWpO0-B_jzkXZChm@mail.gmail.com>
-Subject: Help hcitool cmd (hci to connect)
-From: Thibaut L <thibaut.dvr@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298358806-13257-1-git-send-email-gadiyar@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear all,
+Hi Anand,
 
-Please, could anyone tell me how to connect to a bluetooth device
-through hcitool (BlueZ) hci command. Like this: "hcitool cmd 0x01
-0x0005 [parameters]". How can I input this cmd? Is the [parameters] a
-bt device MAC adress like XX:XX:XX:XX:XX:XX?
+* Anand Gadiyar <gadiyar@ti.com> [2011-02-22 12:43:26 +0530]:
 
-I've tryed to use "hcitool cc <MAC>", but it doesn't work for me cause
-it disconnects the device a second later.
+> hci_sock_cleanup is already called after the sock_err label.
+> It appears that we can drop this call.
+> 
+> Signed-off-by: Anand Gadiyar <gadiyar@ti.com>
+> Cc: Gustavo F. Padovan <padovan@profusion.mobi>
+> ---
+>  net/bluetooth/af_bluetooth.c |    4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-I just wanna measure RSSI.
+Also applied, thanks.
 
-Thanks in advance.
-
-Best
-
-Thibaut
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
