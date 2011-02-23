@@ -1,114 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] Add more debug logs for ftp driver
-Date: Wed, 23 Feb 2011 11:54:37 +0200
-Message-Id: <1298454881-7941-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1298454881-7941-1-git-send-email-luiz.dentz@gmail.com>
-References: <1298454881-7941-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/6] Add support for pcsuite lock file
+Date: Wed, 23 Feb 2011 11:54:36 +0200
+Message-Id: <1298454881-7941-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
+This should make others applications able to detect when pcsuite is
+connected.
 ---
- plugins/ftp.c |   20 ++++++++++++++++++++
- 1 files changed, 20 insertions(+), 0 deletions(-)
+ plugins/ftp.c |  140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 files changed, 134 insertions(+), 6 deletions(-)
 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 546b58c..633abf3 100644
+index a952f64..546b58c 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
-@@ -158,6 +158,8 @@ struct pcsuite_session {
+@@ -150,6 +150,12 @@ struct ftp_session {
+ 	char *folder;
+ };
  
++struct pcsuite_session {
++	struct ftp_session *ftp;
++	char *lock_file;
++	int fd;
++};
++
  static void set_folder(struct ftp_session *ftp, const char *new_folder)
  {
-+	DBG("%p folder %s", ftp, new_folder);
-+
  	g_free(ftp->folder);
- 
- 	ftp->folder = new_folder ? g_strdup(new_folder) : NULL;
-@@ -171,6 +173,8 @@ static int get_by_type(struct ftp_session *ftp, const char *type)
- 	char *path;
- 	int err;
- 
-+	DBG("%p name %s type %s", ftp, name, type);
-+
- 	if (type == NULL && name == NULL)
- 		return -EBADR;
- 
-@@ -190,6 +194,8 @@ static void *ftp_connect(struct obex_session *os, int *err)
- 	struct ftp_session *ftp;
- 	const char *root_folder;
- 
-+	DBG("");
-+
- 	root_folder = obex_get_root_folder(os);
- 
- 	manager_register_session(os);
-@@ -201,6 +207,8 @@ static void *ftp_connect(struct obex_session *os, int *err)
- 	if (err)
- 		*err = 0;
- 
-+	DBG("session %p created", ftp);
-+
- 	return ftp;
+@@ -390,6 +396,128 @@ static void ftp_disconnect(struct obex_session *os, void *user_data)
+ 	g_free(ftp);
  }
  
-@@ -211,6 +219,8 @@ static int ftp_get(struct obex_session *os, obex_object_t *obj,
- 	const char *type = obex_get_type(os);
- 	int ret;
- 
-+	DBG("%p", ftp);
++static void *pcsuite_connect(struct obex_session *os, int *err)
++{
++	struct pcsuite_session *pcsuite;
++	struct ftp_session *ftp;
++	int fd;
++	char *filename;
 +
- 	if (ftp->folder == NULL)
- 		return -ENOENT;
- 
-@@ -229,6 +239,8 @@ static int ftp_delete(struct ftp_session *ftp, const char *name)
- 	char *path;
- 	int ret = 0;
- 
-+	DBG("%p name %s", ftp, name);
++	DBG("");
 +
- 	if (!(ftp->folder && name))
- 		return -EINVAL;
- 
-@@ -249,6 +261,8 @@ static int ftp_chkput(struct obex_session *os, void *user_data)
- 	char *path;
- 	int ret;
- 
-+	DBG("%p name %s", ftp, name);
++	ftp = ftp_connect(os, err);
++	if (ftp == NULL)
++		return NULL;
 +
- 	if (name == NULL)
- 		return -EBADR;
- 
-@@ -271,6 +285,8 @@ static int ftp_put(struct obex_session *os, obex_object_t *obj,
- 	const char *name = obex_get_name(os);
- 	ssize_t size = obex_get_size(os);
- 
-+	DBG("%p name %s size %zd", ftp, name, size);
++	filename = g_build_filename(g_get_home_dir(), ".pcsuite", NULL);
 +
- 	if (ftp->folder == NULL)
- 		return -EPERM;
- 
-@@ -303,6 +319,8 @@ static int ftp_setpath(struct obex_session *os, obex_object_t *obj,
- 	root_folder = obex_get_root_folder(os);
- 	root = g_str_equal(root_folder, ftp->folder);
- 
-+	DBG("%p name %s", ftp, name);
++	fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
++	if (fd < 0 && errno != EEXIST) {
++		error("open(%s): %s(%d)", filename, strerror(errno), errno);
++		goto fail;
++	}
 +
- 	/* Check flag "Backup" */
- 	if ((nonhdr[0] & 0x01) == 0x01) {
- 		DBG("Set to parent path");
-@@ -390,6 +408,8 @@ static void ftp_disconnect(struct obex_session *os, void *user_data)
- {
- 	struct ftp_session *ftp = user_data;
- 
-+	DBG("%p", ftp);
++	/* Try to remove the file before retrying since it could be
++	   that some process left/crash without removing it */
++	if (fd < 0) {
++		if (remove(filename) < 0) {
++			error("remove(%s): %s(%d)", filename, strerror(errno),
++									errno);
++			goto fail;
++		}
 +
- 	manager_unregister_session(os);
++		fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
++		if (fd < 0) {
++			error("open(%s): %s(%d)", filename, strerror(errno),
++									errno);
++			goto fail;
++		}
++	}
++
++	DBG("%s created", filename);
++
++	pcsuite = g_new0(struct pcsuite_session, 1);
++	pcsuite->ftp = ftp;
++	pcsuite->lock_file = filename;
++	pcsuite->fd = fd;
++
++	DBG("session %p created", pcsuite);
++
++	if (err)
++		*err = 0;
++
++	return pcsuite;
++
++fail:
++	if (ftp)
++		ftp_disconnect(os, ftp);
++	if (err)
++		*err = -errno;
++
++	g_free(filename);
++
++	return NULL;
++}
++
++static int pcsuite_get(struct obex_session *os, obex_object_t *obj,
++					gboolean *stream, void *user_data)
++{
++	struct pcsuite_session *pcsuite = user_data;
++
++	DBG("%p", pcsuite);
++
++	return ftp_get(os, obj, stream, pcsuite->ftp);
++}
++
++static int pcsuite_chkput(struct obex_session *os, void *user_data)
++{
++	struct pcsuite_session *pcsuite = user_data;
++
++	DBG("%p", pcsuite);
++
++	return ftp_chkput(os, pcsuite->ftp);
++}
++
++static int pcsuite_put(struct obex_session *os, obex_object_t *obj,
++							void *user_data)
++{
++	struct pcsuite_session *pcsuite = user_data;
++
++	DBG("%p", pcsuite);
++
++	return ftp_put(os, obj, pcsuite->ftp);
++}
++
++static int pcsuite_setpath(struct obex_session *os, obex_object_t *obj,
++							void *user_data)
++{
++	struct pcsuite_session *pcsuite = user_data;
++
++	DBG("%p", pcsuite);
++
++	return ftp_setpath(os, obj, pcsuite->ftp);
++}
++
++static void pcsuite_disconnect(struct obex_session *os, void *user_data)
++{
++	struct pcsuite_session *pcsuite = user_data;
++
++	DBG("%p", pcsuite);
++
++	if (pcsuite->fd >= 0)
++		close(pcsuite->fd);
++
++	if (pcsuite->lock_file) {
++		remove(pcsuite->lock_file);
++		g_free(pcsuite->lock_file);
++	}
++
++	if (pcsuite->ftp)
++		ftp_disconnect(os, pcsuite->ftp);
++
++	g_free(pcsuite);
++}
++
+ static struct obex_service_driver pcsuite = {
+ 	.name = "Nokia OBEX PC Suite Services",
+ 	.service = OBEX_PCSUITE,
+@@ -399,12 +527,12 @@ static struct obex_service_driver pcsuite = {
+ 	.target_size = TARGET_SIZE,
+ 	.who = PCSUITE_WHO,
+ 	.who_size = PCSUITE_WHO_SIZE,
+-	.connect = ftp_connect,
+-	.get = ftp_get,
+-	.put = ftp_put,
+-	.chkput = ftp_chkput,
+-	.setpath = ftp_setpath,
+-	.disconnect = ftp_disconnect
++	.connect = pcsuite_connect,
++	.get = pcsuite_get,
++	.put = pcsuite_put,
++	.chkput = pcsuite_chkput,
++	.setpath = pcsuite_setpath,
++	.disconnect = pcsuite_disconnect
+ };
  
- 	g_free(ftp->folder);
+ static struct obex_service_driver ftp = {
 -- 
 1.7.1
 
