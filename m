@@ -1,64 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH v3 3/5] Check properties before setting client configs
-Date: Wed, 23 Feb 2011 12:14:19 -0300
-Message-Id: <1298474061-18410-3-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Wed, 23 Feb 2011 11:51:12 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix typo on DBG() string format
+Message-ID: <20110223145112.GC26355@jh-x301>
+References: <1298464037-10700-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298464037-10700-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Dieb Martins <andre.dieb@signove.com>
+Hi Lizardo,
 
-Only enable notification/indication if the descriptor allows it.
----
- src/attrib-server.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
+On Wed, Feb 23, 2011, Anderson Lizardo wrote:
+> ---
+>  attrib/client.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/attrib/client.c b/attrib/client.c
+> index 0f9ba3e..4635c75 100644
+> --- a/attrib/client.c
+> +++ b/attrib/client.c
+> @@ -299,7 +299,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len,
+>  						NULL, NULL, NULL);
+>  	case ATT_OP_HANDLE_NOTIFY:
+>  		if (characteristic_set_value(chr, &pdu[3], len - 3) < 0)
+> -			DBG("Can't change Characteristic %0x02x", handle);
+> +			DBG("Can't change Characteristic 0x%02x", handle);
+>  
+>  		g_slist_foreach(prim->watchers, update_watchers, chr);
+>  		break;
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 47ca5d9..21da17e 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -199,13 +199,14 @@ static uint8_t client_set_notifications(struct attribute *attr,
- 	struct gatt_channel *channel = user_data;
- 	struct attribute *last_chr_val = NULL;
- 	uint16_t cfg_val;
-+	uint8_t props;
- 	uuid_t uuid;
- 	GSList *l;
- 
- 	cfg_val = att_get_u16(attr->data);
- 
- 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
--	for (l = database; l != NULL; l = l->next) {
-+	for (l = database, props = 0; l != NULL; l = l->next) {
- 		struct attribute *a = l->data;
- 		static uint16_t handle = 0;
- 
-@@ -213,6 +214,7 @@ static uint8_t client_set_notifications(struct attribute *attr,
- 			break;
- 
- 		if (sdp_uuid_cmp(&a->uuid, &uuid) == 0) {
-+			props = att_get_u8(&a->data[0]);
- 			handle = att_get_u16(&a->data[1]);
- 			continue;
- 		}
-@@ -224,8 +226,11 @@ static uint8_t client_set_notifications(struct attribute *attr,
- 	if (last_chr_val == NULL)
- 		return 0;
- 
--	/* FIXME: Characteristic properties shall be checked for
--	 * Notification/Indication permissions. */
-+	if ((cfg_val & 0x0001) && !(props & ATT_CHAR_PROPER_NOTIFY))
-+		return ATT_ECODE_WRITE_NOT_PERM;
-+
-+	if ((cfg_val & 0x0002) && !(props & ATT_CHAR_PROPER_INDICATE))
-+		return ATT_ECODE_WRITE_NOT_PERM;
- 
- 	if (cfg_val & 0x0001)
- 		channel->notify = g_slist_append(channel->notify, last_chr_val);
--- 
-1.7.0.4
+Good catch. The patch has been pushed upstream.
 
+Johan
