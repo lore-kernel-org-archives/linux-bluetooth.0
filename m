@@ -1,142 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v3 1/5] Add read/write callbacks to attribute server
-Date: Wed, 23 Feb 2011 12:14:17 -0300
-Message-Id: <1298474061-18410-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH v3 4/5] Implement server-side ATT handle notification
+Date: Wed, 23 Feb 2011 12:14:20 -0300
+Message-Id: <1298474061-18410-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These callbacks will allow profiles to act before an attribute is read
-and after it is written, to e.g. update the attribute value to/from an
-external source.
+From: Andre Dieb Martins <andre.dieb@signove.com>
 
-Note that by the time the callback is called, the necessary security
-checks (attribute permissions, authentication and encryption) were
-already performed by the core attribute server.
+Adds an initial version of ATT handle notification. Notifications are sent to
+interested clients (based on the Client Characteristic Configuration) always
+when the attribute is updated.
 
-The callback can optionally return an ATT status code, which will be
-sent to the client using an Error Response PDU.
+This enables services to call db_attrib_update() and send notifications on their
+own terms.
 ---
- attrib/att.h        |    3 +++
- src/attrib-server.c |   29 ++++++++++++++++++++++++++---
- src/attrib-server.h |    4 ++--
- 3 files changed, 31 insertions(+), 5 deletions(-)
+ src/attrib-server.c |   26 ++++++++++++++++++++++++++
+ 1 files changed, 26 insertions(+), 0 deletions(-)
 
-diff --git a/attrib/att.h b/attrib/att.h
-index 7d9afeb..9b0b538 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -123,6 +123,9 @@ struct attribute {
- 	uuid_t uuid;
- 	int read_reqs;
- 	int write_reqs;
-+	uint8_t (*read_cb)(struct attribute *a, gpointer user_data);
-+	uint8_t (*write_cb)(struct attribute *a, gpointer user_data);
-+	gpointer cb_user_data;
- 	int len;
- 	uint8_t data[0];
- };
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 7ec0f56..28649f1 100644
+index 21da17e..62c10f4 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -229,6 +229,10 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+@@ -965,6 +965,30 @@ static void confirm_event(GIOChannel *io, void *user_data)
+ 	return;
+ }
  
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_GROUP_REQ,
- 								a->read_reqs);
++static void attrib_notify_clients(struct attribute *attr)
++{
++	guint handle = attr->handle;
++	GSList *l;
 +
-+		if (status == 0x00 && a->read_cb)
-+			status = a->read_cb(a, a->cb_user_data);
++	for (l = clients; l; l = l->next) {
++		struct gatt_channel *channel = l->data;
 +
- 		if (status) {
- 			g_slist_foreach(groups, (GFunc) g_free, NULL);
- 			g_slist_free(groups);
-@@ -317,6 +321,10 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
- 
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_TYPE_REQ,
- 								a->read_reqs);
++		/* Notification */
++		if (g_slist_find_custom(channel->notify,
++					GUINT_TO_POINTER(handle), handle_cmp)) {
++			uint8_t pdu[ATT_MAX_MTU];
++			uint16_t len;
 +
-+		if (status == 0x00 && a->read_cb)
-+			status = a->read_cb(a, a->cb_user_data);
++			len = enc_notification(attr, pdu, channel->mtu);
++			if (len == 0)
++				continue;
 +
- 		if (status) {
- 			g_slist_free(types);
- 			return enc_error_resp(ATT_OP_READ_BY_TYPE_REQ,
-@@ -564,6 +572,10 @@ static uint16_t read_value(struct gatt_channel *channel, uint16_t handle,
- 	a = l->data;
- 
- 	status = att_check_reqs(channel, ATT_OP_READ_REQ, a->read_reqs);
-+
-+	if (status == 0x00 && a->read_cb)
-+		status = a->read_cb(a, a->cb_user_data);
-+
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_REQ, handle, status, pdu,
- 									len);
-@@ -591,6 +603,10 @@ static uint16_t read_blob(struct gatt_channel *channel, uint16_t handle,
- 					ATT_ECODE_INVALID_OFFSET, pdu, len);
- 
- 	status = att_check_reqs(channel, ATT_OP_READ_BLOB_REQ, a->read_reqs);
-+
-+	if (status == 0x00 && a->read_cb)
-+		status = a->read_cb(a, a->cb_user_data);
-+
- 	if (status)
- 		return enc_error_resp(ATT_OP_READ_BLOB_REQ, handle, status,
- 								pdu, len);
-@@ -623,6 +639,13 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- 	memcpy(&uuid, &a->uuid, sizeof(uuid_t));
- 	attrib_db_update(handle, &uuid, value, vlen);
- 
-+	if (a->write_cb) {
-+		status = a->write_cb(a, a->cb_user_data);
-+		if (status)
-+			return enc_error_resp(ATT_OP_WRITE_REQ, handle, status,
-+								pdu, len);
++			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
++							NULL, NULL, NULL);
++		}
 +	}
++}
 +
- 	return enc_write_resp(pdu, len);
- }
- 
-@@ -1013,8 +1036,8 @@ void attrib_free_sdp(uint32_t sdp_handle)
- 	remove_record_from_server(sdp_handle);
- }
- 
--int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
--						const uint8_t *value, int len)
-+struct attribute *attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs,
-+				int write_reqs, const uint8_t *value, int len)
+ static gboolean register_core_services(void)
  {
- 	struct attribute *a;
+ 	uint8_t atval[256];
+@@ -1209,6 +1233,8 @@ int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
+ 	a->len = len;
+ 	memcpy(a->data, value, len);
  
-@@ -1030,7 +1053,7 @@ int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
- 
- 	database = g_slist_insert_sorted(database, a, attribute_cmp);
- 
--	return 0;
-+	return a;
++	attrib_notify_clients(a);
++
+ 	return 0;
  }
  
- int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
-diff --git a/src/attrib-server.h b/src/attrib-server.h
-index ecd695c..85f3bdb 100644
---- a/src/attrib-server.h
-+++ b/src/attrib-server.h
-@@ -25,8 +25,8 @@
- int attrib_server_init(void);
- void attrib_server_exit(void);
- 
--int attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs, int write_reqs,
--						const uint8_t *value, int len);
-+struct attribute *attrib_db_add(uint16_t handle, uuid_t *uuid, int read_reqs,
-+				int write_reqs, const uint8_t *value, int len);
- int attrib_db_update(uint16_t handle, uuid_t *uuid, const uint8_t *value,
- 								int len);
- int attrib_db_del(uint16_t handle);
 -- 
 1.7.0.4
 
