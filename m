@@ -1,32 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Feb 2011 11:44:13 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/6] Move pcsuite drivers to its own plugin
-Message-ID: <20110223144413.GA26355@jh-x301>
-References: <1298454881-7941-1-git-send-email-luiz.dentz@gmail.com>
- <1298454881-7941-5-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298454881-7941-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20110223032154.GD16014@jh-x301>
+References: <1298323843-31106-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20110223032154.GD16014@jh-x301>
+Date: Wed, 23 Feb 2011 11:28:11 -0300
+Message-ID: <AANLkTi=AAxHpnUkn73L1dK0fOmEpj8dDPxzPFyFvMni3@mail.gmail.com>
+Subject: Re: [PATCHv2 1/5] Add read/write callbacks to attribute server
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Wed, Feb 23, 2011, Luiz Augusto von Dentz wrote:
-> This make it easier to enable/disable this funcionality as a whole.
-> ---
->  Makefile.am            |    6 +-
->  configure.ac           |    9 +-
->  plugins/ftp.c          |  165 ++------------------------
->  plugins/nokia-backup.c |  309 ------------------------------------------------
->  4 files changed, 16 insertions(+), 473 deletions(-)
->  delete mode 100644 plugins/nokia-backup.c
+On Wed, Feb 23, 2011 at 12:21 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> On Tue, Feb 22, 2011, Anderson Lizardo wrote:
+>> +struct attribute;
+>> +
+>> +typedef uint8_t (*att_cb_t)(struct attribute *a, gpointer user_data);
+>> +
+>>  struct attribute {
+>>       uint16_t handle;
+>>       uuid_t uuid;
+>>       int read_reqs;
+>>       int write_reqs;
+>> +     att_cb_t read_cb;
+>> +     att_cb_t write_cb;
+>> +     gpointer cb_user_data;
+>>       int len;
+>>       uint8_t data[0];
+>>  };
+>
+> I'm not really a fan of the needed forward declaration here. I can't
+> find you using "att_cb_t" anywhere else in your patches, so how about
+> just having the full type of the callbacks inside the struct definition
+> and skip the typedef completely?
 
-It seems like you've forgotten to do git add plugins/pcsuite.c?
+Sure, I'll drop the typedef and send a v3.
 
-Anyway, I went ahead and applied patches 1-4.
-
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
