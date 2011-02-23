@@ -1,185 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Add support for pcsuite lock file
-Date: Wed, 23 Feb 2011 11:54:36 +0200
-Message-Id: <1298454881-7941-1-git-send-email-luiz.dentz@gmail.com>
+From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 23 Feb 2011 08:20:58 +0100
+Subject: [PATCH 4/4] HCI command to clear LE White List
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA334C047D87@EXDCVYMBSTM005.EQ1STM.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+>From 1142406b33f6f279ee6913e0327e922c93c32e16 Mon Sep 17 00:00:00 2001
+From: ArunKumarSingh <arunkr.singh@stericsson.com>
+Date: Wed, 23 Feb 2011 12:26:39 +0530
+Subject: [PATCH] HCI command to clear LE White list
 
-This should make others applications able to detect when pcsuite is
-connected.
+
+Signed-off-by: ArunKumarSingh <arunkr.singh@stericsson.com>
 ---
- plugins/ftp.c |  140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 files changed, 134 insertions(+), 6 deletions(-)
+ lib/hci.c       |   22 ++++++++++++++++++++++
+ lib/hci_lib.h   |    1 +
+ tools/hcitool.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index a952f64..546b58c 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -150,6 +150,12 @@ struct ftp_session {
- 	char *folder;
- };
- 
-+struct pcsuite_session {
-+	struct ftp_session *ftp;
-+	char *lock_file;
-+	int fd;
-+};
-+
- static void set_folder(struct ftp_session *ftp, const char *new_folder)
- {
- 	g_free(ftp->folder);
-@@ -390,6 +396,128 @@ static void ftp_disconnect(struct obex_session *os, void *user_data)
- 	g_free(ftp);
+diff --git a/lib/hci.c b/lib/hci.c
+index 2f36448..43f596f 100755
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -1377,6 +1377,28 @@ int hci_le_read_white_list_size(int dd, int *size)
+ 	return 0;
  }
  
-+static void *pcsuite_connect(struct obex_session *os, int *err)
++int hci_le_clear_white_list(int dd)
 +{
-+	struct pcsuite_session *pcsuite;
-+	struct ftp_session *ftp;
-+	int fd;
-+	char *filename;
++	struct hci_request rq;
++	uint8_t status;
 +
-+	DBG("");
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_CLEAR_WHITE_LIST;
++	rq.rparam = &status;
++	rq.rlen = 1;
 +
-+	ftp = ftp_connect(os, err);
-+	if (ftp == NULL)
-+		return NULL;
++	if (hci_send_req(dd, &rq, 1000) < 0)
++		return -1;
 +
-+	filename = g_build_filename(g_get_home_dir(), ".pcsuite", NULL);
-+
-+	fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
-+	if (fd < 0 && errno != EEXIST) {
-+		error("open(%s): %s(%d)", filename, strerror(errno), errno);
-+		goto fail;
++	if (status) {
++		errno = EIO;
++		return -1;
 +	}
 +
-+	/* Try to remove the file before retrying since it could be
-+	   that some process left/crash without removing it */
-+	if (fd < 0) {
-+		if (remove(filename) < 0) {
-+			error("remove(%s): %s(%d)", filename, strerror(errno),
-+									errno);
-+			goto fail;
-+		}
-+
-+		fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0644);
-+		if (fd < 0) {
-+			error("open(%s): %s(%d)", filename, strerror(errno),
-+									errno);
-+			goto fail;
-+		}
-+	}
-+
-+	DBG("%s created", filename);
-+
-+	pcsuite = g_new0(struct pcsuite_session, 1);
-+	pcsuite->ftp = ftp;
-+	pcsuite->lock_file = filename;
-+	pcsuite->fd = fd;
-+
-+	DBG("session %p created", pcsuite);
-+
-+	if (err)
-+		*err = 0;
-+
-+	return pcsuite;
-+
-+fail:
-+	if (ftp)
-+		ftp_disconnect(os, ftp);
-+	if (err)
-+		*err = -errno;
-+
-+	g_free(filename);
-+
-+	return NULL;
++	return 0;
 +}
 +
-+static int pcsuite_get(struct obex_session *os, obex_object_t *obj,
-+					gboolean *stream, void *user_data)
-+{
-+	struct pcsuite_session *pcsuite = user_data;
-+
-+	DBG("%p", pcsuite);
-+
-+	return ftp_get(os, obj, stream, pcsuite->ftp);
-+}
-+
-+static int pcsuite_chkput(struct obex_session *os, void *user_data)
-+{
-+	struct pcsuite_session *pcsuite = user_data;
-+
-+	DBG("%p", pcsuite);
-+
-+	return ftp_chkput(os, pcsuite->ftp);
-+}
-+
-+static int pcsuite_put(struct obex_session *os, obex_object_t *obj,
-+							void *user_data)
-+{
-+	struct pcsuite_session *pcsuite = user_data;
-+
-+	DBG("%p", pcsuite);
-+
-+	return ftp_put(os, obj, pcsuite->ftp);
-+}
-+
-+static int pcsuite_setpath(struct obex_session *os, obex_object_t *obj,
-+							void *user_data)
-+{
-+	struct pcsuite_session *pcsuite = user_data;
-+
-+	DBG("%p", pcsuite);
-+
-+	return ftp_setpath(os, obj, pcsuite->ftp);
-+}
-+
-+static void pcsuite_disconnect(struct obex_session *os, void *user_data)
-+{
-+	struct pcsuite_session *pcsuite = user_data;
-+
-+	DBG("%p", pcsuite);
-+
-+	if (pcsuite->fd >= 0)
-+		close(pcsuite->fd);
-+
-+	if (pcsuite->lock_file) {
-+		remove(pcsuite->lock_file);
-+		g_free(pcsuite->lock_file);
-+	}
-+
-+	if (pcsuite->ftp)
-+		ftp_disconnect(os, pcsuite->ftp);
-+
-+	g_free(pcsuite);
-+}
-+
- static struct obex_service_driver pcsuite = {
- 	.name = "Nokia OBEX PC Suite Services",
- 	.service = OBEX_PCSUITE,
-@@ -399,12 +527,12 @@ static struct obex_service_driver pcsuite = {
- 	.target_size = TARGET_SIZE,
- 	.who = PCSUITE_WHO,
- 	.who_size = PCSUITE_WHO_SIZE,
--	.connect = ftp_connect,
--	.get = ftp_get,
--	.put = ftp_put,
--	.chkput = ftp_chkput,
--	.setpath = ftp_setpath,
--	.disconnect = ftp_disconnect
-+	.connect = pcsuite_connect,
-+	.get = pcsuite_get,
-+	.put = pcsuite_put,
-+	.chkput = pcsuite_chkput,
-+	.setpath = pcsuite_setpath,
-+	.disconnect = pcsuite_disconnect
- };
+ int hci_read_local_name(int dd, int len, char *name, int to)
+ {
+ 	read_local_name_rp rp;
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index d5f07f6..c86b0de 100755
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -130,6 +130,7 @@ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ int hci_le_add_to_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type);
+ int hci_le_remove_from_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type);
+ int hci_le_read_white_list_size(int dd, int *size);
++int hci_le_clear_white_list(int dd);
  
- static struct obex_service_driver ftp = {
+ int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
+ int hci_get_route(bdaddr_t *bdaddr);
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index fa65c4e..8ec4c20 100755
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2620,6 +2620,47 @@ static void cmd_lerdwlsz(int dev_id, int argc, char **argv)
+ 	}
+ }
+ 
++static struct option leclrwl_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *leclrwl_help =
++	"Usage:\n"
++	"\tleclrwl\n";
++
++static void cmd_leclrwl(int dev_id, int argc, char **argv)
++{
++	int err, dd, opt;
++
++	for_each_opt(opt, leclrwl_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", leclrwl_help);
++			return;
++		}
++	}
++
++	helper_arg(0, 0, &argc, &argv, leclrwl_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	err = hci_le_clear_white_list(dd);
++	hci_close_dev(dd);
++
++	if (err < 0) {
++		perror("Cant clear white list");
++		exit(1);
++	}
++}
++
+ static struct option ledc_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+@@ -2699,6 +2740,7 @@ static struct {
+ 	{ "leaddwl", cmd_leaddwl, "Add this device to white list"	   },
+ 	{ "lermwl", cmd_lermwl, "Remove this device from white list"   },
+ 	{ "lerdwlsz",  cmd_lerdwlsz,  "Read white list size"		   },
++	{ "leclrwl",   cmd_leclrwl,   "Clear white list"			   },
+ 	{ "lecc",   cmd_lecc,   "Create a LE Connection",              },
+ 	{ "ledc",   cmd_ledc,   "Disconnect a LE Connection",          },
+ 	{ NULL, NULL, 0 }
 -- 
-1.7.1
+1.7.0.4
 
