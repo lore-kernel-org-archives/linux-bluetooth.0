@@ -1,45 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-To: Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [Bug 26182] btusb hangs after resetting USB device
-Date: Wed, 23 Feb 2011 20:36:11 +0100
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-References: <bug-26182-10028@https.bugzilla.kernel.org/> <201102231604.p1NG4UEf006117@demeter1.kernel.org>
-In-Reply-To: <201102231604.p1NG4UEf006117@demeter1.kernel.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201102232036.11270.rjw@sisk.pl>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Fix DBG() calls with bogus messages
+Date: Wed, 23 Feb 2011 15:11:03 -0300
+Message-Id: <1298484663-19369-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1298467707-11121-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1298467707-11121-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday, February 23, 2011, bugzilla-daemon@bugzilla.kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=26182
-> 
-> 
-> Alan Stern <stern@rowland.harvard.edu> changed:
-> 
->            What    |Removed                     |Added
-> ----------------------------------------------------------------------------
->                  CC|                            |mjg59-kernel@srcf.ucam.org
-> 
-> 
-> 
-> 
-> --- Comment #7 from Alan Stern <stern@rowland.harvard.edu>  2011-02-23 16:04:19 ---
-> Matthew, it looks like your 556ea928f78a390fe16ae584e6433dff304d3014 commit
-> (Bluetooth: Enable USB autosuspend by default on btusb) needs to be reverted,
-> at least until somebody adds reset-resume support to the btusb driver.
-> 
-> Florian or Rafael, can one of you let the Bluetooth maintainers know about this
-> bug?  There has been at least one other bug report for this same problem on
-> LKML:
-> 
->    http://marc.info/?l=linux-kernel&m=129845423017429&w=2
+Remove unnecessary trailing newlines (already added by DBG()) and
+rewrite debug messages to become more useful.
+---
+ audio/telephony-ofono.c |    2 +-
+ plugins/service.c       |    5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-Sure, CCed.
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index 0a7f0bd..ef4ede7 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -1116,7 +1116,7 @@ static void get_modems_reply(DBusPendingCall *call, void *user_data)
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, entry;
+ 
+-	DBG("list_modem_reply is called\n");
++	DBG("");
+ 	reply = dbus_pending_call_steal_reply(call);
+ 
+ 	dbus_error_init(&err);
+diff --git a/plugins/service.c b/plugins/service.c
+index f44aa92..d73cdea 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -172,13 +172,14 @@ static void element_end(GMarkupParseContext *context,
+ 			int ret = sdp_attr_add(ctx_data->record, ctx_data->attr_id,
+ 							ctx_data->stack_head->data);
+ 			if (ret == -1)
+-				DBG("Trouble adding attribute\n");
++				DBG("Could not add attribute 0x%04x",
++							ctx_data->attr_id);
+ 
+ 			ctx_data->stack_head->data = NULL;
+ 			sdp_xml_data_free(ctx_data->stack_head);
+ 			ctx_data->stack_head = NULL;
+ 		} else {
+-			DBG("No data for attribute 0x%04x\n", ctx_data->attr_id);
++			DBG("No data for attribute 0x%04x", ctx_data->attr_id);
+ 		}
+ 		return;
+ 	}
+-- 
+1.7.0.4
 
-Thanks,
-Rafael
