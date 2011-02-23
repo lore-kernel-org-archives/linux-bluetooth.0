@@ -1,59 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1298467707-11121-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1298467707-11121-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Wed, 23 Feb 2011 15:12:33 -0300
+Message-ID: <AANLkTi=aq9W_Ommx-LZovsMG4BT+L91-s4-UcFZJ_+ZO@mail.gmail.com>
+Subject: Re: [PATCH] Drop trailing newline from DBG() calls
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Don't register GATT related SDP records if attrib server is disabled
-Date: Wed, 23 Feb 2011 15:15:13 -0300
-Message-Id: <1298484913-21415-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT related SDP records should not be added if "AttributeServer" option
-is false in the configuration file. Problem happens only when attribute
-plugin is enabled.
----
- attrib/manager.c |   14 ++++++++------
- 1 files changed, 8 insertions(+), 6 deletions(-)
+Hi Johan,
 
-diff --git a/attrib/manager.c b/attrib/manager.c
-index f991f8e..a5a7de4 100644
---- a/attrib/manager.c
-+++ b/attrib/manager.c
-@@ -32,6 +32,7 @@
- 
- #include "../src/adapter.h"
- #include "../src/device.h"
-+#include "hcid.h"
- 
- #include "manager.h"
- #include "client.h"
-@@ -84,19 +85,20 @@ int attrib_manager_init(DBusConnection *conn)
- 
- 	btd_register_device_driver(&client_driver);
- 
--	/*
--	 * FIXME: Add config file option to allow
--	 * enable/disable the GATT server and client.
--	 */
- 
--	return server_example_init();
-+	if (main_opts.attrib_server)
-+		return server_example_init();
-+
-+	return 0;
- }
- 
- void attrib_manager_exit(void)
- {
- 	btd_unregister_device_driver(&client_driver);
- 
--	server_example_exit();
-+	if (main_opts.attrib_server)
-+		server_example_exit();
-+
- 	attrib_client_exit();
- 
- 	dbus_connection_unref(connection);
+On Wed, Feb 23, 2011 at 10:28 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> ---
+>  audio/telephony-ofono.c |    2 +-
+>  plugins/service.c       |    4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+
+Please ignore this patch, it was superseded by the one titled "Fix
+DBG() calls with bogus messages".
+
+Regards,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
