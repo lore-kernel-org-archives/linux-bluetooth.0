@@ -1,121 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D657852.2090100@sergio.spb.ru>
-Date: Thu, 24 Feb 2011 00:12:50 +0300
-From: sergio <mailbox@sergio.spb.ru>
-MIME-Version: 1.0
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: can't pair the phone
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Add sec-level option to interactive gattool
+Date: Wed, 23 Feb 2011 18:30:10 -0300
+Message-Id: <1298496610-11705-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+---
+ attrib/interactive.c |   46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 46 insertions(+), 0 deletions(-)
 
-I can't pair my Ericsson T39 with my linux box.
-I can pair any another phone (for example Nokia 6310) with linux.
-I can pair Ericsson with any other device (for example with adroid phone, or
-with windows). So it's bluez problem.
-
-% bluez-test-discovery
-[ 00:01:EC:0C:D2:00 ]
-     Name = totoro
-     Paired = 0
-     LegacyPairing = 1
-     Alias = totoro
-     Address = 00:01:EC:0C:D2:00
-     RSSI = 0
-     Class = 0x520204
-     Icon = phone
-[ 00:01:EC:0C:D2:00 ]
-     Name = totoro
-     Paired = 0
-     LegacyPairing = 1
-     Alias = totoro
-     Address = 00:01:EC:0C:D2:00
-     RSSI = 0
-     Class = 0x520204
-     Icon = phone
-
-I don't know why it shows it twice.
-
-bluetoothd -n -d shows:
-bluetoothd[8071]: plugins/hciops.c:hciops_start_inquiry() hci0 length 8 
-periodic 1
-bluetoothd[8071]: Discovery session 0xf77741c8 with :1.64 activated
-bluetoothd[8071]: src/adapter.c:session_ref() 0xf77741c8: ref=1
-bluetoothd[8071]: plugins/hciops.c:hciops_resolve_name() hci0 dba 
-00:01:EC:0C:D2:00
-bluetoothd[8071]: plugins/hciops.c:remote_name_information() hci0 status 0
-bluetoothd[8071]: src/adapter.c:session_remove() Discovery session 
-0xf77741c8 with :1.64 deactivated
-bluetoothd[8071]: src/adapter.c:session_remove() Stopping discovery
-bluetoothd[8071]: plugins/hciops.c:hciops_stop_inquiry() hci0
-
-% bluez-simple-agent hci0 00:01:EC:0C:D2:00
-RequestPinCode (/org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00)
-Enter PIN Code: 1234
-Creating device failed: org.bluez.Error.AuthenticationRejected: 
-Authentication Rejected
-
-Phone doesn't ask to enter pin.
-
-bluetoothd -n -d shows:
-before pin enter:
-bluetoothd[8071]: src/adapter.c:adapter_create_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/device.c:device_create() Creating device 
-/org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00
-bluetoothd[8071]: src/device.c:btd_device_ref() 0xf7786b88: ref=1
-bluetoothd[8071]: src/device.c:bonding_request_new() Requesting bonding 
-for 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/device.c:bonding_request_new() Temporary agent 
-registered for 00:01:EC:0C:D2:00 at :1.65:/test/agent
-bluetoothd[8071]: src/adapter.c:adapter_get_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: plugins/hciops.c:remote_features_information() hci0 
-status 0
-bluetoothd[8071]: plugins/hciops.c:link_key_request() hci0 dba 
-00:01:EC:0C:D2:00
-bluetoothd[8071]: plugins/hciops.c:link_key_request() kernel auth 
-requirements = 0x03
-bluetoothd[8071]: plugins/hciops.c:link_key_request() Matching key not found
-bluetoothd[8071]: plugins/hciops.c:pin_code_request() hci0 PIN request 
-for 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/adapter.c:adapter_get_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/device.c:device_request_authentication() 
-Requesting agent authentication for 00:01:EC:0C:D2:00
-
-after pin enter:
-bluetoothd[8071]: plugins/hciops.c:hciops_pincode_reply() hci0 dba 
-00:01:EC:0C:D2:00
-bluetoothd[8071]: plugins/hciops.c:auth_complete() hci0 status 24
-bluetoothd[8071]: src/event.c:btd_event_bonding_process_complete() status=18
-bluetoothd[8071]: src/device.c:device_cancel_authentication() Canceling 
-authentication request for 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/device.c:device_cancel_bonding() Canceling bonding 
-request for 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/agent.c:agent_release() Releasing agent :1.65, 
-/test/agent
-bluetoothd[8071]: src/adapter.c:adapter_get_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/adapter.c:adapter_remove_connection() Removing 
-temporary device /org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00
-bluetoothd[8071]: src/device.c:device_remove() Removing device 
-/org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00
-bluetoothd[8071]: src/device.c:btd_device_unref() 0xf7786b88: ref=0
-bluetoothd[8071]: src/device.c:device_free() 0xf7786b88
-
-
-When I try to iniate pairing from phone I get, after enter pin on phone:
-
-bluetoothd[8071]: src/adapter.c:adapter_get_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/adapter.c:adapter_create_device() 00:01:EC:0C:D2:00
-bluetoothd[8071]: src/device.c:device_create() Creating device 
-/org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00
-bluetoothd[8071]: src/device.c:btd_device_ref() 0xf7786b88: ref=1
-bluetoothd[8071]: src/device.c:device_remove() Removing device 
-/org/bluez/8071/hci0/dev_00_01_EC_0C_D2_00
-bluetoothd[8071]: src/device.c:btd_device_unref() 0xf7786b88: ref=0
-bluetoothd[8071]: src/device.c:device_free() 0xf7786b88
-
-bluez-simple-agent shows nothing.
-
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 05d94af..ec77f27 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -537,6 +537,50 @@ static void cmd_char_write_req(int argcp, char **argvp)
+ 	g_free(value);
+ }
+ 
++static void cmd_sec_level(int argcp, char **argvp)
++{
++	GError *gerr = NULL;
++	BtIOSecLevel sec_level;
++
++	if (argcp < 2) {
++		printf("sec-level: %s\n", opt_sec_level);
++		return;
++	}
++
++	if (strcasecmp(argvp[1], "medium") == 0)
++		sec_level = BT_IO_SEC_MEDIUM;
++	else if (strcasecmp(argvp[1], "high") == 0)
++		sec_level = BT_IO_SEC_HIGH;
++	else if (strcasecmp(argvp[1], "low") == 0)
++		sec_level = BT_IO_SEC_LOW;
++	else {
++		printf("Allowed values: low | medium | high\n");
++		return;
++	}
++
++	g_free(opt_sec_level);
++	opt_sec_level = strdup(argvp[1]);
++
++	if (conn_state == STATE_CONNECTED) {
++		if (opt_psm) {
++			printf("It must be reconnected to this "
++				"change take effect\n");
++			return;
++		}
++
++		bt_io_set(iochannel, BT_IO_L2CAP, &gerr,
++				BT_IO_OPT_SEC_LEVEL, sec_level,
++				BT_IO_OPT_INVALID);
++
++		if (gerr) {
++			printf("Error: %s\n", gerr->message);
++			g_error_free(gerr);
++		}
++	}
++
++	return;
++}
++
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
+@@ -563,6 +607,8 @@ static struct {
+ 		"Characteristics Value/Descriptor Read by UUID" },
+ 	{ "char-write-req",	cmd_char_write_req,	"<handle> <new value>",
+ 		"Characteristic Value Write (Write Request)" },
++	{ "sec-level",		cmd_sec_level,	"[low | medium | high]",
++		"Set security level. Default: low" },
+ 	{ NULL, NULL, NULL}
+ };
+ 
 -- 
-sergio.
+1.7.1
+
