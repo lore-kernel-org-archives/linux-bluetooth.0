@@ -1,97 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-Subject: [PATCH v3 5/5] Implement ATT handle indication
-Date: Wed, 23 Feb 2011 12:14:21 -0300
-Message-Id: <1298474061-18410-5-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH v3 3/5] Check properties before setting client configs
+Date: Wed, 23 Feb 2011 12:14:19 -0300
+Message-Id: <1298474061-18410-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1298408491-11154-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Elvis Pfützenreuter <epx@signove.com>
+From: Andre Dieb Martins <andre.dieb@signove.com>
 
+Only enable notification/indication if the descriptor allows it.
 ---
- src/attrib-server.c |   40 ++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 40 insertions(+), 0 deletions(-)
+ src/attrib-server.c |   11 ++++++++---
+ 1 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 62c10f4..a0c30b5 100644
+index 47ca5d9..21da17e 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -61,6 +61,8 @@ struct gatt_channel {
- 	guint mtu;
- 	guint id;
- 	gboolean encrypted;
-+	guint outstanding_indications;
-+	time_t oldest_indication;
- };
- 
- struct group_elem {
-@@ -889,6 +891,10 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 		length = find_by_type(start, end, &uuid, value, vlen,
- 							opdu, channel->mtu);
- 		break;
-+	case ATT_OP_HANDLE_CNF:
-+		if (channel->outstanding_indications)
-+			channel->outstanding_indications -= 1;
-+		return;
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_PREP_WRITE_REQ:
- 	case ATT_OP_EXEC_WRITE_REQ:
-@@ -968,8 +974,11 @@ static void confirm_event(GIOChannel *io, void *user_data)
- static void attrib_notify_clients(struct attribute *attr)
- {
- 	guint handle = attr->handle;
-+	time_t now;
+@@ -199,13 +199,14 @@ static uint8_t client_set_notifications(struct attribute *attr,
+ 	struct gatt_channel *channel = user_data;
+ 	struct attribute *last_chr_val = NULL;
+ 	uint16_t cfg_val;
++	uint8_t props;
+ 	uuid_t uuid;
  	GSList *l;
  
-+	time(&now);
-+
- 	for (l = clients; l; l = l->next) {
- 		struct gatt_channel *channel = l->data;
+ 	cfg_val = att_get_u16(attr->data);
  
-@@ -986,6 +995,37 @@ static void attrib_notify_clients(struct attribute *attr)
- 			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
- 							NULL, NULL, NULL);
+ 	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
+-	for (l = database; l != NULL; l = l->next) {
++	for (l = database, props = 0; l != NULL; l = l->next) {
+ 		struct attribute *a = l->data;
+ 		static uint16_t handle = 0;
+ 
+@@ -213,6 +214,7 @@ static uint8_t client_set_notifications(struct attribute *attr,
+ 			break;
+ 
+ 		if (sdp_uuid_cmp(&a->uuid, &uuid) == 0) {
++			props = att_get_u8(&a->data[0]);
+ 			handle = att_get_u16(&a->data[1]);
+ 			continue;
  		}
-+
-+		/* The outstanding_indications variable counts how many
-+		 * unconfirmed indications have been sent. The oldest_indication
-+		 * variable gives a small time frame to accomodate
-+		 * almost-concomitant indications, sending both without forcing
-+		 * a serialization.
-+		 *
-+		 * Indications are withheld once oldest_indication is older than
-+		 * at least 1 second and there are pending confirmations. */
-+
-+		if (channel->outstanding_indications &&
-+				(now - channel->oldest_indication) > 1)
-+			continue;
-+
-+		/* Indication */
-+		if (g_slist_find_custom(channel->indicate,
-+				GUINT_TO_POINTER(handle), handle_cmp) != NULL) {
-+			uint8_t pdu[ATT_MAX_MTU];
-+			uint16_t len;
-+
-+			len = enc_indication(attr, pdu, channel->mtu);
-+			if (len == 0)
-+				continue;
-+
-+			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
-+							NULL, NULL, NULL);
-+
-+			channel->outstanding_indications += 1;
-+			if (channel->outstanding_indications == 1)
-+				channel->oldest_indication = now;
-+		}
- 	}
- }
+@@ -224,8 +226,11 @@ static uint8_t client_set_notifications(struct attribute *attr,
+ 	if (last_chr_val == NULL)
+ 		return 0;
  
+-	/* FIXME: Characteristic properties shall be checked for
+-	 * Notification/Indication permissions. */
++	if ((cfg_val & 0x0001) && !(props & ATT_CHAR_PROPER_NOTIFY))
++		return ATT_ECODE_WRITE_NOT_PERM;
++
++	if ((cfg_val & 0x0002) && !(props & ATT_CHAR_PROPER_INDICATE))
++		return ATT_ECODE_WRITE_NOT_PERM;
+ 
+ 	if (cfg_val & 0x0001)
+ 		channel->notify = g_slist_append(channel->notify, last_chr_val);
 -- 
 1.7.0.4
 
