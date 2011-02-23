@@ -1,50 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: Re: [PATCH 2/3] Bluetooth: Move index to common header in management interface
-Date: Wed, 23 Feb 2011 14:37:10 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com"
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-References: <1298456785-1572-1-git-send-email-szymon.janc@tieto.com> <1298456785-1572-2-git-send-email-szymon.janc@tieto.com> <AANLkTin=5B6E26nzSkGad0W7FfTc+3S0_7F7ErsBLbbp@mail.gmail.com>
-In-Reply-To: <AANLkTin=5B6E26nzSkGad0W7FfTc+3S0_7F7ErsBLbbp@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201102231437.10401.szymon.janc@tieto.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] Drop trailing newline from DBG() calls
+Date: Wed, 23 Feb 2011 10:28:27 -0300
+Message-Id: <1298467707-11121-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > -       err = cmd_complete(sk, MGMT_OP_ADD_UUID, &dev_id, sizeof(dev_id));
-> > +       err = cmd_complete(sk, index, MGMT_OP_ADD_UUID, &index, sizeof(index));
-> 
-> Is index still required to be passed as return parameter, now that it
-> is part of the header? This is the case for various other commands.
+---
+ audio/telephony-ofono.c |    2 +-
+ plugins/service.c       |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-I've missed that, should be cmd_complete(sk, index, MGMT_OP_ADD_UUID, NULL, 0);
-Will send fixed version. 
-
-> > -       err = cmd_complete(sk, MGMT_OP_REMOVE_UUID, &dev_id, sizeof(dev_id));
-> > +       err = cmd_complete(sk, index, MGMT_OP_REMOVE_UUID, NULL, 0);
-> 
-> Here controller index is not being passed as return parameter anymore,
-> so it looks inconsistent to me.
-
-This one is correct.
-
-> In general, I think all commands which used to have controller index
-> as parameters (both cp and rp), would need to be modified because
-> index is already part of the header.
-
-Actually all commands were modified, just missed to null parameters.
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index 0a7f0bd..b9fb0f1 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -1116,7 +1116,7 @@ static void get_modems_reply(DBusPendingCall *call, void *user_data)
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, entry;
  
-> Also be sure to update doc/mgmt-api.txt from BlueZ.
+-	DBG("list_modem_reply is called\n");
++	DBG("list_modem_reply is called");
+ 	reply = dbus_pending_call_steal_reply(call);
+ 
+ 	dbus_error_init(&err);
+diff --git a/plugins/service.c b/plugins/service.c
+index f44aa92..4e4db81 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -172,13 +172,13 @@ static void element_end(GMarkupParseContext *context,
+ 			int ret = sdp_attr_add(ctx_data->record, ctx_data->attr_id,
+ 							ctx_data->stack_head->data);
+ 			if (ret == -1)
+-				DBG("Trouble adding attribute\n");
++				DBG("Trouble adding attribute");
+ 
+ 			ctx_data->stack_head->data = NULL;
+ 			sdp_xml_data_free(ctx_data->stack_head);
+ 			ctx_data->stack_head = NULL;
+ 		} else {
+-			DBG("No data for attribute 0x%04x\n", ctx_data->attr_id);
++			DBG("No data for attribute 0x%04x", ctx_data->attr_id);
+ 		}
+ 		return;
+ 	}
+-- 
+1.7.0.4
 
-Sure.
-
-> Regards,
-> 
-
-BR
-Szymon
