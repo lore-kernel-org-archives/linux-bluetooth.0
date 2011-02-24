@@ -1,44 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <C0C1E181-6699-4545-9AEC-EB813F387EBD@signove.com>
-References: <1298468980-2215-1-git-send-email-epx@signove.com>
-	<AANLkTik9wa_Pzezs3_udVD9MzwjxOaAAdEugjrD_U-KG@mail.gmail.com>
-	<C0C1E181-6699-4545-9AEC-EB813F387EBD@signove.com>
-Date: Thu, 24 Feb 2011 17:46:16 -0300
-Message-ID: <AANLkTi=zuZk0cYTqp-REn2oFybfHP4+VBc4rOEaNBPfD@mail.gmail.com>
-Subject: Re: [PATCH 1/2 v3] Add generic descriptor support to Attribute API document
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 2/6] Add Characteristics Descriptor Discovery option in interactive gatttool
+Date: Thu, 24 Feb 2011 17:38:26 -0300
+Message-Id: <1298579910-15198-3-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
+References: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Elvis,
+---
+ attrib/interactive.c |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 72 insertions(+), 0 deletions(-)
 
-On Thu, Feb 24, 2011 at 4:34 PM, Elvis Pfützenreuter <epx@signove.com> wrote:
->> With all those restrictions for writing, do you think it makes sense
->> to allow writing to the "Descriptors" property? Can you mention
->> situations where you might want applications to modify descriptors?
->
-> Apart from CCC (which we plan to deal with in another series), no :(
->
-> But GATT has this feature, so a general API should IMHO have it, since some
-> future GATT-based profile may well use it.
->
-> Actually, there is just one restriction for writing: one descriptor at a time,
-> and I propose this just because of difficulties in error reporting (if e.g.
-> 2 out of 5 descriptors could not be updated due to lack of permissions, yet
-> just 1 error can be reported back).
-
-As we discussed on IRC, let's wait for stabilization and clarification
-or our D-Bus API for GATT services and characteristics, then we can
-introduce a descriptor access API upstream.
-
-Anyway, your patch is useful for whoever wants direct access to descriptors :)
-
-Regards,
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 7b18e90..89e244a 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -169,6 +169,47 @@ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ 	rl_forced_update_display();
+ }
+ 
++static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
++							gpointer user_data)
++{
++	struct att_data_list *list;
++	guint8 format;
++	int i;
++
++	if (status != 0) {
++		printf("Discover all characteristic descriptors failed: "
++						"%s\n", att_ecode2str(status));
++		return;
++	}
++
++	list = dec_find_info_resp(pdu, plen, &format);
++	if (list == NULL)
++		return;
++
++	printf("\n");
++	for (i = 0; i < list->num; i++) {
++		char uuidstr[MAX_LEN_UUID_STR];
++		uint16_t handle;
++		uint8_t *value;
++		uuid_t uuid;
++
++		value = list->data[i];
++		handle = att_get_u16(value);
++
++		if (format == 0x01)
++			sdp_uuid16_create(&uuid, att_get_u16(&value[2]));
++		else
++			sdp_uuid128_create(&uuid, &value[2]);
++
++		sdp_uuid2strn(&uuid, uuidstr, MAX_LEN_UUID_STR);
++		printf("handle: 0x%04x, uuid: %s\n", handle, uuidstr);
++	}
++
++	att_data_list_free(list);
++
++	rl_forced_update_display();
++}
++
+ static void cmd_exit(int argcp, char **argvp)
+ {
+ 	rl_callback_handler_remove();
+@@ -280,6 +321,35 @@ static void cmd_char(int argcp, char **argvp)
+ 	gatt_discover_char(attrib, start, end, char_cb, NULL);
+ }
+ 
++static void cmd_char_desc(int argcp, char **argvp)
++{
++	int start = 0x0001;
++	int end = 0xffff;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
++		return;
++	}
++
++	if (argcp > 1) {
++		start = strtohandle(argvp[1]);
++		if (start < 0) {
++			printf("Invalid start handle: %s\n", argvp[1]);
++			return;
++		}
++	}
++
++	if (argcp > 2) {
++		end = strtohandle(argvp[2]);
++		if (end < 0) {
++			printf("Invalid end handle: %s\n", argvp[2]);
++			return;
++		}
++	}
++
++	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
++}
++
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
+@@ -298,6 +368,8 @@ static struct {
+ 		"Primary Service Discovery" },
+ 	{ "characteristics",	cmd_char,	"[start hnd] [end hnd]",
+ 		"Characteristics Discovery" },
++	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
++		"Characteristics Descriptor Discovery" },
+ 	{ NULL, NULL, NULL}
+ };
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.1
+
