@@ -1,41 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Feb 2011 17:40:07 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hcitool: add discovery procedure to lescan command
-Message-ID: <20110224204007.GA30774@jh-x301>
-References: <1298495788-22273-1-git-send-email-andre.guedes@openbossa.org>
- <20110224025437.GA6189@jh-x301>
- <AANLkTi=ZGNaLi7VUBzEWoDffcJaP9HPmxf_AmAcPw_g-@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=ZGNaLi7VUBzEWoDffcJaP9HPmxf_AmAcPw_g-@mail.gmail.com>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 1/6] Create a helper function to deal with handles on interactive gatttool
+Date: Thu, 24 Feb 2011 17:38:25 -0300
+Message-Id: <1298579910-15198-2-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
+References: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ attrib/interactive.c |   27 +++++++++++++++++----------
+ 1 files changed, 17 insertions(+), 10 deletions(-)
 
-On Thu, Feb 24, 2011, Anderson Lizardo wrote:
-> On Wed, Feb 23, 2011 at 11:54 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Hi André,
-> >
-> > On Wed, Feb 23, 2011, Andre Guedes wrote:
-> >> +     "\tlescan [--discovery=g|l] enable general or limited discovery"
-> >
-> > To make this consistent with the other options please default to general
-> > and have a --limited switch to enable limited discovery.
-> 
-> Note that there are actually three modes:
-> 
-> 1) the default one, when no parameters are given: do not filter
-> anything, useful for debugging (this is what is currently done)
-> 2) limited discovery
-> 3) general discovery
-> 
-> limited/general are done according to the procedure description on the spec.
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 7cc03bc..7b18e90 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -238,6 +238,19 @@ static void cmd_primary(int argcp, char **argvp)
+ 	gatt_discover_primary(attrib, &uuid, primary_by_uuid_cb, NULL);
+ }
+ 
++static int strtohandle(const char *src)
++{
++	char *e;
++	int dst;
++
++	errno = 0;
++	dst = strtoll(src, &e, 16);
++	if (errno != 0 || *e != '\0')
++		return -EINVAL;
++
++	return dst;
++}
++
+ static void cmd_char(int argcp, char **argvp)
+ {
+ 	int start = 0x0001;
+@@ -249,28 +262,22 @@ static void cmd_char(int argcp, char **argvp)
+ 	}
+ 
+ 	if (argcp > 1) {
+-		char *e;
+-
+-		start = strtoll(argvp[1], &e, 16);
+-		if (errno != 0 || *e != '\0') {
++		start = strtohandle(argvp[1]);
++		if (start < 0) {
+ 			printf("Invalid start handle: %s\n", argvp[1]);
+ 			return;
+ 		}
+ 	}
+ 
+ 	if (argcp > 2) {
+-		char *e;
+-
+-		end = strtoll(argvp[2], &e, 16);
+-		if (errno != 0 || *e != '\0') {
++		end = strtohandle(argvp[2]);
++		if (end < 0) {
+ 			printf("Invalid end handle: %s\n", argvp[2]);
+ 			return;
+ 		}
+ 	}
+ 
+ 	gatt_discover_char(attrib, start, end, char_cb, NULL);
+-
+-	return;
+ }
+ 
+ static struct {
+-- 
+1.7.1
 
-Ok, then the patch makes sense. It has now been pushed upstream.
-
-Johan
