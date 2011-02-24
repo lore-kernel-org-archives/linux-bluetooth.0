@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Feb 2011 18:37:08 -0300
+Date: Thu, 24 Feb 2011 18:35:05 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Use attribute data list memory allocation
- function on attrib server
-Message-ID: <20110224213708.GB1055@jh-x301>
-References: <=1298500393-4894-2-git-send-email-claudio.takahasi@openbossa.org>
- <1298582368-28819-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH 6/6] Add sec-level option to interactive gattool
+Message-ID: <20110224213505.GA1055@jh-x301>
+References: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
+ <1298579910-15198-7-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298582368-28819-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298579910-15198-7-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Sheldon,
 
-On Thu, Feb 24, 2011, Claudio Takahasi wrote:
+On Thu, Feb 24, 2011, Sheldon Demario wrote:
 > ---
->  src/attrib-server.c |   18 +++---------------
->  1 files changed, 3 insertions(+), 15 deletions(-)
+>  attrib/interactive.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 44 insertions(+), 0 deletions(-)
 
-Both patches have been pushed upstream. Thanks.
+All six patches have been pushed upstream. Thanks.
 
 Johan
