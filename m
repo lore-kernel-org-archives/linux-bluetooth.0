@@ -1,109 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 4/6] Move attr_data_from_string() to utils.c
-Date: Thu, 24 Feb 2011 17:38:28 -0300
-Message-Id: <1298579910-15198-5-git-send-email-sheldon.demario@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 6/6] Add sec-level option to interactive gattool
+Date: Thu, 24 Feb 2011 17:38:30 -0300
+Message-Id: <1298579910-15198-7-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 References: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-
-The attr_data_from_string() function will be used in interactive and
-usual gatttool so this function was moved to common file utils.c.
 ---
- attrib/gatttool.c |   23 ++---------------------
- attrib/gatttool.h |    1 +
- attrib/utils.c    |   19 +++++++++++++++++++
- 3 files changed, 22 insertions(+), 21 deletions(-)
+ attrib/interactive.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 44 insertions(+), 0 deletions(-)
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 7478043..d7887c6 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -313,25 +313,6 @@ static gboolean characteristics_read(gpointer user_data)
- 	return FALSE;
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index e5817ab..ff676b4 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -551,6 +551,48 @@ static void cmd_char_write_req(int argcp, char **argvp)
+ 	g_free(value);
  }
  
--static size_t attr_data_from_string(const char *str, uint8_t **data)
--{
--	char tmp[3];
--	size_t size, i;
--
--	size = strlen(str) / 2;
--	*data = g_try_malloc0(size);
--	if (*data == NULL)
--		return 0;
--
--	tmp[2] = '\0';
--	for (i = 0; i < size; i++) {
--		memcpy(tmp, str + (i * 2), 2);
--		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
--	}
--
--	return size;
--}
--
- static void mainloop_quit(gpointer user_data)
- {
- 	uint8_t *value = user_data;
-@@ -356,7 +337,7 @@ static gboolean characteristics_write(gpointer user_data)
- 		goto error;
- 	}
- 
--	len = attr_data_from_string(opt_value, &value);
-+	len = gatt_attr_data_from_string(opt_value, &value);
- 	if (len == 0) {
- 		g_printerr("Invalid value\n");
- 		goto error;
-@@ -408,7 +389,7 @@ static gboolean characteristics_write_req(gpointer user_data)
- 		goto error;
- 	}
- 
--	len = attr_data_from_string(opt_value, &value);
-+	len = gatt_attr_data_from_string(opt_value, &value);
- 	if (len == 0) {
- 		g_printerr("Invalid value\n");
- 		goto error;
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-index 7eae18d..2fd4a46 100644
---- a/attrib/gatttool.h
-+++ b/attrib/gatttool.h
-@@ -25,3 +25,4 @@ int interactive(gchar *dst, gboolean le);
- GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 			const gchar *sec_level, int psm, int mtu,
- 			BtIOConnect connect_cb);
-+size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
-diff --git a/attrib/utils.c b/attrib/utils.c
-index 4d0000d..8d1ca74 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -104,3 +104,22 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 
- 	return chan;
- }
-+
-+size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
++static void cmd_sec_level(int argcp, char **argvp)
 +{
-+	char tmp[3];
-+	size_t size, i;
++	GError *gerr = NULL;
++	BtIOSecLevel sec_level;
 +
-+	size = strlen(str) / 2;
-+	*data = g_try_malloc0(size);
-+	if (*data == NULL)
-+		return 0;
-+
-+	tmp[2] = '\0';
-+	for (i = 0; i < size; i++) {
-+		memcpy(tmp, str + (i * 2), 2);
-+		(*data)[i] = (uint8_t) strtol(tmp, NULL, 16);
++	if (argcp < 2) {
++		printf("sec-level: %s\n", opt_sec_level);
++		return;
 +	}
 +
-+	return size;
++	if (strcasecmp(argvp[1], "medium") == 0)
++		sec_level = BT_IO_SEC_MEDIUM;
++	else if (strcasecmp(argvp[1], "high") == 0)
++		sec_level = BT_IO_SEC_HIGH;
++	else if (strcasecmp(argvp[1], "low") == 0)
++		sec_level = BT_IO_SEC_LOW;
++	else {
++		printf("Allowed values: low | medium | high\n");
++		return;
++	}
++
++	g_free(opt_sec_level);
++	opt_sec_level = strdup(argvp[1]);
++
++	if (conn_state != STATE_CONNECTED)
++		return;
++
++	if (opt_psm) {
++		printf("It must be reconnected to this change take effect\n");
++		return;
++	}
++
++	bt_io_set(iochannel, BT_IO_L2CAP, &gerr,
++			BT_IO_OPT_SEC_LEVEL, sec_level,
++			BT_IO_OPT_INVALID);
++
++	if (gerr) {
++		printf("Error: %s\n", gerr->message);
++		g_error_free(gerr);
++	}
 +}
++
+ static struct {
+ 	const char *cmd;
+ 	void (*func)(int argcp, char **argvp);
+@@ -577,6 +619,8 @@ static struct {
+ 		"Characteristics Value/Descriptor Read by UUID" },
+ 	{ "char-write-req",	cmd_char_write_req,	"<handle> <new value>",
+ 		"Characteristic Value Write (Write Request)" },
++	{ "sec-level",		cmd_sec_level,	"[low | medium | high]",
++		"Set security level. Default: low" },
+ 	{ NULL, NULL, NULL}
+ };
+ 
 -- 
 1.7.1
 
