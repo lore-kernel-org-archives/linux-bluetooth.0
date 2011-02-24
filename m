@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH] Fix test/test-attrib script
-Date: Thu, 24 Feb 2011 18:47:00 -0300
-Message-Id: <1298584020-14568-1-git-send-email-anderson.lizardo@openbossa.org>
+Message-ID: <4D66D107.9000305@codeaurora.org>
+Date: Thu, 24 Feb 2011 13:43:35 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix MTU value used on MTU exchange response
+References: <1298583454-18227-1-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1298583454-18227-1-git-send-email-bruna.moreira@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Characteristics are not being fetched anymore when the device is
-created. Discover method needs to be called actively to discover the
-characteristics exposed by a given service.
----
- test/test-attrib |   12 ++++++++----
- 1 files changed, 8 insertions(+), 4 deletions(-)
+On 2/24/2011 1:37 PM, Bruna Moreira wrote:
+> The new MTU value only should be applied in server side after sending
+> the ATT_MTU_RESP so encode the response using the old MTU value.
+> ---
+>   src/attrib-server.c |    4 +++-
+>   1 files changed, 3 insertions(+), 1 deletions(-)
+>
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index 62c10f4..9de4c81 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -773,9 +773,11 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
+>   static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+>   		uint8_t *pdu, int len)
+>   {
+> +	guint old_mtu = channel->mtu;
+> +
+>   	channel->mtu = MIN(mtu, channel->mtu);
+>
+> -	return enc_mtu_resp(channel->mtu, pdu, len);
+> +	return enc_mtu_resp(old_mtu, pdu, len);
+>   }
+>
+>   static void channel_disconnect(void *user_data)
 
-diff --git a/test/test-attrib b/test/test-attrib
-index 05ee381..dc3f804 100755
---- a/test/test-attrib
-+++ b/test/test-attrib
-@@ -62,13 +62,17 @@ class Watcher(dbus.service.Object):
-         print "Watcher: new value for %s: %s" % (char, dbus_type_to_str(newvalue))
- 
- def handle_characteristics(char):
--    for (path, props) in char.GetCharacteristics().iteritems():
--        if options.char_path and path != options.char_path:
-+    char.Discover()
-+    for c in char.GetProperties()["Characteristics"]:
-+        char = dbus.Interface(bus.get_object("org.bluez", c),
-+                "org.bluez.Characteristic")
-+
-+        if options.char_path and c != options.char_path:
-             continue
- 
-         if not options.set_property:
--            ret = "Characteristic: %s\nProperties:\n" % path
--            for (k, v) in props.iteritems():
-+            ret = "Characteristic: %s\nProperties:\n" % c
-+            for (k, v) in char.GetProperties().iteritems():
-                 ret += "\t%s: %s\n" % (k, dbus_type_to_str(v))
-             print ret
-         elif options.set_property.get(path, None):
+
+I don't think this is correct.  The change has us replying with our old 
+MTU.  What part of the specification justifies this change?
+
 -- 
-1.7.0.4
-
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
