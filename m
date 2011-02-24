@@ -1,44 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>, <padovan@profusion.mobi>, Marcel
- Holtmann <marcel@holtmann.org>, Waldemar Rymarkiewicz
-	<waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v2 0/4] Sim Access Profile
-Date: Thu, 24 Feb 2011 13:13:22 +0100
-Message-ID: <1298549606-16594-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+From: <sachin.athanikar@accenture.com>
+To: <dstockwell@frequency-one.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Thu, 24 Feb 2011 14:28:47 +0530
+Subject: RE: Status of MAP and AVRCP
+Message-ID: <23B1B83C3513ED4B8E8B2B9029CDE8EFCBABE735D8@INDXM3113.dir.svc.accenture.com>
+References: <20110207090836.GA26064@plexity.net>
+ <6027B6444B774B019847152FB098B13F@freqoneremote>
+In-Reply-To: <6027B6444B774B019847152FB098B13F@freqoneremote>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Here you are the SAP codes adjusted to previous comments and API change.
+Hi David,
 
-/Waldek
+Please let me know the status on development on AVRCP 1.3 & 1.4.
+
+When is the release planned for BlueZ with AVRCP 1.3 support?
+
+Thanks
+Sachin
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of David Stockwell
+Sent: Tuesday, February 08, 2011 8:13 PM
+To: dsaxena@plexity.net; BlueZ devel list
+Subject: Re: Status of MAP and AVRCP
+
+Hello Deepak,
 
 
-Waldemar Rymarkiewicz (4):
-  Sim Access Profile API
-  Sim Access Profile Manager
-  Sim Access Profile Server
-  Sim Access Profile dummy driver
+Hi,
 
- .gitignore      |    1 +
- Makefile.am     |   22 +-
- acinclude.m4    |   12 +
- doc/sap-api.txt |   34 ++
- sap/main.c      |   55 +++
- sap/manager.c   |   93 ++++
- sap/manager.h   |   22 +
- sap/sap-dummy.c |  328 +++++++++++++
- sap/sap.h       |  192 ++++++++
- sap/server.c    | 1425 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- sap/server.h    |   26 +
- 11 files changed, 2208 insertions(+), 2 deletions(-)
- create mode 100644 doc/sap-api.txt
- create mode 100644 sap/main.c
- create mode 100644 sap/manager.c
- create mode 100644 sap/manager.h
- create mode 100644 sap/sap-dummy.c
- create mode 100644 sap/sap.h
- create mode 100644 sap/server.c
- create mode 100644 sap/server.h
+I am wondering about the status of AVRCP and MAP profile support
+in the current BlueZ tree. It looks like ther were a few GSOC
+projects related to adding/extending these last year, but from
+my quick skim, it does not look like these were integrated
+upstream. Was an attempt made to push these changes and did
+they get reject? Is someone still driving this work within the
+BlueZ community to make sure it goes upstream?
+
++++++
+
+I restarted work-in-earnest on an AVRCP layer a bit over two months ago (I
+also have a full-time day-job that has nothing to do with Bluetooth, Linux,
+Open Source, etc.). I am now resolving some issues in connecting from my
+custom built AVRCP remote (hardware and firmware), which connects, pairs,
+and connects with full AVRCP with my BlackBerry Torch, and the AVRCP stack
+on my laptop.  After working through that issue (I expect, by later this
+week), and verifying that the BB Torch can connect with my changes in place,
+I will complete fairly extensive testing and begin submitting patches with
+major surgery to audio/control.c, supporting the API doc worked out in the
+Portland meeting, with a couple of minor extensions.  This will bring BlueZ
+to AVRCP 1.3, figure by the end of this month.
+
+I will also include message fragmentation support, which will be needed for
+1.4 (not really needed for 1.3, although it is in the 1.3 spec).  However,
+there are a number of issues with 1.4, the biggest being the amount of
+integration between the BlueZ stack/profile (which should remain pure) and
+the player(s), that are required to respond to queries for browsing track
+metadata, etc.  I think there will need to be a discussion about how much of
+1.4, if any, to support, and how.  I think Sander van Grieken's work with
+MPRIS may be a guide.  Also, I understand ST Ericsson (Shivendra Agrawal) is
+also proposing to provide 1.4 support.
+
+Just my two cents...questions, please do not hesitate.
+
+David Stockwell
+
++++++
+
+Thanks,
+~Deepak
+
+
+--
+"People think all we need to fix our predicament is a free source of
+energy, but I think we need to change out behaviour. More energy would
+just deplete the Earth's lifeblood faster." - Janine Benyius
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+This message is for the designated recipient only and may contain privileged, proprietary, or otherwise private information.  If you have received it in error, please notify the sender immediately and delete the original.  Any other use of the email by you is prohibited.
