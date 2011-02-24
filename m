@@ -1,50 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 5/6] Add Write Request in interactive gatttool
-Date: Thu, 24 Feb 2011 17:38:29 -0300
-Message-Id: <1298579910-15198-6-git-send-email-sheldon.demario@openbossa.org>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH 3/6] Add characteristics read options in interactive gatttool
+Date: Thu, 24 Feb 2011 17:38:27 -0300
+Message-Id: <1298579910-15198-4-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 References: <1298579910-15198-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-
 ---
- attrib/interactive.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 52 insertions(+), 0 deletions(-)
+ attrib/interactive.c |  157 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 156 insertions(+), 1 deletions(-)
 
 diff --git a/attrib/interactive.c b/attrib/interactive.c
-index c5dd2b7..e5817ab 100644
+index 89e244a..c5dd2b7 100644
 --- a/attrib/interactive.c
 +++ b/attrib/interactive.c
-@@ -501,6 +501,56 @@ static void cmd_read_uuid(int argcp, char **argvp)
- 					char_read_by_uuid_cb, char_data);
+@@ -50,6 +50,13 @@ static gchar *opt_sec_level = NULL;
+ static int opt_psm = 0;
+ static int opt_mtu = 0;
+ 
++struct characteristic_data {
++	uint16_t orig_start;
++	uint16_t start;
++	uint16_t end;
++	uuid_t uuid;
++};
++
+ static void cmd_help(int argcp, char **argvp);
+ 
+ enum state {
+@@ -210,6 +217,79 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	rl_forced_update_display();
  }
  
-+static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
 +							gpointer user_data)
 +{
++	uint8_t value[ATT_MAX_MTU];
++	int i, vlen;
++
 +	if (status != 0) {
-+		printf("Characteristic Write Request failed: "
-+						"%s\n", att_ecode2str(status));
++		printf("Characteristic value/descriptor read failed: %s\n",
++							att_ecode2str(status));
 +		return;
 +	}
 +
-+	if (!dec_write_resp(pdu, plen)) {
++	if (!dec_read_resp(pdu, plen, value, &vlen)) {
 +		printf("Protocol error\n");
 +		return;
 +	}
 +
-+	printf("Characteristic value was written successfully\n");
++	printf("\nCharacteristic value/descriptor: ");
++	for (i = 0; i < vlen; i++)
++		printf("%02x ", value[i]);
++	printf("\n");
++
++	rl_forced_update_display();
 +}
 +
-+static void cmd_char_write_req(int argcp, char **argvp)
++static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
++					guint16 plen, gpointer user_data)
 +{
-+	uint8_t *value;
-+	size_t plen;
++	struct characteristic_data *char_data = user_data;
++	struct att_data_list *list;
++	int i;
++
++	if (status == ATT_ECODE_ATTR_NOT_FOUND &&
++				char_data->start != char_data->orig_start)
++		goto done;
++
++	if (status != 0) {
++		printf("Read characteristics by UUID failed: %s\n",
++							att_ecode2str(status));
++		goto done;
++	}
++
++	list = dec_read_by_type_resp(pdu, plen);
++	if (list == NULL)
++		goto done;
++
++	for (i = 0; i < list->num; i++) {
++		uint8_t *value = list->data[i];
++		int j;
++
++		char_data->start = att_get_u16(value) + 1;
++
++		printf("\nhandle: 0x%04x \t value: ", att_get_u16(value));
++		value += 2;
++		for (j = 0; j < list->len - 2; j++, value++)
++			printf("%02x ", *value);
++		printf("\n");
++	}
++
++	att_data_list_free(list);
++
++	gatt_read_char_by_uuid(attrib, char_data->start, char_data->end,
++					&char_data->uuid, char_read_by_uuid_cb,
++					char_data);
++
++	rl_forced_update_display();
++
++	return;
++
++done:
++	g_free(char_data);
++}
++
+ static void cmd_exit(int argcp, char **argvp)
+ {
+ 	rl_callback_handler_remove();
+@@ -350,6 +430,77 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
+ }
+ 
++static void cmd_read_hnd(int argcp, char **argvp)
++{
 +	int handle;
 +
 +	if (conn_state != STATE_CONNECTED) {
@@ -52,39 +125,90 @@ index c5dd2b7..e5817ab 100644
 +		return;
 +	}
 +
-+	if (argcp < 3) {
-+		printf("Usage: char-write-req <handle> <new value>\n");
++	if (argcp < 2) {
++		printf("Missing argument: handle\n");
 +		return;
 +	}
 +
-+	handle = strtoll(argvp[1], NULL, 16);
-+	if (errno != 0 || handle <= 0) {
-+		printf("A valid handle is required\n");
++	handle = strtohandle(argvp[1]);
++	if (handle < 0) {
++		printf("Invalid handle: %s\n", argvp[1]);
 +		return;
 +	}
 +
-+	plen = gatt_attr_data_from_string(argvp[2], &value);
-+	if (plen == 0) {
-+		g_printerr("Invalid value\n");
++	gatt_read_char(attrib, handle, char_read_cb, attrib);
++}
++
++static void cmd_read_uuid(int argcp, char **argvp)
++{
++	struct characteristic_data *char_data;
++	int start = 0x0001;
++	int end = 0xffff;
++	uuid_t uuid;
++
++	if (conn_state != STATE_CONNECTED) {
++		printf("Command failed: disconnected\n");
 +		return;
 +	}
 +
-+	gatt_write_char(attrib, handle, value, plen, char_write_req_cb, NULL);
++	if (argcp < 2) {
++		printf("Missing argument: UUID\n");
++		return;
++	}
 +
-+	g_free(value);
++	if (bt_string2uuid(&uuid, argvp[1]) < 0) {
++		printf("Invalid UUID\n");
++		return;
++	}
++
++	if (argcp > 2) {
++		start = strtohandle(argvp[2]);
++		if (start < 0) {
++			printf("Invalid start handle: %s\n", argvp[1]);
++			return;
++		}
++	}
++
++	if (argcp > 3) {
++		end = strtohandle(argvp[3]);
++		if (end < 0) {
++			printf("Invalid end handle: %s\n", argvp[2]);
++			return;
++		}
++	}
++
++	char_data = g_new(struct characteristic_data, 1);
++	char_data->orig_start = start;
++	char_data->start = start;
++	char_data->end = end;
++	char_data->uuid = uuid;
++
++	gatt_read_char_by_uuid(attrib, start, end, &char_data->uuid,
++					char_read_by_uuid_cb, char_data);
 +}
 +
  static struct {
  	const char *cmd;
  	void (*func)(int argcp, char **argvp);
-@@ -525,6 +575,8 @@ static struct {
- 		"Characteristics Value/Descriptor Read by handle" },
- 	{ "char-read-uuid",	cmd_read_uuid,	"<UUID> [start hnd] [end hnd]",
- 		"Characteristics Value/Descriptor Read by UUID" },
-+	{ "char-write-req",	cmd_char_write_req,	"<handle> <new value>",
-+		"Characteristic Value Write (Write Request)" },
+@@ -370,6 +521,10 @@ static struct {
+ 		"Characteristics Discovery" },
+ 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
+ 		"Characteristics Descriptor Discovery" },
++	{ "char-read-hnd",	cmd_read_hnd,	"<handle>",
++		"Characteristics Value/Descriptor Read by handle" },
++	{ "char-read-uuid",	cmd_read_uuid,	"<UUID> [start hnd] [end hnd]",
++		"Characteristics Value/Descriptor Read by UUID" },
  	{ NULL, NULL, NULL}
  };
+ 
+@@ -378,7 +533,7 @@ static void cmd_help(int argcp, char **argvp)
+ 	int i;
+ 
+ 	for (i = 0; commands[i].cmd; i++)
+-		printf("%-15s %-25s %s\n", commands[i].cmd,
++		printf("%-15s %-30s %s\n", commands[i].cmd,
+ 				commands[i].params, commands[i].desc);
+ }
  
 -- 
 1.7.1
