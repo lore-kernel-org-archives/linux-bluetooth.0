@@ -1,55 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 24 Feb 2011 14:27:02 +0200
-Message-ID: <AANLkTinzSuO8a87BuqAxakQS5=pd9zRd7zdmBasjXrxs@mail.gmail.com>
-Subject: [PATCH] Maemo6 MCE: skip first adapter_powered callback
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0015175cb2c6a7ef84049d0654e5
+In-Reply-To: <20110224025437.GA6189@jh-x301>
+References: <1298495788-22273-1-git-send-email-andre.guedes@openbossa.org>
+	<20110224025437.GA6189@jh-x301>
+Date: Thu, 24 Feb 2011 08:32:35 -0300
+Message-ID: <AANLkTi=ZGNaLi7VUBzEWoDffcJaP9HPmxf_AmAcPw_g-@mail.gmail.com>
+Subject: Re: [PATCH] hcitool: add discovery procedure to lescan command
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015175cb2c6a7ef84049d0654e5
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Johan,
 
+On Wed, Feb 23, 2011 at 11:54 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi André,
+>
+> On Wed, Feb 23, 2011, Andre Guedes wrote:
+>> +     "\tlescan [--discovery=g|l] enable general or limited discovery"
+>
+> To make this consistent with the other options please default to general
+> and have a --limited switch to enable limited discovery.
 
+Note that there are actually three modes:
 
---0015175cb2c6a7ef84049d0654e5
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Maemo6-MCE-skip-first-adapter_powered-callback.patch"
-Content-Disposition: attachment;
-	filename="0001-Maemo6-MCE-skip-first-adapter_powered-callback.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gkjnf8hf0
+1) the default one, when no parameters are given: do not filter
+anything, useful for debugging (this is what is currently done)
+2) limited discovery
+3) general discovery
 
-RnJvbSAxMmY2ZTgzZThhNDM3Zjk0NWExOGQ5ZTE1ZTk1NjAzOWFjYWQzYTRiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVGh1LCAyNCBGZWIgMjAxMSAxMzo0NTozMyArMDIwMApTdWJqZWN0OiBb
-UEFUQ0hdIE1hZW1vNiBNQ0U6IHNraXAgZmlyc3QgYWRhcHRlcl9wb3dlcmVkIGNhbGxiYWNrCgpU
-aGUgbWFlbW82IE1DRSBwbHVnaW4gc2hvdWxkIGJlIHVzZWQgd2l0aCB0aGUgZmxhZyBJbml0aWFs
-bHlQb3dlcmVkCmluIG1haW4uY29uZiBzZXQgdG8gJ3RydWUnIHNvIHRoYXQgQmx1ZVogcG93ZXJz
-IG9uIHRoZSBhZGFwdGVyCmFuZCBsZWF2ZXMgaXQgaW4gdGhhdCBzdGF0ZSB3aGVuIHRoZSBkYWVt
-b24gaXMgc3RhcnRlZC4gVGhlIHBsdWdpbgp3aWxsIHJlYWQgdGhlIHJhZGlvIHN0YXRlIGZyb20g
-dGhlIE1DRSBhbmQgc2V0IHRoZSBzdGF0ZQphY2NvcmRpbmdseS4gVGhlIG1hZW1vNiBwbHVnaW4g
-aXMgYSBidGRfYWRhcHRlcl9kcml2ZXIgYW5kIHRob3NlCmRyaXZlcnMgYXJlIGxvYWRlZCBhZnRl
-ciBCbHVlWiBoYXMgcmVhZCB0aGUgQkQgYWRkcmVzcyBldGMgZnJvbSB0aGUKYWRhcHRlci4KClRo
-aXMgcGF0Y2ggYWRkcyBhIGJvb2xlYW4gZmxhZyBpbiB0aGUgY2FsbGJhY2sgdG8gaWdub3JlIHRo
-ZSBpbml0aWFsCnBvd2VyaW5nIG9uIG9mIHRoZSBhZGFwdGVyIGJ5IEJsdWVaLCBzaW5jZSBpdCBz
-aG91bGRuJ3QgYmUKcHJvcGFnYXRlZCB0byB0aGUgTUNFLiBXaXRoIEluaXRpYWxseVBvd2VyZWQg
-c2V0IHRvICdmYWxzZScgdGhlCmFkYXB0ZXJfcG93ZXJlZCBjYWxsYmFjayBpcyBub3QgY2FsbGVk
-IHdoZW4gdGhlIGFkYXB0ZXIgaXMgdHVybmVkCm9uIGF0IEJsdWVaIHN0YXJ0dXAsIHdoaWNoIGlz
-IHdoeSB0aGlzIHdhc24ndCBpbXBsZW1lbnRlZCBiZWZvcmUuCi0tLQogcGx1Z2lucy9tYWVtbzYu
-YyB8ICAgIDYgKysrKysrCiAxIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgMCBkZWxl
-dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9wbHVnaW5zL21hZW1vNi5jIGIvcGx1Z2lucy9tYWVtbzYu
-YwppbmRleCAzYzkxOTI2Li41NmYyNjY0IDEwMDY0NAotLS0gYS9wbHVnaW5zL21hZW1vNi5jCisr
-KyBiL3BsdWdpbnMvbWFlbW82LmMKQEAgLTEzNSw5ICsxMzUsMTUgQEAgc3RhdGljIHZvaWQgYWRh
-cHRlcl9wb3dlcmVkKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwgZ2Jvb2xlYW4gcG93ZXJl
-ZCkKIAlEQnVzTWVzc2FnZSAqbXNnOwogCWRidXNfdWludDMyX3QgcmFkaW9fc3RhdGVzID0gMDsK
-IAlkYnVzX3VpbnQzMl90IHJhZGlvX21hc2sgPSBNQ0VfUkFESU9fU1RBVEVfQkxVRVRPT1RIOwor
-CXN0YXRpYyBnYm9vbGVhbiBzdGFydHVwID0gVFJVRTsKIAogCURCRygiYWRhcHRlcl9wb3dlcmVk
-IGNhbGxlZCB3aXRoICVkIiwgcG93ZXJlZCk7CiAKKwlpZiAoc3RhcnR1cCkgeworCQlzdGFydHVw
-ID0gRkFMU0U7CisJCXJldHVybjsKKwl9CisKIAkvKiBjaGVjayBpZiB0aGUgcGx1Z2luIGdvdCB0
-aGUgZ2V0X3JhZGlvX3N0YXRlcyByZXBseSBmcm9tIHRoZQogCSAqIG1jZSB3aGVuIHRoZSBhZGFw
-dGVyIHdhcyBub3QgeWV0IGRvd24gZHVyaW5nIHRoZSBwb3dlcgogCSAqIGN5Y2xpbmcgd2hlbiBi
-bHVldG9vdGhkIGlzIHN0YXJ0ZWQgKi8KLS0gCjEuNi4wLjQKCg==
---0015175cb2c6a7ef84049d0654e5--
+limited/general are done according to the procedure description on the spec.
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
