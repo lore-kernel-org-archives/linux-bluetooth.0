@@ -1,54 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH] Add filter option to test/test-discovery
-Date: Fri, 25 Feb 2011 18:38:31 -0300
-Message-Id: <1298669911-12942-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 25 Feb 2011 14:48:13 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: David Miller <davem@davemloft.net>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, padovan@profusion.mobi
+Subject: Re: pull request: wireless-next-2.6 2011-02-22
+Message-ID: <20110225194812.GG15897@tuxdriver.com>
+References: <20110222215229.GJ12153@tuxdriver.com>
+ <20110224.224344.104068328.davem@davemloft.net>
+ <20110225.111500.59674472.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110225.111500.59674472.davem@davemloft.net>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new --filter option, which can be used to only show discovery
-results which satisfy a given (Python) expression. This expression can
-use any property of a discovered device. Example:
+On Fri, Feb 25, 2011 at 11:15:00AM -0800, David Miller wrote:
+> From: David Miller <davem@davemloft.net>
+> Date: Thu, 24 Feb 2011 22:43:44 -0800 (PST)
 
-test-discovery -f "Name == 'BlueZ'"
-test-discovery --filter="LegacyPairing == 1"
+> > Pulled, thanks a lot John.
+> 
+> John a few things:
+> 
+> 1) I had to add some vmalloc.h includes to fix the build on sparc64,
+>    see commit b08cd667c4b6641c4d16a3f87f4550f81a6d69ac in net-next-2.6
 
-This option is useful for showing only devices which we are interested
-on, e.g. LE devices (once we have a property to identify them).
----
- test/test-discovery |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+I have a patch in my tree for that -- seems they hit it on ARM as well.
 
-diff --git a/test/test-discovery b/test/test-discovery
-index 22c88c3..92f931d 100755
---- a/test/test-discovery
-+++ b/test/test-discovery
-@@ -7,6 +7,13 @@ import dbus.mainloop.glib
- from optparse import OptionParser, make_option
- 
- def device_found(address, properties):
-+	import sys
-+	try:
-+		if options.filter and not eval(options.filter, dict(properties)):
-+			return
-+	except NameError:
-+		return
-+
- 	print "[ " + address + " ]"
- 
- 	for key in properties.keys():
-@@ -30,6 +37,9 @@ if __name__ == '__main__':
- 	option_list = [
- 			make_option("-i", "--device", action="store",
- 					type="string", dest="dev_id"),
-+			make_option("-f", "--filter", action="store",
-+					type="string", dest="filter", metavar="PYTHON_EXPR",
-+					help="Filter results according to PYTHON_EXPR"),
- 			]
- 	parser = OptionParser(option_list=option_list)
- 
+> 2) Something is screwey with the bluetooth config options now.
+> 
+>    I have an allmodconfig tree, and when I run "make oldconfig" after
+>    this pull, BT_L2CAP and BT_SCO both prompt me, claiming that they
+>    can only be built statically.
+> 
+>    I give it 'y' just to make it happen, for both, and afterways no
+>    matter how many times I rerun "make oldconfig" I keep seeing things
+>    like this in my build:
+> 
+> scripts/kconfig/conf --silentoldconfig Kconfig
+> include/config/auto.conf:986:warning: symbol value 'm' invalid for BT_SCO
+> include/config/auto.conf:3156:warning: symbol value 'm' invalid for BT_L2CAP
+> 
+>    First, what the heck is going on here?  Second, why the heck can't these
+>    non-trivial pieces of code be built modular any more?
+> 
+>    You can't make something "bool", have it depend on something that
+>    might be modular, and then build it into what could in fact be a
+>    module.  That's exactly what the bluetooth stuff seems to be doing
+>    now.
+> 
+>    I suspect commit 642745184f82688eb3ef0cdfaa4ba632055be9af
+> 
+> Thanks.
+
+Sorry, I overlooked that.  Hopefully Gustavo will figure it out quickly.
+
+Thanks,
+
+John
 -- 
-1.7.0.4
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
