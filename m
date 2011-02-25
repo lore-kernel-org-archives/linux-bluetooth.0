@@ -1,33 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Feb 2011 14:48:13 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
+Date: Fri, 25 Feb 2011 16:36:18 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: David Miller <davem@davemloft.net>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, padovan@profusion.mobi
+Cc: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: pull request: wireless-next-2.6 2011-02-22
-Message-ID: <20110225194812.GG15897@tuxdriver.com>
+Message-ID: <20110225193618.GB2107@joana>
 References: <20110222215229.GJ12153@tuxdriver.com>
  <20110224.224344.104068328.davem@davemloft.net>
  <20110225.111500.59674472.davem@davemloft.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20110225.111500.59674472.davem@davemloft.net>
-Sender: linux-wireless-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Feb 25, 2011 at 11:15:00AM -0800, David Miller wrote:
+Hi David,
+
+* David Miller <davem@davemloft.net> [2011-02-25 11:15:00 -0800]:
+
 > From: David Miller <davem@davemloft.net>
 > Date: Thu, 24 Feb 2011 22:43:44 -0800 (PST)
-
+> 
+> > From: "John W. Linville" <linville@tuxdriver.com>
+> > Date: Tue, 22 Feb 2011 16:52:30 -0500
+> > 
+> >> Here is the latest batch of wireless bits intended for 2.6.39.  It seems
+> >> I neglected to send a pull request last week, so this one is a bit big
+> >> -- I apologize!
+> >> 
+> >> This includes a rather large batch of bluetooth bits by way of Gustavo.
+> >> It looks like a variety of bits, including some code refactoring, some
+> >> protocol support enhancements, some bugfixes, etc. -- nothing too
+> >> unusual.
+> >> 
+> >> Other items of interest include a new driver from Realtek, some ssb
+> >> support enhancements, and the usual sort of updates for mac80211 and a
+> >> variety of drivers.  Also included is a wireless-2.6 pull to resolve
+> >> some build breakage.
+> >> 
+> >> Please let me know if there are problems!
+> > 
 > > Pulled, thanks a lot John.
 > 
 > John a few things:
 > 
 > 1) I had to add some vmalloc.h includes to fix the build on sparc64,
 >    see commit b08cd667c4b6641c4d16a3f87f4550f81a6d69ac in net-next-2.6
-
-I have a patch in my tree for that -- seems they hit it on ARM as well.
-
+> 
 > 2) Something is screwey with the bluetooth config options now.
 > 
 >    I have an allmodconfig tree, and when I run "make oldconfig" after
@@ -44,21 +64,18 @@ I have a patch in my tree for that -- seems they hit it on ARM as well.
 > 
 >    First, what the heck is going on here?  Second, why the heck can't these
 >    non-trivial pieces of code be built modular any more?
+
+We now have L2CAP and SCO built-in in the main bluetooth.ko module.
+
 > 
 >    You can't make something "bool", have it depend on something that
 >    might be modular, and then build it into what could in fact be a
 >    module.  That's exactly what the bluetooth stuff seems to be doing
 >    now.
-> 
->    I suspect commit 642745184f82688eb3ef0cdfaa4ba632055be9af
-> 
-> Thanks.
 
-Sorry, I overlooked that.  Hopefully Gustavo will figure it out quickly.
+Seems I did the Kconfig change wrong, I'll fix it ASAP and send it to you
+guys.
 
-Thanks,
-
-John
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Gustavo F. Padovan
+http://profusion.mobi
