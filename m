@@ -1,23 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D67CF87.50600@koala.ie>
-Date: Fri, 25 Feb 2011 15:49:27 +0000
-From: Simon Kenyon <simon@koala.ie>
+Date: Fri, 25 Feb 2011 12:57:23 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH] Move index to common header in management interface
+Message-ID: <20110225155723.GE19437@jh-x301>
+References: <1298554607-2527-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-CC: linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] Another try for the Sixaxis plugin
-References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298554607-2527-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 25/02/2011 10:04, Antonio Ospite wrote:
-> FUTURE plans:
->   - Add support for battery status report
->   - Add support for Playstation Move (I don't have the hardware, tho),
->     Pascal?
+Hi Szymon,
 
-any chance of including the PS3 BD remote in your plans?
--- 
-simon
+On Thu, Feb 24, 2011, Szymon Janc wrote:
+> Match changes introduced in mgmt interface after moving controller
+> index to common header.
+> ---
+>  lib/mgmt.h        |   43 +---------
+>  plugins/mgmtops.c |  243 +++++++++++++++++++----------------------------------
+>  2 files changed, 90 insertions(+), 196 deletions(-)
+
+Pushed upstream. Thanks.
+
+Now let's try to get the kernel patches to bluetooth-next-2.6 asap. I'll
+base all my future work on top of them.
+
+Johan
