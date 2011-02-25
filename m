@@ -1,44 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <i8xvd084322.fsf@pabr.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Date: Fri, 25 Feb 2011 15:11:15 +0100
-From: pascal44973@pabr.org
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
-	Ranulf Doswell <ralf@ranulf.net>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>
-Subject: Re: [PATCH v2 0/3] Another try for the Sixaxis plugin
-In-Reply-To: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+Subject: Re: [PATCH] Implement ATT handle indications
+Mime-Version: 1.0 (Apple Message framework v1082)
+Content-Type: text/plain; charset=iso-8859-1
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <1298637457-19588-1-git-send-email-epx@signove.com>
+Date: Fri, 25 Feb 2011 10:34:16 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C00D88F8-CE33-48DB-B67C-19C464F2C02A@signove.com>
+References: <1298637457-19588-1-git-send-email-epx@signove.com>
+To: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Antonio Ospite writes:
- > FUTURE plans:
- >  - Add support for battery status report
- >  - Add support for Playstation Move (I don't have the hardware, tho),
 
-As far as I know, if your infrastructure can both pair the
-sixaxis over USB and register it in /var/lib/bluetooth, then it
-will only take a small patch to add support for the Move later.
+On 25 Feb 2011, at 09:37 , Elvis Pfützenreuter wrote:
 
-There are rumours that Sony will announce PC support the Move
-at a conference next week, and the speaker seems to have a
-strong Linux background.  Maybe that will reveal some useful
-information, such as:
+> Treatment of near-concomitant indications, the first possibly blocking
+> the second, will be implemented in another patch.
+> ---
+> src/attrib-server.c |   24 ++++++++++++++++++++++++
+> 1 files changed, 24 insertions(+), 0 deletions(-)
+> 
+> diff --git a/src/attrib-server.c b/src/attrib-server.c
+> index 5f645bb..2114700 100644
+> --- a/src/attrib-server.c
+> +++ b/src/attrib-server.c
+> @@ -58,6 +58,7 @@ struct gatt_channel {
+> 	guint mtu;
+> 	guint id;
+> 	gboolean encrypted;
+> +	guint outstanding_indications;
+> };
+> 
+> struct group_elem {
+> @@ -872,6 +873,10 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+> 		length = find_by_type(start, end, &uuid, value, vlen,
+> 							opdu, channel->mtu);
+> 		break;
+> +	case ATT_OP_HANDLE_CNF:
+> +		if (channel->outstanding_indications)
+> +			channel->outstanding_indications -= 1;
+> +		return;
+> 	case ATT_OP_READ_MULTI_REQ:
+> 	case ATT_OP_PREP_WRITE_REQ:
+> 	case ATT_OP_EXEC_WRITE_REQ:
+> @@ -969,6 +974,25 @@ static void attrib_notify_clients(struct attribute *attr)
+> 			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
+> 							NULL, NULL, NULL);
+> 		}
+> +
+> +		if (channel->outstanding_indications)
+> +			continue;
+> +
+> +		/* Indication */
+> +		if (g_slist_find_custom(channel->indicate,
+> +				GUINT_TO_POINTER(handle), handle_cmp) != NULL) {
+> +			uint8_t pdu[ATT_MAX_MTU];
+> +			uint16_t len;
+> +
+> +			len = enc_indication(attr, pdu, channel->mtu);
+> +			if (len == 0)
+> +				return;
+> +
+> +			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
+> +							NULL, NULL, NULL);
+> +
+> +			channel->outstanding_indications += 1;
+> +		}
+> 	}
+> }
+> 
+> -- 
+> 1.7.1
 
-- whether it is safe to perform the cable pairing everytime the
-  device is plugged in (I'd expect the USB socket to die long
-  before any flash chip wears out, but who knows ?)
+I was thinking better and using a boolean for outstanding_indications is better,
+since the current logic never lets it go above 1. So, ignore this patch, I
+will send another one.
 
-- whether it is safe to run the LED bulb at full power
-
-- how to use the built-in sensor calibration data.
-
-Pascal
