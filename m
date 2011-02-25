@@ -1,138 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH v2] Implement ATT handle indications
-Date: Fri, 25 Feb 2011 12:01:12 -0300
-Message-Id: <1298646072-28812-1-git-send-email-epx@signove.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-Id: <i8xvd084322.fsf@pabr.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Date: Fri, 25 Feb 2011 15:11:15 +0100
+From: pascal44973@pabr.org
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
+	Ranulf Doswell <ralf@ranulf.net>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
+	Mikko Virkkila <virkkila@kapsi.fi>
+Subject: Re: [PATCH v2 0/3] Another try for the Sixaxis plugin
+In-Reply-To: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
+References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/attrib-server.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 69 insertions(+), 0 deletions(-)
+Antonio Ospite writes:
+ > FUTURE plans:
+ >  - Add support for battery status report
+ >  - Add support for Playstation Move (I don't have the hardware, tho),
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 5f645bb..f683707 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -54,6 +54,8 @@ struct gatt_channel {
- 	GSList *configs;
- 	GSList *notify;
- 	GSList *indicate;
-+	gboolean outstanding_indication;
-+	GSList *pending_indications;
- 	GAttrib *attrib;
- 	guint mtu;
- 	guint id;
-@@ -770,12 +772,58 @@ static void channel_disconnect(void *user_data)
- 
- 	g_slist_free(channel->notify);
- 	g_slist_free(channel->indicate);
-+	g_slist_free(channel->pending_indications);
- 	g_slist_foreach(channel->configs, (GFunc) g_free, NULL);
- 	g_slist_free(channel->configs);
- 
- 	g_free(channel);
- }
- 
-+static void attrib_resume_indications(struct gatt_channel *channel);
-+
-+static void attrib_indicate_client_cb(guint8 status, const guint8 *pdu,
-+					guint16 len, gpointer user_data)
-+{
-+	struct gatt_channel *channel = user_data;
-+
-+	if (status)
-+		return;
-+
-+	attrib_resume_indications(channel);
-+}
-+
-+static void attrib_indicate_client(struct gatt_channel *channel,
-+					struct attribute *attr)
-+{
-+	uint8_t pdu[ATT_MAX_MTU];
-+	uint16_t len;
-+
-+	len = enc_indication(attr, pdu, channel->mtu);
-+	if (len == 0)
-+		return;
-+
-+	channel->outstanding_indication = TRUE;
-+
-+	g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
-+		attrib_indicate_client_cb, channel, NULL);
-+}
-+
-+static void attrib_resume_indications(struct gatt_channel *channel)
-+{
-+	struct attribute *a;
-+
-+	channel->outstanding_indication = FALSE;
-+
-+	if (!channel->pending_indications)
-+		return;
-+
-+	a = channel->pending_indications->data;
-+	channel->pending_indications =
-+		g_slist_remove(channel->pending_indications, a);
-+
-+	attrib_indicate_client(channel, a);
-+}
-+
- static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 							gpointer user_data)
- {
-@@ -872,6 +920,8 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 		length = find_by_type(start, end, &uuid, value, vlen,
- 							opdu, channel->mtu);
- 		break;
-+	case ATT_OP_HANDLE_CNF:
-+		return;
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_PREP_WRITE_REQ:
- 	case ATT_OP_EXEC_WRITE_REQ:
-@@ -948,6 +998,15 @@ static void confirm_event(GIOChannel *io, void *user_data)
- 	return;
- }
- 
-+static void attrib_sched_indication(struct gatt_channel *channel,
-+							struct attribute *a)
-+{
-+	if (!g_slist_find_custom(channel->pending_indications, a,
-+							attribute_cmp))
-+		channel->pending_indications =
-+			g_slist_append(channel->pending_indications, a);
-+}
-+
- static void attrib_notify_clients(struct attribute *attr)
- {
- 	guint handle = attr->handle;
-@@ -969,6 +1028,15 @@ static void attrib_notify_clients(struct attribute *attr)
- 			g_attrib_send(channel->attrib, 0, pdu[0], pdu, len,
- 							NULL, NULL, NULL);
- 		}
-+
-+		/* Indication */
-+		if (g_slist_find_custom(channel->indicate,
-+				GUINT_TO_POINTER(handle), handle_cmp) != NULL) {
-+			if (channel->outstanding_indication)
-+				attrib_sched_indication(channel, attr);
-+			else
-+				attrib_indicate_client(channel, attr);
-+		}
- 	}
- }
- 
-@@ -1111,6 +1179,7 @@ void attrib_server_exit(void)
- 
- 		g_slist_free(channel->notify);
- 		g_slist_free(channel->indicate);
-+		g_slist_free(channel->pending_indications);
- 		g_slist_foreach(channel->configs, (GFunc) g_free, NULL);
- 		g_slist_free(channel->configs);
- 
--- 
-1.7.1
+As far as I know, if your infrastructure can both pair the
+sixaxis over USB and register it in /var/lib/bluetooth, then it
+will only take a small patch to add support for the Move later.
 
+There are rumours that Sony will announce PC support the Move
+at a conference next week, and the speaker seems to have a
+strong Linux background.  Maybe that will reveal some useful
+information, such as:
+
+- whether it is safe to perform the cable pairing everytime the
+  device is plugged in (I'd expect the USB socket to die long
+  before any flash chip wears out, but who knows ?)
+
+- whether it is safe to run the LED bulb at full power
+
+- how to use the built-in sensor calibration data.
+
+Pascal
