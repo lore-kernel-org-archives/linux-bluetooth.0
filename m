@@ -1,118 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Feb 2011 16:15:45 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Liang Bao <tim.bao@gmail.com>
-Cc: David Fries <david@fries.net>,
-	Andrei Warkentin <andreiw@motorola.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] work around for l2cap NULL dereference in
- l2cap_conn_start
-Message-ID: <20110227191545.GB2166@joana>
-References: <20110211035309.GA22204@spacedout.fries.net>
- <20110214145649.GE2597@joana>
- <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
- <20110221043601.GB22204@spacedout.fries.net>
- <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
+In-Reply-To: <AANLkTikW1upXoEX05vVepE+GFHoFk4_X6m0ur1PYEHFz@mail.gmail.com>
+References: <AANLkTi=yuqTG1MiqN3FHM+2m0OX9QNajq8+xJG_D1-EG@mail.gmail.com>
+	<AANLkTi=qB6WcjkQcp0teuL5DTKKBSSK0ydWD1EtwCh=n@mail.gmail.com>
+	<AANLkTinsnjed16owx=JqCCPa3AMC3P_Z9qLNd8AZ4jyf@mail.gmail.com>
+	<AANLkTi=Z0jaFfeLsNzx9SDJvz-2XCzzTJ++L56rLGZt3@mail.gmail.com>
+	<AANLkTikW1upXoEX05vVepE+GFHoFk4_X6m0ur1PYEHFz@mail.gmail.com>
+Date: Sun, 27 Feb 2011 05:30:57 -0600
+Message-ID: <AANLkTing8htA_TSLQ7ScxC0+KGAo+nHZ+6Amiyet7d5-@mail.gmail.com>
+Subject: Re: HCI core error recovery.
+From: Andrei Warkentin <andreiw@motorola.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David and Liang,
+On Fri, Feb 18, 2011 at 2:21 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
+> On Mon, Feb 14, 2011 at 4:23 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
+>> On Sat, Feb 12, 2011 at 12:47 AM, Andrei Warkentin <andreiw@motorola.com> wrote:
+>>> On Fri, Feb 11, 2011 at 5:07 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
+>>>> Dear List,
+>>>>
+>>>> I've run into an interesting problem. Excuse me in advance if this was
+>>>> already covered here, or for my explanations, since I'm not too
+>>>> familiar with overall flow within BlueZ or Bluetooth specifics...
+>>>> We've had some hardware config issues that resulted in garbage/malformed
+>>>> messages arriving via H4 into the HCI layer. We've since resolved
+>>>> these, but it got me thinking. The issues would result in certain HCI
+>>>> messages being missed, including occasionally disconnect events being
+>>>> missed, and a subsequent connect event would result in a double add.
+>>>>
+>>>> I was thinking about how to fix at the very least the crash. The sysfs
+>>>> object is created as a last step after getting a "connection
+>>>> completed" HCI message, I think. What I am unsure about is if it's
+>>>> safe to just ignore the add if there is already a sysfs entry...
+>>>>
+>>>> So I would think the HCI core needs some resiliency against
+>>>> bad/malignant bluetooth controllers, and perform error
+>>>> recovery/resynchronization. Perhaps maybe there is room for a virtual
+>>>> hci controller that just injects various message types to see how well
+>>>> the core can cope?
+>>>>
+>>>> Thanks in advance,
+>>>> A
+>>>
+>>> To further explain the issue, here is what was happening -
+>>>
+>>> 0) A BT device is paired.
+>>> 1) Host goes into sleep mode.
+>>> 2) BT device turns off.
+>>> 3) Host wakes up due to BT waking the host. Due to UART resume issues,
+>>> HCI message corrupted. hci_disconn_complete_evt never gets called.
+>>> 4) BT device turns on.
+>>> 5) devref gets incremented in  hci_conn_complete_evt, and is now 2.
+>>> 6) BT device turns off. hci_disconn_complete_evt is called, conn hash
+>>> is deleted, but sysfs entry not cleaned up since
+>>> atomic_dec_and_test(&conn->devref) != 0.
+>>> 7) BT device turns on. sysfs add fails since it never was cleaned up.
+>>>
+>>> The attached patch takes care of that. I'm not too familiar with BlueZ
+>>> (or bluetooth :-(), so I would like your feedback. In particular, I am
+>>> unsure about sync connections.
+>>> The primary issue overall is that HCI core doesn't handle HCI issues
+>>> (whether caused by transport issues, or bad/malicious BT controller).
+>>> I am curious if there are other ways to break the core.
+>>>
+>>> Thanks,
+>>> A
+>>>
+>>
+>> Anyone?
+>>
+>
+> Anyone? Who should I talk to about HCI?
+>
 
-* Liang Bao <tim.bao@gmail.com> [2011-02-21 14:41:29 +0800]:
+Anyone pretty please :)? I'm positive what I'm doing isn't necessarily
+right, but I do think this is a real issue in current BlueZ code that
+needs work. HCI core should be more resilient to HCI transport issues,
+after all, the BT HCI spec does mandate specific behavior.
 
-> Hi, David, Andrew et al.
-> 
-> 2011/2/21 David Fries <david@fries.net>:
-> > bt_sk(sk)->parent can be NULL in l2cap_conn_start in state BT_CONNECT2
-> > at least when a headset device pairs and the play button was pressed
-> > right before pairing.
-> >
-> > Signed-off-by: David Fries <david@fries.net>
-> > ---
-> > I removed the printk, can this be merged to the bluetooth next tree?
-> >
-> > On Mon, Feb 14, 2011 at 03:40:46PM -0600, Andrei Warkentin wrote:
-> >> FWIW still need it in 2.6.36.
-> >
-> > Andrei, I'm curious, what's your hardware hardware and bluetooth
-> > device that's trigginer the crash?
-> I  once submitted an issue observed with Android+Motorola S305 stereo
-> headset. It's still open in launchpad:
-> https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/513642. Hope this
-> helps. Thanks.
-> >
-> >> On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
-> >> <padovan@profusion.mobi> wrote:
-> >> > Hi David,
-> >> >
-> >> > * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
-> >> >
-> >> >> Here's a patch to avoid a very repeatable crash in the N900.  If I
-> >> >> take a Motorola S305 bluetooth headset that was previously paried with
-> >> >> the N900, turn it on, and press the play button before the headphones
-> >> >> automatically pair with the cell phone, the N900 will crash (and
-> >> >> reboot) in pairing.  If I wait until after they have paired there
-> >> >> isn't any problem.  The patch is against the kernel-power
-> >> >> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
-> >> >> the same, I just haven't gone back to that kernel.
-> >> >
-> >> > This is a very old kernel. You need to check this issue against
-> >> > bluetooth-next-2.6.
-> >
-> >  net/bluetooth/l2cap.c |    3 ++-
-> >  1 files changed, 2 insertions(+), 1 deletions(-)
-> >
-> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-> > index ed83c1f..a7aa4d9 100644
-> > --- a/net/bluetooth/l2cap.c
-> > +++ b/net/bluetooth/l2cap.c
-> > @@ -408,7 +408,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
-> >                                        struct sock *parent = bt_sk(sk)->parent;
-> >                                        rsp.result = cpu_to_le16(L2CAP_CR_PEND);
-> >                                        rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-> > -                                       parent->sk_data_ready(parent, 0);
-> > +                                       if(parent)
-> > +                                               parent->sk_data_ready(parent,0);
-> >
-> >                                } else {
-> >                                        sk->sk_state = BT_CONFIG;
-
-I pushed the following patch to bluetooth-2.6 tree. It should fix the problem
-by avoiding connections to be accepted before a L2CAP info response comes:
-
-commit 743400e01a33779f93b79c84a1b0d1a2d27338c8
-Author: Gustavo F. Padovan <padovan@profusion.mobi>
-Date:   Sun Feb 27 16:05:07 2011 -0300
-
-    Bluetooth: Don't accept l2cap connection before info_rsp
-    
-    When using defer_setup accepting a connection before receive the L2CAP
-    Info Response for the connection lead us to a crash in l2cap_conn_start(.
-    
-    Reported-by: David Fries <david@fries.net>
-    Reported-by: Liang Bao <tim.bao@gmail.com>
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index c4cf3f5..a8ca42b 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -211,8 +211,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
-                        continue;
-                }
- 
--               if (sk->sk_state == BT_CONNECTED || !newsock ||
--                                               bt_sk(parent)->defer_setup) {
-+               if ((bt_sk(parent)->defer_setup && sk->sk_state == BT_CONNECT2)
-+                               || sk->sk_state == BT_CONNECTED || !newsock) {
-                        bt_accept_unlink(sk);
-                        if (newsock)
-                                sock_graft(sk, newsock);
-
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+A
