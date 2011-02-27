@@ -1,82 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Feb 2011 16:19:01 -0300
+Date: Sun, 27 Feb 2011 16:15:45 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vitaly Wool <vitalywool@gmail.com>
-Cc: davem@davemloft.net, linville@tuxdriver.com,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix BT_L2CAP and BT_SCO in Kconfig
-Message-ID: <20110227191901.GC2166@joana>
-References: <20110226013639.GA2166@joana>
- <1298684485-3081-1-git-send-email-padovan@profusion.mobi>
- <AANLkTimuyx4ixPq5BexRHozebVpjry2k-2xskqVf79g1@mail.gmail.com>
+To: Liang Bao <tim.bao@gmail.com>
+Cc: David Fries <david@fries.net>,
+	Andrei Warkentin <andreiw@motorola.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] work around for l2cap NULL dereference in
+ l2cap_conn_start
+Message-ID: <20110227191545.GB2166@joana>
+References: <20110211035309.GA22204@spacedout.fries.net>
+ <20110214145649.GE2597@joana>
+ <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
+ <20110221043601.GB22204@spacedout.fries.net>
+ <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTimuyx4ixPq5BexRHozebVpjry2k-2xskqVf79g1@mail.gmail.com>
+In-Reply-To: <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vitaly,
+Hi David and Liang,
 
-* Vitaly Wool <vitalywool@gmail.com> [2011-02-26 18:52:44 +0100]:
+* Liang Bao <tim.bao@gmail.com> [2011-02-21 14:41:29 +0800]:
 
-> Hi Gustavo,
+> Hi, David, Andrew et al.
 > 
-> On Sat, Feb 26, 2011 at 2:41 AM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
-> > If we want something "bool" built-in in something "tristate" it can't
-> > "depend on" the tristate config option.
+> 2011/2/21 David Fries <david@fries.net>:
+> > bt_sk(sk)->parent can be NULL in l2cap_conn_start in state BT_CONNECT2
+> > at least when a headset device pairs and the play button was pressed
+> > right before pairing.
 > >
-> > Report by DaveM:
-> >
-> >   I give it 'y' just to make it happen, for both, and afterways no
-> >   matter how many times I rerun "make oldconfig" I keep seeing things
-> >   like this in my build:
-> >
-> > scripts/kconfig/conf --silentoldconfig Kconfig
-> > include/config/auto.conf:986:warning: symbol value 'm' invalid for BT_SCO
-> > include/config/auto.conf:3156:warning: symbol value 'm' invalid for BT_L2CAP
-> >
-> > Reported-by: David S. Miller <davem@davemloft.net>
-> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> > Signed-off-by: David Fries <david@fries.net>
 > > ---
-> >  net/bluetooth/Kconfig |    6 ++++--
-> >  1 files changed, 4 insertions(+), 2 deletions(-)
+> > I removed the printk, can this be merged to the bluetooth next tree?
 > >
-> > diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> > index c6f9c2f..6ae5ec5 100644
-> > --- a/net/bluetooth/Kconfig
-> > +++ b/net/bluetooth/Kconfig
-> > @@ -31,9 +31,10 @@ menuconfig BT
-> >          to Bluetooth kernel modules are provided in the BlueZ packages.  For
-> >          more information, see <http://www.bluez.org/>.
+> > On Mon, Feb 14, 2011 at 03:40:46PM -0600, Andrei Warkentin wrote:
+> >> FWIW still need it in 2.6.36.
 > >
-> > +if BT != n
-> > +
-> >  config BT_L2CAP
-> >        bool "L2CAP protocol support"
-> > -       depends on BT
-> >        select CRC16
-> >        help
-> >          L2CAP (Logical Link Control and Adaptation Protocol) provides
-> > @@ -42,11 +43,12 @@ config BT_L2CAP
+> > Andrei, I'm curious, what's your hardware hardware and bluetooth
+> > device that's trigginer the crash?
+> I  once submitted an issue observed with Android+Motorola S305 stereo
+> headset. It's still open in launchpad:
+> https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/513642. Hope this
+> helps. Thanks.
 > >
-> >  config BT_SCO
-> >        bool "SCO links support"
-> > -       depends on BT
-> >        help
-> >          SCO link provides voice transport over Bluetooth.  SCO support is
-> >          required for voice applications like Headset and Audio.
+> >> On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
+> >> <padovan@profusion.mobi> wrote:
+> >> > Hi David,
+> >> >
+> >> > * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
+> >> >
+> >> >> Here's a patch to avoid a very repeatable crash in the N900.  If I
+> >> >> take a Motorola S305 bluetooth headset that was previously paried with
+> >> >> the N900, turn it on, and press the play button before the headphones
+> >> >> automatically pair with the cell phone, the N900 will crash (and
+> >> >> reboot) in pairing.  If I wait until after they have paired there
+> >> >> isn't any problem.  The patch is against the kernel-power
+> >> >> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
+> >> >> the same, I just haven't gone back to that kernel.
+> >> >
+> >> > This is a very old kernel. You need to check this issue against
+> >> > bluetooth-next-2.6.
 > >
-> > +endif
-> > +
-> 
-> Ugh, isn't it far cleaner to change initial dependencies to "depends
-> on BT != n" ?
+> >  net/bluetooth/l2cap.c |    3 ++-
+> >  1 files changed, 2 insertions(+), 1 deletions(-)
+> >
+> > diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> > index ed83c1f..a7aa4d9 100644
+> > --- a/net/bluetooth/l2cap.c
+> > +++ b/net/bluetooth/l2cap.c
+> > @@ -408,7 +408,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+> >                                        struct sock *parent = bt_sk(sk)->parent;
+> >                                        rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+> >                                        rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+> > -                                       parent->sk_data_ready(parent, 0);
+> > +                                       if(parent)
+> > +                                               parent->sk_data_ready(parent,0);
+> >
+> >                                } else {
+> >                                        sk->sk_state = BT_CONFIG;
 
-I just followed the same approach as net/ipv6/Kconfig and
-net/mac80211/Kconfig. 
+I pushed the following patch to bluetooth-2.6 tree. It should fix the problem
+by avoiding connections to be accepted before a L2CAP info response comes:
 
-Dave, how do you prefer this?
+commit 743400e01a33779f93b79c84a1b0d1a2d27338c8
+Author: Gustavo F. Padovan <padovan@profusion.mobi>
+Date:   Sun Feb 27 16:05:07 2011 -0300
+
+    Bluetooth: Don't accept l2cap connection before info_rsp
+    
+    When using defer_setup accepting a connection before receive the L2CAP
+    Info Response for the connection lead us to a crash in l2cap_conn_start(.
+    
+    Reported-by: David Fries <david@fries.net>
+    Reported-by: Liang Bao <tim.bao@gmail.com>
+    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index c4cf3f5..a8ca42b 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -211,8 +211,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+                        continue;
+                }
+ 
+-               if (sk->sk_state == BT_CONNECTED || !newsock ||
+-                                               bt_sk(parent)->defer_setup) {
++               if ((bt_sk(parent)->defer_setup && sk->sk_state == BT_CONNECT2)
++                               || sk->sk_state == BT_CONNECTED || !newsock) {
+                        bt_accept_unlink(sk);
+                        if (newsock)
+                                sock_graft(sk, newsock);
+
 
 -- 
 Gustavo F. Padovan
