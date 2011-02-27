@@ -1,83 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D69EE46.9050401@lundman.net>
+Date: Sun, 27 Feb 2011 15:25:10 +0900
+From: lundman <lundman@lundman.net>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTikW1upXoEX05vVepE+GFHoFk4_X6m0ur1PYEHFz@mail.gmail.com>
-References: <AANLkTi=yuqTG1MiqN3FHM+2m0OX9QNajq8+xJG_D1-EG@mail.gmail.com>
-	<AANLkTi=qB6WcjkQcp0teuL5DTKKBSSK0ydWD1EtwCh=n@mail.gmail.com>
-	<AANLkTinsnjed16owx=JqCCPa3AMC3P_Z9qLNd8AZ4jyf@mail.gmail.com>
-	<AANLkTi=Z0jaFfeLsNzx9SDJvz-2XCzzTJ++L56rLGZt3@mail.gmail.com>
-	<AANLkTikW1upXoEX05vVepE+GFHoFk4_X6m0ur1PYEHFz@mail.gmail.com>
-Date: Sun, 27 Feb 2011 05:30:57 -0600
-Message-ID: <AANLkTing8htA_TSLQ7ScxC0+KGAo+nHZ+6Amiyet7d5-@mail.gmail.com>
-Subject: Re: HCI core error recovery.
-From: Andrei Warkentin <andreiw@motorola.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Linux 2.6.28-10 Oops in hci_send_to_sock
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Feb 18, 2011 at 2:21 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
-> On Mon, Feb 14, 2011 at 4:23 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
->> On Sat, Feb 12, 2011 at 12:47 AM, Andrei Warkentin <andreiw@motorola.com> wrote:
->>> On Fri, Feb 11, 2011 at 5:07 PM, Andrei Warkentin <andreiw@motorola.com> wrote:
->>>> Dear List,
->>>>
->>>> I've run into an interesting problem. Excuse me in advance if this was
->>>> already covered here, or for my explanations, since I'm not too
->>>> familiar with overall flow within BlueZ or Bluetooth specifics...
->>>> We've had some hardware config issues that resulted in garbage/malformed
->>>> messages arriving via H4 into the HCI layer. We've since resolved
->>>> these, but it got me thinking. The issues would result in certain HCI
->>>> messages being missed, including occasionally disconnect events being
->>>> missed, and a subsequent connect event would result in a double add.
->>>>
->>>> I was thinking about how to fix at the very least the crash. The sysfs
->>>> object is created as a last step after getting a "connection
->>>> completed" HCI message, I think. What I am unsure about is if it's
->>>> safe to just ignore the add if there is already a sysfs entry...
->>>>
->>>> So I would think the HCI core needs some resiliency against
->>>> bad/malignant bluetooth controllers, and perform error
->>>> recovery/resynchronization. Perhaps maybe there is room for a virtual
->>>> hci controller that just injects various message types to see how well
->>>> the core can cope?
->>>>
->>>> Thanks in advance,
->>>> A
->>>
->>> To further explain the issue, here is what was happening -
->>>
->>> 0) A BT device is paired.
->>> 1) Host goes into sleep mode.
->>> 2) BT device turns off.
->>> 3) Host wakes up due to BT waking the host. Due to UART resume issues,
->>> HCI message corrupted. hci_disconn_complete_evt never gets called.
->>> 4) BT device turns on.
->>> 5) devref gets incremented in  hci_conn_complete_evt, and is now 2.
->>> 6) BT device turns off. hci_disconn_complete_evt is called, conn hash
->>> is deleted, but sysfs entry not cleaned up since
->>> atomic_dec_and_test(&conn->devref) != 0.
->>> 7) BT device turns on. sysfs add fails since it never was cleaned up.
->>>
->>> The attached patch takes care of that. I'm not too familiar with BlueZ
->>> (or bluetooth :-(), so I would like your feedback. In particular, I am
->>> unsure about sync connections.
->>> The primary issue overall is that HCI core doesn't handle HCI issues
->>> (whether caused by transport issues, or bad/malicious BT controller).
->>> I am curious if there are other ways to break the core.
->>>
->>> Thanks,
->>> A
->>>
->>
->> Anyone?
->>
->
-> Anyone? Who should I talk to about HCI?
->
 
-Anyone pretty please :)? I'm positive what I'm doing isn't necessarily
-right, but I do think this is a real issue in current BlueZ code that
-needs work. HCI core should be more resilient to HCI transport issues,
-after all, the BT HCI spec does mandate specific behavior.
+Linux-2.6.28 CE41xx kernel, sodaville board.
 
-A
+I turned on more debugging, and added a print for each SK and peppered 
+the logic a little:
+
+[code]
+void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+{
+[snip]
+
+         BT_DBG("filter");
+
+         /* Apply filter */
+         flt = &hci_pi(sk)->filter;
+
+  [snip]
+
+         BT_DBG("type");
+
+         if (bt_cb(skb)->pkt_type == HCI_EVENT_PKT) {
+             register int evt = (*(__u8 *)skb->data & HCI_FLT_EVENT_BITS);
+
+             if (!hci_test_bit(evt, &flt->event_mask))
+                 continue;
+
+             if (flt->opcode &&
+                 ((evt == HCI_EV_CMD_COMPLETE &&
+                   flt->opcode !=                  get_unaligned((__le16 
+*)(skb->data + 3))) ||
+                  (evt == HCI_EV_CMD_STATUS &&
+                   flt->opcode !=
+                   get_unaligned((__le16 *)(skb->data + 4)))))
+                 continue;
+         }
+
+         BT_DBG("clone");
+
+
+[/code]
+
+
+When I start bluetoothd, the panic looks like:
+
+
+[code]
+hci_send_to_sock: hdev 00000000 len 8
+usbcore: registered new interface driver btusb
+hci_sock_create: sock cbd6dd80
+hci_sock_bind: sock cbd6dd80 sk cab87c00
+hci_sock_sendmsg: sock cbd6dd80 sk cab87c00
+hci_sock_release: sock cbd6dd80 sk cab87c00
+hci_sock_create: sock cbd6dd80
+hci_sock_setsockopt: sk cab87e00, opt 2
+hci_sock_bind: sock cbd6dd80 sk cab87e00
+hci_sock_ioctl: cmd 800448d2 arg b7f37208
+hci_sock_create: sock cbdb9000
+hci_sock_bind: sock cbdb9000 sk ca2cd400
+hci_dev_get: 0
+hci_sock_setsockopt: sk ca2cd400, opt 2
+hci_sock_ioctl: cmd 400448e2 arg bff12038
+hci_dev_get: 0
+hci_sock_ioctl: cmd 400448c9 arg 0
+hci_dev_get: 0
+hci_dev_open: hci0 cc308c00
+btusb_open: hci0
+btusb_submit_intr_urb: hci0
+__hci_request: hci0 start
+btusb_intr_complete: hci0 urb ca3bec80 status 0 count 6
+hci_rx_task: hci0
+hci_send_to_sock: hdev cc308c00 len 6
+hci_send_to_sock: skb ca2cd400
+hci_send_to_sock: filter
+hci_send_to_sock: type
+BUG: unable to handle kernel NULL pointer dereference at 00000008
+IP: [<cf108fc8>] hci_send_to_sock+0x83/0x153 [bluetooth]
+*pdpt = 000000000a3d6001 *pde = 0000000000000000
+Oops: 0000 [#1] PREEMPT
+last sysfs file: /sys/class/vc/vcsa1/dev
+Modules linked in: btusb bluetooth fusion pvrsrvkm alsa_shim 
+snd_usb_audio snd_x
+
+Pid: 1783, comm: bluetoothd Not tainted (2.6.28 #1)
+EIP: 0060:[<cf108fc8>] EFLAGS: 00010246 CPU: 0
+EIP is at hci_send_to_sock+0x83/0x153 [bluetooth]
+EAX: 00000008 EBX: ca2cd400 ECX: 00000004 EDX: ffffffff
+ESI: ca2cd408 EDI: 00000102 EBP: cc2a1480 ESP: ca3cbd4c
+  DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 0068
+Process bluetoothd (pid: 1783, ti=ca3ca000 task=ca0e6e60 task.ti=ca3ca000)
+Call Trace:
+  [<cf103ef1>] hci_rx_task+0x54/0x286 [bluetooth]
+  [<c011ee03>] tasklet_action+0x34/0x69
+  [<c011ec7e>] __do_softirq+0x53/0xe7
+  [<cfb2b989>] SystemISRWrapper+0xe/0x24 [pvrsrvkm]
+  [<c013a8dc>] handle_IRQ_event+0x25/0x4a
+  [<c011ed39>] do_softirq+0x27/0x29
+  [<c011ef52>] irq_exit+0x32/0x34
+  [<c0104ed8>] do_IRQ+0x4c/0x94
+  [<c0298eef>] serial8250_console_putchar+0x0/0x1d
+  [<c01039bf>] common_interrupt+0x23/0x28
+  [<c011b494>] vprintk+0x1d3/0x300
+  [<c011b525>] vprintk+0x264/0x300
+  [<c013fe13>] filemap_fault+0x119/0x466
+  [<c011b5dc>] printk+0x1b/0x1f
+  [<cf102fba>] __hci_request+0x48/0xfb [bluetooth]
+  [<cf1034e8>] hci_init_req+0x0/0x158 [bluetooth]
+  [<c01179c5>] default_wake_function+0x0/0x8
+  [<cf103902>] hci_dev_open+0x9a/0x197 [bluetooth]
+  [<c035c98f>] sock_ioctl+0xb0/0x1fc
+  [<c035c8df>] sock_ioctl+0x0/0x1fc
+  [<c016d5f6>] vfs_ioctl+0x1f/0x6d
+  [<c016d7a7>] do_vfs_ioctl+0x52/0x471
+  [<c0111f41>] do_page_fault+0x1b2/0x881
+  [<c0111d8f>] do_page_fault+0x0/0x881
+  [<c043a1c2>] error_code+0x6a/0x70
+  [<c016dbfa>] sys_ioctl+0x34/0x50
+  [<c0102e71>] sysenter_do_call+0x12/0x25
+  [<c0430000>] pci_scan_bridge+0x40/0x3c7
+[/code]
+
+
+Somewhere between 'type' and 'clone', anyone want to throw me a bone?;)
+
+Lund
+
