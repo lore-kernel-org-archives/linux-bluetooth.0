@@ -1,32 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Sun, 27 Feb 2011 17:13:58 -0300
+Date: Sun, 27 Feb 2011 17:12:22 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Feng Tang <feng.tang@intel.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: l2cap: fix a NULL pointer oops in
- l2cap_conn_start
-Message-ID: <20110227201357.GF2166@joana>
-References: <1298361804-11733-1-git-send-email-feng.tang@intel.com>
+To: anderson.briglia@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [PATCH v2] Bluetooth: Use ERR_PTR as return error from
+ hci_connect
+Message-ID: <20110227201222.GE2166@joana>
+References: <y>
+ <4d640a47.a21fec0a.065e.466f@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298361804-11733-1-git-send-email-feng.tang@intel.com>
+In-Reply-To: <4d640a47.a21fec0a.065e.466f@mx.google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Feng,
+Hi Briglia,
 
-* Feng Tang <feng.tang@intel.com> [2011-02-22 16:03:24 +0800]:
+* anderson.briglia@openbossa.org <anderson.briglia@openbossa.org> [2011-02-22 16:10:53 -0300]:
 
-> When I try to setup a PAND connection between the sever and client,
-> the server side always get a NULL pointer oops in l2cap_conn_start()
-> right after the client run "pand -r PANU -c sever_addr". Don't have
-> the boot log as it's an immediate hang.
+> From: Ville Tervo <ville.tervo@nokia.com>
 > 
-> Simply adding this "if (parent)" check will fix it, don't know whether
-> it fix the real problem. Anyway, send it as a hint.
+> Use ERR_PTR mechanism to return error from hci_connect.
+> 
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> ---
+>  net/bluetooth/hci_conn.c   |    4 ++--
+>  net/bluetooth/l2cap_core.c |   10 ++++------
+>  net/bluetooth/mgmt.c       |    4 ++--
+>  net/bluetooth/sco.c        |    6 +++---
+>  4 files changed, 11 insertions(+), 13 deletions(-)
 
-I pushed a proper fix for this issues, see the bluetooth-2.6 tree.
+Patch is applied now, but I had to fix it, your error handling was still
+wrong. Here are the changes I did to your patch:
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0bbb6c6..c9f9cec 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -841,7 +841,7 @@ int l2cap_do_connect(struct sock *sk)
+        struct hci_conn *hcon;
+        struct hci_dev *hdev;
+        __u8 auth_type;
+-       int err = 0;
++       int err;
+ 
+        BT_DBG("%s -> %s psm 0x%2.2x", batostr(src), batostr(dst),
+                                                        l2cap_pi(sk)->psm);
+@@ -869,6 +869,7 @@ int l2cap_do_connect(struct sock *sk)
+        conn = l2cap_conn_add(hcon, 0);
+        if (!conn) {
+                hci_conn_put(hcon);
++               err = -ENOMEM;
+                goto done;
+        }
+ 
+@@ -890,6 +891,8 @@ int l2cap_do_connect(struct sock *sk)
+                        l2cap_do_start(sk);
+        }
+ 
++       err = 0;
++
+ done:
+        hci_dev_unlock_bh(hdev);
+        hci_dev_put(hdev);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 26f2f04..42fdffd 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -204,6 +204,7 @@ static int sco_connect(struct sock *sk)
+        conn = sco_conn_add(hcon, 0);
+        if (!conn) {
+                hci_conn_put(hcon);
++               err = -ENOMEM;
+                goto done;
+        }
+ 
 -- 
 Gustavo F. Padovan
 http://profusion.mobi
