@@ -1,181 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110227202041.GG2166@joana>
-References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
-	<02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
-	<20110227202041.GG2166@joana>
-Date: Sun, 27 Feb 2011 21:49:39 -0300
-Message-ID: <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
+Date: Sun, 27 Feb 2011 17:20:41 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anderson Briglia <anderson.briglia@openbossa.org>
 Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the
  crypto subsystem
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20110227202041.GG2166@joana>
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+ <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Vinicius,
 
-On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Vinicius,
->
-> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-02-21 14:23:51 -0300]:
->
->> This will allow using the crypto subsystem for encrypting data. As SMP
->> (Security Manager Protocol) is implemented almost entirely on the host
->> side and the crypto module already implements the needed methods
->> (AES-128), it makes sense to use it.
->>
->> This patch also adds a new Kconfig option to toggle the SMP support.
->>
->> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
->> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
->> ---
->>  include/net/bluetooth/hci_core.h |    2 ++
->>  net/bluetooth/Kconfig            |    6 ++++++
->>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
->>  net/bluetooth/smp.c              |   17 +++++++++++++++--
->>  4 files changed, 45 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index d5d8454..e8dbde8 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -161,6 +161,8 @@ struct hci_dev {
->>
->>       __u16                   init_last_cmd;
->>
->> +     struct crypto_blkcipher *tfm;
->> +
->>       struct inquiry_cache    inq_cache;
->>       struct hci_conn_hash    conn_hash;
->>       struct list_head        blacklist;
->> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
->> index c6f9c2f..e9f40af 100644
->> --- a/net/bluetooth/Kconfig
->> +++ b/net/bluetooth/Kconfig
->> @@ -22,6 +22,7 @@ menuconfig BT
->>            BNEP Module (Bluetooth Network Encapsulation Protocol)
->>            CMTP Module (CAPI Message Transport Protocol)
->>            HIDP Module (Human Interface Device Protocol)
->> +          SMP Module (Security Manager Protocol)
->>
->>         Say Y here to compile Bluetooth support into the kernel or say M to
->>         compile it as module (bluetooth).
->> @@ -35,11 +36,16 @@ config BT_L2CAP
->>       bool "L2CAP protocol support"
->>       depends on BT
->>       select CRC16
->> +     select CRYPTO_BLKCIPHER
->> +     select CRYPTO_AES
->>       help
->>         L2CAP (Logical Link Control and Adaptation Protocol) provides
->>         connection oriented and connection-less data transport.  L2CAP
->>         support is required for most Bluetooth applications.
->>
->> +       Also included is support for SMP (Security Manager Protocol) which
->> +       is the security layer on top of LE (Low Energy) links.
->> +
->>  config BT_SCO
->>       bool "SCO links support"
->>       depends on BT
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index b372fb8..ff67843 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -42,6 +42,7 @@
->>  #include <linux/notifier.h>
->>  #include <linux/rfkill.h>
->>  #include <linux/timer.h>
->> +#include <linux/crypto.h>
->>  #include <net/sock.h>
->>
->>  #include <asm/system.h>
->> @@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
->>
->>  static DEFINE_RWLOCK(hci_task_lock);
->>
->> +static int enable_smp;
->> +
->>  /* HCI device list */
->>  LIST_HEAD(hci_dev_list);
->>  DEFINE_RWLOCK(hci_dev_list_lock);
->> @@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
->>       tasklet_schedule(&hdev->cmd_task);
->>  }
->>
->> +static struct crypto_blkcipher *alloc_cypher(void)
->> +{
->> +     if (enable_smp)
->> +             return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
->> +
->> +     return ERR_PTR(-ENOTSUPP);
->> +}
->> +
->>  /* Register HCI device */
->>  int hci_register_dev(struct hci_dev *hdev)
->>  {
->> @@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
->>       if (!hdev->workqueue)
->>               goto nomem;
->>
->> +     hdev->tfm = alloc_cypher();
->> +     if (IS_ERR(hdev->tfm))
->> +             BT_INFO("Failed to load transform for ecb(aes): %ld",
->> +                                                     PTR_ERR(hdev->tfm));
->> +
->>       hci_register_sysfs(hdev);
->>
->>       hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
->> @@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
->>                                       !test_bit(HCI_SETUP, &hdev->flags))
->>               mgmt_index_removed(hdev->id);
->>
->> +     if (!IS_ERR(hdev->tfm))
->> +             crypto_free_blkcipher(hdev->tfm);
->> +
->>       hci_notify(hdev, HCI_DEV_UNREG);
->>
->>       if (hdev->rfkill) {
->> @@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
->>               }
->>       }
->>  }
->> +
->> +module_param(enable_smp, bool, 0644);
->> +MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
->
-> This all should be obviously inside smp.c
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-02-21 14:23:51 -0300]:
 
-I have a couple of points against it:
+> This will allow using the crypto subsystem for encrypting data. As SMP
+> (Security Manager Protocol) is implemented almost entirely on the host
+> side and the crypto module already implements the needed methods
+> (AES-128), it makes sense to use it.
+> 
+> This patch also adds a new Kconfig option to toggle the SMP support.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    2 ++
+>  net/bluetooth/Kconfig            |    6 ++++++
+>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
+>  net/bluetooth/smp.c              |   17 +++++++++++++++--
+>  4 files changed, 45 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index d5d8454..e8dbde8 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -161,6 +161,8 @@ struct hci_dev {
+>  
+>  	__u16			init_last_cmd;
+>  
+> +	struct crypto_blkcipher	*tfm;
+> +
+>  	struct inquiry_cache	inq_cache;
+>  	struct hci_conn_hash	conn_hash;
+>  	struct list_head	blacklist;
+> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> index c6f9c2f..e9f40af 100644
+> --- a/net/bluetooth/Kconfig
+> +++ b/net/bluetooth/Kconfig
+> @@ -22,6 +22,7 @@ menuconfig BT
+>  	     BNEP Module (Bluetooth Network Encapsulation Protocol)
+>  	     CMTP Module (CAPI Message Transport Protocol)
+>  	     HIDP Module (Human Interface Device Protocol)
+> +	     SMP Module (Security Manager Protocol)
+>  
+>  	  Say Y here to compile Bluetooth support into the kernel or say M to
+>  	  compile it as module (bluetooth).
+> @@ -35,11 +36,16 @@ config BT_L2CAP
+>  	bool "L2CAP protocol support"
+>  	depends on BT
+>  	select CRC16
+> +	select CRYPTO_BLKCIPHER
+> +	select CRYPTO_AES
+>  	help
+>  	  L2CAP (Logical Link Control and Adaptation Protocol) provides
+>  	  connection oriented and connection-less data transport.  L2CAP
+>  	  support is required for most Bluetooth applications.
+>  
+> +	  Also included is support for SMP (Security Manager Protocol) which
+> +	  is the security layer on top of LE (Low Energy) links.
+> +
+>  config BT_SCO
+>  	bool "SCO links support"
+>  	depends on BT
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index b372fb8..ff67843 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -42,6 +42,7 @@
+>  #include <linux/notifier.h>
+>  #include <linux/rfkill.h>
+>  #include <linux/timer.h>
+> +#include <linux/crypto.h>
+>  #include <net/sock.h>
+>  
+>  #include <asm/system.h>
+> @@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
+>  
+>  static DEFINE_RWLOCK(hci_task_lock);
+>  
+> +static int enable_smp;
+> +
+>  /* HCI device list */
+>  LIST_HEAD(hci_dev_list);
+>  DEFINE_RWLOCK(hci_dev_list_lock);
+> @@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
+>  	tasklet_schedule(&hdev->cmd_task);
+>  }
+>  
+> +static struct crypto_blkcipher *alloc_cypher(void)
+> +{
+> +	if (enable_smp)
+> +		return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+> +
+> +	return ERR_PTR(-ENOTSUPP);
+> +}
+> +
+>  /* Register HCI device */
+>  int hci_register_dev(struct hci_dev *hdev)
+>  {
+> @@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
+>  	if (!hdev->workqueue)
+>  		goto nomem;
+>  
+> +	hdev->tfm = alloc_cypher();
+> +	if (IS_ERR(hdev->tfm))
+> +		BT_INFO("Failed to load transform for ecb(aes): %ld",
+> +							PTR_ERR(hdev->tfm));
+> +
+>  	hci_register_sysfs(hdev);
+>  
+>  	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+> @@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
+>  					!test_bit(HCI_SETUP, &hdev->flags))
+>  		mgmt_index_removed(hdev->id);
+>  
+> +	if (!IS_ERR(hdev->tfm))
+> +		crypto_free_blkcipher(hdev->tfm);
+> +
+>  	hci_notify(hdev, HCI_DEV_UNREG);
+>  
+>  	if (hdev->rfkill) {
+> @@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
+>  		}
+>  	}
+>  }
+> +
+> +module_param(enable_smp, bool, 0644);
+> +MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
 
-1. it's only used for one purpose, it says whether to try or not to
-allocate the block cypher, which is done during the adapter
-registration;
+This all should be obviously inside smp.c
 
-2. If the current way is ok, it would mean that I would need to export
-another method from smp.c, that was something that I tried to
-minimize;
+Regards,
 
-3. and my weakest argument, seems that there are other similar uses,
-for example enable_mgmt.
-
-But if you think the code will be clearer moving that to smp.c, will
-be glad to change.
-
->
-> Regards,
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
-
-
-Cheers,
 -- 
-Vinicius
+Gustavo F. Padovan
+http://profusion.mobi
