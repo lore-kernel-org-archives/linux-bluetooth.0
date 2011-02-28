@@ -1,49 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Feb 2011 14:30:22 -0300
+Date: Mon, 28 Feb 2011 14:28:01 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: David Fries <david@fries.net>
-Cc: Liang Bao <tim.bao@gmail.com>,
-	Andrei Warkentin <andreiw@motorola.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Feng Tang <feng.tang@intel.com>
-Subject: Re: [PATCH] work around for l2cap NULL dereference in
- l2cap_conn_start
-Message-ID: <20110228173022.GC2165@joana>
-References: <20110211035309.GA22204@spacedout.fries.net>
- <20110214145649.GE2597@joana>
- <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
- <20110221043601.GB22204@spacedout.fries.net>
- <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
- <20110227191545.GB2166@joana>
- <20110228050340.GC22204@spacedout.fries.net>
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the
+ crypto subsystem
+Message-ID: <20110228172801.GB2165@joana>
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+ <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
+ <20110227202041.GG2166@joana>
+ <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110228050340.GC22204@spacedout.fries.net>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Vinicius,
 
-* David Fries <david@fries.net> [2011-02-27 23:03:40 -0600]:
+* Vinicius Gomes <vinicius.gomes@openbossa.org> [2011-02-27 21:49:39 -0300]:
 
-> On Sun, Feb 27, 2011 at 04:15:45PM -0300, Gustavo F. Padovan wrote:
-> > I pushed the following patch to bluetooth-2.6 tree. It should fix the problem
-> > by avoiding connections to be accepted before a L2CAP info response comes:
+> Hi Gustavo,
 > 
-> Is
-> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-> the bluetooth-2.6 tree you mentioned?  I don't see your patch there.
-> As a side note, the inline patch in your e-mail has the tabs replaced by
-> spaces, once I changed them, it applied cleanly.
+> On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Vinicius,
+> >
+> > * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-02-21 14:23:51 -0300]:
+> >
+> >> This will allow using the crypto subsystem for encrypting data. As SMP
+> >> (Security Manager Protocol) is implemented almost entirely on the host
+> >> side and the crypto module already implements the needed methods
+> >> (AES-128), it makes sense to use it.
+> >>
+> >> This patch also adds a new Kconfig option to toggle the SMP support.
+> >>
+> >> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> >> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> >> ---
+> >>  include/net/bluetooth/hci_core.h |    2 ++
+> >>  net/bluetooth/Kconfig            |    6 ++++++
+> >>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
+> >>  net/bluetooth/smp.c              |   17 +++++++++++++++--
+> >>  4 files changed, 45 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> index d5d8454..e8dbde8 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -161,6 +161,8 @@ struct hci_dev {
+> >>
+> >>       __u16                   init_last_cmd;
+> >>
+> >> +     struct crypto_blkcipher *tfm;
+> >> +
+> >>       struct inquiry_cache    inq_cache;
+> >>       struct hci_conn_hash    conn_hash;
+> >>       struct list_head        blacklist;
+> >> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> >> index c6f9c2f..e9f40af 100644
+> >> --- a/net/bluetooth/Kconfig
+> >> +++ b/net/bluetooth/Kconfig
+> >> @@ -22,6 +22,7 @@ menuconfig BT
+> >>            BNEP Module (Bluetooth Network Encapsulation Protocol)
+> >>            CMTP Module (CAPI Message Transport Protocol)
+> >>            HIDP Module (Human Interface Device Protocol)
+> >> +          SMP Module (Security Manager Protocol)
+> >>
+> >>         Say Y here to compile Bluetooth support into the kernel or say M to
+> >>         compile it as module (bluetooth).
+> >> @@ -35,11 +36,16 @@ config BT_L2CAP
+> >>       bool "L2CAP protocol support"
+> >>       depends on BT
+> >>       select CRC16
+> >> +     select CRYPTO_BLKCIPHER
+> >> +     select CRYPTO_AES
+> >>       help
+> >>         L2CAP (Logical Link Control and Adaptation Protocol) provides
+> >>         connection oriented and connection-less data transport.  L2CAP
+> >>         support is required for most Bluetooth applications.
+> >>
+> >> +       Also included is support for SMP (Security Manager Protocol) which
+> >> +       is the security layer on top of LE (Low Energy) links.
+> >> +
+> >>  config BT_SCO
+> >>       bool "SCO links support"
+> >>       depends on BT
+> >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> >> index b372fb8..ff67843 100644
+> >> --- a/net/bluetooth/hci_core.c
+> >> +++ b/net/bluetooth/hci_core.c
+> >> @@ -42,6 +42,7 @@
+> >>  #include <linux/notifier.h>
+> >>  #include <linux/rfkill.h>
+> >>  #include <linux/timer.h>
+> >> +#include <linux/crypto.h>
+> >>  #include <net/sock.h>
+> >>
+> >>  #include <asm/system.h>
+> >> @@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
+> >>
+> >>  static DEFINE_RWLOCK(hci_task_lock);
+> >>
+> >> +static int enable_smp;
+> >> +
+> >>  /* HCI device list */
+> >>  LIST_HEAD(hci_dev_list);
+> >>  DEFINE_RWLOCK(hci_dev_list_lock);
+> >> @@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
+> >>       tasklet_schedule(&hdev->cmd_task);
+> >>  }
+> >>
+> >> +static struct crypto_blkcipher *alloc_cypher(void)
+> >> +{
+> >> +     if (enable_smp)
+> >> +             return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+> >> +
+> >> +     return ERR_PTR(-ENOTSUPP);
+> >> +}
+> >> +
+> >>  /* Register HCI device */
+> >>  int hci_register_dev(struct hci_dev *hdev)
+> >>  {
+> >> @@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
+> >>       if (!hdev->workqueue)
+> >>               goto nomem;
+> >>
+> >> +     hdev->tfm = alloc_cypher();
+> >> +     if (IS_ERR(hdev->tfm))
+> >> +             BT_INFO("Failed to load transform for ecb(aes): %ld",
+> >> +                                                     PTR_ERR(hdev->tfm));
+> >> +
+> >>       hci_register_sysfs(hdev);
+> >>
+> >>       hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+> >> @@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
+> >>                                       !test_bit(HCI_SETUP, &hdev->flags))
+> >>               mgmt_index_removed(hdev->id);
+> >>
+> >> +     if (!IS_ERR(hdev->tfm))
+> >> +             crypto_free_blkcipher(hdev->tfm);
+> >> +
+> >>       hci_notify(hdev, HCI_DEV_UNREG);
+> >>
+> >>       if (hdev->rfkill) {
+> >> @@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
+> >>               }
+> >>       }
+> >>  }
+> >> +
+> >> +module_param(enable_smp, bool, 0644);
+> >> +MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
+> >
+> > This all should be obviously inside smp.c
 > 
-> I first reverted to the base N900 kernel-power-2.6.28 46 (none of my
-> changes or debugging), it crashed as expected.  I then applied your
-> patch 743400e0, and it still crashed.  I added back the
-> l2cap_conn_start parent check and some debugging in af_bluetooth.c
-> dmesg debug output and patches follow.
+> I have a couple of points against it:
+> 
+> 1. it's only used for one purpose, it says whether to try or not to
+> allocate the block cypher, which is done during the adapter
+> registration;
+> 
+> 2. If the current way is ok, it would mean that I would need to export
+> another method from smp.c, that was something that I tried to
+> minimize;
+> 
+> 3. and my weakest argument, seems that there are other similar uses,
+> for example enable_mgmt.
 
-I want to see a test with this patch and a recent kernel. We added many fixes
-to stack in the last two years. Can you test this scenario?
+A similar example here is enable_ertm inside l2cap_core.c. It's a L2CAP
+related option and should reside inside L2CAP code.
+
+> 
+> But if you think the code will be clearer moving that to smp.c, will
+> be glad to change.
+
+I don't see the point on have it on hci code. SMP and Block cypher has
+not much to do with HCI. I prefer it on smp.c
 
 -- 
 Gustavo F. Padovan
