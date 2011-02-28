@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH] Adjust prefix of contact id for getting pb size
-Date: Mon, 28 Feb 2011 14:53:43 +0100
-Message-Id: <1298901223-8313-1-git-send-email-michalski.raf@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 4/4] TODO: Add item to implement device type in the DeviceFound signal
+Date: Mon, 28 Feb 2011 10:44:13 -0300
+Message-Id: <1298900653-7567-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298900653-7567-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1298900653-7567-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Getting phonebook size is related to recognizing contacts by their id
-prefixes. Previously it was "contact: " and has been changed to
-"urn:uuid:". This patch fixes it and allows to get valid phonebook size.
 ---
- plugins/phonebook-tracker.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ TODO |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index b204493..99848e3 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -809,7 +809,7 @@
- 	"SELECT COUNT(?c) "						\
- 	"WHERE {"							\
- 		"?c a nco:PersonContact ."				\
--		"FILTER (regex(str(?c), \"contact:\"))"			\
-+		"FILTER (regex(str(?c), \"urn:uuid:\"))"		\
- 	"}"
+diff --git a/TODO b/TODO
+index 9f899b0..4e3585e 100644
+--- a/TODO
++++ b/TODO
+@@ -78,6 +78,12 @@ Low Energy
+   Priority: Medium
+   Complexity: C2
  
- #define MISSED_CALLS_COUNT_QUERY					\
++- Add new property in the DeviceFound signal to report the device type:
++  BR/EDR, single mode or dual-mode.
++
++  Priority: Medium
++  Complexity: C1
++
+ - Privacy: When privacy is enabled in the adapter, LE scanning/connection
+   should use a private address. StartDiscovery method shall be changed and
+   new adapter property shall be added.
 -- 
-1.6.3.3
+1.7.4.1
 
