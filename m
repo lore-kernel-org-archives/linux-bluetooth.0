@@ -1,220 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Dieb Martins <andre.dieb@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH v1] Fix HCI LE advertising report dump
-Date: Mon, 28 Feb 2011 00:58:22 -0300
-Message-Id: <1298865502-12676-1-git-send-email-andre.dieb@signove.com>
+MIME-Version: 1.0
+In-Reply-To: <20110227202041.GG2166@joana>
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+	<02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
+	<20110227202041.GG2166@joana>
+Date: Sun, 27 Feb 2011 21:49:39 -0300
+Message-ID: <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
+Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the
+ crypto subsystem
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-LE advertising report event has only one data block for each report. Thus, we
-can't reuse ext_inquiry_response_dump(), which loops over successive data blocks
-until reaches a zero-length one.
+Hi Gustavo,
 
-This commit introduces ext_inquiry_data_dump(), which dumps a frame containing
-data formatted according to [Vol 3] Part C, Section 8. This function is reused
-by ext_inquiry_response_dump().
+On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> Hi Vinicius,
+>
+> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-02-21 14:23:51 -0300]:
+>
+>> This will allow using the crypto subsystem for encrypting data. As SMP
+>> (Security Manager Protocol) is implemented almost entirely on the host
+>> side and the crypto module already implements the needed methods
+>> (AES-128), it makes sense to use it.
+>>
+>> This patch also adds a new Kconfig option to toggle the SMP support.
+>>
+>> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+>> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+>> ---
+>>  include/net/bluetooth/hci_core.h |    2 ++
+>>  net/bluetooth/Kconfig            |    6 ++++++
+>>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
+>>  net/bluetooth/smp.c              |   17 +++++++++++++++--
+>>  4 files changed, 45 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index d5d8454..e8dbde8 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -161,6 +161,8 @@ struct hci_dev {
+>>
+>>       __u16                   init_last_cmd;
+>>
+>> +     struct crypto_blkcipher *tfm;
+>> +
+>>       struct inquiry_cache    inq_cache;
+>>       struct hci_conn_hash    conn_hash;
+>>       struct list_head        blacklist;
+>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+>> index c6f9c2f..e9f40af 100644
+>> --- a/net/bluetooth/Kconfig
+>> +++ b/net/bluetooth/Kconfig
+>> @@ -22,6 +22,7 @@ menuconfig BT
+>>            BNEP Module (Bluetooth Network Encapsulation Protocol)
+>>            CMTP Module (CAPI Message Transport Protocol)
+>>            HIDP Module (Human Interface Device Protocol)
+>> +          SMP Module (Security Manager Protocol)
+>>
+>>         Say Y here to compile Bluetooth support into the kernel or say M to
+>>         compile it as module (bluetooth).
+>> @@ -35,11 +36,16 @@ config BT_L2CAP
+>>       bool "L2CAP protocol support"
+>>       depends on BT
+>>       select CRC16
+>> +     select CRYPTO_BLKCIPHER
+>> +     select CRYPTO_AES
+>>       help
+>>         L2CAP (Logical Link Control and Adaptation Protocol) provides
+>>         connection oriented and connection-less data transport.  L2CAP
+>>         support is required for most Bluetooth applications.
+>>
+>> +       Also included is support for SMP (Security Manager Protocol) which
+>> +       is the security layer on top of LE (Low Energy) links.
+>> +
+>>  config BT_SCO
+>>       bool "SCO links support"
+>>       depends on BT
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index b372fb8..ff67843 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -42,6 +42,7 @@
+>>  #include <linux/notifier.h>
+>>  #include <linux/rfkill.h>
+>>  #include <linux/timer.h>
+>> +#include <linux/crypto.h>
+>>  #include <net/sock.h>
+>>
+>>  #include <asm/system.h>
+>> @@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
+>>
+>>  static DEFINE_RWLOCK(hci_task_lock);
+>>
+>> +static int enable_smp;
+>> +
+>>  /* HCI device list */
+>>  LIST_HEAD(hci_dev_list);
+>>  DEFINE_RWLOCK(hci_dev_list_lock);
+>> @@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
+>>       tasklet_schedule(&hdev->cmd_task);
+>>  }
+>>
+>> +static struct crypto_blkcipher *alloc_cypher(void)
+>> +{
+>> +     if (enable_smp)
+>> +             return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+>> +
+>> +     return ERR_PTR(-ENOTSUPP);
+>> +}
+>> +
+>>  /* Register HCI device */
+>>  int hci_register_dev(struct hci_dev *hdev)
+>>  {
+>> @@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
+>>       if (!hdev->workqueue)
+>>               goto nomem;
+>>
+>> +     hdev->tfm = alloc_cypher();
+>> +     if (IS_ERR(hdev->tfm))
+>> +             BT_INFO("Failed to load transform for ecb(aes): %ld",
+>> +                                                     PTR_ERR(hdev->tfm));
+>> +
+>>       hci_register_sysfs(hdev);
+>>
+>>       hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+>> @@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
+>>                                       !test_bit(HCI_SETUP, &hdev->flags))
+>>               mgmt_index_removed(hdev->id);
+>>
+>> +     if (!IS_ERR(hdev->tfm))
+>> +             crypto_free_blkcipher(hdev->tfm);
+>> +
+>>       hci_notify(hdev, HCI_DEV_UNREG);
+>>
+>>       if (hdev->rfkill) {
+>> @@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
+>>               }
+>>       }
+>>  }
+>> +
+>> +module_param(enable_smp, bool, 0644);
+>> +MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
+>
+> This all should be obviously inside smp.c
 
-Also adds RSSI parsing to each advertising report.
----
- parser/hci.c |  146 +++++++++++++++++++++++++++++++++------------------------
- 1 files changed, 84 insertions(+), 62 deletions(-)
+I have a couple of points against it:
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 183fa66..e4a3633 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -757,67 +757,83 @@ static char *filterpolicy2str(uint8_t policy)
- 	}
- }
- 
--static inline void ext_inquiry_response_dump(int level, struct frame *frm)
-+static inline void ext_inquiry_data_dump(int level, struct frame *frm,
-+						uint8_t *data)
- {
--	void *ptr = frm->ptr;
--	uint32_t len = frm->len;
--	uint8_t type, length;
-+	uint8_t len = data[0];
-+	uint8_t type;
- 	char *str;
- 	int i;
- 
--	length = get_u8(frm);
-+	if (len == 0)
-+		return;
- 
--	while (length > 0) {
--		type = get_u8(frm);
--		length--;
-+	type = data[1];
-+	data += 2;
-+	len -= 1;
- 
--		switch (type) {
--		case 0x01:
--			p_indent(level, frm);
--			printf("Flags:");
--			for (i = 0; i < length; i++)
--				printf(" 0x%2.2x", *((uint8_t *) (frm->ptr + i)));
--			printf("\n");
--			break;
-+	switch (type) {
-+	case 0x01:
-+		p_indent(level, frm);
-+		printf("Flags:");
-+		for (i = 0; i < len; i++)
-+			printf(" 0x%2.2x", data[i]);
-+		printf("\n");
-+		break;
- 
--		case 0x02:
--		case 0x03:
--			p_indent(level, frm);
--			printf("%s service classes:",
--					type == 0x02 ? "Shortened" : "Complete");
--			for (i = 0; i < length / 2; i++) {
--				uint16_t val = btohs(bt_get_unaligned((uint16_t *) (frm->ptr + (i * 2))));
--				printf(" 0x%4.4x", val);
--			}
--			printf("\n");
--			break;
-+	case 0x02:
-+	case 0x03:
-+		p_indent(level, frm);
-+		printf("%s service classes:",
-+				type == 0x02 ? "Shortened" : "Complete");
- 
--		case 0x08:
--		case 0x09:
--			str = malloc(length + 1);
--			if (str) {
--				snprintf(str, length + 1, "%s", (char *) frm->ptr);
--				for (i = 0; i < length; i++)
--					if (!isprint(str[i]))
--						str[i] = '.';
--				p_indent(level, frm);
--				printf("%s local name: \'%s\'\n",
--					type == 0x08 ? "Shortened" : "Complete", str);
--				free(str);
--			}
--			break;
-+		for (i = 0; i < len / 2; i++) {
-+			uint16_t val;
- 
--		case 0x0a:
--			p_indent(level, frm);
--			printf("TX power level: %d\n", *((uint8_t *) frm->ptr));
--			break;
-+			val = btohs(bt_get_unaligned(((uint16_t *) (data + i * 2))));
-+			printf(" 0x%4.4x", val);
-+		}
-+		printf("\n");
-+		break;
- 
--		default:
-+	case 0x08:
-+	case 0x09:
-+		str = malloc(len + 1);
-+		if (str) {
-+			snprintf(str, len + 1, "%s", (char *) data);
-+			for (i = 0; i < len; i++)
-+				if (!isprint(str[i]))
-+					str[i] = '.';
- 			p_indent(level, frm);
--			printf("Unknown type 0x%02x with %d bytes data\n",
--								type, length);
--			break;
-+			printf("%s local name: \'%s\'\n",
-+				type == 0x08 ? "Shortened" : "Complete", str);
-+			free(str);
- 		}
-+		break;
-+
-+	case 0x0a:
-+		p_indent(level, frm);
-+		printf("TX power level: %d\n", *((uint8_t *) data));
-+		break;
-+
-+	default:
-+		p_indent(level, frm);
-+		printf("Unknown type 0x%02x with %d bytes data\n",
-+							type, len);
-+		break;
-+	}
-+}
-+
-+static inline void ext_inquiry_response_dump(int level, struct frame *frm)
-+{
-+	void *ptr = frm->ptr;
-+	uint32_t len = frm->len;
-+	uint8_t length;
-+
-+	length = get_u8(frm);
-+
-+	while (length > 0) {
-+		ext_inquiry_data_dump(level, frm, frm->ptr);
- 
- 		frm->ptr += length;
- 		frm->len -= length;
-@@ -825,8 +841,10 @@ static inline void ext_inquiry_response_dump(int level, struct frame *frm)
- 		length = get_u8(frm);
- 	}
- 
--	frm->ptr = ptr + (EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
--	frm->len = len + (EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
-+	frm->ptr = ptr +
-+		(EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
-+	frm->len = len +
-+		(EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
- }
- 
- static inline void bdaddr_command_dump(int level, struct frame *frm)
-@@ -3504,14 +3522,12 @@ static inline void evt_le_conn_complete_dump(int level, struct frame *frm)
- 
- static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
- {
--	uint8_t num = get_u8(frm);
--	char addr[18];
--	int i;
-+	uint8_t num_reports = get_u8(frm);
-+	const uint8_t RSSI_SIZE = 1;
- 
--	for (i = 0; i < num; i++) {
-+	while (num_reports--) {
-+		char addr[18];
- 		le_advertising_info *info = frm->ptr;
--		void *ptr = frm->ptr;
--		uint32_t len = frm->len;
- 
- 		p_ba2str(&info->bdaddr, addr);
- 
-@@ -3522,13 +3538,19 @@ static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
- 		printf("bdaddr %s (%s)\n", addr,
- 					bdaddrtype2str(info->bdaddr_type));
- 
--		frm->ptr += LE_ADVERTISING_INFO_SIZE;
--		frm->len -= LE_ADVERTISING_INFO_SIZE;
-+		if (info->length > 0) {
-+			ext_inquiry_data_dump(level, frm,
-+					((uint8_t *) &info->length) + 1);
-+		}
- 
--		ext_inquiry_response_dump(level, frm);
-+		frm->ptr += LE_ADVERTISING_INFO_SIZE + info->length;
-+		frm->len -= LE_ADVERTISING_INFO_SIZE + info->length;
-+
-+		p_indent(level, frm);
-+		printf("RSSI: %d\n", ((int8_t *) frm->ptr)[frm->len - 1]);
- 
--		frm->ptr = ptr + 1;
--		frm->len = len - 1;
-+		frm->ptr += RSSI_SIZE;
-+		frm->len -= RSSI_SIZE;
- 	}
- }
- 
+1. it's only used for one purpose, it says whether to try or not to
+allocate the block cypher, which is done during the adapter
+registration;
+
+2. If the current way is ok, it would mean that I would need to export
+another method from smp.c, that was something that I tried to
+minimize;
+
+3. and my weakest argument, seems that there are other similar uses,
+for example enable_mgmt.
+
+But if you think the code will be clearer moving that to smp.c, will
+be glad to change.
+
+>
+> Regards,
+>
+> --
+> Gustavo F. Padovan
+> http://profusion.mobi
+>
+
+
+Cheers,
 -- 
-1.7.1
-
+Vinicius
