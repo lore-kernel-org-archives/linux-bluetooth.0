@@ -1,165 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Feb 2011 23:03:40 -0600
-From: David Fries <david@fries.net>
-To: Liang Bao <tim.bao@gmail.com>,
-	Andrei Warkentin <andreiw@motorola.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Feng Tang <feng.tang@intel.com>
-Subject: Re: [PATCH] work around for l2cap NULL dereference in
- l2cap_conn_start
-Message-ID: <20110228050340.GC22204@spacedout.fries.net>
-References: <20110211035309.GA22204@spacedout.fries.net>
- <20110214145649.GE2597@joana>
- <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
- <20110221043601.GB22204@spacedout.fries.net>
- <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
- <20110227191545.GB2166@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110227191545.GB2166@joana>
+From: Andre Dieb Martins <andre.dieb@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH v1] Fix HCI LE advertising report dump
+Date: Mon, 28 Feb 2011 00:58:22 -0300
+Message-Id: <1298865502-12676-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Feb 27, 2011 at 04:15:45PM -0300, Gustavo F. Padovan wrote:
-> I pushed the following patch to bluetooth-2.6 tree. It should fix the problem
-> by avoiding connections to be accepted before a L2CAP info response comes:
+LE advertising report event has only one data block for each report. Thus, we
+can't reuse ext_inquiry_response_dump(), which loops over successive data blocks
+until reaches a zero-length one.
 
-Is
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-the bluetooth-2.6 tree you mentioned?  I don't see your patch there.
-As a side note, the inline patch in your e-mail has the tabs replaced by
-spaces, once I changed them, it applied cleanly.
+This commit introduces ext_inquiry_data_dump(), which dumps a frame containing
+data formatted according to [Vol 3] Part C, Section 8. This function is reused
+by ext_inquiry_response_dump().
 
-I first reverted to the base N900 kernel-power-2.6.28 46 (none of my
-changes or debugging), it crashed as expected.  I then applied your
-patch 743400e0, and it still crashed.  I added back the
-l2cap_conn_start parent check and some debugging in af_bluetooth.c
-dmesg debug output and patches follow.
-
-I haven't at all looked into the bluetooth protocol, but what connect
-sequence difference does it make if I power on the bluetooth headset
-and press play on the headset before it automatically pairs with the
-N900, vs power on bluetooth headset, wait for it to pair then press
-play?  I ask this partly because I'm curiouse, but mostly how I
-trigger the bug.  This is with pulse audio running, but no
-applications playing audio or responding to a play event from the
-headset.
-
-[  443.424560] bt_accept_dequeue, parent cd54ba00 newsock c81f0180, defer_setup && BT_CONNECT2
-[  443.427368] avoided crash in l2cap_conn_start sk c6d3f600 result 1 status 2
-[  443.518463] bt_accept_dequeue, parent cdee9c00 newsock c81f0000, BT_CONNECTED
-[  443.729736] bt_accept_dequeue, parent cd54be00 newsock c81f0000, BT_CONNECTED
-[  443.813537] bt_accept_dequeue, parent cd54b600 newsock c81f0180, defer_setup && BT_CONNECT2
-
->From 5bc80fafac43b6698e271f1246cb24e596bf2ef1 Mon Sep 17 00:00:00 2001
-From: David Fries <david@fries.net>
-Date: Sun, 6 Feb 2011 14:34:49 -0600
-Subject: [PATCH 1/2] work around for l2cap NULL dereference in l2cap_conn_start print sk
-
+Also adds RSSI parsing to each advertising report.
 ---
- net/bluetooth/l2cap.c |   11 ++++++++++-
- 1 files changed, 10 insertions(+), 1 deletions(-)
+ parser/hci.c |  146 +++++++++++++++++++++++++++++++++------------------------
+ 1 files changed, 84 insertions(+), 62 deletions(-)
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index fda7741..ff05f51 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -400,7 +400,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 					struct sock *parent = bt_sk(sk)->parent;
- 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
--					parent->sk_data_ready(parent, 0);
-+					if(!parent) {
-+						printk(KERN_DEBUG "avoided "
-+							"crash in %s sk %p "
-+							"result %d status %d\n",
-+							__func__, sk,
-+							rsp.result, rsp.status);
-+					} else {
-+						parent->sk_data_ready(parent,
-+							0);
-+					}
+diff --git a/parser/hci.c b/parser/hci.c
+index 183fa66..e4a3633 100644
+--- a/parser/hci.c
++++ b/parser/hci.c
+@@ -757,67 +757,83 @@ static char *filterpolicy2str(uint8_t policy)
+ 	}
+ }
  
- 				} else {
- 					sk->sk_state = BT_CONFIG;
--- 
-1.7.2.3
-
-
->From 42b9a6ef68a1cd0ef025b826afcfb0ef23342fe5 Mon Sep 17 00:00:00 2001
-From: David Fries <david@fries.net>
-Date: Sun, 27 Feb 2011 21:50:14 -0600
-Subject: [PATCH 2/2] af_bluetooth.c debug
-
----
- net/bluetooth/af_bluetooth.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 8e910f1..57cd360 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -211,6 +211,18 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 			continue;
+-static inline void ext_inquiry_response_dump(int level, struct frame *frm)
++static inline void ext_inquiry_data_dump(int level, struct frame *frm,
++						uint8_t *data)
+ {
+-	void *ptr = frm->ptr;
+-	uint32_t len = frm->len;
+-	uint8_t type, length;
++	uint8_t len = data[0];
++	uint8_t type;
+ 	char *str;
+ 	int i;
+ 
+-	length = get_u8(frm);
++	if (len == 0)
++		return;
+ 
+-	while (length > 0) {
+-		type = get_u8(frm);
+-		length--;
++	type = data[1];
++	data += 2;
++	len -= 1;
+ 
+-		switch (type) {
+-		case 0x01:
+-			p_indent(level, frm);
+-			printf("Flags:");
+-			for (i = 0; i < length; i++)
+-				printf(" 0x%2.2x", *((uint8_t *) (frm->ptr + i)));
+-			printf("\n");
+-			break;
++	switch (type) {
++	case 0x01:
++		p_indent(level, frm);
++		printf("Flags:");
++		for (i = 0; i < len; i++)
++			printf(" 0x%2.2x", data[i]);
++		printf("\n");
++		break;
+ 
+-		case 0x02:
+-		case 0x03:
+-			p_indent(level, frm);
+-			printf("%s service classes:",
+-					type == 0x02 ? "Shortened" : "Complete");
+-			for (i = 0; i < length / 2; i++) {
+-				uint16_t val = btohs(bt_get_unaligned((uint16_t *) (frm->ptr + (i * 2))));
+-				printf(" 0x%4.4x", val);
+-			}
+-			printf("\n");
+-			break;
++	case 0x02:
++	case 0x03:
++		p_indent(level, frm);
++		printf("%s service classes:",
++				type == 0x02 ? "Shortened" : "Complete");
+ 
+-		case 0x08:
+-		case 0x09:
+-			str = malloc(length + 1);
+-			if (str) {
+-				snprintf(str, length + 1, "%s", (char *) frm->ptr);
+-				for (i = 0; i < length; i++)
+-					if (!isprint(str[i]))
+-						str[i] = '.';
+-				p_indent(level, frm);
+-				printf("%s local name: \'%s\'\n",
+-					type == 0x08 ? "Shortened" : "Complete", str);
+-				free(str);
+-			}
+-			break;
++		for (i = 0; i < len / 2; i++) {
++			uint16_t val;
+ 
+-		case 0x0a:
+-			p_indent(level, frm);
+-			printf("TX power level: %d\n", *((uint8_t *) frm->ptr));
+-			break;
++			val = btohs(bt_get_unaligned(((uint16_t *) (data + i * 2))));
++			printf(" 0x%4.4x", val);
++		}
++		printf("\n");
++		break;
+ 
+-		default:
++	case 0x08:
++	case 0x09:
++		str = malloc(len + 1);
++		if (str) {
++			snprintf(str, len + 1, "%s", (char *) data);
++			for (i = 0; i < len; i++)
++				if (!isprint(str[i]))
++					str[i] = '.';
+ 			p_indent(level, frm);
+-			printf("Unknown type 0x%02x with %d bytes data\n",
+-								type, length);
+-			break;
++			printf("%s local name: \'%s\'\n",
++				type == 0x08 ? "Shortened" : "Complete", str);
++			free(str);
  		}
++		break;
++
++	case 0x0a:
++		p_indent(level, frm);
++		printf("TX power level: %d\n", *((uint8_t *) data));
++		break;
++
++	default:
++		p_indent(level, frm);
++		printf("Unknown type 0x%02x with %d bytes data\n",
++							type, len);
++		break;
++	}
++}
++
++static inline void ext_inquiry_response_dump(int level, struct frame *frm)
++{
++	void *ptr = frm->ptr;
++	uint32_t len = frm->len;
++	uint8_t length;
++
++	length = get_u8(frm);
++
++	while (length > 0) {
++		ext_inquiry_data_dump(level, frm, frm->ptr);
  
-+		if (bt_sk(parent)->defer_setup && sk->sk_state == BT_CONNECT2)
-+			printk("%s, parent %p newsock %p, "
-+				"defer_setup && BT_CONNECT2\n", __func__,
-+				parent, newsock);
-+		if (sk->sk_state == BT_CONNECTED)
-+			printk("%s, parent %p newsock %p, "
-+				"BT_CONNECTED\n", __func__,
-+				parent, newsock);
-+		if (!newsock)
-+			printk("%s, parent %p newsock %p, "
-+				"!newsock\n", __func__,
-+				parent, newsock);
- 		if ((bt_sk(parent)->defer_setup && sk->sk_state == BT_CONNECT2)
- 				|| sk->sk_state == BT_CONNECTED || !newsock) {
- 			bt_accept_unlink(sk);
--- 
-1.7.2.3
-
+ 		frm->ptr += length;
+ 		frm->len -= length;
+@@ -825,8 +841,10 @@ static inline void ext_inquiry_response_dump(int level, struct frame *frm)
+ 		length = get_u8(frm);
+ 	}
  
-> commit 743400e01a33779f93b79c84a1b0d1a2d27338c8
-> Author: Gustavo F. Padovan <padovan@profusion.mobi>
-> Date:   Sun Feb 27 16:05:07 2011 -0300
-> 
->     Bluetooth: Don't accept l2cap connection before info_rsp
->     
->     When using defer_setup accepting a connection before receive the L2CAP
->     Info Response for the connection lead us to a crash in l2cap_conn_start(.
->     
->     Reported-by: David Fries <david@fries.net>
->     Reported-by: Liang Bao <tim.bao@gmail.com>
->     Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> 
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index c4cf3f5..a8ca42b 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -211,8 +211,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
->                         continue;
->                 }
->  
-> -               if (sk->sk_state == BT_CONNECTED || !newsock ||
-> -                                               bt_sk(parent)->defer_setup) {
-> +               if ((bt_sk(parent)->defer_setup && sk->sk_state == BT_CONNECT2)
-> +                               || sk->sk_state == BT_CONNECTED || !newsock) {
->                         bt_accept_unlink(sk);
->                         if (newsock)
->                                 sock_graft(sk, newsock);
-> 
-> 
-> -- 
-> Gustavo F. Padovan
-> http://profusion.mobi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+-	frm->ptr = ptr + (EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
+-	frm->len = len + (EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
++	frm->ptr = ptr +
++		(EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
++	frm->len = len +
++		(EXTENDED_INQUIRY_INFO_SIZE - INQUIRY_INFO_WITH_RSSI_SIZE);
+ }
+ 
+ static inline void bdaddr_command_dump(int level, struct frame *frm)
+@@ -3504,14 +3522,12 @@ static inline void evt_le_conn_complete_dump(int level, struct frame *frm)
+ 
+ static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
+ {
+-	uint8_t num = get_u8(frm);
+-	char addr[18];
+-	int i;
++	uint8_t num_reports = get_u8(frm);
++	const uint8_t RSSI_SIZE = 1;
+ 
+-	for (i = 0; i < num; i++) {
++	while (num_reports--) {
++		char addr[18];
+ 		le_advertising_info *info = frm->ptr;
+-		void *ptr = frm->ptr;
+-		uint32_t len = frm->len;
+ 
+ 		p_ba2str(&info->bdaddr, addr);
+ 
+@@ -3522,13 +3538,19 @@ static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
+ 		printf("bdaddr %s (%s)\n", addr,
+ 					bdaddrtype2str(info->bdaddr_type));
+ 
+-		frm->ptr += LE_ADVERTISING_INFO_SIZE;
+-		frm->len -= LE_ADVERTISING_INFO_SIZE;
++		if (info->length > 0) {
++			ext_inquiry_data_dump(level, frm,
++					((uint8_t *) &info->length) + 1);
++		}
+ 
+-		ext_inquiry_response_dump(level, frm);
++		frm->ptr += LE_ADVERTISING_INFO_SIZE + info->length;
++		frm->len -= LE_ADVERTISING_INFO_SIZE + info->length;
++
++		p_indent(level, frm);
++		printf("RSSI: %d\n", ((int8_t *) frm->ptr)[frm->len - 1]);
+ 
+-		frm->ptr = ptr + 1;
+-		frm->len = len - 1;
++		frm->ptr += RSSI_SIZE;
++		frm->len -= RSSI_SIZE;
+ 	}
+ }
+ 
 -- 
-David Fries <david@fries.net>
-http://fries.net/~david/ (PGP encryption key available)
+1.7.1
+
