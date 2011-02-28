@@ -1,167 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <635561.59590.qm@web161820.mail.bf1.yahoo.com>
-Date: Mon, 28 Feb 2011 14:29:07 -0800 (PST)
-From: Mikko Vinni <mmvinni@yahoo.com>
-Subject: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: "Justin P. Mattock" <justinmattock@gmail.com>,
-	Ed Tomlinson <edt@aei.ca>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Johan Hedberg <johan.hedberg@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: Arun Kumar Singh <arunkat@gmail.com>
+Subject: [PATCH 4/5] hcitool: Add command to read size of LE White List
+Date: Mon, 28 Feb 2011 15:18:53 -0300
+Message-Id: <1298917134-8229-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298917134-8229-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1298917134-8229-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+From: Arun Kumar Singh <arunkat@gmail.com>
 
-Just wondering what is the status of "bluetooth disabled with current 
-2.6.38-rc4"
-from Justin (http://www.spinics.net/lists/linux-bluetooth/msg10745.html) and
-"[BUG] usb problems in .38-rc3+"" (http://marc.info/?t=129693396800003&r=1&w=2)
-from Ed? (apologies for not being able to reply to those threads)
+---
+ lib/hci.c       |   27 +++++++++++++++++++++++++++
+ lib/hci_lib.h   |    1 +
+ tools/hcitool.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 0 deletions(-)
 
-The first one because I think I see the same problem and the second one because
-for me also "hciconfig -a" makes the bluetooth adapter work. Maybe they have
-a common cause.
+diff --git a/lib/hci.c b/lib/hci.c
+index 0e1518c..9184e09 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -1349,6 +1349,33 @@ int hci_le_rm_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type, int to)
+ 	return 0;
+ }
+ 
++int hci_le_read_white_list_size(int dd, uint8_t *size, int to)
++{
++	struct hci_request rq;
++	le_read_white_list_size_rp rp;
++
++	memset(&rp, 0, sizeof(rp));
++	memset(&rq, 0, sizeof(rq));
++
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_READ_WHITE_LIST_SIZE;
++	rq.rparam = &rp;
++	rq.rlen = LE_READ_WHITE_LIST_SIZE_RP_SIZE;
++
++	if (hci_send_req(dd, &rq, to) < 0)
++		return -1;
++
++	if (rp.status) {
++		errno = EIO;
++		return -1;
++	}
++
++	if (size)
++		*size = rp.size;
++
++	return 0;
++}
++
+ int hci_read_local_name(int dd, int len, char *name, int to)
+ {
+ 	read_local_name_rp rp;
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index e894e8e..ce1bb6c 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -133,6 +133,7 @@ int hci_le_conn_update(int dd, uint16_t handle, uint16_t min_interval,
+ 			uint16_t supervision_timeout, int to);
+ int hci_le_add_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type, int to);
+ int hci_le_rm_white_list(int dd, const bdaddr_t *bdaddr, uint8_t type, int to);
++int hci_le_read_white_list_size(int dd, uint8_t *size, int to);
+ int hci_for_each_dev(int flag, int(*func)(int dd, int dev_id, long arg), long arg);
+ int hci_get_route(bdaddr_t *bdaddr);
+ 
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index bf0f25d..427edc2 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2656,6 +2656,52 @@ static void cmd_lewlrm(int dev_id, int argc, char **argv)
+ 	}
+ }
+ 
++static struct option lewlsz_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++static const char *lewlsz_help =
++	"Usage:\n"
++	"\tlewlsz\n";
++
++static void cmd_lewlsz(int dev_id, int argc, char **argv)
++{
++	int err, dd, opt;
++	uint8_t size;
++
++	for_each_opt(opt, lewlsz_options, NULL) {
++		switch (opt) {
++		default:
++			printf("%s", lewlsz_help);
++			return;
++		}
++	}
++
++	helper_arg(0, 0, &argc, &argv, lewlsz_help);
++
++	if (dev_id < 0)
++		dev_id = hci_get_route(NULL);
++
++	dd = hci_open_dev(dev_id);
++	if (dd < 0) {
++		perror("Could not open device");
++		exit(1);
++	}
++
++	err = hci_le_read_white_list_size(dd, &size, 1000);
++	hci_close_dev(dd);
++
++	if (err < 0) {
++		err = errno;
++		fprintf(stderr, "Can't read white list size: %s(%d)\n",
++							strerror(err), err);
++		exit(1);
++	}
++
++	printf("White list size: %d\n", size);
++}
++
+ static struct option ledc_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+@@ -2819,6 +2865,7 @@ static struct {
+ 	{ "lescan",   cmd_lescan,  "Start LE scan"                        },
+ 	{ "lewladd",  cmd_lewladd, "Add device to LE White List"          },
+ 	{ "lewlrm",   cmd_lewlrm,  "Remove device from LE White List"     },
++	{ "lewlsz",   cmd_lewlsz,  "Read size of LE White List"           },
+ 	{ "lecc",     cmd_lecc,    "Create a LE Connection"               },
+ 	{ "ledc",     cmd_ledc,    "Disconnect a LE Connection"           },
+ 	{ "lecup",    cmd_lecup,   "LE Connection Update"                 },
+-- 
+1.7.4.1
 
-For me, reverting 23bb57633df ("Bluetooth: Fix __hci_request synchronization
-for hci_open_dev"; suggested by Justin) on top of
-2.6.38-rc6-166-g493f335 makes everything work as before.
-
-bluez version and bluetooth adapter model:
-
-[root@koni ~]# pacman -Qo /usr/sbin/bluetoothd
-/usr/sbin/bluetoothd is owned by bluez 4.89-1
-[root@koni ~]# lsusb | grep i.Tech
-Bus 003 Device 002: ID 13dd:0001 i.Tech Dynamic Limited
-
-Part of bluetoothd -d dump below. The printout only really got started when
-I run "hciconfig -a" after 22:01:42 (hciconfig hci0 down and hciconfig hci0 up
-can also be used to make it work):
-
-[root@koni ~]# hciconfig
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: 00:0D:3C:38:xx:yy  ACL MTU: 384:8  SCO MTU: 64:8
-        UP RUNNING
-        RX bytes:356 acl:0 sco:0 events:13 errors:0
-        TX bytes:53 acl:0 sco:0 commands:13 errors:0
-
-[root@koni ~]# date
-Mon Feb 28 22:01:42 EET 2011
-[root@koni ~]# hciconfig -a
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: 00:0D:3C:38:xx:yy  ACL MTU: 384:8  SCO MTU: 64:8
-        UP RUNNING
-        RX bytes:356 acl:0 sco:0 events:13 errors:0
-        TX bytes:53 acl:0 sco:0 commands:13 errors:0
-        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DH1 HV1
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'CSR - bc4'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Version: 2.0 (0x3)  Revision: 0x7a6
-        LMP Version: 2.0 (0x3)  Subversion: 0x7a6
-        Manufacturer: Cambridge Silicon Radio (10)
-
-
-Feb 28 21:55:39 koni bluetoothd[3256]: src/rfkill.c:rfkill_event() RFKILL event 
-idx 0 type 1 op 0 soft 1 hard 0
-Feb 28 21:55:39 koni bluetoothd[3256]: plugins/hciops.c:init_known_adapters() 
-Feb 28 21:56:14 koni blueman-mechanism: Starting blueman-mechanism 
-Feb 28 21:56:14 koni kernel: fuse init (API version 7.16)
-Feb 28 21:56:14 koni blueman-mechanism: reload 0 0 
-Feb 28 21:56:15 koni kernel: Bluetooth: RFCOMM TTY layer initialized
-Feb 28 21:56:15 koni kernel: Bluetooth: RFCOMM socket layer initialized
-Feb 28 21:56:15 koni kernel: Bluetooth: RFCOMM ver 1.11
-Feb 28 21:56:28 koni kernel: usb 6-1: new full speed USB device using ohci_hcd 
-and address 2
-Feb 28 21:56:29 koni kernel: usb 6-1: New USB device found, idVendor=13dd, 
-idProduct=0001
-Feb 28 21:56:29 koni kernel: usb 6-1: New USB device strings: Mfr=1, Product=2, 
-SerialNumber=0
-Feb 28 21:56:29 koni kernel: usb 6-1: Product: BlueCON U2
-Feb 28 21:56:29 koni kernel: usb 6-1: Manufacturer: i.Tech Dynamic
-Feb 28 21:56:29 koni kernel: Bluetooth: Generic Bluetooth USB driver ver 0.6
-Feb 28 21:56:29 koni bluetoothd[3256]: src/rfkill.c:rfkill_event() RFKILL event 
-idx 1 type 2 op 0 soft 0 hard 0
-Feb 28 21:56:29 koni bluetoothd[3256]: HCI dev 0 registered
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:init_device() hci0
-Feb 28 21:56:29 koni bluetoothd[3256]: Listening for HCI events on hci0
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:init_device() child 3317 
-forked
-Feb 28 21:56:29 koni bluetoothd[3256]: src/rfkill.c:rfkill_event() RFKILL event 
-idx 1 type 2 op 2 soft 0 hard 0
-Feb 28 21:56:29 koni kernel: usbcore: registered new interface driver btusb
-Feb 28 21:56:29 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_version_complete() Got version for hci0
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:read_bd_addr_complete() 
-hci0 status 0
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:read_bd_addr_complete() 
-Got bdaddr for hci0
-Feb 28 21:56:29 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_name_complete() hci0 status 0
-Feb 28 21:56:29 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_name_complete() Got name for hci0
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:child_exit() child 3317 
-exited
-Feb 28 21:56:29 koni bluetoothd[3256]: HCI dev 0 up
-Feb 28 21:56:29 koni bluetoothd[3256]: plugins/hciops.c:device_devup_setup() 
-hci0
-Feb 28 21:56:44 koni blueman-mechanism: Exiting 
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_name_complete() hci0 status 0
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_name_complete() Got name for hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-plugins/hciops.c:read_local_features_complete() Got features for hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: src/adapter.c:btd_adapter_ref() 
-0x7f2d7b862e10: ref=1
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:hciops_read_bdaddr() 
-hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-plugins/hciops.c:hciops_read_local_version() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-plugins/hciops.c:hciops_read_local_features() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: 
-src/sdpd-database.c:sdp_init_services_list() 
-
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:hciops_add_uuid() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:update_service_classes() 
-hci0 value 0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:hciops_add_uuid() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:update_service_classes() 
-hci0 value 0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:hciops_add_uuid() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:update_service_classes() 
-hci0 value 16
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:hciops_add_uuid() hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/hciops.c:update_service_classes() 
-hci0 value 16
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/service.c:register_interface() 
-path /org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: plugins/service.c:register_interface() 
-Registered interface org.bluez.Service on path /org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: network/manager.c:network_server_probe() 
-path /org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: src/adapter.c:btd_adapter_ref() 
-0x7f2d7b862e10: ref=2
-Feb 28 22:01:45 koni bluetoothd[3256]: network/server.c:server_register() 
-Registered interface org.bluez.NetworkServer on path /org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: serial/manager.c:proxy_probe() path 
-/org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: src/adapter.c:btd_adapter_ref() 
-0x7f2d7b862e10: ref=3
-Feb 28 22:01:45 koni bluetoothd[3256]: serial/proxy.c:proxy_register() 
-Registered interface org.bluez.SerialProxyManager on path /org/bluez/3256/hci0
-Feb 28 22:01:45 koni bluetoothd[3256]: src/adapter.c:btd_adapter_ref() 
-0x7f2d7b862e10: ref=4
-...
-
-Mikko
-
-
-      
