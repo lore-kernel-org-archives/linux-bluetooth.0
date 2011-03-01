@@ -1,35 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 0/4] Support for OOB in mgmt interface
-Date: Tue, 1 Mar 2011 18:23:32 +0100
-Message-ID: <1299000216-6570-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1298970756-32328-1-git-send-email-greg.whiteley@gmail.com>
+References: <1298970756-32328-1-git-send-email-greg.whiteley@gmail.com>
+From: "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Tue, 1 Mar 2011 09:04:07 -0800
+Message-ID: <AANLkTi=PK9v0O6T9AMnTB66e4c6CQQm2bjzhpAxSC9JQ@mail.gmail.com>
+Subject: Re: [PATCH] compat-wireless: rt2800pci (and rt2x00pci) don't unload
+ on 'make unload'
+To: Greg Whiteley <greg.whiteley@gmail.com>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Patches rebased to match changes after moving index to mgmt_hdr.
-Dropped patches already applied.
+On Tue, Mar 1, 2011 at 1:12 AM, Greg Whiteley <greg.whiteley@gmail.com> wrote:
+> Add missing module names to scripts/unload.sh
+>
+> Signed-off-by: Greg Whiteley
 
-BR,
-Szymon Janc
-on behalf of ST-Ericsson
+Thanks! SOB must have the e-mail address too next time.
 
-Szymon Janc (4):
-  Bluetooth: Rename cmd to cmd_params in pending_cmd
-  Bluetooth: Allow for NULL data in mgmt_pending_add
-  Bluetooth: Add read_local_oob_data management command
-  Bluetooth: Add add/remove_remote_oob_data management commands
-
- include/net/bluetooth/hci.h      |   26 ++++++
- include/net/bluetooth/hci_core.h |   18 ++++
- include/net/bluetooth/mgmt.h     |   18 ++++
- net/bluetooth/hci_core.c         |   76 ++++++++++++++++
- net/bluetooth/hci_event.c        |   56 ++++++++++++-
- net/bluetooth/mgmt.c             |  175 ++++++++++++++++++++++++++++++++++++--
- 6 files changed, 361 insertions(+), 8 deletions(-)
-
+  Luis
