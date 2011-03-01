@@ -1,180 +1,396 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] Bluetooth: Add counter for not acked HCI commands
-Date: Tue, 1 Mar 2011 19:16:09 +0100
-Message-ID: <1299003369-17901-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 4/4] Bluetooth: Add add/remove_remote_oob_data management commands
+Date: Tue, 1 Mar 2011 18:23:36 +0100
+Message-ID: <1299000216-6570-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1299000216-6570-1-git-send-email-szymon.janc@tieto.com>
+References: <1299000216-6570-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds counter for HCI commands which were sent but are not yet acked.
-This is to prevent race conditions in scenarios where HCI commands
-are sent between complete event and command status event, i.e.
-last sent HCI command is not accounted in credits number returned
-by command status event.
+This patch adds commands to add and remove remote OOB data to the managment
+interface. Remote data is stored in kernel and used by corresponding HCI
+commands and events (also implemented in this patch) when needed.
 
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:23:76:E3:24:58 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 1 bdaddr 00:23:76:E3:24:58 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 1
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 2
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 1 slots 5
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 1
-    Features: 0xbf 0xfe 0x8f 0xfe 0x9b 0xff 0x79 0x83
-< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
-    handle 1 page 1
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 2
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> HCI Event: Read Remote Extended Features (0x23) plen 13
-    status 0x00 handle 1 page 1 max 1
-    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 1
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 2
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:23:76:E3:24:58 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:23:76:E3:24:58
-
-Following command should not be sent here since we have effectively no
-credits for HCI command, i.e. 1 credit returned by CS for Authentication
-Requested was already consumed by Remote Name Request.
-
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-    bdaddr 00:23:76:E3:24:58
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Negative Reply (0x01|0x000c) ncmd 0
-    status 0x0c bdaddr 00:23:76:E3:24:58
-    Error: Command Disallowed
-
-Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   10 ++++++++--
- net/bluetooth/hci_event.c        |    8 ++++++--
- 3 files changed, 15 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci.h      |   19 +++++++++
+ include/net/bluetooth/hci_core.h |   16 ++++++++
+ include/net/bluetooth/mgmt.h     |   12 ++++++
+ net/bluetooth/hci_core.c         |   76 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   41 ++++++++++++++++++++-
+ net/bluetooth/mgmt.c             |   75 +++++++++++++++++++++++++++++++++++++
+ 6 files changed, 238 insertions(+), 1 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 20840dc..b37ed33 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -426,6 +426,20 @@ struct hci_rp_user_confirm_reply {
+ 
+ #define HCI_OP_USER_CONFIRM_NEG_REPLY	0x042d
+ 
++
++#define HCI_OP_REMOTE_OOB_DATA_REPLY	0x0430
++struct hci_cp_remote_oob_data_reply {
++	bdaddr_t bdaddr;
++	__u8     hash[16];
++	__u8     randomizer[16];
++} __packed;
++
++#define HCI_OP_REMOTE_OOB_DATA_NEG_REPLY	0x0433
++struct hci_cp_remote_oob_data_neg_reply {
++	bdaddr_t bdaddr;
++} __packed;
++
++
+ #define HCI_OP_IO_CAPABILITY_NEG_REPLY	0x0434
+ struct hci_cp_io_capability_neg_reply {
+ 	bdaddr_t bdaddr;
+@@ -960,6 +974,11 @@ struct hci_ev_user_confirm_req {
+ 	__le32		passkey;
+ } __packed;
+ 
++#define HCI_EV_REMOTE_OOB_DATA_REQUEST	0x35
++struct hci_ev_remote_oob_data_request {
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define HCI_EV_SIMPLE_PAIR_COMPLETE	0x36
+ struct hci_ev_simple_pair_complete {
+ 	__u8     status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 441dadb..baf190b 100644
+index c8b7ee6..0f1e1d6 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -121,6 +121,7 @@ struct hci_dev {
- 	unsigned long	quirks;
+@@ -82,6 +82,13 @@ struct link_key {
+ 	u8 pin_len;
+ };
  
- 	atomic_t	cmd_cnt;
-+	atomic_t	cmd_not_ack;
- 	unsigned int	acl_cnt;
- 	unsigned int	sco_cnt;
- 	unsigned int	le_cnt;
++struct oob_data {
++	struct list_head list;
++	bdaddr_t bdaddr;
++	u8 hash[16];
++	u8 randomizer[16];
++};
++
+ #define NUM_REASSEMBLY 4
+ struct hci_dev {
+ 	struct list_head list;
+@@ -169,6 +176,8 @@ struct hci_dev {
+ 
+ 	struct list_head	link_keys;
+ 
++	struct list_head	remote_oob_data;
++
+ 	struct hci_dev_stats	stat;
+ 
+ 	struct sk_buff_head	driver_init;
+@@ -505,6 +514,13 @@ int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+ 						u8 *key, u8 type, u8 pin_len);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ 
++int hci_remote_oob_data_clear(struct hci_dev *hdev);
++struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
++							bdaddr_t *bdaddr);
++int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
++								u8 *randomizer);
++int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
++
+ void hci_del_off_timer(struct hci_dev *hdev);
+ 
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 916b1c6..ebe288c 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -173,6 +173,18 @@ struct mgmt_rp_read_local_oob_data {
+ 	__u8 randomizer[16];
+ } __packed;
+ 
++#define MGMT_OP_ADD_REMOTE_OOB_DATA	0x0018
++struct mgmt_cp_add_remote_oob_data {
++	bdaddr_t bdaddr;
++	__u8 hash[16];
++	__u8 randomizer[16];
++} __packed;
++
++#define MGMT_OP_REMOVE_REMOTE_OOB_DATA	0x0019
++struct mgmt_cp_remove_remote_oob_data {
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b372fb8..1c6886d 100644
+index b372fb8..a1d2263 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -531,6 +531,7 @@ int hci_dev_open(__u16 dev)
- 
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
-+		atomic_set(&hdev->cmd_not_ack, 0);
- 		set_bit(HCI_INIT, &hdev->flags);
- 		hdev->init_last_cmd = 0;
- 
-@@ -606,6 +607,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	/* Reset device */
- 	skb_queue_purge(&hdev->cmd_q);
- 	atomic_set(&hdev->cmd_cnt, 1);
-+	atomic_set(&hdev->cmd_not_ack, 0);
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		set_bit(HCI_INIT, &hdev->flags);
- 		__hci_request(hdev, hci_reset_req, 0,
-@@ -684,6 +686,7 @@ int hci_dev_reset(__u16 dev)
- 		hdev->flush(hdev);
- 
- 	atomic_set(&hdev->cmd_cnt, 1);
-+	atomic_set(&hdev->cmd_not_ack, 0);
- 	hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
- 
- 	if (!test_bit(HCI_RAW, &hdev->flags))
-@@ -1074,6 +1077,7 @@ static void hci_cmd_timer(unsigned long arg)
- 
- 	BT_ERR("%s command tx timeout", hdev->name);
- 	atomic_set(&hdev->cmd_cnt, 1);
-+	atomic_add_unless(&hdev->cmd_not_ack, -1, 0);
+@@ -1077,6 +1077,79 @@ static void hci_cmd_timer(unsigned long arg)
  	tasklet_schedule(&hdev->cmd_task);
  }
  
-@@ -2015,10 +2019,11 @@ static void hci_cmd_task(unsigned long arg)
- 	struct hci_dev *hdev = (struct hci_dev *) arg;
- 	struct sk_buff *skb;
++struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
++							bdaddr_t *bdaddr)
++{
++	struct list_head *p;
++
++	list_for_each(p, &hdev->remote_oob_data) {
++		struct oob_data *data;
++
++		data = list_entry(p, struct oob_data, list);
++
++		if (bacmp(bdaddr, &data->bdaddr) == 0)
++			return data;
++	}
++
++	return NULL;
++}
++
++int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr)
++{
++	struct oob_data *data;
++
++	data = hci_find_remote_oob_data(hdev, bdaddr);
++	if (!data)
++		return -ENOENT;
++
++	BT_DBG("%s removing %s", hdev->name, batostr(bdaddr));
++
++	list_del(&data->list);
++	kfree(data);
++
++	return 0;
++}
++
++int hci_remote_oob_data_clear(struct hci_dev *hdev)
++{
++	struct list_head *p, *n;
++
++	list_for_each_safe(p, n, &hdev->remote_oob_data) {
++		struct oob_data *data;
++
++		data = list_entry(p, struct oob_data, list);
++
++		list_del(p);
++		kfree(data);
++	}
++
++	return 0;
++}
++
++int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
++								u8 *randomizer)
++{
++	struct oob_data *data;
++
++	data = hci_find_remote_oob_data(hdev, bdaddr);
++
++	if (!data) {
++		data = kmalloc(sizeof(*data), GFP_ATOMIC);
++		if (!data)
++			return -ENOMEM;
++
++		bacpy(&data->bdaddr, bdaddr);
++		list_add(&data->list, &hdev->remote_oob_data);
++	}
++
++	memcpy(data->hash, hash, 16);
++	memcpy(data->randomizer, randomizer, 16);
++
++	BT_DBG("%s for %s", hdev->name, batostr(bdaddr));
++
++	return 0;
++}
++
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+@@ -1141,6 +1214,8 @@ int hci_register_dev(struct hci_dev *hdev)
  
--	BT_DBG("%s cmd %d", hdev->name, atomic_read(&hdev->cmd_cnt));
-+	BT_DBG("%s cnt %d not_ack %d", hdev->name, atomic_read(&hdev->cmd_cnt),
-+					atomic_read(&hdev->cmd_not_ack));
+ 	INIT_LIST_HEAD(&hdev->link_keys);
  
- 	/* Send queued commands */
--	if (atomic_read(&hdev->cmd_cnt)) {
-+	if (atomic_read(&hdev->cmd_cnt) > atomic_read(&hdev->cmd_not_ack)) {
- 		skb = skb_dequeue(&hdev->cmd_q);
- 		if (!skb)
- 			return;
-@@ -2028,6 +2033,7 @@ static void hci_cmd_task(unsigned long arg)
- 		hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC);
- 		if (hdev->sent_cmd) {
- 			atomic_dec(&hdev->cmd_cnt);
-+			atomic_inc(&hdev->cmd_not_ack);
- 			hci_send_frame(skb);
- 			mod_timer(&hdev->cmd_timer,
- 				  jiffies + msecs_to_jiffies(HCI_CMD_TIMEOUT));
++	INIT_LIST_HEAD(&hdev->remote_oob_data);
++
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
+ 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
+@@ -1220,6 +1295,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_blacklist_clear(hdev);
+ 	hci_uuids_clear(hdev);
+ 	hci_link_keys_clear(hdev);
++	hci_remote_oob_data_clear(hdev);
+ 	hci_dev_unlock_bh(hdev);
+ 
+ 	__hci_dev_put(hdev);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3fbfa50..3cf63a1 100644
+index 4faab87..955b86a 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1766,8 +1766,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		break;
- 	}
+@@ -2368,9 +2368,14 @@ static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff
  
--	if (ev->opcode != HCI_OP_NOP)
-+	if (ev->opcode != HCI_OP_NOP) {
- 		del_timer(&hdev->cmd_timer);
-+		atomic_add_unless(&hdev->cmd_not_ack, -1, 0);
+ 		bacpy(&cp.bdaddr, &ev->bdaddr);
+ 		cp.capability = conn->io_capability;
+-		cp.oob_data = 0;
+ 		cp.authentication = hci_get_auth_req(conn);
+ 
++		if ((conn->out == 1 || conn->remote_oob == 0x01) &&
++				hci_find_remote_oob_data(hdev, &conn->dst))
++			cp.oob_data = 0x01;
++		else
++			cp.oob_data = 0x00;
++
+ 		hci_send_cmd(hdev, HCI_OP_IO_CAPABILITY_REPLY,
+ 							sizeof(cp), &cp);
+ 	} else {
+@@ -2468,6 +2473,37 @@ static inline void hci_remote_host_features_evt(struct hci_dev *hdev, struct sk_
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static inline void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
++							struct sk_buff *skb)
++{
++	struct hci_ev_remote_oob_data_request *ev = (void *) skb->data;
++	struct oob_data *data;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_dev_lock(hdev);
++
++	data = hci_find_remote_oob_data(hdev, &ev->bdaddr);
++	if (data) {
++		struct hci_cp_remote_oob_data_reply cp;
++
++		bacpy(&cp.bdaddr, &ev->bdaddr);
++		memcpy(cp.hash, data->hash, 16);
++		memcpy(cp.randomizer, data->randomizer, 16);
++
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY, sizeof(cp),
++									&cp);
++	} else {
++		struct hci_cp_remote_oob_data_neg_reply cp;
++
++		bacpy(&cp.bdaddr, &ev->bdaddr);
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY, sizeof(cp),
++									&cp);
 +	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+@@ -2668,6 +2704,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
  
- 	if (ev->ncmd) {
- 		atomic_set(&hdev->cmd_cnt, 1);
-@@ -1844,8 +1846,10 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	case HCI_EV_LE_META:
+ 		hci_le_meta_evt(hdev, skb);
++
++	case HCI_EV_REMOTE_OOB_DATA_REQUEST:
++		hci_remote_oob_data_request_evt(hdev, skb);
  		break;
- 	}
  
--	if (ev->opcode != HCI_OP_NOP)
-+	if (ev->opcode != HCI_OP_NOP) {
- 		del_timer(&hdev->cmd_timer);
-+		atomic_add_unless(&hdev->cmd_not_ack, -1, 0);
-+	}
+ 	default:
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ba43b85..323b722 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1310,6 +1310,74 @@ unlock:
+ 	return err;
+ }
  
- 	if (ev->ncmd) {
- 		atomic_set(&hdev->cmd_cnt, 1);
++static int add_remote_oob_data(struct sock *sk, u16 index, unsigned char *data,
++									u16 len)
++{
++	struct hci_dev *hdev;
++	struct mgmt_cp_add_remote_oob_data *cp = (void *) data;
++	int err;
++
++	BT_DBG("hci%u ", index);
++
++	if (len != sizeof(*cp))
++		return cmd_status(sk, index, MGMT_OP_ADD_REMOTE_OOB_DATA,
++									EINVAL);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_ADD_REMOTE_OOB_DATA,
++									ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	err = hci_add_remote_oob_data(hdev, &cp->bdaddr, cp->hash,
++								cp->randomizer);
++	if (err < 0)
++		err = cmd_status(sk, index, MGMT_OP_ADD_REMOTE_OOB_DATA, -err);
++	else
++		err = cmd_complete(sk, index, MGMT_OP_ADD_REMOTE_OOB_DATA, NULL,
++									0);
++
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
++static int remove_remote_oob_data(struct sock *sk, u16 index,
++						unsigned char *data, u16 len)
++{
++	struct hci_dev *hdev;
++	struct mgmt_cp_remove_remote_oob_data *cp = (void *)data;
++	int err;
++
++	BT_DBG("hci%u ", index);
++
++	if (len != sizeof(*cp))
++		return cmd_status(sk, index, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
++									EINVAL);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
++									ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	err = hci_remove_remote_oob_data(hdev, &cp->bdaddr);
++	if (err < 0)
++		err = cmd_status(sk, index, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
++									-err);
++	else
++		err = cmd_complete(sk, index, MGMT_OP_REMOVE_REMOTE_OOB_DATA,
++								NULL, 0);
++
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -1408,6 +1476,13 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_READ_LOCAL_OOB_DATA:
+ 		err = read_local_oob_data(sk, index);
+ 		break;
++	case MGMT_OP_ADD_REMOTE_OOB_DATA:
++		err = add_remote_oob_data(sk, index, buf + sizeof(*hdr), len);
++		break;
++	case MGMT_OP_REMOVE_REMOTE_OOB_DATA:
++		err = remove_remote_oob_data(sk, index, buf + sizeof(*hdr),
++									len);
++		break;
+ 
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
 -- 
 1.7.0.4
 
-Patch on behalf of ST-Ericsson
