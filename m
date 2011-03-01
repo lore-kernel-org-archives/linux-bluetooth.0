@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Mar 2011 22:23:42 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
+Message-ID: <4D6D4926.907@codeaurora.org>
+Date: Tue, 01 Mar 2011 11:29:42 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+CC: linux-bluetooth@vger.kernel.org,
 	par-gunnar.p.hjalmdahl@stericsson.com,
 	henrik.possung@stericsson.com
-Subject: Re: [PATCH] Bluetooth: Fix some small code style issues in mgmt.c
-Message-ID: <20110302012253.GB2224@joana>
-References: <1298994934-23281-3-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298994934-23281-3-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH] Bluetooth: Add counter for not acked HCI commands
+References: <1299003369-17901-1-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1299003369-17901-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Again,
 
-* Szymon Janc <szymon.janc@tieto.com> [2011-03-01 16:55:34 +0100]:
+On 11-03-01 10:16 AM, Andrzej Kaczmarek wrote:
+[...]
 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  net/bluetooth/mgmt.c |   14 +++++---------
->  1 files changed, 5 insertions(+), 9 deletions(-)
+>   			atomic_dec(&hdev->cmd_cnt);
+> +			atomic_inc(&hdev->cmd_not_ack);
+[...]
 
-The 3 patches were applied, thanks.
+Also, I am not sure this means what you may intend it to mean. I think 
+that this is intended to do both of these operations "together 
+atomically", but that as written, it is possible for an interruption to 
+occur between the two operations.
+
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
