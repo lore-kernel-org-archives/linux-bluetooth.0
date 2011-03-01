@@ -1,36 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Mar 2011 15:45:15 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-Subject: Re: [PATCH 1/2] Move pcsuite drivers to its own plugin
-Message-ID: <20110301184515.GA32583@jh-x301>
-References: <1298749782-24129-1-git-send-email-luiz.dentz@gmail.com>
- <1298749782-24129-3-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298749782-24129-3-git-send-email-luiz.dentz@gmail.com>
+Message-Id: <7.0.1.0.2.20110301192526.031f7c30@gmx.net>
+Date: Tue, 01 Mar 2011 19:26:57 +0100
+To: linux-bluetooth@vger.kernel.org
+From: Peter Kornatowski <pkorn@gmx.net>
+Subject: headset answer button with HFP and telephony-dummy
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hello,
 
-On Sat, Feb 26, 2011, luiz.dentz@gmail.com wrote:
-> This make it easier to enable/disable this funcionality as a whole.
-> ---
->  Makefile.am            |    6 +-
->  configure.ac           |    9 +-
->  plugins/ftp.c          |  165 +---------------
->  plugins/ftp.h          |   30 +++
->  plugins/nokia-backup.c |  309 -----------------------------
->  plugins/pcsuite.c      |  515 ++++++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 561 insertions(+), 473 deletions(-)
->  create mode 100644 plugins/ftp.h
->  delete mode 100644 plugins/nokia-backup.c
->  create mode 100644 plugins/pcsuite.c
+I want to catch the answer button signal of a bluetooth headset when 
+connected in HFP mode (HSP is trivial through the dbus-headset-signal 
+"AnswerRequested"). I don't want to use the computer as the "headset 
+part", but as the "audio gateway part". I have a small self-build app 
+that can handle VoIP-calls and Bluetooth-audio through bluez and 
+pulseaudio. Now I want the app to recognize the answer button being 
+pressed and then answer or hang up a call. I know that it has to be 
+done through a telephony-dummy because of the more complicated HFP 
+state machine. So I also digged into the source of the corresponding 
+.c files and searched the web. But I still have several questions left:
+1. The bluez bindings for ofono and maemo seem to be just fulfilling 
+the "headset part", so when connecting a mobile phone to the computer 
+through Bluetooth. But I need the other direction. Is this possible 
+with ofono or maemo?
+2. I found this patch on the web: 
+http://whitequark.livejournal.com/20590.html. It is already 
+integrated into bluez (since version 4.6x), so my problem seems to be 
+possible to solve with the telephony-dummy. But I tested it and when 
+the headset is in connected mode, I don't receive anything when 
+pressing the answer button. In playing mode I just received "AT+BLDN" 
+(last_dialed_number) and "AT+CHUP" (terminate_call). But according to 
+the patch I should receive "AT+BVRA" (voice_dial). Should the headset 
+be in some state (if yes, in which one and how do I trigger it)?
+3. Should I be able to use the dbus-methods in the telephony-dummy to 
+simulate a "HFP state machine" and maybe be able to catch the answer 
+button then? But here only the "audio gateway role" on the remote 
+device (org.bluez.HeadsetGateway) is documented in the audio-api.txt, 
+not the other direction.
 
-Thanks. Both patches have been pushed upstream (with a couple of fixes
-to the commit messages).
+Thanks,
+Peter Kornatowski 
 
-Johan
