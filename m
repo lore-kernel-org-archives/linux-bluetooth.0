@@ -1,25 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Mar 2011 16:12:36 -0300
+Date: Tue, 1 Mar 2011 16:02:26 -0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Rafal Michalski <michalski.raf@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] TODO: Remove item related to ATT transation
- timeouts
-Message-ID: <20110301191236.GA10738@jh-x301>
-References: <1298900653-7567-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Adjust prefix of contact id for pulling single vCard
+Message-ID: <20110301190226.GC32583@jh-x301>
+References: <1298894632-30497-1-git-send-email-michalski.raf@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298900653-7567-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1298894632-30497-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Rafal,
 
-On Mon, Feb 28, 2011, Claudio Takahasi wrote:
+On Mon, Feb 28, 2011, Rafal Michalski wrote:
+> Pulling single vCard is related to recognizing it by prefix of contact
+> id. Previously it was "contact: " and has been changed to "urn:uuid:".
+> This patch fixes it and allows to pull valid single vCard.
 > ---
->  TODO |    7 -------
->  1 files changed, 0 insertions(+), 7 deletions(-)
+>  plugins/phonebook-tracker.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-All four patches have been pushed upstream. Thanks.
+Pushed upstream. Thanks.
 
 Johan
