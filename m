@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Bluetooth: Use variable name instead of type to compute size with sizeof()
-Date: Tue, 1 Mar 2011 16:55:33 +0100
-Message-ID: <1298994934-23281-2-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20110301154919.GB27312@kroah.com>
+References: <AANLkTi=_gAQiAqKsYa2=Haq0ceJwK3n7OafDk6Lb7MZE@mail.gmail.com>
+	<20110301154919.GB27312@kroah.com>
+Date: Tue, 1 Mar 2011 23:53:55 +0800
+Message-ID: <AANLkTi=wW0jEvOnKR+=iYnyYE4DedQ9AV5HVSwUqdvBT@mail.gmail.com>
+Subject: Re: [stable] [2.6.38-rc6, patch] fix hci_dev_list locking...
+From: Daniel J Blueman <daniel.blueman@gmail.com>
+To: Greg KH <greg@kroah.com>
+Cc: linux-bluetooth@vger.kernel.org, stable@kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/mgmt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On 1 March 2011 23:49, Greg KH <greg@kroah.com> wrote:
+> On Tue, Mar 01, 2011 at 11:41:38PM +0800, Daniel J Blueman wrote:
+>> Release acquired lock on error path, fixing potential hang up.
+>>
+>> Signed-off-by: Daniel J Blueman <daniel.blueman@gmail.com>
+>>
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index f827fd9..ace8726 100644
+>
+> Please go read Documentation/stable_kernel_rules.txt for how to properly
+> submit patches to the stable kernel tree (hint, this way was not
+> correct...)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6dd0152..f69dbcb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1035,7 +1035,7 @@ static int pin_code_neg_reply(struct sock *sk, u16 index, unsigned char *data,
- 		goto failed;
- 	}
- 
--	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY, sizeof(bdaddr_t),
-+	err = hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY, sizeof(cp->bdaddr),
- 								&cp->bdaddr);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
+Good tip; I'll follow it up.
+
+Thanks,
+  Daniel
 -- 
-1.7.0.4
-on behalf of ST-Ericsson
+Daniel J Blueman
