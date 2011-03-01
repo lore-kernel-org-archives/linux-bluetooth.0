@@ -1,58 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4D6D016B.8010308@nokia.com>
-References: <1298749782-24129-1-git-send-email-luiz.dentz@gmail.com>
-	<1298749782-24129-3-git-send-email-luiz.dentz@gmail.com>
-	<4D6D016B.8010308@nokia.com>
-Date: Tue, 1 Mar 2011 11:31:05 -0300
-Message-ID: <AANLkTimu8tZT8BzycJ8ROFynrLgbHMfEK3JqU0PbkGuQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Move pcsuite drivers to its own plugin
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Fix response on adapter RequestSession method
+Date: Tue,  1 Mar 2011 16:25:35 +0200
+Message-Id: <1298989535-403-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1298989535-403-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1298989535-403-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Fixes response on adapter RequestSession method to be sent after mode is
+changed, if such is necessary. More specifically change of power off mode
+to power on is in question.
 
-On Tue, Mar 1, 2011 at 11:23 AM, Radoslaw Jablonski
-<ext-jablonski.radoslaw@nokia.com> wrote:
->  Hi Luiz,
->
-> On 02/26/2011 09:49 PM, ext luiz.dentz@gmail.com wrote:
->>
->> From: Luiz Augusto von Dentz<luiz.dentz-von@nokia.com>
->>
->> This make it easier to enable/disable this funcionality as a whole.
->> ---
->>  Makefile.am            |    6 +-
->>  configure.ac           |    9 +-
->>  plugins/ftp.c          |  165 +---------------
->>  plugins/ftp.h          |   30 +++
->>  plugins/nokia-backup.c |  309 -----------------------------
->>  plugins/pcsuite.c      |  515
->> ++++++++++++++++++++++++++++++++++++++++++++++++
->>  6 files changed, 561 insertions(+), 473 deletions(-)
->>  create mode 100644 plugins/ftp.h
->>  delete mode 100644 plugins/nokia-backup.c
->>  create mode 100644 plugins/pcsuite.c
->
-> I've applied this patch and suddenly PC Suite stopped to discover if usb
-> cable is connected (no possibility to take backup/restore via usb cable).
-> In syslog there is no obexd logs in that scenario so hard to tell what
-> went wrong:) After reverting to obexd release, based on upstream,
-> everything started to work normally again.
->
-> So, does other components (which are using this backup functionality)
-> need to make some changes to their code or something is wrong
-> with that patch?
+Currenty, response is sent when mode change is confirmed by agent, not by
+response from controller. Such may lead to failed CreateDevice method if
+it is called quickly enough after RequestSession when controller is in
+powered off state.
 
-Did you remember to add --enable-pcsuite to rules, otherwise pcsuite
-plugin won't compile.
+New session is not created if there is already a session for such D-Bus
+message.
+---
+ src/adapter.c |   51 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 files changed, 43 insertions(+), 8 deletions(-)
 
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 2e11832..e973aa3 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -452,6 +452,20 @@ static int adapter_set_mode(struct btd_adapter *adapter, uint8_t mode)
+ 	return 0;
+ }
+ 
++static struct session_req *find_session_by_msg(GSList *list, const DBusMessage *msg)
++{
++	GSList *l;
++
++	for (l = list; l; l = l->next) {
++		struct session_req *req = l->data;
++
++		if (req->msg == msg)
++			return req;
++	}
++
++	return NULL;
++}
++
+ static int set_mode(struct btd_adapter *adapter, uint8_t new_mode,
+ 			DBusMessage *msg)
+ {
+@@ -496,11 +510,18 @@ done:
+ 
+ 	DBG("%s", modestr);
+ 
+-	if (msg != NULL)
+-		/* Wait for mode change to reply */
+-		adapter->pending_mode = create_session(adapter, connection,
+-							msg, new_mode, NULL);
+-	else
++	if (msg != NULL) {
++		struct session_req *req;
++
++		req = find_session_by_msg(adapter->mode_sessions, msg);
++		if (req) {
++			adapter->pending_mode = req;
++			session_ref(req);
++		} else
++			/* Wait for mode change to reply */
++			adapter->pending_mode = create_session(adapter,
++					connection, msg, new_mode, NULL);
++	} else
+ 		/* Nothing to reply just write the new mode */
+ 		adapter->mode = new_mode;
+ 
+@@ -795,17 +816,31 @@ static void confirm_mode_cb(struct agent *agent, DBusError *derr, void *data)
+ 		return;
+ 	}
+ 
+-	err = set_mode(req->adapter, req->mode, NULL);
+-	if (err < 0)
++	err = set_mode(req->adapter, req->mode, req->msg);
++	if (err < 0) {
+ 		reply = btd_error_failed(req->msg, strerror(-err));
+-	else
++		goto proceed;
++	}
++
++	if (!req->adapter->pending_mode) {
+ 		reply = dbus_message_new_method_return(req->msg);
++		goto proceed;
++	}
++
++	goto done;
+ 
++proceed:
++	/*
++	 * Send reply immidiately only if there was an error changing
++	 * mode, or change is not needed. Otherwise, reply is sent in
++	 * set_mode_complete.
++	 */
+ 	g_dbus_send_message(req->conn, reply);
+ 
+ 	dbus_message_unref(req->msg);
+ 	req->msg = NULL;
+ 
++done:
+ 	if (!find_session(req->adapter->mode_sessions, req->owner))
+ 		session_unref(req);
+ }
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.1
+
