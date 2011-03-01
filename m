@@ -1,58 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D6CFF69.1020503@csr.com>
-Date: Tue, 01 Mar 2011 14:15:05 +0000
-From: Marco Sinigaglia <marco.sinigaglia@csr.com>
+Message-ID: <4D6D04A6.2090300@nokia.com>
+Date: Tue, 01 Mar 2011 16:37:26 +0200
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: HCI Le time out
+To: ext Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Subject: Re: [PATCH 1/2] Move pcsuite drivers to its own plugin
+References: <1298749782-24129-1-git-send-email-luiz.dentz@gmail.com>	<1298749782-24129-3-git-send-email-luiz.dentz@gmail.com>	<4D6D016B.8010308@nokia.com> <AANLkTimu8tZT8BzycJ8ROFynrLgbHMfEK3JqU0PbkGuQ@mail.gmail.com>
+In-Reply-To: <AANLkTimu8tZT8BzycJ8ROFynrLgbHMfEK3JqU0PbkGuQ@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+  Hi Luiz,
 
-I am using CSR 8505 A06 and, using LE, I have some timeout problems 
-raised on hci.c.
-The following LE functions use a 100ms for the hci_send_req cmd.
-- hci_le_set_scan_parameters
-- hci_le_set_advertise_enable
-- hci_le_set_scan_enable
+On 03/01/2011 04:31 PM, ext Luiz Augusto von Dentz wrote:
+> Hi Radek,
+>
+> On Tue, Mar 1, 2011 at 11:23 AM, Radoslaw Jablonski
+> <ext-jablonski.radoslaw@nokia.com>  wrote:
+>>
+>> I've applied this patch and suddenly PC Suite stopped to discover if usb
+>> cable is connected (no possibility to take backup/restore via usb cable).
+>> In syslog there is no obexd logs in that scenario so hard to tell what
+>> went wrong:) After reverting to obexd release, based on upstream,
+>> everything started to work normally again.
+>>
+>> So, does other components (which are using this backup functionality)
+>> need to make some changes to their code or something is wrong
+>> with that patch?
+> Did you remember to add --enable-pcsuite to rules, otherwise pcsuite
+> plugin won't compile.
+>
+No, I haven't touched rules so that was source of my problems:)
+Many thanks for quick response.
 
-The 100ms is not enough becouse the chip can be in deep sleep.
-Indeed, increasing it to 1000 the problem is fixed.
-
-Would be possible to check in this modifications?
-
-Cheers
-Marco Sinigaglia
-
-
-@@ -2646,7 +2645,7 @@
-      rq.rparam = &status;
-      rq.rlen = 1;
-
--    if (hci_send_req(dd, &rq, 100) < 0)
-+    if (hci_send_req(dd, &rq, 1000) < 0)
-          return -1;
-
-      if (status) {
-@@ -2680,7 +2679,7 @@
-      rq.rparam = &status;
-      rq.rlen = 1;
-
--    if (hci_send_req(dd, &rq, 100) < 0)
-+    if (hci_send_req(dd, &rq, 1000) < 0)
-          return -1;
-
-      if (status) {
-@@ -2708,7 +2707,7 @@
-      rq.rparam = &status;
-      rq.rlen = 1;
-
--    if (hci_send_req(dd, &rq, 100) < 0)
-+    if (hci_send_req(dd, &rq, 1000) < 0)
-          return -1;
-
-
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+Radek
