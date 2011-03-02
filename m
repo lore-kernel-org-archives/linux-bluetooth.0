@@ -1,60 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+Message-ID: <4D6E5398.4070300@csr.com>
+Date: Wed, 02 Mar 2011 14:26:32 +0000
+From: Marco Sinigaglia <marco.sinigaglia@csr.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCHv2 1/2] Use CID to infer transport type
-Date: Wed,  2 Mar 2011 12:34:43 -0400
-Message-Id: <1299083684-5062-1-git-send-email-bruna.moreira@openbossa.org>
-In-Reply-To: <1298583454-18227-1-git-send-email-bruna.moreira@openbossa.org>
-References: <1298583454-18227-1-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH] Adjust timeout LE
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of comparing GIOChannel pointers, use the CID returned by
-bt_io_get() to infer the transport type. LE uses the fixed CID for GATT.
+The hci_send_req 100ms timeout is not enough when the chip is in deep 
+sleep.
+This patch increases it to 1000ms.
+
+From: Marco Sinigaglia, marco.sinigaglia@csr.com
 ---
- src/attrib-server.c |    7 ++++---
- 1 files changed, 4 insertions(+), 3 deletions(-)
+lib/hci.c         |    6 +++---
+tools/hciconfig.c |    2 +-
+2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index b980b28..61db851 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -899,7 +899,7 @@ done:
- static void connect_event(GIOChannel *io, GError *err, void *user_data)
- {
- 	struct gatt_channel *channel;
--	GIOChannel **server_io = user_data;
-+	uint16_t cid;
- 	GError *gerr = NULL;
- 
- 	if (err) {
-@@ -912,6 +912,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- 	bt_io_get(io, BT_IO_L2CAP, &gerr,
- 			BT_IO_OPT_SOURCE_BDADDR, &channel->src,
- 			BT_IO_OPT_DEST_BDADDR, &channel->dst,
-+			BT_IO_OPT_CID, &cid,
- 			BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		error("bt_io_get: %s", gerr->message);
-@@ -921,7 +922,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
- 		return;
- 	}
- 
--	if (server_io == &l2cap_io)
-+	if (cid != GATT_CID)
- 		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
- 	else
- 		channel->mtu = ATT_DEFAULT_LE_MTU;
-@@ -1046,7 +1047,7 @@ int attrib_server_init(void)
- 
- 	/* BR/EDR socket */
- 	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
--					&l2cap_io, NULL, &gerr,
-+					NULL, NULL, &gerr,
- 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
- 					BT_IO_OPT_PSM, GATT_PSM,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
--- 
-1.7.0.4
+diff --git a/lib/hci.c b/lib/hci.c
+index 02fc0cf..96fafe1 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -2753,7 +2753,7 @@ int hci_le_set_scan_enable(int dd, uint8_t enable, 
+uint8_t filter_dup)
+         rq.rparam = &status;
+         rq.rlen = 1;
 
+-       if (hci_send_req(dd, &rq, 100) < 0)
++       if (hci_send_req(dd, &rq, 1000) < 0)
+                 return -1;
+
+         if (status) {
+@@ -2787,7 +2787,7 @@ int hci_le_set_scan_parameters(int dd, uint8_t type,
+         rq.rparam = &status;
+         rq.rlen = 1;
+
+-       if (hci_send_req(dd, &rq, 100) < 0)
++       if (hci_send_req(dd, &rq, 1000) < 0)
+                 return -1;
+
+         if (status) {
+@@ -2815,7 +2815,7 @@ int hci_le_set_advertise_enable(int dd, uint8_t 
+enable)
+         rq.rparam = &status;
+         rq.rlen = 1;
+
+-       if (hci_send_req(dd, &rq, 100) < 0)
++       if (hci_send_req(dd, &rq, 1000) < 0)
+                 return -1;
+
+         if (status) {
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 05a8910..aa6d009 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -268,7 +268,7 @@ static void cmd_le_adv(int ctl, int hdev, char *opt)
+         rq.rparam = &status;
+         rq.rlen = 1;
+
+-       ret = hci_send_req(dd, &rq, 100);
++       ret = hci_send_req(dd, &rq, 1000);
+
+         hci_close_dev(dd);
+
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
