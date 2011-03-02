@@ -4,62 +4,35 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Simplify bachk function
-Date: Wed, 2 Mar 2011 11:19:27 +0100
-Message-ID: <1299061167-8323-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Fix adapter reference count in input plugin
+Date: Wed, 2 Mar 2011 10:44:57 +0100
+Message-ID: <1299059097-24462-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Adapter unref was called  on driver removal even if input server failed
+to start on probe and reference was not incremented. This leads to
+segmentation fault while removing adapter.
 ---
- lib/bluetooth.c |   21 ++++++---------------
- 1 files changed, 6 insertions(+), 15 deletions(-)
+ input/manager.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/lib/bluetooth.c b/lib/bluetooth.c
-index 4af2ef6..875119b 100644
---- a/lib/bluetooth.c
-+++ b/lib/bluetooth.c
-@@ -118,33 +118,24 @@ int ba2oui(const bdaddr_t *ba, char *str)
- 
- int bachk(const char *str)
+diff --git a/input/manager.c b/input/manager.c
+index a98a080..259aef7 100644
+--- a/input/manager.c
++++ b/input/manager.c
+@@ -143,6 +143,9 @@ static void hid_server_remove(struct btd_adapter *adapter)
  {
--	char tmp[18], *ptr = tmp;
--
- 	if (!str)
- 		return -1;
+ 	bdaddr_t src;
  
- 	if (strlen(str) != 17)
- 		return -1;
- 
--	memcpy(tmp, str, 18);
--
--	while (*ptr) {
--		*ptr = toupper(*ptr);
--		if (*ptr < '0'|| (*ptr > '9' && *ptr < 'A') || *ptr > 'F')
-+	while (*str) {
-+		if (!isxdigit(*str++))
- 			return -1;
--		ptr++;
- 
--		*ptr = toupper(*ptr);
--		if (*ptr < '0'|| (*ptr > '9' && *ptr < 'A') || *ptr > 'F')
-+		if (!isxdigit(*str++))
- 			return -1;
--		ptr++;
- 
--		*ptr = toupper(*ptr);
--		if (*ptr == 0)
-+		if (*str == 0)
- 			break;
--		if (*ptr != ':')
++	if (!g_slist_find(adapters, adapter))
++		return;
 +
-+		if (*str++ != ':')
- 			return -1;
--		ptr++;
- 	}
+ 	adapter_get_address(adapter, &src);
  
- 	return 0;
+ 	server_stop(&src);
 -- 
 1.7.0.4
 on behalf of ST-Ericsson
