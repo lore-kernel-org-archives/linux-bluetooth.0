@@ -1,75 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Mar 2011 00:47:35 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next-2.6 2011-03-01
-Message-ID: <20110302034735.GA2202@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110221043601.GB22204@spacedout.fries.net>
+References: <20110211035309.GA22204@spacedout.fries.net>
+	<20110214145649.GE2597@joana>
+	<AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
+	<20110221043601.GB22204@spacedout.fries.net>
+Date: Tue, 1 Mar 2011 19:31:42 -0600
+Message-ID: <AANLkTin+NDruj7c5r_pQxWZWEsMqiWpnkCptKFq2mfps@mail.gmail.com>
+Subject: Re: [PATCH] work around for l2cap NULL dereference in l2cap_conn_start
+From: Andrei Warkentin <andreiw@motorola.com>
+To: David Fries <david@fries.net>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi all,
 
-Here is the latest batch of Bluetooth changes, they are most changes in the
-HCI Management interface both from Johan Hedberg and Szymon Janc. The rest are
-just clean ups and bug fixes.
+I don't have an S305 headset at the moment to play with this, but, our
+tree (2.6.36) has
+a fix like this for this issue.
 
-Please pull, thanks a lot!
 
-The following changes since commit e46395a4b3d32d161d8b6d8e4a002972b1faae3e:
+ 				if (bt_sk(sk)->defer_setup) {
+ 					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+-					parent->sk_data_ready(parent, 0);
++					if (parent)
++						parent->sk_data_ready(parent, 0);
 
-  mac80211: make rate control Kconfig warning depend on mac80211 (2011-03-01 13:48:22 -0500)
+ 				} else {
+ 					sk->sk_state = BT_CONFIG;
+ 					rsp.result = cpu_to_le16(L2CAP_CR_SUCCESS);
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+The comment is:
 
-Anand Gadiyar (2):
-      Bluetooth: fix build break on hci_sock.c
-      Bluetooth: remove unnecessary call to hci_sock_cleanup
+    Bluetooth: Hack: Don't dereference null pointer.
 
-Anderson Briglia (1):
-      Bluetooth: Fix LE conn creation
+    This avoids the S305 panic during incoming connection.
 
-Gustavo F. Padovan (1):
-      Bluetooth: Remove duplicated BT_INFO() from L2CAP
+    S305 sends PSM 25 L2CAP connection request before the L2CAP info response.
+    When we receive that info response we crash on null pointer here.
 
-Johan Hedberg (8):
-      Bluetooth: Make pending_add return a pointer to the added entry
-      Bluetooth: Add mgmt_pair_device command
-      Bluetooth: Add management support for user confirmation request
-      Bluetooth: Fix mgmt_pin_code_reply command status opcode
-      Bluetooth: Fix mgmt_pin_code_reply return parameters
-      Bluetooth: Add mgmt_auth_failed event
-      Bluetooth: Fix inititial value for remote authentication requirements
-      Bluetooth: Fix unnecessary list traversal in mgmt_pending_remove
+Sorry for the wait,
+A
 
-Szymon Janc (8):
-      Bluetooth: Use proper command structure in remove_uuid
-      Bluetooth: Move index to common header in management interface
-      Bluetooth: Validate data size before accessing mgmt commands
-      Bluetooth: Fix possible NULL pointer dereference in cmd_complete                         
-      Bluetooth: Log all parameters in cmd_status for easier debugging                         
-      Bluetooth: Remove unused code from get_connections                                       
-      Bluetooth: Use variable name instead of type in sizeof()                                 
-      Bluetooth: Fix some small code style issues in mgmt.c                                    
-                                                                                               
-Ville Tervo (1):                                                                               
-      Bluetooth: Use ERR_PTR as return error from hci_connect                                  
-                                                                                               
- include/net/bluetooth/hci.h      |   17 +                                                     
- include/net/bluetooth/hci_core.h |   21 +                                                     
- include/net/bluetooth/mgmt.h     |   73 ++--                                                  
- net/bluetooth/af_bluetooth.c     |    4 +-                                                    
- net/bluetooth/hci_conn.c         |    8 +-                                                    
- net/bluetooth/hci_event.c        |   69 ++++-                                                 
- net/bluetooth/hci_sock.c         |    2 +-                                                    
- net/bluetooth/l2cap_core.c       |   13 +-                                                    
- net/bluetooth/mgmt.c             |  751 +++++++++++++++++++++++++-------------                
- net/bluetooth/sco.c              |    7 +-                                                    
- 10 files changed, 663 insertions(+), 302 deletions(-)                                        
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+On Sun, Feb 20, 2011 at 10:36 PM, David Fries <david@fries.net> wrote:
+> bt_sk(sk)->parent can be NULL in l2cap_conn_start in state BT_CONNECT2
+> at least when a headset device pairs and the play button was pressed
+> right before pairing.
+>
+> Signed-off-by: David Fries <david@fries.net>
+> ---
+> I removed the printk, can this be merged to the bluetooth next tree?
+>
+> On Mon, Feb 14, 2011 at 03:40:46PM -0600, Andrei Warkentin wrote:
+>> FWIW still need it in 2.6.36.
+>
+> Andrei, I'm curious, what's your hardware hardware and bluetooth
+> device that's trigginer the crash?
+>
+>> On Mon, Feb 14, 2011 at 8:56 AM, Gustavo F. Padovan
+>> <padovan@profusion.mobi> wrote:
+>> > Hi David,
+>> >
+>> > * David Fries <david@fries.net> [2011-02-10 21:53:09 -0600]:
+>> >
+>> >> Here's a patch to avoid a very repeatable crash in the N900.  If I
+>> >> take a Motorola S305 bluetooth headset that was previously paried with
+>> >> the N900, turn it on, and press the play button before the headphones
+>> >> automatically pair with the cell phone, the N900 will crash (and
+>> >> reboot) in pairing.  If I wait until after they have paired there
+>> >> isn't any problem.  The patch is against the kernel-power
+>> >> 2.6.28-maemo46 by Thomas Tanner, the stock Nokia PR1.2 oops looked
+>> >> the same, I just haven't gone back to that kernel.
+>> >
+>> > This is a very old kernel. You need to check this issue against
+>> > bluetooth-next-2.6.
+>
+>  net/bluetooth/l2cap.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
+> index ed83c1f..a7aa4d9 100644
+> --- a/net/bluetooth/l2cap.c
+> +++ b/net/bluetooth/l2cap.c
+> @@ -408,7 +408,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+>                                        struct sock *parent = bt_sk(sk)->parent;
+>                                        rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+>                                        rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+> -                                       parent->sk_data_ready(parent, 0);
+> +                                       if(parent)
+> +                                               parent->sk_data_ready(parent,0);
+>
+>                                } else {
+>                                        sk->sk_state = BT_CONFIG;
+> --
+> 1.7.2.3
+>
+>
