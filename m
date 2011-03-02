@@ -1,65 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH 1/3] Replace all strdup() with g_strdup() in gatttool
-Date: Wed,  2 Mar 2011 19:36:56 -0300
-Message-Id: <1299105418-15795-1-git-send-email-sheldon.demario@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1299058614-8904-1-git-send-email-lkslawek@gmail.com>
+References: <1299058614-8904-1-git-send-email-lkslawek@gmail.com>
+Date: Wed, 2 Mar 2011 18:12:56 -0300
+Message-ID: <AANLkTikGvm5bjwyypJA6Pb47QmBcE1677dJdGQxo+3G7@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Message Access Profile plugin
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: lkslawek@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/gatttool.c    |    2 +-
- attrib/interactive.c |    8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index e51db7b..975fb47 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -538,7 +538,7 @@ int main(int argc, char *argv[])
- 	GIOChannel *chan;
- 	GSourceFunc callback;
- 
--	opt_sec_level = strdup("low");
-+	opt_sec_level = g_strdup("low");
- 
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 52edeac..8429a47 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -303,7 +303,7 @@ static void cmd_connect(int argcp, char **argvp)
- 
- 	if (argcp > 1) {
- 		g_free(opt_dst);
--		opt_dst = strdup(argvp[1]);
-+		opt_dst = g_strdup(argvp[1]);
- 	}
- 
- 	if (opt_dst == NULL) {
-@@ -585,7 +585,7 @@ static void cmd_sec_level(int argcp, char **argvp)
- 	}
- 
- 	g_free(opt_sec_level);
--	opt_sec_level = strdup(argvp[1]);
-+	opt_sec_level = g_strdup(argvp[1]);
- 
- 	if (conn_state != STATE_CONNECTED)
- 		return;
-@@ -696,9 +696,9 @@ int interactive(gchar *dst, int psm)
- 	GIOChannel *pchan;
- 	gint events;
- 
--	opt_sec_level = strdup("low");
-+	opt_sec_level = g_strdup("low");
- 
--	opt_dst = strdup(dst);
-+	opt_dst = g_strdup(dst);
- 	opt_psm = psm;
- 
- 	prompt = g_string_new(NULL);
+On Wed, Mar 2, 2011 at 6:36 AM,  <lkslawek@gmail.com> wrote:
+> These are the first ones of upcoming series of patches implementing Message
+> Access Profile (server role) in obexd.
+>
+> The work is more than less complete (~4k lines now), but as advised by Johan,
+> I'm cutting the whole thing into smaller pieces before sending this here.
+>
+> Regards,
+> Slawomir Bochenski
+>
+>  .gitignore               |    1 +
+>  Makefile.am              |   10 ++-
+>  configure.ac             |   12 ++
+>  plugins/mas.c            |  338 ++++++++++++++++++++++++++++++++++++++++++++++
+>  plugins/messages-dummy.c |   28 ++++
+>  plugins/messages.h       |   37 +++++
+>  src/main.c               |   11 ++-
+>  src/obex.h               |    1 +
+>  8 files changed, 435 insertions(+), 3 deletions(-)
+
+I guess naming the file and plugin 'map' would make more sense here,
+we don't want to confuse people what this file is about.
+
+Also Ive been thinking on removing this internal APIs for backend,
+each would implemented as plugin/mimetype driver directly and we can
+create basic drivers for pbap and map and export its callbacks on
+pbap.h and map.h respectively as we do for pcsuite which uses ftp
+driver callbacks.
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
+Computer Engineer
