@@ -1,78 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D6EAA7D.70508@interlinx.bc.ca>
-Date: Wed, 02 Mar 2011 15:37:17 -0500
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-MIME-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: cannot use multiple devices reliably
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig238E46C6671DFEBD102A5D54"
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 3/3] hcitool: add "whitelist" option to create LE connections
+Date: Wed,  2 Mar 2011 17:29:28 -0300
+Message-Id: <1299097768-27237-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1299097768-27237-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1299097768-27237-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig238E46C6671DFEBD102A5D54
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+If "whitelist" option is given, the peer address and type will be
+ignored and the white list will be used to determine which advertiser
+to connect to.
+---
+ tools/hcitool.c |   15 +++++++++++----
+ 1 files changed, 11 insertions(+), 4 deletions(-)
 
-Hi,
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 3e59630..d4775f1 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -2499,12 +2499,14 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ static struct option lecc_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "random",	0, 0, 'r' },
++	{ "whitelist",	0, 0, 'w' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+ static const char *lecc_help =
+ 	"Usage:\n"
+-	"\tlecc [--random] <bdaddr>\n";
++	"\tlecc [--random] <bdaddr>\n"
++	"\tlecc --whitelist\n";
+ 
+ static void cmd_lecc(int dev_id, int argc, char **argv)
+ {
+@@ -2515,18 +2517,22 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 	uint8_t initiator_filter, own_bdaddr_type, peer_bdaddr_type;
+ 
+ 	peer_bdaddr_type = LE_PUBLIC_ADDRESS;
++	initiator_filter = 0; /* Use peer address */
+ 
+ 	for_each_opt(opt, lecc_options, NULL) {
+ 		switch (opt) {
+ 		case 'r':
+ 			peer_bdaddr_type = LE_RANDOM_ADDRESS;
+ 			break;
++		case 'w':
++			initiator_filter = 0x01; /* Use white list */
++			break;
+ 		default:
+ 			printf("%s", lecc_help);
+ 			return;
+ 		}
+ 	}
+-	helper_arg(1, 1, &argc, &argv, lecc_help);
++	helper_arg(0, 1, &argc, &argv, lecc_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2537,11 +2543,12 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 		exit(1);
+ 	}
+ 
+-	str2ba(argv[0], &bdaddr);
++	memset(&bdaddr, 0, sizeof(bdaddr_t));
++	if (argv[0])
++		str2ba(argv[0], &bdaddr);
+ 
+ 	interval = htobs(0x0004);
+ 	window = htobs(0x0004);
+-	initiator_filter = 0x00;
+ 	own_bdaddr_type = 0x00;
+ 	min_interval = htobs(0x000F);
+ 	max_interval = htobs(0x000F);
+-- 
+1.7.4.1
 
-I'm using bluez 4.69[-0ubuntu2] on Ubuntu 10.10 (Maverick) with kernel
-2.6.35[-24-generic].
-
-I have a:
-
-Bus 002 Device 003: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub
-(part of BCM2046 Bluetooth)
-
-bluetooth dongle which seems to work decently for the most part.
-
-I also have a logitech B/T mouse and Jabra BT125 headset (i.e. mono
-device with microphone typically used with a handsfree mobile phone)
-which I'd like to use simultaneously.
-
-I can seem to connect both the headset and the mouse at the same time
-but typically as soon as I connect the headset (i.e. while the mouse is
-already connected), the mouse stops working.  It remains connected
-(according to the Bluetooth Preferences window) but moving the mouse
-doesn't result in mouse cursor movement.
-
-Additionally, as I move the mouse, there is crackling in the headset.
-
-Disconnecting the headset causes the mouse to subsequently disconnect
-and reconnect at which point it is again able to move the mouse cursor.
-
-I also have an LG HBM-210 headset with which the mouse seems co-exist
-with successfully.  I can connect the LG headset and the mouse continues
-to work.  The mouse continues to work even if I am listening to audio on
-the headset, so this problem seems unique to the Jabra BT125.
-
-I'd happily just put the Jabra headset aside and use the LG headset but
-it seems to have it's own problems with the audio in and out (i.e. both
-the mic and earpeice) periodically dropping out for 5-20 seconds and
-then coming back.  When such a dropout happens the mouse stops working
-then disconnects and reconnects.
-
-Perhaps related, perhaps not, but I have noticed also that the mouse
-will occasionally just stop working (but not disconnect) and then just
-start working again.
-
-b.
-
-
---------------enig238E46C6671DFEBD102A5D54
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iEYEARECAAYFAk1uqn0ACgkQl3EQlGLyuXB6igCg0KWXkDCgiEjzqhMEV2EBko43
-NNMAoMcKMwj8o3Zf1EPSxiZaQ1v/+w0F
-=Wa+m
------END PGP SIGNATURE-----
-
---------------enig238E46C6671DFEBD102A5D54--
