@@ -1,40 +1,210 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: New device driver: Nintendo Wii Remote
-From: Bastien Nocera <hadess@hadess.net>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 03 Mar 2011 17:49:53 +0000
-In-Reply-To: <AANLkTimCFW3bZkmm_B8VfViMC1A+rDjWRnE5OSB7eCCJ@mail.gmail.com>
-References: <AANLkTimCFW3bZkmm_B8VfViMC1A+rDjWRnE5OSB7eCCJ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1299174593.18332.42.camel@novo.hadess.net>
-Mime-Version: 1.0
+Date: Thu, 3 Mar 2011 14:45:02 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the
+ crypto subsystem
+Message-ID: <20110303174501.GA10733@piper>
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+ <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
+ <20110227202041.GG2166@joana>
+ <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
+ <20110228172801.GB2165@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20110228172801.GB2165@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2011-03-03 at 18:42 +0100, David Herrmann wrote:
-> Hi
+Hi Marcel,
+
+On 14:28 Mon 28 Feb, Gustavo F. Padovan wrote:
+> Hi Vinicius,
 > 
-> The Nintendo Wii Remote (short Wiimote) is the remote for the Nintedo
-> Wii console and communicates via bluetooth. There have been many
-> approaches to write linux drivers (incomplete list:
-> http://wiibrew.org/wiki/Wiimote/Library), however, they all are
-> written as separate libraries and not as device drivers. This has the
-> disadvantage, that the application must actively connect to the
-> wiimote (probably performing a bt-inquiry beforehand) instead of
-> listening for incoming connections.
-> The latter one can be achieved by listening on the HID l2cap channels
-> (psm 0x11 and 0x13), though, the wiimote does not follow the HID
-> standard. Since the bluez input-plugin listens on these ports, the
-> driver needs to be integrated into the bluez-daemon or kernel to work
-> properly.
+> * Vinicius Gomes <vinicius.gomes@openbossa.org> [2011-02-27 21:49:39 -0300]:
+> 
+> > Hi Gustavo,
+> > 
+> > On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
+> > <padovan@profusion.mobi> wrote:
+> > > Hi Vinicius,
+> > >
+> > > * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-02-21 14:23:51 -0300]:
+> > >
+> > >> This will allow using the crypto subsystem for encrypting data. As SMP
+> > >> (Security Manager Protocol) is implemented almost entirely on the host
+> > >> side and the crypto module already implements the needed methods
+> > >> (AES-128), it makes sense to use it.
+> > >>
+> > >> This patch also adds a new Kconfig option to toggle the SMP support.
+> > >>
+> > >> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > >> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> > >> ---
+> > >>  include/net/bluetooth/hci_core.h |    2 ++
+> > >>  net/bluetooth/Kconfig            |    6 ++++++
+> > >>  net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
+> > >>  net/bluetooth/smp.c              |   17 +++++++++++++++--
+> > >>  4 files changed, 45 insertions(+), 2 deletions(-)
+> > >>
+> > >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > >> index d5d8454..e8dbde8 100644
+> > >> --- a/include/net/bluetooth/hci_core.h
+> > >> +++ b/include/net/bluetooth/hci_core.h
+> > >> @@ -161,6 +161,8 @@ struct hci_dev {
+> > >>
+> > >>       __u16                   init_last_cmd;
+> > >>
+> > >> +     struct crypto_blkcipher *tfm;
+> > >> +
+> > >>       struct inquiry_cache    inq_cache;
+> > >>       struct hci_conn_hash    conn_hash;
+> > >>       struct list_head        blacklist;
+> > >> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> > >> index c6f9c2f..e9f40af 100644
+> > >> --- a/net/bluetooth/Kconfig
+> > >> +++ b/net/bluetooth/Kconfig
+> > >> @@ -22,6 +22,7 @@ menuconfig BT
+> > >>            BNEP Module (Bluetooth Network Encapsulation Protocol)
+> > >>            CMTP Module (CAPI Message Transport Protocol)
+> > >>            HIDP Module (Human Interface Device Protocol)
+> > >> +          SMP Module (Security Manager Protocol)
+> > >>
+> > >>         Say Y here to compile Bluetooth support into the kernel or say M to
+> > >>         compile it as module (bluetooth).
+> > >> @@ -35,11 +36,16 @@ config BT_L2CAP
+> > >>       bool "L2CAP protocol support"
+> > >>       depends on BT
+> > >>       select CRC16
+> > >> +     select CRYPTO_BLKCIPHER
+> > >> +     select CRYPTO_AES
+> > >>       help
+> > >>         L2CAP (Logical Link Control and Adaptation Protocol) provides
+> > >>         connection oriented and connection-less data transport.  L2CAP
+> > >>         support is required for most Bluetooth applications.
+> > >>
+> > >> +       Also included is support for SMP (Security Manager Protocol) which
+> > >> +       is the security layer on top of LE (Low Energy) links.
+> > >> +
+> > >>  config BT_SCO
+> > >>       bool "SCO links support"
+> > >>       depends on BT
+> > >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > >> index b372fb8..ff67843 100644
+> > >> --- a/net/bluetooth/hci_core.c
+> > >> +++ b/net/bluetooth/hci_core.c
+> > >> @@ -42,6 +42,7 @@
+> > >>  #include <linux/notifier.h>
+> > >>  #include <linux/rfkill.h>
+> > >>  #include <linux/timer.h>
+> > >> +#include <linux/crypto.h>
+> > >>  #include <net/sock.h>
+> > >>
+> > >>  #include <asm/system.h>
+> > >> @@ -60,6 +61,8 @@ static void hci_notify(struct hci_dev *hdev, int event);
+> > >>
+> > >>  static DEFINE_RWLOCK(hci_task_lock);
+> > >>
+> > >> +static int enable_smp;
+> > >> +
+> > >>  /* HCI device list */
+> > >>  LIST_HEAD(hci_dev_list);
+> > >>  DEFINE_RWLOCK(hci_dev_list_lock);
+> > >> @@ -1077,6 +1080,14 @@ static void hci_cmd_timer(unsigned long arg)
+> > >>       tasklet_schedule(&hdev->cmd_task);
+> > >>  }
+> > >>
+> > >> +static struct crypto_blkcipher *alloc_cypher(void)
+> > >> +{
+> > >> +     if (enable_smp)
+> > >> +             return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+> > >> +
+> > >> +     return ERR_PTR(-ENOTSUPP);
+> > >> +}
+> > >> +
+> > >>  /* Register HCI device */
+> > >>  int hci_register_dev(struct hci_dev *hdev)
+> > >>  {
+> > >> @@ -1155,6 +1166,11 @@ int hci_register_dev(struct hci_dev *hdev)
+> > >>       if (!hdev->workqueue)
+> > >>               goto nomem;
+> > >>
+> > >> +     hdev->tfm = alloc_cypher();
+> > >> +     if (IS_ERR(hdev->tfm))
+> > >> +             BT_INFO("Failed to load transform for ecb(aes): %ld",
+> > >> +                                                     PTR_ERR(hdev->tfm));
+> > >> +
+> > >>       hci_register_sysfs(hdev);
+> > >>
+> > >>       hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+> > >> @@ -1203,6 +1219,9 @@ int hci_unregister_dev(struct hci_dev *hdev)
+> > >>                                       !test_bit(HCI_SETUP, &hdev->flags))
+> > >>               mgmt_index_removed(hdev->id);
+> > >>
+> > >> +     if (!IS_ERR(hdev->tfm))
+> > >> +             crypto_free_blkcipher(hdev->tfm);
+> > >> +
+> > >>       hci_notify(hdev, HCI_DEV_UNREG);
+> > >>
+> > >>       if (hdev->rfkill) {
+> > >> @@ -2037,3 +2056,6 @@ static void hci_cmd_task(unsigned long arg)
+> > >>               }
+> > >>       }
+> > >>  }
+> > >> +
+> > >> +module_param(enable_smp, bool, 0644);
+> > >> +MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
+> > >
+> > > This all should be obviously inside smp.c
+> > 
+> > I have a couple of points against it:
+> > 
+> > 1. it's only used for one purpose, it says whether to try or not to
+> > allocate the block cypher, which is done during the adapter
+> > registration;
+> > 
+> > 2. If the current way is ok, it would mean that I would need to export
+> > another method from smp.c, that was something that I tried to
+> > minimize;
+> > 
+> > 3. and my weakest argument, seems that there are other similar uses,
+> > for example enable_mgmt.
+> 
+> A similar example here is enable_ertm inside l2cap_core.c. It's a L2CAP
+> related option and should reside inside L2CAP code.
+> 
+> > 
+> > But if you think the code will be clearer moving that to smp.c, will
+> > be glad to change.
+> 
+> I don't see the point on have it on hci code. SMP and Block cypher has
+> not much to do with HCI. I prefer it on smp.c
 
-You can do the pairing by hacking bluetoothd:
-https://bugzilla.gnome.org/show_bug.cgi?id=603845
+Gustavo and I were talking on IRC and couldn't come to a solution, so
+we ask you for some input.
 
-This is the first thing to fix to get proper Wiimote access. Marcel
-would also like the pairing and PIN setting to be handled directly in
-bluetoothd for this device.
+So, just to give a little more context, the problem is that the crypto
+functions used in SMP depend on the allocation of a block cypher "transform",
+this allocation must happen during user context.
 
-Cheers
+The current solution is that the allocation is done in hci_core.c during the
+adapter registration, but only when the enable_smp module parameter is enabled.
+When the parameter is disabled the allocation method just returns an invalid 
+pointer and everything happens the same as if the allocation has failed.
 
+Gustavo has a preference for an ondemand aproach, for example, using a
+workqueue for doing the allocation, and trying the allocation just when SMP is
+going to be used, e.g. when we receive the first SMP message or when some 
+security level is activated for that socket.
+
+Any ideas?
+
+> 
+> -- 
+> Gustavo F. Padovan
+> http://profusion.mobi
+
+
+Cheers,
+-- 
+Vinicius
