@@ -1,136 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 3 Mar 2011 11:31:54 -0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikko Vinni <mmvinni@yahoo.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Justin P. Mattock" <justinmattock@gmail.com>,
+	Ed Tomlinson <edt@aei.ca>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
+Message-ID: <20110303143154.GA2342@jh-x301>
+References: <635561.59590.qm@web161820.mail.bf1.yahoo.com>
+ <20110302140055.GA15047@jh-x301>
+ <574436.88358.qm@web161820.mail.bf1.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimymhOiY1=9k7aB80Vy-dTJF+22uDid+ivgJZH-@mail.gmail.com>
-References: <1299058614-8904-1-git-send-email-lkslawek@gmail.com>
-	<AANLkTikGvm5bjwyypJA6Pb47QmBcE1677dJdGQxo+3G7@mail.gmail.com>
-	<AANLkTim4d+RaySzaKUFg7yy0gHz-LL4avbYE7_EpDeip@mail.gmail.com>
-	<AANLkTi=Hu0tKrrt4_RMSijgvPkJ+WP7Y3TS4Ve5RbkeH@mail.gmail.com>
-	<AANLkTimymhOiY1=9k7aB80Vy-dTJF+22uDid+ivgJZH-@mail.gmail.com>
-Date: Thu, 3 Mar 2011 12:08:36 -0300
-Message-ID: <AANLkTinsGUaOCe0bwuvGP=z83=YqKd9ARPOOGLU=csLq@mail.gmail.com>
-Subject: Re: [PATCH 0/4] Message Access Profile plugin
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/mixed; boundary="BOKacYhQ+x31HxR3"
+In-Reply-To: <574436.88358.qm@web161820.mail.bf1.yahoo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Thu, Mar 3, 2011 at 11:09 AM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> On 3/3/11, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi,
->>
->> On Thu, Mar 3, 2011 at 6:58 AM, Slawomir Bochenski <lkslawek@gmail.com>
->> wrote:
->>> Hi,
->>>
->>> On Wed, Mar 2, 2011 at 10:12 PM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> I guess naming the file and plugin 'map' would make more sense here,
->>>> we don't want to confuse people what this file is about.
->>>
->>> There are two things which makes MAP - MAS and MNS. It is not like any
->>> other plugin we have here. The communication goes both ways, i.e. in
->>> full implementation there are OBEX server and OBEX client present on
->>> _both_ sides. As generally architecture of obexd and obex-client
->>> currently allows OBEX servers to be implemented only in obexd and OBEX
->>> clients in obex-client, it is easy to imagine that in order to add
->>> full MAP client role, there would be need for another plugin in obexd
->>> for MNS.
->>
->> But that doesn't solve any problem since the profile as a whole need
->> both client and server side it make no sense to have one without the
->> other, we can still have different drivers for each sides but the
->> plugin should be the same, it is a single profile not two.
->>
->
-> Let me rephrase this:
-> +-------+-------------+---------------+
-> |MAP    | obex-client | client/mns.c  |
-> |Server |             |     / \       |
-> |role   |             |      |        |
-> |       +-------------|    D-Bus      |
-> |       | obexd       |      |        |
-> |       |             |     \ /       |
-> |       |             | plugins/mas.c |
-> +-------+-------------+---------------+
->
-> +-------+-------------+---------------+
-> |MAP    | obex-client | client/mas.c  |
-> |Client |             |     / \       |
-> |role   |             |      |        |
-> |       +-------------|    D-Bus      |
-> |       | obexd       |      |        |
-> |       |             |     \ /       |
-> |       |             | plugins/mns.c |
-> +-------+-------------+---------------+
->
->>> So there can be mns.c and mas.c, both in obexd, both completely
->>> independent - each one of them having nothing in common, i.e. user can
->>> run mns when he wants to be MAP client, mas when he wants to be MAP
->>> server or mas and mns when he likes to be both.
->>>
->>> Therefore naming it "map" would confuse more those who know what is
->>> MAP and what they really want.
->>
->> Again if they cannot be qualified separately then it make no sense to
->> separate them in two plugin, the logical separation can happen on
->> driver level.
->
-> So yes, they most definitely can be qualified separately.
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Sorry but I doubt you can, MAS and MSN are not profiles they just
-represent services, besides it is mandatory to support both MAS and
-MNS in MSE see Table 4-1:MAP features, so at least for obexd it
-doesn't make much sense to have them separated in two plugins, they
-can be separated in different files which are used by the same plugin,
-this make it easier to enable/disable MAP as o whole.
+Hi Mikko,
 
->>>> Also Ive been thinking on removing this internal APIs for backend,
->>>> each would implemented as plugin/mimetype driver directly and we can
->>>> create basic drivers for pbap and map and export its callbacks on
->>>> pbap.h and map.h respectively as we do for pcsuite which uses ftp
->>>> driver callbacks.
->>>
->>> I really hope that you will keep this in "thinking stage" for now. I
->>> see problems coming. I'd rather prefer to use what we have now and
->>> what works. There might be some parts that won't fit well in this new
->>> philosophy. It would be better to postpone considering such changes in
->>> MAP to the point when it will be in repository in a more complete
->>> form.
->>
->> It should not cause any problem, because core only knows about the
->> mimetype drivers, the backend interface is a plugin specific API. In
->> theory one could re implement pbap plugin which would have another
->> backend interface. If we have the backend implementing the mimetype
->> driver the only thing that changes is that no API is needed between
->> e.g. pbap plugin and the backend.
->>
->> Note that one of the worst problems with current pbap implementation
->> is the backend API, because it has to handle things like asynchronous
->> requests and cancel requests which comes from mimetype driver it had
->> to change several times during the development, I don't want this to
->> happen with map.
->
-> This already happened with MAP and it works. It is done differently than
-> in PBAP, for example handling of application parameters and cases when
-> body is sent and when it is not is done more cleanly. And I've already
-> seen the problems closer to the end of the MAP implementation road. What
-> you're proposing will make this road more bumpy.
+On Thu, Mar 03, 2011, Mikko Vinni wrote:
+> > I can't reproduce this issue with any of my Bluetooth  adapters (I tested
+> > with 6 different ones). Could you get us the hcidump of  what happens
+> > when bluetoothd tries to switch on the adapter for the very  first time?
+> > Probably you'll need to disable starting of bluetoothd when your  system
+> > boots so that you have the chance to run hcidump first. Additionally,  if
+> > possible, could you enable dynamic debug in your kernel and get the  logs
+> > from hci_core.c and hci_event.c? Typically you'd enable this  with
+> > something like:
+> > 
+> > echo 'file hci_event.c +p' >  /sys/kernel/debug/dynamic_debug/control
+> > echo 'file hci_core.c +p' >  /sys/kernel/debug/dynamic_debug/control
+> > 
+> > Hopefully those logs will give  some better idea of what's going on since
+> > the logs provided so far aren't  really helpful.
+> > 
+> 
+> - Compiled the kernel (2.6.38-rc7 now) with dynamic debug
+> - Commented out the lines to start bluetoothd from /lib/udev/rules.d/
+> - Killed bluetoothd
+> - rmmod'ed all bluetooth modules and then modprobe'd rfcomm (which pulls
+> in all the others) (this resets the situation so that the bug appears -
+> when unplugging and plugging the adapter in the working state it keeps
+> on working)
+> - enabled dynamic debug for hci_core.c, hci_event.c, and rfcomm/core.c
+> - plugged in the bluetooth adapter
+> - hcidump -w hcidump_ddebug (parsed version below)
+> - bluetoothd -d
+> - run hciconfig (without parameters) a couple of times
+> - waited some minutes
+> - run hciconfig -a (around 08:18:37 in the logs)
+> - adapter led starts blinking (and e.g. blueman-applet sees it)
+> - messages from syslog further below
+> 
+> Do these help?
 
-Sorry, but until this reach upstream you cannot assumed it has
-happened. That why we suggest sending us patches earlier so we can
-review and discuss architect and design aspects not only code, now
-that we had more experience with the backend interface we could
-actually experiment the direct approach without creating more APIs,
-usually it is easier to add API but hard to remove them once a lot of
-code depend on them. What you may suggest is to integrate MAP
-implementation as it is and latter change it, but please communicate
-before about design decisions, there is no need to develop this
-completely before sending upstream.
+They do indeed. However, the simplest short-term fix I can come up for
+this is in user space and not the kernel.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+> HCI sniffer - Bluetooth packet analyzer ver 2.0
+> btsnoop version: 1 datalink type: 1002
+> 2011-03-03 08:14:38.386728 < HCI Command: Reset (0x03|0x0003) plen 0
+> 2011-03-03 08:14:38.386759 > HCI Event: Command Status (0x0f) plen 4
+>     Unknown (0x00|0x0000) status 0x00 ncmd 1
+> 2011-03-03 08:14:38.386810 < HCI Command: Read Local Supported Features 
+> (0x04|0x0003) plen 0
+> 2011-03-03 08:14:38.524768 > HCI Event: Command Complete (0x0e) plen 4
+>     Reset (0x03|0x0003) ncmd 1
+>     status 0x00
+
+I'm not sure if this is correct. The command status for opcode 0 means
+that we can start sending commands to the controller, however since
+there's a pending reset command maybe we should be waiting for its
+command complete event before sending the features command. Or should we
+be sending the Reset command at all so early and instead wait for the
+command status before sending it?
+
+In any case what's happening is that there's never a command complete
+for the local features. This is one of those commands that user space
+tracks to determine that the adapter is initialized so if it never comes
+the adapter remains uninitialized from a bluetoothd perspective. There
+is supposed to be some work-around code in bluetoothd for this kind of
+situations, but due to the patch you found in the kernel the code
+doesn't get triggered since the "up" flag is not set when the situation
+happens. The patch I've attached removed this check for the flag. Could
+you try and see if it helps?
+
+Meanwhile, it'd be nice to get some input from more knowledgeable
+persons on whether the kernel is doing the right thing in not waiting
+for the command status for opcode 0 before sending the HCI_Reset.
+
+Johan
+
+--BOKacYhQ+x31HxR3
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="devup.patch"
+
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index fd19ef4..c46465a 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -1569,9 +1569,6 @@ static void read_local_name_complete(int index, read_local_name_rp *rp)
+ 
+ 	DBG("Got name for hci%d", index);
+ 
+-	if (!dev->up)
+-		return;
+-
+ 	/* Even though it shouldn't happen (assuming the kernel behaves
+ 	 * properly) it seems like we might miss the very first
+ 	 * initialization commands that the kernel sends. So check for
+
+--BOKacYhQ+x31HxR3--
