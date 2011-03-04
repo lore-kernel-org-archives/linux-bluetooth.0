@@ -2,60 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 4/6] Bluetooth: Check advertising cache in hci_connect()
-Date: Fri,  4 Mar 2011 17:35:11 -0300
-Message-Id: <1299270913-8436-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 3/6] Bluetooth: Protect adv_entries with a RW semaphore
+Date: Fri,  4 Mar 2011 17:35:10 -0300
+Message-Id: <1299270913-8436-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
 References: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When connecting to a LE device, we need to check the advertising cache
-in order to know the bdaddr_type of that device. Additionally,
-hci_le_connect() was changed to handle the bdaddr_type info.
+This patch adds a RW semaphore to protect concurrent operations on
+adv_entries list.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   22 ++++++++++++++++++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9a4a769..2d3197a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -45,7 +45,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 970711d..bf7b5df 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -178,6 +178,7 @@ struct hci_dev {
+ 	struct list_head	link_keys;
  
--static void hci_le_connect(struct hci_conn *conn)
-+static void hci_le_connect(struct hci_conn *conn, u8 bdaddr_type)
+ 	struct list_head	adv_entries;
++	struct rw_semaphore	adv_entries_rwsem;
+ 
+ 	struct hci_dev_stats	stat;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cbff329..71f8788 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -44,6 +44,7 @@
+ #include <linux/timer.h>
+ #include <linux/crypto.h>
+ #include <net/sock.h>
++#include <linux/rwsem.h>
+ 
+ #include <asm/system.h>
+ #include <linux/uaccess.h>
+@@ -1084,6 +1085,8 @@ static int hci_adv_entries_clear(struct hci_dev *hdev)
  {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_cp_le_create_conn cp;
-@@ -59,6 +59,7 @@ static void hci_le_connect(struct hci_conn *conn)
- 	cp.scan_interval = cpu_to_le16(0x0004);
- 	cp.scan_window = cpu_to_le16(0x0004);
- 	bacpy(&cp.peer_addr, &conn->dst);
-+	cp.peer_addr_type = bdaddr_type;
- 	cp.conn_interval_min = cpu_to_le16(0x0008);
- 	cp.conn_interval_max = cpu_to_le16(0x0100);
- 	cp.supervision_timeout = cpu_to_le16(0x0064);
-@@ -482,8 +483,13 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		le = hci_conn_add(hdev, LE_LINK, dst);
- 		if (!le)
- 			return ERR_PTR(-ENOMEM);
--		if (le->state == BT_OPEN)
--			hci_le_connect(le);
-+		if (le->state == BT_OPEN) {
-+			struct adv_entry *entry = hci_find_adv_entry(hdev, dst);
-+			if (!entry)
-+				return ERR_PTR(-EHOSTUNREACH);
+ 	struct list_head *p, *n;
+ 
++	down_write(&hdev->adv_entries_rwsem);
 +
-+			hci_le_connect(le, entry->bdaddr_type);
+ 	list_for_each_safe(p, n, &hdev->adv_entries) {
+ 		struct adv_entry *entry;
+ 
+@@ -1093,23 +1096,31 @@ static int hci_adv_entries_clear(struct hci_dev *hdev)
+ 		kfree(entry);
+ 	}
+ 
++	up_write(&hdev->adv_entries_rwsem);
++
+ 	return 0;
+ }
+ 
+ struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct list_head *p;
++	struct adv_entry *res = NULL;
++
++	down_read(&hdev->adv_entries_rwsem);
+ 
+ 	list_for_each(p, &hdev->adv_entries) {
+ 		struct adv_entry *entry;
+ 
+ 		entry = list_entry(p, struct adv_entry, list);
+ 
+-		if (bacmp(bdaddr, &entry->bdaddr) == 0)
+-			return entry;
++		if (bacmp(bdaddr, &entry->bdaddr) == 0) {
++			res = entry;
++			goto out;
 +		}
+ 	}
+-
+-	return NULL;
++out:
++	up_read(&hdev->adv_entries_rwsem);
++	return res;
+ }
  
- 		hci_conn_hold(le);
+ static inline int is_connectable_adv(u8 evt_type)
+@@ -1141,7 +1152,9 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+ 	bacpy(&entry->bdaddr, &ev->bdaddr);
+ 	entry->bdaddr_type = ev->bdaddr_type;
  
++	down_write(&hdev->adv_entries_rwsem);
+ 	list_add(&entry->list, &hdev->adv_entries);
++	up_write(&hdev->adv_entries_rwsem);
+ 
+ 	return 0;
+ }
+@@ -1219,6 +1232,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&hdev->link_keys);
+ 
+ 	INIT_LIST_HEAD(&hdev->adv_entries);
++	init_rwsem(&hdev->adv_entries_rwsem);
+ 
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
 -- 
 1.7.1
 
