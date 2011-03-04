@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Mar 2011 21:53:09 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Suraj Sumangala <suraj@Atheros.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: updating unacked_frames counter during retransmission
-Message-ID: <20110305005309.GB9005@joana>
-References: <4D6F358B.9020603@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4D6F358B.9020603@Atheros.com>
+In-Reply-To: <AANLkTik5Z_eAA_qWGB_rwoK3P1g4jMnM6hj26fje6JHf@mail.gmail.com>
+References: <1299076306-11955-1-git-send-email-geryk@ti.com> <AANLkTik5Z_eAA_qWGB_rwoK3P1g4jMnM6hj26fje6JHf@mail.gmail.com>
+From: Ohad Ben-Cohen <ohad@wizery.com>
+Date: Sat, 5 Mar 2011 01:34:19 +0200
+Message-ID: <AANLkTimkoaZqn9SDEuc=vuazzqwA7Jrmz1hiwDWSXhM2@mail.gmail.com>
+Subject: Re: [PATCH v2] linux-firmware: Initial release for Bluetooth init script
+To: Pavan Savoy <pavan_savoy@ti.com>
+Cc: Gery Kahn <gery.kahn@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Luciano Coelho <coelho@ti.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+Hi Pavan,
 
-* Suraj Sumangala <suraj@Atheros.com> [2011-03-03 12:00:35 +0530]:
+On Thu, Mar 3, 2011 at 3:44 PM, Pavan Savoy <pavan_savoy@ti.com> wrote:
+> On Wed, Mar 2, 2011 at 8:01 PM, Gery Kahn <gery.kahn@gmail.com> wrote:
+...
+> Can we name this in all smaller case?
 
-> Hi Gustavo,
-> 
-> I have a question regarding the ERTM implementation.
-> 
-> Should we be incrementing the "l2cap_pinfo.unacked_frames" variable if 
-> we are retransmitting a frame?
+How is this going to work with smaller case ?
 
-No, if we are retransmitting a frame that means L2CAP didn't received an ack
-for it and we are already accounting it in unacked_frames and there is no need
-to increment unacked_frames in this case.
+AFAICS, Gery used the exact name format that st_kim is looking for:
 
-> 
-> Won't this cause the same frame to be accounted twice?
-> 
-> If there are too many retransmissions, will there be a chance that 
-> "unacked_frames" could cross 0xFF and over flow.
+http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=drivers/misc/ti-st/st_kim.c;h=73b6c8b0e8696db9dbe8a71590bf7b62fb3b5532;hb=HEAD#l261
 
-No, unacked_frames number is limited by the remote transmission window size.
+Do you plan to change st_kim ?
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+If so, please first change it, and then update the firmware file.
+
+Thanks,
+Ohad.
