@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/4] Make strtoba use str2ba for string conversion
-Date: Fri, 4 Mar 2011 19:34:05 +0100
-Message-ID: <1299263645-25329-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/4] Fix str2ba behaviour on malformed bt address
+Date: Fri, 4 Mar 2011 19:34:04 +0100
+Message-ID: <1299263645-25329-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1299263645-25329-1-git-send-email-szymon.janc@tieto.com>
 References: <1299263645-25329-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,42 +14,43 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+str2ba could create bogus bt address from malformed string. Return
+all zeros bt address on malformed string.
 ---
- lib/bluetooth.c |   18 ++++++------------
- 1 files changed, 6 insertions(+), 12 deletions(-)
+ lib/bluetooth.c |   15 +++++++--------
+ 1 files changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/lib/bluetooth.c b/lib/bluetooth.c
-index d943fdc..aac9bdc 100644
+index f51e310..d943fdc 100644
 --- a/lib/bluetooth.c
 +++ b/lib/bluetooth.c
-@@ -63,21 +63,15 @@ char *batostr(const bdaddr_t *ba)
+@@ -88,19 +88,18 @@ int ba2str(const bdaddr_t *ba, char *str)
  
- bdaddr_t *strtoba(const char *str)
+ int str2ba(const char *str, bdaddr_t *ba)
  {
+-	uint8_t b[6];
 -	const char *ptr = str;
--	int i;
--
--	uint8_t *ba = bt_malloc(sizeof(bdaddr_t));
--	if (!ba)
--		return NULL;
 +	bdaddr_t b;
-+	bdaddr_t *ba = bt_malloc(sizeof(*ba));
+ 	int i;
  
 -	for (i = 0; i < 6; i++) {
--		ba[i] = (uint8_t) strtol(ptr, NULL, 16);
--		if (i != 5 && !(ptr = strchr(ptr,':')))
+-		b[i] = (uint8_t) strtol(ptr, NULL, 16);
+-		if (i != 5 && !(ptr = strchr(ptr, ':')))
 -			ptr = ":00:00:00:00:00";
 -		ptr++;
-+	if (ba) {
-+		str2ba(str, &b);
-+		baswap(ba, &b);
++	if (bachk(str) < 0) {
++		memset(ba, 0, sizeof(*ba));
++		return -1;
  	}
  
--	return (bdaddr_t *) ba;
-+	return ba;
+-	baswap(ba, (bdaddr_t *) b);
++	for (i = 0; i < 6; i++, str += 3)
++		b.b[i] = strtol(str, NULL, 16);
+ 
++	baswap(ba, &b);
+ 	return 0;
  }
  
- int ba2str(const bdaddr_t *ba, char *str)
 -- 
 1.7.0.4
 
