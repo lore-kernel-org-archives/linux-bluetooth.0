@@ -2,100 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCHv3 2/2] Fix MTU value used on MTU exchange response
-Date: Fri,  4 Mar 2011 16:17:45 -0400
-Message-Id: <1299269865-1259-2-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCHv3 1/2] Use CID to infer transport type
+Date: Fri,  4 Mar 2011 16:17:44 -0400
+Message-Id: <1299269865-1259-1-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1299083684-5062-2-git-send-email-bruna.moreira@openbossa.org>
 References: <1299083684-5062-2-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ATT_MTU_RESP shall send the original MTU value prior to the exchange. If
-client sends an invalid value, the server shall use the ATT_DEFAULT_LE_MTU
-value. This operation is not supported in BR/EDR, so if any client sends
-this request it will be ignored by server and it will reply with
-"Request not supported".
-
-For BR/EDR, the MTU is limited to ATT_MAX_MTU (currently 256). This
-avoids allocating a big buffer when most ATT PDUs are small.
-
-Note: the kernel currently limits the minimum MTU to 48, regardless of
-transport type. This limit is valid only for BR/EDR, for LE the minimum
-is 23. This bug will be fixed, but it does not affect the outgoing MTU
-for new created LE sockets, which are correctly set to 23.
+Instead of comparing GIOChannel pointers, use the CID returned by
+bt_io_get() to infer the transport type. LE uses the fixed CID for GATT.
 ---
- src/attrib-server.c |   27 +++++++++++++++++++++++----
- 1 files changed, 23 insertions(+), 4 deletions(-)
+ src/attrib-server.c |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 61db851..8464d2a 100644
+index b980b28..61db851 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -59,6 +59,7 @@ struct gatt_channel {
- 	GSList *indicate;
- 	GAttrib *attrib;
- 	guint mtu;
-+	gboolean le;
- 	guint id;
- 	gboolean encrypted;
- };
-@@ -759,9 +760,18 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
- static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
- 		uint8_t *pdu, int len)
+@@ -899,7 +899,7 @@ done:
+ static void connect_event(GIOChannel *io, GError *err, void *user_data)
  {
--	channel->mtu = MIN(mtu, channel->mtu);
-+	guint old_mtu = channel->mtu;
+ 	struct gatt_channel *channel;
+-	GIOChannel **server_io = user_data;
++	uint16_t cid;
+ 	GError *gerr = NULL;
  
--	return enc_mtu_resp(channel->mtu, pdu, len);
-+	if (mtu < ATT_DEFAULT_LE_MTU)
-+		channel->mtu = ATT_DEFAULT_LE_MTU;
-+	else
-+		channel->mtu = MIN(mtu, channel->mtu);
-+
-+	bt_io_set(le_io, BT_IO_L2CAP, NULL,
-+			BT_IO_OPT_OMTU, channel->mtu,
-+			BT_IO_OPT_INVALID);
-+
-+	return enc_mtu_resp(old_mtu, pdu, len);
- }
- 
- static void channel_disconnect(void *user_data)
-@@ -831,6 +841,11 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 		length = read_blob(channel, start, offset, opdu, channel->mtu);
- 		break;
- 	case ATT_OP_MTU_REQ:
-+		if (!channel->le) {
-+			status = ATT_ECODE_REQ_NOT_SUPP;
-+			goto done;
-+		}
-+
- 		length = dec_mtu_req(ipdu, len, &mtu);
- 		if (length == 0) {
- 			status = ATT_ECODE_INVALID_PDU;
-@@ -913,6 +928,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 	if (err) {
+@@ -912,6 +912,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 	bt_io_get(io, BT_IO_L2CAP, &gerr,
  			BT_IO_OPT_SOURCE_BDADDR, &channel->src,
  			BT_IO_OPT_DEST_BDADDR, &channel->dst,
- 			BT_IO_OPT_CID, &cid,
-+			BT_IO_OPT_OMTU, &channel->mtu,
++			BT_IO_OPT_CID, &cid,
  			BT_IO_OPT_INVALID);
  	if (gerr) {
  		error("bt_io_get: %s", gerr->message);
-@@ -922,10 +938,13 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+@@ -921,7 +922,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
  		return;
  	}
  
-+	if (channel->mtu > ATT_MAX_MTU)
-+		channel->mtu = ATT_MAX_MTU;
-+
- 	if (cid != GATT_CID)
--		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
-+		channel->le = FALSE;
+-	if (server_io == &l2cap_io)
++	if (cid != GATT_CID)
+ 		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
  	else
--		channel->mtu = ATT_DEFAULT_LE_MTU;
-+		channel->le = TRUE;
+ 		channel->mtu = ATT_DEFAULT_LE_MTU;
+@@ -1046,7 +1047,7 @@ int attrib_server_init(void)
  
- 	channel->attrib = g_attrib_new(io);
- 	g_io_channel_unref(io);
+ 	/* BR/EDR socket */
+ 	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+-					&l2cap_io, NULL, &gerr,
++					NULL, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
+ 					BT_IO_OPT_PSM, GATT_PSM,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
 -- 
 1.7.0.4
 
