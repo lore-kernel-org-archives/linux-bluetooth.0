@@ -1,95 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 1/6] Bluetooth: Implement advertising report meta event
-Date: Fri,  4 Mar 2011 17:35:08 -0300
-Message-Id: <1299270913-8436-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
-References: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [RFC 0/6] LE advertising cache
+Date: Fri,  4 Mar 2011 17:35:07 -0300
+Message-Id: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+During a LE connection establishment, the host should be able to infer the
+bdaddr type from a given bdaddr.
 
-This patch implements new LE meta event in order to handle advertising
-reports.
+To achieve that, during the LE scanning, the host stores the bdaddr and the
+bdaddr type gathered from advertising reports. The host keeps a list of
+advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
+be called Advertising Cache.
 
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
----
- include/net/bluetooth/hci.h |   18 ++++++++++++++++++
- net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
- 2 files changed, 40 insertions(+), 0 deletions(-)
+Since the penality to connect to an unreachable device is relatively high,
+we must keep only fresh advertising entries on the advertising cache. So,
+before each LE scanning the advertising cache is cleared. Also, after the LE
+scanning, a timer is set to clear the cache.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index d851f8b..fdcc494 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1011,6 +1011,24 @@ struct hci_ev_le_conn_complete {
- 	__u8     clk_accurancy;
- } __packed;
- 
-+#define ADV_IND		0x00
-+#define ADV_DIRECT_IND	0x01
-+#define ADV_SCAN_IND	0x02
-+#define ADV_NONCONN_IND	0x03
-+#define SCAN_RSP	0x04
-+
-+#define ADDR_DEV_PUBLIC	0x00
-+#define ADDR_DEV_RANDOM	0x01
-+
-+#define HCI_EV_LE_ADVERTISING_REPORT	0x02
-+struct hci_ev_le_advertising_info {
-+	__u8	 evt_type;
-+	__u8	 bdaddr_type;
-+	bdaddr_t bdaddr;
-+	__u8	 length;
-+	__u8	 data[0];
-+} __packed;
-+
- #define HCI_EV_LE_LTK_REQ		0x05
- struct hci_ev_le_ltk_req {
- 	__le16	handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5a2ab2c..8acc4a5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2556,6 +2556,24 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
- }
- 
-+static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
-+						struct sk_buff *skb)
-+{
-+	struct hci_ev_le_advertising_info *ev;
-+	u8 num_reports, i;
-+
-+	num_reports = skb->data[0];
-+
-+	ev = (void *) &skb->data[1];
-+
-+	BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-+
-+	for (i = 1; i < num_reports; i++) {
-+		ev = (void *) (ev->data + ev->length + 1);
-+		BT_DBG("adv from: %s", batostr(&ev->bdaddr));
-+	}
-+}
-+
- static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-@@ -2571,6 +2589,10 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_ltk_request_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_LE_ADVERTISING_REPORT:
-+		hci_le_adv_report_evt(hdev, skb);
-+		break;
-+
- 	default:
- 		break;
- 	}
--- 
-1.7.1
+Next steps include removing all advertising cache from userspace and
+implementing a mechanism to sync kernel and userspace advertising cache.
+
+Patches are rebased using Vinicius SMP patches, repo:
+git://git.infradead.org/users/vcgomes/linux-2.6.git for-next
+
+Anderson Briglia (1):
+  Bluetooth: Implement advertising report meta event
+
+Andre Guedes (5):
+  Bluetooth: LE advertising info caching
+  Bluetooth: Protect adv_entries with a RW semaphore
+  Bluetooth: Check advertising cache in hci_connect()
+  Bluetooth: Clear advertising cache before scanning
+  Bluetooth: Add a timer to clear the advertising cache
+
+ include/net/bluetooth/hci.h      |   20 ++++++++
+ include/net/bluetooth/hci_core.h |   16 +++++++
+ net/bluetooth/hci_conn.c         |   12 ++++-
+ net/bluetooth/hci_core.c         |   92 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   48 ++++++++++++++++++++
+ 5 files changed, 185 insertions(+), 3 deletions(-)
 
