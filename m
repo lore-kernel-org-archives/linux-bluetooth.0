@@ -1,26 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mike Tsai <Mike.Tsai@Atheros.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Brian Gix <bgix@codeaurora.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 3 Mar 2011 18:36:26 -0800
-Subject: RE: RFC: LE Security Manager and next steps
-Message-ID: <35B17FE5076C7040809188FBE7913F9843169AF1F8@SC1EXMB-MBCL.global.atheros.com>
-References: <4D6FF23D.5020608@codeaurora.org> <20110304013706.GA20251@piper>
-In-Reply-To: <20110304013706.GA20251@piper>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi,
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Vinicius Costa Gomes
-Sent: Thursday, March 03, 2011 5:37 PM
-To: Brian Gix
+Date: Thu, 3 Mar 2011 22:37:06 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: RFC: LE Security Manager and next steps
+Message-ID: <20110304013706.GA20251@piper>
+References: <4D6FF23D.5020608@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4D6FF23D.5020608@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
+List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Brian,
 
@@ -73,10 +63,6 @@ For now I have a separate storage for LTKs. For the other kinds of
 keys I am still not sure how to store/use them. Right now, your idea
 holds, it is completely hidden from the apps how the pairing happened.
 
-[MT]The Keys can be stored based on the public or static address. CSRK is used
-For data signing, LTK is used for encryption and IDK is used for resolving private 
-Address. Could it be possible to store/retrieve these keys all from inside the SM context? 
-That would save many additional work to create management interface?
 > 
 > Also, I understand that some people think that Write-Cmd signing
 > (CSRK) and verification should be a function of GATT/ATT in User
@@ -90,12 +76,6 @@ preference about doing it in userspace (most of the ATT stuff is there).
 But it is just a gut feeling.
 
 This is something that any form of input will be awesome. 
-
-[MT]ATT is in user space and only it can recognize the need to either sign
-The command or verify the data signing. The CMAC algorithm can be implement
-On user space, however, its input parameters have to come from SM. A 
-Possible solution would be allowing ATT to call SM API to sign/verify the
-Data signing.
 
 > 
 > Privacy is the biggest problem however.  Identity *resolution* can
@@ -124,11 +104,6 @@ But even without this restriction I guess there are few problems that
 need be solved before we can support Privacy the Right Way. In short,
 any help with this will be great :-)
 
-[MTsai]One solution is not to store private address, but only the public address at user space level. Private
-Address in a temporary thing (update every 15 minutes) and it can always be converted back to Public address,
-Or else discarded if can't. The Appl will only base on public address for all the operations. 
-
-
 > 
 > Anyway, we are starting work on this soon, so if there is
 > competing/complimentary work being done, I would really like to hear
@@ -152,13 +127,4 @@ Cheers,
 -- 
 Vinicius
 
-Regards,
-
-Mike
-
-
 [1] http://www.bluez.org/the-management-interface/
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
