@@ -1,46 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 0/6] LE advertising cache
-Date: Fri,  4 Mar 2011 17:35:07 -0300
-Message-Id: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCHv3 2/2] Fix MTU value used on MTU exchange response
+Date: Fri,  4 Mar 2011 16:17:45 -0400
+Message-Id: <1299269865-1259-2-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1299083684-5062-2-git-send-email-bruna.moreira@openbossa.org>
+References: <1299083684-5062-2-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During a LE connection establishment, the host should be able to infer the
-bdaddr type from a given bdaddr.
+ATT_MTU_RESP shall send the original MTU value prior to the exchange. If
+client sends an invalid value, the server shall use the ATT_DEFAULT_LE_MTU
+value. This operation is not supported in BR/EDR, so if any client sends
+this request it will be ignored by server and it will reply with
+"Request not supported".
 
-To achieve that, during the LE scanning, the host stores the bdaddr and the
-bdaddr type gathered from advertising reports. The host keeps a list of
-advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
-be called Advertising Cache.
+For BR/EDR, the MTU is limited to ATT_MAX_MTU (currently 256). This
+avoids allocating a big buffer when most ATT PDUs are small.
 
-Since the penality to connect to an unreachable device is relatively high,
-we must keep only fresh advertising entries on the advertising cache. So,
-before each LE scanning the advertising cache is cleared. Also, after the LE
-scanning, a timer is set to clear the cache.
+Note: the kernel currently limits the minimum MTU to 48, regardless of
+transport type. This limit is valid only for BR/EDR, for LE the minimum
+is 23. This bug will be fixed, but it does not affect the outgoing MTU
+for new created LE sockets, which are correctly set to 23.
+---
+ src/attrib-server.c |   27 +++++++++++++++++++++++----
+ 1 files changed, 23 insertions(+), 4 deletions(-)
 
-Next steps include removing all advertising cache from userspace and
-implementing a mechanism to sync kernel and userspace advertising cache.
-
-Patches are rebased using Vinicius SMP patches, repo:
-git://git.infradead.org/users/vcgomes/linux-2.6.git for-next
-
-Anderson Briglia (1):
-  Bluetooth: Implement advertising report meta event
-
-Andre Guedes (5):
-  Bluetooth: LE advertising info caching
-  Bluetooth: Protect adv_entries with a RW semaphore
-  Bluetooth: Check advertising cache in hci_connect()
-  Bluetooth: Clear advertising cache before scanning
-  Bluetooth: Add a timer to clear the advertising cache
-
- include/net/bluetooth/hci.h      |   20 ++++++++
- include/net/bluetooth/hci_core.h |   16 +++++++
- net/bluetooth/hci_conn.c         |   12 ++++-
- net/bluetooth/hci_core.c         |   92 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |   48 ++++++++++++++++++++
- 5 files changed, 185 insertions(+), 3 deletions(-)
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 61db851..8464d2a 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -59,6 +59,7 @@ struct gatt_channel {
+ 	GSList *indicate;
+ 	GAttrib *attrib;
+ 	guint mtu;
++	gboolean le;
+ 	guint id;
+ 	gboolean encrypted;
+ };
+@@ -759,9 +760,18 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
+ static uint16_t mtu_exchange(struct gatt_channel *channel, uint16_t mtu,
+ 		uint8_t *pdu, int len)
+ {
+-	channel->mtu = MIN(mtu, channel->mtu);
++	guint old_mtu = channel->mtu;
+ 
+-	return enc_mtu_resp(channel->mtu, pdu, len);
++	if (mtu < ATT_DEFAULT_LE_MTU)
++		channel->mtu = ATT_DEFAULT_LE_MTU;
++	else
++		channel->mtu = MIN(mtu, channel->mtu);
++
++	bt_io_set(le_io, BT_IO_L2CAP, NULL,
++			BT_IO_OPT_OMTU, channel->mtu,
++			BT_IO_OPT_INVALID);
++
++	return enc_mtu_resp(old_mtu, pdu, len);
+ }
+ 
+ static void channel_disconnect(void *user_data)
+@@ -831,6 +841,11 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+ 		length = read_blob(channel, start, offset, opdu, channel->mtu);
+ 		break;
+ 	case ATT_OP_MTU_REQ:
++		if (!channel->le) {
++			status = ATT_ECODE_REQ_NOT_SUPP;
++			goto done;
++		}
++
+ 		length = dec_mtu_req(ipdu, len, &mtu);
+ 		if (length == 0) {
+ 			status = ATT_ECODE_INVALID_PDU;
+@@ -913,6 +928,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 			BT_IO_OPT_SOURCE_BDADDR, &channel->src,
+ 			BT_IO_OPT_DEST_BDADDR, &channel->dst,
+ 			BT_IO_OPT_CID, &cid,
++			BT_IO_OPT_OMTU, &channel->mtu,
+ 			BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		error("bt_io_get: %s", gerr->message);
+@@ -922,10 +938,13 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 		return;
+ 	}
+ 
++	if (channel->mtu > ATT_MAX_MTU)
++		channel->mtu = ATT_MAX_MTU;
++
+ 	if (cid != GATT_CID)
+-		channel->mtu = ATT_DEFAULT_L2CAP_MTU;
++		channel->le = FALSE;
+ 	else
+-		channel->mtu = ATT_DEFAULT_LE_MTU;
++		channel->le = TRUE;
+ 
+ 	channel->attrib = g_attrib_new(io);
+ 	g_io_channel_unref(io);
+-- 
+1.7.0.4
 
