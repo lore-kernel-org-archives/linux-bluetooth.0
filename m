@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Mar 2011 16:43:33 -0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: lkslawek@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix support for shells that do not have "+="
-Message-ID: <20110304194333.GA31553@jh-x301>
-References: <1298637272-21031-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1298637272-21031-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1299083684-5062-1-git-send-email-bruna.moreira@openbossa.org>
+References: <1298583454-18227-1-git-send-email-bruna.moreira@openbossa.org>
+	<1299083684-5062-1-git-send-email-bruna.moreira@openbossa.org>
+Date: Fri, 4 Mar 2011 15:32:11 -0400
+Message-ID: <AANLkTin6_iXpnzefS3duPz0n8PV804CVE0LjPmDfF4+Y@mail.gmail.com>
+Subject: Re: [PATCHv2 1/2] Use CID to infer transport type
+From: Bruna Moreira <bruna.moreira@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
-
-On Fri, Feb 25, 2011, lkslawek@gmail.com wrote:
-> From: Slawomir Bochenski <lkslawek@gmail.com>
-> 
-> This will make maintainer mode work on less advanced shells, the ones
-> that do not support appending.
+On 3/2/11, Bruna Moreira <bruna.moreira@openbossa.org> wrote:
+> Instead of comparing GIOChannel pointers, use the CID returned by
+> bt_io_get() to infer the transport type. LE uses the fixed CID for GATT.
 > ---
->  acinclude.m4 |   16 ++++++++--------
->  1 files changed, 8 insertions(+), 8 deletions(-)
+>  src/attrib-server.c |    7 ++++---
+>  1 files changed, 4 insertions(+), 3 deletions(-)
+>
 
-Pushed upstream. Thanks. I also went ahead and pushed a similar patch
-for BlueZ.
+Please ignore this series, I will send a fixed one (I found a bug
+after running more tests).
 
-Johan
+BR,
+-- 
+Bruna Moreira
+Instituto Nokia de Tecnologia (INdT)
+Manaus - Brazil
