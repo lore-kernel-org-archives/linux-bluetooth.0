@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] pand: Fix for TP_BNEP_CTRL_BV_01_C qualification test
-Date: Fri, 4 Mar 2011 19:35:09 +0100
-Message-ID: <1299263709-7763-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Fri, 4 Mar 2011 15:34:25 -0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	anderson.lizardo@openbossa.org
+Subject: Re: [PATCH v3] Fix response on adapter RequestSession method
+Message-ID: <20110304183425.GA21452@jh-x301>
+References: <1299054257-15806-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1299054257-15806-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1299054257-15806-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this fix pand will correctly respond on
-unknown BNEP control command
----
- compat/bnep.c |   16 ++++++++++++++++
- 1 files changed, 16 insertions(+), 0 deletions(-)
+Hi Dmitriy,
 
-diff --git a/compat/bnep.c b/compat/bnep.c
-index 24bf7e3..1d02ea7 100644
---- a/compat/bnep.c
-+++ b/compat/bnep.c
-@@ -231,6 +231,22 @@ int bnep_accept_connection(int sk, uint16_t role, char *dev)
- 		return -1;
- 
- 	req = (void *) pkt;
-+
-+	 /*
-+	 * Highest known Control command ID
-+	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06
-+	 */
-+	iif (req->type == BNEP_CONTROL &&
-+			req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-+		__u8 pkt[3];
-+		pkt[0] = BNEP_CONTROL;
-+		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
-+		pkt[2] = cmd;
-+
-+		send(sk, pkt, sizeof(*pkt), 0);
-+		return -1;
-+	}
-+
- 	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
- 		return -1;
- 
--- 
-1.7.0.4
+On Wed, Mar 02, 2011, Dmitriy Paliy wrote:
+> Fixes response on adapter RequestSession method to be sent after mode
+> is changed, if such is necessary. More specifically, change of power
+> off mode to power on is in question.
+> 
+> Currently response is sent when mode change is confirmed by agent, not
+> by response from controller. Such may lead to failed CreateDevice
+> method if it is called quickly enough after RequestSession when
+> controller is in powered off state.
+> 
+> New session is not created if there is already a session for such
+> D-Bus message.
+> ---
+>  src/adapter.c |   52 +++++++++++++++++++++++++++++++++++++++++-----------
+>  1 files changed, 41 insertions(+), 11 deletions(-)
 
+Pushed upstream. Thanks.
+
+Johan
