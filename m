@@ -1,256 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com, Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 1/5] Add new UUID utility functions
-Date: Fri,  4 Mar 2011 13:20:36 -0300
-Message-Id: <1299255640-13599-1-git-send-email-epx@signove.com>
+Message-ID: <4D710F7D.6090905@codeaurora.org>
+Date: Fri, 04 Mar 2011 08:12:45 -0800
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+Subject: Re: [PATCH] Bluetooth: Add counter for not acked HCI commands
+References: <1299003369-17901-1-git-send-email-andrzej.kaczmarek@tieto.com> <4D6D480E.7080908@codeaurora.org> <4D70DD01.2030003@tieto.com>
+In-Reply-To: <4D70DD01.2030003@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Hi Andrzej,
 
-New UUID functions will store the UUIDs values on host order. Byte
-ordering functions are implemented somewhere else.
----
- Makefile.am |    6 +-
- lib/uuid.c  |  134 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/uuid.h  |   61 +++++++++++++++++++++++++++
- 3 files changed, 198 insertions(+), 3 deletions(-)
- create mode 100644 lib/uuid.c
- create mode 100644 lib/uuid.h
+On 3/4/2011 4:37 AM, Andrzej Kaczmarek wrote:
+> Hi Brian,
+>
+> On 01.03.2011 20:25, Brian Gix wrote:
+>> The problem you describe sounds like one I had to solve in the past, but
+>> unfortunately, I think it may be a little more difficult to solve here.
+>> This particular baseband appears to have an outstanding Cmd queue of
+>> 2. It also appears to consume one of them for extended periods of time
+>> when making requests of the remote device, and using the NOP
+>> Cmd-Status-Event to inform the host that the slot is now free.
+>>
+>> As you are observing, the completion of the task (triggering additional
+>> requests locally) overlaps with these NOP responses, giving a false
+>> count to the host of available cmd slots.
+>>
+>> Personally, I consider this to be a baseband bug, which could have been
+>> avoided by having a max outstanding queue of 1.
+>
+> This particular controller uses 1 credit for each command that is being
+> processed and having max outstanding queue of 1 would make some
+> scenarios impossible - consider authentication with
+> HCI_Authentication_Request pending and other HCI command to be sent in
+> parallel.
+>
 
-diff --git a/Makefile.am b/Makefile.am
-index ec1ca97..8eb1e56 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -43,8 +43,8 @@ plugin_LTLIBRARIES =
- 
- 
- lib_headers = lib/bluetooth.h lib/hci.h lib/hci_lib.h lib/mgmt.h \
--			lib/sco.h lib/l2cap.h lib/sdp.h lib/sdp_lib.h \
--				lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
-+		lib/sco.h lib/l2cap.h lib/sdp.h lib/sdp_lib.h lib/uuid.h \
-+			lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
- local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
- 
- include_HEADERS += $(lib_headers)
-@@ -52,7 +52,7 @@ include_HEADERS += $(lib_headers)
- lib_LTLIBRARIES += lib/libbluetooth.la
- 
- lib_libbluetooth_la_SOURCES = $(lib_headers) \
--					lib/bluetooth.c lib/hci.c lib/sdp.c
-+			      lib/bluetooth.c lib/hci.c lib/sdp.c lib/uuid.c
- lib_libbluetooth_la_LDFLAGS = -version-info 13:5:10
- lib_libbluetooth_la_DEPENDENCIES = $(local_headers)
- 
-diff --git a/lib/uuid.c b/lib/uuid.c
-new file mode 100644
-index 0000000..6bdff12
---- /dev/null
-+++ b/lib/uuid.c
-@@ -0,0 +1,134 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <string.h>
-+
-+#include "uuid.h"
-+
-+#if __BYTE_ORDER == __BIG_ENDIAN
-+static uint128_t bluetooth_base_uuid = {
-+	.data = {	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB }
-+};
-+
-+#define BASE_UUID16_OFFSET	2
-+#define BASE_UUID32_OFFSET	0
-+
-+#else
-+static uint128_t bluetooth_base_uuid = {
-+	.data = {	0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
-+};
-+
-+#define BASE_UUID16_OFFSET	12
-+#define BASE_UUID32_OFFSET	BASE_UUID16_OFFSET
-+
-+#endif
-+
-+static void bt_uuid16_to_uuid128(const bt_uuid_t *uuid16, bt_uuid_t *uuid128)
-+{
-+	uint16_t data;
-+
-+	uuid128->value.u128 = bluetooth_base_uuid;
-+	uuid128->type = BT_UUID128;
-+
-+	memcpy(&data, &bluetooth_base_uuid.data[BASE_UUID16_OFFSET], 2);
-+	data += uuid16->value.u16;
-+
-+	memcpy(&uuid128->value.u128.data[BASE_UUID16_OFFSET], &data, 2);
-+}
-+
-+static void bt_uuid32_to_uuid128(const bt_uuid_t *uuid32, bt_uuid_t *uuid128)
-+{
-+	uint32_t data;
-+
-+	uuid128->value.u128 = bluetooth_base_uuid;
-+	uuid128->type = BT_UUID128;
-+
-+	memcpy(&data, &bluetooth_base_uuid.data[BASE_UUID32_OFFSET], 4);
-+	data += uuid32->value.u32;
-+
-+	memcpy(&uuid128->value.u128.data[BASE_UUID32_OFFSET], &data, 4);
-+}
-+
-+static void bt_uuid2uuid128(const bt_uuid_t *uuid, bt_uuid_t *uuid128)
-+{
-+	switch (uuid->type) {
-+	case BT_UUID128:
-+		memcpy(uuid128, uuid, sizeof(bt_uuid_t));
-+		break;
-+	case BT_UUID32:
-+		bt_uuid32_to_uuid128(uuid, uuid128);
-+		break;
-+	case BT_UUID16:
-+		bt_uuid16_to_uuid128(uuid, uuid128);
-+		break;
-+	}
-+}
-+
-+static int bt_uuid128_cmp(const bt_uuid_t *u1, const bt_uuid_t *u2)
-+{
-+	return memcmp(&u1->value.u128, &u2->value.u128, sizeof(uint128_t));
-+}
-+
-+int bt_uuid16_create(bt_uuid_t *btuuid, uint16_t value)
-+{
-+	memset(btuuid, 0, sizeof(bt_uuid_t));
-+	btuuid->type = BT_UUID16;
-+	btuuid->value.u16 = value;
-+
-+	return 0;
-+}
-+
-+int bt_uuid32_create(bt_uuid_t *btuuid, uint32_t value)
-+{
-+	memset(btuuid, 0, sizeof(bt_uuid_t));
-+	btuuid->type = BT_UUID32;
-+	btuuid->value.u32 = value;
-+
-+	return 0;
-+}
-+
-+int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value)
-+{
-+	memset(btuuid, 0, sizeof(bt_uuid_t));
-+	btuuid->type = BT_UUID128;
-+	btuuid->value.u128 = value;
-+
-+	return 0;
-+}
-+
-+int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2)
-+{
-+	bt_uuid_t u1, u2;
-+
-+	bt_uuid2uuid128(uuid1, &u1);
-+	bt_uuid2uuid128(uuid2, &u2);
-+
-+	return bt_uuid128_cmp(&u1, &u2);
-+}
-diff --git a/lib/uuid.h b/lib/uuid.h
-new file mode 100644
-index 0000000..bc9ca31
---- /dev/null
-+++ b/lib/uuid.h
-@@ -0,0 +1,61 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifndef __BLUETOOTH_UUID_H
-+#define __BLUETOOTH_UUID_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#include <stdint.h>
-+
-+typedef struct {
-+	uint8_t data[16];
-+} uint128_t;
-+
-+typedef struct {
-+	enum {
-+		BT_UUID16 = 16,
-+		BT_UUID32 = 32,
-+		BT_UUID128 = 128,
-+	} type;
-+	union {
-+		uint16_t  u16;
-+		uint32_t  u32;
-+		uint128_t u128;
-+	} value;
-+} bt_uuid_t;
-+
-+int bt_uuid16_create(bt_uuid_t *btuuid, uint16_t value);
-+int bt_uuid32_create(bt_uuid_t *btuuid, uint32_t value);
-+int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
-+
-+int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif /* __BLUETOOTH_UUID_H */
+The adjustment I suggest doesn't disallow this.  I was having a 
+theory-of-operation talk with a baseband guy once, and this is what he 
+had to say:
+
+The HCI interface is intended to be an interface that immediately 
+responds to *every* command. The problem is that some commands are 
+intended for the local baseband (and can be handled immediately) and 
+others require interaction outside of the control of the local baseband, 
+and take an indeterminate amount of time.
+
+So two response mechanism were created:
+
+Command    Immediate Rsp     Delayed Rsp
+Cmd   -->  Cmd Complete Evt                (Cmds handled Locally)
+Cmd   -->  Cmd Status Evt --> Cmplt Event  ("long" Async Cmds)
+
+The HCI flow control is contained in both the Cmd-Complt-Evt and the 
+Cmd-Status-Evt.
+
+So it is assumed that both flow control response event types will be 
+delivered immediately after the baseband receives them. Of course 
+because of the communication link, these response are still asyncronous 
+in most cases including the BlueZ case.
+
+The baseband guy basically said that "the baseband" does not expect the 
+next command until the host has processed the (immediate) response to 
+the previous one. And that the (immediate) response to the previous one 
+should be RXed in milliseconds at the most.
+
+So I would always delay sending the next command until the prior 
+commands CmdStatus or CmdCmplt has been received. This should work 
+unless there is something seriously wrong with the baseband.
+
+
 -- 
-1.7.1
-
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
