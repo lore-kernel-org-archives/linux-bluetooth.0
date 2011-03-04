@@ -1,85 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D712A3D.6090402@codeaurora.org>
+Date: Fri, 04 Mar 2011 10:06:53 -0800
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <1299251315-2041-1-git-send-email-szymon.janc@tieto.com>
-References: <1299251315-2041-1-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 4 Mar 2011 15:17:53 -0300
-Message-ID: <AANLkTinhJ2Omcj2s5Um8ARxhG1fVcwEEqH8uF-=dioMx@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] Support for out of band association model
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+CC: linux-bluetooth@vger.kernel.org,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH 1/5] Add new UUID utility functions
+References: <1299255640-13599-1-git-send-email-epx@signove.com>
+In-Reply-To: <1299255640-13599-1-git-send-email-epx@signove.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Elvis,
 
-On Fri, Mar 4, 2011 at 12:08 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Significant change since last version is that oob data is now fed to kernel (or
-> hciops) and is used while pairing if needed. No need for requesting
-> providers/agent while pairing. Advantage is less roundtrips and much simpler
-> implementation.
->
-> Whats in the patchset:
-> - for new kernels implementation in mgmtops
->  (with kernel patches from "[PATCH v2 0/4] Support for OOB in mgmt interface")
-> - for compatibility with older kernels implementation in hciops (mimic mgmt)
-> - D-Bus plugin only exposes OOB functionality. In future we could also have
->  CreateOOB[Paired]Device (or similar) which would act as
->  AddRemoteOobData+CreateDevice.
+I'm trying to understand the problem being addressed by these patches. I 
+am guessing that there is a difference in behaviour between little 
+endian and big endian architectures, but I still question some of the 
+changes.
 
-What happened to the idea of changing CreateDevice to take a
-dictionary as we discussed in irc? I guess this is the main point of
-the OOB since with this implementation any process can overwrite the
-OOB data of a remote device which is not safe, once we have OOB we
-should try to pair to check if the data is really valid. The drawback
-is that it breaks the current API but I guess we should be focusing on
-BlueZ 5.x pretty soon.
+One example below.
 
-> As usual, comments are welcome.
->
->
-> BR,
-> Szymon Janc
-> on behalf of ST-Ericsson
->
->
-> Szymon Janc (6):
->  Add initial support for Out of Band (OOB) association model
->  Add support for Out of Band (OOB) association model in mgmtops
->  Add support for Out of Band (OOB) association model in hciops
->  Add D-Bus OOB plugin
->  Update mgmt-api.txt with OOB commands
->  Add oob-api.txt with documentation about OOB D-Bus methods
->
->  Makefile.am       |    8 ++-
->  acinclude.m4      |    6 ++
->  doc/mgmt-api.txt  |   30 +++++++
->  doc/oob-api.txt   |   38 +++++++++
->  lib/mgmt.h        |   18 ++++
->  plugins/dbusoob.c |  241 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  plugins/hciops.c  |  143 ++++++++++++++++++++++++++++++-
->  plugins/mgmtops.c |  127 ++++++++++++++++++++++++++++
->  src/adapter.c     |   18 ++++
->  src/adapter.h     |   12 +++
->  src/oob.c         |   43 ++++++++++
->  src/oob.h         |   30 +++++++
->  12 files changed, 708 insertions(+), 6 deletions(-)
->  create mode 100644 doc/oob-api.txt
->  create mode 100644 plugins/dbusoob.c
->  create mode 100644 src/oob.c
->  create mode 100644 src/oob.h
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+On 11-03-04 08:20 AM, Elvis Pfützenreuter wrote:
+[...]
+> +
+> +#if __BYTE_ORDER == __BIG_ENDIAN
+> +static uint128_t bluetooth_base_uuid = {
+> +	.data = {	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+> +			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB }
+> +};
+> +
+> +#define BASE_UUID16_OFFSET	2
+> +#define BASE_UUID32_OFFSET	0
+> +
+> +#else
+> +static uint128_t bluetooth_base_uuid = {
+> +	.data = {	0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
+> +			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+> +};
+> +
+> +#define BASE_UUID16_OFFSET	12
+> +#define BASE_UUID32_OFFSET	BASE_UUID16_OFFSET
+> +
+> +#endif
+> +
+> +static void bt_uuid16_to_uuid128(const bt_uuid_t *uuid16, bt_uuid_t *uuid128)
+> +{
+> +	uint16_t data;
+> +
+> +	uuid128->value.u128 = bluetooth_base_uuid;
+> +	uuid128->type = BT_UUID128;
+> +
+> +	memcpy(&data,&bluetooth_base_uuid.data[BASE_UUID16_OFFSET], 2);
+
+This line should always be copying Zero, and so more directly should be 
+data = 0; These appear to be bluetooth specific, so the 4 MSBs of the 
+base are Zero by definition.
+
+> +	data += uuid16->value.u16;
+
+Given the above line, this would become "data = uuid16->value.16", and 
+the other eliminated.
+
+> +
+> +	memcpy(&uuid128->value.u128.data[BASE_UUID16_OFFSET],&data, 2);
+
+I don't believe this line to be always portable between platforms. This 
+line makes the assumption that a uint16_t is two native units (not 
+always true) and can therefore be directly memcopy'd into into an array 
+of uint8_t array members. This is not always true. memcpy should never 
+be used in portable code when packing data for network datagram usage 
+models (anything that treats data as an octet stream).
+
+I am not saying I agree with the need to store UUIDs in anything but 
+network order, however if I were to write a portable function that will 
+always work in this instance, I would eliminate all usage of memcpy here 
+and do something like:
+
+uuid128->value.u128.data[SHORT_UUID_LE_0] = (uint8_t) data;
+uuid128->value.u128.data[SHORT_UUID_LE_1] = (uint8_t) (data >> 8);
+
+And likewise for uuid32 to uui128:
+uuid128->value.u128.data[SHORT_UUID_LE_2] = (uint8_t) (data >> 16);
+uuid128->value.u128.data[SHORT_UUID_LE_3] = (uint8_t) (data >> 24);
 
 
+Where depending on the endian, SHORT_UUID_LE_0 thru SHORT_UUID_LE_3 
+would be defined as 3 thru 0 for Big Endian storage, and 12 thru 15 for 
+Little Endian storage.
+
+This is guaranteed to put the desired octet into it's correct position 
+within the uuid128's data array, while it could not be guaranteed across 
+platforms with memcpy.
+
+> +}
+
+
+Regards,
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
