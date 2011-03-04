@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v5 3/6] Add support for Out of Band (OOB) association model in hciops
-Date: Fri, 4 Mar 2011 16:08:32 +0100
-Message-ID: <1299251315-2041-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v5 2/6] Add support for Out of Band (OOB) association model in mgmtops
+Date: Fri, 4 Mar 2011 16:08:31 +0100
+Message-ID: <1299251315-2041-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1299251315-2041-1-git-send-email-szymon.janc@tieto.com>
 References: <1299251315-2041-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -15,236 +15,201 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/hciops.c |  118 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 110 insertions(+), 8 deletions(-)
+ lib/mgmt.h        |   18 +++++++++
+ plugins/mgmtops.c |  102 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 117 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 74ff7d5..9013694 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -50,6 +50,7 @@
- #include "storage.h"
- #include "event.h"
- #include "manager.h"
-+#include "oob.h"
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 7854ab1..bbe64d6 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -173,6 +173,24 @@ struct mgmt_rp_user_confirm_reply {
  
- static int child_pipe[2] = { -1, -1 };
+ #define MGMT_OP_USER_CONFIRM_NEG_REPLY	0x0016
  
-@@ -77,11 +78,18 @@ struct bt_conn {
- 	uint8_t loc_auth;
- 	uint8_t rem_cap;
- 	uint8_t rem_auth;
-+	uint8_t rem_oob_data;
- 	gboolean bonding_initiator;
- 	gboolean secmode3;
- 	GIOChannel *io; /* For raw L2CAP socket (bonding) */
- };
- 
-+struct oob_data {
++#define MGMT_OP_READ_LOCAL_OOB_DATA	0x0017
++struct mgmt_rp_read_local_oob_data {
++	uint8_t hash[16];
++	uint8_t randomizer[16];
++} __packed;
++
++#define MGMT_OP_ADD_REMOTE_OOB_DATA	0x0018
++struct mgmt_cp_add_remote_oob_data {
 +	bdaddr_t bdaddr;
 +	uint8_t hash[16];
 +	uint8_t randomizer[16];
-+};
++} __packed;
 +
- static int max_dev = -1;
- static struct dev_info {
- 	int id;
-@@ -120,6 +128,8 @@ static struct dev_info {
- 	GSList *keys;
- 	uint8_t pin_length;
- 
-+	GSList *oob_data;
++#define MGMT_OP_REMOVE_REMOTE_OOB_DATA	0x0019
++struct mgmt_cp_remove_remote_oob_data {
++	bdaddr_t bdaddr;
++} __packed;
 +
- 	GSList *uuids;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 6c840ca..4a52be8 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -47,6 +47,7 @@
+ #include "manager.h"
+ #include "device.h"
+ #include "event.h"
++#include "oob.h"
  
- 	GSList *connections;
-@@ -1053,14 +1063,43 @@ static void user_passkey_notify(int index, void *ptr)
- 						btohl(req->passkey));
+ #define MGMT_BUF_SIZE 1024
+ 
+@@ -996,6 +997,49 @@ static void get_connections_complete(int sk, uint16_t index, void *buf,
+ 	read_info(sk, index);
  }
  
--static void remote_oob_data_request(int index, void *ptr)
-+static gint oob_bdaddr_cmp(gconstpointer a, gconstpointer b)
++static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
++								size_t len)
 +{
-+	const struct oob_data *data = a;
-+	const bdaddr_t *bdaddr = b;
++	struct mgmt_rp_read_local_oob_data *rp = buf;
++	struct btd_adapter *adapter;
 +
-+	return bacmp(&data->bdaddr, bdaddr);
-+}
-+
-+static void remote_oob_data_request(int index, bdaddr_t *bdaddr)
- {
- 	struct dev_info *dev = &devs[index];
-+	GSList *match;
- 
- 	DBG("hci%d", index);
- 
--	hci_send_cmd(dev->sk, OGF_LINK_CTL,
--				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, ptr);
-+	match = g_slist_find_custom(dev->oob_data, bdaddr, oob_bdaddr_cmp);
-+
-+	if (match) {
-+		struct oob_data *data;
-+		remote_oob_data_reply_cp cp;
-+
-+		data = match->data;
-+
-+		bacpy(&cp.bdaddr, &data->bdaddr);
-+		memcpy(cp.hash, data->hash, sizeof(cp.hash));
-+		memcpy(cp.randomizer, data->randomizer, sizeof(cp.randomizer));
-+
-+		dev->oob_data = g_slist_delete_link(dev->oob_data, match);
-+
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_REMOTE_OOB_DATA_REPLY,
-+				REMOTE_OOB_DATA_REPLY_CP_SIZE, &cp);
-+
-+	} else {
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL,
-+				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, bdaddr);
++	if (len != sizeof(*rp)) {
++		error("Wrong read_local_oob_data_complete event size");
++		return;
 +	}
 +
- }
- 
- static int get_io_cap(int index, bdaddr_t *bdaddr, uint8_t *cap, uint8_t *auth)
-@@ -1158,11 +1197,23 @@ static void io_capa_request(int index, void *ptr)
- 					IO_CAPABILITY_NEG_REPLY_CP_SIZE, &cp);
- 	} else {
- 		io_capability_reply_cp cp;
-+		struct bt_conn *conn;
-+		GSList *match;
-+
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.bdaddr, dba);
- 		cp.capability = cap;
--		cp.oob_data = 0x00;
- 		cp.authentication = auth;
-+
-+		conn = find_connection(dev, dba);
-+		match = g_slist_find_custom(dev->oob_data, dba, oob_bdaddr_cmp);
-+
-+		if ((conn->bonding_initiator || conn->rem_oob_data == 0x01) &&
-+				match)
-+			cp.oob_data = 0x01;
-+		else
-+			cp.oob_data = 0x00;
-+
- 		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_IO_CAPABILITY_REPLY,
- 					IO_CAPABILITY_REPLY_CP_SIZE, &cp);
- 	}
-@@ -1182,6 +1233,7 @@ static void io_capa_response(int index, void *ptr)
- 	if (conn) {
- 		conn->rem_cap = evt->capability;
- 		conn->rem_auth = evt->authentication;
-+		conn->rem_oob_data = evt->oob_data;
- 	}
- }
- 
-@@ -1788,6 +1840,20 @@ static void write_class_complete(int index, uint8_t status)
- 		write_class(index, dev->wanted_cod);
- }
- 
-+static void read_local_oob_data_complete(int index, uint8_t status,
-+						read_local_oob_data_rp *rp)
-+{
-+	struct btd_adapter *adapter = manager_find_adapter_by_id(index);
-+
-+	if (!adapter)
++	if (index > max_index) {
++		error("Unexpected index %u in read_local_oob_data_complete",
++								index);
 +		return;
++	}
 +
-+	if (status)
-+		oob_local_data_read(adapter, NULL, NULL);
-+	else
++	DBG("hci%u", index);
++
++	adapter = manager_find_adapter_by_id(index);
++
++	if (adapter)
 +		oob_local_data_read(adapter, rp->hash, rp->randomizer);
 +}
 +
- static inline void cmd_complete(int index, void *ptr)
++static void read_local_oob_data_failed(int sk, uint16_t index)
++{
++	struct btd_adapter *adapter;
++
++	if (index > max_index) {
++		error("Unexpected index %u in read_local_oob_data_failed",
++								index);
++		return;
++	}
++
++	DBG("hci%u", index);
++
++	adapter = manager_find_adapter_by_id(index);
++
++	if (adapter)
++		oob_local_data_read(adapter, NULL, NULL);
++}
++
+ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
  {
- 	struct dev_info *dev = &devs[index];
-@@ -1861,6 +1927,10 @@ static inline void cmd_complete(int index, void *ptr)
- 		ptr += sizeof(evt_cmd_complete);
- 		read_tx_power_complete(index, ptr);
+ 	struct mgmt_ev_cmd_complete *ev = buf;
+@@ -1077,6 +1121,15 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ 	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
+ 		DBG("user_confirm_net_reply complete");
  		break;
-+	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA):
-+		ptr += sizeof(evt_cmd_complete);
-+		read_local_oob_data_complete(index, status, ptr);
++	case MGMT_OP_READ_LOCAL_OOB_DATA:
++		read_local_oob_data_complete(sk, index, ev->data, len);
 +		break;
- 	};
++	case MGMT_OP_ADD_REMOTE_OOB_DATA:
++		DBG("add_remote_oob_data complete");
++		break;
++	case MGMT_OP_REMOVE_REMOTE_OOB_DATA:
++		DBG("remove_remote_oob_data complete");
++		break;
+ 	default:
+ 		error("Unknown command complete for opcode %u", opcode);
+ 		break;
+@@ -1096,6 +1149,10 @@ static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
+ 	opcode = btohs(bt_get_unaligned(&ev->opcode));
+ 
+ 	DBG("status %u opcode %u (index %u)", ev->status, opcode, index);
++
++	if (opcode == MGMT_OP_READ_LOCAL_OOB_DATA)
++		read_local_oob_data_failed(sk, index);
++
  }
  
-@@ -2390,7 +2460,7 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond,
- 		break;
+ static void mgmt_controller_error(int sk, uint16_t index, void *buf, size_t len)
+@@ -1671,30 +1728,69 @@ static int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr)
  
- 	case EVT_REMOTE_OOB_DATA_REQUEST:
--		remote_oob_data_request(index, ptr);
-+		remote_oob_data_request(index, (bdaddr_t *) ptr);
- 		break;
- 	}
- 
-@@ -3560,30 +3630,62 @@ static int hciops_cancel_bonding(int index, bdaddr_t *bdaddr)
- 
- static int hciops_read_local_oob_data (int index)
+ static int mgmt_read_local_oob_data (int index)
  {
-+	struct dev_info *dev = &devs[index];
++	struct mgmt_hdr hdr;
 +
  	DBG("hci%d", index);
  
 -	return -ENOSYS;
-+	if (hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA, 0, 0)
-+									< 0)
++	hdr.opcode = htobs(MGMT_OP_READ_LOCAL_OOB_DATA);
++	hdr.len = 0;
++	hdr.index = htobs(index);
++
++	if (write(mgmt_sock, &hdr, sizeof(hdr)) < 0)
 +		return -errno;
 +
 +	return 0;
  }
  
- static int hciops_add_remote_oob_data (int index, bdaddr_t *bdaddr,
+ static int mgmt_add_remote_oob_data (int index, bdaddr_t *bdaddr,
  					uint8_t *hash, uint8_t *randomizer)
  {
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_add_remote_oob_data)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_add_remote_oob_data *cp = (void *) &buf[sizeof(*hdr)];
  	char addr[18];
-+	struct dev_info *dev = &devs[index];
-+	GSList *match;
-+	struct oob_data *data;
  
  	ba2str(bdaddr, addr);
  	DBG("hci%d bdaddr %s", index, addr);
  
 -	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
++	memset(buf, 0, sizeof(buf));
 +
-+	if (match) {
-+		data = match->data;
-+	} else {
-+		data = g_new(struct oob_data, 1);
-+		bacpy(&data->bdaddr, bdaddr);
-+		dev->oob_data = g_slist_prepend(dev->oob_data, data);
-+	}
++	hdr->opcode = htobs(MGMT_OP_ADD_REMOTE_OOB_DATA);
++	hdr->index = htobs(index);
++	hdr->len = htobs(sizeof(*cp));
 +
-+	memcpy(data->hash, hash, sizeof(data->hash));
-+	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
++	bacpy(&cp->bdaddr, bdaddr);
++	memcpy(cp->hash, hash, 16);
++	memcpy(cp->randomizer, randomizer, 16);
++
++	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
++		return -errno;
 +
 +	return 0;
  }
  
- static int hciops_remove_remote_oob_data (int index, bdaddr_t *bdaddr)
+ static int mgmt_remove_remote_oob_data (int index, bdaddr_t *bdaddr)
  {
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_remove_remote_oob_data)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_remove_remote_oob_data *cp = (void *) &buf[sizeof(*hdr)];
  	char addr[18];
-+	struct dev_info *dev = &devs[index];
-+	GSList *match;
  
  	ba2str(bdaddr, addr);
  	DBG("hci%d bdaddr %s", index, addr);
  
 -	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
++	memset(buf, 0, sizeof(buf));
 +
-+	if (!match)
-+		return -ENOENT;
++	hdr->opcode = htobs(MGMT_OP_REMOVE_REMOTE_OOB_DATA);
++	hdr->index = htobs(index);
++	hdr->len = htobs(sizeof(*cp));
 +
-+	g_free(match->data);
-+	dev->oob_data = g_slist_delete_link(dev->oob_data, match);
++	bacpy(&cp->bdaddr, bdaddr);
++
++	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
++		return -errno;
 +
 +	return 0;
  }
  
- static struct btd_adapter_ops hci_ops = {
+ static struct btd_adapter_ops mgmt_ops = {
 -- 
 1.7.0.4
 
