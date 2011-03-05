@@ -1,56 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimkoaZqn9SDEuc=vuazzqwA7Jrmz1hiwDWSXhM2@mail.gmail.com>
-References: <1299076306-11955-1-git-send-email-geryk@ti.com>
-	<AANLkTik5Z_eAA_qWGB_rwoK3P1g4jMnM6hj26fje6JHf@mail.gmail.com>
-	<AANLkTimkoaZqn9SDEuc=vuazzqwA7Jrmz1hiwDWSXhM2@mail.gmail.com>
-Date: Sat, 5 Mar 2011 13:47:39 +0530
-Message-ID: <AANLkTi=fRXHWVeZpR1X5pGAZjPGTt84ZPo1kWkPQhZps@mail.gmail.com>
-Subject: Re: [PATCH v2] linux-firmware: Initial release for Bluetooth init script
-From: Pavan Savoy <pavan_savoy@ti.com>
-To: Ohad Ben-Cohen <ohad@wizery.com>
-Cc: Gery Kahn <gery.kahn@gmail.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Luciano Coelho <coelho@ti.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Sat, 5 Mar 2011 13:04:45 +0530
+Message-ID: <AANLkTik9H33kmgZSZ6+_uVONq0tMa4XcM5O9W9xNXrxW@mail.gmail.com>
+Subject: hci_conn_timeout
+From: Koustuv Ghosh <koustuvg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Koustuv Ghosh <koustuvg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Mar 5, 2011 at 5:04 AM, Ohad Ben-Cohen <ohad@wizery.com> wrote:
-> Hi Pavan,
->
-> On Thu, Mar 3, 2011 at 3:44 PM, Pavan Savoy <pavan_savoy@ti.com> wrote:
->> On Wed, Mar 2, 2011 at 8:01 PM, Gery Kahn <gery.kahn@gmail.com> wrote:
-> ...
->> Can we name this in all smaller case?
->
-> How is this going to work with smaller case ?
+Hello ,
 
-No, Not right away - Since every release the firmware team makes, it
-does that by naming it in CamelCase.
-So, I was thinking while putting up each new firmware on /lib/ may be
-we can make it smaller case - like other firmware....
+I am using vcgomes kernel for LE .
 
+I observed two thing...
 
-> AFAICS, Gery used the exact name format that st_kim is looking for:
->
-> http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=drivers/misc/ti-st/st_kim.c;h=73b6c8b0e8696db9dbe8a71590bf7b62fb3b5532;hb=HEAD#l261
->
-> Do you plan to change st_kim ?
->
-> If so, please first change it, and then update the firmware file.
+once I  issue LE connect via gatttool(bluez-4.88)  from my host  ,
+after 2 or 3s I
+am geeting a hci_conn_timeout, which causes existing  LE connection
+disconnected.
 
-So, yes in case the firmware is going to be freely available from
-now-onwards - will post a patch to expect smaller case file name.
+So I noticed there is a hci_conn_hold(conn) which I feel basically
+deactivate  the timer, and as a work around   I introduced it in
+hci_le_conn_complete_evt ,and  after that  disconnect time out does
+not occur.
 
-Thanks,
-Pavan
+But then if I am trying to connect remote device  via gatttool with
+same parameter  twice , system hangs.
 
-> Thanks,
-> Ohad.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Any help...
+
+rgds
+Koustuv
