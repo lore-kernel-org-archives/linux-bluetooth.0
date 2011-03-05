@@ -1,32 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D71F996.1070203@Atheros.com>
+Date: Sat, 5 Mar 2011 14:21:34 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=fRXHWVeZpR1X5pGAZjPGTt84ZPo1kWkPQhZps@mail.gmail.com>
-References: <1299076306-11955-1-git-send-email-geryk@ti.com>
- <AANLkTik5Z_eAA_qWGB_rwoK3P1g4jMnM6hj26fje6JHf@mail.gmail.com>
- <AANLkTimkoaZqn9SDEuc=vuazzqwA7Jrmz1hiwDWSXhM2@mail.gmail.com> <AANLkTi=fRXHWVeZpR1X5pGAZjPGTt84ZPo1kWkPQhZps@mail.gmail.com>
-From: Ohad Ben-Cohen <ohad@wizery.com>
-Date: Sat, 5 Mar 2011 11:15:09 +0200
-Message-ID: <AANLkTin3UcHeJeRmjUYNNyHFitjv5GNg51uxm=63wtDG@mail.gmail.com>
-Subject: Re: [PATCH v2] linux-firmware: Initial release for Bluetooth init script
-To: Pavan Savoy <pavan_savoy@ti.com>
-Cc: Gery Kahn <gery.kahn@gmail.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Luciano Coelho <coelho@ti.com>
-Content-Type: text/plain; charset=ISO-8859-1
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: updating unacked_frames counter during retransmission
+References: <4D6F358B.9020603@Atheros.com> <20110305005309.GB9005@joana>
+In-Reply-To: <20110305005309.GB9005@joana>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Mar 5, 2011 at 10:17 AM, Pavan Savoy <pavan_savoy@ti.com> wrote:
-> So, yes in case the firmware is going to be freely available from
-> now-onwards - will post a patch to expect smaller case file name.
+Hi Gustavo,
 
-Well, right now we have users of st_kim, and we prefer using the
-firmware name that is currently expected by it. Otherwise it just
-won't work..
+On 3/5/2011 6:23 AM, Gustavo F. Padovan wrote:
+> Hi Suraj,
+>
+> * Suraj Sumangala<suraj@Atheros.com>  [2011-03-03 12:00:35 +0530]:
+>
+>> Hi Gustavo,
+>>
+>> I have a question regarding the ERTM implementation.
+>>
+>> Should we be incrementing the "l2cap_pinfo.unacked_frames" variable if
+>> we are retransmitting a frame?
+>
+> No, if we are retransmitting a frame that means L2CAP didn't received an ack
+> for it and we are already accounting it in unacked_frames and there is no need
+> to increment unacked_frames in this case.
 
-I understand the the lower case affinity, but that's second to not
-breaking the user experience IMHO.
+I think right now we are incrementing the "l2cap_pinfo.unacked_frames" 
+for retransmission also.
+>
+>>
+>> Won't this cause the same frame to be accounted twice?
+>>
+>> If there are too many retransmissions, will there be a chance that
+>> "unacked_frames" could cross 0xFF and over flow.
+>
+> No, unacked_frames number is limited by the remote transmission window size.
+>
+Actually, I am seeing an overflow (crossing the remote transmit window) 
+issue, when there is retransmission. This was found in older kernel(2.6.35).
 
-Thanks,
-Ohad.
+So not sure if this is valid in the latest kernel. Will anyway try to 
+send a patch for the same.
+
+Regards
+Suraj
+
+
