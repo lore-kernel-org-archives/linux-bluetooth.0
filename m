@@ -1,31 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D740AA7.5080209@interlinx.bc.ca>
+Date: Sun, 06 Mar 2011 17:28:55 -0500
+From: "Brian J. Murrell" <brian@whamcloud.com>
 MIME-Version: 1.0
-In-Reply-To: <4D740AA7.5080209@interlinx.bc.ca>
-References: <4D6EF7ED.2090905@interlinx.bc.ca>
-	<4D740AA7.5080209@interlinx.bc.ca>
-Date: Sun, 6 Mar 2011 18:08:40 -0700
-Message-ID: <AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Subject: Re: how to set adapter to master with bluez 4.69?
-From: Brad Midgley <bmidgley@gmail.com>
-To: "Brian J. Murrell" <brian@whamcloud.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+References: <4D6EF7ED.2090905@interlinx.bc.ca>
+In-Reply-To: <4D6EF7ED.2090905@interlinx.bc.ca>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig4E0A71D578C33BF3878C1791"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brian,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig4E0A71D578C33BF3878C1791
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-> Nobody knows?  I was hoping this was going to be one of those simple
-> questions that just about everybody knew.  :-(
+On 11-03-02 09:07 PM, Brian J. Murrell wrote:
+> Per the thread at
+> http://permalink.gmane.org/gmane.linux.bluez.kernel/11455 it appears
+> that I need to ensure that my B/T adapter is the master in the piconet.=
 
-It has been really quiet.
 
-I got the latest bluez and looked through doc/ and test/ for
-references to link mode. I think maybe mentions of L2CAP_LM_MASTER in
-test/l2test.c might be on the right track. You could probably follow
-that model and set the l2cap link mode to get what you want. I didn't
-see it in any gui I could find. A patch to a gui would be ambitious
-but would end up being the nicest user experience in the end.
+Nobody knows?  I was hoping this was going to be one of those simple
+questions that just about everybody knew.  :-(
 
--- 
-Brad Midgley
+b.
+
+
+
+
+--------------enig4E0A71D578C33BF3878C1791
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk10CqcACgkQl3EQlGLyuXCiCwCg/cFPuX1wYyYLKAEZL7gOXFAW
+disAnjylLH06KrTaxZeRxIbmTeDe6cL3
+=CwT2
+-----END PGP SIGNATURE-----
+
+--------------enig4E0A71D578C33BF3878C1791--
