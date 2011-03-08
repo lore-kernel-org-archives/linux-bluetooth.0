@@ -1,37 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 9 Mar 2011 00:07:54 +0800
-Message-ID: <AANLkTinN=eYJB3wF9jw7vbbTtUgOzr8oap4+i21Uei5X@mail.gmail.com>
-Subject: [2.6.38-rc8, patch] fix hci_dev_list locking
-From: Daniel J Blueman <daniel.blueman@gmail.com>
-To: Linux Kernel <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Tue, 8 Mar 2011 15:18:44 +0200
+Message-ID: <AANLkTi=aBuDLD2qTa4p29CMdBHjBs_nos5YxC5F4T-fB@mail.gmail.com>
+Subject: [PATCH] Increase AVDTP request timeout
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00151757714aaaea05049df8733f
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No response from original post, and it missed getting taken into -rc7
-and -rc8, so repost:
+--00151757714aaaea05049df8733f
+Content-Type: text/plain; charset=ISO-8859-1
 
-Release acquired lock on error path, fixing potential hang up.
 
-Signed-off-by: Daniel J Blueman <daniel.blueman@gmail.com>
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f827fd9..ace8726 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -111,8 +111,10 @@ static int read_index_list(struct sock *sk)
+--00151757714aaaea05049df8733f
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Increase-AVDTP-request-timeout.patch"
+Content-Disposition: attachment;
+	filename="0001-Increase-AVDTP-request-timeout.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gl0uj8gx0
 
- 	body_len = sizeof(*ev) + sizeof(*rp) + (2 * count);
- 	skb = alloc_skb(sizeof(*hdr) + body_len, GFP_ATOMIC);
--	if (!skb)
-+	if (!skb) {
-+		read_unlock(&hci_dev_list_lock);
- 		return -ENOMEM;
-+	}
-
- 	hdr = (void *) skb_put(skb, sizeof(*hdr));
- 	hdr->opcode = cpu_to_le16(MGMT_EV_CMD_COMPLETE);--
--- 
-Daniel J Blueman
+RnJvbSA0YTJjM2U5NzNkZDQxN2QyODliZDg3ZGQyZmVjZThiMGM0MmJjYjUyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogVHVlLCA4IE1hciAyMDExIDE0OjMzOjU1ICswMjAwClN1YmplY3Q6IFtQ
+QVRDSF0gSW5jcmVhc2UgQVZEVFAgcmVxdWVzdCB0aW1lb3V0CgpBdCBsZWFzdCBvbmUgaGVhZHNl
+dCB3aXRoIGJvdGggQTJEUCBhbmQgUEJBUCBzZW5kcyBkZWxheWVkIHJlc3BvbnNlcwp0byBBVkRU
+UCByZXF1ZXN0cyB3aGVuIGl0IGlzIGRvaW5nIFBCQVAgcXVlcmllcyAodHlwaWNhbGx5IGF0IHRo
+ZQpiZWdpbm5pbmcgb2YgdGhlIGNvbm5lY3Rpb24pLgoKSW5jcmVhc2luZyB0aGUgdGltZXIgYnkg
+dHdvIHNlY29uZHMgdG8gZ2l2ZSB0aGUgaGVhZHNldCBtb3JlIHRpbWUgdG8KcmVwbHksIHRvIGF2
+b2lkIGFib3J0aW5nIHRoZSBBVkRUUCBjb25uZWN0aW9uLgotLS0KIGF1ZGlvL2F2ZHRwLmMgfCAg
+ICAyICstCiAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkK
+CmRpZmYgLS1naXQgYS9hdWRpby9hdmR0cC5jIGIvYXVkaW8vYXZkdHAuYwppbmRleCA2YmE5Nzk0
+Li44M2IxYWEyIDEwMDY0NAotLS0gYS9hdWRpby9hdmR0cC5jCisrKyBiL2F1ZGlvL2F2ZHRwLmMK
+QEAgLTg1LDcgKzg1LDcgQEAKICNkZWZpbmUgQVZEVFBfTVNHX1RZUEVfQUNDRVBUCQkJMHgwMgog
+I2RlZmluZSBBVkRUUF9NU0dfVFlQRV9SRUpFQ1QJCQkweDAzCiAKLSNkZWZpbmUgUkVRX1RJTUVP
+VVQgNAorI2RlZmluZSBSRVFfVElNRU9VVCA2CiAjZGVmaW5lIEFCT1JUX1RJTUVPVVQgMgogI2Rl
+ZmluZSBESVNDT05ORUNUX1RJTUVPVVQgMQogI2RlZmluZSBTVFJFQU1fVElNRU9VVCAyMAotLSAK
+MS42LjAuNAoK
+--00151757714aaaea05049df8733f--
