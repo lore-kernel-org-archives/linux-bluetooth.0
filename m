@@ -1,42 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D760E47.4000006@interlinx.bc.ca>
+Date: Tue, 08 Mar 2011 06:08:55 -0500
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 MIME-Version: 1.0
-Date: Tue, 8 Mar 2011 15:18:44 +0200
-Message-ID: <AANLkTi=aBuDLD2qTa4p29CMdBHjBs_nos5YxC5F4T-fB@mail.gmail.com>
-Subject: [PATCH] Increase AVDTP request timeout
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00151757714aaaea05049df8733f
+To: Andrei Warkentin
+	<public-andreiw-3WKxDLwmzFNWk0Htik3J/w@plane.gmane.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTikbv=9T3t_Y6LO4faqC5k1X_usWYH8ghmt8TGHV@mail.gmail.com>
+In-Reply-To: <AANLkTikbv=9T3t_Y6LO4faqC5k1X_usWYH8ghmt8TGHV@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig8F18A71862CCA88AF871513A"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00151757714aaaea05049df8733f
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig8F18A71862CCA88AF871513A
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+On 11-03-07 05:57 PM, Andrei Warkentin wrote:
+>=20
+> What do you get for hcitool info 00:1F:20:0F:30:6A?
+
+$ hcitool info 00:1F:20:0F:30:6A
+Requesting information ...
+	BD Address:  00:1F:20:0F:30:6A
+	Device Name: Bluetooth Laser Travel Mouse
+	LMP Version: 2.0 (0x3) LMP Subversion: 0x229
+	Manufacturer: Broadcom Corporation (15)
+	Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
+		<encryption> <slot offset> <timing accuracy> <role switch>
+		<sniff mode> <RSSI> <power control> <enhanced iscan>
+		<interlaced iscan> <interlaced pscan> <AFH cap. slave>
+
+Cheers,
+b.
 
 
 
---00151757714aaaea05049df8733f
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Increase-AVDTP-request-timeout.patch"
-Content-Disposition: attachment;
-	filename="0001-Increase-AVDTP-request-timeout.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gl0uj8gx0
 
-RnJvbSA0YTJjM2U5NzNkZDQxN2QyODliZDg3ZGQyZmVjZThiMGM0MmJjYjUyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVHVlLCA4IE1hciAyMDExIDE0OjMzOjU1ICswMjAwClN1YmplY3Q6IFtQ
-QVRDSF0gSW5jcmVhc2UgQVZEVFAgcmVxdWVzdCB0aW1lb3V0CgpBdCBsZWFzdCBvbmUgaGVhZHNl
-dCB3aXRoIGJvdGggQTJEUCBhbmQgUEJBUCBzZW5kcyBkZWxheWVkIHJlc3BvbnNlcwp0byBBVkRU
-UCByZXF1ZXN0cyB3aGVuIGl0IGlzIGRvaW5nIFBCQVAgcXVlcmllcyAodHlwaWNhbGx5IGF0IHRo
-ZQpiZWdpbm5pbmcgb2YgdGhlIGNvbm5lY3Rpb24pLgoKSW5jcmVhc2luZyB0aGUgdGltZXIgYnkg
-dHdvIHNlY29uZHMgdG8gZ2l2ZSB0aGUgaGVhZHNldCBtb3JlIHRpbWUgdG8KcmVwbHksIHRvIGF2
-b2lkIGFib3J0aW5nIHRoZSBBVkRUUCBjb25uZWN0aW9uLgotLS0KIGF1ZGlvL2F2ZHRwLmMgfCAg
-ICAyICstCiAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9hdWRpby9hdmR0cC5jIGIvYXVkaW8vYXZkdHAuYwppbmRleCA2YmE5Nzk0
-Li44M2IxYWEyIDEwMDY0NAotLS0gYS9hdWRpby9hdmR0cC5jCisrKyBiL2F1ZGlvL2F2ZHRwLmMK
-QEAgLTg1LDcgKzg1LDcgQEAKICNkZWZpbmUgQVZEVFBfTVNHX1RZUEVfQUNDRVBUCQkJMHgwMgog
-I2RlZmluZSBBVkRUUF9NU0dfVFlQRV9SRUpFQ1QJCQkweDAzCiAKLSNkZWZpbmUgUkVRX1RJTUVP
-VVQgNAorI2RlZmluZSBSRVFfVElNRU9VVCA2CiAjZGVmaW5lIEFCT1JUX1RJTUVPVVQgMgogI2Rl
-ZmluZSBESVNDT05ORUNUX1RJTUVPVVQgMQogI2RlZmluZSBTVFJFQU1fVElNRU9VVCAyMAotLSAK
-MS42LjAuNAoK
---00151757714aaaea05049df8733f--
+
+
+--------------enig8F18A71862CCA88AF871513A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk12DkcACgkQl3EQlGLyuXC6wACggkoZQlqUK1oXoqbiEeYF90cP
+b/0AoN63KA4Ky4mRlN8fr5i+FBR9TPcC
+=sce6
+-----END PGP SIGNATURE-----
+
+--------------enig8F18A71862CCA88AF871513A--
