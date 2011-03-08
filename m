@@ -1,60 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D760E47.4000006@interlinx.bc.ca>
-Date: Tue, 08 Mar 2011 06:08:55 -0500
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+From: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>,
+	"xiaosuo@gmail.com" <xiaosuo@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Date: Tue, 8 Mar 2011 10:10:10 +0000
+Subject: [PATCH] Fix "possible circular locking dependency" in rfcomm
+Message-ID: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8C9F86D162@irsmsx501.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Andrei Warkentin
-	<public-andreiw-3WKxDLwmzFNWk0Htik3J/w@plane.gmane.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: how to set adapter to master with bluez 4.69?
-References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTikbv=9T3t_Y6LO4faqC5k1X_usWYH8ghmt8TGHV@mail.gmail.com>
-In-Reply-To: <AANLkTikbv=9T3t_Y6LO4faqC5k1X_usWYH8ghmt8TGHV@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig8F18A71862CCA88AF871513A"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig8F18A71862CCA88AF871513A
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Changes in sock.c in function __rfcomm_sock_close, to release sock before c=
+alling rfcomm_dlc_close to avoid possible deadlock when calling rfcomm_lock=
+ (in rfcomm_dlc_close).
 
-On 11-03-07 05:57 PM, Andrei Warkentin wrote:
->=20
-> What do you get for hcitool info 00:1F:20:0F:30:6A?
+Signed-off-by: Jean Regis Ferraton <jrferraton@gmail.com>
 
-$ hcitool info 00:1F:20:0F:30:6A
-Requesting information ...
-	BD Address:  00:1F:20:0F:30:6A
-	Device Name: Bluetooth Laser Travel Mouse
-	LMP Version: 2.0 (0x3) LMP Subversion: 0x229
-	Manufacturer: Broadcom Corporation (15)
-	Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
-		<encryption> <slot offset> <timing accuracy> <role switch>
-		<sniff mode> <RSSI> <power control> <enhanced iscan>
-		<interlaced iscan> <interlaced pscan> <AFH cap. slave>
+---
+ net/bluetooth/rfcomm/sock.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-Cheers,
-b.
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 66cc1f0..3b5ec09 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -234,7 +234,10 @@ static void __rfcomm_sock_close(struct sock *sk)
+ 	case BT_CONNECT2:
+ 	case BT_CONFIG:
+ 	case BT_CONNECTED:
++		/* release_sock to avoid deadlock when calling rfcomm_lock() */
++		release_sock(sk);
+ 		rfcomm_dlc_close(d, 0);
++		lock_sock(sk);
+=20
+ 	default:
+ 		sock_set_flag(sk, SOCK_ZAPPED);
+--=20
+1.6.2.5
 
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris,=20
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
 
-
-
-
-
---------------enig8F18A71862CCA88AF871513A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iEYEARECAAYFAk12DkcACgkQl3EQlGLyuXC6wACggkoZQlqUK1oXoqbiEeYF90cP
-b/0AoN63KA4Ky4mRlN8fr5i+FBR9TPcC
-=sce6
------END PGP SIGNATURE-----
-
---------------enig8F18A71862CCA88AF871513A--
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
