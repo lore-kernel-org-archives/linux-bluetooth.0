@@ -1,48 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D776D93.1050400@gmail.com>
-Date: Wed, 09 Mar 2011 17:37:47 +0530
-From: Malar <malarkannan.p@gmail.com>
+Message-ID: <4D776310.7000301@interlinx.bc.ca>
+Date: Wed, 09 Mar 2011 06:22:56 -0500
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: bluetooth-hid2hci.rules no longer works
+To: public-linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org
+CC: Andrei Warkentin
+	<public-andreiw-3WKxDLwmzFNWk0Htik3J/w@plane.gmane.org>
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTikbv=9T3t_Y6LO4faqC5k1X_usWYH8ghmt8TGHV@mail.gmail.com> <4D760E47.4000006@interlinx.bc.ca>
+In-Reply-To: <4D760E47.4000006@interlinx.bc.ca>
 Content-Type: multipart/signed; micalg=pgp-sha1;
  protocol="application/pgp-signature";
- boundary="------------enig7AB1F6E33E6A1F21F1E2C3C1"
+ boundary="------------enigB5D01F6751FC59E814412577"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+
 This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig7AB1F6E33E6A1F21F1E2C3C1
+--------------enigB5D01F6751FC59E814412577
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 
-Hello,
-    the udev rules under scripts/bluetooth-hid2hci.rules uses -v and
--p parameters which are no longer supported by the hid2hci in udev.
-Instead it uses --devpath parameter.
-Please fix these rules as they fail to switch the mode of the
-bluetooth device.
+On 11-03-08 06:08 AM, Brian J. Murrell wrote:
+> On 11-03-07 05:57 PM, Andrei Warkentin wrote:
+>>
+>> What do you get for hcitool info 00:1F:20:0F:30:6A?
+>=20
+> $ hcitool info 00:1F:20:0F:30:6A
+> Requesting information ...
+> 	BD Address:  00:1F:20:0F:30:6A
+> 	Device Name: Bluetooth Laser Travel Mouse
+> 	LMP Version: 2.0 (0x3) LMP Subversion: 0x229
+> 	Manufacturer: Broadcom Corporation (15)
+> 	Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
+> 		<encryption> <slot offset> <timing accuracy> <role switch>
+> 		<sniff mode> <RSSI> <power control> <enhanced iscan>
+> 		<interlaced iscan> <interlaced pscan> <AFH cap. slave>
 
-regards,
-Malar
+Was this at all helpful?
+
+Cheers,
+b.
 
 
-
---------------enig7AB1F6E33E6A1F21F1E2C3C1
+--------------enigB5D01F6751FC59E814412577
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
 
-iQEcBAEBAgAGBQJNd22TAAoJEL10URRJl/EVo/wIAJi5OmGbtA7ODuwsm0Cr75W5
-xiwdTCmbiD8vNYL/liMwEkd4iwE/FsYFGPEeR+YgY8s/ShjAKPnBCYHiFFvPRKeG
-YAMwBv7WETPOdi62167Ze8vRa6PjjFbjVi5G5K0Xp+9txUxRtTRW+BFAk0GjUemD
-+K2GJuQrj7NHbDFCe7uN51zp3Xb7ZioWIH8K135mXo/RYPdESqDqCv+vRFQi1UQ/
-G18YIU8WADIh0PGOGPOvSRpGgTB86LUPJyHkpi2mOoYnnS2SwvT7LpoRdM2cBsjR
-dLR4y6+NqnjoOqA+IiCxqikA1Pil+a5JcF4tkltuXDmZnIARnT8I4mvKqogMqvY=
-=lPgz
+iEUEARECAAYFAk13YxAACgkQl3EQlGLyuXAKqACYoLshdtDUskLaUQ0xiQ2CswQe
+8gCdEDBhfzIWq/l4fE8DbYNnXErUN4c=
+=nvs7
 -----END PGP SIGNATURE-----
 
---------------enig7AB1F6E33E6A1F21F1E2C3C1--
+--------------enigB5D01F6751FC59E814412577--
+
