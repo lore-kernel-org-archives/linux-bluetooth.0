@@ -1,28 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 22:06:09 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH v2] Fix unloading of adapter drivers
-Message-ID: <20110310200609.GA6749@jh-x301>
-References: <201103101516.30070.szymon.janc@tieto.com>
- <1299769834-11133-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 10 Mar 2011 16:29:41 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: loody <miloody@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: some questions about Bluez
+Message-ID: <20110310192941.GC2190@joana>
+References: <AANLkTims_WHKQ4pNPZNgWS390ASeU8Kw1=w4LN2TOsR3@mail.gmail.com>
+ <20110310153754.GA2190@joana>
+ <AANLkTi=ckPmqtRZQvHq5Rkg0jKCuk7uvisM10r+o2hjF@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1299769834-11133-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTi=ckPmqtRZQvHq5Rkg0jKCuk7uvisM10r+o2hjF@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Loody,
 
-On Thu, Mar 10, 2011, Szymon Janc wrote:
-> Call driver remove callback only if corresponding probe succeed.
-> ---
->  src/adapter.c |   47 +++++++++++++++++++++++++++++++----------------
->  1 files changed, 31 insertions(+), 16 deletions(-)
+* loody <miloody@gmail.com> [2011-03-11 03:01:52 +0800]:
 
-Pushed upstream. Thanks.
+> hi gustavo:
+> 
+> 2011/3/10 Gustavo F. Padovan <padovan@profusion.mobi>:
+> > Hi Loody,
+> >
+> > * loody <miloody@gmail.com> [2011-03-10 20:33:49 +0800]:
+> >
+> >> hi all:
+> >> I have some questions about bluetooth.
+> >> 1. how many additional libs that I need to successfully compile bluez?
+> >> so far as I know are:
+> >>     a. DBUS
+> >>     b. GLIB
+> >>     c. ALSA
+> >>     d. GSTREAMER
+> >>     e. USB
+> >>     f. SNDFILE
+> >>     g.CAPNG
+> >> am I right?
+> >>
+> >> 2. I try to compile Bluez to run on mips platform.
+> >> What I need is a simple tool which can tell me what kind of bluetooth
+> >> device around my usb bluetooth controller.
+> >> it seems I only need to enable USB lib above, right?
+> >>
+> >> 3. from configure, I found we can turn off features by setting
+> >> "--disable-xxxx", so I use below configure command for configuring
+> >> ./configure --prefix=/media/sdb1/bluez-4.89.mips/build
+> >> --host=mipsel-linux-gnu --disable-optimization --disable-fortify
+> >> --disable-pie --disable-network --disable-serial --disable-input
+> >> --disable-audio --disable-service
+> >>
+> >> but it still complain to me that he cannot find alsa header files and libs.
+> >
+> > The ./configure line you provided work for me in x86_64. Can you provide the
+> > logs of ./configure && make?
+> Here you are :)
 
-Johan
+Send in plain text please.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
