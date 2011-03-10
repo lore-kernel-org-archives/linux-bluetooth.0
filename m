@@ -1,60 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] Fix unloading of adapter drivers
+Date: Thu, 10 Mar 2011 15:16:29 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+References: <1299759009-17407-1-git-send-email-szymon.janc@tieto.com> <20110310134204.GA22155@jh-x301>
+In-Reply-To: <20110310134204.GA22155@jh-x301>
 MIME-Version: 1.0
-In-Reply-To: <1299765690-16322-1-git-send-email-epx@signove.com>
-References: <1299765690-16322-1-git-send-email-epx@signove.com>
-Date: Thu, 10 Mar 2011 14:16:55 +0000
-Message-ID: <AANLkTimoeb9NAsuN3QS+UP1P2obYhY7rj+D-Ww4G1+QV@mail.gmail.com>
-Subject: Re: [PATCH v4] Implement ATT handle indications
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: =?UTF-8?Q?Elvis_Pf=C3=BCtzenreuter?= <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201103101516.30070.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRWx2aXMsCgpJcyBpdCBhbGxvd2VkIHRvIGhhdmUgbm90aWZpY2F0aW9uIGFuZCBpbmRpY2F0
-aW9uIGJpdHMgc2V0IHRvIHRoZSBzYW1lCmNoYXJhY3RlcmlzdGljPwpJZiBpdCBpcyBub3QgYWxs
-b3dlZCB5b3UgY291bGQgc2ltcGxpZnkgdGhlIGxvZ2ljIGluc2lkZSB0aGUgImZvciIuCgpPbiBU
-aHUsIE1hciAxMCwgMjAxMSBhdCAyOjAxIFBNLCBFbHZpcyBQZsO8dHplbnJldXRlciA8ZXB4QHNp
-Z25vdmUuY29tPiB3cm90ZToKPiBUaGlzIHBhdGNoIHRha2VzIGFkdmFudGFnZSBvZiBnX2F0dHJp
-Yl9zZW5kKCkgaW1wbGljaXQgZ3VhcmFudGVlIG9mCj4gcXVldWVpbmcgaS5lLiBpbmRpY2F0aW9u
-IGlzIG9ubHkgc2VudCBpZiB0aGUgcHJldmlvdXMgb25lIGhhcyBiZWVuCj4gY29uZmlybWVkLCBz
-byB3ZSBkb24ndCBuZWVkIHRvIG1haW50YWluIGFuIGV4cGxpY2l0IHF1ZXVlLgo+IC0tLQo+IMKg
-c3JjL2F0dHJpYi1zZXJ2ZXIuYyB8IMKgIDE2ICsrKysrKysrKysrKysrKysKPiDCoDEgZmlsZXMg
-Y2hhbmdlZCwgMTYgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQg
-YS9zcmMvYXR0cmliLXNlcnZlci5jIGIvc3JjL2F0dHJpYi1zZXJ2ZXIuYwo+IGluZGV4IGI5ODBi
-MjguLmYxNTc0MjQgMTAwNjQ0Cj4gLS0tIGEvc3JjL2F0dHJpYi1zZXJ2ZXIuYwo+ICsrKyBiL3Ny
-Yy9hdHRyaWItc2VydmVyLmMKPiBAQCAtODc1LDYgKzg3NSw4IEBAIHN0YXRpYyB2b2lkIGNoYW5u
-ZWxfaGFuZGxlcihjb25zdCB1aW50OF90ICppcGR1LCB1aW50MTZfdCBsZW4sCj4gwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqBsZW5ndGggPSBmaW5kX2J5X3R5cGUoc3RhcnQsIGVuZCwgJnV1aWQsIHZh
-bHVlLCB2bGVuLAo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgb3BkdSwgY2hhbm5lbC0+bXR1
-KTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGJyZWFrOwo+ICsgwqAgwqAgwqAgY2FzZSBBVFRf
-T1BfSEFORExFX0NORjoKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJldHVybjsKPiDCoCDCoCDC
-oCDCoGNhc2UgQVRUX09QX1JFQURfTVVMVElfUkVROgo+IMKgIMKgIMKgIMKgY2FzZSBBVFRfT1Bf
-UFJFUF9XUklURV9SRVE6Cj4gwqAgwqAgwqAgwqBjYXNlIEFUVF9PUF9FWEVDX1dSSVRFX1JFUToK
-PiBAQCAtOTcyLDYgKzk3NCwyMCBAQCBzdGF0aWMgdm9pZCBhdHRyaWJfbm90aWZ5X2NsaWVudHMo
-c3RydWN0IGF0dHJpYnV0ZSAqYXR0cikKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoGdfYXR0cmliX3NlbmQoY2hhbm5lbC0+YXR0cmliLCAwLCBwZHVbMF0sIHBkdSwgbGVuLAo+
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgTlVMTCwgTlVMTCwgTlVMTCk7Cj4gwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqB9Cj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgLyogSW5kaWNhdGlv
-biAqLwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaWYgKGdfc2xpc3RfZmluZF9jdXN0b20oY2hh
-bm5lbC0+aW5kaWNhdGUsCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCBHVUlOVF9UT19QT0lOVEVSKGhhbmRsZSksIGhhbmRsZV9jbXAp
-KSB7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB1aW50OF90IHBkdVtBVFRf
-TUFYX01UVV07Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB1aW50MTZfdCBs
-ZW47CgpUaGUgc2FtZSBkZWNsYXJhdGlvbnMocGR1IGFuZCBsZW4pIGV4aXN0ICBmb3IgTm90aWZp
-Y2F0aW9uLiBJIHN1Z2dlc3QKbW92ZSB0byB0aGUgb3V0ZXIgc2NvcGUuCgpCUiwKQ2xhdWRpbwoK
-PiArCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBsZW4gPSBlbmNfaW5kaWNh
-dGlvbihhdHRyLCBwZHUsIGNoYW5uZWwtPm10dSk7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCBpZiAobGVuID09IDApCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCByZXR1cm47Cj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgZ19hdHRyaWJfc2VuZChjaGFubmVsLT5hdHRyaWIsIDAsIHBkdVswXSwgcGR1LCBs
-ZW4sCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBOVUxMLCBOVUxMLCBOVUxMKTsKPiArIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIH0KPiDCoCDCoCDCoCDCoH0KPiDCoH0KPgo+IC0tCj4gMS43LjEK
-Pgo+IC0tCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
-c3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8g
-bWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZwo+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQgwqBodHRw
-Oi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwKPgo=
+> Hi Szymon,
+> 
+> On Thu, Mar 10, 2011, Szymon Janc wrote:
+> > Call driver remove callback only if corresponding probe succeed.
+> > ---
+> >  src/adapter.c |   41 +++++++++++++++++++++++++----------------
+> >  1 files changed, 25 insertions(+), 16 deletions(-)
+> 
+> The patch looks ok'ish, but don't you have to update the
+> btd_unregister_adapter_driver function too? (so it also removes
+> potential entries in the loaded_drivers list)
+
+Hmm all drivers unregisters them self only when plugin is unloaded, but it might
+be good to be prepare for more 'dynamic' drivers in future..
+
+Will prepare v2 shortly.
+
+-- 
+BR
+Szymon Janc
