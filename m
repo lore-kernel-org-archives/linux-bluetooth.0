@@ -1,29 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 11:06:59 +0200
+Date: Thu, 10 Mar 2011 10:52:20 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Increase AVDTP request timeout
-Message-ID: <20110310090659.GB2883@jh-x301>
-References: <AANLkTi=aBuDLD2qTa4p29CMdBHjBs_nos5YxC5F4T-fB@mail.gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH v2] pand: Fix for TP_BNEP_CTRL_BV_01_C qualification
+ test
+Message-ID: <20110310085220.GA2883@jh-x301>
+References: <1299264115-10702-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AANLkTi=aBuDLD2qTa4p29CMdBHjBs_nos5YxC5F4T-fB@mail.gmail.com>
+In-Reply-To: <1299264115-10702-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Lukasz,
 
-On Tue, Mar 08, 2011, Daniel ??rstadius wrote:
-> At least one headset with both A2DP and PBAP sends delayed responses
-> to AVDTP requests when it is doing PBAP queries (typically at the
-> beginning of the connection).
-> 
-> Increasing the timer by two seconds to give the headset more time to
-> reply, to avoid aborting the AVDTP connection.
+On Fri, Mar 04, 2011, Lukasz Rymanowski wrote:
+> With this fix pand will correctly respond on
+> unknown BNEP control command
 > ---
->  audio/avdtp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  compat/bnep.c |   16 ++++++++++++++++
+>  1 files changed, 16 insertions(+), 0 deletions(-)
 
-Pushed upstream. Thanks.
+Pushed upstream. Could you also create a matching patch for the network
+plugin, please? (network/server.c bnep_setup function).
 
 Johan
