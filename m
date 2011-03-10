@@ -1,28 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 11:21:37 +0200
+Date: Thu, 10 Mar 2011 11:18:26 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marco Sinigaglia <marco.sinigaglia@csr.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Extend Characteristic Write to support Write
- Without Response
-Message-ID: <20110310092137.GA9363@jh-x301>
-References: <1299697431-7670-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH v2] Adjust timeout LE and API
+Message-ID: <20110310091826.GB5566@jh-x301>
+References: <1299689985-6818-1-git-send-email-marco.sinigaglia@csr.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1299697431-7670-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1299689985-6818-1-git-send-email-marco.sinigaglia@csr.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Marco,
 
-On Wed, Mar 09, 2011, Claudio Takahasi wrote:
-> If callback is not informed, Write Command will be used to execute
-> a Write Without Response sub-procedure. Error is not returned by the
-> server no matter the result of the operation.
+On Wed, Mar 09, 2011, Marco Sinigaglia wrote:
+> 
+> The timeout value has been hardcoded on hci_send_req call and, instead, it should be passed from above (for ex from hci_le_set_scan_enable).
+> This patch removes the hardcoded value from hci_send_req and it increases the timeout to 1000ms.
+> 
+> v1-->v2: used git-format-patch
+> 
+> Signed-off-by: Marco Sinigaglia <marco.sinigaglia@csr.com>
+> 
 > ---
->  attrib/gatt.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
+>  lib/hci.c         |   12 ++++++------
+>  lib/hci_lib.h     |    6 +++---
+>  tools/hciconfig.c |    2 +-
+>  tools/hcitool.c   |    6 +++---
+>  4 files changed, 13 insertions(+), 13 deletions(-)
 
-Both patches have been pushed upstream. Thanks.
+The patch finally applies and has been pushed upstream. However, I did
+have to fix your commit message manually:
+
+- Lines should be short enough to fit git log output on a 80
+  column wide terminal
+- Patch version changes do not belong in the commit message. Put them
+  between the "---" and the "diff" line.
+- No Signed-off-by line for user space patches
 
 Johan
