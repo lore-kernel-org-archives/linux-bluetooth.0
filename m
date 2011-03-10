@@ -1,63 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 16:29:41 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: loody <miloody@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: some questions about Bluez
-Message-ID: <20110310192941.GC2190@joana>
-References: <AANLkTims_WHKQ4pNPZNgWS390ASeU8Kw1=w4LN2TOsR3@mail.gmail.com>
- <20110310153754.GA2190@joana>
- <AANLkTi=ckPmqtRZQvHq5Rkg0jKCuk7uvisM10r+o2hjF@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTi=ckPmqtRZQvHq5Rkg0jKCuk7uvisM10r+o2hjF@mail.gmail.com>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Add indication/notification support to interactive gatttool
+Date: Thu, 10 Mar 2011 16:26:46 -0300
+Message-Id: <1299785206-15145-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loody,
+---
+ attrib/interactive.c |   39 +++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 39 insertions(+), 0 deletions(-)
 
-* loody <miloody@gmail.com> [2011-03-11 03:01:52 +0800]:
-
-> hi gustavo:
-> 
-> 2011/3/10 Gustavo F. Padovan <padovan@profusion.mobi>:
-> > Hi Loody,
-> >
-> > * loody <miloody@gmail.com> [2011-03-10 20:33:49 +0800]:
-> >
-> >> hi all:
-> >> I have some questions about bluetooth.
-> >> 1. how many additional libs that I need to successfully compile bluez?
-> >> so far as I know are:
-> >>     a. DBUS
-> >>     b. GLIB
-> >>     c. ALSA
-> >>     d. GSTREAMER
-> >>     e. USB
-> >>     f. SNDFILE
-> >>     g.CAPNG
-> >> am I right?
-> >>
-> >> 2. I try to compile Bluez to run on mips platform.
-> >> What I need is a simple tool which can tell me what kind of bluetooth
-> >> device around my usb bluetooth controller.
-> >> it seems I only need to enable USB lib above, right?
-> >>
-> >> 3. from configure, I found we can turn off features by setting
-> >> "--disable-xxxx", so I use below configure command for configuring
-> >> ./configure --prefix=/media/sdb1/bluez-4.89.mips/build
-> >> --host=mipsel-linux-gnu --disable-optimization --disable-fortify
-> >> --disable-pie --disable-network --disable-serial --disable-input
-> >> --disable-audio --disable-service
-> >>
-> >> but it still complain to me that he cannot find alsa header files and libs.
-> >
-> > The ./configure line you provided work for me in x86_64. Can you provide the
-> > logs of ./configure && make?
-> Here you are :)
-
-Send in plain text please.
-
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 232cf35..99e99c5 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -98,6 +98,41 @@ static void set_state(enum state st)
+ 	rl_redisplay();
+ }
+ 
++static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
++{
++	uint8_t opdu[ATT_MAX_MTU];
++	uint16_t handle, i, olen;
++
++	handle = att_get_u16(&pdu[1]);
++
++	printf("\n");
++	switch (pdu[0]) {
++	case ATT_OP_HANDLE_NOTIFY:
++		printf("Notification handle = 0x%04x value: ", handle);
++		break;
++	case ATT_OP_HANDLE_IND:
++		printf("Indication   handle = 0x%04x value: ", handle);
++		break;
++	default:
++		printf("Invalid opcode\n");
++		return;
++	}
++
++	for (i = 3; i < len; i++)
++		printf("%02x ", pdu[i]);
++
++	printf("\n");
++	rl_forced_update_display();
++
++	if (pdu[0] == ATT_OP_HANDLE_NOTIFY)
++		return;
++
++	olen = enc_confirmation(opdu, sizeof(opdu));
++
++	if (olen > 0)
++		g_attrib_send(attrib, 0, opdu[0], opdu, olen, NULL, NULL, NULL);
++}
++
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	if (err) {
+@@ -107,6 +142,10 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	}
+ 
+ 	attrib = g_attrib_new(iochannel);
++	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, events_handler,
++							attrib, NULL);
++	g_attrib_register(attrib, ATT_OP_HANDLE_IND, events_handler,
++							attrib, NULL);
+ 	set_state(STATE_CONNECTED);
+ }
+ 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.1
+
