@@ -1,62 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 09:32:06 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ed Tomlinson <edt@aei.ca>
-Cc: "Justin P. Mattock" <justinmattock@gmail.com>,
-	Mikko Vinni <mmvinni@yahoo.com>,
+From: Ed Tomlinson <edt@aei.ca>
+To: "Justin P. Mattock" <justinmattock@gmail.com>
+Subject: Re: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
+Date: Wed, 9 Mar 2011 21:54:22 -0500
+Cc: Mikko Vinni <mmvinni@yahoo.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: Re: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
-Message-ID: <20110310073206.GA1033@jh-x301>
-References: <635561.59590.qm@web161820.mail.bf1.yahoo.com>
- <359639.21781.qm@web161807.mail.bf1.yahoo.com>
- <4D77EFEB.1020804@gmail.com>
- <201103092154.22796.edt@aei.ca>
+References: <635561.59590.qm@web161820.mail.bf1.yahoo.com> <359639.21781.qm@web161807.mail.bf1.yahoo.com> <4D77EFEB.1020804@gmail.com>
+In-Reply-To: <4D77EFEB.1020804@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201103092154.22796.edt@aei.ca>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201103092154.22796.edt@aei.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Wed, Mar 09, 2011, Ed Tomlinson wrote:
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 9c4541b..f690eb5 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -95,18 +95,17 @@ void hci_req_complete(struct hci_dev *hdev, __u16 
-> > cmd, int result)
-> >   {
-> >   	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
-> > 
-> > +	if (hdev->req_status == HCI_REQ_PEND) {
-> > +		hdev->req_result = result;
-> > +		hdev->req_status = HCI_REQ_DONE;
-> > +		wake_up_interruptible(&hdev->req_wait_q);
-> > +	}
-> >   	/* If the request has set req_last_cmd (typical for multi-HCI
-> >   	 * command requests) check if the completed command matches
-> >   	 * this, and if not just return. Single HCI command requests
-> >   	 * typically leave req_last_cmd as 0 */
-> >   	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
-> >   		return;
-> > -
-> > -	if (hdev->req_status == HCI_REQ_PEND) {
-> > -		hdev->req_result = result;
-> > -		hdev->req_status = HCI_REQ_DONE;
-> > -		wake_up_interruptible(&hdev->req_wait_q);
-> > -	}
-> >   }
-> > 
-> >   static void hci_req_cancel(struct hci_dev *hdev, int err)
-> > 
+On Wednesday 09 March 2011 16:23:55 Justin P. Mattock wrote:
 > 
-> Works here too - bluetooth comes up enabled.  On to Linus?
+> looking more into this issue I am noticing that it seems this might be a 
+> timing issue. I have tried adding msleep to the function but endedup 
+> having a system freeze(only because I am not sure how msleep 
+> works)udelay I have not played around with just yet.
+> 
+> the below patch gets everything working for me:
+> 
+> 
+>  From 8065e37b546cdf6e42a5de4277e08ebba0a18637 Mon Sep 17 00:00:00 2001
+> From: Justin P. Mattock <justinmattock@gmail.com>
+> Date: Tue, 8 Mar 2011 22:01:19 -0800
+> Subject: [PATCH] bluetooth_bug_fix_test_1
+>   Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+> 
+> ---
+>   net/bluetooth/hci_core.c |   11 +++++------
+>   1 files changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 9c4541b..f690eb5 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -95,18 +95,17 @@ void hci_req_complete(struct hci_dev *hdev, __u16 
+> cmd, int result)
+>   {
+>   	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
+> 
+> +	if (hdev->req_status == HCI_REQ_PEND) {
+> +		hdev->req_result = result;
+> +		hdev->req_status = HCI_REQ_DONE;
+> +		wake_up_interruptible(&hdev->req_wait_q);
+> +	}
+>   	/* If the request has set req_last_cmd (typical for multi-HCI
+>   	 * command requests) check if the completed command matches
+>   	 * this, and if not just return. Single HCI command requests
+>   	 * typically leave req_last_cmd as 0 */
+>   	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
+>   		return;
+> -
+> -	if (hdev->req_status == HCI_REQ_PEND) {
+> -		hdev->req_result = result;
+> -		hdev->req_status = HCI_REQ_DONE;
+> -		wake_up_interruptible(&hdev->req_wait_q);
+> -	}
+>   }
+> 
+>   static void hci_req_cancel(struct hci_dev *hdev, int err)
+> 
 
-All the patch does is it re-breaks the __hci_request function by
-removing proper synchronization from it (again) and thereby hides the
-real bug which is the kernel sending commands to the controller before
-the HCI_Reset command has completed.
+Works here too - bluetooth comes up enabled.  On to Linus?
 
-Johan
+Thanks
+Ed
