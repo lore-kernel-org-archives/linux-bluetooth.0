@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Fix unloading of adapter drivers
-Date: Thu, 10 Mar 2011 15:16:29 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com"
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-References: <1299759009-17407-1-git-send-email-szymon.janc@tieto.com> <20110310134204.GA22155@jh-x301>
-In-Reply-To: <20110310134204.GA22155@jh-x301>
+Date: Thu, 10 Mar 2011 16:05:50 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v2 2/4] Sim Access Profile Manager
+Message-ID: <20110310140550.GA22537@jh-x301>
+References: <1298549606-16594-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1298549606-16594-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201103101516.30070.szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1298549606-16594-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi Szymon,
-> 
-> On Thu, Mar 10, 2011, Szymon Janc wrote:
-> > Call driver remove callback only if corresponding probe succeed.
-> > ---
-> >  src/adapter.c |   41 +++++++++++++++++++++++++----------------
-> >  1 files changed, 25 insertions(+), 16 deletions(-)
-> 
-> The patch looks ok'ish, but don't you have to update the
-> btd_unregister_adapter_driver function too? (so it also removes
-> potential entries in the loaded_drivers list)
+Hi Waldek,
 
-Hmm all drivers unregisters them self only when plugin is unloaded, but it might
-be good to be prepare for more 'dynamic' drivers in future..
+On Thu, Feb 24, 2011, Waldemar Rymarkiewicz wrote:
+> Add a SAP plugin main file and the plugin manager. Also include the SAP
+> plugin in the Makefile.
+> ---
+>  Makefile.am   |    7 ++++
+>  acinclude.m4  |    6 ++++
+>  sap/main.c    |   55 +++++++++++++++++++++++++++++++++
+>  sap/manager.c |   93 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  sap/manager.h |   22 +++++++++++++
+>  sap/server.c  |   48 +++++++++++++++++++++++++++++
+>  sap/server.h  |   26 ++++++++++++++++
+>  7 files changed, 257 insertions(+), 0 deletions(-)
+>  create mode 100644 sap/main.c
+>  create mode 100644 sap/manager.c
+>  create mode 100644 sap/manager.h
+>  create mode 100644 sap/server.c
+>  create mode 100644 sap/server.h
 
-Will prepare v2 shortly.
+I've applied the first two patches, but the third one has some coding
+style issues which I will comment on shortly.
 
--- 
-BR
-Szymon Janc
+Johan
