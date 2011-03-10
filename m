@@ -1,53 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 13:58:28 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: lkslawek@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] Add skeleton for Message Access Profile plugin
-Message-ID: <20110310115828.GB18256@jh-x301>
-References: <1299755065-4816-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1299755065-4816-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <20110310111408.GA18256@jh-x301>
+References: <1299058614-8904-1-git-send-email-lkslawek@gmail.com>
+	<1299058614-8904-3-git-send-email-lkslawek@gmail.com>
+	<20110310111408.GA18256@jh-x301>
+Date: Thu, 10 Mar 2011 12:28:23 +0100
+Message-ID: <AANLkTi=3PwFWLUAVXNGjrA-9dBRD=58F_yq5w84rVpXV@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Add actual service for Message Access Profile
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: lkslawek@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+On Thu, Mar 10, 2011 at 12:14 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Slawek,
+>
+> On Wed, Mar 02, 2011, lkslawek@gmail.com wrote:
+>> +     ret = obex_get_stream_start(os, name);
+>> +     if (ret < 0)
+>> +             goto fail;
+>> +
+>> +     return 0;
+>> +fail:
+>> +     return ret;
+>> +}
+>
+> How about just "return obex_get_stream_start(os, name);"?
+>
+>> +     ret = obex_put_stream_start(os, name);
+>> +     if (ret < 0)
+>> +             goto fail;
+>> +
+>> +     return 0;
+>> +fail:
+>> +     return ret;
+>> +}
+>
+> Same here.
+>
+This is ready for upcoming change, where there is also applications
+parameter parsing that can fail and return it's own error code.
+>> +     }
+>> +
+>> +     return 0;
+>> +}
+>> +static struct obex_service_driver mas = {
+>
+> Missing empty line before "statis struct ...".
+>
+I will fix it.
+>>  static int mas_init(void)
+>>  {
+>> +     int err;
+>> +
+>> +     err = obex_service_driver_register(&mas);
+>> +     if (err < 0)
+>> +             goto fail_mas_reg;
+>> +
+>>       return 0;
+>> +
+>> +fail_mas_reg:
+>> +     return err;
+>>  }
+>
+> Just "return obex_service_driver_register(&mas);" should be enough.
+This one makes more sense when you look at all patches in this set as a whole.
 
-On Thu, Mar 10, 2011, lkslawek@gmail.com wrote:
-> This patch introduces skeleton of a plugin supporting server role side
-> of Bluetooth SIG profile defining procedures for exchanging message
-> objects.
-> 
-> The plugin can be compiled with different backends used for accessing
-> message repository. This can be selected during configure:
-> 
-> 	./configure --with-messages=backend_name
-> 
-> When no backend is specified, the default dummy is chosen.
-> 
-> There is also a new command line option to obexd needed to start Message
-> Access service:
-> 
-> 	obexd [...] --mas
-> ---
-> v2: fix copyright declarations
-> 
->  .gitignore               |    1 +
->  Makefile.am              |   10 +++++++++-
->  configure.ac             |   12 ++++++++++++
->  plugins/mas.c            |   42 ++++++++++++++++++++++++++++++++++++++++++
->  plugins/messages-dummy.c |   28 ++++++++++++++++++++++++++++
->  plugins/messages.h       |   22 ++++++++++++++++++++++
->  src/main.c               |   11 +++++++++--
->  src/obex.h               |    1 +
->  8 files changed, 124 insertions(+), 3 deletions(-)
->  create mode 100644 plugins/mas.c
->  create mode 100644 plugins/messages-dummy.c
->  create mode 100644 plugins/messages.h
-
-This patch has been pushed upstream, however I'll wait until we reach a
-consensus on the coding style issues for the other patches before
-proceeding with them.
-
-Johan
+-- 
+Slawomir Bochenski
