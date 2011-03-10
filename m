@@ -1,30 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Mar 2011 10:52:20 +0200
+Date: Thu, 10 Mar 2011 09:32:06 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH v2] pand: Fix for TP_BNEP_CTRL_BV_01_C qualification
- test
-Message-ID: <20110310085220.GA2883@jh-x301>
-References: <1299264115-10702-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: "Justin P. Mattock" <justinmattock@gmail.com>,
+	Mikko Vinni <mmvinni@yahoo.com>,
+	linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
+Message-ID: <20110310073206.GA1033@jh-x301>
+References: <635561.59590.qm@web161820.mail.bf1.yahoo.com>
+ <359639.21781.qm@web161807.mail.bf1.yahoo.com>
+ <4D77EFEB.1020804@gmail.com>
+ <201103092154.22796.edt@aei.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1299264115-10702-1-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <201103092154.22796.edt@aei.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi,
 
-On Fri, Mar 04, 2011, Lukasz Rymanowski wrote:
-> With this fix pand will correctly respond on
-> unknown BNEP control command
-> ---
->  compat/bnep.c |   16 ++++++++++++++++
->  1 files changed, 16 insertions(+), 0 deletions(-)
+On Wed, Mar 09, 2011, Ed Tomlinson wrote:
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 9c4541b..f690eb5 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -95,18 +95,17 @@ void hci_req_complete(struct hci_dev *hdev, __u16 
+> > cmd, int result)
+> >   {
+> >   	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
+> > 
+> > +	if (hdev->req_status == HCI_REQ_PEND) {
+> > +		hdev->req_result = result;
+> > +		hdev->req_status = HCI_REQ_DONE;
+> > +		wake_up_interruptible(&hdev->req_wait_q);
+> > +	}
+> >   	/* If the request has set req_last_cmd (typical for multi-HCI
+> >   	 * command requests) check if the completed command matches
+> >   	 * this, and if not just return. Single HCI command requests
+> >   	 * typically leave req_last_cmd as 0 */
+> >   	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
+> >   		return;
+> > -
+> > -	if (hdev->req_status == HCI_REQ_PEND) {
+> > -		hdev->req_result = result;
+> > -		hdev->req_status = HCI_REQ_DONE;
+> > -		wake_up_interruptible(&hdev->req_wait_q);
+> > -	}
+> >   }
+> > 
+> >   static void hci_req_cancel(struct hci_dev *hdev, int err)
+> > 
+> 
+> Works here too - bluetooth comes up enabled.  On to Linus?
 
-Pushed upstream. Could you also create a matching patch for the network
-plugin, please? (network/server.c bnep_setup function).
+All the patch does is it re-breaks the __hci_request function by
+removing proper synchronization from it (again) and thereby hides the
+real bug which is the kernel sending commands to the controller before
+the HCI_Reset command has completed.
 
 Johan
