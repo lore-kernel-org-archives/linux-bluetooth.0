@@ -1,95 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4D715062.1070508@codeaurora.org>
-References: <1299270913-8436-1-git-send-email-andre.guedes@openbossa.org>
-	<4D715062.1070508@codeaurora.org>
-Date: Fri, 11 Mar 2011 10:27:21 -0300
-Message-ID: <AANLkTin8+tW8skjJYo1R_sRz7rmPrZR_MzdmQsnuMTj5@mail.gmail.com>
-Subject: Re: [RFC 0/6] LE advertising cache
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20110311111313.GA20128@jh-x301>
+References: <1299829612-3704-1-git-send-email-lkslawek@gmail.com>
+	<1299829612-3704-4-git-send-email-lkslawek@gmail.com>
+	<20110311111313.GA20128@jh-x301>
+Date: Fri, 11 Mar 2011 12:40:05 +0100
+Message-ID: <AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Add detection of MAP function in OBEX requests
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
-
-On Fri, Mar 4, 2011 at 5:49 PM, Brian Gix <bgix@codeaurora.org> wrote:
+>> +enum messages_function_id {
+>> +     MFID_INVALID = 0,
+>> +     MFID_SET_NOTIFICATION_REGISTRATION,
+>> +     MFID_GET_FOLDER_LISTING,
+>> +     MFID_GET_MESSAGES_LISTING,
+>> +     MFID_GET_MESSAGE,
+>> +     MFID_SET_MESSAGE_STATUS,
+>> +     MFID_PUSH_MESSAGE,
+>> +     MFID_UPDATE_INBOX,
+>> +};
 >
-> On 11-03-04 12:35 PM, Andre Guedes wrote:
->>
->> During a LE connection establishment, the host should be able to infer the
->> bdaddr type from a given bdaddr.
->>
->> To achieve that, during the LE scanning, the host stores the bdaddr and the
->> bdaddr type gathered from advertising reports. The host keeps a list of
->> advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
->> be called Advertising Cache.
->
-> My biggest problem with this is testing purposes.
->
-> While it is true that the bdaddr_type can be extracted from the LE Scan data, when you are at an event like UPF, there can be an awful lot of devices very close to you.
->
-> It would be nice to be able to explicitly specify both the bdaddr and bdaddr_type during these things.
+> Since "function" here doesn't seem to be referring to a C function but
+> to the type of request, could you call it e.g. request_type instead? Is
+> there a reason you you want to have this enum instead of e.g. storing
+> the original value of the type header?
+Function here refers to function as used in MAP specification (see
+chapter 5: Message Access Profile Functions). Functions in MAP are an
+abstraction above OBEX requests and types. There is one case where one
+type is used for two functions (the difference is whether it is GET or
+PUT request).
 
-For testing purposes, hcitool lecc [--random] <bdaddr> command can be
-used to explicitly specify both the bdaddr and bdaddr_type.
+In 3 (of 9 total) cases type is used solely for selecting function, as
+there is no real object transmitted (well, to be exact the body in
+this cases consist of single filler byte).
 
-For the L2CAP socket, we could have extended the "struct sockaddr_l2"
-to add the address type field, but we've decided to not add a new
-field which is not applied to basic rate.
+And those MAP functions also accept input parameters and return output
+ones, so the name "function" is quite appropriate.
 
->
-> But I agree that as a deployed device, caching from an LE scan makes the most sense.
->
-> Will this also work for (future) private addressing, where the address being connected to may not be the one initially seen in the scan?
+As checking for this MAP function called is needed in more places it
+is convenient to store it as a number instead of doing expensive
+string comparison each time.
 
-Yes. Advertising entries are cached during both active and passive
-scanning. We need to define how to put all pieces together: whitelist,
-active/passive scanning and address resolution in the kernel.
-
->>
->> Since the penality to connect to an unreachable device is relatively high,
->> we must keep only fresh advertising entries on the advertising cache. So,
->> before each LE scanning the advertising cache is cleared. Also, after the LE
->> scanning, a timer is set to clear the cache.
->>
->> Next steps include removing all advertising cache from userspace and
->> implementing a mechanism to sync kernel and userspace advertising cache.
->>
->> Patches are rebased using Vinicius SMP patches, repo:
->> git://git.infradead.org/users/vcgomes/linux-2.6.git for-next
->>
->> Anderson Briglia (1):
->>   Bluetooth: Implement advertising report meta event
->>
->> Andre Guedes (5):
->>   Bluetooth: LE advertising info caching
->>   Bluetooth: Protect adv_entries with a RW semaphore
->>   Bluetooth: Check advertising cache in hci_connect()
->>   Bluetooth: Clear advertising cache before scanning
->>   Bluetooth: Add a timer to clear the advertising cache
->>
->>  include/net/bluetooth/hci.h      |   20 ++++++++
->>  include/net/bluetooth/hci_core.h |   16 +++++++
->>  net/bluetooth/hci_conn.c         |   12 ++++-
->>  net/bluetooth/hci_core.c         |   92 ++++++++++++++++++++++++++++++++++++++
->>  net/bluetooth/hci_event.c        |   48 ++++++++++++++++++++
->>  5 files changed, 185 insertions(+), 3 deletions(-)
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> --
-> Brian Gix
-> bgix@codeaurora.org
-> Employee of Qualcomm Innovation Center, Inc.
-> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
-Regards,
-
-Andre Guedes.
+-- 
+Slawomir Bochenski
