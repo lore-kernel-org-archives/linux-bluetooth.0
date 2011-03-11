@@ -1,69 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Mar 2011 22:33:49 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Ed Tomlinson <edt@aei.ca>,
-	"Justin P. Mattock" <justinmattock@gmail.com>,
-	Mikko Vinni <mmvinni@yahoo.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: re "bluetooth disabled" and "[BUG] usb problems in .38-rc3+"
-Message-ID: <20110312013349.GA2164@joana>
-References: <635561.59590.qm@web161820.mail.bf1.yahoo.com>
- <359639.21781.qm@web161807.mail.bf1.yahoo.com>
- <4D77EFEB.1020804@gmail.com>
- <201103092154.22796.edt@aei.ca>
- <20110310073206.GA1033@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110310073206.GA1033@jh-x301>
+Date: Fri, 11 Mar 2011 21:30:09 +0000
+Message-ID: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
+Subject: [RFC] Auto Connections
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Ville Tervo <Ville.Tervo@nokia.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2011-03-10 09:32:06 +0200]:
+Hi guys,
 
-> Hi,
-> 
-> On Wed, Mar 09, 2011, Ed Tomlinson wrote:
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index 9c4541b..f690eb5 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -95,18 +95,17 @@ void hci_req_complete(struct hci_dev *hdev, __u16 
-> > > cmd, int result)
-> > >   {
-> > >   	BT_DBG("%s command 0x%04x result 0x%2.2x", hdev->name, cmd, result);
-> > > 
-> > > +	if (hdev->req_status == HCI_REQ_PEND) {
-> > > +		hdev->req_result = result;
-> > > +		hdev->req_status = HCI_REQ_DONE;
-> > > +		wake_up_interruptible(&hdev->req_wait_q);
-> > > +	}
-> > >   	/* If the request has set req_last_cmd (typical for multi-HCI
-> > >   	 * command requests) check if the completed command matches
-> > >   	 * this, and if not just return. Single HCI command requests
-> > >   	 * typically leave req_last_cmd as 0 */
-> > >   	if (hdev->req_last_cmd && cmd != hdev->req_last_cmd)
-> > >   		return;
-> > > -
-> > > -	if (hdev->req_status == HCI_REQ_PEND) {
-> > > -		hdev->req_result = result;
-> > > -		hdev->req_status = HCI_REQ_DONE;
-> > > -		wake_up_interruptible(&hdev->req_wait_q);
-> > > -	}
-> > >   }
-> > > 
-> > >   static void hci_req_cancel(struct hci_dev *hdev, int err)
-> > > 
-> > 
-> > Works here too - bluetooth comes up enabled.  On to Linus?
-> 
-> All the patch does is it re-breaks the __hci_request function by
-> removing proper synchronization from it (again) and thereby hides the
-> real bug which is the kernel sending commands to the controller before
-> the HCI_Reset command has completed.
+It is time to get opinions from some gurus!
 
-I got an 1.1 Bluetooth dongle that can cause this issue, now I can test this
-by myself. I'll work to fix this next week.
+We need to implement automatic connections to implement the Profiles.
+At the moment BlueZ supports only dual mode adapters, as consequence
+BlueZ needs to start the LE connection. IMHO, it is better to leave
+the responsibility to the controller, implementing "selective"
+connections will only introduce more code without concrete benefits.
+Configuring the controller to autonomously establish connections seems
+to be the right approach to proceed.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+This topic is NOT about StartDiscovery() + CreateDevice.
+StartDiscovery uses active scanning and CreateDevice uses direct
+connection establishment. We need a mechanism to automatically connect
+to "trusted" devices or devices flagged as "AutoConnect".
+
+
+My initial idea is: change the LE server socket to report
+outgoing(host initiated) connections through the server socket.
+Awkward?
+To achieve that we need to manage the LE Create Connection(using
+whitelist) in the kernel, extend the management interface to control
+devices in the whitelist, change the LE Connection Complete Event
+handling to get the Role properly.
+Pros:
+- Controller manage connections
+- Flexible to support  connections to "trusted" resolvable address and
+passive scanning
+- Only one "flow" for the connections: LE server socket
+- Maybe we could hide resolvable address from the userspace, mapping
+it directly to public or static random
+Cons:
+- Risky
+- Less control of the connection establishment process
+
+
+Another approach can be to manage the LE connections(using whitelist)
+from the userspace. BDADDR_ANY in the destination field(sockaddr_l2)
+can be used to define LE connections using white list.
+Pros:
+- It will not be necessary to extend the management interface now,
+address can be added directly to the controller's white list
+- Doesn't require changes in the LE server socket
+Cons:
+- BDADDR_ANY in the destination field has no meaning for Basic Rate
+- Needs to expose the resolvable address to the userspace
+- Different "flows" for incoming/outgoing connections
+
+
+Open issue(s):
+* How to handle timeouts when sending LE Create Connection
+* Passive scanning management
+
+
+Cheers,
+Claudio
