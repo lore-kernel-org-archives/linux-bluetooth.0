@@ -2,37 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 3/4] Add Discover method to the Attribute API
-Date: Fri, 11 Mar 2011 14:53:01 -0300
-Message-Id: <1299865982-13601-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/4] Fix not returning an error when Discover() fails
+Date: Fri, 11 Mar 2011 14:53:00 -0300
+Message-Id: <1299865982-13601-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1299865982-13601-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1299865982-13601-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/attribute-api.txt |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+When the connection fails an error should be returned to inform
+the user.
 
-diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index 23808e6..10a9a66 100644
---- a/doc/attribute-api.txt
-+++ b/doc/attribute-api.txt
-@@ -50,6 +50,14 @@ Methods 	dict GetProperties()
- 			Returns all properties for the interface. See the
- 			Properties section for the available properties.
+This adds a field to store the DBusMessage that caused the error,
+so we can send the correct reply.
+---
+ attrib/client.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/attrib/client.c b/attrib/client.c
+index 47c5d4d..e67edc2 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -59,6 +59,7 @@ struct gatt_service {
+ 	char *path;
+ 	GSList *primary;
+ 	GAttrib *attrib;
++	DBusMessage *msg;
+ 	int psm;
+ 	gboolean listen;
+ };
+@@ -335,6 +336,12 @@ static void connect_cb(GIOChannel *chan, GError *gerr, gpointer user_data)
+ 	struct gatt_service *gatt = user_data;
  
-+		Discover()
+ 	if (gerr) {
++		if (gatt->msg) {
++			DBusMessage *reply = btd_error_failed(gatt->msg,
++							gerr->message);
++			g_dbus_send_message(connection, reply);
++		}
 +
-+			Discover all characteristics that belongs in this service.
-+			When it returns all the characteristics paths will be
-+			already registered. It will return as soon as all the
-+			characteristics are discovered. After that it will try to
-+			read all values.
-+
- 		RegisterCharacteristicsWatcher(object agent)
- 
- 			Register a watcher to monitor characteristic changes.
+ 		error("%s", gerr->message);
+ 		goto fail;
+ 	}
 -- 
 1.7.4.1
 
