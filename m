@@ -2,339 +2,309 @@ Return-Path: <cyrus@holtmann.org>
 From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: epx@signove.com
-Subject: [PATCH 5/5 v2] Add "unit test" for new UUID functions
-Date: Fri, 11 Mar 2011 11:30:13 -0300
-Message-Id: <1299853813-15753-5-git-send-email-epx@signove.com>
+Subject: [PATCH 4/5 v2] Use new UUID functions in example GATT server
+Date: Fri, 11 Mar 2011 11:30:12 -0300
+Message-Id: <1299853813-15753-4-git-send-email-epx@signove.com>
 In-Reply-To: <1299853813-15753-1-git-send-email-epx@signove.com>
 References: <1299853813-15753-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.tools  |    6 +-
- test/uuidtest.c |  289 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 294 insertions(+), 1 deletions(-)
- create mode 100644 test/uuidtest.c
+ attrib/example.c |   92 ++++++++++++++++++++++++++++--------------------------
+ 1 files changed, 48 insertions(+), 44 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 9c43202..1a1f5a1 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -142,7 +142,8 @@ bin_PROGRAMS += test/l2test test/rctest
- noinst_PROGRAMS += test/gaptest test/sdptest test/scotest \
- 			test/attest test/hstest test/avtest test/ipctest \
- 					test/lmptest test/bdaddr test/agent \
--					test/btiotest test/test-textfile
-+					test/btiotest test/test-textfile \
-+					test/uuidtest
+diff --git a/attrib/example.c b/attrib/example.c
+index 395650a..fae288c 100644
+--- a/attrib/example.c
++++ b/attrib/example.c
+@@ -29,8 +29,7 @@
  
- test_hciemu_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+ #include <arpa/inet.h>
  
-@@ -175,6 +176,9 @@ test_agent_LDADD = @DBUS_LIBS@
- test_btiotest_SOURCES = test/btiotest.c btio/btio.h btio/btio.c
- test_btiotest_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
- 
-+test_uuidtest_SOURCES = test/uuidtest.c
-+test_uuidtest_LDADD = lib/libbluetooth.la
-+
- test_test_textfile_SOURCES = test/test-textfile.c src/textfile.h src/textfile.c
- 
- dist_man_MANS += test/rctest.1 test/hciemu.1
-diff --git a/test/uuidtest.c b/test/uuidtest.c
-new file mode 100644
-index 0000000..9df0998
---- /dev/null
-+++ b/test/uuidtest.c
-@@ -0,0 +1,289 @@
-+#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
 +#include <bluetooth/uuid.h>
+ 
+ #include <glib.h>
+ 
+@@ -70,36 +69,41 @@ static int register_attributes(void)
+ 	const char *manufacturer_name2 = "ACME Weighing Scales";
+ 	const char *serial1 = "237495-3282-A";
+ 	const char *serial2 = "11267-2327A00239";
+-	const unsigned char char_weight_uuid[] = { 0x80, 0x88, 0xF2, 0x18, 0x90,
+-		0x2C, 0x45, 0x0B, 0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25,
+-		0xE9 };
+-	const unsigned char prim_weight_uuid[] = { 0x4F, 0x0A, 0xC0, 0x96, 0x35,
+-		0xD4, 0x49, 0x11, 0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE,
+-		0xFE };
 +
-+const char *base = "00000000-0000-1000-8000-00805F9B34FB";
++	const uint128_t char_weight_uuid_btorder = {
++		.data = { 0x80, 0x88, 0xF2, 0x18, 0x90, 0x2C, 0x45, 0x0B,
++			  0xB6, 0xC4, 0x62, 0x89, 0x1E, 0x8C, 0x25, 0xE9 } };
++	const uint128_t prim_weight_uuid_btorder = {
++		.data = { 0x4F, 0x0A, 0xC0, 0x96, 0x35, 0xD4, 0x49, 0x11,
++			  0x96, 0x31, 0xDE, 0xA8, 0xDC, 0x74, 0xEE, 0xFE } };
 +
-+uint8_t xbase[] = {0x00, 0x00, 0x00, 0x00,
-+		  0x00, 0x00,
-+		  0x10, 0x00,
-+		  0x80, 0x00,
-+		  0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
++	uint128_t char_weight_uuid;
+ 	uint8_t atval[256];
+ 	uint32_t handle;
+-	uuid_t uuid;
++	bt_uuid_t uuid;
+ 	int len;
+ 
++	btoh128(&char_weight_uuid_btorder, &char_weight_uuid);
 +
-+uint16_t sixteen = 0x1234;
-+const char *uuidsixteen128 = "00001234-0000-1000-8000-00805F9B34FB";
-+const char *uuidsixteen16 = "0x1234";
-+const char *uuidsixteen16a = "1234";
-+
-+uint8_t xuuidsixteen[] = {0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-+
-+uint32_t thirtytwo = 0x12345678;
-+const char *uuidthirtytwo32 = "0x12345678";
-+const char *uuidthirtytwo32a = "12345678";
-+const char *uuidthirtytwo128 = "12345678-0000-1000-8000-00805F9B34FB";
-+
-+uint8_t xuuidthirtytwo[] = {0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-+
-+const char *malformed[] = {
-+	"0",
-+	"01",
-+	"012",
-+	"xxxx",
-+	"xxxxx",
-+	"0xxxxx",
-+	"0123456",
-+	"012g4567",
-+	"012345678",
-+	"0x234567u9",
-+	"01234567890",
-+	"00001234-0000-1000-8000-00805F9B34F",
-+	"00001234-0000-1000-8000 00805F9B34FB",
-+	"00001234-0000-1000-8000-00805F9B34FBC",
-+	"00001234-0000-1000-800G-00805F9B34FB",
-+	NULL };
-+
-+int main()
-+{
-+	bt_uuid_t u, u2, u3, u4, u5, ub;
-+	uint128_t n, i;
-+	char buf[512];
-+	int s;
-+
-+	memcpy(&n, xbase, 16);
-+	ntoh128(&n, &i);
-+
-+	if (bt_string_to_uuid(&u, base)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&ub, base)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (ub.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&u.value.u128, &i, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&ub.value.u128, &i, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&ub.value.u128, &u.value.u128, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	bt_uuid_to_string(&u, buf, sizeof(buf));
-+	/* printf("%s\n", buf); */
-+
-+	if (strcasecmp(buf, base) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	memcpy(&n, xuuidsixteen, 16);
-+	ntoh128(&n, &i);
-+
-+	bt_uuid16_create(&u, sixteen);
-+
-+	if (bt_string_to_uuid(&u2, uuidsixteen16)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&u3, uuidsixteen16a)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&u4, uuidsixteen128)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	bt_uuid128_create(&u5, i);
-+
-+	if (u.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.value.u16 != sixteen) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u2.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u3.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u4.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u5.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u2) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u2, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u3, &u4) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u4, &u5) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &u) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	memcpy(&n, xuuidthirtytwo, 16);
-+	ntoh128(&n, &i);
-+
-+	bt_uuid32_create(&u, thirtytwo);
-+	bt_string_to_uuid(&u2, uuidthirtytwo32);
-+	bt_string_to_uuid(&u3, uuidthirtytwo32a);
-+	bt_string_to_uuid(&u4, uuidthirtytwo128);
-+	bt_uuid128_create(&u5, i);
-+
-+	/*
-+	bt_uuid_to_string(&u2, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+
-+	bt_uuid_to_string(&u3, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+
-+	bt_uuid_to_string(&u4, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+	*/
-+
-+	if (u.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.value.u32 != thirtytwo) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u2.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u3.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u4.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u5.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u2) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u2, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u3, &u4) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u4, &u5) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &u) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	for (s = 0; malformed[s]; ++s) {
-+		if (bt_string_to_uuid(&u3, malformed[s]) == 0) {
-+			printf("Fail %s %d\n", malformed[s], __LINE__);
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
+ 	/* Battery state service: primary service definition */
+-	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	att_put_u16(BATTERY_STATE_SVC_UUID, &atval[0]);
+ 	attrib_db_add(0x0100, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Battery: battery state characteristic */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0110, &atval[1]);
+ 	att_put_u16(BATTERY_STATE_UUID, &atval[3]);
+ 	attrib_db_add(0x0106, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Battery: battery state attribute */
+-	sdp_uuid16_create(&uuid, BATTERY_STATE_UUID);
++	bt_uuid16_create(&uuid, BATTERY_STATE_UUID);
+ 	atval[0] = 0x04;
+ 	attrib_db_add(0x0110, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+ 
+ 	/* Battery: Client Characteristic Configuration */
+-	sdp_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
++	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+ 	atval[0] = 0x00;
+ 	atval[1] = 0x00;
+ 	attrib_db_add(0x0111, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval, 2);
+@@ -110,12 +114,12 @@ static int register_attributes(void)
+ 		sdp_handles = g_slist_prepend(sdp_handles, GUINT_TO_POINTER(handle));
+ 
+ 	/* Thermometer: primary service definition */
+-	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+ 	att_put_u16(THERM_HUMIDITY_SVC_UUID, &atval[0]);
+ 	attrib_db_add(0x0200, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Thermometer: Include */
+-	sdp_uuid16_create(&uuid, GATT_INCLUDE_UUID);
++	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+ 	att_put_u16(0x0500, &atval[0]);
+ 	att_put_u16(0x0504, &atval[2]);
+ 	att_put_u16(MANUFACTURER_SVC_UUID, &atval[4]);
+@@ -128,20 +132,20 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0202, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Thermometer: temperature characteristic */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0204, &atval[1]);
+ 	att_put_u16(TEMPERATURE_UUID, &atval[3]);
+ 	attrib_db_add(0x0203, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Thermometer: temperature characteristic value */
+-	sdp_uuid16_create(&uuid, TEMPERATURE_UUID);
++	bt_uuid16_create(&uuid, TEMPERATURE_UUID);
+ 	atval[0] = 0x8A;
+ 	atval[1] = 0x02;
+ 	attrib_db_add(0x0204, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Thermometer: temperature characteristic format */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+ 	atval[0] = 0x0E;
+ 	atval[1] = 0xFE;
+ 	att_put_u16(FMT_CELSIUS_UUID, &atval[2]);
+@@ -150,25 +154,25 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0205, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 7);
+ 
+ 	/* Thermometer: characteristic user description */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_out_temp);
+ 	strncpy((char *) atval, desc_out_temp, len);
+ 	attrib_db_add(0x0206, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Thermometer: relative humidity characteristic */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0212, &atval[1]);
+ 	att_put_u16(RELATIVE_HUMIDITY_UUID, &atval[3]);
+ 	attrib_db_add(0x0210, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Thermometer: relative humidity value */
+-	sdp_uuid16_create(&uuid, RELATIVE_HUMIDITY_UUID);
++	bt_uuid16_create(&uuid, RELATIVE_HUMIDITY_UUID);
+ 	atval[0] = 0x27;
+ 	attrib_db_add(0x0212, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
+ 
+ 	/* Thermometer: relative humidity characteristic format */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+ 	atval[0] = 0x04;
+ 	atval[1] = 0x00;
+ 	att_put_u16(FMT_PERCENT_UUID, &atval[2]);
+@@ -177,7 +181,7 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0213, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 8);
+ 
+ 	/* Thermometer: characteristic user description */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_out_hum);
+ 	strncpy((char *) atval, desc_out_hum, len);
+ 	attrib_db_add(0x0214, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+@@ -188,62 +192,62 @@ static int register_attributes(void)
+ 		sdp_handles = g_slist_prepend(sdp_handles, GUINT_TO_POINTER(handle));
+ 
+ 	/* Secondary Service: Manufacturer Service */
+-	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
++	bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	att_put_u16(MANUFACTURER_SVC_UUID, &atval[0]);
+ 	attrib_db_add(0x0500, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Manufacturer name characteristic definition */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0502, &atval[1]);
+ 	att_put_u16(MANUFACTURER_NAME_UUID, &atval[3]);
+ 	attrib_db_add(0x0501, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Manufacturer name characteristic value */
+-	sdp_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
++	bt_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
+ 	len = strlen(manufacturer_name1);
+ 	strncpy((char *) atval, manufacturer_name1, len);
+ 	attrib_db_add(0x0502, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Manufacturer serial number characteristic */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0504, &atval[1]);
+ 	att_put_u16(MANUFACTURER_SERIAL_UUID, &atval[3]);
+ 	attrib_db_add(0x0503, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Manufacturer serial number characteristic value */
+-	sdp_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
++	bt_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
+ 	len = strlen(serial1);
+ 	strncpy((char *) atval, serial1, len);
+ 	attrib_db_add(0x0504, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Secondary Service: Manufacturer Service */
+-	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
++	bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	att_put_u16(MANUFACTURER_SVC_UUID, &atval[0]);
+ 	attrib_db_add(0x0505, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Manufacturer name characteristic definition */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0507, &atval[1]);
+ 	att_put_u16(MANUFACTURER_NAME_UUID, &atval[3]);
+ 	attrib_db_add(0x0506, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Secondary Service: Vendor Specific Service */
+-	sdp_uuid16_create(&uuid, GATT_SND_SVC_UUID);
++	bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
+ 	att_put_u16(VENDOR_SPECIFIC_SVC_UUID, &atval[0]);
+ 	attrib_db_add(0x0550, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+ 
+ 	/* Vendor Specific Type characteristic definition */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0568, &atval[1]);
+ 	att_put_u16(VENDOR_SPECIFIC_TYPE_UUID, &atval[3]);
+ 	attrib_db_add(0x0560, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Vendor Specific Type characteristic value */
+-	sdp_uuid16_create(&uuid, VENDOR_SPECIFIC_TYPE_UUID);
++	bt_uuid16_create(&uuid, VENDOR_SPECIFIC_TYPE_UUID);
+ 	atval[0] = 0x56;
+ 	atval[1] = 0x65;
+ 	atval[2] = 0x6E;
+@@ -253,45 +257,45 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0568, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Manufacturer name attribute */
+-	sdp_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
++	bt_uuid16_create(&uuid, MANUFACTURER_NAME_UUID);
+ 	len = strlen(manufacturer_name2);
+ 	strncpy((char *) atval, manufacturer_name2, len);
+ 	attrib_db_add(0x0507, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Characteristic: serial number */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0509, &atval[1]);
+ 	att_put_u16(MANUFACTURER_SERIAL_UUID, &atval[3]);
+ 	attrib_db_add(0x0508, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+ 
+ 	/* Serial number characteristic value */
+-	sdp_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
++	bt_uuid16_create(&uuid, MANUFACTURER_SERIAL_UUID);
+ 	len = strlen(serial2);
+ 	strncpy((char *) atval, serial2, len);
+ 	attrib_db_add(0x0509, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
+ 
+ 	/* Weight service: primary service definition */
+-	sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+-	memcpy(atval, prim_weight_uuid, 16);
++	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	memcpy(atval, &prim_weight_uuid_btorder, 16);
+ 	attrib_db_add(0x0680, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 16);
+ 
+ 	/* Weight: include */
+-	sdp_uuid16_create(&uuid, GATT_INCLUDE_UUID);
++	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+ 	att_put_u16(0x0505, &atval[0]);
+ 	att_put_u16(0x0509, &atval[2]);
+ 	att_put_u16(MANUFACTURER_SVC_UUID, &atval[4]);
+ 	attrib_db_add(0x0681, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 6);
+ 
+ 	/* Weight: characteristic */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+ 	atval[0] = ATT_CHAR_PROPER_READ;
+ 	att_put_u16(0x0683, &atval[1]);
+-	memcpy(&atval[3], char_weight_uuid, 16);
++	memcpy(&atval[3], &char_weight_uuid_btorder, 16);
+ 	attrib_db_add(0x0682, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 19);
+ 
+ 	/* Weight: characteristic value */
+-	sdp_uuid128_create(&uuid, char_weight_uuid);
++	bt_uuid128_create(&uuid, char_weight_uuid);
+ 	atval[0] = 0x82;
+ 	atval[1] = 0x55;
+ 	atval[2] = 0x00;
+@@ -299,7 +303,7 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0683, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 4);
+ 
+ 	/* Weight: characteristic format */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_FMT_UUID);
+ 	atval[0] = 0x08;
+ 	atval[1] = 0xFD;
+ 	att_put_u16(FMT_KILOGRAM_UUID, &atval[2]);
+@@ -308,7 +312,7 @@ static int register_attributes(void)
+ 	attrib_db_add(0x0684, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 8);
+ 
+ 	/* Weight: characteristic user description */
+-	sdp_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
++	bt_uuid16_create(&uuid, GATT_CHARAC_USER_DESC_UUID);
+ 	len = strlen(desc_weight);
+ 	strncpy((char *) atval, desc_weight, len);
+ 	attrib_db_add(0x0685, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, len);
 -- 
 1.7.1
 
