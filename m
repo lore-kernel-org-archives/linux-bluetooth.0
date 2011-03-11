@@ -1,69 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 11 Mar 2011 23:27:58 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] Add detection of MAP function in OBEX requests
+Message-ID: <20110311212758.GA8147@jh-x301>
+References: <1299829612-3704-1-git-send-email-lkslawek@gmail.com>
+ <1299829612-3704-4-git-send-email-lkslawek@gmail.com>
+ <20110311111313.GA20128@jh-x301>
+ <AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
+ <20110311144855.GA23826@jh-x301>
 MIME-Version: 1.0
-Date: Fri, 11 Mar 2011 21:30:09 +0000
-Message-ID: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
-Subject: [RFC] Auto Connections
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Ville Tervo <Ville.Tervo@nokia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110311144855.GA23826@jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Hi,
 
-It is time to get opinions from some gurus!
+On Fri, Mar 11, 2011, Johan Hedberg wrote:
+> This would be similar to how we handle the telephony driver in BlueZ and
+> how the PBAP phonebook back-end is handled in obexd. I'm not saying this
+> as justification for the approach but just as a place to look for
+> examples. The main justification is to remove one unnecessary
+> abstraction layer (the numeric function id) and to remove the need to
+> fit each MAP request into the same C function signature (messages_open).
+> 
+> Trying to fit everything into the same mold forces you to create very
+> generic structs like mas_request which then end up needing a
+> private_data pointer (for request specific data)
 
-We need to implement automatic connections to implement the Profiles.
-At the moment BlueZ supports only dual mode adapters, as consequence
-BlueZ needs to start the LE connection. IMHO, it is better to leave
-the responsibility to the controller, implementing "selective"
-connections will only introduce more code without concrete benefits.
-Configuring the controller to autonomously establish connections seems
-to be the right approach to proceed.
+Sorry, I mixed this with some other structs in your code that have this
+sort of private data and layering. However, the main point about telling
+the back-end which function to call indirectly through an integer
+instead of just calling the function directly remains (even if the
+function signatures would be the same or very similar).
 
-This topic is NOT about StartDiscovery() + CreateDevice.
-StartDiscovery uses active scanning and CreateDevice uses direct
-connection establishment. We need a mechanism to automatically connect
-to "trusted" devices or devices flagged as "AutoConnect".
-
-
-My initial idea is: change the LE server socket to report
-outgoing(host initiated) connections through the server socket.
-Awkward?
-To achieve that we need to manage the LE Create Connection(using
-whitelist) in the kernel, extend the management interface to control
-devices in the whitelist, change the LE Connection Complete Event
-handling to get the Role properly.
-Pros:
-- Controller manage connections
-- Flexible to support  connections to "trusted" resolvable address and
-passive scanning
-- Only one "flow" for the connections: LE server socket
-- Maybe we could hide resolvable address from the userspace, mapping
-it directly to public or static random
-Cons:
-- Risky
-- Less control of the connection establishment process
-
-
-Another approach can be to manage the LE connections(using whitelist)
-from the userspace. BDADDR_ANY in the destination field(sockaddr_l2)
-can be used to define LE connections using white list.
-Pros:
-- It will not be necessary to extend the management interface now,
-address can be added directly to the controller's white list
-- Doesn't require changes in the LE server socket
-Cons:
-- BDADDR_ANY in the destination field has no meaning for Basic Rate
-- Needs to expose the resolvable address to the userspace
-- Different "flows" for incoming/outgoing connections
-
-
-Open issue(s):
-* How to handle timeouts when sending LE Create Connection
-* Passive scanning management
-
-
-Cheers,
-Claudio
+Johan
