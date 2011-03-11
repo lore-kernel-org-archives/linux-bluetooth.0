@@ -1,73 +1,340 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Mar 2011 16:48:55 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] Add detection of MAP function in OBEX requests
-Message-ID: <20110311144855.GA23826@jh-x301>
-References: <1299829612-3704-1-git-send-email-lkslawek@gmail.com>
- <1299829612-3704-4-git-send-email-lkslawek@gmail.com>
- <20110311111313.GA20128@jh-x301>
- <AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: epx@signove.com
+Subject: [PATCH 5/5 v2] Add "unit test" for new UUID functions
+Date: Fri, 11 Mar 2011 11:30:13 -0300
+Message-Id: <1299853813-15753-5-git-send-email-epx@signove.com>
+In-Reply-To: <1299853813-15753-1-git-send-email-epx@signove.com>
+References: <1299853813-15753-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+---
+ Makefile.tools  |    6 +-
+ test/uuidtest.c |  289 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 294 insertions(+), 1 deletions(-)
+ create mode 100644 test/uuidtest.c
 
-On Fri, Mar 11, 2011, Slawomir Bochenski wrote:
-> >> +enum messages_function_id {
-> >> +     MFID_INVALID = 0,
-> >> +     MFID_SET_NOTIFICATION_REGISTRATION,
-> >> +     MFID_GET_FOLDER_LISTING,
-> >> +     MFID_GET_MESSAGES_LISTING,
-> >> +     MFID_GET_MESSAGE,
-> >> +     MFID_SET_MESSAGE_STATUS,
-> >> +     MFID_PUSH_MESSAGE,
-> >> +     MFID_UPDATE_INBOX,
-> >> +};
-> >
-> > Since "function" here doesn't seem to be referring to a C function but
-> > to the type of request, could you call it e.g. request_type instead? Is
-> > there a reason you you want to have this enum instead of e.g. storing
-> > the original value of the type header?
->
-> Function here refers to function as used in MAP specification (see
-> chapter 5: Message Access Profile Functions). Functions in MAP are an
-> abstraction above OBEX requests and types. There is one case where one
-> type is used for two functions (the difference is whether it is GET or
-> PUT request).
-> 
-> In 3 (of 9 total) cases type is used solely for selecting function, as
-> there is no real object transmitted (well, to be exact the body in
-> this cases consist of single filler byte).
-> 
-> And those MAP functions also accept input parameters and return output
-> ones, so the name "function" is quite appropriate.
-> 
-> As checking for this MAP function called is needed in more places it
-> is convenient to store it as a number instead of doing expensive
-> string comparison each time.
+diff --git a/Makefile.tools b/Makefile.tools
+index 9c43202..1a1f5a1 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -142,7 +142,8 @@ bin_PROGRAMS += test/l2test test/rctest
+ noinst_PROGRAMS += test/gaptest test/sdptest test/scotest \
+ 			test/attest test/hstest test/avtest test/ipctest \
+ 					test/lmptest test/bdaddr test/agent \
+-					test/btiotest test/test-textfile
++					test/btiotest test/test-textfile \
++					test/uuidtest
+ 
+ test_hciemu_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+ 
+@@ -175,6 +176,9 @@ test_agent_LDADD = @DBUS_LIBS@
+ test_btiotest_SOURCES = test/btiotest.c btio/btio.h btio/btio.c
+ test_btiotest_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+ 
++test_uuidtest_SOURCES = test/uuidtest.c
++test_uuidtest_LDADD = lib/libbluetooth.la
++
+ test_test_textfile_SOURCES = test/test-textfile.c src/textfile.h src/textfile.c
+ 
+ dist_man_MANS += test/rctest.1 test/hciemu.1
+diff --git a/test/uuidtest.c b/test/uuidtest.c
+new file mode 100644
+index 0000000..9df0998
+--- /dev/null
++++ b/test/uuidtest.c
+@@ -0,0 +1,289 @@
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/uuid.h>
++
++const char *base = "00000000-0000-1000-8000-00805F9B34FB";
++
++uint8_t xbase[] = {0x00, 0x00, 0x00, 0x00,
++		  0x00, 0x00,
++		  0x10, 0x00,
++		  0x80, 0x00,
++		  0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
++
++uint16_t sixteen = 0x1234;
++const char *uuidsixteen128 = "00001234-0000-1000-8000-00805F9B34FB";
++const char *uuidsixteen16 = "0x1234";
++const char *uuidsixteen16a = "1234";
++
++uint8_t xuuidsixteen[] = {0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
++
++uint32_t thirtytwo = 0x12345678;
++const char *uuidthirtytwo32 = "0x12345678";
++const char *uuidthirtytwo32a = "12345678";
++const char *uuidthirtytwo128 = "12345678-0000-1000-8000-00805F9B34FB";
++
++uint8_t xuuidthirtytwo[] = {0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
++
++const char *malformed[] = {
++	"0",
++	"01",
++	"012",
++	"xxxx",
++	"xxxxx",
++	"0xxxxx",
++	"0123456",
++	"012g4567",
++	"012345678",
++	"0x234567u9",
++	"01234567890",
++	"00001234-0000-1000-8000-00805F9B34F",
++	"00001234-0000-1000-8000 00805F9B34FB",
++	"00001234-0000-1000-8000-00805F9B34FBC",
++	"00001234-0000-1000-800G-00805F9B34FB",
++	NULL };
++
++int main()
++{
++	bt_uuid_t u, u2, u3, u4, u5, ub;
++	uint128_t n, i;
++	char buf[512];
++	int s;
++
++	memcpy(&n, xbase, 16);
++	ntoh128(&n, &i);
++
++	if (bt_string_to_uuid(&u, base)) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_string_to_uuid(&ub, base)) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (ub.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (memcmp(&u.value.u128, &i, 16) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (memcmp(&ub.value.u128, &i, 16) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (memcmp(&ub.value.u128, &u.value.u128, 16) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &ub) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	bt_uuid_to_string(&u, buf, sizeof(buf));
++	/* printf("%s\n", buf); */
++
++	if (strcasecmp(buf, base) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	memcpy(&n, xuuidsixteen, 16);
++	ntoh128(&n, &i);
++
++	bt_uuid16_create(&u, sixteen);
++
++	if (bt_string_to_uuid(&u2, uuidsixteen16)) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_string_to_uuid(&u3, uuidsixteen16a)) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_string_to_uuid(&u4, uuidsixteen128)) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	bt_uuid128_create(&u5, i);
++
++	if (u.type != 16) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u.value.u16 != sixteen) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u2.type != 16) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u3.type != 16) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u4.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u5.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &u2) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u2, &u3) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &u3) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u3, &u4) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u4, &u5) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u5, &u) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &ub) == 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u5, &ub) == 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	memcpy(&n, xuuidthirtytwo, 16);
++	ntoh128(&n, &i);
++
++	bt_uuid32_create(&u, thirtytwo);
++	bt_string_to_uuid(&u2, uuidthirtytwo32);
++	bt_string_to_uuid(&u3, uuidthirtytwo32a);
++	bt_string_to_uuid(&u4, uuidthirtytwo128);
++	bt_uuid128_create(&u5, i);
++
++	/*
++	bt_uuid_to_string(&u2, buf, sizeof(buf));
++	printf("%s\n", buf);
++
++	bt_uuid_to_string(&u3, buf, sizeof(buf));
++	printf("%s\n", buf);
++
++	bt_uuid_to_string(&u4, buf, sizeof(buf));
++	printf("%s\n", buf);
++	*/
++
++	if (u.type != 32) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u.value.u32 != thirtytwo) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u2.type != 32) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u3.type != 32) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u4.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (u5.type != 128) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &u2) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u2, &u3) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u3, &u4) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u4, &u5) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u5, &u) != 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u, &ub) == 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	if (bt_uuid_cmp(&u5, &ub) == 0) {
++		printf("Fail %d\n", __LINE__);
++		return 1;
++	}
++
++	for (s = 0; malformed[s]; ++s) {
++		if (bt_string_to_uuid(&u3, malformed[s]) == 0) {
++			printf("Fail %s %d\n", malformed[s], __LINE__);
++			return 1;
++		}
++	}
++
++	return 0;
++}
+-- 
+1.7.1
 
-Ok, this makes sense (this was a good chance for me to catch up on the
-MAP spec ;). However only as far as the MAP core is concerned. On the
-MAP back-end side the only relevant purpose of the id seems to be to
-pick the right internal function to call. Therefore, I think it'd make
-more sense to have these request specific functions exported by the
-back-end and have the MAP core call them directly.
-
-This would be similar to how we handle the telephony driver in BlueZ and
-how the PBAP phonebook back-end is handled in obexd. I'm not saying this
-as justification for the approach but just as a place to look for
-examples. The main justification is to remove one unnecessary
-abstraction layer (the numeric function id) and to remove the need to
-fit each MAP request into the same C function signature (messages_open).
-
-Trying to fit everything into the same mold forces you to create very
-generic structs like mas_request which then end up needing a
-private_data pointer (for request specific data) and all this layering
-just increases the overall complexity of the code.
-
-Johan
