@@ -1,96 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 1/4] Fix the behaviour of the Attribute API Discover method
-Date: Fri, 11 Mar 2011 14:52:59 -0300
-Message-Id: <1299865982-13601-1-git-send-email-vinicius.gomes@openbossa.org>
+Message-ID: <4D7A43BB.4050801@nokia.com>
+Date: Fri, 11 Mar 2011 17:46:03 +0200
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Change order of freeing contacts data in send_pull_part
+References: <1299839095-12008-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1299839095-12008-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This method returns as soons as all the characteristics
-are discovered or a error happens. The old behaviour was
-to return as soon as the connection was made.
+  Hi,
 
-Now it is safe to call GetCharacteristics() as soon as this
-method returns sucessfully.
+On 03/11/2011 12:24 PM, Radoslaw Jablonski wrote:
+> Moved freeing data->contacts before asynchronous data sending
+> is triggered via data->cb callback.
+> This data is no longer needed anyway after vcards are generated
+> and freeing it later may cause race condition (because freeing
+> this data need to be handled also in phonebook_req_finalize to
+> avoid memory leaks when client disconnects in the middle of
+> retrieving contacts from db).
+> ---
+>   plugins/phonebook-tracker.c |    9 ++++++---
+>   1 files changed, 6 insertions(+), 3 deletions(-)
+>
+Please ignore this patch - these changes are not needed in
+current architecture (based on offline discussion with Johan).
 
-After this method returns it will try to read all the characteristics
-values.
----
- attrib/client.c |   17 +++++++++++++----
- 1 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/attrib/client.c b/attrib/client.c
-index 17157cd..47c5d4d 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -96,6 +96,7 @@ struct characteristic {
- struct query_data {
- 	struct primary *prim;
- 	struct characteristic *chr;
-+	DBusMessage *msg;
- 	uint16_t handle;
- };
- 
-@@ -863,6 +864,7 @@ static void update_all_chars(gpointer data, gpointer user_data)
- static void char_discovered_cb(GSList *characteristics, guint8 status,
- 							gpointer user_data)
- {
-+	DBusMessage *reply;
- 	struct query_data *current = user_data;
- 	struct primary *prim = current->prim;
- 	struct att_primary *att = prim->att;
-@@ -871,8 +873,10 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
- 	GSList *l;
- 
- 	if (status != 0) {
--		DBG("Discover all characteristics failed: %s",
--						att_ecode2str(status));
-+		const char *str = att_ecode2str(status);
-+
-+		DBG("Discover all characteristics failed: %s", str);
-+		reply = btd_error_failed(current->msg, str);
- 		goto fail;
- 	}
- 
-@@ -909,9 +913,12 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
- 	store_characteristics(gatt, prim);
- 	register_characteristics(prim);
- 
-+	reply = dbus_message_new_method_return(current->msg);
-+
- 	g_slist_foreach(prim->chars, update_all_chars, prim);
- 
- fail:
-+	g_dbus_send_message(connection, reply);
- 	g_attrib_unref(gatt->attrib);
- 	g_free(current);
- }
-@@ -933,11 +940,12 @@ static DBusMessage *discover_char(DBusConnection *conn, DBusMessage *msg,
- 
- 	qchr = g_new0(struct query_data, 1);
- 	qchr->prim = prim;
-+	qchr->msg = dbus_message_ref(msg);
- 
- 	gatt_discover_char(gatt->attrib, att->start, att->end,
- 						char_discovered_cb, qchr);
- 
--	return dbus_message_new_method_return(msg);
-+	return NULL;
- }
- 
- static DBusMessage *prim_get_properties(DBusConnection *conn, DBusMessage *msg,
-@@ -983,7 +991,8 @@ static DBusMessage *prim_get_properties(DBusConnection *conn, DBusMessage *msg,
- }
- 
- static GDBusMethodTable prim_methods[] = {
--	{ "Discover",		"",	"",		discover_char	},
-+	{ "Discover",		"",	"",		discover_char,
-+						G_DBUS_METHOD_FLAG_ASYNC},
- 	{ "RegisterCharacteristicsWatcher",	"o", "",
- 						register_watcher	},
- 	{ "UnregisterCharacteristicsWatcher",	"o", "",
--- 
-1.7.4.1
-
+BR,
+Radek
