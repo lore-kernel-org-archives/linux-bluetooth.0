@@ -1,129 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D7E211F.1030000@interlinx.bc.ca>
+Date: Mon, 14 Mar 2011 10:07:27 -0400
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 MIME-Version: 1.0
-In-Reply-To: <20110311212758.GA8147@jh-x301>
-References: <1299829612-3704-1-git-send-email-lkslawek@gmail.com>
-	<1299829612-3704-4-git-send-email-lkslawek@gmail.com>
-	<20110311111313.GA20128@jh-x301>
-	<AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
-	<20110311144855.GA23826@jh-x301>
-	<20110311212758.GA8147@jh-x301>
-Date: Mon, 14 Mar 2011 15:27:21 +0100
-Message-ID: <AANLkTikTfnHGqmbG1_8kfsbzpBOHuYB51TghF-5QoEe0@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] Add detection of MAP function in OBEX requests
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+CC: Brad Midgley
+	<public-bmidgley-Re5JQEeQqe8AvxtiuMwx3w-1dZseelyfdZg9hUCZPvPmw@public.gmane.org>
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com> <AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com> <4D7DF55D.2010402@interlinx.bc.ca> <4D7E0A15.5000708@interlinx.bc.ca>
+In-Reply-To: <4D7E0A15.5000708@interlinx.bc.ca>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigC495D6885ACF0D1C36741714"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I will start with some introduction.
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigC495D6885ACF0D1C36741714
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-*** How MAP obexd plugin works? ***
+On 11-03-14 08:29 AM, Brian J. Murrell wrote:
+>=20
+> Having been playing an audio stream to the headset for nearly an hour,
+> it seems to be co-existing with the mouse today.  Currently HCI
+> connections are:
+>=20
+> $ hcitool con
+> Connections:
+> 	< SCO 00:1A:45:1B:19:89 handle 1 state 1 lm SLAVE
+> 	> ACL 00:1A:45:1B:19:89 handle 11 state 1 lm MASTER AUTH ENCRYPT
+> 	> ACL 00:1F:20:0F:30:6A handle 12 state 1 lm MASTER
+>=20
+> Which I find interesting.
+>=20
+> I'm going to try the other headset now and see if it's just as stable
+> this morning.
 
-Service driver and MIME driver are split between mas.c and messages-*.c.
-mas.c makes the actual obexd plugin, i.e. there are OBEX_PLUGIN_DEFINE,
-obex_service_driver and obex_mime_type_driver there.
+So, I tried the other headset, which was reported as:
 
-In order to support different message storages the actual data accessing
-is done in messages-*.c files (a symbolic link messages.c to one of them
-is made during ./configure phase, as it is also done in PBAP plugin). I
-will refer to this one as "backend".
+$ hcitool con
+Connections:
+	< eSCO 00:18:6B:E5:4F:7E handle 6 state 1 lm SLAVE
+	> ACL 00:18:6B:E5:4F:7E handle 12 state 1 lm MASTER AUTH ENCRYPT
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
 
-There is only one mime driver here, as OBEX request type and OBEX type
-header is used in MAP merely to select operation to perform. This
-operation in MAP specification is called function. Processing of the
-incoming headers and response is done in the same fashion for each one of
-them, thus one driver handling all requests to MAP target is enough.
+and it was not as stable.  I had periodic disconnect/reconnects of all
+B/T devices.
 
-Backend in many ways resembles service plugin/mime type driver pair.
+I've disconnected the (unstable) LG headset and connected the Jabra
+headset again and it seems stable again.
 
-So there are messages_init() and messages_exit() to give backend the
-chance to do its own initialization during MAP startup. Converting it to
-plugin on its own wouldn't make much sense, as it is fully functional
-only in context of MAP plugin (i.e. mas.c). Calling messages_init()
-manually from MAP plugin init() function also allows MAP plugin to stop
-from loading if the messages backend is non-functional.
+It's just too bad I dislike the ergonomics of the Jabra headset.  It's
+nowhere near as comfortable as the LG headset.  The LG headset "seals"
+into the ear where Jabra basically just "hangs" there using gravity to
+hold itself to the ear and does not create anywhere near as good a
+fit/seal to the ear.  :-(
 
-There is also messages_connect() and messages_disconnect() which are
-called from service driver ->connect() and ->disconnect() respectively.
-Session awareness is needed for doing connection-specific processing, for
-example storing (un)read status per client (which is required by MAP
-specification). The message_connect() call returns pointer which is in
-turn passed to all other in-session functions of backend.
+I'd entertain going and buying yet another headset, hoping to get the
+stability of this Jabra with the fit of the LG, but given my 50/50
+success rate here, it seems like it will be a real crapshoot getting a
+headset that works stably.  :-(
 
-The low-level processing which would be the same regardless of storage in
-use are done in mas.c. When receiving get/put request, mas.c determines
-operation to perform (MAP function) and parses application parameters
-headers. Then as in case of other obexd services
-obex_(get|put)_stream_start gets called which in turn triggers MIME
-driver's ->open().
-
-As I mentioned, the MIME driver functionality is split between mas.c and
-backend. So actual MIME driver open() elects appropriate callback for MAP
-function in question and calls messages_open() which does the rest of the
-job of preparing I/O for the request. It however does not pass the same
-data it gets, as some preliminary processing has been already done - so
-message_open() gets requested opcode (MAP function), input parameters,
-storage for output parameters, OBEX name header value and callback
-address. This callback is used to return data asynchronously.
-
-The data in callback is returned in a structure specific to selected MAP
-function and optionally wakes the I/O. Callback code takes the structure,
-formats it into a stream for sending and appends this to output buffer.
-So for example, in GetMessagesListing case, callback gets struct with
-metadata of messages in folder and makes an XML from it.
-
-Simultaneously MIME driver read()-s are called (as driven by OpenOBEX
-streaming mode) and they pass to the caller what's in the buffer, or
-return -EAGAIN if buffer is empty and callback did not set the flag
-informing that the operation is already finished.
-
-At the end of the request or at any time if the request is aborted MIME
-driver close() is called which in turn calls messages_close() to free
-it's data or stop any pending actions (for example D-Bus calls if backend
-uses D-Bus).
+b.
 
 
-==========================================
 
-So to answer Johan's doubts.
 
-Current design makes some things easier. For instance request abortion,
-as there is messages_open() and messages_close() and close already knows
-what to close because of fid (function id) presence. In case of what
-Johan wants either I would have to make 14 functions in global name space
-(7 MAP functions, equivalent of close and open for any single one of
-them) or use 7
-identical "open" functions and one single close, which will rely on
-hidden function id stored internally in backend. Latter would make ugly
-asymmetry in plugin code, as in MIME driver open() there would be called
-one of those 7 functions and in close() only messages_close() (or
-cancel?) for which relation to one of previous functions would not be
-clear from mas.c perspective.
+--------------enigC495D6885ACF0D1C36741714
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-And of course each of these "open" functions and also each of
-these "close" functions would have the same prototype and would do the
-same thing from the caller view.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
 
-What I'm trying to say is that the abstraction is rewarding also from the
-service plugin point, and putting backend logic behind something almost
-like mime driver is well...  logical, as it almost follows mime driver
-work flow, it is just a little bit too crippled to be real mime driver on
-its own so mime->open() does what it can (it does the low level OBEX
-things) and then calls for assistance from messages_open(). And
-messages_open does the rest of opening but not using low level mime-like
-open() semantics, but MAP semantics.
+iEYEARECAAYFAk1+IR8ACgkQl3EQlGLyuXDVSQCg8HGamXpFmng5tEJH8T9WpRkI
+e9AAoOBcgfX7DRS/WvJLTmPz6X7jDwUo
+=CtpH
+-----END PGP SIGNATURE-----
 
-Err... I said "also" because implementing backend is easier too. It can
-simply return error for any MAP function it does not want to support
-right away from messages_open and it also makes it immune to further
-addition of new MAP functions.
-
-And even though MAP calls its functions, well, functions, they are not
-exactly the same as C functions they are more like an opcodes selecting
-what to do with data presented. And this data is always of the same
-structure.
-
-The way it is now, MIME driver and thus plugin code is kept short and sweet.
+--------------enigC495D6885ACF0D1C36741714--
