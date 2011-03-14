@@ -1,162 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>,
-	"xiaosuo@gmail.com" <xiaosuo@gmail.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Date: Mon, 14 Mar 2011 14:56:20 +0000
-Subject: [PATCH] Fix "possible circular locking dependency" in rfcomm
-Message-ID: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8C9F8C1539@irsmsx501.ger.corp.intel.com>
-References: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8C9F86D162@irsmsx501.ger.corp.intel.com>
-In-Reply-To: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8C9F86D162@irsmsx501.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <20110311212758.GA8147@jh-x301>
+References: <1299829612-3704-1-git-send-email-lkslawek@gmail.com>
+	<1299829612-3704-4-git-send-email-lkslawek@gmail.com>
+	<20110311111313.GA20128@jh-x301>
+	<AANLkTikJaxmK3pjyptv0xSfb10ivFSu49GdGRTJrXdhP@mail.gmail.com>
+	<20110311144855.GA23826@jh-x301>
+	<20110311212758.GA8147@jh-x301>
+Date: Mon, 14 Mar 2011 15:27:21 +0100
+Message-ID: <AANLkTikTfnHGqmbG1_8kfsbzpBOHuYB51TghF-5QoEe0@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] Add detection of MAP function in OBEX requests
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No response from original post, submit again, more details below:
+I will start with some introduction.
 
-Changes in sock.c in function __rfcomm_sock_close, to release sock before c=
-alling rfcomm_dlc_close to avoid possible deadlock when calling rfcomm_lock=
- (in rfcomm_dlc_close).
+*** How MAP obexd plugin works? ***
 
-Signed-off-by: Jean Regis Ferraton <jrferraton@gmail.com>
+Service driver and MIME driver are split between mas.c and messages-*.c.
+mas.c makes the actual obexd plugin, i.e. there are OBEX_PLUGIN_DEFINE,
+obex_service_driver and obex_mime_type_driver there.
 
----
- net/bluetooth/rfcomm/sock.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+In order to support different message storages the actual data accessing
+is done in messages-*.c files (a symbolic link messages.c to one of them
+is made during ./configure phase, as it is also done in PBAP plugin). I
+will refer to this one as "backend".
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c inde=
-x 66cc1f0..3b5ec09 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -234,7 +234,10 @@ static void __rfcomm_sock_close(struct sock *sk)
- 	case BT_CONNECT2:
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
-+		/* release_sock to avoid deadlock when calling rfcomm_lock() */
-+		release_sock(sk);
- 		rfcomm_dlc_close(d, 0);
-+		lock_sock(sk);
-=20
- 	default:
- 		sock_set_flag(sk, SOCK_ZAPPED);
---
-1.6.2.5
+There is only one mime driver here, as OBEX request type and OBEX type
+header is used in MAP merely to select operation to perform. This
+operation in MAP specification is called function. Processing of the
+incoming headers and response is done in the same fashion for each one of
+them, thus one driver handling all requests to MAP target is enough.
+
+Backend in many ways resembles service plugin/mime type driver pair.
+
+So there are messages_init() and messages_exit() to give backend the
+chance to do its own initialization during MAP startup. Converting it to
+plugin on its own wouldn't make much sense, as it is fully functional
+only in context of MAP plugin (i.e. mas.c). Calling messages_init()
+manually from MAP plugin init() function also allows MAP plugin to stop
+from loading if the messages backend is non-functional.
+
+There is also messages_connect() and messages_disconnect() which are
+called from service driver ->connect() and ->disconnect() respectively.
+Session awareness is needed for doing connection-specific processing, for
+example storing (un)read status per client (which is required by MAP
+specification). The message_connect() call returns pointer which is in
+turn passed to all other in-session functions of backend.
+
+The low-level processing which would be the same regardless of storage in
+use are done in mas.c. When receiving get/put request, mas.c determines
+operation to perform (MAP function) and parses application parameters
+headers. Then as in case of other obexd services
+obex_(get|put)_stream_start gets called which in turn triggers MIME
+driver's ->open().
+
+As I mentioned, the MIME driver functionality is split between mas.c and
+backend. So actual MIME driver open() elects appropriate callback for MAP
+function in question and calls messages_open() which does the rest of the
+job of preparing I/O for the request. It however does not pass the same
+data it gets, as some preliminary processing has been already done - so
+message_open() gets requested opcode (MAP function), input parameters,
+storage for output parameters, OBEX name header value and callback
+address. This callback is used to return data asynchronously.
+
+The data in callback is returned in a structure specific to selected MAP
+function and optionally wakes the I/O. Callback code takes the structure,
+formats it into a stream for sending and appends this to output buffer.
+So for example, in GetMessagesListing case, callback gets struct with
+metadata of messages in folder and makes an XML from it.
+
+Simultaneously MIME driver read()-s are called (as driven by OpenOBEX
+streaming mode) and they pass to the caller what's in the buffer, or
+return -EAGAIN if buffer is empty and callback did not set the flag
+informing that the operation is already finished.
+
+At the end of the request or at any time if the request is aborted MIME
+driver close() is called which in turn calls messages_close() to free
+it's data or stop any pending actions (for example D-Bus calls if backend
+uses D-Bus).
 
 
+==========================================
 
-This patch solves a problem of "possible circular locking dependency" relat=
-ed to rfcomm. Problem seen on kernel 2.6.37. Maybe it's not a bug, just a w=
-arning, see the trace below.
+So to answer Johan's doubts.
 
-This problem occurs in 2 cases:
-1- When initiating a connection from the remote device
-2- When browsing my BT device from my PC
+Current design makes some things easier. For instance request abortion,
+as there is messages_open() and messages_close() and close already knows
+what to close because of fid (function id) presence. In case of what
+Johan wants either I would have to make 14 functions in global name space
+(7 MAP functions, equivalent of close and open for any single one of
+them) or use 7
+identical "open" functions and one single close, which will rely on
+hidden function id stored internally in backend. Latter would make ugly
+asymmetry in plugin code, as in MIME driver open() there would be called
+one of those 7 functions and in close() only messages_close() (or
+cancel?) for which relation to one of previous functions would not be
+clear from mas.c perspective.
 
-My analysis is the following:
-1- We call the function rfcomm_sock_shutdown() which locks a socket, an aft=
-er calls __rfcomm_sock_close()
-     	lock_sock(sk);
-    	if (!sk->sk_shutdown) {
-    		sk->sk_shutdown =3D SHUTDOWN_MASK;
-    		__rfcomm_sock_close(sk);
-2- In the function __rfcomm_sock_close(), we call rfcomm_dlc_close()
-	case BT_CONNECTED:
-    		rfcomm_dlc_close(d, 0);
-3- In the function rfcomm_dlc_close(), we call rfcomm_lock() which locks a =
-mutex on rfcomm, and this second lock causes the problem.
-	rfcomm_lock();
-	r =3D __rfcomm_dlc_close(d, err);
+And of course each of these "open" functions and also each of
+these "close" functions would have the same prototype and would do the
+same thing from the caller view.
 
-My message trace is the following (for remote connect):
-[  113.995511] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[  114.001897] [ INFO: possible circular locking dependency detected ]=20
-[  114.008157] 2.6.37.3jrf_fix #1=20
-[  114.011196] -------------------------------------------------------
-[  114.017457] bluetoothd/511 is trying to acquire lock:
-[  114.022499]  (rfcomm_mutex){+.+.+.}, at: [<c14f281a>] rfcomm_dlc_close+0=
-x15/0x30=20
-[  114.029887]=20
-[  114.029892] but task is already holding lock:
-[  114.035713]  (sk_lock-AF_BLUETOOTH){+.+.+.}, at: [<c14f4cfe>] rfcomm_soc=
-k_shutdown+0x17/0x5d=20
-[  114.044147]=20
-[  114.044152] which lock already depends on the new lock.
-[  114.044158]
-[  114.052319]
-[  114.052324] the existing dependency chain (in reverse order) is:
-[  114.059796]
-[  114.059801] -> #1 (sk_lock-AF_BLUETOOTH){+.+.+.}:
-[  114.065967]        [<c105d660>] lock_acquire+0xf9/0x135
-[  114.071184]        [<c1445cf3>] lock_sock_nested+0x55/0x65
-[  114.076662]        [<c14ed17d>] l2cap_sock_sendmsg+0x3f/0x606
-[  114.082400]        [<c1443775>] sock_sendmsg+0xc9/0xe0
-[  114.087530]        [<c14437b4>] kernel_sendmsg+0x28/0x37
-[  114.092833]        [<c14f2278>] rfcomm_send_frame+0x2f/0x37
-[  114.098398]        [<c14f232c>] rfcomm_send_ua+0x57/0x59
-[  114.103701]        [<c14f3884>] rfcomm_run+0x431/0xb06
-[  114.108830]        [<c104bc8f>] kthread+0x5f/0x64
-[  114.113525]        [<c1002b7a>] kernel_thread_helper+0x6/0x1a
-[  114.119265]
-[  114.119270] -> #0 (rfcomm_mutex){+.+.+.}:
-[  114.124739]        [<c105cff1>] __lock_acquire+0xe03/0x1379
-[  114.130304]        [<c105d660>] lock_acquire+0xf9/0x135
-[  114.135522]        [<c1522bf3>] mutex_lock_nested+0x45/0x286
-[  114.141171]        [<c14f281a>] rfcomm_dlc_close+0x15/0x30
-[  114.146650]        [<c14f4cdb>] __rfcomm_sock_close+0x5e/0x6a
-[  114.152388]        [<c14f4d12>] rfcomm_sock_shutdown+0x2b/0x5d
-[  114.158212]        [<c14f4d5d>] rfcomm_sock_release+0x19/0x60
-[  114.163951]        [<c14445da>] sock_release+0x14/0x5b
-[  114.169080]        [<c144463d>] sock_close+0x1c/0x20
-[  114.174037]        [<c10bdd19>] fput+0xfa/0x19e
-[  114.178557]        [<c10bb3c5>] filp_close+0x51/0x5b
-[  114.183512]        [<c10bb488>] sys_close+0xb9/0xee
-[  114.188381]        [<c1002650>] sysenter_do_call+0x12/0x36
-[  114.193858]
-[  114.193863] other info that might help us debug this:
-[  114.193870]
-[  114.201860] 1 lock held by bluetoothd/511:
-[  114.205945]  #0:  (sk_lock-AF_BLUETOOTH){+.+.+.}, at: [<c14f4cfe>] rfcom=
-m_sock_shutdown+0x17/0x5d
-[  114.214811]
-[  114.214816] stack backtrace:
-[  114.219167] Pid: 511, comm: bluetoothd Tainted: G        WC  2.6.37.3jrf=
-_fix #1
-[  114.226463] Call Trace:
-[  114.228913]  [<c152108a>] ? printk+0xf/0x11=20
-[  114.233086]  [<c105bc3b>] print_circular_bug+0x90/0x9c=20
-[  114.238211]  [<c105cff1>] __lock_acquire+0xe03/0x1379=20
-[  114.243260]  [<c14f281a>] ? rfcomm_dlc_close+0x15/0x30=20
-[  114.248382]  [<c105d660>] lock_acquire+0xf9/0x135=20
-[  114.253079]  [<c14f281a>] ? rfcomm_dlc_close+0x15/0x30=20
-[  114.258208]  [<c1522bf3>] mutex_lock_nested+0x45/0x286=20
-[  114.263338]  [<c14f281a>] ? rfcomm_dlc_close+0x15/0x30=20
-[  114.268469]  [<c105b68d>] ? trace_hardirqs_on_caller+0x100/0x121
-[  114.274467]  [<c1445cf8>] ? lock_sock_nested+0x5a/0x65=20
-[  114.279597]  [<c105b6b9>] ? trace_hardirqs_on+0xb/0xd=20
-[  114.284639]  [<c14f281a>] rfcomm_dlc_close+0x15/0x30=20
-[  114.289594]  [<c14f4cdb>] __rfcomm_sock_close+0x5e/0x6a=20
-[  114.294811]  [<c14f4d12>] rfcomm_sock_shutdown+0x2b/0x5d=20
-[  114.300115]  [<c14f4d5d>] rfcomm_sock_release+0x19/0x60=20
-[  114.305331]  [<c14445da>] sock_release+0x14/0x5b=20
-[  114.309937]  [<c144463d>] sock_close+0x1c/0x20=20
-[  114.314373]  [<c10bdd19>] fput+0xfa/0x19e=20
-[  114.318371]  [<c10bb3c5>] filp_close+0x51/0x5b=20
-[  114.322804]  [<c10bb488>] sys_close+0xb9/0xee=20
-[  114.327151]  [<c1002650>] sysenter_do_call+0x12/0x36
----------------------------------------------------------------------
-Intel Corporation SAS (French simplified joint stock company)
-Registered headquarters: "Les Montalets"- 2, rue de Paris,=20
-92196 Meudon Cedex, France
-Registration Number:  302 456 199 R.C.S. NANTERRE
-Capital: 4,572,000 Euros
+What I'm trying to say is that the abstraction is rewarding also from the
+service plugin point, and putting backend logic behind something almost
+like mime driver is well...  logical, as it almost follows mime driver
+work flow, it is just a little bit too crippled to be real mime driver on
+its own so mime->open() does what it can (it does the low level OBEX
+things) and then calls for assistance from messages_open(). And
+messages_open does the rest of opening but not using low level mime-like
+open() semantics, but MAP semantics.
 
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
+Err... I said "also" because implementing backend is easier too. It can
+simply return error for any MAP function it does not want to support
+right away from messages_open and it also makes it immune to further
+addition of new MAP functions.
+
+And even though MAP calls its functions, well, functions, they are not
+exactly the same as C functions they are more like an opcodes selecting
+what to do with data presented. And this data is always of the same
+structure.
+
+The way it is now, MIME driver and thus plugin code is kept short and sweet.
