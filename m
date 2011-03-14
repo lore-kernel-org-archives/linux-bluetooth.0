@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>
-CC: <padovan@profusion.mobi>, Marcel Holtmann <marcel@holtmann.org>, Waldemar
- Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v3 0/5] SIM Access Profile v3
-Date: Mon, 14 Mar 2011 12:16:15 +0100
-Message-ID: <1300101380-10358-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>
+References: <4D6EF7ED.2090905@interlinx.bc.ca>
+	<4D740AA7.5080209@interlinx.bc.ca>
+	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>
+	<4D754A84.1020609@interlinx.bc.ca>
+	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>
+Date: Sun, 13 Mar 2011 21:46:36 -0600
+Message-ID: <AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>
+Subject: Re: how to set adapter to master with bluez 4.69?
+From: Brad Midgley <bmidgley@gmail.com>
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Cc: public-linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-Thanks for your last comments. I've fixed them and as you suggested I split the SAP server patch into 3 smaller patches.
-I hope this will help with a review.
-
-Thanks,
-/Waldek
 
 
-Waldemar Rymarkiewicz (5):
-  Sim Access Profile Server
-  Sim Access Profile connect/disconnect procedures
-  Add support for SAP protocol
-  Sim Access Profile dummy driver
-  Sim Access Profile test scripts
+Brian,
 
- .gitignore       |    1 +
- Makefile.am      |   14 +-
- acinclude.m4     |    6 +
- sap/sap-dummy.c  |  328 +++++++++++++
- sap/sap.h        |  187 ++++++++
- sap/server.c     | 1395 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- test/sap.py      |  945 ++++++++++++++++++++++++++++++++++++
- test/test-sap.py |  140 ++++++
- 8 files changed, 3006 insertions(+), 10 deletions(-)
- create mode 100644 sap/sap-dummy.c
- create mode 100644 sap/sap.h
- create mode 100644 test/sap.py
- create mode 100755 test/test-sap.py
+>> $ sudo hcitool sr 00:1F:20:0F:30:6A slave
+>> Switch role request failed: Input/output error
+
+Sorry I didn't look at the gui again.
+
+Were you able to use hcitool to switch the role to master manually?
+
+-- 
+Brad Midgley
+
