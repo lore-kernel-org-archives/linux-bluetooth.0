@@ -1,42 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4D7F5EF2.2000709@interlinx.bc.ca>
-References: <4D6EF7ED.2090905@interlinx.bc.ca>
-	<4D740AA7.5080209@interlinx.bc.ca>
-	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>
-	<4D754A84.1020609@interlinx.bc.ca>
-	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>
-	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>
-	<4D7DF55D.2010402@interlinx.bc.ca>
-	<4D7E0A15.5000708@interlinx.bc.ca>
-	<4D7E211F.1030000@interlinx.bc.ca>
-	<AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
-	<4D7F5AE3.20909@interlinx.bc.ca>
-	<4D7F5EF2.2000709@interlinx.bc.ca>
-Date: Tue, 15 Mar 2011 09:25:35 -0600
-Message-ID: <AANLkTim2oLMjE-9C0G7VCjXafg03xnb7a0Q04zwKh2ns@mail.gmail.com>
-Subject: Re: how to set adapter to master with bluez 4.69?
-From: Brad Midgley <bmidgley@gmail.com>
-To: "Brian J. Murrell" <brian@interlinx.bc.ca>
-Cc: linux-bluetooth@vger.kernel.org,
-	Brad Midgley
-	<public-bmidgley-Re5JQEeQqe8AvxtiuMwx3w-1dZseelyfdZg9hUCZPvPmw@public.gmane.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20110315075742.GD4369@null>
+References: <1299850377-3734-1-git-send-email-andre.guedes@openbossa.org>
+	<20110315075742.GD4369@null>
+Date: Tue, 15 Mar 2011 10:41:55 -0400
+Message-ID: <AANLkTikK4vjMgpuBHMLP4-6J2JMMnWqbaDo1-rwFsjEY@mail.gmail.com>
+Subject: Re: [RFC v2 0/6] LE advertising cache
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: ext Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brian,
+Hi Ville,
 
-You can have both master and slave connections simultaneously, just
-like you can be slave to more than one master. In both cases it means
-your adapter is in different piconets.
+On Tue, Mar 15, 2011 at 3:57 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> Hi,
+>
+> On Fri, Mar 11, 2011 at 10:32:51AM -0300, ext Andre Guedes wrote:
+>> During a LE connection establishment, the host should be able to infer the
+>> bdaddr type from a given bdaddr.
+>>
+>> To achieve that, during the LE scanning, the host stores the bdaddr and the
+>> bdaddr type gathered from advertising reports. The host keeps a list of
+>> advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
+>> be called Advertising Cache.
+>>
+>> Since the penality to connect to an unreachable device is relatively high,
+>> we must keep only fresh advertising entries on the advertising cache. So,
+>> before each LE scanning the advertising cache is cleared. Also, after the LE
+>> scanning, a timer is set to clear the cache.
+>
+> I tested these pathes with a device which had random address. Connection works
+> which is good.
+>
+> How ever I'm not yet sure if mandatory scanning before every connect is
+> acceptable.
 
-There are rules about whether devices can refuse the master/slave
-switch. It's been some time since I read this so I can't remember, but
-maybe it's the initiating device that starts out as slave and the
-remote device has to agree to a role switch. So you should be able to
-force the headset to cooperate, even if it's refusing role switches,
-by changing who initiates that connection in addition to a link policy
-that keeps your adapter as master.
+IIRC the connection procedure defined on the spec requires this scan.
+See for instance the general connection establishment procedure at
+page 1715
 
-Brad
+>
+> I have been playing with idea to derive address type from msb bits of the
+> address. Any ideaѕ what would lose in that way?
+
+How can you differ public address type from a random one in this case?
+I think the MSB bit checking is only for detecting the type of random
+address (static, non-resolvable private, resolvable private)
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
