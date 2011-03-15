@@ -1,52 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D7FBA0F.7070208@codeaurora.org>
+Date: Tue, 15 Mar 2011 12:12:15 -0700
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <20110315170124.GA15712@jh-x301>
-References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>
-	<20110315170124.GA15712@jh-x301>
-Date: Tue, 15 Mar 2011 16:29:34 -0300
-Message-ID: <AANLkTimF0Ux=-uQiWaWH14r3_YAuyp2o=QrmyeLkWWeT@mail.gmail.com>
-Subject: Re: Switching between SBC and MPEG audio on headsets
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arun Raghavan <arun.raghavan@collabora.co.uk>,
+To: Anderson Briglia <anderson.briglia@openbossa.org>
+CC: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the crypto
+ subsystem
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org> <02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org> <20110227202041.GG2166@joana> <AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com> <20110228172801.GB2165@joana> <20110303174501.GA10733@piper> <20110309225246.GA3009@piper> <AANLkTinQh-oM+Dn-j8Rt8s99edozbXFjC-MUwiOLd_y1@mail.gmail.com>
+In-Reply-To: <AANLkTinQh-oM+Dn-j8Rt8s99edozbXFjC-MUwiOLd_y1@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Tue, Mar 15, 2011 at 2:01 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Arun,
+On 3/15/2011 12:03 PM, Anderson Briglia wrote:
+> Hi all,
 >
-> On Tue, Mar 15, 2011, Arun Raghavan wrote:
->> I've been trying to set up PulseAudio to be able to switch the A2DP sink
->> dynamically between SBC and MPEG modes. I've got this working now [1], but I
->> did face one problem on the bluez side. When sending a reconfigure request, the
->> request always goes to the SEID that was used previously (=> always to the SBC
->> SEID). Trying to reconfigure for MPEG therefore results the headset returning
->> an error. I'm not very familiar with how this is supposed to work, but the
->> patch following this mail seems to work (I can now switch back and forth
->> between SBC and MPEG modes). It basically forces figuring out what remote SEP
->> to talk to while reconfiguring.
+> On Wed, Mar 9, 2011 at 6:52 PM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org>  wrote:
+>> On 14:45 Thu 03 Mar, Vinicius Costa Gomes wrote:
+>>> Hi Marcel,
+>>>
+>>> On 14:28 Mon 28 Feb, Gustavo F. Padovan wrote:
+>>>> Hi Vinicius,
+>>>>
+>>>> * Vinicius Gomes<vinicius.gomes@openbossa.org>  [2011-02-27 21:49:39 -0300]:
+>>>>
+>>>>> Hi Gustavo,
+>>>>>
+>>>>> On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
+>>>>> <padovan@profusion.mobi>  wrote:
+>>>>>> Hi Vinicius,
+>>>>>>
+>>>>>> * Vinicius Costa Gomes<vinicius.gomes@openbossa.org>  [2011-02-21 14:23:51 -0300]:
+>>>>>>
+
+[...]
+
+>>>
+>>> Any ideas?
 >>
->> Is this the right approach?
+>> Still no ideas?
+>>
 >
-> I'm not sure about the places where you set the value to NULL, but the
-> place in close_cfm which you remove isn't acceptable as such. It was
-> originally created to fix the issue reported in this thread:
-> http://marc.info/?l=linux-bluetooth&m=129190286303247&w=2
->
-> Only a fix which doesn't break the use-case reported there can be
-> accepted upstream. FWIW, the commit that introduced the fix is de96fcd8.
+> We at INdT have some patches based on top of this series. What is the
+> maintainer's opinion about this series? I'm asking it because should
+> be great to know if we are doing the right stuff or we need to change
+> our approach. The number of features and patches that have this series
+> as dependency is growing.
 
-Also the solution should consider a transition and not dropping the
-stream completely before configuring the other, otherwise errors may
-cause a complete disconnect just to switch between endpoints. Actually
-I would suggest configuring both endpoint since the beginning so that
-we only need to suspend/resume to switch between them, but I don't
-think many headsets would be able to handle this situation.
+I am also developing patches off of this series and have signed off on 
+their baseline functionality.
+
+> Regards,
+>
+> Anderson Briglia
+
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
