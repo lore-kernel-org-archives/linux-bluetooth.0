@@ -1,372 +1,193 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH v4 2/2] Add "unit test" for new UUID functions
-Date: Tue, 15 Mar 2011 10:05:04 -0300
-Message-Id: <1300194304-29449-2-git-send-email-epx@signove.com>
-In-Reply-To: <1300194304-29449-1-git-send-email-epx@signove.com>
-References: <1300194304-29449-1-git-send-email-epx@signove.com>
-In-Reply-To: <20110315085205.GB16296@jh-x301>
-References: <20110315085205.GB16296@jh-x301>
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 3/3] Remove unused code due to dial and re-dial change
+Date: Tue, 15 Mar 2011 14:55:54 +0200
+Message-Id: <1300193754-5748-3-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1300193754-5748-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1300193754-5748-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+last_dialed_number and callerid are not used after changing CreateWith
+to Create and CreateFromLast csd method calls, and therefore can be
+removed.
 ---
- Makefile.tools  |    6 +-
- test/uuidtest.c |  319 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 324 insertions(+), 1 deletions(-)
- create mode 100644 test/uuidtest.c
+ audio/telephony-maemo6.c |  125 ----------------------------------------------
+ 1 files changed, 0 insertions(+), 125 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 9c43202..1a1f5a1 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -142,7 +142,8 @@ bin_PROGRAMS += test/l2test test/rctest
- noinst_PROGRAMS += test/gaptest test/sdptest test/scotest \
- 			test/attest test/hstest test/avtest test/ipctest \
- 					test/lmptest test/bdaddr test/agent \
--					test/btiotest test/test-textfile
-+					test/btiotest test/test-textfile \
-+					test/uuidtest
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 311b5ed..ff851f3 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -70,13 +70,6 @@ enum net_registration_status {
+ #define TELEPHONY_MAEMO_PATH		"/com/nokia/MaemoTelephony"
+ #define TELEPHONY_MAEMO_INTERFACE	"com.nokia.MaemoTelephony"
  
- test_hciemu_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+-#define CALLERID_BASE		"/var/lib/bluetooth/maemo-callerid-"
+-#define ALLOWED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-allowed"
+-#define RESTRICTED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-restricted"
+-#define NONE_FLAG_FILE		"/var/lib/bluetooth/maemo-callerid-none"
+-
+-static uint32_t callerid = 0;
+-
+ /* CSD CALL plugin D-Bus definitions */
+ #define CSD_CALL_BUS_NAME	"com.nokia.csd.Call"
+ #define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
+@@ -171,8 +164,6 @@ static gboolean events_enabled = FALSE;
+ /* Supported set of call hold operations */
+ static const char *chld_str = "0,1,1x,2,2x,3,4";
  
-@@ -175,6 +176,9 @@ test_agent_LDADD = @DBUS_LIBS@
- test_btiotest_SOURCES = test/btiotest.c btio/btio.h btio/btio.c
- test_btiotest_LDADD = @GLIB_LIBS@ lib/libbluetooth.la
+-static char *last_dialed_number = NULL;
+-
+ /* Timer for tracking call creation requests */
+ static guint create_request_timer = 0;
  
-+test_uuidtest_SOURCES = test/uuidtest.c
-+test_uuidtest_LDADD = lib/libbluetooth.la
-+
- test_test_textfile_SOURCES = test/test-textfile.c src/textfile.h src/textfile.c
+@@ -944,9 +935,6 @@ static void handle_outgoing_call(DBusMessage *msg)
+ 	g_free(call->number);
+ 	call->number = g_strdup(number);
  
- dist_man_MANS += test/rctest.1 test/hciemu.1
-diff --git a/test/uuidtest.c b/test/uuidtest.c
-new file mode 100644
-index 0000000..a8b46d7
---- /dev/null
-+++ b/test/uuidtest.c
-@@ -0,0 +1,319 @@
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/uuid.h>
-+
-+const char *base = "00000000-0000-1000-8000-00805F9B34FB";
-+
-+uint8_t xbase[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-+
-+uint16_t sixteen = 0x1234;
-+const char *uuidsixteen128 = "00001234-0000-1000-8000-00805F9B34FB";
-+const char *uuidsixteen16 = "0x1234";
-+const char *uuidsixteen16a = "1234";
-+
-+uint8_t xuuidsixteen[] = {0x00, 0x00, 0x12, 0x34, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-+
-+uint32_t thirtytwo = 0x12345678;
-+const char *uuidthirtytwo32 = "0x12345678";
-+const char *uuidthirtytwo32a = "12345678";
-+const char *uuidthirtytwo128 = "12345678-0000-1000-8000-00805F9B34FB";
-+
-+uint8_t xuuidthirtytwo[] = {0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb};
-+
-+const char *malformed[] = {
-+	"0",
-+	"01",
-+	"012",
-+	"xxxx",
-+	"xxxxx",
-+	"0xxxxx",
-+	"0123456",
-+	"012g4567",
-+	"012345678",
-+	"0x234567u9",
-+	"01234567890",
-+	"00001234-0000-1000-8000-00805F9B34F",
-+	"00001234-0000-1000-8000 00805F9B34FB",
-+	"00001234-0000-1000-8000-00805F9B34FBC",
-+	"00001234-0000-1000-800G-00805F9B34FB",
-+	NULL,
-+	};
-+
-+int main(int argc, char *argv[])
-+{
-+	bt_uuid_t u, u2, u3, u4, u5, ub, u128;
-+	uint128_t n, i;
-+	char buf[512];
-+	int s;
-+
-+	memcpy(&n, xbase, 16);
-+	ntoh128(&n, &i);
-+
-+	if (bt_string_to_uuid(&u, base)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&ub, base)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (ub.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&u.value.u128, &i, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&ub.value.u128, &i, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (memcmp(&ub.value.u128, &u.value.u128, 16) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	bt_uuid_to_string(&u, buf, sizeof(buf));
-+	/* printf("%s\n", buf); */
-+
-+	if (strcasecmp(buf, base) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	memcpy(&n, xuuidsixteen, 16);
-+	ntoh128(&n, &i);
-+
-+	bt_uuid16_create(&u, sixteen);
-+	bt_uuid_to_uuid128(&u, &u128);
-+
-+	if (bt_string_to_uuid(&u2, uuidsixteen16)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&u3, uuidsixteen16a)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_string_to_uuid(&u4, uuidsixteen128)) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	bt_uuid128_create(&u5, i);
-+
-+	if (u.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u128.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.value.u16 != sixteen) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u2.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u3.type != 16) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u4.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u5.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u2) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u2, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u3, &u4) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u4, &u5) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &u) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u128) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&ub, &u128) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	memcpy(&n, xuuidthirtytwo, 16);
-+	ntoh128(&n, &i);
-+
-+	bt_uuid32_create(&u, thirtytwo);
-+	bt_uuid_to_uuid128(&u, &u128);
-+	bt_string_to_uuid(&u2, uuidthirtytwo32);
-+	bt_string_to_uuid(&u3, uuidthirtytwo32a);
-+	bt_string_to_uuid(&u4, uuidthirtytwo128);
-+	bt_uuid128_create(&u5, i);
-+
-+	/*
-+	bt_uuid_to_string(&u2, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+
-+	bt_uuid_to_string(&u3, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+
-+	bt_uuid_to_string(&u4, buf, sizeof(buf));
-+	printf("%s\n", buf);
-+	*/
-+
-+	if (u.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u128.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u.value.u32 != thirtytwo) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u2.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u3.type != 32) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u4.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (u5.type != 128) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u2) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u2, &u3) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u3, &u4) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u4, &u5) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &u) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u5, &ub) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&u, &u128) != 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	if (bt_uuid_cmp(&ub, &u128) == 0) {
-+		printf("Fail %d\n", __LINE__);
-+		return 1;
-+	}
-+
-+	for (s = 0; malformed[s]; ++s) {
-+		if (bt_string_to_uuid(&u3, malformed[s]) == 0) {
-+			printf("Fail %s %d\n", malformed[s], __LINE__);
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
+-	g_free(last_dialed_number);
+-	last_dialed_number = g_strdup(number);
+-
+ 	if (create_request_timer) {
+ 		g_source_remove(create_request_timer);
+ 		create_request_timer = 0;
+@@ -1720,103 +1708,6 @@ static void csd_init(void)
+ 	}
+ }
+ 
+-static uint32_t get_callflag(const char *callerid_setting)
+-{
+-	if (callerid_setting != NULL) {
+-		if (g_str_equal(callerid_setting, "allowed"))
+-			return CALL_FLAG_PRESENTATION_ALLOWED;
+-		else if (g_str_equal(callerid_setting, "restricted"))
+-			return CALL_FLAG_PRESENTATION_RESTRICTED;
+-		else
+-			return CALL_FLAG_NONE;
+-	} else
+-		return CALL_FLAG_NONE;
+-}
+-
+-static void generate_flag_file(const char *filename)
+-{
+-	int fd;
+-
+-	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
+-			g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
+-			g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		return;
+-
+-	fd = open(filename, O_WRONLY | O_CREAT, 0);
+-	if (fd >= 0)
+-		close(fd);
+-}
+-
+-static void save_callerid_to_file(const char *callerid_setting)
+-{
+-	char callerid_file[FILENAME_MAX];
+-
+-	snprintf(callerid_file, sizeof(callerid_file), "%s%s",
+-					CALLERID_BASE, callerid_setting);
+-
+-	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		rename(ALLOWED_FLAG_FILE, callerid_file);
+-	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		rename(RESTRICTED_FLAG_FILE, callerid_file);
+-	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		rename(NONE_FLAG_FILE, callerid_file);
+-	else
+-		generate_flag_file(callerid_file);
+-}
+-
+-static uint32_t callerid_from_file(void)
+-{
+-	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		return CALL_FLAG_PRESENTATION_ALLOWED;
+-	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		return CALL_FLAG_PRESENTATION_RESTRICTED;
+-	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
+-		return CALL_FLAG_NONE;
+-	else
+-		return CALL_FLAG_NONE;
+-}
+-
+-static DBusMessage *set_callerid(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	const char *callerid_setting;
+-
+-	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING,
+-						&callerid_setting,
+-						DBUS_TYPE_INVALID) == FALSE)
+-		return btd_error_invalid_args(msg);
+-
+-	if (g_str_equal(callerid_setting, "allowed") ||
+-			g_str_equal(callerid_setting, "restricted") ||
+-			g_str_equal(callerid_setting, "none")) {
+-		save_callerid_to_file(callerid_setting);
+-		callerid = get_callflag(callerid_setting);
+-		DBG("telephony-maemo6 setting callerid flag: %s",
+-							callerid_setting);
+-		return dbus_message_new_method_return(msg);
+-	}
+-
+-	error("telephony-maemo6: invalid argument %s for method call"
+-					" SetCallerId", callerid_setting);
+-		return btd_error_invalid_args(msg);
+-}
+-
+-static DBusMessage *clear_lastnumber(DBusConnection *conn, DBusMessage *msg,
+-					void *data)
+-{
+-	g_free(last_dialed_number);
+-	last_dialed_number = NULL;
+-
+-	return dbus_message_new_method_return(msg);
+-}
+-
+-static GDBusMethodTable telephony_maemo_methods[] = {
+-	{ "SetCallerId",	"s",	"",	set_callerid,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "ClearLastNumber",	"",	"",	clear_lastnumber },
+-	{ }
+-};
+-
+ static void handle_modem_state(DBusMessage *msg)
+ {
+ 	const char *state;
+@@ -1979,19 +1870,6 @@ int telephony_init(void)
+ 					NULL, DBUS_TYPE_INVALID) < 0)
+ 		error("Unable to send " SSC_DBUS_IFACE ".get_modem_state()");
+ 
+-	generate_flag_file(NONE_FLAG_FILE);
+-	callerid = callerid_from_file();
+-
+-	if (!g_dbus_register_interface(connection, TELEPHONY_MAEMO_PATH,
+-			TELEPHONY_MAEMO_INTERFACE, telephony_maemo_methods,
+-			NULL, NULL, NULL, NULL)) {
+-		error("telephony-maemo6 interface %s init failed on path %s",
+-			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
+-	}
+-
+-	DBG("telephony-maemo6 registering %s interface on path %s",
+-			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
+-
+ 	/* Reset indicators */
+ 	for (i = 0; maemo_indicators[i].desc != NULL; i++) {
+ 		if (g_str_equal(maemo_indicators[i].desc, "battchg"))
+@@ -2029,9 +1907,6 @@ void telephony_exit(void)
+ 	net.status = NETWORK_REG_STATUS_UNKOWN;
+ 	net.signal_bars = 0;
+ 
+-	g_free(last_dialed_number);
+-	last_dialed_number = NULL;
+-
+ 	g_slist_free(active_calls);
+ 	active_calls = NULL;
+ 
 -- 
 1.7.1
 
