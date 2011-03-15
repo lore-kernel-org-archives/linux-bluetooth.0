@@ -2,192 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 3/3] Remove unused code due to dial and re-dial change
-Date: Tue, 15 Mar 2011 14:55:54 +0200
-Message-Id: <1300193754-5748-3-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/3] Change dial and re-dial in maemo6 telephony
+Date: Tue, 15 Mar 2011 14:55:53 +0200
+Message-Id: <1300193754-5748-2-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1300193754-5748-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1300193754-5748-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-last_dialed_number and callerid are not used after changing CreateWith
-to Create and CreateFromLast csd method calls, and therefore can be
-removed.
+Dial and re-dial to last number functions are changed in maemo6
+telephony driver accordingly to updated API in csd back-end. CreateWith
+method call is replaced by Create and CreateFromLast.
+
+After such modification callerid and last dialed number are not used
+and hence removed in sucessive patch.
 ---
- audio/telephony-maemo6.c |  125 ----------------------------------------------
- 1 files changed, 0 insertions(+), 125 deletions(-)
+ audio/telephony-maemo6.c |   27 ++++++++++++++-------------
+ 1 files changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 311b5ed..ff851f3 100644
+index 04c69c6..311b5ed 100644
 --- a/audio/telephony-maemo6.c
 +++ b/audio/telephony-maemo6.c
-@@ -70,13 +70,6 @@ enum net_registration_status {
- #define TELEPHONY_MAEMO_PATH		"/com/nokia/MaemoTelephony"
- #define TELEPHONY_MAEMO_INTERFACE	"com.nokia.MaemoTelephony"
+@@ -579,14 +579,19 @@ static int send_method_call(const char *dest, const char *path,
  
--#define CALLERID_BASE		"/var/lib/bluetooth/maemo-callerid-"
--#define ALLOWED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-allowed"
--#define RESTRICTED_FLAG_FILE	"/var/lib/bluetooth/maemo-callerid-restricted"
--#define NONE_FLAG_FILE		"/var/lib/bluetooth/maemo-callerid-none"
--
--static uint32_t callerid = 0;
--
- /* CSD CALL plugin D-Bus definitions */
- #define CSD_CALL_BUS_NAME	"com.nokia.csd.Call"
- #define CSD_CALL_INTERFACE	"com.nokia.csd.Call"
-@@ -171,8 +164,6 @@ static gboolean events_enabled = FALSE;
- /* Supported set of call hold operations */
- static const char *chld_str = "0,1,1x,2,2x,3,4";
+ void telephony_last_dialed_number_req(void *telephony_device)
+ {
++	int ret;
++
+ 	DBG("telephony-maemo6: last dialed number request");
  
--static char *last_dialed_number = NULL;
--
- /* Timer for tracking call creation requests */
- static guint create_request_timer = 0;
- 
-@@ -944,9 +935,6 @@ static void handle_outgoing_call(DBusMessage *msg)
- 	g_free(call->number);
- 	call->number = g_strdup(number);
- 
--	g_free(last_dialed_number);
--	last_dialed_number = g_strdup(number);
--
- 	if (create_request_timer) {
- 		g_source_remove(create_request_timer);
- 		create_request_timer = 0;
-@@ -1720,103 +1708,6 @@ static void csd_init(void)
- 	}
+-	if (last_dialed_number)
+-		telephony_dial_number_req(telephony_device,
+-						last_dialed_number);
++	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
++				CSD_CALL_INTERFACE, "CreateFromLast",
++				NULL, NULL,
++				DBUS_TYPE_INVALID);
++	if (ret < 0)
++		telephony_dial_number_rsp(telephony_device,
++						CME_ERROR_AG_FAILURE);
+ 	else
+-		telephony_last_dialed_number_rsp(telephony_device,
+-						CME_ERROR_NOT_ALLOWED);
++		telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
  }
  
--static uint32_t get_callflag(const char *callerid_setting)
--{
--	if (callerid_setting != NULL) {
--		if (g_str_equal(callerid_setting, "allowed"))
--			return CALL_FLAG_PRESENTATION_ALLOWED;
--		else if (g_str_equal(callerid_setting, "restricted"))
--			return CALL_FLAG_PRESENTATION_RESTRICTED;
--		else
--			return CALL_FLAG_NONE;
--	} else
--		return CALL_FLAG_NONE;
--}
--
--static void generate_flag_file(const char *filename)
--{
--	int fd;
--
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
--			g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS) ||
--			g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return;
--
--	fd = open(filename, O_WRONLY | O_CREAT, 0);
--	if (fd >= 0)
--		close(fd);
--}
--
--static void save_callerid_to_file(const char *callerid_setting)
--{
--	char callerid_file[FILENAME_MAX];
--
--	snprintf(callerid_file, sizeof(callerid_file), "%s%s",
--					CALLERID_BASE, callerid_setting);
--
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(ALLOWED_FLAG_FILE, callerid_file);
--	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(RESTRICTED_FLAG_FILE, callerid_file);
--	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		rename(NONE_FLAG_FILE, callerid_file);
--	else
--		generate_flag_file(callerid_file);
--}
--
--static uint32_t callerid_from_file(void)
--{
--	if (g_file_test(ALLOWED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_PRESENTATION_ALLOWED;
--	else if (g_file_test(RESTRICTED_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_PRESENTATION_RESTRICTED;
--	else if (g_file_test(NONE_FLAG_FILE, G_FILE_TEST_EXISTS))
--		return CALL_FLAG_NONE;
--	else
--		return CALL_FLAG_NONE;
--}
--
--static DBusMessage *set_callerid(DBusConnection *conn, DBusMessage *msg,
--					void *data)
--{
--	const char *callerid_setting;
--
--	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING,
--						&callerid_setting,
--						DBUS_TYPE_INVALID) == FALSE)
--		return btd_error_invalid_args(msg);
--
--	if (g_str_equal(callerid_setting, "allowed") ||
--			g_str_equal(callerid_setting, "restricted") ||
--			g_str_equal(callerid_setting, "none")) {
--		save_callerid_to_file(callerid_setting);
--		callerid = get_callflag(callerid_setting);
--		DBG("telephony-maemo6 setting callerid flag: %s",
--							callerid_setting);
--		return dbus_message_new_method_return(msg);
--	}
--
--	error("telephony-maemo6: invalid argument %s for method call"
--					" SetCallerId", callerid_setting);
--		return btd_error_invalid_args(msg);
--}
--
--static DBusMessage *clear_lastnumber(DBusConnection *conn, DBusMessage *msg,
--					void *data)
--{
--	g_free(last_dialed_number);
--	last_dialed_number = NULL;
--
--	return dbus_message_new_method_return(msg);
--}
--
--static GDBusMethodTable telephony_maemo_methods[] = {
--	{ "SetCallerId",	"s",	"",	set_callerid,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "ClearLastNumber",	"",	"",	clear_lastnumber },
--	{ }
--};
--
- static void handle_modem_state(DBusMessage *msg)
+ static const char *memory_dial_lookup(int location)
+@@ -599,18 +604,15 @@ static const char *memory_dial_lookup(int location)
+ 
+ void telephony_dial_number_req(void *telephony_device, const char *number)
  {
- 	const char *state;
-@@ -1979,19 +1870,6 @@ int telephony_init(void)
- 					NULL, DBUS_TYPE_INVALID) < 0)
- 		error("Unable to send " SSC_DBUS_IFACE ".get_modem_state()");
+-	uint32_t flags = callerid;
+ 	int ret;
  
--	generate_flag_file(NONE_FLAG_FILE);
--	callerid = callerid_from_file();
--
--	if (!g_dbus_register_interface(connection, TELEPHONY_MAEMO_PATH,
--			TELEPHONY_MAEMO_INTERFACE, telephony_maemo_methods,
--			NULL, NULL, NULL, NULL)) {
--		error("telephony-maemo6 interface %s init failed on path %s",
--			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
--	}
--
--	DBG("telephony-maemo6 registering %s interface on path %s",
--			TELEPHONY_MAEMO_INTERFACE, TELEPHONY_MAEMO_PATH);
--
- 	/* Reset indicators */
- 	for (i = 0; maemo_indicators[i].desc != NULL; i++) {
- 		if (g_str_equal(maemo_indicators[i].desc, "battchg"))
-@@ -2029,9 +1907,6 @@ void telephony_exit(void)
- 	net.status = NETWORK_REG_STATUS_UNKOWN;
- 	net.signal_bars = 0;
+ 	DBG("telephony-maemo6: dial request to %s", number);
  
--	g_free(last_dialed_number);
--	last_dialed_number = NULL;
--
- 	g_slist_free(active_calls);
- 	active_calls = NULL;
+-	if (strncmp(number, "*31#", 4) == 0) {
++	if (strncmp(number, "*31#", 4) == 0)
+ 		number += 4;
+-		flags = CALL_FLAG_PRESENTATION_ALLOWED;
+-	} else if (strncmp(number, "#31#", 4) == 0) {
++	else if (strncmp(number, "#31#", 4) == 0)
+ 		number += 4;
+-		flags = CALL_FLAG_PRESENTATION_RESTRICTED;
+-	} else if (number[0] == '>') {
++	else if (number[0] == '>') {
+ 		const char *location = &number[1];
  
+ 		number = memory_dial_lookup(strtol(&number[1], NULL, 0));
+@@ -623,10 +625,9 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+ 	}
+ 
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+-				CSD_CALL_INTERFACE, "CreateWith",
++				CSD_CALL_INTERFACE, "Create",
+ 				NULL, NULL,
+ 				DBUS_TYPE_STRING, &number,
+-				DBUS_TYPE_UINT32, &flags,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0) {
+ 		telephony_dial_number_rsp(telephony_device,
 -- 
 1.7.1
 
