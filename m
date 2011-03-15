@@ -1,42 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Mar 2011 09:57:42 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 0/6] LE advertising cache
-Message-ID: <20110315075742.GD4369@null>
-References: <1299850377-3734-1-git-send-email-andre.guedes@openbossa.org>
+Message-ID: <4D7EB16F.1050609@interlinx.bc.ca>
+Date: Mon, 14 Mar 2011 20:23:11 -0400
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1299850377-3734-1-git-send-email-andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+CC: Brad Midgley <bmidgley-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>	<4D7DF55D.2010402@interlinx.bc.ca>	<4D7E0A15.5000708@interlinx.bc.ca>	<4D7E211F.1030000@interlinx.bc.ca> <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
+In-Reply-To: <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigDDC74600150FB81F1CD55B79"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigDDC74600150FB81F1CD55B79
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 11, 2011 at 10:32:51AM -0300, ext Andre Guedes wrote:
-> During a LE connection establishment, the host should be able to infer the
-> bdaddr type from a given bdaddr.
-> 
-> To achieve that, during the LE scanning, the host stores the bdaddr and the
-> bdaddr type gathered from advertising reports. The host keeps a list of
-> advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
-> be called Advertising Cache.
-> 
-> Since the penality to connect to an unreachable device is relatively high,
-> we must keep only fresh advertising entries on the advertising cache. So,
-> before each LE scanning the advertising cache is cleared. Also, after the LE
-> scanning, a timer is set to clear the cache.
+On 11-03-14 11:29 AM, Brad Midgley wrote:
+> Brian,
 
-I tested these pathes with a device which had random address. Connection works
-which is good.
+Heya Brad,
 
-How ever I'm not yet sure if mandatory scanning before every connect is
-acceptable.
+> iirc, the hcitool output tells you the role of the local adapter in
+> the connection.
 
-I have been playing with idea to derive address type from msb bits of the
-address. Any ideaѕ what would lose in that way?
+Really?
+
+> So when you see 'master' in that list, it's what you
+> want.
+
+Really?
+
+$ hcitool con
+Connections:
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+                                                     ^^^^^^
+
+This means that in the connection to 00:1F:20:0F:30:6A which is my
+mouse, my adapter is the master?  That's a strange representation.
+
+> You should also be requesting master when you try hcitool.
+
+Do you mean like this:
+
+$ hcitool sr 00:02:72:1E:E0:12 master
+
+Cheers,
+b.
 
 
--- 
-Ville
+
+--------------enigDDC74600150FB81F1CD55B79
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk1+sW8ACgkQl3EQlGLyuXAOUwCeKfx9cCefHulSP+omAXOpyaUk
+hPcAnAu6yTybRRrWL6937ZkAjL/6bKpB
+=s1v9
+-----END PGP SIGNATURE-----
+
+--------------enigDDC74600150FB81F1CD55B79--
