@@ -1,95 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D7F5EF2.2000709@interlinx.bc.ca>
-Date: Tue, 15 Mar 2011 08:43:30 -0400
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: Brad Midgley
-	<public-bmidgley-Re5JQEeQqe8AvxtiuMwx3w-1dZseelyfdZg9hUCZPvPmw@public.gmane.org>
-Subject: Re: how to set adapter to master with bluez 4.69?
-References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>	<4D7DF55D.2010402@interlinx.bc.ca>	<4D7E0A15.5000708@interlinx.bc.ca>	<4D7E211F.1030000@interlinx.bc.ca> <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com> <4D7F5AE3.20909@interlinx.bc.ca>
-In-Reply-To: <4D7F5AE3.20909@interlinx.bc.ca>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig0003A13FC62E7BEDCCEC284D"
+Subject: Re: [PATCH v3 3/5] Use new UUID functions in GATT
+Mime-Version: 1.0 (Apple Message framework v1082)
+Content-Type: text/plain; charset=us-ascii
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <20110315085205.GB16296@jh-x301>
+Date: Tue, 15 Mar 2011 09:39:04 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <017AB6E3-8032-41FF-AABD-8E6709FA2F0E@signove.com>
+References: <1300128839-6293-1-git-send-email-epx@signove.com> <1300128839-6293-4-git-send-email-epx@signove.com> <20110315085205.GB16296@jh-x301>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig0003A13FC62E7BEDCCEC284D
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
 
-Hrm.  It seems to be a real crap shoot whether this B/T stuff is going
-to work or not under Linux...
+On 15 Mar 2011, at 05:52 , Johan Hedberg wrote:
 
-Since the mouse got disconnected (not by me, but by the B/T stack) I
-decided to try to disconnect the headset and connect it again.  Success,
-it was connected with the adapter as MASTER:
+> Hi Elvis,
+> 
+> On Mon, Mar 14, 2011, Elvis Pf??tzenreuter wrote:
+>> This patch puts the new UUID functions into use for GATT-related
+>> code, and adds some convenience functions to ATT API (att.h).
+>> ---
+>> attrib/att.c         |   47 +++++++++++--------------
+>> attrib/att.h         |   69 +++++++++++++++++++++++++++++++++----
+>> attrib/client.c      |   26 ++++++--------
+>> attrib/gatt.c        |   68 +++++++++++++++++++------------------
+>> attrib/gatt.h        |    4 +-
+>> attrib/gattrib.c     |    3 +-
+>> attrib/gatttool.c    |   18 ++++-----
+>> attrib/interactive.c |   22 +++++------
+>> attrib/utils.c       |    1 +
+>> src/adapter.c        |    1 +
+>> src/attrib-server.c  |   93 +++++++++++++++++++++++++------------------------
+>> src/attrib-server.h  |    4 +-
+>> src/device.c         |    1 +
+>> src/main.c           |    1 +
+> 
+> This one doesn't compile at all:
+> 
+> In file included from attrib/example.c:39:
+> ./src/attrib-server.h:28: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> ./src/attrib-server.h:30: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> In file included from attrib/example.c:41:
+> attrib/att.h:123: error: expected specifier-qualifier-list before 'bt_uuid_t'
+> In file included from attrib/example.c:41:
+> attrib/att.h:208: error: expected ')' before 'src'
+> attrib/att.h:213: error: expected ')' before 'src'
+> attrib/att.h:218: error: expected ')' before 'src'
+> attrib/att.h:226: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'att_get_uuid16'
+> attrib/att.h:235: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'att_get_uuid128'
+> attrib/att.h:250: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> attrib/att.h:253: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> attrib/att.h:255: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> attrib/att.h:258: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> attrib/att.h:262: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> attrib/att.h:265: error: expected declaration specifiers or '...' before 'bt_uuid_t'
+> cc1: warnings being treated as errors
+> attrib/example.c: In function 'register_attributes':
+> attrib/example.c:87: error: passing argument 2 of 'attrib_db_add' makes integer from pointer without a cast
+> ./src/attrib-server.h:28: note: expected 'int' but argument is of type 'struct uuid_t *'
+> ...
+> 
+> Please at least do a basic compilation test before submitting patches ;)
 
-$ hcitool con
-Connections:
-	< ACL 00:1A:45:1B:19:89 handle 11 state 1 lm MASTER
-
-
-Then I tried to connect the mouse again.  Doing that resulted in the
-headset getting disconnected and the mouse was connected:
-
-$ hcitool con
-Connections:
-	< ACL 00:1F:20:0F:30:6A handle 0 state 5 lm MASTER
-
-And then shortly after they were both connected and both as slaves.
-Double yay.
-
-$ hcitool con
-Connections:
-	< ACL 00:1A:45:1B:19:89 handle 12 state 1 lm MASTER
-	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
-
-I guess the connection to the headset was still being negotiated because
-the connection changed:
-
-$ hcitool con
-Connections:
-	< ACL 00:1A:45:1B:19:89 handle 12 state 1 lm MASTER AUTH ENCRYPT
-	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
-
-But then the headset reverted so that the adapter was the slave again:
-
-$ hcitool con
-Connections:
-	< SCO 00:1A:45:1B:19:89 handle 1 state 1 lm SLAVE
-	< ACL 00:1A:45:1B:19:89 handle 12 state 1 lm SLAVE AUTH ENCRYPT
-	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
-
-And the mouse got disconnected shortly after that:
-
-$ hcitool con
-Connections:
-	< SCO 00:1A:45:1B:19:89 handle 1 state 1 lm SLAVE
-	< ACL 00:1A:45:1B:19:89 handle 12 state 1 lm SLAVE AUTH ENCRYPT
-
-~sigh~
-
-Am I looking for something that B/T on Linux is just not ready to
-deliver yet?  Namely stable co-existence of multiple devices.
-
-b.
-
-
---------------enig0003A13FC62E7BEDCCEC284D
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iEYEARECAAYFAk1/XvIACgkQl3EQlGLyuXC4MwCeL57AaPsqhCDQGAYvFdcrR6t1
-sKoAn3fhRzbKyPG73PDH3icq6mPazODF
-=jJ5b
------END PGP SIGNATURE-----
-
---------------enig0003A13FC62E7BEDCCEC284D--
+That's because the example server is changed in patch 4/5 (to make smaller patches) but a couple functions
+it uses had prototypes changed by this patch. So it was expected it would not compile between 3/5 and 4/5.
+(I forgot to mention in cover letter.)
