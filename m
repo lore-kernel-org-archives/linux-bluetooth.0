@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Mar 2011 19:54:08 +0200
+Date: Tue, 15 Mar 2011 19:39:40 +0200
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: Elvis@jh-x301, Pf@jh-x301
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 2/6] Sim Access Profile Server
-Message-ID: <20110315175408.GC16335@jh-x301>
-References: <1300207401-23438-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1300207401-23438-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: Re: [PATCH v4 1/2] Use new UUID functions in GATT
+Message-ID: <20110315173940.GB16335@jh-x301>
+References: <20110315085205.GB16296@jh-x301>
+ <1300194304-29449-1-git-send-email-epx@signove.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300207401-23438-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1300194304-29449-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi Elvis,
 
-On Tue, Mar 15, 2011, Waldemar Rymarkiewicz wrote:
-> Add a Sim Access Server to the SAP plugin and a framework for the dummy
-> sap driver as well.
-> 
-> 	* add the server register and unregister rutines
-> 	* add server listening socket setup
-> 	* add SAP DBus API
-> 	* add prototypes for SAP protocol implementation
-> 	* add skeleton of dummy SIM driver
+On Tue, Mar 15, 2011, Elvis Pf??tzenreuter wrote:
+> This patch puts the new UUID functions into use for GATT-related
+> code, and adds some convenience functions to ATT API (att.h).
+> Example GATT server is also changed.
 > ---
->  Makefile.am     |    3 +-
->  sap/sap-dummy.c |   85 ++++++++
->  sap/sap.h       |  186 +++++++++++++++++
->  sap/server.c    |  612 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  4 files changed, 878 insertions(+), 8 deletions(-)
->  create mode 100644 sap/sap-dummy.c
->  create mode 100644 sap/sap.h
+>  attrib/att.c         |   47 +++++++++++--------------
+>  attrib/att.h         |   69 +++++++++++++++++++++++++++++++++----
+>  attrib/client.c      |   26 ++++++--------
+>  attrib/example.c     |   92 ++++++++++++++++++++++++++-----------------------
+>  attrib/gatt.c        |   68 +++++++++++++++++++------------------
+>  attrib/gatt.h        |    4 +-
+>  attrib/gattrib.c     |    3 +-
+>  attrib/gatttool.c    |   18 ++++-----
+>  attrib/interactive.c |   22 +++++------
+>  attrib/utils.c       |    1 +
+>  src/adapter.c        |    1 +
+>  src/attrib-server.c  |   93 +++++++++++++++++++++++++------------------------
+>  src/attrib-server.h  |    4 +-
+>  src/device.c         |    1 +
+>  src/main.c           |    1 +
+>  15 files changed, 250 insertions(+), 200 deletions(-)
 
-I've pushed the first two patches in this set, but it's gonna take quite
-a bit longer to properly review the rest (at a quick glance I noticed at
-least some coding style stuff with over 80-character lines). So the rest
-will have to wait until after the next BlueZ release (which will
-hopefully happen still today).
+Both patches have been pushed upstream. Thanks.
 
 Johan
