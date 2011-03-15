@@ -1,35 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix missing hci_dev_lock_bh in user_confirm_reply
-Date: Tue, 15 Mar 2011 20:54:51 +0200
-Message-Id: <1300215293-30294-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 15 Mar 2011 19:54:08 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] Sim Access Profile Server
+Message-ID: <20110315175408.GC16335@jh-x301>
+References: <1300207401-23438-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1300207401-23438-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1300207401-23438-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Hi Waldek,
 
-The code was correctly calling _unlock at the end of the function but
-there was no actual _lock call anywhere.
+On Tue, Mar 15, 2011, Waldemar Rymarkiewicz wrote:
+> Add a Sim Access Server to the SAP plugin and a framework for the dummy
+> sap driver as well.
+> 
+> 	* add the server register and unregister rutines
+> 	* add server listening socket setup
+> 	* add SAP DBus API
+> 	* add prototypes for SAP protocol implementation
+> 	* add skeleton of dummy SIM driver
+> ---
+>  Makefile.am     |    3 +-
+>  sap/sap-dummy.c |   85 ++++++++
+>  sap/sap.h       |  186 +++++++++++++++++
+>  sap/server.c    |  612 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 878 insertions(+), 8 deletions(-)
+>  create mode 100644 sap/sap-dummy.c
+>  create mode 100644 sap/sap.h
 
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
----
- net/bluetooth/mgmt.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+I've pushed the first two patches in this set, but it's gonna take quite
+a bit longer to properly review the rest (at a quick glance I noticed at
+least some coding style stuff with over 80-character lines). So the rest
+will have to wait until after the next BlueZ release (which will
+hopefully happen still today).
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0054c74..4476d8e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1230,6 +1230,8 @@ static int user_confirm_reply(struct sock *sk, u16 index, unsigned char *data,
- 	if (!hdev)
- 		return cmd_status(sk, index, mgmt_op, ENODEV);
- 
-+	hci_dev_lock_bh(hdev);
-+
- 	if (!test_bit(HCI_UP, &hdev->flags)) {
- 		err = cmd_status(sk, index, mgmt_op, ENETDOWN);
- 		goto failed;
--- 
-1.7.4.1
-
+Johan
