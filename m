@@ -1,38 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Mar 2011 19:01:24 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arun Raghavan <arun.raghavan@collabora.co.uk>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Switching between SBC and MPEG audio on headsets
-Message-ID: <20110315170124.GA15712@jh-x301>
-References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>
+Message-ID: <4D7F9410.5020609@codeaurora.org>
+Date: Tue, 15 Mar 2011 09:30:08 -0700
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>
+To: Arun Raghavan <arun.raghavan@collabora.co.uk>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Always reset the remote SEP when reconfiguring A2DP
+References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk> <1300199261-27481-2-git-send-email-arun.raghavan@collabora.co.uk>
+In-Reply-To: <1300199261-27481-2-git-send-email-arun.raghavan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+This patch violates the AVDTP specification, as indicated in other 
+email. SEID may not be changed by RECONFIGURE.
 
-On Tue, Mar 15, 2011, Arun Raghavan wrote:
-> I've been trying to set up PulseAudio to be able to switch the A2DP sink
-> dynamically between SBC and MPEG modes. I've got this working now [1], but I
-> did face one problem on the bluez side. When sending a reconfigure request, the
-> request always goes to the SEID that was used previously (=> always to the SBC
-> SEID). Trying to reconfigure for MPEG therefore results the headset returning
-> an error. I'm not very familiar with how this is supposed to work, but the
-> patch following this mail seems to work (I can now switch back and forth
-> between SBC and MPEG modes). It basically forces figuring out what remote SEP
-> to talk to while reconfiguring.
-> 
-> Is this the right approach?
+On 3/15/2011 7:27 AM, Arun Raghavan wrote:
+> This forces the remote SEP to be recalculated when reconfiguring an A2DP
+> stream. This is required, for example, when reconfiguring the sink to
+> accept MPEG audio instead of SBC (and thus the remote SEID changes).
+> ---
+>   audio/a2dp.c |    5 ++---
+>   1 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/audio/a2dp.c b/audio/a2dp.c
+> index 3407d6f..27759b8 100644
+> --- a/audio/a2dp.c
+> +++ b/audio/a2dp.c
+> @@ -1101,9 +1101,6 @@ static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+>   		return;
+>   	}
+>
+> -	if (!setup->rsep)
+> -		setup->rsep = avdtp_stream_get_remote_sep(stream);
+> -
+>   	if (setup->reconfigure)
+>   		g_timeout_add(RECONFIGURE_TIMEOUT, a2dp_reconfigure, setup);
+>   }
+> @@ -2048,6 +2045,7 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+>   			if (a2dp_sep_get_lock(tmp))
+>   				goto failed;
+>   			setup->reconfigure = TRUE;
+> +			setup->rsep = NULL;
+>   			if (avdtp_close(session, tmp->stream, FALSE)<  0) {
+>   				error("avdtp_close failed");
+>   				goto failed;
+> @@ -2077,6 +2075,7 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+>   			g_idle_add((GSourceFunc) finalize_config, setup);
+>   		} else if (!setup->reconfigure) {
+>   			setup->reconfigure = TRUE;
+> +			setup->rsep = NULL;
+>   			if (avdtp_close(session, sep->stream, FALSE)<  0) {
+>   				error("avdtp_close failed");
+>   				goto failed;
 
-I'm not sure about the places where you set the value to NULL, but the
-place in close_cfm which you remove isn't acceptable as such. It was
-originally created to fix the issue reported in this thread:
-http://marc.info/?l=linux-bluetooth&m=129190286303247&w=2
 
-Only a fix which doesn't break the use-case reported there can be
-accepted upstream. FWIW, the commit that introduced the fix is de96fcd8.
-
-Johan
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
