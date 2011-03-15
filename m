@@ -1,52 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Mar 2011 12:38:09 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth-next] Bluetooth: fix sending LE data over USB
-Message-ID: <20110315103809.GF4369@null>
-References: <1300137633-24495-1-git-send-email-vinicius.gomes@openbossa.org>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH] Adjust sap/server.c license text to the rest of the code
+Date: Tue, 15 Mar 2011 12:02:58 +0100
+Message-ID: <1300186978-15582-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300137633-24495-1-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+---
+ sap/server.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-On Mon, Mar 14, 2011 at 06:20:33PM -0300, ext Vinicius Costa Gomes wrote:
-> Now that we have support for LE connections, before discarding a
-> frame we must check if there's a LE connection over that transport.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+diff --git a/sap/server.c b/sap/server.c
+index 2728778..64af3f9 100644
+--- a/sap/server.c
++++ b/sap/server.c
+@@ -7,7 +7,8 @@
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; version 2 of the License.
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
+  *
+  *  This program is distributed in the hope that it will be useful,
+  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- 
+1.7.1
 
-Looks ok.
-
-Acked-by: Ville Tervo <ville.tervo@nokia.com>
-
-
-> ---
->  drivers/bluetooth/btusb.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 411ae9c..59dd4ae 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -690,7 +690,8 @@ static int btusb_send_frame(struct sk_buff *skb)
->  		break;
->  
->  	case HCI_ACLDATA_PKT:
-> -		if (!data->bulk_tx_ep || hdev->conn_hash.acl_num < 1)
-> +		if (!data->bulk_tx_ep || (hdev->conn_hash.acl_num < 1 &&
-> +						hdev->conn_hash.le_num < 1))
->  			return -ENODEV;
->  
->  		urb = usb_alloc_urb(0, GFP_ATOMIC);
-> -- 
-> 1.7.4.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
