@@ -1,98 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D7FC0D2.5080509@codeaurora.org>
+Date: Tue, 15 Mar 2011 12:41:06 -0700
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Arun Raghavan <arun.raghavan@collabora.co.uk>,
+	linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
 Subject: Re: Switching between SBC and MPEG audio on headsets
-From: Arun Raghavan <arun.raghavan@collabora.co.uk>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4D7F9237.2080206@codeaurora.org>
-References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>
-	 <4D7F9237.2080206@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Mar 2011 01:21:10 +0530
-Message-ID: <1300218670.2192.35.camel@snowflake>
-Mime-Version: 1.0
+References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>	<20110315170124.GA15712@jh-x301> <AANLkTimF0Ux=-uQiWaWH14r3_YAuyp2o=QrmyeLkWWeT@mail.gmail.com>
+In-Reply-To: <AANLkTimF0Ux=-uQiWaWH14r3_YAuyp2o=QrmyeLkWWeT@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Brian,
+On 3/15/2011 12:29 PM, Luiz Augusto von Dentz wrote:
+> Hi,
+>
+> On Tue, Mar 15, 2011 at 2:01 PM, Johan Hedberg<johan.hedberg@gmail.com>  wrote:
+>> Hi Arun,
+>>
+>> On Tue, Mar 15, 2011, Arun Raghavan wrote:
+>>> I've been trying to set up PulseAudio to be able to switch the A2DP sink
+>>> dynamically between SBC and MPEG modes. I've got this working now [1], but I
+>>> did face one problem on the bluez side. When sending a reconfigure request, the
+>>> request always goes to the SEID that was used previously (=>  always to the SBC
+>>> SEID). Trying to reconfigure for MPEG therefore results the headset returning
+>>> an error. I'm not very familiar with how this is supposed to work, but the
+>>> patch following this mail seems to work (I can now switch back and forth
+>>> between SBC and MPEG modes). It basically forces figuring out what remote SEP
+>>> to talk to while reconfiguring.
+>>>
+>>> Is this the right approach?
+>>
+>> I'm not sure about the places where you set the value to NULL, but the
+>> place in close_cfm which you remove isn't acceptable as such. It was
+>> originally created to fix the issue reported in this thread:
+>> http://marc.info/?l=linux-bluetooth&m=129190286303247&w=2
+>>
+>> Only a fix which doesn't break the use-case reported there can be
+>> accepted upstream. FWIW, the commit that introduced the fix is de96fcd8.
+>
+> Also the solution should consider a transition and not dropping the
+> stream completely before configuring the other, otherwise errors may
+> cause a complete disconnect just to switch between endpoints. Actually
+> I would suggest configuring both endpoint since the beginning so that
+> we only need to suspend/resume to switch between them, but I don't
+> think many headsets would be able to handle this situation.
+>
 
-On Tue, 2011-03-15 at 09:22 -0700, Brian Gix wrote:
-[...]
-> No this is the incorrect approach.
+I think most headsets will not support this because it would require an 
+extra L2CAP connection to be maintained.
 
-Thanks (to you and Johan) for the detailed explanation! :)
+I don't think there is much of a big deal with closing the first 
+endpoint relationship prior to configuring the next, becuase the AVDTP 
+signaling channel will keep the underlying ACL connection open. Headsets 
+I have worked on in the past would reject a SET_CONFIG if an existing 
+local/remote SEID relationship already existed, not only for the extra 
+resources required to maintain the extra L2CAP channel, but also because 
+the SET_CONFIG is when the hw resources are reserved and configured for 
+the actual PCM data stream.
 
-> Both SRC and SNK devices have a variety of endpoints that have 
-> capabilities describing what that endpoint is capable of, the most 
-> important of which is the Codec Capability.  Each endpoint is allowed a 
-> single capability of a particular type, which means that an endpoint 
-> that supports SBC should not attempt to use a different codec (for MPEG 
-> in this case). Any device that attempts to wedge both codecs into a 
-> single endpoint would most definitely be non-compliant.
-> 
-> The SUSPEND/RECONFIGURE/START procedure will not work to switch between 
-> SBC and MPEG for this reason.  The purpose for that procedure is to 
-> allow quick changes within the bounds of the current (remote and local) 
-> endpoint capabilities.  To quickly switch between a 44.1KHz and 48KHz 
-> sampling for instance.
-> 
-> The correct procedure to switch between SBC and MPEG would be to close 
-> the existing media channel (but NOT the AVDTP signaling channel) and 
-> reset up a new endpoint.  If you know you will be doing this, you can 
-> save time by caching all of the remote devices endpoints the first time 
-> you do an AVDTP_DISCOVER, so that you have all the remote endpoint info 
-> you need to make the switch (and even know if the switch will work). You 
-> also should have all supported local endpoints separated into their own 
-> endpoints of course.
-> 
-> The to switch, you will need to:
-> 
-> <halt streaming>
-> 
-> AVDTP_CLOSE (on AVDTP signaling channel)
-> 
-> L2CAP_CLOSE (close the media L2CAP channel for SBC)
-> 
-> <<<< You should Rx AVDTP_CLOSE_CFM
-> 
-> AVDTP_SET_CONFIG (on AVDTP signaling channel,
->          specify a local and remote endpoint that are compatible)
-> 
-> <<<<< You should Rx SET_CONFIG_CFM
-> 
-> AVDTP_OPEN (on AVDTP signaling channel)
-> 
-> L2CAP_OPEN (open new media L2CAP channel for MPEG)
-> 
-> <<<<< You should Rx AVDTP_OPEN_CFM
-> 
-> AVDTP_START (on AVDTP signaling channel)
-> 
-> <<<<< You should Rx AVDTP_START_CFM
-> 
-> <start streaming>
+And assuming that the ACL doesn't get dropped, the critical re-setup 
+time is probably most bounded by the underlying hw reconfiguration, and 
+not so much by the few extra small ACL pkts that need to be exchanged.
 
-I'm quite unfamiliar with how this works, so please excuse any wild
-inaccuracies in terminology. I believe that I am doing it this way
-already (mostly discovered by trial and error). When I want to
-reconfigure, I do the following:
-
-- Send a BT_STOP_STREAM request, get the expected response
-- Send a BT_CLOSE request, get the expected response
-- Send a BT_OPEN request with the new seid, get the expected response
-- Send a BT_SET_CONFIGURATION request with the new caps, get the
-expected response
-- Send a BT_START_STREAM, wait for the response
-- Start streaming
-
-This actually does work here after I apply my patch, although switching
-sample rates doesn't seem to actually happen (probably just something
-broken in my code).
-
-So if I understand this correctly, it should be sufficient to modify my
-patch so we only search for a new remote endpoint if the local endpoint
-changed (or a more specific change limited to if the codec type
-changed)?
-
-Cheers,
-Arun
-
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
