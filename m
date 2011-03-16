@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: mgmt: Add local name information to read_info reply
-Date: Wed, 16 Mar 2011 14:29:36 +0200
-Message-Id: <1300278577-23068-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/4] Bluetooth: Add define for the maximum name length on HCI level
+Date: Wed, 16 Mar 2011 14:29:35 +0200
+Message-Id: <1300278577-23068-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1300278577-23068-1-git-send-email-johan.hedberg@gmail.com>
 References: <1300278577-23068-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-This patch adds the name of the adapter to the reply of the read_info
-management command.
-
-The management messages reserve 249 bytes for the name instead of 248
-(like in the HCI spec) so that there is always a guarantee that it is
-nul-terminated. That way it can safely be passed onto string
-manipulation functions.
+This patch adds a clear define for the maximum device name length in HCI
+messages and thereby avoids magic numbers in the code.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- include/net/bluetooth/mgmt.h |    5 +++++
- net/bluetooth/mgmt.c         |    4 ++++
- 2 files changed, 9 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h      |    8 +++++---
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_event.c        |    4 ++--
+ net/bluetooth/hci_sysfs.c        |    6 +++---
+ 4 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 5fabfa8..7d0749b 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -41,6 +41,10 @@ struct mgmt_rp_read_index_list {
- 	__le16 index[0];
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ec6acf2..1cd031c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -535,15 +535,17 @@ struct hci_cp_delete_stored_link_key {
+ 	__u8     delete_all;
  } __packed;
  
-+/* Reserve one extra byte for names in management messages so that they
-+ * are always guaranteed to be nul-terminated */
-+#define MGMT_MAX_NAME_LENGTH		(HCI_MAX_NAME_LENGTH + 1)
++#define HCI_MAX_NAME_LENGTH		248
 +
- #define MGMT_OP_READ_INFO		0x0004
- struct mgmt_rp_read_info {
- 	__u8 type;
-@@ -55,6 +59,7 @@ struct mgmt_rp_read_info {
- 	__u16 manufacturer;
- 	__u8 hci_ver;
- 	__u16 hci_rev;
-+	__u8 name[MGMT_MAX_NAME_LENGTH];
+ #define HCI_OP_WRITE_LOCAL_NAME		0x0c13
+ struct hci_cp_write_local_name {
+-	__u8     name[248];
++	__u8     name[HCI_MAX_NAME_LENGTH];
  } __packed;
  
- struct mgmt_mode {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4476d8e..67529c8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -183,6 +183,8 @@ static int read_controller_info(struct sock *sk, u16 index)
+ #define HCI_OP_READ_LOCAL_NAME		0x0c14
+ struct hci_rp_read_local_name {
+ 	__u8     status;
+-	__u8     name[248];
++	__u8     name[HCI_MAX_NAME_LENGTH];
+ } __packed;
  
- 	set_bit(HCI_MGMT, &hdev->flags);
+ #define HCI_OP_WRITE_CA_TIMEOUT		0x0c16
+@@ -745,7 +747,7 @@ struct hci_ev_auth_complete {
+ struct hci_ev_remote_name {
+ 	__u8     status;
+ 	bdaddr_t bdaddr;
+-	__u8     name[248];
++	__u8     name[HCI_MAX_NAME_LENGTH];
+ } __packed;
  
-+	memset(&rp, 0, sizeof(rp));
-+
- 	rp.type = hdev->dev_type;
+ #define HCI_EV_ENCRYPT_CHANGE		0x08
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 441dadb..9aabb14 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -94,7 +94,7 @@ struct hci_dev {
+ 	__u8		bus;
+ 	__u8		dev_type;
+ 	bdaddr_t	bdaddr;
+-	__u8		dev_name[248];
++	__u8		dev_name[HCI_MAX_NAME_LENGTH];
+ 	__u8		dev_class[3];
+ 	__u8		major_class;
+ 	__u8		minor_class;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3fbfa50..91ef526 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -200,7 +200,7 @@ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
  
- 	rp.powered = test_bit(HCI_UP, &hdev->flags);
-@@ -204,6 +206,8 @@ static int read_controller_info(struct sock *sk, u16 index)
- 	rp.hci_ver = hdev->hci_ver;
- 	put_unaligned_le16(hdev->hci_rev, &rp.hci_rev);
+-	memcpy(hdev->dev_name, sent, 248);
++	memcpy(hdev->dev_name, sent, HCI_MAX_NAME_LENGTH);
+ }
  
-+	memcpy(rp.name, hdev->dev_name, sizeof(hdev->dev_name));
-+
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
+ static void hci_cc_read_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -212,7 +212,7 @@ static void hci_cc_read_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (rp->status)
+ 		return;
+ 
+-	memcpy(hdev->dev_name, rp->name, 248);
++	memcpy(hdev->dev_name, rp->name, HCI_MAX_NAME_LENGTH);
+ }
+ 
+ static void hci_cc_write_auth_enable(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 3c838a6..e544216 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -216,13 +216,13 @@ static ssize_t show_type(struct device *dev, struct device_attribute *attr, char
+ static ssize_t show_name(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+ 	struct hci_dev *hdev = dev_get_drvdata(dev);
+-	char name[249];
++	char name[HCI_MAX_NAME_LENGTH + 1];
+ 	int i;
+ 
+-	for (i = 0; i < 248; i++)
++	for (i = 0; i < HCI_MAX_NAME_LENGTH; i++)
+ 		name[i] = hdev->dev_name[i];
+ 
+-	name[248] = '\0';
++	name[HCI_MAX_NAME_LENGTH] = '\0';
+ 	return sprintf(buf, "%s\n", name);
+ }
  
 -- 
 1.7.4.1
