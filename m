@@ -3,9 +3,9 @@ From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 CC: <linux-bluetooth@vger.kernel.org>,
 	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v5 3/4] Sim Access Profile dummy driver
-Date: Wed, 16 Mar 2011 13:10:20 +0100
-Message-ID: <1300277421-8053-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v5 2/4] Add support for SAP protocol
+Date: Wed, 16 Mar 2011 13:10:19 +0100
+Message-ID: <1300277421-8053-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 In-Reply-To: <1300277421-8053-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 References: <1300277421-8053-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
@@ -13,422 +13,515 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add SAP dummy driver implementation and extend configure
-with --with-sap=<driver>.
+Add new protocol features:
+	* transfer APDu request/response
+	* get ATR request/response
+	* power sim of/on request/response
+	* card reader status
+	* set transport protocol
 ---
- .gitignore      |    1 +
- Makefile.am     |   13 +++-
- acinclude.m4    |    6 ++
- sap/sap-dummy.c |  269 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 4 files changed, 275 insertions(+), 14 deletions(-)
+ sap/server.c |  415 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 files changed, 399 insertions(+), 16 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 07e239f..3e36a59 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -35,6 +35,7 @@ lib/bluetooth
- src/builtin.h
- src/bluetoothd
- audio/telephony.c
-+sap/sap.c
- scripts/bluetooth.rules
- scripts/97-bluetooth.rules
- scripts/97-bluetooth-hid2hci.rules
-diff --git a/Makefile.am b/Makefile.am
-index 7267200..2994bf9 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -148,7 +148,13 @@ builtin_modules += sap
- builtin_sources += sap/main.c \
- 			sap/manager.h sap/manager.c \
- 			sap/server.h sap/server.c \
--			sap/sap.h sap/sap-dummy.c
-+			sap/sap.h
-+
-+builtin_nodist += sap/sap.c
-+
-+noinst_LIBRARIES = sap/libsap.a
-+
-+sap_libsap_a_SOURCES = sap/sap.h sap/sap-dummy.c
- endif
+diff --git a/sap/server.c b/sap/server.c
+index 8337fe1..35abffb 100644
+--- a/sap/server.c
++++ b/sap/server.c
+@@ -89,6 +89,44 @@ static void start_guard_timer(struct sap_connection *conn, guint interval);
+ static void stop_guard_timer(struct sap_connection *conn);
+ static gboolean guard_timeout(gpointer data);
  
- if INPUTPLUGIN
-@@ -278,7 +284,7 @@ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			input/input.conf serial/serial.conf \
- 			audio/audio.conf audio/telephony-dummy.c \
- 			audio/telephony-maemo5.c audio/telephony-ofono.c \
--			audio/telephony-maemo6.c
-+			audio/telephony-maemo6.c sap/sap-dummy.c
- 
- 
- if ALSA
-@@ -403,6 +409,9 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
- audio/telephony.c: audio/@TELEPHONY_DRIVER@
- 	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
- 
-+sap/sap.c: sap/@SAP_DRIVER@
-+	$(AM_V_GEN)$(LN_S) $(abs_top_srcdir)/$< $@
-+
- scripts/%.rules:
- 	$(AM_V_GEN)cp $(subst 97-,,$@) $@
- 
-diff --git a/acinclude.m4 b/acinclude.m4
-index d07418f..faa7f7c 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -205,6 +205,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	configfiles_enable=yes
- 	telephony_driver=dummy
- 	maemo6_enable=no
-+	sap_driver=dummy
- 
- 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
- 		optimization_enable=${enableval}
-@@ -226,6 +227,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		sap_enable=${enableval}
- 	])
- 
-+	AC_ARG_WITH(sap, AC_HELP_STRING([--with-sap=DRIVER], [select SAP driver]), [
-+		sap_driver=${withval}
-+	])
-+	AC_SUBST([SAP_DRIVER], [sap-${sap_driver}.c])
-+
- 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--disable-serial], [disable serial plugin]), [
- 		serial_enable=${enableval}
- 	])
-diff --git a/sap/sap-dummy.c b/sap/sap-dummy.c
-index b433ba3..39e1fc9 100644
---- a/sap/sap-dummy.c
-+++ b/sap/sap-dummy.c
-@@ -2,6 +2,7 @@
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-  *  Copyright (C) 2010 ST-Ericsson SA
-+ *  Copyright (C) 2011 Tieto Poland
-  *
-  *  Author: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-  *          for ST-Ericsson
-@@ -21,50 +22,185 @@
-  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <glib.h>
-+#include <gdbus.h>
-+
- #include "log.h"
- #include "sap.h"
- 
-+#define SAP_DUMMY_IFACE "org.bluez.SimAccessTest"
-+#define SAP_DUMMY_PATH "/org/bluez/test"
-+
-+enum {
-+	SIM_DISCONNECTED= 0x00,
-+	SIM_CONNECTED	= 0x01,
-+	SIM_POWERED_OFF	= 0x02,
-+	SIM_MISSING	= 0x03
-+};
-+
-+static DBusConnection *connection = NULL;
-+
-+static int sim_card_conn_status = SIM_DISCONNECTED;
-+static void *sap_data = NULL;  /* SAP server private data.*/
-+static gboolean ongoing_call_status = FALSE;
-+static int max_msg_size_supported = 512;
-+
- void sap_connect_req(void *sap_device, uint16_t maxmsgsize)
- {
--	sap_connect_rsp(sap_device, SAP_STATUS_OK, maxmsgsize);
--	sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status != SIM_DISCONNECTED) {
-+		sap_connect_rsp(sap_device, SAP_STATUS_CONNECTION_FAILED,
-+								maxmsgsize);
-+		return;
-+	} else if (max_msg_size_supported > maxmsgsize) {
-+		sap_connect_rsp(sap_device, SAP_STATUS_MAX_MSG_SIZE_TOO_SMALL,
-+						max_msg_size_supported);
-+		return;
-+	} else if (max_msg_size_supported < maxmsgsize) {
-+		sap_connect_rsp(sap_device,
-+				SAP_STATUS_MAX_MSG_SIZE_NOT_SUPPORTED,
-+				max_msg_size_supported);
-+		return;
-+	} else if (ongoing_call_status) {
-+		sap_connect_rsp(sap_device, SAP_STATUS_OK_ONGOING_CALL,
-+								maxmsgsize);
-+		return;
-+	} else {
-+		sim_card_conn_status = SIM_CONNECTED;
-+		sap_data = sap_device;
-+
-+		sap_connect_rsp(sap_device, SAP_STATUS_OK, maxmsgsize);
-+		sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
-+	}
- }
- 
- void sap_disconnect_req(void *sap_device, uint8_t linkloss)
- {
-+	sim_card_conn_status = SIM_DISCONNECTED;
-+	sap_data = NULL;
-+	ongoing_call_status = FALSE;
-+
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (linkloss)
-+		return;
-+
- 	sap_disconnect_rsp(sap_device);
- }
- 
- void sap_transfer_apdu_req(void *sap_device, struct sap_parameter *param)
- {
--	sap_transfer_apdu_rsp(sap_device, SAP_RESULT_OK, NULL, 0);
-+	char apdu[] = "APDU response!";
-+
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status == SIM_MISSING)
-+		sap_transfer_apdu_rsp(sap_device,
-+				SAP_RESULT_ERROR_CARD_REMOVED, NULL, 0);
-+	else if (sim_card_conn_status == SIM_POWERED_OFF)
-+		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
-+								NULL, 0);
-+	else if (sim_card_conn_status != SIM_CONNECTED)
-+		sap_transfer_apdu_rsp(sap_device,
-+			SAP_RESULT_ERROR_NOT_ACCESSIBLE, NULL, 0);
-+	else
-+		sap_transfer_apdu_rsp(sap_device, SAP_RESULT_OK,
-+						(uint8_t*)&apdu, sizeof(apdu));
- }
- 
- void sap_transfer_atr_req(void *sap_device)
- {
--	sap_transfer_atr_rsp(sap_device, SAP_RESULT_OK, NULL, 0);
-+	char atr[] = "ATR response!";
-+
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status == SIM_MISSING)
-+		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED,
-+								NULL, 0);
-+	else if (sim_card_conn_status == SIM_POWERED_OFF)
-+		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF,
-+								NULL, 0);
-+	else if (sim_card_conn_status != SIM_CONNECTED)
-+		sap_transfer_atr_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON,
-+								NULL, 0);
-+	else
-+		sap_transfer_atr_rsp(sap_device, SAP_RESULT_OK,
-+						(uint8_t*)&atr, sizeof(atr));
- }
- 
- void sap_power_sim_off_req(void *sap_device)
- {
--	sap_power_sim_off_rsp(sap_device, SAP_RESULT_OK);
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status == SIM_MISSING) {
-+		sap_power_sim_off_rsp(sap_device,
-+					SAP_RESULT_ERROR_CARD_REMOVED);
-+	} else if (sim_card_conn_status == SIM_POWERED_OFF) {
-+		sap_power_sim_off_rsp(sap_device,
-+					SAP_RESULT_ERROR_POWERED_OFF);
-+	} else if (sim_card_conn_status != SIM_CONNECTED) {
-+		sap_power_sim_off_rsp(sap_device,
-+					SAP_RESULT_ERROR_NO_REASON);
-+	} else {
-+		sap_power_sim_off_rsp(sap_device, SAP_RESULT_OK);
-+		sim_card_conn_status = SIM_POWERED_OFF;
-+	}
- }
- 
- void sap_power_sim_on_req(void *sap_device)
- {
--	sap_power_sim_on_rsp(sap_device, SAP_RESULT_OK);
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status == SIM_MISSING) {
-+		sap_power_sim_on_rsp(sap_device,
-+					SAP_RESULT_ERROR_CARD_REMOVED);
-+	} else if (sim_card_conn_status == SIM_POWERED_OFF) {
-+		sap_power_sim_on_rsp(sap_device, SAP_RESULT_OK);
-+		sim_card_conn_status = SIM_CONNECTED;
-+		return;
-+	} else if (sim_card_conn_status != SIM_CONNECTED) {
-+		sap_power_sim_on_rsp(sap_device,
-+					SAP_RESULT_ERROR_NOT_ACCESSIBLE);
-+	} else {
-+		sap_power_sim_on_rsp(sap_device,
-+					SAP_RESULT_ERROR_NO_REASON);
-+	}
- }
- 
- void sap_reset_sim_req(void *sap_device)
- {
--	sap_reset_sim_rsp(sap_device, SAP_RESULT_OK);
--	sap_status_ind(sap_device, SAP_STATUS_CHANGE_CARD_RESET);
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status == SIM_MISSING) {
-+		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_CARD_REMOVED);
-+	} else if (sim_card_conn_status == SIM_POWERED_OFF) {
-+		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_POWERED_OFF);
-+	} else if (sim_card_conn_status != SIM_CONNECTED) {
-+		sap_reset_sim_rsp(sap_device, SAP_RESULT_ERROR_NO_REASON);
-+	} else {
-+		sap_reset_sim_rsp(sap_device, SAP_RESULT_OK);
-+	}
- }
- 
- void sap_transfer_card_reader_status_req(void *sap_device)
- {
--	sap_transfer_card_reader_status_rsp(sap_device, SAP_RESULT_OK,
--						ICC_READER_CARD_POWERED_ON);
-+	DBG("status: %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status != SIM_CONNECTED) {
-+		sap_transfer_card_reader_status_rsp(sap_device,
-+					SAP_RESULT_ERROR_NO_REASON, 0xF1);
-+		return;
-+	}
-+
-+	sap_transfer_card_reader_status_rsp(sap_device, SAP_RESULT_OK, 0xF1);
- }
- 
- void sap_set_transport_protocol_req(void *sap_device,
-@@ -73,13 +209,122 @@ void sap_set_transport_protocol_req(void *sap_device,
- 	sap_transport_protocol_rsp(sap_device, SAP_RESULT_NOT_SUPPORTED);
- }
- 
-+static inline DBusMessage *invalid_args(DBusMessage *msg)
++static size_t add_result_parameter(uint8_t result,
++					struct sap_parameter *param)
 +{
-+	return g_dbus_create_error(msg, "org.bluez.Error.InvalidArguments",
-+					"Invalid arguments in method call");
++	param->id = SAP_PARAM_ID_RESULT_CODE;
++	param->len = htons(SAP_PARAM_ID_RESULT_CODE_LEN);
++	*param->val = result;
++
++	return PARAMETER_SIZE(SAP_PARAM_ID_RESULT_CODE_LEN);
 +}
 +
-+static DBusMessage *ongoing_call(DBusConnection *conn, DBusMessage *msg,
-+						void *data)
++static int is_power_sim_off_req_allowed(uint8_t processing_req)
 +{
-+	dbus_bool_t ongoing;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_BOOLEAN, &ongoing,
-+						DBUS_TYPE_INVALID))
-+		return invalid_args(msg);
-+
-+	if (ongoing_call_status && !ongoing) {
-+		/* An ongoing call has finished. Continue connection.*/
-+		sap_connect_rsp(sap_data, SAP_STATUS_OK,
-+						max_msg_size_supported);
-+		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_RESET);
-+		ongoing_call_status = ongoing;
-+	} else if (!ongoing_call_status && ongoing) {
-+		/* An ongoing call has started.*/
-+		ongoing_call_status = ongoing;
++	switch (processing_req) {
++	case SAP_NO_REQ:
++	case SAP_TRANSFER_APDU_REQ:
++	case SAP_TRANSFER_ATR_REQ:
++	case SAP_POWER_SIM_ON_REQ:
++	case SAP_RESET_SIM_REQ:
++	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
++		return 1;
++	default:
++		return 0;
 +	}
-+
-+	DBG("OngoingCall status set to %d", ongoing_call_status);
-+
-+	return dbus_message_new_method_return(msg);
 +}
 +
-+static DBusMessage *max_msg_size(DBusConnection *conn, DBusMessage *msg,
-+						void *data)
++static int is_reset_sim_req_allowed(uint8_t processing_req)
 +{
-+	dbus_uint32_t size;
-+
-+	if (sim_card_conn_status == SIM_CONNECTED)
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed",
-+				"Can't change msg size when connected.");
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &size,
-+							DBUS_TYPE_INVALID))
-+		return invalid_args(msg);
-+
-+	max_msg_size_supported = size;
-+
-+	DBG("MaxMessageSize set to %d", max_msg_size_supported);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
-+						void *data)
-+{
-+	sim_card_conn_status = SIM_DISCONNECTED;
-+	sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *card_status(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	dbus_uint32_t status;
-+
-+	DBG("status %d", sim_card_conn_status);
-+
-+	if (sim_card_conn_status != SIM_CONNECTED)
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed",
-+				"Can't change msg size when not connected.");
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_UINT32, &status,
-+							DBUS_TYPE_INVALID))
-+		return invalid_args(msg);
-+
-+	if (status) {
-+		if (sim_card_conn_status == SIM_MISSING) {
-+			sim_card_conn_status = SIM_CONNECTED;
-+			sap_status_ind(sap_data,
-+					SAP_STATUS_CHANGE_CARD_INSERTED);
-+		}
-+	} else {
-+		sim_card_conn_status = SIM_MISSING;
-+		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_REMOVED);
++	switch (processing_req) {
++	case SAP_NO_REQ:
++	case SAP_TRANSFER_APDU_REQ:
++	case SAP_TRANSFER_ATR_REQ:
++	case SAP_TRANSFER_CARD_READER_STATUS_REQ:
++		return 1;
++	default:
++		return 0;
 +	}
-+
-+	DBG("Card status changed to %d", status);
-+
-+	return dbus_message_new_method_return(msg);
 +}
 +
-+static GDBusMethodTable dummy_methods[] = {
-+	{ "OngoingCall", "b", "", ongoing_call},
-+	{ "MaxMessageSize", "u", "", max_msg_size},
-+	{ "Disconnect", "", "", disconnect},
-+	{ "CardStatus", "u", "", card_status},
-+	{ }
-+};
-+
- int sap_init(void)
+ static int check_msg(struct sap_message *msg)
  {
--	DBG("SAP driver init.");
-+	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+ 	if (!msg)
+@@ -375,38 +413,159 @@ error_req:
+ static void transfer_apdu_req(struct sap_connection *conn,
+ 					struct sap_parameter *param)
+ {
+-	DBG("SAP_APDU_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
 +
-+	if (g_dbus_register_interface(connection, SAP_DUMMY_PATH,
-+				SAP_DUMMY_IFACE, dummy_methods, NULL, NULL,
-+				NULL, NULL) == FALSE) {
-+		error("sap-dummy interface %s init failed on path %s",
-+					SAP_DUMMY_IFACE, SAP_DUMMY_PATH);
-+		return -1;
-+	}
++	if (!param)
++		goto error_rsp;
 +
- 	return 0;
++	param->len = ntohs(param->len);
++
++	if (conn->state != SAP_STATE_CONNECTED &&
++			conn->state != SAP_STATE_GRACEFUL_DISCONNECT)
++		goto error_rsp;
++
++	if (conn->processing_req != SAP_NO_REQ)
++		goto error_rsp;
++
++	conn->processing_req = SAP_TRANSFER_APDU_REQ;
++	sap_transfer_apdu_req(conn, param);
++
++	return;
++
++error_rsp:
++	error("Processing error (param %p state %d pr 0x%02x)", param,
++					conn->state, conn->processing_req);
++	sap_error_rsp(conn);
  }
  
- void sap_exit(void)
+ static void transfer_atr_req(struct sap_connection *conn)
  {
--	DBG("SAP driver exit.");
-+	dbus_connection_unref(connection);
-+	connection = NULL;
+-	DBG("SAP_ATR_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (conn->processing_req != SAP_NO_REQ)
++		goto error_rsp;
++
++	conn->processing_req = SAP_TRANSFER_ATR_REQ;
++	sap_transfer_atr_req(conn);
++
++	return;
++
++error_rsp:
++	error("Processing error (state %d pr 0x%02x)", conn->state,
++						conn->processing_req);
++	sap_error_rsp(conn);
  }
+ 
+ static void power_sim_off_req(struct sap_connection *conn)
+ {
+-	DBG("SAP_SIM_OFF_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (!is_power_sim_off_req_allowed(conn->processing_req))
++		goto error_rsp;
++
++	conn->processing_req = SAP_POWER_SIM_OFF_REQ;
++	sap_power_sim_off_req(conn);
++
++	return;
++
++error_rsp:
++	error("Processing error (state %d pr 0x%02x)", conn->state,
++						conn->processing_req);
++	sap_error_rsp(conn);
+ }
+ 
+ static void power_sim_on_req(struct sap_connection *conn)
+ {
+-	DBG("SAP_SIM_ON_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (conn->processing_req != SAP_NO_REQ)
++		goto error_rsp;
++
++	conn->processing_req = SAP_POWER_SIM_ON_REQ;
++	sap_power_sim_on_req(conn);
++
++	return;
++
++error_rsp:
++	error("Processing error (state %d pr 0x%02x)", conn->state,
++						conn->processing_req);
++	sap_error_rsp(conn);
+ }
+ 
+ static void reset_sim_req(struct sap_connection *conn)
+ {
+-	DBG("SAP_RESET_SIM_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (!is_reset_sim_req_allowed(conn->processing_req))
++		goto error_rsp;
++
++	conn->processing_req = SAP_RESET_SIM_REQ;
++	sap_reset_sim_req(conn);
++
++	return;
++
++error_rsp:
++	error("Processing error (state %d pr 0x%02x param)", conn->state,
++						conn->processing_req);
++	sap_error_rsp(conn);
+ }
+ 
+ static void transfer_card_reader_status_req(struct sap_connection *conn)
+ {
+-	DBG("SAP_TRANSFER_CARD_READER_STATUS_REQUEST");
++	DBG("conn %p state %d", conn, conn->state);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (conn->processing_req != SAP_NO_REQ)
++		goto error_rsp;
++
++	conn->processing_req = SAP_TRANSFER_CARD_READER_STATUS_REQ;
++	sap_transfer_card_reader_status_req(conn);
++
++	return;
++
++error_rsp:
++	error("Processing error (state %d pr 0x%02x)", conn->state,
++						conn->processing_req);
++	sap_error_rsp(conn);
+ }
+ 
+ static void set_transport_protocol_req(struct sap_connection *conn,
+ 					struct sap_parameter *param)
+ {
+-	DBG("SAP_SET_TRANSPORT_PROTOCOL_REQUEST");
++	if (!param)
++		goto error_rsp;
++
++	DBG("conn %p state %d param %p", conn, conn->state, param);
++
++	if (conn->state != SAP_STATE_CONNECTED)
++		goto error_rsp;
++
++	if (conn->processing_req != SAP_NO_REQ)
++		goto error_rsp;
++
++	conn->processing_req = SAP_SET_TRANSPORT_PROTOCOL_REQ;
++	sap_set_transport_protocol_req(conn, param);
++
++	return;
++
++error_rsp:
++	error("Processing error (param %p state %d pr 0x%02x)", param,
++					conn->state, conn->processing_req);
++	sap_error_rsp(conn);
+ }
+ 
+ static void start_guard_timer(struct sap_connection *conn, guint interval)
+@@ -572,49 +731,273 @@ int sap_disconnect_rsp(void *sap_device)
+ int sap_transfer_apdu_rsp(void *sap_device, uint8_t result, uint8_t *apdu,
+ 					uint16_t length)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	struct sap_parameter *param = (struct sap_parameter *) msg->param;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
++
++	if (conn->processing_req != SAP_TRANSFER_APDU_REQ)
++		return 0;
++
++	if (result == SAP_RESULT_OK && (!apdu || (apdu && length == 0x00)))
++		return -EINVAL;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_TRANSFER_APDU_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, param);
++
++	/* Add APDU response. */
++	if (result == SAP_RESULT_OK) {
++		msg->nparam++;
++		param = (struct sap_parameter *) &buf[size];
++		param->id = SAP_PARAM_ID_RESPONSE_APDU;
++		param->len = htons(length);
++
++		size += PARAMETER_SIZE(length);
++
++		if (size > SAP_BUF_SIZE)
++			return -EOVERFLOW;
++
++		memcpy(param->val, apdu, length);
++	}
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_transfer_atr_rsp(void *sap_device, uint8_t result, uint8_t *atr,
+ 					uint16_t length)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	struct sap_parameter *param = (struct sap_parameter *) msg->param;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("result 0x%02x state %d pr 0x%02x len %d", result, conn->state,
++			conn->processing_req, length);
++
++	if (conn->processing_req != SAP_TRANSFER_ATR_REQ)
++		return 0;
++
++	if (result == SAP_RESULT_OK && (!atr || (atr && length == 0x00)))
++		return -EINVAL;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_TRANSFER_ATR_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, param);
++
++	/* Add ATR response */
++	if (result == SAP_RESULT_OK) {
++		msg->nparam++;
++		param = (struct sap_parameter *) &buf[size];
++		param->id = SAP_PARAM_ID_ATR;
++		param->len = htons(length);
++		size += PARAMETER_SIZE(length);
++
++		if (size > SAP_BUF_SIZE)
++			return -EOVERFLOW;
++
++		memcpy(param->val, atr, length);
++	}
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_power_sim_off_rsp(void *sap_device, uint8_t result)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
++
++	if (conn->processing_req != SAP_POWER_SIM_OFF_REQ)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_POWER_SIM_OFF_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, msg->param);
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_power_sim_on_rsp(void *sap_device, uint8_t result)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x", conn->state, conn->processing_req);
++
++	if (conn->processing_req != SAP_POWER_SIM_ON_REQ)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_POWER_SIM_ON_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, msg->param);
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_reset_sim_rsp(void *sap_device, uint8_t result)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
++					conn->processing_req, result);
++
++	if (conn->processing_req != SAP_RESET_SIM_REQ)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_RESET_SIM_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, msg->param);
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_transfer_card_reader_status_rsp(void *sap_device, uint8_t result,
+ 						uint8_t status)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	struct sap_parameter *param = (struct sap_parameter *) msg->param;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
++					conn->processing_req, result);
++
++	if (conn->processing_req != SAP_TRANSFER_CARD_READER_STATUS_REQ)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_TRANSFER_CARD_READER_STATUS_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, param);
++
++	/* Add card reader status. */
++	if (result == SAP_RESULT_OK) {
++		msg->nparam++;
++		param = (struct sap_parameter *) &buf[size];
++		param->id = SAP_PARAM_ID_CARD_READER_STATUS;
++		param->len = htons(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
++		*param->val = status;
++		size += PARAMETER_SIZE(SAP_PARAM_ID_CARD_READER_STATUS_LEN);
++	}
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_transport_protocol_rsp(void *sap_device, uint8_t result)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x result 0x%02x", conn->state,
++					conn->processing_req, result);
++
++	if (conn->processing_req != SAP_SET_TRANSPORT_PROTOCOL_REQ)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_SET_TRANSPORT_PROTOCOL_RESP;
++	msg->nparam = 0x01;
++	size += add_result_parameter(result, msg->param);
++
++	conn->processing_req = SAP_NO_REQ;
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ int sap_error_rsp(void *sap_device)
+ {
+-	return 0;
++	struct sap_message msg;
++	struct sap_connection *conn = sap_device;
++
++	memset(&msg, 0, sizeof(msg));
++	msg.id = SAP_ERROR_RESP;
++
++	return send_message(conn, &msg, sizeof(msg));
+ }
+ 
+ int sap_status_ind(void *sap_device, uint8_t status_change)
+ {
+-	return 0;
++	struct sap_connection *conn = sap_device;
++	char buf[SAP_BUF_SIZE];
++	struct sap_message *msg = (struct sap_message *) buf;
++	struct sap_parameter *param = (struct sap_parameter *) msg->param;
++	size_t size = sizeof(struct sap_message);
++
++	if (!conn)
++		return -EINVAL;
++
++	DBG("state %d pr 0x%02x sc 0x%02x", conn->state, conn->processing_req,
++				status_change);
++
++	if (conn->state != SAP_STATE_CONNECTED &&
++			conn->state != SAP_STATE_GRACEFUL_DISCONNECT)
++		return 0;
++
++	memset(buf, 0, sizeof(buf));
++	msg->id = SAP_STATUS_IND;
++	msg->nparam = 0x01;
++
++	/* Add status change. */
++	param->id  = SAP_PARAM_ID_STATUS_CHANGE;
++	param->len = htons(SAP_PARAM_ID_STATUS_CHANGE_LEN);
++	*param->val = status_change;
++	size += PARAMETER_SIZE(SAP_PARAM_ID_STATUS_CHANGE_LEN);
++
++	return send_message(sap_device, buf, size);
+ }
+ 
+ static int handle_cmd(void *data, void *buf, size_t size)
 -- 
 1.7.1
 
