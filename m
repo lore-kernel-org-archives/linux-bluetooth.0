@@ -1,124 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Switching between SBC and MPEG audio on headsets
-From: Arun Raghavan <arun.raghavan@collabora.co.uk>
-To: Brian Gix <bgix@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4D7FCF71.7080702@codeaurora.org>
-References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>
-	 <4D7F9237.2080206@codeaurora.org> <1300218670.2192.35.camel@snowflake>
-	 <4D7FCF71.7080702@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 16 Mar 2011 23:49:55 +0530
-Message-ID: <1300299595.2192.92.camel@snowflake>
-Mime-Version: 1.0
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Add discover characteristics by uuid to gattool
+Date: Wed, 16 Mar 2011 14:40:46 -0300
+Message-Id: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2011-03-15 at 13:43 -0700, Brian Gix wrote:
-> Hi Arun,
-> 
-> On 3/15/2011 12:51 PM, Arun Raghavan wrote:
-> > Hey Brian,
-> >
-> 
-> [...]
-> 
-> >
-> > I'm quite unfamiliar with how this works, so please excuse any wild
-> > inaccuracies in terminology. I believe that I am doing it this way
-> > already (mostly discovered by trial and error). When I want to
-> > reconfigure, I do the following:
-> >
-> > - Send a BT_STOP_STREAM request, get the expected response
-> > - Send a BT_CLOSE request, get the expected response
-> > - Send a BT_OPEN request with the new seid, get the expected response
-> > - Send a BT_SET_CONFIGURATION request with the new caps, get the
-> > expected response
-> > - Send a BT_START_STREAM, wait for the response
-> > - Start streaming
-> 
-> Well, with full knowledge that I *haven't* examined this part of BlueZ, 
-> I can say that from a protocol perspective, the AVDTP_SET_CONFIG must go 
-> over the air/be acknowledged  before the AVDTP_OPEN can be 
-> sent/acknowledged.  I haven't checked to see if those step are 
-> obfuscated at all by the BT_OPEN/BT_SET_CONFIGURATION naming convention, 
-> or if it is a simple mapping.
-> 
-> On a compliant device, an Open directly following a Close should return 
-> a NOT_CONFIGURED error. But it may be that a less strict SNK device 
-> might assume the last configuration and overlook the protocol error.
+---
+ attrib/client.c      |    2 +-
+ attrib/gatt.c        |   16 +++++++++++-----
+ attrib/gatt.h        |    3 ++-
+ attrib/gatttool.c    |    3 ++-
+ attrib/interactive.c |   18 ++++++++++++++++--
+ 5 files changed, 32 insertions(+), 10 deletions(-)
 
-You're right - the BT_OPEN doesn't result in an AVDTP_OPEN, this happens
-after the SET_CONFIGURATION is done. I'll try to hack up a patch to look
-up a new rsep if the media type of the lsep and currently selected rsep
-do not match.
-
-Cheers,
-Arun
-
-p.s.: FWIW, the debug log looks like this:
-
-bluetoothd[17790]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_STOP_STREAM
-bluetoothd[17790]: audio/avdtp.c:avdtp_ref() 0x7fc7f57aa260: ref=4
-bluetoothd[17790]: audio/a2dp.c:setup_ref() 0x7fc7f57a86d0: ref=1
-bluetoothd[17790]: audio/avdtp.c:session_cb() 
-bluetoothd[17790]: audio/avdtp.c:avdtp_parse_resp() SUSPEND request succeeded
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: STREAMING -> OPEN
-bluetoothd[17790]: audio/sink.c:sink_set_state() State changed /org/bluez/17790/hci0/dev_00_0B_E4_91_11_A1: SINK_STATE_PLAYING -> SINK_STATE_CONNECTED
-bluetoothd[17790]: audio/a2dp.c:suspend_cfm() Source 0x7fc7f57869d0: Suspend_Cfm
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_STOP_STREAM
-bluetoothd[17790]: audio/a2dp.c:setup_unref() 0x7fc7f57a86d0: ref=0
-bluetoothd[17790]: audio/a2dp.c:setup_free() 0x7fc7f57a86d0
-bluetoothd[17790]: audio/avdtp.c:avdtp_unref() 0x7fc7f57aa260: ref=3
-bluetoothd[17790]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_SUSPEND_STREAM
-bluetoothd[17790]: audio/a2dp.c:a2dp_sep_unlock() SEP 0x7fc7f57869d0 unlocked
-bluetoothd[17790]: audio/avdtp.c:avdtp_unref() 0x7fc7f57aa260: ref=2
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_SUSPEND_STREAM
-bluetoothd[17790]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_OPEN
-bluetoothd[17790]: audio/unix.c:handle_a2dp_open() open a2dp - object=/org/bluez/17790/hci0/dev_00_0B_E4_91_11_A1 source=ANY destination=ANY lock=write
-bluetoothd[17790]: audio/avdtp.c:avdtp_ref() 0x7fc7f57aa260: ref=3
-bluetoothd[17790]: audio/a2dp.c:a2dp_sep_lock() SEP 0x7fc7f5787250 locked
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_OPEN
-bluetoothd[17790]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_SET_CONFIGURATION
-bluetoothd[17790]: audio/unix.c:print_mpeg12() Media Codec: MPEG12 Channel Modes: Stereo  Frequencies: 44.1Khz  Layers: 3  CRC: No
-bluetoothd[17790]: audio/a2dp.c:a2dp_config() a2dp_config: selected SEP 0x7fc7f5787250
-bluetoothd[17790]: audio/avdtp.c:avdtp_ref() 0x7fc7f57aa260: ref=4
-bluetoothd[17790]: audio/a2dp.c:setup_ref() 0x7fc7f57a86d0: ref=1
-bluetoothd[17790]: audio/avdtp.c:session_cb() 
-bluetoothd[17790]: audio/avdtp.c:avdtp_parse_resp() CLOSE request succeeded
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: OPEN -> CLOSING
-bluetoothd[17790]: audio/a2dp.c:close_cfm() Source 0x7fc7f57869d0: Close_Cfm
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: CLOSING -> IDLE
-bluetoothd[17790]: audio/avdtp.c:avdtp_unref() 0x7fc7f57aa260: ref=3
-bluetoothd[17790]: audio/avdtp.c:avdtp_set_configuration() 0x7fc7f57aa260: int_seid=2, acp_seid=2
-bluetoothd[17790]: audio/avdtp.c:session_cb() 
-bluetoothd[17790]: audio/avdtp.c:avdtp_parse_resp() SET_CONFIGURATION request succeeded
-bluetoothd[17790]: audio/a2dp.c:setconf_cfm() Source 0x7fc7f5787250: Set_Configuration_Cfm
-bluetoothd[17790]: audio/avdtp.c:avdtp_ref() 0x7fc7f57aa260: ref=4
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: IDLE -> CONFIGURED
-bluetoothd[17790]: audio/avdtp.c:session_cb() 
-bluetoothd[17790]: audio/avdtp.c:avdtp_parse_resp() OPEN request succeeded
-bluetoothd[17790]: audio/avdtp.c:avdtp_connect_cb() AVDTP: connected transport channel to 00:0B:E4:91:11:A1
-bluetoothd[17790]: audio/avdtp.c:handle_transport_connect() sk 26, omtu 895, send buffer size 61440
-bluetoothd[17790]: audio/a2dp.c:open_cfm() Source 0x7fc7f5787250: Open_Cfm
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_SET_CONFIGURATION
-bluetoothd[17790]: audio/a2dp.c:setup_unref() 0x7fc7f57a86d0: ref=0
-bluetoothd[17790]: audio/a2dp.c:setup_free() 0x7fc7f57a86d0
-bluetoothd[17790]: audio/avdtp.c:avdtp_unref() 0x7fc7f57aa260: ref=3
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: CONFIGURED -> OPEN
-bluetoothd[17790]: audio/sink.c:sink_set_state() State changed /org/bluez/17790/hci0/dev_00_0B_E4_91_11_A1: SINK_STATE_CONNECTED -> SINK_STATE_CONNECTED
-bluetoothd[17790]: audio/device.c:device_set_state() state change attempted from connected to connected
-bluetoothd[17790]: audio/unix.c:client_cb() Audio API: BT_REQUEST <- BT_START_STREAM
-bluetoothd[17790]: audio/avdtp.c:avdtp_ref() 0x7fc7f57aa260: ref=4
-bluetoothd[17790]: audio/a2dp.c:setup_ref() 0x7fc7f57a86d0: ref=1
-bluetoothd[17790]: audio/avdtp.c:session_cb() 
-bluetoothd[17790]: audio/avdtp.c:avdtp_parse_resp() START request succeeded
-bluetoothd[17790]: audio/a2dp.c:start_cfm() Source 0x7fc7f5787250: Start_Cfm
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_START_STREAM
-bluetoothd[17790]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_RESPONSE -> BT_NEW_STREAM
-bluetoothd[17790]: audio/a2dp.c:setup_unref() 0x7fc7f57a86d0: ref=0
-bluetoothd[17790]: audio/a2dp.c:setup_free() 0x7fc7f57a86d0
-bluetoothd[17790]: audio/avdtp.c:avdtp_unref() 0x7fc7f57aa260: ref=3
-bluetoothd[17790]: audio/avdtp.c:avdtp_sep_set_state() stream state changed: OPEN -> STREAMING
-bluetoothd[17790]: audio/sink.c:sink_set_state() State changed /org/bluez/17790/hci0/dev_00_0B_E4_91_11_A1: SINK_STATE_CONNECTED -> SINK_STATE_PLAYING
+diff --git a/attrib/client.c b/attrib/client.c
+index 3237a6b..54bdc79 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -960,7 +960,7 @@ static DBusMessage *discover_char(DBusConnection *conn, DBusMessage *msg,
+ 	qchr->prim = prim;
+ 	qchr->msg = dbus_message_ref(msg);
+ 
+-	gatt_discover_char(gatt->attrib, att->start, att->end,
++	gatt_discover_char(gatt->attrib, att->start, att->end, NULL,
+ 						char_discovered_cb, qchr);
+ 
+ 	return NULL;
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 32bd4a0..b328c72 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -40,7 +40,7 @@ struct discover_primary {
+ 
+ struct discover_char {
+ 	GAttrib *attrib;
+-	bt_uuid_t uuid;
++	bt_uuid_t *uuid;
+ 	uint16_t end;
+ 	GSList *characteristics;
+ 	gatt_cb_t cb;
+@@ -59,6 +59,7 @@ static void discover_char_free(struct discover_char *dc)
+ 	g_slist_foreach(dc->characteristics, (GFunc) g_free, NULL);
+ 	g_slist_free(dc->characteristics);
+ 	g_attrib_unref(dc->attrib);
++	g_free(dc->uuid);
+ 	g_free(dc);
+ }
+ 
+@@ -281,6 +282,9 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 			goto done;
+ 		}
+ 
++		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid))
++			break;
++
+ 		chars->handle = last;
+ 		chars->properties = value[2];
+ 		chars->value_handle = att_get_u16(&value[3]);
+@@ -313,16 +317,17 @@ done:
+ }
+ 
+ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+-					gatt_cb_t func, gpointer user_data)
++						bt_uuid_t *uuid, gatt_cb_t func,
++						gpointer user_data)
+ {
+ 	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+ 	struct discover_char *dc;
++	bt_uuid_t type_uuid;
+ 	guint16 plen;
+-	bt_uuid_t uuid;
+ 
+-	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
++	bt_uuid16_create(&type_uuid, GATT_CHARAC_UUID);
+ 
+-	plen = enc_read_by_type_req(start, end, &uuid, pdu, sizeof(pdu));
++	plen = enc_read_by_type_req(start, end, &type_uuid, pdu, sizeof(pdu));
+ 	if (plen == 0)
+ 		return 0;
+ 
+@@ -334,6 +339,7 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	dc->cb = func;
+ 	dc->user_data = user_data;
+ 	dc->end = end;
++	dc->uuid = uuid;
+ 
+ 	return g_attrib_send(attrib, 0, pdu[0], pdu, plen, char_discovered_cb,
+ 								dc, NULL);
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 730de7e..c6d3843 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -30,7 +30,8 @@ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 							gpointer user_data);
+ 
+ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+-					gatt_cb_t func, gpointer user_data);
++					bt_uuid_t *uuid, gatt_cb_t func,
++					gpointer user_data);
+ 
+ guint gatt_read_char(GAttrib *attrib, uint16_t handle, uint16_t offset,
+ 				GAttribResultFunc func, gpointer user_data);
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 729e18d..0dfbc04 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -206,7 +206,8 @@ static gboolean characteristics(gpointer user_data)
+ {
+ 	GAttrib *attrib = user_data;
+ 
+-	gatt_discover_char(attrib, opt_start, opt_end, char_discovered_cb, NULL);
++	gatt_discover_char(attrib, opt_start, opt_end, opt_uuid,
++						char_discovered_cb, NULL);
+ 
+ 	return FALSE;
+ }
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index b32e9e7..7e5aa4c 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -431,7 +431,21 @@ static void cmd_char(int argcp, char **argvp)
+ 		}
+ 	}
+ 
+-	gatt_discover_char(attrib, start, end, char_cb, NULL);
++	if (argcp > 3) {
++		bt_uuid_t *uuid;
++
++		uuid = g_try_new(bt_uuid_t, 1);
++		if (bt_string_to_uuid(uuid, argvp[3]) < 0) {
++			g_free(uuid);
++			printf("Invalid UUID\n");
++			return;
++		}
++
++		gatt_discover_char(attrib, start, end, uuid, char_cb, NULL);
++		return;
++	}
++
++	gatt_discover_char(attrib, start, end, NULL, char_cb, NULL);
+ }
+ 
+ static void cmd_char_desc(int argcp, char **argvp)
+@@ -658,7 +672,7 @@ static struct {
+ 		"Disconnect from a remote device" },
+ 	{ "primary",		cmd_primary,	"[UUID]",
+ 		"Primary Service Discovery" },
+-	{ "characteristics",	cmd_char,	"[start hnd] [end hnd]",
++	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
+ 		"Characteristics Discovery" },
+ 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
+ 		"Characteristics Descriptor Discovery" },
+-- 
+1.7.1
 
