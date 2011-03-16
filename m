@@ -1,94 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110316204004.GA2339@joana>
-References: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
-	<20110316204004.GA2339@joana>
-Date: Wed, 16 Mar 2011 22:20:58 +0000
-Message-ID: <AANLkTin-Tc4s76OuJ26ktQXT7n5f7yMZbYWpMiv-Dfc4@mail.gmail.com>
-Subject: Re: [RFC] Auto Connections
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <Ville.Tervo@nokia.com>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+In-Reply-To: <1300277421-8053-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1300277421-8053-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	<1300277421-8053-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Date: Wed, 16 Mar 2011 23:06:59 +0100
+Message-ID: <AANLkTinF695CSLoSgxCn1LOiZ=jF-Z8OjAsEeY52K8GG@mail.gmail.com>
+Subject: Re: [PATCH v5 2/4] Add support for SAP protocol
+From: "ANGUS.H" <hombre71@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo/Jaikumar
+2011/3/16 Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>:
+> Add new protocol features:
+>        * transfer APDu request/response
+>        * get ATR request/response
+>        * power sim of/on request/response
+>        * card reader status
+>        * set transport protocol
+> ---
+>  sap/server.c |  415 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 files changed, 399 insertions(+), 16 deletions(-)
 
-On Wed, Mar 16, 2011 at 8:40 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Claudio,
->
-> * Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-03-11 21:30:09 +0000]:
->
->> Hi guys,
->>
->> It is time to get opinions from some gurus!
->>
->> We need to implement automatic connections to implement the Profiles.
->> At the moment BlueZ supports only dual mode adapters, as consequence
->> BlueZ needs to start the LE connection. IMHO, it is better to leave
->> the responsibility to the controller, implementing "selective"
->> connections will only introduce more code without concrete benefits.
->> Configuring the controller to autonomously establish connections seems
->> to be the right approach to proceed.
->>
->> This topic is NOT about StartDiscovery() + CreateDevice.
->> StartDiscovery uses active scanning and CreateDevice uses direct
->> connection establishment. We need a mechanism to automatically connect
->> to "trusted" devices or devices flagged as "AutoConnect".
->>
->>
->> My initial idea is: change the LE server socket to report
->> outgoing(host initiated) connections through the server socket.
->> Awkward?
->> To achieve that we need to manage the LE Create Connection(using
->> whitelist) in the kernel, extend the management interface to control
->> devices in the whitelist, change the LE Connection Complete Event
->> handling to get the Role properly.
->> Pros:
->> - Controller manage connections
->> - Flexible to support  connections to "trusted" resolvable address and
->> passive scanning
->> - Only one "flow" for the connections: LE server socket
->> - Maybe we could hide resolvable address from the userspace, mapping
->> it directly to public or static random
->
-> This approach have a lot of advantages. It seems the best option to me.
->
->> Cons:
->> - Risky
->
-> Define risky here.
-More code in the kernel, more time to get the code upstream,
-additional verification to avoid insufficient resources when scanning
-and connecting, but to me it seems the best approach.
 
-to Jaikumar:
-The profiles will indirectly manage the connections providing
-informations such as connection parameters(interval, window, ...) and
-addresses, but the kernel needs to centralize/manage the connections.
-We can't allow the profiles to control the connection directly, a
-remote can implement more than one profile, maybe with different
-constraints. The host can also provide inputs, for instance power
-saving profile or maximum number of LE connections.
+Hi
 
->
->> - Less control of the connection establishment process
->
-> But do we need this control?
-Yes, we need. It is not allowed to send more than one LE Create
-Connection command to the controller or try to establish a connection
-while scanning.
-Some controller also doesn't support some state combination, see "LE
-read supported states"
+A lot of code could be refactored.
+Quite a few repeatable (logically) blocks in every
+"...._req()" and "..._rsp()" handlers.
 
-Claudio
-
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+/A.H
