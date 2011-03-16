@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH v2] Add discover characteristics by uuid to gatttool
-Date: Wed, 16 Mar 2011 19:00:56 -0300
-Message-Id: <1300312856-14034-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: [PATCH] Add discover characteristics by uuid to gatttool
+Date: Wed, 16 Mar 2011 18:51:44 -0300
+Message-Id: <1300312304-13874-1-git-send-email-sheldon.demario@openbossa.org>
 In-Reply-To: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
 References: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
