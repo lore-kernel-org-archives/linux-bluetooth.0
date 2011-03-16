@@ -1,159 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH] Add discover characteristics by uuid to gattool
-Date: Wed, 16 Mar 2011 14:40:46 -0300
-Message-Id: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: [PATCH 4/4] Bluetooth: mgmt: Add support for setting the local name
+Date: Wed, 16 Mar 2011 14:29:37 +0200
+Message-Id: <1300278577-23068-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1300278577-23068-1-git-send-email-johan.hedberg@gmail.com>
+References: <1300278577-23068-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/client.c      |    2 +-
- attrib/gatt.c        |   16 +++++++++++-----
- attrib/gatt.h        |    3 ++-
- attrib/gatttool.c    |    3 ++-
- attrib/interactive.c |   18 ++++++++++++++++--
- 5 files changed, 32 insertions(+), 10 deletions(-)
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-diff --git a/attrib/client.c b/attrib/client.c
-index 3237a6b..54bdc79 100644
---- a/attrib/client.c
-+++ b/attrib/client.c
-@@ -960,7 +960,7 @@ static DBusMessage *discover_char(DBusConnection *conn, DBusMessage *msg,
- 	qchr->prim = prim;
- 	qchr->msg = dbus_message_ref(msg);
+This patch adds a new set_local_name management command as well as a
+local_name_changed management event. With these user space can both
+change the local name as well as monitor changes to it by others.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |   10 +++++
+ net/bluetooth/hci_event.c        |    9 +++--
+ net/bluetooth/mgmt.c             |   75 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9aabb14..3912c7a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -767,6 +767,7 @@ int mgmt_user_confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
+ int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
+ 								u8 status);
+ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
++int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
  
--	gatt_discover_char(gatt->attrib, att->start, att->end,
-+	gatt_discover_char(gatt->attrib, att->start, att->end, NULL,
- 						char_discovered_cb, qchr);
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7d0749b..89e7c82 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -172,6 +172,11 @@ struct mgmt_rp_user_confirm_reply {
  
- 	return NULL;
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 32bd4a0..b328c72 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -40,7 +40,7 @@ struct discover_primary {
+ #define MGMT_OP_USER_CONFIRM_NEG_REPLY	0x0016
  
- struct discover_char {
- 	GAttrib *attrib;
--	bt_uuid_t uuid;
-+	bt_uuid_t *uuid;
- 	uint16_t end;
- 	GSList *characteristics;
- 	gatt_cb_t cb;
-@@ -59,6 +59,7 @@ static void discover_char_free(struct discover_char *dc)
- 	g_slist_foreach(dc->characteristics, (GFunc) g_free, NULL);
- 	g_slist_free(dc->characteristics);
- 	g_attrib_unref(dc->attrib);
-+	g_free(dc->uuid);
- 	g_free(dc);
- }
- 
-@@ -281,6 +282,9 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 			goto done;
- 		}
- 
-+		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid))
-+			break;
++#define MGMT_OP_SET_LOCAL_NAME		0x0017
++struct mgmt_cp_set_local_name {
++	__u8 name[MGMT_MAX_NAME_LENGTH];
++} __packed;
 +
- 		chars->handle = last;
- 		chars->properties = value[2];
- 		chars->value_handle = att_get_u16(&value[3]);
-@@ -313,16 +317,17 @@ done:
- }
- 
- guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
--					gatt_cb_t func, gpointer user_data)
-+						bt_uuid_t *uuid, gatt_cb_t func,
-+						gpointer user_data)
- {
- 	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	struct discover_char *dc;
-+	bt_uuid_t type_uuid;
- 	guint16 plen;
--	bt_uuid_t uuid;
- 
--	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
-+	bt_uuid16_create(&type_uuid, GATT_CHARAC_UUID);
- 
--	plen = enc_read_by_type_req(start, end, &uuid, pdu, sizeof(pdu));
-+	plen = enc_read_by_type_req(start, end, &type_uuid, pdu, sizeof(pdu));
- 	if (plen == 0)
- 		return 0;
- 
-@@ -334,6 +339,7 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
- 	dc->cb = func;
- 	dc->user_data = user_data;
- 	dc->end = end;
-+	dc->uuid = uuid;
- 
- 	return g_attrib_send(attrib, 0, pdu[0], pdu, plen, char_discovered_cb,
- 								dc, NULL);
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 730de7e..c6d3843 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -30,7 +30,8 @@ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
- 							gpointer user_data);
- 
- guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
--					gatt_cb_t func, gpointer user_data);
-+					bt_uuid_t *uuid, gatt_cb_t func,
-+					gpointer user_data);
- 
- guint gatt_read_char(GAttrib *attrib, uint16_t handle, uint16_t offset,
- 				GAttribResultFunc func, gpointer user_data);
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 729e18d..0dfbc04 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -206,7 +206,8 @@ static gboolean characteristics(gpointer user_data)
- {
- 	GAttrib *attrib = user_data;
- 
--	gatt_discover_char(attrib, opt_start, opt_end, char_discovered_cb, NULL);
-+	gatt_discover_char(attrib, opt_start, opt_end, opt_uuid,
-+						char_discovered_cb, NULL);
- 
- 	return FALSE;
- }
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index b32e9e7..7e5aa4c 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -431,7 +431,21 @@ static void cmd_char(int argcp, char **argvp)
- 		}
- 	}
- 
--	gatt_discover_char(attrib, start, end, char_cb, NULL);
-+	if (argcp > 3) {
-+		bt_uuid_t *uuid;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
+@@ -239,3 +244,8 @@ struct mgmt_ev_auth_failed {
+ 	bdaddr_t bdaddr;
+ 	__u8 status;
+ } __packed;
 +
-+		uuid = g_try_new(bt_uuid_t, 1);
-+		if (bt_string_to_uuid(uuid, argvp[3]) < 0) {
-+			g_free(uuid);
-+			printf("Invalid UUID\n");
-+			return;
-+		}
++#define MGMT_EV_LOCAL_NAME_CHANGED	0x0011
++struct mgmt_ev_local_name_changed {
++	__u8 name[MGMT_MAX_NAME_LENGTH];
++} __packed;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 91ef526..0def3e1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -193,13 +193,16 @@ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+ 
+-	if (status)
+-		return;
+-
+ 	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_LOCAL_NAME);
+ 	if (!sent)
+ 		return;
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags))
++		mgmt_set_local_name_complete(hdev->id, sent, status);
 +
-+		gatt_discover_char(attrib, start, end, uuid, char_cb, NULL);
++	if (status)
 +		return;
++
+ 	memcpy(hdev->dev_name, sent, HCI_MAX_NAME_LENGTH);
+ }
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 67529c8..98988c8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1258,6 +1258,45 @@ failed:
+ 	return err;
+ }
+ 
++static int set_local_name(struct sock *sk, u16 index, unsigned char *data,
++								u16 len)
++{
++	struct mgmt_cp_set_local_name *mgmt_cp = (void *) data;
++	struct hci_cp_write_local_name hci_cp;
++	struct hci_dev *hdev;
++	struct pending_cmd *cmd;
++	int err;
++
++	BT_DBG("");
++
++	if (len != sizeof(*mgmt_cp))
++		return cmd_status(sk, index, MGMT_OP_SET_LOCAL_NAME, EINVAL);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_SET_LOCAL_NAME, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LOCAL_NAME, index, data, len);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
 +	}
 +
-+	gatt_discover_char(attrib, start, end, NULL, char_cb, NULL);
- }
++	memcpy(hci_cp.name, mgmt_cp->name, sizeof(hci_cp.name));
++	err = hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(hci_cp),
++								&hci_cp);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -1353,6 +1392,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
+ 		err = user_confirm_reply(sk, index, buf + sizeof(*hdr), len, 0);
+ 		break;
++	case MGMT_OP_SET_LOCAL_NAME:
++		err = set_local_name(sk, index, buf + sizeof(*hdr), len);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode, 0x01);
+@@ -1649,3 +1691,36 @@ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status)
  
- static void cmd_char_desc(int argcp, char **argvp)
-@@ -658,7 +672,7 @@ static struct {
- 		"Disconnect from a remote device" },
- 	{ "primary",		cmd_primary,	"[UUID]",
- 		"Primary Service Discovery" },
--	{ "characteristics",	cmd_char,	"[start hnd] [end hnd]",
-+	{ "characteristics",	cmd_char,	"[start hnd [end hnd [UUID]]]",
- 		"Characteristics Discovery" },
- 	{ "char-desc",		cmd_char_desc,	"[start hnd] [end hnd]",
- 		"Characteristics Descriptor Discovery" },
+ 	return mgmt_event(MGMT_EV_AUTH_FAILED, index, &ev, sizeof(ev), NULL);
+ }
++
++int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status)
++{
++	struct pending_cmd *cmd;
++	struct mgmt_cp_set_local_name ev;
++	int err;
++
++	memset(&ev, 0, sizeof(ev));
++	memcpy(ev.name, name, HCI_MAX_NAME_LENGTH);
++
++	cmd = mgmt_pending_find(MGMT_OP_SET_LOCAL_NAME, index);
++	if (!cmd)
++		goto send_event;
++
++	if (status) {
++		err = cmd_status(cmd->sk, index, MGMT_OP_SET_LOCAL_NAME, EIO);
++		goto failed;
++	}
++
++	err = cmd_complete(cmd->sk, index, MGMT_OP_SET_LOCAL_NAME, &ev,
++								sizeof(ev));
++	if (err < 0)
++		goto failed;
++
++send_event:
++	err = mgmt_event(MGMT_EV_LOCAL_NAME_CHANGED, index, &ev, sizeof(ev),
++							cmd ? cmd->sk : NULL);
++
++failed:
++	if (cmd)
++		mgmt_pending_remove(cmd);
++	return err;
++}
 -- 
-1.7.1
+1.7.4.1
 
