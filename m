@@ -3,8 +3,8 @@ MIME-Version: 1.0
 In-Reply-To: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
 References: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
 From: jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Tue, 15 Mar 2011 19:57:22 -0700
-Message-ID: <AANLkTimVj3PjXjYPfj_3f-8bSvYBLnxeX-n_pyh6rY8r@mail.gmail.com>
+Date: Tue, 15 Mar 2011 19:56:37 -0700
+Message-ID: <AANLkTi=dy-NO1b7dWCFNwGUCv+_8UVAJt0Po8KnXMeqX@mail.gmail.com>
 Subject: Re: [RFC] Auto Connections
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
@@ -14,6 +14,12 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hey Claudio:
+    In general, why do we want let the stack manage auto connections
+i.e can you elaborate on "We need to implement automatic connections
+to implement the Profiles". Why not let the applications handle auto
+connections ?
+
+Thanks
 
 On Fri, Mar 11, 2011 at 1:30 PM, Claudio Takahasi
 <claudio.takahasi@openbossa.org> wrote:
@@ -71,15 +77,6 @@ On Fri, Mar 11, 2011 at 1:30 PM, Claudio Takahasi
 > * How to handle timeouts when sending LE Create Connection
 > * Passive scanning management
 >
-
-
- In general, why do we want let the stack manage auto connections i.e
-can you elaborate on "We need to implement automatic connections to
-implement the Profiles". Why not let the applications (which sit above
-Bluez) handle auto connections ?
-
-Thanks
-
 >
 > Cheers,
 > Claudio
