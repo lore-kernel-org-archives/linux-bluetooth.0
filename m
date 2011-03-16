@@ -1,65 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Mar 2011 07:53:57 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
-To: ext Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: ext Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 0/6] LE advertising cache
-Message-ID: <20110316055357.GG4369@null>
-References: <1299850377-3734-1-git-send-email-andre.guedes@openbossa.org>
- <20110315075742.GD4369@null>
- <AANLkTikK4vjMgpuBHMLP4-6J2JMMnWqbaDo1-rwFsjEY@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AANLkTikK4vjMgpuBHMLP4-6J2JMMnWqbaDo1-rwFsjEY@mail.gmail.com>
+In-Reply-To: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
+References: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
+From: jaikumar Ganesh <jaikumarg@gmail.com>
+Date: Tue, 15 Mar 2011 19:57:22 -0700
+Message-ID: <AANLkTimVj3PjXjYPfj_3f-8bSvYBLnxeX-n_pyh6rY8r@mail.gmail.com>
+Subject: Re: [RFC] Auto Connections
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Ville Tervo <Ville.Tervo@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 15, 2011 at 10:41:55AM -0400, ext Anderson Lizardo wrote:
-> Hi Ville,
-> 
-> On Tue, Mar 15, 2011 at 3:57 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
-> > Hi,
-> >
-> > On Fri, Mar 11, 2011 at 10:32:51AM -0300, ext Andre Guedes wrote:
-> >> During a LE connection establishment, the host should be able to infer the
-> >> bdaddr type from a given bdaddr.
-> >>
-> >> To achieve that, during the LE scanning, the host stores the bdaddr and the
-> >> bdaddr type gathered from advertising reports. The host keeps a list of
-> >> advertising entry (bdaddr and bdaddr_type) for later lookup. This list will
-> >> be called Advertising Cache.
-> >>
-> >> Since the penality to connect to an unreachable device is relatively high,
-> >> we must keep only fresh advertising entries on the advertising cache. So,
-> >> before each LE scanning the advertising cache is cleared. Also, after the LE
-> >> scanning, a timer is set to clear the cache.
-> >
-> > I tested these pathes with a device which had random address. Connection works
-> > which is good.
-> >
-> > How ever I'm not yet sure if mandatory scanning before every connect is
-> > acceptable.
-> 
-> IIRC the connection procedure defined on the spec requires this scan.
-> See for instance the general connection establishment procedure at
-> page 1715
+Hey Claudio:
 
-But it makes "Direct Connection Establishment" impossible.
+On Fri, Mar 11, 2011 at 1:30 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi guys,
+>
+> It is time to get opinions from some gurus!
+>
+> We need to implement automatic connections to implement the Profiles.
+> At the moment BlueZ supports only dual mode adapters, as consequence
+> BlueZ needs to start the LE connection. IMHO, it is better to leave
+> the responsibility to the controller, implementing "selective"
+> connections will only introduce more code without concrete benefits.
+> Configuring the controller to autonomously establish connections seems
+> to be the right approach to proceed.
+>
+> This topic is NOT about StartDiscovery() + CreateDevice.
+> StartDiscovery uses active scanning and CreateDevice uses direct
+> connection establishment. We need a mechanism to automatically connect
+> to "trusted" devices or devices flagged as "AutoConnect".
+>
+>
+> My initial idea is: change the LE server socket to report
+> outgoing(host initiated) connections through the server socket.
+> Awkward?
+> To achieve that we need to manage the LE Create Connection(using
+> whitelist) in the kernel, extend the management interface to control
+> devices in the whitelist, change the LE Connection Complete Event
+> handling to get the Role properly.
+> Pros:
+> - Controller manage connections
+> - Flexible to support  connections to "trusted" resolvable address and
+> passive scanning
+> - Only one "flow" for the connections: LE server socket
+> - Maybe we could hide resolvable address from the userspace, mapping
+> it directly to public or static random
+> Cons:
+> - Risky
+> - Less control of the connection establishment process
+>
+>
+> Another approach can be to manage the LE connections(using whitelist)
+> from the userspace. BDADDR_ANY in the destination field(sockaddr_l2)
+> can be used to define LE connections using white list.
+> Pros:
+> - It will not be necessary to extend the management interface now,
+> address can be added directly to the controller's white list
+> - Doesn't require changes in the LE server socket
+> Cons:
+> - BDADDR_ANY in the destination field has no meaning for Basic Rate
+> - Needs to expose the resolvable address to the userspace
+> - Different "flows" for incoming/outgoing connections
+>
+>
+> Open issue(s):
+> * How to handle timeouts when sending LE Create Connection
+> * Passive scanning management
+>
 
-Is it needed to pass PTS for example?
 
-> 
-> >
-> > I have been playing with idea to derive address type from msb bits of the
-> > address. Any ideaÑ• what would lose in that way?
-> 
-> How can you differ public address type from a random one in this case?
-> I think the MSB bit checking is only for detecting the type of random
-> address (static, non-resolvable private, resolvable private)
+ In general, why do we want let the stack manage auto connections i.e
+can you elaborate on "We need to implement automatic connections to
+implement the Profiles". Why not let the applications (which sit above
+Bluez) handle auto connections ?
 
-That's true. Address type needs to be known.
+Thanks
 
-
--- 
-Ville
+>
+> Cheers,
+> Claudio
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
