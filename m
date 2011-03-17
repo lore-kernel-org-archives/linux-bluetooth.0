@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH] Fix adapter drivers unload order
-Date: Fri, 18 Mar 2011 10:25:29 +0200
-Message-Id: <1300436729-3578-1-git-send-email-dmitriy.paliy@nokia.com>
+Message-ID: <4D8286A4.4000706@codeaurora.org>
+Date: Thu, 17 Mar 2011 15:09:40 -0700
+From: Brian Gix <bgix@codeaurora.org>
+MIME-Version: 1.0
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: SMP data within struct l2cap_conn  -vs-  single threading SMP
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Order of unloading drivers shell be preserved as given in
-audio_manager_exit. It was reverted in 'c772636 Fix unloading of adapter
-drivers', which causes in turn bluetoothd crash on exit.
 
-Removing of media end-point results in removing of A2DP end-point for
-the corresponding A2DP server but not vice versa. Therefore, unregistering
-and destroying A2DP server, which clears all A2DP end-points, before media
-server is incorrect.
----
- src/adapter.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+Hi Vinicius,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8c368fe..9fa7c4d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2258,8 +2258,8 @@ static void probe_driver(struct btd_adapter *adapter, gpointer user_data)
- 		return;
- 	}
- 
--	adapter->loaded_drivers = g_slist_prepend(adapter->loaded_drivers,
--									driver);
-+	adapter->loaded_drivers = g_slist_append(adapter->loaded_drivers,
-+								driver);
- }
- 
- static void load_drivers(struct btd_adapter *adapter)
+As you probably know, I am working on adding mgmt.c plumbing into SMP, 
+to enable user level input (Confirmation, passkeys, perhaps OOB).
+
+One issue I am running into is matching up the return of user 
+confirmation with the (struct l2cap_conn *).  There is nothing within 
+the user confirmation aside from the bdaddr that identifies who it is 
+intended for, and there is no one-to-one relationship between bdaddrs 
+and L2CAP channels.
+
+What would you think about enforcing a "one at a time" SMP process?
+
+The SMP pairing data within the l2cap_conn structure is certainly a 
+handy place for it, however it is bulky for the times (most of the time) 
+where SMP is *not* taking place, and as in the obvious case I mention 
+above, there is not a handy way to track the L2CAP connection back to 
+the user input.
+
+I would like to suggest that all of the SMP data be pulled out of the 
+l2cap_conn structure, and put into a private structure within smp.c. It 
+can be malloc'd when the pairing process starts, free'd when it 
+completes, and any traffic (from either the User or the Baseband) that 
+takes place when another device is in the midst of pairing gets rejected.
+
+This structure local to smp.c would store both the bdaddr (to match up 
+with user input) and the l2cap_conn * to match up with BB traffic, and 
+provide the outbound path for the user confirmation which would 
+otherwise be difficult to track down.
+
+Your Thoughts?
+
 -- 
-1.7.1
-
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
