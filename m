@@ -1,82 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 02/15] GATT server: add profile API plugin skeleton
-Date: Wed, 16 Mar 2011 21:00:26 -0400
-Message-Id: <1300323639-13296-3-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC][PATCH 00/15] Attribute server management API
+Date: Wed, 16 Mar 2011 21:00:24 -0400
+Message-Id: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.am            |    3 +++
- plugins/gatt-profile.c |   41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 0 deletions(-)
- create mode 100644 plugins/gatt-profile.c
+Hi all,
 
-diff --git a/Makefile.am b/Makefile.am
-index 34c0def..5963c7f 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -199,6 +199,9 @@ builtin_modules += attrib
- builtin_sources += attrib/main.c \
- 		attrib/manager.h attrib/manager.c \
- 		attrib/client.h attrib/client.c
-+
-+builtin_modules += gatt_profile
-+builtin_sources += plugins/gatt-profile.c
- endif
- 
- if HEALTHPLUGIN
-diff --git a/plugins/gatt-profile.c b/plugins/gatt-profile.c
-new file mode 100644
-index 0000000..025a3c5
---- /dev/null
-+++ b/plugins/gatt-profile.c
-@@ -0,0 +1,41 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include "plugin.h"
-+
-+static int gatt_profile_init(void)
-+{
-+	return 0;
-+}
-+
-+static void gatt_profile_exit(void)
-+{
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(gatt_profile, VERSION, BLUETOOTH_PLUGIN_PRIORITY_HIGH,
-+					gatt_profile_init, gatt_profile_exit)
--- 
-1.7.0.4
+This series represents a proposal for an "Attribute server management API". It
+consists of a D-Bus interface for registering services, specified as XML. It
+was inspired on the existing SDP plugin (plugins/service.c), but the XML format
+is totally different because the "record" concept used for SDP is much simpler
+and lower level than GATT services.
 
+The XML format is currently not documented, but I expect it to be intuitive for
+those familiar with the definition of GATT services (of course, we can properly
+document it once the API is accepted). Additionally, the API is high level, in
+a sense that it is not required to specify attributes individually.
+
+It was implemented as a plugin, so it can be easily disabled. It was also built
+on top of the existing (internal) attribute API, requiring only an additional
+attrib_db_find_avail() function which is used to find free handle "slots"
+inside the attribute database.
+
+What is currently implemented:
+
+* Register primary/secondary services and service includes
+* Register characteristics and descriptors (only "User Description" and
+  "Presentation Format" are supported), including initial values
+* Automatically unregister services when the D-Bus client exits
+
+Open issues or not yet implemented:
+
+* Documentation of the plugin API and XML format
+* Better handling of malformed XML
+* Remaining characteristic descriptors: Extended Properties, Client
+  Configuration, Server Configuration and Aggregate Format
+* Set attribute permissions for characteristic value and descriptors which are
+  not read-only (note that these permissions are profile specific)
+* Manipulate registered services (remove, modify) without requiring to
+  disconnect from D-Bus
+* Callbacks for value/descriptor read/writes (so externally implemented
+  profiles could react on these procedures)
+* Update characteristic value
+* Better name for the plugin and D-Bus interface (currently it is
+  "gatt-profile" and GattProfile, respectively)
+
+Comments and suggestions are welcome. I would also appreciate comments
+regarding coding style, given that I based on the SDP "service.c" plugin which
+is quite old.
+
+Regards,
+--
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
