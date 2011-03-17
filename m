@@ -2,137 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 05/15] GATT server: parse primary/secondary services
-Date: Wed, 16 Mar 2011 21:00:29 -0400
-Message-Id: <1300323639-13296-6-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 04/15] GATT server: add initial XML parsing
+Date: Wed, 16 Mar 2011 21:00:28 -0400
+Message-Id: <1300323639-13296-5-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/gatt-profile.c |   76 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 75 insertions(+), 1 deletions(-)
+ plugins/gatt-profile.c |   46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 45 insertions(+), 1 deletions(-)
 
 diff --git a/plugins/gatt-profile.c b/plugins/gatt-profile.c
-index 694769c..c0b2a50 100644
+index fc6b08e..694769c 100644
 --- a/plugins/gatt-profile.c
 +++ b/plugins/gatt-profile.c
-@@ -29,6 +29,7 @@
- #include <errno.h>
- 
- #include <gdbus.h>
-+#include <bluetooth/uuid.h>
+@@ -32,6 +32,7 @@
  
  #include "plugin.h"
  #include "adapter.h"
-@@ -40,12 +41,72 @@
++#include "error.h"
+ #include "log.h"
+ 
+ #define GATT_PROFILE_INTERFACE "org.bluez.GattProfile"
+@@ -39,10 +40,53 @@
  static DBusConnection *connection = NULL;
  static const char *any_path = NULL;
  
-+struct gatt_service {
-+	gboolean primary;
-+	bt_uuid_t uuid;
-+	gchar *id;
-+	GSList *chars;
-+	GSList *includes;
-+};
-+
-+static void parse_service(const gchar **attribute_names,
-+					const gchar **attribute_values,
-+					gboolean primary, GSList **services)
++static void element_start(GMarkupParseContext *ctx, const gchar *element_name,
++		const gchar **attribute_names, const gchar **attribute_values,
++		gpointer user_data, GError **err)
 +{
-+	struct gatt_service *svc;
-+	const gchar *uuid, *id;
-+	int i;
-+
-+	for (i = 0, uuid = NULL, id = NULL; attribute_names[i]; i++) {
-+		if (g_strcmp0(attribute_names[i], "uuid") == 0)
-+			uuid = attribute_values[i];
-+		else if (g_strcmp0(attribute_names[i], "id") == 0)
-+			id = attribute_values[i];
-+		else
-+			error("Invalid XML attribute: %s", attribute_names[i]);
-+	}
-+
-+	if (uuid == NULL) {
-+		error("Missing UUID for service");
++	if (g_strcmp0(element_name, "gatt-profile") == 0)
 +		return;
-+	}
-+
-+	if (!primary && (id == NULL || id[0] == '\0')) {
-+		error("Missing ID for secondary service");
-+		return;
-+	}
-+
-+	svc = g_new0(struct gatt_service, 1);
-+	svc->primary = primary;
-+
-+	if (bt_string_to_uuid(&svc->uuid, uuid) < 0) {
-+		error("Invalid UUID: %s", uuid);
-+		g_free(svc);
-+		return;
-+	}
-+
-+	svc->id = g_strdup(id);
-+
-+	DBG("New %s service with UUID %s", primary ? "primary" : "secondary",
-+									uuid);
-+
-+	*services = g_slist_prepend(*services, svc);
++	else
++		error("Invalid XML tag: %s", element_name);
 +}
 +
- static void element_start(GMarkupParseContext *ctx, const gchar *element_name,
- 		const gchar **attribute_names, const gchar **attribute_values,
- 		gpointer user_data, GError **err)
- {
-+	GSList **services = user_data;
-+
- 	if (g_strcmp0(element_name, "gatt-profile") == 0)
- 		return;
-+	else if (g_strcmp0(element_name, "primary-service") == 0)
-+		parse_service(attribute_names, attribute_values, TRUE,
-+								services);
-+	else if (g_strcmp0(element_name, "secondary-service") == 0)
-+		parse_service(attribute_names, attribute_values, FALSE,
-+								services);
- 	else
- 		error("Invalid XML tag: %s", element_name);
- }
-@@ -56,19 +117,32 @@ static void element_end(GMarkupParseContext *ctx, const gchar *element_name,
- 	/* TODO: verify tag balance */
- }
- 
-+static void free_services(gpointer data, gpointer user_data)
++static void element_end(GMarkupParseContext *ctx, const gchar *element_name,
++					gpointer user_data, GError **err)
 +{
-+	struct gatt_service *svc = data;
-+
-+	/* TODO: free characteristics, includes and descriptors */
-+
-+	g_free(svc);
++	/* TODO: verify tag balance */
 +}
 +
- static int add_xml_profile(DBusConnection *conn, const char *profile)
- {
- 	GMarkupParser parser = { element_start, element_end, NULL, NULL, NULL };
- 	GMarkupParseContext *ctx;
-+	GSList *services = NULL;
- 	int ret = 0;
- 
--	ctx = g_markup_parse_context_new(&parser, 0, NULL, NULL);
-+	ctx = g_markup_parse_context_new(&parser, 0, &services, NULL);
- 	if (!g_markup_parse_context_parse(ctx, profile, strlen(profile),
- 									NULL)) {
- 		error("Parsing of GATT profile XML failed");
- 		ret = -EINVAL;
- 	}
- 
-+	g_slist_foreach(services, free_services, NULL);
-+	g_slist_free(services);
++static int add_xml_profile(DBusConnection *conn, const char *profile)
++{
++	GMarkupParser parser = { element_start, element_end, NULL, NULL, NULL };
++	GMarkupParseContext *ctx;
++	int ret = 0;
 +
- 	g_markup_parse_context_free(ctx);
++	ctx = g_markup_parse_context_new(&parser, 0, NULL, NULL);
++	if (!g_markup_parse_context_parse(ctx, profile, strlen(profile),
++									NULL)) {
++		error("Parsing of GATT profile XML failed");
++		ret = -EINVAL;
++	}
++
++	g_markup_parse_context_free(ctx);
++
++	return ret;
++}
++
+ static DBusMessage *add_profile(DBusConnection *conn, DBusMessage *msg,
+ 								void *user_data)
+ {
+-	/* TODO */
++	const char *profile;
++	int err;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &profile,
++							DBUS_TYPE_INVALID))
++		return NULL;
++
++	err = add_xml_profile(conn, profile);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
  
- 	return ret;
+ 	return dbus_message_new_method_return(msg);
+ }
 -- 
 1.7.0.4
 
