@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Mar 2011 14:52:14 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Add discover characteristics by uuid to gatttool
-Message-ID: <20110317125214.GD12238@jh-x301>
+Date: Thu, 17 Mar 2011 14:49:57 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add discover characteristics by uuid to gattool
+Message-ID: <20110317124957.GA18727@jh-x301>
 References: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
- <1300312856-14034-1-git-send-email-sheldon.demario@openbossa.org>
+ <20110317124754.GC12238@jh-x301>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300312856-14034-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <20110317124754.GC12238@jh-x301>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi,
 
-On Wed, Mar 16, 2011, Sheldon Demario wrote:
-> According to the spec the characteristics discover and characteristics discover
-> by uuid use the same opcode and the result should be filtered by callback.
-> ---
->  attrib/client.c      |    2 +-
->  attrib/gatt.c        |   16 +++++++++++-----
->  attrib/gatt.h        |    3 ++-
->  attrib/gatttool.c    |    3 ++-
->  attrib/interactive.c |   16 ++++++++++++++--
->  5 files changed, 30 insertions(+), 10 deletions(-)
+On Thu, Mar 17, 2011, Johan Hedberg wrote:
+> On Wed, Mar 16, 2011, Sheldon Demario wrote:
+> > +		uuid = g_try_new(bt_uuid_t, 1);
+> > +		if (bt_string_to_uuid(uuid, argvp[3]) < 0) {
+> > +			g_free(uuid);
+> > +			printf("Invalid UUID\n");
+> > +			return;
+> > +		}
+> 
+> If you're gonna use the _try version of GLib memory allocators you need
+> to check for the return value. However in this case I'd just use the
+> non-try version (since the amount of memory is small).
 
-Pushed upstream after manually fixing your commit message: please limit
-line lengths to 74 characters.
+Never mind, I just saw that you've sent an updated version which gets
+rid of the memory allocation need completely (by using a stack
+variable).
 
 Johan
