@@ -1,51 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 17 Mar 2011 14:52:14 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Add discover characteristics by uuid to gatttool
+Message-ID: <20110317125214.GD12238@jh-x301>
+References: <1300297246-11056-1-git-send-email-sheldon.demario@openbossa.org>
+ <1300312856-14034-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <20110317123031.GA12238@jh-x301>
-References: <1300274712-3931-1-git-send-email-bruna.moreira@openbossa.org>
-	<1300274712-3931-2-git-send-email-bruna.moreira@openbossa.org>
-	<20110317123031.GA12238@jh-x301>
-Date: Thu, 17 Mar 2011 08:43:14 -0400
-Message-ID: <AANLkTikE1u=xPsD=zE=NjYtWWVTd6DQj9H2sFX3Z49+f@mail.gmail.com>
-Subject: Re: [PATCH 2/5] Add internal buffer to GAttrib struct
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-To: Bruna Moreira <bruna.moreira@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1300312856-14034-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 3/17/11, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Bruna,
->
-> On Wed, Mar 16, 2011, Bruna Moreira wrote:
->> +gboolean g_attrib_set_buffer(GAttrib *attrib, int mtu)
->> +{
->> +	if (mtu < ATT_DEFAULT_LE_MTU)
->> +		mtu = ATT_DEFAULT_LE_MTU;
->> +
->> +	if (mtu > ATT_MAX_MTU)
->> +		mtu = ATT_MAX_MTU;
->> +
->> +	if (!bt_io_set(attrib->io, BT_IO_L2CAP, NULL,
->> +			BT_IO_OPT_OMTU, mtu,
->> +			BT_IO_OPT_INVALID))
->> +		return FALSE;
->> +
->> +	attrib->buf = g_realloc(attrib->buf, mtu);
->> +
->> +	attrib->buflen = mtu;
->> +
->> +	return TRUE;
->> +}
->
-> Wouldn't g_attrib_set_mtu make more sense for the name of this function?
-> Since it's named symmetrically to the _get version one would expect it
-> to take a buffer as an input parameter, but it's not doing that.
+Hi Sheldon,
 
-Agreed. I will send a new updated series.
+On Wed, Mar 16, 2011, Sheldon Demario wrote:
+> According to the spec the characteristics discover and characteristics discover
+> by uuid use the same opcode and the result should be filtered by callback.
+> ---
+>  attrib/client.c      |    2 +-
+>  attrib/gatt.c        |   16 +++++++++++-----
+>  attrib/gatt.h        |    3 ++-
+>  attrib/gatttool.c    |    3 ++-
+>  attrib/interactive.c |   16 ++++++++++++++--
+>  5 files changed, 30 insertions(+), 10 deletions(-)
 
-BR,
--- 
-Bruna Moreira
-Instituto Nokia de Tecnologia (INdT)
-Manaus - Brazil
+Pushed upstream after manually fixing your commit message: please limit
+line lengths to 74 characters.
+
+Johan
