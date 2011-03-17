@@ -2,113 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 11/15] GATT server: add service registration
-Date: Wed, 16 Mar 2011 21:00:35 -0400
-Message-Id: <1300323639-13296-12-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 10/15] Add attrib_db_find_avail() function to attribute server
+Date: Wed, 16 Mar 2011 21:00:34 -0400
+Message-Id: <1300323639-13296-11-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This new function searches for a range of at least "nitems" available
+(unused) attribute handles. It then returns either zero (if no available
+range was found) or the start handle of the available range.
 ---
- plugins/gatt-profile.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 63 insertions(+), 0 deletions(-)
+ src/attrib-server.c |   28 ++++++++++++++++++++++++++++
+ src/attrib-server.h |    1 +
+ 2 files changed, 29 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/gatt-profile.c b/plugins/gatt-profile.c
-index b0256ba..f61bdb4 100644
---- a/plugins/gatt-profile.c
-+++ b/plugins/gatt-profile.c
-@@ -37,6 +37,7 @@
- #include "error.h"
- #include "log.h"
- #include "att.h"
-+#include "attrib-server.h"
- 
- #define GATT_PROFILE_INTERFACE "org.bluez.GattProfile"
- 
-@@ -74,6 +75,7 @@ struct gatt_service {
- 	gchar *id;
- 	GSList *chars;
- 	GSList *includes;
-+	GSList *attrs;
- };
- 
- static void parse_service(const gchar **attribute_names,
-@@ -404,6 +406,66 @@ static void resolve_includes(gpointer data, gpointer user_data)
- 	svc->includes = includes;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 74a1c8d..67165f8 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1209,6 +1209,34 @@ void attrib_free_sdp(uint32_t sdp_handle)
+ 	remove_record_from_server(sdp_handle);
  }
  
-+static uint16_t service_size(struct gatt_service *svc)
++uint16_t attrib_db_find_avail(uint16_t nitems)
 +{
-+	GSList *cl;
-+	uint16_t size;
++	uint16_t handle;
++	GSList *l;
 +
-+	/* A service contains at minimum one declaration attribute, plus one
-+	 * attribute for each service include. */
-+	size = 1 + g_slist_length(svc->includes);
++	g_assert(nitems > 0);
 +
-+	for (cl = svc->chars; cl; cl = cl->next) {
-+		struct gatt_characteristic *c = cl->data;
++	for (l = database, handle = 0; l; l = l->next) {
++		struct attribute *a = l->data;
 +
-+		/* A characteristic contains at least two attributes (for
-+		 * declaration and value), plus one attribute for each
-+		 * descriptor. */
-+		size += 2 + g_slist_length(c->descriptors);
++		if (handle && (bt_uuid_cmp(&a->uuid, &prim_uuid) == 0 ||
++				bt_uuid_cmp(&a->uuid, &snd_uuid) == 0) &&
++				a->handle - handle >= nitems)
++			/* Note: the range above excludes the current handle */
++			return handle;
++
++		if (a->handle == 0xffff)
++			return 0;
++
++		handle = a->handle + 1;
 +	}
 +
-+	return size;
++	if (0xffff - handle + 1 >= nitems)
++		return handle;
++
++	return 0;
 +}
 +
-+static void register_services(gpointer data, gpointer user_data)
-+{
-+	struct gatt_service *svc = data;
-+	struct attribute *a;
-+	uint16_t handle, size;
-+	bt_uuid_t uuid;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	uint8_t atval[ATT_MAX_VALUE_LEN];
-+	int atlen;
-+
-+	size = service_size(svc);
-+	handle = attrib_db_find_avail(size);
-+	if (handle == 0) {
-+		error("Not enough space on attribute database");
-+		return;
-+	}
-+
-+	bt_uuid_to_string(&svc->uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("service: primary=%s, uuid=%s, id=%s, handle=0x%04x, size=%u",
-+				svc->primary ? "TRUE" : "FALSE", uuidstr,
-+				svc->id ? svc->id : "", handle, size);
-+
-+	if (svc->primary)
-+		bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-+	else
-+		bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
-+
-+	att_put_uuid(svc->uuid, atval);
-+	if (svc->uuid.type == BT_UUID16)
-+		atlen = 2;
-+	else
-+		atlen = 16;
-+
-+	a = attrib_db_add(handle++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval,
-+									atlen);
-+	g_assert(a != NULL);
-+	svc->attrs = g_slist_append(svc->attrs, a);
-+}
-+
- static void free_services(gpointer data, gpointer user_data)
+ struct attribute *attrib_db_add(uint16_t handle, bt_uuid_t *uuid, int read_reqs,
+ 				int write_reqs, const uint8_t *value, int len)
  {
- 	struct gatt_service *svc = data;
-@@ -450,6 +512,7 @@ static int add_xml_profile(DBusConnection *conn, const char *profile)
- 	}
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index 38a1f05..83484fc 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -25,6 +25,7 @@
+ int attrib_server_init(void);
+ void attrib_server_exit(void);
  
- 	g_slist_foreach(services, resolve_includes, services);
-+	g_slist_foreach(services, register_services, NULL);
- 	g_slist_foreach(services, free_services, NULL);
- 	g_slist_free(services);
- 
++uint16_t attrib_db_find_avail(uint16_t nitems);
+ struct attribute *attrib_db_add(uint16_t handle, bt_uuid_t *uuid, int read_reqs,
+ 				int write_reqs, const uint8_t *value, int len);
+ int attrib_db_update(uint16_t handle, bt_uuid_t *uuid, const uint8_t *value,
 -- 
 1.7.0.4
 
