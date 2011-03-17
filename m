@@ -1,28 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add 'Protocol not supported' error in a2dp_add_sep
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
 To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1300276872-20149-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1300276872-20149-1-git-send-email-dmitriy.paliy@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 17 Mar 2011 09:45:49 +0200
-Message-ID: <1300347949.2509.11.camel@dp-x301>
-Mime-Version: 1.0
+Cc: epx@signove.com
+Subject: [PATCH] Update TODO regarding bt_uuid_* functions
+Date: Wed, 16 Mar 2011 22:36:54 -0300
+Message-Id: <1300325814-6247-1-git-send-email-epx@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ TODO |   14 ++++----------
+ 1 files changed, 4 insertions(+), 10 deletions(-)
 
-On Wed, 2011-03-16 at 14:01 +0200, ext Dmitriy Paliy wrote:
-> 'Protocol not supported' error code is added to registeration of A2DP
-> end-points. Error response org.bluez.Error.NotSupported instead of
-> org.bluez.Error.InvalidArguments is used when SEP registration fails
-> due to disabled corresponding interface in audio.conf.
-
-Seems like there were some comment about this patch that I missed. Could
-anybody post a reply with them to this email?
-
-Thanks,
-Dmitriy
-
+diff --git a/TODO b/TODO
+index 1120ad9..3351ac9 100644
+--- a/TODO
++++ b/TODO
+@@ -17,18 +17,12 @@ Background
+ General
+ ==========
+ 
+-- UUID128 handling: Create new functions to handle UUIDs on host order.
+-  Functions should start with prefix "bt_uuid". In the first phase, attribute
+-  server/client and gatttool code should be changed to use these new functions.
+-  The idea is to keep the consistency for UUID-16, UUID-32 and UUID-128. SDP
+-  functions store UUID-16 and UUID-32 on host order, however UUID-128 is stored
+-  on network order/big endian. Attribute Protocol uses little endian, while
+-  SDP uses big endian. The idea is always store the UUID values on host order
+-  and use utility functions to convert to the proper byte order depending on
+-  the protocol: ATT or SDP.
++- UUID handling: Use the new functions created for UUID handling in all parts
++  of BlueZ code.  Currently, the new bt_uuid_* functions are being used by
++  GATT-related code only.
+ 
+   Priority: high
+-  Complexity: C1
++  Complexity: C4
+ 
+ - Rename glib-helper file to a more convenient name. The ideia is try to keep
+   only sdp helpers functions. bt_* prefix shall be also changed.
+-- 
+1.7.1
 
