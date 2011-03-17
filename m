@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Mar 2011 14:30:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/5] Add internal buffer to GAttrib struct
-Message-ID: <20110317123031.GA12238@jh-x301>
-References: <1300274712-3931-1-git-send-email-bruna.moreira@openbossa.org>
- <1300274712-3931-2-git-send-email-bruna.moreira@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300274712-3931-2-git-send-email-bruna.moreira@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH] TODO: set owner of 'Define attribute server API' task
+Date: Thu, 17 Mar 2011 07:55:01 -0400
+Message-Id: <1300362901-3920-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+An initial implementation was sent as RFC.
+---
+ TODO |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-On Wed, Mar 16, 2011, Bruna Moreira wrote:
-> +gboolean g_attrib_set_buffer(GAttrib *attrib, int mtu)
-> +{
-> +	if (mtu < ATT_DEFAULT_LE_MTU)
-> +		mtu = ATT_DEFAULT_LE_MTU;
-> +
-> +	if (mtu > ATT_MAX_MTU)
-> +		mtu = ATT_MAX_MTU;
-> +
-> +	if (!bt_io_set(attrib->io, BT_IO_L2CAP, NULL,
-> +			BT_IO_OPT_OMTU, mtu,
-> +			BT_IO_OPT_INVALID))
-> +		return FALSE;
-> +
-> +	attrib->buf = g_realloc(attrib->buf, mtu);
-> +
-> +	attrib->buflen = mtu;
-> +
-> +	return TRUE;
-> +}
+diff --git a/TODO b/TODO
+index 1120ad9..6932c4e 100644
+--- a/TODO
++++ b/TODO
+@@ -224,6 +224,7 @@ ATT/GATT
+ 
+   Priority: Low
+   Complexity: C2
++  Owner: Anderson Lizardo <anderson.lizardo@openbossa.org>
+ 
+ Management Interface
+ ====================
+-- 
+1.7.0.4
 
-Wouldn't g_attrib_set_mtu make more sense for the name of this function?
-Since it's named symmetrically to the _get version one would expect it
-to take a buffer as an input parameter, but it's not doing that.
-
-Johan
