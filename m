@@ -1,27 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <hombre71@gmail.com>
-CC: <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
-Date: Thu, 17 Mar 2011 11:50:28 +0200
-Subject: RE: [PATCH v5 2/4] Add support for SAP protocol
-Message-ID: <99B09243E1A5DA4898CDD8B70011144810830AAEF3@EXMB04.eu.tieto.com>
-References: <1300277421-8053-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1300277421-8053-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <AANLkTinF695CSLoSgxCn1LOiZ=jF-Z8OjAsEeY52K8GG@mail.gmail.com>
-In-Reply-To: <AANLkTinF695CSLoSgxCn1LOiZ=jF-Z8OjAsEeY52K8GG@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Add 'Protocol not supported' error in a2dp_add_sep
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1300276872-20149-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1300276872-20149-1-git-send-email-dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 17 Mar 2011 09:45:49 +0200
+Message-ID: <1300347949.2509.11.camel@dp-x301>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Angus.H,
+Hi,
 
->A lot of code could be refactored.
->Quite a few repeatable (logically) blocks in every 
->"...._req()" and "..._rsp()" handlers.
->
+On Wed, 2011-03-16 at 14:01 +0200, ext Dmitriy Paliy wrote:
+> 'Protocol not supported' error code is added to registeration of A2DP
+> end-points. Error response org.bluez.Error.NotSupported instead of
+> org.bluez.Error.InvalidArguments is used when SEP registration fails
+> due to disabled corresponding interface in audio.conf.
 
-Indeed, but those blocks are not equal in all cases. Thus, I prefere to split it up into seperate functions instead of having one big function with switch-case statement.
-It's not like we can replace those blocks with one generic function without switch-case.  I consider this as slightly more readable. However, I'm not strongly opposed to change it one function.
+Seems like there were some comment about this patch that I missed. Could
+anybody post a reply with them to this email?
 
-Waldek
+Thanks,
+Dmitriy
+
+
