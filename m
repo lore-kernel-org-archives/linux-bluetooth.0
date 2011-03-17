@@ -1,44 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Elvis=20Pf=C3=BCtzenreuter?= <epx@signove.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: epx@signove.com
-Subject: [PATCH] Update TODO regarding bt_uuid_* functions
-Date: Wed, 16 Mar 2011 22:36:54 -0300
-Message-Id: <1300325814-6247-1-git-send-email-epx@signove.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH 13/15] GATT server: add characteristic registration
+Date: Wed, 16 Mar 2011 21:00:37 -0400
+Message-Id: <1300323639-13296-14-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- TODO |   14 ++++----------
- 1 files changed, 4 insertions(+), 10 deletions(-)
+ plugins/gatt-profile.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 45 insertions(+), 0 deletions(-)
 
-diff --git a/TODO b/TODO
-index 1120ad9..3351ac9 100644
---- a/TODO
-+++ b/TODO
-@@ -17,18 +17,12 @@ Background
- General
- ==========
+diff --git a/plugins/gatt-profile.c b/plugins/gatt-profile.c
+index 83006fb..4cf0164 100644
+--- a/plugins/gatt-profile.c
++++ b/plugins/gatt-profile.c
+@@ -427,6 +427,49 @@ static uint16_t service_size(struct gatt_service *svc)
+ 	return size;
+ }
  
--- UUID128 handling: Create new functions to handle UUIDs on host order.
--  Functions should start with prefix "bt_uuid". In the first phase, attribute
--  server/client and gatttool code should be changed to use these new functions.
--  The idea is to keep the consistency for UUID-16, UUID-32 and UUID-128. SDP
--  functions store UUID-16 and UUID-32 on host order, however UUID-128 is stored
--  on network order/big endian. Attribute Protocol uses little endian, while
--  SDP uses big endian. The idea is always store the UUID values on host order
--  and use utility functions to convert to the proper byte order depending on
--  the protocol: ATT or SDP.
-+- UUID handling: Use the new functions created for UUID handling in all parts
-+  of BlueZ code.  Currently, the new bt_uuid_* functions are being used by
-+  GATT-related code only.
++static void register_characteristics(gpointer data, gpointer user_data)
++{
++	struct gatt_characteristic *chr = data;
++	GSList **attrs = user_data, *l;
++	struct attribute *a;
++	uint16_t handle;
++	bt_uuid_t uuid;
++	char uuidstr[MAX_LEN_UUID_STR];
++	uint8_t atval[ATT_MAX_VALUE_LEN];
++	int atlen;
++
++	bt_uuid_to_string(&chr->value_uuid, uuidstr, MAX_LEN_UUID_STR);
++	DBG("characteristic: props=0x%02x, value_uuid=%s", chr->props, uuidstr);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
++
++	l = g_slist_last(*attrs);
++	g_assert(l != NULL);
++
++	a = l->data;
++	handle = a->handle + 1;
++
++	atval[0] = chr->props;
++	att_put_u16(handle + 1, &atval[1]);
++	att_put_uuid(chr->value_uuid, &atval[3]);
++	if (chr->value_uuid.type == BT_UUID16)
++		atlen = 2;
++	else
++		atlen = 16;
++
++	/* Characteristic declaration attribute */
++	a = attrib_db_add(handle++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval,
++								atlen + 3);
++	g_assert(a != NULL);
++	*attrs = g_slist_append(*attrs, a);
++
++	/* Characteristic value attribute */
++	a = attrib_db_add(handle, &chr->value_uuid, ATT_NONE,
++				ATT_NOT_PERMITTED, chr->value, chr->vlen);
++	g_assert(a != NULL);
++	*attrs = g_slist_append(*attrs, a);
++}
++
+ static void register_services(gpointer data, gpointer user_data)
+ {
+ 	struct gatt_service *svc = data;
+@@ -477,6 +520,8 @@ static void register_services(gpointer data, gpointer user_data)
  
-   Priority: high
--  Complexity: C1
-+  Complexity: C4
+ 		DBG("include: handle=0x%04x", a->handle);
+ 	}
++
++	g_slist_foreach(svc->chars, register_characteristics, &svc->attrs);
+ }
  
- - Rename glib-helper file to a more convenient name. The ideia is try to keep
-   only sdp helpers functions. bt_* prefix shall be also changed.
+ static void free_services(gpointer data, gpointer user_data)
 -- 
-1.7.1
+1.7.0.4
 
