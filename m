@@ -2,81 +2,159 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH 13/15] GATT server: add characteristic registration
-Date: Wed, 16 Mar 2011 21:00:37 -0400
-Message-Id: <1300323639-13296-14-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH 15/15] GATT server: add disconnect watch
+Date: Wed, 16 Mar 2011 21:00:39 -0400
+Message-Id: <1300323639-13296-16-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1300323639-13296-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The disconnect watch is used to delete attributes added by a client. The
+added attributes are only useful while the D-Bus client which added them
+is alive, otherwise read/write callbacks, notifications and indications
+will not work.
 ---
- plugins/gatt-profile.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 45 insertions(+), 0 deletions(-)
+ plugins/gatt-profile.c |   64 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 58 insertions(+), 6 deletions(-)
 
 diff --git a/plugins/gatt-profile.c b/plugins/gatt-profile.c
-index 83006fb..4cf0164 100644
+index 521befe..600efa1 100644
 --- a/plugins/gatt-profile.c
 +++ b/plugins/gatt-profile.c
-@@ -427,6 +427,49 @@ static uint16_t service_size(struct gatt_service *svc)
- 	return size;
- }
+@@ -44,6 +44,11 @@
+ static DBusConnection *connection = NULL;
+ static const char *any_path = NULL;
  
-+static void register_characteristics(gpointer data, gpointer user_data)
-+{
-+	struct gatt_characteristic *chr = data;
-+	GSList **attrs = user_data, *l;
-+	struct attribute *a;
-+	uint16_t handle;
-+	bt_uuid_t uuid;
-+	char uuidstr[MAX_LEN_UUID_STR];
-+	uint8_t atval[ATT_MAX_VALUE_LEN];
-+	int atlen;
++struct client_data {
++	GSList *attrs; /* All attributes registered by this client */
++	guint listener_id;
++};
 +
-+	bt_uuid_to_string(&chr->value_uuid, uuidstr, MAX_LEN_UUID_STR);
-+	DBG("characteristic: props=0x%02x, value_uuid=%s", chr->props, uuidstr);
-+
-+	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
-+
-+	l = g_slist_last(*attrs);
-+	g_assert(l != NULL);
-+
-+	a = l->data;
-+	handle = a->handle + 1;
-+
-+	atval[0] = chr->props;
-+	att_put_u16(handle + 1, &atval[1]);
-+	att_put_uuid(chr->value_uuid, &atval[3]);
-+	if (chr->value_uuid.type == BT_UUID16)
-+		atlen = 2;
-+	else
-+		atlen = 16;
-+
-+	/* Characteristic declaration attribute */
-+	a = attrib_db_add(handle++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval,
-+								atlen + 3);
-+	g_assert(a != NULL);
-+	*attrs = g_slist_append(*attrs, a);
-+
-+	/* Characteristic value attribute */
-+	a = attrib_db_add(handle, &chr->value_uuid, ATT_NONE,
-+				ATT_NOT_PERMITTED, chr->value, chr->vlen);
-+	g_assert(a != NULL);
-+	*attrs = g_slist_append(*attrs, a);
-+}
-+
- static void register_services(gpointer data, gpointer user_data)
+ struct gatt_descriptor {
+ 	uint16_t type;
+ 	union {
+@@ -568,6 +573,7 @@ static void register_services(gpointer data, gpointer user_data)
+ static void free_services(gpointer data, gpointer user_data)
  {
  	struct gatt_service *svc = data;
-@@ -477,6 +520,8 @@ static void register_services(gpointer data, gpointer user_data)
++	GSList **attrs = user_data;
+ 	GSList *cl;
  
- 		DBG("include: handle=0x%04x", a->handle);
- 	}
+ 	for (cl = svc->chars; cl; cl = cl->next) {
+@@ -593,6 +599,9 @@ static void free_services(gpointer data, gpointer user_data)
+ 	g_free(svc->id);
+ 	g_slist_free(svc->includes);
+ 
++	if (attrs)
++		*attrs = g_slist_concat(*attrs, svc->attrs);
 +
-+	g_slist_foreach(svc->chars, register_characteristics, &svc->attrs);
+ 	g_free(svc);
  }
  
- static void free_services(gpointer data, gpointer user_data)
+@@ -639,7 +648,8 @@ static void update_includes(gpointer data, gpointer user_data)
+ 	}
+ }
+ 
+-static int add_xml_profile(DBusConnection *conn, const char *profile)
++static int add_xml_profile(DBusConnection *conn, const char *profile,
++								GSList **attrs)
+ {
+ 	GMarkupParser parser = { element_start, element_end, NULL, NULL, NULL };
+ 	GMarkupParseContext *ctx;
+@@ -656,7 +666,7 @@ static int add_xml_profile(DBusConnection *conn, const char *profile)
+ 	g_slist_foreach(services, resolve_includes, services);
+ 	g_slist_foreach(services, register_services, NULL);
+ 	g_slist_foreach(services, update_includes, NULL);
+-	g_slist_foreach(services, free_services, NULL);
++	g_slist_foreach(services, free_services, attrs);
+ 	g_slist_free(services);
+ 
+ 	g_markup_parse_context_free(ctx);
+@@ -664,23 +674,59 @@ static int add_xml_profile(DBusConnection *conn, const char *profile)
+ 	return ret;
+ }
+ 
++static void exit_callback(DBusConnection *conn, void *user_data)
++{
++	struct client_data *client = user_data;
++	GSList *l;
++
++	DBG("client=%p", client);
++
++	for (l = client->attrs; l; l = l->next) {
++		struct attribute *a = l->data;
++
++		attrib_db_del(a->handle);
++	}
++
++	g_slist_free(client->attrs);
++	client->attrs = NULL;
++}
++
+ static DBusMessage *add_profile(DBusConnection *conn, DBusMessage *msg,
+ 								void *user_data)
+ {
+-	const char *profile;
++	struct client_data *client = user_data;
++	const char *sender, *profile;
+ 	int err;
+ 
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &profile,
+ 							DBUS_TYPE_INVALID))
+ 		return NULL;
+ 
+-	err = add_xml_profile(conn, profile);
++	err = add_xml_profile(conn, profile, &client->attrs);
+ 	if (err < 0)
+ 		return btd_error_failed(msg, strerror(-err));
+ 
++	sender = dbus_message_get_sender(msg);
++	client->listener_id = g_dbus_add_disconnect_watch(conn, sender,
++					exit_callback, client, NULL);
++
++	DBG("listener_id %d", client->listener_id);
++
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static void destroy_interface(void *user_data)
++{
++	struct client_data *client = user_data;
++
++	DBG("client=%p", client);
++
++	g_dbus_remove_watch(connection, client->listener_id);
++	exit_callback(connection, client);
++
++	g_free(client);
++}
++
+ static GDBusMethodTable gatt_profile_methods[] = {
+ 	{ "AddProfile", "s", "", add_profile },
+ 	{ }
+@@ -688,13 +734,19 @@ static GDBusMethodTable gatt_profile_methods[] = {
+ 
+ static int register_interface(const char *path, struct btd_adapter *adapter)
+ {
++	struct client_data *client;
++
+ 	DBG("path %s", path);
+ 
++	client = g_new0(struct client_data, 1);
++
+ 	if (!g_dbus_register_interface(connection, path, GATT_PROFILE_INTERFACE,
+-					gatt_profile_methods, NULL, NULL, NULL,
+-					NULL)) {
++					gatt_profile_methods, NULL, NULL,
++					client, destroy_interface)) {
+ 		error("D-Bus failed to register %s interface",
+ 							GATT_PROFILE_INTERFACE);
++		g_free(client);
++
+ 		return -EIO;
+ 	}
+ 
 -- 
 1.7.0.4
 
