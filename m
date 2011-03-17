@@ -1,113 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Mar 2011 13:48:40 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"mmvinni@yahoo.com" <mmvinni@yahoo.com>,
-	"justinmattock@gmail.com" <justinmattock@gmail.com>,
-	"edt@aei.ca" <edt@aei.ca>
-Subject: Re: [PATCH] Bluetooth: Fix HCI_RESET command syncronization
-Message-ID: <20110317164840.GA2214@joana>
-References: <4D7BB10B.3080100@gmail.com>
- <1300301086-22653-1-git-send-email-padovan@profusion.mobi>
- <201103171135.20477.szymon.janc@tieto.com>
+Message-ID: <4D823499.3060208@codeaurora.org>
+Date: Thu, 17 Mar 2011 09:19:37 -0700
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201103171135.20477.szymon.janc@tieto.com>
+To: donpedro@tdcadsl.dk
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Arun Raghavan <arun.raghavan@collabora.co.uk>,
+	linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: Switching between SBC and MPEG audio on headsets
+References: <1300199261-27481-1-git-send-email-arun.raghavan@collabora.co.uk>	 <20110315170124.GA15712@jh-x301>	 <AANLkTimF0Ux=-uQiWaWH14r3_YAuyp2o=QrmyeLkWWeT@mail.gmail.com>	 <1300315111.4500.34.camel@donpedro>  <4D814334.6080407@codeaurora.org> <1300354542.4500.72.camel@donpedro>
+In-Reply-To: <1300354542.4500.72.camel@donpedro>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Pedro,
 
-* Szymon Janc <szymon.janc@tieto.com> [2011-03-17 11:35:20 +0100]:
+On 3/17/2011 2:35 AM, Peter Dons Tychsen wrote:
+> Hi Brian,
+>
+> On Wed, 2011-03-16 at 16:09 -0700, Brian Gix wrote:
+>> This is not actually true. You can have multiple media channels open
+>> simultaneously (for instance one for Video and one for Audio) which
+>> are
+>> opened with careful handshaking with the AVDTP_OPEN signaling
+>> command.
+>> In theory, this could be two audio channels as well.  If someone wants
+>> a
+>> Journaling channel, it would be opened without the AVDTP_OPEN
+>> signaling.
+>
+> Yes, except protocol-wise the new channel on PSM=0x19 could also be the
+> start of a new A2DP signaling connection (however very unlikely). As you
+> mentioned, the problem with the Journaling channel can be filtered out
+> with correct signaling.
 
-> > We can't send new commands before a cmd_complete for the HCI_RESET commnnd
-> 
-> Typo: comm*a*nd
-> 
-> > shows up.
-> > 
-> > Reported-by: Mikko Vinni <mmvinni@yahoo.com>
-> > Reported-by: Justin P. Mattock <justinmattock@gmail.com>
-> > Reported-by: Ed Tomlinson <edt@aei.ca>
-> > Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> > ---
-> >  include/net/bluetooth/hci.h |    2 ++
-> >  net/bluetooth/hci_core.c    |    3 +++
-> >  net/bluetooth/hci_event.c   |    4 +++-
-> >  3 files changed, 8 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index ec6acf2..2c0d309 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -84,6 +84,8 @@ enum {
-> >  	HCI_SERVICE_CACHE,
-> >  	HCI_LINK_KEYS,
-> >  	HCI_DEBUG_KEYS,
-> > +
-> > +	HCI_RESET,
-> >  };
-> >  
-> >  /* HCI ioctl defines */
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index b372fb8..32b82e2 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -534,6 +534,8 @@ int hci_dev_open(__u16 dev)
-> >  		set_bit(HCI_INIT, &hdev->flags);
-> >  		hdev->init_last_cmd = 0;
-> >  
-> > +		set_bit(HCI_RESET, &hdev->flags);
-> 
-> Does this work with HCI_QUIRK_NO_RESET enabled?
-> Shouldn't this bit be set only right before sending HCI_OP_RESET
-> (in hci_init_req and hci_reset_req) for doing what commit msg says?
-> 
-> Now it looks more like a workaround for initialization issue..
+AVDTP only allows a single signaling channel to exist between any two 
+peers. You are allowed to have separate signaling channels to separate 
+remote devices, but even if you are supporting multiple media streams 
+(video/audio, or audio/audio) to the same device, all AVDTP signaling 
+must be done on a single channel.
 
-Ah yes, I fixed this as well now.
+>
+> I totally agree with you that your solution is the most elegant. However
+> back when A2DP was introduced it did not seem clear to everyone how
+> multiple streams would work. Some thought it would work with multiple
+> media channels (like you suggest), and some thought it would work with
+> multiple signaling channels (with max 1 media channel).
+>
+> Most of the implementations i have seen (for headsets), unfortunately
+> ended up with the last solution. This means that they will not accept a
+> secondary media channel. This is unfortunately basically true for all of
+> the most popular chipsets and SDKs.
 
-> 
-> > +
-> >  		ret = __hci_request(hdev, hci_init_req, 0,
-> >  					msecs_to_jiffies(HCI_INIT_TIMEOUT));
-> >  
-> > @@ -1074,6 +1076,7 @@ static void hci_cmd_timer(unsigned long arg)
-> >  
-> >  	BT_ERR("%s command tx timeout", hdev->name);
-> >  	atomic_set(&hdev->cmd_cnt, 1);
-> > +	clear_bit(HCI_RESET, &hdev->flags);
-> >  	tasklet_schedule(&hdev->cmd_task);
-> >  }
-> >  
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 3fbfa50..cebe7588 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -183,6 +183,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
-> >  
-> >  	BT_DBG("%s status 0x%x", hdev->name, status);
-> >  
-> > +	clear_bit(HCI_RESET, &hdev->flags);
-> > +
-> >  	hci_req_complete(hdev, HCI_OP_RESET, status);
-> >  }
-> >  
-> > @@ -1847,7 +1849,7 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> >  	if (ev->opcode != HCI_OP_NOP)
-> >  		del_timer(&hdev->cmd_timer);
-> >  
-> > -	if (ev->ncmd) {
-> > +	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
-> >  		atomic_set(&hdev->cmd_cnt, 1);
-> >  		if (!skb_queue_empty(&hdev->cmd_q))
-> >  			tasklet_schedule(&hdev->cmd_task);
-> 
-> Maybe use unlikely() here?
+Actually, I thought I was agreeing with you about *not* having two media 
+channels open simultaneously. There are too many legacy devices in the 
+market that do not support a second media channel for audio. I was just 
+pointing out that the limitations are in the implementations, not the 
+specification. And I am a big believer in maintaining compatibility with 
+legacy devices. It is possible to have two spec compliant devices that 
+do not interoperate, which of course is why we have UPFs.
 
-We don't use this in Bluetooth.
+> Your suggestion is clever and follows the standard nicely (and would get
+> my vote for a white-paper), but i doubt it will work with many headsets
+> out there.
+>
+> Even worse, many headsets are hardcoded (not nice) to believe that the
+> 3rd channel is always the Journaling channel. That is of course, just
+> plain wrong due to the reasons you have stated.
+
+I haven't actually even encountered any headsets in the wild that 
+support Journaling.
+
+>
+> Thanks,
+>
+> /pedro
+>
+
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
