@@ -1,51 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: luiz.dentz@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Add action commands support to TODO
-Date: Fri, 18 Mar 2011 13:52:46 -0300
-Message-Id: <1300467167-32442-1-git-send-email-luiz.dentz@gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Fix adapter drivers unload order
+Date: Fri, 18 Mar 2011 16:18:50 +0200
+Message-Id: <1300457930-16282-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1300457930-16282-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1300457930-16282-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Order of unloading drivers shell be preserved as given in
+audio_manager_exit. It was reverted in 'c772636 Fix unloading of adapter
+drivers', which causes in turn bluetoothd crash on exit.
 
+Removing of media end-point results in removing of A2DP end-point for
+the corresponding A2DP server but not vice versa. Therefore, unregistering
+and destroying A2DP server, which clears all A2DP end-points, before media
+server is incorrect.
 ---
- TODO |   26 ++++++++++++++++++++++++++
- 1 files changed, 26 insertions(+), 0 deletions(-)
- create mode 100644 TODO
+ src/adapter.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/TODO b/TODO
-new file mode 100644
-index 0000000..d2bbd1a
---- /dev/null
-+++ b/TODO
-@@ -0,0 +1,26 @@
-+Background
-+==========
-+
-+- Priority scale: High, Medium and Low
-+
-+- Complexity scale: C1, C2, C4 and C8.  The complexity scale is exponential,
-+  with complexity 1 being the lowest complexity.  Complexity is a function
-+  of both task 'complexity' and task 'scope'.
-+
-+  The general rule of thumb is that a complexity 1 task should take 1-2 weeks
-+  for a person very familiar with BlueZ codebase.  Higher complexity tasks
-+  require more time and have higher uncertainty.
-+
-+  Higher complexity tasks should be refined into several lower complexity tasks
-+  once the task is better understood.
-+
-+General
-+==========
-+
-+- OBEX Actions are used to perform actions not primarily defined as OBEX
-+  commands. This actions include, for example, moving, copying and setting the
-+  permissions of objects. OBEX actions would be very useful when implementing
-+  virtual filesystems over OBEX.
-+
-+  Priority: Medium
-+  Complexity: C2
+diff --git a/src/adapter.c b/src/adapter.c
+index cc4f43e..3455237 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2494,6 +2494,7 @@ static void remove_driver(gpointer data, gpointer user_data)
+ 
+ static void unload_drivers(struct btd_adapter *adapter)
+ {
++	adapter->loaded_drivers = g_slist_reverse(adapter->loaded_drivers);
+ 	g_slist_foreach(adapter->loaded_drivers, remove_driver, adapter);
+ 	g_slist_free(adapter->loaded_drivers);
+ 	adapter->loaded_drivers = NULL;
 -- 
 1.7.1
 
