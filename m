@@ -1,17 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: [PATCH 0/1 v2] Fix adapter drivers unload order
-Date: Fri, 18 Mar 2011 16:18:49 +0200
-Message-Id: <1300457930-16282-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: Re: [PATCH] Fix adapter drivers unload order
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: ext Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+In-Reply-To: <1300448640.2478.0.camel@novo.hadess.net>
+References: <1300436729-3578-1-git-send-email-dmitriy.paliy@nokia.com>
+	 <1300448640.2478.0.camel@novo.hadess.net>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 18 Mar 2011 13:59:01 +0200
+Message-ID: <1300449541.2484.5.camel@dp-x301>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-This patch includes corrections done based on Bastien's comments.
-Thanks for reviewing.
+> > -	adapter->loaded_drivers = g_slist_prepend(adapter->loaded_drivers,
+> > -									driver);
+> > +	adapter->loaded_drivers = g_slist_append(adapter->loaded_drivers,
+> > +								driver);
+> 
+> That's usually g_slist_prepend() followed by a g_slist_reverse(), not a
+> g_slist_append().
+
+In this case append looks more appropriate if we want to be consistent
+with rest of code. To be more specific with audio_manager_init and
+audio_manager_exit, and btd_register_adapter_driver where drivers are
+appended
+adapter_drivers = g_slist_append(adapter_drivers, driver);
 
 BR,
 Dmitriy
+
 
