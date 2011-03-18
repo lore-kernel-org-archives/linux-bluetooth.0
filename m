@@ -1,35 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: [PATCH] Fix adapter drivers unload order
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: ext Bastien Nocera <hadess@hadess.net>
+From: Bastien Nocera <hadess@hadess.net>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-In-Reply-To: <1300448640.2478.0.camel@novo.hadess.net>
+Date: Fri, 18 Mar 2011 11:43:57 +0000
+In-Reply-To: <1300436729-3578-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1300436729-3578-1-git-send-email-dmitriy.paliy@nokia.com>
-	 <1300448640.2478.0.camel@novo.hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 18 Mar 2011 13:59:01 +0200
-Message-ID: <1300449541.2484.5.camel@dp-x301>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1300448640.2478.0.camel@novo.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-> > -	adapter->loaded_drivers = g_slist_prepend(adapter->loaded_drivers,
-> > -									driver);
-> > +	adapter->loaded_drivers = g_slist_append(adapter->loaded_drivers,
-> > +								driver);
+On Fri, 2011-03-18 at 10:25 +0200, Dmitriy Paliy wrote:
+> Order of unloading drivers shell be preserved as given in
+> audio_manager_exit. It was reverted in 'c772636 Fix unloading of adapter
+> drivers', which causes in turn bluetoothd crash on exit.
 > 
-> That's usually g_slist_prepend() followed by a g_slist_reverse(), not a
-> g_slist_append().
+> Removing of media end-point results in removing of A2DP end-point for
+> the corresponding A2DP server but not vice versa. Therefore, unregistering
+> and destroying A2DP server, which clears all A2DP end-points, before media
+> server is incorrect.
+> ---
+>  src/adapter.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 8c368fe..9fa7c4d 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -2258,8 +2258,8 @@ static void probe_driver(struct btd_adapter *adapter, gpointer user_data)
+>  		return;
+>  	}
+>  
+> -	adapter->loaded_drivers = g_slist_prepend(adapter->loaded_drivers,
+> -									driver);
+> +	adapter->loaded_drivers = g_slist_append(adapter->loaded_drivers,
+> +								driver);
 
-In this case append looks more appropriate if we want to be consistent
-with rest of code. To be more specific with audio_manager_init and
-audio_manager_exit, and btd_register_adapter_driver where drivers are
-appended
-adapter_drivers = g_slist_append(adapter_drivers, driver);
+That's usually g_slist_prepend() followed by a g_slist_reverse(), not a
+g_slist_append().
 
-BR,
-Dmitriy
+>  }
+>  
+>  static void load_drivers(struct btd_adapter *adapter)
 
 
