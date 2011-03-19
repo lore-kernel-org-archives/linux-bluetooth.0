@@ -1,32 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Iain Hibbert <plunky@rya-online.net>
-Date: Sun, 20 Mar 2011 20:24:22 +0000
-Subject: [PATCH] use correct size for direction value
-To: linux-bluetooth@vger.kernel.org
-Message-Id: <20110320203202.66B6A26015B@galant.ukfsn.org>
+Date: Sun, 20 Mar 2011 01:21:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Add action commands support to TODO
+Message-ID: <20110319232119.GA12435@jh-x301>
+References: <1300467167-32442-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1300467167-32442-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-frm.in is a uint8_t, so don't copy an int there directly..
-use an intermediate variable so that it works on big-endian systems
----
- src/hcidump.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+Hi Luiz,
 
-diff --git a/src/hcidump.c b/src/hcidump.c
-index af086c7..844720d 100644
---- a/src/hcidump.c
-+++ b/src/hcidump.c
-@@ -299,7 +299,8 @@ static int process_frames(int dev, int sock, int fd, unsigned long flags)
- 		while (cmsg) {
- 			switch (cmsg->cmsg_type) {
- 			case HCI_CMSG_DIR:
--				memcpy(&frm.in, CMSG_DATA(cmsg), sizeof(int));
-+				memcpy(&i, CMSG_DATA(cmsg), sizeof(int));
-+				frm.in = (uint8_t)i;
- 				break;
- 			case HCI_CMSG_TSTAMP:
- 				memcpy(&frm.ts, CMSG_DATA(cmsg),
--- 
-1.7.3.4
+On Fri, Mar 18, 2011, luiz.dentz@gmail.com wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> ---
+>  TODO |   26 ++++++++++++++++++++++++++
+>  1 files changed, 26 insertions(+), 0 deletions(-)
+>  create mode 100644 TODO
 
+Both patches have been pushed upstream. Thanks.
+
+Johan
