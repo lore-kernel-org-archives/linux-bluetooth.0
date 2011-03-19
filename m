@@ -1,71 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4D8477B8.4010803@cs.drexel.edu>
+Date: Sat, 19 Mar 2011 05:30:32 -0400
+From: Lee Trager <lt73@cs.drexel.edu>
 MIME-Version: 1.0
-In-Reply-To: <99B09243E1A5DA4898CDD8B70011144810830AAEF3@EXMB04.eu.tieto.com>
-References: <1300277421-8053-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1300277421-8053-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<AANLkTinF695CSLoSgxCn1LOiZ=jF-Z8OjAsEeY52K8GG@mail.gmail.com>
-	<99B09243E1A5DA4898CDD8B70011144810830AAEF3@EXMB04.eu.tieto.com>
-Date: Sat, 19 Mar 2011 15:57:21 +0100
-Message-ID: <AANLkTinM-5ZfMYb61PAbcN1tfTTLVsFq1Sc-5wOhTi5_@mail.gmail.com>
-Subject: Re: [PATCH v5 2/4] Add support for SAP protocol
-From: "ANGUS.H" <hombre71@gmail.com>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: marcel@holtmann.org, padovan@profusion.mobi
+CC: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] ath3k: Add ASUS BT Support
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 17, 2011 at 10:50 AM,  <Waldemar.Rymarkiewicz@tieto.com> wrote:
-> Hi Angus.H,
->
->>A lot of code could be refactored.
->>Quite a few repeatable (logically) blocks in every
->>"...._req()" and "..._rsp()" handlers.
->>
->
-> Indeed, but those blocks are not equal in all cases. Thus, I prefere to split it up into seperate functions instead of having one big function with switch-case statement.
-> It's not like we can replace those blocks with one generic function without switch-case.  I consider this as slightly more readable. However, I'm not strongly opposed to change it one function.
->
-> Waldek
->
+The ASUS USB Bluetooth module that comes with my motherboard(ASUS P8P67
+Pro) is simply a re-branded Atheros AR3011. This patch add support for
+it in the driver
 
-Hi
-I just wanted to say that refactoring of typical req() here could be
-seen as 3 or 4 internal prcedure calls,
-[ refactoring here == extracting common/repeatable code to new routine ]
+Signed-off-by: Lee Trager <lt73@cs.drexel.edu>
 
-typical req example:
-static void power_sim_off_req(struct sap_connection *conn)
- {
--       DBG("SAP_SIM_OFF_REQUEST");
-+       DBG("conn %p state %d", conn, conn->state);
-+
-+       if (conn->state != SAP_STATE_CONNECTED)
-+               goto error_rsp;
-+
-+       if (!is_power_sim_off_req_allowed(conn->processing_req))
-+               goto error_rsp;
-+
-+       conn->processing_req = SAP_POWER_SIM_OFF_REQ;
-+       sap_power_sim_off_req(conn);
-+
-+       return;
-+
-+error_rsp:
-+       error("Processing error (state %d pr 0x%02x)", conn->state,
-+                                               conn->processing_req);
-+       sap_error_rsp(conn);
- }
+--- drivers/bluetooth/ath3k.c.old	2011-03-18 04:27:26.160161039 -0400
++++ drivers/bluetooth/ath3k.c	2011-03-18 04:29:05.853945455 -0400
+@@ -36,9 +36,12 @@
+ 	/* Atheros AR3011 */
+ 	{ USB_DEVICE(0x0CF3, 0x3000) },
 
-could be represented as:
-{
-validate_req(conn, VALIDATION_RULE)
-assign_req(conn,REQ)
-send_req(conn, handlers[REQ])  ( where handlers is an array of req/rsp
-handlers to sap driver )
-error_handling:
-}
+-	/* Atheros AR3011 with sflash firmware*/
++	/* Atheros AR3011 with sflash firmware */
+ 	{ USB_DEVICE(0x0CF3, 0x3002) },
 
-
-it's just an example, more readable/maintainable.
-/AH
++	/* ASUS branded Atheros AR3011 */
++	{ USB_DEVICE(0x0B05, 0x179C) },
++
+ 	/* Atheros AR9285 Malbec with sflash firmware */
+ 	{ USB_DEVICE(0x03F0, 0x311D) },
