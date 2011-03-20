@@ -1,29 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D870E6F.4050502@Atheros.com>
-Date: Mon, 21 Mar 2011 14:08:07 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: accessing Link key within the Bluetooth module
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Iain Hibbert <plunky@rya-online.net>
+Date: Sun, 20 Mar 2011 20:24:22 +0000
+Subject: [PATCH] use correct size for direction value
+To: linux-bluetooth@vger.kernel.org
+Message-Id: <20110320203202.66B6A26015B@galant.ukfsn.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+frm.in is a uint8_t, so don't copy an int there directly..
+use an intermediate variable so that it works on big-endian systems
+---
+ src/hcidump.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-I am working on a Bluetooth AMP manager module (linked to l2cap module) 
-that require access to the Link key of the connected(paired) device.
+diff --git a/src/hcidump.c b/src/hcidump.c
+index af086c7..844720d 100644
+--- a/src/hcidump.c
++++ b/src/hcidump.c
+@@ -299,7 +299,8 @@ static int process_frames(int dev, int sock, int fd, unsigned long flags)
+ 		while (cmsg) {
+ 			switch (cmsg->cmsg_type) {
+ 			case HCI_CMSG_DIR:
+-				memcpy(&frm.in, CMSG_DATA(cmsg), sizeof(int));
++				memcpy(&i, CMSG_DATA(cmsg), sizeof(int));
++				frm.in = (uint8_t)i;
+ 				break;
+ 			case HCI_CMSG_TSTAMP:
+ 				memcpy(&frm.ts, CMSG_DATA(cmsg),
+-- 
+1.7.3.4
 
-I am trying to use the hci_find_link_key() call with the BDADDR of the 
-remote device as parameter without success. It looks like the list 
-"hci_dev.link_keys" is not getting populated in the first place.
-
-Note: The device is already paired with the local device, so the link 
-key should be available( I do see the link_key_notify_evt getting called).
-
-is there any way to access the link key of a paired device inside the 
-Bluetooth module?
-
-Regards
-Suraj
