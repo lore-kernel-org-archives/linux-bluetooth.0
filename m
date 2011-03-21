@@ -1,36 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH] Add release all sessions when adapter is switched off
-Date: Mon, 21 Mar 2011 17:39:19 +0200
-Message-Id: <1300721959-5913-1-git-send-email-dmitriy.paliy@nokia.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH v3 4/5] Bluetooth: Add add/remove_remote_oob_data management commands
+Date: Mon, 21 Mar 2011 15:42:14 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+References: <1300712821-23172-1-git-send-email-szymon.janc@tieto.com> <1300712821-23172-5-git-send-email-szymon.janc@tieto.com> <20110321142639.GA2685@piper>
+In-Reply-To: <20110321142639.GA2685@piper>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201103211542.14986.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All sessions should be released when adapter is switched off. Then a new
-RequestSession method call always results in change from power off to power
-on such ensuring operational mode. Otherwise, it is possible to end up in
-adapter state being powered off after RequestSession succeded.
----
- src/adapter.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+> Hi Szymon,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index cc4f43e..f1c0e2a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2507,6 +2507,10 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 
- 	DBG("");
- 
-+	if (adapter->mode == MODE_OFF)
-+		g_slist_foreach(adapter->mode_sessions, (GFunc)  session_free,
-+									NULL);
-+
- 	if (adapter->pending_mode == NULL)
- 		return;
- 
--- 
-1.7.1
+Hi Vinicius,
 
+> >  static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> >  {
+> >  	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+> > @@ -2673,6 +2704,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+> >  
+> >  	case HCI_EV_LE_META:
+> >  		hci_le_meta_evt(hdev, skb);
+> > +
+> 
+> Looks like you are missing a "break" here.
+
+Thanks for spotting this, will send v4 soon.
+
+> Cheers,
+
+BR,
+Szymon Janc
