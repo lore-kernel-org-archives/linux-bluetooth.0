@@ -1,70 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Dieb Martins <andre.dieb@signove.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 1/4] Add parsing for ATT Find By Type
-Date: Mon, 21 Mar 2011 09:18:31 -0300
-Message-Id: <1300709914-2838-1-git-send-email-andre.dieb@signove.com>
+Subject: [PATCH] Fix crash when unregistering a2dp driver before media driver
+Date: Mon, 21 Mar 2011 14:18:46 +0200
+Message-Id: <1300709926-32395-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- parser/att.c |   35 +++++++++++++++++++++++++++++++++++
- 1 files changed, 35 insertions(+), 0 deletions(-)
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-diff --git a/parser/att.c b/parser/att.c
-index a0fb135..134143c 100644
---- a/parser/att.c
-+++ b/parser/att.c
-@@ -330,6 +330,35 @@ static void att_find_info_resp_dump(int level, struct frame *frm)
- 	}
- }
+Since media driver uses a2dp to register its sep and store a pointer,
+this pointer may be invalid/freed when media driver is unregistered.
+
+To fix this now a2dp will also release any sep registered using media
+API.
+
+It also protect from future changes on the order of drivers removal by
+checking if pointers (sep or endpoint) are still available in the list
+before removing them.
+---
+ audio/a2dp.c  |    7 +++++++
+ audio/media.c |    3 +++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
+
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index ea4805c..8595350 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1517,6 +1517,9 @@ proceed:
  
-+static void att_find_by_type_req_dump(int level, struct frame *frm)
-+{
-+	uint16_t start = btohs(htons(get_u16(frm)));
-+	uint16_t end = btohs(htons(get_u16(frm)));
-+	uint16_t uuid = btohs(htons(get_u16(frm)));
-+
-+	p_indent(level, frm);
-+	printf("start 0x%4.4x, end 0x%4.4x, uuid 0x%4.4x\n", start, end, uuid);
-+
-+	p_indent(level, frm);
-+	printf("value");
-+	while (frm->len > 0) {
-+		printf(" 0x%2.2x", get_u8(frm));
-+	}
-+	printf("\n");
-+}
-+
-+static void att_find_by_type_resp_dump(int level, struct frame *frm)
-+{
-+	while (frm->len > 0) {
-+		uint16_t uuid = btohs(htons(get_u16(frm)));
-+		uint16_t end = btohs(htons(get_u16(frm)));
-+
-+		p_indent(level, frm);
-+		printf("Found attr 0x%4.4x, group end handle 0x%4.4x\n",
-+								uuid, end);
-+	}
-+}
-+
- static void att_read_by_type_req_dump(int level, struct frame *frm)
+ static void a2dp_unregister_sep(struct a2dp_sep *sep)
  {
- 	uint16_t start = btohs(htons(get_u16(frm)));
-@@ -426,6 +455,12 @@ void att_dump(int level, struct frame *frm)
- 		case ATT_OP_FIND_INFO_RESP:
- 			att_find_info_resp_dump(level + 1, frm);
- 			break;
-+		case ATT_OP_FIND_BY_TYPE_REQ:
-+			att_find_by_type_req_dump(level + 1, frm);
-+			break;
-+		case ATT_OP_FIND_BY_TYPE_RESP:
-+			att_find_by_type_resp_dump(level + 1, frm);
-+			break;
- 		case ATT_OP_READ_BY_TYPE_REQ:
- 			att_read_by_type_req_dump(level + 1, frm);
- 			break;
++	if (sep->endpoint)
++		media_endpoint_release(sep->endpoint);
++
+ 	avdtp_unregister_sep(sep->lsep);
+ 	g_free(sep);
+ }
+@@ -1648,12 +1651,16 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 	struct a2dp_server *server = sep->server;
+ 
+ 	if (sep->type == AVDTP_SEP_TYPE_SOURCE) {
++		if (g_slist_find(server->sources, sep) == NULL)
++			return;
+ 		server->sources = g_slist_remove(server->sources, sep);
+ 		if (server->sources == NULL && server->source_record_id) {
+ 			remove_record_from_server(server->source_record_id);
+ 			server->source_record_id = 0;
+ 		}
+ 	} else {
++		if (g_slist_find(server->sinks, sep) == NULL)
++			return;
+ 		server->sinks = g_slist_remove(server->sinks, sep);
+ 		if (server->sinks == NULL && server->sink_record_id) {
+ 			remove_record_from_server(server->sink_record_id);
+diff --git a/audio/media.c b/audio/media.c
+index d5fb29c..4b389c6 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -108,6 +108,9 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
+ {
+ 	struct media_adapter *adapter = endpoint->adapter;
+ 
++	if (g_slist_find(adapter->endpoints, endpoint) == NULL)
++		return;
++
+ 	info("Endpoint unregistered: sender=%s path=%s", endpoint->sender,
+ 			endpoint->path);
+ 
 -- 
 1.7.1
 
