@@ -1,95 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Mar 2011 21:30:54 -0500
-From: David Fries <david@fries.net>
-To: Liang Bao <tim.bao@gmail.com>,
-	Andrei Warkentin <andreiw@motorola.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Feng Tang <feng.tang@intel.com>
-Subject: Re: [PATCH] work around for l2cap NULL dereference in
- l2cap_conn_start
-Message-ID: <20110322023054.GF22204@spacedout.fries.net>
-References: <20110211035309.GA22204@spacedout.fries.net>
- <20110214145649.GE2597@joana>
- <AANLkTi==Sh2yc2JjjY5t-NKxQexKPgPwNyWo4SMju92k@mail.gmail.com>
- <20110221043601.GB22204@spacedout.fries.net>
- <AANLkTi=b5UCdyc3ZtUFCx23uYygM7eRyGu-y_wdJ5JXi@mail.gmail.com>
- <20110227191545.GB2166@joana>
- <20110228050340.GC22204@spacedout.fries.net>
- <20110228173022.GC2165@joana>
- <20110302061910.GE22204@spacedout.fries.net>
- <20110305021257.GD9005@joana>
+Message-ID: <4D87DAC6.3090409@codeaurora.org>
+Date: Mon, 21 Mar 2011 16:09:58 -0700
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110305021257.GD9005@joana>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+CC: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: SMP data within struct l2cap_conn  -vs-  single threading SMP
+References: <4D8286A4.4000706@codeaurora.org> <20110321222829.GA2910@piper>
+In-Reply-To: <20110321222829.GA2910@piper>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Mar 04, 2011 at 11:12:57PM -0300, Gustavo F. Padovan wrote:
-> Hi David,
-> 
-> * David Fries <david@fries.net> [2011-03-02 00:19:10 -0600]:
-> 
-> > On Mon, Feb 28, 2011 at 02:30:22PM -0300, Gustavo F. Padovan wrote:
-> > > Hi David,
-> > > 
-> > > * David Fries <david@fries.net> [2011-02-27 23:03:40 -0600]:
-> > > 
-> > > > On Sun, Feb 27, 2011 at 04:15:45PM -0300, Gustavo F. Padovan wrote:
-> > > > > I pushed the following patch to bluetooth-2.6 tree. It should fix the problem
-> > > > > by avoiding connections to be accepted before a L2CAP info response comes:
-> > > > 
-> > > > Is
-> > > > git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-> > > > the bluetooth-2.6 tree you mentioned?  I don't see your patch there.
-> > > > As a side note, the inline patch in your e-mail has the tabs replaced by
-> > > > spaces, once I changed them, it applied cleanly.
-> > > > 
-> > > > I first reverted to the base N900 kernel-power-2.6.28 46 (none of my
-> > > > changes or debugging), it crashed as expected.  I then applied your
-> > > > patch 743400e0, and it still crashed.  I added back the
-> > > > l2cap_conn_start parent check and some debugging in af_bluetooth.c
-> > > > dmesg debug output and patches follow.
-> > > 
-> > > I want to see a test with this patch and a recent kernel. We added many fixes
-> > > to stack in the last two years. Can you test this scenario?
-> > 
-> > I'm sorry, but apparently not, at least this post says 2.6.37 isn't
-> > going to happen for the N900 and Maemo.
-> > http://forums.internettablettalk.com/showthread.php?t=70082
-> > 
-> > I tried 2.6.37-n900 from
-> > git://gitorious.org/nokia-n900-kernel/nokia-n900-kernel.git anyway,
-> > but the display visibly degrades like it isn't being updated and
-> > doesn't apparently get any further.  I don't have anyway to debug it
-> > further.
-> 
-> I think you can test this in a desktop machine.
+Hi Vinicius,
 
-I've not been able to reproduce the bug on my desktop, and not for a
-lack of trying.
-2.6.28, l2cap_conn_start doesn't dereference parent (so it wouldn't
-crash there anyway)  N900 must have some backported patches.
-2.6.30 first kernel with that code
-2.6.30, 2.6.37+, 2.6.38-rc7+, with a debug patch to print
-the sk and parent in l2cap_conn_start, only executes the BT_CONNECT2
-path in l2cap_conn_start maybe only one in five or less times and I
-have yet to see it (on the desktop) have a NULL parent.
-This is with the following USB Bluetooth dongle,
-Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-
-Looks like I'm not going to be any more help verifying it is or isn't
-fixed with a newer bluetooth stack.  Here's a post from Liang Bao.
-
-On Tue, Mar 15, 2011 at 10:42:07PM +0800, Liang Bao wrote:
-> Hi,
+On 3/21/2011 3:28 PM, Vinicius Costa Gomes wrote:
+> Hi Brian,
 >
-> Sorry for get back so late. I am really crazy busy with my project. I tested
-> with 2.6.35-27 kernel + ubuntu 10.10 just now and seems the issue is really
-> gone. Hcidump attached for your reference. It's more than one year so it
-> might need some more time to figure out the difference of logs but as said,
-> I am really hard to find out that time. Wondering if you would like to
-> compare this with the one I attached into the mailing list a year ago.
+> Sorry for the delay,
+>
+> On 15:09 Thu 17 Mar, Brian Gix wrote:
+>>
+>> Hi Vinicius,
+>>
+>> As you probably know, I am working on adding mgmt.c plumbing into
+>> SMP, to enable user level input (Confirmation, passkeys, perhaps
+>> OOB).
+>>
+>
+> I didn't know. Cool.
+>
+>> One issue I am running into is matching up the return of user
+>> confirmation with the (struct l2cap_conn *).  There is nothing
+>> within the user confirmation aside from the bdaddr that identifies
+>> who it is intended for, and there is no one-to-one relationship
+>> between bdaddrs and L2CAP channels.
+>>
+>
+> Yeah, I can see why this is a problem.
+>
+>> What would you think about enforcing a "one at a time" SMP process?
+>>
+>
+> Short answer: seems easier to get right, but a little ugly. Long answer
+> below, opinions welcome.
+>
+>> The SMP pairing data within the l2cap_conn structure is certainly a
+>> handy place for it, however it is bulky for the times (most of the
+>> time) where SMP is *not* taking place, and as in the obvious case I
+>> mention above, there is not a handy way to track the L2CAP
+>> connection back to the user input.
+>
+> I agree that this information needs to be grouped and moved somewhere
+> else. Something similar to l2cap_pinfo? smp_pinfo perhaps?
+
+Maybe.  I will look at that mechanism. Is this a way to attach a block 
+of data to a socket?
+
+>
+>>
+>> I would like to suggest that all of the SMP data be pulled out of
+>> the l2cap_conn structure, and put into a private structure within
+>> smp.c. It can be malloc'd when the pairing process starts, free'd
+>> when it completes, and any traffic (from either the User or the
+>> Baseband) that takes place when another device is in the midst of
+>> pairing gets rejected.
+>
+> This sounds very tempting, but I don't think that imposing this
+> restriction from kernel side is the right aproach, the only hard
+> limitation that I can imagine is user interaction. And if we use
+> Just Works even that limitation is droped.
+
+The JUST_WORKS case becomes a race condition.  In my experience, because 
+there is no user interaction (aside from the initial action the caused 
+the request), this all happens in well under a second. The 
+"inconvenience factor" is therefore mitigated by it being very short.
+
+Also, for the foreseeable future, the RF links do not have the ability 
+to be connected to more than one LE peer at a time, making concurrent LE 
+SMP sessions a technical impossibility at this point regardless (except 
+in the case of multiple adapters).
+
+>
+> One question: what were your plans for dealing with multiple adapters?
+
+I didn't have any. I still sort of think that concurrent pairing is 
+unlikely to ever be a critical use case. Even though user input is a 
+user space responsibility and not kernel, I think accounting for the 
+fact that the User can only respond to a single pairing request at a 
+time should not be ignored if it can make the code simpler.
+
+>
+> Btw, it would be great if we could maintain a similar behaviour to
+> Basic Rate.
+
+There will necessarily need to be some minor changes due to the fact 
+that passkey handling is different between BR and LE. In BR, if both 
+devices have Displays and Y/N capabilities, the same passkey is 
+presented to both, and other than visual comparison, nobody has to 
+actually enter the digits.  In LE, for MITM protection without oob, one 
+of the two devices MUST be able to enter a 6 digit number.
+
+I think both BR interfaces will be maintained as is, and I am adding a 
+"one off" of the standard JUST WORKS, plus a couple explicit requests:
+
+1. If Local Device has Input capabilities, it will be asked to 
+Accept/Reject any *BONDING* requests, even if the pairing method is 
+JUST_WORKS. This isn't really necessary if not bonding. This aligns with 
+standard BR functionality, which requests confirmation even without MITM 
+authentication.
+
+2. I am writing a new MGMT function which explicitely requests a 
+passkey. The existing one for BR always supplies the baseband generated 
+passkey (which doesn't exist in LE), and passes that to user space, 
+which can be used either to visually compare, or to request user entry 
+of matching value.
+
+3. I am adding a placeholder for OOB input which I intend to leave as an 
+unused shell for now, until I see a little more about how it is done for 
+BR. I see patches being submitted by Szymon Janc for BR OOB, so I don't 
+imagine we'll be waiting for too long for that.
+
+
+>
+>>
+>> This structure local to smp.c would store both the bdaddr (to match
+>> up with user input) and the l2cap_conn * to match up with BB
+>> traffic, and provide the outbound path for the user confirmation
+>> which would otherwise be difficult to track down.
+>
+> It would be a little harder but we could do something similar to l2cap
+> when it's needed to find a socket associated with a connection.
+>
+>>
+>> Your Thoughts?
+>>
+>> --
+>> Brian Gix
+>> bgix@codeaurora.org
+>> Employee of Qualcomm Innovation Center, Inc.
+>> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+>
+>
+> Cheers,
+
 
 -- 
-David Fries <david@fries.net>
-http://fries.net/~david/ (PGP encryption key available)
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
