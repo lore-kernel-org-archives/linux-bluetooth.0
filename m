@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v4 0/5] Support for OOB in mgmt interface
-Date: Mon, 21 Mar 2011 16:43:48 +0100
-Message-ID: <1300722233-11598-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Add release all sessions when adapter is switched off
+Date: Mon, 21 Mar 2011 17:39:19 +0200
+Message-Id: <1300721959-5913-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since v3:
-- fix missing break in switch-case in hci_event_packet()
-- remove some not needed empty lines in hci.h
+All sessions should be released when adapter is switched off. Then a new
+RequestSession method call always results in change from power off to power
+on such ensuring operational mode. Otherwise, it is possible to end up in
+adapter state being powered off after RequestSession succeded.
+---
+ src/adapter.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-BR,
-Szymon Janc
-on behalf of ST-Ericsson
-
-Szymon Janc (5):
-  Bluetooth: Rename cmd to param in pending_cmd
-  Bluetooth: Allow for NULL data in mgmt_pending_add
-  Bluetooth: Add read_local_oob_data management command
-  Bluetooth: Add add/remove_remote_oob_data management commands
-  Bluetooth: Enable support for out of band association model
-
- include/net/bluetooth/hci.h      |   24 +++++
- include/net/bluetooth/hci_core.h |   18 ++++
- include/net/bluetooth/mgmt.h     |   18 ++++
- net/bluetooth/hci_core.c         |   67 +++++++++++++++
- net/bluetooth/hci_event.c        |   57 ++++++++++++-
- net/bluetooth/mgmt.c             |  175 ++++++++++++++++++++++++++++++++++++--
- 6 files changed, 351 insertions(+), 8 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index cc4f43e..f1c0e2a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2507,6 +2507,10 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 	DBG("");
+ 
++	if (adapter->mode == MODE_OFF)
++		g_slist_foreach(adapter->mode_sessions, (GFunc)  session_free,
++									NULL);
++
+ 	if (adapter->pending_mode == NULL)
+ 		return;
+ 
+-- 
+1.7.1
 
