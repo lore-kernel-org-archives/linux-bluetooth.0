@@ -1,55 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 21 Mar 2011 15:48:33 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Suraj Sumangala <suraj@Atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: accessing Link key within the Bluetooth module
+Message-ID: <20110321134833.GA8819@jh-x301>
+References: <4D870E6F.4050502@Atheros.com>
 MIME-Version: 1.0
-Date: Mon, 21 Mar 2011 14:58:32 +0100
-Message-ID: <AANLkTin3yvX_M-iA_op2ygmbP2BNd_99gp7HnoY=gzWR@mail.gmail.com>
-Subject: crash in rfcomm_check_security()
-From: Vitaly Wool <vitalywool@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4D870E6F.4050502@Atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Suraj,
 
-I experienced a kernel crash while downloading pictures using OPP to my device.
+On Mon, Mar 21, 2011, Suraj Sumangala wrote:
+> I am working on a Bluetooth AMP manager module (linked to l2cap
+> module) that require access to the Link key of the connected(paired)
+> device.
+> 
+> I am trying to use the hci_find_link_key() call with the BDADDR of
+> the remote device as parameter without success. It looks like the
+> list "hci_dev.link_keys" is not getting populated in the first
+> place.
 
-The crash turned out to happen in rfcomm_recv_sabm():
+That list only gets populated if you've enabled the management interface
+(enable_mgmt=1 module option) and have a matching user space version
+with management interface support.
 
-        /* Notify socket layer about incoming connection */
-        channel = __srv_channel(dlci);
-        if (rfcomm_connect_ind(s, channel, &d)) {
-                d->dlci = dlci;
-                d->addr = __addr(s->initiator, dlci);
-                rfcomm_dlc_link(s, d);
-
-                rfcomm_check_accept(d); <--- crash point!
-        } else {
-                rfcomm_send_dm(s, dlci);
-        }
-
-Effectively it was the rfcomm_check_security() that crashed because
-hci_conn_security(l2cap_pi(sk)->conn was NULL at the moment so
-dereferencing it resulted in the crash.
-
-As far as I can see, the flow was the following:
-
-rfcomm_run()
-  rfcomm_process_sessions()
-    rfcomm_process_rx()
-      rfcomm_recv_frame() <-- l2cap_sock_timeout() happens around here
-        rfcomm_recv_sabm()
-          rfcomm_check_accept()
-            rfcomm_check_security()
-
-I verified that session->sock->sk->state == BT_CLOSED and it confirms
-the fact that there was a race between processing received frame in a
-separate thread (with some latency then, of course) and sock timeout
-which is processed almost immediately.
-
-So the basic question is, how to handle that? Is it okay to just add a
-NULL check in rfcomm_check_security() and hope it'll get sorted out on
-its own? Or should there be an attempt to rewrite the whole sock
-timeout handling so that it's race-free?
-
-Thanks,
-   Vitaly
+Johan
