@@ -1,38 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 0/5] Support for OOB in mgmt interface
-Date: Mon, 21 Mar 2011 14:06:56 +0100
-Message-ID: <1300712821-23172-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andre Dieb Martins <andre.dieb@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andre Dieb Martins <andre.dieb@signove.com>
+Subject: [PATCH 4/4] Add parsing for Read Multiple
+Date: Mon, 21 Mar 2011 09:18:34 -0300
+Message-Id: <1300709914-2838-4-git-send-email-andre.dieb@signove.com>
+In-Reply-To: <1300709914-2838-1-git-send-email-andre.dieb@signove.com>
+References: <1300709914-2838-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since v2:
-- include Gustavo comments
-- rebase and update commands codes
-- move oob enabling part to separate patch
+---
+ parser/att.c |   28 ++++++++++++++++++++++++++++
+ 1 files changed, 28 insertions(+), 0 deletions(-)
 
-BR,
-Szymon Janc
-on behalf of ST-Ericsson
-
-Szymon Janc (5):
-  Bluetooth: Rename cmd to param in pending_cmd
-  Bluetooth: Allow for NULL data in mgmt_pending_add
-  Bluetooth: Add read_local_oob_data management command
-  Bluetooth: Add add/remove_remote_oob_data management commands
-  Bluetooth: Enable support for out of band association model
-
- include/net/bluetooth/hci.h      |   26 ++++++
- include/net/bluetooth/hci_core.h |   18 ++++
- include/net/bluetooth/mgmt.h     |   18 ++++
- net/bluetooth/hci_core.c         |   67 +++++++++++++++
- net/bluetooth/hci_event.c        |   56 ++++++++++++-
- net/bluetooth/mgmt.c             |  175 ++++++++++++++++++++++++++++++++++++--
- 6 files changed, 352 insertions(+), 8 deletions(-)
+diff --git a/parser/att.c b/parser/att.c
+index 124aaa7..329a0dc 100644
+--- a/parser/att.c
++++ b/parser/att.c
+@@ -435,6 +435,28 @@ static void att_read_blob_resp_dump(int level, struct frame *frm)
+ 	printf("\n");
+ }
+ 
++static void att_read_multi_req_dump(int level, struct frame *frm)
++{
++	p_indent(level, frm);
++	printf("Handles\n");
++
++	while (frm->len > 0) {
++		p_indent(level, frm);
++		printf("handle 0x%4.4x\n", btohs(htons(get_u16(frm))));
++	}
++}
++
++static void att_read_multi_resp_dump(int level, struct frame *frm)
++{
++	p_indent(level, frm);
++	printf("values");
++
++	while (frm->len > 0) {
++		printf(" 0x%2.2x", get_u8(frm));
++	}
++	printf("\n");
++}
++
+ static void att_read_by_group_resp_dump(int level, struct frame *frm)
+ {
+ 	uint8_t length = get_u8(frm);
+@@ -522,6 +544,12 @@ void att_dump(int level, struct frame *frm)
+ 		case ATT_OP_READ_BLOB_RESP:
+ 			att_read_blob_resp_dump(level + 1, frm);
+ 			break;
++		case ATT_OP_READ_MULTI_REQ:
++			att_read_multi_req_dump(level + 1, frm);
++			break;
++		case ATT_OP_READ_MULTI_RESP:
++			att_read_multi_resp_dump(level + 1, frm);
++			break;
+ 		case ATT_OP_READ_BY_GROUP_RESP:
+ 			att_read_by_group_resp_dump(level + 1, frm);
+ 			break;
+-- 
+1.7.1
 
