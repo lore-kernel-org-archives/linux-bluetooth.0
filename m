@@ -4,38 +4,35 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 2/5] Bluetooth: Allow for NULL data in mgmt_pending_add
-Date: Mon, 21 Mar 2011 14:06:58 +0100
-Message-ID: <1300712821-23172-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1300712821-23172-1-git-send-email-szymon.janc@tieto.com>
-References: <1300712821-23172-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 0/5] Support for OOB in mgmt interface
+Date: Mon, 21 Mar 2011 14:06:56 +0100
+Message-ID: <1300712821-23172-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since index is in mgmt_hdr it is possible to have mgmt command with
-no parameters that still needs to add itself to pending list.
+Changes since v2:
+- include Gustavo comments
+- rebase and update commands codes
+- move oob enabling part to separate patch
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/mgmt.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+BR,
+Szymon Janc
+on behalf of ST-Ericsson
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 657a02d..ebf495d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -239,7 +239,8 @@ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
- 		return NULL;
- 	}
- 
--	memcpy(cmd->param, data, len);
-+	if (data)
-+		memcpy(cmd->param, data, len);
- 
- 	cmd->sk = sk;
- 	sock_hold(sk);
--- 
-1.7.0.4
+Szymon Janc (5):
+  Bluetooth: Rename cmd to param in pending_cmd
+  Bluetooth: Allow for NULL data in mgmt_pending_add
+  Bluetooth: Add read_local_oob_data management command
+  Bluetooth: Add add/remove_remote_oob_data management commands
+  Bluetooth: Enable support for out of band association model
+
+ include/net/bluetooth/hci.h      |   26 ++++++
+ include/net/bluetooth/hci_core.h |   18 ++++
+ include/net/bluetooth/mgmt.h     |   18 ++++
+ net/bluetooth/hci_core.c         |   67 +++++++++++++++
+ net/bluetooth/hci_event.c        |   56 ++++++++++++-
+ net/bluetooth/mgmt.c             |  175 ++++++++++++++++++++++++++++++++++++--
+ 6 files changed, 352 insertions(+), 8 deletions(-)
 
