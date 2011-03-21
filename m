@@ -1,126 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<henrik.possung@stericsson.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 10/10] Bluetooth: Use kthread API in cmtp
+Date: Mon, 21 Mar 2011 14:20:06 +0100
+Message-ID: <1300713606-23523-11-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com>
+References: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinVZEW7WrkTRP-cjxrgk8xy=QLgNE2WX0BF+aoC@mail.gmail.com>
-References: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
-	<20110316204004.GA2339@joana>
-	<AANLkTin-Tc4s76OuJ26ktQXT7n5f7yMZbYWpMiv-Dfc4@mail.gmail.com>
-	<AANLkTinVZEW7WrkTRP-cjxrgk8xy=QLgNE2WX0BF+aoC@mail.gmail.com>
-Date: Mon, 21 Mar 2011 13:26:09 +0000
-Message-ID: <AANLkTim-nh=eLVWUtbvCg-Rt9kaumEju_msNsAY=LBmT@mail.gmail.com>
-Subject: Re: [RFC] Auto Connections
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: "Arun K. Singh" <arunkat@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <Ville.Tervo@nokia.com>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+kernel_thread() is a low-level implementation detail and
+EXPORT_SYMBOL(kernel_thread) is scheduled for removal.
+Use the <linux/kthread.h> API instead.
 
-On Mon, Mar 21, 2011 at 10:55 AM, Arun K. Singh <arunkat@gmail.com> wrote:
-> Hi Claudio,
->
->
->>
->> >> It is time to get opinions from some gurus!
->> >>
->> >> We need to implement automatic connections to implement the Profiles.
->> >> At the moment BlueZ supports only dual mode adapters, as consequence
->> >> BlueZ needs to start the LE connection. IMHO, it is better to leave
->> >> the responsibility to the controller, implementing "selective"
->> >> connections will only introduce more code without concrete benefits.
->> >> Configuring the controller to autonomously establish connections seems
->> >> to be the right approach to proceed.
->> >>
->> >> This topic is NOT about StartDiscovery() + CreateDevice.
->> >> StartDiscovery uses active scanning and CreateDevice uses direct
->> >> connection establishment. We need a mechanism to automatically connect
->> >> to "trusted" devices or devices flagged as "AutoConnect".
->> >>
->> >>
->> >> My initial idea is: change the LE server socket to report
->> >> outgoing(host initiated) connections through the server socket.
->> >> Awkward?
->> >> To achieve that we need to manage the LE Create Connection(using
->> >> whitelist) in the kernel, extend the management interface to control
->> >> devices in the whitelist, change the LE Connection Complete Event
->> >> handling to get the Role properly.
->> >> Pros:
->> >> - Controller manage connections
->> >> - Flexible to support  connections to "trusted" resolvable address and
->> >> passive scanning
->> >> - Only one "flow" for the connections: LE server socket
->> >> - Maybe we could hide resolvable address from the userspace, mapping
->> >> it directly to public or static random
->> >
->> > This approach have a lot of advantages. It seems the best option to me.
->> >
->> >> Cons:
->> >> - Risky
->> >
->> > Define risky here.
->> More code in the kernel, more time to get the code upstream,
->> additional verification to avoid insufficient resources when scanning
->> and connecting, but to me it seems the best approach.
->>
->> to Jaikumar:
->> The profiles will indirectly manage the connections providing
->> informations such as connection parameters(interval, window, ...) and
->> addresses, but the kernel needs to centralize/manage the connections.
->
->
-> As per section 9.3.8, a host can still perform direct connection
-> establishment procedure
-> by telling controller to "ignore the White List and process connectable
-> advertising
-> packets from a specific single device specified by the Host". Wouldn't this
-> be same
-> as letting the host[read profiles] directly manage connections?
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/cmtp/capi.c |    6 +++---
+ net/bluetooth/cmtp/cmtp.h |    9 +--------
+ net/bluetooth/cmtp/core.c |   16 +++++++++-------
+ 3 files changed, 13 insertions(+), 18 deletions(-)
 
-There are four Connection Establishment Procedures: Auto, General,
-Selective and Direct.
-CreateDevice/CreatePairedDevice will use Direct. But after pairing or
-create device("known" devices) we need a more transparent procedure. I
-am not saying that we will implement straitly Auto procedure, we will
-also need to handle the resolvable address, a hybrid approach seems to
-be more appropriated.
+diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c
+index 67cff81..744233c 100644
+--- a/net/bluetooth/cmtp/capi.c
++++ b/net/bluetooth/cmtp/capi.c
+@@ -35,6 +35,7 @@
+ #include <linux/ioctl.h>
+ #include <linux/file.h>
+ #include <linux/wait.h>
++#include <linux/kthread.h>
+ #include <net/sock.h>
+ 
+ #include <linux/isdn/capilli.h>
+@@ -143,7 +144,7 @@ static void cmtp_send_capimsg(struct cmtp_session *session, struct sk_buff *skb)
+ 
+ 	skb_queue_tail(&session->transmit, skb);
+ 
+-	cmtp_schedule(session);
++	wake_up_interruptible(sk_sleep(session->sock->sk));
+ }
+ 
+ static void cmtp_send_interopmsg(struct cmtp_session *session,
+@@ -386,8 +387,7 @@ static void cmtp_reset_ctr(struct capi_ctr *ctrl)
+ 
+ 	capi_ctr_down(ctrl);
+ 
+-	atomic_inc(&session->terminate);
+-	cmtp_schedule(session);
++	kthread_stop(session->task);
+ }
+ 
+ static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
+diff --git a/net/bluetooth/cmtp/cmtp.h b/net/bluetooth/cmtp/cmtp.h
+index c6f78f8..db43b54 100644
+--- a/net/bluetooth/cmtp/cmtp.h
++++ b/net/bluetooth/cmtp/cmtp.h
+@@ -81,7 +81,7 @@ struct cmtp_session {
+ 
+ 	char name[BTNAMSIZ];
+ 
+-	atomic_t terminate;
++	struct task_struct *task;
+ 
+ 	wait_queue_head_t wait;
+ 
+@@ -121,13 +121,6 @@ void cmtp_detach_device(struct cmtp_session *session);
+ 
+ void cmtp_recv_capimsg(struct cmtp_session *session, struct sk_buff *skb);
+ 
+-static inline void cmtp_schedule(struct cmtp_session *session)
+-{
+-	struct sock *sk = session->sock->sk;
+-
+-	wake_up_interruptible(sk_sleep(sk));
+-}
+-
+ /* CMTP init defines */
+ int cmtp_init_sockets(void);
+ void cmtp_cleanup_sockets(void);
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 16aa6bd..cce99b0 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -35,6 +35,7 @@
+ #include <linux/ioctl.h>
+ #include <linux/file.h>
+ #include <linux/init.h>
++#include <linux/kthread.h>
+ #include <net/sock.h>
+ 
+ #include <linux/isdn/capilli.h>
+@@ -287,12 +288,11 @@ static int cmtp_session(void *arg)
+ 
+ 	BT_DBG("session %p", session);
+ 
+-	daemonize("kcmtpd_ctr_%d", session->num);
+ 	set_user_nice(current, -15);
+ 
+ 	init_waitqueue_entry(&wait, current);
+ 	add_wait_queue(sk_sleep(sk), &wait);
+-	while (!atomic_read(&session->terminate)) {
++	while (!kthread_should_stop()) {
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 
+ 		if (sk->sk_state != BT_CONNECTED)
+@@ -370,9 +370,12 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
+ 
+ 	__cmtp_link_session(session);
+ 
+-	err = kernel_thread(cmtp_session, session, CLONE_KERNEL);
+-	if (err < 0)
++	session->task = kthread_run(cmtp_session, session, "kcmtpd_ctr_%d",
++								session->num);
++	if (IS_ERR(session->task)) {
++		err = PTR_ERR(session->task);
+ 		goto unlink;
++	}
+ 
+ 	if (!(session->flags & (1 << CMTP_LOOPBACK))) {
+ 		err = cmtp_attach_device(session);
+@@ -409,9 +412,8 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
+ 		/* Flush the transmit queue */
+ 		skb_queue_purge(&session->transmit);
+ 
+-		/* Kill session thread */
+-		atomic_inc(&session->terminate);
+-		cmtp_schedule(session);
++		/* Stop session thread */
++		kthread_stop(session->task);
+ 	} else
+ 		err = -ENOENT;
+ 
+-- 
+1.7.0.4
 
- We could use Direct procedure, managing(serializing) the connection
-establishment implementing logic in the kernel or userspace for the
-"known" devices. However, I prefer to transfer the responsibility to
-the controller. If I choose connections using whitelist, how the STE
-controller prioritizes the advertises? Does directed advertises have a
-higher priority?
-
->
->
->> We can't allow the profiles to control the connection directly, a
->> remote can implement more than one profile, maybe with different
->> constraints.
->
-> under direct connection establishment procedure, it should be possible for a
-> host
-> to establish connection with a remote peer device with host selected
-> connection
-> configurable parameters. Why should we deprive a bluez host of establishing
-> such a connection...
-> Or did I miss something here?
-
-At API level, what is the benefit of exposing this option to the API users?
-
-Some profiles define the recommended connection parameters, there is
-also the Slave Connection Interval Range AD type that may be used to
-in the  connection establishment.
-
-BR,
-Claudio
-
->
->
->
-> Thanks,
-> Arun
->
->
