@@ -1,61 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: <james.steele@accenture.com>
-To: <epx@signove.com>, <wjturner@vm-go.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Tue, 22 Mar 2011 19:46:37 +0100
-Subject: Re: BlueZ health device interface, problems with link security
- level?
-Message-ID: <7970713F1B9E4F489FABBDEAE1C93BC001241842F415@EMEXM3131.dir.svc.accenture.com>
-References: <AANLkTi=Kohr02dZOFS4HJknp=keMTCN47jYFOdJBN7Ze@mail.gmail.com>
-	<AANLkTimxiLzu=3Cx_LqmVo3+HCcBJ_JzWuYLXJ_kKhEz@mail.gmail.com>
-	<FA8D22F4-FDEA-4E7A-82AB-E684953D90C0@signove.com>
- <AANLkTikTJsY3-WY12hD0yTbU3u7ovW3C1CHic2WReoZq@mail.gmail.com>
-In-Reply-To: <AANLkTikTJsY3-WY12hD0yTbU3u7ovW3C1CHic2WReoZq@mail.gmail.com>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+Date: Tue, 22 Mar 2011 20:11:38 +0100
+Message-ID: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
+Subject: android: bluetoothd hung after bluetooth had been turned off
+From: Vitaly Wool <vitalywool@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Greetings,
 
->> I've gotten the device to correctly connect and exchange data if I
->> modify the call to mcap_create_instance to use BT_IO_SEC_MEDIUM
->> instead, so the MITM protection isn't required.  I'm not sure if I'm
->> doing something else wrong and BT_IO_SEC_HIGH should work, or if there
->> is indeed a problem in the BlueZ code (and if so what the correct
->> solution is).
->>
->> Does anyone else have the unmodified BlueZ code working correctly with
->> health devices?
+I'd got a nasty hang in my Android phone when I turned bluetooth off
+from the UI while the music was playing over bluetooth connection.
 
-> Another known workaround is to disable SSP mode with hciconfig
-> (hciconfig hciX sspmode 0).
+After some investigation I concluded that bluetoothd was stuck. It was
+not able to perform the a2dp_cleanup() and bluetooth_close().
+bluetoothd call stack analysis showed that poll function was called
+with an infinite timeout argument (-1).
 
-> There has been discussion whether BlueZ HDP is correct or not in this
-> respect. The HDP specification says that devices SHOULD require authenticated
-> and encrypted connections (which maps to SEC_HIGH) while some devices are
-> known not to use authentication (SEC_MEDIUM). But the word in spec is 'SHOULD',
-> not 'SHALL'.
+The timeout is initialized in g_main_context_prepare() to -1. As far
+as I understand, it may then be set either to the timeout value
+provided by source->source_funcs->prepare(), or to 0 if there is data
+pending. But as long as all the channels are g_io_unix, the timeout
+will remain set to -1 if there's no data ATM.
 
-An "authenticated" connection has a slightly ambiguous meaning in
-Bluetooth since 2.1+EDR, since you can have an authenticated link that
-does not have any MITM protection.
+I guess if the interface is taken down, it is expected that poll
+function quits with POLLERR set in revents but that hasn't happened.
+Isn't it reasonable to still have a timeout for poll to avoid such
+situations?
 
-I think the correct behavior is that HDP should be using "Level 2"
-(from GAP in the Core specification), where HDP wants the strongest
-level of security it can achieve with a device, but it does not want to
-exclude devices that do not have the capability to support input/output.
+The Android version is Gingerbread so BlueZ is 4.69.
 
-There does seem to be a slight discrepancy between SEC_MEDIUM in BlueZ
-and Security Level 2 in GAP.  I believe that the intention of Level 2
-is to propose that MITM protection is needed - however it will happily
-accept security where no MITM protection has been achieved (this being
-the difference between Level 2 and Level 3).  BlueZ however does not
-seem to propose MITM protection for SEC_MEDIUM - which would be important
-for HDP (at least in the BlueZ <-> BlueZ case).
+Any help would be greatly appreciated.
 
-James Steele
-Software Engineer
-Accenture
-
-This message is for the designated recipient only and may contain privileged, proprietary, or otherwise private information.  If you have received it in error, please notify the sender immediately and delete the original.  Any other use of the email by you is prohibited.
+Thanks,
+   Vitaly
