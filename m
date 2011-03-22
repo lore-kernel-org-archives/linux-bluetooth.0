@@ -1,42 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH] Add release all sessions when adapter is switched off
-Date: Tue, 22 Mar 2011 13:46:58 +0200
-Message-Id: <1300794418-453-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1300794418-453-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1300794418-453-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 0/1 v2] Add release all sessions when adapter is switched off
+Date: Tue, 22 Mar 2011 13:46:57 +0200
+Message-Id: <1300794418-453-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All sessions should be released when adapter is switched off. Then a new
-RequestSession method call always results in change from power off to power
-on such ensuring operational mode. Otherwise, it is possible to end up in
-adapter state being powered off after RequestSession succeded.
+Hi,
 
-g_slist_free is not called after g_slist_foreach because the list is updated
-using g_slist_remove inside of session_free, which is called for each element
-by g_slist_foreach.
----
- src/adapter.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+This is updated version to previous submission where more detailed comments
+are added explaining why g_slist_free is not called after g_slist_foreach,
+and second space is removed.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index cc4f43e..b0d1773 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2507,6 +2507,10 @@ static void set_mode_complete(struct btd_adapter *adapter)
- 
- 	DBG("");
- 
-+	if (adapter->mode == MODE_OFF)
-+		g_slist_foreach(adapter->mode_sessions, (GFunc) session_free,
-+									NULL);
-+
- 	if (adapter->pending_mode == NULL)
- 		return;
- 
--- 
-1.7.1
+BR,
+Dmitriy
 
