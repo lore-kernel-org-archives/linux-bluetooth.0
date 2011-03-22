@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Mar 2011 12:36:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix crash when unregistering a2dp driver before media
- driver
-Message-ID: <20110322103653.GA28726@jh-x301>
-References: <1300709926-32395-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <4D8825C7.1000904@Atheros.com>
+Date: Tue, 22 Mar 2011 09:59:59 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300709926-32395-1-git-send-email-luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: accessing Link key within the Bluetooth module
+References: <4D870E6F.4050502@Atheros.com> <20110321134833.GA8819@jh-x301>
+In-Reply-To: <20110321134833.GA8819@jh-x301>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Mon, Mar 21, 2011, Luiz Augusto von Dentz wrote:
-> Since media driver uses a2dp to register its sep and store a pointer,
-> this pointer may be invalid/freed when media driver is unregistered.
-> 
-> To fix this now a2dp will also release any sep registered using media
-> API.
-> 
-> It also protect from future changes on the order of drivers removal by
-> checking if pointers (sep or endpoint) are still available in the list
-> before removing them.
-> ---
->  audio/a2dp.c  |    7 +++++++
->  audio/media.c |    3 +++
->  2 files changed, 10 insertions(+), 0 deletions(-)
+On 3/21/2011 7:18 PM, Johan Hedberg wrote:
+> Hi Suraj,
+>
+> That list only gets populated if you've enabled the management interface
+> (enable_mgmt=1 module option) and have a matching user space version
+> with management interface support.
 
-Pushed upstream. Thanks.
+Thanks,
+The link key is required for creating an AMP connection.
 
-Johan
+Does it make sense to depend the AMP module on the "enable_mgmt" feature?
+Or
+Add an new link key variable to the "struct hci_conn" and update it by 
+handling the LINK KEY related HCI (Link key request/reply) events?
+>
+> Johan
+
+Regards
+Suraj
