@@ -1,37 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v5 0/5] Support for OOB in mgmt interface
-Date: Tue, 22 Mar 2011 13:12:18 +0100
-Message-ID: <1300795943-6681-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Add release all sessions when adapter is switched off
+Date: Tue, 22 Mar 2011 13:46:58 +0200
+Message-Id: <1300794418-453-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1300794418-453-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1300794418-453-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since v4:
-- include comments from Anderson Lizardo
-- use sizeof instead of hardcoded size in memcpy calls
+All sessions should be released when adapter is switched off. Then a new
+RequestSession method call always results in change from power off to power
+on such ensuring operational mode. Otherwise, it is possible to end up in
+adapter state being powered off after RequestSession succeded.
 
-BR,
-Szymon Janc
-on behalf of ST-Ericsson
+g_slist_free is not called after g_slist_foreach because the list is updated
+using g_slist_remove inside of session_free, which is called for each element
+by g_slist_foreach.
+---
+ src/adapter.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-Szymon Janc (5):
-  Bluetooth: Rename cmd to param in pending_cmd
-  Bluetooth: Allow for NULL data in mgmt_pending_add
-  Bluetooth: Add read_local_oob_data management command
-  Bluetooth: Add add/remove_remote_oob_data management commands
-  Bluetooth: Enable support for out of band association model
-
- include/net/bluetooth/hci.h      |   24 +++++
- include/net/bluetooth/hci_core.h |   18 ++++
- include/net/bluetooth/mgmt.h     |   18 ++++
- net/bluetooth/hci_core.c         |   67 +++++++++++++++
- net/bluetooth/hci_event.c        |   57 ++++++++++++-
- net/bluetooth/mgmt.c             |  173 ++++++++++++++++++++++++++++++++++++--
- 6 files changed, 349 insertions(+), 8 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index cc4f43e..b0d1773 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2507,6 +2507,10 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 	DBG("");
+ 
++	if (adapter->mode == MODE_OFF)
++		g_slist_foreach(adapter->mode_sessions, (GFunc) session_free,
++									NULL);
++
+ 	if (adapter->pending_mode == NULL)
+ 		return;
+ 
+-- 
+1.7.1
 
