@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 22 Mar 2011 14:16:43 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Suraj Sumangala <suraj@Atheros.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: accessing Link key within the Bluetooth module
+Message-ID: <20110322171643.GA2202@joana>
+References: <4D870E6F.4050502@Atheros.com>
+ <20110321134833.GA8819@jh-x301>
+ <4D8825C7.1000904@Atheros.com>
 MIME-Version: 1.0
-Date: Tue, 22 Mar 2011 20:11:38 +0100
-Message-ID: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
-Subject: android: bluetoothd hung after bluetooth had been turned off
-From: Vitaly Wool <vitalywool@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4D8825C7.1000904@Atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings,
+Hi Suraj,
 
-I'd got a nasty hang in my Android phone when I turned bluetooth off
-from the UI while the music was playing over bluetooth connection.
+* Suraj Sumangala <suraj@Atheros.com> [2011-03-22 09:59:59 +0530]:
 
-After some investigation I concluded that bluetoothd was stuck. It was
-not able to perform the a2dp_cleanup() and bluetooth_close().
-bluetoothd call stack analysis showed that poll function was called
-with an infinite timeout argument (-1).
+> Hi Johan,
+> 
+> On 3/21/2011 7:18 PM, Johan Hedberg wrote:
+> > Hi Suraj,
+> >
+> > That list only gets populated if you've enabled the management interface
+> > (enable_mgmt=1 module option) and have a matching user space version
+> > with management interface support.
+> 
+> Thanks,
+> The link key is required for creating an AMP connection.
+> 
+> Does it make sense to depend the AMP module on the "enable_mgmt" feature?
 
-The timeout is initialized in g_main_context_prepare() to -1. As far
-as I understand, it may then be set either to the timeout value
-provided by source->source_funcs->prepare(), or to 0 if there is data
-pending. But as long as all the channels are g_io_unix, the timeout
-will remain set to -1 if there's no data ATM.
+Yes, but does not use enable_mgmt in your code.
 
-I guess if the interface is taken down, it is expected that poll
-function quits with POLLERR set in revents but that hasn't happened.
-Isn't it reasonable to still have a timeout for poll to avoid such
-situations?
-
-The Android version is Gingerbread so BlueZ is 4.69.
-
-Any help would be greatly appreciated.
-
-Thanks,
-   Vitaly
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
