@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Mar 2011 11:16:28 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] telephony-ofono: fix handling of
- telephony_key_press_req
-Message-ID: <20110324091628.GA30621@jh-x301>
-References: <1300894927-31702-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1300894927-31702-1-git-send-email-luiz.dentz@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] TODO: Add item related to authorization and authentication
+Date: Wed, 23 Mar 2011 16:40:12 -0300
+Message-Id: <1300909212-15709-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1300909212-15709-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1300909212-15709-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ TODO |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-On Wed, Mar 23, 2011, Luiz Augusto von Dentz wrote:
-> ---
->  audio/telephony-ofono.c |   10 ++++------
->  1 files changed, 4 insertions(+), 6 deletions(-)
+diff --git a/TODO b/TODO
+index b05cfc0..0e06f99 100644
+--- a/TODO
++++ b/TODO
+@@ -124,6 +124,15 @@ ATT/GATT
+   Priority: Medium
+   Complexity: C1
+ 
++- At the moment authentication and authorization is not supported at the
++  same time, read/write requirements in the attribute server needs to
++  be extended. According to Bluetooth Specification a server shall check
++  authentication and authorization requirements before any other check is
++  performed.
++
++  Priority: Medium
++  Complexity: C1
++
+ - ATT/GATT parsing to hcidump. Partially implemented, missing to fix
+   multiple advertises in the same event and RSSI.
+ 
+-- 
+1.7.4.1
 
-Pushed upstream. Thanks. Btw, don't be afraid to use a bit more verbose
-commit messages. I can guess what was wrong with the original code, but
-it would be nice to have it explicitly stated in the commit message.
-
-Johan
