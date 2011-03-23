@@ -1,66 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: BlueZ health device interface, problems with link security level?
-Mime-Version: 1.0 (Apple Message framework v1082)
-Content-Type: text/plain; charset=us-ascii
-From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
-In-Reply-To: <20110323092612.GA16903@jh-x301>
-Date: Wed, 23 Mar 2011 08:44:56 -0300
-Cc: Santiago Carot <sancane@gmail.com>, james.steele@accenture.com,
-	wjturner@vm-go.com, linux-bluetooth@vger.kernel.org
-Message-Id: <04A63FE3-17AC-4C4C-A5B7-CDACC10A8917@signove.com>
-References: <AANLkTi=Kohr02dZOFS4HJknp=keMTCN47jYFOdJBN7Ze@mail.gmail.com> <AANLkTimxiLzu=3Cx_LqmVo3+HCcBJ_JzWuYLXJ_kKhEz@mail.gmail.com> <FA8D22F4-FDEA-4E7A-82AB-E684953D90C0@signove.com> <AANLkTikTJsY3-WY12hD0yTbU3u7ovW3C1CHic2WReoZq@mail.gmail.com> <7970713F1B9E4F489FABBDEAE1C93BC001241842F415@EMEXM3131.dir.svc.accenture.com> <AANLkTin2vUmA5Y0Vx_JuoBJ9XviTqgDQsGzde=g+0PP=@mail.gmail.com> <20110323092612.GA16903@jh-x301>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-ID: <4D89DCE6.7050106@interlinx.bc.ca>
+Date: Wed, 23 Mar 2011 07:43:34 -0400
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+MIME-Version: 1.0
+To: Brad Midgley <bmidgley-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>	<4D7DF55D.2010402@interlinx.bc.ca>	<4D7E0A15.5000708@interlinx.bc.ca>	<4D7E211F.1030000@interlinx.bc.ca> <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
+In-Reply-To: <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigB982E9F8BD1039E47C0F5AA2"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigB982E9F8BD1039E47C0F5AA2
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On 23 Mar 2011, at 06:26 , Johan Hedberg wrote:
+On 11-03-14 11:29 AM, Brad Midgley wrote:
+> Brian,
 
-> Hi,
-> 
-> On Wed, Mar 23, 2011, Santiago Carot wrote:
->>>> There has been discussion whether BlueZ HDP is correct or not in this
->>>> respect. The HDP specification says that devices SHOULD require authenticated
->>>> and encrypted connections (which maps to SEC_HIGH) while some devices are
->>>> known not to use authentication (SEC_MEDIUM). But the word in spec is 'SHOULD',
->>>> not 'SHALL'.
->>> 
->>> An "authenticated" connection has a slightly ambiguous meaning in
->>> Bluetooth since 2.1+EDR, since you can have an authenticated link that
->>> does not have any MITM protection.
->>> 
->>> I think the correct behavior is that HDP should be using "Level 2"
->>> (from GAP in the Core specification), where HDP wants the strongest
->>> level of security it can achieve with a device, but it does not want to
->>> exclude devices that do not have the capability to support input/output.
->>> 
->>> There does seem to be a slight discrepancy between SEC_MEDIUM in BlueZ
->>> and Security Level 2 in GAP.  I believe that the intention of Level 2
->>> is to propose that MITM protection is needed - however it will happily
->>> accept security where no MITM protection has been achieved (this being
->>> the difference between Level 2 and Level 3).  BlueZ however does not
->>> seem to propose MITM protection for SEC_MEDIUM - which would be important
->>> for HDP (at least in the BlueZ <-> BlueZ case).
->> 
->> I remember that issue with we were developing HDP and MCAP. We set
->> SEC_HIGH in HDP to get encrypted channels and to pass Bluetooth PTS.
->> The problem doing that is related with devices that don't support MITM
->> protection (In fact if they don't have any
->> user input capabilities). This may be a good opportunity to go back
->> about this issue. What do you think?
->> 
->> In any case, such as Elvis has said, you can disable sspmode to get
->> HDP working without modify BlueZ code.
-> 
-> Either I just don't remember correctly how SEC_MEDIUM is supposed to
-> work or then there's some confusion here. Medium security will require
-> encryption. The main difference that high security brings is that
-> unauthenticated link keys will not be accepted. Furthermore, you should
-> also be able to get an authenticated link key with medium security as
-> long as both sides have the IO capabilities for it and at least one side
-> requires MITM protection (only if *neither* side requires MITM will Just
-> Works be triggered).
+Hey Brad,
 
-So it is a matter of testing HDP with Nonin oximeter (which works with
-HIGH security) having BlueZ set to MEDIUM. If it works ok, we should
-submit a patch to change HDP to MEDIUM.
+> iirc, the hcitool output tells you the role of the local adapter in
+> the connection. So when you see 'master' in that list, it's what you
+> want. You should also be requesting master when you try hcitool.
+
+Does the above still jive with all of this:
+
+$ hciconfig hci0 lm
+hci0:	Type: BR/EDR  Bus: USB
+	BD Address: 00:02:72:1E:E0:12  ACL MTU: 1021:7  SCO MTU: 64:1
+	Link mode: SLAVE ACCEPT
+
+Notice the B/T adapter's link mode is set to slave, yet...
+
+$ hcitool con
+Connections:
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+
+In the connection with the mouse, the B/T adapter is master.
+
+I can change it successfully:
+
+brian@pc:~$ sudo hciconfig hci0 lm master,accept
+brian@pc:~$ hciconfig hci0 lm
+hci0:	Type: BR/EDR  Bus: USB
+	BD Address: 00:02:72:1E:E0:12  ACL MTU: 1021:7  SCO MTU: 64:1
+	Link mode: ACCEPT MASTER
+
+Which doesn't change the connection with the mouse:
+
+$ hcitool con
+Connections:
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+
+When I connect the headset using the bluetooth-applet:
+
+$ hcitool con
+Connections:
+	< eSCO 00:18:6B:E5:4F:7E handle 6 state 1 lm SLAVE
+	< ACL 00:18:6B:E5:4F:7E handle 12 state 1 lm MASTER AUTH ENCRYPT
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+
+The connection with the headset itself has the B/T adapter as master but
+this eSCO connection is slave?
+
+Oh wait.  The eSCO connection disappeared now:
+
+$ hcitool con
+Connections:
+	< ACL 00:18:6B:E5:4F:7E handle 12 state 1 lm MASTER AUTH ENCRYPT
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+
+Now that I play something through the headset it comes back:
+
+Connections:
+	< eSCO 00:18:6B:E5:4F:7E handle 6 state 1 lm SLAVE
+	< ACL 00:18:6B:E5:4F:7E handle 12 state 1 lm MASTER AUTH ENCRYPT
+	> ACL 00:1F:20:0F:30:6A handle 11 state 1 lm MASTER
+
+I guess that eSCO connection is only active when there is audio sent to
+the headset perhaps.
+
+I sure wish I could get all of this to work reliably.  Even if I had to
+follow a recipe of manual steps -- something I have not yet been able to
+figure out with any consistency.
+
+b.
+
+
+--------------enigB982E9F8BD1039E47C0F5AA2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk2J3OYACgkQl3EQlGLyuXDndgCfUOJenJtECdRCjDRyYISypZWX
+/t4An3wS7ZdrU6bBVRzV1Ccc+Fb+BOWh
+=f3lD
+-----END PGP SIGNATURE-----
+
+--------------enigB982E9F8BD1039E47C0F5AA2--
