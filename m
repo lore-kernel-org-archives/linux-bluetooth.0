@@ -1,48 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: linus.ml.walleij@gmail.com
-In-Reply-To: <20110323142719.GA17369@suse.de>
-References: <1300888803-26474-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
-	<20110323142719.GA17369@suse.de>
-Date: Wed, 23 Mar 2011 18:55:28 +0100
-Message-ID: <AANLkTikZD5qie4y=tRpZXuea9D+_vDSGLMr+20p_PVkC@mail.gmail.com>
-Subject: Re: [PATCH 2/2] mach-ux500: Add CG2900 devices
-From: Linus Walleij <linus.walleij@linaro.org>
-To: Greg KH <gregkh@suse.de>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>, Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>
+In-Reply-To: <4D89E589.5010909@interlinx.bc.ca>
+References: <4D6EF7ED.2090905@interlinx.bc.ca>
+	<4D740AA7.5080209@interlinx.bc.ca>
+	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>
+	<4D754A84.1020609@interlinx.bc.ca>
+	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>
+	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>
+	<4D7DF55D.2010402@interlinx.bc.ca>
+	<4D7E0A15.5000708@interlinx.bc.ca>
+	<4D7E211F.1030000@interlinx.bc.ca>
+	<AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com>
+	<4D89DCE6.7050106@interlinx.bc.ca>
+	<4D89E589.5010909@interlinx.bc.ca>
+Date: Wed, 23 Mar 2011 10:24:43 -0600
+Message-ID: <AANLkTimoiBMB0e2KrQVdPT8BjORs1PUECs0DXmxBFi8n@mail.gmail.com>
+Subject: Re: how to set adapter to master with bluez 4.69?
+From: Brad Midgley <bmidgley@gmail.com>
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Cc: Brad Midgley <bmidgley-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2011/3/23 Greg KH <gregkh@suse.de>:
+Brian,
 
->> =A0arch/arm/mach-ux500/Makefile =A0 =A0 =A0 =A0 | =A0 =A04 +
->> =A0arch/arm/mach-ux500/board-mop500.c =A0 | =A0160 ++++++++++++++++
->> =A0arch/arm/mach-ux500/devices-cg2900.c | =A0349 +++++++++++++++++++++++=
-+++++++++++
->> =A0arch/arm/mach-ux500/devices-cg2900.h | =A0 19 ++
->> =A04 files changed, 532 insertions(+), 0 deletions(-)
->> =A0create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
->> =A0create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
->
-> As this touches ARM specific code, I need an ack from the ARM maintainer
-> before I can take this through the staging tree. =A0Is there any way to
-> make it part of your drivers/staging/ submission? =A0There are other
-> examples in the staging tree already that do this, why not do that here
-> as well?
+My suggestion earlier about influencing connection order won't apply I
+think because the esco is opened indirectly after some negotiation on
+the acl connection.
 
-Hm yeah maybe it's possible if you move devices-cg2900.*
-to staging/cg2900, then split off the stuff in board-mop500.c into
-some drivers/staging/cg2900/board-mop500-cg2900.c which
-adds the device in some proper initcall.
+You could try a different headset. I think it is unusual for it to
+behave this way. I haven't played with multiple bt adapters, that
+would fix it but there's the possibility for more complications.
 
-Do you think it can be done P-G? I might have overestimated
-the work involved in moving that stuff to /staging.
-
-Yours,
-Linus Walleij
+-- 
+Brad Midgley
