@@ -1,165 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Dieb Martins <andre.dieb@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Dieb Martins <andre.dieb@signove.com>
-Subject: [PATCH 1/5] Inline ATT dump functions
-Date: Wed, 23 Mar 2011 11:46:37 -0300
-Message-Id: <1300891601-11412-1-git-send-email-andre.dieb@signove.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Arnd Bergmann <arnd@arndb.de>
+To: "Par-Gunnar Hjalmdahl" <par-gunnar.p.hjalmdahl@stericsson.com>
+Subject: Re: [PATCH 1/2] staging: Add ST-Ericsson CG2900 driver
+Date: Wed, 23 Mar 2011 15:46:09 +0100
+Cc: "Greg Kroah-Hartman" <gregkh@suse.de>,
+ devel@driverdev.osuosl.org,
+ Linus Walleij <linus.walleij@linaro.org>,
+ linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org,
+ Pavan Savoy <pavan_savoy@sify.com>,
+ Vitaly Wool <vitalywool@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+ Linus Walleij <linus.walleij@stericsson.com>,
+ "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Lee Jones <lee.jones@linaro.org>
+References: <1300888771-26437-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+In-Reply-To: <1300888771-26437-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Message-Id: <201103231546.10206.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- parser/att.c |   32 ++++++++++++++++----------------
- 1 files changed, 16 insertions(+), 16 deletions(-)
+On Wednesday 23 March 2011, Par-Gunnar Hjalmdahl wrote:
+> +TODO
+> +----
+> +
+> + - Decide upon architecture. Some people consider architecture in the cg2900
+> +   driver to be too complex. We consider it to be not more complex than needed.
+> +
+> + - Currently the cg2900_uart registers as protocol driver against hci_ldisc.c.
+> +   There is however some common functionality with hci_h4.c and the cg2900 could
+> +   therefore register it's vendor specific channels to hci_h4.c, but this would
+> +   require adding a registration functionality in the hci_h4 file.
+> +
+> + - Some people demand that the cg2900 driver re-use the Bluetooth driver to send
+> +   and receive BT commands and events. That is however not possible with current
+> +   BT API and might not be feasible, for example when using FM only in
+> +   the cg2900 chip.
+> +
+> + - TI has already delivered a driver for a multi-function chip called ti-st.
+> +   This driver is currently located in drivers/misc/ti-st/. There has however
+> +   been criticism raised against design/architecture of the driver. There
+> +   currently also doesn't seem to be a way to add support for cg2900 in that
+> +   driver even though some people has raised this as an alternative.
 
-diff --git a/parser/att.c b/parser/att.c
-index 7b8b83c..6c1d0d8 100644
---- a/parser/att.c
-+++ b/parser/att.c
-@@ -257,7 +257,7 @@ static const char *uuid2str(uint16_t uuid)
- 	}
- }
- 
--static void att_error_dump(int level, struct frame *frm)
-+static inline void att_error_dump(int level, struct frame *frm)
- {
- 	uint8_t op = get_u8(frm);
- 	uint16_t handle = btohs(htons(get_u16(frm)));
-@@ -270,7 +270,7 @@ static void att_error_dump(int level, struct frame *frm)
- 	printf("%s (0x%.2x) on handle 0x%2.2x\n", attop2str(op), op, handle);
- }
- 
--static void att_mtu_req_dump(int level, struct frame *frm)
-+static inline void att_mtu_req_dump(int level, struct frame *frm)
- {
- 	uint16_t client_rx_mtu = btohs(htons(get_u16(frm)));
- 
-@@ -278,7 +278,7 @@ static void att_mtu_req_dump(int level, struct frame *frm)
- 	printf("client rx mtu %d\n", client_rx_mtu);
- }
- 
--static void att_mtu_resp_dump(int level, struct frame *frm)
-+static inline void att_mtu_resp_dump(int level, struct frame *frm)
- {
- 	uint16_t server_rx_mtu = btohs(htons(get_u16(frm)));
- 
-@@ -286,7 +286,7 @@ static void att_mtu_resp_dump(int level, struct frame *frm)
- 	printf("server rx mtu %d\n", server_rx_mtu);
- }
- 
--static void att_find_info_req_dump(int level, struct frame *frm)
-+static inline void att_find_info_req_dump(int level, struct frame *frm)
- {
- 	uint16_t start = btohs(htons(get_u16(frm)));
- 	uint16_t end = btohs(htons(get_u16(frm)));
-@@ -295,7 +295,7 @@ static void att_find_info_req_dump(int level, struct frame *frm)
- 	printf("start 0x%2.2x, end 0x%2.2x\n", start, end);
- }
- 
--static void att_find_info_resp_dump(int level, struct frame *frm)
-+static inline void att_find_info_resp_dump(int level, struct frame *frm)
- {
- 	uint8_t fmt = get_u8(frm);
- 
-@@ -330,7 +330,7 @@ static void att_find_info_resp_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_find_by_type_req_dump(int level, struct frame *frm)
-+static inline void att_find_by_type_req_dump(int level, struct frame *frm)
- {
- 	uint16_t start = btohs(htons(get_u16(frm)));
- 	uint16_t end = btohs(htons(get_u16(frm)));
-@@ -346,7 +346,7 @@ static void att_find_by_type_req_dump(int level, struct frame *frm)
- 	printf("\n");
- }
- 
--static void att_find_by_type_resp_dump(int level, struct frame *frm)
-+static inline void att_find_by_type_resp_dump(int level, struct frame *frm)
- {
- 	while (frm->len > 0) {
- 		uint16_t uuid = btohs(htons(get_u16(frm)));
-@@ -358,7 +358,7 @@ static void att_find_by_type_resp_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_read_by_type_req_dump(int level, struct frame *frm)
-+static inline void att_read_by_type_req_dump(int level, struct frame *frm)
- {
- 	uint16_t start = btohs(htons(get_u16(frm)));
- 	uint16_t end = btohs(htons(get_u16(frm)));
-@@ -385,7 +385,7 @@ static void att_read_by_type_req_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_read_by_type_resp_dump(int level, struct frame *frm)
-+static inline void att_read_by_type_resp_dump(int level, struct frame *frm)
- {
- 	uint8_t length = get_u8(frm);
- 
-@@ -406,7 +406,7 @@ static void att_read_by_type_resp_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_read_req_dump(int level, struct frame *frm)
-+static inline void att_read_req_dump(int level, struct frame *frm)
- {
- 	uint16_t handle = btohs(htons(get_u16(frm)));
- 
-@@ -414,7 +414,7 @@ static void att_read_req_dump(int level, struct frame *frm)
- 	printf("handle 0x%2.2x\n", handle);
- }
- 
--static void att_read_blob_req_dump(int level, struct frame *frm)
-+static inline void att_read_blob_req_dump(int level, struct frame *frm)
- {
- 	uint16_t handle = btohs(htons(get_u16(frm)));
- 	uint16_t offset = btohs(htons(get_u16(frm)));
-@@ -423,7 +423,7 @@ static void att_read_blob_req_dump(int level, struct frame *frm)
- 	printf("handle 0x%4.4x offset 0x%4.4x\n", handle, offset);
- }
- 
--static void att_read_blob_resp_dump(int level, struct frame *frm)
-+static inline void att_read_blob_resp_dump(int level, struct frame *frm)
- {
- 	p_indent(level, frm);
- 	printf("value");
-@@ -433,7 +433,7 @@ static void att_read_blob_resp_dump(int level, struct frame *frm)
- 	printf("\n");
- }
- 
--static void att_read_multi_req_dump(int level, struct frame *frm)
-+static inline void att_read_multi_req_dump(int level, struct frame *frm)
- {
- 	p_indent(level, frm);
- 	printf("Handles\n");
-@@ -444,7 +444,7 @@ static void att_read_multi_req_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_read_multi_resp_dump(int level, struct frame *frm)
-+static inline void att_read_multi_resp_dump(int level, struct frame *frm)
- {
- 	p_indent(level, frm);
- 	printf("values");
-@@ -454,7 +454,7 @@ static void att_read_multi_resp_dump(int level, struct frame *frm)
- 	printf("\n");
- }
- 
--static void att_read_by_group_resp_dump(int level, struct frame *frm)
-+static inline void att_read_by_group_resp_dump(int level, struct frame *frm)
- {
- 	uint8_t length = get_u8(frm);
- 
-@@ -476,7 +476,7 @@ static void att_read_by_group_resp_dump(int level, struct frame *frm)
- 	}
- }
- 
--static void att_handle_notify_dump(int level, struct frame *frm)
-+static inline void att_handle_notify_dump(int level, struct frame *frm)
- {
- 	uint16_t handle = btohs(htons(get_u16(frm)));
- 
--- 
-1.7.1
+I assume that this TODO list will evolve a bit as we start resume the
+driver. For now, I'm fine this patch going into staging (aside from
+my comments on patch 2/2). I'll do a new review soon, please ping me
+again if I haven't done it by next week.
 
+	Arnd
