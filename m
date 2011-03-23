@@ -1,98 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg Kroah-Hartman <gregkh@suse.de>,
-	<devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH 0/2] Add ST-Ericsson CG2900 driver
-Date: Wed, 23 Mar 2011 14:58:23 +0100
-Message-ID: <1300888703-26400-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/2] Add ERROR response on AT+BLDN command for maemo6
+Date: Wed, 23 Mar 2011 15:58:32 +0200
+Message-Id: <1300888712-19442-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1300888712-19442-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1300888712-19442-1-git-send-email-dmitriy.paliy@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds a driver for the ST-Ericsson CG2900 connectivity
-controller.
-It has earlier been tried to add this driver to the mfd and bluetooth
-areas, but due to continued discussions the driver is placed into
-staging for the moment.
+Response on AT+BLDN command in maemo6 telephony driver is added to be
+sent after confirmation from csd back-end. Both ERROR or OK codes are
+sent only after asynchronous response on D-Bus call is available.
+---
+ audio/telephony-maemo6.c |   26 +++++++++++++++++++++++---
+ 1 files changed, 23 insertions(+), 3 deletions(-)
 
-The patch set contains 2 patches:
- - The first patch adds the driver to the staging directory. It also
-   includes modified versions of some files from the Bluetooth UART
-   drivers.
- - The second patch contains the device setup for the mach-ux500
-   boards such as U8500.
-
-Par-Gunnar Hjalmdahl (2):
-  staging: Add ST-Ericsson CG2900 driver
-  mach-ux500: Add CG2900 devices
-
- arch/arm/mach-ux500/Makefile                     |    4 +
- arch/arm/mach-ux500/board-mop500.c               |  160 +
- arch/arm/mach-ux500/devices-cg2900.c             |  349 +++
- arch/arm/mach-ux500/devices-cg2900.h             |   19 +
- drivers/staging/Kconfig                          |    2 +
- drivers/staging/Makefile                         |    1 +
- drivers/staging/cg2900/Kconfig                   |   52 +
- drivers/staging/cg2900/Makefile                  |    6 +
- drivers/staging/cg2900/TODO                      |   21 +
- drivers/staging/cg2900/bluetooth/Makefile        |    9 +
- drivers/staging/cg2900/bluetooth/btcg2900.c      | 1203 ++++++++
- drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
- drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  652 ++++
- drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
- drivers/staging/cg2900/include/cg2900.h          |  290 ++
- drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
- drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
- drivers/staging/cg2900/mfd/Makefile              |   18 +
- drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_char_devices.c |  701 +++++
- drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
- drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
- drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
- drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
- drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
- drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
- drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
- drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
- 29 files changed, 16856 insertions(+), 0 deletions(-)
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
- create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
- create mode 100644 drivers/staging/cg2900/Kconfig
- create mode 100644 drivers/staging/cg2900/Makefile
- create mode 100644 drivers/staging/cg2900/TODO
- create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
- create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
- create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
- create mode 100644 drivers/staging/cg2900/include/cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
- create mode 100644 drivers/staging/cg2900/mfd/Makefile
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
-
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 18e7e90..e727955 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -622,6 +622,28 @@ static void remove_pending(DBusPendingCall *call)
+ 	pending_req_finalize(req);
+ }
+ 
++static void last_number_call_reply(DBusPendingCall *call, void *user_data)
++{
++	DBusError err;
++	DBusMessage *reply;
++	void *telephony_device = user_data;
++
++	reply = dbus_pending_call_steal_reply(call);
++
++	dbus_error_init(&err);
++	if (dbus_set_error_from_message(&err, reply)) {
++		error("csd replied with an error: %s, %s",
++				err.name, err.message);
++		dbus_error_free(&err);
++		telephony_dial_number_rsp(telephony_device,
++							CME_ERROR_AG_FAILURE);
++	} else
++		telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
++
++	dbus_message_unref(reply);
++	remove_pending(call);
++}
++
+ void telephony_last_dialed_number_req(void *telephony_device)
+ {
+ 	int ret;
+@@ -630,13 +652,11 @@ void telephony_last_dialed_number_req(void *telephony_device)
+ 
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+ 				CSD_CALL_INTERFACE, "CreateFromLast",
+-				NULL, NULL,
++				last_number_call_reply, telephony_device,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0)
+ 		telephony_dial_number_rsp(telephony_device,
+ 						CME_ERROR_AG_FAILURE);
+-	else
+-		telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
+ }
+ 
+ static const char *memory_dial_lookup(int location)
 -- 
-1.7.4.1
+1.7.1
+
