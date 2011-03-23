@@ -1,35 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix crash while exiting when endpoint has a a2dp stream
-Date: Wed, 23 Mar 2011 17:43:33 +0200
-Message-Id: <1300895013-32010-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] telephony-ofono: fix handling of telephony_key_press_req
+Date: Wed, 23 Mar 2011 17:42:07 +0200
+Message-Id: <1300894927-31702-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-After releasing the endpoint should not be used anymore.
 ---
- audio/a2dp.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ audio/telephony-ofono.c |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index 8595350..88c280a 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1517,8 +1517,10 @@ proceed:
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index ef4ede7..6f5685b 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -579,19 +579,17 @@ void telephony_nr_and_ec_req(void *telephony_device, gboolean enable)
  
- static void a2dp_unregister_sep(struct a2dp_sep *sep)
+ void telephony_key_press_req(void *telephony_device, const char *keys)
  {
--	if (sep->endpoint)
-+	if (sep->endpoint) {
- 		media_endpoint_release(sep->endpoint);
-+		sep->endpoint = NULL;
-+	}
+-	struct voice_call *active, *waiting;
++	struct voice_call *active, *incoming;
+ 	int err;
  
- 	avdtp_unregister_sep(sep->lsep);
- 	g_free(sep);
+ 	DBG("telephony-ofono: got key press request for %s", keys);
+ 
+-	waiting = find_vc_with_status(CALL_STATUS_INCOMING);
+-	if (!waiting)
+-		waiting = find_vc_with_status(CALL_STATUS_DIALING);
++	incoming = find_vc_with_status(CALL_STATUS_INCOMING);
+ 
+ 	active = find_vc_with_status(CALL_STATUS_ACTIVE);
+ 
+-	if (waiting)
+-		err = answer_call(waiting);
++	if (incoming)
++		err = answer_call(incoming);
+ 	else if (active)
+ 		err = release_call(active);
+ 	else
 -- 
 1.7.1
 
