@@ -1,112 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 1/2] Remove unnecessary btd_driver_data struct
-Date: Wed, 23 Mar 2011 09:20:23 -0300
-Message-Id: <1300882823-671-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <AANLkTin6PCLVm5H1o0gBFhX_XipETYCxia4ASdqjPNpL@mail.gmail.com>
-References: <AANLkTin6PCLVm5H1o0gBFhX_XipETYCxia4ASdqjPNpL@mail.gmail.com>
+Message-ID: <4D89E589.5010909@interlinx.bc.ca>
+Date: Wed, 23 Mar 2011 08:20:25 -0400
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+MIME-Version: 1.0
+To: Brad Midgley <bmidgley-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: how to set adapter to master with bluez 4.69?
+References: <4D6EF7ED.2090905@interlinx.bc.ca>	<4D740AA7.5080209@interlinx.bc.ca>	<AANLkTin3-+9txbUyFxyrirySnkjwWVeMHrZtCqGfz-4m@mail.gmail.com>	<4D754A84.1020609@interlinx.bc.ca>	<AANLkTimzHs1=z11GJ-ye10o_6PfoQ_R1RkDeS1jCVue2@mail.gmail.com>	<AANLkTi=G2_hvZrZ=pG6naJ2fw7n4_T8=3+heV29vRPRD@mail.gmail.com>	<4D7DF55D.2010402@interlinx.bc.ca>	<4D7E0A15.5000708@interlinx.bc.ca>	<4D7E211F.1030000@interlinx.bc.ca> <AANLkTi=N_5BaEOaaFsTHhNF82Vo83bzeNuzqmd9rMU3j@mail.gmail.com> <4D89DCE6.7050106@interlinx.bc.ca>
+In-Reply-To: <4D89DCE6.7050106@interlinx.bc.ca>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigD4C1AF4ECC90CE630AFCAE21"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/device.c |   29 ++++++-----------------------
- 1 files changed, 6 insertions(+), 23 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigD4C1AF4ECC90CE630AFCAE21
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/src/device.c b/src/device.c
-index e9d9e65..b4d13f2 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -67,12 +67,6 @@
- /* When all services should trust a remote device */
- #define GLOBAL_TRUST "[all]"
- 
--struct btd_driver_data {
--	guint id;
--	struct btd_device_driver *driver;
--	void *priv;
--};
--
- struct btd_disconnect_data {
- 	guint id;
- 	disconnect_watch watch;
-@@ -120,7 +114,7 @@ struct btd_device {
- 	GSList		*uuids;
- 	GSList		*services;		/* Primary services path */
- 	GSList		*primaries;		/* List of primary services */
--	GSList		*drivers;		/* List of driver_data */
-+	GSList		*drivers;		/* List of device drivers */
- 	GSList		*watches;		/* List of disconnect_data */
- 	gboolean	temporary;
- 	struct agent	*agent;
-@@ -413,15 +407,12 @@ static DBusMessage *set_trust(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
--static void driver_remove(struct btd_driver_data *driver_data,
-+static void driver_remove(struct btd_device_driver *driver,
- 						struct btd_device *device)
- {
--	struct btd_device_driver *driver = driver_data->driver;
--
- 	driver->remove(device);
- 
--	device->drivers = g_slist_remove(device->drivers, driver_data);
--	g_free(driver_data);
-+	device->drivers = g_slist_remove(device->drivers, driver);
- }
- 
- static gboolean do_disconnect(gpointer user_data)
-@@ -1145,26 +1136,21 @@ void device_probe_drivers(struct btd_device *device, GSList *profiles)
- 	for (list = device_drivers; list; list = list->next) {
- 		struct btd_device_driver *driver = list->data;
- 		GSList *probe_uuids;
--		struct btd_driver_data *driver_data;
- 
- 		probe_uuids = device_match_driver(device, driver, profiles);
- 
- 		if (!probe_uuids)
- 			continue;
- 
--		driver_data = g_new0(struct btd_driver_data, 1);
--
- 		err = driver->probe(device, probe_uuids);
- 		if (err < 0) {
- 			error("%s driver probe failed for device %s",
- 							driver->name, addr);
--			g_free(driver_data);
- 			g_slist_free(probe_uuids);
- 			continue;
- 		}
- 
--		driver_data->driver = driver;
--		device->drivers = g_slist_append(device->drivers, driver_data);
-+		device->drivers = g_slist_append(device->drivers, driver);
- 		g_slist_free(probe_uuids);
- 	}
- 
-@@ -1198,8 +1184,7 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 	DBG("Removing drivers for %s", dstaddr);
- 
- 	for (list = device->drivers; list; list = next) {
--		struct btd_driver_data *driver_data = list->data;
--		struct btd_device_driver *driver = driver_data->driver;
-+		struct btd_device_driver *driver = list->data;
- 		const char **uuid;
- 
- 		next = list->next;
-@@ -1214,9 +1199,7 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
- 
- 			driver->remove(device);
- 			device->drivers = g_slist_remove(device->drivers,
--								driver_data);
--			g_free(driver_data);
--
-+								driver);
- 			break;
- 		}
- 	}
--- 
-1.7.4.1
+Experimenting again this morning with both the mouse and the headset
+connected both with the B/T adapter as master and the eSCO connection as
+slave (since I can't seem to influence that), it was working fairly
+stably.  Every now and then all devices would just completely
+disconnected and then they would all reconnect.
 
+However this most recent disconnect of all devices resulted in the mouse
+reconnecting immediately but the headset went through a dozen or two
+reconnection attempts (i.e. as observed by watching the output of
+hcitool con with "watch -n 0") before it finally got reconnected.
+
+This is in contrast to where I can have a completely stable (i.e. days
+on end without a single hiccup) connection with just the mouse.
+
+This really is frustrating.  ~sigh~
+
+With all of the time I have pissed away on this, if I knew of a B/T
+adapter/chipset that would absolutely work stably with multiple devices
+(mouse, headset, etc.) I would just run out and buy one, but as it is, I
+am on my third B/T adapter here and still nothing works stably -- as
+opposed to my laptop where multiple devices seem to cohabitate nicely.
+
+Hrm,  Given that I have multiple B/T adapters here, I don't suppose I'd
+have any better luck by using another B/T adapter and just assigning 1
+device to each, would I?
+
+Cheers,
+b.
+
+
+--------------enigD4C1AF4ECC90CE630AFCAE21
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk2J5YkACgkQl3EQlGLyuXABsgCgjz3pLTe1/H1/Cl4UGPUyqOl5
+EusAnjN74IChGY2UTh964rNVlCXLvfMB
+=whfA
+-----END PGP SIGNATURE-----
+
+--------------enigD4C1AF4ECC90CE630AFCAE21--
