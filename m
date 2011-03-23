@@ -1,59 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
-References: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
-Date: Wed, 23 Mar 2011 19:47:40 +0100
-Message-ID: <AANLkTi=V2VHmO1R4wmo_D99X=pz4PdqBfJuTPOj8eN6s@mail.gmail.com>
-Subject: Re: android: bluetoothd hung after bluetooth had been turned off
-From: Vitaly Wool <vitalywool@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+Sender: linus.ml.walleij@gmail.com
+In-Reply-To: <20110323142719.GA17369@suse.de>
+References: <1300888803-26474-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+	<20110323142719.GA17369@suse.de>
+Date: Wed, 23 Mar 2011 18:55:28 +0100
+Message-ID: <AANLkTikZD5qie4y=tRpZXuea9D+_vDSGLMr+20p_PVkC@mail.gmail.com>
+Subject: Re: [PATCH 2/2] mach-ux500: Add CG2900 devices
+From: Linus Walleij <linus.walleij@linaro.org>
+To: Greg KH <gregkh@suse.de>,
+	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>, Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+2011/3/23 Greg KH <gregkh@suse.de>:
 
-On Tue, Mar 22, 2011 at 8:11 PM, Vitaly Wool <vitalywool@gmail.com> wrote:
-> Greetings,
+>> =A0arch/arm/mach-ux500/Makefile =A0 =A0 =A0 =A0 | =A0 =A04 +
+>> =A0arch/arm/mach-ux500/board-mop500.c =A0 | =A0160 ++++++++++++++++
+>> =A0arch/arm/mach-ux500/devices-cg2900.c | =A0349 +++++++++++++++++++++++=
++++++++++++
+>> =A0arch/arm/mach-ux500/devices-cg2900.h | =A0 19 ++
+>> =A04 files changed, 532 insertions(+), 0 deletions(-)
+>> =A0create mode 100644 arch/arm/mach-ux500/devices-cg2900.c
+>> =A0create mode 100644 arch/arm/mach-ux500/devices-cg2900.h
 >
-> I'd got a nasty hang in my Android phone when I turned bluetooth off
-> from the UI while the music was playing over bluetooth connection.
+> As this touches ARM specific code, I need an ack from the ARM maintainer
+> before I can take this through the staging tree. =A0Is there any way to
+> make it part of your drivers/staging/ submission? =A0There are other
+> examples in the staging tree already that do this, why not do that here
+> as well?
 
-as a follow-up on this, it looks like the problem is fairly generic on
-one hand but may be specific to Android, on the other.
+Hm yeah maybe it's possible if you move devices-cg2900.*
+to staging/cg2900, then split off the stuff in board-mop500.c into
+some drivers/staging/cg2900/board-mop500-cg2900.c which
+adds the device in some proper initcall.
 
-bluetoothd defines its own signal handler for SIGTERM (sig_term())
-which calls g_main_loop_quit(event_loop).
+Do you think it can be done P-G? I might have overestimated
+the work involved in moving that stuff to /staging.
 
-The latter will call g_main_context_wakeup_unlocked() which is exactly
-the following:
-
-   g_main_context_wakeup_unlocked (GMainContext *context)
-   {
-   #ifdef G_THREADS_ENABLED
-     if (g_thread_supported() && context->poll_waiting)
-       {
-         context->poll_waiting = FALSE;
-   #ifndef G_OS_WIN32
-         write (context->wake_up_pipe[1], "A", 1);
-   #else
-         ReleaseSemaphore (context->wake_up_semaphore, 1, NULL);
-   #endif
-       }
-   #endif
-
-This is meant to make bluetoothd quit waiting on a poll() call in
-g_main_context_poll() which is polling on the read descriptor of this
-pipe along with all the other descriptors supplied by bluetoothd.
-Unfortunately gthreads are not initialized in Android, moreover, this
-part of glib code is not even compiled, so g_thread_supported()
-returns false and this function is basically no-op in the Android
-case.
-
-So if there are no other events for the poll() to quit, we'll get
-stuck in poll() forever because the write to wake_up_pipe will never
-happen.
-
-Still don't have a good enough idea on how to fix it in the right way though...
-
-~Vitaly
+Yours,
+Linus Walleij
