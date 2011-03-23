@@ -1,139 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/2] Add handling of pending D-Bus calls in maemo6
-Date: Wed, 23 Mar 2011 15:58:31 +0200
-Message-Id: <1300888712-19442-1-git-send-email-dmitriy.paliy@nokia.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH 2/2] Message Access Profile: SetFolder function
+Date: Wed, 23 Mar 2011 14:56:20 +0100
+Message-Id: <1300888580-19317-3-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1300888580-19317-1-git-send-email-lkslawek@gmail.com>
+References: <1300888580-19317-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handling of pending D-Bus calls to csd back-end is added maemo6
-telephony driver.
----
- audio/telephony-maemo6.c |   65 +++++++++++++++++++++++++++++++++++++++------
- 1 files changed, 56 insertions(+), 9 deletions(-)
+This adds support for MAP SetFolder function (served by OBEX SetPath
+request).
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index ff851f3..18e7e90 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -138,6 +138,11 @@ static struct {
- 	.signal_bars = 0,
+Current directory is kept in plugin code. Storage backend offers
+messages_dir_exists() function which is used by MAP plugin to check
+whether new path is correct.
+---
+ plugins/mas.c            |   45 ++++++++++++++++++++++++++++++++++++++++++++-
+ plugins/messages-dummy.c |   17 +++++++++++++++++
+ plugins/messages.h       |    2 ++
+ 3 files changed, 63 insertions(+), 1 deletions(-)
+
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 243d2f6..1d33ca1 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -27,6 +27,7 @@
+ 
+ #include <errno.h>
+ #include <glib.h>
++#include <string.h>
+ #include <openobex/obex.h>
+ 
+ #include "plugin.h"
+@@ -87,6 +88,7 @@
+ </record>"
+ 
+ struct mas_session {
++	char *cwd;
+ 	struct mas_request *request;
  };
  
-+struct pending_req {
-+	DBusPendingCall *call;
-+	void *user_data;
-+};
-+
- static int get_property(const char *iface, const char *prop);
+@@ -96,6 +98,7 @@ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
  
- static DBusConnection *connection = NULL;
-@@ -447,10 +452,31 @@ void telephony_device_connected(void *telephony_device)
- 	}
- }
- 
-+static void pending_req_finalize(struct pending_req *req)
-+{
-+	if (!dbus_pending_call_get_completed(req->call))
-+		dbus_pending_call_cancel(req->call);
-+
-+	dbus_pending_call_unref(req->call);
-+	g_free(req);
-+	req = NULL;
-+}
-+
- void telephony_device_disconnected(void *telephony_device)
+ static void mas_clean(struct mas_session *mas)
  {
-+	GSList *l;
-+
- 	DBG("telephony-maemo6: device %p disconnected", telephony_device);
- 	events_enabled = FALSE;
-+
-+	for (l = pending; l; l = l->next) {
-+		struct pending_req *req = l->data;
-+
-+		if (req->user_data == telephony_device) {
-+			pending = g_slist_remove(pending, req);
-+			pending_req_finalize(req);
-+		}
-+	}
++	g_free(mas->cwd);
+ 	g_free(mas);
  }
  
- void telephony_event_reporting_req(void *telephony_device, int ind)
-@@ -533,6 +559,7 @@ static int send_method_call(const char *dest, const char *path,
- 	DBusMessage *msg;
- 	DBusPendingCall *call;
- 	va_list args;
-+	struct pending_req *req;
+@@ -108,6 +111,7 @@ static void *mas_connect(struct obex_session *os, int *err)
+ 	*err = 0;
  
- 	msg = dbus_message_new_method_call(dest, path, interface, method);
- 	if (!msg) {
-@@ -562,12 +589,39 @@ static int send_method_call(const char *dest, const char *path,
- 	}
+ 	mas = g_new0(struct mas_session, 1);
++	mas->cwd = g_strdup("");
  
- 	dbus_pending_call_set_notify(call, cb, user_data, NULL);
--	pending = g_slist_prepend(pending, call);
-+
-+	req = g_new0(struct pending_req, 1);
-+	req->call = call;
-+	req->user_data = user_data;
-+
-+	pending = g_slist_prepend(pending, req);
- 	dbus_message_unref(msg);
+ 	manager_register_session(os);
  
- 	return 0;
+@@ -173,9 +177,48 @@ failed:
+ 	return ret;
  }
  
-+static struct pending_req *find_request(const DBusPendingCall *call)
++static int set_folder(struct mas_session *mas, const char *name, int cdup)
 +{
-+	GSList *l;
++	char *newcwd = NULL;
++	char *tmp;
 +
-+	for (l = pending; l; l = l->next) {
-+		struct pending_req *req = l->data;
++	if (name && (strchr(name, '/') || strcmp(name, "..") == 0))
++		return -EBADR;
 +
-+		if (req->call == call)
-+			return req;
++	if (cdup) {
++		if (mas->cwd[0] == 0)
++			return -ENOENT;
++
++		newcwd = g_path_get_dirname(mas->cwd);
++
++		/* We use empty string for indication of the root directory */
++		if (newcwd[0] == '.' && newcwd[1] == 0)
++			newcwd[0] = 0;
 +	}
 +
-+	return NULL;
++	tmp = newcwd;
++	if (!cdup && (!name || name[0] == 0))
++		newcwd = g_strdup("");
++	else
++		newcwd = g_build_filename(newcwd ? newcwd : mas->cwd, name,
++					NULL);
++	g_free(tmp);
++
++	if (!messages_dir_exists(newcwd)) {
++		g_free(newcwd);
++		return -ENOENT;
++	}
++
++	g_free(mas->cwd);
++	mas->cwd = newcwd;
++
++	return 0;
 +}
 +
-+static void remove_pending(DBusPendingCall *call)
-+{
-+	struct pending_req *req = find_request(call);
-+
-+	pending = g_slist_remove(pending, req);
-+	pending_req_finalize(req);
-+}
-+
- void telephony_last_dialed_number_req(void *telephony_device)
+ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+ 		void *user_data)
  {
- 	int ret;
-@@ -1299,12 +1353,6 @@ static gboolean iter_get_basic_args(DBusMessageIter *iter,
- 	return type == DBUS_TYPE_INVALID ? TRUE : FALSE;
++	struct mas_session *mas = user_data;
+ 	const char *name;
+ 	uint8_t *nonhdr;
+ 
+@@ -193,7 +236,7 @@ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+ 		return -EBADR;
+ 	}
+ 
+-	return 0;
++	return set_folder(mas, name, nonhdr[0] & 0x01);
  }
  
--static void remove_pending(DBusPendingCall *call)
--{
--	pending = g_slist_remove(pending, call);
--	dbus_pending_call_unref(call);
--}
--
- static void hal_battery_level_reply(DBusPendingCall *call, void *user_data)
- {
- 	DBusError err;
-@@ -1914,8 +1962,7 @@ void telephony_exit(void)
- 	g_slist_free(calls);
- 	calls = NULL;
+ static void *any_open(const char *name, int oflag, mode_t mode,
+diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+index 9bb1ba1..805ce80 100644
+--- a/plugins/messages-dummy.c
++++ b/plugins/messages-dummy.c
+@@ -57,3 +57,20 @@ void messages_exit(void)
+ 	g_free(root_folder);
+ 	root_folder = NULL;
+ }
++
++gboolean messages_dir_exists(const char *path)
++{
++	char *abs;
++	gboolean ret;
++
++	abs = g_build_filename(root_folder, path, NULL);
++
++	if (g_file_test(abs, G_FILE_TEST_IS_DIR))
++		ret = TRUE;
++	else
++		ret = FALSE;
++
++	g_free(abs);
++
++	return ret;
++}
+diff --git a/plugins/messages.h b/plugins/messages.h
+index 65e2274..dccdb74 100644
+--- a/plugins/messages.h
++++ b/plugins/messages.h
+@@ -24,3 +24,5 @@
+ int messages_init(void);
  
--	g_slist_foreach(pending, (GFunc) dbus_pending_call_cancel, NULL);
--	g_slist_foreach(pending, (GFunc) dbus_pending_call_unref, NULL);
-+	g_slist_foreach(pending, (GFunc) pending_req_finalize, NULL);
- 	g_slist_free(pending);
- 	pending = NULL;
- 
+ void messages_exit(void);
++
++gboolean messages_dir_exists(const char *path);
 -- 
 1.7.1
 
