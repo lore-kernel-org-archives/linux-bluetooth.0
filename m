@@ -1,133 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA334C4DE29C@EXDCVYMBSTM005.EQ1STM.local>
-References: <AANLkTimP_XBFy58dMDZa69RQ9UKeZmh++jeuH073doLr@mail.gmail.com>
-	<20110316204004.GA2339@joana>
-	<AANLkTin-Tc4s76OuJ26ktQXT7n5f7yMZbYWpMiv-Dfc4@mail.gmail.com>
-	<AANLkTinVZEW7WrkTRP-cjxrgk8xy=QLgNE2WX0BF+aoC@mail.gmail.com>
-	<AANLkTim-nh=eLVWUtbvCg-Rt9kaumEju_msNsAY=LBmT@mail.gmail.com>
-	<AFCDDB4A3EA003429EEF1E7B211FDBBA334C4DE29C@EXDCVYMBSTM005.EQ1STM.local>
-Date: Wed, 23 Mar 2011 19:11:14 +0000
-Message-ID: <AANLkTimfLFAK7q+W0Tsj=aZ2=gSumfRCOtCeAwOVC1vq@mail.gmail.com>
-Subject: Re: [RFC] Auto Connections
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-Cc: "Arun K. Singh" <arunkat@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <Ville.Tervo@nokia.com>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Andre Guedes <andre.guedes@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
+References: <AANLkTi=R7kt2tFTpj_RBBbnoPBGNT90K0grshUSJNVnD@mail.gmail.com>
+Date: Wed, 23 Mar 2011 19:47:40 +0100
+Message-ID: <AANLkTi=V2VHmO1R4wmo_D99X=pz4PdqBfJuTPOj8eN6s@mail.gmail.com>
+Subject: Re: android: bluetoothd hung after bluetooth had been turned off
+From: Vitaly Wool <vitalywool@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+Hi,
 
-On Wed, Mar 23, 2011 at 7:37 AM, Arun Kumar SINGH
-<arunkr.singh@stericsson.com> wrote:
-> Hi Claudio,
+On Tue, Mar 22, 2011 at 8:11 PM, Vitaly Wool <vitalywool@gmail.com> wrote:
+> Greetings,
 >
->
->>There are four Connection
->>Establishment Procedures:
->>Auto, General,
->>Selective and Direct.
->>CreateDevice/CreatePairedDev
->>ice will use Direct. But
->>after pairing or
->>create device("known"
->>devices) we need a more
->>transparent procedure. I
->>am not saying that we will
->>implement straitly Auto
->>procedure, we will
->>also need to handle the
->>resolvable address, a hybrid
->>approach seems to
->>be more appropriated.
->>
->> We could use Direct
->>procedure,
->>managing(serializing) the
->>connection
->>establishment implementing
->>logic in the kernel or
->>userspace for the
->>"known" devices. However, I
->>prefer to transfer the
->>responsibility to
->>the controller. If I choose
->>connections using whitelist,
->>how the STE
->>controller prioritizes the
->>advertises? Does directed
->>advertises have a
->>higher priority?
->>
->
-> Agreed but not sure whether we have a choice to use both a)auto connection via white-lists and b)direct connection ignoring white-lists - at the same time?
-> In my opinion for doing either a) or b) you need to set the intitiator filter plicy to either use white-list or ignore it for direct connection. So, if you eventually implement auto-connection, you may not be able to do direct connect at all unless of course if you change the filter policy everytime. STE controller behaves the same way as per controller spec requirements letting the host decide on the filter policy and act suitably.
+> I'd got a nasty hang in my Android phone when I turned bluetooth off
+> from the UI while the music was playing over bluetooth connection.
 
-Not at the same time, controllers don't allow a second LE Create
-Connection command if there is a pending command.
-My question about your controller was how it decides in the case that
-it receives connectable advertises from more than one remote. Does it
-use RSSI(included in the advertise) and/or direct advertises has
-higher priority?
+as a follow-up on this, it looks like the problem is fairly generic on
+one hand but may be specific to Android, on the other.
 
->
-> Coming back to the connection policy debate, we can as well have this as configurable option in bluetoothd to give a choice whether to use auto connection or direct connect policy by default?
->
-> Also all the seven steps you need[9.3.5] for auto connection could either be done from user-space itself. And doing same from user-space would make more sense once the connection policy is configurable in bluetoothd?
->
-> Please excuse if these sound too wild ...
-Your comments are being very useful! No worries.
+bluetoothd defines its own signal handler for SIGTERM (sig_term())
+which calls g_main_loop_quit(event_loop).
 
-We have been discussing internally how to implement the connection
-management and new facts came up:
-1. If we wanna support GATT over BR/EDR, manage automatically
-connections in the kernel will be hard to keep a similar approach for
-LE and basic rate.
-2. Change the server socket to "notify" local host initiated
-connections is also breaking the socket API and requires some nasty
-code changes in the kernel.
-3. There are a lot of LE kernel patches pending(SM, cache and MTU)
+The latter will call g_main_context_wakeup_unlocked() which is exactly
+the following:
 
-After that we decided to start our first shot managing the connection
-is the usespace(as you suggested). Hide the resolvable address is
-still possible to be implemented in the kernel if we manage the
-advertise kernel cache and passive scanning properly in the kernel.
+   g_main_context_wakeup_unlocked (GMainContext *context)
+   {
+   #ifdef G_THREADS_ENABLED
+     if (g_thread_supported() && context->poll_waiting)
+       {
+         context->poll_waiting = FALSE;
+   #ifndef G_OS_WIN32
+         write (context->wake_up_pipe[1], "A", 1);
+   #else
+         ReleaseSemaphore (context->wake_up_semaphore, 1, NULL);
+   #endif
+       }
+   #endif
 
+This is meant to make bluetoothd quit waiting on a poll() call in
+g_main_context_poll() which is polling on the read descriptor of this
+pipe along with all the other descriptors supplied by bluetoothd.
+Unfortunately gthreads are not initialized in Android, moreover, this
+part of glib code is not even compiled, so g_thread_supported()
+returns false and this function is basically no-op in the Android
+case.
 
->
->
->>At API level, what is the
->>benefit of exposing this
->>option to the API users?
->>
->>Some profiles define the
->>recommended connection
->>parameters, there is
->>also the Slave Connection
->>Interval Range AD type that
->>may be used to
->>in the  connection
->>establishment.
->>
->
->
-> I don’t have a strong reason to give this option as an API to profiles but considering that a profile may have more flexibiltiy to set the connection parameters etc while initiating a new connection etc. As if this is done by Auto- Connection policy, you may have to set same connection parameters for all devices --something which be undesirable from profile point of view ...
->
+So if there are no other events for the poll() to quit, we'll get
+stuck in poll() forever because the write to wake_up_pipe will never
+happen.
 
-At the moment the values are hardcoded in the kernel. Ville sent last
-year a proposal to allow changing the connection parameters. We didn't
-decide yet we we will use management interface or extend the socket to
-pass the connection parameters.
+Still don't have a good enough idea on how to fix it in the right way though...
 
-BR,
-Claudio.
-
->
-> Thanks,
-> Arun
->
+~Vitaly
