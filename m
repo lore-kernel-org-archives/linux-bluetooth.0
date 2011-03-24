@@ -1,119 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH] Add sap_disconnect_ind interface for sap-sim drivers.
-Date: Thu, 24 Mar 2011 17:09:31 +0100
-Message-ID: <1300982971-2869-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <4D7FBA0F.7070208@codeaurora.org>
+References: <cover.1298307667.git.vinicius.gomes@openbossa.org>
+	<02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>
+	<20110227202041.GG2166@joana>
+	<AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>
+	<20110228172801.GB2165@joana>
+	<20110303174501.GA10733@piper>
+	<20110309225246.GA3009@piper>
+	<AANLkTinQh-oM+Dn-j8Rt8s99edozbXFjC-MUwiOLd_y1@mail.gmail.com>
+	<4D7FBA0F.7070208@codeaurora.org>
+Date: Thu, 24 Mar 2011 11:14:51 -0300
+Message-ID: <AANLkTin_yLAyWjLjqk-5Z-gerWeVxQhk4ONtngqt1zKT@mail.gmail.com>
+Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the
+ crypto subsystem
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Brian Gix <bgix@codeaurora.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The sap_disconnect_ind() let's the sim driver to indicate
-immediate disconnection.
+Hi all developers interested on LE,
 
-Add support of immediate disconnection in sap-dummy driver
-as well as a card status change in order to pass all PTS tests.
----
- sap/sap-dummy.c |   31 ++++++++++++++++++++++++-------
- sap/sap.h       |    1 +
- sap/server.c    |    8 ++++++++
- 3 files changed, 33 insertions(+), 7 deletions(-)
+On Tue, Mar 15, 2011 at 4:12 PM, Brian Gix <bgix@codeaurora.org> wrote:
+> On 3/15/2011 12:03 PM, Anderson Briglia wrote:
+>>
+>> Hi all,
+>>
+>> On Wed, Mar 9, 2011 at 6:52 PM, Vinicius Costa Gomes
+>> <vinicius.gomes@openbossa.org>  wrote:
+>>>
+>>> On 14:45 Thu 03 Mar, Vinicius Costa Gomes wrote:
+>>>>
+>>>> Hi Marcel,
+>>>>
+>>>> On 14:28 Mon 28 Feb, Gustavo F. Padovan wrote:
+>>>>>
+>>>>> Hi Vinicius,
+>>>>>
+>>>>> * Vinicius Gomes<vinicius.gomes@openbossa.org>  [2011-02-27 21:49:39
+>>>>> -0300]:
+>>>>>
+>>>>>> Hi Gustavo,
+>>>>>>
+>>>>>> On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
+>>>>>> <padovan@profusion.mobi>  wrote:
+>>>>>>>
+>>>>>>> Hi Vinicius,
+>>>>>>>
+>>>>>>> * Vinicius Costa Gomes<vinicius.gomes@openbossa.org>  [2011-02-21
+>>>>>>> 14:23:51 -0300]:
+>>>>>>>
+>
+> [...]
+>
+>>>>
+>>>> Any ideas?
+>>>
+>>> Still no ideas?
+>>>
+>>
+>> We at INdT have some patches based on top of this series. What is the
+>> maintainer's opinion about this series? I'm asking it because should
+>> be great to know if we are doing the right stuff or we need to change
+>> our approach. The number of features and patches that have this series
+>> as dependency is growing.
+>
+> I am also developing patches off of this series and have signed off on their
+> baseline functionality.
+>
+>> Regards,
+>>
+>> Anderson Briglia
+>
+>
+> --
+> Brian Gix
+> bgix@codeaurora.org
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-diff --git a/sap/sap-dummy.c b/sap/sap-dummy.c
-index 39e1fc9..37982be 100644
---- a/sap/sap-dummy.c
-+++ b/sap/sap-dummy.c
-@@ -260,11 +260,15 @@ static DBusMessage *max_msg_size(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
--static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
-+static DBusMessage *disconnect_immediate(DBusConnection *conn, DBusMessage *msg,
- 						void *data)
- {
-+	if (sim_card_conn_status == SIM_DISCONNECTED)
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed",
-+				"Already disconnected.");
-+
- 	sim_card_conn_status = SIM_DISCONNECTED;
--	sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE);
-+	sap_disconnect_ind(sap_data, SAP_DISCONNECTION_TYPE_IMMEDIATE);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -284,15 +288,28 @@ static DBusMessage *card_status(DBusConnection *conn, DBusMessage *msg,
- 							DBUS_TYPE_INVALID))
- 		return invalid_args(msg);
- 
--	if (status) {
-+	switch (status) {
-+	case 0: /* card removed */
-+		sim_card_conn_status = SIM_MISSING;
-+		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_REMOVED);
-+		break;
-+
-+	case 1: /* card inserted */
- 		if (sim_card_conn_status == SIM_MISSING) {
- 			sim_card_conn_status = SIM_CONNECTED;
- 			sap_status_ind(sap_data,
- 					SAP_STATUS_CHANGE_CARD_INSERTED);
- 		}
--	} else {
--		sim_card_conn_status = SIM_MISSING;
--		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_REMOVED);
-+		break;
-+
-+	case 2: /* card not longer available*/
-+		sim_card_conn_status = SIM_POWERED_OFF;
-+		sap_status_ind(sap_data, SAP_STATUS_CHANGE_CARD_NOT_ACCESSIBLE);
-+		break;
-+
-+	default:
-+		return g_dbus_create_error(msg, "org.bluez.Error.Failed",
-+				"Unknown card status. Use 0, 1 or 2.");
- 	}
- 
- 	DBG("Card status changed to %d", status);
-@@ -303,7 +320,7 @@ static DBusMessage *card_status(DBusConnection *conn, DBusMessage *msg,
- static GDBusMethodTable dummy_methods[] = {
- 	{ "OngoingCall", "b", "", ongoing_call},
- 	{ "MaxMessageSize", "u", "", max_msg_size},
--	{ "Disconnect", "", "", disconnect},
-+	{ "DisconnectImmediate", "", "", disconnect_immediate},
- 	{ "CardStatus", "u", "", card_status},
- 	{ }
- };
-diff --git a/sap/sap.h b/sap/sap.h
-index 24240ca..7c4a815 100644
---- a/sap/sap.h
-+++ b/sap/sap.h
-@@ -184,3 +184,4 @@ int sap_transport_protocol_rsp(void *sap_device, uint8_t result);
- 
- /* Event indication. Implemented by server.c*/
- int sap_status_ind(void *sap_device, uint8_t status_change);
-+int sap_disconnect_ind(void *sap_device, uint8_t disc_type);
-diff --git a/sap/server.c b/sap/server.c
-index 35abffb..a051a85 100644
---- a/sap/server.c
-+++ b/sap/server.c
-@@ -1000,6 +1000,14 @@ int sap_status_ind(void *sap_device, uint8_t status_change)
- 	return send_message(sap_device, buf, size);
- }
- 
-+int sap_disconnect_ind(void *sap_device, uint8_t disc_type)
-+{
-+	struct sap_connection *conn = sap_device;
-+
-+	return disconnect_req(conn, SAP_DISCONNECTION_TYPE_IMMEDIATE);
-+}
-+
-+
- static int handle_cmd(void *data, void *buf, size_t size)
- {
- 	struct sap_message *msg = buf;
--- 
-1.7.1
+Patches not upstream(bluetooth-next) are available here:
+git://gitorious.org/bluetooth-next/for-upstream.git
 
+Contains patches for SM just works method, advertising cache and MTU.
+
+BR,
+Claudio
