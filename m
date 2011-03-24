@@ -1,43 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 24 Mar 2011 16:14:30 -0300
+Date: Thu, 24 Mar 2011 16:12:42 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Lee Trager <lt73@cs.drexel.edu>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ath3k: Add ASUS BT Support
-Message-ID: <20110324191430.GE2236@joana>
-References: <4D8477B8.4010803@cs.drexel.edu>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 3/3] Bluetooth: delete hanging L2CAP channel
+Message-ID: <20110324191242.GD2236@joana>
+References: <1300979768-31963-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1300979768-31963-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4D8477B8.4010803@cs.drexel.edu>
+In-Reply-To: <1300979768-31963-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lee,
+Hi Andrei,
 
-* Lee Trager <lt73@cs.drexel.edu> [2011-03-19 05:30:32 -0400]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-03-24 17:16:08 +0200]:
 
-> The ASUS USB Bluetooth module that comes with my motherboard(ASUS P8P67
-> Pro) is simply a re-branded Atheros AR3011. This patch add support for
-> it in the driver
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 > 
-> Signed-off-by: Lee Trager <lt73@cs.drexel.edu>
+> Sometimes L2CAP connection remains hanging. Make sure that
+> L2CAP channel is deleted.
 > 
-> --- drivers/bluetooth/ath3k.c.old	2011-03-18 04:27:26.160161039 -0400
-> +++ drivers/bluetooth/ath3k.c	2011-03-18 04:29:05.853945455 -0400
-> @@ -36,9 +36,12 @@
->  	/* Atheros AR3011 */
->  	{ USB_DEVICE(0x0CF3, 0x3000) },
-> 
-> -	/* Atheros AR3011 with sflash firmware*/
-> +	/* Atheros AR3011 with sflash firmware */
->  	{ USB_DEVICE(0x0CF3, 0x3002) },
-> 
-> +	/* ASUS branded Atheros AR3011 */
-> +	{ USB_DEVICE(0x0B05, 0x179C) },
-> +
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap_sock.c |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-This patch doesn't apply to bluetooth-2.6 (or the not yet released
-2.6.39-rc1). Please rebase, thanks.
+This one is applied. Thanks.
 
 -- 
 Gustavo F. Padovan
