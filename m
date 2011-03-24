@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v6 3/6] Add support for Out of Band (OOB) association model in hciops
-Date: Thu, 24 Mar 2011 14:47:36 +0100
-Message-ID: <1300974459-24076-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v6 4/6] Add D-Bus OOB plugin
+Date: Thu, 24 Mar 2011 14:47:37 +0100
+Message-ID: <1300974459-24076-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1300974459-24076-1-git-send-email-szymon.janc@tieto.com>
 References: <1300974459-24076-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,237 +14,306 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+A sample OOB plugin that directly exposes OOB functionality over D-Bus.
 ---
- plugins/hciops.c |  118 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 110 insertions(+), 8 deletions(-)
+ Makefile.am       |    5 +
+ acinclude.m4      |    6 ++
+ plugins/dbusoob.c |  241 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 252 insertions(+), 0 deletions(-)
+ create mode 100644 plugins/dbusoob.c
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 3dbb381..0914285 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -50,6 +50,7 @@
- #include "storage.h"
- #include "event.h"
- #include "manager.h"
+diff --git a/Makefile.am b/Makefile.am
+index 0ed2acf..a23cc60 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -237,6 +237,11 @@ builtin_modules += maemo6
+ builtin_sources += plugins/maemo6.c
+ endif
+ 
++if DBUSOOBPLUGIN
++builtin_modules += dbusoob
++builtin_sources += plugins/dbusoob.c
++endif
++
+ sbin_PROGRAMS += src/bluetoothd
+ 
+ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+diff --git a/acinclude.m4 b/acinclude.m4
+index faa7f7c..69e0740 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -206,6 +206,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	telephony_driver=dummy
+ 	maemo6_enable=no
+ 	sap_driver=dummy
++	dbusoob_enable=no
+ 
+ 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+ 		optimization_enable=${enableval}
+@@ -338,6 +339,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		maemo6_enable=${enableval}
+ 	])
+ 
++	AC_ARG_ENABLE(dbusoob, AC_HELP_STRING([--enable-dbusoob], [compile with D-Bus OOB plugin]), [
++		dbusoob_enable=${enableval}
++	])
++
+ 	AC_ARG_ENABLE(hal, AC_HELP_STRING([--enable-hal], [Use HAL to determine adapter class]), [
+ 		hal_enable=${enableval}
+ 	])
+@@ -396,4 +401,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(UDEVRULES, test "${udevrules_enable}" = "yes")
+ 	AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" = "yes")
+ 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
++	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+ ])
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+new file mode 100644
+index 0000000..8b7edc6
+--- /dev/null
++++ b/plugins/dbusoob.c
+@@ -0,0 +1,241 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  ST-Ericsson SA
++ *
++ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <gdbus.h>
++
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/hci.h>
++#include <bluetooth/sdp.h>
++
++#include "plugin.h"
++#include "log.h"
++#include "adapter.h"
++#include "device.h"
++#include "manager.h"
++#include "dbus-common.h"
++#include "event.h"
++#include "error.h"
 +#include "oob.h"
- 
- static int child_pipe[2] = { -1, -1 };
- 
-@@ -77,11 +78,18 @@ struct bt_conn {
- 	uint8_t loc_auth;
- 	uint8_t rem_cap;
- 	uint8_t rem_auth;
-+	uint8_t rem_oob_data;
- 	gboolean bonding_initiator;
- 	gboolean secmode3;
- 	GIOChannel *io; /* For raw L2CAP socket (bonding) */
- };
- 
-+struct oob_data {
-+	bdaddr_t bdaddr;
-+	uint8_t hash[16];
-+	uint8_t randomizer[16];
++
++#define REQUEST_TIMEOUT		(60 * 1000)	/* 60 seconds */
++#define OOB_INTERFACE	"org.bluez.Oob"
++
++struct oob_request {
++	struct btd_adapter *adapter;
++	DBusMessage *msg;
 +};
 +
- static int max_dev = -1;
- static struct dev_info {
- 	int id;
-@@ -120,6 +128,8 @@ static struct dev_info {
- 	GSList *keys;
- 	uint8_t pin_length;
- 
-+	GSList *oob_data;
++static GSList *oob_requests = NULL;
++static DBusConnection *connection = NULL;
 +
- 	GSList *uuids;
- 
- 	GSList *connections;
-@@ -1053,14 +1063,43 @@ static void user_passkey_notify(int index, void *ptr)
- 						btohl(req->passkey));
- }
- 
--static void remote_oob_data_request(int index, void *ptr)
-+static gint oob_bdaddr_cmp(gconstpointer a, gconstpointer b)
++static gint oob_request_cmp(gconstpointer a, gconstpointer b)
 +{
-+	const struct oob_data *data = a;
-+	const bdaddr_t *bdaddr = b;
++	const struct oob_request *data = a;
++	const struct btd_adapter *adapter = b;
 +
-+	return bacmp(&data->bdaddr, bdaddr);
++	return data->adapter != adapter;
 +}
 +
-+static void remote_oob_data_request(int index, bdaddr_t *bdaddr)
- {
- 	struct dev_info *dev = &devs[index];
-+	GSList *match;
- 
- 	DBG("hci%d", index);
- 
--	hci_send_cmd(dev->sk, OGF_LINK_CTL,
--				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, ptr);
-+	match = g_slist_find_custom(dev->oob_data, bdaddr, oob_bdaddr_cmp);
-+
-+	if (match) {
-+		struct oob_data *data;
-+		remote_oob_data_reply_cp cp;
-+
-+		data = match->data;
-+
-+		bacpy(&cp.bdaddr, &data->bdaddr);
-+		memcpy(cp.hash, data->hash, sizeof(cp.hash));
-+		memcpy(cp.randomizer, data->randomizer, sizeof(cp.randomizer));
-+
-+		dev->oob_data = g_slist_delete_link(dev->oob_data, match);
-+
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_REMOTE_OOB_DATA_REPLY,
-+				REMOTE_OOB_DATA_REPLY_CP_SIZE, &cp);
-+
-+	} else {
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL,
-+				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, bdaddr);
-+	}
-+
- }
- 
- static int get_io_cap(int index, bdaddr_t *bdaddr, uint8_t *cap, uint8_t *auth)
-@@ -1158,11 +1197,23 @@ static void io_capa_request(int index, void *ptr)
- 					IO_CAPABILITY_NEG_REPLY_CP_SIZE, &cp);
- 	} else {
- 		io_capability_reply_cp cp;
-+		struct bt_conn *conn;
-+		GSList *match;
-+
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.bdaddr, dba);
- 		cp.capability = cap;
--		cp.oob_data = 0x00;
- 		cp.authentication = auth;
-+
-+		conn = find_connection(dev, dba);
-+		match = g_slist_find_custom(dev->oob_data, dba, oob_bdaddr_cmp);
-+
-+		if ((conn->bonding_initiator || conn->rem_oob_data == 0x01) &&
-+				match)
-+			cp.oob_data = 0x01;
-+		else
-+			cp.oob_data = 0x00;
-+
- 		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_IO_CAPABILITY_REPLY,
- 					IO_CAPABILITY_REPLY_CP_SIZE, &cp);
- 	}
-@@ -1182,6 +1233,7 @@ static void io_capa_response(int index, void *ptr)
- 	if (conn) {
- 		conn->rem_cap = evt->capability;
- 		conn->rem_auth = evt->authentication;
-+		conn->rem_oob_data = evt->oob_data;
- 	}
- }
- 
-@@ -1785,6 +1837,20 @@ static void write_class_complete(int index, uint8_t status)
- 		write_class(index, dev->wanted_cod);
- }
- 
-+static void read_local_oob_data_complete(int index, uint8_t status,
-+						read_local_oob_data_rp *rp)
++static struct oob_request* find_oob_request(struct btd_adapter *adapter)
 +{
-+	struct btd_adapter *adapter = manager_find_adapter_by_id(index);
++	GSList *match;
 +
-+	if (!adapter)
++	match = g_slist_find_custom(oob_requests, adapter, oob_request_cmp);
++
++	if (match)
++		return match->data;
++
++	return NULL;
++}
++
++static void local_data_read(struct btd_adapter *adapter, uint8_t *hash,
++				uint8_t *randomizer)
++{
++	struct DBusMessage *reply;
++	struct oob_request *oob_request;
++
++	oob_request = find_oob_request(adapter);
++	if (!oob_request)
 +		return;
 +
-+	if (status)
-+		oob_local_data_read(adapter, NULL, NULL);
++	if (hash && randomizer)
++		reply = g_dbus_create_reply(oob_request->msg,
++			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, 16,
++			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, 16,
++			DBUS_TYPE_INVALID);
 +	else
-+		oob_local_data_read(adapter, rp->hash, rp->randomizer);
-+}
++		reply = btd_error_failed(oob_request->msg,
++					"Failed to read local OOB data.");
 +
- static inline void cmd_complete(int index, void *ptr)
- {
- 	struct dev_info *dev = &devs[index];
-@@ -1858,6 +1924,10 @@ static inline void cmd_complete(int index, void *ptr)
- 		ptr += sizeof(evt_cmd_complete);
- 		read_tx_power_complete(index, ptr);
- 		break;
-+	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA):
-+		ptr += sizeof(evt_cmd_complete);
-+		read_local_oob_data_complete(index, status, ptr);
-+		break;
- 	};
- }
- 
-@@ -2387,7 +2457,7 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond,
- 		break;
- 
- 	case EVT_REMOTE_OOB_DATA_REQUEST:
--		remote_oob_data_request(index, ptr);
-+		remote_oob_data_request(index, (bdaddr_t *) ptr);
- 		break;
- 	}
- 
-@@ -3557,30 +3627,62 @@ static int hciops_cancel_bonding(int index, bdaddr_t *bdaddr)
- 
- static int hciops_read_local_oob_data (int index)
- {
-+	struct dev_info *dev = &devs[index];
++	oob_requests = g_slist_remove(oob_requests, oob_request);
++	dbus_message_unref(oob_request->msg);
++	g_free(oob_request);
 +
- 	DBG("hci%d", index);
- 
--	return -ENOSYS;
-+	if (hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA, 0, 0)
-+									< 0)
-+		return -errno;
-+
-+	return 0;
- }
- 
- static int hciops_add_remote_oob_data (int index, bdaddr_t *bdaddr,
- 					uint8_t *hash, uint8_t *randomizer)
- {
- 	char addr[18];
-+	struct dev_info *dev = &devs[index];
-+	GSList *match;
-+	struct oob_data *data;
- 
- 	ba2str(bdaddr, addr);
- 	DBG("hci%d bdaddr %s", index, addr);
- 
--	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
-+
-+	if (match) {
-+		data = match->data;
-+	} else {
-+		data = g_new(struct oob_data, 1);
-+		bacpy(&data->bdaddr, bdaddr);
-+		dev->oob_data = g_slist_prepend(dev->oob_data, data);
++	if (!reply) {
++		error("Couldn't allocate D-Bus message");
++		return;
 +	}
 +
-+	memcpy(data->hash, hash, sizeof(data->hash));
-+	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
++	if (!g_dbus_send_message(connection, reply))
++		error("D-Bus send failed");
++}
++
++static DBusMessage *read_local_data(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct btd_adapter *adapter = data;
++	struct oob_request *oob_request;
++
++	if (find_oob_request(adapter))
++		return btd_error_in_progress(msg);
++
++	if (btd_adapter_read_local_oob_data(adapter))
++		return btd_error_failed(msg, "Request failed.");
++
++	oob_request = g_new(struct oob_request, 1);
++	oob_request->adapter = adapter;
++	oob_requests = g_slist_append(oob_requests, oob_request);
++	oob_request->msg = dbus_message_ref(msg);
++	return NULL;
++}
++
++static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct btd_adapter *adapter = data;
++	uint8_t *hash, *randomizer;
++	int32_t hlen, rlen;
++	const char *addr;
++	bdaddr_t bdaddr;
++
++	if (!dbus_message_get_args(msg, NULL,
++			DBUS_TYPE_STRING, &addr,
++			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &hash, &hlen,
++			DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &randomizer, &rlen,
++			DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	if (hlen != 16 || rlen != 16 || bachk(addr))
++		return btd_error_invalid_args(msg);
++
++	str2ba(addr, &bdaddr);
++
++	if (btd_adapter_add_remote_oob_data(adapter, &bdaddr, hash, randomizer))
++		return btd_error_failed(msg, "Request failed");
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct btd_adapter *adapter = data;
++	const char *addr;
++	bdaddr_t bdaddr;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &addr,
++			DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	if (bachk(addr))
++		return btd_error_invalid_args(msg);
++
++	str2ba(addr, &bdaddr);
++
++	if (btd_adapter_remove_remote_oob_data(adapter, &bdaddr))
++		return btd_error_failed(msg, "Request failed");
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
++static GDBusMethodTable oob_methods[] = {
++	{"AddRemoteOobData",	"sayay", "",	 add_remote_data},
++	{"RemoveRemoteOobData",	"s",	 "",	 remove_remote_data},
++	{"ReadLocalOobData",	"",	 "ayay", read_local_data,
++						 G_DBUS_METHOD_FLAG_ASYNC},
++	{ }
++};
++
++static int oob_probe(struct btd_adapter *adapter)
++{
++	const char* path = adapter_get_path(adapter);
++
++	if (!g_dbus_register_interface(connection, path, OOB_INTERFACE,
++				oob_methods, NULL, NULL, adapter, NULL)) {
++			error("OOB interface init failed on path %s", path);
++			return -EIO;
++		}
 +
 +	return 0;
- }
- 
- static int hciops_remove_remote_oob_data (int index, bdaddr_t *bdaddr)
- {
- 	char addr[18];
-+	struct dev_info *dev = &devs[index];
++}
++
++static void oob_remove(struct btd_adapter *adapter)
++{
++	local_data_read(adapter, NULL, NULL);
++
++	g_dbus_unregister_interface(connection, adapter_get_path(adapter),
++							OOB_INTERFACE);
++}
++
++
++static struct btd_adapter_driver oob_driver = {
++	.name	= "oob",
++	.probe	= oob_probe,
++	.remove	= oob_remove,
++};
++
++static int dbusoob_init(void)
++{
++	DBG("Setup dbusoob plugin");
++
++	connection = get_dbus_connection();
++
++	oob_register_cb(local_data_read);
++
++	return btd_register_adapter_driver(&oob_driver);
++}
++
++static void dbusoob_exit(void)
++{
++	struct oob_request *oob_request;
 +	GSList *match;
- 
- 	ba2str(bdaddr, addr);
- 	DBG("hci%d bdaddr %s", index, addr);
- 
--	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
 +
-+	if (!match)
-+		return -ENOENT;
++	DBG("Cleanup dbusoob plugin");
 +
-+	g_free(match->data);
-+	dev->oob_data = g_slist_delete_link(dev->oob_data, match);
++	while ((match = g_slist_next(oob_requests))) {
++		oob_request = match->data;
++		oob_remove(oob_request->adapter);
++	}
 +
-+	return 0;
- }
- 
- static struct btd_adapter_ops hci_ops = {
++	btd_unregister_adapter_driver(&oob_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(dbusoob, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++						dbusoob_init, dbusoob_exit)
 -- 
 1.7.0.4
 
