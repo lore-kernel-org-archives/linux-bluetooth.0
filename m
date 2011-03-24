@@ -1,62 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Wait SCO socket to HUP before changing state
-Date: Thu, 24 Mar 2011 14:09:53 +0200
-Message-Id: <1300968593-25442-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1300968593-25442-1-git-send-email-luiz.dentz@gmail.com>
-References: <1300968593-25442-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+To: Linus Walleij <linus.walleij@linaro.org>,
+	Greg KH <gregkh@suse.de>
+Cc: "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>
+Date: Thu, 24 Mar 2011 12:45:54 +0100
+Subject: RE: [PATCH 2/2] mach-ux500: Add CG2900 devices
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA334C52AB89@EXDCVYMBSTM005.EQ1STM.local>
+References: <1300888803-26474-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+	<20110323142719.GA17369@suse.de>
+ <AANLkTikZD5qie4y=tRpZXuea9D+_vDSGLMr+20p_PVkC@mail.gmail.com>
+In-Reply-To: <AANLkTikZD5qie4y=tRpZXuea9D+_vDSGLMr+20p_PVkC@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Linus,
 
-In situations where application wants to switch profiles e.g hfp to a2dp
-it normally needs to wait SCO to be disconnected to resume a2dp due to
-resource limitations on headset.
+> > As this touches ARM specific code, I need an ack from the ARM
+> maintainer
+> > before I can take this through the staging tree. =A0Is there any way to
+> > make it part of your drivers/staging/ submission? =A0There are other
+> > examples in the staging tree already that do this, why not do that
+> here
+> > as well?
+>=20
+> Hm yeah maybe it's possible if you move devices-cg2900.*
+> to staging/cg2900, then split off the stuff in board-mop500.c into
+> some drivers/staging/cg2900/board-mop500-cg2900.c which
+> adds the device in some proper initcall.
+>=20
+> Do you think it can be done P-G? I might have overestimated
+> the work involved in moving that stuff to /staging.
+>=20
+> Yours,
+> Linus Walleij
 
-There seems to be an issue in the kernel side which prevent this to work
-properly, apparently shutdown does not wait the link to be disconnected,
-but it is under investigation.
----
- audio/headset.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+As Arnd requested yesterday, I can move most of devices-cg2900, maybe all,
+to the staging folder (probably to cg2900_lib.c). I will then minimize
+whatever is needed in board-mop500.c. I will see what I can do.
 
-diff --git a/audio/headset.c b/audio/headset.c
-index bdaa8da..dff10d1 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -1345,6 +1345,7 @@ static gboolean sco_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	error("Audio connection got disconnected");
- 
-+	pending_connect_finalize(device);
- 	headset_set_state(device, HEADSET_STATE_CONNECTED);
- 
- 	return FALSE;
-@@ -2385,6 +2386,7 @@ unsigned int headset_suspend_stream(struct audio_device *dev,
- {
- 	struct headset *hs = dev->headset;
- 	unsigned int id;
-+	int sock;
- 
- 	if (hs->state == HEADSET_STATE_DISCONNECTED ||
- 				hs->state == HEADSET_STATE_CONNECTING)
-@@ -2395,10 +2397,12 @@ unsigned int headset_suspend_stream(struct audio_device *dev,
- 		hs->dc_timer = 0;
- 	}
- 
--	headset_set_state(dev, HEADSET_STATE_CONNECTED);
-+	sock = g_io_channel_unix_get_fd(hs->sco);
-+
-+	/* shutdown but leave the socket open and wait for hup */
-+	shutdown(sock, SHUT_RDWR);
- 
- 	id = connect_cb_new(hs, HEADSET_STATE_CONNECTED, cb, user_data);
--	g_idle_add((GSourceFunc) dummy_connect_complete, dev);
- 
- 	return id;
- }
--- 
-1.7.1
-
+Thanks,
+/P-G
