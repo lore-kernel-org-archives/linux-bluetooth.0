@@ -1,101 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D8BCEC2.7090309@codeaurora.org>
-Date: Thu, 24 Mar 2011 16:07:46 -0700
-From: Brian Gix <bgix@codeaurora.org>
+Date: Thu, 24 Mar 2011 17:43:50 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-2.6 2011-03-24
+Message-ID: <20110324204349.GL2236@joana>
 MIME-Version: 1.0
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-CC: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth-next 04/15] Bluetooth: Add support for using the crypto
- subsystem
-References: <cover.1298307667.git.vinicius.gomes@openbossa.org>	<02fa778ab4292dffba1330e829b0d4029517a21e.1298307667.git.vinicius.gomes@openbossa.org>	<20110227202041.GG2166@joana>	<AANLkTi=j3REcNM4bXfFJPamPwqazS5k4eGAJf3BpB_Ya@mail.gmail.com>	<20110228172801.GB2165@joana>	<20110303174501.GA10733@piper>	<20110309225246.GA3009@piper>	<AANLkTinQh-oM+Dn-j8Rt8s99edozbXFjC-MUwiOLd_y1@mail.gmail.com>	<4D7FBA0F.7070208@codeaurora.org> <AANLkTin_yLAyWjLjqk-5Z-gerWeVxQhk4ONtngqt1zKT@mail.gmail.com>
-In-Reply-To: <AANLkTin_yLAyWjLjqk-5Z-gerWeVxQhk4ONtngqt1zKT@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 3/24/2011 7:14 AM, Claudio Takahasi wrote:
-> Hi all developers interested on LE,
->
-> On Tue, Mar 15, 2011 at 4:12 PM, Brian Gix<bgix@codeaurora.org>  wrote:
->> On 3/15/2011 12:03 PM, Anderson Briglia wrote:
->>>
->>> Hi all,
->>>
->>> On Wed, Mar 9, 2011 at 6:52 PM, Vinicius Costa Gomes
->>> <vinicius.gomes@openbossa.org>    wrote:
->>>>
->>>> On 14:45 Thu 03 Mar, Vinicius Costa Gomes wrote:
->>>>>
->>>>> Hi Marcel,
->>>>>
->>>>> On 14:28 Mon 28 Feb, Gustavo F. Padovan wrote:
->>>>>>
->>>>>> Hi Vinicius,
->>>>>>
->>>>>> * Vinicius Gomes<vinicius.gomes@openbossa.org>    [2011-02-27 21:49:39
->>>>>> -0300]:
->>>>>>
->>>>>>> Hi Gustavo,
->>>>>>>
->>>>>>> On Sun, Feb 27, 2011 at 5:20 PM, Gustavo F. Padovan
->>>>>>> <padovan@profusion.mobi>    wrote:
->>>>>>>>
->>>>>>>> Hi Vinicius,
->>>>>>>>
->>>>>>>> * Vinicius Costa Gomes<vinicius.gomes@openbossa.org>    [2011-02-21
->>>>>>>> 14:23:51 -0300]:
->>>>>>>>
->>
->> [...]
->>
->>>>>
->>>>> Any ideas?
->>>>
->>>> Still no ideas?
->>>>
->>>
->>> We at INdT have some patches based on top of this series. What is the
->>> maintainer's opinion about this series? I'm asking it because should
->>> be great to know if we are doing the right stuff or we need to change
->>> our approach. The number of features and patches that have this series
->>> as dependency is growing.
->>
->> I am also developing patches off of this series and have signed off on their
->> baseline functionality.
->>
->>> Regards,
->>>
->>> Anderson Briglia
->>
->>
->> --
->> Brian Gix
->> bgix@codeaurora.org
->> Employee of Qualcomm Innovation Center, Inc.
->> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
-> Patches not upstream(bluetooth-next) are available here:
-> git://gitorious.org/bluetooth-next/for-upstream.git
->
-> Contains patches for SM just works method, advertising cache and MTU.
+Hi John,
 
-Are these rebased off of bluetooth-next on kernel.org?
+Here is my first pull request of fixes for 2.6.39-rc1, the two critical fixes
+are HCI_RESET command synchronization that fixes an issues with loosing some
+HCI commands responses. And a warning shut up in HCI code by Thomas Gleixner.
+The other fixes are all important.
 
+Please pull, thanks. :)
 
-> BR,
-> Claudio
+The following changes since commit d78f4b3e2c4dfb9487624f7157af04ab4260e189:
 
+  ath9k: Fix TX queue stuck issue. (2011-03-23 15:22:05 -0400)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Andrei Emeltchenko (1):
+      Bluetooth: delete hanging L2CAP channel
+
+Gustavo F. Padovan (1):
+      Bluetooth: Fix HCI_RESET command synchronization
+
+Johan Hedberg (1):
+      Bluetooth: Fix missing hci_dev_lock_bh in user_confirm_reply
+
+Marc-Antoine Perennou (1):
+      Bluetooth: add support for Apple MacBook Pro 8,2
+
+Suraj Sumangala (1):
+      Bluetooth: Increment unacked_frames count only the first transmit
+
+Thomas Gleixner (1):
+      Bluetooth: Fix warning with hci_cmd_timer
+
+Vinicius Costa Gomes (1):
+      Bluetooth: Fix sending LE data over USB
+
+ drivers/bluetooth/btusb.c   |    6 +++++-
+ include/net/bluetooth/hci.h |    2 ++
+ net/bluetooth/hci_core.c    |   10 ++++++++--
+ net/bluetooth/hci_event.c   |    4 +++-
+ net/bluetooth/l2cap_core.c  |    4 +++-
+ net/bluetooth/l2cap_sock.c  |    5 +++--
+ net/bluetooth/mgmt.c        |    2 ++
+ 7 files changed, 26 insertions(+), 7 deletions(-)
 
 -- 
-Brian Gix
-bgix@codeaurora.org
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Gustavo F. Padovan
+http://profusion.mobi
