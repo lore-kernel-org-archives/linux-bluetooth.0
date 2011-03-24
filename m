@@ -1,35 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Mar 2011 17:33:06 -0300
+Date: Thu, 24 Mar 2011 17:29:22 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: =?iso-8859-1?Q?Andr=E9?= Dieb <andre.dieb@signove.com>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 1/5] Inline ATT dump functions
-Message-ID: <20110324203306.GK2236@joana>
-References: <1300891601-11412-1-git-send-email-andre.dieb@signove.com>
- <20110324092452.GE30621@jh-x301>
- <AANLkTikPc1ejpG5vvpRYk-AmPHtYXJe-GgQuj7-5vr3=@mail.gmail.com>
- <201103241211.07592.szymon.janc@tieto.com>
- <AANLkTik_wfOuhUg1qJWG6XdNukbs-maH9nyPeJecGxkB@mail.gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH v5 0/5] Support for OOB in mgmt interface
+Message-ID: <20110324202922.GJ2236@joana>
+References: <1300795943-6681-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <AANLkTik_wfOuhUg1qJWG6XdNukbs-maH9nyPeJecGxkB@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1300795943-6681-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi André,
+Hi Szymon,
 
-Please stop the top-posting on this mailing list.
+* Szymon Janc <szymon.janc@tieto.com> [2011-03-22 13:12:18 +0100]:
 
-* André Dieb <andre.dieb@signove.com> [2011-03-24 09:59:28 -0300]:
-
-> Hello,
+> Changes since v4:
+> - include comments from Anderson Lizardo
+> - use sizeof instead of hardcoded size in memcpy calls
 > 
-> In case most agree with this, I can change my patch and provide some
-> patches changing old code.
+> BR,
+> Szymon Janc
+> on behalf of ST-Ericsson
+> 
+> Szymon Janc (5):
+>   Bluetooth: Rename cmd to param in pending_cmd
+>   Bluetooth: Allow for NULL data in mgmt_pending_add
+>   Bluetooth: Add read_local_oob_data management command
+>   Bluetooth: Add add/remove_remote_oob_data management commands
+>   Bluetooth: Enable support for out of band association model
 
-I agree, let the compiler decide. It know exactly how to handle this.
+
+All 5 patches applied. Thanks for implement this.
 
 -- 
 Gustavo F. Padovan
