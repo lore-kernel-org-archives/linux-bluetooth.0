@@ -1,31 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 24 Mar 2011 17:24:31 -0300
+Date: Thu, 24 Mar 2011 17:23:16 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluetooth git tree
-Message-ID: <20110324202431.GI2236@joana>
-References: <477F20668A386D41ADCC57781B1F704307FA791446@SC-VEXCH1.marvell.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH 09/10] Bluetooth: Fix checkpatch error in cmtp.h
+Message-ID: <20110324202316.GH2236@joana>
+References: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com>
+ <1300713606-23523-10-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <477F20668A386D41ADCC57781B1F704307FA791446@SC-VEXCH1.marvell.com>
+In-Reply-To: <1300713606-23523-10-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Szymon,
 
-* Bing Zhao <bzhao@marvell.com> [2011-03-22 17:10:26 -0700]:
+* Szymon Janc <szymon.janc@tieto.com> [2011-03-21 14:20:05 +0100]:
 
-> Hi Gustavo,
+> Do not use C99 // comments.
 > 
-> I'm planning to add SD8787 support to 'btmrvl' driver.
-> 
-> Should I get started from the git tree below?
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/cmtp/cmtp.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Yes, that is the bluetooth git tree for new developments.
+All patches applied, except the 3 kthread ones. I'll wait your reply on them.
 
 -- 
 Gustavo F. Padovan
