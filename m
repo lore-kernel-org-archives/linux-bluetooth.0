@@ -1,60 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Mar 2011 17:43:50 -0300
+Date: Thu, 24 Mar 2011 17:33:06 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2011-03-24
-Message-ID: <20110324204349.GL2236@joana>
+To: =?iso-8859-1?Q?Andr=E9?= Dieb <andre.dieb@signove.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/5] Inline ATT dump functions
+Message-ID: <20110324203306.GK2236@joana>
+References: <1300891601-11412-1-git-send-email-andre.dieb@signove.com>
+ <20110324092452.GE30621@jh-x301>
+ <AANLkTikPc1ejpG5vvpRYk-AmPHtYXJe-GgQuj7-5vr3=@mail.gmail.com>
+ <201103241211.07592.szymon.janc@tieto.com>
+ <AANLkTik_wfOuhUg1qJWG6XdNukbs-maH9nyPeJecGxkB@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTik_wfOuhUg1qJWG6XdNukbs-maH9nyPeJecGxkB@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi André,
 
-Here is my first pull request of fixes for 2.6.39-rc1, the two critical fixes
-are HCI_RESET command synchronization that fixes an issues with loosing some
-HCI commands responses. And a warning shut up in HCI code by Thomas Gleixner.
-The other fixes are all important.
+Please stop the top-posting on this mailing list.
 
-Please pull, thanks. :)
+* André Dieb <andre.dieb@signove.com> [2011-03-24 09:59:28 -0300]:
 
-The following changes since commit d78f4b3e2c4dfb9487624f7157af04ab4260e189:
+> Hello,
+> 
+> In case most agree with this, I can change my patch and provide some
+> patches changing old code.
 
-  ath9k: Fix TX queue stuck issue. (2011-03-23 15:22:05 -0400)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
-
-Andrei Emeltchenko (1):
-      Bluetooth: delete hanging L2CAP channel
-
-Gustavo F. Padovan (1):
-      Bluetooth: Fix HCI_RESET command synchronization
-
-Johan Hedberg (1):
-      Bluetooth: Fix missing hci_dev_lock_bh in user_confirm_reply
-
-Marc-Antoine Perennou (1):
-      Bluetooth: add support for Apple MacBook Pro 8,2
-
-Suraj Sumangala (1):
-      Bluetooth: Increment unacked_frames count only the first transmit
-
-Thomas Gleixner (1):
-      Bluetooth: Fix warning with hci_cmd_timer
-
-Vinicius Costa Gomes (1):
-      Bluetooth: Fix sending LE data over USB
-
- drivers/bluetooth/btusb.c   |    6 +++++-
- include/net/bluetooth/hci.h |    2 ++
- net/bluetooth/hci_core.c    |   10 ++++++++--
- net/bluetooth/hci_event.c   |    4 +++-
- net/bluetooth/l2cap_core.c  |    4 +++-
- net/bluetooth/l2cap_sock.c  |    5 +++--
- net/bluetooth/mgmt.c        |    2 ++
- 7 files changed, 26 insertions(+), 7 deletions(-)
+I agree, let the compiler decide. It know exactly how to handle this.
 
 -- 
 Gustavo F. Padovan
