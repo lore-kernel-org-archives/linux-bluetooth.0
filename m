@@ -1,91 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Mar 2011 17:27:10 +0100
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Jim Paris <jim@jtan.com>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
-	Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>
-Subject: Re: [PATCH v2 0/3] Another try for the Sixaxis plugin
-Message-Id: <20110325172710.b87db045.ospite@studenti.unina.it>
-In-Reply-To: <20110325153105.GA26039@psychosis.jim.sh>
-References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-	<1298637244.10364.19.camel@novo.hadess.net>
-	<20110324183247.3291e59e.ospite@studenti.unina.it>
-	<20110325153105.GA26039@psychosis.jim.sh>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Fri__25_Mar_2011_17_27_10_+0100_wSS6YIkiiayen._2"
+Date: Fri, 25 Mar 2011 18:15:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Emit missing signal when data channel is reconnected.
+Message-ID: <20110325161532.GA9649@jh-x301>
+References: <1301059143-14614-1-git-send-email-sancane@gmail.com>
+ <20110325133237.GA6600@jh-x301>
+ <AANLkTimEenNDyt3Q6wSoeqiA83hQ4Xth=2dUTf1J9knH@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTimEenNDyt3Q6wSoeqiA83hQ4Xth=2dUTf1J9knH@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Fri__25_Mar_2011_17_27_10_+0100_wSS6YIkiiayen._2
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Fri, 25 Mar 2011 11:31:05 -0400
-Jim Paris <jim@jtan.com> wrote:
+On Fri, Mar 25, 2011, Santiago Carot wrote:
+> >> diff --git a/health/hdp.c b/health/hdp.c
+> >> index 3c2dce1..b06fe17 100644
+> >> --- a/health/hdp.c
+> >> +++ b/health/hdp.c
+> >> @@ -510,14 +510,23 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+> >>       }
+> >>
+> >>       fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
+> >> -     if (fd < 0)
+> >> +     if (fd < 0) {
+> >>               reply = g_dbus_create_error(dc_data->msg,
+> >>                                               ERROR_INTERFACE ".HealthError",
+> >>                                               "Cannot get file descriptor");
+> >> +             g_dbus_send_message(dc_data->conn, reply);
+> >> +             return;
+> >> +     }
+> >>
+> 
+> This is not a memory leak fix, if fd is less than 0, then reconnection
+> was not succesfully and then we reply with an error response to the
+> application but we dont not emit the CahnnelConnected signal. (return
+> statement).
 
-> Antonio Ospite wrote:
-> > With regard to that, I'd like to see some USB dumps of a Sixaxis
-> > talking with GameOS to check if the PS3 can turn off BT on the
-> > controller explicitly, can anyone help here? (Pascal? Do you have
-> > access to a USB analyzer?):
-> >=20
-> > The scenarios I am interested in are:
-> >  1. Connect a non-paired Sixaxis to the PS3 via USB
-> >  2. Connect an already paired Sixaxis to the PS3 via USB
-> >  3. Connect a Sixaxis already associated via BT to a PS3 via USB
->=20
-> Hi Antonio,
->=20
-> You asked me for this a while ago, sorry it took so long.  I ran some
-> tests and put the log files here:
->   http://ps3.jim.sh/sixaxis/dumps/
->
+The code (before your patch) was assigning a value to reply and then
+right afterwards assigning another value to it without freeing it in
+between:
 
-Thanks a lot Jim, now I know what to do if I got bored this weekend.
+> >>       reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD, &fd,
+> >>                                                       DBUS_TYPE_INVALID);
 
-[...]
-> I also did some quick captures of pairing the keypad (CECHZK1UC) and
-> original headset (CECHYA-0075).  They are being paired with 00:13:a9:74:f=
-e:57.
->   http://ps3.jim.sh/sixaxis/dumps/
->=20
-> -jim
->
+How is that not a memory leak? (not to mention that g_dbus_send_message
+isn't called to the error message that you create). Looks to me like
+there was an "else" statement missing or something similar.
 
-If I get to taking a look at those I could ask Bastien to test some
-stuff too :)
-
-Thanks,
-   Antonio
-
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Fri__25_Mar_2011_17_27_10_+0100_wSS6YIkiiayen._2
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk2Mwl4ACgkQ5xr2akVTsAGZ+QCdExcN5jNtO1Yb+pF4So6vO+Ze
-0IkAn30h7DxIIoC5I568+N/KtC31IECz
-=cV/N
------END PGP SIGNATURE-----
-
---Signature=_Fri__25_Mar_2011_17_27_10_+0100_wSS6YIkiiayen._2--
+Johan
