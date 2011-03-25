@@ -1,44 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 25 Mar 2011 10:54:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH v6 4/6] Add D-Bus OOB plugin
+Message-ID: <20110325085436.GD30796@jh-x301>
+References: <1300974459-24076-1-git-send-email-szymon.janc@tieto.com>
+ <1300974459-24076-5-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20110324191242.GD2236@joana>
-References: <1300979768-31963-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1300979768-31963-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20110324191242.GD2236@joana>
-Date: Fri, 25 Mar 2011 10:57:52 +0200
-Message-ID: <AANLkTim2_owHJ9NT4B7u484D1itkuEmGUzdp1wxgaZTi@mail.gmail.com>
-Subject: Re: [RFCv1 3/3] Bluetooth: delete hanging L2CAP channel
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1300974459-24076-5-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Szymon,
 
-On Thu, Mar 24, 2011 at 9:12 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Andrei,
->
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-03-24 17:16:08 +0200]:
->
->> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->>
->> Sometimes L2CAP connection remains hanging. Make sure that
->> L2CAP channel is deleted.
->>
->> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> ---
->>  net/bluetooth/l2cap_sock.c |    5 +++--
->>  1 files changed, 3 insertions(+), 2 deletions(-)
->
-> This one is applied. Thanks.
+On Thu, Mar 24, 2011, Szymon Janc wrote:
+> +static GDBusMethodTable oob_methods[] = {
+> +	{"AddRemoteOobData",	"sayay", "",	 add_remote_data},
+> +	{"RemoveRemoteOobData",	"s",	 "",	 remove_remote_data},
+> +	{"ReadLocalOobData",	"",	 "ayay", read_local_data,
+> +						 G_DBUS_METHOD_FLAG_ASYNC},
+> +	{ }
+> +};
 
-Where it is applied? Cannot find it here:
+You're using mixing spaces and tabs for indentation within this table.
+Just use table if you want to align the columns.
 
-http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git;a=shortlog;h=refs/heads/master
+> +static void oob_remove(struct btd_adapter *adapter)
+> +{
+> +	local_data_read(adapter, NULL, NULL);
+> +
+> +	g_dbus_unregister_interface(connection, adapter_get_path(adapter),
+> +							OOB_INTERFACE);
+> +}
+> +
+> +
+> +static struct btd_adapter_driver oob_driver = {
 
+There should never be the need to have two consecutive empty lines.
+Please remove one.
 
-Regards,
-Andrei
+> +	while ((match = g_slist_next(oob_requests))) {
+> +		oob_request = match->data;
+> +		oob_remove(oob_request->adapter);
+> +	}
+
+This loop looks flawed to me. Why are you skipping the first element in
+the list? It also took some time to see that you don't have an infinite
+loop here as it's a quite indirect way that the elements get removed.
+Furthermore, you've got functions called "local_data_read" and
+"read_local_data". Do you think someone would immediately understand the
+difference from those names? Maybe local_data_read could be named
+read_local_data_complete or read_local_data_cb or something similar?
+
+Johan
