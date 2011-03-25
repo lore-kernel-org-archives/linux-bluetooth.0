@@ -1,60 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110324185759.GB2236@joana>
-References: <1300979768-31963-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1300979768-31963-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20110324185759.GB2236@joana>
-Date: Fri, 25 Mar 2011 11:35:04 +0200
-Message-ID: <AANLkTimW5=zRZkYBpVCCGeYbm0+g0O4HaaQd4VgyhvCw@mail.gmail.com>
-Subject: Re: [RFCv1 2/3] Bluetooth: remove duplicated code
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: check L2CAP info_rsp ident and state
+Date: Fri, 25 Mar 2011 11:31:41 +0200
+Message-Id: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
 
-On Thu, Mar 24, 2011 at 8:57 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Andrei,
->
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-03-24 17:16:07 +0200]:
->
->> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->>
->> info_timer takes care about removed code
->>
->> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->> ---
->>  net/bluetooth/l2cap_core.c |   12 +++---------
->>  1 files changed, 3 insertions(+), 9 deletions(-)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index fd58b8f..4255f00 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -2472,16 +2472,10 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
->>               return 0;
->>       }
->>
->> -     del_timer(&conn->info_timer);
->> -
->> -     if (result != L2CAP_IR_SUCCESS) {
->> -             conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
->> -             conn->info_ident = 0;
->> -
->> -             l2cap_conn_start(conn);
->
-> Are you sure? Does remove this code won't create a delay to call
-> l2cap_conn_start()?
+Information requests/responses are unbound to L2CAP channel. Patch
+fixes issue arising when two devices connects at the same time to
+each other. This way we do not process out of the context messages.
+We are safe dropping info_rsp since info_timer is left running.
 
-Yes, but the difference is only with delay. I believe that this way it
-will be cleaner.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+---
+ net/bluetooth/l2cap_core.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-Do you think that it could cause problems?
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b5a1ce0..1426c03 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2460,6 +2460,11 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 
+ 	BT_DBG("type 0x%4.4x result 0x%2.2x", type, result);
+ 
++	/* L2CAP Info req/rsp are unbound to channels, add extra checks */
++	if (cmd->ident != conn->info_ident ||
++			conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
++		return 0;
++
+ 	del_timer(&conn->info_timer);
+ 
+ 	if (result != L2CAP_IR_SUCCESS) {
+-- 
+1.7.1
 
-Regards,
-Andrei
