@@ -1,42 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 0/6] Move Attrib client (including: should we disconnect or not?)
-Date: Fri, 25 Mar 2011 21:01:07 -0300
-Message-Id: <1301097673-5262-1-git-send-email-vinicius.gomes@openbossa.org>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 1/2] Fix memory leak if an error occurs when a data channel is reconnected.
+Date: Fri, 25 Mar 2011 18:39:21 +0100
+Message-Id: <1301074762-26844-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ health/hdp.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-The move itself is pretty simple, but when implementing it, I took a decision
-and I would like to hear your opinion about it.
-
-With this patch series, the behaviour is that we never disconnect from
-a LE device unless we are told so, i.e. org.bluez.Device.Disconnect(),
-is that what is expected from us?
-
-
-Cheers,
---
-
-Vinicius Costa Gomes (6):
-  Move Attrib client to the core
-  Register Attrib interface when loading device from storage
-  Register Attrib interface after Primary Service discovery
-  Remove _init and _exit methods from Attrib client
-  Add support for re-using the attrib channel
-  Fix disconnecting when primary service discovery is done
-
- Makefile.am      |    4 ++--
- attrib/client.c  |   49 ++++++++++++++++++-------------------------------
- attrib/client.h  |    6 +++---
- attrib/manager.c |   47 -----------------------------------------------
- src/adapter.c    |    5 +++++
- src/device.c     |   20 +++++++++++++-------
- 6 files changed, 41 insertions(+), 90 deletions(-)
-
---
+diff --git a/health/hdp.c b/health/hdp.c
+index 3c2dce1..7a4b219 100644
+--- a/health/hdp.c
++++ b/health/hdp.c
+@@ -514,9 +514,9 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+ 		reply = g_dbus_create_error(dc_data->msg,
+ 						ERROR_INTERFACE ".HealthError",
+ 						"Cannot get file descriptor");
+-
+-	reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD, &fd,
+-							DBUS_TYPE_INVALID);
++	else
++		reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD,
++							&fd, DBUS_TYPE_INVALID);
+ 	g_dbus_send_message(dc_data->conn, reply);
+ }
+ 
+-- 
 1.7.4.1
 
