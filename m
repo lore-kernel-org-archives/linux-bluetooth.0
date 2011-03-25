@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Remove owner reference to request structure
-Date: Fri, 25 Mar 2011 18:59:55 +0200
-Message-Id: <1301072395-16787-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/3] Rework adding/removing owners to a transport
+Date: Fri, 25 Mar 2011 18:59:54 +0200
+Message-Id: <1301072395-16787-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1301072395-16787-1-git-send-email-luiz.dentz@gmail.com>
 References: <1301072395-16787-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,238 +11,244 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-This should avoid doing too much implicity and should improve the
-readability of the code.
+Instead of directly add/remove and owner to transport list do it in a
+separate function.
 ---
- audio/transport.c |  100 ++++++++++++++++++++++++++++++++--------------------
- 1 files changed, 61 insertions(+), 39 deletions(-)
+ audio/media.c     |    4 +-
+ audio/transport.c |   85 +++++++++++++++++++++++++++++++---------------------
+ audio/transport.h |    2 +-
+ 3 files changed, 54 insertions(+), 37 deletions(-)
 
+diff --git a/audio/media.c b/audio/media.c
+index 4b389c6..0efb0a8 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -126,7 +126,7 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
+ 		media_endpoint_cancel(endpoint);
+ 
+ 	if (endpoint->transport)
+-		media_transport_remove(endpoint->transport);
++		media_transport_destroy(endpoint->transport);
+ 
+ 	g_dbus_remove_watch(adapter->conn, endpoint->watch);
+ 	g_free(endpoint->capabilities);
+@@ -665,7 +665,7 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 							DBUS_TYPE_INVALID);
+ 	g_dbus_send_message(conn, msg);
+ done:
+-	media_transport_remove(endpoint->transport);
++	media_transport_destroy(endpoint->transport);
+ 	endpoint->transport = NULL;
+ }
+ 
 diff --git a/audio/transport.c b/audio/transport.c
-index e0390e5..3442e5f 100644
+index 9a8fc22..e0390e5 100644
 --- a/audio/transport.c
 +++ b/audio/transport.c
-@@ -52,7 +52,6 @@
- struct media_request {
- 	DBusMessage		*msg;
- 	guint			id;
--	struct media_owner	*owner;
+@@ -95,7 +95,7 @@ struct media_transport {
+ 					DBusMessageIter *value);
  };
  
- struct media_owner {
-@@ -107,48 +106,36 @@ void media_transport_destroy(struct media_transport *transport)
- 	g_free(path);
- }
- 
--static struct media_request *media_request_new(struct media_owner *owner,
--							DBusMessage *msg)
-+static struct media_request *media_request_create(DBusMessage *msg, guint id)
+-void media_transport_remove(struct media_transport *transport)
++void media_transport_destroy(struct media_transport *transport)
  {
- 	struct media_request *req;
+ 	char *path;
  
- 	req = g_new0(struct media_request, 1);
- 	req->msg = dbus_message_ref(msg);
--	req->owner = owner;
--	owner->pending = req;
--
--	return req;
--}
--
--static void media_request_free(struct media_request *req)
--{
--	struct media_owner *owner = req->owner;
--	struct media_transport *transport = owner->transport;
-+	req->id = id;
- 
--	if (req->id)
--		transport->cancel(owner->transport, req->id);
--
--	if (req->msg)
--		dbus_message_unref(req->msg);
-+	DBG("Request created: method=%s id=%u", dbus_message_get_member(msg),
-+									id);
- 
--	owner->pending = NULL;
--	g_free(req);
-+	return req;
- }
- 
--static void media_request_reply(struct media_request *req, int err)
-+static void media_request_reply(struct media_request *req,
-+						DBusConnection *conn, int err)
- {
--	struct media_owner *owner = req->owner;
--	struct media_transport *transport = owner->transport;
- 	DBusMessage *reply;
- 
-+	DBG("Request %s Reply %s", dbus_message_get_member(req->msg),
-+							strerror(err));
-+
- 	if (!err)
- 		reply = g_dbus_create_reply(req->msg, DBUS_TYPE_INVALID);
- 	else
--		reply = g_dbus_create_error(owner->pending->msg,
-+		reply = g_dbus_create_error(req->msg,
- 						ERROR_INTERFACE ".Failed",
- 						"%s", strerror(err));
- 
--	g_dbus_send_message(transport->conn, reply);
-+	g_dbus_send_message(conn, reply);
- }
- 
- static gboolean media_transport_release(struct media_transport *transport,
-@@ -167,12 +154,30 @@ static gboolean media_transport_release(struct media_transport *transport,
+@@ -167,30 +167,35 @@ static gboolean media_transport_release(struct media_transport *transport,
  	return TRUE;
  }
  
-+static void media_owner_remove(struct media_owner *owner,
-+						struct media_request *req)
-+{
-+	struct media_transport *transport = owner->transport;
+-static void media_owner_remove(struct media_owner *owner)
++static void media_owner_free(struct media_owner *owner)
+ {
+-	struct media_transport *transport = owner->transport;
++	DBG("Owner %s", owner->name);
 +
-+	DBG("Owner %s Request %s", owner->name,
-+					dbus_message_get_member(req->msg));
++	if (owner->pending)
++		media_request_free(owner->pending);
 +
-+	if (req->id)
-+		transport->cancel(transport, req->id);
-+
-+	owner->pending = NULL;
-+	if (req->msg)
-+		dbus_message_unref(req->msg);
-+
-+	g_free(req);
++	g_free(owner->name);
++	g_free(owner->accesstype);
++	g_free(owner);
 +}
 +
- static void media_owner_free(struct media_owner *owner)
- {
- 	DBG("Owner %s", owner->name);
++static void media_transport_remove(struct media_transport *transport,
++						struct media_owner *owner)
++{
++	DBG("Transport %s Owner %s", transport->path, owner->name);
  
- 	if (owner->pending)
+ 	media_transport_release(transport, owner->accesstype);
+ 
++	transport->owners = g_slist_remove(transport->owners, owner);
++
+ 	if (owner->watch)
+ 		g_dbus_remove_watch(transport->conn, owner->watch);
+ 
+-	if (owner->pending)
 -		media_request_free(owner->pending);
-+		media_owner_remove(owner, owner->pending);
+-
+-	transport->owners = g_slist_remove(transport->owners, owner);
++	media_owner_free(owner);
  
- 	g_free(owner->name);
- 	g_free(owner->accesstype);
-@@ -263,7 +268,7 @@ static void a2dp_resume_complete(struct avdtp *session,
- 	if (ret == FALSE)
- 		goto fail;
+ 	/* Suspend if there is no longer any owner */
+ 	if (transport->owners == NULL && transport->in_use)
+ 		transport->suspend(transport, NULL);
+-
+-	DBG("Owner removed: sender=%s accesstype=%s", owner->name,
+-							owner->accesstype);
+-
+-	g_free(owner->name);
+-	g_free(owner->accesstype);
+-	g_free(owner);
+ }
  
--	media_request_free(req);
-+	media_owner_remove(owner, req);
+ static gboolean media_transport_set_fd(struct media_transport *transport,
+@@ -210,7 +215,9 @@ static gboolean media_transport_set_fd(struct media_transport *transport,
  
- 	return;
+ static gboolean remove_owner(gpointer data)
+ {
+-	media_owner_remove(data);
++	struct media_owner *owner = data;
++
++	media_transport_remove(owner->transport, owner);
  
-@@ -307,7 +312,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 	/* Release always succeeds */
- 	if (owner->pending) {
- 		owner->pending->id = 0;
--		media_request_reply(owner->pending, 0);
-+		media_request_reply(owner->pending, transport->conn, 0);
- 	}
+ 	return FALSE;
+ }
+@@ -305,7 +312,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
  
  	a2dp_sep_unlock(sep, transport->session);
-@@ -373,7 +378,7 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
- 	if (ret == FALSE)
- 		goto fail;
+ 	transport->in_use = FALSE;
+-	media_owner_remove(owner);
++	media_transport_remove(transport, owner);
+ }
  
--	media_request_free(req);
-+	media_owner_remove(owner, req);
- 
+ static guint suspend_a2dp(struct media_transport *transport,
+@@ -371,7 +378,7 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
  	return;
  
-@@ -407,7 +412,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
- 	/* Release always succeeds */
- 	if (owner->pending) {
- 		owner->pending->id = 0;
--		media_request_reply(owner->pending, 0);
-+		media_request_reply(owner->pending, transport->conn, 0);
- 	}
+ fail:
+-	media_owner_remove(owner);
++	media_transport_remove(transport, owner);
+ }
+ 
+ static guint resume_headset(struct media_transport *transport,
+@@ -405,7 +412,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
  
  	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
-@@ -441,7 +446,7 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
- 	owner->watch = 0;
+ 	transport->in_use = FALSE;
+-	media_owner_remove(owner);
++	media_transport_remove(transport, owner);
+ }
  
+ static guint suspend_headset(struct media_transport *transport,
+@@ -436,7 +443,7 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
  	if (owner->pending != NULL)
--		media_request_free(owner->pending);
-+		media_owner_remove(owner, owner->pending);
+ 		media_request_free(owner->pending);
  
- 	media_transport_remove(owner->transport, owner);
- }
-@@ -508,6 +513,15 @@ static struct media_owner *media_owner_create(DBusConnection *conn,
- 	return owner;
+-	media_owner_remove(owner);
++	media_transport_remove(owner->transport, owner);
  }
  
-+static void media_owner_add(struct media_owner *owner,
-+						struct media_request *req)
+ static gboolean media_transport_acquire(struct media_transport *transport,
+@@ -474,22 +481,26 @@ static gboolean media_transport_acquire(struct media_transport *transport,
+ 	return TRUE;
+ }
+ 
+-static struct media_owner *media_owner_create(
+-					struct media_transport *transport,
+-					DBusMessage *msg,
+-					const char *accesstype)
++static void media_transport_add(struct media_transport *transport,
++					struct media_owner *owner)
 +{
-+	DBG("Owner %s Request %s", owner->name,
-+					dbus_message_get_member(req->msg));
-+
-+	owner->pending = req;
++	DBG("Transport %s Owner %s", transport->path, owner->name);
++	transport->owners = g_slist_append(transport->owners, owner);
++	owner->transport = transport;
 +}
 +
- static struct media_owner *media_transport_find_owner(
- 					struct media_transport *transport,
- 					const char *name)
-@@ -531,6 +545,7 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
++static struct media_owner *media_owner_create(DBusConnection *conn,
++						DBusMessage *msg,
++						const char *accesstype)
+ {
  	struct media_owner *owner;
- 	struct media_request *req;
- 	const char *accesstype, *sender;
-+	guint id;
  
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_STRING, &accesstype,
-@@ -547,13 +562,14 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 	owner = g_new0(struct media_owner, 1);
+-	owner->transport = transport;
+ 	owner->name = g_strdup(dbus_message_get_sender(msg));
+ 	owner->accesstype = g_strdup(accesstype);
+-	owner->watch = g_dbus_add_disconnect_watch(transport->conn,
+-							owner->name,
++	owner->watch = g_dbus_add_disconnect_watch(conn, owner->name,
+ 							media_owner_exit,
+ 							owner, NULL);
+-	transport->owners = g_slist_append(transport->owners, owner);
+ 
+ 	DBG("Owner created: sender=%s accesstype=%s", owner->name,
+ 			accesstype);
+@@ -535,11 +546,15 @@ static DBusMessage *acquire(DBusConnection *conn, DBusMessage *msg,
+ 	if (media_transport_acquire(transport, accesstype) == FALSE)
  		return btd_error_not_authorized(msg);
  
- 	owner = media_owner_create(conn, msg, accesstype);
--	req = media_request_new(owner, msg);
--	req->id = transport->resume(transport, owner);
--	if (req->id == 0) {
-+	id = transport->resume(transport, owner);
-+	if (id == 0) {
- 		media_owner_free(owner);
--		return NULL;
-+		return btd_error_not_authorized(msg);
- 	}
- 
-+	req = media_request_create(msg, id);
-+	media_owner_add(owner, req);
- 	media_transport_add(transport, owner);
+-	owner = media_owner_create(transport, msg, accesstype);
++	owner = media_owner_create(conn, msg, accesstype);
+ 	req = media_request_new(owner, msg);
+ 	req->id = transport->resume(transport, owner);
+-	if (req->id == 0)
+-		media_owner_remove(owner);
++	if (req->id == 0) {
++		media_owner_free(owner);
++		return NULL;
++	}
++
++	media_transport_add(transport, owner);
  
  	return NULL;
-@@ -579,6 +595,8 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_not_authorized(msg);
- 
+ }
+@@ -566,7 +581,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
  	if (g_strcmp0(owner->accesstype, accesstype) == 0) {
-+		guint id;
-+
  		/* Not the last owner, no need to suspend */
  		if (g_slist_length(transport->owners) != 1) {
- 			media_transport_remove(transport, owner);
-@@ -591,15 +609,19 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 			member = dbus_message_get_member(owner->pending->msg);
- 			/* Cancel Acquire request if that exist */
- 			if (g_str_equal(member, "Acquire"))
--				media_request_free(owner->pending);
-+				media_owner_remove(owner, owner->pending);
- 			else
- 				return btd_error_in_progress(msg);
+-			media_owner_remove(owner);
++			media_transport_remove(transport, owner);
+ 			return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  		}
  
--		req = media_request_new(owner, msg);
--		req->id = transport->suspend(transport, owner);
--		if (req->id == 0)
-+		id = transport->suspend(transport, owner);
-+		if (id == 0) {
- 			media_transport_remove(transport, owner);
-+			return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+		}
-+
-+		req = media_request_create(msg, id);
-+		media_owner_add(owner, req);
+@@ -584,7 +599,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
+ 		req = media_request_new(owner, msg);
+ 		req->id = transport->suspend(transport, owner);
+ 		if (req->id == 0)
+-			media_owner_remove(owner);
++			media_transport_remove(transport, owner);
  
  		return NULL;
  	} else if (g_strstr_len(owner->accesstype, -1, accesstype) != NULL) {
+@@ -774,9 +789,11 @@ static GDBusSignalTable transport_signals[] = {
+ static void media_transport_free(void *data)
+ {
+ 	struct media_transport *transport = data;
++	GSList *l;
++
++	for (l = transport->owners; l; l = l->next)
++		media_transport_remove(transport, l->data);
+ 
+-	g_slist_foreach(transport->owners, (GFunc) media_owner_remove,
+-				NULL);
+ 	g_slist_free(transport->owners);
+ 
+ 	if (transport->session)
+diff --git a/audio/transport.h b/audio/transport.h
+index b6c27b9..be4d666 100644
+--- a/audio/transport.h
++++ b/audio/transport.h
+@@ -30,7 +30,7 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 						uint8_t *configuration,
+ 						size_t size);
+ 
+-void media_transport_remove(struct media_transport *transport);
++void media_transport_destroy(struct media_transport *transport);
+ const char *media_transport_get_path(struct media_transport *transport);
+ void media_transport_update_delay(struct media_transport *transport,
+ 							uint16_t delay);
 -- 
 1.7.1
 
