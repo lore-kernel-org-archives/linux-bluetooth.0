@@ -1,49 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Mar 2011 18:49:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add local Extended Inquiry Response (EIR)
- support
-Message-ID: <20110325164902.GA10252@jh-x301>
-References: <1301059544-6200-1-git-send-email-johan.hedberg@gmail.com>
- <AANLkTinhC8-1fe0KYBb+Tz-x7RZSC3FtometdNw05xgX@mail.gmail.com>
- <20110325163549.GA9894@jh-x301>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20110325163549.GA9894@jh-x301>
+In-Reply-To: <20110325161532.GA9649@jh-x301>
+References: <1301059143-14614-1-git-send-email-sancane@gmail.com>
+	<20110325133237.GA6600@jh-x301>
+	<AANLkTimEenNDyt3Q6wSoeqiA83hQ4Xth=2dUTf1J9knH@mail.gmail.com>
+	<20110325161532.GA9649@jh-x301>
+Date: Fri, 25 Mar 2011 17:46:37 +0100
+Message-ID: <AANLkTikNNc6E-H3xs7wa5Ro2cxCYBDmY-kM6N2sU41RP@mail.gmail.com>
+Subject: Re: [PATCH] Emit missing signal when data channel is reconnected.
+From: Santiago Carot <sancane@gmail.com>
+To: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Mar 25, 2011, Johan Hedberg wrote:
-> > > +       }
-> > > +
-> > > +       memcpy(&val, uuid128, 4);
-> > > +
-> > > +       val = be32_to_cpu(val);
-> > 
-> > I noticed just know the those UUID handling functions from management
-> > API are assuming UUIDs in network order. We will need to change this,
-> > or take extra care when reusing them for Advertising Data and GATT
-> > uuids.
-> 
-> Right. This code is pretty much a copy of what user space already has
-> (hciops.c), and that code is relying on SDP (i.e. network) byte order
-> UUID-128s.
+2011/3/25 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi,
+>
+> On Fri, Mar 25, 2011, Santiago Carot wrote:
+>> >> diff --git a/health/hdp.c b/health/hdp.c
+>> >> index 3c2dce1..b06fe17 100644
+>> >> --- a/health/hdp.c
+>> >> +++ b/health/hdp.c
+>> >> @@ -510,14 +510,23 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
+>> >>       }
+>> >>
+>> >>       fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
+>> >> -     if (fd < 0)
+>> >> +     if (fd < 0) {
+>> >>               reply = g_dbus_create_error(dc_data->msg,
+>> >>                                               ERROR_INTERFACE ".HealthError",
+>> >>                                               "Cannot get file descriptor");
+>> >> +             g_dbus_send_message(dc_data->conn, reply);
+>> >> +             return;
+>> >> +     }
+>> >>
+>>
+>> This is not a memory leak fix, if fd is less than 0, then reconnection
+>> was not succesfully and then we reply with an error response to the
+>> application but we dont not emit the CahnnelConnected signal. (return
+>> statement).
+>
+> The code (before your patch) was assigning a value to reply and then
+> right afterwards assigning another value to it without freeing it in
+> between:
+>
+>> >>       reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD, &fd,
+>> >>                                                       DBUS_TYPE_INVALID);
+>
+> How is that not a memory leak? (not to mention that g_dbus_send_message
+> isn't called to the error message that you create). Looks to me like
+> there was an "else" statement missing or something similar.
+>
 
-Actually now that I think about it, for consistency with everything else
-in the management interface the byte order, at least in the management
-protocol, should probably stay little endian (mimicing HCI). We *could*
-store the UUIDs in hdev->uuids in host byte order, but then we'll need
-to add all the byte-order dependent code that we've recently created for
-user space with bt_uuid.
-
-The really important part is the management protocol since that's what's
-visible to user space. The internal storage of these UUIDs in the kernel
-is secondary. Personally, I'd like to avoid any 128-bit byte order
-conversions if possible but I can see how this can be argued in both
-ways.
-
-Johan
+Sorry,
+I didn't understood what you meant. I though that you was referring to
+the pach but you was referring to the old code. Now I see.
+You are right, I'm going to split it in two patches right away.
