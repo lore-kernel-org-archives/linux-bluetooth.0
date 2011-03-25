@@ -1,62 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110325161532.GA9649@jh-x301>
-References: <1301059143-14614-1-git-send-email-sancane@gmail.com>
-	<20110325133237.GA6600@jh-x301>
-	<AANLkTimEenNDyt3Q6wSoeqiA83hQ4Xth=2dUTf1J9knH@mail.gmail.com>
-	<20110325161532.GA9649@jh-x301>
-Date: Fri, 25 Mar 2011 17:46:37 +0100
-Message-ID: <AANLkTikNNc6E-H3xs7wa5Ro2cxCYBDmY-kM6N2sU41RP@mail.gmail.com>
-Subject: Re: [PATCH] Emit missing signal when data channel is reconnected.
-From: Santiago Carot <sancane@gmail.com>
-To: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/2] Add ERROR response on AT+BLDN command for maemo6
+Date: Fri, 25 Mar 2011 18:44:09 +0200
+Message-Id: <1301071449-22230-3-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1301071449-22230-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1301071449-22230-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Response on AT+BLDN command in maemo6 telephony driver is added to be
+sent after confirmation from csd back-end. Both ERROR or OK codes are
+sent only after asynchronous response on D-Bus call is available.
+---
+ audio/telephony-maemo6.c |   26 +++++++++++++++++++++++---
+ 1 files changed, 23 insertions(+), 3 deletions(-)
 
-2011/3/25 Johan Hedberg <johan.hedberg@gmail.com>:
-> Hi,
->
-> On Fri, Mar 25, 2011, Santiago Carot wrote:
->> >> diff --git a/health/hdp.c b/health/hdp.c
->> >> index 3c2dce1..b06fe17 100644
->> >> --- a/health/hdp.c
->> >> +++ b/health/hdp.c
->> >> @@ -510,14 +510,23 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
->> >>       }
->> >>
->> >>       fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
->> >> -     if (fd < 0)
->> >> +     if (fd < 0) {
->> >>               reply = g_dbus_create_error(dc_data->msg,
->> >>                                               ERROR_INTERFACE ".HealthError",
->> >>                                               "Cannot get file descriptor");
->> >> +             g_dbus_send_message(dc_data->conn, reply);
->> >> +             return;
->> >> +     }
->> >>
->>
->> This is not a memory leak fix, if fd is less than 0, then reconnection
->> was not succesfully and then we reply with an error response to the
->> application but we dont not emit the CahnnelConnected signal. (return
->> statement).
->
-> The code (before your patch) was assigning a value to reply and then
-> right afterwards assigning another value to it without freeing it in
-> between:
->
->> >>       reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD, &fd,
->> >>                                                       DBUS_TYPE_INVALID);
->
-> How is that not a memory leak? (not to mention that g_dbus_send_message
-> isn't called to the error message that you create). Looks to me like
-> there was an "else" statement missing or something similar.
->
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 9650cba..0cef7dd 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -618,6 +618,28 @@ static void remove_pending(DBusPendingCall *call)
+ 	pending_req_finalize(req);
+ }
+ 
++static void last_number_call_reply(DBusPendingCall *call, void *user_data)
++{
++	DBusError err;
++	DBusMessage *reply;
++	void *telephony_device = user_data;
++
++	reply = dbus_pending_call_steal_reply(call);
++
++	dbus_error_init(&err);
++	if (dbus_set_error_from_message(&err, reply)) {
++		error("csd replied with an error: %s, %s",
++				err.name, err.message);
++		dbus_error_free(&err);
++		telephony_dial_number_rsp(telephony_device,
++							CME_ERROR_AG_FAILURE);
++	} else
++		telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
++
++	dbus_message_unref(reply);
++	remove_pending(call);
++}
++
+ void telephony_last_dialed_number_req(void *telephony_device)
+ {
+ 	int ret;
+@@ -626,13 +648,11 @@ void telephony_last_dialed_number_req(void *telephony_device)
+ 
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+ 				CSD_CALL_INTERFACE, "CreateFromLast",
+-				NULL, NULL,
++				last_number_call_reply, telephony_device,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0)
+ 		telephony_dial_number_rsp(telephony_device,
+ 						CME_ERROR_AG_FAILURE);
+-	else
+-		telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
+ }
+ 
+ static const char *memory_dial_lookup(int location)
+-- 
+1.7.1
 
-Sorry,
-I didn't understood what you meant. I though that you was referring to
-the pach but you was referring to the old code. Now I see.
-You are right, I'm going to split it in two patches right away.
