@@ -1,52 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 2/2] Emit missing signal when data channel is reconnected.
-Date: Fri, 25 Mar 2011 18:39:22 +0100
-Message-Id: <1301074762-26844-2-git-send-email-sancane@gmail.com>
-In-Reply-To: <1301074762-26844-1-git-send-email-sancane@gmail.com>
-References: <1301074762-26844-1-git-send-email-sancane@gmail.com>
+Date: Fri, 25 Mar 2011 19:28:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add local Extended Inquiry Response (EIR)
+ support
+Message-ID: <20110325172848.GA11543@jh-x301>
+References: <1301059544-6200-1-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTinhC8-1fe0KYBb+Tz-x7RZSC3FtometdNw05xgX@mail.gmail.com>
+ <20110325163549.GA9894@jh-x301>
+ <AANLkTi=Yebkv+B=8WvaPkV1-Q+UifKX+UohN5p=977pq@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AANLkTi=Yebkv+B=8WvaPkV1-Q+UifKX+UohN5p=977pq@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reconnections of data channels should be indicated to others
-applications by using the appropriate signal.
----
- health/hdp.c |   15 ++++++++++++---
- 1 files changed, 12 insertions(+), 3 deletions(-)
+Hi Lizardo,
 
-diff --git a/health/hdp.c b/health/hdp.c
-index 7a4b219..7fed483 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -510,14 +510,23 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
- 	}
- 
- 	fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
--	if (fd < 0)
-+	if (fd < 0) {
- 		reply = g_dbus_create_error(dc_data->msg,
- 						ERROR_INTERFACE ".HealthError",
- 						"Cannot get file descriptor");
--	else
--		reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD,
-+		g_dbus_send_message(dc_data->conn, reply);
-+		return;
-+	}
-+
-+	reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD,
- 							&fd, DBUS_TYPE_INVALID);
- 	g_dbus_send_message(dc_data->conn, reply);
-+
-+	g_dbus_emit_signal(dc_data->conn,
-+			device_get_path(dc_data->hdp_chann->dev->dev),
-+			HEALTH_DEVICE, "ChannelConnected",
-+			DBUS_TYPE_OBJECT_PATH, &dc_data->hdp_chann->path,
-+			DBUS_TYPE_INVALID);
- }
- 
- static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
--- 
-1.7.4.1
+On Fri, Mar 25, 2011, Anderson Lizardo wrote:
+> > On Fri, Mar 25, 2011, Anderson Lizardo wrote:
+> >> > +static u16 get_uuid16(u8 *uuid128)
+> >> > +{
+> >> > +       u8 *b = bluetooth_base_uuid;
+> >> > +       u32 val;
+> >> > +       int i;
+> >> > +
+> >> > +       for (i = 4; i < 16; i++) {
+> >> > +               if (b[i] != uuid128[i])
+> >> > +                       return 0;
+> >>
+> >> Don't you need to check bytes 0 and 1 as well, i.e. only bytes 2 and 3
+> >> are changed?
+> >
+> > The first four bytes can have any value for Bluetooth UUIDs. The purpose
+> > of this part of the function is to determine whether it's a Bluetooth
+> > UUID or not (i.e. derived from the Bluetooth base UUID), so the four
+> > first bytes don't matter.
+> 
+> At least for UUIDs used in attribute types I see this on the spec (page 1835):
+> 
+> "Or, to put it more simply, the 16-bit Attribute UUID replaces the x’s
+> in the follow-
+> ing:
+> 0000xxxx-0000-1000-8000-00805F9B34FB"
+> 
+> I.e. , only third and fourth bytes being part of 16-bit UUID.
 
+That's correct, and we're not contradicting each other here. The
+function simply in the first stage doesn't care if it's a 32 or 16 bit
+Bluetooth UUID and only after that it does the > 0xffff comparison.
+
+Johan
