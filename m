@@ -1,48 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Emit missing signal when data channel is reconnected.
-Date: Fri, 25 Mar 2011 14:19:03 +0100
-Message-Id: <1301059143-14614-1-git-send-email-sancane@gmail.com>
+Date: Fri, 25 Mar 2011 09:35:43 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 3/3] Bluetooth: delete hanging L2CAP channel
+Message-ID: <20110325123458.GA2596@joana>
+References: <1300979768-31963-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1300979768-31963-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20110324191242.GD2236@joana>
+ <AANLkTim2_owHJ9NT4B7u484D1itkuEmGUzdp1wxgaZTi@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <AANLkTim2_owHJ9NT4B7u484D1itkuEmGUzdp1wxgaZTi@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reconnections of data channels should be indicated to others
-applications by using the appropriate signal.
----
- health/hdp.c |   11 ++++++++++-
- 1 files changed, 10 insertions(+), 1 deletions(-)
+Hi Andrei,
 
-diff --git a/health/hdp.c b/health/hdp.c
-index 3c2dce1..b06fe17 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -510,14 +510,23 @@ static void hdp_mdl_reconn_cb(struct mcap_mdl *mdl, GError *err, gpointer data)
- 	}
- 
- 	fd = mcap_mdl_get_fd(dc_data->hdp_chann->mdl);
--	if (fd < 0)
-+	if (fd < 0) {
- 		reply = g_dbus_create_error(dc_data->msg,
- 						ERROR_INTERFACE ".HealthError",
- 						"Cannot get file descriptor");
-+		g_dbus_send_message(dc_data->conn, reply);
-+		return;
-+	}
- 
- 	reply = g_dbus_create_reply(dc_data->msg, DBUS_TYPE_UNIX_FD, &fd,
- 							DBUS_TYPE_INVALID);
- 	g_dbus_send_message(dc_data->conn, reply);
-+
-+	g_dbus_emit_signal(dc_data->conn,
-+			device_get_path(dc_data->hdp_chann->dev->dev),
-+			HEALTH_DEVICE, "ChannelConnected",
-+			DBUS_TYPE_OBJECT_PATH,
-+			&dc_data->hdp_chann->path, DBUS_TYPE_INVALID);
- }
- 
- static void hdp_get_dcpsm_cb(uint16_t dcpsm, gpointer user_data, GError *err)
+* Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com> [2011-03-25 10:57:52 +0200]:
+
+> Hi Gustavo,
+> 
+> On Thu, Mar 24, 2011 at 9:12 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Andrei,
+> >
+> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-03-24 17:16:08 +0200]:
+> >
+> >> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >>
+> >> Sometimes L2CAP connection remains hanging. Make sure that
+> >> L2CAP channel is deleted.
+> >>
+> >> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> >> ---
+> >>  net/bluetooth/l2cap_sock.c |    5 +++--
+> >>  1 files changed, 3 insertions(+), 2 deletions(-)
+> >
+> > This one is applied. Thanks.
+> 
+> Where it is applied? Cannot find it here:
+
+I applied it to bluetooth-2.6 as it is a bug fix.
+
 -- 
-1.7.4.1
-
+Gustavo F. Padovan
+http://profusion.mobi
