@@ -1,40 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 27 Mar 2011 14:47:51 +0200
-From: Vladimir Botka <vbotka@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: ciriarte@personal.net.py
-Subject: bluetoothd connection timed-out with Nokia BH-505 and BCM2045 in
- 2.6.37
-Message-ID: <20110327144751.1463ebbe@l696.suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<henrik.possung@stericsson.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v7 6/6] Add oob-api.txt with documentation about OOB D-Bus methods
+Date: Sat, 26 Mar 2011 12:27:11 +0100
+Message-ID: <1301138831-12082-7-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
+References: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!,
+---
+ doc/oob-api.txt |   38 ++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 38 insertions(+), 0 deletions(-)
+ create mode 100644 doc/oob-api.txt
 
-bluetoothd connection timed-out with Nokia BH-505 and BCM2045 [1] in 2.6.37. The multimedia buttons work
-(play/pause), but the audio doesn't work. From /var/log/messages can be seen:
---
-Mar 19 19:31:06 roamer pulseaudio[3668]: module-bluetooth-device.c: Skipping
-5410592 us (= 954428 bytes) in audio stream
-Mar 19 19:31:14 roamer bluetoothd[1663]: Suspend: Connection timed out (110)
-Mar 19 19:31:14 roamer bluetoothd[1663]: suspend failed
-Mar 19 19:31:14 roamer pulseaudio[3668]: module-bluetooth-device.c: Received
-error condition: Error de entrada/salida
-Mar 19 19:31:17 roamer bluetoothd[1663]: Abort: Connection timed out (110)
---
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+new file mode 100644
+index 0000000..7fa09f7
+--- /dev/null
++++ b/doc/oob-api.txt
+@@ -0,0 +1,38 @@
++BlueZ D-Bus Out Of Band API description
++***********************************
++
++Copyright (C) 2011  Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
++
++Service		org.bluez
++Interface	org.bluez.Oob
++Object path	[variable prefix]/{hci0,hci1,...}
++
++Methods		array{byte} hash, array{byte} randomizer ReadLocalOobData()
++
++			This method reads local OOB data from adapter. Return
++			value is pair of arrays 16 bytes each.
++
++			Note: This method will generate and return new local
++			OOB data.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.InProgress
++
++		void AddRemoteOobData(string address, array{byte} hash,
++							array{byte} randomizer)
++
++			This method adds new Out Of Band data for specified
++			address. If data for specified address already exists it
++			will be overwritten with new one.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.InvalidArguments
++
++		void RemoveRemoteOobData(string address)
++
++			This method removes Out Of Band data for specified
++			address. If data for specified address does not exist
++			nothing is removed.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.InvalidArguments
+-- 
+1.7.0.4
 
-[1]
-  Model: "Dell BCM2045"
-  Hotplug: USB
-  Vendor: usb 0x413c "Dell Computer Corp."
-  Device: usb 0x8126 "BCM2045"
-[2] /var/log/messages with bluetooth debug
-    https://bugzilla.novell.com/show_bug.cgi?id=681080#c6
-[3] # hcidump -t -w test
-    https://bugzilla.novell.com/show_bug.cgi?id=681080#c7
-
-Any idea ? Thank you,
-
-	Vladimir Botka
