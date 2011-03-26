@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v7 1/6] Add initial support for Out of Band (OOB) association model
-Date: Sat, 26 Mar 2011 12:27:06 +0100
-Message-ID: <1301138831-12082-2-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v7 2/6] Add support for Out of Band (OOB) association model in mgmtops
+Date: Sat, 26 Mar 2011 12:27:07 +0100
+Message-ID: <1301138831-12082-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 References: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -15,267 +15,203 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am       |    3 ++-
- plugins/hciops.c  |   31 +++++++++++++++++++++++++++++++
- plugins/mgmtops.c |   31 +++++++++++++++++++++++++++++++
- src/adapter.c     |   18 ++++++++++++++++++
- src/adapter.h     |   12 ++++++++++++
- src/oob.c         |   41 +++++++++++++++++++++++++++++++++++++++++
- src/oob.h         |   32 ++++++++++++++++++++++++++++++++
- 7 files changed, 167 insertions(+), 1 deletions(-)
- create mode 100644 src/oob.c
- create mode 100644 src/oob.h
+ lib/mgmt.h        |   18 +++++++++
+ plugins/mgmtops.c |  104 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 119 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 2994bf9..0ed2acf 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -259,7 +259,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
- 			src/adapter.h src/adapter.c \
- 			src/device.h src/device.c \
- 			src/dbus-common.c src/dbus-common.h \
--			src/event.h src/event.c
-+			src/event.h src/event.c \
-+			src/oob.h src/oob.c
- src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
- 							@CAPNG_LIBS@ -ldl -lrt
- src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 69627eb..ffda339 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -3555,6 +3555,34 @@ static int hciops_cancel_bonding(int index, bdaddr_t *bdaddr)
- 	return 0;
- }
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index bd65328..3d29b24 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -179,6 +179,24 @@ struct mgmt_cp_set_local_name {
+ 	uint8_t name[249];
+ } __packed;
  
-+static int hciops_read_local_oob_data(int index)
-+{
-+	DBG("hci%d", index);
++#define MGMT_OP_READ_LOCAL_OOB_DATA	0x0018
++struct mgmt_rp_read_local_oob_data {
++	uint8_t hash[16];
++	uint8_t randomizer[16];
++} __packed;
 +
-+	return -ENOSYS;
-+}
++#define MGMT_OP_ADD_REMOTE_OOB_DATA	0x0019
++struct mgmt_cp_add_remote_oob_data {
++	bdaddr_t bdaddr;
++	uint8_t hash[16];
++	uint8_t randomizer[16];
++} __packed;
 +
-+static int hciops_add_remote_oob_data(int index, bdaddr_t *bdaddr,
-+					uint8_t *hash, uint8_t *randomizer)
-+{
-+	char addr[18];
++#define MGMT_OP_REMOVE_REMOTE_OOB_DATA	0x001A
++struct mgmt_cp_remove_remote_oob_data {
++	bdaddr_t bdaddr;
++} __packed;
 +
-+	ba2str(bdaddr, addr);
-+	DBG("hci%d bdaddr %s", index, addr);
-+
-+	return -ENOSYS;
-+}
-+
-+static int hciops_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
-+{
-+	char addr[18];
-+
-+	ba2str(bdaddr, addr);
-+	DBG("hci%d bdaddr %s", index, addr);
-+
-+	return -ENOSYS;
-+}
-+
- static struct btd_adapter_ops hci_ops = {
- 	.setup = hciops_setup,
- 	.cleanup = hciops_cleanup,
-@@ -3594,6 +3622,9 @@ static struct btd_adapter_ops hci_ops = {
- 	.set_io_capability = hciops_set_io_capability,
- 	.create_bonding = hciops_create_bonding,
- 	.cancel_bonding = hciops_cancel_bonding,
-+	.read_local_oob_data = hciops_read_local_oob_data,
-+	.add_remote_oob_data = hciops_add_remote_oob_data,
-+	.remove_remote_oob_data = hciops_remove_remote_oob_data,
- };
- 
- static int hciops_init(void)
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 0c376f7..6bb033b 100644
+index 6bb033b..3aca861 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -1748,6 +1748,34 @@ static int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr)
- 	return -ENOSYS;
- }
- 
-+static int mgmt_read_local_oob_data(int index)
-+{
-+	DBG("hci%d", index);
-+
-+	return -ENOSYS;
-+}
-+
-+static int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
-+					uint8_t *hash, uint8_t *randomizer)
-+{
-+	char addr[18];
-+
-+	ba2str(bdaddr, addr);
-+	DBG("hci%d bdaddr %s", index, addr);
-+
-+	return -ENOSYS;
-+}
-+
-+static int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
-+{
-+	char addr[18];
-+
-+	ba2str(bdaddr, addr);
-+	DBG("hci%d bdaddr %s", index, addr);
-+
-+	return -ENOSYS;
-+}
-+
- static struct btd_adapter_ops mgmt_ops = {
- 	.setup = mgmt_setup,
- 	.cleanup = mgmt_cleanup,
-@@ -1787,6 +1815,9 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.set_io_capability = mgmt_set_io_capability,
- 	.create_bonding = mgmt_create_bonding,
- 	.cancel_bonding = mgmt_cancel_bonding,
-+	.read_local_oob_data = mgmt_read_local_oob_data,
-+	.add_remote_oob_data = mgmt_add_remote_oob_data,
-+	.remove_remote_oob_data = mgmt_remove_remote_oob_data,
- };
- 
- static int mgmt_init(void)
-diff --git a/src/adapter.c b/src/adapter.c
-index 691b963..5894146 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3729,3 +3729,21 @@ int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
- {
- 	return adapter_ops->cancel_bonding(adapter->dev_id, bdaddr);
- }
-+
-+int btd_adapter_read_local_oob_data(struct btd_adapter *adapter)
-+{
-+	return adapter_ops->read_local_oob_data(adapter->dev_id);
-+}
-+
-+int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
-+			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer)
-+{
-+	return adapter_ops->add_remote_oob_data(adapter->dev_id, bdaddr, hash,
-+								randomizer);
-+}
-+
-+int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
-+							bdaddr_t *bdaddr)
-+{
-+	return adapter_ops->remove_remote_oob_data(adapter->dev_id, bdaddr);
-+}
-diff --git a/src/adapter.h b/src/adapter.h
-index 8bc687d..308af75 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -237,6 +237,10 @@ struct btd_adapter_ops {
- 	int (*set_io_capability) (int index, uint8_t io_capability);
- 	int (*create_bonding) (int index, bdaddr_t *bdaddr, uint8_t io_cap);
- 	int (*cancel_bonding) (int index, bdaddr_t *bdaddr);
-+	int (*read_local_oob_data) (int index);
-+	int (*add_remote_oob_data) (int index, bdaddr_t *bdaddr, uint8_t *hash,
-+							uint8_t *randomizer);
-+	int (*remove_remote_oob_data) (int index, bdaddr_t *bdaddr);
- };
- 
- int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
-@@ -288,3 +292,11 @@ int adapter_create_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 							uint8_t io_cap);
- 
- int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr);
-+
-+int btd_adapter_read_local_oob_data(struct btd_adapter *adapter);
-+
-+int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
-+			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer);
-+
-+int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
-+							bdaddr_t *bdaddr);
-diff --git a/src/oob.c b/src/oob.c
-new file mode 100644
-index 0000000..75798fb
---- /dev/null
-+++ b/src/oob.c
-@@ -0,0 +1,41 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  ST-Ericsson SA
-+ *
-+ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include "adapter.h"
+@@ -47,6 +47,7 @@
+ #include "manager.h"
+ #include "device.h"
+ #include "event.h"
 +#include "oob.h"
-+
-+static oob_read_cb_t local_oob_read_cb = NULL;
-+
-+void oob_register_cb(oob_read_cb_t cb)
+ 
+ #define MGMT_BUF_SIZE 1024
+ 
+@@ -1029,6 +1030,49 @@ static void set_local_name_complete(int sk, uint16_t index, void *buf,
+ 	adapter_update_local_name(adapter, (char *) rp->name);
+ }
+ 
++static void read_local_oob_data_complete(int sk, uint16_t index, void *buf,
++								size_t len)
 +{
-+	local_oob_read_cb = cb;
++	struct mgmt_rp_read_local_oob_data *rp = buf;
++	struct btd_adapter *adapter;
++
++	if (len != sizeof(*rp)) {
++		error("Wrong read_local_oob_data_complete event size");
++		return;
++	}
++
++	if (index > max_index) {
++		error("Unexpected index %u in read_local_oob_data_complete",
++								index);
++		return;
++	}
++
++	DBG("hci%u", index);
++
++	adapter = manager_find_adapter_by_id(index);
++
++	if (adapter)
++		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
 +}
 +
-+void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
-+							uint8_t *randomizer)
++static void read_local_oob_data_failed(int sk, uint16_t index)
 +{
-+	if (local_oob_read_cb)
-+		local_oob_read_cb(adapter, hash, randomizer);
++	struct btd_adapter *adapter;
++
++	if (index > max_index) {
++		error("Unexpected index %u in read_local_oob_data_failed",
++								index);
++		return;
++	}
++
++	DBG("hci%u", index);
++
++	adapter = manager_find_adapter_by_id(index);
++
++	if (adapter)
++		oob_read_local_data_complete(adapter, NULL, NULL);
 +}
-diff --git a/src/oob.h b/src/oob.h
-new file mode 100644
-index 0000000..5805082
---- /dev/null
-+++ b/src/oob.h
-@@ -0,0 +1,32 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  ST-Ericsson SA
-+ *
-+ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+typedef void (*oob_read_cb_t) (struct btd_adapter *adapter, uint8_t *hash,
-+							uint8_t *randomizer);
+ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ {
+ 	struct mgmt_ev_cmd_complete *ev = buf;
+@@ -1113,6 +1157,15 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
+ 	case MGMT_OP_SET_LOCAL_NAME:
+ 		set_local_name_complete(sk, index, ev->data, len);
+ 		break;
++	case MGMT_OP_READ_LOCAL_OOB_DATA:
++		read_local_oob_data_complete(sk, index, ev->data, len);
++		break;
++	case MGMT_OP_ADD_REMOTE_OOB_DATA:
++		DBG("add_remote_oob_data complete");
++		break;
++	case MGMT_OP_REMOVE_REMOTE_OOB_DATA:
++		DBG("remove_remote_oob_data complete");
++		break;
+ 	default:
+ 		error("Unknown command complete for opcode %u", opcode);
+ 		break;
+@@ -1132,6 +1185,12 @@ static void mgmt_cmd_status(int sk, uint16_t index, void *buf, size_t len)
+ 	opcode = btohs(bt_get_unaligned(&ev->opcode));
+ 
+ 	DBG("status %u opcode %u (index %u)", ev->status, opcode, index);
 +
-+void oob_register_cb(oob_read_cb_t cb);
++	switch (opcode) {
++	case MGMT_OP_READ_LOCAL_OOB_DATA:
++		read_local_oob_data_failed(sk, index);
++		break;
++	}
+ }
+ 
+ static void mgmt_controller_error(int sk, uint16_t index, void *buf, size_t len)
+@@ -1750,30 +1809,69 @@ static int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr)
+ 
+ static int mgmt_read_local_oob_data(int index)
+ {
++	struct mgmt_hdr hdr;
 +
-+void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
-+							uint8_t *randomizer);
+ 	DBG("hci%d", index);
+ 
+-	return -ENOSYS;
++	hdr.opcode = htobs(MGMT_OP_READ_LOCAL_OOB_DATA);
++	hdr.len = 0;
++	hdr.index = htobs(index);
++
++	if (write(mgmt_sock, &hdr, sizeof(hdr)) < 0)
++		return -errno;
++
++	return 0;
+ }
+ 
+ static int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
+ 					uint8_t *hash, uint8_t *randomizer)
+ {
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_add_remote_oob_data)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_add_remote_oob_data *cp = (void *) &buf[sizeof(*hdr)];
+ 	char addr[18];
+ 
+ 	ba2str(bdaddr, addr);
+ 	DBG("hci%d bdaddr %s", index, addr);
+ 
+-	return -ENOSYS;
++	memset(buf, 0, sizeof(buf));
++
++	hdr->opcode = htobs(MGMT_OP_ADD_REMOTE_OOB_DATA);
++	hdr->index = htobs(index);
++	hdr->len = htobs(sizeof(*cp));
++
++	bacpy(&cp->bdaddr, bdaddr);
++	memcpy(cp->hash, hash, 16);
++	memcpy(cp->randomizer, randomizer, 16);
++
++	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
++		return -errno;
++
++	return 0;
+ }
+ 
+ static int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
+ {
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_remove_remote_oob_data)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_remove_remote_oob_data *cp = (void *) &buf[sizeof(*hdr)];
+ 	char addr[18];
+ 
+ 	ba2str(bdaddr, addr);
+ 	DBG("hci%d bdaddr %s", index, addr);
+ 
+-	return -ENOSYS;
++	memset(buf, 0, sizeof(buf));
++
++	hdr->opcode = htobs(MGMT_OP_REMOVE_REMOTE_OOB_DATA);
++	hdr->index = htobs(index);
++	hdr->len = htobs(sizeof(*cp));
++
++	bacpy(&cp->bdaddr, bdaddr);
++
++	if (write(mgmt_sock, &buf, sizeof(buf)) < 0)
++		return -errno;
++
++	return 0;
+ }
+ 
+ static struct btd_adapter_ops mgmt_ops = {
 -- 
 1.7.0.4
 
