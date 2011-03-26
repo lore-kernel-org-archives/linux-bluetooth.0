@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<henrik.possung@stericsson.com>,
 	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v7 3/6] Add support for Out of Band (OOB) association model in hciops
-Date: Sat, 26 Mar 2011 12:27:08 +0100
-Message-ID: <1301138831-12082-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v7 1/6] Add initial support for Out of Band (OOB) association model
+Date: Sat, 26 Mar 2011 12:27:06 +0100
+Message-ID: <1301138831-12082-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 References: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -15,235 +15,267 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/hciops.c |  117 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 109 insertions(+), 8 deletions(-)
+ Makefile.am       |    3 ++-
+ plugins/hciops.c  |   31 +++++++++++++++++++++++++++++++
+ plugins/mgmtops.c |   31 +++++++++++++++++++++++++++++++
+ src/adapter.c     |   18 ++++++++++++++++++
+ src/adapter.h     |   12 ++++++++++++
+ src/oob.c         |   41 +++++++++++++++++++++++++++++++++++++++++
+ src/oob.h         |   32 ++++++++++++++++++++++++++++++++
+ 7 files changed, 167 insertions(+), 1 deletions(-)
+ create mode 100644 src/oob.c
+ create mode 100644 src/oob.h
 
+diff --git a/Makefile.am b/Makefile.am
+index 2994bf9..0ed2acf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -259,7 +259,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/adapter.h src/adapter.c \
+ 			src/device.h src/device.c \
+ 			src/dbus-common.c src/dbus-common.h \
+-			src/event.h src/event.c
++			src/event.h src/event.c \
++			src/oob.h src/oob.c
+ src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
+ 							@CAPNG_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
 diff --git a/plugins/hciops.c b/plugins/hciops.c
-index ffda339..93f6f21 100644
+index 69627eb..ffda339 100644
 --- a/plugins/hciops.c
 +++ b/plugins/hciops.c
-@@ -50,6 +50,7 @@
- #include "storage.h"
- #include "event.h"
- #include "manager.h"
-+#include "oob.h"
+@@ -3555,6 +3555,34 @@ static int hciops_cancel_bonding(int index, bdaddr_t *bdaddr)
+ 	return 0;
+ }
  
- static int child_pipe[2] = { -1, -1 };
- 
-@@ -77,11 +78,18 @@ struct bt_conn {
- 	uint8_t loc_auth;
- 	uint8_t rem_cap;
- 	uint8_t rem_auth;
-+	uint8_t rem_oob_data;
- 	gboolean bonding_initiator;
- 	gboolean secmode3;
- 	GIOChannel *io; /* For raw L2CAP socket (bonding) */
++static int hciops_read_local_oob_data(int index)
++{
++	DBG("hci%d", index);
++
++	return -ENOSYS;
++}
++
++static int hciops_add_remote_oob_data(int index, bdaddr_t *bdaddr,
++					uint8_t *hash, uint8_t *randomizer)
++{
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("hci%d bdaddr %s", index, addr);
++
++	return -ENOSYS;
++}
++
++static int hciops_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
++{
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("hci%d bdaddr %s", index, addr);
++
++	return -ENOSYS;
++}
++
+ static struct btd_adapter_ops hci_ops = {
+ 	.setup = hciops_setup,
+ 	.cleanup = hciops_cleanup,
+@@ -3594,6 +3622,9 @@ static struct btd_adapter_ops hci_ops = {
+ 	.set_io_capability = hciops_set_io_capability,
+ 	.create_bonding = hciops_create_bonding,
+ 	.cancel_bonding = hciops_cancel_bonding,
++	.read_local_oob_data = hciops_read_local_oob_data,
++	.add_remote_oob_data = hciops_add_remote_oob_data,
++	.remove_remote_oob_data = hciops_remove_remote_oob_data,
  };
  
-+struct oob_data {
-+	bdaddr_t bdaddr;
-+	uint8_t hash[16];
-+	uint8_t randomizer[16];
-+};
-+
- static int max_dev = -1;
- static struct dev_info {
- 	int id;
-@@ -120,6 +128,8 @@ static struct dev_info {
- 	GSList *keys;
- 	uint8_t pin_length;
- 
-+	GSList *oob_data;
-+
- 	GSList *uuids;
- 
- 	GSList *connections;
-@@ -1053,14 +1063,42 @@ static void user_passkey_notify(int index, void *ptr)
- 						btohl(req->passkey));
+ static int hciops_init(void)
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 0c376f7..6bb033b 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1748,6 +1748,34 @@ static int mgmt_cancel_bonding(int index, bdaddr_t *bdaddr)
+ 	return -ENOSYS;
  }
  
--static void remote_oob_data_request(int index, void *ptr)
-+static gint oob_bdaddr_cmp(gconstpointer a, gconstpointer b)
++static int mgmt_read_local_oob_data(int index)
 +{
-+	const struct oob_data *data = a;
-+	const bdaddr_t *bdaddr = b;
++	DBG("hci%d", index);
 +
-+	return bacmp(&data->bdaddr, bdaddr);
++	return -ENOSYS;
 +}
 +
-+static void remote_oob_data_request(int index, bdaddr_t *bdaddr)
- {
- 	struct dev_info *dev = &devs[index];
-+	GSList *match;
- 
- 	DBG("hci%d", index);
- 
--	hci_send_cmd(dev->sk, OGF_LINK_CTL,
--				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, ptr);
-+	match = g_slist_find_custom(dev->oob_data, bdaddr, oob_bdaddr_cmp);
-+
-+	if (match) {
-+		struct oob_data *data;
-+		remote_oob_data_reply_cp cp;
-+
-+		data = match->data;
-+
-+		bacpy(&cp.bdaddr, &data->bdaddr);
-+		memcpy(cp.hash, data->hash, sizeof(cp.hash));
-+		memcpy(cp.randomizer, data->randomizer, sizeof(cp.randomizer));
-+
-+		dev->oob_data = g_slist_delete_link(dev->oob_data, match);
-+
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_REMOTE_OOB_DATA_REPLY,
-+				REMOTE_OOB_DATA_REPLY_CP_SIZE, &cp);
-+
-+	} else {
-+		hci_send_cmd(dev->sk, OGF_LINK_CTL,
-+				OCF_REMOTE_OOB_DATA_NEG_REPLY, 6, bdaddr);
-+	}
- }
- 
- static int get_io_cap(int index, bdaddr_t *bdaddr, uint8_t *cap, uint8_t *auth)
-@@ -1158,11 +1196,23 @@ static void io_capa_request(int index, void *ptr)
- 					IO_CAPABILITY_NEG_REPLY_CP_SIZE, &cp);
- 	} else {
- 		io_capability_reply_cp cp;
-+		struct bt_conn *conn;
-+		GSList *match;
-+
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.bdaddr, dba);
- 		cp.capability = cap;
--		cp.oob_data = 0x00;
- 		cp.authentication = auth;
-+
-+		conn = find_connection(dev, dba);
-+		match = g_slist_find_custom(dev->oob_data, dba, oob_bdaddr_cmp);
-+
-+		if ((conn->bonding_initiator || conn->rem_oob_data == 0x01) &&
-+				match)
-+			cp.oob_data = 0x01;
-+		else
-+			cp.oob_data = 0x00;
-+
- 		hci_send_cmd(dev->sk, OGF_LINK_CTL, OCF_IO_CAPABILITY_REPLY,
- 					IO_CAPABILITY_REPLY_CP_SIZE, &cp);
- 	}
-@@ -1182,6 +1232,7 @@ static void io_capa_response(int index, void *ptr)
- 	if (conn) {
- 		conn->rem_cap = evt->capability;
- 		conn->rem_auth = evt->authentication;
-+		conn->rem_oob_data = evt->oob_data;
- 	}
- }
- 
-@@ -1785,6 +1836,20 @@ static void write_class_complete(int index, uint8_t status)
- 		write_class(index, dev->wanted_cod);
- }
- 
-+static void read_local_oob_data_complete(int index, uint8_t status,
-+						read_local_oob_data_rp *rp)
++static int mgmt_add_remote_oob_data(int index, bdaddr_t *bdaddr,
++					uint8_t *hash, uint8_t *randomizer)
 +{
-+	struct btd_adapter *adapter = manager_find_adapter_by_id(index);
++	char addr[18];
 +
-+	if (!adapter)
-+		return;
++	ba2str(bdaddr, addr);
++	DBG("hci%d bdaddr %s", index, addr);
 +
-+	if (status)
-+		oob_read_local_data_complete(adapter, NULL, NULL);
-+	else
-+		oob_read_local_data_complete(adapter, rp->hash, rp->randomizer);
++	return -ENOSYS;
 +}
 +
- static inline void cmd_complete(int index, void *ptr)
++static int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
++{
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("hci%d bdaddr %s", index, addr);
++
++	return -ENOSYS;
++}
++
+ static struct btd_adapter_ops mgmt_ops = {
+ 	.setup = mgmt_setup,
+ 	.cleanup = mgmt_cleanup,
+@@ -1787,6 +1815,9 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.set_io_capability = mgmt_set_io_capability,
+ 	.create_bonding = mgmt_create_bonding,
+ 	.cancel_bonding = mgmt_cancel_bonding,
++	.read_local_oob_data = mgmt_read_local_oob_data,
++	.add_remote_oob_data = mgmt_add_remote_oob_data,
++	.remove_remote_oob_data = mgmt_remove_remote_oob_data,
+ };
+ 
+ static int mgmt_init(void)
+diff --git a/src/adapter.c b/src/adapter.c
+index 691b963..5894146 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3729,3 +3729,21 @@ int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
  {
- 	struct dev_info *dev = &devs[index];
-@@ -1858,6 +1923,10 @@ static inline void cmd_complete(int index, void *ptr)
- 		ptr += sizeof(evt_cmd_complete);
- 		read_tx_power_complete(index, ptr);
- 		break;
-+	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA):
-+		ptr += sizeof(evt_cmd_complete);
-+		read_local_oob_data_complete(index, status, ptr);
-+		break;
- 	};
+ 	return adapter_ops->cancel_bonding(adapter->dev_id, bdaddr);
  }
- 
-@@ -2387,7 +2456,7 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond,
- 		break;
- 
- 	case EVT_REMOTE_OOB_DATA_REQUEST:
--		remote_oob_data_request(index, ptr);
-+		remote_oob_data_request(index, (bdaddr_t *) ptr);
- 		break;
- 	}
- 
-@@ -3557,30 +3626,62 @@ static int hciops_cancel_bonding(int index, bdaddr_t *bdaddr)
- 
- static int hciops_read_local_oob_data(int index)
- {
-+	struct dev_info *dev = &devs[index];
 +
- 	DBG("hci%d", index);
- 
--	return -ENOSYS;
-+	if (hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_LOCAL_OOB_DATA, 0, 0)
-+									< 0)
-+		return -errno;
++int btd_adapter_read_local_oob_data(struct btd_adapter *adapter)
++{
++	return adapter_ops->read_local_oob_data(adapter->dev_id);
++}
 +
-+	return 0;
- }
- 
- static int hciops_add_remote_oob_data(int index, bdaddr_t *bdaddr,
- 					uint8_t *hash, uint8_t *randomizer)
- {
- 	char addr[18];
-+	struct dev_info *dev = &devs[index];
-+	GSList *match;
-+	struct oob_data *data;
- 
- 	ba2str(bdaddr, addr);
- 	DBG("hci%d bdaddr %s", index, addr);
- 
--	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
++int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
++			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer)
++{
++	return adapter_ops->add_remote_oob_data(adapter->dev_id, bdaddr, hash,
++								randomizer);
++}
 +
-+	if (match) {
-+		data = match->data;
-+	} else {
-+		data = g_new(struct oob_data, 1);
-+		bacpy(&data->bdaddr, bdaddr);
-+		dev->oob_data = g_slist_prepend(dev->oob_data, data);
-+	}
-+
-+	memcpy(data->hash, hash, sizeof(data->hash));
-+	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
-+
-+	return 0;
- }
++int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
++							bdaddr_t *bdaddr)
++{
++	return adapter_ops->remove_remote_oob_data(adapter->dev_id, bdaddr);
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index 8bc687d..308af75 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -237,6 +237,10 @@ struct btd_adapter_ops {
+ 	int (*set_io_capability) (int index, uint8_t io_capability);
+ 	int (*create_bonding) (int index, bdaddr_t *bdaddr, uint8_t io_cap);
+ 	int (*cancel_bonding) (int index, bdaddr_t *bdaddr);
++	int (*read_local_oob_data) (int index);
++	int (*add_remote_oob_data) (int index, bdaddr_t *bdaddr, uint8_t *hash,
++							uint8_t *randomizer);
++	int (*remove_remote_oob_data) (int index, bdaddr_t *bdaddr);
+ };
  
- static int hciops_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
- {
- 	char addr[18];
-+	struct dev_info *dev = &devs[index];
-+	GSList *match;
+ int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
+@@ -288,3 +292,11 @@ int adapter_create_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 							uint8_t io_cap);
  
- 	ba2str(bdaddr, addr);
- 	DBG("hci%d bdaddr %s", index, addr);
- 
--	return -ENOSYS;
-+	match = g_slist_find_custom(dev->oob_data, &bdaddr, oob_bdaddr_cmp);
+ int adapter_cancel_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr);
 +
-+	if (!match)
-+		return -ENOENT;
++int btd_adapter_read_local_oob_data(struct btd_adapter *adapter);
 +
-+	g_free(match->data);
-+	dev->oob_data = g_slist_delete_link(dev->oob_data, match);
++int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
++			bdaddr_t *bdaddr, uint8_t *hash, uint8_t *randomizer);
 +
-+	return 0;
- }
- 
- static struct btd_adapter_ops hci_ops = {
++int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
++							bdaddr_t *bdaddr);
+diff --git a/src/oob.c b/src/oob.c
+new file mode 100644
+index 0000000..75798fb
+--- /dev/null
++++ b/src/oob.c
+@@ -0,0 +1,41 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  ST-Ericsson SA
++ *
++ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include "adapter.h"
++#include "oob.h"
++
++static oob_read_cb_t local_oob_read_cb = NULL;
++
++void oob_register_cb(oob_read_cb_t cb)
++{
++	local_oob_read_cb = cb;
++}
++
++void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
++							uint8_t *randomizer)
++{
++	if (local_oob_read_cb)
++		local_oob_read_cb(adapter, hash, randomizer);
++}
+diff --git a/src/oob.h b/src/oob.h
+new file mode 100644
+index 0000000..5805082
+--- /dev/null
++++ b/src/oob.h
+@@ -0,0 +1,32 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  ST-Ericsson SA
++ *
++ *  Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++typedef void (*oob_read_cb_t) (struct btd_adapter *adapter, uint8_t *hash,
++							uint8_t *randomizer);
++
++void oob_register_cb(oob_read_cb_t cb);
++
++void oob_read_local_data_complete(struct btd_adapter *adapter, uint8_t *hash,
++							uint8_t *randomizer);
 -- 
 1.7.0.4
 
