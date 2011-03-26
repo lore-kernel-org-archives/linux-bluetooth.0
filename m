@@ -2,84 +2,209 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 6/6] Fix disconnecting when primary service discovery is done
-Date: Fri, 25 Mar 2011 21:01:13 -0300
-Message-Id: <1301097673-5262-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 4/6] Remove _init and _exit methods from Attrib client
+Date: Fri, 25 Mar 2011 21:01:11 -0300
+Message-Id: <1301097673-5262-5-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1301097673-5262-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1301097673-5262-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We shouldn't disconnect when the primary service discovery is done.
-Most LE devices leave advertising mode as soon as the connection is
-established, so shouldn't assume that we are able to reconnect to
-them again.
+Now that Attrib client is being moved to the core, there's no
+need to have explicit _init and _exit methods.
 
-For that we rely on the fact that GAttrib will close the connection
-when its last reference is dropped.
+This also means that we need to pass the DBusConnection explicitly
+to the registration method.
 ---
- src/device.c |   13 ++++++-------
- 1 files changed, 6 insertions(+), 7 deletions(-)
+ attrib/client.c |   44 ++++++++++++++------------------------------
+ attrib/client.h |    5 ++---
+ src/adapter.c   |    2 +-
+ src/device.c    |    2 +-
+ 4 files changed, 18 insertions(+), 35 deletions(-)
 
+diff --git a/attrib/client.c b/attrib/client.c
+index 590f33b..acd35f9 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -52,6 +52,7 @@
+ 
+ struct gatt_service {
+ 	struct btd_device *dev;
++	DBusConnection *conn;
+ 	bdaddr_t sba;
+ 	bdaddr_t dba;
+ 	char *path;
+@@ -108,8 +109,6 @@ struct watcher {
+ 
+ static GSList *gatt_services = NULL;
+ 
+-static DBusConnection *connection;
+-
+ static void characteristic_free(void *user_data)
+ {
+ 	struct characteristic *chr = user_data;
+@@ -138,7 +137,7 @@ static void primary_free(void *user_data)
+ 
+ 	for (l = prim->watchers; l; l = l->next) {
+ 		struct watcher *watcher = l->data;
+-		g_dbus_remove_watch(connection, watcher->id);
++		g_dbus_remove_watch(prim->gatt->conn, watcher->id);
+ 	}
+ 
+ 	g_slist_foreach(prim->chars, (GFunc) characteristic_free, NULL);
+@@ -156,6 +155,7 @@ static void gatt_service_free(void *user_data)
+ 	g_attrib_unref(gatt->attrib);
+ 	g_free(gatt->path);
+ 	btd_device_unref(gatt->dev);
++	dbus_connection_unref(gatt->conn);
+ 	g_free(gatt);
+ }
+ 
+@@ -249,6 +249,7 @@ static void update_watchers(gpointer data, gpointer user_data)
+ {
+ 	struct watcher *w = data;
+ 	struct characteristic *chr = user_data;
++	DBusConnection *conn = w->prim->gatt->conn;
+ 	DBusMessage *msg;
+ 
+ 	msg = dbus_message_new_method_call(w->name, w->path,
+@@ -261,7 +262,7 @@ static void update_watchers(gpointer data, gpointer user_data)
+ 			&chr->value, chr->vlen, DBUS_TYPE_INVALID);
+ 
+ 	dbus_message_set_no_reply(msg, TRUE);
+-	g_dbus_send_message(connection, msg);
++	g_dbus_send_message(conn, msg);
+ }
+ 
+ static void events_handler(const uint8_t *pdu, uint16_t len,
+@@ -337,7 +338,7 @@ static void connect_cb(GIOChannel *chan, GError *gerr, gpointer user_data)
+ 		if (gatt->msg) {
+ 			DBusMessage *reply = btd_error_failed(gatt->msg,
+ 							gerr->message);
+-			g_dbus_send_message(connection, reply);
++			g_dbus_send_message(gatt->conn, reply);
+ 		}
+ 
+ 		error("%s", gerr->message);
+@@ -592,7 +593,7 @@ static void register_characteristics(struct primary *prim)
+ 
+ 	for (lc = prim->chars; lc; lc = lc->next) {
+ 		struct characteristic *chr = lc->data;
+-		g_dbus_register_interface(connection, chr->path,
++		g_dbus_register_interface(prim->gatt->conn, chr->path,
+ 				CHAR_INTERFACE, char_methods,
+ 				NULL, NULL, chr, NULL);
+ 		DBG("Registered: %s", chr->path);
+@@ -936,7 +937,7 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 	g_slist_foreach(prim->chars, update_all_chars, prim);
+ 
+ fail:
+-	g_dbus_send_message(connection, reply);
++	g_dbus_send_message(gatt->conn, reply);
+ 	g_attrib_unref(gatt->attrib);
+ 	g_free(current);
+ }
+@@ -1033,7 +1034,7 @@ static void register_primaries(struct gatt_service *gatt, GSList *primaries)
+ 		prim->path = g_strdup_printf("%s/service%04x", gatt->path,
+ 								att->start);
+ 
+-		g_dbus_register_interface(connection, prim->path,
++		g_dbus_register_interface(gatt->conn, prim->path,
+ 				CHAR_INTERFACE, prim_methods,
+ 				NULL, NULL, prim, NULL);
+ 		DBG("Registered: %s", prim->path);
+@@ -1044,7 +1045,8 @@ static void register_primaries(struct gatt_service *gatt, GSList *primaries)
+ 	}
+ }
+ 
+-int attrib_client_register(struct btd_device *device, int psm, GSList *primaries)
++int attrib_client_register(DBusConnection *connection,
++		struct btd_device *device, int psm, GSList *primaries)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	const char *path = device_get_path(device);
+@@ -1056,6 +1058,7 @@ int attrib_client_register(struct btd_device *device, int psm, GSList *primaries
+ 
+ 	gatt = g_new0(struct gatt_service, 1);
+ 	gatt->dev = btd_device_ref(device);
++	gatt->conn = dbus_connection_ref(connection);
+ 	gatt->listen = FALSE;
+ 	gatt->path = g_strdup(path);
+ 	bacpy(&gatt->sba, &sba);
+@@ -1085,31 +1088,12 @@ void attrib_client_unregister(struct btd_device *device)
+ 		struct primary *prim = lp->data;
+ 		for (lc = prim->chars; lc; lc = lc->next) {
+ 			struct characteristic *chr = lc->data;
+-			g_dbus_unregister_interface(connection, chr->path,
++			g_dbus_unregister_interface(gatt->conn, chr->path,
+ 								CHAR_INTERFACE);
+ 		}
+-		g_dbus_unregister_interface(connection, prim->path,
++		g_dbus_unregister_interface(gatt->conn, prim->path,
+ 								CHAR_INTERFACE);
+ 	}
+ 
+ 	gatt_service_free(gatt);
+ }
+-
+-int attrib_client_init(DBusConnection *conn)
+-{
+-
+-	connection = dbus_connection_ref(conn);
+-
+-	/*
+-	 * FIXME: if the adapter supports BLE start scanning. Temporary
+-	 * solution, this approach doesn't allow to control scanning based
+-	 * on the discoverable property.
+-	 */
+-
+-	return 0;
+-}
+-
+-void attrib_client_exit(void)
+-{
+-	dbus_connection_unref(connection);
+-}
+diff --git a/attrib/client.h b/attrib/client.h
+index 2bee84c..650b0c1 100644
+--- a/attrib/client.h
++++ b/attrib/client.h
+@@ -22,7 +22,6 @@
+  *
+  */
+ 
+-int attrib_client_init(DBusConnection *conn);
+-void attrib_client_exit(void);
+-int attrib_client_register(struct btd_device *device, int psm, GSList *primaries);
++int attrib_client_register(DBusConnection *connection,
++		struct btd_device *device, int psm, GSList *primaries);
+ void attrib_client_unregister(struct btd_device *device);
+diff --git a/src/adapter.c b/src/adapter.c
+index 56105c7..124252a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2182,7 +2182,7 @@ static void create_stored_device_from_primary(char *key, char *value,
+ 	}
+ 
+ 	/* FIXME: Need the correct psm */
+-	attrib_client_register(device, -1, services);
++	attrib_client_register(connection, device, -1, services);
+ 
+ 	device_probe_drivers(device, uuids);
+ 
 diff --git a/src/device.c b/src/device.c
-index fa5764e..d567952 100644
+index 1d7094b..511c9d0 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -94,7 +94,6 @@ struct browse_req {
- 	DBusConnection *conn;
- 	DBusMessage *msg;
- 	GAttrib *attrib;
--	GIOChannel *io;
- 	struct btd_device *device;
- 	GSList *match_uuids;
- 	GSList *profiles_added;
-@@ -166,11 +165,8 @@ static void browse_request_free(struct browse_req *req)
- 	if (req->records)
- 		sdp_list_free(req->records, (sdp_free_func_t) sdp_record_free);
+@@ -1548,7 +1548,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	device_probe_drivers(device, uuids);
  
--	if (req->io) {
-+	if (req->attrib)
- 		g_attrib_unref(req->attrib);
--		g_io_channel_unref(req->io);
--		g_io_channel_shutdown(req->io, FALSE, NULL);
--	}
+ 	/* FIXME: Need the correct psm */
+-	attrib_client_register(device, -1, services);
++	attrib_client_register(req->conn, device, -1, services);
  
- 	g_free(req);
- }
-@@ -1588,6 +1584,8 @@ static void gatt_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	}
+ 	g_slist_free(uuids);
  
- 	req->attrib = g_attrib_new(io);
-+	g_io_channel_unref(io);
-+
- 	gatt_discover_primary(req->attrib, NULL, primary_cb, req);
- }
- 
-@@ -1597,6 +1595,7 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
- 	struct btd_adapter *adapter = device->adapter;
- 	struct browse_req *req;
- 	BtIOSecLevel sec_level;
-+	GIOChannel *io;
- 	bdaddr_t src;
- 
- 	if (device->browse)
-@@ -1609,14 +1608,14 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
- 
- 	sec_level = secure ? BT_IO_SEC_HIGH : BT_IO_SEC_LOW;
- 
--	req->io = bt_io_connect(BT_IO_L2CAP, gatt_connect_cb, req, NULL, NULL,
-+	io = bt_io_connect(BT_IO_L2CAP, gatt_connect_cb, req, NULL, NULL,
- 				BT_IO_OPT_SOURCE_BDADDR, &src,
- 				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
- 				BT_IO_OPT_CID, GATT_CID,
- 				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 
--	if (req->io == NULL ) {
-+	if (io == NULL ) {
- 		browse_request_free(req);
- 		return -EIO;
- 	}
 -- 
 1.7.4.1
 
