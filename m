@@ -1,58 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 27 Mar 2011 23:04:46 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH v7 0/6] Support for out of band association mode
+Message-ID: <20110327200446.GD6994@jh-x301>
+References: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 28 Mar 2011 10:29:04 +0300
-Message-ID: <AANLkTimJC0GHZo1vV_GpWi26dfwKc5vono94mofu_1JN@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: check L2CAP info_rsp ident and state
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1301138831-12082-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gustavo,
+Hi Szymon,
 
-On Fri, Mar 25, 2011 at 12:31 PM, Emeltchenko Andrei
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
->
-> Information requests/responses are unbound to L2CAP channel. Patch
-> fixes issue arising when two devices connects at the same time to
-> each other. This way we do not process out of the context messages.
-> We are safe dropping info_rsp since info_timer is left running.
->
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> ---
->  net/bluetooth/l2cap_core.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index b5a1ce0..1426c03 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -2460,6 +2460,11 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
->
->        BT_DBG("type 0x%4.4x result 0x%2.2x", type, result);
->
-> +       /* L2CAP Info req/rsp are unbound to channels, add extra checks */
-> +       if (cmd->ident != conn->info_ident ||
-> +                       conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
-> +               return 0;
-> +
->        del_timer(&conn->info_timer);
->
->        if (result != L2CAP_IR_SUCCESS) {
-> --
-> 1.7.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+On Sat, Mar 26, 2011, Szymon Janc wrote:
+> Changes since v6:
+> - fixed issues pointed out by Johan
+> 
+> BR,
+> Szymon Janc
+> on behalf of ST-Ericsson
+> 
+> Szymon Janc (6):
+>   Add initial support for Out of Band (OOB) association model
+>   Add support for Out of Band (OOB) association model in mgmtops
+>   Add support for Out of Band (OOB) association model in hciops
+>   Add D-Bus OOB plugin
+>   Update mgmt-api.txt with OOB commands
+>   Add oob-api.txt with documentation about OOB D-Bus methods
+> 
+>  Makefile.am       |    8 ++-
+>  acinclude.m4      |    6 ++
+>  doc/mgmt-api.txt  |   30 +++++++
+>  doc/oob-api.txt   |   38 +++++++++
+>  lib/mgmt.h        |   18 ++++
+>  plugins/dbusoob.c |  234 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  plugins/hciops.c  |  142 +++++++++++++++++++++++++++++++-
+>  plugins/mgmtops.c |  129 +++++++++++++++++++++++++++++
+>  src/adapter.c     |   18 ++++
+>  src/adapter.h     |   12 +++
+>  src/oob.c         |   41 +++++++++
+>  src/oob.h         |   32 +++++++
+>  12 files changed, 702 insertions(+), 6 deletions(-)
+>  create mode 100644 doc/oob-api.txt
+>  create mode 100644 plugins/dbusoob.c
+>  create mode 100644 src/oob.c
+>  create mode 100644 src/oob.h
 
-what about this version?
+All six patches have been pushed upstream. Thanks.
 
-Regards,
-Andrei
+Do you think you could come up with a test script to test this (through
+the dbusoob plugin) between two local adapters? We could then add that
+to the test subdirectory.
+
+Johan
