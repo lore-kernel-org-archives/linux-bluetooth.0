@@ -1,106 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Simplify media_owner_remove
-Date: Mon, 28 Mar 2011 18:52:20 +0300
-Message-Id: <1301327540-5699-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Arnd Bergmann <arnd@arndb.de>
+To: Vitaly Wool <vitalywool@gmail.com>
+Subject: Re: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
+Date: Mon, 28 Mar 2011 16:49:24 +0200
+Cc: "Par-Gunnar Hjalmdahl" <par-gunnar.p.hjalmdahl@stericsson.com>,
+ "Greg Kroah-Hartman" <gregkh@suse.de>,
+ devel@driverdev.osuosl.org,
+ Linus Walleij <linus.walleij@linaro.org>,
+ linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org,
+ Pavan Savoy <pavan_savoy@sify.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+ Linus Walleij <linus.walleij@stericsson.com>,
+ "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Lee Jones <lee.jones@linaro.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>
+References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <AANLkTimhcFNDdq0FCP2rVdDJ5V_YP+E82+80OavsuAS=@mail.gmail.com>
+In-Reply-To: <AANLkTimhcFNDdq0FCP2rVdDJ5V_YP+E82+80OavsuAS=@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201103281649.25140.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+On Monday 28 March 2011, Vitaly Wool wrote:
+> On Mon, Mar 28, 2011 at 11:03 AM, Par-Gunnar Hjalmdahl
+> <par-gunnar.p.hjalmdahl@stericsson.com> wrote:
+> >
+> > +/* Function located in drivers/staging/cg2900 */
+> > +extern void cg2900_init_board(void);
+> > +
+> 
+> I'm confused. Where in the drivers/staging is this function? Couldn't
+> find it in the previous patch.
 
-Since there is only one pending request and is directly acessible via
-owner pointer there is no need for media_owner_remove to take the
-request as parameter.
----
- audio/transport.c |   23 ++++++++++++-----------
- 1 files changed, 12 insertions(+), 11 deletions(-)
+It's in v2 of patch 2/2, in
 
-diff --git a/audio/transport.c b/audio/transport.c
-index 795b794..8ff6c85 100644
---- a/audio/transport.c
-+++ b/audio/transport.c
-@@ -154,10 +154,13 @@ static gboolean media_transport_release(struct media_transport *transport,
- 	return TRUE;
- }
- 
--static void media_owner_remove(struct media_owner *owner,
--						struct media_request *req)
-+static void media_owner_remove(struct media_owner *owner)
- {
- 	struct media_transport *transport = owner->transport;
-+	struct media_request *req = owner->pending;
-+
-+	if (!req)
-+		return;
- 
- 	DBG("Owner %s Request %s", owner->name,
- 					dbus_message_get_member(req->msg));
-@@ -176,8 +179,7 @@ static void media_owner_free(struct media_owner *owner)
- {
- 	DBG("Owner %s", owner->name);
- 
--	if (owner->pending)
--		media_owner_remove(owner, owner->pending);
-+	media_owner_remove(owner);
- 
- 	g_free(owner->name);
- 	g_free(owner->accesstype);
-@@ -272,7 +274,7 @@ static void a2dp_resume_complete(struct avdtp *session,
- 	if (ret == FALSE)
- 		goto fail;
- 
--	media_owner_remove(owner, req);
-+	media_owner_remove(owner);
- 
- 	return;
- 
-@@ -317,7 +319,7 @@ static void a2dp_suspend_complete(struct avdtp *session,
- 	if (owner->pending) {
- 		owner->pending->id = 0;
- 		media_request_reply(owner->pending, transport->conn, 0);
--		media_owner_remove(owner, owner->pending);
-+		media_owner_remove(owner);
- 	}
- 
- 	a2dp_sep_unlock(sep, transport->session);
-@@ -383,7 +385,7 @@ static void headset_resume_complete(struct audio_device *dev, void *user_data)
- 	if (ret == FALSE)
- 		goto fail;
- 
--	media_owner_remove(owner, req);
-+	media_owner_remove(owner);
- 
- 	return;
- 
-@@ -418,7 +420,7 @@ static void headset_suspend_complete(struct audio_device *dev, void *user_data)
- 	if (owner->pending) {
- 		owner->pending->id = 0;
- 		media_request_reply(owner->pending, transport->conn, 0);
--		media_owner_remove(owner, owner->pending);
-+		media_owner_remove(owner);
- 	}
- 
- 	headset_unlock(dev, HEADSET_LOCK_READ | HEADSET_LOCK_WRITE);
-@@ -451,8 +453,7 @@ static void media_owner_exit(DBusConnection *connection, void *user_data)
- 
- 	owner->watch = 0;
- 
--	if (owner->pending != NULL)
--		media_owner_remove(owner, owner->pending);
-+	media_owner_remove(owner);
- 
- 	media_transport_remove(owner->transport, owner);
- }
-@@ -615,7 +616,7 @@ static DBusMessage *release(DBusConnection *conn, DBusMessage *msg,
- 			member = dbus_message_get_member(owner->pending->msg);
- 			/* Cancel Acquire request if that exist */
- 			if (g_str_equal(member, "Acquire"))
--				media_owner_remove(owner, owner->pending);
-+				media_owner_remove(owner);
- 			else
- 				return btd_error_in_progress(msg);
- 		}
--- 
-1.7.1
+drivers/staging/cg2900/board-mop500-cg2900.c
 
+	Arnd
