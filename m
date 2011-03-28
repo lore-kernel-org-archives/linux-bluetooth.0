@@ -1,35 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH] Clean and fix copyright header in test/sap-client
-Date: Mon, 28 Mar 2011 16:00:16 +0200
-Message-ID: <1301320816-4964-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20110328124448.GA15266@jh-x301>
+References: <AANLkTin4-oCPX3qoWFS1rnLScPmS1xs5LGW6+rAKyEaX@mail.gmail.com>
+	<20110328124448.GA15266@jh-x301>
+Date: Mon, 28 Mar 2011 15:04:32 +0200
+Message-ID: <AANLkTinwVMShrWW7A3D98sYZNFPPz_yObzkAO6zj8ZF4@mail.gmail.com>
+Subject: Re: Bug in hciconfig.c
+From: Arno Willig <akw@thinkwiki.org>
+To: Arno Willig <akw@thinkwiki.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ST-Ericsson is the copyright holder of test/sap-client.
----
- test/sap-client |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+Hi Johan,
 
-diff --git a/test/sap-client b/test/sap-client
-index 5a0c711..d6e8e71 100644
---- a/test/sap-client
-+++ b/test/sap-client
-@@ -1,7 +1,6 @@
--""" Copyright (C) 2011 Tieto """
-+""" Copyright (C) 2010 ST-Ericsson SA
- 
--""" Szymon Janc <szymon.janc@tieto.com> """
--""" Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> """
-+""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
- 
- """ This program is free software; you can redistribute it and/or modify """
- """ it under the terms of the GNU General Public License as published by """
+wow, 6 years...
+I always wondered whi LMP and HCI versions are identical on my
+bluetooth sticks, but maybe this is correct for most devices...
+
+Thank you!
+
+Ciao, Arno
+
+
+2011/3/28 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Arno,
+>
+> On Mon, Mar 28, 2011, Arno Willig wrote:
+>> I do not follow this list, so please excuse me, if this request isn't
+>> appropriate here.
+>>
+>> I think I found an error in the Bluez Package of my Ubuntu 11.04
+>> distro. (bluez-4.90)
+>> In bluez-4.90/tools/hciconfig.c (Function cmd_version(), line 1141):
+>>
+>>        hciver = hci_vertostr(ver.hci_ver);
+>>  -     lmpver = lmp_vertostr(ver.hci_ver);
+>>
+>>
+>> I think it should be this, right?
+>>
+>>        hciver = hci_vertostr(ver.hci_ver);
+>>  +    lmpver = lmp_vertostr(ver.lmp_ver);
+>>
+>>
+>> Maybe nobody saw this before, because the values are nevertheless
+>> equal (2.1 for example) ?
+>>
+>>
+>> Please tell me if this is really a bug or if I oversaw something, will you?
+>
+> It's a real bug which can be seen from commit 9848c1fa that introduced
+> it (6 years ago). Before that commit the code was correctly using lmp_ver.
+>
+> I've pushed a patch to fix it upstream.
+>
+> Johan
+>
+
+
+
 -- 
-1.7.1
-
+Arno Willig <akw@thinkwiki.org>
