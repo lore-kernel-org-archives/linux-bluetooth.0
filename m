@@ -1,35 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v3] Clean and fix copyright header in test/sap-client
-Date: Mon, 28 Mar 2011 16:28:14 +0200
-Message-ID: <1301322494-10611-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/2] Update Media API documentation
+Date: Mon, 28 Mar 2011 17:21:57 +0300
+Message-Id: <1301322117-22724-3-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1301322117-22724-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1301322117-22724-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ST-Ericsson is the copyright holder of test/sap-client.
+Possible error responses are added to RegisterEndpoint.
 ---
- test/sap-client |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+ doc/media-api.txt |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/test/sap-client b/test/sap-client
-index 5a0c711..b12d455 100644
---- a/test/sap-client
-+++ b/test/sap-client
-@@ -1,7 +1,6 @@
--""" Copyright (C) 2011 Tieto """
-+""" Copyright (C) 2010-2011 ST-Ericsson SA """
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 84903d6..b2f239a 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -35,6 +35,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 					Capabilities blob, it is used as it is
+ 					so the size and byte order must match.
  
--""" Szymon Janc <szymon.janc@tieto.com> """
--""" Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> """
-+""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotSupported - emitted
++					 when interface for the end-point is
++					 disabled.
++
+ 		void UnregisterEndpoint(object endpoint)
  
- """ This program is free software; you can redistribute it and/or modify """
- """ it under the terms of the GNU General Public License as published by """
+ 			Unregister sender end point.
 -- 
 1.7.1
 
