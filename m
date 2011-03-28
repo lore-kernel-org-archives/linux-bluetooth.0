@@ -1,23 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Mar 2011 16:59:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Clean and fix copyright header in test/sap-client
-Message-ID: <20110328135913.GA19374@jh-x301>
-References: <1301320816-4964-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH] Clean and fix copyright header in test/sap-client
+Date: Mon, 28 Mar 2011 16:00:16 +0200
+Message-ID: <1301320816-4964-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301320816-4964-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+ST-Ericsson is the copyright holder of test/sap-client.
+---
+ test/sap-client |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-On Mon, Mar 28, 2011, Waldemar Rymarkiewicz wrote:
-> -""" Copyright (C) 2011 Tieto """
-> +""" Copyright (C) 2010 ST-Ericsson SA
+diff --git a/test/sap-client b/test/sap-client
+index 5a0c711..d6e8e71 100644
+--- a/test/sap-client
++++ b/test/sap-client
+@@ -1,7 +1,6 @@
+-""" Copyright (C) 2011 Tieto """
++""" Copyright (C) 2010 ST-Ericsson SA
+ 
+-""" Szymon Janc <szymon.janc@tieto.com> """
+-""" Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> """
++""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
+ 
+ """ This program is free software; you can redistribute it and/or modify """
+ """ it under the terms of the GNU General Public License as published by """
+-- 
+1.7.1
 
-Is the year change from 2011 to 2010 intentional?
-
-Johan
