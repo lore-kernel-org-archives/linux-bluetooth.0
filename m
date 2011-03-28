@@ -1,57 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: "Par-Gunnar HJALMDAHL" <par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Mon, 28 Mar 2011 07:39:55 -0700
+From: Greg KH <gregkh@suse.de>
+To: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
 Subject: Re: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
-Date: Mon, 28 Mar 2011 16:47:48 +0200
-Cc: Greg KH <gregkh@suse.de>,
- "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Pavan Savoy <pavan_savoy@sify.com>,
- Vitaly Wool <vitalywool@gmail.com>,
- Alan Cox <alan@lxorguk.ukuu.org.uk>,
- Marcel Holtmann <marcel@holtmann.org>,
- Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
- Linus WALLEIJ <linus.walleij@stericsson.com>,
- "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
- Lee Jones <lee.jones@linaro.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>
-References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <20110328141237.GB19350@suse.de> <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local>
-In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local>
+Message-ID: <20110328143955.GB23892@suse.de>
+References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <201103281500.38954.arnd@arndb.de>
+ <20110328141237.GB19350@suse.de>
+ <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201103281647.48802.arnd@arndb.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 28 March 2011, Par-Gunnar HJALMDAHL wrote:
+On Mon, Mar 28, 2011 at 04:29:44PM +0200, Par-Gunnar HJALMDAHL wrote:
+> > >
+> > > Not exactly what I had in mind, but probably good enough for a start.
+> > > This adds a dependency from core code to the staging driver now,
+> > > which shouldn't be there. I suppose we can add
+> > >
+> > > "Clean up device registration path to register the main device from
+> > board code"
+> > >
+> > > to the TODO file.
+> > 
+> > No, please do not make any core code dependant on a staging driver,
+> > this
+> > isn't ok, it needs to be stand-alone, or at the least, the rest of the
+> > kernel needs to be able to be built with no staging drivers enabled.
+> > 
+> > thanks,
+> > 
+> > greg k-h
+> 
 > But how should I then do this? As I understood it I was told that I should
 > call an init function, but I was not allowed to add any staging folder
 > inclusion in the board config makefile. And now I can't do any extern
 > declaration either. I don't really see how I could do it then.
-> 
-> The only thing I can think of is to use platform device and driver for
-> the cg2900_init. But I wouldn't call that to call an init-function, but that
-> might be OK for this purpose?
 
-There are at least two ways to do it:
+Why can't you add a staging folder inclusion?  You could do that, and
+properly set up your .h file so that if the driver is not built, your
+code still properly builds and runs.
 
-* As Linus Walleij explained, use an initcall instead of calling a
-  function from the board init code. "initcall" here refers to the
-  interfaces from include/linux/init.h, e.g. module_init(). This
-  will result in the function getting called at module load time,
-  or at some point during bootup when it's built into the kernel.
-  This initcall needs to check if you are running on the right board,
-  using machine_is_xxx().
+thanks,
 
-* As I explained, register a simple platform_device with the resources
-  for the entire cg2900 device from the board code in a way that
-  is independent of the actual driver. The driver code can then
-  register all the subdevices from the cg2900_probe function.
-  The code in the architecture would consist out of a single
-  call to platform_device_register_simple() plus the resources.
-
-Either way is fine with me.
-
-	Arnd
+greg k-h
