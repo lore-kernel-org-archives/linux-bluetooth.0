@@ -1,62 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Mar 2011 07:11:06 -0700
-From: Greg KH <gregkh@suse.de>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Lukasz.Rymanowski@tieto.com,
-	par-gunnar.p.hjalmdahl@stericsson.com, devel@driverdev.osuosl.org,
-	linus.walleij@linaro.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, pavan_savoy@sify.com,
-	vitalywool@gmail.com, alan@lxorguk.ukuu.org.uk, arnd@arndb.de,
-	marcel@holtmann.org, linus.walleij@stericsson.com,
-	pghatwork@gmail.com, lee.jones@linaro.org, mathieu.poirier@linaro.org
-Subject: Re: [PATCH v2 1/2] staging: Add ST-Ericsson CG2900 driver
-Message-ID: <20110328141106.GA19350@suse.de>
-References: <1301302950-10628-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <alpine.LFD.2.00.1103281110210.31464@localhost6.localdomain6>
- <7D7F2FD3846CF6429ACEBDFB5A2DD86F07E35E5F89@EXMB01.eu.tieto.com>
- <alpine.LFD.2.00.1103281221250.31464@localhost6.localdomain6>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v2] Clean and fix copyright header in test/sap-client
+Date: Mon, 28 Mar 2011 16:21:48 +0200
+Message-ID: <1301322108-10519-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LFD.2.00.1103281221250.31464@localhost6.localdomain6>
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 28, 2011 at 12:21:53PM +0200, Thomas Gleixner wrote:
-> On Mon, 28 Mar 2011, Lukasz.Rymanowski@tieto.com wrote:
-> 
-> > >> +/**
-> > >> + * cts_interrupt() - Called to handle CTS interrupt.
-> > >> + * @irq:	Interrupt that occurred.
-> > >> + * @dev_id:	Device ID where interrupt occurred.
-> > >> + *
-> > >> + * The cts_interrupt() function is called if interrupt on CTS occurred.
-> > >> + * It disables the interrupt and starts a new work thread to handle
-> > >> + * the interrupt.
-> > >> + */
-> > >> +static irqreturn_t cts_interrupt(int irq, void *dev_id) {
-> > >> +	struct uart_info *uart_info = dev_get_drvdata(dev_id); #ifdef 
-> > >> +CONFIG_PM
-> > >> +	disable_irq_wake(irq);
-> > >> +#endif
-> > >> +	disable_irq_nosync(irq);
-> > >> +
-> > >> +	/* Create work and leave IRQ context. */
-> > >> +	(void)create_work_item(uart_info, handle_cts_irq);
-> > >> +
-> > >> +	return IRQ_HANDLED;
-> > >> +}
-> > 
-> > >Have you thought about using a threaded interrupt handler? That would make all this work cruft go away.
-> > 
-> > Good point.
-> > To be honest we did think about it but in the time we where we were busy with other issues.
-> > Anyway, shall we resend patches now or we can push patch for it once driver gets in the tree ?
-> 
-> Up to Greg.
+ST-Ericsson is the copyright holder of test/sap-client.
+---
+ test/sap-client |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-Just send patches after it's in the linux-next tree.  Give it a week or
-so before that happens due to .39-rc1 issues at the moment and vacation
-schedules...
+diff --git a/test/sap-client b/test/sap-client
+index 5a0c711..65235bc 100644
+--- a/test/sap-client
++++ b/test/sap-client
+@@ -1,7 +1,6 @@
+-""" Copyright (C) 2011 Tieto """
++""" Copyright (C) 2010-2011 ST-Ericsson SA
+ 
+-""" Szymon Janc <szymon.janc@tieto.com> """
+-""" Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> """
++""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
+ 
+ """ This program is free software; you can redistribute it and/or modify """
+ """ it under the terms of the GNU General Public License as published by """
+-- 
+1.7.1
 
-thanks,
-
-greg k-h
