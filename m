@@ -1,57 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg KH <gregkh@suse.de>, Arnd Bergmann <arnd@arndb.de>
-Cc: "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>
-Date: Mon, 28 Mar 2011 16:29:44 +0200
-Subject: RE: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local>
-References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <201103281500.38954.arnd@arndb.de> <20110328141237.GB19350@suse.de>
-In-Reply-To: <20110328141237.GB19350@suse.de>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix crash when receiving avdtp close command
+Date: Mon, 28 Mar 2011 18:31:09 +0300
+Message-Id: <1301326269-5078-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> >
-> > Not exactly what I had in mind, but probably good enough for a start.
-> > This adds a dependency from core code to the staging driver now,
-> > which shouldn't be there. I suppose we can add
-> >
-> > "Clean up device registration path to register the main device from
-> board code"
-> >
-> > to the TODO file.
->=20
-> No, please do not make any core code dependant on a staging driver,
-> this
-> isn't ok, it needs to be stand-alone, or at the least, the rest of the
-> kernel needs to be able to be built with no staging drivers enabled.
->=20
-> thanks,
->=20
-> greg k-h
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-But how should I then do this? As I understood it I was told that I should
-call an init function, but I was not allowed to add any staging folder
-inclusion in the board config makefile. And now I can't do any extern
-declaration either. I don't really see how I could do it then.
+If there are pending start or suspend requests they should all fail since
+once close indication return the state will be changed to closing and
+remote stack can then disconnect cleanly.
 
-The only thing I can think of is to use platform device and driver for
-the cg2900_init. But I wouldn't call that to call an init-function, but tha=
-t
-might be OK for this purpose?
+This also follow what specs says about connection release:
 
-Thanks,
-P-G
+"When the Upper Layer has completed releasing all resources allocated to
+the stream, an AVDTP_CLOSE_RSP is sent back to the INT."
+---
+ audio/a2dp.c |   18 ++++++++++++++++++
+ 1 files changed, 18 insertions(+), 0 deletions(-)
+
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 88c280a..9d9c61d 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -252,6 +252,16 @@ static gboolean finalize_resume(struct a2dp_setup *s)
+ 	return FALSE;
+ }
+ 
++static gboolean finalize_resume_errno(struct a2dp_setup *s, int err)
++{
++	struct avdtp_error avdtp_err;
++
++	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
++	s->err = err ? &avdtp_err : NULL;
++
++	return finalize_resume(s);
++}
++
+ static gboolean finalize_suspend(struct a2dp_setup *s)
+ {
+ 	GSList *l;
+@@ -1044,12 +1054,20 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 				void *user_data)
+ {
+ 	struct a2dp_sep *a2dp_sep = user_data;
++	struct a2dp_setup *setup;
+ 
+ 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+ 		DBG("Sink %p: Close_Ind", sep);
+ 	else
+ 		DBG("Source %p: Close_Ind", sep);
+ 
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return TRUE;
++
++	finalize_suspend_errno(setup, -ECONNRESET);
++	finalize_resume_errno(setup, -ECONNRESET);
++
+ 	return TRUE;
+ }
+ 
+-- 
+1.7.1
+
