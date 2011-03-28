@@ -1,56 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: paulepanter@users.sourceforge.net,
-	Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Subject: [PATCH] sbc: better compatibility with ARM thumb/thumb2
-Date: Tue, 29 Mar 2011 01:57:39 +0300
-Message-Id: <1301353059-12776-1-git-send-email-siarhei.siamashka@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 6/6] Fix disconnecting when primary service discovery is done
+Date: Mon, 28 Mar 2011 19:40:51 -0300
+Message-Id: <1301352051-12046-7-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1301352051-12046-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1301352051-12046-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+We shouldn't disconnect when the primary service discovery is done.
+Most LE devices leave advertising mode as soon as the connection is
+established, so shouldn't assume that we are able to reconnect to
+them again.
 
-ARM assembly optimizations fail to compile in thumb mode, but are fine
-for thumb2. Update ifdefs in the code to make use of ARM assembly only
-when it is safe and also make sure that no optimizations are missed
-when compiling for thumb2.
-
-The problem was reported by Paul Menzel:
-https://tango.0pointer.de/pipermail/pulseaudio-discuss/2011-February/009022.html
+For that we rely on the fact that GAttrib will close the connection
+when its last reference is dropped.
 ---
- sbc/sbc_math.h             |    2 +-
- sbc/sbc_primitives_armv6.h |    4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ src/device.c |   13 ++++++-------
+ 1 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/sbc/sbc_math.h b/sbc/sbc_math.h
-index 9f126c6..5476860 100644
---- a/sbc/sbc_math.h
-+++ b/sbc/sbc_math.h
-@@ -48,7 +48,7 @@ typedef int32_t sbc_fixed_t;
+diff --git a/src/device.c b/src/device.c
+index fa5764e..d567952 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -94,7 +94,6 @@ struct browse_req {
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
+ 	GAttrib *attrib;
+-	GIOChannel *io;
+ 	struct btd_device *device;
+ 	GSList *match_uuids;
+ 	GSList *profiles_added;
+@@ -166,11 +165,8 @@ static void browse_request_free(struct browse_req *req)
+ 	if (req->records)
+ 		sdp_list_free(req->records, (sdp_free_func_t) sdp_record_free);
  
- #define SBC_FIXED_0(val) { val = 0; }
- #define MUL(a, b)        ((a) * (b))
--#ifdef __arm__
-+#if defined(__arm__) && (!defined(__thumb__) || defined(__thumb2__))
- #define MULA(a, b, res) ({				\
- 		int tmp = res;			\
- 		__asm__(				\
-diff --git a/sbc/sbc_primitives_armv6.h b/sbc/sbc_primitives_armv6.h
-index 1862aed..6a9efe5 100644
---- a/sbc/sbc_primitives_armv6.h
-+++ b/sbc/sbc_primitives_armv6.h
-@@ -40,8 +40,8 @@
+-	if (req->io) {
++	if (req->attrib)
+ 		g_attrib_unref(req->attrib);
+-		g_io_channel_unref(req->io);
+-		g_io_channel_shutdown(req->io, FALSE, NULL);
+-	}
  
- #if !defined(SBC_HIGH_PRECISION) && (SCALE_OUT_BITS == 15) && \
- 	defined(__GNUC__) && defined(SBC_HAVE_ARMV6) && \
--	defined(__ARM_EABI__) && !defined(__thumb__) && \
--	!defined(__ARM_NEON__)
-+	defined(__ARM_EABI__) && !defined(__ARM_NEON__) && \
-+	(!defined(__thumb__) || defined(__thumb2__))
+ 	g_free(req);
+ }
+@@ -1588,6 +1584,8 @@ static void gatt_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	}
  
- #define SBC_BUILD_WITH_ARMV6_SUPPORT
+ 	req->attrib = g_attrib_new(io);
++	g_io_channel_unref(io);
++
+ 	gatt_discover_primary(req->attrib, NULL, primary_cb, req);
+ }
  
+@@ -1597,6 +1595,7 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+ 	struct btd_adapter *adapter = device->adapter;
+ 	struct browse_req *req;
+ 	BtIOSecLevel sec_level;
++	GIOChannel *io;
+ 	bdaddr_t src;
+ 
+ 	if (device->browse)
+@@ -1609,14 +1608,14 @@ int device_browse_primary(struct btd_device *device, DBusConnection *conn,
+ 
+ 	sec_level = secure ? BT_IO_SEC_HIGH : BT_IO_SEC_LOW;
+ 
+-	req->io = bt_io_connect(BT_IO_L2CAP, gatt_connect_cb, req, NULL, NULL,
++	io = bt_io_connect(BT_IO_L2CAP, gatt_connect_cb, req, NULL, NULL,
+ 				BT_IO_OPT_SOURCE_BDADDR, &src,
+ 				BT_IO_OPT_DEST_BDADDR, &device->bdaddr,
+ 				BT_IO_OPT_CID, GATT_CID,
+ 				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 
+-	if (req->io == NULL ) {
++	if (io == NULL ) {
+ 		browse_request_free(req);
+ 		return -EIO;
+ 	}
 -- 
-1.7.3.4
+1.7.4.1
 
