@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Lukasz.Rymanowski@tieto.com
-Subject: Re: [PATCH v2 1/2] staging: Add ST-Ericsson CG2900 driver
-Date: Mon, 28 Mar 2011 15:02:05 +0200
-Cc: tglx@linutronix.de,
- par-gunnar.p.hjalmdahl@stericsson.com,
- gregkh@suse.de,
- devel@driverdev.osuosl.org,
- linus.walleij@linaro.org,
- linux-kernel@vger.kernel.org,
- linux-bluetooth@vger.kernel.org,
- pavan_savoy@sify.com,
- vitalywool@gmail.com,
- alan@lxorguk.ukuu.org.uk,
- marcel@holtmann.org,
- linus.walleij@stericsson.com,
- pghatwork@gmail.com,
- lee.jones@linaro.org,
- mathieu.poirier@linaro.org
-References: <1301302950-10628-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <alpine.LFD.2.00.1103281110210.31464@localhost6.localdomain6> <7D7F2FD3846CF6429ACEBDFB5A2DD86F07E35E5F89@EXMB01.eu.tieto.com>
-In-Reply-To: <7D7F2FD3846CF6429ACEBDFB5A2DD86F07E35E5F89@EXMB01.eu.tieto.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201103281502.05203.arnd@arndb.de>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/2] Update Media API documentation
+Date: Mon, 28 Mar 2011 16:01:39 +0300
+Message-Id: <1301317299-18915-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1301317299-18915-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1301317299-18915-1-git-send-email-dmitriy.paliy@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 28 March 2011, Lukasz.Rymanowski@tieto.com wrote:
-> >Have you thought about using a threaded interrupt handler?
-> >That would make all this work cruft go away.
-> 
-> Good point.
-> To be honest we did think about it but in the time we where we were busy with other issues.
-> Anyway, shall we resend patches now or we can push patch for it once driver gets in the tree ?
+Possible error responses are added to RegisterEndpoint.
+---
+ doc/media-api.txt |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-No need to hold up merging because of this. Either patch it
-once the code is in staging, or add a TODO file item.
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 84903d6..fc9c985 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -35,6 +35,11 @@ Methods		void RegisterEndpoint(object endpoint, dict properties)
+ 					Capabilities blob, it is used as it is
+ 					so the size and byte order must match.
+ 
++			Possible Errors: org.bluez.Error.InvalidArguments
++					org.bluez.Error.NotSupported - emitted
++					when interface for the end-point is
++					disabled.
++
+ 		void UnregisterEndpoint(object endpoint)
+ 
+ 			Unregister sender end point.
+-- 
+1.7.1
 
-	Arnd
