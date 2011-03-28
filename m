@@ -1,91 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+From: Arnd Bergmann <arnd@arndb.de>
+To: Greg KH <gregkh@suse.de>
+Subject: Re: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
+Date: Mon, 28 Mar 2011 16:59:45 +0200
+Cc: "Par-Gunnar HJALMDAHL" <par-gunnar.p.hjalmdahl@stericsson.com>,
+ "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ Pavan Savoy <pavan_savoy@sify.com>,
+ Vitaly Wool <vitalywool@gmail.com>,
+ Alan Cox <alan@lxorguk.ukuu.org.uk>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+ Linus WALLEIJ <linus.walleij@stericsson.com>,
+ "Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
+ Lee Jones <lee.jones@linaro.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>
+References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com> <AFCDDB4A3EA003429EEF1E7B211FDBBA3377B51A1F@EXDCVYMBSTM005.EQ1STM.local> <20110328143955.GB23892@suse.de>
+In-Reply-To: <20110328143955.GB23892@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <1301052849.7592.15.camel@mattotaupa>
-References: <1298226004.3712.1.camel@mattotaupa>
-	<1298320304.6159.21.camel@snowflake>
-	<ik00pv$8d8$1@dough.gmane.org>
-	<1298374409.3861.32.camel@mattotaupa>
-	<1298403438.6736.26.camel@snowflake>
-	<1300531488.6875.3.camel@snowflake>
-	<1301052849.7592.15.camel@mattotaupa>
-Date: Mon, 28 Mar 2011 18:41:22 +0300
-Message-ID: <AANLkTi=wTkJ654Zo0SEuzLi3MBjvee54HvToxmeYGMF1@mail.gmail.com>
-Subject: Re: [pulseaudio-discuss] [PATCH] sbc_math.h: add explicit check for
- ARMv6 instructions
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: General PulseAudio Discussion
-	<pulseaudio-discuss@mail.0pointer.de>
-Cc: Paul Menzel <paulepanter@users.sourceforge.net>,
-	Siarhei Siamashka <siarhei.siamashka@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=20cf303b40758af1a5049f8cc63f
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201103281659.45929.arnd@arndb.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf303b40758af1a5049f8cc63f
-Content-Type: text/plain; charset=ISO-8859-1
+On Monday 28 March 2011, Greg KH wrote:
+> > 
+> > But how should I then do this? As I understood it I was told that I should
+> > call an init function, but I was not allowed to add any staging folder
+> > inclusion in the board config makefile. And now I can't do any extern
+> > declaration either. I don't really see how I could do it then.
+> 
+> Why can't you add a staging folder inclusion?  You could do that, and
+> properly set up your .h file so that if the driver is not built, your
+> code still properly builds and runs.
 
-Hi,
+That would work as well, along with the two solutions I suggested.
 
-On Fri, Mar 25, 2011 at 1:34 PM, Paul Menzel
-<paulepanter@users.sourceforge.net> wrote:
-> Dear Arun,
->
->
-> Am Samstag, den 19.03.2011, 16:14 +0530 schrieb Arun Raghavan:
->
->> On Wed, 2011-02-23 at 01:07 +0530, Arun Raghavan wrote:
->> [...]
->> > The correct fix for this, imo, is in bluez (there is a new
->> > sbc_primitives_armv6.h that can probably be used at least as a
->> > template). We need to do an sbc-udpate on the PA side anyway, and can
->> > pull this when we do.
->>
->> Could you see if the attached patch works for you? If it does, I can
->> push this to the bluez folks.
->
-> My tag on the other thread [1] is ambiguous. The error is indeed caused
-> by your patch. I will try to implement your recommended changes but will
-> probably not get to it before Sunday.
+I believe Pär-Gunnar was trying to avoid #ifdefs, and the patch actually
+contains alternative files implementing cg2900_init_board as a stub
+when CONFIG_CG2900 is set, so the intent was clearly there:
 
-Im including Siarhei Siamashka since he did most, if not all, of this
-code and linux-bluetooth to cc.
+@@ -0,0 +1,18 @@
++#
++# Makefile for ST-Ericsson CG2900 connectivity combo controller
++#
++
++ccflags-y :=                                   \
++       -Idrivers/staging/cg2900/include \
++       -Iarch/arm/mach-ux500
++
++ifeq ($(CONFIG_CG2900),n)
++obj-y  += board-mop500-nocg2900.o
++export-objs                    := board-mop500-nocg2900.o
++else
++obj-$(CONFIG_CG2900)   += board-mop500-cg2900.o devices-cg2900.o
++export-objs                    := board-mop500-cg2900.o
++endif
++
 
-Btw, the sbc subdir should be in sync with sbc subdir in BlueZ tree.
+I don't think that this works though, because the directory
+is ignored when CONFIG_CG2900 is not set, and if it did work,
+it would cause an empty function to be included in every
+single kernel, not even limited to the ARM architecture.
 
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
-
---20cf303b40758af1a5049f8cc63f
-Content-Type: text/x-patch; charset=US-ASCII; name="thumb2-fix.patch"
-Content-Disposition: attachment; filename="thumb2-fix.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gltmmliw1
-
-ZGlmZiAtLWdpdCBhL3NyYy9tb2R1bGVzL2JsdWV0b290aC9zYmMvc2JjX21hdGguaCBiL3NyYy9t
-b2R1bGVzL2JsdWV0b290aC9zYmMvc2JjX21hdGguaAppbmRleCBiODdiYzgxLi4zNWQ1ZGNjIDEw
-MDY0NAotLS0gYS9zcmMvbW9kdWxlcy9ibHVldG9vdGgvc2JjL3NiY19tYXRoLmgKKysrIGIvc3Jj
-L21vZHVsZXMvYmx1ZXRvb3RoL3NiYy9zYmNfbWF0aC5oCkBAIC0yMyw2ICsyMyw4IEBACiAgKgog
-ICovCiAKKyNpbmNsdWRlICJzYmNfcHJpbWl0aXZlc19hcm12Ni5oIgorCiAjZGVmaW5lIGZhYnMo
-eCkgKCh4KSA8IDAgPyAtKHgpIDogKHgpKQogLyogQyBkb2VzIG5vdCBwcm92aWRlIGFuIGV4cGxp
-Y2l0IGFyaXRobWV0aWMgc2hpZnQgcmlnaHQgYnV0IHRoaXMgd2lsbAogICAgYWx3YXlzIGJlIGNv
-cnJlY3QgYW5kIGV2ZXJ5IGNvbXBpbGVyICpzaG91bGQqIGdlbmVyYXRlIG9wdGltYWwgY29kZSAq
-LwpAQCAtNDcsNyArNDksNyBAQCB0eXBlZGVmIGludDMyX3Qgc2JjX2ZpeGVkX3Q7CiAKICNkZWZp
-bmUgU0JDX0ZJWEVEXzAodmFsKSB7IHZhbCA9IDA7IH0KICNkZWZpbmUgTVVMKGEsIGIpICAgICAg
-ICAoKGEpICogKGIpKQotI2lmZGVmIF9fYXJtX18KKyNpZmRlZiBTQkNfSEFWRV9USFVNQjIKICNk
-ZWZpbmUgTVVMQShhLCBiLCByZXMpICh7CQkJCVwKIAkJaW50IHRtcCA9IHJlczsJCQlcCiAJCV9f
-YXNtX18oCQkJCVwKZGlmZiAtLWdpdCBhL3NyYy9tb2R1bGVzL2JsdWV0b290aC9zYmMvc2JjX3By
-aW1pdGl2ZXNfYXJtdjYuaCBiL3NyYy9tb2R1bGVzL2JsdWV0b290aC9zYmMvc2JjX3ByaW1pdGl2
-ZXNfYXJtdjYuaAppbmRleCAxODYyYWVkLi5lNzA0NjlhIDEwMDY0NAotLS0gYS9zcmMvbW9kdWxl
-cy9ibHVldG9vdGgvc2JjL3NiY19wcmltaXRpdmVzX2FybXY2LmgKKysrIGIvc3JjL21vZHVsZXMv
-Ymx1ZXRvb3RoL3NiYy9zYmNfcHJpbWl0aXZlc19hcm12Ni5oCkBAIC0zOCw2ICszOCwxMiBAQAog
-I2RlZmluZSBTQkNfSEFWRV9BUk1WNiAxCiAjZW5kaWYKIAorI2lmIGRlZmluZWQoX19BUk1fQVJD
-SF82VDJfXyApIHx8IGRlZmluZWQoX19BUk1fQVJDSF83X18pIHx8IFwKKwlkZWZpbmVkKF9fQVJN
-X0FSQ0hfN0FfXykgfHwgZGVmaW5lZChfX0FSTV9BUkNIXzdSX18pIHx8IFwKKwlkZWZpbmVkKF9f
-QVJNX0FSQ0hfN01fXykKKyNkZWZpbmUgU0JDX0hBVkVfVEhVTUIyIDEKKyNlbmRpZgorCiAjaWYg
-IWRlZmluZWQoU0JDX0hJR0hfUFJFQ0lTSU9OKSAmJiAoU0NBTEVfT1VUX0JJVFMgPT0gMTUpICYm
-IFwKIAlkZWZpbmVkKF9fR05VQ19fKSAmJiBkZWZpbmVkKFNCQ19IQVZFX0FSTVY2KSAmJiBcCiAJ
-ZGVmaW5lZChfX0FSTV9FQUJJX18pICYmICFkZWZpbmVkKF9fdGh1bWJfXykgJiYgXAo=
---20cf303b40758af1a5049f8cc63f--
+	Arnd
