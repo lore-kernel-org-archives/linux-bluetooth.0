@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v2] Clean and fix copyright header in test/sap-client
-Date: Mon, 28 Mar 2011 16:21:48 +0200
-Message-ID: <1301322108-10519-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Mon, 28 Mar 2011 17:14:35 +0300
+Subject: RE: [PATCH] Clean and fix copyright header in test/sap-client
+Message-ID: <99B09243E1A5DA4898CDD8B7001114481085E234F6@EXMB04.eu.tieto.com>
+References: <1301320816-4964-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <20110328135913.GA19374@jh-x301>
+ <99B09243E1A5DA4898CDD8B7001114481085E234E5@EXMB04.eu.tieto.com>
+ <20110328141114.GA19728@jh-x301>
+In-Reply-To: <20110328141114.GA19728@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ST-Ericsson is the copyright holder of test/sap-client.
----
- test/sap-client |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+>-----Original Message-----
+>From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
+>Sent: Monday, March 28, 2011 4:11 PM
+>To: Rymarkiewicz Waldemar
+>Cc: linux-bluetooth@vger.kernel.org
+>Subject: Re: [PATCH] Clean and fix copyright header in test/sap-client
+>
+>On Mon, Mar 28, 2011, Waldemar.Rymarkiewicz@tieto.com wrote:
+>> The initial date of that file is 2010.
+>
+>So it should be 2010-2011 then? Or has there not been a single 
+>edit since the beginning to the year to it (besides this one)? 
+>We usually try to update as many copyright years as we can 
+>early in the year so we don't have to touch/remember them the 
+>rest of the year.
 
-diff --git a/test/sap-client b/test/sap-client
-index 5a0c711..65235bc 100644
---- a/test/sap-client
-+++ b/test/sap-client
-@@ -1,7 +1,6 @@
--""" Copyright (C) 2011 Tieto """
-+""" Copyright (C) 2010-2011 ST-Ericsson SA
- 
--""" Szymon Janc <szymon.janc@tieto.com> """
--""" Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> """
-+""" Author: Szymon Janc <szymon.janc@tieto.com> for ST-Ericsson. """
- 
- """ This program is free software; you can redistribute it and/or modify """
- """ it under the terms of the GNU General Public License as published by """
--- 
-1.7.1
+Ok, I don't get all this license stuff.
+Will fix then with 2010-2011 as I fixed some issues there.
 
+Waldek
