@@ -1,32 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Mon, 28 Mar 2011 12:40:55 +0300
-Subject: RE: [PATCH v2] Add sap_disconnect_ind interface for sap-sim drivers
-Message-ID: <99B09243E1A5DA4898CDD8B7001114481085E2325E@EXMB04.eu.tieto.com>
-References: <1300982971-2869-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1300983402-2970-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20110325091759.GA1150@jh-x301>
-In-Reply-To: <20110325091759.GA1150@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
+Date: Mon, 28 Mar 2011 11:13:56 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+To: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+cc: Greg Kroah-Hartman <gregkh@suse.de>, devel@driverdev.osuosl.org,
+    Linus Walleij <linus.walleij@linaro.org>, linux-kernel@vger.kernel.org,
+    linux-bluetooth@vger.kernel.org, Pavan Savoy <pavan_savoy@sify.com>,
+    Vitaly Wool <vitalywool@gmail.com>, Alan Cox <alan@lxorguk.ukuu.org.uk>,
+    Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
+    Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+    Linus Walleij <linus.walleij@stericsson.com>,
+    Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+    Lee Jones <lee.jones@linaro.org>,
+    Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v2 1/2] staging: Add ST-Ericsson CG2900 driver
+In-Reply-To: <1301302950-10628-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Message-ID: <alpine.LFD.2.00.1103281110210.31464@localhost6.localdomain6>
+References: <1301302950-10628-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, 
+On Mon, 28 Mar 2011, Par-Gunnar Hjalmdahl wrote:
 
->Are you planning to have some additional Disconnect* method in 
->the future since you didn't reuse the existing "Disconnect" 
->method name for this? The patch is also missing the 
->corresponding update to sap-api.txt.
+This wants to be split up for review.
 
+> +/**
+> + * cts_interrupt() - Called to handle CTS interrupt.
+> + * @irq:	Interrupt that occurred.
+> + * @dev_id:	Device ID where interrupt occurred.
+> + *
+> + * The cts_interrupt() function is called if interrupt on CTS occurred.
+> + * It disables the interrupt and starts a new work thread to handle
+> + * the interrupt.
+> + */
+> +static irqreturn_t cts_interrupt(int irq, void *dev_id)
+> +{
+> +	struct uart_info *uart_info = dev_get_drvdata(dev_id);
+> +#ifdef CONFIG_PM
+> +	disable_irq_wake(irq);
+> +#endif
+> +	disable_irq_nosync(irq);
+> +
+> +	/* Create work and leave IRQ context. */
+> +	(void)create_work_item(uart_info, handle_cts_irq);
+> +
+> +	return IRQ_HANDLED;
+> +}
 
-The Disconnect method mentioned in sap-api.txt is implemented in server.c and it's the gracefull disconnect. The one I've changes in the patch is used in sap-dummy.c driver, which is used for tests only.
-The original idea was to have Disconnect(type) method in server.c, but finally, in a discussion, we came to the conclusion that the immediate disconnect should not be used by user. Driver should handle this if it's needed.
+Have you thought about using a threaded interrupt handler? That would
+make all this work cruft go away.
 
-So, sap-api.txt stays unchanged, and dummy-driver is changed to be able to pass some of  PTS tests.
+Thanks,
 
-Waldek
-
-
+	tglx
