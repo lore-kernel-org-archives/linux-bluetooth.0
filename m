@@ -15,47 +15,95 @@ Cc: <linux-kernel@vger.kernel.org>,
 	Lee Jones <lee.jones@linaro.org>,
 	Mathieu Poirier <mathieu.poirier@linaro.org>,
 	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
-Date: Mon, 28 Mar 2011 11:03:12 +0200
-Message-ID: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Subject: [PATCH v2 0/2] Add ST-Ericsson CG2900 driver
+Date: Mon, 28 Mar 2011 11:01:55 +0200
+Message-ID: <1301302915-10592-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the board specific data for the CG2900 driver
-on a UX500 board.
+This patch set adds a driver for the ST-Ericsson CG2900 connectivity
+controller.
+It has earlier been tried to add this driver to the mfd and bluetooth
+areas, but due to continued discussions the driver is placed into
+staging for the moment.
 
-Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
----
- arch/arm/mach-ux500/board-mop500.c |    2 ++
- arch/arm/mach-ux500/board-mop500.h |    3 +++
- 2 files changed, 5 insertions(+), 0 deletions(-)
+The patch set contains 2 patches:
+ - The first patch adds the driver to the staging directory. It also
+  includes modified versions of some files from the Bluetooth UART
+  drivers.
+ - The second patch contains the device setup for the mach-ux500
+  boards such as U8500.
 
-diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
-index d8e5a52..16b7343 100644
---- a/arch/arm/mach-ux500/board-mop500.c
-+++ b/arch/arm/mach-ux500/board-mop500.c
-@@ -417,6 +417,8 @@ static void __init mop500_init_machine(void)
- 
- 	platform_device_register(&ab8500_device);
- 
-+	cg2900_init_board();
-+
- 	i2c_register_board_info(0, mop500_i2c0_devices,
- 				ARRAY_SIZE(mop500_i2c0_devices));
- 	i2c_register_board_info(2, mop500_i2c2_devices,
-diff --git a/arch/arm/mach-ux500/board-mop500.h b/arch/arm/mach-ux500/board-mop500.h
-index 56722f4..7c89993 100644
---- a/arch/arm/mach-ux500/board-mop500.h
-+++ b/arch/arm/mach-ux500/board-mop500.h
-@@ -39,4 +39,7 @@ void __init mop500_pins_init(void);
- void mop500_uib_i2c_add(int busnum, struct i2c_board_info *info,
- 		unsigned n);
- 
-+/* Function located in drivers/staging/cg2900 */
-+extern void cg2900_init_board(void);
-+
- #endif
+Compared to v1 this patch set has the following updates:
+ - Corrected TODO file
+ - Moved devices-cg2900 and board-mop500 (CG2900 parts) to staging
+   folder
+ - Corrected all checkpatch warnings and errors
+
+Par-Gunnar Hjalmdahl (2):
+  staging: Add ST-Ericsson CG2900 driver
+  mach-ux500: Add CG2900 devices
+
+ arch/arm/mach-ux500/board-mop500.c               |    2 +
+ arch/arm/mach-ux500/board-mop500.h               |    3 +
+ drivers/staging/Kconfig                          |    2 +
+ drivers/staging/Makefile                         |    1 +
+ drivers/staging/cg2900/Kconfig                   |   72 +
+ drivers/staging/cg2900/Makefile                  |   18 +
+ drivers/staging/cg2900/TODO                      |   23 +
+ drivers/staging/cg2900/bluetooth/Makefile        |    9 +
+ drivers/staging/cg2900/bluetooth/btcg2900.c      | 1203 ++++++++
+ drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
+ drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  657 ++++
+ drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
+ drivers/staging/cg2900/board-mop500-cg2900.c     |  157 +
+ drivers/staging/cg2900/board-mop500-nocg2900.c   |   16 +
+ drivers/staging/cg2900/devices-cg2900.c          |  342 +++
+ drivers/staging/cg2900/devices-cg2900.h          |   31 +
+ drivers/staging/cg2900/include/cg2900.h          |  278 ++
+ drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
+ drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
+ drivers/staging/cg2900/mfd/Makefile              |   18 +
+ drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
+ drivers/staging/cg2900/mfd/cg2900_char_devices.c |  701 +++++
+ drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
+ drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
+ drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
+ drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
+ drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
+ drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
+ drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
+ drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
+ drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
+ 31 files changed, 16902 insertions(+), 0 deletions(-)
+ create mode 100644 drivers/staging/cg2900/Kconfig
+ create mode 100644 drivers/staging/cg2900/Makefile
+ create mode 100644 drivers/staging/cg2900/TODO
+ create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
+ create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
+ create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
+ create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
+ create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
+ create mode 100644 drivers/staging/cg2900/board-mop500-cg2900.c
+ create mode 100644 drivers/staging/cg2900/board-mop500-nocg2900.c
+ create mode 100644 drivers/staging/cg2900/devices-cg2900.c
+ create mode 100644 drivers/staging/cg2900/devices-cg2900.h
+ create mode 100644 drivers/staging/cg2900/include/cg2900.h
+ create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
+ create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
+ create mode 100644 drivers/staging/cg2900/mfd/Makefile
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
+ create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
+ create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
+ create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
+
 -- 
 1.7.4.1
