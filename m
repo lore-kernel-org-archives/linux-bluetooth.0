@@ -1,50 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: "Par-Gunnar Hjalmdahl" <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: Re: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
-Date: Mon, 28 Mar 2011 15:00:38 +0200
-Cc: "Greg Kroah-Hartman" <gregkh@suse.de>, devel@driverdev.osuosl.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	"Par-Gunnar Hjalmdahl" <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>
-References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
-In-Reply-To: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Mon, 28 Mar 2011 15:44:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arno Willig <akw@thinkwiki.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bug in hciconfig.c
+Message-ID: <20110328124448.GA15266@jh-x301>
+References: <AANLkTin4-oCPX3qoWFS1rnLScPmS1xs5LGW6+rAKyEaX@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Message-Id: <201103281500.38954.arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTin4-oCPX3qoWFS1rnLScPmS1xs5LGW6+rAKyEaX@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 28 March 2011, Par-Gunnar Hjalmdahl wrote:
-> diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
-> index d8e5a52..16b7343 100644
-> --- a/arch/arm/mach-ux500/board-mop500.c
-> +++ b/arch/arm/mach-ux500/board-mop500.c
-> @@ -417,6 +417,8 @@ static void __init mop500_init_machine(void)
->  
->         platform_device_register(&ab8500_device);
->  
-> +       cg2900_init_board();
-> +
->         i2c_register_board_info(0, mop500_i2c0_devices,
->                                 ARRAY_SIZE(mop500_i2c0_devices));
->         i2c_register_board_info(2, mop500_i2c2_devices,
+Hi Arno,
 
-Not exactly what I had in mind, but probably good enough for a start.
-This adds a dependency from core code to the staging driver now,
-which shouldn't be there. I suppose we can add
+On Mon, Mar 28, 2011, Arno Willig wrote:
+> I do not follow this list, so please excuse me, if this request isn't
+> appropriate here.
+> 
+> I think I found an error in the Bluez Package of my Ubuntu 11.04
+> distro. (bluez-4.90)
+> In bluez-4.90/tools/hciconfig.c (Function cmd_version(), line 1141):
+> 
+>        hciver = hci_vertostr(ver.hci_ver);
+>  -     lmpver = lmp_vertostr(ver.hci_ver);
+> 
+> 
+> I think it should be this, right?
+> 
+>        hciver = hci_vertostr(ver.hci_ver);
+>  +    lmpver = lmp_vertostr(ver.lmp_ver);
+> 
+> 
+> Maybe nobody saw this before, because the values are nevertheless
+> equal (2.1 for example) ?
+> 
+> 
+> Please tell me if this is really a bug or if I oversaw something, will you?
 
-"Clean up device registration path to register the main device from board code"
- 
-to the TODO file.
+It's a real bug which can be seen from commit 9848c1fa that introduced
+it (6 years ago). Before that commit the code was correctly using lmp_ver.
 
-	Arnd
+I've pushed a patch to fix it upstream.
+
+Johan
