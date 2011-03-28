@@ -1,109 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg Kroah-Hartman <gregkh@suse.de>,
-	<devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH v2 0/2] Add ST-Ericsson CG2900 driver
-Date: Mon, 28 Mar 2011 11:01:55 +0200
-Message-ID: <1301302915-10592-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 28 Mar 2011 10:29:04 +0300
+Message-ID: <AANLkTimJC0GHZo1vV_GpWi26dfwKc5vono94mofu_1JN@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: check L2CAP info_rsp ident and state
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds a driver for the ST-Ericsson CG2900 connectivity
-controller.
-It has earlier been tried to add this driver to the mfd and bluetooth
-areas, but due to continued discussions the driver is placed into
-staging for the moment.
+Gustavo,
 
-The patch set contains 2 patches:
- - The first patch adds the driver to the staging directory. It also
-  includes modified versions of some files from the Bluetooth UART
-  drivers.
- - The second patch contains the device setup for the mach-ux500
-  boards such as U8500.
+On Fri, Mar 25, 2011 at 12:31 PM, Emeltchenko Andrei
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+>
+> Information requests/responses are unbound to L2CAP channel. Patch
+> fixes issue arising when two devices connects at the same time to
+> each other. This way we do not process out of the context messages.
+> We are safe dropping info_rsp since info_timer is left running.
+>
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index b5a1ce0..1426c03 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -2460,6 +2460,11 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+>
+>        BT_DBG("type 0x%4.4x result 0x%2.2x", type, result);
+>
+> +       /* L2CAP Info req/rsp are unbound to channels, add extra checks */
+> +       if (cmd->ident != conn->info_ident ||
+> +                       conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE)
+> +               return 0;
+> +
+>        del_timer(&conn->info_timer);
+>
+>        if (result != L2CAP_IR_SUCCESS) {
+> --
+> 1.7.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-Compared to v1 this patch set has the following updates:
- - Corrected TODO file
- - Moved devices-cg2900 and board-mop500 (CG2900 parts) to staging
-   folder
- - Corrected all checkpatch warnings and errors
+what about this version?
 
-Par-Gunnar Hjalmdahl (2):
-  staging: Add ST-Ericsson CG2900 driver
-  mach-ux500: Add CG2900 devices
-
- arch/arm/mach-ux500/board-mop500.c               |    2 +
- arch/arm/mach-ux500/board-mop500.h               |    3 +
- drivers/staging/Kconfig                          |    2 +
- drivers/staging/Makefile                         |    1 +
- drivers/staging/cg2900/Kconfig                   |   72 +
- drivers/staging/cg2900/Makefile                  |   18 +
- drivers/staging/cg2900/TODO                      |   23 +
- drivers/staging/cg2900/bluetooth/Makefile        |    9 +
- drivers/staging/cg2900/bluetooth/btcg2900.c      | 1203 ++++++++
- drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
- drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  657 ++++
- drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
- drivers/staging/cg2900/board-mop500-cg2900.c     |  157 +
- drivers/staging/cg2900/board-mop500-nocg2900.c   |   16 +
- drivers/staging/cg2900/devices-cg2900.c          |  342 +++
- drivers/staging/cg2900/devices-cg2900.h          |   31 +
- drivers/staging/cg2900/include/cg2900.h          |  278 ++
- drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
- drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
- drivers/staging/cg2900/mfd/Makefile              |   18 +
- drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_char_devices.c |  701 +++++
- drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
- drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
- drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
- drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
- drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
- drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
- drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
- drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
- 31 files changed, 16902 insertions(+), 0 deletions(-)
- create mode 100644 drivers/staging/cg2900/Kconfig
- create mode 100644 drivers/staging/cg2900/Makefile
- create mode 100644 drivers/staging/cg2900/TODO
- create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
- create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
- create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
- create mode 100644 drivers/staging/cg2900/board-mop500-cg2900.c
- create mode 100644 drivers/staging/cg2900/board-mop500-nocg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
- create mode 100644 drivers/staging/cg2900/mfd/Makefile
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
-
--- 
-1.7.4.1
+Regards,
+Andrei
