@@ -1,55 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 28 Mar 2011 07:12:37 -0700
+Date: Mon, 28 Mar 2011 07:11:06 -0700
 From: Greg KH <gregkh@suse.de>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>,
-	devel@driverdev.osuosl.org, Linus Walleij <linus.walleij@linaro.org>,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v2 2/2] mach-ux500: Add CG2900 devices
-Message-ID: <20110328141237.GB19350@suse.de>
-References: <1301302992-10671-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <201103281500.38954.arnd@arndb.de>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Lukasz.Rymanowski@tieto.com,
+	par-gunnar.p.hjalmdahl@stericsson.com, devel@driverdev.osuosl.org,
+	linus.walleij@linaro.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, pavan_savoy@sify.com,
+	vitalywool@gmail.com, alan@lxorguk.ukuu.org.uk, arnd@arndb.de,
+	marcel@holtmann.org, linus.walleij@stericsson.com,
+	pghatwork@gmail.com, lee.jones@linaro.org, mathieu.poirier@linaro.org
+Subject: Re: [PATCH v2 1/2] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110328141106.GA19350@suse.de>
+References: <1301302950-10628-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <alpine.LFD.2.00.1103281110210.31464@localhost6.localdomain6>
+ <7D7F2FD3846CF6429ACEBDFB5A2DD86F07E35E5F89@EXMB01.eu.tieto.com>
+ <alpine.LFD.2.00.1103281221250.31464@localhost6.localdomain6>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201103281500.38954.arnd@arndb.de>
+In-Reply-To: <alpine.LFD.2.00.1103281221250.31464@localhost6.localdomain6>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 28, 2011 at 03:00:38PM +0200, Arnd Bergmann wrote:
-> On Monday 28 March 2011, Par-Gunnar Hjalmdahl wrote:
-> > diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
-> > index d8e5a52..16b7343 100644
-> > --- a/arch/arm/mach-ux500/board-mop500.c
-> > +++ b/arch/arm/mach-ux500/board-mop500.c
-> > @@ -417,6 +417,8 @@ static void __init mop500_init_machine(void)
-> >  
-> >         platform_device_register(&ab8500_device);
-> >  
-> > +       cg2900_init_board();
-> > +
-> >         i2c_register_board_info(0, mop500_i2c0_devices,
-> >                                 ARRAY_SIZE(mop500_i2c0_devices));
-> >         i2c_register_board_info(2, mop500_i2c2_devices,
+On Mon, Mar 28, 2011 at 12:21:53PM +0200, Thomas Gleixner wrote:
+> On Mon, 28 Mar 2011, Lukasz.Rymanowski@tieto.com wrote:
 > 
-> Not exactly what I had in mind, but probably good enough for a start.
-> This adds a dependency from core code to the staging driver now,
-> which shouldn't be there. I suppose we can add
+> > >> +/**
+> > >> + * cts_interrupt() - Called to handle CTS interrupt.
+> > >> + * @irq:	Interrupt that occurred.
+> > >> + * @dev_id:	Device ID where interrupt occurred.
+> > >> + *
+> > >> + * The cts_interrupt() function is called if interrupt on CTS occurred.
+> > >> + * It disables the interrupt and starts a new work thread to handle
+> > >> + * the interrupt.
+> > >> + */
+> > >> +static irqreturn_t cts_interrupt(int irq, void *dev_id) {
+> > >> +	struct uart_info *uart_info = dev_get_drvdata(dev_id); #ifdef 
+> > >> +CONFIG_PM
+> > >> +	disable_irq_wake(irq);
+> > >> +#endif
+> > >> +	disable_irq_nosync(irq);
+> > >> +
+> > >> +	/* Create work and leave IRQ context. */
+> > >> +	(void)create_work_item(uart_info, handle_cts_irq);
+> > >> +
+> > >> +	return IRQ_HANDLED;
+> > >> +}
+> > 
+> > >Have you thought about using a threaded interrupt handler? That would make all this work cruft go away.
+> > 
+> > Good point.
+> > To be honest we did think about it but in the time we where we were busy with other issues.
+> > Anyway, shall we resend patches now or we can push patch for it once driver gets in the tree ?
 > 
-> "Clean up device registration path to register the main device from board code"
->  
-> to the TODO file.
+> Up to Greg.
 
-No, please do not make any core code dependant on a staging driver, this
-isn't ok, it needs to be stand-alone, or at the least, the rest of the
-kernel needs to be able to be built with no staging drivers enabled.
+Just send patches after it's in the linux-next tree.  Give it a week or
+so before that happens due to .39-rc1 issues at the moment and vacation
+schedules...
 
 thanks,
 
