@@ -1,133 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: luiz.dentz@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Fix uninitialized variable warning
-Date: Tue, 29 Mar 2011 14:36:53 +0300
-Message-Id: <1301398615-16283-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <4D91B28F.1060605@colin.guthr.ie>
+Date: Tue, 29 Mar 2011 11:21:03 +0100
+From: Colin Guthrie <gmane@colin.guthr.ie>
 MIME-Version: 1.0
+To: General PulseAudio Discussion
+	<pulseaudio-discuss@mail.0pointer.de>
+CC: Paul Menzel <paulepanter@users.sourceforge.net>,
+	Siarhei Siamashka <siarhei.siamashka@nokia.com>,
+	linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH] sbc_math.h: add explicit check for ARMv6 instructions
+References: <1298226004.3712.1.camel@mattotaupa>	<1298320304.6159.21.camel@snowflake> <ik00pv$8d8$1@dough.gmane.org>	<1298374409.3861.32.camel@mattotaupa>	<1298403438.6736.26.camel@snowflake>	<1300531488.6875.3.camel@snowflake>	<1301052849.7592.15.camel@mattotaupa>	<AANLkTi=wTkJ654Zo0SEuzLi3MBjvee54HvToxmeYGMF1@mail.gmail.com> <1301353257.6649.6.camel@mattotaupa>
+In-Reply-To: <1301353257.6649.6.camel@mattotaupa>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+'Twas brillig, and Paul Menzel at 29/03/11 00:00 did gyre and gimble:
+>         commit b676f89d8579c7ec1629892342a330f1e4c35657
+>         Author: Colin Guthrie <cguthrie@mandriva.org>
+>         Date:   Sun Mar 20 11:44:53 2011 +0000
+>         
+>             bluetooth: Run 'make update-sbc'
+>             
+>             Note that changes to ipc.h from 8f3ef04b had to be manually reapplied.
+> 
 
-audio/unix.c: In function ‘client_cb’:
-audio/unix.c:1078:20: error: ‘a2dp’ may be used uninitialized in this function
-audio/unix.c:1154:20: error: ‘a2dp’ may be used uninitialized in this function
-make[1]: *** [audio/unix.o] Error 1
----
- audio/unix.c |   51 ++++++++++++++++++++++++++++-----------------------
- 1 files changed, 28 insertions(+), 23 deletions(-)
+I ran this after checking with Luiz first.
 
-diff --git a/audio/unix.c b/audio/unix.c
-index 3c47510..37c772d 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -1075,31 +1075,30 @@ failed:
- 
- static void start_resume(struct audio_device *dev, struct unix_client *client)
- {
--	struct a2dp_data *a2dp;
-+	struct a2dp_data *a2dp = NULL;
- 	struct headset_data *hs;
- 	unsigned int id;
--	gboolean unref_avdtp_on_fail = FALSE;
-+	struct avdtp *session = NULL;
- 
- 	switch (client->type) {
- 	case TYPE_SINK:
- 	case TYPE_SOURCE:
- 		a2dp = &client->d.a2dp;
- 
--		if (!a2dp->session) {
--			a2dp->session = avdtp_get(&dev->src, &dev->dst);
--			unref_avdtp_on_fail = TRUE;
--		}
--
--		if (!a2dp->session) {
--			error("Unable to get a session");
--			goto failed;
--		}
--
- 		if (!a2dp->sep) {
- 			error("seid not opened");
- 			goto failed;
- 		}
- 
-+		if (!a2dp->session) {
-+			session = avdtp_get(&dev->src, &dev->dst);
-+			if (!session) {
-+				error("Unable to get a session");
-+				goto failed;
-+			}
-+			a2dp->session = session;
-+		}
-+
- 		id = a2dp_resume(a2dp->session, a2dp->sep, a2dp_resume_complete,
- 					client);
- 		client->cancel = a2dp_cancel;
-@@ -1142,33 +1141,38 @@ static void start_resume(struct audio_device *dev, struct unix_client *client)
- 	return;
- 
- failed:
--	if (unref_avdtp_on_fail && a2dp->session) {
--		avdtp_unref(a2dp->session);
-+	if (session) {
-+		avdtp_unref(session);
- 		a2dp->session = NULL;
- 	}
-+
- 	unix_ipc_error(client, BT_START_STREAM, EIO);
- }
- 
- static void start_suspend(struct audio_device *dev, struct unix_client *client)
- {
--	struct a2dp_data *a2dp;
-+	struct a2dp_data *a2dp = NULL;
- 	struct headset_data *hs;
- 	unsigned int id;
--	gboolean unref_avdtp_on_fail = FALSE;
-+	struct avdtp *session = NULL;
- 
- 	switch (client->type) {
- 	case TYPE_SINK:
- 	case TYPE_SOURCE:
- 		a2dp = &client->d.a2dp;
- 
--		if (!a2dp->session) {
--			a2dp->session = avdtp_get(&dev->src, &dev->dst);
--			unref_avdtp_on_fail = TRUE;
-+		if (!a2dp->sep) {
-+			error("seid not opened");
-+			goto failed;
- 		}
- 
- 		if (!a2dp->session) {
--			error("Unable to get a session");
--			goto failed;
-+			session = avdtp_get(&dev->src, &dev->dst);
-+			if (!session) {
-+				error("Unable to get a session");
-+				goto failed;
-+			}
-+			a2dp->session = session;
- 		}
- 
- 		if (!a2dp->sep) {
-@@ -1214,10 +1218,11 @@ static void start_suspend(struct audio_device *dev, struct unix_client *client)
- 	return;
- 
- failed:
--	if (unref_avdtp_on_fail && a2dp->session) {
--		avdtp_unref(a2dp->session);
-+	if (session) {
-+		avdtp_unref(session);
- 		a2dp->session = NULL;
- 	}
-+
- 	unix_ipc_error(client, BT_STOP_STREAM, EIO);
- }
- 
+I've asked that the local changes to our ipc.h were pushed upstream
+after doing so to but not sure of the status of that, Luiz, I think I
+included a specific patch in the last mail... let me know if you want it
+again :)
+
+Col
+
 -- 
-1.7.4.1
 
+Colin Guthrie
+gmane(at)colin.guthr.ie
+http://colin.guthr.ie/
+
+Day Job:
+  Tribalogic Limited [http://www.tribalogic.net/]
+Open Source:
+  Mageia Contributor [http://www.mageia.org/]
+  PulseAudio Hacker [http://www.pulseaudio.org/]
+  Trac Hacker [http://trac.edgewall.org/]
