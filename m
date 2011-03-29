@@ -1,95 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg Kroah-Hartman <gregkh@suse.de>,
-	<devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH v3] Add ST-Ericsson CG2900 driver
-Date: Tue, 29 Mar 2011 13:48:54 +0200
-Message-ID: <1301399334-10747-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+From: luiz.dentz@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Fix uninitialized variables warnings
+Date: Tue, 29 Mar 2011 14:36:55 +0300
+Message-Id: <1301398615-16283-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1301398615-16283-1-git-send-email-luiz.dentz@gmail.com>
+References: <1301398615-16283-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a driver for the ST-Ericsson CG2900 connectivity
-controller.
-It has earlier been tried to add this driver to the mfd and bluetooth
-areas, but due to continued discussions the driver is placed into
-staging for the moment.
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Compared to v2 this patch has the following update:
- - Removed dependency to board files in the arch/arm/mach-ux500
-   folder
+src/attrib-server.c: In function ‘channel_handler’:
+src/attrib-server.c:297:21: error: ‘cur’ may be used uninitialized in this function
+src/attrib-server.c:502:10: error: ‘format’ may be used uninitialized in this function
+src/attrib-server.c:503:11: error: ‘length’ may be used uninitialized in this function
+make[1]: *** [src/attrib-server.o] Error 1
+---
+ src/attrib-server.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-Par-Gunnar Hjalmdahl (1):
-  staging: Add ST-Ericsson CG2900 driver
-
- drivers/staging/Kconfig                          |    2 +
- drivers/staging/Makefile                         |    1 +
- drivers/staging/cg2900/Kconfig                   |   72 +
- drivers/staging/cg2900/Makefile                  |   12 +
- drivers/staging/cg2900/TODO                      |   23 +
- drivers/staging/cg2900/bluetooth/Makefile        |    9 +
- drivers/staging/cg2900/bluetooth/btcg2900.c      | 1203 ++++++++
- drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
- drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  657 ++++
- drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
- drivers/staging/cg2900/board-mop500-cg2900.c     |  204 ++
- drivers/staging/cg2900/devices-cg2900.c          |  342 +++
- drivers/staging/cg2900/devices-cg2900.h          |   31 +
- drivers/staging/cg2900/include/cg2900.h          |  278 ++
- drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
- drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
- drivers/staging/cg2900/mfd/Makefile              |   18 +
- drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_char_devices.c |  701 +++++
- drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
- drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
- drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
- drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
- drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
- drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
- drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
- drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
- 28 files changed, 16922 insertions(+), 0 deletions(-)
- create mode 100644 drivers/staging/cg2900/Kconfig
- create mode 100644 drivers/staging/cg2900/Makefile
- create mode 100644 drivers/staging/cg2900/TODO
- create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
- create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
- create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
- create mode 100644 drivers/staging/cg2900/board-mop500-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
- create mode 100644 drivers/staging/cg2900/mfd/Makefile
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
-
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index dc05d7e..fb89ea5 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -294,7 +294,7 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+ {
+ 	struct att_data_list *adl;
+ 	struct attribute *a;
+-	struct group_elem *cur, *old = NULL;
++	struct group_elem *cur = NULL, *old = NULL;
+ 	GSList *l, *groups;
+ 	uint16_t length, last_handle, last_size = 0;
+ 	uint8_t status;
+@@ -499,8 +499,8 @@ static int find_info(uint16_t start, uint16_t end, uint8_t *pdu, int len)
+ 	struct attribute *a;
+ 	struct att_data_list *adl;
+ 	GSList *l, *info;
+-	uint8_t format, last_type = BT_UUID_UNSPEC;
+-	uint16_t length, num;
++	uint8_t format = 0, last_type = BT_UUID_UNSPEC;
++	uint16_t length = 0, num;
+ 	int i;
+ 
+ 	if (start > end || start == 0x0000)
 -- 
 1.7.4.1
+
