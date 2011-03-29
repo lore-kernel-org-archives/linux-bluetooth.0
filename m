@@ -1,64 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] sbc: better compatibility with ARM thumb/thumb2
-From: Paul Menzel <paulepanter@users.sourceforge.net>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Siarhei Siamashka <siarhei.siamashka@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Siarhei Siamashka <siarhei.siamashka@nokia.com>
-In-Reply-To: <20110329071714.GA3915@jh-x301>
-References: <1301353059-12776-1-git-send-email-siarhei.siamashka@gmail.com>
-	 <20110329071714.GA3915@jh-x301>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-QbZqAoRMp/IBnzv8PVdq"
-Date: Tue, 29 Mar 2011 15:51:09 +0200
-Message-ID: <1301406669.15348.37.camel@mattotaupa>
-Mime-Version: 1.0
+From: luiz.dentz@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3 v2] Fix uninitialized variables warnings
+Date: Tue, 29 Mar 2011 16:47:44 +0300
+Message-Id: <1301406464-3404-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1301406464-3404-1-git-send-email-luiz.dentz@gmail.com>
+References: <1301406464-3404-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
---=-QbZqAoRMp/IBnzv8PVdq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+src/attrib-server.c: In function ‘channel_handler’:
+src/attrib-server.c:297:21: error: ‘cur’ may be used uninitialized in this function
+src/attrib-server.c:502:10: error: ‘format’ may be used uninitialized in this function
+src/attrib-server.c:503:11: error: ‘length’ may be used uninitialized in this function
+make[1]: *** [src/attrib-server.o] Error 1
+---
+ src/attrib-server.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Dear Johan, Siarhei,
-
-
-Am Dienstag, den 29.03.2011, 10:17 +0300 schrieb Johan Hedberg:
-
-> On Tue, Mar 29, 2011, Siarhei Siamashka wrote:
-> > ARM assembly optimizations fail to compile in thumb mode, but are fine
-> > for thumb2. Update ifdefs in the code to make use of ARM assembly only
-> > when it is safe and also make sure that no optimizations are missed
-> > when compiling for thumb2.
-> >=20
-> > The problem was reported by Paul Menzel:
-> > https://tango.0pointer.de/pipermail/pulseaudio-discuss/2011-February/00=
-9022.html
-> > ---
-> >  sbc/sbc_math.h             |    2 +-
-> >  sbc/sbc_primitives_armv6.h |    4 ++--
-> >  2 files changed, 3 insertions(+), 3 deletions(-)
->=20
-> Pushed upstream. Thanks.
-
-Tested-by: Paul Menzel <paulepanter@users.sourceforge.net>
-
-
-Thanks,
-
-Paul
-
---=-QbZqAoRMp/IBnzv8PVdq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEABECAAYFAk2R480ACgkQPX1aK2wOHVjnhACePYCGrRyFzu4LJ6NEZR4p56i3
-DDgAnis+yn6QkKVOUSa9zz6pV+0j0Mw2
-=K1B2
------END PGP SIGNATURE-----
-
---=-QbZqAoRMp/IBnzv8PVdq--
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index dc05d7e..98bd6b1 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -315,7 +315,7 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+ 					ATT_ECODE_UNSUPP_GRP_TYPE, pdu, len);
+ 
+ 	last_handle = end;
+-	for (l = database, groups = NULL; l; l = l->next) {
++	for (l = database, groups = NULL, cur = NULL; l; l = l->next) {
+ 		struct attribute *client_attr;
+ 
+ 		a = l->data;
+@@ -538,6 +538,9 @@ static int find_info(uint16_t start, uint16_t end, uint8_t *pdu, int len)
+ 	} else if (last_type == BT_UUID128) {
+ 		length = 16;
+ 		format = 0x02;
++	} else {
++		g_slist_free(info);
++		return 0;
+ 	}
+ 
+ 	adl = att_data_list_alloc(num, length + 2);
+-- 
+1.7.4.1
 
