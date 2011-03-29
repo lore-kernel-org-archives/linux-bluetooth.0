@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Mar 2011 16:06:49 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: check L2CAP info_rsp ident and state
-Message-ID: <20110329190359.GA8336@joana>
-References: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301045501-3346-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 29 Mar 2011 15:44:37 -0300
+Message-ID: <AANLkTimH7vK283veJ-HHG-9KKS4P4ec3s1Z=ktX5auqz@mail.gmail.com>
+Subject: BlueZ on Google Summer of Code: List of Ideas
+From: "Gustavo F. Padovan" <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Everyone,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-03-25 11:31:41 +0200]:
+As many of you may already know Google announced the accepted
+organizations for Google Summer of Code and BlueZ[0] was accepted
+again! If you a student and know nothing about it go to the Google
+Summer of Code page[1] and learn about it.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
-> 
-> Information requests/responses are unbound to L2CAP channel. Patch
-> fixes issue arising when two devices connects at the same time to
-> each other. This way we do not process out of the context messages.
-> We are safe dropping info_rsp since info_timer is left running.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@nokia.com>
+We are already accepting projects proposal, check our ideas list[2] or
+propose some new good idea you want to implement in BlueZ. Discuss
+them with the BlueZ mentors and submit your project proposal. Our
+freenode irc channel for GSoC is #bluez-gsoc.
 
-Patch has been applied. Thanks.
+We will be very glad to accept the best students proposals to take
+part of GSoC 2011 with BlueZ.
+
+Regards,
+
+
+[0] http://www.bluez.org
+[1] http://code.google.com/soc/
+[2] http://www.bluez.org/development/gsoc/gsoc-ideas-list/
 
 -- 
 Gustavo F. Padovan
-http://profusion.mobi
+http://padovan.org
