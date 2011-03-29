@@ -1,30 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Mar 2011 18:08:13 +0300
+Date: Tue, 29 Mar 2011 17:50:49 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: luiz.dentz@gmail.com
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3 v2] Fix uninitialized variables warnings
-Message-ID: <20110329150813.GA13062@jh-x301>
-References: <1301406464-3404-1-git-send-email-luiz.dentz@gmail.com>
- <1301406464-3404-2-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Remove unused variable in mgmtops plugin
+Message-ID: <20110329145049.GA12595@jh-x301>
+References: <1301409722-16198-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1301406464-3404-2-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1301409722-16198-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Claudio,
 
-On Tue, Mar 29, 2011, luiz.dentz@gmail.com wrote:
-> src/attrib-server.c: In function ‘channel_handler’:
-> src/attrib-server.c:297:21: error: ‘cur’ may be used uninitialized in this function
-> src/attrib-server.c:502:10: error: ‘format’ may be used uninitialized in this function
-> src/attrib-server.c:503:11: error: ‘length’ may be used uninitialized in this function
-> make[1]: *** [src/attrib-server.o] Error 1
+On Tue, Mar 29, 2011, Claudio Takahasi wrote:
 > ---
->  src/attrib-server.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
+>  plugins/mgmtops.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+> index 65b32e6..3f96017 100644
+> --- a/plugins/mgmtops.c
+> +++ b/plugins/mgmtops.c
+> @@ -1410,7 +1410,6 @@ static void mgmt_cleanup(void)
+>  {
+>  	g_free(controllers);
+>  	controllers = NULL;
+> -	max_index = -1;
+>  
+>  	if (mgmt_sock >= 0) {
+>  		close(mgmt_sock);
 
-All three patches (v2 of 2/3 & 3/3) have been pushed upstream. Thanks.
+I don't understand the purpose of this patch. You're neither removing a
+variable (just removing an assignment) nor is the variable you're
+touching unused.
 
 Johan
