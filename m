@@ -2,83 +2,82 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Dieb Martins <andre.dieb@signove.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: andre.dieb@signove.com
-Subject: [RFC 2/2] Add type property to Adapter
-Date: Wed, 30 Mar 2011 15:33:56 -0300
-Message-Id: <1301510036-17282-2-git-send-email-andre.dieb@signove.com>
-In-Reply-To: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
-References: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
+Subject: [RFC 1/2] Add Type property to Device
+Date: Wed, 30 Mar 2011 15:33:55 -0300
+Message-Id: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/adapter-api.txt |    4 ++++
- src/adapter.c       |   17 ++++++++++++++++-
- 2 files changed, 20 insertions(+), 1 deletions(-)
+ doc/device-api.txt |    4 ++++
+ src/device.c       |   18 ++++++++++++++++++
+ src/device.h       |    2 ++
+ 3 files changed, 24 insertions(+), 0 deletions(-)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index f34d58f..c199fa1 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -225,6 +225,10 @@ Properties	string Address [readonly]
- 
- 			The Bluetooth class of device.
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index d1feb18..a667296 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -130,6 +130,10 @@ Properties	string Address [readonly]
+ 			Proposed icon name according to the freedesktop.org
+ 			icon naming specification.
  
 +		string Type [readonly]
 +
-+			Adapter type (BR/EDR, LE or BR/EDR/LE).
++			Device type (BR/EDR, LE, BR/EDR/LE).
 +
- 		boolean Powered [readwrite]
+ 		uint32 Class [readonly]
  
- 			Switch an adapter on or off. This will also set the
-diff --git a/src/adapter.c b/src/adapter.c
-index 4ce7e4c..39a8d0a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -112,6 +112,7 @@ struct btd_adapter {
- 	char *path;			/* adapter object path */
- 	bdaddr_t bdaddr;		/* adapter Bluetooth Address */
- 	uint32_t dev_class;		/* Class of Device */
-+	device_type_t type;		/* Type (BR/EDR, LE, etc) */
- 	guint discov_timeout_id;	/* discoverable timeout id */
- 	guint stop_discov_id;		/* stop inquiry/scanning id */
- 	uint32_t discov_timeout;	/* discoverable time(sec) */
-@@ -1361,6 +1362,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 	dict_append_entry(&dict, "Class",
- 				DBUS_TYPE_UINT32, &adapter->dev_class);
+ 			The Bluetooth class of device of the remote device.
+diff --git a/src/device.c b/src/device.c
+index d567952..96683de 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -228,6 +228,20 @@ static void device_free(gpointer user_data)
+ 	g_free(device);
+ }
+ 
++const char *devtype2str(device_type_t type)
++{
++	switch (type) {
++	case DEVICE_TYPE_BREDR:
++		return "BR/EDR";
++	case DEVICE_TYPE_LE:
++		return "LE";
++	case DEVICE_TYPE_DUALMODE:
++		return "BR/EDR/LE";
++	default:
++		return "Unknown";
++	}
++}
++
+ gboolean device_is_paired(struct btd_device *device)
+ {
+ 	return device->paired;
+@@ -302,6 +316,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 						DBUS_TYPE_STRING, &icon);
+ 	}
  
 +	/* Type */
-+	property = devtype2str(adapter->type);
-+	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &property);
++	ptr = devtype2str(device->type);
++	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &ptr);
 +
- 	/* Powered */
- 	value = (adapter->up && !adapter->off_requested) ? TRUE : FALSE;
- 	dict_append_entry(&dict, "Powered", DBUS_TYPE_BOOLEAN, &value);
-@@ -2699,7 +2704,6 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 					adapter->dev_id, strerror(-err), -err);
- 		return FALSE;
- 	}
--
- 	dev = &adapter->dev;
+ 	/* Paired */
+ 	boolean = device_is_paired(device);
+ 	dict_append_entry(&dict, "Paired", DBUS_TYPE_BOOLEAN, &boolean);
+diff --git a/src/device.h b/src/device.h
+index 3ce212b..b385070 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -41,6 +41,8 @@ typedef enum {
+ 	DEVICE_TYPE_DUALMODE
+ } device_type_t;
  
- 	dev->hci_rev = ver.hci_rev;
-@@ -2714,6 +2718,17 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 		return FALSE;
- 	}
- 
-+	/* Determine controller type based on LMP features */
-+	if (dev->features[4] & LMP_NO_BREDR) {
-+		if (dev->features[4] & LMP_LE)
-+			adapter->type = DEVICE_TYPE_LE;
-+		else
-+			adapter->type = DEVICE_TYPE_UNKNOWN;
-+	} else if (dev->features[6] & LMP_LE_BREDR)
-+		adapter->type = DEVICE_TYPE_DUALMODE;
-+	else
-+		adapter->type = DEVICE_TYPE_BREDR;
++const char *devtype2str(device_type_t type);
 +
- 	if (read_local_name(&adapter->bdaddr, adapter->dev.name) < 0)
- 		expand_name(adapter->dev.name, MAX_NAME_LENGTH, main_opts.name,
- 							adapter->dev_id);
+ struct btd_device *device_create(DBusConnection *conn,
+ 				struct btd_adapter *adapter,
+ 				const gchar *address, device_type_t type);
 -- 
 1.7.1
 
