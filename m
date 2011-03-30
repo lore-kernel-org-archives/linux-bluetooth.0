@@ -1,52 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Dieb Martins <andre.dieb@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: andre.dieb@signove.com
-Subject: [PATCH v2 1/6] Add parsing for ATT Write Request
-Date: Wed, 30 Mar 2011 11:01:29 -0300
-Message-Id: <1301493694-10957-1-git-send-email-andre.dieb@signove.com>
+Date: Wed, 30 Mar 2011 17:00:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Add mgmt_remote_name event
+Message-ID: <20110330140042.GA28881@jh-x301>
+References: <1301480292-25370-1-git-send-email-johan.hedberg@gmail.com>
+ <1301480292-25370-2-git-send-email-johan.hedberg@gmail.com>
+ <AANLkTi=BZhjKvCBon7qhS0tCPkABmv7to39UhoaQE1a8@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AANLkTi=BZhjKvCBon7qhS0tCPkABmv7to39UhoaQE1a8@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Note we do not need extra parsing for ATT Write Response as it only has one
-field (opcode).
----
- parser/att.c |   15 +++++++++++++++
- 1 files changed, 15 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/parser/att.c b/parser/att.c
-index 7b8b83c..3804206 100644
---- a/parser/att.c
-+++ b/parser/att.c
-@@ -476,6 +476,18 @@ static void att_read_by_group_resp_dump(int level, struct frame *frm)
- 	}
- }
- 
-+static void att_write_req_dump(int level, struct frame *frm)
-+{
-+	uint16_t handle = btohs(htons(get_u16(frm)));
-+
-+	p_indent(level, frm);
-+	printf("handle 0x%4.4x value ", handle);
-+
-+	while (frm->len > 0)
-+		printf(" 0x%2.2x", get_u8(frm));
-+	printf("\n");
-+}
-+
- static void att_handle_notify_dump(int level, struct frame *frm)
- {
- 	uint16_t handle = btohs(htons(get_u16(frm)));
-@@ -549,6 +561,9 @@ void att_dump(int level, struct frame *frm)
- 		case ATT_OP_READ_BY_GROUP_RESP:
- 			att_read_by_group_resp_dump(level + 1, frm);
- 			break;
-+		case ATT_OP_WRITE_REQ:
-+			att_write_req_dump(level + 1, frm);
-+			break;
- 		case ATT_OP_HANDLE_NOTIFY:
- 			att_handle_notify_dump(level + 1, frm);
- 			break;
--- 
-1.7.1
+On Wed, Mar 30, 2011, Anderson Lizardo wrote:
+> > This patch adds a new remote_name event to the Management interface
+> > which is sent every time the name of a remote device is resolved (over
+> > BR/EDR).
+> 
+> Just wondering if we could ever reuse this for LE. For LE (and GATT
+> over BR/EDR ?), I believe the "remote device name resolution" is done
+> by looking at the GAP "Device Name" characteristic after a service
+> discovery (see spec page 1739).
+> 
+> The advertising data may contain the "full" device name as well, but
+> it is not mandatory to include it. GAP Device Name OTOH is mandatory.
 
+I suppose it can't be reused for LE. Btw, this event will *not* be sent
+for advertising data or extended inquiry response data containing a
+remote name. User space is expected to do that extraction from the data
+(which comes in the mgmt_device_found event).
+
+Johan
