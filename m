@@ -1,49 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 2/2] Add constant for interleaved discovery window
-Date: Wed, 30 Mar 2011 13:48:29 -0300
-Message-Id: <1301503709-18788-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <20110330164251.GF30984@jh-x301>
-References: <20110330164251.GF30984@jh-x301>
+Date: Wed, 30 Mar 2011 19:47:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Dieb Martins <andre.dieb@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/6] Add parsing for ATT Write Request
+Message-ID: <20110330164710.GA20595@jh-x301>
+References: <1301493694-10957-1-git-send-email-andre.dieb@signove.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1301493694-10957-1-git-send-email-andre.dieb@signove.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+Hi André,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4ce7e4c..1d236ca 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -61,6 +61,9 @@
- #include "gattrib.h"
- #include "attrib/client.h"
- 
-+/* Interleaved discovery window: 5.12 sec */
-+#define GAP_INTER_DISCOV_WIN		5120
-+
- /* Flags Descriptions */
- #define EIR_LIM_DISC                0x01 /* LE Limited Discoverable Mode */
- #define EIR_GEN_DISC                0x02 /* LE General Discoverable Mode */
-@@ -2836,11 +2839,12 @@ void adapter_set_state(struct btd_adapter *adapter, int state)
- 		if (!adapter->disc_sessions)
- 			break;
- 
--		/* Scanning enabled */
--		adapter->stop_discov_id = g_timeout_add(5120, stop_scanning,
-+		/* Stop scanning after TGAP(100)/2 */
-+		adapter->stop_discov_id = g_timeout_add(GAP_INTER_DISCOV_WIN,
-+							stop_scanning,
- 							adapter);
- 
--		/* For dual mode: don't send "Discovering = TRUE"  */
-+		/* For dual mode: don't send "Discovering = TRUE" (twice) */
- 		if (bredr_capable(adapter) == TRUE)
- 			return;
- 
--- 
-1.7.4.1
+On Wed, Mar 30, 2011, Andre Dieb Martins wrote:
+> Note we do not need extra parsing for ATT Write Response as it only has one
+> field (opcode).
+> ---
+>  parser/att.c |   15 +++++++++++++++
+>  1 files changed, 15 insertions(+), 0 deletions(-)
 
+All patches in this set have been pushed upstream. Thanks.
+
+Johan
