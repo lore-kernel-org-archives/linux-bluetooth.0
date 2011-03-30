@@ -1,83 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Dieb Martins <andre.dieb@signove.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: andre.dieb@signove.com
-Subject: [RFC 1/2] Add Type property to Device
-Date: Wed, 30 Mar 2011 15:33:55 -0300
-Message-Id: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
+MIME-Version: 1.0
+In-Reply-To: <4D91B28F.1060605@colin.guthr.ie>
+References: <1298226004.3712.1.camel@mattotaupa>
+	<1298320304.6159.21.camel@snowflake>
+	<ik00pv$8d8$1@dough.gmane.org>
+	<1298374409.3861.32.camel@mattotaupa>
+	<1298403438.6736.26.camel@snowflake>
+	<1300531488.6875.3.camel@snowflake>
+	<1301052849.7592.15.camel@mattotaupa>
+	<AANLkTi=wTkJ654Zo0SEuzLi3MBjvee54HvToxmeYGMF1@mail.gmail.com>
+	<1301353257.6649.6.camel@mattotaupa>
+	<4D91B28F.1060605@colin.guthr.ie>
+Date: Wed, 30 Mar 2011 20:42:57 +0300
+Message-ID: <AANLkTi=5HTOasN=zZwcfFb9=CenDnHOBnQtJrMBqVOAb@mail.gmail.com>
+Subject: Re: [PATCH] sbc_math.h: add explicit check for ARMv6 instructions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Colin Guthrie <gmane@colin.guthr.ie>
+Cc: General PulseAudio Discussion
+	<pulseaudio-discuss@mail.0pointer.de>,
+	Paul Menzel <paulepanter@users.sourceforge.net>,
+	Siarhei Siamashka <siarhei.siamashka@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/device-api.txt |    4 ++++
- src/device.c       |   18 ++++++++++++++++++
- src/device.h       |    2 ++
- 3 files changed, 24 insertions(+), 0 deletions(-)
+Hi Colin,
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index d1feb18..a667296 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -130,6 +130,10 @@ Properties	string Address [readonly]
- 			Proposed icon name according to the freedesktop.org
- 			icon naming specification.
- 
-+		string Type [readonly]
-+
-+			Device type (BR/EDR, LE, BR/EDR/LE).
-+
- 		uint32 Class [readonly]
- 
- 			The Bluetooth class of device of the remote device.
-diff --git a/src/device.c b/src/device.c
-index d567952..96683de 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -228,6 +228,20 @@ static void device_free(gpointer user_data)
- 	g_free(device);
- }
- 
-+const char *devtype2str(device_type_t type)
-+{
-+	switch (type) {
-+	case DEVICE_TYPE_BREDR:
-+		return "BR/EDR";
-+	case DEVICE_TYPE_LE:
-+		return "LE";
-+	case DEVICE_TYPE_DUALMODE:
-+		return "BR/EDR/LE";
-+	default:
-+		return "Unknown";
-+	}
-+}
-+
- gboolean device_is_paired(struct btd_device *device)
- {
- 	return device->paired;
-@@ -302,6 +316,10 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 						DBUS_TYPE_STRING, &icon);
- 	}
- 
-+	/* Type */
-+	ptr = devtype2str(device->type);
-+	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &ptr);
-+
- 	/* Paired */
- 	boolean = device_is_paired(device);
- 	dict_append_entry(&dict, "Paired", DBUS_TYPE_BOOLEAN, &boolean);
-diff --git a/src/device.h b/src/device.h
-index 3ce212b..b385070 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -41,6 +41,8 @@ typedef enum {
- 	DEVICE_TYPE_DUALMODE
- } device_type_t;
- 
-+const char *devtype2str(device_type_t type);
-+
- struct btd_device *device_create(DBusConnection *conn,
- 				struct btd_adapter *adapter,
- 				const gchar *address, device_type_t type);
+On Tue, Mar 29, 2011 at 1:21 PM, Colin Guthrie <gmane@colin.guthr.ie> wrote:
+> 'Twas brillig, and Paul Menzel at 29/03/11 00:00 did gyre and gimble:
+>>         commit b676f89d8579c7ec1629892342a330f1e4c35657
+>>         Author: Colin Guthrie <cguthrie@mandriva.org>
+>>         Date:   Sun Mar 20 11:44:53 2011 +0000
+>>
+>>             bluetooth: Run 'make update-sbc'
+>>
+>>             Note that changes to ipc.h from 8f3ef04b had to be manually reapplied.
+>>
+>
+> I ran this after checking with Luiz first.
+>
+> I've asked that the local changes to our ipc.h were pushed upstream
+> after doing so to but not sure of the status of that, Luiz, I think I
+> included a specific patch in the last mail... let me know if you want it
+> again :)
+
+I think it is better to add the a2dp-codecs.h header present on BlueZ
+to PA too and remove the definitions Ive added to ipc.h, this should
+make it easier to sync things. I just need some free time to make this
+happen :D
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
+Computer Engineer
