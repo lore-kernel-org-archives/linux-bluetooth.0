@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Apr 2011 16:48:25 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add ERROR code response to ATD in maemo6 telephony
-Message-ID: <20110401134825.GC24588@jh-x301>
-References: <1301659554-2773-1-git-send-email-dmitriy.paliy@nokia.com>
+From: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 1 Apr 2011 14:47:40 +0100
+Subject: Question about supported profiles
+Message-ID: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3BCE@irsmsx501.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301659554-2773-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi,
 
-On Fri, Apr 01, 2011, Dmitriy Paliy wrote:
-> ERROR code response is added to ATD command in maemo6 telephony driver
-> based on HFP 1.5 specification, page 68:
-> "Standard error indication code. It shall be issued on detection of any
-> syntax, format or procedure error condition."
-> ---
->  audio/telephony-maemo6.c |   12 ++++--------
->  1 files changed, 4 insertions(+), 8 deletions(-)
+I have a question about supported profiles under linux-bluez.
+Where and how are defined the default supported profiles? Is it a conf file?
+In our case, by default we support HFP, A2DP, OPP, AVRCP...
+But if we want to use FTP or DUN, we have to enter "sdptool add DUN" or " sdptool add FTP"
+Can anyone tell me how to change the default params?
+Thanks
+Regards
 
-Pushed upstream. Thanks.
+Jean 
 
-Johan
+
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris, 
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
+
