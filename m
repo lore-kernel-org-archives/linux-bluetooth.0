@@ -1,37 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Apr 2011 16:43:24 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Remove deprecated attrib plugin
-Message-ID: <20110401134324.GA24588@jh-x301>
-References: <1301587151-18975-1-git-send-email-bruna.moreira@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301587151-18975-1-git-send-email-bruna.moreira@openbossa.org>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Add ERROR code response to ATD in maemo6 telephony
+Date: Fri,  1 Apr 2011 15:05:54 +0300
+Message-Id: <1301659554-2773-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+ERROR code response is added to ATD command in maemo6 telephony driver
+based on HFP 1.5 specification, page 68:
+"Standard error indication code. It shall be issued on detection of any
+syntax, format or procedure error condition."
+---
+ audio/telephony-maemo6.c |   12 ++++--------
+ 1 files changed, 4 insertions(+), 8 deletions(-)
 
-On Thu, Mar 31, 2011, Bruna Moreira wrote:
-> The attrib plugin is deprecated and it is not used anymore. Remove it
-> and all related configuration. Note that GATT utility (gatttool)
-> configuration item was moved to Makefile.tools and it is compiled when
-> --enable-tools is used in configure.
-> ---
->  Makefile.am         |   18 ------------------
->  Makefile.tools      |   11 +++++++++++
->  acinclude.m4        |    6 ------
->  attrib/main.c       |   48 ------------------------------------------------
->  attrib/manager.c    |   43 -------------------------------------------
->  attrib/manager.h    |   26 --------------------------
->  bootstrap-configure |    1 -
->  7 files changed, 11 insertions(+), 142 deletions(-)
->  delete mode 100644 attrib/main.c
->  delete mode 100644 attrib/manager.c
->  delete mode 100644 attrib/manager.h
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 0cef7dd..be2fb87 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -618,7 +618,7 @@ static void remove_pending(DBusPendingCall *call)
+ 	pending_req_finalize(req);
+ }
+ 
+-static void last_number_call_reply(DBusPendingCall *call, void *user_data)
++static void create_call_reply(DBusPendingCall *call, void *user_data)
+ {
+ 	DBusError err;
+ 	DBusMessage *reply;
+@@ -648,7 +648,7 @@ void telephony_last_dialed_number_req(void *telephony_device)
+ 
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+ 				CSD_CALL_INTERFACE, "CreateFromLast",
+-				last_number_call_reply, telephony_device,
++				create_call_reply, telephony_device,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0)
+ 		telephony_dial_number_rsp(telephony_device,
+@@ -687,16 +687,12 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+ 
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+ 				CSD_CALL_INTERFACE, "Create",
+-				NULL, NULL,
++				create_call_reply, telephony_device,
+ 				DBUS_TYPE_STRING, &number,
+ 				DBUS_TYPE_INVALID);
+-	if (ret < 0) {
++	if (ret < 0)
+ 		telephony_dial_number_rsp(telephony_device,
+ 						CME_ERROR_AG_FAILURE);
+-		return;
+-	}
+-
+-	telephony_dial_number_rsp(telephony_device, CME_ERROR_NONE);
+ }
+ 
+ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
+-- 
+1.7.1
 
-Both patches have been pushed upstream. Thanks.
-
-Johan
