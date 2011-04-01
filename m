@@ -1,32 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3BCE@irsmsx501.ger.corp.intel.com>
-References: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3BCE@irsmsx501.ger.corp.intel.com>
-From: "Arun K. Singh" <arunkat@gmail.com>
-Date: Fri, 1 Apr 2011 22:36:20 +0530
-Message-ID: <AANLkTim3NBH2dB=EF2pZDEoj+77Gv+k3JKvqSwc=6sFk@mail.gmail.com>
-Subject: Re: Question about supported profiles
-To: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Fri, 1 Apr 2011 17:20:56 +0300
+Message-ID: <BANLkTi=ce+qfeS14zX-k0qrt75iGP1d7ig@mail.gmail.com>
+Subject: [PATCH] Fix check for valid SCO socket before shutdown
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=0015175ce1e2433fd1049fdc1ec9
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jean,
+--0015175ce1e2433fd1049fdc1ec9
+Content-Type: text/plain; charset=ISO-8859-1
 
-> I have a question about supported profiles under linux-bluez.
-> Where and how are defined the default supported profiles? Is it a conf file?
-> In our case, by default we support HFP, A2DP, OPP, AVRCP...
-> But if we want to use FTP or DUN, we have to enter "sdptool add DUN" or " sdptool add FTP"
-> Can anyone tell me how to change the default params?
 
-First of all its not clear what exactly are you looking for? in case
-you need to know which all profiles are supported in bluez,
-./configure --help should help! Most of the profiles are implemented
-as plugins to either bluetoothd or obexd.
-Few of the profiles are also supported via daemons. All data profiles,
-such as FTP/OPP/PBAP they are supported as obex plugins.
-hope this helps.
 
-thanks,
-Arun
+--0015175ce1e2433fd1049fdc1ec9
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Fix-check-for-valid-SCO-socket-before-shutdown.patch"
+Content-Disposition: attachment;
+	filename="0001-Fix-check-for-valid-SCO-socket-before-shutdown.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_glz74jtz1
+
+RnJvbSA3MDcwMjY1YWFiZDVjNDk3ZGYwOTVlMTNkZmJhZmU1ODJkYjcwZWVhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogRnJpLCAxIEFwciAyMDExIDE2OjUzOjA5ICswMzAwClN1YmplY3Q6IFtQ
+QVRDSF0gRml4IGNoZWNrIGZvciB2YWxpZCBTQ08gc29ja2V0IGJlZm9yZSBzaHV0ZG93bgoKVG8g
+cHJldmVudCBhIGNyYXNoIGluIHRoZSBldmVudCB0aGF0IHRoZXJlIGlzIGEgcmVxdWVzdCB0byBy
+ZW1vdmUKdGhlIGF1ZGlvIGNvbm5lY3Rpb24gd2hlbiBpdCBoYXMgYWxyZWFkeSBiZWVuIGRpc2Nv
+bm5lY3RlZCBieSB0aGUKcmVtb3RlLgoKU2V0IGhlYWRzZXQgc3RhdGUgdG8gY29ubmVjdGVkIGRp
+cmVjdGx5IGlmIHRoZXJlIGlzIG5vIFNDTyBzb2NrZXQuCi0tLQogYXVkaW8vaGVhZHNldC5jIHwg
+ICAxMiArKysrKysrKystLS0KIDEgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAzIGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQuYyBiL2F1ZGlvL2hlYWRzZXQu
+YwppbmRleCBkZmYxMGQxLi5jNjA1ZTlkIDEwMDY0NAotLS0gYS9hdWRpby9oZWFkc2V0LmMKKysr
+IGIvYXVkaW8vaGVhZHNldC5jCkBAIC0yMzk3LDEwICsyMzk3LDE2IEBAIHVuc2lnbmVkIGludCBo
+ZWFkc2V0X3N1c3BlbmRfc3RyZWFtKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwKIAkJaHMtPmRj
+X3RpbWVyID0gMDsKIAl9CiAKLQlzb2NrID0gZ19pb19jaGFubmVsX3VuaXhfZ2V0X2ZkKGhzLT5z
+Y28pOworCWlmIChocy0+c2NvKSB7CisJCXNvY2sgPSBnX2lvX2NoYW5uZWxfdW5peF9nZXRfZmQo
+aHMtPnNjbyk7CiAKLQkvKiBzaHV0ZG93biBidXQgbGVhdmUgdGhlIHNvY2tldCBvcGVuIGFuZCB3
+YWl0IGZvciBodXAgKi8KLQlzaHV0ZG93bihzb2NrLCBTSFVUX1JEV1IpOworCQkvKiBzaHV0ZG93
+biBidXQgbGVhdmUgdGhlIHNvY2tldCBvcGVuIGFuZCB3YWl0IGZvciBodXAgKi8KKwkJc2h1dGRv
+d24oc29jaywgU0hVVF9SRFdSKTsKKwl9IGVsc2UgeworCQloZWFkc2V0X3NldF9zdGF0ZShkZXYs
+IEhFQURTRVRfU1RBVEVfQ09OTkVDVEVEKTsKKworCQlnX2lkbGVfYWRkKChHU291cmNlRnVuYykg
+ZHVtbXlfY29ubmVjdF9jb21wbGV0ZSwgZGV2KTsKKwl9CiAKIAlpZCA9IGNvbm5lY3RfY2JfbmV3
+KGhzLCBIRUFEU0VUX1NUQVRFX0NPTk5FQ1RFRCwgY2IsIHVzZXJfZGF0YSk7CiAKLS0gCjEuNi4w
+LjQKCg==
+--0015175ce1e2433fd1049fdc1ec9--
