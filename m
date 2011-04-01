@@ -1,26 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Apr 2011 16:44:55 +0300
+Date: Fri, 1 Apr 2011 16:43:24 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaikumar Ganesh <jaikumar@google.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix include paths for health plugin.
-Message-ID: <20110401134455.GB24588@jh-x301>
-References: <1301594884-5730-1-git-send-email-jaikumar@google.com>
+Subject: Re: [PATCH 1/2] Remove deprecated attrib plugin
+Message-ID: <20110401134324.GA24588@jh-x301>
+References: <1301587151-18975-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301594884-5730-1-git-send-email-jaikumar@google.com>
+In-Reply-To: <1301587151-18975-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+Hi Bruna,
 
-On Thu, Mar 31, 2011, Jaikumar Ganesh wrote:
-> Fix the include path of l2cap.h and sdp_lib.h
+On Thu, Mar 31, 2011, Bruna Moreira wrote:
+> The attrib plugin is deprecated and it is not used anymore. Remove it
+> and all related configuration. Note that GATT utility (gatttool)
+> configuration item was moved to Makefile.tools and it is compiled when
+> --enable-tools is used in configure.
 > ---
->  health/hdp.c      |    2 +-
->  health/hdp_util.c |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  Makefile.am         |   18 ------------------
+>  Makefile.tools      |   11 +++++++++++
+>  acinclude.m4        |    6 ------
+>  attrib/main.c       |   48 ------------------------------------------------
+>  attrib/manager.c    |   43 -------------------------------------------
+>  attrib/manager.h    |   26 --------------------------
+>  bootstrap-configure |    1 -
+>  7 files changed, 11 insertions(+), 142 deletions(-)
+>  delete mode 100644 attrib/main.c
+>  delete mode 100644 attrib/manager.c
+>  delete mode 100644 attrib/manager.h
 
-Pushed upstream. Thanks.
+Both patches have been pushed upstream. Thanks.
 
 Johan
