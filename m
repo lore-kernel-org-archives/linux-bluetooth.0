@@ -1,82 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 2 Apr 2011 14:19:41 +0300
-From: Alexey Dobriyan <adobriyan@gmail.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] kstrtox: convert net/bluetooth/
-Message-ID: <20110402111941.GB19357@p183.telecom.by>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 15/15] Bluetooth: Fix lockdep warning with skb list lock
+Date: Fri,  1 Apr 2011 19:33:20 -0300
+Message-Id: <1301697200-2446-16-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1301697200-2446-15-git-send-email-padovan@profusion.mobi>
+References: <1301697200-2446-1-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-2-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-3-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-4-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-5-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-6-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-7-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-8-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-9-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-10-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-11-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-12-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-13-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-14-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-15-git-send-email-padovan@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Convert from strict_strto*() interfaces to kstrto*() interfaces.
+This is a regression acctually, caused by the first patch series for
+creating a formal strcut l2cap_chan.
 
-Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
+ net/bluetooth/l2cap_core.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
- net/bluetooth/hci_sysfs.c |   37 +++++++++++++++++--------------------
- 1 file changed, 17 insertions(+), 20 deletions(-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0cf3a55..0dd8d5b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -236,6 +236,10 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	} else
+ 		sk->sk_state_change(sk);
+ 
++	if (!(l2cap_pi(sk)->conf_state & L2CAP_CONF_OUTPUT_DONE &&
++			l2cap_pi(sk)->conf_state & L2CAP_CONF_INPUT_DONE))
++		goto free;
++
+ 	skb_queue_purge(TX_QUEUE(sk));
+ 
+ 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
+@@ -254,6 +258,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		}
+ 	}
+ 
++free:
+ 	kfree(chan);
+ }
+ 
+-- 
+1.7.4.1
 
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -277,11 +277,12 @@ static ssize_t show_idle_timeout(struct device *dev, struct device_attribute *at
- static ssize_t store_idle_timeout(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	unsigned long val;
--
--	if (strict_strtoul(buf, 0, &val) < 0)
--		return -EINVAL;
-+	unsigned int val;
-+	int rv;
- 
-+	rv = kstrtouint(buf, 0, &val);
-+	if (rv < 0)
-+		return rv;
- 	if (val != 0 && (val < 500 || val > 3600000))
- 		return -EINVAL;
- 
-@@ -299,15 +300,13 @@ static ssize_t show_sniff_max_interval(struct device *dev, struct device_attribu
- static ssize_t store_sniff_max_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	unsigned long val;
--
--	if (strict_strtoul(buf, 0, &val) < 0)
--		return -EINVAL;
--
--	if (val < 0x0002 || val > 0xFFFE || val % 2)
--		return -EINVAL;
-+	u16 val;
-+	int rv;
- 
--	if (val < hdev->sniff_min_interval)
-+	rv = kstrtou16(buf, 0, &val);
-+	if (rv < 0)
-+		return rv;
-+	if (val == 0 || val % 2 || val < hdev->sniff_min_interval)
- 		return -EINVAL;
- 
- 	hdev->sniff_max_interval = val;
-@@ -324,15 +323,13 @@ static ssize_t show_sniff_min_interval(struct device *dev, struct device_attribu
- static ssize_t store_sniff_min_interval(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
- {
- 	struct hci_dev *hdev = dev_get_drvdata(dev);
--	unsigned long val;
--
--	if (strict_strtoul(buf, 0, &val) < 0)
--		return -EINVAL;
--
--	if (val < 0x0002 || val > 0xFFFE || val % 2)
--		return -EINVAL;
-+	u16 val;
-+	int rv;
- 
--	if (val > hdev->sniff_max_interval)
-+	rv = kstrtou16(buf, 0, &val);
-+	if (rv < 0)
-+		return rv;
-+	if (val == 0 || val % 2 || val > hdev->sniff_max_interval)
- 		return -EINVAL;
- 
- 	hdev->sniff_min_interval = val;
