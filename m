@@ -1,48 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 1 Apr 2011 16:48:25 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Add ERROR code response to ATD in maemo6 telephony
+Message-ID: <20110401134825.GC24588@jh-x301>
+References: <1301659554-2773-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Date: Fri, 1 Apr 2011 17:20:56 +0300
-Message-ID: <BANLkTi=ce+qfeS14zX-k0qrt75iGP1d7ig@mail.gmail.com>
-Subject: [PATCH] Fix check for valid SCO socket before shutdown
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=0015175ce1e2433fd1049fdc1ec9
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1301659554-2773-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---0015175ce1e2433fd1049fdc1ec9
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Dmitriy,
 
+On Fri, Apr 01, 2011, Dmitriy Paliy wrote:
+> ERROR code response is added to ATD command in maemo6 telephony driver
+> based on HFP 1.5 specification, page 68:
+> "Standard error indication code. It shall be issued on detection of any
+> syntax, format or procedure error condition."
+> ---
+>  audio/telephony-maemo6.c |   12 ++++--------
+>  1 files changed, 4 insertions(+), 8 deletions(-)
 
+Pushed upstream. Thanks.
 
---0015175ce1e2433fd1049fdc1ec9
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-check-for-valid-SCO-socket-before-shutdown.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-check-for-valid-SCO-socket-before-shutdown.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_glz74jtz1
-
-RnJvbSA3MDcwMjY1YWFiZDVjNDk3ZGYwOTVlMTNkZmJhZmU1ODJkYjcwZWVhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogRnJpLCAxIEFwciAyMDExIDE2OjUzOjA5ICswMzAwClN1YmplY3Q6IFtQ
-QVRDSF0gRml4IGNoZWNrIGZvciB2YWxpZCBTQ08gc29ja2V0IGJlZm9yZSBzaHV0ZG93bgoKVG8g
-cHJldmVudCBhIGNyYXNoIGluIHRoZSBldmVudCB0aGF0IHRoZXJlIGlzIGEgcmVxdWVzdCB0byBy
-ZW1vdmUKdGhlIGF1ZGlvIGNvbm5lY3Rpb24gd2hlbiBpdCBoYXMgYWxyZWFkeSBiZWVuIGRpc2Nv
-bm5lY3RlZCBieSB0aGUKcmVtb3RlLgoKU2V0IGhlYWRzZXQgc3RhdGUgdG8gY29ubmVjdGVkIGRp
-cmVjdGx5IGlmIHRoZXJlIGlzIG5vIFNDTyBzb2NrZXQuCi0tLQogYXVkaW8vaGVhZHNldC5jIHwg
-ICAxMiArKysrKysrKystLS0KIDEgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAzIGRl
-bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQuYyBiL2F1ZGlvL2hlYWRzZXQu
-YwppbmRleCBkZmYxMGQxLi5jNjA1ZTlkIDEwMDY0NAotLS0gYS9hdWRpby9oZWFkc2V0LmMKKysr
-IGIvYXVkaW8vaGVhZHNldC5jCkBAIC0yMzk3LDEwICsyMzk3LDE2IEBAIHVuc2lnbmVkIGludCBo
-ZWFkc2V0X3N1c3BlbmRfc3RyZWFtKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwKIAkJaHMtPmRj
-X3RpbWVyID0gMDsKIAl9CiAKLQlzb2NrID0gZ19pb19jaGFubmVsX3VuaXhfZ2V0X2ZkKGhzLT5z
-Y28pOworCWlmIChocy0+c2NvKSB7CisJCXNvY2sgPSBnX2lvX2NoYW5uZWxfdW5peF9nZXRfZmQo
-aHMtPnNjbyk7CiAKLQkvKiBzaHV0ZG93biBidXQgbGVhdmUgdGhlIHNvY2tldCBvcGVuIGFuZCB3
-YWl0IGZvciBodXAgKi8KLQlzaHV0ZG93bihzb2NrLCBTSFVUX1JEV1IpOworCQkvKiBzaHV0ZG93
-biBidXQgbGVhdmUgdGhlIHNvY2tldCBvcGVuIGFuZCB3YWl0IGZvciBodXAgKi8KKwkJc2h1dGRv
-d24oc29jaywgU0hVVF9SRFdSKTsKKwl9IGVsc2UgeworCQloZWFkc2V0X3NldF9zdGF0ZShkZXYs
-IEhFQURTRVRfU1RBVEVfQ09OTkVDVEVEKTsKKworCQlnX2lkbGVfYWRkKChHU291cmNlRnVuYykg
-ZHVtbXlfY29ubmVjdF9jb21wbGV0ZSwgZGV2KTsKKwl9CiAKIAlpZCA9IGNvbm5lY3RfY2JfbmV3
-KGhzLCBIRUFEU0VUX1NUQVRFX0NPTk5FQ1RFRCwgY2IsIHVzZXJfZGF0YSk7CiAKLS0gCjEuNi4w
-LjQKCg==
---0015175ce1e2433fd1049fdc1ec9--
+Johan
