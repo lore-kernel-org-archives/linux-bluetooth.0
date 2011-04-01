@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/15] Bluetooth: Move srej and busy queues to struct l2cap_chan
-Date: Fri,  1 Apr 2011 19:33:18 -0300
-Message-Id: <1301697200-2446-14-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1301697200-2446-13-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 12/15] Bluetooth: Move ERTM timers to struct l2cap_chan
+Date: Fri,  1 Apr 2011 19:33:17 -0300
+Message-Id: <1301697200-2446-13-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1301697200-2446-12-git-send-email-padovan@profusion.mobi>
 References: <1301697200-2446-1-git-send-email-padovan@profusion.mobi>
  <1301697200-2446-2-git-send-email-padovan@profusion.mobi>
  <1301697200-2446-3-git-send-email-padovan@profusion.mobi>
@@ -17,208 +17,383 @@ References: <1301697200-2446-1-git-send-email-padovan@profusion.mobi>
  <1301697200-2446-10-git-send-email-padovan@profusion.mobi>
  <1301697200-2446-11-git-send-email-padovan@profusion.mobi>
  <1301697200-2446-12-git-send-email-padovan@profusion.mobi>
- <1301697200-2446-13-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As part of the moving channel stuff to l2cap_chan.
+This also triggered a change in l2cap_send_disconn_req() parameters.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    6 +---
- net/bluetooth/l2cap_core.c    |   42 +++++++++++++++++++---------------------
- net/bluetooth/l2cap_sock.c    |    2 -
- 3 files changed, 22 insertions(+), 28 deletions(-)
+ include/net/bluetooth/l2cap.h |   15 ++++----
+ net/bluetooth/l2cap_core.c    |   74 ++++++++++++++++++++---------------------
+ net/bluetooth/l2cap_sock.c    |   13 ++++---
+ 3 files changed, 51 insertions(+), 51 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 5f4abea..09f4a2f 100644
+index 11c53cb..5f4abea 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -309,6 +309,8 @@ struct l2cap_chan {
- 	struct timer_list	retrans_timer;
- 	struct timer_list	monitor_timer;
- 	struct timer_list	ack_timer;
-+	struct sk_buff_head	srej_q;
-+	struct sk_buff_head	busy_q;
+@@ -306,6 +306,10 @@ struct l2cap_chan {
+ 	__u8		remote_max_tx;
+ 	__u16		remote_mps;
  
++	struct timer_list	retrans_timer;
++	struct timer_list	monitor_timer;
++	struct timer_list	ack_timer;
++
  	struct list_head list;
  };
-@@ -347,8 +349,6 @@ struct l2cap_conn {
- /* ----- L2CAP socket info ----- */
- #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
- #define TX_QUEUE(sk) (&l2cap_pi(sk)->tx_queue)
--#define SREJ_QUEUE(sk) (&l2cap_pi(sk)->srej_queue)
--#define BUSY_QUEUE(sk) (&l2cap_pi(sk)->busy_queue)
- #define SREJ_LIST(sk) (&l2cap_pi(sk)->srej_l.list)
  
- struct srej_list {
-@@ -384,8 +384,6 @@ struct l2cap_pinfo {
+@@ -379,9 +383,6 @@ struct l2cap_pinfo {
+ 
  	__le16		sport;
  
+-	struct timer_list	retrans_timer;
+-	struct timer_list	monitor_timer;
+-	struct timer_list	ack_timer;
  	struct sk_buff_head	tx_queue;
--	struct sk_buff_head	srej_queue;
--	struct sk_buff_head	busy_queue;
- 	struct work_struct	busy_work;
- 	struct srej_list	srej_l;
- 	struct l2cap_conn	*conn;
+ 	struct sk_buff_head	srej_queue;
+ 	struct sk_buff_head	busy_queue;
+@@ -415,11 +416,11 @@ struct l2cap_pinfo {
+ #define L2CAP_CONN_RNR_SENT        0x0200
+ #define L2CAP_CONN_SAR_RETRY       0x0400
+ 
+-#define __mod_retrans_timer() mod_timer(&l2cap_pi(sk)->retrans_timer, \
++#define __mod_retrans_timer() mod_timer(&chan->retrans_timer, \
+ 		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+-#define __mod_monitor_timer() mod_timer(&l2cap_pi(sk)->monitor_timer, \
++#define __mod_monitor_timer() mod_timer(&chan->monitor_timer, \
+ 		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
+-#define __mod_ack_timer() mod_timer(&l2cap_pi(sk)->ack_timer, \
++#define __mod_ack_timer() mod_timer(&chan->ack_timer, \
+ 		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
+ 
+ static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
+@@ -466,7 +467,7 @@ void l2cap_sock_kill(struct sock *sk);
+ void l2cap_sock_init(struct sock *sk, struct sock *parent);
+ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 							int proto, gfp_t prio);
+-void l2cap_send_disconn_req(struct l2cap_conn *conn, struct sock *sk, int err);
++void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ int l2cap_do_connect(struct sock *sk);
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b44347b..a5aecc5 100644
+index 512cf26..b44347b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -245,8 +245,8 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 		del_timer(&chan->monitor_timer);
- 		del_timer(&chan->ack_timer);
+@@ -241,9 +241,9 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
+ 		struct srej_list *l, *tmp;
  
--		skb_queue_purge(SREJ_QUEUE(sk));
--		skb_queue_purge(BUSY_QUEUE(sk));
-+		skb_queue_purge(&chan->srej_q);
-+		skb_queue_purge(&chan->busy_q);
+-		del_timer(&l2cap_pi(sk)->retrans_timer);
+-		del_timer(&l2cap_pi(sk)->monitor_timer);
+-		del_timer(&l2cap_pi(sk)->ack_timer);
++		del_timer(&chan->retrans_timer);
++		del_timer(&chan->monitor_timer);
++		del_timer(&chan->ack_timer);
  
- 		list_for_each_entry_safe(l, tmp, SREJ_LIST(sk), list) {
- 			list_del(&l->list);
-@@ -1589,8 +1589,8 @@ static inline void l2cap_ertm_init(struct l2cap_chan *chan)
- 							(unsigned long) chan);
- 	setup_timer(&chan->ack_timer, l2cap_ack_timeout, (unsigned long) chan);
+ 		skb_queue_purge(SREJ_QUEUE(sk));
+ 		skb_queue_purge(BUSY_QUEUE(sk));
+@@ -462,19 +462,22 @@ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+ 	}
+ }
  
--	__skb_queue_head_init(SREJ_QUEUE(sk));
--	__skb_queue_head_init(BUSY_QUEUE(sk));
-+	skb_queue_head_init(&chan->srej_q);
-+	skb_queue_head_init(&chan->busy_q);
- 
- 	INIT_WORK(&l2cap_pi(sk)->busy_work, l2cap_busy_work);
- 
-@@ -2816,16 +2816,15 @@ static inline void l2cap_send_i_or_rr_or_rnr(struct l2cap_chan *chan)
- 
- static int l2cap_add_to_srej_queue(struct l2cap_chan *chan, struct sk_buff *skb, u8 tx_seq, u8 sar)
+-void l2cap_send_disconn_req(struct l2cap_conn *conn, struct sock *sk, int err)
++void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *chan, int err)
  {
--	struct sock *sk = chan->sk;
- 	struct sk_buff *next_skb;
- 	int tx_seq_offset, next_tx_seq_offset;
++	struct sock *sk;
+ 	struct l2cap_disconn_req req;
  
- 	bt_cb(skb)->tx_seq = tx_seq;
- 	bt_cb(skb)->sar = sar;
+ 	if (!conn)
+ 		return;
  
--	next_skb = skb_peek(SREJ_QUEUE(sk));
-+	next_skb = skb_peek(&chan->srej_q);
- 	if (!next_skb) {
--		__skb_queue_tail(SREJ_QUEUE(sk), skb);
-+		__skb_queue_tail(&chan->srej_q, skb);
- 		return 0;
++	sk = chan->sk;
++
+ 	skb_queue_purge(TX_QUEUE(sk));
+ 
+ 	if (l2cap_pi(sk)->mode == L2CAP_MODE_ERTM) {
+-		del_timer(&l2cap_pi(sk)->retrans_timer);
+-		del_timer(&l2cap_pi(sk)->monitor_timer);
+-		del_timer(&l2cap_pi(sk)->ack_timer);
++		del_timer(&chan->retrans_timer);
++		del_timer(&chan->monitor_timer);
++		del_timer(&chan->ack_timer);
  	}
  
-@@ -2843,16 +2842,16 @@ static int l2cap_add_to_srej_queue(struct l2cap_chan *chan, struct sk_buff *skb,
- 			next_tx_seq_offset += 64;
+ 	req.dcid = cpu_to_le16(l2cap_pi(sk)->dcid);
+@@ -958,7 +961,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
  
- 		if (next_tx_seq_offset > tx_seq_offset) {
--			__skb_queue_before(SREJ_QUEUE(sk), next_skb, skb);
-+			__skb_queue_before(&chan->srej_q, next_skb, skb);
- 			return 0;
+ 	bh_lock_sock(sk);
+ 	if (chan->retry_count >= chan->remote_max_tx) {
+-		l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk, ECONNABORTED);
++		l2cap_send_disconn_req(l2cap_pi(chan)->conn, chan, ECONNABORTED);
+ 		bh_unlock_sock(sk);
+ 		return;
+ 	}
+@@ -1004,7 +1007,7 @@ static void l2cap_drop_acked_frames(struct l2cap_chan *chan)
+ 	}
+ 
+ 	if (!chan->unacked_frames)
+-		del_timer(&l2cap_pi(sk)->retrans_timer);
++		del_timer(&chan->retrans_timer);
+ }
+ 
+ void l2cap_do_send(struct sock *sk, struct sk_buff *skb)
+@@ -1068,7 +1071,7 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u8 tx_seq)
+ 
+ 	if (chan->remote_max_tx &&
+ 			bt_cb(skb)->retries == chan->remote_max_tx) {
+-		l2cap_send_disconn_req(pi->conn, sk, ECONNABORTED);
++		l2cap_send_disconn_req(pi->conn, chan, ECONNABORTED);
+ 		return;
+ 	}
+ 
+@@ -1109,7 +1112,7 @@ int l2cap_ertm_send(struct l2cap_chan *chan)
+ 
+ 		if (chan->remote_max_tx &&
+ 				bt_cb(skb)->retries == chan->remote_max_tx) {
+-			l2cap_send_disconn_req(pi->conn, sk, ECONNABORTED);
++			l2cap_send_disconn_req(pi->conn, chan, ECONNABORTED);
+ 			break;
  		}
  
--		if (skb_queue_is_last(SREJ_QUEUE(sk), next_skb))
-+		if (skb_queue_is_last(&chan->srej_q, next_skb))
- 			break;
+@@ -1580,12 +1583,11 @@ static inline void l2cap_ertm_init(struct l2cap_chan *chan)
+ 	chan->num_acked = 0;
+ 	chan->frames_sent = 0;
  
--	} while ((next_skb = skb_queue_next(SREJ_QUEUE(sk), next_skb)));
-+	} while ((next_skb = skb_queue_next(&chan->srej_q, next_skb)));
+-	setup_timer(&l2cap_pi(sk)->retrans_timer,
+-			l2cap_retrans_timeout, (unsigned long) chan);
+-	setup_timer(&l2cap_pi(sk)->monitor_timer,
+-			l2cap_monitor_timeout, (unsigned long) chan);
+-	setup_timer(&l2cap_pi(sk)->ack_timer,
+-			l2cap_ack_timeout, (unsigned long) chan);
++	setup_timer(&chan->retrans_timer, l2cap_retrans_timeout,
++							(unsigned long) chan);
++	setup_timer(&chan->monitor_timer, l2cap_monitor_timeout,
++							(unsigned long) chan);
++	setup_timer(&chan->ack_timer, l2cap_ack_timeout, (unsigned long) chan);
  
--	__skb_queue_tail(SREJ_QUEUE(sk), skb);
-+	__skb_queue_tail(&chan->srej_q, skb);
+ 	__skb_queue_head_init(SREJ_QUEUE(sk));
+ 	__skb_queue_head_init(BUSY_QUEUE(sk));
+@@ -2292,7 +2294,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	/* Complete config. */
+ 	len = l2cap_parse_conf_req(chan, rsp);
+ 	if (len < 0) {
+-		l2cap_send_disconn_req(conn, sk, ECONNRESET);
++		l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 		goto unlock;
+ 	}
  
+@@ -2364,7 +2366,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 			char req[64];
+ 
+ 			if (len > sizeof(req) - sizeof(struct l2cap_conf_req)) {
+-				l2cap_send_disconn_req(conn, sk, ECONNRESET);
++				l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 				goto done;
+ 			}
+ 
+@@ -2373,7 +2375,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 			len = l2cap_parse_conf_rsp(sk, rsp->data,
+ 							len, req, &result);
+ 			if (len < 0) {
+-				l2cap_send_disconn_req(conn, sk, ECONNRESET);
++				l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 				goto done;
+ 			}
+ 
+@@ -2388,7 +2390,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	default:
+ 		sk->sk_err = ECONNRESET;
+ 		l2cap_sock_set_timer(sk, HZ * 5);
+-		l2cap_send_disconn_req(conn, sk, ECONNRESET);
++		l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 		goto done;
+ 	}
+ 
+@@ -2958,7 +2960,7 @@ drop:
+ 	chan->sdu = NULL;
+ 
+ disconnect:
+-	l2cap_send_disconn_req(pi->conn, chan->sk, ECONNRESET);
++	l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 	kfree_skb(skb);
  	return 0;
  }
-@@ -2972,11 +2971,11 @@ static int l2cap_try_push_rx_skb(struct l2cap_chan *chan)
- 	u16 control;
- 	int err;
- 
--	while ((skb = skb_dequeue(BUSY_QUEUE(sk)))) {
-+	while ((skb = skb_dequeue(&chan->busy_q))) {
- 		control = bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
- 		err = l2cap_ertm_reassembly_sdu(chan, skb, control);
- 		if (err < 0) {
--			skb_queue_head(BUSY_QUEUE(sk), skb);
-+			skb_queue_head(&chan->busy_q, skb);
- 			return -EBUSY;
- 		}
- 
-@@ -3017,7 +3016,7 @@ static void l2cap_busy_work(struct work_struct *work)
- 	lock_sock(sk);
- 
- 	add_wait_queue(sk_sleep(sk), &wait);
--	while ((skb = skb_peek(BUSY_QUEUE(sk)))) {
-+	while ((skb = skb_peek(&pi->chan->busy_q))) {
- 		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		if (n_tries++ > L2CAP_LOCAL_BUSY_TRIES) {
-@@ -3060,7 +3059,7 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
- 
- 	if (chan->conn_state & L2CAP_CONN_LOCAL_BUSY) {
- 		bt_cb(skb)->sar = control >> L2CAP_CTRL_SAR_SHIFT;
--		__skb_queue_tail(BUSY_QUEUE(sk), skb);
-+		__skb_queue_tail(&chan->busy_q, skb);
- 		return l2cap_try_push_rx_skb(chan);
- 
- 
-@@ -3077,7 +3076,7 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
- 
- 	chan->conn_state |= L2CAP_CONN_LOCAL_BUSY;
- 	bt_cb(skb)->sar = control >> L2CAP_CTRL_SAR_SHIFT;
--	__skb_queue_tail(BUSY_QUEUE(sk), skb);
-+	__skb_queue_tail(&chan->busy_q, skb);
- 
- 	sctrl = chan->buffer_seq << L2CAP_CTRL_REQSEQ_SHIFT;
- 	sctrl |= L2CAP_SUPER_RCV_NOT_READY;
-@@ -3188,15 +3187,14 @@ drop:
- 
- static void l2cap_check_srej_gap(struct l2cap_chan *chan, u8 tx_seq)
+@@ -2966,7 +2968,6 @@ disconnect:
+ static int l2cap_try_push_rx_skb(struct l2cap_chan *chan)
  {
--	struct sock *sk = chan->sk;
+ 	struct sock *sk = chan->sk;
+-	struct l2cap_pinfo *pi = l2cap_pi(sk);
  	struct sk_buff *skb;
  	u16 control;
+ 	int err;
+@@ -2990,7 +2991,7 @@ static int l2cap_try_push_rx_skb(struct l2cap_chan *chan)
+ 	l2cap_send_sframe(chan, control);
+ 	chan->retry_count = 1;
  
--	while ((skb = skb_peek(SREJ_QUEUE(sk)))) {
-+	while ((skb = skb_peek(&chan->srej_q))) {
- 		if (bt_cb(skb)->tx_seq != tx_seq)
+-	del_timer(&pi->retrans_timer);
++	del_timer(&chan->retrans_timer);
+ 	__mod_monitor_timer();
+ 
+ 	chan->conn_state |= L2CAP_CONN_WAIT_F;
+@@ -3021,7 +3022,7 @@ static void l2cap_busy_work(struct work_struct *work)
+ 
+ 		if (n_tries++ > L2CAP_LOCAL_BUSY_TRIES) {
+ 			err = -EBUSY;
+-			l2cap_send_disconn_req(pi->conn, sk, EBUSY);
++			l2cap_send_disconn_req(pi->conn, pi->chan, EBUSY);
  			break;
+ 		}
  
--		skb = skb_dequeue(SREJ_QUEUE(sk));
-+		skb = skb_dequeue(&chan->srej_q);
- 		control = bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
- 		l2cap_ertm_reassembly_sdu(chan, skb, control);
- 		chan->buffer_seq_srej =
-@@ -3335,8 +3333,8 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
- 		INIT_LIST_HEAD(SREJ_LIST(sk));
- 		chan->buffer_seq_srej = chan->buffer_seq;
+@@ -3084,7 +3085,7 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
  
--		__skb_queue_head_init(SREJ_QUEUE(sk));
--		__skb_queue_head_init(BUSY_QUEUE(sk));
-+		__skb_queue_head_init(&chan->srej_q);
-+		__skb_queue_head_init(&chan->busy_q);
- 		l2cap_add_to_srej_queue(chan, skb, tx_seq, sar);
+ 	chan->conn_state |= L2CAP_CONN_RNR_SENT;
  
- 		chan->conn_state |= L2CAP_CONN_SEND_PBIT;
-@@ -3353,7 +3351,7 @@ expected:
- 	if (chan->conn_state & L2CAP_CONN_SREJ_SENT) {
- 		bt_cb(skb)->tx_seq = tx_seq;
- 		bt_cb(skb)->sar = sar;
--		__skb_queue_tail(SREJ_QUEUE(sk), skb);
-+		__skb_queue_tail(&chan->srej_q, skb);
- 		return 0;
+-	del_timer(&pi->ack_timer);
++	del_timer(&chan->ack_timer);
+ 
+ 	queue_work(_busy_wq, &pi->busy_work);
+ 
+@@ -3259,7 +3260,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 	if (L2CAP_CTRL_FINAL & rx_control &&
+ 			chan->conn_state & L2CAP_CONN_WAIT_F) {
+-		del_timer(&pi->monitor_timer);
++		del_timer(&chan->monitor_timer);
+ 		if (chan->unacked_frames > 0)
+ 			__mod_retrans_timer();
+ 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
+@@ -3277,7 +3278,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 	/* invalid tx_seq */
+ 	if (tx_seq_offset >= pi->tx_win) {
+-		l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
++		l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 		goto drop;
  	}
  
+@@ -3342,7 +3343,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 		l2cap_send_srejframe(chan, tx_seq);
+ 
+-		del_timer(&pi->ack_timer);
++		del_timer(&chan->ack_timer);
+ 	}
+ 	return 0;
+ 
+@@ -3485,7 +3486,6 @@ static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_
+ 
+ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_control)
+ {
+-	struct l2cap_pinfo *pi = l2cap_pi(chan->sk);
+ 	u8 tx_seq = __get_reqseq(rx_control);
+ 
+ 	BT_DBG("chan %p, req_seq %d ctrl 0x%4.4x", chan, tx_seq, rx_control);
+@@ -3498,7 +3498,7 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
+ 		chan->conn_state |= L2CAP_CONN_SEND_FBIT;
+ 
+ 	if (!(chan->conn_state & L2CAP_CONN_SREJ_SENT)) {
+-		del_timer(&pi->retrans_timer);
++		del_timer(&chan->retrans_timer);
+ 		if (rx_control & L2CAP_CTRL_POLL)
+ 			l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_FINAL);
+ 		return;
+@@ -3512,13 +3512,11 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
+ 
+ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u16 rx_control, struct sk_buff *skb)
+ {
+-	struct sock *sk = chan->sk;
+-
+ 	BT_DBG("chan %p rx_control 0x%4.4x len %d", chan, rx_control, skb->len);
+ 
+ 	if (L2CAP_CTRL_FINAL & rx_control &&
+ 			chan->conn_state & L2CAP_CONN_WAIT_F) {
+-		del_timer(&l2cap_pi(sk)->monitor_timer);
++		del_timer(&chan->monitor_timer);
+ 		if (chan->unacked_frames > 0)
+ 			__mod_retrans_timer();
+ 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
+@@ -3573,7 +3571,7 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 		len -= 2;
+ 
+ 	if (len > pi->mps) {
+-		l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
++		l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 		goto drop;
+ 	}
+ 
+@@ -3589,13 +3587,13 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 
+ 	/* check for invalid req-seq */
+ 	if (req_seq_offset > next_tx_seq_offset) {
+-		l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
++		l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 		goto drop;
+ 	}
+ 
+ 	if (__is_iframe(control)) {
+ 		if (len < 0) {
+-			l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
++			l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 			goto drop;
+ 		}
+ 
+@@ -3603,7 +3601,7 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 	} else {
+ 		if (len != 0) {
+ 			BT_ERR("%d", len);
+-			l2cap_send_disconn_req(pi->conn, sk, ECONNRESET);
++			l2cap_send_disconn_req(pi->conn, chan, ECONNRESET);
+ 			goto drop;
+ 		}
+ 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index d66886f..55dee99 100644
+index f90ca25..d66886f 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1018,8 +1018,6 @@ void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 	/* Default config options */
- 	pi->flush_to = L2CAP_DEFAULT_FLUSH_TO;
- 	skb_queue_head_init(TX_QUEUE(sk));
--	skb_queue_head_init(SREJ_QUEUE(sk));
--	skb_queue_head_init(BUSY_QUEUE(sk));
- 	INIT_LIST_HEAD(SREJ_LIST(sk));
- }
+@@ -866,6 +866,7 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
+ void __l2cap_sock_close(struct sock *sk, int reason)
+ {
+ 	struct l2cap_conn *conn = l2cap_pi(sk)->conn;
++	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
  
+ 	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
+ 
+@@ -880,9 +881,9 @@ void __l2cap_sock_close(struct sock *sk, int reason)
+ 					sk->sk_type == SOCK_STREAM) &&
+ 					conn->hcon->type == ACL_LINK) {
+ 			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
+-			l2cap_send_disconn_req(conn, sk, reason);
++			l2cap_send_disconn_req(conn, chan, reason);
+ 		} else
+-			l2cap_chan_del(l2cap_pi(sk)->chan, reason);
++			l2cap_chan_del(chan, reason);
+ 		break;
+ 
+ 	case BT_CONNECT2:
+@@ -901,16 +902,16 @@ void __l2cap_sock_close(struct sock *sk, int reason)
+ 			rsp.dcid   = cpu_to_le16(l2cap_pi(sk)->scid);
+ 			rsp.result = cpu_to_le16(result);
+ 			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
+-			l2cap_send_cmd(conn, l2cap_pi(sk)->chan->ident,
+-					L2CAP_CONN_RSP, sizeof(rsp), &rsp);
++			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
++							sizeof(rsp), &rsp);
+ 		}
+ 
+-		l2cap_chan_del(l2cap_pi(sk)->chan, reason);
++		l2cap_chan_del(chan, reason);
+ 		break;
+ 
+ 	case BT_CONNECT:
+ 	case BT_DISCONN:
+-		l2cap_chan_del(l2cap_pi(sk)->chan, reason);
++		l2cap_chan_del(chan, reason);
+ 		break;
+ 
+ 	default:
 -- 
 1.7.4.1
 
