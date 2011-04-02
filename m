@@ -1,26 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: hadess@hadess.net,
-	marcel@holtmann.org,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 0/3] Support binary pin codes 
-Date: Sat,  2 Apr 2011 21:51:00 +0200
-Message-Id: <1301773863-16297-1-git-send-email-dh.herrmann@googlemail.com>
+Cc: David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH] Add uuidtest binary to gitignore list
+Date: Sat,  2 Apr 2011 19:52:40 +0200
+Message-Id: <1301766760-12063-1-git-send-email-dh.herrmann@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series allows passing binary bluetooth PINs to the hci handlers
-by adding a pin_len argument. This is required to support devices which
-require binary PINs like the Nintendo Wii Remote.
+---
+ .gitignore |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-This patch series also adds Nintendo Wii Remote pairing support by hardcoding
-the PIN. This was discussed earlier in:
-http://thread.gmane.org/gmane.linux.bluez.kernel/3961
+diff --git a/.gitignore b/.gitignore
+index 3e36a59..2ef7cb5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -79,6 +79,7 @@ test/lmptest
+ test/ipctest
+ test/btiotest
+ test/test-textfile
++test/uuidtest
+ compat/dund
+ compat/hidd
+ compat/pand
+-- 
+1.7.4.2
 
-Marcel suggested automatic pairing inside the daemon by VID/PID detection
-and this patch implements this approach. See:
-http://thread.gmane.org/gmane.linux.bluez.kernel/3964
-
-
-Regards
-David
