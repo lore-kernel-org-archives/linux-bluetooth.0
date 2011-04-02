@@ -1,39 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 4 Apr 2011 09:24:35 +0800
-Message-ID: <BANLkTikpv9_MgFtHmxAb_zzmCQVX78HQ+Q@mail.gmail.com>
-Subject: [GSoC] about "Improve A2DP support"
-From: Vincent Medivh <medivhc@gmail.com>
+From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: hadess@hadess.net,
+	marcel@holtmann.org,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH 3/3] Support hardcoded Nintendo Wii Remote pins
+Date: Sat,  2 Apr 2011 21:51:03 +0200
+Message-Id: <1301773863-16297-4-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1301773863-16297-1-git-send-email-dh.herrmann@googlemail.com>
+References: <1301773863-16297-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+The Nintendo Wii Remote requires the destination bluetooth address
+as pincode. This changes the pin handling by skipping the agent
+module and sending an hardcoded pin if the target device is a
+Nintendo Wii Remote.
+---
+ src/event.c |   20 +++++++++++++++++++-
+ 1 files changed, 19 insertions(+), 1 deletions(-)
 
-I am interested in the idea "Improve A2DP support". I  knew a little
-knowledge of Bluetooth. After some "googling", I still have some
-confusion about "Improve support for Sink role and coexistence with
-HFP gateway role. " Does it mean while I am using the Bluetooth kit as
-the speaker of some mp3 player, still I can use the kit to make a
-phone call via Bluetooth HFP?
-
-I also have a question that I now have a USB Bluetooth dongle, a iPod
-touch and a cellphone(Nokia 6120c), are  those things enough to build
-the test environment?
-
-I have a little experience of Linux multimedia programming (a mp3
-player program on ARM development board). I am good at C and have some
-experience of hacking Linux kernel. I think I am also a fast learner.
-Am I qualified to the Google Summer of Code project?
-
-Recently I am reading the the code of the BlueZ and the Bluetooth
-specification, but I still don't get the full understanding of the
-structure of BlueZ. Could someone guide me about which I should focus
-on to implement the idea?  I am also writing the proposal,but have no
-ideas about the project milestones. I will be grateful if someone
-could give some suggestions.
-
-Here is more information about me, the answers to the questions.
-
-https://docs.google.com/document/d/1HmDybIBT9GMNaByLy8EpW0RwzLcMtyrHuCPA54NHl5I/edit?hl=en
+diff --git a/src/event.c b/src/event.c
+index 91343d4..ec05e95 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -129,6 +129,24 @@ fail:
+ 	error("Sending PIN code reply failed: %s (%d)", strerror(-err), -err);
+ }
+ 
++static int get_pin(bdaddr_t *sba, bdaddr_t *dba, char *pinbuf)
++{
++	uint16_t vendor, product;
++	char src_addr[18], dst_addr[18];
++
++	ba2str(sba, src_addr);
++	ba2str(dba, dst_addr);
++	if (0 == read_device_id(src_addr, dst_addr, NULL, &vendor, &product, NULL)) {
++		/* Nintendo Wii Remote uses destination address as PIN */
++		if (vendor == 0x057e && product == 0x0306) {
++			memcpy(pinbuf, dba, 6);
++			return 6;
++		}
++	}
++
++	return read_pin_code(sba, dba, pinbuf);
++}
++
+ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
+ {
+ 	struct btd_adapter *adapter;
+@@ -140,7 +158,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
+ 		return -ENODEV;
+ 
+ 	memset(pin, 0, sizeof(pin));
+-	pinlen = read_pin_code(sba, dba, pin);
++	pinlen = get_pin(sba, dba, pin);
+ 	if (pinlen > 0) {
+ 		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
+ 		return 0;
+-- 
+1.7.4.2
