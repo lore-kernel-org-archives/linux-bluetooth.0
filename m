@@ -4,58 +4,78 @@ To: linux-bluetooth@vger.kernel.org
 Cc: hadess@hadess.net,
 	marcel@holtmann.org,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 3/3] Support hardcoded Nintendo Wii Remote pins
-Date: Sat,  2 Apr 2011 21:51:03 +0200
-Message-Id: <1301773863-16297-4-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 2/3] Make adapter API accept binary pincodes
+Date: Sat,  2 Apr 2011 21:51:02 +0200
+Message-Id: <1301773863-16297-3-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1301773863-16297-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1301773863-16297-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Nintendo Wii Remote requires the destination bluetooth address
-as pincode. This changes the pin handling by skipping the agent
-module and sending an hardcoded pin if the target device is a
-Nintendo Wii Remote.
+Add pin-length argument to adapter API to allow passing binary pins
+containing \0 characters to the hci handler.
 ---
- src/event.c |   20 +++++++++++++++++++-
- 1 files changed, 19 insertions(+), 1 deletions(-)
+ src/adapter.c |    4 ++--
+ src/adapter.h |    2 +-
+ src/event.c   |    6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 91343d4..ec05e95 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -129,6 +129,24 @@ fail:
- 	error("Sending PIN code reply failed: %s (%d)", strerror(-err), -err);
+diff --git a/src/adapter.c b/src/adapter.c
+index 83f3217..14516ac 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3701,9 +3701,9 @@ int btd_adapter_remove_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
  }
  
-+static int get_pin(bdaddr_t *sba, bdaddr_t *dba, char *pinbuf)
-+{
-+	uint16_t vendor, product;
-+	char src_addr[18], dst_addr[18];
-+
-+	ba2str(sba, src_addr);
-+	ba2str(dba, dst_addr);
-+	if (0 == read_device_id(src_addr, dst_addr, NULL, &vendor, &product, NULL)) {
-+		/* Nintendo Wii Remote uses destination address as PIN */
-+		if (vendor == 0x057e && product == 0x0306) {
-+			memcpy(pinbuf, dba, 6);
-+			return 6;
-+		}
-+	}
-+
-+	return read_pin_code(sba, dba, pinbuf);
-+}
-+
- int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
+ int btd_adapter_pincode_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-							const char *pin)
++							const char *pin, size_t pinlen)
  {
- 	struct btd_adapter *adapter;
-@@ -140,7 +158,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
- 		return -ENODEV;
+-	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin, pin ? strlen(pin) : 0);
++	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin, pinlen);
+ }
  
+ int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+diff --git a/src/adapter.h b/src/adapter.h
+index fd2fc12..b507506 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -273,7 +273,7 @@ int btd_adapter_disconnect_device(struct btd_adapter *adapter,
+ int btd_adapter_remove_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr);
+ 
+ int btd_adapter_pincode_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-							const char *pin);
++							const char *pin, size_t pinlen);
+ int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 							gboolean success);
+ int btd_adapter_passkey_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+diff --git a/src/event.c b/src/event.c
+index 4ca1be5..91343d4 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -111,13 +111,13 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
+ 	device_get_address(device, &dba);
+ 
+ 	if (derr) {
+-		err = btd_adapter_pincode_reply(adapter, &dba, NULL);
++		err = btd_adapter_pincode_reply(adapter, &dba, NULL, 0);
+ 		if (err < 0)
+ 			goto fail;
+ 		return;
+ 	}
+ 
+-	err = btd_adapter_pincode_reply(adapter, &dba, pincode);
++	err = btd_adapter_pincode_reply(adapter, &dba, pincode, pincode ? strlen(pincode) : 0);
+ 	if (err < 0)
+ 		goto fail;
+ 
+@@ -142,7 +142,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
  	memset(pin, 0, sizeof(pin));
--	pinlen = read_pin_code(sba, dba, pin);
-+	pinlen = get_pin(sba, dba, pin);
+ 	pinlen = read_pin_code(sba, dba, pin);
  	if (pinlen > 0) {
- 		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
+-		btd_adapter_pincode_reply(adapter, dba, pin);
++		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
  		return 0;
+ 	}
+ 
 -- 
 1.7.4.2
