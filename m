@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Apr 2011 19:48:19 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix check for valid SCO socket before shutdown
-Message-ID: <20110405024819.GA29805@jh-x301>
-References: <BANLkTi=ce+qfeS14zX-k0qrt75iGP1d7ig@mail.gmail.com>
+Message-ID: <4D9A44A7.4020204@codeaurora.org>
+Date: Mon, 04 Apr 2011 15:22:31 -0700
+From: Brian Gix <bgix@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <BANLkTi=ce+qfeS14zX-k0qrt75iGP1d7ig@mail.gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: Low Energy Security Manager
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
 
-On Fri, Apr 01, 2011, Daniel Örstadius wrote:
-> To prevent a crash in the event that there is a request to remove
-> the audio connection when it has already been disconnected by the
-> remote.
-> 
-> Set headset state to connected directly if there is no SCO socket.
-> ---
->  audio/headset.c |   12 +++++++++---
->  1 files changed, 9 insertions(+), 3 deletions(-)
+Hi Gustavo,
 
-Pushed upstream. Thanks.
+I (and a few others) are currently doing LE kernel development work off of:
 
-Johan
+git://gitorious.org/bluetooth-next/for-upstream.git
+
+which is where Vinicius' LE Security Manager resides.
+
+Acceptance of this body of work into bluetooth-next appears to have 
+stalled out, and I was wondering if you had a sense for when it may 
+start moving forward again.  Are there any outstanding comments lodged 
+against it?  I have looked through the mail reflector, and not seen 
+anything that should hold it up, beyond perhaps the normal quiet times 
+prior to pushing bluetooth-next changes up the food chain towards the 
+official kernel.
+
+Is this what is occurring?
+
+Thanks for your time,
+
+-- 
+Brian Gix
+bgix@codeaurora.org
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
