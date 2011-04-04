@@ -1,73 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Fix not removing source when removing setup callback
-Date: Mon,  4 Apr 2011 12:00:19 +0300
-Message-Id: <1301907619-6684-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
-References: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/3] Fix handling of suspend response
+Date: Mon,  4 Apr 2011 12:00:17 +0300
+Message-Id: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-In rare situation this may lead to access invalid memory since setup can
-be freed before idle callback is called.
+finalize_suspend is being called twice when a resume request is queue
+after it or if start fails.
 ---
- audio/a2dp.c |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
+ audio/a2dp.c |   22 +++++++++++-----------
+ 1 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
-index d51276d..1f3bc99 100644
+index 9d9c61d..1208ad1 100644
 --- a/audio/a2dp.c
 +++ b/audio/a2dp.c
-@@ -82,6 +82,7 @@ struct a2dp_setup_cb {
- 	a2dp_config_cb_t config_cb;
- 	a2dp_stream_cb_t resume_cb;
- 	a2dp_stream_cb_t suspend_cb;
-+	guint source_id;
- 	void *user_data;
- 	unsigned int id;
- };
-@@ -197,6 +198,9 @@ static void setup_cb_free(struct a2dp_setup_cb *cb)
- {
- 	struct a2dp_setup *setup = cb->setup;
+@@ -1011,6 +1011,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	struct a2dp_sep *a2dp_sep = user_data;
+ 	struct a2dp_setup *setup;
+ 	gboolean start;
++	int perr;
  
-+	if (cb->source_id)
-+		g_source_remove(cb->source_id);
+ 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+ 		DBG("Sink %p: Suspend_Cfm", sep);
+@@ -1029,23 +1030,22 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	if (err) {
+ 		setup->stream = NULL;
+ 		setup->err = err;
+-		finalize_suspend(setup);
+ 	}
+-	else
+-		finalize_suspend_errno(setup, 0);
 +
- 	setup->cb = g_slist_remove(setup->cb, cb);
- 	setup_unref(cb->setup);
- 	g_free(cb);
-@@ -2120,7 +2124,8 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
- 	case AVDTP_STATE_STREAMING:
- 		if (avdtp_stream_has_capabilities(setup->stream, caps)) {
- 			DBG("Configuration match: resuming");
--			g_idle_add(finalize_config, setup);
-+			cb_data->source_id = g_idle_add(finalize_config,
-+								setup);
- 		} else if (!setup->reconfigure) {
- 			setup->reconfigure = TRUE;
- 			if (avdtp_close(session, sep->stream, FALSE) < 0) {
-@@ -2178,7 +2183,8 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
- 		if (sep->suspending)
- 			setup->start = TRUE;
- 		else
--			g_idle_add(finalize_resume, setup);
-+			cb_data->source_id = g_idle_add(finalize_resume,
-+								setup);
- 		break;
- 	default:
- 		error("SEP in bad state for resume");
-@@ -2215,7 +2221,7 @@ unsigned int a2dp_suspend(struct avdtp *session, struct a2dp_sep *sep,
- 		goto failed;
- 		break;
- 	case AVDTP_STATE_OPEN:
--		g_idle_add(finalize_suspend, setup);
-+		cb_data->source_id = g_idle_add(finalize_suspend, setup);
- 		break;
- 	case AVDTP_STATE_STREAMING:
- 		if (avdtp_suspend(session, sep->stream) < 0) {
++	finalize_suspend(setup);
+ 
+ 	if (!start)
+ 		return;
+ 
+ 	if (err) {
+-		setup->err = err;
+-		finalize_suspend(setup);
+-	} else if (avdtp_start(session, a2dp_sep->stream) < 0) {
+-		struct avdtp_error start_err;
+-		error("avdtp_start failed");
+-		avdtp_error_init(&start_err, AVDTP_ERRNO, EIO);
+-		setup->err = err;
+-		finalize_suspend(setup);
++		finalize_resume(setup);
++		return;
++	}
++
++	perr = avdtp_start(session, a2dp_sep->stream);
++	if (perr < 0) {
++		error("Error on avdtp_start %s (%d)", strerror(-perr), -perr);
++		finalize_resume_errno(setup, perr);
+ 	}
+ }
+ 
 -- 
 1.7.1
 
