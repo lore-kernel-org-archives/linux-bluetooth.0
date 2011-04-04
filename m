@@ -1,66 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Fix handling of suspend response
-Date: Mon,  4 Apr 2011 12:00:17 +0300
-Message-Id: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
+From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+To: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	"dwmw2@infradead.org" <dwmw2@infradead.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+Date: Mon, 4 Apr 2011 12:28:44 +0530
+Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
+Message-ID: <44EE5C37ADC36343B0625A05DD408C4850EEF57D5A@CHEXMB-01.global.atheros.com>
+References: <1301649288-3315-1-git-send-email-jkumar@atheros.com>
+In-Reply-To: <1301649288-3315-1-git-send-email-jkumar@atheros.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi David,
 
-finalize_suspend is being called twice when a resume request is queue
-after it or if start fails.
----
- audio/a2dp.c |   22 +++++++++++-----------
- 1 files changed, 11 insertions(+), 11 deletions(-)
+-----Original Message-----
+From: Jothikumar Mothilal 
+Sent: Friday, April 01, 2011 2:45 PM
+To: dwmw2@infradead.org
+Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam; Jothikumar Mothilal
+>Subject: [PATCH] linux-firmware: Add patch and sysconfig files
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index 9d9c61d..1208ad1 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -1011,6 +1011,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct a2dp_setup *setup;
- 	gboolean start;
-+	int perr;
- 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
- 		DBG("Sink %p: Suspend_Cfm", sep);
-@@ -1029,23 +1030,22 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (err) {
- 		setup->stream = NULL;
- 		setup->err = err;
--		finalize_suspend(setup);
- 	}
--	else
--		finalize_suspend_errno(setup, 0);
-+
-+	finalize_suspend(setup);
- 
- 	if (!start)
- 		return;
- 
- 	if (err) {
--		setup->err = err;
--		finalize_suspend(setup);
--	} else if (avdtp_start(session, a2dp_sep->stream) < 0) {
--		struct avdtp_error start_err;
--		error("avdtp_start failed");
--		avdtp_error_init(&start_err, AVDTP_ERRNO, EIO);
--		setup->err = err;
--		finalize_suspend(setup);
-+		finalize_resume(setup);
-+		return;
-+	}
-+
-+	perr = avdtp_start(session, a2dp_sep->stream);
-+	if (perr < 0) {
-+		error("Error on avdtp_start %s (%d)", strerror(-perr), -perr);
-+		finalize_resume_errno(setup, perr);
- 	}
- }
- 
--- 
-1.7.1
+>Added files for AR3012 version 2.2
 
+>Signed-off-by: Jothikumar Mothilal <jkumar@atheros.com>
+>---
+> WHENCE                       |    2 ++
+> ar3k/AthrBT_0x01020200.dfu   |  Bin 0 -> 40596 bytes
+> ar3k/ramps_0x01020200_26.dfu |  Bin 0 -> 1262 bytes
+> 3 files changed, 2 insertions(+), 0 deletions(-)
+> create mode 100644 ar3k/AthrBT_0x01020200.dfu
+ >create mode 100644 ar3k/ramps_0x01020200_26.dfu
+
+>diff --git a/WHENCE b/WHENCE
+>index 6632b85..f6a0ec1 100644
+>--- a/WHENCE
+>+++ b/WHENCE
+>@@ -1555,6 +1555,8 @@ Driver: DFU Driver for Atheros bluetooth chipset AR3012
+ 
+> File: ar3k/AthrBT_0x01020001.dfu
+> File: ar3k/ramps_0x01020001_26.dfu
+>+File: ar3k/AthrBT_0x01020200.dfu
+>+File: ar3k/ramps_0x01020200_26.dfu
+ 
+ >Licence: Redistributable. See LICENCE.atheros_firmware for details
+ 
+>diff --git a/ar3k/AthrBT_0x01020200.dfu b/ar3k/AthrBT_0x01020200.dfu
+>new file mode 100644
+
+> literal 0
+>HcmV?d00001
+
+> -- 
+> 1.6.3.3
+
+Can you please push this firmware patch upstream if you have no comments.
+
+Thanks,
+Jothi
