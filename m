@@ -1,63 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-To: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	"dwmw2@infradead.org" <dwmw2@infradead.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
-Date: Mon, 4 Apr 2011 12:28:44 +0530
-Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
-Message-ID: <44EE5C37ADC36343B0625A05DD408C4850EEF57D5A@CHEXMB-01.global.atheros.com>
-References: <1301649288-3315-1-git-send-email-jkumar@atheros.com>
-In-Reply-To: <1301649288-3315-1-git-send-email-jkumar@atheros.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Mon, 4 Apr 2011 09:24:35 +0800
+Message-ID: <BANLkTikpv9_MgFtHmxAb_zzmCQVX78HQ+Q@mail.gmail.com>
+Subject: [GSoC] about "Improve A2DP support"
+From: Vincent Medivh <medivhc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi
 
------Original Message-----
-From: Jothikumar Mothilal 
-Sent: Friday, April 01, 2011 2:45 PM
-To: dwmw2@infradead.org
-Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam; Jothikumar Mothilal
->Subject: [PATCH] linux-firmware: Add patch and sysconfig files
+I am interested in the idea "Improve A2DP support". I  knew a little
+knowledge of Bluetooth. After some "googling", I still have some
+confusion about "Improve support for Sink role and coexistence with
+HFP gateway role. " Does it mean while I am using the Bluetooth kit as
+the speaker of some mp3 player, still I can use the kit to make a
+phone call via Bluetooth HFP?
 
->Added files for AR3012 version 2.2
+I also have a question that I now have a USB Bluetooth dongle, a iPod
+touch and a cellphone(Nokia 6120c), are  those things enough to build
+the test environment?
 
->Signed-off-by: Jothikumar Mothilal <jkumar@atheros.com>
->---
-> WHENCE                       |    2 ++
-> ar3k/AthrBT_0x01020200.dfu   |  Bin 0 -> 40596 bytes
-> ar3k/ramps_0x01020200_26.dfu |  Bin 0 -> 1262 bytes
-> 3 files changed, 2 insertions(+), 0 deletions(-)
-> create mode 100644 ar3k/AthrBT_0x01020200.dfu
- >create mode 100644 ar3k/ramps_0x01020200_26.dfu
+I have a little experience of Linux multimedia programming (a mp3
+player program on ARM development board). I am good at C and have some
+experience of hacking Linux kernel. I think I am also a fast learner.
+Am I qualified to the Google Summer of Code project?
 
->diff --git a/WHENCE b/WHENCE
->index 6632b85..f6a0ec1 100644
->--- a/WHENCE
->+++ b/WHENCE
->@@ -1555,6 +1555,8 @@ Driver: DFU Driver for Atheros bluetooth chipset AR3012
- 
-> File: ar3k/AthrBT_0x01020001.dfu
-> File: ar3k/ramps_0x01020001_26.dfu
->+File: ar3k/AthrBT_0x01020200.dfu
->+File: ar3k/ramps_0x01020200_26.dfu
- 
- >Licence: Redistributable. See LICENCE.atheros_firmware for details
- 
->diff --git a/ar3k/AthrBT_0x01020200.dfu b/ar3k/AthrBT_0x01020200.dfu
->new file mode 100644
+Recently I am reading the the code of the BlueZ and the Bluetooth
+specification, but I still don't get the full understanding of the
+structure of BlueZ. Could someone guide me about which I should focus
+on to implement the idea?  I am also writing the proposal,but have no
+ideas about the project milestones. I will be grateful if someone
+could give some suggestions.
 
-> literal 0
->HcmV?d00001
+Here is more information about me, the answers to the questions.
 
-> -- 
-> 1.6.3.3
-
-Can you please push this firmware patch upstream if you have no comments.
-
-Thanks,
-Jothi
+https://docs.google.com/document/d/1HmDybIBT9GMNaByLy8EpW0RwzLcMtyrHuCPA54NHl5I/edit?hl=en
