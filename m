@@ -1,80 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Apr 2011 10:46:42 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Question about supported profiles
-Message-ID: <20110404134641.GA3696@piper>
-References: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3BCE@irsmsx501.ger.corp.intel.com>
- <AANLkTim3NBH2dB=EF2pZDEoj+77Gv+k3JKvqSwc=6sFk@mail.gmail.com>
- <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3EC6@irsmsx501.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3EC6@irsmsx501.ger.corp.intel.com>
+In-Reply-To: <BANLkTi=YSMeNpFoi8mwHz-8SjiQOPu6G5g@mail.gmail.com>
+References: <BANLkTikpv9_MgFtHmxAb_zzmCQVX78HQ+Q@mail.gmail.com>
+	<BANLkTi=YSMeNpFoi8mwHz-8SjiQOPu6G5g@mail.gmail.com>
+Date: Mon, 4 Apr 2011 19:39:47 +0800
+Message-ID: <BANLkTi=Kky+PDg2LupH25sugog9znOKcNA@mail.gmail.com>
+Subject: Re: [GSoC] about "Improve A2DP support"
+From: Cui Xiang <medivhc@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jean,
+Thanks for the reply. I will begin as the guide, and finish the proposal.
 
-On 09:32 Mon 04 Apr, Ferraton, Jean RegisX wrote:
-> Hi Arun,
-> 
-> > -----Original Message-----
-> > From: Arun K. Singh [mailto:arunkat@gmail.com]
-> > Sent: Friday, April 01, 2011 7:06 PM
-> > To: Ferraton, Jean RegisX
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Subject: Re: Question about supported profiles
-> > 
-> > Hi Jean,
-> > 
-> > > I have a question about supported profiles under linux-bluez.
-> > > Where and how are defined the default supported profiles? Is it a conf
-> > file?
-> > > In our case, by default we support HFP, A2DP, OPP, AVRCP...
-> > > But if we want to use FTP or DUN, we have to enter "sdptool add DUN" or
-> > " sdptool add FTP"
-> > > Can anyone tell me how to change the default params?
-> > 
-> > First of all its not clear what exactly are you looking for? in case
-> > you need to know which all profiles are supported in bluez,
-> > ./configure --help should help! Most of the profiles are implemented
-> > as plugins to either bluetoothd or obexd.
-> > Few of the profiles are also supported via daemons. All data profiles,
-> > such as FTP/OPP/PBAP they are supported as obex plugins.
-> > hope this helps.
-> > 
-> > thanks,
-> > Arun
-> 
-> To clarify my question, I want to know where is stored the information of profiles supported by our device when we launch the command "sdptool browse BDADDR" from an external device. This command gives us our platform default supported profiles.
-> If I launch additional commands like "sdptool add DUN" or " sdptool add FTP", my platform is seen as supporting more profiles.
-> Where and how can I modify this default profile list?
-
-Normally those SDP records are added by bluetoothd services (audio and
-network, for example) or some external service (obexd is a good example).
-
-For the bluetoothd services case, you can disable the services that you
-don't want editing the configuration file (by default,
-/etc/bluetooth/main.conf), for obexd you have to edit its command line
-parameters.
-
-> Thanks
-> Regards
-> Jean
-> ---------------------------------------------------------------------
-> Intel Corporation SAS (French simplified joint stock company)
-> Registered headquarters: "Les Montalets"- 2, rue de Paris, 
-> 92196 Meudon Cedex, France
-> Registration Number:  302 456 199 R.C.S. NANTERRE
-> Capital: 4,572,000 Euros
-> 
-> This e-mail and any attachments may contain confidential material for
-> the sole use of the intended recipient(s). Any review or distribution
-> by others is strictly prohibited. If you are not the intended
-> recipient, please contact the sender and delete all copies.
-
-
-Cheers,
--- 
-Vinicius
+2011/4/4 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
+>
+> On Mon, Apr 4, 2011 at 4:24 AM, Vincent Medivh <medivhc@gmail.com> wrote:
+>> Hi
+>>
+>> I am interested in the idea "Improve A2DP support". I  knew a little
+>> knowledge of Bluetooth. After some "googling", I still have some
+>> confusion about "Improve support for Sink role and coexistence with
+>> HFP gateway role. " Does it mean while I am using the Bluetooth kit as
+>> the speaker of some mp3 player, still I can use the kit to make a
+>> phone call via Bluetooth HFP?
+>>
+>> I also have a question that I now have a USB Bluetooth dongle, a iPod
+>> touch and a cellphone(Nokia 6120c), are  those things enough to build
+>> the test environment?
+>
+> You will probably need a pc running linux, but I guess you already
+> figured that out don't you?
+>
+>> I have a little experience of Linux multimedia programming (a mp3
+>> player program on ARM development board). I am good at C and have some
+>> experience of hacking Linux kernel. I think I am also a fast learner.
+>> Am I qualified to the Google Summer of Code project?
+>
+> Yes, but you do have understand that you are qualified to apply to
+> project which doesn't mean you will get one for sure.
+>
+>> Recently I am reading the the code of the BlueZ and the Bluetooth
+>> specification, but I still don't get the full understanding of the
+>> structure of BlueZ. Could someone guide me about which I should focus
+>> on to implement the idea?  I am also writing the proposal,but have no
+>> ideas about the project milestones. I will be grateful if someone
+>> could give some suggestions.
+>
+> A good start is, audio/a2dp.c and audio/avdtp.c and take a look at
+> a2dp and avdtp specs on bluetooth.org.
+>
+>> Here is more information about me, the answers to the questions.
+>>
+>> https://docs.google.com/document/d/1HmDybIBT9GMNaByLy8EpW0RwzLcMtyrHuCPA54NHl5I/edit?hl=en
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
