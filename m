@@ -1,53 +1,223 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ferraton, Jean RegisX" <jean.regisx.ferraton@intel.com>
-To: "Arun K. Singh" <arunkat@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 4 Apr 2011 09:32:56 +0100
-Subject: RE: Question about supported profiles
-Message-ID: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3EC6@irsmsx501.ger.corp.intel.com>
-References: <6E42A1B4DD2F7B4D80A1F26BB498BF9F8CC70E3BCE@irsmsx501.ger.corp.intel.com>
- <AANLkTim3NBH2dB=EF2pZDEoj+77Gv+k3JKvqSwc=6sFk@mail.gmail.com>
-In-Reply-To: <AANLkTim3NBH2dB=EF2pZDEoj+77Gv+k3JKvqSwc=6sFk@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Refactore a2dp finalize_*_errno functions
+Date: Mon,  4 Apr 2011 12:00:18 +0300
+Message-Id: <1301907619-6684-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
+References: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQXJ1biwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcnVuIEsu
-IFNpbmdoIFttYWlsdG86YXJ1bmthdEBnbWFpbC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgQXByaWwg
-MDEsIDIwMTEgNzowNiBQTQ0KPiBUbzogRmVycmF0b24sIEplYW4gUmVnaXNYDQo+IENjOiBsaW51
-eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBRdWVzdGlvbiBhYm91
-dCBzdXBwb3J0ZWQgcHJvZmlsZXMNCj4gDQo+IEhpIEplYW4sDQo+IA0KPiA+IEkgaGF2ZSBhIHF1
-ZXN0aW9uIGFib3V0IHN1cHBvcnRlZCBwcm9maWxlcyB1bmRlciBsaW51eC1ibHVlei4NCj4gPiBX
-aGVyZSBhbmQgaG93IGFyZSBkZWZpbmVkIHRoZSBkZWZhdWx0IHN1cHBvcnRlZCBwcm9maWxlcz8g
-SXMgaXQgYSBjb25mDQo+IGZpbGU/DQo+ID4gSW4gb3VyIGNhc2UsIGJ5IGRlZmF1bHQgd2Ugc3Vw
-cG9ydCBIRlAsIEEyRFAsIE9QUCwgQVZSQ1AuLi4NCj4gPiBCdXQgaWYgd2Ugd2FudCB0byB1c2Ug
-RlRQIG9yIERVTiwgd2UgaGF2ZSB0byBlbnRlciAic2RwdG9vbCBhZGQgRFVOIiBvcg0KPiAiIHNk
-cHRvb2wgYWRkIEZUUCINCj4gPiBDYW4gYW55b25lIHRlbGwgbWUgaG93IHRvIGNoYW5nZSB0aGUg
-ZGVmYXVsdCBwYXJhbXM/DQo+IA0KPiBGaXJzdCBvZiBhbGwgaXRzIG5vdCBjbGVhciB3aGF0IGV4
-YWN0bHkgYXJlIHlvdSBsb29raW5nIGZvcj8gaW4gY2FzZQ0KPiB5b3UgbmVlZCB0byBrbm93IHdo
-aWNoIGFsbCBwcm9maWxlcyBhcmUgc3VwcG9ydGVkIGluIGJsdWV6LA0KPiAuL2NvbmZpZ3VyZSAt
-LWhlbHAgc2hvdWxkIGhlbHAhIE1vc3Qgb2YgdGhlIHByb2ZpbGVzIGFyZSBpbXBsZW1lbnRlZA0K
-PiBhcyBwbHVnaW5zIHRvIGVpdGhlciBibHVldG9vdGhkIG9yIG9iZXhkLg0KPiBGZXcgb2YgdGhl
-IHByb2ZpbGVzIGFyZSBhbHNvIHN1cHBvcnRlZCB2aWEgZGFlbW9ucy4gQWxsIGRhdGEgcHJvZmls
-ZXMsDQo+IHN1Y2ggYXMgRlRQL09QUC9QQkFQIHRoZXkgYXJlIHN1cHBvcnRlZCBhcyBvYmV4IHBs
-dWdpbnMuDQo+IGhvcGUgdGhpcyBoZWxwcy4NCj4gDQo+IHRoYW5rcywNCj4gQXJ1bg0KDQpUbyBj
-bGFyaWZ5IG15IHF1ZXN0aW9uLCBJIHdhbnQgdG8ga25vdyB3aGVyZSBpcyBzdG9yZWQgdGhlIGlu
-Zm9ybWF0aW9uIG9mIHByb2ZpbGVzIHN1cHBvcnRlZCBieSBvdXIgZGV2aWNlIHdoZW4gd2UgbGF1
-bmNoIHRoZSBjb21tYW5kICJzZHB0b29sIGJyb3dzZSBCREFERFIiIGZyb20gYW4gZXh0ZXJuYWwg
-ZGV2aWNlLiBUaGlzIGNvbW1hbmQgZ2l2ZXMgdXMgb3VyIHBsYXRmb3JtIGRlZmF1bHQgc3VwcG9y
-dGVkIHByb2ZpbGVzLg0KSWYgSSBsYXVuY2ggYWRkaXRpb25hbCBjb21tYW5kcyBsaWtlICJzZHB0
-b29sIGFkZCBEVU4iIG9yICIgc2RwdG9vbCBhZGQgRlRQIiwgbXkgcGxhdGZvcm0gaXMgc2VlbiBh
-cyBzdXBwb3J0aW5nIG1vcmUgcHJvZmlsZXMuDQpXaGVyZSBhbmQgaG93IGNhbiBJIG1vZGlmeSB0
-aGlzIGRlZmF1bHQgcHJvZmlsZSBsaXN0Pw0KVGhhbmtzDQpSZWdhcmRzDQpKZWFuDQotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0KSW50ZWwgQ29ycG9yYXRpb24gU0FTIChGcmVuY2ggc2ltcGxpZmllZCBqb2ludCBzdG9j
-ayBjb21wYW55KQpSZWdpc3RlcmVkIGhlYWRxdWFydGVyczogIkxlcyBNb250YWxldHMiLSAyLCBy
-dWUgZGUgUGFyaXMsIAo5MjE5NiBNZXVkb24gQ2VkZXgsIEZyYW5jZQpSZWdpc3RyYXRpb24gTnVt
-YmVyOiAgMzAyIDQ1NiAxOTkgUi5DLlMuIE5BTlRFUlJFCkNhcGl0YWw6IDQsNTcyLDAwMCBFdXJv
-cwoKVGhpcyBlLW1haWwgYW5kIGFueSBhdHRhY2htZW50cyBtYXkgY29udGFpbiBjb25maWRlbnRp
-YWwgbWF0ZXJpYWwgZm9yCnRoZSBzb2xlIHVzZSBvZiB0aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMp
-LiBBbnkgcmV2aWV3IG9yIGRpc3RyaWJ1dGlvbgpieSBvdGhlcnMgaXMgc3RyaWN0bHkgcHJvaGli
-aXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkCnJlY2lwaWVudCwgcGxlYXNlIGNvbnRh
-Y3QgdGhlIHNlbmRlciBhbmQgZGVsZXRlIGFsbCBjb3BpZXMuCg==
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+
+There were a lot of duplicate code in them so they are now replaced by
+finalize_setup_errno which can deal with multiple callbacks reusing the
+same error.
+---
+ audio/a2dp.c |   88 +++++++++++++++++++++++++++-------------------------------
+ 1 files changed, 41 insertions(+), 47 deletions(-)
+
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 1208ad1..d51276d 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -202,8 +202,32 @@ static void setup_cb_free(struct a2dp_setup_cb *cb)
+ 	g_free(cb);
+ }
+ 
+-static gboolean finalize_config(struct a2dp_setup *s)
++static void finalize_setup_errno(struct a2dp_setup *s, int err,
++					GSourceFunc cb1, ...)
+ {
++	GSourceFunc finalize;
++	va_list args;
++	struct avdtp_error avdtp_err;
++
++	if (err < 0) {
++		avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
++		s->err = &avdtp_err;
++	}
++
++	va_start(args, cb1);
++	finalize = cb1;
++	setup_ref(s);
++	while (finalize != NULL) {
++		finalize(s);
++		finalize = va_arg(args, GSourceFunc);
++	}
++	setup_unref(s);
++	va_end(args);
++}
++
++static gboolean finalize_config(gpointer data)
++{
++	struct a2dp_setup *s = data;
+ 	GSList *l;
+ 	struct avdtp_stream *stream = s->err ? NULL : s->stream;
+ 
+@@ -223,18 +247,9 @@ static gboolean finalize_config(struct a2dp_setup *s)
+ 	return FALSE;
+ }
+ 
+-static gboolean finalize_config_errno(struct a2dp_setup *s, int err)
+-{
+-	struct avdtp_error avdtp_err;
+-
+-	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
+-	s->err = err ? &avdtp_err : NULL;
+-
+-	return finalize_config(s);
+-}
+-
+-static gboolean finalize_resume(struct a2dp_setup *s)
++static gboolean finalize_resume(gpointer data)
+ {
++	struct a2dp_setup *s = data;
+ 	GSList *l;
+ 
+ 	for (l = s->cb; l != NULL; ) {
+@@ -252,18 +267,9 @@ static gboolean finalize_resume(struct a2dp_setup *s)
+ 	return FALSE;
+ }
+ 
+-static gboolean finalize_resume_errno(struct a2dp_setup *s, int err)
+-{
+-	struct avdtp_error avdtp_err;
+-
+-	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
+-	s->err = err ? &avdtp_err : NULL;
+-
+-	return finalize_resume(s);
+-}
+-
+-static gboolean finalize_suspend(struct a2dp_setup *s)
++static gboolean finalize_suspend(gpointer data)
+ {
++	struct a2dp_setup *s = data;
+ 	GSList *l;
+ 
+ 	for (l = s->cb; l != NULL; ) {
+@@ -281,17 +287,7 @@ static gboolean finalize_suspend(struct a2dp_setup *s)
+ 	return FALSE;
+ }
+ 
+-static gboolean finalize_suspend_errno(struct a2dp_setup *s, int err)
+-{
+-	struct avdtp_error avdtp_err;
+-
+-	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
+-	s->err = err ? &avdtp_err : NULL;
+-
+-	return finalize_suspend(s);
+-}
+-
+-static gboolean finalize_select(struct a2dp_setup *s)
++static void finalize_select(struct a2dp_setup *s)
+ {
+ 	GSList *l;
+ 
+@@ -306,8 +302,6 @@ static gboolean finalize_select(struct a2dp_setup *s)
+ 		cb->select_cb(s->session, s->sep, s->caps, cb->user_data);
+ 		setup_cb_free(cb);
+ 	}
+-
+-	return FALSE;
+ }
+ 
+ static struct a2dp_setup *find_setup_by_session(struct avdtp *session)
+@@ -777,7 +771,7 @@ static void endpoint_open_cb(struct media_endpoint *endpoint, void *ret,
+ 
+ 	if (ret == NULL) {
+ 		setup->stream = NULL;
+-		finalize_config_errno(setup, -EPERM);
++		finalize_setup_errno(setup, -EPERM, finalize_config);
+ 		return;
+ 	}
+ 
+@@ -787,7 +781,7 @@ static void endpoint_open_cb(struct media_endpoint *endpoint, void *ret,
+ 
+ 	error("Error on avdtp_open %s (%d)", strerror(-err), -err);
+ 	setup->stream = NULL;
+-	finalize_config_errno(setup, err);
++	finalize_setup_errno(setup, err, finalize_config);
+ }
+ 
+ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+@@ -844,7 +838,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 			return;
+ 
+ 		setup->stream = NULL;
+-		finalize_config_errno(setup, -EPERM);
++		finalize_setup_errno(setup, -EPERM, finalize_config);
+ 		return;
+ 	}
+ 
+@@ -852,7 +846,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	if (ret < 0) {
+ 		error("Error on avdtp_open %s (%d)", strerror(-ret), -ret);
+ 		setup->stream = NULL;
+-		finalize_config_errno(setup, ret);
++		finalize_setup_errno(setup, ret, finalize_config);
+ 	}
+ }
+ 
+@@ -1045,7 +1039,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	perr = avdtp_start(session, a2dp_sep->stream);
+ 	if (perr < 0) {
+ 		error("Error on avdtp_start %s (%d)", strerror(-perr), -perr);
+-		finalize_resume_errno(setup, perr);
++		finalize_setup_errno(setup, -EIO, finalize_suspend);
+ 	}
+ }
+ 
+@@ -1065,8 +1059,8 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	if (!setup)
+ 		return TRUE;
+ 
+-	finalize_suspend_errno(setup, -ECONNRESET);
+-	finalize_resume_errno(setup, -ECONNRESET);
++	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
++							finalize_resume);
+ 
+ 	return TRUE;
+ }
+@@ -1099,7 +1093,7 @@ static gboolean a2dp_reconfigure(gpointer data)
+ 	return FALSE;
+ 
+ failed:
+-	finalize_config_errno(setup, posix_err);
++	finalize_setup_errno(setup, posix_err, finalize_config);
+ 	return FALSE;
+ }
+ 
+@@ -2126,7 +2120,7 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+ 	case AVDTP_STATE_STREAMING:
+ 		if (avdtp_stream_has_capabilities(setup->stream, caps)) {
+ 			DBG("Configuration match: resuming");
+-			g_idle_add((GSourceFunc) finalize_config, setup);
++			g_idle_add(finalize_config, setup);
+ 		} else if (!setup->reconfigure) {
+ 			setup->reconfigure = TRUE;
+ 			if (avdtp_close(session, sep->stream, FALSE) < 0) {
+@@ -2184,7 +2178,7 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
+ 		if (sep->suspending)
+ 			setup->start = TRUE;
+ 		else
+-			g_idle_add((GSourceFunc) finalize_resume, setup);
++			g_idle_add(finalize_resume, setup);
+ 		break;
+ 	default:
+ 		error("SEP in bad state for resume");
+@@ -2221,7 +2215,7 @@ unsigned int a2dp_suspend(struct avdtp *session, struct a2dp_sep *sep,
+ 		goto failed;
+ 		break;
+ 	case AVDTP_STATE_OPEN:
+-		g_idle_add((GSourceFunc) finalize_suspend, setup);
++		g_idle_add(finalize_suspend, setup);
+ 		break;
+ 	case AVDTP_STATE_STREAMING:
+ 		if (avdtp_suspend(session, sep->stream) < 0) {
+-- 
+1.7.1
 
