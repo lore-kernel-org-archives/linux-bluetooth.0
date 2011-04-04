@@ -1,44 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Mon, 4 Apr 2011 18:16:17 -0300
+Date: Mon, 4 Apr 2011 18:05:51 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Zhang Jiejing <jiejing.zhang@freescale.com>
-Cc: suraj@atheros.com, marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: change gfp type in hci_recv_stream_fragment()
-Message-ID: <20110404211617.GD2230@joana>
-References: <1301554616-27595-1-git-send-email-jiejing.zhang@freescale.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 12/15] Bluetooth: Move ERTM timers to struct l2cap_chan
+Message-ID: <20110404210551.GC2230@joana>
+References: <1301697200-2446-5-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-6-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-7-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-8-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-9-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-10-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-11-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-12-git-send-email-padovan@profusion.mobi>
+ <1301697200-2446-13-git-send-email-padovan@profusion.mobi>
+ <BANLkTikP-bL5LUmmim7Y3dxrsU7Qwuhm0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301554616-27595-1-git-send-email-jiejing.zhang@freescale.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTikP-bL5LUmmim7Y3dxrsU7Qwuhm0Q@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhang,
+Hi Lizardo,
 
-* Zhang Jiejing <jiejing.zhang@freescale.com> [2011-03-31 14:56:56 +0800]:
+* Anderson Lizardo <anderson.lizardo@openbossa.org> [2011-04-04 17:00:17 -0400]:
 
-> change gfp type passed to hci_reassembly(), replace GFP_ATOMIC
-> to GFP_KERNEL. Since some HCI_ACLDATA may request 1024+4 bytes
-> some time GFP_ATOMIC will failed to allocation memory during
-> large file FTP transfer in high baud rate.
+> Hi Gustavo,
 > 
-> Signed-off-by: Zhang Jiejing <jiejing.zhang@freescale.com>
-> ---
->  net/bluetooth/hci_core.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> On Fri, Apr 1, 2011 at 6:33 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > @@ -958,7 +961,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
+> >
+> >        bh_lock_sock(sk);
+> >        if (chan->retry_count >= chan->remote_max_tx) {
+> > -               l2cap_send_disconn_req(l2cap_pi(sk)->conn, sk, ECONNABORTED);
+> > +               l2cap_send_disconn_req(l2cap_pi(chan)->conn, chan, ECONNABORTED);
+> >                bh_unlock_sock(sk);
+> >                return;
+> >        }
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9c4541b..22b3ded 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1214,7 +1214,7 @@ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
->  			type = bt_cb(skb)->pkt_type;
->  
->  		rem = hci_reassembly(hdev, type, data,
-> -					count, STREAM_REASSEMBLY, GFP_ATOMIC);
-> +					count, STREAM_REASSEMBLY, GFP_KERNEL);
+> Why "l2cap_pi(chan)" ? This looks strange.
 
-We can't use GFP_KERNEL in a interrupt context, we can't sleep here and
-GFP_ATOMIC guarantees that.
+Indeed, I'll fix it.
 
 -- 
 Gustavo F. Padovan
