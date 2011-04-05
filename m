@@ -1,42 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: Re: [PATCH 04/10] Bluetooth: Use kthread API in bnep
-Date: Tue, 5 Apr 2011 09:51:17 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com"
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-References: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com> <1300713606-23523-5-git-send-email-szymon.janc@tieto.com> <20110324201226.GG2236@joana>
-In-Reply-To: <20110324201226.GG2236@joana>
+Date: Mon, 4 Apr 2011 23:08:44 -0700
+From: Greg KH <greg@kroah.com>
+To: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>, devel@driverdev.osuosl.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus Walleij <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110405060844.GA15065@kroah.com>
+References: <1301399358-10783-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201104050951.17932.szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1301399358-10783-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hy Szymon,
+On Tue, Mar 29, 2011 at 01:49:18PM +0200, Par-Gunnar Hjalmdahl wrote:
+> +config CG2900_UART
+> +	tristate "Support CG2900 UART transport"
+> +	depends on CG2900
+> +	select BT
+> +	select BT_HCIUART
 
-Hi,
+No, depend on this, don't have a staging driver select any other config
+options, sorry.
 
-> * Szymon Janc <szymon.janc@tieto.com> [2011-03-21 14:20:00 +0100]:
-> 
-> > kernel_thread() is a low-level implementation detail and
-> > EXPORT_SYMBOL(kernel_thread) is scheduled for removal.
-> > Use the <linux/kthread.h> API instead.
-> 
-> Just to be sure. Have you tested the kernel_thread removal patches for bnep
-> and hipd?
+Care to fix this up, and your drivers/staging/Kconfig fuzz in the patch
+and resend it?
 
-Sorry for late reply, missed that one..
-Yes, I did test both bnep (basic connect-disconnect) and hidp (play around with it
-from my mobile). Kernel processes create and terminate fine.
+thanks,
 
-I didn't test cmtp (don't have isdn hw) but change is very similar to rest of patches.
-
-I've noticed that hidp patch doesn't apply anymore to bluetooth-next-2.6 after
-merging 2.6.39-rc1. I'll send v2 shortly (only for that one if you're fine with that)
-
-BR,
-Szymon Janc
+greg k-h
