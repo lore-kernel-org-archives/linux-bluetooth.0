@@ -1,51 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Apr 2011 12:39:53 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com"
-	<par-gunnar.p.hjalmdahl@stericsson.com>,
-	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-Subject: Re: [PATCH 04/10] Bluetooth: Use kthread API in bnep
-Message-ID: <20110405153054.GA2259@joana>
-References: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com>
- <1300713606-23523-5-git-send-email-szymon.janc@tieto.com>
- <20110324201226.GG2236@joana>
- <201104050951.17932.szymon.janc@tieto.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Date: Tue, 5 Apr 2011 16:38:09 +0300
+Subject: RE: [PATCH v2] Add sap_disconnect_ind interface for sap-sim drivers
+Message-ID: <99B09243E1A5DA4898CDD8B7001114481085FBEEE1@EXMB04.eu.tieto.com>
+References: <1300982971-2869-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1300983402-2970-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <20110325091759.GA1150@jh-x301>
+ <99B09243E1A5DA4898CDD8B7001114481085E2325E@EXMB04.eu.tieto.com>
+ <20110328095557.GA11511@jh-x301>
+In-Reply-To: <20110328095557.GA11511@jh-x301>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201104050951.17932.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Johan, 
 
-* Szymon Janc <szymon.janc@tieto.com> [2011-04-05 09:51:17 +0200]:
+>> The original idea was to have Disconnect(type) method in 
+>server.c, but 
+>> finally, in a discussion, we came to the conclusion that the 
+>immediate 
+>> disconnect should not be used by user. Driver should handle this if 
+>> it's needed.
+>> 
+>> So, sap-api.txt stays unchanged, and dummy-driver is changed to be 
+>> able to pass some of  PTS tests.
+>
+>Ok, sounds fine to me.
 
-> > Hy Szymon,
-> 
-> Hi,
-> 
-> > * Szymon Janc <szymon.janc@tieto.com> [2011-03-21 14:20:00 +0100]:
-> > 
-> > > kernel_thread() is a low-level implementation detail and
-> > > EXPORT_SYMBOL(kernel_thread) is scheduled for removal.
-> > > Use the <linux/kthread.h> API instead.
-> > 
-> > Just to be sure. Have you tested the kernel_thread removal patches for bnep
-> > and hipd?
-> 
-> Sorry for late reply, missed that one..
-> Yes, I did test both bnep (basic connect-disconnect) and hidp (play around with it
-> from my mobile). Kernel processes create and terminate fine.
+Are you going to push upstram this patch ?
 
-Fair enough, I applied the 3 patches. Thanks for fixing this.
-
-> 
-> I didn't test cmtp (don't have isdn hw) but change is very similar to rest of patches.
-
-No problem, no one should be using this thing these days.
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Waldek
