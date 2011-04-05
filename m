@@ -1,66 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 5 Apr 2011 13:38:45 -0300
+Date: Tue, 5 Apr 2011 12:39:53 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] kstrtox: convert net/bluetooth/
-Message-ID: <20110405162326.GB2259@joana>
-References: <20110402111941.GB19357@p183.telecom.by>
- <20110404220002.GF2230@joana>
- <BANLkTimwBDydVTS2Crcbgiy7sKK+T49pHw@mail.gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	"henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+Subject: Re: [PATCH 04/10] Bluetooth: Use kthread API in bnep
+Message-ID: <20110405153054.GA2259@joana>
+References: <1300713606-23523-1-git-send-email-szymon.janc@tieto.com>
+ <1300713606-23523-5-git-send-email-szymon.janc@tieto.com>
+ <20110324201226.GG2236@joana>
+ <201104050951.17932.szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <BANLkTimwBDydVTS2Crcbgiy7sKK+T49pHw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201104050951.17932.szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexey,
+Hi Szymon,
 
-* Alexey Dobriyan <adobriyan@gmail.com> [2011-04-05 15:33:47 +0300]:
+* Szymon Janc <szymon.janc@tieto.com> [2011-04-05 09:51:17 +0200]:
 
-> On Tue, Apr 5, 2011 at 1:00 AM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
->=20
-> >> @@ -299,15 +300,13 @@ static ssize_t show_sniff_max_interval(struct de=
-vice *dev, struct device_attribu
-> >> =A0static ssize_t store_sniff_max_interval(struct device *dev, struct =
-device_attribute *attr, const char *buf, size_t count)
-> >> =A0{
-> >> =A0 =A0 =A0 struct hci_dev *hdev =3D dev_get_drvdata(dev);
-> >> - =A0 =A0 unsigned long val;
-> >> -
-> >> - =A0 =A0 if (strict_strtoul(buf, 0, &val) < 0)
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> >> -
-> >> - =A0 =A0 if (val < 0x0002 || val > 0xFFFE || val % 2)
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> >> + =A0 =A0 u16 val;
-> >> + =A0 =A0 int rv;
-> >>
-> >> - =A0 =A0 if (val < hdev->sniff_min_interval)
-> >> + =A0 =A0 rv =3D kstrtou16(buf, 0, &val);
-> >> + =A0 =A0 if (rv < 0)
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 return rv;
-> >> + =A0 =A0 if (val =3D=3D 0 || val % 2 || val < hdev->sniff_min_interva=
-l)
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> >
-> > Why are you changing other things besides the string conversions?
->=20
-> Because this is not mindless s/foo/bar/g conversion.
->=20
-> > The checks for val should stay the same.
->=20
-> No, they should not. kstrtou16() takes care of [0x0000, 0xFFFF] interval,
-> then you check for even values, then you have only 0 to ban.
->=20
-> WIth previous checks, say, "val > 0xFFFE" is not necessary,
-> kstrtou16 + "val % 2" do it.
+> > Hy Szymon,
+> 
+> Hi,
+> 
+> > * Szymon Janc <szymon.janc@tieto.com> [2011-03-21 14:20:00 +0100]:
+> > 
+> > > kernel_thread() is a low-level implementation detail and
+> > > EXPORT_SYMBOL(kernel_thread) is scheduled for removal.
+> > > Use the <linux/kthread.h> API instead.
+> > 
+> > Just to be sure. Have you tested the kernel_thread removal patches for bnep
+> > and hipd?
+> 
+> Sorry for late reply, missed that one..
+> Yes, I did test both bnep (basic connect-disconnect) and hidp (play around with it
+> from my mobile). Kernel processes create and terminate fine.
 
-Ok, I agree, I didn't noted that at in a first review. Patch is now applied.
-Thanks.
+Fair enough, I applied the 3 patches. Thanks for fixing this.
 
+> 
+> I didn't test cmtp (don't have isdn hw) but change is very similar to rest of patches.
 
---=20
+No problem, no one should be using this thing these days.
+
+-- 
 Gustavo F. Padovan
 http://profusion.mobi
