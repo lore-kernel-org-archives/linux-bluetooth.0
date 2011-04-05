@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Apr 2011 19:53:51 -0700
+Date: Mon, 4 Apr 2011 19:49:48 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Fix handling of suspend response
-Message-ID: <20110405025351.GC29805@jh-x301>
-References: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: Re: [PATCH] Add uuidtest binary to gitignore list
+Message-ID: <20110405024948.GB29805@jh-x301>
+References: <1301766760-12063-1-git-send-email-dh.herrmann@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301907619-6684-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1301766760-12063-1-git-send-email-dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi David,
 
-On Mon, Apr 04, 2011, Luiz Augusto von Dentz wrote:
-> finalize_suspend is being called twice when a resume request is queue
-> after it or if start fails.
+On Sat, Apr 02, 2011, David Herrmann wrote:
 > ---
->  audio/a2dp.c |   22 +++++++++++-----------
->  1 files changed, 11 insertions(+), 11 deletions(-)
+>  .gitignore |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-All three patches have been pushed upstream. Thanks.
+Applied. Thanks.
 
 Johan
