@@ -1,136 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<henrik.possung@stericsson.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Fix unconditional call to mgmt interface in hci_event.c
+Date: Wed, 6 Apr 2011 13:02:20 +0200
+Message-ID: <1302087740-18244-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTinQBr7Scuab_KAs_1L1UY-E9j87pw@mail.gmail.com>
-References: <BANLkTikdXHstUxQ52RM6OMSnqfLWYJVMvg@mail.gmail.com>
-	<BANLkTinQBr7Scuab_KAs_1L1UY-E9j87pw@mail.gmail.com>
-Date: Wed, 6 Apr 2011 16:05:10 +0200
-Message-ID: <BANLkTikn99GO4JV4uV64KCuka0G1QYYHpQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Support hardcoded Nintendo Wii Remote pins
-From: Daniele Forsi <dforsi@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2011/4/6 David Herrmann:
+hci_cc_read_local_oob_data_reply funtion should call
+mgmt_read_local_oob_data_reply_complete only if management interface
+is enabled.
 
-> Please try both methods: sync button and 1+2 buttons and report which
-> method works
-> with which PIN. As I mentioned above all my Wiimotes work with source-addr plus
-> red-sync-button and dest-addr plus 1+2 buttons.
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ net/bluetooth/hci_event.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-now I understand, you're right, such explaination would be useful as a
-comment in the code even if only one method is implemented
-I can confirm that your code works unmodified for me too if I press
-1+2 (after I manually fix the issue I still have with vid/pid), and it
-also works after modifying it to use source-addr and pressing the sync
-button
-
-> If there is a valid PnP record maybe some bluez Dev could elaborate whether
-> VID/PID values are guaranteed to be available when pairing is started.
-
-I have two original remotes from December 2008 and different one from
-December 2010 and their SDP records are identical:
-
-Service RecHandle: 0x0
-Service Class ID List:
-  "SDP Server" (0x1000)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-  "SDP" (0x0001)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "" (0x0100)
-    Version: 0x0100
-
-Service Name: Nintendo RVL-CNT-01
-Service Description: Nintendo RVL-CNT-01
-Service Provider: Nintendo
-Service RecHandle: 0x10000
-Service Class ID List:
-  "Human Interface Device" (0x1124)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 17
-  "HIDP" (0x0011)
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Human Interface Device" (0x1124)
-    Version: 0x0100
-
-Service RecHandle: 0x10001
-Service Class ID List:
-  "PnP Information" (0x1200)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 1
-  "SDP" (0x0001)
-Profile Descriptor List:
-  "PnP Information" (0x1200)
-    Version: 0x0100
-
-> I couldn't figure out when autoreconnection is established, reliably. Pairing
-> the wiimote works sometimes, but not always and I didn't figure out how to
-> reset the internal cache of reconnection addresses.
-
-if you have dangerous ideas I'm willing to sacrifice for the good of
-science :-) my remote that doesn't work well
-
-> If this works for you, could you run the example code at:
-> http://goo.gl/axeqd
-> on the new /dev/hidrawX device which is created for the wiimote?
-
-it kind of works, but it seems I'm running an older kernel
-(2.6.35-28-generic #49-Ubuntu):
-$ sudo ./hid-example /dev/hidraw0
-Report Descriptor Size: 218
-Report Descriptor:
-5 1 9 5 a1 1 85 10 15 0 26 ff 0 75 8 95 1 6 0 ff 9 1 91 0 85 11 95 1 9
-1 91 0 85 12 95 2 9 1 91 0 85 13 95 1 9 1 91 0 85 14 95 1 9 1 91 0 85
-15 95 1 9 1 91 0 85 16 95 15 9 1 91 0 85 17 95 6 9 1 91 0 85 18 95 15
-9 1 91 0 85 19 95 1 9 1 91 0 85 1a 95 1 9 1 91 0 85 20 95 6 9 1 81 0
-85 21 95 15 9 1 81 0 85 22 95 4 9 1 81 0 85 30 95 2 9 1 81 0 85 31 95
-5 9 1 81 0 85 32 95 a 9 1 81 0 85 33 95 11 9 1 81 0 85 34 95 15 9 1 81
-0 85 35 95 15 9 1 81 0 85 36 95 15 9 1 81 0 85 37 95 15 9 1 81 0 85 3d
-95 15 9 1 81 0 85 3e 95 15 9 1 81 0 85 3f 95 15 9 1 81 0 c0 0
-
-Raw Name: Nintendo RVL-CNT-01
-Raw Phys: 00:1F:81:00:01:00
-Raw Info:
-	bustype: 5 (Bluetooth)
-	vendor: 0x057e
-	product: 0x0306
-HIDIOCSFEATURE: Invalid argument
-HIDIOCGFEATURE: Invalid argument
-write() wrote 2 bytes
-read: Resource temporarily unavailable
-
-> If you have ideas how to support both, sba and dba via some new DBUS
-> interface, I would be glad to hear about it.
-
-using a binary pin seems to solve this problem and the pin could be
-constructed by the agent based on user choice (and the agent can use
-the binary pin interface also for plain strings)
-I understand that constructing the pin in bluez would make it
-available to all agents but then how do we ask the user for which
-method to use?
-
-you know better than me, but supporting dba doesn't seem a strict
-requirement to me because pairing with 1+2 already worked for me with
-gnome-bluetooth 2.32 and bluez-4.69; the config file has this
-explaination:
-  The special NULL pin means that the devices will not be paired, but
-  connected to and marked as trusted. This is for devices such as mice
-  and joypads where there is no encryption
-I don't understand the details but this means that CreateDevice is
-used instead of CreatePairedDevice
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7a3398d..9062e1b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -831,7 +831,8 @@ static void hci_cc_read_local_oob_data_reply(struct hci_dev *hdev,
+ 
+ 	BT_DBG("%s status 0x%x", hdev->name, rp->status);
+ 
+-	mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
++	if (test_bit(HCI_MGMT, &hdev->flags))
++		mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
+ 						rp->randomizer, rp->status);
+ }
+ 
 -- 
-Daniele Forsi
+1.7.0.4
+
