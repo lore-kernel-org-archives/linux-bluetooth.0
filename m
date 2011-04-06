@@ -2,142 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 04/15] Bluetooth: Add functions to manipulate the link key list for SMP
-Date: Tue,  5 Apr 2011 23:11:17 -0300
-Message-Id: <1302055888-28177-5-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC 03/15] Bluetooth: Add new structures for supporting SM key distribution
+Date: Tue,  5 Apr 2011 23:11:16 -0300
+Message-Id: <1302055888-28177-4-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1302055888-28177-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1302055888-28177-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the LTK (the new type of key being handled now) has more data
-associated with it, we need to store this extra data and retrieve
-the keys based on that data.
-
-Methods for searching for a key and for adding a new LTK are
-introduced here.
+We need these changes because SMP keys may have more information
+associated with them, for example, in the LTK case, it has an
+encrypted diversifier (ediv) and a random number (rand).
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    5 ++
- net/bluetooth/hci_core.c         |   81 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 86 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |   20 ++++++++++++++++++++
+ include/net/bluetooth/mgmt.h     |    2 ++
+ 2 files changed, 22 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 74c9f07..72305d6 100644
+index 669bcea..74c9f07 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -546,6 +546,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
- 						u8 *key, u8 type, u8 pin_len);
-+struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
-+struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-+					bdaddr_t *bdaddr, u8 type);
-+int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-+					__le16 ediv, u8 rand[8], u8 ltk[16]);
- int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+@@ -74,12 +74,32 @@ struct bt_uuid {
+ 	u8 svc_hint;
+ };
  
- int hci_remote_oob_data_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1c2160f..ab8ee1e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1024,6 +1024,50 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return NULL;
- }
++struct key_master_id {
++	__le16 ediv;
++	u8 rand[8];
++} __packed;
++
++#define KEY_TYPE_LTK	0x11
++#define KEY_TYPE_IRK	0x12
++#define KEY_TYPE_CSRK	0x13
++
++struct link_key_data {
++	bdaddr_t bdaddr;
++	u8 type;
++	u8 val[16];
++	u8 pin_len;
++	u8 dlen;
++	u8 data[0];
++} __packed;
++
+ struct link_key {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+ 	u8 type;
+ 	u8 val[16];
+ 	u8 pin_len;
++	u8 dlen;
++	u8 data[0];
+ };
  
-+struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-+{
-+	struct list_head *p;
-+
-+	list_for_each(p, &hdev->link_keys) {
-+		struct link_key *k;
-+		struct key_master_id *id;
-+
-+		k = list_entry(p, struct link_key, list);
-+
-+		if (k->type != KEY_TYPE_LTK)
-+			continue;
-+
-+		if (k->dlen != sizeof(*id))
-+			continue;
-+
-+		id = (void *) &k->data;
-+		if (id->ediv == ediv &&
-+				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
-+			return k;
-+	}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(hci_find_ltk);
-+
-+struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-+					bdaddr_t *bdaddr, u8 type)
-+{
-+	struct list_head *p;
-+
-+	list_for_each(p, &hdev->link_keys) {
-+		struct link_key *k;
-+
-+		k = list_entry(p, struct link_key, list);
-+
-+		if ((k->type == type) && (bacmp(bdaddr, &k->bdaddr) == 0))
-+			return k;
-+	}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(hci_find_link_key_type);
-+
- int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
- 						u8 *val, u8 type, u8 pin_len)
- {
-@@ -1058,6 +1102,43 @@ int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
- 	return 0;
- }
+ struct oob_data {
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 6b6ff92..d467fb8 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -101,6 +101,8 @@ struct mgmt_key_info {
+ 	u8 type;
+ 	u8 val[16];
+ 	u8 pin_len;
++	u8 dlen;
++	u8 data[0];
+ } __packed;
  
-+int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-+					__le16 ediv, u8 rand[8], u8 ltk[16])
-+{
-+	struct link_key *key, *old_key;
-+	struct key_master_id *id;
-+	u8 old_key_type;
-+
-+	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
-+
-+	old_key = hci_find_link_key_type(hdev, bdaddr, KEY_TYPE_LTK);
-+	if (old_key) {
-+		key = old_key;
-+		old_key_type = old_key->type;
-+	} else {
-+		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
-+		if (!key)
-+			return -ENOMEM;
-+		list_add(&key->list, &hdev->link_keys);
-+		old_key_type = 0xff;
-+	}
-+
-+	key->dlen = sizeof(*id);
-+
-+	bacpy(&key->bdaddr, bdaddr);
-+	memcpy(key->val, ltk, sizeof(key->val));
-+	key->type = KEY_TYPE_LTK;
-+
-+	id = (void *) &key->data;
-+	id->ediv = ediv;
-+	memcpy(id->rand, rand, sizeof(id->rand));
-+
-+	if (new_key)
-+		mgmt_new_key(hdev->id, key, old_key_type);
-+
-+	return 0;
-+}
-+
- int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct link_key *key;
+ #define MGMT_OP_LOAD_KEYS		0x000D
 -- 
 1.7.4.1
 
