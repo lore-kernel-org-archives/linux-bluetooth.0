@@ -1,45 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 6 Apr 2011 12:04:49 +0200
-Message-ID: <BANLkTikdXHstUxQ52RM6OMSnqfLWYJVMvg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Support hardcoded Nintendo Wii Remote pins
-From: Daniele Forsi <dforsi@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC 15/15] Bluetooth: Add support for returning the encryption key size
+Date: Tue,  5 Apr 2011 23:11:28 -0300
+Message-Id: <1302055888-28177-16-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1302055888-28177-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1302055888-28177-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-David Herrmann wrote:
+This will be useful when userspace wants to restrict some kinds of
+operations based on the length of the key size used to encrypt the
+link.
 
-> The Nintendo Wii Remote requires the destination bluetooth address
-> as pincode.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/l2cap_sock.c        |    4 ++++
+ 2 files changed, 5 insertions(+), 0 deletions(-)
 
-according to my my tests they require the source address, ie the host
-adapter's address
-
-> +		/* Nintendo Wii Remote uses destination address as PIN */
-
-better to document in that comment if it works when pressing the red
-button or the 1+2 buttons
-
-I tested your 3 patches against bluez git 4.91-32-gd7f412e and
-gnome-bluetooth 2.32 but they didn't work for me for 2 reasons:
-1) can't get vid/pid so when the remote is unknown the
-read_device_id() call in your code fails to get vid/pid and the
-specific pin is never tried; the same happens after a failed pairing
-when the /var/lib/bluetooth/*/did file contains a line this:
-00:1F:C5:25:36:87 FFFF 0000 0000 0000
-2) the source vs destination address I mentioned above
-
-It works for me if I manually edit that line with the values read from
-another wiimote's line:
-00:1F:C5:25:36:87 0002 057E 0306 0600
-and if I change dba to sba here
->			memcpy(pinbuf, dba, 6);
-
-how can I help you to debug these issues?
-
-BTW pairing also works when I use the test code mentioned in
-https://bugzilla.gnome.org/show_bug.cgi?id=603845#c6
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index acf186d..28ae91a 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -56,6 +56,7 @@
+ #define BT_SECURITY	4
+ struct bt_security {
+ 	__u8 level;
++	__u8 key_size;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 12dbbf2..dd79b6b 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -492,8 +492,12 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 			break;
+ 		}
+ 
++		memset(&sec, 0, sizeof(sec));
+ 		sec.level = l2cap_pi(sk)->sec_level;
+ 
++		if (sk->sk_state == BT_CONNECTED)
++			sec.key_size = l2cap_pi(sk)->conn->hcon->pin_length;
++
+ 		len = min_t(unsigned int, len, sizeof(sec));
+ 		if (copy_to_user(optval, (char *) &sec, len))
+ 			err = -EFAULT;
 -- 
-Daniele Forsi
+1.7.4.1
+
