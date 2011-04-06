@@ -1,48 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<henrik.possung@stericsson.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Bluetooth: Fix Out Of Band pairing when mgmt interface is disabled
-Date: Wed, 6 Apr 2011 13:01:59 +0200
-Message-ID: <1302087719-18197-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/5] Fix handling of a2dp abort indication
+Date: Wed,  6 Apr 2011 14:00:37 +0300
+Message-Id: <1302087637-30131-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1302087637-30131-1-git-send-email-luiz.dentz@gmail.com>
+References: <1302087637-30131-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use kernel stored remote Out Of Band data only if management interface
-is enabled. Otherwise HCI_OP_REMOTE_OOB_DATA_NEG_REPLY was sent to
-controller even if remote Out Of Band data was present in bluetoothd.
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+When an abort indication is received reset all flags and finalize any
+ongoing setup.
 ---
- net/bluetooth/hci_event.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ audio/a2dp.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9062e1b..7a3103e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2498,6 +2498,9 @@ static inline void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index e7234eb..719658b 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1180,6 +1180,7 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 				void *user_data)
+ {
+ 	struct a2dp_sep *a2dp_sep = user_data;
++	struct a2dp_setup *setup;
  
- 	hci_dev_lock(hdev);
+ 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+ 		DBG("Sink %p: Abort_Ind", sep);
+@@ -1187,6 +1188,16 @@ static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 		DBG("Source %p: Abort_Ind", sep);
  
-+	if (!test_bit(HCI_MGMT, &hdev->flags))
-+		goto unlock;
+ 	a2dp_sep->stream = NULL;
++	a2dp_sep->suspending = FALSE;
++	a2dp_sep->starting = FALSE;
 +
- 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr);
- 	if (data) {
- 		struct hci_cp_remote_oob_data_reply cp;
-@@ -2516,6 +2519,7 @@ static inline void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
- 									&cp);
- 	}
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return TRUE;
++
++	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
++							finalize_resume,
++							finalize_config);
  
-+unlock:
- 	hci_dev_unlock(hdev);
+ 	return TRUE;
  }
- 
 -- 
-1.7.0.4
+1.7.1
 
