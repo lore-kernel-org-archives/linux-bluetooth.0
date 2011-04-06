@@ -1,79 +1,184 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Apr 2011 20:36:05 -0300
+Date: Wed, 6 Apr 2011 20:26:32 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: Re: [bluetooth-next 06/15] Bluetooth: Add SMP confirmation structs
-Message-ID: <20110406233605.GD2228@joana>
+	Anderson Briglia <anderson.briglia@openbossa.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: Re: [bluetooth-next 05/15] Bluetooth: LE SMP Cryptoolbox functions
+Message-ID: <20110406232632.GC2228@joana>
 References: <1302054716-24534-1-git-send-email-vinicius.gomes@openbossa.org>
- <1302054716-24534-7-git-send-email-vinicius.gomes@openbossa.org>
+ <1302054716-24534-6-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302054716-24534-7-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1302054716-24534-6-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vinicius,
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-04-05 22:51:47 -0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-04-05 22:51:46 -0300]:
 
 > From: Anderson Briglia <anderson.briglia@openbossa.org>
 > 
-> This patch adds initial support for verifying the confirmation value
-> that the remote side has sent.
+> This patch implements SMP crypto functions called ah, c1, s1 and e.
+> It also implements auxiliary functions. All These functions are needed
+> for SMP keys generation.
 > 
 > Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+> Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
 > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  include/net/bluetooth/l2cap.h |    5 +++++
->  net/bluetooth/smp.c           |   17 +++++++++++++++++
->  2 files changed, 22 insertions(+), 0 deletions(-)
+>  net/bluetooth/smp.c |  122 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 122 insertions(+), 0 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 2b9ca0d..dc4aa63 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -305,6 +305,11 @@ struct l2cap_conn {
->  
->  	__u8		disc_reason;
->  
-> +	__u8		preq[7]; /* SMP Pairing Request */
-> +	__u8		prsp[7]; /* SMP Pairing Response */
-> +	__u8		prnd[16]; /* SMP Pairing Random */
-> +	__u8		pcnf[16]; /* SMP Pairing Confirm */
-> +
->  	struct l2cap_chan_list chan_list;
->  };
->  
 > diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 58047e8..7fa3542 100644
+> index 42aed82..58047e8 100644
 > --- a/net/bluetooth/smp.c
 > +++ b/net/bluetooth/smp.c
-> @@ -192,6 +192,8 @@ static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
->  
->  	BT_DBG("conn %p", conn);
->  
-> +	conn->preq[0] = SMP_CMD_PAIRING_REQ;
-> +	memcpy(&conn->preq[1], rp, sizeof(*rp));
->  	skb_pull(skb, sizeof(*rp));
->  
->  	rp->io_capability = 0x00;
-> @@ -201,17 +203,25 @@ static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
->  	rp->resp_key_dist = 0x00;
->  	rp->auth_req &= (SMP_AUTH_BONDING | SMP_AUTH_MITM);
->  
-> +	conn->prsp[0] = SMP_CMD_PAIRING_RSP;
-> +	memcpy(&conn->prsp[1], rp, sizeof(*rp));
+> @@ -24,6 +24,128 @@
+>  #include <net/bluetooth/hci_core.h>
+>  #include <net/bluetooth/l2cap.h>
+>  #include <net/bluetooth/smp.h>
+> +#include <linux/crypto.h>
+> +#include <crypto/b128ops.h>
 > +
->  	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
->  }
->  
->  static void smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
->  {
-> +	struct smp_cmd_pairing *rp = (void *) skb->data;
+> +static inline void swap128(u8 src[16], u8 dst[16])
+> +{
+> +	int i;
+> +	for (i = 0; i < 16; i++)
+> +		dst[15 - i] = src[i];
+> +}
+> +
+> +static inline void swap56(u8 src[7], u8 dst[7])
+> +{
+> +	int i;
+> +	for (i = 0; i < 7; i++)
+> +		dst[6 - i] = src[i];
+> +}
+> +
+> +static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+> +{
+> +	struct blkcipher_desc desc;
+> +	struct scatterlist sg;
+> +	int err, iv_len;
+> +	unsigned char iv[128];
+> +
+> +	if (tfm == NULL) {
+> +		BT_ERR("tfm %p", tfm);
+> +		return -EINVAL;
+> +	}
+> +
+> +	desc.tfm = tfm;
+> +	desc.flags = 0;
+> +
+> +	err = crypto_blkcipher_setkey(tfm, k, 16);
+> +	if (err) {
+> +		BT_ERR("cipher setkey failed: %d", err);
+> +		return err;
+> +	}
+> +
+> +	sg_init_one(&sg, r, 16);
+> +
+> +	iv_len = crypto_blkcipher_ivsize(tfm);
+> +	if (iv_len) {
+> +		memset(&iv, 0xff, iv_len);
+> +		crypto_blkcipher_set_iv(tfm, iv, iv_len);
+> +	}
+> +
+> +	err = crypto_blkcipher_encrypt(&desc, &sg, &sg, 16);
+> +	if (err)
+> +		BT_ERR("Encrypt data error %d", err);
+> +
+> +	return err;
+> +}
+> +
+> +static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
+> +		u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
+> +		u8 _rat, bdaddr_t *ra, u8 res[16])
+> +{
+> +	u8 p1[16], p2[16], pair[7];
+> +	bdaddr_t addr;
+> +	int err;
+> +
+> +	/* p1 = pres || preq || _rat || _iat */
+> +	memset(p1, 0, 16);
+> +	swap56(pres, pair);
+> +
+> +	memcpy(p1, pair, 7);
+> +	swap56(preq, pair);
+> +
+> +	memcpy(p1 + 7, pair, 7);
 
-No need for cast here.
+	swap56(pres, p1)
+	swap56(preq, pi + 7)
+
+> +	*(p1 + 14) = _rat;
+> +	*(p1 + 15) = _iat;
+
+Isn't p1[14] = _rat better?
+
+btw, if fill all 16 bytes here, there is no need for a memset(p1)
+
+> +
+> +	/* p2 = padding || ia || ra */
+> +	memset(p2, 0, 16);
+> +	baswap(&addr, ia);
+> +	memcpy(p2 + 4, &addr, 6);
+> +	baswap(&addr, ra);
+> +	memcpy(p2 + 10, &addr, 6);
+
+baswap(p2 + 4, ia) should have the same effect.
+
+> +	/* res = r XOR p1 */
+> +	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
+> +
+> +	/* res = e(k, res) */
+> +	err = smp_e(tfm, k, res);
+> +	if (err) {
+> +		BT_ERR("Encrypt data error");
+> +		return err;
+> +	}
+> +
+> +	/* res = res XOR p2 */
+> +	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
+> +
+> +	/* res = e(k, res) */
+> +	err = smp_e(tfm, k, res);
+> +	if (err)
+> +		BT_ERR("Encrypt data error");
+> +
+> +	return err;
+> +}
+> +
+> +static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16],
+> +			u8 r1[16], u8 r2[16], u8 _r[16])
+> +{
+> +	int err;
+> +
+> +	/* Just least significant octets from r1 and r2 are considered */
+> +	memcpy(_r, r1 + 8, 8);
+> +	memcpy(_r + 8, r2 + 8, 8);
+> +
+> +	err = smp_e(tfm, k, _r);
+> +	if (err)
+> +		BT_ERR("Encrypt data error");
+> +
+> +	return err;
+> +}
+> +
+> +static int smp_rand(u8 *buf)
+
+This can be void.
+
+> +{
+> +	get_random_bytes(buf, 16);
+> +
+> +	return 0;
+> +}
+>  
 
 -- 
 Gustavo F. Padovan
