@@ -1,65 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Apr 2011 16:09:55 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: Re: [bluetooth-next 08/15] Bluetooth: Minor fix in SMP methods
-Message-ID: <20110406190955.GA2228@joana>
-References: <1302054716-24534-1-git-send-email-vinicius.gomes@openbossa.org>
- <1302054716-24534-9-git-send-email-vinicius.gomes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302054716-24534-9-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 3/3] Support hardcoded Nintendo Wii Remote pins
+From: Bastien Nocera <hadess@hadess.net>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: Daniele Forsi <dforsi@gmail.com>, linux-bluetooth@vger.kernel.org
+Date: Wed, 06 Apr 2011 19:05:44 +0100
+In-Reply-To: <BANLkTi=gqh3fxYipPE9CqMgV=6Qr0MkTSA@mail.gmail.com>
+References: <BANLkTikdXHstUxQ52RM6OMSnqfLWYJVMvg@mail.gmail.com>
+	 <BANLkTinQBr7Scuab_KAs_1L1UY-E9j87pw@mail.gmail.com>
+	 <BANLkTikn99GO4JV4uV64KCuka0G1QYYHpQ@mail.gmail.com>
+	 <1302100288.3227.51.camel@novo.hadess.net>
+	 <BANLkTi=gqh3fxYipPE9CqMgV=6Qr0MkTSA@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1302113146.3227.62.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
-
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-04-05 22:51:49 -0300]:
-
-> From: Anderson Briglia <anderson.briglia@openbossa.org>
+On Wed, 2011-04-06 at 19:55 +0200, David Herrmann wrote:
+<snip>
+> Exactly.
 > 
-> Minor fix in smp_conn_security function.
-> 
-> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  net/bluetooth/smp.c |    7 ++++---
->  1 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index fd9c3ff..f03513d 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -355,11 +355,12 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
->  
->  int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
->  {
-> +	struct hci_conn *hcon = conn->hcon;
->  	__u8 authreq;
->  
-> -	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, conn->hcon, sec_level);
-> +	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
->  
-> -	if (IS_ERR(conn->hcon->hdev->tfm))
-> +	if (IS_ERR(hcon->hdev->tfm))
+> I prefer my solution with dba over sba because it allows to pair the wiimote
+> without opening the backside. The only issue left with the patches is the
+> VID/PID thing. It works perfectly for me when I delete the device with
+> gnome-bluetooth and add the wiimote as new device.
 
-Merge these changes in the commits that add this code for the first time,
-patch 01 and others.
+gnome-bluetooth just calls RemoveDevice() which won't remove cached SDP
+records, resolved name, etc. for the device. Best open
+up /var/lib/bluetooth files with a text editor, and remove everything
+related to your Wiimote for testing.
 
->  		return 1;
->  
->  	switch (sec_level) {
-> @@ -378,7 +379,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
->  		return 1;
->  	}
->  
-> -	if (conn->hcon->link_mode & HCI_LM_MASTER) {
-> +	if (hcon->link_mode & HCI_LM_MASTER) {
+(or you can just nuke the directory if you don't care about pairing your
+other devices again).
 
-Same here.
+> It would be interesting to know from a bluez dev or gnome-bluetooth dev whether
+> the SDP records are always retrieved before trying to connect to a remote
+> device or whether we need to do this manually.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+The ordering of this is done by bluetoothd, and I'm pretty certain that
+the SDP records are only updated *after* pairing, as some devices might
+refuse to answer SDP requests from unpaired devices.
+
+But at that point we should already have a name for it cached (at least
+with gnome-bluetooth, which waits for the name to be resolved to allow
+you to go through the next steps).
+
+
+
