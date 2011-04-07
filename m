@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Apr 2011 18:47:18 -0300
+Date: Thu, 7 Apr 2011 15:25:14 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH] Bluetooth: Fix Out Of Band pairing when mgmt interface
- is disabled
-Message-ID: <20110407214718.GB2366@joana>
-References: <1302087719-18197-1-git-send-email-szymon.janc@tieto.com>
+To: Mark Szentes-Wanner <mark2005@szentes.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth Mighty Mouse buttons do not work
+Message-ID: <20110407182514.GA2366@joana>
+References: <201102162252.55503.mark2005@szentes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302087719-18197-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <201102162252.55503.mark2005@szentes.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Mark,
 
-* Szymon Janc <szymon.janc@tieto.com> [2011-04-06 13:01:59 +0200]:
+* Mark Szentes-Wanner <mark2005@szentes.org> [2011-02-16 22:52:54 +0100]:
 
-> Use kernel stored remote Out Of Band data only if management interface
-> is enabled. Otherwise HCI_OP_REMOTE_OOB_DATA_NEG_REPLY was sent to
-> controller even if remote Out Of Band data was present in bluetoothd.
+> Hello,
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  net/bluetooth/hci_event.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+> my Apple Wireless Mighty Mouse stopped working years ago after a 
+> kernel&userland tools upgrade. More exactly, button 1, button 2 and button 3 
+> register no klicks, the rest works perfectly. There is an extensive bug 
+> report at Ubuntu's Launchpad:
+> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/319053?comments=all
+> 
+> The bug was filed more than 2 years ago. Is it worth waiting for a solution 
+> or will it never be fixed? Is it a lack of hardware to test? (Apple 
+> discontinued the product in 2009.)
 
-Applied, thanks.
+I'm using this mouse right now (Apple modem A1197) and it is fully working for
+me. Something in the last two years fixed this bug, but I don't know what.
+I'm using 2.6.39-rc1 here.
+
+Regards,
 
 -- 
 Gustavo F. Padovan
