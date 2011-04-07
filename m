@@ -1,170 +1,224 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 1/9] Register primary services exported over basic rate
-Date: Thu,  7 Apr 2011 14:30:06 -0300
-Message-Id: <1302197414-833-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1302177682-7873-1-git-send-email-szymon.janc@tieto.com>
+References: <1302177682-7873-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 7 Apr 2011 18:48:20 +0300
+Message-ID: <BANLkTinwyumKSUXq7LZkWrABwD8Xwih5cw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Move Agent and Rejected classes from simple-agent to agent.py
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch registers the object paths for primary services exported
-through SDP. PSM, start and end handle information are available in
-the Protocol Descriptor List.
----
- src/device.c |  130 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 129 insertions(+), 1 deletions(-)
+Hi,
 
-diff --git a/src/device.c b/src/device.c
-index d567952..32eb643 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1367,6 +1367,127 @@ static void create_device_reply(struct btd_device *device, struct browse_req *re
- 	g_dbus_send_message(req->conn, reply);
- }
- 
-+static sdp_data_t *proto_seq_find(sdp_list_t *proto_list)
-+{
-+	sdp_list_t *list;
-+	uuid_t proto;
-+
-+	sdp_uuid16_create(&proto, ATT_UUID);
-+
-+	for (;list = proto_list, list; list = list->next) {
-+		sdp_list_t *p;
-+		for (p = list->data; p; p = p->next) {
-+			sdp_data_t *seq = p->data;
-+			if (seq && seq->dtd == SDP_UUID16 &&
-+				sdp_uuid16_cmp(&proto, &seq->val.uuid) == 0)
-+				return seq->next;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+static gboolean parse_proto_params(sdp_list_t *proto_list, uint16_t *psm,
-+						uint16_t *start, uint16_t *end)
-+{
-+	sdp_data_t *seq1, *seq2;
-+
-+	if (psm)
-+		*psm = sdp_get_proto_port(proto_list, L2CAP_UUID);
-+
-+	/* Getting start and end handle */
-+	seq1 = proto_seq_find(proto_list);
-+	if (!seq1 || seq1->dtd != SDP_UINT16)
-+		return FALSE;
-+
-+	seq2 = seq1->next;
-+	if (!seq2 || seq2->dtd != SDP_UINT16)
-+		return FALSE;
-+
-+	if (start)
-+		*start = seq1->val.uint16;
-+
-+	if (end)
-+		*end = seq2->val.uint16;
-+
-+	return TRUE;
-+}
-+
-+static gboolean parse_primary_record(const sdp_record_t *rec,
-+					uuid_t *prim_uuid, uint16_t *psm,
-+					uint16_t *start, uint16_t *end)
-+{
-+	sdp_list_t *list;
-+	uuid_t uuid;
-+	gboolean ret;
-+
-+	if (sdp_get_service_classes(rec, &list) < 0)
-+		return FALSE;
-+
-+	memcpy(&uuid, list->data, sizeof(uuid));
-+	sdp_list_free(list, free);
-+
-+	if (sdp_get_access_protos(rec, &list) < 0)
-+		return FALSE;
-+
-+	ret = parse_proto_params(list, psm, start, end);
-+
-+	sdp_list_foreach(list, (sdp_list_func_t) sdp_list_free, NULL);
-+	sdp_list_free(list, NULL);
-+
-+	if (ret && prim_uuid)
-+		memcpy(prim_uuid, &uuid, sizeof(uuid_t));
-+
-+	return ret;
-+}
-+
-+static GSList *primary_from_record(struct btd_device *device, GSList *profiles)
-+{
-+	GSList *l, *prim_list = NULL;
-+	char *att_uuid;
-+	uuid_t proto_uuid;
-+
-+	sdp_uuid16_create(&proto_uuid, ATT_UUID);
-+	att_uuid = bt_uuid2string(&proto_uuid);
-+
-+	for (l = profiles; l; l = l->next) {
-+		const char *profile_uuid = l->data;
-+		const sdp_record_t *rec;
-+		struct att_primary *prim;
-+		uint16_t start = 0, end = 0, psm = 0;
-+		uuid_t prim_uuid;
-+
-+		rec = btd_device_get_record(device, profile_uuid);
-+		if (!rec)
-+			continue;
-+
-+		if (!record_has_uuid(rec, att_uuid))
-+			continue;
-+
-+		if (!parse_primary_record(rec, &prim_uuid, &psm, &start, &end))
-+			continue;
-+
-+		prim = g_new0(struct att_primary, 1);
-+		prim->start = start;
-+		prim->end = end;
-+		sdp_uuid2strn(&prim_uuid, prim->uuid, sizeof(prim->uuid));
-+
-+		prim_list = g_slist_append(prim_list, prim);
-+	}
-+
-+	g_free(att_uuid);
-+
-+	return prim_list;
-+}
-+
-+static void register_primary_services(DBusConnection *conn,
-+				struct btd_device *device, GSList *prim_list)
-+{
-+	/* TODO: PSM is hardcoded */
-+	attrib_client_register(conn, device, 31, NULL, prim_list);
-+	device->primaries = g_slist_concat(device->primaries, prim_list);
-+}
-+
- static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- {
- 	struct browse_req *req = user_data;
-@@ -1396,9 +1517,16 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	}
- 
- 	/* Probe matching drivers for services added */
--	if (req->profiles_added)
-+	if (req->profiles_added) {
-+		GSList *list;
-+
- 		device_probe_drivers(device, req->profiles_added);
- 
-+		list = primary_from_record(device, req->profiles_added);
-+		if (list)
-+			register_primary_services(req->conn, device, list);
-+	}
-+
- 	/* Remove drivers for services removed */
- 	if (req->profiles_removed)
- 		device_remove_drivers(device, req->profiles_removed);
+On Thu, Apr 7, 2011 at 3:01 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Moving agent implementation to agent.py will allow to easily reuse
+> this code by other tests if needed.
+> ---
+>  .gitignore        |    1 +
+>  Makefile.tools    |    4 +-
+>  test/agent.py     |   70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  test/simple-agent |   68 +--------------------------------------------------
+>  4 files changed, 74 insertions(+), 69 deletions(-)
+>  create mode 100644 test/agent.py
+>
+> diff --git a/.gitignore b/.gitignore
+> index 2ef7cb5..1eda4d3 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -80,6 +80,7 @@ test/ipctest
+>  test/btiotest
+>  test/test-textfile
+>  test/uuidtest
+> +test/agent.pyc
+>  compat/dund
+>  compat/hidd
+>  compat/pand
+> diff --git a/Makefile.tools b/Makefile.tools
+> index f6d7b13..de45371 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -205,8 +205,8 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
+>                test/test-telephony test/test-network test/simple-agent \
+>                test/simple-service test/simple-endpoint test/test-audio \
+>                test/test-input test/test-attrib test/test-sap-server \
+> -               test/service-record.dtd test/service-did.xml test/service-spp.xml \
+> -               test/service-opp.xml test/service-ftp.xml
+> +               test/agent.py test/service-record.dtd test/service-did.xml \
+> +               test/service-spp.xml test/service-opp.xml test/service-ftp.xml
+>
+>
+>  if HIDD
+> diff --git a/test/agent.py b/test/agent.py
+> new file mode 100644
+> index 0000000..d58ddd9
+> --- /dev/null
+> +++ b/test/agent.py
+> @@ -0,0 +1,70 @@
+> +#!/usr/bin/python
+> +
+> +import dbus
+> +import dbus.service
+> +
+> +class Rejected(dbus.DBusException):
+> +       _dbus_error_name = "org.bluez.Error.Rejected"
+> +
+> +class Agent(dbus.service.Object):
+> +       exit_on_release = True
+> +
+> +       def set_exit_on_release(self, exit_on_release):
+> +               self.exit_on_release = exit_on_release
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="", out_signature="")
+> +       def Release(self):
+> +               print "Release"
+> +               if self.exit_on_release:
+> +                       mainloop.quit()
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="os", out_signature="")
+> +       def Authorize(self, device, uuid):
+> +               print "Authorize (%s, %s)" % (device, uuid)
+> +               authorize = raw_input("Authorize connection (yes/no): ")
+> +               if (authorize == "yes"):
+> +                       return
+> +               raise Rejected("Connection rejected by user")
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="o", out_signature="s")
+> +       def RequestPinCode(self, device):
+> +               print "RequestPinCode (%s)" % (device)
+> +               return raw_input("Enter PIN Code: ")
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="o", out_signature="u")
+> +       def RequestPasskey(self, device):
+> +               print "RequestPasskey (%s)" % (device)
+> +               passkey = raw_input("Enter passkey: ")
+> +               return dbus.UInt32(passkey)
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="ou", out_signature="")
+> +       def DisplayPasskey(self, device, passkey):
+> +               print "DisplayPasskey (%s, %d)" % (device, passkey)
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="ou", out_signature="")
+> +       def RequestConfirmation(self, device, passkey):
+> +               print "RequestConfirmation (%s, %d)" % (device, passkey)
+> +               confirm = raw_input("Confirm passkey (yes/no): ")
+> +               if (confirm == "yes"):
+> +                       return
+> +               raise Rejected("Passkey doesn't match")
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="s", out_signature="")
+> +       def ConfirmModeChange(self, mode):
+> +               print "ConfirmModeChange (%s)" % (mode)
+> +               authorize = raw_input("Authorize mode change (yes/no): ")
+> +               if (authorize == "yes"):
+> +                       return
+> +               raise Rejected("Mode change by user")
+> +
+> +       @dbus.service.method("org.bluez.Agent",
+> +                                       in_signature="", out_signature="")
+> +       def Cancel(self):
+> +               print "Cancel"
+> diff --git a/test/simple-agent b/test/simple-agent
+> index f2cc3dd..2cba7a3 100755
+> --- a/test/simple-agent
+> +++ b/test/simple-agent
+> @@ -3,75 +3,9 @@
+>  import gobject
+>
+>  import sys
+> -import dbus
+> -import dbus.service
+>  import dbus.mainloop.glib
+>
+> -class Rejected(dbus.DBusException):
+> -       _dbus_error_name = "org.bluez.Error.Rejected"
+> -
+> -class Agent(dbus.service.Object):
+> -       exit_on_release = True
+> -
+> -       def set_exit_on_release(self, exit_on_release):
+> -               self.exit_on_release = exit_on_release
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="", out_signature="")
+> -       def Release(self):
+> -               print "Release"
+> -               if self.exit_on_release:
+> -                       mainloop.quit()
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="os", out_signature="")
+> -       def Authorize(self, device, uuid):
+> -               print "Authorize (%s, %s)" % (device, uuid)
+> -               authorize = raw_input("Authorize connection (yes/no): ")
+> -               if (authorize == "yes"):
+> -                       return
+> -               raise Rejected("Connection rejected by user")
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="o", out_signature="s")
+> -       def RequestPinCode(self, device):
+> -               print "RequestPinCode (%s)" % (device)
+> -               return raw_input("Enter PIN Code: ")
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="o", out_signature="u")
+> -       def RequestPasskey(self, device):
+> -               print "RequestPasskey (%s)" % (device)
+> -               passkey = raw_input("Enter passkey: ")
+> -               return dbus.UInt32(passkey)
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="ou", out_signature="")
+> -       def DisplayPasskey(self, device, passkey):
+> -               print "DisplayPasskey (%s, %d)" % (device, passkey)
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="ou", out_signature="")
+> -       def RequestConfirmation(self, device, passkey):
+> -               print "RequestConfirmation (%s, %d)" % (device, passkey)
+> -               confirm = raw_input("Confirm passkey (yes/no): ")
+> -               if (confirm == "yes"):
+> -                       return
+> -               raise Rejected("Passkey doesn't match")
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="s", out_signature="")
+> -       def ConfirmModeChange(self, mode):
+> -               print "ConfirmModeChange (%s)" % (mode)
+> -               authorize = raw_input("Authorize mode change (yes/no): ")
+> -               if (authorize == "yes"):
+> -                       return
+> -               raise Rejected("Mode change by user")
+> -
+> -       @dbus.service.method("org.bluez.Agent",
+> -                                       in_signature="", out_signature="")
+> -       def Cancel(self):
+> -               print "Cancel"
+> +from agent import *
+>
+>  def create_device_reply(device):
+>        print "New device (%s)" % (device)
+> --
+
+Im not sure if this is a good idea, in a single file it is easier to
+copy this script around, also depending how this is installed it can
+break simple-agent or make somebody to start using it agent as a
+dependency in some other tool as some kind of python API so perhaps it
+is better to just copy the code that you want from it.
+
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
+Computer Engineer
