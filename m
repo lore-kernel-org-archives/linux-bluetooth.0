@@ -1,93 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg Kroah-Hartman <gregkh@suse.de>,
-	<devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH v4] Add ST-Ericsson CG2900 driver
-Date: Thu, 7 Apr 2011 12:58:28 +0200
-Message-ID: <1302173908-25326-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
+To: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
+	"dwmw2@infradead.org" <dwmw2@infradead.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Shanmugamkamatchi Balashanmugam
+	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
+Date: Thu, 7 Apr 2011 15:28:37 +0530
+Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
+Message-ID: <44EE5C37ADC36343B0625A05DD408C4850EF09CA00@CHEXMB-01.global.atheros.com>
+References: <1301649288-3315-1-git-send-email-jkumar@atheros.com> 
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a driver for the ST-Ericsson CG2900 connectivity controller.
-It has earlier been tried to add this driver to the mfd and bluetooth areas,
-but due to continued discussions the driver is placed into staging for the moment.
+Hi David,
 
-Compared to v3 this patch has the following update:
- - Kconfig: Removed selecting BT and BTHCIUART when CG2900_UART is enabled.
-   It now depends on BT instead.
+-----Original Message-----
+>From: Jothikumar Mothilal 
+>Sent: Monday, April 04, 2011 12:29 PM
+>To: Jothikumar Mothilal; dwmw2@infradead.org
+>Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam
+>Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
 
-Par-Gunnar Hjalmdahl (1):
-  staging: Add ST-Ericsson CG2900 driver
+>Hi David,
 
- drivers/staging/Kconfig                          |    2 +
- drivers/staging/Makefile                         |    1 +
- drivers/staging/cg2900/Kconfig                   |   70 +
- drivers/staging/cg2900/Makefile                  |   12 +
- drivers/staging/cg2900/TODO                      |   23 +
- drivers/staging/cg2900/bluetooth/Makefile        |    9 +
- drivers/staging/cg2900/bluetooth/btcg2900.c      | 1203 ++++++++
- drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
- drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  657 ++++
- drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
- drivers/staging/cg2900/board-mop500-cg2900.c     |  204 ++
- drivers/staging/cg2900/devices-cg2900.c          |  342 +++
- drivers/staging/cg2900/devices-cg2900.h          |   31 +
- drivers/staging/cg2900/include/cg2900.h          |  278 ++
- drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
- drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
- drivers/staging/cg2900/mfd/Makefile              |   18 +
- drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_char_devices.c |  701 +++++
- drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
- drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
- drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
- drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
- drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
- drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
- drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
- drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
- 28 files changed, 16920 insertions(+), 0 deletions(-)
- create mode 100644 drivers/staging/cg2900/Kconfig
- create mode 100644 drivers/staging/cg2900/Makefile
- create mode 100644 drivers/staging/cg2900/TODO
- create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
- create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
- create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
- create mode 100644 drivers/staging/cg2900/board-mop500-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
- create mode 100644 drivers/staging/cg2900/mfd/Makefile
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
+-----Original Message-----
+From: Jothikumar Mothilal 
+Sent: Friday, April 01, 2011 2:45 PM
+To: dwmw2@infradead.org
+Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam; Jothikumar Mothilal
+>Subject: [PATCH] linux-firmware: Add patch and sysconfig files
 
--- 
-1.7.4.3
+>Added files for AR3012 version 2.2
+
+>Signed-off-by: Jothikumar Mothilal <jkumar@atheros.com>
+>---
+> WHENCE                       |    2 ++
+> ar3k/AthrBT_0x01020200.dfu   |  Bin 0 -> 40596 bytes
+> ar3k/ramps_0x01020200_26.dfu |  Bin 0 -> 1262 bytes
+> 3 files changed, 2 insertions(+), 0 deletions(-)
+> create mode 100644 ar3k/AthrBT_0x01020200.dfu
+ >create mode 100644 ar3k/ramps_0x01020200_26.dfu
+
+>diff --git a/WHENCE b/WHENCE
+>index 6632b85..f6a0ec1 100644
+>--- a/WHENCE
+>+++ b/WHENCE
+>@@ -1555,6 +1555,8 @@ Driver: DFU Driver for Atheros bluetooth chipset AR3012
+ 
+> File: ar3k/AthrBT_0x01020001.dfu
+> File: ar3k/ramps_0x01020001_26.dfu
+>+File: ar3k/AthrBT_0x01020200.dfu
+>+File: ar3k/ramps_0x01020200_26.dfu
+ 
+ >Licence: Redistributable. See LICENCE.atheros_firmware for details
+ 
+>diff --git a/ar3k/AthrBT_0x01020200.dfu b/ar3k/AthrBT_0x01020200.dfu
+>new file mode 100644
+
+> literal 0
+>HcmV?d00001
+
+> -- 
+> 1.6.3.3
+
+>Can you please push this firmware patch upstream if you have no comments.
+
+Did you get a chance to push this firmware patch upstream?
+
+Thanks,
+Jothi
