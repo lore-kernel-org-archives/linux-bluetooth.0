@@ -1,224 +1,197 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 7 Apr 2011 11:48:32 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth-next 10/15] Bluetooth: Add support for resuming
+ socket when SMP is finished
+Message-ID: <20110407144832.GA29191@piper>
+References: <1302054716-24534-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1302054716-24534-11-git-send-email-vinicius.gomes@openbossa.org>
+ <20110407001100.GE2228@joana>
 MIME-Version: 1.0
-In-Reply-To: <1302177682-7873-1-git-send-email-szymon.janc@tieto.com>
-References: <1302177682-7873-1-git-send-email-szymon.janc@tieto.com>
-Date: Thu, 7 Apr 2011 18:48:20 +0300
-Message-ID: <BANLkTinwyumKSUXq7LZkWrABwD8Xwih5cw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Move Agent and Rejected classes from simple-agent to agent.py
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110407001100.GE2228@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-On Thu, Apr 7, 2011 at 3:01 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Moving agent implementation to agent.py will allow to easily reuse
-> this code by other tests if needed.
-> ---
->  .gitignore        |    1 +
->  Makefile.tools    |    4 +-
->  test/agent.py     |   70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  test/simple-agent |   68 +--------------------------------------------------
->  4 files changed, 74 insertions(+), 69 deletions(-)
->  create mode 100644 test/agent.py
->
-> diff --git a/.gitignore b/.gitignore
-> index 2ef7cb5..1eda4d3 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -80,6 +80,7 @@ test/ipctest
->  test/btiotest
->  test/test-textfile
->  test/uuidtest
-> +test/agent.pyc
->  compat/dund
->  compat/hidd
->  compat/pand
-> diff --git a/Makefile.tools b/Makefile.tools
-> index f6d7b13..de45371 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -205,8 +205,8 @@ EXTRA_DIST += test/apitest test/sap-client test/hsplay test/hsmicro \
->                test/test-telephony test/test-network test/simple-agent \
->                test/simple-service test/simple-endpoint test/test-audio \
->                test/test-input test/test-attrib test/test-sap-server \
-> -               test/service-record.dtd test/service-did.xml test/service-spp.xml \
-> -               test/service-opp.xml test/service-ftp.xml
-> +               test/agent.py test/service-record.dtd test/service-did.xml \
-> +               test/service-spp.xml test/service-opp.xml test/service-ftp.xml
->
->
->  if HIDD
-> diff --git a/test/agent.py b/test/agent.py
-> new file mode 100644
-> index 0000000..d58ddd9
-> --- /dev/null
-> +++ b/test/agent.py
-> @@ -0,0 +1,70 @@
-> +#!/usr/bin/python
-> +
-> +import dbus
-> +import dbus.service
-> +
-> +class Rejected(dbus.DBusException):
-> +       _dbus_error_name = "org.bluez.Error.Rejected"
-> +
-> +class Agent(dbus.service.Object):
-> +       exit_on_release = True
-> +
-> +       def set_exit_on_release(self, exit_on_release):
-> +               self.exit_on_release = exit_on_release
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="", out_signature="")
-> +       def Release(self):
-> +               print "Release"
-> +               if self.exit_on_release:
-> +                       mainloop.quit()
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="os", out_signature="")
-> +       def Authorize(self, device, uuid):
-> +               print "Authorize (%s, %s)" % (device, uuid)
-> +               authorize = raw_input("Authorize connection (yes/no): ")
-> +               if (authorize == "yes"):
-> +                       return
-> +               raise Rejected("Connection rejected by user")
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="o", out_signature="s")
-> +       def RequestPinCode(self, device):
-> +               print "RequestPinCode (%s)" % (device)
-> +               return raw_input("Enter PIN Code: ")
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="o", out_signature="u")
-> +       def RequestPasskey(self, device):
-> +               print "RequestPasskey (%s)" % (device)
-> +               passkey = raw_input("Enter passkey: ")
-> +               return dbus.UInt32(passkey)
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="ou", out_signature="")
-> +       def DisplayPasskey(self, device, passkey):
-> +               print "DisplayPasskey (%s, %d)" % (device, passkey)
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="ou", out_signature="")
-> +       def RequestConfirmation(self, device, passkey):
-> +               print "RequestConfirmation (%s, %d)" % (device, passkey)
-> +               confirm = raw_input("Confirm passkey (yes/no): ")
-> +               if (confirm == "yes"):
-> +                       return
-> +               raise Rejected("Passkey doesn't match")
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="s", out_signature="")
-> +       def ConfirmModeChange(self, mode):
-> +               print "ConfirmModeChange (%s)" % (mode)
-> +               authorize = raw_input("Authorize mode change (yes/no): ")
-> +               if (authorize == "yes"):
-> +                       return
-> +               raise Rejected("Mode change by user")
-> +
-> +       @dbus.service.method("org.bluez.Agent",
-> +                                       in_signature="", out_signature="")
-> +       def Cancel(self):
-> +               print "Cancel"
-> diff --git a/test/simple-agent b/test/simple-agent
-> index f2cc3dd..2cba7a3 100755
-> --- a/test/simple-agent
-> +++ b/test/simple-agent
-> @@ -3,75 +3,9 @@
->  import gobject
->
->  import sys
-> -import dbus
-> -import dbus.service
->  import dbus.mainloop.glib
->
-> -class Rejected(dbus.DBusException):
-> -       _dbus_error_name = "org.bluez.Error.Rejected"
-> -
-> -class Agent(dbus.service.Object):
-> -       exit_on_release = True
-> -
-> -       def set_exit_on_release(self, exit_on_release):
-> -               self.exit_on_release = exit_on_release
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="", out_signature="")
-> -       def Release(self):
-> -               print "Release"
-> -               if self.exit_on_release:
-> -                       mainloop.quit()
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="os", out_signature="")
-> -       def Authorize(self, device, uuid):
-> -               print "Authorize (%s, %s)" % (device, uuid)
-> -               authorize = raw_input("Authorize connection (yes/no): ")
-> -               if (authorize == "yes"):
-> -                       return
-> -               raise Rejected("Connection rejected by user")
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="o", out_signature="s")
-> -       def RequestPinCode(self, device):
-> -               print "RequestPinCode (%s)" % (device)
-> -               return raw_input("Enter PIN Code: ")
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="o", out_signature="u")
-> -       def RequestPasskey(self, device):
-> -               print "RequestPasskey (%s)" % (device)
-> -               passkey = raw_input("Enter passkey: ")
-> -               return dbus.UInt32(passkey)
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="ou", out_signature="")
-> -       def DisplayPasskey(self, device, passkey):
-> -               print "DisplayPasskey (%s, %d)" % (device, passkey)
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="ou", out_signature="")
-> -       def RequestConfirmation(self, device, passkey):
-> -               print "RequestConfirmation (%s, %d)" % (device, passkey)
-> -               confirm = raw_input("Confirm passkey (yes/no): ")
-> -               if (confirm == "yes"):
-> -                       return
-> -               raise Rejected("Passkey doesn't match")
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="s", out_signature="")
-> -       def ConfirmModeChange(self, mode):
-> -               print "ConfirmModeChange (%s)" % (mode)
-> -               authorize = raw_input("Authorize mode change (yes/no): ")
-> -               if (authorize == "yes"):
-> -                       return
-> -               raise Rejected("Mode change by user")
-> -
-> -       @dbus.service.method("org.bluez.Agent",
-> -                                       in_signature="", out_signature="")
-> -       def Cancel(self):
-> -               print "Cancel"
-> +from agent import *
->
->  def create_device_reply(device):
->        print "New device (%s)" % (device)
-> --
+On 21:11 Wed 06 Apr, Gustavo F. Padovan wrote:
+> Hi Vinicius,
+> 
+> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-04-05 22:51:51 -0300]:
+> 
+> > This adds support for resuming the user space traffic when SMP
+> > negotiation is complete.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   61 ++++++++++++++++++++++---------------------
+> >  net/bluetooth/l2cap_sock.c |   16 +++++++++++
+> >  net/bluetooth/smp.c        |   40 ++++++++++++++++++++--------
+> >  3 files changed, 75 insertions(+), 42 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 0cec292..a5062f14 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -665,6 +665,22 @@ clean:
+> >  	bh_unlock_sock(parent);
+> >  }
+> >  
+> > +static void l2cap_chan_ready(struct sock *sk)
+> > +{
+> > +	struct sock *parent = bt_sk(sk)->parent;
+> > +
+> > +	BT_DBG("sk %p, parent %p", sk, parent);
+> > +
+> > +	l2cap_pi(sk)->conf_state = 0;
+> > +	l2cap_sock_clear_timer(sk);
+> > +
+> > +	sk->sk_state = BT_CONNECTED;
+> > +	sk->sk_state_change(sk);
+> > +
+> > +	if (parent)
+> > +		parent->sk_data_ready(parent, 0);
+> > +}
+> > +
+> >  static void l2cap_conn_ready(struct l2cap_conn *conn)
+> >  {
+> >  	struct l2cap_chan_list *l = &conn->chan_list;
+> > @@ -680,15 +696,11 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+> >  	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+> >  		bh_lock_sock(sk);
+> >  
+> > -		if (conn->hcon->type == LE_LINK) {
+> > -			l2cap_sock_clear_timer(sk);
+> > -			sk->sk_state = BT_CONNECTED;
+> > -			sk->sk_state_change(sk);
+> > +		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> >  			if (smp_conn_security(conn, l2cap_pi(sk)->sec_level))
+> > -				BT_DBG("Insufficient security");
+> > -		}
+> > +				l2cap_chan_ready(sk);
+> >  
+> > -		if (sk->sk_type != SOCK_SEQPACKET &&
+> > +		} else if (sk->sk_type != SOCK_SEQPACKET &&
+> >  				sk->sk_type != SOCK_STREAM) {
+> >  			l2cap_sock_clear_timer(sk);
+> >  			sk->sk_state = BT_CONNECTED;
+> > @@ -1362,29 +1374,6 @@ int l2cap_sar_segment_sdu(struct sock *sk, struct msghdr *msg, size_t len)
+> >  	return size;
+> >  }
+> >  
+> > -static void l2cap_chan_ready(struct sock *sk)
+> > -{
+> > -	struct sock *parent = bt_sk(sk)->parent;
+> > -
+> > -	BT_DBG("sk %p, parent %p", sk, parent);
+> > -
+> > -	l2cap_pi(sk)->conf_state = 0;
+> > -	l2cap_sock_clear_timer(sk);
+> > -
+> > -	if (!parent) {
+> > -		/* Outgoing channel.
+> > -		 * Wake up socket sleeping on connect.
+> > -		 */
+> > -		sk->sk_state = BT_CONNECTED;
+> > -		sk->sk_state_change(sk);
+> > -	} else {
+> > -		/* Incoming channel.
+> > -		 * Wake up socket sleeping on accept.
+> > -		 */
+> > -		parent->sk_data_ready(parent, 0);
+> > -	}
+> > -}
+> > -
+> >  /* Copy frame to all raw sockets on that connection */
+> >  static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+> >  {
+> > @@ -3810,6 +3799,18 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+> >  	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+> >  		bh_lock_sock(sk);
+> >  
+> > +		BT_DBG("sk->scid %d", l2cap_pi(sk)->scid);
+> > +
+> > +		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> > +			if (!status && encrypt) {
+> > +				l2cap_pi(sk)->sec_level = hcon->sec_level;
+> > +				l2cap_chan_ready(sk);
+> > +			}
+> > +
+> > +			bh_unlock_sock(sk);
+> > +			continue;
+> > +		}
+> > +
+> >  		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND) {
+> >  			bh_unlock_sock(sk);
+> >  			continue;
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index f77308e..14e491a 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -29,6 +29,7 @@
+> >  #include <net/bluetooth/bluetooth.h>
+> >  #include <net/bluetooth/hci_core.h>
+> >  #include <net/bluetooth/l2cap.h>
+> > +#include <net/bluetooth/smp.h>
+> >  
+> >  /* ---- L2CAP timers ---- */
+> >  static void l2cap_sock_timeout(unsigned long arg)
+> > @@ -614,6 +615,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> >  {
+> >  	struct sock *sk = sock->sk;
+> >  	struct bt_security sec;
+> > +	struct l2cap_conn *conn;
+> >  	int len, err = 0;
+> >  	u32 opt;
+> >  
+> > @@ -650,6 +652,20 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> >  		}
+> >  
+> >  		l2cap_pi(sk)->sec_level = sec.level;
+> > +
+> > +		conn = l2cap_pi(sk)->conn;
+> > +		if (conn && l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> > +			if (!conn->hcon->out) {
+> > +				err = -EINVAL;
+> > +				break;
+> > +			}
+> > +
+> > +			if (smp_conn_security(conn, sec.level))
+> > +				break;
+> > +
+> > +			err = 0;
+> > +			sk->sk_state = BT_CONFIG;
+> > +		}
+> 
+> I don't like the idea of bring SMP stuff to l2cap_sock.c, we are working now
+> to clean up that file and keep only socket related stuff there, and only
+> channel related stuff in l2cap_core.c. I've already sent a patchset on that
+> direction to mailing list. However, I don't have any idea now on how to remove
+> smp_conn_security() from here.
 
-Im not sure if this is a good idea, in a single file it is easier to
-copy this script around, also depending how this is installed it can
-break simple-agent or make somebody to start using it agent as a
-dependency in some other tool as some kind of python API so perhaps it
-is better to just copy the code that you want from it.
+I understand, but I guess that in order to solve some problems there will be 
+need for having some points of contact between those parts.
 
+For this security case, one solution is having some kind of mechanism that
+checks if the security level of the link/channel attends the security level
+requested by the socket. And, in principle, this could even work for BR/EDR
+links.
+
+Another thing, is that in the LE case the MTU is negotiated over GATT, so
+in our architecture, if we want to support this there will be need for
+changing MTU from userspace, most probably setting one socket option.
+
+I think that these are the examples I have against keeping the channel 
+and the socket *totally* isolated from each other.
+
+> 
+> -- 
+> Gustavo F. Padovan
+> http://profusion.mobi
+
+
+Cheers,
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Vinicius
