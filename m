@@ -1,41 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 7 Apr 2011 18:48:49 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Jiejing Zhang <kzjeef@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	Jiejing Zhang <jiejing.zhang@freescale.com>
+Subject: Re: [PATCH] Bluetooth: hci_uart: check the return value of recv()
+Message-ID: <20110407214849.GC2366@joana>
+References: <1302179826-15745-1-git-send-email-kzjeef@gmail.com>
 MIME-Version: 1.0
-Subject: HDP, can't read data from fd which Acquire from HealthChannel
-Message-ID: <OF2953F661.C5E1B3A9-ON4825786C.000D1F6C-4825786C.000D35E6@cn.ibm.com>
-From: Yi Hui Fan <yihuifan@cn.ibm.com>
-Date: Fri, 8 Apr 2011 10:24:01 +0800
-Content-Type: text/plain; charset="US-ASCII"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1302179826-15745-1-git-send-email-kzjeef@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dears
+Hi Jiejing,
 
-I'd like to build a demo for HDP sink. I try to use the DBUS API provided 
-by Bluez. But there is a problem with unix fd to receive data.
+* Jiejing Zhang <kzjeef@gmail.com> [2011-04-07 20:37:06 +0800]:
 
-I can get fd by calling HealthChannel.Acquire method.  following is the 
-code I write to read data according the sock I got.
+> Check the return value of hu->proto->recv() in hci_uart_tty_receive()
+> the recv() may return error, check it, not add this to statistics.
+> 
+> Signed-off-by: Jiejing Zhang <jiejing.zhang@freescale.com>
+> ---
+>  drivers/bluetooth/hci_ath.c   |    6 +++++-
+>  drivers/bluetooth/hci_ldisc.c |    6 ++++--
+>  2 files changed, 9 insertions(+), 3 deletions(-)
 
-        fd_set rfds;
-        struct timeval tv;
-        int rv;
-        char buff[1024];
+Patch has been applied. Thanks.
 
-        FD_ZERO(&rfds);
-        FD_SET(sock, &rfds);
-        tv.tv_sec = 10;
-        tv.tv_usec = 500;
-
-        rv = select(sock+1, &rfds, NULL, NULL, &tv);
-
-        rv = recv(sock, buff, 1024, 0);
-
-rv is always return 0 when I call select method. I can't get anything.
-
-Any problem with these codes?
-
-Thanks &
-Best regards,
-
-Yihui,Fan
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
