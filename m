@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Fix unconditional call to mgmt interface in hci_event.c
-Date: Thu, 7 Apr 2011 08:26:36 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "par-gunnar.p.hjalmdahl@stericsson.com" <par-gunnar.p.hjalmdahl@stericsson.com>,
- "henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
-References: <1302087740-18244-1-git-send-email-szymon.janc@tieto.com> <1302098907.2572.174.camel@aeonflux>
-In-Reply-To: <1302098907.2572.174.camel@aeonflux>
+Date: Wed, 6 Apr 2011 21:32:32 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [bluetooth-next 14/15] Bluetooth: Add support for SMP timeout
+Message-ID: <20110407003232.GA28257@piper>
+References: <1302054716-24534-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1302054716-24534-15-git-send-email-vinicius.gomes@openbossa.org>
+ <20110407001418.GF2228@joana>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201104070826.36505.szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110407001418.GF2228@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi Szymon,
+Hi Gustavo,
 
-Hi Marcel,
-
-> please just exit the function if flag is not set:
+On 21:14 Wed 06 Apr, Gustavo F. Padovan wrote:
+> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-04-05 22:51:55 -0300]:
 > 
-> 	if (!test_bit(...))
-> 		return
+> > This patch adds support for disconnecting the link when SMP procedure
+> > takes more than 30 seconds.
 > 
-> > -	mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
-> > +	if (test_bit(HCI_MGMT, &hdev->flags))
-> > +		mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
-> >  						rp->randomizer, rp->status);
-> >  }
+> As this is a SMP procedure, doesn't make more sense put this timer in SMP
+> code? It does not fit quite well to me in l2cap.
 
-Other hci_cc_*_reply functions do
-    if (test_bit(..))
-        mgmt_call();
+The only reason is that SMP code isn't able to tell that the pairing
+finished or not. We only can tell that the pairing finished when we receive
+the Encryption Changed HCI event or the connection is terminated.
 
-I'd prefer to keep the same convention for all of them.
+And I don't think that SMP code has to be informed of any of these conditions.
 
-BR,
-Szymon Janc
+> 
+> -- 
+> Gustavo F. Padovan
+> http://profusion.mobi
+
+Cheers,
+-- 
+Vinicius
