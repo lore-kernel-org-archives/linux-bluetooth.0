@@ -2,68 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 4/9] Move the primary service storage code to a local function
-Date: Thu,  7 Apr 2011 14:30:09 -0300
-Message-Id: <1302197414-833-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH 3/9] Remove btd_device_add_service function
+Date: Thu,  7 Apr 2011 14:30:08 -0300
+Message-Id: <1302197414-833-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1302197414-833-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1302197414-833-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+btd_device_add_service is no longer necessary if the object paths for
+the primary services can be returned during the registration.
 ---
- src/device.c |   27 ++++++++++++++++-----------
- 1 files changed, 16 insertions(+), 11 deletions(-)
+ attrib/client.c |   16 ++++++++--------
+ attrib/client.h |    2 +-
+ src/device.c    |   11 ++---------
+ src/device.h    |    1 -
+ 4 files changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index d1ed05a..eecaee0 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1636,14 +1636,26 @@ static char *primary_list_to_string(GSList *primary_list)
- 	return g_string_free(services, FALSE);
+diff --git a/attrib/client.c b/attrib/client.c
+index 28e5704..2dd70c9 100644
+--- a/attrib/client.c
++++ b/attrib/client.c
+@@ -1020,11 +1020,11 @@ static GDBusMethodTable prim_methods[] = {
+ 	{ }
+ };
+ 
+-static void register_primaries(struct gatt_service *gatt, GSList *primaries)
++static GSList *register_primaries(struct gatt_service *gatt, GSList *primaries)
+ {
+-	GSList *l;
++	GSList *l, *paths;
+ 
+-	for (l = primaries; l; l = l->next) {
++	for (paths = NULL, l = primaries; l; l = l->next) {
+ 		struct att_primary *att = l->data;
+ 		struct primary *prim;
+ 
+@@ -1040,12 +1040,14 @@ static void register_primaries(struct gatt_service *gatt, GSList *primaries)
+ 		DBG("Registered: %s", prim->path);
+ 
+ 		gatt->primary = g_slist_append(gatt->primary, prim);
+-		btd_device_add_service(gatt->dev, prim->path);
++		paths = g_slist_append(paths, g_strdup(prim->path));
+ 		load_characteristics(prim, gatt);
+ 	}
++
++	return paths;
  }
  
-+static void store_services(struct btd_device *device)
-+{
-+	struct btd_adapter *adapter = device->adapter;
-+	bdaddr_t dba, sba;
-+	char *str = primary_list_to_string(device->services);
-+
-+	adapter_get_address(adapter, &sba);
-+	device_get_address(device, &dba);
-+
-+	write_device_type(&sba, &dba, device->type);
-+	write_device_services(&sba, &dba, str);
-+
-+	g_free(str);
-+}
-+
- static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+-int attrib_client_register(DBusConnection *connection,
++GSList *attrib_client_register(DBusConnection *connection,
+ 					struct btd_device *device, int psm,
+ 					GAttrib *attrib, GSList *primaries)
  {
- 	struct browse_req *req = user_data;
- 	struct btd_device *device = req->device;
--	struct btd_adapter *adapter = device->adapter;
- 	GSList *l, *uuids = NULL;
--	bdaddr_t dba, sba;
--	char *str;
+@@ -1069,11 +1071,9 @@ int attrib_client_register(DBusConnection *connection,
+ 	if (attrib)
+ 		gatt->attrib = g_attrib_ref(attrib);
  
- 	if (status) {
- 		DBusMessage *reply;
-@@ -1668,14 +1680,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
- 
- 	create_device_reply(device, req);
- 
--	str = primary_list_to_string(services);
+-	register_primaries(gatt, primaries);
 -
--	adapter_get_address(adapter, &sba);
--	device_get_address(device, &dba);
--
--	write_device_type(&sba, &dba, device->type);
--	write_device_services(&sba, &dba, str);
--	g_free(str);
-+	store_services(device);
+ 	gatt_services = g_slist_append(gatt_services, gatt);
  
- done:
- 	device->browse = NULL;
+-	return 0;
++	return register_primaries(gatt, primaries);
+ }
+ 
+ void attrib_client_unregister(struct btd_device *device)
+diff --git a/attrib/client.h b/attrib/client.h
+index b4a4ecc..b29797c 100644
+--- a/attrib/client.h
++++ b/attrib/client.h
+@@ -22,7 +22,7 @@
+  *
+  */
+ 
+-int attrib_client_register(DBusConnection *connection,
++GSList *attrib_client_register(DBusConnection *connection,
+ 					struct btd_device *device, int psm,
+ 					GAttrib *attrib, GSList *primaries);
+ void attrib_client_unregister(struct btd_device *device);
+diff --git a/src/device.c b/src/device.c
+index b6750b6..d1ed05a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2410,18 +2410,11 @@ void device_set_authorizing(struct btd_device *device, gboolean auth)
+ 	device->authorizing = auth;
+ }
+ 
+-void btd_device_add_service(struct btd_device *device, const char *path)
+-{
+-	if (g_slist_find_custom(device->services, path, (GCompareFunc) strcmp))
+-		return;
+-
+-	device->services = g_slist_append(device->services, g_strdup(path));
+-}
+-
+ void device_register_services(DBusConnection *conn, struct btd_device *device,
+ 						GSList *prim_list, int psm)
+ {
+-	attrib_client_register(conn, device, psm, NULL, prim_list);
++	device->services = attrib_client_register(conn, device, psm, NULL,
++								prim_list);
+ 	device->primaries = g_slist_concat(device->primaries, prim_list);
+ }
+ 
+diff --git a/src/device.h b/src/device.h
+index 285364f..2432884 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -56,7 +56,6 @@ void device_probe_drivers(struct btd_device *device, GSList *profiles);
+ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+ 						const char *uuid);
+ GSList *btd_device_get_primaries(struct btd_device *device);
+-void btd_device_add_service(struct btd_device *device, const char *path);
+ void device_register_services(DBusConnection *conn, struct btd_device *device,
+ 						GSList *prim_list, int psm);
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid);
 -- 
 1.7.4.1
 
