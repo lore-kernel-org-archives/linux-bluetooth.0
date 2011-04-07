@@ -1,73 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>
-To: Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	"dwmw2@infradead.org" <dwmw2@infradead.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Shanmugamkamatchi Balashanmugam
-	<Shanmugamkamatchi.Balashanmugam@Atheros.com>
-Date: Thu, 7 Apr 2011 15:28:37 +0530
-Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
-Message-ID: <44EE5C37ADC36343B0625A05DD408C4850EF09CA00@CHEXMB-01.global.atheros.com>
-References: <1301649288-3315-1-git-send-email-jkumar@atheros.com> 
-Content-Type: text/plain; charset="us-ascii"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Fix unconditional call to mgmt interface in hci_event.c
+Date: Thu, 7 Apr 2011 08:26:36 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ "par-gunnar.p.hjalmdahl@stericsson.com" <par-gunnar.p.hjalmdahl@stericsson.com>,
+ "henrik.possung@stericsson.com" <henrik.possung@stericsson.com>
+References: <1302087740-18244-1-git-send-email-szymon.janc@tieto.com> <1302098907.2572.174.camel@aeonflux>
+In-Reply-To: <1302098907.2572.174.camel@aeonflux>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201104070826.36505.szymon.janc@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+> Hi Szymon,
 
------Original Message-----
->From: Jothikumar Mothilal 
->Sent: Monday, April 04, 2011 12:29 PM
->To: Jothikumar Mothilal; dwmw2@infradead.org
->Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam
->Subject: RE: [PATCH] linux-firmware: Add patch and sysconfig files
+Hi Marcel,
 
->Hi David,
+> please just exit the function if flag is not set:
+> 
+> 	if (!test_bit(...))
+> 		return
+> 
+> > -	mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
+> > +	if (test_bit(HCI_MGMT, &hdev->flags))
+> > +		mgmt_read_local_oob_data_reply_complete(hdev->id, rp->hash,
+> >  						rp->randomizer, rp->status);
+> >  }
 
------Original Message-----
-From: Jothikumar Mothilal 
-Sent: Friday, April 01, 2011 2:45 PM
-To: dwmw2@infradead.org
-Cc: linux-bluetooth@vger.kernel.org; Shanmugamkamatchi Balashanmugam; Jothikumar Mothilal
->Subject: [PATCH] linux-firmware: Add patch and sysconfig files
+Other hci_cc_*_reply functions do
+    if (test_bit(..))
+        mgmt_call();
 
->Added files for AR3012 version 2.2
+I'd prefer to keep the same convention for all of them.
 
->Signed-off-by: Jothikumar Mothilal <jkumar@atheros.com>
->---
-> WHENCE                       |    2 ++
-> ar3k/AthrBT_0x01020200.dfu   |  Bin 0 -> 40596 bytes
-> ar3k/ramps_0x01020200_26.dfu |  Bin 0 -> 1262 bytes
-> 3 files changed, 2 insertions(+), 0 deletions(-)
-> create mode 100644 ar3k/AthrBT_0x01020200.dfu
- >create mode 100644 ar3k/ramps_0x01020200_26.dfu
-
->diff --git a/WHENCE b/WHENCE
->index 6632b85..f6a0ec1 100644
->--- a/WHENCE
->+++ b/WHENCE
->@@ -1555,6 +1555,8 @@ Driver: DFU Driver for Atheros bluetooth chipset AR3012
- 
-> File: ar3k/AthrBT_0x01020001.dfu
-> File: ar3k/ramps_0x01020001_26.dfu
->+File: ar3k/AthrBT_0x01020200.dfu
->+File: ar3k/ramps_0x01020200_26.dfu
- 
- >Licence: Redistributable. See LICENCE.atheros_firmware for details
- 
->diff --git a/ar3k/AthrBT_0x01020200.dfu b/ar3k/AthrBT_0x01020200.dfu
->new file mode 100644
-
-> literal 0
->HcmV?d00001
-
-> -- 
-> 1.6.3.3
-
->Can you please push this firmware patch upstream if you have no comments.
-
-Did you get a chance to push this firmware patch upstream?
-
-Thanks,
-Jothi
+BR,
+Szymon Janc
