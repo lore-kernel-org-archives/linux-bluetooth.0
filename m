@@ -1,32 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 7 Apr 2011 18:48:49 -0300
+Date: Thu, 7 Apr 2011 18:47:18 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jiejing Zhang <kzjeef@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	Jiejing Zhang <jiejing.zhang@freescale.com>
-Subject: Re: [PATCH] Bluetooth: hci_uart: check the return value of recv()
-Message-ID: <20110407214849.GC2366@joana>
-References: <1302179826-15745-1-git-send-email-kzjeef@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH] Bluetooth: Fix Out Of Band pairing when mgmt interface
+ is disabled
+Message-ID: <20110407214718.GB2366@joana>
+References: <1302087719-18197-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302179826-15745-1-git-send-email-kzjeef@gmail.com>
+In-Reply-To: <1302087719-18197-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiejing,
+Hi Szymon,
 
-* Jiejing Zhang <kzjeef@gmail.com> [2011-04-07 20:37:06 +0800]:
+* Szymon Janc <szymon.janc@tieto.com> [2011-04-06 13:01:59 +0200]:
 
-> Check the return value of hu->proto->recv() in hci_uart_tty_receive()
-> the recv() may return error, check it, not add this to statistics.
+> Use kernel stored remote Out Of Band data only if management interface
+> is enabled. Otherwise HCI_OP_REMOTE_OOB_DATA_NEG_REPLY was sent to
+> controller even if remote Out Of Band data was present in bluetoothd.
 > 
-> Signed-off-by: Jiejing Zhang <jiejing.zhang@freescale.com>
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 > ---
->  drivers/bluetooth/hci_ath.c   |    6 +++++-
->  drivers/bluetooth/hci_ldisc.c |    6 ++++--
->  2 files changed, 9 insertions(+), 3 deletions(-)
+>  net/bluetooth/hci_event.c |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
 
-Patch has been applied. Thanks.
+Applied, thanks.
 
 -- 
 Gustavo F. Padovan
