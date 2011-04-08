@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: vinicius.gomes@openbossa.org
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Bluetooth: Fix keeping the command timer running
-Date: Fri,  8 Apr 2011 21:08:27 -0300
-Message-Id: <4d9fa361.1836640a.6de8.ffffbffe@mx.google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Keith Packard <keithp@keithp.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: 2.6.39-rc2 regression: X201s fails to resume b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
+In-Reply-To: <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
+References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6> <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
+Date: Fri, 08 Apr 2011 16:13:28 -0700
+Message-ID: <yunaag0tjzb.fsf@aiko.keithp.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+--=-=-=
+Content-Transfer-Encoding: quoted-printable
 
-In the teardown path the reset command is sent to the controller,
-this event causes the command timer to be reactivated.
+On Fri, 8 Apr 2011 23:44:51 +0200 (CEST), Thomas Gleixner <tglx@linutronix.=
+de> wrote:
 
-Now we remove the timer after the reset command is sent.
+> Can the bluetooth folks please have a look at that ASAP? The obvious
+> fast fix for Linus tree is to revert the second hunk for now, but this
+> needs to be fixed proper.
 
-Reported-by: Keith Packard <keithp@keithp.com>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/hci_core.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+Who will submit this patch? I'd rather have your name on it so that
+people come complain at you...
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a80bc1c..7467eaa 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -586,9 +586,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	hci_req_cancel(hdev, ENODEV);
- 	hci_req_lock(hdev);
- 
--	/* Stop timer, it might be running */
--	del_timer_sync(&hdev->cmd_timer);
--
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		hci_req_unlock(hdev);
- 		return 0;
-@@ -618,6 +615,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
-+	/* Stop timer, it might be running */
-+	del_timer_sync(&hdev->cmd_timer);
-+
- 	/* Kill cmd task */
- 	tasklet_kill(&hdev->cmd_task);
- 
--- 
-1.7.4.3
+=2D-=20
+keith.packard@intel.com
 
+--=-=-=
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFNn5aYQp8BWwlsTdMRAg7+AKCc7neuNQmv96AZ/sXpqfnf8UJajQCfatzG
+GIQoeHiswtlphStgv72ShVw=
+=JWE1
+-----END PGP SIGNATURE-----
+--=-=-=--
