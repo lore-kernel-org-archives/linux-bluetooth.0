@@ -1,44 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Apr 2011 23:44:51 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Keith Packard <keithp@keithp.com>
-cc: linux-kernel <linux-kernel@vger.kernel.org>,
+Subject: Re: [bluetooth-next 10/15] Bluetooth: Add support for resuming
+ socket when SMP is finished
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: 2.6.39-rc2 regression: X201s fails to resume
- b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-In-Reply-To: <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
-Message-ID: <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
-References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20110407001100.GE2228@joana>
+References: <1302054716-24534-1-git-send-email-vinicius.gomes@openbossa.org>
+	 <1302054716-24534-11-git-send-email-vinicius.gomes@openbossa.org>
+	 <20110407001100.GE2228@joana>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 08 Apr 2011 09:34:08 -0700
+Message-ID: <1302280448.2572.200.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 7 Apr 2011, Thomas Gleixner wrote:
+Hi Gustavo,
 
-> On Wed, 6 Apr 2011, Keith Packard wrote:
-> > -rc2 was causing resume failures on my X201s -- the video mode would get
-> > reset, but the system would then lock up. I bisected the failure down to:
+> > This adds support for resuming the user space traffic when SMP
+> > negotiation is complete.
 > > 
-> > commit b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-> > Author: Thomas Gleixner <tglx@linutronix.de>
-> > Date:   Thu Mar 24 20:16:42 2011 +0100
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  net/bluetooth/l2cap_core.c |   61 ++++++++++++++++++++++---------------------
+> >  net/bluetooth/l2cap_sock.c |   16 +++++++++++
+> >  net/bluetooth/smp.c        |   40 ++++++++++++++++++++--------
+> >  3 files changed, 75 insertions(+), 42 deletions(-)
 > > 
-> >     Bluetooth: Fix warning with hci_cmd_timer
-> > 
-> > Reverting this on top of -rc2 makes resume reliable again.
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 0cec292..a5062f14 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -665,6 +665,22 @@ clean:
+> >  	bh_unlock_sock(parent);
+> >  }
+> >  
+> > +static void l2cap_chan_ready(struct sock *sk)
+> > +{
+> > +	struct sock *parent = bt_sk(sk)->parent;
+> > +
+> > +	BT_DBG("sk %p, parent %p", sk, parent);
+> > +
+> > +	l2cap_pi(sk)->conf_state = 0;
+> > +	l2cap_sock_clear_timer(sk);
+> > +
+> > +	sk->sk_state = BT_CONNECTED;
+> > +	sk->sk_state_change(sk);
+> > +
+> > +	if (parent)
+> > +		parent->sk_data_ready(parent, 0);
+> > +}
+> > +
+> >  static void l2cap_conn_ready(struct l2cap_conn *conn)
+> >  {
+> >  	struct l2cap_chan_list *l = &conn->chan_list;
+> > @@ -680,15 +696,11 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+> >  	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+> >  		bh_lock_sock(sk);
+> >  
+> > -		if (conn->hcon->type == LE_LINK) {
+> > -			l2cap_sock_clear_timer(sk);
+> > -			sk->sk_state = BT_CONNECTED;
+> > -			sk->sk_state_change(sk);
+> > +		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> >  			if (smp_conn_security(conn, l2cap_pi(sk)->sec_level))
+> > -				BT_DBG("Insufficient security");
+> > -		}
+> > +				l2cap_chan_ready(sk);
+> >  
+> > -		if (sk->sk_type != SOCK_SEQPACKET &&
+> > +		} else if (sk->sk_type != SOCK_SEQPACKET &&
+> >  				sk->sk_type != SOCK_STREAM) {
+> >  			l2cap_sock_clear_timer(sk);
+> >  			sk->sk_state = BT_CONNECTED;
+> > @@ -1362,29 +1374,6 @@ int l2cap_sar_segment_sdu(struct sock *sk, struct msghdr *msg, size_t len)
+> >  	return size;
+> >  }
+> >  
+> > -static void l2cap_chan_ready(struct sock *sk)
+> > -{
+> > -	struct sock *parent = bt_sk(sk)->parent;
+> > -
+> > -	BT_DBG("sk %p, parent %p", sk, parent);
+> > -
+> > -	l2cap_pi(sk)->conf_state = 0;
+> > -	l2cap_sock_clear_timer(sk);
+> > -
+> > -	if (!parent) {
+> > -		/* Outgoing channel.
+> > -		 * Wake up socket sleeping on connect.
+> > -		 */
+> > -		sk->sk_state = BT_CONNECTED;
+> > -		sk->sk_state_change(sk);
+> > -	} else {
+> > -		/* Incoming channel.
+> > -		 * Wake up socket sleeping on accept.
+> > -		 */
+> > -		parent->sk_data_ready(parent, 0);
+> > -	}
+> > -}
+> > -
+> >  /* Copy frame to all raw sockets on that connection */
+> >  static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+> >  {
+> > @@ -3810,6 +3799,18 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+> >  	for (sk = l->head; sk; sk = l2cap_pi(sk)->next_c) {
+> >  		bh_lock_sock(sk);
+> >  
+> > +		BT_DBG("sk->scid %d", l2cap_pi(sk)->scid);
+> > +
+> > +		if (l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> > +			if (!status && encrypt) {
+> > +				l2cap_pi(sk)->sec_level = hcon->sec_level;
+> > +				l2cap_chan_ready(sk);
+> > +			}
+> > +
+> > +			bh_unlock_sock(sk);
+> > +			continue;
+> > +		}
+> > +
+> >  		if (l2cap_pi(sk)->conf_state & L2CAP_CONF_CONNECT_PEND) {
+> >  			bh_unlock_sock(sk);
+> >  			continue;
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index f77308e..14e491a 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -29,6 +29,7 @@
+> >  #include <net/bluetooth/bluetooth.h>
+> >  #include <net/bluetooth/hci_core.h>
+> >  #include <net/bluetooth/l2cap.h>
+> > +#include <net/bluetooth/smp.h>
+> >  
+> >  /* ---- L2CAP timers ---- */
+> >  static void l2cap_sock_timeout(unsigned long arg)
+> > @@ -614,6 +615,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> >  {
+> >  	struct sock *sk = sock->sk;
+> >  	struct bt_security sec;
+> > +	struct l2cap_conn *conn;
+> >  	int len, err = 0;
+> >  	u32 opt;
+> >  
+> > @@ -650,6 +652,20 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+> >  		}
+> >  
+> >  		l2cap_pi(sk)->sec_level = sec.level;
+> > +
+> > +		conn = l2cap_pi(sk)->conn;
+> > +		if (conn && l2cap_pi(sk)->scid == L2CAP_CID_LE_DATA) {
+> > +			if (!conn->hcon->out) {
+> > +				err = -EINVAL;
+> > +				break;
+> > +			}
+> > +
+> > +			if (smp_conn_security(conn, sec.level))
+> > +				break;
+> > +
+> > +			err = 0;
+> > +			sk->sk_state = BT_CONFIG;
+> > +		}
 > 
-> Huch. I really have a hard time to connect this. Can you revert the
-> two hunks seperately?
+> I don't like the idea of bring SMP stuff to l2cap_sock.c, we are working now
+> to clean up that file and keep only socket related stuff there, and only
+> channel related stuff in l2cap_core.c. I've already sent a patchset on that
+> direction to mailing list. However, I don't have any idea now on how to remove
+> smp_conn_security() from here.
 
-Keith confirmed that reverting the second hunk fixes the
-problem. Heck, so that timer is rearmed somewhere in the teardown
-path?
+I don't think we have much choice here. We could abstract this out with
+drivers, but in the end we want direct functions call and not some heavy
+abstracted framework. Since lets face it, this is all pretty static.
 
-Can the bluetooth folks please have a look at that ASAP? The obvious
-fast fix for Linus tree is to revert the second hunk for now, but this
-needs to be fixed proper.
+However we might need some better function naming for this. Some of the
+naming inside L2CAP is a bit odd and not really clear what it does.
 
-Thanks,
+Regards
 
-	tglx
+Marcel
+
+
