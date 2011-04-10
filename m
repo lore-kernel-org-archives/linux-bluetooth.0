@@ -1,25 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Mon, 11 Apr 2011 01:56:11 +0300
-Message-ID: <BANLkTikULKr_9PjxdxFDRoHQF04xLDdzBg@mail.gmail.com>
-Subject: Bug report in Obex code
-From: Claudiu Coman <claud.coman@gmail.com>
+From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: johan.hedberg@gmail.com, hadess@hadess.net, dforsi@gmail.com,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH 4/4] Remove 16 byte limit for PIN codes returned by agents
+Date: Sun, 10 Apr 2011 19:11:17 +0200
+Message-Id: <1302455477-27664-5-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
+References: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Agents can now return PIN codes longer than 16 characters. The
+pin parser automatically truncates all PINs to 16 characters, but
+allows hexadecimal PINs to be longer than 16 characters because
+each two hexdecimal encoded bytes are parsed into one output byte.
+---
+ src/agent.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-While doing some documentation for my GSOC application, I found a small
-bug in the Obex code, in src/obex.c, function "obex_write_stream".
-There's the declaration:
-"uint8_t hi;"
-If the "if" statement body between lines 640-648 is executed, after the jump
-to the "add_header" tag, the switch statement will test an
-uninitialized variable.
-At first I thought about sending a patch myself, but I don't know what value
-the header index variable should be initialized with.
+diff --git a/src/agent.c b/src/agent.c
+index f87f253..40495bf 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -403,7 +403,7 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
+ 	len = strlen(pin);
+ 
+ 	dbus_error_init(&err);
+-	if (len > 16 || len < 1) {
++	if (len < 1) {
+ 		error("Invalid PIN length (%zu) from agent", len);
+ 		dbus_set_error_const(&err, "org.bluez.Error.InvalidArgs",
+ 					"Invalid passkey length");
+-- 
+1.7.4.4
 
-Cheers,
-Claudiu
