@@ -3,98 +3,134 @@ From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, hadess@hadess.net, dforsi@gmail.com,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 3/4] Parse pin codes starting with '$' as hexadecimal encoded strings
-Date: Sun, 10 Apr 2011 19:11:16 +0200
-Message-Id: <1302455477-27664-4-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/4] Add length argument to hci pincode reply
+Date: Sun, 10 Apr 2011 19:11:14 +0200
+Message-Id: <1302455477-27664-2-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a pin code is retrieved from an agent and the first character is
-a dollar sign '$', then the pin is decoded as following:
-  - The first character (dollar sign) is stripped from the pin
-  - The rest is parsed as hexadecimal numbers, where each two characters
-    will be converted into a one byte integer. If an odd number of
-    characters follows, then the last character is stripped. Empty
-    pins are valid. Parser is case insensitive.
-Pins not starting with '$' are parsed as usual.
-
-For instance:
-  pin: $0A3e005067
-is decoded into a 5 byte pin:
-  decoded: 0x0a 0x3e 0x00 0x50 0x67
+This adds a new "length" argument to the hci pincode reply to allow
+sending binary pins including \0 characters.
 ---
- src/event.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 42 insertions(+), 1 deletions(-)
+ plugins/hciops.c  |    9 ++++-----
+ plugins/mgmtops.c |   14 ++++++--------
+ src/adapter.c     |    2 +-
+ src/adapter.h     |    2 +-
+ 4 files changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 248fb78..f2fc688 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -101,12 +101,52 @@ static gboolean get_adapter_and_device(bdaddr_t *src, bdaddr_t *dst,
-  *
-  *****************************************************************/
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 93f6f21..afac330 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3296,7 +3296,7 @@ static int hciops_remove_bonding(int index, bdaddr_t *bdaddr)
+ 	return 0;
+ }
  
-+static char hex2dec(char c)
-+{
-+	if (c >= '0' && c <= '9')
-+		return  c - '0';
-+	else if (c >= 'A' && c <= 'F')
-+		return c - 'A' + 10;
-+	else if (c >= 'a' && c <= 'f')
-+		return c - 'a' + 10;
-+	else
-+		return 0;
-+}
-+
-+static size_t decode_hex(const char *pin, char *out)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < 16 && pin[i * 2] && pin[i * 2 + 1]; ++i)
-+		out[i] = hex2dec(pin[i * 2]) * 16 + hex2dec(pin[i * 2 + 1]);
-+	return i;
-+}
-+
-+static size_t decode_pin(const char *pin, char *out)
-+{
-+	size_t len;
-+
-+	if (!pin) {
-+		return 0;
-+	}
-+	else if (pin[0] == '$') {
-+		len = decode_hex(&pin[1], out);
-+	}
-+	else {
-+		len = strnlen(pin, 16);
-+		memcpy(out, pin, len);
-+	}
-+	return len;
-+}
-+
- static void pincode_cb(struct agent *agent, DBusError *derr,
- 				const char *pincode, struct btd_device *device)
+-static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
++static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen)
  {
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	bdaddr_t sba, dba;
- 	int err;
-+	size_t len;
-+	char rawpin[16];
+ 	struct dev_info *dev = &devs[index];
+ 	char addr[18];
+@@ -3307,14 +3307,13 @@ static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
  
- 	device_get_address(device, &dba);
+ 	if (pin) {
+ 		pin_code_reply_cp pr;
+-		size_t len = strlen(pin);
  
-@@ -117,7 +157,8 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
- 		return;
+-		dev->pin_length = len;
++		dev->pin_length = pinlen;
+ 
+ 		memset(&pr, 0, sizeof(pr));
+ 		bacpy(&pr.bdaddr, bdaddr);
+-		memcpy(pr.pin_code, pin, len);
+-		pr.pin_len = len;
++		memcpy(pr.pin_code, pin, pinlen);
++		pr.pin_len = pinlen;
+ 		err = hci_send_cmd(dev->sk, OGF_LINK_CTL,
+ 						OCF_PIN_CODE_REPLY,
+ 						PIN_CODE_REPLY_CP_SIZE, &pr);
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 042afc5..d03a29d 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -493,7 +493,7 @@ static void mgmt_connect_failed(int sk, uint16_t index, void *buf, size_t len)
+ 	btd_event_bonding_complete(&info->bdaddr, &ev->bdaddr, ev->status);
+ }
+ 
+-static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
++static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen)
+ {
+ 	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_pin_code_reply)];
+ 	struct mgmt_hdr *hdr = (void *) buf;
+@@ -501,7 +501,7 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+ 	char addr[18];
+ 
+ 	ba2str(bdaddr, addr);
+-	DBG("index %d addr %s pin %s", index, addr, pin ? pin : "<none>");
++	DBG("index %d addr %s pinlen %lu", index, addr, pinlen);
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+@@ -518,10 +518,8 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+ 		buf_len = sizeof(*hdr) + sizeof(*cp);
+ 	} else {
+ 		struct mgmt_cp_pin_code_reply *cp;
+-		size_t pin_len;
+ 
+-		pin_len = strlen(pin);
+-		if (pin_len > 16)
++		if (pinlen > 16)
+ 			return -EINVAL;
+ 
+ 		hdr->opcode = htobs(MGMT_OP_PIN_CODE_REPLY);
+@@ -530,8 +528,8 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+ 
+ 		cp = (void *) &buf[sizeof(*hdr)];
+ 		bacpy(&cp->bdaddr, bdaddr);
+-		cp->pin_len = pin_len;
+-		memcpy(cp->pin_code, pin, pin_len);
++		cp->pin_len = pinlen;
++		memcpy(cp->pin_code, pin, pinlen);
+ 
+ 		buf_len = sizeof(*hdr) + sizeof(*cp);
  	}
+@@ -568,7 +566,7 @@ static void mgmt_pin_code_request(int sk, uint16_t index, void *buf, size_t len)
+ 	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr);
+ 	if (err < 0) {
+ 		error("btd_event_request_pin: %s", strerror(-err));
+-		mgmt_pincode_reply(index, &ev->bdaddr, NULL);
++		mgmt_pincode_reply(index, &ev->bdaddr, NULL, 0);
+ 	}
+ }
  
--	err = btd_adapter_pincode_reply(adapter, &dba, pincode, pincode ? strlen(pincode) : 0);
-+	len = decode_pin(pincode, rawpin);
-+	err = btd_adapter_pincode_reply(adapter, &dba, rawpin, len);
- 	if (err < 0)
- 		goto fail;
+diff --git a/src/adapter.c b/src/adapter.c
+index c400bfd..83f3217 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3703,7 +3703,7 @@ int btd_adapter_remove_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+ int btd_adapter_pincode_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 							const char *pin)
+ {
+-	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin);
++	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin, pin ? strlen(pin) : 0);
+ }
  
+ int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+diff --git a/src/adapter.h b/src/adapter.h
+index 308af75..fd2fc12 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -221,7 +221,7 @@ struct btd_adapter_ops {
+ 	int (*read_local_features) (int index, uint8_t *features);
+ 	int (*disconnect) (int index, bdaddr_t *bdaddr);
+ 	int (*remove_bonding) (int index, bdaddr_t *bdaddr);
+-	int (*pincode_reply) (int index, bdaddr_t *bdaddr, const char *pin);
++	int (*pincode_reply) (int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen);
+ 	int (*confirm_reply) (int index, bdaddr_t *bdaddr, gboolean success);
+ 	int (*passkey_reply) (int index, bdaddr_t *bdaddr, uint32_t passkey);
+ 	int (*enable_le) (int index);
 -- 
 1.7.4.4
 
