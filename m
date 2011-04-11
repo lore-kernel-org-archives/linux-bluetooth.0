@@ -1,33 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Apr 2011 14:38:32 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Zdenek Kabelac <zdenek.kabelac@gmail.com>
-cc: USB list <linux-usb@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: Endless print of uhci_result_common: failed with status 440000
-In-Reply-To: <BANLkTikNb7FEDMbX3wSMti2e3muiaLZh-g@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1104111437440.1975-100000@iolanthe.rowland.org>
+Date: Mon, 11 Apr 2011 15:38:48 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org, Kevin Gan <ganhy@marvell.com>,
+	Tristan Xu <xurf@marvell.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Stefan A. Popa" <stefan.a.popa@intel.com>
+Subject: Re: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device
+ SD8787
+Message-ID: <20110411183848.GD2195@joana>
+References: <1302311973-10715-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1302311973-10715-1-git-send-email-bzhao@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 11 Apr 2011, Zdenek Kabelac wrote:
+Hi Bing,
 
-> > I've created:
-> >
-> > https://bugzilla.kernel.org/show_bug.cgi?id=33062
-> >
-> > and I'm cc-ing linux-bluetooth.
-> >
+* Bing Zhao <bzhao@marvell.com> [2011-04-08 18:19:33 -0700]:
+
+> From: Kevin Gan <ganhy@marvell.com>
 > 
-> In fact this Ooops might be related to:
+> The SD8787 firmware image is shared with mwifiex driver.
+> Whoever gets loaded first will be responsible for firmware
+> downloading.
 > 
-> http://marc.info/?l=linux-kernel&m=130207593728273&w=2
+> Signed-off-by: Kevin Gan <ganhy@marvell.com>
+> Signed-off-by: Tristan Xu <xurf@marvell.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> ---
+>  drivers/bluetooth/Kconfig       |    4 +-
+>  drivers/bluetooth/btmrvl_sdio.c |  124 +++++++++++++++++++++++++++++---------
+>  drivers/bluetooth/btmrvl_sdio.h |   68 +++++++++++----------
+>  3 files changed, 132 insertions(+), 64 deletions(-)
 
-It might be.  Did you try reverting the patch mentioned in that email?
+Patch is now applied, thanks.
 
-Alan Stern
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
