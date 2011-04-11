@@ -1,43 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Apr 2011 15:34:27 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Ville Tervo <ville.tervo@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
-Subject: Re: [PATCH] Bluetooth: Fix refcount balance for hci connection
-Message-ID: <20110411183427.GC2195@joana>
-References: <1302177590-4107-1-git-send-email-ville.tervo@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302177590-4107-1-git-send-email-ville.tervo@nokia.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 9/9] TODO: Add hard-coded PSM for GATT over basic rate
+Date: Mon, 11 Apr 2011 15:26:34 -0300
+Message-Id: <1302546394-24310-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1302197414-833-9-git-send-email-claudio.takahasi@openbossa.org>
+References: <1302197414-833-9-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+---
+ TODO |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-* Ville Tervo <ville.tervo@nokia.com> [2011-04-07 14:59:50 +0300]:
-
-> hci_io_capa_reply_evt() holds reference for hciconnection. It's useless since
-> hci_io_capa_request_evt()/hci_simple_pair_complete_evt() already protects the
-> connection. In addition it leaves connection open after failed SSP pairing.
-> 
-> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
-> ---
->  net/bluetooth/hci_event.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 7a3398d..6b878c8 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2419,8 +2419,6 @@ static inline void hci_io_capa_reply_evt(struct hci_dev *hdev, struct sk_buff *s
->  	if (!conn)
->  		goto unlock;
->  
-> -	hci_conn_hold(conn);
-> -
-
-Patch has been applied, thanks.
-
+diff --git a/TODO b/TODO
+index 461b179..fab3ec0 100644
+--- a/TODO
++++ b/TODO
+@@ -136,6 +136,11 @@ ATT/GATT
+   Priority: Medium
+   Complexity: C1
+ 
++- Fix hard-coded PSM for GATT services over basic rate.
++
++  Priority: Low
++  Complexity: C1
++
+ - Refactor read_by_group() and read_by_type() in src/attrib-server.c
+   (they've grown simply too big). First step could be to move out the
+   long for-loops to new functions called e.g. get_groups() and get_types().
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.4.1
+
