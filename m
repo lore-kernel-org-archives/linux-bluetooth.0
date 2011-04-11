@@ -1,41 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Apr 2011 15:38:48 -0300
+Date: Mon, 11 Apr 2011 15:34:27 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, Kevin Gan <ganhy@marvell.com>,
-	Tristan Xu <xurf@marvell.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Stefan A. Popa" <stefan.a.popa@intel.com>
-Subject: Re: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device
- SD8787
-Message-ID: <20110411183848.GD2195@joana>
-References: <1302311973-10715-1-git-send-email-bzhao@marvell.com>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@nokia.com
+Subject: Re: [PATCH] Bluetooth: Fix refcount balance for hci connection
+Message-ID: <20110411183427.GC2195@joana>
+References: <1302177590-4107-1-git-send-email-ville.tervo@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302311973-10715-1-git-send-email-bzhao@marvell.com>
+In-Reply-To: <1302177590-4107-1-git-send-email-ville.tervo@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Ville,
 
-* Bing Zhao <bzhao@marvell.com> [2011-04-08 18:19:33 -0700]:
+* Ville Tervo <ville.tervo@nokia.com> [2011-04-07 14:59:50 +0300]:
 
-> From: Kevin Gan <ganhy@marvell.com>
+> hci_io_capa_reply_evt() holds reference for hciconnection. It's useless since
+> hci_io_capa_request_evt()/hci_simple_pair_complete_evt() already protects the
+> connection. In addition it leaves connection open after failed SSP pairing.
 > 
-> The SD8787 firmware image is shared with mwifiex driver.
-> Whoever gets loaded first will be responsible for firmware
-> downloading.
-> 
-> Signed-off-by: Kevin Gan <ganhy@marvell.com>
-> Signed-off-by: Tristan Xu <xurf@marvell.com>
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
 > ---
->  drivers/bluetooth/Kconfig       |    4 +-
->  drivers/bluetooth/btmrvl_sdio.c |  124 +++++++++++++++++++++++++++++---------
->  drivers/bluetooth/btmrvl_sdio.h |   68 +++++++++++----------
->  3 files changed, 132 insertions(+), 64 deletions(-)
+>  net/bluetooth/hci_event.c |    2 --
+>  1 files changed, 0 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 7a3398d..6b878c8 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2419,8 +2419,6 @@ static inline void hci_io_capa_reply_evt(struct hci_dev *hdev, struct sk_buff *s
+>  	if (!conn)
+>  		goto unlock;
+>  
+> -	hci_conn_hold(conn);
+> -
 
-Patch is now applied, thanks.
+Patch has been applied, thanks.
 
 -- 
 Gustavo F. Padovan
