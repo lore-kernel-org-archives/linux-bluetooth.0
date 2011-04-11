@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Apr 2011 18:12:22 +0200 (CEST)
-From: Thomas Gleixner <tglx@linutronix.de>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-cc: Keith Packard <keithp@keithp.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 2.6.39-rc2 regression: X201s fails to resume
- b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-In-Reply-To: <20110409000857.GB25581@piper>
-Message-ID: <alpine.LFD.2.00.1104111807480.4501@localhost6.localdomain6>
-References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6> <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6> <yunaag0tjzb.fsf@aiko.keithp.com> <20110409000857.GB25581@piper>
+Date: Mon, 11 Apr 2011 13:00:58 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Andre Dieb Martins <andre.dieb@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/2] Add Type property to Device
+Message-ID: <20110411160058.GB2195@joana>
+References: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 8 Apr 2011, Vinicius Costa Gomes wrote:
+* Andre Dieb Martins <andre.dieb@signove.com> [2011-03-30 15:33:55 -0300]:
 
-> Hi Keith,
+> ---
+>  doc/device-api.txt |    4 ++++
+>  src/device.c       |   18 ++++++++++++++++++
+>  src/device.h       |    2 ++
+>  3 files changed, 24 insertions(+), 0 deletions(-)
 > 
-> On 16:13 Fri 08 Apr, Keith Packard wrote:
-> > On Fri, 8 Apr 2011 23:44:51 +0200 (CEST), Thomas Gleixner <tglx@linutronix.de> wrote:
-> > 
-> > > Can the bluetooth folks please have a look at that ASAP? The obvious
-> > > fast fix for Linus tree is to revert the second hunk for now, but this
-> > > needs to be fixed proper.
-> > 
-> > Who will submit this patch? I'd rather have your name on it so that
-> > people come complain at you...
-> 
-> I took a shot at it and just sent a patch (also attached for convenience) 
-> that should solve the problem.
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index d1feb18..a667296 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -130,6 +130,10 @@ Properties	string Address [readonly]
+>  			Proposed icon name according to the freedesktop.org
+>  			icon naming specification.
+>  
+> +		string Type [readonly]
+> +
+> +			Device type (BR/EDR, LE, BR/EDR/LE).
+> +
+>  		uint32 Class [readonly]
+>  
+>  			The Bluetooth class of device of the remote device.
+> diff --git a/src/device.c b/src/device.c
+> index d567952..96683de 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -228,6 +228,20 @@ static void device_free(gpointer user_data)
+>  	g_free(device);
+>  }
+>  
+> +const char *devtype2str(device_type_t type)
+> +{
+> +	switch (type) {
+> +	case DEVICE_TYPE_BREDR:
+> +		return "BR/EDR";
+> +	case DEVICE_TYPE_LE:
+> +		return "LE";
+> +	case DEVICE_TYPE_DUALMODE:
+> +		return "BR/EDR/LE";
 
-Aaarg. No. That patch reverts both hunks.
+I think that  use "Dual Mode" is much better here.
 
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -586,9 +586,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	hci_req_cancel(hdev, ENODEV);
- 	hci_req_lock(hdev);
- 
--	/* Stop timer, it might be running */
--	del_timer_sync(&hdev->cmd_timer);
--
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		hci_req_unlock(hdev);
- 		return 0;
-
-As I said before you need that first hunk to stay for the case where
-there is no device up and you return via the !HCI_UP check. You just
-moved back to the state before as the stupid timer is active for
-whatever reason even when HCI_UP is not set.
-
-@@ -618,6 +615,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
-+	/* Stop timer, it might be running */
-+	del_timer_sync(&hdev->cmd_timer);
-+
- 	/* Kill cmd task */
- 	tasklet_kill(&hdev->cmd_task);
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
