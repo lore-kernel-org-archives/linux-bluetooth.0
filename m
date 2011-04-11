@@ -1,26 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-To: linux-bluetooth@vger.kernel.org,
-	ville.tervo@nokia.com,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org
-Subject: [RFC] Bluetooth: MTU for LE links
-Date: Mon, 11 Apr 2011 20:12:37 -0400
-Message-Id: <1302567158-18617-1-git-send-email-anderson.briglia@openbossa.org>
-In-Reply-To: <anderson.briglia@openbossa.org>
-References: <anderson.briglia@openbossa.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 11 Apr 2011 19:25:04 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Keith Packard <keithp@keithp.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: 2.6.39-rc2 regression: X201s fails to resume
+ b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
+Message-ID: <20110411222504.GE2195@joana>
+References: <yun1v1fj024.fsf@aiko.keithp.com>
+ <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
+ <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
+ <yunaag0tjzb.fsf@aiko.keithp.com>
+ <20110409000857.GB25581@piper>
+ <alpine.LFD.2.00.1104111807480.4501@localhost6.localdomain6>
+ <1302558033.2572.219.camel@aeonflux>
+ <alpine.LFD.2.00.1104120014130.2702@localhost6.localdomain6>
+ <alpine.LFD.2.00.1104120016490.2702@localhost6.localdomain6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.LFD.2.00.1104120016490.2702@localhost6.localdomain6>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+* Thomas Gleixner <tglx@linutronix.de> [2011-04-12 00:19:32 +0200]:
 
-This patch is about MTU configuration for LE links. The current implementation
-is wrong since the MTU value is not being negotiated.
-Comments will be appreciated.
+> On Tue, 12 Apr 2011, Thomas Gleixner wrote:
+> > On Mon, 11 Apr 2011, Marcel Holtmann wrote:
+> > 
+> > > Hi Thomas,
+> > > 
+> > > > > > > Can the bluetooth folks please have a look at that ASAP? The obvious
+> > > > > > > fast fix for Linus tree is to revert the second hunk for now, but this
+> > > > > > > needs to be fixed proper.
+> > > > > > 
+> > > > > > Who will submit this patch? I'd rather have your name on it so that
+> > > > > > people come complain at you...
+> > > > > 
+> > > > > I took a shot at it and just sent a patch (also attached for convenience) 
+> > > > > that should solve the problem.
+> > > > 
+> > > > Aaarg. No. That patch reverts both hunks.
+> > > > 
+> > > > --- a/net/bluetooth/hci_core.c
+> > > > +++ b/net/bluetooth/hci_core.c
+> > > > @@ -586,9 +586,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+> > > >  	hci_req_cancel(hdev, ENODEV);
+> > > >  	hci_req_lock(hdev);
+> > > >  
+> > > > -	/* Stop timer, it might be running */
+> > > > -	del_timer_sync(&hdev->cmd_timer);
+> > > > -
+> > > >  	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+> > > >  		hci_req_unlock(hdev);
+> > > >  		return 0;
+> > > > 
+> > > > As I said before you need that first hunk to stay for the case where
+> > > > there is no device up and you return via the !HCI_UP check. You just
+> > > > moved back to the state before as the stupid timer is active for
+> > > > whatever reason even when HCI_UP is not set.
+> > > 
+> > > if I read this right then we have the case that we arm this timer for no
+> > > real reason. A device in !HCI_UP should have nothing running. Certainly
+> > > not the cmd_timer since it will never process any commands.
+> > > 
+> > > According to Gustavo, the problem is really in the hci_reset logic were
+> > > we arm the timer even when shutting down the device.
+> > 
+> > The reason why the original patch was sent is, that the timer was
+> > running when the thing went out via the !HCI_UP path, which caused the
+> > whole thing to explode in the first place. I had no time to figure out
+> > why, but moving the del_timer_sync above the
+> > if (!test_and_clear_bit(HCI_UP, &hdev->flags)) solved it.
+> 
+> Oops. Hit send too fast.
+> 
+> Then it broke the resume on Keith machine and reverting just the hunk
+> which disarms the timer in the 
+> 
+>         if (hdev->sent_cmd) {
+> 
+> path made both scenarios working. So there are two problems:
+> 
+>      1) Why do we need the del_timer_sync() above the !HCI_UP check
 
-This patch is part of LE/SMP patches available here [1]
+That is still a mysterious to me, the real bug the hiding here. I'm trying to
+track this down but no luck yet.
 
-Regards,
+> 
+>      2) Why gets the timer rearmed after that
 
-Anderson Briglia
+It is armed at each HCI command we send. In the close path we send out an HCI
+RESET command that rearms it.
 
-[1] git://gitorious.org/bluetooth-next/for-upstream.git
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
