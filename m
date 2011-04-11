@@ -1,77 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110411160058.GB2195@joana>
-References: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
-	<20110411160058.GB2195@joana>
-Date: Mon, 11 Apr 2011 17:18:43 +0000
-Message-ID: <BANLkTi=p=nqbKxZbTRU8eGMBXKbXN4uh2Q@mail.gmail.com>
-Subject: Re: [RFC 1/2] Add Type property to Device
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Andre Dieb Martins <andre.dieb@signove.com>,
+In-Reply-To: <20110411173409.1567679c@lxorguk.ukuu.org.uk>
+References: <yun1v1fj024.fsf@aiko.keithp.com>
+	<alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
+	<alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
+	<yunaag0tjzb.fsf@aiko.keithp.com>
+	<20110409000857.GB25581@piper>
+	<20110411173409.1567679c@lxorguk.ukuu.org.uk>
+Date: Mon, 11 Apr 2011 13:59:23 -0300
+Message-ID: <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com>
+Subject: Re: 2.6.39-rc2 regression: X201s fails to resume b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Cc: Keith Packard <keithp@keithp.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
 	linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Hi Gustavo,
 
-On Mon, Apr 11, 2011 at 4:00 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> * Andre Dieb Martins <andre.dieb@signove.com> [2011-03-30 15:33:55 -0300]:
+On Mon, Apr 11, 2011 at 1:34 PM, Alan Cox <alan@lxorguk.ukuu.org.uk> wrote:
+>> I took a shot at it and just sent a patch (also attached for convenience)
+>> that should solve the problem.
 >
->> ---
->>  doc/device-api.txt |    4 ++++
->>  src/device.c       |   18 ++++++++++++++++++
->>  src/device.h       |    2 ++
->>  3 files changed, 24 insertions(+), 0 deletions(-)
->>
->> diff --git a/doc/device-api.txt b/doc/device-api.txt
->> index d1feb18..a667296 100644
->> --- a/doc/device-api.txt
->> +++ b/doc/device-api.txt
->> @@ -130,6 +130,10 @@ Properties       string Address [readonly]
->>                       Proposed icon name according to the freedesktop.org
->>                       icon naming specification.
->>
->> +             string Type [readonly]
->> +
->> +                     Device type (BR/EDR, LE, BR/EDR/LE).
->> +
->>               uint32 Class [readonly]
->>
->>                       The Bluetooth class of device of the remote device.
->> diff --git a/src/device.c b/src/device.c
->> index d567952..96683de 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -228,6 +228,20 @@ static void device_free(gpointer user_data)
->>       g_free(device);
->>  }
->>
->> +const char *devtype2str(device_type_t type)
->> +{
->> +     switch (type) {
->> +     case DEVICE_TYPE_BREDR:
->> +             return "BR/EDR";
->> +     case DEVICE_TYPE_LE:
->> +             return "LE";
->> +     case DEVICE_TYPE_DUALMODE:
->> +             return "BR/EDR/LE";
+> Well its reverting too much but its also looking pretty bogus to me
 >
-> I think that  use "Dual Mode" is much better here.
+> -       /* Stop timer, it might be running */
+> -       del_timer_sync(&hdev->cmd_timer);
+> -
+>        if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+>                hci_req_unlock(hdev);
+>                return 0;
 >
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
-> --
+> So you've now got a path where you leave the timer running and didn't
+> before - not it appears one that is a good idea.
+>
+> Certainly not the kind of change that should be considered for a
+> regression fix for an rc kernel. It's far too big a behavioural change to
+> be safe.
+
+Considering what was said and that this patch didn't hit your public tree yet,
+I guess that this patch should be ignored.
+
+Will send a proper fix soon. Thanks all.
+
+>
+> Alan
+>
 
 
-Marcel asked me to wait until we have a request from UI developers.
-
-This property is more useful in the DeviceFound() signal, since it is
-not clear how to guess the type of the device found. For the Adapter
-and Device objects it is less relevant at the moment.
-
-BR,
-Claudio
+Cheers,
+-- 
+Vinicius
