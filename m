@@ -1,59 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Apr 2011 13:00:58 -0300
+Date: Mon, 11 Apr 2011 12:58:26 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andre Dieb Martins <andre.dieb@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/2] Add Type property to Device
-Message-ID: <20110411160058.GB2195@joana>
-References: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
+To: Keith Packard <keithp@keithp.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: 2.6.39-rc2 regression: X201s fails to resume
+ b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
+Message-ID: <20110411155826.GA2195@joana>
+References: <yun1v1fj024.fsf@aiko.keithp.com>
+ <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
+ <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
+ <yunaag0tjzb.fsf@aiko.keithp.com>
+ <20110409000857.GB25581@piper>
+ <yunipuouqoi.fsf@aiko.keithp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1301510036-17282-1-git-send-email-andre.dieb@signove.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <yunipuouqoi.fsf@aiko.keithp.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Andre Dieb Martins <andre.dieb@signove.com> [2011-03-30 15:33:55 -0300]:
+* Keith Packard <keithp@keithp.com> [2011-04-08 19:03:25 -0700]:
 
-> ---
->  doc/device-api.txt |    4 ++++
->  src/device.c       |   18 ++++++++++++++++++
->  src/device.h       |    2 ++
->  3 files changed, 24 insertions(+), 0 deletions(-)
+> On Fri, 8 Apr 2011 21:08:57 -0300, Vinicius Costa Gomes <vinicius.gomes@openbossa.org> wrote:
 > 
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index d1feb18..a667296 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -130,6 +130,10 @@ Properties	string Address [readonly]
->  			Proposed icon name according to the freedesktop.org
->  			icon naming specification.
->  
-> +		string Type [readonly]
-> +
-> +			Device type (BR/EDR, LE, BR/EDR/LE).
-> +
->  		uint32 Class [readonly]
->  
->  			The Bluetooth class of device of the remote device.
-> diff --git a/src/device.c b/src/device.c
-> index d567952..96683de 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -228,6 +228,20 @@ static void device_free(gpointer user_data)
->  	g_free(device);
->  }
->  
-> +const char *devtype2str(device_type_t type)
-> +{
-> +	switch (type) {
-> +	case DEVICE_TYPE_BREDR:
-> +		return "BR/EDR";
-> +	case DEVICE_TYPE_LE:
-> +		return "LE";
-> +	case DEVICE_TYPE_DUALMODE:
-> +		return "BR/EDR/LE";
+> > I took a shot at it and just sent a patch (also attached for convenience) 
+> > that should solve the problem.
+> 
+> Thanks much! I applied this to -rc2 and it appears to work fine in some
+> brief testing (a dozen suspend/resume cycles)
+> 
+> > Reported-by: Keith Packard <keithp@keithp.com>
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> 
+> Tested-by: Keith Packard <keithp@keithp.com>
 
-I think that  use "Dual Mode" is much better here.
+I applied the patch to bluetooth-2.6. Thank you all.
+
 
 -- 
 Gustavo F. Padovan
