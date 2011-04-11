@@ -1,216 +1,212 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 1/9] Register primary services exported over basic rate
-Date: Mon, 11 Apr 2011 15:24:03 -0300
-Message-Id: <1302546243-24005-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <BANLkTikZia_V1pVN_EqF8cpk0xu6GF9ZCg@mail.gmail.com>
-References: <BANLkTikZia_V1pVN_EqF8cpk0xu6GF9ZCg@mail.gmail.com>
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH] Fix race condition on gatttool
+Date: Mon, 11 Apr 2011 14:57:04 -0300
+Message-Id: <1302544624-5216-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch registers the object paths for primary services exported
-through SDP. PSM, start and end handle information are available in
-the Protocol Descriptor List.
+When the connect_cb() takes too long to be called the event_loop goes to idle
+state and executes the callback too early
 ---
- attrib/gatt.c |   78 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- attrib/gatt.h |    6 ++++
- src/device.c  |   56 ++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 139 insertions(+), 1 deletions(-)
+ attrib/gatttool.c |  128 +++++++++++++++++++++++++---------------------------
+ 1 files changed, 62 insertions(+), 66 deletions(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 0b69daf..360218b 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -23,8 +23,11 @@
-  */
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index be91967..cf052db 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -63,6 +63,7 @@ static gboolean opt_char_write_req = FALSE;
+ static gboolean opt_interactive = FALSE;
+ static GMainLoop *event_loop;
+ static gboolean got_error = FALSE;
++static GSourceFunc operation;
  
- #include <stdint.h>
-+#include <stdlib.h>
- #include <glib.h>
- #include <bluetooth/uuid.h>
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
+ struct characteristic_data {
+ 	GAttrib *attrib;
+@@ -70,13 +71,68 @@ struct characteristic_data {
+ 	uint16_t end;
+ };
  
- #include "att.h"
- #include "gattrib.h"
-@@ -575,3 +578,78 @@ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
- 	return g_attrib_send(attrib, 0, ATT_OP_WRITE_CMD, buf, plen, NULL,
- 							user_data, notify);
- }
-+
-+static sdp_data_t *proto_seq_find(sdp_list_t *proto_list)
++static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
 +{
-+	sdp_list_t *list;
-+	uuid_t proto;
++	GAttrib *attrib = user_data;
++	uint8_t opdu[ATT_MAX_MTU];
++	uint16_t handle, i, olen = 0;
 +
-+	sdp_uuid16_create(&proto, ATT_UUID);
++	handle = att_get_u16(&pdu[1]);
 +
-+	for (list = proto_list; list; list = list->next) {
-+		sdp_list_t *p;
-+		for (p = list->data; p; p = p->next) {
-+			sdp_data_t *seq = p->data;
-+			if (seq && seq->dtd == SDP_UUID16 &&
-+				sdp_uuid16_cmp(&proto, &seq->val.uuid) == 0)
-+				return seq->next;
-+		}
++	switch (pdu[0]) {
++	case ATT_OP_HANDLE_NOTIFY:
++		g_print("Notification handle = 0x%04x value: ", handle);
++		break;
++	case ATT_OP_HANDLE_IND:
++		g_print("Indication   handle = 0x%04x value: ", handle);
++		break;
++	default:
++		g_print("Invalid opcode\n");
++		return;
 +	}
 +
-+	return NULL;
++	for (i = 3; i < len; i++)
++		g_print("%02x ", pdu[i]);
++
++	g_print("\n");
++
++	if (pdu[0] == ATT_OP_HANDLE_NOTIFY)
++		return;
++
++	olen = enc_confirmation(opdu, sizeof(opdu));
++
++	if (olen > 0)
++		g_attrib_send(attrib, 0, opdu[0], opdu, olen, NULL, NULL, NULL);
 +}
 +
-+static gboolean parse_proto_params(sdp_list_t *proto_list, uint16_t *psm,
-+						uint16_t *start, uint16_t *end)
++static gboolean listen_start(gpointer user_data)
 +{
-+	sdp_data_t *seq1, *seq2;
++	GAttrib *attrib = user_data;
 +
-+	if (psm)
-+		*psm = sdp_get_proto_port(proto_list, L2CAP_UUID);
++	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, events_handler,
++							attrib, NULL);
++	g_attrib_register(attrib, ATT_OP_HANDLE_IND, events_handler,
++							attrib, NULL);
 +
-+	/* Getting start and end handle */
-+	seq1 = proto_seq_find(proto_list);
-+	if (!seq1 || seq1->dtd != SDP_UINT16)
-+		return FALSE;
-+
-+	seq2 = seq1->next;
-+	if (!seq2 || seq2->dtd != SDP_UINT16)
-+		return FALSE;
-+
-+	if (start)
-+		*start = seq1->val.uint16;
-+
-+	if (end)
-+		*end = seq2->val.uint16;
-+
-+	return TRUE;
++	return FALSE;
 +}
 +
-+gboolean gatt_parse_record(const sdp_record_t *rec,
-+					uuid_t *prim_uuid, uint16_t *psm,
-+					uint16_t *start, uint16_t *end)
-+{
-+	sdp_list_t *list;
-+	uuid_t uuid;
-+	gboolean ret;
-+
-+	if (sdp_get_service_classes(rec, &list) < 0)
-+		return FALSE;
-+
-+	memcpy(&uuid, list->data, sizeof(uuid));
-+	sdp_list_free(list, free);
-+
-+	if (sdp_get_access_protos(rec, &list) < 0)
-+		return FALSE;
-+
-+	ret = parse_proto_params(list, psm, start, end);
-+
-+	sdp_list_foreach(list, (sdp_list_func_t) sdp_list_free, NULL);
-+	sdp_list_free(list, NULL);
-+
-+	/* FIXME: replace by bt_uuid_t after uuid_t/sdp code cleanup */
-+	if (ret && prim_uuid)
-+		memcpy(prim_uuid, &uuid, sizeof(uuid_t));
-+
-+	return ret;
-+}
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 221d94d..2c2f38c 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -24,6 +24,8 @@
- 
- #define GATT_CID 4
- 
-+#include <bluetooth/sdp.h>
-+
- typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
- 
- guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
-@@ -51,3 +53,7 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
- 
- guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
- 							gpointer user_data);
-+
-+gboolean gatt_parse_record(const sdp_record_t *rec,
-+					uuid_t *prim_uuid, uint16_t *psm,
-+					uint16_t *start, uint16_t *end);
-diff --git a/src/device.c b/src/device.c
-index d567952..ecd1861 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1367,6 +1367,53 @@ static void create_device_reply(struct btd_device *device, struct browse_req *re
- 	g_dbus_send_message(req->conn, reply);
- }
- 
-+static GSList *primary_from_record(struct btd_device *device, GSList *profiles)
-+{
-+	GSList *l, *prim_list = NULL;
-+	char *att_uuid;
-+	uuid_t proto_uuid;
-+
-+	sdp_uuid16_create(&proto_uuid, ATT_UUID);
-+	att_uuid = bt_uuid2string(&proto_uuid);
-+
-+	for (l = profiles; l; l = l->next) {
-+		const char *profile_uuid = l->data;
-+		const sdp_record_t *rec;
-+		struct att_primary *prim;
-+		uint16_t start = 0, end = 0, psm = 0;
-+		uuid_t prim_uuid;
-+
-+		rec = btd_device_get_record(device, profile_uuid);
-+		if (!rec)
-+			continue;
-+
-+		if (!record_has_uuid(rec, att_uuid))
-+			continue;
-+
-+		if (!gatt_parse_record(rec, &prim_uuid, &psm, &start, &end))
-+			continue;
-+
-+		prim = g_new0(struct att_primary, 1);
-+		prim->start = start;
-+		prim->end = end;
-+		sdp_uuid2strn(&prim_uuid, prim->uuid, sizeof(prim->uuid));
-+
-+		prim_list = g_slist_append(prim_list, prim);
-+	}
-+
-+	g_free(att_uuid);
-+
-+	return prim_list;
-+}
-+
-+static void register_primary_services(DBusConnection *conn,
-+				struct btd_device *device, GSList *prim_list)
-+{
-+	/* TODO: PSM is hardcoded */
-+	attrib_client_register(conn, device, 31, NULL, prim_list);
-+	device->primaries = g_slist_concat(device->primaries, prim_list);
-+}
-+
- static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
- 	struct browse_req *req = user_data;
-@@ -1396,9 +1443,16 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
++	GAttrib *attrib;
++
+ 	if (err) {
+ 		g_printerr("%s\n", err->message);
+ 		got_error = TRUE;
+ 		g_main_loop_quit(event_loop);
+ 	}
++
++	attrib = g_attrib_new(io);
++
++	if (opt_listen)
++		g_idle_add(listen_start, attrib);
++
++	operation(attrib);
+ }
+ 
+ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+@@ -120,52 +176,6 @@ done:
+ 	g_main_loop_quit(event_loop);
+ }
+ 
+-static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+-{
+-	GAttrib *attrib = user_data;
+-	uint8_t opdu[ATT_MAX_MTU];
+-	uint16_t handle, i, olen = 0;
+-
+-	handle = att_get_u16(&pdu[1]);
+-
+-	switch (pdu[0]) {
+-	case ATT_OP_HANDLE_NOTIFY:
+-		g_print("Notification handle = 0x%04x value: ", handle);
+-		break;
+-	case ATT_OP_HANDLE_IND:
+-		g_print("Indication   handle = 0x%04x value: ", handle);
+-		break;
+-	default:
+-		g_print("Invalid opcode\n");
+-		return;
+-	}
+-
+-	for (i = 3; i < len; i++)
+-		g_print("%02x ", pdu[i]);
+-
+-	g_print("\n");
+-
+-	if (pdu[0] == ATT_OP_HANDLE_NOTIFY)
+-		return;
+-
+-	olen = enc_confirmation(opdu, sizeof(opdu));
+-
+-	if (olen > 0)
+-		g_attrib_send(attrib, 0, opdu[0], opdu, olen, NULL, NULL, NULL);
+-}
+-
+-static gboolean listen_start(gpointer user_data)
+-{
+-	GAttrib *attrib = user_data;
+-
+-	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, events_handler,
+-							attrib, NULL);
+-	g_attrib_register(attrib, ATT_OP_HANDLE_IND, events_handler,
+-							attrib, NULL);
+-
+-	return FALSE;
+-}
+-
+ static gboolean primary(gpointer user_data)
+ {
+ 	GAttrib *attrib = user_data;
+@@ -527,9 +537,7 @@ int main(int argc, char *argv[])
+ 	GOptionContext *context;
+ 	GOptionGroup *gatt_group, *params_group, *char_rw_group;
+ 	GError *gerr = NULL;
+-	GAttrib *attrib;
+ 	GIOChannel *chan;
+-	GSourceFunc callback;
+ 
+ 	opt_sec_level = g_strdup("low");
+ 
+@@ -570,17 +578,17 @@ int main(int argc, char *argv[])
  	}
  
- 	/* Probe matching drivers for services added */
--	if (req->profiles_added)
-+	if (req->profiles_added) {
-+		GSList *list;
-+
- 		device_probe_drivers(device, req->profiles_added);
+ 	if (opt_primary)
+-		callback = primary;
++		operation = primary;
+ 	else if (opt_characteristics)
+-		callback = characteristics;
++		operation = characteristics;
+ 	else if (opt_char_read)
+-		callback = characteristics_read;
++		operation = characteristics_read;
+ 	else if (opt_char_write)
+-		callback = characteristics_write;
++		operation = characteristics_write;
+ 	else if (opt_char_write_req)
+-		callback = characteristics_write_req;
++		operation = characteristics_write_req;
+ 	else if (opt_char_desc)
+-		callback = characteristics_desc;
++		operation = characteristics_desc;
+ 	else {
+ 		gchar *help = g_option_context_get_help(context, TRUE, NULL);
+ 		g_print("%s\n", help);
+@@ -596,24 +604,12 @@ int main(int argc, char *argv[])
+ 		goto done;
+ 	}
  
-+		list = primary_from_record(device, req->profiles_added);
-+		if (list)
-+			register_primary_services(req->conn, device, list);
-+	}
-+
- 	/* Remove drivers for services removed */
- 	if (req->profiles_removed)
- 		device_remove_drivers(device, req->profiles_removed);
+-	attrib = g_attrib_new(chan);
+-	g_io_channel_unref(chan);
+-
+ 	event_loop = g_main_loop_new(NULL, FALSE);
+ 
+-	if (opt_listen)
+-		g_idle_add(listen_start, attrib);
+-
+-	g_idle_add(callback, attrib);
+-
+ 	g_main_loop_run(event_loop);
+ 
+-	g_attrib_unregister_all(attrib);
+-
+ 	g_main_loop_unref(event_loop);
+ 
+-	g_attrib_unref(attrib);
+-
+ done:
+ 	g_option_context_free(context);
+ 	g_free(opt_src);
 -- 
-1.7.4.1
+1.7.1
 
