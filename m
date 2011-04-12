@@ -1,60 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1302605974.2572.258.camel@aeonflux>
-References: <anderson.briglia@openbossa.org>
-	<1302567158-18617-2-git-send-email-anderson.briglia@openbossa.org>
-	<1302581196.2572.249.camel@aeonflux>
-	<BANLkTinoW_bjCw=DwS2pMg-eM06Yq3MXLg@mail.gmail.com>
-	<1302605974.2572.258.camel@aeonflux>
-Date: Tue, 12 Apr 2011 07:46:49 -0400
-Message-ID: <BANLkTinOJGPTfQwjTi7mXEWHWKAd0aX6Zw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: MTU configuration for LE links
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>, linux-bluetooth@vger.kernel.org,
-	ville.tervo@nokia.com, johan.hedberg@gmail.com,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Date: Tue, 12 Apr 2011 14:36:01 +0300
+Message-ID: <BANLkTinfkhcfYu_L+5B_LkQVZyp8VdnnBw@mail.gmail.com>
+Subject: Wrong timeout when connecting to device with removed pairing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Apparently this is a regression caused by commit
+769be974d0c7b4fe1a52f9cdaad22259b60953f7 - [Bluetooth] Use ACL config
+stage to retrieve remote features, when receiving pincode request in a
+new connection the state will be BT_CONFIG so HCI_PAIRING_TIMEOUT is
+never set to the connection, this could be reproduced by removing a
+link key in the remote side and trying to connect:
 
-On Tue, Apr 12, 2011 at 6:59 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->> One thing to consider is that there are a couple of MTU checks along
->> the L2CAP code. The issue which originated this patch is code such as:
->>
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check outgoing MTU */
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > pi->omtu) {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EMSGSIZE;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->>
->> We understood that just letting omtu/imtu values on kernel reflect the
->> current connection MTU settings was the cleanest solution. What do you
->> propose? Bypassing these checks for LE?
->
-> this does not look clean to me. And we might have an internal MTU
-> variable as part of L2CAP, but the way how it gets set and thus its
-> semantic differs clearly between BR/EDR and LE. So shoehorning an
-> existing socket option this is clearly a bad idea.
+2011-04-05 12:11:37.070953 < HCI Command: Authentication Requested
+(0x01|0x0011) plen 2
+    handle 1
+2011-04-05 12:11:37.071686 > HCI Event: Command Status (0x0f) plen 4
+    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+2011-04-05 12:11:37.071838 > HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:1F:E1:EB:B9:CB
+2011-04-05 12:11:37.075073 < HCI Command: Link Key Request Reply
+(0x01|0x000b) plen 22
+    bdaddr 00:1F:E1:EB:B9:CB key 92BA9EAD06542B0600457C609B8F5395
+2011-04-05 12:11:37.075775 > HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:1F:E1:EB:B9:CB
+2011-04-05 12:11:37.087005 > HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:1F:E1:EB:B9:CB
+2011-04-05 12:11:39.038849 < ACL data: handle 1 flags 0x00 dlen 12
+    L2CAP(s): Disconn req: dcid 0x00a9 scid 0x0040
+2011-04-05 12:11:39.100647 > HCI Event: Number of Completed Packets
+(0x13) plen 5
+    handle 1 packets 1
+2011-04-05 12:11:39.100830 > ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x00a9 scid 0x0040
+2011-04-05 12:11:40.433624 > HCI Event: Auth Complete (0x06) plen 3
+    status 0x13 handle 1
+    Error: Remote User Terminated Connection
+2011-04-05 12:11:40.437774 > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
 
-Sure. What to do then if:
+I think the following patch might fix it:
 
-1) LE links have MTU (omtu specifically) hard-coded to 23 on kernel.
-2) the kernel rejects sending data longer than omtu.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3fbfa50..abdc4de 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1973,10 +1973,14 @@ static inline void hci_pin_code_request_evt(struct
+hci_dev *hdev, struct sk_buff
+        hci_dev_lock(hdev);
 
-(this is the current situation)
+        conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-       if (conn && conn->state == BT_CONNECTED) {
+-               hci_conn_hold(conn);
++       if (conn) {
+                conn->disc_timeout = HCI_PAIRING_TIMEOUT;
+-               hci_conn_put(conn);
++
++               /* Update disconnect timer */
++               if (conn->state == BT_CONNECTED) {
++                       hci_conn_hold(conn);
++                       hci_conn_put(conn);
++               }
+        }
 
-This clearly needs some fix on kernel side, otherwise we can't send
-PDUs longer than the LE default MTU (23), *even* if the peer device
-supports a bigger MTU.
+Comments?
 
-Suggestions are welcome regarding how to best approach this, without
-affecting current BR/EDR MTU semantics.
-
-Regards,
---=20
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
