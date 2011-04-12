@@ -1,43 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Apr 2011 12:10:56 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Zdenek Kabelac <zdenek.kabelac@gmail.com>
-cc: USB list <linux-usb@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: Endless print of uhci_result_common: failed with status 440000
-In-Reply-To: <BANLkTin0bKs1D3JxVODw3F+qH0ZqRwh5KA@mail.gmail.com>
-Message-ID: <Pine.LNX.4.44L0.1104121210250.2000-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1302605974.2572.258.camel@aeonflux>
+References: <anderson.briglia@openbossa.org>
+	<1302567158-18617-2-git-send-email-anderson.briglia@openbossa.org>
+	<1302581196.2572.249.camel@aeonflux>
+	<BANLkTinoW_bjCw=DwS2pMg-eM06Yq3MXLg@mail.gmail.com>
+	<1302605974.2572.258.camel@aeonflux>
+Date: Tue, 12 Apr 2011 07:46:49 -0400
+Message-ID: <BANLkTinOJGPTfQwjTi7mXEWHWKAd0aX6Zw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: MTU configuration for LE links
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>, linux-bluetooth@vger.kernel.org,
+	ville.tervo@nokia.com, johan.hedberg@gmail.com,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 12 Apr 2011, Zdenek Kabelac wrote:
+Hi Marcel,
 
-> 2011/4/11 Alan Stern <stern@rowland.harvard.edu>:
-> > On Mon, 11 Apr 2011, Zdenek Kabelac wrote:
-> >
-> >> > I've created:
-> >> >
-> >> > https://bugzilla.kernel.org/show_bug.cgi?id=33062
-> >> >
-> >> > and I'm cc-ing linux-bluetooth.
-> >> >
-> >>
-> >> In fact this Ooops might be related to:
-> >>
-> >> http://marc.info/?l=linux-kernel&m=130207593728273&w=2
-> >
-> > It might be.  Did you try reverting the patch mentioned in that email?
-> >
-> 
-> Yep - it looks like the patch
-> http://marc.info/?l=linux-bluetooth&m=130230770920378&w=2
-> solved my problem with weird deadlocks.
+On Tue, Apr 12, 2011 at 6:59 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+>> One thing to consider is that there are a couple of MTU checks along
+>> the L2CAP code. The issue which originated this patch is code such as:
+>>
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check outgoing MTU */
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > pi->omtu) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EMSGSIZE;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>>
+>> We understood that just letting omtu/imtu values on kernel reflect the
+>> current connection MTU settings was the cleanest solution. What do you
+>> propose? Bypassing these checks for LE?
+>
+> this does not look clean to me. And we might have an internal MTU
+> variable as part of L2CAP, but the way how it gets set and thus its
+> semantic differs clearly between BR/EDR and LE. So shoehorning an
+> existing socket option this is clearly a bad idea.
 
-Okay, great!
+Sure. What to do then if:
 
-Alan Stern
+1) LE links have MTU (omtu specifically) hard-coded to 23 on kernel.
+2) the kernel rejects sending data longer than omtu.
 
+(this is the current situation)
+
+This clearly needs some fix on kernel side, otherwise we can't send
+PDUs longer than the LE default MTU (23), *even* if the peer device
+supports a bigger MTU.
+
+Suggestions are welcome regarding how to best approach this, without
+affecting current BR/EDR MTU semantics.
+
+Regards,
+--=20
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
