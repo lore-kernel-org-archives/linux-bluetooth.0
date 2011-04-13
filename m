@@ -1,35 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <braghave@codeaurora.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 13 Apr 2011 13:56:28 +0300
-Subject: RE: About the BT_SECURITY_HIGH support in Bluez stack
-Message-ID: <99B09243E1A5DA4898CDD8B70011144810861C42D7@EXMB04.eu.tieto.com>
-References: <6274c94659d0fd65491ca3370cf69db4.squirrel@www.codeaurora.org>
- <91156ff5702cf87ea80f2285c5c92855.squirrel@www.codeaurora.org>
-In-Reply-To: <91156ff5702cf87ea80f2285c5c92855.squirrel@www.codeaurora.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix unregistering a2dp sep while it is locked
+Date: Wed, 13 Apr 2011 12:20:50 +0300
+Message-Id: <1302686450-5961-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
->> I was looking at the archived conversations below,
->>
->> http://marc.info/?t=128290950000001&r=1&w=2
->>
->> I see, there is some effort in adding  this BT_SECURITY_HIGH suuport 
->> in to the bluez stack, which is a mandatory for the BT SAP profile.
->>
->> Could you please, let me know what is the plan to release these 
->> patches as part of Bluez?
->>
->> These patches seem to be suffecient. But, may need to add another 
->> D-Bus property to emit to the UI layers to take 16 character 
->PIN code.
+If sep is locked it should not be unregistered until properly unlocked.
+---
+ audio/a2dp.c |   16 ++++++++++++++++
+ 1 files changed, 16 insertions(+), 0 deletions(-)
 
-Those patches are obsolete as this part has changed significantly. 
-Most of this should be supported in kernel and not bluez now.
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 719658b..fe627c1 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -1741,6 +1741,9 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 		}
+ 	}
+ 
++	if (sep->locked)
++		return;
++
+ 	a2dp_unregister_sep(sep);
+ }
+ 
+@@ -2342,7 +2345,9 @@ gboolean a2dp_sep_lock(struct a2dp_sep *sep, struct avdtp *session)
+ 
+ gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session)
+ {
++	struct a2dp_server *server = sep->server;
+ 	avdtp_state_t state;
++	GSList *l;
+ 
+ 	state = avdtp_sep_get_state(sep->lsep);
+ 
+@@ -2350,6 +2355,17 @@ gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session)
+ 
+ 	DBG("SEP %p unlocked", sep->lsep);
+ 
++	if (sep->type == AVDTP_SEP_TYPE_SOURCE)
++		l = server->sources;
++	else
++		l = server->sinks;
++
++	/* Unregister sep if it was removed */
++	if (g_slist_find(l, sep) == NULL) {
++		a2dp_unregister_sep(sep);
++		return TRUE;
++	}
++
+ 	if (!sep->stream || state == AVDTP_STATE_IDLE)
+ 		return TRUE;
+ 
+-- 
+1.7.1
 
-Waldek
