@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 14 Apr 2011 10:10:21 +0100 (BST)
 From: Iain Hibbert <plunky@rya-online.net>
-Date: Thu, 14 Apr 2011 10:08:36 +0100
-Subject: [PATCH] hcidump: use correct size to copy 'direction' value
-To: linux-bluetooth@vger.kernel.org
-Message-Id: <20110414091124.D0AB826008F@galant.ukfsn.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bugfix patches for hcidump
+In-Reply-To: <20110414072937.GA28187@jh-x301>
+Message-ID: <alpine.NEB.2.00.1104140949480.11301@galant.ukfsn.org>
+References: <alpine.NEB.2.00.1104140748380.12891@galant.ukfsn.org> <20110414072937.GA28187@jh-x301>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-frm.in is stored as an uint8_t, so we cannot copy an int there
-directly.  use an intermediate variable so that it also works
-on big-endian systems.
----
- src/hcidump.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+On Thu, 14 Apr 2011, Johan Hedberg wrote:
 
-diff --git a/src/hcidump.c b/src/hcidump.c
-index 2023130..f865ad6 100644
---- a/src/hcidump.c
-+++ b/src/hcidump.c
-@@ -281,9 +281,11 @@ static int process_frames(int dev, int sock, int fd, unsigned long flags)
- 
- 		cmsg = CMSG_FIRSTHDR(&msg);
- 		while (cmsg) {
-+			int dir;
- 			switch (cmsg->cmsg_type) {
- 			case HCI_CMSG_DIR:
--				memcpy(&frm.in, CMSG_DATA(cmsg), sizeof(int));
-+				memcpy(&dir, CMSG_DATA(cmsg), sizeof(int));
-+				frm.in = (uint8_t) dir;
- 				break;
- 			case HCI_CMSG_TSTAMP:
- 				memcpy(&frm.ts, CMSG_DATA(cmsg),
--- 
-1.7.4.1
+> Your patch email is still marked as "new" in my linux-bluetooth folder,
+> so in that sense it's not lost. I've just forgotten to check back on
+> older unapplied patches for a while.
 
+Hence why a bugtracker would be good.. I previously unsubscribed from this
+list because it turns into a patch dumping ground, and I guess that you
+guys must feel pain trying to keep up..
+
+> The reason why it didn't immediately go upstream was a coding style
+> issue (missing space after a typecast) and the reuse of an iterator
+> variable for something else than iteration. I don't remember what I was
+> doing at the time when I glanced at your patch but it seems I must have
+> been in quite a hurry since I didn't respond with these comments back
+> then. Sorry about that.
+
+Ok thanks (though you should be aware that I don't see space after cast
+mentioned in the CodingStyle document :), will repost in a moment..
+
+iain
