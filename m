@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Apr 2011 20:07:28 +0300
+Date: Thu, 14 Apr 2011 20:04:54 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sheldon Demario <sheldon.demario@openbossa.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix race condition on gatttool
-Message-ID: <20110414170728.GC7152@jh-x301>
-References: <1302544624-5216-1-git-send-email-sheldon.demario@openbossa.org>
+Subject: Re: [PATCH] Remove unnecessary code from pin handler
+Message-ID: <20110414170454.GB7152@jh-x301>
+References: <1302450491-26550-1-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302544624-5216-1-git-send-email-sheldon.demario@openbossa.org>
+In-Reply-To: <1302450491-26550-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sheldon,
+Hi David,
 
-On Mon, Apr 11, 2011, Sheldon Demario wrote:
-> When the connect_cb() takes too long to be called the event_loop goes to idle
-> state and executes the callback too early
+On Sun, Apr 10, 2011, David Herrmann wrote:
+> The source address is not used inside the pin handler and, thus,
+> can be skipped.
 > ---
->  attrib/gatttool.c |  128 +++++++++++++++++++++++++---------------------------
->  1 files changed, 62 insertions(+), 66 deletions(-)
+>  src/event.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
 
-Thanks, the patch has been pushed upstream. Could you please fix your
-editor settings so that it doesn't produce lines longer than 74
-characters for git commit messages? I had to manually edit it this time.
+The patch has been applied. Thanks.
 
 Johan
