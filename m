@@ -1,30 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Apr 2011 20:04:08 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH v2] Add test/test-oob for testing Out Of Band pairing
-Message-ID: <20110414170408.GA7152@jh-x301>
-References: <1302255474-15128-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302255474-15128-1-git-send-email-szymon.janc@tieto.com>
+From: Iain Hibbert <plunky@rya-online.net>
+Date: Thu, 14 Apr 2011 10:08:36 +0100
+Subject: [PATCH] hcidump: use correct size to copy 'direction' value
+To: linux-bluetooth@vger.kernel.org
+Message-Id: <20110414091124.D0AB826008F@galant.ukfsn.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+frm.in is stored as an uint8_t, so we cannot copy an int there
+directly.  use an intermediate variable so that it also works
+on big-endian systems.
+---
+ src/hcidump.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-On Fri, Apr 08, 2011, Szymon Janc wrote:
-> This test utilizes D-Bus Out Of Band API so bluetoothd must be
-> compiled with dbusoob plugin.
-> ---
->  Makefile.tools |    4 +-
->  test/test-oob  |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 82 insertions(+), 2 deletions(-)
->  create mode 100755 test/test-oob
+diff --git a/src/hcidump.c b/src/hcidump.c
+index 2023130..f865ad6 100644
+--- a/src/hcidump.c
++++ b/src/hcidump.c
+@@ -281,9 +281,11 @@ static int process_frames(int dev, int sock, int fd, unsigned long flags)
+ 
+ 		cmsg = CMSG_FIRSTHDR(&msg);
+ 		while (cmsg) {
++			int dir;
+ 			switch (cmsg->cmsg_type) {
+ 			case HCI_CMSG_DIR:
+-				memcpy(&frm.in, CMSG_DATA(cmsg), sizeof(int));
++				memcpy(&dir, CMSG_DATA(cmsg), sizeof(int));
++				frm.in = (uint8_t) dir;
+ 				break;
+ 			case HCI_CMSG_TSTAMP:
+ 				memcpy(&frm.ts, CMSG_DATA(cmsg),
+-- 
+1.7.4.1
 
-Pushed upstream. Thanks.
-
-Johan
