@@ -2,76 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 2/3] Add support for passing the CID to btiotest
-Date: Thu, 14 Apr 2011 21:06:42 -0300
-Message-Id: <1302826003-5511-2-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1302826003-5511-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1302826003-5511-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 1/3] Add support for getting the Encryption Key Size via btio
+Date: Thu, 14 Apr 2011 21:06:41 -0300
+Message-Id: <1302826003-5511-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/btiotest.c |   11 ++++++++---
- 1 files changed, 8 insertions(+), 3 deletions(-)
+Some profiles specify some restriction depending on the length
+of the key used to encrypt the link, this adds an way to retrieve
+that value from the kernel.
 
-diff --git a/test/btiotest.c b/test/btiotest.c
-index c02a25a..c4d8f4f 100644
---- a/test/btiotest.c
-+++ b/test/btiotest.c
-@@ -225,7 +225,7 @@ static void confirm_cb(GIOChannel *io, gpointer user_data)
+Current kernels don't provide this information so the size is
+always zero.
+---
+ btio/btio.c     |   21 +++++++++++++++++++++
+ btio/btio.h     |    1 +
+ lib/bluetooth.h |    1 +
+ 3 files changed, 23 insertions(+), 0 deletions(-)
+
+diff --git a/btio/btio.c b/btio/btio.c
+index 3f5b69a..aed9e0a 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -485,6 +485,22 @@ static gboolean get_sec_level(int sock, BtIOType type, int *level,
+ 	return TRUE;
  }
  
- static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
--						gint disconn, gint sec)
-+					uint16_t cid, gint disconn, gint sec)
++static gboolean get_key_size(int sock, BtIOType type, int *size,
++								GError **err)
++{
++	struct bt_security sec;
++	socklen_t len;
++
++	memset(&sec, 0, sizeof(sec));
++	len = sizeof(sec);
++	if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
++		*size = sec.key_size;
++		return TRUE;
++	}
++
++	return FALSE;
++}
++
+ static gboolean l2cap_set(int sock, int sec_level, uint16_t imtu, uint16_t omtu,
+ 					uint8_t mode, int master, GError **err)
  {
- 	struct io_data *data;
- 	GError *err = NULL;
-@@ -241,6 +241,7 @@ static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
- 						BT_IO_OPT_SOURCE, src,
- 						BT_IO_OPT_DEST, dst,
- 						BT_IO_OPT_PSM, psm,
-+						BT_IO_OPT_CID, cid,
- 						BT_IO_OPT_SEC_LEVEL, sec,
- 						BT_IO_OPT_INVALID);
- 	else
-@@ -249,6 +250,7 @@ static void l2cap_connect(const char *src, const char *dst, uint16_t psm,
- 						&err,
- 						BT_IO_OPT_DEST, dst,
- 						BT_IO_OPT_PSM, psm,
-+						BT_IO_OPT_CID, cid,
- 						BT_IO_OPT_SEC_LEVEL, sec,
- 						BT_IO_OPT_INVALID);
- 
-@@ -466,6 +468,7 @@ static gint opt_disconn = -1;
- static gint opt_accept = DEFAULT_ACCEPT_TIMEOUT;
- static gint opt_sec = 0;
- static gboolean opt_master = FALSE;
-+static gint opt_cid = 0;
- 
- static GMainLoop *main_loop;
- 
-@@ -474,6 +477,8 @@ static GOptionEntry options[] = {
- 				"RFCOMM channel" },
- 	{ "psm", 'p', 0, G_OPTION_ARG_INT, &opt_psm,
- 				"L2CAP PSM" },
-+	{ "cid", 'j', 0, G_OPTION_ARG_INT, &opt_cid,
-+				"L2CAP CID" },
- 	{ "sco", 's', 0, G_OPTION_ARG_NONE, &opt_sco,
- 				"Use SCO" },
- 	{ "defer", 'd', 0, G_OPTION_ARG_NONE, &opt_defer,
-@@ -513,9 +518,9 @@ int main(int argc, char *argv[])
- 	printf("accept=%d, reject=%d, discon=%d, defer=%d, sec=%d\n",
- 		opt_accept, opt_reject, opt_disconn, opt_defer, opt_sec);
- 
--	if (opt_psm) {
-+	if (opt_psm || opt_cid) {
- 		if (argc > 1)
--			l2cap_connect(opt_dev, argv[1], opt_psm,
-+			l2cap_connect(opt_dev, argv[1], opt_psm, opt_cid,
- 							opt_disconn, opt_sec);
- 		else
- 			l2cap_listen(opt_dev, opt_psm, opt_defer, opt_reject,
+@@ -800,6 +816,11 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+ 						va_arg(args, int *), err))
+ 				return FALSE;
+ 			break;
++		case BT_IO_OPT_KEY_SIZE:
++			if (!get_key_size(sock, BT_IO_L2CAP,
++						va_arg(args, int *), err))
++				return FALSE;
++			break;
+ 		case BT_IO_OPT_PSM:
+ 			*(va_arg(args, uint16_t *)) = src.l2_psm ?
+ 						src.l2_psm : dst.l2_psm;
+diff --git a/btio/btio.h b/btio/btio.h
+index 53e8eaa..637710f 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -52,6 +52,7 @@ typedef enum {
+ 	BT_IO_OPT_DEST_BDADDR,
+ 	BT_IO_OPT_DEFER_TIMEOUT,
+ 	BT_IO_OPT_SEC_LEVEL,
++	BT_IO_OPT_KEY_SIZE,
+ 	BT_IO_OPT_CHANNEL,
+ 	BT_IO_OPT_SOURCE_CHANNEL,
+ 	BT_IO_OPT_DEST_CHANNEL,
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 738e07a..1492139 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -63,6 +63,7 @@ extern "C" {
+ #define BT_SECURITY	4
+ struct bt_security {
+ 	uint8_t level;
++	uint8_t key_size;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
 -- 
 1.7.4.3
 
