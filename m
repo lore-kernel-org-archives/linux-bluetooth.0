@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH 0/3] Handle link key type and security requirements
-Date: Fri, 15 Apr 2011 13:06:54 +0200
-Message-ID: <1302865617-32704-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Message-ID: <4DA81E10.60109@Atheros.com>
+Date: Fri, 15 Apr 2011 15:59:36 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: optional support for ERTM mode for certain PSM
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-Please put some comments on these patches. I will test them in next days.
+I am working on the L2CAP BQB test cases for ERTM mode and came across 
+test cases for PSMs which optionally and mandatorily support ERTM.
 
-There will be further patches to support 16 digit pin notification to userspace 
-and rfcomm re-authentication.
+As part of BQB qualification, I see two test cases
 
-Waldek
+1. Mandatory support:
+	When tester sends a Config respose with "Un-acceptable parameter" for 
+EFC parameter, the IUT is supposed to disconnect the link.
 
+2. Optional support
 
-Waldemar Rymarkiewicz (3):
-  Bluetooth: Add definitions for link key types
-  Bluetooth: Map sec_level to link key requirements
-  Bluetooth: Ignore key unauthenticated for high security
+	When tester sends a Config respose with "Un-acceptable parameter" for 
+EFC parameter, the IUT is supposed re-negotiate the connection with the 
+EFC parameter provided by Tester.
 
- include/net/bluetooth/hci.h      |    9 +++++
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_conn.c         |   61 +++++++++++++++++++++++++++++++------
- net/bluetooth/hci_core.c         |    2 +-
- net/bluetooth/hci_event.c        |   28 ++++++++++++++---
- 5 files changed, 85 insertions(+), 16 deletions(-)
+Any idea how both cases can be executed successfully?
 
+Regards
+Suraj
