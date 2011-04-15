@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 0/4] hcimgmt: command line tool for mgmt interface
-Date: Fri, 15 Apr 2011 14:57:41 -0300
-Message-Id: <1302890265-15649-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20110414170728.GC7152@jh-x301>
+References: <1302544624-5216-1-git-send-email-sheldon.demario@openbossa.org>
+	<20110414170728.GC7152@jh-x301>
+Date: Fri, 15 Apr 2011 10:29:18 -0300
+Message-ID: <BANLkTikUb_DJ98KCoTVwcmENPe1p7cm-9g@mail.gmail.com>
+Subject: Re: [PATCH] Fix race condition on gatttool
+From: Sheldon Demario <sheldon.demario@openbossa.org>
+To: Sheldon Demario <sheldon.demario@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Johan,
 
-When the mgmt interface was first proposed Johan sent a patch
-that introduced this tool, I updated it for the current MGMT API
-and added a couple new commands.
+On Thu, Apr 14, 2011 at 2:07 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Sheldon,
+>
+> On Mon, Apr 11, 2011, Sheldon Demario wrote:
+>> When the connect_cb() takes too long to be called the event_loop goes to idle
+>> state and executes the callback too early
+>> ---
+>>  attrib/gatttool.c |  128 +++++++++++++++++++++++++---------------------------
+>>  1 files changed, 62 insertions(+), 66 deletions(-)
+>
+> Thanks, the patch has been pushed upstream. Could you please fix your
+> editor settings so that it doesn't produce lines longer than 74
+> characters for git commit messages? I had to manually edit it this time.
 
+For sure. I was using the 80 chars limit.
 
---
-Cheers,
-
-
-Johan Hedberg (1):
-  Add hcimgmt command line test tool
-
-Vinicius Costa Gomes (3):
-  hcimgmt: Add command to set IO Capabilities
-  Add command to clear the link key list via MGMT interface
-  hcimgmt: add support for setting pairable mode
-
- Makefile.tools  |    5 +-
- tools/hcimgmt.c |  546 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 550 insertions(+), 1 deletions(-)
- create mode 100644 tools/hcimgmt.c
-
---
-1.7.4.3
-
+>
+> Johan
+>
