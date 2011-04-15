@@ -1,33 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DA81E10.60109@Atheros.com>
-Date: Fri, 15 Apr 2011 15:59:36 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
-MIME-Version: 1.0
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: optional support for ERTM mode for certain PSM
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 3/3] Add support for btiotest to returning the key size
+Date: Thu, 14 Apr 2011 21:06:43 -0300
+Message-Id: <1302826003-5511-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1302826003-5511-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1302826003-5511-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+---
+ test/btiotest.c |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-I am working on the L2CAP BQB test cases for ERTM mode and came across 
-test cases for PSMs which optionally and mandatorily support ERTM.
+diff --git a/test/btiotest.c b/test/btiotest.c
+index c4d8f4f..fdf2234 100644
+--- a/test/btiotest.c
++++ b/test/btiotest.c
+@@ -135,6 +135,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 			printf("imtu=%u, omtu=%u\n", imtu, omtu);
+ 	}
+ 
++	if (data->type == BT_IO_L2CAP) {
++		uint8_t key_size;
++
++		if (!bt_io_get(io, data->type, &err,
++					BT_IO_OPT_KEY_SIZE, &key_size,
++					BT_IO_OPT_INVALID)) {
++			printf("Unable to get L2CAP Key size: %s\n",
++								err->message);
++			g_clear_error(&err);
++		} else
++			printf("key_size=%u\n", key_size);
++	}
++
+ 	if (data->disconn == 0) {
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 		printf("Disconnected\n");
+-- 
+1.7.4.3
 
-As part of BQB qualification, I see two test cases
-
-1. Mandatory support:
-	When tester sends a Config respose with "Un-acceptable parameter" for 
-EFC parameter, the IUT is supposed to disconnect the link.
-
-2. Optional support
-
-	When tester sends a Config respose with "Un-acceptable parameter" for 
-EFC parameter, the IUT is supposed re-negotiate the connection with the 
-EFC parameter provided by Tester.
-
-Any idea how both cases can be executed successfully?
-
-Regards
-Suraj
