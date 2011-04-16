@@ -1,34 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 16 Apr 2011 10:00:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Proposal to distinguish address device types
+Message-ID: <20110416070006.GA10860@jh-x301>
+References: <1302892422-32206-1-git-send-email-claudio.takahasi@openbossa.org>
+ <20110415184728.GA2359@joana>
+ <1302915790.2503.31.camel@aeonflux>
 MIME-Version: 1.0
-From: Gottfried Haider <gottfried.haider@gmail.com>
-Date: Sat, 16 Apr 2011 18:38:59 +0200
-Message-ID: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
-Subject: [Regression] Bluetooth pairing does not work anymore in 2.6.39-rc3
- (works in 2.6.38.3)
-To: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1302915790.2503.31.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Marcel,
 
-I am having problems pairing bluetooth devices in 2.6.39. Scanning
-works fine (hcitool scan), but when I try to pair a device using
-"bluez-simple-agent hci0 $MAC", I receive the following error message:
-"Creating device failed: org.bluez.Error.Failed: Input/output error"
+On Fri, Apr 15, 2011, Marcel Holtmann wrote:
+> > > +	BDADDR_TYPE_LE_PUBLIC,
+> > > +	BRADDR_TYPE_LE_RANDOM
+> > > +};
+> 
+> I am also not sure the we should have this BR/EDR differentiation since
+> the specification only talks about public and random addresses. And we
+> should follow the specification type value here. I am against
+> introducing our enum here.
 
-The same command reliably works on a 2.6.38.3 kernel with pretty much
-the same config.
+The HCI specification only has values for public and random because
+everywhere they are used it is already clear from the context (the HCI
+command or event in question) if we're talking about LE or BR/EDR. We on
+the other hand don't have this contextual information with the
+mgmt_pair_device command. Saying "public" there could mean both BR/EDR
+public or LE public, i.e. an enum with just two possible values is not
+going to be of much use to us. Because of this difference between our
+API and that of HCI I don't think it's fair to apply the HCI
+convention/restriction to us.
 
-According to lsusb, I have a Broadcom Bluetooth Controller with ID
-0a5c:217f. I don't see anything related in either of the dmesgs.
-My lspci output is here: http://sukzessiv.net/x120e/
-Userspace is an up-to-date Ubuntu 11.04 beta (with bluez 4.91).
-
-If there are any debugging steps that I could do or patches to try or
-revert, let me know. Unfortunately I can't do a proper bisect since
-the machine is a netbook type.
-
-cheers,
-gohai
+Johan
