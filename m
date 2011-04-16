@@ -1,40 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 16 Apr 2011 10:00:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Proposal to distinguish address device types
-Message-ID: <20110416070006.GA10860@jh-x301>
-References: <1302892422-32206-1-git-send-email-claudio.takahasi@openbossa.org>
- <20110415184728.GA2359@joana>
- <1302915790.2503.31.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1302915790.2503.31.camel@aeonflux>
+Subject: Re: [RFC 2/2] Bluetooth: Add support for returning the encryption
+ key size
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+In-Reply-To: <1302915440.2503.26.camel@aeonflux>
+References: <1302825888-5359-1-git-send-email-vinicius.gomes@openbossa.org>
+	 <1302825888-5359-3-git-send-email-vinicius.gomes@openbossa.org>
+	 <1302915440.2503.26.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 15 Apr 2011 22:24:25 -0700
+Message-ID: <1302931465.2503.33.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Vinicius,
 
-On Fri, Apr 15, 2011, Marcel Holtmann wrote:
-> > > +	BDADDR_TYPE_LE_PUBLIC,
-> > > +	BRADDR_TYPE_LE_RANDOM
-> > > +};
-> 
-> I am also not sure the we should have this BR/EDR differentiation since
-> the specification only talks about public and random addresses. And we
-> should follow the specification type value here. I am against
-> introducing our enum here.
+> And of course the same now applies for PIN code length. Even if with
+> Simple Pairing this does not matter anymore. For Legacy Pairing this is
+> still relevant.
 
-The HCI specification only has values for public and random because
-everywhere they are used it is already clear from the context (the HCI
-command or event in question) if we're talking about LE or BR/EDR. We on
-the other hand don't have this contextual information with the
-mgmt_pair_device command. Saying "public" there could mean both BR/EDR
-public or LE public, i.e. an enum with just two possible values is not
-going to be of much use to us. Because of this difference between our
-API and that of HCI I don't think it's fair to apply the HCI
-convention/restriction to us.
+forget about this comment. It is actually bogus since the HIGH vs MEDIUM
+security for Legacy Pairing implies the PIN length requirement already.
 
-Johan
+We just need to make sure to enforce it properly via the new in-kernel
+handling of pairing.
+
+Regards
+
+Marcel
+
+
