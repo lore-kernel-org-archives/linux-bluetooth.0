@@ -1,61 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4DA9CB83.4050000@gmail.com>
+Date: Sat, 16 Apr 2011 10:01:55 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20110416070006.GA10860@jh-x301>
-References: <1302892422-32206-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20110415184728.GA2359@joana>
-	<1302915790.2503.31.camel@aeonflux>
-	<20110416070006.GA10860@jh-x301>
-Date: Sat, 16 Apr 2011 17:04:50 +0000
-Message-ID: <BANLkTi=QNU7MS80fKfsAvRRKAX+80hmQtA@mail.gmail.com>
-Subject: Re: [RFC] Proposal to distinguish address device types
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+To: Gottfried Haider <gottfried.haider@gmail.com>
+CC: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [Regression] Bluetooth pairing does not work anymore in 2.6.39-rc3
+ (works in 2.6.38.3)
+References: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
+In-Reply-To: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Sat, Apr 16, 2011 at 7:00 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Marcel,
+On 04/16/2011 09:38 AM, Gottfried Haider wrote:
+> Hello,
 >
-> On Fri, Apr 15, 2011, Marcel Holtmann wrote:
->> > > + BDADDR_TYPE_LE_PUBLIC,
->> > > + BRADDR_TYPE_LE_RANDOM
->> > > +};
->>
->> I am also not sure the we should have this BR/EDR differentiation since
->> the specification only talks about public and random addresses. And we
->> should follow the specification type value here. I am against
->> introducing our enum here.
+> I am having problems pairing bluetooth devices in 2.6.39. Scanning
+> works fine (hcitool scan), but when I try to pair a device using
+> "bluez-simple-agent hci0 $MAC", I receive the following error message:
+> "Creating device failed: org.bluez.Error.Failed: Input/output error"
 >
-> The HCI specification only has values for public and random because
-> everywhere they are used it is already clear from the context (the HCI
-> command or event in question) if we're talking about LE or BR/EDR. We on
-> the other hand don't have this contextual information with the
-> mgmt_pair_device command. Saying "public" there could mean both BR/EDR
-> public or LE public, i.e. an enum with just two possible values is not
-> going to be of much use to us. Because of this difference between our
-> API and that of HCI I don't think it's fair to apply the HCI
-> convention/restriction to us.
+> The same command reliably works on a 2.6.38.3 kernel with pretty much
+> the same config.
 >
-> Johan
+> According to lsusb, I have a Broadcom Bluetooth Controller with ID
+> 0a5c:217f. I don't see anything related in either of the dmesgs.
+> My lspci output is here: http://sukzessiv.net/x120e/
+> Userspace is an up-to-date Ubuntu 11.04 beta (with bluez 4.91).
+>
+> If there are any debugging steps that I could do or patches to try or
+> revert, let me know. Unfortunately I can't do a proper bisect since
+> the machine is a netbook type.
+>
+> cheers,
+> gohai
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
 >
 
-I added 3 values because it gives more flexibility. Possible use cases:
-- Whitelist needs the address type
-- SMP
-- As input to decide to store or not information about the device
-since private address can change every 15minutes
+I'm wondering if you are hitting what I was hitting a few days ago.. the 
+commit below got things working over here:
+(not sure if this is in the stable yet)
+http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git;a=commitdiff;h=b99faf1b798d6d0e33526fd2cef55a405c08ff09;hp=58b6e124aac64bebb2e9e1a136cbd21a5ab0485a
 
- At the moment we only need to know if the address is basic rate or LE
-to select the discovery type: SDP or LE Discovery primary. For
-pairing, Vinicius is using the kernel advertising cache to discover
-the address type, passing the address type could avoid wrong fallback
-to basic rate if the entry is not found in the cache.
+hope this helps,
 
-Claudio
+Justin P. Mattock
