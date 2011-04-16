@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4DAA27C8.7060800@gmail.com>
+Date: Sat, 16 Apr 2011 16:35:36 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20110415185845.GB2359@joana>
-References: <1302271841-12127-1-git-send-email-luiz.dentz@gmail.com>
-	<20110415185845.GB2359@joana>
-Date: Sun, 17 Apr 2011 20:26:53 +0300
-Message-ID: <BANLkTin2kuhT9vyANhLHTqw8G8maTEbQWg@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: fix shutdown on SCO sockets
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Gottfried Haider <gottfried.haider@gmail.com>
+CC: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [Regression] Bluetooth pairing does not work anymore in 2.6.39-rc3
+ (works in 2.6.38.3)
+References: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com> <4DA9CB83.4050000@gmail.com> <BANLkTi=avo9yvpQ0VRPRv1uroF3ZnJzfAg@mail.gmail.com>
+In-Reply-To: <BANLkTi=avo9yvpQ0VRPRv1uroF3ZnJzfAg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-On Fri, Apr 15, 2011 at 9:58 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Luiz,
+On 04/16/2011 03:43 PM, Gottfried Haider wrote:
+> Hi Justin,
 >
-> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-08 17:10:41 +0300]:
+>> I'm wondering if you are hitting what I was hitting a few days ago.. the
+>> commit below got things working over here:
+>> (not sure if this is in the stable yet)
+>> http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next-2.6.git;a=commitdiff;h=b99faf1b798d6d0e33526fd2cef55a405c08ff09;hp=58b6e124aac64bebb2e9e1a136cbd21a5ab0485a
 >
->> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
->>
->> shutdown should wait for SCO link to be properly disconnected before
->> detroying the socket, otherwise an application using the socket may
->> assume link is properly disconnected before it really happens which
->> can be a problem when e.g synchronizing profile switch.
->>
->> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> I checked: I have this commit in -rc3, so it must be something else here.
 >
-> I applied it, but in bluetooth-next. Let's see its behaviour there and if no
-> problems show up we can move it to bluetooth-2.6
+> greetings,
+>
+> gohai
+>
 
-I tested this against Nokia BH-504 and Sony Ericsson W600, both have
-problem when switching from hfp to a2dp where the avdtp start is sent
-before SCO is fully disconnected, this patch fixes with those
-headsets.
+hmm... seems to be working over here with the latest Mainline. one thing 
+  I have notice though is the daemon is not starting during 
+boot(systemd), manually starting bluetoothd gets me to connect.(system 
+is fedora 15).
 
-
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Justin P. Mattock
