@@ -1,47 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/2] Add NO CARRIER response to HFP
-Date: Mon, 18 Apr 2011 00:29:13 +0300
-Message-Id: <1303075754-15375-1-git-send-email-dmitriy.paliy@nokia.com>
+From: Maciej Rutecki <maciej.rutecki@gmail.com>
+Reply-To: maciej.rutecki@gmail.com
+To: Gottfried Haider <gottfried.haider@gmail.com>
+Subject: Re: [Regression] Bluetooth pairing does not work anymore in 2.6.39-rc3 (works in 2.6.38.3)
+Date: Sun, 17 Apr 2011 20:40:21 +0200
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+References: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
+In-Reply-To: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201104172040.21852.maciej.rutecki@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HFP is updated by NO CARRIER response accordingly to HFP 1.5 p.68.
----
- audio/headset.c |   17 ++++++++++-------
- 1 files changed, 10 insertions(+), 7 deletions(-)
+I created a Bugzilla entry at 
+https://bugzilla.kernel.org/show_bug.cgi?id=33482
+for your bug report, please add your address to the CC list in there, thanks!
 
-diff --git a/audio/headset.c b/audio/headset.c
-index c605e9d..2e4f6ca 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -687,14 +687,17 @@ static int telephony_generic_rsp(struct audio_device *device, cme_error_t err)
- 	struct headset *hs = device->headset;
- 	struct headset_slc *slc = hs->slc;
- 
--	if (err != CME_ERROR_NONE) {
--		if (slc->cme_enabled)
--			return headset_send(hs, "\r\n+CME ERROR: %d\r\n", err);
--		else
--			return headset_send(hs, "\r\nERROR\r\n");
--	}
-+	if ((err != CME_ERROR_NONE) && slc->cme_enabled)
-+		return headset_send(hs, "\r\n+CME ERROR: %d\r\n", err);
- 
--	return headset_send(hs, "\r\nOK\r\n");
-+	switch (err) {
-+	case CME_ERROR_NONE:
-+		return headset_send(hs, "\r\nOK\r\n");
-+	case CME_ERROR_NO_NETWORK_SERVICE:
-+		return headset_send(hs, "\r\nNO CARRIER\r\n");
-+	default:
-+		return headset_send(hs, "\r\nERROR\r\n");
-+	}
- }
- 
- int telephony_event_reporting_rsp(void *telephony_device, cme_error_t err)
+On sobota, 16 kwietnia 2011 o 18:38:59 Gottfried Haider wrote:
+> Hello,
+> 
+> I am having problems pairing bluetooth devices in 2.6.39. Scanning
+> works fine (hcitool scan), but when I try to pair a device using
+> "bluez-simple-agent hci0 $MAC", I receive the following error message:
+> "Creating device failed: org.bluez.Error.Failed: Input/output error"
+> 
+> The same command reliably works on a 2.6.38.3 kernel with pretty much
+> the same config.
+> 
+> According to lsusb, I have a Broadcom Bluetooth Controller with ID
+> 0a5c:217f. I don't see anything related in either of the dmesgs.
+> My lspci output is here: http://sukzessiv.net/x120e/
+> Userspace is an up-to-date Ubuntu 11.04 beta (with bluez 4.91).
+> 
+> If there are any debugging steps that I could do or patches to try or
+> revert, let me know. Unfortunately I can't do a proper bisect since
+> the machine is a netbook type.
+> 
+> cheers,
+> gohai
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+
 -- 
-1.7.1
-
+Maciej Rutecki
+http://www.maciek.unixy.pl
