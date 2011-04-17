@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110415192858.GD2359@joana>
-References: <BANLkTinfkhcfYu_L+5B_LkQVZyp8VdnnBw@mail.gmail.com>
-	<20110415192258.GC2359@joana>
-	<20110415192858.GD2359@joana>
-Date: Sun, 17 Apr 2011 20:32:32 +0300
-Message-ID: <BANLkTi=96g=+Lg-0Y=m8rrzbCaFnQ=xx_Q@mail.gmail.com>
-Subject: Re: Wrong timeout when connecting to device with removed pairing
+In-Reply-To: <20110415185845.GB2359@joana>
+References: <1302271841-12127-1-git-send-email-luiz.dentz@gmail.com>
+	<20110415185845.GB2359@joana>
+Date: Sun, 17 Apr 2011 20:26:53 +0300
+Message-ID: <BANLkTin2kuhT9vyANhLHTqw8G8maTEbQWg@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: fix shutdown on SCO sockets
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
@@ -14,86 +13,31 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-On Fri, Apr 15, 2011 at 10:28 PM, Gustavo F. Padovan
+On Fri, Apr 15, 2011 at 9:58 PM, Gustavo F. Padovan
 <padovan@profusion.mobi> wrote:
-> * Gustavo F. Padovan <padovan@profusion.mobi> [2011-04-15 16:22:58 -0300]:
+> Hi Luiz,
 >
->> Hi Luiz,
->>
->> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-12 14:36:01 +0300]:
->>
->> > Apparently this is a regression caused by commit
->> > 769be974d0c7b4fe1a52f9cdaad22259b60953f7 - [Bluetooth] Use ACL config
->> > stage to retrieve remote features, when receiving pincode request in a
->> > new connection the state will be BT_CONFIG so HCI_PAIRING_TIMEOUT is
->> > never set to the connection, this could be reproduced by removing a
->> > link key in the remote side and trying to connect:
->> >
->> > 2011-04-05 12:11:37.070953 < HCI Command: Authentication Requested
->> > (0x01|0x0011) plen 2
->> >     handle 1
->> > 2011-04-05 12:11:37.071686 > HCI Event: Command Status (0x0f) plen 4
->> >     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
->> > 2011-04-05 12:11:37.071838 > HCI Event: Link Key Request (0x17) plen 6
->> >     bdaddr 00:1F:E1:EB:B9:CB
->> > 2011-04-05 12:11:37.075073 < HCI Command: Link Key Request Reply
->> > (0x01|0x000b) plen 22
->> >     bdaddr 00:1F:E1:EB:B9:CB key 92BA9EAD06542B0600457C609B8F5395
->> > 2011-04-05 12:11:37.075775 > HCI Event: Command Complete (0x0e) plen 10
->> >     Link Key Request Reply (0x01|0x000b) ncmd 1
->> >     status 0x00 bdaddr 00:1F:E1:EB:B9:CB
->> > 2011-04-05 12:11:37.087005 > HCI Event: PIN Code Request (0x16) plen 6
->> >     bdaddr 00:1F:E1:EB:B9:CB
->> > 2011-04-05 12:11:39.038849 < ACL data: handle 1 flags 0x00 dlen 12
->> >     L2CAP(s): Disconn req: dcid 0x00a9 scid 0x0040
->> > 2011-04-05 12:11:39.100647 > HCI Event: Number of Completed Packets
->> > (0x13) plen 5
->> >     handle 1 packets 1
->> > 2011-04-05 12:11:39.100830 > ACL data: handle 1 flags 0x02 dlen 12
->> >     L2CAP(s): Disconn rsp: dcid 0x00a9 scid 0x0040
->> > 2011-04-05 12:11:40.433624 > HCI Event: Auth Complete (0x06) plen 3
->> >     status 0x13 handle 1
->> >     Error: Remote User Terminated Connection
->> > 2011-04-05 12:11:40.437774 > HCI Event: Disconn Complete (0x05) plen 4
->> >     status 0x00 handle 1 reason 0x13
->> >     Reason: Remote User Terminated Connection
->> >
->> > I think the following patch might fix it:
->> >
->> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> > index 3fbfa50..abdc4de 100644
->> > --- a/net/bluetooth/hci_event.c
->> > +++ b/net/bluetooth/hci_event.c
->> > @@ -1973,10 +1973,14 @@ static inline void hci_pin_code_request_evt(struct
->> > hci_dev *hdev, struct sk_buff
->> >         hci_dev_lock(hdev);
->> >
->> >         conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
->> > -       if (conn && conn->state == BT_CONNECTED) {
->> > -               hci_conn_hold(conn);
->> > +       if (conn) {
->> >                 conn->disc_timeout = HCI_PAIRING_TIMEOUT;
->> > -               hci_conn_put(conn);
->> > +
->> > +               /* Update disconnect timer */
->> > +               if (conn->state == BT_CONNECTED) {
->> > +                       hci_conn_hold(conn);
->> > +                       hci_conn_put(conn);
->>
->> I think these two line can be:
->>
->>               mod_timer(&conn->disc_timer, jiffies + HCI_PAIRING_TIMEOUT);
->>
->>
->> The two main difference are that here we don't delete the idle_timer, but it
->> isn't used anywhere, so I think we can delete it.
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-08 17:10:41 +0300]:
 >
-> My mistake, idle_timer is actually used, I forgot to look hci_conn.c
+>> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+>>
+>> shutdown should wait for SCO link to be properly disconnected before
+>> detroying the socket, otherwise an application using the socket may
+>> assume link is properly disconnected before it really happens which
+>> can be a problem when e.g synchronizing profile switch.
+>>
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+>
+> I applied it, but in bluetooth-next. Let's see its behaviour there and if no
+> problems show up we can move it to bluetooth-2.6
 
-Well apparently the patch didn't really help to fix the problem, any
-other ideas?
+I tested this against Nokia BH-504 and Sony Ericsson W600, both have
+problem when switching from hfp to a2dp where the avdtp start is sent
+before SCO is fully disconnected, this patch fixes with those
+headsets.
+
 
 -- 
 Luiz Augusto von Dentz
