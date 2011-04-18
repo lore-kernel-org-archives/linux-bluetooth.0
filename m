@@ -1,83 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Apr 2011 19:48:13 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next-2.6 2011-04-18
-Message-ID: <20110418224813.GC2472@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BANLkTi=QNU7MS80fKfsAvRRKAX+80hmQtA@mail.gmail.com>
+References: <1302892422-32206-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20110415184728.GA2359@joana>
+	<1302915790.2503.31.camel@aeonflux>
+	<20110416070006.GA10860@jh-x301>
+	<BANLkTi=QNU7MS80fKfsAvRRKAX+80hmQtA@mail.gmail.com>
+Date: Mon, 18 Apr 2011 18:20:24 +0000
+Message-ID: <BANLkTim2-LiAO4UdoU0+UT92_JAtxZ+XFw@mail.gmail.com>
+Subject: Re: [RFC] Proposal to distinguish address device types
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Marcel/Johan/Gustavo,
 
-Biggest changes are the initial patches for an refactor inside the L2CAP code:
-we have to separate the L2CAP socket stuff from the L2CAP core code to make
-life of L2CAP users(rfcomm and AMP manager in the future) inside the kernel easy.
+On Sat, Apr 16, 2011 at 5:04 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi Marcel,
+>
+> On Sat, Apr 16, 2011 at 7:00 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Marcel,
+>>
+>> On Fri, Apr 15, 2011, Marcel Holtmann wrote:
+>>> > > + BDADDR_TYPE_LE_PUBLIC,
+>>> > > + BRADDR_TYPE_LE_RANDOM
+>>> > > +};
+>>>
+>>> I am also not sure the we should have this BR/EDR differentiation since
+>>> the specification only talks about public and random addresses. And we
+>>> should follow the specification type value here. I am against
+>>> introducing our enum here.
+>>
+>> The HCI specification only has values for public and random because
+>> everywhere they are used it is already clear from the context (the HCI
+>> command or event in question) if we're talking about LE or BR/EDR. We on
+>> the other hand don't have this contextual information with the
+>> mgmt_pair_device command. Saying "public" there could mean both BR/EDR
+>> public or LE public, i.e. an enum with just two possible values is not
+>> going to be of much use to us. Because of this difference between our
+>> API and that of HCI I don't think it's fair to apply the HCI
+>> convention/restriction to us.
+>>
+>> Johan
+>>
+>
+> I added 3 values because it gives more flexibility. Possible use cases:
+> - Whitelist needs the address type
+> - SMP
+> - As input to decide to store or not information about the device
+> since private address can change every 15minutes
+>
+>  At the moment we only need to know if the address is basic rate or LE
+> to select the discovery type: SDP or LE Discovery primary. For
+> pairing, Vinicius is using the kernel advertising cache to discover
+> the address type, passing the address type could avoid wrong fallback
+> to basic rate if the entry is not found in the cache.
+>
+> Claudio
+>
 
-Other than that we basically bugfixes and cleanups.
+Any objection to add the address type in the MGMT_EV_DEVICE_CONNECTED event?
+Inside event.c there are a lot of get_adapter_and_device calls, for
+some contexts it creates a new device object if it doesn't exist(eg:
+incoming pairing). But the type is required to create a new device,
+otherwise it will not be possible to trigger the reverse service
+search. Obtain the type later based on the link key type will not
+work, unless we create a device with unknown type to be able to call
+the agent methods.
 
-Please pull, thanks!
+BTW, is there a reason why it is necessary to "force" device
+creation(get_adapter_and_device option)? In my opinion we could create
+the device(if it doesn't exist) it inside btd_event_conn_complete
+only. There is a potential race condition: other application calling
+RemoveDevice, but for this case reference counting should work.
+
+Currently, controllers doesn't support simultaneous BR/EDR/LE, this is
+another argument to export the address type or connection type through
+management interface avoiding future changes on the API.
 
 
-The following changes since commit a90c7a313a1c5b4fc99f987a2ae8f92ab0ae35c7:
-
-  cfg80211: add a timer for invalid user reg hints (2011-04-07 15:52:29 -0400)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
-
-Gustavo F. Padovan (26):
-      Bluetooth: Create struct l2cap_chan
-      Bluetooth: Use struct list_head for L2CAP channels list
-      Bluetooth: Remove struct del_list
-      Bluetooth: Move ident to struct l2cap_chan
-      Bluetooth: Move conf_{req,rsp} stuff to struct l2cap_chan
-      Bluetooth: clean up l2cap_sock_recvmsg()
-      Bluetooth: Move conn_state to struct l2cap_chan
-      Bluetooth: Move of ERTM *_seq vars to struct l2cap_chan
-      Bluetooth: Move more ERTM stuff to struct l2cap_chan
-      Bluetooth: Move SDU related vars to struct l2cap_chan
-      Bluetooth: Move remote info to struct l2cap_chan
-      Bluetooth: Move ERTM timers to struct l2cap_chan
-      Bluetooth: Move srej and busy queues to struct l2cap_chan
-      Bluetooth: Move busy workqueue to struct l2cap_chan
-      Bluetooth: Fix lockdep warning with skb list lock
-      Bluetooth: Move SREJ list to struct l2cap_chan
-      Bluetooth: Remove some sk references from l2cap_core.c
-      Bluetooth: Remove unneeded uninitialized_vars()
-      Bluetooth: Move tx queue to struct l2cap_chan
-      Bluetooth: Fix wrong comparison in listen()
-      Bluetooth: Clean up ath3k_load_firmware()
-      Bluetooth: Add proper handling of received LE data
-      Bluetooth: Check return value of hci_recv_stream_fragment()
-      Bluetooth: Don't lock sock inside l2cap_get_sock_by_scid()
-      Bluetooth: Fix another locking unbalance
-      Bluetooth: Fix lockdep warning in L2CAP
-
-Jiejing Zhang (1):
-      Bluetooth: hci_uart: check the return value of recv()
-
-Kevin Gan (1):
-      Bluetooth: btmrvl: support Marvell Bluetooth device SD8787
-
-Szymon Janc (1):
-      Bluetooth: Fix Out Of Band pairing when mgmt interface is disabled
-
- drivers/bluetooth/Kconfig       |    4 +-
- drivers/bluetooth/ath3k.c       |    3 -
- drivers/bluetooth/btmrvl_sdio.c |  124 +++-
- drivers/bluetooth/btmrvl_sdio.h |   68 +-
- drivers/bluetooth/hci_ath.c     |    7 +-
- drivers/bluetooth/hci_h4.c      |    7 +-
- drivers/bluetooth/hci_ldisc.c   |    6 +-
- include/net/bluetooth/l2cap.h   |  130 ++--
- net/bluetooth/hci_event.c       |    4 +
- net/bluetooth/l2cap_core.c      | 1344 +++++++++++++++++++++------------------
- net/bluetooth/l2cap_sock.c      |   72 +--
- 11 files changed, 964 insertions(+), 805 deletions(-)
-
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Regards,
+Claudio.
