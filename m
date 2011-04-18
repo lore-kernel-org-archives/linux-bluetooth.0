@@ -1,46 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4DAA27C8.7060800@gmail.com>
-References: <BANLkTi=LvyZ+7BHfVL849pztfvsYaVM4SQ@mail.gmail.com>
- <4DA9CB83.4050000@gmail.com> <BANLkTi=avo9yvpQ0VRPRv1uroF3ZnJzfAg@mail.gmail.com>
- <4DAA27C8.7060800@gmail.com>
-From: Gottfried Haider <gottfried.haider@gmail.com>
-Date: Mon, 18 Apr 2011 09:34:24 +0200
-Message-ID: <BANLkTikihzxtp9ep3dE1zpPGKUGm1gij8Q@mail.gmail.com>
-Subject: Re: [Regression] Bluetooth pairing does not work anymore in
- 2.6.39-rc3 (works in 2.6.38.3)
-To: "Justin P. Mattock" <justinmattock@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix not waiting for POLLERR when disconnecting SCO
+Date: Mon, 18 Apr 2011 09:57:26 +0300
+Message-Id: <1303109846-8811-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->> I checked: I have this commit in -rc3, so it must be something else here.
-> hmm... seems to be working over here with the latest Mainline. one thing  I
-> have notice though is the daemon is not starting during boot(systemd),
-> manually starting bluetoothd gets me to connect.(system is fedora 15).
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-It was my fault after all:
+To make sure the SCO link is really disconnected we should wait for
+POLLERR since POLLHUP does not necessarily means the link is
+completely disconnected just that no further data can be sent/received.
 
-I had based my kernel config on 2.6.39-rc2 from Ubuntu's
-mainline-kernel PPA, and this doesn't have BT_L2CAP..
+Note that this depend on a fix of SCO socket shutdown in kernel to wait
+for disconnect confimation to then kill/destroy the socket indicating
+the err/reason using POLLERR.
+---
+ audio/headset.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Case closed.
+diff --git a/audio/headset.c b/audio/headset.c
+index c605e9d..819e0f8 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -2548,7 +2548,7 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 					AUDIO_HEADSET_INTERFACE, "State",
+ 					DBUS_TYPE_STRING, &state_str);
+ 		hs->sco_id = g_io_add_watch(hs->sco,
+-					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++					G_IO_ERR | G_IO_NVAL,
+ 					(GIOFunc) sco_cb, dev);
+ 
+ 		g_dbus_emit_signal(dev->conn, dev->path,
+-- 
+1.7.1
 
-
-I am just wondering: is it possible to make BT_L2CAP (and SCO?)
-default to yes when BT is compiled in or build as a module?
-
->From commit 6427451: "The L2CAP layer is needed by almost all
-Bluetooth protocols and profiles. There isn't any real use case
-without having L2CAP loaded." Yet when I am doing oldconfig from a
-config that had L2CAP build as a module, I am getting these easily
-overlooked lines:
-
-L2CAP protocol support (BT_L2CAP) [N/y/?] (NEW)
-SCO links support (BT_SCO) [N/y/?] (NEW)
-
-
-cheers,
-gohai
