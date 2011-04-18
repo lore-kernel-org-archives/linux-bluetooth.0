@@ -1,27 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 18 Apr 2011 19:48:13 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next-2.6 2011-04-18
+Message-ID: <20110418224813.GC2472@joana>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com>
-References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com>
-Date: Tue, 19 Apr 2011 15:46:17 +0800
-Message-ID: <BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
-Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Hui Zhu <teawater@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
-> Cannot connect to any outside devices through bluetooth.
->
-> And I think this is not a bug of low level driver.  Because both my
-> laptop and a usb bluetooth card cannot work.
+Hi John,
 
-Hi, please explain the "cannot work" in detail,
-Firstly check dmesg and hciconfig to see if there's anything wrong.
+Biggest changes are the initial patches for an refactor inside the L2CAP code:
+we have to separate the L2CAP socket stuff from the L2CAP core code to make
+life of L2CAP users(rfcomm and AMP manager in the future) inside the kernel easy.
+
+Other than that we basically bugfixes and cleanups.
+
+Please pull, thanks!
+
+
+The following changes since commit a90c7a313a1c5b4fc99f987a2ae8f92ab0ae35c7:
+
+  cfg80211: add a timer for invalid user reg hints (2011-04-07 15:52:29 -0400)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+
+Gustavo F. Padovan (26):
+      Bluetooth: Create struct l2cap_chan
+      Bluetooth: Use struct list_head for L2CAP channels list
+      Bluetooth: Remove struct del_list
+      Bluetooth: Move ident to struct l2cap_chan
+      Bluetooth: Move conf_{req,rsp} stuff to struct l2cap_chan
+      Bluetooth: clean up l2cap_sock_recvmsg()
+      Bluetooth: Move conn_state to struct l2cap_chan
+      Bluetooth: Move of ERTM *_seq vars to struct l2cap_chan
+      Bluetooth: Move more ERTM stuff to struct l2cap_chan
+      Bluetooth: Move SDU related vars to struct l2cap_chan
+      Bluetooth: Move remote info to struct l2cap_chan
+      Bluetooth: Move ERTM timers to struct l2cap_chan
+      Bluetooth: Move srej and busy queues to struct l2cap_chan
+      Bluetooth: Move busy workqueue to struct l2cap_chan
+      Bluetooth: Fix lockdep warning with skb list lock
+      Bluetooth: Move SREJ list to struct l2cap_chan
+      Bluetooth: Remove some sk references from l2cap_core.c
+      Bluetooth: Remove unneeded uninitialized_vars()
+      Bluetooth: Move tx queue to struct l2cap_chan
+      Bluetooth: Fix wrong comparison in listen()
+      Bluetooth: Clean up ath3k_load_firmware()
+      Bluetooth: Add proper handling of received LE data
+      Bluetooth: Check return value of hci_recv_stream_fragment()
+      Bluetooth: Don't lock sock inside l2cap_get_sock_by_scid()
+      Bluetooth: Fix another locking unbalance
+      Bluetooth: Fix lockdep warning in L2CAP
+
+Jiejing Zhang (1):
+      Bluetooth: hci_uart: check the return value of recv()
+
+Kevin Gan (1):
+      Bluetooth: btmrvl: support Marvell Bluetooth device SD8787
+
+Szymon Janc (1):
+      Bluetooth: Fix Out Of Band pairing when mgmt interface is disabled
+
+ drivers/bluetooth/Kconfig       |    4 +-
+ drivers/bluetooth/ath3k.c       |    3 -
+ drivers/bluetooth/btmrvl_sdio.c |  124 +++-
+ drivers/bluetooth/btmrvl_sdio.h |   68 +-
+ drivers/bluetooth/hci_ath.c     |    7 +-
+ drivers/bluetooth/hci_h4.c      |    7 +-
+ drivers/bluetooth/hci_ldisc.c   |    6 +-
+ include/net/bluetooth/l2cap.h   |  130 ++--
+ net/bluetooth/hci_event.c       |    4 +
+ net/bluetooth/l2cap_core.c      | 1344 +++++++++++++++++++++------------------
+ net/bluetooth/l2cap_sock.c      |   72 +--
+ 11 files changed, 964 insertions(+), 805 deletions(-)
 
 -- 
-Regards
-dave
+Gustavo F. Padovan
+http://profusion.mobi
