@@ -2,100 +2,129 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 4/4] Remove read_local_version() from struct btd_adapter_ops
-Date: Tue, 19 Apr 2011 16:34:03 -0400
-Message-Id: <1303245243-12116-5-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH 3/4] Move adapter name from struct hci_dev to struct btd_adapter
+Date: Tue, 19 Apr 2011 16:34:02 -0400
+Message-Id: <1303245243-12116-4-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This callback is used only for getting HCI version/manufacturer
-information, and is not being called anywhere in BlueZ anymore.
+It makes more sense to have this information on the adapter structure,
+as it is not HCI specific.
 ---
- plugins/hciops.c  |   12 ------------
- plugins/mgmtops.c |   18 ------------------
- src/adapter.h     |    1 -
- 3 files changed, 0 insertions(+), 31 deletions(-)
+ src/adapter.c |   30 ++++++++++++++----------------
+ src/adapter.h |    1 -
+ 2 files changed, 14 insertions(+), 17 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 7d2eca3..2b9be3f 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -3231,17 +3231,6 @@ static int hciops_get_conn_list(int index, GSList **conns)
- 	return 0;
- }
+diff --git a/src/adapter.c b/src/adapter.c
+index 6707241..2b9f719 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -113,6 +113,7 @@ struct btd_adapter {
+ 	char *path;			/* adapter object path */
+ 	bdaddr_t bdaddr;		/* adapter Bluetooth Address */
+ 	uint32_t dev_class;		/* Class of Device */
++	char name[MAX_NAME_LENGTH + 1]; /* adapter name */
+ 	guint discov_timeout_id;	/* discoverable timeout id */
+ 	guint stop_discov_id;		/* stop inquiry/scanning id */
+ 	uint32_t discov_timeout;	/* discoverable time(sec) */
+@@ -926,21 +927,19 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
  
--static int hciops_read_local_version(int index, struct hci_version *ver)
--{
--	struct dev_info *dev = &devs[index];
--
--	DBG("hci%d", index);
--
--	memcpy(ver, &dev->ver, sizeof(*ver));
--
--	return 0;
--}
--
- static int hciops_read_local_features(int index, uint8_t *features)
+ void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
  {
- 	struct dev_info *dev = &devs[index];
-@@ -3696,7 +3685,6 @@ static struct btd_adapter_ops hci_ops = {
- 	.block_device = hciops_block_device,
- 	.unblock_device = hciops_unblock_device,
- 	.get_conn_list = hciops_get_conn_list,
--	.read_local_version = hciops_read_local_version,
- 	.read_local_features = hciops_read_local_features,
- 	.disconnect = hciops_disconnect,
- 	.remove_bonding = hciops_remove_bonding,
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 042afc5..bb53e82 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1706,23 +1706,6 @@ static int mgmt_get_conn_list(int index, GSList **conns)
- 	return 0;
- }
+-	struct hci_dev *dev = &adapter->dev;
+-
+-	if (strncmp(name, dev->name, MAX_NAME_LENGTH) == 0)
++	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
+ 		return;
  
--static int mgmt_read_local_version(int index, struct hci_version *ver)
--{
--	struct controller_info *info = &controllers[index];
--
--	DBG("index %d", index);
--
--	if (!info->valid)
--		return -ENODEV;
--
--	memset(ver, 0, sizeof(*ver));
--	ver->manufacturer = info->manufacturer;
--	ver->hci_ver = info->hci_ver;
--	ver->hci_rev = info->hci_rev;
--
--	return 0;
--}
--
- static int mgmt_read_local_features(int index, uint8_t *features)
+-	strncpy(dev->name, name, MAX_NAME_LENGTH);
++	strncpy(adapter->name, name, MAX_NAME_LENGTH);
+ 
+ 	if (main_opts.attrib_server)
+ 		attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+-			(const uint8_t *) dev->name, strlen(dev->name));
++			(const uint8_t *) adapter->name, strlen(adapter->name));
+ 
+ 	if (!adapter->name_stored) {
+-		char *name_ptr = dev->name;
++		char *name_ptr = adapter->name;
+ 
+-		write_local_name(&adapter->bdaddr, dev->name);
++		write_local_name(&adapter->bdaddr, adapter->name);
+ 
+ 		if (connection)
+ 			emit_property_changed(connection, adapter->path,
+@@ -955,18 +954,17 @@ static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
+ 					const char *name, void *data)
  {
- 	struct controller_info *info = &controllers[index];
-@@ -2024,7 +2007,6 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.block_device = mgmt_block_device,
- 	.unblock_device = mgmt_unblock_device,
- 	.get_conn_list = mgmt_get_conn_list,
--	.read_local_version = mgmt_read_local_version,
- 	.read_local_features = mgmt_read_local_features,
- 	.disconnect = mgmt_disconnect,
- 	.remove_bonding = mgmt_remove_bonding,
+ 	struct btd_adapter *adapter = data;
+-	struct hci_dev *dev = &adapter->dev;
+-	char *name_ptr = dev->name;
++	char *name_ptr = adapter->name;
+ 
+ 	if (!g_utf8_validate(name, -1, NULL)) {
+ 		error("Name change failed: supplied name isn't valid UTF-8");
+ 		return btd_error_invalid_args(msg);
+ 	}
+ 
+-	if (strncmp(name, dev->name, MAX_NAME_LENGTH) == 0)
++	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
+ 		goto done;
+ 
+-	strncpy(dev->name, name, MAX_NAME_LENGTH);
++	strncpy(adapter->name, name, MAX_NAME_LENGTH);
+ 	write_local_name(&adapter->bdaddr, name);
+ 	emit_property_changed(connection, adapter->path,
+ 					ADAPTER_INTERFACE, "Name",
+@@ -1362,7 +1360,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 
+ 	/* Name */
+ 	memset(str, 0, sizeof(str));
+-	strncpy(str, (char *) adapter->dev.name, MAX_NAME_LENGTH);
++	strncpy(str, (char *) adapter->name, MAX_NAME_LENGTH);
+ 	property = str;
+ 
+ 	dict_append_entry(&dict, "Name", DBUS_TYPE_STRING, &property);
+@@ -2454,7 +2452,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
+ 	if (main_opts.le)
+ 		adapter_ops->enable_le(adapter->dev_id);
+ 
+-	adapter_ops->set_name(adapter->dev_id, adapter->dev.name);
++	adapter_ops->set_name(adapter->dev_id, adapter->name);
+ 
+ 	if (read_local_class(&adapter->bdaddr, cls) < 0) {
+ 		uint32_t class = htobl(main_opts.class);
+@@ -2698,13 +2696,13 @@ gboolean adapter_init(struct btd_adapter *adapter)
+ 		return FALSE;
+ 	}
+ 
+-	if (read_local_name(&adapter->bdaddr, adapter->dev.name) < 0)
+-		expand_name(adapter->dev.name, MAX_NAME_LENGTH, main_opts.name,
++	if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
++		expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
+ 							adapter->dev_id);
+ 
+ 	if (main_opts.attrib_server)
+ 		attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+-			(const uint8_t *) dev->name, strlen(dev->name));
++			(const uint8_t *) adapter->name, strlen(adapter->name));
+ 
+ 	sdp_init_services_list(&adapter->bdaddr);
+ 	load_drivers(adapter);
 diff --git a/src/adapter.h b/src/adapter.h
-index 4d8824e..ee3cae9 100644
+index 01659f1..4d8824e 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -209,7 +209,6 @@ struct btd_adapter_ops {
- 	int (*block_device) (int index, bdaddr_t *bdaddr);
- 	int (*unblock_device) (int index, bdaddr_t *bdaddr);
- 	int (*get_conn_list) (int index, GSList **conns);
--	int (*read_local_version) (int index, struct hci_version *ver);
- 	int (*read_local_features) (int index, uint8_t *features);
- 	int (*disconnect) (int index, bdaddr_t *bdaddr);
- 	int (*remove_bonding) (int index, bdaddr_t *bdaddr);
+@@ -93,7 +93,6 @@ struct hci_dev {
+ 	uint8_t  features[8];
+ 	uint8_t  extfeatures[8];
+ 
+-	char     name[MAX_NAME_LENGTH + 1];
+ };
+ 
+ void btd_adapter_start(struct btd_adapter *adapter);
 -- 
 1.7.0.4
 
