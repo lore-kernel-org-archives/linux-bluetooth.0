@@ -1,32 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 0/4] Remove deprecated fields from struct hci_dev
-Date: Tue, 19 Apr 2011 16:33:59 -0400
-Message-Id: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
+Date: Tue, 19 Apr 2011 15:04:25 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Anurag Gupta <anurag1303@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BT 3.0 HS Support in BlueZ
+Message-ID: <20110419180425.GA2476@joana>
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches remove unused fields from struct hci_dev. The adapter name is
-moved to struct btd_adapter. The entire struct hci_dev will be gone once the
-device discovery logic is moved to the hciops/mgmtops plugin.
+Hi Anurag,
 
-The last patch removes the read_local_version() from struct btd_adapter_ops. It
-was being used only by code which was removed, but we left it in a separate
-patch because we don't know if it is okay to remove it completely.
+* Anurag Gupta <anurag1303@gmail.com> [2011-04-19 23:06:57 +0530]:
 
-Note that no removed fields are used on D-Bus API nor internally.
+> Hello all,
+> 
+> Does anybody know if bluetooth 3.0 HS spec is supported in BlueZ?
+> Is AMP supported in BlueZ?
 
-Bruna Moreira (4):
-  Remove ssp_mode from struct hci_dev
-  Remove LMP/HCI version and manufacturer from struct hci_dev
-  Move adapter name from struct hci_dev to struct btd_adapter
-  Remove read_local_version() from struct btd_adapter_ops
+There is two different implementations, one by Atheros and another by QuIC.
+Both never reach upstream, if you look to the list logs you will find them.
 
- plugins/hciops.c  |   21 ---------------------
- plugins/mgmtops.c |   18 ------------------
- src/adapter.c     |   52 ++++++++++++++--------------------------------------
- src/adapter.h     |    9 ---------
- 4 files changed, 14 insertions(+), 86 deletions(-)
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
