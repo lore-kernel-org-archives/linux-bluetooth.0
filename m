@@ -1,99 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1302736838.2572.262.camel@aeonflux>
-References: <anderson.briglia@openbossa.org> <1302567158-18617-2-git-send-email-anderson.briglia@openbossa.org>
- <1302581196.2572.249.camel@aeonflux> <BANLkTinoW_bjCw=DwS2pMg-eM06Yq3MXLg@mail.gmail.com>
- <1302605974.2572.258.camel@aeonflux> <BANLkTinOJGPTfQwjTi7mXEWHWKAd0aX6Zw@mail.gmail.com>
- <1302736838.2572.262.camel@aeonflux>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Tue, 19 Apr 2011 17:50:27 -0400
-Message-ID: <BANLkTimez87G5-PnbDr8JPOuY7OU8+M25Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: MTU configuration for LE links
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, linux-bluetooth@vger.kernel.org,
-	ville.tervo@nokia.com, johan.hedberg@gmail.com,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: anderson.briglia@openbossa.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Add discovering event to the Management interface
+Date: Tue, 19 Apr 2011 17:35:26 -0400
+Message-Id: <4dae0089.a905ec0a.709a.12f8@mx.google.com>
+In-Reply-To: <1303248926-16607-1-git-send-email-y>
+References: <1303248926-16607-1-git-send-email-y>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
-On Wed, Apr 13, 2011 at 7:20 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Anderson,
->
->> >> One thing to consider is that there are a couple of MTU checks along
->> >> the L2CAP code. The issue which originated this patch is code such as=
-:
->> >>
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check outgoing MTU */
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > pi->omtu) {
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EMSGSIZE;
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> >>
->> >> We understood that just letting omtu/imtu values on kernel reflect th=
-e
->> >> current connection MTU settings was the cleanest solution. What do yo=
-u
->> >> propose? Bypassing these checks for LE?
->> >
->> > this does not look clean to me. And we might have an internal MTU
->> > variable as part of L2CAP, but the way how it gets set and thus its
->> > semantic differs clearly between BR/EDR and LE. So shoehorning an
->> > existing socket option this is clearly a bad idea.
->>
->> Sure. What to do then if:
->>
->> 1) LE links have MTU (omtu specifically) hard-coded to 23 on kernel.
->> 2) the kernel rejects sending data longer than omtu.
->>
->> (this is the current situation)
->>
->> This clearly needs some fix on kernel side, otherwise we can't send
->> PDUs longer than the LE default MTU (23), *even* if the peer device
->> supports a bigger MTU.
->
-> I agree with that. Userspace needs to be able to change the kernel MTU
-> if a different one gets negotiated. That is not the problem. The problem
-> is trying to shoehorn this into an existing (and already declared
-> legacy) socket option.
->
->> Suggestions are welcome regarding how to best approach this, without
->> affecting current BR/EDR MTU semantics.
->
-> We need to have a socket option that allows us the dynamically change
-> the MTU of a L2CAP link. And right now this option will only be valid if
-> the link is actually an LE link.
+This patch adds a new event to the Management interface to track when
+local adapters are discovering remote devices. For now this only tracks
+BR/EDR discovery procedures.
 
-Ok, so we have some options IMHO:
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |    2 +
+ net/bluetooth/hci_event.c        |   44 +++++++++++++++++++++++++++++++++++--
+ net/bluetooth/mgmt.c             |    6 +++++
+ 4 files changed, 50 insertions(+), 3 deletions(-)
 
-a) Do not add a new option in struct l2cap_options because it will
-still be hijacking.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4093133..69967e5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -790,6 +790,7 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
++int mgmt_discovering(u16 index, u8 discovering);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index be93dd0..7434406 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -285,3 +285,5 @@ struct mgmt_ev_remote_name {
+ 	bdaddr_t bdaddr;
+ 	__u8 name[MGMT_MAX_NAME_LENGTH];
+ } __packed;
++
++#define MGMT_EV_DISCOVERING		0x0014
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c7eb073..f356ed7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -56,6 +56,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+@@ -72,6 +76,10 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -841,10 +849,15 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 
+ 	if (status) {
+ 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+-
+ 		hci_conn_check_pending(hdev);
+-	} else
+-		set_bit(HCI_INQUIRY, &hdev->flags);
++		return;
++	}
++
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					!test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 1);
++
++	set_bit(HCI_INQUIRY, &hdev->flags);
+ }
+ 
+ static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+@@ -1208,6 +1221,10 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 
+ 	BT_DBG("%s status %d", hdev->name, status);
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+@@ -1228,6 +1245,13 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	for (; num_rsp; num_rsp--, info++) {
+ 		bacpy(&data.bdaddr, &info->bdaddr);
+ 		data.pscan_rep_mode	= info->pscan_rep_mode;
+@@ -2158,6 +2182,13 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+ 		struct inquiry_info_with_rssi_and_pscan_mode *info;
+ 		info = (void *) (skb->data + 1);
+@@ -2320,6 +2351,13 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	if (!num_rsp)
+ 		return;
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	hci_dev_lock(hdev);
+ 
+ 	for (; num_rsp; num_rsp--, info++) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 958544a..f623b8a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2150,3 +2150,9 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
+ 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+ }
+ 
++int mgmt_discovering(u16 index, u8 discovering)
++{
++	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
++						sizeof(discovering), NULL);
++}
++
+-- 
+1.7.1
 
-b) Add a new option for LE OMTU in struct l2cap_conninfo. Is it valid?
-
-c) Add a new struct (l2cap_le_options ?) and add a omtu field there.
-
-The problem in c) is that we will have to implement significant
-modifications in userspace and the code should be redundant: we will
-have two options to represent the same value.
-
-Regards,
-
-Anderson Briglia
-
->
-> Regards
->
-> Marcel
->
->
->
-
-
-
---=20
-INdT - Instituto Nokia de tecnologia
-+55 2126 1122
-http://techblog.briglia.net
