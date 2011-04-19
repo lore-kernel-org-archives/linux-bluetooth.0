@@ -2,68 +2,89 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH 2/4] Remove LMP/HCI version and manufacturer from struct hci_dev
-Date: Tue, 19 Apr 2011 16:34:01 -0400
-Message-Id: <1303245243-12116-3-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH 1/4] Remove ssp_mode from struct hci_dev
+Date: Tue, 19 Apr 2011 16:34:00 -0400
+Message-Id: <1303245243-12116-2-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These fields were not being used anywhere inside BlueZ.
+ssp_mode is duplicated information and is not being used anywhere.
 ---
- src/adapter.c |   13 -------------
- src/adapter.h |    4 ----
- 2 files changed, 0 insertions(+), 17 deletions(-)
+ plugins/hciops.c |    9 ---------
+ src/adapter.c    |    9 ---------
+ src/adapter.h    |    3 ---
+ 3 files changed, 0 insertions(+), 21 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 06119dd..6707241 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2675,7 +2675,6 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- 
- gboolean adapter_init(struct btd_adapter *adapter)
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 93f6f21..7d2eca3 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -1658,7 +1658,6 @@ static void read_simple_pairing_mode_complete(int index, void *ptr)
  {
--	struct hci_version ver;
- 	struct hci_dev *dev;
- 	int err;
+ 	struct dev_info *dev = &devs[index];
+ 	read_simple_pairing_mode_rp *rp = ptr;
+-	struct btd_adapter *adapter;
  
-@@ -2690,20 +2689,8 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 		return FALSE;
- 	}
+ 	DBG("hci%d status %u", index, rp->status);
  
--	err = adapter_ops->read_local_version(adapter->dev_id, &ver);
--	if (err < 0) {
--		error("Can't read version info for hci%d: %s (%d)",
--					adapter->dev_id, strerror(-err), -err);
--		return FALSE;
+@@ -1667,14 +1666,6 @@ static void read_simple_pairing_mode_complete(int index, void *ptr)
+ 
+ 	dev->ssp_mode = rp->mode;
+ 	update_ext_inquiry_response(index);
+-
+-	adapter = manager_find_adapter(&dev->bdaddr);
+-	if (!adapter) {
+-		error("No matching adapter found");
+-		return;
 -	}
 -
- 	dev = &adapter->dev;
+-	adapter_update_ssp_mode(adapter, rp->mode);
+ }
  
--	dev->hci_rev = ver.hci_rev;
--	dev->lmp_ver = ver.lmp_ver;
--	dev->lmp_subver = ver.lmp_subver;
--	dev->manufacturer = ver.manufacturer;
+ static void read_local_ext_features_complete(int index,
+diff --git a/src/adapter.c b/src/adapter.c
+index dbc2c93..06119dd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2623,15 +2623,6 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+ 	return 0;
+ }
+ 
+-int adapter_update_ssp_mode(struct btd_adapter *adapter, uint8_t mode)
+-{
+-	struct hci_dev *dev = &adapter->dev;
 -
- 	err = adapter_ops->read_local_features(adapter->dev_id, dev->features);
- 	if (err < 0) {
- 		error("Can't read features for hci%d: %s (%d)",
+-	dev->ssp_mode = mode;
+-
+-	return 0;
+-}
+-
+ static void adapter_free(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
 diff --git a/src/adapter.h b/src/adapter.h
-index 14338b5..01659f1 100644
+index 308af75..14338b5 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -92,10 +92,6 @@ struct remote_dev_info {
- struct hci_dev {
- 	uint8_t  features[8];
- 	uint8_t  extfeatures[8];
--	uint8_t  lmp_ver;
--	uint16_t lmp_subver;
--	uint16_t hci_rev;
--	uint16_t manufacturer;
+@@ -97,7 +97,6 @@ struct hci_dev {
+ 	uint16_t hci_rev;
+ 	uint16_t manufacturer;
  
+-	uint8_t  ssp_mode;
  	char     name[MAX_NAME_LENGTH + 1];
  };
+ 
+@@ -108,8 +107,6 @@ int btd_adapter_stop(struct btd_adapter *adapter);
+ void btd_adapter_get_mode(struct btd_adapter *adapter, uint8_t *mode,
+ 					uint8_t *on_mode, gboolean *pairable);
+ 
+-int adapter_update_ssp_mode(struct btd_adapter *adapter, uint8_t mode);
+-
+ struct btd_device *adapter_get_device(DBusConnection *conn,
+ 				struct btd_adapter *adapter, const char *address);
+ 
 -- 
 1.7.0.4
 
