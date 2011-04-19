@@ -1,145 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH 1/2] Bluetooth: Add basic discovery commands to the management interface
-Date: Tue, 19 Apr 2011 17:35:25 -0400
-Message-Id: <4dae0084.a905ec0a.709a.12f6@mx.google.com>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH 4/4] Remove read_local_version() from struct btd_adapter_ops
+Date: Tue, 19 Apr 2011 16:34:03 -0400
+Message-Id: <1303245243-12116-5-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
+References: <1303245243-12116-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
-
-This patch adds start_discovery and stop_discovery commands to the
-management interface. Right now their implementation is fairly
-simplistic and the parameters are fixed to what user space has
-defaulted to so far.
-This is the very initial phase for discovery implementation into
-the kernel. Next steps include name resolution, LE scanning and
-bdaddr type handling.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+This callback is used only for getting HCI version/manufacturer
+information, and is not being called anywhere in BlueZ anymore.
 ---
- include/net/bluetooth/mgmt.h |    4 ++
- net/bluetooth/mgmt.c         |   77 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 80 insertions(+), 1 deletions(-)
+ plugins/hciops.c  |   12 ------------
+ plugins/mgmtops.c |   18 ------------------
+ src/adapter.h     |    1 -
+ 3 files changed, 0 insertions(+), 31 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 6b6ff92..be93dd0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -195,6 +195,10 @@ struct mgmt_cp_remove_remote_oob_data {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define MGMT_OP_START_DISCOVERY		0x001B
-+
-+#define MGMT_OP_STOP_DISCOVERY		0x001C
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c304688..958544a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1569,6 +1569,75 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 7d2eca3..2b9be3f 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3231,17 +3231,6 @@ static int hciops_get_conn_list(int index, GSList **conns)
+ 	return 0;
  }
  
-+static int start_discovery(struct sock *sk, u16 index)
-+{
-+	u8 lap[3] = { 0x33, 0x8b, 0x9e };
-+	struct hci_cp_inquiry cp;
-+	struct pending_cmd *cmd;
-+	struct hci_dev *hdev;
-+	int err;
-+
-+	BT_DBG("hci%u ", index);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY, ENODEV);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, index, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(&cp.lap, lap, 3);
-+	cp.length  = 0x08;
-+	cp.num_rsp = 0x00;
-+
-+	err = hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+failed:
-+	hci_dev_unlock_bh(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
-+static int stop_discovery(struct sock *sk, u16 index)
-+{
-+	struct hci_dev *hdev;
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	BT_DBG("hci%u ", index);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY, ENODEV);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, index, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+failed:
-+	hci_dev_unlock_bh(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1677,7 +1746,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 		err = remove_remote_oob_data(sk, index, buf + sizeof(*hdr),
- 									len);
- 		break;
+-static int hciops_read_local_version(int index, struct hci_version *ver)
+-{
+-	struct dev_info *dev = &devs[index];
 -
-+	case MGMT_OP_START_DISCOVERY:
-+		err = start_discovery(sk, index);
-+		break;
-+	case MGMT_OP_STOP_DISCOVERY:
-+		err = stop_discovery(sk, index);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
-@@ -2075,3 +2149,4 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
- 
- 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+-	DBG("hci%d", index);
+-
+-	memcpy(ver, &dev->ver, sizeof(*ver));
+-
+-	return 0;
+-}
+-
+ static int hciops_read_local_features(int index, uint8_t *features)
+ {
+ 	struct dev_info *dev = &devs[index];
+@@ -3696,7 +3685,6 @@ static struct btd_adapter_ops hci_ops = {
+ 	.block_device = hciops_block_device,
+ 	.unblock_device = hciops_unblock_device,
+ 	.get_conn_list = hciops_get_conn_list,
+-	.read_local_version = hciops_read_local_version,
+ 	.read_local_features = hciops_read_local_features,
+ 	.disconnect = hciops_disconnect,
+ 	.remove_bonding = hciops_remove_bonding,
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 042afc5..bb53e82 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1706,23 +1706,6 @@ static int mgmt_get_conn_list(int index, GSList **conns)
+ 	return 0;
  }
-+
+ 
+-static int mgmt_read_local_version(int index, struct hci_version *ver)
+-{
+-	struct controller_info *info = &controllers[index];
+-
+-	DBG("index %d", index);
+-
+-	if (!info->valid)
+-		return -ENODEV;
+-
+-	memset(ver, 0, sizeof(*ver));
+-	ver->manufacturer = info->manufacturer;
+-	ver->hci_ver = info->hci_ver;
+-	ver->hci_rev = info->hci_rev;
+-
+-	return 0;
+-}
+-
+ static int mgmt_read_local_features(int index, uint8_t *features)
+ {
+ 	struct controller_info *info = &controllers[index];
+@@ -2024,7 +2007,6 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.block_device = mgmt_block_device,
+ 	.unblock_device = mgmt_unblock_device,
+ 	.get_conn_list = mgmt_get_conn_list,
+-	.read_local_version = mgmt_read_local_version,
+ 	.read_local_features = mgmt_read_local_features,
+ 	.disconnect = mgmt_disconnect,
+ 	.remove_bonding = mgmt_remove_bonding,
+diff --git a/src/adapter.h b/src/adapter.h
+index 4d8824e..ee3cae9 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -209,7 +209,6 @@ struct btd_adapter_ops {
+ 	int (*block_device) (int index, bdaddr_t *bdaddr);
+ 	int (*unblock_device) (int index, bdaddr_t *bdaddr);
+ 	int (*get_conn_list) (int index, GSList **conns);
+-	int (*read_local_version) (int index, struct hci_version *ver);
+ 	int (*read_local_features) (int index, uint8_t *features);
+ 	int (*disconnect) (int index, bdaddr_t *bdaddr);
+ 	int (*remove_bonding) (int index, bdaddr_t *bdaddr);
 -- 
-1.7.1
+1.7.0.4
 
