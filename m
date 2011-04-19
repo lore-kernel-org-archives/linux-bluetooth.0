@@ -3,162 +3,142 @@ From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
 Cc: Johan Hedberg <johan.hedberg@nokia.com>,
 	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH 2/2] Bluetooth: Add discovering event to the Management interface
-Date: Tue, 19 Apr 2011 17:35:26 -0400
-Message-Id: <4dae0089.a905ec0a.709a.12f8@mx.google.com>
-In-Reply-To: <1303248926-16607-1-git-send-email-y>
-References: <1303248926-16607-1-git-send-email-y>
+Subject: [PATCH 1/2] Bluetooth: Add basic discovery commands to the management interface
+Date: Tue, 19 Apr 2011 17:35:25 -0400
+Message-Id: <4dae0084.a905ec0a.709a.12f6@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-This patch adds a new event to the Management interface to track when
-local adapters are discovering remote devices. For now this only tracks
-BR/EDR discovery procedures.
+This patch adds start_discovery and stop_discovery commands to the
+management interface. Right now their implementation is fairly
+simplistic and the parameters are fixed to what user space has
+defaulted to so far.
+This is the very initial phase for discovery implementation into
+the kernel. Next steps include name resolution, LE scanning and
+bdaddr type handling.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- include/net/bluetooth/mgmt.h     |    2 +
- net/bluetooth/hci_event.c        |   44 +++++++++++++++++++++++++++++++++++--
- net/bluetooth/mgmt.c             |    6 +++++
- 4 files changed, 50 insertions(+), 3 deletions(-)
+ include/net/bluetooth/mgmt.h |    4 ++
+ net/bluetooth/mgmt.c         |   77 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 80 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4093133..69967e5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -790,6 +790,7 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
- 								u8 *eir);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
-+int mgmt_discovering(u16 index, u8 discovering);
- 
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index be93dd0..7434406 100644
+index 6b6ff92..be93dd0 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -285,3 +285,5 @@ struct mgmt_ev_remote_name {
+@@ -195,6 +195,10 @@ struct mgmt_cp_remove_remote_oob_data {
  	bdaddr_t bdaddr;
- 	__u8 name[MGMT_MAX_NAME_LENGTH];
  } __packed;
+ 
++#define MGMT_OP_START_DISCOVERY		0x001B
 +
-+#define MGMT_EV_DISCOVERING		0x0014
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c7eb073..f356ed7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -56,6 +56,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
-+	if (test_bit(HCI_MGMT, &hdev->flags) &&
-+					test_bit(HCI_INQUIRY, &hdev->flags))
-+		mgmt_discovering(hdev->id, 0);
++#define MGMT_OP_STOP_DISCOVERY		0x001C
 +
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
-@@ -72,6 +76,10 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
-+	if (test_bit(HCI_MGMT, &hdev->flags) &&
-+					test_bit(HCI_INQUIRY, &hdev->flags))
-+		mgmt_discovering(hdev->id, 0);
-+
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
- 	hci_conn_check_pending(hdev);
-@@ -841,10 +849,15 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 
- 	if (status) {
- 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
--
- 		hci_conn_check_pending(hdev);
--	} else
--		set_bit(HCI_INQUIRY, &hdev->flags);
-+		return;
-+	}
-+
-+	if (test_bit(HCI_MGMT, &hdev->flags) &&
-+					!test_bit(HCI_INQUIRY, &hdev->flags))
-+		mgmt_discovering(hdev->id, 1);
-+
-+	set_bit(HCI_INQUIRY, &hdev->flags);
- }
- 
- static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
-@@ -1208,6 +1221,10 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	BT_DBG("%s status %d", hdev->name, status);
- 
-+	if (test_bit(HCI_MGMT, &hdev->flags) &&
-+					test_bit(HCI_INQUIRY, &hdev->flags))
-+		mgmt_discovering(hdev->id, 0);
-+
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
-@@ -1228,6 +1245,13 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
- 
- 	hci_dev_lock(hdev);
- 
-+	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
-+		set_bit(HCI_INQUIRY, &hdev->flags);
-+
-+		if (test_bit(HCI_MGMT, &hdev->flags))
-+			mgmt_discovering(hdev->id, 1);
-+	}
-+
- 	for (; num_rsp; num_rsp--, info++) {
- 		bacpy(&data.bdaddr, &info->bdaddr);
- 		data.pscan_rep_mode	= info->pscan_rep_mode;
-@@ -2158,6 +2182,13 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
- 
- 	hci_dev_lock(hdev);
- 
-+	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
-+		set_bit(HCI_INQUIRY, &hdev->flags);
-+
-+		if (test_bit(HCI_MGMT, &hdev->flags))
-+			mgmt_discovering(hdev->id, 1);
-+	}
-+
- 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
- 		struct inquiry_info_with_rssi_and_pscan_mode *info;
- 		info = (void *) (skb->data + 1);
-@@ -2320,6 +2351,13 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 	if (!num_rsp)
- 		return;
- 
-+	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
-+		set_bit(HCI_INQUIRY, &hdev->flags);
-+
-+		if (test_bit(HCI_MGMT, &hdev->flags))
-+			mgmt_discovering(hdev->id, 1);
-+	}
-+
- 	hci_dev_lock(hdev);
- 
- 	for (; num_rsp; num_rsp--, info++) {
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 958544a..f623b8a 100644
+index c304688..958544a 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2150,3 +2150,9 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
- 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+@@ -1569,6 +1569,75 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
+ 	return err;
  }
  
-+int mgmt_discovering(u16 index, u8 discovering)
++static int start_discovery(struct sock *sk, u16 index)
 +{
-+	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
-+						sizeof(discovering), NULL);
++	u8 lap[3] = { 0x33, 0x8b, 0x9e };
++	struct hci_cp_inquiry cp;
++	struct pending_cmd *cmd;
++	struct hci_dev *hdev;
++	int err;
++
++	BT_DBG("hci%u ", index);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.lap, lap, 3);
++	cp.length  = 0x08;
++	cp.num_rsp = 0x00;
++
++	err = hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
 +}
++
++static int stop_discovery(struct sock *sk, u16 index)
++{
++	struct hci_dev *hdev;
++	struct pending_cmd *cmd;
++	int err;
++
++	BT_DBG("hci%u ", index);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY, ENODEV);
++
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
++	err = hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -1677,7 +1746,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 		err = remove_remote_oob_data(sk, index, buf + sizeof(*hdr),
+ 									len);
+ 		break;
+-
++	case MGMT_OP_START_DISCOVERY:
++		err = start_discovery(sk, index);
++		break;
++	case MGMT_OP_STOP_DISCOVERY:
++		err = stop_discovery(sk, index);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode, 0x01);
+@@ -2075,3 +2149,4 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
+ 
+ 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+ }
 +
 -- 
 1.7.1
