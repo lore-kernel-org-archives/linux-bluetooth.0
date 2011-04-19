@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Apr 2011 15:30:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Fix not waiting for POLLERR when disconnecting SCO
+Message-ID: <20110419123030.GA25424@jh-x301>
+References: <1303209490-14760-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
-References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com> <BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
-From: Hui Zhu <teawater@gmail.com>
-Date: Tue, 19 Apr 2011 23:34:30 +0800
-Message-ID: <BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
-Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
-To: Dave Young <hidave.darkstar@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1303209490-14760-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Do you part is OK?
+Hi Luiz,
 
-I think it will be very easy to reproduce.
+On Tue, Apr 19, 2011, Luiz Augusto von Dentz wrote:
+> To make sure the SCO link is really disconnected we should wait for
+> POLLERR since POLLHUP does not necessarily means the link is
+> completely disconnected just that no further data can be sent/received.
+> 
+> Note that this depend on a fix of SCO socket shutdown in kernel to wait
+> for disconnect confimation to then kill/destroy the socket indicating
+> the err/reason using POLLERR.
+> ---
+>  audio/headset.c |    5 ++++-
+>  1 files changed, 4 insertions(+), 1 deletions(-)
 
-Thanks,
-Hui
+Pushed upstream. Thanks.
 
-On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
-> On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
->> Cannot connect to any outside devices through bluetooth.
->>
->> And I think this is not a bug of low level driver.  Because both my
->> laptop and a usb bluetooth card cannot work.
->
-> Hi, please explain the "cannot work" in detail,
-> Firstly check dmesg and hciconfig to see if there's anything wrong.
->
-> --
-> Regards
-> dave
->
+Johan
