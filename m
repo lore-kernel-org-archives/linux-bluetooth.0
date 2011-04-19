@@ -1,31 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Apr 2011 15:30:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix not waiting for POLLERR when disconnecting SCO
-Message-ID: <20110419123030.GA25424@jh-x301>
-References: <1303209490-14760-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303209490-14760-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Fix not waiting for POLLERR when disconnecting SCO
+Date: Tue, 19 Apr 2011 13:38:10 +0300
+Message-Id: <1303209490-14760-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Tue, Apr 19, 2011, Luiz Augusto von Dentz wrote:
-> To make sure the SCO link is really disconnected we should wait for
-> POLLERR since POLLHUP does not necessarily means the link is
-> completely disconnected just that no further data can be sent/received.
-> 
-> Note that this depend on a fix of SCO socket shutdown in kernel to wait
-> for disconnect confimation to then kill/destroy the socket indicating
-> the err/reason using POLLERR.
-> ---
->  audio/headset.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
+To make sure the SCO link is really disconnected we should wait for
+POLLERR since POLLHUP does not necessarily means the link is
+completely disconnected just that no further data can be sent/received.
 
-Pushed upstream. Thanks.
+Note that this depend on a fix of SCO socket shutdown in kernel to wait
+for disconnect confimation to then kill/destroy the socket indicating
+the err/reason using POLLERR.
+---
+ audio/headset.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Johan
+diff --git a/audio/headset.c b/audio/headset.c
+index c605e9d..8fc83be 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -2547,8 +2547,11 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
+ 		emit_property_changed(dev->conn, dev->path,
+ 					AUDIO_HEADSET_INTERFACE, "State",
+ 					DBUS_TYPE_STRING, &state_str);
++
++		/* Do not watch HUP since we need to know when the link is
++		   really disconnected */
+ 		hs->sco_id = g_io_add_watch(hs->sco,
+-					G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++					G_IO_ERR | G_IO_NVAL,
+ 					(GIOFunc) sco_cb, dev);
+ 
+ 		g_dbus_emit_signal(dev->conn, dev->path,
+-- 
+1.7.1
+
