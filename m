@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 20 Apr 2011 22:18:52 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Subject: Re: Read RSSI through Management Interface?
-Message-ID: <20110421011852.GB9392@joana>
-References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
-MIME-Version: 1.0
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
+Subject: Announcement: Antidote, an IEEE 11073 library
+Date: Wed, 20 Apr 2011 22:09:52 -0300
+Message-Id: <A3EC7A9A-8F49-4E71-8927-3B251AFD6A1B@signove.com>
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Apple Message framework v1084)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Since the time we worked on BlueZ HDP support, we missed a free implementation
+for the "upper part" of health protocol stack, namely the IEEE 11073-20601
+standard.
 
-* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-04-20 19:20:57 -0300]:
+Well, not anymore. Signove has released its implementation as free software:
 
-> Hi guys,
-> 
-> we need to read the RSSI of LE and basic rate connections to implement
-> the Proximity profile. RSSI included in the advertising packets can't
-> be used for Proximity, it requires an "active" connection.
-> 
-> Here are some suggestions:
-> 
-> 1. Add a new command to mgmt interface to add a given address into a
-> RSSI "monitoring list".
->    When the connection is established the kernel will automatically
-> track the RSSI of the connection on regular intervals sending
-> HCI_Read_RSSI. Read RSSI value can be reported through a new event in
-> the management interface
-> 
-> Forgetting SMP, we can keep the hciops compatibility implementing the
-> same logic inside the hciops plugin.
+http://oss.signove.com/index.php/Antidote_release_announcement
 
-I'm against this in hciops. Let's add the new features only to mgmtopts, so we
-force people to use it and deprecate hciops.
+Antidote contains:
 
-> 
-> 2. Add a new command to mgmt interface to actively read the RSSI of a
-> given connection/address
+1) a library that can be statically or dynamically liked by any application that
+needs to use the IEEE protocol;
 
-If the user use this in the wrong way it will waste power. Let's
-do (1) and not give him this option to actively read RSSI.
+2) a set of transport plug-ins that save the core library from most platform
+dependencies. The most well-tested, by now, is the BlueZ HDP plugin. (Currently,
+plug-ins are linked along with library.)
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+3) a sample health D-Bus service that allows applications to communicate with
+health devices without having to link with Antidote library. This service is
+perfectly functional and doubles as a complete example of how to use the
+Antidote API.
+
+License is LGPL.
