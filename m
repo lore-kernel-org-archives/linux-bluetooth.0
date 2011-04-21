@@ -3,9 +3,9 @@ From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Johan Hedberg <johan.hedberg@gmail.com>, <padovan@profusion.mobi>,
 	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v2 4/6] Bluetooth: Ignore key unauthenticated for high security
-Date: Thu, 21 Apr 2011 09:54:19 +0200
-Message-ID: <1303372461-11848-4-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v2 3/6] Bluetooth: Map sec_level to link key requirements
+Date: Thu, 21 Apr 2011 09:54:18 +0200
+Message-ID: <1303372461-11848-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 In-Reply-To: <1303372461-11848-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 References: <1303372461-11848-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
@@ -13,50 +13,139 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-High security level for pre v2.1 devices requires combination link key
-authenticated by at least 16 digit PIN code.
-
-It's also necessary to update key_type and pin_length when the key
-exists and is sufficently secured for the connection as there will be
-no link key notify event in that case.
+Keep the link key type together with connection and use it to
+map security level to link key requirements. Authenticate and/or
+encrypt connection if the link is insufficiently secure.
 
 Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 ---
- net/bluetooth/hci_event.c |   20 ++++++++++++++++----
- 1 files changed, 16 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   61 +++++++++++++++++++++++++++++++------
+ net/bluetooth/hci_event.c        |    4 ++
+ 3 files changed, 56 insertions(+), 10 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4093133..02e7256 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -226,6 +226,7 @@ struct hci_conn {
+ 	__u16		pkt_type;
+ 	__u16		link_policy;
+ 	__u32		link_mode;
++	__u8		key_type;
+ 	__u8		auth_type;
+ 	__u8		sec_level;
+ 	__u8		pending_sec_level;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7a6f56b..74cd755 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -287,6 +287,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 	conn->auth_type = HCI_AT_GENERAL_BONDING;
+ 	conn->io_capability = hdev->io_capability;
+ 	conn->remote_auth = 0xff;
++	conn->key_type = 0xff;
+ 
+ 	conn->power_save = 1;
+ 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+@@ -535,32 +536,72 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 	return 0;
+ }
+ 
++/* Encrypt the the link */
++static void hci_conn_encrypt(struct hci_conn *conn)
++{
++	BT_DBG("conn %p", conn);
++
++	if (!test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend)) {
++		struct hci_cp_set_conn_encrypt cp;
++		cp.handle  = cpu_to_le16(conn->handle);
++		cp.encrypt = 0x01;
++		hci_send_cmd(conn->hdev, HCI_OP_SET_CONN_ENCRYPT, sizeof(cp),
++									&cp);
++	}
++}
++
+ /* Enable security */
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ {
+ 	BT_DBG("conn %p", conn);
+ 
++	/* For sdp we don't need the link key. */
+ 	if (sec_level == BT_SECURITY_SDP)
+ 		return 1;
+ 
++	/* For non 2.1 devices and low security level we don't need the link
++	   key. */
+ 	if (sec_level == BT_SECURITY_LOW &&
+ 				(!conn->ssp_mode || !conn->hdev->ssp_mode))
+ 		return 1;
+ 
+-	if (conn->link_mode & HCI_LM_ENCRYPT)
+-		return hci_conn_auth(conn, sec_level, auth_type);
+-
++	/* For other security levels we need the link key. */
++	if (!(conn->link_mode & HCI_LM_AUTH))
++		goto auth;
++
++	/* An authenticated combination key has sufficient security for any
++	   security level. */
++	if (conn->key_type == HCI_LK_AUTH_COMBINATION)
++		goto encrypt;
++
++	/* An unauthenticated combination key has sufficient security for
++	   security level 1 and 2. */
++	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION &&
++			(sec_level == BT_SECURITY_MEDIUM ||
++			sec_level == BT_SECURITY_LOW))
++		goto encrypt;
++
++	/* A combination key has always sufficient security for the security
++	   levels 1 or 2. High security level requires the combination key
++	   is generated using maximum PIN code length (16).
++	   For pre 2.1 units. */
++	if (conn->key_type == HCI_LK_COMBINATION &&
++			(sec_level != BT_SECURITY_HIGH ||
++			conn->pin_length == 16))
++		goto encrypt;
++
++auth:
+ 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
+ 		return 0;
+ 
+-	if (hci_conn_auth(conn, sec_level, auth_type)) {
+-		struct hci_cp_set_conn_encrypt cp;
+-		cp.handle  = cpu_to_le16(conn->handle);
+-		cp.encrypt = 1;
+-		hci_send_cmd(conn->hdev, HCI_OP_SET_CONN_ENCRYPT,
+-							sizeof(cp), &cp);
+-	}
++	hci_conn_auth(conn, sec_level, auth_type);
++	return 0;
++
++encrypt:
++	if (conn->link_mode & HCI_LM_ENCRYPT)
++		return 1;
+ 
++	hci_conn_encrypt(conn);
+ 	return 0;
+ }
+ EXPORT_SYMBOL(hci_conn_security);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1610e5f..087953e 100644
+index 0ceecd7..1610e5f 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2043,11 +2043,23 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
- 	}
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
-+	if (conn) {
-+		if (key->type == HCI_LK_UNAUTH_COMBINATION &&
-+				conn->auth_type != 0xff &&
-+				(conn->auth_type & 0x01)) {
-+			BT_DBG("%s ignoring unauthenticated key", hdev->name);
-+			goto not_found;
-+		}
- 
--	if (key->type == HCI_LK_UNAUTH_COMBINATION && conn &&
--			conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
--		BT_DBG("%s ignoring unauthenticated key", hdev->name);
--		goto not_found;
-+		if (key->type == HCI_LK_COMBINATION && key->pin_len < 16 &&
-+				conn->pending_sec_level == BT_SECURITY_HIGH) {
-+			BT_DBG("%s ignoring key unauthenticated for high \
-+							security", hdev->name);
-+			goto not_found;
-+		}
+@@ -2079,6 +2079,10 @@ static inline void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff
+ 		hci_conn_hold(conn);
+ 		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+ 		pin_len = conn->pin_length;
 +
-+		conn->key_type = key->type;
-+		conn->pin_length = key->pin_len;
++		if (ev->key_type != HCI_LK_CHANGED_COMBINATION)
++			conn->key_type = ev->key_type;
++
+ 		hci_conn_put(conn);
  	}
  
- 	bacpy(&cp.bdaddr, &ev->bdaddr);
 -- 
 1.7.1
 
