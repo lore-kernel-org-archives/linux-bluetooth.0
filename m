@@ -1,21 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Read RSSI through Management Interface?
-From: Marcel Holtmann <marcel@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 20 Apr 2011 22:18:52 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@nokia.com>
-In-Reply-To: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
+Subject: Re: Read RSSI through Management Interface?
+Message-ID: <20110421011852.GB9392@joana>
 References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 20 Apr 2011 20:36:35 -0700
-Message-ID: <1303356995.15916.8.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Claudio,
 
+* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-04-20 19:20:57 -0300]:
+
+> Hi guys,
+> 
 > we need to read the RSSI of LE and basic rate connections to implement
 > the Proximity profile. RSSI included in the advertising packets can't
 > be used for Proximity, it requires an "active" connection.
@@ -28,17 +32,20 @@ Hi Claudio,
 > track the RSSI of the connection on regular intervals sending
 > HCI_Read_RSSI. Read RSSI value can be reported through a new event in
 > the management interface
+> 
+> Forgetting SMP, we can keep the hciops compatibility implementing the
+> same logic inside the hciops plugin.
 
-the HCI_Read_RSSI on basic rate is a useless command since it depends
-highly on the power control. Especially since all Bluetooth chips try to
-keep this one optimized.
+I'm against this in hciops. Let's add the new features only to mgmtopts, so we
+force people to use it and deprecate hciops.
 
-The RSSI from an active connection does not really give us much. And in
-addition we have a lot of legacy BR chips just plain failing this
-command and returning static data. How do you plan to address this?
+> 
+> 2. Add a new command to mgmt interface to actively read the RSSI of a
+> given connection/address
 
-Regards
+If the user use this in the wrong way it will waste power. Let's
+do (1) and not give him this option to actively read RSSI.
 
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
