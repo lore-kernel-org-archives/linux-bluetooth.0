@@ -1,43 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keith Packard <keithp@keithp.com>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 2.6.39-rc2 regression: X201s fails to resume b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-In-Reply-To: <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com>
-References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6> <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6> <yunaag0tjzb.fsf@aiko.keithp.com> <20110409000857.GB25581@piper> <20110411173409.1567679c@lxorguk.ukuu.org.uk> <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com>
-Date: Thu, 21 Apr 2011 14:50:32 -0700
-Message-ID: <yunaafjs28n.fsf@aiko.keithp.com>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+CC: <padovan@profusion.mobi>
+Date: Thu, 21 Apr 2011 13:02:12 +0300
+Subject: RE: [PATCH v2 3/6] Bluetooth: Map sec_level to link key requirements
+Message-ID: <99B09243E1A5DA4898CDD8B7001114481086306E70@EXMB04.eu.tieto.com>
+References: <1303372461-11848-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1303372461-11848-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1303372461-11848-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Transfer-Encoding: quoted-printable
+Hi Johan, 
 
-On Mon, 11 Apr 2011 13:59:23 -0300, Vinicius Gomes <vinicius.gomes@openboss=
-a.org> wrote:
+> /* Enable security */
+> int hci_conn_security(struct hci_conn *conn, __u8 sec_level, 
+>__u8 auth_type)  {
 
-> Will send a proper fix soon. Thanks all.
+Just to clarify. This change modifies hciops behaviour, but it's not visible for the user.
+In case of re-auth an extra authentication request is generated, but hciops will link_key_request_replay (key already exists, no check against pin len) on link_key_request.
 
-This is still broken in -rc4, I'd love to see a proper patch soon --
-this will affect any machine with a bluetooth device.
+As a result, connection will be accepted without any user notification.
 
-=2D-=20
-keith.packard@intel.com
 
---=-=-=
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iD8DBQFNsKaoQp8BWwlsTdMRAjjkAJ9hXPl3Y8T50g/lH1+lPH7vx2IN8gCgjZfu
-bpd9cnPnRLknM98dv2BfnRo=
-=jXoa
------END PGP SIGNATURE-----
---=-=-=--
+Thanks,
+Waldek
