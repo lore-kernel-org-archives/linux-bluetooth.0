@@ -1,69 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+From: Keith Packard <keithp@keithp.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: 2.6.39-rc2 regression: X201s fails to resume b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
+In-Reply-To: <20110421225953.GA2323@joana>
+References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6> <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6> <yunaag0tjzb.fsf@aiko.keithp.com> <20110409000857.GB25581@piper> <20110411173409.1567679c@lxorguk.ukuu.org.uk> <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com> <yunaafjs28n.fsf@aiko.keithp.com> <20110421225953.GA2323@joana>
+Date: Thu, 21 Apr 2011 17:04:51 -0700
+Message-ID: <yun62q7i21o.fsf@aiko.keithp.com>
 MIME-Version: 1.0
-In-Reply-To: <20110421011852.GB9392@joana>
-References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
-	<20110421011852.GB9392@joana>
-Date: Thu, 21 Apr 2011 23:45:29 -0300
-Message-ID: <BANLkTik3CkS4OM9ycDQ-_gs5UE0Pu0jo7A@mail.gmail.com>
-Subject: Re: Read RSSI through Management Interface?
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+--=-=-=
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 20, 2011 at 10:18 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> Hi Claudio,
->
-> * Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-04-20 19:20:57 =
--0300]:
->
->> Hi guys,
->>
->> we need to read the RSSI of LE and basic rate connections to implement
->> the Proximity profile. RSSI included in the advertising packets can't
->> be used for Proximity, it requires an "active" connection.
->>
->> Here are some suggestions:
->>
->> 1. Add a new command to mgmt interface to add a given address into a
->> RSSI "monitoring list".
->> =C2=A0 =C2=A0When the connection is established the kernel will automati=
-cally
->> track the RSSI of the connection on regular intervals sending
->> HCI_Read_RSSI. Read RSSI value can be reported through a new event in
->> the management interface
->>
->> Forgetting SMP, we can keep the hciops compatibility implementing the
->> same logic inside the hciops plugin.
->
-> I'm against this in hciops. Let's add the new features only to mgmtopts, =
-so we
-> force people to use it and deprecate hciops.
 
-We need to keep both "interfaces" working, the same way that we are
-trying to do for discovery.
-When hciops will be removed?
+On Thu, 21 Apr 2011 19:59:53 -0300, "Gustavo F. Padovan" <padovan@profusion=
+.mobi> wrote:
 
-Anyway, if someone wants to use LE Security Manager/Pairing it is
-necessary to use the Management Interface. If security is not
-essential for LE, hciops can be used. For basic rate, it will be
-functional on both "interfaces".
+> Patch is on the way to mainline. It's currently on wireless-2.6. Next ste=
+ps
+> are net-2.6 -> linux-2.6.
 
-Claudio.
->
->>
->> 2. Add a new command to mgmt interface to actively read the RSSI of a
->> given connection/address
->
-> If the user use this in the wrong way it will waste power. Let's
-> do (1) and not give him this option to actively read RSSI.
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+I didn't see it on linux-kernel, so I was a bit worried. I'd love to
+test it in place of the kludge that Vinicius sent me.
+
+=2D-=20
+keith.packard@intel.com
+
+--=-=-=
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFNsMYjQp8BWwlsTdMRApX8AJ9vrnM4CArC56KHhQw2N3m7G6ohiwCfV0JO
+MZoPFs2kv0eMHglCjQXwKBc=
+=W13N
+-----END PGP SIGNATURE-----
+--=-=-=--
