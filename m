@@ -1,44 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 23 Apr 2011 13:37:59 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Keith Packard <keithp@keithp.com>
-Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 2.6.39-rc2 regression: X201s fails to resume
- b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-Message-ID: <20110423163759.GB2323@joana>
-References: <yun1v1fj024.fsf@aiko.keithp.com>
- <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6>
- <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6>
- <yunaag0tjzb.fsf@aiko.keithp.com>
- <20110409000857.GB25581@piper>
- <20110411173409.1567679c@lxorguk.ukuu.org.uk>
- <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com>
- <yunaafjs28n.fsf@aiko.keithp.com>
- <20110421225953.GA2323@joana>
- <yun62q7i21o.fsf@aiko.keithp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <yun62q7i21o.fsf@aiko.keithp.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Imran Haider <imran1008@gmail.com>
+To: marcel@holtmann.org,
+	padovan@profusion.mobi
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Imran Haider <imran1008@gmail.com>
+Subject: [PATCH] Bluetooth: Don't sleep after deleting command timer
+Date: Fri, 22 Apr 2011 19:02:42 -0400
+Message-Id: <1303513362-9357-1-git-send-email-imran1008@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Keith Packard <keithp@keithp.com> [2011-04-21 17:04:51 -0700]:
+This fix adds on to commit b77dcf84. It seems that scheduling a timeout
+of 250ms after deleting the command timer causes a kernel panic when
+system is resuming from Suspend-to-RAM. I tried adding another timeout
+before deleting the command timer but that didn't help so I believe that
+some code in hci_dev_do_close must execute after the command timer is
+deleted before control is returned to another thread.
 
-> 
-> On Thu, 21 Apr 2011 19:59:53 -0300, "Gustavo F. Padovan" <padovan@profusion.mobi> wrote:
-> 
-> > Patch is on the way to mainline. It's currently on wireless-2.6. Next steps
-> > are net-2.6 -> linux-2.6.
-> 
-> I didn't see it on linux-kernel, so I was a bit worried. I'd love to
-> test it in place of the kludge that Vinicius sent me.
+The only bit the command timer handler hci_cmd_timer() touches is HCI_RESET.
+It should be fine to delete the timer after testing the HCI_UP bit.
+---
+ net/bluetooth/hci_core.c |    9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
 
-I usually don't cc linux-kernel in my pull-requests, maybe I should.
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c83f618..398ec93 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -587,10 +587,10 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_req_cancel(hdev, ENODEV);
+ 	hci_req_lock(hdev);
+ 
+-	/* Stop timer, it might be running */
+-	del_timer_sync(&hdev->cmd_timer);
+-
+ 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
++		/* Stop timer, it might be running */
++		del_timer_sync(&hdev->cmd_timer);
++
+ 		hci_req_unlock(hdev);
+ 		return 0;
+ 	}
+@@ -619,6 +619,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
+ 
++	/* Stop timer, it might be running */
++	del_timer_sync(&hdev->cmd_timer);
++
+ 	/* Kill cmd task */
+ 	tasklet_kill(&hdev->cmd_task);
+ 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.3.4
