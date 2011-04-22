@@ -1,47 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keith Packard <keithp@keithp.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: 2.6.39-rc2 regression: X201s fails to resume b77dcf8460ae57d4eb9fd3633eb4f97b8fb20716
-In-Reply-To: <20110421225953.GA2323@joana>
-References: <yun1v1fj024.fsf@aiko.keithp.com> <alpine.LFD.2.00.1104070022280.3971@localhost6.localdomain6> <alpine.LFD.2.00.1104082340020.2724@localhost6.localdomain6> <yunaag0tjzb.fsf@aiko.keithp.com> <20110409000857.GB25581@piper> <20110411173409.1567679c@lxorguk.ukuu.org.uk> <BANLkTinK-cA67X6Knp-h5SKpjpDpwaMgZg@mail.gmail.com> <yunaafjs28n.fsf@aiko.keithp.com> <20110421225953.GA2323@joana>
-Date: Thu, 21 Apr 2011 17:04:51 -0700
-Message-ID: <yun62q7i21o.fsf@aiko.keithp.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-Sender: linux-kernel-owner@vger.kernel.org
+From: anderson.briglia@openbossa.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@nokia.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Add discovering event to the Management interface
+Date: Thu, 21 Apr 2011 20:00:30 -0400
+Message-Id: <4db0c547.0f44970a.646e.62f9@mx.google.com>
+In-Reply-To: <1303430430-11160-1-git-send-email-y>
+References: <1303430430-11160-1-git-send-email-y>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Transfer-Encoding: quoted-printable
+From: Johan Hedberg <johan.hedberg@nokia.com>
 
+This patch adds a new event to the Management interface to track when
+local adapters are discovering remote devices. For now this only tracks
+BR/EDR discovery procedures.
 
-On Thu, 21 Apr 2011 19:59:53 -0300, "Gustavo F. Padovan" <padovan@profusion=
-.mobi> wrote:
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |    2 +
+ net/bluetooth/hci_event.c        |   44 +++++++++++++++++++++++++++++++++++--
+ net/bluetooth/mgmt.c             |    6 +++++
+ 4 files changed, 50 insertions(+), 3 deletions(-)
 
-> Patch is on the way to mainline. It's currently on wireless-2.6. Next ste=
-ps
-> are net-2.6 -> linux-2.6.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4093133..69967e5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -790,6 +790,7 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
++int mgmt_discovering(u16 index, u8 discovering);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index be93dd0..7434406 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -285,3 +285,5 @@ struct mgmt_ev_remote_name {
+ 	bdaddr_t bdaddr;
+ 	__u8 name[MGMT_MAX_NAME_LENGTH];
+ } __packed;
++
++#define MGMT_EV_DISCOVERING		0x0014
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c7eb073..f356ed7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -56,6 +56,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+@@ -72,6 +76,10 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -841,10 +849,15 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 
+ 	if (status) {
+ 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+-
+ 		hci_conn_check_pending(hdev);
+-	} else
+-		set_bit(HCI_INQUIRY, &hdev->flags);
++		return;
++	}
++
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					!test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 1);
++
++	set_bit(HCI_INQUIRY, &hdev->flags);
+ }
+ 
+ static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+@@ -1208,6 +1221,10 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 
+ 	BT_DBG("%s status %d", hdev->name, status);
+ 
++	if (test_bit(HCI_MGMT, &hdev->flags) &&
++					test_bit(HCI_INQUIRY, &hdev->flags))
++		mgmt_discovering(hdev->id, 0);
++
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+@@ -1228,6 +1245,13 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	for (; num_rsp; num_rsp--, info++) {
+ 		bacpy(&data.bdaddr, &info->bdaddr);
+ 		data.pscan_rep_mode	= info->pscan_rep_mode;
+@@ -2158,6 +2182,13 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+ 		struct inquiry_info_with_rssi_and_pscan_mode *info;
+ 		info = (void *) (skb->data + 1);
+@@ -2320,6 +2351,13 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	if (!num_rsp)
+ 		return;
+ 
++	if (!test_bit(HCI_INQUIRY, &hdev->flags)) {
++		set_bit(HCI_INQUIRY, &hdev->flags);
++
++		if (test_bit(HCI_MGMT, &hdev->flags))
++			mgmt_discovering(hdev->id, 1);
++	}
++
+ 	hci_dev_lock(hdev);
+ 
+ 	for (; num_rsp; num_rsp--, info++) {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index dbc248f..4542396 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2149,3 +2149,9 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name)
+ 
+ 	return mgmt_event(MGMT_EV_REMOTE_NAME, index, &ev, sizeof(ev), NULL);
+ }
++
++int mgmt_discovering(u16 index, u8 discovering)
++{
++	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
++						sizeof(discovering), NULL);
++}
+-- 
+1.7.1
 
-I didn't see it on linux-kernel, so I was a bit worried. I'd love to
-test it in place of the kludge that Vinicius sent me.
-
-=2D-=20
-keith.packard@intel.com
-
---=-=-=
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iD8DBQFNsMYjQp8BWwlsTdMRApX8AJ9vrnM4CArC56KHhQw2N3m7G6ohiwCfV0JO
-MZoPFs2kv0eMHglCjQXwKBc=
-=W13N
------END PGP SIGNATURE-----
---=-=-=--
