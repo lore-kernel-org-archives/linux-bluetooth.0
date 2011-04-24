@@ -1,115 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ed Tomlinson <edt@aei.ca>
+To: Hui Zhu <teawater@gmail.com>
+Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
+Date: Sun, 24 Apr 2011 09:52:14 -0400
+Cc: Dave Young <hidave.darkstar@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com> <BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com> <BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
+In-Reply-To: <BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTimez87G5-PnbDr8JPOuY7OU8+M25Q@mail.gmail.com>
-References: <anderson.briglia@openbossa.org> <1302567158-18617-2-git-send-email-anderson.briglia@openbossa.org>
- <1302581196.2572.249.camel@aeonflux> <BANLkTinoW_bjCw=DwS2pMg-eM06Yq3MXLg@mail.gmail.com>
- <1302605974.2572.258.camel@aeonflux> <BANLkTinOJGPTfQwjTi7mXEWHWKAd0aX6Zw@mail.gmail.com>
- <1302736838.2572.262.camel@aeonflux> <BANLkTimez87G5-PnbDr8JPOuY7OU8+M25Q@mail.gmail.com>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Mon, 25 Apr 2011 09:29:00 -0400
-Message-ID: <BANLkTi=5Dk7qb+rxz-8=mGxS96w1_LeUcg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: MTU configuration for LE links
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, linux-bluetooth@vger.kernel.org,
-	ville.tervo@nokia.com, johan.hedberg@gmail.com,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201104240952.14848.edt@aei.ca>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+On Tuesday 19 April 2011 11:34:30 Hui Zhu wrote:
+> Do you part is OK?
+> 
+> I think it will be very easy to reproduce.
+> 
+> Thanks,
+> Hui
+> 
+> On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
+> > On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
+> >> Cannot connect to any outside devices through bluetooth.
+> >>
+> >> And I think this is not a bug of low level driver.  Because both my
+> >> laptop and a usb bluetooth card cannot work.
+> >
+> > Hi, please explain the "cannot work" in detail,
+> > Firstly check dmesg and hciconfig to see if there's anything wrong.
 
-On Tue, Apr 19, 2011 at 5:50 PM, Anderson Briglia
-<anderson.briglia@openbossa.org> wrote:
-> Hi Marcel,
->
-> On Wed, Apr 13, 2011 at 7:20 PM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> Hi Anderson,
->>
->>> >> One thing to consider is that there are a couple of MTU checks along
->>> >> the L2CAP code. The issue which originated this patch is code such a=
-s:
->>> >>
->>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check outgoing MTU */
->>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > pi->omtu) {
->>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EMSGSIZE;
->>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
->>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->>> >>
->>> >> We understood that just letting omtu/imtu values on kernel reflect t=
-he
->>> >> current connection MTU settings was the cleanest solution. What do y=
-ou
->>> >> propose? Bypassing these checks for LE?
->>> >
->>> > this does not look clean to me. And we might have an internal MTU
->>> > variable as part of L2CAP, but the way how it gets set and thus its
->>> > semantic differs clearly between BR/EDR and LE. So shoehorning an
->>> > existing socket option this is clearly a bad idea.
->>>
->>> Sure. What to do then if:
->>>
->>> 1) LE links have MTU (omtu specifically) hard-coded to 23 on kernel.
->>> 2) the kernel rejects sending data longer than omtu.
->>>
->>> (this is the current situation)
->>>
->>> This clearly needs some fix on kernel side, otherwise we can't send
->>> PDUs longer than the LE default MTU (23), *even* if the peer device
->>> supports a bigger MTU.
->>
->> I agree with that. Userspace needs to be able to change the kernel MTU
->> if a different one gets negotiated. That is not the problem. The problem
->> is trying to shoehorn this into an existing (and already declared
->> legacy) socket option.
->>
->>> Suggestions are welcome regarding how to best approach this, without
->>> affecting current BR/EDR MTU semantics.
->>
->> We need to have a socket option that allows us the dynamically change
->> the MTU of a L2CAP link. And right now this option will only be valid if
->> the link is actually an LE link.
->
-> Ok, so we have some options IMHO:
->
-> a) Do not add a new option in struct l2cap_options because it will
-> still be hijacking.
->
-> b) Add a new option for LE OMTU in struct l2cap_conninfo. Is it valid?
->
-> c) Add a new struct (l2cap_le_options ?) and add a omtu field there.
->
-> The problem in c) is that we will have to implement significant
-> modifications in userspace and the code should be redundant: we will
-> have two options to represent the same value.
+I am also seeing problems with bluetooth in .39-rc4+
 
-Some comments about this a) and b) should be great. LE link
-configuration is dependent of this MTU exchange to work properly.
+[54511.033258] usb 2-4.4: USB disconnect, device number 5
+[54513.920060] usb 2-4.3: new full speed USB device number 6 using ehci_hcd
+[54514.063057] usb 2-4.3: New USB device found, idVendor=0a12, idProduct=0001
+[54514.070281] usb 2-4.3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+grover ~ # hciconfig -a
+hci0:   Type: BR/EDR  Bus: USB
+        BD Address: 00:0A:3A:55:07:5A  ACL MTU: 192:8  SCO MTU: 64:8
+        DOWN 
+        RX bytes:718 acl:0 sco:0 events:25 errors:0
+        TX bytes:108 acl:0 sco:0 commands:24 errors:0
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: CONFIG_BT_HCIBTUSB=m
+        Link mode: SLAVE ACCEPT 
 
->
-> Regards,
->
-> Anderson Briglia
->
->>
->> Regards
->>
->> Marcel
->>
->>
->>
->
->
->
-> --
-> INdT - Instituto Nokia de tecnologia
-> +55 2126 1122
-> http://techblog.briglia.net
->
+grover ~ # hciconfig hci0 up
+Can't init device hci0: Invalid argument (22)
 
+The same error happens If I just try a hciconfig hci0 up after boot (without replugging the adaptor).
 
+CONFIG_BT_HCIBTSDIO=m
+CONFIG_BT_HCIUART=m
+CONFIG_BT_HCIUART_H4=y
+CONFIG_BT_HCIUART_BCSP=y
+# CONFIG_BT_HCIUART_ATH3K is not set
+CONFIG_BT_HCIUART_LL=y
+CONFIG_BT_HCIBCM203X=m
+CONFIG_BT_HCIBPA10X=m
+CONFIG_BT_HCIBFUSB=m
+CONFIG_BT_HCIVHCI=m
 
---=20
-INdT - Instituto Nokia de tecnologia
-+55 2126 1122
-http://techblog.briglia.net
+and bluez-4.91 is installed
+
+Ideas?
+Ed Tomlinson
