@@ -1,59 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <99B09243E1A5DA4898CDD8B7001114481086306D89@EXMB04.eu.tieto.com>
-References: <1303372461-11848-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1303372461-11848-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<20110421081048.GA23120@jh-x301>
-	<99B09243E1A5DA4898CDD8B7001114481086306D89@EXMB04.eu.tieto.com>
-Date: Mon, 25 Apr 2011 20:09:54 +0300
-Message-ID: <BANLkTi=B_54Zbgi8xz1RRwdVa9DgwayvAQ@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] Bluetooth: Respect local MITM req in io_cap reply
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Waldemar.Rymarkiewicz@tieto.com
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	padovan@profusion.mobi
+In-Reply-To: <BANLkTimez87G5-PnbDr8JPOuY7OU8+M25Q@mail.gmail.com>
+References: <anderson.briglia@openbossa.org> <1302567158-18617-2-git-send-email-anderson.briglia@openbossa.org>
+ <1302581196.2572.249.camel@aeonflux> <BANLkTinoW_bjCw=DwS2pMg-eM06Yq3MXLg@mail.gmail.com>
+ <1302605974.2572.258.camel@aeonflux> <BANLkTinOJGPTfQwjTi7mXEWHWKAd0aX6Zw@mail.gmail.com>
+ <1302736838.2572.262.camel@aeonflux> <BANLkTimez87G5-PnbDr8JPOuY7OU8+M25Q@mail.gmail.com>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
+Date: Mon, 25 Apr 2011 09:29:00 -0400
+Message-ID: <BANLkTi=5Dk7qb+rxz-8=mGxS96w1_LeUcg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: MTU configuration for LE links
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, linux-bluetooth@vger.kernel.org,
+	ville.tervo@nokia.com, johan.hedberg@gmail.com,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi guys,
 
-On Thu, Apr 21, 2011 at 11:24 AM,  <Waldemar.Rymarkiewicz@tieto.com> wrote:
-> Hi Johan,
+On Tue, Apr 19, 2011 at 5:50 PM, Anderson Briglia
+<anderson.briglia@openbossa.org> wrote:
+> Hi Marcel,
 >
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -2369,7 +2369,7 @@ static inline u8 hci_get_auth_req(struct
->>> hci_conn *conn)
->>>
->>>      /* If remote requests no-bonding follow that lead */
->>>      if (conn->remote_auth == 0x00 || conn->remote_auth == 0x01)
->>> -            return 0x00;
->>> +            return conn->auth_type & 0x01;
->>>
->>>      return conn->auth_type;
->>>  }
+> On Wed, Apr 13, 2011 at 7:20 PM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>> Hi Anderson,
 >>
->>Your other patches seem ok to me, but have you verified this
->>one with the BITE tester? This logic is directly copied from
->>how it is in user space right now and that's something we have
->>arrived at after multiple iterations with the BITE tester over
->>the last few years. So I'd be very careful when changing it.
+>>> >> One thing to consider is that there are a couple of MTU checks along
+>>> >> the L2CAP code. The issue which originated this patch is code such a=
+s:
+>>> >>
+>>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check outgoing MTU */
+>>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (len > pi->omtu) {
+>>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D -EMSGSIZE;
+>>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto done;
+>>> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>>> >>
+>>> >> We understood that just letting omtu/imtu values on kernel reflect t=
+he
+>>> >> current connection MTU settings was the cleanest solution. What do y=
+ou
+>>> >> propose? Bypassing these checks for LE?
+>>> >
+>>> > this does not look clean to me. And we might have an internal MTU
+>>> > variable as part of L2CAP, but the way how it gets set and thus its
+>>> > semantic differs clearly between BR/EDR and LE. So shoehorning an
+>>> > existing socket option this is clearly a bad idea.
+>>>
+>>> Sure. What to do then if:
+>>>
+>>> 1) LE links have MTU (omtu specifically) hard-coded to 23 on kernel.
+>>> 2) the kernel rejects sending data longer than omtu.
+>>>
+>>> (this is the current situation)
+>>>
+>>> This clearly needs some fix on kernel side, otherwise we can't send
+>>> PDUs longer than the LE default MTU (23), *even* if the peer device
+>>> supports a bigger MTU.
+>>
+>> I agree with that. Userspace needs to be able to change the kernel MTU
+>> if a different one gets negotiated. That is not the problem. The problem
+>> is trying to shoehorn this into an existing (and already declared
+>> legacy) socket option.
+>>
+>>> Suggestions are welcome regarding how to best approach this, without
+>>> affecting current BR/EDR MTU semantics.
+>>
+>> We need to have a socket option that allows us the dynamically change
+>> the MTU of a L2CAP link. And right now this option will only be valid if
+>> the link is actually an LE link.
+>
+> Ok, so we have some options IMHO:
+>
+> a) Do not add a new option in struct l2cap_options because it will
+> still be hijacking.
+>
+> b) Add a new option for LE OMTU in struct l2cap_conninfo. Is it valid?
+>
+> c) Add a new struct (l2cap_le_options ?) and add a omtu field there.
+>
+> The problem in c) is that we will have to implement significant
+> modifications in userspace and the code should be redundant: we will
+> have two options to represent the same value.
+
+Some comments about this a) and b) should be great. LE link
+configuration is dependent of this MTU exchange to work properly.
+
+>
+> Regards,
+>
+> Anderson Briglia
+>
+>>
+>> Regards
+>>
+>> Marcel
+>>
+>>
 >>
 >
-> No, I did not. I don't have an access to BITE directly, but I will see if I can verify this.
 >
-> I simply did some combination of manual tests with three different dongles (2.0 and two 2.1), with sspmode on/off , with auth and encrypt on/off, with required sec_level 1,2,3 in security mode 2 and 4.
-
-I remember we discussing something similar regarding LE security, iirc
-this avoid failing in case there is not possible to generate an
-authenticated key due to lack of io capability, but I also remember
-that we do check what type of link key the kernel wants when reading
-from storage and return not found when e.g authenticated key is
-required but we have only unauthenticated, so perhaps this is just to
-make sure we pass some specific BITE test.
+>
+> --
+> INdT - Instituto Nokia de tecnologia
+> +55 2126 1122
+> http://techblog.briglia.net
+>
 
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+
+--=20
+INdT - Instituto Nokia de tecnologia
++55 2126 1122
+http://techblog.briglia.net
