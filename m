@@ -1,63 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Read RSSI through Management Interface?
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Johan Hedberg <johan.hedberg@nokia.com>
-In-Reply-To: <BANLkTikWMu3nNP0nUN3xVr2jzJmLhrx09Q@mail.gmail.com>
-References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
-	 <1303356995.15916.8.camel@aeonflux>
-	 <BANLkTikWMu3nNP0nUN3xVr2jzJmLhrx09Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 25 Apr 2011 19:18:28 -0700
-Message-ID: <1303784308.15916.36.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 25 Apr 2011 16:53:28 -0700
+From: Greg KH <greg@kroah.com>
+To: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>, devel@driverdev.osuosl.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus Walleij <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v4] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110425235328.GA31473@kroah.com>
+References: <1302173946-25363-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1302173946-25363-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
-
-> >> we need to read the RSSI of LE and basic rate connections to implement
-> >> the Proximity profile. RSSI included in the advertising packets can't
-> >> be used for Proximity, it requires an "active" connection.
-> >>
-> >> Here are some suggestions:
-> >>
-> >> 1. Add a new command to mgmt interface to add a given address into a
-> >> RSSI "monitoring list".
-> >>    When the connection is established the kernel will automatically
-> >> track the RSSI of the connection on regular intervals sending
-> >> HCI_Read_RSSI. Read RSSI value can be reported through a new event in
-> >> the management interface
-> >
-> > the HCI_Read_RSSI on basic rate is a useless command since it depends
-> > highly on the power control. Especially since all Bluetooth chips try to
-> > keep this one optimized.
-> >
-> > The RSSI from an active connection does not really give us much. And in
-> > addition we have a lot of legacy BR chips just plain failing this
-> > command and returning static data. How do you plan to address this?
+On Thu, Apr 07, 2011 at 12:59:06PM +0200, Par-Gunnar Hjalmdahl wrote:
+> This patch adds support for the ST-Ericsson CG2900
+> Connectivity Combo controller (Bluetooth, FM, GPS).
 > 
-> I don't expect to have an accurate measurement of the RSSI for basic
-> rate, we are only trying to have the profile operational on both
-> transports. If it is not feasible enable it for basic rate we can keep
-> only Link Loss service running.
-> 
-> For LE, I hope we get better results. The fact is: we need a way to
-> get the RSSI value of an active connection on regular intervals.
-> Any other suggestion to implement this service keeping transport abstraction?
+> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
 
-the problem with RSSI is really that for basic rate, it is different
-from the HCI_Read_RSSI command and Inquiry_Result_with_RSSI event. The
-value from inquiry is most likely useful while the connected value is
-rather pointless.
+To have a patch accepted into the staging tree there are only 2 simple
+requirements:
+	- proper license
+	- code must build
 
-The HCI_Read_Link_Quality is way better, but the problem is that its
-implementation is vendor specific :(
+Somehow the second one fails here, please at least test-build your code
+before sending it out, to do otherwise just wastes people's time and
+makes them grumpy:
 
-Regards
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CALL    scripts/checksyscalls.sh
+  CHK     include/generated/compile.h
+  CC [M]  drivers/staging/cg2900/mfd/cg2900_chip.o
+drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: (near initialization for ‘cg2900_devs[0].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2941:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2941:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2945:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2945:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2945:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2945:3: error: (near initialization for ‘cg2900_devs[1].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2946:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2946:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2950:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2950:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2950:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2950:3: error: (near initialization for ‘cg2900_devs[2].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2951:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2951:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2955:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2955:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2955:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2955:3: error: (near initialization for ‘cg2900_devs[3].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2956:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2956:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2960:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2960:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2960:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2960:3: error: (near initialization for ‘cg2900_devs[4].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2961:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2961:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2965:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2965:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2965:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2965:3: error: (near initialization for ‘cg2900_devs[5].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2966:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2966:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2970:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2970:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2970:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2970:3: error: (near initialization for ‘cg2900_devs[6].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2971:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2971:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2975:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2975:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2975:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2975:3: error: (near initialization for ‘cg2900_devs[7].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2976:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2976:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2980:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2980:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2980:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2980:3: error: (near initialization for ‘cg2900_devs[8].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2981:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2981:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2985:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2985:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2985:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2985:3: error: (near initialization for ‘cg2900_devs[9].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2986:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2986:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2990:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2990:3: warning: initialization makes integer from pointer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:2990:3: error: initializer element is not computable at load time
+drivers/staging/cg2900/mfd/cg2900_chip.c:2990:3: error: (near initialization for ‘cg2900_devs[10].id’)
+drivers/staging/cg2900/mfd/cg2900_chip.c:2991:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:2991:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3073:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3073:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3074:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3074:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3079:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3079:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3080:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3080:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3085:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3085:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3086:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3086:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3091:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3091:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3092:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3092:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3097:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3097:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3098:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3098:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3103:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3103:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3104:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3104:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3109:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3109:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3110:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3110:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3115:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3115:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3116:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3116:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3121:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3121:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3122:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3122:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3127:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3127:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3128:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3128:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c:3133:3: error: unknown field ‘platform_data’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3133:3: warning: initialization from incompatible pointer type
+drivers/staging/cg2900/mfd/cg2900_chip.c:3134:3: error: unknown field ‘data_size’ specified in initializer
+drivers/staging/cg2900/mfd/cg2900_chip.c:3134:3: warning: initialization makes pointer from integer without a cast
+drivers/staging/cg2900/mfd/cg2900_chip.c: In function ‘set_plat_data’:
+drivers/staging/cg2900/mfd/cg2900_chip.c:3147:41: error: ‘struct mfd_cell’ has no member named ‘platform_data’
+drivers/staging/cg2900/mfd/cg2900_chip.c:3147:37: warning: initialization from incompatible pointer type
+make[4]: *** [drivers/staging/cg2900/mfd/cg2900_chip.o] Error 1
+make[3]: *** [drivers/staging/cg2900/mfd] Error 2
+make[2]: *** [drivers/staging/cg2900] Error 2
+make[1]: *** [drivers/staging] Error 2
+make: *** [drivers] Error 2
 
-Marcel
 
+{sigh}
 
+Please redo this, I obviously can't accept it as-is.
+
+greg k-h
