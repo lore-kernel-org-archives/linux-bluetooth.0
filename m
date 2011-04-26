@@ -1,37 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 26 Apr 2011 12:49:50 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Imran Haider <imran1008@gmail.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Don't sleep after deleting command timer
-Message-ID: <20110426154950.GA2242@joana>
-References: <1303513362-9357-1-git-send-email-imran1008@gmail.com>
+From: =?iso-8859-1?Q?=22H=F6glind=2C_Henrik=22?=
+	<Henrik.Hoglind@sonyericsson.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 26 Apr 2011 17:31:07 +0200
+Subject: Re: Status of MAP and AVRCP
+Message-ID: <9A742367D258D34A9753780E2AE6B8BD2CC75DB764@SELDMBX04.corpusers.net>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303513362-9357-1-git-send-email-imran1008@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Imran,
+Hi David,
 
-* Imran Haider <imran1008@gmail.com> [2011-04-22 19:02:42 -0400]:
+> I restarted work-in-earnest on an AVRCP layer a bit over two months ago
+> [...]
+> I will complete fairly extensive testing and begin submitting patches with
+> major surgery to audio/control.c, supporting the API doc worked out in the
+> Portland meeting, with a couple of minor extensions.  This will bring BlueZ
+>to AVRCP 1.3, figure by the end of this month.
 
-> This fix adds on to commit b77dcf84. It seems that scheduling a timeout
-> of 250ms after deleting the command timer causes a kernel panic when
-> system is resuming from Suspend-to-RAM. I tried adding another timeout
-> before deleting the command timer but that didn't help so I believe that
-> some code in hci_dev_do_close must execute after the command timer is
-> deleted before control is returned to another thread.
-> 
-> The only bit the command timer handler hci_cmd_timer() touches is HCI_RESET.
-> It should be fine to delete the timer after testing the HCI_UP bit.
-> ---
->  net/bluetooth/hci_core.c |    9 ++++++---
->  1 files changed, 6 insertions(+), 3 deletions(-)
+Have you made any progress with the Avrcp v1.3 implementation? Judging from the messages on the list, there seems to be a lot of interest for this update. We are also awaiting this, and would be happy to help if there is something we can do.
 
-I already have for that. But thanks anyway. ;)
+Best regards,
+Henrik
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
