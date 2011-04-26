@@ -1,85 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 26 Apr 2011 16:59:23 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Subject: Re: [PATCH v2 6/6] Bluetooth: Respect local MITM req in io_cap
+ reply
+Message-ID: <20110426235923.GA4486@jh-x301>
+References: <1303372461-11848-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1303372461-11848-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <201104240952.14848.edt@aei.ca>
-References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com>
-	<BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
-	<BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
-	<201104240952.14848.edt@aei.ca>
-Date: Wed, 27 Apr 2011 10:55:22 +0800
-Message-ID: <BANLkTim-49ZdSLnyjs_kjLxuvyCe=oUdGA@mail.gmail.com>
-Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Ed Tomlinson <edt@aei.ca>
-Cc: Hui Zhu <teawater@gmail.com>, linux-kernel@vger.kernel.org,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1303372461-11848-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Apr 24, 2011 at 9:52 PM, Ed Tomlinson <edt@aei.ca> wrote:
-> On Tuesday 19 April 2011 11:34:30 Hui Zhu wrote:
->> Do you part is OK?
->>
->> I think it will be very easy to reproduce.
->>
->> Thanks,
->> Hui
->>
->> On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
->> > On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
->> >> Cannot connect to any outside devices through bluetooth.
->> >>
->> >> And I think this is not a bug of low level driver.  Because both my
->> >> laptop and a usb bluetooth card cannot work.
->> >
->> > Hi, please explain the "cannot work" in detail,
->> > Firstly check dmesg and hciconfig to see if there's anything wrong.
->
-> I am also seeing problems with bluetooth in .39-rc4+
->
-> [54511.033258] usb 2-4.4: USB disconnect, device number 5
-> [54513.920060] usb 2-4.3: new full speed USB device number 6 using ehci_hcd
-> [54514.063057] usb 2-4.3: New USB device found, idVendor=0a12, idProduct=0001
-> [54514.070281] usb 2-4.3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> grover ~ # hciconfig -a
-> hci0:   Type: BR/EDR  Bus: USB
->        BD Address: 00:0A:3A:55:07:5A  ACL MTU: 192:8  SCO MTU: 64:8
->        DOWN
->        RX bytes:718 acl:0 sco:0 events:25 errors:0
->        TX bytes:108 acl:0 sco:0 commands:24 errors:0
->        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->        Link policy: CONFIG_BT_HCIBTUSB=m
->        Link mode: SLAVE ACCEPT
->
-> grover ~ # hciconfig hci0 up
-> Can't init device hci0: Invalid argument (22)
->
-> The same error happens If I just try a hciconfig hci0 up after boot (without replugging the adaptor).
+Hi Waldek,
 
-I did not see your problem, my usb dongle usbid is 0a12:0001 as well,
-maybe bisect is the way to go.
+On Thu, Apr 21, 2011, Waldemar Rymarkiewicz wrote:
+> If host requires MITM protection notify that to controller in
+> io capabilities reply even if the remote device requires no bonding.
+> 
+> If it is not respected, host can get an unauthenticated link key while
+> it expects authenticated one.
+> 
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+> ---
+>  net/bluetooth/hci_event.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 087953e..3ee0060 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2369,7 +2369,7 @@ static inline u8 hci_get_auth_req(struct hci_conn *conn)
+>  
+>  	/* If remote requests no-bonding follow that lead */
+>  	if (conn->remote_auth == 0x00 || conn->remote_auth == 0x01)
+> -		return 0x00;
+> +		return conn->auth_type & 0x01;
 
->
-> CONFIG_BT_HCIBTSDIO=m
-> CONFIG_BT_HCIUART=m
-> CONFIG_BT_HCIUART_H4=y
-> CONFIG_BT_HCIUART_BCSP=y
-> # CONFIG_BT_HCIUART_ATH3K is not set
-> CONFIG_BT_HCIUART_LL=y
-> CONFIG_BT_HCIBCM203X=m
-> CONFIG_BT_HCIBPA10X=m
-> CONFIG_BT_HCIBFUSB=m
-> CONFIG_BT_HCIVHCI=m
->
-> and bluez-4.91 is installed
->
-> Ideas?
-> Ed Tomlinson
->
+I had to change this to:
 
+	return conn->remote_auth | (conn->auth_type & 0x01);
 
+I.e. follow remote requirement and apply the MITM bit to it if the local
+requirement has it. Otherwise TP/SEC/SEM/BV-04-C doesn't want to pass
+(test vector used is 1.0.39.0). It seems to require us to mirror the
+remote MITM requirement. Not sure why hciops is working and I haven't
+had the chance to check the logs there. I'm still continuing testing so
+we'll see if there are further issues with other test cases.
 
--- 
-Regards
-dave
+Johan
