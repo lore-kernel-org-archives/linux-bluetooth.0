@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 Apr 2011 11:03:00 +0800
-Subject: [PATCH] Check session->msg at sync_getphonebook_callback() in file
- client/sync.c
-Message-ID: <CE761E84DADF2947A4AF22FB8D97A47357356695@shsmsx501.ccr.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: wu.zheng@intel.com
+To: linux-bluetooth@vger.kernel.org
+Cc: "wu.zheng" <wu.zheng@intel.com>
+Subject: [PATCH] Check session->msg at sync_getphonebook_callback() in file client/sync.c
+Date: Tue, 26 Apr 2011 10:45:54 +0800
+Message-Id: <1303785954-16905-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+From: wu.zheng <wu.zheng@intel.com>
 
 Otherwise,session->msg will be NULL and cause segmentation fault error.The reason is that the condition of transfer->fd>0 && session->msg is ok and session->msg will be set to NULL in the func of session_notify_progress when sync profile is used.
 
