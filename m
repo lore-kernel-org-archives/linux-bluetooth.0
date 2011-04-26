@@ -1,73 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Apr 2011 15:41:41 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: "Zheng, Wu" <wu.zheng@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Check session->msg at sync_getphonebook_callback() in
- file client/sync.c
-Message-ID: <20110426184141.GA2653@piper>
-References: <CE761E84DADF2947A4AF22FB8D97A47357356695@shsmsx501.ccr.corp.intel.com>
+Date: Tue, 26 Apr 2011 13:13:30 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Hui Zhu <teawater@gmail.com>,
+	Dave Young <hidave.darkstar@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
+Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
+Message-ID: <20110426161330.GC2242@joana>
+References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com>
+ <BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
+ <BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
+ <201104240952.14848.edt@aei.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CE761E84DADF2947A4AF22FB8D97A47357356695@shsmsx501.ccr.corp.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <201104240952.14848.edt@aei.ca>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+* Ed Tomlinson <edt@aei.ca> [2011-04-24 09:52:14 -0400]:
 
-On 11:03 Tue 26 Apr, Zheng, Wu wrote:
-> Otherwise,session->msg will be NULL and cause segmentation fault error.The reason is that the condition of transfer->fd>0 && session->msg is ok and session->msg will be set to NULL in the func of session_notify_progress when sync profile is used.
-
-Please try to keep your commit title to less than 72 characters (if possible
-less than 50) and the commit message to less than 72 characters.
-
+> On Tuesday 19 April 2011 11:34:30 Hui Zhu wrote:
+> > Do you part is OK?
+> > 
+> > I think it will be very easy to reproduce.
+> > 
+> > Thanks,
+> > Hui
+> > 
+> > On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
+> > > On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
+> > >> Cannot connect to any outside devices through bluetooth.
+> > >>
+> > >> And I think this is not a bug of low level driver.  Because both my
+> > >> laptop and a usb bluetooth card cannot work.
+> > >
+> > > Hi, please explain the "cannot work" in detail,
+> > > Firstly check dmesg and hciconfig to see if there's anything wrong.
 > 
-> ---
->  client/sync.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+> I am also seeing problems with bluetooth in .39-rc4+
 > 
-> diff --git a/client/sync.c b/client/sync.c
-> index 3622a3d..28ace61 100644
-> --- a/client/sync.c
-> +++ b/client/sync.c
-> @@ -78,6 +78,9 @@ static void sync_getphonebook_callback(struct session_data *session,
->  	DBusMessage *reply;
->  	char *buf = NULL;
->  
-> +	if (session->msg == NULL)
-> +		goto done;
-> +
->  	reply = dbus_message_new_method_return(session->msg);
->  
->  	if (transfer->filled > 0)
-> @@ -91,6 +94,8 @@ static void sync_getphonebook_callback(struct session_data *session,
->  	g_dbus_send_message(session->conn, reply);
->  	dbus_message_unref(session->msg);
->  	session->msg = NULL;
-
-Add an empty line here.
-
-> +done:
-> +	transfer_unregister(transfer); 
-
-There's a trailing space here.
-
-Also, taking a look at the code, if the reply is big enough (is it possible?),
-the callback could be called more than one time for one transfer, right? Seems
-it would cause some unexpected problems.
-
->  }
->  
->  static DBusMessage *sync_getphonebook(DBusConnection *connection,
-> -- 
-> 1.7.3.4
+> [54511.033258] usb 2-4.4: USB disconnect, device number 5
+> [54513.920060] usb 2-4.3: new full speed USB device number 6 using ehci_hcd
+> [54514.063057] usb 2-4.3: New USB device found, idVendor=0a12, idProduct=0001
+> [54514.070281] usb 2-4.3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+> grover ~ # hciconfig -a
+> hci0:   Type: BR/EDR  Bus: USB
+>         BD Address: 00:0A:3A:55:07:5A  ACL MTU: 192:8  SCO MTU: 64:8
+>         DOWN 
+>         RX bytes:718 acl:0 sco:0 events:25 errors:0
+>         TX bytes:108 acl:0 sco:0 commands:24 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: CONFIG_BT_HCIBTUSB=m
+>         Link mode: SLAVE ACCEPT 
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> grover ~ # hciconfig hci0 up
+> Can't init device hci0: Invalid argument (22)
 
+does dmesg show something? I'm using a -rc kernel and bluetooth is working to
+me.
 
-Cheers,
 -- 
-Vinicius
+Gustavo F. Padovan
+http://profusion.mobi
