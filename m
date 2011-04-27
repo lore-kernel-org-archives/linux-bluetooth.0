@@ -2,16 +2,15 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: <BANLkTi=UG0Xy2UEkNj2S_bS-PjOG5krNkQ@mail.gmail.com>
 References: <BANLkTi=UG0Xy2UEkNj2S_bS-PjOG5krNkQ@mail.gmail.com>
-Date: Wed, 27 Apr 2011 14:41:09 +0800
-Message-ID: <BANLkTimfJXQdJHbG7J8frwPrBKOMxVjQUg@mail.gmail.com>
+Date: Wed, 27 Apr 2011 14:38:01 +0800
+Message-ID: <BANLkTi=8OyYiMdz8Fmih2L=U+yj3S_-CRw@mail.gmail.com>
 Subject: Re: kernel panic after unplug usb bluetooth dongle
-From: Yong Zhang <yong.zhang0@gmail.com>
-To: Dave Young <hidave.darkstar@gmail.com>
-Cc: Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Wed, Apr 27, 2011 at 2:35 PM, Dave Young <hidave.darkstar@gmail.com> wrote:
@@ -19,6 +18,11 @@ On Wed, Apr 27, 2011 at 2:35 PM, Dave Young <hidave.darkstar@gmail.com> wrote:
 >
 > Unplug usb bluetooth dongle make kernel panic as below. Thomas, any
 > idea about it?
+
+BTW, addr2line -e vmlinux 0xffffffff81048988 show:
+kernel/timer.c:1183:
+list_for_each_entry(nte, varp->vec + slot, entry) {
+
 >
 > usb 6-1: USB disconnect, device number 3
 > btusb_intr_complete: hci0 urb ffff8801275bb9c0 failed to resubmit (19)
@@ -27,14 +31,6 @@ On Wed, Apr 27, 2011 at 2:35 PM, Dave Young <hidave.darkstar@gmail.com> wrote:
 > btusb_send_frame: hci0 urb ffff8801275bb6c0 submission failed
 > BUG: unable to handle kernel NULL pointer dereference at           (null)
 > IP: [<ffffffff81048988>] get_next_timer_interrupt+0x13d/0x21d
-
-Seems a hrtimer is freed abnormaly.
-
-Could you try to build your kernel with CONFIG_DEBUG_OBJECTS_TIMERS=y
-
-Thanks,
-Yong
-
 > PGD 12609c067 PUD 1260b5067 PMD 0
 > Oops: 0000 [#1] SMP
 > last sysfs file: /sys/devices/virtual/dmi/id/chassis_type
@@ -115,14 +111,10 @@ Yong
 > --
 > Regards
 > dave
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
 >
 
 
 
 -- 
-Only stand for myself
+Regards
+dave
