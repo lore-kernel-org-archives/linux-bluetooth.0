@@ -1,25 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Apr 2011 16:24:42 -0700
+Date: Wed, 27 Apr 2011 16:23:41 -0700
 From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Change attrib server to use ATT CID & PSM defined in
- att.h
-Message-ID: <20110427232442.GB26404@jh-x301>
-References: <1303909660-30690-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Remove grouping by phone number in call-history results
+Message-ID: <20110427232341.GA26404@jh-x301>
+References: <1303901520-6508-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303909660-30690-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1303901520-6508-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Radek,
 
-On Wed, Apr 27, 2011, Claudio Takahasi wrote:
+On Wed, Apr 27, 2011, Radoslaw Jablonski wrote:
+> Now call history entries are distinguished also by call
+> date (previously only contact-id was compared, so calls with
+> different date were grouped into one entry in pull results).
+> This change is needed for headsets with PBAP support that are
+> confused when number of "new missed calls" is different than
+> number of returned entries by pull call-history response (by
+> example Nokia BH-903 hangs when this happens).
 > ---
->  src/attrib-server.c |   11 ++++-------
->  1 files changed, 4 insertions(+), 7 deletions(-)
+>  plugins/phonebook-tracker.c |   30 +++++++++++++++++++++++++++---
+>  1 files changed, 27 insertions(+), 3 deletions(-)
 
-Applied. Thanks.
+Pushed upstream. Thanks.
 
 Johan
