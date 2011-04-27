@@ -1,104 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 27 Apr 2011 14:35:59 +0800
-Message-ID: <BANLkTi=UG0Xy2UEkNj2S_bS-PjOG5krNkQ@mail.gmail.com>
-Subject: kernel panic after unplug usb bluetooth dongle
+In-Reply-To: <201104240952.14848.edt@aei.ca>
+References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com>
+	<BANLkTi=-RnUyuC2VGuRix_J4KOx+9BhroQ@mail.gmail.com>
+	<BANLkTik67uGB-1q17JcTPnr_WjuNd_37gA@mail.gmail.com>
+	<201104240952.14848.edt@aei.ca>
+Date: Wed, 27 Apr 2011 10:55:22 +0800
+Message-ID: <BANLkTim-49ZdSLnyjs_kjLxuvyCe=oUdGA@mail.gmail.com>
+Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
 From: Dave Young <hidave.darkstar@gmail.com>
-To: Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Hui Zhu <teawater@gmail.com>, linux-kernel@vger.kernel.org,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Sun, Apr 24, 2011 at 9:52 PM, Ed Tomlinson <edt@aei.ca> wrote:
+> On Tuesday 19 April 2011 11:34:30 Hui Zhu wrote:
+>> Do you part is OK?
+>>
+>> I think it will be very easy to reproduce.
+>>
+>> Thanks,
+>> Hui
+>>
+>> On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
+>> > On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
+>> >> Cannot connect to any outside devices through bluetooth.
+>> >>
+>> >> And I think this is not a bug of low level driver.  Because both my
+>> >> laptop and a usb bluetooth card cannot work.
+>> >
+>> > Hi, please explain the "cannot work" in detail,
+>> > Firstly check dmesg and hciconfig to see if there's anything wrong.
+>
+> I am also seeing problems with bluetooth in .39-rc4+
+>
+> [54511.033258] usb 2-4.4: USB disconnect, device number 5
+> [54513.920060] usb 2-4.3: new full speed USB device number 6 using ehci_hcd
+> [54514.063057] usb 2-4.3: New USB device found, idVendor=0a12, idProduct=0001
+> [54514.070281] usb 2-4.3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+> grover ~ # hciconfig -a
+> hci0:   Type: BR/EDR  Bus: USB
+>        BD Address: 00:0A:3A:55:07:5A  ACL MTU: 192:8  SCO MTU: 64:8
+>        DOWN
+>        RX bytes:718 acl:0 sco:0 events:25 errors:0
+>        TX bytes:108 acl:0 sco:0 commands:24 errors:0
+>        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>        Link policy: CONFIG_BT_HCIBTUSB=m
+>        Link mode: SLAVE ACCEPT
+>
+> grover ~ # hciconfig hci0 up
+> Can't init device hci0: Invalid argument (22)
+>
+> The same error happens If I just try a hciconfig hci0 up after boot (without replugging the adaptor).
 
-Unplug usb bluetooth dongle make kernel panic as below. Thomas, any
-idea about it?
+I did not see your problem, my usb dongle usbid is 0a12:0001 as well,
+maybe bisect is the way to go.
 
-usb 6-1: USB disconnect, device number 3
-btusb_intr_complete: hci0 urb ffff8801275bb9c0 failed to resubmit (19)
-btusb_bulk_complete: hci0 urb ffff8801275bb540 failed to resubmit (19)
-btusb_bulk_complete: hci0 urb ffff8801275bb6c0 failed to resubmit (19)
-btusb_send_frame: hci0 urb ffff8801275bb6c0 submission failed
-BUG: unable to handle kernel NULL pointer dereference at           (null)
-IP: [<ffffffff81048988>] get_next_timer_interrupt+0x13d/0x21d
-PGD 12609c067 PUD 1260b5067 PMD 0
-Oops: 0000 [#1] SMP
-last sysfs file: /sys/devices/virtual/dmi/id/chassis_type
-CPU 0
-Modules linked in: tun rfcomm bnep snd_pcm_oss snd_mixer_oss kvm_intel
-kvm btusb bluetooth snd_hda_codec_analog snd_hda_intel dell_wmi
-sparse_keymap snd_hda_codec snd_hwdep e1000e snd_pcm wmi snd_timer
-8139too rfkill snd_page_alloc
+>
+> CONFIG_BT_HCIBTSDIO=m
+> CONFIG_BT_HCIUART=m
+> CONFIG_BT_HCIUART_H4=y
+> CONFIG_BT_HCIUART_BCSP=y
+> # CONFIG_BT_HCIUART_ATH3K is not set
+> CONFIG_BT_HCIUART_LL=y
+> CONFIG_BT_HCIBCM203X=m
+> CONFIG_BT_HCIBPA10X=m
+> CONFIG_BT_HCIBFUSB=m
+> CONFIG_BT_HCIVHCI=m
+>
+> and bluez-4.91 is installed
+>
+> Ideas?
+> Ed Tomlinson
+>
 
-Pid: 0, comm: swapper Not tainted 2.6.39-rc5 #224 Dell Inc. OptiPlex
-780                 /0V4W66
-RIP: 0010:[<ffffffff81048988>]  [<ffffffff81048988>]
-get_next_timer_interrupt+0x13d/0x21d
-RSP: 0018:ffffffff817dddf8  EFLAGS: 00010097
-RAX: 0000000000000000 RBX: ffffffff819adb80 RCX: 000000000000003e
-RDX: 0000000000000000 RSI: 000000000000003e RDI: 0000000000000000
-RBP: ffffffff817dde58 R08: ffffffff817dde08 R09: 00000000010000fe
-R10: 0000000000000000 R11: 0000000000000001 R12: 000000010000fdf7
-R13: ffffffff819aefb0 R14: ffffffff819aebd0 R15: 0000000000000040
-FS:  0000000000000000(0000) GS:ffff880127c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-CR2: 0000000000000000 CR3: 000000012605a000 CR4: 00000000000406b0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Process swapper (pid: 0, threadinfo ffffffff817dc000, task ffffffff81800020)
-Stack:
- ffffffff817dde28 ffffffff8105c769 ffffffff819aebd0 ffffffff819aefd0
- ffffffff819af3d0 ffffffff819af7d0 ffffffff817dde48 000000000000ccc0
- ffff880127c0e2a0 00000000a983c6e8 0000000000000000 000000010000fdf7
-Call Trace:
- [<ffffffff8105c769>] ? sched_clock_local+0x1c/0x80
- [<ffffffff810652c4>] tick_nohz_stop_sched_tick+0x370/0x390
- [<ffffffff81001e77>] cpu_idle+0x2f/0x9a
- [<ffffffff814fd409>] rest_init+0xad/0xb1
- [<ffffffff814fd35c>] ? csum_partial_copy_generic+0x16c/0x16c
- [<ffffffff818b0c49>] start_kernel+0x399/0x3a4
- [<ffffffff818b0140>] ? early_idt_handlers+0x140/0x140
- [<ffffffff818b02af>] x86_64_start_reservations+0xb6/0xba
- [<ffffffff818b03b3>] x86_64_start_kernel+0x100/0x10f
-Code: 04 4a 8b 14 30 4d 8d 2c 06 eb 20 4c 89 d0 f6 42 18 01 75 11 48
-8b 42 10 41 bb 01 00 00 00 4c 39 d0 49 0f 49 c2 48 89 fa 49 89 c2
- 8b 3a 4c 39 ea 0f 18 0f 75 d5 45 85 db 74 10 85 f6 74 04 39
-RIP  [<ffffffff81048988>] get_next_timer_interrupt+0x13d/0x21d
- RSP <ffffffff817dddf8>
-CR2: 0000000000000000
----[ end trace 5621bb82abfeb30f ]---
-Kernel panic - not syncing: Attempted to kill the idle task!
-Pid: 0, comm: swapper Tainted: G      D     2.6.39-rc5 #224
-Call Trace:
- [<ffffffff8151a544>] panic+0xb7/0x1c9
- [<ffffffff8103ef48>] do_exit+0xb6/0x7b3
- [<ffffffff8103bd25>] ? kmsg_dump+0x120/0x12f
- [<ffffffff8103bc96>] ? kmsg_dump+0x91/0x12f
- [<ffffffff8151e23f>] oops_end+0xc1/0xc9
- [<ffffffff810228c3>] no_context+0x1f3/0x202
- [<ffffffff81022a8d>] __bad_area_nosemaphore+0x1bb/0x1e1
- [<ffffffff810685c8>] ? mark_lock+0x22/0x261
- [<ffffffff8106a49c>] ? __lock_acquire+0xe05/0xe14
- [<ffffffff81022ac1>] bad_area_nosemaphore+0xe/0x10
- [<ffffffff815202a3>] do_page_fault+0x20b/0x421
- [<ffffffff8106a49c>] ? __lock_acquire+0xe05/0xe14
- [<ffffffff8106a49c>] ? __lock_acquire+0xe05/0xe14
- [<ffffffff8151d020>] ? _raw_spin_unlock_irq+0x2b/0x37
- [<ffffffff812816fd>] ? trace_hardirqs_off_thunk+0x3a/0x3c
- [<ffffffff8151d5e5>] page_fault+0x25/0x30
- [<ffffffff81048988>] ? get_next_timer_interrupt+0x13d/0x21d
- [<ffffffff81048894>] ? get_next_timer_interrupt+0x49/0x21d
- [<ffffffff8105c769>] ? sched_clock_local+0x1c/0x80
- [<ffffffff810652c4>] tick_nohz_stop_sched_tick+0x370/0x390
- [<ffffffff81001e77>] cpu_idle+0x2f/0x9a
- [<ffffffff814fd409>] rest_init+0xad/0xb1
- [<ffffffff814fd35c>] ? csum_partial_copy_generic+0x16c/0x16c
- [<ffffffff818b0c49>] start_kernel+0x399/0x3a4
- [<ffffffff818b0140>] ? early_idt_handlers+0x140/0x140
- [<ffffffff818b02af>] x86_64_start_reservations+0xb6/0xba
- [<ffffffff818b03b3>] x86_64_start_kernel+0x100/0x10f
+
 
 -- 
 Regards
