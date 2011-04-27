@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Apr 2011 19:06:11 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Remove l2cap_sk_list
-Message-ID: <20110427220611.GA8537@piper>
-References: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
- <1303940957-22694-2-git-send-email-padovan@profusion.mobi>
- <1303940957-22694-3-git-send-email-padovan@profusion.mobi>
+Date: Wed, 27 Apr 2011 18:54:33 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: anderson.briglia@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [PATCH v2 2/2] Bluetooth: Add discovering event to the
+ Management interface
+Message-ID: <20110427215433.GB2328@joana>
+References: <y>
+ <4db82875.624dec0a.70bd.226a@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303940957-22694-3-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <4db82875.624dec0a.70bd.226a@mx.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+* anderson.briglia@openbossa.org <anderson.briglia@openbossa.org> [2011-04-27 10:29:57 -0400]:
 
-On 18:49 Wed 27 Apr, Gustavo F. Padovan wrote:
-> A new list was added to replace the socket based one. This new list
-> doesn't depent on sock and then fits better inside l2cap_core.c code.
+> From: Johan Hedberg <johan.hedberg@nokia.com>
 > 
-> It also rename l2cap_chan_alloc() to l2cap_chan_create() and
-> l2cap_chan_free() to l2cap_chan_destruct()
-
-I think that l2cap_chan_destroy() would sound better. create/destroy sound
-more related than create/destruct.
-
+> This patch adds a new event to the Management interface to track when
+> local adapters are discovering remote devices. For now this only tracks
+> BR/EDR discovery procedures.
 > 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 > ---
->  include/net/bluetooth/l2cap.h |    6 +-
->  net/bluetooth/l2cap_core.c    |  165 ++++++++++++++++++++++-------------------
->  net/bluetooth/l2cap_sock.c    |    6 +-
->  3 files changed, 95 insertions(+), 82 deletions(-)
-> 
+>  include/net/bluetooth/hci_core.h |    1 +
+>  include/net/bluetooth/mgmt.h     |    2 +
+>  net/bluetooth/hci_event.c        |   40 ++++++++++++++++++++++++++++++++-----
+>  net/bluetooth/mgmt.c             |    6 +++++
+>  4 files changed, 43 insertions(+), 6 deletions(-)
 
+Both applied, thanks.
 
-Cheers,
 -- 
-Vinicius
+Gustavo F. Padovan
+http://profusion.mobi
