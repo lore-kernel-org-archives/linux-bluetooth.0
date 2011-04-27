@@ -1,125 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Handle psm == 0 case inside l2cap_add_psm()
-Date: Wed, 27 Apr 2011 18:49:16 -0300
-Message-Id: <1303940957-22694-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
-References: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 1/3] Bluetooth: Add l2cap_add_psm() and l2cap_add_scid()
+Date: Wed, 27 Apr 2011 18:49:15 -0300
+Message-Id: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the user doesn't specify a psm we have the choose one for the
-channel. Now we do this inside l2cap_add_psm().
+The intention is to get rid of the l2cap_sk_list usage inside
+l2cap_core.c. l2cap_sk_list will soon be replaced by a list that does not
+depend on socket usage.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    1 -
- net/bluetooth/l2cap_core.c    |   32 ++++++++++++++++++++++++--------
- net/bluetooth/l2cap_sock.c    |   22 ----------------------
- 3 files changed, 24 insertions(+), 31 deletions(-)
+ include/net/bluetooth/l2cap.h |    4 +++
+ net/bluetooth/l2cap_core.c    |   44 +++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_sock.c    |   44 ++++++++++------------------------------
+ 3 files changed, 59 insertions(+), 33 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f5f3c2c..fb3f90e 100644
+index c34b1c1..f5f3c2c 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -458,7 +458,6 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb);
+@@ -458,6 +458,10 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb);
  void l2cap_streaming_send(struct l2cap_chan *chan);
  int l2cap_ertm_send(struct l2cap_chan *chan);
  
--struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src);
- int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- 
++struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src);
++int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
++int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
++
+ void l2cap_sock_set_timer(struct sock *sk, long timeout);
+ void l2cap_sock_clear_timer(struct sock *sk);
+ void __l2cap_sock_close(struct sock *sk, int reason);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 98ddd86..9e3f64f 100644
+index 338d8c3..98ddd86 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -135,7 +135,7 @@ static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn
+@@ -135,6 +135,50 @@ static inline struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn
  	return c;
  }
  
--struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
-+static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
- {
- 	struct sock *sk;
- 	struct hlist_node *node;
-@@ -153,19 +153,35 @@ found:
- 
- int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
- {
-+	int err;
++struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
++{
++	struct sock *sk;
++	struct hlist_node *node;
++	sk_for_each(sk, node, &l2cap_sk_list.head) {
++		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
 +
- 	write_lock_bh(&l2cap_sk_list.lock);
- 
--	if (__l2cap_get_sock_by_addr(psm, src)) {
--		write_unlock_bh(&l2cap_sk_list.lock);
--		return -EADDRINUSE;
-+	if (psm && __l2cap_get_sock_by_addr(psm, src)) {
-+		err = -EADDRINUSE;
-+		goto done;
- 	}
- 
--	chan->psm = psm;
--	chan->sport = psm;
-+	if (psm) {
-+		chan->psm = psm;
-+		chan->sport = psm;
-+		err = 0;
-+	} else {
-+		u16 p;
- 
--	write_unlock_bh(&l2cap_sk_list.lock);
-+		err = -EINVAL;
-+		for (p = 0x1001; p < 0x1100; p += 2)
-+			if (!__l2cap_get_sock_by_addr(cpu_to_le16(p), src)) {
-+				chan->psm   = cpu_to_le16(p);
-+				chan->sport = cpu_to_le16(p);
-+				err = 0;
-+				break;
-+			}
++		if (chan->sport == psm && !bacmp(&bt_sk(sk)->src, src))
++			goto found;
 +	}
- 
--	return 0;
-+done:
++
++	sk = NULL;
++found:
++	return sk;
++}
++
++int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
++{
++	write_lock_bh(&l2cap_sk_list.lock);
++
++	if (__l2cap_get_sock_by_addr(psm, src)) {
++		write_unlock_bh(&l2cap_sk_list.lock);
++		return -EADDRINUSE;
++	}
++
++	chan->psm = psm;
++	chan->sport = psm;
++
 +	write_unlock_bh(&l2cap_sk_list.lock);
-+	return err;
- }
- 
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid)
++
++	return 0;
++}
++
++int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid)
++{
++	write_lock_bh(&l2cap_sk_list.lock);
++
++	chan->scid = scid;
++
++	write_unlock_bh(&l2cap_sk_list.lock);
++
++	return 0;
++}
++
+ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
+ {
+ 	u16 cid = L2CAP_CID_DYN_START;
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 2156dce..aca99cd 100644
+index 09cc7a0..2156dce 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -256,28 +256,6 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 		goto done;
- 	}
+@@ -78,22 +78,6 @@ void l2cap_sock_clear_timer(struct sock *sk)
+ 	sk_stop_timer(sk, &sk->sk_timer);
+ }
  
--	if (!chan->psm && !chan->scid) {
--		bdaddr_t *src = &bt_sk(sk)->src;
--		u16 psm;
+-static struct sock *__l2cap_get_sock_by_addr(__le16 psm, bdaddr_t *src)
+-{
+-	struct sock *sk;
+-	struct hlist_node *node;
+-	sk_for_each(sk, node, &l2cap_sk_list.head) {
+-		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
 -
--		err = -EINVAL;
--
--		write_lock_bh(&l2cap_sk_list.lock);
--
--		for (psm = 0x1001; psm < 0x1100; psm += 2)
--			if (!__l2cap_get_sock_by_addr(cpu_to_le16(psm), src)) {
--				chan->psm   = cpu_to_le16(psm);
--				chan->sport = cpu_to_le16(psm);
--				err = 0;
--				break;
--			}
--
--		write_unlock_bh(&l2cap_sk_list.lock);
--
--		if (err < 0)
--			goto done;
+-		if (chan->sport == psm && !bacmp(&bt_sk(sk)->src, src))
+-			goto found;
 -	}
 -
- 	sk->sk_max_ack_backlog = backlog;
- 	sk->sk_ack_backlog = 0;
- 	sk->sk_state = BT_LISTEN;
+-	sk = NULL;
+-found:
+-	return sk;
+-}
+-
+ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -136,26 +120,20 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 		}
+ 	}
+ 
+-	write_lock_bh(&l2cap_sk_list.lock);
++	if (la.l2_cid)
++		err = l2cap_add_scid(chan, la.l2_cid);
++	else
++		err = l2cap_add_psm(chan, &la.l2_bdaddr, la.l2_psm);
+ 
+-	if (la.l2_psm && __l2cap_get_sock_by_addr(la.l2_psm, &la.l2_bdaddr)) {
+-		err = -EADDRINUSE;
+-	} else {
+-		/* Save source address */
+-		bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
+-		chan->psm   = la.l2_psm;
+-		chan->sport = la.l2_psm;
+-		sk->sk_state = BT_BOUND;
+-
+-		if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
+-					__le16_to_cpu(la.l2_psm) == 0x0003)
+-			chan->sec_level = BT_SECURITY_SDP;
+-	}
++	if (err < 0)
++		goto done;
+ 
+-	if (la.l2_cid)
+-		chan->scid = la.l2_cid;
++	if (__le16_to_cpu(la.l2_psm) == 0x0001 ||
++				__le16_to_cpu(la.l2_psm) == 0x0003)
++		chan->sec_level = BT_SECURITY_SDP;
+ 
+-	write_unlock_bh(&l2cap_sk_list.lock);
++	bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
++	sk->sk_state = BT_BOUND;
+ 
+ done:
+ 	release_sock(sk);
 -- 
 1.7.5.rc1
 
