@@ -1,54 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1303945480-25756-7-git-send-email-johan.hedberg@gmail.com>
-References: <1303945480-25756-1-git-send-email-johan.hedberg@gmail.com>
-	<1303945480-25756-7-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 27 Apr 2011 19:47:33 -0400
-Message-ID: <BANLkTikpQZ9MLvfnCH7oDMN2+_+M=M-QNQ@mail.gmail.com>
-Subject: Re: [PATCH 7/7] Bluetooth: Fix link key persistent storage criteria
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: johan.hedberg@gmail.com
+Date: Wed, 27 Apr 2011 16:46:05 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/7] Bluetooth: Add automated SSP user confirmation
+ responses
+Message-ID: <20110427234605.GA3022@jh-x301>
+References: <1303945480-25756-1-git-send-email-johan.hedberg@gmail.com>
+ <BANLkTinxDHjLjAPqMLys3nxsjkHNnM=x0A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTinxDHjLjAPqMLys3nxsjkHNnM=x0A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Lizardo,
 
-On Wed, Apr 27, 2011 at 7:04 PM,  <johan.hedberg@gmail.com> wrote:
-> @@ -1042,6 +1078,20 @@ int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
->
->        BT_DBG("%s key for %s type %u", hdev->name, batostr(bdaddr), type);
->
-> +       /* Some buggy controller combinations generate a changed
-> +        * combination key for legacy pairing even when there's no
-> +        * previous key */
-> +       if (type == HCI_LK_CHANGED_COMBINATION &&
-> +                                       (!conn || conn->remote_auth == 0xff) &&
-> +                                       old_key_type == 0xff)
-> +               type = HCI_LK_COMBINATION;
-> +
-> +       if (new_key && !hci_persistent_key(hdev, conn, type, old_key_type)) {
-> +               list_del(&key->list);
-> +               kfree(key);
-> +               return 0;
+On Wed, Apr 27, 2011, Anderson Lizardo wrote:
+> On Wed, Apr 27, 2011 at 7:04 PM,  <johan.hedberg@gmail.com> wrote:
+> > @@ -2447,14 +2447,47 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
+> >                                                        struct sk_buff *skb)
+> >  {
+> >        struct hci_ev_user_confirm_req *ev = (void *) skb->data;
+> > +       int loc_mitm, rem_mitm;
+> > +       struct hci_conn *conn;
+> >
+> >        BT_DBG("%s", hdev->name);
+> >
+> >        hci_dev_lock(hdev);
+> >
+> > -       if (test_bit(HCI_MGMT, &hdev->flags))
+> > -               mgmt_user_confirm_request(hdev->id, &ev->bdaddr, ev->passkey);
+> > +       if (!test_bit(HCI_MGMT, &hdev->flags))
+> > +               goto unlock;
+> 
+> You lock hdev for checking hdev->flags, but not for reading hdev->name
+> on the BT_DBG() call. Is that ok?
 
-Just to make sure, is this condition possible?
+I suppose hdev->name can be considered a read-only value as it never
+changes after the HCI dev is created. There's also lots of other places
+in hci_event.c that access it without locking, so I think this should be
+fine.
 
-* new_key parameter not zero
-* old_key variable not NULL
-
-If so, "key" will point to an entry from hdev->link_keys , which will
-be freed on the if() above without removing it from the list.
-
-> +       }
-> +
->        bacpy(&key->bdaddr, bdaddr);
->        memcpy(key->val, val, 16);
->        key->type = type;
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
