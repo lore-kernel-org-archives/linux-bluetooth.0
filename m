@@ -1,66 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: Re: [BUG] bluetooth doesn't work from 2.6.39-rc1+ to 2.6.39-rc3+
-Date: Wed, 27 Apr 2011 06:57:49 -0400
-Cc: Hui Zhu <teawater@gmail.com>,
-	Dave Young <hidave.darkstar@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Bluettooth Linux <linux-bluetooth@vger.kernel.org>
-References: <BANLkTi=Ei91GRcL2oP0G16LDy7mpLoDEGQ@mail.gmail.com> <201104240952.14848.edt@aei.ca> <20110426161330.GC2242@joana>
-In-Reply-To: <20110426161330.GC2242@joana>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201104270657.49646.edt@aei.ca>
+From: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Subject: [PATCH] Remove grouping by phone number in call-history results
+Date: Wed, 27 Apr 2011 13:52:00 +0300
+Message-Id: <1303901520-6508-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 26 April 2011 12:13:30 Gustavo F. Padovan wrote:
-> * Ed Tomlinson <edt@aei.ca> [2011-04-24 09:52:14 -0400]:
-> 
-> > On Tuesday 19 April 2011 11:34:30 Hui Zhu wrote:
-> > > Do you part is OK?
-> > > 
-> > > I think it will be very easy to reproduce.
-> > > 
-> > > Thanks,
-> > > Hui
-> > > 
-> > > On Tue, Apr 19, 2011 at 15:46, Dave Young <hidave.darkstar@gmail.com> wrote:
-> > > > On Tue, Apr 19, 2011 at 10:53 AM, Hui Zhu <teawater@gmail.com> wrote:
-> > > >> Cannot connect to any outside devices through bluetooth.
-> > > >>
-> > > >> And I think this is not a bug of low level driver.  Because both my
-> > > >> laptop and a usb bluetooth card cannot work.
-> > > >
-> > > > Hi, please explain the "cannot work" in detail,
-> > > > Firstly check dmesg and hciconfig to see if there's anything wrong.
-> > 
-> > I am also seeing problems with bluetooth in .39-rc4+
-> > 
-> > [54511.033258] usb 2-4.4: USB disconnect, device number 5
-> > [54513.920060] usb 2-4.3: new full speed USB device number 6 using ehci_hcd
-> > [54514.063057] usb 2-4.3: New USB device found, idVendor=0a12, idProduct=0001
-> > [54514.070281] usb 2-4.3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> > grover ~ # hciconfig -a
-> > hci0:   Type: BR/EDR  Bus: USB
-> >         BD Address: 00:0A:3A:55:07:5A  ACL MTU: 192:8  SCO MTU: 64:8
-> >         DOWN 
-> >         RX bytes:718 acl:0 sco:0 events:25 errors:0
-> >         TX bytes:108 acl:0 sco:0 commands:24 errors:0
-> >         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-> >         Link policy: CONFIG_BT_HCIBTUSB=m
-> >         Link mode: SLAVE ACCEPT 
-> > 
-> > grover ~ # hciconfig hci0 up
-> > Can't init device hci0: Invalid argument (22)
-> 
-> does dmesg show something? I'm using a -rc kernel and bluetooth is working to
-> me.
+Now call history entries are distinguished also by call
+date (previously only contact-id was compared, so calls with
+different date were grouped into one entry in pull results).
+This change is needed for headsets with PBAP support that are
+confused when number of "new missed calls" is different than
+number of returned entries by pull call-history response (by
+example Nokia BH-903 hangs when this happens).
+---
+ plugins/phonebook-tracker.c |   30 +++++++++++++++++++++++++++---
+ 1 files changed, 27 insertions(+), 3 deletions(-)
 
-What dmesg shows is included above.  The tell tail for this bug is the error 22 from
-user space.  I see nothing on the kernel side.
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 2fced7a..d72c04e 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -1208,13 +1208,36 @@ static void set_call_type(struct phonebook_contact *contact,
+ 	contact->datetime = iso8601_utc_to_localtime(datetime);
+ }
+ 
+-static struct phonebook_contact *find_contact(GSList *contacts, const char *id)
++static gboolean contact_matches(struct contact_data *c_data, const char *id,
++							const char *datetime)
++{
++	char *localtime;
++	int cmp_ret;
++
++	if (g_strcmp0(c_data->id, id) != 0)
++		return FALSE;
++
++	/* id is equal and not call history entry => contact matches */
++	if (c_data->contact->calltype == CALL_TYPE_NOT_A_CALL)
++		return TRUE;
++
++	/* for call history entries have to compare also timestamps of calls */
++	localtime = iso8601_utc_to_localtime(datetime);
++	cmp_ret = g_strcmp0(c_data->contact->datetime, localtime);
++	g_free(localtime);
++
++	return (cmp_ret == 0) ? TRUE : FALSE;
++}
++
++static struct phonebook_contact *find_contact(GSList *contacts, const char *id,
++							const char *datetime)
+ {
+ 	GSList *l;
+ 
+ 	for (l = contacts; l; l = l->next) {
+ 		struct contact_data *c_data = l->data;
+-		if (g_strcmp0(c_data->id, id) == 0)
++
++		if (contact_matches(c_data, id, datetime))
+ 			return c_data->contact;
+ 	}
+ 
+@@ -1609,7 +1632,8 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
+ 
+ 	/* Trying to find contact in recently added contacts. It is needed for
+ 	 * contacts that have more than one telephone number filled */
+-	contact = find_contact(data->contacts, reply[CONTACTS_ID_COL]);
++	contact = find_contact(data->contacts, reply[CONTACTS_ID_COL],
++							reply[COL_DATE]);
+ 
+ 	/* If contact is already created then adding only new phone numbers */
+ 	if (contact) {
+-- 
+1.7.0.4
 
-Ed
