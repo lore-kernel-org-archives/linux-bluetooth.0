@@ -1,31 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Apr 2011 16:23:41 -0700
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Remove grouping by phone number in call-history results
-Message-ID: <20110427232341.GA26404@jh-x301>
-References: <1303901520-6508-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303901520-6508-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+In-Reply-To: <1303940957-22694-3-git-send-email-padovan@profusion.mobi>
+References: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
+	<1303940957-22694-2-git-send-email-padovan@profusion.mobi>
+	<1303940957-22694-3-git-send-email-padovan@profusion.mobi>
+Date: Wed, 27 Apr 2011 19:19:35 -0400
+Message-ID: <BANLkTimYW2ZweS5GSnVQ6nn_WTs9+b0RcA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Remove l2cap_sk_list
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Gustavo,
 
-On Wed, Apr 27, 2011, Radoslaw Jablonski wrote:
-> Now call history entries are distinguished also by call
-> date (previously only contact-id was compared, so calls with
-> different date were grouped into one entry in pull results).
-> This change is needed for headsets with PBAP support that are
-> confused when number of "new missed calls" is different than
-> number of returned entries by pull call-history response (by
-> example Nokia BH-903 hangs when this happens).
-> ---
->  plugins/phonebook-tracker.c |   30 +++++++++++++++++++++++++++---
->  1 files changed, 27 insertions(+), 3 deletions(-)
+On Wed, Apr 27, 2011 at 5:49 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> @@ -883,33 +891,34 @@ static inline void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *ch
+>  /* Find socket with psm and source bdaddr.
+>  * Returns closest match.
+>  */
+> -static struct sock *l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src)
+> +static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr_t *src)
+>  {
+> -       struct sock *sk = NULL, *sk1 = NULL;
+> -       struct hlist_node *node;
+> +       struct l2cap_chan *c, *c1 = NULL;
+>
+> -       read_lock(&l2cap_sk_list.lock);
+> +       read_lock(&chan_list_lock);
+>
+> -       sk_for_each(sk, node, &l2cap_sk_list.head) {
+> -               struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> +       list_for_each_entry(c, &chan_list, global_l) {
+> +               struct sock *sk = c->sk;
+>
+>                if (state && sk->sk_state != state)
+>                        continue;
+>
+> -               if (chan->psm == psm) {
+> +               if (c->psm == psm) {
+>                        /* Exact match. */
+> -                       if (!bacmp(&bt_sk(sk)->src, src))
+> -                               break;
+> +                       if (!bacmp(&bt_sk(sk)->src, src)) {
+> +                               read_unlock_bh(&chan_list_lock);
+> +                               return c;
 
-Pushed upstream. Thanks.
+What about this instead of the above:
 
-Johan
+c1 = c;
+break;
+
+This avoids a duplicated read_unlock_bh() and keeps a single exit
+point for the function.
+
+> +                       }
+>
+>                        /* Closest match */
+>                        if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
+> -                               sk1 = sk;
+> +                               c1 = c;
+>                }
+>        }
+>
+> -       read_unlock(&l2cap_sk_list.lock);
+> +       read_unlock(&chan_list_lock);
+>
+> -       return node ? sk : sk1;
+> +       return c1;
+>  }
+>
+>  int l2cap_chan_connect(struct l2cap_chan *chan)
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
