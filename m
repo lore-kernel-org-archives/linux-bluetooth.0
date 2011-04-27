@@ -1,142 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@nokia.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH v2 1/2] Bluetooth: Add basic discovery commands to the management interface
-Date: Wed, 27 Apr 2011 10:29:56 -0400
-Message-Id: <4db8286e.624dec0a.70bd.2267@mx.google.com>
-In-Reply-To: <y>
-References: <y>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] Change attrib server to use ATT CID & PSM defined in att.h
+Date: Wed, 27 Apr 2011 10:07:40 -0300
+Message-Id: <1303909660-30690-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@nokia.com>
-
-This patch adds start_discovery and stop_discovery commands to the
-management interface. Right now their implementation is fairly
-simplistic and the parameters are fixed to what user space has
-defaulted to so far.
-This is the very initial phase for discovery implementation into
-the kernel. Next steps include name resolution, LE scanning and
-bdaddr type handling.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/mgmt.h |    4 ++
- net/bluetooth/mgmt.c         |   76 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 79 insertions(+), 1 deletions(-)
+ src/attrib-server.c |   11 ++++-------
+ 1 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 6b6ff92..be93dd0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -195,6 +195,10 @@ struct mgmt_cp_remove_remote_oob_data {
- 	bdaddr_t bdaddr;
- } __packed;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 7ee496e..c55167f 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -47,9 +47,6 @@
  
-+#define MGMT_OP_START_DISCOVERY		0x001B
-+
-+#define MGMT_OP_STOP_DISCOVERY		0x001C
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c304688..dbc248f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1569,6 +1569,75 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
- }
+ #include "attrib-server.h"
  
-+static int start_discovery(struct sock *sk, u16 index)
-+{
-+	u8 lap[3] = { 0x33, 0x8b, 0x9e };
-+	struct hci_cp_inquiry cp;
-+	struct pending_cmd *cmd;
-+	struct hci_dev *hdev;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_START_DISCOVERY, ENODEV);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, index, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(&cp.lap, lap, 3);
-+	cp.length  = 0x08;
-+	cp.num_rsp = 0x00;
-+
-+	err = hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+failed:
-+	hci_dev_unlock_bh(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
-+static int stop_discovery(struct sock *sk, u16 index)
-+{
-+	struct hci_dev *hdev;
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY, ENODEV);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, index, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto failed;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+failed:
-+	hci_dev_unlock_bh(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1677,7 +1746,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 		err = remove_remote_oob_data(sk, index, buf + sizeof(*hdr),
- 									len);
- 		break;
+-#define GATT_PSM 0x1f
+-#define GATT_CID 4
 -
-+	case MGMT_OP_START_DISCOVERY:
-+		err = start_discovery(sk, index);
-+		break;
-+	case MGMT_OP_STOP_DISCOVERY:
-+		err = stop_discovery(sk, index);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
+ static GSList *database = NULL;
+ 
+ struct gatt_channel {
+@@ -97,7 +94,7 @@ static sdp_record_t *server_record_new(uuid_t *uuid, uint16_t start, uint16_t en
+ 	uuid_t root_uuid, proto_uuid, l2cap;
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *sh, *eh;
+-	uint16_t lp = GATT_PSM;
++	uint16_t lp = ATT_PSM;
+ 
+ 	if (uuid == NULL)
+ 		return NULL;
+@@ -949,7 +946,7 @@ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+ 	if (channel->mtu > ATT_MAX_MTU)
+ 		channel->mtu = ATT_MAX_MTU;
+ 
+-	if (cid != GATT_CID)
++	if (cid != ATT_CID)
+ 		channel->le = FALSE;
+ 	else
+ 		channel->le = TRUE;
+@@ -1089,7 +1086,7 @@ int attrib_server_init(void)
+ 	l2cap_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+ 					NULL, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
+-					BT_IO_OPT_PSM, GATT_PSM,
++					BT_IO_OPT_PSM, ATT_PSM,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 					BT_IO_OPT_INVALID);
+ 	if (l2cap_io == NULL) {
+@@ -1108,7 +1105,7 @@ int attrib_server_init(void)
+ 	le_io = bt_io_listen(BT_IO_L2CAP, NULL, confirm_event,
+ 					&le_io, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, BDADDR_ANY,
+-					BT_IO_OPT_CID, GATT_CID,
++					BT_IO_OPT_CID, ATT_CID,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 					BT_IO_OPT_INVALID);
+ 	if (le_io == NULL) {
 -- 
-1.7.1
+1.7.5.rc1
 
