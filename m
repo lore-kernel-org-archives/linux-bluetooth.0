@@ -1,82 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1303940957-22694-3-git-send-email-padovan@profusion.mobi>
-References: <1303940957-22694-1-git-send-email-padovan@profusion.mobi>
-	<1303940957-22694-2-git-send-email-padovan@profusion.mobi>
-	<1303940957-22694-3-git-send-email-padovan@profusion.mobi>
-Date: Wed, 27 Apr 2011 19:19:35 -0400
-Message-ID: <BANLkTimYW2ZweS5GSnVQ6nn_WTs9+b0RcA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Remove l2cap_sk_list
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Respect local MITM req in io_cap reply
+Date: Wed, 27 Apr 2011 16:09:47 -0700
+Message-Id: <1303945787-25951-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1303372461-11848-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1303372461-11848-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 
-On Wed, Apr 27, 2011 at 5:49 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> @@ -883,33 +891,34 @@ static inline void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *ch
->  /* Find socket with psm and source bdaddr.
->  * Returns closest match.
->  */
-> -static struct sock *l2cap_get_sock_by_psm(int state, __le16 psm, bdaddr_t *src)
-> +static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm, bdaddr_t *src)
->  {
-> -       struct sock *sk = NULL, *sk1 = NULL;
-> -       struct hlist_node *node;
-> +       struct l2cap_chan *c, *c1 = NULL;
->
-> -       read_lock(&l2cap_sk_list.lock);
-> +       read_lock(&chan_list_lock);
->
-> -       sk_for_each(sk, node, &l2cap_sk_list.head) {
-> -               struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> +       list_for_each_entry(c, &chan_list, global_l) {
-> +               struct sock *sk = c->sk;
->
->                if (state && sk->sk_state != state)
->                        continue;
->
-> -               if (chan->psm == psm) {
-> +               if (c->psm == psm) {
->                        /* Exact match. */
-> -                       if (!bacmp(&bt_sk(sk)->src, src))
-> -                               break;
-> +                       if (!bacmp(&bt_sk(sk)->src, src)) {
-> +                               read_unlock_bh(&chan_list_lock);
-> +                               return c;
+If host requires MITM protection notify that to controller in
+io capabilities reply even if the remote device requires no bonding.
 
-What about this instead of the above:
+If it is not respected, host can get an unauthenticated link key while
+it expects authenticated one.
 
-c1 = c;
-break;
+Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+---
+ net/bluetooth/hci_event.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-This avoids a duplicated read_unlock_bh() and keeps a single exit
-point for the function.
-
-> +                       }
->
->                        /* Closest match */
->                        if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
-> -                               sk1 = sk;
-> +                               c1 = c;
->                }
->        }
->
-> -       read_unlock(&l2cap_sk_list.lock);
-> +       read_unlock(&chan_list_lock);
->
-> -       return node ? sk : sk1;
-> +       return c1;
->  }
->
->  int l2cap_chan_connect(struct l2cap_chan *chan)
-
-Regards,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cba0bdb..3c90736 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2369,7 +2369,7 @@ static inline u8 hci_get_auth_req(struct hci_conn *conn)
+ 
+ 	/* If remote requests no-bonding follow that lead */
+ 	if (conn->remote_auth == 0x00 || conn->remote_auth == 0x01)
+-		return 0x00;
++		return conn->remote_auth | (conn->auth_type & 0x01);
+ 
+ 	return conn->auth_type;
+ }
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.4.4
+
