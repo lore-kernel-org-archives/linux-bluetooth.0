@@ -2,33 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 2/2] Remove wrong checking for legacy devices
-Date: Thu, 28 Apr 2011 19:34:30 -0300
-Message-Id: <1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH 1/2] Cleanup functions that update found UUIDs(EIR)
+Date: Thu, 28 Apr 2011 19:34:29 -0300
+Message-Id: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Infer that the found device is a legacy device based on the presence
-of its name in the storage is wrong.
 ---
- src/event.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+ src/adapter.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 5373e33..b873000 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -481,8 +481,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+diff --git a/src/adapter.c b/src/adapter.c
+index 8dbd62c..f7bbc3e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3059,11 +3059,11 @@ static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
+ static void remove_same_uuid(gpointer data, gpointer user_data)
+ {
+ 	struct remote_dev_info *dev = user_data;
++	const char *new_uuid = data;
+ 	GSList *l;
  
- 	if (data)
- 		legacy = FALSE;
--	else if (name == NULL)
--		legacy = TRUE;
- 	else if (read_remote_features(local, peer, NULL, features) == 0) {
- 		if (features[0] & 0x01)
- 			legacy = FALSE;
+ 	for (l = dev->services; l; l = l->next) {
+ 		char *current_uuid = l->data;
+-		char *new_uuid = data;
+ 
+ 		if (strcmp(current_uuid, new_uuid) == 0) {
+ 			g_free(current_uuid);
+@@ -3076,7 +3076,7 @@ static void remove_same_uuid(gpointer data, gpointer user_data)
+ static void dev_prepend_uuid(gpointer data, gpointer user_data)
+ {
+ 	struct remote_dev_info *dev = user_data;
+-	char *new_uuid = data;
++	const char *new_uuid = data;
+ 
+ 	dev->services = g_slist_prepend(dev->services, g_strdup(new_uuid));
+ }
 -- 
 1.7.5.rc3
 
