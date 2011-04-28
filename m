@@ -1,53 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DB94EB2.5060204@nokia.com>
-Date: Thu, 28 Apr 2011 14:25:38 +0300
-From: Mika Linnanoja <mika.linnanoja@nokia.com>
+From: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+To: <padovan@profusion.mobi>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+Subject: [PATCH] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure.
+Date: Thu, 28 Apr 2011 19:39:41 +0800
+Message-ID: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
 MIME-Version: 1.0
-To: padovan@profusion.mobi
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>
-Subject: latest bluetooth-next doesn't compile
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+ In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
+ l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
+ skb into BUSY_QUEUE for later retries.
 
-I cloned today 
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git 
-and seems it does not want to fully compile.
 
-Steps were like this:
-$ git clone <url>
-$ cd <git_dir>
-$ cp /boot/old_config_file .config
-$ make oldconfig (default answers)
-$ make
-   CHK     include/linux/version.h
-   CHK     include/generated/utsrelease.h
-   CALL    scripts/checksyscalls.sh
-   CHK     include/generated/compile.h
-   UPD     include/generated/compile.h
-   CC      init/version.o
-   LD      init/built-in.o
-   VDSOSYM arch/x86/vdso/vdso32-int80-syms.lds
-   VDSOSYM arch/x86/vdso/vdso32-sysenter-syms.lds
-   VDSOSYM arch/x86/vdso/vdso32-syms.lds
-   LD      arch/x86/vdso/built-in.o
-   LD      arch/x86/built-in.o
-   CC [M]  net/bluetooth/cmtp/core.o
-net/bluetooth/cmtp/core.c: In function ‘cmtp_add_connection’:
-net/bluetooth/cmtp/core.c:349: error: ‘struct l2cap_pinfo’ has no member named 
-‘omtu’
-net/bluetooth/cmtp/core.c:349: error: ‘struct l2cap_pinfo’ has no member named 
-‘imtu’
-make[3]: *** [net/bluetooth/cmtp/core.o] Error 1
-make[2]: *** [net/bluetooth/cmtp] Error 2
-make[1]: *** [net/bluetooth] Error 2
-make: *** [net] Error 2
-$
+Signed-off-by: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+---
+ net/bluetooth/l2cap_core.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-Is this a known issue? I have not tried to build this exact tree before.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ca27f3a..3b2f140 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2784,8 +2784,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
+ 			goto drop;
+ 
+ 		err = sock_queue_rcv_skb(sk, skb);
+-		if (!err)
+-			return err;
++		return err;
+ 
+ 		break;
+ 
+-- 
+1.7.1
 
-BR,
-Mika
