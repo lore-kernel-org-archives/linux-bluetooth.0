@@ -3,82 +3,38 @@ From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>, <padovan@profusion.mobi>
 CC: <linux-bluetooth@vger.kernel.org>,
 	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v3 1/7] Bluetooth: Add definitions for link key types
-Date: Thu, 28 Apr 2011 12:07:53 +0200
-Message-ID: <1303985279-3944-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-In-Reply-To: <1303985279-3944-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1303985279-3944-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v3 0/7] Handle link key type and security requirements
+Date: Thu, 28 Apr 2011 12:07:52 +0200
+Message-ID: <1303985279-3944-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Introduce the link key types defs and use them instead of magic numbers.
+Johan, 
 
-Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
----
- include/net/bluetooth/hci.h |    9 +++++++++
- net/bluetooth/hci_core.c    |    2 +-
- net/bluetooth/hci_event.c   |    7 ++++---
- 3 files changed, 14 insertions(+), 4 deletions(-)
+I modified patch 6/7 according to your comment and have added a new patch 7/7 which is an
+extension of mgmt api to require secure pin code.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 6138e31..e0a3cf1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -246,6 +246,15 @@ enum {
- #define HCI_AT_GENERAL_BONDING		0x04
- #define HCI_AT_GENERAL_BONDING_MITM	0x05
- 
-+/* Link Key types */
-+#define HCI_LK_COMBINATION		0x00
-+#define HCI_LK_LOCAL_UNIT		0x01
-+#define HCI_LK_REMOTE_UNIT		0x02
-+#define HCI_LK_DEBUG_COMBINATION	0x03
-+#define HCI_LK_UNAUTH_COMBINATION	0x04
-+#define HCI_LK_AUTH_COMBINATION		0x05
-+#define HCI_LK_CHANGED_COMBINATION	0x06
-+
- /* -----  HCI Commands ---- */
- #define HCI_OP_NOP			0x0000
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 98aa24b..07d0ba3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1050,7 +1050,7 @@ int hci_add_link_key(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
- 	if (new_key)
- 		mgmt_new_key(hdev->id, key, old_key_type);
- 
--	if (type == 0x06)
-+	if (type == HCI_LK_CHANGED_COMBINATION)
- 		key->type = old_key_type;
- 
- 	return 0;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e64a3de..fbbb63f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2053,15 +2053,16 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
- 	BT_DBG("%s found key type %u for %s", hdev->name, key->type,
- 							batostr(&ev->bdaddr));
- 
--	if (!test_bit(HCI_DEBUG_KEYS, &hdev->flags) && key->type == 0x03) {
-+	if (!test_bit(HCI_DEBUG_KEYS, &hdev->flags) &&
-+				key->type == HCI_LK_DEBUG_COMBINATION) {
- 		BT_DBG("%s ignoring debug key", hdev->name);
- 		goto not_found;
- 	}
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 
--	if (key->type == 0x04 && conn && conn->auth_type != 0xff &&
--						(conn->auth_type & 0x01)) {
-+	if (key->type == HCI_LK_UNAUTH_COMBINATION && conn &&
-+			conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
- 		BT_DBG("%s ignoring unauthenticated key", hdev->name);
- 		goto not_found;
- 	}
--- 
-1.7.1
+Thanks,
+Waldek
+
+Waldemar Rymarkiewicz (7):
+  Bluetooth: Add definitions for link key types
+  Bluetooth: Don't modify sec_level if auth failed
+  Bluetooth: Map sec_level to link key requirements
+  Bluetooth: Ignore key unauthenticated for high security
+  Bluetooth: Double check sec req for pre 2.1 device
+  Bluetooth: Respect local MITM req in io_cap reply
+  Bluetooth: Add secure flag for mgmt_pin_code_req
+
+ include/net/bluetooth/hci.h      |    9 +++++
+ include/net/bluetooth/hci_core.h |    3 +-
+ include/net/bluetooth/mgmt.h     |    1 +
+ net/bluetooth/hci_conn.c         |   61 +++++++++++++++++++++++++++++++------
+ net/bluetooth/hci_core.c         |    2 +-
+ net/bluetooth/hci_event.c        |   39 ++++++++++++++++++-----
+ net/bluetooth/mgmt.c             |    3 +-
+ net/bluetooth/rfcomm/core.c      |   17 ++++++++++-
+ 8 files changed, 112 insertions(+), 23 deletions(-)
 
