@@ -3,17 +3,13 @@ From: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
 To: <padovan@profusion.mobi>
 CC: <linux-bluetooth@vger.kernel.org>,
 	Ruiyi Zhang <Ruiyi.zhang@atheros.com>
-Subject: [PATCH] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure.
-Date: Thu, 28 Apr 2011 19:39:41 +0800
-Message-ID: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
+Subject: [PATCH] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure. In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error, l2cap_ertm_reassembly_sdu should not return 0 so as to insert the skb into BUSY_QUEUE for later retries.
+Date: Thu, 28 Apr 2011 19:31:04 +0800
+Message-ID: <1303990264-15387-1-git-send-email-Ruiyi.zhang@atheros.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
- In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
- l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
- skb into BUSY_QUEUE for later retries.
 
 
 Signed-off-by: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
