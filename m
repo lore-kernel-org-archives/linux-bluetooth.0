@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/12] Bluetooth: Add confirm_hint parameter to user confirmation requests
-Date: Thu, 28 Apr 2011 11:28:56 -0700
-Message-Id: <1304015344-12238-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 03/12] Bluetooth: Fix HCI_CONN_AUTH_PEND flag for all authentication requests
+Date: Thu, 28 Apr 2011 11:28:55 -0700
+Message-Id: <1304015344-12238-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1304015344-12238-1-git-send-email-johan.hedberg@gmail.com>
 References: <1304015344-12238-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,108 +11,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@nokia.com>
 
-When accepting a pairing request which fulfills the SSP auto-accept
-criteria we need to push the request all the way to the user for
-confirmation. This patch adds a new hint to the user_confirm_request
-management event so user space can know when to show a numeric
-comparison dialog and when to show a simple yes/no confirmation dialog.
+The HCI_CONN_AUTH_PEND flag should be set whenever requesting
+authentication so that multiple pending requests can't occur.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
 ---
- include/net/bluetooth/hci_core.h |    3 ++-
- include/net/bluetooth/mgmt.h     |    1 +
- net/bluetooth/hci_event.c        |   16 ++++++++++++++--
- net/bluetooth/mgmt.c             |    4 +++-
- 4 files changed, 20 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_event.c |   22 ++++++++++++++++++----
+ 1 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 09b9dd6..135dfac 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -783,7 +783,8 @@ int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_pin_code_request(u16 index, bdaddr_t *bdaddr, u8 secure);
- int mgmt_pin_code_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
--int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value);
-+int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value,
-+							u8 confirm_hint);
- int mgmt_user_confirm_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_user_confirm_neg_reply_complete(u16 index, bdaddr_t *bdaddr,
- 								u8 status);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 0e7de63..c444a2b 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -259,6 +259,7 @@ struct mgmt_ev_pin_code_request {
- #define MGMT_EV_USER_CONFIRM_REQUEST	0x000F
- struct mgmt_ev_user_confirm_request {
- 	bdaddr_t bdaddr;
-+	__u8 confirm_hint;
- 	__le32 value;
- } __packed;
- 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 94c1296..470fab4 100644
+index a479389..94c1296 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2497,7 +2497,7 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 							struct sk_buff *skb)
- {
- 	struct hci_ev_user_confirm_req *ev = (void *) skb->data;
--	int loc_mitm, rem_mitm;
-+	int loc_mitm, rem_mitm, confirm_hint = 0;
- 	struct hci_conn *conn;
+@@ -1021,12 +1021,19 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_lock(hdev);
  
- 	BT_DBG("%s", hdev->name);
-@@ -2529,6 +2529,16 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 	/* If no side requires MITM protection; auto-accept */
- 	if ((!loc_mitm || conn->remote_cap == 0x03) &&
- 				(!rem_mitm || conn->io_capability == 0x03)) {
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
+-	if (conn && hci_outgoing_auth_needed(hdev, conn)) {
++	if (!conn)
++		goto unlock;
 +
-+		/* If we're not the initiators request authorization to
-+		 * proceed from user space (mgmt_user_confirm with
-+		 * confirm_hint set to 1). */
-+		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
-+			BT_DBG("Confirming auto-accept as acceptor");
-+			confirm_hint = 1;
-+			goto confirm;
-+		}
++	if (!hci_outgoing_auth_needed(hdev, conn))
++		goto unlock;
 +
- 		BT_DBG("Auto-accept of user confirmation with %ums delay",
- 						hdev->auto_accept_delay);
- 
-@@ -2543,7 +2553,9 @@ static inline void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 		goto unlock;
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
+ 		struct hci_cp_auth_requested cp;
+-		cp.handle = __cpu_to_le16(conn->handle);
++		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
  	}
  
--	mgmt_user_confirm_request(hdev->id, &ev->bdaddr, ev->passkey);
-+confirm:
-+	mgmt_user_confirm_request(hdev->id, &ev->bdaddr, ev->passkey,
-+								confirm_hint);
- 
- unlock:
++unlock:
  	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a7b4937..a1b0ec4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1995,13 +1995,15 @@ int mgmt_pin_code_neg_reply_complete(u16 index, bdaddr_t *bdaddr, u8 status)
- 	return err;
  }
  
--int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value)
-+int mgmt_user_confirm_request(u16 index, bdaddr_t *bdaddr, __le32 value,
-+							u8 confirm_hint)
- {
- 	struct mgmt_ev_user_confirm_request ev;
+@@ -1516,12 +1523,19 @@ static inline void hci_remote_name_evt(struct hci_dev *hdev, struct sk_buff *skb
+ 		mgmt_remote_name(hdev->id, &ev->bdaddr, ev->name);
  
- 	BT_DBG("hci%u", index);
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (conn && hci_outgoing_auth_needed(hdev, conn)) {
++	if (!conn)
++		goto unlock;
++
++	if (!hci_outgoing_auth_needed(hdev, conn))
++		goto unlock;
++
++	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->pend)) {
+ 		struct hci_cp_auth_requested cp;
+-		cp.handle = __cpu_to_le16(conn->handle);
++		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
+ 	}
  
- 	bacpy(&ev.bdaddr, bdaddr);
-+	ev.confirm_hint = confirm_hint;
- 	put_unaligned_le32(value, &ev.value);
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
  
- 	return mgmt_event(MGMT_EV_USER_CONFIRM_REQUEST, index, &ev, sizeof(ev),
 -- 
 1.7.4.4
 
