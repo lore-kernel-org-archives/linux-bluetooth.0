@@ -1,43 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH] Move hid2hci to /lib/udev
+From: Kay Sievers <kay.sievers@vrfy.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH 1/2] Cleanup functions that update found UUIDs(EIR)
-Date: Thu, 28 Apr 2011 19:34:29 -0300
-Message-Id: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Fri, 29 Apr 2011 00:32:25 +0200
+Message-ID: <1304029945.27065.1.camel@zag>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+>From 6a825582d6a3b1e1c3ed2a7ea6c62c207d45542d Mon Sep 17 00:00:00 2001
+From: Kay Sievers <kay.sievers@vrfy.org>
+Date: Fri, 29 Apr 2011 00:29:15 +0200
+Subject: [PATCH] Move hid2hci to /lib/udev
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8dbd62c..f7bbc3e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3059,11 +3059,11 @@ static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
- static void remove_same_uuid(gpointer data, gpointer user_data)
- {
- 	struct remote_dev_info *dev = user_data;
-+	const char *new_uuid = data;
- 	GSList *l;
+---
+ Makefile.am    |    2 +-
+ Makefile.tools |    4 +++-
+ acinclude.m4   |   10 ++++------
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 9703bf0..552c81d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -334,7 +334,7 @@ EXTRA_DIST += audio/bluetooth.conf
+ include Makefile.tools
  
- 	for (l = dev->services; l; l = l->next) {
- 		char *current_uuid = l->data;
--		char *new_uuid = data;
+ if UDEVRULES
+-rulesdir = @UDEV_DATADIR@
++rulesdir = @UDEV_DIR@/rules.d
  
- 		if (strcmp(current_uuid, new_uuid) == 0) {
- 			g_free(current_uuid);
-@@ -3076,7 +3076,7 @@ static void remove_same_uuid(gpointer data, gpointer user_data)
- static void dev_prepend_uuid(gpointer data, gpointer user_data)
- {
- 	struct remote_dev_info *dev = user_data;
--	char *new_uuid = data;
-+	const char *new_uuid = data;
+ udev_files = scripts/bluetooth.rules
  
- 	dev->services = g_slist_prepend(dev->services, g_strdup(new_uuid));
- }
+diff --git a/Makefile.tools b/Makefile.tools
+index 1bf21b2..bec10b5 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -100,7 +100,9 @@ EXTRA_DIST += tools/bccmd.8
+ endif
+ 
+ if HID2HCI
+-sbin_PROGRAMS += tools/hid2hci
++udevdir = @UDEV_DIR@
++
++udev_PROGRAMS = tools/hid2hci
+ 
+ tools_hid2hci_LDADD = @USB_LIBS@ @UDEV_LIBS@
+ 
+diff --git a/acinclude.m4 b/acinclude.m4
+index a27cd22..d77937b 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -84,13 +84,11 @@ AC_DEFUN([AC_INIT_BLUEZ], [
+ 	AC_SUBST(CONFIGDIR, "${configdir}")
+ 	AC_SUBST(STORAGEDIR, "${storagedir}")
+ 
+-	UDEV_DATADIR="`$PKG_CONFIG --variable=udevdir udev`"
+-	if (test -z "${UDEV_DATADIR}"); then
+-		UDEV_DATADIR="${sysconfdir}/udev/rules.d"
+-	else
+-		UDEV_DATADIR="${UDEV_DATADIR}/rules.d"
++	UDEV_DIR="`$PKG_CONFIG --variable=udevdir udev`"
++	if (test -z "${UDEV_DIR}"); then
++		UDEV_DIR="/lib/udev"
+ 	fi
+-	AC_SUBST(UDEV_DATADIR)
++	AC_SUBST(UDEV_DIR)
+ ])
+ 
+ AC_DEFUN([AC_PATH_DBUS], [
 -- 
-1.7.5.rc3
+1.7.4.2
+
 
