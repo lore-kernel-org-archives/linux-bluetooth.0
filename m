@@ -1,51 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Apr 2011 16:18:42 -0300
+Date: Thu, 28 Apr 2011 15:34:45 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 12/12] Bluetooth: Fix updating conn->auth_type in
- hci_io_capa_request_evt
-Message-ID: <20110428191842.GC2302@joana>
-References: <1304015344-12238-1-git-send-email-johan.hedberg@gmail.com>
- <1304015344-12238-12-git-send-email-johan.hedberg@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 7/7] Bluetooth: Add secure flag for mgmt_pin_code_req
+Message-ID: <20110428183445.GB2302@joana>
+References: <1303985279-3944-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1303985279-3944-8-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304015344-12238-12-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1303985279-3944-8-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Waldemar,
 
-* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-04-28 11:29:04 -0700]:
+* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-04-28 12:07:59 +0200]:
 
-> From: Johan Hedberg <johan.hedberg@nokia.com>
+> Extend the mgmt_pin_code_request interface to require secure
+> pin code (16 digit) for authentication.
 > 
-> In some circumstances hci_get_auth_req will return a value different
-> from the current conn->auth_type. In these cases update conn->auth_type
-> so that when a user confirm request comes it doesn't falsely trigger
-> auto-accept.
+> This is a kernel part of the secure pin code requirement notification
+> to user space agent.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@nokia.com>
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 > ---
->  net/bluetooth/hci_event.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 8dfd386..f6219e2 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2447,7 +2447,8 @@ static inline void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff
->  
->  		bacpy(&cp.bdaddr, &ev->bdaddr);
->  		cp.capability = conn->io_capability;
-> -		cp.authentication = hci_get_auth_req(conn);
-> +		conn->auth_type = hci_get_auth_req(conn);
-> +		cp.authentication = conn->auth_type;
->  
->  		if ((conn->out == 0x01 || conn->remote_oob == 0x01) &&
->  				hci_find_remote_oob_data(hdev, &conn->dst))
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  include/net/bluetooth/mgmt.h     |    1 +
+>  net/bluetooth/hci_event.c        |    9 +++++++--
+>  net/bluetooth/mgmt.c             |    3 ++-
+>  4 files changed, 11 insertions(+), 4 deletions(-)
 
-All applied, thanks for fixes.
+All patches but 5/7 were applied. thanks.
 
 -- 
 Gustavo F. Padovan
