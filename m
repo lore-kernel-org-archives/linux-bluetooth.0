@@ -1,34 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaikumar Ganesh <jaikumar@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaikumar Ganesh <jaikumar@google.com>
-Subject: [PATCH] Fix property type of Main Channel of Health plugin
-Date: Fri, 29 Apr 2011 14:01:03 -0700
-Message-Id: <1304110863-26528-1-git-send-email-jaikumar@google.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTi=dTXOX+vcCnDt0Z4f9X5hRbyi7bg@mail.gmail.com>
+References: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
+	<BANLkTimm=CVbBrLEPWf8Q0BgvtMmZaxNBg@mail.gmail.com>
+	<BANLkTin=vjdpnB3v9-AfXwPjvGV+F1wP4Q@mail.gmail.com>
+	<20110429175625.GA29649@jh-x301>
+	<BANLkTi=dTXOX+vcCnDt0Z4f9X5hRbyi7bg@mail.gmail.com>
+Date: Fri, 29 Apr 2011 14:44:37 -0400
+Message-ID: <BANLkTimostGXQJd9XADSxv0oi+L-eCPFQg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Remove wrong checking for legacy devices
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The property type must be DBUS_TYPE_OBJECT_PATH instead
-of DBUS_TYPE_STRING. This is in sync with the documentation
-and with the other places of usage such as the property change
-signal.
----
- health/hdp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Apr 29, 2011 at 2:41 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Fri, Apr 29, 2011 at 1:56 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>> BTW: why this information needs to be exposed through the DeviceFound() signal?
+>>> It is not used internally in the adapter.c source.
+>>
+>> It's useful for pairing UIs. If a device is expected to produce legacy
+>> pairing when calling CreatePairedDevice the UI can ask the user for the
+>> PIN *before* calling CreatePairedDevice and thereby eliminate the risk of
+>> user response timeout locally.
+>
+> Maybe this is useful do be documented on doc/device-api.txt? The
+> LegacyPairing only mentions "This property is useful in the
+> Adapter.DeviceFound signal to anticipate whether legacy or simple
+> pairing will occur.", but it is not mentioned *why* the API user might
+> want to detect legacy pairing devices.
 
-diff --git a/health/hdp.c b/health/hdp.c
-index 6f2c89d..d53ea80 100644
---- a/health/hdp.c
-+++ b/health/hdp.c
-@@ -2058,7 +2058,7 @@ static DBusMessage *device_get_properties(DBusConnection *conn,
- 		path = g_strdup(device->fr->path);
- 	else
- 		path = g_strdup("");
--	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_STRING, &path);
-+	dict_append_entry(&dict, "MainChannel", DBUS_TYPE_OBJECT_PATH, &path);
- 	g_free(path);
- 	dbus_message_iter_close_container(&iter, &dict);
- 
+On another story, I'm not sure about BR/EDR, but for LE there is a
+timeout associated with SMP pairing. Would this "anticipate user PIN
+request" thing be necessary on this case as well?
+
+Regards,
 -- 
-1.7.3.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
