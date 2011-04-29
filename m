@@ -1,63 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <padovan@profusion.mobi>, <linux-bluetooth@vger.kernel.org>
-Date: Fri, 29 Apr 2011 11:10:57 +0300
-Subject: RE: [PATCH v3 5/7] Bluetooth: Double check sec req for pre 2.1
- device
-Message-ID: <99B09243E1A5DA4898CDD8B70011144816F29AEE89@EXMB04.eu.tieto.com>
-References: <1303985279-3944-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1303985279-3944-6-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20110428181117.GA11610@jh-x301>
-In-Reply-To: <20110428181117.GA11610@jh-x301>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4DBA6D97.7050207@nokia.com>
+Date: Fri, 29 Apr 2011 10:49:43 +0300
+From: Mika Linnanoja <mika.linnanoja@nokia.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+CC: ext Ville Tervo <ville.tervo@nokia.com>,
+        Antti Julku <antti.julku@nokia.com>,
+        ext Marcel Holtmann <marcel@holtmann.org>,
+        Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+        linus.walleij@stericsson.com, par-gunnar.p.hjalmdahl@stericsson.com,
+        padovan@profusion.mobi
+Subject: Re: [PATCH] bluetooth: Fix for security block issue.
+References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com> <1295971990.1520.53.camel@aeonflux> <4DB935D9.5080302@nokia.com> <20110428095139.GJ18898@null>
+In-Reply-To: <20110428095139.GJ18898@null>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, 
-
->> +static int rfcomm_accept_secure(struct hci_conn *conn, struct 
->> +rfcomm_dlc *d) {
->> +	BT_DBG("");
->> +
->> +	if (d->sec_level != BT_SECURITY_HIGH)
->> +		return 1; /* Accept */
->> +
->> +	if (conn->key_type == HCI_LK_AUTH_COMBINATION ||
->> +			(conn->key_type == HCI_LK_COMBINATION &&
->> +			conn->pin_length == 16))
->> +		return 1;
->> +
->> +	return 0; /* Reject */
->> +}
+On 04/28/2011 12:51 PM, ext Ville Tervo wrote:
+> Could the actual reason be some change in usb stack? Could it have lower
+> priority for event pipe than for data pipe? In that case event for security
+> change might arrive to bt stack too late.
 >
->If conn->key_type and conn->pin_length are like you want them 
->to be in the second if-statement, shouldn't conn->sec_level 
->already be BT_SECURITY_HIGH?
+> At lest I haven't seen this kind of behaviour with serial attached chips. So I
+> think this is something USB specific.
 
-Yes, but if  service requires BT_SECURITY_MEDIUM we should accept it as well. Thus, we need this first check.
+Happens on Ubuntu 11.04 (released yesterday; bluez 4.91 & kernel 2.6.38-8) as 
+well, tested with White PTS 2.1 dongle (CSR chip) on laptop x61s. Sending 
+party (OPP with obex-client in a loop) was a phone.
 
->And if that's the case I guess 
->you don't need a separate function at all: just check for 
->conn->sec_level.
-
-However, we could do like this
-
-if (d->sec_level != BT_SECURITY_HIGH)
-	return 1; /* Accept */
-
-If (conn->sec_level == BT_SECURITY_HIGH)
-	return 1; /* Accept */
-
-return 0; /* Reject */
-
-... and then perhaps we don't need a new function here.
-
-
-> Btw, what purpose does d->sec_level serve 
->when we already have conn->sec_level?
-
-d->sec_level is required sec level for the service and conn->sec_level is the level that's already on the link.
-
-/Waldek
+Cheers,
+Mika
