@@ -1,23 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: wu zheng <wu.zheng@intel.com>
+From: "wu.zheng" <wu.zheng@intel.com>
 To: <linux-bluetooth@vger.kernel.org>
-Cc: wu zheng <wu.zheng@intel.com>
+Cc: "wu.zheng" <wu.zheng@intel.com>
 Subject: [PATCH] Modify the condition of removing filters of dbus at filter_data_remove_callback and message_filter in file gdbus/watch.c
-Date: Fri, 29 Apr 2011 15:23:13 +0800
-Message-Id: <1304061793-10407-1-git-send-email-wu.zheng@intel.com>
+Date: Fri, 29 Apr 2011 12:48:15 +0800
+Message-Id: <1304052495-9650-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After Checking the code style, and send the patch again.
 Otherwise, removing filter will run twice when using g_dbus_add_signal_watch with sender and cause dbus remove filter error and crash.The result is that g_dbus_add_signal_watch will inovke g_dbus_add_service_watch if the param of sender of g_dbus_add_signal_watch is avaliable and add two callback and only add a dbus filter, which result in the func of g_dbus_remove_watch will remove dbus filter twice. When using telephony-ofono for telephony, add_watch will add signal watch with sender at telephony_init and remove_watch will be inovked at telephony_exit in file audio/telephony-ofono.c, which result in bluez crash when using telephony-ofono.c.
-
-Signed-off-by: wu zheng <wu.zheng@intel.com>
 ---
  gdbus/watch.c |   21 +++++++++++++++------
  1 files changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/gdbus/watch.c b/gdbus/watch.c
-index fba58c3..4f4533e 100644
+index fba58c3..1304083 100644
 --- a/gdbus/watch.c
 +++ b/gdbus/watch.c
 @@ -266,15 +266,16 @@ static struct filter_callback *filter_data_find_callback(
@@ -28,7 +25,7 @@ index fba58c3..4f4533e 100644
 +static gboolean filter_data_free(struct filter_data *data)
  {
  	GSList *l;
-+	gboolean watch_removed;
++        gboolean watch_removed;
  
  	for (l = data->callbacks; l != NULL; l = l->next)
  		g_free(l->data);
@@ -44,7 +41,7 @@ index fba58c3..4f4533e 100644
  	dbus_connection_unref(data->connection);
  	g_free(data);
 +
-+	return watch_removed;
++        return watch_removed;
  }
  
  static void filter_data_call_and_free(struct filter_data *data)
@@ -52,8 +49,8 @@ index fba58c3..4f4533e 100644
  						struct filter_callback *cb)
  {
  	DBusConnection *connection;
-+	guint name_watch;
-+	gboolean watch_removed;
++        guint name_watch;
++        gboolean watch_removed;
  
  	data->callbacks = g_slist_remove(data->callbacks, cb);
  	data->processed = g_slist_remove(data->processed, cb);
@@ -61,7 +58,7 @@ index fba58c3..4f4533e 100644
  		return FALSE;
  
  	connection = dbus_connection_ref(data->connection);
-+	name_watch = data->name_watch;
++        name_watch = data->name_watch;
  	listeners = g_slist_remove(listeners, data);
 -	filter_data_free(data);
 +	watch_removed = filter_data_free(data);
@@ -78,8 +75,8 @@ index fba58c3..4f4533e 100644
  {
  	struct filter_data *data;
  	const char *sender, *path, *iface, *member, *arg = NULL;
-+	guint name_watch;
-+	gboolean watch_removed;
++        guint name_watch;
++        gboolean watch_removed;
  
  	/* Only filter signals */
  	if (dbus_message_get_type(message) != DBUS_MESSAGE_TYPE_SIGNAL)
@@ -87,7 +84,7 @@ index fba58c3..4f4533e 100644
  
  	remove_match(data);
  
-+	name_watch = data->name_watch;
++        name_watch = data->name_watch;
  	listeners = g_slist_remove(listeners, data);
 -	filter_data_free(data);
 +	watch_removed = filter_data_free(data);
