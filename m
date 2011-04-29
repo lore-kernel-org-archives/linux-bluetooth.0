@@ -1,64 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTimm=CVbBrLEPWf8Q0BgvtMmZaxNBg@mail.gmail.com>
+In-Reply-To: <1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
 References: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
 	<1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
-	<BANLkTimm=CVbBrLEPWf8Q0BgvtMmZaxNBg@mail.gmail.com>
-Date: Fri, 29 Apr 2011 09:53:54 -0300
-Message-ID: <BANLkTin=vjdpnB3v9-AfXwPjvGV+F1wP4Q@mail.gmail.com>
+Date: Fri, 29 Apr 2011 14:27:48 +0300
+Message-ID: <BANLkTimm=CVbBrLEPWf8Q0BgvtMmZaxNBg@mail.gmail.com>
 Subject: Re: [PATCH 2/2] Remove wrong checking for legacy devices
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Claudio,
 
-On Fri, Apr 29, 2011 at 8:27 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Claudio,
+On Fri, Apr 29, 2011 at 1:34 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Infer that the found device is a legacy device based on the presence
+> of its name in the storage is wrong.
+> ---
+>  src/event.c |    2 --
+>  1 files changed, 0 insertions(+), 2 deletions(-)
 >
-> On Fri, Apr 29, 2011 at 1:34 AM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
->> Infer that the found device is a legacy device based on the presence
->> of its name in the storage is wrong.
->> ---
->> Â src/event.c | Â  Â 2 --
->> Â 1 files changed, 0 insertions(+), 2 deletions(-)
->>
->> diff --git a/src/event.c b/src/event.c
->> index 5373e33..b873000 100644
->> --- a/src/event.c
->> +++ b/src/event.c
->> @@ -481,8 +481,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
->>
->> Â  Â  Â  Â if (data)
->> Â  Â  Â  Â  Â  Â  Â  Â legacy = FALSE;
->> - Â  Â  Â  else if (name == NULL)
->> - Â  Â  Â  Â  Â  Â  Â  legacy = TRUE;
->> Â  Â  Â  Â else if (read_remote_features(local, peer, NULL, features) == 0) {
->> Â  Â  Â  Â  Â  Â  Â  Â if (features[0] & 0x01)
->> Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â legacy = FALSE;
->> --
+> diff --git a/src/event.c b/src/event.c
+> index 5373e33..b873000 100644
+> --- a/src/event.c
+> +++ b/src/event.c
+> @@ -481,8 +481,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
 >
-> That was some use of it, but I can't remember now, maybe some broken
-> stack which has feature bits broken or we do actually infer if we ever
-> connect to the device before trying to read its features from the
-> storage.
->
->
+>        if (data)
+>                legacy = FALSE;
+> -       else if (name == NULL)
+> -               legacy = TRUE;
+>        else if (read_remote_features(local, peer, NULL, features) == 0) {
+>                if (features[0] & 0x01)
+>                        legacy = FALSE;
 > --
-> Luiz Augusto von Dentz
-> Computer Engineer
->
 
-I found the commit that introduced this code, but it is still not clear to me:
-989c60c0b9c96edf1fbdf80356abf05bac336673
+That was some use of it, but I can't remember now, maybe some broken
+stack which has feature bits broken or we do actually infer if we ever
+connect to the device before trying to read its features from the
+storage.
 
-BTW: why this information needs to be exposed through the DeviceFound() signal?
-It is not used internally in the adapter.c source.
 
-BR,
-Claudio
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
