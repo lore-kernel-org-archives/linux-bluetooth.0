@@ -1,32 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DBA6D97.7050207@nokia.com>
-Date: Fri, 29 Apr 2011 10:49:43 +0300
-From: Mika Linnanoja <mika.linnanoja@nokia.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: ext Ville Tervo <ville.tervo@nokia.com>,
-        Antti Julku <antti.julku@nokia.com>,
-        ext Marcel Holtmann <marcel@holtmann.org>,
-        Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-        linus.walleij@stericsson.com, par-gunnar.p.hjalmdahl@stericsson.com,
-        padovan@profusion.mobi
-Subject: Re: [PATCH] bluetooth: Fix for security block issue.
-References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com> <1295971990.1520.53.camel@aeonflux> <4DB935D9.5080302@nokia.com> <20110428095139.GJ18898@null>
-In-Reply-To: <20110428095139.GJ18898@null>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: wu zheng <wu.zheng@intel.com>
+To: <linux-bluetooth@vger.kernel.org>
+Cc: wu zheng <wu.zheng@intel.com>
+Subject: [PATCH] Modify the condition of removing filters of dbus at filter_data_remove_callback and message_filter in file gdbus/watch.c
+Date: Fri, 29 Apr 2011 15:23:13 +0800
+Message-Id: <1304061793-10407-1-git-send-email-wu.zheng@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04/28/2011 12:51 PM, ext Ville Tervo wrote:
-> Could the actual reason be some change in usb stack? Could it have lower
-> priority for event pipe than for data pipe? In that case event for security
-> change might arrive to bt stack too late.
->
-> At lest I haven't seen this kind of behaviour with serial attached chips. So I
-> think this is something USB specific.
+After Checking the code style, and send the patch again.
+Otherwise, removing filter will run twice when using g_dbus_add_signal_watch with sender and cause dbus remove filter error and crash.The result is that g_dbus_add_signal_watch will inovke g_dbus_add_service_watch if the param of sender of g_dbus_add_signal_watch is avaliable and add two callback and only add a dbus filter, which result in the func of g_dbus_remove_watch will remove dbus filter twice. When using telephony-ofono for telephony, add_watch will add signal watch with sender at telephony_init and remove_watch will be inovked at telephony_exit in file audio/telephony-ofono.c, which result in bluez crash when using telephony-ofono.c.
 
-Happens on Ubuntu 11.04 (released yesterday; bluez 4.91 & kernel 2.6.38-8) as 
-well, tested with White PTS 2.1 dongle (CSR chip) on laptop x61s. Sending 
-party (OPP with obex-client in a loop) was a phone.
+Signed-off-by: wu zheng <wu.zheng@intel.com>
+---
+ gdbus/watch.c |   21 +++++++++++++++------
+ 1 files changed, 15 insertions(+), 6 deletions(-)
 
-Cheers,
-Mika
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index fba58c3..4f4533e 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -266,15 +266,16 @@ static struct filter_callback *filter_data_find_callback(
+ 	return NULL;
+ }
+ 
+-static void filter_data_free(struct filter_data *data)
++static gboolean filter_data_free(struct filter_data *data)
+ {
+ 	GSList *l;
++	gboolean watch_removed;
+ 
+ 	for (l = data->callbacks; l != NULL; l = l->next)
+ 		g_free(l->data);
+ 
+ 	g_slist_free(data->callbacks);
+-	g_dbus_remove_watch(data->connection, data->name_watch);
++	watch_removed = g_dbus_remove_watch(data->connection, data->name_watch);
+ 	g_free(data->name);
+ 	g_free(data->owner);
+ 	g_free(data->path);
+@@ -283,6 +284,8 @@ static void filter_data_free(struct filter_data *data)
+ 	g_free(data->argument);
+ 	dbus_connection_unref(data->connection);
+ 	g_free(data);
++
++	return watch_removed;
+ }
+ 
+ static void filter_data_call_and_free(struct filter_data *data)
+@@ -350,6 +353,8 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 						struct filter_callback *cb)
+ {
+ 	DBusConnection *connection;
++	guint name_watch;
++	gboolean watch_removed;
+ 
+ 	data->callbacks = g_slist_remove(data->callbacks, cb);
+ 	data->processed = g_slist_remove(data->processed, cb);
+@@ -375,13 +380,14 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 		return FALSE;
+ 
+ 	connection = dbus_connection_ref(data->connection);
++	name_watch = data->name_watch;
+ 	listeners = g_slist_remove(listeners, data);
+-	filter_data_free(data);
++	watch_removed = filter_data_free(data);
+ 
+ 	/* Remove filter if there are no listeners left for the connection */
+ 	data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+ 					NULL);
+-	if (data == NULL)
++	if (data == NULL && (name_watch == 0 || watch_removed == FALSE))
+ 		dbus_connection_remove_filter(connection, message_filter,
+ 						NULL);
+ 
+@@ -502,6 +508,8 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+ {
+ 	struct filter_data *data;
+ 	const char *sender, *path, *iface, *member, *arg = NULL;
++	guint name_watch;
++	gboolean watch_removed;
+ 
+ 	/* Only filter signals */
+ 	if (dbus_message_get_type(message) != DBUS_MESSAGE_TYPE_SIGNAL)
+@@ -536,13 +544,14 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+ 
+ 	remove_match(data);
+ 
++	name_watch = data->name_watch;
+ 	listeners = g_slist_remove(listeners, data);
+-	filter_data_free(data);
++	watch_removed = filter_data_free(data);
+ 
+ 	/* Remove filter if there no listener left for the connection */
+ 	data = filter_data_find(connection, NULL, NULL, NULL, NULL, NULL,
+ 					NULL);
+-	if (data == NULL)
++	if (data == NULL && (name_watch == 0 || watch_removed == FALSE))
+ 		dbus_connection_remove_filter(connection, message_filter,
+ 						NULL);
+ 
+-- 
+1.7.3.4
+
