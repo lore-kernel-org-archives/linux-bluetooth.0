@@ -1,58 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 00/16] Discovery procedure refactoring
-Date: Fri, 29 Apr 2011 21:27:16 -0300
-Message-Id: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1304030229-6672-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1304030229-6672-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 29 Apr 2011 18:07:48 -0300
+Message-ID: <BANLkTin_qd=-3-3undR-Rcx0BG9t=Z3nVQ@mail.gmail.com>
+Subject: Re: [PATCH 00/13] Discovery Cleanup - Step 1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org, Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Johan,
 
-Today, discovery procedure is supported only in hciops. This refactoring has
-been done to provide easier implementation of discovery procedure in mgmtops.
-Lots of effort would be necessary to implement discovery procedure in mgmtops
-because its logic is spread out adapter layer and hciops layer.
+Please ignore this patch series. I will fix the unnecessary
+file-system lookup for the remote features.
 
-The approach this patchset follows is moving all logic related to discovery
-procedure from adapter layer to hciops layer.
+On Thu, Apr 28, 2011 at 7:36 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> This patch series is the first step to cleanup the device discovery
+> procedure. The main changes are:
+> =C2=A0- Unify advertising reports and inquiry results: mgmt sends
+> =C2=A0 =C2=A0one device found event
+> =C2=A0- Logic improvement/cleanup: device found
+> =C2=A0- Move EIR functions to a new file
+>
+> Andre Guedes will send soon a patch series changing the discovery state
+> control to be make hciops and mgmtops functional.
+>
+> There is excessive dynamic memory allocations/deallocations for EIR data.
+> This is not a problem introduced by this patch serie. eir_data_free
+> will be removed soon.
+>
+> ***** Open Issues *****
+>
+> * Use BDADDR_TYPE_NON_LE instead of BR?
+> #define BDADDR_TYPE_LE_PUBLIC =C2=A00x00
+> #define BRADDR_TYPE_LE_RANDOM =C2=A00x01
+> #define BDADDR_TYPE_BR =C2=A0 =C2=A0 =C2=A0 =C2=A0 0xff
 
-Future work will be:
-        - full support for discovery procedure (BR/EDR, LE-Only, BR/EDR/LE
-          devices) in kernel via management interface (today, only BR/EDR is
-          supported).
-        - name resolving support through mgmt interface (kernel + userspace)
+Comments here?
 
-Thanks,
-Guedes.
+BR,
+Claudio
 
-Anderson Briglia (1):
-  Implement mgmt start and stop discovery
-
-Andre Guedes (15):
-  Add discovery callbacks to btd_adapter_ops
-  Replace inquiry/scanning calls by discovery calls
-  Add 'discov_state' field to struct dev_info
-  Code cleanup event.c
-  Remove Periodic Inquiry support in hciops
-  Change DiscoverSchedulerInterval default value
-  Add 'timeout' param to start_scanning callback
-  Refactoring adapter_set_state()
-  Remove 'suspend' param from stop_discovery()
-  Add extfeatures to struct dev_info
-  Implement start_discovery hciops callback
-  Remove obsolete code.
-  Implement stop_discovery hciops callback
-  Remove inquiry and scanning callbacks from btd_adapter_ops
-  Remove 'periodic' param from hciops_start_inquiry()
-
- plugins/hciops.c  |  373 ++++++++++++++++++++++++++++++++++++-----------------
- plugins/mgmtops.c |   35 ++----
- src/adapter.c     |  217 ++++++++++---------------------
- src/adapter.h     |   19 +--
- src/event.c       |   48 +-------
- src/event.h       |    1 -
- src/main.conf     |    4 +-
- 7 files changed, 345 insertions(+), 352 deletions(-)
-
+>
+> Bruna Moreira (3):
+> =C2=A0Remove btd_event_advertising_report
+> =C2=A0Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
+> =C2=A0Drop variable EIR length
+>
+> Claudio Takahasi (10):
+> =C2=A0Move EIR related functions to a new file
+> =C2=A0Add Bluetooth address type definition
+> =C2=A0Initial device found cleanup
+> =C2=A0Move legacy verification to a new function
+> =C2=A0Cleanup read name and alias from storage
+> =C2=A0Don't resolve name if the name is in the storage
+> =C2=A0Unify inquiry results and advertises
+> =C2=A0Fix memory leak of EIR data
+> =C2=A0Change the order to write/read the remote's name
+> =C2=A0Cleanup inserting new device found entry
+>
+> =C2=A0Makefile.am =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A02 +-
+> =C2=A0lib/bluetooth.h =C2=A0 | =C2=A0 =C2=A04 +
+> =C2=A0plugins/hciops.c =C2=A0| =C2=A0202 +++++---------------------------=
+-
+> =C2=A0plugins/mgmtops.c | =C2=A0 =C2=A03 +-
+> =C2=A0src/adapter.c =C2=A0 =C2=A0 | =C2=A0178 ++++++++++++++++++---------=
+--
+> =C2=A0src/adapter.h =C2=A0 =C2=A0 | =C2=A0 =C2=A09 +-
+> =C2=A0src/eir.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0328 +++++++++++++++++=
+++++++++++++++++++++++++++++++++++++
+> =C2=A0src/eir.h =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0 41 +++++++
+> =C2=A0src/event.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0222 +---------------------=
+--------------
+> =C2=A0src/event.h =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A05 +-
+> =C2=A0src/sdpd.h =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 14 ---
+> =C2=A011 files changed, 526 insertions(+), 482 deletions(-)
+> =C2=A0create mode 100644 src/eir.c
+> =C2=A0create mode 100644 src/eir.h
+>
+> --
+> 1.7.5.rc3
+>
