@@ -1,49 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
-References: <1304030070-6575-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1304030070-6575-2-git-send-email-claudio.takahasi@openbossa.org>
-Date: Fri, 29 Apr 2011 14:27:48 +0300
-Message-ID: <BANLkTimm=CVbBrLEPWf8Q0BgvtMmZaxNBg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Remove wrong checking for legacy devices
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix crash when calling finalize_setup_errno
+Date: Fri, 29 Apr 2011 13:56:03 +0300
+Message-Id: <1304074563-16865-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-On Fri, Apr 29, 2011 at 1:34 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Infer that the found device is a legacy device based on the presence
-> of its name in the storage is wrong.
-> ---
->  src/event.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
->
-> diff --git a/src/event.c b/src/event.c
-> index 5373e33..b873000 100644
-> --- a/src/event.c
-> +++ b/src/event.c
-> @@ -481,8 +481,6 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
->
->        if (data)
->                legacy = FALSE;
-> -       else if (name == NULL)
-> -               legacy = TRUE;
->        else if (read_remote_features(local, peer, NULL, features) == 0) {
->                if (features[0] & 0x01)
->                        legacy = FALSE;
-> --
+finalize_setup_errno last parameter must be NULL otherwise it may access
+invalid memory.
+---
+ audio/a2dp.c |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
 
-That was some use of it, but I can't remember now, maybe some broken
-stack which has feature bits broken or we do actually infer if we ever
-connect to the device before trying to read its features from the
-storage.
-
-
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index 741b134..9cd7207 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -775,7 +775,7 @@ static void endpoint_open_cb(struct media_endpoint *endpoint, void *ret,
+ 
+ 	if (ret == NULL) {
+ 		setup->stream = NULL;
+-		finalize_setup_errno(setup, -EPERM, finalize_config);
++		finalize_setup_errno(setup, -EPERM, finalize_config, NULL);
+ 		return;
+ 	}
+ 
+@@ -785,7 +785,7 @@ static void endpoint_open_cb(struct media_endpoint *endpoint, void *ret,
+ 
+ 	error("Error on avdtp_open %s (%d)", strerror(-err), -err);
+ 	setup->stream = NULL;
+-	finalize_setup_errno(setup, err, finalize_config);
++	finalize_setup_errno(setup, err, finalize_config, NULL);
+ }
+ 
+ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+@@ -842,7 +842,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 			return;
+ 
+ 		setup->stream = NULL;
+-		finalize_setup_errno(setup, -EPERM, finalize_config);
++		finalize_setup_errno(setup, -EPERM, finalize_config, NULL);
+ 		return;
+ 	}
+ 
+@@ -850,7 +850,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	if (ret < 0) {
+ 		error("Error on avdtp_open %s (%d)", strerror(-ret), -ret);
+ 		setup->stream = NULL;
+-		finalize_setup_errno(setup, ret, finalize_config);
++		finalize_setup_errno(setup, ret, finalize_config, NULL);
+ 	}
+ }
+ 
+@@ -1043,7 +1043,7 @@ static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	perr = avdtp_start(session, a2dp_sep->stream);
+ 	if (perr < 0) {
+ 		error("Error on avdtp_start %s (%d)", strerror(-perr), -perr);
+-		finalize_setup_errno(setup, -EIO, finalize_suspend);
++		finalize_setup_errno(setup, -EIO, finalize_suspend, NULL);
+ 	}
+ }
+ 
+@@ -1064,7 +1064,7 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+ 		return TRUE;
+ 
+ 	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
+-							finalize_resume);
++							finalize_resume, NULL);
+ 
+ 	return TRUE;
+ }
+@@ -1097,7 +1097,7 @@ static gboolean a2dp_reconfigure(gpointer data)
+ 	return FALSE;
+ 
+ failed:
+-	finalize_setup_errno(setup, posix_err, finalize_config);
++	finalize_setup_errno(setup, posix_err, finalize_config, NULL);
+ 	return FALSE;
+ }
+ 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.1
+
