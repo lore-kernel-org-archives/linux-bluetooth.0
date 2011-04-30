@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4D6C9478.5040505@atheros.com>
-Date: Tue, 1 Mar 2011 12:08:48 +0530
-From: Bala Shanmugam <sbalashanmugam@atheros.com>
-MIME-Version: 1.0
-To: David Woodhouse <dwmw2@infradead.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jothikumar Mothilal <Jothikumar.Mothilal@Atheros.com>,
-	Vikram Kandukuri <Vikram.Kandukuri@Atheros.com>
-Subject: Re: [PATCH] linux-firmware: Remove ath3k-2.fw
-References: <1296207208-4465-1-git-send-email-sbalashanmugam@atheros.com> <1296719005.12863.28.camel@macbook.infradead.org> <4D4A60E1.3080000@atheros.com>
-In-Reply-To: <4D4A60E1.3080000@atheros.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH 1/2] Add secure param to Mgmt PIN Code Request Event
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1303987847-6878-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1303987847-6878-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Sat, 30 Apr 2011 11:46:06 -0700
+Message-ID: <1304189166.15916.98.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2/3/2011 1:31 PM, Bala Shanmugam wrote:
-> On 2/3/2011 1:13 PM, David Woodhouse wrote:
->> On Fri, 2011-01-28 at 15:03 +0530, Bala Shanmugam wrote:
->>> ath3k-2.fw is obsolete and not use by Atheros chipsets
->>> anymore.
->> Are you telling me that there is no extant hardware, and no old kernels,
->> which would use this? It was added to the linux-firmware tree and
->> *never* used?
->>
-> Yes David, no older kernel uses this firmware.
-> We thought to have new firmware file for newer versions but
-> our driver patch was not accepted and we decided to
-> have single firmware for this chipset [ath3k-1.fw].
->
-> Thanks and Regards,
-> Bala.
->
->
-Hi David,
+Hi Waldemar,
 
-Can you please remove this firmware.
-If you have any concerns please let me know.
+> Update mgmt interface with secure param in pin code request event
+> which is part of secure pin requirement implementation.
+> ---
+>  doc/mgmt-api.txt |    1 +
+>  lib/mgmt.h       |    1 +
+>  2 files changed, 2 insertions(+), 0 deletions(-)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 925b5ad..45f6a64 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -482,6 +482,7 @@ PIN Code Request Event
+>  Event Code		0x000E
+>  Controller Index:	<controller id>
+>  Event Parameters	Address (6 Octets)
+> +			Secure (1 Octet)
 
-Regards,
-Bala.
+we do need to document possible values and their meanings. Is this a
+boolean or is this suppose to indicate the PIN code length?
+
+Regards
+
+Marcel
+
 
