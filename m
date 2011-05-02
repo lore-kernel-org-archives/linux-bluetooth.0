@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 May 2011 10:24:48 -0700
+Date: Mon, 2 May 2011 10:24:04 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaikumar Ganesh <jaikumar@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix property type of Main Channel of Health plugin
-Message-ID: <20110502172448.GB13914@jh-x301>
-References: <1304110863-26528-1-git-send-email-jaikumar@google.com>
+Subject: Re: [PATCH] Fix crash when calling finalize_setup_errno
+Message-ID: <20110502172404.GA13914@jh-x301>
+References: <1304074563-16865-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304110863-26528-1-git-send-email-jaikumar@google.com>
+In-Reply-To: <1304074563-16865-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+Hi Luiz,
 
-On Fri, Apr 29, 2011, Jaikumar Ganesh wrote:
-> The property type must be DBUS_TYPE_OBJECT_PATH instead
-> of DBUS_TYPE_STRING. This is in sync with the documentation
-> and with the other places of usage such as the property change
-> signal.
+On Fri, Apr 29, 2011, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> 
+> finalize_setup_errno last parameter must be NULL otherwise it may access
+> invalid memory.
 > ---
->  health/hdp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  audio/a2dp.c |   14 +++++++-------
+>  1 files changed, 7 insertions(+), 7 deletions(-)
 
 Pushed upstream. Thanks.
 
