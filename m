@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
 References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
-	<1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 2 May 2011 11:42:59 +0300
-Message-ID: <BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
-Subject: Re: [RFC 09/16] Remove 'suspend' param from stop_discovery()
+Date: Mon, 2 May 2011 11:39:58 +0300
+Message-ID: <BANLkTin7oCB9L0S0_kjESF6SfMfaqjwMtA@mail.gmail.com>
+Subject: Re: [RFC 00/16] Discovery procedure refactoring
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,56 +16,67 @@ Hi Andre,
 
 On Sat, Apr 30, 2011 at 3:27 AM, Andre Guedes
 <andre.guedes@openbossa.org> wrote:
-> This patch removes 'suspend' parameter from stop_discovery() in adapter.c.
+> Hi all,
 >
-> This parameter is useless since new a function (suspend_discovery) was
-> created to suspend discovery sessions.
-> ---
->  src/adapter.c |    9 ++++-----
->  1 files changed, 4 insertions(+), 5 deletions(-)
+> Today, discovery procedure is supported only in hciops. This refactoring has
+> been done to provide easier implementation of discovery procedure in mgmtops.
+> Lots of effort would be necessary to implement discovery procedure in mgmtops
+> because its logic is spread out adapter layer and hciops layer.
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 6a2a8c1..0279494 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -700,12 +700,11 @@ static GSList *remove_bredr(GSList *all)
->        return le;
->  }
+> The approach this patchset follows is moving all logic related to discovery
+> procedure from adapter layer to hciops layer.
 >
-> -static void stop_discovery(struct btd_adapter *adapter, gboolean suspend)
-> +static void stop_discovery(struct btd_adapter *adapter)
->  {
->        pending_remote_name_cancel(adapter);
+> Future work will be:
+>        - full support for discovery procedure (BR/EDR, LE-Only, BR/EDR/LE
+>          devices) in kernel via management interface (today, only BR/EDR is
+>          supported).
+>        - name resolving support through mgmt interface (kernel + userspace)
 >
-> -       if (suspend == FALSE)
-> -               adapter->found_devices = remove_bredr(adapter->found_devices);
-> +       adapter->found_devices = remove_bredr(adapter->found_devices);
+> Thanks,
+> Guedes.
 >
->        if (adapter->oor_devices) {
->                g_slist_free(adapter->oor_devices);
-> @@ -762,7 +761,7 @@ static void session_remove(struct session_req *req)
+> Anderson Briglia (1):
+>  Implement mgmt start and stop discovery
 >
->                DBG("Stopping discovery");
+> Andre Guedes (15):
+>  Add discovery callbacks to btd_adapter_ops
+>  Replace inquiry/scanning calls by discovery calls
+>  Add 'discov_state' field to struct dev_info
+>  Code cleanup event.c
+>  Remove Periodic Inquiry support in hciops
+>  Change DiscoverSchedulerInterval default value
+>  Add 'timeout' param to start_scanning callback
+>  Refactoring adapter_set_state()
+>  Remove 'suspend' param from stop_discovery()
+>  Add extfeatures to struct dev_info
+>  Implement start_discovery hciops callback
+>  Remove obsolete code.
+>  Implement stop_discovery hciops callback
+>  Remove inquiry and scanning callbacks from btd_adapter_ops
+>  Remove 'periodic' param from hciops_start_inquiry()
 >
-> -               stop_discovery(adapter, FALSE);
-> +               stop_discovery(adapter);
->        }
->  }
->
-> @@ -2537,7 +2536,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
->        /* check pending requests */
->        reply_pending_requests(adapter);
->
-> -       stop_discovery(adapter, FALSE);
-> +       stop_discovery(adapter);
->
->        if (adapter->disc_sessions) {
->                g_slist_foreach(adapter->disc_sessions, (GFunc) session_free,
-> --
+>  plugins/hciops.c  |  373 ++++++++++++++++++++++++++++++++++++-----------------
+>  plugins/mgmtops.c |   35 ++----
+>  src/adapter.c     |  217 ++++++++++---------------------
+>  src/adapter.h     |   19 +--
+>  src/event.c       |   48 +-------
+>  src/event.h       |    1 -
+>  src/main.conf     |    4 +-
+>  7 files changed, 345 insertions(+), 352 deletions(-)
 
-What happened with stop_discovery called within suspend_discovery? We
-need to avoid cleaning up the list of found devices otherwise we won't
-be able to send DeviceDisappeared properly when discovery got resume.
+How do we solve the problem with command failing to restart
+inquiring/scanning, with pinq we only need to send the command once
+and if it fails we can signal the error back to the client, but if we
+are sending commands every round they may fail (buggy hardware) and
+currently we have no way to notify the client if discovery session
+failed after it has been started.
+
+Im afraid because of dual mode adapters we may need to change the
+D-Bus API in the future and have the client to specify somehow on
+StartDiscovery if LE only, BR/EDR only or both like connman does with
+RequestScan, otherwise it may take too long (each cycle taking 20-30
+seconds) to discover devices because it wasting time scanning or
+resolving names in the wrong technology.
 
 -- 
 Luiz Augusto von Dentz
