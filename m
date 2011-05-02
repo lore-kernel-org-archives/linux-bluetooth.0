@@ -1,44 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTin7oCB9L0S0_kjESF6SfMfaqjwMtA@mail.gmail.com>
+In-Reply-To: <1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
 References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
-	<BANLkTin7oCB9L0S0_kjESF6SfMfaqjwMtA@mail.gmail.com>
-Date: Mon, 2 May 2011 10:01:51 -0400
-Message-ID: <BANLkTimMf6YZRPT+V4dLiEH0iN0gsv=FbQ@mail.gmail.com>
-Subject: Re: [RFC 00/16] Discovery procedure refactoring
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+	<1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 2 May 2011 11:42:59 +0300
+Message-ID: <BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
+Subject: Re: [RFC 09/16] Remove 'suspend' param from stop_discovery()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andre,
 
-On Mon, May 2, 2011 at 4:39 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Im afraid because of dual mode adapters we may need to change the
-> D-Bus API in the future and have the client to specify somehow on
-> StartDiscovery if LE only, BR/EDR only or both like connman does with
-> RequestScan, otherwise it may take too long (each cycle taking 20-30
-> seconds) to discover devices because it wasting time scanning or
-> resolving names in the wrong technology.
+On Sat, Apr 30, 2011 at 3:27 AM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> This patch removes 'suspend' parameter from stop_discovery() in adapter.c.
+>
+> This parameter is useless since new a function (suspend_discovery) was
+> created to suspend discovery sessions.
+> ---
+>  src/adapter.c |    9 ++++-----
+>  1 files changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 6a2a8c1..0279494 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -700,12 +700,11 @@ static GSList *remove_bredr(GSList *all)
+>        return le;
+>  }
+>
+> -static void stop_discovery(struct btd_adapter *adapter, gboolean suspend)
+> +static void stop_discovery(struct btd_adapter *adapter)
+>  {
+>        pending_remote_name_cancel(adapter);
+>
+> -       if (suspend == FALSE)
+> -               adapter->found_devices = remove_bredr(adapter->found_devices);
+> +       adapter->found_devices = remove_bredr(adapter->found_devices);
+>
+>        if (adapter->oor_devices) {
+>                g_slist_free(adapter->oor_devices);
+> @@ -762,7 +761,7 @@ static void session_remove(struct session_req *req)
+>
+>                DBG("Stopping discovery");
+>
+> -               stop_discovery(adapter, FALSE);
+> +               stop_discovery(adapter);
+>        }
+>  }
+>
+> @@ -2537,7 +2536,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+>        /* check pending requests */
+>        reply_pending_requests(adapter);
+>
+> -       stop_discovery(adapter, FALSE);
+> +       stop_discovery(adapter);
+>
+>        if (adapter->disc_sessions) {
+>                g_slist_foreach(adapter->disc_sessions, (GFunc) session_free,
+> --
 
-On dual mode devices, there is a specific procedure (defined by the
-Core spec) for discovery, called "interleaved discovery" where BR/EDR
-and LE discovery procedures are alternated at specific times. It
-cannot just do BR/EDR or LE, unless we want to "fake" a single mode
-adapter.
+What happened with stop_discovery called within suspend_discovery? We
+need to avoid cleaning up the list of found devices otherwise we won't
+be able to send DeviceDisappeared properly when discovery got resume.
 
-In summary, if the adapter is to work as a compliant dual mode device,
-it shall use the interleaved discovery procedure. BR/EDR only or LE
-only discovery would only be acceptable for single mode adapters. We
-could as well have configuration options to "simulate" single mode on
-dual mode adapters.
-
-HTH,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
+Computer Engineer
