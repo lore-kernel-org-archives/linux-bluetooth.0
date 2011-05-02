@@ -1,38 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC][PATCH 0/4] Allow hexadecimal encoded pins
-From: Bastien Nocera <hadess@hadess.net>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
-	dforsi@gmail.com
-Date: Tue, 03 May 2011 00:32:48 +0100
-In-Reply-To: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1304379171.13362.41.camel@novo.hadess.net>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
+References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
+	<1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
+	<BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
+Date: Mon, 2 May 2011 19:38:32 -0300
+Message-ID: <BANLkTikMBBkkt1OK==iRXA_TSufd3KZ7FA@mail.gmail.com>
+Subject: Re: [RFC 09/16] Remove 'suspend' param from stop_discovery()
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, 2011-04-10 at 19:11 +0200, David Herrmann wrote:
-<snip>
-> Binary pin support is inspired by getting Nintendo Wiimote pairing support.
-> To test wiimote pairing with this patch series, do the following:
->  - assume the local bdaddr is: 01:23:45:67:89:ab
->    and the wiimote bdaddr is: ba:98:76:54:32:10
->  - Pairing with red-sync button, use pin: $ab8967452301 (host addr. backwards)
->  - Pairing with 1+2 buttons, use pin: $1032547698ba (wiimote addr backwards)
-> Automatic reconnection is only enabled in the wiimote when synced with the
-> red-sync button. The 1+2 button method is only for temporary connections.
+Hi Luiz,
 
-What are the necessary changes to be made in gnome-bluetooth?
+On Mon, May 2, 2011 at 5:42 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andre,
+>
+> On Sat, Apr 30, 2011 at 3:27 AM, Andre Guedes
+> <andre.guedes@openbossa.org> wrote:
+>> This patch removes 'suspend' parameter from stop_discovery() in adapter.c.
+>>
+>> This parameter is useless since new a function (suspend_discovery) was
+>> created to suspend discovery sessions.
+>> ---
+>>  src/adapter.c |    9 ++++-----
+>>  1 files changed, 4 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 6a2a8c1..0279494 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -700,12 +700,11 @@ static GSList *remove_bredr(GSList *all)
+>>        return le;
+>>  }
+>>
+>> -static void stop_discovery(struct btd_adapter *adapter, gboolean suspend)
+>> +static void stop_discovery(struct btd_adapter *adapter)
+>>  {
+>>        pending_remote_name_cancel(adapter);
+>>
+>> -       if (suspend == FALSE)
+>> -               adapter->found_devices = remove_bredr(adapter->found_devices);
+>> +       adapter->found_devices = remove_bredr(adapter->found_devices);
+>>
+>>        if (adapter->oor_devices) {
+>>                g_slist_free(adapter->oor_devices);
+>> @@ -762,7 +761,7 @@ static void session_remove(struct session_req *req)
+>>
+>>                DBG("Stopping discovery");
+>>
+>> -               stop_discovery(adapter, FALSE);
+>> +               stop_discovery(adapter);
+>>        }
+>>  }
+>>
+>> @@ -2537,7 +2536,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+>>        /* check pending requests */
+>>        reply_pending_requests(adapter);
+>>
+>> -       stop_discovery(adapter, FALSE);
+>> +       stop_discovery(adapter);
+>>
+>>        if (adapter->disc_sessions) {
+>>                g_slist_foreach(adapter->disc_sessions, (GFunc) session_free,
+>> --
+>
+> What happened with stop_discovery called within suspend_discovery? We
+> need to avoid cleaning up the list of found devices otherwise we won't
+> be able to send DeviceDisappeared properly when discovery got resume.
+>
 
-I'm guessing that we should add a "WIIMOTE" type of special casing in
-the pin database, and pass the adapter address as per the above when a
-PIN is requested.
+At patch 08/16 I create a new function to suspend the discovery procedure
+(see suspend_discovery() in adapter.c). It was done because using the
+same function to perform stop or suspend discovery started to get a little
+bit confusing.
 
-Is there any way to detect which "type" of pairing is made with the
-Wiimote, eg. you say that button 1+2 will only work for temporary
-connections. Can we detect this? Would pairing anyway work?
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
 
-Cheers
-
+--
+Andre Guedes
