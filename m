@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 May 2011 10:24:04 -0700
+Date: Mon, 2 May 2011 09:26:28 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Kay Sievers <kay.sievers@vrfy.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix crash when calling finalize_setup_errno
-Message-ID: <20110502172404.GA13914@jh-x301>
-References: <1304074563-16865-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Move hid2hci to /lib/udev
+Message-ID: <20110502162628.GA12780@jh-x301>
+References: <1304029945.27065.1.camel@zag>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304074563-16865-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1304029945.27065.1.camel@zag>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Kay,
 
-On Fri, Apr 29, 2011, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-> 
-> finalize_setup_errno last parameter must be NULL otherwise it may access
-> invalid memory.
+On Fri, Apr 29, 2011, Kay Sievers wrote:
 > ---
->  audio/a2dp.c |   14 +++++++-------
->  1 files changed, 7 insertions(+), 7 deletions(-)
+>  Makefile.am    |    2 +-
+>  Makefile.tools |    4 +++-
+>  acinclude.m4   |   10 ++++------
+>  3 files changed, 8 insertions(+), 8 deletions(-)
 
-Pushed upstream. Thanks.
+The patch has been pushed upstream. Thanks.
 
 Johan
