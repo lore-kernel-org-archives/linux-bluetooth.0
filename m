@@ -1,36 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH] Remove btio.c compilation warning
-Date: Mon,  2 May 2011 16:43:26 -0400
-Message-Id: <4dbf1776.0bd9650a.1733.7e99@mx.google.com>
-In-Reply-To: <y>
-References: <y>
+Date: Mon, 2 May 2011 10:24:48 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaikumar Ganesh <jaikumar@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix property type of Main Channel of Health plugin
+Message-ID: <20110502172448.GB13914@jh-x301>
+References: <1304110863-26528-1-git-send-email-jaikumar@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1304110863-26528-1-git-send-email-jaikumar@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+Hi Jaikumar,
 
-This patch fixes a compilation warning regarding btio/btio.c
-compilation.
----
- btio/btio.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Apr 29, 2011, Jaikumar Ganesh wrote:
+> The property type must be DBUS_TYPE_OBJECT_PATH instead
+> of DBUS_TYPE_STRING. This is in sync with the documentation
+> and with the other places of usage such as the property change
+> signal.
+> ---
+>  health/hdp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 6d71b90..8f166cc 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -800,7 +800,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 	uint8_t dev_class[3];
- 	uint16_t handle;
- 	socklen_t len;
--	gboolean flushable;
-+	gboolean flushable = TRUE;
- 
- 	len = sizeof(l2o);
- 	memset(&l2o, 0, len);
--- 
-1.7.4.1
+Pushed upstream. Thanks.
 
+Johan
