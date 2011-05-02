@@ -1,26 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 May 2011 09:26:28 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Kay Sievers <kay.sievers@vrfy.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Move hid2hci to /lib/udev
-Message-ID: <20110502162628.GA12780@jh-x301>
-References: <1304029945.27065.1.camel@zag>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304029945.27065.1.camel@zag>
+Subject: RE: [PATCH 1/2] Add secure param to Mgmt PIN Code Request Event
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Waldemar.Rymarkiewicz@tieto.com
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+In-Reply-To: <99B09243E1A5DA4898CDD8B70011144816F29AF32A@EXMB04.eu.tieto.com>
+References: <1303987847-6878-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	 <1304189166.15916.98.camel@aeonflux>
+	 <99B09243E1A5DA4898CDD8B70011144816F29AF32A@EXMB04.eu.tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 02 May 2011 08:31:00 -0700
+Message-ID: <1304350260.15916.102.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kay,
+Hi Waldemar,
 
-On Fri, Apr 29, 2011, Kay Sievers wrote:
-> ---
->  Makefile.am    |    2 +-
->  Makefile.tools |    4 +++-
->  acinclude.m4   |   10 ++++------
->  3 files changed, 8 insertions(+), 8 deletions(-)
+> >> @@ -482,6 +482,7 @@ PIN Code Request Event
+> >>  Event Code		0x000E
+> >>  Controller Index:	<controller id>
+> >>  Event Parameters	Address (6 Octets)
+> >> +			Secure (1 Octet)
+> >
+> >we do need to document possible values and their meanings. Is 
+> >this a boolean or is this suppose to indicate the PIN code length?
+> 
+> It's boolean. 	
+> Do you mean something like this?
+> 
+> Event Code		0x000E
+> Controller Index:	<controller id>
+> Event Parameters	Address (6 Octets)
+> 			Secure (1 Octet)
+> 
+> 		Secure: 0x01  16 digit PIN code required
+> 			0x00  16 digit PIN code not required
 
-The patch has been pushed upstream. Thanks.
+yes, we need these things documented.
 
-Johan
+Obviously now the question is why not expose this as min_pin_length
+value?
+
+Regards
+
+Marcel
+
+
