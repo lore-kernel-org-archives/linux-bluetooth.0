@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
+In-Reply-To: <BANLkTinwg4B3dTsWtUzZ8ji5FqGPHjHPyg@mail.gmail.com>
 References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
-	<1304123252-14464-10-git-send-email-andre.guedes@openbossa.org>
-	<BANLkTikv2fJoLJ+tpchWD7X6ugwjVcwoxg@mail.gmail.com>
-Date: Mon, 2 May 2011 19:38:32 -0300
-Message-ID: <BANLkTikMBBkkt1OK==iRXA_TSufd3KZ7FA@mail.gmail.com>
-Subject: Re: [RFC 09/16] Remove 'suspend' param from stop_discovery()
+	<1304123252-14464-7-git-send-email-andre.guedes@openbossa.org>
+	<BANLkTinwg4B3dTsWtUzZ8ji5FqGPHjHPyg@mail.gmail.com>
+Date: Mon, 2 May 2011 19:37:48 -0300
+Message-ID: <BANLkTi=W0+6RWZDmjWmOT8FY3Rr=9Bo_Fg@mail.gmail.com>
+Subject: Re: [RFC 06/16] Change DiscoverSchedulerInterval default value
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -16,68 +16,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Mon, May 2, 2011 at 5:42 AM, Luiz Augusto von Dentz
+On Mon, May 2, 2011 at 4:48 AM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > Hi Andre,
 >
 > On Sat, Apr 30, 2011 at 3:27 AM, Andre Guedes
 > <andre.guedes@openbossa.org> wrote:
->> This patch removes 'suspend' parameter from stop_discovery() in adapter.c.
+>> This patch changes the default value of "DiscoverSchedulerInterval"
+>> from 0 to 30 seconds.
 >>
->> This parameter is useless since new a function (suspend_discovery) was
->> created to suspend discovery sessions.
+>> Since Periodic Inquiry is not supported anymore, the option
+>> "DiscoverSchedulerInterval" in main.conf must be updated. As
+>> a first attempt, it was chosen a 30 seconds interval.
 >> ---
->>  src/adapter.c |    9 ++++-----
->>  1 files changed, 4 insertions(+), 5 deletions(-)
+>>  src/main.conf |    4 ++--
+>>  1 files changed, 2 insertions(+), 2 deletions(-)
 >>
->> diff --git a/src/adapter.c b/src/adapter.c
->> index 6a2a8c1..0279494 100644
->> --- a/src/adapter.c
->> +++ b/src/adapter.c
->> @@ -700,12 +700,11 @@ static GSList *remove_bredr(GSList *all)
->>        return le;
->>  }
+>> diff --git a/src/main.conf b/src/main.conf
+>> index c03f135..8cd132f 100644
+>> --- a/src/main.conf
+>> +++ b/src/main.conf
+>> @@ -27,8 +27,8 @@ PairableTimeout = 0
+>>  PageTimeout = 8192
 >>
->> -static void stop_discovery(struct btd_adapter *adapter, gboolean suspend)
->> +static void stop_discovery(struct btd_adapter *adapter)
->>  {
->>        pending_remote_name_cancel(adapter);
+>>  # Discover scheduler interval used in Adapter.DiscoverDevices
+>> -# The value is in seconds. Defaults is 0 to use controller scheduler.
+>> -DiscoverSchedulerInterval = 0
+>> +# The value is in seconds. Defaults is 30.
+>> +DiscoverSchedulerInterval = 30
 >>
->> -       if (suspend == FALSE)
->> -               adapter->found_devices = remove_bredr(adapter->found_devices);
->> +       adapter->found_devices = remove_bredr(adapter->found_devices);
->>
->>        if (adapter->oor_devices) {
->>                g_slist_free(adapter->oor_devices);
->> @@ -762,7 +761,7 @@ static void session_remove(struct session_req *req)
->>
->>                DBG("Stopping discovery");
->>
->> -               stop_discovery(adapter, FALSE);
->> +               stop_discovery(adapter);
->>        }
->>  }
->>
->> @@ -2537,7 +2536,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
->>        /* check pending requests */
->>        reply_pending_requests(adapter);
->>
->> -       stop_discovery(adapter, FALSE);
->> +       stop_discovery(adapter);
->>
->>        if (adapter->disc_sessions) {
->>                g_slist_foreach(adapter->disc_sessions, (GFunc) session_free,
->> --
+>>  # What value should be assumed for the adapter Powered property when
+>>  # SetProperty(Powered, ...) hasn't been called yet. Defaults to true
 >
-> What happened with stop_discovery called within suspend_discovery? We
-> need to avoid cleaning up the list of found devices otherwise we won't
-> be able to send DeviceDisappeared properly when discovery got resume.
+> Im not sure how you came up with 30 sec, IMO it is too long and
+> doesn't specify how long we inquiry/scan/resolve names.
 >
 
-At patch 08/16 I create a new function to suspend the discovery procedure
-(see suspend_discovery() in adapter.c). It was done because using the
-same function to perform stop or suspend discovery started to get a little
-bit confusing.
+30 sec was a reasonable time we firstly thought. But as I said, it is
+just a first
+attempt. How long you think it is a good interval value?
+
+Yes. It doesn't specify how long the whole discovery process takes. It specifies
+how long the adapter is gonna wait in IDLE state before trigger the a new
+discovery procedure. We changed this behavior because it would become very
+tricky to predict how long the name resolving is gonna take since it depends on
+the number of devices found during discovery.
+
+I think this is not clear in the patch description, so I rewrite it. Thanks.
 
 > --
 > Luiz Augusto von Dentz
