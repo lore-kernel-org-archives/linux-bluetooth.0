@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 3 May 2011 12:43:26 +0200
-Message-ID: <BANLkTimoVzAObkRAt_5L_2V0ZHWkA2=VTg@mail.gmail.com>
+Date: Tue, 3 May 2011 10:13:54 +0200
+Message-ID: <BANLkTimepCM=_-LT1c6jrx4vj3bY8UNw8Q@mail.gmail.com>
 Subject: Re: Status of MAP and AVRCP
-From: Henrik Hoglind <hhdev1@gmail.com>
+From: Henrik Hoglind <henrik.hoglind@sonyericsson.com>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
