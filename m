@@ -2,166 +2,69 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 11/13] Cleanup inserting new device found entry
-Date: Tue,  3 May 2011 18:33:46 -0300
-Message-Id: <1304458426-21895-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1304030229-6672-12-git-send-email-claudio.takahasi@openbossa.org>
-References: <1304030229-6672-12-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 10/13] Change the order to write/read the remote's name
+Date: Tue,  3 May 2011 18:33:38 -0300
+Message-Id: <1304458418-21859-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1304030229-6672-11-git-send-email-claudio.takahasi@openbossa.org>
+References: <1304030229-6672-11-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+When discovering, write the EIR "complete" name first before to read
+the name. Only names retrieved from EIR "complete" name and HCI Remote
+Name Request Complete event are stored. This patch doesn't change the
+final result: the value of the name sent in the signal.
 ---
- src/adapter.c |   97 +++++++++++++++++++++++++++-----------------------------
- 1 files changed, 47 insertions(+), 50 deletions(-)
+ src/adapter.c |   19 +++++--------------
+ 1 files changed, 5 insertions(+), 14 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index b8e6e61..378e095 100644
+index c4e2210..b8e6e61 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3030,29 +3030,24 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
- 	g_free(alias);
- }
- 
--static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
--						const bdaddr_t *bdaddr,
--						gboolean *new_dev)
-+static struct remote_dev_info *found_device_new(const bdaddr_t *bdaddr,
-+					gboolean le, const char *name,
-+					const char *alias, uint32_t class,
-+					gboolean legacy, name_status_t status,
-+					int flags)
- {
--	struct remote_dev_info *dev, match;
-+	struct remote_dev_info *dev;
- 
--	memset(&match, 0, sizeof(struct remote_dev_info));
--	bacpy(&match.bdaddr, bdaddr);
--	match.name_status = NAME_ANY;
--
--	dev = adapter_search_found_devices(adapter, &match);
--	if (dev) {
--		*new_dev = FALSE;
--		/* Out of range list update */
--		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
--							dev);
--	} else {
--		*new_dev = TRUE;
--		dev = g_new0(struct remote_dev_info, 1);
--		bacpy(&dev->bdaddr, bdaddr);
--		adapter->found_devices = g_slist_prepend(adapter->found_devices,
--									dev);
--	}
-+	dev = g_new0(struct remote_dev_info, 1);
-+	bacpy(&dev->bdaddr, bdaddr);
-+	dev->le = le;
-+	dev->name = g_strdup(name);
-+	dev->alias = g_strdup(alias);
-+	dev->class = class;
-+	dev->legacy = legacy;
-+	dev->name_status = status;
-+	if (flags >= 0)
-+		dev->flags = flags;
- 
- 	return dev;
- }
-@@ -3124,11 +3119,11 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 					int8_t rssi, uint8_t *data,
- 					size_t eir_size)
- {
--	struct remote_dev_info *dev;
-+	struct remote_dev_info *dev, match;
- 	struct eir_data eir_data;
--	char *name;
--	gboolean new_dev, legacy, le;
--	name_status_t name_status = NAME_NOT_REQUIRED;
-+	char *alias, *name;
-+	gboolean legacy, le;
-+	name_status_t name_status;
+@@ -3129,7 +3129,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 	char *name;
+ 	gboolean new_dev, legacy, le;
+ 	name_status_t name_status = NAME_NOT_REQUIRED;
+-	const char *dev_name;
  	int err, type;
  
  	memset(&eir_data, 0, sizeof(eir_data));
-@@ -3141,6 +3136,25 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 	if (eir_data.name != NULL && eir_data.name_complete)
- 		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
+@@ -3139,6 +3138,9 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 		return;
+ 	}
  
-+	/* Device already seen in the discovery session ? */
-+	memset(&match, 0, sizeof(struct remote_dev_info));
-+	bacpy(&match.bdaddr, bdaddr);
-+	match.name_status = NAME_ANY;
-+
-+	dev = adapter_search_found_devices(adapter, &match);
-+	if (dev) {
-+		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
-+							dev);
-+		if (dev->rssi != rssi)
-+			goto done;
-+
-+		eir_data_free(&eir_data);
-+
-+		return;
-+	}
-+
-+	/* New device in the discovery session */
++	if (eir_data.name != NULL && eir_data.name_complete)
++		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
 +
  	name = read_stored_data(&adapter->bdaddr, bdaddr, "names");
  
  	switch (bda_type) {
-@@ -3148,6 +3162,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 	case BRADDR_TYPE_LE_RANDOM:
- 		le = TRUE;
- 		legacy = FALSE;
-+		name_status = NAME_NOT_REQUIRED;
- 		break;
- 	default:
- 		/*  BDADDR_TYPE_BR */
-@@ -3168,32 +3183,16 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+@@ -3166,23 +3168,12 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
  		break;
  	}
  
--	dev = get_found_dev(adapter, bdaddr, &new_dev);
+-	/* Complete EIR names are always used. Shortened EIR names are only
+-	 * used if there is no name already in storage. */
+-	dev_name = name;
+-	if (eir_data.name != NULL) {
+-		if (eir_data.name_complete) {
+-			write_device_name(&adapter->bdaddr, bdaddr,
+-							eir_data.name);
+-			name_status = NAME_NOT_REQUIRED;
+-			dev_name = eir_data.name;
+-		} else if (name == NULL)
+-			dev_name = eir_data.name;
+-	}
 -
--	if (new_dev) {
--		const char *dev_name = (name ? name : eir_data.name);
--		char *alias;
-+	alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
+ 	dev = get_found_dev(adapter, bdaddr, &new_dev);
  
--		if (dev_name)
--			dev->name = g_strdup(dev_name);
--
--		alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
--		if (alias) {
--			dev->alias = g_strdup(alias);
--			free(alias);
--		}
--
--		dev->le = FALSE;
--		dev->class = class;
--		dev->legacy = legacy;
--		dev->name_status = name_status;
-+	dev = found_device_new(bdaddr, le, name, alias, class, legacy,
-+						name_status, eir_data.flags);
-+	free(name);
-+	free(alias);
- 
--		if (eir_data.flags >= 0)
--			dev->flags = eir_data.flags;
--
--	} else if (dev->rssi == rssi)
--		goto done;
-+	adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
- 
-+done:
- 	dev->rssi = rssi;
- 
- 	adapter->found_devices = g_slist_sort(adapter->found_devices,
-@@ -3204,8 +3203,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 
- 	adapter_emit_device_found(adapter, dev);
- 
--done:
--	free(name);
- 	eir_data_free(&eir_data);
- }
+ 	if (new_dev) {
++		const char *dev_name = (name ? name : eir_data.name);
+ 		char *alias;
++
+ 		if (dev_name)
+ 			dev->name = g_strdup(dev_name);
  
 -- 
 1.7.5.rc3
