@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v2 00/13] Discovery Cleanup - Step 1
-Date: Tue,  3 May 2011 18:32:10 -0300
-Message-Id: <1304458330-21499-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <BANLkTin_qd=-3-3undR-Rcx0BG9t=Z3nVQ@mail.gmail.com>
-References: <BANLkTin_qd=-3-3undR-Rcx0BG9t=Z3nVQ@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTinarShNUkchPANmFfF7j54Sw_-FCQ@mail.gmail.com>
+References: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
+	<1304379171.13362.41.camel@novo.hadess.net>
+	<BANLkTimkpKpGTuTmFdYyjm4Ok_+pwho-aA@mail.gmail.com>
+	<BANLkTinarShNUkchPANmFfF7j54Sw_-FCQ@mail.gmail.com>
+Date: Tue, 3 May 2011 20:28:17 +0200
+Message-ID: <BANLkTingDa5rTU3YAQStB15CFFeiWNMXhQ@mail.gmail.com>
+Subject: Re: [RFC][PATCH 0/4] Allow hexadecimal encoded pins
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Daniele Forsi <dforsi@gmail.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series is the first step to cleanup the device discovery
-procedure. The main changes are:
-  - Unify advertising reports and inquiry results: mgmt sends
-    one device found event
-  - Logic improvement/cleanup: device found
-  - Move EIR functions to a new file
-  - Add BDADDR type constants: necessary L2CAP connections and bonding
+On Tue, May 3, 2011 at 2:27 PM, Daniele Forsi <dforsi@gmail.com> wrote:
+> one issue when using the 1+2 way is that the Wiimote will forget the
+> pairing when it is turned off while the PC will remember it, so the
+> Wiimote won't be shown in the list of found devices and you need to
+> delete it before you can pair again
 
+I don't get this. If the wiimote is listed as paired, why would you
+want to see it in the list of found devices? The wiimote is already
+listed as paired so simply reestablish the pairing by connecting to
+the wiimote via DBus bluez.Input api.
 
+>>> Is there any way to detect which "type" of pairing is made with the
+>>> Wiimote, eg. you say that button 1+2 will only work for temporary
+>>> connections. Can we detect this? Would pairing anyway work?
+>>
+>> I guess you mean that you wanna predict which PIN to use? No, I
+>> currently know no way to detect this. However, one may try the first
+>> pin and if that fails the second pin.
+>
+> I think this is what the Wii does when in the "home" screen where you
+> are supposed to press 1+2 because it will find the remote also when
+> pressing the sync button (I have a Wiimote that I need to pair from
+> the home screen pressing sync because it doesn't wake up with 1+2)
 
-Bruna Moreira (3):
-  Remove btd_event_advertising_report
-  Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
-  Drop variable EIR length
-
-Claudio Takahasi (10):
-  Move EIR related functions to a new file
-  Add Bluetooth address type definition
-  Initial device found cleanup
-  Move legacy verification to a new function
-  Cleanup read name and alias from storage
-  Don't resolve name if the name is in the storage
-  Unify inquiry results and advertises
-  Fix memory leak of EIR data
-  Change the order to write/read the remote's name
-  Cleanup inserting new device found entry
-
- Makefile.am       |    2 +-
- lib/bluetooth.h   |    4 +
- plugins/hciops.c  |  202 +++++----------------------------
- plugins/mgmtops.c |    3 +-
- src/adapter.c     |  182 +++++++++++++++++++-----------
- src/adapter.h     |    9 +-
- src/eir.c         |  328 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/eir.h         |   41 +++++++
- src/event.c       |  224 +-----------------------------------
- src/event.h       |    5 +-
- src/sdpd.h        |   14 ---
- 11 files changed, 530 insertions(+), 484 deletions(-)
- create mode 100644 src/eir.c
- create mode 100644 src/eir.h
-
--- 
-1.7.5.rc3
-
+With 1+2 buttons only the dest-address works as PIN (I checked this). However,
+with "sync" button both addresses may work. I will check this later...
+Anyway, this would simplify the wiimote handling significantly.
