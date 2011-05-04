@@ -1,65 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 May 2011 21:31:34 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 02/13] Add Bluetooth address type definition
-Message-ID: <20110505003134.GA26302@piper>
-References: <1304030229-6672-3-git-send-email-claudio.takahasi@openbossa.org>
- <1304458357-21571-1-git-send-email-claudio.takahasi@openbossa.org>
- <20110504060357.GA3711@jh-x301>
-MIME-Version: 1.0
+Subject: Re: [PATCH] Remove btio.c compilation warning
+Mime-Version: 1.0 (Apple Message framework v1084)
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110504060357.GA3711@jh-x301>
+From: =?iso-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+In-Reply-To: <BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
+Date: Wed, 4 May 2011 20:23:25 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
+References: <4dbf1776.0bd9650a.1733.7e99@mx.google.com> <20110504213936.GA22493@jh-x301> <BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
+To: Anderson Briglia <anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 4 May 2011, at 20:09 , Anderson Briglia wrote:
 
-On 09:03 Wed 04 May, Johan Hedberg wrote:
-> Hi Claudio,
+> Hi Johan,
 > 
-> On Tue, May 03, 2011, Claudio Takahasi wrote:
-> > Values defined to LE(public and random) are defined in the Bluetooth
-> > Core Specification. For basic rate, there isn't address type concept.
-> > The constants introduced by this commit will be used to identify the
-> > remote address type, basically to distinguish LE/BR devices before
-> > to request the L2CAP connection.
-> > ---
-> >  lib/bluetooth.h |    4 ++++
-> >  1 files changed, 4 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> > index 738e07a..98b8f1c 100644
-> > --- a/lib/bluetooth.h
-> > +++ b/lib/bluetooth.h
-> > @@ -130,6 +130,10 @@ typedef struct {
-> >  #define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
-> >  #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
-> >  
-> > +#define BDADDR_TYPE_LE_PUBLIC	0x00
-> > +#define BRADDR_TYPE_LE_RANDOM	0x01
-> > +#define BDADDR_TYPE_BR		0xff
+> On Wed, May 4, 2011 at 5:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi,
+>> 
+>> On Mon, May 02, 2011, anderson.briglia@openbossa.org wrote:
+>>> This patch fixes a compilation warning regarding btio/btio.c
+>>> compilation.
+>>> ---
+>>>  btio/btio.c |    2 +-
+>>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>> 
+>>> diff --git a/btio/btio.c b/btio/btio.c
+>>> index 6d71b90..8f166cc 100644
+>>> --- a/btio/btio.c
+>>> +++ b/btio/btio.c
+>>> @@ -800,7 +800,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+>>>       uint8_t dev_class[3];
+>>>       uint16_t handle;
+>>>       socklen_t len;
+>>> -     gboolean flushable;
+>>> +     gboolean flushable = TRUE;
+>>> 
+>>>       len = sizeof(l2o);
+>>>       memset(&l2o, 0, len);
+>> 
+>> So are we going to get an updated patch for this (with the modifications
+>> that were requested)? It's quite clearly a false positive by the
+>> compiler (i.e. a compiler bug) but I still think that we should try to
+>> keep the BlueZ tree compilable with "./bootstrap-configure && make" for
+>> all major distributions.
 > 
-> Firstly this still needs Marcel's blessing (though I don't really see
-> any other solution than an address type with three possible values).
-> Secondly, if this is ever going to be added to the L2CAP socket address
-> you'd have to have 0x00 as BDADDR_TYPE_BR for backwards compatibility.
-> 
+> Elvis is going to open a bug in Ubuntu bug system regarding this false
+> positive. I believe it is worth to wait what Ubuntu developers will
+> say.
 
-As Claudio explained in an earlier email, we will need a way to get the
-device type when the connection with that device starts 
-(MGMT_EV_DEVICE_CONNECTED), with hciops we can infer the type if we receive
-the LE Meta Event.
-
-My question is: should the event have a bdaddr_type field or a type field?
-
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Cheers,
--- 
-Vinicius
+I have reported the bug yesterday
+(https://bugs.launchpad.net/ubuntu/+source/gcc-defaults/+bug/776447),
+but don't hold your breath while waiting for a response, you *will* die :)
