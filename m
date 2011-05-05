@@ -2,45 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Fix set but not used variable in attrib code
-Date: Thu,  5 May 2011 17:33:56 -0300
-Message-Id: <1304627636-22358-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH] Remove unneeded list when removing a device driver
+Date: Thu,  5 May 2011 17:33:55 -0300
+Message-Id: <1304627636-22358-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1304627636-22358-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1304627636-22358-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- attrib/gatt.c |    4 ----
- 1 files changed, 0 insertions(+), 4 deletions(-)
+ src/device.c |    6 ++----
+ 1 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 360218b..095b157 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -71,13 +71,11 @@ static guint16 encode_discover_primary(uint16_t start, uint16_t end,
+diff --git a/src/device.c b/src/device.c
+index b0a6542..694a3df 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1168,7 +1168,7 @@ add_uuids:
+ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
  {
- 	bt_uuid_t prim;
- 	guint16 plen;
--	uint8_t op;
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+-	GSList *list, *next;
++	GSList *list;
+ 	char srcaddr[18], dstaddr[18];
+ 	bdaddr_t src;
+ 	sdp_list_t *records;
+@@ -1181,12 +1181,10 @@ static void device_remove_drivers(struct btd_device *device, GSList *uuids)
  
- 	bt_uuid16_create(&prim, GATT_PRIM_SVC_UUID);
+ 	DBG("Removing drivers for %s", dstaddr);
  
- 	if (uuid == NULL) {
- 		/* Discover all primary services */
--		op = ATT_OP_READ_BY_GROUP_REQ;
- 		plen = enc_read_by_grp_req(start, end, &prim, pdu, len);
- 	} else {
- 		uint16_t u16;
-@@ -86,8 +84,6 @@ static guint16 encode_discover_primary(uint16_t start, uint16_t end,
- 		int vlen;
+-	for (list = device->drivers; list; list = next) {
++	for (list = device->drivers; list; list = list->next) {
+ 		struct btd_device_driver *driver = list->data;
+ 		const char **uuid;
  
- 		/* Discover primary service by service UUID */
--		op = ATT_OP_FIND_BY_TYPE_REQ;
+-		next = list->next;
 -
- 		if (uuid->type == BT_UUID16) {
- 			u16 = htobs(uuid->value.u16);
- 			value = &u16;
+ 		for (uuid = driver->uuids; *uuid; uuid++) {
+ 			if (!g_slist_find_custom(uuids, *uuid,
+ 						(GCompareFunc) strcasecmp))
 -- 
 1.7.5.rc3
 
