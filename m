@@ -1,85 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: Bastien Nocera <hadessuk@googlemail.com>
 Subject: Re: [PATCH] Re: Work-around for broken MS device
 From: Bastien Nocera <hadess@hadess.net>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Thu, 05 May 2011 19:37:59 +0100
-In-Reply-To: <1304618532.16101.14.camel@novo.hadess.net>
+Date: Thu, 05 May 2011 19:02:09 +0100
+In-Reply-To: <7B1632C9-FE1A-43EA-A0B6-F26A46F9929F@holtmann.org>
 References: <1236278908.3602.1896.camel@cookie.hadess.net>
 	 <1237397279.15346.1157.camel@cookie.hadess.net>
 	 <1237011673.24751.10.camel@localhost.localdomain>
 	 <1237816742.19118.1234.camel@cookie.hadess.net>
 	 <7B1632C9-FE1A-43EA-A0B6-F26A46F9929F@holtmann.org>
-	 <1304618532.16101.14.camel@novo.hadess.net>
-Content-Type: multipart/mixed; boundary="=-mrJjVwsL58oIAbK/lCiZ"
-Message-ID: <1304620681.16101.15.camel@novo.hadess.net>
+Content-Type: multipart/mixed; boundary="=-N++cpaLUuNevao+K+Qnp"
+Message-ID: <1304618532.16101.14.camel@novo.hadess.net>
 Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-mrJjVwsL58oIAbK/lCiZ
+--=-N++cpaLUuNevao+K+Qnp
 Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2011-05-05 at 19:02 +0100, Bastien Nocera wrote:
-> On Mon, 2009-03-23 at 16:45 +0100, Marcel Holtmann wrote:
-> > Hi Bastien,
-> >=20
-> > >>>> As seen in https://bugzilla.redhat.com/show_bug.cgi?id=3D450081
-> > >>>> The Microsoft Wireless Notebook Presenter Mouse 8000 has its nam=
-e =20
-> > >>>> in
-> > >>>> ISO-8859-1 instead of UTF-8, as required by the BT spec.
-> > >>>>
-> > >>>> I've implemented a small work-around. This isn't very invasive, =
-=20
-> > >>>> IMO, as
-> > >>>> we already do UTF-8 checks.
-> > >>>>
-> > >>>> In my tests, this makes the mouse show up as:
-> > >>>> Microsoft=AE Wireless Notebook Presenter Mouse 8000
-> > >>>
-> > >>> Attached is patch in the proper format.
-> > >>
-> > >> I see the need for this one, but just a failing UTF-8 check to =20
-> > >> assume we
-> > >> are using ISO-8859-1 is not good enough. Since the mouse has a DID
-> > >> record, can we tie this together with the VID and PID?
-> > >
-> > > In those kind of cases, we can only guess what the encoding would =20
-> > > be, we
-> > > can't detect those encodings reliably. Given that we fallback to th=
-e =20
-> > > old
-> > > behaviour when the device, and that ISO-8859-X corresponds 1-1 with
-> > > UTF-8 for the ASCII characters, I don't think it's such a stretch t=
-o
-> > > think that American companies (who'd be using ISO-8859-1) would be =
-the
-> > > worst offenders for this sort of mistake.
-> > >
-> > > I don't think special casing only this device would be a good idea.=
- =20
-> > > As I
-> > > mentioned, I reproduced the bug by making my computer, running Blue=
-Z,
-> > > adopt that name.
-> >=20
-> > can we just fallback to ASCII only? Looks better to me than assuming =
-=20
-> > Latin-1. We replace invalid characters with spaces in that case.
->=20
-> Patch to do that attached.
+On Mon, 2009-03-23 at 16:45 +0100, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> >>>> As seen in https://bugzilla.redhat.com/show_bug.cgi?id=450081
+> >>>> The Microsoft Wireless Notebook Presenter Mouse 8000 has its name  
+> >>>> in
+> >>>> ISO-8859-1 instead of UTF-8, as required by the BT spec.
+> >>>>
+> >>>> I've implemented a small work-around. This isn't very invasive,  
+> >>>> IMO, as
+> >>>> we already do UTF-8 checks.
+> >>>>
+> >>>> In my tests, this makes the mouse show up as:
+> >>>> Microsoft® Wireless Notebook Presenter Mouse 8000
+> >>>
+> >>> Attached is patch in the proper format.
+> >>
+> >> I see the need for this one, but just a failing UTF-8 check to  
+> >> assume we
+> >> are using ISO-8859-1 is not good enough. Since the mouse has a DID
+> >> record, can we tie this together with the VID and PID?
+> >
+> > In those kind of cases, we can only guess what the encoding would  
+> > be, we
+> > can't detect those encodings reliably. Given that we fallback to the  
+> > old
+> > behaviour when the device, and that ISO-8859-X corresponds 1-1 with
+> > UTF-8 for the ASCII characters, I don't think it's such a stretch to
+> > think that American companies (who'd be using ISO-8859-1) would be the
+> > worst offenders for this sort of mistake.
+> >
+> > I don't think special casing only this device would be a good idea.  
+> > As I
+> > mentioned, I reproduced the bug by making my computer, running BlueZ,
+> > adopt that name.
+> 
+> can we just fallback to ASCII only? Looks better to me than assuming  
+> Latin-1. We replace invalid characters with spaces in that case.
 
-And one that compiles (sigh).
+Patch to do that attached.
 
---=-mrJjVwsL58oIAbK/lCiZ
+Cheers
+
+--=-N++cpaLUuNevao+K+Qnp
 Content-Disposition: attachment; filename="0001-Handle-non-UTF-8-device-names.patch"
 Content-Type: text/x-patch; name="0001-Handle-non-UTF-8-device-names.patch";
 	charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 2b4524b060d980a7899c03359cd4943c9ad9cfe4 Mon Sep 17 00:00:00 2001
+>From 02180fd9a53d3e544a218b3040ce63dcb58b4560 Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
 Date: Mon, 8 Nov 2010 16:43:42 +0000
 Subject: [PATCH] Handle non-UTF-8 device names
@@ -87,22 +78,14 @@ Subject: [PATCH] Handle non-UTF-8 device names
 http://thread.gmane.org/gmane.linux.bluez.kernel/1687
 https://bugzilla.redhat.com/show_bug.cgi?id=450081
 ---
- src/event.c |   19 ++++++++++++-------
- 1 files changed, 12 insertions(+), 7 deletions(-)
+ src/event.c |   16 +++++++++-------
+ 1 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/src/event.c b/src/event.c
-index d5bf967..6805c0b 100644
+index d5bf967..0a2fb0c 100644
 --- a/src/event.c
 +++ b/src/event.c
-@@ -28,6 +28,7 @@
- 
- #define _GNU_SOURCE
- #include <stdio.h>
-+#include <ctype.h>
- #include <errno.h>
- #include <unistd.h>
- #include <stdlib.h>
-@@ -562,13 +563,17 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, uint8_t status,
+@@ -562,13 +562,15 @@ void btd_event_remote_name(bdaddr_t *local, bdaddr_t *peer, uint8_t status,
  	struct remote_dev_info match, *dev_info;
  
  	if (status == 0) {
@@ -114,8 +97,6 @@ index d5bf967..6805c0b 100644
 -			*end = '\0';
 -
 +		if (!g_utf8_validate(name, -1, NULL)) {
-+			guint i;
-+
 +			/* Assume ASCII, and replace all non-ASCII with spaces */
 +			for (i = 0; name[i] != '\0'; i++) {
 +				if (!isascii (name[i]))
@@ -131,4 +112,4 @@ index d5bf967..6805c0b 100644
 1.7.5
 
 
---=-mrJjVwsL58oIAbK/lCiZ--
+--=-N++cpaLUuNevao+K+Qnp--
