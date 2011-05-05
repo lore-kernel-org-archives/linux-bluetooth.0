@@ -1,53 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110505140531.GA27568@piper>
-References: <4dbf1776.0bd9650a.1733.7e99@mx.google.com>
-	<20110504213936.GA22493@jh-x301>
-	<BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
-	<EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
-	<BANLkTikLnb229tLvdeeWMnfqkqdSAva1bQ@mail.gmail.com>
-	<20110505140531.GA27568@piper>
-Date: Thu, 5 May 2011 17:30:06 +0300
-Message-ID: <BANLkTinUocgdf3YFTEvzTo6ij7E_oAGvKQ@mail.gmail.com>
-Subject: Re: [PATCH] Remove btio.c compilation warning
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local>
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com>
+	<20110419180425.GA2476@joana>
+	<AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local>
+Date: Thu, 5 May 2011 17:13:56 +0300
+Message-ID: <BANLkTikr_vG90mt37W6eDYcgjteM9tu7-Q@mail.gmail.com>
+Subject: Re: BT 3.0 HS Support in BlueZ
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Anurag Gupta <anurag1303@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
-On Thu, May 5, 2011 at 5:05 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Luiz,
+On Thu, May 5, 2011 at 10:26 AM, Arun Kumar SINGH
+<arunkr.singh@stericsson.com> wrote:
+> Hi Gustavo,
 >
-> On 11:05 Thu 05 May, Luiz Augusto von Dentz wrote:
->
-> [snip]
->
+>>> Does anybody know if
+>>bluetooth 3.0 HS spec is
+>>supported in BlueZ?
+>>> Is AMP supported in BlueZ?
 >>
->> I don't see why it would be ubuntu specific, this seems to be some
->> kind of regression/'feature' with gcc 4.5.
+>>There is two different
+>>implementations, one by
+>>Atheros and another by QuIC.
+>>Both never reach upstream,
+>>if you look to the list logs
+>>you will find them.
 >
-> Yeah, I really believe this is the case. I have gcc 4.5.2 here, that
-> would be the version as in Natty, and I don't encounter that problem.
-
-So it seems to be Ubuntu specific in some way, very annoying way.
-
-> The only difference that I could find is that Ubuntu ships gcc with
-> a .diff.gz of 1.3MB ;-)
 >
-> But back to the topic at hand, I agree that the patch should be applied,
-> Ubuntu is used by many developers and BlueZ should be kept clean of
-> warnings.
+> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
+>
+> I am trying to understand the options other folks may have, who may be interested in having 3.0 support in Bluez. Rewriting entire 3.0 support from scratch may be one thing that should be avoided as long as current upstreaming activity doesn't end up in a dead trail.  Which I assume, it hadn't.
 
-Well if we don't get anywhere with the bug Elvis sent than that is the
-only think we can do, or maybe there is some new gcc flag that can
-prevent such behavior.
+Well I would like to test something with obexd/obex-client to see how
+we could indicate that high speed is necessary, so it would be very
+welcoming if somebody step up and try to make a plan to integrate this
+work upstream, otherwise we gonna have to either start from scratch or
+pick one that seems to fit best in upstream.
 
 
 -- 
