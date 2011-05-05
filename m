@@ -1,45 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 17:15:31 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-Cc: Anurag Gupta <anurag1303@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: BT 3.0 HS Support in BlueZ
-Message-ID: <20110505201531.GE2098@joana>
-References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com>
- <20110419180425.GA2476@joana>
- <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local>
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@gmail.com, padovan@profusion.mobi,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH 3/5 v3] Parse pin codes starting with '$' as hexadecimal encoded strings
+Date: Thu,  5 May 2011 22:10:30 +0200
+Message-Id: <1304626230-30992-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+If a pin code is retrieved from an agent and the first character is
+a dollar sign '$', then the pin is decoded as following:
+ - The first character (dollar sign) is stripped from the pin
+ - The rest is parsed as hexadecimal numbers, where each two characters
+   will be converted into a one byte integer. If an odd number of
+   characters follows, then the last character is stripped.
+Parser is case insensitive. Pins not starting with '$' are parsed
+as usual.
 
-* Arun Kumar SINGH <arunkr.singh@stericsson.com> [2011-05-05 09:26:58 +0200]:
+For instance:
+ pin: $0A3e005067
+is decoded into a 5 byte pin:
+ decoded: 0x0a 0x3e 0x00 0x50 0x67
+---
+This removes support for empty PINs (pin = "$") as suggested by Johan
+since HCI specs forbid it.
 
-> Hi Gustavo,
-> 
-> >> Does anybody know if
-> >bluetooth 3.0 HS spec is
-> >supported in BlueZ?
-> >> Is AMP supported in BlueZ?
-> >
-> >There is two different
-> >implementations, one by
-> >Atheros and another by QuIC.
-> >Both never reach upstream,
-> >if you look to the list logs
-> >you will find them.
-> 
-> 
-> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august. 
+ src/event.c |   35 ++++++++++++++++++++++++++++++++---
+ 1 files changed, 32 insertions(+), 3 deletions(-)
 
-I'm interested in have this on the stack but it doesn't depend on me.
-Patches for this are not arriving to the mailing list. Actually we had no real
-feedback for AMP since the meeting in Boston.
-
+diff --git a/src/event.c b/src/event.c
+index c238392..a8dbafc 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -101,24 +101,53 @@ static gboolean get_adapter_and_device(bdaddr_t *src, bdaddr_t *dst,
+  *
+  *****************************************************************/
+ 
++static size_t decode_hex(const char *pin, char *out)
++{
++	size_t i;
++
++	for (i = 0; i < 16 && pin[i * 2] && pin[i * 2 + 1]; i++)
++		sscanf(&pin[i * 2], "%02hhX", &out[i]);
++
++	return i;
++}
++
++static size_t decode_pin(const char *pin, char *out)
++{
++	size_t len;
++
++	if (!pin)
++		return 0;
++
++	if (pin[0] == '$') {
++		len = decode_hex(&pin[1], out);
++	} else {
++		len = strnlen(pin, 16);
++		memcpy(out, pin, len);
++	}
++
++	return len;
++}
++
+ static void pincode_cb(struct agent *agent, DBusError *derr,
+ 				const char *pincode, struct btd_device *device)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	bdaddr_t dba;
+ 	int err;
++	size_t len;
++	char rawpin[16];
+ 
+ 	device_get_address(device, &dba);
+ 
+-	if (derr) {
++	len = decode_pin(pincode, rawpin);
++	if (derr || !len) {
+ 		err = btd_adapter_pincode_reply(adapter, &dba, NULL, 0);
+ 		if (err < 0)
+ 			goto fail;
+ 		return;
+ 	}
+ 
+-	err = btd_adapter_pincode_reply(adapter, &dba, pincode,
+-						pincode ? strlen(pincode) : 0);
++	err = btd_adapter_pincode_reply(adapter, &dba, rawpin, len);
+ 	if (err < 0)
+ 		goto fail;
+ 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.5
+
