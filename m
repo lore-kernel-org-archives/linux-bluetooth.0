@@ -1,25 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <padovan@profusion.mobi>, <linux-bluetooth@vger.kernel.org>
-CC: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v1] Bluetooth: Double check sec req for pre 2.1 device
-Date: Thu, 5 May 2011 16:16:16 +0200
-Message-ID: <1304604978-17895-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Date: Thu, 5 May 2011 11:05:31 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Elvis =?iso-8859-1?Q?Pf=FCtzenreuter?= <epx@signove.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Remove btio.c compilation warning
+Message-ID: <20110505140531.GA27568@piper>
+References: <4dbf1776.0bd9650a.1733.7e99@mx.google.com>
+ <20110504213936.GA22493@jh-x301>
+ <BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
+ <EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
+ <BANLkTikLnb229tLvdeeWMnfqkqdSAva1bQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BANLkTikLnb229tLvdeeWMnfqkqdSAva1bQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've changed the function name since hci_conn_check_secure seems more
-adequare then hci_conn_accept_secure.
+Hi Luiz,
 
-/Waldek
+On 11:05 Thu 05 May, Luiz Augusto von Dentz wrote:
 
-Waldemar Rymarkiewicz (1):
-  Bluetooth: Double check sec req for pre 2.1 device
+[snip]
 
- include/net/bluetooth/hci_core.h |    4 +++-
- net/bluetooth/hci_conn.c         |   17 +++++++++++++++++
- net/bluetooth/rfcomm/core.c      |    2 +-
- 3 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> I don't see why it would be ubuntu specific, this seems to be some
+> kind of regression/'feature' with gcc 4.5.
 
+Yeah, I really believe this is the case. I have gcc 4.5.2 here, that
+would be the version as in Natty, and I don't encounter that problem.
+
+The only difference that I could find is that Ubuntu ships gcc with
+a .diff.gz of 1.3MB ;-)
+
+But back to the topic at hand, I agree that the patch should be applied,
+Ubuntu is used by many developers and BlueZ should be kept clean of 
+warnings.
+
+> 
+> -- 
+> Luiz Augusto von Dentz
+> Computer Engineer
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+-- 
+Vinicius
