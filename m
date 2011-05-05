@@ -1,68 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 16:27:17 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: Arun Kumar SINGH <arunkr.singh@stericsson.com>,
-	Anurag Gupta <anurag1303@gmail.com>, pkrystad@codeaurora.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: BT 3.0 HS Support in BlueZ
-In-Reply-To: <20110505201531.GE2098@joana>
-Message-ID: <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6>
-References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana>
+Date: Thu, 5 May 2011 17:35:11 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: Double check sec req for pre 2.1 device
+Message-ID: <20110505203511.GG2098@joana>
+References: <1304604978-17895-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1304604978-17895-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1304604978-17895-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Waldemar,
 
-On Thu, 5 May 2011, Gustavo F. Padovan wrote:
+* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-05-05 16:16:17 +0200]:
 
-> Hi Arun,
->
-> * Arun Kumar SINGH <arunkr.singh@stericsson.com> [2011-05-05 09:26:58 +0200]:
->
->> Hi Gustavo,
->>
->>>> Does anybody know if
->>> bluetooth 3.0 HS spec is
->>> supported in BlueZ?
->>>> Is AMP supported in BlueZ?
->>>
->>> There is two different
->>> implementations, one by
->>> Atheros and another by QuIC.
->>> Both never reach upstream,
->>> if you look to the list logs
->>> you will find them.
->>
->>
->> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
->
-> I'm interested in have this on the stack but it doesn't depend on me.
-> Patches for this are not arriving to the mailing list. Actually we had no real
-> feedback for AMP since the meeting in Boston.
+> In case of pre v2.1 devices authentication request will return
+> success immediately if the link key already exists without any
+> authentication process.
+> 
+> That means, it's not possible to re-authenticate the link if you
+> already have combination key and for instance want to re-authenticate
+> to get the high security (use 16 digit pin).
+> 
+> Therefore, it's necessary to check security requirements on auth
+> complete event to prevent not enough secure connection.
+> 
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    4 +++-
+>  net/bluetooth/hci_conn.c         |   17 +++++++++++++++++
+>  net/bluetooth/rfcomm/core.c      |    2 +-
+>  3 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 14cc324..1b35c27 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -420,8 +420,10 @@ int hci_conn_del(struct hci_conn *conn);
+>  void hci_conn_hash_flush(struct hci_dev *hdev);
+>  void hci_conn_check_pending(struct hci_dev *hdev);
+>  
+> -struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type);
+> +struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> +					__u8 sec_level, __u8 auth_type);
 
-Gustavo, Arun:
+Coding styles changes needs a new patch for it. Just leave this out.
 
-We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I 
-will start work on upstreaming later this month, but I need to merge 
-in all of the recent L2CAP refactoring changes.
-
-Also note that Qualcomm and Atheros have announced a merger.
-
-You can find the kernel AMP implementation in the codeaurora.org 
-Android git trees:
-
-git://codeaurora.org/kernel/msm.git
-https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
-
-The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
-
-
-Please let me know if you have any other questions about AMP.
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
