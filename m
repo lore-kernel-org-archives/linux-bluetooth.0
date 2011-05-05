@@ -3,9 +3,9 @@ From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, padovan@profusion.mobi,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 3/5 v3] Parse pin codes starting with '$' as hexadecimal encoded strings
-Date: Thu,  5 May 2011 22:10:30 +0200
-Message-Id: <1304626230-30992-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 3/5] Parse pin codes starting with '$' as hexadecimal encoded strings
+Date: Thu,  5 May 2011 21:42:51 +0200
+Message-Id: <1304624571-30754-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,27 +13,24 @@ If a pin code is retrieved from an agent and the first character is
 a dollar sign '$', then the pin is decoded as following:
  - The first character (dollar sign) is stripped from the pin
  - The rest is parsed as hexadecimal numbers, where each two characters
-   will be converted into a one byte integer. If an odd number of
-   characters follows, then the last character is stripped.
-Parser is case insensitive. Pins not starting with '$' are parsed
-as usual.
+  will be converted into a one byte integer. If an odd number of
+  characters follows, then the last character is stripped. Empty
+  pins are valid. Parser is case insensitive.
+Pins not starting with '$' are parsed as usual.
 
 For instance:
  pin: $0A3e005067
 is decoded into a 5 byte pin:
  decoded: 0x0a 0x3e 0x00 0x50 0x67
 ---
-This removes support for empty PINs (pin = "$") as suggested by Johan
-since HCI specs forbid it.
-
- src/event.c |   35 ++++++++++++++++++++++++++++++++---
- 1 files changed, 32 insertions(+), 3 deletions(-)
+ src/event.c |   33 +++++++++++++++++++++++++++++++--
+ 1 files changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/src/event.c b/src/event.c
-index c238392..a8dbafc 100644
+index c238392..147a29b 100644
 --- a/src/event.c
 +++ b/src/event.c
-@@ -101,24 +101,53 @@ static gboolean get_adapter_and_device(bdaddr_t *src, bdaddr_t *dst,
+@@ -101,12 +101,41 @@ static gboolean get_adapter_and_device(bdaddr_t *src, bdaddr_t *dst,
   *
   *****************************************************************/
  
@@ -75,17 +72,13 @@ index c238392..a8dbafc 100644
  
  	device_get_address(device, &dba);
  
--	if (derr) {
-+	len = decode_pin(pincode, rawpin);
-+	if (derr || !len) {
- 		err = btd_adapter_pincode_reply(adapter, &dba, NULL, 0);
- 		if (err < 0)
- 			goto fail;
+@@ -117,8 +146,8 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
  		return;
  	}
  
 -	err = btd_adapter_pincode_reply(adapter, &dba, pincode,
 -						pincode ? strlen(pincode) : 0);
++	len = decode_pin(pincode, rawpin);
 +	err = btd_adapter_pincode_reply(adapter, &dba, rawpin, len);
  	if (err < 0)
  		goto fail;
