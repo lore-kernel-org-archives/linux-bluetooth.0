@@ -1,66 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 01:34:17 -0700
+Date: Thu, 5 May 2011 01:26:41 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 00/13] Discovery Cleanup - Step 1
-Message-ID: <20110505083417.GB24639@jh-x301>
-References: <BANLkTin_qd=-3-3undR-Rcx0BG9t=Z3nVQ@mail.gmail.com>
- <1304458330-21499-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [RFC 00/16] Discovery procedure refactoring
+Message-ID: <20110505082641.GA24639@jh-x301>
+References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1304458330-21499-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi André,
 
-On Tue, May 03, 2011, Claudio Takahasi wrote:
-> This patch series is the first step to cleanup the device discovery
-> procedure. The main changes are:
->   - Unify advertising reports and inquiry results: mgmt sends
->     one device found event
->   - Logic improvement/cleanup: device found
->   - Move EIR functions to a new file
->   - Add BDADDR type constants: necessary L2CAP connections and bonding
+On Fri, Apr 29, 2011, Andre Guedes wrote:
+> Hi all,
 > 
+> Today, discovery procedure is supported only in hciops. This refactoring has
+> been done to provide easier implementation of discovery procedure in mgmtops.
+> Lots of effort would be necessary to implement discovery procedure in mgmtops
+> because its logic is spread out adapter layer and hciops layer.
 > 
+> The approach this patchset follows is moving all logic related to discovery
+> procedure from adapter layer to hciops layer.
 > 
-> Bruna Moreira (3):
->   Remove btd_event_advertising_report
->   Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
->   Drop variable EIR length
+> Future work will be:
+>         - full support for discovery procedure (BR/EDR, LE-Only, BR/EDR/LE
+>           devices) in kernel via management interface (today, only BR/EDR is
+>           supported).
+>         - name resolving support through mgmt interface (kernel + userspace)
 > 
-> Claudio Takahasi (10):
->   Move EIR related functions to a new file
->   Add Bluetooth address type definition
->   Initial device found cleanup
->   Move legacy verification to a new function
->   Cleanup read name and alias from storage
->   Don't resolve name if the name is in the storage
->   Unify inquiry results and advertises
->   Fix memory leak of EIR data
->   Change the order to write/read the remote's name
->   Cleanup inserting new device found entry
+> Thanks,
+> Guedes.
 > 
->  Makefile.am       |    2 +-
->  lib/bluetooth.h   |    4 +
->  plugins/hciops.c  |  202 +++++----------------------------
->  plugins/mgmtops.c |    3 +-
->  src/adapter.c     |  182 +++++++++++++++++++-----------
->  src/adapter.h     |    9 +-
->  src/eir.c         |  328 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/eir.h         |   41 +++++++
->  src/event.c       |  224 +-----------------------------------
->  src/event.h       |    5 +-
->  src/sdpd.h        |   14 ---
->  11 files changed, 530 insertions(+), 484 deletions(-)
->  create mode 100644 src/eir.c
->  create mode 100644 src/eir.h
+> Anderson Briglia (1):
+>   Implement mgmt start and stop discovery
+> 
+> Andre Guedes (15):
+>   Add discovery callbacks to btd_adapter_ops
+>   Replace inquiry/scanning calls by discovery calls
+>   Add 'discov_state' field to struct dev_info
+>   Code cleanup event.c
+>   Remove Periodic Inquiry support in hciops
+>   Change DiscoverSchedulerInterval default value
+>   Add 'timeout' param to start_scanning callback
+>   Refactoring adapter_set_state()
+>   Remove 'suspend' param from stop_discovery()
+>   Add extfeatures to struct dev_info
+>   Implement start_discovery hciops callback
+>   Remove obsolete code.
+>   Implement stop_discovery hciops callback
+>   Remove inquiry and scanning callbacks from btd_adapter_ops
+>   Remove 'periodic' param from hciops_start_inquiry()
+> 
+>  plugins/hciops.c  |  373 ++++++++++++++++++++++++++++++++++++-----------------
+>  plugins/mgmtops.c |   35 ++----
+>  src/adapter.c     |  217 ++++++++++---------------------
+>  src/adapter.h     |   19 +--
+>  src/event.c       |   48 +-------
+>  src/event.h       |    1 -
+>  src/main.conf     |    4 +-
+>  7 files changed, 345 insertions(+), 352 deletions(-)
 
-These patches don't seem to apply any more after I applied Andrés
-patches. (also, I can't really try applying anything else except 1/13
-since 2/13 is already the address type patch which is still being
-discussed).
+All patches in this set have been pushed upstream. Thanks.
+
+There seems to be at least one race condition that'd need fixing which I
+can see with test-discovery: if the D-Bus client that requested
+discovery exits like test-discovery does it can occur between sending
+the HCI_Inquiry command but before the cmd_status or first inquiry event
+arrives. In this case the adapter state doesn't seem to be yet updated
+and so the ongoing inquiry doesn't get canceled even if it should. You
+should be able to see this simply by running hcidump together with
+test-discovery e.g. on your laptop.
 
 Johan
