@@ -1,77 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 01:26:41 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 00/16] Discovery procedure refactoring
-Message-ID: <20110505082641.GA24639@jh-x301>
-References: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1304123252-14464-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
+References: <4dbf1776.0bd9650a.1733.7e99@mx.google.com>
+	<20110504213936.GA22493@jh-x301>
+	<BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
+	<EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
+Date: Thu, 5 May 2011 11:05:09 +0300
+Message-ID: <BANLkTikLnb229tLvdeeWMnfqkqdSAva1bQ@mail.gmail.com>
+Subject: Re: [PATCH] Remove btio.c compilation warning
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi André,
+Hi,
 
-On Fri, Apr 29, 2011, Andre Guedes wrote:
-> Hi all,
-> 
-> Today, discovery procedure is supported only in hciops. This refactoring has
-> been done to provide easier implementation of discovery procedure in mgmtops.
-> Lots of effort would be necessary to implement discovery procedure in mgmtops
-> because its logic is spread out adapter layer and hciops layer.
-> 
-> The approach this patchset follows is moving all logic related to discovery
-> procedure from adapter layer to hciops layer.
-> 
-> Future work will be:
->         - full support for discovery procedure (BR/EDR, LE-Only, BR/EDR/LE
->           devices) in kernel via management interface (today, only BR/EDR is
->           supported).
->         - name resolving support through mgmt interface (kernel + userspace)
-> 
-> Thanks,
-> Guedes.
-> 
-> Anderson Briglia (1):
->   Implement mgmt start and stop discovery
-> 
-> Andre Guedes (15):
->   Add discovery callbacks to btd_adapter_ops
->   Replace inquiry/scanning calls by discovery calls
->   Add 'discov_state' field to struct dev_info
->   Code cleanup event.c
->   Remove Periodic Inquiry support in hciops
->   Change DiscoverSchedulerInterval default value
->   Add 'timeout' param to start_scanning callback
->   Refactoring adapter_set_state()
->   Remove 'suspend' param from stop_discovery()
->   Add extfeatures to struct dev_info
->   Implement start_discovery hciops callback
->   Remove obsolete code.
->   Implement stop_discovery hciops callback
->   Remove inquiry and scanning callbacks from btd_adapter_ops
->   Remove 'periodic' param from hciops_start_inquiry()
-> 
->  plugins/hciops.c  |  373 ++++++++++++++++++++++++++++++++++++-----------------
->  plugins/mgmtops.c |   35 ++----
->  src/adapter.c     |  217 ++++++++++---------------------
->  src/adapter.h     |   19 +--
->  src/event.c       |   48 +-------
->  src/event.h       |    1 -
->  src/main.conf     |    4 +-
->  7 files changed, 345 insertions(+), 352 deletions(-)
+On Thu, May 5, 2011 at 2:23 AM, Elvis Pfützenreuter <epx@signove.com> wrote:
+> On 4 May 2011, at 20:09 , Anderson Briglia wrote:
+>
+>> Hi Johan,
+>>
+>> On Wed, May 4, 2011 at 5:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> On Mon, May 02, 2011, anderson.briglia@openbossa.org wrote:
+>>>> This patch fixes a compilation warning regarding btio/btio.c
+>>>> compilation.
+>>>> ---
+>>>>  btio/btio.c |    2 +-
+>>>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>>>
+>>>> diff --git a/btio/btio.c b/btio/btio.c
+>>>> index 6d71b90..8f166cc 100644
+>>>> --- a/btio/btio.c
+>>>> +++ b/btio/btio.c
+>>>> @@ -800,7 +800,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+>>>>       uint8_t dev_class[3];
+>>>>       uint16_t handle;
+>>>>       socklen_t len;
+>>>> -     gboolean flushable;
+>>>> +     gboolean flushable = TRUE;
+>>>>
+>>>>       len = sizeof(l2o);
+>>>>       memset(&l2o, 0, len);
+>>>
+>>> So are we going to get an updated patch for this (with the modifications
+>>> that were requested)? It's quite clearly a false positive by the
+>>> compiler (i.e. a compiler bug) but I still think that we should try to
+>>> keep the BlueZ tree compilable with "./bootstrap-configure && make" for
+>>> all major distributions.
+>>
+>> Elvis is going to open a bug in Ubuntu bug system regarding this false
+>> positive. I believe it is worth to wait what Ubuntu developers will
+>> say.
 
-All patches in this set have been pushed upstream. Thanks.
+I don't see why it would be ubuntu specific, this seems to be some
+kind of regression/'feature' with gcc 4.5.
 
-There seems to be at least one race condition that'd need fixing which I
-can see with test-discovery: if the D-Bus client that requested
-discovery exits like test-discovery does it can occur between sending
-the HCI_Inquiry command but before the cmd_status or first inquiry event
-arrives. In this case the adapter state doesn't seem to be yet updated
-and so the ongoing inquiry doesn't get canceled even if it should. You
-should be able to see this simply by running hcidump together with
-test-discovery e.g. on your laptop.
-
-Johan
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
