@@ -2,19 +2,20 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v3] Add partial mas.c - messages-*.c API.
-Date: Thu,  5 May 2011 14:37:19 +0200
-Message-Id: <1304599039-1615-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH v2] Add partial mas.c - messages-*.c API.
+Date: Thu,  5 May 2011 14:30:20 +0200
+Message-Id: <1304598620-1442-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This adds stubs of functions needed for message browsing and retrieval.
 ---
-Fixed documentation for messages_set_notification_registration().
+Fixed typos pointed out by Daniele Forsi. Changes coming from
+discussion on the IRC.
 
  plugins/messages-dummy.c |   71 ++++++++++++++
- plugins/messages.h       |  231 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 302 insertions(+), 0 deletions(-)
+ plugins/messages.h       |  229 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 300 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
 index fd9679d..819f952 100644
@@ -97,10 +98,10 @@ index fd9679d..819f952 100644
 +{
 +}
 diff --git a/plugins/messages.h b/plugins/messages.h
-index c510244..ae6287b 100644
+index c510244..1c4c9db 100644
 --- a/plugins/messages.h
 +++ b/plugins/messages.h
-@@ -20,3 +20,234 @@
+@@ -20,3 +20,232 @@
   *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
   */
@@ -251,10 +252,8 @@ index c510244..ae6287b 100644
 +/* Registers for messaging events notifications.
 + *
 + * session: Backend session.
++ * enable: If true, register, otherwise unregister.
 + * send_event: Function that will be called to indicate a new event.
-+ *
-+ * To unregister currently registered notifications, call this with send_event
-+ * set to NULL.
 + */
 +int messages_set_notification_registration(void *session,
 +		void (*send_event)(void *session,
