@@ -1,49 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 3/3] Add sixaxis plugin: USB pairing and LEDs settings
-From: Bastien Nocera <hadess@hadess.net>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
-	Jim Paris <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>
-Date: Fri, 06 May 2011 02:14:38 +0100
-In-Reply-To: <1298628292-8842-4-git-send-email-ospite@studenti.unina.it>
-References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-	 <1298628292-8842-4-git-send-email-ospite@studenti.unina.it>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1304644488.16101.28.camel@novo.hadess.net>
-Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+Date: Thu, 5 May 2011 16:27:17 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+cc: Arun Kumar SINGH <arunkr.singh@stericsson.com>,
+	Anurag Gupta <anurag1303@gmail.com>, pkrystad@codeaurora.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: BT 3.0 HS Support in BlueZ
+In-Reply-To: <20110505201531.GE2098@joana>
+Message-ID: <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6>
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2011-02-25 at 11:04 +0100, Antonio Ospite wrote:
-> +                       [AC_LANG_PROGRAM([[
-> +                               #include <sys/ioctl.h>
-> +                               #include <linux/hidraw.h>
-> +                               #if ! (defined(HIDIOCSFEATURE) &&
-> defined(HIDIOCGFEATURE))
-> +                               #error "HIDIOCSFEATURE and
-> HIDIOCGFEATURE are required (linux-libc-dev >= 2.6.3x)"
-> +                               #endif
-> +                               ]], 
 
-The only part of the patch I have a problem with is this one.
+On Thu, 5 May 2011, Gustavo F. Padovan wrote:
 
-I'd rather the code had:
-#ifndef HIDIOCSFEATURE
-#define HIDIOCSFEATURE bleh
-#endif
+> Hi Arun,
+>
+> * Arun Kumar SINGH <arunkr.singh@stericsson.com> [2011-05-05 09:26:58 +0200]:
+>
+>> Hi Gustavo,
+>>
+>>>> Does anybody know if
+>>> bluetooth 3.0 HS spec is
+>>> supported in BlueZ?
+>>>> Is AMP supported in BlueZ?
+>>>
+>>> There is two different
+>>> implementations, one by
+>>> Atheros and another by QuIC.
+>>> Both never reach upstream,
+>>> if you look to the list logs
+>>> you will find them.
+>>
+>>
+>> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
+>
+> I'm interested in have this on the stack but it doesn't depend on me.
+> Patches for this are not arriving to the mailing list. Actually we had no real
+> feedback for AMP since the meeting in Boston.
 
-And gracefully handled the ioctl not being available on the running
-kernel (eg. "Not handling plugged in Sixaxis joypad because the kernel
-lacks HIDIOCSFEATURE support").
+Gustavo, Arun:
 
-The rest looks fine, and I'll be testing whether my Fedora 15 kernel has
-the feature merged in yet (which would make testing your code much
-easier).
+We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I 
+will start work on upstreaming later this month, but I need to merge 
+in all of the recent L2CAP refactoring changes.
 
-Cheers
+Also note that Qualcomm and Atheros have announced a merger.
+
+You can find the kernel AMP implementation in the codeaurora.org 
+Android git trees:
+
+git://codeaurora.org/kernel/msm.git
+https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
+
+The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
+
+
+Please let me know if you have any other questions about AMP.
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
