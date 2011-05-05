@@ -3,37 +3,35 @@ From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, hadess@hadess.net, padovan@profusion.mobi,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 5/5] Document new "hex-encoded pins" feature
-Date: Thu,  5 May 2011 21:17:20 +0200
-Message-Id: <1304623040-30461-5-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 4/5] Remove 16 byte limit for PIN codes returned by agents
+Date: Thu,  5 May 2011 21:17:19 +0200
+Message-Id: <1304623040-30461-4-git-send-email-dh.herrmann@googlemail.com>
 In-Reply-To: <1304623040-30461-1-git-send-email-dh.herrmann@googlemail.com>
 References: <1304623040-30461-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Agents can now return PIN codes longer than 16 characters. The
+pin parser automatically truncates all PINs to 16 characters, but
+allows hexadecimal PINs to be longer than 16 characters because
+each two hexdecimal encoded bytes are parsed into one output byte.
 ---
- doc/agent-api.txt |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
+ src/agent.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index d8d35c0..0c84e1c 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -26,7 +26,13 @@ Methods		void Release()
- 			needs to get the passkey for an authentication.
+diff --git a/src/agent.c b/src/agent.c
+index f87f253..40495bf 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -403,7 +403,7 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
+ 	len = strlen(pin);
  
- 			The return value should be a string of 1-16 characters
--			length. The string can be alphanumeric.
-+			length. Longer strings are truncated to 16 characters.
-+			The string can be alphanumeric.
-+
-+			Strings starting with '$' are parsed as hex-encoded
-+			pins. That is, each two following hex characters form
-+			a single byte of the resulting pin. The parser is
-+			case-insensitive.
- 
- 			Possible errors: org.bluez.Error.Rejected
- 			                 org.bluez.Error.Canceled
+ 	dbus_error_init(&err);
+-	if (len > 16 || len < 1) {
++	if (len < 1) {
+ 		error("Invalid PIN length (%zu) from agent", len);
+ 		dbus_set_error_const(&err, "org.bluez.Error.InvalidArgs",
+ 					"Invalid passkey length");
 -- 
 1.7.5
 
