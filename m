@@ -1,51 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 13:30:08 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Allow unsegmented SDU retries on
- sock_queue_rcv_skb failure.
-Message-ID: <20110505163008.GA2139@joana>
-References: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
+In-Reply-To: <20110418175619.GB2472@joana>
+References: <1302271841-12127-1-git-send-email-luiz.dentz@gmail.com>
+	<20110415185845.GB2359@joana>
+	<BANLkTin2kuhT9vyANhLHTqw8G8maTEbQWg@mail.gmail.com>
+	<20110418175619.GB2472@joana>
+Date: Thu, 5 May 2011 17:50:53 +0300
+Message-ID: <BANLkTikgZBh5SyXJvFE6z+F2V-JxC5Y9YQ@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: fix shutdown on SCO sockets
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ruiyi,
+Hi Gustavo,
 
-* Ruiyi Zhang <Ruiyi.zhang@atheros.com> [2011-04-28 19:39:41 +0800]:
+On Mon, Apr 18, 2011 at 8:56 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-17 20:26:53 +0300]:
+>
+>> Hi Gustavo,
+>>
+>> On Fri, Apr 15, 2011 at 9:58 PM, Gustavo F. Padovan
+>> <padovan@profusion.mobi> wrote:
+>> > Hi Luiz,
+>> >
+>> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-08 17:10:41 +0300]:
+>> >
+>> >> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+>> >>
+>> >> shutdown should wait for SCO link to be properly disconnected before
+>> >> detroying the socket, otherwise an application using the socket may
+>> >> assume link is properly disconnected before it really happens which
+>> >> can be a problem when e.g synchronizing profile switch.
+>> >>
+>> >> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+>> >
+>> > I applied it, but in bluetooth-next. Let's see its behaviour there and if no
+>> > problems show up we can move it to bluetooth-2.6
+>>
+>> I tested this against Nokia BH-504 and Sony Ericsson W600, both have
+>> problem when switching from hfp to a2dp where the avdtp start is sent
+>> before SCO is fully disconnected, this patch fixes with those
+>> headsets.
+>
+> Ok, I also pushed it to bluetooth-2.6.
 
->  In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
->  l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
->  skb into BUSY_QUEUE for later retries.
-> 
-> 
-> Signed-off-by: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
-> ---
->  net/bluetooth/l2cap_core.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ca27f3a..3b2f140 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -2784,8 +2784,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
->  			goto drop;
->  
->  		err = sock_queue_rcv_skb(sk, skb);
-> -		if (!err)
-> -			return err;
-> +		return err;
->  
->  		break;
 
-I prefer simply
-		return sock_queue_rcv_skb();
+Apparently this cause a regression, since we set conn to NULL but an
+application may not wait for shutdown to complete and call
+close/release which will cause sco_chan_del to be called which destroy
+the socket without resetting conn->sk to NULL so on disconn_cfm it
+will access invalid memory.
 
-and remove the break inclusive.
+To fix this what about the following:
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 94954c7..cb4fb78 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -373,7 +373,7 @@ static void __sco_sock_close(struct sock *sk)
+                        sk->sk_state = BT_DISCONN;
+                        sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+                        hci_conn_put(sco_pi(sk)->conn->hcon);
+-                       sco_pi(sk)->conn = NULL;
++                       sco_pi(sk)->conn->hcon = NULL;
+                } else
+                        sco_chan_del(sk, ECONNRESET);
+                break;
+@@ -828,7 +828,9 @@ static void sco_chan_del(struct sock *sk, int err)
+                conn->sk = NULL;
+                sco_pi(sk)->conn = NULL;
+                sco_conn_unlock(conn);
+-               hci_conn_put(conn->hcon);
++
++               if (conn->hcon)
++                       hci_conn_put(conn->hcon);
+        }
+
+        sk->sk_state = BT_CLOSED;
+
+I tested it with code waiting for shutdown to complete, watch for
+POLL_ERR, and without waiting and it seems to work fine, finally.
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+Luiz Augusto von Dentz
+Computer Engineer
