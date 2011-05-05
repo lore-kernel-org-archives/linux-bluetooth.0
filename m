@@ -1,83 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 5 May 2011 14:34:45 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
+	hadess@hadess.net, dforsi@gmail.com
+Subject: Re: [PATCH 1/4] Add length argument to hci pincode reply
+Message-ID: <20110505173445.GA2098@joana>
+References: <1302455477-27664-1-git-send-email-dh.herrmann@googlemail.com>
+ <1302455477-27664-2-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
-In-Reply-To: <20110505083417.GB24639@jh-x301>
-References: <BANLkTin_qd=-3-3undR-Rcx0BG9t=Z3nVQ@mail.gmail.com>
-	<1304458330-21499-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20110505083417.GB24639@jh-x301>
-Date: Thu, 5 May 2011 14:34:53 -0300
-Message-ID: <BANLkTikx8qkTnpb46Q=zh8=7NnwDyvXDXQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] Discovery Cleanup - Step 1
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>, linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1302455477-27664-2-git-send-email-dh.herrmann@googlemail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+* David Herrmann <dh.herrmann@googlemail.com> [2011-04-10 19:11:14 +0200]:
 
-On Thu, May 5, 2011 at 5:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wro=
-te:
-> Hi Claudio,
->
-> On Tue, May 03, 2011, Claudio Takahasi wrote:
->> This patch series is the first step to cleanup the device discovery
->> procedure. The main changes are:
->> =C2=A0 - Unify advertising reports and inquiry results: mgmt sends
->> =C2=A0 =C2=A0 one device found event
->> =C2=A0 - Logic improvement/cleanup: device found
->> =C2=A0 - Move EIR functions to a new file
->> =C2=A0 - Add BDADDR type constants: necessary L2CAP connections and bond=
-ing
->>
->>
->>
->> Bruna Moreira (3):
->> =C2=A0 Remove btd_event_advertising_report
->> =C2=A0 Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
->> =C2=A0 Drop variable EIR length
->>
->> Claudio Takahasi (10):
->> =C2=A0 Move EIR related functions to a new file
->> =C2=A0 Add Bluetooth address type definition
->> =C2=A0 Initial device found cleanup
->> =C2=A0 Move legacy verification to a new function
->> =C2=A0 Cleanup read name and alias from storage
->> =C2=A0 Don't resolve name if the name is in the storage
->> =C2=A0 Unify inquiry results and advertises
->> =C2=A0 Fix memory leak of EIR data
->> =C2=A0 Change the order to write/read the remote's name
->> =C2=A0 Cleanup inserting new device found entry
->>
->> =C2=A0Makefile.am =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A02 +-
->> =C2=A0lib/bluetooth.h =C2=A0 | =C2=A0 =C2=A04 +
->> =C2=A0plugins/hciops.c =C2=A0| =C2=A0202 +++++--------------------------=
---
->> =C2=A0plugins/mgmtops.c | =C2=A0 =C2=A03 +-
->> =C2=A0src/adapter.c =C2=A0 =C2=A0 | =C2=A0182 +++++++++++++++++++-------=
-----
->> =C2=A0src/adapter.h =C2=A0 =C2=A0 | =C2=A0 =C2=A09 +-
->> =C2=A0src/eir.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0328 ++++++++++++++++=
-+++++++++++++++++++++++++++++++++++++
->> =C2=A0src/eir.h =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =C2=A0 41 +++++++
->> =C2=A0src/event.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0224 +--------------------=
----------------
->> =C2=A0src/event.h =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A05 +-
->> =C2=A0src/sdpd.h =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 14 ---
->> =C2=A011 files changed, 530 insertions(+), 484 deletions(-)
->> =C2=A0create mode 100644 src/eir.c
->> =C2=A0create mode 100644 src/eir.h
->
-> These patches don't seem to apply any more after I applied Andr=C3=A9s
-> patches. (also, I can't really try applying anything else except 1/13
-> since 2/13 is already the address type patch which is still being
-> discussed).
->
-> Johan
->
+> This adds a new "length" argument to the hci pincode reply to allow
+> sending binary pins including \0 characters.
+> ---
+>  plugins/hciops.c  |    9 ++++-----
+>  plugins/mgmtops.c |   14 ++++++--------
+>  src/adapter.c     |    2 +-
+>  src/adapter.h     |    2 +-
+>  4 files changed, 12 insertions(+), 15 deletions(-)
+> 
+> diff --git a/plugins/hciops.c b/plugins/hciops.c
+> index 93f6f21..afac330 100644
+> --- a/plugins/hciops.c
+> +++ b/plugins/hciops.c
+> @@ -3296,7 +3296,7 @@ static int hciops_remove_bonding(int index, bdaddr_t *bdaddr)
+>  	return 0;
+>  }
+>  
+> -static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+> +static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen)
+>  {
+>  	struct dev_info *dev = &devs[index];
+>  	char addr[18];
+> @@ -3307,14 +3307,13 @@ static int hciops_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+>  
+>  	if (pin) {
+>  		pin_code_reply_cp pr;
+> -		size_t len = strlen(pin);
+>  
+> -		dev->pin_length = len;
+> +		dev->pin_length = pinlen;
+>  
+>  		memset(&pr, 0, sizeof(pr));
+>  		bacpy(&pr.bdaddr, bdaddr);
+> -		memcpy(pr.pin_code, pin, len);
+> -		pr.pin_len = len;
+> +		memcpy(pr.pin_code, pin, pinlen);
+> +		pr.pin_len = pinlen;
+>  		err = hci_send_cmd(dev->sk, OGF_LINK_CTL,
+>  						OCF_PIN_CODE_REPLY,
+>  						PIN_CODE_REPLY_CP_SIZE, &pr);
+> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+> index 042afc5..d03a29d 100644
+> --- a/plugins/mgmtops.c
+> +++ b/plugins/mgmtops.c
+> @@ -493,7 +493,7 @@ static void mgmt_connect_failed(int sk, uint16_t index, void *buf, size_t len)
+>  	btd_event_bonding_complete(&info->bdaddr, &ev->bdaddr, ev->status);
+>  }
+>  
+> -static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+> +static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen)
 
-I am aware of this conflict. Patches are already rebased, but I will
-wait Marcel's blessing(for the address type) before to send again the
-patch series.
+This is over 80 characters. And call pinlen, pin_len instead to keep the same
+name and have a small diff here.
 
-BR,
-Claudio.
+>  {
+>  	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_pin_code_reply)];
+>  	struct mgmt_hdr *hdr = (void *) buf;
+> @@ -501,7 +501,7 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+>  	char addr[18];
+>  
+>  	ba2str(bdaddr, addr);
+> -	DBG("index %d addr %s pin %s", index, addr, pin ? pin : "<none>");
+> +	DBG("index %d addr %s pinlen %lu", index, addr, pinlen);
+>  
+>  	memset(buf, 0, sizeof(buf));
+>  
+> @@ -518,10 +518,8 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+>  		buf_len = sizeof(*hdr) + sizeof(*cp);
+>  	} else {
+>  		struct mgmt_cp_pin_code_reply *cp;
+> -		size_t pin_len;
+>  
+> -		pin_len = strlen(pin);
+> -		if (pin_len > 16)
+> +		if (pinlen > 16)
+>  			return -EINVAL;
+>  
+>  		hdr->opcode = htobs(MGMT_OP_PIN_CODE_REPLY);
+> @@ -530,8 +528,8 @@ static int mgmt_pincode_reply(int index, bdaddr_t *bdaddr, const char *pin)
+>  
+>  		cp = (void *) &buf[sizeof(*hdr)];
+>  		bacpy(&cp->bdaddr, bdaddr);
+> -		cp->pin_len = pin_len;
+> -		memcpy(cp->pin_code, pin, pin_len);
+> +		cp->pin_len = pinlen;
+> +		memcpy(cp->pin_code, pin, pinlen);
+>  
+>  		buf_len = sizeof(*hdr) + sizeof(*cp);
+>  	}
+> @@ -568,7 +566,7 @@ static void mgmt_pin_code_request(int sk, uint16_t index, void *buf, size_t len)
+>  	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr);
+>  	if (err < 0) {
+>  		error("btd_event_request_pin: %s", strerror(-err));
+> -		mgmt_pincode_reply(index, &ev->bdaddr, NULL);
+> +		mgmt_pincode_reply(index, &ev->bdaddr, NULL, 0);
+>  	}
+>  }
+>  
+> diff --git a/src/adapter.c b/src/adapter.c
+> index c400bfd..83f3217 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -3703,7 +3703,7 @@ int btd_adapter_remove_bonding(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+>  int btd_adapter_pincode_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+>  							const char *pin)
+>  {
+> -	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin);
+> +	return adapter_ops->pincode_reply(adapter->dev_id, bdaddr, pin, pin ? strlen(pin) : 0);
+
+Over 80 here as well.
+
+>  }
+>  
+>  int btd_adapter_confirm_reply(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+> diff --git a/src/adapter.h b/src/adapter.h
+> index 308af75..fd2fc12 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -221,7 +221,7 @@ struct btd_adapter_ops {
+>  	int (*read_local_features) (int index, uint8_t *features);
+>  	int (*disconnect) (int index, bdaddr_t *bdaddr);
+>  	int (*remove_bonding) (int index, bdaddr_t *bdaddr);
+> -	int (*pincode_reply) (int index, bdaddr_t *bdaddr, const char *pin);
+> +	int (*pincode_reply) (int index, bdaddr_t *bdaddr, const char *pin, size_t pinlen);
+
+same here.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
