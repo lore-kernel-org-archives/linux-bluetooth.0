@@ -1,89 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110418175619.GB2472@joana>
-References: <1302271841-12127-1-git-send-email-luiz.dentz@gmail.com>
-	<20110415185845.GB2359@joana>
-	<BANLkTin2kuhT9vyANhLHTqw8G8maTEbQWg@mail.gmail.com>
-	<20110418175619.GB2472@joana>
-Date: Thu, 5 May 2011 17:50:53 +0300
-Message-ID: <BANLkTikgZBh5SyXJvFE6z+F2V-JxC5Y9YQ@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: fix shutdown on SCO sockets
+In-Reply-To: <20110505140531.GA27568@piper>
+References: <4dbf1776.0bd9650a.1733.7e99@mx.google.com>
+	<20110504213936.GA22493@jh-x301>
+	<BANLkTikbokOzYmnbPGcLGPVV_qJUCf3SkQ@mail.gmail.com>
+	<EE9AF3E8-0C89-4B05-93F1-D77B46A7BAF7@signove.com>
+	<BANLkTikLnb229tLvdeeWMnfqkqdSAva1bQ@mail.gmail.com>
+	<20110505140531.GA27568@piper>
+Date: Thu, 5 May 2011 17:30:06 +0300
+Message-ID: <BANLkTinUocgdf3YFTEvzTo6ij7E_oAGvKQ@mail.gmail.com>
+Subject: Re: [PATCH] Remove btio.c compilation warning
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>,
+	Anderson Briglia <anderson.briglia@openbossa.org>,
 	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Vinicius,
 
-On Mon, Apr 18, 2011 at 8:56 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-17 20:26:53 +0300]:
+On Thu, May 5, 2011 at 5:05 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi Luiz,
 >
->> Hi Gustavo,
->>
->> On Fri, Apr 15, 2011 at 9:58 PM, Gustavo F. Padovan
->> <padovan@profusion.mobi> wrote:
->> > Hi Luiz,
->> >
->> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-08 17:10:41 +0300]:
->> >
->> >> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
->> >>
->> >> shutdown should wait for SCO link to be properly disconnected before
->> >> detroying the socket, otherwise an application using the socket may
->> >> assume link is properly disconnected before it really happens which
->> >> can be a problem when e.g synchronizing profile switch.
->> >>
->> >> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
->> >
->> > I applied it, but in bluetooth-next. Let's see its behaviour there and if no
->> > problems show up we can move it to bluetooth-2.6
->>
->> I tested this against Nokia BH-504 and Sony Ericsson W600, both have
->> problem when switching from hfp to a2dp where the avdtp start is sent
->> before SCO is fully disconnected, this patch fixes with those
->> headsets.
+> On 11:05 Thu 05 May, Luiz Augusto von Dentz wrote:
 >
-> Ok, I also pushed it to bluetooth-2.6.
+> [snip]
+>
+>>
+>> I don't see why it would be ubuntu specific, this seems to be some
+>> kind of regression/'feature' with gcc 4.5.
+>
+> Yeah, I really believe this is the case. I have gcc 4.5.2 here, that
+> would be the version as in Natty, and I don't encounter that problem.
 
+So it seems to be Ubuntu specific in some way, very annoying way.
 
-Apparently this cause a regression, since we set conn to NULL but an
-application may not wait for shutdown to complete and call
-close/release which will cause sco_chan_del to be called which destroy
-the socket without resetting conn->sk to NULL so on disconn_cfm it
-will access invalid memory.
+> The only difference that I could find is that Ubuntu ships gcc with
+> a .diff.gz of 1.3MB ;-)
+>
+> But back to the topic at hand, I agree that the patch should be applied,
+> Ubuntu is used by many developers and BlueZ should be kept clean of
+> warnings.
 
-To fix this what about the following:
+Well if we don't get anywhere with the bug Elvis sent than that is the
+only think we can do, or maybe there is some new gcc flag that can
+prevent such behavior.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 94954c7..cb4fb78 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -373,7 +373,7 @@ static void __sco_sock_close(struct sock *sk)
-                        sk->sk_state = BT_DISCONN;
-                        sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
-                        hci_conn_put(sco_pi(sk)->conn->hcon);
--                       sco_pi(sk)->conn = NULL;
-+                       sco_pi(sk)->conn->hcon = NULL;
-                } else
-                        sco_chan_del(sk, ECONNRESET);
-                break;
-@@ -828,7 +828,9 @@ static void sco_chan_del(struct sock *sk, int err)
-                conn->sk = NULL;
-                sco_pi(sk)->conn = NULL;
-                sco_conn_unlock(conn);
--               hci_conn_put(conn->hcon);
-+
-+               if (conn->hcon)
-+                       hci_conn_put(conn->hcon);
-        }
-
-        sk->sk_state = BT_CLOSED;
-
-I tested it with code waiting for shutdown to complete, watch for
-POLL_ERR, and without waiting and it seems to work fine, finally.
 
 -- 
 Luiz Augusto von Dentz
