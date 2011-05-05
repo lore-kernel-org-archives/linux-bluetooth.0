@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 May 2011 12:02:56 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Re: Work-around for broken MS device
-Message-ID: <20110505190256.GA15545@jh-x301>
-References: <1236278908.3602.1896.camel@cookie.hadess.net>
- <1237397279.15346.1157.camel@cookie.hadess.net>
- <1237011673.24751.10.camel@localhost.localdomain>
- <1237816742.19118.1234.camel@cookie.hadess.net>
- <7B1632C9-FE1A-43EA-A0B6-F26A46F9929F@holtmann.org>
- <1304618532.16101.14.camel@novo.hadess.net>
- <1304620681.16101.15.camel@novo.hadess.net>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 5 May 2011 16:02:30 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mika Linnanoja <mika.linnanoja@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	ext Ville Tervo <ville.tervo@nokia.com>,
+	Antti Julku <antti.julku@nokia.com>,
+	ext Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	linus.walleij@stericsson.com, par-gunnar.p.hjalmdahl@stericsson.com
+Subject: Re: [PATCH] bluetooth: Fix for security block issue.
+Message-ID: <20110505190230.GC2098@joana>
+References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1295971990.1520.53.camel@aeonflux>
+ <4DB935D9.5080302@nokia.com>
+ <20110428095139.GJ18898@null>
+ <4DBA6D97.7050207@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304620681.16101.15.camel@novo.hadess.net>
+In-Reply-To: <4DBA6D97.7050207@nokia.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Mika,
 
-On Thu, May 05, 2011, Bastien Nocera wrote:
-> > Patch to do that attached.
+* Mika Linnanoja <mika.linnanoja@nokia.com> [2011-04-29 10:49:43 +0300]:
+
+> On 04/28/2011 12:51 PM, ext Ville Tervo wrote:
+> > Could the actual reason be some change in usb stack? Could it have lower
+> > priority for event pipe than for data pipe? In that case event for security
+> > change might arrive to bt stack too late.
+> >
+> > At lest I haven't seen this kind of behaviour with serial attached chips. So I
+> > think this is something USB specific.
 > 
-> And one that compiles (sigh).
+> Happens on Ubuntu 11.04 (released yesterday; bluez 4.91 & kernel 2.6.38-8) as 
+> well, tested with White PTS 2.1 dongle (CSR chip) on laptop x61s. Sending 
+> party (OPP with obex-client in a loop) was a phone.
 
-> From 2b4524b060d980a7899c03359cd4943c9ad9cfe4 Mon Sep 17 00:00:00 2001
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Mon, 8 Nov 2010 16:43:42 +0000
-> Subject: [PATCH] Handle non-UTF-8 device names
-> 
-> http://thread.gmane.org/gmane.linux.bluez.kernel/1687
-> https://bugzilla.redhat.com/show_bug.cgi?id=450081
-> ---
->  src/event.c |   19 ++++++++++++-------
->  1 files changed, 12 insertions(+), 7 deletions(-)
+Is this an regression? Or did it never happen before?
 
-Pushed upstream. Thanks.
-
-Johan
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
