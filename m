@@ -1,67 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 04/12] Bluetooth: Add advertising report meta event handler
-Date: Fri,  6 May 2011 14:05:13 -0300
-Message-Id: <1304701521-26459-5-git-send-email-andre.guedes@openbossa.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [PATCH 03/12] Bluetooth: Protect 'adv_entries' with a RW lock
+Date: Fri,  6 May 2011 14:05:12 -0300
+Message-Id: <1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
 References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+This patch adds a RW lock to protect concurrent operations on
+adv_entries list.
 
-This patch adds a function to handle LE Advertising Report Meta
-Events.
-
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c |   22 ++++++++++++++++++++++
- 1 files changed, 22 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   21 +++++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d5aa97e..3fb36bc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2677,6 +2677,24 @@ unlock:
- 	hci_dev_unlock(hdev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 65135f8..2ceeadf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -188,6 +188,7 @@ struct hci_dev {
+ 	struct list_head	remote_oob_data;
+ 
+ 	struct list_head	adv_entries;
++	rwlock_t		adv_entries_lock;
+ 
+ 	struct hci_dev_stats	stat;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0ba3c39..89d7cc8 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1208,6 +1208,8 @@ int hci_adv_entries_clear(struct hci_dev *hdev)
+ {
+ 	struct list_head *p, *n;
+ 
++	write_lock_bh(&hdev->adv_entries_lock);
++
+ 	list_for_each_safe(p, n, &hdev->adv_entries) {
+ 		struct adv_entry *entry;
+ 
+@@ -1217,6 +1219,8 @@ int hci_adv_entries_clear(struct hci_dev *hdev)
+ 		kfree(entry);
+ 	}
+ 
++	write_unlock_bh(&hdev->adv_entries_lock);
++
+ 	BT_DBG("%s adv cache cleared", hdev->name);
+ 
+ 	return 0;
+@@ -1225,17 +1229,23 @@ int hci_adv_entries_clear(struct hci_dev *hdev)
+ struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct list_head *p;
++	struct adv_entry *res = NULL;
++
++	read_lock_bh(&hdev->adv_entries_lock);
+ 
+ 	list_for_each(p, &hdev->adv_entries) {
+ 		struct adv_entry *entry;
+ 
+ 		entry = list_entry(p, struct adv_entry, list);
+ 
+-		if (bacmp(bdaddr, &entry->bdaddr) == 0)
+-			return entry;
++		if (bacmp(bdaddr, &entry->bdaddr) == 0) {
++			res = entry;
++			goto out;
++		}
+ 	}
+-
+-	return NULL;
++out:
++	read_unlock_bh(&hdev->adv_entries_lock);
++	return res;
  }
  
-+static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
-+						struct sk_buff *skb)
-+{
-+	const u8 RSSI_SIZE = 1;
-+	struct hci_ev_le_advertising_info *ev;
-+	u8 num_reports;
-+
-+	num_reports = skb->data[0];
-+
-+	ev = (void *) &skb->data[1];
-+	hci_add_adv_entry(hdev, ev);
-+
-+	while (--num_reports) {
-+		ev = (void *) (ev->data + ev->length + RSSI_SIZE);
-+		hci_add_adv_entry(hdev, ev);
-+	}
-+}
-+
- static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-@@ -2688,6 +2706,10 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_conn_complete_evt(hdev, skb);
- 		break;
+ static inline int is_connectable_adv(u8 evt_type)
+@@ -1267,7 +1277,9 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+ 	bacpy(&entry->bdaddr, &ev->bdaddr);
+ 	entry->bdaddr_type = ev->bdaddr_type;
  
-+	case HCI_EV_LE_ADVERTISING_REPORT:
-+		hci_le_adv_report_evt(hdev, skb);
-+		break;
-+
- 	default:
- 		break;
- 	}
++	write_lock(&hdev->adv_entries_lock);
+ 	list_add(&entry->list, &hdev->adv_entries);
++	write_unlock(&hdev->adv_entries_lock);
+ 
+ 	BT_DBG("%s adv entry added: address %s type %u", hdev->name,
+ 				batostr(&entry->bdaddr), entry->bdaddr_type);
+@@ -1342,6 +1354,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 
+ 	INIT_LIST_HEAD(&hdev->adv_entries);
++	rwlock_init(&hdev->adv_entries_lock);
+ 
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
 -- 
 1.7.1
 
