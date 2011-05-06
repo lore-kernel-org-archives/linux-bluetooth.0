@@ -1,53 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 May 2011 12:12:48 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Bastien Nocera <hadess@hadess.net>
+Subject: Re: Warning fixes for GCC 4.6
+Date: Fri, 6 May 2011 17:08:36 +0200
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Warning fixes for GCC 4.6
-Message-ID: <20110506151248.GA2221@joana>
-References: <1304620983.16101.16.camel@novo.hadess.net>
- <BANLkTinBw-qXODF03rtcW+M3GEjK7yC3NQ@mail.gmail.com>
- <1304693789.16101.35.camel@novo.hadess.net>
+References: <1304620983.16101.16.camel@novo.hadess.net> <BANLkTinBw-qXODF03rtcW+M3GEjK7yC3NQ@mail.gmail.com> <1304693325.16101.34.camel@novo.hadess.net>
+In-Reply-To: <1304693325.16101.34.camel@novo.hadess.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304693789.16101.35.camel@novo.hadess.net>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201105061708.36472.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-* Bastien Nocera <hadess@hadess.net> [2011-05-06 15:56:28 +0100]:
-
-> On Fri, 2011-05-06 at 10:52 +0300, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
-> > 
-> > On Thu, May 5, 2011 at 9:43 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> > > So that bluez compiles with -Werror.
-> > >
-> > > Cheers
-> > >
+> > Can't we just removed err here, Im afraid using
+> > __attribute__((__unused__)) is not a good practice and we should try
+> > to avoid using it.
 > 
-> Updated patch attached. Only comment left is the "unused" attribute.
+> We either get a warning that the return value is unused, or that we
+> should be checking the return value. Which one do you prefer?
 
-> From 1816c686e1e411ec574c6f168dac43e0ff4d6bd1 Mon Sep 17 00:00:00 2001
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Thu, 5 May 2011 19:41:38 +0100
-> Subject: [PATCH] Fix "set but not unused variable" GCC 4.6 warnings
-> 
-> ---
->  attrib/gatt.c         |    4 ----
->  audio/a2dp.c          |    3 ---
->  audio/manager.c       |    2 --
->  audio/pcm_bluetooth.c |    4 ++--
->  btio/btio.c           |    5 +++++
->  compat/fakehid.c      |    6 ++++--
->  cups/hcrp.c           |   12 ++++++++++++
->  gdbus/object.c        |    3 +--
+Maybe sth like this:
 
-The gdbus changes need a new patch. It also needs to be applied to Obexd
-ConnMan and oFono.
+diff --git a/input/device.c b/input/device.c
+index 316b2cc..2da2030 100644
+--- a/input/device.c
++++ b/input/device.c
+@@ -250,14 +250,14 @@ static int decode_key(const char *str)
+ static void send_event(int fd, uint16_t type, uint16_t code, int32_t value)
+ {
+        struct uinput_event event;
+-       int err;
+ 
+        memset(&event, 0, sizeof(event));
+        event.type      = type;
+        event.code      = code;
+        event.value     = value;
+ 
+-       err = write(fd, &event, sizeof(event));
++       if (write(fd, &event, sizeof(event)) < 0)
++               error("input: send_event failed: %s", strerror(errno));
+ }
 
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+BR
+Szymon Janc
