@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DC390C0.1000607@nokia.com>
-Date: Fri, 06 May 2011 09:10:08 +0300
-From: Mika Linnanoja <mika.linnanoja@nokia.com>
+From: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+Subject: [PATCH v2] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure.
+Date: Fri, 6 May 2011 12:44:11 +0800
+Message-ID: <1304657051-26453-1-git-send-email-Ruiyi.zhang@atheros.com>
+In-Reply-To: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
+References: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
 MIME-Version: 1.0
-To: padovan@profusion.mobi
-CC: linux-bluetooth@vger.kernel.org, ext Ville Tervo <ville.tervo@nokia.com>,
-        Antti Julku <antti.julku@nokia.com>,
-        ext Marcel Holtmann <marcel@holtmann.org>,
-        Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-        linus.walleij@stericsson.com, par-gunnar.p.hjalmdahl@stericsson.com
-Subject: Re: [PATCH] bluetooth: Fix for security block issue.
-References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com> <1295971990.1520.53.camel@aeonflux> <4DB935D9.5080302@nokia.com> <20110428095139.GJ18898@null> <4DBA6D97.7050207@nokia.com> <20110505190230.GC2098@joana>
-In-Reply-To: <20110505190230.GC2098@joana>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/05/2011 10:02 PM, ext Gustavo F. Padovan wrote:
->> Happens on Ubuntu 11.04 (released yesterday; bluez 4.91&  kernel 2.6.38-8) as
->> well, tested with White PTS 2.1 dongle (CSR chip) on laptop x61s. Sending
->> party (OPP with obex-client in a loop) was a phone.
->
-> Is this an regression? Or did it never happen before?
+In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
+l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
+skb into BUSY_QUEUE for later retries.
 
-Hi.
+Signed-off-by: Ruiyi Zhang <Ruiyi.zhang@atheros.com>
+---
+ net/bluetooth/l2cap_core.c |    6 +-----
+ 1 files changed, 1 insertions(+), 5 deletions(-)
 
-Was not happening on ubuntu 9.04 (2.6.28.x) and ubuntu 9.10 (2.6.31.x).
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2c8dd44..623421c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2784,11 +2784,7 @@ static int l2cap_ertm_reassembly_sdu(struct sock *sk, struct sk_buff *skb, u16 c
+ 		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
+ 			goto drop;
+ 
+-		err = sock_queue_rcv_skb(sk, skb);
+-		if (!err)
+-			return err;
+-
+-		break;
++		return sock_queue_rcv_skb(sk, skb);
+ 
+ 	case L2CAP_SDU_START:
+ 		if (pi->conn_state & L2CAP_CONN_SAR_SDU)
+-- 
+1.7.1
 
-Since 10.04 (2.6.32.x) it has been happening to my knowledge.
-
-It's rather easy to reproduce also manually just by trying to send files in a 
-loop via OPP between e.g. 2 ubuntu boxes when both have BT2.1 usb dongles 
-(devices can be paired, doesn't help).
-
-Cheers,
-Mika
