@@ -1,87 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <padovan@profusion.mobi>
-CC: <linux-bluetooth@vger.kernel.org>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v2] Bluetooth: Double check sec req for pre 2.1 device
-Date: Fri, 6 May 2011 09:42:31 +0200
-Message-ID: <1304667751-21670-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Message-ID: <4DC3A317.9060700@nokia.com>
+Date: Fri, 06 May 2011 10:28:23 +0300
+From: Mika Linnanoja <mika.linnanoja@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: padovan@profusion.mobi
+CC: linux-bluetooth@vger.kernel.org, ext Ville Tervo <ville.tervo@nokia.com>,
+        Antti Julku <antti.julku@nokia.com>,
+        ext Marcel Holtmann <marcel@holtmann.org>,
+        Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+        linus.walleij@stericsson.com, par-gunnar.p.hjalmdahl@stericsson.com
+Subject: Re: [PATCH] bluetooth: Fix for security block issue.
+References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com> <1295971990.1520.53.camel@aeonflux> <4DB935D9.5080302@nokia.com> <20110428095139.GJ18898@null> <4DBA6D97.7050207@nokia.com> <20110505190230.GC2098@joana> <4DC390C0.1000607@nokia.com>
+In-Reply-To: <4DC390C0.1000607@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of pre v2.1 devices authentication request will return
-success immediately if the link key already exists without any
-authentication process.
+On 05/06/2011 09:10 AM, Mika Linnanoja wrote:
+> Hi.
+>
+> Was not happening on ubuntu 9.04 (2.6.28.x) and ubuntu 9.10 (2.6.31.x).
+>
+> Since 10.04 (2.6.32.x) it has been happening to my knowledge.
+>
+> It's rather easy to reproduce also manually just by trying to send files in a
+> loop via OPP between e.g. 2 ubuntu boxes when both have BT2.1 usb dongles
+> (devices can be paired, doesn't help).
 
-That means, it's not possible to re-authenticate the link if you
-already have combination key and for instance want to re-authenticate
-to get the high security (use 16 digit pin).
+One another thing; this specific patch doesn't apply on top of your 
+linux-bluetooth or bluetooth-next anymore due to the refactoring work (.39 level).
 
-Therefore, it's necessary to check security requirements on auth
-complete event to prevent not enough secure connection.
+Applying it on top of 2.6.38.x kernel[1] works, but after sending OPP towards 
+PC running with applied kernel I get kernel oops/crash like:
 
-Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_conn.c         |   17 +++++++++++++++++
- net/bluetooth/rfcomm/core.c      |    2 +-
- 3 files changed, 19 insertions(+), 1 deletions(-)
+[  143.503531] Call Trace:
+[  143.503531]  [<c12eaff2>] acpi_idle_enter_simple+0x105/0x13d
+[  143.820013]  [<c12eb114>] acpi_idle_enter_bm+0xd5/0x25e
+[  143.820017]  [<c142000d>] cpuidle_idle_call+0x7d/0x160
+[  143.820020]  [<c10092ca>] cpu_idle+0x8a/0xc0
+[  143.820023]  [<c104021e>] ? complete+0x4e/0x60
+[  143.820026]  [<c15055cd>] rest_init+0x5d/0x70
+[  143.820029]  [<c17a87ee>] start_kernel+0x35f/0x366
+[  143.820032]  [<c17a82a3>] ? pass_all_bootoptions+0x0/0x149
+[  143.820036]  [<c17a80f1>] i386_start_kernel+0xe0/0xe8
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 14cc324..6c994c0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -422,6 +422,7 @@ void hci_conn_check_pending(struct hci_dev *hdev);
- 
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type);
- int hci_conn_check_link_mode(struct hci_conn *conn);
-+int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
- int hci_conn_change_link_key(struct hci_conn *conn);
- int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 7f5ad8a..3163330 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -623,6 +623,23 @@ encrypt:
- }
- EXPORT_SYMBOL(hci_conn_security);
- 
-+/* Check secure link requirement */
-+int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
-+{
-+	BT_DBG("conn %p", conn);
-+
-+	if (sec_level != BT_SECURITY_HIGH)
-+		return 1; /* Accept if non-secure is required */
-+
-+	if (conn->key_type == HCI_LK_AUTH_COMBINATION ||
-+			(conn->key_type == HCI_LK_COMBINATION &&
-+			conn->pin_length == 16))
-+		return 1;
-+
-+	return 0; /* Reject not secure link */
-+}
-+EXPORT_SYMBOL(hci_conn_check_secure);
-+
- /* Change link key */
- int hci_conn_change_link_key(struct hci_conn *conn)
- {
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 121a5c1..5759bb7 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -2096,7 +2096,7 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
- 		if (!test_and_clear_bit(RFCOMM_AUTH_PENDING, &d->flags))
- 			continue;
- 
--		if (!status)
-+		if (!status && hci_conn_check_secure(conn, d->sec_level))
- 			set_bit(RFCOMM_AUTH_ACCEPT, &d->flags);
- 		else
- 			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
--- 
-1.7.1
+After that trying "hciconfig hci0 -a" results in timeout. That trace doesn't 
+look like bt specific at all to my untrained eye.
 
+Stock kernel without this patch doesn't cause such kind of issue. Of course it 
+could be built somehow differently, I'm not an expert, followed some blog's 
+instructions[2].
+
+BR,
+Mika
+
+[1] git cloned git://kernel.ubuntu.com/ubuntu/ubuntu-natty.git
+[2] http://parabing.com/2011/04/28/ubuntu-natty-a-custom-kernel-is-what-you-want/
