@@ -3,78 +3,116 @@ Subject: Re: Warning fixes for GCC 4.6
 From: Bastien Nocera <hadess@hadess.net>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Fri, 06 May 2011 18:54:26 +0100
-In-Reply-To: <1304704211.2427.0.camel@novo.hadess.net>
+Date: Fri, 06 May 2011 18:50:10 +0100
+In-Reply-To: <BANLkTim+KAu03JSJ--wkYGs0a9kD6hzC7w@mail.gmail.com>
 References: <1304620983.16101.16.camel@novo.hadess.net>
 	 <BANLkTinBw-qXODF03rtcW+M3GEjK7yC3NQ@mail.gmail.com>
 	 <1304693325.16101.34.camel@novo.hadess.net>
 	 <BANLkTim+KAu03JSJ--wkYGs0a9kD6hzC7w@mail.gmail.com>
-	 <1304704211.2427.0.camel@novo.hadess.net>
-Content-Type: multipart/mixed; boundary="=-2Sw/XXlKiZhs8D2SfNpR"
-Message-ID: <1304704468.2427.1.camel@novo.hadess.net>
+Content-Type: multipart/mixed; boundary="=-/uicHKzqRy5kyPjbDXD3"
+Message-ID: <1304704211.2427.0.camel@novo.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-2Sw/XXlKiZhs8D2SfNpR
+--=-/uicHKzqRy5kyPjbDXD3
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2011-05-06 at 18:50 +0100, Bastien Nocera wrote:
-> On Fri, 2011-05-06 at 20:43 +0300, Luiz Augusto von Dentz wrote:
-> > Hi,
-> > 
-> > On Fri, May 6, 2011 at 5:48 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> > >> @@ -250,7 +250,7 @@ static int decode_key(const char *str)
-> > >>  static void send_event(int fd, uint16_t type, uint16_t code, int32_t value)
-> > >>  {
-> > >>       struct uinput_event event;
-> > >> -     int err;
-> > >> +     int __attribute__((__unused__)) err;
-> > >>
-> > >>       memset(&event, 0, sizeof(event));
-> > >>       event.type      = type;
-> > >>
-> > >> Can't we just removed err here, Im afraid using
-> > >> __attribute__((__unused__)) is not a good practice and we should try
-> > >> to avoid using it.
-> > >
-> > > We either get a warning that the return value is unused, or that we
-> > > should be checking the return value. Which one do you prefer?
-> > 
-> > I guess I would prefer checking the return properly if you don't mind.
+On Fri, 2011-05-06 at 20:43 +0300, Luiz Augusto von Dentz wrote:
+> Hi,
 > 
-> Done.
+> On Fri, May 6, 2011 at 5:48 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> >> @@ -250,7 +250,7 @@ static int decode_key(const char *str)
+> >>  static void send_event(int fd, uint16_t type, uint16_t code, int32_t value)
+> >>  {
+> >>       struct uinput_event event;
+> >> -     int err;
+> >> +     int __attribute__((__unused__)) err;
+> >>
+> >>       memset(&event, 0, sizeof(event));
+> >>       event.type      = type;
+> >>
+> >> Can't we just removed err here, Im afraid using
+> >> __attribute__((__unused__)) is not a good practice and we should try
+> >> to avoid using it.
+> >
+> > We either get a warning that the return value is unused, or that we
+> > should be checking the return value. Which one do you prefer?
 > 
-> > Also like Gustavo mentioned, it would be great to have the gdbus
-> > changes in a separate patch so we can apply to other project which
-> > uses it.
-> 
-> Done.
+> I guess I would prefer checking the return properly if you don't mind.
 
-And without the now unnecessary changes to btio/btio.c (flushable
-problem is already fixed).
+Done.
 
---=-2Sw/XXlKiZhs8D2SfNpR
+> Also like Gustavo mentioned, it would be great to have the gdbus
+> changes in a separate patch so we can apply to other project which
+> uses it.
+
+Done.
+
+--=-/uicHKzqRy5kyPjbDXD3
 Content-Disposition: attachment;
-	filename="0001-Fix-set-but-not-unused-variable-GCC-4.6-warnings.patch"
+	filename*0=0001-GDBus-Fix-set-but-not-unused-variable-GCC-4.6-warnin.pat;
+	filename*1=ch
 Content-Type: text/x-patch;
-	name="0001-Fix-set-but-not-unused-variable-GCC-4.6-warnings.patch";
+	name="0001-GDBus-Fix-set-but-not-unused-variable-GCC-4.6-warnin.patch";
 	charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 4fa5b05d184d355ee1cb7ebc7abf88f51ec53a59 Mon Sep 17 00:00:00 2001
+>From 59b84e616cec298cfb87ab08bbc5ea31b21adf17 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 6 May 2011 18:49:11 +0100
+Subject: [PATCH 1/2] GDBus: Fix "set but not unused variable" GCC 4.6
+ warnings
+
+---
+ gdbus/object.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/gdbus/object.c b/gdbus/object.c
+index eaa2e1a..d17a101 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -255,14 +255,13 @@ void g_dbus_pending_success(DBusConnection *connection,
+ 
+         for (list = pending_security; list; list = list->next) {
+ 		struct security_data *secdata = list->data;
+-		DBusHandlerResult result;
+ 
+ 		if (secdata->pending != pending)
+ 			continue;
+ 
+ 		pending_security = g_slist_remove(pending_security, secdata);
+ 
+-		result = process_message(connection, secdata->message,
++		process_message(connection, secdata->message,
+ 				secdata->method, secdata->iface_user_data);
+ 
+ 		dbus_message_unref(secdata->message);
+-- 
+1.7.5.1
+
+
+--=-/uicHKzqRy5kyPjbDXD3
+Content-Disposition: attachment;
+	filename="0002-Fix-set-but-not-unused-variable-GCC-4.6-warnings.patch"
+Content-Type: text/x-patch;
+	name="0002-Fix-set-but-not-unused-variable-GCC-4.6-warnings.patch";
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From 1177b9a0c9cabcf15982ea78801465212d2564aa Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
 Date: Fri, 6 May 2011 18:49:26 +0100
-Subject: [PATCH] Fix "set but not unused variable" GCC 4.6 warnings
+Subject: [PATCH 2/2] Fix "set but not unused variable" GCC 4.6 warnings
 
 ---
  attrib/gatt.c         |    4 ----
  audio/a2dp.c          |    3 ---
  audio/manager.c       |    2 --
  audio/pcm_bluetooth.c |    4 ++--
- btio/btio.c           |    4 ++++
+ btio/btio.c           |    5 +++++
  compat/fakehid.c      |    6 ++++--
  cups/hcrp.c           |   12 ++++++++++++
  input/device.c        |    4 ++--
@@ -95,7 +133,7 @@ Subject: [PATCH] Fix "set but not unused variable" GCC 4.6 warnings
  test/test-textfile.c  |    2 ++
  tools/hciattach.c     |    6 +++---
  tools/hcitool.c       |    2 --
- 25 files changed, 57 insertions(+), 46 deletions(-)
+ 25 files changed, 58 insertions(+), 46 deletions(-)
 
 diff --git a/attrib/gatt.c b/attrib/gatt.c
 index 360218b..095b157 100644
@@ -189,10 +227,18 @@ index 799f17f..2d9f178 100644
  
  
 diff --git a/btio/btio.c b/btio/btio.c
-index a3cf38a..4d855ae 100644
+index 6d71b90..64cd8c6 100644
 --- a/btio/btio.c
 +++ b/btio/btio.c
-@@ -1135,6 +1135,10 @@ gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
+@@ -884,6 +884,7 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
+ 			*(va_arg(args, uint8_t *)) = l2o.mode;
+ 			break;
+ 		case BT_IO_OPT_FLUSHABLE:
++			flushable = TRUE;
+ 			if (l2cap_get_flushable(sock, &flushable) < 0) {
+ 				ERROR_FAILED(err, "get_flushable", errno);
+ 				return FALSE;
+@@ -1135,6 +1136,10 @@ gboolean bt_io_accept(GIOChannel *io, BtIOConnect connect, gpointer user_data,
  	if (!(pfd.revents & POLLOUT)) {
  		int ret;
  		ret = read(sock, &c, 1);
@@ -638,5 +684,5 @@ index a117449..ece187c 100644
 1.7.5.1
 
 
---=-2Sw/XXlKiZhs8D2SfNpR--
+--=-/uicHKzqRy5kyPjbDXD3--
 
