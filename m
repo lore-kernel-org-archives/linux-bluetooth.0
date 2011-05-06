@@ -1,165 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 02/12] Bluetooth: LE advertising cache
-Date: Fri,  6 May 2011 14:05:11 -0300
-Message-Id: <1304701521-26459-3-git-send-email-andre.guedes@openbossa.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH 01/12] Bluetooth: Add advertising report meta event structs
+Date: Fri,  6 May 2011 14:05:10 -0300
+Message-Id: <1304701521-26459-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
 References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the LE advertising cache. It stores sensitive
-information (bdaddr and bdaddr_type so far) gathered from LE
-advertising report events.
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-Only advertising entries from connectables devices are added to the
-cache.
+This patch adds definitions and a new struct for Advertising Report
+Event from LE and Dual Mode controllers.
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |   13 +++++++
- net/bluetooth/hci_core.c         |   74 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 87 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci.h |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 14cc324..65135f8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -89,6 +89,12 @@ struct oob_data {
- 	u8 randomizer[16];
- };
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index e0a3cf1..ec0fb2d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1029,6 +1029,25 @@ struct hci_ev_le_conn_complete {
+ 	__u8     clk_accurancy;
+ } __packed;
  
-+struct adv_entry {
-+	struct list_head list;
++/* Advertising report event types */
++#define ADV_IND		0x00
++#define ADV_DIRECT_IND	0x01
++#define ADV_SCAN_IND	0x02
++#define ADV_NONCONN_IND	0x03
++#define ADV_SCAN_RSP	0x04
++
++#define ADDR_LE_DEV_PUBLIC	0x00
++#define ADDR_LE_DEV_RANDOM	0x01
++
++#define HCI_EV_LE_ADVERTISING_REPORT	0x02
++struct hci_ev_le_advertising_info {
++	__u8	 evt_type;
++	__u8	 bdaddr_type;
 +	bdaddr_t bdaddr;
-+	u8 bdaddr_type;
-+};
++	__u8	 length;
++	__u8	 data[0];
++} __packed;
 +
- #define NUM_REASSEMBLY 4
- struct hci_dev {
- 	struct list_head list;
-@@ -181,6 +187,8 @@ struct hci_dev {
- 
- 	struct list_head	remote_oob_data;
- 
-+	struct list_head	adv_entries;
-+
- 	struct hci_dev_stats	stat;
- 
- 	struct sk_buff_head	driver_init;
-@@ -526,6 +534,11 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
- 								u8 *randomizer);
- int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
- 
-+int hci_adv_entries_clear(struct hci_dev *hdev);
-+struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
-+int hci_add_adv_entry(struct hci_dev *hdev,
-+					struct hci_ev_le_advertising_info *ev);
-+
- void hci_del_off_timer(struct hci_dev *hdev);
- 
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b6bda3f..0ba3c39 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1204,6 +1204,77 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
- 	return 0;
- }
- 
-+int hci_adv_entries_clear(struct hci_dev *hdev)
-+{
-+	struct list_head *p, *n;
-+
-+	list_for_each_safe(p, n, &hdev->adv_entries) {
-+		struct adv_entry *entry;
-+
-+		entry = list_entry(p, struct adv_entry, list);
-+
-+		list_del(p);
-+		kfree(entry);
-+	}
-+
-+	BT_DBG("%s adv cache cleared", hdev->name);
-+
-+	return 0;
-+}
-+
-+struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
-+{
-+	struct list_head *p;
-+
-+	list_for_each(p, &hdev->adv_entries) {
-+		struct adv_entry *entry;
-+
-+		entry = list_entry(p, struct adv_entry, list);
-+
-+		if (bacmp(bdaddr, &entry->bdaddr) == 0)
-+			return entry;
-+	}
-+
-+	return NULL;
-+}
-+
-+static inline int is_connectable_adv(u8 evt_type)
-+{
-+	if (evt_type == ADV_IND || evt_type == ADV_DIRECT_IND)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+int hci_add_adv_entry(struct hci_dev *hdev,
-+					struct hci_ev_le_advertising_info *ev)
-+{
-+	struct adv_entry *entry;
-+
-+	if (!is_connectable_adv(ev->evt_type))
-+		return -EINVAL;
-+
-+	entry = hci_find_adv_entry(hdev, &ev->bdaddr);
-+	/* Only new entries should be added to adv_entries. So, if
-+	 * bdaddr was found, don't add it. */
-+	if (entry)
-+		return 0;
-+
-+	entry = kzalloc(sizeof(*entry), GFP_ATOMIC);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	bacpy(&entry->bdaddr, &ev->bdaddr);
-+	entry->bdaddr_type = ev->bdaddr_type;
-+
-+	list_add(&entry->list, &hdev->adv_entries);
-+
-+	BT_DBG("%s adv entry added: address %s type %u", hdev->name,
-+				batostr(&entry->bdaddr), entry->bdaddr_type);
-+
-+	return 0;
-+}
-+
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
-@@ -1270,6 +1341,8 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
- 
-+	INIT_LIST_HEAD(&hdev->adv_entries);
-+
- 	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_WORK(&hdev->power_off, hci_power_off);
- 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
-@@ -1350,6 +1423,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 	hci_uuids_clear(hdev);
- 	hci_link_keys_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	hci_adv_entries_clear(hdev);
- 	hci_dev_unlock_bh(hdev);
- 
- 	__hci_dev_put(hdev);
+ /* Internal events generated by Bluetooth stack */
+ #define HCI_EV_STACK_INTERNAL	0xfd
+ struct hci_ev_stack_internal {
 -- 
 1.7.1
 
