@@ -1,468 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110506171550.GA30648@piper>
-References: <1304678639-31853-1-git-send-email-luiz.dentz@gmail.com>
-	<20110506171550.GA30648@piper>
-Date: Sat, 7 May 2011 16:58:29 +0300
-Message-ID: <BANLkTinhkcFCLmKmjMO3QCh7qeCTr8Wo6Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] client: fix not canceling connection request if
- client exit bus
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: RFC: First pass at pretty hostname support
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Sat, 07 May 2011 07:56:23 +0100
+In-Reply-To: <1304701117.16101.40.camel@novo.hadess.net>
+References: <1304701117.16101.40.camel@novo.hadess.net>
+Content-Type: multipart/mixed; boundary="=-dFSrTdBTd6hZ6CztuDPP"
+Message-ID: <1304751384.2427.5.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
 
-On Fri, May 6, 2011 at 8:15 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Luiz,
->
-> On 13:43 Fri 06 May, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
->>
->> There is no point on proceeding with sdp/rfcomm connections if client
->> exit the bus.
->> ---
->>  client/main.c    |   23 +++++----
->>  client/session.c |  144 ++++++++++++++++++++++++++++++++++++------------------
->>  client/session.h |   10 +++-
->>  3 files changed, 115 insertions(+), 62 deletions(-)
->>
->> diff --git a/client/main.c b/client/main.c
->> index 20d56d2..478181c 100644
->> --- a/client/main.c
->> +++ b/client/main.c
->> @@ -86,6 +86,7 @@ static void create_callback(struct session_data *session, GError *err,
->>       if (session->target != NULL) {
->>               session_register(session);
->>               session_set_owner(session, data->sender, owner_exit);
->> +
->>               g_dbus_send_reply(data->connection, data->message,
->>                               DBUS_TYPE_OBJECT_PATH, &session->path,
->>                               DBUS_TYPE_INVALID);
->> @@ -165,6 +166,7 @@ static DBusMessage *send_files(DBusConnection *connection,
->>       GPtrArray *files;
->>       struct send_data *data;
->>       const char *agent, *source = NULL, *dest = NULL, *target = NULL;
->> +     const char *sender;
->>       uint8_t channel = 0;
->>
->>       dbus_message_iter_init(message, &iter);
->> @@ -201,6 +203,8 @@ static DBusMessage *send_files(DBusConnection *connection,
->>                               "org.openobex.Error.InvalidArguments", NULL);
->>       }
->>
->> +     sender = dbus_message_get_sender(message);
->> +
->>       data = g_try_malloc0(sizeof(*data));
->>       if (data == NULL) {
->>               g_ptr_array_free(files, TRUE);
->> @@ -210,12 +214,12 @@ static DBusMessage *send_files(DBusConnection *connection,
->>
->>       data->connection = dbus_connection_ref(connection);
->>       data->message = dbus_message_ref(message);
->> -     data->sender = g_strdup(dbus_message_get_sender(message));
->> +     data->sender = g_strdup(sender);
->>       data->agent = g_strdup(agent);
->>       data->files = files;
->>
->> -     session = session_create(source, dest, "OPP", channel, create_callback,
->> -                             data);
->> +     session = session_create(source, dest, "OPP", channel, sender,
->> +                                                     create_callback, data);
->>       if (session != NULL) {
->>               sessions = g_slist_append(sessions, session);
->>               return NULL;
->> @@ -269,8 +273,6 @@ static void pull_session_callback(struct session_data *session,
->>               goto done;
->>       }
->>
->> -     session_set_owner(session, data->sender, owner_exit);
->> -
->>       session_pull(session, "text/x-vcard", data->filename,
->>                                               pull_complete_callback, data);
->>
->> @@ -320,7 +322,7 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
->>       data->sender = g_strdup(dbus_message_get_sender(message));
->>       data->filename = g_strdup(name);
->>
->> -     session = session_create(source, dest, "OPP", channel,
->> +     session = session_create(source, dest, "OPP", channel, data->sender,
->>                                       pull_session_callback, data);
->>       if (session != NULL) {
->>               sessions = g_slist_append(sessions, session);
->> @@ -382,8 +384,8 @@ static DBusMessage *create_session(DBusConnection *connection,
->>       data->message = dbus_message_ref(message);
->>       data->sender = g_strdup(dbus_message_get_sender(message));
->>
->> -     session = session_create(source, dest, target, channel,
->> -                                     create_callback, data);
->> +     session = session_create(source, dest, target, channel, data->sender,
->> +                                                     create_callback, data);
->>       if (session != NULL) {
->>               sessions = g_slist_append(sessions, session);
->>               return NULL;
->> @@ -471,7 +473,6 @@ static void capability_session_callback(struct session_data *session,
->>               goto done;
->>       }
->>
->> -     session_set_owner(session, data->sender, owner_exit);
->>       session_pull(session, "x-obex/capability", NULL,
->>                               capabilities_complete_callback, data);
->>
->> @@ -513,8 +514,8 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
->>       if (!target)
->>               target = "OPP";
->>
->> -     session = session_create(source, dest, target, channel,
->> -                             capability_session_callback, data);
->> +     session = session_create(source, dest, target, channel, data->sender,
->> +                                     capability_session_callback, data);
->>       if (session != NULL) {
->>               sessions = g_slist_append(sessions, session);
->>               return NULL;
->> diff --git a/client/session.c b/client/session.c
->> index 88eae8d..8c41858 100644
->> --- a/client/session.c
->> +++ b/client/session.c
->> @@ -169,6 +169,9 @@ static void session_unregistered(struct session_data *session)
->>                                       SESSION_INTERFACE);
->>
->>       DBG("Session(%p) unregistered %s", session, session->path);
->> +
->> +     g_free(session->path);
->> +     session->path = NULL;
->>  }
->>
->>  static void session_free(struct session_data *session)
->> @@ -199,6 +202,7 @@ static void session_free(struct session_data *session)
->>       g_free(session->callback);
->>       g_free(session->path);
->>       g_free(session->owner);
->> +     g_free(session->service);
->>       g_free(session);
->>  }
->>
->> @@ -223,6 +227,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
->>       GwObex *obex;
->>       int fd;
->>
->> +     DBG("");
->> +
->>       if (err != NULL) {
->>               error("%s", err->message);
->>               goto done;
->> @@ -255,6 +261,8 @@ static GIOChannel *rfcomm_connect(const bdaddr_t *src, const bdaddr_t *dst,
->>       GIOChannel *io;
->>       GError *err = NULL;
->>
->> +     DBG("");
->> +
->>       io = bt_io_connect(BT_IO_RFCOMM, function, user_data, NULL, &err,
->>                               BT_IO_OPT_SOURCE_BDADDR, src,
->>                               BT_IO_OPT_DEST_BDADDR, dst,
->> @@ -273,6 +281,7 @@ static void search_callback(uint8_t type, uint16_t status,
->>                       uint8_t *rsp, size_t size, void *user_data)
->>  {
->>       struct callback_data *callback = user_data;
->> +     struct session_data *session = callback->session;
->>       unsigned int scanned, bytesleft = size;
->>       int seqlen = 0;
->>       uint8_t dataType, channel = 0;
->> @@ -325,23 +334,26 @@ static void search_callback(uint8_t type, uint16_t status,
->>       if (channel == 0)
->>               goto failed;
->>
->> -     callback->session->channel = channel;
->> +     session->channel = channel;
->>
->> -     callback->session->io = rfcomm_connect(&callback->session->src,
->> -                                             &callback->session->dst,
->> -                                             channel, rfcomm_callback,
->> -                                             callback);
->> -     if (callback->session->io != NULL) {
->> +     g_io_channel_set_close_on_unref(session->io, FALSE);
->> +     g_io_channel_unref(session->io);
->> +
->> +     session->io = rfcomm_connect(&session->src, &session->dst, channel,
->> +                                     rfcomm_callback, callback);
->> +     if (session->io != NULL) {
->>               sdp_close(callback->sdp);
->>               return;
->>       }
->>
->>  failed:
->> -     sdp_close(callback->sdp);
->> +     g_io_channel_shutdown(session->io, TRUE, NULL);
->> +     g_io_channel_unref(session->io);
->> +     session->io = NULL;
->>
->>       g_set_error(&gerr, OBEX_IO_ERROR, -EIO,
->>                                       "Unable to find service record");
->> -     callback->func(callback->session, gerr, callback->data);
->> +     callback->func(session, gerr, callback->data);
->>       g_clear_error(&gerr);
->>
->>       session_unref(callback->session);
->> @@ -366,6 +378,7 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
->>                                                       gpointer user_data)
->>  {
->>       struct callback_data *callback = user_data;
->> +     struct session_data *session = callback->session;
->>       sdp_list_t *search, *attrid;
->>       uint32_t range = 0x0000ffff;
->>       GError *gerr = NULL;
->> @@ -395,7 +408,9 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
->>       return FALSE;
->>
->>  failed:
->> -     sdp_close(callback->sdp);
->> +     g_io_channel_shutdown(session->io, TRUE, NULL);
->> +     g_io_channel_unref(session->io);
->> +     session->io = NULL;
->>
->>       g_set_error(&gerr, OBEX_IO_ERROR, -EIO,
->>                                       "Unable to find service record");
->> @@ -410,6 +425,7 @@ failed:
->>  static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
->>                                       GIOFunc function, gpointer user_data)
->>  {
->> +     struct callback_data *cb = user_data;
->>       sdp_session_t *sdp;
->>       GIOChannel *io;
->>
->> @@ -426,15 +442,59 @@ static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
->>       g_io_add_watch(io, G_IO_OUT | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
->>                                                       function, user_data);
->>
->> -     g_io_channel_unref(io);
->> +     cb->session->io = io;
->>
->>       return sdp;
->>  }
->>
->> +static gboolean connection_complete(gpointer data)
->> +{
->> +     struct callback_data *cb = data;
->> +
->> +     cb->func(cb->session, 0, cb->data);
->> +
->> +     session_unref(cb->session);
->> +
->> +     g_free(cb);
->> +
->> +     return FALSE;
->> +}
->> +
->> +static void owner_disconnected(DBusConnection *connection, void *user_data)
->> +{
->> +     struct session_data *session = user_data;
->> +
->> +     DBG("");
->> +
->> +     session_shutdown(session);
->> +}
->> +
->> +int session_set_owner(struct session_data *session, const char *name,
->> +                     GDBusWatchFunction func)
->> +{
->> +     if (session == NULL)
->> +             return -EINVAL;
->> +
->> +     if (session->watch)
->> +             g_dbus_remove_watch(session->conn, session->watch);
->> +
->> +     session->watch = g_dbus_add_disconnect_watch(session->conn, name, func,
->> +                                                     session, NULL);
->> +     if (session->watch == 0)
->> +             return -EINVAL;
->> +
->> +     session->owner = g_strdup(name);
->> +
->> +     return 0;
->> +}
->> +
->>  struct session_data *session_create(const char *source,
->> -                     const char *destination, const char *target,
->> -                     uint8_t channel, session_callback_t function,
->> -                     void *user_data)
->> +                                             const char *destination,
->> +                                             const char *service,
->> +                                             uint8_t channel,
->> +                                             const char *owner,
->> +                                             session_callback_t function,
->> +                                             void *user_data)
->>  {
->>       struct session_data *session;
->>       struct callback_data *callback;
->> @@ -462,22 +522,23 @@ struct session_data *session_create(const char *source,
->>               str2ba(source, &session->src);
->>
->>       str2ba(destination, &session->dst);
->> +     session->service = g_strdup(service);
->>
->> -     if (!g_ascii_strncasecmp(target, "OPP", 3)) {
->> +     if (!g_ascii_strncasecmp(service, "OPP", 3)) {
->>               sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
->> -     } else if (!g_ascii_strncasecmp(target, "FTP", 3)) {
->> +     } else if (!g_ascii_strncasecmp(service, "FTP", 3)) {
->>               sdp_uuid16_create(&session->uuid, OBEX_FILETRANS_SVCLASS_ID);
->>               session->target = OBEX_FTP_UUID;
->>               session->target_len = OBEX_FTP_UUID_LEN;
->> -     } else if (!g_ascii_strncasecmp(target, "PBAP", 4)) {
->> +     } else if (!g_ascii_strncasecmp(service, "PBAP", 4)) {
->>               sdp_uuid16_create(&session->uuid, PBAP_PSE_SVCLASS_ID);
->>               session->target = OBEX_PBAP_UUID;
->>               session->target_len = OBEX_PBAP_UUID_LEN;
->> -     } else if (!g_ascii_strncasecmp(target, "SYNC", 4)) {
->> +     } else if (!g_ascii_strncasecmp(service, "SYNC", 4)) {
->>               sdp_uuid16_create(&session->uuid, IRMC_SYNC_SVCLASS_ID);
->>               session->target = OBEX_SYNC_UUID;
->>               session->target_len = OBEX_SYNC_UUID_LEN;
->> -     } else if (!g_ascii_strncasecmp(target, "PCSUITE", 7)) {
->> +     } else if (!g_ascii_strncasecmp(service, "PCSUITE", 7)) {
->>               sdp_uuid128_create(&session->uuid, pcsuite_uuid);
->>       } else {
->>               return NULL;
->> @@ -493,7 +554,10 @@ struct session_data *session_create(const char *source,
->>       callback->func = function;
->>       callback->data = user_data;
->>
->> -     if (session->channel > 0) {
->> +     if (session->obex) {
->> +             g_idle_add(connection_complete, callback);
->> +             err = 0;
->> +     } else if (session->channel > 0) {
->>               session->io = rfcomm_connect(&session->src, &session->dst,
->>                                                       session->channel,
->>                                                       rfcomm_callback,
->> @@ -511,21 +575,31 @@ struct session_data *session_create(const char *source,
->>               return NULL;
->>       }
->>
->> +     if (owner)
->> +             session_set_owner(session, owner, owner_disconnected);
->> +
->>       return session;
->>  }
->>
->>  void session_shutdown(struct session_data *session)
->>  {
->> -     struct transfer_data *transfer;
->> -
->>       DBG("%p", session);
->> -     transfer = session->pending ? session->pending->data : NULL;
->>
->>       session_ref(session);
->>
->>       /* Unregister any pending transfer */
->>       g_slist_foreach(session->pending, (GFunc) transfer_unregister, NULL);
->>
->> +     /* Unregister interfaces */
->> +     if (session->path)
->> +             session_unregistered(session);
->> +
->> +     /* Shutdown io */
->> +     if (session->io) {
->> +             int fd = g_io_channel_unix_get_fd(session->io);
->> +             shutdown(fd, SHUT_RDWR);
->> +     }
->> +
->>       session_unref(session);
->>  }
->>
->> @@ -589,13 +663,6 @@ static DBusMessage *release_agent(DBusConnection *connection,
->>       return dbus_message_new_method_return(message);
->>  }
->>
->> -static void owner_disconnected(DBusConnection *connection, void *user_data)
->> -{
->> -     struct session_data *session = user_data;
->> -
->> -     session_shutdown(session);
->> -}
->> -
->>  static void append_entry(DBusMessageIter *dict,
->>                               const char *key, int type, void *val)
->>  {
->> @@ -1469,25 +1536,6 @@ const char *session_get_agent(struct session_data *session)
->>       return agent->name;
->>  }
->>
->> -int session_set_owner(struct session_data *session, const char *name,
->> -                     GDBusWatchFunction func)
->> -{
->> -     if (session == NULL)
->> -             return -EINVAL;
->> -
->> -     if (session->watch != 0)
->> -             return -EALREADY;
->> -
->> -     session->watch = g_dbus_add_disconnect_watch(session->conn, name, func,
->> -                                                     session, NULL);
->> -     if (session->watch == 0)
->> -             return -EINVAL;
->> -
->> -     session->owner = g_strdup(name);
->> -
->> -     return 0;
->> -}
->> -
->>  const char *session_get_owner(struct session_data *session)
->>  {
->>       if (session == NULL)
->> diff --git a/client/session.h b/client/session.h
->> index 546849e..6f8a434 100644
->> --- a/client/session.h
->> +++ b/client/session.h
->> @@ -36,6 +36,7 @@ struct session_data {
->>       bdaddr_t src;
->>       bdaddr_t dst;
->>       uint8_t channel;
->> +     char *service;          /* Service friendly name */
->
-> Shouldn't adding the "service" field (and related changes) be on a separate
-> patch?
+--=-dFSrTdBTd6hZ6CztuDPP
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 
-Yep, gonna split this, thanks for catching this.
+On Fri, 2011-05-06 at 17:58 +0100, Bastien Nocera wrote:
+> Most of the details are in the patch.
+> 
+> I just wanted to mention that:
+> "Bastien's desktop": good
+> "novo-0": bad
+> 
+> Ideas on how to implement the TODO items would be appreciated. I'm
+> currently thinking that a plugin to monitor the pretty hostname would be
+> the cleaner way. It would even allow us to change the adapter name on
+> the fly if the hostname (rather than the pretty hostname) changed.
+> 
+> Cheers
 
->>       const char *target;     /* OBEX Target UUID */
->>       int target_len;
->>       uuid_t uuid;            /* Bluetooth Service Class */
->> @@ -56,9 +57,12 @@ typedef void (*session_callback_t) (struct session_data *session,
->>                                       GError *err, void *user_data);
->>
->>  struct session_data *session_create(const char *source,
->> -                     const char *destination, const char *target,
->> -                     uint8_t channel, session_callback_t function,
->> -                     void *user_data);
->> +                                             const char *destination,
->> +                                             const char *service,
->> +                                             uint8_t channel,
->> +                                             const char *owner,
->> +                                             session_callback_t function,
->> +                                             void *user_data);
->>
->>  struct session_data *session_ref(struct session_data *session);
->>  void session_unref(struct session_data *session);
->> --
->> 1.7.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Cheers,
-> --
-> Vinicius
->
+And with the correct patch...
 
+--=-dFSrTdBTd6hZ6CztuDPP
+Content-Disposition: attachment; filename="0001-Use-Pretty-hostname-for-the-adapter-name.patch"
+Content-Type: text/x-patch; name="0001-Use-Pretty-hostname-for-the-adapter-name.patch";
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 
+>From 76eef22b0cc2e99724fbac05d6d4cb054337b795 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 6 May 2011 17:48:56 +0100
+Subject: [PATCH] Use "Pretty hostname" for the adapter name
 
+systemd exports a "pretty hostname" through /etc/machine-info[1],
+as well as through a D-Bus service[2]. This pretty hostname should be
+used to name the adapter in a way that's more dynamic and user-friendly
+than the current "static hostname" use.
+
+[1]: http://0pointer.de/public/systemd-man/machine-info.html
+[2]: http://www.freedesktop.org/wiki/Software/systemd/hostnamed
+
+TODO:
+- Add option not to write the adapter name, so it can be changed
+  automatically
+- Make the default adapter (and not hci0) have the shorter pretty name
+  (eg. through plug/unplug, "My laptop 1" could be the name for the
+   default adapter, we don't want that)
+- Monitor /etc/machine-info, or listen to the hostname service signals
+  for changes
+---
+ src/adapter.c |   20 ++++++++++++++++++++
+ src/hcid.h    |    1 +
+ src/main.c    |   32 ++++++++++++++++++++++++++++++++
+ src/main.conf |    8 +++++---
+ 4 files changed, 58 insertions(+), 3 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 76fc01b..1ef6e36 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -183,7 +183,10 @@ static void dev_info_free(struct remote_dev_info *dev)
+ 
+ /*
+  * Device name expansion
++ *   %h - hostname
+  *   %d - device id
++ *   %p - pretty hostname
++ *   %i - device id if different from 0, empty otherwise
+  */
+ static char *expand_name(char *dst, int size, char *str, int dev_id)
+ {
+@@ -209,6 +212,19 @@ static char *expand_name(char *dst, int size, char *str, int dev_id)
+ 				opt = main_opts.host_name;
+ 				break;
+ 
++			case 'p':
++				opt = main_opts.pretty_host_name;
++				if (!opt)
++					opt = main_opts.host_name;
++				break;
++
++			case 'i':
++				if (dev_id > 0) {
++					sprintf(buf, "%d", dev_id);
++					opt = buf;
++				}
++				break;
++
+ 			case '%':
+ 				dst[np++] = str[sp++];
+ 				/* fall through */
+@@ -236,6 +252,10 @@ static char *expand_name(char *dst, int size, char *str, int dev_id)
+ 		}
+ 	}
+ 	dst[np] = '\0';
++
++	/* Remove leading and trailing whitespaces */
++	g_strstrip(dst);
++
+ 	return dst;
+ }
+ 
+diff --git a/src/hcid.h b/src/hcid.h
+index 856723b..b2a3b0a 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -25,6 +25,7 @@
+ 
+ struct main_opts {
+ 	char		host_name[40];
++	char           *pretty_host_name;
+ 	unsigned long	flags;
+ 	char		*name;
+ 	uint32_t	class;
+diff --git a/src/main.c b/src/main.c
+index c454327..4a336ba 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -234,6 +234,35 @@ static void parse_config(GKeyFile *config)
+ 						HCI_LP_HOLD | HCI_LP_PARK;
+ }
+ 
++static char *read_pretty_host_name (void)
++{
++	char *contents, *ret;
++	char **lines;
++	guint i;
++
++	ret = NULL;
++
++	if (g_file_get_contents("/etc/machine-info",
++			&contents, NULL, NULL) == FALSE) {
++		return NULL;
++	}
++	lines = g_strsplit_set(contents, "\r\n", 0);
++	g_free(contents);
++
++	if (lines == NULL)
++		return NULL;
++
++	for (i = 0; lines[i] != NULL; i++) {
++		if (g_str_has_prefix(lines[i], "PRETTY_HOSTNAME=")) {
++			ret = g_strdup(lines[i] + strlen("PRETTY_HOSTNAME="));
++			break;
++		}
++	}
++
++	g_strfreev(lines);
++	return ret;
++}
++
+ static void init_defaults(void)
+ {
+ 	/* Default HCId settings */
+@@ -248,6 +277,7 @@ static void init_defaults(void)
+ 
+ 	if (gethostname(main_opts.host_name, sizeof(main_opts.host_name) - 1) < 0)
+ 		strcpy(main_opts.host_name, "noname");
++	main_opts.pretty_host_name = read_pretty_host_name();
+ }
+ 
+ static GMainLoop *event_loop;
+@@ -501,6 +531,8 @@ int main(int argc, char *argv[])
+ 	if (config)
+ 		g_key_file_free(config);
+ 
++	g_free (main_opts.pretty_host_name);
++
+ 	info("Exit");
+ 
+ 	__btd_log_cleanup();
+diff --git a/src/main.conf b/src/main.conf
+index 8cd132f..bedd5c7 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -4,9 +4,11 @@
+ #DisablePlugins = network,input
+ 
+ # Default adaper name
+-# %h - substituted for hostname
+-# %d - substituted for adapter id
+-Name = %h-%d
++# %h - hostname
++# %d - adapter id
++# %p - pretty hostname (if available, hostname otherwise)
++# %i - device id if different from 0, empty otherwise
++Name = %p %i
+ 
+ # Default device class. Only the major and minor device class bits are
+ # considered.
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.5
+
+
+--=-dFSrTdBTd6hZ6CztuDPP--
+
