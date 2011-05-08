@@ -1,33 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-ID: <492322.54247.qm@web111608.mail.gq1.yahoo.com>
+Date: Sun, 8 May 2011 16:56:38 -0700 (PDT)
+From: Phaneeth Kumar <phaneeth@yahoo.com>
+Subject: HDP: Any Bluez Sample C code for Health sink?
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] client: remove unused variable
-Date: Mon,  9 May 2011 11:21:36 +0300
-Message-Id: <1304929298-1586-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi All,
 
----
- client/session.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+I am new to the whole DBus way of accessing API and the  Bluez Health API. I am 
+trying to build a generic HDP sink in C and I am  totally lost.
+All the sample codes that I find are in Python and scripting isn't really an 
+option for this application.
+Is there any sample C code available that uses Bluez in general and HDP 
+interface in Bluez in particular?
 
-diff --git a/client/session.c b/client/session.c
-index 88eae8d..ceda3f4 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -516,10 +516,7 @@ struct session_data *session_create(const char *source,
- 
- void session_shutdown(struct session_data *session)
- {
--	struct transfer_data *transfer;
--
- 	DBG("%p", session);
--	transfer = session->pending ? session->pending->data : NULL;
- 
- 	session_ref(session);
- 
--- 
-1.7.1
+Thanks for your help!
 
+Phaneeth
