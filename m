@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 9 May 2011 20:48:41 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Fix starting security procedures when not needed
-Date: Mon,  9 May 2011 20:49:54 -0300
-Message-Id: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH] Fix starting the security procedure when setting the MTU
+Message-ID: <20110509234841.GA3760@piper>
+References: <1304963788-2926-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1304963788-2926-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The default value of sec_level when setting *any* option
-using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
-the security procedure being started in some situations that
-it should not.
----
- btio/btio.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+Hi Johan,
 
-diff --git a/btio/btio.c b/btio/btio.c
-index a3cf38a..df028a6 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -659,7 +659,6 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
- 	/* Set defaults */
- 	opts->defer = DEFAULT_DEFER_TIMEOUT;
- 	opts->master = -1;
--	opts->sec_level = BT_IO_SEC_MEDIUM;
- 	opts->mode = L2CAP_MODE_BASIC;
- 	opts->flushable = -1;
- 
+On 14:56 Mon 09 May, Vinicius Costa Gomes wrote:
+> The default security level of btio is BT_IO_SEC_MEDIUM, and for
+> LE links this would cause encryption to be started. So, we set the
+> security level to LOW (a no-op) and the MTU to the desired value.
+> ---
+>  attrib/gattrib.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+
+Please ignore this patch. As discussed on IRC, I will send a patch
+that fixes the actual problem.
+
+
+Cheers,
 -- 
-1.7.4.3
-
+Vinicius
