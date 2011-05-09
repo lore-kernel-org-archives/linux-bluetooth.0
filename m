@@ -2,31 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Fix starting the security procedure when setting the MTU
-Date: Mon,  9 May 2011 14:56:28 -0300
-Message-Id: <1304963788-2926-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH] Fix a crash when creating a device from storage
+Date: Mon,  9 May 2011 14:55:44 -0300
+Message-Id: <1304963744-31282-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The default security level of btio is BT_IO_SEC_MEDIUM, and for
-LE links this would cause encryption to be started. So, we set the
-security level to LOW (a no-op) and the MTU to the desired value.
+The list "services" is just a list of the object paths of the
+registered services that a device has. When we want to store
+the primary services information we need to store the "primaries"
+list, that contain all the primary services information.
 ---
- attrib/gattrib.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ src/device.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 8c15e52..55ec645 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -540,6 +540,7 @@ gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
+diff --git a/src/device.c b/src/device.c
+index b0a6542..9b8591b 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1567,7 +1567,7 @@ static void store_services(struct btd_device *device)
+ {
+ 	struct btd_adapter *adapter = device->adapter;
+ 	bdaddr_t dba, sba;
+-	char *str = primary_list_to_string(device->services);
++	char *str = primary_list_to_string(device->primaries);
  
- 	if (!bt_io_set(attrib->io, BT_IO_L2CAP, NULL,
- 			BT_IO_OPT_OMTU, mtu,
-+			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
- 			BT_IO_OPT_INVALID))
- 		return FALSE;
- 
+ 	adapter_get_address(adapter, &sba);
+ 	device_get_address(device, &dba);
 -- 
 1.7.4.3
 
