@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] client: add support for reusing session for the same client
-Date: Mon,  9 May 2011 11:21:38 +0300
-Message-Id: <1304929298-1586-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/3] client: fix not canceling connection request if client exit bus
+Date: Mon,  9 May 2011 11:21:37 +0300
+Message-Id: <1304929298-1586-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1304929298-1586-1-git-send-email-luiz.dentz@gmail.com>
 References: <1304929298-1586-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,177 +11,374 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-If the a client owning a session attempt to send a new file just reuse
-the same session instead of trying to connect again.
+There is no point on proceeding with sdp/rfcomm connections if client
+exit the bus.
 ---
- client/session.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- client/session.h |    1 +
- 2 files changed, 72 insertions(+), 3 deletions(-)
+ client/main.c    |   23 +++++-----
+ client/session.c |  121 ++++++++++++++++++++++++++++++++++-------------------
+ client/session.h |    9 +++-
+ 3 files changed, 95 insertions(+), 58 deletions(-)
 
-diff --git a/client/session.c b/client/session.c
-index e8915cf..266d00c 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -87,6 +87,8 @@ struct agent_data {
- 	struct pending_data *pending;
- };
- 
-+static GSList *sessions = NULL;
+diff --git a/client/main.c b/client/main.c
+index 20d56d2..478181c 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -86,6 +86,7 @@ static void create_callback(struct session_data *session, GError *err,
+ 	if (session->target != NULL) {
+ 		session_register(session);
+ 		session_set_owner(session, data->sender, owner_exit);
 +
- static void session_prepare_put(struct session_data *session, GError *err,
- 								void *data);
- static void session_terminate_transfer(struct session_data *session,
-@@ -199,8 +201,11 @@ static void session_free(struct session_data *session)
- 		dbus_connection_unref(session->conn);
+ 		g_dbus_send_reply(data->connection, data->message,
+ 				DBUS_TYPE_OBJECT_PATH, &session->path,
+ 				DBUS_TYPE_INVALID);
+@@ -165,6 +166,7 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 	GPtrArray *files;
+ 	struct send_data *data;
+ 	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
++	const char *sender;
+ 	uint8_t channel = 0;
+ 
+ 	dbus_message_iter_init(message, &iter);
+@@ -201,6 +203,8 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 				"org.openobex.Error.InvalidArguments", NULL);
  	}
  
-+	sessions = g_slist_remove(sessions, session);
++	sender = dbus_message_get_sender(message);
 +
- 	g_free(session->callback);
- 	g_free(session->path);
-+	g_free(session->service);
- 	g_free(session->owner);
- 	g_free(session);
+ 	data = g_try_malloc0(sizeof(*data));
+ 	if (data == NULL) {
+ 		g_ptr_array_free(files, TRUE);
+@@ -210,12 +214,12 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 
+ 	data->connection = dbus_connection_ref(connection);
+ 	data->message = dbus_message_ref(message);
+-	data->sender = g_strdup(dbus_message_get_sender(message));
++	data->sender = g_strdup(sender);
+ 	data->agent = g_strdup(agent);
+ 	data->files = files;
+ 
+-	session = session_create(source, dest, "OPP", channel, create_callback,
+-				data);
++	session = session_create(source, dest, "OPP", channel, sender,
++							create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+@@ -269,8 +273,6 @@ static void pull_session_callback(struct session_data *session,
+ 		goto done;
+ 	}
+ 
+-	session_set_owner(session, data->sender, owner_exit);
+-
+ 	session_pull(session, "text/x-vcard", data->filename,
+ 						pull_complete_callback, data);
+ 
+@@ -320,7 +322,7 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+ 	data->filename = g_strdup(name);
+ 
+-	session = session_create(source, dest, "OPP", channel,
++	session = session_create(source, dest, "OPP", channel, data->sender,
+ 					pull_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -382,8 +384,8 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	data->message = dbus_message_ref(message);
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+ 
+-	session = session_create(source, dest, target, channel,
+-					create_callback, data);
++	session = session_create(source, dest, target, channel, data->sender,
++							create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+@@ -471,7 +473,6 @@ static void capability_session_callback(struct session_data *session,
+ 		goto done;
+ 	}
+ 
+-	session_set_owner(session, data->sender, owner_exit);
+ 	session_pull(session, "x-obex/capability", NULL,
+ 				capabilities_complete_callback, data);
+ 
+@@ -513,8 +514,8 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	if (!target)
+ 		target = "OPP";
+ 
+-	session = session_create(source, dest, target, channel,
+-				capability_session_callback, data);
++	session = session_create(source, dest, target, channel, data->sender,
++					capability_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+diff --git a/client/session.c b/client/session.c
+index ceda3f4..e8915cf 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -169,6 +169,9 @@ static void session_unregistered(struct session_data *session)
+ 					SESSION_INTERFACE);
+ 
+ 	DBG("Session(%p) unregistered %s", session, session->path);
++
++	g_free(session->path);
++	session->path = NULL;
  }
-@@ -245,6 +250,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
  
- 	session->obex = obex;
+ static void session_free(struct session_data *session)
+@@ -223,6 +226,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
+ 	GwObex *obex;
+ 	int fd;
  
-+	sessions = g_slist_prepend(sessions, session);
++	DBG("");
 +
- done:
- 	callback->func(callback->session, err, callback->data);
+ 	if (err != NULL) {
+ 		error("%s", err->message);
+ 		goto done;
+@@ -255,6 +260,8 @@ static GIOChannel *rfcomm_connect(const bdaddr_t *src, const bdaddr_t *dst,
+ 	GIOChannel *io;
+ 	GError *err = NULL;
  
-@@ -446,6 +453,19 @@ static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
++	DBG("");
++
+ 	io = bt_io_connect(BT_IO_RFCOMM, function, user_data, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_DEST_BDADDR, dst,
+@@ -273,6 +280,7 @@ static void search_callback(uint8_t type, uint16_t status,
+ 			uint8_t *rsp, size_t size, void *user_data)
+ {
+ 	struct callback_data *callback = user_data;
++	struct session_data *session = callback->session;
+ 	unsigned int scanned, bytesleft = size;
+ 	int seqlen = 0;
+ 	uint8_t dataType, channel = 0;
+@@ -325,23 +333,26 @@ static void search_callback(uint8_t type, uint16_t status,
+ 	if (channel == 0)
+ 		goto failed;
+ 
+-	callback->session->channel = channel;
++	session->channel = channel;
+ 
+-	callback->session->io = rfcomm_connect(&callback->session->src,
+-						&callback->session->dst,
+-						channel, rfcomm_callback,
+-						callback);
+-	if (callback->session->io != NULL) {
++	g_io_channel_set_close_on_unref(session->io, FALSE);
++	g_io_channel_unref(session->io);
++
++	session->io = rfcomm_connect(&session->src, &session->dst, channel,
++					rfcomm_callback, callback);
++	if (session->io != NULL) {
+ 		sdp_close(callback->sdp);
+ 		return;
+ 	}
+ 
+ failed:
+-	sdp_close(callback->sdp);
++	g_io_channel_shutdown(session->io, TRUE, NULL);
++	g_io_channel_unref(session->io);
++	session->io = NULL;
+ 
+ 	g_set_error(&gerr, OBEX_IO_ERROR, -EIO,
+ 					"Unable to find service record");
+-	callback->func(callback->session, gerr, callback->data);
++	callback->func(session, gerr, callback->data);
+ 	g_clear_error(&gerr);
+ 
+ 	session_unref(callback->session);
+@@ -366,6 +377,7 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct callback_data *callback = user_data;
++	struct session_data *session = callback->session;
+ 	sdp_list_t *search, *attrid;
+ 	uint32_t range = 0x0000ffff;
+ 	GError *gerr = NULL;
+@@ -395,7 +407,9 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
+ 	return FALSE;
+ 
+ failed:
+-	sdp_close(callback->sdp);
++	g_io_channel_shutdown(session->io, TRUE, NULL);
++	g_io_channel_unref(session->io);
++	session->io = NULL;
+ 
+ 	g_set_error(&gerr, OBEX_IO_ERROR, -EIO,
+ 					"Unable to find service record");
+@@ -410,6 +424,7 @@ failed:
+ static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
+ 					GIOFunc function, gpointer user_data)
+ {
++	struct callback_data *cb = user_data;
+ 	sdp_session_t *sdp;
+ 	GIOChannel *io;
+ 
+@@ -426,15 +441,46 @@ static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
+ 	g_io_add_watch(io, G_IO_OUT | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 							function, user_data);
+ 
+-	g_io_channel_unref(io);
++	cb->session->io = io;
+ 
  	return sdp;
  }
  
-+static gboolean connection_complete(gpointer data)
++static void owner_disconnected(DBusConnection *connection, void *user_data)
 +{
-+	struct callback_data *cb = data;
++	struct session_data *session = user_data;
 +
-+	cb->func(cb->session, 0, cb->data);
++	DBG("");
 +
-+	session_unref(cb->session);
-+
-+	g_free(cb);
-+
-+	return FALSE;
++	session_shutdown(session);
 +}
 +
- static void owner_disconnected(DBusConnection *connection, void *user_data)
- {
- 	struct session_data *session = user_data;
-@@ -474,6 +494,43 @@ int session_set_owner(struct session_data *session, const char *name,
- 	return 0;
- }
- 
-+static struct session_data *session_find(const char *source,
-+						const char *destination,
-+						const char *service,
-+						uint8_t channel,
-+						const char *owner)
++int session_set_owner(struct session_data *session, const char *name,
++			GDBusWatchFunction func)
 +{
-+	GSList *l;
++	if (session == NULL)
++		return -EINVAL;
 +
-+	for (l = sessions; l; l = l->next) {
-+		struct session_data *session = l->data;
-+		bdaddr_t adr;
++	if (session->watch)
++		g_dbus_remove_watch(session->conn, session->watch);
 +
-+		if (source) {
-+			str2ba(source, &adr);
-+			if (bacmp(&session->src, &adr))
-+				continue;
-+		}
++	session->watch = g_dbus_add_disconnect_watch(session->conn, name, func,
++							session, NULL);
++	if (session->watch == 0)
++		return -EINVAL;
 +
-+		str2ba(destination, &adr);
-+		if (bacmp(&session->dst, &adr))
-+			continue;
++	session->owner = g_strdup(name);
 +
-+		if (g_strcmp0(service, session->service))
-+			continue;
-+
-+		if (channel && session->channel != channel)
-+			continue;
-+
-+		if (g_strcmp0(owner, session->owner))
-+			continue;
-+
-+		return session;
-+	}
-+
-+	return NULL;
++	return 0;
 +}
 +
  struct session_data *session_create(const char *source,
- 						const char *destination,
- 						const char *service,
-@@ -489,6 +546,12 @@ struct session_data *session_create(const char *source,
- 	if (destination == NULL)
- 		return NULL;
- 
-+	session = session_find(source, destination, service, channel, owner);
-+	if (session) {
-+		session_ref(session);
-+		goto proceed;
-+	}
-+
- 	session = g_try_malloc0(sizeof(*session));
- 	if (session == NULL)
- 		return NULL;
-@@ -508,6 +571,7 @@ struct session_data *session_create(const char *source,
- 		str2ba(source, &session->src);
+-			const char *destination, const char *target,
+-			uint8_t channel, session_callback_t function,
+-			void *user_data)
++						const char *destination,
++						const char *service,
++						uint8_t channel,
++						const char *owner,
++						session_callback_t function,
++						void *user_data)
+ {
+ 	struct session_data *session;
+ 	struct callback_data *callback;
+@@ -463,21 +509,21 @@ struct session_data *session_create(const char *source,
  
  	str2ba(destination, &session->dst);
-+	session->service = g_strdup(service);
  
- 	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
+-	if (!g_ascii_strncasecmp(target, "OPP", 3)) {
++	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
  		sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
-@@ -529,9 +593,10 @@ struct session_data *session_create(const char *source,
+-	} else if (!g_ascii_strncasecmp(target, "FTP", 3)) {
++	} else if (!g_ascii_strncasecmp(service, "FTP", 3)) {
+ 		sdp_uuid16_create(&session->uuid, OBEX_FILETRANS_SVCLASS_ID);
+ 		session->target = OBEX_FTP_UUID;
+ 		session->target_len = OBEX_FTP_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(target, "PBAP", 4)) {
++	} else if (!g_ascii_strncasecmp(service, "PBAP", 4)) {
+ 		sdp_uuid16_create(&session->uuid, PBAP_PSE_SVCLASS_ID);
+ 		session->target = OBEX_PBAP_UUID;
+ 		session->target_len = OBEX_PBAP_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(target, "SYNC", 4)) {
++	} else if (!g_ascii_strncasecmp(service, "SYNC", 4)) {
+ 		sdp_uuid16_create(&session->uuid, IRMC_SYNC_SVCLASS_ID);
+ 		session->target = OBEX_SYNC_UUID;
+ 		session->target_len = OBEX_SYNC_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(target, "PCSUITE", 7)) {
++	} else if (!g_ascii_strncasecmp(service, "PCSUITE", 7)) {
+ 		sdp_uuid128_create(&session->uuid, pcsuite_uuid);
+ 	} else {
+ 		return NULL;
+@@ -511,6 +557,9 @@ struct session_data *session_create(const char *source,
  		return NULL;
  	}
  
-+proceed:
- 	callback = g_try_malloc0(sizeof(*callback));
- 	if (callback == NULL) {
--		session_free(session);
-+		session_unref(session);
- 		return NULL;
- 	}
++	if (owner)
++		session_set_owner(session, owner, owner_disconnected);
++
+ 	return session;
+ }
  
-@@ -539,7 +604,10 @@ struct session_data *session_create(const char *source,
- 	callback->func = function;
- 	callback->data = user_data;
+@@ -523,6 +572,16 @@ void session_shutdown(struct session_data *session)
+ 	/* Unregister any pending transfer */
+ 	g_slist_foreach(session->pending, (GFunc) transfer_unregister, NULL);
  
--	if (session->channel > 0) {
-+	if (session->obex) {
-+		g_idle_add(connection_complete, callback);
-+		err = 0;
-+	} else if (session->channel > 0) {
- 		session->io = rfcomm_connect(&session->src, &session->dst,
- 							session->channel,
- 							rfcomm_callback,
-@@ -552,7 +620,7 @@ struct session_data *session_create(const char *source,
- 	}
++	/* Unregister interfaces */
++	if (session->path)
++		session_unregistered(session);
++
++	/* Shutdown io */
++	if (session->io) {
++		int fd = g_io_channel_unix_get_fd(session->io);
++		shutdown(fd, SHUT_RDWR);
++	}
++
+ 	session_unref(session);
+ }
  
- 	if (err < 0) {
--		session_free(session);
-+		session_unref(session);
- 		g_free(callback);
- 		return NULL;
- 	}
+@@ -586,13 +645,6 @@ static DBusMessage *release_agent(DBusConnection *connection,
+ 	return dbus_message_new_method_return(message);
+ }
+ 
+-static void owner_disconnected(DBusConnection *connection, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-
+-	session_shutdown(session);
+-}
+-
+ static void append_entry(DBusMessageIter *dict,
+ 				const char *key, int type, void *val)
+ {
+@@ -1466,25 +1518,6 @@ const char *session_get_agent(struct session_data *session)
+ 	return agent->name;
+ }
+ 
+-int session_set_owner(struct session_data *session, const char *name,
+-			GDBusWatchFunction func)
+-{
+-	if (session == NULL)
+-		return -EINVAL;
+-
+-	if (session->watch != 0)
+-		return -EALREADY;
+-
+-	session->watch = g_dbus_add_disconnect_watch(session->conn, name, func,
+-							session, NULL);
+-	if (session->watch == 0)
+-		return -EINVAL;
+-
+-	session->owner = g_strdup(name);
+-
+-	return 0;
+-}
+-
+ const char *session_get_owner(struct session_data *session)
+ {
+ 	if (session == NULL)
 diff --git a/client/session.h b/client/session.h
-index eee439f..6f8a434 100644
+index 546849e..eee439f 100644
 --- a/client/session.h
 +++ b/client/session.h
-@@ -36,6 +36,7 @@ struct session_data {
- 	bdaddr_t src;
- 	bdaddr_t dst;
- 	uint8_t channel;
-+	char *service;		/* Service friendly name */
- 	const char *target;	/* OBEX Target UUID */
- 	int target_len;
- 	uuid_t uuid;		/* Bluetooth Service Class */
+@@ -56,9 +56,12 @@ typedef void (*session_callback_t) (struct session_data *session,
+ 					GError *err, void *user_data);
+ 
+ struct session_data *session_create(const char *source,
+-			const char *destination, const char *target,
+-			uint8_t channel, session_callback_t function,
+-			void *user_data);
++						const char *destination,
++						const char *service,
++						uint8_t channel,
++						const char *owner,
++						session_callback_t function,
++						void *user_data);
+ 
+ struct session_data *session_ref(struct session_data *session);
+ void session_unref(struct session_data *session);
 -- 
 1.7.1
 
