@@ -1,54 +1,187 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg KH <greg@kroah.com>
-Cc: Greg Kroah-Hartman <gregkh@suse.de>,
-	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Arnd Bergmann <arnd@arndb.de>, Vitaly Wool <vitalywool@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>, Lee Jones <lee.jones@linaro.org>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>
-Date: Mon, 9 May 2011 14:07:02 +0200
-Subject: RE: [PATCH v5] staging: Add ST-Ericsson CG2900 driver
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33959B23C3@EXDCVYMBSTM005.EQ1STM.local>
-References: <1303818021-24275-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <20110503174937.GA18622@kroah.com>
-In-Reply-To: <20110503174937.GA18622@kroah.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] client: add support for reusing session for the same client
+Date: Mon,  9 May 2011 11:21:38 +0300
+Message-Id: <1304929298-1586-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1304929298-1586-1-git-send-email-luiz.dentz@gmail.com>
+References: <1304929298-1586-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> From: Greg KH [mailto:greg@kroah.com]
-> Sent: den 3 maj 2011 19:50
->=20
-> What changed in this version?  It still doesn't apply properly to the
-> linux-next tree, which shows me that I don't think anything really
-> changed here.
->=20
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-What I changed from v4 was in particular to adapt to changes to mfd.
-The mfd device data name had been changed from platform_data (plus length)
-to mfd_data. This was modified cg2900_chip.c and stlc2690.c.
-In connection to this I also modified so we used the function mfd_get_data
-to retrieve the platform data.
-There had also been one parameter removed in the call to tty->ops->tiocmget
-so I had to modify the call in hci_ldisc as well.
+If the a client owning a session attempt to send a new file just reuse
+the same session instead of trying to connect again.
+---
+ client/session.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ client/session.h |    1 +
+ 2 files changed, 72 insertions(+), 3 deletions(-)
 
-> Can you rediff it so it properly applies (i.e. why are you adding your
-> driver to the middle of drivers/staging/Makefile and not at the end
-> which is where it properly belongs?) and resend it?
+diff --git a/client/session.c b/client/session.c
+index e8915cf..266d00c 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -87,6 +87,8 @@ struct agent_data {
+ 	struct pending_data *pending;
+ };
+ 
++static GSList *sessions = NULL;
++
+ static void session_prepare_put(struct session_data *session, GError *err,
+ 								void *data);
+ static void session_terminate_transfer(struct session_data *session,
+@@ -199,8 +201,11 @@ static void session_free(struct session_data *session)
+ 		dbus_connection_unref(session->conn);
+ 	}
+ 
++	sessions = g_slist_remove(sessions, session);
++
+ 	g_free(session->callback);
+ 	g_free(session->path);
++	g_free(session->service);
+ 	g_free(session->owner);
+ 	g_free(session);
+ }
+@@ -245,6 +250,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	session->obex = obex;
+ 
++	sessions = g_slist_prepend(sessions, session);
++
+ done:
+ 	callback->func(callback->session, err, callback->data);
+ 
+@@ -446,6 +453,19 @@ static sdp_session_t *service_connect(const bdaddr_t *src, const bdaddr_t *dst,
+ 	return sdp;
+ }
+ 
++static gboolean connection_complete(gpointer data)
++{
++	struct callback_data *cb = data;
++
++	cb->func(cb->session, 0, cb->data);
++
++	session_unref(cb->session);
++
++	g_free(cb);
++
++	return FALSE;
++}
++
+ static void owner_disconnected(DBusConnection *connection, void *user_data)
+ {
+ 	struct session_data *session = user_data;
+@@ -474,6 +494,43 @@ int session_set_owner(struct session_data *session, const char *name,
+ 	return 0;
+ }
+ 
++static struct session_data *session_find(const char *source,
++						const char *destination,
++						const char *service,
++						uint8_t channel,
++						const char *owner)
++{
++	GSList *l;
++
++	for (l = sessions; l; l = l->next) {
++		struct session_data *session = l->data;
++		bdaddr_t adr;
++
++		if (source) {
++			str2ba(source, &adr);
++			if (bacmp(&session->src, &adr))
++				continue;
++		}
++
++		str2ba(destination, &adr);
++		if (bacmp(&session->dst, &adr))
++			continue;
++
++		if (g_strcmp0(service, session->service))
++			continue;
++
++		if (channel && session->channel != channel)
++			continue;
++
++		if (g_strcmp0(owner, session->owner))
++			continue;
++
++		return session;
++	}
++
++	return NULL;
++}
++
+ struct session_data *session_create(const char *source,
+ 						const char *destination,
+ 						const char *service,
+@@ -489,6 +546,12 @@ struct session_data *session_create(const char *source,
+ 	if (destination == NULL)
+ 		return NULL;
+ 
++	session = session_find(source, destination, service, channel, owner);
++	if (session) {
++		session_ref(session);
++		goto proceed;
++	}
++
+ 	session = g_try_malloc0(sizeof(*session));
+ 	if (session == NULL)
+ 		return NULL;
+@@ -508,6 +571,7 @@ struct session_data *session_create(const char *source,
+ 		str2ba(source, &session->src);
+ 
+ 	str2ba(destination, &session->dst);
++	session->service = g_strdup(service);
+ 
+ 	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
+ 		sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
+@@ -529,9 +593,10 @@ struct session_data *session_create(const char *source,
+ 		return NULL;
+ 	}
+ 
++proceed:
+ 	callback = g_try_malloc0(sizeof(*callback));
+ 	if (callback == NULL) {
+-		session_free(session);
++		session_unref(session);
+ 		return NULL;
+ 	}
+ 
+@@ -539,7 +604,10 @@ struct session_data *session_create(const char *source,
+ 	callback->func = function;
+ 	callback->data = user_data;
+ 
+-	if (session->channel > 0) {
++	if (session->obex) {
++		g_idle_add(connection_complete, callback);
++		err = 0;
++	} else if (session->channel > 0) {
+ 		session->io = rfcomm_connect(&session->src, &session->dst,
+ 							session->channel,
+ 							rfcomm_callback,
+@@ -552,7 +620,7 @@ struct session_data *session_create(const char *source,
+ 	}
+ 
+ 	if (err < 0) {
+-		session_free(session);
++		session_unref(session);
+ 		g_free(callback);
+ 		return NULL;
+ 	}
+diff --git a/client/session.h b/client/session.h
+index eee439f..6f8a434 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -36,6 +36,7 @@ struct session_data {
+ 	bdaddr_t src;
+ 	bdaddr_t dst;
+ 	uint8_t channel;
++	char *service;		/* Service friendly name */
+ 	const char *target;	/* OBEX Target UUID */
+ 	int target_len;
+ 	uuid_t uuid;		/* Bluetooth Service Class */
+-- 
+1.7.1
 
-I will do another try, but I honestly do not know why it doesn't apply.
-The reason for the placement in the makefile I do not remember at the
-moment, probably just a simple mistake from my part. I agree that I
-should have placed it last in the file.
-
-Thanks,
-/P-G
