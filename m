@@ -2,58 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 Subject: Re: RFC: First pass at pretty hostname support
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Tue, 10 May 2011 19:20:42 +0100
-In-Reply-To: <1305047402.2427.77.camel@novo.hadess.net>
+Date: Tue, 10 May 2011 18:10:01 +0100
+In-Reply-To: <1304751384.2427.5.camel@novo.hadess.net>
 References: <1304701117.16101.40.camel@novo.hadess.net>
 	 <1304751384.2427.5.camel@novo.hadess.net>
-	 <1305047402.2427.77.camel@novo.hadess.net>
-Content-Type: multipart/mixed; boundary="=-XwRNG8JUl4asBDmaq3Sm"
-Message-ID: <1305051643.2427.82.camel@novo.hadess.net>
+Content-Type: multipart/mixed; boundary="=-n3v/m0TH6z/fJIxC0kK8"
+Message-ID: <1305047402.2427.77.camel@novo.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-XwRNG8JUl4asBDmaq3Sm
+--=-n3v/m0TH6z/fJIxC0kK8
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2011-05-10 at 18:10 +0100, Bastien Nocera wrote:
-> On Sat, 2011-05-07 at 07:56 +0100, Bastien Nocera wrote:
-> > On Fri, 2011-05-06 at 17:58 +0100, Bastien Nocera wrote:
-> > > Most of the details are in the patch.
-> > > 
-> > > I just wanted to mention that:
-> > > "Bastien's desktop": good
-> > > "novo-0": bad
-> > > 
-> > > Ideas on how to implement the TODO items would be appreciated. I'm
-> > > currently thinking that a plugin to monitor the pretty hostname would be
-> > > the cleaner way. It would even allow us to change the adapter name on
-> > > the fly if the hostname (rather than the pretty hostname) changed.
-> > > 
-> > > Cheers
+On Sat, 2011-05-07 at 07:56 +0100, Bastien Nocera wrote:
+> On Fri, 2011-05-06 at 17:58 +0100, Bastien Nocera wrote:
+> > Most of the details are in the patch.
 > > 
-> > And with the correct patch...
+> > I just wanted to mention that:
+> > "Bastien's desktop": good
+> > "novo-0": bad
+> > 
+> > Ideas on how to implement the TODO items would be appreciated. I'm
+> > currently thinking that a plugin to monitor the pretty hostname would be
+> > the cleaner way. It would even allow us to change the adapter name on
+> > the fly if the hostname (rather than the pretty hostname) changed.
+> > 
+> > Cheers
 > 
-> Another pass at it, moving all that code into a plugin (untested).
-> 
-> Things that still need working on:
-> - some sort of callback when the default adapter changes (I'd like the
-> unmodified pretty hostname to always be attached to the default adapter)
-> - updating the hostname when /etc/machine-info changes (or is removed,
-> etc.). Having to use raw inotify for this would be a pain though.
-> 
-> Comments?
+> And with the correct patch...
 
-And a patch with inotify support (easier than I remembered).
+Another pass at it, moving all that code into a plugin (untested).
 
-That leaves us with the problem of changing the name when the default
-adapter changes.
+Things that still need working on:
+- some sort of callback when the default adapter changes (I'd like the
+unmodified pretty hostname to always be attached to the default adapter)
+- updating the hostname when /etc/machine-info changes (or is removed,
+etc.). Having to use raw inotify for this would be a pain though.
+
+Comments?
 
 Cheers
 
---=-XwRNG8JUl4asBDmaq3Sm
+--=-n3v/m0TH6z/fJIxC0kK8
 Content-Disposition: attachment;
 	filename="0001-adaptername-Move-adapter-naming-into-a-plugin.patch"
 Content-Type: text/x-patch;
@@ -61,7 +54,7 @@ Content-Type: text/x-patch;
 	charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 588cb2f03e146970a647f28b1f1ca007cabfd099 Mon Sep 17 00:00:00 2001
+>From a23592fed14430483cccf6eca644da4486dffb0a Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
 Date: Tue, 10 May 2011 18:02:14 +0100
 Subject: [PATCH] adaptername: Move adapter naming into a plugin
@@ -78,14 +71,14 @@ has been set yet, the default from the main.conf will be used.
 
 TODO:
 * Changing the adapter name when the default changes
+* Monitoring /etc/machine-info to change an existing name
 ---
  Makefile.am           |    3 +
- configure.ac          |    3 +
- plugins/adaptername.c |  286 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c         |   66 -----------
+ plugins/adaptername.c |  200 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c         |   66 ----------------
  src/manager.c         |    5 +
  src/manager.h         |    1 +
- 6 files changed, 298 insertions(+), 66 deletions(-)
+ 5 files changed, 209 insertions(+), 66 deletions(-)
  create mode 100644 plugins/adaptername.c
 
 diff --git a/Makefile.am b/Makefile.am
@@ -102,26 +95,12 @@ index caffbe2..fe24883 100644
  if MAEMO6PLUGIN
  builtin_modules += maemo6
  builtin_sources += plugins/maemo6.c
-diff --git a/configure.ac b/configure.ac
-index 111ff01..4c6016a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -35,6 +35,9 @@ AC_FUNC_PPOLL
- AC_CHECK_LIB(dl, dlopen, dummy=yes,
- 			AC_MSG_ERROR(dynamic linking loader is required))
- 
-+AC_CHECK_HEADER([sys/inotify.h],
-+		[AC_DEFINE([HAVE_SYS_INOTIFY_H], 1,
-+			   [Define to 1 if you have <sys/inotify.h>.])])
- AC_PATH_DBUS
- AC_PATH_GLIB
- AC_PATH_ALSA
 diff --git a/plugins/adaptername.c b/plugins/adaptername.c
 new file mode 100644
-index 0000000..9df4903
+index 0000000..8696c5a
 --- /dev/null
 +++ b/plugins/adaptername.c
-@@ -0,0 +1,286 @@
+@@ -0,0 +1,200 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -150,7 +129,6 @@ index 0000000..9df4903
 +#endif
 +
 +#include <stdlib.h>
-+#include <unistd.h>
 +#include <errno.h>
 +
 +#include <glib.h>
@@ -164,20 +142,6 @@ index 0000000..9df4903
 +#include "storage.h"
 +#include "log.h"
 +
-+#ifdef HAVE_SYS_INOTIFY_H
-+#include <sys/inotify.h>
-+#define EVENT_SIZE  (sizeof (struct inotify_event))
-+#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
-+#endif
-+
-+#define MACHINE_INFO_DIR "/etc/"
-+#define MACHINE_INFO_FILE "machine-info"
-+
-+#ifdef HAVE_SYS_INOTIFY_H
-+static GIOChannel *inotify = NULL;
-+static int watch_fd = -1;
-+#endif
-+
 +/* This file is part of systemd's hostnamed functionality:
 + * http://0pointer.de/public/systemd-man/machine-info.html
 + * http://www.freedesktop.org/wiki/Software/systemd/hostnamed
@@ -190,7 +154,7 @@ index 0000000..9df4903
 +
 +	ret = NULL;
 +
-+	if (g_file_get_contents(MACHINE_INFO_DIR MACHINE_INFO_FILE,
++	if (g_file_get_contents("/etc/machine-info",
 +			&contents, NULL, NULL) == FALSE) {
 +		return NULL;
 +	}
@@ -315,52 +279,8 @@ index 0000000..9df4903
 +	return 0;
 +}
 +
-+static gboolean handle_inotify_cb(GIOChannel *channel,
-+		GIOCondition condition, gpointer data)
-+{
-+	char buf[EVENT_BUF_LEN];
-+	GIOError err;
-+	gsize len, i;
-+	gboolean changed;
-+
-+	changed = FALSE;
-+
-+	err = g_io_channel_read_chars (channel, buf, EVENT_BUF_LEN, &len, NULL);
-+	if (err != G_IO_ERROR_NONE) {
-+		error ("Error reading inotify event: %d\n", err);
-+		return FALSE;
-+	}
-+
-+	i = 0;
-+	while (i < len) {
-+		struct inotify_event *pevent = (struct inotify_event *) & buf[i];
-+
-+		/* check that it's ours */
-+		if (pevent->len &&
-+		    pevent->name != NULL &&
-+		    strcmp(pevent->name, MACHINE_INFO_FILE) == 0) {
-+			changed = TRUE;
-+		}
-+		i += EVENT_SIZE + pevent->len;
-+	}
-+
-+	if (changed != FALSE) {
-+		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
-+				" changed, changing names for adapters");
-+		//FIXME
-+	}
-+
-+	return TRUE;
-+}
-+
 +static void adaptername_remove(struct btd_adapter *adapter)
 +{
-+#ifdef HAVE_SYS_INOTIFY_H
-+	if (inotify != NULL)
-+		g_io_channel_shutdown (inotify, FALSE, NULL);
-+	if (watch_fd >= 0)
-+		close (watch_fd);
-+#endif /* HAVE_SYS_INOTIFY_H */
 +}
 +
 +static struct btd_adapter_driver adaptername_driver = {
@@ -371,34 +291,7 @@ index 0000000..9df4903
 +
 +static int adaptername_init(void)
 +{
-+	int ret;
-+
-+	ret = btd_register_adapter_driver(&adaptername_driver);
-+#ifdef HAVE_SYS_INOTIFY_H
-+	if (ret == 0) {
-+		int inot_fd;
-+
-+		inot_fd = inotify_init();
-+		if (inot_fd < 0) {
-+			error("Failed to setup inotify");
-+			return 0;
-+		}
-+		watch_fd = inotify_add_watch (inot_fd,
-+				MACHINE_INFO_DIR,
-+				IN_CLOSE_WRITE & IN_DELETE & IN_CREATE);
-+		if (watch_fd < 0) {
-+			error("Failed to setup watch for '%s'",
-+					MACHINE_INFO_DIR);
-+			return 0;
-+		}
-+
-+		inotify = g_io_channel_unix_new (inot_fd);
-+		g_io_add_watch(inotify, G_IO_IN, handle_inotify_cb, NULL);
-+
-+		return 0;
-+	}
-+#endif /* HAVE_SYS_INOTIFY_H */
-+	return ret;
++	return btd_register_adapter_driver(&adaptername_driver);
 +}
 +
 +static void adaptername_exit(void)
@@ -521,5 +414,5 @@ index 05c38b3..90d3690 100644
 1.7.5.1
 
 
---=-XwRNG8JUl4asBDmaq3Sm--
+--=-n3v/m0TH6z/fJIxC0kK8--
 
