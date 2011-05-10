@@ -1,96 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg Kroah-Hartman <gregkh@suse.de>,
-	<devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>
-Cc: <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus Walleij <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
-Subject: [PATCH v6] Add ST-Ericsson CG2900 driver
-Date: Tue, 10 May 2011 17:10:15 +0200
-Message-ID: <1305040215-712-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+Date: Tue, 10 May 2011 11:56:24 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix starting security procedures when not needed
+Message-ID: <20110510145624.GA6502@piper>
+References: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
+ <BANLkTinX+8SXu+6jg5v4vHjde1fOWP2_cw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTinX+8SXu+6jg5v4vHjde1fOWP2_cw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a driver for the ST-Ericsson CG2900 connectivity controller.
-It has earlier been tried to add this driver to the mfd and bluetooth areas,
-but due to continued discussions the driver is placed into staging for the moment.
+Hi Luiz,
 
-Patch created on next-20110510.
+On 13:21 Tue 10 May, Luiz Augusto von Dentz wrote:
+> Hi Vinicius,
+> 
+> On Tue, May 10, 2011 at 2:49 AM, Vinicius Costa Gomes
+> <vinicius.gomes@openbossa.org> wrote:
+> > The default value of sec_level when setting *any* option
+> > using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
+> > the security procedure being started in some situations that
+> > it should not.
+> > ---
+> >  btio/btio.c |    1 -
+> >  1 files changed, 0 insertions(+), 1 deletions(-)
+> >
+> > diff --git a/btio/btio.c b/btio/btio.c
+> > index a3cf38a..df028a6 100644
+> > --- a/btio/btio.c
+> > +++ b/btio/btio.c
+> > @@ -659,7 +659,6 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+> >        /* Set defaults */
+> >        opts->defer = DEFAULT_DEFER_TIMEOUT;
+> >        opts->master = -1;
+> > -       opts->sec_level = BT_IO_SEC_MEDIUM;
+> >        opts->mode = L2CAP_MODE_BASIC;
+> >        opts->flushable = -1;
+> 
+> I believe this was on purpose so that if you want another security
+> level you need to force it when using BtIO, this could be set in the
+> kernel by default but since it already uses LOW that could break some
+> applications.
 
-Compared to v5 this patch has the following update:
- - Updated driver after changes to MFD interfaces in linux-next (from mfd_data
-   to platform_data).
- - Changed platform specific file dependencies (included correct nomadik file).
+If this was by design, I would gladly have my first patch applied.
 
-Par-Gunnar Hjalmdahl (1):
-  staging: Add ST-Ericsson CG2900 driver
+It is just that it is weird that I have to pass the security level on
+every call to bt_io_set() if I don't want the security level to change.
 
- drivers/staging/Kconfig                          |    2 +
- drivers/staging/Makefile                         |    1 +
- drivers/staging/cg2900/Kconfig                   |   70 +
- drivers/staging/cg2900/Makefile                  |   12 +
- drivers/staging/cg2900/TODO                      |   23 +
- drivers/staging/cg2900/bluetooth/Makefile        |    9 +
- drivers/staging/cg2900/bluetooth/btcg2900.c      | 1209 ++++++++
- drivers/staging/cg2900/bluetooth/cg2900_uart.c   | 2074 +++++++++++++
- drivers/staging/cg2900/bluetooth/hci_ldisc.c     |  657 ++++
- drivers/staging/cg2900/bluetooth/hci_uart.h      |  105 +
- drivers/staging/cg2900/board-mop500-cg2900.c     |  202 ++
- drivers/staging/cg2900/devices-cg2900.c          |  342 +++
- drivers/staging/cg2900/devices-cg2900.h          |   31 +
- drivers/staging/cg2900/include/cg2900.h          |  278 ++
- drivers/staging/cg2900/include/cg2900_audio.h    |  473 +++
- drivers/staging/cg2900/include/cg2900_hci.h      |   19 +
- drivers/staging/cg2900/mfd/Makefile              |   18 +
- drivers/staging/cg2900/mfd/cg2900_audio.c        | 3462 ++++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_char_devices.c |  707 +++++
- drivers/staging/cg2900/mfd/cg2900_chip.c         | 3415 +++++++++++++++++++++
- drivers/staging/cg2900/mfd/cg2900_chip.h         |  613 ++++
- drivers/staging/cg2900/mfd/cg2900_core.c         |  713 +++++
- drivers/staging/cg2900/mfd/cg2900_core.h         |   51 +
- drivers/staging/cg2900/mfd/cg2900_lib.c          |  281 ++
- drivers/staging/cg2900/mfd/cg2900_lib.h          |   61 +
- drivers/staging/cg2900/mfd/cg2900_test.c         |  402 +++
- drivers/staging/cg2900/mfd/stlc2690_chip.c       | 1653 +++++++++++
- drivers/staging/cg2900/mfd/stlc2690_chip.h       |   47 +
- 28 files changed, 16930 insertions(+), 0 deletions(-)
- create mode 100644 drivers/staging/cg2900/Kconfig
- create mode 100644 drivers/staging/cg2900/Makefile
- create mode 100644 drivers/staging/cg2900/TODO
- create mode 100644 drivers/staging/cg2900/bluetooth/Makefile
- create mode 100644 drivers/staging/cg2900/bluetooth/btcg2900.c
- create mode 100644 drivers/staging/cg2900/bluetooth/cg2900_uart.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_ldisc.c
- create mode 100644 drivers/staging/cg2900/bluetooth/hci_uart.h
- create mode 100644 drivers/staging/cg2900/board-mop500-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.c
- create mode 100644 drivers/staging/cg2900/devices-cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_audio.h
- create mode 100644 drivers/staging/cg2900/include/cg2900_hci.h
- create mode 100644 drivers/staging/cg2900/mfd/Makefile
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_audio.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_char_devices.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_chip.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_core.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.c
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_lib.h
- create mode 100644 drivers/staging/cg2900/mfd/cg2900_test.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.c
- create mode 100644 drivers/staging/cg2900/mfd/stlc2690_chip.h
+In any case, while writing this email, I realized that only checking
+all bt_io_set() calls wasn't enough, so this patch may be incomplete.
+All bt_io_listen() users should be safe, but there are some callers
+of bt_io_connect() that may depend on BtIO setting the default
+security level to MEDIUM.
 
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
+> Computer Engineer
+
+
+Cheers,
 -- 
-1.7.4.3
+Vinicius
