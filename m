@@ -1,257 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v2] Adjust SPARQL queries to the changes in call history
-Date: Tue, 10 May 2011 13:09:41 +0200
-Message-Id: <1305025781-21893-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1305017315-30927-1-git-send-email-lkslawek@gmail.com>
-References: <1305017315-30927-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Tue, 10 May 2011 13:21:08 +0300
+Message-ID: <BANLkTinX+8SXu+6jg5v4vHjde1fOWP2_cw@mail.gmail.com>
+Subject: Re: [PATCH] Fix starting security procedures when not needed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently nmo:Call resources put to the Tracker by commhistory do not use
-the same nco:PhoneNumber as the one bound to the nco:PersonContact. This
-patch introduces matching contacts by actual phone number, thus returning
-proper contact data regardless of this commhistory change.
----
-In the previous version backslashes at the ends of lines were incorrectly
-aligned.
- plugins/phonebook-tracker.c |   74 ++++++++++++++++++++++++++++++------------
- 1 files changed, 53 insertions(+), 21 deletions(-)
+Hi Vinicius,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d72c04e..9431d8a 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -231,7 +231,7 @@
- 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
--	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_ncontact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_ncontact ; "					\
- 	"nmo:isAnswered false ;"					\
-@@ -239,9 +239,11 @@
- 	"?_contact a nco:PersonContact . "				\
- 	"?_contact nco:hasAffiliation ?_role . "			\
- 	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
-+	"?_number maemo:localPhoneNumber ?_realnum . "			\
- "} UNION { "								\
- 	"?_unb_contact a nco:Contact . "				\
--	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_unb_contact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_unb_contact ; "					\
- 	"nmo:isAnswered false ;"					\
-@@ -250,7 +252,9 @@
- 	"nco:hasPhoneNumber ?_number . } "				\
- 	"OPTIONAL {?_contact a nco:PersonContact ; "			\
- 	"nco:hasAffiliation ?_role . "					\
--	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
-+	"?_number maemo:localPhoneNumber ?_realnum . }"			\
- 	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
- "} "									\
- "} "									\
-@@ -288,7 +292,9 @@
- 		"nmo:isAnswered false ."				\
- 		"?c a nco:PersonContact . "				\
- 		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?h . "				\
-+		"?a nco:hasPhoneNumber ?no . "				\
-+		"?h maemo:localPhoneNumber ?num . "			\
-+		"?no maemo:localPhoneNumber ?num . "			\
- 	"} "								\
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
-@@ -368,7 +374,7 @@
- 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
--	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_ncontact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_ncontact ; "					\
- 	"nmo:isAnswered true ;"						\
-@@ -376,9 +382,11 @@
- 	"?_contact a nco:PersonContact . "				\
- 	"?_contact nco:hasAffiliation ?_role . "			\
- 	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_number maemo:localPhoneNumber ?_realnum . "			\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
- "} UNION { "								\
- 	"?_unb_contact a nco:Contact . "				\
--	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_unb_contact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_unb_contact ; "					\
- 	"nmo:isAnswered true ;"						\
-@@ -387,7 +395,9 @@
- 	"nco:hasPhoneNumber ?_number . } "				\
- 	"OPTIONAL {?_contact a nco:PersonContact ; "			\
- 	"nco:hasAffiliation ?_role . "					\
--	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_number maemo:localPhoneNumber ?_realnum ."			\
-+	"?_other maemo:localPhoneNumber ?_realnum . }"			\
- 	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
- "} "									\
- "} "\
-@@ -424,7 +434,9 @@
- 		"nmo:isAnswered true ."					\
- 		"?c a nco:PersonContact . "				\
- 		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?h . "				\
-+		"?a nco:hasPhoneNumber ?no . "				\
-+		"?h maemo:localPhoneNumber ?num . "			\
-+		"?no maemo:localPhoneNumber ?num . "			\
- 	"}"								\
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
-@@ -503,16 +515,18 @@
- 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
--	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_ncontact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:to ?_ncontact ; "						\
- 	"nmo:isSent true . "						\
- 	"?_contact a nco:PersonContact . "				\
- 	"?_contact nco:hasAffiliation ?_role . "			\
- 	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
-+	"?_number maemo:localPhoneNumber ?_realnum . "			\
- "} UNION { "								\
- 	"?_unb_contact a nco:Contact . "				\
--	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_unb_contact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:to ?_unb_contact ; "					\
- 	"nmo:isSent true . "						\
-@@ -520,7 +534,9 @@
- 	"nco:hasPhoneNumber ?_number . } "				\
- 	"OPTIONAL {?_contact a nco:PersonContact ; "			\
- 	"nco:hasAffiliation ?_role . "					\
--	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum ."			\
-+	"?_number maemo:localPhoneNumber ?_realnum . }"			\
- 	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
- "} "									\
- "} "									\
-@@ -554,7 +570,9 @@
- 		"nmo:isSent true . "					\
- 		"?c a nco:PersonContact . "				\
- 		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?h . "				\
-+		"?a nco:hasPhoneNumber ?no . "				\
-+		"?h maemo:localPhoneNumber ?num . "			\
-+		"?no maemo:localPhoneNumber ?num . "			\
- 	"}"								\
- 	"} GROUP BY ?call ORDER BY DESC(nmo:sentDate(?call))"
- 
-@@ -633,16 +651,18 @@
- 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
--	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_ncontact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:to ?_ncontact ; "						\
- 	"nmo:isSent true . "						\
- 	"?_contact a nco:PersonContact . "				\
- 	"?_contact nco:hasAffiliation ?_role . "			\
- 	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
-+	"?_number maemo:localPhoneNumber ?_realnum . "			\
- "} UNION { "								\
- 	"?_unb_contact a nco:Contact . "				\
--	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_unb_contact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:to ?_unb_contact ; "					\
- 	"nmo:isSent true . "						\
-@@ -650,7 +670,9 @@
- 	"nco:hasPhoneNumber ?_number . } "				\
- 	"OPTIONAL {?_contact a nco:PersonContact ; "			\
- 	"nco:hasAffiliation ?_role . "					\
--	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum ."			\
-+	"?_number maemo:localPhoneNumber ?_realnum . }"			\
- 	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
-@@ -663,16 +685,18 @@
- 	"OPTIONAL { ?_contact nco:hasAffiliation ?_role .} "		\
- "} UNION { "								\
- 	"?_ncontact a nco:Contact . "					\
--	"?_ncontact nco:hasPhoneNumber ?_number . "			\
-+	"?_ncontact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_ncontact ; "					\
- 	"nmo:isSent false . "						\
- 	"?_contact a nco:PersonContact . "				\
- 	"?_contact nco:hasAffiliation ?_role . "			\
- 	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum . "			\
-+	"?_number maemo:localPhoneNumber ?_realnum . "			\
- "} UNION { "								\
- 	"?_unb_contact a nco:Contact . "				\
--	"?_unb_contact nco:hasPhoneNumber ?_number . "			\
-+	"?_unb_contact nco:hasPhoneNumber ?_other . "			\
- 	"?_call a nmo:Call ; "						\
- 	"nmo:from ?_unb_contact ; "					\
- 	"nmo:isSent false . "						\
-@@ -680,7 +704,9 @@
- 	"nco:hasPhoneNumber ?_number . } "				\
- 	"OPTIONAL {?_contact a nco:PersonContact ; "			\
- 	"nco:hasAffiliation ?_role . "					\
--	"?_role nco:hasPhoneNumber ?_number. } "			\
-+	"?_role nco:hasPhoneNumber ?_number . "				\
-+	"?_other maemo:localPhoneNumber ?_realnum ."			\
-+	"?_number maemo:localPhoneNumber ?_realnum . }"			\
- 	"FILTER ( !bound(?_contact) && !bound(?_role) ) "		\
- "} "									\
- "} "									\
-@@ -713,7 +739,9 @@
- 			"nmo:isSent true . "				\
- 			"?c a nco:PersonContact . "			\
- 			"?c nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?h . "			\
-+			"?a nco:hasPhoneNumber ?no . "			\
-+			"?h maemo:localPhoneNumber ?num . "		\
-+			"?no maemo:localPhoneNumber ?num . "		\
- 		"}UNION {"						\
- 			"?c a nco:Contact . "				\
- 			"?c nco:hasPhoneNumber ?h . "			\
-@@ -736,7 +764,9 @@
- 			"nmo:isSent false . "				\
- 			"?c a nco:PersonContact . "			\
- 			"?c nco:hasAffiliation ?a . "			\
--			"?a nco:hasPhoneNumber ?h . "			\
-+			"?a nco:hasPhoneNumber ?no . "			\
-+			"?h maemo:localPhoneNumber ?num . "		\
-+			"?no maemo:localPhoneNumber ?num . "		\
- 		"}"							\
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call))"
- 
-@@ -887,7 +917,9 @@
- 		"nmo:isAnswered false ."				\
- 		"?c a nco:PersonContact . "				\
- 		"?c nco:hasAffiliation ?a . "				\
--		"?a nco:hasPhoneNumber ?h . "				\
-+		"?a nco:hasPhoneNumber ?no . "				\
-+		"?h maemo:localPhoneNumber ?num . "			\
-+		"?no maemo:localPhoneNumber ?num . "			\
- 	"} "								\
- 	"} GROUP BY ?call ORDER BY DESC(nmo:receivedDate(?call)) "	\
- 	"LIMIT 40"
+On Tue, May 10, 2011 at 2:49 AM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> The default value of sec_level when setting *any* option
+> using bt_io_set() was BT_SECURITY_MEDIUM. This was causing
+> the security procedure being started in some situations that
+> it should not.
+> ---
+>  btio/btio.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+>
+> diff --git a/btio/btio.c b/btio/btio.c
+> index a3cf38a..df028a6 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -659,7 +659,6 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+>        /* Set defaults */
+>        opts->defer = DEFAULT_DEFER_TIMEOUT;
+>        opts->master = -1;
+> -       opts->sec_level = BT_IO_SEC_MEDIUM;
+>        opts->mode = L2CAP_MODE_BASIC;
+>        opts->flushable = -1;
+
+I believe this was on purpose so that if you want another security
+level you need to force it when using BtIO, this could be set in the
+kernel by default but since it already uses LOW that could break some
+applications.
+
+
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
+Computer Engineer
