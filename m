@@ -1,80 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 May 2011 06:48:59 -0700
-From: Greg KH <greg@kroah.com>
-To: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
-Cc: Greg Kroah-Hartman <gregkh@suse.de>,
-	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Pavan Savoy <pavan_savoy@sify.com>,
-	Vitaly Wool <vitalywool@gmail.com>,
-	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
-	Lee Jones <lee.jones@linaro.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
-Message-ID: <20110511134859.GB12717@kroah.com>
-References: <1305040232-750-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
- <20110510200801.GA8125@kroah.com>
- <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
+	Johan Hedberg <johan.hedberg@nokia.com>
+Date: Wed, 11 May 2011 13:22:15 +0200
+Subject: RE: Read RSSI through Management Interface?
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A48E@EXDCVYMBSTM005.EQ1STM.local>
+References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
+	<20110421011852.GB9392@joana>
+ <BANLkTik3CkS4OM9ycDQ-_gs5UE0Pu0jo7A@mail.gmail.com>
+In-Reply-To: <BANLkTik3CkS4OM9ycDQ-_gs5UE0Pu0jo7A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 11, 2011 at 10:34:47AM +0200, Par-Gunnar HJALMDAHL wrote:
-> > -----Original Message-----
-> > From: Greg KH [mailto:greg@kroah.com]
-> > Sent: den 10 maj 2011 22:08
-> > 
-> > {sigh}
-> > 
-> > This breaks the build again, the error messages are below :(
-> > 
-> > I'm about to give up here, so the next time you send this patch in, I
-> > want some kind of proof that the code will at least build properly.
-> > 
-> > How you provide this is up to you.
-> > 
-> > Oh, and if the next one breaks stuff again, you will owe me a lot of
-> > beer, although I think you owe me already...
-> > 
-> > thanks,
-> > 
-> > greg k-h
-> > 
-> >   CC [M]  drivers/staging/cg2900/mfd/cg2900_chip.o
-> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: unknown field
-> > ‘platform_data’ specified in initializer
-> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: warning:
-> > initialization makes integer from pointer without a cast
-> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: initializer
-> > element is not computable at load time
-> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: (near
-> > initialization for ‘cg2900_devs[0].id’)
-> 
-> Hi Greg,
-> 
-> What linux-next tag did you base the patch on?
-
-My staging git tree.  I can't apply to linux-next, only my tree,
-linux-next then picks it up.
-
-> I used next-20110510 and in that tag the file include/Linux/mfd/core.h
-> The struct mfd_cell has a parameter called platform_data, while in your
-> build it seems it doesn't.
-> This was changed very recently in the core.h file (on April 6).
-> So for core.h the last commit ID I have in the tag I built upon is
-> 558aa9c0d620b91a896d5e39ce8a570bed65589b.
-
-So do I need that patch on the staging-next tree also?
-
-Or is it an issue of building this on x86-64...
-
-thanks,
-
-greg k-h
+SGkgQ2xhdWRpbywgR3VzdGF2bywNCg0KPj4+IDEuIEFkZCBhIG5ldyBjb21tYW5kIHRvDQo+bWdt
+dCBpbnRlcmZhY2UgdG8gYWRkIGENCj5naXZlbiBhZGRyZXNzIGludG8gYQ0KPj4+IFJTU0kgIm1v
+bml0b3JpbmcgbGlzdCIuDQo+Pj4gwqAgwqBXaGVuIHRoZSBjb25uZWN0aW9uIGlzDQo+ZXN0YWJs
+aXNoZWQgdGhlIGtlcm5lbCB3aWxsDQo+YXV0b21hdGljYWxseQ0KPj4+IHRyYWNrIHRoZSBSU1NJ
+IG9mIHRoZQ0KPmNvbm5lY3Rpb24gb24gcmVndWxhcg0KPmludGVydmFscyBzZW5kaW5nDQo+Pj4g
+SENJX1JlYWRfUlNTSS4gUmVhZCBSU1NJDQo+dmFsdWUgY2FuIGJlIHJlcG9ydGVkDQo+dGhyb3Vn
+aCBhIG5ldyBldmVudCBpbg0KPj4+IHRoZSBtYW5hZ2VtZW50IGludGVyZmFjZQ0KPj4+DQo+Pj4g
+Rm9yZ2V0dGluZyBTTVAsIHdlIGNhbg0KPmtlZXAgdGhlIGhjaW9wcw0KPmNvbXBhdGliaWxpdHkg
+aW1wbGVtZW50aW5nDQo+dGhlDQo+Pj4gc2FtZSBsb2dpYyBpbnNpZGUgdGhlDQo+aGNpb3BzIHBs
+dWdpbi4NCj4+DQo+PiBJJ20gYWdhaW5zdCB0aGlzIGluDQo+aGNpb3BzLiBMZXQncyBhZGQgdGhl
+IG5ldw0KPmZlYXR1cmVzIG9ubHkgdG8gbWdtdG9wdHMsDQo+c28gd2UNCj4+IGZvcmNlIHBlb3Bs
+ZSB0byB1c2UgaXQgYW5kDQo+ZGVwcmVjYXRlIGhjaW9wcy4NCj4NCj5XZSBuZWVkIHRvIGtlZXAg
+Ym90aA0KPiJpbnRlcmZhY2VzIiB3b3JraW5nLCB0aGUNCj5zYW1lIHdheSB0aGF0IHdlIGFyZQ0K
+PnRyeWluZyB0byBkbyBmb3IgZGlzY292ZXJ5Lg0KPldoZW4gaGNpb3BzIHdpbGwgYmUgcmVtb3Zl
+ZD8NCg0KW0FydW5dIFNpbmNlIG1hbnkgTEUgcHJvZmlsZXMgcmVxdWlyZSBTTVAgcHJvY2VkdXJl
+cywgaXQgd291bGQgYmUgaW1wcnVkZW50IHRvIGtlZXAgInJzc2kiIHN1cHBvcnQgb24gYm90aCBp
+bnRlcmZhY2VzPyBVbmxlc3Mgb2YgY291cnNlIHdlIGFyZSBsb29raW5nIGF0IHByb2ZpbGVzIHRo
+YXQgd291bGQgbmV2ZXIgbmVlZCBhbnkgTEUgc2VjdXJpdHkgaW1wbGVtZW50YXRpb24gd2hpY2gg
+d291bGQgbGVhZCBoYWxmIG9mIHRoZSBwcm9maWxlIGltcGxlbWVudG9ycyB1c2luZyBoY2lvcHMg
+YW5kIHJlbWFpbmluZyBtZ210LCBtYWtpbmcgcGhhc2luZyBvdXQgb2YgaGNpb3BzIGFsbCB0aGUg
+bW9yZSBkaWZmaWN1bHQuDQpMRSBhbmQgcHJvZmlsZSBzdXBwb3J0IHNob3VsZCBmaW5hbGx5IGN1
+bGltaW5hdGUgdG8gbWdtdCBpL2YgZWxzZSB3ZSB3b3VsZCBjbHV0dGVyIHByb2ZpbGUgc3VwcG9y
+dCBhbGwgb3ZlciB0aGUgdXNlciBzcGFjZS4gaGNpb3BzIHNob3VsZCBldmVudHVhbGx5IHNsaXAg
+dG8gb2JsaXZpb24gc29tZWRheS0NCg0KPj4+IDIuIEFkZCBhIG5ldyBjb21tYW5kIHRvDQo+bWdt
+dCBpbnRlcmZhY2UgdG8gYWN0aXZlbHkNCj5yZWFkIHRoZSBSU1NJIG9mIGENCj4+PiBnaXZlbiBj
+b25uZWN0aW9uL2FkZHJlc3MNCj4+DQo+PiBJZiB0aGUgdXNlciB1c2UgdGhpcyBpbg0KPnRoZSB3
+cm9uZyB3YXkgaXQgd2lsbCB3YXN0ZQ0KPnBvd2VyLiBMZXQncw0KPj4gZG8gKDEpIGFuZCBub3Qg
+Z2l2ZSBoaW0NCj50aGlzIG9wdGlvbiB0byBhY3RpdmVseSByZWFkDQo+UlNTSS4NCj4+DQpbQXJ1
+bl0gU2luY2UgdGhlIG9udXMgb2YgY2FsY3VsYXRpbmcgcGF0aC1sb3NzIGlzIGVudGlyZWx5IG9u
+IHRoZSBwcm94aW1pdHkgbW9uaXRvciBha2EgYXBwbGljYXRpb24sIGl0IHNob3VsZCBiZSByZWxp
+ZWQgYXMgc2FuZSBlbm91Z2ggdG8ga25vdyBob3cgdG8gdXNlIHRoaXMgY29tbWFuZC4gTW9yZW92
+ZXIsIGlmIHdlIGltcGxlbWVudCAoMSkgdGhlbiB3ZSBtYXkgaGF2ZSB0byBnaXZlIGFuIG9wdGlv
+biB0byB1c2VyL3Byb2ZpbGUgbW9uaXRvciB0byBhbHNvIGNvbmZpZnVyZSB0aGUgcnNzaSBtb25p
+dG9yaW5nIGludGVydmFscyB3aGljaCB3b3VsZCBtYWtlIHRoaXMgc3R1ZmYgb3Zlcmx5IGNvbXBs
+aWNhdGVkLiAoMikgc291bmRzIHNhZmUuDQoNCg0KVGhhbmtzLA0KQXJ1bg0K
