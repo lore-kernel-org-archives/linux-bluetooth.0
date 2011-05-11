@@ -1,41 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 May 2011 13:47:36 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Eponymous - <the.epon@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: HCI data payload not getting through when using BlueZ
-Message-ID: <20110511164736.GA22065@joana>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+Date: Wed, 11 May 2011 07:54:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix starting security procedures when not needed
+Message-ID: <20110511045412.GA4511@ideapad.Elisa>
+References: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
+ <BANLkTinX+8SXu+6jg5v4vHjde1fOWP2_cw@mail.gmail.com>
+ <20110510145624.GA6502@piper>
+ <BANLkTimFhnHyyJvSE+9wQB+NAS=GppzaZg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+In-Reply-To: <BANLkTimFhnHyyJvSE+9wQB+NAS=GppzaZg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Eponymous - <the.epon@gmail.com> [2011-05-11 09:52:28 +0100]:
+Hi Luiz & Vinicius,
 
-> Hi,
+> > In any case, while writing this email, I realized that only checking
+> > all bt_io_set() calls wasn't enough, so this patch may be incomplete.
+> > All bt_io_listen() users should be safe, but there are some callers
+> > of bt_io_connect() that may depend on BtIO setting the default
+> > security level to MEDIUM.
 > 
-> I've ran into an issue where data doesn't seem to be received by a slave device.
-> 
-> I do the following:
-> 
-> Using Gentoo Linux (2.6.34-gentoo-r1)
-> Using BlueZ 4.81
-> 
-> 1. Use BlueZ to connect to two Bluetooth devices using HCI only. This
-> is over USB.
-> 
-> 2. I set one device as a slave and then create a connection between
-> the two. This completes sucessfully and can be seen on both sides.
-> 
-> 3. I then try to send an acl packet with the word "hi" in it and it is
-> not received on the other side.
+> Exactly, so if you really want to use kernel default you will have to
+> change all of those, but I don't thing we use any other security level
+> more than medium, then it would better not to change it.
 
-There a utility called l2test in the bluez sources. Check if it works for you.
-Using -r in one side to listen and -s in the other side to send data. Or
-l2test -h and see all options.
+The problem is that the same function is used within btio.c for parsing
+options, no matter if they're from _set, _connect or _listen. Having an
+default to MEDIUM within btio.c means that we don't know when a
+bt_io_set caller *doesn't* want to modify the existing security level.
+(something the commit message should explain more clearly, btw). So I do
+think we need to remove this default from btio.c and have all users set
+it explicitly when needed (I could find 2 or 3 places missing it under
+audio/ but there could be more). A simple "git grep BT_IO_OPT_" gives a
+pretty good overview. Just look for places that give a PSM or RFCOMM
+channel but no SEC_LEVEL.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Johan
