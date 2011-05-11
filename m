@@ -1,42 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 May 2011 07:54:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix starting security procedures when not needed
-Message-ID: <20110511045412.GA4511@ideapad.Elisa>
-References: <1304984994-14114-1-git-send-email-vinicius.gomes@openbossa.org>
- <BANLkTinX+8SXu+6jg5v4vHjde1fOWP2_cw@mail.gmail.com>
- <20110510145624.GA6502@piper>
- <BANLkTimFhnHyyJvSE+9wQB+NAS=GppzaZg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTimFhnHyyJvSE+9wQB+NAS=GppzaZg@mail.gmail.com>
+Date: Wed, 11 May 2011 09:52:28 +0100
+Message-ID: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+Subject: HCI data payload not getting through when using BlueZ
+From: Eponymous - <the.epon@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=000e0ce02aaa3a96a204a2fc310b
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz & Vinicius,
+--000e0ce02aaa3a96a204a2fc310b
+Content-Type: text/plain; charset=ISO-8859-1
 
-> > In any case, while writing this email, I realized that only checking
-> > all bt_io_set() calls wasn't enough, so this patch may be incomplete.
-> > All bt_io_listen() users should be safe, but there are some callers
-> > of bt_io_connect() that may depend on BtIO setting the default
-> > security level to MEDIUM.
-> 
-> Exactly, so if you really want to use kernel default you will have to
-> change all of those, but I don't thing we use any other security level
-> more than medium, then it would better not to change it.
+Hi,
 
-The problem is that the same function is used within btio.c for parsing
-options, no matter if they're from _set, _connect or _listen. Having an
-default to MEDIUM within btio.c means that we don't know when a
-bt_io_set caller *doesn't* want to modify the existing security level.
-(something the commit message should explain more clearly, btw). So I do
-think we need to remove this default from btio.c and have all users set
-it explicitly when needed (I could find 2 or 3 places missing it under
-audio/ but there could be more). A simple "git grep BT_IO_OPT_" gives a
-pretty good overview. Just look for places that give a PSM or RFCOMM
-channel but no SEC_LEVEL.
+I've ran into an issue where data doesn't seem to be received by a slave device.
 
-Johan
+I do the following:
+
+Using Gentoo Linux (2.6.34-gentoo-r1)
+Using BlueZ 4.81
+
+1. Use BlueZ to connect to two Bluetooth devices using HCI only. This
+is over USB.
+
+2. I set one device as a slave and then create a connection between
+the two. This completes sucessfully and can be seen on both sides.
+
+3. I then try to send an acl packet with the word "hi" in it and it is
+not received on the other side.
+
+--------
+
+Doing the same thing above but:
+
+Using Fedora Core 5 (2.6.20-1.2320.fc5)
+And:
+bluez-libs-2.25-1
+bluez-pin-0.30-2
+bluez-utils-2.25-4
+bluez-libs-devel-2.25-1
+bluez-hcidump-1.30-1
+
+and using the same hardware - the problem doesn't happen.
+
+I have attached two HCI dumps, one of the Master device and one of the Slave.
+
+Thanks for any help you can give.
+
+--000e0ce02aaa3a96a204a2fc310b
+Content-Type: application/octet-stream; name="master.out"
+Content-Disposition: attachment; filename="master.out"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gnk12z7n0
+
+EQAAAFNPyU01cQMAAQUEDSExAFsCABjMAQAAAAAHAAEAU0/JTdWIAwAEDwQAAQUEDgABAFVPyU1/
+DQYABAMLACsAITEAWwIAAQAGAAEAVU/JTdYoBgAEGwMrAAUEAAAAWk/JTQRlBQABBRAADgABAFpP
+yU13cQUABA4LAQUQADYBQAoACAALAAAAWk/JTbZyBQACKyAGAAIAQABoaQ==
+--000e0ce02aaa3a96a204a2fc310b
+Content-Type: application/octet-stream; name="slave.out"
+Content-Disposition: attachment; filename="slave.out"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gnk1347v1
+
+BwAAAEtPyU1SPwEAAQUMAwIAAgcAAQBLT8lNClIBAAQOBAEFDAAFAAAAS0/JTUVTAQABGgwBAwcA
+AQBLT8lNwF0BAAQOBAEaDAAEAAAAS0/JTZJeAQABCRAADQABAEtPyU16aQEABA4KAQkQACExAFsC
+AA4AAQBVT8lNYxEGAAQDCwArAN/+AVsCAAEACgABAFVPyU1LFQYABCAH3/4BWwIAAQYAAQBVT8lN
+GB0GAAQbAysABQ==
+--000e0ce02aaa3a96a204a2fc310b--
