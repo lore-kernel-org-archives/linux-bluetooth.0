@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
-To: Greg KH <greg@kroah.com>
-Cc: Greg Kroah-Hartman <gregkh@suse.de>,
-	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+Date: Tue, 10 May 2011 18:56:50 -0700
+From: Greg KH <greg@kroah.com>
+To: Linus Walleij <linus.ml.walleij@gmail.com>
+Cc: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, devel@driverdev.osuosl.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	Pavan Savoy <pavan_savoy@sify.com>,
 	Vitaly Wool <vitalywool@gmail.com>,
 	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
 	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
 	Lee Jones <lee.jones@linaro.org>,
 	Mathieu Poirier <mathieu.poirier@linaro.org>
-Date: Wed, 11 May 2011 10:34:47 +0200
-Subject: RE: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
+Subject: Re: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110511015650.GA6840@kroah.com>
 References: <1305040232-750-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
  <20110510200801.GA8125@kroah.com>
-In-Reply-To: <20110510200801.GA8125@kroah.com>
-Content-Type: text/plain; charset="utf-8"
+ <BANLkTimimx-pW9mOtb_9yM5XcQ5nOeGYug@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BANLkTimimx-pW9mOtb_9yM5XcQ5nOeGYug@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHcmVnIEtIIFttYWlsdG86Z3Jl
-Z0Brcm9haC5jb21dDQo+IFNlbnQ6IGRlbiAxMCBtYWogMjAxMSAyMjowOA0KPiANCj4ge3NpZ2h9
-DQo+IA0KPiBUaGlzIGJyZWFrcyB0aGUgYnVpbGQgYWdhaW4sIHRoZSBlcnJvciBtZXNzYWdlcyBh
-cmUgYmVsb3cgOigNCj4gDQo+IEknbSBhYm91dCB0byBnaXZlIHVwIGhlcmUsIHNvIHRoZSBuZXh0
-IHRpbWUgeW91IHNlbmQgdGhpcyBwYXRjaCBpbiwgSQ0KPiB3YW50IHNvbWUga2luZCBvZiBwcm9v
-ZiB0aGF0IHRoZSBjb2RlIHdpbGwgYXQgbGVhc3QgYnVpbGQgcHJvcGVybHkuDQo+IA0KPiBIb3cg
-eW91IHByb3ZpZGUgdGhpcyBpcyB1cCB0byB5b3UuDQo+IA0KPiBPaCwgYW5kIGlmIHRoZSBuZXh0
-IG9uZSBicmVha3Mgc3R1ZmYgYWdhaW4sIHlvdSB3aWxsIG93ZSBtZSBhIGxvdCBvZg0KPiBiZWVy
-LCBhbHRob3VnaCBJIHRoaW5rIHlvdSBvd2UgbWUgYWxyZWFkeS4uLg0KPiANCj4gdGhhbmtzLA0K
-PiANCj4gZ3JlZyBrLWgNCj4gDQo+ICAgQ0MgW01dICBkcml2ZXJzL3N0YWdpbmcvY2cyOTAwL21m
-ZC9jZzI5MDBfY2hpcC5vDQo+IGRyaXZlcnMvc3RhZ2luZy9jZzI5MDAvbWZkL2NnMjkwMF9jaGlw
-LmM6Mjk0MDozOiBlcnJvcjogdW5rbm93biBmaWVsZA0KPiDigJhwbGF0Zm9ybV9kYXRh4oCZIHNw
-ZWNpZmllZCBpbiBpbml0aWFsaXplcg0KPiBkcml2ZXJzL3N0YWdpbmcvY2cyOTAwL21mZC9jZzI5
-MDBfY2hpcC5jOjI5NDA6Mzogd2FybmluZzoNCj4gaW5pdGlhbGl6YXRpb24gbWFrZXMgaW50ZWdl
-ciBmcm9tIHBvaW50ZXIgd2l0aG91dCBhIGNhc3QNCj4gZHJpdmVycy9zdGFnaW5nL2NnMjkwMC9t
-ZmQvY2cyOTAwX2NoaXAuYzoyOTQwOjM6IGVycm9yOiBpbml0aWFsaXplcg0KPiBlbGVtZW50IGlz
-IG5vdCBjb21wdXRhYmxlIGF0IGxvYWQgdGltZQ0KPiBkcml2ZXJzL3N0YWdpbmcvY2cyOTAwL21m
-ZC9jZzI5MDBfY2hpcC5jOjI5NDA6MzogZXJyb3I6IChuZWFyDQo+IGluaXRpYWxpemF0aW9uIGZv
-ciDigJhjZzI5MDBfZGV2c1swXS5pZOKAmSkNCg0KSGkgR3JlZywNCg0KV2hhdCBsaW51eC1uZXh0
-IHRhZyBkaWQgeW91IGJhc2UgdGhlIHBhdGNoIG9uPw0KSSB1c2VkIG5leHQtMjAxMTA1MTAgYW5k
-IGluIHRoYXQgdGFnIHRoZSBmaWxlIGluY2x1ZGUvTGludXgvbWZkL2NvcmUuaA0KVGhlIHN0cnVj
-dCBtZmRfY2VsbCBoYXMgYSBwYXJhbWV0ZXIgY2FsbGVkIHBsYXRmb3JtX2RhdGEsIHdoaWxlIGlu
-IHlvdXINCmJ1aWxkIGl0IHNlZW1zIGl0IGRvZXNuJ3QuDQpUaGlzIHdhcyBjaGFuZ2VkIHZlcnkg
-cmVjZW50bHkgaW4gdGhlIGNvcmUuaCBmaWxlIChvbiBBcHJpbCA2KS4NClNvIGZvciBjb3JlLmgg
-dGhlIGxhc3QgY29tbWl0IElEIEkgaGF2ZSBpbiB0aGUgdGFnIEkgYnVpbHQgdXBvbiBpcw0KNTU4
-YWE5YzBkNjIwYjkxYTg5NmQ1ZTM5Y2U4YTU3MGJlZDY1NTg5Yi4NCg0KVGhhbmtzLA0KUC1HDQoN
-Cg==
+On Wed, May 11, 2011 at 02:07:33AM +0200, Linus Walleij wrote:
+> 2011/5/10 Greg KH <greg@kroah.com>:
+> 
+> > On Tue, May 10, 2011 at 05:10:32PM +0200, Par-Gunnar Hjalmdahl wrote:
+> >> This patch adds support for the ST-Ericsson CG2900
+> >> Connectivity Combo controller (Bluetooth, FM, GPS).
+> >>
+> >> Signed-off-by: Par-Gunnar Hjalmdahl <par-gunnar.p.hjalmdahl@stericsson.com>
+> >> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> >
+> > {sigh}
+> >
+> > This breaks the build again, the error messages are below :(
+> 
+> I suspect the problem is that Per-Gunnar does not know how to reproduce
+> your build errors. Are you building for some x86 combination, allyes, etc
+> for example? This is likely currently only tested and applicable for ux500
+> so a simple  "depends on ARCH_U8500" under config CG2900 may solve
+> stuff.
+
+All I did was merely enable the driver to be built on my desktop,
+something that any developer should have done, right?
+
+And why can't the code be built for any architecture, what is forcing it
+for only one platform?  That's not the way drivers should be written,
+right?
+
+So please fix the real problem, don't just confine it to one
+architecture, what is to keep this from showing up on another chip soon?
+
+thanks,
+
+greg k-h
