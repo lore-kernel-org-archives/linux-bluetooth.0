@@ -1,53 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 02/13] Add Bluetooth address type definition
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <20110504060357.GA3711@jh-x301>
-References: <1304030229-6672-3-git-send-email-claudio.takahasi@openbossa.org>
-	 <1304458357-21571-1-git-send-email-claudio.takahasi@openbossa.org>
-	 <20110504060357.GA3711@jh-x301>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 11 May 2011 18:20:28 -0700
-Message-ID: <1305163228.15916.163.camel@aeonflux>
-Mime-Version: 1.0
+Date: Wed, 11 May 2011 17:52:19 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: fix shutdown on SCO sockets
+Message-ID: <20110511205219.GI22065@joana>
+References: <1302271841-12127-1-git-send-email-luiz.dentz@gmail.com>
+ <20110415185845.GB2359@joana>
+ <BANLkTin2kuhT9vyANhLHTqw8G8maTEbQWg@mail.gmail.com>
+ <20110418175619.GB2472@joana>
+ <BANLkTikgZBh5SyXJvFE6z+F2V-JxC5Y9YQ@mail.gmail.com>
+ <20110511170951.GB22065@joana>
+ <BANLkTimatFYD2Jn1o0DqxKpv+RRC6+3uSg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTimatFYD2Jn1o0DqxKpv+RRC6+3uSg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
-> > Values defined to LE(public and random) are defined in the Bluetooth
-> > Core Specification. For basic rate, there isn't address type concept.
-> > The constants introduced by this commit will be used to identify the
-> > remote address type, basically to distinguish LE/BR devices before
-> > to request the L2CAP connection.
-> > ---
-> >  lib/bluetooth.h |    4 ++++
-> >  1 files changed, 4 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> > index 738e07a..98b8f1c 100644
-> > --- a/lib/bluetooth.h
-> > +++ b/lib/bluetooth.h
-> > @@ -130,6 +130,10 @@ typedef struct {
-> >  #define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
-> >  #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
-> >  
-> > +#define BDADDR_TYPE_LE_PUBLIC	0x00
-> > +#define BRADDR_TYPE_LE_RANDOM	0x01
-> > +#define BDADDR_TYPE_BR		0xff
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-05-11 23:49:51 +0300]:
+
+> Hi Gustavo,
 > 
-> Firstly this still needs Marcel's blessing (though I don't really see
-> any other solution than an address type with three possible values).
-> Secondly, if this is ever going to be added to the L2CAP socket address
-> you'd have to have 0x00 as BDADDR_TYPE_BR for backwards compatibility.
+> On Wed, May 11, 2011 at 8:09 PM, Gustavo F. Padovan
+> <padovan@profusion.mobi> wrote:
+> > Hi Luiz,
+> >
+> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-05-05 17:50:53 +0300]:
+> >
+> >> Hi Gustavo,
+> >>
+> >> On Mon, Apr 18, 2011 at 8:56 PM, Gustavo F. Padovan
+> >> <padovan@profusion.mobi> wrote:
+> >> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-17 20:26:53 +0300]:
+> >> >
+> >> >> Hi Gustavo,
+> >> >>
+> >> >> On Fri, Apr 15, 2011 at 9:58 PM, Gustavo F. Padovan
+> >> >> <padovan@profusion.mobi> wrote:
+> >> >> > Hi Luiz,
+> >> >> >
+> >> >> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-04-08 17:10:41 +0300]:
+> >> >> >
+> >> >> >> From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> >> >> >>
+> >> >> >> shutdown should wait for SCO link to be properly disconnected before
+> >> >> >> detroying the socket, otherwise an application using the socket may
+> >> >> >> assume link is properly disconnected before it really happens which
+> >> >> >> can be a problem when e.g synchronizing profile switch.
+> >> >> >>
+> >> >> >> Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+> >> >> >
+> >> >> > I applied it, but in bluetooth-next. Let's see its behaviour there and if no
+> >> >> > problems show up we can move it to bluetooth-2.6
+> >> >>
+> >> >> I tested this against Nokia BH-504 and Sony Ericsson W600, both have
+> >> >> problem when switching from hfp to a2dp where the avdtp start is sent
+> >> >> before SCO is fully disconnected, this patch fixes with those
+> >> >> headsets.
+> >> >
+> >> > Ok, I also pushed it to bluetooth-2.6.
+> >>
+> >>
+> >> Apparently this cause a regression, since we set conn to NULL but an
+> >> application may not wait for shutdown to complete and call
+> >> close/release which will cause sco_chan_del to be called which destroy
+> >> the socket without resetting conn->sk to NULL so on disconn_cfm it
+> >> will access invalid memory.
+> >>
+> >> To fix this what about the following:
+> >>
+> >> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> >> index 94954c7..cb4fb78 100644
+> >> --- a/net/bluetooth/sco.c
+> >> +++ b/net/bluetooth/sco.c
+> >> @@ -373,7 +373,7 @@ static void __sco_sock_close(struct sock *sk)
+> >>                         sk->sk_state = BT_DISCONN;
+> >>                         sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+> >>                         hci_conn_put(sco_pi(sk)->conn->hcon);
+> >> -                       sco_pi(sk)->conn = NULL;
+> >> +                       sco_pi(sk)->conn->hcon = NULL;
+> >>                 } else
+> >>                         sco_chan_del(sk, ECONNRESET);
+> >>                 break;
+> >> @@ -828,7 +828,9 @@ static void sco_chan_del(struct sock *sk, int err)
+> >>                 conn->sk = NULL;
+> >>                 sco_pi(sk)->conn = NULL;
+> >>                 sco_conn_unlock(conn);
+> >> -               hci_conn_put(conn->hcon);
+> >> +
+> >> +               if (conn->hcon)
+> >> +                       hci_conn_put(conn->hcon);
+> >
+> > I think first we need to revert the patch on linus' tree. There isn't time to
+> > a proper fix and test. It may have introduced other bugs too. I don't wanna
+> > take this risk.
+> 
+> Ville and I tested the suggested changes and see no regression
+> anymore, so I can either create a new patch or update the other in
+> case we revert it.
 
-I am still not 100% convinced, but yes, the default 0x00 then needs to
-be BDADDR_TYPE_BREDR. Otherwise we break APIs.
+So update the patch and resend, I already asked Linus to revert it.
 
-Regards
-
-Marcel
-
-
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
