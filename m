@@ -1,82 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Fix not indicating audio connection problems on Headset interface
-Date: Wed, 11 May 2011 18:15:29 +0300
-Message-Id: <1305126930-1926-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 11 May 2011 14:37:56 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com
+Subject: Re: [PATCH] Bluetooth: Fix possible NULL pointer derefence in l2cap
+ code
+Message-ID: <20110511173756.GC22065@joana>
+References: <1305119698-22888-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1305119698-22888-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Szymon,
 
-There is no D-Bus signal when attempting to connect SCO leaving
-application unable to detect any problem if they were not directly using
-Media API or unix socket.
----
- audio/headset.c   |    9 ++++++---
- doc/audio-api.txt |    7 +++++--
- 2 files changed, 11 insertions(+), 5 deletions(-)
+* Szymon Janc <szymon.janc@tieto.com> [2011-05-11 15:14:58 +0200]:
 
-diff --git a/audio/headset.c b/audio/headset.c
-index 1a3c365..b28667e 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -276,8 +276,9 @@ static const char *state2str(headset_state_t state)
- 	case HEADSET_STATE_CONNECTING:
- 		return "connecting";
- 	case HEADSET_STATE_CONNECTED:
--	case HEADSET_STATE_PLAY_IN_PROGRESS:
- 		return "connected";
-+	case HEADSET_STATE_PLAY_IN_PROGRESS:
-+		return "resuming";
- 	case HEADSET_STATE_PLAYING:
- 		return "playing";
- 	}
-@@ -2522,8 +2523,7 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
- 		break;
- 	case HEADSET_STATE_CONNECTED:
- 		close_sco(dev);
--		if (hs->state != HEADSET_STATE_PLAY_IN_PROGRESS)
--			emit_property_changed(dev->conn, dev->path,
-+		emit_property_changed(dev->conn, dev->path,
- 					AUDIO_HEADSET_INTERFACE, "State",
- 					DBUS_TYPE_STRING, &state_str);
- 		if (hs->state < state) {
-@@ -2555,6 +2555,9 @@ void headset_set_state(struct audio_device *dev, headset_state_t state)
- 		}
- 		break;
- 	case HEADSET_STATE_PLAY_IN_PROGRESS:
-+		emit_property_changed(dev->conn, dev->path,
-+					AUDIO_HEADSET_INTERFACE, "State",
-+					DBUS_TYPE_STRING, &state_str);
- 		break;
- 	case HEADSET_STATE_PLAYING:
- 		value = TRUE;
-diff --git a/doc/audio-api.txt b/doc/audio-api.txt
-index e7991f3..1eed843 100644
---- a/doc/audio-api.txt
-+++ b/doc/audio-api.txt
-@@ -164,7 +164,7 @@ Signals		void AnswerRequested()
- properties	string State [readonly]
- 
- 			Possible values: "disconnected", "connecting",
--			"connected", "playing"
-+			"connected", "resuming", "playing"
- 
- 			"disconnected" -> "connecting"
- 				Either an incoming or outgoing connection
-@@ -176,7 +176,10 @@ properties	string State [readonly]
- 			"connecting" -> "connected"
- 				Successfully connected
- 
--			"connected" -> "playing"
-+			"resuming" -> "connected"
-+				SCO connection attempt failed
-+
-+			"resuming" -> "playing"
- 				SCO audio connection successfully opened
- 
- 			"playing" -> "connected"
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index d0769a8..d9833d1 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3292,6 +3292,11 @@ static void l2cap_send_srejframe(struct l2cap_chan *chan, u8 tx_seq)
+>  		l2cap_send_sframe(chan, control);
+>  
+>  		new = kzalloc(sizeof(struct srej_list), GFP_ATOMIC);
+> +		if (!new) {
+> +			BT_ERR("Memory allocation failed on tx_seq = %d",
+> +							chan->expected_tx_seq);
+> +			break;
+
+I think a proper behavior here is disconnect the channel. The Enhanced
+Retransmission mode is reliable and we have to guarantee that all data is
+delivered. Skip adding to the list doesn't seem to be safe here. 
+
 -- 
-1.7.1
-
+Gustavo F. Padovan
+http://profusion.mobi
