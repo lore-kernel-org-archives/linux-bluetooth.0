@@ -1,52 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
+From: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+To: Greg KH <greg@kroah.com>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>,
+	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@nokia.com>
-Date: Wed, 11 May 2011 13:22:15 +0200
-Subject: RE: Read RSSI through Management Interface?
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A48E@EXDCVYMBSTM005.EQ1STM.local>
-References: <BANLkTinpSJeozeWCcYCBeQ=sxKU5SJSrSQ@mail.gmail.com>
-	<20110421011852.GB9392@joana>
- <BANLkTik3CkS4OM9ycDQ-_gs5UE0Pu0jo7A@mail.gmail.com>
-In-Reply-To: <BANLkTik3CkS4OM9ycDQ-_gs5UE0Pu0jo7A@mail.gmail.com>
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
+Date: Wed, 11 May 2011 10:37:25 +0200
+Subject: RE: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A292@EXDCVYMBSTM005.EQ1STM.local>
+References: <1305040232-750-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <20110510200801.GA8125@kroah.com>
+In-Reply-To: <20110510200801.GA8125@kroah.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywgR3VzdGF2bywNCg0KPj4+IDEuIEFkZCBhIG5ldyBjb21tYW5kIHRvDQo+bWdt
-dCBpbnRlcmZhY2UgdG8gYWRkIGENCj5naXZlbiBhZGRyZXNzIGludG8gYQ0KPj4+IFJTU0kgIm1v
-bml0b3JpbmcgbGlzdCIuDQo+Pj4gwqAgwqBXaGVuIHRoZSBjb25uZWN0aW9uIGlzDQo+ZXN0YWJs
-aXNoZWQgdGhlIGtlcm5lbCB3aWxsDQo+YXV0b21hdGljYWxseQ0KPj4+IHRyYWNrIHRoZSBSU1NJ
-IG9mIHRoZQ0KPmNvbm5lY3Rpb24gb24gcmVndWxhcg0KPmludGVydmFscyBzZW5kaW5nDQo+Pj4g
-SENJX1JlYWRfUlNTSS4gUmVhZCBSU1NJDQo+dmFsdWUgY2FuIGJlIHJlcG9ydGVkDQo+dGhyb3Vn
-aCBhIG5ldyBldmVudCBpbg0KPj4+IHRoZSBtYW5hZ2VtZW50IGludGVyZmFjZQ0KPj4+DQo+Pj4g
-Rm9yZ2V0dGluZyBTTVAsIHdlIGNhbg0KPmtlZXAgdGhlIGhjaW9wcw0KPmNvbXBhdGliaWxpdHkg
-aW1wbGVtZW50aW5nDQo+dGhlDQo+Pj4gc2FtZSBsb2dpYyBpbnNpZGUgdGhlDQo+aGNpb3BzIHBs
-dWdpbi4NCj4+DQo+PiBJJ20gYWdhaW5zdCB0aGlzIGluDQo+aGNpb3BzLiBMZXQncyBhZGQgdGhl
-IG5ldw0KPmZlYXR1cmVzIG9ubHkgdG8gbWdtdG9wdHMsDQo+c28gd2UNCj4+IGZvcmNlIHBlb3Bs
-ZSB0byB1c2UgaXQgYW5kDQo+ZGVwcmVjYXRlIGhjaW9wcy4NCj4NCj5XZSBuZWVkIHRvIGtlZXAg
-Ym90aA0KPiJpbnRlcmZhY2VzIiB3b3JraW5nLCB0aGUNCj5zYW1lIHdheSB0aGF0IHdlIGFyZQ0K
-PnRyeWluZyB0byBkbyBmb3IgZGlzY292ZXJ5Lg0KPldoZW4gaGNpb3BzIHdpbGwgYmUgcmVtb3Zl
-ZD8NCg0KW0FydW5dIFNpbmNlIG1hbnkgTEUgcHJvZmlsZXMgcmVxdWlyZSBTTVAgcHJvY2VkdXJl
-cywgaXQgd291bGQgYmUgaW1wcnVkZW50IHRvIGtlZXAgInJzc2kiIHN1cHBvcnQgb24gYm90aCBp
-bnRlcmZhY2VzPyBVbmxlc3Mgb2YgY291cnNlIHdlIGFyZSBsb29raW5nIGF0IHByb2ZpbGVzIHRo
-YXQgd291bGQgbmV2ZXIgbmVlZCBhbnkgTEUgc2VjdXJpdHkgaW1wbGVtZW50YXRpb24gd2hpY2gg
-d291bGQgbGVhZCBoYWxmIG9mIHRoZSBwcm9maWxlIGltcGxlbWVudG9ycyB1c2luZyBoY2lvcHMg
-YW5kIHJlbWFpbmluZyBtZ210LCBtYWtpbmcgcGhhc2luZyBvdXQgb2YgaGNpb3BzIGFsbCB0aGUg
-bW9yZSBkaWZmaWN1bHQuDQpMRSBhbmQgcHJvZmlsZSBzdXBwb3J0IHNob3VsZCBmaW5hbGx5IGN1
-bGltaW5hdGUgdG8gbWdtdCBpL2YgZWxzZSB3ZSB3b3VsZCBjbHV0dGVyIHByb2ZpbGUgc3VwcG9y
-dCBhbGwgb3ZlciB0aGUgdXNlciBzcGFjZS4gaGNpb3BzIHNob3VsZCBldmVudHVhbGx5IHNsaXAg
-dG8gb2JsaXZpb24gc29tZWRheS0NCg0KPj4+IDIuIEFkZCBhIG5ldyBjb21tYW5kIHRvDQo+bWdt
-dCBpbnRlcmZhY2UgdG8gYWN0aXZlbHkNCj5yZWFkIHRoZSBSU1NJIG9mIGENCj4+PiBnaXZlbiBj
-b25uZWN0aW9uL2FkZHJlc3MNCj4+DQo+PiBJZiB0aGUgdXNlciB1c2UgdGhpcyBpbg0KPnRoZSB3
-cm9uZyB3YXkgaXQgd2lsbCB3YXN0ZQ0KPnBvd2VyLiBMZXQncw0KPj4gZG8gKDEpIGFuZCBub3Qg
-Z2l2ZSBoaW0NCj50aGlzIG9wdGlvbiB0byBhY3RpdmVseSByZWFkDQo+UlNTSS4NCj4+DQpbQXJ1
-bl0gU2luY2UgdGhlIG9udXMgb2YgY2FsY3VsYXRpbmcgcGF0aC1sb3NzIGlzIGVudGlyZWx5IG9u
-IHRoZSBwcm94aW1pdHkgbW9uaXRvciBha2EgYXBwbGljYXRpb24sIGl0IHNob3VsZCBiZSByZWxp
-ZWQgYXMgc2FuZSBlbm91Z2ggdG8ga25vdyBob3cgdG8gdXNlIHRoaXMgY29tbWFuZC4gTW9yZW92
-ZXIsIGlmIHdlIGltcGxlbWVudCAoMSkgdGhlbiB3ZSBtYXkgaGF2ZSB0byBnaXZlIGFuIG9wdGlv
-biB0byB1c2VyL3Byb2ZpbGUgbW9uaXRvciB0byBhbHNvIGNvbmZpZnVyZSB0aGUgcnNzaSBtb25p
-dG9yaW5nIGludGVydmFscyB3aGljaCB3b3VsZCBtYWtlIHRoaXMgc3R1ZmYgb3Zlcmx5IGNvbXBs
-aWNhdGVkLiAoMikgc291bmRzIHNhZmUuDQoNCg0KVGhhbmtzLA0KQXJ1bg0K
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHcmVnIEtIIFttYWlsdG86Z3Jl
+Z0Brcm9haC5jb21dDQo+IFNlbnQ6IGRlbiAxMCBtYWogMjAxMSAyMjowOA0KPiB7c2lnaH0NCj4g
+DQo+IE9oLCBhbmQgaWYgdGhlIG5leHQgb25lIGJyZWFrcyBzdHVmZiBhZ2FpbiwgeW91IHdpbGwg
+b3dlIG1lIGEgbG90IG9mDQo+IGJlZXIsIGFsdGhvdWdoIEkgdGhpbmsgeW91IG93ZSBtZSBhbHJl
+YWR5Li4uDQo+IA0KDQpJIHByb21pc2UgeW91IGEgYmVlciBpZiB3ZSBtZWV0LiA6LSkNCg0KL1At
+Rw0K
