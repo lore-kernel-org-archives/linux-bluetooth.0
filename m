@@ -1,39 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 May 2011 17:05:04 -0300
+Date: Wed, 11 May 2011 16:42:53 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: torvalds@linux-foundation.org
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, linville@tuxdriver.com
-Subject: Revert "Bluetooth: fix shutdown on SCO sockets"
-Message-ID: <20110511200503.GH22065@joana>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Add support for disconnecting LE links
+ via mgmt
+Message-ID: <20110511194253.GG22065@joana>
+References: <1304718104-6448-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1304718104-6448-2-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1304718104-6448-2-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Linus,
+Hi Vinicius,
 
-Commit f21ca5fff6e548833fa5ee8867239a8378623150 can cause a NULL dereference
-if we call shutdown in a bluetooth SCO socket and doesn't wait the shutdown
-completion to call close(). Please revert it. I may have a fix for it soon,
-but we don't have time anymore, so revert is the way to go. ;)
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-05-06 18:41:44 -0300]:
 
-Regards,
+> If we can't find a ACL link between the devices, we search
+> the connection list one second time looking for LE links.
 
-
-commit f21ca5fff6e548833fa5ee8867239a8378623150
-Author: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-Date:   Fri Apr 8 17:10:41 2011 +0300
-
-    Bluetooth: fix shutdown on SCO sockets
-    
-    shutdown should wait for SCO link to be properly disconnected before
-    detroying the socket, otherwise an application using the socket may
-    assume link is properly disconnected before it really happens which
-    can be a problem when e.g synchronizing profile switch.
-    
-    Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+Both patches have been applied. Thanks.
 
 -- 
 Gustavo F. Padovan
