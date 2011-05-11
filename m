@@ -1,70 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 11 May 2011 06:48:59 -0700
+From: Greg KH <greg@kroah.com>
+To: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>,
+	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110511134859.GB12717@kroah.com>
+References: <1305040232-750-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <20110510200801.GA8125@kroah.com>
+ <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
 MIME-Version: 1.0
-Date: Wed, 11 May 2011 09:52:28 +0100
-Message-ID: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-Subject: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0ce02aaa3a96a204a2fc310b
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0ce02aaa3a96a204a2fc310b
-Content-Type: text/plain; charset=ISO-8859-1
+On Wed, May 11, 2011 at 10:34:47AM +0200, Par-Gunnar HJALMDAHL wrote:
+> > -----Original Message-----
+> > From: Greg KH [mailto:greg@kroah.com]
+> > Sent: den 10 maj 2011 22:08
+> > 
+> > {sigh}
+> > 
+> > This breaks the build again, the error messages are below :(
+> > 
+> > I'm about to give up here, so the next time you send this patch in, I
+> > want some kind of proof that the code will at least build properly.
+> > 
+> > How you provide this is up to you.
+> > 
+> > Oh, and if the next one breaks stuff again, you will owe me a lot of
+> > beer, although I think you owe me already...
+> > 
+> > thanks,
+> > 
+> > greg k-h
+> > 
+> >   CC [M]  drivers/staging/cg2900/mfd/cg2900_chip.o
+> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: unknown field
+> > ‘platform_data’ specified in initializer
+> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: warning:
+> > initialization makes integer from pointer without a cast
+> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: initializer
+> > element is not computable at load time
+> > drivers/staging/cg2900/mfd/cg2900_chip.c:2940:3: error: (near
+> > initialization for ‘cg2900_devs[0].id’)
+> 
+> Hi Greg,
+> 
+> What linux-next tag did you base the patch on?
 
-Hi,
+My staging git tree.  I can't apply to linux-next, only my tree,
+linux-next then picks it up.
 
-I've ran into an issue where data doesn't seem to be received by a slave device.
+> I used next-20110510 and in that tag the file include/Linux/mfd/core.h
+> The struct mfd_cell has a parameter called platform_data, while in your
+> build it seems it doesn't.
+> This was changed very recently in the core.h file (on April 6).
+> So for core.h the last commit ID I have in the tag I built upon is
+> 558aa9c0d620b91a896d5e39ce8a570bed65589b.
 
-I do the following:
+So do I need that patch on the staging-next tree also?
 
-Using Gentoo Linux (2.6.34-gentoo-r1)
-Using BlueZ 4.81
+Or is it an issue of building this on x86-64...
 
-1. Use BlueZ to connect to two Bluetooth devices using HCI only. This
-is over USB.
+thanks,
 
-2. I set one device as a slave and then create a connection between
-the two. This completes sucessfully and can be seen on both sides.
-
-3. I then try to send an acl packet with the word "hi" in it and it is
-not received on the other side.
-
---------
-
-Doing the same thing above but:
-
-Using Fedora Core 5 (2.6.20-1.2320.fc5)
-And:
-bluez-libs-2.25-1
-bluez-pin-0.30-2
-bluez-utils-2.25-4
-bluez-libs-devel-2.25-1
-bluez-hcidump-1.30-1
-
-and using the same hardware - the problem doesn't happen.
-
-I have attached two HCI dumps, one of the Master device and one of the Slave.
-
-Thanks for any help you can give.
-
---000e0ce02aaa3a96a204a2fc310b
-Content-Type: application/octet-stream; name="master.out"
-Content-Disposition: attachment; filename="master.out"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gnk12z7n0
-
-EQAAAFNPyU01cQMAAQUEDSExAFsCABjMAQAAAAAHAAEAU0/JTdWIAwAEDwQAAQUEDgABAFVPyU1/
-DQYABAMLACsAITEAWwIAAQAGAAEAVU/JTdYoBgAEGwMrAAUEAAAAWk/JTQRlBQABBRAADgABAFpP
-yU13cQUABA4LAQUQADYBQAoACAALAAAAWk/JTbZyBQACKyAGAAIAQABoaQ==
---000e0ce02aaa3a96a204a2fc310b
-Content-Type: application/octet-stream; name="slave.out"
-Content-Disposition: attachment; filename="slave.out"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gnk1347v1
-
-BwAAAEtPyU1SPwEAAQUMAwIAAgcAAQBLT8lNClIBAAQOBAEFDAAFAAAAS0/JTUVTAQABGgwBAwcA
-AQBLT8lNwF0BAAQOBAEaDAAEAAAAS0/JTZJeAQABCRAADQABAEtPyU16aQEABA4KAQkQACExAFsC
-AA4AAQBVT8lNYxEGAAQDCwArAN/+AVsCAAEACgABAFVPyU1LFQYABCAH3/4BWwIAAQYAAQBVT8lN
-GB0GAAQbAysABQ==
---000e0ce02aaa3a96a204a2fc310b--
+greg k-h
