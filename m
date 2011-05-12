@@ -1,41 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 03/12] Bluetooth: Protect 'adv_entries' with a RW lock
+Subject: Re: [PATCH 00/12] Caching LE advertising information
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
 References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
-	 <1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 11 May 2011 18:24:34 -0700
-Message-ID: <1305163474.15916.166.camel@aeonflux>
+Date: Wed, 11 May 2011 18:23:34 -0700
+Message-ID: <1305163414.15916.165.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds a RW lock to protect concurrent operations on
-> adv_entries list.
+> This patchset implements the LE advertising cache which is used
+> to establish LE connections.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_core.c         |   21 +++++++++++++++++----
->  2 files changed, 18 insertions(+), 4 deletions(-)
+> Today, we cannot establish LE connections (via l2cap socket) with
+> devices which use random address type. To achieve that, we came up
+> with a solution where the host should be able to infer the address
+> type (public or random) from the device it wants to connect to.
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 65135f8..2ceeadf 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -188,6 +188,7 @@ struct hci_dev {
->  	struct list_head	remote_oob_data;
->  
->  	struct list_head	adv_entries;
-> +	rwlock_t		adv_entries_lock;
+> The approach this patchset implements is: during the LE scanning,
+> the host stores the address and the address type gathered from
+> advertising reports. These information are stored at the advertising
+> cache. So, during a LE connection, the host looks up the advertising
+> cache and gets the address type from the device it wants to connect
+> to.
 
-we might wanna consider just using spinlocks and not rwlocks. Also can
-you please look into using RCU.
+I would prefer if we try using the cache as long as possible. As long as
+this works out it should be fine. Adding the BDADDR_TYPE to all public
+socket address structures seems a bit of a pain to me.
+
+And as backup we can always revert to that, but we can never ever remove
+that address from the socket structure. While we can remove the cache if
+we no longer need it.
 
 Regards
 
