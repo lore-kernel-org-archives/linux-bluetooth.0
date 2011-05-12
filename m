@@ -1,45 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1305178350-7568-3-git-send-email-padovan@profusion.mobi>
-References: <1305178350-7568-1-git-send-email-padovan@profusion.mobi>
-	<1305178350-7568-2-git-send-email-padovan@profusion.mobi>
-	<1305178350-7568-3-git-send-email-padovan@profusion.mobi>
-Date: Thu, 12 May 2011 13:58:34 -0400
-Message-ID: <BANLkTimQ_AC0X1XZAbwmPh2q+iXKT2c05A@mail.gmail.com>
-Subject: Re: [PATCH 3/6] Bluetooth: Add chan->link_type struct member
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1305163228.15916.163.camel@aeonflux>
+References: <1304030229-6672-3-git-send-email-claudio.takahasi@openbossa.org>
+	<1304458357-21571-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20110504060357.GA3711@jh-x301>
+	<1305163228.15916.163.camel@aeonflux>
+Date: Thu, 12 May 2011 14:55:24 -0300
+Message-ID: <BANLkTims0=RKEBMaSgG-Mw5RfUJKrWtR=A@mail.gmail.com>
+Subject: Re: [PATCH v2 02/13] Add Bluetooth address type definition
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Marcel/Johan,
 
-On Thu, May 12, 2011 at 1:32 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> @@ -204,8 +204,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->        }
+On Wed, May 11, 2011 at 10:20 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Johan,
 >
->        /* PSM must be odd and lsb of upper byte must be 0 */
-> -       if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 &&
-> -                               sk->sk_type != SOCK_RAW && !la.l2_cid) {
-> +       if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 && !la.l2_cid &&
-> +                                       chan->link_type == L2CAP_LINK_RAW) {
+>> > Values defined to LE(public and random) are defined in the Bluetooth
+>> > Core Specification. For basic rate, there isn't address type concept.
+>> > The constants introduced by this commit will be used to identify the
+>> > remote address type, basically to distinguish LE/BR devices before
+>> > to request the L2CAP connection.
+>> > ---
+>> > =C2=A0lib/bluetooth.h | =C2=A0 =C2=A04 ++++
+>> > =C2=A01 files changed, 4 insertions(+), 0 deletions(-)
+>> >
+>> > diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+>> > index 738e07a..98b8f1c 100644
+>> > --- a/lib/bluetooth.h
+>> > +++ b/lib/bluetooth.h
+>> > @@ -130,6 +130,10 @@ typedef struct {
+>> > =C2=A0#define BDADDR_ALL =C2=A0 (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff,=
+ 0xff, 0xff}})
+>> > =C2=A0#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+>> >
+>> > +#define BDADDR_TYPE_LE_PUBLIC =C2=A0 =C2=A0 =C2=A00x00
+>> > +#define BRADDR_TYPE_LE_RANDOM =C2=A0 =C2=A0 =C2=A00x01
+>> > +#define BDADDR_TYPE_BR =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0xff
+>>
+>> Firstly this still needs Marcel's blessing (though I don't really see
+>> any other solution than an address type with three possible values).
+>> Secondly, if this is ever going to be added to the L2CAP socket address
+>> you'd have to have 0x00 as BDADDR_TYPE_BR for backwards compatibility.
+>
+> I am still not 100% convinced, but yes, the default 0x00 then needs to
+> be BDADDR_TYPE_BREDR. Otherwise we break APIs.
+>
+> Regards
+>
+> Marcel
 
-There seems to be a typo here:
+Use the kernel advertising cache(for address type) plus a device
+type(LE or BR) field in the mgmt_ev_device_found is another approach.
+Can we proceed with this approach?
 
-Original: sk->sk_type != SOCK_RAW
-New: chan->link_type == L2CAP_LINK_RAW
-
-Should it be != instead?
-
->                err = -EINVAL;
->                goto done;
->        }
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Claudio.
