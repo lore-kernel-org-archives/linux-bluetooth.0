@@ -1,50 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110511164736.GA22065@joana>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-	<20110511164736.GA22065@joana>
-Date: Thu, 12 May 2011 11:19:01 +0100
-Message-ID: <BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
-Subject: Re: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: Eponymous - <the.epon@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] bluetooth: fix shutdown on SCO sockets
+Date: Thu, 12 May 2011 11:13:15 +0300
+Message-Id: <1305187995-5780-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-I've just downloaded the 4.91 sources and done a make and the only
-program I can see starting "l2" is "l2ping". There is no l2test.
+shutdown should wait for SCO link to be properly disconnected before
+detroying the socket, otherwise an application using the socket may
+assume link is properly disconnected before it really happens which
+can be a problem when e.g synchronizing profile switch.
 
+Signed-off-by: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+---
+ net/bluetooth/sco.c |   13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletions(-)
 
-On Wed, May 11, 2011 at 5:47 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> * Eponymous - <the.epon@gmail.com> [2011-05-11 09:52:28 +0100]:
->
->> Hi,
->>
->> I've ran into an issue where data doesn't seem to be received by a slave device.
->>
->> I do the following:
->>
->> Using Gentoo Linux (2.6.34-gentoo-r1)
->> Using BlueZ 4.81
->>
->> 1. Use BlueZ to connect to two Bluetooth devices using HCI only. This
->> is over USB.
->>
->> 2. I set one device as a slave and then create a connection between
->> the two. This completes sucessfully and can be seen on both sides.
->>
->> 3. I then try to send an acl packet with the word "hi" in it and it is
->> not received on the other side.
->
-> There a utility called l2test in the bluez sources. Check if it works for you.
-> Using -r in one side to listen and -s in the other side to send data. Or
-> l2test -h and see all options.
->
-> --
-> Gustavo F. Padovan
-> http://profusion.mobi
->
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 42fdffd..cb4fb78 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -369,6 +369,15 @@ static void __sco_sock_close(struct sock *sk)
+ 
+ 	case BT_CONNECTED:
+ 	case BT_CONFIG:
++		if (sco_pi(sk)->conn) {
++			sk->sk_state = BT_DISCONN;
++			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
++			hci_conn_put(sco_pi(sk)->conn->hcon);
++			sco_pi(sk)->conn->hcon = NULL;
++		} else
++			sco_chan_del(sk, ECONNRESET);
++		break;
++
+ 	case BT_CONNECT:
+ 	case BT_DISCONN:
+ 		sco_chan_del(sk, ECONNRESET);
+@@ -819,7 +828,9 @@ static void sco_chan_del(struct sock *sk, int err)
+ 		conn->sk = NULL;
+ 		sco_pi(sk)->conn = NULL;
+ 		sco_conn_unlock(conn);
+-		hci_conn_put(conn->hcon);
++
++		if (conn->hcon)
++			hci_conn_put(conn->hcon);
+ 	}
+ 
+ 	sk->sk_state = BT_CLOSED;
+-- 
+1.7.1
+
