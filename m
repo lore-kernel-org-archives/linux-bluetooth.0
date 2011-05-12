@@ -1,49 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 09/12] Bluetooth: Add hci_le_conn_add()
+Subject: Re: [PATCH 03/12] Bluetooth: Protect 'adv_entries' with a RW lock
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1304701521-26459-10-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
 References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
-	 <1304701521-26459-10-git-send-email-andre.guedes@openbossa.org>
+	 <1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 11 May 2011 18:27:18 -0700
-Message-ID: <1305163638.15916.168.camel@aeonflux>
+Date: Wed, 11 May 2011 18:24:34 -0700
+Message-ID: <1305163474.15916.166.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch implements a wrapper function to hci_conn_add() which
-> takes the address type as argument. This patch also replaces
-> hci_conn_add() calls by hci_le_conn_add() in LE related code.
-> 
-> hci_le_conn_add() was created to consider the destination address
-> type when creating a new LE hci_conn.
+> This patch adds a RW lock to protect concurrent operations on
+> adv_entries list.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_conn.c         |   14 +++++++++++++-
->  net/bluetooth/hci_event.c        |    5 +++--
->  3 files changed, 18 insertions(+), 3 deletions(-)
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_core.c         |   21 +++++++++++++++++----
+>  2 files changed, 18 insertions(+), 4 deletions(-)
 > 
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 5e64d3f..6dd7cad 100644
+> index 65135f8..2ceeadf 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -427,6 +427,8 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle);
->  void hci_sco_setup(struct hci_conn *conn, __u8 status);
+> @@ -188,6 +188,7 @@ struct hci_dev {
+>  	struct list_head	remote_oob_data;
 >  
->  struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
-> +struct hci_conn *hci_le_conn_add(struct hci_dev *hdev, bdaddr_t *dst,
-> +							__u8 addr_type);
+>  	struct list_head	adv_entries;
+> +	rwlock_t		adv_entries_lock;
 
-the reason why we never split hci_conn_add is too keep it simple. So
-better just add the dst_type there directly and only use it when LE_LINK
-or we split this clearly in SCO, ACL and LE links. This way is just
-half-baked.
+we might wanna consider just using spinlocks and not rwlocks. Also can
+you please look into using RCU.
 
 Regards
 
