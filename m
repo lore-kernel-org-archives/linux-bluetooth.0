@@ -1,270 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 12 May 2011 14:37:31 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/6] Bluetooth: Add chan->link_type struct member
-Message-ID: <20110512173730.GA716@piper>
-References: <1305178350-7568-1-git-send-email-padovan@profusion.mobi>
- <1305178350-7568-2-git-send-email-padovan@profusion.mobi>
- <1305178350-7568-3-git-send-email-padovan@profusion.mobi>
+Date: Thu, 12 May 2011 09:54:59 -0700
+From: Greg KH <greg@kroah.com>
+To: Par-Gunnar HJALMDAHL <par-gunnar.p.hjalmdahl@stericsson.com>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>,
+	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@sify.com>,
+	Vitaly Wool <vitalywool@gmail.com>,
+	Alan Cox <alan@lxorguk.ukuu.org.uk>, Arnd Bergmann <arnd@arndb.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <Lukasz.Rymanowski@tieto.com>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Par-Gunnar Hjalmdahl <pghatwork@gmail.com>,
+	Lee Jones <lee.jones@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v6] staging: Add ST-Ericsson CG2900 driver
+Message-ID: <20110512165459.GA14243@kroah.com>
+References: <1305040232-750-1-git-send-email-par-gunnar.p.hjalmdahl@stericsson.com>
+ <20110510200801.GA8125@kroah.com>
+ <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A1A289@EXDCVYMBSTM005.EQ1STM.local>
+ <20110511134859.GB12717@kroah.com>
+ <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A6DC72@EXDCVYMBSTM005.EQ1STM.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1305178350-7568-3-git-send-email-padovan@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA3395A6DC72@EXDCVYMBSTM005.EQ1STM.local>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
-
-On 02:32 Thu 12 May, Gustavo F. Padovan wrote:
-> link_type says if our link is raw, connection less or connection oriented.
-
-To avoid confusion with the hci_conn "type" field (which is the actual type
-of the link between those two devices), wouldn't it be better to rename this
-to chan_type or something like it?
-
+On Thu, May 12, 2011 at 01:54:46PM +0200, Par-Gunnar HJALMDAHL wrote:
+> Hi Greg,
 > 
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
->  include/net/bluetooth/l2cap.h |    5 +++++
->  net/bluetooth/l2cap_core.c    |   30 +++++++++++-------------------
->  net/bluetooth/l2cap_sock.c    |   30 +++++++++++++++++++++++-------
->  3 files changed, 39 insertions(+), 26 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index dc721ca..6915c43 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -295,6 +295,7 @@ struct l2cap_chan {
->  	__u16		omtu;
->  	__u16		flush_to;
->  	__u8		mode;
-> +	__u8		link_type;
->  
->  	__le16		sport;
->  
-> @@ -384,6 +385,10 @@ struct l2cap_conn {
->  #define L2CAP_INFO_FEAT_MASK_REQ_SENT	0x04
->  #define L2CAP_INFO_FEAT_MASK_REQ_DONE	0x08
->  
-> +#define L2CAP_LINK_RAW		1
-> +#define L2CAP_LINK_CONNLESS	2
-> +#define L2CAP_LINK_ORIENTED	3
-> +
->  /* ----- L2CAP socket info ----- */
->  #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
->  
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 5473fc9..e1731b9 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -245,7 +245,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->  
->  	chan->conn = conn;
->  
-> -	if (sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM) {
-> +	if (chan->link_type == L2CAP_LINK_ORIENTED) {
->  		if (conn->hcon->type == LE_LINK) {
->  			/* LE connection */
->  			chan->omtu = L2CAP_LE_DEFAULT_MTU;
-> @@ -256,7 +256,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
->  			chan->scid = l2cap_alloc_cid(conn);
->  			chan->omtu = L2CAP_DEFAULT_MTU;
->  		}
-> -	} else if (sk->sk_type == SOCK_DGRAM) {
-> +	} else if (chan->link_type == L2CAP_LINK_CONNLESS) {
->  		/* Connectionless socket */
->  		chan->scid = L2CAP_CID_CONN_LESS;
->  		chan->dcid = L2CAP_CID_CONN_LESS;
-> @@ -369,8 +369,7 @@ void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
->  
->  	case BT_CONNECTED:
->  	case BT_CONFIG:
-> -		if ((sk->sk_type == SOCK_SEQPACKET ||
-> -					sk->sk_type == SOCK_STREAM) &&
-> +		if (chan->link_type == L2CAP_LINK_ORIENTED &&
->  					conn->hcon->type == ACL_LINK) {
->  			l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
->  			l2cap_send_disconn_req(conn, chan, reason);
-> @@ -379,8 +378,7 @@ void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
->  		break;
->  
->  	case BT_CONNECT2:
-> -		if ((sk->sk_type == SOCK_SEQPACKET ||
-> -					sk->sk_type == SOCK_STREAM) &&
-> +		if (chan->link_type == L2CAP_LINK_ORIENTED &&
->  					conn->hcon->type == ACL_LINK) {
->  			struct l2cap_conn_rsp rsp;
->  			__u16 result;
-> @@ -414,9 +412,7 @@ void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
->  
->  static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
->  {
-> -	struct sock *sk = chan->sk;
-> -
-> -	if (sk->sk_type == SOCK_RAW) {
-> +	if (chan->link_type == L2CAP_LINK_RAW) {
->  		switch (chan->sec_level) {
->  		case BT_SECURITY_HIGH:
->  			return HCI_AT_DEDICATED_BONDING_MITM;
-> @@ -657,8 +653,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
->  
->  		bh_lock_sock(sk);
->  
-> -		if (sk->sk_type != SOCK_SEQPACKET &&
-> -				sk->sk_type != SOCK_STREAM) {
-> +		if (chan->link_type != L2CAP_LINK_ORIENTED) {
->  			bh_unlock_sock(sk);
->  			continue;
->  		}
-> @@ -852,8 +847,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
->  			sk->sk_state_change(sk);
->  		}
->  
-> -		if (sk->sk_type != SOCK_SEQPACKET &&
-> -				sk->sk_type != SOCK_STREAM) {
-> +		if (chan->link_type != L2CAP_LINK_ORIENTED) {
->  			l2cap_sock_clear_timer(sk);
->  			sk->sk_state = BT_CONNECTED;
->  			sk->sk_state_change(sk);
-> @@ -1056,8 +1050,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan)
->  	l2cap_sock_set_timer(sk, sk->sk_sndtimeo);
->  
->  	if (hcon->state == BT_CONNECTED) {
-> -		if (sk->sk_type != SOCK_SEQPACKET &&
-> -				sk->sk_type != SOCK_STREAM) {
-> +		if (chan->link_type != L2CAP_LINK_ORIENTED) {
->  			l2cap_sock_clear_timer(sk);
->  			if (l2cap_check_security(chan))
->  				sk->sk_state = BT_CONNECTED;
-> @@ -1537,13 +1530,12 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
->  
->  int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
->  {
-> -	struct sock *sk = chan->sk;
->  	struct sk_buff *skb;
->  	u16 control;
->  	int err;
->  
->  	/* Connectionless channel */
-> -	if (sk->sk_type == SOCK_DGRAM) {
-> +	if (chan->link_type == L2CAP_LINK_CONNLESS) {
->  		skb = l2cap_create_connless_pdu(chan, msg, len);
->  		if (IS_ERR(skb))
->  			return PTR_ERR(skb);
-> @@ -1649,7 +1641,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
->  	read_lock(&conn->chan_lock);
->  	list_for_each_entry(chan, &conn->chan_l, list) {
->  		struct sock *sk = chan->sk;
-> -		if (sk->sk_type != SOCK_RAW)
-> +		if (chan->link_type != L2CAP_LINK_RAW)
->  			continue;
->  
->  		/* Don't send frame to the socket it came from */
-> @@ -4105,7 +4097,7 @@ static inline void l2cap_check_encryption(struct l2cap_chan *chan, u8 encrypt)
->  {
->  	struct sock *sk = chan->sk;
->  
-> -	if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM)
-> +	if (chan->link_type != L2CAP_LINK_ORIENTED)
->  		return;
->  
->  	if (encrypt == 0x00) {
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index f36776e..6d5ecca 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -162,7 +162,7 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->  
->  	lock_sock(sk);
->  
-> -	if ((sk->sk_type == SOCK_SEQPACKET || sk->sk_type == SOCK_STREAM)
-> +	if (chan->link_type == L2CAP_LINK_ORIENTED
->  			&& !(la.l2_psm || la.l2_cid)) {
->  		err = -EINVAL;
->  		goto done;
-> @@ -204,8 +204,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
->  	}
->  
->  	/* PSM must be odd and lsb of upper byte must be 0 */
-> -	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 &&
-> -				sk->sk_type != SOCK_RAW && !la.l2_cid) {
-> +	if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 && !la.l2_cid &&
-> +					chan->link_type == L2CAP_LINK_RAW) {
->  		err = -EINVAL;
->  		goto done;
->  	}
-> @@ -453,8 +453,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
->  
->  	switch (optname) {
->  	case BT_SECURITY:
-> -		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
-> -				&& sk->sk_type != SOCK_RAW) {
-> +		if (chan->link_type != L2CAP_LINK_ORIENTED &&
-> +					chan->link_type != L2CAP_LINK_RAW) {
->  			err = -EINVAL;
->  			break;
->  		}
-> @@ -599,8 +599,8 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
->  
->  	switch (optname) {
->  	case BT_SECURITY:
-> -		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
-> -				&& sk->sk_type != SOCK_RAW) {
-> +		if (chan->link_type != L2CAP_LINK_ORIENTED &&
-> +					chan->link_type != L2CAP_LINK_RAW) {
->  			err = -EINVAL;
->  			break;
->  		}
-> @@ -806,6 +806,7 @@ void l2cap_sock_init(struct sock *sk, struct sock *parent)
->  		sk->sk_type = parent->sk_type;
->  		bt_sk(sk)->defer_setup = bt_sk(parent)->defer_setup;
->  
-> +		chan->link_type = pchan->link_type;
->  		chan->imtu = pchan->imtu;
->  		chan->omtu = pchan->omtu;
->  		chan->conf_state = pchan->conf_state;
-> @@ -818,6 +819,20 @@ void l2cap_sock_init(struct sock *sk, struct sock *parent)
->  		chan->force_reliable = pchan->force_reliable;
->  		chan->flushable = pchan->flushable;
->  	} else {
-> +
-> +		switch (sk->sk_type) {
-> +		case SOCK_RAW:
-> +			chan->link_type = L2CAP_LINK_RAW;
-> +			break;
-> +		case SOCK_DGRAM:
-> +			chan->link_type = L2CAP_LINK_CONNLESS;
-> +			break;
-> +		case SOCK_SEQPACKET:
-> +		case SOCK_STREAM:
-> +			chan->link_type = L2CAP_LINK_ORIENTED;
-> +			break;
-> +		}
-> +
->  		chan->imtu = L2CAP_DEFAULT_MTU;
->  		chan->omtu = 0;
->  		if (!disable_ertm && sk->sk_type == SOCK_STREAM) {
-> @@ -826,6 +841,7 @@ void l2cap_sock_init(struct sock *sk, struct sock *parent)
->  		} else {
->  			chan->mode = L2CAP_MODE_BASIC;
->  		}
-> +
+> I downloaded you staging tree and compared the logs for the core.h file.
+> Compared to linux-next tag next-20110510 it is missing 2 commits:
+> 4dbee6b76fffd5740e87e286f4f4c1c15901bcae
+> 558aa9c0d620b91a896d5e39ce8a570bed65589b
+> where the first one is the "oldest" one in the log and is the most
+> important one for my patch.
 
-Nitpick, feel free to ignore ;-)
+What trees are these patches coming from?
 
->  		chan->max_tx = L2CAP_DEFAULT_MAX_TX;
->  		chan->fcs  = L2CAP_FCS_CRC16;
->  		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
-> -- 
-> 1.7.5.rc3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Another option would be for me to fix the patch for your tree, but
+> then I would probably have to fix it back in a few days when you update
+> your staging tree to Linux-next. How often is your tree updated?
 
+linux-next pulls from my tree, I don't pull from linux-next.
 
-Cheers,
--- 
-Vinicius
+As I don't see those patches in Linus's tree, I can't merge my tree
+forward to include them yet.  I could take those patches also through my
+tree if you want me to, or you could send this patch through the mfd
+tree so that things build properly there too.
+
+> The easiest is probably to wait a few days until you have the next-20110510
+> tag in your tree and then apply the patch.
+
+That will never happen, see above for how linux-next works.
+
+thanks,
+
+greg k-h
