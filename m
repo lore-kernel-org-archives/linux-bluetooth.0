@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1305178350-7568-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1305178350-7568-3-git-send-email-padovan@profusion.mobi>
 References: <1305178350-7568-1-git-send-email-padovan@profusion.mobi>
 	<1305178350-7568-2-git-send-email-padovan@profusion.mobi>
-Date: Thu, 12 May 2011 14:16:20 -0400
-Message-ID: <BANLkTimv_yX_abp-3hutps5EZ1+HXQEoKw@mail.gmail.com>
-Subject: Re: [PATCH 2/6] Bluetooth: Create l2cap_chan_send()
+	<1305178350-7568-3-git-send-email-padovan@profusion.mobi>
+Date: Thu, 12 May 2011 13:58:34 -0400
+Message-ID: <BANLkTimQ_AC0X1XZAbwmPh2q+iXKT2c05A@mail.gmail.com>
+Subject: Re: [PATCH 3/6] Bluetooth: Add chan->link_type struct member
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,36 +18,25 @@ Hi Gustavo,
 
 On Thu, May 12, 2011 at 1:32 AM, Gustavo F. Padovan
 <padovan@profusion.mobi> wrote:
-> +               } else {
-> +               /* Segment SDU into multiples PDUs */
+> @@ -204,8 +204,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr, int al
+>        }
+>
+>        /* PSM must be odd and lsb of upper byte must be 0 */
+> -       if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 &&
+> -                               sk->sk_type != SOCK_RAW && !la.l2_cid) {
+> +       if ((__le16_to_cpu(la.l2_psm) & 0x0101) != 0x0001 && !la.l2_cid &&
+> +                                       chan->link_type == L2CAP_LINK_RAW) {
 
-Given that you are moving code around, can you fix the indentation
-error on the comment above?
+There seems to be a typo here:
 
-> +                       err = l2cap_sar_segment_sdu(chan, msg, len);
-> +                       if (err < 0)
-> +                               return err;
-> +               }
-> +
-> +               if (chan->mode == L2CAP_MODE_STREAMING) {
-> +                       l2cap_streaming_send(chan);
-> +                       err = len;
-> +                       break;
-> +               }
-> +
-> +               if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
-> +                               (chan->conn_state & L2CAP_CONN_WAIT_F)) {
-> +                       err = len;
-> +                       break;
-> +               }
-> +               err = l2cap_ertm_send(chan);
-> +
-> +               if (err >= 0)
-> +                       err = len;
-> +               break;
+Original: sk->sk_type != SOCK_RAW
+New: chan->link_type == L2CAP_LINK_RAW
 
-Also, it makes more sense to have an empty line above
-l2cap_ertm_send(), and remove the empty line below it.
+Should it be != instead?
+
+>                err = -EINVAL;
+>                goto done;
+>        }
 
 Regards,
 -- 
