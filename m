@@ -1,22 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: btusb and non-standard descriptors
+Subject: Re: Bluetooth: l2cap and rfcomm: fix 1 byte infoleak to userspace.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Cufi, Carles" <carles.cufi@nordicsemi.no>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <5B4B9A479BF6994B88EA975675EC5B790575861F5C@MES1OS2SXC003.mes1.tconet.net>
-References: <5B4B9A479BF6994B88EA975675EC5B790575861F5C@MES1OS2SXC003.mes1.tconet.net>
+To: Filip Palian <s3810@pjwstk.edu.pl>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <BANLkTik7WyQ977-+8XapTgBrVRMyexyHKg@mail.gmail.com>
+References: <BANLkTik7WyQ977-+8XapTgBrVRMyexyHKg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 11 May 2011 18:32:13 -0700
-Message-ID: <1305163933.15916.170.camel@aeonflux>
+Date: Wed, 11 May 2011 18:30:00 -0700
+Message-ID: <1305163800.15916.169.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Carles,
+Hi Filip,
 
-> Just wondering, what intefaces/endpoints does btusb use when there's no standard "USB_DEVICE_INFO(0xe0, 0x01, 0x01)" descriptor and instead it's using a hardcoded VID/PID?
+> Structures "l2cap_conninfo" and "rfcomm_conninfo" have one padding
+> byte each. This byte in "cinfo" is copied to userspace uninitialized.
+> 
+> patch no.1:
+> -- cut --
+> --- a/net/bluetooth/l2cap_sock.c        2011-05-04 03:59:13.000000000 +0100
+> +++ b/net/bluetooth/l2cap_sock.c        2011-05-08 18:57:20.000000000 +0100
+> @@ -446,6 +446,7 @@ static int l2cap_sock_getsockopt_old(str
+>                         break;
+>                 }
+> 
+> +               memset(&cinfo, 0, sizeof(cinfo));
+>                 cinfo.hci_handle = l2cap_pi(sk)->conn->hcon->handle;
+>                 memcpy(cinfo.dev_class, l2cap_pi(sk)->conn->hcon->dev_class, 3);
 
-the ones described in the Bluetooth USB HCI (aka H:2) standard.
+nice catch, but please create a patch via git format-patch and don't
+forget a Signed-off-by line.
 
 Regards
 
