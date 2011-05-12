@@ -1,39 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 12 May 2011 19:32:46 +0200
+From: Filip Palian <s3810@pjwstk.edu.pl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth: l2cap and rfcomm: fix 1 byte infoleak to userspace.
+Message-ID: <20110512173246.GC11166@backtrack>
+References: <BANLkTik7WyQ977-+8XapTgBrVRMyexyHKg@mail.gmail.com> <1305163800.15916.169.camel@aeonflux>
 MIME-Version: 1.0
-In-Reply-To: <1305178350-7568-1-git-send-email-padovan@profusion.mobi>
-References: <1305178350-7568-1-git-send-email-padovan@profusion.mobi>
-Date: Thu, 12 May 2011 11:55:42 -0400
-Message-ID: <BANLkTinnOesA2YFfgoi8YuWFa3o+jaADeQ@mail.gmail.com>
-Subject: Re: [PATCH 1/6] Bluetooth: Create __l2cap_chan_close()
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1305163800.15916.169.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Padovan,
+Structures "l2cap_conninfo" and "rfcomm_conninfo" have one padding
+byte each. This byte in "cinfo" is copied to userspace uninitialized.
 
-On Thu, May 12, 2011 at 1:32 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> +void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
-> +{
-> +       struct l2cap_conn *conn = chan->conn;
-> +       struct sock *sk = chan->sk;
-> +
-> +       BT_DBG("chan %p state %d socket %p", chan, sk->sk_state, sk->sk_socket);
-> +
-> +       switch (sk->sk_state) {
-> +       case BT_LISTEN:
-> +               l2cap_chan_cleanup_listen(chan->sk);
+Signed-off-by: Filip Palian <filip.palian@pjwstk.edu.pl>
+---
+ net/bluetooth/l2cap_sock.c  |    1 +
+ net/bluetooth/rfcomm/sock.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-Cosmetic: you can use just "sk" above.
-
-> +               break;
-> +
-
-Regards,
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 299fe56..581310f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -446,6 +446,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 			break;
+ 		}
+ 
++		memset(&cinfo, 0, sizeof(cinfo));
+ 		cinfo.hci_handle = l2cap_pi(sk)->conn->hcon->handle;
+ 		memcpy(cinfo.dev_class, l2cap_pi(sk)->conn->hcon->dev_class, 3);
+ 
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 66cc1f0..784af0f 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -787,6 +787,7 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __u
+ 
+ 		l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+ 
++		memset(&cinfo, 0, sizeof(cinfo));
+ 		cinfo.hci_handle = l2cap_pi(l2cap_sk)->conn->hcon->handle;
+ 		memcpy(cinfo.dev_class, l2cap_pi(l2cap_sk)->conn->hcon->dev_class, 3);
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.5.6.3
+
+Found by Marek Kroemeke and Filip Palian. Special thanks to Vasiliy Kulikov for advices.
+
+Best regards.
