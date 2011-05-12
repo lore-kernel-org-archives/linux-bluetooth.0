@@ -1,44 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
-Subject: [PATCH v3] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure.
-Date: Fri, 13 May 2011 13:07:52 +0800
-Message-ID: <7f3edf43a88fbbcd8ef1797450b43eda889e2c9a.1305256769.git.Ruiyi.Zhang@Atheros.com>
-In-Reply-To: <20110511175555.GE22065@joana>
-References: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com> <1304657051-26453-1-git-send-email-Ruiyi.zhang@atheros.com> <20110511175555.GE22065@joana>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Stephen Boyd <sboyd@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH 6/9] Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y warning
+Date: Thu, 12 May 2011 16:50:09 -0700
+Message-Id: <1305244212-19183-7-git-send-email-sboyd@codeaurora.org>
+In-Reply-To: <1305244212-19183-1-git-send-email-sboyd@codeaurora.org>
+References: <1305244212-19183-1-git-send-email-sboyd@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
-l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
-skb into BUSY_QUEUE for later retries.
+Enabling DEBUG_STRICT_USER_COPY_CHECKS causes the following
+warning:
 
-Signed-off-by: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+In function 'copy_from_user',
+    inlined from 'rfcomm_sock_setsockopt' at
+    net/bluetooth/rfcomm/sock.c:705:
+arch/x86/include/asm/uaccess_64.h:65:
+warning: call to 'copy_from_user_overflow' declared with
+attribute warning: copy_from_user() buffer size is not provably
+correct
+
+presumably due to buf_size being signed causing GCC to fail to
+see that buf_size can't become negative.
+
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo F. Padovan <padovan@profusion.mobi>
+Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |    6 +-----
- 1 files changed, 1 insertions(+), 5 deletions(-)
+ net/bluetooth/rfcomm/sock.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a5ab4a2..a99e5d7 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2928,11 +2928,7 @@ static int l2cap_ertm_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *sk
- 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
- 			goto drop;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 66cc1f0..0698b37 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -679,7 +679,8 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname, c
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct bt_security sec;
+-	int len, err = 0;
++	int err = 0;
++	size_t len;
+ 	u32 opt;
  
--		err = sock_queue_rcv_skb(chan->sk, skb);
--		if (!err)
--			return err;
--
--		break;
-+		return sock_queue_rcv_skb(chan->sk, skb);
- 
- 	case L2CAP_SDU_START:
- 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
+ 	BT_DBG("sk %p", sk);
 -- 
-1.7.1
-
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
