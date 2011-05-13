@@ -1,27 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Fri, 13 May 2011 18:06:20 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Stephen Boyd <sboyd@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH 6/9] Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y
+ warning
+Message-ID: <20110513210620.GB2187@joana>
+References: <1305244212-19183-1-git-send-email-sboyd@codeaurora.org>
+ <1305244212-19183-7-git-send-email-sboyd@codeaurora.org>
 MIME-Version: 1.0
-Date: Fri, 13 May 2011 23:57:17 +0200
-Message-ID: <BANLkTikA6KOpgWH9sg96dE2oYB3VKS5gLQ@mail.gmail.com>
-Subject: [GSoC] Presentation
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1305244212-19183-7-git-send-email-sboyd@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I've been asked to sent some introducing mail, so here it goes ;)
+Hi Stephen,
 
-My name is Bartosz Szatkowski and I'm going to implement/extend EDS
-(Evolution Data Server) backend for PBAP in obexd as my GSoC project.
-As far I've managed to go thought PBAP spec, OBEX spec(partialy),
-general EDS architecture and API, existing PBAP code (dummy, tracker
-and existing EDS base). Also I've write small frontend for pbap-client
-(there are some issues with pbap-client in obex-client -- I'v already
-sent on patch and I'm checking other issues).
+* Stephen Boyd <sboyd@codeaurora.org> [2011-05-12 16:50:09 -0700]:
 
-Main coding part starts at May 24 so I'll be in touch :)
+> Enabling DEBUG_STRICT_USER_COPY_CHECKS causes the following
+> warning:
+> 
+> In function 'copy_from_user',
+>     inlined from 'rfcomm_sock_setsockopt' at
+>     net/bluetooth/rfcomm/sock.c:705:
+> arch/x86/include/asm/uaccess_64.h:65:
+> warning: call to 'copy_from_user_overflow' declared with
+> attribute warning: copy_from_user() buffer size is not provably
+> correct
+> 
+> presumably due to buf_size being signed causing GCC to fail to
+> see that buf_size can't become negative.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo F. Padovan <padovan@profusion.mobi>
+> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+> ---
+>  net/bluetooth/rfcomm/sock.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+
+Applied, thanks.
 
 -- 
-Pozdrowienia,
-Bartosz Szatkowski
+Gustavo F. Padovan
+http://profusion.mobi
