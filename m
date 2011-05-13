@@ -1,25 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <Suraj.Sumangala@Atheros.com>
-To: Eponymous - <the.epon@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 13 May 2011 13:43:16 +0530
-Subject: RE: HCI data payload not getting through when using BlueZ
-Message-ID: <44EE5C37ADC36343B0625A05DD408C48517CE84134@CHEXMB-01.global.atheros.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
 References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
 	<20110511164736.GA22065@joana>
-	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>,<BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
-In-Reply-To: <BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
+Date: Fri, 13 May 2011 08:54:18 +0100
+Message-ID: <BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
+Subject: Re: HCI data payload not getting through when using BlueZ
+From: Eponymous - <the.epon@gmail.com>
+To: Eponymous - <the.epon@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi,
-________________________________________
-From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] On Behalf Of Eponymous - [the.epon@gmail.com]
-Sent: Friday, May 13, 2011 1:24 PM
-To: Eponymous -; linux-bluetooth@vger.kernel.org
-Subject: Re: HCI data payload not getting through when using BlueZ
 
 Can someone please advise me further on this please? There is no
 binary called "l2test" in the 4.91 sources. It's crucial I get this
@@ -65,16 +57,3 @@ On Thu, May 12, 2011 at 11:19 AM, Eponymous - <the.epon@gmail.com> wrote:
 >> http://profusion.mobi
 >>
 >
-
-You have to enable it in the cofigure file and change "test_enable" from "no" to "yes".
-Edit the file "configure", search for "test_enable"
-change "test_enable=no" to "test_enable=yes"
-
-That is what I do to enable l2test. I guess there could be some other cleaner way to do it.
-
-Regards
-Suraj
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
