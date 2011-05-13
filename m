@@ -1,59 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+Subject: [PATCH v3] Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure.
+Date: Fri, 13 May 2011 13:07:52 +0800
+Message-ID: <7f3edf43a88fbbcd8ef1797450b43eda889e2c9a.1305256769.git.Ruiyi.Zhang@Atheros.com>
+In-Reply-To: <20110511175555.GE22065@joana>
+References: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com> <1304657051-26453-1-git-send-email-Ruiyi.zhang@atheros.com> <20110511175555.GE22065@joana>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-	<20110511164736.GA22065@joana>
-	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
-Date: Fri, 13 May 2011 08:54:18 +0100
-Message-ID: <BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
-Subject: Re: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: Eponymous - <the.epon@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Can someone please advise me further on this please? There is no
-binary called "l2test" in the 4.91 sources. It's crucial I get this
-problem remedied as I can't send data between two HCI devices. This
-could be a bug in BlueZ...
+In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
+l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
+skb into BUSY_QUEUE for later retries.
 
+Signed-off-by: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+---
+ net/bluetooth/l2cap_core.c |    6 +-----
+ 1 files changed, 1 insertions(+), 5 deletions(-)
 
-On Thu, May 12, 2011 at 11:19 AM, Eponymous - <the.epon@gmail.com> wrote:
-> Hi,
->
-> I've just downloaded the 4.91 sources and done a make and the only
-> program I can see starting "l2" is "l2ping". There is no l2test.
->
->
-> On Wed, May 11, 2011 at 5:47 PM, Gustavo F. Padovan
-> <padovan@profusion.mobi> wrote:
->> * Eponymous - <the.epon@gmail.com> [2011-05-11 09:52:28 +0100]:
->>
->>> Hi,
->>>
->>> I've ran into an issue where data doesn't seem to be received by a slave device.
->>>
->>> I do the following:
->>>
->>> Using Gentoo Linux (2.6.34-gentoo-r1)
->>> Using BlueZ 4.81
->>>
->>> 1. Use BlueZ to connect to two Bluetooth devices using HCI only. This
->>> is over USB.
->>>
->>> 2. I set one device as a slave and then create a connection between
->>> the two. This completes sucessfully and can be seen on both sides.
->>>
->>> 3. I then try to send an acl packet with the word "hi" in it and it is
->>> not received on the other side.
->>
->> There a utility called l2test in the bluez sources. Check if it works for you.
->> Using -r in one side to listen and -s in the other side to send data. Or
->> l2test -h and see all options.
->>
->> --
->> Gustavo F. Padovan
->> http://profusion.mobi
->>
->
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a5ab4a2..a99e5d7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2928,11 +2928,7 @@ static int l2cap_ertm_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *sk
+ 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
+ 			goto drop;
+ 
+-		err = sock_queue_rcv_skb(chan->sk, skb);
+-		if (!err)
+-			return err;
+-
+-		break;
++		return sock_queue_rcv_skb(chan->sk, skb);
+ 
+ 	case L2CAP_SDU_START:
+ 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
+-- 
+1.7.1
+
