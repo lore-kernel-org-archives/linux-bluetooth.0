@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 May 2011 15:23:53 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH -v2 0/7] L2CAP rework patches
-Date: Fri, 13 May 2011 16:20:43 -0300
-Message-Id: <1305314450-25493-1-git-send-email-padovan@profusion.mobi>
+To: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Allow unsegmented SDU retries on
+ sock_queue_rcv_skb failure.
+Message-ID: <20110513182353.GA5403@joana>
+References: <1303990781-15538-1-git-send-email-Ruiyi.zhang@atheros.com>
+ <1304657051-26453-1-git-send-email-Ruiyi.zhang@atheros.com>
+ <20110511175555.GE22065@joana>
+ <7f3edf43a88fbbcd8ef1797450b43eda889e2c9a.1305256769.git.Ruiyi.Zhang@Atheros.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <7f3edf43a88fbbcd8ef1797450b43eda889e2c9a.1305256769.git.Ruiyi.Zhang@Atheros.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is part of the ongoing series to fix the L2CAP core and remove its socket
-dependence.
+Hi Ruiyi,
 
-Changes since v1:
-- Fixed styles issues and typos reported by Lizardo
-- renamed link_type to chan_type
-- renamed L2CAP_LINK_RAW to L2CAP_CHAN_RAW
-- renamed L2CAP_LINK_CONNLESS to L2CAP_CHAN_CONN_LESS
-- renamed L2CAP_LINK_ORIENTED to L2CAP_CHAN_CONN_ORIENTED
+* Ruiyi Zhang <Ruiyi.Zhang@Atheros.com> [2011-05-13 13:07:52 +0800]:
 
-Gustavo F. Padovan (7):
-  Bluetooth: Remove leftover debug messages
-  Bluetooth: Create __l2cap_chan_close()
-  Bluetooth: Create l2cap_chan_send()
-  Bluetooth: Add chan->chan_type struct member
-  Bluetooth: create channel timer to replace sk_timer
-  Bluetooth: Remove export of l2cap_chan_clear_timer()
-  Bluetooth: Rename __l2cap_chan_close() to l2cap_chan_close()
+> In L2CAP_SDU_UNSEGMENTED case, if sock_queue_rcv_skb returns error,
+> l2cap_ertm_reassembly_sdu should not return 0 so as to insert the
+> skb into BUSY_QUEUE for later retries.
+> 
+> Signed-off-by: Ruiyi Zhang <Ruiyi.Zhang@Atheros.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    6 +-----
+>  1 files changed, 1 insertions(+), 5 deletions(-)
 
- include/net/bluetooth/l2cap.h |   23 ++--
- net/bluetooth/l2cap_core.c    |  289 ++++++++++++++++++++++++++++++++++------
- net/bluetooth/l2cap_sock.c    |  244 ++++-------------------------------
- 3 files changed, 280 insertions(+), 276 deletions(-)
+Applied, thanks.
 
 -- 
-1.7.5.rc3
-
+Gustavo F. Padovan
+http://profusion.mobi
