@@ -1,152 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 May 2011 16:33:26 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/12] Bluetooth: LE advertising cache
-Message-ID: <20110513193326.GB5403@joana>
-References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
- <1304701521-26459-3-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304701521-26459-3-git-send-email-andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH -v2 7/7] Bluetooth: Rename __l2cap_chan_close() to l2cap_chan_close()
+Date: Fri, 13 May 2011 16:20:50 -0300
+Message-Id: <1305314450-25493-8-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1305314450-25493-7-git-send-email-padovan@profusion.mobi>
+References: <1305314450-25493-1-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-2-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-3-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-4-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-5-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-6-git-send-email-padovan@profusion.mobi>
+ <1305314450-25493-7-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+To make it consistent with the rest of the API.
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-05-06 14:05:11 -0300]:
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |   29 ++++++++++++-----------------
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 3 files changed, 14 insertions(+), 19 deletions(-)
 
-> This patch implements the LE advertising cache. It stores sensitive
-> information (bdaddr and bdaddr_type so far) gathered from LE
-> advertising report events.
-> 
-> Only advertising entries from connectables devices are added to the
-> cache.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |   13 +++++++
->  net/bluetooth/hci_core.c         |   74 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 87 insertions(+), 0 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 14cc324..65135f8 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -89,6 +89,12 @@ struct oob_data {
->  	u8 randomizer[16];
->  };
->  
-> +struct adv_entry {
-> +	struct list_head list;
-> +	bdaddr_t bdaddr;
-> +	u8 bdaddr_type;
-> +};
-> +
->  #define NUM_REASSEMBLY 4
->  struct hci_dev {
->  	struct list_head list;
-> @@ -181,6 +187,8 @@ struct hci_dev {
->  
->  	struct list_head	remote_oob_data;
->  
-> +	struct list_head	adv_entries;
-> +
->  	struct hci_dev_stats	stat;
->  
->  	struct sk_buff_head	driver_init;
-> @@ -526,6 +534,11 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
->  								u8 *randomizer);
->  int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
->  
-> +int hci_adv_entries_clear(struct hci_dev *hdev);
-> +struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> +int hci_add_adv_entry(struct hci_dev *hdev,
-> +					struct hci_ev_le_advertising_info *ev);
-
-Rename this to hci_adv_add_entry()
-
-> +
->  void hci_del_off_timer(struct hci_dev *hdev);
->  
->  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b6bda3f..0ba3c39 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1204,6 +1204,77 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
->  	return 0;
->  }
->  
-> +int hci_adv_entries_clear(struct hci_dev *hdev)
-> +{
-> +	struct list_head *p, *n;
-> +
-> +	list_for_each_safe(p, n, &hdev->adv_entries) {
-
-list_for_each_entry_safe() here.
-
-> +		struct adv_entry *entry;
-> +
-> +		entry = list_entry(p, struct adv_entry, list);
-> +
-> +		list_del(p);
-> +		kfree(entry);
-> +	}
-> +
-> +	BT_DBG("%s adv cache cleared", hdev->name);
-> +
-> +	return 0;
-> +}
-> +
-> +struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr)
-> +{
-> +	struct list_head *p;
-> +
-> +	list_for_each(p, &hdev->adv_entries) {
-
-list_for_each_entry() here.
-
-> +		struct adv_entry *entry;
-> +
-> +		entry = list_entry(p, struct adv_entry, list);
-> +
-> +		if (bacmp(bdaddr, &entry->bdaddr) == 0)
-> +			return entry;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static inline int is_connectable_adv(u8 evt_type)
-> +{
-> +	if (evt_type == ADV_IND || evt_type == ADV_DIRECT_IND)
-> +		return 1;
-> +
-> +	return 0;
-
-You use this function just in one place, get rid of it.
-
-> +}
-> +
-> +int hci_add_adv_entry(struct hci_dev *hdev,
-> +					struct hci_ev_le_advertising_info *ev)
-> +{
-> +	struct adv_entry *entry;
-> +
-> +	if (!is_connectable_adv(ev->evt_type))
-> +		return -EINVAL;
-> +
-> +	entry = hci_find_adv_entry(hdev, &ev->bdaddr);
-> +	/* Only new entries should be added to adv_entries. So, if
-> +	 * bdaddr was found, don't add it. */
-> +	if (entry)
-> +		return 0;
-
-	if (hci_find_adv_entry())
-		return 0;
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 1c89c7f..a2dcbff 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -464,7 +464,7 @@ struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 							int proto, gfp_t prio);
+ 
+ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+-void __l2cap_chan_close(struct l2cap_chan *chan, int reason);
++void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+ int l2cap_chan_connect(struct l2cap_chan *chan);
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 1390d0b..c7eda36 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -250,7 +250,7 @@ static void l2cap_chan_timeout(unsigned long arg)
+ 	else
+ 		reason = ETIMEDOUT;
+ 
+-	__l2cap_chan_close(chan, reason);
++	l2cap_chan_close(chan, reason);
+ 
+ 	bh_unlock_sock(sk);
+ 
+@@ -383,16 +383,6 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	}
+ }
+ 
+-/* Must be called on unlocked socket. */
+-static void l2cap_chan_close(struct sock *sk)
+-{
+-	l2cap_chan_clear_timer(l2cap_pi(sk)->chan);
+-	lock_sock(sk);
+-	__l2cap_chan_close(l2cap_pi(sk)->chan, ECONNRESET);
+-	release_sock(sk);
+-	l2cap_sock_kill(sk);
+-}
+-
+ static void l2cap_chan_cleanup_listen(struct sock *parent)
+ {
+ 	struct sock *sk;
+@@ -400,14 +390,19 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
+ 	BT_DBG("parent %p", parent);
+ 
+ 	/* Close not yet accepted channels */
+-	while ((sk = bt_accept_dequeue(parent, NULL)))
+-		l2cap_chan_close(sk);
++	while ((sk = bt_accept_dequeue(parent, NULL))) {
++		l2cap_chan_clear_timer(l2cap_pi(sk)->chan);
++		lock_sock(sk);
++		l2cap_chan_close(l2cap_pi(sk)->chan, ECONNRESET);
++		release_sock(sk);
++		l2cap_sock_kill(sk);
++	}
+ 
+ 	parent->sk_state = BT_CLOSED;
+ 	sock_set_flag(parent, SOCK_ZAPPED);
+ }
+ 
+-void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
++void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sock *sk = chan->sk;
+@@ -724,10 +719,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 					conn->feat_mask)
+ 					&& chan->conf_state &
+ 					L2CAP_CONF_STATE2_DEVICE) {
+-				/* __l2cap_chan_close() calls list_del(chan)
++				/* l2cap_chan_close() calls list_del(chan)
+ 				 * so release the lock */
+ 				read_unlock_bh(&conn->chan_lock);
+-				 __l2cap_chan_close(chan, ECONNRESET);
++				 l2cap_chan_close(chan, ECONNRESET);
+ 				read_lock_bh(&conn->chan_lock);
+ 				bh_unlock_sock(sk);
+ 				continue;
+@@ -4157,7 +4152,7 @@ static inline void l2cap_check_encryption(struct l2cap_chan *chan, u8 encrypt)
+ 			l2cap_chan_clear_timer(chan);
+ 			l2cap_chan_set_timer(chan, HZ * 5);
+ 		} else if (chan->sec_level == BT_SECURITY_HIGH)
+-			__l2cap_chan_close(chan, ECONNREFUSED);
++			l2cap_chan_close(chan, ECONNREFUSED);
+ 	} else {
+ 		if (chan->sec_level == BT_SECURITY_MEDIUM)
+ 			l2cap_chan_clear_timer(chan);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index aca1d56..735d89a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -707,7 +707,7 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+ 			err = __l2cap_wait_ack(sk);
+ 
+ 		sk->sk_shutdown = SHUTDOWN_MASK;
+-		__l2cap_chan_close(chan, 0);
++		l2cap_chan_close(chan, 0);
+ 
+ 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
+ 			err = bt_sock_wait_state(sk, BT_CLOSED,
 -- 
-Gustavo F. Padovan
-http://profusion.mobi
+1.7.5.rc3
+
