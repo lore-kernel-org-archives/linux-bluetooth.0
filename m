@@ -1,30 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 15 May 2011 02:18:54 +0300
+Date: Sun, 15 May 2011 02:13:16 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-Cc: linux-bluetooth@vger.kernel.org, hadess@hadess.net,
-	padovan@profusion.mobi
-Subject: Re: [PATCH 1/5] Add length argument to hci pincode reply
-Message-ID: <20110514231854.GC28969@dell.ger.corp.intel.com>
-References: <1304623040-30461-1-git-send-email-dh.herrmann@googlemail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Update params description of PIN Code Request
+Message-ID: <20110514231316.GB28969@dell.ger.corp.intel.com>
+References: <1304499240-4966-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1304623040-30461-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1304499240-4966-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Waldek,
 
-On Thu, May 05, 2011, David Herrmann wrote:
-> This adds a new "length" argument to the hci pincode reply to allow
-> sending binary pins including \0 characters.
+On Wed, May 04, 2011, Waldemar Rymarkiewicz wrote:
 > ---
->  plugins/hciops.c  |   10 +++++-----
->  plugins/mgmtops.c |    9 ++++-----
->  src/adapter.c     |    3 ++-
->  src/adapter.h     |    3 ++-
->  4 files changed, 13 insertions(+), 12 deletions(-)
+>  doc/mgmt-api.txt |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 
-All patches in this set have been pushed upstream. Thanks.
+Pushed upstream. Thanks.
 
 Johan
