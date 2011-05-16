@@ -1,91 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: [PATCH -v2 3/7] Bluetooth: Create l2cap_chan_send()
+Date: Mon, 16 May 2011 11:07:25 +0200
+References: <1305314450-25493-1-git-send-email-padovan@profusion.mobi> <1305314450-25493-3-git-send-email-padovan@profusion.mobi> <1305314450-25493-4-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1305314450-25493-4-git-send-email-padovan@profusion.mobi>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTi=KK0zUyeBUxWJxUW+EyFvJ_SuALA@mail.gmail.com>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-	<20110511164736.GA22065@joana>
-	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
-	<BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
-	<44EE5C37ADC36343B0625A05DD408C48517CE84134@CHEXMB-01.global.atheros.com>
-	<4DCCEB4E.7040600@nokia.com>
-	<BANLkTikJMKed11aRghia+7as9XGHokOH7w@mail.gmail.com>
-	<BANLkTi=H-iEn_oAMb1bwJk6KEAueHRMVtQ@mail.gmail.com>
-	<BANLkTi=KK0zUyeBUxWJxUW+EyFvJ_SuALA@mail.gmail.com>
-Date: Mon, 16 May 2011 11:36:51 +0100
-Message-ID: <BANLkTi=nUb=CxPYMgJQk7HKUF0OCsc7jUw@mail.gmail.com>
-Subject: Re: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201105161107.25986.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-OK guys,
+Hi,
 
-I had a theory that my l2test test was not working due to the fact
-that the chip wasn't configured to work with upperlayers. After
-enabling this however, the  devices disappear (in hciconfig) so I
-can't really test any L2CAP stuff (which I assume is what l2test is
-doing).
+> This move all the sending logic to l2cap_core.c, but we still have a
+> socket dependence there, struct msghdr. It will be removed in some of the
+> further commits.
 
-Are there any other things I can try to help debug this issue I've seen?
+> +int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+> +{
+> +	struct sock *sk = chan->sk;
+> +	struct sk_buff *skb;
+> +	u16 control;
+> +	int err;
+> +
+> +	/* Connectionless channel */
+> +	if (sk->sk_type == SOCK_DGRAM) {
+> +		skb = l2cap_create_connless_pdu(chan, msg, len);
+> +		if (IS_ERR(skb))
+> +			return PTR_ERR(skb);
+> +
+> +		l2cap_do_send(chan, skb);
+> +		return len;
+> +	}
+> +
+> +	switch (chan->mode) {
+> +	case L2CAP_MODE_BASIC:
+> +		/* Check outgoing MTU */
+> +		if (len > chan->omtu)
+> +			return -EMSGSIZE;
+> +
+> +		/* Create a basic PDU */
+> +		skb = l2cap_create_basic_pdu(chan, msg, len);
+> +		if (IS_ERR(skb))
+> +			return PTR_ERR(skb);
+> +
+> +		l2cap_do_send(chan, skb);
+> +		err = len;
+> +		break;
+> +
+> +	case L2CAP_MODE_ERTM:
+> +	case L2CAP_MODE_STREAMING:
 
-Thankyou.
+How about moving common part (sdu if-else) to a function and separate those 2 cases?
+Would be less confusing imho.
 
-On Fri, May 13, 2011 at 1:42 PM, Eponymous - <the.epon@gmail.com> wrote:
-> The following were executed in a root shell.
->
-> Receive Side (Device B):
->
-> $ ./l2test -r 00:02:5B:00:31:21
-> l2test[29219]: Waiting for connection on psm 4113 ...
->
-> Transmit Side (Device A):
->
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29234]: Can't connect: Permission denied (13)
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29311]: Can't connect: Connection refused (111)
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29326]: Can't connect: Connection refused (111)
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29401]: Can't connect: Permission denied (13)
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29478]: Can't connect: Connection refused (111)
-> $ ./l2test -s -b 10 00:02:5B:01:FE:DF
-> l2test[29493]: Can't connect: Connection refused (111)
->
-> Doesn't appear to work...
->
-> On Fri, May 13, 2011 at 9:39 AM, Eponymous - <the.epon@gmail.com> wrote:
->> What format do you specify the bdaddr in ?
->>
->> Cheers.
->>
->> On Fri, May 13, 2011 at 9:26 AM, Mika Linnanoja
->> <mika.linnanoja@nokia.com> wrote:
->>> On 05/13/2011 11:13 AM, ext Suraj Sumangala wrote:
->>>>
->>>> You have to enable it in the cofigure file and change "test_enable" from
->>>> "no" to "yes".
->>>> Edit the file "configure", search for "test_enable"
->>>> change "test_enable=no" to "test_enable=yes"
->>>>
->>>> That is what I do to enable l2test. I guess there could be some other
->>>> cleaner way to do it.
->>>
->>> ./configure --help :)
->>>
->>> If you pull from the git repo ./bootstrap-configure already enables most of
->>> them.
->>>
->>> Although lately configure is often *not* complaining if something is missing
->>> from build dependencies, have to do a bit of trial & error to get it right.
->>>
->>> This is very easy to notice when trying to 'make' bluez on a clean system
->>> where it hasn't ever been built before.
->>>
->>> Cheers,
->>> Mika
->>>
->>
->
+> +		/* Entire SDU fits into one PDU */
+> +		if (len <= chan->remote_mps) {
+> +			control = L2CAP_SDU_UNSEGMENTED;
+> +			skb = l2cap_create_iframe_pdu(chan, msg, len, control,
+> +									0);
+> +			if (IS_ERR(skb))
+> +				return PTR_ERR(skb);
+> +
+> +			__skb_queue_tail(&chan->tx_q, skb);
+> +
+> +			if (chan->tx_send_head == NULL)
+> +				chan->tx_send_head = skb;
+> +
+> +		} else {
+> +			/* Segment SDU into multiples PDUs */
+> +			err = l2cap_sar_segment_sdu(chan, msg, len);
+> +			if (err < 0)
+> +				return err;
+> +		}
+> +
+> +		if (chan->mode == L2CAP_MODE_STREAMING) {
+> +			l2cap_streaming_send(chan);
+> +			err = len;
+> +			break;
+> +		}
+> +
+> +		if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
+> +				(chan->conn_state & L2CAP_CONN_WAIT_F)) {
+> +			err = len;
+> +			break;
+> +		}
+> +
+> +		err = l2cap_ertm_send(chan);
+> +		if (err >= 0)
+> +			err = len;
+> +
+> +		break;
+> +
+> +	default:
+> +		BT_DBG("bad state %1.1x", chan->mode);
+> +		err = -EBADFD;
+> +	}
+> +
+> +	return err;
+> +}
+
+-- 
+BR
+Szymon Janc
