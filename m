@@ -1,60 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTinL=-ODxZa9CGboD0o9443cG-uFkQ@mail.gmail.com>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-	<20110511164736.GA22065@joana>
-	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
-	<BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
-	<44EE5C37ADC36343B0625A05DD408C48517CE84134@CHEXMB-01.global.atheros.com>
-	<4DCCEB4E.7040600@nokia.com>
-	<BANLkTikJMKed11aRghia+7as9XGHokOH7w@mail.gmail.com>
-	<BANLkTi=H-iEn_oAMb1bwJk6KEAueHRMVtQ@mail.gmail.com>
-	<BANLkTi=KK0zUyeBUxWJxUW+EyFvJ_SuALA@mail.gmail.com>
-	<BANLkTi=nUb=CxPYMgJQk7HKUF0OCsc7jUw@mail.gmail.com>
-	<BANLkTinL=-ODxZa9CGboD0o9443cG-uFkQ@mail.gmail.com>
-Date: Tue, 17 May 2011 08:13:25 +0100
-Message-ID: <BANLkTi=xgHcwU-2XeKoVweoLGRYQJNUvvg@mail.gmail.com>
-Subject: Re: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH v3 12/12] Drop variable EIR length
+Date: Mon, 16 May 2011 17:50:01 -0300
+Message-Id: <1305579001-3019-12-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1305579001-3019-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1305579001-3019-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The chips are CSR Bluecores. In order to get upperlayers access rather
- than HCI over USB you have to configure a key in the firmware.
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-As soon as I enable upperlayers access the devices disappear from hciconfig.
+The functions eir_parse() and adapter_update_found_devices() now
+assume that the EIR buffer has always 240 octets. For advertising
+reports, the advertising data is stored on a buffer with 240 bytes,
+padded with zeroes.
+---
+ plugins/hciops.c |   13 +++++++++----
+ src/adapter.c    |    6 +++---
+ src/adapter.h    |    4 ++--
+ src/eir.c        |    8 ++++----
+ src/eir.h        |    2 +-
+ src/event.c      |    3 +--
+ 6 files changed, 20 insertions(+), 16 deletions(-)
 
-On Mon, May 16, 2011 at 1:17 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi,
->
-> On Mon, May 16, 2011 at 6:36 AM, Eponymous - <the.epon@gmail.com> wrote:
->> OK guys,
->>
->> I had a theory that my l2test test was not working due to the fact
->> that the chip wasn't configured to work with upperlayers. After
->> enabling this however, the  devices disappear (in hciconfig) so I
->> can't really test any L2CAP stuff (which I assume is what l2test is
->> doing).
->>
->> Are there any other things I can try to help debug this issue I've seen?
->
-> What is the chipset of your USB dongles ? A "lsusb -d <vid>:<pid>" and
-> relevant output from dmesg might help here.
->
-> What do you mean by "the chip wasn't configured to work with
-> upperlayers" ? Was the chipset in a mode which was not HCI compliant?
->
-> Keep in mind that there are development/prototype USB dongles which
-> are in fact serial/FTDI devices, and thus require using hciattach to
-> be able to use them in BlueZ.
->
-> Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
->
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 37b2d8e..d976822 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -2171,7 +2171,7 @@ static inline void le_advertising_report(int index, evt_le_meta_event *meta)
+ {
+ 	struct dev_info *dev = &devs[index];
+ 	le_advertising_info *info;
+-	uint8_t num_reports, rssi;
++	uint8_t num_reports, rssi, eir[HCI_MAX_EIR_LENGTH];
+ 	const uint8_t RSSI_SIZE = 1;
+ 
+ 	num_reports = meta->data[0];
+@@ -2179,8 +2179,10 @@ static inline void le_advertising_report(int index, evt_le_meta_event *meta)
+ 	info = (le_advertising_info *) &meta->data[1];
+ 	rssi = *(info->data + info->length);
+ 
+-	btd_event_device_found(&dev->bdaddr, &info->bdaddr, 0, rssi,
+-								info->data);
++	memset(eir, 0, sizeof(eir));
++	memcpy(eir, info->data, info->length);
++
++	btd_event_device_found(&dev->bdaddr, &info->bdaddr, 0, rssi, eir);
+ 
+ 	num_reports--;
+ 
+@@ -2189,8 +2191,11 @@ static inline void le_advertising_report(int index, evt_le_meta_event *meta)
+ 								RSSI_SIZE);
+ 		rssi = *(info->data + info->length);
+ 
++		memset(eir, 0, sizeof(eir));
++		memcpy(eir, info->data, info->length);
++
+ 		btd_event_device_found(&dev->bdaddr, &info->bdaddr, 0, rssi,
+-								info->data);
++									eir);
+ 	}
+ }
+ 
+diff --git a/src/adapter.c b/src/adapter.c
+index 84e8ca6..33fd354 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2999,8 +2999,8 @@ static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer, const char *file)
+ }
+ 
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-					uint32_t class, int8_t rssi,
+-					uint8_t *data, size_t eir_size)
++						uint32_t class, int8_t rssi,
++						uint8_t *data)
+ {
+ 	struct remote_dev_info *dev, match;
+ 	struct eir_data eir_data;
+@@ -3010,7 +3010,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 	int err;
+ 
+ 	memset(&eir_data, 0, sizeof(eir_data));
+-	err = eir_parse(&eir_data, data, HCI_MAX_EIR_LENGTH);
++	err = eir_parse(&eir_data, data);
+ 	if (err < 0) {
+ 		error("Error parsing EIR data: %s (%d)", strerror(-err), -err);
+ 		return;
+diff --git a/src/adapter.h b/src/adapter.h
+index 4c07e92..3526849 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -109,8 +109,8 @@ int adapter_get_discover_type(struct btd_adapter *adapter);
+ struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter,
+ 						struct remote_dev_info *match);
+ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+-					uint32_t class, int8_t rssi,
+-					uint8_t *data, size_t eir_size);
++						uint32_t class, int8_t rssi,
++						uint8_t *data);
+ int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr);
+ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 						struct remote_dev_info *dev);
+diff --git a/src/eir.c b/src/eir.c
+index 7dfc444..01b6ac5 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -52,7 +52,7 @@ void eir_data_free(struct eir_data *eir)
+ 	g_free(eir->name);
+ }
+ 
+-int eir_parse(struct eir_data *eir, uint8_t *eir_data, size_t eir_length)
++int eir_parse(struct eir_data *eir, uint8_t *eir_data)
+ {
+ 	uint16_t len = 0;
+ 	size_t total;
+@@ -69,10 +69,10 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, size_t eir_length)
+ 	eir->flags = -1;
+ 
+ 	/* No EIR data to parse */
+-	if (eir_data == NULL || eir_length == 0)
++	if (eir_data == NULL)
+ 		return 0;
+ 
+-	while (len < eir_length - 1) {
++	while (len < HCI_MAX_EIR_LENGTH - 1) {
+ 		uint8_t field_len = eir_data[0];
+ 
+ 		/* Check for the end of EIR */
+@@ -115,7 +115,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data, size_t eir_length)
+ 	}
+ 
+ 	/* Bail out if got incorrect length */
+-	if (len > eir_length)
++	if (len > HCI_MAX_EIR_LENGTH)
+ 		return -EINVAL;
+ 
+ 	total = uuid16_count + uuid32_count + uuid128_count;
+diff --git a/src/eir.h b/src/eir.h
+index ea38570..d225973 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -35,7 +35,7 @@ struct eir_data {
+ };
+ 
+ void eir_data_free(struct eir_data *eir);
+-int eir_parse(struct eir_data *eir, uint8_t *eir_data, size_t eir_length);
++int eir_parse(struct eir_data *eir, uint8_t *eir_data);
+ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
+ 			uint16_t did_product, uint16_t did_version,
+ 			GSList *uuids, uint8_t *data);
+diff --git a/src/event.c b/src/event.c
+index cd5e9e1..55ffadb 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -320,8 +320,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+ 	if (data)
+ 		write_remote_eir(local, peer, data);
+ 
+-	adapter_update_found_devices(adapter, peer, class, rssi,
+-						data, HCI_MAX_EIR_LENGTH);
++	adapter_update_found_devices(adapter, peer, class, rssi, data);
+ }
+ 
+ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer,
+-- 
+1.7.5.rc3
+
