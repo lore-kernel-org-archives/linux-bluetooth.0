@@ -1,60 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v3 00/12] Discovery Cleanup
-Date: Mon, 16 May 2011 17:49:39 -0300
-Message-Id: <1305578979-2981-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <BANLkTikx8qkTnpb46Q=zh8=7NnwDyvXDXQ@mail.gmail.com>
-References: <BANLkTikx8qkTnpb46Q=zh8=7NnwDyvXDXQ@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTi=nUb=CxPYMgJQk7HKUF0OCsc7jUw@mail.gmail.com>
+References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+	<20110511164736.GA22065@joana>
+	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
+	<BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
+	<44EE5C37ADC36343B0625A05DD408C48517CE84134@CHEXMB-01.global.atheros.com>
+	<4DCCEB4E.7040600@nokia.com>
+	<BANLkTikJMKed11aRghia+7as9XGHokOH7w@mail.gmail.com>
+	<BANLkTi=H-iEn_oAMb1bwJk6KEAueHRMVtQ@mail.gmail.com>
+	<BANLkTi=KK0zUyeBUxWJxUW+EyFvJ_SuALA@mail.gmail.com>
+	<BANLkTi=nUb=CxPYMgJQk7HKUF0OCsc7jUw@mail.gmail.com>
+Date: Mon, 16 May 2011 08:17:53 -0400
+Message-ID: <BANLkTinL=-ODxZa9CGboD0o9443cG-uFkQ@mail.gmail.com>
+Subject: Re: HCI data payload not getting through when using BlueZ
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Eponymous - <the.epon@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Main changes are:
- - Unify advertising reports and inquiry results: mgmt sends device
-   found event. Device type(BR/LE) are now discovered based on the
-   EIR flags.
- - Logic improvement/cleanup: device found
- - Move EIR functions to a new file
+Hi,
 
-Check AD Flags of the EIR data(in the advertising data) doesn't require
-kernel socket API changes, broken LE devices can send advertises without
-AD flags set, for this case the fallback is to consider it as BR device
-and for the connection page timeout.
+On Mon, May 16, 2011 at 6:36 AM, Eponymous - <the.epon@gmail.com> wrote:
+> OK guys,
+>
+> I had a theory that my l2test test was not working due to the fact
+> that the chip wasn't configured to work with upperlayers. After
+> enabling this however, the  devices disappear (in hciconfig) so I
+> can't really test any L2CAP stuff (which I assume is what l2test is
+> doing).
+>
+> Are there any other things I can try to help debug this issue I've seen?
 
-Open(old) issues: excessive dynamic memory allocation/free for EIR data.
-Check if EIR has changed to send another DeviceFound signal, trust on RSSI
-value only is not correct.
+What is the chipset of your USB dongles ? A "lsusb -d <vid>:<pid>" and
+relevant output from dmesg might help here.
 
-Bruna Moreira (3):
-  Remove btd_event_advertising_report
-  Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
-  Drop variable EIR length
+What do you mean by "the chip wasn't configured to work with
+upperlayers" ? Was the chipset in a mode which was not HCI compliant?
 
-Claudio Takahasi (9):
-  Move EIR related functions to a new file
-  Initial device found cleanup
-  Move legacy verification to a new function
-  Cleanup read name and alias from storage
-  Don't resolve name if the name is in the storage
-  Unify inquiry results and advertises
-  Fix memory leak of EIR data
-  Change the order to write/read the remote's name
-  Cleanup inserting new device found entry
+Keep in mind that there are development/prototype USB dongles which
+are in fact serial/FTDI devices, and thus require using hciattach to
+be able to use them in BlueZ.
 
- Makefile.am      |    2 +-
- plugins/hciops.c |  188 +++----------------------------
- src/adapter.c    |  174 ++++++++++++++++++-----------
- src/adapter.h    |    9 +-
- src/eir.c        |  328 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/eir.h        |   41 +++++++
- src/event.c      |  217 +-----------------------------------
- src/event.h      |    1 -
- src/sdpd.h       |   14 ---
- 9 files changed, 502 insertions(+), 472 deletions(-)
- create mode 100644 src/eir.c
- create mode 100644 src/eir.h
-
+Regards,
 -- 
-1.7.5.rc3
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
