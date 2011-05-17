@@ -1,111 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH v4 11/12] Replace EIR_DATA_LENGTH with HCI_MAX_EIR_LENGTH
-Date: Tue, 17 May 2011 15:26:36 -0300
-Message-Id: <1305656796-9911-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1305579001-3019-11-git-send-email-claudio.takahasi@openbossa.org>
-References: <1305579001-3019-11-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v4 10/12] Cleanup inserting new device found entry
+Date: Tue, 17 May 2011 15:26:29 -0300
+Message-Id: <1305656789-9875-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1305579001-3019-10-git-send-email-claudio.takahasi@openbossa.org>
+References: <1305579001-3019-10-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-
-Both defines have the same value (240) and meaning.
 ---
- src/adapter.c |    2 +-
- src/eir.c     |    9 +++++----
- src/eir.h     |    2 --
- src/event.c   |    2 +-
- 4 files changed, 7 insertions(+), 8 deletions(-)
+ src/adapter.c |   97 +++++++++++++++++++++++++++-----------------------------
+ 1 files changed, 47 insertions(+), 50 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index ff2b484..e8fa8e0 100644
+index 1a49fb0..ff2b484 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3005,7 +3005,7 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+@@ -2914,29 +2914,24 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	g_free(alias);
+ }
+ 
+-static struct remote_dev_info *get_found_dev(struct btd_adapter *adapter,
+-						const bdaddr_t *bdaddr,
+-						gboolean *new_dev)
++static struct remote_dev_info *found_device_new(const bdaddr_t *bdaddr,
++					gboolean le, const char *name,
++					const char *alias, uint32_t class,
++					gboolean legacy, name_status_t status,
++					int flags)
+ {
+-	struct remote_dev_info *dev, match;
++	struct remote_dev_info *dev;
+ 
+-	memset(&match, 0, sizeof(struct remote_dev_info));
+-	bacpy(&match.bdaddr, bdaddr);
+-	match.name_status = NAME_ANY;
+-
+-	dev = adapter_search_found_devices(adapter, &match);
+-	if (dev) {
+-		*new_dev = FALSE;
+-		/* Out of range list update */
+-		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
+-							dev);
+-	} else {
+-		*new_dev = TRUE;
+-		dev = g_new0(struct remote_dev_info, 1);
+-		bacpy(&dev->bdaddr, bdaddr);
+-		adapter->found_devices = g_slist_prepend(adapter->found_devices,
+-									dev);
+-	}
++	dev = g_new0(struct remote_dev_info, 1);
++	bacpy(&dev->bdaddr, bdaddr);
++	dev->le = le;
++	dev->name = g_strdup(name);
++	dev->alias = g_strdup(alias);
++	dev->class = class;
++	dev->legacy = legacy;
++	dev->name_status = status;
++	if (flags >= 0)
++		dev->flags = flags;
+ 
+ 	return dev;
+ }
+@@ -3002,11 +2997,11 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 					uint32_t class, int8_t rssi,
+ 					uint8_t *data, size_t eir_size)
+ {
+-	struct remote_dev_info *dev;
++	struct remote_dev_info *dev, match;
+ 	struct eir_data eir_data;
+-	char *name;
+-	gboolean new_dev, legacy, le;
+-	name_status_t name_status = NAME_NOT_REQUIRED;
++	char *alias, *name;
++	gboolean legacy, le;
++	name_status_t name_status;
  	int err;
  
  	memset(&eir_data, 0, sizeof(eir_data));
--	err = eir_parse(&eir_data, data, EIR_DATA_LENGTH);
-+	err = eir_parse(&eir_data, data, HCI_MAX_EIR_LENGTH);
- 	if (err < 0) {
- 		error("Error parsing EIR data: %s (%d)", strerror(-err), -err);
- 		return;
-diff --git a/src/eir.c b/src/eir.c
-index 2fbd919..7dfc444 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -27,6 +27,7 @@
- #include <glib.h>
+@@ -3019,6 +3014,25 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		write_device_name(&adapter->bdaddr, bdaddr, eir_data.name);
  
- #include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
- #include <bluetooth/sdp.h>
++	/* Device already seen in the discovery session ? */
++	memset(&match, 0, sizeof(struct remote_dev_info));
++	bacpy(&match.bdaddr, bdaddr);
++	match.name_status = NAME_ANY;
++
++	dev = adapter_search_found_devices(adapter, &match);
++	if (dev) {
++		adapter->oor_devices = g_slist_remove(adapter->oor_devices,
++							dev);
++		if (dev->rssi != rssi)
++			goto done;
++
++		eir_data_free(&eir_data);
++
++		return;
++	}
++
++	/* New device in the discovery session */
++
+ 	name = read_stored_data(&adapter->bdaddr, bdaddr, "names");
  
- #include "glib-helper.h"
-@@ -184,7 +185,7 @@ static void eir_generate_uuid128(GSList *list, uint8_t *ptr, uint16_t *eir_len)
- 			continue;
- 
- 		/* Stop if not enough space to put next UUID128 */
--		if ((len + 2 + SIZEOF_UUID128) > EIR_DATA_LENGTH) {
-+		if ((len + 2 + SIZEOF_UUID128) > HCI_MAX_EIR_LENGTH) {
- 			truncated = TRUE;
- 			break;
- 		}
-@@ -229,7 +230,7 @@ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
- 	GSList *l;
- 	uint8_t *ptr = data;
- 	uint16_t eir_len = 0;
--	uint16_t uuid16[EIR_DATA_LENGTH / 2];
-+	uint16_t uuid16[HCI_MAX_EIR_LENGTH / 2];
- 	int i, uuid_count = 0;
- 	gboolean truncated = FALSE;
- 	size_t name_len;
-@@ -289,7 +290,7 @@ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
- 			continue;
- 
- 		/* Stop if not enough space to put next UUID16 */
--		if ((eir_len + 2 + sizeof(uint16_t)) > EIR_DATA_LENGTH) {
-+		if ((eir_len + 2 + sizeof(uint16_t)) > HCI_MAX_EIR_LENGTH) {
- 			truncated = TRUE;
- 			break;
- 		}
-@@ -322,6 +323,6 @@ void eir_create(const char *name, int8_t tx_power, uint16_t did_vendor,
+ 	if (eir_data.flags < 0) {
+@@ -3036,34 +3050,19 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 	} else {
+ 		le = TRUE;
+ 		legacy = FALSE;
++		name_status = NAME_NOT_REQUIRED;
  	}
  
- 	/* Group all UUID128 types */
--	if (eir_len <= EIR_DATA_LENGTH - 2)
-+	if (eir_len <= HCI_MAX_EIR_LENGTH - 2)
- 		eir_generate_uuid128(uuids, ptr, &eir_len);
- }
-diff --git a/src/eir.h b/src/eir.h
-index aacd16a..ea38570 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -22,8 +22,6 @@
-  *
-  */
- 
--#define EIR_DATA_LENGTH  240
+-	dev = get_found_dev(adapter, bdaddr, &new_dev);
 -
- struct uuid_info {
- 	uuid_t uuid;
- 	uint8_t svc_hint;
-diff --git a/src/event.c b/src/event.c
-index 3ee8802..e28afa3 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -321,7 +321,7 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 		write_remote_eir(local, peer, data);
+-	if (new_dev) {
+-		const char *dev_name = (name ? name : eir_data.name);
+-		char *alias;
++	alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
  
- 	adapter_update_found_devices(adapter, peer, class, rssi,
--						data, EIR_DATA_LENGTH);
-+						data, HCI_MAX_EIR_LENGTH);
+-		if (dev_name)
+-			dev->name = g_strdup(dev_name);
+-
+-		alias = read_stored_data(&adapter->bdaddr, bdaddr, "aliases");
+-		if (alias) {
+-			dev->alias = g_strdup(alias);
+-			free(alias);
+-		}
+-
+-		dev->le = FALSE;
+-		dev->class = class;
+-		dev->legacy = legacy;
+-		dev->name_status = name_status;
++	dev = found_device_new(bdaddr, le, name, alias, class, legacy,
++						name_status, eir_data.flags);
++	free(name);
++	free(alias);
+ 
+-		if (eir_data.flags >= 0)
+-			dev->flags = eir_data.flags;
+-
+-	} else if (dev->rssi == rssi)
+-		goto done;
++	adapter->found_devices = g_slist_prepend(adapter->found_devices, dev);
+ 
++done:
+ 	dev->rssi = rssi;
+ 
+ 	adapter->found_devices = g_slist_sort(adapter->found_devices,
+@@ -3074,8 +3073,6 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
+ 
+ 	adapter_emit_device_found(adapter, dev);
+ 
+-done:
+-	free(name);
+ 	eir_data_free(&eir_data);
  }
  
- void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer,
 -- 
 1.7.5.rc3
 
