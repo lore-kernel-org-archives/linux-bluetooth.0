@@ -1,242 +1,380 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Simplify options for including/excluding plugins
-Date: Tue, 17 May 2011 11:17:44 +0300
-Message-Id: <1305620264-22304-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
-References: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 1/2] Add conf file support
+Date: Tue, 17 May 2011 11:17:43 +0300
+Message-Id: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Plugins options are now handle with --plugin(-p)/--noplugin(-P) which
-takes a string set containing the plugin names separated by ',',':' or
-' 'similar to bluetoothd, ofono and connman.
+This should reduce the amount of options which normally don't change each
+time obexd is executed.
 ---
- src/main.c   |   76 ++++++++++++++-------------------------------------------
- src/obexd.h  |    2 +-
- src/plugin.c |   51 +++++++++++++++++++++++++++++++++++++-
- 3 files changed, 69 insertions(+), 60 deletions(-)
+ Makefile.am    |    2 +-
+ plugins/ftp.c  |    8 ++-
+ src/main.c     |  176 +++++++++++++++++++++++++++++++++++++++-----------------
+ src/obexd.conf |   19 ++++++
+ 4 files changed, 149 insertions(+), 56 deletions(-)
+ create mode 100644 src/obexd.conf
 
+diff --git a/Makefile.am b/Makefile.am
+index 8d8fdc6..2b329a6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -138,7 +138,7 @@ INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
+ 
+ CLEANFILES = $(service_DATA) $(builtin_files)
+ 
+-EXTRA_DIST = src/genbuiltin $(doc_files) $(test_files) src/obex.conf \
++EXTRA_DIST = src/genbuiltin $(doc_files) $(test_files) src/obexd.conf \
+ 			src/obexd.service.in client/obex-client.service.in \
+ 			plugins/phonebook-dummy.c plugins/phonebook-ebook.c \
+ 			plugins/phonebook-tracker.c \
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index 79223bf..879d9e9 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -179,8 +179,12 @@ static int get_by_type(struct ftp_session *ftp, const char *type)
+ 	if (type == NULL && name == NULL)
+ 		return -EBADR;
+ 
+-	if (g_strcmp0(type, CAP_TYPE) == 0)
+-		return obex_get_stream_start(os, capability);
++	if (g_strcmp0(type, CAP_TYPE) == 0) {
++		if (capability)
++			return obex_get_stream_start(os, capability);
++		else
++			return -ENOENT;
++	}
+ 
+ 	path = g_build_filename(ftp->folder, name, NULL);
+ 	err = obex_get_stream_start(os, path);
 diff --git a/src/main.c b/src/main.c
-index 018a8cf..fb4c8e0 100644
+index 8154e3b..018a8cf 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -148,15 +148,10 @@ static void sig_debug(int sig)
+@@ -54,7 +54,83 @@
+ 
+ #define DEFAULT_ROOT_PATH "/tmp"
+ 
+-#define DEFAULT_CAP_FILE CONFIGDIR "/capability.xml"
++static struct {
++	char *root_setup;
++	char *root_folder;
++	char *capability;
++	gboolean symlinks;
++} obexd_settings  = {
++	.root_setup = NULL,
++	.root_folder = DEFAULT_ROOT_PATH,
++	.capability = NULL,
++	.symlinks = FALSE
++};
++
++static void parse_config(GKeyFile *config)
++{
++	GError *error = NULL;
++	char *string;
++	gboolean boolean;
++
++	string = g_key_file_get_string(config, "General",
++						"RootSetup", &error);
++	if (error == NULL)
++		obexd_settings.root_setup = string;
++	else
++		g_clear_error(&error);
++
++	string = g_key_file_get_string(config, "General",
++						"RootFolder", &error);
++	if (error == NULL) {
++		if (string[0] != '/') {
++			char *old_root = string, *home = getenv("HOME");
++			if (home) {
++				string = g_strdup_printf("%s/%s", home, old_root);
++				g_free(old_root);
++			}
++		}
++
++		obexd_settings.root_folder = string;
++	} else
++		g_clear_error(&error);
++
++	string = g_key_file_get_string(config, "General",
++						"Capability", &error);
++	if (error == NULL)
++		obexd_settings.capability = string;
++	else
++		g_clear_error(&error);
++
++	boolean = g_key_file_get_boolean(config, "General",
++						"Symlinks", &error);
++	if (error == NULL)
++		obexd_settings.symlinks = boolean;
++
++	g_clear_error(&error);
++}
++
++static GKeyFile *load_config(const char *file)
++{
++	GError *err = NULL;
++	GKeyFile *keyfile;
++
++	DBG("%s", file);
++
++	keyfile = g_key_file_new();
++
++	g_key_file_set_list_separator(keyfile, ',');
++
++	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
++		error("Parsing %s failed: %s", file, err->message);
++		g_error_free(err);
++		g_key_file_free(keyfile);
++		return NULL;
++	}
++
++	parse_config(keyfile);
++
++	return keyfile;
++}
+ 
+ static GMainLoop *main_loop = NULL;
+ 
+@@ -71,10 +147,7 @@ static void sig_debug(int sig)
+ 
  static gboolean option_detach = TRUE;
  static char *option_debug = NULL;
- static char *option_config = NULL;
-+static char *option_plugin = NULL;
-+static char *option_noplugin = NULL;
+-
+-static char *option_root = NULL;
+-static char *option_root_setup = NULL;
+-static char *option_capability = NULL;
++static char *option_config = NULL;
  
  static gboolean option_autoaccept = FALSE;
--static gboolean option_opp = FALSE;
--static gboolean option_ftp = FALSE;
--static gboolean option_pbap = FALSE;
--static gboolean option_irmc = FALSE;
--static gboolean option_pcsuite = FALSE;
--static gboolean option_syncevolution = FALSE;
--static gboolean option_mas = FALSE;
+ static gboolean option_opp = FALSE;
+@@ -82,7 +155,6 @@ static gboolean option_ftp = FALSE;
+ static gboolean option_pbap = FALSE;
+ static gboolean option_irmc = FALSE;
+ static gboolean option_pcsuite = FALSE;
+-static gboolean option_symlinks = FALSE;
+ static gboolean option_syncevolution = FALSE;
+ static gboolean option_mas = FALSE;
  
- static gboolean parse_debug(const char *key, const char *value,
- 				gpointer user_data, GError **error)
-@@ -192,20 +187,10 @@ static GOptionEntry options[] = {
- 				"Config file location", "FILE" },
- 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
- 				"Automatically accept push requests" },
--	{ "opp", 'o', 0, G_OPTION_ARG_NONE, &option_opp,
--				"Enable Object Push server" },
--	{ "ftp", 'f', 0, G_OPTION_ARG_NONE, &option_ftp,
--				"Enable File Transfer server" },
--	{ "pbap", 'p', 0, G_OPTION_ARG_NONE, &option_pbap,
--				"Enable Phonebook Access server" },
--	{ "irmc", 'i', 0, G_OPTION_ARG_NONE, &option_irmc,
--				"Enable IrMC Sync server" },
--	{ "pcsuite", 's', 0, G_OPTION_ARG_NONE, &option_pcsuite,
--				"Enable PC Suite Services server" },
--	{ "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
--				"Enable OBEX server for SyncEvolution" },
--        { "mas", 'm', 0, G_OPTION_ARG_NONE, &option_mas,
--				"Enable Message Access server" },
-+	{ "plugin", 'p', 0, G_OPTION_ARG_STRING, &option_plugin,
-+				"Specify plugins to load", "NAME,..." },
-+	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
-+				"Specify plugins not to load", "NAME,..." },
- 	{ NULL },
- };
- 
-@@ -292,16 +277,6 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	if (option_opp == FALSE && option_ftp == FALSE &&
--				option_pbap == FALSE &&
--				option_irmc == FALSE &&
--				option_syncevolution == FALSE &&
--				option_mas == FALSE) {
--		fprintf(stderr, "No server selected (use either "
--				"--opp, --ftp, --pbap, --irmc, --mas, or --syncevolution)\n");
--		exit(EXIT_FAILURE);
--	}
--
- 	__obex_log_init("obexd", option_debug, option_detach);
- 
- 	if (option_config)
-@@ -323,39 +298,26 @@ int main(int argc, char *argv[])
- 		exit(EXIT_FAILURE);
- 	}
- 
--	plugin_init();
-+	plugin_init(option_plugin, option_noplugin);
- 
--	if (option_opp == TRUE)
--		obex_server_init(OBEX_OPP, obexd_settings.root_folder,
--						FALSE, option_autoaccept,
--						obexd_settings.symlinks,
--						NULL);
-+	obex_server_init(OBEX_OPP, obexd_settings.root_folder, FALSE,
-+			option_autoaccept, obexd_settings.symlinks, NULL);
- 
--	if (option_ftp == TRUE)
--		obex_server_init(OBEX_FTP, obexd_settings.root_folder,
--						TRUE, option_autoaccept,
--						obexd_settings.symlinks,
--						obexd_settings.capability);
-+	obex_server_init(OBEX_FTP, obexd_settings.root_folder, TRUE,
-+			option_autoaccept, obexd_settings.symlinks,
-+			obexd_settings.capability);
- 
--	if (option_pbap == TRUE)
--		obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE, NULL);
-+	obex_server_init(OBEX_PCSUITE, obexd_settings.root_folder, TRUE,
-+			option_autoaccept, obexd_settings.symlinks,
-+			obexd_settings.capability);
- 
--	if (option_pcsuite == TRUE)
--		obex_server_init(OBEX_PCSUITE, obexd_settings.root_folder,
--						TRUE, option_autoaccept,
--						obexd_settings.symlinks,
--						obexd_settings.capability);
-+	obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE, NULL);
- 
--	if (option_irmc == TRUE)
--		obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
--						obexd_settings.capability);
-+	obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE, NULL);
- 
--	if (option_syncevolution == TRUE)
--		obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE,
--							FALSE, NULL);
-+	obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE, FALSE, NULL);
- 
--	if (option_mas == TRUE)
--		obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
-+	obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
- 
- 	if (!root_folder_setup()) {
- 		error("Unable to setup root folder %s",
-diff --git a/src/obexd.h b/src/obexd.h
-index df21f00..37106b7 100644
---- a/src/obexd.h
-+++ b/src/obexd.h
-@@ -21,7 +21,7 @@
-  *
-  */
- 
--gboolean plugin_init(void);
-+gboolean plugin_init(const char *pattern, const char *exclude);
- void plugin_cleanup(void);
- 
- gboolean manager_init(void);
-diff --git a/src/plugin.c b/src/plugin.c
-index 14a569f..c8ec642 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
-@@ -79,10 +79,39 @@ static gboolean add_plugin(void *handle, struct obex_plugin_desc *desc)
+@@ -97,6 +169,17 @@ static gboolean parse_debug(const char *key, const char *value,
  	return TRUE;
  }
  
-+static gboolean check_plugin(struct obex_plugin_desc *desc,
-+				char **patterns, char **excludes)
++static gboolean set_config(const char *key, const char *value,
++				gpointer user_data, GError **error)
 +{
-+	if (excludes) {
-+		for (; *excludes; excludes++)
-+			if (g_pattern_match_simple(*excludes, desc->name))
-+				break;
-+		if (*excludes) {
-+			info("Excluding %s", desc->name);
-+			return FALSE;
-+		}
-+	}
++	if (!value)
++		return FALSE;
 +
-+	if (patterns) {
-+		for (; *patterns; patterns++)
-+			if (g_pattern_match_simple(*patterns, desc->name))
-+				break;
-+		if (*patterns == NULL) {
-+			info("Ignoring %s", desc->name);
-+			return FALSE;
-+		}
-+	}
++	option_config = g_strdup(value);
 +
 +	return TRUE;
 +}
 +
-+
- #include "builtin.h"
+ static GOptionEntry options[] = {
+ 	{ "nodaemon", 'n', G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_detach,
+@@ -104,14 +187,9 @@ static GOptionEntry options[] = {
+ 	{ "debug", 'd', G_OPTION_FLAG_OPTIONAL_ARG,
+ 				G_OPTION_ARG_CALLBACK, parse_debug,
+ 				"Enable debug information output", "DEBUG" },
+-	{ "root", 'r', 0, G_OPTION_ARG_STRING, &option_root,
+-				"Specify root folder location", "PATH" },
+-	{ "root-setup", 'S', 0, G_OPTION_ARG_STRING, &option_root_setup,
+-				"Root folder setup script", "SCRIPT" },
+-	{ "symlinks", 'l', 0, G_OPTION_ARG_NONE, &option_symlinks,
+-				"Enable symlinks on root folder" },
+-	{ "capability", 'c', 0, G_OPTION_ARG_STRING, &option_capability,
+-				"Specify capability file", "FILE" },
++	{ "config", 'c', G_OPTION_FLAG_OPTIONAL_ARG,
++				G_OPTION_ARG_CALLBACK, set_config,
++				"Config file location", "FILE" },
+ 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
+ 				"Automatically accept push requests" },
+ 	{ "opp", 'o', 0, G_OPTION_ARG_NONE, &option_opp,
+@@ -133,12 +211,12 @@ static GOptionEntry options[] = {
  
--gboolean plugin_init(void)
-+gboolean plugin_init(const char *pattern, const char *exclude)
+ const char *obex_option_root_folder(void)
  {
-+	gchar **patterns = NULL;
-+	gchar **excludes = NULL;
- 	GDir *dir;
- 	const char *file;
- 	unsigned int i;
-@@ -90,10 +119,21 @@ gboolean plugin_init(void)
- 	if (strlen(PLUGINDIR) == 0)
+-	return option_root;
++	return obexd_settings.root_folder;
+ }
+ 
+ gboolean obex_option_symlinks(void)
+ {
+-	return option_symlinks;
++	return obexd_settings.symlinks;
+ }
+ 
+ static gboolean is_dir(const char *dir) {
+@@ -152,32 +230,33 @@ static gboolean is_dir(const char *dir) {
+ 	return S_ISDIR(st.st_mode);
+ }
+ 
+-static gboolean root_folder_setup(char *root, char *root_setup)
++static gboolean root_folder_setup()
+ {
+ 	int status;
+-	char *argv[3] = { root_setup, root, NULL };
++	char *argv[3] = { obexd_settings.root_setup,
++					obexd_settings.root_folder, NULL };
+ 
+-	if (is_dir(root))
++	if (is_dir(argv[1]))
+ 		return TRUE;
+ 
+-	if (root_setup == NULL)
++	if (argv[0] == NULL || strlen(argv[0]) == 0)
  		return FALSE;
  
-+	if (pattern)
-+		patterns = g_strsplit_set(pattern, ":, ", -1);
-+
-+	if (exclude)
-+		excludes = g_strsplit_set(exclude, ":, ", -1);
-+
- 	DBG("Loading builtin plugins");
+-	DBG("Setting up %s using %s", root, root_setup);
++	DBG("Setting up %s using %s", argv[1], argv[0]);
  
--	for (i = 0; __obex_builtin[i]; i++)
-+	for (i = 0; __obex_builtin[i]; i++) {
-+		if (check_plugin(__obex_builtin[i],
-+					patterns, excludes) == FALSE)
-+			continue;
-+
- 		add_plugin(NULL,  __obex_builtin[i]);
-+	}
- 
- 	DBG("Loading plugins %s", PLUGINDIR);
- 
-@@ -129,11 +169,18 @@ gboolean plugin_init(void)
- 			continue;
- 		}
- 
-+		if (check_plugin(desc, patterns, excludes) == FALSE) {
-+			dlclose(handle);
-+			continue;
-+		}
-+
- 		if (add_plugin(handle, desc) == FALSE)
- 			dlclose(handle);
+ 	if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL, NULL, NULL,
+ 							&status, NULL)) {
+-		error("Unable to execute %s", root_setup);
++		error("Unable to execute %s", argv[0]);
+ 		return FALSE;
  	}
  
- 	g_dir_close(dir);
-+	g_strfreev(patterns);
-+	g_strfreev(excludes);
+ 	if (WEXITSTATUS(status) != EXIT_SUCCESS) {
+-		error("%s exited with status %d", root_setup,
++		error("%s exited with status %d", argv[0],
+ 							WEXITSTATUS(status));
+ 		return FALSE;
+ 	}
  
- 	return TRUE;
+-	return is_dir(root);
++	return is_dir(argv[1]);
  }
+ 
+ int main(int argc, char *argv[])
+@@ -185,6 +264,7 @@ int main(int argc, char *argv[])
+ 	GOptionContext *context;
+ 	GError *err = NULL;
+ 	struct sigaction sa;
++	GKeyFile *config;
+ 
+ #ifdef NEED_THREADS
+ 	if (g_thread_supported() == FALSE)
+@@ -224,6 +304,9 @@ int main(int argc, char *argv[])
+ 
+ 	__obex_log_init("obexd", option_debug, option_detach);
+ 
++	if (option_config)
++		config = load_config(option_config);
++
+ 	DBG("Entering main loop");
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
+@@ -240,43 +323,32 @@ int main(int argc, char *argv[])
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+-	if (option_root == NULL)
+-		option_root = g_strdup(DEFAULT_ROOT_PATH);
+-
+-	if (option_root[0] != '/') {
+-		char *old_root = option_root, *home = getenv("HOME");
+-		if (home) {
+-			option_root = g_strdup_printf("%s/%s", home, old_root);
+-			g_free(old_root);
+-		}
+-	}
+-
+ 	plugin_init();
+ 
+-	if (option_capability == NULL)
+-		option_capability = g_strdup(DEFAULT_CAP_FILE);
+-
+ 	if (option_opp == TRUE)
+-		obex_server_init(OBEX_OPP, option_root, FALSE,
+-				option_autoaccept, option_symlinks,
+-				NULL);
++		obex_server_init(OBEX_OPP, obexd_settings.root_folder,
++						FALSE, option_autoaccept,
++						obexd_settings.symlinks,
++						NULL);
+ 
+ 	if (option_ftp == TRUE)
+-		obex_server_init(OBEX_FTP, option_root, TRUE,
+-				option_autoaccept, option_symlinks,
+-				option_capability);
++		obex_server_init(OBEX_FTP, obexd_settings.root_folder,
++						TRUE, option_autoaccept,
++						obexd_settings.symlinks,
++						obexd_settings.capability);
+ 
+ 	if (option_pbap == TRUE)
+ 		obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE, NULL);
+ 
+ 	if (option_pcsuite == TRUE)
+-		obex_server_init(OBEX_PCSUITE, option_root, TRUE,
+-				option_autoaccept, option_symlinks,
+-				option_capability);
++		obex_server_init(OBEX_PCSUITE, obexd_settings.root_folder,
++						TRUE, option_autoaccept,
++						obexd_settings.symlinks,
++						obexd_settings.capability);
+ 
+ 	if (option_irmc == TRUE)
+ 		obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
+-				option_capability);
++						obexd_settings.capability);
+ 
+ 	if (option_syncevolution == TRUE)
+ 		obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE,
+@@ -285,8 +357,9 @@ int main(int argc, char *argv[])
+ 	if (option_mas == TRUE)
+ 		obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
+ 
+-	if (!root_folder_setup(option_root, option_root_setup)) {
+-		error("Unable to setup root folder %s", option_root);
++	if (!root_folder_setup()) {
++		error("Unable to setup root folder %s",
++						obexd_settings.root_folder);
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+@@ -308,9 +381,6 @@ int main(int argc, char *argv[])
+ 
+ 	g_main_loop_unref(main_loop);
+ 
+-	g_free(option_capability);
+-	g_free(option_root);
+-
+ 	__obex_log_cleanup();
+ 
+ 	return 0;
+diff --git a/src/obexd.conf b/src/obexd.conf
+new file mode 100644
+index 0000000..ef2541b
+--- /dev/null
++++ b/src/obexd.conf
+@@ -0,0 +1,19 @@
++[General]
++
++# Root folder location. Both absolute and relative paths can be used, but
++# relative paths are assumed to be relative to user $HOME folder
++# Default /tmp
++RootFolder = /tmp
++
++# Root setup script absolute path used in case root folder doesn't exist
++# Default none
++#RootSetup =
++
++# Capability file or script absolute path, in case of script it should start
++# with '!' mark.
++# Default none
++#Capability =
++
++# Indicates if symbolics links should be followed (only on root folder)
++# Default false
++Symlinks = false
 -- 
 1.7.1
 
