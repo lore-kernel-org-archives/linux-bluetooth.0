@@ -1,380 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Alan <alanbluetooth@AiAware.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Add conf file support
-Date: Tue, 17 May 2011 11:17:43 +0300
-Message-Id: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Does any one recognise this protocol? is it RF_COMM
+Date: Tue, 17 May 2011 17:15:46 +1000
+MIME-Version: 1.0
+Message-Id: <201105171715.47064.alanbluetooth@aiaware.com>
+Content-Type: Text/Plain;
+  charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+I am trying to write an OS driver for some propeitary hardware.
+I have hit brick wall and need to go back and check what I know so far and 
+turn over the rocks on the bits I hoped I could ignore. 
 
-This should reduce the amount of options which normally don't change each
-time obexd is executed.
----
- Makefile.am    |    2 +-
- plugins/ftp.c  |    8 ++-
- src/main.c     |  176 +++++++++++++++++++++++++++++++++++++++-----------------
- src/obexd.conf |   19 ++++++
- 4 files changed, 149 insertions(+), 56 deletions(-)
- create mode 100644 src/obexd.conf
 
-diff --git a/Makefile.am b/Makefile.am
-index 8d8fdc6..2b329a6 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -138,7 +138,7 @@ INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
- 
- CLEANFILES = $(service_DATA) $(builtin_files)
- 
--EXTRA_DIST = src/genbuiltin $(doc_files) $(test_files) src/obex.conf \
-+EXTRA_DIST = src/genbuiltin $(doc_files) $(test_files) src/obexd.conf \
- 			src/obexd.service.in client/obex-client.service.in \
- 			plugins/phonebook-dummy.c plugins/phonebook-ebook.c \
- 			plugins/phonebook-tracker.c \
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 79223bf..879d9e9 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -179,8 +179,12 @@ static int get_by_type(struct ftp_session *ftp, const char *type)
- 	if (type == NULL && name == NULL)
- 		return -EBADR;
- 
--	if (g_strcmp0(type, CAP_TYPE) == 0)
--		return obex_get_stream_start(os, capability);
-+	if (g_strcmp0(type, CAP_TYPE) == 0) {
-+		if (capability)
-+			return obex_get_stream_start(os, capability);
-+		else
-+			return -ENOENT;
-+	}
- 
- 	path = g_build_filename(ftp->folder, name, NULL);
- 	err = obex_get_stream_start(os, path);
-diff --git a/src/main.c b/src/main.c
-index 8154e3b..018a8cf 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -54,7 +54,83 @@
- 
- #define DEFAULT_ROOT_PATH "/tmp"
- 
--#define DEFAULT_CAP_FILE CONFIGDIR "/capability.xml"
-+static struct {
-+	char *root_setup;
-+	char *root_folder;
-+	char *capability;
-+	gboolean symlinks;
-+} obexd_settings  = {
-+	.root_setup = NULL,
-+	.root_folder = DEFAULT_ROOT_PATH,
-+	.capability = NULL,
-+	.symlinks = FALSE
-+};
-+
-+static void parse_config(GKeyFile *config)
-+{
-+	GError *error = NULL;
-+	char *string;
-+	gboolean boolean;
-+
-+	string = g_key_file_get_string(config, "General",
-+						"RootSetup", &error);
-+	if (error == NULL)
-+		obexd_settings.root_setup = string;
-+	else
-+		g_clear_error(&error);
-+
-+	string = g_key_file_get_string(config, "General",
-+						"RootFolder", &error);
-+	if (error == NULL) {
-+		if (string[0] != '/') {
-+			char *old_root = string, *home = getenv("HOME");
-+			if (home) {
-+				string = g_strdup_printf("%s/%s", home, old_root);
-+				g_free(old_root);
-+			}
-+		}
-+
-+		obexd_settings.root_folder = string;
-+	} else
-+		g_clear_error(&error);
-+
-+	string = g_key_file_get_string(config, "General",
-+						"Capability", &error);
-+	if (error == NULL)
-+		obexd_settings.capability = string;
-+	else
-+		g_clear_error(&error);
-+
-+	boolean = g_key_file_get_boolean(config, "General",
-+						"Symlinks", &error);
-+	if (error == NULL)
-+		obexd_settings.symlinks = boolean;
-+
-+	g_clear_error(&error);
-+}
-+
-+static GKeyFile *load_config(const char *file)
-+{
-+	GError *err = NULL;
-+	GKeyFile *keyfile;
-+
-+	DBG("%s", file);
-+
-+	keyfile = g_key_file_new();
-+
-+	g_key_file_set_list_separator(keyfile, ',');
-+
-+	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
-+		error("Parsing %s failed: %s", file, err->message);
-+		g_error_free(err);
-+		g_key_file_free(keyfile);
-+		return NULL;
-+	}
-+
-+	parse_config(keyfile);
-+
-+	return keyfile;
-+}
- 
- static GMainLoop *main_loop = NULL;
- 
-@@ -71,10 +147,7 @@ static void sig_debug(int sig)
- 
- static gboolean option_detach = TRUE;
- static char *option_debug = NULL;
--
--static char *option_root = NULL;
--static char *option_root_setup = NULL;
--static char *option_capability = NULL;
-+static char *option_config = NULL;
- 
- static gboolean option_autoaccept = FALSE;
- static gboolean option_opp = FALSE;
-@@ -82,7 +155,6 @@ static gboolean option_ftp = FALSE;
- static gboolean option_pbap = FALSE;
- static gboolean option_irmc = FALSE;
- static gboolean option_pcsuite = FALSE;
--static gboolean option_symlinks = FALSE;
- static gboolean option_syncevolution = FALSE;
- static gboolean option_mas = FALSE;
- 
-@@ -97,6 +169,17 @@ static gboolean parse_debug(const char *key, const char *value,
- 	return TRUE;
- }
- 
-+static gboolean set_config(const char *key, const char *value,
-+				gpointer user_data, GError **error)
-+{
-+	if (!value)
-+		return FALSE;
-+
-+	option_config = g_strdup(value);
-+
-+	return TRUE;
-+}
-+
- static GOptionEntry options[] = {
- 	{ "nodaemon", 'n', G_OPTION_FLAG_REVERSE,
- 				G_OPTION_ARG_NONE, &option_detach,
-@@ -104,14 +187,9 @@ static GOptionEntry options[] = {
- 	{ "debug", 'd', G_OPTION_FLAG_OPTIONAL_ARG,
- 				G_OPTION_ARG_CALLBACK, parse_debug,
- 				"Enable debug information output", "DEBUG" },
--	{ "root", 'r', 0, G_OPTION_ARG_STRING, &option_root,
--				"Specify root folder location", "PATH" },
--	{ "root-setup", 'S', 0, G_OPTION_ARG_STRING, &option_root_setup,
--				"Root folder setup script", "SCRIPT" },
--	{ "symlinks", 'l', 0, G_OPTION_ARG_NONE, &option_symlinks,
--				"Enable symlinks on root folder" },
--	{ "capability", 'c', 0, G_OPTION_ARG_STRING, &option_capability,
--				"Specify capability file", "FILE" },
-+	{ "config", 'c', G_OPTION_FLAG_OPTIONAL_ARG,
-+				G_OPTION_ARG_CALLBACK, set_config,
-+				"Config file location", "FILE" },
- 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
- 				"Automatically accept push requests" },
- 	{ "opp", 'o', 0, G_OPTION_ARG_NONE, &option_opp,
-@@ -133,12 +211,12 @@ static GOptionEntry options[] = {
- 
- const char *obex_option_root_folder(void)
- {
--	return option_root;
-+	return obexd_settings.root_folder;
- }
- 
- gboolean obex_option_symlinks(void)
- {
--	return option_symlinks;
-+	return obexd_settings.symlinks;
- }
- 
- static gboolean is_dir(const char *dir) {
-@@ -152,32 +230,33 @@ static gboolean is_dir(const char *dir) {
- 	return S_ISDIR(st.st_mode);
- }
- 
--static gboolean root_folder_setup(char *root, char *root_setup)
-+static gboolean root_folder_setup()
- {
- 	int status;
--	char *argv[3] = { root_setup, root, NULL };
-+	char *argv[3] = { obexd_settings.root_setup,
-+					obexd_settings.root_folder, NULL };
- 
--	if (is_dir(root))
-+	if (is_dir(argv[1]))
- 		return TRUE;
- 
--	if (root_setup == NULL)
-+	if (argv[0] == NULL || strlen(argv[0]) == 0)
- 		return FALSE;
- 
--	DBG("Setting up %s using %s", root, root_setup);
-+	DBG("Setting up %s using %s", argv[1], argv[0]);
- 
- 	if (!g_spawn_sync(NULL, argv, NULL, 0, NULL, NULL, NULL, NULL,
- 							&status, NULL)) {
--		error("Unable to execute %s", root_setup);
-+		error("Unable to execute %s", argv[0]);
- 		return FALSE;
- 	}
- 
- 	if (WEXITSTATUS(status) != EXIT_SUCCESS) {
--		error("%s exited with status %d", root_setup,
-+		error("%s exited with status %d", argv[0],
- 							WEXITSTATUS(status));
- 		return FALSE;
- 	}
- 
--	return is_dir(root);
-+	return is_dir(argv[1]);
- }
- 
- int main(int argc, char *argv[])
-@@ -185,6 +264,7 @@ int main(int argc, char *argv[])
- 	GOptionContext *context;
- 	GError *err = NULL;
- 	struct sigaction sa;
-+	GKeyFile *config;
- 
- #ifdef NEED_THREADS
- 	if (g_thread_supported() == FALSE)
-@@ -224,6 +304,9 @@ int main(int argc, char *argv[])
- 
- 	__obex_log_init("obexd", option_debug, option_detach);
- 
-+	if (option_config)
-+		config = load_config(option_config);
-+
- 	DBG("Entering main loop");
- 
- 	main_loop = g_main_loop_new(NULL, FALSE);
-@@ -240,43 +323,32 @@ int main(int argc, char *argv[])
- 		exit(EXIT_FAILURE);
- 	}
- 
--	if (option_root == NULL)
--		option_root = g_strdup(DEFAULT_ROOT_PATH);
--
--	if (option_root[0] != '/') {
--		char *old_root = option_root, *home = getenv("HOME");
--		if (home) {
--			option_root = g_strdup_printf("%s/%s", home, old_root);
--			g_free(old_root);
--		}
--	}
--
- 	plugin_init();
- 
--	if (option_capability == NULL)
--		option_capability = g_strdup(DEFAULT_CAP_FILE);
--
- 	if (option_opp == TRUE)
--		obex_server_init(OBEX_OPP, option_root, FALSE,
--				option_autoaccept, option_symlinks,
--				NULL);
-+		obex_server_init(OBEX_OPP, obexd_settings.root_folder,
-+						FALSE, option_autoaccept,
-+						obexd_settings.symlinks,
-+						NULL);
- 
- 	if (option_ftp == TRUE)
--		obex_server_init(OBEX_FTP, option_root, TRUE,
--				option_autoaccept, option_symlinks,
--				option_capability);
-+		obex_server_init(OBEX_FTP, obexd_settings.root_folder,
-+						TRUE, option_autoaccept,
-+						obexd_settings.symlinks,
-+						obexd_settings.capability);
- 
- 	if (option_pbap == TRUE)
- 		obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE, NULL);
- 
- 	if (option_pcsuite == TRUE)
--		obex_server_init(OBEX_PCSUITE, option_root, TRUE,
--				option_autoaccept, option_symlinks,
--				option_capability);
-+		obex_server_init(OBEX_PCSUITE, obexd_settings.root_folder,
-+						TRUE, option_autoaccept,
-+						obexd_settings.symlinks,
-+						obexd_settings.capability);
- 
- 	if (option_irmc == TRUE)
- 		obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
--				option_capability);
-+						obexd_settings.capability);
- 
- 	if (option_syncevolution == TRUE)
- 		obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE,
-@@ -285,8 +357,9 @@ int main(int argc, char *argv[])
- 	if (option_mas == TRUE)
- 		obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
- 
--	if (!root_folder_setup(option_root, option_root_setup)) {
--		error("Unable to setup root folder %s", option_root);
-+	if (!root_folder_setup()) {
-+		error("Unable to setup root folder %s",
-+						obexd_settings.root_folder);
- 		exit(EXIT_FAILURE);
- 	}
- 
-@@ -308,9 +381,6 @@ int main(int argc, char *argv[])
- 
- 	g_main_loop_unref(main_loop);
- 
--	g_free(option_capability);
--	g_free(option_root);
--
- 	__obex_log_cleanup();
- 
- 	return 0;
-diff --git a/src/obexd.conf b/src/obexd.conf
-new file mode 100644
-index 0000000..ef2541b
---- /dev/null
-+++ b/src/obexd.conf
-@@ -0,0 +1,19 @@
-+[General]
-+
-+# Root folder location. Both absolute and relative paths can be used, but
-+# relative paths are assumed to be relative to user $HOME folder
-+# Default /tmp
-+RootFolder = /tmp
-+
-+# Root setup script absolute path used in case root folder doesn't exist
-+# Default none
-+#RootSetup =
-+
-+# Capability file or script absolute path, in case of script it should start
-+# with '!' mark.
-+# Default none
-+#Capability =
-+
-+# Indicates if symbolics links should be followed (only on root folder)
-+# Default false
-+Symlinks = false
--- 
-1.7.1
+I am wondering if I made faulty guess early on.  hence this question.
 
+
+
+What protocol is this?   Can it be RF_COMM ?
+
+below is an edited extract of SnoppyPro logs from the windows software talking 
+to the real physical device.
+
+My question is what protocol are all the wrappers.
+ I beleieve I identified HCI-ACL / L2CAp/ UNK / Proprietary.
+
+The Unk one is probably something standard. As I can feed the proprietary part 
+into an RF_COMM socket under linux and the device responds as if I am the 
+windows machine. I thook that to mean Windows was talking RF_COMM.
+
+Howver when I have unix software pretend  be the device and listen( ) the 
+accept( ) never returns if it is the winodw software talking to me, but does 
+when it is my linux software talking to my enulated on linux device.
+I can post full hcidump of the failure to connect if you indicate what 
+settings are intelligible to you, Im finding raw the most informative  as i 
+can compare it to Snopypro logs....  
+But expect people who knows things would understand the gobbledegooked
+output modes better. 
+
+The snoopy pro logs are at the USB level(?), and contain one extra (internal) 
+layer of protocol data I do not undertsand. I think it is RF_COMM
+
+Typical packets
+Physical devices packet sent to Windows
+113     in      up      0x82    28.093  28.093  00
+TransferBuffer: 0x0000002b (43) length
+pre  0000: 2b 20 27 00    23 00 41 00    09 ef 3f 
+wrap 0000: 7e[1f 00](61)  24:ac:18:25:80:00 => 00:00:00:00:00:00
+cmnd 0000: 02 00 00 04  70 00 01 00  00 00 00 01  00 00 00 40
+
+Windows PC Packet sent to Device
+122     out     down    0x02    28.140  28.140  00
+TransferBuffer: 0x00000024 (36) length
+pre  0000: 2b 20 20 00    1c 00 8c 00    0b ff 2f 00    
+wrap 0000: 7e[17 00](69)  00:00:00:00:00:00 => 01:00:00:00:00:00
+cmnd 0000: 01 02 76 65  72 0d 0a 86  
+
+wrap and cmnd lines are the Device specific protocol burried in what look like 
+lower layers. My LinuxSoftware emulates the Windows software by injecting the 
+packets starting at 7E up the second last byte, into an RF_COMM socket.
+
+What I think I know
+Im pretty sure the   2b 20 20 00  is
+Protocol: “Core_V4.0.pdf” Figure 5.2: HCI ACL Data Packet   p429
+and 1c 00 8c 00
+is L2CAP  [size and channel ID].
+
+Does anyone recognise a protocol runnign on L2CAP that looks like this
+
+09 ef 3f       Data        40   for inbound packets and
+0b ff 2f 00    Data       86  for outbound packets
+
+Here are the same packets dumped RAW for Linux Software talking
+physical devices.  
+(I cant get packets for windw softwware talking emulated device as the conect 
+fails. Thats the problem)
+
+Note there are binary differences in both the L2CAP and RFCOMM parts.
+Most worrying to me is the missing 0.
+> 02 2B 20 27 00 23 00 40 00 09 EF 3F 7E 1F 00 61 24 AC 18 25 
+  80 00 00 00 00 00 00 00 02 00 00 04 70 00 01 00 00 00 00 01 
+  00 00 00 40 
+Linux RFComm packet.
+< 02 2B 20 1F 00 1B 00 4D 00 0B EF 2F 7E 17 00 69 00 00 00 00 
+  00 00 01 00 00 00 00 00 01 02 76 65 72 0D 0A 9A 
+
+Any idea why the differences or where there is a reasonable document on what 
+those RF_COMM bytes mean.
+Im probably goign to have to go deep enough to understand the connect process.
+
+
+          Alan
