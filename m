@@ -1,42 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 May 2011 09:13:26 -0700
+Date: Tue, 17 May 2011 08:51:06 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 03/12] Move legacy verification to a new function
-Message-ID: <20110517161326.GA20885@dell.ice.intel.com>
-References: <1305579001-3019-1-git-send-email-claudio.takahasi@openbossa.org>
- <1305579001-3019-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH v2] Adjust SPARQL queries to the changes in call history
+Message-ID: <20110517155106.GA17702@dell.ice.intel.com>
+References: <1305017315-30927-1-git-send-email-lkslawek@gmail.com>
+ <1305025781-21893-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1305579001-3019-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1305025781-21893-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Slawek,
 
-On Mon, May 16, 2011, Claudio Takahasi wrote:
+On Tue, May 10, 2011, Slawomir Bochenski wrote:
+> Currently nmo:Call resources put to the Tracker by commhistory do not use
+> the same nco:PhoneNumber as the one bound to the nco:PersonContact. This
+> patch introduces matching contacts by actual phone number, thus returning
+> proper contact data regardless of this commhistory change.
 > ---
->  src/adapter.c |   40 ++++++++++++++++++++++++++++------------
->  1 files changed, 28 insertions(+), 12 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 3188974..6f85abf 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3002,6 +3002,31 @@ void adapter_update_device_from_info(struct btd_adapter *adapter,
->  	adapter_emit_device_found(adapter, dev);
->  }
->  
-> +static int pairing_is_legacy(bdaddr_t *local, bdaddr_t *peer, gboolean eir,
-> +					gboolean name, gboolean *legacy)
-> +{
+> In the previous version backslashes at the ends of lines were incorrectly
+> aligned.
+>  plugins/phonebook-tracker.c |   74 ++++++++++++++++++++++++++++++------------
+>  1 files changed, 53 insertions(+), 21 deletions(-)
 
-The first two patches in this set have been pushed upstream, however
-could you consider the following change to this one: since you just
-assume legacy == TRUE if the storage read fails, why not just make this
-pairing_is_legacy function return a gboolean instead of returning the
-value by reference? (it's look cleaner, especially considering the name
-of the function)
+Pushed upstream. Thanks.
 
 Johan
