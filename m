@@ -1,65 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1305163474.15916.166.camel@aeonflux>
-References: <1304701521-26459-1-git-send-email-andre.guedes@openbossa.org>
-	<1304701521-26459-4-git-send-email-andre.guedes@openbossa.org>
-	<1305163474.15916.166.camel@aeonflux>
-Date: Tue, 17 May 2011 11:39:11 -0300
-Message-ID: <BANLkTim++9Q_93+=8TnjfurEZgi+=KbskA@mail.gmail.com>
-Subject: Re: [PATCH 03/12] Bluetooth: Protect 'adv_entries' with a RW lock
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <BANLkTin1wGOa2=_9qHhYmmTbLs_E2xUHXw@mail.gmail.com>
+References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+	<20110511164736.GA22065@joana>
+	<BANLkTimFMZ+ohvJsmD9NV7WqFqtX1W4yXw@mail.gmail.com>
+	<BANLkTi=t-0QPSV4ZOqCA=OMZaGRhcga+FA@mail.gmail.com>
+	<44EE5C37ADC36343B0625A05DD408C48517CE84134@CHEXMB-01.global.atheros.com>
+	<4DCCEB4E.7040600@nokia.com>
+	<BANLkTikJMKed11aRghia+7as9XGHokOH7w@mail.gmail.com>
+	<BANLkTi=H-iEn_oAMb1bwJk6KEAueHRMVtQ@mail.gmail.com>
+	<BANLkTi=KK0zUyeBUxWJxUW+EyFvJ_SuALA@mail.gmail.com>
+	<BANLkTi=nUb=CxPYMgJQk7HKUF0OCsc7jUw@mail.gmail.com>
+	<BANLkTinL=-ODxZa9CGboD0o9443cG-uFkQ@mail.gmail.com>
+	<BANLkTi=xgHcwU-2XeKoVweoLGRYQJNUvvg@mail.gmail.com>
+	<BANLkTin1wGOa2=_9qHhYmmTbLs_E2xUHXw@mail.gmail.com>
+Date: Tue, 17 May 2011 13:45:45 +0100
+Message-ID: <BANLkTinCBL_kkwfFH_nu5N7NKktVqxfdsA@mail.gmail.com>
+Subject: Re: HCI data payload not getting through when using BlueZ
+From: Eponymous - <the.epon@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+lsusb:
 
-On Wed, May 11, 2011 at 10:24 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> Hi Andre,
+Bus 001 Device 041: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
+Bus 001 Device 040: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
+
+These are definitely plain USB devices. There is no /dev/ttyUSBxx like
+you would get with the FTDI USB->Serial converters.
+
+I've checked over dmesg and the messages (of which there are many
+since I have eight of these devices) says they are USB.
+
+I don't want to become sidetracked from the issue though. Is there
+anyway to debug this issue without using l2test or any other
+upperlayers program? The issue I have seen was at the HCI level
+remember so I'm thinking introducing the upperlayers is going to make
+things unnecessarily complicated.
+
+Cheers.
+
+
+On Tue, May 17, 2011 at 12:50 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi,
 >
->> This patch adds a RW lock to protect concurrent operations on
->> adv_entries list.
+> On Tue, May 17, 2011 at 3:13 AM, Eponymous - <the.epon@gmail.com> wrote:
+>> The chips are CSR Bluecores. In order to get upperlayers access rather
+>>  than HCI over USB you have to configure a key in the firmware.
 >>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> =A0include/net/bluetooth/hci_core.h | =A0 =A01 +
->> =A0net/bluetooth/hci_core.c =A0 =A0 =A0 =A0 | =A0 21 +++++++++++++++++--=
---
->> =A02 files changed, 18 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index 65135f8..2ceeadf 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -188,6 +188,7 @@ struct hci_dev {
->> =A0 =A0 =A0 struct list_head =A0 =A0 =A0 =A0remote_oob_data;
->>
->> =A0 =A0 =A0 struct list_head =A0 =A0 =A0 =A0adv_entries;
->> + =A0 =A0 rwlock_t =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0adv_entries_lock;
+>> As soon as I enable upperlayers access the devices disappear from hciconfig.
 >
-> we might wanna consider just using spinlocks and not rwlocks. Also can
-> you please look into using RCU.
+> As I said, there are various development/prototype devices out there
+> that use UART (usually CDC ACM or FTDI over USB) transport instead of
+> "plain" USB. If you post the relevant lines from "dmesg" and "lsusb"
+> somewhere (after you configure the firmware key), we might be able to
+> identify the transport.
 >
-> Regards
+> For UART, you need to use hciattach on a e.g. /dev/ttyUSBX device
+> created when plugging the device.
 >
-> Marcel
+> HTH,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
 >
->
->
-
-Ok. I will use hci_dev_lock and friends to protect adv_entries.
-This is the approach already used to protect uuids, link_keys,
-remote_oob_data lists.
-
-About RCU, I see the point in using it, but since reading operations
-in adv_entries are not _extremely_ requested, IMO, we'll not have
-much performance gain here. Anyway, the changes to use RCU
-are straightforward. So, let me know if you wanna try RCU to
-protect the advertising cache.
-
-BR,
-
-Andre Guedes.
