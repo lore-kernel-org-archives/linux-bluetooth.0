@@ -2,85 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/3] Fix numbers GSlist to be used in new missed calls
-Date: Wed, 18 May 2011 18:58:07 +0300
-Message-Id: <1305734288-4317-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/3] Move phonebook_req_finalize
+Date: Wed, 18 May 2011 18:58:06 +0300
+Message-Id: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is possible that phonebook_pull_read is invoked several times
-submitting multiple pull requests without closing PBAP object. E.g. when
-maxlistcount value is small and size of call history is large enough.
-
-The result is possibility of different data structures (gstring and
-contact_data) to be mixed in a single GSlist that may lead to undefined
-behaviour.
+It is used in successive patch.
 ---
- plugins/phonebook-tracker.c |   17 ++++++++++++-----
- 1 files changed, 12 insertions(+), 5 deletions(-)
+ plugins/phonebook-tracker.c |   40 ++++++++++++++++++++--------------------
+ 1 files changed, 20 insertions(+), 20 deletions(-)
 
 diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 9c60ec3..52ed31b 100644
+index 9431d8a..9c60ec3 100644
 --- a/plugins/phonebook-tracker.c
 +++ b/plugins/phonebook-tracker.c
-@@ -948,6 +948,7 @@ struct phonebook_data {
- 	gboolean vcardentry;
- 	const struct apparam_field *params;
- 	GSList *contacts;
-+	GSList *numbers;
- 	phonebook_cache_ready_cb ready_cb;
- 	phonebook_entry_cb entry_cb;
- 	int newmissedcalls;
-@@ -1923,6 +1924,13 @@ static void gstring_free_helper(gpointer data, gpointer user_data)
- 	g_string_free(data, TRUE);
+@@ -1905,26 +1905,6 @@ done:
+ 	return path;
  }
  
-+static void free_data_numbers(struct phonebook_data *data)
+-void phonebook_req_finalize(void *request)
+-{
+-	struct phonebook_data *data = request;
+-
+-	DBG("");
+-
+-	if (!data)
+-		return;
+-
+-	/* canceling asynchronous operation on tracker if any is active */
+-	if (data->query_canc) {
+-		g_cancellable_cancel(data->query_canc);
+-		g_object_unref(data->query_canc);
+-	}
+-
+-	free_data_contacts(data);
+-	g_free(data->req_name);
+-	g_free(data);
+-}
+-
+ static gboolean find_checked_number(GSList *numbers, const char *number)
+ {
+ 	GSList *l;
+@@ -1996,6 +1976,26 @@ done:
+ 	return 0;
+ }
+ 
++void phonebook_req_finalize(void *request)
 +{
-+	g_slist_foreach(data->numbers, gstring_free_helper, NULL);
-+	g_slist_free(data->numbers);
-+	data->numbers = NULL;
++	struct phonebook_data *data = request;
++
++	DBG("");
++
++	if (!data)
++		return;
++
++	/* canceling asynchronous operation on tracker if any is active */
++	if (data->query_canc) {
++		g_cancellable_cancel(data->query_canc);
++		g_object_unref(data->query_canc);
++	}
++
++	free_data_contacts(data);
++	g_free(data->req_name);
++	g_free(data);
 +}
 +
- static int pull_newmissedcalls(const char **reply, int num_fields,
- 							void *user_data)
+ void *phonebook_pull(const char *name, const struct apparam_field *params,
+ 				phonebook_cb cb, void *user_data, int *err)
  {
-@@ -1934,12 +1942,12 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
- 	if (num_fields < 0 || reply == NULL)
- 		goto done;
- 
--	if (!find_checked_number(data->contacts, reply[1])) {
-+	if (!find_checked_number(data->numbers, reply[1])) {
- 		if (g_strcmp0(reply[2], "false") == 0)
- 			data->newmissedcalls++;
- 		else {
- 			GString *number = g_string_new(reply[1]);
--			data->contacts = g_slist_append(data->contacts,
-+			data->numbers = g_slist_append(data->numbers,
- 								number);
- 		}
- 	}
-@@ -1947,9 +1955,7 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
- 
- done:
- 	DBG("newmissedcalls %d", data->newmissedcalls);
--	g_slist_foreach(data->contacts, gstring_free_helper, NULL);
--	g_slist_free(data->contacts);
--	data->contacts = NULL;
-+	free_data_numbers(data);
- 
- 	if (num_fields < 0) {
- 		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
-@@ -1991,6 +1997,7 @@ void phonebook_req_finalize(void *request)
- 		g_object_unref(data->query_canc);
- 	}
- 
-+	free_data_numbers(data);
- 	free_data_contacts(data);
- 	g_free(data->req_name);
- 	g_free(data);
 -- 
 1.7.4.1
 
