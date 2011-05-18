@@ -1,30 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 May 2011 09:09:36 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com
-Subject: Re: [PATCH v2 1/2] Fix empty parameter list in functions declarations
-Message-ID: <20110518160936.GA8625@dell.amr.corp.intel.com>
-References: <1305700967-13217-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1305700967-13217-1-git-send-email-szymon.janc@tieto.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/3] Fix numbers GSlist to be used in new missed calls
+Date: Wed, 18 May 2011 18:58:07 +0300
+Message-Id: <1305734288-4317-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+It is possible that phonebook_pull_read is invoked several times
+submitting multiple pull requests without closing PBAP object. E.g. when
+maxlistcount value is small and size of call history is large enough.
 
-On Wed, May 18, 2011, Szymon Janc wrote:
-> ---
->  lib/sdp.c           |    2 +-
->  src/log.c           |    2 +-
->  src/log.h           |    2 +-
->  src/sdpd-database.c |    2 +-
->  test/avtest.c       |    2 +-
->  tools/avinfo.c      |    2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
+The result is possibility of different data structures (gstring and
+contact_data) to be mixed in a single GSlist that may lead to undefined
+behaviour.
+---
+ plugins/phonebook-tracker.c |   17 ++++++++++++-----
+ 1 files changed, 12 insertions(+), 5 deletions(-)
 
-Both patches have been pushed upstream. Thanks.
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 9c60ec3..52ed31b 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -948,6 +948,7 @@ struct phonebook_data {
+ 	gboolean vcardentry;
+ 	const struct apparam_field *params;
+ 	GSList *contacts;
++	GSList *numbers;
+ 	phonebook_cache_ready_cb ready_cb;
+ 	phonebook_entry_cb entry_cb;
+ 	int newmissedcalls;
+@@ -1923,6 +1924,13 @@ static void gstring_free_helper(gpointer data, gpointer user_data)
+ 	g_string_free(data, TRUE);
+ }
+ 
++static void free_data_numbers(struct phonebook_data *data)
++{
++	g_slist_foreach(data->numbers, gstring_free_helper, NULL);
++	g_slist_free(data->numbers);
++	data->numbers = NULL;
++}
++
+ static int pull_newmissedcalls(const char **reply, int num_fields,
+ 							void *user_data)
+ {
+@@ -1934,12 +1942,12 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
+ 	if (num_fields < 0 || reply == NULL)
+ 		goto done;
+ 
+-	if (!find_checked_number(data->contacts, reply[1])) {
++	if (!find_checked_number(data->numbers, reply[1])) {
+ 		if (g_strcmp0(reply[2], "false") == 0)
+ 			data->newmissedcalls++;
+ 		else {
+ 			GString *number = g_string_new(reply[1]);
+-			data->contacts = g_slist_append(data->contacts,
++			data->numbers = g_slist_append(data->numbers,
+ 								number);
+ 		}
+ 	}
+@@ -1947,9 +1955,7 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
+ 
+ done:
+ 	DBG("newmissedcalls %d", data->newmissedcalls);
+-	g_slist_foreach(data->contacts, gstring_free_helper, NULL);
+-	g_slist_free(data->contacts);
+-	data->contacts = NULL;
++	free_data_numbers(data);
+ 
+ 	if (num_fields < 0) {
+ 		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
+@@ -1991,6 +1997,7 @@ void phonebook_req_finalize(void *request)
+ 		g_object_unref(data->query_canc);
+ 	}
+ 
++	free_data_numbers(data);
+ 	free_data_contacts(data);
+ 	g_free(data->req_name);
+ 	g_free(data);
+-- 
+1.7.4.1
 
-Johan
