@@ -2,11 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v2] Fix incorrect number of expected columns in a response to NEW_MISSED_CALLS_LIST
-Date: Wed, 18 May 2011 11:17:50 +0200
-Message-Id: <1305710270-31716-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1305710013-31563-1-git-send-email-lkslawek@gmail.com>
-References: <1305710013-31563-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH] Fix incorrect number of expected columns in a response to NEW_MISSED_CALLS_LIST
+Date: Wed, 18 May 2011 11:13:33 +0200
+Message-Id: <1305710013-31563-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,11 +12,9 @@ This fixes error "GLIB CRITICAL ** Tracker -
 tracker_db_cursor_get_value_type: assertion `column < n_columns' failed"
 occurring when pulling phone book or doing listing for missed calls. The
 number of expected columns in reply to NEW_MISSED_CALLS_LIST query was
-incorrectly set to PULL_QUERY_COL_AMOUNT (23) but the query actually
+incorrectly set PULL_QUERY_CALL_AMOUNT (23) but the query actually
 returns 3 columns.
 ---
-Just a little modification of a commit message.
-
  plugins/phonebook-tracker.c |    3 ++-
  1 files changed, 2 insertions(+), 1 deletions(-)
 
