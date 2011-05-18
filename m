@@ -1,86 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 May 2011 13:58:56 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: Arun Kumar SINGH <arunkr.singh@stericsson.com>,
-	Anurag Gupta <anurag1303@gmail.com>, pkrystad@codeaurora.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: BT 3.0 HS Support in BlueZ
-In-Reply-To: <20110509225246.GB2203@joana>
-Message-ID: <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
-References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6>
- <20110509225246.GB2203@joana>
+Date: Wed, 18 May 2011 13:53:42 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 06/12] Unify inquiry results and advertises
+Message-ID: <20110518205342.GB31478@dell.amr.corp.intel.com>
+References: <1305656757-9731-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1305747562-19595-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1305747562-19595-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Claudio,
 
-Gustavo,
+On Wed, May 18, 2011, Claudio Takahasi wrote:
+> Adapter needs to have only one method to allow discovery results
+> integration for both interfaces: hciops and mgmtops. This patch
+> moves the code related to advertises parsing to the same function
+> that handles inquiry results.
+> ---
+>  src/adapter.c |   67 ++++++++++++++++++--------------------------------------
+>  src/adapter.h |    7 +----
+>  src/event.c   |   25 +++-----------------
+>  3 files changed, 28 insertions(+), 71 deletions(-)
 
-On Mon, 9 May 2011, Gustavo F. Padovan wrote:
+Patches 3, 4 and 5 have been pushed upstream, but this one causes a
+compiler error with gcc 4.6:
 
-> Hi Mat,
->
-> * Mat Martineau <mathewm@codeaurora.org> [2011-05-05 16:27:17 -0700]:
->
->>
->> On Thu, 5 May 2011, Gustavo F. Padovan wrote:
->>
->>> Hi Arun,
->>>
->>> * Arun Kumar SINGH <arunkr.singh@stericsson.com> [2011-05-05 09:26:58 +0200]:
->>>
->>>> Hi Gustavo,
->>>>
->>>>>> Does anybody know if
->>>>> bluetooth 3.0 HS spec is
->>>>> supported in BlueZ?
->>>>>> Is AMP supported in BlueZ?
->>>>>
->>>>> There is two different
->>>>> implementations, one by
->>>>> Atheros and another by QuIC.
->>>>> Both never reach upstream,
->>>>> if you look to the list logs
->>>>> you will find them.
->>>>
->>>>
->>>> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
->>>
->>> I'm interested in have this on the stack but it doesn't depend on me.
->>> Patches for this are not arriving to the mailing list. Actually we had no real
->>> feedback for AMP since the meeting in Boston.
->>
->> Gustavo, Arun:
->>
->> We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I
->> will start work on upstreaming later this month, but I need to merge
->> in all of the recent L2CAP refactoring changes.
->>
->> Also note that Qualcomm and Atheros have announced a merger.
->>
->> You can find the kernel AMP implementation in the codeaurora.org
->> Android git trees:
->>
->> git://codeaurora.org/kernel/msm.git
->> https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
->>
->> The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
->>
->>
->> Please let me know if you have any other questions about AMP.
->
-> Isn't Extended Flow Specification a required feature for AMP? I haven't seen
-> it in your implementation.
+src/adapter.c: In function ‘adapter_update_found_devices’:
+src/adapter.c:3008:28: error: variable ‘le’ set but not used [-Werror=unused-but-set-variable]
 
-Extended Flowspec is needed to create an L2CAP channel directly on 
-AMP, but the implementation you're looking at does not implement the 
-"create channel" feature.  Channels are created on BR/EDR and moved 
-to AMP, which does not require extended flowspec.
+Please fix and resend.
 
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Johan
