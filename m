@@ -1,209 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v6 06/12] Unify inquiry results and advertises
-Date: Wed, 18 May 2011 18:33:22 -0300
-Message-Id: <1305754402-27907-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <20110518205342.GB31478@dell.amr.corp.intel.com>
-References: <20110518205342.GB31478@dell.amr.corp.intel.com>
+Date: Wed, 18 May 2011 13:58:56 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+cc: Arun Kumar SINGH <arunkr.singh@stericsson.com>,
+	Anurag Gupta <anurag1303@gmail.com>, pkrystad@codeaurora.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: BT 3.0 HS Support in BlueZ
+In-Reply-To: <20110509225246.GB2203@joana>
+Message-ID: <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6>
+ <20110509225246.GB2203@joana>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adapter needs to have only one method to allow discovery results
-integration for both interfaces: hciops and mgmtops. This patch
-moves the code related to advertises parsing to the same function
-that handles inquiry results.
----
- src/adapter.c |   69 +++++++++++++++++++--------------------------------------
- src/adapter.h |    7 +----
- src/event.c   |   25 +++-----------------
- 3 files changed, 29 insertions(+), 72 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f1d9148..4c3d027 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2966,42 +2966,6 @@ static void dev_prepend_uuid(gpointer data, gpointer user_data)
- 	dev->services = g_slist_prepend(dev->services, g_strdup(new_uuid));
- }
- 
--void adapter_update_device_from_info(struct btd_adapter *adapter,
--					bdaddr_t bdaddr, int8_t rssi,
--					const char *name, GSList *services,
--					int flags)
--{
--	struct remote_dev_info *dev;
--	gboolean new_dev;
--
--	dev = get_found_dev(adapter, &bdaddr, &new_dev);
--
--	if (new_dev)
--		dev->le = TRUE;
--	else if (dev->rssi == rssi)
--		return;
--
--	dev->rssi = rssi;
--
--	adapter->found_devices = g_slist_sort(adapter->found_devices,
--						(GCompareFunc) dev_rssi_cmp);
--
--	g_slist_foreach(services, remove_same_uuid, dev);
--	g_slist_foreach(services, dev_prepend_uuid, dev);
--
--	if (flags >= 0)
--		dev->flags = flags;
--
--	if (name) {
--		g_free(dev->name);
--		dev->name = g_strdup(name);
--	}
--
--	/* FIXME: check if other information was changed before emitting the
--	 * signal */
--	adapter_emit_device_found(adapter, dev);
--}
--
- static gboolean pairing_is_legacy(bdaddr_t *local, bdaddr_t *peer,
- 					const uint8_t *eir, const char *name)
- {
-@@ -3035,13 +2999,14 @@ static char *read_stored_data(bdaddr_t *local, bdaddr_t *peer, const char *file)
- }
- 
- void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--				uint32_t class, int8_t rssi, uint8_t *data)
-+					uint32_t class, int8_t rssi,
-+					uint8_t *data, size_t eir_size)
- {
- 	struct remote_dev_info *dev;
- 	struct eir_data eir_data;
- 	char *name;
--	gboolean new_dev, legacy;
--	name_status_t name_status;
-+	gboolean new_dev, legacy, le;
-+	name_status_t name_status = NAME_NOT_REQUIRED;
- 	const char *dev_name;
- 	int err;
- 
-@@ -3054,13 +3019,21 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 
- 	name = read_stored_data(&adapter->bdaddr, bdaddr, "names");
- 
--	legacy = pairing_is_legacy(&adapter->bdaddr, bdaddr, data, name);
-+	if (eir_data.flags < 0) {
-+		le = FALSE;
- 
--	if (!name && main_opts.name_resolv &&
--			adapter_has_discov_sessions(adapter))
--		name_status = NAME_REQUIRED;
--	else
--		name_status = NAME_NOT_REQUIRED;
-+		legacy = pairing_is_legacy(&adapter->bdaddr, bdaddr, data,
-+									name);
-+
-+		if (!name && main_opts.name_resolv &&
-+				adapter_has_discov_sessions(adapter))
-+			name_status = NAME_REQUIRED;
-+		else
-+			name_status = NAME_NOT_REQUIRED;
-+	} else {
-+		le = TRUE;
-+		legacy = FALSE;
-+	}
- 
- 	/* Complete EIR names are always used. Shortened EIR names are only
- 	 * used if there is no name already in storage. */
-@@ -3088,10 +3061,14 @@ void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
- 			free(alias);
- 		}
- 
--		dev->le = FALSE;
-+		dev->le = le;
- 		dev->class = class;
- 		dev->legacy = legacy;
- 		dev->name_status = name_status;
-+
-+		if (eir_data.flags >= 0)
-+			dev->flags = eir_data.flags;
-+
- 	} else if (dev->rssi == rssi)
- 		goto done;
- 
-diff --git a/src/adapter.h b/src/adapter.h
-index 4785d5c..4c07e92 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -108,12 +108,9 @@ int adapter_get_state(struct btd_adapter *adapter);
- int adapter_get_discover_type(struct btd_adapter *adapter);
- struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter,
- 						struct remote_dev_info *match);
--void adapter_update_device_from_info(struct btd_adapter *adapter,
--					bdaddr_t bdaddr, int8_t rssi,
--					const char *name, GSList *services,
--					int flags);
- void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
--				uint32_t class, int8_t rssi, uint8_t *data);
-+					uint32_t class, int8_t rssi,
-+					uint8_t *data, size_t eir_size);
- int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr);
- void adapter_emit_device_found(struct btd_adapter *adapter,
- 						struct remote_dev_info *dev);
-diff --git a/src/event.c b/src/event.c
-index 2c893f0..115b285 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -281,19 +281,10 @@ void btd_event_simple_pairing_complete(bdaddr_t *local, bdaddr_t *peer,
- 	device_simple_pairing_complete(device, status);
- }
- 
--static void free_eir_data(struct eir_data *eir)
--{
--	g_slist_foreach(eir->services, (GFunc) g_free, NULL);
--	g_slist_free(eir->services);
--	g_free(eir->name);
--}
--
- void btd_event_advertising_report(bdaddr_t *local, le_advertising_info *info)
- {
- 	struct btd_adapter *adapter;
--	struct eir_data eir_data;
- 	int8_t rssi;
--	int err;
- 
- 	adapter = manager_find_adapter(local);
- 	if (adapter == NULL) {
-@@ -301,19 +292,10 @@ void btd_event_advertising_report(bdaddr_t *local, le_advertising_info *info)
- 		return;
- 	}
- 
--	memset(&eir_data, 0, sizeof(eir_data));
--	err = eir_parse(&eir_data, info->data, info->length);
--	if (err < 0)
--		error("Error parsing advertising data: %s (%d)",
--							strerror(-err), -err);
--
- 	rssi = *(info->data + info->length);
- 
--	adapter_update_device_from_info(adapter, info->bdaddr, rssi,
--					eir_data.name, eir_data.services,
--					eir_data.flags);
--
--	free_eir_data(&eir_data);
-+	adapter_update_found_devices(adapter, &info->bdaddr, 0, rssi,
-+						info->data, info->length);
- }
- 
- static void update_lastseen(bdaddr_t *sba, bdaddr_t *dba)
-@@ -355,7 +337,8 @@ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 	if (data)
- 		write_remote_eir(local, peer, data);
- 
--	adapter_update_found_devices(adapter, peer, class, rssi, data);
-+	adapter_update_found_devices(adapter, peer, class, rssi,
-+						data, EIR_DATA_LENGTH);
- }
- 
- void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer,
--- 
-1.7.5.rc3
+Gustavo,
 
+On Mon, 9 May 2011, Gustavo F. Padovan wrote:
+
+> Hi Mat,
+>
+> * Mat Martineau <mathewm@codeaurora.org> [2011-05-05 16:27:17 -0700]:
+>
+>>
+>> On Thu, 5 May 2011, Gustavo F. Padovan wrote:
+>>
+>>> Hi Arun,
+>>>
+>>> * Arun Kumar SINGH <arunkr.singh@stericsson.com> [2011-05-05 09:26:58 +0200]:
+>>>
+>>>> Hi Gustavo,
+>>>>
+>>>>>> Does anybody know if
+>>>>> bluetooth 3.0 HS spec is
+>>>>> supported in BlueZ?
+>>>>>> Is AMP supported in BlueZ?
+>>>>>
+>>>>> There is two different
+>>>>> implementations, one by
+>>>>> Atheros and another by QuIC.
+>>>>> Both never reach upstream,
+>>>>> if you look to the list logs
+>>>>> you will find them.
+>>>>
+>>>>
+>>>> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
+>>>
+>>> I'm interested in have this on the stack but it doesn't depend on me.
+>>> Patches for this are not arriving to the mailing list. Actually we had no real
+>>> feedback for AMP since the meeting in Boston.
+>>
+>> Gustavo, Arun:
+>>
+>> We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I
+>> will start work on upstreaming later this month, but I need to merge
+>> in all of the recent L2CAP refactoring changes.
+>>
+>> Also note that Qualcomm and Atheros have announced a merger.
+>>
+>> You can find the kernel AMP implementation in the codeaurora.org
+>> Android git trees:
+>>
+>> git://codeaurora.org/kernel/msm.git
+>> https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
+>>
+>> The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
+>>
+>>
+>> Please let me know if you have any other questions about AMP.
+>
+> Isn't Extended Flow Specification a required feature for AMP? I haven't seen
+> it in your implementation.
+
+Extended Flowspec is needed to create an L2CAP channel directly on 
+AMP, but the implementation you're looking at does not implement the 
+"create channel" feature.  Channels are created on BR/EDR and moved 
+to AMP, which does not require extended flowspec.
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
