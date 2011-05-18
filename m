@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 May 2011 13:53:42 -0700
+Date: Wed, 18 May 2011 13:42:48 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 06/12] Unify inquiry results and advertises
-Message-ID: <20110518205342.GB31478@dell.amr.corp.intel.com>
-References: <1305656757-9731-1-git-send-email-claudio.takahasi@openbossa.org>
- <1305747562-19595-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Rewrite of PBAP call history queries
+Message-ID: <20110518204248.GA31478@dell.amr.corp.intel.com>
+References: <1305723910-13168-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1305747562-19595-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1305723910-13168-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Slawek,
 
-On Wed, May 18, 2011, Claudio Takahasi wrote:
-> Adapter needs to have only one method to allow discovery results
-> integration for both interfaces: hciops and mgmtops. This patch
-> moves the code related to advertises parsing to the same function
-> that handles inquiry results.
+On Wed, May 18, 2011, Slawomir Bochenski wrote:
+> Graph patterns used in queries for PullPhonebook and PullvCardListing in
+> case of call history are now rewritten to share the same code and be
+> simpler - previously they were doing almost the same, but exact code
+> differed. So in this patch repeating parts of queries were reduced to one
+> place for easy management.
+> 
+> Also new queries fix the behaviour in situation when there is more than
+> one contact matching a phone number from call history entry - in this
+> case no contact data is returned instead of returning random contact as
+> it was the case before.
 > ---
->  src/adapter.c |   67 ++++++++++++++++++--------------------------------------
->  src/adapter.h |    7 +----
->  src/event.c   |   25 +++-----------------
->  3 files changed, 28 insertions(+), 71 deletions(-)
+>  plugins/phonebook-tracker.c |  600 ++++--------------------------------------
+>  1 files changed, 58 insertions(+), 542 deletions(-)
 
-Patches 3, 4 and 5 have been pushed upstream, but this one causes a
-compiler error with gcc 4.6:
-
-src/adapter.c: In function ‘adapter_update_found_devices’:
-src/adapter.c:3008:28: error: variable ‘le’ set but not used [-Werror=unused-but-set-variable]
-
-Please fix and resend.
+Applied. Thanks.
 
 Johan
