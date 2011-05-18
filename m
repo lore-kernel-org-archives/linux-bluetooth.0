@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 May 2011 13:42:48 -0700
+Date: Wed, 18 May 2011 13:30:10 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Rewrite of PBAP call history queries
-Message-ID: <20110518204248.GA31478@dell.amr.corp.intel.com>
-References: <1305723910-13168-1-git-send-email-lkslawek@gmail.com>
+Subject: Re: [PATCH v2] Fix incorrect number of expected columns in a
+ response to NEW_MISSED_CALLS_LIST
+Message-ID: <20110518203010.GB16185@dell.amr.corp.intel.com>
+References: <1305710013-31563-1-git-send-email-lkslawek@gmail.com>
+ <1305710270-31716-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1305723910-13168-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1305710270-31716-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Slawek,
 
 On Wed, May 18, 2011, Slawomir Bochenski wrote:
-> Graph patterns used in queries for PullPhonebook and PullvCardListing in
-> case of call history are now rewritten to share the same code and be
-> simpler - previously they were doing almost the same, but exact code
-> differed. So in this patch repeating parts of queries were reduced to one
-> place for easy management.
-> 
-> Also new queries fix the behaviour in situation when there is more than
-> one contact matching a phone number from call history entry - in this
-> case no contact data is returned instead of returning random contact as
-> it was the case before.
+> This fixes error "GLIB CRITICAL ** Tracker -
+> tracker_db_cursor_get_value_type: assertion `column < n_columns' failed"
+> occurring when pulling phone book or doing listing for missed calls. The
+> number of expected columns in reply to NEW_MISSED_CALLS_LIST query was
+> incorrectly set to PULL_QUERY_COL_AMOUNT (23) but the query actually
+> returns 3 columns.
 > ---
->  plugins/phonebook-tracker.c |  600 ++++--------------------------------------
->  1 files changed, 58 insertions(+), 542 deletions(-)
+> Just a little modification of a commit message.
+> 
+>  plugins/phonebook-tracker.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
-Applied. Thanks.
+Applied, but I had to first edit your commit message summary line to be
+considerably shorter.
 
 Johan
