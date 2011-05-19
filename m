@@ -1,83 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 May 2011 23:33:07 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: David Miller <davem@davemloft.net>
+Date: Thu, 19 May 2011 16:35:44 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sheldon Demario <sheldon.demario@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: Do not ignore errors returned from
- strict_strtol()
-Message-ID: <20110520023307.GC4888@joana>
-References: <20110519.173745.19153862714606787.davem@davemloft.net>
+Subject: Re: [PATCH] Cleanup of device class update signal
+Message-ID: <20110519233544.GC4016@dell.ger.corp.intel.com>
+References: <1305814620-8649-1-git-send-email-sheldon.demario@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110519.173745.19153862714606787.davem@davemloft.net>
+In-Reply-To: <1305814620-8649-1-git-send-email-sheldon.demario@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* David Miller <davem@davemloft.net> [2011-05-19 17:37:45 -0400]:
+Hi Sheldon,
 
-> 
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> 
-> diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-> index fd6305b..8ecf4c6 100644
-> --- a/drivers/bluetooth/btmrvl_debugfs.c
-> +++ b/drivers/bluetooth/btmrvl_debugfs.c
-> @@ -64,6 +64,8 @@ static ssize_t btmrvl_hscfgcmd_write(struct file *file,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.hscfgcmd = result;
->  
-> @@ -108,6 +110,8 @@ static ssize_t btmrvl_psmode_write(struct file *file, const char __user *ubuf,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.psmode = result;
->  
-> @@ -147,6 +151,8 @@ static ssize_t btmrvl_pscmd_write(struct file *file, const char __user *ubuf,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.pscmd = result;
->  
-> @@ -191,6 +197,8 @@ static ssize_t btmrvl_gpiogap_write(struct file *file, const char __user *ubuf,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 16, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.gpio_gap = result;
->  
-> @@ -230,6 +238,8 @@ static ssize_t btmrvl_hscmd_write(struct file *file, const char __user *ubuf,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.hscmd = result;
->  	if (priv->btmrvl_dev.hscmd) {
-> @@ -272,6 +282,8 @@ static ssize_t btmrvl_hsmode_write(struct file *file, const char __user *ubuf,
->  		return -EFAULT;
->  
->  	ret = strict_strtol(buf, 10, &result);
-> +	if (ret)
-> +		return ret;
->  
->  	priv->btmrvl_dev.hsmode = result;
+On Thu, May 19, 2011, Sheldon Demario wrote:
+> Adds a new device function to address the PropertyChanged
+> signal when the device's class changes. event.c file should
+> avoid sending signals that belongs to device objects.
+> ---
+>  src/device.c |    8 ++++++++
+>  src/device.h |    1 +
+>  src/event.c  |    9 ++-------
+>  3 files changed, 11 insertions(+), 7 deletions(-)
 
-Applied, thanks Dave!
+Applied. Thanks.
 
--- 
-Gustavo F. Padovan
-http://profusion.mobi
+Johan
