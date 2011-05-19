@@ -1,88 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4DD4AB14.9050401@Atheros.com>
+Date: Thu, 19 May 2011 11:01:00 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1305734288-4317-1-git-send-email-dmitriy.paliy@nokia.com>
-Date: Thu, 19 May 2011 10:27:43 +0300
-Message-ID: <BANLkTin6Lzdb8dESq7Oz8djhar9wc6VPdg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Move phonebook_req_finalize
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Mat Martineau <mathewm@codeaurora.org>
+CC: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Arun Kumar SINGH <arunkr.singh@stericsson.com>,
+	Anurag Gupta <anurag1303@gmail.com>,
+	"pkrystad@codeaurora.org" <pkrystad@codeaurora.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: BT 3.0 HS Support in BlueZ
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6> <20110509225246.GB2203@joana> <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
+In-Reply-To: <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Mat,
 
-On Wed, May 18, 2011 at 6:58 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
-> It is used in successive patch.
-> ---
->  plugins/phonebook-tracker.c |   40 ++++++++++++++++++++--------------------
->  1 files changed, 20 insertions(+), 20 deletions(-)
+On 5/19/2011 2:28 AM, Mat Martineau wrote:
 >
-> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-> index 9431d8a..9c60ec3 100644
-> --- a/plugins/phonebook-tracker.c
-> +++ b/plugins/phonebook-tracker.c
-> @@ -1905,26 +1905,6 @@ done:
->        return path;
->  }
+> Gustavo,
 >
-> -void phonebook_req_finalize(void *request)
-> -{
-> -       struct phonebook_data *data = request;
-> -
-> -       DBG("");
-> -
-> -       if (!data)
-> -               return;
-> -
-> -       /* canceling asynchronous operation on tracker if any is active */
-> -       if (data->query_canc) {
-> -               g_cancellable_cancel(data->query_canc);
-> -               g_object_unref(data->query_canc);
-> -       }
-> -
-> -       free_data_contacts(data);
-> -       g_free(data->req_name);
-> -       g_free(data);
-> -}
-> -
->  static gboolean find_checked_number(GSList *numbers, const char *number)
->  {
->        GSList *l;
-> @@ -1996,6 +1976,26 @@ done:
->        return 0;
->  }
+> On Mon, 9 May 2011, Gustavo F. Padovan wrote:
 >
-> +void phonebook_req_finalize(void *request)
-> +{
-> +       struct phonebook_data *data = request;
-> +
-> +       DBG("");
-> +
-> +       if (!data)
-> +               return;
-> +
-> +       /* canceling asynchronous operation on tracker if any is active */
-> +       if (data->query_canc) {
-> +               g_cancellable_cancel(data->query_canc);
-> +               g_object_unref(data->query_canc);
-> +       }
-> +
-> +       free_data_contacts(data);
-> +       g_free(data->req_name);
-> +       g_free(data);
-> +}
-> +
->  void *phonebook_pull(const char *name, const struct apparam_field *params,
->                                phonebook_cb cb, void *user_data, int *err)
->  {
-> --
+>> Hi Mat,
+>>
+>> * Mat Martineau<mathewm@codeaurora.org>  [2011-05-05 16:27:17 -0700]:
+>>
+>>>
+>>> On Thu, 5 May 2011, Gustavo F. Padovan wrote:
+>>>
+>>>> Hi Arun,
+>>>>
+>>>> * Arun Kumar SINGH<arunkr.singh@stericsson.com>  [2011-05-05 09:26:58 +0200]:
+>>>>
+>>>>> Hi Gustavo,
+>>>>>
+>>>>>>> Does anybody know if
+>>>>>> bluetooth 3.0 HS spec is
+>>>>>> supported in BlueZ?
+>>>>>>> Is AMP supported in BlueZ?
+>>>>>>
+>>>>>> There is two different
+>>>>>> implementations, one by
+>>>>>> Atheros and another by QuIC.
+>>>>>> Both never reach upstream,
+>>>>>> if you look to the list logs
+>>>>>> you will find them.
+>>>>>
+>>>>>
+>>>>> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
+>>>>
+>>>> I'm interested in have this on the stack but it doesn't depend on me.
+>>>> Patches for this are not arriving to the mailing list. Actually we had no real
+>>>> feedback for AMP since the meeting in Boston.
+>>>
+>>> Gustavo, Arun:
+>>>
+>>> We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I
+>>> will start work on upstreaming later this month, but I need to merge
+>>> in all of the recent L2CAP refactoring changes.
+>>>
+>>> Also note that Qualcomm and Atheros have announced a merger.
+>>>
+>>> You can find the kernel AMP implementation in the codeaurora.org
+>>> Android git trees:
+>>>
+>>> git://codeaurora.org/kernel/msm.git
+>>> https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
+>>>
+>>> The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
+>>>
+>>>
+>>> Please let me know if you have any other questions about AMP.
+>>
+>> Isn't Extended Flow Specification a required feature for AMP? I haven't seen
+>> it in your implementation.
+>
+> Extended Flowspec is needed to create an L2CAP channel directly on
+> AMP, but the implementation you're looking at does not implement the
+> "create channel" feature.  Channels are created on BR/EDR and moved
+> to AMP, which does not require extended flowspec.
+>
 
-It should be fine to have 1 and 2 together, it is less troublesome if
-somebody is using git blame to check the history.
+Why don't we have to use EFS for channels moved from BDR? Is it because 
+we assume that the QoS provided by AMP will be better than BDR?
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Regards
+Suraj
