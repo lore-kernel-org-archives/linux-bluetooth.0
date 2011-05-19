@@ -2,13 +2,13 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH v2] Fix disconnect devices after enabling offline mode
-Date: Thu, 19 May 2011 10:12:20 +0200
-Message-Id: <1305792740-32536-1-git-send-email-michalski.raf@gmail.com>
+Subject: [PATCH] Fix disconnect devices after enabling offline mode
+Date: Thu, 19 May 2011 09:58:35 +0200
+Message-Id: <1305791915-32348-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously paired and connected devices were disconnected automatically
+Previoulsy paired and connected devices were disconnected automatically
 after turning bluetooth off directly via bluetooth UI. This patch makes
 that also other ways of turning bluetooth off (which should lead to
 disconnecting paired and connected devices), such as enabling offline
