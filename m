@@ -1,31 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH] Removed unused variable "secmode3" in btd_device
-Date: Thu, 19 May 2011 11:15:40 -0300
-Message-Id: <1305814540-13342-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Thu, 19 May 2011 06:57:55 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Radoslaw Jablonski <ext-jablonski.radoslaw@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix TRACKER_LIBS value in configure.ac
+Message-ID: <20110519135755.GA5919@dell.Hilton.com>
+References: <1305796207-13094-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1305796207-13094-1-git-send-email-ext-jablonski.radoslaw@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/device.c |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+Hi Radek,
 
-diff --git a/src/device.c b/src/device.c
-index 9b8591b..271c14c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -127,9 +127,6 @@ struct btd_device {
- 
- 	gboolean	connected;
- 
--	/* Whether were creating a security mode 3 connection */
--	gboolean	secmode3;
--
- 	sdp_list_t	*tmp_records;
- 
- 	gboolean	trusted;
--- 
-1.7.5.rc3
+On Thu, May 19, 2011, Radoslaw Jablonski wrote:
+> This fixes problem with building obexd introduced by commit
+> 6134dcbbb5acfa1b567aebb798597e9f96cf47ce (Add support for tracker-0.10)
+> ---
+>  configure.ac |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
+Thanks! The patch has been pushed upstream.
+
+Johan
