@@ -1,73 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 May 2011 17:37:45 -0400 (EDT)
-Message-Id: <20110519.173745.19153862714606787.davem@davemloft.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: Do not ignore errors returned from
- strict_strtol()
-From: David Miller <davem@davemloft.net>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Date: Thu, 19 May 2011 15:40:18 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Suraj Sumangala <suraj@Atheros.com>,
+	Arun Kumar SINGH <arunkr.singh@stericsson.com>,
+	Anurag Gupta <anurag1303@gmail.com>,
+	Peter Krystad <pkrystad@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: BT 3.0 HS Support in BlueZ
+Message-ID: <20110519184018.GA4888@joana>
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com>
+ <20110419180425.GA2476@joana>
+ <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local>
+ <20110505201531.GE2098@joana>
+ <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6>
+ <20110509225246.GB2203@joana>
+ <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
+ <4DD4AB14.9050401@Atheros.com>
+ <alpine.DEB.2.00.1105190939240.22147@localhost6.localdomain6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.00.1105190939240.22147@localhost6.localdomain6>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Mat,
 
-Signed-off-by: David S. Miller <davem@davemloft.net>
+* Mat Martineau <mathewm@codeaurora.org> [2011-05-19 09:58:04 -0700]:
 
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-index fd6305b..8ecf4c6 100644
---- a/drivers/bluetooth/btmrvl_debugfs.c
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -64,6 +64,8 @@ static ssize_t btmrvl_hscfgcmd_write(struct file *file,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 10, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.hscfgcmd = result;
- 
-@@ -108,6 +110,8 @@ static ssize_t btmrvl_psmode_write(struct file *file, const char __user *ubuf,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 10, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.psmode = result;
- 
-@@ -147,6 +151,8 @@ static ssize_t btmrvl_pscmd_write(struct file *file, const char __user *ubuf,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 10, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.pscmd = result;
- 
-@@ -191,6 +197,8 @@ static ssize_t btmrvl_gpiogap_write(struct file *file, const char __user *ubuf,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 16, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.gpio_gap = result;
- 
-@@ -230,6 +238,8 @@ static ssize_t btmrvl_hscmd_write(struct file *file, const char __user *ubuf,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 10, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.hscmd = result;
- 	if (priv->btmrvl_dev.hscmd) {
-@@ -272,6 +282,8 @@ static ssize_t btmrvl_hsmode_write(struct file *file, const char __user *ubuf,
- 		return -EFAULT;
- 
- 	ret = strict_strtol(buf, 10, &result);
-+	if (ret)
-+		return ret;
- 
- 	priv->btmrvl_dev.hsmode = result;
- 
+> 
+> 
+> On Thu, 19 May 2011, Suraj Sumangala wrote:
+> 
+> >Hi Mat,
+> >
+> >On 5/19/2011 2:28 AM, Mat Martineau wrote:
+> >>
+> >>Gustavo,
+> >>
+> >>On Mon, 9 May 2011, Gustavo F. Padovan wrote:
+> >>
+> 
+> ... snip ...
+> 
+> >>>
+> >>>Isn't Extended Flow Specification a required feature for AMP?
+> >>>I haven't seen
+> >>>it in your implementation.
+> >>
+> >>Extended Flowspec is needed to create an L2CAP channel directly on
+> >>AMP, but the implementation you're looking at does not implement the
+> >>"create channel" feature.  Channels are created on BR/EDR and moved
+> >>to AMP, which does not require extended flowspec.
+> >>
+> >
+> >Why don't we have to use EFS for channels moved from BDR? Is it
+> >because we assume that the QoS provided by AMP will be better than
+> >BDR?
+> 
+> Only "Best Effort" is supported by this implementation so QoS is
+> equivalent on either controller type.  EFS is optional when creating
+> channels on BR/EDR, and the spec does not require EFS when moving to
+> a Best Effort AMP link.  We've extensively interop'd AMP channel
+> moves without EFS.
+
+Isn't EFS and Create Channel Command required to the qualification?
+In PTS when AMP Support and AMP Manager Channel are enabled tests
+for Create Channel and EFS are also enabled.
+
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
