@@ -1,91 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DD4AB14.9050401@Atheros.com>
-Date: Thu, 19 May 2011 11:01:00 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
+From: Alan <alanbluetooth@AiAware.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Does any one recognise this protocol? is it RF_COMM
+Date: Thu, 19 May 2011 13:13:29 +1000
+References: <201105171715.47064.alanbluetooth@aiaware.com> <BANLkTinCkT1wXAUiuQz2jmgfGCHwmvhonw@mail.gmail.com>
+In-Reply-To: <BANLkTinCkT1wXAUiuQz2jmgfGCHwmvhonw@mail.gmail.com>
 MIME-Version: 1.0
-To: Mat Martineau <mathewm@codeaurora.org>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Arun Kumar SINGH <arunkr.singh@stericsson.com>,
-	Anurag Gupta <anurag1303@gmail.com>,
-	"pkrystad@codeaurora.org" <pkrystad@codeaurora.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: BT 3.0 HS Support in BlueZ
-References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6> <20110509225246.GB2203@joana> <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
-In-Reply-To: <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Message-Id: <201105191313.29238.alanbluetooth@aiaware.com>
+Content-Type: Text/Plain;
+  charset="windows-1252"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Status my problems are solved for now...
+>From here on down the turtles appear to be all mine. Weeee.... 
 
-On 5/19/2011 2:28 AM, Mat Martineau wrote:
->
-> Gustavo,
->
-> On Mon, 9 May 2011, Gustavo F. Padovan wrote:
->
->> Hi Mat,
->>
->> * Mat Martineau<mathewm@codeaurora.org>  [2011-05-05 16:27:17 -0700]:
->>
->>>
->>> On Thu, 5 May 2011, Gustavo F. Padovan wrote:
->>>
->>>> Hi Arun,
->>>>
->>>> * Arun Kumar SINGH<arunkr.singh@stericsson.com>  [2011-05-05 09:26:58 +0200]:
->>>>
->>>>> Hi Gustavo,
->>>>>
->>>>>>> Does anybody know if
->>>>>> bluetooth 3.0 HS spec is
->>>>>> supported in BlueZ?
->>>>>>> Is AMP supported in BlueZ?
->>>>>>
->>>>>> There is two different
->>>>>> implementations, one by
->>>>>> Atheros and another by QuIC.
->>>>>> Both never reach upstream,
->>>>>> if you look to the list logs
->>>>>> you will find them.
->>>>>
->>>>>
->>>>> Any hopes of getting this unified version upstream anytime in near future? I guess this has been on the cards for some time now given that merge process started last august.
->>>>
->>>> I'm interested in have this on the stack but it doesn't depend on me.
->>>> Patches for this are not arriving to the mailing list. Actually we had no real
->>>> feedback for AMP since the meeting in Boston.
->>>
->>> Gustavo, Arun:
->>>
->>> We do still plan to upstream our Bluetooth 3.0 + HS implementation.  I
->>> will start work on upstreaming later this month, but I need to merge
->>> in all of the recent L2CAP refactoring changes.
->>>
->>> Also note that Qualcomm and Atheros have announced a merger.
->>>
->>> You can find the kernel AMP implementation in the codeaurora.org
->>> Android git trees:
->>>
->>> git://codeaurora.org/kernel/msm.git
->>> https://www.codeaurora.org/gitweb/quic/la/?p=kernel/msm.git;a=summary
->>>
->>> The android-msm-2.6.35 and msm-2.6.38 branches contain the AMP code.
->>>
->>>
->>> Please let me know if you have any other questions about AMP.
->>
->> Isn't Extended Flow Specification a required feature for AMP? I haven't seen
->> it in your implementation.
->
-> Extended Flowspec is needed to create an L2CAP channel directly on
-> AMP, but the implementation you're looking at does not implement the
-> "create channel" feature.  Channels are created on BR/EDR and moved
-> to AMP, which does not require extended flowspec.
->
+On Wednesday 18 May 2011 03:30:53 you wrote:
+> On 17 May 2011 12:45, Alan <alanbluetooth@aiaware.com> wrote:
+> > What protocol is this?   Can it be RF_COMM ?
+> 
+> It looks like it is RFCOMM yes (at least it looks sane from my mental
+> parser).
+> 
+> > Im pretty sure the   2b 20 20 00  is is L2CAP  [size and channel ID].
+> Yes
+> 
+> > Does anyone recognise a protocol runnign on L2CAP that looks like this
+> Yes - it's RFCOMM
 
-Why don't we have to use EFS for channels moved from BDR? Is it because 
-we assume that the QoS provided by AMP will be better than BDR?
+You got no idea how good it is to be sure of at least one or two things.
+Those few bytes were always a gulf between what I was coding against and the 
+last thing I new for sure. I had a fundamental problem with attempting to 
+interperet any protocol when a few of the preceding bytes meant? and changed 
+from time to time. 
 
-Regards
-Suraj
+Armed with that certainty I have determiend that my actual sticking point
+was that the connect sequence from windows was examining via SDP what servies 
+were offered and that I had to emulate to some degree the proprietary service 
+as advertised.... I guessed and tried a plain old serial service, which was 
+superficially similar to thers and it works fine (so far).  
+
+Im beginning to like my physical device manufacturer more and more as so far 
+I've not run into anything that was seemingly utterly borked as was situatiion 
+normal at the last telco I worked for, and in the OS that shall not be named.
+Even this SDP requirement appears to only test "does it advertsie the protocol 
+I want to talk?" (yeah Im new to bt Id never seen an advertisement or sdptool 
+browse) (it took me awhile to find "hciconfig hci0 class" as well.)
+
+
+
+> I assume you mean the "extra" 00 in the "outbound packet" you
+> mentioned above?  
+yes extra in the windows packet which is what Im trying to emulate so its 
+missing in my packets when I try to send the same data from linux.
+ (sorry if my befuddlement was leaking)
+> If so then don't worry, that is the "credits" field
+> when RFCOMM is operating with credit based flow control - it's present
+> when the poll bit (0x10) is set in the control field for a UIH
+> (control field = 0xef).
+Now that sounds gnarly.
+
+Ta. I will check that out. 
+A quick google (now that i have the right keywords) seemed to say that "credit 
+based flow control" is negotiated. Ive looked at  the HCI dump of that connect 
+negotiation.  ouch. gnarly in hex. In my observation the extra byte is only 
+sent one way which seems odd but then again the data coming back from the 
+device is much larger than the questions. The device appears to never sends 
+any "credits" field back to the windows software.
+
+Its either credits or weird ignored extra leading bytes in the proprietary 
+protocol. I have tested and I can stuff extra bytes into the front of the 
+packets (before 7E) that I send to the Physical device. It appears to ignore 
+them up to the leading 7E. Its plausible that older versions of the device 
+used an extra byte to route packets to internal susbsystems, ... but Im 
+guessing pretty hard here.
+
+If I really am about to today get my (facade based) emulation of the device 
+going I can test and be certain which it is, as I will either get the zeros 
+delivered by RFCOMM as data or they will be eaten as part of the header.
+ 
+> The RFCOMM specification gives a basic introduction, but the headers
+> can be quite gnarly since they are quite "packed"
+I've worked with snmp, SS7 signalling protocol and worse..., the RFCOMM 
+packing isnt tooo gnarly, but I admit storing an extension flag in the lsb and 
+length*2 in the higher bits tricked me for bit. Im sure it makes sense in a 
+circuit. I had stared at those 3 bytes for ages looking a length and missed it 
+entirely.
+
+> overview for the regular frames (Figure 5.1) and credit based flow
+> control frames (Figure 6.1) though 
+More good key words for google. Yummy.
+> Otherwise TS 07.10 - you can find it on 3GPP.
+
+	Alan
