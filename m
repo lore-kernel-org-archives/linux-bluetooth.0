@@ -1,31 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 19 May 2011 17:56:18 +0530
-Message-ID: <BANLkTi=xGCsnyzdQK=w6qYp6dJE4tg6fHA@mail.gmail.com>
-Subject: Audio streaming to 2 A2DP headsets
-From: Vijayalakshmi N <vijayalakshmi.nk@gmail.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: A2DP Connection problem
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+To: "ext h.patil@accenture.com" <h.patil@accenture.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <AA5DFB06574FF54BA4A76C3F1040DCBB11C18DE91D@INDXM3131.dir.svc.accenture.com>
+References: <1305795079-5251-1-git-send-email-dmitriy.paliy@nokia.com>
+	 <1305795079-5251-3-git-send-email-dmitriy.paliy@nokia.com>
+	 <AA5DFB06574FF54BA4A76C3F1040DCBB11C18DE91D@INDXM3131.dir.svc.accenture.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 19 May 2011 12:34:19 +0300
+Message-ID: <1305797659.2388.11.camel@dentz-desktop>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-We have a requirement of establishing A2DP connections to 2 headsets
-simultaniously (on android).
+On Thu, 2011-05-19 at 14:44 +0530, ext h.patil@accenture.com wrote:
+> Hi All,
+> 
+> I am working on A2DP-bluez, using latest version of bluez which is
+> 4.93, I am able to establish A2DP connection using dbus API's, after
+> 10 seconds my connection is getting losted .please find the below log
+> and please do help me.
+> 
+>  
+> 
+> bluetoothd[1509]: audio/a2dp.c:a2dp_config() Configuration match:
+> resuming
+> 
+> bluetoothd[1509]: audio/unix.c:unix_ipc_sendmsg() Audio API:
+> BT_RESPONSE -> BT_SET_CONFIGURATION
+> 
+> bluetoothd[1509]: audio/a2dp.c:setup_unref() 0x54b7d3e0: ref=0
+> 
+> bluetoothd[1509]: audio/a2dp.c:setup_free() 0x54b7d3e0
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=3
+> 
+> bluetoothd[1509]: audio/unix.c:client_cb() Audio API: BT_REQUEST <-
+> BT_START_STREAM
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_ref() 0x54b93370: ref=4
+> 
+> bluetoothd[1509]: audio/a2dp.c:setup_ref() 0x54b7d3e0: ref=1
+> 
+> bluetoothd[1509]: audio/avdtp.c:session_cb() 
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_parse_cmd() Received
+> DISCOVER_CMD
+> 
+> bluetoothd[1509]: audio/avdtp.c:session_cb() 
+> 
+> bluetoothd[1509]: START request rejected: Bad Acceptor SEID (18)
 
-After changing the audio.conf with SBCSources=2, I am able to connect
-to 2 devices from DBUS (audio.sink).
-But this establishes the Signaling channels only.
+Strange, how come you manage to get a bad seid? I tough you were using
+PulseAudio since I saw your messages on its mailing list, but afaik it
+should not cause such behavior. Well it could also be that the remote
+device is not working properly too, which device is that?
 
-And the data channel is established when the Media player plays the audio.
+> 
+> bluetoothd[1509]: audio/a2dp.c:start_cfm() Sink 0x54b48aa0: Start_Cfm
+> 
+> bluetoothd[1509]: resume failed
+> 
+> bluetoothd[1509]: audio/unix.c:unix_ipc_error() sending error
+> Input/output error(5)
+> 
+> bluetoothd[1509]: audio/unix.c:unix_ipc_sendmsg() Audio API: BT_ERROR
+> -> BT_START_STREAM
+> 
+> bluetoothd[1509]: audio/a2dp.c:a2dp_sep_unlock() SEP 0x54b48aa0
+> unlocked
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=3
+> 
+> bluetoothd[1509]: audio/a2dp.c:setup_unref() 0x54b7d3e0: ref=0
+> 
+> bluetoothd[1509]: audio/a2dp.c:setup_free() 0x54b7d3e0
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=2
+> 
+> bluetoothd[1509]: audio/unix.c:client_cb() Unix client disconnected
+> (fd=26)
+> 
+> bluetoothd[1509]: audio/unix.c:client_free() client_free(0x54b455d0)
+> 
+> bluetoothd[1509]: audio/avdtp.c:session_cb() 
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
+> 
+> bluetoothd[1509]: audio/a2dp.c:start_ind() Sink 0x54b48aa0: Start_Ind
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_ref() 0x54b93370: ref=3
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_sep_set_state() stream state
+> changed: OPEN -> STREAMING
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=2
+> 
+> bluetoothd[1509]: Suspend: Connection timed out (110)
+> 
+> bluetoothd[1509]: audio/a2dp.c:suspend_cfm() Sink 0x54b48aa0:
+> Suspend_Cfm
+> 
+> bluetoothd[1509]: Abort: Connection timed out (110)
+> 
+> bluetoothd[1509]: audio/avdtp.c:connection_lost() Disconnected from
+> 00:25:CF:03:FE:AE
+> 
+> bluetoothd[1509]: audio/a2dp.c:abort_cfm() Sink 0x54b48aa0: Abort_Cfm
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_sep_set_state() stream state
+> changed: STREAMING -> IDLE
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=1
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: ref=0
+> 
+> bluetoothd[1509]: audio/avdtp.c:avdtp_unref() 0x54b93370: freeing
+> session and removing from list
 
-But the audio is streamed to only the first device.
+If there is no client connected like you can see above the stream will
+auto suspend in 5 seconds. Btw this timeout normally indicates that the
+remote device either crashed or is in bad state.
 
-Is it possible to establish the data channel to the 2nd device also
-and stream the audio on bluez?
 
-Could anyone please give a hint on this?
-
-Thanks,
-Vijayalakshmi
