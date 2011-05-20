@@ -1,34 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3 1/2] Fix change to numbers GSlist in new missed calls
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: ext Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20110519233401.GB4016@dell.ger.corp.intel.com>
-References: <1305809864-9963-1-git-send-email-dmitriy.paliy@nokia.com>
-	 <1305809864-9963-2-git-send-email-dmitriy.paliy@nokia.com>
-	 <20110519233401.GB4016@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 20 May 2011 09:51:48 +0300
-Message-ID: <1305874308.2501.9.camel@dp-x301>
-Mime-Version: 1.0
+Message-ID: <4DD5F955.20305@Atheros.com>
+Date: Fri, 20 May 2011 10:47:09 +0530
+From: Suraj Sumangala <suraj@Atheros.com>
+MIME-Version: 1.0
+To: Mat Martineau <mathewm@codeaurora.org>,
+	Arun Kumar SINGH <arunkr.singh@stericsson.com>,
+	Anurag Gupta <anurag1303@gmail.com>,
+	Peter Krystad <pkrystad@codeaurora.org>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: BT 3.0 HS Support in BlueZ
+References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6> <20110509225246.GB2203@joana> <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6> <4DD4AB14.9050401@Atheros.com> <alpine.DEB.2.00.1105190939240.22147@localhost6.localdomain6> <20110519184018.GA4888@joana>
+In-Reply-To: <20110519184018.GA4888@joana>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Mat,
 
-> Both patches have been pushed upstream. Could you still explain what
-> data->numbers is supposed to be useful for? It's not used anywhere in
-> the code (except where creating and freeing the list).
+On 5/20/2011 12:10 AM, Gustavo F. Padovan wrote:
+> Hi Mat,
+>
+> * Mat Martineau<mathewm@codeaurora.org>  [2011-05-19 09:58:04 -0700]:
+>
+>>
+>>
+>> On Thu, 19 May 2011, Suraj Sumangala wrote:
+>>
+>>> Hi Mat,
+>>>
+>>> On 5/19/2011 2:28 AM, Mat Martineau wrote:
+>>>>
+>>>> Gustavo,
+>>>>
+>>>> On Mon, 9 May 2011, Gustavo F. Padovan wrote:
+>>>>
+>>
+>> ... snip ...
+>>
+>>>>>
+>>>>> Isn't Extended Flow Specification a required feature for AMP?
+>>>>> I haven't seen
+>>>>> it in your implementation.
+>>>>
+>>>> Extended Flowspec is needed to create an L2CAP channel directly on
+>>>> AMP, but the implementation you're looking at does not implement the
+>>>> "create channel" feature.  Channels are created on BR/EDR and moved
+>>>> to AMP, which does not require extended flowspec.
+>>>>
+>>>
+>>> Why don't we have to use EFS for channels moved from BDR? Is it
+>>> because we assume that the QoS provided by AMP will be better than
+>>> BDR?
+>>
+>> Only "Best Effort" is supported by this implementation so QoS is
+>> equivalent on either controller type.  EFS is optional when creating
+>> channels on BR/EDR, and the spec does not require EFS when moving to
+>> a Best Effort AMP link.  We've extensively interop'd AMP channel
+>> moves without EFS.g
+>
+> Isn't EFS and Create Channel Command required to the qualification?
+> In PTS when AMP Support and AMP Manager Channel are enabled tests
+> for Create Channel and EFS are also enabled.
+>
 
-Thanks.
+I also see test cases which require you to do L2CAP configure with EFS 
+and 'Best Effort' as the service type, Aren't they mandatory test cases?
 
-data->numbers is used in pull_newmissedcalls to store missed calls
-numbers that were checked by user. It is updated when starts reading
-response, and cleared when completed. Therefore,
-free_data_numbers(data); is done also in _finalize function also for the
-sake of safety if PBAP object is destroyed before the list if freed.
+But, I think what you said is correct. Here is what the spec say about it.
 
-BR,
-Dmitriy
+"Since the Identifier for an Extended Flow Specification with Service
+Type Best Effort is fixed to 0x01 it is possible to generate a Best 
+Effort Extended Flow Specification for the remote device without 
+performing the Lockstep Configuration process"
 
-
+Regards
+Suraj
