@@ -1,44 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove unnecessary use of hci_dev_list_lock
-Date: Fri, 20 May 2011 11:50:41 -0700
-Message-Id: <1305917441-26680-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: bluez patch : Modify OPUSH sdp record when use sdptool for
+ GOEP v2.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: hui li <nami.li1984@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"haijun.liu" <haijun.liu@atheros.com>, steven.li@atheros.com,
+	ruiyi.zhang@atheros.com, yang.wu@atheros.com,
+	costa.yao@atheros.com, nami.li@atheros.com
+In-Reply-To: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
+References: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 20 May 2011 11:42:09 -0700
+Message-ID: <1305916929.2681.12.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Hui,
 
-The get_connections function has no need to use hci_dev_list_lock. The
-code was there probably because of a copy-paste mistake.
+>  Since GOEP v2.0 has some changes in sdp record, I`d like to add the
+> two changes in bluez for backwards compatibility with GOEP v1.x:
+> • The profile version number in the BluetoothProfileDescriptorList
+> attribute shall be incremented to match the version number of the
+> enhanced profile specification. If earlier versions of the profile do
+> not include this SDP attribute it shall be included in revised
+> versions.
+> • The SDP records shall include the GoepL2capPsm attribute.
+> 
+> The upper text references Generic Object Exchange Profile v2.0.
+> The GoepL2capPsm attribute value can be found in Bluetooth SIG
+> Assigned Numbers – Service Discovery, and this value is 0x0200.
+> 
+> My patch only define GoepL2capPsm and change OPUSH sdp record in
+> sdptool. I didn`t assign a new variable in svc_info_t struct to
+> indicate the new l2cap psm value, I used its original psm member to
+> indicate l2cap psm value.
+> Also, I didn`t found OPUSH l2cap psm default value in Bluetooth SIG
+> Assigned Numbers or its spec, so I just choose 0x1015 as its default
+> value.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    4 ----
- 1 files changed, 0 insertions(+), 4 deletions(-)
+please do not update opush record details since we are using that one
+for qualification and I don't wanna redo all my SDP data.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index dae382c..fe835b8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1092,8 +1092,6 @@ static int get_connections(struct sock *sk, u16 index)
- 
- 	put_unaligned_le16(count, &rp->conn_count);
- 
--	read_lock(&hci_dev_list_lock);
--
- 	i = 0;
- 	list_for_each(p, &hdev->conn_hash.list) {
- 		struct hci_conn *c = list_entry(p, struct hci_conn, list);
-@@ -1101,8 +1099,6 @@ static int get_connections(struct sock *sk, u16 index)
- 		bacpy(&rp->conn[i++], &c->dst);
- 	}
- 
--	read_unlock(&hci_dev_list_lock);
--
- 	err = cmd_complete(sk, index, MGMT_OP_GET_CONNECTIONS, rp, rp_len);
- 
- unlock:
--- 
-1.7.5.1
+Just add an opush2 command to sdptool to add a GOEP 2.0 SDP record.
+
+Regards
+
+Marcel
+
 
