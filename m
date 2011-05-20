@@ -1,48 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez patch : Modify OPUSH sdp record when use sdptool for
- GOEP v2.0
+Subject: Re: [PATCH 1/2] Add conf file support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: hui li <nami.li1984@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"haijun.liu" <haijun.liu@atheros.com>, steven.li@atheros.com,
-	ruiyi.zhang@atheros.com, yang.wu@atheros.com,
-	costa.yao@atheros.com, nami.li@atheros.com
-In-Reply-To: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
-References: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <20110520180401.GA23399@dell.amr.corp.intel.com>
+References: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
+	 <20110520180401.GA23399@dell.amr.corp.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 20 May 2011 11:42:09 -0700
-Message-ID: <1305916929.2681.12.camel@aeonflux>
+Date: Fri, 20 May 2011 11:37:24 -0700
+Message-ID: <1305916644.2681.10.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hui,
+Hi Johan,
 
->  Since GOEP v2.0 has some changes in sdp record, I`d like to add the
-> two changes in bluez for backwards compatibility with GOEP v1.x:
-> • The profile version number in the BluetoothProfileDescriptorList
-> attribute shall be incremented to match the version number of the
-> enhanced profile specification. If earlier versions of the profile do
-> not include this SDP attribute it shall be included in revised
-> versions.
-> • The SDP records shall include the GoepL2capPsm attribute.
+> > This should reduce the amount of options which normally don't change each
+> > time obexd is executed.
+> > ---
+> >  Makefile.am    |    2 +-
+> >  plugins/ftp.c  |    8 ++-
+> >  src/main.c     |  176 +++++++++++++++++++++++++++++++++++++++-----------------
+> >  src/obexd.conf |   19 ++++++
+> >  4 files changed, 149 insertions(+), 56 deletions(-)
+> >  create mode 100644 src/obexd.conf
 > 
-> The upper text references Generic Object Exchange Profile v2.0.
-> The GoepL2capPsm attribute value can be found in Bluetooth SIG
-> Assigned Numbers – Service Discovery, and this value is 0x0200.
+> This doesn't compile with gcc 4.6:
 > 
-> My patch only define GoepL2capPsm and change OPUSH sdp record in
-> sdptool. I didn`t assign a new variable in svc_info_t struct to
-> indicate the new l2cap psm value, I used its original psm member to
-> indicate l2cap psm value.
-> Also, I didn`t found OPUSH l2cap psm default value in Bluetooth SIG
-> Assigned Numbers or its spec, so I just choose 0x1015 as its default
-> value.
+> src/main.c: In function ‘main’:
+> src/main.c:267:12: error: variable ‘config’ set but not used [-Werror=unused-but-set-variable]
+> 
+> Please fix and resend.
 
-please do not update opush record details since we are using that one
-for qualification and I don't wanna redo all my SDP data.
-
-Just add an opush2 command to sdptool to add a GOEP 2.0 SDP record.
+didn't we agree on not having an obexd configuration file. That stuff
+should be part of the D-Bus service autostart file.
 
 Regards
 
