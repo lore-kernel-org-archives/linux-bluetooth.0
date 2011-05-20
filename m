@@ -1,77 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DD5F955.20305@Atheros.com>
-Date: Fri, 20 May 2011 10:47:09 +0530
-From: Suraj Sumangala <suraj@Atheros.com>
+Date: Thu, 19 May 2011 23:43:57 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: David Miller <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: Kill set but not used variable 'l2cap_sk' in
+ rfcomm_sock_getsockopt_old()
+Message-ID: <20110520024357.GF4888@joana>
+References: <20110519.180900.1412544790459751168.davem@davemloft.net>
 MIME-Version: 1.0
-To: Mat Martineau <mathewm@codeaurora.org>,
-	Arun Kumar SINGH <arunkr.singh@stericsson.com>,
-	Anurag Gupta <anurag1303@gmail.com>,
-	Peter Krystad <pkrystad@codeaurora.org>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: BT 3.0 HS Support in BlueZ
-References: <BANLkTimKJNo9WgwkfC2Hci-dW6kjF3VWGw@mail.gmail.com> <20110419180425.GA2476@joana> <AFCDDB4A3EA003429EEF1E7B211FDBBA3395937A4C@EXDCVYMBSTM005.EQ1STM.local> <20110505201531.GE2098@joana> <alpine.DEB.2.00.1105051548540.4213@localhost6.localdomain6> <20110509225246.GB2203@joana> <alpine.DEB.2.00.1105181352000.32548@localhost6.localdomain6> <4DD4AB14.9050401@Atheros.com> <alpine.DEB.2.00.1105190939240.22147@localhost6.localdomain6> <20110519184018.GA4888@joana>
-In-Reply-To: <20110519184018.GA4888@joana>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110519.180900.1412544790459751168.davem@davemloft.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+* David Miller <davem@davemloft.net> [2011-05-19 18:09:00 -0400]:
 
-On 5/20/2011 12:10 AM, Gustavo F. Padovan wrote:
-> Hi Mat,
->
-> * Mat Martineau<mathewm@codeaurora.org>  [2011-05-19 09:58:04 -0700]:
->
->>
->>
->> On Thu, 19 May 2011, Suraj Sumangala wrote:
->>
->>> Hi Mat,
->>>
->>> On 5/19/2011 2:28 AM, Mat Martineau wrote:
->>>>
->>>> Gustavo,
->>>>
->>>> On Mon, 9 May 2011, Gustavo F. Padovan wrote:
->>>>
->>
->> ... snip ...
->>
->>>>>
->>>>> Isn't Extended Flow Specification a required feature for AMP?
->>>>> I haven't seen
->>>>> it in your implementation.
->>>>
->>>> Extended Flowspec is needed to create an L2CAP channel directly on
->>>> AMP, but the implementation you're looking at does not implement the
->>>> "create channel" feature.  Channels are created on BR/EDR and moved
->>>> to AMP, which does not require extended flowspec.
->>>>
->>>
->>> Why don't we have to use EFS for channels moved from BDR? Is it
->>> because we assume that the QoS provided by AMP will be better than
->>> BDR?
->>
->> Only "Best Effort" is supported by this implementation so QoS is
->> equivalent on either controller type.  EFS is optional when creating
->> channels on BR/EDR, and the spec does not require EFS when moving to
->> a Best Effort AMP link.  We've extensively interop'd AMP channel
->> moves without EFS.g
->
-> Isn't EFS and Create Channel Command required to the qualification?
-> In PTS when AMP Support and AMP Manager Channel are enabled tests
-> for Create Channel and EFS are also enabled.
->
+> 
+> Signed-off-by: David S. Miller <davem@davemloft.net>
+> 
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 386cfaf..bcf077c 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -741,7 +741,6 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname, c
+>  static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __user *optval, int __user *optlen)
+>  {
+>  	struct sock *sk = sock->sk;
+> -	struct sock *l2cap_sk;
+>  	struct rfcomm_conninfo cinfo;
+>  	struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
+>  	int len, err = 0;
+> @@ -786,8 +785,6 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __u
+>  			break;
+>  		}
+>  
+> -		l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+> -
+>  		cinfo.hci_handle = conn->hcon->handle;
+>  		memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
 
-I also see test cases which require you to do L2CAP configure with EFS 
-and 'Best Effort' as the service type, Aren't they mandatory test cases?
+applied, thanks.
 
-But, I think what you said is correct. Here is what the spec say about it.
-
-"Since the Identifier for an Extended Flow Specification with Service
-Type Best Effort is fixed to 0x01 it is possible to generate a Best 
-Effort Extended Flow Specification for the remote device without 
-performing the Lockstep Configuration process"
-
-Regards
-Suraj
+-- 
+Gustavo F. Padovan
+http://profusion.mobi
