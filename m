@@ -1,57 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Suraj Sumangala <suraj@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <Jothikumar.Mothilal@Atheros.com>,
-	Suraj Sumangala <suraj@atheros.com>
-Subject: [PATCH] Bluetooth: Support SCO over HCI for Atheros AR300x Bluetooth device
-Date: Fri, 20 May 2011 13:36:11 +0530
-Message-ID: <1305878771-26464-1-git-send-email-suraj@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH v3 1/2] Fix change to numbers GSlist in new missed calls
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: ext Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20110519233401.GB4016@dell.ger.corp.intel.com>
+References: <1305809864-9963-1-git-send-email-dmitriy.paliy@nokia.com>
+	 <1305809864-9963-2-git-send-email-dmitriy.paliy@nokia.com>
+	 <20110519233401.GB4016@dell.ger.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 20 May 2011 09:51:48 +0300
+Message-ID: <1305874308.2501.9.camel@dp-x301>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds SCO over HCI support to Atheros AR300x HCI transport
-driver.
+Hi Johan,
 
-Signed-off-by: Suraj Sumangala <suraj@atheros.com>
----
- drivers/bluetooth/hci_ath.c |   14 +++++++-------
- 1 files changed, 7 insertions(+), 7 deletions(-)
+> Both patches have been pushed upstream. Could you still explain what
+> data->numbers is supposed to be useful for? It's not used anywhere in
+> the code (except where creating and freeing the list).
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index 4093935..8e15c31 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -162,11 +162,6 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- {
- 	struct ath_struct *ath = hu->priv;
- 
--	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
--		kfree_skb(skb);
--		return 0;
--	}
--
- 	/*
- 	 * Update power management enable flag with parameters of
- 	 * HCI sleep enable vendor specific HCI command.
-@@ -184,9 +179,14 @@ static int ath_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
- 
- 	skb_queue_tail(&ath->txq, skb);
--	set_bit(HCI_UART_SENDING, &hu->tx_state);
- 
--	schedule_work(&ath->ctxtsw);
-+	if (bt_cb(skb)->pkt_type == HCI_SCODATA_PKT) {
-+		clear_bit(HCI_UART_SENDING, &hu->tx_state);
-+		hci_uart_tx_wakeup(hu);
-+	} else {
-+		set_bit(HCI_UART_SENDING, &hu->tx_state);
-+		schedule_work(&ath->ctxtsw);
-+	}
- 
- 	return 0;
- }
--- 
-1.7.0.4
+Thanks.
+
+data->numbers is used in pull_newmissedcalls to store missed calls
+numbers that were checked by user. It is updated when starts reading
+response, and cleared when completed. Therefore,
+free_data_numbers(data); is done also in _finalize function also for the
+sake of safety if PBAP object is destroyed before the list if freed.
+
+BR,
+Dmitriy
+
 
