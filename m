@@ -1,55 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1305916644.2681.10.camel@aeonflux>
-References: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
-	<20110520180401.GA23399@dell.amr.corp.intel.com>
-	<1305916644.2681.10.camel@aeonflux>
-Date: Fri, 20 May 2011 22:17:16 +0300
-Message-ID: <BANLkTinK4UZm7LDbGe6jt0LCaiUFikE4hA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Add conf file support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove unnecessary use of hci_dev_list_lock
+Date: Fri, 20 May 2011 11:50:41 -0700
+Message-Id: <1305917441-26680-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, Marcel,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Fri, May 20, 2011 at 9:37 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Johan,
->
->> > This should reduce the amount of options which normally don't change e=
-ach
->> > time obexd is executed.
->> > ---
->> > =A0Makefile.am =A0 =A0| =A0 =A02 +-
->> > =A0plugins/ftp.c =A0| =A0 =A08 ++-
->> > =A0src/main.c =A0 =A0 | =A0176 +++++++++++++++++++++++++++++++++++++++=
------------------
->> > =A0src/obexd.conf | =A0 19 ++++++
->> > =A04 files changed, 149 insertions(+), 56 deletions(-)
->> > =A0create mode 100644 src/obexd.conf
->>
->> This doesn't compile with gcc 4.6:
->>
->> src/main.c: In function =91main=92:
->> src/main.c:267:12: error: variable =91config=92 set but not used [-Werro=
-r=3Dunused-but-set-variable]
->>
->> Please fix and resend.
+The get_connections function has no need to use hci_dev_list_lock. The
+code was there probably because of a copy-paste mistake.
 
-Gonna fix that,
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c |    4 ----
+ 1 files changed, 0 insertions(+), 4 deletions(-)
 
-> didn't we agree on not having an obexd configuration file. That stuff
-> should be part of the D-Bus service autostart file.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index dae382c..fe835b8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1092,8 +1092,6 @@ static int get_connections(struct sock *sk, u16 index)
+ 
+ 	put_unaligned_le16(count, &rp->conn_count);
+ 
+-	read_lock(&hci_dev_list_lock);
+-
+ 	i = 0;
+ 	list_for_each(p, &hdev->conn_hash.list) {
+ 		struct hci_conn *c = list_entry(p, struct hci_conn, list);
+@@ -1101,8 +1099,6 @@ static int get_connections(struct sock *sk, u16 index)
+ 		bacpy(&rp->conn[i++], &c->dst);
+ 	}
+ 
+-	read_unlock(&hci_dev_list_lock);
+-
+ 	err = cmd_complete(sk, index, MGMT_OP_GET_CONNECTIONS, rp, rp_len);
+ 
+ unlock:
+-- 
+1.7.5.1
 
-Well you still have to specify the configuration location on service
-file, so it not like bluetoothd which always loads from a specific
-location. Besides the point here is to group together configurations
-that a normal user should be able to customize, so the configuration
-could be on user home e.g. /home/user/.obexd.conf.
-
---=20
-Luiz Augusto von Dentz
-Computer Engineer
