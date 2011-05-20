@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1305916929.2681.12.camel@aeonflux>
-References: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
-	<1305916929.2681.12.camel@aeonflux>
-Date: Fri, 20 May 2011 22:40:50 +0300
-Message-ID: <BANLkTikahpfAQ48=Mtc5kMkbtC7sQd37sg@mail.gmail.com>
-Subject: Re: bluez patch : Modify OPUSH sdp record when use sdptool for GOEP v2.0
+In-Reply-To: <1305916644.2681.10.camel@aeonflux>
+References: <1305620264-22304-1-git-send-email-luiz.dentz@gmail.com>
+	<20110520180401.GA23399@dell.amr.corp.intel.com>
+	<1305916644.2681.10.camel@aeonflux>
+Date: Fri, 20 May 2011 22:17:16 +0300
+Message-ID: <BANLkTinK4UZm7LDbGe6jt0LCaiUFikE4hA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add conf file support
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: hui li <nami.li1984@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, "haijun.liu" <haijun.liu@atheros.com>,
-	steven.li@atheros.com, ruiyi.zhang@atheros.com, yang.wu@atheros.com,
-	costa.yao@atheros.com, nami.li@atheros.com
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan, Marcel,
 
-On Fri, May 20, 2011 at 9:42 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+On Fri, May 20, 2011 at 9:37 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
 e:
-> Hi Hui,
+> Hi Johan,
 >
->> =A0Since GOEP v2.0 has some changes in sdp record, I`d like to add the
->> two changes in bluez for backwards compatibility with GOEP v1.x:
->> =95 The profile version number in the BluetoothProfileDescriptorList
->> attribute shall be incremented to match the version number of the
->> enhanced profile specification. If earlier versions of the profile do
->> not include this SDP attribute it shall be included in revised
->> versions.
->> =95 The SDP records shall include the GoepL2capPsm attribute.
+>> > This should reduce the amount of options which normally don't change e=
+ach
+>> > time obexd is executed.
+>> > ---
+>> > =A0Makefile.am =A0 =A0| =A0 =A02 +-
+>> > =A0plugins/ftp.c =A0| =A0 =A08 ++-
+>> > =A0src/main.c =A0 =A0 | =A0176 +++++++++++++++++++++++++++++++++++++++=
+-----------------
+>> > =A0src/obexd.conf | =A0 19 ++++++
+>> > =A04 files changed, 149 insertions(+), 56 deletions(-)
+>> > =A0create mode 100644 src/obexd.conf
 >>
->> The upper text references Generic Object Exchange Profile v2.0.
->> The GoepL2capPsm attribute value can be found in Bluetooth SIG
->> Assigned Numbers =96 Service Discovery, and this value is 0x0200.
+>> This doesn't compile with gcc 4.6:
 >>
->> My patch only define GoepL2capPsm and change OPUSH sdp record in
->> sdptool. I didn`t assign a new variable in svc_info_t struct to
->> indicate the new l2cap psm value, I used its original psm member to
->> indicate l2cap psm value.
->> Also, I didn`t found OPUSH l2cap psm default value in Bluetooth SIG
->> Assigned Numbers or its spec, so I just choose 0x1015 as its default
->> value.
->
-> please do not update opush record details since we are using that one
-> for qualification and I don't wanna redo all my SDP data.
->
-> Just add an opush2 command to sdptool to add a GOEP 2.0 SDP record.
+>> src/main.c: In function =91main=92:
+>> src/main.c:267:12: error: variable =91config=92 set but not used [-Werro=
+r=3Dunused-but-set-variable]
+>>
+>> Please fix and resend.
 
-Btw, GoepL2capPsm seems to be random/user defined like RFCOMM
-channels, maybe we could adopt the non-reserved psm base + original
-RFCOMM channel in pre 2.0?
+Gonna fix that,
+
+> didn't we agree on not having an obexd configuration file. That stuff
+> should be part of the D-Bus service autostart file.
+
+Well you still have to specify the configuration location on service
+file, so it not like bluetoothd which always loads from a specific
+location. Besides the point here is to group together configurations
+that a normal user should be able to customize, so the configuration
+could be on user home e.g. /home/user/.obexd.conf.
 
 --=20
 Luiz Augusto von Dentz
