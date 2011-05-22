@@ -1,104 +1,297 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 22 May 2011 16:28:29 +0200
-Subject: [PATCH] AVRCP TG now return REJECTED response
-Message-ID: <AC090B9732AB2B4DB7FF476E907FE6600130F70785@dnce02.ent.ti.com>
-Content-Type: text/plain; charset="windows-1255"
 MIME-Version: 1.0
+From: Stefan Sommer <stefan@nefan.dk>
+Date: Sun, 22 May 2011 09:08:18 +0200
+Message-ID: <BANLkTinOoLTyBFktQtT-Eb8Pe2FJxM8suA@mail.gmail.com>
+Subject: Scan for devices fails with ralink rt539f card
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 1db53842d930c84d381401e44a9c340adfc5a411 Mon Sep 17 00:00:00 2001
-From: Ilia Kolomisnky <iliak@ti.com>
-Date: Sun, 22 May 2011 11:49:30 +0300
-Subject: [PATCH] AVRCP TG now return REJECTED response
- AVRCP TG now return REJECTED response with error code==Invalid command for command with VENDOR-DEPENDED oper. code ( fix for PTS certification )
+Hi,
 
----
- audio/control.c |   33 +++++++++++++++++++++++++++++++++
- 1 files changed, 33 insertions(+), 0 deletions(-)
+bluetooth fails to discover devices when scanning with my rt539f
+bluetooth/wifi combo card in my laptop. That is, the btusb module
+loads, the device shows up with 'hcitool dev' but 'hcitool scan' fails
+to detect any devices. I have tried running 2.6.38 and 2.6.39rc7
+(ubuntu), and I've asked at the rt2x00 since other people affected by
+this had the idea that it could be a problem with the wifi/bluetooth
+co-existence. No luck so far, though.
 
-diff --git a/audio/control.c b/audio/control.c
-index 6238007..4adef2f 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -80,6 +80,7 @@
- #define CTYPE_STABLE           0xC
- 
- /* opcodes */
-+#define OP_VENDORDEP   0x0
- #define OP_UNITINFO            0x30
- #define OP_SUBUNITINFO         0x31
- #define OP_PASSTHROUGH         0x7c
-@@ -127,6 +128,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+       uint8_t company_id[3];
-+       uint8_t pdu_id;
-+       uint8_t packet_type:2;
-+       uint8_t rsvd:6;
-+       uint16_t params_len;
-+       uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #elif __BYTE_ORDER == __BIG_ENDIAN
- 
- struct avctp_header {
-@@ -147,6 +158,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+       uint8_t company_id[3];
-+       uint8_t pdu_id;
-+       uint8_t rsvd:6;
-+       uint8_t packet_type:2;
-+       uint16_t params_len;
-+       uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #else
- #error "Unknown byte order"
- #endif
-@@ -493,6 +514,8 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
-        unsigned char buf[1024], *operands;
-        struct avctp_header *avctp;
-        struct avrcp_header *avrcp;
-+       struct avrcp_spec_avc_pdu *pdu_spec;
-+
-        int ret, packet_size, operand_count, sock;
- 
-        if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
-@@ -569,6 +592,16 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
-                        operands[1] = SUBUNIT_PANEL << 3;
-                DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
-                                "OP_UNITINFO" : "OP_SUBUNITINFO");
-+       } else if ( avrcp->opcode == OP_VENDORDEP ) {
-+               /* reply with REJECT msg with err. code == 0x0 ( Invalid Command ) as defined in AVRCP spec ( 6.15.1 ) */
-+               pdu_spec = ( struct avrcp_spec_avc_pdu* ) ( buf + sizeof(struct avctp_header) + sizeof(struct avrcp_header) );
-+               pdu_spec->packet_type = 0;
-+               pdu_spec->rsvd = 0;
-+               pdu_spec->params[0] = 0; /* invalid command */
-+               pdu_spec->params_len = htons(1);
-+
-+               avctp->cr = AVCTP_RESPONSE;
-+               avrcp->code = CTYPE_REJECTED;
-        } else {
-                avctp->cr = AVCTP_RESPONSE;
-                avrcp->code = CTYPE_REJECTED;
--- 
-1.7.1
+Thanks,
+Stefan Sommer
 
-Ilia Kolominsky
-iliak@ti.com
-Direct:  +972(9)7906231
-Mobile: +972(54)909009
+hcidump output during scan:
+HCI sniffer - Bluetooth packet analyzer ver 1.42
+device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+1305190041.929978 < HCI Command: Inquiry (0x01|0x0001) plen 5
+  0000: 33 8b 9e 08 00                                    3....
+1305190041.932580 > HCI Event: Command Status (0x0f) plen 4
+  0000: 00 01 01 04                                       ....
+1305190052.174568 > HCI Event: Inquiry Complete (0x01) plen 1
+  0000: 00
 
+(lsusb -v)
+Bus 006 Device 002: ID 148f:2000 Ralink Technology, Corp.
+Device Descriptor:
+ bLength                18
+ bDescriptorType         1
+ bcdUSB               2.00
+ bDeviceClass          224 Wireless
+ bDeviceSubClass         1 Radio Frequency
+ bDeviceProtocol         1 Bluetooth
+ bMaxPacketSize0        64
+ idVendor           0x148f Ralink Technology, Corp.
+ idProduct          0x2000
+ bcdDevice           68.17
+ iManufacturer           0
+ iProduct                2 CSR BS8510
+ iSerial                 0
+ bNumConfigurations      1
+ Configuration Descriptor:
+   bLength                 9
+   bDescriptorType         2
+   wTotalLength          177
+   bNumInterfaces          2
+   bConfigurationValue     1
+   iConfiguration          0
+   bmAttributes         0xe0
+     Self Powered
+     Remote Wakeup
+   MaxPower                0mA
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        0
+     bAlternateSetting       0
+     bNumEndpoints           3
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x81  EP 1 IN
+       bmAttributes            3
+         Transfer Type            Interrupt
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0010  1x 16 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x02  EP 2 OUT
+       bmAttributes            2
+         Transfer Type            Bulk
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0040  1x 64 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x82  EP 2 IN
+       bmAttributes            2
+         Transfer Type            Bulk
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0040  1x 64 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       0
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0000  1x 0 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0000  1x 0 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       1
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0009  1x 9 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0009  1x 9 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       2
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0011  1x 17 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0011  1x 17 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       3
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0019  1x 25 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0019  1x 25 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       4
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0021  1x 33 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0021  1x 33 bytes
+       bInterval               1
+   Interface Descriptor:
+     bLength                 9
+     bDescriptorType         4
+     bInterfaceNumber        1
+     bAlternateSetting       5
+     bNumEndpoints           2
+     bInterfaceClass       224 Wireless
+     bInterfaceSubClass      1 Radio Frequency
+     bInterfaceProtocol      1 Bluetooth
+     iInterface              0
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x03  EP 3 OUT
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0031  1x 49 bytes
+       bInterval               1
+     Endpoint Descriptor:
+       bLength                 7
+       bDescriptorType         5
+       bEndpointAddress     0x83  EP 3 IN
+       bmAttributes            1
+         Transfer Type            Isochronous
+         Synch Type               None
+         Usage Type               Data
+       wMaxPacketSize     0x0031  1x 49 bytes
+       bInterval               1
+Device Status:     0x0001
+ Self Powered
 
-
-
+(lspci -v with the rt5390sta wifi driver)
+02:00.0 Network controller: Ralink corp. Device 539f
+       Subsystem: Hewlett-Packard Company Device 1637
+       Flags: bus master, fast devsel, latency 0, IRQ 17
+       Memory at f0100000 (32-bit, non-prefetchable) [size=64K]
+       Capabilities: [40] Power Management version 3
+       Capabilities: [50] MSI: Enable- Count=1/32 Maskable- 64bit+
+       Capabilities: [70] Express Endpoint, MSI 00
+       Capabilities: [100] Advanced Error Reporting
+       Capabilities: [140] Device Serial Number 00-00-a8-85-05-da-f8-c0
+       Kernel driver in use: rt5390
+       Kernel modules: rt5390sta
