@@ -1,160 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DDA1349.7030307@comarch.pl>
-Date: Mon, 23 May 2011 09:56:57 +0200
-From: =?UTF-8?B?UmFmYcWCIE1pY2hhbHNraQ==?= <rafal.michalski@comarch.pl>
 MIME-Version: 1.0
-To: johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Fix disconnect devices after enabling offline mode
-References: <1305792740-32536-1-git-send-email-michalski.raf@gmail.com>
-In-Reply-To: <1305792740-32536-1-git-send-email-michalski.raf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <BANLkTikahpfAQ48=Mtc5kMkbtC7sQd37sg@mail.gmail.com>
+References: <BANLkTi=V_s9UjZ19qk-jivF=0wzPk9XYbA@mail.gmail.com>
+	<1305916929.2681.12.camel@aeonflux>
+	<BANLkTikahpfAQ48=Mtc5kMkbtC7sQd37sg@mail.gmail.com>
+Date: Mon, 23 May 2011 15:05:25 +0800
+Message-ID: <BANLkTimpsOoibrke0-v8tRSTpaZr1imJWQ@mail.gmail.com>
+Subject: Re: bluez patch : Modify OPUSH sdp record when use sdptool for GOEP v2.0
+From: hui li <nami.li1984@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"haijun.liu" <haijun.liu@atheros.com>, steven.li@atheros.com, ruiyi.zhang@atheros.com,
+	yang.wu@atheros.com, costa.yao@atheros.com, nami.li@atheros.com
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rafal Michalski wrote:
-> Previously paired and connected devices were disconnected automatically
-> after turning bluetooth off directly via bluetooth UI. This patch makes
-> that also other ways of turning bluetooth off (which should lead to
-> disconnecting paired and connected devices), such as enabling offline
-> mode (which turns bluetooth off as well), can be handled properly.
-> ---
->  plugins/maemo6.c |   49 ++++++++++++++++++++++++++++++++++++++++++++-----
->  src/adapter.c    |    5 +++++
->  src/adapter.h    |    1 +
->  3 files changed, 50 insertions(+), 5 deletions(-)
+2011/5/21 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
 >
-> diff --git a/plugins/maemo6.c b/plugins/maemo6.c
-> index 56f2664..851f6e1 100644
-> --- a/plugins/maemo6.c
-> +++ b/plugins/maemo6.c
-> @@ -30,6 +30,7 @@
->  #include <dbus/dbus.h>
->  
->  #include "adapter.h"
-> +#include "device.h"
->  #include "plugin.h"
->  #include "log.h"
->  #include "gdbus.h"
-> @@ -52,12 +53,33 @@ static DBusConnection *conn = NULL;
->  static gboolean mce_bt_set = FALSE;
->  static gboolean collision = FALSE;
->  
-> +static struct maemo6 {
-> +	struct btd_adapter *adapter;
-> +	guint timer_id;
-> +} *maemo6_adapter_data = NULL;
-> +
-> +static void disconnect_device(struct btd_device *device, gpointer user_data)
-> +{
-> +	device_request_disconnect(device, NULL);
-> +}
-> +
-> +static gboolean switch_off_timeout(gpointer user_data)
-> +{
-> +	struct maemo6 *maemo6_adapter = user_data;
-> +	btd_adapter_switch_offline(maemo6_adapter->adapter);
-> +	maemo6_adapter->timer_id = 0;
-> +
-> +	return FALSE;
-> +}
-> +
->  static gboolean mce_signal_callback(DBusConnection *connection,
->  					DBusMessage *message, void *user_data)
->  {
->  	DBusMessageIter args;
->  	uint32_t sigvalue;
-> -	struct btd_adapter *adapter = user_data;
-> +	struct maemo6 *maemo6_adapter = user_data;
-> +	GSList *connections =
-> +		adapter_get_connected_device_list(maemo6_adapter->adapter);
->  
->  	DBG("received mce signal");
->  
-> @@ -74,10 +96,20 @@ static gboolean mce_signal_callback(DBusConnection *connection,
->  		mce_bt_set = sigvalue & MCE_RADIO_STATE_BLUETOOTH ?
->  								TRUE : FALSE;
->  
-> +		if (maemo6_adapter->timer_id) {
-> +			g_source_remove(maemo6_adapter->timer_id);
-> +			maemo6_adapter->timer_id = 0;
-> +		}
-> +
->  		if (mce_bt_set)
-> -			btd_adapter_switch_online(adapter);
-> -		else
-> -			btd_adapter_switch_offline(adapter);
-> +			btd_adapter_switch_online(maemo6_adapter->adapter);
-> +		else if (connections) {
-> +			g_slist_foreach(connections,
-> +					(GFunc) disconnect_device, NULL);
-> +			maemo6_adapter->timer_id = g_timeout_add_seconds(3,
-> +					switch_off_timeout, maemo6_adapter);
-> +		} else
-> +			btd_adapter_switch_offline(maemo6_adapter->adapter);
->  	}
->  
->  	return TRUE;
-> @@ -200,9 +232,13 @@ static int mce_probe(struct btd_adapter *adapter)
->  	dbus_pending_call_unref(call);
->  	dbus_message_unref(msg);
->  
-> +	maemo6_adapter_data = g_new0(struct maemo6, 1);
-> +	maemo6_adapter_data->adapter = adapter;
-> +
->  	watch_id = g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_PATH,
->  					MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
-> -					mce_signal_callback, adapter, NULL);
-> +					mce_signal_callback,
-> +					maemo6_adapter_data, NULL);
->  
->  	btd_adapter_register_powered_callback(adapter, adapter_powered);
->  
-> @@ -216,6 +252,9 @@ static void mce_remove(struct btd_adapter *adapter)
->  	if (watch_id > 0)
->  		g_dbus_remove_watch(conn, watch_id);
->  
-> +	g_free(maemo6_adapter_data);
-> +	maemo6_adapter_data = NULL;
-> +
->  	btd_adapter_unregister_powered_callback(adapter, adapter_powered);
->  }
->  
-> diff --git a/src/adapter.c b/src/adapter.c
-> index c30febc..736c1b3 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -1192,6 +1192,11 @@ struct btd_device *adapter_get_device(DBusConnection *conn,
->  						DEVICE_TYPE_BREDR);
->  }
->  
-> +GSList *adapter_get_connected_device_list(struct btd_adapter *adapter)
-> +{
-> +	return adapter->connections;
-> +}
-> +
->  static int start_discovery(struct btd_adapter *adapter)
->  {
->  	/* Do not start if suspended */
-> diff --git a/src/adapter.h b/src/adapter.h
-> index 3526849..313ffd3 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -106,6 +106,7 @@ void adapter_get_address(struct btd_adapter *adapter, bdaddr_t *bdaddr);
->  void adapter_set_state(struct btd_adapter *adapter, int state);
->  int adapter_get_state(struct btd_adapter *adapter);
->  int adapter_get_discover_type(struct btd_adapter *adapter);
-> +GSList *adapter_get_connected_device_list(struct btd_adapter *adapter);
->  struct remote_dev_info *adapter_search_found_devices(struct btd_adapter *adapter,
->  						struct remote_dev_info *match);
->  void adapter_update_found_devices(struct btd_adapter *adapter, bdaddr_t *bdaddr,
->   
-Hi Johan
+> On Fri, May 20, 2011 at 9:42 PM, Marcel Holtmann <marcel@holtmann.org> wr=
+ote:
+>> Hi Hui,
+>>
+>>> =A0Since GOEP v2.0 has some changes in sdp record, I`d like to add the
+>>> two changes in bluez for backwards compatibility with GOEP v1.x:
+>>> =95 The profile version number in the BluetoothProfileDescriptorList
+>>> attribute shall be incremented to match the version number of the
+>>> enhanced profile specification. If earlier versions of the profile do
+>>> not include this SDP attribute it shall be included in revised
+>>> versions.
+>>> =95 The SDP records shall include the GoepL2capPsm attribute.
+>>>
+>>> The upper text references Generic Object Exchange Profile v2.0.
+>>> The GoepL2capPsm attribute value can be found in Bluetooth SIG
+>>> Assigned Numbers =96 Service Discovery, and this value is 0x0200.
+>>>
+>>> My patch only define GoepL2capPsm and change OPUSH sdp record in
+>>> sdptool. I didn`t assign a new variable in svc_info_t struct to
+>>> indicate the new l2cap psm value, I used its original psm member to
+>>> indicate l2cap psm value.
+>>> Also, I didn`t found OPUSH l2cap psm default value in Bluetooth SIG
+>>> Assigned Numbers or its spec, so I just choose 0x1015 as its default
+>>> value.
+>>
+>> please do not update opush record details since we are using that one
+>> for qualification and I don't wanna redo all my SDP data.
+>>
+>> Just add an opush2 command to sdptool to add a GOEP 2.0 SDP record.
+>
+> Btw, GoepL2capPsm seems to be random/user defined like RFCOMM
+> channels, maybe we could adopt the non-reserved psm base + original
+> RFCOMM channel in pre 2.0?
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
 
-I want to ask about patch review: [PATCH v2] Fix disconnect devices 
-after enabling offline mode.
-Did you have time to take a look at this patch?
+Hi, Marcel
+    So you  mean you don`t wanna to change currently add_opush
+,add_ftp and other obex services functions code?
+I think instead of opush2, we can add a new goep2 command commonly to
+sdptool to update service record like below:
 
-Best Regards
+ sdptool goep2 l2cappsm SERVICE
 
-Rafał Michalski
+And in cmd_goep2 function, I first get that service original sdp
+record, then update profile version, add new GoepL2capPsm attribute ,
+and finally update that service record.
+How do you think about this way ? It doesn`t influnce original command
+and fuctions. If ok, I will send out my patch.
+Thanks.
+
+Hi, Luiz
+  I think it`s a good idear to adopt the non-reserved psm base +
+original RFCOMM channel for the L2CAP Psm. I will change my default
+value as your suggestion.
+
+Thanks .
+Hui
