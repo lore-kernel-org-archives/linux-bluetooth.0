@@ -1,66 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cufi, Carles" <carles.cufi@nordicsemi.no>
-To: "wyrles@ytram.com" <wyrles@ytram.com>,
-	"corey@kansanian.com" <corey@kansanian.com>
-CC: 'Ed Tomlinson' <edt@aei.ca>, 'Ville Tervo' <ville.tervo@nokia.com>,
-	'Bluettooth Linux' <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date: Wed, 25 May 2011 19:04:21 +0200
-Subject: RE: Linux 2.6.39
-Message-ID: <5B4B9A479BF6994B88EA975675EC5B79057A6029C4@MES1OS2SXC003.mes1.tconet.net>
-References: <BANLkTinG_qCtHQYRYFQUJ9oGv4H1cuznWg@mail.gmail.com>
- <201105250711.17971.edt@aei.ca>	<20110525113614.GQ2480@null>
- <201105250812.43246.edt@aei.ca>
- <5B4B9A479BF6994B88EA975675EC5B79057A399D82@MES1OS2SXC003.mes1.tconet.net>
- <BANLkTi=ec3bh24=2r8f3tmj2g0n0bMnq1Q@mail.gmail.com>
- <5B4B9A479BF6994B88EA975675EC5B79057A60296D@MES1OS2SXC003.mes1.tconet.net>
- <013c01cc1af9$361b00e0$a25102a0$@ytram.com>
-In-Reply-To: <013c01cc1af9$361b00e0$a25102a0$@ytram.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Reply-To: <wyrles@ytram.com>
+From: "Tom Allebrandi" <wyrles@ytram.com>
+To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
+	<ext-jablonski.radoslaw@nokia.com>
+Cc: <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>
+References: <F41BD0C0A0991E449426F6CEE2BF5779014724@008-AM1MPN1-014.mgdnok.nokia.com> <BANLkTi=rPoWHxdSi8=Q2GtYwRzQkxo1mJQ@mail.gmail.com>
+In-Reply-To: <BANLkTi=rPoWHxdSi8=Q2GtYwRzQkxo1mJQ@mail.gmail.com>
+Subject: RE: Question about ABORT when canceling OPP file transfer
+Date: Wed, 25 May 2011 09:43:43 -0700
+Message-ID: <013e01cc1afa$f17d7920$d4786b60$@ytram.com>
 MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- (Snipping...)
-On Wed, May 25, 2011 at 8:46 AM, Cufi, Carles <carles.cufi@nordicsemi.no>
-wrote:
-> On Wednesday 25 May 2011 07:36:14 Ville Tervo wrote:
->> On Wed, May 25, 2011 at 07:11:17AM -0400, ext Ed Tomlinson wrote:
->> > On Wednesday 25 May 2011 06:54:54 Corey Boyle wrote:
->> > > > On Mon, May 23, 2011 at 06:08:36PM -0400, ext Ed Tomlinson wrote:
->> > > > > On Saturday 21 May 2011 16:31:00 Ed Tomlinson wrote:
->> > > > > > On Saturday 21 May 2011 13:56:20 Milan Oravec wrote:
-...
->> > Read Local Version Information (0x04|0x0001) plen 0
->> > > HCI Event: Command Complete (0x0e) plen 12
->> >     Read Local Version Information (0x04|0x0001) ncmd 1
->> >     status 0x00
->> >     HCI Version: 1.1 (0x1) HCI Revision: 0x20d
-*************************
->> >     LMP Version: 1.1 (0x1) LMP Subversion: 0x20d
-*************************
->> >     Manufacturer: Cambridge Silicon Radio (10) < HCI Command: Set 
->> > Event Mask (0x03|0x0001) plen 8
->> >     Mask: 0xfffffbff00000000
-*************************
->> > > HCI Event: Command Complete (0x0e) plen 4
->> >     Set Event Mask (0x03|0x0001) ncmd 1
->> >     status 0x12
->> >     Error: Invalid HCI Command Parameters
->
->Set Event Mask has been in the Bluetooth Spec since day 1, so it must 
->be
->the bitmask, which has been extended with each new spec release to cover newly >added events. Looking at the latest spec, and judging >by the year your chipset was released in (it probably is a 1.1 compliant chipset) I believe that >0x000000008FFFFFFF is the highest >event mask it would support (up until and including Page Scan Repetition Mode Change Event), but since I don't have the >old 1.1 spec >around I may be one or two bits off.
+Hi All -
 
->The device appears to have identified itself as CSR firmware using Bluetooth version 1.1.
->I do happen to have the 1.1 spec lying around :-), for Set_Event_Mask it says
->0x0000000100000000
->To                                          Reserved for future use
->0x8000000000000000
->0x00000000FFFFFFFF	Default (All events enabled)
->The mask above looks ok (no undefined bits), but are they supposed to be displayed in that order? (IOW, are the bytes in correct >order?)
+> On Wed, May 25, 2011 at 10:39 AM,  <ext-jablonski.radoslaw@nokia.com>
+> wrote:
+> > Hi Johan,
+> >
+> > There is one PTS test for OPP which tests if we're disconnecting
+> > cleanly when cancelling outgoing file transfer (this test is not
+mandatory).
+> > Currently it fails, because we don't send ABORT before disconnect.
+> 
+> Just to confirm, this test is for client, right?
+> 
+> > I've noticed that code for handling it nicely already exist in
+> > gw_obex_xfer_do_abort(...) but is disabled by default (via
+> > USE_NICE_ABORT definition).
+> >
+> > Is it safe to change that and  use "nice abort" by default? Were there
+> > problems with handling this ABORT command by some devices in described
+> scenario?
+> 
+> Well if you want to have this test to pass obviously you need to send
+abort
+> properly, in the other hand I think we should make this a proper API on
+> gwobex so the application using it can pass to gw_obex_xfer_do_abort how
+> it wants to abort.
+> 
 
-The HCI spec lists this as a 64-bit number but it must be sent in Little Endian to the controller, hence the reverse order in Ville Tervo's patch earlier in the email thread. 
+I think he is referring to TC_CLIENT_OPH_BV_27_I -- "To verify that a client
+can ABORT an OBEX push operation."
 
-Carles
+This is an optional (category X) test case that was added to exercise the
+OBEX ABORT command. It is not required to pass this test case for
+qualification.
+
+It's a fairly new test case, it was just added in 4.1 or 4.2 of PTS.
+
+Cheers!
+
+--- tom
+tom allebrandi
+(Bluetooth SIG PTS Development Team: OPP, FTP, BIP, DUN, HCRP)
+wyrles@ytram.com
+
 
