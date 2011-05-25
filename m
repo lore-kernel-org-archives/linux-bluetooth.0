@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 May 2011 13:17:56 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: ext-jablonski.radoslaw@nokia.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Question about ABORT when canceling OPP file transfer
-Message-ID: <20110525201756.GA18489@dell.amr.corp.intel.com>
-References: <F41BD0C0A0991E449426F6CEE2BF5779014724@008-AM1MPN1-014.mgdnok.nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F41BD0C0A0991E449426F6CEE2BF5779014724@008-AM1MPN1-014.mgdnok.nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1306352882.2681.43.camel@aeonflux>
+References: <1306253521-30725-1-git-send-email-luiz.dentz@gmail.com>
+	<1306283998.2681.17.camel@aeonflux>
+	<BANLkTikKXPx-FgPB5nR6H9LKVTHGdLaggQ@mail.gmail.com>
+	<1306352882.2681.43.camel@aeonflux>
+Date: Wed, 25 May 2011 22:58:22 +0300
+Message-ID: <BANLkTi=1w=_7aMBu0t-NRVu8c1wMrhebjg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add conf file support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Marcel,
 
-On Wed, May 25, 2011, ext-jablonski.radoslaw@nokia.com wrote:
-> There is one PTS test for OPP which tests if we're disconnecting
-> cleanly when cancelling outgoing file transfer (this test is not
-> mandatory).  Currently it fails, because we don't send ABORT before
-> disconnect. 
-> 
-> I've noticed that code for handling it nicely already exist in
-> gw_obex_xfer_do_abort(...) but is disabled by default (via
-> USE_NICE_ABORT definition).
-> 
-> Is it safe to change that and  use "nice abort" by default? Were there
-> problems with handling this ABORT command by some devices in described
-> scenario?
+On Wed, May 25, 2011 at 10:48 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Luiz,
+>
+>> >> This should reduce the amount of options which normally don't change
+>> >> each time obexd is executed.
+>> >> ---
+>> >> =A0Makefile.am =A0 | =A0 =A02 +-
+>> >> =A0plugins/ftp.c | =A0 =A08 ++-
+>> >> =A0src/main.c =A0 =A0| =A0173 +++++++++++++++++++++++++++++++++++++++=
+-----------------
+>> >> =A03 files changed, 127 insertions(+), 56 deletions(-)
+>> >
+>> > I do not want to have config file support for obexd.
+>> >
+>>
+>> Alright, then I will just update the documentation of the current
+>> options to be more detailed and remove the old configuration file that
+>> still exists on the repository.
+>
+> I don't know how much Johan mentioned on IRC, but what we should be
+> doing is by default enable all compiled in plugins and then use -p and
+> -P command line switches to control what gets enabled and what not. And
+> that can be done easily in the D-Bus autostart file.
 
-I think this is just a packaging bug. There's no reason to disable the
-"nice abort" feature. Actually, I think it'd be fine not to have this
-configurable for gwobex but always enable it (it's a legacy from really
-old OpenOBEX versions that didn't yet support sending the Abort
-command).
+That one I did in a separated patch, 1/3 in the new series I just have
+sent today, it should work just like connman, ofono and BlueZ do.
 
-Johan
+
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
