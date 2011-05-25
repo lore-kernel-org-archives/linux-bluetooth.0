@@ -1,90 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4DDD7263.5010904@ukf.sk>
+Date: Wed, 25 May 2011 23:19:31 +0200
+From: Milan Oravec <moravec@ukf.sk>
 MIME-Version: 1.0
-Reply-To: corey@kansanian.com
-In-Reply-To: <013c01cc1af9$361b00e0$a25102a0$@ytram.com>
-References: <BANLkTinG_qCtHQYRYFQUJ9oGv4H1cuznWg@mail.gmail.com>
-	<201105250711.17971.edt@aei.ca>
-	<20110525113614.GQ2480@null>
-	<201105250812.43246.edt@aei.ca>
-	<5B4B9A479BF6994B88EA975675EC5B79057A399D82@MES1OS2SXC003.mes1.tconet.net>
-	<BANLkTi=ec3bh24=2r8f3tmj2g0n0bMnq1Q@mail.gmail.com>
-	<5B4B9A479BF6994B88EA975675EC5B79057A60296D@MES1OS2SXC003.mes1.tconet.net>
-	<013c01cc1af9$361b00e0$a25102a0$@ytram.com>
-Date: Wed, 25 May 2011 21:11:19 -0400
-Message-ID: <BANLkTikxR3AZJK5Bhc5b=7dq6CbXd2iBtQ@mail.gmail.com>
-Subject: Re: Linux 2.6.39
-From: Corey Boyle <corey@kansanian.com>
-To: wyrles@ytram.com, Ville Tervo <ville.tervo@nokia.com>,
-	"Cufi, Carles" <carles.cufi@nordicsemi.no>
-Cc: Ed Tomlinson <edt@aei.ca>,
+To: Ville Tervo <ville.tervo@nokia.com>
+CC: ext Ed Tomlinson <edt@aei.ca>, linux-kernel@vger.kernel.org,
+	Hui Zhu <teawater@gmail.com>,
+	Dave Young <hidave.darkstar@gmail.com>,
 	Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: Re: Linux 2.6.39
+References: <BANLkTikB37AvEgh1MAFBbYvFaxsL6W11OQ@mail.gmail.com> <loom.20110521T194736-595@post.gmane.org> <201105211631.00804.edt@aei.ca> <201105231808.37369.edt@aei.ca> <20110525082744.GP2480@null>
+In-Reply-To: <20110525082744.GP2480@null>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 25, 2011 at 12:31 PM, Tom Allebrandi <wyrles@ytram.com> wrote:
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org
-> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Cufi, Carles
-> Sent: Wednesday, May 25, 2011 7:15 AM
-> To: corey@kansanian.com
-> Cc: Ed Tomlinson; Ville Tervo; Bluettooth Linux;
-> linux-kernel@vger.kernel.org
-> Subject: RE: Linux 2.6.39
->
-> (Snipping...)
-> On Wed, May 25, 2011 at 8:46 AM, Cufi, Carles <carles.cufi@nordicsemi.no>
-> wrote:
->> On Wednesday 25 May 2011 07:36:14 Ville Tervo wrote:
->>> On Wed, May 25, 2011 at 07:11:17AM -0400, ext Ed Tomlinson wrote:
->>> > On Wednesday 25 May 2011 06:54:54 Corey Boyle wrote:
->>> > > > On Mon, May 23, 2011 at 06:08:36PM -0400, ext Ed Tomlinson wrote:
->>> > > > > On Saturday 21 May 2011 16:31:00 Ed Tomlinson wrote:
->>> > > > > > On Saturday 21 May 2011 13:56:20 Milan Oravec wrote:
-> ...
->>> > Read Local Version Information (0x04|0x0001) plen 0
->>> > > HCI Event: Command Complete (0x0e) plen 12
->>> >     Read Local Version Information (0x04|0x0001) ncmd 1
->>> >     status 0x00
->>> >     HCI Version: 1.1 (0x1) HCI Revision: 0x20d
-> *************************
->>> >     LMP Version: 1.1 (0x1) LMP Subversion: 0x20d
-> *************************
->>> >     Manufacturer: Cambridge Silicon Radio (10) < HCI Command: Set
->>> > Event Mask (0x03|0x0001) plen 8
->>> >     Mask: 0xfffffbff00000000
-> *************************
->>> > > HCI Event: Command Complete (0x0e) plen 4
->>> >     Set Event Mask (0x03|0x0001) ncmd 1
->>> >     status 0x12
->>> >     Error: Invalid HCI Command Parameters
->>
->>Set Event Mask has been in the Bluetooth Spec since day 1, so it must be
-> the bitmask, which has been extended with each new spec release to cover
-> newly >added events. Looking at the latest spec, and judging by the year
-> your chipset was released in (it probably is a 1.1 compliant chipset) I
-> believe that >0x000000008FFFFFFF is the highest event mask it would support
-> (up until and including Page Scan Repetition Mode Change Event), but since I
-> don't have the >old 1.1 spec around I may be one or two bits off.
->
-> The device appears to have identified itself as CSR firmware using Bluetooth
-> version 1.1.
->
-> I do happen to have the 1.1 spec lying around :-), for Set_Event_Mask it
-> says
->
-> 0x0000000100000000
-> To                                          Reserved for future use
-> 0x8000000000000000
->
-> 0x00000000FFFFFFFF      Default (All events enabled)
->
+Hi Ville, thank you for your help.
 
-I am beginning to think that my adapter simply does not support this
-command.  I have tried with all the suggested bitmasks, all zeros, all
-ones, all combinations where a single bit is set, etc.  I'm not sure
-where to go from here other than add a flag which incidates that
-certain devices don't support this command so it can be skipped.
-Again, the only way I have gotten it to work is by not sending the
-command at all.  Thoughts?
+In 2.6.39 kernel command hciconfig hci0 up produces this output:
+
+HCI sniffer - Bluetooth packet analyzer ver 1.42
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Reset (0x03|0x0003) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 12
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 12
+< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 11
+< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 10
+< HCI Command: Read Class of Device (0x03|0x0023) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 7
+< HCI Command: Read Local Name (0x03|0x0014) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 252
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Set Event Filter (0x03|0x0005) plen 1
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
+ > > HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Set Event Mask (0x03|0x0001) plen 8
+ > > HCI Event: Command Complete (0x0e) plen 4
+
+In 2.6.38.7 kernel command hciconfig hci0 up produces:
+
+HCI sniffer - Bluetooth packet analyzer ver 1.42
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Reset (0x03|0x0003) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 12
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 12
+< HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 11
+< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 10
+< HCI Command: Read Class of Device (0x03|0x0023) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 7
+< HCI Command: Read Local Name (0x03|0x0014) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 252
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Set Event Filter (0x03|0x0005) plen 1
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Page Timeout (0x03|0x0018) plen 2
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
+ > > HCI Event: Command Complete (0x0e) plen 8
+< HCI Command: Set Event Mask (0x03|0x0001) plen 8
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Default Link Policy Settings (0x02|0x000f) plen 2
+ > > HCI Event: Command Status (0x0f) plen 4
+< HCI Command: Write Local Name (0x03|0x0013) plen 248
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Class of Device (0x03|0x0024) plen 3
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
+ > > HCI Event: Command Complete (0x0e) plen 4
+< HCI Command: Read Local Name (0x03|0x0014) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 252
+< HCI Command: Read Scan Enable (0x03|0x0019) plen 0
+ > > HCI Event: Command Complete (0x0e) plen 5
+
+Hope this helps.
+
+Best regards,
+
+Milan
+
+
+
+On 05/25/2011 10:27 AM, Ville Tervo wrote:
+> On Mon, May 23, 2011 at 06:08:36PM -0400, ext Ed Tomlinson wrote:
+>> On Saturday 21 May 2011 16:31:00 Ed Tomlinson wrote:
+>>> On Saturday 21 May 2011 13:56:20 Milan Oravec wrote:
+>>>> Hi Linus, I'm sorry bothering you, but my usb-bluetooth dongle stop working in
+>>>> 2.6.39 kernel series.
+>>>> I know it is nothing ground breaking but it is bug.
+>>>> I'm using this hardware from 2.6.11 kernel series.
+>>>> Details are included in this thread:
+>>>>
+>>>> https://lkml.org/lkml/2011/4/18/481
+>>>>
+>>>> I hope I'm doing nothing false writing this email.
+>>>
+>>> Same device, same problem here.
+>>>
+>>> You are not alone
+>>
+>> I had some time this afternood so I tried bisecting without much luck.  I ended up somewhere rc1 ish with a system
+>> that would paniced during boot.  Here is the bisect log incase it helps:
+>>
+>> # bad: [61c4f2c81c61f73549928dfd9f3e8f26aa36a8cf] Linux 2.6.39
+>> # good: [521cb40b0c44418a4fd36dc633f575813d59a43d] Linux 2.6.38
+>> git bisect start 'v2.6.39' 'v2.6.38' '--' 'drivers/bluetooth'
+>> # bad: [7a6362800cb7d1d618a697a650c7aaed3eb39320] Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next-2.6
+>> git bisect bad 7a6362800cb7d1d618a697a650c7aaed3eb39320
+>> # bad: [0a0e9ae1bd788bc19adc4d4ae08c98b233697402] Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/davem/net-2.6
+>> git bisect bad 0a0e9ae1bd788bc19adc4d4ae08c98b233697402
+>> # skip: [03c2d0e89409b59c1ec9d9511533cedc0b7aaa69] Bluetooth: Use usb_fill_int_urb()
+>> git bisect skip 03c2d0e89409b59c1ec9d9511533cedc0b7aaa69
+>> # skip: [7f4b2b04c88377af30c022f36c060190182850fb] Bluetooth: Make hci a child of the corresponding tty device.
+>> git bisect skip 7f4b2b04c88377af30c022f36c060190182850fb
+>> # skip: [84f0e17f78471857104a20dfc57711409f68d7bf] Bluetooth: ath3k: Avoid duplication of code
+>> git bisect skip 84f0e17f78471857104a20dfc57711409f68d7bf
+>>
+>> Ring any bells for anyone?
+>>
+>> Probably should open a regression bug for this too....
+>
+> I think this is regression with d5859e22cd40b73164b3e5d8d5d796f96edcc6af
+> commit. Probably the code tries to enable something that is not supported.
+>
+> Could you pastebin hcidump while doing hciconfig hci0 up?
+>
