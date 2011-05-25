@@ -1,27 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1306352625-8422-1-git-send-email-luiz.dentz@gmail.com>
-References: <1306352625-8422-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 25 May 2011 22:43:00 +0200
-Message-ID: <BANLkTikQtckCcOqWC8DeBkhYTUb7gYcsXQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3 v2] Improve usage documentation for some options
-From: Daniele Forsi <dforsi@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 25 May 2011 13:40:48 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/2] Add messages backend initialization and finalization
+Message-ID: <20110525204048.GC18794@dell.amr.corp.intel.com>
+References: <1306159280-19889-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1306159280-19889-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2011/5/25 Luiz Augusto von Dentz:
+Hi Slawek,
 
-> +                               "Specify root folder location. Both absolute "
-> +                               "and relative can be use, but relative paths "
+On Mon, May 23, 2011, Slawomir Bochenski wrote:
+> +	err = messages_init();
+> +	if (err < 0)
+> +		goto failed_messages_init;
+> +
+>  	err = obex_mime_type_driver_register(&mime_map);
+>  	if (err < 0)
+>  		goto failed_mime;
+> @@ -275,6 +279,9 @@ failed_mas_reg:
+>  	obex_mime_type_driver_unregister(&mime_map);
+>  
+>  failed_mime:
+> +	messages_exit();
+> +
+> +failed_messages_init:
+>  	return err;
+>  }
 
-past participle: s/use/used/
+In this case it'd be simpler to do the following instead of adding the
+new label:
 
-> +                               "are assume to be relative to user $HOME "
+	if (err < 0)
+		return err;
 
-s/assume/assumed/
+If there was more complex cleanup involved then the new label would make
+sense, but not really with a simple return statement.
 
--- 
-Daniele Forsi
+Johan
