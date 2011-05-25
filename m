@@ -1,43 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Add conf file support
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTimDY-b6uRr68WWbzuLw_4mP0Sp+Hg@mail.gmail.com>
+References: <1306338000-7905-1-git-send-email-luiz.dentz@gmail.com>
+	<1306338000-7905-3-git-send-email-luiz.dentz@gmail.com>
+	<BANLkTimDY-b6uRr68WWbzuLw_4mP0Sp+Hg@mail.gmail.com>
+Date: Wed, 25 May 2011 22:45:46 +0300
+Message-ID: <BANLkTinBfZQ6jfngOBDDVJSDDyJCwsJ-yg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Improve usage documentation for some options
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <BANLkTikKXPx-FgPB5nR6H9LKVTHGdLaggQ@mail.gmail.com>
-References: <1306253521-30725-1-git-send-email-luiz.dentz@gmail.com>
-	 <1306283998.2681.17.camel@aeonflux>
-	 <BANLkTikKXPx-FgPB5nR6H9LKVTHGdLaggQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 25 May 2011 12:48:02 -0700
-Message-ID: <1306352882.2681.43.camel@aeonflux>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-> >> This should reduce the amount of options which normally don't change
-> >> each time obexd is executed.
-> >> ---
-> >>  Makefile.am   |    2 +-
-> >>  plugins/ftp.c |    8 ++-
-> >>  src/main.c    |  173 +++++++++++++++++++++++++++++++++++++++-----------------
-> >>  3 files changed, 127 insertions(+), 56 deletions(-)
-> >
-> > I do not want to have config file support for obexd.
-> >
-> 
-> Alright, then I will just update the documentation of the current
-> options to be more detailed and remove the old configuration file that
-> still exists on the repository.
+On Wed, May 25, 2011 at 8:17 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Luiz,
+>
+> On Wed, May 25, 2011 at 11:40 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  src/main.c |    8 ++++++--
+>>  1 files changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/main.c b/src/main.c
+>> index e1ce442..5b30f07 100644
+>> --- a/src/main.c
+>> +++ b/src/main.c
+>> @@ -100,13 +100,17 @@ static GOptionEntry options[] = {
+>>                                G_OPTION_ARG_CALLBACK, parse_debug,
+>>                                "Enable debug information output", "DEBUG" },
+>>        { "root", 'r', 0, G_OPTION_ARG_STRING, &option_root,
+>> -                               "Specify root folder location", "PATH" },
+>> +                               "Specify root folder location. Both absolute"
+>> +                               "and relative can be use, but relative paths"
+>> +                               "are assume to be relative to user $HOME"
+>> +                               "folder", "PATH" },
+>
+> IIRC, you should add the spaces to the string if you want them on the
+> printed string, otherwise you will see:
+>
+> absoluteand
+> pathsare
+> etc.
 
-I don't know how much Johan mentioned on IRC, but what we should be
-doing is by default enable all compiled in plugins and then use -p and
--P command line switches to control what gets enabled and what not. And
-that can be done easily in the D-Bus autostart file.
+It sure does need the extra spaces, gonna fix them, thanks.
 
-Regards
+>>        { "root-setup", 'S', 0, G_OPTION_ARG_STRING, &option_root_setup,
+>>                                "Root folder setup script", "SCRIPT" },
+>>        { "symlinks", 'l', 0, G_OPTION_ARG_NONE, &option_symlinks,
+>>                                "Enable symlinks on root folder" },
+>>        { "capability", 'c', 0, G_OPTION_ARG_STRING, &option_capability,
+>> -                               "Specify capability file", "FILE" },
+>> +                               "Specify capability file, use '!' mark for"
+>> +                               "scripts", "FILE" },
+>
+> Same here.
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
 
-Marcel
 
 
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
