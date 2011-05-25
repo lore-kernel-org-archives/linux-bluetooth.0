@@ -1,240 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Simplify options for including/excluding plugins
-Date: Wed, 25 May 2011 18:39:58 +0300
-Message-Id: <1306338000-7905-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Add little note to the docs
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Wed, 25 May 2011 16:34:05 +0100
+Content-Type: multipart/mixed; boundary="=-vqPgtzwTOuu5TQeH6gjL"
+Message-ID: <1306337646.2010.219.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Plugins options are now handle with --plugin(-p)/--noplugin(-P) which
-takes a string set containing the plugin names separated by ',',':' or
-' 'similar to bluetoothd, ofono and connman.
+--=-vqPgtzwTOuu5TQeH6gjL
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+Heya,
+
+If one didn't read the Bluetooth 2.1 specs, we could easily miss that
+particular point. Passkeys used for SSP need to have zeros prepended if
+they are less than 6 digits long.
+
+Added to the docs in the patch below, and will fix the bugs in
+gnome-bluetooth.
+
+Cheers
+
+--=-vqPgtzwTOuu5TQeH6gjL
+Content-Disposition: attachment;
+	filename="0001-doc-Add-mention-of-the-6-digit-padding-problem.patch"
+Content-Type: text/x-patch;
+	name="0001-doc-Add-mention-of-the-6-digit-padding-problem.patch";
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From 86b5302feedd578256aea400b8f220515220885e Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 25 May 2011 16:30:09 +0100
+Subject: [PATCH] doc: Add mention of the 6-digit padding problem
+
+Passkeys used for Secure Simple pairing should always appear
+zero-padded in the end-user display, as per specification
+(5.4 ASSOCIATION MODELS in BLUETOOTH SPECIFICATION Version 2.1 + EDR
+ [vol 1])
 ---
- src/main.c   |   68 +++++++++++++++------------------------------------------
- src/obexd.h  |    2 +-
- src/plugin.c |   51 +++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 68 insertions(+), 53 deletions(-)
+ doc/agent-api.txt |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-diff --git a/src/main.c b/src/main.c
-index 8154e3b..e1ce442 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -75,16 +75,11 @@ static char *option_debug = NULL;
- static char *option_root = NULL;
- static char *option_root_setup = NULL;
- static char *option_capability = NULL;
-+static char *option_plugin = NULL;
-+static char *option_noplugin = NULL;
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index 0c84e1c..fca2875 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -63,6 +63,10 @@ Methods		void Release()
+ 			During the pairing process this method might be
+ 			called multiple times to update the entered value.
  
- static gboolean option_autoaccept = FALSE;
--static gboolean option_opp = FALSE;
--static gboolean option_ftp = FALSE;
--static gboolean option_pbap = FALSE;
--static gboolean option_irmc = FALSE;
--static gboolean option_pcsuite = FALSE;
- static gboolean option_symlinks = FALSE;
--static gboolean option_syncevolution = FALSE;
--static gboolean option_mas = FALSE;
- 
- static gboolean parse_debug(const char *key, const char *value,
- 				gpointer user_data, GError **error)
-@@ -114,20 +109,10 @@ static GOptionEntry options[] = {
- 				"Specify capability file", "FILE" },
- 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
- 				"Automatically accept push requests" },
--	{ "opp", 'o', 0, G_OPTION_ARG_NONE, &option_opp,
--				"Enable Object Push server" },
--	{ "ftp", 'f', 0, G_OPTION_ARG_NONE, &option_ftp,
--				"Enable File Transfer server" },
--	{ "pbap", 'p', 0, G_OPTION_ARG_NONE, &option_pbap,
--				"Enable Phonebook Access server" },
--	{ "irmc", 'i', 0, G_OPTION_ARG_NONE, &option_irmc,
--				"Enable IrMC Sync server" },
--	{ "pcsuite", 's', 0, G_OPTION_ARG_NONE, &option_pcsuite,
--				"Enable PC Suite Services server" },
--	{ "syncevolution", 'e', 0, G_OPTION_ARG_NONE, &option_syncevolution,
--				"Enable OBEX server for SyncEvolution" },
--        { "mas", 'm', 0, G_OPTION_ARG_NONE, &option_mas,
--				"Enable Message Access server" },
-+	{ "plugin", 'p', 0, G_OPTION_ARG_STRING, &option_plugin,
-+				"Specify plugins to load", "NAME,..." },
-+	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
-+				"Specify plugins not to load", "NAME,..." },
- 	{ NULL },
- };
- 
-@@ -212,16 +197,6 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	if (option_opp == FALSE && option_ftp == FALSE &&
--				option_pbap == FALSE &&
--				option_irmc == FALSE &&
--				option_syncevolution == FALSE &&
--				option_mas == FALSE) {
--		fprintf(stderr, "No server selected (use either "
--				"--opp, --ftp, --pbap, --irmc, --mas, or --syncevolution)\n");
--		exit(EXIT_FAILURE);
--	}
--
- 	__obex_log_init("obexd", option_debug, option_detach);
- 
- 	DBG("Entering main loop");
-@@ -251,39 +226,32 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	plugin_init();
--
- 	if (option_capability == NULL)
- 		option_capability = g_strdup(DEFAULT_CAP_FILE);
- 
--	if (option_opp == TRUE)
--		obex_server_init(OBEX_OPP, option_root, FALSE,
-+	plugin_init(option_plugin, option_noplugin);
++			Note that the passkey will always be a 6-digit number,
++			so the display should be zero-padded at the start if
++			the value contains less than 6 digits.
 +
-+	obex_server_init(OBEX_OPP, option_root, FALSE,
- 				option_autoaccept, option_symlinks,
- 				NULL);
+ 		void RequestConfirmation(object device, uint32 passkey)
  
--	if (option_ftp == TRUE)
--		obex_server_init(OBEX_FTP, option_root, TRUE,
-+	obex_server_init(OBEX_FTP, option_root, TRUE,
- 				option_autoaccept, option_symlinks,
- 				option_capability);
+ 			This method gets called when the service daemon
+@@ -71,6 +75,10 @@ Methods		void Release()
+ 			To confirm the value it should return an empty reply
+ 			or an error in case the passkey is invalid.
  
--	if (option_pbap == TRUE)
--		obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE, NULL);
--
--	if (option_pcsuite == TRUE)
--		obex_server_init(OBEX_PCSUITE, option_root, TRUE,
-+	obex_server_init(OBEX_PCSUITE, option_root, TRUE,
- 				option_autoaccept, option_symlinks,
- 				option_capability);
- 
--	if (option_irmc == TRUE)
--		obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
--				option_capability);
-+	obex_server_init(OBEX_PBAP, NULL, TRUE, FALSE, FALSE,
-+							option_capability);
++			Note that the passkey will always be a 6-digit number,
++			so the display should be zero-padded at the start if
++			the value contains less than 6 digits.
 +
-+	obex_server_init(OBEX_IRMC, NULL, TRUE, FALSE, FALSE,
-+							option_capability);
+ 			Possible errors: org.bluez.Error.Rejected
+ 			                 org.bluez.Error.Canceled
  
--	if (option_syncevolution == TRUE)
--		obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE,
--							FALSE, NULL);
-+	obex_server_init(OBEX_SYNCEVOLUTION, NULL, TRUE, FALSE, FALSE, NULL);
- 
--	if (option_mas == TRUE)
--		obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
-+	obex_server_init(OBEX_MAS, NULL, TRUE, FALSE, FALSE, NULL);
- 
- 	if (!root_folder_setup(option_root, option_root_setup)) {
- 		error("Unable to setup root folder %s", option_root);
-diff --git a/src/obexd.h b/src/obexd.h
-index df21f00..37106b7 100644
---- a/src/obexd.h
-+++ b/src/obexd.h
-@@ -21,7 +21,7 @@
-  *
-  */
- 
--gboolean plugin_init(void);
-+gboolean plugin_init(const char *pattern, const char *exclude);
- void plugin_cleanup(void);
- 
- gboolean manager_init(void);
-diff --git a/src/plugin.c b/src/plugin.c
-index 14a569f..c8ec642 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
-@@ -79,10 +79,39 @@ static gboolean add_plugin(void *handle, struct obex_plugin_desc *desc)
- 	return TRUE;
- }
- 
-+static gboolean check_plugin(struct obex_plugin_desc *desc,
-+				char **patterns, char **excludes)
-+{
-+	if (excludes) {
-+		for (; *excludes; excludes++)
-+			if (g_pattern_match_simple(*excludes, desc->name))
-+				break;
-+		if (*excludes) {
-+			info("Excluding %s", desc->name);
-+			return FALSE;
-+		}
-+	}
-+
-+	if (patterns) {
-+		for (; *patterns; patterns++)
-+			if (g_pattern_match_simple(*patterns, desc->name))
-+				break;
-+		if (*patterns == NULL) {
-+			info("Ignoring %s", desc->name);
-+			return FALSE;
-+		}
-+	}
-+
-+	return TRUE;
-+}
-+
-+
- #include "builtin.h"
- 
--gboolean plugin_init(void)
-+gboolean plugin_init(const char *pattern, const char *exclude)
- {
-+	gchar **patterns = NULL;
-+	gchar **excludes = NULL;
- 	GDir *dir;
- 	const char *file;
- 	unsigned int i;
-@@ -90,10 +119,21 @@ gboolean plugin_init(void)
- 	if (strlen(PLUGINDIR) == 0)
- 		return FALSE;
- 
-+	if (pattern)
-+		patterns = g_strsplit_set(pattern, ":, ", -1);
-+
-+	if (exclude)
-+		excludes = g_strsplit_set(exclude, ":, ", -1);
-+
- 	DBG("Loading builtin plugins");
- 
--	for (i = 0; __obex_builtin[i]; i++)
-+	for (i = 0; __obex_builtin[i]; i++) {
-+		if (check_plugin(__obex_builtin[i],
-+					patterns, excludes) == FALSE)
-+			continue;
-+
- 		add_plugin(NULL,  __obex_builtin[i]);
-+	}
- 
- 	DBG("Loading plugins %s", PLUGINDIR);
- 
-@@ -129,11 +169,18 @@ gboolean plugin_init(void)
- 			continue;
- 		}
- 
-+		if (check_plugin(desc, patterns, excludes) == FALSE) {
-+			dlclose(handle);
-+			continue;
-+		}
-+
- 		if (add_plugin(handle, desc) == FALSE)
- 			dlclose(handle);
- 	}
- 
- 	g_dir_close(dir);
-+	g_strfreev(patterns);
-+	g_strfreev(excludes);
- 
- 	return TRUE;
- }
 -- 
 1.7.5.1
+
+
+--=-vqPgtzwTOuu5TQeH6gjL--
 
