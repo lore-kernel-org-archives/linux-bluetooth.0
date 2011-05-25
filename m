@@ -1,27 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: <ext-jablonski.radoslaw@nokia.com>
-To: <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Question about ABORT when canceling OPP file transfer
-Date: Wed, 25 May 2011 07:39:39 +0000
-Message-ID: <F41BD0C0A0991E449426F6CEE2BF5779014724@008-AM1MPN1-014.mgdnok.nokia.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1306283998.2681.17.camel@aeonflux>
+References: <1306253521-30725-1-git-send-email-luiz.dentz@gmail.com>
+	<1306283998.2681.17.camel@aeonflux>
+Date: Wed, 25 May 2011 09:14:17 +0300
+Message-ID: <BANLkTikKXPx-FgPB5nR6H9LKVTHGdLaggQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add conf file support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-There is one PTS test for OPP which tests if we're disconnecting cleanly 
-when cancelling outgoing file transfer (this test is not mandatory). 
-Currently it fails, because we don't send ABORT before disconnect. 
+On Wed, May 25, 2011 at 3:39 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Luiz,
+>
+>> This should reduce the amount of options which normally don't change
+>> each time obexd is executed.
+>> ---
+>> =A0Makefile.am =A0 | =A0 =A02 +-
+>> =A0plugins/ftp.c | =A0 =A08 ++-
+>> =A0src/main.c =A0 =A0| =A0173 +++++++++++++++++++++++++++++++++++++++---=
+--------------
+>> =A03 files changed, 127 insertions(+), 56 deletions(-)
+>
+> I do not want to have config file support for obexd.
+>
 
-I've noticed that code for handling it nicely already exist in 
-gw_obex_xfer_do_abort(...) but is disabled by default (via 
-USE_NICE_ABORT definition).
+Alright, then I will just update the documentation of the current
+options to be more detailed and remove the old configuration file that
+still exists on the repository.
 
-Is it safe to change that and  use "nice abort" by default? Were there problems 
-with handling this ABORT command by some devices in described scenario?
 
-BR,
-Radek
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
