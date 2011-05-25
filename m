@@ -1,80 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Add little note to the docs
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Wed, 25 May 2011 16:34:05 +0100
-Content-Type: multipart/mixed; boundary="=-vqPgtzwTOuu5TQeH6gjL"
-Message-ID: <1306337646.2010.219.camel@novo.hadess.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Cufi, Carles" <carles.cufi@nordicsemi.no>
+To: "corey@kansanian.com" <corey@kansanian.com>
+CC: Ed Tomlinson <edt@aei.ca>, Ville Tervo <ville.tervo@nokia.com>,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Wed, 25 May 2011 16:15:24 +0200
+Subject: RE: Linux 2.6.39
+Message-ID: <5B4B9A479BF6994B88EA975675EC5B79057A60296D@MES1OS2SXC003.mes1.tconet.net>
+References: <BANLkTinG_qCtHQYRYFQUJ9oGv4H1cuznWg@mail.gmail.com>
+	<201105250711.17971.edt@aei.ca>	<20110525113614.GQ2480@null>
+	<201105250812.43246.edt@aei.ca>
+	<5B4B9A479BF6994B88EA975675EC5B79057A399D82@MES1OS2SXC003.mes1.tconet.net>
+ <BANLkTi=ec3bh24=2r8f3tmj2g0n0bMnq1Q@mail.gmail.com>
+In-Reply-To: <BANLkTi=ec3bh24=2r8f3tmj2g0n0bMnq1Q@mail.gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, May 25, 2011 at 8:46 AM, Cufi, Carles <carles.cufi@nordicsemi.no> wrote:
+>
+>
+> On Wednesday 25 May 2011 07:36:14 Ville Tervo wrote:
+>> On Wed, May 25, 2011 at 07:11:17AM -0400, ext Ed Tomlinson wrote:
+>> > On Wednesday 25 May 2011 06:54:54 Corey Boyle wrote:
+>> > > > On Mon, May 23, 2011 at 06:08:36PM -0400, ext Ed Tomlinson wrote:
+>> > > > > On Saturday 21 May 2011 16:31:00 Ed Tomlinson wrote:
+>> > > > > > On Saturday 21 May 2011 13:56:20 Milan Oravec wrote:
+>> > > > > > > Hi Linus, I'm sorry bothering you, but my usb-bluetooth 
+>> > > > > > > dongle stop working in
+>> > > > > > > 2.6.39 kernel series.
+>> > > > > > > I know it is nothing ground breaking but it is bug.
+>> > > > > > > I'm using this hardware from 2.6.11 kernel series.
+>> > > > > > > Details are included in this thread:
+>> > > > > > >
+>> > > > > > > https://lkml.org/lkml/2011/4/18/481
+>> > > > > > >
+>> > > > > > > I hope I'm doing nothing false writing this email.
+>> > > > > >
+>> > > > > > Same device, same problem here.
+>> > > > > >
+>> > > > > > You are not alone
+>> > > > >
+>> > > > > I had some time this afternood so I tried bisecting without 
+>> > > > > much luck.  I ended up \ somewhere rc1 ish with a system that 
+>> > > > > would paniced during boot.  Here is the bisect \ log incase it helps:
+>> > > > > # bad: [61c4f2c81c61f73549928dfd9f3e8f26aa36a8cf] Linux 
+>> > > > > 2.6.39 # good: [521cb40b0c44418a4fd36dc633f575813d59a43d] 
+>> > > > > Linux
+>> > > > > 2.6.38 git bisect start 'v2.6.39' 'v2.6.38' '--' 'drivers/bluetooth'
+>> > > > > # bad: [7a6362800cb7d1d618a697a650c7aaed3eb39320] Merge \
+>> > > > > git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next-
+>> > > > > 2
+>> > > > > .6 git bisect bad \
+>> > > > > 7a6362800cb7d1d618a697a650c7aaed3eb39320 # bad: \ 
+>> > > > > [0a0e9ae1bd788bc19adc4d4ae08c98b233697402] Merge branch 
+>> > > > > 'master' of \
+>> > > > > master.kernel.org:/pub/scm/linux/kernel/git/davem/net-2.6 git 
+>> > > > > bisect bad \
+>> > > > > 0a0e9ae1bd788bc19adc4d4ae08c98b233697402 # skip: \ 
+>> > > > > [03c2d0e89409b59c1ec9d9511533cedc0b7aaa69] Bluetooth: Use
+>> > > > > usb_fill_int_urb() git \ bisect skip
+>> > > > > 03c2d0e89409b59c1ec9d9511533cedc0b7aaa69 # skip: \ 
+>> > > > > [7f4b2b04c88377af30c022f36c060190182850fb] Bluetooth: Make 
+>> > > > > hci a child of the \ corresponding tty device. git bisect 
+>> > > > > skip 7f4b2b04c88377af30c022f36c060190182850fb
+>> > > > > # skip: [84f0e17f78471857104a20dfc57711409f68d7bf] Bluetooth:
+>> > > > > ath3k: Avoid \ duplication of code git bisect skip 
+>> > > > > 84f0e17f78471857104a20dfc57711409f68d7bf
+>> > > > >
+>> > > > > Ring any bells for anyone?
+>> > > > >
+>> > > > > Probably should open a regression bug for this too....
+>> > > >
+>> > > > I think this is regression with 
+>> > > > d5859e22cd40b73164b3e5d8d5d796f96edcc6af
+>> > > > commit. Probably the code tries to enable something that is not supported.
+>> > > >
+>> > > > Could you pastebin hcidump while doing hciconfig hci0 up?
+>>
+>> Some cutting done
+>>
+>> >
+>> > hcidump
+>> > HCI sniffer - Bluetooth packet analyzer ver 2.0 < HCI Command: Read 
+>> > Local Supported Features (0x04|0x0003) plen 0
+>> > > HCI Event: Command Complete (0x0e) plen 12
+>> >     Read Local Supported Features (0x04|0x0003) ncmd 1
+>> >     status 0x00
+>> >     Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00 < HCI Command:
+>> > Read Local Version Information (0x04|0x0001) plen 0
+>> > > HCI Event: Command Complete (0x0e) plen 12
+>> >     Read Local Version Information (0x04|0x0001) ncmd 1
+>> >     status 0x00
+>> >     HCI Version: 1.1 (0x1) HCI Revision: 0x20d
+>> >     LMP Version: 1.1 (0x1) LMP Subversion: 0x20d
+>> >     Manufacturer: Cambridge Silicon Radio (10) < HCI Command: Set 
+>> > Event Mask (0x03|0x0001) plen 8
+>> >     Mask: 0xfffffbff00000000
+>> > > HCI Event: Command Complete (0x0e) plen 4
+>> >     Set Event Mask (0x03|0x0001) ncmd 1
+>> >     status 0x12
+>> >     Error: Invalid HCI Command Parameters
+>> >
+>>
+>> Yes the HCI_OP_SET_EVENT_MASK cmd seems to be the source of problems.
+>>
+>> Maybe is rejects it because two reserved bits are being enabled. 
+>> Could you try this patch?
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c 
+>> index 19cd4af..e483e30 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -475,7 +475,7 @@ static void hci_setup_event_mask(struct hci_dev 
+>> *hdev)
+>>         /* The second byte is 0xff instead of 0x9f (two reserved bits
+>>          * disabled) since a Broadcom 1.2 dongle doesn't respond to 
+>> the
+>>          * command otherwise */
+>> -       u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 
+>> 0x00 };
+>> +       u8 events[8] = { 0xff, 0x9f, 0xfb, 0xff, 0x00, 0x00, 0x00,
+>> + 0x00 };
+>>
+>>         /* Events for 1.2 and newer controllers */
+>>         if (hdev->lmp_ver > 1) {
+>
+>> No luck here - same results.
+>
+> For what it's worth:
+>
+> With a (recent)CSR chipset, with 2.6.38 only Set Event Filter is used (with a 0 filter) and no Set Event Mask is sent at all. With Bluetooth-next, I get the following:
+>
+> < HCI Command: Set Event Mask (0x03|0x0001) plen 8
+>    Mask: 0xfffffbff07f8bf3d
+>> HCI Event: Command Complete (0x0e) plen 4
+>    Set Event Mask (0x03|0x0001) ncmd 1
+>    status 0x00
+>
+> So Set Event Mask actually seems to go through without any problems.
+>
+> Carles
+>
+>My adapter is from 2002 so I'm guessing it either doesn't support Set Event Mask at all, or is very sensitive about the values it >receives.
 
---=-vqPgtzwTOuu5TQeH6gjL
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Set Event Mask has been in the Bluetooth Spec since day 1, so it must be the bitmask, which has been extended with each new spec release to cover newly added events. Looking at the latest spec, and judging by the year your chipset was released in (it probably is a 1.1 compliant chipset) I believe that 0x000000008FFFFFFF is the highest event mask it would support (up until and including Page Scan Repetition Mode Change Event), but since I don't have the old 1.1 spec around I may be one or two bits off.
 
-Heya,
-
-If one didn't read the Bluetooth 2.1 specs, we could easily miss that
-particular point. Passkeys used for SSP need to have zeros prepended if
-they are less than 6 digits long.
-
-Added to the docs in the patch below, and will fix the bugs in
-gnome-bluetooth.
-
-Cheers
-
---=-vqPgtzwTOuu5TQeH6gjL
-Content-Disposition: attachment;
-	filename="0001-doc-Add-mention-of-the-6-digit-padding-problem.patch"
-Content-Type: text/x-patch;
-	name="0001-doc-Add-mention-of-the-6-digit-padding-problem.patch";
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From 86b5302feedd578256aea400b8f220515220885e Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Wed, 25 May 2011 16:30:09 +0100
-Subject: [PATCH] doc: Add mention of the 6-digit padding problem
-
-Passkeys used for Secure Simple pairing should always appear
-zero-padded in the end-user display, as per specification
-(5.4 ASSOCIATION MODELS in BLUETOOTH SPECIFICATION Version 2.1 + EDR
- [vol 1])
----
- doc/agent-api.txt |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
-
-diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-index 0c84e1c..fca2875 100644
---- a/doc/agent-api.txt
-+++ b/doc/agent-api.txt
-@@ -63,6 +63,10 @@ Methods		void Release()
- 			During the pairing process this method might be
- 			called multiple times to update the entered value.
- 
-+			Note that the passkey will always be a 6-digit number,
-+			so the display should be zero-padded at the start if
-+			the value contains less than 6 digits.
-+
- 		void RequestConfirmation(object device, uint32 passkey)
- 
- 			This method gets called when the service daemon
-@@ -71,6 +75,10 @@ Methods		void Release()
- 			To confirm the value it should return an empty reply
- 			or an error in case the passkey is invalid.
- 
-+			Note that the passkey will always be a 6-digit number,
-+			so the display should be zero-padded at the start if
-+			the value contains less than 6 digits.
-+
- 			Possible errors: org.bluez.Error.Rejected
- 			                 org.bluez.Error.Canceled
- 
--- 
-1.7.5.1
-
-
---=-vqPgtzwTOuu5TQeH6gjL--
-
+Carles
