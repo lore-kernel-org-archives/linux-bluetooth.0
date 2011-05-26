@@ -1,218 +1,210 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steven Li <Steven.Li@Atheros.com>
-To: Steven Li <Steven.Li@Atheros.com>, Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>, Bluettooth Linux
-	<linux-bluetooth@vger.kernel.org>, Haijun Liu <Haijun.Liu@Atheros.com>, Hong
- Fan <Hong.Fan@Atheros.com>, Vic Wei <Vic.Wei@Atheros.com>, "Jack
- Chen(Taipei)" <Sheng-Kuan.Chen@Atheros.com>, Robert Chang
-	<Robert.Chang@Atheros.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 26 May 2011 17:30:32 +0800
-Subject: RE: Bluetooth USB device keeps same PID/VID after downloading the
- patch and radio table
-Message-ID: <6AAC4214B9104E409FF4885ACB62A96101A78ADABF@SHEXMB-01.global.atheros.com>
-References: <6AAC4214B9104E409FF4885ACB62A96101A78ADA81@SHEXMB-01.global.atheros.com>
-In-Reply-To: <6AAC4214B9104E409FF4885ACB62A96101A78ADA81@SHEXMB-01.global.atheros.com>
-Content-Type: multipart/mixed;
-	boundary="_002_6AAC4214B9104E409FF4885ACB62A96101A78ADABFSHEXMB01globa_"
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v2] Add support of secure pin code in mgmt code
+Date: Thu, 26 May 2011 11:15:15 +0200
+Message-ID: <1306401315-10948-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_002_6AAC4214B9104E409FF4885ACB62A96101A78ADABFSHEXMB01globa_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Use secure pin code parameter received from the kernel in
+MGMT_EV_PIN_CODE_REQUEST event and propagate this to agent
+code.
 
-SGkgTWFyY2VsOg0KDQpJdCBjb21lcyBvdXQgYW5vdGhlciBmaXggdG8gdGhpcyBvbmUgUElEL1ZJ
-RCBpc3N1ZS4NClRoYXQgaXMgdG8gdXNlIHRoZSBiY2REZXZpY2UgKERldmljZSBSZWxlYXNlIE51
-bWJlcikgdG8ganVkZ2Ugd2hldGhlciB0aGUgQXRoZXJvcyAzMDEyIGNoaXAgaGFzIGJlZW4gcGF0
-Y2hlZCBvciBub3QuDQpUaGUgaW5pdCBiY2REZXZpY2UgdmFsdWUgb2YgdGhpcyBjaGlwIGlzIDB4
-MDAwMSwgIHdlIHdpbGwgaW5jcmVhc2UgdGhpcyB2YWx1ZSBhZnRlciBwYXRjaCBhbmQgcmFkaW8g
-dGFibGUgZG93bmxvYWRpbmcuDQpJIHB1dCB0aGUgZHJhZnQgbW9kaWZpY2F0aW9uIHRvIHRoZSBh
-dHRhY2htZW50Lg0KDQpEbyB5b3UgdGhpbmsgaXQgaXMgcG9zc2libGUgPw0KDQpUaGFuayB5b3Ug
-dmVyeSBtdWNoICENCg0KQmVzdCBSZWdhcmRzLA0KU3RldmVuLA0KDQoNCj4gLS0tLS1PcmlnaW5h
-bCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVs
-Lm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBP
-biBCZWhhbGYgT2YgU3RldmVuIExpDQo+IFNlbnQ6IFRodXJzZGF5LCBNYXkgMjYsIDIwMTEgNDo0
-NiBQTQ0KPiBUbzogTWFyY2VsIEhvbHRtYW5uDQo+IENjOiBHdXN0YXZvIEYuIFBhZG92YW47IEJs
-dWV0dG9vdGggTGludXg7IEhhaWp1biBMaXU7IEhvbmcgRmFuOyBWaWMgV2VpOyBKYWNrDQo+IENo
-ZW4oVGFpcGVpKTsgUm9iZXJ0IENoYW5nOyBMdWlzIFIuIFJvZHJpZ3Vleg0KPiBTdWJqZWN0OiBS
-RTogQmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIGRvd25sb2Fk
-aW5nDQo+IHRoZSBwYXRjaCBhbmQgcmFkaW8gdGFibGUNCj4gDQo+IEhpIE1hcmNlbDoNCj4gDQo+
-ID4gd2h5IGRvIHlvdSB3YW50IHRoaXMgYXQgYWxsLiBZb3UgcnVuIGEgZGlmZmVyZW50IHByb3Rv
-Y29sIHdpdGggZGlmZmVyZW50DQo+ID4gZW5kcG9pbnRzIG9uIHRoZSBkZXZpY2UgaW4gREZVIG1v
-ZGUgYW5kIG9uIHRoZSBkZXZpY2UgaW4gSDoyIG1vZGUuDQo+IA0KPiBTb3JyeSwgSSBtYWRlIGEg
-bWlzdGFrZSBpbiB0aGUgc3ViamVjdCBvZiB0aGlzIG1haWwgdGhyZWFkLg0KPiBUaGUgIkJsdWV0
-b290aCBVU0IgZGV2aWNlIGtlZXBzIHNhbWUgUElEL1ZJRCBhZnRlciBERlUiLg0KPiAgc2hvdWxk
-IGJlICIgQmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIGRvd25s
-b2FkaW5nDQo+IHRoZSBwYXRjaCBhbmQgcmFkaW8gdGFibGUiLg0KPiANCj4gQXMgdG8gdGhlIEF0
-aGVyb3MgMzAxMSBjaGlwLiAgeWVzLCBpdCB1c2VzIERGVSBtb2RlIHRvIGRvd25sb2FkIHRoZQ0K
-PiBmaXJtd2FyZS4NCj4gU28gdGhlcmUgYXJlIGRpZmZlcmVudCBwcm90b2NvbHMgd2l0aCBkaWZm
-ZXJlbnQgZW5kcG9pbnRzIG9uIHRoZSBkZXZpY2UuDQo+IA0KPiBCdXQgbm93LCB3ZSBhcmUgZ29p
-bmcgdG8gdXBzdHJlYW0gb3VyIG5ldyBBdGhlcm9zIDMwMTIgY2hpcCBhbmQgdGhpbmdzIGFyZQ0K
-PiBub3QgbGlrZSB0aGF0Lg0KPiBUaGUgQXRoZXJvcyAzMDEyIGNoaXAgaXMgYSBuYXRpdmUgYmx1
-ZXRvb3RoIGRldmljZSwgZXZlbiB3aXRob3V0DQo+IGRvd25sb2FkaW5nIHBhdGNoIGFuZCByYWRp
-byB0YWJsZS4NCj4gVGhlIHBhdGNoIGFuZCByYWRpbyB0YWJsZSBhcmUgdXNlZCB0byBmaXggdGhv
-c2UgYnVncyBmb3VuZCBhZnRlciBjaGlwIHNoaXBwaW5nLg0KPiBTbyB3aXRoIHRoaXMgZGVzaWdu
-LCB0aGUgQXRoZXJvcyAzMDEyIGNoaXANCj4gIGFsd2F5cyBrZWVwcyBzYW1lIFBJRC9WSUQgZXZl
-biBhZnRlciBkb3dubG9hZGluZyB0aGUgcGF0Y2ggYW5kIHJhZGlvDQo+IHRhYmxlLg0KPiANCj4g
-VGhhdCBjb21lcyBvdXQgb3VyIGNvbmNlcm4gdG8gdGhlIGJ0dXNiIGRyaXZlci4NCj4gDQo+IA0K
-PiANCj4gQmVzdCBSZWdhcmRzLA0KPiBTdGV2ZW4sDQo+IA0KPiANCj4gPiAtLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBo
-b2x0bWFubi5vcmddDQo+ID4gU2VudDogVGh1cnNkYXksIE1heSAyNiwgMjAxMSAxMDo0NyBBTQ0K
-PiA+IFRvOiBTdGV2ZW4gTGkNCj4gPiBDYzogR3VzdGF2byBGLiBQYWRvdmFuOyBCbHVldHRvb3Ro
-IExpbnV4OyBIYWlqdW4gTGl1OyBIb25nIEZhbjsgVmljIFdlaTsNCj4gSmFjaw0KPiA+IENoZW4o
-VGFpcGVpKTsgUm9iZXJ0IENoYW5nOyBMdWlzIFIuIFJvZHJpZ3Vleg0KPiA+IFN1YmplY3Q6IFJl
-OiBCbHVldG9vdGggVVNCIGRldmljZSBrZWVwcyBzYW1lIFBJRC9WSUQgYWZ0ZXIgREZVDQo+ID4N
-Cj4gPiBIaSBTdGV2ZW4sDQo+ID4NCj4gPiA+IEhlcmUgaXMgc3RldmVuIGZyb20gQXRoZXJvcy4g
-IEdsYWQgdG8gY29udGFjdCB5b3UgaGVyZS4gd2UgaGF2ZSBzb21lDQo+ID4gY29uY2VybnMgdG8g
-dGhlIGJ0dXNiIGRldmljZSBkcml2ZXIuDQo+ID4gPiBQcmVzZW50IFVTQiBCbHVldG9vdGggaW1w
-bGVtZW50YXRpb24gaW4gTGludXggaGFzIHNvbWUgbGltaXRhdGlvbnMuDQo+IE1hbnkNCj4gPiB2
-ZW5kb3JzIG5lZWQgdG8gbG9hZCBwYXRjaCBhbmQgb3RoZXIgc3BlY2lmaWMgb3BlcmF0aW9ucyBk
-dXJpbmcgZGV2aWNlDQo+ID4gcHJvYmUgb3IgZGlzY29ubmVjdCB0byB0aGVpciBCbHVldG9vdGgg
-ZGV2aWNlLCBidXQgYnR1c2IgZHJpdmVyIGdpdmVzDQo+ID4gbGltaXRhdGlvbiB0byB0aGlzIGJl
-aGF2aW9yLiAgSXQgbmVlZHMgdG8gYWRkIHRoZSBCbHVldG9vdGggZGV2aWNlIFBJRC9WSUQNCj4g
-aW50bw0KPiA+IHRoZSBidHVzYiBibGFja2xpc3QsIGFuZCB1c2UgdGhlIHZlbmRvciBzcGVjaWZp
-YyBkcml2ZXIgdG8gbG9hZCBmaXJtd2FyZS4gQnkNCj4gPiB0aGlzLCBpdCBjYXVzZXMgdGhlIEJs
-dWV0b290aCBkZXZpY2UgIk1VU1QiIGhhdmUgdHdvIFBJRC9WSURzIGluIExpbnV4Lg0KPiBCdXQN
-Cj4gPiBvbiB3aW5kb3dzIHBsYXRmb3JtLCB0aGUgZGV2aWNlIGNhbiBhbHdheXMga2VlcCBvbmUg
-c2FtZSBQSUQvVklELiAgSXQgaXMNCj4gPiBoYXJkIGZvciB1cyB0byBoYW5kbGUgdGhpcyBpc3N1
-ZSB3aXRoIGN1cnJlbnQgYnR1c2IgZGVzaWduLg0KPiA+ID4gTW9yZW92ZXIgaW4gb3VyIEF0aGVy
-b3MgMzAxMiBjaGlwLCB3ZSBhbHNvIG5lZWQgdG8gc3dpdGNoIHRoZSAzMDEyIGNoaXANCj4gPiBi
-ZXR3ZWVuICJub3JtYWwiIG1vZGUgYW5kICJwcmUtYm9vdCIgbW9kZSBkdXJpbmcgUEMgcmVib290
-LCAgd2l0aA0KPiA+IGN1cnJlbnQgYnR1c2IgZGVzaWduLCB3ZSBoYXZlIHRvIG1ha2UgY2hhbmdl
-cyBpbiBidHVzYi5jIGRpcmVjdGx5LCBidXQgaXQgaXMNCj4gPiBvdXIgY2hpcCBzcGVjaWZpYyBy
-ZXF1aXJlbWVudHMuICBUaGVyZWZvcmUsIHdl4oCZZCBsaWtlIHRvIHByb3Bvc2Ugc29tZQ0KPiA+
-IG1ldGhvZHMgdG8gbWFrZSB0aGUgQmx1ZXRvb3RoIGRldmljZSBoYXMgb25seSBvbmUgUElEL1ZJ
-RCBieSBwcm9wZXINCj4gPiBidHVzYiBtb2RpZmljYXRpb24gYW5kIGFsc28gZm9yIG90aGVyIHZl
-bmRvciBleHRlbnNpb25zIHN1Y2ggYXMgbW9kZQ0KPiBzd2l0Y2guDQo+ID4gPg0KPiA+ID4gQ3Vy
-cmVudGx5LCB3ZSBoYXZlIHRocmVlIHByb3Bvc2Fscy4gQW5kIEkgYXR0YWNoZWQgb3VyIHJvdWdo
-IHBhdGNoZXMgZm9yDQo+ID4gdGhlc2UgdGhyZWUgcHJvcG9zYWxzLg0KPiA+ID4gVGhleSBhcmUg
-dG90YWxseSBub3QgZm9ybWFsLCBJIGF0dGFjaGVkIHRoZW0ganVzdCB3YW50IHRvIG1ha2UgeW91
-IGVhc3kNCj4gdG8NCj4gPiB1bmRlcnN0YW5kLg0KPiA+ID4NCj4gPiA+IEFuZCBmcm9tIGhlcmUs
-IExldCBtZSBleHBsYWluIG1vcmUgb2YgIHRoZXNlIHByb3Bvc2FsIG9uZSBieSBvbmUuDQo+ID4g
-Pg0KPiA+ID4gIyBQcm9wb3NhbCAxLg0KPiA+ID4gVGhpcyBvcHRpb24gY291bGQgYmUgcmVmZXIg
-dG8gd2hhdCBpdOKAmXMgd29ya2luZyBmb3IgbG90cyBvZiBVQVJUIEJsdWV0b290aA0KPiA+IGRl
-dmljZXMgaW4gTGludXguDQo+ID4gPiBNYWlubHksIHZlbmRvciBkcml2ZXIgd291bGQgYmUgYnVp
-bHQgYXMgYW4gb2JqZWN0IG9mIGJ0dXNiLmtvLiBUaGlzIHNob3VsZA0KPiA+IGJlIHNhbWUgYXMg
-dGhvc2UgVUFSVCBCbHVldG9vdGggZHJpdmVycy4NCj4gPiA+IEluIG91ciBjYXNlLCBhdGgzayB3
-b3VsZCBiZSBidWlsdCBhcyBhbiBvYmplY3QgZmlsZSBhY2NvcmRpbmcgdG8NCj4gPiBDT05GSUdf
-QlRfQVRIM0sgZGVmaW5lLg0KPiA+ID4gVGhlbiBidHVzYiBrZXJuZWwgbW9kdWxlIHdpbGwgYmUg
-Y29tcG9zZWQgb2YgYnR1c2IubyBhbmQgYXRoM2suby4gIFNvIGl0DQo+IGlzDQo+ID4gZWFzeSB0
-byBtYWtlIG9uZSBQSUQvVklEIGRldmljZSB3b3JrLg0KPiA+ID4gVGhpcyBjb25jZXB0IHdhcyBv
-cmllbnRlZCBieSBoY2lfdWFydCBkcml2ZXIuICBJdCBjYW4ganVtcCB0byBpbmRpdmlkdWFsDQo+
-ID4gZW50cnkgZnVuY3Rpb24gYmFzZWQgb24gZGlmZmVyZW50IElELg0KPiA+ID4gQW5kIHRoaW5n
-cyBsaWtlIG1vZGUgc3dpdGNoIGFsc28gY291bGQgYmUgaGFuZGxlZCBieSBqdXN0IGFkZGluZyBm
-dW5jdGlvbg0KPiA+IGxpa2Ugc3dpdGNoX21vZGUoKSBpbiBhdGgzay5jLg0KPiA+ID4NCj4gPiA+
-ICMgUHJvcG9zYWwgMi4NCj4gPiA+IFRoaXMgb3B0aW9uIGlzIHRvIGV4cG9ydCBidHVzYiBjb21t
-b24gZnVuY3Rpb25zLCBhbmQgdmVuZG9yIGRyaXZlciAoZm9yDQo+ID4gZXhhbXBsZSBvdXIgYXRo
-M2spIGNhbiBiZSB0YWtlbiBhcyB0aGUgZXh0ZW5zaW9uIG9mIGJ0dXNiLg0KPiA+ID4gLCBhbmQg
-aXQgY2FuIGZpcnN0IGRvd25sb2FkcyB0aGUgZmlybXdhcmUgYW5kIHRoZW4gdXNlIHRob3NlIGZ1
-bmN0aW9ucw0KPiA+IGV4cG9ydGVkIGluIGJ0dXNiIGRyaXZlcg0KPiA+ID4gdG8gc2V0dXAgdGhl
-IGhjaSBCbHVldG9vdGggZGV2aWNlLiAgTW9yZW92ZXIgaWYgaXQgaXMgcG9zc2libGUsIHdlIGFy
-ZSBhbHNvDQo+ID4gcHJvcG9zZSB0byByZWZpbmUgdGhlIGJ0dXNiLmMgYW5kIHNwbGl0IHRoZSBi
-dHVzYi5jIHRvIGJ0dXNiX2NvcmUuYyBhbmQNCj4gPiBidHVzYl9nZW5lcmljLmMsDQo+ID4gPiBJ
-biB0aGUgYnR1c2JfY29yZS5jLiBJdCBpbmNsdWRlcyBhbGwgdGhlICBCbHVldG9vdGggdXNiIGNv
-bW1vbiBvcGVyYXRpb25zDQo+ID4gYW5kIHRoZXNlIEJsdWV0b290aCB1c2IgZnVuY3Rpb25zIHdp
-bGwgYmUgZXhwb3J0ZWQsDQo+ID4gPiBhbmQgdGhlIGJ0dXNiX2dlbmVyaWMuYyBpcyB0aGUgcmVh
-bCBnZW5lcmljIEJsdWV0b290aCBkcml2ZXIgcmVtYWlucw0KPiA+IHN1cHBvcnQgYWxsIGN1cnJl
-bnQgQmx1ZXRvb3RoIGRldmljZSAsd2hpY2ggdXNlcyB0aGUgYnR1c2JfY29yZSBmdW5jdGlvbnMu
-DQo+ID4gPiBBbmQgdmVuZG9yIGRyaXZlciBjYW4gYWxzbyBjYWxsIHRob3NlIHVzYiBjb21tb24g
-b3BlcmF0aW9ucyBpbiB0aGUNCj4gPiBidHVzYl9jb3JlLmMuDQo+ID4gPiBXaXRoIHRoaXMgcHJv
-cG9zYWwsIFNpbmNlIHRoZSBhdGgzayBkcml2ZXIgYXJlIHRoZSBvbmx5IG93bmVyIG9mIHRoZQ0K
-PiA+IGJsdWV0b290aCBkZXZpY2UsIG9ubHkgb25lIFBJRC9WSUQgaXMgbmVjZXNzYXJ5Lg0KPiA+
-ID4gQW5kIGl0IGlzIHZlcnkgZWFzeSB0byBoYW5kbGUgdGhlIG1vZGUgc3dpdGNoIGNhc2UgaW4g
-aXRzZWxmIGVpdGhlci4gUGxlYXNlDQo+ID4gY2hlY2sgYnR1c2JfYXRoM2tfMi5wYXRjaCBmb3Ig
-ZGV0YWlsLg0KPiA+ID4NCj4gPiA+ICMgUHJvcG9zYWwgMy4NCj4gPiA+IFRoaXMgb3B0aW9uIGlz
-IHRvIGFkZCAicXVpcmsgZGV2aWNlIiB0byBidHVzYiBkcml2ZXIuIFdlIGZvdW5kIGFjdHVhbGx5
-IHlvdQ0KPiA+IGFkZGVkIGxvdHMgb2Ygc28tY2FsbGVkIOKAnHF1aXJr4oCdIGltcGxlbWVudGF0
-aW9uIGluIGJ0dXNiIGRyaXZlciBmb3IgbWFueQ0KPiA+IHZlbmRvcnMuDQo+ID4gPiBodHRwOi8v
-Z2l0Lmtlcm5lbC5vcmcvP3A9bGludXgva2VybmVsL2dpdC9uZXh0L2xpbnV4LQ0KPiA+IG5leHQu
-Z2l0O2E9Y29tbWl0O2g9Y2ZlYjQxNDUzN2IxZDdjMjNiYTIwMmYxOThmYTQxNTRjZDVhNDg1Ng0K
-PiA+ID4gVmVuZG9yIHNwZWNpZmljIGRyaXZlciBjYW4gY2FsbCBidHVzYl9yZWdpc3Rlcl9xdWly
-a19kZXZpY2UoKSBmdW5jdGlvbiB0bw0KPiA+IHJlZ2lzdGVyIGl0c2VsZiB0byB0aGUgYnR1c2Ig
-ZHJpdmVyLg0KPiA+ID4gU28gZHVyaW5nIHRoZSBkZXZpY2UgcHJvYmUsIHRoZSBidHVzYiB3aWxs
-IHRyeSB0byBtYXRjaCB0aGUgZGV2aWNlIGlkLCBhbmQNCj4gaWYNCj4gPiBpdCBpcyBhIOKAnHF1
-aXJr4oCdIGRldmljZSwgaXQgd2lsbCBjYWxsDQo+ID4gPiB0aGUg4oCccXVpcmvigJ0gZGV2aWNl
-4oCZcyBzcGVjaWZpYyBmdW5jdGlvbiBmaXJzdC4gIEV2ZXJ5IHZlbmRvciBjYW4gdXNlIHRoaXMg
-cXVpcmsNCj4gPiB0byBkb3dubG9hZCB0aGVpciBmaXJtd2FyZSBhbmQga2VlcCB0aGUgc2FtZSBQ
-SUQvVklEIHdpdGggcHJvcGVyIGNvZGVzDQo+IGluDQo+ID4gYnR1c2IuYy4NCj4gPiA+IFRoaXMg
-cHJvcG9zYWwgaXMgYWxzbyBhYmxlIHRvIGhhbmRsZSB0aGUgbW9kZSBzd2l0Y2ggY2FzZS4NCj4g
-PiA+DQo+ID4gPiBQbGVhc2UgZ2l2ZSB5b3VyIGNvbW1lbnRzIGFuZCBzdWdnZXN0aW9uIGZvciBv
-dXIgcHJvcG9zYWxzLg0KPiA+ID4gV2UgYXJlIGhvcGluZyB0byBtYWtlIG9uZSBQSUQvVklEIHdv
-cmsgYW5kIGNvbnRyaWJ1dGUgdG8gdGhlDQo+ID4gY29tbXVuaXR5Lg0KPiA+DQo+ID4gd2h5IGRv
-IHlvdSB3YW50IHRoaXMgYXQgYWxsLiBZb3UgcnVuIGEgZGlmZmVyZW50IHByb3RvY29sIHdpdGgg
-ZGlmZmVyZW50DQo+ID4gZW5kcG9pbnRzIG9uIHRoZSBkZXZpY2UgaW4gREZVIG1vZGUgYW5kIG9u
-IHRoZSBkZXZpY2UgaW4gSDoyIG1vZGUuDQo+ID4NCj4gPiBTbyB5b3UgYWN0dWFsbHkgaGF2ZSBk
-aWZmZXJlbnQgZnVuY3Rpb25hbGl0eS4gQW5kIEkgcGVyc29uYWxseSBkbyBub3QNCj4gPiBjYXJl
-IHdoYXQgV2luZG93cyBpcyBkb2luZy4gVGhpcyBpcyBMaW51eCwgc28gcGxlYXNlIGZvbGxvdyB3
-aGF0IHRoZQ0KPiA+IExpbnV4IGNvbW11bml0eSBleHBlY3QgeW91IHRvIGRvLg0KPiA+DQo+ID4g
-QWxzbyBpbiBjYXNlIG9mIGJ0dXNiLCB5b3UgY2FuIHVzZSB0aGUgQmx1ZXRvb3RoIFNJRyAoYW5k
-IGZvciB0aGF0DQo+ID4gbWF0dGVyIFVTQiBTSUcpIGRlZmluZWQgaW50ZXJmYWNlIGlkZW50aWZp
-ZXJzLiBUaGUgYnR1c2IgZHJpdmVyIGRvZXMgbm90DQo+ID4gbWF0Y2ggYnkgZGVmYXVsdCB0byBW
-SUQvUElELiBJdCB1c2VzIGEgc3RhbmRhcmQuIElmIHlvdSB3YW5uYSB1c2UgdGhlDQo+ID4gc2Ft
-ZSBWSUQvUElEIGhlcmUsIHRoZW4gZGVjbGFyZSB0aGUgaW50ZXJmYWNlIGlkZW50aWZpZXJzIHBy
-b3Blcmx5IGFuZA0KPiA+IGV2ZXJ5dGhpbmcgd291bGQgd29yayBvdXQgbmljZWx5Lg0KPiA+DQo+
-ID4gWW91IGd1eXMgaW5zaXN0IG9uIGx5aW5nIHRvIHRoZSBVU0Igc3Vic3lzdGVtIGFuZCBieSB0
-aGF0IGZhY3QgbW9zdA0KPiA+IGxpa2VseSB2aW9sYXRpbmcgdGhlIFVTQiBzdGFuZGFyZHMuIERv
-bid0IGRvIHRoYXQgYW5kIGV2ZXJ5dGhpbmcgd2lsbA0KPiA+IHdvcmsgb3V0IG9mIHRoZSBib3gg
-d2l0aCBMaW51eC4gTm8gZXh0cmEgcGF0Y2hlcyBvciBtb2RpZmljYXRpb24gZm9yDQo+ID4gYnR1
-c2IgbmVlZGVkLg0KPiA+DQo+ID4gUmVnYXJkcw0KPiA+DQo+ID4gTWFyY2VsDQo+ID4NCj4gDQo+
-IATvv717Lm7vv70r77+977+977+977+977+977+977+9KyXvv73vv71sendt77+977+9Yu+/veun
-su+/ve+/vXLvv73vv716WO+/ve+/vRbvv73vv71o77+977+9Yu+/ve+/vV5u77+9cu+/ve+/ve+/
-vXrvv70a77+977+9aO+/vQ0KPiDvv73vv73vv70m77+977+9Hu+/vUfvv73vv73vv71o77+9Ayjv
-v73pmo7vv73domoi77+977+9Gu+/vRtt77+977+977+977+977+9eu+/vd6W77+977+977+9Zu+/
-ve+/ve+/vWjvv73vv73vv71+77+9be+/vQ0K
+The secure flag is saved in the device structure not to change
+common interface for all authentication types. Secure flag is
+specific for the pin code request only.
+---
+ plugins/hciops.c  |    2 +-
+ plugins/mgmtops.c |    2 +-
+ src/agent.c       |   10 ++++++++--
+ src/device.c      |   17 +++++++++++++++++
+ src/device.h      |    2 ++
+ src/event.c       |   16 +++++++++++++---
+ src/event.h       |    2 +-
+ 7 files changed, 43 insertions(+), 8 deletions(-)
 
---_002_6AAC4214B9104E409FF4885ACB62A96101A78ADABFSHEXMB01globa_
-Content-Type: application/octet-stream;
-	name="0001-Use-bcdDevice-Device-Release-Number-to-exclude-the-a.patch"
-Content-Description: 0001-Use-bcdDevice-Device-Release-Number-to-exclude-the-a.patch
-Content-Disposition: attachment;
-	filename="0001-Use-bcdDevice-Device-Release-Number-to-exclude-the-a.patch";
-	size=2351; creation-date="Thu, 26 May 2011 17:22:58 GMT";
-	modification-date="Thu, 26 May 2011 17:08:45 GMT"
-Content-Transfer-Encoding: base64
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9b1225c..70c0919 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -1344,7 +1344,7 @@ static void pin_code_request(int index, bdaddr_t *dba)
+ 		goto reject;
+ 	}
+ 
+-	err = btd_event_request_pin(&dev->bdaddr, dba);
++	err = btd_event_request_pin(&dev->bdaddr, dba, 0);
+ 	if (err < 0) {
+ 		error("PIN code negative reply: %s", strerror(-err));
+ 		goto reject;
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 95de3d1..4302813 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -563,7 +563,7 @@ static void mgmt_pin_code_request(int sk, uint16_t index, void *buf, size_t len)
+ 
+ 	info = &controllers[index];
+ 
+-	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr);
++	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr, ev->secure);
+ 	if (err < 0) {
+ 		error("btd_event_request_pin: %s", strerror(-err));
+ 		mgmt_pincode_reply(index, &ev->bdaddr, NULL, 0);
+diff --git a/src/agent.c b/src/agent.c
+index 40495bf..cca1463 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -424,10 +424,13 @@ done:
+ }
+ 
+ static int pincode_request_new(struct agent_request *req, const char *device_path,
+-				dbus_bool_t numeric)
++				uint8_t secure)
+ {
+ 	struct agent *agent = req->agent;
+ 
++	/* TODO: Add a new method or a new param to Agent interface to request
++		secure pin. */
++
+ 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
+ 					"org.bluez.Agent", "RequestPinCode");
+ 	if (req->msg == NULL) {
+@@ -455,14 +458,17 @@ int agent_request_pincode(struct agent *agent, struct btd_device *device,
+ 	struct agent_request *req;
+ 	const gchar *dev_path = device_get_path(device);
+ 	int err;
++	uint8_t secure;
+ 
+ 	if (agent->request)
+ 		return -EBUSY;
+ 
++	secure = device_get_secure_pin(device);
++
+ 	req = agent_request_new(agent, AGENT_REQUEST_PINCODE, cb,
+ 							user_data, destroy);
+ 
+-	err = pincode_request_new(req, dev_path, FALSE);
++	err = pincode_request_new(req, dev_path, secure);
+ 	if (err < 0)
+ 		goto failed;
+ 
+diff --git a/src/device.c b/src/device.c
+index 4ffc124..f4fb5c7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -133,6 +133,8 @@ struct btd_device {
+ 	gboolean	paired;
+ 	gboolean	blocked;
+ 
++	uint8_t		secure_pin;
++
+ 	gboolean	authorizing;
+ 	gint		ref;
+ };
+@@ -1773,6 +1775,21 @@ struct agent *device_get_agent(struct btd_device *device)
+ 	return adapter_get_agent(device->adapter);
+ }
+ 
++uint8_t device_get_secure_pin(struct btd_device *device)
++{
++	return device->secure_pin;
++}
++
++void device_set_secure_pin(struct btd_device *device, uint8_t secure)
++{
++	if (!device)
++		return;
++
++	DBG("secure pin %d", secure);
++
++	device->secure_pin = secure;
++}
++
+ gboolean device_is_busy(struct btd_device *device)
+ {
+ 	return device->browse ? TRUE : FALSE;
+diff --git a/src/device.h b/src/device.h
+index ad7350a..d3b159f 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -65,6 +65,8 @@ struct btd_adapter *device_get_adapter(struct btd_device *device);
+ void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
+ const gchar *device_get_path(struct btd_device *device);
+ struct agent *device_get_agent(struct btd_device *device);
++uint8_t device_get_secure_pin(struct btd_device *device);
++void device_set_secure_pin(struct btd_device *device, uint8_t secure);
+ gboolean device_is_busy(struct btd_device *device);
+ gboolean device_is_temporary(struct btd_device *device);
+ gboolean device_is_paired(struct btd_device *device);
+diff --git a/src/event.c b/src/event.c
+index 6be7ea2..0f8243b 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -128,6 +128,7 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	bdaddr_t dba;
++	uint8_t secure;
+ 	int err;
+ 	size_t len;
+ 	char rawpin[16];
+@@ -142,7 +143,14 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
+ 		return;
+ 	}
+ 
+-	err = btd_adapter_pincode_reply(adapter, &dba, rawpin, len);
++	secure  = device_get_secure_pin(device);
++	if (secure && len != 16) {
++		err = btd_adapter_pincode_reply(adapter, &dba, NULL, 0);
++		if (err < 0)
++			goto fail;
++	}
++
++	err = btd_adapter_pincode_reply(adapter, &dba, pincode, len);
+ 	if (err < 0)
+ 		goto fail;
+ 
+@@ -152,7 +160,7 @@ fail:
+ 	error("Sending PIN code reply failed: %s (%d)", strerror(-err), -err);
+ }
+ 
+-int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
++int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, uint8_t secure)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+@@ -164,11 +172,13 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
+ 
+ 	memset(pin, 0, sizeof(pin));
+ 	pinlen = read_pin_code(sba, dba, pin);
+-	if (pinlen > 0) {
++	if (pinlen > 0 && (secure && pinlen == 16)) {
+ 		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
+ 		return 0;
+ 	}
+ 
++	device_set_secure_pin(device, secure);
++
+ 	return device_request_authentication(device, AUTH_TYPE_PINCODE, 0,
+ 								pincode_cb);
+ }
+diff --git a/src/event.h b/src/event.h
+index 22c199e..14029ed 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -22,7 +22,7 @@
+  *
+  */
+ 
+-int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba);
++int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, uint8_t secure);
+ void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
+ 						int8_t rssi, uint8_t *data);
+ void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean legacy);
+-- 
+1.7.1
 
-RnJvbSAyZGMwZTcwM2VkMzkyZjQxZDkxOTg0YjBjZmQxZGE1NmY2ZjE3M2NiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZW4uTGkgPFN0ZXZlbi5MaUBBdGhlcm9zLmNvbT4KRGF0
-ZTogVGh1LCAyNiBNYXkgMjAxMSAxNzowNjo1MiArMDgwMApTdWJqZWN0OiBbUEFUQ0hdIFVzZSBi
-Y2REZXZpY2UoRGV2aWNlIFJlbGVhc2UgTnVtYmVyKSB0byBleGNsdWRlIHRoZSBhdGgzayBhbmQg
-YnR1c2IgZHJpdmVyLgoKLS0tCiBkcml2ZXJzL2JsdWV0b290aC9hdGgzay5jIHwgICAgNSArKysr
-LQogZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8ICAgIDkgKysrKysrKystCiAyIGZpbGVzIGNo
-YW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ibHVldG9vdGgvYXRoM2suYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMKaW5kZXgg
-NmJhY2VmMy4uYzk5ZmIwOCAxMDA2NDQKLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYwor
-KysgYi9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5jCkBAIC0zNzUsNiArMzc1LDkgQEAgc3RhdGlj
-IGludCBhdGgza19wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwKIAogCS8qIGxvYWQg
-cGF0Y2ggYW5kIHN5c2NvbmZpZyBmaWxlcyBmb3IgQVIzMDEyICovCiAJaWYgKGlkLT5kcml2ZXJf
-aW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsKKwkJaWYobGUxNl90b19jcHUodWRldi0+ZGVzY3JpcHRv
-ci5iY2REZXZpY2UgPiAweDAwMDEpKSAKKwkJCXJldHVybiAtRU5PREVWOworCiAJCXJldCA9IGF0
-aDNrX2xvYWRfcGF0Y2godWRldik7CiAJCWlmIChyZXQgPCAwKSB7CiAJCQlCVF9FUlIoIkxvYWRp
-bmcgcGF0Y2ggZmlsZSBmYWlsZWQiKTsKQEAgLTM5MCw3ICszOTMsNyBAQCBzdGF0aWMgaW50IGF0
-aDNrX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLAogCQkJQlRfRVJSKCJTZXQgbm9y
-bWFsIG1vZGUgZmFpbGVkIik7CiAJCQlyZXR1cm4gcmV0OwogCQl9Ci0JCWF0aDNrX3N3aXRjaF9w
-aWQodWRldik7CisJCS8qIGF0aDNrX3N3aXRjaF9waWQodWRldik7ICovCiAJCXJldHVybiAwOwog
-CX0KIApkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1
-ZXRvb3RoL2J0dXNiLmMKaW5kZXggYzJkZTg5NS4uOWI2N2IyMiAxMDA2NDQKLS0tIGEvZHJpdmVy
-cy9ibHVldG9vdGgvYnR1c2IuYworKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jCkBAIC01
-NCw2ICs1NCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7CiAjZGVm
-aW5lIEJUVVNCX0JDTTkyMDM1CQkweDEwCiAjZGVmaW5lIEJUVVNCX0JST0tFTl9JU09DCTB4MjAK
-ICNkZWZpbmUgQlRVU0JfV1JPTkdfU0NPX01UVQkweDQwCisjZGVmaW5lIEJUVVNCX0FUSDMwMTIJ
-CTB4ODAKIAogc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJ0dXNiX3RhYmxlW10gPSB7CiAJ
-LyogR2VuZXJpYyBCbHVldG9vdGggVVNCIGRldmljZSAqLwpAQCAtMTEwLDcgKzExMSw3IEBAIHN0
-YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBibGFja2xpc3RfdGFibGVbXSA9IHsKIAl7IFVTQl9E
-RVZJQ0UoMHgwM2YwLCAweDMxMWQpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwKIAog
-CS8qIEF0aGVyb3MgMzAxMiB3aXRoIHNmbGFzaCBmaXJtd2FyZSAqLwotCXsgVVNCX0RFVklDRSgw
-eDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9SRSB9LAorCXsgVVNCX0RF
-VklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0FUSDMwMTIgfSwKIAog
-CS8qIEF0aGVyb3MgQVI1QkJVMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUgKi8KIAl7IFVTQl9ERVZJ
-Q0UoMHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwKQEAgLTkx
-NCw2ICs5MTUsMTIgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFj
-ZSAqaW50ZiwKIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQtPmRyaXZlcl9pbmZvICYgQlRVU0Jf
-U05JRkZFUikKIAkJcmV0dXJuIC1FTk9ERVY7CiAKKwlpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRV
-U0JfQVRIMzAxMikgeworCQlzdHJ1Y3QgdXNiX2RldmljZSAqdWRldiA9IGludGVyZmFjZV90b191
-c2JkZXYoaW50Zik7CisJCWlmKGxlMTZfdG9fY3B1KHVkZXYtPmRlc2NyaXB0b3IuYmNkRGV2aWNl
-IDw9IDB4MDAwMSkpIAorCQkJcmV0dXJuIC1FTk9ERVY7CisJfQorCiAJZGF0YSA9IGt6YWxsb2Mo
-c2l6ZW9mKCpkYXRhKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFkYXRhKQogCQlyZXR1cm4gLUVOT01F
-TTsKLS0gCjEuNy4xCgo=
-
---_002_6AAC4214B9104E409FF4885ACB62A96101A78ADABFSHEXMB01globa_--
