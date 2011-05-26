@@ -3,123 +3,99 @@ From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
 Subject: [PATCH] Remove unnecessary jumps
-Date: Thu, 26 May 2011 09:08:25 +0200
-Message-Id: <1306393705-12839-1-git-send-email-lkslawek@gmail.com>
+Date: Thu, 26 May 2011 08:42:50 +0200
+Message-Id: <1306392170-12483-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/avdtp.c         |   11 ++++-------
- audio/ctl_bluetooth.c |    6 ++----
- tools/hciattach_ti.c  |    9 ++++-----
- tools/sdptool.c       |    3 +--
- 4 files changed, 11 insertions(+), 18 deletions(-)
+ plugins/irmc.c          |    4 ++--
+ plugins/pbap.c          |    4 ++--
+ plugins/syncevolution.c |    9 +++------
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index e6407bb..653c099 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -2239,22 +2239,22 @@ static uint16_t get_version(struct avdtp *session)
+diff --git a/plugins/irmc.c b/plugins/irmc.c
+index 2cf673c..fd233f7 100644
+--- a/plugins/irmc.c
++++ b/plugins/irmc.c
+@@ -510,7 +510,7 @@ static int irmc_init(void)
+ 	DBG("");
+ 	err = phonebook_init();
+ 	if (err < 0)
+-		goto fail_pb_init;
++		return err;
  
- 	adapter = manager_find_adapter(&session->server->src);
- 	if (!adapter)
--		goto done;
-+		return ver;
- 
- 	ba2str(&session->dst, addr);
- 	device = adapter_find_device(adapter, addr);
- 	if (!device)
--		goto done;
-+		return ver;
- 
- 	rec = btd_device_get_record(device, A2DP_SINK_UUID);
- 	if (!rec)
- 		rec = btd_device_get_record(device, A2DP_SOURCE_UUID);
- 
- 	if (!rec)
--		goto done;
-+		return ver;
- 
- 	if (sdp_get_access_protos(rec, &protos) < 0)
--		goto done;
-+		return ver;
- 
- 	proto_desc = sdp_get_proto_desc(protos, AVDTP_UUID);
- 	if (proto_desc && proto_desc->dtd == SDP_UINT16)
-@@ -2262,9 +2262,6 @@ static uint16_t get_version(struct avdtp *session)
- 
- 	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
- 	sdp_list_free(protos, NULL);
--
--done:
--	return ver;
+ 	err = obex_mime_type_driver_register(&irmc_driver);
+ 	if (err < 0)
+@@ -526,7 +526,7 @@ fail_irmc_reg:
+ 	obex_mime_type_driver_unregister(&irmc_driver);
+ fail_mime_irmc:
+ 	phonebook_exit();
+-fail_pb_init:
++
+ 	return err;
  }
  
- static struct avdtp *avdtp_get_internal(const bdaddr_t *src, const bdaddr_t *dst)
-diff --git a/audio/ctl_bluetooth.c b/audio/ctl_bluetooth.c
-index 2981385..d941421 100644
---- a/audio/ctl_bluetooth.c
-+++ b/audio/ctl_bluetooth.c
-@@ -213,11 +213,9 @@ static int bluetooth_read_integer(snd_ctl_ext_t *ext, snd_ctl_ext_key_t key,
- 	*value = 0;
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 61e7e42..c4df37f 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -1090,7 +1090,7 @@ static int pbap_init(void)
  
- 	ret = bluetooth_send_ctl(data, key, 0, rsp);
--	if (ret < 0)
--		goto done;
-+	if (ret == 0)
-+		*value = rsp->key;
+ 	err = phonebook_init();
+ 	if (err < 0)
+-		goto fail_pb_init;
++		return err;
  
--	*value = rsp->key;
--done:
- 	return ret;
+ 	err = obex_mime_type_driver_register(&mime_pull);
+ 	if (err < 0)
+@@ -1118,7 +1118,7 @@ fail_mime_list:
+ 	obex_mime_type_driver_unregister(&mime_pull);
+ fail_mime_pull:
+ 	phonebook_exit();
+-fail_pb_init:
++
+ 	return err;
  }
  
-diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
-index e107a65..6269181 100644
---- a/tools/hciattach_ti.c
-+++ b/tools/hciattach_ti.c
-@@ -119,7 +119,7 @@ static FILE *bts_load_script(const char* file_name, uint32_t* version)
- 	fp = fopen(file_name, "rb");
- 	if (!fp) {
- 		perror("can't open firmware file");
--		goto out;
-+		return NULL;
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index a000b36..0575ab1 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -353,12 +353,12 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
+ 
+ 	conn = obex_dbus_get_connection();
+ 	if (conn == NULL)
+-		goto failed;
++		return -EPERM;
+ 
+ 	msg = dbus_message_new_method_call(SYNCE_BUS_NAME, SYNCE_PATH,
+ 				SYNCE_SERVER_INTERFACE, "Connect");
+ 	if (!msg)
+-		goto failed;
++		return -EPERM;
+ 
+ 	dbus_message_iter_init_append(msg, &iter);
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+@@ -387,7 +387,7 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
+ 	if (!dbus_connection_send_with_reply(conn, msg, &call, -1)) {
+ 		error("D-Bus call to %s failed.", SYNCE_SERVER_INTERFACE);
+ 		dbus_message_unref(msg);
+-		goto failed;
++		return -EPERM;
  	}
  
- 	if (1 != fread(&header, sizeof(struct bts_header), 1, fp)) {
-@@ -135,13 +135,12 @@ static FILE *bts_load_script(const char* file_name, uint32_t* version)
- 	if (NULL != version)
- 		*version = header.version;
+ 	dbus_pending_call_set_notify(call, connect_cb, context, NULL);
+@@ -396,9 +396,6 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
+ 	dbus_message_unref(msg);
  
--	goto out;
-+	return fp;
- 
- errclose:
- 	fclose(fp);
--	fp = NULL;
--out:
--	return fp;
-+
-+	return NULL;
+ 	return -EAGAIN;
+-
+-failed:
+-	return -EPERM;
  }
  
- static unsigned long bts_fetch_action(FILE* fp, unsigned char* action_buf,
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index 140a46a..aea4954 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -4116,10 +4116,9 @@ static int cmd_records(int argc, char **argv)
- 			context.handle = base[i] + n;
- 			err = get_service(&bdaddr, &context, 1);
- 			if (err < 0)
--				goto done;
-+				return 0;
- 		}
- 
--done:
- 	return 0;
- }
- 
+ static ssize_t synce_write(void *object, const void *buf, size_t count)
 -- 
 1.7.4.1
 
