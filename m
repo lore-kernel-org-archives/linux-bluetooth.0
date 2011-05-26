@@ -1,33 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
-References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
-Date: Thu, 26 May 2011 18:44:22 +0300
-Message-ID: <BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
-Subject: Re: [PATCH] Init telephony before adding HFP SDP records
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3 v3] Improve usage documentation for some options
+Date: Thu, 26 May 2011 17:58:01 +0300
+Message-Id: <1306421881-1956-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, May 26, 2011 at 4:58 PM, Daniel Örstadius
-<daniel.orstadius@gmail.com> wrote:
-> Please review.
+---
+ src/main.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-For telephony-maemo6 it should be enough to just call
-headset_server_init after state_changed/telephony_init.
-
-Now this won't work with telephony-ofono since it waits some network
-to be available before it signals it is ready, but I guess we can move
-to its call of telepfony_ready_ind to telephony_init since the
-features bits does not seems to depend in network availability.
-
-Regards,
-
+diff --git a/src/main.c b/src/main.c
+index e1ce442..bf966f4 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -100,13 +100,17 @@ static GOptionEntry options[] = {
+ 				G_OPTION_ARG_CALLBACK, parse_debug,
+ 				"Enable debug information output", "DEBUG" },
+ 	{ "root", 'r', 0, G_OPTION_ARG_STRING, &option_root,
+-				"Specify root folder location", "PATH" },
++				"Specify root folder location. Both absolute "
++				"and relative can be used, but relative paths "
++				"are assumed to be relative to user $HOME "
++				"folder", "PATH" },
+ 	{ "root-setup", 'S', 0, G_OPTION_ARG_STRING, &option_root_setup,
+ 				"Root folder setup script", "SCRIPT" },
+ 	{ "symlinks", 'l', 0, G_OPTION_ARG_NONE, &option_symlinks,
+ 				"Enable symlinks on root folder" },
+ 	{ "capability", 'c', 0, G_OPTION_ARG_STRING, &option_capability,
+-				"Specify capability file", "FILE" },
++				"Specify capability file, use '!' mark for "
++				"scripts", "FILE" },
+ 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
+ 				"Automatically accept push requests" },
+ 	{ "plugin", 'p', 0, G_OPTION_ARG_STRING, &option_plugin,
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.5.2
+
