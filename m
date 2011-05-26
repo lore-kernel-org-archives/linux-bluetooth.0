@@ -1,79 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ed Tomlinson <edt@aei.ca>
+To: corey@kansanian.com
+Subject: Re: Linux 2.6.39
+Date: Thu, 26 May 2011 06:47:55 -0400
+Cc: Ville Tervo <ville.tervo@nokia.com>, wyrles@ytram.com,
+	"Cufi, Carles" <carles.cufi@nordicsemi.no>,
+	Bluettooth Linux <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+References: <BANLkTinG_qCtHQYRYFQUJ9oGv4H1cuznWg@mail.gmail.com> <20110526083746.GT2480@null> <BANLkTi=473CVADx9D-5m6jjvDjZGWMu3BA@mail.gmail.com>
+In-Reply-To: <BANLkTi=473CVADx9D-5m6jjvDjZGWMu3BA@mail.gmail.com>
 MIME-Version: 1.0
-Date: Thu, 26 May 2011 16:58:34 +0300
-Message-ID: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
-Subject: [PATCH] Init telephony before adding HFP SDP records
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00504502c67f93403504a42e377f
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201105260647.55949.edt@aei.ca>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00504502c67f93403504a42e377f
-Content-Type: text/plain; charset=ISO-8859-1
+On Thursday 26 May 2011 06:17:20 Corey Boyle wrote:
+> On Thu, May 26, 2011 at 4:37 AM, Ville Tervo <ville.tervo@nokia.com> wrote:
+> > On Wed, May 25, 2011 at 09:11:19PM -0400, ext Corey Boyle wrote:
+> >> On Wed, May 25, 2011 at 12:31 PM, Tom Allebrandi <wyrles@ytram.com> wrote:
+> >> > -----Original Message-----
+> >> > From: linux-bluetooth-owner@vger.kernel.org
+> >> > [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Cufi, Carles
+> >> > Sent: Wednesday, May 25, 2011 7:15 AM
+> >> > To: corey@kansanian.com
+> >> > Cc: Ed Tomlinson; Ville Tervo; Bluettooth Linux;
+> >> > linux-kernel@vger.kernel.org
+> >> > Subject: RE: Linux 2.6.39
+> >> >
+> >> > (Snipping...)
+> >> > On Wed, May 25, 2011 at 8:46 AM, Cufi, Carles <carles.cufi@nordicsemi.no>
+> >> > wrote:
+> >> >> On Wednesday 25 May 2011 07:36:14 Ville Tervo wrote:
+> >> >>> On Wed, May 25, 2011 at 07:11:17AM -0400, ext Ed Tomlinson wrote:
+> >> >>> > On Wednesday 25 May 2011 06:54:54 Corey Boyle wrote:
+> >> >>> > > > On Mon, May 23, 2011 at 06:08:36PM -0400, ext Ed Tomlinson wrote:
+> >> >>> > > > > On Saturday 21 May 2011 16:31:00 Ed Tomlinson wrote:
+> >> >>> > > > > > On Saturday 21 May 2011 13:56:20 Milan Oravec wrote:
+> >> > ...
+> >> >>> > Read Local Version Information (0x04|0x0001) plen 0
+> >> >>> > > HCI Event: Command Complete (0x0e) plen 12
+> >> >>> >     Read Local Version Information (0x04|0x0001) ncmd 1
+> >> >>> >     status 0x00
+> >> >>> >     HCI Version: 1.1 (0x1) HCI Revision: 0x20d
+> >> > *************************
+> >> >>> >     LMP Version: 1.1 (0x1) LMP Subversion: 0x20d
+> >> > *************************
+> >> >>> >     Manufacturer: Cambridge Silicon Radio (10) < HCI Command: Set
+> >> >>> > Event Mask (0x03|0x0001) plen 8
+> >> >>> >     Mask: 0xfffffbff00000000
+> >> > *************************
+> >> >>> > > HCI Event: Command Complete (0x0e) plen 4
+> >> >>> >     Set Event Mask (0x03|0x0001) ncmd 1
+> >> >>> >     status 0x12
+> >> >>> >     Error: Invalid HCI Command Parameters
+> >> >>
+> >> >>Set Event Mask has been in the Bluetooth Spec since day 1, so it must be
+> >> > the bitmask, which has been extended with each new spec release to cover
+> >> > newly >added events. Looking at the latest spec, and judging by the year
+> >> > your chipset was released in (it probably is a 1.1 compliant chipset) I
+> >> > believe that >0x000000008FFFFFFF is the highest event mask it would support
+> >> > (up until and including Page Scan Repetition Mode Change Event), but since I
+> >> > don't have the >old 1.1 spec around I may be one or two bits off.
+> >> >
+> >> > The device appears to have identified itself as CSR firmware using Bluetooth
+> >> > version 1.1.
+> >> >
+> >> > I do happen to have the 1.1 spec lying around :-), for Set_Event_Mask it
+> >> > says
+> >> >
+> >> > 0x0000000100000000
+> >> > To                                          Reserved for future use
+> >> > 0x8000000000000000
+> >> >
+> >> > 0x00000000FFFFFFFF      Default (All events enabled)
+> >> >
+> >>
+> >> I am beginning to think that my adapter simply does not support this
+> >> command.  I have tried with all the suggested bitmasks, all zeros, all
+> >> ones, all combinations where a single bit is set, etc.  I'm not sure
+> >> where to go from here other than add a flag which incidates that
+> >> certain devices don't support this command so it can be skipped.
+> >> Again, the only way I have gotten it to work is by not sending the
+> >> command at all.  Thoughts?
+> >
+> > I also played a bit with 1.1 CSR dongle and couldn't find any mask that would
+> > be accepted. I think this command can be left out for older than 1.2 devices.
+> >
+> > Following patch should do it. Could you verify it. I don't have access to old
+> > hw ATM.
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 19cd4af..86d1e26 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+> >         * command otherwise */
+> >        u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
+> >
+> > -       /* Events for 1.2 and newer controllers */
+> > -       if (hdev->lmp_ver > 1) {
+> > -               events[4] |= 0x01; /* Flow Specification Complete */
+> > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > -               events[5] |= 0x08; /* Synchronous Connection Complete */
+> > -               events[5] |= 0x10; /* Synchronous Connection Changed */
+> > -       }
+> > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
+> > +        * any event mask for pre 1.2 devices */
+> > +       if (hdev->lmp_ver <= 1)
+> > +               return;
+> > +
+> > +       events[4] |= 0x01; /* Flow Specification Complete */
+> > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > +       events[5] |= 0x08; /* Synchronous Connection Complete */
+> > +       events[5] |= 0x10; /* Synchronous Connection Changed */
+> >
+> >        if (hdev->features[3] & LMP_RSSI_INQ)
+> >                events[4] |= 0x04; /* Inquiry Result with RSSI */
+> > --
+> >
+> >
+> 
+> Patch works great - typing this email from my bluetooth keyboard.
 
-Please review.
+Works here too.
 
-Regards,
-Daniel
-
---00504502c67f93403504a42e377f
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Init-telephony-before-adding-HFP-SDP-records.patch"
-Content-Disposition: attachment;
-	filename="0001-Init-telephony-before-adding-HFP-SDP-records.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_go5ropk00
-
-RnJvbSBiYmM2NGRiOGMzMDdiMDYwYjU1YjUzYzcwMDZmNTdkNjNhODZlZmZlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogVGh1LCAyNiBNYXkgMjAxMSAxNTozNToxOSArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIEluaXQgdGVsZXBob255IGJlZm9yZSBhZGRpbmcgSEZQIFNEUCByZWNvcmRzCgpCeSBw
-YXRjaCBiOWQ4NWMwMDEwODk3N2IyNGFlOTFlYThlY2VkYjljZWZmZTZmNjQ4IHRoZSBpbml0aWFs
-aXphdGlvbgpvZiB0aGUgdGVsZXBob255IHN1YnN5c3RlbSBpcyBkZWxheWVkIGluIHRoZSBibHVl
-dG9vdGhkIHN0YXJ0dXAKcHJvY2VkdXJlLiBBcyBhIHJlc3VsdCB0aGUgU3VwcG9ydGVkRmVhdHVy
-ZXMgYml0bWFwIGhhcyBub3QgYmVlbiBzZXQKd2hlbiBjcmVhdGluZyB0aGUgSEZQIFNEUCByZWNv
-cmQuIFRoaXMgcGF0Y2ggY2FsbHMgdGhlIGZpcnN0CmluaXRpYWxpemF0aW9uIGZyb20gdGhlIHBy
-ZXZpb3VzIHBsYWNlIHNvIHRoYXQgdGhlIHJlY29yZApnZXRzIHRoZSBjb3JyZWN0IHZhbHVlLgoK
-QWx0aG91Z2ggdGhlIGNvcnJlc3BvbmRpbmcgYml0IGluICtCUlNGIGlzIGNvcnJlY3RseSBzZXQs
-IHRoZQptaXNzaW5nIGJpdCBmb3IgdGhlICJUaHJlZS13YXkgY2FsbGluZyIgZmVhdHVyZSBpbiB0
-aGUgU0RQIHJlY29yZApjYXVzZXMgc29tZSBoZWFkc2V0cyBub3QgdG8gc2VuZCBBVCtDSExEPT8g
-aW4gY2VydGFpbiBzaXR1YXRpb25zLgpUaGlzIHJlc3VsdHMgaW4gZmFpbGVkIGNvbm5lY3Rpb25z
-IHNpbmNlIEJsdWVaIGRvZXMgbm90IGVudGVyIHRoZQoiY29ubmVjdGVkIiBzdGF0ZSBvbiB0aGUg
-aGVhZHNldCBpbnRlcmZhY2UgYmVmb3JlIHRoYXQgY29tbWFuZCBpcwpyZWNlaXZlZCwgaWYgdGhl
-IGZlYXR1cmUgaXMgc3VwcG9ydGVkIGJ5IGJvdGggc2lkZXMuCi0tLQogYXVkaW8vbWFuYWdlci5j
-IHwgICAzOSArKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0KIDEgZmlsZXMg
-Y2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEv
-YXVkaW8vbWFuYWdlci5jIGIvYXVkaW8vbWFuYWdlci5jCmluZGV4IDM1MTgxMzcuLmNlMjA2NzYg
-MTAwNjQ0Ci0tLSBhL2F1ZGlvL21hbmFnZXIuYworKysgYi9hdWRpby9tYW5hZ2VyLmMKQEAgLTg1
-NCwyNSArODU0LDEyIEBAIHN0YXRpYyBzdHJ1Y3QgYXVkaW9fYWRhcHRlciAqYXVkaW9fYWRhcHRl
-cl9nZXQoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyKQogCXJldHVybiBhZHA7CiB9CiAKLXN0
-YXRpYyB2b2lkIHN0YXRlX2NoYW5nZWQoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLCBnYm9v
-bGVhbiBwb3dlcmVkKQorc3RhdGljIHZvaWQgc2V0dXBfdGVsZXBob255KGdib29sZWFuIHBvd2Vy
-ZWQpCiB7CiAJc3RydWN0IGF1ZGlvX2FkYXB0ZXIgKmFkcDsKIAlzdGF0aWMgZ2Jvb2xlYW4gdGVs
-ZXBob255ID0gRkFMU0U7CiAJR1NMaXN0ICpsOwogCi0JREJHKCIlcyBwb3dlcmVkICVzIiwgYWRh
-cHRlcl9nZXRfcGF0aChhZGFwdGVyKSwKLQkJCQkJCXBvd2VyZWQgPyAib24iIDogIm9mZiIpOwot
-Ci0JLyogaWdub3JlIHBvd2VyZWQgY2hhbmdlLCBhZGFwdGVyIGlzIHBvd2VyaW5nIGRvd24gKi8K
-LQlpZiAocG93ZXJlZCAmJiBhZGFwdGVyX3Bvd2VyaW5nX2Rvd24oYWRhcHRlcikpCi0JCXJldHVy
-bjsKLQotCWFkcCA9IGZpbmRfYWRhcHRlcihhZGFwdGVycywgYWRhcHRlcik7Ci0JaWYgKCFhZHAp
-Ci0JCXJldHVybjsKLQotCWFkcC0+cG93ZXJlZCA9IHBvd2VyZWQ7Ci0KIAlpZiAocG93ZXJlZCkg
-ewogCQkvKiB0ZWxlcGhvbnkgZHJpdmVyIGFscmVhZHkgaW5pdGlhbGl6ZWQqLwogCQlpZiAodGVs
-ZXBob255ID09IFRSVUUpCkBAIC04OTcsNiArODg0LDI2IEBAIHN0YXRpYyB2b2lkIHN0YXRlX2No
-YW5nZWQoc3RydWN0IGJ0ZF9hZGFwdGVyICphZGFwdGVyLCBnYm9vbGVhbiBwb3dlcmVkKQogCXRl
-bGVwaG9ueSA9IEZBTFNFOwogfQogCitzdGF0aWMgdm9pZCBzdGF0ZV9jaGFuZ2VkKHN0cnVjdCBi
-dGRfYWRhcHRlciAqYWRhcHRlciwgZ2Jvb2xlYW4gcG93ZXJlZCkKK3sKKwlzdHJ1Y3QgYXVkaW9f
-YWRhcHRlciAqYWRwOworCisJZXJyb3IoIiVzIHBvd2VyZWQgJXMiLCBhZGFwdGVyX2dldF9wYXRo
-KGFkYXB0ZXIpLAorCQkJCQkJcG93ZXJlZCA/ICJvbiIgOiAib2ZmIik7CisKKwkvKiBpZ25vcmUg
-cG93ZXJlZCBjaGFuZ2UsIGFkYXB0ZXIgaXMgcG93ZXJpbmcgZG93biAqLworCWlmIChwb3dlcmVk
-ICYmIGFkYXB0ZXJfcG93ZXJpbmdfZG93bihhZGFwdGVyKSkKKwkJcmV0dXJuOworCisJYWRwID0g
-ZmluZF9hZGFwdGVyKGFkYXB0ZXJzLCBhZGFwdGVyKTsKKwlpZiAoIWFkcCkKKwkJcmV0dXJuOwor
-CisJYWRwLT5wb3dlcmVkID0gcG93ZXJlZDsKKworCXNldHVwX3RlbGVwaG9ueShwb3dlcmVkKTsK
-K30KKwogc3RhdGljIGludCBoZWFkc2V0X3NlcnZlcl9wcm9iZShzdHJ1Y3QgYnRkX2FkYXB0ZXIg
-KmFkYXB0ZXIpCiB7CiAJc3RydWN0IGF1ZGlvX2FkYXB0ZXIgKmFkcDsKQEAgLTEyMjMsOCArMTIz
-MCwxMCBAQCBwcm9jZWVkOgogCWlmIChlbmFibGVkLm1lZGlhKQogCQlidGRfcmVnaXN0ZXJfYWRh
-cHRlcl9kcml2ZXIoJm1lZGlhX3NlcnZlcl9kcml2ZXIpOwogCi0JaWYgKGVuYWJsZWQuaGVhZHNl
-dCkKKwlpZiAoZW5hYmxlZC5oZWFkc2V0KSB7CisJCXNldHVwX3RlbGVwaG9ueShUUlVFKTsKIAkJ
-YnRkX3JlZ2lzdGVyX2FkYXB0ZXJfZHJpdmVyKCZoZWFkc2V0X3NlcnZlcl9kcml2ZXIpOworCX0K
-IAogCWlmIChlbmFibGVkLmdhdGV3YXkpCiAJCWJ0ZF9yZWdpc3Rlcl9hZGFwdGVyX2RyaXZlcigm
-Z2F0ZXdheV9zZXJ2ZXJfZHJpdmVyKTsKLS0gCjEuNi4wLjQKCg==
---00504502c67f93403504a42e377f--
+Thanks
+Ed
