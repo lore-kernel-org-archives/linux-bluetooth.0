@@ -1,210 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v2] Add support of secure pin code in mgmt code
-Date: Thu, 26 May 2011 11:15:15 +0200
-Message-ID: <1306401315-10948-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+From: Steven Li <Steven.Li@Atheros.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <padovan@profusion.mobi>, Bluettooth Linux
+	<linux-bluetooth@vger.kernel.org>, Haijun Liu <Haijun.Liu@Atheros.com>, Hong
+ Fan <Hong.Fan@Atheros.com>, Vic Wei <Vic.Wei@Atheros.com>, "Jack
+ Chen(Taipei)" <Sheng-Kuan.Chen@Atheros.com>, Robert Chang
+	<Robert.Chang@Atheros.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>
+Date: Thu, 26 May 2011 16:46:13 +0800
+Subject: RE: Bluetooth USB device keeps same PID/VID after downloading the
+ patch and radio table
+Message-ID: <6AAC4214B9104E409FF4885ACB62A96101A78ADA81@SHEXMB-01.global.atheros.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use secure pin code parameter received from the kernel in
-MGMT_EV_PIN_CODE_REQUEST event and propagate this to agent
-code.
-
-The secure flag is saved in the device structure not to change
-common interface for all authentication types. Secure flag is
-specific for the pin code request only.
----
- plugins/hciops.c  |    2 +-
- plugins/mgmtops.c |    2 +-
- src/agent.c       |   10 ++++++++--
- src/device.c      |   17 +++++++++++++++++
- src/device.h      |    2 ++
- src/event.c       |   16 +++++++++++++---
- src/event.h       |    2 +-
- 7 files changed, 43 insertions(+), 8 deletions(-)
-
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 9b1225c..70c0919 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -1344,7 +1344,7 @@ static void pin_code_request(int index, bdaddr_t *dba)
- 		goto reject;
- 	}
- 
--	err = btd_event_request_pin(&dev->bdaddr, dba);
-+	err = btd_event_request_pin(&dev->bdaddr, dba, 0);
- 	if (err < 0) {
- 		error("PIN code negative reply: %s", strerror(-err));
- 		goto reject;
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 95de3d1..4302813 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -563,7 +563,7 @@ static void mgmt_pin_code_request(int sk, uint16_t index, void *buf, size_t len)
- 
- 	info = &controllers[index];
- 
--	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr);
-+	err = btd_event_request_pin(&info->bdaddr, &ev->bdaddr, ev->secure);
- 	if (err < 0) {
- 		error("btd_event_request_pin: %s", strerror(-err));
- 		mgmt_pincode_reply(index, &ev->bdaddr, NULL, 0);
-diff --git a/src/agent.c b/src/agent.c
-index 40495bf..cca1463 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -424,10 +424,13 @@ done:
- }
- 
- static int pincode_request_new(struct agent_request *req, const char *device_path,
--				dbus_bool_t numeric)
-+				uint8_t secure)
- {
- 	struct agent *agent = req->agent;
- 
-+	/* TODO: Add a new method or a new param to Agent interface to request
-+		secure pin. */
-+
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
- 					"org.bluez.Agent", "RequestPinCode");
- 	if (req->msg == NULL) {
-@@ -455,14 +458,17 @@ int agent_request_pincode(struct agent *agent, struct btd_device *device,
- 	struct agent_request *req;
- 	const gchar *dev_path = device_get_path(device);
- 	int err;
-+	uint8_t secure;
- 
- 	if (agent->request)
- 		return -EBUSY;
- 
-+	secure = device_get_secure_pin(device);
-+
- 	req = agent_request_new(agent, AGENT_REQUEST_PINCODE, cb,
- 							user_data, destroy);
- 
--	err = pincode_request_new(req, dev_path, FALSE);
-+	err = pincode_request_new(req, dev_path, secure);
- 	if (err < 0)
- 		goto failed;
- 
-diff --git a/src/device.c b/src/device.c
-index 4ffc124..f4fb5c7 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -133,6 +133,8 @@ struct btd_device {
- 	gboolean	paired;
- 	gboolean	blocked;
- 
-+	uint8_t		secure_pin;
-+
- 	gboolean	authorizing;
- 	gint		ref;
- };
-@@ -1773,6 +1775,21 @@ struct agent *device_get_agent(struct btd_device *device)
- 	return adapter_get_agent(device->adapter);
- }
- 
-+uint8_t device_get_secure_pin(struct btd_device *device)
-+{
-+	return device->secure_pin;
-+}
-+
-+void device_set_secure_pin(struct btd_device *device, uint8_t secure)
-+{
-+	if (!device)
-+		return;
-+
-+	DBG("secure pin %d", secure);
-+
-+	device->secure_pin = secure;
-+}
-+
- gboolean device_is_busy(struct btd_device *device)
- {
- 	return device->browse ? TRUE : FALSE;
-diff --git a/src/device.h b/src/device.h
-index ad7350a..d3b159f 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -65,6 +65,8 @@ struct btd_adapter *device_get_adapter(struct btd_device *device);
- void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
- const gchar *device_get_path(struct btd_device *device);
- struct agent *device_get_agent(struct btd_device *device);
-+uint8_t device_get_secure_pin(struct btd_device *device);
-+void device_set_secure_pin(struct btd_device *device, uint8_t secure);
- gboolean device_is_busy(struct btd_device *device);
- gboolean device_is_temporary(struct btd_device *device);
- gboolean device_is_paired(struct btd_device *device);
-diff --git a/src/event.c b/src/event.c
-index 6be7ea2..0f8243b 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -128,6 +128,7 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
- {
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	bdaddr_t dba;
-+	uint8_t secure;
- 	int err;
- 	size_t len;
- 	char rawpin[16];
-@@ -142,7 +143,14 @@ static void pincode_cb(struct agent *agent, DBusError *derr,
- 		return;
- 	}
- 
--	err = btd_adapter_pincode_reply(adapter, &dba, rawpin, len);
-+	secure  = device_get_secure_pin(device);
-+	if (secure && len != 16) {
-+		err = btd_adapter_pincode_reply(adapter, &dba, NULL, 0);
-+		if (err < 0)
-+			goto fail;
-+	}
-+
-+	err = btd_adapter_pincode_reply(adapter, &dba, pincode, len);
- 	if (err < 0)
- 		goto fail;
- 
-@@ -152,7 +160,7 @@ fail:
- 	error("Sending PIN code reply failed: %s (%d)", strerror(-err), -err);
- }
- 
--int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
-+int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, uint8_t secure)
- {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
-@@ -164,11 +172,13 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
- 
- 	memset(pin, 0, sizeof(pin));
- 	pinlen = read_pin_code(sba, dba, pin);
--	if (pinlen > 0) {
-+	if (pinlen > 0 && (secure && pinlen == 16)) {
- 		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
- 		return 0;
- 	}
- 
-+	device_set_secure_pin(device, secure);
-+
- 	return device_request_authentication(device, AUTH_TYPE_PINCODE, 0,
- 								pincode_cb);
- }
-diff --git a/src/event.h b/src/event.h
-index 22c199e..14029ed 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -22,7 +22,7 @@
-  *
-  */
- 
--int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba);
-+int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, uint8_t secure);
- void btd_event_device_found(bdaddr_t *local, bdaddr_t *peer, uint32_t class,
- 						int8_t rssi, uint8_t *data);
- void btd_event_set_legacy_pairing(bdaddr_t *local, bdaddr_t *peer, gboolean legacy);
--- 
-1.7.1
-
+SGkgTWFyY2VsOg0KDQo+IHdoeSBkbyB5b3Ugd2FudCB0aGlzIGF0IGFsbC4gWW91IHJ1biBhIGRp
+ZmZlcmVudCBwcm90b2NvbCB3aXRoIGRpZmZlcmVudA0KPiBlbmRwb2ludHMgb24gdGhlIGRldmlj
+ZSBpbiBERlUgbW9kZSBhbmQgb24gdGhlIGRldmljZSBpbiBIOjIgbW9kZS4NCg0KU29ycnksIEkg
+bWFkZSBhIG1pc3Rha2UgaW4gdGhlIHN1YmplY3Qgb2YgdGhpcyBtYWlsIHRocmVhZC4NClRoZSAi
+Qmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIERGVSIuDQogc2hv
+dWxkIGJlICIgQmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIGRv
+d25sb2FkaW5nIHRoZSBwYXRjaCBhbmQgcmFkaW8gdGFibGUiLg0KDQpBcyB0byB0aGUgQXRoZXJv
+cyAzMDExIGNoaXAuICB5ZXMsIGl0IHVzZXMgREZVIG1vZGUgdG8gZG93bmxvYWQgdGhlIGZpcm13
+YXJlLg0KU28gdGhlcmUgYXJlIGRpZmZlcmVudCBwcm90b2NvbHMgd2l0aCBkaWZmZXJlbnQgZW5k
+cG9pbnRzIG9uIHRoZSBkZXZpY2UuDQoNCkJ1dCBub3csIHdlIGFyZSBnb2luZyB0byB1cHN0cmVh
+bSBvdXIgbmV3IEF0aGVyb3MgMzAxMiBjaGlwIGFuZCB0aGluZ3MgYXJlIG5vdCBsaWtlIHRoYXQu
+DQpUaGUgQXRoZXJvcyAzMDEyIGNoaXAgaXMgYSBuYXRpdmUgYmx1ZXRvb3RoIGRldmljZSwgZXZl
+biB3aXRob3V0IGRvd25sb2FkaW5nIHBhdGNoIGFuZCByYWRpbyB0YWJsZS4NClRoZSBwYXRjaCBh
+bmQgcmFkaW8gdGFibGUgYXJlIHVzZWQgdG8gZml4IHRob3NlIGJ1Z3MgZm91bmQgYWZ0ZXIgY2hp
+cCBzaGlwcGluZy4gIFNvIHdpdGggdGhpcyBkZXNpZ24sIHRoZSBBdGhlcm9zIDMwMTIgY2hpcA0K
+IGFsd2F5cyBrZWVwcyBzYW1lIFBJRC9WSUQgZXZlbiBhZnRlciBkb3dubG9hZGluZyB0aGUgcGF0
+Y2ggYW5kIHJhZGlvIHRhYmxlLg0KDQpUaGF0IGNvbWVzIG91dCBvdXIgY29uY2VybiB0byB0aGUg
+YnR1c2IgZHJpdmVyLg0KDQoNCg0KQmVzdCBSZWdhcmRzLA0KU3RldmVuLA0KDQoNCj4gLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86bWFy
+Y2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVGh1cnNkYXksIE1heSAyNiwgMjAxMSAxMDo0NyBB
+TQ0KPiBUbzogU3RldmVuIExpDQo+IENjOiBHdXN0YXZvIEYuIFBhZG92YW47IEJsdWV0dG9vdGgg
+TGludXg7IEhhaWp1biBMaXU7IEhvbmcgRmFuOyBWaWMgV2VpOyBKYWNrDQo+IENoZW4oVGFpcGVp
+KTsgUm9iZXJ0IENoYW5nOyBMdWlzIFIuIFJvZHJpZ3Vleg0KPiBTdWJqZWN0OiBSZTogQmx1ZXRv
+b3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIERGVQ0KPiANCj4gSGkgU3Rl
+dmVuLA0KPiANCj4gPiBIZXJlIGlzIHN0ZXZlbiBmcm9tIEF0aGVyb3MuICBHbGFkIHRvIGNvbnRh
+Y3QgeW91IGhlcmUuIHdlIGhhdmUgc29tZQ0KPiBjb25jZXJucyB0byB0aGUgYnR1c2IgZGV2aWNl
+IGRyaXZlci4NCj4gPiBQcmVzZW50IFVTQiBCbHVldG9vdGggaW1wbGVtZW50YXRpb24gaW4gTGlu
+dXggaGFzIHNvbWUgbGltaXRhdGlvbnMuIE1hbnkNCj4gdmVuZG9ycyBuZWVkIHRvIGxvYWQgcGF0
+Y2ggYW5kIG90aGVyIHNwZWNpZmljIG9wZXJhdGlvbnMgZHVyaW5nIGRldmljZQ0KPiBwcm9iZSBv
+ciBkaXNjb25uZWN0IHRvIHRoZWlyIEJsdWV0b290aCBkZXZpY2UsIGJ1dCBidHVzYiBkcml2ZXIg
+Z2l2ZXMNCj4gbGltaXRhdGlvbiB0byB0aGlzIGJlaGF2aW9yLiAgSXQgbmVlZHMgdG8gYWRkIHRo
+ZSBCbHVldG9vdGggZGV2aWNlIFBJRC9WSUQgaW50bw0KPiB0aGUgYnR1c2IgYmxhY2tsaXN0LCBh
+bmQgdXNlIHRoZSB2ZW5kb3Igc3BlY2lmaWMgZHJpdmVyIHRvIGxvYWQgZmlybXdhcmUuIEJ5DQo+
+IHRoaXMsIGl0IGNhdXNlcyB0aGUgQmx1ZXRvb3RoIGRldmljZSAiTVVTVCIgaGF2ZSB0d28gUElE
+L1ZJRHMgaW4gTGludXguICBCdXQNCj4gb24gd2luZG93cyBwbGF0Zm9ybSwgdGhlIGRldmljZSBj
+YW4gYWx3YXlzIGtlZXAgb25lIHNhbWUgUElEL1ZJRC4gIEl0IGlzDQo+IGhhcmQgZm9yIHVzIHRv
+IGhhbmRsZSB0aGlzIGlzc3VlIHdpdGggY3VycmVudCBidHVzYiBkZXNpZ24uDQo+ID4gTW9yZW92
+ZXIgaW4gb3VyIEF0aGVyb3MgMzAxMiBjaGlwLCB3ZSBhbHNvIG5lZWQgdG8gc3dpdGNoIHRoZSAz
+MDEyIGNoaXANCj4gYmV0d2VlbiAibm9ybWFsIiBtb2RlIGFuZCAicHJlLWJvb3QiIG1vZGUgZHVy
+aW5nIFBDIHJlYm9vdCwgIHdpdGgNCj4gY3VycmVudCBidHVzYiBkZXNpZ24sIHdlIGhhdmUgdG8g
+bWFrZSBjaGFuZ2VzIGluIGJ0dXNiLmMgZGlyZWN0bHksIGJ1dCBpdCBpcw0KPiBvdXIgY2hpcCBz
+cGVjaWZpYyByZXF1aXJlbWVudHMuICBUaGVyZWZvcmUsIHdl4oCZZCBsaWtlIHRvIHByb3Bvc2Ug
+c29tZQ0KPiBtZXRob2RzIHRvIG1ha2UgdGhlIEJsdWV0b290aCBkZXZpY2UgaGFzIG9ubHkgb25l
+IFBJRC9WSUQgYnkgcHJvcGVyDQo+IGJ0dXNiIG1vZGlmaWNhdGlvbiBhbmQgYWxzbyBmb3Igb3Ro
+ZXIgdmVuZG9yIGV4dGVuc2lvbnMgc3VjaCBhcyBtb2RlIHN3aXRjaC4NCj4gPg0KPiA+IEN1cnJl
+bnRseSwgd2UgaGF2ZSB0aHJlZSBwcm9wb3NhbHMuIEFuZCBJIGF0dGFjaGVkIG91ciByb3VnaCBw
+YXRjaGVzIGZvcg0KPiB0aGVzZSB0aHJlZSBwcm9wb3NhbHMuDQo+ID4gVGhleSBhcmUgdG90YWxs
+eSBub3QgZm9ybWFsLCBJIGF0dGFjaGVkIHRoZW0ganVzdCB3YW50IHRvIG1ha2UgeW91IGVhc3kg
+dG8NCj4gdW5kZXJzdGFuZC4NCj4gPg0KPiA+IEFuZCBmcm9tIGhlcmUsIExldCBtZSBleHBsYWlu
+IG1vcmUgb2YgIHRoZXNlIHByb3Bvc2FsIG9uZSBieSBvbmUuDQo+ID4NCj4gPiAjIFByb3Bvc2Fs
+IDEuDQo+ID4gVGhpcyBvcHRpb24gY291bGQgYmUgcmVmZXIgdG8gd2hhdCBpdOKAmXMgd29ya2lu
+ZyBmb3IgbG90cyBvZiBVQVJUIEJsdWV0b290aA0KPiBkZXZpY2VzIGluIExpbnV4Lg0KPiA+IE1h
+aW5seSwgdmVuZG9yIGRyaXZlciB3b3VsZCBiZSBidWlsdCBhcyBhbiBvYmplY3Qgb2YgYnR1c2Iu
+a28uIFRoaXMgc2hvdWxkDQo+IGJlIHNhbWUgYXMgdGhvc2UgVUFSVCBCbHVldG9vdGggZHJpdmVy
+cy4NCj4gPiBJbiBvdXIgY2FzZSwgYXRoM2sgd291bGQgYmUgYnVpbHQgYXMgYW4gb2JqZWN0IGZp
+bGUgYWNjb3JkaW5nIHRvDQo+IENPTkZJR19CVF9BVEgzSyBkZWZpbmUuDQo+ID4gVGhlbiBidHVz
+YiBrZXJuZWwgbW9kdWxlIHdpbGwgYmUgY29tcG9zZWQgb2YgYnR1c2IubyBhbmQgYXRoM2suby4g
+IFNvIGl0IGlzDQo+IGVhc3kgdG8gbWFrZSBvbmUgUElEL1ZJRCBkZXZpY2Ugd29yay4NCj4gPiBU
+aGlzIGNvbmNlcHQgd2FzIG9yaWVudGVkIGJ5IGhjaV91YXJ0IGRyaXZlci4gIEl0IGNhbiBqdW1w
+IHRvIGluZGl2aWR1YWwNCj4gZW50cnkgZnVuY3Rpb24gYmFzZWQgb24gZGlmZmVyZW50IElELg0K
+PiA+IEFuZCB0aGluZ3MgbGlrZSBtb2RlIHN3aXRjaCBhbHNvIGNvdWxkIGJlIGhhbmRsZWQgYnkg
+anVzdCBhZGRpbmcgZnVuY3Rpb24NCj4gbGlrZSBzd2l0Y2hfbW9kZSgpIGluIGF0aDNrLmMuDQo+
+ID4NCj4gPiAjIFByb3Bvc2FsIDIuDQo+ID4gVGhpcyBvcHRpb24gaXMgdG8gZXhwb3J0IGJ0dXNi
+IGNvbW1vbiBmdW5jdGlvbnMsIGFuZCB2ZW5kb3IgZHJpdmVyIChmb3INCj4gZXhhbXBsZSBvdXIg
+YXRoM2spIGNhbiBiZSB0YWtlbiBhcyB0aGUgZXh0ZW5zaW9uIG9mIGJ0dXNiLg0KPiA+ICwgYW5k
+IGl0IGNhbiBmaXJzdCBkb3dubG9hZHMgdGhlIGZpcm13YXJlIGFuZCB0aGVuIHVzZSB0aG9zZSBm
+dW5jdGlvbnMNCj4gZXhwb3J0ZWQgaW4gYnR1c2IgZHJpdmVyDQo+ID4gdG8gc2V0dXAgdGhlIGhj
+aSBCbHVldG9vdGggZGV2aWNlLiAgTW9yZW92ZXIgaWYgaXQgaXMgcG9zc2libGUsIHdlIGFyZSBh
+bHNvDQo+IHByb3Bvc2UgdG8gcmVmaW5lIHRoZSBidHVzYi5jIGFuZCBzcGxpdCB0aGUgYnR1c2Iu
+YyB0byBidHVzYl9jb3JlLmMgYW5kDQo+IGJ0dXNiX2dlbmVyaWMuYywNCj4gPiBJbiB0aGUgYnR1
+c2JfY29yZS5jLiBJdCBpbmNsdWRlcyBhbGwgdGhlICBCbHVldG9vdGggdXNiIGNvbW1vbiBvcGVy
+YXRpb25zDQo+IGFuZCB0aGVzZSBCbHVldG9vdGggdXNiIGZ1bmN0aW9ucyB3aWxsIGJlIGV4cG9y
+dGVkLA0KPiA+IGFuZCB0aGUgYnR1c2JfZ2VuZXJpYy5jIGlzIHRoZSByZWFsIGdlbmVyaWMgQmx1
+ZXRvb3RoIGRyaXZlciByZW1haW5zDQo+IHN1cHBvcnQgYWxsIGN1cnJlbnQgQmx1ZXRvb3RoIGRl
+dmljZSAsd2hpY2ggdXNlcyB0aGUgYnR1c2JfY29yZSBmdW5jdGlvbnMuDQo+ID4gQW5kIHZlbmRv
+ciBkcml2ZXIgY2FuIGFsc28gY2FsbCB0aG9zZSB1c2IgY29tbW9uIG9wZXJhdGlvbnMgaW4gdGhl
+DQo+IGJ0dXNiX2NvcmUuYy4NCj4gPiBXaXRoIHRoaXMgcHJvcG9zYWwsIFNpbmNlIHRoZSBhdGgz
+ayBkcml2ZXIgYXJlIHRoZSBvbmx5IG93bmVyIG9mIHRoZQ0KPiBibHVldG9vdGggZGV2aWNlLCBv
+bmx5IG9uZSBQSUQvVklEIGlzIG5lY2Vzc2FyeS4NCj4gPiBBbmQgaXQgaXMgdmVyeSBlYXN5IHRv
+IGhhbmRsZSB0aGUgbW9kZSBzd2l0Y2ggY2FzZSBpbiBpdHNlbGYgZWl0aGVyLiBQbGVhc2UNCj4g
+Y2hlY2sgYnR1c2JfYXRoM2tfMi5wYXRjaCBmb3IgZGV0YWlsLg0KPiA+DQo+ID4gIyBQcm9wb3Nh
+bCAzLg0KPiA+IFRoaXMgb3B0aW9uIGlzIHRvIGFkZCAicXVpcmsgZGV2aWNlIiB0byBidHVzYiBk
+cml2ZXIuIFdlIGZvdW5kIGFjdHVhbGx5IHlvdQ0KPiBhZGRlZCBsb3RzIG9mIHNvLWNhbGxlZCDi
+gJxxdWlya+KAnSBpbXBsZW1lbnRhdGlvbiBpbiBidHVzYiBkcml2ZXIgZm9yIG1hbnkNCj4gdmVu
+ZG9ycy4NCj4gPiBodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvP3A9bGludXgva2VybmVsL2dpdC9uZXh0
+L2xpbnV4LQ0KPiBuZXh0LmdpdDthPWNvbW1pdDtoPWNmZWI0MTQ1MzdiMWQ3YzIzYmEyMDJmMTk4
+ZmE0MTU0Y2Q1YTQ4NTYNCj4gPiBWZW5kb3Igc3BlY2lmaWMgZHJpdmVyIGNhbiBjYWxsIGJ0dXNi
+X3JlZ2lzdGVyX3F1aXJrX2RldmljZSgpIGZ1bmN0aW9uIHRvDQo+IHJlZ2lzdGVyIGl0c2VsZiB0
+byB0aGUgYnR1c2IgZHJpdmVyLg0KPiA+IFNvIGR1cmluZyB0aGUgZGV2aWNlIHByb2JlLCB0aGUg
+YnR1c2Igd2lsbCB0cnkgdG8gbWF0Y2ggdGhlIGRldmljZSBpZCwgYW5kIGlmDQo+IGl0IGlzIGEg
+4oCccXVpcmvigJ0gZGV2aWNlLCBpdCB3aWxsIGNhbGwNCj4gPiB0aGUg4oCccXVpcmvigJ0gZGV2
+aWNl4oCZcyBzcGVjaWZpYyBmdW5jdGlvbiBmaXJzdC4gIEV2ZXJ5IHZlbmRvciBjYW4gdXNlIHRo
+aXMgcXVpcmsNCj4gdG8gZG93bmxvYWQgdGhlaXIgZmlybXdhcmUgYW5kIGtlZXAgdGhlIHNhbWUg
+UElEL1ZJRCB3aXRoIHByb3BlciBjb2RlcyBpbg0KPiBidHVzYi5jLg0KPiA+IFRoaXMgcHJvcG9z
+YWwgaXMgYWxzbyBhYmxlIHRvIGhhbmRsZSB0aGUgbW9kZSBzd2l0Y2ggY2FzZS4NCj4gPg0KPiA+
+IFBsZWFzZSBnaXZlIHlvdXIgY29tbWVudHMgYW5kIHN1Z2dlc3Rpb24gZm9yIG91ciBwcm9wb3Nh
+bHMuDQo+ID4gV2UgYXJlIGhvcGluZyB0byBtYWtlIG9uZSBQSUQvVklEIHdvcmsgYW5kIGNvbnRy
+aWJ1dGUgdG8gdGhlDQo+IGNvbW11bml0eS4NCj4gDQo+IHdoeSBkbyB5b3Ugd2FudCB0aGlzIGF0
+IGFsbC4gWW91IHJ1biBhIGRpZmZlcmVudCBwcm90b2NvbCB3aXRoIGRpZmZlcmVudA0KPiBlbmRw
+b2ludHMgb24gdGhlIGRldmljZSBpbiBERlUgbW9kZSBhbmQgb24gdGhlIGRldmljZSBpbiBIOjIg
+bW9kZS4NCj4gDQo+IFNvIHlvdSBhY3R1YWxseSBoYXZlIGRpZmZlcmVudCBmdW5jdGlvbmFsaXR5
+LiBBbmQgSSBwZXJzb25hbGx5IGRvIG5vdA0KPiBjYXJlIHdoYXQgV2luZG93cyBpcyBkb2luZy4g
+VGhpcyBpcyBMaW51eCwgc28gcGxlYXNlIGZvbGxvdyB3aGF0IHRoZQ0KPiBMaW51eCBjb21tdW5p
+dHkgZXhwZWN0IHlvdSB0byBkby4NCj4gDQo+IEFsc28gaW4gY2FzZSBvZiBidHVzYiwgeW91IGNh
+biB1c2UgdGhlIEJsdWV0b290aCBTSUcgKGFuZCBmb3IgdGhhdA0KPiBtYXR0ZXIgVVNCIFNJRykg
+ZGVmaW5lZCBpbnRlcmZhY2UgaWRlbnRpZmllcnMuIFRoZSBidHVzYiBkcml2ZXIgZG9lcyBub3QN
+Cj4gbWF0Y2ggYnkgZGVmYXVsdCB0byBWSUQvUElELiBJdCB1c2VzIGEgc3RhbmRhcmQuIElmIHlv
+dSB3YW5uYSB1c2UgdGhlDQo+IHNhbWUgVklEL1BJRCBoZXJlLCB0aGVuIGRlY2xhcmUgdGhlIGlu
+dGVyZmFjZSBpZGVudGlmaWVycyBwcm9wZXJseSBhbmQNCj4gZXZlcnl0aGluZyB3b3VsZCB3b3Jr
+IG91dCBuaWNlbHkuDQo+IA0KPiBZb3UgZ3V5cyBpbnNpc3Qgb24gbHlpbmcgdG8gdGhlIFVTQiBz
+dWJzeXN0ZW0gYW5kIGJ5IHRoYXQgZmFjdCBtb3N0DQo+IGxpa2VseSB2aW9sYXRpbmcgdGhlIFVT
+QiBzdGFuZGFyZHMuIERvbid0IGRvIHRoYXQgYW5kIGV2ZXJ5dGhpbmcgd2lsbA0KPiB3b3JrIG91
+dCBvZiB0aGUgYm94IHdpdGggTGludXguIE5vIGV4dHJhIHBhdGNoZXMgb3IgbW9kaWZpY2F0aW9u
+IGZvcg0KPiBidHVzYiBuZWVkZWQuDQo+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoN
+Cg==
