@@ -2,146 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH v3 6/9] Bluetooth: Add 'dst_type' field to struct hci_conn
-Date: Thu, 26 May 2011 16:23:54 -0300
-Message-Id: <1306437837-18263-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v3 5/9] Bluetooth: Advertising entries lifetime
+Date: Thu, 26 May 2011 16:23:53 -0300
+Message-Id: <1306437837-18263-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1306437837-18263-1-git-send-email-andre.guedes@openbossa.org>
 References: <1306437837-18263-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a new field (dst_type) to the struct hci_conn which
-holds the type of the destination address (bdaddr_t dst). This
-approach is needed in order to use the struct hci_conn as an
-abstraction of LE connections in HCI Layer.
+This patch adds a timer to clear 'adv_entries' after three minutes.
 
-This patch also adds a new parameter to hci_conn_add() since now the
-address type must be considered to create LE struct hci_conn objects.
-For non-LE that parameter is ignored.
+After some amount of time, the advertising entries cached during
+the last LE scan should be considered expired and they should be
+removed from the advertising cache.
+
+It was chosen a three minutes timeout as an initial attempt. This
+value might change in future.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    4 +++-
- net/bluetooth/hci_conn.c         |   12 ++++++++----
- net/bluetooth/hci_event.c        |   11 +++++++----
- 3 files changed, 18 insertions(+), 9 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   14 ++++++++++++++
+ net/bluetooth/hci_event.c        |    6 +++++-
+ 3 files changed, 21 insertions(+), 1 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index af4b0ed..486224d 100644
+index 10dfb85..af4b0ed 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -224,6 +224,7 @@ struct hci_conn {
- 	spinlock_t	lock;
+@@ -188,6 +188,7 @@ struct hci_dev {
+ 	struct list_head	remote_oob_data;
  
- 	bdaddr_t	dst;
-+	__u8            dst_type;
- 	__u16		handle;
- 	__u16		state;
- 	__u8		mode;
-@@ -424,7 +425,8 @@ void hci_add_sco(struct hci_conn *conn, __u16 handle);
- void hci_setup_sync(struct hci_conn *conn, __u16 handle);
- void hci_sco_setup(struct hci_conn *conn, __u8 status);
+ 	struct list_head	adv_entries;
++	struct timer_list	adv_timer;
  
--struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
-+struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+								__u8 dst_type);
- int hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3163330..84ad32b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -282,7 +282,8 @@ static void hci_conn_auto_accept(unsigned long arg)
- 	hci_dev_unlock(hdev);
+ 	struct hci_dev_stats	stat;
+ 
+@@ -535,6 +536,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 								u8 *randomizer);
+ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ 
++#define ADV_CLEAR_TIMEOUT (3*60*HZ) /* Three minutes */
+ int hci_adv_entries_clear(struct hci_dev *hdev);
+ struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_add_adv_entry(struct hci_dev *hdev,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index dd27f97..5040c3f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1204,6 +1204,17 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 	return 0;
  }
  
--struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
-+struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+								__u8 dst_type)
++static void hci_clear_adv_cache(unsigned long arg)
++{
++	struct hci_dev *hdev = (void *) arg;
++
++	hci_dev_lock(hdev);
++
++	hci_adv_entries_clear(hdev);
++
++	hci_dev_unlock(hdev);
++}
++
+ int hci_adv_entries_clear(struct hci_dev *hdev)
  {
- 	struct hci_conn *conn;
+ 	struct adv_entry *entry, *tmp;
+@@ -1332,6 +1343,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
  
-@@ -319,6 +320,9 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	case ESCO_LINK:
- 		conn->pkt_type = hdev->esco_type & ~EDR_ESCO_MASK;
- 		break;
-+	case LE_LINK:
-+		conn->dst_type = dst_type;
-+		break;
- 	}
+ 	INIT_LIST_HEAD(&hdev->adv_entries);
++	setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
++						(unsigned long) hdev);
  
- 	skb_queue_head_init(&conn->data_q);
-@@ -450,7 +454,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
- 		if (le)
- 			return ERR_PTR(-EBUSY);
--		le = hci_conn_add(hdev, LE_LINK, dst);
-+		le = hci_conn_add(hdev, LE_LINK, dst, 0);
- 		if (!le)
- 			return ERR_PTR(-ENOMEM);
- 		if (le->state == BT_OPEN)
-@@ -463,7 +467,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
+@@ -1405,6 +1418,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_unregister_sysfs(hdev);
  
- 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
- 	if (!acl) {
--		acl = hci_conn_add(hdev, ACL_LINK, dst);
-+		acl = hci_conn_add(hdev, ACL_LINK, dst, 0);
- 		if (!acl)
- 			return NULL;
- 	}
-@@ -482,7 +486,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+ 	hci_del_off_timer(hdev);
++	del_timer(&hdev->adv_timer);
  
- 	sco = hci_conn_hash_lookup_ba(hdev, type, dst);
- 	if (!sco) {
--		sco = hci_conn_add(hdev, type, dst);
-+		sco = hci_conn_add(hdev, type, dst, 0);
- 		if (!sco) {
- 			hci_conn_put(acl);
- 			return NULL;
+ 	destroy_workqueue(hdev->workqueue);
+ 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index df51f93..3fbc66c 100644
+index 556c38a..df51f93 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -910,7 +910,7 @@ static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
- 		}
- 	} else {
- 		if (!conn) {
--			conn = hci_conn_add(hdev, ACL_LINK, &cp->bdaddr);
-+			conn = hci_conn_add(hdev, ACL_LINK, &cp->bdaddr, 0);
- 			if (conn) {
- 				conn->out = 1;
- 				conn->link_mode |= HCI_LM_MASTER;
-@@ -1233,7 +1233,8 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
- 		}
- 	} else {
- 		if (!conn) {
--			conn = hci_conn_add(hdev, LE_LINK, &cp->peer_addr);
-+			conn = hci_conn_add(hdev, LE_LINK, &cp->peer_addr,
-+						cp->peer_addr_type);
- 			if (conn)
- 				conn->out = 1;
- 			else
-@@ -1397,7 +1398,8 @@ static inline void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *sk
+@@ -856,8 +856,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
  
- 		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
- 		if (!conn) {
--			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr);
-+			conn = hci_conn_add(hdev, ev->link_type,
-+							&ev->bdaddr, 0);
- 			if (!conn) {
- 				BT_ERR("No memory for new connection");
- 				hci_dev_unlock(hdev);
-@@ -2681,7 +2683,8 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_lock(hdev);
  
- 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
- 	if (!conn) {
--		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
-+		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr,
-+							ev->bdaddr_type);
- 		if (!conn) {
- 			BT_ERR("No memory for new connection");
- 			hci_dev_unlock(hdev);
+-	if (cp->enable == 0x01)
++	if (cp->enable == 0x01) {
++		del_timer(&hdev->adv_timer);
+ 		hci_adv_entries_clear(hdev);
++	} else if (cp->enable == 0x00) {
++		mod_timer(&hdev->adv_timer, jiffies + ADV_CLEAR_TIMEOUT);
++	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
 -- 
 1.7.4.1
 
