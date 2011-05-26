@@ -2,24 +2,21 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v2] Remove unnecessary jumps
-Date: Thu, 26 May 2011 09:17:40 +0200
-Message-Id: <1306394260-23293-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1306393705-12839-1-git-send-email-lkslawek@gmail.com>
-References: <1306393705-12839-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH] Remove unnecessary jumps
+Date: Thu, 26 May 2011 09:08:25 +0200
+Message-Id: <1306393705-12839-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/avdtp.c         |    9 ++++-----
+ audio/avdtp.c         |   11 ++++-------
  audio/ctl_bluetooth.c |    6 ++----
- audio/headset.c       |    3 +--
  tools/hciattach_ti.c  |    9 ++++-----
  tools/sdptool.c       |    3 +--
- 5 files changed, 12 insertions(+), 18 deletions(-)
+ 4 files changed, 11 insertions(+), 18 deletions(-)
 
 diff --git a/audio/avdtp.c b/audio/avdtp.c
-index e6407bb..59c544f 100644
+index e6407bb..653c099 100644
 --- a/audio/avdtp.c
 +++ b/audio/avdtp.c
 @@ -2239,22 +2239,22 @@ static uint16_t get_version(struct avdtp *session)
@@ -49,14 +46,16 @@ index e6407bb..59c544f 100644
  
  	proto_desc = sdp_get_proto_desc(protos, AVDTP_UUID);
  	if (proto_desc && proto_desc->dtd == SDP_UINT16)
-@@ -2263,7 +2263,6 @@ static uint16_t get_version(struct avdtp *session)
+@@ -2262,9 +2262,6 @@ static uint16_t get_version(struct avdtp *session)
+ 
  	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
  	sdp_list_free(protos, NULL);
- 
+-
 -done:
- 	return ver;
+-	return ver;
  }
  
+ static struct avdtp *avdtp_get_internal(const bdaddr_t *src, const bdaddr_t *dst)
 diff --git a/audio/ctl_bluetooth.c b/audio/ctl_bluetooth.c
 index 2981385..d941421 100644
 --- a/audio/ctl_bluetooth.c
@@ -73,27 +72,6 @@ index 2981385..d941421 100644
 -	*value = rsp->key;
 -done:
  	return ret;
- }
- 
-diff --git a/audio/headset.c b/audio/headset.c
-index 4540c34..e7a4ea4 100644
---- a/audio/headset.c
-+++ b/audio/headset.c
-@@ -1771,7 +1771,7 @@ static DBusMessage *hs_ring(DBusConnection *conn, DBusMessage *msg,
- 
- 	if (ag.ring_timer) {
- 		DBG("IndicateCall received when already indicating");
--		goto done;
-+		return reply;
- 	}
- 
- 	err = headset_send(hs, "\r\nRING\r\n");
-@@ -1784,7 +1784,6 @@ static DBusMessage *hs_ring(DBusConnection *conn, DBusMessage *msg,
- 	ag.ring_timer = g_timeout_add_seconds(RING_INTERVAL, ring_timer_cb,
- 						NULL);
- 
--done:
- 	return reply;
  }
  
 diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
