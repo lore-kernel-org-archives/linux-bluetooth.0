@@ -1,42 +1,547 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3 v3] Improve usage documentation for some options
-Date: Thu, 26 May 2011 17:58:01 +0300
-Message-Id: <1306421881-1956-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: Another pass at adapter naming
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Thu, 26 May 2011 15:50:09 +0100
+In-Reply-To: <1306419070.2010.244.camel@novo.hadess.net>
+References: <1306419070.2010.244.camel@novo.hadess.net>
+Content-Type: multipart/mixed; boundary="=-faUCBQVytK4JanpC+hOy"
+Message-ID: <1306421410.2669.0.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+--=-faUCBQVytK4JanpC+hOy
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+On Thu, 2011-05-26 at 15:11 +0100, Bastien Nocera wrote:
+> As discussed on IRC,
+> 
+> inotify is now required, and we force hci0 (or the first device) to be
+> named after the pretty hostname.
+> 
+> Note that the GATT call isn't removed, it's now done in
+> adapter_update_local_name().
+
+As discussed again, removed the default adapter special casing, and
+we'll just call hci0 with the pretty name.
+
+--=-faUCBQVytK4JanpC+hOy
+Content-Disposition: attachment;
+	filename="0001-adaptername-Move-adapter-naming-into-a-plugin.patch"
+Content-Type: text/x-patch;
+	name="0001-adaptername-Move-adapter-naming-into-a-plugin.patch";
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+>From 2ddb830390100b6614be228331635d2e3fc9b9d8 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Tue, 10 May 2011 18:02:14 +0100
+Subject: [PATCH] adaptername: Move adapter naming into a plugin
+
+Moving the adapter naming allows us to use the /etc/machine-info [1]
+pretty hostname, as implemented by hostnamed [2] in systemd.
+
+If /etc/machine-info is not present, the adapter name stored
+on disk in /var/lib/bluetooth will be used. If no adapter name
+has been set yet, the default from the main.conf will be used.
+
+If a pretty name is available, hci0 will be using this name,
+and further adapters will have a number appended.
+
+[1]: http://0pointer.de/public/systemd-man/machine-info.html
+[2]: http://www.freedesktop.org/wiki/Software/systemd/hostnamed
 ---
- src/main.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ Makefile.am           |    3 +
+ configure.ac          |    4 +
+ plugins/adaptername.c |  279 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c         |  107 +++----------------
+ src/adapter.h         |    2 +-
+ 5 files changed, 303 insertions(+), 92 deletions(-)
+ create mode 100644 plugins/adaptername.c
 
-diff --git a/src/main.c b/src/main.c
-index e1ce442..bf966f4 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -100,13 +100,17 @@ static GOptionEntry options[] = {
- 				G_OPTION_ARG_CALLBACK, parse_debug,
- 				"Enable debug information output", "DEBUG" },
- 	{ "root", 'r', 0, G_OPTION_ARG_STRING, &option_root,
--				"Specify root folder location", "PATH" },
-+				"Specify root folder location. Both absolute "
-+				"and relative can be used, but relative paths "
-+				"are assumed to be relative to user $HOME "
-+				"folder", "PATH" },
- 	{ "root-setup", 'S', 0, G_OPTION_ARG_STRING, &option_root_setup,
- 				"Root folder setup script", "SCRIPT" },
- 	{ "symlinks", 'l', 0, G_OPTION_ARG_NONE, &option_symlinks,
- 				"Enable symlinks on root folder" },
- 	{ "capability", 'c', 0, G_OPTION_ARG_STRING, &option_capability,
--				"Specify capability file", "FILE" },
-+				"Specify capability file, use '!' mark for "
-+				"scripts", "FILE" },
- 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
- 				"Automatically accept push requests" },
- 	{ "plugin", 'p', 0, G_OPTION_ARG_STRING, &option_plugin,
+diff --git a/Makefile.am b/Makefile.am
+index 175f8c9..2f3051c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -218,6 +218,9 @@ EXTRA_DIST += plugins/hal.c plugins/formfactor.c
+ builtin_modules += storage
+ builtin_sources += plugins/storage.c
+ 
++builtin_modules += adaptername
++builtin_sources += plugins/adaptername.c
++
+ if MAEMO6PLUGIN
+ builtin_modules += maemo6
+ builtin_sources += plugins/maemo6.c
+diff --git a/configure.ac b/configure.ac
+index 111ff01..987b7e1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,6 +35,10 @@ AC_FUNC_PPOLL
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+ 
++AC_CHECK_HEADER([sys/inotify.h],
++		[AC_DEFINE([HAVE_SYS_INOTIFY_H], 1,
++			   [Define to 1 if you have <sys/inotify.h>.])],
++			   [AC_MSG_ERROR(inotify headers are required and missing)])
+ AC_PATH_DBUS
+ AC_PATH_GLIB
+ AC_PATH_ALSA
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+new file mode 100644
+index 0000000..56a74c9
+--- /dev/null
++++ b/plugins/adaptername.c
+@@ -0,0 +1,279 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++#include <unistd.h>
++#include <errno.h>
++
++#include <glib.h>
++#include <bluetooth/bluetooth.h>
++
++#include "plugin.h"
++#include "hcid.h" /* For main_opts */
++#include "adapter.h"
++#include "manager.h"
++#include "device.h" /* Needed for storage.h */
++#include "storage.h"
++#include "log.h"
++
++#include <sys/inotify.h>
++#define EVENT_SIZE  (sizeof (struct inotify_event))
++#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
++
++#define MACHINE_INFO_DIR "/etc/"
++#define MACHINE_INFO_FILE "machine-info"
++
++static GIOChannel *inotify = NULL;
++static int watch_fd = -1;
++
++/* This file is part of systemd's hostnamed functionality:
++ * http://0pointer.de/public/systemd-man/machine-info.html
++ * http://www.freedesktop.org/wiki/Software/systemd/hostnamed
++ */
++static char *read_pretty_host_name (void)
++{
++	char *contents, *ret;
++	char **lines;
++	guint i;
++
++	ret = NULL;
++
++	if (g_file_get_contents(MACHINE_INFO_DIR MACHINE_INFO_FILE,
++			&contents, NULL, NULL) == FALSE) {
++		return NULL;
++	}
++	lines = g_strsplit_set(contents, "\r\n", 0);
++	g_free(contents);
++
++	if (lines == NULL)
++		return NULL;
++
++	for (i = 0; lines[i] != NULL; i++) {
++		if (g_str_has_prefix(lines[i], "PRETTY_HOSTNAME=")) {
++			ret = g_strdup(lines[i] + strlen("PRETTY_HOSTNAME="));
++			break;
++		}
++	}
++
++	g_strfreev(lines);
++	return ret;
++}
++
++/*
++ * Device name expansion
++ *   %d - device id
++ *   %h - hostname
++ */
++static char *expand_name(char *dst, int size, char *str, int dev_id)
++{
++	register int sp, np, olen;
++	char *opt, buf[10];
++
++	if (!str || !dst)
++		return NULL;
++
++	sp = np = 0;
++	while (np < size - 1 && str[sp]) {
++		switch (str[sp]) {
++		case '%':
++			opt = NULL;
++
++			switch (str[sp+1]) {
++			case 'd':
++				sprintf(buf, "%d", dev_id);
++				opt = buf;
++				break;
++
++			case 'h':
++				opt = main_opts.host_name;
++				break;
++
++			case '%':
++				dst[np++] = str[sp++];
++				/* fall through */
++			default:
++				sp++;
++				continue;
++			}
++
++			if (opt) {
++				/* substitute */
++				olen = strlen(opt);
++				if (np + olen < size - 1)
++					memcpy(dst + np, opt, olen);
++				np += olen;
++			}
++			sp += 2;
++			continue;
++
++		case '\\':
++			sp++;
++			/* fall through */
++		default:
++			dst[np++] = str[sp++];
++			break;
++		}
++	}
++	dst[np] = '\0';
++	return dst;
++}
++
++static int adaptername_probe(struct btd_adapter *adapter)
++{
++	int current_id;
++	char name[MAX_NAME_LENGTH + 1];
++	char *pretty_hostname;
++	bdaddr_t bdaddr;
++
++	current_id = adapter_get_dev_id(adapter);
++
++	pretty_hostname = read_pretty_host_name();
++	if (pretty_hostname != NULL) {
++		if (current_id != 0) {
++			char *str;
++
++			/* +1 because we don't want an adapter called "Foobar's laptop #0" */
++			str = g_strdup_printf ("%s #%d", pretty_hostname, current_id + 1);
++			DBG("Setting name '%s' for device 'hci%d'", str, current_id);
++
++			adapter_update_local_name(adapter, str);
++			g_free(str);
++		} else {
++			DBG("Setting name '%s' for device 'hci%d'", pretty_hostname, current_id);
++			adapter_update_local_name(adapter, pretty_hostname);
++		}
++		g_free(pretty_hostname);
++
++		return 0;
++	}
++
++	adapter_get_address(adapter, &bdaddr);
++
++	if (read_local_name(&bdaddr, name) < 0) {
++		expand_name(name, MAX_NAME_LENGTH, main_opts.name,
++							current_id);
++	}
++	DBG("Setting name '%s' for device 'hci%d'", name, current_id);
++	adapter_update_local_name(adapter, name);
++
++	return 0;
++}
++
++static gboolean handle_inotify_cb(GIOChannel *channel,
++		GIOCondition condition, gpointer data)
++{
++	char buf[EVENT_BUF_LEN];
++	GIOStatus err;
++	gsize len, i;
++	gboolean changed;
++
++	changed = FALSE;
++
++	err = g_io_channel_read_chars(channel, buf, EVENT_BUF_LEN, &len, NULL);
++	if (err != G_IO_STATUS_NORMAL) {
++		error("Error reading inotify event: %d\n", err);
++		return FALSE;
++	}
++
++	i = 0;
++	while (i < len) {
++		struct inotify_event *pevent = (struct inotify_event *) & buf[i];
++
++		/* check that it's ours */
++		if (pevent->len &&
++		    pevent->name != NULL &&
++		    strcmp(pevent->name, MACHINE_INFO_FILE) == 0) {
++			changed = TRUE;
++		}
++		i += EVENT_SIZE + pevent->len;
++	}
++
++	if (changed != FALSE) {
++		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
++				" changed, changing names for adapters");
++		manager_foreach_adapter ((adapter_cb) adaptername_probe, NULL);
++	}
++
++	return TRUE;
++}
++
++static void adaptername_remove(struct btd_adapter *adapter)
++{
++	if (watch_fd >= 0)
++		close (watch_fd);
++	if (inotify != NULL)
++		g_io_channel_shutdown(inotify, FALSE, NULL);
++}
++
++static struct btd_adapter_driver adaptername_driver = {
++	.name	= "adaptername",
++	.probe	= adaptername_probe,
++	.remove	= adaptername_remove,
++};
++
++static int adaptername_init(void)
++{
++	int ret;
++
++	ret = btd_register_adapter_driver(&adaptername_driver);
++
++	if (ret == 0) {
++		int inot_fd;
++
++		inot_fd = inotify_init();
++		if (inot_fd < 0) {
++			error("Failed to setup inotify");
++			return 0;
++		}
++		watch_fd = inotify_add_watch(inot_fd,
++				MACHINE_INFO_DIR,
++				IN_CLOSE_WRITE | IN_DELETE | IN_CREATE);
++		if (watch_fd < 0) {
++			error("Failed to setup watch for '%s'",
++					MACHINE_INFO_DIR);
++			return 0;
++		}
++
++		inotify = g_io_channel_unix_new(inot_fd);
++		g_io_channel_set_close_on_unref(inotify, TRUE);
++		g_io_channel_set_encoding (inotify, NULL, NULL);
++		  g_io_channel_set_flags (inotify, G_IO_FLAG_NONBLOCK, NULL);
++		g_io_add_watch(inotify, G_IO_IN, handle_inotify_cb, NULL);
++
++		return 0;
++	}
++
++	return ret;
++}
++
++static void adaptername_exit(void)
++{
++	btd_unregister_adapter_driver(&adaptername_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(adaptername, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_LOW, adaptername_init, adaptername_exit)
+diff --git a/src/adapter.c b/src/adapter.c
+index c30febc..5598d17 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -182,64 +182,6 @@ static void dev_info_free(struct remote_dev_info *dev)
+ 	g_free(dev);
+ }
+ 
+-/*
+- * Device name expansion
+- *   %d - device id
+- */
+-static char *expand_name(char *dst, int size, char *str, int dev_id)
+-{
+-	register int sp, np, olen;
+-	char *opt, buf[10];
+-
+-	if (!str || !dst)
+-		return NULL;
+-
+-	sp = np = 0;
+-	while (np < size - 1 && str[sp]) {
+-		switch (str[sp]) {
+-		case '%':
+-			opt = NULL;
+-
+-			switch (str[sp+1]) {
+-			case 'd':
+-				sprintf(buf, "%d", dev_id);
+-				opt = buf;
+-				break;
+-
+-			case 'h':
+-				opt = main_opts.host_name;
+-				break;
+-
+-			case '%':
+-				dst[np++] = str[sp++];
+-				/* fall through */
+-			default:
+-				sp++;
+-				continue;
+-			}
+-
+-			if (opt) {
+-				/* substitute */
+-				olen = strlen(opt);
+-				if (np + olen < size - 1)
+-					memcpy(dst + np, opt, olen);
+-				np += olen;
+-			}
+-			sp += 2;
+-			continue;
+-
+-		case '\\':
+-			sp++;
+-			/* fall through */
+-		default:
+-			dst[np++] = str[sp++];
+-			break;
+-		}
+-	}
+-	dst[np] = '\0';
+-	return dst;
+-}
+-
+ int btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
+ 								uint8_t minor)
+ {
+@@ -912,10 +854,10 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
+ 				DBUS_TYPE_UINT32, &new_class);
+ }
+ 
+-void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
++int adapter_update_local_name(struct btd_adapter *adapter, const char *name)
+ {
+ 	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
+-		return;
++		return 0;
+ 
+ 	strncpy(adapter->name, name, MAX_NAME_LENGTH);
+ 
+@@ -934,38 +876,29 @@ void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
+ 						DBUS_TYPE_STRING, &name_ptr);
+ 	}
+ 
++	if (adapter->up) {
++		int err = adapter_ops->set_name(adapter->dev_id, name);
++		if (err < 0)
++			return -err;
++
++		adapter->name_stored = TRUE;
++	}
++
+ 	adapter->name_stored = FALSE;
++
++	return 0;
+ }
+ 
+ static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
+ 					const char *name, void *data)
+ {
+ 	struct btd_adapter *adapter = data;
+-	char *name_ptr = adapter->name;
+-
+-	if (!g_utf8_validate(name, -1, NULL)) {
+-		error("Name change failed: supplied name isn't valid UTF-8");
+-		return btd_error_invalid_args(msg);
+-	}
+-
+-	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
+-		goto done;
+-
+-	strncpy(adapter->name, name, MAX_NAME_LENGTH);
+-	write_local_name(&adapter->bdaddr, name);
+-	emit_property_changed(connection, adapter->path,
+-					ADAPTER_INTERFACE, "Name",
+-					DBUS_TYPE_STRING, &name_ptr);
+-
+-	if (adapter->up) {
+-		int err = adapter_ops->set_name(adapter->dev_id, name);
+-		if (err < 0)
+-			return btd_error_failed(msg, strerror(-err));
++	int err;
+ 
+-		adapter->name_stored = TRUE;
+-	}
++	err = adapter_update_local_name (adapter, name);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(err));
+ 
+-done:
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
+@@ -2577,14 +2510,6 @@ gboolean adapter_init(struct btd_adapter *adapter)
+ 		return FALSE;
+ 	}
+ 
+-	if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
+-		expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
+-							adapter->dev_id);
+-
+-	if (main_opts.attrib_server)
+-		attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+-			(const uint8_t *) adapter->name, strlen(adapter->name));
+-
+ 	sdp_init_services_list(&adapter->bdaddr);
+ 	load_drivers(adapter);
+ 	clear_blocked(adapter);
+diff --git a/src/adapter.h b/src/adapter.h
+index 3526849..13971bf 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -115,7 +115,7 @@ int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr);
+ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 						struct remote_dev_info *dev);
+ void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
+-void adapter_update_local_name(struct btd_adapter *adapter, const char *name);
++int adapter_update_local_name(struct btd_adapter *adapter, const char *name);
+ void adapter_service_insert(struct btd_adapter *adapter, void *rec);
+ void adapter_service_remove(struct btd_adapter *adapter, void *rec);
+ void btd_adapter_class_changed(struct btd_adapter *adapter,
 -- 
-1.7.5.2
+1.7.5.1
+
+
+--=-faUCBQVytK4JanpC+hOy--
 
