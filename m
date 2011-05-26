@@ -2,100 +2,184 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH] Remove unnecessary jumps
-Date: Thu, 26 May 2011 08:42:50 +0200
-Message-Id: <1306392170-12483-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH v2 2/2] Add MAP session management and SetFolder function
+Date: Thu, 26 May 2011 08:26:22 +0200
+Message-Id: <1306391182-11550-2-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1306391182-11550-1-git-send-email-lkslawek@gmail.com>
+References: <1306391182-11550-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/irmc.c          |    4 ++--
- plugins/pbap.c          |    4 ++--
- plugins/syncevolution.c |    9 +++------
- 3 files changed, 7 insertions(+), 10 deletions(-)
+ plugins/mas.c            |   16 ++++++++--
+ plugins/messages-dummy.c |   69 ++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 77 insertions(+), 8 deletions(-)
 
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-index 2cf673c..fd233f7 100644
---- a/plugins/irmc.c
-+++ b/plugins/irmc.c
-@@ -510,7 +510,7 @@ static int irmc_init(void)
+diff --git a/plugins/mas.c b/plugins/mas.c
+index 761c23b..fb1b13a 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -88,6 +88,7 @@
+ 
+ struct mas_session {
+ 	struct mas_request *request;
++	void *backend_data;
+ };
+ 
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -105,13 +106,20 @@ static void *mas_connect(struct obex_session *os, int *err)
+ 
  	DBG("");
- 	err = phonebook_init();
- 	if (err < 0)
--		goto fail_pb_init;
-+		return err;
  
- 	err = obex_mime_type_driver_register(&irmc_driver);
- 	if (err < 0)
-@@ -526,7 +526,7 @@ fail_irmc_reg:
- 	obex_mime_type_driver_unregister(&irmc_driver);
- fail_mime_irmc:
- 	phonebook_exit();
--fail_pb_init:
+-	*err = 0;
+-
+ 	mas = g_new0(struct mas_session, 1);
+ 
++	*err = messages_connect(&mas->backend_data);
++	if (*err < 0)
++		goto failed;
 +
- 	return err;
+ 	manager_register_session(os);
+ 
+ 	return mas;
++
++failed:
++	g_free(mas);
++
++	return NULL;
  }
  
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 61e7e42..c4df37f 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -1090,7 +1090,7 @@ static int pbap_init(void)
+ static void mas_disconnect(struct obex_session *os, void *user_data)
+@@ -121,6 +129,7 @@ static void mas_disconnect(struct obex_session *os, void *user_data)
+ 	DBG("");
  
- 	err = phonebook_init();
- 	if (err < 0)
--		goto fail_pb_init;
-+		return err;
+ 	manager_unregister_session(os);
++	messages_disconnect(mas->backend_data);
  
- 	err = obex_mime_type_driver_register(&mime_pull);
- 	if (err < 0)
-@@ -1118,7 +1118,7 @@ fail_mime_list:
- 	obex_mime_type_driver_unregister(&mime_pull);
- fail_mime_pull:
- 	phonebook_exit();
--fail_pb_init:
-+
- 	return err;
+ 	mas_clean(mas);
  }
+@@ -178,6 +187,7 @@ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+ {
+ 	const char *name;
+ 	uint8_t *nonhdr;
++	struct mas_session *mas = user_data;
  
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index a000b36..0575ab1 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -353,12 +353,12 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
- 
- 	conn = obex_dbus_get_connection();
- 	if (conn == NULL)
--		goto failed;
-+		return -EPERM;
- 
- 	msg = dbus_message_new_method_call(SYNCE_BUS_NAME, SYNCE_PATH,
- 				SYNCE_SERVER_INTERFACE, "Connect");
- 	if (!msg)
--		goto failed;
-+		return -EPERM;
- 
- 	dbus_message_iter_init_append(msg, &iter);
- 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-@@ -387,7 +387,7 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
- 	if (!dbus_connection_send_with_reply(conn, msg, &call, -1)) {
- 		error("D-Bus call to %s failed.", SYNCE_SERVER_INTERFACE);
- 		dbus_message_unref(msg);
--		goto failed;
-+		return -EPERM;
+ 	if (OBEX_ObjectGetNonHdrData(obj, &nonhdr) != 2) {
+ 		error("Set path failed: flag and constants not found!");
+@@ -193,7 +203,7 @@ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+ 		return -EBADR;
  	}
  
- 	dbus_pending_call_set_notify(call, connect_cb, context, NULL);
-@@ -396,9 +396,6 @@ static ssize_t synce_read(void *object, void *buf, size_t count,
- 	dbus_message_unref(msg);
- 
- 	return -EAGAIN;
--
--failed:
--	return -EPERM;
+-	return 0;
++	return messages_set_folder(mas->backend_data, name, nonhdr[0] & 0x01);
  }
  
- static ssize_t synce_write(void *object, const void *buf, size_t count)
+ static void *any_open(const char *name, int oflag, mode_t mode,
+diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
+index 7b2e1a1..3b5c98e 100644
+--- a/plugins/messages-dummy.c
++++ b/plugins/messages-dummy.c
+@@ -27,11 +27,17 @@
+ 
+ #include <errno.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #include "messages.h"
+ 
+ static char *root_folder = NULL;
+ 
++struct session {
++	char *cwd;
++	char *cwd_absolute;
++};
++
+ int messages_init(void)
+ {
+ 	char *tmp;
+@@ -60,14 +66,26 @@ void messages_exit(void)
+ 	root_folder = NULL;
+ }
+ 
+-int messages_connect(void **session)
++int messages_connect(void **s)
+ {
+-	*session = 0;
++	struct session *session;
++
++	session = g_new0(struct session, 1);
++	session->cwd = g_strdup("");
++	session->cwd_absolute = g_strdup(root_folder);
++
++	*s = session;
++
+ 	return 0;
+ }
+ 
+-void messages_disconnect(void *session)
++void messages_disconnect(void *s)
+ {
++	struct session *session = s;
++
++	g_free(session->cwd);
++	g_free(session->cwd_absolute);
++	g_free(session);
+ }
+ 
+ int messages_set_notification_registration(void *session,
+@@ -78,9 +96,50 @@ int messages_set_notification_registration(void *session,
+ 	return -EINVAL;
+ }
+ 
+-int messages_set_folder(void *session, const char *name, gboolean cdup)
++int messages_set_folder(void *s, const char *name, gboolean cdup)
+ {
+-	return -EINVAL;
++	struct session *session = s;
++	char *newrel = NULL;
++	char *newabs;
++	char *tmp;
++
++	if (name && (strchr(name, '/') || strcmp(name, "..") == 0))
++		return -EBADR;
++
++	if (cdup) {
++		if (session->cwd[0] == 0)
++			return -ENOENT;
++
++		newrel = g_path_get_dirname(session->cwd);
++
++		/* We use empty string for indication of the root directory */
++		if (newrel[0] == '.' && newrel[1] == 0)
++			newrel[0] = 0;
++	}
++
++	tmp = newrel;
++	if (!cdup && (!name || name[0] == 0))
++		newrel = g_strdup("");
++	else
++		newrel = g_build_filename(newrel ? newrel : session->cwd, name,
++				NULL);
++	g_free(tmp);
++
++	newabs = g_build_filename(root_folder, newrel, NULL);
++
++	if (!g_file_test(newabs, G_FILE_TEST_IS_DIR)) {
++		g_free(newrel);
++		g_free(newabs);
++		return -ENOENT;
++	}
++
++	g_free(session->cwd);
++	session->cwd = newrel;
++
++	g_free(session->cwd_absolute);
++	session->cwd_absolute = newabs;
++
++	return 0;
+ }
+ 
+ int messages_get_folder_listing(void *session,
 -- 
 1.7.4.1
 
