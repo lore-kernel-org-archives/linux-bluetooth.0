@@ -1,131 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-From: Steven Li <Steven.Li@Atheros.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>, Bluettooth Linux
-	<linux-bluetooth@vger.kernel.org>, Haijun Liu <Haijun.Liu@Atheros.com>, Hong
- Fan <Hong.Fan@Atheros.com>, Vic Wei <Vic.Wei@Atheros.com>, "Jack
- Chen(Taipei)" <Sheng-Kuan.Chen@Atheros.com>, Robert Chang
-	<Robert.Chang@Atheros.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>
-Date: Thu, 26 May 2011 16:46:13 +0800
-Subject: RE: Bluetooth USB device keeps same PID/VID after downloading the
- patch and radio table
-Message-ID: <6AAC4214B9104E409FF4885ACB62A96101A78ADA81@SHEXMB-01.global.atheros.com>
-Content-Type: text/plain; charset="utf-8"
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>, <padovan@profusion.mobi>,
+	<luiz.dentz@gmail.com>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix auth_complete_evt for legacy units
+Date: Thu, 26 May 2011 10:46:48 +0200
+Message-ID: <1306399608-10595-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsOg0KDQo+IHdoeSBkbyB5b3Ugd2FudCB0aGlzIGF0IGFsbC4gWW91IHJ1biBhIGRp
-ZmZlcmVudCBwcm90b2NvbCB3aXRoIGRpZmZlcmVudA0KPiBlbmRwb2ludHMgb24gdGhlIGRldmlj
-ZSBpbiBERlUgbW9kZSBhbmQgb24gdGhlIGRldmljZSBpbiBIOjIgbW9kZS4NCg0KU29ycnksIEkg
-bWFkZSBhIG1pc3Rha2UgaW4gdGhlIHN1YmplY3Qgb2YgdGhpcyBtYWlsIHRocmVhZC4NClRoZSAi
-Qmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIERGVSIuDQogc2hv
-dWxkIGJlICIgQmx1ZXRvb3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIGRv
-d25sb2FkaW5nIHRoZSBwYXRjaCBhbmQgcmFkaW8gdGFibGUiLg0KDQpBcyB0byB0aGUgQXRoZXJv
-cyAzMDExIGNoaXAuICB5ZXMsIGl0IHVzZXMgREZVIG1vZGUgdG8gZG93bmxvYWQgdGhlIGZpcm13
-YXJlLg0KU28gdGhlcmUgYXJlIGRpZmZlcmVudCBwcm90b2NvbHMgd2l0aCBkaWZmZXJlbnQgZW5k
-cG9pbnRzIG9uIHRoZSBkZXZpY2UuDQoNCkJ1dCBub3csIHdlIGFyZSBnb2luZyB0byB1cHN0cmVh
-bSBvdXIgbmV3IEF0aGVyb3MgMzAxMiBjaGlwIGFuZCB0aGluZ3MgYXJlIG5vdCBsaWtlIHRoYXQu
-DQpUaGUgQXRoZXJvcyAzMDEyIGNoaXAgaXMgYSBuYXRpdmUgYmx1ZXRvb3RoIGRldmljZSwgZXZl
-biB3aXRob3V0IGRvd25sb2FkaW5nIHBhdGNoIGFuZCByYWRpbyB0YWJsZS4NClRoZSBwYXRjaCBh
-bmQgcmFkaW8gdGFibGUgYXJlIHVzZWQgdG8gZml4IHRob3NlIGJ1Z3MgZm91bmQgYWZ0ZXIgY2hp
-cCBzaGlwcGluZy4gIFNvIHdpdGggdGhpcyBkZXNpZ24sIHRoZSBBdGhlcm9zIDMwMTIgY2hpcA0K
-IGFsd2F5cyBrZWVwcyBzYW1lIFBJRC9WSUQgZXZlbiBhZnRlciBkb3dubG9hZGluZyB0aGUgcGF0
-Y2ggYW5kIHJhZGlvIHRhYmxlLg0KDQpUaGF0IGNvbWVzIG91dCBvdXIgY29uY2VybiB0byB0aGUg
-YnR1c2IgZHJpdmVyLg0KDQoNCg0KQmVzdCBSZWdhcmRzLA0KU3RldmVuLA0KDQoNCj4gLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86bWFy
-Y2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogVGh1cnNkYXksIE1heSAyNiwgMjAxMSAxMDo0NyBB
-TQ0KPiBUbzogU3RldmVuIExpDQo+IENjOiBHdXN0YXZvIEYuIFBhZG92YW47IEJsdWV0dG9vdGgg
-TGludXg7IEhhaWp1biBMaXU7IEhvbmcgRmFuOyBWaWMgV2VpOyBKYWNrDQo+IENoZW4oVGFpcGVp
-KTsgUm9iZXJ0IENoYW5nOyBMdWlzIFIuIFJvZHJpZ3Vleg0KPiBTdWJqZWN0OiBSZTogQmx1ZXRv
-b3RoIFVTQiBkZXZpY2Uga2VlcHMgc2FtZSBQSUQvVklEIGFmdGVyIERGVQ0KPiANCj4gSGkgU3Rl
-dmVuLA0KPiANCj4gPiBIZXJlIGlzIHN0ZXZlbiBmcm9tIEF0aGVyb3MuICBHbGFkIHRvIGNvbnRh
-Y3QgeW91IGhlcmUuIHdlIGhhdmUgc29tZQ0KPiBjb25jZXJucyB0byB0aGUgYnR1c2IgZGV2aWNl
-IGRyaXZlci4NCj4gPiBQcmVzZW50IFVTQiBCbHVldG9vdGggaW1wbGVtZW50YXRpb24gaW4gTGlu
-dXggaGFzIHNvbWUgbGltaXRhdGlvbnMuIE1hbnkNCj4gdmVuZG9ycyBuZWVkIHRvIGxvYWQgcGF0
-Y2ggYW5kIG90aGVyIHNwZWNpZmljIG9wZXJhdGlvbnMgZHVyaW5nIGRldmljZQ0KPiBwcm9iZSBv
-ciBkaXNjb25uZWN0IHRvIHRoZWlyIEJsdWV0b290aCBkZXZpY2UsIGJ1dCBidHVzYiBkcml2ZXIg
-Z2l2ZXMNCj4gbGltaXRhdGlvbiB0byB0aGlzIGJlaGF2aW9yLiAgSXQgbmVlZHMgdG8gYWRkIHRo
-ZSBCbHVldG9vdGggZGV2aWNlIFBJRC9WSUQgaW50bw0KPiB0aGUgYnR1c2IgYmxhY2tsaXN0LCBh
-bmQgdXNlIHRoZSB2ZW5kb3Igc3BlY2lmaWMgZHJpdmVyIHRvIGxvYWQgZmlybXdhcmUuIEJ5DQo+
-IHRoaXMsIGl0IGNhdXNlcyB0aGUgQmx1ZXRvb3RoIGRldmljZSAiTVVTVCIgaGF2ZSB0d28gUElE
-L1ZJRHMgaW4gTGludXguICBCdXQNCj4gb24gd2luZG93cyBwbGF0Zm9ybSwgdGhlIGRldmljZSBj
-YW4gYWx3YXlzIGtlZXAgb25lIHNhbWUgUElEL1ZJRC4gIEl0IGlzDQo+IGhhcmQgZm9yIHVzIHRv
-IGhhbmRsZSB0aGlzIGlzc3VlIHdpdGggY3VycmVudCBidHVzYiBkZXNpZ24uDQo+ID4gTW9yZW92
-ZXIgaW4gb3VyIEF0aGVyb3MgMzAxMiBjaGlwLCB3ZSBhbHNvIG5lZWQgdG8gc3dpdGNoIHRoZSAz
-MDEyIGNoaXANCj4gYmV0d2VlbiAibm9ybWFsIiBtb2RlIGFuZCAicHJlLWJvb3QiIG1vZGUgZHVy
-aW5nIFBDIHJlYm9vdCwgIHdpdGgNCj4gY3VycmVudCBidHVzYiBkZXNpZ24sIHdlIGhhdmUgdG8g
-bWFrZSBjaGFuZ2VzIGluIGJ0dXNiLmMgZGlyZWN0bHksIGJ1dCBpdCBpcw0KPiBvdXIgY2hpcCBz
-cGVjaWZpYyByZXF1aXJlbWVudHMuICBUaGVyZWZvcmUsIHdl4oCZZCBsaWtlIHRvIHByb3Bvc2Ug
-c29tZQ0KPiBtZXRob2RzIHRvIG1ha2UgdGhlIEJsdWV0b290aCBkZXZpY2UgaGFzIG9ubHkgb25l
-IFBJRC9WSUQgYnkgcHJvcGVyDQo+IGJ0dXNiIG1vZGlmaWNhdGlvbiBhbmQgYWxzbyBmb3Igb3Ro
-ZXIgdmVuZG9yIGV4dGVuc2lvbnMgc3VjaCBhcyBtb2RlIHN3aXRjaC4NCj4gPg0KPiA+IEN1cnJl
-bnRseSwgd2UgaGF2ZSB0aHJlZSBwcm9wb3NhbHMuIEFuZCBJIGF0dGFjaGVkIG91ciByb3VnaCBw
-YXRjaGVzIGZvcg0KPiB0aGVzZSB0aHJlZSBwcm9wb3NhbHMuDQo+ID4gVGhleSBhcmUgdG90YWxs
-eSBub3QgZm9ybWFsLCBJIGF0dGFjaGVkIHRoZW0ganVzdCB3YW50IHRvIG1ha2UgeW91IGVhc3kg
-dG8NCj4gdW5kZXJzdGFuZC4NCj4gPg0KPiA+IEFuZCBmcm9tIGhlcmUsIExldCBtZSBleHBsYWlu
-IG1vcmUgb2YgIHRoZXNlIHByb3Bvc2FsIG9uZSBieSBvbmUuDQo+ID4NCj4gPiAjIFByb3Bvc2Fs
-IDEuDQo+ID4gVGhpcyBvcHRpb24gY291bGQgYmUgcmVmZXIgdG8gd2hhdCBpdOKAmXMgd29ya2lu
-ZyBmb3IgbG90cyBvZiBVQVJUIEJsdWV0b290aA0KPiBkZXZpY2VzIGluIExpbnV4Lg0KPiA+IE1h
-aW5seSwgdmVuZG9yIGRyaXZlciB3b3VsZCBiZSBidWlsdCBhcyBhbiBvYmplY3Qgb2YgYnR1c2Iu
-a28uIFRoaXMgc2hvdWxkDQo+IGJlIHNhbWUgYXMgdGhvc2UgVUFSVCBCbHVldG9vdGggZHJpdmVy
-cy4NCj4gPiBJbiBvdXIgY2FzZSwgYXRoM2sgd291bGQgYmUgYnVpbHQgYXMgYW4gb2JqZWN0IGZp
-bGUgYWNjb3JkaW5nIHRvDQo+IENPTkZJR19CVF9BVEgzSyBkZWZpbmUuDQo+ID4gVGhlbiBidHVz
-YiBrZXJuZWwgbW9kdWxlIHdpbGwgYmUgY29tcG9zZWQgb2YgYnR1c2IubyBhbmQgYXRoM2suby4g
-IFNvIGl0IGlzDQo+IGVhc3kgdG8gbWFrZSBvbmUgUElEL1ZJRCBkZXZpY2Ugd29yay4NCj4gPiBU
-aGlzIGNvbmNlcHQgd2FzIG9yaWVudGVkIGJ5IGhjaV91YXJ0IGRyaXZlci4gIEl0IGNhbiBqdW1w
-IHRvIGluZGl2aWR1YWwNCj4gZW50cnkgZnVuY3Rpb24gYmFzZWQgb24gZGlmZmVyZW50IElELg0K
-PiA+IEFuZCB0aGluZ3MgbGlrZSBtb2RlIHN3aXRjaCBhbHNvIGNvdWxkIGJlIGhhbmRsZWQgYnkg
-anVzdCBhZGRpbmcgZnVuY3Rpb24NCj4gbGlrZSBzd2l0Y2hfbW9kZSgpIGluIGF0aDNrLmMuDQo+
-ID4NCj4gPiAjIFByb3Bvc2FsIDIuDQo+ID4gVGhpcyBvcHRpb24gaXMgdG8gZXhwb3J0IGJ0dXNi
-IGNvbW1vbiBmdW5jdGlvbnMsIGFuZCB2ZW5kb3IgZHJpdmVyIChmb3INCj4gZXhhbXBsZSBvdXIg
-YXRoM2spIGNhbiBiZSB0YWtlbiBhcyB0aGUgZXh0ZW5zaW9uIG9mIGJ0dXNiLg0KPiA+ICwgYW5k
-IGl0IGNhbiBmaXJzdCBkb3dubG9hZHMgdGhlIGZpcm13YXJlIGFuZCB0aGVuIHVzZSB0aG9zZSBm
-dW5jdGlvbnMNCj4gZXhwb3J0ZWQgaW4gYnR1c2IgZHJpdmVyDQo+ID4gdG8gc2V0dXAgdGhlIGhj
-aSBCbHVldG9vdGggZGV2aWNlLiAgTW9yZW92ZXIgaWYgaXQgaXMgcG9zc2libGUsIHdlIGFyZSBh
-bHNvDQo+IHByb3Bvc2UgdG8gcmVmaW5lIHRoZSBidHVzYi5jIGFuZCBzcGxpdCB0aGUgYnR1c2Iu
-YyB0byBidHVzYl9jb3JlLmMgYW5kDQo+IGJ0dXNiX2dlbmVyaWMuYywNCj4gPiBJbiB0aGUgYnR1
-c2JfY29yZS5jLiBJdCBpbmNsdWRlcyBhbGwgdGhlICBCbHVldG9vdGggdXNiIGNvbW1vbiBvcGVy
-YXRpb25zDQo+IGFuZCB0aGVzZSBCbHVldG9vdGggdXNiIGZ1bmN0aW9ucyB3aWxsIGJlIGV4cG9y
-dGVkLA0KPiA+IGFuZCB0aGUgYnR1c2JfZ2VuZXJpYy5jIGlzIHRoZSByZWFsIGdlbmVyaWMgQmx1
-ZXRvb3RoIGRyaXZlciByZW1haW5zDQo+IHN1cHBvcnQgYWxsIGN1cnJlbnQgQmx1ZXRvb3RoIGRl
-dmljZSAsd2hpY2ggdXNlcyB0aGUgYnR1c2JfY29yZSBmdW5jdGlvbnMuDQo+ID4gQW5kIHZlbmRv
-ciBkcml2ZXIgY2FuIGFsc28gY2FsbCB0aG9zZSB1c2IgY29tbW9uIG9wZXJhdGlvbnMgaW4gdGhl
-DQo+IGJ0dXNiX2NvcmUuYy4NCj4gPiBXaXRoIHRoaXMgcHJvcG9zYWwsIFNpbmNlIHRoZSBhdGgz
-ayBkcml2ZXIgYXJlIHRoZSBvbmx5IG93bmVyIG9mIHRoZQ0KPiBibHVldG9vdGggZGV2aWNlLCBv
-bmx5IG9uZSBQSUQvVklEIGlzIG5lY2Vzc2FyeS4NCj4gPiBBbmQgaXQgaXMgdmVyeSBlYXN5IHRv
-IGhhbmRsZSB0aGUgbW9kZSBzd2l0Y2ggY2FzZSBpbiBpdHNlbGYgZWl0aGVyLiBQbGVhc2UNCj4g
-Y2hlY2sgYnR1c2JfYXRoM2tfMi5wYXRjaCBmb3IgZGV0YWlsLg0KPiA+DQo+ID4gIyBQcm9wb3Nh
-bCAzLg0KPiA+IFRoaXMgb3B0aW9uIGlzIHRvIGFkZCAicXVpcmsgZGV2aWNlIiB0byBidHVzYiBk
-cml2ZXIuIFdlIGZvdW5kIGFjdHVhbGx5IHlvdQ0KPiBhZGRlZCBsb3RzIG9mIHNvLWNhbGxlZCDi
-gJxxdWlya+KAnSBpbXBsZW1lbnRhdGlvbiBpbiBidHVzYiBkcml2ZXIgZm9yIG1hbnkNCj4gdmVu
-ZG9ycy4NCj4gPiBodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvP3A9bGludXgva2VybmVsL2dpdC9uZXh0
-L2xpbnV4LQ0KPiBuZXh0LmdpdDthPWNvbW1pdDtoPWNmZWI0MTQ1MzdiMWQ3YzIzYmEyMDJmMTk4
-ZmE0MTU0Y2Q1YTQ4NTYNCj4gPiBWZW5kb3Igc3BlY2lmaWMgZHJpdmVyIGNhbiBjYWxsIGJ0dXNi
-X3JlZ2lzdGVyX3F1aXJrX2RldmljZSgpIGZ1bmN0aW9uIHRvDQo+IHJlZ2lzdGVyIGl0c2VsZiB0
-byB0aGUgYnR1c2IgZHJpdmVyLg0KPiA+IFNvIGR1cmluZyB0aGUgZGV2aWNlIHByb2JlLCB0aGUg
-YnR1c2Igd2lsbCB0cnkgdG8gbWF0Y2ggdGhlIGRldmljZSBpZCwgYW5kIGlmDQo+IGl0IGlzIGEg
-4oCccXVpcmvigJ0gZGV2aWNlLCBpdCB3aWxsIGNhbGwNCj4gPiB0aGUg4oCccXVpcmvigJ0gZGV2
-aWNl4oCZcyBzcGVjaWZpYyBmdW5jdGlvbiBmaXJzdC4gIEV2ZXJ5IHZlbmRvciBjYW4gdXNlIHRo
-aXMgcXVpcmsNCj4gdG8gZG93bmxvYWQgdGhlaXIgZmlybXdhcmUgYW5kIGtlZXAgdGhlIHNhbWUg
-UElEL1ZJRCB3aXRoIHByb3BlciBjb2RlcyBpbg0KPiBidHVzYi5jLg0KPiA+IFRoaXMgcHJvcG9z
-YWwgaXMgYWxzbyBhYmxlIHRvIGhhbmRsZSB0aGUgbW9kZSBzd2l0Y2ggY2FzZS4NCj4gPg0KPiA+
-IFBsZWFzZSBnaXZlIHlvdXIgY29tbWVudHMgYW5kIHN1Z2dlc3Rpb24gZm9yIG91ciBwcm9wb3Nh
-bHMuDQo+ID4gV2UgYXJlIGhvcGluZyB0byBtYWtlIG9uZSBQSUQvVklEIHdvcmsgYW5kIGNvbnRy
-aWJ1dGUgdG8gdGhlDQo+IGNvbW11bml0eS4NCj4gDQo+IHdoeSBkbyB5b3Ugd2FudCB0aGlzIGF0
-IGFsbC4gWW91IHJ1biBhIGRpZmZlcmVudCBwcm90b2NvbCB3aXRoIGRpZmZlcmVudA0KPiBlbmRw
-b2ludHMgb24gdGhlIGRldmljZSBpbiBERlUgbW9kZSBhbmQgb24gdGhlIGRldmljZSBpbiBIOjIg
-bW9kZS4NCj4gDQo+IFNvIHlvdSBhY3R1YWxseSBoYXZlIGRpZmZlcmVudCBmdW5jdGlvbmFsaXR5
-LiBBbmQgSSBwZXJzb25hbGx5IGRvIG5vdA0KPiBjYXJlIHdoYXQgV2luZG93cyBpcyBkb2luZy4g
-VGhpcyBpcyBMaW51eCwgc28gcGxlYXNlIGZvbGxvdyB3aGF0IHRoZQ0KPiBMaW51eCBjb21tdW5p
-dHkgZXhwZWN0IHlvdSB0byBkby4NCj4gDQo+IEFsc28gaW4gY2FzZSBvZiBidHVzYiwgeW91IGNh
-biB1c2UgdGhlIEJsdWV0b290aCBTSUcgKGFuZCBmb3IgdGhhdA0KPiBtYXR0ZXIgVVNCIFNJRykg
-ZGVmaW5lZCBpbnRlcmZhY2UgaWRlbnRpZmllcnMuIFRoZSBidHVzYiBkcml2ZXIgZG9lcyBub3QN
-Cj4gbWF0Y2ggYnkgZGVmYXVsdCB0byBWSUQvUElELiBJdCB1c2VzIGEgc3RhbmRhcmQuIElmIHlv
-dSB3YW5uYSB1c2UgdGhlDQo+IHNhbWUgVklEL1BJRCBoZXJlLCB0aGVuIGRlY2xhcmUgdGhlIGlu
-dGVyZmFjZSBpZGVudGlmaWVycyBwcm9wZXJseSBhbmQNCj4gZXZlcnl0aGluZyB3b3VsZCB3b3Jr
-IG91dCBuaWNlbHkuDQo+IA0KPiBZb3UgZ3V5cyBpbnNpc3Qgb24gbHlpbmcgdG8gdGhlIFVTQiBz
-dWJzeXN0ZW0gYW5kIGJ5IHRoYXQgZmFjdCBtb3N0DQo+IGxpa2VseSB2aW9sYXRpbmcgdGhlIFVT
-QiBzdGFuZGFyZHMuIERvbid0IGRvIHRoYXQgYW5kIGV2ZXJ5dGhpbmcgd2lsbA0KPiB3b3JrIG91
-dCBvZiB0aGUgYm94IHdpdGggTGludXguIE5vIGV4dHJhIHBhdGNoZXMgb3IgbW9kaWZpY2F0aW9u
-IGZvcg0KPiBidHVzYiBuZWVkZWQuDQo+IA0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoN
-Cg==
+Legacy devices don't re-authenticate the link properly if a link key
+already exists.  Thus, don't update sec_level for this case even if
+hci_auth_complete_evt indicates success. Otherwise the sec_level will
+not reflect a real security on the link.
+
+Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+---
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |    2 +
+ net/bluetooth/hci_event.c        |   73 +++++++++++++++++++++-----------------
+ 3 files changed, 43 insertions(+), 33 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6c994c0..1af6754 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -313,6 +313,7 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data);
+ /* ----- HCI Connections ----- */
+ enum {
+ 	HCI_CONN_AUTH_PEND,
++	HCI_CONN_REAUTH_PEND,
+ 	HCI_CONN_ENCRYPT_PEND,
+ 	HCI_CONN_RSWITCH_PEND,
+ 	HCI_CONN_MODE_CHANGE_PEND,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3163330..e675402 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -548,6 +548,8 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
+ 							sizeof(cp), &cp);
++		if (conn->key_type != 0xff)
++			set_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
+ 	}
+ 
+ 	return 0;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f13ddbf..4b289a4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1460,51 +1460,58 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+-	if (conn) {
+-		if (!ev->status) {
++	if (!conn)
++		goto unlock;
++
++	if (!ev->status) {
++		if (!(conn->ssp_mode > 0 && hdev->ssp_mode > 0) &&
++				test_bit(HCI_CONN_REAUTH_PEND,	&conn->pend)) {
++			BT_INFO("re-auth of legacy device is not possible.");
++		} else {
+ 			conn->link_mode |= HCI_LM_AUTH;
+ 			conn->sec_level = conn->pending_sec_level;
+-		} else {
+-			mgmt_auth_failed(hdev->id, &conn->dst, ev->status);
+ 		}
++	} else {
++		mgmt_auth_failed(hdev->id, &conn->dst, ev->status);
++	}
+ 
+-		clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
++	clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
++	clear_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
+ 
+-		if (conn->state == BT_CONFIG) {
+-			if (!ev->status && hdev->ssp_mode > 0 &&
+-							conn->ssp_mode > 0) {
+-				struct hci_cp_set_conn_encrypt cp;
+-				cp.handle  = ev->handle;
+-				cp.encrypt = 0x01;
+-				hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT,
+-							sizeof(cp), &cp);
+-			} else {
+-				conn->state = BT_CONNECTED;
+-				hci_proto_connect_cfm(conn, ev->status);
+-				hci_conn_put(conn);
+-			}
++	if (conn->state == BT_CONFIG) {
++		if (!ev->status && hdev->ssp_mode > 0 && conn->ssp_mode > 0) {
++			struct hci_cp_set_conn_encrypt cp;
++			cp.handle  = ev->handle;
++			cp.encrypt = 0x01;
++			hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT, sizeof(cp),
++									&cp);
+ 		} else {
+-			hci_auth_cfm(conn, ev->status);
+-
+-			hci_conn_hold(conn);
+-			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++			conn->state = BT_CONNECTED;
++			hci_proto_connect_cfm(conn, ev->status);
+ 			hci_conn_put(conn);
+ 		}
++	} else {
++		hci_auth_cfm(conn, ev->status);
+ 
+-		if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend)) {
+-			if (!ev->status) {
+-				struct hci_cp_set_conn_encrypt cp;
+-				cp.handle  = ev->handle;
+-				cp.encrypt = 0x01;
+-				hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT,
+-							sizeof(cp), &cp);
+-			} else {
+-				clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
+-				hci_encrypt_cfm(conn, ev->status, 0x00);
+-			}
++		hci_conn_hold(conn);
++		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
++		hci_conn_put(conn);
++	}
++
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend)) {
++		if (!ev->status) {
++			struct hci_cp_set_conn_encrypt cp;
++			cp.handle  = ev->handle;
++			cp.encrypt = 0x01;
++			hci_send_cmd(hdev, HCI_OP_SET_CONN_ENCRYPT, sizeof(cp),
++									&cp);
++		} else {
++			clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend);
++			hci_encrypt_cfm(conn, ev->status, 0x00);
+ 		}
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-- 
+1.7.1
+
