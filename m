@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1306421410.2669.0.camel@novo.hadess.net>
-References: <1306419070.2010.244.camel@novo.hadess.net>
-	<1306421410.2669.0.camel@novo.hadess.net>
-Date: Thu, 26 May 2011 19:00:37 +0300
-Message-ID: <BANLkTikvWsxgN2C7yFyr8z3bmwvD9-h=1g@mail.gmail.com>
-Subject: Re: Another pass at adapter naming
+In-Reply-To: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
+References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
+Date: Thu, 26 May 2011 18:44:22 +0300
+Message-ID: <BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
+Subject: Re: [PATCH] Init telephony before adding HFP SDP records
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Daniel,
 
-On Thu, May 26, 2011 at 5:50 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Thu, 2011-05-26 at 15:11 +0100, Bastien Nocera wrote:
->> As discussed on IRC,
->>
->> inotify is now required, and we force hci0 (or the first device) to be
->> named after the pretty hostname.
->>
->> Note that the GATT call isn't removed, it's now done in
->> adapter_update_local_name().
->
-> As discussed again, removed the default adapter special casing, and
-> we'll just call hci0 with the pretty name.
+On Thu, May 26, 2011 at 4:58 PM, Daniel Örstadius
+<daniel.orstadius@gmail.com> wrote:
+> Please review.
 
-Does this means that the user cannot change permanently its adapter
-name when pretty hostname is available? In that case I would suggest
-having the stored name before pretty name otherwise if bluetoothd is
-restarted the adapter name will be reset to pretty hostname again.
+For telephony-maemo6 it should be enough to just call
+headset_server_init after state_changed/telephony_init.
 
+Now this won't work with telephony-ofono since it waits some network
+to be available before it signals it is ready, but I guess we can move
+to its call of telepfony_ready_ind to telephony_init since the
+features bits does not seems to depend in network availability.
+
+Regards,
 
 -- 
 Luiz Augusto von Dentz
