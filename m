@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH] Fix invalid read of memory in avdtp module
-Date: Fri, 27 May 2011 14:59:17 +0200
-Message-Id: <1306501157-13073-1-git-send-email-michalski.raf@gmail.com>
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH] Change append to prepend in media_transport_add
+Date: Fri, 27 May 2011 15:24:20 +0300
+Message-Id: <1306499060-10415-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed incorrect update of server->sessions GSlist in avdtp_exit.
-Previosly it was leading to invalid read of memory (l = l->next)
-(and possible memory leaks) since after invoking avdtp_unref in
-connection_lost, l pointer was not valid anymore (previously assignment
-l = l->next was used after invoking connection_lost in for loop).
 ---
- audio/avdtp.c |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
+ audio/transport.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index e6407bb..3b2a9ae 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -3857,9 +3857,15 @@ void avdtp_exit(const bdaddr_t *src)
- 	if (!server)
- 		return;
- 
--	for (l = server->sessions; l; l = l->next) {
-+	l = server->sessions;
-+	while (l) {
- 		struct avdtp *session = l->data;
- 
-+		l = l->next;
-+		/* value of l pointer should be updated before invoking
-+		 * connection_lost since it internally uses avdtp_unref
-+		 * which operates on server->session list as well
-+		 */
- 		connection_lost(session, -ECONNABORTED);
- 	}
+diff --git a/audio/transport.c b/audio/transport.c
+index 702bef2..85358c7 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -487,7 +487,7 @@ static void media_transport_add(struct media_transport *transport,
+ 					struct media_owner *owner)
+ {
+ 	DBG("Transport %s Owner %s", transport->path, owner->name);
+-	transport->owners = g_slist_append(transport->owners, owner);
++	transport->owners = g_slist_prepend(transport->owners, owner);
+ 	owner->transport = transport;
+ }
  
 -- 
-1.6.3.3
+1.7.4.1
 
