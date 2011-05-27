@@ -1,78 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
-References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
-	<BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
-Date: Fri, 27 May 2011 11:40:26 +0300
-Message-ID: <BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
-Subject: Re: [PATCH] Init telephony before adding HFP SDP records
-From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=00504502c032a7a7d404a43de335
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Fix possible buffer overflow when sending avdtp commands
+Date: Fri, 27 May 2011 11:37:24 +0300
+Message-Id: <1306485444-2110-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---00504502c032a7a7d404a43de335
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hi Luiz,
+Buffer size should be as big as the maximum of imtu and omtu, otherwise
+it may overflow when sending messages which are bigger then imtu.
+---
+ audio/avdtp.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-On Thu, May 26, 2011 at 6:44 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Daniel,
->
-> On Thu, May 26, 2011 at 4:58 PM, Daniel =D6rstadius
-> <daniel.orstadius@gmail.com> wrote:
->> Please review.
->
-> For telephony-maemo6 it should be enough to just call
-> headset_server_init after state_changed/telephony_init.
->
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 056b455..5659f38 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -61,6 +61,10 @@
+ 
+ #define MAX_SEID 0x3E
+ 
++#ifndef MAX
++# define MAX(x, y) ((x) > (y) ? (x) : (y))
++#endif
++
+ #define AVDTP_DISCOVER				0x01
+ #define AVDTP_GET_CAPABILITIES			0x02
+ #define AVDTP_SET_CONFIGURATION			0x03
+@@ -2408,7 +2412,7 @@ static void avdtp_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	if (session->state == AVDTP_SESSION_STATE_CONNECTING) {
+ 		DBG("AVDTP imtu=%u, omtu=%u", session->imtu, session->omtu);
+ 
+-		session->buf = g_malloc0(session->imtu);
++		session->buf = g_malloc0(MAX(session->imtu, session->omtu));
+ 		avdtp_set_state(session, AVDTP_SESSION_STATE_CONNECTED);
+ 
+ 		if (session->io_id)
+-- 
+1.7.5.2
 
-Thanks for the feedback, that seems like a much leaner solution.
-Attaching new patch.
-
-Regards,
-Daniel
-
---00504502c032a7a7d404a43de335
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Init-telephony-before-adding-the-HFP-SDP-record.patch"
-Content-Disposition: attachment;
-	filename="0001-Init-telephony-before-adding-the-HFP-SDP-record.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_go6vqmpc0
-
-RnJvbSA2ZWYyNTk2ZDFiNDJhYmQ2ZGI1MWQyMmE1Y2YyMjM5YTA2NjljYTEyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
-a2lhLmNvbT4KRGF0ZTogRnJpLCAyNyBNYXkgMjAxMSAxMToyNjoxOCArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIEluaXQgdGVsZXBob255IGJlZm9yZSBhZGRpbmcgdGhlIEhGUCBTRFAgcmVjb3JkCgpC
-eSBwYXRjaCBiOWQ4NWMwMDEwODk3N2IyNGFlOTFlYThlY2VkYjljZWZmZTZmNjQ4IHRoZSBpbml0
-aWFsaXphdGlvbgpvZiB0aGUgdGVsZXBob255IHN1YnN5c3RlbSBpcyBkZWxheWVkIGluIHRoZSBi
-bHVldG9vdGhkIHN0YXJ0dXAKcHJvY2VkdXJlLiBBcyBhIHJlc3VsdCB0aGUgU3VwcG9ydGVkRmVh
-dHVyZXMgYml0bWFwIGhhcyBub3QgYmVlbiBzZXQKd2hlbiBjcmVhdGluZyB0aGUgSEZQIFNEUCBy
-ZWNvcmQuIFRoaXMgcGF0Y2ggY2hhbmdlcyB0aGUgb3JkZXIgb2YKdGhlIHRlbGVwaG9ueSBpbml0
-aWFsaXphdGlvbiAodmlhIHRoZSBzdGF0ZV9jaGFuZ2VkIGZ1bmN0aW9uKSBhbmQKdGhlIHJlZ2lz
-dHJhdGlvbiBvZiB0aGUgcmVjb3JkLCBzbyB0aGF0IGl0IGdldHMgdGhlIHJpZ2h0IHZhbHVlLgoK
-QWx0aG91Z2ggdGhlIGNvcnJlc3BvbmRpbmcgYml0IGluICtCUlNGIGlzIGNvcnJlY3RseSBzZXQs
-IHRoZQptaXNzaW5nIGJpdCBmb3IgdGhlICJUaHJlZS13YXkgY2FsbGluZyIgZmVhdHVyZSBpbiB0
-aGUgU0RQIHJlY29yZApjYXVzZXMgc29tZSBoZWFkc2V0cyBub3QgdG8gc2VuZCBBVCtDSExEPT8g
-aW4gY2VydGFpbiBzaXR1YXRpb25zLgpUaGlzIHJlc3VsdHMgaW4gZmFpbGVkIGNvbm5lY3Rpb25z
-IHNpbmNlIEJsdWVaIGRvZXMgbm90IGVudGVyIHRoZQoiY29ubmVjdGVkIiBzdGF0ZSBvbiB0aGUg
-aGVhZHNldCBpbnRlcmZhY2UgYmVmb3JlIHRoYXQgY29tbWFuZCBpcwpyZWNlaXZlZCwgaWYgdGhl
-IGZlYXR1cmUgaXMgc3VwcG9ydGVkIGJ5IGJvdGggc2lkZXMuCi0tLQogYXVkaW8vbWFuYWdlci5j
-IHwgICAgNiArKystLS0KIDEgZmlsZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0
-aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL21hbmFnZXIuYyBiL2F1ZGlvL21hbmFnZXIuYwpp
-bmRleCAzNTE4MTM3Li45MTFhZjQ1IDEwMDY0NAotLS0gYS9hdWRpby9tYW5hZ2VyLmMKKysrIGIv
-YXVkaW8vbWFuYWdlci5jCkBAIC05MDksMTUgKzkwOSwxNSBAQCBzdGF0aWMgaW50IGhlYWRzZXRf
-c2VydmVyX3Byb2JlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAlpZiAoIWFkcCkKIAkJ
-cmV0dXJuIC1FSU5WQUw7CiAKKwlidGRfYWRhcHRlcl9yZWdpc3Rlcl9wb3dlcmVkX2NhbGxiYWNr
-KGFkYXB0ZXIsIHN0YXRlX2NoYW5nZWQpOworCXN0YXRlX2NoYW5nZWQoYWRhcHRlciwgVFJVRSk7
-CisKIAllcnIgPSBoZWFkc2V0X3NlcnZlcl9pbml0KGFkcCk7CiAJaWYgKGVyciA8IDApIHsKIAkJ
-YXVkaW9fYWRhcHRlcl91bnJlZihhZHApOwogCQlyZXR1cm4gZXJyOwogCX0KIAotCWJ0ZF9hZGFw
-dGVyX3JlZ2lzdGVyX3Bvd2VyZWRfY2FsbGJhY2soYWRhcHRlciwgc3RhdGVfY2hhbmdlZCk7Ci0J
-c3RhdGVfY2hhbmdlZChhZGFwdGVyLCBUUlVFKTsKLQogCXJldHVybiAwOwogfQogCi0tIAoxLjYu
-MC40Cgo=
---00504502c032a7a7d404a43de335--
