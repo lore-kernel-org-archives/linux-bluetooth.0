@@ -1,43 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
+In-Reply-To: <BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
 References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
 	<BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
-	<BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
-Date: Fri, 27 May 2011 13:26:28 +0300
-Message-ID: <BANLkTinYb=i9iYNR0Uhd7YG84jdGht2gNg@mail.gmail.com>
+Date: Fri, 27 May 2011 11:40:26 +0300
+Message-ID: <BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
 Subject: Re: [PATCH] Init telephony before adding HFP SDP records
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary=00504502c032a7a7d404a43de335
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+--00504502c032a7a7d404a43de335
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 27, 2011 at 11:40 AM, Daniel Örstadius
-<daniel.orstadius@gmail.com> wrote:
-> Hi Luiz,
+Hi Luiz,
+
+On Thu, May 26, 2011 at 6:44 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Daniel,
 >
-> On Thu, May 26, 2011 at 6:44 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Daniel,
->>
->> On Thu, May 26, 2011 at 4:58 PM, Daniel Örstadius
->> <daniel.orstadius@gmail.com> wrote:
->>> Please review.
->>
->> For telephony-maemo6 it should be enough to just call
->> headset_server_init after state_changed/telephony_init.
->>
+> On Thu, May 26, 2011 at 4:58 PM, Daniel =D6rstadius
+> <daniel.orstadius@gmail.com> wrote:
+>> Please review.
 >
-> Thanks for the feedback, that seems like a much leaner solution.
-> Attaching new patch.
+> For telephony-maemo6 it should be enough to just call
+> headset_server_init after state_changed/telephony_init.
+>
 
-Looks much better, shall I take care of fixing telephony-ofono or you
-already have a patch for it?
+Thanks for the feedback, that seems like a much leaner solution.
+Attaching new patch.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Regards,
+Daniel
+
+--00504502c032a7a7d404a43de335
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-Init-telephony-before-adding-the-HFP-SDP-record.patch"
+Content-Disposition: attachment;
+	filename="0001-Init-telephony-before-adding-the-HFP-SDP-record.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_go6vqmpc0
+
+RnJvbSA2ZWYyNTk2ZDFiNDJhYmQ2ZGI1MWQyMmE1Y2YyMjM5YTA2NjljYTEyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYW5pZWwgT3JzdGFkaXVzIDxkYW5pZWwub3JzdGFkaXVzQG5v
+a2lhLmNvbT4KRGF0ZTogRnJpLCAyNyBNYXkgMjAxMSAxMToyNjoxOCArMDMwMApTdWJqZWN0OiBb
+UEFUQ0hdIEluaXQgdGVsZXBob255IGJlZm9yZSBhZGRpbmcgdGhlIEhGUCBTRFAgcmVjb3JkCgpC
+eSBwYXRjaCBiOWQ4NWMwMDEwODk3N2IyNGFlOTFlYThlY2VkYjljZWZmZTZmNjQ4IHRoZSBpbml0
+aWFsaXphdGlvbgpvZiB0aGUgdGVsZXBob255IHN1YnN5c3RlbSBpcyBkZWxheWVkIGluIHRoZSBi
+bHVldG9vdGhkIHN0YXJ0dXAKcHJvY2VkdXJlLiBBcyBhIHJlc3VsdCB0aGUgU3VwcG9ydGVkRmVh
+dHVyZXMgYml0bWFwIGhhcyBub3QgYmVlbiBzZXQKd2hlbiBjcmVhdGluZyB0aGUgSEZQIFNEUCBy
+ZWNvcmQuIFRoaXMgcGF0Y2ggY2hhbmdlcyB0aGUgb3JkZXIgb2YKdGhlIHRlbGVwaG9ueSBpbml0
+aWFsaXphdGlvbiAodmlhIHRoZSBzdGF0ZV9jaGFuZ2VkIGZ1bmN0aW9uKSBhbmQKdGhlIHJlZ2lz
+dHJhdGlvbiBvZiB0aGUgcmVjb3JkLCBzbyB0aGF0IGl0IGdldHMgdGhlIHJpZ2h0IHZhbHVlLgoK
+QWx0aG91Z2ggdGhlIGNvcnJlc3BvbmRpbmcgYml0IGluICtCUlNGIGlzIGNvcnJlY3RseSBzZXQs
+IHRoZQptaXNzaW5nIGJpdCBmb3IgdGhlICJUaHJlZS13YXkgY2FsbGluZyIgZmVhdHVyZSBpbiB0
+aGUgU0RQIHJlY29yZApjYXVzZXMgc29tZSBoZWFkc2V0cyBub3QgdG8gc2VuZCBBVCtDSExEPT8g
+aW4gY2VydGFpbiBzaXR1YXRpb25zLgpUaGlzIHJlc3VsdHMgaW4gZmFpbGVkIGNvbm5lY3Rpb25z
+IHNpbmNlIEJsdWVaIGRvZXMgbm90IGVudGVyIHRoZQoiY29ubmVjdGVkIiBzdGF0ZSBvbiB0aGUg
+aGVhZHNldCBpbnRlcmZhY2UgYmVmb3JlIHRoYXQgY29tbWFuZCBpcwpyZWNlaXZlZCwgaWYgdGhl
+IGZlYXR1cmUgaXMgc3VwcG9ydGVkIGJ5IGJvdGggc2lkZXMuCi0tLQogYXVkaW8vbWFuYWdlci5j
+IHwgICAgNiArKystLS0KIDEgZmlsZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0
+aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL21hbmFnZXIuYyBiL2F1ZGlvL21hbmFnZXIuYwpp
+bmRleCAzNTE4MTM3Li45MTFhZjQ1IDEwMDY0NAotLS0gYS9hdWRpby9tYW5hZ2VyLmMKKysrIGIv
+YXVkaW8vbWFuYWdlci5jCkBAIC05MDksMTUgKzkwOSwxNSBAQCBzdGF0aWMgaW50IGhlYWRzZXRf
+c2VydmVyX3Byb2JlKHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlcikKIAlpZiAoIWFkcCkKIAkJ
+cmV0dXJuIC1FSU5WQUw7CiAKKwlidGRfYWRhcHRlcl9yZWdpc3Rlcl9wb3dlcmVkX2NhbGxiYWNr
+KGFkYXB0ZXIsIHN0YXRlX2NoYW5nZWQpOworCXN0YXRlX2NoYW5nZWQoYWRhcHRlciwgVFJVRSk7
+CisKIAllcnIgPSBoZWFkc2V0X3NlcnZlcl9pbml0KGFkcCk7CiAJaWYgKGVyciA8IDApIHsKIAkJ
+YXVkaW9fYWRhcHRlcl91bnJlZihhZHApOwogCQlyZXR1cm4gZXJyOwogCX0KIAotCWJ0ZF9hZGFw
+dGVyX3JlZ2lzdGVyX3Bvd2VyZWRfY2FsbGJhY2soYWRhcHRlciwgc3RhdGVfY2hhbmdlZCk7Ci0J
+c3RhdGVfY2hhbmdlZChhZGFwdGVyLCBUUlVFKTsKLQogCXJldHVybiAwOwogfQogCi0tIAoxLjYu
+MC40Cgo=
+--00504502c032a7a7d404a43de335--
