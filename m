@@ -1,98 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Date: Sun, 29 May 2011 14:26:41 +0200
-Subject: [PATCH v2] AVRCP TG now return REJECTED response
-Message-ID: <AC090B9732AB2B4DB7FF476E907FE66001310E5C72@dnce02.ent.ti.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <4DE073C2.40607@ethicstech.in>
+Date: Sat, 28 May 2011 09:32:10 +0530
+From: Siva kumar <sivakumar@ethicstech.in>
 MIME-Version: 1.0
+To: Jaikumar Ganesh <jaikumarg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: How to implement just works type ssp pairing in bluez
+References: <4DDA4FC9.3090302@ethicstech.in> <20110527112746.GB15238@dell.amr.corp.intel.com> <BANLkTin6co9=+exiZ=g6HVgj8NNwVcqe4w@mail.gmail.com>
+In-Reply-To: <BANLkTin6co9=+exiZ=g6HVgj8NNwVcqe4w@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AVRCP TG now return REJECTED response with error code==Invalid
-command for command with VENDOR-DEPENDED oper. code
-( fix for PTS certification )
----
- audio/control.c |   35 +++++++++++++++++++++++++++++++++++
- 1 files changed, 35 insertions(+), 0 deletions(-)
+Jaikumar Ganesh wrote:
+> Hi Siva:
+>
+> On Fri, May 27, 2011 at 4:27 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>   
+>> Hi Siva,
+>>
+>> On Mon, May 23, 2011, Siva kumar wrote:
+>>     
+>>>             I have two android phones, when i connect two phones
+>>> using bluetooth it generates passkey and displays it for our
+>>> conformation, once we conform, pairing takes place , i was able to
+>>> transmit and receive data via bluetooth. i want to change the
+>>> pairing process to "just works" of SSP. so that the phones connect
+>>> automatically without MITM protection. how to change the pairing
+>>> mode of SSP from numerical comparison
+>>>       
+>> There are two ways how to do this:
+>>
+>> 1. Make sure neither side requires MITM by setting the security level
+>> for each socket to low.
+>>
+>> 2. Set NoInputNoOutput as the IO capability for the agent on one or both
+>> sides (you can override the Android agents capability e.g. by doing your
+>> own CreatePairedDevice D-Bus method call).
+>>
+>> Johan
+>>     
+>
+>
+> Majority of Android phones don't use Bluez as the Bluetooth stack.
+> If your phone uses Bluez, what Johan said will work.
+> If not, post to the Android mailing lists as this is dedicated to Bluez.
+>
+>   
+> Hello Jaikumar,
+>   
+Android is based on linux, I think Majority of Android phones uses only 
+Bluez as the bluetooth stack, Can you please mention what are the other 
+Bluetooth stack used in majority of Android phones. So that many of us 
+like me can known about that.
 
-diff --git a/audio/control.c b/audio/control.c
-index 6238007..dd54f5e 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -80,6 +80,7 @@
- #define CTYPE_STABLE           0xC
- 
- /* opcodes */
-+#define OP_VENDORDEP   0x0
- #define OP_UNITINFO            0x30
- #define OP_SUBUNITINFO         0x31
- #define OP_PASSTHROUGH         0x7c
-@@ -127,6 +128,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+       uint8_t company_id[3];
-+       uint8_t pdu_id;
-+       uint8_t packet_type:2;
-+       uint8_t rsvd:6;
-+       uint16_t params_len;
-+       uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #elif __BYTE_ORDER == __BIG_ENDIAN
- 
- struct avctp_header {
-@@ -147,6 +158,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+       uint8_t company_id[3];
-+       uint8_t pdu_id;
-+       uint8_t rsvd:6;
-+       uint8_t packet_type:2;
-+       uint16_t params_len;
-+       uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #else
- #error "Unknown byte order"
- #endif
-@@ -493,6 +514,7 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
-        unsigned char buf[1024], *operands;
-        struct avctp_header *avctp;
-        struct avrcp_header *avrcp;
-+
-        int ret, packet_size, operand_count, sock;
- 
-        if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
-@@ -569,6 +591,19 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
-                        operands[1] = SUBUNIT_PANEL << 3;
-                DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
-                                "OP_UNITINFO" : "OP_SUBUNITINFO");
-+       } else if ( avrcp->opcode == OP_VENDORDEP ) {
-+               /* reply with REJECT msg with err. code == 0x0 
-+                * ( Invalid Command ) as defined in AVRCP spec ( 6.15.1 ) */
-+               struct avrcp_spec_avc_pdu *pdu_spec;
-+               pdu_spec = (void *) ( buf + sizeof(struct avctp_header) 
-+                                       + sizeof(struct avrcp_header) );
-+               pdu_spec->packet_type = 0;
-+               pdu_spec->rsvd = 0;
-+               pdu_spec->params[0] = 0; /* invalid command */
-+               pdu_spec->params_len = htons(1);
-+
-+               avctp->cr = AVCTP_RESPONSE;
-+               avrcp->code = CTYPE_REJECTED;
-        } else {
-                avctp->cr = AVCTP_RESPONSE;
-                avrcp->code = CTYPE_REJECTED;
--- 
-1.7.1
-
-
+Sivakumar
 
