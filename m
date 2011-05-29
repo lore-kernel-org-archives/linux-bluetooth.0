@@ -1,61 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 May 2011 21:57:52 +0300
+Date: Sun, 29 May 2011 21:48:59 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Clean nad simplify SAP server error printouts
-Message-ID: <20110529185525.GC32088@dell.ger.corp.intel.com>
-References: <1306403760-22254-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: Re: [PATCH v2] Add support of secure pin code in mgmt code
+Message-ID: <20110529184859.GB32088@dell.ger.corp.intel.com>
+References: <1306401315-10948-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306403760-22254-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1306401315-10948-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Waldek,
 
 On Thu, May 26, 2011, Waldemar Rymarkiewicz wrote:
-> -	DBG("Client has been authorized.");
-> +	info("Access has been granted.");
+> -	err = btd_event_request_pin(&dev->bdaddr, dba);
+> +	err = btd_event_request_pin(&dev->bdaddr, dba, 0);
 
-You should be very conservative with the use of info() instead of DBG().
-Essentially it should be reserved for some very fundamental core daemon
-events only, such as init and exit of bluetoothd. Plugins shouldn't
-really need to use it ever.
+Even though the mgmt protocol uses uint8_t from there upwards you should
+use gboolean, i.e. use FALSE instead of 0 here.
 
->  	if (conn) {
-> +		info("Another SAP connection already exists.");
+>  static int pincode_request_new(struct agent_request *req, const char *device_path,
+> -				dbus_bool_t numeric)
+> +				uint8_t secure)
 
-Same here (change to DBG)
+Since in the long run secure will map to a D-Bus message parameter, use
+dbus_bool_t for it here (just like numeric).
 
-> -	DBG("SAP incoming connection (sock %d) authorization.",
-> -				g_io_channel_unix_get_fd(io));
-> +	info("Authorizing incomming SAP connection from %s", dstaddr);
-
-And here.
-
-> @@ -1298,7 +1282,7 @@ static DBusMessage *get_properties(DBusConnection *c,
->  			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 >  
->  	connected = (conn->state == SAP_STATE_CONNECTED ||
-> -			conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
-> +				conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
->  	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN, &connected);
+>  	if (agent->request)
+>  		return -EBUSY;
+>  
+> +	secure = device_get_secure_pin(device);
 
-This looks like a coding style cleanup. Don't mix that with the logging
-changes (i.e. separate patch please). Usually having the word "and" in
-your commit message summary (or "nad" in this case ;) is a good
-indication that you might need to consider splitting up your patch.
+The agent_request_pincode function should get the secure parameter
+passed to it directly. It shouldn't need to poll device.c about it.
 
->  	if (!g_dbus_register_interface(connection, path, SAP_SERVER_INTERFACE,
-> -				server_methods, server_signals, NULL,
-> -				server, destroy_sap_interface)) {
-> +					server_methods, server_signals, NULL,
-> +					server, destroy_sap_interface)) {
->  		error("D-Bus failed to register %s interface",
-> -						SAP_SERVER_INTERFACE);
-> +							SAP_SERVER_INTERFACE);
+> diff --git a/src/device.c b/src/device.c
+> index 4ffc124..f4fb5c7 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -133,6 +133,8 @@ struct btd_device {
+>  	gboolean	paired;
+>  	gboolean	blocked;
+>  
+> +	uint8_t		secure_pin;
+> +
+>  	gboolean	authorizing;
+>  	gint		ref;
+>  };
 
-Same here.
+struct authentictation_req (device->authr) is the right place to store
+this value since it's bound is to the lifetime of the authentication
+request, whereas struct btd_device isn't. Also, as previously mentioned
+the type should be gboolean and not uint8_t.
 
 Johan
