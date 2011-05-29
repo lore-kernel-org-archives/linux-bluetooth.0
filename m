@@ -1,41 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 May 2011 22:04:31 +0300
+Date: Sun, 29 May 2011 21:57:52 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Remove obsolete code in hidd
-Message-ID: <20110529190431.GD32088@dell.ger.corp.intel.com>
-References: <1306419283.2010.245.camel@novo.hadess.net>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Clean nad simplify SAP server error printouts
+Message-ID: <20110529185525.GC32088@dell.ger.corp.intel.com>
+References: <1306403760-22254-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306419283.2010.245.camel@novo.hadess.net>
+In-Reply-To: <1306403760-22254-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Waldek,
 
-On Thu, May 26, 2011, Bastien Nocera wrote:
-> Heya,
-> 
-> This code has now been in the kernel for a while.
-> 
-> Cheers
+On Thu, May 26, 2011, Waldemar Rymarkiewicz wrote:
+> -	DBG("Client has been authorized.");
+> +	info("Access has been granted.");
 
-> From 3a22abd3eb4b8b428bb76069c46d5e8ac2cebb10 Mon Sep 17 00:00:00 2001
-> From: Bastien Nocera <hadess@hadess.net>
-> Date: Thu, 5 May 2011 19:41:07 +0100
-> Subject: [PATCH] Remove obsolete Sixaxis enablement in hidd
-> 
-> Seeing as this is now handled in the kernel.
-> ---
->  compat/hidd.c |   12 ------------
->  1 files changed, 0 insertions(+), 12 deletions(-)
+You should be very conservative with the use of info() instead of DBG().
+Essentially it should be reserved for some very fundamental core daemon
+events only, such as init and exit of bluetoothd. Plugins shouldn't
+really need to use it ever.
 
-Applied, thanks.
+>  	if (conn) {
+> +		info("Another SAP connection already exists.");
 
-In the future, I'd prefer if you could prefix patch email subjects with
-[PATCH] (easier for me to spot them) and send the patch inline instead
-of as an attachment (so I can use the same steps in mutt for applying
-all patches). git send-email would do both of these for you for free.
+Same here (change to DBG)
+
+> -	DBG("SAP incoming connection (sock %d) authorization.",
+> -				g_io_channel_unix_get_fd(io));
+> +	info("Authorizing incomming SAP connection from %s", dstaddr);
+
+And here.
+
+> @@ -1298,7 +1282,7 @@ static DBusMessage *get_properties(DBusConnection *c,
+>  			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+>  
+>  	connected = (conn->state == SAP_STATE_CONNECTED ||
+> -			conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
+> +				conn->state == SAP_STATE_GRACEFUL_DISCONNECT);
+>  	dict_append_entry(&dict, "Connected", DBUS_TYPE_BOOLEAN, &connected);
+
+This looks like a coding style cleanup. Don't mix that with the logging
+changes (i.e. separate patch please). Usually having the word "and" in
+your commit message summary (or "nad" in this case ;) is a good
+indication that you might need to consider splitting up your patch.
+
+>  	if (!g_dbus_register_interface(connection, path, SAP_SERVER_INTERFACE,
+> -				server_methods, server_signals, NULL,
+> -				server, destroy_sap_interface)) {
+> +					server_methods, server_signals, NULL,
+> +					server, destroy_sap_interface)) {
+>  		error("D-Bus failed to register %s interface",
+> -						SAP_SERVER_INTERFACE);
+> +							SAP_SERVER_INTERFACE);
+
+Same here.
 
 Johan
