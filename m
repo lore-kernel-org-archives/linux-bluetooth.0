@@ -1,140 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 May 2011 16:24:41 -0500
-From: David Fries <david@fries.net>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: akpm@linux-foundation.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-        linville@tuxdriver.com
-Subject: Re: [PATCH] rfcomm/core.c avoid dangling pointer, check session
- exists
-Message-ID: <20110530212441.GP3935@spacedout.fries.net>
-References: <20110521190253.GA24600@spacedout.fries.net>
- <20110530204852.GE2556@joana>
+Date: Mon, 30 May 2011 18:04:44 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Do not send SET_EVENT_MASK for 1.1 and
+ earlier devices
+Message-ID: <20110530210444.GH2556@joana>
+References: <1306484181-2615-1-git-send-email-ville.tervo@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110530204852.GE2556@joana>
+In-Reply-To: <1306484181-2615-1-git-send-email-ville.tervo@nokia.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 30, 2011 at 05:48:52PM -0300, Gustavo F. Padovan wrote:
-> Hi David,
+* Ville Tervo <ville.tervo@nokia.com> [2011-05-27 11:16:21 +0300]:
+
+> Some old hci controllers do not accept any mask so leave the
+> default mask on for these devices.
 > 
-> * David Fries <david@fries.net> [2011-05-21 14:02:53 -0500]:
+> < HCI Command: Set Event Mask (0x03|0x0001) plen 8
+>     Mask: 0xfffffbff00000000
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Set Event Mask (0x03|0x0001) ncmd 1
+>     status 0x12
+>     Error: Invalid HCI Command Parameters
 > 
-> > rfcomm_process_sessions is calling rfcomm_process_rx, but
-> > in this case the session is closed and freed leaving a
-> > dangling pointer that blows up when rfcomm_process_rx returns
-> > and rfcomm_process_dlcs is called with the now dangling session
-> > pointer.  Check to see if the entry is still in the list.
-> > 
-> > Signed-off-by: David Fries <David@Fries.net>
-> > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> > ---
-> > I sent out an ealier patch,
-> > Date: Mon, 21 Mar 2011 21:38:10 -0500
-> > Subject: [PATCH] rfcomm/core.c avoid dangling pointer, check session
-> > 
-> > That version added a return value to rfcomm_session_close to determine
-> > if the session was closed.  I thought this would be cleaner.
-> > 
-> > I can reproduce using blueman-manager on desktop, and Motorola S305 bluetooth
-> > headset, 2.6.39, but it can take a few attempts.  Start out with the
-> > desktop as the last device the S305 paired with.
-> > desktop, connect to the S305,
-> > S305, turn on
-> > desktop (connection fails)
-> > desktop (connection automatically comes up now that S305 is on)
-> > desktop disconnect S305
-> > desktop (kernel panic)
-> > 
-> > While rfcomm_process_sessions looks symmetrical,
-> > rfcomm_session_hold(s);
-> > rfcomm_process_rx
-> > rfcomm_process_dlcs
-> > rfcomm_session_put(s);
-> > 
-> > rfcomm_process_rx
-> > if (sk->sk_state == BT_CLOSED) {
-> >         if (!s->initiator)
-> >                 rfcomm_session_put(s);
-> >         rfcomm_session_close(s, sk->sk_err);
-> > 
-> > Which isn't symmetrical.  I don't know enough about the subsystem to
-> > know if there is a better cleaner way to fix this, or if my patch is
-> > the best solution.
-> > 
-> >  net/bluetooth/rfcomm/core.c |    6 ++++++
-> >  1 files changed, 6 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> > index c997393..ac47ef3 100644
-> > --- a/net/bluetooth/rfcomm/core.c
-> > +++ b/net/bluetooth/rfcomm/core.c
-> > @@ -1952,6 +1952,12 @@ static inline void rfcomm_process_sessions(void)
-> >  
-> >  		default:
-> >  			rfcomm_process_rx(s);
-> > +			/* The current session can be closed as part of rx
-> > +			 * in which case s is now dangling.  Check if it
-> > +			 * has been removed.
-> > +			 */
-> > +			if(n->prev != p)
-> > +				continue;
-> >  			break;
-> >  		}
-> 
-> I don't like this, it's not the proper fix. So I'm trying to figure out this
-> and fix it. Can you try this patch:
+> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+> ---
+>  net/bluetooth/hci_event.c |   18 ++++++++++--------
+>  1 files changed, 10 insertions(+), 8 deletions(-)
 
-Not without some explaination as to what it's trying to accomplish
-(other than crash my computer), it's just a single CPU system, so it
-isn't a very good test case for crashes in use after free anyway.
-s->sock has been released by sock_release, s has been freed by kfree
-(in rfcomm_session_del), which leaves s->sock-> completely dangling by
-now.  That's why I was using something other than s to determine if
-it's dangling, and looking to see if it was still in the list looked
-like the best way to me.
-
-I posted an earlier patch, 'Date: Mon, 21 Mar 2011 21:38:10 -0500'
-where I added a return value to to rfcomm_session_put, as another way
-to determine if s has been freed and now dangling.  The other question
-is why check BT_CLOSED outside of default?  It's only
-rfcomm_process_rx that will delete the session with something still
-holding on to it.
-
-I would rather see a fix where rfcomm_process_rx doesn't do the put
-which caused this situation.  Also, now that I look at it,
-rfcomm_process_rx is doing a close after it did a put, which means the
-entire close is dealing with a dangling pointer.  Looks to me like the
-order could be switched, pending the outcome of the propper fix.
-
-	if (sk->sk_state == BT_CLOSED) {
-		if (!s->initiator)
-			rfcomm_session_put(s);
-
-		rfcomm_session_close(s, sk->sk_err);
-	}
-
-> padovan bluetooth-next-2.6 $ git diff
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 5759bb7..75c58ed 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -1958,6 +1958,9 @@ static inline void rfcomm_process_sessions(void)
->                         break;
->                 }
->  
-> +               if (s->sock->sk->sk_state == BT_CLOSED)
-> +                       continue;
-> +
->                 rfcomm_process_dlcs(s);
->  
->                 rfcomm_session_put(s);
-> 
-> -- 
-> Gustavo F. Padovan
-> http://profusion.mobi
+Applied to bluetooth-2.6. Thanks all.
 
 -- 
-David Fries <david@fries.net>    PGP pub CB1EE8F0
-http://fries.net/~david/
+Gustavo F. Padovan
+http://profusion.mobi
