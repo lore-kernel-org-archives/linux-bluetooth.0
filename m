@@ -1,75 +1,240 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 May 2011 19:14:08 -0300
+Date: Mon, 30 May 2011 19:11:41 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>, luiz.dentz@gmail.com
-Subject: Re: [PATCH v2] Bluetooth: Fix auth_complete_evt for legacy units
-Message-ID: <20110530221408.GJ2556@joana>
-References: <1306399608-10595-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+To: Jaikumar Ganesh <jaikumar@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add BT_POWER L2CAP socket option.
+Message-ID: <20110530221141.GI2556@joana>
+References: <1306199164-28310-1-git-send-email-jaikumar@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306399608-10595-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1306199164-28310-1-git-send-email-jaikumar@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Jaikumar,
 
-* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-05-26 10:46:48 +0200]:
+* Jaikumar Ganesh <jaikumar@google.com> [2011-05-23 18:06:04 -0700]:
 
-> Legacy devices don't re-authenticate the link properly if a link key
-> already exists.  Thus, don't update sec_level for this case even if
-> hci_auth_complete_evt indicates success. Otherwise the sec_level will
-> not reflect a real security on the link.
+> Add BT_POWER socket option used to control the power
+> characteristics of the underlying ACL link. When the remote end
+> has put the link in sniff mode and the host stack wants to send
+> data we need need to explicitly exit sniff mode to work well with
+> certain devices (For example, A2DP on Plantronics Voyager 855).
+> However, this causes problems with HID devices.
 > 
-> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+> Hence, moving into active mode when sending data, irrespective
+> of who set the sniff mode has been made as a socket option. By
+> default, we will move into active mode. HID devices can set the
+> L2CAP socket option to prevent this from happening.
+> 
+> Currently, this has been implemented for L2CAP sockets. This has been
+> tested with incoming and outgoing L2CAP sockets for HID and A2DP.
+> 
+> Based on discussions on linux-bluetooth and patches submitted by
+> Andrei Emeltchenko.
+> 
+> Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
 > ---
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/hci_conn.c         |    2 +
->  net/bluetooth/hci_event.c        |   73 +++++++++++++++++++++-----------------
->  3 files changed, 43 insertions(+), 33 deletions(-)
+>  include/net/bluetooth/bluetooth.h |    8 ++++++++
+>  include/net/bluetooth/hci_core.h  |    2 +-
+>  include/net/bluetooth/l2cap.h     |    1 +
+>  net/bluetooth/hci_conn.c          |    9 ++++++---
+>  net/bluetooth/hci_core.c          |    4 ++--
+>  net/bluetooth/l2cap_core.c        |    5 +++++
+>  net/bluetooth/l2cap_sock.c        |   36 ++++++++++++++++++++++++++++++++++++
+>  7 files changed, 59 insertions(+), 6 deletions(-)
 > 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 4375043..af930a3 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -69,6 +69,13 @@ struct bt_security {
+>  #define BT_FLUSHABLE_OFF	0
+>  #define BT_FLUSHABLE_ON		1
+>  
+> +#define BT_POWER	9
+> +struct bt_power {
+> +	__u8 force_active;
+> +};
+> +#define BT_POWER_FORCE_ACTIVE_OFF 0
+> +#define BT_POWER_FORCE_ACTIVE_ON  1
+> +
+>  #define BT_INFO(fmt, arg...) printk(KERN_INFO "Bluetooth: " fmt "\n" , ## arg)
+>  #define BT_ERR(fmt, arg...)  printk(KERN_ERR "%s: " fmt "\n" , __func__ , ## arg)
+>  #define BT_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n" , __func__ , ## arg)
+> @@ -150,6 +157,7 @@ struct bt_skb_cb {
+>  	__u8 retries;
+>  	__u8 sar;
+>  	unsigned short channel;
+> +	__u8 force_active;
+>  };
+>  #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+>  
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 6c994c0..1af6754 100644
+> index 6c994c0..0747841 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -313,6 +313,7 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data);
->  /* ----- HCI Connections ----- */
->  enum {
->  	HCI_CONN_AUTH_PEND,
-> +	HCI_CONN_REAUTH_PEND,
->  	HCI_CONN_ENCRYPT_PEND,
->  	HCI_CONN_RSWITCH_PEND,
->  	HCI_CONN_MODE_CHANGE_PEND,
+> @@ -427,7 +427,7 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+>  int hci_conn_change_link_key(struct hci_conn *conn);
+>  int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+>  
+> -void hci_conn_enter_active_mode(struct hci_conn *conn);
+> +void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
+>  void hci_conn_enter_sniff_mode(struct hci_conn *conn);
+>  
+>  void hci_conn_hold_device(struct hci_conn *conn);
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index d09c9b1..942970d 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -302,6 +302,7 @@ struct l2cap_chan {
+>  	__u8		role_switch;
+>  	__u8		force_reliable;
+>  	__u8		flushable;
+> +	__u8		force_active;
+>  
+>  	__u8		ident;
+>  
 > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 3163330..e675402 100644
+> index 3163330..5195715 100644
 > --- a/net/bluetooth/hci_conn.c
 > +++ b/net/bluetooth/hci_conn.c
-> @@ -548,6 +548,8 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
->  		cp.handle = cpu_to_le16(conn->handle);
->  		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
->  							sizeof(cp), &cp);
-> +		if (conn->key_type != 0xff)
-> +			set_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
->  	}
+> @@ -497,7 +497,7 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
+>  	if (acl->state == BT_CONNECTED &&
+>  			(sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+>  		acl->power_save = 1;
+> -		hci_conn_enter_active_mode(acl);
+> +		hci_conn_enter_active_mode(acl, BT_POWER_FORCE_ACTIVE_ON);
 >  
->  	return 0;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index f13ddbf..4b289a4 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1460,51 +1460,58 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
->  	hci_dev_lock(hdev);
+>  		if (test_bit(HCI_CONN_MODE_CHANGE_PEND, &acl->pend)) {
+>  			/* defer SCO setup until mode change completed */
+> @@ -676,7 +676,7 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role)
+>  EXPORT_SYMBOL(hci_conn_switch_role);
 >  
->  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-> -	if (conn) {
-> -		if (!ev->status) {
-> +	if (!conn)
-> +		goto unlock;
+>  /* Enter active mode */
+> -void hci_conn_enter_active_mode(struct hci_conn *conn)
+> +void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
+>  {
+>  	struct hci_dev *hdev = conn->hdev;
+>  
+> @@ -685,7 +685,10 @@ void hci_conn_enter_active_mode(struct hci_conn *conn)
+>  	if (test_bit(HCI_RAW, &hdev->flags))
+>  		return;
+>  
+> -	if (conn->mode != HCI_CM_SNIFF || !conn->power_save)
+> +	if (conn->mode != HCI_CM_SNIFF)
+> +		goto timer;
+> +
+> +	if (!conn->power_save && !force_active)
+>  		goto timer;
+>  
+>  	if (!test_and_set_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->pend)) {
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index b6bda3f..be68e7d 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1893,7 +1893,7 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
+>  		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+>  			BT_DBG("skb %p len %d", skb, skb->len);
+>  
+> -			hci_conn_enter_active_mode(conn);
+> +			hci_conn_enter_active_mode(conn, bt_cb(skb)->force_active);
+>  
+>  			hci_send_frame(skb);
+>  			hdev->acl_last_tx = jiffies;
+> @@ -2032,7 +2032,7 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+>  	if (conn) {
+>  		register struct hci_proto *hp;
+>  
+> -		hci_conn_enter_active_mode(conn);
+> +		hci_conn_enter_active_mode(conn, bt_cb(skb)->force_active);
+>  
+>  		/* Send to upper protocol */
+>  		hp = hci_proto[HCI_PROTO_L2CAP];
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 7c0e571..2a80a91 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -408,6 +408,8 @@ void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *d
+>  	else
+>  		flags = ACL_START;
+>  
+> +	bt_cb(skb)->force_active = BT_POWER_FORCE_ACTIVE_ON;
+> +
+>  	hci_send_acl(conn->hcon, skb, flags);
+>  }
+>  
+> @@ -461,6 +463,8 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u16 control)
+>  	else
+>  		flags = ACL_START;
+>  
+> +	bt_cb(skb)->force_active = chan->force_active;
+> +
+>  	hci_send_acl(chan->conn->hcon, skb, flags);
+>  }
+>  
+> @@ -1089,6 +1093,7 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>  	else
+>  		flags = ACL_START;
+>  
+> +	bt_cb(skb)->force_active = chan->force_active;
+>  	hci_send_acl(hcon, skb, flags);
+>  }
+>  
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index c98360d..9f99e1d 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -436,6 +436,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+>  	struct sock *sk = sock->sk;
+>  	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>  	struct bt_security sec;
+> +	struct bt_power pwr;
+>  	int len, err = 0;
+>  
+>  	BT_DBG("sk %p", sk);
+> @@ -484,6 +485,21 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+>  
+>  		break;
+>  
+> +	case BT_POWER:
+> +		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
+> +				&& sk->sk_type != SOCK_RAW) {
+> +			err = -EINVAL;
+> +			break;
+> +		}
+> +
+> +		pwr.force_active = chan->force_active;
+> +
+> +		len = min_t(unsigned int, len, sizeof(pwr));
+> +		if (copy_to_user(optval, (char *) &pwr, len))
+> +			err = -EFAULT;
+> +
+> +		break;
+> +
+>  	default:
+>  		err = -ENOPROTOOPT;
+>  		break;
+> @@ -584,6 +600,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+>  	struct sock *sk = sock->sk;
+>  	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>  	struct bt_security sec;
+> +	struct bt_power pwr;
+>  	int len, err = 0;
+>  	u32 opt;
+>  
+> @@ -660,6 +677,23 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+>  		chan->flushable = opt;
+>  		break;
+>  
+> +	case BT_POWER:
+> +		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
+> +				&& sk->sk_type != SOCK_RAW) {
+> +			err = -EINVAL;
 
-Now you messed up everything with the !conn check. Care to split in two
-patches please? One for the !conn change and the other with the actual change
-to the code.
+This need to be rebased against bluetooth-next. Not sure, but this seems to be
+the only place of conflict.
 
 -- 
 Gustavo F. Padovan
