@@ -1,89 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilia Kolomisnky <ilia.kolominsky@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH v4] Fix response for vendor dependent AVRCP commands
-Date: Tue, 31 May 2011 05:32:49 +0300
-Message-Id: <1306809169-5050-1-git-send-email-iliak@ti.com>
+Date: Tue, 31 May 2011 09:07:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] Fix return value in send_message
+Message-ID: <20110531060742.GB15916@dell.ger.corp.intel.com>
+References: <1306749575-21119-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1306749575-21119-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1306749575-21119-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AVRCP TG now returns a REJECTED response with the "Invalid command"
-error code for VENDOR DEPENDENT commands. This fixes test case
-AVRCP/TG/INV/TC_TG_INV_BI_01_C with recent PTS version.
----
- audio/control.c |   37 +++++++++++++++++++++++++++++++++++++
- 1 files changed, 37 insertions(+), 0 deletions(-)
+Hi Waldek,
 
-diff --git a/audio/control.c b/audio/control.c
-index 6238007..264699b 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -80,6 +80,7 @@
- #define CTYPE_STABLE		0xC
- 
- /* opcodes */
-+#define OP_VENDORDEP		0x00
- #define OP_UNITINFO		0x30
- #define OP_SUBUNITINFO		0x31
- #define OP_PASSTHROUGH		0x7c
-@@ -127,6 +128,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+	uint8_t company_id[3];
-+	uint8_t pdu_id;
-+	uint8_t packet_type:2;
-+	uint8_t rsvd:6;
-+	uint16_t params_len;
-+	uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #elif __BYTE_ORDER == __BIG_ENDIAN
- 
- struct avctp_header {
-@@ -147,6 +158,16 @@ struct avrcp_header {
- } __attribute__ ((packed));
- #define AVRCP_HEADER_LENGTH 3
- 
-+struct avrcp_spec_avc_pdu {
-+	uint8_t company_id[3];
-+	uint8_t pdu_id;
-+	uint8_t rsvd:6;
-+	uint8_t packet_type:2;
-+	uint16_t params_len;
-+	uint8_t params[0];
-+} __attribute__ ((packed));
-+#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+
- #else
- #error "Unknown byte order"
- #endif
-@@ -569,6 +590,22 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
- 			operands[1] = SUBUNIT_PANEL << 3;
- 		DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
- 				"OP_UNITINFO" : "OP_SUBUNITINFO");
-+	} else if (avrcp->opcode == OP_VENDORDEP) {
-+		/* reply with REJECT msg with err. code == 0x0
-+		 * ( Invalid Command ) as defined in AVRCP spec ( 6.15.1 ) */
-+		struct avrcp_spec_avc_pdu *pdu = (void *) operands;
-+		pdu->packet_type = 0;
-+		pdu->rsvd = 0;
-+		pdu->params[0] = 0; /* invalid command */
-+		pdu->params_len = htons(1);
-+
-+		avctp->cr = AVCTP_RESPONSE;
-+		avrcp->code = CTYPE_REJECTED;
-+
-+		packet_size =  sizeof(struct avctp_header)
-+			+ sizeof(struct avrcp_header)
-+			+ sizeof(struct avrcp_spec_avc_pdu)
-+			+ 1;
- 	} else {
- 		avctp->cr = AVCTP_RESPONSE;
- 		avrcp->code = CTYPE_REJECTED;
--- 
-1.7.1
+On Mon, May 30, 2011, Waldemar Rymarkiewicz wrote:
+>  	gstatus = g_io_channel_write_chars(conn->io, buf, size, &written,
+> -						&gerr);
+> +									&gerr);
 
+I know this is a little bit nitpicking, but I prefer keeping the commit
+history clean and the commits and their messages consistent. This change
+has nothing to do with the commit message. You'll probably want to merge
+it with your third coding style cleanup patch.
+
+Johan
