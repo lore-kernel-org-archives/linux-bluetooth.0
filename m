@@ -1,81 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <padovan@profusion.mobi>
-CC: <linux-bluetooth@vger.kernel.org>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH v3 1/2] Bluetooth: Fix auth_complete_evt for legacy units
-Date: Tue, 31 May 2011 15:49:25 +0200
-Message-ID: <1306849766-31540-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH v3] Fix disconnect devices after enabling offline mode
+Date: Tue, 31 May 2011 15:37:10 +0200
+Message-Id: <1306849030-12332-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Legacy devices don't re-authenticate the link properly if a link key
-already exists.  Thus, don't update sec_level for this case even if
-hci_auth_complete_evt indicates success. Otherwise the sec_level will
-not reflect a real security on the link.
-
-Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Previously paired and connected devices were disconnected automatically
+after turning bluetooth off directly via bluetooth UI. This patch makes
+that also other ways of turning bluetooth off (which should lead to
+disconnecting paired and connected devices), such as enabling offline
+mode (which turns bluetooth off as well), can be handled properly.
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_conn.c         |    2 ++
- net/bluetooth/hci_event.c        |   12 ++++++++++--
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ plugins/maemo6.c |    4 ++--
+ src/adapter.c    |   38 +++++++++++++++++++++++++++++++++++++-
+ src/adapter.h    |    2 +-
+ 3 files changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index af4b0ed..0ac820d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -322,6 +322,7 @@ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data);
- /* ----- HCI Connections ----- */
- enum {
- 	HCI_CONN_AUTH_PEND,
-+	HCI_CONN_REAUTH_PEND,
- 	HCI_CONN_ENCRYPT_PEND,
- 	HCI_CONN_RSWITCH_PEND,
- 	HCI_CONN_MODE_CHANGE_PEND,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3163330..e675402 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -548,6 +548,8 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 		cp.handle = cpu_to_le16(conn->handle);
- 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
- 							sizeof(cp), &cp);
-+		if (conn->key_type != 0xff)
-+			set_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
+diff --git a/plugins/maemo6.c b/plugins/maemo6.c
+index 56f2664..d16ac9f 100644
+--- a/plugins/maemo6.c
++++ b/plugins/maemo6.c
+@@ -77,7 +77,7 @@ static gboolean mce_signal_callback(DBusConnection *connection,
+ 		if (mce_bt_set)
+ 			btd_adapter_switch_online(adapter);
+ 		else
+-			btd_adapter_switch_offline(adapter);
++			btd_adapter_switch_offline(adapter, TRUE);
  	}
  
- 	return 0;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c456f9c..82061db 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1491,13 +1491,21 @@ static inline void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *s
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
- 	if (conn) {
- 		if (!ev->status) {
--			conn->link_mode |= HCI_LM_AUTH;
--			conn->sec_level = conn->pending_sec_level;
-+			if (!(conn->ssp_mode > 0 && hdev->ssp_mode > 0) &&
-+						test_bit(HCI_CONN_REAUTH_PEND,
-+						&conn->pend)) {
-+				BT_INFO("re-auth of legacy device is not"
-+								"possible.");
-+			} else {
-+				conn->link_mode |= HCI_LM_AUTH;
-+				conn->sec_level = conn->pending_sec_level;
-+			}
- 		} else {
- 			mgmt_auth_failed(hdev->id, &conn->dst, ev->status);
- 		}
+ 	return TRUE;
+@@ -124,7 +124,7 @@ static void read_radio_states_cb(DBusPendingCall *call, void *user_data)
+ 	if (mce_bt_set)
+ 		btd_adapter_switch_online(adapter);
+ 	else
+-		btd_adapter_switch_offline(adapter);
++		btd_adapter_switch_offline(adapter, TRUE);
  
- 		clear_bit(HCI_CONN_AUTH_PEND, &conn->pend);
-+		clear_bit(HCI_CONN_REAUTH_PEND, &conn->pend);
+ done:
+ 	dbus_message_unref(reply);
+diff --git a/src/adapter.c b/src/adapter.c
+index c30febc..60f03dc 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -142,6 +142,8 @@ struct btd_adapter {
  
- 		if (conn->state == BT_CONFIG) {
- 			if (!ev->status && hdev->ssp_mode > 0 &&
+ 	gint ref;
+ 
++	guint timer_id;
++
+ 	GSList *powered_callbacks;
+ 
+ 	gboolean name_stored;
+@@ -2331,6 +2333,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
+ 	adapter->pairable_timeout = get_pairable_timeout(address);
+ 	adapter->state = STATE_IDLE;
+ 	adapter->mode = MODE_CONNECTABLE;
++	adapter->timer_id = 0;
+ 
+ 	if (main_opts.le)
+ 		adapter_ops->enable_le(adapter->dev_id);
+@@ -3454,6 +3457,21 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
+ 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
+ }
+ 
++static void disconnect_device(struct btd_device *device, gpointer user_data)
++{
++	device_request_disconnect(device, NULL);
++}
++
++static gboolean switch_off_timeout(gpointer user_data)
++{
++	struct btd_adapter *adapter = user_data;
++
++	adapter_ops->set_powered(adapter->dev_id, FALSE);
++	adapter->timer_id = 0;
++
++	return FALSE;
++}
++
+ int btd_adapter_switch_online(struct btd_adapter *adapter)
+ {
+ 	if (!adapter_ops)
+@@ -3462,10 +3480,15 @@ int btd_adapter_switch_online(struct btd_adapter *adapter)
+ 	if (adapter->up)
+ 		return 0;
+ 
++	if (adapter->timer_id) {
++		g_source_remove(adapter->timer_id);
++		adapter->timer_id = 0;
++	}
++
+ 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
+ }
+ 
+-int btd_adapter_switch_offline(struct btd_adapter *adapter)
++int btd_adapter_switch_offline(struct btd_adapter *adapter, gboolean clean)
+ {
+ 	if (!adapter_ops)
+ 		return -EINVAL;
+@@ -3473,6 +3496,19 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
+ 	if (!adapter->up)
+ 		return 0;
+ 
++	if (adapter->timer_id)
++		return 0;
++
++	if (clean && adapter->connections) {
++		g_slist_foreach(adapter->connections,
++					(GFunc) disconnect_device, NULL);
++
++		adapter->timer_id = g_timeout_add_seconds(3,
++					switch_off_timeout, adapter);
++
++		return 0;
++	}
++
+ 	return adapter_ops->set_powered(adapter->dev_id, FALSE);
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 3526849..ca40a1a 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -161,7 +161,7 @@ gboolean adapter_powering_down(struct btd_adapter *adapter);
+ 
+ int btd_adapter_restore_powered(struct btd_adapter *adapter);
+ int btd_adapter_switch_online(struct btd_adapter *adapter);
+-int btd_adapter_switch_offline(struct btd_adapter *adapter);
++int btd_adapter_switch_offline(struct btd_adapter *adapter, gboolean clean);
+ 
+ typedef void (*bt_hci_result_t) (uint8_t status, gpointer user_data);
+ 
 -- 
-1.7.4.1
+1.6.3.3
 
