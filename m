@@ -1,42 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Tue, 31 May 2011 11:27:46 +0300
-Subject: RE: [PATCH v2 1/3] Clean SAP server error printouts
-Message-ID: <99B09243E1A5DA4898CDD8B70011144817562253D8@EXMB04.eu.tieto.com>
-References: <1306749575-21119-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20110531060457.GA15916@dell.ger.corp.intel.com>
-In-Reply-To: <20110531060457.GA15916@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <20110531075749.GA18878@dell.ger.corp.intel.com>
+References: <1306828085-30834-1-git-send-email-iwamatsu@nigauri.org> <20110531075749.GA18878@dell.ger.corp.intel.com>
+From: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Date: Tue, 31 May 2011 17:04:26 +0900
+Message-ID: <BANLkTi=AVP1E31fOftqAAb0rQfkqa7ge4A@mail.gmail.com>
+Subject: Re: [PATCH] Fix install path for udevdir
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Johan, 
+Hi,
 
->On Mon, May 30, 2011, Waldemar Rymarkiewicz wrote:
->> @@ -387,8 +385,10 @@ static int disconnect_req(struct sap_connection 
->> *conn, uint8_t disc_type)
->>  
->>  	case SAP_DISCONNECTION_TYPE_CLIENT:
->>  		if (conn->state != SAP_STATE_CONNECTED &&
->> -				conn->state != 
->SAP_STATE_GRACEFUL_DISCONNECT)
->> -			goto error_rsp;
->> +				conn->state != 
->SAP_STATE_GRACEFUL_DISCONNECT) {
->> +			sap_error_rsp(conn);
->> +			goto error_req;
->> +		}
+2011/5/31 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi,
 >
->Since all of the case statements return from the function in 
->the non-error case, and all the error_req label is doing is a 
->single return statment, I think it'd be cleaner (easier to 
->follow the code flow) by removing the label and do "return 
->-EPERM;" directly instead of a goto.
+> On Tue, May 31, 2011, Nobuhiro Iwamatsu wrote:
+>> From: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+>>
+>> If PCMCIA enabled, udevdir value override from /lib/udev to
+>> $(libexecdir)/udev.
+>>
+>> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+>> ---
+>>  Makefile.am |    2 --
+>>  1 files changed, 0 insertions(+), 2 deletions(-)
 >
+> Thanks. The patch has been pushed upstream (with the signed-off-by line
+> removed since we don't use that).
 
-sure, but I guess it should  go to seperate patch as it does not seem to have something to do with cleaning printouts :)
+Thanks and sorry.
+I am careful from next.
 
-Waldek
+Best regards,
+  Nobuhiro
+
+
+-- 
+Nobuhiro Iwamatsu
+   iwamatsu at {nigauri.org / debian.org}
+   GPG ID: 40AD1FA6
