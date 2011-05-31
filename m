@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 31 May 2011 10:57:49 +0300
+Date: Tue, 31 May 2011 10:50:11 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Nobuhiro Iwamatsu <iwamatsu@debian.org>
-Subject: Re: [PATCH] Fix install path for udevdir
-Message-ID: <20110531075749.GA18878@dell.ger.corp.intel.com>
-References: <1306828085-30834-1-git-send-email-iwamatsu@nigauri.org>
+To: Ilia Kolomisnky <ilia.kolominsky@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Ilia Kolomisnky <iliak@ti.com>
+Subject: Re: [PATCH v4] Fix response for vendor dependent AVRCP commands
+Message-ID: <20110531075011.GA18717@dell.ger.corp.intel.com>
+References: <1306809169-5050-1-git-send-email-iliak@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306828085-30834-1-git-send-email-iwamatsu@nigauri.org>
+In-Reply-To: <1306809169-5050-1-git-send-email-iliak@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ilia,
 
-On Tue, May 31, 2011, Nobuhiro Iwamatsu wrote:
-> From: Nobuhiro Iwamatsu <iwamatsu@debian.org>
-> 
-> If PCMCIA enabled, udevdir value override from /lib/udev to
-> $(libexecdir)/udev.
-> 
-> Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+On Tue, May 31, 2011, Ilia Kolomisnky wrote:
+> AVRCP TG now returns a REJECTED response with the "Invalid command"
+> error code for VENDOR DEPENDENT commands. This fixes test case
+> AVRCP/TG/INV/TC_TG_INV_BI_01_C with recent PTS version.
 > ---
->  Makefile.am |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
+>  audio/control.c |   37 +++++++++++++++++++++++++++++++++++++
+>  1 files changed, 37 insertions(+), 0 deletions(-)
 
-Thanks. The patch has been pushed upstream (with the signed-off-by line
-removed since we don't use that).
+Thanks for the quick update. I did a few more cosmetic changes myself
+and pushed the patch upstream.
 
 Johan
