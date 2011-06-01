@@ -1,32 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: <Waldemar.Rymarkiewicz@tieto.com>
-To: <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 1 Jun 2011 13:58:17 +0300
-Subject: RE: [PATCH v2] Add support of secure pin code in mgmt code
-Message-ID: <99B09243E1A5DA4898CDD8B700111448175631BC06@EXMB04.eu.tieto.com>
-References: <1306401315-10948-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <20110529184859.GB32088@dell.ger.corp.intel.com>
-In-Reply-To: <20110529184859.GB32088@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <BANLkTimyLAz6bFMv3eV_2QaCYfjGHH_wcA@mail.gmail.com>
+References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
+	<BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
+	<BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
+	<BANLkTinYb=i9iYNR0Uhd7YG84jdGht2gNg@mail.gmail.com>
+	<BANLkTimwz1D4W9rT6E=84r+3OGkjTen=xg@mail.gmail.com>
+	<BANLkTimyLAz6bFMv3eV_2QaCYfjGHH_wcA@mail.gmail.com>
+Date: Wed, 1 Jun 2011 11:17:15 +0300
+Message-ID: <BANLkTimE8z7vYH2JN=1qMvsoZVvX6uqmyA@mail.gmail.com>
+Subject: Re: [PATCH] Init telephony before adding HFP SDP records
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, 
+Hi Daniel,
 
->struct authentictation_req (device->authr) is the right place 
->to store this value since it's bound is to the lifetime of the 
->authentication request, whereas struct btd_device isn't. Also, 
->as previously mentioned the type should be gboolean and not uint8_t.
+On Wed, Jun 1, 2011 at 10:58 AM, Daniel Örstadius
+<daniel.orstadius@gmail.com> wrote:
+> Hi Luiz,
 >
+> On Fri, May 27, 2011 at 1:45 PM, Daniel Örstadius
+> <daniel.orstadius@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Fri, May 27, 2011 at 1:26 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Daniel,
+>>>
+>>> On Fri, May 27, 2011 at 11:40 AM, Daniel Örstadius
+>>> <daniel.orstadius@gmail.com> wrote:
+>>>> Hi Luiz,
+>>>>
+>>>> On Thu, May 26, 2011 at 6:44 PM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Daniel,
+>>>>>
+>>>>> On Thu, May 26, 2011 at 4:58 PM, Daniel Örstadius
+>>>>> <daniel.orstadius@gmail.com> wrote:
+>>>>>> Please review.
+>>>>>
+>>>>> For telephony-maemo6 it should be enough to just call
+>>>>> headset_server_init after state_changed/telephony_init.
+>>>>>
+>>>>
+>>>> Thanks for the feedback, that seems like a much leaner solution.
+>>>> Attaching new patch.
+>>>
+>>> Looks much better, shall I take care of fixing telephony-ofono or you
+>>> already have a patch for it?
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>> Computer Engineer
+>>>
+>>
+>> No, since I'm not familiar with ofono I didn't make a patch for that issue.
+>>
+>> Regards,
+>> Daniel
+>>
+>
+> Since the patch was not applied I'm wondering how to proceed with it?
+>
+> (Maybe I misunderstood, but isn't the ofono issue a separate bug that
+> exists regardless of the patch?)
 
-You mentioned that the check should be done in kernel as well. However, mgmt API is like mgmt_pincode_replay and mgmt_pincode_neg_replay what means that I should do a check (secure == 1 && pinlen !=16) on mgmt_pincode_replay and if the pin is in fact not secure then send pincode_neg_replay to the controller.
+Yep, it is unrelated, Im fine with it.
 
-In that case we could skipp checking in bluez at all to avoid double checking, but it's fine if we do so.
+Regards,
 
-What about replaceing mgmt_pincode_replay and mgmt_pincode_neg_replay with one mgmt_pincode_replay + error field in the struct to indicate user space succeded or not. This way the checking could be done only in the kernel I guess.
-
-Can you comment on my thoughts?
-
-Waldek
+-- 
+Luiz Augusto von Dentz
+Computer Engineer
