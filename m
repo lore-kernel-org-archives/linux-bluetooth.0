@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH] Adjust parameters in obexd.service.in
-Date: Wed,  1 Jun 2011 15:05:29 +0200
-Message-Id: <1306933529-4270-1-git-send-email-lkslawek@gmail.com>
+Date: Wed, 1 Jun 2011 15:10:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] telephony-ofono: fix features initialization
+Message-ID: <20110601121052.GE26952@dell.ger.corp.intel.com>
+References: <1306929040-425-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1306929040-425-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adjusts obexd.service.in to changes introduced in commit
-e7792642accead1de0016bd7f78c74d9b6cad38a, retaining original behaviour.
----
- src/obexd.service.in |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Luiz,
 
-diff --git a/src/obexd.service.in b/src/obexd.service.in
-index 24571bd..5c6ba0f 100644
---- a/src/obexd.service.in
-+++ b/src/obexd.service.in
-@@ -1,3 +1,3 @@
- [D-BUS Service]
- Name=org.openobex
--Exec=@libexecdir@/obexd --nodaemon --opp --ftp
-+Exec=@libexecdir@/obexd --nodaemon --plugin=bluetooth:usb:opp:ftp
--- 
-1.7.4.1
+On Wed, Jun 01, 2011, Luiz Augusto von Dentz wrote:
+> Features should be ready before telephony_init return, otherwise the
+> record might contain invalid features.
+> ---
+>  audio/telephony-ofono.c |   20 ++++++++++----------
+>  1 files changed, 10 insertions(+), 10 deletions(-)
 
+Pushed upstream. Thanks.
+
+Johan
