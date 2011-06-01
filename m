@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jun 2011 16:48:58 -0300
+Date: Wed, 1 Jun 2011 16:38:30 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "John W. Linville" <linville@tuxdriver.com>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: fix sparse & gcc warnings
-Message-ID: <20110601194858.GE2564@joana>
-References: <1306911285.3867.6.camel@jlt3.sipsolutions.net>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/4] Bluetooth: Set 'peer_addr_type' in hci_le_connect()
+Message-ID: <20110601193830.GD2564@joana>
+References: <1306862457-20310-1-git-send-email-andre.guedes@openbossa.org>
+ <1306862457-20310-4-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306911285.3867.6.camel@jlt3.sipsolutions.net>
+In-Reply-To: <1306862457-20310-4-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+Hi Andre,
 
-* Johannes Berg <johannes@sipsolutions.net> [2011-06-01 08:54:45 +0200]:
+* Andre Guedes <andre.guedes@openbossa.org> [2011-05-31 14:20:57 -0300]:
 
-> From: Johannes Berg <johannes.berg@intel.com>
+> Set the 'peer_addr_type' field of the LE Create Connection command
+> sent in hci_le_connect().
 > 
-> sparse complains about a few things that should
-> be static, and I also noticed another warning
-> from gcc about a set but unused variable.
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Acked-by: Ville Tervo <ville.tervo@nokia.com>
 > ---
->  net/bluetooth/l2cap_core.c  |    6 +++---
->  net/bluetooth/mgmt.c        |    2 +-
->  net/bluetooth/rfcomm/sock.c |    3 ---
->  3 files changed, 4 insertions(+), 7 deletions(-)
+>  net/bluetooth/hci_conn.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-I applied the sparse part as set but unused variable warnings are all fixed,
-thanks for the patch.
+All four patches applied. Thanks.
 
 -- 
 Gustavo F. Padovan
