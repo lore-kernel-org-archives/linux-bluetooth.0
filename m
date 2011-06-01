@@ -1,68 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 1 Jun 2011 16:47:43 +0200
-Message-ID: <BANLkTikAfy-=MRTb_SGa8d2td5oq73xGYg@mail.gmail.com>
-Subject: Binary PIN Support
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, marcel@holtmann.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>
+In-Reply-To: <20110601135322.GA7132@dell.ger.corp.intel.com>
+References: <1306933529-4270-1-git-send-email-lkslawek@gmail.com>
+	<BANLkTik6c0N8Oy9CZZak+Zn5JQ3F636CLQ@mail.gmail.com>
+	<20110601133921.GB6226@dell.ger.corp.intel.com>
+	<BANLkTim-kQt-_6ME-2Ju6SiiEv1bSYUBAQ@mail.gmail.com>
+	<20110601135322.GA7132@dell.ger.corp.intel.com>
+Date: Wed, 1 Jun 2011 16:41:55 +0200
+Message-ID: <BANLkTimMo0Hbt2KQ13Xm1Rb5kTNLMiCNXA@mail.gmail.com>
+Subject: Re: [PATCH] Adjust parameters in obexd.service.in
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+> I don't think the content of the default .service file has been thought
+> out so deeply, so I wouldn't put too much effort into retaining the
+> *exact* same behavior as before. Distros will typically customize it
+> anyway for their needs. What does make sense though is to have some kind
+> of sensible defaults there. Aren't all plugins a sensible default? Do we
+> have something inherently unstable/experimental that could mess up
+> systems? If so then that should probably be disabled by default already
+> at configure time, and if you really want to have something in the
+> service file it's probably easier to use -P instead of -p since the
+> "bad" plugins are in the minority.
 
-Since only half of my binary-PIN patches got applied upstream, I want to start
-a new discussion about binary PIN support.
+Well, in fact when this file was committed originally, there was
+nothing more to choose vyt OPP and FTP. Those two however looked like
+sensible defaults for a desktop setup. I suppose that for example PBAP
+and MAP don't seem to be the most wanted plugins in this case. Don't
+know about IrMC or SyncML.
 
-The thing is, the wiimote device (and as reported also some other
-devices) requires
-a BT-address (which may contain \0) as bluetooth pin. Current dbus
-design forbids
-strings containing \0 (used as string terminator) and so an agent cannot send
-binary PINs to bluetoothd as return value of RequestPinCode().
-
-The BT specs 3.0+ HS (Volume 3, Part C, 3.2.3 Bluetooth Passkey) say
-the UI-input shall
-be UTF-8 encoded and preferably use only the UFT-8 range 0x00-0x7F to
-avoid multibyte
-characters. There is also a recommendation for multi-byte characters.
-Dbus uses utf-8 encoded strings so bluetoothd does not need to modify the
-PIN, but current implementation restricts/violates the specs because
-it disallows 0x00 as
-valid PIN character.
-
-Since the idea with hex-encoding binary PINs and prefixing them with
-'$' did not get
-accepted, I have some other ideas for this:
-
-1: Use hard coded PINs for those devices. That is, use VID/PID
-detection during pairing
-and send hardcoded PIN (or based on src/dst address). Problem: VID/PID
-information is
-not available during pairing or may not be available, yet. Some
-devices may even reject
-SDP requests when not paired (as mentioned on IRC). Maybe someone has
-an idea how to
-get this working.
-
-2: Extend DBus Agent API with a function RequestBinaryPinCode() which
-works exactly
-like RequestPinCode() but returns a bytearray (with length) instead of a string.
-A dbus agent then needs to signal to bluetoothd that it provides this
-method and bluetoothd
-shall call RequestBinaryPinCode() instead of RequestPinCode().
-However, I couldn't figure out a proper way to signal this capability
-to bluetoothd.
-The agent could send some kind of EnabledBinaryPinSupport-Signal to
-bluetoothd...
-
-3: Use some kind of encoding in the UTF-8 string as proposed with the
-'$' character.
-However, this might break old software.
-
-
-Any comments or other ideas?
-
-Regards
-David
+-- 
+Slawomir Bochenski
