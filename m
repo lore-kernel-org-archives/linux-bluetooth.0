@@ -1,23 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: <h.patil@accenture.com>
-To: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 1 Jun 2011 17:22:40 +0530
-Subject: A2DP streaming audio on BT infineon PBA31308
-Message-ID: <AA5DFB06574FF54BA4A76C3F1040DCBB11C1E58D2C@INDXM3131.dir.svc.accenture.com>
-References: <BANLkTi=LMR0vRhyUm22vVodJzFPw=Rbi=A@mail.gmail.com>
-In-Reply-To: <BANLkTi=LMR0vRhyUm22vVodJzFPw=Rbi=A@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 1 Jun 2011 14:52:08 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] Coding style cleanup in sap server
+Message-ID: <20110601115208.GC26952@dell.ger.corp.intel.com>
+References: <1306838810-18325-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1306838810-18325-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1306838810-18325-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-    Anyone tried audio streaming through A2DP on BT chip Infineon PBA31308.
-    I am able to establish the A2dp connection.
-    Audio streaming after 6 seconds causing A2DP disconnection on Infineon PBA31308.
-Any idea? I am using latest bluez n pulse audio on ARM.
+Hi Waldek,
 
-Thanks
-Patil
+On Tue, May 31, 2011, Waldemar Rymarkiewicz wrote:
+> ---
+>  sap/server.c |   23 +++++++++++------------
+>  1 files changed, 11 insertions(+), 12 deletions(-)
 
-This message is for the designated recipient only and may contain privileged, proprietary, or otherwise private information.  If you have received it in error, please notify the sender immediately and delete the original.  Any other use of the email by you is prohibited.
+All four patches have been pushed upstream, but before that I fixed the
+following issues with this patch:
+
+> -	bt_io_get(io, BT_IO_RFCOMM, &gerr,
+> -			BT_IO_OPT_SOURCE_BDADDR, &src,
+> -			BT_IO_OPT_DEST_BDADDR, &dst,
+> -			BT_IO_OPT_INVALID);
+> +	bt_io_get(io, BT_IO_RFCOMM, &gerr, BT_IO_OPT_SOURCE_BDADDR, &src,
+> +			BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
+> +
+
+Readability trumps strict coding style adherence here, so it's fine if
+each op_opt is on its own line.
+
+>  	if (!g_dbus_register_interface(connection, path, SAP_SERVER_INTERFACE,
+> -				server_methods, server_signals, NULL,
+> -				server, destroy_sap_interface)) {
+> +			server_methods, server_signals, NULL, server,
+> +			destroy_sap_interface)) {
+
+The idea is to try to have each continuation line past the opening ( of
+the g_dbus_register_interface function call if possible while keeping
+the lines under 80 charcters, so the existing split is fine except that
+it can be indented by one more tab.
+
+Johan
