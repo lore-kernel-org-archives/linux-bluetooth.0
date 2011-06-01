@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jun 2011 16:38:30 -0300
+Date: Wed, 1 Jun 2011 16:07:52 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] Bluetooth: Set 'peer_addr_type' in hci_le_connect()
-Message-ID: <20110601193830.GD2564@joana>
-References: <1306862457-20310-1-git-send-email-andre.guedes@openbossa.org>
- <1306862457-20310-4-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH v3 2/2] Bluetooth: Refactor hci_auth_complete_evt function
+Message-ID: <20110601190752.GC2564@joana>
+References: <1306849766-31540-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1306849766-31540-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306862457-20310-4-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1306849766-31540-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Waldemar,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-05-31 14:20:57 -0300]:
+* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-05-31 15:49:26 +0200]:
 
-> Set the 'peer_addr_type' field of the LE Create Connection command
-> sent in hci_le_connect().
+> Replace if(conn) with if(!conn) checking to avoid too many nested statements
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> Acked-by: Ville Tervo <ville.tervo@nokia.com>
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 > ---
->  net/bluetooth/hci_conn.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
+>  net/bluetooth/hci_event.c |   83 ++++++++++++++++++++++-----------------------
+>  1 files changed, 41 insertions(+), 42 deletions(-)
 
-All four patches applied. Thanks.
+I applied both patches, thanks.
 
 -- 
 Gustavo F. Padovan
