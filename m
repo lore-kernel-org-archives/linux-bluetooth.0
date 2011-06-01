@@ -1,81 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] bluetooth: fix sparse & gcc warnings
+Subject: [PATCH] bluetooth: fix error cases
 From: Johannes Berg <johannes@sipsolutions.net>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless <linux-wireless@vger.kernel.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+To: John Linville <linville@tuxdriver.com>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
 	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 01 Jun 2011 08:54:45 +0200
-Message-ID: <1306911285.3867.6.camel@jlt3.sipsolutions.net>
+Date: Wed, 01 Jun 2011 08:39:37 +0200
+Message-ID: <1306910377.3867.5.camel@jlt3.sipsolutions.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johannes Berg <johannes.berg@intel.com>
 
-sparse complains about a few things that should
-be static, and I also noticed another warning
-from gcc about a set but unused variable.
+The error cases in a few functions can use a
+socket variable that was never initialised,
+gcc correctly warns about this:
+net/bluetooth/l2cap_core.c: In function ‘l2cap_recv_frame’:
+include/linux/spinlock.h:325:19: warning: ‘sk’ may be used uninitialized in this function [-Wuninitialized]
+net/bluetooth/l2cap_core.c:3789:15: note: ‘sk’ was declared here
+include/linux/spinlock.h:325:19: warning: ‘sk’ may be used uninitialized in this function [-Wuninitialized]
+net/bluetooth/l2cap_core.c:3756:15: note: ‘sk’ was declared here
+
+Initialise the socket to NULL as clearly intended
+by the error handling code.
+
+Also fix a "set but not used" warning.
 
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 ---
- net/bluetooth/l2cap_core.c  |    6 +++---
- net/bluetooth/mgmt.c        |    2 +-
- net/bluetooth/rfcomm/sock.c |    3 ---
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
---- a/net/bluetooth/l2cap_core.c	2011-06-01 08:42:43.000000000 +0200
-+++ b/net/bluetooth/l2cap_core.c	2011-06-01 08:45:04.000000000 +0200
-@@ -62,8 +62,8 @@ static u8 l2cap_fixed_chan[8] = { 0x02,
- 
- static struct workqueue_struct *_busy_wq;
- 
--LIST_HEAD(chan_list);
--DEFINE_RWLOCK(chan_list_lock);
-+static LIST_HEAD(chan_list);
-+static DEFINE_RWLOCK(chan_list_lock);
- 
- static void l2cap_busy_work(struct work_struct *work);
- 
-@@ -371,7 +371,7 @@ static inline int l2cap_check_security(s
- 	return hci_conn_security(conn->hcon, chan->sec_level, auth_type);
- }
- 
--u8 l2cap_get_ident(struct l2cap_conn *conn)
-+static u8 l2cap_get_ident(struct l2cap_conn *conn)
+--- a/net/bluetooth/l2cap_core.c	2011-06-01 08:33:36.000000000 +0200
++++ b/net/bluetooth/l2cap_core.c	2011-06-01 08:34:35.000000000 +0200
+@@ -3667,7 +3667,6 @@ static inline int l2cap_data_channel(str
  {
- 	u8 id;
+ 	struct l2cap_chan *chan;
+ 	struct sock *sk = NULL;
+-	struct l2cap_pinfo *pi;
+ 	u16 control;
+ 	u8 tx_seq;
+ 	int len;
+@@ -3679,7 +3678,6 @@ static inline int l2cap_data_channel(str
+ 	}
  
---- a/net/bluetooth/mgmt.c	2011-06-01 08:42:24.000000000 +0200
-+++ b/net/bluetooth/mgmt.c	2011-06-01 08:42:28.000000000 +0200
-@@ -41,7 +41,7 @@ struct pending_cmd {
- 	void *user_data;
- };
+ 	sk = chan->sk;
+-	pi = l2cap_pi(sk);
  
--LIST_HEAD(cmd_list);
-+static LIST_HEAD(cmd_list);
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
  
- static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
+@@ -3755,7 +3753,7 @@ done:
+ 
+ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, struct sk_buff *skb)
  {
---- a/net/bluetooth/rfcomm/sock.c	2011-06-01 08:50:06.000000000 +0200
-+++ b/net/bluetooth/rfcomm/sock.c	2011-06-01 08:50:23.000000000 +0200
-@@ -741,7 +741,6 @@ static int rfcomm_sock_setsockopt(struct
- static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __user *optval, int __user *optlen)
+-	struct sock *sk;
++	struct sock *sk = NULL;
+ 	struct l2cap_chan *chan;
+ 
+ 	chan = l2cap_global_chan_by_psm(0, psm, conn->src);
+@@ -3788,7 +3786,7 @@ done:
+ 
+ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct sk_buff *skb)
  {
- 	struct sock *sk = sock->sk;
--	struct sock *l2cap_sk;
- 	struct rfcomm_conninfo cinfo;
- 	struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
- 	int len, err = 0;
-@@ -786,8 +785,6 @@ static int rfcomm_sock_getsockopt_old(st
- 			break;
- 		}
+-	struct sock *sk;
++	struct sock *sk = NULL;
+ 	struct l2cap_chan *chan;
  
--		l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
--
- 		cinfo.hci_handle = conn->hcon->handle;
- 		memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
- 
+ 	chan = l2cap_global_chan_by_scid(0, cid, conn->src);
 
 
