@@ -1,48 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jun 2011 14:52:08 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] Coding style cleanup in sap server
-Message-ID: <20110601115208.GC26952@dell.ger.corp.intel.com>
-References: <1306838810-18325-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <1306838810-18325-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306838810-18325-3-git-send-email-waldemar.rymarkiewicz@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] telephony-ofono: fix features initialization
+Date: Wed,  1 Jun 2011 14:50:40 +0300
+Message-Id: <1306929040-425-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, May 31, 2011, Waldemar Rymarkiewicz wrote:
-> ---
->  sap/server.c |   23 +++++++++++------------
->  1 files changed, 11 insertions(+), 12 deletions(-)
+Features should be ready before telephony_init return, otherwise the
+record might contain invalid features.
+---
+ audio/telephony-ofono.c |   20 ++++++++++----------
+ 1 files changed, 10 insertions(+), 10 deletions(-)
 
-All four patches have been pushed upstream, but before that I fixed the
-following issues with this patch:
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index c00637e..20dc907 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -926,13 +926,6 @@ static void handle_network_property(const char *property, DBusMessageIter *varia
+ 
+ static int parse_network_properties(DBusMessageIter *properties)
+ {
+-	uint32_t features = AG_FEATURE_EC_ANDOR_NR |
+-				AG_FEATURE_INBAND_RINGTONE |
+-				AG_FEATURE_REJECT_A_CALL |
+-				AG_FEATURE_ENHANCED_CALL_STATUS |
+-				AG_FEATURE_ENHANCED_CALL_CONTROL |
+-				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
+-				AG_FEATURE_THREE_WAY_CALLING;
+ 	int i;
+ 
+ 	/* Reset indicators */
+@@ -959,9 +952,6 @@ static int parse_network_properties(DBusMessageIter *properties)
+ 		dbus_message_iter_next(properties);
+ 	}
+ 
+-	telephony_ready_ind(features, ofono_indicators, BTRH_NOT_SUPPORTED,
+-								chld_str);
+-
+ 	return 0;
+ }
+ 
+@@ -1553,6 +1543,13 @@ static void handle_service_disconnect(DBusConnection *conn, void *user_data)
+ 
+ int telephony_init(void)
+ {
++	uint32_t features = AG_FEATURE_EC_ANDOR_NR |
++				AG_FEATURE_INBAND_RINGTONE |
++				AG_FEATURE_REJECT_A_CALL |
++				AG_FEATURE_ENHANCED_CALL_STATUS |
++				AG_FEATURE_ENHANCED_CALL_CONTROL |
++				AG_FEATURE_EXTENDED_ERROR_RESULT_CODES |
++				AG_FEATURE_THREE_WAY_CALLING;
+ 	const char *battery_cap = "battery";
+ 	int ret;
+ 	guint watch;
+@@ -1593,6 +1590,9 @@ int telephony_init(void)
+ 
+ 	DBG("telephony_init() successfully");
+ 
++	telephony_ready_ind(features, ofono_indicators, BTRH_NOT_SUPPORTED,
++								chld_str);
++
+ 	return ret;
+ }
+ 
+-- 
+1.7.5.2
 
-> -	bt_io_get(io, BT_IO_RFCOMM, &gerr,
-> -			BT_IO_OPT_SOURCE_BDADDR, &src,
-> -			BT_IO_OPT_DEST_BDADDR, &dst,
-> -			BT_IO_OPT_INVALID);
-> +	bt_io_get(io, BT_IO_RFCOMM, &gerr, BT_IO_OPT_SOURCE_BDADDR, &src,
-> +			BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
-> +
-
-Readability trumps strict coding style adherence here, so it's fine if
-each op_opt is on its own line.
-
->  	if (!g_dbus_register_interface(connection, path, SAP_SERVER_INTERFACE,
-> -				server_methods, server_signals, NULL,
-> -				server, destroy_sap_interface)) {
-> +			server_methods, server_signals, NULL, server,
-> +			destroy_sap_interface)) {
-
-The idea is to try to have each continuation line past the opening ( of
-the g_dbus_register_interface function call if possible while keeping
-the lines under 80 charcters, so the existing split is fine except that
-it can be indented by one more tab.
-
-Johan
