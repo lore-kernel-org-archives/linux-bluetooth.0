@@ -1,48 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1306942320-12400-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1306942320-12400-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-Date: Wed, 1 Jun 2011 11:43:47 -0400
-Message-ID: <BANLkTik3r6-4ik6+bvJ0kJbGKMYxDUprQg@mail.gmail.com>
-Subject: Re: [PATCH v3] Add support of secure pin code in mgmt code
+In-Reply-To: <BANLkTikAfy-=MRTb_SGa8d2td5oq73xGYg@mail.gmail.com>
+References: <BANLkTikAfy-=MRTb_SGa8d2td5oq73xGYg@mail.gmail.com>
+Date: Wed, 1 Jun 2011 11:32:33 -0400
+Message-ID: <BANLkTikmin21C5ZRN7PsZcfo1kzmGYvbFQ@mail.gmail.com>
+Subject: Re: Binary PIN Support
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
+	marcel@holtmann.org, "Gustavo F. Padovan" <padovan@profusion.mobi>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi David,
 
-On Wed, Jun 1, 2011 at 11:32 AM, Waldemar Rymarkiewicz
-<waldemar.rymarkiewicz@tieto.com> wrote:
-> @@ -135,13 +135,13 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba)
->
->        memset(pin, 0, sizeof(pin));
->        pinlen = read_pin_code(sba, dba, pin);
-> -       if (pinlen > 0) {
-> +       if (pinlen > 0 && (secure && pinlen == 16)) {
+On Wed, Jun 1, 2011 at 10:47 AM, David Herrmann
+<dh.herrmann@googlemail.com> wrote:
+> Any comments or other ideas?
 
-I think this does not make sense. Regardless of secure being TRUE or
-FALSE, "pinlen > 0" will never influence the condition check, so this
-is actually equivalent to "if (secure && pinlen == 16)". Maybe you
-meant:
-
-if (pinlen > 0 || (secure && pinlen == 16))
-
-?
-
->                btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
->                return 0;
->        }
->
->        return device_request_authentication(device, AUTH_TYPE_PINCODE, 0,
-> -                                                               pincode_cb);
-> +                                                       secure, pincode_cb);
->  }
->
->  static int confirm_reply(struct btd_adapter *adapter,
+What about a "BinaryPIN" adapter property (default: False) that when
+set to True treats the PIN data as binary stream and not as string? It
+shall be False by default so to not break backwards compatibility.
 
 Regards,
 -- 
