@@ -1,122 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1306933529-4270-1-git-send-email-lkslawek@gmail.com>
+References: <1306933529-4270-1-git-send-email-lkslawek@gmail.com>
+Date: Wed, 1 Jun 2011 15:10:37 +0200
+Message-ID: <BANLkTik6c0N8Oy9CZZak+Zn5JQ3F636CLQ@mail.gmail.com>
+Subject: Re: [PATCH] Adjust parameters in obexd.service.in
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH v5] Fix disconnect devices after enabling offline mode
-Date: Wed,  1 Jun 2011 15:13:08 +0200
-Message-Id: <1306933988-23209-1-git-send-email-michalski.raf@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously paired and connected devices were disconnected automatically
-after turning bluetooth off directly via bluetooth UI. This patch makes
-that also other ways of turning bluetooth off (which should lead to
-disconnecting paired and connected devices), such as enabling offline
-mode (which turns bluetooth off as well), can be handled properly.
----
- src/adapter.c |   40 ++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 40 insertions(+), 0 deletions(-)
+I'm not sure however if ignoring transport plugins when --plugin is
+used is a good idea at all. There is no hint in --help text what user
+would have to load to make obexd work. Also no list of available
+plugins, thus this all is a bit confusing now.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index c30febc..bb2643c 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -77,6 +77,8 @@
- 
- #define check_address(address) bachk(address)
- 
-+#define OFF_TIMER 3
-+
- static DBusConnection *connection = NULL;
- static GSList *adapter_drivers = NULL;
- 
-@@ -142,6 +144,8 @@ struct btd_adapter {
- 
- 	gint ref;
- 
-+	guint off_timer;
-+
- 	GSList *powered_callbacks;
- 
- 	gboolean name_stored;
-@@ -2331,6 +2335,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
- 	adapter->pairable_timeout = get_pairable_timeout(address);
- 	adapter->state = STATE_IDLE;
- 	adapter->mode = MODE_CONNECTABLE;
-+	adapter->off_timer = 0;
- 
- 	if (main_opts.le)
- 		adapter_ops->enable_le(adapter->dev_id);
-@@ -2504,6 +2509,12 @@ int btd_adapter_stop(struct btd_adapter *adapter)
- 	return 0;
- }
- 
-+static void off_timer_remove(struct btd_adapter *adapter)
-+{
-+	g_source_remove(adapter->off_timer);
-+	adapter->off_timer = 0;
-+}
-+
- static void adapter_free(gpointer user_data)
- {
- 	struct btd_adapter *adapter = user_data;
-@@ -2516,6 +2527,9 @@ static void adapter_free(gpointer user_data)
- 	if (adapter->auth_idle_id)
- 		g_source_remove(adapter->auth_idle_id);
- 
-+	if (adapter->off_timer)
-+		off_timer_remove(adapter);
-+
- 	sdp_list_free(adapter->services, NULL);
- 
- 	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
-@@ -3454,6 +3468,16 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
- 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
- }
- 
-+static gboolean switch_off_timeout(gpointer user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	adapter_ops->set_powered(adapter->dev_id, FALSE);
-+	adapter->off_timer = 0;
-+
-+	return FALSE;
-+}
-+
- int btd_adapter_switch_online(struct btd_adapter *adapter)
- {
- 	if (!adapter_ops)
-@@ -3462,6 +3486,9 @@ int btd_adapter_switch_online(struct btd_adapter *adapter)
- 	if (adapter->up)
- 		return 0;
- 
-+	if (adapter->off_timer)
-+		off_timer_remove(adapter);
-+
- 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
- }
- 
-@@ -3473,6 +3500,19 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
- 	if (!adapter->up)
- 		return 0;
- 
-+	if (adapter->off_timer)
-+		return 0;
-+
-+	if (adapter->connections) {
-+		g_slist_foreach(adapter->connections,
-+				(GFunc) device_request_disconnect, NULL);
-+
-+		adapter->off_timer = g_timeout_add_seconds(OFF_TIMER,
-+					switch_off_timeout, adapter);
-+
-+		return 0;
-+	}
-+
- 	return adapter_ops->set_powered(adapter->dev_id, FALSE);
- }
- 
--- 
-1.6.3.3
-
+BR,
+Slawomir Bochenski
