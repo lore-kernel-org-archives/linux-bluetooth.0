@@ -1,78 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTimyLAz6bFMv3eV_2QaCYfjGHH_wcA@mail.gmail.com>
-References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
-	<BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
-	<BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
-	<BANLkTinYb=i9iYNR0Uhd7YG84jdGht2gNg@mail.gmail.com>
-	<BANLkTimwz1D4W9rT6E=84r+3OGkjTen=xg@mail.gmail.com>
-	<BANLkTimyLAz6bFMv3eV_2QaCYfjGHH_wcA@mail.gmail.com>
-Date: Wed, 1 Jun 2011 11:17:15 +0300
-Message-ID: <BANLkTimE8z7vYH2JN=1qMvsoZVvX6uqmyA@mail.gmail.com>
+Date: Wed, 1 Jun 2011 11:17:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Daniel =?iso-8859-1?Q?=D6rstadius?= <daniel.orstadius@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Init telephony before adding HFP SDP records
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Daniel_=D6rstadius?= <daniel.orstadius@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20110601081729.GA9060@dell.ger.corp.intel.com>
+References: <BANLkTi=L1xG3gVi9bmuW_YSWcOmu1HiRoQ@mail.gmail.com>
+ <BANLkTin3vWrRigXOHQbJKr3rbN1xoirdYw@mail.gmail.com>
+ <BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTi=1Si-h9AuMRCBKnBjhj6=LXYhuFQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Daniel,
 
-On Wed, Jun 1, 2011 at 10:58 AM, Daniel Örstadius
-<daniel.orstadius@gmail.com> wrote:
-> Hi Luiz,
->
-> On Fri, May 27, 2011 at 1:45 PM, Daniel Örstadius
-> <daniel.orstadius@gmail.com> wrote:
->> Hi Luiz,
->>
->> On Fri, May 27, 2011 at 1:26 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Daniel,
->>>
->>> On Fri, May 27, 2011 at 11:40 AM, Daniel Örstadius
->>> <daniel.orstadius@gmail.com> wrote:
->>>> Hi Luiz,
->>>>
->>>> On Thu, May 26, 2011 at 6:44 PM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> Hi Daniel,
->>>>>
->>>>> On Thu, May 26, 2011 at 4:58 PM, Daniel Örstadius
->>>>> <daniel.orstadius@gmail.com> wrote:
->>>>>> Please review.
->>>>>
->>>>> For telephony-maemo6 it should be enough to just call
->>>>> headset_server_init after state_changed/telephony_init.
->>>>>
->>>>
->>>> Thanks for the feedback, that seems like a much leaner solution.
->>>> Attaching new patch.
->>>
->>> Looks much better, shall I take care of fixing telephony-ofono or you
->>> already have a patch for it?
->>>
->>> --
->>> Luiz Augusto von Dentz
->>> Computer Engineer
->>>
->>
->> No, since I'm not familiar with ofono I didn't make a patch for that issue.
->>
->> Regards,
->> Daniel
->>
->
-> Since the patch was not applied I'm wondering how to proceed with it?
->
-> (Maybe I misunderstood, but isn't the ofono issue a separate bug that
-> exists regardless of the patch?)
+On Fri, May 27, 2011, Daniel Örstadius wrote:
+> Thanks for the feedback, that seems like a much leaner solution.
+> Attaching new patch.
+> 
+> Regards,
+> Daniel
 
-Yep, it is unrelated, Im fine with it.
+> From 6ef2596d1b42abd6db51d22a5cf2239a0669ca12 Mon Sep 17 00:00:00 2001
+> From: Daniel Orstadius <daniel.orstadius@nokia.com>
+> Date: Fri, 27 May 2011 11:26:18 +0300
+> Subject: [PATCH] Init telephony before adding the HFP SDP record
+> 
+> By patch b9d85c00108977b24ae91ea8ecedb9ceffe6f648 the initialization
+> of the telephony subsystem is delayed in the bluetoothd startup
+> procedure. As a result the SupportedFeatures bitmap has not been set
+> when creating the HFP SDP record. This patch changes the order of
+> the telephony initialization (via the state_changed function) and
+> the registration of the record, so that it gets the right value.
+> 
+> Although the corresponding bit in +BRSF is correctly set, the
+> missing bit for the "Three-way calling" feature in the SDP record
+> causes some headsets not to send AT+CHLD=? in certain situations.
+> This results in failed connections since BlueZ does not enter the
+> "connected" state on the headset interface before that command is
+> received, if the feature is supported by both sides.
+> ---
+>  audio/manager.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-Regards,
+Applied. Thanks.
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+Johan
