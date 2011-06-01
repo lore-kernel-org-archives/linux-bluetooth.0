@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jun 2011 16:56:19 -0300
+Date: Wed, 1 Jun 2011 16:48:58 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Remove a magic number
-Message-ID: <20110601195619.GF2564@joana>
-References: <1306942128-5325-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: "John W. Linville" <linville@tuxdriver.com>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: fix sparse & gcc warnings
+Message-ID: <20110601194858.GE2564@joana>
+References: <1306911285.3867.6.camel@jlt3.sipsolutions.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306942128-5325-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1306911285.3867.6.camel@jlt3.sipsolutions.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-06-01 17:28:47 +0200]:
+Hi Johannes,
 
-> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+* Johannes Berg <johannes@sipsolutions.net> [2011-06-01 08:54:45 +0200]:
+
+> From: Johannes Berg <johannes.berg@intel.com>
+> 
+> sparse complains about a few things that should
+> be static, and I also noticed another warning
+> from gcc about a set but unused variable.
+> 
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 > ---
->  net/bluetooth/mgmt.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap_core.c  |    6 +++---
+>  net/bluetooth/mgmt.c        |    2 +-
+>  net/bluetooth/rfcomm/sock.c |    3 ---
+>  3 files changed, 4 insertions(+), 7 deletions(-)
 
-Applied, thanks.
+I applied the sparse part as set but unused variable warnings are all fixed,
+thanks for the patch.
 
-- 
+-- 
 Gustavo F. Padovan
 http://profusion.mobi
