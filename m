@@ -1,51 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jun 2011 16:33:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5] Fix disconnect devices after enabling offline mode
-Message-ID: <20110601133352.GA6226@dell.ger.corp.intel.com>
-References: <1306933988-23209-1-git-send-email-michalski.raf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1306933988-23209-1-git-send-email-michalski.raf@gmail.com>
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH v5] Fix disconnect devices after enabling offline mode
+Date: Wed,  1 Jun 2011 15:13:08 +0200
+Message-Id: <1306933988-23209-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Previously paired and connected devices were disconnected automatically
+after turning bluetooth off directly via bluetooth UI. This patch makes
+that also other ways of turning bluetooth off (which should lead to
+disconnecting paired and connected devices), such as enabling offline
+mode (which turns bluetooth off as well), can be handled properly.
+---
+ src/adapter.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 40 insertions(+), 0 deletions(-)
 
-On Wed, Jun 01, 2011, Rafal Michalski wrote:
-> Previously paired and connected devices were disconnected automatically
-> after turning bluetooth off directly via bluetooth UI. This patch makes
-> that also other ways of turning bluetooth off (which should lead to
-> disconnecting paired and connected devices), such as enabling offline
-> mode (which turns bluetooth off as well), can be handled properly.
-> ---
->  src/adapter.c |   40 ++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 40 insertions(+), 0 deletions(-)
+diff --git a/src/adapter.c b/src/adapter.c
+index c30febc..bb2643c 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -77,6 +77,8 @@
+ 
+ #define check_address(address) bachk(address)
+ 
++#define OFF_TIMER 3
++
+ static DBusConnection *connection = NULL;
+ static GSList *adapter_drivers = NULL;
+ 
+@@ -142,6 +144,8 @@ struct btd_adapter {
+ 
+ 	gint ref;
+ 
++	guint off_timer;
++
+ 	GSList *powered_callbacks;
+ 
+ 	gboolean name_stored;
+@@ -2331,6 +2335,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
+ 	adapter->pairable_timeout = get_pairable_timeout(address);
+ 	adapter->state = STATE_IDLE;
+ 	adapter->mode = MODE_CONNECTABLE;
++	adapter->off_timer = 0;
+ 
+ 	if (main_opts.le)
+ 		adapter_ops->enable_le(adapter->dev_id);
+@@ -2504,6 +2509,12 @@ int btd_adapter_stop(struct btd_adapter *adapter)
+ 	return 0;
+ }
+ 
++static void off_timer_remove(struct btd_adapter *adapter)
++{
++	g_source_remove(adapter->off_timer);
++	adapter->off_timer = 0;
++}
++
+ static void adapter_free(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
+@@ -2516,6 +2527,9 @@ static void adapter_free(gpointer user_data)
+ 	if (adapter->auth_idle_id)
+ 		g_source_remove(adapter->auth_idle_id);
+ 
++	if (adapter->off_timer)
++		off_timer_remove(adapter);
++
+ 	sdp_list_free(adapter->services, NULL);
+ 
+ 	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
+@@ -3454,6 +3468,16 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
+ 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
+ }
+ 
++static gboolean switch_off_timeout(gpointer user_data)
++{
++	struct btd_adapter *adapter = user_data;
++
++	adapter_ops->set_powered(adapter->dev_id, FALSE);
++	adapter->off_timer = 0;
++
++	return FALSE;
++}
++
+ int btd_adapter_switch_online(struct btd_adapter *adapter)
+ {
+ 	if (!adapter_ops)
+@@ -3462,6 +3486,9 @@ int btd_adapter_switch_online(struct btd_adapter *adapter)
+ 	if (adapter->up)
+ 		return 0;
+ 
++	if (adapter->off_timer)
++		off_timer_remove(adapter);
++
+ 	return adapter_ops->set_powered(adapter->dev_id, TRUE);
+ }
+ 
+@@ -3473,6 +3500,19 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
+ 	if (!adapter->up)
+ 		return 0;
+ 
++	if (adapter->off_timer)
++		return 0;
++
++	if (adapter->connections) {
++		g_slist_foreach(adapter->connections,
++				(GFunc) device_request_disconnect, NULL);
++
++		adapter->off_timer = g_timeout_add_seconds(OFF_TIMER,
++					switch_off_timeout, adapter);
++
++		return 0;
++	}
++
+ 	return adapter_ops->set_powered(adapter->dev_id, FALSE);
+ }
+ 
+-- 
+1.6.3.3
 
-Thanks. The patch has now been pushed upstream with one more minor
-change:
-
-> +	if (adapter->connections) {
-> +		g_slist_foreach(adapter->connections,
-> +				(GFunc) device_request_disconnect, NULL);
-> +
-> +		adapter->off_timer = g_timeout_add_seconds(OFF_TIMER,
-> +					switch_off_timeout, adapter);
-> +
-> +		return 0;
-> +	}
-> +
->  	return adapter_ops->set_powered(adapter->dev_id, FALSE);
->  }
-
-I switched this around to:
-
-	if (adapter->connections == NULL)
-		return adapter_ops->set_powered(adapter->dev_id, FALSE);
-	...
-
-It makes it bit more readable.
-
-Johan
