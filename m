@@ -1,207 +1,240 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] Bluetooth: keep reference if any ERTM timer is enabled
-Date: Thu,  2 Jun 2011 13:15:29 -0300
-Message-Id: <1307031329-8001-6-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1307031329-8001-5-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 5/6] Bluetooth: Make timer functions generic
+Date: Thu,  2 Jun 2011 13:15:28 -0300
+Message-Id: <1307031329-8001-5-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1307031329-8001-4-git-send-email-padovan@profusion.mobi>
 References: <1307031329-8001-1-git-send-email-padovan@profusion.mobi>
  <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
  <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
  <1307031329-8001-4-git-send-email-padovan@profusion.mobi>
- <1307031329-8001-5-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ERTM use the generic L2CAP timer functions to keep a reference to the
-channel. This is useful for avoiding crashes.
+We now plan to use l2cap_set_timer and l2cap_clear_timer in ERTM timers.
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |   15 ++++++++-----
- net/bluetooth/l2cap_core.c    |   44 ++++++++++++++++++++--------------------
- 2 files changed, 31 insertions(+), 28 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +
+ net/bluetooth/l2cap_core.c    |   59 +++++++++++++++++++++--------------------
+ 2 files changed, 32 insertions(+), 29 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e3e58f9..c4799da2 100644
+index c620a92..e3e58f9 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -437,12 +437,15 @@ struct l2cap_pinfo {
+@@ -435,6 +435,8 @@ struct l2cap_pinfo {
+ #define L2CAP_CONN_RNR_SENT        0x0200
+ #define L2CAP_CONN_SAR_RETRY       0x0400
  
- #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
- #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
--#define __mod_retrans_timer() mod_timer(&chan->retrans_timer, \
--		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
--#define __mod_monitor_timer() mod_timer(&chan->monitor_timer, \
--		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
--#define __mod_ack_timer() mod_timer(&chan->ack_timer, \
--		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
-+#define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
-+		L2CAP_DEFAULT_RETRANS_TO);
-+#define __clear_retrans_timer(c) l2cap_clear_timer(c, &c->retrans_timer)
-+#define __set_monitor_timer(c) l2cap_set_timer(c, &c->monitor_timer, \
-+		L2CAP_DEFAULT_MONITOR_TO);
-+#define __clear_monitor_timer(c) l2cap_clear_timer(c, &c->monitor_timer)
-+#define __set_ack_timer(c) l2cap_set_timer(c, &chan->ack_timer, \
-+		L2CAP_DEFAULT_ACK_TO);
-+#define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
- 
- static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
- {
++#define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
++#define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+ #define __mod_retrans_timer() mod_timer(&chan->retrans_timer, \
+ 		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+ #define __mod_monitor_timer() mod_timer(&chan->monitor_timer, \
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8586077..7042f6e 100644
+index dd8da43..8586077 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -380,9 +380,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	if (chan->mode == L2CAP_MODE_ERTM) {
- 		struct srej_list *l, *tmp;
- 
--		del_timer(&chan->retrans_timer);
--		del_timer(&chan->monitor_timer);
--		del_timer(&chan->ack_timer);
-+		__clear_retrans_timer(chan);
-+		__clear_monitor_timer(chan);
-+		__clear_ack_timer(chan);
- 
- 		skb_queue_purge(&chan->srej_q);
- 		skb_queue_purge(&chan->busy_q);
-@@ -686,9 +686,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
- 	sk = chan->sk;
- 
- 	if (chan->mode == L2CAP_MODE_ERTM) {
--		del_timer(&chan->retrans_timer);
--		del_timer(&chan->monitor_timer);
--		del_timer(&chan->ack_timer);
-+		__clear_retrans_timer(chan);
-+		__clear_monitor_timer(chan);
-+		__clear_ack_timer(chan);
- 	}
- 
- 	req.dcid = cpu_to_le16(chan->dcid);
-@@ -1166,7 +1166,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
- 	}
- 
- 	chan->retry_count++;
--	__mod_monitor_timer();
-+	__set_monitor_timer(chan);
- 
- 	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
- 	bh_unlock_sock(sk);
-@@ -1181,7 +1181,7 @@ static void l2cap_retrans_timeout(unsigned long arg)
- 
- 	bh_lock_sock(sk);
- 	chan->retry_count = 1;
--	__mod_monitor_timer();
-+	__set_monitor_timer(chan);
- 
- 	chan->conn_state |= L2CAP_CONN_WAIT_F;
- 
-@@ -1205,7 +1205,7 @@ static void l2cap_drop_acked_frames(struct l2cap_chan *chan)
- 	}
- 
- 	if (!chan->unacked_frames)
--		del_timer(&chan->retrans_timer);
-+		__clear_retrans_timer(chan);
+@@ -220,19 +220,19 @@ static u16 l2cap_alloc_cid(struct l2cap_conn *conn)
+ 	return 0;
  }
  
- void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
-@@ -1332,7 +1332,7 @@ int l2cap_ertm_send(struct l2cap_chan *chan)
+-static void l2cap_chan_set_timer(struct l2cap_chan *chan, long timeout)
++static void l2cap_set_timer(struct l2cap_chan *chan, struct timer_list *timer, long timeout)
+ {
+        BT_DBG("chan %p state %d timeout %ld", chan->sk, chan->sk->sk_state,
+ 								 timeout);
+-       if (!mod_timer(&chan->chan_timer, jiffies + timeout))
++       if (!mod_timer(timer, jiffies + timeout))
+ 	       chan_hold(chan);
+ }
  
- 		l2cap_do_send(chan, tx_skb);
+-static void l2cap_chan_clear_timer(struct l2cap_chan *chan)
++static void l2cap_clear_timer(struct l2cap_chan *chan, struct timer_list *timer)
+ {
+        BT_DBG("chan %p state %d", chan, chan->sk->sk_state);
  
--		__mod_retrans_timer();
-+		__set_retrans_timer(chan);
+-       if (timer_pending(&chan->chan_timer) && del_timer(&chan->chan_timer))
++       if (timer_pending(timer) && del_timer(timer))
+ 	       chan_put(chan);
+ }
  
- 		bt_cb(skb)->tx_seq = chan->next_tx_seq;
- 		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
-@@ -3249,8 +3249,8 @@ static int l2cap_try_push_rx_skb(struct l2cap_chan *chan)
- 	l2cap_send_sframe(chan, control);
- 	chan->retry_count = 1;
+@@ -248,7 +248,7 @@ static void l2cap_chan_timeout(unsigned long arg)
  
--	del_timer(&chan->retrans_timer);
--	__mod_monitor_timer();
-+	__clear_retrans_timer(chan);
-+	__set_monitor_timer(chan);
- 
- 	chan->conn_state |= L2CAP_CONN_WAIT_F;
- 
-@@ -3341,7 +3341,7 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
- 
- 	chan->conn_state |= L2CAP_CONN_RNR_SENT;
- 
--	del_timer(&chan->ack_timer);
-+	__clear_ack_timer(chan);
- 
- 	queue_work(_busy_wq, &chan->busy_work);
- 
-@@ -3510,9 +3510,9 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
- 
- 	if (L2CAP_CTRL_FINAL & rx_control &&
- 			chan->conn_state & L2CAP_CONN_WAIT_F) {
--		del_timer(&chan->monitor_timer);
-+		__clear_monitor_timer(chan);
- 		if (chan->unacked_frames > 0)
--			__mod_retrans_timer();
-+			__set_retrans_timer(chan);
- 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
- 	}
- 
-@@ -3593,7 +3593,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
- 
- 		l2cap_send_srejframe(chan, tx_seq);
- 
--		del_timer(&chan->ack_timer);
-+		__clear_ack_timer(chan);
- 	}
- 	return 0;
- 
-@@ -3618,7 +3618,7 @@ expected:
- 			l2cap_retransmit_frames(chan);
- 	}
- 
--	__mod_ack_timer();
-+	__set_ack_timer(chan);
- 
- 	chan->num_acked = (chan->num_acked + 1) % num_to_ack;
- 	if (chan->num_acked == num_to_ack - 1)
-@@ -3644,7 +3644,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
- 		if (chan->conn_state & L2CAP_CONN_SREJ_SENT) {
- 			if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
- 					(chan->unacked_frames > 0))
--				__mod_retrans_timer();
-+				__set_retrans_timer(chan);
- 
- 			chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
- 			l2cap_send_srejtail(chan);
-@@ -3663,7 +3663,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
- 	} else {
- 		if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
- 				(chan->unacked_frames > 0))
--			__mod_retrans_timer();
-+			__set_retrans_timer(chan);
- 
- 		chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
- 		if (chan->conn_state & L2CAP_CONN_SREJ_SENT)
-@@ -3746,7 +3746,7 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
- 		chan->conn_state |= L2CAP_CONN_SEND_FBIT;
- 
- 	if (!(chan->conn_state & L2CAP_CONN_SREJ_SENT)) {
--		del_timer(&chan->retrans_timer);
-+		__clear_retrans_timer(chan);
- 		if (rx_control & L2CAP_CTRL_POLL)
- 			l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_FINAL);
+ 	if (sock_owned_by_user(sk)) {
+ 		/* sk is owned by user. Try again later */
+-		l2cap_chan_set_timer(chan, HZ / 5);
++		__set_chan_timer(chan, HZ / 5);
+ 		bh_unlock_sock(sk);
+ 		chan_put(chan);
  		return;
-@@ -3764,9 +3764,9 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u16 rx_cont
+@@ -345,7 +345,7 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sock *parent = bt_sk(sk)->parent;
  
- 	if (L2CAP_CTRL_FINAL & rx_control &&
- 			chan->conn_state & L2CAP_CONN_WAIT_F) {
--		del_timer(&chan->monitor_timer);
-+		__clear_monitor_timer(chan);
- 		if (chan->unacked_frames > 0)
--			__mod_retrans_timer();
-+			__set_retrans_timer(chan);
- 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
+-	l2cap_chan_clear_timer(chan);
++	__clear_chan_timer(chan);
+ 
+ 	BT_DBG("chan %p, conn %p, err %d", chan, conn, err);
+ 
+@@ -403,7 +403,8 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
+ 	/* Close not yet accepted channels */
+ 	while ((sk = bt_accept_dequeue(parent, NULL))) {
+ 		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+-		l2cap_chan_clear_timer(chan);
++
++		__clear_chan_timer(chan);
+ 		lock_sock(sk);
+ 		l2cap_chan_close(chan, ECONNRESET);
+ 		release_sock(sk);
+@@ -430,8 +431,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 	case BT_CONFIG:
+ 		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED &&
+ 					conn->hcon->type == ACL_LINK) {
+-			l2cap_chan_clear_timer(chan);
+-			l2cap_chan_set_timer(chan, sk->sk_sndtimeo);
++			__clear_chan_timer(chan);
++			__set_chan_timer(chan, sk->sk_sndtimeo);
+ 			l2cap_send_disconn_req(conn, chan, reason);
+ 		} else
+ 			l2cap_chan_del(chan, reason);
+@@ -866,7 +867,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	__l2cap_chan_add(conn, chan);
+ 
+-	l2cap_chan_set_timer(chan, sk->sk_sndtimeo);
++	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	sk->sk_state = BT_CONNECTED;
+ 	parent->sk_data_ready(parent, 0);
+@@ -894,13 +895,13 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 		bh_lock_sock(sk);
+ 
+ 		if (conn->hcon->type == LE_LINK) {
+-			l2cap_chan_clear_timer(chan);
++			__clear_chan_timer(chan);
+ 			sk->sk_state = BT_CONNECTED;
+ 			sk->sk_state_change(sk);
+ 		}
+ 
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+-			l2cap_chan_clear_timer(chan);
++			__clear_chan_timer(chan);
+ 			sk->sk_state = BT_CONNECTED;
+ 			sk->sk_state_change(sk);
+ 		} else if (sk->sk_state == BT_CONNECT)
+@@ -1099,11 +1100,11 @@ int l2cap_chan_connect(struct l2cap_chan *chan)
+ 	l2cap_chan_add(conn, chan);
+ 
+ 	sk->sk_state = BT_CONNECT;
+-	l2cap_chan_set_timer(chan, sk->sk_sndtimeo);
++	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	if (hcon->state == BT_CONNECTED) {
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+-			l2cap_chan_clear_timer(chan);
++			__clear_chan_timer(chan);
+ 			if (l2cap_check_security(chan))
+ 				sk->sk_state = BT_CONNECTED;
+ 		} else
+@@ -1667,7 +1668,7 @@ static void l2cap_chan_ready(struct sock *sk)
+ 	BT_DBG("sk %p, parent %p", sk, parent);
+ 
+ 	chan->conf_state = 0;
+-	l2cap_chan_clear_timer(chan);
++	__clear_chan_timer(chan);
+ 
+ 	if (!parent) {
+ 		/* Outgoing channel.
+@@ -2362,7 +2363,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 
+ 	dcid = chan->scid;
+ 
+-	l2cap_chan_set_timer(chan, sk->sk_sndtimeo);
++	__set_chan_timer(chan, sk->sk_sndtimeo);
+ 
+ 	chan->ident = cmd->ident;
+ 
+@@ -2479,8 +2480,8 @@ static inline int l2cap_connect_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 		/* don't delete l2cap channel if sk is owned by user */
+ 		if (sock_owned_by_user(sk)) {
+ 			sk->sk_state = BT_DISCONN;
+-			l2cap_chan_clear_timer(chan);
+-			l2cap_chan_set_timer(chan, HZ / 5);
++			__clear_chan_timer(chan);
++			__set_chan_timer(chan, HZ / 5);
+ 			break;
+ 		}
+ 
+@@ -2653,7 +2654,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 
+ 	default:
+ 		sk->sk_err = ECONNRESET;
+-		l2cap_chan_set_timer(chan, HZ * 5);
++		__set_chan_timer(chan, HZ * 5);
+ 		l2cap_send_disconn_req(conn, chan, ECONNRESET);
+ 		goto done;
  	}
+@@ -2709,8 +2710,8 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 	/* don't delete l2cap channel if sk is owned by user */
+ 	if (sock_owned_by_user(sk)) {
+ 		sk->sk_state = BT_DISCONN;
+-		l2cap_chan_clear_timer(chan);
+-		l2cap_chan_set_timer(chan, HZ / 5);
++		__clear_chan_timer(chan);
++		__set_chan_timer(chan, HZ / 5);
+ 		bh_unlock_sock(sk);
+ 		return 0;
+ 	}
+@@ -2743,8 +2744,8 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 	/* don't delete l2cap channel if sk is owned by user */
+ 	if (sock_owned_by_user(sk)) {
+ 		sk->sk_state = BT_DISCONN;
+-		l2cap_chan_clear_timer(chan);
+-		l2cap_chan_set_timer(chan, HZ / 5);
++		__clear_chan_timer(chan);
++		__set_chan_timer(chan, HZ / 5);
+ 		bh_unlock_sock(sk);
+ 		return 0;
+ 	}
+@@ -4140,13 +4141,13 @@ static inline void l2cap_check_encryption(struct l2cap_chan *chan, u8 encrypt)
+ 
+ 	if (encrypt == 0x00) {
+ 		if (chan->sec_level == BT_SECURITY_MEDIUM) {
+-			l2cap_chan_clear_timer(chan);
+-			l2cap_chan_set_timer(chan, HZ * 5);
++			__clear_chan_timer(chan);
++			__set_chan_timer(chan, HZ * 5);
+ 		} else if (chan->sec_level == BT_SECURITY_HIGH)
+ 			l2cap_chan_close(chan, ECONNREFUSED);
+ 	} else {
+ 		if (chan->sec_level == BT_SECURITY_MEDIUM)
+-			l2cap_chan_clear_timer(chan);
++			__clear_chan_timer(chan);
+ 	}
+ }
+ 
+@@ -4191,8 +4192,8 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				l2cap_send_cmd(conn, chan->ident,
+ 					L2CAP_CONN_REQ, sizeof(req), &req);
+ 			} else {
+-				l2cap_chan_clear_timer(chan);
+-				l2cap_chan_set_timer(chan, HZ / 10);
++				__clear_chan_timer(chan);
++				__set_chan_timer(chan, HZ / 10);
+ 			}
+ 		} else if (sk->sk_state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+@@ -4203,7 +4204,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 				result = L2CAP_CR_SUCCESS;
+ 			} else {
+ 				sk->sk_state = BT_DISCONN;
+-				l2cap_chan_set_timer(chan, HZ / 10);
++				__set_chan_timer(chan, HZ / 10);
+ 				result = L2CAP_CR_SEC_BLOCK;
+ 			}
  
 -- 
 1.7.5.1
