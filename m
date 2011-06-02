@@ -1,16 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Lukasz Pawlik <lucas.pawlik@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH 0/5] Renewed new missed calls handling
-Date: Thu,  2 Jun 2011 15:23:18 +0200
-Message-Id: <1307021003-15418-1-git-send-email-lkslawek@gmail.com>
+Cc: Lukasz Pawlik <lucas.pawlik@gmail.com>
+Subject: [PATCH] Fix type in conditional expression
+Date: Thu,  2 Jun 2011 14:54:32 +0200
+Message-Id: <1307019272-19810-1-git-send-email-lucas.pawlik@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series implements working means of sending application
-parameters header before body while still using OpenOBEX body header
-streaming, utilizing it in PBAP plugin.
+Function media_endpoint_create returns pointer to structure. In
+conditional expression it is safer to compare returned value with NULL
+and not with gboolean as it is done in register_endpoint function.
+---
+ audio/media.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-First patch reverts changes that were meant to do the same, however did not
-provide any change to what was being sent.
+diff --git a/audio/media.c b/audio/media.c
+index 0efb0a8..0eb712a 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -365,7 +365,7 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
+ 		return btd_error_invalid_args(msg);
+ 
+ 	if (media_endpoint_create(adapter, sender, path, uuid, delay_reporting,
+-				codec, capabilities, size, &err) == FALSE) {
++				codec, capabilities, size, &err) == NULL) {
+ 		if (err == -EPROTONOSUPPORT)
+ 			return btd_error_not_supported(msg);
+ 		else
+-- 
+1.7.4.1
+
