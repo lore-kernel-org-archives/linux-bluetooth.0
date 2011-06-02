@@ -1,138 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] Bluetooth: Add refcnt to struct l2cap_chan
-Date: Thu,  2 Jun 2011 13:15:27 -0300
-Message-Id: <1307031329-8001-4-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 3/6] Bluetooth: add close() callback to l2cap_chan_ops
+Date: Thu,  2 Jun 2011 13:15:26 -0300
+Message-Id: <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
 References: <1307031329-8001-1-git-send-email-padovan@profusion.mobi>
  <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
- <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-struct l2cap_chan has now its own refcnt that is compatible with the
-socket refcnt, i.e., we won't see sk_refcnt = 0 and chan->refcnt > 0.
+close() calls l2cap_sock_kill() on l2cap_sock.c
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    2 ++
- net/bluetooth/l2cap_core.c    |   29 ++++++++++++++++++++---------
- 2 files changed, 22 insertions(+), 9 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 +--
+ net/bluetooth/l2cap_core.c    |   17 +++++++++--------
+ net/bluetooth/l2cap_sock.c    |   10 +++++++++-
+ 3 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index af2f171..c620a92 100644
+index e625f09..af2f171 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -287,6 +287,8 @@ struct l2cap_chan {
+@@ -363,6 +363,7 @@ struct l2cap_ops {
  
- 	struct l2cap_conn	*conn;
+ 	struct l2cap_chan	*(*new_connection) (void *data);
+ 	int			(*recv) (void *data, struct sk_buff *skb);
++	void			(*close) (void *data);
+ };
  
-+	atomic_t	refcnt;
-+
- 	__le16		psm;
- 	__u16		dcid;
- 	__u16		scid;
+ struct l2cap_conn {
+@@ -468,8 +469,6 @@ int __l2cap_wait_ack(struct sock *sk);
+ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
+ 
+-void l2cap_sock_kill(struct sock *sk);
+-
+ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c645e03..dd8da43 100644
+index b5327f3..c645e03 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -78,6 +78,18 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn,
- static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb);
+@@ -254,7 +254,7 @@ static void l2cap_chan_timeout(unsigned long arg)
  
- /* ---- L2CAP channels ---- */
-+
-+static inline void chan_hold(struct l2cap_chan *c)
-+{
-+	atomic_inc(&c->refcnt);
-+}
-+
-+static inline void chan_put(struct l2cap_chan *c)
-+{
-+	if (atomic_dec_and_test(&c->refcnt))
-+		kfree(c);
-+}
-+
- static struct l2cap_chan *__l2cap_get_chan_by_dcid(struct l2cap_conn *conn, u16 cid)
- {
- 	struct l2cap_chan *c;
-@@ -213,7 +225,7 @@ static void l2cap_chan_set_timer(struct l2cap_chan *chan, long timeout)
-        BT_DBG("chan %p state %d timeout %ld", chan->sk, chan->sk->sk_state,
- 								 timeout);
-        if (!mod_timer(&chan->chan_timer, jiffies + timeout))
--	       sock_hold(chan->sk);
-+	       chan_hold(chan);
- }
- 
- static void l2cap_chan_clear_timer(struct l2cap_chan *chan)
-@@ -221,7 +233,7 @@ static void l2cap_chan_clear_timer(struct l2cap_chan *chan)
-        BT_DBG("chan %p state %d", chan, chan->sk->sk_state);
- 
-        if (timer_pending(&chan->chan_timer) && del_timer(&chan->chan_timer))
--	       __sock_put(chan->sk);
-+	       chan_put(chan);
- }
- 
- static void l2cap_chan_timeout(unsigned long arg)
-@@ -238,7 +250,7 @@ static void l2cap_chan_timeout(unsigned long arg)
- 		/* sk is owned by user. Try again later */
- 		l2cap_chan_set_timer(chan, HZ / 5);
- 		bh_unlock_sock(sk);
--		sock_put(sk);
-+		chan_put(chan);
- 		return;
- 	}
- 
-@@ -255,7 +267,7 @@ static void l2cap_chan_timeout(unsigned long arg)
  	bh_unlock_sock(sk);
  
- 	chan->ops->close(chan->ops->data);
--	sock_put(sk);
-+	chan_put(chan);
+-	l2cap_sock_kill(sk);
++	chan->ops->close(chan->ops->data);
+ 	sock_put(sk);
  }
  
- struct l2cap_chan *l2cap_chan_create(struct sock *sk)
-@@ -274,6 +286,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
+@@ -391,11 +391,12 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
  
- 	setup_timer(&chan->chan_timer, l2cap_chan_timeout, (unsigned long) chan);
- 
-+	atomic_set(&chan->refcnt, 1);
-+
- 	return chan;
- }
- 
-@@ -283,13 +297,11 @@ void l2cap_chan_destroy(struct l2cap_chan *chan)
- 	list_del(&chan->global_l);
- 	write_unlock_bh(&chan_list_lock);
- 
--	kfree(chan);
-+	chan_put(chan);
- }
- 
- static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- {
--	struct sock *sk = chan->sk;
--
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
- 			chan->psm, chan->dcid);
- 
-@@ -320,7 +332,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 		chan->omtu = L2CAP_DEFAULT_MTU;
+ 	/* Close not yet accepted channels */
+ 	while ((sk = bt_accept_dequeue(parent, NULL))) {
+-		l2cap_chan_clear_timer(l2cap_pi(sk)->chan);
++		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++		l2cap_chan_clear_timer(chan);
+ 		lock_sock(sk);
+-		l2cap_chan_close(l2cap_pi(sk)->chan, ECONNRESET);
++		l2cap_chan_close(chan, ECONNRESET);
+ 		release_sock(sk);
+-		l2cap_sock_kill(sk);
++		chan->ops->close(chan->ops->data);
  	}
  
--	sock_hold(sk);
-+	chan_hold(chan);
+ 	parent->sk_state = BT_CLOSED;
+@@ -988,7 +989,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 		bh_lock_sock(sk);
+ 		l2cap_chan_del(chan, err);
+ 		bh_unlock_sock(sk);
+-		l2cap_sock_kill(sk);
++		chan->ops->close(chan->ops->data);
+ 	}
  
- 	list_add(&chan->list, &conn->chan_l);
- }
-@@ -342,7 +354,6 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 		write_lock_bh(&conn->chan_lock);
- 		list_del(&chan->list);
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+@@ -2333,7 +2334,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
+ 	if (__l2cap_get_chan_by_dcid(conn, scid)) {
  		write_unlock_bh(&conn->chan_lock);
--		__sock_put(sk);
+ 		sock_set_flag(sk, SOCK_ZAPPED);
+-		l2cap_sock_kill(sk);
++		chan->ops->close(chan->ops->data);
+ 		goto response;
+ 	}
  
- 		chan->conn = NULL;
- 		hci_conn_put(conn->hcon);
+@@ -2706,7 +2707,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
+ 	l2cap_chan_del(chan, ECONNRESET);
+ 	bh_unlock_sock(sk);
+ 
+-	l2cap_sock_kill(sk);
++	chan->ops->close(chan->ops->data);
+ 	return 0;
+ }
+ 
+@@ -2740,7 +2741,7 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
+ 	l2cap_chan_del(chan, 0);
+ 	bh_unlock_sock(sk);
+ 
+-	l2cap_sock_kill(sk);
++	chan->ops->close(chan->ops->data);
+ 	return 0;
+ }
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ba6d4f1..23cf902 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -679,7 +679,7 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ /* Kill socket (only if zapped and orphan)
+  * Must be called on unlocked socket.
+  */
+-void l2cap_sock_kill(struct sock *sk)
++static void l2cap_sock_kill(struct sock *sk)
+ {
+ 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+ 		return;
+@@ -762,10 +762,18 @@ static int l2cap_chan_recv_cb(void *data, struct sk_buff *skb)
+ 	return sock_queue_rcv_skb(sk, skb);
+ }
+ 
++static void l2cap_chan_close_cb(void *data)
++{
++	struct sock *sk = data;
++
++	l2cap_sock_kill(sk);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_chan_new_connection_cb,
+ 	.recv		= l2cap_chan_recv_cb,
++	.close		= l2cap_chan_close_cb,
+ };
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
 -- 
 1.7.5.1
 
