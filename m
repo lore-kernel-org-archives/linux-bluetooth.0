@@ -1,90 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Jun 2011 14:30:41 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/6] Bluetooth: add close() callback to l2cap_chan_ops
-In-Reply-To: <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
-Message-ID: <alpine.DEB.2.02.1106021412530.3205@mathewm-linux>
-References: <1307031329-8001-1-git-send-email-padovan@profusion.mobi> <1307031329-8001-2-git-send-email-padovan@profusion.mobi> <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [bluetooth-next v2 16/16] Bluetooth: Add key size checks for SMP
+Date: Thu,  2 Jun 2011 17:32:18 -0300
+Message-Id: <1307046738-19588-17-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1307046738-19588-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1307046738-19588-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch implements a check in smp cmd pairing request and pairing
+response to verify if encryption key maximum size is compatible in both
+slave and master when SMP Pairing is requested. Keys are also masked to
+the correct negotiated size.
 
-Hi Gustavo -
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ include/net/bluetooth/l2cap.h |    1 +
+ include/net/bluetooth/smp.h   |    3 ++
+ net/bluetooth/smp.c           |   54 +++++++++++++++++++++++++++++++----------
+ 3 files changed, 45 insertions(+), 13 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6e160d4..5ac334b 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -384,6 +384,7 @@ struct l2cap_conn {
+ 	__u8		prnd[16]; /* SMP Pairing Random */
+ 	__u8		pcnf[16]; /* SMP Pairing Confirm */
+ 	__u8		tk[16]; /* SMP Temporary Key */
++	__u8		smp_key_size;
+ 
+ 	struct timer_list security_timer;
+ 
+diff --git a/include/net/bluetooth/smp.h b/include/net/bluetooth/smp.h
+index 111853a..4fb7d19 100644
+--- a/include/net/bluetooth/smp.h
++++ b/include/net/bluetooth/smp.h
+@@ -112,6 +112,9 @@ struct smp_cmd_security_req {
+ #define SMP_UNSPECIFIED		0x08
+ #define SMP_REPEATED_ATTEMPTS		0x09
+ 
++#define SMP_MIN_ENC_KEY_SIZE		7
++#define SMP_MAX_ENC_KEY_SIZE		16
++
+ /* SMP Commands */
+ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level);
+ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 0389e11..ee936c4 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -200,35 +200,51 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ {
+ 	cmd->io_capability = SMP_IO_NO_INPUT_OUTPUT;
+ 	cmd->oob_flag = SMP_OOB_NOT_PRESENT;
+-	cmd->max_key_size = 16;
++	cmd->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+ 	cmd->init_key_dist = 0x00;
+ 	cmd->resp_key_dist = 0x00;
+ 	cmd->auth_req = authreq;
+ }
+ 
++static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
++{
++	if ((max_key_size > SMP_MAX_ENC_KEY_SIZE) ||
++			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
++		return SMP_ENC_KEY_SIZE;
++
++	conn->smp_key_size = max_key_size;
++
++	return 0;
++}
++
+ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_cmd_pairing *rp = (void *) skb->data;
++	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
++	u8 key_size;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+ 	conn->preq[0] = SMP_CMD_PAIRING_REQ;
+-	memcpy(&conn->preq[1], rp, sizeof(*rp));
+-	skb_pull(skb, sizeof(*rp));
++	memcpy(&conn->preq[1], req, sizeof(*req));
++	skb_pull(skb, sizeof(*req));
+ 
+-	if (rp->oob_flag)
++	if (req->oob_flag)
+ 		return SMP_OOB_NOT_AVAIL;
+ 
+ 	/* We didn't start the pairing, so no requirements */
+-	build_pairing_cmd(conn, rp, SMP_AUTH_NONE);
++	build_pairing_cmd(conn, &rsp, SMP_AUTH_NONE);
++
++	key_size = min(req->max_key_size, rsp.max_key_size);
++	if (check_enc_key_size(conn, key_size))
++		return SMP_ENC_KEY_SIZE;
+ 
+ 	/* Just works */
+ 	memset(conn->tk, 0, sizeof(conn->tk));
+ 
+ 	conn->prsp[0] = SMP_CMD_PAIRING_RSP;
+-	memcpy(&conn->prsp[1], rp, sizeof(*rp));
++	memcpy(&conn->prsp[1], &rsp, sizeof(rsp));
+ 
+-	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(*rp), rp);
++	smp_send_cmd(conn, SMP_CMD_PAIRING_RSP, sizeof(rsp), &rsp);
+ 
+ 	mod_timer(&conn->security_timer, jiffies +
+ 					msecs_to_jiffies(SMP_TIMEOUT));
+@@ -238,24 +254,30 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_cmd_pairing *rp = (void *) skb->data;
++	struct smp_cmd_pairing *req, *rsp = (void *) skb->data;
+ 	struct smp_cmd_pairing_confirm cp;
+ 	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
+ 	int ret;
+-	u8 res[16];
++	u8 res[16], key_size;
+ 
+ 	BT_DBG("conn %p", conn);
+ 
+-	skb_pull(skb, sizeof(*rp));
++	skb_pull(skb, sizeof(*rsp));
++
++	req = (void *) &conn->preq[1];
+ 
+-	if (rp->oob_flag)
++	key_size = min(req->max_key_size, rsp->max_key_size);
++	if (check_enc_key_size(conn, key_size))
++		return SMP_ENC_KEY_SIZE;
++
++	if (rsp->oob_flag)
+ 		return SMP_OOB_NOT_AVAIL;
+ 
+ 	/* Just works */
+ 	memset(conn->tk, 0, sizeof(conn->tk));
+ 
+ 	conn->prsp[0] = SMP_CMD_PAIRING_RSP;
+-	memcpy(&conn->prsp[1], rp, sizeof(*rp));
++	memcpy(&conn->prsp[1], rsp, sizeof(*rsp));
+ 
+ 	ret = smp_rand(conn->prnd);
+ 	if (ret)
+@@ -347,6 +369,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
+ 		swap128(key, hcon->ltk);
+ 
++		memset(hcon->ltk + conn->smp_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++
+ 		hci_le_start_enc(hcon, hcon->ltk);
+ 	} else {
+ 		u8 r[16];
+@@ -356,6 +381,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+ 		swap128(key, hcon->ltk);
++
++		memset(hcon->ltk + conn->smp_key_size, 0,
++				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
+ 	}
+ 
+ 	return 0;
+-- 
+1.7.5.1
 
-On Thu, 2 Jun 2011, Gustavo F. Padovan wrote:
-
-> close() calls l2cap_sock_kill() on l2cap_sock.c
->
-> Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-> ---
-> include/net/bluetooth/l2cap.h |    3 +--
-> net/bluetooth/l2cap_core.c    |   17 +++++++++--------
-> net/bluetooth/l2cap_sock.c    |   10 +++++++++-
-> 3 files changed, 19 insertions(+), 11 deletions(-)
-
-<snip>
-
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -679,7 +679,7 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
-> /* Kill socket (only if zapped and orphan)
->  * Must be called on unlocked socket.
->  */
-> -void l2cap_sock_kill(struct sock *sk)
-> +static void l2cap_sock_kill(struct sock *sk)
-> {
-> 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-> 		return;
-> @@ -762,10 +762,18 @@ static int l2cap_chan_recv_cb(void *data, struct sk_buff *skb)
-> 	return sock_queue_rcv_skb(sk, skb);
-> }
->
-> +static void l2cap_chan_close_cb(void *data)
-> +{
-> +	struct sock *sk = data;
-> +
-> +	l2cap_sock_kill(sk);
-> +}
-> +
-> static struct l2cap_ops l2cap_chan_ops = {
-> 	.name		= "L2CAP Socket Interface",
-> 	.new_connection	= l2cap_chan_new_connection_cb,
-> 	.recv		= l2cap_chan_recv_cb,
-> +	.close		= l2cap_chan_close_cb,
-> };
->
-> static void l2cap_sock_destruct(struct sock *sk)
-
-
-It looks like we'll have l2cap_ops for sock, rfcomm, and AMP's A2MP 
-channel -- so I would suggest using unique names for the callbacks for 
-each of those modules:
-
-l2cap_sock_new_connection_cb
-l2cap_sock_recv_cb
-l2cap_sock_close_cb
-
-l2cap_a2mp_new_connection_cb
-l2cap_a2mp_recv_cb
-l2cap_a2mp_close_cb
-
-etc., instead of "l2cap_chan_*_cb"
-
-Even though the functions are (or will be) static within their 
-respective files, it will be less confusing if their names tie them
-to the specific module.
-
-I hope you can check these in to bluetooth-next soon, it would help 
-with the patch set I'm working on.
-
-Regards,
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
