@@ -1,92 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1307021003-15418-5-git-send-email-lkslawek@gmail.com>
-References: <1307021003-15418-1-git-send-email-lkslawek@gmail.com>
-	<1307021003-15418-5-git-send-email-lkslawek@gmail.com>
-Date: Fri, 3 Jun 2011 10:40:58 +0300
-Message-ID: <BANLkTiki2cesmaLqZh0zzAONJiqsb8Weug@mail.gmail.com>
-Subject: Re: [PATCH 4/5] Add function for starting body streaming later
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+Date: Thu, 2 Jun 2011 18:50:26 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 3/6] Bluetooth: add close() callback to l2cap_chan_ops
+Message-ID: <20110602215026.GC2790@joana>
+References: <1307031329-8001-1-git-send-email-padovan@profusion.mobi>
+ <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
+ <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
+ <alpine.DEB.2.02.1106021412530.3205@mathewm-linux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1106021412530.3205@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mat,
 
-On Thu, Jun 2, 2011 at 4:23 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> PBAP and MAP profiles presents a requirement that in case of multi-packet
-> responses, application parameter header shall be send in the first
-> packet.
->
-> Starting body streaming in OpenOBEX adds body header immediately and
-> queues any other added header for sending after the streaming is
-> finished. Thus to get the possibility to comply to this requirement and
-> still be able to use streaming mode function to start streaming later in
-> time is added.
-> ---
->  src/obex.c |   27 +++++++++++++++++++++++++++
->  src/obex.h |    1 +
->  2 files changed, 28 insertions(+), 0 deletions(-)
->
-> diff --git a/src/obex.c b/src/obex.c
-> index 643b942..097f278 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -1420,6 +1420,33 @@ int obex_aparam_write(struct obex_session *os,
->                        OBEX_HDR_APPARAM, hd, size, 0);
->  }
->
-> +void obex_start_streaming(struct obex_session *os, obex_object_t *obj)
-> +{
-> +       obex_headerdata_t hd;
-> +       int err;
-> +
-> +       os->driver->set_io_watch(os->object, NULL, NULL);
-> +
-> +       hd.bs = NULL;
-> +       OBEX_ObjectAddHeader(os->obex, obj, OBEX_HDR_BODY,
-> +                       hd, 0, OBEX_FL_STREAM_START);
-> +
-> +       err = obex_write_stream(os, os->obex, obj);
-> +
-> +       if (err == -EAGAIN) {
-> +               /* Just to be double sure */
-> +               OBEX_SuspendRequest(os->obex, obj);
-> +               os->obj = obj;
-> +               os->driver->set_io_watch(os->object, handle_async_io,
-> +                                                               os);
-> +       } else if (err < 0) {
-> +               os_set_response(obj, err);
-> +       } else {
-> +               /* Request has been suspended in cmd_get */
-> +               OBEX_ResumeRequest(os->obex);
-> +       }
-> +}
-> +
->  int memncmp0(const void *a, size_t na, const void *b, size_t nb)
->  {
->        if (na != nb)
-> diff --git a/src/obex.h b/src/obex.h
-> index 94274c2..64b4cdc 100644
-> --- a/src/obex.h
-> +++ b/src/obex.h
-> @@ -64,6 +64,7 @@ int obex_aparam_write(struct obex_session *os, obex_object_t *obj,
->
->  const char *obex_option_root_folder(void);
->  gboolean obex_option_symlinks(void);
-> +void obex_start_streaming(struct obex_session *os, obex_object_t *obj);
->
->  /* Just a thin wrapper around memcmp to deal with NULL values */
->  int memncmp0(const void *a, size_t na, const void *b, size_t nb);
+* Mat Martineau <mathewm@codeaurora.org> [2011-06-02 14:30:41 -0700]:
 
-What about doing this directly on obex_write_stream, so that whenever
-we read the first time an OBEX_HRD_BODY data we do start streaming? If
-that is possible this also means that we don't really need .get to
-return this boolean stream since we gonna start the stream on demand
-when the data returned is OBEX_HRD_BODY.
+> 
+> Hi Gustavo -
+> 
+> 
+> On Thu, 2 Jun 2011, Gustavo F. Padovan wrote:
+> 
+> >close() calls l2cap_sock_kill() on l2cap_sock.c
+> >
+> >Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+> >---
+> >include/net/bluetooth/l2cap.h |    3 +--
+> >net/bluetooth/l2cap_core.c    |   17 +++++++++--------
+> >net/bluetooth/l2cap_sock.c    |   10 +++++++++-
+> >3 files changed, 19 insertions(+), 11 deletions(-)
+> 
+> <snip>
+> 
+> >--- a/net/bluetooth/l2cap_sock.c
+> >+++ b/net/bluetooth/l2cap_sock.c
+> >@@ -679,7 +679,7 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
+> >/* Kill socket (only if zapped and orphan)
+> > * Must be called on unlocked socket.
+> > */
+> >-void l2cap_sock_kill(struct sock *sk)
+> >+static void l2cap_sock_kill(struct sock *sk)
+> >{
+> >	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+> >		return;
+> >@@ -762,10 +762,18 @@ static int l2cap_chan_recv_cb(void *data, struct sk_buff *skb)
+> >	return sock_queue_rcv_skb(sk, skb);
+> >}
+> >
+> >+static void l2cap_chan_close_cb(void *data)
+> >+{
+> >+	struct sock *sk = data;
+> >+
+> >+	l2cap_sock_kill(sk);
+> >+}
+> >+
+> >static struct l2cap_ops l2cap_chan_ops = {
+> >	.name		= "L2CAP Socket Interface",
+> >	.new_connection	= l2cap_chan_new_connection_cb,
+> >	.recv		= l2cap_chan_recv_cb,
+> >+	.close		= l2cap_chan_close_cb,
+> >};
+> >
+> >static void l2cap_sock_destruct(struct sock *sk)
+> 
+> 
+> It looks like we'll have l2cap_ops for sock, rfcomm, and AMP's A2MP
+> channel -- so I would suggest using unique names for the callbacks
+> for each of those modules:
+> 
+> l2cap_sock_new_connection_cb
+> l2cap_sock_recv_cb
+> l2cap_sock_close_cb
+> 
+> l2cap_a2mp_new_connection_cb
+> l2cap_a2mp_recv_cb
+> l2cap_a2mp_close_cb
+> 
+> etc., instead of "l2cap_chan_*_cb"
+> 
+> Even though the functions are (or will be) static within their
+> respective files, it will be less confusing if their names tie them
+> to the specific module.
+
+I'm not sure, what I'm trying to avoid here is create a false relation between
+l2cap_sock_close and l2cap_sock_close_cb for example, thus I called it
+l2cap_chan_close_cb. But unique names are indeed a good idea.
+
+Maybe, l2cap_sock_chan_new_cb, l2cap_sock_chan_close_cb,
+l2cap_sock_chan_recv_cb. But those are a bit big.
+
+> 
+> I hope you can check these in to bluetooth-next soon, it would help
+> with the patch set I'm working on.
+
+Btw, I really want to fix this L2CAP mess before push any A2MP stuff into the
+tree. A2MP code shouldn't touch sockets at all. I don't want to bring more
+issues to the stack like the many we have for RFCOMM.
+I intend to finish this soon. Patches are welcome. :)
 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Gustavo F. Padovan
+http://profusion.mobi
