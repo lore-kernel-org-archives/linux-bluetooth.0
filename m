@@ -1,139 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: add close() callback to l2cap_chan_ops
-Date: Thu,  2 Jun 2011 13:15:26 -0300
-Message-Id: <1307031329-8001-3-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 2/6] Bluetooth: add recv() callback to l2cap_chan_ops
+Date: Thu,  2 Jun 2011 13:15:25 -0300
+Message-Id: <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1307031329-8001-1-git-send-email-padovan@profusion.mobi>
 References: <1307031329-8001-1-git-send-email-padovan@profusion.mobi>
- <1307031329-8001-2-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-close() calls l2cap_sock_kill() on l2cap_sock.c
+This abstracts the call to sock_queue_recv_skb() into
+l2cap_chan_ops->recv().
 
 Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
 ---
- include/net/bluetooth/l2cap.h |    3 +--
- net/bluetooth/l2cap_core.c    |   17 +++++++++--------
- net/bluetooth/l2cap_sock.c    |   10 +++++++++-
- 3 files changed, 19 insertions(+), 11 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ net/bluetooth/l2cap_core.c    |   16 ++++++++--------
+ net/bluetooth/l2cap_sock.c    |    8 ++++++++
+ 3 files changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index e625f09..af2f171 100644
+index 95e44df..e625f09 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -363,6 +363,7 @@ struct l2cap_ops {
+@@ -362,6 +362,7 @@ struct l2cap_ops {
+ 	void		*data;
  
  	struct l2cap_chan	*(*new_connection) (void *data);
- 	int			(*recv) (void *data, struct sk_buff *skb);
-+	void			(*close) (void *data);
++	int			(*recv) (void *data, struct sk_buff *skb);
  };
  
  struct l2cap_conn {
-@@ -468,8 +469,6 @@ int __l2cap_wait_ack(struct sock *sk);
- int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- 
--void l2cap_sock_kill(struct sock *sk);
--
- struct l2cap_chan *l2cap_chan_create(struct sock *sk);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b5327f3..c645e03 100644
+index 6849e74..b5327f3 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -254,7 +254,7 @@ static void l2cap_chan_timeout(unsigned long arg)
+@@ -1692,7 +1692,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		if (!nskb)
+ 			continue;
  
- 	bh_unlock_sock(sk);
- 
--	l2cap_sock_kill(sk);
-+	chan->ops->close(chan->ops->data);
- 	sock_put(sk);
- }
- 
-@@ -391,11 +391,12 @@ static void l2cap_chan_cleanup_listen(struct sock *parent)
- 
- 	/* Close not yet accepted channels */
- 	while ((sk = bt_accept_dequeue(parent, NULL))) {
--		l2cap_chan_clear_timer(l2cap_pi(sk)->chan);
-+		struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+		l2cap_chan_clear_timer(chan);
- 		lock_sock(sk);
--		l2cap_chan_close(l2cap_pi(sk)->chan, ECONNRESET);
-+		l2cap_chan_close(chan, ECONNRESET);
- 		release_sock(sk);
--		l2cap_sock_kill(sk);
-+		chan->ops->close(chan->ops->data);
+-		if (sock_queue_rcv_skb(sk, nskb))
++		if (chan->ops->recv(chan->ops->data, nskb))
+ 			kfree_skb(nskb);
  	}
+ 	read_unlock(&conn->chan_lock);
+@@ -3118,7 +3118,7 @@ static int l2cap_ertm_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *sk
+ 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
+ 			goto drop;
  
- 	parent->sk_state = BT_CLOSED;
-@@ -988,7 +989,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 		bh_lock_sock(sk);
- 		l2cap_chan_del(chan, err);
- 		bh_unlock_sock(sk);
--		l2cap_sock_kill(sk);
-+		chan->ops->close(chan->ops->data);
- 	}
+-		return sock_queue_rcv_skb(chan->sk, skb);
++		return chan->ops->recv(chan->ops->data, skb);
  
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
-@@ -2333,7 +2334,7 @@ static inline int l2cap_connect_req(struct l2cap_conn *conn, struct l2cap_cmd_hd
- 	if (__l2cap_get_chan_by_dcid(conn, scid)) {
- 		write_unlock_bh(&conn->chan_lock);
- 		sock_set_flag(sk, SOCK_ZAPPED);
--		l2cap_sock_kill(sk);
-+		chan->ops->close(chan->ops->data);
- 		goto response;
- 	}
+ 	case L2CAP_SDU_START:
+ 		if (chan->conn_state & L2CAP_CONN_SAR_SDU)
+@@ -3184,7 +3184,7 @@ static int l2cap_ertm_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *sk
+ 			return -ENOMEM;
+ 		}
  
-@@ -2706,7 +2707,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn, struct l2cap_cmd
- 	l2cap_chan_del(chan, ECONNRESET);
- 	bh_unlock_sock(sk);
+-		err = sock_queue_rcv_skb(chan->sk, _skb);
++		err = chan->ops->recv(chan->ops->data, _skb);
+ 		if (err < 0) {
+ 			kfree_skb(_skb);
+ 			chan->conn_state |= L2CAP_CONN_SAR_RETRY;
+@@ -3352,7 +3352,7 @@ static int l2cap_streaming_reassembly_sdu(struct l2cap_chan *chan, struct sk_buf
+ 			break;
+ 		}
  
--	l2cap_sock_kill(sk);
-+	chan->ops->close(chan->ops->data);
- 	return 0;
- }
+-		err = sock_queue_rcv_skb(chan->sk, skb);
++		err = chan->ops->recv(chan->ops->data, skb);
+ 		if (!err)
+ 			return 0;
  
-@@ -2740,7 +2741,7 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn, struct l2cap_cmd
- 	l2cap_chan_del(chan, 0);
- 	bh_unlock_sock(sk);
+@@ -3413,7 +3413,7 @@ static int l2cap_streaming_reassembly_sdu(struct l2cap_chan *chan, struct sk_buf
  
--	l2cap_sock_kill(sk);
-+	chan->ops->close(chan->ops->data);
- 	return 0;
- }
+ 		if (chan->partial_sdu_len == chan->sdu_len) {
+ 			_skb = skb_clone(chan->sdu, GFP_ATOMIC);
+-			err = sock_queue_rcv_skb(chan->sk, _skb);
++			err = chan->ops->recv(chan->ops->data, _skb);
+ 			if (err < 0)
+ 				kfree_skb(_skb);
+ 		}
+@@ -3880,7 +3880,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (chan->imtu < skb->len)
+ 			goto drop;
  
+-		if (!sock_queue_rcv_skb(sk, skb))
++		if (!chan->ops->recv(chan->ops->data, skb))
+ 			goto done;
+ 		break;
+ 
+@@ -3958,7 +3958,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
+ 	if (l2cap_pi(sk)->chan->imtu < skb->len)
+ 		goto drop;
+ 
+-	if (!sock_queue_rcv_skb(sk, skb))
++	if (!chan->ops->recv(chan->ops->data, skb))
+ 		goto done;
+ 
+ drop:
+@@ -3991,7 +3991,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
+ 	if (l2cap_pi(sk)->chan->imtu < skb->len)
+ 		goto drop;
+ 
+-	if (!sock_queue_rcv_skb(sk, skb))
++	if (!chan->ops->recv(chan->ops->data, skb))
+ 		goto done;
+ 
+ drop:
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ba6d4f1..23cf902 100644
+index 79926a4..ba6d4f1 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -679,7 +679,7 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
- /* Kill socket (only if zapped and orphan)
-  * Must be called on unlocked socket.
-  */
--void l2cap_sock_kill(struct sock *sk)
-+static void l2cap_sock_kill(struct sock *sk)
- {
- 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
- 		return;
-@@ -762,10 +762,18 @@ static int l2cap_chan_recv_cb(void *data, struct sk_buff *skb)
- 	return sock_queue_rcv_skb(sk, skb);
+@@ -755,9 +755,17 @@ static struct l2cap_chan *l2cap_chan_new_connection_cb(void *data)
+ 	return l2cap_pi(sk)->chan;
  }
  
-+static void l2cap_chan_close_cb(void *data)
++static int l2cap_chan_recv_cb(void *data, struct sk_buff *skb)
 +{
 +	struct sock *sk = data;
 +
-+	l2cap_sock_kill(sk);
++	return sock_queue_rcv_skb(sk, skb);
 +}
 +
  static struct l2cap_ops l2cap_chan_ops = {
  	.name		= "L2CAP Socket Interface",
  	.new_connection	= l2cap_chan_new_connection_cb,
- 	.recv		= l2cap_chan_recv_cb,
-+	.close		= l2cap_chan_close_cb,
++	.recv		= l2cap_chan_recv_cb,
  };
  
  static void l2cap_sock_destruct(struct sock *sk)
