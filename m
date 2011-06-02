@@ -1,45 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: <h.patil@accenture.com>
-To: <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Date: Thu, 2 Jun 2011 14:13:57 +0530
-Subject: RE: A2DP Connection problem
-Message-ID: <AA5DFB06574FF54BA4A76C3F1040DCBB11C1ECCFA1@INDXM3131.dir.svc.accenture.com>
-References: <1305795079-5251-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1305795079-5251-3-git-send-email-dmitriy.paliy@nokia.com>
-	<AA5DFB06574FF54BA4A76C3F1040DCBB11C18DE91D@INDXM3131.dir.svc.accenture.com>
-	<1305797659.2388.11.camel@dentz-desktop>
-	<AA5DFB06574FF54BA4A76C3F1040DCBB11C1E58C45@INDXM3131.dir.svc.accenture.com>
-	<BANLkTin70tw53nFOp3aZGLThst6qTzBAmQ@mail.gmail.com>
-	<AA5DFB06574FF54BA4A76C3F1040DCBB11C1E58CFA@INDXM3131.dir.svc.accenture.com>
- <BANLkTi=COwMPwwG041LGzmOD_gvibr-pXQ@mail.gmail.com>
-In-Reply-To: <BANLkTi=COwMPwwG041LGzmOD_gvibr-pXQ@mail.gmail.com>
-Content-Type: text/plain; charset=US-ASCII
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <padovan@profusion.mobi>
+CC: <linux-bluetooth@vger.kernel.org>, <johan.hedberg@gmail.com>
+Date: Thu, 2 Jun 2011 11:27:09 +0300
+Subject: RE: [PATCH 2/2] Bluetooth: Verify a pin code in pin_code_reply
+Message-ID: <99B09243E1A5DA4898CDD8B700111448175631BE94@EXMB04.eu.tieto.com>
+References: <1306942128-5325-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1306942128-5325-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <20110601205119.GH2564@joana>
+In-Reply-To: <20110601205119.GH2564@joana>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gustavo, 
 
-Hi,
-
-On Wed, Jun 1, 2011 at 2:46 PM,  <h.patil@accenture.com> wrote:
-> Hello Luiz,
+>>  	struct hci_dev *hdev;
+>> +	struct hci_conn *conn;
+>>  	struct mgmt_cp_pin_code_reply *cp;
+>> +	struct mgmt_cp_pin_code_neg_reply ncp;
+>>  	struct hci_cp_pin_code_reply reply;
+>>  	struct pending_cmd *cmd;
 >
-> Thanks a lot for your response.
-> I am trying to stream the audio data from source(Mobile) to my hardaware(sink-BT chip infineon on PBA31308)through A2DP.
-> I established the A2DP connection  from headset(sink) to mobile(source).
-> When I start playing the song, it streams for 6 seconds after that a2dp disconnection is happening.
->
-> Please find the attached hcidump log from my target.
+>please pay more attention on the compiler warnings. cmd is 
+>unused here. I fixed it up.
 
-Please take a look at http://en.wikipedia.org/wiki/Posting_style while
-I take a look at your hcidump.
+Right, but gcc 4.5 doesn't show me that. Will update to 4.6 then.
 
-> Any updates?
-
---
-Luiz Augusto von Dentz
-Computer Engineer
-
-
-This message is for the designated recipient only and may contain privileged, proprietary, or otherwise private information.  If you have received it in error, please notify the sender immediately and delete the original.  Any other use of the email by you is prohibited.
+Thanks,
+Waldek
