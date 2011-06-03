@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 1/4] Bluetooth: Restore accidentally-deleted line
-Date: Fri,  3 Jun 2011 16:21:07 -0700
-Message-Id: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "martin.pitt@ubuntu.com" <martin.pitt@ubuntu.com>
+Date: Fri, 3 Jun 2011 17:18:44 -0400
+Subject: Bluez needs configuration mechanism for not running hid2hci
+Message-ID: <1307135924.2622.109.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When code was moved from l2cap_core.c to l2cap_sock.c in commit
-6de0702b5b93da0ef097aa092b4597fbc024ebba, one line was dropped
-from the old __l2cap_sock_close() implementation. This sk_state
-change should still be in l2cap_chan_close().
+Related to my earlier patch for the udev rules here
+<http://marc.info/?l=linux-bluetooth&m=130713440317947&w=2>,
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
- net/bluetooth/l2cap_core.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Bluez needs a configurable way of *NOT* running hid2hci.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 15e6a53..dc5c654 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -435,6 +435,7 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 				result = L2CAP_CR_SEC_BLOCK;
- 			else
- 				result = L2CAP_CR_BAD_PSM;
-+			sk->sk_state = BT_DISCONN;
- 
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
--- 
-1.7.5.2
+Currently, if a device *is capable* of switching to HCI mode, it _is_
+switched to HCI mode. There are several problems with this approach:
 
+1. Multi-boot systems. Since each host OS currently has different link
+keys (or if the host names are different), *on each cross-boot*
+bluetooth devices must be re-paired.
+2. Input devices. Currently, after hid2hci switches modes, there is no
+reliable way to pair input devices *without non-bluetooth input
+devices*. This means that users with access to bluetooth keyboard and
+mouse *only* should leave those devices in HID mode.
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Pre-udev, /etc/bluetooth/main.conf had HID2HCI_ENABLE= to enable/disable
+this behavior.
 
+Now, there's nothing - and this is the source of *a lot* of distro bug
+reports. Here's a spattering from Ubuntu only:
+https://bugs.launchpad.net/ubuntu/lucid/+source/udev/+bug/444420
+https://bugs.launchpad.net/ubuntu/lucid/+source/udev/+bug/550288
+https://bugs.launchpad.net/ubuntu/+source/udev/+bug/658471
+
+The solutions people come up with is to, in-essence, blacklist HCI mode
+for other users!
+
+Ideas?
+
+Regards,
+Peter Hurley
