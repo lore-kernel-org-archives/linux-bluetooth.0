@@ -1,40 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d49388493b61c568c5ce7cd2ae9594e0.squirrel@host171.canaca.com>
-In-Reply-To: <1307114762.2669.125.camel@novo.hadess.net>
-References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
-    <1298628292-8842-4-git-send-email-ospite@studenti.unina.it>
-    <1304644488.16101.28.camel@novo.hadess.net>
-    <20110507011412.ba0ad1e9.ospite@studenti.unina.it>
-    <1304787442.2427.11.camel@novo.hadess.net>
-    <20110603135904.096660bc.ospite@studenti.unina.it>
-    <1307114762.2669.125.camel@novo.hadess.net>
-Date: Fri, 3 Jun 2011 11:56:38 -0400
-Subject: Re: [PATCH v2 3/3] Add sixaxis plugin: USB pairing and LEDs
- settings
-From: simon@mungewell.org
-To: "Bastien Nocera" <hadess@hadess.net>
-Cc: "Antonio Ospite" <ospite@studenti.unina.it>,
-	linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
-	"Jim Paris" <jim@jtan.com>, "Ranulf Doswell" <ralf@ranulf.net>,
+Subject: Re: [PATCH v2 3/3] Add sixaxis plugin: USB pairing and LEDs settings
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
+	Jim Paris <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>,
 	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	"Marcin Tolysz" <tolysz@gmail.com>,
-	"Christian Birchinger" <joker@netswarm.net>,
-	"Filipe Lopes" <falktx@gmail.com>, "Alan Ott" <alan@signal11.us>,
-	"Mikko Virkkila" <virkkila@kapsi.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
+	Mikko Virkkila <virkkila@kapsi.fi>
+Date: Fri, 03 Jun 2011 16:25:59 +0100
+In-Reply-To: <20110603135904.096660bc.ospite@studenti.unina.it>
+References: <1298628292-8842-1-git-send-email-ospite@studenti.unina.it>
+	 <1298628292-8842-4-git-send-email-ospite@studenti.unina.it>
+	 <1304644488.16101.28.camel@novo.hadess.net>
+	 <20110507011412.ba0ad1e9.ospite@studenti.unina.it>
+	 <1304787442.2427.11.camel@novo.hadess.net>
+	 <20110603135904.096660bc.ospite@studenti.unina.it>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1307114762.2669.125.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just generally on this subject, should the code which performs the USB
-'write' be in 'hid-sony.c' rather than the BT core.
+On Fri, 2011-06-03 at 13:59 +0200, Antonio Ospite wrote:
+> On Sat, 07 May 2011 17:57:07 +0100
+> Bastien Nocera <hadess@hadess.net> wrote:
+> 
+> > On Sat, 2011-05-07 at 01:14 +0200, Antonio Ospite wrote:
+> > > On Fri, 06 May 2011 02:14:38 +0100
+> > > Bastien Nocera <hadess@hadess.net> wrote:
+> > > 
+> > > > On Fri, 2011-02-25 at 11:04 +0100, Antonio Ospite wrote:
+> > > > > +                       [AC_LANG_PROGRAM([[
+> > > > > +                               #include <sys/ioctl.h>
+> > > > > +                               #include <linux/hidraw.h>
+> > > > > +                               #if ! (defined(HIDIOCSFEATURE) &&
+> > > > > defined(HIDIOCGFEATURE))
+> > > > > +                               #error "HIDIOCSFEATURE and
+> > > > > HIDIOCGFEATURE are required (linux-libc-dev >= 2.6.3x)"
+> > > > > +                               #endif
+> > > > > +                               ]], 
+> > > > 
+> > > > The only part of the patch I have a problem with is this one.
+> > > > 
+> > > > I'd rather the code had:
+> > > > #ifndef HIDIOCSFEATURE
+> > > > #define HIDIOCSFEATURE bleh
+> > > > #endif
+> > > > 
+> [...]
+> > Again, it's not compiling against older kernels. but compiling against
+> > older kernel headers, which is a wildly different thing.
+> > 
+> > I'd like the plugin to be enabled, even if building with older kernel
+> > headers, as those have no relation to the capabilities of the running
+> > kernel.
+> > 
+> > It would also make the whole thing easier to test (just install a newer
+> > kernel with the patches merged in, and voila, working sisaxis pairing).
+> > 
+> 
+> Bastien, I'd fulfill your request on the lines of the following
+> WIP patch, the intent is to make the plugin compile unconditionally
+> still mentioning the soft dependency on 2.6.39-rc1.
+> I could have set HAVE_HIDIOCxFEATURE in acinclude.m4 and checked for
+> that in sixaxis.c in place of the explicit ifdefs, what is the common
+> practice about that?
+> 
+> I still have to take care of the runtime check when running on older
+> kernels.
+> 
+> Regards,
+>    Antonio
+> 
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index 901bb4d..e3e0fdd 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -167,12 +167,12 @@ AC_DEFUN([AC_PATH_SIXAXIS], [
+>  			)],[
+>  				ac_cv_have_HIDIOCxFEATURE=yes
+>  			],[
+> -				ac_cv_have_HIDIOCxFEATURE="no, get linux-libc-dev >= 2.6.39-rc1"
+> +				ac_cv_have_HIDIOCxFEATURE="no, emulating linux-libc-dev >= 2.6.39-rc1"
+>  			]
+>  		)]
+>  	)
+>  
+> -	if ( test "${udev_found}" = "yes" && test "${ac_cv_have_HIDIOCxFEATURE}" = "yes" ); then
+> +	if ( test "${udev_found}" = "yes" ); then
+>  		sixaxis_plugin_deps_found=yes
+>  	fi
+>  ])
 
-It's possible that the Sixaxis or other compatible controllers will be
-only USB connected and BT might not even exist on the system.
+Just remove the macro check from acinclude.m4 altogether. It's not
+needed, you already have the necessary checks in the plugin itself.
 
-If/When I manage to do some work on rumble support, we will probably need
-to ensure that a 'hid-sonyff.c' is aware of any LED settings otherwise it
-might overwrite them when setting the rumble.
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index 49aad25..fc12878 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -58,6 +58,16 @@
+>  #include "storage.h"
+>  #include "sdp_lib.h"
+>  
+> +/* Fallback definitions to compile with older headers */
+> +#ifndef HIDIOCGFEATURE
+> +#define HIDIOCGFEATURE(len)    _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x07, len)
+> +#endif
+> +
+> +#ifndef HIDIOCSFEATURE
+> +#define HIDIOCSFEATURE(len)    _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x06, len)
+> +#endif
 
-Simon.
+Looks fine to me.
+
+Cheers
 
