@@ -1,47 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Message-ID: <51aa1a9.d945d30cb26cb71f81aa2e9217bb7f3a@1oca1host.de>
-From: thilo@cestona.ro
-To: "Marcel Holtmann" <marcel@holtmann.org>
+Date: Mon, 6 Jun 2011 15:43:41 +0900
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: AW: Re: Support for 0489:e031 Foxconn / Hon Hai
-Date: Mon, 6 Jun 2011 09:50:13 +0200 (CEST)
-Content-Type: text/plain;
-	charset="utf-8"
+Subject: Re: [bluetooth-next v2 10/16] Bluetooth: Add support for resuming
+ socket when SMP is finished
+Message-ID: <20110606064341.GA1905@dell>
+References: <1307046738-19588-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1307046738-19588-11-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1307046738-19588-11-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Marcel,
+Hi Vinicius,
 
-> what about the usb-devices.sh script output or /proc/bus/usb/devices
-> content for this adatper.
+On Thu, Jun 02, 2011, Vinicius Costa Gomes wrote:
+> @@ -357,21 +375,16 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+>  	if (IS_ERR(hcon->hdev->tfm))
+>  		return 1;
+>  
+> -	switch (sec_level) {
+> -	case BT_SECURITY_MEDIUM:
+> -		/* Encrypted, no MITM protection */
+> -		authreq = HCI_AT_NO_BONDING_MITM;
+> -		break;
+> +	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
+> +		return -EINPROGRESS;
 
-The output for the bluetooth device from /usr/bin/usb-devices (on Ubuntu=
- 11.04) is the following:
+This doesn't look right to me. Like hci_conn_security, smp_conn_security
+is supposed to be a boolean function by only returning 0 or 1. That's
+also how all places use it: "if (smp_conn_security(...))". So returning
+a negative error like this looks wrong.
 
-T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D03 Cnt=3D03 Dev#=3D  5 Spd=3D12  =
-MxCh=3D 0
-D:  Ver=3D 2.00 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1=
-
-P:  Vendor=3D0489 ProdID=3De031 Rev=3D01.12
-S:  Manufacturer=3DBroadcom Corp
-S:  Product=3DBCM20702A0
-S:  SerialNumber=3DEC55F9EADE09
-C:  #Ifs=3D 4 Cfg#=3D 1 Atr=3De0 MxPwr=3D0mA
-I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Drive=
-r=3D(none)
-I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Drive=
-r=3D(none)
-I:  If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Drive=
-r=3D(none)
-I:  If#=3D 3 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D01 Drive=
-r=3D(none)
-
-The folder /proc/bus/usb doesn't exists here. Are the informations from =
-/sys/bus/usb the same?
-When yes, which are you really interessted in (as there are plenty files=
- for that device)?
-
-Can I provide other usefull informations?
-
-Ciao
-Thilo
+Johan
