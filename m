@@ -1,23 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Jun 2011 14:31:53 -0300
+Date: Mon, 6 Jun 2011 14:23:36 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
-Message-ID: <20110606173153.GA30641@joana>
-References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
- <1307143270-2655-2-git-send-email-mathewm@codeaurora.org>
+Subject: Re: [PATCH] Bluetooth: Simplify hci_conn_accept_secure check
+Message-ID: <20110606172336.GA28364@joana>
+References: <1307017492-5684-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307143270-2655-2-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1307017492-5684-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
+Hi Waldemar,
 
-> This workqueue will be used for general L2CAP work, not just dealing
-> with "busy" frames.
+* Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com> [2011-06-02 14:24:52 +0200]:
 
-which general L2CAP work are we talking about?
+> If the link key is secure (authenticated or combination 16 digit)
+> the sec_level will be always BT_SECURITY_HIGH. Therefore, instead
+> of checking the link key type simply check the sec_level on the link.
+> 
+> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+> ---
+>  net/bluetooth/hci_conn.c |    4 +---
+>  1 files changed, 1 insertions(+), 3 deletions(-)
+
+Applied, thanks.
 
 	Gustavo
