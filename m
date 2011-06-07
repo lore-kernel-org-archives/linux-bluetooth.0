@@ -1,109 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jun 2011 20:11:46 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Michael Jarosch <mitsch@riotmusic.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetooth on ubuntu without desktop environment
-Message-ID: <20110607231146.GB8705@piper>
-References: <1307131935.1862.189.camel@powermacG4>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307131935.1862.189.camel@powermacG4>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 5/5] Fix using "magic" values for key types
+Date: Tue,  7 Jun 2011 20:08:14 -0300
+Message-Id: <1307488094-19464-5-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1307488094-19464-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1307488094-19464-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Now that we have macros for the different type of keys we should
+use them to make the code clearer.
+---
+ plugins/hciops.c |   10 ++++++----
+ src/event.c      |   19 ++++++++++++++++---
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-On 22:12 Fri 03 Jun, Michael Jarosch wrote:
-> Hi!
-> 
-> I'm using the latest Ubuntu (11.04) minimal installation with XBMC and I
-> try to make a Logitech Cordless MediaBoard Pro work with it. The
-> keyboard-/touchpad-combination designed for the PS3 worked just fine
-> with a "normal" install of Ubuntu 10.10 with the Gnome desktop
-> environment (and I guess it should work with 11.04/Unity, also). My
-> special problem now is, that I don't use any kind of desktop environment
-> any more, it's just X and the XBMC-GUI. I tried to use "blueman" to
-> configure the bluetooth connection, but it doesn't seem to start - just
-> getting some weird errors. So, I totally depend on the console-tools of
-> bluez and dbus - but, hey, this is linux and it shouldn't be a problem,
-> right?
-> 
-> Well, partly, it actually isn't. Pairing and connecting the keyboard
-> works right away. But if I reboot the computer or try to reconnect the
-> keyboard for other reasons, I'm forced to pair the devices again and
-> again, which isn't exactly the spirit of using bluetooth devices. :)
-> 
-> My goal is to make the keyboard connect to my PC whenever I need it. All
-> I achieved is that the connection only works if the PC initialises it.
-> 
-> 
-> I used an entry from the arch linux wiki for my configuration, which
-> only uses console-commands, mainly dbus-specific:
-> https://wiki.archlinux.org/index.php/Bluetooth_mouse_configuration
-> 
-> 
-> I tried this:
-> 
-> 1) Pressing the reset button of the Logitech-device to make it
-> discoverable to the PC.
-> 
-> 2) Scanning for the Logitech-device with "hcitool scan". I get this
-> answer from the kyeboard:
-> 00:07:61:F6:97:F7   Logitech Cordless MediaBoard Pro(TM)
-> 
-> 3) Getting the dbus adress of the BT-Dongle:
-> $ dbus-send --system --type=method_call --print-reply --dest=org.bluez
-> "/" org.bluez.Manager.ListAdapters
-> 
-> method return sender=:1.23 -> dest=:1.26 reply_serial=2
->    array [
->       object path "/org/bluez/1926/hci0"
->    ]
-> 
-> 4) Create the bluez-device for the keyboard:
-> $ dbus-send --system --type=method_call --print-reply --dest=org.bluez
-> "/org/bluez/1926/hci0" org.bluez.Adapter.CreateDevice
-> string:00:07:61:F6:97:F7
-> 
-> 5) Give keyboard permission to connect the PC:
-> $ dbus-send --system --type=method_call --print-reply --dest=org.bluez
-> "/org/bluez/1926/hci0/dev_00_07_61_F6_97_F7"
-> org.bluez.Device.SetProperty string:Trusted variant:boolean:true
-> 
-
-I didn't read the Arch wiki closely, but there are much better ways to that.
-This is what I would do:
-
-1. Get the BlueZ sources, and go to the test/ directory;
-
-2. ./simple-agent hci0 <keyboard address> 
-   (follow the instructions from the keyboard for pairing, usually putting the
-   same passkey in both sides). This will pair your computer with the
-   keyboard. If it complains about that the pairing already exists, just add a
-   third parameter, it can be anything.
-
-3. ./test-device trusted <keyboard address> yes
-   This will set the device as trusted, so connection comming from it will
-   be automatically accepted.
-
-4. Now as the device is already bonded and connections are automatically
-   accepted, reconnections should work as they should.
-
-Some notes: those are simple python scripts, be sure to have python already
-installed. In case you still have some troubles drop by #bluez-users on 
-freenode.
-
-> 
-> I can connect the Logitech-device with hidd --connect 00:07:61:F6:97:F7,
-> now, but if the connection somehow breaks, it's not possible to
-> reconnect from the keyboard (by just pressing a button or turning the
-> device off and on, f.e.)
-> 
-
-[ snip ]
-
-
-Cheers,
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 101e287..6856dec 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -954,12 +954,12 @@ static void link_key_notify(int index, void *ptr)
+ 	DBG("local auth 0x%02x and remote auth 0x%02x",
+ 					conn->loc_auth, conn->rem_auth);
+ 
+-	if (key_type == 0x06) {
++	if (key_type == HCI_LK_CHANGED_COMBINATION) {
+ 		/* Some buggy controller combinations generate a changed
+ 		 * combination key for legacy pairing even when there's no
+ 		 * previous key */
+ 		if (conn->rem_auth == 0xff && old_key_type == 0xff)
+-			key_type = 0x00;
++			key_type = HCI_LK_COMBINATION;
+ 		else if (old_key_type != 0xff)
+ 			key_type = old_key_type;
+ 		else
+@@ -971,7 +971,7 @@ static void link_key_notify(int index, void *ptr)
+ 	key_info->type = key_type;
+ 
+ 	/* Skip the storage check if this is a debug key */
+-	if (key_type == 0x03)
++	if (key_type == HCI_LK_DEBUG_COMBINATION)
+ 		goto done;
+ 
+ 	/* Store the link key persistently if one of the following is true:
+@@ -985,7 +985,9 @@ static void link_key_notify(int index, void *ptr)
+ 	 * If none of the above match only keep the link key around for
+ 	 * this connection and set the temporary flag for the device.
+ 	 */
+-	if (key_type < 0x03 || (key_type == 0x06 && old_key_type != 0xff) ||
++	if (key_type < HCI_LK_DEBUG_COMBINATION ||
++			(key_type == HCI_LK_CHANGED_COMBINATION
++					&& old_key_type != 0xff) ||
+ 			(conn->loc_auth > 0x01 && conn->rem_auth > 0x01) ||
+ 			(conn->loc_auth == 0x02 || conn->loc_auth == 0x03) ||
+ 			(conn->rem_auth == 0x02 || conn->rem_auth == 0x03)) {
+diff --git a/src/event.c b/src/event.c
+index edf8a0f..6f5fa36 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -443,11 +443,24 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	if (key_type & 0x10)
++	switch (key_type) {
++	case HCI_LK_COMBINATION:
++	case HCI_LK_LOCAL_UNIT:
++	case HCI_LK_REMOTE_UNIT:
++	case HCI_LK_DEBUG_COMBINATION:
++	case HCI_LK_UNAUTH_COMBINATION:
++	case HCI_LK_AUTH_COMBINATION:
++	case HCI_LK_CHANGED_COMBINATION:
++		ret = write_link_key(local, peer, key, key_type, pin_length);
++		break;
++	case HCI_LK_SMP_LTK:
+ 		ret = store_longtermkey(local, peer, key, key_type, pin_length,
+ 								dlen, data);
+-	else
+-		ret = write_link_key(local, peer, key, key_type, pin_length);
++		break;
++	default:
++		ret = -ENOTSUP;
++		break;
++	}
+ 
+ 	if (ret == 0 && device_is_temporary(device))
+ 		device_set_temporary(device, FALSE);
 -- 
-Vinicius
+1.7.5.4
+
