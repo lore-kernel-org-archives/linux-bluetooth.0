@@ -2,235 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v3 10/16] Bluetooth: Add support for resuming socket when SMP is finished
-Date: Tue,  7 Jun 2011 18:46:39 -0300
-Message-Id: <1307483205-1518-11-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next v3 09/16] Bluetooth: Remove debug statements
+Date: Tue,  7 Jun 2011 18:46:38 -0300
+Message-Id: <1307483205-1518-10-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for resuming the user space traffic when SMP
-negotiation is complete.
+Now that these commands are sent to the controller we can use hcidump
+to verify that the correct values are produced.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c |   61 ++++++++++++++++++++++---------------------
- net/bluetooth/l2cap_sock.c |   16 +++++++++++
- net/bluetooth/smp.c        |   40 ++++++++++++++++++++--------
- 3 files changed, 75 insertions(+), 42 deletions(-)
+ net/bluetooth/smp.c |   10 +---------
+ 1 files changed, 1 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1dda9f7..d6cf2ac 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -879,6 +879,23 @@ clean:
- 	bh_unlock_sock(parent);
- }
- 
-+static void l2cap_chan_ready(struct sock *sk)
-+{
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct sock *parent = bt_sk(sk)->parent;
-+
-+	BT_DBG("sk %p, parent %p", sk, parent);
-+
-+	chan->conf_state = 0;
-+	l2cap_chan_clear_timer(chan);
-+
-+	sk->sk_state = BT_CONNECTED;
-+	sk->sk_state_change(sk);
-+
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
-+}
-+
- static void l2cap_conn_ready(struct l2cap_conn *conn)
- {
- 	struct l2cap_chan *chan;
-@@ -895,13 +912,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 		bh_lock_sock(sk);
- 
--		if (conn->hcon->type == LE_LINK) {
--			l2cap_chan_clear_timer(chan);
--			sk->sk_state = BT_CONNECTED;
--			sk->sk_state_change(sk);
-+		if (conn->hcon->type == LE_LINK)
- 			if (smp_conn_security(conn, chan->sec_level))
--				BT_DBG("Insufficient security");
--		}
-+				l2cap_chan_ready(sk);
- 
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			l2cap_chan_clear_timer(chan);
-@@ -1664,30 +1677,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 	return err;
- }
- 
--static void l2cap_chan_ready(struct sock *sk)
--{
--	struct sock *parent = bt_sk(sk)->parent;
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--
--	BT_DBG("sk %p, parent %p", sk, parent);
--
--	chan->conf_state = 0;
--	l2cap_chan_clear_timer(chan);
--
--	if (!parent) {
--		/* Outgoing channel.
--		 * Wake up socket sleeping on connect.
--		 */
--		sk->sk_state = BT_CONNECTED;
--		sk->sk_state_change(sk);
--	} else {
--		/* Incoming channel.
--		 * Wake up socket sleeping on accept.
--		 */
--		parent->sk_data_ready(parent, 0);
--	}
--}
--
- /* Copy frame to all raw sockets on that connection */
- static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- {
-@@ -4184,6 +4173,18 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		bh_lock_sock(sk);
- 
-+		BT_DBG("chan->scid %d", chan->scid);
-+
-+		if (chan->scid == L2CAP_CID_LE_DATA) {
-+			if (!status && encrypt) {
-+				chan->sec_level = hcon->sec_level;
-+				l2cap_chan_ready(sk);
-+			}
-+
-+			bh_unlock_sock(sk);
-+			continue;
-+		}
-+
- 		if (chan->conf_state & L2CAP_CONF_CONNECT_PEND) {
- 			bh_unlock_sock(sk);
- 			continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ab81894..d6cc558 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -29,6 +29,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/smp.h>
- 
- static const struct proto_ops l2cap_sock_ops;
- 
-@@ -556,6 +557,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct bt_security sec;
- 	struct bt_power pwr;
-+	struct l2cap_conn *conn;
- 	int len, err = 0;
- 	u32 opt;
- 
-@@ -592,6 +594,20 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 		}
- 
- 		chan->sec_level = sec.level;
-+
-+		conn = chan->conn;
-+		if (conn && chan->scid == L2CAP_CID_LE_DATA) {
-+			if (!conn->hcon->out) {
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			if (smp_conn_security(conn, sec.level))
-+				break;
-+
-+			err = 0;
-+			sk->sk_state = BT_CONFIG;
-+		}
- 		break;
- 
- 	case BT_DEFER_SETUP:
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index c1c4bc0..8d0f623 100644
+index 22c362b..c1c4bc0 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -328,9 +328,13 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_security_req *rp = (void *) skb->data;
- 	struct smp_cmd_pairing cp;
-+	struct hci_conn *hcon = conn->hcon;
+@@ -279,7 +279,7 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct crypto_blkcipher *tfm = hcon->hdev->tfm;
+ 	int ret;
+-	u8 key[16], res[16], random[16], confirm[16], buf[128];
++	u8 key[16], res[16], random[16], confirm[16];
  
- 	BT_DBG("conn %p", conn);
+ 	swap128(skb->data, random);
+ 	skb_pull(skb, sizeof(random));
+@@ -313,10 +313,6 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		swap128(key, hcon->ltk);
  
-+	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
-+		return;
-+
- 	skb_pull(skb, sizeof(*rp));
- 	memset(&cp, 0, sizeof(cp));
+ 		hci_le_start_enc(hcon, hcon->ltk);
+-
+-		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
+-							sizeof(buf), 0);
+-		BT_DBG("key %s", buf);
+ 	} else {
+ 		u8 r[16];
  
-@@ -345,6 +349,20 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	memcpy(&conn->preq[1], &cp, sizeof(cp));
+@@ -325,10 +321,6 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
  
- 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
-+
-+	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
-+}
-+
-+static __u8 seclevel_to_authreq(__u8 level)
-+{
-+	switch (level) {
-+	case BT_SECURITY_HIGH:
-+		/* For now we don't support bonding */
-+		return SMP_AUTH_MITM;
-+
-+	default:
-+		return SMP_AUTH_NONE;
-+	}
- }
- 
- int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
-@@ -357,21 +375,16 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 	if (IS_ERR(hcon->hdev->tfm))
- 		return 1;
- 
--	switch (sec_level) {
--	case BT_SECURITY_MEDIUM:
--		/* Encrypted, no MITM protection */
--		authreq = HCI_AT_NO_BONDING_MITM;
--		break;
-+	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
-+		return 0;
- 
--	case BT_SECURITY_HIGH:
--		/* Bonding, MITM protection */
--		authreq = HCI_AT_GENERAL_BONDING_MITM;
--		break;
-+	if (sec_level == BT_SECURITY_LOW)
-+		return 1;
- 
--	case BT_SECURITY_LOW:
--	default:
-+	if (hcon->sec_level >= sec_level)
- 		return 1;
--	}
-+
-+	authreq = seclevel_to_authreq(sec_level);
- 
- 	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
-@@ -392,6 +405,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+ 		swap128(key, hcon->ltk);
+-
+-		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
+-							sizeof(buf), 0);
+-		BT_DBG("key %s", buf);
  	}
- 
-+	hcon->pending_sec_level = sec_level;
-+	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
-+
- 	return 0;
  }
  
 -- 
