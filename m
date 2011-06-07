@@ -2,97 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 07/13] Bluetooth: Fix SM pairing parameters negotiation
-Date: Tue,  7 Jun 2011 19:50:08 -0300
-Message-Id: <1307487014-19398-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next 06/13] Bluetooth: Add support for providing parameters to LE Start Encryption
+Date: Tue,  7 Jun 2011 19:50:07 -0300
+Message-Id: <1307487014-19398-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307487014-19398-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307487014-19398-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before implementing SM key distribution, the pairing features
-exchange must be better negotiated, taking into account some
-features of the host and connection requirements.
+With LTK support we need to be able to provide LE Start Encryption
+with EDIV (Encrypted Diversifier) and Rand (just an 64 bit random
+number).
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   42 ++++++++++++++++++++++++++++++++----------
- 1 files changed, 32 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++-
+ net/bluetooth/hci_conn.c         |    5 ++++-
+ net/bluetooth/smp.c              |    7 ++++++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dbe6321..f80ea71 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -874,7 +874,8 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result);
+ 
+ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+ 					u16 latency, u16 to_multiplier);
+-void hci_le_start_enc(struct hci_conn *conn, u8 ltk[16]);
++void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
++							__u8 ltk[16]);
+ void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+ void hci_le_ltk_neg_reply(struct hci_conn *conn);
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b4754a8..2f5ae53 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -205,7 +205,8 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+ }
+ EXPORT_SYMBOL(hci_le_conn_update);
+ 
+-void hci_le_start_enc(struct hci_conn *conn, u8 ltk[16])
++void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
++							__u8 ltk[16])
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_le_start_enc cp;
+@@ -216,6 +217,8 @@ void hci_le_start_enc(struct hci_conn *conn, u8 ltk[16])
+ 
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 	memcpy(cp.ltk, ltk, sizeof(cp.ltk));
++	cp.ediv = ediv;
++	memcpy(cp.rand, rand, sizeof(rand));
+ 
+ 	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
+ }
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 01a6038..b8f9910 100644
+index 171a65c..01a6038 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -196,14 +196,36 @@ static __u8 seclevel_to_authreq(__u8 level)
- }
+@@ -366,13 +366,18 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	}
  
- static void build_pairing_cmd(struct l2cap_conn *conn,
--				struct smp_cmd_pairing *cmd, __u8 authreq)
-+				struct smp_cmd_pairing *req,
-+				struct smp_cmd_pairing *rsp,
-+				__u8 authreq)
- {
--	cmd->io_capability = conn->hcon->io_capability;
--	cmd->oob_flag = SMP_OOB_NOT_PRESENT;
--	cmd->max_key_size = SMP_MAX_ENC_KEY_SIZE;
--	cmd->init_key_dist = SMP_DIST_ENC_KEY | SMP_DIST_ID_KEY | SMP_DIST_SIGN;
--	cmd->resp_key_dist = SMP_DIST_ENC_KEY | SMP_DIST_ID_KEY | SMP_DIST_SIGN;
--	cmd->auth_req = authreq;
-+	u8 all_keys = SMP_DIST_ENC_KEY | SMP_DIST_ID_KEY |
-+						SMP_DIST_SIGN;
-+	u8 dist_keys;
+ 	if (conn->hcon->out) {
++		__le16 ediv;
++		u8 rand[8];
 +
-+	dist_keys = 0;
-+	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->flags)) {
-+		dist_keys = SMP_DIST_ENC_KEY;
-+		authreq |= SMP_AUTH_BONDING;
-+	}
-+
-+	if (rsp == NULL) {
-+		req->io_capability = conn->hcon->io_capability;
-+		req->oob_flag = SMP_OOB_NOT_PRESENT;
-+		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
-+		req->init_key_dist = dist_keys;
-+		req->resp_key_dist = all_keys;
-+		req->auth_req = authreq;
-+		return;
-+	}
-+
-+	rsp->io_capability = conn->hcon->io_capability;
-+	rsp->oob_flag = SMP_OOB_NOT_PRESENT;
-+	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
-+	rsp->init_key_dist = req->init_key_dist & all_keys;
-+	rsp->resp_key_dist = req->resp_key_dist & dist_keys;
-+	rsp->auth_req = authreq;
- }
+ 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
+ 		swap128(key, hcon->ltk);
  
- static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
-@@ -232,7 +254,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return SMP_OOB_NOT_AVAIL;
+ 		memset(hcon->ltk + conn->smp_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
  
- 	/* We didn't start the pairing, so no requirements */
--	build_pairing_cmd(conn, &rsp, SMP_AUTH_NONE);
-+	build_pairing_cmd(conn, req, &rsp, SMP_AUTH_NONE);
- 
- 	key_size = min(req->max_key_size, rsp.max_key_size);
- 	if (check_enc_key_size(conn, key_size))
-@@ -408,7 +430,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	skb_pull(skb, sizeof(*rp));
- 
- 	memset(&cp, 0, sizeof(cp));
--	build_pairing_cmd(conn, &cp, rp->auth_req);
-+	build_pairing_cmd(conn, &cp, NULL, rp->auth_req);
- 
- 	conn->preq[0] = SMP_CMD_PAIRING_REQ;
- 	memcpy(&conn->preq[1], &cp, sizeof(cp));
-@@ -447,7 +469,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
- 
--		build_pairing_cmd(conn, &cp, authreq);
-+		build_pairing_cmd(conn, &cp, NULL, authreq);
- 		conn->preq[0] = SMP_CMD_PAIRING_REQ;
- 		memcpy(&conn->preq[1], &cp, sizeof(cp));
+-		hci_le_start_enc(hcon, hcon->ltk);
++		memset(rand, 0, sizeof(rand));
++		ediv = 0;
++		hci_le_start_enc(hcon, ediv, rand, hcon->ltk);
+ 	} else {
+ 		u8 r[16];
  
 -- 
 1.7.5.4
