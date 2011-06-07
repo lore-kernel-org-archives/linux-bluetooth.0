@@ -2,44 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v3 13/16] Bluetooth: Add support for building pairing commands
-Date: Tue,  7 Jun 2011 18:46:42 -0300
-Message-Id: <1307483205-1518-14-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next v3 11/16] Bluetooth: Fix initial security level of LE links
+Date: Tue,  7 Jun 2011 18:46:40 -0300
+Message-Id: <1307483205-1518-12-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before we are able to do a proper exchange of pairing parameters,
-we need a unified way of building pairing requests and responses.
+As the default security level (BT_SECURITY_SDP) doesn't make sense for
+LE links, initialize LE links with something that makes sense.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   11 +++++++++++
- 1 files changed, 11 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_conn.c  |    1 +
+ net/bluetooth/hci_event.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8d0f623..57d7181 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -181,6 +181,17 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
- 	hci_send_acl(conn->hcon, skb, 0);
- }
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 101160c..b4754a8 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -53,6 +53,7 @@ static void hci_le_connect(struct hci_conn *conn)
+ 	conn->state = BT_CONNECT;
+ 	conn->out = 1;
+ 	conn->link_mode |= HCI_LM_MASTER;
++	conn->sec_level = BT_SECURITY_LOW;
  
-+static void build_pairing_cmd(struct l2cap_conn *conn,
-+				struct smp_cmd_pairing *cmd, __u8 authreq)
-+{
-+	cmd->io_capability = SMP_IO_NO_INPUT_OUTPUT;
-+	cmd->oob_flag = SMP_OOB_NOT_PRESENT;
-+	cmd->max_key_size = 16;
-+	cmd->init_key_dist = 0x00;
-+	cmd->resp_key_dist = 0x00;
-+	cmd->auth_req = authreq;
-+}
-+
- static void smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_pairing *rp = (void *) skb->data;
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.scan_interval = cpu_to_le16(0x0004);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 166fa11..21d6055 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2753,6 +2753,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 
+ 	mgmt_connected(hdev->id, &ev->bdaddr);
+ 
++	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->handle = __le16_to_cpu(ev->handle);
+ 	conn->state = BT_CONNECTED;
+ 
 -- 
 1.7.5.4
 
