@@ -1,108 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH] Add OOB DBus method for changing device properties
-Date: Tue,  7 Jun 2011 13:14:39 +0200
-Message-Id: <1307445279-31865-1-git-send-email-bulislaw@linux.com>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 7 Jun 2011 18:43:52 +0800
+Subject: for sync profile crash(irmc server)when using tracer
+Message-ID: <CE761E84DADF2947A4AF22FB8D97A473593108F1@shsmsx501.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It should be used when connection is made via Out of Band mechanisms.
-For now there is only support for remote device class setting.
----
- doc/oob-api.txt   |   10 +++++++++
- plugins/dbusoob.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+), 0 deletions(-)
+Hi all:
 
-diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-index d838712..606dd38 100644
---- a/doc/oob-api.txt
-+++ b/doc/oob-api.txt
-@@ -36,3 +36,13 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
- 
- 			Possible errors: org.bluez.Error.Failed
- 					 org.bluez.Error.InvalidArguments
-+
-+		void SetDeviceProperty(string address, string property,
-+								variant class)
-+
-+			This method set property for devices with specified
-+			address. For now only "Class" property (uint32) is
-+			supported.
-+
-+			Possible errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InvalidArguments
-diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 2c03780..c7f13ed 100644
---- a/plugins/dbusoob.c
-+++ b/plugins/dbusoob.c
-@@ -175,11 +175,65 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
-+static DBusMessage *set_device_property(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	char *addr;
-+	char *property;
-+	struct btd_device *device;
-+	DBusMessageIter iter;
-+	DBusMessageIter sub;
-+
-+	if (!dbus_message_iter_init(msg, &iter))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter, &addr);
-+	dbus_message_iter_next(&iter);
-+
-+	if (bachk(addr) != 0)
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter, &property);
-+	dbus_message_iter_next(&iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_recurse(&iter, &sub);
-+
-+	if (g_str_equal("Class", property)) {
-+		uint32_t class;
-+		bdaddr_t src, peer;
-+
-+		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT32)
-+			return btd_error_invalid_args(msg);
-+
-+		dbus_message_iter_get_basic(&sub, &class);
-+
-+		device = adapter_get_device(conn, adapter, addr);
-+		adapter_get_address(adapter, &src);
-+		device_get_address(device, &peer);
-+
-+		btd_event_remote_class(&src, &peer, class);
-+	} else
-+		return btd_error_failed(msg, "Invalid property");
-+
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+}
-+
- static GDBusMethodTable oob_methods[] = {
- 	{"AddRemoteData",	"sayay",	"",	add_remote_data},
- 	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
- 	{"ReadLocalData",	"",		"ayay",	read_local_data,
- 						G_DBUS_METHOD_FLAG_ASYNC},
-+	{"SetDeviceProperty",	"ssv",		"",	set_device_property},
- 	{}
- };
- 
--- 
-1.7.1
+For the sync profile(irmc) of obex, I meet a question when I use phonebook-tracer.c.
+
+Firstly, in the function of irmc_connect, we use phonebook_pull("telecom/pb.vcf", irmc->params,
+					phonebook_size_result, irmc, err);
+
+In the callback function of phonebook_size_result, we can get the number of vcards.
+
+If the number of vcards is 0, irmc still use irmc->request = phonebook_pull("telecom/pb.vcf", irmc->params,
+						query_result, irmc, &ret); in the function of irmc_open_pb.
+
+If that, the callback function of phonebook_pull is query_result and the number of vcards is 0.
+
+The condition will result in the crash of program if we use tracker.
+
+The reason is that if the number of vcards is 0, params->maxlistcount = 0. And phonebook_pull will search pull_contacts_size again.
+
+Therefore, if the number of vcards is 0 after irmc_connect, we need to do something for avoid the crash when irmc_open_pb, is right?
+
+Any idea or comments for it?
+
+Best regards
+Zheng wu
 
