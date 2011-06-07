@@ -2,64 +2,142 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next 05/13] Bluetooth: Reject an encryption request when the key isn't found
-Date: Tue,  7 Jun 2011 19:50:06 -0300
-Message-Id: <1307487014-19398-6-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next 04/13] Bluetooth: Add functions to manipulate the link key list for SMP
+Date: Tue,  7 Jun 2011 19:50:05 -0300
+Message-Id: <1307487014-19398-5-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307487014-19398-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307487014-19398-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that we have methods to finding keys by its parameters we can
-reject an encryption request if the key isn't found.
+As the LTK (the new type of key being handled now) has more data
+associated with it, we need to store this extra data and retrieve
+the keys based on that data.
+
+Methods for searching for a key and for adding a new LTK are
+introduced here.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/hci_event.c |   18 ++++++++++++++++--
- 1 files changed, 16 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |    5 ++
+ net/bluetooth/hci_core.c         |   81 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ac2c5e8..9c7c370 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2793,21 +2793,35 @@ static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
- {
- 	struct hci_ev_le_ltk_req *ev = (void *) skb->data;
- 	struct hci_cp_le_ltk_reply cp;
-+	struct hci_cp_le_ltk_neg_reply neg;
- 	struct hci_conn *conn;
-+	struct link_key *ltk;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0ba309e..dbe6321 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -548,6 +548,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
++struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
++struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
++					bdaddr_t *bdaddr, u8 type);
++int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
++					__le16 ediv, u8 rand[8], u8 ltk[16]);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
  
- 	BT_DBG("%s handle %d", hdev->name, cpu_to_le16(ev->handle));
- 
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (conn == NULL)
-+		goto not_found;
-+
-+	ltk = hci_find_ltk(hdev, ev->ediv, ev->random);
-+	if (ltk == NULL)
-+		goto not_found;
- 
--	memset(&cp, 0, sizeof(cp));
-+	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
- 	cp.handle = cpu_to_le16(conn->handle);
--	memcpy(cp.ltk, conn->ltk, sizeof(conn->ltk));
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
- 
- 	hci_dev_unlock(hdev);
-+
-+	return;
-+
-+not_found:
-+	neg.handle = ev->handle;
-+	hci_send_cmd(hdev, HCI_OP_LE_LTK_NEG_REPLY, sizeof(neg), &neg);
-+	hci_dev_unlock(hdev);
+ int hci_remote_oob_data_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f62ca19..02cad1f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1059,6 +1059,50 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+ 	return 0;
  }
  
- static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
++struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
++{
++	struct list_head *p;
++
++	list_for_each(p, &hdev->link_keys) {
++		struct link_key *k;
++		struct key_master_id *id;
++
++		k = list_entry(p, struct link_key, list);
++
++		if (k->type != HCI_LK_SMP_LTK)
++			continue;
++
++		if (k->dlen != sizeof(*id))
++			continue;
++
++		id = (void *) &k->data;
++		if (id->ediv == ediv &&
++				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
++			return k;
++	}
++
++	return NULL;
++}
++EXPORT_SYMBOL(hci_find_ltk);
++
++struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
++					bdaddr_t *bdaddr, u8 type)
++{
++	struct list_head *p;
++
++	list_for_each(p, &hdev->link_keys) {
++		struct link_key *k;
++
++		k = list_entry(p, struct link_key, list);
++
++		if ((k->type == type) && (bacmp(bdaddr, &k->bdaddr) == 0))
++			return k;
++	}
++
++	return NULL;
++}
++EXPORT_SYMBOL(hci_find_link_key_type);
++
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 				bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
+ {
+@@ -1114,6 +1158,43 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 	return 0;
+ }
+ 
++int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
++					__le16 ediv, u8 rand[8], u8 ltk[16])
++{
++	struct link_key *key, *old_key;
++	struct key_master_id *id;
++	u8 old_key_type;
++
++	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
++
++	old_key = hci_find_link_key_type(hdev, bdaddr, HCI_LK_SMP_LTK);
++	if (old_key) {
++		key = old_key;
++		old_key_type = old_key->type;
++	} else {
++		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
++		if (!key)
++			return -ENOMEM;
++		list_add(&key->list, &hdev->link_keys);
++		old_key_type = 0xff;
++	}
++
++	key->dlen = sizeof(*id);
++
++	bacpy(&key->bdaddr, bdaddr);
++	memcpy(key->val, ltk, sizeof(key->val));
++	key->type = HCI_LK_SMP_LTK;
++
++	id = (void *) &key->data;
++	id->ediv = ediv;
++	memcpy(id->rand, rand, sizeof(id->rand));
++
++	if (new_key)
++		mgmt_new_key(hdev->id, key, old_key_type);
++
++	return 0;
++}
++
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct link_key *key;
 -- 
 1.7.5.4
 
