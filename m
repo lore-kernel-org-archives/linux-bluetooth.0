@@ -1,605 +1,197 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH] adaptername: Move adapter naming into a plugin
-Date: Tue,  7 Jun 2011 10:34:01 +0100
-Message-Id: <1307439241-10585-1-git-send-email-hadess@hadess.net>
-In-Reply-To: <BANLkTi=rVQ+vi+nN_DH+LuyBe4L6xk=hBg@mail.gmail.com>
-References: <BANLkTi=rVQ+vi+nN_DH+LuyBe4L6xk=hBg@mail.gmail.com>
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <padovan@profusion.mobi>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH v2] Bluetooth: Clean up some code style issues
+Date: Tue, 7 Jun 2011 11:18:06 +0200
+Message-ID: <1307438286-30597-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Moving the adapter naming allows us to use the /etc/machine-info [1]
-pretty hostname, as implemented by hostnamed [2] in systemd.
+Fix lines longer than 80 chars in length.
 
-If /etc/machine-info is not present, the adapter name stored
-on disk in /var/lib/bluetooth will be used. If no adapter name
-has been set yet, the default from the main.conf will be used.
-
-We don't currently number the name of hci0 if a pretty name is
-available, but we should instead number it if it happens not
-to be the default adapter. As we cannot be told when the default
-adapter changes, we'll behave this way for now.
-
-Note that when an adapter name is set automatically from
-the pretty hostname, changing it through the D-Bus interface
-will fail.
-
-[1]: http://0pointer.de/public/systemd-man/machine-info.html
-[2]: http://www.freedesktop.org/wiki/Software/systemd/hostnamed
+Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 ---
- Makefile.am           |    3 +
- configure.ac          |    4 +
- plugins/adaptername.c |  296 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c         |  119 +++++---------------
- src/adapter.h         |    4 +-
- src/manager.c         |    5 +
- src/manager.h         |    1 +
- 7 files changed, 340 insertions(+), 92 deletions(-)
- create mode 100644 plugins/adaptername.c
+ include/net/bluetooth/bluetooth.h |    7 +++--
+ include/net/bluetooth/hci_core.h  |   38 ++++++++++++++++++++++++------------
+ include/net/bluetooth/rfcomm.h    |    9 +++++--
+ 3 files changed, 35 insertions(+), 19 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index c2a6976..ba9a89d 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -218,6 +218,9 @@ EXTRA_DIST += plugins/hal.c plugins/formfactor.c
- builtin_modules += storage
- builtin_sources += plugins/storage.c
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index af930a3..7bccaf9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -137,7 +137,8 @@ int  bt_sock_register(int proto, const struct net_proto_family *ops);
+ int  bt_sock_unregister(int proto);
+ void bt_sock_link(struct bt_sock_list *l, struct sock *s);
+ void bt_sock_unlink(struct bt_sock_list *l, struct sock *s);
+-int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags);
++int  bt_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
++				struct msghdr *msg, size_t len, int flags);
+ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 			struct msghdr *msg, size_t len, int flags);
+ uint bt_sock_poll(struct file * file, struct socket *sock, poll_table *wait);
+@@ -172,8 +173,8 @@ static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
+ 	return skb;
+ }
  
-+builtin_modules += adaptername
-+builtin_sources += plugins/adaptername.c
-+
- if MAEMO6PLUGIN
- builtin_modules += maemo6
- builtin_sources += plugins/maemo6.c
-diff --git a/configure.ac b/configure.ac
-index 07b9e55..084ece5 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -35,6 +35,10 @@ AC_FUNC_PPOLL
- AC_CHECK_LIB(dl, dlopen, dummy=yes,
- 			AC_MSG_ERROR(dynamic linking loader is required))
+-static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk, unsigned long len, 
+-							int nb, int *err)
++static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
++					unsigned long len, int nb, int *err)
+ {
+ 	struct sk_buff *skb;
  
-+AC_CHECK_HEADER([sys/inotify.h],
-+		[AC_DEFINE([HAVE_SYS_INOTIFY_H], 1,
-+			   [Define to 1 if you have <sys/inotify.h>.])],
-+			   [AC_MSG_ERROR(inotify headers are required and missing)])
- AC_PATH_DBUS
- AC_PATH_GLIB
- AC_PATH_ALSA
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-new file mode 100644
-index 0000000..f3156fe
---- /dev/null
-+++ b/plugins/adaptername.c
-@@ -0,0 +1,296 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <errno.h>
-+
-+#include <glib.h>
-+#include <bluetooth/bluetooth.h>
-+
-+#include "plugin.h"
-+#include "hcid.h" /* For main_opts */
-+#include "adapter.h"
-+#include "manager.h"
-+#include "device.h" /* Needed for storage.h */
-+#include "storage.h"
-+#include "log.h"
-+
-+#include <sys/inotify.h>
-+#define EVENT_SIZE  (sizeof (struct inotify_event))
-+#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
-+
-+#define MACHINE_INFO_DIR "/etc/"
-+#define MACHINE_INFO_FILE "machine-info"
-+
-+static GIOChannel *inotify = NULL;
-+static int watch_fd = -1;
-+
-+/* This file is part of systemd's hostnamed functionality:
-+ * http://0pointer.de/public/systemd-man/machine-info.html
-+ * http://www.freedesktop.org/wiki/Software/systemd/hostnamed
-+ */
-+static char *read_pretty_host_name (void)
-+{
-+	char *contents, *ret;
-+	char **lines;
-+	guint i;
-+
-+	ret = NULL;
-+
-+	if (g_file_get_contents(MACHINE_INFO_DIR MACHINE_INFO_FILE,
-+			&contents, NULL, NULL) == FALSE) {
-+		return NULL;
-+	}
-+	lines = g_strsplit_set(contents, "\r\n", 0);
-+	g_free(contents);
-+
-+	if (lines == NULL)
-+		return NULL;
-+
-+	for (i = 0; lines[i] != NULL; i++) {
-+		if (g_str_has_prefix(lines[i], "PRETTY_HOSTNAME=")) {
-+			ret = g_strdup(lines[i] + strlen("PRETTY_HOSTNAME="));
-+			break;
-+		}
-+	}
-+
-+	g_strfreev(lines);
-+	return ret;
-+}
-+
-+/*
-+ * Device name expansion
-+ *   %d - device id
-+ *   %h - hostname
-+ */
-+static char *expand_name(char *dst, int size, char *str, int dev_id)
-+{
-+	register int sp, np, olen;
-+	char *opt, buf[10];
-+
-+	if (!str || !dst)
-+		return NULL;
-+
-+	sp = np = 0;
-+	while (np < size - 1 && str[sp]) {
-+		switch (str[sp]) {
-+		case '%':
-+			opt = NULL;
-+
-+			switch (str[sp+1]) {
-+			case 'd':
-+				sprintf(buf, "%d", dev_id);
-+				opt = buf;
-+				break;
-+
-+			case 'h':
-+				opt = main_opts.host_name;
-+				break;
-+
-+			case '%':
-+				dst[np++] = str[sp++];
-+				/* fall through */
-+			default:
-+				sp++;
-+				continue;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 818eadb..836d3e8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -224,7 +224,7 @@ struct hci_conn {
+ 	spinlock_t	lock;
+ 
+ 	bdaddr_t	dst;
+-	__u8            dst_type;
++	__u8		dst_type;
+ 	__u16		handle;
+ 	__u16		state;
+ 	__u8		mode;
+@@ -317,7 +317,8 @@ static inline long inquiry_entry_age(struct inquiry_entry *e)
+ 	return jiffies - e->timestamp;
+ }
+ 
+-struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev, bdaddr_t *bdaddr);
++struct inquiry_entry *hci_inquiry_cache_lookup(struct hci_dev *hdev,
++							bdaddr_t *bdaddr);
+ void hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data);
+ 
+ /* ----- HCI Connections ----- */
+@@ -431,7 +432,8 @@ int hci_conn_del(struct hci_conn *conn);
+ void hci_conn_hash_flush(struct hci_dev *hdev);
+ void hci_conn_check_pending(struct hci_dev *hdev);
+ 
+-struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8 sec_level, __u8 auth_type);
++struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
++						__u8 sec_level, __u8 auth_type);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+@@ -460,10 +462,12 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ 				timeo = msecs_to_jiffies(conn->disc_timeout);
+ 				if (!conn->out)
+ 					timeo *= 2;
+-			} else
++			} else {
+ 				timeo = msecs_to_jiffies(10);
+-		} else
 +			}
-+
-+			if (opt) {
-+				/* substitute */
-+				olen = strlen(opt);
-+				if (np + olen < size - 1)
-+					memcpy(dst + np, opt, olen);
-+				np += olen;
-+			}
-+			sp += 2;
-+			continue;
-+
-+		case '\\':
-+			sp++;
-+			/* fall through */
-+		default:
-+			dst[np++] = str[sp++];
-+			break;
-+		}
-+	}
-+	dst[np] = '\0';
-+	return dst;
-+}
-+
-+static int adaptername_probe(struct btd_adapter *adapter)
-+{
-+	int current_id;
-+	char name[MAX_NAME_LENGTH + 1];
-+	char *pretty_hostname;
-+	bdaddr_t bdaddr;
-+
-+	current_id = adapter_get_dev_id(adapter);
-+
-+	pretty_hostname = read_pretty_host_name();
-+	if (pretty_hostname != NULL) {
-+		int default_adapter;
-+
-+		default_adapter = manager_get_default_adapter();
-+
-+		/* Allow us to change the name */
-+		adapter_set_allow_name_changes(adapter, TRUE);
-+
-+		/* If it's the first device, let's assume it will
-+		 * be the default one, as we're not told when
-+		 * the default adapter changes */
-+		if (default_adapter < 0)
-+			default_adapter = current_id;
-+
-+		if (default_adapter != current_id) {
-+			char *str;
-+
-+			/* +1 because we don't want an adapter called "Foobar's laptop #0" */
-+			str = g_strdup_printf ("%s #%d", pretty_hostname, current_id + 1);
-+			DBG("Setting name '%s' for device 'hci%d'", str, current_id);
-+
-+			adapter_update_local_name(adapter, str);
-+			g_free(str);
 +		} else {
-+			DBG("Setting name '%s' for device 'hci%d'", pretty_hostname, current_id);
-+			adapter_update_local_name(adapter, pretty_hostname);
+ 			timeo = msecs_to_jiffies(10);
 +		}
-+		g_free(pretty_hostname);
-+
-+		/* And disable the name change now */
-+		adapter_set_allow_name_changes(adapter, FALSE);
-+
-+		return 0;
-+	}
-+
-+	adapter_set_allow_name_changes(adapter, TRUE);
-+	adapter_get_address(adapter, &bdaddr);
-+
-+	if (read_local_name(&bdaddr, name) < 0) {
-+		expand_name(name, MAX_NAME_LENGTH, main_opts.name,
-+							current_id);
-+	}
-+	DBG("Setting name '%s' for device 'hci%d'", name, current_id);
-+	adapter_update_local_name(adapter, name);
-+
-+	return 0;
-+}
-+
-+static gboolean handle_inotify_cb(GIOChannel *channel,
-+		GIOCondition condition, gpointer data)
-+{
-+	char buf[EVENT_BUF_LEN];
-+	GIOStatus err;
-+	gsize len, i;
-+	gboolean changed;
-+
-+	changed = FALSE;
-+
-+	err = g_io_channel_read_chars(channel, buf, EVENT_BUF_LEN, &len, NULL);
-+	if (err != G_IO_STATUS_NORMAL) {
-+		error("Error reading inotify event: %d\n", err);
-+		return FALSE;
-+	}
-+
-+	i = 0;
-+	while (i < len) {
-+		struct inotify_event *pevent = (struct inotify_event *) & buf[i];
-+
-+		/* check that it's ours */
-+		if (pevent->len &&
-+		    pevent->name != NULL &&
-+		    strcmp(pevent->name, MACHINE_INFO_FILE) == 0) {
-+			changed = TRUE;
-+		}
-+		i += EVENT_SIZE + pevent->len;
-+	}
-+
-+	if (changed != FALSE) {
-+		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
-+				" changed, changing names for adapters");
-+		manager_foreach_adapter ((adapter_cb) adaptername_probe, NULL);
-+	}
-+
-+	return TRUE;
-+}
-+
-+static void adaptername_remove(struct btd_adapter *adapter)
-+{
-+	if (watch_fd >= 0)
-+		close (watch_fd);
-+	if (inotify != NULL)
-+		g_io_channel_shutdown(inotify, FALSE, NULL);
-+}
-+
-+static struct btd_adapter_driver adaptername_driver = {
-+	.name	= "adaptername",
-+	.probe	= adaptername_probe,
-+	.remove	= adaptername_remove,
-+};
-+
-+static int adaptername_init(void)
-+{
-+	int ret;
-+
-+	ret = btd_register_adapter_driver(&adaptername_driver);
-+
-+	if (ret == 0) {
-+		int inot_fd;
-+
-+		inot_fd = inotify_init();
-+		if (inot_fd < 0) {
-+			error("Failed to setup inotify");
-+			return 0;
-+		}
-+		watch_fd = inotify_add_watch(inot_fd,
-+				MACHINE_INFO_DIR,
-+				IN_CLOSE_WRITE | IN_DELETE | IN_CREATE);
-+		if (watch_fd < 0) {
-+			error("Failed to setup watch for '%s'",
-+					MACHINE_INFO_DIR);
-+			return 0;
-+		}
-+
-+		inotify = g_io_channel_unix_new(inot_fd);
-+		g_io_channel_set_close_on_unref(inotify, TRUE);
-+		g_io_channel_set_encoding (inotify, NULL, NULL);
-+		  g_io_channel_set_flags (inotify, G_IO_FLAG_NONBLOCK, NULL);
-+		g_io_add_watch(inotify, G_IO_IN, handle_inotify_cb, NULL);
-+
-+		return 0;
-+	}
-+
-+	return ret;
-+}
-+
-+static void adaptername_exit(void)
-+{
-+	btd_unregister_adapter_driver(&adaptername_driver);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(adaptername, VERSION,
-+		BLUETOOTH_PLUGIN_PRIORITY_LOW, adaptername_init, adaptername_exit)
-diff --git a/src/adapter.c b/src/adapter.c
-index b189841..b061624 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -111,6 +111,7 @@ struct btd_adapter {
- 	bdaddr_t bdaddr;		/* adapter Bluetooth Address */
- 	uint32_t dev_class;		/* Class of Device */
- 	char name[MAX_NAME_LENGTH + 1]; /* adapter name */
-+	gboolean allow_name_changes;	/* whether the adapter name can be changed */
- 	guint discov_timeout_id;	/* discoverable timeout id */
- 	guint stop_discov_id;		/* stop inquiry/scanning id */
- 	uint32_t discov_timeout;	/* discoverable time(sec) */
-@@ -186,64 +187,6 @@ static void dev_info_free(struct remote_dev_info *dev)
- 	g_free(dev);
- }
- 
--/*
-- * Device name expansion
-- *   %d - device id
-- */
--static char *expand_name(char *dst, int size, char *str, int dev_id)
--{
--	register int sp, np, olen;
--	char *opt, buf[10];
--
--	if (!str || !dst)
--		return NULL;
--
--	sp = np = 0;
--	while (np < size - 1 && str[sp]) {
--		switch (str[sp]) {
--		case '%':
--			opt = NULL;
--
--			switch (str[sp+1]) {
--			case 'd':
--				sprintf(buf, "%d", dev_id);
--				opt = buf;
--				break;
--
--			case 'h':
--				opt = main_opts.host_name;
--				break;
--
--			case '%':
--				dst[np++] = str[sp++];
--				/* fall through */
--			default:
--				sp++;
--				continue;
--			}
--
--			if (opt) {
--				/* substitute */
--				olen = strlen(opt);
--				if (np + olen < size - 1)
--					memcpy(dst + np, opt, olen);
--				np += olen;
--			}
--			sp += 2;
--			continue;
--
--		case '\\':
--			sp++;
--			/* fall through */
--		default:
--			dst[np++] = str[sp++];
--			break;
--		}
--	}
--	dst[np] = '\0';
--	return dst;
--}
--
- int btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
- 								uint8_t minor)
- {
-@@ -916,10 +859,13 @@ void btd_adapter_class_changed(struct btd_adapter *adapter, uint32_t new_class)
- 				DBUS_TYPE_UINT32, &new_class);
- }
- 
--void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
-+int adapter_update_local_name(struct btd_adapter *adapter, const char *name)
- {
-+	if (adapter->allow_name_changes == FALSE)
-+		return -EPERM;
-+
- 	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
--		return;
-+		return 0;
- 
- 	strncpy(adapter->name, name, MAX_NAME_LENGTH);
- 
-@@ -938,38 +884,29 @@ void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
- 						DBUS_TYPE_STRING, &name_ptr);
+ 		mod_timer(&conn->disc_timer, jiffies + timeo);
  	}
- 
-+	if (adapter->up) {
-+		int err = adapter_ops->set_name(adapter->dev_id, name);
-+		if (err < 0)
-+			return -err;
-+
-+		adapter->name_stored = TRUE;
-+	}
-+
- 	adapter->name_stored = FALSE;
-+
-+	return 0;
  }
+@@ -578,16 +582,20 @@ struct hci_proto {
  
- static DBusMessage *set_name(DBusConnection *conn, DBusMessage *msg,
- 					const char *name, void *data)
+ 	void		*priv;
+ 
+-	int (*connect_ind)	(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type);
++	int (*connect_ind)	(struct hci_dev *hdev, bdaddr_t *bdaddr,
++								__u8 type);
+ 	int (*connect_cfm)	(struct hci_conn *conn, __u8 status);
+ 	int (*disconn_ind)	(struct hci_conn *conn);
+ 	int (*disconn_cfm)	(struct hci_conn *conn, __u8 reason);
+-	int (*recv_acldata)	(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
++	int (*recv_acldata)	(struct hci_conn *conn, struct sk_buff *skb,
++								__u16 flags);
+ 	int (*recv_scodata)	(struct hci_conn *conn, struct sk_buff *skb);
+-	int (*security_cfm)	(struct hci_conn *conn, __u8 status, __u8 encrypt);
++	int (*security_cfm)	(struct hci_conn *conn, __u8 status,
++								__u8 encrypt);
+ };
+ 
+-static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type)
++static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
++								__u8 type)
  {
- 	struct btd_adapter *adapter = data;
--	char *name_ptr = adapter->name;
--
--	if (!g_utf8_validate(name, -1, NULL)) {
--		error("Name change failed: supplied name isn't valid UTF-8");
--		return btd_error_invalid_args(msg);
--	}
--
--	if (strncmp(name, adapter->name, MAX_NAME_LENGTH) == 0)
--		goto done;
--
--	strncpy(adapter->name, name, MAX_NAME_LENGTH);
--	write_local_name(&adapter->bdaddr, name);
--	emit_property_changed(connection, adapter->path,
--					ADAPTER_INTERFACE, "Name",
--					DBUS_TYPE_STRING, &name_ptr);
--
--	if (adapter->up) {
--		int err = adapter_ops->set_name(adapter->dev_id, name);
--		if (err < 0)
--			return btd_error_failed(msg, strerror(-err));
-+	int err;
- 
--		adapter->name_stored = TRUE;
--	}
-+	err = adapter_update_local_name (adapter, name);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
- 
--done:
- 	return dbus_message_new_method_return(msg);
+ 	register struct hci_proto *hp;
+ 	int mask = 0;
+@@ -673,7 +681,8 @@ static inline void hci_proto_auth_cfm(struct hci_conn *conn, __u8 status)
+ 		conn->security_cfm_cb(conn, status);
  }
  
-@@ -2576,6 +2513,8 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 	 * start off as powered */
- 	adapter->up = TRUE;
- 
-+	adapter->allow_name_changes = TRUE;
-+
- 	adapter_ops->read_bdaddr(adapter->dev_id, &adapter->bdaddr);
- 
- 	if (bacmp(&adapter->bdaddr, BDADDR_ANY) == 0) {
-@@ -2591,14 +2530,6 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 		return FALSE;
- 	}
- 
--	if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
--		expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
--							adapter->dev_id);
--
--	if (main_opts.attrib_server)
--		attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
--			(const uint8_t *) adapter->name, strlen(adapter->name));
--
- 	sdp_init_services_list(&adapter->bdaddr);
- 	load_drivers(adapter);
- 	clear_blocked(adapter);
-@@ -2684,6 +2615,12 @@ void adapter_get_address(struct btd_adapter *adapter, bdaddr_t *bdaddr)
- 	bacpy(bdaddr, &adapter->bdaddr);
- }
- 
-+void adapter_set_allow_name_changes(struct btd_adapter *adapter,
-+						gboolean allow_name_changes)
-+{
-+	adapter->allow_name_changes = allow_name_changes;
-+}
-+
- static inline void suspend_discovery(struct btd_adapter *adapter)
+-static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encrypt)
++static inline void hci_proto_encrypt_cfm(struct hci_conn *conn, __u8 status,
++								__u8 encrypt)
  {
- 	if (adapter->state != STATE_SUSPENDED)
-diff --git a/src/adapter.h b/src/adapter.h
-index 3526849..626c9ef 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -100,6 +100,8 @@ int adapter_resolve_names(struct btd_adapter *adapter);
- struct btd_adapter *adapter_create(DBusConnection *conn, int id);
- gboolean adapter_init(struct btd_adapter *adapter);
- void adapter_remove(struct btd_adapter *adapter);
-+void adapter_set_allow_name_changes(struct btd_adapter *adapter,
-+						gboolean allow_name_changes);
- uint16_t adapter_get_dev_id(struct btd_adapter *adapter);
- const gchar *adapter_get_path(struct btd_adapter *adapter);
- void adapter_get_address(struct btd_adapter *adapter, bdaddr_t *bdaddr);
-@@ -115,7 +117,7 @@ int adapter_remove_found_device(struct btd_adapter *adapter, bdaddr_t *bdaddr);
- void adapter_emit_device_found(struct btd_adapter *adapter,
- 						struct remote_dev_info *dev);
- void adapter_mode_changed(struct btd_adapter *adapter, uint8_t scan_mode);
--void adapter_update_local_name(struct btd_adapter *adapter, const char *name);
-+int adapter_update_local_name(struct btd_adapter *adapter, const char *name);
- void adapter_service_insert(struct btd_adapter *adapter, void *rec);
- void adapter_service_remove(struct btd_adapter *adapter, void *rec);
- void btd_adapter_class_changed(struct btd_adapter *adapter,
-diff --git a/src/manager.c b/src/manager.c
-index e805e0c..dedec8b 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
- 		btd_start_exit_timer();
+ 	register struct hci_proto *hp;
+ 
+@@ -698,7 +707,8 @@ struct hci_cb {
+ 
+ 	char *name;
+ 
+-	void (*security_cfm)	(struct hci_conn *conn, __u8 status, __u8 encrypt);
++	void (*security_cfm)	(struct hci_conn *conn, __u8 status,
++								__u8 encrypt);
+ 	void (*key_change_cfm)	(struct hci_conn *conn, __u8 status);
+ 	void (*role_switch_cfm)	(struct hci_conn *conn, __u8 status, __u8 role);
+ };
+@@ -724,7 +734,8 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
+ 	read_unlock_bh(&hci_cb_list_lock);
  }
  
-+int manager_get_default_adapter (void)
-+{
-+	return default_adapter_id;
-+}
-+
- void manager_cleanup(DBusConnection *conn, const char *path)
+-static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status, __u8 encrypt)
++static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
++								__u8 encrypt)
  {
- 	g_slist_foreach(adapters, (GFunc) manager_remove_adapter, NULL);
-diff --git a/src/manager.h b/src/manager.h
-index 05c38b3..90d3690 100644
---- a/src/manager.h
-+++ b/src/manager.h
-@@ -41,3 +41,4 @@ struct btd_adapter *btd_manager_register_adapter(int id);
- int btd_manager_unregister_adapter(int id);
- void manager_add_adapter(const char *path);
- void btd_manager_set_did(uint16_t vendor, uint16_t product, uint16_t version);
-+int manager_get_default_adapter (void);
+ 	struct list_head *p;
+ 
+@@ -755,7 +766,8 @@ static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
+ 	read_unlock_bh(&hci_cb_list_lock);
+ }
+ 
+-static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status, __u8 role)
++static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
++								__u8 role)
+ {
+ 	struct list_head *p;
+ 
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 6eac4a7..d5eee20 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -234,7 +234,8 @@ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
+ /* ---- RFCOMM DLCs (channels) ---- */
+ struct rfcomm_dlc *rfcomm_dlc_alloc(gfp_t prio);
+ void rfcomm_dlc_free(struct rfcomm_dlc *d);
+-int  rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 channel);
++int  rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst,
++								u8 channel);
+ int  rfcomm_dlc_close(struct rfcomm_dlc *d, int reason);
+ int  rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb);
+ int  rfcomm_dlc_set_modem_status(struct rfcomm_dlc *d, u8 v24_sig);
+@@ -271,7 +272,8 @@ static inline void rfcomm_dlc_unthrottle(struct rfcomm_dlc *d)
+ }
+ 
+ /* ---- RFCOMM sessions ---- */
+-void   rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *dst);
++void   rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src,
++								bdaddr_t *dst);
+ 
+ static inline void rfcomm_session_hold(struct rfcomm_session *s)
+ {
+@@ -312,7 +314,8 @@ struct rfcomm_pinfo {
+ int  rfcomm_init_sockets(void);
+ void rfcomm_cleanup_sockets(void);
+ 
+-int  rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc **d);
++int  rfcomm_connect_ind(struct rfcomm_session *s, u8 channel,
++							struct rfcomm_dlc **d);
+ 
+ /* ---- RFCOMM TTY ---- */
+ #define RFCOMM_MAX_DEV  256
 -- 
-1.7.5.1
+1.7.4.1
 
