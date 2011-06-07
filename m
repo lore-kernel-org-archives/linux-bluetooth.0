@@ -1,125 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1305936645-15007-6-git-send-email-andre.guedes@openbossa.org>
-References: <1305936645-15007-1-git-send-email-andre.guedes@openbossa.org>
-	<1305936645-15007-6-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 7 Jun 2011 14:18:07 +0900
-Message-ID: <BANLkTin3Q1cO0-q50fEye7=7KHxTgKmhTg@mail.gmail.com>
-Subject: Re: [PATCH v2 06/11] Bluetooth: Advertising entries lifetime
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH] Add OOB DBus method for changing device properties
+Date: Tue,  7 Jun 2011 13:14:39 +0200
+Message-Id: <1307445279-31865-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+It should be used when connection is made via Out of Band mechanisms.
+For now there is only support for remote device class setting.
+---
+ doc/oob-api.txt   |   10 +++++++++
+ plugins/dbusoob.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+), 0 deletions(-)
 
-On Sat, May 21, 2011 at 9:10 AM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> This patch adds a timer to clear 'adv_entries' after three minutes.
->
-> After some amount of time, the advertising entries cached during
-> the last LE scan should be considered expired and they should be
-> removed from the advertising cache.
->
-> It was chosen a three minutes timeout as an initial attempt. This
-> value might change in future.
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_core.c         |   14 ++++++++++++++
->  net/bluetooth/hci_event.c        |    6 +++++-
->  3 files changed, 21 insertions(+), 1 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 10dfb85..af4b0ed 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -188,6 +188,7 @@ struct hci_dev {
->        struct list_head        remote_oob_data;
->
->        struct list_head        adv_entries;
-> +       struct timer_list       adv_timer;
->
->        struct hci_dev_stats    stat;
->
-> @@ -535,6 +536,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
->                                                                u8 *randomizer);
->  int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
->
-> +#define ADV_CLEAR_TIMEOUT (3*60*HZ) /* Three minutes */
->  int hci_adv_entries_clear(struct hci_dev *hdev);
->  struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
->  int hci_add_adv_entry(struct hci_dev *hdev,
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index dd27f97..5040c3f 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1204,6 +1204,17 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
->        return 0;
->  }
->
-> +static void hci_clear_adv_cache(unsigned long arg)
-> +{
-> +       struct hci_dev *hdev = (void *) arg;
-> +
-> +       hci_dev_lock(hdev);
-> +
-> +       hci_adv_entries_clear(hdev);
-> +
-> +       hci_dev_unlock(hdev);
-> +}
-> +
->  int hci_adv_entries_clear(struct hci_dev *hdev)
->  {
->        struct adv_entry *entry, *tmp;
-> @@ -1332,6 +1343,8 @@ int hci_register_dev(struct hci_dev *hdev)
->        INIT_LIST_HEAD(&hdev->remote_oob_data);
->
->        INIT_LIST_HEAD(&hdev->adv_entries);
-> +       setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
-> +                                               (unsigned long) hdev);
->
->        INIT_WORK(&hdev->power_on, hci_power_on);
->        INIT_WORK(&hdev->power_off, hci_power_off);
-> @@ -1405,6 +1418,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
->        hci_unregister_sysfs(hdev);
->
->        hci_del_off_timer(hdev);
-> +       del_timer(&hdev->adv_timer);
->
->        destroy_workqueue(hdev->workqueue);
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 85e12d8..8d6dc1e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -859,8 +859,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
->
->        hci_dev_lock(hdev);
->
-> -       if (param_scan_enable == 0x01)
-> +       if (param_scan_enable == 0x01) {
-> +               del_timer(&hdev->adv_timer);
->                hci_adv_entries_clear(hdev);
-> +       } else if (param_scan_enable == 0x00) {
-> +               mod_timer(&hdev->adv_timer, jiffies + ADV_CLEAR_TIMEOUT);
-> +       }
->
->        hci_dev_unlock(hdev);
->  }
-> --
-> 1.7.4.1
-
-Maybe we should not trigger the timer if the we are connected to the
-device, this would be very convenient if a disconnect happen for
-unknown reason e.g. bug or crash so we can quickly reconnect without
-having to scan again, once disconnected then we start the entry timer,
-what do you think?
-
-
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index d838712..606dd38 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -36,3 +36,13 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+ 
+ 			Possible errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InvalidArguments
++
++		void SetDeviceProperty(string address, string property,
++								variant class)
++
++			This method set property for devices with specified
++			address. For now only "Class" property (uint32) is
++			supported.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.InvalidArguments
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index 2c03780..c7f13ed 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -175,11 +175,65 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
++static DBusMessage *set_device_property(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct btd_adapter *adapter = data;
++	char *addr;
++	char *property;
++	struct btd_device *device;
++	DBusMessageIter iter;
++	DBusMessageIter sub;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &addr);
++	dbus_message_iter_next(&iter);
++
++	if (bachk(addr) != 0)
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &property);
++	dbus_message_iter_next(&iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &sub);
++
++	if (g_str_equal("Class", property)) {
++		uint32_t class;
++		bdaddr_t src, peer;
++
++		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_UINT32)
++			return btd_error_invalid_args(msg);
++
++		dbus_message_iter_get_basic(&sub, &class);
++
++		device = adapter_get_device(conn, adapter, addr);
++		adapter_get_address(adapter, &src);
++		device_get_address(device, &peer);
++
++		btd_event_remote_class(&src, &peer, class);
++	} else
++		return btd_error_failed(msg, "Invalid property");
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++}
++
+ static GDBusMethodTable oob_methods[] = {
+ 	{"AddRemoteData",	"sayay",	"",	add_remote_data},
+ 	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
+ 	{"ReadLocalData",	"",		"ayay",	read_local_data,
+ 						G_DBUS_METHOD_FLAG_ASYNC},
++	{"SetDeviceProperty",	"ssv",		"",	set_device_property},
+ 	{}
+ };
+ 
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+1.7.1
+
