@@ -1,58 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Peter Hurley <peter@hurleysoftware.com>
-Date: Tue, 7 Jun 2011 16:20:41 -0400
-Subject: [PATCH] Bluetooth: l2cap: removed erroneous NULL ACL packet handling
-Message-ID: <1307478041.2651.3.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+In-Reply-To: <BANLkTin3Q1cO0-q50fEye7=7KHxTgKmhTg@mail.gmail.com>
+References: <1305936645-15007-1-git-send-email-andre.guedes@openbossa.org>
+	<1305936645-15007-6-git-send-email-andre.guedes@openbossa.org>
+	<BANLkTin3Q1cO0-q50fEye7=7KHxTgKmhTg@mail.gmail.com>
+Date: Tue, 7 Jun 2011 16:08:20 -0300
+Message-ID: <BANLkTikeNWd44kzTSS2N9mSxB3xwNkeX8g@mail.gmail.com>
+Subject: Re: [PATCH v2 06/11] Bluetooth: Advertising entries lifetime
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From 3a1e7de889253732609efe80cc6cb465c0e8e7d4 Mon Sep 17 00:00:00 2001
-From: Peter Hurley <peter@hurleysoftware.com>
-Date: Tue, 7 Jun 2011 15:47:47 -0400
-Subject: [PATCH] Bluetooth: l2cap: removed erroneous NULL ACL packet handling
+Hi Luiz,
 
-A 0-length ACL continuation-fragment is a valid NULL packet. Remote
-devices can use the FLOW indicator in the ACL packet header to
-flow-control ACL packets without sending a payload.
+On Tue, Jun 7, 2011 at 2:18 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andre,
+>
+> On Sat, May 21, 2011 at 9:10 AM, Andre Guedes
+> <andre.guedes@openbossa.org> wrote:
+>> This patch adds a timer to clear 'adv_entries' after three minutes.
+>>
+>> After some amount of time, the advertising entries cached during
+>> the last LE scan should be considered expired and they should be
+>> removed from the advertising cache.
+>>
+>> It was chosen a three minutes timeout as an initial attempt. This
+>> value might change in future.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  include/net/bluetooth/hci_core.h |    2 ++
+>>  net/bluetooth/hci_core.c         |   14 ++++++++++++++
+>>  net/bluetooth/hci_event.c        |    6 +++++-
+>>  3 files changed, 21 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index 10dfb85..af4b0ed 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -188,6 +188,7 @@ struct hci_dev {
+>>        struct list_head        remote_oob_data;
+>>
+>>        struct list_head        adv_entries;
+>> +       struct timer_list       adv_timer;
+>>
+>>        struct hci_dev_stats    stat;
+>>
+>> @@ -535,6 +536,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+>>                                                                u8 *randomizer);
+>>  int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
+>>
+>> +#define ADV_CLEAR_TIMEOUT (3*60*HZ) /* Three minutes */
+>>  int hci_adv_entries_clear(struct hci_dev *hdev);
+>>  struct adv_entry *hci_find_adv_entry(struct hci_dev *hdev, bdaddr_t *bdaddr);
+>>  int hci_add_adv_entry(struct hci_dev *hdev,
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index dd27f97..5040c3f 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1204,6 +1204,17 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+>>        return 0;
+>>  }
+>>
+>> +static void hci_clear_adv_cache(unsigned long arg)
+>> +{
+>> +       struct hci_dev *hdev = (void *) arg;
+>> +
+>> +       hci_dev_lock(hdev);
+>> +
+>> +       hci_adv_entries_clear(hdev);
+>> +
+>> +       hci_dev_unlock(hdev);
+>> +}
+>> +
+>>  int hci_adv_entries_clear(struct hci_dev *hdev)
+>>  {
+>>        struct adv_entry *entry, *tmp;
+>> @@ -1332,6 +1343,8 @@ int hci_register_dev(struct hci_dev *hdev)
+>>        INIT_LIST_HEAD(&hdev->remote_oob_data);
+>>
+>>        INIT_LIST_HEAD(&hdev->adv_entries);
+>> +       setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
+>> +                                               (unsigned long) hdev);
+>>
+>>        INIT_WORK(&hdev->power_on, hci_power_on);
+>>        INIT_WORK(&hdev->power_off, hci_power_off);
+>> @@ -1405,6 +1418,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+>>        hci_unregister_sysfs(hdev);
+>>
+>>        hci_del_off_timer(hdev);
+>> +       del_timer(&hdev->adv_timer);
+>>
+>>        destroy_workqueue(hdev->workqueue);
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 85e12d8..8d6dc1e 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -859,8 +859,12 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>>
+>>        hci_dev_lock(hdev);
+>>
+>> -       if (param_scan_enable == 0x01)
+>> +       if (param_scan_enable == 0x01) {
+>> +               del_timer(&hdev->adv_timer);
+>>                hci_adv_entries_clear(hdev);
+>> +       } else if (param_scan_enable == 0x00) {
+>> +               mod_timer(&hdev->adv_timer, jiffies + ADV_CLEAR_TIMEOUT);
+>> +       }
+>>
+>>        hci_dev_unlock(hdev);
+>>  }
+>> --
+>> 1.7.4.1
+>
+> Maybe we should not trigger the timer if the we are connected to the
+> device, this would be very convenient if a disconnect happen for
+> unknown reason e.g. bug or crash so we can quickly reconnect without
+> having to scan again, once disconnected then we start the entry timer,
+> what do you think?
+>
 
->From the 2.1 spec, Vol 2, Part B, 6.6.2:
-  "Real-time flow control shall be carried out at the packet level by
-   the link controller via the flow bit in the packet header
-   (see Section 6.4.3 on page 110). With the payload flow bit, traffic
-   from the remote end can be controlled. It is allowed to generate and
-   send an ACL packet with payload length zero irrespective of flow
-   status. L2CAP start-fragment and continue-fragment indications
-   (LLID=10 and LLID=01) also retain their meaning when the payload
-   length is equal to zero (i.e. an empty start fragment shall not be
-   sent in the middle of an on-going ACL-U packet transmission).
-   It is always safe to send an ACL packet with length=0 and LLID=01."
+I think keeping the advertising entry from the devices we are connected to
+may be a good idea.
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
- net/bluetooth/l2cap.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+The spec says "When a device in the directed connectable mode establishes a
+connection, the device will exit this mode and enter the non-connectable mode".
+So, fast reconnection attempts will fail since the device is in non-connectable
+mode. However, once the connection is dropped, some LE applications will enter
+in connectable mode ASAP (see proximity or health thermometer profiles).
 
-diff --git a/net/bluetooth/l2cap.c b/net/bluetooth/l2cap.c
-index 675614e..84b8134 100644
---- a/net/bluetooth/l2cap.c
-+++ b/net/bluetooth/l2cap.c
-@@ -4743,8 +4743,10 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
- 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
- 
- 		if (!conn->rx_len) {
--			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
--			l2cap_conn_unreliable(conn, ECOMM);
-+			/* A 0-length, continuation fragment is a NULL packet
-+			 * (Core 2.1, Vol 2, Part B, 6.5.1.2, 6.4.3 & 6.6.2)
-+			 * The remote device is likely controlling packet flow
-+			 * with ACL payload header FLOW indicator. */
- 			goto drop;
- 		}
- 
--- 
-1.7.4.1
+So, I'm not sure we will have much gain implementing this approach. But it
+would be nice to do some experiments to see this in practice.
 
+BTW, instead of deactivating/activating the adv timer, I think a bit better
+approach would be modifying the hci_adv_entries_clear() so it doesn't remove
+the adv entries from devices we are connected to. This way we would keep only
+fresh entries in the advertising cache and we can perform a LE scan normally.
+
+>
+> --
+> Luiz Augusto von Dentz
+> Computer Engineer
+>
+
+BR,
+
+Andre Guedes.
