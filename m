@@ -2,179 +2,144 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 3/5] Add support for creating the device from the SMP keys
-Date: Tue,  7 Jun 2011 20:08:12 -0300
-Message-Id: <1307488094-19464-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 2/5] Add support for storing SMP keys
+Date: Tue,  7 Jun 2011 20:08:11 -0300
+Message-Id: <1307488094-19464-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307488094-19464-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307488094-19464-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for creating the device from the SMP keys (for now
-just the LTK) previously stored.
 ---
- plugins/mgmtops.c |   26 ++++++++++++++---
- src/adapter.c     |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 93 insertions(+), 9 deletions(-)
+ plugins/mgmtops.c |    4 ++--
+ src/event.c       |   43 ++++++++++++++++++++++++++++++++++++++++---
+ src/storage.c     |   25 ++++++++++++++++++++++++-
+ src/storage.h     |    1 +
+ 4 files changed, 67 insertions(+), 6 deletions(-)
 
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index cc5fd78..e27acdc 100644
+index e950fff..cc5fd78 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -1838,13 +1838,20 @@ static int mgmt_load_keys(int index, GSList *keys, gboolean debug_keys)
- 	struct mgmt_key_info *key;
- 	size_t key_count, cp_size;
- 	GSList *l;
--	int err;
-+	int err, i;
+@@ -383,8 +383,8 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
+ 	struct mgmt_ev_new_key *ev = buf;
+ 	struct controller_info *info;
  
--	key_count = g_slist_length(keys);
-+	key_count = 0;
-+	cp_size = sizeof(*cp);
-+	for (l = keys; l; l = g_slist_next(l)) {
-+		struct link_key_info *info = l->data;
-+		key_count++;
-+		cp_size += sizeof(struct mgmt_key_info) + info->dlen;
-+	}
- 
--	DBG("index %d keys %zu debug_keys %d", index, key_count, debug_keys);
-+	if (key_count == 0)
-+		return 0;
- 
--	cp_size = sizeof(*cp) + (key_count * sizeof(*key));
-+	DBG("index %d keys %zu debug_keys %d size %zd", index, key_count, debug_keys, cp_size);
- 
- 	buf = g_try_malloc0(sizeof(*hdr) + cp_size);
- 	if (buf == NULL)
-@@ -1861,13 +1868,22 @@ static int mgmt_load_keys(int index, GSList *keys, gboolean debug_keys)
- 	cp->debug_keys = debug_keys;
- 	cp->key_count = htobs(key_count);
- 
--	for (l = keys, key = cp->keys; l != NULL; l = g_slist_next(l), key++) {
-+	key = cp->keys;
-+	i = 0;
-+
-+	for (l = keys; l != NULL; l = g_slist_next(l)) {
- 		struct link_key_info *info = l->data;
- 
-+		key = (void *) (cp->keys + i);
-+
- 		bacpy(&key->bdaddr, &info->bdaddr);
- 		key->type = info->type;
- 		memcpy(key->val, info->key, 16);
- 		key->pin_len = info->pin_len;
-+		memcpy(key->data, info->data, info->dlen);
-+		key->dlen = info->dlen;
-+
-+		i += sizeof(struct mgmt_key_info) + info->dlen;
+-	if (len != sizeof(*ev)) {
+-		error("new_key event size mismatch (%zu != %zu)",
++	if (len < sizeof(*ev)) {
++		error("new_key event size mismatch (%zu < %zu)",
+ 							len, sizeof(*ev));
+ 		return;
  	}
- 
- 	if (write(mgmt_sock, buf, sizeof(*hdr) + cp_size) < 0)
-diff --git a/src/adapter.c b/src/adapter.c
-index b189841..fe9350f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1987,6 +1987,47 @@ static struct link_key_info *get_key_info(const char *addr, const char *value)
- 	return info;
+diff --git a/src/event.c b/src/event.c
+index b258dda..edf8a0f 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -395,6 +395,42 @@ proceed:
+ 	adapter_set_state(adapter, STATE_IDLE);
  }
  
-+static struct link_key_info *get_ltk_info(const char *addr, const char *value)
++static gchar *buf2str(uint8_t *data, int datalen)
 +{
-+	struct link_key_info *info;
-+	char tmp[3], *ptr;
-+	int i, ret;
++	gchar *buf;
++	int i;
 +
-+	if (strlen(value) < 36) {
-+		error("Unexpectedly short (%zu) link key line", strlen(value));
-+		return NULL;
-+	}
++	buf = g_new0(gchar, (datalen * 2) + 1);
 +
-+	info = g_new0(struct link_key_info, 1);
++	for (i = 0; i < datalen; i++)
++		sprintf(buf + (i * 2), "%2.2x", data[i]);
 +
-+	str2ba(addr, &info->bdaddr);
-+
-+	memset(tmp, 0, sizeof(tmp));
-+
-+	for (i = 0; i < 16; i++) {
-+		memcpy(tmp, value + (i * 2), 2);
-+		info->key[i] = (uint8_t) strtol(tmp, NULL, 16);
-+	}
-+
-+	ptr = (char *) value + 33;
-+
-+	ret = sscanf(ptr, "%hhd %hhd %hhd %n", &info->type, &info->pin_len,
-+							&info->dlen, &i);
-+	if (ret < 3) {
-+		g_free(info);
-+		return NULL;
-+	}
-+	ptr += i;
-+
-+	info = g_realloc(info, sizeof(struct link_key_info) + info->dlen);
-+	for (i = 0; i < info->dlen; i++) {
-+		memcpy(tmp, ptr + (i * 2), 2);
-+		info->data[i] = (uint8_t) strtol(tmp, NULL, 16);
-+	}
-+
-+	return info;
++	return buf;
 +}
 +
- static void create_stored_device_from_linkkeys(char *key, char *value,
- 							void *user_data)
++static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer, unsigned char *key,
++			uint8_t type, int length, int dlen, uint8_t *data)
++{
++	GString *newkey;
++	char *val, *str;
++	int err;
++
++	val = buf2str(key, 16);
++	newkey = g_string_new(val);
++
++	g_string_append_printf(newkey, " %d %d %d ", type, length, dlen);
++
++	str = buf2str(data, dlen);
++	newkey = g_string_append(newkey, str);
++	g_free(str);
++
++	err = write_longtermkeys(local, peer, newkey->str);
++
++	g_string_free(newkey, TRUE);
++
++	return err;
++}
++
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 		uint8_t key_type, uint8_t pin_length, int dlen, uint8_t *data)
  {
-@@ -2010,6 +2051,29 @@ static void create_stored_device_from_linkkeys(char *key, char *value,
- 	}
+@@ -407,10 +443,11 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	if (key_type < 0x10)
+-		ret = write_link_key(local, peer, key, key_type, pin_length);
++	if (key_type & 0x10)
++		ret = store_longtermkey(local, peer, key, key_type, pin_length,
++								dlen, data);
+ 	else
+-		ret = write_longtermkeys(local, peer, NULL);
++		ret = write_link_key(local, peer, key, key_type, pin_length);
+ 
+ 	if (ret == 0 && device_is_temporary(device))
+ 		device_set_temporary(device, FALSE);
+diff --git a/src/storage.c b/src/storage.c
+index 786e24b..7ec8df2 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1346,5 +1346,28 @@ device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba)
+ 
+ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
+ {
+-	return 0;
++	char filename[PATH_MAX + 1], addr[18];
++
++	if (!key)
++		return -EINVAL;
++
++	create_filename(filename, PATH_MAX, local, "longtermkeys");
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	ba2str(peer, addr);
++	return textfile_put(filename, addr, key);
++}
++
++char *read_longtermkeys(bdaddr_t *local, bdaddr_t *peer)
++{
++	char filename[PATH_MAX + 1], addr[18];
++
++	create_filename(filename, PATH_MAX, local, "longtermkeys");
++
++	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++
++	ba2str(peer, addr);
++
++	return textfile_caseget(filename, addr);
  }
+diff --git a/src/storage.h b/src/storage.h
+index 923e819..23d9ab6 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -88,6 +88,7 @@ int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
+ 						device_type_t type);
+ device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba);
+ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
++char *read_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
  
-+static void create_stored_device_from_ltks(char *key, char *value,
-+							void *user_data)
-+{
-+	struct adapter_keys *keys = user_data;
-+	struct btd_adapter *adapter = keys->adapter;
-+	struct btd_device *device;
-+	struct link_key_info *info;
-+
-+	info = get_ltk_info(key, value);
-+	if (info)
-+		keys->keys = g_slist_append(keys->keys, info);
-+
-+	if (g_slist_find_custom(adapter->devices, key,
-+					(GCompareFunc) device_address_cmp))
-+		return;
-+
-+	device = device_create(connection, adapter, key, DEVICE_TYPE_LE);
-+	if (device) {
-+		device_set_temporary(device, FALSE);
-+		adapter->devices = g_slist_append(adapter->devices, device);
-+	}
-+}
-+
- static void create_stored_device_from_blocked(char *key, char *value,
- 							void *user_data)
- {
-@@ -2140,14 +2204,18 @@ static void load_devices(struct btd_adapter *adapter)
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "linkkeys");
- 	textfile_foreach(filename, create_stored_device_from_linkkeys, &keys);
+ #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
  
-+	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "longtermkeys");
-+	textfile_foreach(filename, create_stored_device_from_ltks, &keys);
-+
- 	err = adapter_ops->load_keys(adapter->dev_id, keys.keys,
- 							main_opts.debug_keys);
--	if (err < 0) {
-+	if (err < 0)
- 		error("Unable to load keys to adapter_ops: %s (%d)",
- 							strerror(-err), -err);
--		g_slist_foreach(keys.keys, (GFunc) g_free, NULL);
--		g_slist_free(keys.keys);
--	}
-+
-+	g_slist_foreach(keys.keys, (GFunc) g_free, NULL);
-+	g_slist_free(keys.keys);
-+	keys.keys = NULL;
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
- 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
 -- 
 1.7.5.4
 
