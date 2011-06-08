@@ -1,60 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org,
-	Jim Paris <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>,
-	Simon Wood <simon@mungewell.org>,
-	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCHv3 2/3] Re-add manager_get_default_adapter()
-Date: Wed,  8 Jun 2011 15:09:16 +0200
-Message-Id: <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1307538557-9287-1-git-send-email-ospite@studenti.unina.it>
-References: <1307538557-9287-1-git-send-email-ospite@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <BANLkTim=DVTzgBXDp4Rsed8LNwfrY47ACg@mail.gmail.com>
+References: <BANLkTim=DVTzgBXDp4Rsed8LNwfrY47ACg@mail.gmail.com>
+Date: Wed, 8 Jun 2011 14:53:54 +0200
+Message-ID: <BANLkTimboYUW4v=tHmVKiCKELqbGfAxegg@mail.gmail.com>
+Subject: Re: Read clock not implemented in management
+From: Santiago Carot <sancane@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: =?ISO-8859-1?Q?Elvis_Pf=FCtzenreuter?= <epx@signove.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bastien Nocera <hadess@hadess.net>
+Hello Claudio.
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
-Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
----
- src/manager.c |    5 +++++
- src/manager.h |    1 +
- 2 files changed, 6 insertions(+), 0 deletions(-)
+2011/6/8 Claudio Takahasi <claudio.takahasi@openbossa.org>:
+> Hi Santiago and Elvis,
+>
+> Read clock is not implemented in the management interface. Does it
+> break something important in the health plug-in?
+>
 
-diff --git a/src/manager.c b/src/manager.c
-index e805e0c..254ace4 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -262,6 +262,11 @@ static void manager_set_default_adapter(int id)
- 			DBUS_TYPE_INVALID);
- }
- 
-+struct btd_adapter *manager_get_default_adapter(void)
-+{
-+	return manager_find_adapter_by_id(default_adapter_id);
-+}
-+
- static void manager_remove_adapter(struct btd_adapter *adapter)
- {
- 	uint16_t dev_id = adapter_get_dev_id(adapter);
-diff --git a/src/manager.h b/src/manager.h
-index 05c38b3..4f92d2f 100644
---- a/src/manager.h
-+++ b/src/manager.h
-@@ -35,6 +35,7 @@ void manager_cleanup(DBusConnection *conn, const char *path);
- const char *manager_get_base_path(void);
- struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
- struct btd_adapter *manager_find_adapter_by_id(int id);
-+struct btd_adapter *manager_get_default_adapter(void);
- void manager_foreach_adapter(adapter_cb func, gpointer user_data);
- GSList *manager_get_adapters(void);
- struct btd_adapter *btd_manager_register_adapter(int id);
--- 
-1.7.5.3
+Read clock is only required for Clock Shynchronization Protocol (CSP)
+in MCAP, but  CSP is not mandatory for HDP and although this feature
+was implemented in MCAP is not used in the Health Plugin so it won't
+break the API.
 
+> I am not aware when hciops will be dropped, but the fact is: if the
+> system uses mgmtops instead of hciops health will not work properly.
+>
+
+Well, as far as I know, only MCAP uses it for CSP and it's an optional
+part in the specification so it won't a severe problem for health
+applications.
+
+> BR,
+> Claudio.
+>
