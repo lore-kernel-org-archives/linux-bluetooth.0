@@ -1,75 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluetooth on ubuntu without desktop environment
-From: Michael Jarosch <mitsch@riotmusic.de>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20110607231146.GB8705@piper>
-References: <1307131935.1862.189.camel@powermacG4>
-	 <20110607231146.GB8705@piper>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-/Vi3/pwdUQ1qrwa1Aaqy"
-Date: Wed, 08 Jun 2011 16:46:27 +0200
-Message-ID: <1307544387.1761.8.camel@powermacG4>
-Mime-Version: 1.0
+Date: Wed, 8 Jun 2011 11:38:47 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: Re: [bluetooth-next v3 07/16] Bluetooth: Add SMP confirmation checks
+ methods
+Message-ID: <20110608143847.GA20343@piper>
+References: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1307483205-1518-8-git-send-email-vinicius.gomes@openbossa.org>
+ <20110608022610.GA2772@dell.ccr.corp.intel.com>
+ <BANLkTikHJE-165=JOD+4UhxY7XQ6Lrx3KA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTikHJE-165=JOD+4UhxY7XQ6Lrx3KA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
---=-/Vi3/pwdUQ1qrwa1Aaqy
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 13:16 Wed 08 Jun, Luiz Augusto von Dentz wrote:
+> Hi Vinicius,
+> 
+> On Wed, Jun 8, 2011 at 11:26 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Vinicius/Anderson,
+> >
+> > On Tue, Jun 07, 2011, Vinicius Costa Gomes wrote:
+> >> +     ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp, 0,
+> >> +                     conn->src, 0, conn->dst, res);
+> >
+> > The third last parameter is the remote address type and you're
+> > hard-coding it to 0 (public) here. This means that we cannot pair with a
+> > device with a random address. I suppose you should be passing
+> > conn->hcon->dst_type instead.
+> 
+> I notice that you guys have this fixed here:
+> 
+> http://git.infradead.org/users/vcgomes/linux-2.6.git/commitdiff/f345aa37d6d49104ef4b2b7e4466fb3186807199
+> 
+> So I wonder why this was not fix in place?
 
-Am Dienstag, den 07.06.2011, 20:11 -0300 schrieb Vinicius Costa Gomes:
+No reason at all. It happened because this patch was written when the dst_type field
+wasn't introduced yet. Will fix.
 
-> This is what I would do:
->=20
-> 1. Get the BlueZ sources, and go to the test/ directory;
->=20
-> 2. ./simple-agent hci0 <keyboard address>=20
->    (follow the instructions from the keyboard for pairing, usually puttin=
-g the
->    same passkey in both sides). This will pair your computer with the
->    keyboard. If it complains about that the pairing already exists, just =
-add a
->    third parameter, it can be anything.
->=20
-> 3. ./test-device trusted <keyboard address> yes
->    This will set the device as trusted, so connection comming from it wil=
-l
->    be automatically accepted.
->=20
-> 4. Now as the device is already bonded and connections are automatically
->    accepted, reconnections should work as they should.
+> 
+> >> +             ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp,
+> >> +                                     0, conn->dst, 0, conn->src, res);
+> >
+> > Same here.
+> >
+> >> +     if (conn->hcon->out)
+> >> +             ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
+> >> +                             conn->src, 0, conn->dst, res);
+> >> +     else
+> >> +             ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
+> >> +                             conn->dst, 0, conn->src, res);
+> >
+> > And here.
+> >
+> > You're also hard-coding the local address type to public, but that's a
+> > less severe issue (for now).
+> >
+> > Johan
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
+> Computer Engineer
 
-Unbelievable: It's working! Thanks!
 
-Those scripts are part of the ubuntu "bluez"-package with a little
-change in naming them: There is always a "bluez-" in front of it.
-
-simple-agent -> bluez-simple-agent
-test-device -> bluez-test-device
-
-So no need to download them.
-I must confess, I was sceptical at first, because I already tried
-bluez-simple-agent without success. I guess I was lucky to have the
-right combination of packages installed, now - got to figure out, why it
-didn't work last time!
-
-Well, then: I'll spread the word!
-Thanks again!
-
-Bye!
-
---=-/Vi3/pwdUQ1qrwa1Aaqy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEABECAAYFAk3vizwACgkQNFzJVOwishmdwQCfQ+Z0a9381syLn14a22lvMwQs
-kfYAoK0Cbu4osbut7Q9XBuDvZQF2CYKP
-=6V3x
------END PGP SIGNATURE-----
-
---=-/Vi3/pwdUQ1qrwa1Aaqy--
-
+Cheers,
+-- 
+Vinicius
