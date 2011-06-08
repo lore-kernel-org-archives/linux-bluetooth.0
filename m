@@ -1,119 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 8 Jun 2011 16:24:05 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
+In-Reply-To: <20110606173153.GA30641@joana>
+Message-ID: <alpine.DEB.2.02.1106081612210.5280@mathewm-linux>
+References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org> <1307143270-2655-2-git-send-email-mathewm@codeaurora.org> <20110606173153.GA30641@joana>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
-References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
- <BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com> <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
-From: Jaikumar Ganesh <jaikumarg@gmail.com>
-Date: Thu, 9 Jun 2011 11:06:00 +0900
-Message-ID: <BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
-Subject: Re: Generic Attribute API race condition
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Claudio:
 
-On Thu, Jun 9, 2011 at 2:44 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Hi Jaikumar,
+On Mon, 6 Jun 2011, Gustavo F. Padovan wrote:
+
+> * Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
 >
-> On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com> wrote:
->> Hi Claudio:
->>
->> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
->> <claudio.takahasi@openbossa.org> wrote:
->>> Hi All,
->>>
->>> There is a potential race condition in the Generic Attribute API. I'd
->>> like to collect opinions to avoid re-work later.
->>>
->>> How to reproduce:
->>> - call CreateDevice() for a device which exports a GATT based service:
->>> CreateDevice will discover all primary services
->>>  and the Generic API will register the object paths for all found services
->>> - Call DiscoverCharacteristics() of the primary service followed by
->>> Characteristic GetProperties(), expected result: read all
->>> characteristics properties outcome: partial characteristics properties
->>> may appear.
->>>
->>> This problem happens because DiscoverCharacteristics() doesn't wait
->>> for all characteristic VALUES, it returns after discovering all
->>> characteristic DECLARATIONS.
->>> Wait for characteristic values is a problem, attributes may require
->>> authentication or authorization.
->>>
->>> Suggestions are:
->>> 1. Report discovered characteristic values using PropertyChanged:
->>> Returning empty properties values (for GetProperties) if the discovery
->>> is in progress
->>>
->>> 2. Block GetProperties() if there is a discovery pending: returning
->>> after discovery finishes. Timeout can still happen!
->>>
->>> 3. Return Busy for GetProperties() if there is a characteristic
->>> discovery in progress
->>>
->>> Comments?
->>
->> I don't think we should read characteristic value till the application
->> asks for it.
-> Are you suggesting to trigger the characteristic value and descriptors
-> read when Characteristic GetProperties() is called and block it?
-> Remember that GATT timeout is 30seconds and the default D-Bus message
-> reply timeout is smaller.
+>> This workqueue will be used for general L2CAP work, not just dealing
+>> with "busy" frames.
 >
->> DiscoverCharacteristics() should just return after getting the DECLARATIONS.
-> This is current behaviour.
+> which general L2CAP work are we talking about?
 
-Sorry misread your email a bit.
+I'll update the commit message and resubmit, but to immediately 
+answer your question:
 
-I assume you are referring to the Characteristic Watcher when you are
-talking about the PropertyChanged signal,
-since there is no explicit PropertyChanged signal.
+* ERTM tx queue callbacks (patch 3/4 in this series)
+* ERTM timers (ack, retrans, monitor) that can utilize proper locking.
+* Updating the ERTM tx queue after an AMP channel move and L2CAP 
+reconfiguration
+* Moving various AMP-related work out of interrupt context
 
-I don't think we should block GetProperties. But then if we are
-returning null and depending on PropertyChanged signal when we have to
-read the values, clients will need to wait for it after calling
-GetProperties. We need to guarantee that this signal will be sent
-(with a timeout, unless we want the clients to have the timeout at
-their end) even if we are unable to get the value - because of some
-kind of error.
 
-In all other places we use PropertyChanged signal when the property
-value actually changes, whereas here we are tying it with the reading
-of the properties.
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
-How about providing separate calls for read and writing values and
-decoupling it from the Properties ?
-
-Thanks
-
->
->> A client might not be interested in all the values and thus we should
->> read them only
->> when needed by the client. This will save both time and power and
->> solve this problem too.
->
-> I don't think it is critical, we are not reading them on all
-> connections/re-connections and the profiles available at the moment
-> don't expose "complex" characteristics.
-
-I am talking about GATT clients written using the attribute DBUS apis.
-Accessory vendors
-want to get started on LE and not wait till all the profiles are
-approved the SIG and developed
-and they want to develop things based on the GATT clients APIs.
-
->
-> BR,
-> Claudio
->
->>
->> Thanks
->> Jaikumar
->>>
->>> BR,
->>> Claudio
->
