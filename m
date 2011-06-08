@@ -1,83 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com>
-References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
-	<BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com>
-Date: Wed, 8 Jun 2011 14:44:34 -0300
-Message-ID: <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
-Subject: Re: Generic Attribute API race condition
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Jaikumar Ganesh <jaikumarg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] adaptername: Move adapter naming into a plugin
+From: Bastien Nocera <hadess@hadess.net>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Date: Wed, 08 Jun 2011 18:43:57 +0100
+In-Reply-To: <BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
+References: <BANLkTi=X16G8JreU68yFZeoqTbLfy5EyNg@mail.gmail.com>
+	 <1307440992-11087-1-git-send-email-hadess@hadess.net>
+	 <BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1307555040.2669.192.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar,
+On Wed, 2011-06-08 at 12:13 -0400, Anderson Lizardo wrote:
+> Hi Bastien,
+> 
+> On Tue, Jun 7, 2011 at 6:03 AM, Bastien Nocera <hadess@hadess.net> wrote:
+<snip>
+> > +
+> > +       if (g_file_get_contents(MACHINE_INFO_DIR MACHINE_INFO_FILE,
+> 
+> I wonder if it would be better to use the autoconf variable for
+> "/etc/" instead of MACHINE_INFO_DIR.
 
-On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com> wrote:
-> Hi Claudio:
->
-> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
->> Hi All,
->>
->> There is a potential race condition in the Generic Attribute API. I'd
->> like to collect opinions to avoid re-work later.
->>
->> How to reproduce:
->> - call CreateDevice() for a device which exports a GATT based service:
->> CreateDevice will discover all primary services
->>  and the Generic API will register the object paths for all found services
->> - Call DiscoverCharacteristics() of the primary service followed by
->> Characteristic GetProperties(), expected result: read all
->> characteristics properties outcome: partial characteristics properties
->> may appear.
->>
->> This problem happens because DiscoverCharacteristics() doesn't wait
->> for all characteristic VALUES, it returns after discovering all
->> characteristic DECLARATIONS.
->> Wait for characteristic values is a problem, attributes may require
->> authentication or authorization.
->>
->> Suggestions are:
->> 1. Report discovered characteristic values using PropertyChanged:
->> Returning empty properties values (for GetProperties) if the discovery
->> is in progress
->>
->> 2. Block GetProperties() if there is a discovery pending: returning
->> after discovery finishes. Timeout can still happen!
->>
->> 3. Return Busy for GetProperties() if there is a characteristic
->> discovery in progress
->>
->> Comments?
->
-> I don't think we should read characteristic value till the application
-> asks for it.
-Are you suggesting to trigger the characteristic value and descriptors
-read when Characteristic GetProperties() is called and block it?
-Remember that GATT timeout is 30seconds and the default D-Bus message
-reply timeout is smaller.
+I'm not sure that'd be any help. Even if bluez is installed in /opt/usr/
+or something, the /etc/machine-info is still the canonical location of
+that file.
 
-> DiscoverCharacteristics() should just return after getting the DECLARATIONS.
-This is current behaviour.
+<snip>
+> Maybe it is also good to strip whitespaces before/after the string as
+> well (there is a glib function for that).
 
-> A client might not be interested in all the values and thus we should
-> read them only
-> when needed by the client. This will save both time and power and
-> solve this problem too.
+We already strip the whitespaces when setting the adapter name, but I'll
+gladly add that if you think it's important.
 
-I don't think it is critical, we are not reading them on all
-connections/re-connections and the profiles available at the moment
-don't expose "complex" characteristics.
+<snip>
+> > @@ -938,38 +884,29 @@ void adapter_update_local_name(struct btd_adapter *adapter, const char *name)
+> >                                                DBUS_TYPE_STRING, &name_ptr);
+> >        }
+> >
+> > +       if (adapter->up) {
+> > +               int err = adapter_ops->set_name(adapter->dev_id, name);
+> > +               if (err < 0)
+> > +                       return err;
+> > +
+> > +               adapter->name_stored = TRUE;
+> 
+> This looks incorrect. If the if() is entered, adapter->name_stored is
+> set to TRUE and right after to FALSE.
 
-BR,
-Claudio
+I think I fixed this, otherwise it's me not understanding what
+adapter->name_stored is supposed to flag. If it's whether the adapter
+name was written to /var/lib/bluetooth/.../config, then we could
+probably simplify this code.
+<snip>
+> > -       if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
+> > -               expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
+> > -                                                       adapter->dev_id);
+> > -
+> > -       if (main_opts.attrib_server)
+> > -               attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+> > -                       (const uint8_t *) adapter->name, strlen(adapter->name));
+> 
+> I can't find where you moved the attrib_gap_set() call to. This is
+> necessary for GATT attribute server.
 
->
-> Thanks
-> Jaikumar
->>
->> BR,
->> Claudio
+Check the code instead of the patch, it's already done in
+adapter_update_local_name().
+<snip>
+> > diff --git a/src/manager.c b/src/manager.c
+> > index e805e0c..dedec8b 100644
+> > --- a/src/manager.c
+> > +++ b/src/manager.c
+> > @@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
+> >                btd_start_exit_timer();
+> >  }
+> >
+> > +int manager_get_default_adapter (void)
+> 
+> Unnecessary whitespace before "(". Also I've seem a patch sent to this
+> list a while ago with this change.
+
+That's Antonio's patch, but it returns the adapter struct, not the ID. I
+changed the function name, so both can coexist (as both are needed).
+
+Updated patch sent.
+
+Cheers
+
