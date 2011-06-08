@@ -1,54 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Jun 2011 16:46:58 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2011-06-08
-Message-ID: <20110608194658.GD13036@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1307555040.2669.192.camel@novo.hadess.net>
+References: <BANLkTi=X16G8JreU68yFZeoqTbLfy5EyNg@mail.gmail.com>
+	<1307440992-11087-1-git-send-email-hadess@hadess.net>
+	<BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
+	<1307555040.2669.192.camel@novo.hadess.net>
+Date: Wed, 8 Jun 2011 15:30:27 -0400
+Message-ID: <BANLkTikqiD93ijS8rbpEijtuVH_L8dRTmA@mail.gmail.com>
+Subject: Re: [PATCH] adaptername: Move adapter naming into a plugin
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Bastien,
 
-First round of fixed for 3.0! There are here a regression fix for 1.1 and
-earlier devices and a fix in the shutdown of SCO sockets.  Other 3 patches are
-warning shut up. And one byte leak to userspace fix.
+On Wed, Jun 8, 2011 at 1:43 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> <snip>
+>> > -       if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
+>> > -               expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
+>> > -                                                       adapter->dev_id);
+>> > -
+>> > -       if (main_opts.attrib_server)
+>> > -               attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+>> > -                       (const uint8_t *) adapter->name, strlen(adapter->name));
+>>
+>> I can't find where you moved the attrib_gap_set() call to. This is
+>> necessary for GATT attribute server.
+>
+> Check the code instead of the patch, it's already done in
+> adapter_update_local_name().
 
-Please pull, thanks!
+In this case, it is better if you put this cleanup/refactor in a
+separate patch. IMHO, you are doing two things on the same patch:
 
+1) moving things to a plugin and removing duplicated code.
+2) adding support for /etc/machine-info
 
-The following changes since commit 51e65257142a87fe46a1ce5c35c86c5baf012614:
+These could be split in two patches. This facilitates tracking
+regressions (if any) later by bisect.
 
-  iwlegacy: fix channel switch locking (2011-06-08 14:19:05 -0400)
-
-are available in the git repository at:
-  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
-
-David Miller (2):
-      Bluetooth: Do not ignore errors returned from strict_strtol()
-      Bluetooth: Kill set but unused variable 'cmd' in cmtp_recv_capimsg()
-
-Filip Palian (1):
-      Bluetooth: l2cap and rfcomm: fix 1 byte infoleak to userspace.
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: fix shutdown on SCO sockets
-
-Stephen Boyd (1):
-      Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y warning
-
-Ville Tervo (1):
-      Bluetooth: Do not send SET_EVENT_MASK for 1.1 and earlier devices
-
- drivers/bluetooth/btmrvl_debugfs.c |   12 ++++++++++++
- net/bluetooth/cmtp/capi.c          |    3 +--
- net/bluetooth/hci_event.c          |   18 ++++++++++--------
- net/bluetooth/l2cap_sock.c         |    1 +
- net/bluetooth/rfcomm/sock.c        |    4 +++-
- net/bluetooth/sco.c                |   13 ++++++++++++-
- 6 files changed, 39 insertions(+), 12 deletions(-)
-
-
-	Gustavo 
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
