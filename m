@@ -1,112 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1307452201-11057-5-git-send-email-lkslawek@gmail.com>
-References: <1307452201-11057-1-git-send-email-lkslawek@gmail.com>
-	<1307452201-11057-5-git-send-email-lkslawek@gmail.com>
-Date: Wed, 8 Jun 2011 13:27:43 +0900
-Message-ID: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
-Subject: Re: [PATCH 4/4] Fix handling asynchronous plugin reads
+In-Reply-To: <20110608022610.GA2772@dell.ccr.corp.intel.com>
+References: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1307483205-1518-8-git-send-email-vinicius.gomes@openbossa.org>
+	<20110608022610.GA2772@dell.ccr.corp.intel.com>
+Date: Wed, 8 Jun 2011 13:16:42 +0900
+Message-ID: <BANLkTikHJE-165=JOD+4UhxY7XQ6Lrx3KA@mail.gmail.com>
+Subject: Re: [bluetooth-next v3 07/16] Bluetooth: Add SMP confirmation checks methods
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Anderson Briglia <anderson.briglia@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius,
 
-On Tue, Jun 7, 2011 at 10:10 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> Calling OBEX_ResumeRequest() from handle_async_io() may result in direct
-> calling obex_event_cb() (this happens when obex_write_stream() will
-> deliver not enough bytes to fully fill OpenOBEX TX packet). In this case
-> set_io_watch will fail if handle_async_io() is called from
-> obex_object_set_io_flags(), because the watch is already installed.
-> Originally when code returns from OBEX_ResumeRequest(), handle_async_io()
-> returns FALSE which makes obex_object_set_io_flags() remove this watch.
+On Wed, Jun 8, 2011 at 11:26 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Vinicius/Anderson,
 >
-> This patch adds variable for tracking whether subsequent calls suspended
-> stream, causing obex_object_set_io_flags() remove the watch only when the
-> streaming is still running (i.e. not suspended).
-> ---
->  src/obex-priv.h |    1 +
->  src/obex.c      |   15 ++++++++++++---
->  2 files changed, 13 insertions(+), 3 deletions(-)
+> On Tue, Jun 07, 2011, Vinicius Costa Gomes wrote:
+>> +     ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp, 0,
+>> +                     conn->src, 0, conn->dst, res);
 >
-> diff --git a/src/obex-priv.h b/src/obex-priv.h
-> index 8c722dc..54ec991 100644
-> --- a/src/obex-priv.h
-> +++ b/src/obex-priv.h
-> @@ -46,6 +46,7 @@ struct obex_session {
->        obex_object_t *obj;
->        struct obex_mime_type_driver *driver;
->        gboolean streaming;
-> +       gboolean stream_running;
->  };
+> The third last parameter is the remote address type and you're
+> hard-coding it to 0 (public) here. This means that we cannot pair with a
+> device with a random address. I suppose you should be passing
+> conn->hcon->dst_type instead.
 
-I guess we can call this suspended.
+I notice that you guys have this fixed here:
 
->  int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
-> diff --git a/src/obex.c b/src/obex.c
-> index 659f39b..5f437c7 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -311,6 +311,7 @@ static void os_reset_session(struct obex_session *os)
->        os->offset = 0;
->        os->size = OBJECT_SIZE_DELETE;
->        os->streaming = FALSE;
-> +       os->stream_running = FALSE;
->  }
+http://git.infradead.org/users/vcgomes/linux-2.6.git/commitdiff/f345aa37d6d49104ef4b2b7e4466fb3186807199
+
+So I wonder why this was not fix in place?
+
+>> +             ret = smp_c1(tfm, conn->tk, conn->prnd, conn->preq, conn->prsp,
+>> +                                     0, conn->dst, 0, conn->src, res);
 >
->  static void obex_session_free(struct obex_session *os)
-> @@ -670,6 +671,7 @@ static int obex_write_stream(struct obex_session *os,
->                        OBEX_ObjectAddHeader(obex, obj, hi, hd, 0,
->                                                OBEX_FL_STREAM_START);
->                        os->streaming = TRUE;
-> +                       os->stream_running = TRUE;
->                }
+> Same here.
 >
->                hd.bs = os->buf;
-> @@ -698,6 +700,8 @@ static void suspend_stream(struct obex_session *os, obex_t *obex,
->  {
->        obex_headerdata_t hd;
+>> +     if (conn->hcon->out)
+>> +             ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
+>> +                             conn->src, 0, conn->dst, res);
+>> +     else
+>> +             ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
+>> +                             conn->dst, 0, conn->src, res);
 >
-> +       os->stream_running = FALSE;
-> +
->        if (os->streaming) {
->                OBEX_SuspendRequest(obex, obj);
->                return;
-> @@ -731,10 +735,15 @@ proceed:
->        if (ret < 0) {
->                os_set_response(os->obj, err);
->                OBEX_CancelRequest(os->obex, TRUE);
-> -       } else
-> +       } else {
-> +               os->stream_running = TRUE;
->                OBEX_ResumeRequest(os->obex);
-> +       }
+> And here.
 >
-> -       return FALSE;
-> +       if (os->stream_running)
-> +               return FALSE;
-> +       else
-> +               return TRUE;
->  }
+> You're also hard-coding the local address type to public, but that's a
+> less severe issue (for now).
 >
->  static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
-> @@ -1225,7 +1234,7 @@ static void obex_event_cb(obex_t *obex, obex_object_t *obj, int mode,
->        case OBEX_EV_STREAMEMPTY:
->                err = obex_write_stream(os, obex, obj);
->                if (err == -EAGAIN) {
-> -                       OBEX_SuspendRequest(obex, obj);
-> +                       suspend_stream(os, obex, obj);
->                        os->obj = obj;
->                        os->driver->set_io_watch(os->object, handle_async_io,
->                                                                        os);
+> Johan
 > --
-
-I guess we should be calling suspend_stream whenever we suspend the
-stream so we set suspended/stream_running, also don't we need a
-resume_stream to reset the flag?
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
 
 
