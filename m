@@ -3,38 +3,45 @@ From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Johan Hedberg <johan.hedberg@gmail.com>,
 	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Subject: [PATCH 2/2] Request secure pincode from agent when necessary
-Date: Wed, 8 Jun 2011 16:05:20 +0200
-Message-ID: <1307541920-3776-2-git-send-email-waldemar.rymarkiewicz@tieto.com>
-In-Reply-To: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Subject: [PATCH 1/2] Add RequestSecurePinCode to agent API
+Date: Wed, 8 Jun 2011 16:05:19 +0200
+Message-ID: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/agent.c |    6 ++----
- 1 files changed, 2 insertions(+), 4 deletions(-)
+The method is called if min. 16 bytes pincode is mendatory
+to authenticate connection.
 
-diff --git a/src/agent.c b/src/agent.c
-index 7bba849..d1494de 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -428,11 +428,9 @@ static int pincode_request_new(struct agent_request *req, const char *device_pat
- {
- 	struct agent *agent = req->agent;
+In practice this will be called only with mgmtops switched on. Hciops
+don't support secure pin code so far.
+---
+ doc/agent-api.txt |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+index 9ab2063..b1cb354 100644
+--- a/doc/agent-api.txt
++++ b/doc/agent-api.txt
+@@ -31,6 +31,17 @@ Methods		void Release()
+ 			Possible errors: org.bluez.Error.Rejected
+ 			                 org.bluez.Error.Canceled
  
--	/* TODO: Add a new method or a new param to Agent interface to request
--		secure pin. */
--
- 	req->msg = dbus_message_new_method_call(agent->name, agent->path,
--					"org.bluez.Agent", "RequestPinCode");
-+				"org.bluez.Agent", secure ?
-+				"RequestSecurePinCode" : "RequestPinCode");
- 	if (req->msg == NULL) {
- 		error("Couldn't allocate D-Bus message");
- 		return -ENOMEM;
++		string RequestSecurePinCode(object device)
++
++			This method gets called when the service daemon
++			needs to get the secure passkey for an authentication.
++
++			The return value should be a string of 16 characters
++			length. The string can be alphanumeric.
++
++			Possible errors: org.bluez.Error.Rejected
++			                 org.bluez.Error.Canceled
++
+ 		uint32 RequestPasskey(object device)
+ 
+ 			This method gets called when the service daemon
 -- 
 1.7.4.1
 
