@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Fix typo error in the attribute API documentation
-Date: Wed,  8 Jun 2011 11:07:33 +0200
-Message-Id: <1307524053-10477-1-git-send-email-sancane@gmail.com>
+Date: Wed, 8 Jun 2011 17:36:44 +0900
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Add basic parsing for SMP
+Message-ID: <20110608083644.GA10502@dell.ccr.corp.intel.com>
+References: <1307522004-4225-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1307522004-4225-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/attribute-api.txt |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Luiz,
 
-diff --git a/doc/attribute-api.txt b/doc/attribute-api.txt
-index f2778f3..98d7f30 100644
---- a/doc/attribute-api.txt
-+++ b/doc/attribute-api.txt
-@@ -12,7 +12,7 @@ or service from attribute database.
- 
- Local services are children of the adapter object path. Remote services
- are children of the remote device object path. This doesn't solve the
--problem where local atttributes can have different instances based on
-+problem where local attributes can have different instances based on
- the remote device.
- 
- In general the idea is to also represent SDP records as services so that
--- 
-1.7.5.2
+On Wed, Jun 08, 2011, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+> Fix copyright statement in smp.c
+> 
+>  Makefile.am     |    1 +
+>  parser/l2cap.c  |    5 +
+>  parser/parser.h |    2 +
+>  parser/smp.c    |  339 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/hcidump.c   |    1 +
+>  5 files changed, 348 insertions(+), 0 deletions(-)
+>  create mode 100644 parser/smp.c
 
+Applied. Thanks.
+
+Johan
