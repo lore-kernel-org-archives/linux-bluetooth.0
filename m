@@ -1,103 +1,211 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4DEF9705.4070502@canonical.com>
-Date: Wed, 08 Jun 2011 08:36:37 -0700
-From: Chase Douglas <chase.douglas@canonical.com>
-MIME-Version: 1.0
-To: Ed Tomlinson <edt@aei.ca>
-CC: Greg KH <gregkh@suse.de>, Jiri Kosina <jkosina@suse.cz>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Linux 2.6.39.1
-References: <20110603003835.GA20381@kroah.com> <201106032236.41294.edt@aei.ca> <4DED20C6.1020701@canonical.com> <201106061926.14661.edt@aei.ca>
-In-Reply-To: <201106061926.14661.edt@aei.ca>
-Content-Type: text/plain; charset=UTF-8
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH -v2 8/8] Bluetooth: keep reference if any ERTM timer is enabled
+Date: Wed,  8 Jun 2011 12:18:59 -0300
+Message-Id: <1307546339-12035-9-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1307546339-12035-8-git-send-email-padovan@profusion.mobi>
+References: <1307546339-12035-1-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-2-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-3-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-4-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-5-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-6-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-7-git-send-email-padovan@profusion.mobi>
+ <1307546339-12035-8-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/06/2011 04:26 PM, Ed Tomlinson wrote:
-> On Monday 06 June 2011 14:47:34 Chase Douglas wrote:
->> On 06/03/2011 07:36 PM, Ed Tomlinson wrote:
->>> On Thursday 02 June 2011 20:38:35 you wrote:
->>>> I'm announcing the release of the 2.6.39.1 kernel.
->>>>
->>>> All users of the 2.6.39 kernel series must upgrade.
->>>>
->>>> The updated 2.6.39.y git tree can be found at:
->>>>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-2.6.39.y.git
->>>> and can be browsed at the normal kernel.org git web browser:
->>>>         http://git.kernel.org/?p=linux/kernel/git/stable/linux-2.6.39.y.git;a=summary
->>>>
->>>
->>> Greg,
->>>
->>> Just updated to 39.1 and it breaks my magicmouse
->>>
->>> [  107.360715] input: Apple Wireless Mouse as /devices/pci0000:00/0000:00:13.2/usb2/2-4/2-4.4/2-4.4:1.0/bluetooth/hci0/hci0:21/input8
->>> [  107.376797] magicmouse 0005:05AC:030D.0005: input,hidraw3: BLUETOOTH HID v0.84 Mouse [Apple Wireless Mouse] on 00:02:72:20:20:1D
->>> [  107.423387] magicmouse 0005:05AC:030D.0005: unable to request touch data (2)
->>> [  107.451216] magicmouse: probe of 0005:05AC:030D.0005 failed with error 2
->>>
->>> and the magicmouse is dead.
->>>
->>> reverting 23746a66d7d9e73402c68ef00d708796b97ebd72
->>>
->>> makes it work as before.
->>
->> Hi Ed,
->>>
->> Thanks!
->>
->> -- Chase
->>
->>
->> We pushed this commit to fix the regression you reported where the mouse
->> failed to work in 2.6.39. With the commit, the mouse should be working
->> properly.
-> 
-> Chase,
-> 
-> The patch that fixed .39 here was
-> 
-> (From: Ville Tervo <ville.tervo@nokia.com>)
-> 
-> I also played a bit with 1.1 CSR dongle and couldn't find any mask that would
-> be accepted. I think this command can be left out for older than 1.2 devices.
-> 
-> Following patch should do it. Could you verify it. I don't have access to old
-> hw ATM.
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 19cd4af..86d1e26 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
->          * command otherwise */
->         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
->  
-> -       /* Events for 1.2 and newer controllers */
-> -       if (hdev->lmp_ver > 1) {
-> -               events[4] |= 0x01; /* Flow Specification Complete */
-> -               events[4] |= 0x02; /* Inquiry Result with RSSI */
-> -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> -               events[5] |= 0x08; /* Synchronous Connection Complete */
-> -               events[5] |= 0x10; /* Synchronous Connection Changed */
-> -       }
-> +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
-> +        * any event mask for pre 1.2 devices */
-> +       if (hdev->lmp_ver <= 1)
-> +               return;
-> +
-> +       events[4] |= 0x01; /* Flow Specification Complete */
-> +       events[4] |= 0x02; /* Inquiry Result with RSSI */
-> +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> +       events[5] |= 0x08; /* Synchronous Connection Complete */
-> +       events[5] |= 0x10; /* Synchronous Connection Changed */
->  
->         if (hdev->features[3] & LMP_RSSI_INQ)
->                 events[4] |= 0x04; /* Inquiry Result with RSSI */
+ERTM use the generic L2CAP timer functions to keep a reference to the
+channel. This is useful for avoiding crashes.
 
-Where did this patch come from? I don't see it in Linus' tree. If this
-patch is merged, I can test the a new kernel out to see if we should
-back out the commit from Jiri. However, right now my magic trackpad
-(which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
+Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+---
+ include/net/bluetooth/l2cap.h |   15 ++++++++-----
+ net/bluetooth/l2cap_core.c    |   44 ++++++++++++++++++++--------------------
+ 2 files changed, 31 insertions(+), 28 deletions(-)
 
--- Chase
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 7aaf7f7..c284be0 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -441,12 +441,15 @@ struct l2cap_pinfo {
+ 
+ #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+ #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+-#define __mod_retrans_timer() mod_timer(&chan->retrans_timer, \
+-		jiffies +  msecs_to_jiffies(L2CAP_DEFAULT_RETRANS_TO));
+-#define __mod_monitor_timer() mod_timer(&chan->monitor_timer, \
+-		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_MONITOR_TO));
+-#define __mod_ack_timer() mod_timer(&chan->ack_timer, \
+-		jiffies + msecs_to_jiffies(L2CAP_DEFAULT_ACK_TO));
++#define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
++		L2CAP_DEFAULT_RETRANS_TO);
++#define __clear_retrans_timer(c) l2cap_clear_timer(c, &c->retrans_timer)
++#define __set_monitor_timer(c) l2cap_set_timer(c, &c->monitor_timer, \
++		L2CAP_DEFAULT_MONITOR_TO);
++#define __clear_monitor_timer(c) l2cap_clear_timer(c, &c->monitor_timer)
++#define __set_ack_timer(c) l2cap_set_timer(c, &chan->ack_timer, \
++		L2CAP_DEFAULT_ACK_TO);
++#define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
+ 
+ static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
+ {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c6d008d..3af8882 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -389,9 +389,9 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+ 		struct srej_list *l, *tmp;
+ 
+-		del_timer(&chan->retrans_timer);
+-		del_timer(&chan->monitor_timer);
+-		del_timer(&chan->ack_timer);
++		__clear_retrans_timer(chan);
++		__clear_monitor_timer(chan);
++		__clear_ack_timer(chan);
+ 
+ 		skb_queue_purge(&chan->srej_q);
+ 		skb_queue_purge(&chan->busy_q);
+@@ -697,9 +697,9 @@ static void l2cap_send_disconn_req(struct l2cap_conn *conn, struct l2cap_chan *c
+ 	sk = chan->sk;
+ 
+ 	if (chan->mode == L2CAP_MODE_ERTM) {
+-		del_timer(&chan->retrans_timer);
+-		del_timer(&chan->monitor_timer);
+-		del_timer(&chan->ack_timer);
++		__clear_retrans_timer(chan);
++		__clear_monitor_timer(chan);
++		__clear_ack_timer(chan);
+ 	}
+ 
+ 	req.dcid = cpu_to_le16(chan->dcid);
+@@ -1177,7 +1177,7 @@ static void l2cap_monitor_timeout(unsigned long arg)
+ 	}
+ 
+ 	chan->retry_count++;
+-	__mod_monitor_timer();
++	__set_monitor_timer(chan);
+ 
+ 	l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_POLL);
+ 	bh_unlock_sock(sk);
+@@ -1192,7 +1192,7 @@ static void l2cap_retrans_timeout(unsigned long arg)
+ 
+ 	bh_lock_sock(sk);
+ 	chan->retry_count = 1;
+-	__mod_monitor_timer();
++	__set_monitor_timer(chan);
+ 
+ 	chan->conn_state |= L2CAP_CONN_WAIT_F;
+ 
+@@ -1216,7 +1216,7 @@ static void l2cap_drop_acked_frames(struct l2cap_chan *chan)
+ 	}
+ 
+ 	if (!chan->unacked_frames)
+-		del_timer(&chan->retrans_timer);
++		__clear_retrans_timer(chan);
+ }
+ 
+ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+@@ -1343,7 +1343,7 @@ int l2cap_ertm_send(struct l2cap_chan *chan)
+ 
+ 		l2cap_do_send(chan, tx_skb);
+ 
+-		__mod_retrans_timer();
++		__set_retrans_timer(chan);
+ 
+ 		bt_cb(skb)->tx_seq = chan->next_tx_seq;
+ 		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
+@@ -3260,8 +3260,8 @@ static int l2cap_try_push_rx_skb(struct l2cap_chan *chan)
+ 	l2cap_send_sframe(chan, control);
+ 	chan->retry_count = 1;
+ 
+-	del_timer(&chan->retrans_timer);
+-	__mod_monitor_timer();
++	__clear_retrans_timer(chan);
++	__set_monitor_timer(chan);
+ 
+ 	chan->conn_state |= L2CAP_CONN_WAIT_F;
+ 
+@@ -3352,7 +3352,7 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
+ 
+ 	chan->conn_state |= L2CAP_CONN_RNR_SENT;
+ 
+-	del_timer(&chan->ack_timer);
++	__clear_ack_timer(chan);
+ 
+ 	queue_work(_busy_wq, &chan->busy_work);
+ 
+@@ -3521,9 +3521,9 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 	if (L2CAP_CTRL_FINAL & rx_control &&
+ 			chan->conn_state & L2CAP_CONN_WAIT_F) {
+-		del_timer(&chan->monitor_timer);
++		__clear_monitor_timer(chan);
+ 		if (chan->unacked_frames > 0)
+-			__mod_retrans_timer();
++			__set_retrans_timer(chan);
+ 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
+ 	}
+ 
+@@ -3604,7 +3604,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 		l2cap_send_srejframe(chan, tx_seq);
+ 
+-		del_timer(&chan->ack_timer);
++		__clear_ack_timer(chan);
+ 	}
+ 	return 0;
+ 
+@@ -3629,7 +3629,7 @@ expected:
+ 			l2cap_retransmit_frames(chan);
+ 	}
+ 
+-	__mod_ack_timer();
++	__set_ack_timer(chan);
+ 
+ 	chan->num_acked = (chan->num_acked + 1) % num_to_ack;
+ 	if (chan->num_acked == num_to_ack - 1)
+@@ -3655,7 +3655,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
+ 		if (chan->conn_state & L2CAP_CONN_SREJ_SENT) {
+ 			if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
+ 					(chan->unacked_frames > 0))
+-				__mod_retrans_timer();
++				__set_retrans_timer(chan);
+ 
+ 			chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+ 			l2cap_send_srejtail(chan);
+@@ -3674,7 +3674,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
+ 	} else {
+ 		if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
+ 				(chan->unacked_frames > 0))
+-			__mod_retrans_timer();
++			__set_retrans_timer(chan);
+ 
+ 		chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+ 		if (chan->conn_state & L2CAP_CONN_SREJ_SENT)
+@@ -3757,7 +3757,7 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
+ 		chan->conn_state |= L2CAP_CONN_SEND_FBIT;
+ 
+ 	if (!(chan->conn_state & L2CAP_CONN_SREJ_SENT)) {
+-		del_timer(&chan->retrans_timer);
++		__clear_retrans_timer(chan);
+ 		if (rx_control & L2CAP_CTRL_POLL)
+ 			l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_FINAL);
+ 		return;
+@@ -3775,9 +3775,9 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u16 rx_cont
+ 
+ 	if (L2CAP_CTRL_FINAL & rx_control &&
+ 			chan->conn_state & L2CAP_CONN_WAIT_F) {
+-		del_timer(&chan->monitor_timer);
++		__clear_monitor_timer(chan);
+ 		if (chan->unacked_frames > 0)
+-			__mod_retrans_timer();
++			__set_retrans_timer(chan);
+ 		chan->conn_state &= ~L2CAP_CONN_WAIT_F;
+ 	}
+ 
+-- 
+1.7.5.1
+
