@@ -1,42 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Read clock not implemented in management
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <20110609122805.GA8875@dell.ccr.corp.intel.com>
-Date: Thu, 9 Jun 2011 09:42:42 -0300
-Cc: Santiago Carot <sancane@gmail.com>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <82461851-7132-415D-A9D1-AE5C1B64440E@signove.com>
-References: <BANLkTim=DVTzgBXDp4Rsed8LNwfrY47ACg@mail.gmail.com> <BANLkTimboYUW4v=tHmVKiCKELqbGfAxegg@mail.gmail.com> <BANLkTi=qBBOkmcS4SD+QJ-BLu7is=ghLTg@mail.gmail.com> <A4DF21E7-112D-4AA7-9043-90C744A33CE0@signove.com> <20110609122805.GA8875@dell.ccr.corp.intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 9 Jun 2011 14:42:11 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Ed Tomlinson <edt@aei.ca>
+Cc: Chase Douglas <chase.douglas@canonical.com>,
+	Greg KH <gregkh@suse.de>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Linux 2.6.39.1
+In-Reply-To: <201106090807.27459.edt@aei.ca>
+Message-ID: <alpine.LNX.2.00.1106091441300.22872@pobox.suse.cz>
+References: <20110603003835.GA20381@kroah.com> <4DEF9705.4070502@canonical.com> <alpine.LNX.2.00.1106081740040.22872@pobox.suse.cz> <201106090807.27459.edt@aei.ca>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jun 9, 2011, at 9:28 AM, Johan Hedberg wrote:
+On Thu, 9 Jun 2011, Ed Tomlinson wrote:
 
-> Hi,
+> > > > I also played a bit with 1.1 CSR dongle and couldn't find any mask that would
+> > > > be accepted. I think this command can be left out for older than 1.2 devices.
+> > > > 
+> > > > Following patch should do it. Could you verify it. I don't have access to old
+> > > > hw ATM.
+> > > > 
+> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > > index 19cd4af..86d1e26 100644
+> > > > --- a/net/bluetooth/hci_event.c
+> > > > +++ b/net/bluetooth/hci_event.c
+> > > > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+> > > >          * command otherwise */
+> > > >         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
+> > > >  
+> > > > -       /* Events for 1.2 and newer controllers */
+> > > > -       if (hdev->lmp_ver > 1) {
+> > > > -               events[4] |= 0x01; /* Flow Specification Complete */
+> > > > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > > > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > > > -               events[5] |= 0x08; /* Synchronous Connection Complete */
+> > > > -               events[5] |= 0x10; /* Synchronous Connection Changed */
+> > > > -       }
+> > > > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
+> > > > +        * any event mask for pre 1.2 devices */
+> > > > +       if (hdev->lmp_ver <= 1)
+> > > > +               return;
+> > > > +
+> > > > +       events[4] |= 0x01; /* Flow Specification Complete */
+> > > > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > > > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > > > +       events[5] |= 0x08; /* Synchronous Connection Complete */
+> > > > +       events[5] |= 0x10; /* Synchronous Connection Changed */
+> > > >  
+> > > >         if (hdev->features[3] & LMP_RSSI_INQ)
+> > > >                 events[4] |= 0x04; /* Inquiry Result with RSSI */
+> > > 
+> > > Where did this patch come from? I don't see it in Linus' tree. If this
+> > > patch is merged, I can test the a new kernel out to see if we should
+> > > back out the commit from Jiri. However, right now my magic trackpad
+> > > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
+> > 
+> > It might be because of different versions of CSR dongles you guys might 
+> > have.
+> > 
+> > I am still a bit lost here -- Ed, do you say that with the patch above, 
+> > and with my patch reverted, your device is working properly?
 > 
-> On Thu, Jun 09, 2011, Elvis Pfutzenreuter wrote:
->>> Coming back to this issue. I'm not caught up with this stuff and I
->>> dont know if there are any special reason to not provide a read clock
->>> functionality in the bluetooth API. although I think it's a pity  to
->>> restrict MCAP features after the good work Elvis did in CSP.
->> 
->> More to the point, could we implement HCI read clock for mgmt interface? Or
->> it simply won't have read clock by design?
-> 
-> There's no obvious reason why it couldn't have it. However other means
-> should be considered too, e.g. would it be cleaner to get the info
-> directly through the socket (using a socket option or something
-> similar)? Or was this already considered when the HCI socket solution
-> was implemented?
+> Yes.  Your understanding is correct.
 
-Not exactly, I just made use of hci_read_clock() that already existed in BlueZ
-API, and copied the code into hciops.
+Thanks for confirming. I'll wait for Chase's confirmation that it works 
+for him as well (so that we could rule out hardware differencies playing 
+a role), and will then push revert to Linus.
 
-Getting clock via a socket option sounds better to me since a) we need
-connection ACL to read it, getting it through a L2CAP socket would imply the
-ACL; b) it would allow other apps to use the feature (e.g. PyBluez that
-currently reads clock using an HCI socket).
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
