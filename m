@@ -1,56 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v4 00/16] SMP Just Works implementation
-Date: Thu,  9 Jun 2011 18:50:39 -0300
-Message-Id: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 9 Jun 2011 16:49:43 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next-2.6 2011-06-09
+Message-ID: <20110609194943.GF2533@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi John,
 
-Changes from last version:
-  - Support for remote devices with random addresses;
+First Bluetooth batch for 3.1 kernel. Here are more L2CAP rewrite/clean up bu
+myself.  Low Energy advertising cache support by Andre Guedes and Anderson
+Briglia and a new L2CAP socket option, BT_POWER, from Jaikumar Ganesh.
+All the rest are basically fixes and cleanup over the whole stack.
 
---
-Cheers,
+Please pull this or let me know any problem. Thanks, John!
 
-Anderson Briglia (6):
-  Bluetooth: Implement the first SMP commands
-  Bluetooth: Start SMP procedure
-  Bluetooth: Add simple SMP pairing negotiation
-  Bluetooth: Add LE SMP Cryptoolbox functions
-  Bluetooth: Add SMP confirmation structs
-  Bluetooth: Add SMP confirmation checks methods
+	Gustavo
 
-Vinicius Costa Gomes (10):
-  Bluetooth: Add support for using the crypto subsystem
-  Bluetooth: Add support for LE Start Encryption
-  Bluetooth: Remove debug statements
-  Bluetooth: Add support for resuming socket when SMP is finished
-  Bluetooth: Fix initial security level of LE links
-  Bluetooth: Update the security level when link is encrypted
-  Bluetooth: Add support for building pairing commands
-  Bluetooth: Add support for Pairing features exchange
-  Bluetooth: Add support for SMP timeout
-  Bluetooth: Add key size checks for SMP
 
- include/net/bluetooth/hci.h      |   34 +++
- include/net/bluetooth/hci_core.h |   11 +
- include/net/bluetooth/l2cap.h    |    9 +
- include/net/bluetooth/smp.h      |   46 ++++
- net/bluetooth/Kconfig            |    8 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/hci_conn.c         |   50 ++++
- net/bluetooth/hci_core.c         |   22 ++
- net/bluetooth/hci_event.c        |   69 +++++
- net/bluetooth/l2cap_core.c       |  141 ++++++-----
- net/bluetooth/l2cap_sock.c       |   16 ++
- net/bluetooth/smp.c              |  533 ++++++++++++++++++++++++++++++++++++++
- 12 files changed, 881 insertions(+), 60 deletions(-)
- create mode 100644 net/bluetooth/smp.c
+The following changes since commit 931749bf78b969c54de9bbc67cf29b13a40bb73b:
 
---
-1.7.5.4
+  ath9k: make use of a helper to get paprd scale factor (2011-06-07 14:46:13 -0400)
 
+are available in the git repository at:
+  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
+
+Anderson Briglia (1):
+      Bluetooth: Add advertising report meta event structs
+
+Andre Guedes (8):
+      Bluetooth: LE advertising cache
+      Bluetooth: Add Advertising Report Meta Event handler
+      Bluetooth: Clear advertising cache before scanning
+      Bluetooth: Advertising entries lifetime
+      Bluetooth: Add 'dst_type' field to struct hci_conn
+      Bluetooth: Remove useless check in hci_connect()
+      Bluetooth: Check advertising cache in hci_connect()
+      Bluetooth: Set 'peer_addr_type' in hci_le_connect()
+
+David Miller (3):
+      Bluetooth: Kill set but not used variable 'l2cap_sk' in rfcomm_sock_getsockopt_old()
+      Bluetooth: Do not ignore errors returned from strict_strtol()
+      Bluetooth: Kill set but unused variable 'cmd' in cmtp_recv_capimsg()
+
+Filip Palian (1):
+      Bluetooth: l2cap and rfcomm: fix 1 byte infoleak to userspace.
+
+Gustavo F. Padovan (8):
+      Bluetooth: fix set but not used warning
+      Bluetooth: Create __l2cap_chan_close()
+      Bluetooth: Create l2cap_chan_send()
+      Bluetooth: Add chan->chan_type struct member
+      Bluetooth: create channel timer to replace sk_timer
+      Bluetooth: Remove export of l2cap_chan_clear_timer()
+      Bluetooth: Rename __l2cap_chan_close() to l2cap_chan_close()
+      Merge master.kernel.org:/.../padovan/bluetooth-2.6
+
+Jaikumar Ganesh (1):
+      Bluetooth: Add BT_POWER L2CAP socket option.
+
+Johan Hedberg (1):
+      Bluetooth: Remove unnecessary use of hci_dev_list_lock
+
+Johannes Berg (1):
+      Bluetooth: fix sparse & gcc warnings
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: fix shutdown on SCO sockets
+
+Mat Martineau (2):
+      Bluetooth: Restore accidentally-deleted line
+      Bluetooth: Fix check for the ERTM local busy state
+
+Ruiyi Zhang (1):
+      Bluetooth: Allow unsegmented SDU retries on sock_queue_rcv_skb failure
+
+Stephen Boyd (1):
+      Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y warning
+
+Ville Tervo (1):
+      Bluetooth: Do not send SET_EVENT_MASK for 1.1 and earlier devices
+
+Waldemar Rymarkiewicz (6):
+      Bluetooth: Fix auth_complete_evt for legacy units
+      Bluetooth: Refactor hci_auth_complete_evt function
+      Bluetooth: Remove a magic number
+      Bluetooth: Verify a pin code in pin_code_reply
+      Bluetooth: Simplify hci_conn_accept_secure check
+      Bluetooth: Clean up some code style issues
+
+ drivers/bluetooth/btmrvl_debugfs.c |   12 ++
+ include/net/bluetooth/bluetooth.h  |   15 ++-
+ include/net/bluetooth/hci.h        |   25 +++
+ include/net/bluetooth/hci_core.h   |   55 +++++--
+ include/net/bluetooth/l2cap.h      |   24 ++--
+ include/net/bluetooth/rfcomm.h     |    9 +-
+ net/bluetooth/cmtp/capi.c          |    3 +-
+ net/bluetooth/hci_conn.c           |   29 +++-
+ net/bluetooth/hci_core.c           |   82 ++++++++++-
+ net/bluetooth/hci_event.c          |  155 +++++++++++++-----
+ net/bluetooth/l2cap_core.c         |  307 ++++++++++++++++++++++++++++++------
+ net/bluetooth/l2cap_sock.c         |  281 ++++++++-------------------------
+ net/bluetooth/mgmt.c               |   61 +++++--
+ net/bluetooth/rfcomm/sock.c        |    7 +-
+ net/bluetooth/sco.c                |   13 ++-
+ 15 files changed, 697 insertions(+), 381 deletions(-)
