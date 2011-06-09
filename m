@@ -1,71 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: Jiri Kosina <jkosina@suse.cz>
-Subject: Re: Linux 2.6.39.1
-Date: Thu, 9 Jun 2011 08:07:26 -0400
-Cc: Chase Douglas <chase.douglas@canonical.com>,
-	Greg KH <gregkh@suse.de>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20110603003835.GA20381@kroah.com> <4DEF9705.4070502@canonical.com> <alpine.LNX.2.00.1106081740040.22872@pobox.suse.cz>
-In-Reply-To: <alpine.LNX.2.00.1106081740040.22872@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201106090807.27459.edt@aei.ca>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <70c3591.c7ad04bfd88fbba33e950f8f2a7c3fd4@1oca1host.de>
+From: thilo@cestona.ro
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: AW: Re: Support for 0489:e031 Foxconn / Hon Hai
+Date: Thu, 9 Jun 2011 13:45:44 +0200 (CEST)
+Content-Type: text/plain;
+	charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 08 June 2011 11:41:03 Jiri Kosina wrote:
-> On Wed, 8 Jun 2011, Chase Douglas wrote:
-> 
-> > > I also played a bit with 1.1 CSR dongle and couldn't find any mask that would
-> > > be accepted. I think this command can be left out for older than 1.2 devices.
-> > > 
-> > > Following patch should do it. Could you verify it. I don't have access to old
-> > > hw ATM.
-> > > 
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index 19cd4af..86d1e26 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
-> > >          * command otherwise */
-> > >         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
-> > >  
-> > > -       /* Events for 1.2 and newer controllers */
-> > > -       if (hdev->lmp_ver > 1) {
-> > > -               events[4] |= 0x01; /* Flow Specification Complete */
-> > > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > -               events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > -               events[5] |= 0x10; /* Synchronous Connection Changed */
-> > > -       }
-> > > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
-> > > +        * any event mask for pre 1.2 devices */
-> > > +       if (hdev->lmp_ver <= 1)
-> > > +               return;
-> > > +
-> > > +       events[4] |= 0x01; /* Flow Specification Complete */
-> > > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > +       events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > +       events[5] |= 0x10; /* Synchronous Connection Changed */
-> > >  
-> > >         if (hdev->features[3] & LMP_RSSI_INQ)
-> > >                 events[4] |= 0x04; /* Inquiry Result with RSSI */
-> > 
-> > Where did this patch come from? I don't see it in Linus' tree. If this
-> > patch is merged, I can test the a new kernel out to see if we should
-> > back out the commit from Jiri. However, right now my magic trackpad
-> > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
-> 
-> It might be because of different versions of CSR dongles you guys might 
-> have.
-> 
-> I am still a bit lost here -- Ed, do you say that with the patch above, 
-> and with my patch reverted, your device is working properly?
+Hey Marcel,
 
-Yes.  Your understanding is correct.
+>> Here is the output of hciconfig hci0 -a:
+>> $ hciconfig hci0 -a
+>> hci0:=09Type: BR/EDR  Bus: USB
+>> =09BD Address: EC:55:F9:EA:DE:09  ACL MTU: 1021:8  SCO MTU: 64:1
+>> =09UP RUNNING PSCAN ISCAN 
+>> =09RX bytes:5947 acl:0 sco:0 events:198 errors:0
+>> =09TX bytes:1986 acl:0 sco:0 commands:117 errors:0
+>> =09Features: 0xff 0xff 0x8f 0xfe 0xdb 0xff 0x7b 0x87
+>> =09Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>> =09Link policy: RSWITCH HOLD SNIFF PARK 
+>> =09Link mode: SLAVE ACCEPT 
+>> =09Name: 'abg4858n-lnx'
+>> =09Class: 0x4a0100
+>> =09Service Classes: Networking, Capturing, Telephony
+>> =09Device Class: Computer, Uncategorized
+>> =09HCI Version: 4.0 (0x6)  Revision: 0x0
+>> =09LMP Version: 4.0 (0x6)  Subversion: 0x2118
+>> =09Manufacturer: Broadcom Corporation (15)
+>> 
+>> Looks ok isn't it?
+>
+>Yes, and getting a nice Low-Energy capable dongle is great. Where did
+>you get this from? I like to get a bunch of these for testing.
 
-Thanks,
-Ed
+It's build-in into the Lifebook E751 of Fujitsu (when ordered with Bluet=
+ooth).
+The product page for the E751: http://lifebook.uk.ts.fujitsu.com/Product=
+s/Performance/LIFEBOOK-E751.htm
+More an advertisment page ;) ... and the only thing about Bluetooth is t=
+his sentence: "Ultimate connectivity with optional embedded 3G/UMTS, WLA=
+N and Bluetooth=C2=AE"
+
+>> But I can't add any devices. When I search for devices VERY long, I c=
+an find one or two. But only devices which I can't pair with.
+>> e.g. I never found my headset, altought it is in pairing mode when I =
+start searching.
+>> 
+>> During search, hcidump -v shows only this:
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> > HCI Event: Inquiry Complete (0x01) plen 1
+>>     status 0x00
+>> 
+>> so no problem here too.
+>> 
+>> Any suggestions what I could try next? Anything which could give me i=
+nformations whats going wrong here?
+>
+>Maybe the antenna is kinda wrongly calibrated, but I can't tell any
+>details here. That is hardware specific.
+
+So you think it's not connected correctly or what means wrongly calibrat=
+ed?
+Perhaps I can give it a try via Virtualbox under windows ... 
+
+Ciao
+Thilo
