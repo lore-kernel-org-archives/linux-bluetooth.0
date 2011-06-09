@@ -2,40 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v4 12/16] Bluetooth: Update the security level when link is encrypted
-Date: Thu,  9 Jun 2011 18:50:51 -0300
-Message-Id: <1307656255-8659-13-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next v4 09/16] Bluetooth: Remove debug statements
+Date: Thu,  9 Jun 2011 18:50:48 -0300
+Message-Id: <1307656255-8659-10-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the pending security level is greater than the current security
-level and the link is now encrypted, we should update the link
-security level.
-
-This is only useful for LE links, when the only event generated
-when SMP is sucessful in the Encrypt Change event.
+Now that these commands are sent to the controller we can use hcidump
+to verify that the correct values are produced.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/smp.c |    6 +-----
+ 1 files changed, 1 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ab6842c..fe05946 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -745,6 +745,9 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 	if (conn->sec_level == BT_SECURITY_SDP)
- 		conn->sec_level = BT_SECURITY_LOW;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 56828db..6983979 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -280,7 +280,7 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct crypto_blkcipher *tfm = hcon->hdev->tfm;
+ 	int ret;
+-	u8 key[16], res[16], random[16], confirm[16], buf[128];
++	u8 key[16], res[16], random[16], confirm[16];
  
-+	if (conn->pending_sec_level > conn->sec_level)
-+		conn->sec_level = conn->pending_sec_level;
-+
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
+ 	swap128(skb->data, random);
+ 	skb_pull(skb, sizeof(random));
+@@ -329,10 +329,6 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
  
- 	read_lock_bh(&hci_cb_list_lock);
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+ 		swap128(key, hcon->ltk);
+-
+-		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
+-							sizeof(buf), 0);
+-		BT_DBG("key %s", buf);
+ 	}
+ }
+ 
 -- 
 1.7.5.4
 
