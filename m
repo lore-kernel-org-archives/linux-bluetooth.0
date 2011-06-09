@@ -1,74 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jun 2011 16:36:29 -0700 (PDT)
+Date: Thu, 9 Jun 2011 16:09:52 -0700 (PDT)
 From: Mat Martineau <mathewm@codeaurora.org>
 To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Bluetooth: Limit depth of the HCI TX queue with ERTM
- mode
-In-Reply-To: <20110609021648.GA2776@joana>
-Message-ID: <alpine.DEB.2.02.1106091610040.18748@mathewm-linux>
-References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org> <1307143270-2655-3-git-send-email-mathewm@codeaurora.org> <20110609021648.GA2776@joana>
+Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
+In-Reply-To: <20110609184747.GB2533@joana>
+Message-ID: <alpine.DEB.2.02.1106091548010.18748@mathewm-linux>
+References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org> <1307143270-2655-2-git-send-email-mathewm@codeaurora.org> <20110606173153.GA30641@joana> <alpine.DEB.2.02.1106081612210.5280@mathewm-linux> <20110609184747.GB2533@joana>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-Gustavo,
+On Thu, 9 Jun 2011, Gustavo F. Padovan wrote:
 
-On Wed, 8 Jun 2011, Gustavo F. Padovan wrote:
-
-> Hi Mat,
+> * Mat Martineau <mathewm@codeaurora.org> [2011-06-08 16:24:05 -0700]:
 >
-> * Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:09 -0700]:
+>>
+>> On Mon, 6 Jun 2011, Gustavo F. Padovan wrote:
+>>
+>>> * Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
+>>>
+>>>> This workqueue will be used for general L2CAP work, not just dealing
+>>>> with "busy" frames.
+>>>
+>>> which general L2CAP work are we talking about?
+>>
+>> I'll update the commit message and resubmit, but to immediately
+>> answer your question:
+>>
+>> * ERTM tx queue callbacks (patch 3/4 in this series)
+>> * ERTM timers (ack, retrans, monitor) that can utilize proper locking.
 >
->> In order to provide timely responses to REJ, SREJ, and poll input from
->> the remote device, it helps to reduce the number of ERTM data frames
->> in the HCI TX queue at one time. If a full TX window of data is in the
->> HCI TX queue, any responses to REJ, SREJ, or polls must wait in line
->> behind all previously queued data. This latency leads to disconnects,
->> and will be more severe with extended window sizes.
+> What are the problems with ERTM timers? From what I remember it was not using
+> reference count on them, I fixed this. Patch is on this mailing for review.
+
+The ERTM timer handlers modify l2cap_chan data, but use bh_lock_sock() 
+and bh_unlock_sock() instead of lock_sock() and release_sock().  The 
+socket might be locked in userspace context, but these timers can fire 
+and start executing code concurrently.
+
+See http://article.gmane.org/gmane.linux.bluez.kernel/6808 for the 
+full description.
+
+With the refactoring of L2CAP to separate out the socket code, we will 
+still need a per-channel lock to protect l2cap_chan data.
+
+>> * Updating the ERTM tx queue after an AMP channel move and L2CAP
+>> reconfiguration
+>> * Moving various AMP-related work out of interrupt context
 >
-> I prefer if we go with a hci_send_acl_prio() implementation. It will have much
-> less overhead using a workqueue. As it will be filled only by S-frames with a
-> few bytes each I don't think we will have problems. So lets go with this
-> approach and see what we can get.
+> Marcel wrote a patch sometime ago the move the whole Bluetooth core work out
+> of the interrupt context. That will help with many issues we have today,
+> including these you are talking about.
+> We need to take that patch, fix it, and push it no bluetooth-next.
+> This task is on my TODO list, but my TODO list is getting bigger. ;)
 
-I considered that approach too, but it breaks some major assumptions 
-and I don't think it complies with the ERTM spec.  I-frames contain 
-reqseq fields and a final bit, so if S-frames and I-frames are 
-delivered out-of-sequence, you can easily end up with a confusing 
-series of reqseq values at the receiver.
+This would be a big help, do you have a pointer to this patch?  Is the 
+new workqueue accessible for all Bluetooth modules, or is it just for 
+the HCI core?  The other issues in my list still need a workqueue to 
+use, they are not solved by moving rx processing out of interrupt 
+context.  If rx processing gets rid of interrupt context, we'll also 
+want to take a close look at all other timer use.
 
-Suppose the HCI tx queue is full of I-frames, and the oldest I-frame 
-has reqseq set to 1.  Since that I-frame has been queued, other 
-incoming I-frames have been processed, so the last recieved I-frame 
-had txseq 20.  The remote device sends a poll, and we reply with an RR 
-(reqseq 21) using the priority queue.  HCI sends that RR first, then 
-an I-frame from the normal queue with reqseq 1.  Now the remote side 
-thinks it missed all of the frames from 21 to 1 (having wrapped 
-around).  The remote side then has to send REJ or SREJ frames, even 
-though nothing is actually missing.
-
-
-So, I think we have two options:
-
-  * Use the skb_destructor mechanism to pull data for ERTM (which is 
-what my patch does), and leave queuing for other modes alone
-  * Rearchitect HCI & L2CAP so that data is pulled from the L2CAP layer 
-as num_comp_pkts events are received
-
-
-I realize there is increased overhead to make the callbacks to get 
-data out of the ERTM tx queue, but the skb destructor is very 
-lightweight (since it uses an atomic_t counter).  The overhead is 
-tunable using L2CAP_MAX_ERTM_QUEUED and L2CAP_MIN_ERTM_QUEUED to 
-control how often the callback to l2cap_ertm_send() is actually made. 
-With the current queuing behavior, things get unmanageable on AMP with 
-extra latency from larger tx windows and much shorter timeouts.
-
-
-Regards,
+Thanks,
 
 --
 Mat Martineau
