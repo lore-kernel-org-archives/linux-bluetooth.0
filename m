@@ -1,56 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 1/2] Add function to get default adapter ID
-Date: Thu,  9 Jun 2011 14:53:08 +0100
-Message-Id: <1307627589-25786-1-git-send-email-hadess@hadess.net>
+Subject: Re: How to contribute to Bluetooth profiles still not adopted by BT SIG?
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Elvis Pfutzenreuter <epx@signove.com>
+In-Reply-To: <BANLkTi=Q2oufRQOgqmn_EqfV4EVCO2B0EA@mail.gmail.com>
+Date: Thu, 9 Jun 2011 10:20:34 -0300
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <6E4AFC41-A4B8-44FC-B715-D7BAFEB264FA@signove.com>
+References: <BANLkTi=Q2oufRQOgqmn_EqfV4EVCO2B0EA@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Combined with manager_find_adapter_by_id(), it is now possible
-to get the btd_adapter struct for the default adapter:
-manager_find_adapter_by_id (manager_get_default_adapter_id ());
----
- src/manager.c |    8 ++++++++
- src/manager.h |    1 +
- 2 files changed, 9 insertions(+), 0 deletions(-)
+On Jun 9, 2011, at 8:09 AM, Anderson Lizardo wrote:
 
-diff --git a/src/manager.c b/src/manager.c
-index e805e0c..9d0de25 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
- 		btd_start_exit_timer();
- }
- 
-+int manager_get_default_adapter_id(void)
-+{
-+	return default_adapter_id;
-+}
-+
- void manager_cleanup(DBusConnection *conn, const char *path)
- {
- 	g_slist_foreach(adapters, (GFunc) manager_remove_adapter, NULL);
-@@ -331,6 +336,9 @@ struct btd_adapter *manager_find_adapter_by_id(int id)
- {
- 	GSList *match;
- 
-+	if (id < 0)
-+		return NULL;
-+
- 	match = g_slist_find_custom(adapters, GINT_TO_POINTER(id),
- 							adapter_id_cmp);
- 	if (!match)
-diff --git a/src/manager.h b/src/manager.h
-index 05c38b3..52bf36b 100644
---- a/src/manager.h
-+++ b/src/manager.h
-@@ -41,3 +41,4 @@ struct btd_adapter *btd_manager_register_adapter(int id);
- int btd_manager_unregister_adapter(int id);
- void manager_add_adapter(const char *path);
- void btd_manager_set_did(uint16_t vendor, uint16_t product, uint16_t version);
-+int manager_get_default_adapter_id(void);
--- 
-1.7.5.1
+> Hi,
+> 
+> I would like to bring another discussion (hoping that someone cares
+> about the same issue as well :).
+> 
+> Recently, the first GATT based profile was finally adopted by BT SIG:
+> http://e2e.ti.com/blogs_/b/bluetooth_low_energy_blog/archive/2011/06/07/first-bluetooth-low-energy-profile-adopted.aspx
+> . This means we can now finally work on it without fear of discussing
+> things which are confidential.
+> 
+> But what about all those other draft profiles? For sure some of you
+> are already working on some of them (we included), but looks like we
+> cannot discuss publicly or share code... or can we?
+> 
+> What has been the policy on non-GATT profiles? I'm not involved on
+> BlueZ development long enough to even have seen how the other non-GATT
+> profiles have been implemented.
+> 
+> If confidentiality is still necessary, could we have an invite-only
+> mailing list for discussing and sharing code (at least for as long as
+> the profile is not adopted).
 
+At first sight, some list with people having account in SIG would do.
+
+For example, "that" page that is the primary source of most practical
+information (UUIDs etc.) you need to implement a GATT profile.
+Current policy is allow access only for people with a SIG account.
+Once you are logged in, it shows infos for adopted as well as non-adopted
+profiles.
+
+The remaining problem is the profiles that didn't even reach the stage of
+appearing in the Web page. Information about that ones is
+"trapped" inside each working group. As far as I understand, it can't
+be shared even with SIG members that are not part of the same WG.
