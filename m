@@ -1,138 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+From: <Waldemar.Rymarkiewicz@tieto.com>
+To: <keithp@keithp.com>, <johan.hedberg@gmail.com>
+CC: <padovan@profusion.mobi>, <marcel@holtmann.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Date: Thu, 9 Jun 2011 20:11:21 +0300
+Subject: RE: Regression caused by "Bluetooth: Map sec_level to link key
+ requirements"
+Message-ID: <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com>
+References: <yunboy7a2so.fsf@aiko.keithp.com>
+ <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com>
+ <20110609083345.GA2894@dell.ccr.corp.intel.com>
+ <yuny61b3pnm.fsf@aiko.keithp.com>
+In-Reply-To: <yuny61b3pnm.fsf@aiko.keithp.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
-References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
-	<BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com>
-	<BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
-	<BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
-Date: Thu, 9 Jun 2011 14:41:04 -0300
-Message-ID: <BANLkTin4uZTLMeFM8ZZNUQ-Os3ob8eB6iQ@mail.gmail.com>
-Subject: Re: Generic Attribute API race condition
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Jaikumar Ganesh <jaikumarg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaikumar
+Hi Keith,=20
 
-On Wed, Jun 8, 2011 at 11:06 PM, Jaikumar Ganesh <jaikumarg@gmail.com> wrote:
-> Hey Claudio:
->
-> On Thu, Jun 9, 2011 at 2:44 AM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
->> Hi Jaikumar,
->>
->> On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com> wrote:
->>> Hi Claudio:
->>>
->>> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
->>> <claudio.takahasi@openbossa.org> wrote:
->>>> Hi All,
->>>>
->>>> There is a potential race condition in the Generic Attribute API. I'd
->>>> like to collect opinions to avoid re-work later.
->>>>
->>>> How to reproduce:
->>>> - call CreateDevice() for a device which exports a GATT based service:
->>>> CreateDevice will discover all primary services
->>>>  and the Generic API will register the object paths for all found services
->>>> - Call DiscoverCharacteristics() of the primary service followed by
->>>> Characteristic GetProperties(), expected result: read all
->>>> characteristics properties outcome: partial characteristics properties
->>>> may appear.
->>>>
->>>> This problem happens because DiscoverCharacteristics() doesn't wait
->>>> for all characteristic VALUES, it returns after discovering all
->>>> characteristic DECLARATIONS.
->>>> Wait for characteristic values is a problem, attributes may require
->>>> authentication or authorization.
->>>>
->>>> Suggestions are:
->>>> 1. Report discovered characteristic values using PropertyChanged:
->>>> Returning empty properties values (for GetProperties) if the discovery
->>>> is in progress
->>>>
->>>> 2. Block GetProperties() if there is a discovery pending: returning
->>>> after discovery finishes. Timeout can still happen!
->>>>
->>>> 3. Return Busy for GetProperties() if there is a characteristic
->>>> discovery in progress
->>>>
->>>> Comments?
->>>
->>> I don't think we should read characteristic value till the application
->>> asks for it.
->> Are you suggesting to trigger the characteristic value and descriptors
->> read when Characteristic GetProperties() is called and block it?
->> Remember that GATT timeout is 30seconds and the default D-Bus message
->> reply timeout is smaller.
->>
->>> DiscoverCharacteristics() should just return after getting the DECLARATIONS.
->> This is current behaviour.
->
-> Sorry misread your email a bit.
->
-> I assume you are referring to the Characteristic Watcher when you are
-> talking about the PropertyChanged signal,
-> since there is no explicit PropertyChanged signal.
->
-> I don't think we should block GetProperties. But then if we are
-> returning null and depending on PropertyChanged signal when we have to
-> read the values, clients will need to wait for it after calling
-> GetProperties. We need to guarantee that this signal will be sent
-> (with a timeout, unless we want the clients to have the timeout at
-> their end) even if we are unable to get the value - because of some
-> kind of error.
+>I re-pair'ed using a manually entered a 16 digit pin, but now=20
+>DUN setup doesn't succeed at all.
 
-Signal with a timeout? I don't think that it is necessary.
-We can use persistent storage returning "old" values on GetProperties
-calls and use PropertyChanged to notify "new" values asynchronously.
-This approach should be enough.
+Did you try to remove all stored link keys and start again?
+If you already have a pincode which is insecure you have to remove it manua=
+lly.
 
->
-> In all other places we use PropertyChanged signal when the property
-> value actually changes, whereas here we are tying it with the reading
-> of the properties.
->
-> How about providing separate calls for read and writing values and
-> decoupling it from the Properties ?
+Try 'hciconfig hciX noauth noencrypt ' before.
 
-I don't think it will help, authorization and GATT timeout is still a problem.
-We are trying to cover unusual scenarios, IMO change the API to cover
-these cases doesn't look correct.
+Check syslog and switch debug on in the kernel first.
 
-BR,
-Claudio.
 
->
-> Thanks
->
->>
->>> A client might not be interested in all the values and thus we should
->>> read them only
->>> when needed by the client. This will save both time and power and
->>> solve this problem too.
->>
->> I don't think it is critical, we are not reading them on all
->> connections/re-connections and the profiles available at the moment
->> don't expose "complex" characteristics.
->
-> I am talking about GATT clients written using the attribute DBUS apis.
-> Accessory vendors
-> want to get started on LE and not wait till all the profiles are
-> approved the SIG and developed
-> and they want to develop things based on the GATT clients APIs.
->
->>
->> BR,
->> Claudio
->>
->>>
->>> Thanks
->>> Jaikumar
->>>>
->>>> BR,
->>>> Claudio
->>
+Waldek
