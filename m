@@ -2,237 +2,323 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v4 10/16] Bluetooth: Add support for resuming socket when SMP is finished
-Date: Thu,  9 Jun 2011 18:50:49 -0300
-Message-Id: <1307656255-8659-11-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next v4 08/16] Bluetooth: Add support for LE Start Encryption
+Date: Thu,  9 Jun 2011 18:50:47 -0300
+Message-Id: <1307656255-8659-9-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for resuming the user space traffic when SMP
-negotiation is complete.
+This adds support for starting SMP Phase 2 Encryption, when the initial
+SMP negotiation is successful. This adds the LE Start Encryption and LE
+Long Term Key Request commands and related events.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c |   61 ++++++++++++++++++++++---------------------
- net/bluetooth/l2cap_sock.c |   16 +++++++++++
- net/bluetooth/smp.c        |   40 ++++++++++++++++++++--------
- 3 files changed, 75 insertions(+), 42 deletions(-)
+ include/net/bluetooth/hci.h      |   34 +++++++++++++++++++
+ include/net/bluetooth/hci_core.h |    6 +++
+ net/bluetooth/hci_conn.c         |   49 +++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   67 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/smp.c              |   16 +++++++--
+ 5 files changed, 168 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e9c053c..d2036b5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -879,6 +879,23 @@ clean:
- 	bh_unlock_sock(parent);
- }
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index bd285c6..65345cd 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -745,6 +745,33 @@ struct hci_cp_le_conn_update {
+ 	__le16   max_ce_len;
+ } __packed;
  
-+static void l2cap_chan_ready(struct sock *sk)
++#define HCI_OP_LE_START_ENC		0x2019
++struct hci_cp_le_start_enc {
++	__le16	handle;
++	__u8	rand[8];
++	__le16	ediv;
++	__u8	ltk[16];
++} __packed;
++
++#define HCI_OP_LE_LTK_REPLY		0x201a
++struct hci_cp_le_ltk_reply {
++	__le16	handle;
++	__u8	ltk[16];
++} __packed;
++struct hci_rp_le_ltk_reply {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
++#define HCI_OP_LE_LTK_NEG_REPLY		0x201b
++struct hci_cp_le_ltk_neg_reply {
++	__le16	handle;
++} __packed;
++struct hci_rp_le_ltk_neg_reply {
++	__u8	status;
++	__le16	handle;
++} __packed;
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+@@ -1035,6 +1062,13 @@ struct hci_ev_le_conn_complete {
+ 	__u8     clk_accurancy;
+ } __packed;
+ 
++#define HCI_EV_LE_LTK_REQ		0x05
++struct hci_ev_le_ltk_req {
++	__le16	handle;
++	__u8	random[8];
++	__le16	ediv;
++} __packed;
++
+ /* Advertising report event types */
+ #define ADV_IND		0x00
+ #define ADV_DIRECT_IND	0x01
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7837f32..ab6842c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -249,6 +249,7 @@ struct hci_conn {
+ 	__u8		power_save;
+ 	__u16		disc_timeout;
+ 	unsigned long	pend;
++	__u8		ltk[16];
+ 
+ 	__u8		remote_cap;
+ 	__u8		remote_oob;
+@@ -861,4 +862,9 @@ void hci_req_complete(struct hci_dev *hdev, __u16 cmd, int result);
+ 
+ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+ 					u16 latency, u16 to_multiplier);
++void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
++							__u8 ltk[16]);
++void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
++void hci_le_ltk_neg_reply(struct hci_conn *conn);
++
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 37f5a17..1819383 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -204,6 +204,55 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+ }
+ EXPORT_SYMBOL(hci_le_conn_update);
+ 
++void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
++							__u8 ltk[16])
 +{
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct sock *parent = bt_sk(sk)->parent;
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_start_enc cp;
 +
-+	BT_DBG("sk %p, parent %p", sk, parent);
++	BT_DBG("%p", conn);
 +
-+	chan->conf_state = 0;
-+	l2cap_chan_clear_timer(chan);
++	memset(&cp, 0, sizeof(cp));
 +
-+	sk->sk_state = BT_CONNECTED;
-+	sk->sk_state_change(sk);
++	cp.handle = cpu_to_le16(conn->handle);
++	memcpy(cp.ltk, ltk, sizeof(cp.ltk));
++	cp.ediv = ediv;
++	memcpy(cp.rand, rand, sizeof(rand));
 +
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
++	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
++}
++EXPORT_SYMBOL(hci_le_start_enc);
++
++void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16])
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_ltk_reply cp;
++
++	BT_DBG("%p", conn);
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.handle = cpu_to_le16(conn->handle);
++	memcpy(cp.ltk, ltk, sizeof(ltk));
++
++	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
++}
++EXPORT_SYMBOL(hci_le_ltk_reply);
++
++void hci_le_ltk_neg_reply(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_ltk_neg_reply cp;
++
++	BT_DBG("%p", conn);
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.handle = cpu_to_le16(conn->handle);
++
++	hci_send_cmd(hdev, HCI_OP_LE_LTK_NEG_REPLY, sizeof(cp), &cp);
 +}
 +
- static void l2cap_conn_ready(struct l2cap_conn *conn)
+ /* Device _must_ be locked */
+ void hci_sco_setup(struct hci_conn *conn, __u8 status)
  {
- 	struct l2cap_chan *chan;
-@@ -895,13 +912,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 
- 		bh_lock_sock(sk);
- 
--		if (conn->hcon->type == LE_LINK) {
--			l2cap_chan_clear_timer(chan);
--			sk->sk_state = BT_CONNECTED;
--			sk->sk_state_change(sk);
-+		if (conn->hcon->type == LE_LINK)
- 			if (smp_conn_security(conn, chan->sec_level))
--				BT_DBG("Insufficient security");
--		}
-+				l2cap_chan_ready(sk);
- 
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			l2cap_chan_clear_timer(chan);
-@@ -1664,30 +1677,6 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 	return err;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0f643f8..166fa11 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -868,6 +868,30 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
  }
  
--static void l2cap_chan_ready(struct sock *sk)
--{
--	struct sock *parent = bt_sk(sk)->parent;
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--
--	BT_DBG("sk %p, parent %p", sk, parent);
--
--	chan->conf_state = 0;
--	l2cap_chan_clear_timer(chan);
--
--	if (!parent) {
--		/* Outgoing channel.
--		 * Wake up socket sleeping on connect.
--		 */
--		sk->sk_state = BT_CONNECTED;
--		sk->sk_state_change(sk);
--	} else {
--		/* Incoming channel.
--		 * Wake up socket sleeping on accept.
--		 */
--		parent->sk_data_ready(parent, 0);
--	}
--}
--
- /* Copy frame to all raw sockets on that connection */
- static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- {
-@@ -4184,6 +4173,18 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		bh_lock_sock(sk);
- 
-+		BT_DBG("chan->scid %d", chan->scid);
++static void hci_cc_le_ltk_reply(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_rp_le_ltk_reply *rp = (void *) skb->data;
 +
-+		if (chan->scid == L2CAP_CID_LE_DATA) {
-+			if (!status && encrypt) {
-+				chan->sec_level = hcon->sec_level;
-+				l2cap_chan_ready(sk);
-+			}
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
 +
-+			bh_unlock_sock(sk);
-+			continue;
-+		}
-+
- 		if (chan->conf_state & L2CAP_CONF_CONNECT_PEND) {
- 			bh_unlock_sock(sk);
- 			continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ab81894..d6cc558 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -29,6 +29,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
-+#include <net/bluetooth/smp.h>
- 
- static const struct proto_ops l2cap_sock_ops;
- 
-@@ -556,6 +557,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct bt_security sec;
- 	struct bt_power pwr;
-+	struct l2cap_conn *conn;
- 	int len, err = 0;
- 	u32 opt;
- 
-@@ -592,6 +594,20 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 		}
- 
- 		chan->sec_level = sec.level;
-+
-+		conn = chan->conn;
-+		if (conn && chan->scid == L2CAP_CID_LE_DATA) {
-+			if (!conn->hcon->out) {
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			if (smp_conn_security(conn, sec.level))
-+				break;
-+
-+			err = 0;
-+			sk->sk_state = BT_CONFIG;
-+		}
- 		break;
- 
- 	case BT_DEFER_SETUP:
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6983979..da46d76 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -336,9 +336,13 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_security_req *rp = (void *) skb->data;
- 	struct smp_cmd_pairing cp;
-+	struct hci_conn *hcon = conn->hcon;
- 
- 	BT_DBG("conn %p", conn);
- 
-+	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
++	if (rp->status)
 +		return;
 +
- 	skb_pull(skb, sizeof(*rp));
- 	memset(&cp, 0, sizeof(cp));
- 
-@@ -353,6 +357,20 @@ static void smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	memcpy(&conn->preq[1], &cp, sizeof(cp));
- 
- 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
-+
-+	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
++	hci_req_complete(hdev, HCI_OP_LE_LTK_REPLY, rp->status);
 +}
 +
-+static __u8 seclevel_to_authreq(__u8 level)
++static void hci_cc_le_ltk_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	switch (level) {
-+	case BT_SECURITY_HIGH:
-+		/* For now we don't support bonding */
-+		return SMP_AUTH_MITM;
++	struct hci_rp_le_ltk_neg_reply *rp = (void *) skb->data;
 +
-+	default:
-+		return SMP_AUTH_NONE;
-+	}
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	hci_req_complete(hdev, HCI_OP_LE_LTK_NEG_REPLY, rp->status);
++}
++
+ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ {
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+@@ -1248,6 +1272,11 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
+ 	hci_dev_unlock(hdev);
  }
  
- int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
-@@ -365,21 +383,16 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 	if (IS_ERR(hcon->hdev->tfm))
- 		return 1;
- 
--	switch (sec_level) {
--	case BT_SECURITY_MEDIUM:
--		/* Encrypted, no MITM protection */
--		authreq = HCI_AT_NO_BONDING_MITM;
--		break;
-+	if (test_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend))
-+		return 0;
- 
--	case BT_SECURITY_HIGH:
--		/* Bonding, MITM protection */
--		authreq = HCI_AT_GENERAL_BONDING_MITM;
--		break;
-+	if (sec_level == BT_SECURITY_LOW)
-+		return 1;
- 
--	case BT_SECURITY_LOW:
--	default:
-+	if (hcon->sec_level >= sec_level)
- 		return 1;
--	}
++static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
++{
++	BT_DBG("%s status 0x%x", hdev->name, status);
++}
 +
-+	authreq = seclevel_to_authreq(sec_level);
+ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+@@ -1856,6 +1885,14 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_le_set_scan_enable(hdev, skb);
+ 		break;
  
- 	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
-@@ -400,6 +413,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
++	case HCI_OP_LE_LTK_REPLY:
++		hci_cc_le_ltk_reply(hdev, skb);
++		break;
++
++	case HCI_OP_LE_LTK_NEG_REPLY:
++		hci_cc_le_ltk_neg_reply(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
+@@ -1934,6 +1971,10 @@ static inline void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cs_le_create_conn(hdev, ev->status);
+ 		break;
+ 
++	case HCI_OP_LE_START_ENC:
++		hci_cs_le_start_enc(hdev, ev->status);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
+@@ -2745,6 +2786,28 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static inline void hci_le_ltk_request_evt(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	struct hci_ev_le_ltk_req *ev = (void *) skb->data;
++	struct hci_cp_le_ltk_reply cp;
++	struct hci_conn *conn;
++
++	BT_DBG("%s handle %d", hdev->name, cpu_to_le16(ev->handle));
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = cpu_to_le16(conn->handle);
++	memcpy(cp.ltk, conn->ltk, sizeof(conn->ltk));
++
++	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
++
++	hci_dev_unlock(hdev);
++}
++
+ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
+@@ -2760,6 +2823,10 @@ static inline void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_le_adv_report_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_LE_LTK_REQ:
++		hci_le_ltk_request_evt(hdev, skb);
++		break;
++
+ 	default:
+ 		break;
+ 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 7a9a195..56828db 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -277,13 +277,16 @@ static void smp_cmd_pairing_confirm(struct l2cap_conn *conn,
+ 
+ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct crypto_blkcipher *tfm = conn->hcon->hdev->tfm;
++	struct hci_conn *hcon = conn->hcon;
++	struct crypto_blkcipher *tfm = hcon->hdev->tfm;
+ 	int ret;
+ 	u8 key[16], res[16], random[16], confirm[16], buf[128];
+ 
+ 	swap128(skb->data, random);
+ 	skb_pull(skb, sizeof(random));
+ 
++	memset(hcon->ltk, 0, sizeof(hcon->ltk));
++
+ 	if (conn->hcon->out)
+ 		ret = smp_c1(tfm, conn->tk, random, conn->preq, conn->prsp, 0,
+ 				conn->src, conn->hcon->dst_type, conn->dst,
+@@ -309,11 +312,15 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
  	}
  
-+	hcon->pending_sec_level = sec_level;
-+	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
+ 	if (conn->hcon->out) {
++		__le16 ediv;
++		u8 rand[8];
 +
- 	return 0;
- }
+ 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
++		swap128(key, hcon->ltk);
  
+-		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
+-							sizeof(buf), 0);
+-		BT_DBG("key %s", buf);
++		memset(rand, 0, sizeof(rand));
++		ediv = 0;
++		hci_le_start_enc(hcon, ediv, rand, hcon->ltk);
+ 	} else {
+ 		u8 r[16];
+ 
+@@ -321,6 +328,7 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(r), r);
+ 
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
++		swap128(key, hcon->ltk);
+ 
+ 		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
+ 							sizeof(buf), 0);
 -- 
 1.7.5.4
 
