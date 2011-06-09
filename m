@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 9 Jun 2011 07:09:38 -0400
-Message-ID: <BANLkTi=Q2oufRQOgqmn_EqfV4EVCO2B0EA@mail.gmail.com>
-Subject: How to contribute to Bluetooth profiles still not adopted by BT SIG?
+Date: Thu, 9 Jun 2011 07:00:10 -0400
+Message-ID: <BANLkTikwhgD37HzK4v4NRWFUySf8HRoU7w@mail.gmail.com>
+Subject: D-Bus GATT API for external/proprietary profiles
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -11,27 +11,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I would like to bring another discussion (hoping that someone cares
-about the same issue as well :).
+I have noticed this topic appearing lately on IRC and the mailing
+list, and on private discussions I got with a couple of people.
 
-Recently, the first GATT based profile was finally adopted by BT SIG:
-http://e2e.ti.com/blogs_/b/bluetooth_low_energy_blog/archive/2011/06/07/first-bluetooth-low-energy-profile-adopted.aspx
-. This means we can now finally work on it without fear of discussing
-things which are confidential.
+There seems to have quite some interest in allowing an external
+application to talk with BlueZ, and use only its GATT & GAP stack to
+talk to the device, implementing all the upper level (profile) logic
+on its own. These people are supposing that the "generic" Attribute
+API (documented on doc/attribute-api.txt) is intended for that.
 
-But what about all those other draft profiles? For sure some of you
-are already working on some of them (we included), but looks like we
-cannot discuss publicly or share code... or can we?
+I would like to clarify that this has _never_ been the intention of
+this API, as far as I remember. It was designed/implemented at a time
+when all we knew about LE and GATT was from the Core 4.0 spec drafts
+(at least myself didn't closely monitor draft GATT profile draft specs
+as I do now). It was meant to be used for simple devices, which may
+send information through notifications/indications or have
+characteristics whose values are readable/writable (and some standard
+descriptors). For these, the Attribute API (along with its Watcher
+mechanism) could be used to implement some simple "profile".
 
-What has been the policy on non-GATT profiles? I'm not involved on
-BlueZ development long enough to even have seen how the other non-GATT
-profiles have been implemented.
+To be able to implement a full GATT profile externally (client role),
+we would need to expose the full GATT (or even ATT) stack over D-Bus.
+For instance, have methods for each GATT operation, and signals for
+notifications/indications.
 
-If confidentiality is still necessary, could we have an invite-only
-mailing list for discussing and sharing code (at least for as long as
-the profile is not adopted).
+Is that really what we want? If yes, the Attribute API could have to
+be severely redesigned. It was not (and currently still not is)
+intended for that.
 
-Regards,
+This may bring some issues/questions:
+
+* if an external application issues GATT/ATT operations along with a
+BlueZ implemented profile, could it interfere with or corrupt BlueZ
+internal state?
+* How to implement server roles? It would need a mechanism to register
+attributes externally, and handle notifications/indications.
+
+Comments, specially from BlueZ maintainers (Johan, Marcel?) are very welcome.
+
+Best Regards,
 -- 
 Anderson Lizardo
 Instituto Nokia de Tecnologia - INdT
