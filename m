@@ -1,76 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jun 2011 14:42:11 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Ed Tomlinson <edt@aei.ca>
-Cc: Chase Douglas <chase.douglas@canonical.com>,
-	Greg KH <gregkh@suse.de>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Linux 2.6.39.1
-In-Reply-To: <201106090807.27459.edt@aei.ca>
-Message-ID: <alpine.LNX.2.00.1106091441300.22872@pobox.suse.cz>
-References: <20110603003835.GA20381@kroah.com> <4DEF9705.4070502@canonical.com> <alpine.LNX.2.00.1106081740040.22872@pobox.suse.cz> <201106090807.27459.edt@aei.ca>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1307615061.2589.36.camel@aeonflux>
+References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	<1307615061.2589.36.camel@aeonflux>
+Date: Thu, 9 Jun 2011 21:38:22 +0900
+Message-ID: <BANLkTimz5QrqtXpEnEF8gwiVesGt8-HjLQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add RequestSecurePinCode to agent API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>, linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 9 Jun 2011, Ed Tomlinson wrote:
+Hi Marcel,
 
-> > > > I also played a bit with 1.1 CSR dongle and couldn't find any mask that would
-> > > > be accepted. I think this command can be left out for older than 1.2 devices.
-> > > > 
-> > > > Following patch should do it. Could you verify it. I don't have access to old
-> > > > hw ATM.
-> > > > 
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index 19cd4af..86d1e26 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
-> > > >          * command otherwise */
-> > > >         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
-> > > >  
-> > > > -       /* Events for 1.2 and newer controllers */
-> > > > -       if (hdev->lmp_ver > 1) {
-> > > > -               events[4] |= 0x01; /* Flow Specification Complete */
-> > > > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > > -               events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > > -               events[5] |= 0x10; /* Synchronous Connection Changed */
-> > > > -       }
-> > > > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
-> > > > +        * any event mask for pre 1.2 devices */
-> > > > +       if (hdev->lmp_ver <= 1)
-> > > > +               return;
-> > > > +
-> > > > +       events[4] |= 0x01; /* Flow Specification Complete */
-> > > > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > > +       events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > > +       events[5] |= 0x10; /* Synchronous Connection Changed */
-> > > >  
-> > > >         if (hdev->features[3] & LMP_RSSI_INQ)
-> > > >                 events[4] |= 0x04; /* Inquiry Result with RSSI */
-> > > 
-> > > Where did this patch come from? I don't see it in Linus' tree. If this
-> > > patch is merged, I can test the a new kernel out to see if we should
-> > > back out the commit from Jiri. However, right now my magic trackpad
-> > > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
-> > 
-> > It might be because of different versions of CSR dongles you guys might 
-> > have.
-> > 
-> > I am still a bit lost here -- Ed, do you say that with the patch above, 
-> > and with my patch reverted, your device is working properly?
-> 
-> Yes.  Your understanding is correct.
+On Thu, Jun 9, 2011 at 7:24 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Waldemar,
+>
+>> The method is called if min. 16 bytes pincode is mendatory
+>> to authenticate connection.
+>>
+>> In practice this will be called only with mgmtops switched on. Hciops
+>> don't support secure pin code so far.
+>> ---
+>> =A0doc/agent-api.txt | =A0 11 +++++++++++
+>> =A01 files changed, 11 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+>> index 9ab2063..b1cb354 100644
+>> --- a/doc/agent-api.txt
+>> +++ b/doc/agent-api.txt
+>> @@ -31,6 +31,17 @@ Methods =A0 =A0 =A0 =A0 =A0 =A0void Release()
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.bluez.E=
+rror.Rejected
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0org.bluez.Error.Canceled
+>>
+>> + =A0 =A0 =A0 =A0 =A0 =A0 string RequestSecurePinCode(object device)
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 This method gets called when t=
+he service daemon
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 needs to get the secure passke=
+y for an authentication.
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 The return value should be a s=
+tring of 16 characters
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 length. The string can be alph=
+anumeric.
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.bluez.Err=
+or.Rejected
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0org.bluez.Error.Canceled
+>> +
+>
+> I do not like this since it is really legacy stuff and makes since
+> really complicated. And now we are making big efforts to support this
+> and that is bad. Since Simple Pairing solved this nicely for us.
+>
+> However I need to talk with Johan about this and figure something out.
 
-Thanks for confirming. I'll wait for Chase's confirmation that it works 
-for him as well (so that we could rule out hardware differencies playing 
-a role), and will then push revert to Linus.
+We are getting closer to 4.100, maybe it is time to start doing the
+transition to 5.x, which means we could start thinking on fixing the
+current API without worrying if it breaks or not. How about that?
 
-Thanks,
 
--- 
-Jiri Kosina
-SUSE Labs
+
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
