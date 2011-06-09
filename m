@@ -2,45 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [bluetooth-next v4 09/16] Bluetooth: Remove debug statements
-Date: Thu,  9 Jun 2011 18:50:48 -0300
-Message-Id: <1307656255-8659-10-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [bluetooth-next v4 11/16] Bluetooth: Fix initial security level of LE links
+Date: Thu,  9 Jun 2011 18:50:50 -0300
+Message-Id: <1307656255-8659-12-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1307656255-8659-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that these commands are sent to the controller we can use hcidump
-to verify that the correct values are produced.
+As the default security level (BT_SECURITY_SDP) doesn't make sense for
+LE links, initialize LE links with something that makes sense.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |    6 +-----
- 1 files changed, 1 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_conn.c  |    1 +
+ net/bluetooth/hci_event.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 56828db..6983979 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -280,7 +280,7 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	struct hci_conn *hcon = conn->hcon;
- 	struct crypto_blkcipher *tfm = hcon->hdev->tfm;
- 	int ret;
--	u8 key[16], res[16], random[16], confirm[16], buf[128];
-+	u8 key[16], res[16], random[16], confirm[16];
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1819383..2f5ae53 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -53,6 +53,7 @@ static void hci_le_connect(struct hci_conn *conn)
+ 	conn->state = BT_CONNECT;
+ 	conn->out = 1;
+ 	conn->link_mode |= HCI_LM_MASTER;
++	conn->sec_level = BT_SECURITY_LOW;
  
- 	swap128(skb->data, random);
- 	skb_pull(skb, sizeof(random));
-@@ -329,10 +329,6 @@ static void smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.scan_interval = cpu_to_le16(0x0004);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 166fa11..21d6055 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2753,6 +2753,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
  
- 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
- 		swap128(key, hcon->ltk);
--
--		hex_dump_to_buffer(key, sizeof(key), 16, 1, buf,
--							sizeof(buf), 0);
--		BT_DBG("key %s", buf);
- 	}
- }
+ 	mgmt_connected(hdev->id, &ev->bdaddr);
+ 
++	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->handle = __le16_to_cpu(ev->handle);
+ 	conn->state = BT_CONNECTED;
  
 -- 
 1.7.5.4
