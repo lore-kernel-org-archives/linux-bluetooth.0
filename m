@@ -1,34 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 Jun 2011 23:16:48 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Bluetooth: Limit depth of the HCI TX queue with ERTM
- mode
-Message-ID: <20110609021648.GA2776@joana>
-References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
- <1307143270-2655-3-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307143270-2655-3-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
+References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
+ <BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com> <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
+From: Jaikumar Ganesh <jaikumarg@gmail.com>
+Date: Thu, 9 Jun 2011 11:06:00 +0900
+Message-ID: <BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
+Subject: Re: Generic Attribute API race condition
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Hey Claudio:
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:09 -0700]:
+On Thu, Jun 9, 2011 at 2:44 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi Jaikumar,
+>
+> On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com> wrote:
+>> Hi Claudio:
+>>
+>> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
+>> <claudio.takahasi@openbossa.org> wrote:
+>>> Hi All,
+>>>
+>>> There is a potential race condition in the Generic Attribute API. I'd
+>>> like to collect opinions to avoid re-work later.
+>>>
+>>> How to reproduce:
+>>> - call CreateDevice() for a device which exports a GATT based service:
+>>> CreateDevice will discover all primary services
+>>>  and the Generic API will register the object paths for all found services
+>>> - Call DiscoverCharacteristics() of the primary service followed by
+>>> Characteristic GetProperties(), expected result: read all
+>>> characteristics properties outcome: partial characteristics properties
+>>> may appear.
+>>>
+>>> This problem happens because DiscoverCharacteristics() doesn't wait
+>>> for all characteristic VALUES, it returns after discovering all
+>>> characteristic DECLARATIONS.
+>>> Wait for characteristic values is a problem, attributes may require
+>>> authentication or authorization.
+>>>
+>>> Suggestions are:
+>>> 1. Report discovered characteristic values using PropertyChanged:
+>>> Returning empty properties values (for GetProperties) if the discovery
+>>> is in progress
+>>>
+>>> 2. Block GetProperties() if there is a discovery pending: returning
+>>> after discovery finishes. Timeout can still happen!
+>>>
+>>> 3. Return Busy for GetProperties() if there is a characteristic
+>>> discovery in progress
+>>>
+>>> Comments?
+>>
+>> I don't think we should read characteristic value till the application
+>> asks for it.
+> Are you suggesting to trigger the characteristic value and descriptors
+> read when Characteristic GetProperties() is called and block it?
+> Remember that GATT timeout is 30seconds and the default D-Bus message
+> reply timeout is smaller.
+>
+>> DiscoverCharacteristics() should just return after getting the DECLARATIONS.
+> This is current behaviour.
 
-> In order to provide timely responses to REJ, SREJ, and poll input from
-> the remote device, it helps to reduce the number of ERTM data frames
-> in the HCI TX queue at one time. If a full TX window of data is in the
-> HCI TX queue, any responses to REJ, SREJ, or polls must wait in line
-> behind all previously queued data. This latency leads to disconnects,
-> and will be more severe with extended window sizes.
+Sorry misread your email a bit.
 
+I assume you are referring to the Characteristic Watcher when you are
+talking about the PropertyChanged signal,
+since there is no explicit PropertyChanged signal.
 
-I prefer if we go with a hci_send_acl_prio() implementation. It will have much
-less overhead using a workqueue. As it will be filled only by S-frames with a
-few bytes each I don't think we will have problems. So lets go with this
-approach and see what we can get.
+I don't think we should block GetProperties. But then if we are
+returning null and depending on PropertyChanged signal when we have to
+read the values, clients will need to wait for it after calling
+GetProperties. We need to guarantee that this signal will be sent
+(with a timeout, unless we want the clients to have the timeout at
+their end) even if we are unable to get the value - because of some
+kind of error.
 
-	Gustavo
+In all other places we use PropertyChanged signal when the property
+value actually changes, whereas here we are tying it with the reading
+of the properties.
+
+How about providing separate calls for read and writing values and
+decoupling it from the Properties ?
+
+Thanks
+
+>
+>> A client might not be interested in all the values and thus we should
+>> read them only
+>> when needed by the client. This will save both time and power and
+>> solve this problem too.
+>
+> I don't think it is critical, we are not reading them on all
+> connections/re-connections and the profiles available at the moment
+> don't expose "complex" characteristics.
+
+I am talking about GATT clients written using the attribute DBUS apis.
+Accessory vendors
+want to get started on LE and not wait till all the profiles are
+approved the SIG and developed
+and they want to develop things based on the GATT clients APIs.
+
+>
+> BR,
+> Claudio
+>
+>>
+>> Thanks
+>> Jaikumar
+>>>
+>>> BR,
+>>> Claudio
+>
