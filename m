@@ -1,74 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Subject: [PATCH] Fix return code of hid2hci
-Date: Thu,  9 Jun 2011 23:00:35 +0900
-Message-Id: <1307628035-3619-1-git-send-email-iwamatsu@nigauri.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Message-ID: <70c3591.2c9bb3104890d70c4f20e2f78ab19c38@1oca1host.de>
+From: thilo@cestona.ro
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: AW: AW: Re: Support for 0489:e031 Foxconn / Hon Hai
+Date: Thu, 9 Jun 2011 15:58:40 +0200 (CEST)
+Content-Type: text/plain;
+	charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hid2hci already return 1.
-This set 0 to default retuen code and add error code.
----
- tools/hid2hci.c |   10 ++++++++--
- 1 files changed, 8 insertions(+), 2 deletions(-)
+Hey Marcel,
 
-diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-index 45a3a3d..da278cb 100644
---- a/tools/hid2hci.c
-+++ b/tools/hid2hci.c
-@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
- 	enum mode mode = HCI;
- 	const char *devpath = NULL;
- 	int err = -1;
--	int rc = 1;
-+	int rc = 0;
- 
- 	for (;;) {
- 		int option;
-@@ -288,13 +288,16 @@ int main(int argc, char *argv[])
- 	}
- 
- 	udev = udev_new();
--	if (udev == NULL)
-+	if (udev == NULL) {
-+		rc = errno;
- 		goto exit;
-+	}
- 
- 	snprintf(syspath, sizeof(syspath), "%s/%s", udev_get_sys_path(udev), devpath);
- 	udev_dev = udev_device_new_from_syspath(udev, syspath);
- 	if (udev_dev == NULL) {
- 		fprintf(stderr, "error: could not find '%s'\n", devpath);
-+		rc = errno;
- 		goto exit;
- 	}
- 
-@@ -312,6 +315,7 @@ int main(int argc, char *argv[])
- 			dev = udev_device_get_parent_with_subsystem_devtype(dev, "usb", "usb_device");
- 			if (dev == NULL) {
- 				fprintf(stderr, "error: could not find usb_device for '%s'\n", devpath);
-+				rc = errno;
- 				goto exit;
- 			}
- 		}
-@@ -320,6 +324,7 @@ int main(int argc, char *argv[])
- 		if (handle == NULL) {
- 			fprintf(stderr, "error: unable to handle '%s'\n",
- 				udev_device_get_syspath(dev));
-+			rc = errno;
- 			goto exit;
- 		}
- 		err = usb_switch(handle, mode);
-@@ -331,6 +336,7 @@ int main(int argc, char *argv[])
- 		device = udev_device_get_devnode(udev_dev);
- 		if (device == NULL) {
- 			fprintf(stderr, "error: could not find hiddev device node\n");
-+			rc = errno;
- 			goto exit;
- 		}
- 		err = hid_switch_logitech(device);
--- 
-1.7.5.3
+thx for your help! Now it works.
 
+>>Maybe the antenna is kinda wrongly calibrated, but I can't tell any
+>>details here. That is hardware specific.
+>
+>So you think it's not connected correctly or what means wrongly calibra=
+ted?
+>Perhaps I can give it a try via Virtualbox under windows ... 
+
+As Virtualbox does a direct usb passthrough to the client I could instal=
+l the bluetooth adapter in windows with the original broadcom bluetooth =
+driver.
+Once I opened the settings there and "saved" theses, the adapter finds b=
+luetooth devices nicely under windows AND linux.
+
+Sadly I have no idea what the broadcom driver did to "activate" the adap=
+ter.
+
+Does this make sence? For me not, but it works now.
+
+When someone is interessted in any details, I will answer any question a=
+s good as I can!
+
+Perhaps someone can integrate the vendor id and product id in the kernel=
+ source btusb.c file.
+The broadcom driver names the adapter 'Broadcom BCM20702 Bluetooth USB D=
+evice'.
+vid: 0x0489
+pid: 0xE031
+
+Ciao
+Thilo
