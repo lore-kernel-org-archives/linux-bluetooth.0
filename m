@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: How to contribute to Bluetooth profiles still not adopted by BT SIG?
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <BANLkTi=Q2oufRQOgqmn_EqfV4EVCO2B0EA@mail.gmail.com>
-Date: Thu, 9 Jun 2011 10:20:34 -0300
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <6E4AFC41-A4B8-44FC-B715-D7BAFEB264FA@signove.com>
-References: <BANLkTi=Q2oufRQOgqmn_EqfV4EVCO2B0EA@mail.gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTimM6B7y8ZpmqBCuSRZNjN5jFv=Wvg@mail.gmail.com>
+References: <1307487014-19398-1-git-send-email-vinicius.gomes@openbossa.org>
+	<BANLkTimM6B7y8ZpmqBCuSRZNjN5jFv=Wvg@mail.gmail.com>
+Date: Thu, 9 Jun 2011 09:09:49 -0400
+Message-ID: <BANLkTi=19esZYZLcvrNbC2Sw4fd23w54XA@mail.gmail.com>
+Subject: Re: [bluetooth-next 00/13] SMP Key Exchange Support
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jun 9, 2011, at 8:09 AM, Anderson Lizardo wrote:
+Hi Luiz,
 
-> Hi,
-> 
-> I would like to bring another discussion (hoping that someone cares
-> about the same issue as well :).
-> 
-> Recently, the first GATT based profile was finally adopted by BT SIG:
-> http://e2e.ti.com/blogs_/b/bluetooth_low_energy_blog/archive/2011/06/07/first-bluetooth-low-energy-profile-adopted.aspx
-> . This means we can now finally work on it without fear of discussing
-> things which are confidential.
-> 
-> But what about all those other draft profiles? For sure some of you
-> are already working on some of them (we included), but looks like we
-> cannot discuss publicly or share code... or can we?
-> 
-> What has been the policy on non-GATT profiles? I'm not involved on
-> BlueZ development long enough to even have seen how the other non-GATT
-> profiles have been implemented.
-> 
-> If confidentiality is still necessary, could we have an invite-only
-> mailing list for discussing and sharing code (at least for as long as
-> the profile is not adopted).
+On Thu, Jun 9, 2011 at 9:02 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> This patches seems to be working fine, tried with pts and some other
+> stacks without problem, the only inconvenients for testing are the
+> hardcoded io capabilitity, hardcoded distribution keys (it seems we
+> distribute only LTK) and not being able to remove keys other than
+> remove the adapter (didn't try reset).
 
-At first sight, some list with people having account in SIG would do.
+About the "not being able to remove keys" part, there is some proposal
+(original code is from Johan) to a "mgmt tool" that could be used to
+remove keys. Also note that if the remote reports pairing error due to
+"missing key or PIN", the bluez side will forget the keys and issue a
+fresh pairing.
 
-For example, "that" page that is the primary source of most practical
-information (UUIDs etc.) you need to implement a GATT profile.
-Current policy is allow access only for people with a SIG account.
-Once you are logged in, it shows infos for adopted as well as non-adopted
-profiles.
+Not sure what you meant about "hardcoded distribution keys". IIRC I've
+seen at least master and identity information distributed as well (but
+Vinicius can definitely confirm or deny that).
 
-The remaining problem is the profiles that didn't even reach the stage of
-appearing in the Web page. Information about that ones is
-"trapped" inside each working group. As far as I understand, it can't
-be shared even with SIG members that are not part of the same WG.
+HTH,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
