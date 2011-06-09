@@ -1,49 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jun 2011 16:36:38 -0300
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 9 Jun 2011 16:18:33 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>,
 	linux-bluetooth@vger.kernel.org,
-	Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: Re: [bluetooth-next v3 06/16] Bluetooth: Add SMP confirmation structs
-Message-ID: <20110609193638.GE2533@joana>
-References: <1307483205-1518-1-git-send-email-vinicius.gomes@openbossa.org>
- <1307483205-1518-7-git-send-email-vinicius.gomes@openbossa.org>
- <20110608184649.GC13036@joana>
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/2] Add RequestSecurePinCode to agent API
+Message-ID: <20110609191833.GD2533@joana>
+References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1307615061.2589.36.camel@aeonflux>
+ <BANLkTimz5QrqtXpEnEF8gwiVesGt8-HjLQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20110608184649.GC13036@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTimz5QrqtXpEnEF8gwiVesGt8-HjLQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-08 15:46:49 -0300]:
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-06-09 21:38:22 +0900]:
 
-> * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-06-07 18:46:35 -0300]:
-> 
-> > From: Anderson Briglia <anderson.briglia@openbossa.org>
-> > 
-> > This patch adds initial support for verifying the confirmation value
-> > that the remote side has sent.
-> > 
-> > Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
-> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    5 +++++
-> >  net/bluetooth/smp.c           |   17 +++++++++++++++++
-> >  2 files changed, 22 insertions(+), 0 deletions(-)
-> 
-> Patch up to 6/16 are applied. Thanks.
+> Hi Marcel,
+>=20
+> On Thu, Jun 9, 2011 at 7:24 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> > Hi Waldemar,
+> >
+> >> The method is called if min. 16 bytes pincode is mendatory
+> >> to authenticate connection.
+> >>
+> >> In practice this will be called only with mgmtops switched on. Hciops
+> >> don't support secure pin code so far.
+> >> ---
+> >> =A0doc/agent-api.txt | =A0 11 +++++++++++
+> >> =A01 files changed, 11 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+> >> index 9ab2063..b1cb354 100644
+> >> --- a/doc/agent-api.txt
+> >> +++ b/doc/agent-api.txt
+> >> @@ -31,6 +31,17 @@ Methods =A0 =A0 =A0 =A0 =A0 =A0void Release()
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.bluez=
+=2EError.Rejected
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0org.bluez.Error.Canceled
+> >>
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 string RequestSecurePinCode(object device)
+> >> +
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 This method gets called when=
+ the service daemon
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 needs to get the secure pass=
+key for an authentication.
+> >> +
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 The return value should be a=
+ string of 16 characters
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 length. The string can be al=
+phanumeric.
+> >> +
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.bluez.E=
+rror.Rejected
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0org.bluez.Error.Canceled
+> >> +
+> >
+> > I do not like this since it is really legacy stuff and makes since
+> > really complicated. And now we are making big efforts to support this
+> > and that is bad. Since Simple Pairing solved this nicely for us.
+> >
+> > However I need to talk with Johan about this and figure something out.
+>=20
+> We are getting closer to 4.100, maybe it is time to start doing the
+> transition to 5.x, which means we could start thinking on fixing the
+> current API without worrying if it breaks or not. How about that?
 
-I dropped all six patches:
+I'm with Luiz here. Unless we want the the crazy idea of have a development
+branch we should start breaking the API someday. How about now?
 
-  CC [M]  net/bluetooth/l2cap_sock.o
-  CC [M]  net/bluetooth/smp.o
-  CC [M]  net/bluetooth/sco.o
-net/bluetooth/smp.c:80:12: warning: ‘smp_c1’ defined but not used [-Wunused-function]
-net/bluetooth/smp.c:122:12: warning: ‘smp_s1’ defined but not used [-Wunused-function]
-net/bluetooth/smp.c:138:12: warning: ‘smp_rand’ defined but not used [-Wunused-function]
-  CC [M]  net/bluetooth/bnep/core.o
-  CC [M]  net/bluetooth/bnep/sock.o
-
-I pick them again with the whole patchset next time to avoid warnings like these.
+And if we are really going for it a roadmap made public somewhere would be
+good. :)
 
 	Gustavo
