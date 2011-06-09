@@ -1,40 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 9 Jun 2011 16:09:27 +0200
-Message-ID: <BANLkTimO9hqs-_4gyiY3YBOutBd8yhsuXQ@mail.gmail.com>
-Subject: Health Thermomether Profile
-From: Santiago Carot <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCHv3 2/3] Re-add manager_get_default_adapter()
+From: Bastien Nocera <hadess@hadess.net>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
+	Jim Paris <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>,
+	"Pascal A . Brisset" <pascal44973@pabr.org>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
+	Mikko Virkkila <virkkila@kapsi.fi>,
+	Simon Wood <simon@mungewell.org>
+Date: Thu, 09 Jun 2011 15:02:32 +0100
+In-Reply-To: <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
+References: <1307538557-9287-1-git-send-email-ospite@studenti.unina.it>
+	 <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1307628154.2669.212.camel@novo.hadess.net>
+Mime-Version: 1.0
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Wed, 2011-06-08 at 15:09 +0200, Antonio Ospite wrote:
+> From: Bastien Nocera <hadess@hadess.net>
 
-I was thinking in to get my hands on this stuff. First of all, I would
-like to know if there are people working in this profile to join and
-callaborate with them in the development tasks (if it would be
-possible), if not, I would like to start with the development of this
-profile as soon as we agree a proper desgin, API and so with all of
-you.
+Sent out a new patch for that which allows the same functionality, but
+returns an ID instead (you can then get the btd_adapter through existing
+manager functions).
 
-Next I'm going to explain some light ideas that round my head:
-
-At first I was thinking to attack the attribute D-Bus API due that
-health thermomether profile is placed over GATT, but I don't see how
-it fits into BlueZ architecture because it will force us to use the
-attribute D-Bus API to provide another Thermomether API through D-Bus.
-It seems me quite ugly.
-
-On the other hand, lastest Anderson's e-mails about GATT make me think
-other designs avoiding attribute D-Bus API by using GATT direclty to
-implement the Thermomether client profile. In this way we can make a
-bluetooth plugin wich exposes the client part through D-Bus API to
-manage Thermomether devices by hiding GATT profile to applications
-that only want to operate over this kind of devices. I think that it's
-a pretty design wich fits better in BlueZ.
-
-These are only rough ideas so I really appreciate comments and
-suggestion from your side before starting.
-
-Regards.
