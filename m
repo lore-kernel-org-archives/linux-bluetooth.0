@@ -1,110 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Steven" <yongli@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <padovan@profusion.mobi>, Bluettooth Linux
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluetooth USB device keeps same PID/VID after downloading the
- patch and radio table
-Date: Thu, 9 Jun 2011 10:24:25 +0000
-Message-ID: <73DDB75979F36A42B75F3E2B6EB2943401012D24@nasanexd02c.na.qualcomm.com>
-References: <6AAC4214B9104E409FF4885ACB62A96101A78ADA81@SHEXMB-01.global.atheros.com>
-	 <6AAC4214B9104E409FF4885ACB62A96101A78ADABF@SHEXMB-01.global.atheros.com>
-	 <73DDB75979F36A42B75F3E2B6EB29434010129F0@nasanexd02c.na.qualcomm.com>
- <1307614687.2589.31.camel@aeonflux>
-In-Reply-To: <1307614687.2589.31.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH 1/2] Add RequestSecurePinCode to agent API
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 09 Jun 2011 12:24:19 +0200
+In-Reply-To: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1307615061.2589.36.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQpUaGFuayB5b3UgdmVyeSBtdWNoLCAgTWFyY2VsICENCg0KVGhlbiBJJ2xsIGRpc2N1c3Mgd2l0
-aCBteSBtYW5hZ2VycyBhZ2FpbiB0byBkZXRlcm1pbmUgb3VyIHRoZSBmaW5hbCBzb2x1dGlvbi4g
-DQoNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXJjZWwgSG9sdG1h
-bm4gW21haWx0bzptYXJjZWxAaG9sdG1hbm4ub3JnXQ0KPiBTZW50OiBUaHVyc2RheSwgSnVuZSAw
-OSwgMjAxMSA2OjE4IFBNDQo+IFRvOiBMaSwgU3RldmVuDQo+IENjOiBHdXN0YXZvIEYuIFBhZG92
-YW47IEJsdWV0dG9vdGggTGludXgNCj4gU3ViamVjdDogUmU6IEJsdWV0b290aCBVU0IgZGV2aWNl
-IGtlZXBzIHNhbWUgUElEL1ZJRCBhZnRlciBkb3dubG9hZGluZw0KPiB0aGUgcGF0Y2ggYW5kIHJh
-ZGlvIHRhYmxlDQo+IA0KPiBIaSBTdGV2ZW4sDQo+IA0KPiA+ID4gSSBkZWxldGVkIHlvdXIgbGFz
-dCBlbWFpbCBieSBhY2NpZGVudC4gQ2FuIHlvdSByZS1zZW5kIGl0IHBsZWFzZS4NCj4gPg0KPiA+
-IEFzIHlvdSBtYXkgbG9zZSB0aGUgbWFpbC4gSSdkIGxpa2UgdG8gaW50cm9kdWNlIG91ciBjb25k
-aXRpb24gYWdhaW4uDQo+ID4NCj4gPiBBcyB0byB0aGUgQXRoZXJvcyAzMDExIGNoaXAuICB5ZXMs
-IGl0IHVzZXMgREZVIG1vZGUgdG8gZG93bmxvYWQgdGhlDQo+IGZpcm13YXJlLg0KPiA+IEluc3Rl
-YWQgb2YgZG93bmxvYWRpbmcgdGhlIGZpcm13YXJlLCB0aGUgbmV3IEF0aGVyb3MgMzAxMiBjaGlw
-IG5lZWRzIHRvDQo+IGRvd25sb2FkIHBhdGNoIGFuZCByYWRpbyB0YWJsZS4NCj4gPiBUaGUgcGF0
-Y2ggYW5kIHJhZGlvIHRhYmxlIGFyZSB1c2VkIHRvIGZpeCB0aG9zZSBidWdzIGZvdW5kIGFmdGVy
-IGNoaXANCj4gc2hpcHBpbmcgb3IgZm9yIHNvbWUgb3RoZXIgc3BlY2lmaWMgdXNlLg0KPiA+IEFu
-ZCAgdGhlIEF0aGVyb3MgMzAxMiBjaGlwIGl0c2VsZiBpcyBhIG5hdGl2ZSBibHVldG9vdGggZGV2
-aWNlLiBFdmVuIHdpdGhvdXQNCj4gZG93bmxvYWRpbmcgcGF0Y2ggYW5kIHJhZGlvIHRhYmxlLCBp
-dCBjYW4gd29yay4NCj4gPg0KPiA+IFNvIHdpdGggdGhpcyBkZXNpZ24sIHRoZSBBdGhlcm9zIDMw
-MTIgY2hpcCBhbHdheXMga2VlcHMgc2FtZSBQSUQvVklEIGV2ZW4NCj4gYWZ0ZXIgZG93bmxvYWRp
-bmcgdGhlIHBhdGNoIGFuZCByYWRpbw0KPiA+IHRhYmxlLiBEdWUgdG8gdGhpcyBsaW1pdGF0aW9u
-LCB3ZSBoYXZlIHByb2JsZW1zIHdpdGggY3VycmVudCBidHVzYi5jDQo+IGltcGxlbWVudGF0aW9u
-Lg0KPiA+DQo+ID4gV2UgaGF2ZSB0byBoYXZlIGEgd29yayBhcm91bmQgd2F5LCAgdGhpcyBpcyB0
-byB1c2UgdGhlIGJjZERldmljZSAoRGV2aWNlDQo+IFJlbGVhc2UgTnVtYmVyKSB0byBqdWRnZQ0K
-PiA+IHdoZXRoZXIgdGhlIEF0aGVyb3MgMzAxMiBjaGlwIGhhcyBiZWVuIHBhdGNoZWQgb3Igbm90
-Lg0KPiA+IFRoZSBpbml0IGJjZERldmljZSB2YWx1ZSBvZiB0aGlzIGNoaXAgaXMgMHgwMDAxLCAg
-d2UgY2FuIGluY3JlYXNlIHRoaXMgdmFsdWUNCj4gYWZ0ZXIgcGF0Y2ggYW5kIHJhZGlvIHRhYmxl
-IGRvd25sb2FkaW5nLg0KPiA+DQo+ID4gRG8geW91IHRoaW5rIGl0IGlzIHBvc3NpYmxlID8NCj4g
-DQo+IG5vdyBJIHVuZGVyc3RhbmQgeW91ciBwcm9ibGVtLiBTbyBpbiB0aGVvcnkgeW91IGhhdmUg
-YSBmdWxsIEJsdWV0b290aA0KPiBkZXZpY2Ugd29ya2luZyBhY2NvcmRpbmcgdG8gdGhlIEhDSSBz
-dGFuZGFyZC4gQW5kIHlvdSBhcmUgdXNpbmcgdmVuZG9yDQo+IEhDSSBjb21tYW5kcyB0byBwYXRj
-aCB0aGUgZmlybXdhcmUuDQo+IA0KPiBTbyB0aGlzIGlzIHNpbWlsYXIgdG8gd2hhdCB3ZSBhcmUg
-ZG9pbmcgd2l0aCBhIGxvdCBvZiBVQVJUIGJhc2VkIGRldmljZXMNCj4gd2hlbiB1c2luZyBoY2lh
-dHRhY2guDQo+IA0KPiBGb3Igbm93LCBJIGFtIGZpbmUgdXNpbmcgYmNkRGV2aWNlIG51bWJlci4g
-SW4gdGhlIGVuZCB3ZSBoYXZlIHRvIGNyZWF0ZQ0KPiBhIHByZS1zdGFnZSBmb3IgbG9hZGluZyBm
-dXJ0aGVyIGluc3RydWN0aW9ucyBvciBwYXRjaGVzIGludG8gdGhlIGRldmljZS4NCj4gV2UgaGFk
-IHBsYW5zIGZvciB0aGlzIHByZS1zdGFnZSBhbHJlYWR5LCBidXQgbmV2ZXIgaW1wbGVtZW50ZWQg
-dGhlbS4NCj4gDQo+ID4gRnJvbSAyZGMwZTcwM2VkMzkyZjQxZDkxOTg0YjBjZmQxZGE1NmY2ZjE3
-M2NiIE1vbiBTZXAgMTcgMDA6MDA6MDANCj4gMjAwMQ0KPiA+IEZyb206IFN0ZXZlbi5MaSA8U3Rl
-dmVuLkxpQEF0aGVyb3MuY29tPg0KPiA+IERhdGU6IFRodSwgMjYgTWF5IDIwMTEgMTc6MDY6NTIg
-KzA4MDANCj4gPiBTdWJqZWN0OiBbUEFUQ0hdIFVzZSBiY2REZXZpY2UoRGV2aWNlIFJlbGVhc2Ug
-TnVtYmVyKSB0byBleGNsdWRlIHRoZQ0KPiBhdGgzayBhbmQgYnR1c2IgZHJpdmVyLg0KPiA+DQo+
-ID4gLS0tDQo+ID4gIGRyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMgfCAgICA1ICsrKystDQo+ID4g
-IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAgICA5ICsrKysrKysrLQ0KPiA+ICAyIGZpbGVz
-IGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZm
-IC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2F0
-aDNrLmMNCj4gPiBpbmRleCA2YmFjZWYzLi5jOTlmYjA4IDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZl
-cnMvYmx1ZXRvb3RoL2F0aDNrLmMNCj4gPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5j
-DQo+ID4gQEAgLTM3NSw2ICszNzUsOSBAQCBzdGF0aWMgaW50IGF0aDNrX3Byb2JlKHN0cnVjdCB1
-c2JfaW50ZXJmYWNlICppbnRmLA0KPiA+DQo+ID4gIAkvKiBsb2FkIHBhdGNoIGFuZCBzeXNjb25m
-aWcgZmlsZXMgZm9yIEFSMzAxMiAqLw0KPiA+ICAJaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNC
-X0FUSDMwMTIpIHsNCj4gPiArCQlpZihsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJjZERl
-dmljZSA+IDB4MDAwMSkpDQo+IA0KPiBUaGlzIG5lZWRzIHRvIGJlIGxpa2UgdGhpczoNCj4gDQo+
-IAkiaWYgKGxlMTZfdG9fY3B1KHVkZXYtPmRlc2NyaXB0b3IuYmNkRGV2aWNlKSA+IDB4MDAwMSki
-DQo+IA0KPiBPdGhlcndpc2UgeW91IGVuZGlhbiBzd2FwcGluZyBpcyBub3QgcmVhbGx5IGRvaW5n
-IHdoYXQgaXQgaXMgc3VwcG9zZSB0bw0KPiBiZSBkb2luZy4NCj4gDQo+ID4gKwkJCXJldHVybiAt
-RU5PREVWOw0KPiA+ICsNCj4gPiAgCQlyZXQgPSBhdGgza19sb2FkX3BhdGNoKHVkZXYpOw0KPiA+
-ICAJCWlmIChyZXQgPCAwKSB7DQo+ID4gIAkJCUJUX0VSUigiTG9hZGluZyBwYXRjaCBmaWxlIGZh
-aWxlZCIpOw0KPiA+IEBAIC0zOTAsNyArMzkzLDcgQEAgc3RhdGljIGludCBhdGgza19wcm9iZShz
-dHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwNCj4gPiAgCQkJQlRfRVJSKCJTZXQgbm9ybWFsIG1v
-ZGUgZmFpbGVkIik7DQo+ID4gIAkJCXJldHVybiByZXQ7DQo+ID4gIAkJfQ0KPiA+IC0JCWF0aDNr
-X3N3aXRjaF9waWQodWRldik7DQo+ID4gKwkJLyogYXRoM2tfc3dpdGNoX3BpZCh1ZGV2KTsgKi8N
-Cj4gDQo+IFRoaXMgaXMgaG9wZWZ1bGx5IGp1c3QgYSBjaGFuZ2UgZm9yIHRlc3RpbmcuIE90aGVy
-d2lzZSB5b3UgYnJlYWsgdGhlDQo+IG90aGVyIGRyaXZlcnMgdGhhdCByZWFsbHkgZG8gbmVlZCB0
-aGUgUElEIHN3aXRjaGluZy4gU28gcGxlYXNlIGZpeCB0aGlzLg0KPiANCj4gPiAgCQlyZXR1cm4g
-MDsNCj4gPiAgCX0NCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVz
-Yi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IGluZGV4IGMyZGU4OTUuLjliNjdi
-MjIgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+ICsrKyBi
-L2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiBAQCAtNTQsNiArNTQsNyBAQCBzdGF0aWMg
-c3RydWN0IHVzYl9kcml2ZXIgYnR1c2JfZHJpdmVyOw0KPiA+ICAjZGVmaW5lIEJUVVNCX0JDTTky
-MDM1CQkweDEwDQo+ID4gICNkZWZpbmUgQlRVU0JfQlJPS0VOX0lTT0MJMHgyMA0KPiA+ICAjZGVm
-aW5lIEJUVVNCX1dST05HX1NDT19NVFUJMHg0MA0KPiA+ICsjZGVmaW5lIEJUVVNCX0FUSDMwMTIJ
-CTB4ODANCj4gPg0KPiA+ICBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYnR1c2JfdGFibGVb
-XSA9IHsNCj4gPiAgCS8qIEdlbmVyaWMgQmx1ZXRvb3RoIFVTQiBkZXZpY2UgKi8NCj4gPiBAQCAt
-MTEwLDcgKzExMSw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBibGFja2xpc3RfdGFi
-bGVbXSA9IHsNCj4gPiAgCXsgVVNCX0RFVklDRSgweDAzZjAsIDB4MzExZCksIC5kcml2ZXJfaW5m
-byA9IEJUVVNCX0lHTk9SRSB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9zIDMwMTIgd2l0aCBzZmxh
-c2ggZmlybXdhcmUgKi8NCj4gPiAtCXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2
-ZXJfaW5mbyA9IEJUVVNCX0lHTk9SRSB9LA0KPiA+ICsJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgz
-MDA0KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfQVRIMzAxMiB9LA0KPiA+DQo+ID4gIAkvKiBBdGhl
-cm9zIEFSNUJCVTEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQo+ID4gIAl7IFVTQl9ERVZJQ0Uo
-MHgwNDg5LCAweGUwMmMpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwNCj4gPiBAQCAt
-OTE0LDYgKzkxNSwxMiBAQCBzdGF0aWMgaW50IGJ0dXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJm
-YWNlICppbnRmLA0KPiA+ICAJaWYgKGlnbm9yZV9zbmlmZmVyICYmIGlkLT5kcml2ZXJfaW5mbyAm
-IEJUVVNCX1NOSUZGRVIpDQo+ID4gIAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4NCj4gPiArCWlmIChp
-ZC0+ZHJpdmVyX2luZm8gJiBCVFVTQl9BVEgzMDEyKSB7DQo+ID4gKwkJc3RydWN0IHVzYl9kZXZp
-Y2UgKnVkZXYgPSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KPiA+ICsJCWlmKGxlMTZfdG9f
-Y3B1KHVkZXYtPmRlc2NyaXB0b3IuYmNkRGV2aWNlIDw9IDB4MDAwMSkpDQo+IA0KPiBTZWUgY29t
-bWVudCBhYm92ZS4NCj4gDQo+ID4gKwkJCXJldHVybiAtRU5PREVWOw0KPiA+ICsJfQ0KPiA+ICsN
-Cj4gPiAgCWRhdGEgPSBremFsbG9jKHNpemVvZigqZGF0YSksIEdGUF9LRVJORUwpOw0KPiA+ICAJ
-aWYgKCFkYXRhKQ0KPiA+ICAJCXJldHVybiAtRU5PTUVNOw0KPiANCj4gUmVnYXJkcw0KPiANCj4g
-TWFyY2VsDQo+IA0KDQo=
+Hi Waldemar,
+
+> The method is called if min. 16 bytes pincode is mendatory
+> to authenticate connection.
+> 
+> In practice this will be called only with mgmtops switched on. Hciops
+> don't support secure pin code so far.
+> ---
+>  doc/agent-api.txt |   11 +++++++++++
+>  1 files changed, 11 insertions(+), 0 deletions(-)
+> 
+> diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+> index 9ab2063..b1cb354 100644
+> --- a/doc/agent-api.txt
+> +++ b/doc/agent-api.txt
+> @@ -31,6 +31,17 @@ Methods		void Release()
+>  			Possible errors: org.bluez.Error.Rejected
+>  			                 org.bluez.Error.Canceled
+>  
+> +		string RequestSecurePinCode(object device)
+> +
+> +			This method gets called when the service daemon
+> +			needs to get the secure passkey for an authentication.
+> +
+> +			The return value should be a string of 16 characters
+> +			length. The string can be alphanumeric.
+> +
+> +			Possible errors: org.bluez.Error.Rejected
+> +			                 org.bluez.Error.Canceled
+> +
+
+I do not like this since it is really legacy stuff and makes since
+really complicated. And now we are making big efforts to support this
+and that is bad. Since Simple Pairing solved this nicely for us.
+
+However I need to talk with Johan about this and figure something out.
+
+Regards
+
+Marcel
+
+
