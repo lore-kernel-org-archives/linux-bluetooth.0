@@ -1,97 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 9 Jun 2011 16:36:29 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/4] Bluetooth: Limit depth of the HCI TX queue with ERTM
+ mode
+In-Reply-To: <20110609021648.GA2776@joana>
+Message-ID: <alpine.DEB.2.02.1106091610040.18748@mathewm-linux>
+References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org> <1307143270-2655-3-git-send-email-mathewm@codeaurora.org> <20110609021648.GA2776@joana>
 MIME-Version: 1.0
-In-Reply-To: <20110609191833.GD2533@joana>
-References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	<1307615061.2589.36.camel@aeonflux>
-	<BANLkTimz5QrqtXpEnEF8gwiVesGt8-HjLQ@mail.gmail.com>
-	<20110609191833.GD2533@joana>
-Date: Fri, 10 Jun 2011 09:54:39 +0900
-Message-ID: <BANLkTimPSt9JQtahJT_LbNiw22HH16Twyw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Add RequestSecurePinCode to agent API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>, linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Fri, Jun 10, 2011 at 4:18 AM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-06-09 21:38:22 +090=
-0]:
->
->> Hi Marcel,
->>
->> On Thu, Jun 9, 2011 at 7:24 PM, Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
->> > Hi Waldemar,
->> >
->> >> The method is called if min. 16 bytes pincode is mendatory
->> >> to authenticate connection.
->> >>
->> >> In practice this will be called only with mgmtops switched on. Hciops
->> >> don't support secure pin code so far.
->> >> ---
->> >> =A0doc/agent-api.txt | =A0 11 +++++++++++
->> >> =A01 files changed, 11 insertions(+), 0 deletions(-)
->> >>
->> >> diff --git a/doc/agent-api.txt b/doc/agent-api.txt
->> >> index 9ab2063..b1cb354 100644
->> >> --- a/doc/agent-api.txt
->> >> +++ b/doc/agent-api.txt
->> >> @@ -31,6 +31,17 @@ Methods =A0 =A0 =A0 =A0 =A0 =A0void Release()
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.blue=
-z.Error.Rejected
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0org.bluez.Error.Canceled
->> >>
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 string RequestSecurePinCode(object device)
->> >> +
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 This method gets called whe=
-n the service daemon
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 needs to get the secure pas=
-skey for an authentication.
->> >> +
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 The return value should be =
-a string of 16 characters
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 length. The string can be a=
-lphanumeric.
->> >> +
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Possible errors: org.bluez.=
-Error.Rejected
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0org.bluez.Error.Canceled
->> >> +
->> >
->> > I do not like this since it is really legacy stuff and makes since
->> > really complicated. And now we are making big efforts to support this
->> > and that is bad. Since Simple Pairing solved this nicely for us.
->> >
->> > However I need to talk with Johan about this and figure something out.
->>
->> We are getting closer to 4.100, maybe it is time to start doing the
->> transition to 5.x, which means we could start thinking on fixing the
->> current API without worrying if it breaks or not. How about that?
->
-> I'm with Luiz here. Unless we want the the crazy idea of have a developme=
-nt
-> branch we should start breaking the API someday. How about now?
->
-> And if we are really going for it a roadmap made public somewhere would b=
-e
-> good. :)
+Gustavo,
 
-Actually we can do it without breaking 4.x API like we did with 3.x
-where both API lives side by side until we decide it is stable enough,
-to do that we can have the new API having a different interface prefix
-e.g. org.bluez5 or just have a different connection with same
-interfaces names, the 1 option is less complicated for bluetoothd but
-requires more work on the client side while the second is more
-complicated for the daemon while the client just need to change the
-bus id.
+On Wed, 8 Jun 2011, Gustavo F. Padovan wrote:
 
---=20
-Luiz Augusto von Dentz
-Computer Engineer
+> Hi Mat,
+>
+> * Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:09 -0700]:
+>
+>> In order to provide timely responses to REJ, SREJ, and poll input from
+>> the remote device, it helps to reduce the number of ERTM data frames
+>> in the HCI TX queue at one time. If a full TX window of data is in the
+>> HCI TX queue, any responses to REJ, SREJ, or polls must wait in line
+>> behind all previously queued data. This latency leads to disconnects,
+>> and will be more severe with extended window sizes.
+>
+> I prefer if we go with a hci_send_acl_prio() implementation. It will have much
+> less overhead using a workqueue. As it will be filled only by S-frames with a
+> few bytes each I don't think we will have problems. So lets go with this
+> approach and see what we can get.
+
+I considered that approach too, but it breaks some major assumptions 
+and I don't think it complies with the ERTM spec.  I-frames contain 
+reqseq fields and a final bit, so if S-frames and I-frames are 
+delivered out-of-sequence, you can easily end up with a confusing 
+series of reqseq values at the receiver.
+
+Suppose the HCI tx queue is full of I-frames, and the oldest I-frame 
+has reqseq set to 1.  Since that I-frame has been queued, other 
+incoming I-frames have been processed, so the last recieved I-frame 
+had txseq 20.  The remote device sends a poll, and we reply with an RR 
+(reqseq 21) using the priority queue.  HCI sends that RR first, then 
+an I-frame from the normal queue with reqseq 1.  Now the remote side 
+thinks it missed all of the frames from 21 to 1 (having wrapped 
+around).  The remote side then has to send REJ or SREJ frames, even 
+though nothing is actually missing.
+
+
+So, I think we have two options:
+
+  * Use the skb_destructor mechanism to pull data for ERTM (which is 
+what my patch does), and leave queuing for other modes alone
+  * Rearchitect HCI & L2CAP so that data is pulled from the L2CAP layer 
+as num_comp_pkts events are received
+
+
+I realize there is increased overhead to make the callbacks to get 
+data out of the ERTM tx queue, but the skb destructor is very 
+lightweight (since it uses an atomic_t counter).  The overhead is 
+tunable using L2CAP_MAX_ERTM_QUEUED and L2CAP_MIN_ERTM_QUEUED to 
+control how often the callback to l2cap_ertm_send() is actually made. 
+With the current queuing behavior, things get unmanageable on AMP with 
+extra latency from larger tx windows and much shorter timeouts.
+
+
+Regards,
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
