@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Jun 2011 13:53:03 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-2.6 2011-06-08
-Message-ID: <20110610175302.GD2665@tuxdriver.com>
-References: <20110608194658.GD13036@joana>
- <20110609175933.GA16802@tuxdriver.com>
- <20110609183430.GA2533@joana>
+Date: Fri, 10 Jun 2011 14:57:57 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Pairing fails on kernel 2.6.39 with "Command Disallowed" error,
+ while on 2.6.26 it works fine
+Message-ID: <20110610175757.GB2663@joana>
+References: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110609183430.GA2533@joana>
+In-Reply-To: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jun 09, 2011 at 03:34:31PM -0300, Gustavo F. Padovan wrote:
-> * John W. Linville <linville@tuxdriver.com> [2011-06-09 13:59:34 -0400]:
+Hi Takeshi,
+
+* Takeshi Hamasaki <hmatrjp@users.sourceforge.jp> [2011-06-10 20:41:10 +0900]:
+
+> Hello list,
 > 
-> > On Wed, Jun 08, 2011 at 04:46:58PM -0300, Gustavo F. Padovan wrote:
-
-> > >       Bluetooth: Kill set but unused variable 'cmd' in cmtp_recv_capimsg()
-> > 
-> > Well, the patch submitter sounds familiar.  :-)  But killing an unused
-> > variable isn't a bug fix.  It doesn't do any damage, but I suspect that
-> > Dave expects to be held to the same standards as everyone else.
-> > 
-> > Can you drop that one (and reapply it for 3.1)?  Sorry for the trouble...
+> I'm trying to pair Bluetooth USB dongle and Bluetooth headset
+> and facing a trouble.
+> Detail of devices are described below.
 > 
-> Sorry for that, I tough it was not that bad fix this for 3.0. New pull request
-> follows. Thanks a lot!
+> The problems happens on kernel 2.6.39,
+> while on kernel 2.6.26 it works fine.
 
-> Stephen Boyd (1):
->       Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y warning
+What about 2.6.38? 2.6.26 is quite old to compare.
 
-Sorry, I missed this one too -- can you redirect it for 3.1 as well?
-
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+	Gustavo
