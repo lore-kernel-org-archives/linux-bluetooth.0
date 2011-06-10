@@ -3,8 +3,10 @@ From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Rafal Michalski <michalski.raf@gmail.com>
 Subject: [PATCH 2/3] Fix invalid write to memory issue in media module
-Date: Fri, 10 Jun 2011 15:33:24 +0200
-Message-Id: <1307712804-1892-1-git-send-email-michalski.raf@gmail.com>
+Date: Fri, 10 Jun 2011 15:31:45 +0200
+Message-Id: <1307712706-1849-2-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1307712706-1849-1-git-send-email-michalski.raf@gmail.com>
+References: <1307712706-1849-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
