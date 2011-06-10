@@ -1,45 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
+MIME-Version: 1.0
+Date: Fri, 10 Jun 2011 22:24:23 +1000
+Message-ID: <BANLkTi=UhEzuwebu-HE2Zvjtohc43sP42Q@mail.gmail.com>
+Subject: bluez compilation glib path
+From: Anthony Linnett <anthony.linnett@linit.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH 1/3] Fix invalid write to memory issue in a2dp module
-Date: Fri, 10 Jun 2011 15:31:44 +0200
-Message-Id: <1307712706-1849-1-git-send-email-michalski.raf@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Under some circumstances (such as terminating bluetoothd during music is
-streamed) sep object may be destroyed (memory for sep object is internally
-freed, directly by "a2dp_unregister_sep") after invoking
-"media_endpoint_clear_configuration" (in "stream_state_changed") It leads
-to invalid write issue (reported by valgrind) after assigning
-"sep->stream = NULL", since "sep" is "alias" pointer to sep object which
-is already out of date (memory for sep object has been already freed).
+hi, would love some beginners help if someone has the time.
 
-This patch prevents from this issue by ensuring that assignment
-"sep->stream = NULL" would be executed when sep object certainly exists.
----
- audio/a2dp.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+i am on centos 5.6 PIAF purple distro. i am attempting to compile
+bluez as the native package is missing passkey-agent.
 
-diff --git a/audio/a2dp.c b/audio/a2dp.c
-index b4ec274..f3e7af3 100644
---- a/audio/a2dp.c
-+++ b/audio/a2dp.c
-@@ -371,11 +371,10 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		sep->session = NULL;
- 	}
- 
--	if (sep->endpoint)
--		media_endpoint_clear_configuration(sep->endpoint);
--
- 	sep->stream = NULL;
- 
-+	if (sep->endpoint)
-+		media_endpoint_clear_configuration(sep->endpoint);
- }
- 
- static gboolean auto_config(gpointer data)
--- 
-1.6.3.3
+i am getting stuck on the distros glib2 package version 2.12. i do not
+wish to replace this version. i have compiled 2.16.6 to /usr/local and
+wish to compile bluez against this instance.
 
+how? i believe the answer lies with PKG_CONFIG but I am lacking the experience.
+
+thanks in advance!
