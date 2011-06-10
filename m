@@ -2,114 +2,146 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 02/16] Bluetooth: Add failed/complete functions to discovery commands
-Date: Fri, 10 Jun 2011 16:35:59 -0300
-Message-Id: <1307734573-1630-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 01/16] Bluetooth: Periodic Inquiry and mgmt discovering event
+Date: Fri, 10 Jun 2011 16:35:58 -0300
+Message-Id: <1307734573-1630-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
 References: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These functions remove pending commands and send command complete/
-status events.
+By using periodic inquiry command we're not able to detect correctly
+when the controller has started inquiry.
+
+Today we have this workaround in inquiry result event handler to set
+the HCI_INQUIRY flag when it sees the first inquiry result event.
+This workaround isn't enough because the device may be performing
+an inquiry but the HCI_INQUIRY flag is not set. For instance, if
+there is no device in range, no inquiry result event is generated,
+consequently, the HCI_INQUIRY flags isn't set when it should so.
+
+We rely on HCI_INQUIRY flag to implement the discovery procedure
+properly. So, as we aren't able to clear/set the HCI_INQUIRY flag in
+a reliable manner, periodic inquiry events shouldn't change the
+HCI_INQUIRY flag. In future, if needed, we might add a new flag (e.g.
+HCI_PINQUIRY) to know if the controller is performing periodic
+inquiry.
+
+Thus, due to that issue and in order to keep compatibility with
+userspace, periodic inquiry events shouldn't send mgmt discovering
+events.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    4 ++
- net/bluetooth/mgmt.c             |   68 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_event.c |   46 ++++++++++++--------------------------------
+ 1 files changed, 13 insertions(+), 33 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 836d3e8..bfa5f0b 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -826,6 +826,10 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
- 								u8 *eir);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
- int mgmt_discovering(u16 index, u8 discovering);
-+int mgmt_start_discovery_complete(u16 index);
-+int mgmt_start_discovery_failed(u16 index);
-+int mgmt_stop_discovery_complete(u16 index);
-+int mgmt_stop_discovery_failed(u16 index);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0f643f8..18b9813 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -56,13 +56,13 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
  
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fcccf10..b9115eb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2186,3 +2186,71 @@ int mgmt_discovering(u16 index, u8 discovering)
- 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
- 						sizeof(discovering), NULL);
+-	if (test_bit(HCI_MGMT, &hdev->flags) &&
+-				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+-		mgmt_discovering(hdev->id, 0);
++	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+ 
+ 	hci_conn_check_pending(hdev);
++
++	mgmt_discovering(hdev->id, 0);
  }
+ 
+ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -74,10 +74,6 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status)
+ 		return;
+ 
+-	if (test_bit(HCI_MGMT, &hdev->flags) &&
+-				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+-		mgmt_discovering(hdev->id, 0);
+-
+ 	hci_conn_check_pending(hdev);
+ }
+ 
+@@ -878,10 +874,9 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 		return;
+ 	}
+ 
+-	if (test_bit(HCI_MGMT, &hdev->flags) &&
+-					!test_and_set_bit(HCI_INQUIRY,
+-							&hdev->flags))
+-		mgmt_discovering(hdev->id, 1);
++	set_bit(HCI_INQUIRY, &hdev->flags);
 +
-+int mgmt_start_discovery_complete(u16 index)
-+{
-+	struct pending_cmd *cmd;
-+	int err;
++	mgmt_discovering(hdev->id, 1);
+ }
+ 
+ static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+@@ -1254,13 +1249,16 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 
+ 	BT_DBG("%s status %d", hdev->name, status);
+ 
+-	if (test_bit(HCI_MGMT, &hdev->flags) &&
+-				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+-		mgmt_discovering(hdev->id, 0);
++	hci_conn_check_pending(hdev);
 +
-+	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
-+	if (!cmd)
-+		return -ENOENT;
++	if (!test_bit(HCI_INQUIRY, &hdev->flags))
++		return;
 +
-+	err = cmd_complete(cmd->sk, index, MGMT_OP_START_DISCOVERY, NULL, 0);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
-+
-+int mgmt_start_discovery_failed(u16 index)
-+{
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	err = cmd_status(cmd->sk, index, MGMT_OP_START_DISCOVERY, EIO);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
-+
-+int mgmt_stop_discovery_complete(u16 index)
-+{
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	err = cmd_complete(cmd->sk, index, MGMT_OP_STOP_DISCOVERY, NULL, 0);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
-+	if (cmd)
-+		mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
-+
-+int mgmt_stop_discovery_failed(u16 index)
-+{
-+	struct pending_cmd *cmd;
-+	int err;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	err = cmd_status(cmd->sk, index, MGMT_OP_STOP_DISCOVERY, EIO);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
++	clear_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+ 
+-	hci_conn_check_pending(hdev);
++	mgmt_discovering(hdev->id, 0);
+ }
+ 
+ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1276,12 +1274,6 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
+-
+-		if (test_bit(HCI_MGMT, &hdev->flags))
+-			mgmt_discovering(hdev->id, 1);
+-	}
+-
+ 	for (; num_rsp; num_rsp--, info++) {
+ 		bacpy(&data.bdaddr, &info->bdaddr);
+ 		data.pscan_rep_mode	= info->pscan_rep_mode;
+@@ -2253,12 +2245,6 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
+-
+-		if (test_bit(HCI_MGMT, &hdev->flags))
+-			mgmt_discovering(hdev->id, 1);
+-	}
+-
+ 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+ 		struct inquiry_info_with_rssi_and_pscan_mode *info;
+ 		info = (void *) (skb->data + 1);
+@@ -2421,12 +2407,6 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 	if (!num_rsp)
+ 		return;
+ 
+-	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
+-
+-		if (test_bit(HCI_MGMT, &hdev->flags))
+-			mgmt_discovering(hdev->id, 1);
+-	}
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	for (; num_rsp; num_rsp--, info++) {
 -- 
 1.7.4.1
 
