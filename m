@@ -2,77 +2,114 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 03/16] Bluetooth: Remove pending discovery commands
-Date: Fri, 10 Jun 2011 16:36:00 -0300
-Message-Id: <1307734573-1630-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 02/16] Bluetooth: Add failed/complete functions to discovery commands
+Date: Fri, 10 Jun 2011 16:35:59 -0300
+Message-Id: <1307734573-1630-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
 References: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Discovery commands are added to the pending list but they aren't
-removed.
-
-This patch removes MGMT_OP_START_DISCOVERY and MGMT_OP_STOP_DISCOVERY
-commands from pending command list when they terminate.
+These functions remove pending commands and send command complete/
+status events.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ include/net/bluetooth/hci_core.h |    4 ++
+ net/bluetooth/mgmt.c             |   68 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 18b9813..0f8126d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -53,8 +53,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 836d3e8..bfa5f0b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -826,6 +826,10 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_discovering(u16 index, u8 discovering);
++int mgmt_start_discovery_complete(u16 index);
++int mgmt_start_discovery_failed(u16 index);
++int mgmt_stop_discovery_complete(u16 index);
++int mgmt_stop_discovery_failed(u16 index);
  
- 	BT_DBG("%s status 0x%x", hdev->name, status);
- 
--	if (status)
-+	if (status) {
-+		mgmt_stop_discovery_failed(hdev->id);
- 		return;
-+	}
- 
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
-@@ -63,6 +65,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_conn_check_pending(hdev);
- 
- 	mgmt_discovering(hdev->id, 0);
-+	mgmt_stop_discovery_complete(hdev->id);
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index fcccf10..b9115eb 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2186,3 +2186,71 @@ int mgmt_discovering(u16 index, u8 discovering)
+ 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
+ 						sizeof(discovering), NULL);
  }
- 
- static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -871,6 +874,9 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 	if (status) {
- 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 		hci_conn_check_pending(hdev);
 +
-+		mgmt_start_discovery_failed(hdev->id);
++int mgmt_start_discovery_complete(u16 index)
++{
++	struct pending_cmd *cmd;
++	int err;
 +
- 		return;
- 	}
- 
-@@ -1254,11 +1260,17 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 	if (!test_bit(HCI_INQUIRY, &hdev->flags))
- 		return;
- 
-+	if (status) {
-+		mgmt_start_discovery_failed(hdev->id);
-+		return;
-+	}
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
++	if (!cmd)
++		return -ENOENT;
 +
- 	clear_bit(HCI_INQUIRY, &hdev->flags);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 	mgmt_discovering(hdev->id, 0);
-+	mgmt_start_discovery_complete(hdev->id);
- }
- 
- static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
++	err = cmd_complete(cmd->sk, index, MGMT_OP_START_DISCOVERY, NULL, 0);
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
++int mgmt_start_discovery_failed(u16 index)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
++	if (!cmd)
++		return -ENOENT;
++
++	err = cmd_status(cmd->sk, index, MGMT_OP_START_DISCOVERY, EIO);
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
++int mgmt_stop_discovery_complete(u16 index)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
++	if (!cmd)
++		return -ENOENT;
++
++	err = cmd_complete(cmd->sk, index, MGMT_OP_STOP_DISCOVERY, NULL, 0);
++
++	mgmt_pending_remove(cmd);
++
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
++	if (cmd)
++		mgmt_pending_remove(cmd);
++
++	return err;
++}
++
++int mgmt_stop_discovery_failed(u16 index)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
++	if (!cmd)
++		return -ENOENT;
++
++	err = cmd_status(cmd->sk, index, MGMT_OP_STOP_DISCOVERY, EIO);
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
 -- 
 1.7.4.1
 
