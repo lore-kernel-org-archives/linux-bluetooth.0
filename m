@@ -1,67 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix accepting connect requests for defer_setup
-Date: Fri, 10 Jun 2011 13:15:07 +0900
-Message-Id: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 10 Jun 2011 10:14:44 +0900
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Add RequestSecurePinCode to agent API
+Message-ID: <20110610011444.GA13293@dell.ccr.corp.intel.com>
+References: <1307541920-3776-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <1307615061.2589.36.camel@aeonflux>
+ <BANLkTimz5QrqtXpEnEF8gwiVesGt8-HjLQ@mail.gmail.com>
+ <20110609191833.GD2533@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110609191833.GD2533@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Gustavo,
 
-When authentication completes we shouldn't blindly accept any pending
-L2CAP connect requests. If the socket has the defer_setup feature
-enabled it should still wait for user space acceptance of the connect
-request. The issue only happens for non-SSP connections since with SSP
-the L2CAP Connect request may not be sent for non-SDP PSMs before
-authentication has completed successfully.
+On Thu, Jun 09, 2011, Gustavo F. Padovan wrote:
+> > We are getting closer to 4.100, maybe it is time to start doing the
+> > transition to 5.x, which means we could start thinking on fixing the
+> > current API without worrying if it breaks or not. How about that?
+> 
+> I'm with Luiz here. Unless we want the the crazy idea of have a development
+> branch we should start breaking the API someday. How about now?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c |   21 +++++++++++++++------
- 1 files changed, 15 insertions(+), 6 deletions(-)
+I'd prefer to have mgmtops.c on par with hciops.c for BR/EDR before
+doing the move to 5.x. I do prefer the RequestPinCode with the boolean
+parameter option, but since it breaks the API I think it needs to wait
+until we're ready to go for 5.0.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 15e6a53..564e647 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4204,21 +4204,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			}
- 		} else if (sk->sk_state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
--			__u16 result;
-+			__u16 res, stat;
- 
- 			if (!status) {
--				sk->sk_state = BT_CONFIG;
--				result = L2CAP_CR_SUCCESS;
-+				if (bt_sk(sk)->defer_setup) {
-+					struct sock *parent = bt_sk(sk)->parent;
-+					res = L2CAP_CR_PEND;
-+					stat = L2CAP_CS_AUTHOR_PEND;
-+					parent->sk_data_ready(parent, 0);
-+				} else {
-+					sk->sk_state = BT_CONFIG;
-+					res = L2CAP_CR_SUCCESS;
-+					stat = L2CAP_CS_NO_INFO;
-+				}
- 			} else {
- 				sk->sk_state = BT_DISCONN;
- 				l2cap_chan_set_timer(chan, HZ / 10);
--				result = L2CAP_CR_SEC_BLOCK;
-+				res = L2CAP_CR_SEC_BLOCK;
-+				stat = L2CAP_CS_NO_INFO;
- 			}
- 
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
--			rsp.result = cpu_to_le16(result);
--			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+			rsp.result = cpu_to_le16(res);
-+			rsp.status = cpu_to_le16(stat);
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 							sizeof(rsp), &rsp);
- 		}
--- 
-1.7.5.3
-
+Johan
