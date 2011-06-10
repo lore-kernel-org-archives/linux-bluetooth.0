@@ -2,73 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH 3/3] Fix invalid memory access issues in avdtp module
-Date: Fri, 10 Jun 2011 15:34:10 +0200
-Message-Id: <1307712850-1934-1-git-send-email-michalski.raf@gmail.com>
+Subject: [PATCH 2/3] Fix invalid write to memory issue in media module
+Date: Fri, 10 Jun 2011 15:33:24 +0200
+Message-Id: <1307712804-1892-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changing stream state from STREAMING to IDLE can be associated with side
-effects under some circumstances (such as terminating bluetoothd during
-music is streamed). In this case, after connection is lost, stream state
-changes from STREAMING to IDLE - "avdtp_sep_set_state" is triggered which
-invokes callback called "stream_state_changed" which internally invokes
-"avdtp_sep_set_state" (state of stream doesn't change and stays as IDLE)
-second time and then stream object is freed by "stream_free" at the end
-of "avdtp_sep_set_state". After returning from callback
-"stream_state_changed", first triggered "avdtp_sep_set_state" attempts
-to free stream object again ("if (state == AVDTP_STATE_IDLE)" condition
-is still satisfied) and it leads to invalid read/write/free issues
-(reported by valgrind) in "stream free" body, since "stream" is "alias"
-pointer to stream object which is already out of date (memory for stream
-object has been already freed). Moreover freeing stream object also
-discards its callback list so after finishing iteration on this list
-(in "avdtp_sep_set_state") "l" pointer is out of date and getting
-"l->next" pointer (returned by "g_slist_next(l)") leads to invalid read
-issue.
+Under some circumstances (such as terminating bluetoothd during music is
+streamed) endpoint object may be destroyed (memory for endpoint object is
+internally freed, directly by "media_endpoint_remove") after invoking
+"media_transport_destroy" (in "media_endpoint_clear_configuration") to
+destroy transport object (memory for transport object is directly freed by
+"media_transport_free"). It leads to invalid write issue (reported by
+valgrind) after assigning "endpoint->transport = NULL", since "endpoint"
+is "alias" pointer to endpoint object which is already out of date
+(memory for endpoint object has been already freed).
 
-This patch prevents from this special case by freeing stream object only
-when it is present on streams list and removing from this list when
-stream object would be freed. Additionally to avoid issue with callback
-list loop for this has been modified and "while" used instead of "for"
-loop variant.
+This patch prevents from this issue by ensuring that assignment
+"endpoint->transport = NULL" would be executed when enpoint object
+certainly exists.
 ---
- audio/avdtp.c |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+ audio/media.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 6018c37..19c9fd1 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -1086,7 +1086,6 @@ static void avdtp_sep_set_state(struct avdtp *session,
- 			g_source_remove(stream->idle_timer);
- 			stream->idle_timer = 0;
- 		}
--		session->streams = g_slist_remove(session->streams, stream);
- 		if (session->pending_open == stream)
- 			handle_transport_connect(session, NULL, 0, 0);
- 		if (session->req && session->req->stream == stream)
-@@ -1098,13 +1097,18 @@ static void avdtp_sep_set_state(struct avdtp *session,
- 		break;
- 	}
+diff --git a/audio/media.c b/audio/media.c
+index 0eb712a..bbb77cf 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -643,6 +643,7 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
+ 	const char *path;
++	struct media_transport *transport = endpoint->transport;
  
--	for (l = stream->callbacks; l != NULL; l = g_slist_next(l)) {
-+	l = stream->callbacks;
-+	while (l != NULL) {
- 		struct stream_callback *cb = l->data;
-+		l = g_slist_next(l);
- 		cb->cb(stream, old_state, state, err_ptr, cb->user_data);
- 	}
- 
--	if (state == AVDTP_STATE_IDLE)
-+	if (state == AVDTP_STATE_IDLE &&
-+				g_slist_find(session->streams, stream)) {
-+		session->streams = g_slist_remove(session->streams, stream);
- 		stream_free(stream);
-+	}
+ 	if (endpoint->transport == NULL)
+ 		return;
+@@ -665,8 +666,8 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 							DBUS_TYPE_INVALID);
+ 	g_dbus_send_message(conn, msg);
+ done:
+-	media_transport_destroy(endpoint->transport);
+ 	endpoint->transport = NULL;
++	media_transport_destroy(transport);
  }
  
- static void finalize_discovery(struct avdtp *session, int err)
+ void media_endpoint_release(struct media_endpoint *endpoint)
 -- 
 1.6.3.3
 
