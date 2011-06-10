@@ -1,52 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [RFC 00/16] Full support discovery procedure
-Date: Fri, 10 Jun 2011 16:35:57 -0300
-Message-Id: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 10 Jun 2011 15:05:55 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-2.6 2011-06-08
+Message-ID: <20110610180555.GC2663@joana>
+References: <20110608194658.GD13036@joana>
+ <20110609175933.GA16802@tuxdriver.com>
+ <20110609183430.GA2533@joana>
+ <20110610175302.GD2665@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110610175302.GD2665@tuxdriver.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+* John W. Linville <linville@tuxdriver.com> [2011-06-10 13:53:03 -0400]:
 
-This patch series implements the full support to discovery procedure through
-management interface. Today, only BR/EDR devices are supported. This work is
-part of the effort to have discovery procedures and name resolution supported
-in management interface.
+> On Thu, Jun 09, 2011 at 03:34:31PM -0300, Gustavo F. Padovan wrote:
+> > * John W. Linville <linville@tuxdriver.com> [2011-06-09 13:59:34 -0400]:
+> > 
+> > > On Wed, Jun 08, 2011 at 04:46:58PM -0300, Gustavo F. Padovan wrote:
+> 
+> > > >       Bluetooth: Kill set but unused variable 'cmd' in cmtp_recv_capimsg()
+> > > 
+> > > Well, the patch submitter sounds familiar.  :-)  But killing an unused
+> > > variable isn't a bug fix.  It doesn't do any damage, but I suspect that
+> > > Dave expects to be held to the same standards as everyone else.
+> > > 
+> > > Can you drop that one (and reapply it for 3.1)?  Sorry for the trouble...
+> > 
+> > Sorry for that, I tough it was not that bad fix this for 3.0. New pull request
+> > follows. Thanks a lot!
+> 
+> > Stephen Boyd (1):
+> >       Bluetooth: Silence DEBUG_STRICT_USER_COPY_CHECKS=y warning
+> 
+> Sorry, I missed this one too -- can you redirect it for 3.1 as well?
 
-Before beginning LE-Only and BR/EDR/LE support, it was needed to fix some
-issues in BR/EDR discovery. These issues are discussed in patches 1 to 6.
+The following changes since commit 51e65257142a87fe46a1ce5c35c86c5baf012614:            
+                                                                                        
+  iwlegacy: fix channel switch locking (2011-06-08 14:19:05 -0400)                      
+                                                                                        
+are available in the git repository at:                                                 
+  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master          
+                                                                                        
+David Miller (1):                                                                       
+      Bluetooth: Do not ignore errors returned from strict_strtol()                     
+                                                                                        
+Filip Palian (1):                                                                       
+      Bluetooth: l2cap and rfcomm: fix 1 byte infoleak to userspace.                    
+                                                                                        
+Luiz Augusto von Dentz (1):                                                             
+      Bluetooth: fix shutdown on SCO sockets                                            
+                                                                                        
+Ville Tervo (1):                                                                        
+      Bluetooth: Do not send SET_EVENT_MASK for 1.1 and earlier devices                 
+                                                                                        
+ drivers/bluetooth/btmrvl_debugfs.c |   12 ++++++++++++
+ net/bluetooth/hci_event.c          |   18 ++++++++++--------
+ net/bluetooth/l2cap_sock.c         |    1 +
+ net/bluetooth/rfcomm/sock.c        |    1 +
+ net/bluetooth/sco.c                |   13 ++++++++++++-
+ 5 files changed, 36 insertions(+), 9 deletions(-)
 
-Thanks,
-
-Andre Guedes.
-
-Andre Guedes (16):
-  Bluetooth: Periodic Inquiry and mgmt discovering event
-  Bluetooth: Add failed/complete functions to discovery commands
-  Bluetooth: Remove pending discovery commands
-  Bluetooth: Check pending command in start_discovery()
-  Bluetooth: Check pending commands in stop_discovery()
-  Bluetooth: Fix stop_discovery()
-  Bluetooth: Create do_inquiry()
-  Bluetooth: Create cancel_inquiry()
-  Bluetooth: Prepare for full support discovery procedures
-  Bluetooth: Check 'dev_class' in mgmt_device_found()
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: Add 'le_scan_timer' to struct hci_dev
-  Bluetooth: Add LE Scan helper functions
-  Bluetooth: Support LE-Only discovery procedure
-  Bluetooth: Support BR/EDR/LE discovery procedure
-
- include/net/bluetooth/hci.h      |   12 ++
- include/net/bluetooth/hci_core.h |   12 ++-
- net/bluetooth/hci_core.c         |   19 +++
- net/bluetooth/hci_event.c        |  145 +++++++++++++++------
- net/bluetooth/mgmt.c             |  262 ++++++++++++++++++++++++++++++++++++--
- 5 files changed, 398 insertions(+), 52 deletions(-)
-
--- 
-1.7.4.1
-
+	Gustavo
