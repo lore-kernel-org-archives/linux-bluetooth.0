@@ -1,97 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1307712850-1934-1-git-send-email-michalski.raf@gmail.com>
-References: <1307712850-1934-1-git-send-email-michalski.raf@gmail.com>
-Date: Sat, 11 Jun 2011 09:16:00 +0900
-Message-ID: <BANLkTikFpU_Q6jO6i3QmYTh=csbn7aGQUg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Fix invalid memory access issues in avdtp module
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [RFC] Bluetooth: Add link_type information to the mgmt Connected event
+Date: Fri, 10 Jun 2011 19:34:43 -0300
+Message-Id: <1307745283-12160-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+One piece of information that was lost when using the mgmt interface,
+was the type of the connection. Using HCI events we used to know
+the type of the connection based on the type of the event, e.g.
+HCI_LE_Connection_Complete for LE links.
 
-On Fri, Jun 10, 2011 at 10:34 PM, Rafal Michalski
-<michalski.raf@gmail.com> wrote:
-> Changing stream state from STREAMING to IDLE can be associated with side
-> effects under some circumstances (such as terminating bluetoothd during
-> music is streamed). In this case, after connection is lost, stream state
-> changes from STREAMING to IDLE - "avdtp_sep_set_state" is triggered which
-> invokes callback called "stream_state_changed" which internally invokes
-> "avdtp_sep_set_state" (state of stream doesn't change and stays as IDLE)
-> second time and then stream object is freed by "stream_free" at the end
-> of "avdtp_sep_set_state". After returning from callback
-> "stream_state_changed", first triggered "avdtp_sep_set_state" attempts
-> to free stream object again ("if (state == AVDTP_STATE_IDLE)" condition
-> is still satisfied) and it leads to invalid read/write/free issues
-> (reported by valgrind) in "stream free" body, since "stream" is "alias"
-> pointer to stream object which is already out of date (memory for stream
-> object has been already freed). Moreover freeing stream object also
-> discards its callback list so after finishing iteration on this list
-> (in "avdtp_sep_set_state") "l" pointer is out of date and getting
-> "l->next" pointer (returned by "g_slist_next(l)") leads to invalid read
-> issue.
->
-> This patch prevents from this special case by freeing stream object only
-> when it is present on streams list and removing from this list when
-> stream object would be freed. Additionally to avoid issue with callback
-> list loop for this has been modified and "while" used instead of "for"
-> loop variant.
-> ---
->  audio/avdtp.c |   10 +++++++---
->  1 files changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/audio/avdtp.c b/audio/avdtp.c
-> index 6018c37..19c9fd1 100644
-> --- a/audio/avdtp.c
-> +++ b/audio/avdtp.c
-> @@ -1086,7 +1086,6 @@ static void avdtp_sep_set_state(struct avdtp *session,
->                        g_source_remove(stream->idle_timer);
->                        stream->idle_timer = 0;
->                }
-> -               session->streams = g_slist_remove(session->streams, stream);
->                if (session->pending_open == stream)
->                        handle_transport_connect(session, NULL, 0, 0);
->                if (session->req && session->req->stream == stream)
-> @@ -1098,13 +1097,18 @@ static void avdtp_sep_set_state(struct avdtp *session,
->                break;
->        }
->
-> -       for (l = stream->callbacks; l != NULL; l = g_slist_next(l)) {
-> +       l = stream->callbacks;
-> +       while (l != NULL) {
->                struct stream_callback *cb = l->data;
-> +               l = g_slist_next(l);
->                cb->cb(stream, old_state, state, err_ptr, cb->user_data);
->        }
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
 
-I guess we it would be better to have this as a separate patch since
-it is not exactly the same problem is it? Or this only gets triggered
-because of the change bellow? If that is the case Im fine.
+Johan,
 
-> -       if (state == AVDTP_STATE_IDLE)
-> +       if (state == AVDTP_STATE_IDLE &&
-> +                               g_slist_find(session->streams, stream)) {
-> +               session->streams = g_slist_remove(session->streams, stream);
->                stream_free(stream);
-> +       }
->  }
->
->  static void finalize_discovery(struct avdtp *session, int err)
-> --
-> 1.6.3.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+>From my SM series, the other patch that adds information to the mgmt
+interface is:
+"Bluetooth: Add new structures for supporting SM key distribution"
+from Jun 7.
+
+Cheers,
 
 
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    1 +
+ net/bluetooth/hci_event.c        |    4 ++--
+ net/bluetooth/mgmt.c             |    3 ++-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
--- 
-Luiz Augusto von Dentz
-Computer Engineer
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 404872d..5de3866 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -834,7 +834,7 @@ int mgmt_powered(u16 index, u8 powered);
+ int mgmt_discoverable(u16 index, u8 discoverable);
+ int mgmt_connectable(u16 index, u8 connectable);
+ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
+-int mgmt_connected(u16 index, bdaddr_t *bdaddr);
++int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
+ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
+ int mgmt_disconnect_failed(u16 index);
+ int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 129d4b3..9663f5d 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -239,6 +239,7 @@ struct mgmt_ev_new_key {
+ #define MGMT_EV_CONNECTED		0x000B
+ struct mgmt_ev_connected {
+ 	bdaddr_t bdaddr;
++	__u8 link_type;
+ } __packed;
+
+ #define MGMT_EV_DISCONNECTED		0x000C
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 620f307..bc3a0b6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1356,7 +1356,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			conn->state = BT_CONFIG;
+ 			hci_conn_hold(conn);
+ 			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-			mgmt_connected(hdev->id, &ev->bdaddr);
++			mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
+ 		} else
+ 			conn->state = BT_CONNECTED;
+
+@@ -2752,7 +2752,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+
+-	mgmt_connected(hdev->id, &ev->bdaddr);
++	mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
+
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->handle = __le16_to_cpu(ev->handle);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bf8f84e..1373a32 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1942,11 +1942,12 @@ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
+ 	return err;
+ }
+
+-int mgmt_connected(u16 index, bdaddr_t *bdaddr)
++int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
+ {
+ 	struct mgmt_ev_connected ev;
+
+ 	bacpy(&ev.bdaddr, bdaddr);
++	ev.link_type = link_type;
+
+ 	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
+ }
+--
+1.7.5.4
+
