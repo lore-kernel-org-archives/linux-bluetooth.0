@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Jun 2011 14:57:57 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Pairing fails on kernel 2.6.39 with "Command Disallowed" error,
- while on 2.6.26 it works fine
-Message-ID: <20110610175757.GB2663@joana>
-References: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
+In-Reply-To: <1307688624-5519-1-git-send-email-luiz.dentz@gmail.com>
+References: <1307688624-5519-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 10 Jun 2011 10:26:49 -0400
+Message-ID: <BANLkTi=Y8qekQKsX_1fY01sF0A4Ja1tiSA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix L2CAP security check
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Takeshi,
+Hi Luiz,
 
-* Takeshi Hamasaki <hmatrjp@users.sourceforge.jp> [2011-06-10 20:41:10 +0900]:
+On Fri, Jun 10, 2011 at 2:50 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 3163330..efda44c 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -611,8 +611,8 @@ auth:
+>        if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
+>                return 0;
+>
+> -       hci_conn_auth(conn, sec_level, auth_type);
+> -       return 0;
+> +       if (!(hci_conn_auth(conn, sec_level, auth_type)))
+> +               return 0;
 
-> Hello list,
-> 
-> I'm trying to pair Bluetooth USB dongle and Bluetooth headset
-> and facing a trouble.
-> Detail of devices are described below.
-> 
-> The problems happens on kernel 2.6.39,
-> while on kernel 2.6.26 it works fine.
+Too much nitpicking, but why the extra parenthesis?
 
-What about 2.6.38? 2.6.26 is quite old to compare.
-
-	Gustavo
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
