@@ -1,115 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 10 Jun 2011 17:04:51 -0400
-Message-ID: <BANLkTikb5hQAP-v=JbQa6j5L71Ki0kZoPA@mail.gmail.com>
-Subject: GAP Discovery and Connection establishment for LE
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [RFC 16/16] Bluetooth: Support BR/EDR/LE discovery procedure
+Date: Fri, 10 Jun 2011 16:36:13 -0300
+Message-Id: <1307734573-1630-17-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
+References: <1307734573-1630-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_event.c        |   20 +++++++++++++++-----
+ net/bluetooth/mgmt.c             |   34 +++++++++++++++++++++++++++++++++-
+ 3 files changed, 50 insertions(+), 6 deletions(-)
 
-I would like to discuss the implementation of the GAP discovery and
-connection establishment for LE. I will focus only on the Central
-role, which is the role we are actively working on at the moment. Also
-I'm only talking about the new "mgmt" API.
-
-Most of the discussed implementation is not yet upstream (they are on
-our "developer" trees on gitorious.org and infradead.org), but we are
-in the process of upstreaming it.
-
-Device Discovery:
-For dual mode (BR/EDR/LE) adapters, discovery is interleaved between
-BR/EDR and LE. This procedure is documented on Core spec, Vol. 3 [Part
-C], Section 13.2.1. For single mode adapters (although we have no
-working single mode adapter), LE only discovery is used, as described
-on Vol. 3 [Part C], Section 9.2.6. Note that only "General Discovery"
-is supported. We don't support Limited Discovery.
-
-Name discovery: not supported (both BR/EDR and LE)
-
-Connection establishment (over LE):
-"Direct Connection Establishment" procedure is followed, with these parameters:
-
-Scan interval: 2.5ms
-Scan window: 2.5ms
-Conn_Interval_Min: 5ms
-Conn_Interval_Max: 160ms
-Supervision timeout: 62.5ms (this is incorrect, it shall be larger
-than Conn_Interval_Max)
-
-Unsupported features
-==================
-
-Now that the Thermometer GATT profile has been approved, anyone can
-take a look at the "Connection Establishment" section of
-https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=238687
-and notice the following:
-
-"The Collector should use the GAP Limited Discovery Procedure to
-discover a Thermometer."
-
-We currently do not support limited discovery.
-
-"A Collector may use one of the following GAP connection procedures
-based on its connectivity requirements: [...]"
-
-We support only the Direct Connection Establishment Procedure.
-
-"The Collector should use the recommended scan interval and scan
-window values shown in Table 5.2. [...]"
-
-Our scan interval/window values are very different from the
-recommended ones (too small). I think this should be fixed.
-
-"For the first 30 seconds [...], the Collector should use the first
-scan window / scan interval pair to
-attempt fast connection. However, if a connection is not established
-within that time, the
-Collector should switch to one of the other scan window / scan
-interval options as
-defined below to reduce power consumption."
-
-We only attempt the connection once, using a fixed set of parameters.
-Maybe this needs to be changed to follow the recommendations above.
-Note that there are two "reduced power" configurations.
-
-"The Collector shall start encryption after each connection creation
-to verify the status of
-the bond. [...]"
-
-We don't require encryption, it is optional (by setting the security
-level to medium or high).
-
-"When a connection is terminated due to link loss, a Collector should
-attempt to reconnect to the Thermometer"
-
-We don't support automatic reconnection (yet).
-
-"The Collector may perform the GAP Terminate Connection procedure if
-the connection is idle for more than 5 seconds."
-
-We don't have such timer (is it specific to the Thermometer profile?)
-
-"To avoid very long service discovery and encryption times, the
-Collector should use the connection intervals defined in Table 5.3 in
-the connection request."
-
-We use fixed connection interval values during the entire connection.
-
-"This fast connection interval should be maintained as long as low latency is
-required. After that, it should switch to the preferred connection
-parameters as decided
-by the Thermometer using the GAP Connection Parameter Update procedure."
-
-We seem to support connection parameter update requests.
-
-Comments are welcome!
-
-Best Regards,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4eb365d..128a678 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -834,6 +834,8 @@ int mgmt_start_discovery_failed(u16 index);
+ int mgmt_stop_discovery_complete(u16 index);
+ int mgmt_stop_discovery_failed(u16 index);
+ int mgmt_has_pending_stop_discov(u16 index);
++int mgmt_is_interleaved_discovery(u16 index);
++int mgmt_do_interleaved_discovery(u16 index);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 709c3e1..3ca749b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -881,7 +881,8 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 			goto unlock;
+ 		}
+ 
+-		mgmt_discovering(hdev->id, 1);
++		if (!mgmt_is_interleaved_discovery(hdev->id))
++			mgmt_discovering(hdev->id, 1);
+ 	} else if (cp->enable == 0x00) {
+ 		if (status) {
+ 			if (mgmt_has_pending_stop_discov(hdev->id))
+@@ -1315,13 +1316,22 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	mgmt_discovering(hdev->id, 0);
+-
+-	if (mgmt_has_pending_stop_discov(hdev->id))
++	if (mgmt_has_pending_stop_discov(hdev->id)) {
++		mgmt_discovering(hdev->id, 0);
+ 		mgmt_stop_discovery_complete(hdev->id);
+-	else
++		goto unlock;
++	}
++
++	if (mgmt_is_interleaved_discovery(hdev->id)) {
++		int err = mgmt_do_interleaved_discovery(hdev->id);
++		if (err)
++			mgmt_start_discovery_failed(hdev->id);
++	} else {
++		mgmt_discovering(hdev->id, 0);
+ 		mgmt_start_discovery_complete(hdev->id);
++	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index c780367..f3483b5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -40,6 +40,8 @@ enum bt_device_type {
+ };
+ 
+ #define BREDR_ONLY_INQ_LENGTH 0x08 /* TGAP(100) */
++#define BREDR_LE_INQ_LENGTH 0x04 /* TGAP(100)/2 */
++#define BREDR_LE_SCAN_TIMEOUT 5120 /* TGAP(100)/2 */
+ #define LE_ONLY_SCAN_TIMEOUT 10240 /* TGAP(gen_disc_scan_min) */
+ 
+ struct pending_cmd {
+@@ -1717,7 +1719,7 @@ static int start_discovery(struct sock *sk, u16 index)
+ 		err = do_le_scan(hdev, LE_ONLY_SCAN_TIMEOUT);
+ 		break;
+ 	case BREDR_LE:
+-		err = -ENOSYS;
++		err = do_inquiry(hdev, BREDR_LE_INQ_LENGTH);
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+@@ -2394,3 +2396,33 @@ int mgmt_has_pending_stop_discov(u16 index)
+ 
+ 	return 0;
+ }
++
++int mgmt_is_interleaved_discovery(u16 index)
++{
++	struct hci_dev *hdev;
++
++	hdev = hci_dev_get(index);
++
++	if (get_device_type(hdev) == BREDR_LE &&
++			mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev->id))
++		return 1;
++
++	hci_dev_put(hdev);
++
++	return 0;
++}
++
++/* hdev must be locked */
++int mgmt_do_interleaved_discovery(u16 index)
++{
++	int err;
++	struct hci_dev *hdev;
++
++	hdev = hci_dev_get(index);
++
++	err = do_le_scan(hdev, BREDR_LE_SCAN_TIMEOUT);
++
++	hci_dev_put(hdev);
++
++	return err;
++}
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.4.1
+
