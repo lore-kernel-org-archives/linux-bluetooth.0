@@ -1,81 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] build: Add support for systemd service configuration
-Date: Sat, 11 Jun 2011 12:46:00 -0300
-Message-Id: <1307807160-1611-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <20110610175757.GB2663@joana>
+References: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com> <20110610175757.GB2663@joana>
+From: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>
+Date: Sat, 11 Jun 2011 11:15:57 +0900
+Message-ID: <BANLkTi=Cn+paiG8WcHM2aJfV66HXAgh0yw@mail.gmail.com>
+Subject: Re: Pairing fails on kernel 2.6.39 with "Command Disallowed" error,
+ while on 2.6.26 it works fine
+To: padovan@profusion.mobi
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- .gitignore               |    1 +
- Makefile.am              |    4 ++++
- configure.ac             |   11 ++++++++++-
- src/bluetooth.service.in |   10 ++++++++++
- 4 files changed, 25 insertions(+), 1 deletions(-)
- create mode 100644 src/bluetooth.service.in
+Hi Gustavo,
 
-diff --git a/.gitignore b/.gitignore
-index 2ef7cb5..2ce99e7 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -93,3 +93,4 @@ doc/version.xml
- doc/xml
- doc/html
- src/bluetoothd.8
-+src/bluetooth.service
-diff --git a/Makefile.am b/Makefile.am
-index 4659c80..4e28708 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -35,6 +35,10 @@ conf_DATA =
- statedir = $(localstatedir)/lib/bluetooth
- 
- state_DATA =
-+
-+systemdunitdir = @SYSTEMD_UNITDIR@
-+
-+systemdunit_DATA = src/bluetooth.service
- endif
- 
- plugindir = $(libdir)/bluetooth/plugins
-diff --git a/configure.ac b/configure.ac
-index 2ce4acf..6c37e83 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -57,5 +57,14 @@ if (test "${enable_capng}" = "yes"); then
- 	AC_DEFINE(HAVE_CAPNG, 1, [Define to 1 if you have capabilities library.])
- fi
- 
-+AC_ARG_WITH([systemdsystemunitdir], AC_HELP_STRING([--with-systemdsystemunitdir=DIR],
-+	[path to systemd system service directory]), [path_systemdunit=${withval}],
-+		[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
-+if (test -n "${path_systemdunit}"); then
-+	SYSTEMD_UNITDIR="${path_systemdunit}"
-+	AC_SUBST(SYSTEMD_UNITDIR)
-+fi
-+AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
-+
- AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
--					src/bluetoothd.8 bluez.pc)
-+			src/bluetoothd.8 src/bluetooth.service bluez.pc)
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-new file mode 100644
-index 0000000..8a9edb6
---- /dev/null
-+++ b/src/bluetooth.service.in
-@@ -0,0 +1,10 @@
-+[Unit]
-+Description=Bluetooth service
-+
-+[Service]
-+Type=dbus
-+BusName=org.bluez
-+ExecStart=@prefix@/sbin/bluetoothd -n
-+
-+[Install]
-+WantedBy=bluetooth.target
+2011/6/11 Gustavo F. Padovan <padovan@profusion.mobi>:
+>> I'm trying to pair Bluetooth USB dongle and Bluetooth headset
+>> and facing a trouble.
+>> Detail of devices are described below.
+>>
+>> The problems happens on kernel 2.6.39,
+>> while on kernel 2.6.26 it works fine.
+>
+> What about 2.6.38? 2.6.26 is quite old to compare.
+
+2.6.38 shows same trouble as 2.6.39.
+
+After 2.6.26 I tried following kernel versions, and got same trouble.
+2.6.29
+2.6.30
+2.6.31
+2.6.32
+2.6.35
+2.6.36
+2.6.37
+2.6.38
+2.6.39
 -- 
-1.7.5.2
-
+Takeshi Hamasaki
