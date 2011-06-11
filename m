@@ -1,71 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 12 Jun 2011 03:39:53 +0200
-From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: bluetooth headset on linux
-Message-Id: <20110612033953.d0eaedd9.yugiohjcj-mailinglist@laposte.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Connor Hansen <cmdkhh@gmail.com>
+To: marcel@holtmann.org
+Cc: padovan@profusion.mobi,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Connor Hansen <cmdkhh@gmail.com>
+Subject: [PATCH] :V2 drivers/bluetooth/bpa10x.c: missing kfrees
+Date: Sat, 11 Jun 2011 14:36:11 -0700
+Message-Id: <1307828171-22010-1-git-send-email-cmdkhh@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+both bpa10x_submit_initr_urb() and bpa10x_submit_bulk_urb()
+malloc a char buffer(buf) for usb_fill_init_usb() but fail to
+free it after freeing the urb.
 
-Hello,
+Likewise, bpa10x_send_frame() allocates a usb_ctrlrequest(dr)
+for sending packets but does not free it after the
+usb_fill_control_urb() call.
 
-My bluetooth headset is Philips SHB9000 :
-$ hcitool scan
-Scanning ...
-	00:1E:7C:01:0A:5E	Philips SHB9000
+Signed-off-by: Connor Hansen <cmdkhh@gmail.com>
+---
+ drivers/bluetooth/bpa10x.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-I use bluez 4.94.
-
-When I try to bind with hcitool my computer with my headset, it failed :
-$ hcitool dev
-Devices:
-	hci0	00:22:43:B7:BB:F0
-$ sudo hcitool cc 00:1E:7C:01:0A:5E
-$ hcitool con
-Connections:
-
-When I try to bind with rfcomm my computer with my headset, it failed :
-$ rfcomm 
-rfcomm0: 00:1E:7C:01:0A:5E channel 0 clean
-$ sudo rfcomm release hci0
-$ rfcomm
-$ sudo rfcomm -A -E bind 00:22:43:B7:BB:F0 00:1E:7C:01:0A:5E
-$ rfcomm 
-rfcomm0: 00:1E:7C:01:0A:5E channel 1 clean 
-$ sudo rfcomm -A -E connect 00:22:43:B7:BB:F0 00:1E:7C:01:0A:5E
-Can't connect RFCOMM socket: Operation now in progress
-
-So, I found an other way : http://bluetooth-alsa.sourceforge.net/
-But when I install plugz, as explained on the web site, I got an error :
-$ make
-make  all-recursive
-make[1]: Entering directory `/home/yugiohjcj/documents/downloads/software/cvs/plugz'
-Making all in avdtp
-make[2]: Entering directory `/home/yugiohjcj/documents/downloads/software/cvs/plugz/avdtp'
-/bin/sh ../libtool --tag=CC   --mode=link gcc -I/usr/include -Wall   -o avtest avtest.o -lbluetooth libavdtp.a -lbluetooth -lbluetooth
-../libtool: line 681: X--tag=CC: command not found
-../libtool: line 714: libtool: ignoring unknown tag : command not found
-../libtool: line 681: X--mode=link: command not found
-../libtool: line 831: *** Warning: inferring the mode of operation is deprecated.: command not found
-../libtool: line 832: *** Future versions of Libtool will require -mode=MODE be specified.: command not found
-../libtool: line 1985: X-I/usr/include: No such file or directory
-../libtool: line 1985: X-Wall: command not found
-../libtool: line 2149: Xavtest: command not found
-../libtool: line 2154: X/tmp/xorg/lib:/usr/local/lib:/usr/lib/qt4/lib: No such file or directory
-../libtool: line 2161: Xavtest: command not found
-../libtool: line 2169: mkdir /.libs: No such file or directory
-mkdir: cannot create directory `/.libs': Permission denied
-make[2]: *** [avtest] Error 1
-make[2]: Leaving directory `/home/yugiohjcj/documents/downloads/software/cvs/plugz/avdtp'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/yugiohjcj/documents/downloads/software/cvs/plugz'
-make: *** [all] Error 2
-
-Finally, I can't use my bluetooth headset on linux... I am disappointed, but I am sure you can help me :-)
-Can you help me with my  bluetooth headset on linux, please?
-
-Thank you.
-
+diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+index 751b338..0a2dd9e 100644
+--- a/drivers/bluetooth/bpa10x.c
++++ b/drivers/bluetooth/bpa10x.c
+@@ -254,6 +254,7 @@ static inline int bpa10x_submit_intr_urb(struct hci_dev *hdev)
+ 	}
+ 
+ 	usb_free_urb(urb);
++	kfree(buf);
+ 
+ 	return err;
+ }
+@@ -295,6 +296,7 @@ static inline int bpa10x_submit_bulk_urb(struct hci_dev *hdev)
+ 	}
+ 
+ 	usb_free_urb(urb);
++	kfree(buf);
+ 
+ 	return err;
+ }
+@@ -393,6 +395,7 @@ static int bpa10x_send_frame(struct sk_buff *skb)
+ 				skb->data, skb->len, bpa10x_tx_complete, skb);
+ 
+ 		hdev->stat.cmd_tx++;
++		kfree(dr);
+ 		break;
+ 
+ 	case HCI_ACLDATA_PKT:
+-- 
+1.7.4.4
