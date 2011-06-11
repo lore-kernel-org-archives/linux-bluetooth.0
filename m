@@ -1,55 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Connor Hansen <cmdkhh@gmail.com>
-To: marcel@holtmann.org
-Cc: padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Connor Hansen <cmdkhh@gmail.com>
-Subject: [PATCH] drivers/bluetooth/bpa10x.c: missing kfrees
-Date: Sat, 11 Jun 2011 14:21:36 -0700
-Message-Id: <1307827296-21363-1-git-send-email-cmdkhh@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH] build: Add support for systemd service configuration
+Date: Sat, 11 Jun 2011 12:46:00 -0300
+Message-Id: <1307807160-1611-1-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-both bpa10x_submit_initr_urb() and bpa10x_submit_bulk_urb()
-malloc a char buffer(buf) for usb_fill_init_usb() but fail to
-free it after freeing the urb.
-
-Likewise, bpa10x_send_frame() allocates a usb_ctrlrequest(dr)
-for sending packets but does not free it after the
-usb_fill_control_urb() call.
-
-Signed-off-by: Connor Hansen <cmdkhh@gmail.com>
 ---
- drivers/bluetooth/bpa10x.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ .gitignore               |    1 +
+ Makefile.am              |    4 ++++
+ configure.ac             |   11 ++++++++++-
+ src/bluetooth.service.in |   10 ++++++++++
+ 4 files changed, 25 insertions(+), 1 deletions(-)
+ create mode 100644 src/bluetooth.service.in
 
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 751b338..7dfd9ca 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -254,6 +254,7 @@ static inline int bpa10x_submit_intr_urb(struct hci_dev *hdev)
- 	}
+diff --git a/.gitignore b/.gitignore
+index 2ef7cb5..2ce99e7 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -93,3 +93,4 @@ doc/version.xml
+ doc/xml
+ doc/html
+ src/bluetoothd.8
++src/bluetooth.service
+diff --git a/Makefile.am b/Makefile.am
+index 4659c80..4e28708 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -35,6 +35,10 @@ conf_DATA =
+ statedir = $(localstatedir)/lib/bluetooth
  
- 	usb_free_urb(urb);
-+	kfree(buf);
+ state_DATA =
++
++systemdunitdir = @SYSTEMD_UNITDIR@
++
++systemdunit_DATA = src/bluetooth.service
+ endif
  
- 	return err;
- }
-@@ -295,6 +296,7 @@ static inline int bpa10x_submit_bulk_urb(struct hci_dev *hdev)
- 	}
+ plugindir = $(libdir)/bluetooth/plugins
+diff --git a/configure.ac b/configure.ac
+index 2ce4acf..6c37e83 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -57,5 +57,14 @@ if (test "${enable_capng}" = "yes"); then
+ 	AC_DEFINE(HAVE_CAPNG, 1, [Define to 1 if you have capabilities library.])
+ fi
  
- 	usb_free_urb(urb);
-+	kfree(buf);
- 
- 	return err;
- }
-@@ -393,6 +395,7 @@ static int bpa10x_send_frame(struct sk_buff *skb)
- 				skb->data, skb->len, bpa10x_tx_complete, skb);
- 
- 		hdev->stat.cmd_tx++;
-+		kfree(df);
- 		break;
- 
- 	case HCI_ACLDATA_PKT:
++AC_ARG_WITH([systemdsystemunitdir], AC_HELP_STRING([--with-systemdsystemunitdir=DIR],
++	[path to systemd system service directory]), [path_systemdunit=${withval}],
++		[path_systemdunit="`$PKG_CONFIG --variable=systemdsystemunitdir systemd`"])
++if (test -n "${path_systemdunit}"); then
++	SYSTEMD_UNITDIR="${path_systemdunit}"
++	AC_SUBST(SYSTEMD_UNITDIR)
++fi
++AM_CONDITIONAL(SYSTEMD, test -n "${path_systemdunit}")
++
+ AC_OUTPUT(Makefile scripts/bluetooth.rules doc/version.xml
+-					src/bluetoothd.8 bluez.pc)
++			src/bluetoothd.8 src/bluetooth.service bluez.pc)
+diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+new file mode 100644
+index 0000000..8a9edb6
+--- /dev/null
++++ b/src/bluetooth.service.in
+@@ -0,0 +1,10 @@
++[Unit]
++Description=Bluetooth service
++
++[Service]
++Type=dbus
++BusName=org.bluez
++ExecStart=@prefix@/sbin/bluetoothd -n
++
++[Install]
++WantedBy=bluetooth.target
 -- 
-1.7.4.4
+1.7.5.2
+
