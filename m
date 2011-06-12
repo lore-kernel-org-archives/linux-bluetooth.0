@@ -1,41 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 13 Jun 2011 00:11:04 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Chase Douglas <chase.douglas@canonical.com>,
+	Ed Tomlinson <edt@aei.ca>, Greg KH <gregkh@suse.de>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Linux 2.6.39.1
+In-Reply-To: <20110608180146.GB13036@joana>
+Message-ID: <alpine.LNX.2.00.1106130010360.22872@pobox.suse.cz>
+References: <20110603003835.GA20381@kroah.com> <201106032236.41294.edt@aei.ca> <4DED20C6.1020701@canonical.com> <201106061926.14661.edt@aei.ca> <4DEF9705.4070502@canonical.com> <20110608180146.GB13036@joana>
 MIME-Version: 1.0
-In-Reply-To: <20110612173139.63533a90.yugiohjcj-mailinglist@laposte.net>
-References: <1307874927.6198.2.camel@localhost> <BANLkTim6_pgow2+an11ktfHz49RAoJHK=w@mail.gmail.com>
- <20110612173139.63533a90.yugiohjcj-mailinglist@laposte.net>
-From: Takeshi Hamasaki <takeshi.ken.hamasaki@gmail.com>
-Date: Mon, 13 Jun 2011 15:57:41 +0900
-Message-ID: <BANLkTi=L44VBVA1aO-V4mD=3495yLxMdwA@mail.gmail.com>
-Subject: Re: Re: bluetooth headset on linux
-To: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, 8 Jun 2011, Gustavo F. Padovan wrote:
 
-2011/6/13 YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>:
-> Ok, so you think this is probably because I use the last version of bluez that I get this compile error.
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 19cd4af..86d1e26 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+> > >          * command otherwise */
+> > >         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
+> > >  
+> > > -       /* Events for 1.2 and newer controllers */
+> > > -       if (hdev->lmp_ver > 1) {
+> > > -               events[4] |= 0x01; /* Flow Specification Complete */
+> > > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > > -               events[5] |= 0x08; /* Synchronous Connection Complete */
+> > > -               events[5] |= 0x10; /* Synchronous Connection Changed */
+> > > -       }
+> > > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
+> > > +        * any event mask for pre 1.2 devices */
+> > > +       if (hdev->lmp_ver <= 1)
+> > > +               return;
+> > > +
+> > > +       events[4] |= 0x01; /* Flow Specification Complete */
+> > > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
+> > > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
+> > > +       events[5] |= 0x08; /* Synchronous Connection Complete */
+> > > +       events[5] |= 0x10; /* Synchronous Connection Changed */
+> > >  
+> > >         if (hdev->features[3] & LMP_RSSI_INQ)
+> > >                 events[4] |= 0x04; /* Inquiry Result with RSSI */
+> > 
+> > Where did this patch come from? I don't see it in Linus' tree. If this
+> > patch is merged, I can test the a new kernel out to see if we should
+> > back out the commit from Jiri. However, right now my magic trackpad
+> > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
+> 
+> This patch is in my tree. It will be on its way to Linus' tree today.
 
-No. Not only libbluetooth-dev but build tools were also old
-at that libbluetooth.so.2* time.
-For successful build of plugz, find line:
+Doesn't seem to be present in Linus' tree as of today. Has there been any 
+issue discovered in the meantime?
 
-ECHO="echo"
+Thanks,
 
-in libtool and add next line under or above that:
-
-echo="echo"
-
-I found this solution during googling with keywords "$echo libtool" .
-I saw that make command finished with success status but did not installed them.
-If you find some progress beyond that, please let us know.
-
-Cheers!
-
-Oh, I should add this:
-I don't have libbluetooth.so.2* installed.
-I also use bluez 4.94, and my distro is Debian squeeze/wheezy.
 -- 
-Takeshi Hamasaki
+Jiri Kosina
+SUSE Labs
