@@ -1,97 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Problems compiling obexd
-From: Pacho Ramos <pachoramos@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] :V2 drivers/bluetooth/bpa10x.c: missing kfrees
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Connor Hansen <cmdkhh@gmail.com>
+Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Date: Sun, 12 Jun 2011 10:13:54 +0200
+In-Reply-To: <1307828171-22010-1-git-send-email-cmdkhh@gmail.com>
+References: <1307828171-22010-1-git-send-email-cmdkhh@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 12 Jun 2011 12:35:27 +0200
-Message-ID: <1307874927.6198.2.camel@localhost>
+Message-ID: <1307866435.2589.48.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi Connor,
 
-Looks like some people are having problems compiling obexd downstream
-(also with 0.40 version),
-http://bugs.gentoo.org/show_bug.cgi?id=368135
+> both bpa10x_submit_initr_urb() and bpa10x_submit_bulk_urb()
+> malloc a char buffer(buf) for usb_fill_init_usb() but fail to
+> free it after freeing the urb.
 
- I cannot reproduce myself but, googling a bit, looks like some other
-people have this problem (but I still didn't find a solution).
+you do realize that URB_FREE_BUFFER flag is used?
 
-The error is the following:
+> Likewise, bpa10x_send_frame() allocates a usb_ctrlrequest(dr)
+> for sending packets but does not free it after the
+> usb_fill_control_urb() call.
 
-make -j4 -l3 
-make --no-print-directory all-am
-  CC     client/pbap.o
-  CC     client/sync.o
-  CC     client/transfer.o
-  GEN    client/obex-client.service
-  CC     gdbus/mainloop.o
-  CC     gdbus/watch.o
-  CC     gdbus/object.o
-  CC     gdbus/polkit.o
-  CC     gwobex/gw-obex.o
-  CC     gwobex/obex-priv.o
-  CC     gwobex/obex-xfer.o
-  CC     gwobex/utils.o
-  CC     btio/btio.o
-btio/btio.c: In function 'set_sec_level':
-btio/btio.c:369: error: storage size of 'sec' isn't known
-btio/btio.c:372: error: 'BT_SECURITY_LOW' undeclared (first use in this
-function)
-btio/btio.c:372: error: (Each undeclared identifier is reported only
-once
-btio/btio.c:372: error: for each function it appears in.)
-btio/btio.c:372: error: 'BT_SECURITY_HIGH' undeclared (first use in this
-function)
-btio/btio.c:382: error: 'SOL_BLUETOOTH' undeclared (first use in this
-function)
-btio/btio.c:382: error: 'BT_SECURITY' undeclared (first use in this
-function)
-btio/btio.c: In function 'l2cap_get_lm':
-btio/btio.c:416: error: 'BT_SECURITY_LOW' undeclared (first use in this
-function)
-btio/btio.c:418: error: 'BT_SECURITY_MEDIUM' undeclared (first use in
-this function)
-btio/btio.c:420: error: 'BT_SECURITY_HIGH' undeclared (first use in this
-function)
-btio/btio.c: In function 'rfcomm_get_lm':
-btio/btio.c:437: error: 'BT_SECURITY_LOW' undeclared (first use in this
-function)
-btio/btio.c:439: error: 'BT_SECURITY_MEDIUM' undeclared (first use in
-this function)
-btio/btio.c:441: error: 'BT_SECURITY_HIGH' undeclared (first use in this
-function)
-btio/btio.c: In function 'get_sec_level':
-btio/btio.c:449: error: storage size of 'sec' isn't known
-btio/btio.c:455: error: 'SOL_BLUETOOTH' undeclared (first use in this
-function)
-btio/btio.c:455: error: 'BT_SECURITY' undeclared (first use in this
-function)
-btio/btio.c: In function 'parse_set_opts':
-btio/btio.c:635: error: 'L2CAP_MODE_BASIC' undeclared (first use in this
-function)
-btio/btio.c: In function 'l2cap_get':
-btio/btio.c:778: error: 'SOL_BLUETOOTH' undeclared (first use in this
-function)
-btio/btio.c:778: error: 'BT_DEFER_SETUP' undeclared (first use in this
-function)
-btio/btio.c: In function 'rfcomm_get':
-btio/btio.c:885: error: 'SOL_BLUETOOTH' undeclared (first use in this
-function)
-btio/btio.c:885: error: 'BT_DEFER_SETUP' undeclared (first use in this
-function)
-btio/btio.c: In function 'bt_io_listen':
-btio/btio.c:1282: error: 'SOL_BLUETOOTH' undeclared (first use in this
-function)
-btio/btio.c:1282: error: 'BT_DEFER_SETUP' undeclared (first use in this
-function)
-distcc[23546] ERROR: compile btio/btio.c on localhost failed
-make[1]: *** [btio/btio.o] Error 1
-make: *** [all] Error 2
-make: INTERNAL: Exiting with 5 jobserver tokens available; should be 4!
+There is a kfree(urb->setup_packet) in the complete callback. So I am
+not following where you would see a memory leak here.
 
-Do you have any idea about where could the problem be?
+Regards
 
-Thanks a lot
+Marcel
+
 
