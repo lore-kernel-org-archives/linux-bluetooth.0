@@ -1,96 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
-References: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
-From: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>
-Date: Tue, 14 Jun 2011 00:48:28 +0900
-Message-ID: <BANLkTikBv9nbvEfrPjSjf15yWhuFJ33jJw@mail.gmail.com>
-Subject: Re: Pairing fails on kernel 2.6.39 with "Command Disallowed" error,
- while on 2.6.26 it works fine
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Problems compiling obexd
+From: Pacho Ramos <pachoramos@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <BANLkTim6_pgow2+an11ktfHz49RAoJHK=w@mail.gmail.com>
+References: <1307874927.6198.2.camel@localhost>
+	 <BANLkTim6_pgow2+an11ktfHz49RAoJHK=w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 13 Jun 2011 17:06:43 +0200
+Message-ID: <1307977603.20215.0.camel@localhost>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+El dom, 12-06-2011 a las 17:39 +0300, Luiz Augusto von Dentz escribiÃ³:
+> Hi,
+> 
+> On Sun, Jun 12, 2011 at 1:35 PM, Pacho Ramos <pachoramos@gmail.com> wrote:
+> > Hello
+> >
+> > Looks like some people are having problems compiling obexd downstream
+> > (also with 0.40 version),
+> > http://bugs.gentoo.org/show_bug.cgi?id=368135
+> >
+> >  I cannot reproduce myself but, googling a bit, looks like some other
+> > people have this problem (but I still didn't find a solution).
+> >
+> > The error is the following:
+> >
+> > make -j4 -l3
+> > make --no-print-directory all-am
+> >  CC     client/pbap.o
+> >  CC     client/sync.o
+> >  CC     client/transfer.o
+> >  GEN    client/obex-client.service
+> >  CC     gdbus/mainloop.o
+> >  CC     gdbus/watch.o
+> >  CC     gdbus/object.o
+> >  CC     gdbus/polkit.o
+> >  CC     gwobex/gw-obex.o
+> >  CC     gwobex/obex-priv.o
+> >  CC     gwobex/obex-xfer.o
+> >  CC     gwobex/utils.o
+> >  CC     btio/btio.o
+> > btio/btio.c: In function 'set_sec_level':
+> > btio/btio.c:369: error: storage size of 'sec' isn't known
+> > btio/btio.c:372: error: 'BT_SECURITY_LOW' undeclared (first use in this
+> > function)
+> > btio/btio.c:372: error: (Each undeclared identifier is reported only
+> > once
+> > btio/btio.c:372: error: for each function it appears in.)
+> > btio/btio.c:372: error: 'BT_SECURITY_HIGH' undeclared (first use in this
+> > function)
+> > btio/btio.c:382: error: 'SOL_BLUETOOTH' undeclared (first use in this
+> > function)
+> > btio/btio.c:382: error: 'BT_SECURITY' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'l2cap_get_lm':
+> > btio/btio.c:416: error: 'BT_SECURITY_LOW' undeclared (first use in this
+> > function)
+> > btio/btio.c:418: error: 'BT_SECURITY_MEDIUM' undeclared (first use in
+> > this function)
+> > btio/btio.c:420: error: 'BT_SECURITY_HIGH' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'rfcomm_get_lm':
+> > btio/btio.c:437: error: 'BT_SECURITY_LOW' undeclared (first use in this
+> > function)
+> > btio/btio.c:439: error: 'BT_SECURITY_MEDIUM' undeclared (first use in
+> > this function)
+> > btio/btio.c:441: error: 'BT_SECURITY_HIGH' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'get_sec_level':
+> > btio/btio.c:449: error: storage size of 'sec' isn't known
+> > btio/btio.c:455: error: 'SOL_BLUETOOTH' undeclared (first use in this
+> > function)
+> > btio/btio.c:455: error: 'BT_SECURITY' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'parse_set_opts':
+> > btio/btio.c:635: error: 'L2CAP_MODE_BASIC' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'l2cap_get':
+> > btio/btio.c:778: error: 'SOL_BLUETOOTH' undeclared (first use in this
+> > function)
+> > btio/btio.c:778: error: 'BT_DEFER_SETUP' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'rfcomm_get':
+> > btio/btio.c:885: error: 'SOL_BLUETOOTH' undeclared (first use in this
+> > function)
+> > btio/btio.c:885: error: 'BT_DEFER_SETUP' undeclared (first use in this
+> > function)
+> > btio/btio.c: In function 'bt_io_listen':
+> > btio/btio.c:1282: error: 'SOL_BLUETOOTH' undeclared (first use in this
+> > function)
+> > btio/btio.c:1282: error: 'BT_DEFER_SETUP' undeclared (first use in this
+> > function)
+> > distcc[23546] ERROR: compile btio/btio.c on localhost failed
+> > make[1]: *** [btio/btio.o] Error 1
+> > make: *** [all] Error 2
+> > make: INTERNAL: Exiting with 5 jobserver tokens available; should be 4!
+> >
+> > Do you have any idea about where could the problem be?
+> 
+> It could be a very old libbluetooth which does not those symbols, what
+> version are you using? Btw we do check for libbluetooth but don't
+> depend have any version so we might have to fix that so in case like
+> this configure should fail.
+> 
+> 
 
-2011/6/10 Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>:
-> # hcitool info 00:1A:7D:60:4A:AA
-> Requesting information ...
->        BD Address:  00:1A:7D:60:4A:AA
->        Device Name: MM-BTSH24
->        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+Thanks a lot, this was caused by an old bluez version installed
+under /usr/local by users suffering this problem.
 
-This result changed after I added some lines in function
-hci_conn_check_pending() in net/bluetooth/hci_conn.c in kernel 2.6.39,
-following change make ACL connection and it lets succeed the command:
+Best regards :-)
 
-# hcitool info 00:1A:7D:60:4A:AA
-Requesting information ...
-        BD Address:  00:1A:7D:60:4A:AA
-        Device Name: MM-BTSH24
-        LMP Version: 2.1 (0x4) LMP Subversion: 0x14fa
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features page 0: 0xff 0xfe 0x0f 0xc6 0x8b 0xef 0x59 0x83
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <RSSI> <channel quality> <SCO link> <HV2 packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <power control> <transparent SCO> <EDR ACL 2 Mbps>
-                <EDR ACL 3 Mbps> <inquiry with RSSI> <extended SCO>
-                <EV4 packets> <EV5 packets> <AFH cap. slave> <3-slot EDR ACL>
-                <5-slot EDR ACL> <sniff subrating> <pause encryption>
-                <AFH cap. master> <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps>
-                <3-slot EDR eSCO> <extended inquiry> <simple pairing>
-                <encapsulated PDU> <non-flush flag> <LSTO> <inquiry TX power>
-                <extended features>
-        Features page 1: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-
-------------------- changes in hci_conn.c -----------from here
-void hci_conn_check_pending(struct hci_dev *hdev)
-{
-	struct hci_conn *conn;
-
-	BT_DBG("hdev %s", hdev->name);
-
-	hci_dev_lock(hdev);
-
-	conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
-	if (conn)
-		hci_acl_connect(conn);
-+       else {
-+               conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONFIG);
-+               if (conn) {
-+                       BT_DBG("I couldn't find BT_CONNECT2 but
-BT_CONFIG: address %s", batostr( &(hdev->bdaddr) ) );
-+                       hci_acl_connect(conn);
-+               }
-+       }
-	hci_dev_unlock(hdev);
-}
-------------------- changes in hci_conn.c -----------to here
-
->From enum definition in bluetooth.h:
-BT_CONNECT2 = 6
-and
-BT_CONFIG = 7
-
-Why the status was BT_CONFIG and was not BT_CONNECT2?
-
-
-Anyway, it doesn't help to create connection to the headset device:
-# hcitool cc 00:1A:7D:60:4A:AA
-
-hcidump shows:
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:1A:7D:60:4A:AA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x0b ncmd 1
-    Error: ACL Connection Already Exists
-
-So I'm not sure the change is right or not.
-Any suggestions?
--- 
-Takeshi Hamasaki
