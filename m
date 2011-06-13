@@ -1,27 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Jun 2011 17:12:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add support for OBEX Action command
-Message-ID: <20110613141244.GA13272@dell.ger.corp.intel.com>
-References: <1307972806-12723-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307972806-12723-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Add support for OBEX Action command
+Date: Mon, 13 Jun 2011 16:46:46 +0300
+Message-Id: <1307972806-12723-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jun 13, 2011, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Add support for parsing OBEX Action command and related headers.
-> ---
->  parser/obex.c |    8 +++++++-
->  1 files changed, 7 insertions(+), 1 deletions(-)
+Add support for parsing OBEX Action command and related headers.
+---
+ parser/obex.c |    8 +++++++-
+ 1 files changed, 7 insertions(+), 1 deletions(-)
 
-Applied. Thanks.
+diff --git a/parser/obex.c b/parser/obex.c
+index 1767efd..ede6748 100644
+--- a/parser/obex.c
++++ b/parser/obex.c
+@@ -52,7 +52,7 @@ static char *opcode2str(uint8_t opcode)
+ 	case 0x05:
+ 		return "SetPath";
+ 	case 0x06:
+-		return "Reserved";
++		return "Action";
+ 	case 0x07:
+ 		return "Session";
+ 	case 0x7f:
+@@ -181,6 +181,12 @@ static char *hi2str(uint8_t hi)
+ 		return "Session Parameters";
+ 	case 0x13:
+ 		return "Session Sequence Number";
++	case 0x14:
++		return "Action ID";
++	case 0x15:
++		return "DestName";
++	case 0x16:
++		return "Permission";
+ 	default:
+ 		return "Unknown";
+ 	}
+-- 
+1.7.5.4
 
-Johan
