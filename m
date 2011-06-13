@@ -1,69 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Jun 2011 14:27:39 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Chase Douglas <chase.douglas@canonical.com>,
-	Ed Tomlinson <edt@aei.ca>, Greg KH <gregkh@suse.de>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Linux 2.6.39.1
-Message-ID: <20110613172739.GA2661@joana>
-References: <20110603003835.GA20381@kroah.com>
- <201106032236.41294.edt@aei.ca>
- <4DED20C6.1020701@canonical.com>
- <201106061926.14661.edt@aei.ca>
- <4DEF9705.4070502@canonical.com>
- <20110608180146.GB13036@joana>
- <alpine.LNX.2.00.1106130010360.22872@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LNX.2.00.1106130010360.22872@pobox.suse.cz>
+In-Reply-To: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
+References: <BANLkTi=NmMoT2vM=kCvq6JryT5f-MeTWrg@mail.gmail.com>
+From: Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>
+Date: Tue, 14 Jun 2011 00:48:28 +0900
+Message-ID: <BANLkTikBv9nbvEfrPjSjf15yWhuFJ33jJw@mail.gmail.com>
+Subject: Re: Pairing fails on kernel 2.6.39 with "Command Disallowed" error,
+ while on 2.6.26 it works fine
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Jiri Kosina <jkosina@suse.cz> [2011-06-13 00:11:04 +0200]:
+Hi,
 
-> On Wed, 8 Jun 2011, Gustavo F. Padovan wrote:
-> 
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index 19cd4af..86d1e26 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -477,14 +477,16 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
-> > > >          * command otherwise */
-> > > >         u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
-> > > >  
-> > > > -       /* Events for 1.2 and newer controllers */
-> > > > -       if (hdev->lmp_ver > 1) {
-> > > > -               events[4] |= 0x01; /* Flow Specification Complete */
-> > > > -               events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > > -               events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > > -               events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > > -               events[5] |= 0x10; /* Synchronous Connection Changed */
-> > > > -       }
-> > > > +       /* CSR 1.1 dongles does not accept any bitfield so don't try to set
-> > > > +        * any event mask for pre 1.2 devices */
-> > > > +       if (hdev->lmp_ver <= 1)
-> > > > +               return;
-> > > > +
-> > > > +       events[4] |= 0x01; /* Flow Specification Complete */
-> > > > +       events[4] |= 0x02; /* Inquiry Result with RSSI */
-> > > > +       events[4] |= 0x04; /* Read Remote Extended Features Complete */
-> > > > +       events[5] |= 0x08; /* Synchronous Connection Complete */
-> > > > +       events[5] |= 0x10; /* Synchronous Connection Changed */
-> > > >  
-> > > >         if (hdev->features[3] & LMP_RSSI_INQ)
-> > > >                 events[4] |= 0x04; /* Inquiry Result with RSSI */
-> > > 
-> > > Where did this patch come from? I don't see it in Linus' tree. If this
-> > > patch is merged, I can test the a new kernel out to see if we should
-> > > back out the commit from Jiri. However, right now my magic trackpad
-> > > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
-> > 
-> > This patch is in my tree. It will be on its way to Linus' tree today.
-> 
-> Doesn't seem to be present in Linus' tree as of today. Has there been any 
-> issue discovered in the meantime?
+2011/6/10 Takeshi Hamasaki <hmatrjp@users.sourceforge.jp>:
+> # hcitool info 00:1A:7D:60:4A:AA
+> Requesting information ...
+>        BD Address:  00:1A:7D:60:4A:AA
+>        Device Name: MM-BTSH24
+>        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
 
-No, it is on wireless-2.6 right now. Then goes to net-2.6 and finally linus-2.6.
+This result changed after I added some lines in function
+hci_conn_check_pending() in net/bluetooth/hci_conn.c in kernel 2.6.39,
+following change make ACL connection and it lets succeed the command:
 
-	Gustavo
+# hcitool info 00:1A:7D:60:4A:AA
+Requesting information ...
+        BD Address:  00:1A:7D:60:4A:AA
+        Device Name: MM-BTSH24
+        LMP Version: 2.1 (0x4) LMP Subversion: 0x14fa
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features page 0: 0xff 0xfe 0x0f 0xc6 0x8b 0xef 0x59 0x83
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <power control> <transparent SCO> <EDR ACL 2 Mbps>
+                <EDR ACL 3 Mbps> <inquiry with RSSI> <extended SCO>
+                <EV4 packets> <EV5 packets> <AFH cap. slave> <3-slot EDR ACL>
+                <5-slot EDR ACL> <sniff subrating> <pause encryption>
+                <AFH cap. master> <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps>
+                <3-slot EDR eSCO> <extended inquiry> <simple pairing>
+                <encapsulated PDU> <non-flush flag> <LSTO> <inquiry TX power>
+                <extended features>
+        Features page 1: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+
+------------------- changes in hci_conn.c -----------from here
+void hci_conn_check_pending(struct hci_dev *hdev)
+{
+	struct hci_conn *conn;
+
+	BT_DBG("hdev %s", hdev->name);
+
+	hci_dev_lock(hdev);
+
+	conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONNECT2);
+	if (conn)
+		hci_acl_connect(conn);
++       else {
++               conn = hci_conn_hash_lookup_state(hdev, ACL_LINK, BT_CONFIG);
++               if (conn) {
++                       BT_DBG("I couldn't find BT_CONNECT2 but
+BT_CONFIG: address %s", batostr( &(hdev->bdaddr) ) );
++                       hci_acl_connect(conn);
++               }
++       }
+	hci_dev_unlock(hdev);
+}
+------------------- changes in hci_conn.c -----------to here
+
+>From enum definition in bluetooth.h:
+BT_CONNECT2 = 6
+and
+BT_CONFIG = 7
+
+Why the status was BT_CONFIG and was not BT_CONNECT2?
+
+
+Anyway, it doesn't help to create connection to the headset device:
+# hcitool cc 00:1A:7D:60:4A:AA
+
+hcidump shows:
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:1A:7D:60:4A:AA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x0b ncmd 1
+    Error: ACL Connection Already Exists
+
+So I'm not sure the change is right or not.
+Any suggestions?
+-- 
+Takeshi Hamasaki
