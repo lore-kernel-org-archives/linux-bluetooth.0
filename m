@@ -2,48 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH v2 3/4] Fix invalid read from memory issue in avdtp module
-Date: Mon, 13 Jun 2011 12:50:40 +0200
-Message-Id: <1307962240-15534-1-git-send-email-michalski.raf@gmail.com>
+Subject: [PATCH v2 2/4] Fix invalid write to memory issue in media module
+Date: Mon, 13 Jun 2011 12:50:15 +0200
+Message-Id: <1307962215-15497-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changing stream state from STREAMING to IDLE can be associated with side
-effects under some circumstances (such as terminating bluetoothd during
-music is streamed). In this case, after connection is lost, stream state
-changes from STREAMING to IDLE - "avdtp_sep_set_state" is triggered which
-invokes callback called "stream_state_changed" which internally invokes
-"avdtp_sep_set_state" (state of stream doesn't change and stays as IDLE)
-second time and then stream callbacks list is discarded by "stream_free"
-("g_slist_free(stream->callbacks)"). After returning from callback,
-"stream->callbacks" list (and "l" pointer as well) is already out of date,
-so attempting to fetch "l->next" pointer (returned by "g_slist_next(l)"
-to be prepared to next iteration of "for" loop) from node on discarded
-list leads to invalid read issue (reported by valgrind).
+Under some circumstances (such as terminating bluetoothd during music is
+streamed) endpoint object may be destroyed (memory for endpoint object is
+internally freed, directly by "media_endpoint_remove") after invoking
+"media_transport_destroy" (in "media_endpoint_clear_configuration") to
+destroy transport object (memory for transport object is directly freed by
+"media_transport_free"). It leads to invalid write issue (reported by
+valgrind) after assignment "endpoint->transport = NULL", since "endpoint"
+is "alias" pointer to endpoint object which is already out of date
+(memory for endpoint object has been already freed).
 
-This patch prevents from this issue by moving "l = g_slist_next(l)"
-instruction just before invoking callback - loop has been modified and
-"while" used instead of "for" loop variant.
+This patch prevents from this issue by ensuring that assignment
+"endpoint->transport = NULL" would be executed when endpoint object
+certainly exists.
 ---
- audio/avdtp.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ audio/media.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 6018c37..c49dee9 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -1098,8 +1098,10 @@ static void avdtp_sep_set_state(struct avdtp *session,
- 		break;
- 	}
+diff --git a/audio/media.c b/audio/media.c
+index 0eb712a..bbb77cf 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -643,6 +643,7 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
+ 	const char *path;
++	struct media_transport *transport = endpoint->transport;
  
--	for (l = stream->callbacks; l != NULL; l = g_slist_next(l)) {
-+	l = stream->callbacks;
-+	while (l != NULL) {
- 		struct stream_callback *cb = l->data;
-+		l = g_slist_next(l);
- 		cb->cb(stream, old_state, state, err_ptr, cb->user_data);
- 	}
+ 	if (endpoint->transport == NULL)
+ 		return;
+@@ -665,8 +666,8 @@ void media_endpoint_clear_configuration(struct media_endpoint *endpoint)
+ 							DBUS_TYPE_INVALID);
+ 	g_dbus_send_message(conn, msg);
+ done:
+-	media_transport_destroy(endpoint->transport);
+ 	endpoint->transport = NULL;
++	media_transport_destroy(transport);
+ }
  
+ void media_endpoint_release(struct media_endpoint *endpoint)
 -- 
 1.6.3.3
 
