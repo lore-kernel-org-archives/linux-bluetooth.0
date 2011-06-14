@@ -1,38 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jun 2011 14:56:08 -0300
+Date: Tue, 14 Jun 2011 14:52:06 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [bluetooth-next v5 0/2] SMP Just Works implementation
-Message-ID: <20110614175608.GB2613@joana>
-References: <1308069462-31697-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH v2] Bluetooth: Fix accepting connect requests for
+ defer_setup
+Message-ID: <20110614175206.GA2613@joana>
+References: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
+ <1308044899-18953-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1308069462-31697-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1308044899-18953-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-06-14 13:37:40 -0300]:
+* johan.hedberg@gmail.com <johan.hedberg@gmail.com> [2011-06-14 12:48:19 +0300]:
 
-> Hi Gustavo,
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> These are the last two patches (15/16 and 16/16) that needed a
-> rebase on top of your latest tree.
+> When authentication completes we shouldn't blindly accept any pending
+> L2CAP connect requests. If the socket has the defer_setup feature
+> enabled it should still wait for user space acceptance of the connect
+> request. The issue only happens for non-SSP connections since with SSP
+> the L2CAP Connect request may not be sent for non-SDP PSMs before
+> authentication has completed successfully.
 > 
-> --
-> Cheers,
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: rebased against latest bluetooth-next tree
 > 
-> 
-> Vinicius Costa Gomes (2):
->   Bluetooth: Add support for SMP timeout
->   Bluetooth: Add key size checks for SMP
-> 
->  include/net/bluetooth/l2cap.h |    3 ++
->  include/net/bluetooth/smp.h   |    3 ++
->  net/bluetooth/l2cap_core.c    |   74 ++++++++++++++++++++++++----------------
->  net/bluetooth/smp.c           |   68 ++++++++++++++++++++++++++++++-------
->  4 files changed, 105 insertions(+), 43 deletions(-)
+>  net/bluetooth/l2cap_core.c |   21 +++++++++++++++------
+>  1 files changed, 15 insertions(+), 6 deletions(-)
 
-Both patches applied. Thanks.
+Applied with the needed modifications to make it works for bluetooth-2.6.
+Thanks.
 
 	Gustavo
