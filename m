@@ -1,119 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1307964277-12590-1-git-send-email-lkslawek@gmail.com>
-References: <1307957658-11330-3-git-send-email-lkslawek@gmail.com>
-	<1307964277-12590-1-git-send-email-lkslawek@gmail.com>
-Date: Tue, 14 Jun 2011 15:33:48 +0900
-Message-ID: <BANLkTim1bbjPbzG+=gvBua2Y7OM=YTdeNA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] Fix handling asynchronous plugin reads
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+In-Reply-To: <1307995091-4941-2-git-send-email-padovan@profusion.mobi>
+References: <1307995091-4941-1-git-send-email-padovan@profusion.mobi>
+	<1307995091-4941-2-git-send-email-padovan@profusion.mobi>
+Date: Mon, 13 Jun 2011 20:33:19 -0400
+Message-ID: <BANLkTimS7rZVD4ZQ2DpL=NsrCxpL-6imWA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Use bit operations on conn_state
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Gustavo,
 
-On Mon, Jun 13, 2011 at 8:24 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> Calling OBEX_ResumeRequest() from handle_async_io() may result in direct
-> calling obex_event_cb() (this happens when obex_write_stream() will
-> deliver not enough bytes to fully fill OpenOBEX TX packet). In this case
-> set_io_watch will fail if handle_async_io() is called from
-> obex_object_set_io_flags(), because the watch is already installed.
-> Originally when code returns from OBEX_ResumeRequest(), handle_async_io()
-> returns FALSE which makes obex_object_set_io_flags() remove this watch.
+On Mon, Jun 13, 2011 at 3:58 PM, Gustavo F. Padovan
+<padovan@profusion.mobi> wrote:
+> @@ -3637,33 +3628,31 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
+>        l2cap_drop_acked_frames(chan);
 >
-> This patch adds variable for tracking whether subsequent calls suspended
-> get request, causing obex_object_set_io_flags() remove the watch only
-> when the request is not suspended.
-> ---
->  src/obex-priv.h |    1 +
->  src/obex.c      |   19 +++++++++++++++----
->  2 files changed, 16 insertions(+), 4 deletions(-)
+>        if (rx_control & L2CAP_CTRL_POLL) {
+> -               chan->conn_state |= L2CAP_CONN_SEND_FBIT;
+> -               if (chan->conn_state & L2CAP_CONN_SREJ_SENT) {
+> -                       if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
+> +               set_bit(CONN_SEND_FBIT, &chan->conn_state);
+> +               if (test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
+> +                       if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state) &&
+>                                        (chan->unacked_frames > 0))
+>                                __set_retrans_timer(chan);
 >
-> diff --git a/src/obex-priv.h b/src/obex-priv.h
-> index 8c722dc..164bc78 100644
-> --- a/src/obex-priv.h
-> +++ b/src/obex-priv.h
-> @@ -46,6 +46,7 @@ struct obex_session {
->        obex_object_t *obj;
->        struct obex_mime_type_driver *driver;
->        gboolean streaming;
-> +       gboolean suspended;
->  };
+> -                       chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+> +                       clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>                        l2cap_send_srejtail(chan);
+>                } else {
+>                        l2cap_send_i_or_rr_or_rnr(chan);
+>                }
 >
->  int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
-> diff --git a/src/obex.c b/src/obex.c
-> index 1bdb6be..99fedc3 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -311,6 +311,7 @@ static void os_reset_session(struct obex_session *os)
->        os->offset = 0;
->        os->size = OBJECT_SIZE_DELETE;
->        os->streaming = FALSE;
-> +       os->suspended = FALSE;
+>        } else if (rx_control & L2CAP_CTRL_FINAL) {
+> -               chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+> +               clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>
+> -               if (chan->conn_state & L2CAP_CONN_REJ_ACT)
+> -                       chan->conn_state &= ~L2CAP_CONN_REJ_ACT;
+> -               else
+> +               if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
+>                        l2cap_retransmit_frames(chan);
+>
+>        } else {
+> -               if ((chan->conn_state & L2CAP_CONN_REMOTE_BUSY) &&
+> +               if ((test_bit(CONN_REMOTE_BUSY, &chan->conn_state)) &&
+
+Unnecessary extra parenthesis.
+
+>                                (chan->unacked_frames > 0))
+>                        __set_retrans_timer(chan);
+>
+> -               chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+> -               if (chan->conn_state & L2CAP_CONN_SREJ_SENT)
+> +               clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+> +               if (test_bit(CONN_SREJ_SENT, &chan->conn_state))
+>                        l2cap_send_ack(chan);
+>                else
+>                        l2cap_ertm_send(chan);
+> @@ -3676,21 +3665,19 @@ static inline void l2cap_data_channel_rejframe(struct l2cap_chan *chan, u16 rx_c
+>
+>        BT_DBG("chan %p, req_seq %d ctrl 0x%4.4x", chan, tx_seq, rx_control);
+>
+> -       chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+> +       clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>
+>        chan->expected_ack_seq = tx_seq;
+>        l2cap_drop_acked_frames(chan);
+>
+>        if (rx_control & L2CAP_CTRL_FINAL) {
+> -               if (chan->conn_state & L2CAP_CONN_REJ_ACT)
+> -                       chan->conn_state &= ~L2CAP_CONN_REJ_ACT;
+> -               else
+> +               if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
+>                        l2cap_retransmit_frames(chan);
+>        } else {
+>                l2cap_retransmit_frames(chan);
+>
+> -               if (chan->conn_state & L2CAP_CONN_WAIT_F)
+> -                       chan->conn_state |= L2CAP_CONN_REJ_ACT;
+> +               if (test_bit(CONN_WAIT_F, &chan->conn_state))
+> +                       set_bit(CONN_REJ_ACT, &chan->conn_state);
+>        }
 >  }
+>  static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_control)
+> @@ -3699,32 +3686,32 @@ static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_
 >
->  static void obex_session_free(struct obex_session *os)
-> @@ -698,6 +699,8 @@ static void suspend_get(struct obex_session *os, obex_t *obex,
->  {
->        obex_headerdata_t hd;
+>        BT_DBG("chan %p, req_seq %d ctrl 0x%4.4x", chan, tx_seq, rx_control);
 >
-> +       os->suspended = TRUE;
-> +
->        if (os->streaming) {
->                OBEX_SuspendRequest(obex, obj);
->                return;
-> @@ -728,13 +731,21 @@ static gboolean handle_async_io(void *object, int flags, int err,
->                ret = obex_read_stream(os, os->obex, os->obj);
+> -       chan->conn_state &= ~L2CAP_CONN_REMOTE_BUSY;
+> +       clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
 >
->  proceed:
-> -       if (ret < 0) {
-> +       os->suspended = FALSE;
-> +
-> +       if (ret == -EAGAIN) {
-> +               suspend_get(os, os->obex, os->obj);
-> +       } else if (ret < 0) {
->                os_set_response(os->obj, err);
->                OBEX_CancelRequest(os->obex, TRUE);
-> -       } else
-> +       } else {
->                OBEX_ResumeRequest(os->obex);
-> +       }
+>        if (rx_control & L2CAP_CTRL_POLL) {
+>                chan->expected_ack_seq = tx_seq;
+>                l2cap_drop_acked_frames(chan);
+>
+> -               chan->conn_state |= L2CAP_CONN_SEND_FBIT;
+> +               set_bit(CONN_SEND_FBIT, &chan->conn_state);
+>                l2cap_retransmit_one_frame(chan, tx_seq);
+>
+>                l2cap_ertm_send(chan);
+>
+> -               if (chan->conn_state & L2CAP_CONN_WAIT_F) {
+> +               if (test_bit(CONN_WAIT_F, &chan->conn_state)) {
+>                        chan->srej_save_reqseq = tx_seq;
+> -                       chan->conn_state |= L2CAP_CONN_SREJ_ACT;
+> +                       set_bit(CONN_SREJ_ACT, &chan->conn_state);
+>                }
+>        } else if (rx_control & L2CAP_CTRL_FINAL) {
+> -               if ((chan->conn_state & L2CAP_CONN_SREJ_ACT) &&
+> +               if ((test_bit(CONN_SREJ_ACT, &chan->conn_state)) &&
 
-One line statements do not need {
+Unnecessary extra parenthesis.
 
-> -       return FALSE;
-> +       if (os->suspended)
-> +               return TRUE;
-> +       else
-> +               return FALSE;
+>                                chan->srej_save_reqseq == tx_seq)
+> -                       chan->conn_state &= ~L2CAP_CONN_SREJ_ACT;
+> +                       clear_bit(CONN_SREJ_ACT, &chan->conn_state);
+>                else
+>                        l2cap_retransmit_one_frame(chan, tx_seq);
+>        } else {
+>                l2cap_retransmit_one_frame(chan, tx_seq);
+> -               if (chan->conn_state & L2CAP_CONN_WAIT_F) {
+> +               if (test_bit(CONN_WAIT_F, &chan->conn_state)) {
+>                        chan->srej_save_reqseq = tx_seq;
+> -                       chan->conn_state |= L2CAP_CONN_SREJ_ACT;
+> +                       set_bit(CONN_SREJ_ACT, &chan->conn_state);
+>                }
+>        }
 >  }
-
-I guess here you can just return os->suspended.
-
->  static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
-> @@ -1225,7 +1236,7 @@ static void obex_event_cb(obex_t *obex, obex_object_t *obj, int mode,
->        case OBEX_EV_STREAMEMPTY:
->                err = obex_write_stream(os, obex, obj);
->                if (err == -EAGAIN) {
-> -                       OBEX_SuspendRequest(obex, obj);
-> +                       suspend_get(os, obex, obj);
->                        os->obj = obj;
->                        os->driver->set_io_watch(os->object, handle_async_io,
->                                                                        os);
-> --
-> 1.7.4.1
+> @@ -3735,14 +3722,14 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>        BT_DBG("chan %p, req_seq %d ctrl 0x%4.4x", chan, tx_seq, rx_control);
 >
+> -       chan->conn_state |= L2CAP_CONN_REMOTE_BUSY;
+> +       set_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+>        chan->expected_ack_seq = tx_seq;
+>        l2cap_drop_acked_frames(chan);
+>
+>        if (rx_control & L2CAP_CTRL_POLL)
+> -               chan->conn_state |= L2CAP_CONN_SEND_FBIT;
+> +               set_bit(CONN_SEND_FBIT, &chan->conn_state);
+>
+> -       if (!(chan->conn_state & L2CAP_CONN_SREJ_SENT)) {
+> +       if (!test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
+>                __clear_retrans_timer(chan);
+>                if (rx_control & L2CAP_CTRL_POLL)
+>                        l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_FINAL);
 
-
-
+Regards,
 -- 
-Luiz Augusto von Dentz
-Computer Engineer
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
