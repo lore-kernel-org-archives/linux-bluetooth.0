@@ -1,45 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTim1bbjPbzG+=gvBua2Y7OM=YTdeNA@mail.gmail.com>
+In-Reply-To: <1307964277-12590-1-git-send-email-lkslawek@gmail.com>
 References: <1307957658-11330-3-git-send-email-lkslawek@gmail.com>
 	<1307964277-12590-1-git-send-email-lkslawek@gmail.com>
-	<BANLkTim1bbjPbzG+=gvBua2Y7OM=YTdeNA@mail.gmail.com>
-Date: Tue, 14 Jun 2011 08:58:33 +0200
-Message-ID: <BANLkTinJkDZq2a+Z78p1wMAHdC1cO4ngPw@mail.gmail.com>
+Date: Tue, 14 Jun 2011 15:33:48 +0900
+Message-ID: <BANLkTim1bbjPbzG+=gvBua2Y7OM=YTdeNA@mail.gmail.com>
 Subject: Re: [PATCH v3 4/4] Fix handling asynchronous plugin reads
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 14, 2011 at 8:33 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->> +       if (ret == -EAGAIN) {
->> +               suspend_get(os, os->obex, os->obj);
->> +       } else if (ret < 0) {
->>                os_set_response(os->obj, err);
->>                OBEX_CancelRequest(os->obex, TRUE);
->> -       } else
->> +       } else {
->>                OBEX_ResumeRequest(os->obex);
->> +       }
+Hi,
+
+On Mon, Jun 13, 2011 at 8:24 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+> Calling OBEX_ResumeRequest() from handle_async_io() may result in direct
+> calling obex_event_cb() (this happens when obex_write_stream() will
+> deliver not enough bytes to fully fill OpenOBEX TX packet). In this case
+> set_io_watch will fail if handle_async_io() is called from
+> obex_object_set_io_flags(), because the watch is already installed.
+> Originally when code returns from OBEX_ResumeRequest(), handle_async_io()
+> returns FALSE which makes obex_object_set_io_flags() remove this watch.
 >
-> One line statements do not need {
-Kernel coding style states that this is not true when another branch
-in the if-else has more than one statement. Then braces should be used
-for all branches.
+> This patch adds variable for tracking whether subsequent calls suspended
+> get request, causing obex_object_set_io_flags() remove the watch only
+> when the request is not suspended.
+> ---
+>  src/obex-priv.h |    1 +
+>  src/obex.c      |   19 +++++++++++++++----
+>  2 files changed, 16 insertions(+), 4 deletions(-)
 >
->> -       return FALSE;
->> +       if (os->suspended)
->> +               return TRUE;
->> +       else
->> +               return FALSE;
->>  }
+> diff --git a/src/obex-priv.h b/src/obex-priv.h
+> index 8c722dc..164bc78 100644
+> --- a/src/obex-priv.h
+> +++ b/src/obex-priv.h
+> @@ -46,6 +46,7 @@ struct obex_session {
+>        obex_object_t *obj;
+>        struct obex_mime_type_driver *driver;
+>        gboolean streaming;
+> +       gboolean suspended;
+>  };
 >
-> I guess here you can just return os->suspended.
-I guess I can.
+>  int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+> diff --git a/src/obex.c b/src/obex.c
+> index 1bdb6be..99fedc3 100644
+> --- a/src/obex.c
+> +++ b/src/obex.c
+> @@ -311,6 +311,7 @@ static void os_reset_session(struct obex_session *os)
+>        os->offset = 0;
+>        os->size = OBJECT_SIZE_DELETE;
+>        os->streaming = FALSE;
+> +       os->suspended = FALSE;
+>  }
+>
+>  static void obex_session_free(struct obex_session *os)
+> @@ -698,6 +699,8 @@ static void suspend_get(struct obex_session *os, obex_t *obex,
+>  {
+>        obex_headerdata_t hd;
+>
+> +       os->suspended = TRUE;
+> +
+>        if (os->streaming) {
+>                OBEX_SuspendRequest(obex, obj);
+>                return;
+> @@ -728,13 +731,21 @@ static gboolean handle_async_io(void *object, int flags, int err,
+>                ret = obex_read_stream(os, os->obex, os->obj);
+>
+>  proceed:
+> -       if (ret < 0) {
+> +       os->suspended = FALSE;
+> +
+> +       if (ret == -EAGAIN) {
+> +               suspend_get(os, os->obex, os->obj);
+> +       } else if (ret < 0) {
+>                os_set_response(os->obj, err);
+>                OBEX_CancelRequest(os->obex, TRUE);
+> -       } else
+> +       } else {
+>                OBEX_ResumeRequest(os->obex);
+> +       }
+
+One line statements do not need {
+
+> -       return FALSE;
+> +       if (os->suspended)
+> +               return TRUE;
+> +       else
+> +               return FALSE;
+>  }
+
+I guess here you can just return os->suspended.
+
+>  static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+> @@ -1225,7 +1236,7 @@ static void obex_event_cb(obex_t *obex, obex_object_t *obj, int mode,
+>        case OBEX_EV_STREAMEMPTY:
+>                err = obex_write_stream(os, obex, obj);
+>                if (err == -EAGAIN) {
+> -                       OBEX_SuspendRequest(obex, obj);
+> +                       suspend_get(os, obex, obj);
+>                        os->obj = obj;
+>                        os->driver->set_io_watch(os->object, handle_async_io,
+>                                                                        os);
+> --
+> 1.7.4.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
 
 -- 
-Slawomir Bochenski
+Luiz Augusto von Dentz
+Computer Engineer
