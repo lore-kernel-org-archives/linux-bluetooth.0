@@ -1,102 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jun 2011 12:24:03 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] Add function to get default adapter ID
-Message-Id: <20110614122403.15a13073.ospite@studenti.unina.it>
-In-Reply-To: <1307627589-25786-1-git-send-email-hadess@hadess.net>
-References: <1307627589-25786-1-git-send-email-hadess@hadess.net>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Tue__14_Jun_2011_12_24_03_+0200_qseMxCHj4zbHTiA2"
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix accepting connect requests for defer_setup
+Date: Tue, 14 Jun 2011 12:48:19 +0300
+Message-Id: <1308044899-18953-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
+References: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Tue__14_Jun_2011_12_24_03_+0200_qseMxCHj4zbHTiA2
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu,  9 Jun 2011 14:53:08 +0100
-Bastien Nocera <hadess@hadess.net> wrote:
+When authentication completes we shouldn't blindly accept any pending
+L2CAP connect requests. If the socket has the defer_setup feature
+enabled it should still wait for user space acceptance of the connect
+request. The issue only happens for non-SSP connections since with SSP
+the L2CAP Connect request may not be sent for non-SDP PSMs before
+authentication has completed successfully.
 
-> Combined with manager_find_adapter_by_id(), it is now possible
-> to get the btd_adapter struct for the default adapter:
-> manager_find_adapter_by_id (manager_get_default_adapter_id ());
-> ---
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: rebased against latest bluetooth-next tree
 
-Ping, if this gets it I will use it in the next version of the Sixaxis
-plugin.
+ net/bluetooth/l2cap_core.c |   21 +++++++++++++++------
+ 1 files changed, 15 insertions(+), 6 deletions(-)
 
-Thanks,
-   Antonio
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 584a423..c2d2738 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4218,21 +4218,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			}
+ 		} else if (chan->state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+-			__u16 result;
++			__u16 res, stat;
+ 
+ 			if (!status) {
+-				l2cap_state_change(chan, BT_CONFIG);
+-				result = L2CAP_CR_SUCCESS;
++				if (bt_sk(sk)->defer_setup) {
++					struct sock *parent = bt_sk(sk)->parent;
++					res = L2CAP_CR_PEND;
++					stat = L2CAP_CS_AUTHOR_PEND;
++					parent->sk_data_ready(parent, 0);
++				} else {
++					sk->sk_state = BT_CONFIG;
++					res = L2CAP_CR_SUCCESS;
++					stat = L2CAP_CS_NO_INFO;
++				}
+ 			} else {
+ 				l2cap_state_change(chan, BT_DISCONN);
+ 				__set_chan_timer(chan, HZ / 10);
+-				result = L2CAP_CR_SEC_BLOCK;
++				res = L2CAP_CR_SEC_BLOCK;
++				stat = L2CAP_CS_NO_INFO;
+ 			}
+ 
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+ 			rsp.dcid   = cpu_to_le16(chan->scid);
+-			rsp.result = cpu_to_le16(result);
+-			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
++			rsp.result = cpu_to_le16(res);
++			rsp.status = cpu_to_le16(stat);
+ 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
+ 							sizeof(rsp), &rsp);
+ 		}
+-- 
+1.7.5.4
 
-
->  src/manager.c |    8 ++++++++
->  src/manager.h |    1 +
->  2 files changed, 9 insertions(+), 0 deletions(-)
->=20
-> diff --git a/src/manager.c b/src/manager.c
-> index e805e0c..9d0de25 100644
-> --- a/src/manager.c
-> +++ b/src/manager.c
-> @@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_adapte=
-r *adapter)
->  		btd_start_exit_timer();
->  }
-> =20
-> +int manager_get_default_adapter_id(void)
-> +{
-> +	return default_adapter_id;
-> +}
-> +
->  void manager_cleanup(DBusConnection *conn, const char *path)
->  {
->  	g_slist_foreach(adapters, (GFunc) manager_remove_adapter, NULL);
-> @@ -331,6 +336,9 @@ struct btd_adapter *manager_find_adapter_by_id(int id)
->  {
->  	GSList *match;
-> =20
-> +	if (id < 0)
-> +		return NULL;
-> +
->  	match =3D g_slist_find_custom(adapters, GINT_TO_POINTER(id),
->  							adapter_id_cmp);
->  	if (!match)
-> diff --git a/src/manager.h b/src/manager.h
-> index 05c38b3..52bf36b 100644
-> --- a/src/manager.h
-> +++ b/src/manager.h
-> @@ -41,3 +41,4 @@ struct btd_adapter *btd_manager_register_adapter(int id=
-);
->  int btd_manager_unregister_adapter(int id);
->  void manager_add_adapter(const char *path);
->  void btd_manager_set_did(uint16_t vendor, uint16_t product, uint16_t ver=
-sion);
-> +int manager_get_default_adapter_id(void);
-> --=20
-
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Tue__14_Jun_2011_12_24_03_+0200_qseMxCHj4zbHTiA2
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk33NsMACgkQ5xr2akVTsAEmygCgkLviFdZ3s8c6p3V+DUhb5krR
-GmkAn0I80a+8v+OuhSHavO9dFfobxr6v
-=6RqK
------END PGP SIGNATURE-----
-
---Signature=_Tue__14_Jun_2011_12_24_03_+0200_qseMxCHj4zbHTiA2--
