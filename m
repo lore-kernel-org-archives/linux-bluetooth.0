@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix accepting connect requests for defer_setup
-Date: Tue, 14 Jun 2011 12:48:19 +0300
-Message-Id: <1308044899-18953-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
-References: <1307679307-18302-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 14 Jun 2011 12:45:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Send new missed calls count once
+Message-ID: <20110614094539.GB18317@dell.ger.corp.intel.com>
+References: <1308034791-3290-1-git-send-email-lkslawek@gmail.com>
+ <20110614091405.GC31529@dell.ger.corp.intel.com>
+ <BANLkTi=ZdNj6jcCuZMYDk=0TD1gOnPpFqg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTi=ZdNj6jcCuZMYDk=0TD1gOnPpFqg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Slawek,
 
-When authentication completes we shouldn't blindly accept any pending
-L2CAP connect requests. If the socket has the defer_setup feature
-enabled it should still wait for user space acceptance of the connect
-request. The issue only happens for non-SSP connections since with SSP
-the L2CAP Connect request may not be sent for non-SDP PSMs before
-authentication has completed successfully.
+On Tue, Jun 14, 2011, Slawomir Bochenski wrote:
+> On Tue, Jun 14, 2011 at 11:14 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> >> index 80dfc02..d396203 100644
+> >> --- a/plugins/phonebook-tracker.c
+> >> +++ b/plugins/phonebook-tracker.c
+> >> @@ -1551,6 +1551,8 @@ int phonebook_pull_read(void *request)
+> >>       if (!data)
+> >>               return -ENOENT;
+> >>
+> >> +     data->newmissedcalls = 0;
+> >> +
+> >>       if (g_strcmp0(data->req_name,"/telecom/mch.vcf") == 0 &&
+> >>                                               data->tracker_index == 0) {
+> >>               /* new missed calls amount should be counted only once - it
+> >
+> > Shouldn't this be added inside the first if-statement branch instead of
+> > affecting the whole function? It seems to me that only the first branch
+> > deals with new missed calls.
+> 
+> If the pulled phone book is mch, setting this to zero has to be done
+> in case of calling the function when data->tracker_index != 0. So it
+> would have to be added inside second and third branch, or second and
+> third branch can be nested inside a new branch. 'newmissedcalls' is
+> used unconditionally in code in pulls from every phone book (not only
+> mch), and whether or not the header is actually sent depends on
+> non-zero value of it. Thus always presetting it to zero makes sense.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-v2: rebased against latest bluetooth-next tree
+Fair enough. The patch has now been pushed upstream. Thanks for the
+clarification.
 
- net/bluetooth/l2cap_core.c |   21 +++++++++++++++------
- 1 files changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 584a423..c2d2738 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4218,21 +4218,30 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			}
- 		} else if (chan->state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
--			__u16 result;
-+			__u16 res, stat;
- 
- 			if (!status) {
--				l2cap_state_change(chan, BT_CONFIG);
--				result = L2CAP_CR_SUCCESS;
-+				if (bt_sk(sk)->defer_setup) {
-+					struct sock *parent = bt_sk(sk)->parent;
-+					res = L2CAP_CR_PEND;
-+					stat = L2CAP_CS_AUTHOR_PEND;
-+					parent->sk_data_ready(parent, 0);
-+				} else {
-+					sk->sk_state = BT_CONFIG;
-+					res = L2CAP_CR_SUCCESS;
-+					stat = L2CAP_CS_NO_INFO;
-+				}
- 			} else {
- 				l2cap_state_change(chan, BT_DISCONN);
- 				__set_chan_timer(chan, HZ / 10);
--				result = L2CAP_CR_SEC_BLOCK;
-+				res = L2CAP_CR_SEC_BLOCK;
-+				stat = L2CAP_CS_NO_INFO;
- 			}
- 
- 			rsp.scid   = cpu_to_le16(chan->dcid);
- 			rsp.dcid   = cpu_to_le16(chan->scid);
--			rsp.result = cpu_to_le16(result);
--			rsp.status = cpu_to_le16(L2CAP_CS_NO_INFO);
-+			rsp.result = cpu_to_le16(res);
-+			rsp.status = cpu_to_le16(stat);
- 			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
- 							sizeof(rsp), &rsp);
- 		}
--- 
-1.7.5.4
-
+Johan
