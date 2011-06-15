@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 23:53:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
-	Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>,
-	Simon Wood <simon@mungewell.org>
-Subject: Re: [PATCHv3 2/3] Re-add manager_get_default_adapter()
-Message-ID: <20110615205304.GA9331@dell.Elisa>
-References: <1307538557-9287-1-git-send-email-ospite@studenti.unina.it>
- <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
-Sender: linux-input-owner@vger.kernel.org
+In-Reply-To: <20110615124847.GA12633@dell.ger.corp.intel.com>
+References: <1308035981-3623-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1308035981-3623-2-git-send-email-dmitriy.paliy@nokia.com>
+	<20110615124847.GA12633@dell.ger.corp.intel.com>
+Date: Wed, 15 Jun 2011 23:02:33 +0300
+Message-ID: <BANLkTik7qQeMSeOCE4jfLt4zrUwdXps_kQ@mail.gmail.com>
+Subject: Re: [PATCH] Add capability option to simple-agent
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
+	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-On Wed, Jun 08, 2011, Antonio Ospite wrote:
-> From: Bastien Nocera <hadess@hadess.net>
-> 
-> Signed-off-by: Bastien Nocera <hadess@hadess.net>
-> Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
-> ---
->  src/manager.c |    5 +++++
->  src/manager.h |    1 +
->  2 files changed, 6 insertions(+), 0 deletions(-)
+On Wed, Jun 15, 2011 at 3:48 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Applied, thanks. I think you could also fix the mandatory adapter
+> argument to be consistent with the rest of the test scripts so that
+> "./simple-agent <addr>" is equivalent to "./simple-agent -i hci0 <addr>".
+> And please look into this argparser thing to see if we can convert all
+> our scripts to use it (one pre-requisite is that it's present in the
+> python versions of latest mainstream distro releases).
 
-I've applied this one (with the signed-off-by lines remove which we
-don't use and a better explanation) so you can continue with each of
-your work in fine-tuning/fixing your patches.
+Thanks, sounds wise. It looks to me that bonding types would be quite
+useful in simple-agent. However, how to fit those is not very clear
+yet. Any opinions would be appreciated.
 
-Johan
+BR,
+Dmitriy
