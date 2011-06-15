@@ -1,46 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 0/4] Add support for custom (e)SCO parameters
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
-Date: Wed, 15 Jun 2011 04:08:05 -0700
-In-Reply-To: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: Re: [PATCH] adaptername: Move adapter naming into a plugin
+From: Bastien Nocera <hadess@hadess.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Date: Wed, 15 Jun 2011 11:18:51 +0100
+In-Reply-To: <20110614094338.GA18317@dell.ger.corp.intel.com>
+References: <BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
+	 <1307554688-21555-1-git-send-email-hadess@hadess.net>
+	 <20110614080730.GC28890@dell.ger.corp.intel.com>
+	 <1308043116.26522.1.camel@air.hadess.net>
+	 <20110614094338.GA18317@dell.ger.corp.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1308136088.2518.3.camel@aeonflux>
+Message-ID: <1308133135.9190.11.camel@air.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
-
-> Following patches add possibility to specify custom parameters for
-> outgoing (e)SCO link. This is implemented as SCO socket options.
+On Tue, 2011-06-14 at 12:43 +0300, Johan Hedberg wrote:
+> Hi Bastien,
 > 
-> This change allows to use reference parameters as defined in HFP 1.5
-> specification as well as support for future enchancements as wideband
-> speech as defined in HFP 1.6 draft (uses different air coding format).
+> On Tue, Jun 14, 2011, Bastien Nocera wrote:
+> > On Tue, 2011-06-14 at 11:07 +0300, Johan Hedberg wrote:
+> > > Hi Bastien,
+> > <snip>
+> > > This could simply be:
+> > > 
+> > > 	if (adapter->up)
+> > > 		return adapter_ops->set_name(adapter->dev_id, name);
+> > > 
+> > > 	return 0;
+> > > 
+> > > Other than that I didn't find any major issues, however please consider
+> > > the suggestion from Lizardo to split the patch in two parts.
+> > 
+> > I already sent the split patches (2 of them) last week:
+> > http://thread.gmane.org/gmane.linux.bluez.kernel/13621
 > 
-> Additional socket option (patch 3) allows to disable automatic retry
-> in case of failure which fallbacks from eSCO to SCO connection in
-> current implementation. Such fallback should not happen when using
-> wideband speech which mandates using of eSCO transport.
+> No, I did notice that thread. It's not a split of this patch. For one
+> thing it doesn't contain any adaptername plugin at all.
 
-I am not a big fan of just stupidly exposing all possible HCI value to
-userspace and let userspace set them. Especially since in the end there
-are no real variation here anyway. There are just a 2-3 use cases for
-your SCO socket.
+I know. I mentioned on IRC that I would work on the adaptername plugin
+once those 2 patches went in. I'm getting a little bit sick of spinning
+patches that get reviewed when I don't have time. A month to get patches
+into bluez isn't my idea of fun.
 
-I would rather have simple mode to hand to the kernel and let it do the
-right thing (including negotiation and downgrading to SCO) than having
-userspace opening sockets over sockets again.
+> What about the coding style issues I pointed out?
+> 
+> I also need to look more carefully into the name_stored change. I'm not
+> sure you completely understood its significance.
 
-So what are the actual modes for HFP that need to be supported and what
-is the range of possible SCO and eSCO options?
+The significance is to avoid writing the adapter name to disk when it
+hasn't changed. Given that we only ever write the adapter name to disk
+in one location, and we check whether it's been changed, then the
+variable is useless.
 
-Regards
+>  This is also a change
+> which doesn't exist in your original patch (again confirming that the
+> new thread is *not* a split of the original patch).
 
-Marcel
+I *obviously* can't split the original patch in 2 patches and keep the
+code working. Lizardo wanted the simplification of the name setting and
+the adaptername plugin patch to be separate so that we could potentially
+bisect regressions.
 
+Feel free to discuss it between yourselves.
 
