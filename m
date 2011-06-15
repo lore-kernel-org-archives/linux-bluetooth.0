@@ -1,49 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/2] Bluetooth:  FTP and OPP over L2CAP
+Subject: Re: Per-project patch prefixes
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nami <nami.li@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 15 Jun 2011 04:14:38 -0700
-In-Reply-To: <1308109889-5597-1-git-send-email-nami.li@atheros.com>
-References: <1308109889-5597-1-git-send-email-nami.li@atheros.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 15 Jun 2011 04:10:28 -0700
+In-Reply-To: <20110614213143.GD2613@joana>
+References: <20110614211507.GB27437@piper> <20110614213143.GD2613@joana>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1308136501.2518.8.camel@aeonflux>
+Message-ID: <1308136231.2518.5.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nami,
+Hi Gustavo,
 
-> From: nami <nami.li@atheros.com>
+> > Now, this list receives patches for at least 3 different projects, so how
+> > about using different subject prefixes for each priject? The first thing
+> > that comes to mind is this:
 > 
+> This is a great idea. It can a lot when identifying patches, and you can do
+> this to the project's .git/config:
 > 
-> Signed-off-by: Nami <nami.li@atheros.com>
+> [format]
+>         subjectprefix = "bluetooth-next"
 
-the number one thing here is to get your GIT setup done right and follow
-our polices like no signed-off-by line for bluez and obexd submissions.
-
-> ---
->  client/main.c       |   26 +++++++----
->  client/session.c    |  119 ++++++++++++++++++++++++++++++++++++++++++++++----
->  client/session.h    |    6 +++
->  gwobex/gw-obex.c    |    6 +-
->  gwobex/gw-obex.h    |    3 +-
->  gwobex/obex-priv.c  |    4 +-
->  gwobex/obex-priv.h  |    2 +-
->  plugins/bluetooth.c |  112 +++++++++++++++++++++++++++++++++++++++++++++---
->  plugins/ftp.c       |    8 +++-
->  plugins/opp.c       |    8 +++-
->  src/obex.c          |   10 +++-
->  src/service.h       |    7 +++
->  test/main.c         |    2 +-
->  13 files changed, 275 insertions(+), 38 deletions(-)
-
-And without even looking at the actual patch, I can tell you right now
-here that you should have split this up into logical pieces. For example
-gwobex should be it separate patch in the first place. And I assume
-others can also be nicely split up.
-
-These "monster" patches are not acceptable.
+as long as patches come in as [PATCH bluetooth-next v2] or something
+similar I am fine with this. I want the [PATCH ...] prefix kept alive
+since that is one thing that git did right from the beginning.
 
 Regards
 
