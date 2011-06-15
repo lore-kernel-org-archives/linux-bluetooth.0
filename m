@@ -1,44 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilia Kolomisnky <ilia.kolominsky@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH bluetooth-next] Fix L2CAP connection establishment
-Date: Wed, 15 Jun 2011 06:18:26 +0300
-Message-Id: <1308107906-13595-1-git-send-email-iliak@ti.com>
+Date: Wed, 15 Jun 2011 08:27:05 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Andr=E9?= <teste@cabine.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Support for receiving RFCOMM connections without pairing
+Message-ID: <20110615052705.GA19107@dell.ger.corp.intel.com>
+References: <BANLkTimNS+gno8aEK-pFotbWyZt9sGHRUA@mail.gmail.com>
+ <BANLkTimr_hUn9iWy-=es=afDzBgS2UUcpQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <BANLkTimr_hUn9iWy-=es=afDzBgS2UUcpQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In hci_conn_security ( which is used during L2CAP connection
-establishment ) test for HCI_CONN_ENCRYPT_PEND state also
-sets this state, which is bogus, in addition, return value of call
-to hci_conn_auth is ignored, although it may return 1 ( for an
-already authorized ACL connection ). Both actions lead to
-connection time-out on L2CAP sockets in certain situations
-(especially when using non-ssp devices )
----
- net/bluetooth/hci_conn.c |    7 +++----
- 1 files changed, 3 insertions(+), 4 deletions(-)
+Hi André,
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2f5ae53..1938347 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -670,12 +670,11 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 		goto encrypt;
- 
- auth:
--	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
-+	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
- 		return 0;
- 
--	hci_conn_auth(conn, sec_level, auth_type);
--	return 0;
--
-+	if (!hci_conn_auth(conn, sec_level, auth_type))
-+		return 0;
- encrypt:
- 	if (conn->link_mode & HCI_LM_ENCRYPT)
- 		return 1;
--- 
-1.7.1
+On Tue, Jun 14, 2011, André wrote:
+> I'm trying to use the new Android API to create a RFCOMM socket
+> without the need for a previous pairing:
+> 
+> http://developer.android.com/reference/android/bluetooth/BluetoothDevice.html#createInsecureRfcommSocketToServiceRecord%28java.util.UUID%29
+> 
+> Is it possible to accept these connections on a Debian linux system?
+> I'm trying but bluetoothd is always asking for an agent, for pairing
+> it seems. Can we just disable security/pairing?
 
+If both your Android device and your Debian system have Bluetooth 2.1 or
+newer controllers pairing is mandated by the Bluetooth specification for
+everything else except service discovery. If your Debian system has a
+2.0 or older Bluetooth controller all that's needed is to set the
+security level for the server socket you're trying to connect to to low.
+
+FWIW, it's possible to forcibly downgrade even a 2.1 system to a 2.0 one
+as far as pairing is concerned by issuing the command
+"hciconfig hci0 sspmode 0".
+
+Johan
