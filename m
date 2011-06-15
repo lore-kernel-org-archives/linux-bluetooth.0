@@ -1,42 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 15 Jun 2011 15:48:47 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: Re: [PATCH] Add capability option to simple-agent
+Message-ID: <20110615124847.GA12633@dell.ger.corp.intel.com>
+References: <1308035981-3623-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1308035981-3623-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <1308133135.9190.11.camel@air.hadess.net>
-References: <BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
-	<1307554688-21555-1-git-send-email-hadess@hadess.net>
-	<20110614080730.GC28890@dell.ger.corp.intel.com>
-	<1308043116.26522.1.camel@air.hadess.net>
-	<20110614094338.GA18317@dell.ger.corp.intel.com>
-	<1308133135.9190.11.camel@air.hadess.net>
-Date: Wed, 15 Jun 2011 09:00:48 -0400
-Message-ID: <BANLkTikSdWS+YBjmyGd40GbOP48hs1cxjA@mail.gmail.com>
-Subject: Re: [PATCH] adaptername: Move adapter naming into a plugin
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1308035981-3623-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Dmitriy,
 
-On Wed, Jun 15, 2011 at 6:18 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> I *obviously* can't split the original patch in 2 patches and keep the
-> code working. Lizardo wanted the simplification of the name setting and
-> the adaptername plugin patch to be separate so that we could potentially
-> bisect regressions.
+On Tue, Jun 14, 2011, Dmitriy Paliy wrote:
+> A new option is added to simple-agent facilitating use of "DisplayOnly",
+> "DisplayYesNo", "KeyboardOnly" and "NoInputNoOutput" agent capabilities.
+> ---
+>  test/simple-agent |   24 +++++++++++++++++-------
+>  1 files changed, 17 insertions(+), 7 deletions(-)
 
-"wanted" is a bit too much IMHO. It was a suggestion based on my own
-review. In the end it is up to the commiters of the project (Johan &
-Marcel ?) to decide whether to accept/reject the patches.
+Applied, thanks. I think you could also fix the mandatory adapter
+argument to be consistent with the rest of the test scripts so that
+"./simple-agent <addr>" is equivalent to "./simple-agent -i hci0 <addr>".
+And please look into this argparser thing to see if we can convert all
+our scripts to use it (one pre-requisite is that it's present in the
+python versions of latest mainstream distro releases).
 
-My suggestion was to simply split between "move adapter naming into a
-plugin" (like the description of your original patch) and "add support
-for pretty hostnames from systemd". Currently both things are done in
-a single patch.
-
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
