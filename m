@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 15 Jun 2011 22:48:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Antti Julku <antti.julku@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Add blacklisting support for mgmt
+ interface
+Message-ID: <20110615194849.GA8047@dell.ger.corp.intel.com>
+References: <1308128475-11670-1-git-send-email-antti.julku@nokia.com>
+ <1308128475-11670-2-git-send-email-antti.julku@nokia.com>
+ <20110615175739.GA23248@joana>
 MIME-Version: 1.0
-In-Reply-To: <20110615124847.GA12633@dell.ger.corp.intel.com>
-References: <1308035981-3623-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1308035981-3623-2-git-send-email-dmitriy.paliy@nokia.com>
-	<20110615124847.GA12633@dell.ger.corp.intel.com>
-Date: Wed, 15 Jun 2011 23:02:33 +0300
-Message-ID: <BANLkTik7qQeMSeOCE4jfLt4zrUwdXps_kQ@mail.gmail.com>
-Subject: Re: [PATCH] Add capability option to simple-agent
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
-	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110615175739.GA23248@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Gustavo,
 
-On Wed, Jun 15, 2011 at 3:48 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Applied, thanks. I think you could also fix the mandatory adapter
-> argument to be consistent with the rest of the test scripts so that
-> "./simple-agent <addr>" is equivalent to "./simple-agent -i hci0 <addr>".
-> And please look into this argparser thing to see if we can convert all
-> our scripts to use it (one pre-requisite is that it's present in the
-> python versions of latest mainstream distro releases).
+On Wed, Jun 15, 2011, Gustavo F. Padovan wrote:
+> > +#define MGMT_OP_BLOCK_DEVICE		0x001D
+> > +struct mgmt_cp_block_device {
+> > +	bdaddr_t bdaddr;
+> > +} __packed;
+> > +
+> > +#define MGMT_OP_UNBLOCK_DEVICE		0x001E
+> 
+> To make hci code consistent call replace _DEVICE by _ADDR in both macros.
 
-Thanks, sounds wise. It looks to me that bonding types would be quite
-useful in simple-agent. However, how to fit those is not very clear
-yet. Any opinions would be appreciated.
+I think Antti was just taking example from MGMT_OP_PAIR_DEVICE. To me
+"device" sounds better than "addr" as far as the management interface is
+concerned, but I'm not gonna object if you wanna change these
+occurrences to addr.
 
-BR,
-Dmitriy
+Johan
+Johan
