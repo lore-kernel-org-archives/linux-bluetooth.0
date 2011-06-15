@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+From: <piotr.zgorecki@accenture.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <tim.howes@accenture.com>
+Date: Wed, 15 Jun 2011 14:48:05 +0200
+Subject: RE: [PATCH 2/2] Bluetooth:  FTP and OPP over L2CAP
+Message-ID: <56CE5C6D2B8C7844B3FD6D5DDA55523D3E8FFE632A@EMEXM3125.dir.svc.accenture.com>
+References: <1AFE20D16950C745A2A83986B72E87480132148C3626@EMEXM3131.dir.svc.accenture.com>
+In-Reply-To: <1AFE20D16950C745A2A83986B72E87480132148C3626@EMEXM3131.dir.svc.accenture.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20110615130645.GA13007@dell.ger.corp.intel.com>
-References: <1307957658-11330-3-git-send-email-lkslawek@gmail.com>
-	<1307964277-12590-1-git-send-email-lkslawek@gmail.com>
-	<BANLkTim1bbjPbzG+=gvBua2Y7OM=YTdeNA@mail.gmail.com>
-	<BANLkTinJkDZq2a+Z78p1wMAHdC1cO4ngPw@mail.gmail.com>
-	<20110615130645.GA13007@dell.ger.corp.intel.com>
-Date: Wed, 15 Jun 2011 17:08:06 +0200
-Message-ID: <BANLkTinNVufwWakA5CHgRvNRSqRs8Wc3zQ@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] Fix handling asynchronous plugin reads
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> I've applied 1/4 and 2/4 since they seem fine. Luiz had some more
-> comments on 3/4 (I assume he'll send an email soon) and I still didn't
-> see an update on 4/4 to address this coding style issue Luiz pointed
-> out.
-
-This 4/4 will be on hold until we settle with 3/4.
-
--- 
-Slawomir Bochenski
+SGkgVGltLCBNYXJjZWwsDQoNCj4+ICtlbnVtIG9iZXhfdHJhbnNwb3J0X2Zvcm1hdHsNCj4+ICsg
+ICAgIE9CRVhfTVRfU1RSRUFNICwNCj4+ICsgICAgIE9CRVhfTVRfU0VRUEFDS0VUDQo+PiArfTsN
+Cj4+ICsNCj4+IEFuZCBtb3JlIGltcG9ydGFudCwgSSBoYXZlIG5vIGlkZWEgd2h5IGFyZSB5b3Ug
+ZG9pbmcgdGhpcyBhbnl3YXkuIEV2ZW4NCj4+IHdpdGggTDJDQVAgdGhpcyBzaG91bGQgcnVuIG92
+ZXIgU09DS19TVFJFQU0uDQo+DQo+SXMgdGhhdCByZWFsbHkgc28/ICBJIGV4cGVjdCBleHBvc2lu
+ZyBMMkNBUCBFUlRNIGFzIGEgc3RyZWFtIGNvdWxkIGJyZWFrIHByb3RvY29scyBhYm92ZSB0aGF0
+ID5leHBlY3QgZGF0YWdyYW0tYm91bmRhcnkgcHJlc2VydmF0aW9uIChlZyBSVFApLiAgT3IgY2Fu
+IGJyZWFrIHByb3RvY29scyB0aGF0IG1hbmRhdGUgdGhhdCA+b25seSBvbmUgaGlnaGVyLWxheWVy
+IHBhY2tldCBleGlzdHMgaW4gZWFjaCBMMkNBUCBTRFUuICBGb3IgdGhlc2UgdGhlIHNvY2tldCBu
+ZWVkcyB0byBiZSA+cGFja2V0IGJhc2VkLg0KPg0KPlNvLCBteSBzdXJwcmlzZSBpcyB0aGF0IEVS
+VE0gaXMgZXhwb3NlZCBhcyBTT0NLX1NUUkVBTS4gIFNvIEkgZG8gaGF2ZSBhbiBpZGVhIHdoeSB0
+aGUgcGF0Y2ggPm1lbnRpb25zIHNlcXVlbmNlZCBwYWNrZXQuLi4NCj4NCj4+IEkgYXNzdW1lZCB0
+aGF0IE9QUCBhbmQgRlRQIG92ZXIgTDJDQVAgYXJlIHJlcXVpcmluZyBlTDJDQVAgYWN0dWFsbHkN
+Cj4+IHdoaWNoIGlzIHJlLXByZXNlbnRlZCBhcyBhIHN0cmVhbS4NCj4NCj5ZZXMsIE9CRVggb3Zl
+ciBMMkNBUCByZXF1aXJlcyBlbmhhbmNlZCByZXRyYW5zbWlzc2lvbiBtb2RlLg0KDQpGcm9tIHRo
+ZSBDb3JlIFNwZWNpZmljYXRpb24sIFZvbC4gMywgUGFydCBBLCBQdC4gNy4zIEVuY2Fwc3VsYXRp
+b24gb2YgU0RVczoNCiJJdCBpcyBhc3N1bWVkIHRoYXQgU0RVIGJvdW5kYXJpZXMgc2hhbGwgYmUg
+cHJlc2VydmVkIGJldHdlZW4gcGVlciB1cHBlciBsYXllciBlbnRpdGllcy4iDQoNClNEVSBpcyBi
+eSBkZWZpbml0aW9uIGFuIGFic3RyYWN0aW9uIGV4cG9zZWQgdG8gdGhlIHVwcGVyIGxheWVyLiBU
+aGlzIGFzc3VtcHRpb24gcGVybWVhdGVzIGFsbCBvZiBCbHVldG9vdGggYW5kIGJyZWFraW5nIGl0
+IGNhbiBoYXZlIGRpcmUgY29uc2VxdWVuY2VzIGJvdGggZm9yIHByb2ZpbGVzIGFzc3VtaW5nIHRo
+ZWlyIG1lc3NhZ2VzIG1hcCAxOjEgdG8gU0RVcy4NCg0KQ2hlZXJzLA0KUGlvdHINCg0KVGhpcyBt
+ZXNzYWdlIGlzIGZvciB0aGUgZGVzaWduYXRlZCByZWNpcGllbnQgb25seSBhbmQgbWF5IGNvbnRh
+aW4gcHJpdmlsZWdlZCwgcHJvcHJpZXRhcnksIG9yIG90aGVyd2lzZSBwcml2YXRlIGluZm9ybWF0
+aW9uLiAgSWYgeW91IGhhdmUgcmVjZWl2ZWQgaXQgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhl
+IHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZGVsZXRlIHRoZSBvcmlnaW5hbC4gIEFueSBvdGhlciB1
+c2Ugb2YgdGhlIGVtYWlsIGJ5IHlvdSBpcyBwcm9oaWJpdGVkLg0K
