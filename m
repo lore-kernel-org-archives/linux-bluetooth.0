@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 15:13:44 -0300
+Date: Wed, 15 Jun 2011 14:57:39 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Per-project patch prefixes
-Message-ID: <20110615181344.GB23248@joana>
-References: <20110614211507.GB27437@piper>
- <20110614213143.GD2613@joana>
- <1308136231.2518.5.camel@aeonflux>
- <20110615120443.GA11463@dell.ger.corp.intel.com>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Add blacklisting support for mgmt
+ interface
+Message-ID: <20110615175739.GA23248@joana>
+References: <1308128475-11670-1-git-send-email-antti.julku@nokia.com>
+ <1308128475-11670-2-git-send-email-antti.julku@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110615120443.GA11463@dell.ger.corp.intel.com>
+In-Reply-To: <1308128475-11670-2-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2011-06-15 15:04:43 +0300]:
+* Antti Julku <antti.julku@nokia.com> [2011-06-15 12:01:15 +0300]:
 
-> Hi,
+> Management interface commands for blocking and unblocking devices.
 > 
-> On Wed, Jun 15, 2011, Marcel Holtmann wrote:
-> > > > Now, this list receives patches for at least 3 different projects, so how
-> > > > about using different subject prefixes for each priject? The first thing
-> > > > that comes to mind is this:
-> > > 
-> > > This is a great idea. It can a lot when identifying patches, and you can do
-> > > this to the project's .git/config:
-> > > 
-> > > [format]
-> > >         subjectprefix = "bluetooth-next"
-> > 
-> > as long as patches come in as [PATCH bluetooth-next v2] or something
-> > similar I am fine with this. I want the [PATCH ...] prefix kept alive
-> > since that is one thing that git did right from the beginning.
+> Signed-off-by: Antti Julku <antti.julku@nokia.com>
+> ---
+>  include/net/bluetooth/mgmt.h |   10 ++++++
+>  net/bluetooth/mgmt.c         |   70 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 80 insertions(+), 0 deletions(-)
 > 
-> The mandatory part then becomes "[PATCH bluetooth-next] Bluetooth: ".
-> That doesn't leave much to the really valuable part, especially if
-> you're on a 80-column wide terminal. Add Subject: to the beginning and
-> you've got even less. Kernel patches already have the Bluetooth: prefix
-> in the subject so they are pretty easy to spot IMHO. For obexd OTOH I'd
-> be fine with a [PATCH obexd] convention.
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 4899286..45bea25 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -199,6 +199,16 @@ struct mgmt_cp_remove_remote_oob_data {
+>  
+>  #define MGMT_OP_STOP_DISCOVERY		0x001C
+>  
+> +#define MGMT_OP_BLOCK_DEVICE		0x001D
+> +struct mgmt_cp_block_device {
+> +	bdaddr_t bdaddr;
+> +} __packed;
+> +
+> +#define MGMT_OP_UNBLOCK_DEVICE		0x001E
 
-So no modifications for the kernel patches. "Bluetooth:" prefix is enough to
-me as well.
+To make hci code consistent call replace _DEVICE by _ADDR in both macros.
 
 	Gustavo
