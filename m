@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 22:48:49 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Antti Julku <antti.julku@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Add blacklisting support for mgmt
- interface
-Message-ID: <20110615194849.GA8047@dell.ger.corp.intel.com>
-References: <1308128475-11670-1-git-send-email-antti.julku@nokia.com>
- <1308128475-11670-2-git-send-email-antti.julku@nokia.com>
- <20110615175739.GA23248@joana>
+Date: Wed, 15 Jun 2011 16:23:38 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linville@tuxdriver.com, linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-2.6 2011-06-15
+Message-ID: <20110615192338.GC23248@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110615175739.GA23248@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi John,
 
-On Wed, Jun 15, 2011, Gustavo F. Padovan wrote:
-> > +#define MGMT_OP_BLOCK_DEVICE		0x001D
-> > +struct mgmt_cp_block_device {
-> > +	bdaddr_t bdaddr;
-> > +} __packed;
-> > +
-> > +#define MGMT_OP_UNBLOCK_DEVICE		0x001E
-> 
-> To make hci code consistent call replace _DEVICE by _ADDR in both macros.
+Three regressions fix intended for 3.0. Two of them fix a change made in our
+HCI security process for 3.0. The third one fixes an issue with non-SSP devices.
+All of them are critical fixes. They should be in 3.0. Please pull! Thanks.
 
-I think Antti was just taking example from MGMT_OP_PAIR_DEVICE. To me
-"device" sounds better than "addr" as far as the management interface is
-concerned, but I'm not gonna object if you wanna change these
-occurrences to addr.
+	Gustavo
 
-Johan
-Johan
+
+The following changes since commit d6124baf8a098aacdbb85ff5b171da68dad6930e:
+
+  Merge branch 'master' of master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6 (2011-06-10 15:05:34 -0400)
+
+are available in the git repository at:
+
+  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+
+Ilia Kolomisnky (1):
+      Bluetooth: Fix L2CAP connection establishment
+
+Johan Hedberg (1):
+      Bluetooth: Fix accepting connect requests for defer_setup
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: Fix L2CAP security check
+
+ net/bluetooth/hci_conn.c   |    6 +++---
+ net/bluetooth/l2cap_core.c |   21 +++++++++++++++------
+ 2 files changed, 18 insertions(+), 9 deletions(-)
+
