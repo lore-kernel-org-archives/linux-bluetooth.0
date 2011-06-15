@@ -1,39 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 19:02:06 +0200
-From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
+MIME-Version: 1.0
+In-Reply-To: <20110615052705.GA19107@dell.ger.corp.intel.com>
+References: <BANLkTimNS+gno8aEK-pFotbWyZt9sGHRUA@mail.gmail.com>
+	<BANLkTimr_hUn9iWy-=es=afDzBgS2UUcpQ@mail.gmail.com>
+	<20110615052705.GA19107@dell.ger.corp.intel.com>
+Date: Wed, 15 Jun 2011 11:53:00 -0400
+Message-ID: <BANLkTik+xsPcDAk5ejUo0NX77bPJfuV7_Q@mail.gmail.com>
+Subject: Re: Support for receiving RFCOMM connections without pairing
+From: =?ISO-8859-1?Q?Andr=E9?= <teste@cabine.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Computer => Phone SUCCESS | Computer => Headset FAILURE
-Message-Id: <20110615190206.b7bdd7f7.yugiohjcj-mailinglist@laposte.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, Jun 15, 2011 at 1:27 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> I'm trying but bluetoothd is always asking for an agent, for pairing
+>> it seems. Can we just disable security/pairing?
+>
+> If both your Android device and your Debian system have Bluetooth 2.1 or
+> newer controllers pairing is mandated by the Bluetooth specification for
+> everything else except service discovery. If your Debian system has a
+> 2.0 or older Bluetooth controller all that's needed is to set the
+> security level for the server socket you're trying to connect to to low.
+>
+> FWIW, it's possible to forcibly downgrade even a 2.1 system to a 2.0 one
+> as far as pairing is concerned by issuing the command
+> "hciconfig hci0 sspmode 0".
 
-Hello,
+Thanks for the help! It worked.
 
-I have 2 devices (a phone and a headset) :
-$ hcitool scan
-Scanning ...
-	00:24:9F:75:E3:AA	BlackBerry 8900
-	00:1E:7C:01:0A:5E	Philips SHB9000
-
-I can connect my computer and my phone like this :
-$ bluetooth-agent 0000
-Pincode request for device /org/bluez/3308/hci0/dev_00_24_9F_75_E3_AA
-Authorizing request for /org/bluez/3308/hci0/dev_00_24_9F_75_E3_AA
-$ sudo hcitool cc 00:24:9F:75:E3:AA
-$ hcitool con
-Connections:
-	> ACL 00:24:9F:75:E3:AA handle 11 state 1 lm MASTER AUTH ENCRYPT
-
-But I can't connect my computer and my headset :
-$ bluetooth-agent 0000
-$ sudo hcitool cc 00:1E:7C:01:0A:5E
-$ hcitool con
-Connections:
-	> ACL 00:24:9F:75:E3:AA handle 11 state 1 lm MASTER AUTH ENCRYPT
-
-So the problem is only with my headset.
-What's the difference please?
-
+Best regards,
+André
