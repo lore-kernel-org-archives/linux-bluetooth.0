@@ -1,85 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 16:04:48 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] Add function to get default adapter ID
-Message-Id: <20110615160448.418f1ade.ospite@studenti.unina.it>
-In-Reply-To: <1308060161.9190.0.camel@air.hadess.net>
-References: <1307627589-25786-1-git-send-email-hadess@hadess.net>
-	<20110614130252.GA4215@dell.ger.corp.intel.com>
-	<1308060161.9190.0.camel@air.hadess.net>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4DF8B976.3060804@tieto.com>
+Date: Wed, 15 Jun 2011 15:53:58 +0200
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+To: <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>, <ulrik.lauren@stericsson.com>
+Subject: Re: [PATCH 0/4] Add support for custom (e)SCO parameters
+References: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com> <1308136088.2518.3.camel@aeonflux>
+In-Reply-To: <1308136088.2518.3.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-On Tue, 14 Jun 2011 15:02:39 +0100
-Bastien Nocera <hadess@hadess.net> wrote:
+On 15.06.2011 13:08, Marcel Holtmann wrote:
+> Hi Andrzej,
+>
+>> Following patches add possibility to specify custom parameters for
+>> outgoing (e)SCO link. This is implemented as SCO socket options.
+>>
+>> This change allows to use reference parameters as defined in HFP 1.5
+>> specification as well as support for future enchancements as wideband
+>> speech as defined in HFP 1.6 draft (uses different air coding format).
+>>
+>> Additional socket option (patch 3) allows to disable automatic retry
+>> in case of failure which fallbacks from eSCO to SCO connection in
+>> current implementation. Such fallback should not happen when using
+>> wideband speech which mandates using of eSCO transport.
+>
+> I am not a big fan of just stupidly exposing all possible HCI value to
+> userspace and let userspace set them. Especially since in the end there
+> are no real variation here anyway. There are just a 2-3 use cases for
+> your SCO socket.
 
-> On Tue, 2011-06-14 at 16:02 +0300, Johan Hedberg wrote:
-> > Hi Bastien,
+There's L2CAP_OPTIONS sockopt which allows to do pretty much the same 
+for L2CAP sockets so I just followed it.
 
-> > > diff --git a/src/manager.c b/src/manager.c
-> > > index e805e0c..9d0de25 100644
-> > > --- a/src/manager.c
-> > > +++ b/src/manager.c
-> > > @@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_ad=
-apter *adapter)
-> > >  		btd_start_exit_timer();
-> > >  }
-> > > =20
-> > > +int manager_get_default_adapter_id(void)
-> > > +{
-> > > +	return default_adapter_id;
-> > > +}
-> >=20
-> > Would it not make more sense to have something that returns the adapter
-> > object directly? I.e. are there actually any use cases where some plugin
-> > would want the id but *not* want to resolve the matching adapter object?
-> > And even if the plugin still needs the id (which I'd expect to be a
-> > minority use-case if it exists at all) it can always call
-> > adapter_get_dev_id().
->=20
-> I really really don't care either way. I sent both variations of the
-> patch already (Antonio has one in his patchset, and I sent the other).
-> Commit either, and we'll change our patches.
->=20
+What do you mean by just 2-3 use cases for SCO socket? You consider only 
+HFP as use case for SCO socket? I saw devices which use eSCO to stream 
+music to mono headsets which do not support A2DP, this may require 
+custom requirements which we cannot predict. This is only one example, 
+but user can "invent" something else.
 
-Yep, same for me, either this one or the one in
-http://article.gmane.org/gmane.linux.kernel.input/19751 is OK, we just
-need a way to get the default adapter, please.
+> I would rather have simple mode to hand to the kernel and let it do the
+> right thing (including negotiation and downgrading to SCO) than having
+> userspace opening sockets over sockets again.
 
-Thanks,
-   Antonio
+By making such change you actually incorporate part of profiles into 
+kernel. I don't think this is good idea. My understanding is that 
+profiles should be in user-space.
 
---=20
-Antonio Ospite
-http://ao2.it
+And I don't recall any other profile than HFP that uses eSCO, so if 
+we're going to implement "modes" using this spec, user won't have many 
+options to choose from. See example above (music over eSCO).
 
-PGP public key ID: 0x4553B001
+> So what are the actual modes for HFP that need to be supported and what
+> is the range of possible SCO and eSCO options?
 
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+At the moment only HFP 1.5 defines reference parameters for eSCO link.
+In HFP 1.6 draft there are additional reference parameters for CVSD over 
+SCO and mSBC over eSCO. And in future profiles you never know what BT 
+SIG will invent :)
 
---Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk34vAAACgkQ5xr2akVTsAGDKgCeLJnNyvnu6Iz9BWfIrC1z7PcR
-CiIAoKJTpXVULr+f/t2oajDY2CPaw6EN
-=Elhk
------END PGP SIGNATURE-----
-
---Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx--
+BR,
+Andrzej
