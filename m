@@ -1,63 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 7/7] Update Management API documentation
-From: Marcel Holtmann <marcel@holtmann.org>
-To: anderson.briglia@openbossa.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Date: Wed, 15 Jun 2011 15:10:52 -0700
-In-Reply-To: <4df91d74.0b73650a.190f.17ad@mx.google.com>
-References: <y> <1308171784-24442-1-git-send-email-y>
-	 <4df91d74.0b73650a.190f.17ad@mx.google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1308175855.2196.7.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Wed, 15 Jun 2011 17:54:50 -0400
+Message-ID: <BANLkTikWPUmqdZK=D-Q3UQqXWUFAo58F7w@mail.gmail.com>
+Subject: Strange interference between HCI device and another USB device
+From: =?ISO-8859-1?Q?Andr=E9?= <teste@cabine.org>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hello.
 
-> Add Read RSSI and Read TX Power level commands in Management API
-> documentation.
-> ---
->  doc/mgmt-api.txt |   20 ++++++++++++++++++++
->  1 files changed, 20 insertions(+), 0 deletions(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 353705e..b442cc5 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -319,6 +319,26 @@ Stop Discovery Command
->  	Command Parameters:
->  	Return Parameters:
->  
-> +Read RSSI Command
-> +=================
-> +
-> +	Command Code:		0x001D
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +	Return Parameters:	Status (1 Octet)
-> +				Address (6 Octets)
-> +				RSSI (1 Octet)
-> +
-> +Read TX Power Level Command
-> +===========================
-> +
-> +	Command Code:		0x001E
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +	Return Parameters:	Address (6 Octets)
-> +				Status (1 Octet)
-> +				Level (1 Octet)
-> +
+I have a SCL3711 USB NFC adapter alongside a Broadcom Bluetooth USB
+dongle. When I don't have the Bluetooth adapter connected everything
+works fine while reading and writing to the SCL3711 USB device. As
+soon as I connect the Bluetooth dongle and the HCI device is brought
+up (by bluetoothd) I get strange results accessing the other USB
+device (the SCL3711). Namely, writes only succeed half the time.
 
-so why are these two separate commands. Just reading them in one kernel
-call might be a lot better. Including everything else you need to know
-about the connection. Also TX power can be local and remote TX power if
-I remember this correctly.
+The writes that fail look like this:
 
-Regards
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbfdddb8c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 0 (Timeout)
+gettimeofday({1308174525, 865478}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbfdddb8c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 0 (Timeout)
+gettimeofday({1308174525, 866808}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbfdddb8c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 0 (Timeout)
+gettimeofday({1308174525, 868073}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbfdddb8c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 0 (Timeout)
 
-Marcel
+...
+
+Even with 10s timeouts it fails. The strange thing is that if I
+execute two bulkWrite()s in a row, with the same params, half of them
+succeed:
 
 
+gettimeofday({1308174626, 976740}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbff3ce7c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 0 (Timeout)
+gettimeofday({1308174626, 978439}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32,
+0xbff3ce7c) = -1 EAGAIN (Resource temporarily unavailable)
+select(4, NULL, [3], NULL, {0, 1000})   = 1 (out [3], left {0, 0})
+gettimeofday({1308174626, 979862}, NULL) = 0
+ioctl(3, USBDEVFS_REAPURBNDELAY or USBDEVFS_REAPURBNDELAY32, 0xbff3ce7c) = 0
+
+If I bring down the hci0 interface, with a hciconfig hci0 down, as soon as the
+ioctl(ctl, HCIDEVDOWN, hdev)
+is executed, everything starts working correctly again...
+
+I don't even know where to start with this. Is this bluez related? Any
+help would be appreciated. I can provide further info if requested.
+
+Best regards,
+André
