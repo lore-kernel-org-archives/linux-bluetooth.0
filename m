@@ -1,34 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: <tim.howes@accenture.com>
-To: <linux-bluetooth@vger.kernel.org>
-Date: Wed, 15 Jun 2011 14:24:08 +0200
-Subject: RE: [PATCH 2/2] Bluetooth:  FTP and OPP over L2CAP
-Message-ID: <1AFE20D16950C745A2A83986B72E87480132148C3622@EMEXM3131.dir.svc.accenture.com>
-References: <1308110046-5704-1-git-send-email-nami.li@atheros.com>
- <1308136632.2518.11.camel@aeonflux>
-In-Reply-To: <1308136632.2518.11.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1308136231.2518.5.camel@aeonflux>
+References: <20110614211507.GB27437@piper>
+	<20110614213143.GD2613@joana>
+	<1308136231.2518.5.camel@aeonflux>
+Date: Wed, 15 Jun 2011 15:05:18 +0300
+Message-ID: <BANLkTinu9j=6QWYcQUrPeEnB0MMgUYM7zg@mail.gmail.com>
+Subject: Re: Per-project patch prefixes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQoNCj4gK2VudW0gb2JleF90cmFuc3BvcnRfZm9ybWF0ew0KPiArICAgICAg
-T0JFWF9NVF9TVFJFQU0gLA0KPiArICAgICAgT0JFWF9NVF9TRVFQQUNLRVQNCj4gK307DQo+ICsN
-Cj4gQW5kIG1vcmUgaW1wb3J0YW50LCBJIGhhdmUgbm8gaWRlYSB3aHkgYXJlIHlvdSBkb2luZyB0
-aGlzIGFueXdheS4gRXZlbg0KPiB3aXRoIEwyQ0FQIHRoaXMgc2hvdWxkIHJ1biBvdmVyIFNPQ0tf
-U1RSRUFNLg0KDQpJcyB0aGF0IHJlYWxseSBzbz8gIEkgZXhwZWN0IGV4cG9zaW5nIEwyQ0FQIEVS
-VE0gYXMgYSBzdHJlYW0gY291bGQgYnJlYWsgcHJvdG9jb2xzIGFib3ZlIHRoYXQgZXhwZWN0IGRh
-dGFncmFtLWJvdW5kYXJ5IHByZXNlcnZhdGlvbiAoZWcgUlRQKS4gIE9yIGNhbiBicmVhayBwcm90
-b2NvbHMgdGhhdCBtYW5kYXRlIHRoYXQgb25seSBvbmUgaGlnaGVyLWxheWVyIHBhY2tldCBleGlz
-dHMgaW4gZWFjaCBMMkNBUCBTRFUuICBGb3IgdGhlc2UgdGhlIHNvY2tldCBuZWVkcyB0byBiZSBw
-YWNrZXQgYmFzZWQuDQoNClNvLCBteSBzdXJwcmlzZSBpcyB0aGF0IEVSVE0gaXMgZXhwb3NlZCBh
-cyBTT0NLX1NUUkVBTS4gIFNvIEkgZG8gaGF2ZSBhbiBpZGVhIHdoeSB0aGUgcGF0Y2ggbWVudGlv
-bnMgc2VxdWVuY2VkIHBhY2tldC4uLg0KDQo+IEkgYXNzdW1lZCB0aGF0IE9QUCBhbmQgRlRQIG92
-ZXIgTDJDQVAgYXJlIHJlcXVpcmluZyBlTDJDQVAgYWN0dWFsbHkNCj4gd2hpY2ggaXMgcmUtcHJl
-c2VudGVkIGFzIGEgc3RyZWFtLg0KDQpZZXMsIE9CRVggb3ZlciBMMkNBUCByZXF1aXJlcyBlbmhh
-bmNlZCByZXRyYW5zbWlzc2lvbiBtb2RlLg0KDQpUaW0NCg0KVGhpcyBtZXNzYWdlIGlzIGZvciB0
-aGUgZGVzaWduYXRlZCByZWNpcGllbnQgb25seSBhbmQgbWF5IGNvbnRhaW4gcHJpdmlsZWdlZCwg
-cHJvcHJpZXRhcnksIG9yIG90aGVyd2lzZSBwcml2YXRlIGluZm9ybWF0aW9uLiAgSWYgeW91IGhh
-dmUgcmVjZWl2ZWQgaXQgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlh
-dGVseSBhbmQgZGVsZXRlIHRoZSBvcmlnaW5hbC4gIEFueSBvdGhlciB1c2Ugb2YgdGhlIGVtYWls
-IGJ5IHlvdSBpcyBwcm9oaWJpdGVkLg0K
+Hi Marcel,
+
+On Wed, Jun 15, 2011 at 2:10 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Gustavo,
+>
+>> > Now, this list receives patches for at least 3 different projects, so =
+how
+>> > about using different subject prefixes for each priject? The first thi=
+ng
+>> > that comes to mind is this:
+>>
+>> This is a great idea. It can a lot when identifying patches, and you can=
+ do
+>> this to the project's .git/config:
+>>
+>> [format]
+>> =A0 =A0 =A0 =A0 subjectprefix =3D "bluetooth-next"
+>
+> as long as patches come in as [PATCH bluetooth-next v2] or something
+> similar I am fine with this. I want the [PATCH ...] prefix kept alive
+> since that is one thing that git did right from the beginning.
+
+So an obexd patch would look like this:
+
+[PATCH obexd 1/4] Add initial support for OBEX Action command
+
+--=20
+Luiz Augusto von Dentz
+Computer Engineer
