@@ -1,68 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110615133932.GA14904@dell.ger.corp.intel.com>
-References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
-	<1307957658-11330-1-git-send-email-lkslawek@gmail.com>
-	<1307957658-11330-2-git-send-email-lkslawek@gmail.com>
-	<BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
-	<20110615133932.GA14904@dell.ger.corp.intel.com>
-Date: Wed, 15 Jun 2011 16:59:13 +0200
-Message-ID: <BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Slawomir Bochenski <lkslawek@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 0/4] Add support for custom (e)SCO parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	ulrik.lauren@stericsson.com
+Date: Wed, 15 Jun 2011 07:25:01 -0700
+In-Reply-To: <4DF8B976.3060804@tieto.com>
+References: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	 <1308136088.2518.3.camel@aeonflux> <4DF8B976.3060804@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308147904.2196.5.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 15, 2011 at 3:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Wed, Jun 15, 2011, Luiz Augusto von Dentz wrote:
->> So this while loop is a bit dangerous since it is supposing to be
->> doing io, so what about separating the read of apparam and body in two
->> callbacks, the apparam could probably be consider a metadata of you
->> are actually accessing so separating those might be a good idea in the
->> long term. If so then read should probably only read the data itself
->> and never mix with apparams, then we have a e.g. read_apparams which
->> is only called once before reading the actual data, how about that?
+Hi Andrzej,
 
-The loop is only used before we start streaming. That is because if
-there was no streaming started, request will be finished after
-returning from OpenOBEX callback. To still allow plugins to use the
-original approach, the loop guarantees that there will be another
-read() if the service plugin did not explicitly returned -EAGAIN, so
-read() still decides explicitly when it wants the suspending to
-happen, therefore it is perfectly aware of when to call
-obex_object_set_io_flags().
+> >> Following patches add possibility to specify custom parameters for
+> >> outgoing (e)SCO link. This is implemented as SCO socket options.
+> >>
+> >> This change allows to use reference parameters as defined in HFP 1.5
+> >> specification as well as support for future enchancements as wideband
+> >> speech as defined in HFP 1.6 draft (uses different air coding format).
+> >>
+> >> Additional socket option (patch 3) allows to disable automatic retry
+> >> in case of failure which fallbacks from eSCO to SCO connection in
+> >> current implementation. Such fallback should not happen when using
+> >> wideband speech which mandates using of eSCO transport.
+> >
+> > I am not a big fan of just stupidly exposing all possible HCI value to
+> > userspace and let userspace set them. Especially since in the end there
+> > are no real variation here anyway. There are just a 2-3 use cases for
+> > your SCO socket.
+> 
+> There's L2CAP_OPTIONS sockopt which allows to do pretty much the same 
+> for L2CAP sockets so I just followed it.
+> 
+> What do you mean by just 2-3 use cases for SCO socket? You consider only 
+> HFP as use case for SCO socket? I saw devices which use eSCO to stream 
+> music to mono headsets which do not support A2DP, this may require 
+> custom requirements which we cannot predict. This is only one example, 
+> but user can "invent" something else.
+> 
+> > I would rather have simple mode to hand to the kernel and let it do the
+> > right thing (including negotiation and downgrading to SCO) than having
+> > userspace opening sockets over sockets again.
+> 
+> By making such change you actually incorporate part of profiles into 
+> kernel. I don't think this is good idea. My understanding is that 
+> profiles should be in user-space.
+> 
+> And I don't recall any other profile than HFP that uses eSCO, so if 
+> we're going to implement "modes" using this spec, user won't have many 
+> options to choose from. See example above (music over eSCO).
+> 
+> > So what are the actual modes for HFP that need to be supported and what
+> > is the range of possible SCO and eSCO options?
+> 
+> At the moment only HFP 1.5 defines reference parameters for eSCO link.
+> In HFP 1.6 draft there are additional reference parameters for CVSD over 
+> SCO and mSBC over eSCO. And in future profiles you never know what BT 
+> SIG will invent :)
 
-This is just how OpenOBEX works - unless we are streaming body
-headers, we should add headers when getting event and suspend if we
-want to postpone finishing the request. I would not call this loop
-"dangerous".
+personally I would just go for PCM, CVSD and mSBC modes here actually.
 
-> Seems more or less ok with me, but I'd call it get_apparams since it's
-> not really a stream of data like the body. FWIW, I've completely missed
-> the extension of the read callback to return other types of data besides
-> that which is contained within body headers. The original intent of it
-> was to only operate on the actual object body and it'd be nice if we
-> could get it back to that state again.
+And you can not compare L2CAP with SCO since they are different. And
+also L2CAP does not expose everything that the spec. would offer.
 
-Well, we have also another possible header types and generally in some
-near future a profile may need to use more than just application
-parameters header and/or body headers (e.g. user defined headers).
-This might also allow sending Length header asynchronously (which by
-quick looking at code is not possible now).
+My real question is how you expose negotiation capabilities. Since
+re-creating the socket and its connection attempt is not going to work
+out. That concept will fail and will also break qualification testing.
 
-With approach I presented the cost of changes is very low and
-additionally makes it extremely easy to return all possible headers.
-Also everything just works, together with support for asynchronous
-I/O.
+Regards
 
-Adding additional callback will unnecessarily complicate the code.
+Marcel
 
--- 
-Slawomir Bochenski
+
