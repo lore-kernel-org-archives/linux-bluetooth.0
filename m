@@ -1,47 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [PATCH 2/2] Bluetooth:  FTP and OPP over L2CAP
-From: Marcel Holtmann <marcel@holtmann.org>
-To: tim.howes@accenture.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 15 Jun 2011 07:21:24 -0700
-In-Reply-To: <1AFE20D16950C745A2A83986B72E87480132148C3622@EMEXM3131.dir.svc.accenture.com>
-References: <1308110046-5704-1-git-send-email-nami.li@atheros.com>
-	 <1308136632.2518.11.camel@aeonflux>
-	 <1AFE20D16950C745A2A83986B72E87480132148C3622@EMEXM3131.dir.svc.accenture.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1308147687.2196.3.camel@aeonflux>
+Date: Wed, 15 Jun 2011 16:04:48 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] Add function to get default adapter ID
+Message-Id: <20110615160448.418f1ade.ospite@studenti.unina.it>
+In-Reply-To: <1308060161.9190.0.camel@air.hadess.net>
+References: <1307627589-25786-1-git-send-email-hadess@hadess.net>
+	<20110614130252.GA4215@dell.ger.corp.intel.com>
+	<1308060161.9190.0.camel@air.hadess.net>
 Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tim,
+--Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > +enum obex_transport_format{
-> > +      OBEX_MT_STREAM ,
-> > +      OBEX_MT_SEQPACKET
-> > +};
-> > +
-> > And more important, I have no idea why are you doing this anyway. Even
-> > with L2CAP this should run over SOCK_STREAM.
-> 
-> Is that really so?  I expect exposing L2CAP ERTM as a stream could break protocols above that expect datagram-boundary preservation (eg RTP).  Or can break protocols that mandate that only one higher-layer packet exists in each L2CAP SDU.  For these the socket needs to be packet based.
-> 
-> So, my surprise is that ERTM is exposed as SOCK_STREAM.  So I do have an idea why the patch mentions sequenced packet...
+On Tue, 14 Jun 2011 15:02:39 +0100
+Bastien Nocera <hadess@hadess.net> wrote:
 
-you can do both for ERTM actually. You can create SOCK_SEQPACKET and
-have it negotiate ERTM. However you can not run SOCK_STREAM on a Basic
-Mode connection.
+> On Tue, 2011-06-14 at 16:02 +0300, Johan Hedberg wrote:
+> > Hi Bastien,
 
-But the real benefit for higher layer protocols is if you become a
-SOCK_STREAM. Because you are MTU free now. Using SOCK_SEQPACKET with
-ERTM or Basic Mode is not really much of a difference.
+> > > diff --git a/src/manager.c b/src/manager.c
+> > > index e805e0c..9d0de25 100644
+> > > --- a/src/manager.c
+> > > +++ b/src/manager.c
+> > > @@ -288,6 +288,11 @@ static void manager_remove_adapter(struct btd_ad=
+apter *adapter)
+> > >  		btd_start_exit_timer();
+> > >  }
+> > > =20
+> > > +int manager_get_default_adapter_id(void)
+> > > +{
+> > > +	return default_adapter_id;
+> > > +}
+> >=20
+> > Would it not make more sense to have something that returns the adapter
+> > object directly? I.e. are there actually any use cases where some plugin
+> > would want the id but *not* want to resolve the matching adapter object?
+> > And even if the plugin still needs the id (which I'd expect to be a
+> > minority use-case if it exists at all) it can always call
+> > adapter_get_dev_id().
+>=20
+> I really really don't care either way. I sent both variations of the
+> patch already (Antonio has one in his patchset, and I sent the other).
+> Commit either, and we'll change our patches.
+>=20
 
-Especially with OBEX that has its own MTU anyway in the first place has
-always been run on SOCK_STREAM so far, what is the different that you
-expect by running it of SOCK_SEQPACKET with ERTM?
+Yep, same for me, either this one or the one in
+http://article.gmane.org/gmane.linux.kernel.input/19751 is OK, we just
+need a way to get the default adapter, please.
 
-Regards
+Thanks,
+   Antonio
 
-Marcel
+--=20
+Antonio Ospite
+http://ao2.it
 
+PGP public key ID: 0x4553B001
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk34vAAACgkQ5xr2akVTsAGDKgCeLJnNyvnu6Iz9BWfIrC1z7PcR
+CiIAoKJTpXVULr+f/t2oajDY2CPaw6EN
+=Elhk
+-----END PGP SIGNATURE-----
+
+--Signature=_Wed__15_Jun_2011_16_04_48_+0200_5Nkddo9AnrlD5bZx--
