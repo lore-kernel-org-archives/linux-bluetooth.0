@@ -1,166 +1,225 @@
 Return-Path: <cyrus@holtmann.org>
 From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [RFC 2/7] Add read RSSI on hciops
-Date: Wed, 15 Jun 2011 17:02:59 -0400
-Message-Id: <4df91d6b.0b73650a.190f.17a7@mx.google.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC 3/7] Add RSSI read callbacks
+Date: Wed, 15 Jun 2011 17:03:00 -0400
+Message-Id: <4df91d6d.0b73650a.190f.17a8@mx.google.com>
 In-Reply-To: <1308171784-24442-1-git-send-email-y>
 References: <y>
  <1308171784-24442-1-git-send-email-y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-Extend adapter_ops adding a function to read the RSSI of an active
-connection asynchronously. This patch extends hciops only, mgmtops
-requires kernel changes to become functional.
+Implements the adapter callback registration to allow asynchronous
+tracking of the RSSI of an active connection.
 ---
- plugins/hciops.c  |   39 +++++++++++++++++++++++++++++++++++++++
- plugins/mgmtops.c |   11 +++++++++++
- src/adapter.h     |    1 +
- src/event.c       |    8 ++++++++
- src/event.h       |    1 +
- 5 files changed, 60 insertions(+), 0 deletions(-)
+ src/adapter.c |  105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h |   13 +++++++
+ src/event.c   |    9 +++--
+ 3 files changed, 124 insertions(+), 3 deletions(-)
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 93cf822..a9cfc25 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -1789,6 +1789,22 @@ static inline void read_txpower_complete(int index, void *ptr)
- 	btd_event_txpower_read(&dev->bdaddr, &conn->bdaddr, rp->level);
+diff --git a/src/adapter.c b/src/adapter.c
+index b189841..d3d302b 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -79,6 +79,8 @@
+ 
+ #define OFF_TIMER 3
+ 
++#define READ_RSSI_INTERVAL	2
++
+ static DBusConnection *connection = NULL;
+ static GSList *adapter_drivers = NULL;
+ 
+@@ -104,6 +106,13 @@ struct service_auth {
+ 	struct btd_adapter *adapter;
+ };
+ 
++struct rssi_callback {
++	guint id;
++	btd_adapter_rssi_cb cb;
++	bdaddr_t bdaddr;
++	gpointer user_data;
++};
++
+ struct btd_adapter {
+ 	uint16_t dev_id;
+ 	int up;
+@@ -151,6 +160,9 @@ struct btd_adapter {
+ 	gboolean name_stored;
+ 
+ 	GSList *loaded_drivers;
++
++	GSList *rssi_callbacks;
++	gint rssi_id;
+ };
+ 
+ static void adapter_set_pairable_timeout(struct btd_adapter *adapter,
+@@ -2663,6 +2675,13 @@ void adapter_remove(struct btd_adapter *adapter)
+ 	/* Return adapter to down state if it was not up on init */
+ 	adapter_ops->restore_powered(adapter->dev_id);
+ 
++	g_slist_free(adapter->rssi_callbacks);
++
++	if (adapter->rssi_id) {
++		g_source_remove(adapter->rssi_id);
++		adapter->rssi_id = 0;
++	}
++
+ 	btd_adapter_unref(adapter);
  }
  
-+static inline void read_rssi_complete(int index, void *ptr)
-+{
-+	struct dev_info *dev = &devs[index];
-+	read_rssi_rp *rp = ptr;
-+	struct bt_conn *conn;
-+
-+	if (rp->status)
-+		return;
-+
-+	conn = find_conn_by_handle(dev, rp->handle);
-+	if (conn == NULL)
-+		return;
-+
-+	btd_event_rssi_read(&dev->bdaddr, &conn->bdaddr, rp->rssi);
-+}
-+
- static inline void cmd_complete(int index, void *ptr)
- {
- 	struct dev_info *dev = &devs[index];
-@@ -1863,6 +1879,9 @@ static inline void cmd_complete(int index, void *ptr)
- 	case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_TRANSMIT_POWER_LEVEL):
- 		ptr += sizeof(evt_cmd_complete);
- 		read_txpower_complete(index, ptr);
-+	case cmd_opcode_pack(OGF_STATUS_PARAM, OCF_READ_RSSI):
-+		ptr += sizeof(evt_cmd_complete);
-+		read_rssi_complete(index, ptr);
- 		break;
- 	};
- }
-@@ -3178,6 +3197,25 @@ static int hciops_read_clock(int index, bdaddr_t *bdaddr, int which,
- 	return 0;
+@@ -3573,6 +3592,92 @@ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
+ 			g_slist_remove(adapter->powered_callbacks, cb);
  }
  
-+static int hciops_read_rssi(int index, bdaddr_t *bdaddr)
++static gint rssi_id_cmp(gconstpointer a, gconstpointer b)
 +{
-+	struct dev_info *dev = &devs[index];
-+	uint16_t handle;
-+	int err;
++	const struct rssi_callback *rssicb = a;
++	guint id = GPOINTER_TO_UINT(b);
 +
-+	err = get_handle(index, bdaddr, &handle);
-+	if (err < 0)
-+		return err;
-+
-+	err = hci_send_cmd(dev->sk, OGF_STATUS_PARAM, OCF_READ_RSSI,
-+						sizeof(handle), &handle);
-+
-+	if (err < 0 )
-+		return -errno;
-+
-+	return 0;
++	return rssicb->id - id;
 +}
 +
- static int hciops_read_tx_power(int index, bdaddr_t *bdaddr)
- {
- 	struct dev_info *dev = &devs[index];
-@@ -3706,6 +3744,7 @@ static struct btd_adapter_ops hci_ops = {
- 	.set_dev_class = hciops_set_dev_class,
- 	.set_fast_connectable = hciops_fast_connectable,
- 	.read_clock = hciops_read_clock,
-+	.read_rssi = hciops_read_rssi,
- 	.read_tx_power = hciops_read_tx_power,
- 	.read_bdaddr = hciops_read_bdaddr,
- 	.block_device = hciops_block_device,
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 7ee86de..3be2607 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1673,6 +1673,16 @@ static int mgmt_read_clock(int index, bdaddr_t *bdaddr, int which, int timeout,
- 	return -ENOSYS;
- }
- 
-+static int mgmt_read_rssi(int index, bdaddr_t *bdaddr)
++void adapter_read_rssi_complete(struct btd_adapter *adapter, bdaddr_t *dba,
++								int8_t rssi)
 +{
-+	char addr[18];
++	struct rssi_callback *rssicb;
++	GSList *list;
 +
-+	ba2str(bdaddr, addr);
-+	DBG("index %d addr %s", index, addr);
++	for (list = adapter->rssi_callbacks; list; list = list->next) {
++		rssicb = list->data;
 +
-+	return -ENOSYS;
++		if (bacmp(&rssicb->bdaddr, dba))
++			continue;
++
++		rssicb->cb(adapter, rssi, rssicb->user_data);
++	}
 +}
 +
- static int mgmt_read_tx_power(int index, bdaddr_t *bdaddr)
++static gboolean read_rssi(gpointer user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	struct rssi_callback *rssicb;
++	GSList *list;
++
++	for (list = adapter->rssi_callbacks; list; list = list->next) {
++		rssicb = list->data;
++		adapter_ops->read_rssi(adapter->dev_id, &rssicb->bdaddr);
++	}
++
++	return TRUE;
++}
++
++guint btd_adapter_register_rssi_callback(struct btd_adapter *adapter,
++					bdaddr_t *bda, btd_adapter_rssi_cb cb,
++					gpointer user_data)
++{
++	struct rssi_callback *rssicb;
++	static guint rssi_counter = 0;
++
++	rssicb = g_new0(struct rssi_callback, 1);
++
++	rssicb->id = ++rssi_counter;
++	rssicb->cb = cb;
++	bacpy(&rssicb->bdaddr, bda);
++	rssicb->user_data = user_data;
++
++	if (adapter->rssi_callbacks == NULL)
++		adapter->rssi_id = g_timeout_add_seconds(READ_RSSI_INTERVAL,
++							read_rssi, adapter);
++
++	adapter->rssi_callbacks =
++		g_slist_append(adapter->rssi_callbacks, rssicb);
++
++	return rssicb->id;
++}
++
++gboolean btd_adapter_unregister_rssi_callback(struct btd_adapter *adapter, guint id)
++{
++	struct rssi_callback *rssicb;
++	GSList *list;
++
++	list = g_slist_find_custom(adapter->rssi_callbacks,
++					GUINT_TO_POINTER(id), rssi_id_cmp);
++	if (!list)
++		return FALSE;
++
++	rssicb = list->data;
++
++	adapter->rssi_callbacks = g_slist_remove(adapter->rssi_callbacks,
++								rssicb);
++	g_free(rssicb);
++
++	if (adapter->rssi_callbacks == NULL) {
++		g_source_remove(adapter->rssi_id);
++		adapter->rssi_id = 0;
++	}
++
++	return TRUE;
++}
++
+ int btd_adapter_set_fast_connectable(struct btd_adapter *adapter,
+ 							gboolean enable)
  {
- 	char addr[18];
-@@ -2026,6 +2036,7 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.set_dev_class = mgmt_set_dev_class,
- 	.set_fast_connectable = mgmt_fast_connectable,
- 	.read_clock = mgmt_read_clock,
-+	.read_rssi = mgmt_read_rssi,
- 	.read_tx_power = mgmt_read_tx_power,
- 	.read_bdaddr = mgmt_read_bdaddr,
- 	.block_device = mgmt_block_device,
 diff --git a/src/adapter.h b/src/adapter.h
-index 1fa7431..342530c 100644
+index 342530c..af6b908 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -182,6 +182,7 @@ struct btd_adapter_ops {
- 	int (*set_fast_connectable) (int index, gboolean enable);
- 	int (*read_clock) (int index, bdaddr_t *bdaddr, int which, int timeout,
- 					uint32_t *clock, uint16_t *accuracy);
-+	int (*read_rssi) (int index, bdaddr_t *bdaddr);
- 	int (*read_tx_power) (int index, bdaddr_t *bdaddr);
- 	int (*read_bdaddr) (int index, bdaddr_t *bdaddr);
- 	int (*block_device) (int index, bdaddr_t *bdaddr);
+@@ -132,6 +132,9 @@ gboolean adapter_has_discov_sessions(struct btd_adapter *adapter);
+ void adapter_suspend_discovery(struct btd_adapter *adapter);
+ void adapter_resume_discovery(struct btd_adapter *adapter);
+ 
++void adapter_read_rssi_complete(struct btd_adapter *adapter, bdaddr_t *dba,
++								int8_t rssi);
++
+ struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
+ void btd_adapter_unref(struct btd_adapter *adapter);
+ 
+@@ -220,11 +223,21 @@ int adapter_ops_setup(void);
+ 
+ typedef void (*btd_adapter_powered_cb) (struct btd_adapter *adapter,
+ 						gboolean powered);
++
++typedef void (*btd_adapter_rssi_cb) (struct btd_adapter *adapter,
++					int8_t rssi, gpointer user_data);
++
+ void btd_adapter_register_powered_callback(struct btd_adapter *adapter,
+ 						btd_adapter_powered_cb cb);
+ void btd_adapter_unregister_powered_callback(struct btd_adapter *adapter,
+ 						btd_adapter_powered_cb cb);
+ 
++guint btd_adapter_register_rssi_callback(struct btd_adapter *adapter,
++					bdaddr_t *dba, btd_adapter_rssi_cb cb,
++					gpointer user_data);
++
++gboolean btd_adapter_unregister_rssi_callback(struct btd_adapter *adapter,
++								guint id);
+ /* If TRUE, enables fast connectabe, i.e. reduces page scan interval and changes
+  * type. If FALSE, disables fast connectable, i.e. sets page scan interval and
+  * type to default values. Valid for both connectable and discoverable modes. */
 diff --git a/src/event.c b/src/event.c
-index e6383e6..4c613a3 100644
+index 4c613a3..5551cb6 100644
 --- a/src/event.c
 +++ b/src/event.c
-@@ -483,3 +483,11 @@ void btd_event_txpower_read(bdaddr_t *local, bdaddr_t *peer, int8_t level)
- 	ba2str(peer, peer_addr);
- 	DBG("%s TX Power: %d", peer_addr, level);
+@@ -486,8 +486,11 @@ void btd_event_txpower_read(bdaddr_t *local, bdaddr_t *peer, int8_t level)
+ 
+ void btd_event_rssi_read(bdaddr_t *local, bdaddr_t *peer, int8_t rssi)
+ {
+-	char peer_addr[18];
++	struct btd_adapter *adapter;
+ 
+-	ba2str(peer, peer_addr);
+-	DBG("%s RSSI: %d", peer_addr, rssi);
++	adapter = manager_find_adapter(local);
++	if (!adapter)
++		return;
++
++	adapter_read_rssi_complete(adapter, peer, rssi);
  }
-+
-+void btd_event_rssi_read(bdaddr_t *local, bdaddr_t *peer, int8_t rssi)
-+{
-+	char peer_addr[18];
-+
-+	ba2str(peer, peer_addr);
-+	DBG("%s RSSI: %d", peer_addr, rssi);
-+}
-diff --git a/src/event.h b/src/event.h
-index 011d933..e0148bb 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -41,3 +41,4 @@ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
- 					uint8_t key_type, uint8_t pin_length);
- void btd_event_txpower_read(bdaddr_t *local, bdaddr_t *peer, int8_t level);
-+void btd_event_rssi_read(bdaddr_t *local, bdaddr_t *peer, int8_t rssi);
 -- 
 1.7.4.1
 
