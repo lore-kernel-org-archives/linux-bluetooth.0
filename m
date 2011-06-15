@@ -1,61 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 0/7] Implement Proximity Path Loss
-Date: Wed, 15 Jun 2011 17:02:57 -0400
-Message-Id: <4df91d68.0b73650a.190f.17a4@mx.google.com>
-In-Reply-To: <y>
-References: <y>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 15 Jun 2011 23:53:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
+	Ranulf Doswell <ralf@ranulf.net>,
+	"Pascal A . Brisset" <pascal44973@pabr.org>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
+	Mikko Virkkila <virkkila@kapsi.fi>,
+	Simon Wood <simon@mungewell.org>
+Subject: Re: [PATCHv3 2/3] Re-add manager_get_default_adapter()
+Message-ID: <20110615205304.GA9331@dell.Elisa>
+References: <1307538557-9287-1-git-send-email-ospite@studenti.unina.it>
+ <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1307538557-9287-3-git-send-email-ospite@studenti.unina.it>
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+Hi,
 
-The following changes intend to be used by Proximity Monitor (mainly).
-Proximity Path Loss needs to track the RSSI and TX Power. The suggested
-approach for RSSI and TX power is similar to adapter powered callbacks, a
-client(Proximity Monitor in our case) will register a callback per remote to be
-notified when the RSSI of the active connection changes. Tx power will be used
-by the Proximity Reporter to update the Tx Power Characteristic of the active
-connection.
+On Wed, Jun 08, 2011, Antonio Ospite wrote:
+> From: Bastien Nocera <hadess@hadess.net>
+> 
+> Signed-off-by: Bastien Nocera <hadess@hadess.net>
+> Signed-off-by: Antonio Ospite <ospite@studenti.unina.it>
+> ---
+>  src/manager.c |    5 +++++
+>  src/manager.h |    1 +
+>  2 files changed, 6 insertions(+), 0 deletions(-)
 
-In this first proposal, the adapter reads the RSSI and/or Tx Power on regular
-intervals(2 seconds) using hciops or mgmtops if there is at least one callback
-registered.  Callbacks(per remote) can be registered using
-btd_adapter_register_rssi_callback/btd_adapter_register_txpower_callback
-functions.  Results from the hciops or mgmtops are reported using btd_event_xxx
-and the value is "routed" to the registered callbacks.
+I've applied this one (with the signed-off-by lines remove which we
+don't use and a better explanation) so you can continue with each of
+your work in fine-tuning/fixing your patches.
 
-Comments are welcome.
-
-Anderson Briglia
-
-Anderson Briglia (1):
-  Implement mgmt_read_rssi command
-
-Bruna Moreira (2):
-  Implement mgmt_read_tx_power command
-  Update Management API documentation
-
-Claudio Takahasi (3):
-  Add current tx power read on hciops
-  Add RSSI read callbacks
-  Add transmission power callbacks
-
-Sheldon Demario (1):
-  Add read RSSI on hciops
-
- doc/mgmt-api.txt  |   20 +++++
- lib/mgmt.h        |   20 +++++
- plugins/hciops.c  |   82 +++++++++++++++++++++
- plugins/mgmtops.c |  106 +++++++++++++++++++++++++++
- src/adapter.c     |  204 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h     |   25 +++++++
- src/event.c       |   26 +++++++
- src/event.h       |    2 +
- 8 files changed, 485 insertions(+), 0 deletions(-)
-
--- 
-1.7.4.1
-
+Johan
