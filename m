@@ -1,43 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jun 2011 15:04:43 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Per-project patch prefixes
-Message-ID: <20110615120443.GA11463@dell.ger.corp.intel.com>
-References: <20110614211507.GB27437@piper>
- <20110614213143.GD2613@joana>
- <1308136231.2518.5.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1308136231.2518.5.camel@aeonflux>
+Subject: Re: [PATCH 2/2] Bluetooth:  FTP and OPP over L2CAP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Nami <nami.li@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 15 Jun 2011 04:17:10 -0700
+In-Reply-To: <1308110046-5704-1-git-send-email-nami.li@atheros.com>
+References: <1308110046-5704-1-git-send-email-nami.li@atheros.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308136632.2518.11.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Nami,
 
-On Wed, Jun 15, 2011, Marcel Holtmann wrote:
-> > > Now, this list receives patches for at least 3 different projects, so how
-> > > about using different subject prefixes for each priject? The first thing
-> > > that comes to mind is this:
-> > 
-> > This is a great idea. It can a lot when identifying patches, and you can do
-> > this to the project's .git/config:
-> > 
-> > [format]
-> >         subjectprefix = "bluetooth-next"
+> From: nami <nami.li@atheros.com>
 > 
-> as long as patches come in as [PATCH bluetooth-next v2] or something
-> similar I am fine with this. I want the [PATCH ...] prefix kept alive
-> since that is one thing that git did right from the beginning.
+> 
+> Signed-off-by: Nami <nami.li@atheros.com>
 
-The mandatory part then becomes "[PATCH bluetooth-next] Bluetooth: ".
-That doesn't leave much to the really valuable part, especially if
-you're on a 80-column wide terminal. Add Subject: to the beginning and
-you've got even less. Kernel patches already have the Bluetooth: prefix
-in the subject so they are pretty easy to spot IMHO. For obexd OTOH I'd
-be fine with a [PATCH obexd] convention.
+same as with the other one.
 
-Johan
+> ---
+>  glib/obex-lowlevel.c          |    2 +-
+>  include/openobex/obex.h       |    2 +-
+>  include/openobex/obex_const.h |    5 +++++
+>  lib/obex.c                    |    3 ++-
+>  lib/obex_main.c               |    5 ++++-
+>  lib/obex_transport.h          |    1 +
+>  6 files changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/glib/obex-lowlevel.c b/glib/obex-lowlevel.c
+> index 65172fc..660fc37 100644
+> --- a/glib/obex-lowlevel.c
+> +++ b/glib/obex-lowlevel.c
+> @@ -496,7 +496,7 @@ obex_t *obex_open(int fd, obex_callback_t *callback, void *data)
+> 
+>  	OBEX_SetTransportMTU(handle, sizeof(context->buf), sizeof(context->buf));
+> 
+> -	if (FdOBEX_TransportSetup(handle, fd, fd, 0) < 0) {
+> +	if (FdOBEX_TransportSetup(handle, fd, fd, 0, OBEX_MT_STREAM) < 0) {
+>  		OBEX_Cleanup(handle);
+>  		return NULL;
+>  	}
+> diff --git a/include/openobex/obex.h b/include/openobex/obex.h
+> index f948113..0d7afec 100644
+> --- a/include/openobex/obex.h
+> +++ b/include/openobex/obex.h
+> @@ -147,7 +147,7 @@ OPENOBEX_SYMBOL(int) BtOBEX_TransportConnect(obex_t *self, bt_addr_t *src, bt_ad
+>  /*
+>   * OBEX File API
+>   */
+> -OPENOBEX_SYMBOL(int) FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu);
+> +OPENOBEX_SYMBOL(int) FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu, int fmt);
+
+this is breaking public API.
+
+>  /*
+>   * OBEX interface discovery API
+> diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
+> index cb7afeb..4a0a7e9 100644
+> --- a/include/openobex/obex_const.h
+> +++ b/include/openobex/obex_const.h
+> @@ -302,6 +302,11 @@ enum obex_rsp_mode {
+>    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+>  };
+> 
+> +enum obex_transport_format{
+> +	 OBEX_MT_STREAM ,
+> +	 OBEX_MT_SEQPACKET
+> +};
+> +
+
+And more important, I have no idea why are you doing this anyway. Even
+with L2CAP this should run over SOCK_STREAM.
+
+I assumed that OPP and FTP over L2CAP are requiring eL2CAP actually
+which is re-presented as a stream.
+
+Regards
+
+Marcel
+
+
