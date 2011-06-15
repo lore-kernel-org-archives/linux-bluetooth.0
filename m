@@ -1,85 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1308147687.2196.3.camel@aeonflux>
-References: <1308110046-5704-1-git-send-email-nami.li@atheros.com>
-	<1308136632.2518.11.camel@aeonflux>
-	<1AFE20D16950C745A2A83986B72E87480132148C3622@EMEXM3131.dir.svc.accenture.com>
-	<1308147687.2196.3.camel@aeonflux>
-Date: Wed, 15 Jun 2011 16:01:43 +0100
-Message-ID: <BANLkTinWVSVxXQoFW9rtXaTbQQD-XYpvRA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: FTP and OPP over L2CAP
-From: =?ISO-8859-1?Q?Piotr_Zg=F3recki?= <pzgorecki@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, tim.howes@accenture.com
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20110615133932.GA14904@dell.ger.corp.intel.com>
+References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
+	<1307957658-11330-1-git-send-email-lkslawek@gmail.com>
+	<1307957658-11330-2-git-send-email-lkslawek@gmail.com>
+	<BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
+	<20110615133932.GA14904@dell.ger.corp.intel.com>
+Date: Wed, 15 Jun 2011 16:59:13 +0200
+Message-ID: <BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel,
+On Wed, Jun 15, 2011 at 3:39 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Wed, Jun 15, 2011, Luiz Augusto von Dentz wrote:
+>> So this while loop is a bit dangerous since it is supposing to be
+>> doing io, so what about separating the read of apparam and body in two
+>> callbacks, the apparam could probably be consider a metadata of you
+>> are actually accessing so separating those might be a good idea in the
+>> long term. If so then read should probably only read the data itself
+>> and never mix with apparams, then we have a e.g. read_apparams which
+>> is only called once before reading the actual data, how about that?
 
-Allow me to quote GOEP this time :)
-"
->From 7.1 L2CAP Interoperability Requirements
-7.1.1 MTU option
-According to [1], OBEX packets must fit completely within a single
-L2CAP SDU, so an implementation shall either configure the L2CAP MTU
-to be large enough to hold the largest OBEX packet or configure the
-OBEX packet size to be small enough to fit within the L2CAP MTU. In
-any case the OBEX packet size should be set as large as possible,
-especially in the case that the Single Response Mode feature of IrOBEX
-is not supported. By definition:
-=95 The L2CAP MTU refers to the SDU size
-=95 The SDU is the application packet (OBEX packet in GOEP)
-"
+The loop is only used before we start streaming. That is because if
+there was no streaming started, request will be finished after
+returning from OpenOBEX callback. To still allow plugins to use the
+original approach, the loop guarantees that there will be another
+read() if the service plugin did not explicitly returned -EAGAIN, so
+read() still decides explicitly when it wants the suspending to
+happen, therefore it is perfectly aware of when to call
+obex_object_set_io_flags().
 
-So you can't hide the MTUs from OBEX. What is the point of using a
-streaming socket then ?
-I think it's a good illustration of the point I was trying to make in
-my previous email. L2CAP uses SDUs, which unlike e.g. segments in TCP
-_are_ exposed to the upper layers, and you'll find running away from
-them rather difficult :)
+This is just how OpenOBEX works - unless we are streaming body
+headers, we should add headers when getting event and suspend if we
+want to postpone finishing the request. I would not call this loop
+"dangerous".
 
-Cheers,
-Piotr
+> Seems more or less ok with me, but I'd call it get_apparams since it's
+> not really a stream of data like the body. FWIW, I've completely missed
+> the extension of the read callback to return other types of data besides
+> that which is contained within body headers. The original intent of it
+> was to only operate on the actual object body and it'd be nice if we
+> could get it back to that state again.
 
-On 15 June 2011 15:21, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Tim,
->
->> > +enum obex_transport_format{
->> > + =A0 =A0 =A0OBEX_MT_STREAM ,
->> > + =A0 =A0 =A0OBEX_MT_SEQPACKET
->> > +};
->> > +
->> > And more important, I have no idea why are you doing this anyway. Even
->> > with L2CAP this should run over SOCK_STREAM.
->>
->> Is that really so? =A0I expect exposing L2CAP ERTM as a stream could bre=
-ak protocols above that expect datagram-boundary preservation (eg RTP). =A0=
-Or can break protocols that mandate that only one higher-layer packet exist=
-s in each L2CAP SDU. =A0For these the socket needs to be packet based.
->>
->> So, my surprise is that ERTM is exposed as SOCK_STREAM. =A0So I do have =
-an idea why the patch mentions sequenced packet...
->
-> you can do both for ERTM actually. You can create SOCK_SEQPACKET and
-> have it negotiate ERTM. However you can not run SOCK_STREAM on a Basic
-> Mode connection.
->
-> But the real benefit for higher layer protocols is if you become a
-> SOCK_STREAM. Because you are MTU free now. Using SOCK_SEQPACKET with
-> ERTM or Basic Mode is not really much of a difference.
->
-> Especially with OBEX that has its own MTU anyway in the first place has
-> always been run on SOCK_STREAM so far, what is the different that you
-> expect by running it of SOCK_SEQPACKET with ERTM?
->
-> Regards
->
-> Marcel
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Well, we have also another possible header types and generally in some
+near future a profile may need to use more than just application
+parameters header and/or body headers (e.g. user defined headers).
+This might also allow sending Length header asynchronously (which by
+quick looking at code is not possible now).
+
+With approach I presented the cost of changes is very low and
+additionally makes it extremely easy to return all possible headers.
+Also everything just works, together with support for asynchronous
+I/O.
+
+Adding additional callback will unnecessarily complicate the code.
+
+-- 
+Slawomir Bochenski
