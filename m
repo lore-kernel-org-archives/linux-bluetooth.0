@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Thu, 16 Jun 2011 18:57:18 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH] Cleanup: 'features' in btd_adapter is no longer used.
-Date: Thu, 16 Jun 2011 19:13:46 -0300
-Message-Id: <1308262426-27637-1-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [RFC] Bluetooth: Add link_type information to the mgmt Connected
+ event
+Message-ID: <20110616215718.GA23537@piper.indt.org>
+References: <1307745283-12160-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20110616205639.GD2594@joana>
+ <20110616210924.GA14812@dell.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110616210924.GA14812@dell.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c |   12 ------------
- 1 files changed, 0 insertions(+), 12 deletions(-)
+Hi Johan,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index b189841..2650b56 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -135,8 +135,6 @@ struct btd_adapter {
- 	guint scheduler_id;		/* Scheduler handle */
- 	sdp_list_t *services;		/* Services associated to adapter */
- 
--	uint8_t  features[8];
--
- 	gboolean pairable;		/* pairable state */
- 	gboolean initialized;
- 
-@@ -2570,8 +2568,6 @@ void btd_adapter_unref(struct btd_adapter *adapter)
- 
- gboolean adapter_init(struct btd_adapter *adapter)
- {
--	int err;
--
- 	/* adapter_ops makes sure that newly registered adapters always
- 	 * start off as powered */
- 	adapter->up = TRUE;
-@@ -2583,14 +2579,6 @@ gboolean adapter_init(struct btd_adapter *adapter)
- 		return FALSE;
- 	}
- 
--	err = adapter_ops->read_local_features(adapter->dev_id,
--							adapter->features);
--	if (err < 0) {
--		error("Can't read features for hci%d: %s (%d)",
--					adapter->dev_id, strerror(-err), -err);
--		return FALSE;
--	}
--
- 	if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
- 		expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
- 							adapter->dev_id);
+On 00:09 Fri 17 Jun, Johan Hedberg wrote:
+> Hi,
+> 
+> On Thu, Jun 16, 2011, Gustavo F. Padovan wrote:
+> > > -int mgmt_connected(u16 index, bdaddr_t *bdaddr)
+> > > +int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
+> > >  {
+> > >  	struct mgmt_ev_connected ev;
+> > > 
+> > >  	bacpy(&ev.bdaddr, bdaddr);
+> > > +	ev.link_type = link_type;
+> > > 
+> > >  	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
+> > >  }
+> > 
+> > Seems good to me. Anyone else has comments on it?
+> 
+> It seems this is using the SCO_LINK, ESCO_LINK, ACL_LINK, and LE_LINK
+> defines, right? If we're going to add an address or link type I think
+> it'd be good to have the random vs public information for LE addresses
+> included from the start.
+
+Yes, we have to think about exporting the type of the address, I just am
+not sure that the Connected event is the right place, for me, the story this
+event tells is more like: "we are connected to device X over link Y". I
+don't know how to fit address type information in that message.
+
+The Device Found event, on the other hand, seems more appropriate for address
+type information.
+
+> 
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Cheers,
 -- 
-1.7.4.1
-
+Vinicius
