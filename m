@@ -1,58 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4DF9E9FA.7050403@tieto.com>
-References: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1308136088.2518.3.camel@aeonflux>
-	<4DF8B976.3060804@tieto.com>
-	<1308147904.2196.5.camel@aeonflux>
-	<4DF9E9FA.7050403@tieto.com>
-Date: Thu, 16 Jun 2011 17:00:34 +0300
-Message-ID: <BANLkTikZ41m2rMGSGCrOpYXEFFtfnfzv=Q@mail.gmail.com>
-Subject: Re: [PATCH 0/4] Add support for custom (e)SCO parameters
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+In-Reply-To: <BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	<1308175855.2196.7.camel@aeonflux>
+	<BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+	<1308191356.2196.9.camel@aeonflux>
+	<7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+	<BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
+Date: Thu, 16 Jun 2011 09:49:43 -0400
+Message-ID: <BANLkTim3fp1UG7r5zS+iXJZP2Aw00=4OjQ@mail.gmail.com>
+Subject: Re: [RFC 7/7] Update Management API documentation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Ganir, Chen" <chen.ganir@ti.com>, Marcel Holtmann <marcel@holtmann.org>,
+	"anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"par-gunnar.p.hjalmdahl@stericsson.com" <par-gunnar.p.hjalmdahl@stericsson.com>,
-	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>
+	Bruna Moreira <bruna.moreira@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Jun 16, 2011 at 2:33 PM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> Why do you think re-creating the socket is not going to work? How it is
-> different than second attempt to connect SCO when eSCO failed, which is n=
-ow
-> handled inside kernel? The same could be done by user-space but in more
-> sophisticated way which suits specific requirements. And this is how
-> negotiation is solved.
+On Thu, Jun 16, 2011 at 3:54 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> You probably forgot that besides bluetoothd there should be no other
+> application holding the mgmt socket, so not you can't really do it in
+> poll in the application side and doing it over D-Bus is overkill. Also
+> I notice that from some parties, you include, there is some tendency
+> to have the profiles split from the bluetoothd, IMO this will only add
+> fragmentation with each and every platform using BlueZ having their
+> own implementation of each profile and not sharing much, making the
+> IOP a complete mess.
 
-Well the socket API is not meant to do this type of negotiation while
-connecting, you basically have connect/accept and in case you fail to
-configure you have to give up this socket and create a new one, also
-the error reported by the socket may not be enough to you to figure
-out what went wrong the first time to retry.
+I would like to bring attention to a thread I attempted to start some
+time ago, named "D-Bus GATT API for external/proprietary profiles". If
+anyone is really willing to implement external profiles over D-Bus,
+please voice your points that would support this. Note that this
+attempt never happened before, AFAIK all bluez supported profiles are
+implemented internally on bluez source code, usually as plugins.
 
-> And what qualification testing will it break?
->
->
-> Could you please elaborate a little bit more on the above questions so I =
-can
-> understand your point of view better.
->
-> BR,
-> Andrzej
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
-
-
-
---=20
-Luiz Augusto von Dentz
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
