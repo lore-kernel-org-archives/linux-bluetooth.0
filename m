@@ -1,75 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        "anderson.briglia@openbossa.org"
-	<anderson.briglia@openbossa.org>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>,
-        Bruna Moreira
-	<bruna.moreira@openbossa.org>
-Date: Thu, 16 Jun 2011 16:19:34 +0200
-Subject: RE: [RFC 7/7] Update Management API documentation
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01D395E0F5@dnce01.ent.ti.com>
+MIME-Version: 1.0
+In-Reply-To: <20110616140802.GA9225@dell.ger.corp.intel.com>
 References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
 	<1308175855.2196.7.camel@aeonflux>
 	<BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
-	<7769C83744F2C34A841232EF77AEA20C01D395DC90@dnce01.ent.ti.com>
- <BANLkTikn6b+8yezsPOAc77P5dfi2XA8TZA@mail.gmail.com>
-In-Reply-To: <BANLkTikn6b+8yezsPOAc77P5dfi2XA8TZA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+	<1308191356.2196.9.camel@aeonflux>
+	<7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+	<BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
+	<BANLkTim3fp1UG7r5zS+iXJZP2Aw00=4OjQ@mail.gmail.com>
+	<20110616140802.GA9225@dell.ger.corp.intel.com>
+Date: Thu, 16 Jun 2011 10:17:41 -0400
+Message-ID: <BANLkTim_ESc=PTjySsfEek-7aUrq9Rj2kw@mail.gmail.com>
+Subject: Re: [RFC 7/7] Update Management API documentation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "Ganir, Chen" <chen.ganir@ti.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	"anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-> -----Original Message-----
-> From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org]
-> Sent: Thursday, June 16, 2011 4:45 PM
-> To: Ganir, Chen
-> Cc: Marcel Holtmann; anderson.briglia@openbossa.org; linux-
-> bluetooth@vger.kernel.org; Bruna Moreira
-> Subject: Re: [RFC 7/7] Update Management API documentation
->=20
-> Hi Chen,
->=20
-> On Thu, Jun 16, 2011 at 2:03 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
-> > Please note that this is currently true for LE connection, but may
-> change
-> > in the future.
->=20
-> If you read the latest Proximity draft (not from bluetooth.org, from
-> the mailing lists), you will see that the recommendation to read TX
-> power once on LE is to conserve power (specially on the single mode
-> device, I suppose, but it would waste power on the BlueZ side as
-> well). Unfortunately, if they change the recommendation again (in this
-> case they would be returning to a previous decision), we would
-> inevitably have to change implementation anyway.
+On Thu, Jun 16, 2011 at 10:08 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> I would like to bring attention to a thread I attempted to start some
+>> time ago, named "D-Bus GATT API for external/proprietary profiles". If
+>> anyone is really willing to implement external profiles over D-Bus,
+>> please voice your points that would support this. Note that this
+>> attempt never happened before, AFAIK all bluez supported profiles are
+>> implemented internally on bluez source code, usually as plugins.
+>
+> Not all profiles. There's e.g. the OBEX profiles provided by obexd. The
+> main reason for that separation is that practically everything handled
+> by obexd is user data which doesn't belong in a system level daemon like
+> bluetoothd. The same system-user separation could be a reason for other
+> profiles to exist in separate processes. Then there's also partial
+> splits like that for HFP where audio is handled by an audio subsystem
+> like PulseAudio and signaling by a cellular subsystem like oFono.
 
-Anderson,
->From the version I have (d10), it is clearly seen that it can support both
-BR/EDR and LE as well (service discovery for example is explained for both
-BR/EDR and LE). In addition, it is stated in this version of the spec that
-The TX power characteristic should return the current TX power level. This
-means that if there is any chance that this level changes, it must be updat=
-ed
-periodically, or read each time the characteristic is accessed for reading
-(with the suggested GATT server callback mechanism).Furthermore, it is clea=
-rly=20
-specified that on BR/EDR, when the TX Power level changes, the reporter=20
-should notify the monitor about the change, if it's registered for these=20
-notifications.
+Thanks for the clarification. I completely forgot about these cases
+(also I don't actually know how obexd integrates with bluetoothd,
+blame on me). But looks like the decision to whether to implement a
+profile fully inside or outside (partially or not) bluez is per
+profile, right? I think GATT profiles are so diverse that we would
+have to make the decision on a profile basis. In this case, it helps
+each profile having its own D-Bus API and plugin.
 
-I see no reason to implement different behavior or logic for BE/EDR or LE.=
-=20
-In addition, I do not believe it is the responsibility of the bluez stack=20
-(adapter in this case) to set the intervals for getting this info - it is=20
-the responsibility of the profile, whether it is implemented as a bluez plu=
-gin=20
-(so the plugin initiates the RSSI/TX Power readings according to its own=20
-timing) or by an external profile (if future bluez implementation allows th=
-is).
+Proximity, for instance, is so attached to the connection state (and
+depending on RSSI and TX power) that it would be an example of one
+profile that is best implemented next to BlueZ.
 
+Future GATT profiles which might need to read a lot of user
+information might need a split from bluetoothd process.
 
-
-Thanks,
-Chen Ganir
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
