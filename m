@@ -1,43 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] Fix build when pcsuite plugin is enabled
-Date: Thu, 16 Jun 2011 10:34:59 +0300
-Message-Id: <1308209699-3819-1-git-send-email-luiz.dentz@gmail.com>
+From: Ajay Pillai <Ajay.Pillai@csr.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: GATT  and GATT based Profiles architecture - Query
+Date: Thu, 16 Jun 2011 07:15:51 +0000
+Message-ID: <8DCFA6B89B9E70418E47A2348D55495A478165D6@banasiexm01.ASIA.ROOT.PRI>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	 <1308175855.2196.7.camel@aeonflux>
+	 <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+ <1308191356.2196.9.camel@aeonflux>
+In-Reply-To: <1308191356.2196.9.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-Commit 4ae4f7c4949c6e53cd4c874c9cc533038cd03fb2 breakes the pcsuite
-plugin by changing the .read API.
----
- plugins/pcsuite.c |    6 +-----
- 1 files changed, 1 insertions(+), 5 deletions(-)
-
-diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
-index fc60114..125f25a 100644
---- a/plugins/pcsuite.c
-+++ b/plugins/pcsuite.c
-@@ -428,17 +428,13 @@ static int backup_close(void *object)
- 	return 0;
- }
- 
--static ssize_t backup_read(void *object, void *buf, size_t count,
--					uint8_t *hi, unsigned int *flags)
-+static ssize_t backup_read(void *object, void *buf, size_t count, uint8_t *hi)
- {
- 	struct backup_object *obj = object;
- 	ssize_t ret = 0;
- 
- 	*hi = OBEX_HDR_BODY;
- 
--	if (flags)
--		*flags = 0;
--
- 	if (obj->pending_call) {
- 		DBG("cmd = %s, IN WAITING STAGE", obj->cmd);
- 		return -EAGAIN;
--- 
-1.7.5.4
-
+SGksDQoNCkkgaGF2ZSBiZWVuIHJlYWRpbmcgc29tZSBwb3N0cyB3aGVyZSB0
+aGUgR0FUVCBwcm9maWxlcyB3ZXJlIHJlZmVycmVkIHRvIGFzICJwbHVnaW5z
+Ii4NCg0KQ291bGQgeW91IHRlbGwgbWUgd2hhdCBpcyBhICJwbHVnaW4iIGlu
+IHRoaXMgY29udGV4dD8NCkFyZSB0aGVzZSBwcm9maWxlcyBydW5uaW5nIGlu
+IGEgc2VwYXJhdGUgcHJvY2VzcyBzcGFjZSAodG8gcmVzdCBvZiBCbHVlWiBo
+YXZpbmcgR0FUVCAvQVRUKT8NCkNhbiB0aGVzZSBwcm9maWxlcyBiZSBicm91
+Z2h0IHVwIGFuZCBkb3duIGF0IHJ1biB0aW1lPw0KQ2FuIG5vbnN0YW5kYXJk
+IHVzZWNhc2VzIGJlIGltcGxlbWVudGVkIGFuZCBwbHVnZ2VkIGluIHRvIHVz
+ZSBHQVRUIGZyb20gQmx1ZVo/DQoNCkkgYW0gaGFwcHkgdG8gaGF2ZSBzb21l
+IGNvZGUgcmVmZXJlbmNlcyB0aGF0IGNhbiBzaG93IG1lIHRoZSBhbnN3ZXIg
+dG8gdGhlc2UuDQoNClRoYW5rIHlvdQ0KYWpheQ0KCgpNZW1iZXIgb2YgdGhl
+IENTUiBwbGMgZ3JvdXAgb2YgY29tcGFuaWVzLiBDU1IgcGxjIHJlZ2lzdGVy
+ZWQgaW4gRW5nbGFuZCBhbmQgV2FsZXMsIHJlZ2lzdGVyZWQgbnVtYmVyIDQx
+ODczNDYsIHJlZ2lzdGVyZWQgb2ZmaWNlIENodXJjaGlsbCBIb3VzZSwgQ2Ft
+YnJpZGdlIEJ1c2luZXNzIFBhcmssIENvd2xleSBSb2FkLCBDYW1icmlkZ2Us
+IENCNCAwV1osIFVuaXRlZCBLaW5nZG9tCk1vcmUgaW5mb3JtYXRpb24gY2Fu
+IGJlIGZvdW5kIGF0IHd3dy5jc3IuY29tLiBGb2xsb3cgQ1NSIG9uIFR3aXR0
+ZXIgYXQgaHR0cDovL3R3aXR0ZXIuY29tL0NTUl9QTEMgYW5kIHJlYWQgb3Vy
+IGJsb2cgYXQgd3d3LmNzci5jb20vYmxvZwo=
