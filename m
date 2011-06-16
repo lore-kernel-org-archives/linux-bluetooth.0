@@ -1,59 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: "piotr.zgorecki@accenture.com" <piotr.zgorecki@accenture.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "tim.howes@accenture.com" <tim.howes@accenture.com>
-Subject: RE: [PATCH 2/2] Bluetooth:  FTP and OPP over L2CAP
-Date: Thu, 16 Jun 2011 02:41:58 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103C8450@nasanexd01a.na.qualcomm.com>
-References: <1AFE20D16950C745A2A83986B72E87480132148C3626@EMEXM3131.dir.svc.accenture.com>
- <56CE5C6D2B8C7844B3FD6D5DDA55523D3E8FFE632A@EMEXM3125.dir.svc.accenture.com>
-In-Reply-To: <56CE5C6D2B8C7844B3FD6D5DDA55523D3E8FFE632A@EMEXM3125.dir.svc.accenture.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [RFC 7/7] Update Management API documentation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: anderson.briglia@openbossa.org, linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Date: Wed, 15 Jun 2011 19:29:13 -0700
+In-Reply-To: <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	 <1308175855.2196.7.camel@aeonflux>
+	 <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308191356.2196.9.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLCBQaW90ciwNCiAgSSBjb21wbGV0ZWx5IGFncmVlIHdpdGggUGlvdHIgcG9pbnRz
-LiANCiAgQnkgdGhlIHdheSwgaW4gbXkgb2JleGQgcGF0Y2hlcywgb25seSB3aGVuIEkgc3RhcnQg
-TDJDQVAgY29ubmVjdGlvbiBvciBsaXN0ZW4gb24gTDJDQVAgc29jaywgSSBzZXQgdGhlIGlvIG1v
-ZGUgdG8gTDJDQVBfTU9ERV9FUlRNIGFuZCB0aGUgdHJhbnNmZXIgbW9kZSB0byBTT0NLX1NFUVBB
-Q0tFVC4gV2hlbiBzdGFydCBSRkNPTU0gY29ubmVjdGlvbiBvciBsaXN0ZW4gb24gUkZDT01NIHNv
-Y2ssIHRoZSBpbyBtb2RlIGlzIHN0aWxsIEwyQ0FQX01PREVfQkFTSUMgYW5kIHRoZSB0cmFuc2Zl
-ciBtb2RlIGlzIHN0aWxsIFNPQ0tfU0VRUEFDS0VULiBNeSBwYXRjaGVzIHN1cHBvcnQgYm90aCBP
-QkVYIE9WRVIgTDJDQVAgYW5kIE9CRVggT1ZFUiBSRkNPTU0uDQoNCkJlc3Qgd2lzaGVzLg0KTmFt
-aQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93
-bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtl
-cm5lbC5vcmddIE9uIEJlaGFsZiBPZiBwaW90ci56Z29yZWNraUBhY2NlbnR1cmUuY29tDQpTZW50
-OiAyMDEx5bm0NuaciDE15pelIDIwOjQ4DQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVs
-Lm9yZw0KQ2M6IHRpbS5ob3dlc0BhY2NlbnR1cmUuY29tDQpTdWJqZWN0OiBSRTogW1BBVENIIDIv
-Ml0gQmx1ZXRvb3RoOiBGVFAgYW5kIE9QUCBvdmVyIEwyQ0FQDQoNCkhpIFRpbSwgTWFyY2VsLA0K
-DQo+PiArZW51bSBvYmV4X3RyYW5zcG9ydF9mb3JtYXR7DQo+PiArICAgICBPQkVYX01UX1NUUkVB
-TSAsDQo+PiArICAgICBPQkVYX01UX1NFUVBBQ0tFVA0KPj4gK307DQo+PiArDQo+PiBBbmQgbW9y
-ZSBpbXBvcnRhbnQsIEkgaGF2ZSBubyBpZGVhIHdoeSBhcmUgeW91IGRvaW5nIHRoaXMgYW55d2F5
-LiANCj4+IEV2ZW4gd2l0aCBMMkNBUCB0aGlzIHNob3VsZCBydW4gb3ZlciBTT0NLX1NUUkVBTS4N
-Cj4NCj5JcyB0aGF0IHJlYWxseSBzbz8gIEkgZXhwZWN0IGV4cG9zaW5nIEwyQ0FQIEVSVE0gYXMg
-YSBzdHJlYW0gY291bGQgYnJlYWsgcHJvdG9jb2xzIGFib3ZlIHRoYXQgPmV4cGVjdCBkYXRhZ3Jh
-bS1ib3VuZGFyeSBwcmVzZXJ2YXRpb24gKGVnIFJUUCkuICBPciBjYW4gYnJlYWsgcHJvdG9jb2xz
-IHRoYXQgbWFuZGF0ZSB0aGF0ID5vbmx5IG9uZSBoaWdoZXItbGF5ZXIgcGFja2V0IGV4aXN0cyBp
-biBlYWNoIEwyQ0FQIFNEVS4gIEZvciB0aGVzZSB0aGUgc29ja2V0IG5lZWRzIHRvIGJlID5wYWNr
-ZXQgYmFzZWQuDQo+DQo+U28sIG15IHN1cnByaXNlIGlzIHRoYXQgRVJUTSBpcyBleHBvc2VkIGFz
-IFNPQ0tfU1RSRUFNLiAgU28gSSBkbyBoYXZlIGFuIGlkZWEgd2h5IHRoZSBwYXRjaCA+bWVudGlv
-bnMgc2VxdWVuY2VkIHBhY2tldC4uLg0KPg0KPj4gSSBhc3N1bWVkIHRoYXQgT1BQIGFuZCBGVFAg
-b3ZlciBMMkNBUCBhcmUgcmVxdWlyaW5nIGVMMkNBUCBhY3R1YWxseSANCj4+IHdoaWNoIGlzIHJl
-LXByZXNlbnRlZCBhcyBhIHN0cmVhbS4NCj4NCj5ZZXMsIE9CRVggb3ZlciBMMkNBUCByZXF1aXJl
-cyBlbmhhbmNlZCByZXRyYW5zbWlzc2lvbiBtb2RlLg0KDQpGcm9tIHRoZSBDb3JlIFNwZWNpZmlj
-YXRpb24sIFZvbC4gMywgUGFydCBBLCBQdC4gNy4zIEVuY2Fwc3VsYXRpb24gb2YgU0RVczoNCiJJ
-dCBpcyBhc3N1bWVkIHRoYXQgU0RVIGJvdW5kYXJpZXMgc2hhbGwgYmUgcHJlc2VydmVkIGJldHdl
-ZW4gcGVlciB1cHBlciBsYXllciBlbnRpdGllcy4iDQoNClNEVSBpcyBieSBkZWZpbml0aW9uIGFu
-IGFic3RyYWN0aW9uIGV4cG9zZWQgdG8gdGhlIHVwcGVyIGxheWVyLiBUaGlzIGFzc3VtcHRpb24g
-cGVybWVhdGVzIGFsbCBvZiBCbHVldG9vdGggYW5kIGJyZWFraW5nIGl0IGNhbiBoYXZlIGRpcmUg
-Y29uc2VxdWVuY2VzIGJvdGggZm9yIHByb2ZpbGVzIGFzc3VtaW5nIHRoZWlyIG1lc3NhZ2VzIG1h
-cCAxOjEgdG8gU0RVcy4NCg0KQ2hlZXJzLA0KUGlvdHINCg0KVGhpcyBtZXNzYWdlIGlzIGZvciB0
-aGUgZGVzaWduYXRlZCByZWNpcGllbnQgb25seSBhbmQgbWF5IGNvbnRhaW4gcHJpdmlsZWdlZCwg
-cHJvcHJpZXRhcnksIG9yIG90aGVyd2lzZSBwcml2YXRlIGluZm9ybWF0aW9uLiAgSWYgeW91IGhh
-dmUgcmVjZWl2ZWQgaXQgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlh
-dGVseSBhbmQgZGVsZXRlIHRoZSBvcmlnaW5hbC4gIEFueSBvdGhlciB1c2Ugb2YgdGhlIGVtYWls
-IGJ5IHlvdSBpcyBwcm9oaWJpdGVkLg0KTiAgICAgciAgeSAgIGIgWCAgx6d2IF4gKd66ey5uICsg
-ICAgeyBuWyAgIC0gKSAgIHcqamcgICAeICAgICDdomovICAgeiDeliAgMiDemSAgICYgKd+hIGEg
-IH8gIB4gRyAgIGggDyBqOit2ICAgdyDZpQ0K
+Hi Anderson,
+
+> > so why are these two separate commands. Just reading them in one kernel
+> > call might be a lot better. Including everything else you need to know
+> > about the connection. Also TX power can be local and remote TX power if
+> > I remember this correctly.
+> 
+> The issue I see with your proposal is that for Proximity (currently
+> the only user of this information) we read TX power from server
+> (reporter) using GATT, while RSSI is read on client (monitor) side. By
+> reading both, we would need to issue two separate HCI commands (and
+> wait for both responses), but will always use only one value,
+> depending on local BlueZ role.
+> 
+> Also note that on latest Proximity profile drafts, it is mentioned
+> that the TX power on reporter will never change during a connection,
+> and thus it should be read only once when the connection is
+> established. RSSI (which is read "locally" on monitor side), on the
+> other hand, should be read periodically for path loss calculation.
+
+if TX power is only read once than the kernel should just do it once and
+be done with it.
+
+And for RSSI, it would be better if the kernel read this periodically
+based on current sniff mode etc. Userspace can not trigger this with
+proper timing anyway. And it will potentially at some point start
+blocking the controller. Only the kernel really knows when it is
+acceptable to read the RSSI value.
+
+Regards
+
+Marcel
+
+
