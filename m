@@ -1,62 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>
-CC: "anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Bruna
- Moreira <bruna.moreira@openbossa.org>
-Date: Thu, 16 Jun 2011 08:03:49 +0200
-Subject: RE: [RFC 7/7] Update Management API documentation
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01D395DC90@dnce01.ent.ti.com>
-References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
-	<1308175855.2196.7.camel@aeonflux>
- <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
-In-Reply-To: <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH 1/2] Bluetooth:  FTP and OPP over L2CAP
+Date: Thu, 16 Jun 2011 03:22:45 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103C8497@nasanexd01a.na.qualcomm.com>
+References: <1308109889-5597-1-git-send-email-nami.li@atheros.com>
+ <1308136501.2518.8.camel@aeonflux>
+In-Reply-To: <1308136501.2518.8.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Anderson Lizardo
-> Sent: Thursday, June 16, 2011 2:48 AM
-> To: Marcel Holtmann
-> Cc: anderson.briglia@openbossa.org; linux-bluetooth@vger.kernel.org;
-> Bruna Moreira
-> Subject: Re: [RFC 7/7] Update Management API documentation
->=20
-> Hi Marcel,
->=20
-> On Wed, Jun 15, 2011 at 6:10 PM, Marcel Holtmann <marcel@holtmann.org>
-> wrote:
-> > so why are these two separate commands. Just reading them in one
-> kernel
-> > call might be a lot better. Including everything else you need to
-> know
-> > about the connection. Also TX power can be local and remote TX power
-> if
-> > I remember this correctly.
->=20
-> The issue I see with your proposal is that for Proximity (currently
-> the only user of this information) we read TX power from server
-> (reporter) using GATT, while RSSI is read on client (monitor) side. By
-> reading both, we would need to issue two separate HCI commands (and
-> wait for both responses), but will always use only one value,
-> depending on local BlueZ role.
->=20
-> Also note that on latest Proximity profile drafts, it is mentioned
-> that the TX power on reporter will never change during a connection,
-> and thus it should be read only once when the connection is
-> established. RSSI (which is read "locally" on monitor side), on the
-> other hand, should be read periodically for path loss calculation.
-
-Anderson,
-
-Please note that this is currently true for LE connection, but may change=20
-in the future. In addition, TX Power for BR/EDR may change during the=20
-connection (by the controller, depending on LMP commands), so reading it=20
-periodically and updating the GATT server must be implemented.
-
-Chen Ganir.
+SGkgTWFyY2VsLA0KICBPSywgSSB3aWxsIHNwbGl0IG15IHBhdGNoZXMgaW50byBzbWFsbCBsb2dp
+Y2FsIHBpZWNlcyBhbmQgdXBsb2FkIGxhdGVyLg0KDQpUaGFua3MuDQpOYW1pDQoNCi0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0bzptYXJjZWxA
+aG9sdG1hbm4ub3JnXSANClNlbnQ6IDIwMTHlubQ25pyIMTXml6UgMTk6MTUNClRvOiBMaSwgTmFt
+aQ0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFU
+Q0ggMS8yXSBCbHVldG9vdGg6IEZUUCBhbmQgT1BQIG92ZXIgTDJDQVANCg0KSGkgTmFtaSwNCg0K
+PiBGcm9tOiBuYW1pIDxuYW1pLmxpQGF0aGVyb3MuY29tPg0KPiANCj4gDQo+IFNpZ25lZC1vZmYt
+Ynk6IE5hbWkgPG5hbWkubGlAYXRoZXJvcy5jb20+DQoNCnRoZSBudW1iZXIgb25lIHRoaW5nIGhl
+cmUgaXMgdG8gZ2V0IHlvdXIgR0lUIHNldHVwIGRvbmUgcmlnaHQgYW5kIGZvbGxvdyBvdXIgcG9s
+aWNlcyBsaWtlIG5vIHNpZ25lZC1vZmYtYnkgbGluZSBmb3IgYmx1ZXogYW5kIG9iZXhkIHN1Ym1p
+c3Npb25zLg0KDQo+IC0tLQ0KPiAgY2xpZW50L21haW4uYyAgICAgICB8ICAgMjYgKysrKysrKy0t
+LS0NCj4gIGNsaWVudC9zZXNzaW9uLmMgICAgfCAgMTE5ICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKystLS0tDQo+ICBjbGllbnQvc2Vzc2lvbi5oICAgIHwgICAg
+NiArKysNCj4gIGd3b2JleC9ndy1vYmV4LmMgICAgfCAgICA2ICstDQo+ICBnd29iZXgvZ3ctb2Jl
+eC5oICAgIHwgICAgMyArLQ0KPiAgZ3dvYmV4L29iZXgtcHJpdi5jICB8ICAgIDQgKy0NCj4gIGd3
+b2JleC9vYmV4LXByaXYuaCAgfCAgICAyICstDQo+ICBwbHVnaW5zL2JsdWV0b290aC5jIHwgIDEx
+MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0NCj4gIHBs
+dWdpbnMvZnRwLmMgICAgICAgfCAgICA4ICsrKy0NCj4gIHBsdWdpbnMvb3BwLmMgICAgICAgfCAg
+ICA4ICsrKy0NCj4gIHNyYy9vYmV4LmMgICAgICAgICAgfCAgIDEwICsrKy0NCj4gIHNyYy9zZXJ2
+aWNlLmggICAgICAgfCAgICA3ICsrKw0KPiAgdGVzdC9tYWluLmMgICAgICAgICB8ICAgIDIgKy0N
+Cj4gIDEzIGZpbGVzIGNoYW5nZWQsIDI3NSBpbnNlcnRpb25zKCspLCAzOCBkZWxldGlvbnMoLSkN
+Cg0KQW5kIHdpdGhvdXQgZXZlbiBsb29raW5nIGF0IHRoZSBhY3R1YWwgcGF0Y2gsIEkgY2FuIHRl
+bGwgeW91IHJpZ2h0IG5vdyBoZXJlIHRoYXQgeW91IHNob3VsZCBoYXZlIHNwbGl0IHRoaXMgdXAg
+aW50byBsb2dpY2FsIHBpZWNlcy4gRm9yIGV4YW1wbGUgZ3dvYmV4IHNob3VsZCBiZSBpdCBzZXBh
+cmF0ZSBwYXRjaCBpbiB0aGUgZmlyc3QgcGxhY2UuIEFuZCBJIGFzc3VtZSBvdGhlcnMgY2FuIGFs
+c28gYmUgbmljZWx5IHNwbGl0IHVwLg0KDQpUaGVzZSAibW9uc3RlciIgcGF0Y2hlcyBhcmUgbm90
+IGFjY2VwdGFibGUuDQoNClJlZ2FyZHMNCg0KTWFyY2VsDQoNCg0K
