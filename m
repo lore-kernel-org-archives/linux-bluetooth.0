@@ -1,69 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
-References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
-	<1307957658-11330-1-git-send-email-lkslawek@gmail.com>
-	<1307957658-11330-2-git-send-email-lkslawek@gmail.com>
-	<BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
-	<20110615133932.GA14904@dell.ger.corp.intel.com>
-	<BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
-Date: Thu, 16 Jun 2011 11:27:23 +0300
-Message-ID: <BANLkTikOJC7QSWkJ2HbJTQg-e2n36mc-zw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
+In-Reply-To: <7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	<1308175855.2196.7.camel@aeonflux>
+	<BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+	<1308191356.2196.9.camel@aeonflux>
+	<7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+Date: Thu, 16 Jun 2011 10:54:31 +0300
+Message-ID: <BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
+Subject: Re: [RFC 7/7] Update Management API documentation
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+To: "Ganir, Chen" <chen.ganir@ti.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bruna Moreira <bruna.moreira@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Jun 15, 2011 at 5:59 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+On Thu, Jun 16, 2011 at 9:07 AM, Ganir, Chen <chen.ganir@ti.com> wrote:
+>>
+>> if TX power is only read once than the kernel should just do it once
+>> and
+>> be done with it.
+>>
+>> And for RSSI, it would be better if the kernel read this periodically
+>> based on current sniff mode etc. Userspace can not trigger this with
+>> proper timing anyway. And it will potentially at some point start
+>> blocking the controller. Only the kernel really knows when it is
+>> acceptable to read the RSSI value.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+>>
 >
-> The loop is only used before we start streaming. That is because if
-> there was no streaming started, request will be finished after
-> returning from OpenOBEX callback. To still allow plugins to use the
-> original approach, the loop guarantees that there will be another
-> read() if the service plugin did not explicitly returned -EAGAIN, so
-> read() still decides explicitly when it wants the suspending to
-> happen, therefore it is perfectly aware of when to call
-> obex_object_set_io_flags().
+> Marcel,
 >
-> This is just how OpenOBEX works - unless we are streaming body
-> headers, we should add headers when getting event and suspend if we
-> want to postpone finishing the request. I would not call this loop
-> "dangerous".
+> Reading the RSSI by the kernel, will force a certain limitation on the
+> current and future Profiles. I believe setting the timing should be done
+> by the profile itself, not the bluez user space code or the kernel. It
+> is the responsibility of the profile to periodically poll the RSSI Level.
+> For some cases, polling it every 5 seconds would be ok, and for some
+> Others, it may be better to read it every second. I believe we must not
+> impose any limitation here.
 
-I would say this is not a limitation of OpenOBEX, just the way we
-implement async io in obexd.
+You probably forgot that besides bluetoothd there should be no other
+application holding the mgmt socket, so not you can't really do it in
+poll in the application side and doing it over D-Bus is overkill. Also
+I notice that from some parties, you include, there is some tendency
+to have the profiles split from the bluetoothd, IMO this will only add
+fragmentation with each and every platform using BlueZ having their
+own implementation of each profile and not sharing much, making the
+IOP a complete mess.
 
-> Well, we have also another possible header types and generally in some
-> near future a profile may need to use more than just application
-> parameters header and/or body headers (e.g. user defined headers).
-> This might also allow sending Length header asynchronously (which by
-> quick looking at code is not possible now).
->
-> With approach I presented the cost of changes is very low and
-> additionally makes it extremely easy to return all possible headers.
-> Also everything just works, together with support for asynchronous
-> I/O.
->
-> Adding additional callback will unnecessarily complicate the code.
-
-Sorry I have to disagree here, adding another callback probably
-simplify the code a bit since we can have something like this:
-
-if (!streaming && driver->get_apparams)
-    driver->get_apparams...
-
-So just drivers that support get_apparams will be called and that
-should be enough to guarantee the apparams are added in the beginning
-packet.
-
-Custom headers are a different matter, right now we don't have any
-plugin/driver who need them.
 
 -- 
 Luiz Augusto von Dentz
