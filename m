@@ -1,40 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Jun 2011 18:21:09 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: LE supported host configuration using management
-Message-ID: <20110616212109.GE2594@joana>
-References: <BANLkTi=9F=3gXcPte3NF-XA21C=Dkv04kw@mail.gmail.com>
+Date: Fri, 17 Jun 2011 00:09:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Add link_type information to the mgmt Connected
+ event
+Message-ID: <20110616210924.GA14812@dell.ger.corp.intel.com>
+References: <1307745283-12160-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20110616205639.GD2594@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTi=9F=3gXcPte3NF-XA21C=Dkv04kw@mail.gmail.com>
+In-Reply-To: <20110616205639.GD2594@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
-* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-06-16 17:52:01 -0300]:
-
-> Hi,
+On Thu, Jun 16, 2011, Gustavo F. Padovan wrote:
+> > -int mgmt_connected(u16 index, bdaddr_t *bdaddr)
+> > +int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
+> >  {
+> >  	struct mgmt_ev_connected ev;
+> > 
+> >  	bacpy(&ev.bdaddr, bdaddr);
+> > +	ev.link_type = link_type;
+> > 
+> >  	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
+> >  }
 > 
-> We need a way to set the LE supported(host) bit using the management
-> interface. The question is: create a new command for this purpose only
-> or there are other adapter initialization settings planned to be
-> implemented? We could create a generic message passing all settings
-> once.
-> 
-> Even if the controller supports LE, we need a way to disable LE. The
-> current interleaved discovery implementation checks the if the
-> controller LE bit only, a correct implementation should check both:
-> controller and host bits. BlueZ has an option "EnableLE" in main.conf
-> used to control if the LE supported host bit should be set or not.
-> 
-> SPEC page 915 describe how this Write_LE_Host_Support command works.
+> Seems good to me. Anyone else has comments on it?
 
-I think it could be a new command. MGMT_OP_LE_SUPPORT.
+It seems this is using the SCO_LINK, ESCO_LINK, ACL_LINK, and LE_LINK
+defines, right? If we're going to add an address or link type I think
+it'd be good to have the random vs public information for LE addresses
+included from the start.
 
-And dont we also need the send a Read_LE_Host_Support on the LE adapter init
-sequence?
-
-	Gustavo
+Johan
