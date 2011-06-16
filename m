@@ -1,66 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Anderson Lizardo
-	<anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>
 CC: "anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Bruna
  Moreira <bruna.moreira@openbossa.org>
-Date: Thu, 16 Jun 2011 08:07:34 +0200
+Date: Thu, 16 Jun 2011 08:03:49 +0200
 Subject: RE: [RFC 7/7] Update Management API documentation
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01D395DC90@dnce01.ent.ti.com>
 References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
-	 <1308175855.2196.7.camel@aeonflux>
-	 <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
- <1308191356.2196.9.camel@aeonflux>
-In-Reply-To: <1308191356.2196.9.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+	<1308175855.2196.7.camel@aeonflux>
+ <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+In-Reply-To: <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLQ0KPiBvd25lckB2Z2Vy
-Lmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBNYXJjZWwgSG9sdG1hbm4NCj4gU2VudDogVGh1cnNk
-YXksIEp1bmUgMTYsIDIwMTEgNToyOSBBTQ0KPiBUbzogQW5kZXJzb24gTGl6YXJkbw0KPiBDYzog
-YW5kZXJzb24uYnJpZ2xpYUBvcGVuYm9zc2Eub3JnOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
-ZWwub3JnOw0KPiBCcnVuYSBNb3JlaXJhDQo+IFN1YmplY3Q6IFJlOiBbUkZDIDcvN10gVXBkYXRl
-IE1hbmFnZW1lbnQgQVBJIGRvY3VtZW50YXRpb24NCj4gDQo+IEhpIEFuZGVyc29uLA0KPiANCj4g
-PiA+IHNvIHdoeSBhcmUgdGhlc2UgdHdvIHNlcGFyYXRlIGNvbW1hbmRzLiBKdXN0IHJlYWRpbmcg
-dGhlbSBpbiBvbmUNCj4ga2VybmVsDQo+ID4gPiBjYWxsIG1pZ2h0IGJlIGEgbG90IGJldHRlci4g
-SW5jbHVkaW5nIGV2ZXJ5dGhpbmcgZWxzZSB5b3UgbmVlZCB0bw0KPiBrbm93DQo+ID4gPiBhYm91
-dCB0aGUgY29ubmVjdGlvbi4gQWxzbyBUWCBwb3dlciBjYW4gYmUgbG9jYWwgYW5kIHJlbW90ZSBU
-WA0KPiBwb3dlciBpZg0KPiA+ID4gSSByZW1lbWJlciB0aGlzIGNvcnJlY3RseS4NCj4gPg0KPiA+
-IFRoZSBpc3N1ZSBJIHNlZSB3aXRoIHlvdXIgcHJvcG9zYWwgaXMgdGhhdCBmb3IgUHJveGltaXR5
-IChjdXJyZW50bHkNCj4gPiB0aGUgb25seSB1c2VyIG9mIHRoaXMgaW5mb3JtYXRpb24pIHdlIHJl
-YWQgVFggcG93ZXIgZnJvbSBzZXJ2ZXINCj4gPiAocmVwb3J0ZXIpIHVzaW5nIEdBVFQsIHdoaWxl
-IFJTU0kgaXMgcmVhZCBvbiBjbGllbnQgKG1vbml0b3IpIHNpZGUuDQo+IEJ5DQo+ID4gcmVhZGlu
-ZyBib3RoLCB3ZSB3b3VsZCBuZWVkIHRvIGlzc3VlIHR3byBzZXBhcmF0ZSBIQ0kgY29tbWFuZHMg
-KGFuZA0KPiA+IHdhaXQgZm9yIGJvdGggcmVzcG9uc2VzKSwgYnV0IHdpbGwgYWx3YXlzIHVzZSBv
-bmx5IG9uZSB2YWx1ZSwNCj4gPiBkZXBlbmRpbmcgb24gbG9jYWwgQmx1ZVogcm9sZS4NCj4gPg0K
-PiA+IEFsc28gbm90ZSB0aGF0IG9uIGxhdGVzdCBQcm94aW1pdHkgcHJvZmlsZSBkcmFmdHMsIGl0
-IGlzIG1lbnRpb25lZA0KPiA+IHRoYXQgdGhlIFRYIHBvd2VyIG9uIHJlcG9ydGVyIHdpbGwgbmV2
-ZXIgY2hhbmdlIGR1cmluZyBhIGNvbm5lY3Rpb24sDQo+ID4gYW5kIHRodXMgaXQgc2hvdWxkIGJl
-IHJlYWQgb25seSBvbmNlIHdoZW4gdGhlIGNvbm5lY3Rpb24gaXMNCj4gPiBlc3RhYmxpc2hlZC4g
-UlNTSSAod2hpY2ggaXMgcmVhZCAibG9jYWxseSIgb24gbW9uaXRvciBzaWRlKSwgb24gdGhlDQo+
-ID4gb3RoZXIgaGFuZCwgc2hvdWxkIGJlIHJlYWQgcGVyaW9kaWNhbGx5IGZvciBwYXRoIGxvc3Mg
-Y2FsY3VsYXRpb24uDQo+IA0KPiBpZiBUWCBwb3dlciBpcyBvbmx5IHJlYWQgb25jZSB0aGFuIHRo
-ZSBrZXJuZWwgc2hvdWxkIGp1c3QgZG8gaXQgb25jZQ0KPiBhbmQNCj4gYmUgZG9uZSB3aXRoIGl0
-Lg0KPiANCj4gQW5kIGZvciBSU1NJLCBpdCB3b3VsZCBiZSBiZXR0ZXIgaWYgdGhlIGtlcm5lbCBy
-ZWFkIHRoaXMgcGVyaW9kaWNhbGx5DQo+IGJhc2VkIG9uIGN1cnJlbnQgc25pZmYgbW9kZSBldGMu
-IFVzZXJzcGFjZSBjYW4gbm90IHRyaWdnZXIgdGhpcyB3aXRoDQo+IHByb3BlciB0aW1pbmcgYW55
-d2F5LiBBbmQgaXQgd2lsbCBwb3RlbnRpYWxseSBhdCBzb21lIHBvaW50IHN0YXJ0DQo+IGJsb2Nr
-aW5nIHRoZSBjb250cm9sbGVyLiBPbmx5IHRoZSBrZXJuZWwgcmVhbGx5IGtub3dzIHdoZW4gaXQg
-aXMNCj4gYWNjZXB0YWJsZSB0byByZWFkIHRoZSBSU1NJIHZhbHVlLg0KPiANCj4gUmVnYXJkcw0K
-PiANCj4gTWFyY2VsDQo+IA0KPiANCg0KTWFyY2VsLA0KDQpSZWFkaW5nIHRoZSBSU1NJIGJ5IHRo
-ZSBrZXJuZWwsIHdpbGwgZm9yY2UgYSBjZXJ0YWluIGxpbWl0YXRpb24gb24gdGhlIA0KY3VycmVu
-dCBhbmQgZnV0dXJlIFByb2ZpbGVzLiBJIGJlbGlldmUgc2V0dGluZyB0aGUgdGltaW5nIHNob3Vs
-ZCBiZSBkb25lIA0KYnkgdGhlIHByb2ZpbGUgaXRzZWxmLCBub3QgdGhlIGJsdWV6IHVzZXIgc3Bh
-Y2UgY29kZSBvciB0aGUga2VybmVsLiBJdCANCmlzIHRoZSByZXNwb25zaWJpbGl0eSBvZiB0aGUg
-cHJvZmlsZSB0byBwZXJpb2RpY2FsbHkgcG9sbCB0aGUgUlNTSSBMZXZlbC4NCkZvciBzb21lIGNh
-c2VzLCBwb2xsaW5nIGl0IGV2ZXJ5IDUgc2Vjb25kcyB3b3VsZCBiZSBvaywgYW5kIGZvciBzb21l
-IA0KT3RoZXJzLCBpdCBtYXkgYmUgYmV0dGVyIHRvIHJlYWQgaXQgZXZlcnkgc2Vjb25kLiBJIGJl
-bGlldmUgd2UgbXVzdCBub3QgDQppbXBvc2UgYW55IGxpbWl0YXRpb24gaGVyZS4NCg0KSW4gYWRk
-aXRpb24sIFJTU0kgbGV2ZWxzIG1heSBub3QgYWx3YXlzIGJlIHJlcXVpcmVkIC0gc28gd2h5IHNo
-b3VsZCB0aGUgDQpLZXJuZWwgcmVhZCB0aG9zZSB2YWx1ZXMgYW5kIHdhc3RlIGJhbmR3aWR0aD8N
-Cg0KVGhhbmtzLA0KQ2hlbiBHYW5pci4NCg0K
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Anderson Lizardo
+> Sent: Thursday, June 16, 2011 2:48 AM
+> To: Marcel Holtmann
+> Cc: anderson.briglia@openbossa.org; linux-bluetooth@vger.kernel.org;
+> Bruna Moreira
+> Subject: Re: [RFC 7/7] Update Management API documentation
+>=20
+> Hi Marcel,
+>=20
+> On Wed, Jun 15, 2011 at 6:10 PM, Marcel Holtmann <marcel@holtmann.org>
+> wrote:
+> > so why are these two separate commands. Just reading them in one
+> kernel
+> > call might be a lot better. Including everything else you need to
+> know
+> > about the connection. Also TX power can be local and remote TX power
+> if
+> > I remember this correctly.
+>=20
+> The issue I see with your proposal is that for Proximity (currently
+> the only user of this information) we read TX power from server
+> (reporter) using GATT, while RSSI is read on client (monitor) side. By
+> reading both, we would need to issue two separate HCI commands (and
+> wait for both responses), but will always use only one value,
+> depending on local BlueZ role.
+>=20
+> Also note that on latest Proximity profile drafts, it is mentioned
+> that the TX power on reporter will never change during a connection,
+> and thus it should be read only once when the connection is
+> established. RSSI (which is read "locally" on monitor side), on the
+> other hand, should be read periodically for path loss calculation.
+
+Anderson,
+
+Please note that this is currently true for LE connection, but may change=20
+in the future. In addition, TX Power for BR/EDR may change during the=20
+connection (by the controller, depending on LMP commands), so reading it=20
+periodically and updating the GATT server must be implemented.
+
+Chen Ganir.
