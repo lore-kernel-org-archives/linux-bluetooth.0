@@ -1,95 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 16 Jun 2011 17:45:00 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"Ganir, Chen" <chen.ganir@ti.com>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	"anderson.briglia@openbossa.org" <anderson.briglia@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: Re: [RFC 7/7] Update Management API documentation
-Message-ID: <20110616204500.GC2594@joana>
-References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
- <1308175855.2196.7.camel@aeonflux>
- <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
- <1308191356.2196.9.camel@aeonflux>
- <7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
- <BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
- <BANLkTimKcE09f8qniUwbtDHtU2_BajDwwg@mail.gmail.com>
- <1308235671.2196.21.camel@aeonflux>
- <BANLkTi==Co9KP4ELU0Z-RBXXYXJ3dD7RKg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTi==Co9KP4ELU0Z-RBXXYXJ3dD7RKg@mail.gmail.com>
+Subject: Re: Binary PIN Support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Thu, 16 Jun 2011 13:27:56 -0700
+In-Reply-To: <BANLkTi=oyVyy2ocyP5hbHe2TmfRLGN1zpw@mail.gmail.com>
+References: <BANLkTikAfy-=MRTb_SGa8d2td5oq73xGYg@mail.gmail.com>
+	 <1306976897.7131.5.camel@aeonflux>
+	 <20110608013644.GA8315@dell.ccr.corp.intel.com>
+	 <BANLkTi=oyVyy2ocyP5hbHe2TmfRLGN1zpw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308256078.2196.26.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-06-16 12:12:53 -0300]:
+Hi David,
 
-> Hi Marcel,
-> 
-> On Thu, Jun 16, 2011 at 11:47 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Claudio,
-> >
-> >> >>> if TX power is only read once than the kernel should just do it once
-> >> >>> and
-> >> >>> be done with it.
-> >> >>>
-> >> >>> And for RSSI, it would be better if the kernel read this periodically
-> >> >>> based on current sniff mode etc. Userspace can not trigger this with
-> >> >>> proper timing anyway. And it will potentially at some point start
-> >> >>> blocking the controller. Only the kernel really knows when it is
-> >> >>> acceptable to read the RSSI value.
-> >> >>
-> >> >> Reading the RSSI by the kernel, will force a certain limitation on the
-> >> >> current and future Profiles. I believe setting the timing should be done
-> >> >> by the profile itself, not the bluez user space code or the kernel. It
-> >> >> is the responsibility of the profile to periodically poll the RSSI Level.
-> >> >> For some cases, polling it every 5 seconds would be ok, and for some
-> >> >> Others, it may be better to read it every second. I believe we must not
-> >> >> impose any limitation here.
+> >> > Since the idea with hex-encoding binary PINs and prefixing them with
+> >> > '$' did not get accepted, I have some other ideas for this:
 > >> >
-> >> > You probably forgot that besides bluetoothd there should be no other
-> >> > application holding the mgmt socket, so not you can't really do it in
-> >> > poll in the application side and doing it over D-Bus is overkill. Also
-> >> > I notice that from some parties, you include, there is some tendency
-> >> > to have the profiles split from the bluetoothd, IMO this will only add
-> >> > fragmentation with each and every platform using BlueZ having their
-> >> > own implementation of each profile and not sharing much, making the
-> >> > IOP a complete mess.
-> >> >
+> >> > 1: Use hard coded PINs for those devices. That is, use VID/PID
+> >> > detection during pairing and send hardcoded PIN (or based on src/dst
+> >> > address). Problem: VID/PID information is not available during
+> >> > pairing or may not be available, yet. Some devices may even reject
+> >> > SDP requests when not paired (as mentioned on IRC). Maybe someone
+> >> > has an idea how to get this working.
 > >>
-> >> Some additional comments...
+> >> if I remember this correctly, then Wiimote does support DeviceID profile
+> >> and thus reports proper VID/PID combinations.
 > >>
-> >> Health plugin will need a similar approach to read the clock. It will
-> >> be good to implement the same approach.
-> >> In our suggested implementation the adapter controls when to send the
-> >> command to read the RSSI, keeping the same logic for both: hciops and
-> >> mgmtops. If the adapter is managing when to send the commands,
-> >> repeated commands can be avoided, multiple callbacks can be registered
-> >> by the profiles, but only one command to read the RSSI will be sent.
-> >> The cover letter of the userspace patches contains more details how we
-> >> implemented it.
+> >> So just create some auto-pair support in bluetoothd (if needed via
+> >> plugins) and just auto-pair them like we would do with Secure Simple
+> >> Pairing anyway.
 > >>
-> >> Reading the RSSI directly by the kernel will break hciops. These are
-> >> the arguments that I have to support our decision.
+> >> There is really no need at all to involve the UI code and mess up the
+> >> D-Bus API as it is. It was never designed for hardcoded PIN codes other
+> >> then numbers and strings anyway.
+> >>
+> >> > 2: Extend DBus Agent API with a function RequestBinaryPinCode()
+> >> > which works exactly like RequestPinCode() but returns a bytearray
+> >> > (with length) instead of a string. A dbus agent then needs to
+> >> > signal to bluetoothd that it provides this method and bluetoothd
+> >> > shall call RequestBinaryPinCode() instead of RequestPinCode().
+> >> > However, I couldn't figure out a proper way to signal this capability
+> >> > to bluetoothd.
+> >> > The agent could send some kind of EnabledBinaryPinSupport-Signal to
+> >> > bluetoothd...
+> >>
+> >> No way ever. We had that problem when we initially had to support a
+> >> fallback for the agent in 3.x series. Never ever again.
+> >>
+> >> > 3: Use some kind of encoding in the UTF-8 string as proposed with the
+> >> > '$' character.
+> >> > However, this might break old software.
+> >>
+> >> And how is that going to work out in reality. Same as $ is a valid
+> >> character. So also a clear no.
+> >>
+> >> Go with 1) and try to just auto-pair the Wiimotes. That is the right
+> >> approach and makes a lot sense. It might be the one with the most work
+> >> on getting the DeviceID support integrated properly, but it is the right
+> >> way forward here.
 > >
-> > what I am hearing is that we want the kernel to poll for certain
-> > information if userspace needs them. And either it is a one-shot poll or
-> > it is on a regular interval.
+> > Does the Wiimote support DeviceID info through EIR? If not we'd need to
+> > change the way CreatePairedDevice works since right now SDP is done only
+> > *after* pairing.
 > 
-> If everybody agree we can do it. Our objective is to have the patches upstream.
-> To keep the Proximity Monitor functional on both adapter_ops plugins
-> we can move part of the logic from the adapter.c to the hciops. The
-> polling to read the RSSI can be moved to hciops, in the management the
-> polling will be in the kernel. The remaining code to register the
-> callbacks doesn't need to be changed.
+> Would it be ok if I write a plugin that compares the remote-name of
+> the bluetooth device with its database and performs SDP queries before
+> authentication?
+> That is, the UI programs would have to use CreateDevice() to connect
+> to wiimotes, the plugin would then see that the device-name looks
+> familiar, perform SDP query and if the DeviceID matches, then the
+> plugin will call CraetePairedDevice() (or its internal functions) to
+> start authentication.
+> 
+> This would mean that despite UI programs call CreateDevice() they will
+> get always a paired device (if the remote device is a wiimote).
+> Otherwise I would need to change CreatePairedDevice() to always
+> perform SDP queries before pairing which would delay the
+> authentication on many devices that don't need this. Also many devices
+> may not even allow SDP when not paired so this would even fail on many
+> devices.
 
-Do we have a really good reason to implement this both for hciops and mgmtops?
-We wrote mgmt interface to solve our problems. So why do we still care about
-put new stuff on hciops? And then we maintain two pieces of code instead
-of one.
+I think that actually modifying CreatePairedDevice() to compare the
+device name and in case it matches some magic string (provided by a
+plugin), do SDP and check VID/PID (provided by the plugin) to do
+internal PIN handling.
 
-	Gustavo
+If the plugin is not present it falls back to doing PIN input from the
+UI and that is fine with me.
+
+Regards
+
+Marcel
+
+
