@@ -1,140 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti Julku <antti.julku@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
-Date: Thu, 16 Jun 2011 14:54:39 +0300
-Message-Id: <1308225279-15880-1-git-send-email-antti.julku@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <4DF9E9FA.7050403@tieto.com>
+Date: Thu, 16 Jun 2011 13:33:14 +0200
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>, "ulrik.lauren@stericsson.com"
+	<ulrik.lauren@stericsson.com>
+Subject: Re: [PATCH 0/4] Add support for custom (e)SCO parameters
+References: <1308059827-15095-1-git-send-email-andrzej.kaczmarek@tieto.com>	 <1308136088.2518.3.camel@aeonflux> <4DF8B976.3060804@tieto.com> <1308147904.2196.5.camel@aeonflux>
+In-Reply-To: <1308147904.2196.5.camel@aeonflux>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add command to management interface for enabling/disabling the
-fast connectable mode.
+Hi Marcel,
 
-Signed-off-by: Antti Julku <antti.julku@nokia.com>
----
- include/net/bluetooth/hci.h  |   10 +++++++
- include/net/bluetooth/mgmt.h |    5 +++
- net/bluetooth/mgmt.c         |   62 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+), 0 deletions(-)
+On 15.06.2011 16:25, Marcel Holtmann wrote:
+> Hi Andrzej,
+>
+>>>> Following patches add possibility to specify custom parameters for
+>>>> outgoing (e)SCO link. This is implemented as SCO socket options.
+>>>>
+>>>> This change allows to use reference parameters as defined in HFP 1.5
+>>>> specification as well as support for future enchancements as wideband
+>>>> speech as defined in HFP 1.6 draft (uses different air coding format).
+>>>>
+>>>> Additional socket option (patch 3) allows to disable automatic retry
+>>>> in case of failure which fallbacks from eSCO to SCO connection in
+>>>> current implementation. Such fallback should not happen when using
+>>>> wideband speech which mandates using of eSCO transport.
+>>>
+>>> I am not a big fan of just stupidly exposing all possible HCI value to
+>>> userspace and let userspace set them. Especially since in the end there
+>>> are no real variation here anyway. There are just a 2-3 use cases for
+>>> your SCO socket.
+>>
+>> There's L2CAP_OPTIONS sockopt which allows to do pretty much the same
+>> for L2CAP sockets so I just followed it.
+>>
+>> What do you mean by just 2-3 use cases for SCO socket? You consider only
+>> HFP as use case for SCO socket? I saw devices which use eSCO to stream
+>> music to mono headsets which do not support A2DP, this may require
+>> custom requirements which we cannot predict. This is only one example,
+>> but user can "invent" something else.
+>>
+>>> I would rather have simple mode to hand to the kernel and let it do the
+>>> right thing (including negotiation and downgrading to SCO) than having
+>>> userspace opening sockets over sockets again.
+>>
+>> By making such change you actually incorporate part of profiles into
+>> kernel. I don't think this is good idea. My understanding is that
+>> profiles should be in user-space.
+>>
+>> And I don't recall any other profile than HFP that uses eSCO, so if
+>> we're going to implement "modes" using this spec, user won't have many
+>> options to choose from. See example above (music over eSCO).
+>>
+>>> So what are the actual modes for HFP that need to be supported and what
+>>> is the range of possible SCO and eSCO options?
+>>
+>> At the moment only HFP 1.5 defines reference parameters for eSCO link.
+>> In HFP 1.6 draft there are additional reference parameters for CVSD over
+>> SCO and mSBC over eSCO. And in future profiles you never know what BT
+>> SIG will invent :)
+>
+> personally I would just go for PCM, CVSD and mSBC modes here actually.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 65345cd..d7b9600 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
-+struct hci_cp_write_page_scan_activity {
-+	__le16   interval;
-+	__le16   window;
-+} __packed;
-+
-+#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
-+
- #define HCI_OP_LE_SET_EVENT_MASK	0x2001
- struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 4899286..3fd55eb 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -199,6 +199,11 @@ struct mgmt_cp_remove_remote_oob_data {
- 
- #define MGMT_OP_STOP_DISCOVERY		0x001C
- 
-+#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
-+struct mgmt_cp_set_fast_connectable {
-+	__u8 enable;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d192089..49ac03b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1666,6 +1666,64 @@ failed:
- 	return err;
- }
- 
-+static int set_fast_connectable(struct sock *sk, u16 index,
-+					unsigned char *data, u16 len)
-+{
-+	struct hci_dev *hdev;
-+	struct mgmt_cp_set_fast_connectable *cp;
-+	struct hci_cp_write_page_scan_activity acp;
-+	u8 type;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	cp = (void *) data;
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								EINVAL);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								ENODEV);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (cp->enable) {
-+		type = PAGE_SCAN_TYPE_INTERLACED;
-+		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
-+	} else {
-+		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-+		acp.interval = 0x0800;	/* default 1.28 sec page scan */
-+	}
-+
-+	acp.window = 0x0012;	/* default 11.25 msec page scan window */
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
-+						sizeof(acp), &acp);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto failed;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto failed;
-+	}
-+
-+	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+							NULL, 0);
-+failed:
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1780,6 +1838,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_STOP_DISCOVERY:
- 		err = stop_discovery(sk, index);
- 		break;
-+	case MGMT_OP_SET_FAST_CONNECTABLE:
-+		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-+								len);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
--- 
-1.7.2.5
+..and any other codec which can some soon? I'm simply not convinced that 
+kernel should expose something defined in profiles which are 
+application-level specs.
 
+And what do you mean by PCM? Which spec uses eSCO to transport raw PCM data?
+
+> And you can not compare L2CAP with SCO since they are different. And
+> also L2CAP does not expose everything that the spec. would offer.
+
+Sure, they are different. But this does not explain why L2CAP should 
+expose low-level interface and SCO should not do the same but provide 
+very high-level interface only.
+
+In case of L2CAP was it decision not to expose some parameters for some 
+reason other than "nobody uses them anyway"? For eSCO we could skip 
+bandwidth parameter as I never seen anything other than 8000 rx/tx, but 
+I can still imagine someone can use different value.
+
+Actually, from what I see almost all L2CAP parameters supported by BlueZ 
+are exposed.
+
+> My real question is how you expose negotiation capabilities. Since
+> re-creating the socket and its connection attempt is not going to work
+> out. That concept will fail and will also break qualification testing.
+
+Why do you think re-creating the socket is not going to work? How it is 
+different than second attempt to connect SCO when eSCO failed, which is 
+now handled inside kernel? The same could be done by user-space but in 
+more sophisticated way which suits specific requirements. And this is 
+how negotiation is solved.
+
+And what qualification testing will it break?
+
+
+Could you please elaborate a little bit more on the above questions so I 
+can understand your point of view better.
+
+BR,
+Andrzej
