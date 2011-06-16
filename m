@@ -1,110 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Jun 2011 17:56:39 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Add link_type information to the mgmt Connected
- event
-Message-ID: <20110616205639.GD2594@joana>
-References: <1307745283-12160-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1307745283-12160-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 16 Jun 2011 17:52:01 -0300
+Message-ID: <BANLkTi=9F=3gXcPte3NF-XA21C=Dkv04kw@mail.gmail.com>
+Subject: LE supported host configuration using management
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-06-10 19:34:43 -0300]:
+Hi,
 
-> One piece of information that was lost when using the mgmt interface,
-> was the type of the connection. Using HCI events we used to know
-> the type of the connection based on the type of the event, e.g.
-> HCI_LE_Connection_Complete for LE links.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
-> 
-> Johan,
-> 
-> From my SM series, the other patch that adds information to the mgmt
-> interface is:
-> "Bluetooth: Add new structures for supporting SM key distribution"
-> from Jun 7.
-> 
-> Cheers,
-> 
-> 
->  include/net/bluetooth/hci_core.h |    2 +-
->  include/net/bluetooth/mgmt.h     |    1 +
->  net/bluetooth/hci_event.c        |    4 ++--
->  net/bluetooth/mgmt.c             |    3 ++-
->  4 files changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 404872d..5de3866 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -834,7 +834,7 @@ int mgmt_powered(u16 index, u8 powered);
->  int mgmt_discoverable(u16 index, u8 discoverable);
->  int mgmt_connectable(u16 index, u8 connectable);
->  int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
-> -int mgmt_connected(u16 index, bdaddr_t *bdaddr);
-> +int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
->  int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
->  int mgmt_disconnect_failed(u16 index);
->  int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 129d4b3..9663f5d 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -239,6 +239,7 @@ struct mgmt_ev_new_key {
->  #define MGMT_EV_CONNECTED		0x000B
->  struct mgmt_ev_connected {
->  	bdaddr_t bdaddr;
-> +	__u8 link_type;
->  } __packed;
-> 
->  #define MGMT_EV_DISCONNECTED		0x000C
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 620f307..bc3a0b6 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1356,7 +1356,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
->  			conn->state = BT_CONFIG;
->  			hci_conn_hold(conn);
->  			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-> -			mgmt_connected(hdev->id, &ev->bdaddr);
-> +			mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
->  		} else
->  			conn->state = BT_CONNECTED;
-> 
-> @@ -2752,7 +2752,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
->  		goto unlock;
->  	}
-> 
-> -	mgmt_connected(hdev->id, &ev->bdaddr);
-> +	mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
-> 
->  	conn->sec_level = BT_SECURITY_LOW;
->  	conn->handle = __le16_to_cpu(ev->handle);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index bf8f84e..1373a32 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1942,11 +1942,12 @@ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
->  	return err;
->  }
-> 
-> -int mgmt_connected(u16 index, bdaddr_t *bdaddr)
-> +int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
->  {
->  	struct mgmt_ev_connected ev;
-> 
->  	bacpy(&ev.bdaddr, bdaddr);
-> +	ev.link_type = link_type;
-> 
->  	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
->  }
+We need a way to set the LE supported(host) bit using the management
+interface. The question is: create a new command for this purpose only
+or there are other adapter initialization settings planned to be
+implemented? We could create a generic message passing all settings
+once.
 
-Seems good to me. Anyone else has comments on it?
+Even if the controller supports LE, we need a way to disable LE. The
+current interleaved discovery implementation checks the if the
+controller LE bit only, a correct implementation should check both:
+controller and host bits. BlueZ has an option "EnableLE" in main.conf
+used to control if the LE supported host bit should be set or not.
 
-	Gustavo
+SPEC page 915 describe how this Write_LE_Host_Support command works.
+
+Initially I thought that this bit could interfere/change the firmware
+behavior, but it didn't, at least not for the hardwares that we have.
+But the manufacturers are recommending to set and check it to avoid
+IOP issues in the future.
+
+Comments? New command or a generic management command?
+
+Regards,
+Claudio
