@@ -1,87 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Jun 2011 13:51:42 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Slawomir Bochenski <lkslawek@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
-Message-ID: <20110616165140.GA5229@piper>
-References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
- <1307957658-11330-1-git-send-email-lkslawek@gmail.com>
- <1307957658-11330-2-git-send-email-lkslawek@gmail.com>
- <BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
- <20110615133932.GA14904@dell.ger.corp.intel.com>
- <BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
- <BANLkTikOJC7QSWkJ2HbJTQg-e2n36mc-zw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTikOJC7QSWkJ2HbJTQg-e2n36mc-zw@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20110608013644.GA8315@dell.ccr.corp.intel.com>
+References: <BANLkTikAfy-=MRTb_SGa8d2td5oq73xGYg@mail.gmail.com>
+	<1306976897.7131.5.camel@aeonflux>
+	<20110608013644.GA8315@dell.ccr.corp.intel.com>
+Date: Thu, 16 Jun 2011 18:18:35 +0200
+Message-ID: <BANLkTi=oyVyy2ocyP5hbHe2TmfRLGN1zpw@mail.gmail.com>
+Subject: Re: Binary PIN Support
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Marcel Holtmann <marcel@holtmann.org>, David Herrmann <dh.herrmann@googlemail.com>,
+	linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Wed, Jun 8, 2011 at 3:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Marcel,
+>
+> On Thu, Jun 02, 2011, Marcel Holtmann wrote:
+>> > Since the idea with hex-encoding binary PINs and prefixing them with
+>> > '$' did not get accepted, I have some other ideas for this:
+>> >
+>> > 1: Use hard coded PINs for those devices. That is, use VID/PID
+>> > detection during pairing and send hardcoded PIN (or based on src/dst
+>> > address). Problem: VID/PID information is not available during
+>> > pairing or may not be available, yet. Some devices may even reject
+>> > SDP requests when not paired (as mentioned on IRC). Maybe someone
+>> > has an idea how to get this working.
+>>
+>> if I remember this correctly, then Wiimote does support DeviceID profile
+>> and thus reports proper VID/PID combinations.
+>>
+>> So just create some auto-pair support in bluetoothd (if needed via
+>> plugins) and just auto-pair them like we would do with Secure Simple
+>> Pairing anyway.
+>>
+>> There is really no need at all to involve the UI code and mess up the
+>> D-Bus API as it is. It was never designed for hardcoded PIN codes other
+>> then numbers and strings anyway.
+>>
+>> > 2: Extend DBus Agent API with a function RequestBinaryPinCode()
+>> > which works exactly like RequestPinCode() but returns a bytearray
+>> > (with length) instead of a string. A dbus agent then needs to
+>> > signal to bluetoothd that it provides this method and bluetoothd
+>> > shall call RequestBinaryPinCode() instead of RequestPinCode().
+>> > However, I couldn't figure out a proper way to signal this capability
+>> > to bluetoothd.
+>> > The agent could send some kind of EnabledBinaryPinSupport-Signal to
+>> > bluetoothd...
+>>
+>> No way ever. We had that problem when we initially had to support a
+>> fallback for the agent in 3.x series. Never ever again.
+>>
+>> > 3: Use some kind of encoding in the UTF-8 string as proposed with the
+>> > '$' character.
+>> > However, this might break old software.
+>>
+>> And how is that going to work out in reality. Same as $ is a valid
+>> character. So also a clear no.
+>>
+>> Go with 1) and try to just auto-pair the Wiimotes. That is the right
+>> approach and makes a lot sense. It might be the one with the most work
+>> on getting the DeviceID support integrated properly, but it is the right
+>> way forward here.
+>
+> Does the Wiimote support DeviceID info through EIR? If not we'd need to
+> change the way CreatePairedDevice works since right now SDP is done only
+> *after* pairing.
 
-On 11:27 Thu 16 Jun, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Wed, Jun 15, 2011 at 5:59 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> >
-> > The loop is only used before we start streaming. That is because if
-> > there was no streaming started, request will be finished after
-> > returning from OpenOBEX callback. To still allow plugins to use the
-> > original approach, the loop guarantees that there will be another
-> > read() if the service plugin did not explicitly returned -EAGAIN, so
-> > read() still decides explicitly when it wants the suspending to
-> > happen, therefore it is perfectly aware of when to call
-> > obex_object_set_io_flags().
-> >
-> > This is just how OpenOBEX works - unless we are streaming body
-> > headers, we should add headers when getting event and suspend if we
-> > want to postpone finishing the request. I would not call this loop
-> > "dangerous".
-> 
-> I would say this is not a limitation of OpenOBEX, just the way we
-> implement async io in obexd.
-> 
-> > Well, we have also another possible header types and generally in some
-> > near future a profile may need to use more than just application
-> > parameters header and/or body headers (e.g. user defined headers).
-> > This might also allow sending Length header asynchronously (which by
-> > quick looking at code is not possible now).
-> >
-> > With approach I presented the cost of changes is very low and
-> > additionally makes it extremely easy to return all possible headers.
-> > Also everything just works, together with support for asynchronous
-> > I/O.
-> >
-> > Adding additional callback will unnecessarily complicate the code.
-> 
-> Sorry I have to disagree here, adding another callback probably
-> simplify the code a bit since we can have something like this:
-> 
-> if (!streaming && driver->get_apparams)
->     driver->get_apparams...
-> 
-> So just drivers that support get_apparams will be called and that
-> should be enough to guarantee the apparams are added in the beginning
-> packet.
-> 
-> Custom headers are a different matter, right now we don't have any
-> plugin/driver who need them.
+Would it be ok if I write a plugin that compares the remote-name of
+the bluetooth device with its database and performs SDP queries before
+authentication?
+That is, the UI programs would have to use CreateDevice() to connect
+to wiimotes, the plugin would then see that the device-name looks
+familiar, perform SDP query and if the DeviceID matches, then the
+plugin will call CraetePairedDevice() (or its internal functions) to
+start authentication.
 
-But we will have soon, BIP needs them. So we better start considering
-how should we export it to the plugins.
+This would mean that despite UI programs call CreateDevice() they will
+get always a paired device (if the remote device is a wiimote).
+Otherwise I would need to change CreatePairedDevice() to always
+perform SDP queries before pairing which would delay the
+authentication on many devices that don't need this. Also many devices
+may not even allow SDP when not paired so this would even fail on many
+devices.
 
-> 
-> -- 
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
+Regards
+David
