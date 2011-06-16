@@ -1,42 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Jun 2011 12:25:32 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: Chase Douglas <chase.douglas@canonical.com>,
-	Ed Tomlinson <edt@aei.ca>, Greg KH <gregkh@suse.de>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Linux 2.6.39.1
-In-Reply-To: <20110613172739.GA2661@joana>
-Message-ID: <alpine.LNX.2.00.1106161224350.22872@pobox.suse.cz>
-References: <20110603003835.GA20381@kroah.com> <201106032236.41294.edt@aei.ca> <4DED20C6.1020701@canonical.com> <201106061926.14661.edt@aei.ca> <4DEF9705.4070502@canonical.com> <20110608180146.GB13036@joana> <alpine.LNX.2.00.1106130010360.22872@pobox.suse.cz>
- <20110613172739.GA2661@joana>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <BANLkTi=L7F3AR6bukK-GqBxprCPpy6X9TA@mail.gmail.com>
+References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
+	<1307957658-11330-1-git-send-email-lkslawek@gmail.com>
+	<1307957658-11330-2-git-send-email-lkslawek@gmail.com>
+	<BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
+	<20110615133932.GA14904@dell.ger.corp.intel.com>
+	<BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
+	<BANLkTikOJC7QSWkJ2HbJTQg-e2n36mc-zw@mail.gmail.com>
+	<BANLkTi=L7F3AR6bukK-GqBxprCPpy6X9TA@mail.gmail.com>
+Date: Thu, 16 Jun 2011 11:19:16 +0200
+Message-ID: <BANLkTim9dKdFZnNbznkxpa7fvmhKD12o8A@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 13 Jun 2011, Gustavo F. Padovan wrote:
-
-> > > > Where did this patch come from? I don't see it in Linus' tree. If this
-> > > > patch is merged, I can test the a new kernel out to see if we should
-> > > > back out the commit from Jiri. However, right now my magic trackpad
-> > > > (which has the same issue as the magic mouse) works fine on plain 2.6.39.1.
-> > > 
-> > > This patch is in my tree. It will be on its way to Linus' tree today.
-> > 
-> > Doesn't seem to be present in Linus' tree as of today. Has there been any 
-> > issue discovered in the meantime?
-> 
-> No, it is on wireless-2.6 right now. Then goes to net-2.6 and finally linus-2.6.
-
-Still doesn't seem to be present in Linus' tree today.
-
-Could you please point me to where it is queued now? I am going to revert 
-the "workaround" I have for magicmouse today (which is buggy), but I want 
-to make sure that the actual fix (i.e. Villo's patch) flows in soon.
-
-Thanks,
+Another possibility I see to keep the flexibility and make read() be
+used only for Body (as we rather should not add any headers after End
+of Body) is to add ->get_header() which would be a general callback to
+add any non-body headers plugin wishes to use.
 
 -- 
-Jiri Kosina
-SUSE Labs
+Slawomir Bochenski
