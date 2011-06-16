@@ -2,105 +2,139 @@ Return-Path: <cyrus@holtmann.org>
 From: Antti Julku <antti.julku@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH 1/2] Implement fast connectable mode for mgmt interface
-Date: Thu, 16 Jun 2011 14:55:20 +0300
-Message-Id: <1308225321-15910-1-git-send-email-antti.julku@nokia.com>
+Subject: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+Date: Thu, 16 Jun 2011 14:54:39 +0300
+Message-Id: <1308225279-15880-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Management interface implementation for fast connectable mode.
----
- doc/mgmt-api.txt  |    8 ++++++++
- lib/mgmt.h        |    5 +++++
- plugins/mgmtops.c |   24 +++++++++++++++++++++---
- 3 files changed, 34 insertions(+), 3 deletions(-)
+Add command to management interface for enabling/disabling the
+fast connectable mode.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 353705e..b3863e6 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -319,6 +319,14 @@ Stop Discovery Command
- 	Command Parameters:
- 	Return Parameters:
+Signed-off-by: Antti Julku <antti.julku@nokia.com>
+---
+ include/net/bluetooth/hci.h  |   10 +++++++
+ include/net/bluetooth/mgmt.h |    5 +++
+ net/bluetooth/mgmt.c         |   62 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+), 0 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 65345cd..d7b9600 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __packed;
  
-+Set Fast Connectable Command
-+============================
++#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
++struct hci_cp_write_page_scan_activity {
++	__le16   interval;
++	__le16   window;
++} __packed;
 +
-+        Command Code:           0x0001F
-+        Controller Index:       <controller id>
-+        Command Parameters:     Enable (1 Octet)
-+        Return Parameters:      Status (1 octet)
++#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
++	#define PAGE_SCAN_TYPE_STANDARD		0x00
++	#define PAGE_SCAN_TYPE_INTERLACED	0x01
 +
- Read Tracing Buffer Size Command
- ================================
- 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 57e7603..be2f567 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -205,6 +205,11 @@ struct mgmt_cp_remove_remote_oob_data {
+ #define HCI_OP_LE_SET_EVENT_MASK	0x2001
+ struct hci_cp_le_set_event_mask {
+ 	__u8     mask[8];
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 4899286..3fd55eb 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -199,6 +199,11 @@ struct mgmt_cp_remove_remote_oob_data {
  
  #define MGMT_OP_STOP_DISCOVERY		0x001C
  
 +#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
 +struct mgmt_cp_set_fast_connectable {
-+	uint8_t enable;
++	__u8 enable;
 +} __packed;
 +
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
- 	uint16_t opcode;
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 4302813..2893dfd 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1201,6 +1201,9 @@ static void mgmt_cmd_complete(int sk, uint16_t index, void *buf, size_t len)
- 	case MGMT_OP_REMOVE_REMOTE_OOB_DATA:
- 		DBG("remove_remote_oob_data complete");
+ 	__le16 opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d192089..49ac03b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1666,6 +1666,64 @@ failed:
+ 	return err;
+ }
+ 
++static int set_fast_connectable(struct sock *sk, u16 index,
++					unsigned char *data, u16 len)
++{
++	struct hci_dev *hdev;
++	struct mgmt_cp_set_fast_connectable *cp;
++	struct hci_cp_write_page_scan_activity acp;
++	u8 type;
++	int err;
++
++	BT_DBG("hci%u", index);
++
++	cp = (void *) data;
++
++	if (len != sizeof(*cp))
++		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
++								EINVAL);
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
++								ENODEV);
++
++	hci_dev_lock(hdev);
++
++	if (cp->enable) {
++		type = PAGE_SCAN_TYPE_INTERLACED;
++		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
++	} else {
++		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
++		acp.interval = 0x0800;	/* default 1.28 sec page scan */
++	}
++
++	acp.window = 0x0012;	/* default 11.25 msec page scan window */
++
++	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
++						sizeof(acp), &acp);
++	if (err < 0) {
++		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
++								-err);
++		goto failed;
++	}
++
++	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
++	if (err < 0) {
++		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
++								-err);
++		goto failed;
++	}
++
++	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
++							NULL, 0);
++failed:
++	hci_dev_unlock(hdev);
++	hci_dev_put(hdev);
++
++	return err;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -1780,6 +1838,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_STOP_DISCOVERY:
+ 		err = stop_discovery(sk, index);
  		break;
 +	case MGMT_OP_SET_FAST_CONNECTABLE:
-+		DBG("set_fast_connectable complete");
++		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
++								len);
 +		break;
  	default:
- 		error("Unknown command complete for opcode %u", opcode);
- 		break;
-@@ -1655,10 +1658,25 @@ static int mgmt_cancel_resolve_name(int index, bdaddr_t *bdaddr)
- 	return -ENOSYS;
- }
- 
--static int mgmt_fast_connectable(int index, gboolean enable)
-+static int mgmt_set_fast_connectable(int index, gboolean enable)
- {
-+	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_set_fast_connectable)];
-+	struct mgmt_hdr *hdr = (void *) buf;
-+	struct mgmt_cp_set_fast_connectable *cp = (void *) &buf[sizeof(*hdr)];
-+
- 	DBG("index %d enable %d", index, enable);
--	return -ENOSYS;
-+
-+	memset(buf, 0, sizeof(buf));
-+	hdr->opcode = htobs(MGMT_OP_SET_FAST_CONNECTABLE);
-+	hdr->len = htobs(sizeof(*cp));
-+	hdr->index = htobs(index);
-+
-+	cp->enable = enable;
-+
-+	if (write(mgmt_sock, buf, sizeof(buf)) < 0)
-+		return -errno;
-+
-+	return 0;
- }
- 
- static int mgmt_read_clock(int index, bdaddr_t *bdaddr, int which, int timeout,
-@@ -2014,7 +2032,7 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.cancel_resolve_name = mgmt_cancel_resolve_name,
- 	.set_name = mgmt_set_name,
- 	.set_dev_class = mgmt_set_dev_class,
--	.set_fast_connectable = mgmt_fast_connectable,
-+	.set_fast_connectable = mgmt_set_fast_connectable,
- 	.read_clock = mgmt_read_clock,
- 	.read_bdaddr = mgmt_read_bdaddr,
- 	.block_device = mgmt_block_device,
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode, 0x01);
 -- 
 1.7.2.5
 
