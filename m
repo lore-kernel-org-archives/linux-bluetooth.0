@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/4 v3] Add basic support for action commands on ftp driver
-Date: Fri, 17 Jun 2011 14:27:56 +0300
-Message-Id: <1308310076-10758-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/4 v2] Add basic support for action commands on ftp driver
+Date: Fri, 17 Jun 2011 14:21:56 +0300
+Message-Id: <1308309716-9798-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -11,33 +11,31 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This add basic support for copy and move actions for ftp service driver
 ---
- plugins/ftp.c |  103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 103 insertions(+), 0 deletions(-)
+ plugins/ftp.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 101 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 79223bf..2b504a8 100644
+index 79223bf..dc5470a 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
-@@ -403,6 +403,108 @@ done:
+@@ -403,6 +403,106 @@ done:
  	return err;
  }
  
 +static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
 +{
 +	char *filename;
-+	const char *root;
-+
-+	root = obex_get_root_folder(ftp->os);
 +
 +	/* DestName can either be relative or absolute (FTP style) */
 +	if (g_path_is_absolute(destname))
-+		filename = g_build_filename(root, g_path_skip_root(destname),
-+									NULL);
++		filename = g_build_filename(obex_get_root_folder(ftp->os),
++						g_path_skip_root(destname),
++						NULL);
 +	else
 +		filename = g_build_filename(ftp->folder, destname, NULL);
 +
 +	/* Check if destination is inside root path */
-+	if (g_str_has_prefix(filename, root))
++	if (g_str_has_prefix(filename, ftp->folder))
 +		return filename;
 +
 +	g_free(filename);
@@ -127,7 +125,7 @@ index 79223bf..2b504a8 100644
  void ftp_disconnect(struct obex_session *os, void *user_data)
  {
  	struct ftp_session *ftp = user_data;
-@@ -427,6 +529,7 @@ static struct obex_service_driver ftp = {
+@@ -427,6 +527,7 @@ static struct obex_service_driver ftp = {
  	.put = ftp_put,
  	.chkput = ftp_chkput,
  	.setpath = ftp_setpath,
