@@ -1,16 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20110617134150.947246py42dt6ni8@mail.hendrik-sattler.de>
-Date: Fri, 17 Jun 2011 13:41:50 +0200
+Message-ID: <20110617133701.20841fj03lelzzpc@mail.hendrik-sattler.de>
+Date: Fri, 17 Jun 2011 13:37:01 +0200
 From: Hendrik Sattler <post@hendrik-sattler.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 2/4] Add basic support for action commands on ftp
- driver
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 4/4] Add copy and move support for filesystem
+ plugin
 References: <1308292007-2111-1-git-send-email-luiz.dentz@gmail.com>
- <1308292007-2111-2-git-send-email-luiz.dentz@gmail.com>
- <20110617121950.13306qfj8egbctc0@mail.hendrik-sattler.de>
- <BANLkTi=kO_A2cruBQQ7CBDL2h-v-VVPCFA@mail.gmail.com>
-In-Reply-To: <BANLkTi=kO_A2cruBQQ7CBDL2h-v-VVPCFA@mail.gmail.com>
+ <1308292007-2111-4-git-send-email-luiz.dentz@gmail.com>
+ <20110617122836.75292sf1oprtrhwk@mail.hendrik-sattler.de>
+ <20110617104655.GE28423@dell.ger.corp.intel.com>
+In-Reply-To: <20110617104655.GE28423@dell.ger.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
  charset=ISO-8859-1;
@@ -19,41 +20,24 @@ Content-Type: text/plain;
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Zitat von Johan Hedberg <johan.hedberg@gmail.com>:
 
-Zitat von Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> On Fri, Jun 17, 2011 at 1:19 PM, Hendrik Sattler
-> <post@hendrik-sattler.de> wrote:
->> Zitat von Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->>>
->>> +static char *ftp_build_filename(struct ftp_session *ftp, const char
->>> *destname)
->>> +{
->>> +       char *filename;
->>> +
->>> +       /* DestName can either be relative or absolute (FTP style) */
->>> +       if (g_path_is_absolute(destname))
->>> +               filename = g_build_filename(destname, NULL);
->>> +       else
->>> +               filename = g_build_filename(ftp->folder, destname, NULL);
->>> +
->>> +       /* Check if destination is inside root path */
->>> +       if (g_str_has_prefix(filename, ftp->folder))
->>> +               return filename;
->>> +
->>> +       g_free(filename);
->>> +
->>> +       return NULL;
->>> +}
->>
->> You should also catch stuff like the UNC path stuff and drive letter
->> prefixes. No need to support all the sick stuff :-/
+> Hi Hendrik,
 >
-> If g_build_filename doesn't care I don't see why we should care.
+> On Fri, Jun 17, 2011, Hendrik Sattler wrote:
+>> Additionally, the obex spec says that the copy/move actions also
+>> copies/moves directories recursively.
+>
+> Where exactly do you see that? To my understanding Action isn't intended
+> for directories at all. E.g. in section 3.4.8.1 of IrOBEX 1.4 there's
+> just the following:
 
-Because strings like "\\..." and "C:\..." may return 0 with  
-g_path_is_absolute(destname) and you then use a wrong directory that  
-is not according to spec.
+See section 3.4.8.4:
+"A Move Action of a folder should also move the contents of all the  
+subfolders beneath it."
+"A Copy Action of a folder should also copy the contents of all the  
+subfolders beneath it."
 
 HS
+
 
