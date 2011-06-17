@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 3/4] Add support for Action command to pcsuite plugin
-Date: Fri, 17 Jun 2011 09:26:46 +0300
-Message-Id: <1308292007-2111-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/4] Add basic support for action commands on ftp driver
+Date: Fri, 17 Jun 2011 09:26:45 +0300
+Message-Id: <1308292007-2111-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1308292007-2111-1-git-send-email-luiz.dentz@gmail.com>
 References: <1308292007-2111-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,126 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-PCSuite service relies on ftp driver
+This add basic support for copy and move actions for ftp service driver
 ---
- plugins/ftp.c     |    3 +--
- plugins/ftp.h     |    1 +
- plugins/pcsuite.c |   11 +++++++++++
- 3 files changed, 13 insertions(+), 2 deletions(-)
+ plugins/ftp.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 99 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 7e2f1e4..4cf0135 100644
+index 79223bf..7e2f1e4 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
-@@ -478,8 +478,7 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
- 	return ret;
+@@ -403,6 +403,104 @@ done:
+ 	return err;
  }
  
--static int ftp_action(struct obex_session *os, obex_object_t *obj,
--							void *user_data)
-+int ftp_action(struct obex_session *os, obex_object_t *obj, void *user_data)
- {
- 	struct ftp_session *ftp = user_data;
- 	const char *name, *destname;
-diff --git a/plugins/ftp.h b/plugins/ftp.h
-index 2374125..710bfa4 100644
---- a/plugins/ftp.h
-+++ b/plugins/ftp.h
-@@ -28,3 +28,4 @@ int ftp_chkput(struct obex_session *os, void *user_data);
- int ftp_put(struct obex_session *os, obex_object_t *obj, void *user_data);
- int ftp_setpath(struct obex_session *os, obex_object_t *obj, void *user_data);
- void ftp_disconnect(struct obex_session *os, void *user_data);
-+int ftp_action(struct obex_session *os, obex_object_t *obj, void *user_data);
-diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
-index 5545917..125f25a 100644
---- a/plugins/pcsuite.c
-+++ b/plugins/pcsuite.c
-@@ -219,6 +219,16 @@ static int pcsuite_setpath(struct obex_session *os, obex_object_t *obj,
- 	return ftp_setpath(os, obj, pcsuite->ftp);
- }
- 
-+static int pcsuite_action(struct obex_session *os, obex_object_t *obj,
-+							void *user_data)
++static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
 +{
-+	struct pcsuite_session *pcsuite = user_data;
++	char *filename;
 +
-+	DBG("%p", pcsuite);
++	/* DestName can either be relative or absolute (FTP style) */
++	if (g_path_is_absolute(destname))
++		filename = g_build_filename(destname, NULL);
++	else
++		filename = g_build_filename(ftp->folder, destname, NULL);
 +
-+	return ftp_action(os, obj, pcsuite->ftp);
++	/* Check if destination is inside root path */
++	if (g_str_has_prefix(filename, ftp->folder))
++		return filename;
++
++	g_free(filename);
++
++	return NULL;
 +}
 +
- static void pcsuite_disconnect(struct obex_session *os, void *user_data)
++static int ftp_copy(struct ftp_session *ftp, const char *name,
++							const char *destname)
++{
++	char *source, *destination;
++	int ret;
++
++	DBG("%p name %s destination %s", ftp, name, destname);
++
++	if (ftp->folder == NULL) {
++		error("No folder set");
++		return -ENOENT;
++	}
++
++	if (name == NULL || destname == NULL)
++		return -EINVAL;
++
++	destination = ftp_build_filename(ftp, destname);
++
++	source = g_build_filename(ftp->folder, name, NULL);
++
++	ret = obex_copy(ftp->os, source, destination);
++
++	g_free(source);
++	g_free(destination);
++
++	return ret;
++}
++
++static int ftp_move(struct ftp_session *ftp, const char *name,
++							const char *destname)
++{
++	char *source, *destination;
++	int ret;
++
++	DBG("%p name %s destname %s", ftp, name, destname);
++
++	if (ftp->folder == NULL) {
++		error("No folder set");
++		return -ENOENT;
++	}
++
++	if (name == NULL || destname == NULL)
++		return -EINVAL;
++
++	destination = ftp_build_filename(ftp, destname);
++
++	source = g_build_filename(ftp->folder, name, NULL);
++
++	ret = obex_move(ftp->os, source, destination);
++
++	g_free(source);
++	g_free(destination);
++
++	return ret;
++}
++
++static int ftp_action(struct obex_session *os, obex_object_t *obj,
++							void *user_data)
++{
++	struct ftp_session *ftp = user_data;
++	const char *name, *destname;
++	uint8_t action_id;
++
++	name = obex_get_name(os);
++	destname = obex_get_destname(os);
++	action_id = obex_get_action_id(os);
++
++	DBG("%p action 0x%x", ftp, action_id);
++
++	switch (action_id) {
++	case 0x00: /* Copy Object */
++		return ftp_copy(ftp, name, destname);
++	case 0x01: /* Move/Rename Object */
++		return ftp_move(ftp, name, destname);
++	default:
++		return -EINVAL;
++	}
++}
++
+ void ftp_disconnect(struct obex_session *os, void *user_data)
  {
- 	struct pcsuite_session *pcsuite = user_data;
-@@ -253,6 +263,7 @@ static struct obex_service_driver pcsuite = {
- 	.put = pcsuite_put,
- 	.chkput = pcsuite_chkput,
- 	.setpath = pcsuite_setpath,
-+	.action = pcsuite_action,
- 	.disconnect = pcsuite_disconnect
+ 	struct ftp_session *ftp = user_data;
+@@ -427,6 +525,7 @@ static struct obex_service_driver ftp = {
+ 	.put = ftp_put,
+ 	.chkput = ftp_chkput,
+ 	.setpath = ftp_setpath,
++	.action = ftp_action,
+ 	.disconnect = ftp_disconnect
  };
  
 -- 
