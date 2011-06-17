@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/4] Add copy and move support for filesystem plugin
-Date: Fri, 17 Jun 2011 09:26:47 +0300
-Message-Id: <1308292007-2111-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/4] Add support for Action command to pcsuite plugin
+Date: Fri, 17 Jun 2011 09:26:46 +0300
+Message-Id: <1308292007-2111-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1308292007-2111-1-git-send-email-luiz.dentz@gmail.com>
 References: <1308292007-2111-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,130 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Move is implemented using rename and copy uses sendfile, both part of
-posix.
+PCSuite service relies on ftp driver
 ---
- plugins/filesystem.c |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 93 insertions(+), 0 deletions(-)
+ plugins/ftp.c     |    3 +--
+ plugins/ftp.h     |    1 +
+ plugins/pcsuite.c |   11 +++++++++++
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/filesystem.c b/plugins/filesystem.c
-index b4ff556..53e7e94 100644
---- a/plugins/filesystem.c
-+++ b/plugins/filesystem.c
-@@ -36,6 +36,7 @@
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <sys/statvfs.h>
-+#include <sys/sendfile.h>
- #include <fcntl.h>
- #include <wait.h>
- 
-@@ -234,6 +235,96 @@ static ssize_t filesystem_write(void *object, const void *buf, size_t count)
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index 7e2f1e4..4cf0135 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -478,8 +478,7 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
  	return ret;
  }
  
-+static int filesystem_rename(const char *name, const char *destname)
+-static int ftp_action(struct obex_session *os, obex_object_t *obj,
+-							void *user_data)
++int ftp_action(struct obex_session *os, obex_object_t *obj, void *user_data)
+ {
+ 	struct ftp_session *ftp = user_data;
+ 	const char *name, *destname;
+diff --git a/plugins/ftp.h b/plugins/ftp.h
+index 2374125..710bfa4 100644
+--- a/plugins/ftp.h
++++ b/plugins/ftp.h
+@@ -28,3 +28,4 @@ int ftp_chkput(struct obex_session *os, void *user_data);
+ int ftp_put(struct obex_session *os, obex_object_t *obj, void *user_data);
+ int ftp_setpath(struct obex_session *os, obex_object_t *obj, void *user_data);
+ void ftp_disconnect(struct obex_session *os, void *user_data);
++int ftp_action(struct obex_session *os, obex_object_t *obj, void *user_data);
+diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
+index 5545917..125f25a 100644
+--- a/plugins/pcsuite.c
++++ b/plugins/pcsuite.c
+@@ -219,6 +219,16 @@ static int pcsuite_setpath(struct obex_session *os, obex_object_t *obj,
+ 	return ftp_setpath(os, obj, pcsuite->ftp);
+ }
+ 
++static int pcsuite_action(struct obex_session *os, obex_object_t *obj,
++							void *user_data)
 +{
-+	int ret;
++	struct pcsuite_session *pcsuite = user_data;
 +
-+	ret = rename(name, destname);
-+	if (ret < 0) {
-+		error("rename(%s, %s): %s (%d)", name, destname,
-+						strerror(errno), errno);
-+		return -errno;
-+	}
++	DBG("%p", pcsuite);
 +
-+	return ret;
++	return ftp_action(os, obj, pcsuite->ftp);
 +}
 +
-+static int sendfile_async(void *out, void *in, off_t *offset, size_t count)
-+{
-+	int pid;
-+
-+	/* Run sendfile on child process */
-+	pid = fork();
-+	switch (pid) {
-+		case 0:
-+			break;
-+		case -1:
-+			error("fork() %s (%d)", strerror(errno), errno);
-+			return -errno;
-+		default:
-+			DBG("child %d forked", pid);
-+			return pid;
-+	}
-+
-+	/* At child */
-+	if (sendfile(GPOINTER_TO_INT(out), GPOINTER_TO_INT(in), offset, count) < 0)
-+		error("sendfile(): %s (%d)", strerror(errno), errno);
-+
-+	filesystem_close(in);
-+	filesystem_close(out);
-+
-+	exit(errno);
-+}
-+
-+static int filesystem_copy(const char *name, const char *destname)
-+{
-+	void *in, *out;
-+	ssize_t ret;
-+	size_t size;
-+	struct stat fstat;
-+	int err;
-+
-+	in = filesystem_open(name, O_RDONLY, 0, NULL, &size, &err);
-+	if (in == NULL) {
-+		error("open(%s): %s (%d)", name, strerror(-err), -err);
-+		return -err;
-+	}
-+
-+	ret = stat(name, &fstat);
-+	if (ret < 0) {
-+		error("stat(%s): %s (%d)", name, strerror(errno), errno);
-+		return -errno;
-+	}
-+
-+	out = filesystem_open(destname, O_WRONLY | O_CREAT | O_TRUNC,
-+					fstat.st_mode, NULL, &size, &err);
-+	if (out == NULL) {
-+		error("open(%s): %s (%d)", destname, strerror(-err), -err);
-+		filesystem_close(in);
-+		return -errno;
-+	}
-+
-+	/* Check if sendfile is supported */
-+	ret = sendfile(GPOINTER_TO_INT(out), GPOINTER_TO_INT(in), NULL, 0);
-+	if (ret < 0) {
-+		ret = -errno;
-+		error("sendfile: %s (%zd)", strerror(-ret), -ret);
-+		goto done;
-+	}
-+
-+	ret = sendfile_async(out, in, NULL, fstat.st_size);
-+	if (ret < 0)
-+		goto done;
-+
-+	return 0;
-+
-+done:
-+	filesystem_close(in);
-+	filesystem_close(out);
-+
-+	return ret;
-+}
-+
- struct capability_object {
- 	int pid;
- 	int output;
-@@ -555,6 +646,8 @@ static struct obex_mime_type_driver file = {
- 	.read = filesystem_read,
- 	.write = filesystem_write,
- 	.remove = remove,
-+	.move = filesystem_rename,
-+	.copy = filesystem_copy,
+ static void pcsuite_disconnect(struct obex_session *os, void *user_data)
+ {
+ 	struct pcsuite_session *pcsuite = user_data;
+@@ -253,6 +263,7 @@ static struct obex_service_driver pcsuite = {
+ 	.put = pcsuite_put,
+ 	.chkput = pcsuite_chkput,
+ 	.setpath = pcsuite_setpath,
++	.action = pcsuite_action,
+ 	.disconnect = pcsuite_disconnect
  };
  
- static struct obex_mime_type_driver capability = {
 -- 
 1.7.5.4
 
