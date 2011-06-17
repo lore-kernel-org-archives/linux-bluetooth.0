@@ -1,35 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 1/3] Bluetooth: Fix not setting the chan state
-Date: Fri, 17 Jun 2011 22:46:25 -0300
-Message-Id: <1308361587-8338-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTim6_8rrQP_2Z+w_h6F2O8Z_2S-P9Q@mail.gmail.com>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	<1308175855.2196.7.camel@aeonflux>
+	<BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+	<1308191356.2196.9.camel@aeonflux>
+	<8DCFA6B89B9E70418E47A2348D55495A478165D6@banasiexm01.ASIA.ROOT.PRI>
+	<BANLkTimiLXWNfv=hwzDTMd7U8nphUSvMQg@mail.gmail.com>
+	<8DCFA6B89B9E70418E47A2348D55495A4781711C@banasiexm01.ASIA.ROOT.PRI>
+	<BANLkTimXg6_3f25sXCtZ_YU3VoWUayqbFQ@mail.gmail.com>
+	<BANLkTi=vMJDDtJkpZPQY+MijXLA8MuLhSQ@mail.gmail.com>
+	<BANLkTim6_8rrQP_2Z+w_h6F2O8Z_2S-P9Q@mail.gmail.com>
+Date: Fri, 17 Jun 2011 14:53:53 +0200
+Message-ID: <BANLkTi=pfFKubF0-tSSkJrPpUk6FY6J9uQ@mail.gmail.com>
+Subject: Re: GATT and GATT based Profiles architecture - Query
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Ajay Pillai <Ajay.Pillai@csr.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the connection is ready we should set the connection
-to CONNECTED so userspace can use it.
+Hi
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/l2cap_core.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+2011/6/17 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi,
+>
+> On Fri, Jun 17, 2011 at 8:22 AM, Santiago Carot <sancane@gmail.com> wrote:
+>> Just a note. If there is a full GATT API and we do BlueZ plugins over
+>> GATT (wich have their own D-Bus API as usual in BlueZ). The GATT API
+>> may be in conflict with those APIs exposed by those plugins because
+>> Applications will be able to use Attribute D-Bus one avoiding those
+>> APIs exposed by plugins. Do not?
+>
+> As long as all APIs use the same stack, there is no issue AFAIK. For
+> instance, if someone uses the Proximity D-Bus API and another
+> application does the same operation over the "generic" Attribute API,
+> both operations will be processed the same way inside the BlueZ GATT
+> stack (because they use the same functions internally). At least this
+> is the intended behavior, we don't do much testing like that :)
+>
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 25f31f4..4af61fb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -895,8 +895,7 @@ static void l2cap_chan_ready(struct sock *sk)
- 	chan->conf_state = 0;
- 	__clear_chan_timer(chan);
- 
--	sk->sk_state = BT_CONNECTED;
--	sk->sk_state_change(sk);
-+	l2cap_state_change(chan, BT_CONNECTED);
- 
- 	if (parent)
- 		parent->sk_data_ready(parent, 0);
--- 
-1.7.5.4
+Yes, sure. the GATT API will allow applications to avoid use API
+provided for GATT based plugins. In this scenario there will be two
+ways to doing things. A) Using the plugin API and B)Through the GATT
+API. ... or in the worst case, an Application may use both.
 
+
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
