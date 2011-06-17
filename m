@@ -1,140 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti Julku <antti.julku@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
-Date: Fri, 17 Jun 2011 12:43:48 +0300
-Message-Id: <1308303828-1982-1-git-send-email-antti.julku@nokia.com>
+MIME-Version: 1.0
+In-Reply-To: <20110616165140.GA5229@piper>
+References: <BANLkTi=LXBzm+9g-VdonozngKhQfOZoz2w@mail.gmail.com>
+	<1307957658-11330-1-git-send-email-lkslawek@gmail.com>
+	<1307957658-11330-2-git-send-email-lkslawek@gmail.com>
+	<BANLkTinFrYNNSj0SL3TT=kCnB3PLS7yeAw@mail.gmail.com>
+	<20110615133932.GA14904@dell.ger.corp.intel.com>
+	<BANLkTi=U2mgumWCTHBMvtROWn5iAA_fiJw@mail.gmail.com>
+	<BANLkTikOJC7QSWkJ2HbJTQg-e2n36mc-zw@mail.gmail.com>
+	<20110616165140.GA5229@piper>
+Date: Fri, 17 Jun 2011 10:35:39 +0300
+Message-ID: <BANLkTi=6ZFQy2d+emwS3_jUx+M7bwQ4iAA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Modify obex_write_stream logic
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add command to management interface for enabling/disabling the
-fast connectable mode.
+Hi Vinicius,
 
-Signed-off-by: Antti Julku <antti.julku@nokia.com>
----
- include/net/bluetooth/hci.h  |   10 +++++++
- include/net/bluetooth/mgmt.h |    5 +++
- net/bluetooth/mgmt.c         |   62 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+), 0 deletions(-)
+On Thu, Jun 16, 2011 at 7:51 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+>> Sorry I have to disagree here, adding another callback probably
+>> simplify the code a bit since we can have something like this:
+>>
+>> if (!streaming && driver->get_apparams)
+>>     driver->get_apparams...
+>>
+>> So just drivers that support get_apparams will be called and that
+>> should be enough to guarantee the apparams are added in the beginning
+>> packet.
+>>
+>> Custom headers are a different matter, right now we don't have any
+>> plugin/driver who need them.
+>
+> But we will have soon, BIP needs them. So we better start considering
+> how should we export it to the plugins.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 65345cd..d7b9600 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
-+struct hci_cp_write_page_scan_activity {
-+	__le16   interval;
-+	__le16   window;
-+} __packed;
-+
-+#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
-+
- #define HCI_OP_LE_SET_EVENT_MASK	0x2001
- struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 45bea25..7196d04 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
-+struct mgmt_cp_set_fast_connectable {
-+	__u8 enable;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 64c0418..b4bed16 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1730,6 +1730,64 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 	return err;
- }
- 
-+static int set_fast_connectable(struct sock *sk, u16 index,
-+					unsigned char *data, u16 len)
-+{
-+	struct hci_dev *hdev;
-+	struct mgmt_cp_set_fast_connectable *cp;
-+	struct hci_cp_write_page_scan_activity acp;
-+	u8 type;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	cp = (void *) data;
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								EINVAL);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								ENODEV);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (cp->enable) {
-+		type = PAGE_SCAN_TYPE_INTERLACED;
-+		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
-+	} else {
-+		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-+		acp.interval = 0x0800;	/* default 1.28 sec page scan */
-+	}
-+
-+	acp.window = 0x0012;	/* default 11.25 msec page scan window */
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
-+						sizeof(acp), &acp);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto failed;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto failed;
-+	}
-+
-+	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+							NULL, 0);
-+failed:
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1850,6 +1908,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_UNBLOCK_DEVICE:
- 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
- 		break;
-+	case MGMT_OP_SET_FAST_CONNECTABLE:
-+		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-+								len);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
+Sure, still a different plugin, maybe when BIP is to be introduced we
+should actually give the OpenOBEX object to the drivers, so that each
+plugin can add their own headers in whatever order they want, or have
+an abstraction of the object e.g. obexd_object which the plugins can
+use to add their own headers. How about that?
+
 -- 
-1.7.2.5
-
+Luiz Augusto von Dentz
