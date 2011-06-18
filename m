@@ -1,48 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Adamek <adamek.kuba@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd 00/10] Support user defined headers in gwobex
-Date: Sun, 19 Jun 2011 02:59:36 +0200
-Message-Id: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH 3/3] Bluetooth: Remove useless access to the socket
+Date: Fri, 17 Jun 2011 22:46:27 -0300
+Message-Id: <1308361587-8338-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1308361587-8338-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1308361587-8338-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+We already have access to the chan, we don't have to access the
+socket to get its imtu.
 
-these patches will enable sending and receiving of user defined headers
-in gwobex.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/l2cap_core.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Two new functions will enable to start an asynchronous get or put
-transfer, taking as an argument a list of structures describing
-the headers to be sent. The headers are sent out in the order
-of appearance on the list.
-
-Likewise all response headers that would have been previously ignored
-by gwobex are now inserted to a list in the current gw_obex_xfer
-object, and so can be retrieved later after the asynchrous transfer
-has finished.
-
-Additionally, the order of sending headers in gwobex is changed
-to the one mandated by BIP, i.e.:
-Connection ID->Type->Name->Application Parameters->User Defined Headers.
-
-Jakub Adamek (10):
-  Add a_header struct for additional header data
-  Add list to store received headers
-  Store received headers in gw_obex_xfer object
-  Add functions to get, put w. a_header list
-  Parse headers in a PUT response packet
-  Add functions for async requests w a_header list
-  Reorder headers to conform to BIP's requirements
-  Handle partial content response from server
-  Convenience method to make deep copy of a_header
-  Add func for fetching header by id from list
-
- gwobex/gw-obex.h   |   39 +++++++++++++
- gwobex/obex-priv.c |  151 +++++++++++++++++++++++++++++++++++++---------------
- gwobex/obex-priv.h |   29 ++++++++++
- gwobex/obex-xfer.c |   70 ++++++++++++++++++++++++
- gwobex/obex-xfer.h |   15 +++++
- 5 files changed, 261 insertions(+), 43 deletions(-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index bbe5306..904b177 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3964,7 +3964,7 @@ static inline int l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm, str
+ 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
+ 		goto drop;
+ 
+-	if (l2cap_pi(sk)->chan->imtu < skb->len)
++	if (chan->imtu < skb->len)
+ 		goto drop;
+ 
+ 	if (!chan->ops->recv(chan->data, skb))
+@@ -3997,7 +3997,7 @@ static inline int l2cap_att_channel(struct l2cap_conn *conn, __le16 cid, struct
+ 	if (chan->state != BT_BOUND && chan->state != BT_CONNECTED)
+ 		goto drop;
+ 
+-	if (l2cap_pi(sk)->chan->imtu < skb->len)
++	if (chan->imtu < skb->len)
+ 		goto drop;
+ 
+ 	if (!chan->ops->recv(chan->data, skb))
+-- 
+1.7.5.4
 
