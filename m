@@ -2,137 +2,105 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Adamek <adamek.kuba@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd 04/10] Add functions to get, put w. a_header list
-Date: Sun, 19 Jun 2011 02:59:40 +0200
-Message-Id: <1308445186-27135-5-git-send-email-adamek.kuba@gmail.com>
+Subject: [PATCH obexd 05/10] Parse headers in a PUT response packet
+Date: Sun, 19 Jun 2011 02:59:41 +0200
+Message-Id: <1308445186-27135-6-git-send-email-adamek.kuba@gmail.com>
 In-Reply-To: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
 References: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These are for internal use by gwobex.
 ---
- gwobex/obex-priv.c |   42 +++++++++++++++++++++++++++++++++++++++++-
- gwobex/obex-priv.h |   29 +++++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+), 1 deletions(-)
+ gwobex/obex-priv.c |   69 +++++++++++++++++++++++++++-------------------------
+ 1 files changed, 36 insertions(+), 33 deletions(-)
 
 diff --git a/gwobex/obex-priv.c b/gwobex/obex-priv.c
-index b9216e5..93a310b 100644
+index 93a310b..c986744 100644
 --- a/gwobex/obex-priv.c
 +++ b/gwobex/obex-priv.c
-@@ -863,6 +863,15 @@ gboolean gw_obex_get(GwObex *ctx,
-                      const guint8 *apparam, gint apparam_size,
-                      gchar **buf, gint *buf_size, int stream_fd,
-                      gboolean async) {
-+    return gw_obex_get_with_aheaders(ctx, local, remote, type, apparam, apparam_size,
-+            NULL, buf, buf_size, stream_fd, async);
-+}
-+
-+gboolean gw_obex_get_with_aheaders(GwObex *ctx,
-+        const gchar *local, const gchar *remote, const gchar *type,
-+        const guint8 *apparam, gint apparam_size,
-+        const GSList *aheaders, gchar **buf, gint *buf_size, int stream_fd,
-+        gboolean async) {
-     gboolean ret = FALSE;
-     obex_headerdata_t hv;
-     obex_object_t *object;
-@@ -927,6 +936,17 @@ gboolean gw_obex_get(GwObex *ctx,
-         }
-     }
+@@ -298,39 +298,6 @@ static void obex_abort_done(GwObex *ctx, obex_object_t *object,
+                 optostr((uint8_t)obex_cmd), (uint8_t)obex_cmd);
+ }
  
-+    if (aheaders) {
-+        const GSList *hlist = aheaders;
-+        struct a_header *ah;
-+        while (hlist) {
-+            ah = hlist->data;
-+            hv = ah->hv;
-+            OBEX_ObjectAddHeader(ctx->handle, object, ah->hi, hv, ah->hv_size, 0);
-+            hlist = g_slist_next(hlist);
-+        }
-+    }
-+
-     OBEX_ObjectReadStream(ctx->handle, object, NULL);
- 
-     if (async) {
-@@ -980,6 +1000,15 @@ gboolean gw_obex_put(GwObex *ctx,
-                      const guint8 *apparam, gint apparam_size,
-                      const gchar *buf, gint object_size, time_t object_time,
-                      int stream_fd, gboolean async) {
-+    return gw_obex_put_with_aheaders(ctx, local, remote, type, apparam, apparam_size,
-+            NULL, buf, object_size, object_time, stream_fd, async);
-+}
-+
-+gboolean gw_obex_put_with_aheaders(GwObex *ctx,
-+        const gchar *local, const gchar *remote, const gchar *type,
-+        const guint8 *apparam, gint apparam_size,
-+        const GSList *aheaders, const gchar *buf, gint object_size, time_t object_time,
-+        int stream_fd, gboolean async) {
-     gboolean ret = FALSE;
-     obex_headerdata_t hv;
-     obex_object_t *object;
-@@ -1052,12 +1081,23 @@ gboolean gw_obex_put(GwObex *ctx,
-         hv.bs = (unsigned char *)type;
-         OBEX_ObjectAddHeader(ctx->handle, object, OBEX_HDR_TYPE, hv, strlen(type) + 1, 0);
-     }
+-static void obex_request_done(GwObex *ctx, obex_object_t *object,
+-                              int obex_cmd, int obex_rsp) {
+-    ctx->done = TRUE;
+-    if (ctx->xfer)
+-        ctx->xfer->do_cb = TRUE;
 -
-+    
-     if (apparam && apparam_size > 0) {
-         hv.bs = (unsigned char *)apparam;
-         OBEX_ObjectAddHeader(ctx->handle, object, OBEX_HDR_APPARAM, hv, apparam_size, 0);
-     }
+-    ctx->obex_rsp = obex_rsp;
+-
+-    if (obex_rsp != OBEX_RSP_SUCCESS) {
+-        debug("%s command (0x%02x) failed: %s (0x%02x)\n",
+-                optostr((uint8_t)obex_cmd), (uint8_t)obex_cmd,
+-                OBEX_ResponseToString(obex_rsp), (uint8_t)obex_rsp);
+-#ifdef DEBUG
+-        if (obex_rsp == OBEX_RSP_UNAUTHORIZED) {
+-            debug("Showing headers..\n");
+-            show_headers(ctx->handle, object);
+-        }
+-#endif
+-        return;
+-    }
+-
+-    debug("%s command (0x%02x) succeeded.\n", optostr((uint8_t)obex_cmd),
+-            (uint8_t)obex_cmd);
+-
+-    switch (obex_cmd) {
+-        case OBEX_CMD_CONNECT:
+-            obex_connect_done(ctx, object, obex_rsp);
+-            break;
+-        default:
+-            break;
+-    }
+-}
+-
+ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
+                                      struct gw_obex_xfer *xfer) {
+     obex_headerdata_t hv;
+@@ -387,6 +354,42 @@ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
+     OBEX_ObjectReParseHeaders(handle, object);
+ }
  
-+    if (aheaders) {
-+        const GSList *hlist = aheaders;
-+        struct a_header *ah;
-+        while (hlist) {
-+            ah = hlist->data;
-+            hv = ah->hv;
-+            OBEX_ObjectAddHeader(ctx->handle, object, ah->hi, hv, ah->hv_size, 0);
-+            hlist = g_slist_next(hlist);
++static void obex_request_done(GwObex *ctx, obex_object_t *object,
++                              int obex_cmd, int obex_rsp) {
++    ctx->done = TRUE;
++    if (ctx->xfer)
++        ctx->xfer->do_cb = TRUE;
++
++    ctx->obex_rsp = obex_rsp;
++
++    if (obex_rsp != OBEX_RSP_SUCCESS) {
++        debug("%s command (0x%02x) failed: %s (0x%02x)\n",
++                optostr((uint8_t)obex_cmd), (uint8_t)obex_cmd,
++                OBEX_ResponseToString(obex_rsp), (uint8_t)obex_rsp);
++#ifdef DEBUG
++        if (obex_rsp == OBEX_RSP_UNAUTHORIZED) {
++            debug("Showing headers..\n");
++            show_headers(ctx->handle, object);
 +        }
++#endif
++        return;
 +    }
 +
-     /* Try to figure out modification time if none was given */
-     if (ctx->xfer->stream_fd >= 0) {
-         struct stat stats;
-diff --git a/gwobex/obex-priv.h b/gwobex/obex-priv.h
-index f4e3e5b..c0548b0 100644
---- a/gwobex/obex-priv.h
-+++ b/gwobex/obex-priv.h
-@@ -214,4 +214,33 @@ gboolean gw_obex_put(GwObex *ctx,
-                      const gchar *buf, gint buf_size, time_t object_time,
-                      int stream_fd, gboolean async);
- 
++    if (ctx->xfer)
++        get_non_body_headers(ctx->handle, object, ctx->xfer);
 +
-+/** Get an object from the server, specifying additional headers
-+ * @param ctx Pointer returned by gw_obex_setup()
-+ * @param local Local filename which contains the object
-+ * @param remote Remote filename to store the object in
-+ * @param type MIME-type of the object (NULL if not known)
-+ * @param aheaders list of additional headers (NULL if empty)
-+ * @returns TRUE on success, FALSE on failure
-+ */
-+gboolean gw_obex_get_with_aheaders(GwObex *ctx,
-+                     const gchar *local, const gchar *remote, const gchar *type,
-+                     const guint8 *apparam, gint apparam_size,
-+                     const GSList *aheaders, gchar **buf, gint *buf_size, int stream_fd,
-+                     gboolean async);
++    debug("%s command (0x%02x) succeeded.\n", optostr((uint8_t)obex_cmd),
++            (uint8_t)obex_cmd);
 +
-+/** Send an object to the server
-+ * @param ctx Pointer returned by gw_obex_setup()
-+ * @param local Local filename to store the objec in
-+ * @param remote Remote filename which contains the object
-+ * @param type MIME-type of the object (NULL if not known)
-+ * @param aheaders list of additional headers (NULL if empty)
-+ * @returns TRUE on success, FALSE on failure
-+ */
-+gboolean gw_obex_put_with_aheaders(GwObex *ctx,
-+                     const gchar *local, const gchar *remote, const gchar *type,
-+                     const guint8 *apparam, gint apparam_size,
-+                     const GSList *aheaders, const gchar *buf, gint buf_size, time_t object_time,
-+                     int stream_fd, gboolean async);
++    switch (obex_cmd) {
++        case OBEX_CMD_CONNECT:
++            obex_connect_done(ctx, object, obex_rsp);
++            break;
++        default:
++            break;
++    }
++}
 +
- #endif /* _OBEX_PRIV_H_ */
+ static void obex_readstream(GwObex *ctx, obex_object_t *object) {
+     struct gw_obex_xfer *xfer = ctx->xfer;
+     const uint8_t *buf;
 -- 
 1.7.0.4
 
