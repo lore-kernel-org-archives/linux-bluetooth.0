@@ -1,33 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 19 Jun 2011 21:49:42 +0200
-From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: ALSA lib audio/pcm_bluetooth.c:1607:(audioservice_expect) BT_OPEN
- failed : Invalid argument(22)
-Message-Id: <20110619214942.a6e615ca.yugiohjcj-mailinglist@laposte.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Keith Packard <keithp@keithp.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Waldemar.Rymarkiewicz@tieto.com, padovan@profusion.mobi, marcel@holtmann.org, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key requirements"
+In-Reply-To: <20110619175937.GA24188@dell.ger.corp.intel.com>
+References: <yunboy7a2so.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com> <20110609083345.GA2894@dell.ccr.corp.intel.com> <yuny61b3pnm.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com> <20110610055558.GA1832@dell> <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com> <yun8vsynkiy.fsf@aiko.keithp.com> <20110619175937.GA24188@dell.ger.corp.intel.com>
+Date: Sun, 19 Jun 2011 21:01:40 +0200
+Message-ID: <yunliwxabmz.fsf@aiko.keithp.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--=-=-=
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sun, 19 Jun 2011 20:59:37 +0300, Johan Hedberg <johan.hedberg@gmail.com>=
+ wrote:
 
-I use a bluetooth headset.
+> I think you'll need both of them to fix the pairing/security issues.
 
-With some SDL applications[1][2][3][4] I got this error :
-ALSA lib audio/pcm_bluetooth.c:1607:(audioservice_expect) BT_OPEN failed : Invalid argument(22)
-and audio doesn't work.
+Yup, with both of those patches, I get syncml and dun working again.
 
-Whereas with other applications[5][6] I got no error message and the audio works.
+(sorry for the delayed testing, I'm traveling)
 
-I think all SDL applications have this problem.
-Can you tell me how to resolve this problem?
+=2D-=20
+keith.packard@intel.com
 
-[1]supertux
-[2]frozen-bubble
-[3]pingus
-[4]milkytracker
-[5]vlc
-[6]audacity
+--=-=-=
+Content-Type: application/pgp-signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFN/keUQp8BWwlsTdMRAm0HAJ44h1GTyPKILM0gaxQz9fa0HtvxmACg48Rs
+v4TTnREemuN/1jzKOtfTfsw=
+=agQ6
+-----END PGP SIGNATURE-----
+--=-=-=--
