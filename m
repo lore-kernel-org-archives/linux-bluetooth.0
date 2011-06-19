@@ -1,52 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keith Packard <keithp@keithp.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Waldemar.Rymarkiewicz@tieto.com, padovan@profusion.mobi, marcel@holtmann.org, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key requirements"
-In-Reply-To: <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com>
-References: <yunboy7a2so.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com> <20110609083345.GA2894@dell.ccr.corp.intel.com> <yuny61b3pnm.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com> <20110610055558.GA1832@dell> <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com>
-Date: Sun, 19 Jun 2011 13:11:17 +0200
-Message-ID: <yun8vsynkiy.fsf@aiko.keithp.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Sun, 19 Jun 2011 06:06:50 +0200
+From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Bluetooth headset works!
+Message-Id: <20110619060650.fb140f72.yugiohjcj-mailinglist@laposte.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, 10 Jun 2011 14:58:50 +0900, Luiz Augusto von Dentz <luiz.dentz@gmai=
-l.com> wrote:
+Hello,
 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 2f5ae53..b309f84 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -673,8 +673,8 @@ auth:
->         if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &conn->pend))
->                 return 0;
->=20
-> -       hci_conn_auth(conn, sec_level, auth_type);
-> -       return 0;
-> +       if (!(hci_conn_auth(conn, sec_level, auth_type)))
-> +               return 0;
->=20
->  encrypt:
->         if (conn->link_mode & HCI_LM_ENCRYPT)
+I am happy to tell you I finally do something very important : my bluetooth headset works!
 
-That makes the first connection afer boot succeed, but subsequent
-connections fail in the same way.
+This is my mini HOW-TO in 7 steps :
 
-=2D-=20
-keith.packard@intel.com
+1. Install bluez.
 
---=-=-=
-Content-Type: application/pgp-signature
+2. Clear old bounded bluetooth devices :
+$ sudo rm -rfv /var/lib/bluetooth/*
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+3. Put the headset in pairing mode.
 
-iD8DBQFN/dlVQp8BWwlsTdMRAi8RAKDGQGMMW6LSFzz24zRSK15LGq4b1wCfZaPB
-X3v7geL/ClYDgt1xh76tG+8=
-=5E4L
------END PGP SIGNATURE-----
---=-=-=--
+4. Find the MAC address :
+$ hcitool scan
+Scanning ...
+	00:1E:7C:01:0A:5E	Philips SHB9000
+
+5. Pair the headset :
+$ /usr/share/doc/bluez/examples/simple-agent hci0 00:1E:7C:01:0A:5E
+Release
+New device (/org/bluez/19766/hci0/dev_00_1E_7C_01_0A_5E)
+
+6. Configure ~/.asoundrc :
+pcm.!default {
+        type bluetooth
+        device 00:1E:7C:01:0A:5E
+        profile "auto"
+}
+
+7. Play a song :
+$ vlc ~/documents/downloads/audio/playlist.m3u
+
+Now, I would like to know something :
+-Why simple-agent works but bluetooth-agent doesn't work? (step 5)
+-How to tell in ~/.asoundrc to use the normal pcm device if the bluetooth headset isn't bounded or have multiple audio devices? (step 6)
+
+Thank you.
+
