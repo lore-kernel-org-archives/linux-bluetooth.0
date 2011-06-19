@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 19 Jun 2011 06:06:50 +0200
-From: YuGiOhJCJ Mailing-List <yugiohjcj-mailinglist@laposte.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth headset works!
-Message-Id: <20110619060650.fb140f72.yugiohjcj-mailinglist@laposte.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Jakub Adamek <adamek.kuba@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Adamek <adamek.kuba@gmail.com>
+Subject: [PATCH obexd 10/10] Add func for fetching header by id from list
+Date: Sun, 19 Jun 2011 02:59:46 +0200
+Message-Id: <1308445186-27135-11-git-send-email-adamek.kuba@gmail.com>
+In-Reply-To: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
+References: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ gwobex/obex-xfer.c |   10 ++++++++++
+ gwobex/obex-xfer.h |    2 ++
+ 2 files changed, 12 insertions(+), 0 deletions(-)
 
-Hello,
-
-I am happy to tell you I finally do something very important : my bluetooth headset works!
-
-This is my mini HOW-TO in 7 steps :
-
-1. Install bluez.
-
-2. Clear old bounded bluetooth devices :
-$ sudo rm -rfv /var/lib/bluetooth/*
-
-3. Put the headset in pairing mode.
-
-4. Find the MAC address :
-$ hcitool scan
-Scanning ...
-	00:1E:7C:01:0A:5E	Philips SHB9000
-
-5. Pair the headset :
-$ /usr/share/doc/bluez/examples/simple-agent hci0 00:1E:7C:01:0A:5E
-Release
-New device (/org/bluez/19766/hci0/dev_00_1E_7C_01_0A_5E)
-
-6. Configure ~/.asoundrc :
-pcm.!default {
-        type bluetooth
-        device 00:1E:7C:01:0A:5E
-        profile "auto"
-}
-
-7. Play a song :
-$ vlc ~/documents/downloads/audio/playlist.m3u
-
-Now, I would like to know something :
--Why simple-agent works but bluetooth-agent doesn't work? (step 5)
--How to tell in ~/.asoundrc to use the normal pcm device if the bluetooth headset isn't bounded or have multiple audio devices? (step 6)
-
-Thank you.
+diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
+index 20a3221..413fed9 100644
+--- a/gwobex/obex-xfer.c
++++ b/gwobex/obex-xfer.c
+@@ -472,6 +472,16 @@ void a_header_free(struct a_header *ah) {
+     g_free(ah);
+ }
+ 
++struct a_header *a_header_find(GSList *aheaders, uint8_t hi) {
++    while (aheaders) {
++        if (((struct a_header *)aheaders->data)->hi == hi) {
++            return aheaders->data;
++        }
++        aheaders = g_slist_next(aheaders);
++    }
++    return NULL;
++}
++
+ void _gw_obex_xfer_free(struct gw_obex_xfer *xfer) {
+     GSList *aheaders = xfer->aheaders;
+     while (aheaders) {
+diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
+index 61aa048..50dadad 100644
+--- a/gwobex/obex-xfer.h
++++ b/gwobex/obex-xfer.h
+@@ -95,6 +95,8 @@ void a_header_free(struct a_header *ah);
+ 
+ struct a_header *a_header_copy(struct a_header *ah);
+ 
++struct a_header *a_header_find(GSList *aheaders, uint8_t hi);
++
+ struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
+ 
+ void _gw_obex_xfer_free(struct gw_obex_xfer *xfer);
+-- 
+1.7.0.4
 
