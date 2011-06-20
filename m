@@ -1,50 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Jun 2011 13:03:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix unpair device when disconnected for No Bonding
-Message-ID: <20110620100339.GA9457@dell.ger.corp.intel.com>
-References: <1308561837-11530-1-git-send-email-dmitriy.paliy@nokia.com>
- <20110620093143.GA8079@dell.ger.corp.intel.com>
- <BANLkTikE5bLgRWViQd2ynUNHS8HSRbL51A@mail.gmail.com>
+From: Nami <nami.li@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Nami <nami.li@atheros.com>
+Subject: [PATCH obexd 09/14] Add psm parameter for session_find.
+Date: Mon, 20 Jun 2011 18:00:51 +0800
+Message-ID: <1308564051-19004-2-git-send-email-nami.li@atheros.com>
+In-Reply-To: <1308564051-19004-1-git-send-email-nami.li@atheros.com>
+References: <1308564051-19004-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <BANLkTikE5bLgRWViQd2ynUNHS8HSRbL51A@mail.gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+---
+ client/session.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 client/session.c
 
-On Mon, Jun 20, 2011, Dmitriy Paliy wrote:
-> On Mon, Jun 20, 2011 at 12:31 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Coding-style wise your read_link_key call should be checking for < 0 or
-> > specifically for -ENOENT (you're calling the function as if it returned
-> > a boolean value). However, I'm thinking we might just store the
-> > no-bonding info in the device struct itself so you don't need to consult
-> > the storage in this case. I.e. in addition to device_is_paired there'd
-> > also be a device_is_bonded function which'd make the logic like:
-> >
-> >        if (device_is_paired(device) && !device_is_bonded(device))
-> >                device_set_paired(device, FALSE);
-> >
-> > Thoughts? Have you checked that this works both with hciops and mgmtops?
-> 
-> New ..is_bonded sounds a bit redundant since it is quite
-> straightforward to check it from storage, but also ok.
+diff --git a/client/session.c b/client/session.c
+old mode 100644
+new mode 100755
+index dd08610..3db1c1d
+--- a/client/session.c
++++ b/client/session.c
+@@ -498,6 +498,7 @@ static struct session_data *session_find(const char *source,
+ 						const char *destination,
+ 						const char *service,
+ 						uint8_t channel,
++						uint16_t psm,
+ 						const char *owner)
+ {
+ 	GSList *l;
+@@ -519,7 +520,8 @@ static struct session_data *session_find(const char *source,
+ 		if (g_strcmp0(service, session->service))
+ 			continue;
 
-It's still a file-system access for something that we could easily have
-available as a flag in runtime memory. Even if you did do the
-file-system read it'd make the code more readable if you had this
-wrapped into a device_is_bonded function.
+-		if (channel && session->channel != channel)
++		if ((channel && session->channel != channel)
++			&&(psm && session->psm != psm))
+ 			continue;
 
-> I didnt touch mgmtops at all. Could you provide more inputs about what
-> exactly the issue is?
+ 		if (g_strcmp0(owner, session->owner))
+@@ -547,7 +549,7 @@ struct session_data *session_create(const char *source,
+ 	if (destination == NULL)
+ 		return NULL;
 
-I didn't say that there is an issue. I just asked if you've checked that
-this works with mgmtops since the signaling between the kernel,
-adapter_ops and the core bluetooth daemon is quite different wrt pairing
-in that case.
+-	session = session_find(source, destination, service, channel, owner);
++	session = session_find(source, destination, service, channel, psm, owner);
+ 	if (session) {
+ 		session_ref(session);
+ 		goto proceed;
+--
+1.7.1
 
-Johan
