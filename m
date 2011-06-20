@@ -1,55 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: openobex-users@lists.sourceforge.net
-Subject: Re: [openobex-users] [PATCH openobex 1/3] Add transport format member in fdobex_data struct. Support STREAM and SEQPACKET transport format.
-Date: Mon, 20 Jun 2011 20:28:43 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Nami <nami.li@atheros.com>,
- linux-bluetooth@vger.kernel.org,
- haijun@qca.qualcomm.com
-References: <1308548849-11615-1-git-send-email-nami.li@atheros.com> <1308588193.2196.34.camel@aeonflux>
-In-Reply-To: <1308588193.2196.34.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201106202028.43470.post@hendrik-sattler.de>
+In-Reply-To: <BANLkTi=e8C_3Yewys5Oy2ftmbj6U0ygZow@mail.gmail.com>
+References: <1308560871-3225-1-git-send-email-sancane@gmail.com>
+	<EB40D37D-9291-4215-BC31-EE7B1462253B@signove.com>
+	<BANLkTi=e8C_3Yewys5Oy2ftmbj6U0ygZow@mail.gmail.com>
+Date: Mon, 20 Jun 2011 19:24:47 +0200
+Message-ID: <BANLkTincPpdn5475a+BsXgz3ZghJRDS8gg@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Elvis Pfutzenreuter <epx@signove.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Montag, 20. Juni 2011, 18:43:10 schrieb Marcel Holtmann:
-> Hi Nami,
-> 
-> >  include/openobex/obex_const.h |    4 ++++
-> >  lib/fdobex.h                  |    1 +
-> >  2 files changed, 5 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/include/openobex/obex_const.h
-> > b/include/openobex/obex_const.h index cb7afeb..8acee91 100644
-> > --- a/include/openobex/obex_const.h
-> > +++ b/include/openobex/obex_const.h
-> > @@ -302,6 +302,10 @@ enum obex_rsp_mode {
-> > 
-> >    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
-> >  
-> >  };
-> > 
-> > +enum fdobex_transport_format{
-> > +	 FDOBEX_MT_STREAM ,
-> > +	 FDOBEX_MT_SEQPACKET
-> > +};
-> 
-> can I ask again why we should be doing this. Especially for the FdOBEX
-> transport this is pointless. You are getting a file descriptor in the
-> first place. It does not have to be a socket.
-> 
-> And in the case this is really a socket, then you can just use SO_TYPE
-> to read the current type of the socket.
-> 
-> If it is not a socket, then it needs to treated as stream anyway.
+Hi all,
 
-No. Ever tried that on the linux USB gadget implementation in Linux? If a FD 
-is not pointing to a socket, it can still point to a device file of whatever 
-kind. You SO_TYPE won't completely help here. You can try any amount of 
-guessing but isn't it easier if the application just tells you? OTOH, the 
-application could just use a custom transport, then.
+2011/6/20 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi,
+>
+> On Mon, Jun 20, 2011 at 7:45 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
+>>> +             MeasureReceived(dict measure)
+>>> +
+>>> +                     This signal is emmited when a measure has been scanned
+>>> +                     by the thermometer. The Time entry in the dict will be
+>>> +                     only present if the device supports storing of data.
+>>> +                     The Type entry is optional and it will be provided if
+>>> +                     the measure type is non-static. For static measures the
+>>> +                     property Type will be provided. The Value entry
+>>> +                     corresponds to IEEE-11073 32-bit FLOAT.
+>>> +
+>>> +                     Dict is defined as below:
+>>> +                     {
+>>> +                             "Value" : uint32,
+>>> +                             "Unit" : ("Celsius" or "Fahrenheit")
+>>> +                             "Time" : {
+>>> +                                             "Year" : uint16,
+>>> +                                             "Month" : uint8,
+>>> +                                             "Day" : uint8,
+>>> +                                             "Hours" : uint8,
+>>> +                                             "Minutes" : uint8,
+>>> +                                             "Seconds" : uint8
+>>
+>> We don't really need to mimic the timestamp structure used in spec. We could
+>> go for a simple int with time() format (we should look into other
+>> BlueZ APIs to see which format they use for date or time).
+>>
+>> A value for no-timestamp case should be defined, too.
+>
+> For reference, this is from doc/clock-api.txt in connman (which has
+> architecture similar to BlueZ:
+>
+> [...]
+> Properties      uint64 Time [readonly or readwrite]
+>
+>                        Current system time in seconds since epoch.
+> [...]
+>
+>
+>
+>>
+>>> +                                     }
+>>> +                             "Type" : uint8,
+>>> +                             "Measurement" : ("Final", "Intermediate")
+>>> +                     }
+>>
+>> I would favor an agent for this case instead of signals, because it makes it
+>> implicit whether there is someone interested in getting temperature notifications.
+>> I mean, if some app a) enables notification properties and b) leaves, notification
+>> will keep being done, burning both devices' batteries. That's LE, after all :)
+>>
+>> Turning off upon exit is not an option because some other app may be interested,
+>> too. The agent is a natural 'reference counter', too.
+>
+> In general, if you want/need to support multiple users of the D-Bus
+> API, something like an agent is necessary IMHO. Otherwise, it would be
+> necessary to return some "busy" error to avoid other users disabling
+> intermediate measurements while another user is interested on them.
 
-HS
+Ok, I think the agent style API will fit better with multi-user use
+cases. I'm going to work in these changes and I'll submit a new patch
+when it's ready.
+
+Regards.
