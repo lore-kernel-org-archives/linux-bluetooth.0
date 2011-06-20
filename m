@@ -1,82 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nami <nami.li@atheros.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Nami <nami.li@atheros.com>
-Subject: [PATCH obexd 06/14] Add protocol member to distinguish OBEX Protocol.
-Date: Mon, 20 Jun 2011 18:00:50 +0800
-Message-ID: <1308564051-19004-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <BANLkTim-a8RHeThJ10s8dsN+3OXwFD5aMQ@mail.gmail.com>
+References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
+	<1308563100-18917-3-git-send-email-nami.li@atheros.com>
+	<BANLkTim-a8RHeThJ10s8dsN+3OXwFD5aMQ@mail.gmail.com>
+Date: Mon, 20 Jun 2011 13:00:07 +0300
+Message-ID: <BANLkTinYMMw0mBjXRkDM-dgbLyXyrFuHPA@mail.gmail.com>
+Subject: Re: [PATCH obexd 03/14] Add psm member in obex_service_driver struct.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Nami <nami.li@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, haijun@qca.qualcomm.com,
+	yongli@qca.qualcomm.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/bluetooth.c |   14 ++++++++++----
- src/service.h       |    7 +++++++
- 2 files changed, 17 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index 632e148..6eb4048 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -456,10 +456,14 @@ static int request_service_authorization(struct bluetooth_service *service,
+On Mon, Jun 20, 2011 at 12:58 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Mon, Jun 20, 2011 at 12:44 PM, Nami <nami.li@atheros.com> wrote:
+>> ---
+>>  src/service.h |    1 +
+>>  1 files changed, 1 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/src/service.h b/src/service.h
+>> index a844885..313b1f2 100644
+>> --- a/src/service.h
+>> +++ b/src/service.h
+>> @@ -25,6 +25,7 @@ struct obex_service_driver {
+>>        const char *name;
+>>        uint16_t service;
+>>        uint8_t channel;
+>> +       uint16_t psm;
+>>        const uint8_t *target;
+>>        unsigned int target_size;
+>>        const uint8_t *who;
+>> --
+>> 1.7.1
+>>
+>> --
+>
+> This one alone would generate a warning which is not nice if cherry
+> picked, so perhaps you should merge with other code that really uses
+> it.
 
- 	if (connection == NULL || any->path == NULL)
- 		return -1;
--
--	bt_io_get(io, BT_IO_RFCOMM, &err,
--			BT_IO_OPT_SOURCE, source,
--			BT_IO_OPT_INVALID);
-+	if(service->driver->protocol == RFCOMM_OBEX)
-+		bt_io_get(io, BT_IO_RFCOMM, &err,
-+				BT_IO_OPT_SOURCE, source,
-+				BT_IO_OPT_INVALID);
-+	else
-+		bt_io_get(io, BT_IO_L2CAP, &err,
-+				BT_IO_OPT_SOURCE, source,
-+				BT_IO_OPT_INVALID);
- 	if (err) {
- 		error("%s", err->message);
- 		g_error_free(err);
-@@ -505,6 +509,7 @@ static void confirm_event(GIOChannel *io, void *user_data)
- 		error("bluetooth: Unable to find service");
- 		goto drop;
- 	}
-+	service->driver->protocol = RFCOMM_OBEX;
+Nevermind, this is not a variable definition as I (wrongly) assumed.
 
- 	if (service->driver->service != OBEX_OPP) {
- 		if (request_service_authorization(service, io, address) < 0)
-@@ -550,6 +555,7 @@ static void l2cap_confirm_event(GIOChannel *io, void *user_data)
- 		error("bluetooth: Unable to find service");
- 		goto drop;
- 	}
-+	service->driver->protocol = L2CAP_OBEX;
- 	if (service->driver->service != OBEX_OPP) {
- 		if (request_service_authorization(service, io, address) < 0)
- 			goto drop;
-diff --git a/src/service.h b/src/service.h
-index 313b1f2..465be82 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -21,11 +21,18 @@
-  *
-  */
 
-+typedef enum {
-+	RFCOMM_OBEX,
-+	L2CAP_OBEX
-+} Obex_Protocol;
-+
-+
- struct obex_service_driver {
- 	const char *name;
- 	uint16_t service;
- 	uint8_t channel;
- 	uint16_t psm;
-+	Obex_Protocol protocol;
- 	const uint8_t *target;
- 	unsigned int target_size;
- 	const uint8_t *who;
---
-1.7.1
 
+-- 
+Luiz Augusto von Dentz
