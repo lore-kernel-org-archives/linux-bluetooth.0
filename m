@@ -1,116 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Jun 2011 16:23:46 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
-Message-ID: <20110620192346.GB7240@joana>
-References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
- <1307143270-2655-2-git-send-email-mathewm@codeaurora.org>
- <20110606173153.GA30641@joana>
- <alpine.DEB.2.02.1106081612210.5280@mathewm-linux>
- <20110609184747.GB2533@joana>
- <alpine.DEB.2.02.1106091548010.18748@mathewm-linux>
- <20110615000406.GF2613@joana>
- <alpine.DEB.2.02.1106161438390.17210@mathewm-linux>
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: openobex-users@lists.sourceforge.net
+Subject: Re: [openobex-users] [PATCH openobex 1/3] Add transport format member in fdobex_data struct. Support STREAM and SEQPACKET transport format.
+Date: Mon, 20 Jun 2011 20:28:43 +0200
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Nami <nami.li@atheros.com>,
+ linux-bluetooth@vger.kernel.org,
+ haijun@qca.qualcomm.com
+References: <1308548849-11615-1-git-send-email-nami.li@atheros.com> <1308588193.2196.34.camel@aeonflux>
+In-Reply-To: <1308588193.2196.34.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1106161438390.17210@mathewm-linux>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201106202028.43470.post@hendrik-sattler.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
-
-* Mat Martineau <mathewm@codeaurora.org> [2011-06-16 14:48:03 -0700]:
-
+Am Montag, 20. Juni 2011, 18:43:10 schrieb Marcel Holtmann:
+> Hi Nami,
 > 
-> On Tue, 14 Jun 2011, Gustavo F. Padovan wrote:
+> >  include/openobex/obex_const.h |    4 ++++
+> >  lib/fdobex.h                  |    1 +
+> >  2 files changed, 5 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/include/openobex/obex_const.h
+> > b/include/openobex/obex_const.h index cb7afeb..8acee91 100644
+> > --- a/include/openobex/obex_const.h
+> > +++ b/include/openobex/obex_const.h
+> > @@ -302,6 +302,10 @@ enum obex_rsp_mode {
+> > 
+> >    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+> >  
+> >  };
+> > 
+> > +enum fdobex_transport_format{
+> > +	 FDOBEX_MT_STREAM ,
+> > +	 FDOBEX_MT_SEQPACKET
+> > +};
 > 
-> >* Mat Martineau <mathewm@codeaurora.org> [2011-06-09 16:09:52 -0700]:
-> >
-> >>
-> >>On Thu, 9 Jun 2011, Gustavo F. Padovan wrote:
-> >>
-> >>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-08 16:24:05 -0700]:
-> >>>
-> >>>>
-> >>>>On Mon, 6 Jun 2011, Gustavo F. Padovan wrote:
-> >>>>
-> >>>>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
-> >>>>>
-> >>>>>>This workqueue will be used for general L2CAP work, not just dealing
-> >>>>>>with "busy" frames.
-> >>>>>
-> >>>>>which general L2CAP work are we talking about?
-> >>>>
-> >>>>I'll update the commit message and resubmit, but to immediately
-> >>>>answer your question:
-> >>>>
-> >>>>* ERTM tx queue callbacks (patch 3/4 in this series)
-> >>>>* ERTM timers (ack, retrans, monitor) that can utilize proper locking.
-> >>>
-> >>>What are the problems with ERTM timers? From what I remember it was not using
-> >>>reference count on them, I fixed this. Patch is on this mailing for review.
-> >>
-> >>The ERTM timer handlers modify l2cap_chan data, but use
-> >>bh_lock_sock() and bh_unlock_sock() instead of lock_sock() and
-> >>release_sock().  The socket might be locked in userspace context,
-> >>but these timers can fire and start executing code concurrently.
-> >>
-> >>See http://article.gmane.org/gmane.linux.bluez.kernel/6808 for the
-> >>full description.
-> >>
-> >>With the refactoring of L2CAP to separate out the socket code, we
-> >>will still need a per-channel lock to protect l2cap_chan data.
-> >
-> >I understand. I'm just having a similar problem with the workqueue patch.
-> >
-> >>
-> >>>>* Updating the ERTM tx queue after an AMP channel move and L2CAP
-> >>>>reconfiguration
-> >>>>* Moving various AMP-related work out of interrupt context
-> >>>
-> >>>Marcel wrote a patch sometime ago the move the whole Bluetooth core work out
-> >>>of the interrupt context. That will help with many issues we have today,
-> >>>including these you are talking about.
-> >>>We need to take that patch, fix it, and push it no bluetooth-next.
-> >>>This task is on my TODO list, but my TODO list is getting bigger. ;)
-> >>
-> >>This would be a big help, do you have a pointer to this patch?
-> >
-> >http://permalink.gmane.org/gmane.linux.bluez.kernel/6966
-> >
-> >It only moves the cmd rx task to workqueue, but it has problems, see the
-> >comments. I took this patches today and changed it to handle all rx events and
-> >data in an workqueue. But it still has a issue with timers, because those run
-> >in interrupt context. I just had no time to think on this, but will tomorrow.
-> >
+> can I ask again why we should be doing this. Especially for the FdOBEX
+> transport this is pointless. You are getting a file descriptor in the
+> first place. It does not have to be a socket.
 > 
-> Could the timers be changed to use the "delayed_work" workqueue
-> APIs? Then all of those timeouts would be handled on workqueues and
-> locking would be much more manageable.
+> And in the case this is really a socket, then you can just use SO_TYPE
+> to read the current type of the socket.
+> 
+> If it is not a socket, then it needs to treated as stream anyway.
 
-Yes, that is the solution I found. If everything runs in process context is
-better.
+No. Ever tried that on the linux USB gadget implementation in Linux? If a FD 
+is not pointing to a socket, it can still point to a device file of whatever 
+kind. You SO_TYPE won't completely help here. You can try any amount of 
+guessing but isn't it easier if the application just tells you? OTOH, the 
+application could just use a custom transport, then.
 
-> 
-> >>Is
-> >>the new workqueue accessible for all Bluetooth modules, or is it
-> >>just for the HCI core?  The other issues in my list still need a
-> >>workqueue to use, they are not solved by moving rx processing out of
-> >>interrupt context.  If rx processing gets rid of interrupt context,
-> >>we'll also want to take a close look at all other timer use.
-> >
-> >No, but there is a per controller wokqueue. It was added by f48fd9c8cd746.
-> >I think it is good idea reuse it.
-> 
-> I didn't notice that there was already that workqueue for every
-> hdev, it's definitely better to use that instead of a global l2cap
-> queue. Please drop this patch.
-> 
-> In that case, I have an idea for getting rid of _busy_wq.  I'll
-> submit a patch.
-
-Great. That will help.
-
-	Gustavo
+HS
