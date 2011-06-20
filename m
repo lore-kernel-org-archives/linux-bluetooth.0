@@ -3,60 +3,45 @@ From: Nami <nami.li@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <haijun@qca.qualcomm.com>, <openobex-users@lists.sourceforge.net>,
 	Nami <nami.li@atheros.com>
-Subject: [PATCH openobex 2/3] Add transport format parameter when setup fd obex transprot.
-Date: Mon, 20 Jun 2011 13:47:28 +0800
-Message-ID: <1308548849-11615-2-git-send-email-nami.li@atheros.com>
-In-Reply-To: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
-References: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
+Subject: [PATCH openobex 1/3] Add transport format member in fdobex_data struct. Support STREAM and SEQPACKET transport format.
+Date: Mon, 20 Jun 2011 13:47:27 +0800
+Message-ID: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
 ---
- include/openobex/obex.h |    2 +-
- lib/obex.c              |    4 +++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ include/openobex/obex_const.h |    4 ++++
+ lib/fdobex.h                  |    1 +
+ 2 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/include/openobex/obex.h b/include/openobex/obex.h
-index f948113..0d7afec 100644
---- a/include/openobex/obex.h
-+++ b/include/openobex/obex.h
-@@ -147,7 +147,7 @@ OPENOBEX_SYMBOL(int) BtOBEX_TransportConnect(obex_t *self, bt_addr_t *src, bt_ad
- /*
-  * OBEX File API
-  */
--OPENOBEX_SYMBOL(int) FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu);
-+OPENOBEX_SYMBOL(int) FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu, int fmt);
+diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
+index cb7afeb..8acee91 100644
+--- a/include/openobex/obex_const.h
++++ b/include/openobex/obex_const.h
+@@ -302,6 +302,10 @@ enum obex_rsp_mode {
+   OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+ };
 
- /*
-  * OBEX interface discovery API
-diff --git a/lib/obex.c b/lib/obex.c
-index 165fcb8..304bc15 100644
---- a/lib/obex.c
-+++ b/lib/obex.c
-@@ -1116,10 +1116,11 @@ int CALLAPI BtOBEX_TransportConnect(obex_t *self, bdaddr_t *src,
- 	\param rfd descriptor to read
- 	\param wfd descriptor to write
- 	\param mtu transport mtu: 0 - default
-+	\param fmt transport format: 0 - default
- 	\return -1 or negative error code on error
-  */
- LIB_SYMBOL
--int CALLAPI FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu)
-+int CALLAPI FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu, int fmt)
- {
- 	DEBUG(4, "\n");
++enum fdobex_transport_format{
++	 FDOBEX_MT_STREAM ,
++	 FDOBEX_MT_SEQPACKET
++};
+ /* Min, Max and default transport MTU */
+ #define OBEX_DEFAULT_MTU	1024
+ #define OBEX_MINIMUM_MTU	255
+diff --git a/lib/fdobex.h b/lib/fdobex.h
+index 07e33ab..6839e77 100644
+--- a/lib/fdobex.h
++++ b/lib/fdobex.h
+@@ -6,5 +6,6 @@ void fdobex_get_ops(struct obex_transport_ops* ops);
 
-@@ -1132,6 +1133,7 @@ int CALLAPI FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu)
- 	self->trans.fd = rfd;
- 	self->trans.data.fd.writefd = wfd;
- 	self->trans.mtu = mtu ? mtu : self->mtu_tx_max;
-+	self->trans.data.fd.fmt = fmt;
- 	return obex_transport_connect_request(self);
- }
-
+ struct fdobex_data {
+ 	socket_t writefd; /* write descriptor */
++	enum fdobex_transport_format fmt;
+ };
+ #endif
 --
 1.7.1
 
