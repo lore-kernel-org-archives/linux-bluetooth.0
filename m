@@ -1,149 +1,164 @@
 Return-Path: <cyrus@holtmann.org>
+From: Nami <nami.li@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <haijun@qca.qualcomm.com>, <yongli@qca.qualcomm.com>,
+	Nami <nami.li@atheros.com>
+Subject: [PATCH obexd 08/14] Add psm parameter for create_session.
+Date: Mon, 20 Jun 2011 17:44:54 +0800
+Message-ID: <1308563100-18917-8-git-send-email-nami.li@atheros.com>
+In-Reply-To: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
+References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <1308560871-3225-1-git-send-email-sancane@gmail.com>
-References: <1308560871-3225-1-git-send-email-sancane@gmail.com>
-Date: Mon, 20 Jun 2011 12:54:11 +0300
-Message-ID: <BANLkTikDd0LzSTTfurzEGLAV8J00nuXtMw@mail.gmail.com>
-Subject: Re: [RFC] Health Thermometer Profile API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ client/main.c    |   26 +++++++++++++++++---------
+ client/session.c |    1 +
+ client/session.h |    1 +
+ 3 files changed, 19 insertions(+), 9 deletions(-)
 
-On Mon, Jun 20, 2011 at 12:07 PM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> ---
->  doc/thermometer.txt |  101 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 101 insertions(+), 0 deletions(-)
->  create mode 100644 doc/thermometer.txt
->
-> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
-> new file mode 100644
-> index 0000000..9d74403
-> --- /dev/null
-> +++ b/doc/thermometer.txt
-> @@ -0,0 +1,101 @@
-> +BlueZ D-Bus Thermomether API description
-> +****************************************
-> +
-> +       Santiago Carot-Nemesio <sancane@gmail.com>
-> +
-> +Health Thermomether Profile hierarchy
-> +=====================================
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.Thermometer
-> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +
-> +Methods        void SetProperty(string name, variant value)
-> +
-> +                       Changes the value of the specified property. Only
-> +                       read-write properties can be changed. On success
-> +                       this will emit a PropertyChanged signal.
-> +
-> +               dict GetProperties()
-> +
-> +                       Returns all properties for the interface. See the
-> +                       Properties section for the available properties.
-> +
-> +Signals                PropertyChanged(string name, variant value)
-> +
-> +                       This signal indicates a changed value of the given
-> +                       property.
-> +
-> +               MeasureReceived(dict measure)
-> +
-> +                       This signal is emmited when a measure has been scanned
-> +                       by the thermometer. The Time entry in the dict will be
-> +                       only present if the device supports storing of data.
-> +                       The Type entry is optional and it will be provided if
-> +                       the measure type is non-static. For static measures the
-> +                       property Type will be provided. The Value entry
-> +                       corresponds to IEEE-11073 32-bit FLOAT.
-> +
-> +                       Dict is defined as below:
-> +                       {
-> +                               "Value" : uint32,
-> +                               "Unit" : ("Celsius" or "Fahrenheit")
-> +                               "Time" : {
-> +                                               "Year" : uint16,
-> +                                               "Month" : uint8,
-> +                                               "Day" : uint8,
-> +                                               "Hours" : uint8,
-> +                                               "Minutes" : uint8,
-> +                                               "Seconds" : uint8
-> +                                       }
+diff --git a/client/main.c b/client/main.c
+index 478181c..5752831 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -125,7 +125,7 @@ done:
 
-I would try not got past the Dict, so the Time we could just use a timestamp.
+ static int parse_device_dict(DBusMessageIter *iter,
+ 		const char **source, const char **dest, const char **target,
+-		uint8_t *channel)
++		uint8_t *channel, uint16_t *psm)
+ {
+ 	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
+ 		DBusMessageIter entry, value;
+@@ -150,6 +150,10 @@ static int parse_device_dict(DBusMessageIter *iter,
+ 			if (g_str_equal(key, "Channel") == TRUE)
+ 				dbus_message_iter_get_basic(&value, channel);
+ 			break;
++		case DBUS_TYPE_UINT16:
++			if (g_str_equal(key, "Psm") == TRUE)
++				dbus_message_iter_get_basic(&value, psm);
++			break;
+ 		}
 
-> +                               "Type" : uint8,
+ 		dbus_message_iter_next(iter);
+@@ -168,11 +172,12 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
+ 	const char *sender;
+ 	uint8_t channel = 0;
++	uint16_t psm = 0;
 
-Hmm, what values can Type assume? Also be aware that D-Bus don't have
-enum type so it is a bit inconvenient in some bindings, so perhaps we
-should try to avoid them and always convert to human readable string.
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &array);
 
-> +                               "Measurement" : ("Final", "Intermediate")
-> +                       }
-> +
-> +Properties     boolean Enable [readwrite]
-> +
-> +                       Switch notification of a measure on or off.
-> +
-> +               boolean Intermediate (optional) [readwrite]
-> +
-> +                       Switch notification of intermediates measures on or off.
-> +
-> +               uint16 Interval (optional) [readwrite]
-> +
-> +                       The Measurement Interval defines the time (in seconds)
-> +                       between measurements. This interval is not related to
-> +                       the intermediates measures and must be defined into
-> +                       a valid range. Setting it to zero meaning that no
-> +                       periodic measurements will be taken.
-> +
-> +               dict Range (optional) [readonly]
-> +
-> +                       Defines the valid range for the interval between
-> +                       periodic measurements.
-> +
-> +                       Dict is defined as below:
-> +                       {
-> +                               "Minimum" : uint16,
-> +                               "Maximum" : uint16,
-> +                       }
+-	parse_device_dict(&array, &source, &dest, &target, &channel);
++	parse_device_dict(&array, &source, &dest, &target, &channel, &psm);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -218,7 +223,7 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 	data->agent = g_strdup(agent);
+ 	data->files = files;
 
-I guess we can just use them directly as properties.
+-	session = session_create(source, dest, "OPP", channel, sender,
++	session = session_create(source, dest, "OPP", channel, psm, sender,
+ 							create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -295,11 +300,12 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
+ 	const char *name = NULL;
+ 	uint8_t channel = 0;
++	uint16_t psm = 0;
 
-> +
-> +               uint8 Type (optional) [readonly]
-> +
-> +                       Describes the type of the temperature measurement in
-> +                       relation to the thermometer location. If this property
-> +                       is present, the measure type won't be provided with the
-> +                       measure received signal. The value corresponds to the
-> +                       descriptions used in ISO/IEEE 11073-10408-2008.
-> +                       Possible values:
-> +                       0 -> Reserved for future use
-> +                       1 -> Armpit
-> +                       2 -> Body (general)
-> +                       3 -> Ear (usually lobe)
-> +                       4 -> Finger
-> +                       5 -> Gastro-intestinal Tract
-> +                       6 -> Mouth
-> +                       7 -> Rectum
-> +                       8 -> Toe
-> +                       9 -> Tympanum (ear drum)
-> +                       10-255 -> Reserved for future use
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
 
-Not sure why you need MeasureReceived and PropertyChanged here, I
-would use one or another but not both to avoid possible
-inconsistencies.
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &channel, &psm);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -322,7 +328,7 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+ 	data->filename = g_strdup(name);
 
+-	session = session_create(source, dest, "OPP", channel, data->sender,
++	session = session_create(source, dest, "OPP", channel, psm, data->sender,
+ 					pull_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -366,11 +372,12 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	struct send_data *data;
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
+ 	uint8_t channel = 0;
++	uint16_t psm = 0;
 
--- 
-Luiz Augusto von Dentz
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
+
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &channel, &psm);
+ 	if (dest == NULL || target == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -384,7 +391,7 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	data->message = dbus_message_ref(message);
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+
+-	session = session_create(source, dest, target, channel, data->sender,
++	session = session_create(source, dest, target, channel, psm, data->sender,
+ 							create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -493,11 +500,12 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	struct send_data *data;
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
+ 	uint8_t channel = 0;
++	uint16_t psm = 0;
+
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
+
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &channel, &psm);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -514,7 +522,7 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	if (!target)
+ 		target = "OPP";
+
+-	session = session_create(source, dest, target, channel, data->sender,
++	session = session_create(source, dest, target, channel, psm, data->sender,
+ 					capability_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+diff --git a/client/session.c b/client/session.c
+index 266d00c..dd08610 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -535,6 +535,7 @@ struct session_data *session_create(const char *source,
+ 						const char *destination,
+ 						const char *service,
+ 						uint8_t channel,
++						uint16_t psm,
+ 						const char *owner,
+ 						session_callback_t function,
+ 						void *user_data)
+diff --git a/client/session.h b/client/session.h
+index 6f8a434..af79ac8 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -60,6 +60,7 @@ struct session_data *session_create(const char *source,
+ 						const char *destination,
+ 						const char *service,
+ 						uint8_t channel,
++						uint16_t psm,
+ 						const char *owner,
+ 						session_callback_t function,
+ 						void *user_data);
+--
+1.7.1
+
