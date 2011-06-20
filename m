@@ -1,64 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Hendrik Sattler <post@hendrik-sattler.de>,
-	"openobex-users@lists.sourceforge.net" <openobex-users@lists.sourceforge.net>
-CC: Marcel Holtmann <marcel@holtmann.org>, "Liu, Haijun"
-	<haijun@qca.qualcomm.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "Fan, Hong" <hongfan@qca.qualcomm.com>
-Subject: RE: [openobex-users] [PATCH openobex 1/3] Add transport format
- member in fdobex_data struct. Support STREAM and SEQPACKET transport format.
-Date: Tue, 21 Jun 2011 03:17:04 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CEC2C@nasanexd01a.na.qualcomm.com>
-References: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
- <201106202028.43470.post@hendrik-sattler.de>
- <1308599113.2196.46.camel@aeonflux>
- <201106202243.54514.post@hendrik-sattler.de>
-In-Reply-To: <201106202243.54514.post@hendrik-sattler.de>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v2] Bluetooth: Fix not setting the chan state
+Date: Mon, 20 Jun 2011 18:53:18 -0300
+Message-Id: <1308606798-7370-1-git-send-email-vinicius.gomes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIA0KIEkgdGhpbmsgaXRgcyBhIGdvb2QgaWRlYSB0byBjcmVhdGUgYSBuZXcgQVBJIDogRmRP
-QkVYX1NldFRyYW5zcG9ydEZvcm1hdC4gIElgbGwgdXBkYXRlIG15IHBhdGNoZXMgaW4gbmV3IG1h
-aWxzLg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogSGVuZHJpayBTYXR0bGVy
-IFttYWlsdG86cG9zdEBoZW5kcmlrLXNhdHRsZXIuZGVdIA0KU2VudDogMjAxMcTqNtTCMjHI1SA0
-OjQ0DQpUbzogb3Blbm9iZXgtdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0DQpDYzogTWFyY2Vs
-IEhvbHRtYW5uOyBMaSwgTmFtaTsgTGl1LCBIYWlqdW47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtl
-cm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbb3Blbm9iZXgtdXNlcnNdIFtQQVRDSCBvcGVub2JleCAx
-LzNdIEFkZCB0cmFuc3BvcnQgZm9ybWF0IG1lbWJlciBpbiBmZG9iZXhfZGF0YSBzdHJ1Y3QuIFN1
-cHBvcnQgU1RSRUFNIGFuZCBTRVFQQUNLRVQgdHJhbnNwb3J0IGZvcm1hdC4NCg0KSGksDQoNCkFt
-IE1vbnRhZywgMjAuIEp1bmkgMjAxMSwgMjE6NDU6MTEgc2NocmllYiBNYXJjZWwgSG9sdG1hbm46
-DQo+ID4gPiA+ICBpbmNsdWRlL29wZW5vYmV4L29iZXhfY29uc3QuaCB8ICAgIDQgKysrKw0KPiA+
-ID4gPiAgbGliL2Zkb2JleC5oICAgICAgICAgICAgICAgICAgfCAgICAxICsNCj4gPiA+ID4gIDIg
-ZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQ0KPiA+ID4gPiAN
-Cj4gPiA+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvb3Blbm9iZXgvb2JleF9jb25zdC5oIA0KPiA+
-ID4gPiBiL2luY2x1ZGUvb3Blbm9iZXgvb2JleF9jb25zdC5oIGluZGV4IGNiN2FmZWIuLjhhY2Vl
-OTEgMTAwNjQ0DQo+ID4gPiA+IC0tLSBhL2luY2x1ZGUvb3Blbm9iZXgvb2JleF9jb25zdC5oDQo+
-ID4gPiA+ICsrKyBiL2luY2x1ZGUvb3Blbm9iZXgvb2JleF9jb25zdC5oDQo+ID4gPiA+IEBAIC0z
-MDIsNiArMzAyLDEwIEBAIGVudW0gb2JleF9yc3BfbW9kZSB7DQo+ID4gPiA+IA0KPiA+ID4gPiAg
-ICBPQkVYX1JTUF9NT0RFX1NJTkdMRSA9IDEsIC8qKjwgc2luZ2xlIHJlc3BvbnNlIG1vZGUgKFNS
-TSkgKi8NCj4gPiA+ID4gIA0KPiA+ID4gPiAgfTsNCj4gPiA+ID4gDQo+ID4gPiA+ICtlbnVtIGZk
-b2JleF90cmFuc3BvcnRfZm9ybWF0ew0KPiA+ID4gPiArCSBGRE9CRVhfTVRfU1RSRUFNICwNCj4g
-PiA+ID4gKwkgRkRPQkVYX01UX1NFUVBBQ0tFVA0KPiA+ID4gPiArfTsNCj4gPiA+IA0KPiA+ID4g
-Y2FuIEkgYXNrIGFnYWluIHdoeSB3ZSBzaG91bGQgYmUgZG9pbmcgdGhpcy4gRXNwZWNpYWxseSBm
-b3IgdGhlIA0KPiA+ID4gRmRPQkVYIHRyYW5zcG9ydCB0aGlzIGlzIHBvaW50bGVzcy4gWW91IGFy
-ZSBnZXR0aW5nIGEgZmlsZSANCj4gPiA+IGRlc2NyaXB0b3IgaW4gdGhlIGZpcnN0IHBsYWNlLiBJ
-dCBkb2VzIG5vdCBoYXZlIHRvIGJlIGEgc29ja2V0Lg0KPiA+ID4gDQo+ID4gPiBBbmQgaW4gdGhl
-IGNhc2UgdGhpcyBpcyByZWFsbHkgYSBzb2NrZXQsIHRoZW4geW91IGNhbiBqdXN0IHVzZSANCj4g
-PiA+IFNPX1RZUEUgdG8gcmVhZCB0aGUgY3VycmVudCB0eXBlIG9mIHRoZSBzb2NrZXQuDQo+ID4g
-PiANCj4gPiA+IElmIGl0IGlzIG5vdCBhIHNvY2tldCwgdGhlbiBpdCBuZWVkcyB0byB0cmVhdGVk
-IGFzIHN0cmVhbSBhbnl3YXkuDQo+ID4gDQo+ID4gTm8uIEV2ZXIgdHJpZWQgdGhhdCBvbiB0aGUg
-bGludXggVVNCIGdhZGdldCBpbXBsZW1lbnRhdGlvbiBpbiBMaW51eD8gDQo+ID4gSWYgYSBGRCBp
-cyBub3QgcG9pbnRpbmcgdG8gYSBzb2NrZXQsIGl0IGNhbiBzdGlsbCBwb2ludCB0byBhIGRldmlj
-ZSANCj4gPiBmaWxlIG9mIHdoYXRldmVyIGtpbmQuIFlvdSBTT19UWVBFIHdvbid0IGNvbXBsZXRl
-bHkgaGVscCBoZXJlLiBZb3UgDQo+ID4gY2FuIHRyeSBhbnkgYW1vdW50IG9mIGd1ZXNzaW5nIGJ1
-dCBpc24ndCBpdCBlYXNpZXIgaWYgdGhlIA0KPiA+IGFwcGxpY2F0aW9uIGp1c3QgdGVsbHMgeW91
-PyBPVE9ILCB0aGUgYXBwbGljYXRpb24gY291bGQganVzdCB1c2UgYSBjdXN0b20gdHJhbnNwb3J0
-LCB0aGVuLg0KPiANCj4gcHJvYmxlbSBpcyB0aGF0IGVpdGhlciB3ZSBpbnRyb2R1Y2UgYSBuZXcg
-YWJzdHJhY3Rpb24gb3Igd2UgZmlndXJlIA0KPiB0aGlzIG91dCBtYWdpY2FsbHkuIEJyZWFraW5n
-IHRoZSBBUEkgbGlrZSB0aGlzIGlzIG5vdCBhIGdvb2QgaWRlYS4NCj4gDQo+IFNvIGlmIHdlIGdv
-IGZvciBGZFBhY2tldE9CRVggb3Igc29tZXRoaW5nIGl0IG1pZ2h0IGJlIGEgcG9zc2libGUgDQo+
-IG9wdGlvbiwgYnV0IGJyZWFraW5nIEZkT0JFWCBBUEkgaXMgbm90IGFuIG9wdGlvbi4NCg0KSG93
-IGFib3V0IGEgbmV3IGZ1bmN0aW9uOg0Kdm9pZCBGZE9CRVhfU2V0VHJhbnNwb3J0Rm9ybWF0KG9i
-ZXhfdCAqc2VsZiwgZW51bSBmZG9iZXhfdHJhbnNwb3J0X2Zvcm1hdCBmbXQpOw0KDQpTaG91bGQg
-bm90IGJyZWFrIGFueXRoaW5nIDopDQoNCkhTDQo=
+When the connection is ready we should set the connection
+to CONNECTED so userspace can use it.
+
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 700d01e..b1e2570 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -895,7 +895,7 @@ static void l2cap_chan_ready(struct sock *sk)
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+ 
+-	sk->sk_state = BT_CONNECTED;
++	l2cap_state_change(chan, BT_CONNECTED);
+ 	sk->sk_state_change(sk);
+ 
+ 	if (parent)
+-- 
+1.7.5.4
+
