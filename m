@@ -1,64 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 20 Jun 2011 09:35:08 -0300
-Message-ID: <BANLkTimHLO1dJYeapKQdTdOTpzfVjKrhdA@mail.gmail.com>
-Subject: [RFC] Attribute IO Driver
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <EB40D37D-9291-4215-BC31-EE7B1462253B@signove.com>
+References: <1308560871-3225-1-git-send-email-sancane@gmail.com>
+	<EB40D37D-9291-4215-BC31-EE7B1462253B@signove.com>
+Date: Mon, 20 Jun 2011 07:55:58 -0400
+Message-ID: <BANLkTi=e8C_3Yewys5Oy2ftmbj6U0ygZow@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Elvis Pfutzenreuter <epx@signove.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-here is the first proposal of the attribute IO  driver to be "flamed".
+On Mon, Jun 20, 2011 at 7:45 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
+>> +             MeasureReceived(dict measure)
+>> +
+>> +                     This signal is emmited when a measure has been scanned
+>> +                     by the thermometer. The Time entry in the dict will be
+>> +                     only present if the device supports storing of data.
+>> +                     The Type entry is optional and it will be provided if
+>> +                     the measure type is non-static. For static measures the
+>> +                     property Type will be provided. The Value entry
+>> +                     corresponds to IEEE-11073 32-bit FLOAT.
+>> +
+>> +                     Dict is defined as below:
+>> +                     {
+>> +                             "Value" : uint32,
+>> +                             "Unit" : ("Celsius" or "Fahrenheit")
+>> +                             "Time" : {
+>> +                                             "Year" : uint16,
+>> +                                             "Month" : uint8,
+>> +                                             "Day" : uint8,
+>> +                                             "Hours" : uint8,
+>> +                                             "Minutes" : uint8,
+>> +                                             "Seconds" : uint8
+>
+> We don't really need to mimic the timestamp structure used in spec. We could
+> go for a simple int with time() format (we should look into other
+> BlueZ APIs to see which format they use for date or time).
+>
+> A value for no-timestamp case should be defined, too.
 
-git://git.infradead.org/users/cktakahasi/bluez.git attio
+For reference, this is from doc/clock-api.txt in connman (which has
+architecture similar to BlueZ:
 
-The "attio" branch contains a new "driver" concept for GATT/ATT based
-profiles only. It is at the same "level" of the "device" driver.
+[...]
+Properties      uint64 Time [readonly or readwrite]
 
-* Design requirements:
-1. Keep the link up after discover all primary service: avoid re-connections.
-2. Easy to extend: we may need to inform profile based connection
-requirements such as LSTO and intervals(latency).
-3. GAttrib should be shared: if the device implements multiple profiles
-4. Profiles(Plugins) NOT based on GATT/ATT should NOT include or have
-GAttrib dependency
-5. Transports: LE and BR/EDR
+                        Current system time in seconds since epoch.
+[...]
 
-Why generic Attribute API is not enough?
-Response: There are some profile specific needs: write operation used,
-authorization, external data, enable/disable for qualification,
-connection parameters. Proximity for example, the user should be able
-to set the Threshold level(input for local path loss calculation).
 
-This is the current driver definition:
-struct btd_attio_driver {
-        const char *name;
-        const char **uuids; /* UUIDs of primary services */
-        int (*probe) (struct btd_device *device, GSList *uuids);   /*
-List of Primary Services: UUID and start/end handles */
-        void (*remove) (struct btd_device *device);
-        int (*connected) (struct btd_device *device, GAttrib *attrib);
-        void (*disconnected) (struct btd_device *device);
-};
 
-* Open issues:
-1. How to request re-connections. The current code shares the GAtrrib,
-I am trying to avoid sharing the GAttrib reference creating a ATT
-command queue. The idea is to inform the queue when the device is
-probed, allowing offline operations and automatic connection request.
-If there is at least one item in the queue the device will be added in
-the "automatic" connection list. Using a command queue, it MAY be
-possible to remove the "connected" and "disconnected" callbacks.
-2. Move attio.c source to device.c?
-3. should Generic API be a "built-in" ATT IO driver? (I moved to
-plugins/attribute.c), it looks more clean to me. Same "level" of
-Service/SDP plugin.
-4. Passive scanning: it will be necessary to re-connect
+>
+>> +                                     }
+>> +                             "Type" : uint8,
+>> +                             "Measurement" : ("Final", "Intermediate")
+>> +                     }
+>
+> I would favor an agent for this case instead of signals, because it makes it
+> implicit whether there is someone interested in getting temperature notifications.
+> I mean, if some app a) enables notification properties and b) leaves, notification
+> will keep being done, burning both devices' batteries. That's LE, after all :)
+>
+> Turning off upon exit is not an option because some other app may be interested,
+> too. The agent is a natural 'reference counter', too.
 
-Comments?
+In general, if you want/need to support multiple users of the D-Bus
+API, something like an agent is necessary IMHO. Otherwise, it would be
+necessary to return some "busy" error to avoid other users disabling
+intermediate measurements while another user is interested on them.
 
 Regards,
-Claudio.
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
