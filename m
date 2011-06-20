@@ -1,139 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <20110620110046.36582j7fh6rjxcg0@mail.hendrik-sattler.de>
+Date: Mon, 20 Jun 2011 11:00:46 +0200
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: openobex-users@lists.sourceforge.net, Nami <nami.li@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	openobex-users@lists.sourceforge.net, haijun@qca.qualcomm.com
+Subject: Re: [openobex-users] [PATCH openobex 1/3] Add transport format
+ member in fdobex_data struct. Support STREAM and SEQPACKET transport
+ format.
+References: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
+In-Reply-To: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <1308445186-27135-7-git-send-email-adamek.kuba@gmail.com>
-References: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
-	<1308445186-27135-7-git-send-email-adamek.kuba@gmail.com>
-Date: Mon, 20 Jun 2011 12:04:29 +0300
-Message-ID: <BANLkTimJnvLw-jsX9Nemf-ONPVs6Usw=bw@mail.gmail.com>
-Subject: Re: [PATCH obexd 06/10] Add functions for async requests w a_header list
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Adamek <adamek.kuba@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Zitat von Nami <nami.li@atheros.com>:
 
-On Sun, Jun 19, 2011 at 3:59 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
-> These are to be used by client for performing async get or put
-> operations with sending additional headers.
 > ---
->  gwobex/gw-obex.h   |   32 ++++++++++++++++++++++++++++++++
->  gwobex/obex-xfer.c |   27 +++++++++++++++++++++++++++
->  2 files changed, 59 insertions(+), 0 deletions(-)
+>  include/openobex/obex_const.h |    4 ++++
+>  lib/fdobex.h                  |    1 +
+>  2 files changed, 5 insertions(+), 0 deletions(-)
 >
-> diff --git a/gwobex/gw-obex.h b/gwobex/gw-obex.h
-> index 0638f45..238d695 100644
-> --- a/gwobex/gw-obex.h
-> +++ b/gwobex/gw-obex.h
-> @@ -510,6 +510,24 @@ gboolean gw_obex_copy(GwObex *ctx, const gchar *src, const gchar *dst,
->  GwObexXfer *gw_obex_put_async(GwObex *ctx, const char *name, const char *type,
->                               gint size, time_t time, gint *error);
+> diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
+> index cb7afeb..8acee91 100644
+> --- a/include/openobex/obex_const.h
+> +++ b/include/openobex/obex_const.h
+> @@ -302,6 +302,10 @@ enum obex_rsp_mode {
+>    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+>  };
 >
-> +/** Start a PUT operation asynchronously with additional headers
-> + *
-> + * @param ctx   Pointer returned by gw_obex_setup()
-> + * @param name  Name of the object (null terminated UTF-8)
-> + * @param type  Type of the object (null terminated UTF-8), or NULL
-> + * @param apparam      Application parameters of the object
-> + * @param apparam_size Application paramters' size
-> + * @param aheaders      List of additional headers
-> + * @param size  Size of the object (GW_OBEX_UNKNOWN_LENGTH if not known)
-> + * @param time  Last modification time of the object (-1 if not known)
-> + * @param error Place to store error code on failure (NULL if not interested)
-> + *
-> + * @returns a new GwObexXfer object on success, NULL on failure
-> + */
-> +GwObexXfer *gw_obex_put_async_with_aheaders(GwObex *ctx, const char *name, const char *type,
-> +                              const guint8 *apparam, gint apparam_size,
-> +                              const GSList *aheaders,
-> +                              gint size, time_t time, gint *error);
->
->  /** Start a GET operation asynchronously
->  *
-> @@ -537,6 +555,20 @@ GwObexXfer *gw_obex_get_async(GwObex *ctx, const char *name, const char *type, g
->  GwObexXfer *gw_obex_get_async_with_apparam(GwObex *ctx, const char *name, const char *type,
->                const guint8  *apparam, gint apparam_size, gint *error);
->
-> +/** Start a GET operation asynchronously with additional headers
-> + *
-> + * @param ctx   Pointer returned by gw_obex_setup()
-> + * @param name  Name of the object (null terminated UTF-8)
-> + * @param type  Type of the object (null terminated UTF-8), or NULL
-> + * @param aheaders      List of additional headers
-> + * @param error Place to store error code on failure (NULL if not interested)
-> + *
-> + * @returns a new GwObexXfer object on success, NULL on failure
-> + */
-> +
-> +GwObexXfer *gw_obex_get_async_with_aheaders(GwObex *ctx, const char *name, const char *type,
-> +        const guint8 *apparam, gint apparam_size,
-> +        const GSList *aheaders, gint *error);
->
->  /** Set a callback function for a GwObexXfer object
->  * The callback function will be called in the following situations:
-> diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
-> index 1430f10..6d65197 100644
-> --- a/gwobex/obex-xfer.c
-> +++ b/gwobex/obex-xfer.c
-> @@ -124,6 +124,20 @@ GwObexXfer *gw_obex_put_async(GwObex *ctx, const char *name, const char *type,
->     return ret ? ctx->xfer : NULL;
->  }
->
-> +GwObexXfer *gw_obex_put_async_with_aheaders(GwObex *ctx, const char *name, const char *type,
-> +               const guint8 *apparam, gint apparam_size,
-> +        const GSList *aheaders,
-> +        gint size, time_t time, gint *error) {
-> +    gboolean ret;
-> +    GW_OBEX_LOCK(ctx);
-> +    CHECK_DISCONNECT(NULL, error, ctx);
-> +    ret = gw_obex_put_with_aheaders(ctx, NULL, name, type, apparam, apparam_size, aheaders, NULL, size, time, -1, TRUE);
+> +enum fdobex_transport_format{
+> +	 FDOBEX_MT_STREAM ,
+> +	 FDOBEX_MT_SEQPACKET
+> +};
+>  /* Min, Max and default transport MTU */
+>  #define OBEX_DEFAULT_MTU	1024
+>  #define OBEX_MINIMUM_MTU	255
 
-It looks like this is well over 80 columns, isn't it?
+Insert an empty line after the enum, please.
+Also document the enum and its members, see the enum above. This is  
+needed for the doxygen output.
 
-> +    if (ret == FALSE)
-> +        gw_obex_get_error(ctx, error);
-> +    GW_OBEX_UNLOCK(ctx);
-> +    return ret ? ctx->xfer : NULL;
-> +}
-> +
->  GwObexXfer *gw_obex_get_async(GwObex *ctx, const char *name, const char *type, gint *error) {
->     gboolean ret;
->     GW_OBEX_LOCK(ctx);
-> @@ -147,6 +161,19 @@ GwObexXfer *gw_obex_get_async_with_apparam(GwObex *ctx, const char *name, const
->     return ret ? ctx->xfer : NULL;
->  }
+> diff --git a/lib/fdobex.h b/lib/fdobex.h
+> index 07e33ab..6839e77 100644
+> --- a/lib/fdobex.h
+> +++ b/lib/fdobex.h
+> @@ -6,5 +6,6 @@ void fdobex_get_ops(struct obex_transport_ops* ops);
 >
-> +GwObexXfer *gw_obex_get_async_with_aheaders(GwObex *ctx, const char *name, const char *type,
-> +               const guint8 *apparam, gint apparam_size,
-> +        const GSList *aheaders, gint *error) {
-> +    gboolean ret;
-> +    GW_OBEX_LOCK(ctx);
-> +    CHECK_DISCONNECT(NULL, error, ctx);
-> +    ret = gw_obex_get_with_aheaders(ctx, NULL, name, type, apparam, apparam_size, aheaders, NULL, NULL, -1, TRUE);
-
-This too,
-
-> +    if (ret == FALSE)
-> +        gw_obex_get_error(ctx, error);
-> +    GW_OBEX_UNLOCK(ctx);
-> +    return ret ? ctx->xfer : NULL;
-> +}
-> +
->  static gboolean gw_obex_put_idle(GwObexXfer *xfer) {
->     struct gw_obex *ctx = xfer->ctx;
->
+>  struct fdobex_data {
+>  	socket_t writefd; /* write descriptor */
+> +	enum fdobex_transport_format fmt;
+>  };
+>  #endif
 > --
-> 1.7.0.4
+> 1.7.1
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> ------------------------------------------------------------------------------
+> EditLive Enterprise is the world's most technically advanced content
+> authoring tool. Experience the power of Track Changes, Inline Image
+> Editing and ensure content is compliant with Accessibility Checking.
+> http://p.sf.net/sfu/ephox-dev2dev
+> _______________________________________________
+> Openobex-users mailing list
+> Openobex-users@lists.sourceforge.net
+> http://lists.sourceforge.net/lists/listinfo/openobex-users
 >
 
 
 
--- 
-Luiz Augusto von Dentz
