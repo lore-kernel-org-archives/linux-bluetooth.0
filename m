@@ -1,75 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20110620110046.36582j7fh6rjxcg0@mail.hendrik-sattler.de>
-Date: Mon, 20 Jun 2011 11:00:46 +0200
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: openobex-users@lists.sourceforge.net, Nami <nami.li@atheros.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	openobex-users@lists.sourceforge.net, haijun@qca.qualcomm.com
-Subject: Re: [openobex-users] [PATCH openobex 1/3] Add transport format
- member in fdobex_data struct. Support STREAM and SEQPACKET transport
- format.
-References: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
-In-Reply-To: <1308548849-11615-1-git-send-email-nami.li@atheros.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+Subject: Build failure for bluez-hcidump
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Mon, 20 Jun 2011 09:56:11 +0100
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1308560171.6042.3.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Zitat von Nami <nami.li@atheros.com>:
+Heya,
 
-> ---
->  include/openobex/obex_const.h |    4 ++++
->  lib/fdobex.h                  |    1 +
->  2 files changed, 5 insertions(+), 0 deletions(-)
->
-> diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
-> index cb7afeb..8acee91 100644
-> --- a/include/openobex/obex_const.h
-> +++ b/include/openobex/obex_const.h
-> @@ -302,6 +302,10 @@ enum obex_rsp_mode {
->    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
->  };
->
-> +enum fdobex_transport_format{
-> +	 FDOBEX_MT_STREAM ,
-> +	 FDOBEX_MT_SEQPACKET
-> +};
->  /* Min, Max and default transport MTU */
->  #define OBEX_DEFAULT_MTU	1024
->  #define OBEX_MINIMUM_MTU	255
+bluez-hcidump 2.1 fails to build on Fedora 16:
 
-Insert an empty line after the enum, please.
-Also document the enum and its members, see the enum above. This is  
-needed for the doxygen output.
+src/hcidump.c: In function 'process_frames':
+src/hcidump.c:313:5: warning: implicit declaration of function 'hton64' [-Wimplicit-function-declaration]
+src/hcidump.c: In function 'read_dump':
+src/hcidump.c:430:4: warning: implicit declaration of function 'ntoh64' [-Wimplicit-function-declaration]
+  CCLD   src/hcidump
+src/hcidump.o: In function `process_frames':
+/builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:313: undefined reference to `hton64'
+src/hcidump.o: In function `read_dump':
+/builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:436: undefined reference to `ntoh64'
+/builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:430: undefined reference to `ntoh64'
 
-> diff --git a/lib/fdobex.h b/lib/fdobex.h
-> index 07e33ab..6839e77 100644
-> --- a/lib/fdobex.h
-> +++ b/lib/fdobex.h
-> @@ -6,5 +6,6 @@ void fdobex_get_ops(struct obex_transport_ops* ops);
->
->  struct fdobex_data {
->  	socket_t writefd; /* write descriptor */
-> +	enum fdobex_transport_format fmt;
->  };
->  #endif
-> --
-> 1.7.1
->
->
-> ------------------------------------------------------------------------------
-> EditLive Enterprise is the world's most technically advanced content
-> authoring tool. Experience the power of Track Changes, Inline Image
-> Editing and ensure content is compliant with Accessibility Checking.
-> http://p.sf.net/sfu/ephox-dev2dev
-> _______________________________________________
-> Openobex-users mailing list
-> Openobex-users@lists.sourceforge.net
-> http://lists.sourceforge.net/lists/listinfo/openobex-users
->
+Both i686 and x86-64 fails to build with the same error.
 
-
+http://koji.fedoraproject.org/koji/getfile?taskID=3143039&name=build.log
+shows the full build log.
 
