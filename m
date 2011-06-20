@@ -1,52 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ajay Pillai <Ajay.Pillai@csr.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: GATT and GATT based Profiles architecture - Query
-Date: Mon, 20 Jun 2011 08:42:46 +0000
-Message-ID: <8DCFA6B89B9E70418E47A2348D55495A47818B76@banasiexm01.ASIA.ROOT.PRI>
-References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
-	<1308175855.2196.7.camel@aeonflux>
-	<BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
-	<1308191356.2196.9.camel@aeonflux>
-	<8DCFA6B89B9E70418E47A2348D55495A478165D6@banasiexm01.ASIA.ROOT.PRI>
-	<BANLkTimiLXWNfv=hwzDTMd7U8nphUSvMQg@mail.gmail.com>
-	<8DCFA6B89B9E70418E47A2348D55495A4781711C@banasiexm01.ASIA.ROOT.PRI>
- <BANLkTimXg6_3f25sXCtZ_YU3VoWUayqbFQ@mail.gmail.com>
-In-Reply-To: <BANLkTimXg6_3f25sXCtZ_YU3VoWUayqbFQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1308445186-27135-4-git-send-email-adamek.kuba@gmail.com>
+References: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
+	<1308445186-27135-4-git-send-email-adamek.kuba@gmail.com>
+Date: Mon, 20 Jun 2011 11:14:45 +0300
+Message-ID: <BANLkTikqYE7iL0w7DW9xaeUrRVg7yVeO1w@mail.gmail.com>
+Subject: Re: [PATCH obexd 03/10] Store received headers in gw_obex_xfer object
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Adamek <adamek.kuba@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Jakub,
 
->> The way I see it is that the pace of profile spec ratification in the SIG or the pace of development of profiles in BlueZ will probably be too slow
->> for the larger community of device manufacturers and Application developers for platforms like Android.
->> Besides, the usecases being addressed by the profiles in pipeline would probably be only a fraction of the real potential of GATT, which device manufacturers might want to tap into.
+On Sun, Jun 19, 2011 at 3:59 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
+> ---
+>  gwobex/obex-priv.c |   22 ++++++++++++++++++++++
+>  1 files changed, 22 insertions(+), 0 deletions(-)
 >
->I agree. But note that currently we lack use cases which justify a
->complete GATT API over D-Bus. Feel free to discuss your own use cases,
->and propose an API for them.
-
-The point that I was trying to make is that you or me trying to figure out the possible usecases over GATT and then trying to cater to them may prove to be inadequate quite soon after widespread Ble deployment. I thought the usecases over GATT beyond those that are thought over by the SIG are best left to the imagination of the users of GATT which could be the peripheral device manufacturers. Giving BlueZ a comprehensive GATT API will enable any of these usecases and would pave the way for widespread and faster usage of Ble/GATT, at the same time giving freedom to the user to decide what usecases he/she wants in his/her BlueZ powered device.
-I do not have any specific usecase in mind (or it could be that I have just too many of them), but the system of interest to me is Android.
-
-
->> Do you see problems in including GATT Servers too in it?
->> Are you open to stronger contributions to the GATT DBUS API? ( I am interested to do that)
+> diff --git a/gwobex/obex-priv.c b/gwobex/obex-priv.c
+> index aba7dd7..b9216e5 100644
+> --- a/gwobex/obex-priv.c
+> +++ b/gwobex/obex-priv.c
+> @@ -39,6 +39,7 @@
+>  #include <sys/socket.h>
 >
->I believe we are always open to discussions and contributions :). But
->before you begin implementing your proposal, I'd suggest discussing a
->draft API first on this list. I'm sure there are other parties
->interested on helping on that as well.
+>  #include <openobex/obex.h>
+> +#include <openobex/obex_const.h>
+>
+>  #ifdef HAVE_CONFIG_H
+>  # include "config.h"
+> @@ -335,6 +336,7 @@ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
+>     obex_headerdata_t hv;
+>     uint8_t hi;
+>     unsigned int hlen;
+> +    struct a_header *ah;
+>
+>     xfer->target_size = GW_OBEX_UNKNOWN_LENGTH;
+>     xfer->modtime = -1;
+> @@ -358,6 +360,26 @@ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
+>                     xfer->apparam_size = 0;
+>                 break;
+>             default:
+> +                ah = g_new0(struct a_header, 1);
+> +                ah->hi = hi;
+> +                ah->hv_size = hlen;
+> +                switch (hi & OBEX_HDR_TYPE_MASK) {
+> +                    case OBEX_HDR_TYPE_UINT8:
+> +                    case OBEX_HDR_TYPE_UINT32:
+> +                        ah->hv = hv;
+> +                        break;
+> +                    case OBEX_HDR_TYPE_BYTES:
+> +                    case OBEX_HDR_TYPE_UNICODE:
+> +                        ah->hv.bs = g_try_malloc(hlen);
+> +                        if (ah->hv.bs) {
+> +                            memcpy((void *) ah->hv.bs, hv.bs, hlen);
+> +                            ah->hv_size = hlen;
+> +                        } else {
+> +                            ah->hv_size = hlen;
+> +                        }
 
-Sure. I shall send out an API RFC before I start on it.
+No need to add braces for single line statements.
 
+> +                        break;
+> +                }
+> +                xfer->aheaders = g_slist_append(xfer->aheaders, ah);
 
-Thank you,
-ajay
+I would suggest having this code separated in another function e.g.
+get_aheader, it is easier to identify what the code is doing and
+switch inside a switch is not very nice to read/understand IMO.
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
+-- 
+Luiz Augusto von Dentz
