@@ -1,83 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTikqYE7iL0w7DW9xaeUrRVg7yVeO1w@mail.gmail.com>
-References: <1308445186-27135-1-git-send-email-adamek.kuba@gmail.com>
- <1308445186-27135-4-git-send-email-adamek.kuba@gmail.com> <BANLkTikqYE7iL0w7DW9xaeUrRVg7yVeO1w@mail.gmail.com>
-From: Jakub Adamek <adamek.kuba@gmail.com>
-Date: Mon, 20 Jun 2011 19:15:26 +0200
-Message-ID: <BANLkTin8TREM7XD_ayDt9qf_qOgZ+27MQw@mail.gmail.com>
-Subject: Re: [PATCH obexd 03/10] Store received headers in gw_obex_xfer object
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC 7/7] Update Management API documentation
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"Ganir, Chen" <chen.ganir@ti.com>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Date: Mon, 20 Jun 2011 09:47:47 -0700
+In-Reply-To: <BANLkTinuKBu-euzA1E44E-dEHV1fYfCHSg@mail.gmail.com>
+References: <4df91d74.0b73650a.190f.17ad@mx.google.com>
+	 <1308175855.2196.7.camel@aeonflux>
+	 <BANLkTikuyizJeF9xhAo22dv8LJ+JxeTskg@mail.gmail.com>
+	 <1308191356.2196.9.camel@aeonflux>
+	 <7769C83744F2C34A841232EF77AEA20C01D395DC98@dnce01.ent.ti.com>
+	 <BANLkTin2H1wkOj0zOsG5_D1n6ztBP7rGdA@mail.gmail.com>
+	 <BANLkTimKcE09f8qniUwbtDHtU2_BajDwwg@mail.gmail.com>
+	 <1308235671.2196.21.camel@aeonflux>
+	 <BANLkTi==Co9KP4ELU0Z-RBXXYXJ3dD7RKg@mail.gmail.com>
+	 <20110616204500.GC2594@joana>
+	 <BANLkTinuKBu-euzA1E44E-dEHV1fYfCHSg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308588470.2196.37.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-2011/6/20 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Jakub,
->
-> On Sun, Jun 19, 2011 at 3:59 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
->> ---
->>  gwobex/obex-priv.c |   22 ++++++++++++++++++++++
->>  1 files changed, 22 insertions(+), 0 deletions(-)
->>
->> diff --git a/gwobex/obex-priv.c b/gwobex/obex-priv.c
->> index aba7dd7..b9216e5 100644
->> --- a/gwobex/obex-priv.c
->> +++ b/gwobex/obex-priv.c
->> @@ -39,6 +39,7 @@
->>  #include <sys/socket.h>
->>
->>  #include <openobex/obex.h>
->> +#include <openobex/obex_const.h>
->>
->>  #ifdef HAVE_CONFIG_H
->>  # include "config.h"
->> @@ -335,6 +336,7 @@ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
->>     obex_headerdata_t hv;
->>     uint8_t hi;
->>     unsigned int hlen;
->> +    struct a_header *ah;
->>
->>     xfer->target_size = GW_OBEX_UNKNOWN_LENGTH;
->>     xfer->modtime = -1;
->> @@ -358,6 +360,26 @@ static void get_non_body_headers(obex_t *handle, obex_object_t *object,
->>                     xfer->apparam_size = 0;
->>                 break;
->>             default:
->> +                ah = g_new0(struct a_header, 1);
->> +                ah->hi = hi;
->> +                ah->hv_size = hlen;
->> +                switch (hi & OBEX_HDR_TYPE_MASK) {
->> +                    case OBEX_HDR_TYPE_UINT8:
->> +                    case OBEX_HDR_TYPE_UINT32:
->> +                        ah->hv = hv;
->> +                        break;
->> +                    case OBEX_HDR_TYPE_BYTES:
->> +                    case OBEX_HDR_TYPE_UNICODE:
->> +                        ah->hv.bs = g_try_malloc(hlen);
->> +                        if (ah->hv.bs) {
->> +                            memcpy((void *) ah->hv.bs, hv.bs, hlen);
->> +                            ah->hv_size = hlen;
->> +                        } else {
->> +                            ah->hv_size = hlen;
->> +                        }
->
-> No need to add braces for single line statements.
-Will fix. In any case this is badly done, since I think I should test
-if g_try_malloc returned NULL because of hlen=0 or because of failure.
+Hi Anderson,
 
->
->> +                        break;
->> +                }
->> +                xfer->aheaders = g_slist_append(xfer->aheaders, ah);
->
-> I would suggest having this code separated in another function e.g.
-> get_aheader, it is easier to identify what the code is doing and
-> switch inside a switch is not very nice to read/understand IMO.
-Ok.
->
-> --
-> Luiz Augusto von Dentz
->
+> >> >> >>> if TX power is only read once than the kernel should just do it once
+> >> >> >>> and
+> >> >> >>> be done with it.
+> >> >> >>>
+> >> >> >>> And for RSSI, it would be better if the kernel read this periodically
+> >> >> >>> based on current sniff mode etc. Userspace can not trigger this with
+> >> >> >>> proper timing anyway. And it will potentially at some point start
+> >> >> >>> blocking the controller. Only the kernel really knows when it is
+> >> >> >>> acceptable to read the RSSI value.
+> >> >> >>
+> >> >> >> Reading the RSSI by the kernel, will force a certain limitation on the
+> >> >> >> current and future Profiles. I believe setting the timing should be done
+> >> >> >> by the profile itself, not the bluez user space code or the kernel. It
+> >> >> >> is the responsibility of the profile to periodically poll the RSSI Level.
+> >> >> >> For some cases, polling it every 5 seconds would be ok, and for some
+> >> >> >> Others, it may be better to read it every second. I believe we must not
+> >> >> >> impose any limitation here.
+> >> >> >
+> >> >> > You probably forgot that besides bluetoothd there should be no other
+> >> >> > application holding the mgmt socket, so not you can't really do it in
+> >> >> > poll in the application side and doing it over D-Bus is overkill. Also
+> >> >> > I notice that from some parties, you include, there is some tendency
+> >> >> > to have the profiles split from the bluetoothd, IMO this will only add
+> >> >> > fragmentation with each and every platform using BlueZ having their
+> >> >> > own implementation of each profile and not sharing much, making the
+> >> >> > IOP a complete mess.
+> >> >> >
+> >> >>
+> >> >> Some additional comments...
+> >> >>
+> >> >> Health plugin will need a similar approach to read the clock. It will
+> >> >> be good to implement the same approach.
+> >> >> In our suggested implementation the adapter controls when to send the
+> >> >> command to read the RSSI, keeping the same logic for both: hciops and
+> >> >> mgmtops. If the adapter is managing when to send the commands,
+> >> >> repeated commands can be avoided, multiple callbacks can be registered
+> >> >> by the profiles, but only one command to read the RSSI will be sent.
+> >> >> The cover letter of the userspace patches contains more details how we
+> >> >> implemented it.
+> >> >>
+> >> >> Reading the RSSI directly by the kernel will break hciops. These are
+> >> >> the arguments that I have to support our decision.
+> >> >
+> >> > what I am hearing is that we want the kernel to poll for certain
+> >> > information if userspace needs them. And either it is a one-shot poll or
+> >> > it is on a regular interval.
+> >>
+> >> If everybody agree we can do it. Our objective is to have the patches upstream.
+> >> To keep the Proximity Monitor functional on both adapter_ops plugins
+> >> we can move part of the logic from the adapter.c to the hciops. The
+> >> polling to read the RSSI can be moved to hciops, in the management the
+> >> polling will be in the kernel. The remaining code to register the
+> >> callbacks doesn't need to be changed.
+> >
+> > Do we have a really good reason to implement this both for hciops and mgmtops?
+> > We wrote mgmt interface to solve our problems. So why do we still care about
+> > put new stuff on hciops? And then we maintain two pieces of code instead
+> > of one.
+> >
+> >        Gustavo
+> >
+> 
+> Ok, we could implement it just for mgmtops. But, I need some opinions
+> before start coding. We was thinking about the architecture needed
+> into the kernel and we have some ideas:
+> 
+> - Add a new Management command called MGMT_ADD_LISTENER or something
+> like that, which has two arguments at least: command op code and timer
+> interval.
+> - A callback called by the expired timer for each monitored command
+> will be responsible to send the result (e.g.: Read RSSI or Read
+> Clock), to the userspace.
+> 
+> As you could notice, we should have one timer for each command. What
+> do you think about this approach?
+
+what you want is an mgmt event that notifies you about changes and that
+could be well one event per type. And then you need one mgmt command to
+set the trigger here.
+
+Also you might wanna look at the SIG closely. I think they are trying to
+fix this on the HCI controller side. So we get at least RSSI updates
+when they change and don't have to poll them.
+
+In theory it is always better to define a threshold instead of fixed
+poll interval. Even if the threshold is implement as a poll on older
+chips, at least for future ones you get this right.
+
+Regards
+
+Marcel
+
+
