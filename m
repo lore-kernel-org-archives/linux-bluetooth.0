@@ -1,67 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: openobex-users@lists.sourceforge.net
-Subject: Re: [openobex-users] [PATCH openobex 1/3] Add transport format member in fdobex_data struct. Support STREAM and SEQPACKET transport format.
-Date: Mon, 20 Jun 2011 22:43:54 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Nami <nami.li@atheros.com>,
- haijun@qca.qualcomm.com,
- linux-bluetooth@vger.kernel.org
-References: <1308548849-11615-1-git-send-email-nami.li@atheros.com> <201106202028.43470.post@hendrik-sattler.de> <1308599113.2196.46.camel@aeonflux>
-In-Reply-To: <1308599113.2196.46.camel@aeonflux>
+Date: Mon, 20 Jun 2011 17:03:38 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Fix not setting the chan state
+Message-ID: <20110620200338.GE7240@joana>
+References: <1308361587-8338-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20110620193131.GC7240@joana>
+ <20110620200156.GA13325@piper>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201106202243.54514.post@hendrik-sattler.de>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110620200156.GA13325@piper>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Vinicius,
 
-Am Montag, 20. Juni 2011, 21:45:11 schrieb Marcel Holtmann:
-> > > >  include/openobex/obex_const.h |    4 ++++
-> > > >  lib/fdobex.h                  |    1 +
-> > > >  2 files changed, 5 insertions(+), 0 deletions(-)
-> > > > 
-> > > > diff --git a/include/openobex/obex_const.h
-> > > > b/include/openobex/obex_const.h index cb7afeb..8acee91 100644
-> > > > --- a/include/openobex/obex_const.h
-> > > > +++ b/include/openobex/obex_const.h
-> > > > @@ -302,6 +302,10 @@ enum obex_rsp_mode {
-> > > > 
-> > > >    OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
-> > > >  
-> > > >  };
-> > > > 
-> > > > +enum fdobex_transport_format{
-> > > > +	 FDOBEX_MT_STREAM ,
-> > > > +	 FDOBEX_MT_SEQPACKET
-> > > > +};
-> > > 
-> > > can I ask again why we should be doing this. Especially for the FdOBEX
-> > > transport this is pointless. You are getting a file descriptor in the
-> > > first place. It does not have to be a socket.
-> > > 
-> > > And in the case this is really a socket, then you can just use SO_TYPE
-> > > to read the current type of the socket.
-> > > 
-> > > If it is not a socket, then it needs to treated as stream anyway.
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-06-20 17:01:56 -0300]:
+
+> Hi Gustavo,
+> 
+> On 16:31 Mon 20 Jun, Gustavo F. Padovan wrote:
+> > * Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-06-17 22:46:25 -0300]:
 > > 
-> > No. Ever tried that on the linux USB gadget implementation in Linux? If a
-> > FD is not pointing to a socket, it can still point to a device file of
-> > whatever kind. You SO_TYPE won't completely help here. You can try any
-> > amount of guessing but isn't it easier if the application just tells
-> > you? OTOH, the application could just use a custom transport, then.
+> > > When the connection is ready we should set the connection
+> > > to CONNECTED so userspace can use it.
+> > > 
+> > > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > > ---
+> > >  net/bluetooth/l2cap_core.c |    3 +--
+> > >  1 files changed, 1 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > index 25f31f4..4af61fb 100644
+> > > --- a/net/bluetooth/l2cap_core.c
+> > > +++ b/net/bluetooth/l2cap_core.c
+> > > @@ -895,8 +895,7 @@ static void l2cap_chan_ready(struct sock *sk)
+> > >  	chan->conf_state = 0;
+> > >  	__clear_chan_timer(chan);
+> > >  
+> > > -	sk->sk_state = BT_CONNECTED;
+> > > -	sk->sk_state_change(sk);
+> > > +	l2cap_state_change(chan, BT_CONNECTED);
+> > 
+> > Why are you removing the sk->sk_state_change() ?
 > 
-> problem is that either we introduce a new abstraction or we figure this
-> out magically. Breaking the API like this is not a good idea.
-> 
-> So if we go for FdPacketOBEX or something it might be a possible option,
-> but breaking FdOBEX API is not an option.
+> I was thinking that l2cap_state_change() would do this for me. May I ask
+> why it doesn't call sk->sk_state_change()?
 
-How about a new function:
-void FdOBEX_SetTransportFormat(obex_t *self, enum fdobex_transport_format 
-fmt);
+Because we don't call sk->sk_state_change() every time the state changes.
 
-Should not break anything :)
-
-HS
+	Gustavo
