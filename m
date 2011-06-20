@@ -3,9 +3,9 @@ From: Nami <nami.li@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <haijun@qca.qualcomm.com>, <yongli@qca.qualcomm.com>,
 	Nami <nami.li@atheros.com>
-Subject: [PATCH obexd 11/14] Client parse server GoepL2capPsm attribute.
-Date: Mon, 20 Jun 2011 17:44:57 +0800
-Message-ID: <1308563100-18917-11-git-send-email-nami.li@atheros.com>
+Subject: [PATCH obexd 10/14] Add psm member in session_data struct.
+Date: Mon, 20 Jun 2011 17:44:56 +0800
+Message-ID: <1308563100-18917-10-git-send-email-nami.li@atheros.com>
 In-Reply-To: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
 References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
@@ -14,135 +14,37 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/session.c |   52 +++++++++++++++++++++++++++++++++++++++++++++-------
- client/session.h |    4 ++++
- 2 files changed, 49 insertions(+), 7 deletions(-)
+ client/session.c |    1 +
+ client/session.h |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 client/session.h
 
 diff --git a/client/session.c b/client/session.c
-index 8a6ee2c..0e21994 100755
+index 3db1c1d..8a6ee2c 100755
 --- a/client/session.c
 +++ b/client/session.c
-@@ -282,6 +282,14 @@ static GIOChannel *rfcomm_connect(const bdaddr_t *src, const bdaddr_t *dst,
- 	g_error_free(err);
- 	return NULL;
- }
-+static void l2cap_callback(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+static GIOChannel *l2cap_connect(const bdaddr_t *src, const bdaddr_t *dst,
-+					uint16_t psm, BtIOConnect function,
-+					gpointer user_data)
-+{
-+}
+@@ -561,6 +561,7 @@ struct session_data *session_create(const char *source,
 
- static void search_callback(uint8_t type, uint16_t status,
- 			uint8_t *rsp, size_t size, void *user_data)
-@@ -291,6 +299,7 @@ static void search_callback(uint8_t type, uint16_t status,
- 	unsigned int scanned, bytesleft = size;
- 	int seqlen = 0;
- 	uint8_t dataType, channel = 0;
-+	uint16_t l2capPsm = 0;
- 	GError *gerr = NULL;
+ 	session->refcount = 1;
+ 	session->channel = channel;
++	session->psm = psm;
 
- 	if (status || type != SDP_SVC_SEARCH_ATTR_RSP)
-@@ -305,7 +314,9 @@ static void search_callback(uint8_t type, uint16_t status,
- 	do {
- 		sdp_record_t *rec;
- 		sdp_list_t *protos;
-+		sdp_data_t *data;
- 		int recsize, ch = -1;
-+		int l2psm = -1;
-
- 		recsize = 0;
- 		rec = sdp_extract_pdu(rsp, bytesleft, &recsize);
-@@ -316,7 +327,11 @@ static void search_callback(uint8_t type, uint16_t status,
- 			sdp_record_free(rec);
- 			break;
- 		}
--
-+		data = sdp_data_get(rec, SDP_ATTR_GOEP_L2CAP_PSM);
-+		if(data != NULL){
-+			l2psm = data->val.uint16;
-+			DBG("sdp l2psm is %d,",l2psm);
-+		}
- 		if (!sdp_get_access_protos(rec, &protos)) {
- 			ch = sdp_get_proto_port(protos, RFCOMM_UUID);
- 			sdp_list_foreach(protos,
-@@ -327,6 +342,11 @@ static void search_callback(uint8_t type, uint16_t status,
-
- 		sdp_record_free(rec);
-
-+		if (l2psm > 0) {
-+			l2capPsm = l2psm;
-+			break;
-+		}
-+
- 		if (ch > 0) {
- 			channel = ch;
- 			break;
-@@ -337,16 +357,28 @@ static void search_callback(uint8_t type, uint16_t status,
- 		bytesleft -= recsize;
- 	} while (scanned < size && bytesleft > 0);
-
--	if (channel == 0)
-+	if ((l2capPsm == 0)&&(channel == 0))
- 		goto failed;
-
--	session->channel = channel;
-+	if(l2capPsm > 0){
-+		session->psm = l2capPsm;
-
--	g_io_channel_set_close_on_unref(session->io, FALSE);
--	g_io_channel_unref(session->io);
-+		g_io_channel_set_close_on_unref(session->io, FALSE);
-+		g_io_channel_unref(session->io);
-+
-+		session->io = l2cap_connect(&session->src, &session->dst, l2capPsm,
-+						l2cap_callback,	callback);
-+	}else{
-+
-+		session->channel = channel;
-+
-+		g_io_channel_set_close_on_unref(session->io, FALSE);
-+		g_io_channel_unref(session->io);
-+
-+		session->io = rfcomm_connect(&session->src, &session->dst, channel,
-+						rfcomm_callback, callback);
-+	}
-
--	session->io = rfcomm_connect(&session->src, &session->dst, channel,
--					rfcomm_callback, callback);
- 	if (session->io != NULL) {
- 		sdp_close(callback->sdp);
- 		return;
-@@ -611,6 +643,12 @@ proceed:
- 	if (session->obex) {
- 		g_idle_add(connection_complete, callback);
- 		err = 0;
-+	} else if (session->psm > 0) {
-+		session->io = l2cap_connect(&session->src, &session->dst,
-+							session->psm,
-+							l2cap_callback,
-+							callback);
-+		err = (session->io == NULL) ? -EINVAL : 0;
- 	} else if (session->channel > 0) {
- 		session->io = rfcomm_connect(&session->src, &session->dst,
- 							session->channel,
+ 	session->conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
+ 	if (session->conn == NULL) {
 diff --git a/client/session.h b/client/session.h
-index 9180e75..24b1ec5 100755
+old mode 100644
+new mode 100755
+index af79ac8..9180e75
 --- a/client/session.h
 +++ b/client/session.h
-@@ -54,6 +54,10 @@ struct session_data {
- 	void *priv;
- };
-
-+#ifndef SDP_ATTR_GOEP_L2CAP_PSM
-+#define SDP_ATTR_GOEP_L2CAP_PSM		0x0200
-+#endif
-+
- typedef void (*session_callback_t) (struct session_data *session,
- 					GError *err, void *user_data);
-
+@@ -36,6 +36,7 @@ struct session_data {
+ 	bdaddr_t src;
+ 	bdaddr_t dst;
+ 	uint8_t channel;
++	uint16_t psm;  /* GOEP v2.0 and later supprot OBEX over L2CAP */
+ 	char *service;		/* Service friendly name */
+ 	const char *target;	/* OBEX Target UUID */
+ 	int target_len;
 --
 1.7.1
 
