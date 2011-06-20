@@ -1,43 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH] Fix unpair device when disconnected for No Bonding
-Date: Mon, 20 Jun 2011 12:23:57 +0300
-Message-Id: <1308561837-11530-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Mon, 20 Jun 2011 12:15:08 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Build failure for bluez-hcidump
+Message-ID: <20110620091508.GA7447@dell.ger.corp.intel.com>
+References: <1308560171.6042.3.camel@novo.hadess.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1308560171.6042.3.camel@novo.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix Paired property of device to be false if 'No Bonding' authentication
-is used. This property is set to false when device is disconnected and
-no link key is stored. Otherwise, there can be cases when device is still
-valid and being claimed as paired without available bonding information.
+Hi Bastien,
 
-For instanse, use of CreateDevice method call and obex client file
-transfer is such use case.
----
- src/device.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+On Mon, Jun 20, 2011, Bastien Nocera wrote:
+> bluez-hcidump 2.1 fails to build on Fedora 16:
+> 
+> src/hcidump.c: In function 'process_frames':
+> src/hcidump.c:313:5: warning: implicit declaration of function 'hton64' [-Wimplicit-function-declaration]
+> src/hcidump.c: In function 'read_dump':
+> src/hcidump.c:430:4: warning: implicit declaration of function 'ntoh64' [-Wimplicit-function-declaration]
+>   CCLD   src/hcidump
+> src/hcidump.o: In function `process_frames':
+> /builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:313: undefined reference to `hton64'
+> src/hcidump.o: In function `read_dump':
+> /builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:436: undefined reference to `ntoh64'
+> /builddir/build/BUILD/bluez-hcidump-2.1/src/hcidump.c:430: undefined reference to `ntoh64'
+> 
+> Both i686 and x86-64 fails to build with the same error.
+> 
+> http://koji.fedoraproject.org/koji/getfile?taskID=3143039&name=build.log
+> shows the full build log.
 
-diff --git a/src/device.c b/src/device.c
-index ae6a0d5..e886448 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -830,6 +830,14 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn)
- 		device->disconnects = g_slist_remove(device->disconnects, msg);
- 	}
- 
-+	if (device_is_paired(device)) {
-+		bdaddr_t src;
-+
-+		adapter_get_address(device->adapter, &src);
-+		if (read_link_key(&src, &device->bdaddr, NULL, NULL))
-+			device_set_paired(device, FALSE);
-+	}
-+
- 	emit_property_changed(conn, device->path,
- 					DEVICE_INTERFACE, "Connected",
- 					DBUS_TYPE_BOOLEAN, &device->connected);
--- 
-1.7.4.1
+Those functions have been part of bluetooth.h since bluez 4.90 (released
+in March this year). Seems like hcidump is missing proper checks for
+them.
 
+Johan
