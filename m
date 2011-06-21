@@ -1,27 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+MIME-Version: 1.0
+In-Reply-To: <EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
+References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
+	<1308563100-18917-5-git-send-email-nami.li@atheros.com>
+	<BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
+	<EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
+Date: Tue, 21 Jun 2011 09:43:18 +0300
+Message-ID: <BANLkTikWV=B5U8EswBqDjOWj-sr2c1k-aA@mail.gmail.com>
+Subject: Re: [PATCH obexd 05/14] Server listen on both RFCOMM and L2CAP sockets.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Li, Nami" <nami@qca.qualcomm.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"Liu, Haijun" <haijun@qca.qualcomm.com>,
 	"Li, Steven" <yongli@qca.qualcomm.com>
-Subject: RE: [PATCH obexd 11/14] Client parse server GoepL2capPsm attribute.
-Date: Tue, 21 Jun 2011 06:53:52 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CFD07@nasanexd01a.na.qualcomm.com>
-References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
-	<1308563100-18917-11-git-send-email-nami.li@atheros.com>
- <BANLkTin11xUyUgF0VL4wD+fA7iPSZ=SXtA@mail.gmail.com>
-In-Reply-To: <BANLkTin11xUyUgF0VL4wD+fA7iPSZ=SXtA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQo+Tm90IHN1cmUgd2h5IHlvdSBoYXZlIHRvIGNyZWF0ZSB0aG9zZSBlbXB0eSBmdW5jdGlv
-bnMsIHRoZSByZWFsIGNvZGUgaXMgaW4gYW5vdGhlciBwYXRjaCBJIHN1cHBvc2U/DQogWWVhaCwg
-SSBwdXQgdGhlIGRldGFpbGVkIGZ1bmN0aW9uIGNvZGUgaW4gbmV4dCBwYXRjaC4gTWF5YmUgSSBz
-cGxpdCBwYXRjaGVzIHRvbyBzbWFsbC4gU29ycnkgZm9yIG15IGxpdHRsZSBleHBlcmllbmNlIGlu
-IHVwc3RyZWFtLg0KPk5vdCBzdXJlIHdoeSB5b3UgbmVlZCBsMmNhcFBzbSwgd2hpY2ggaWlyYyBk
-byBub3QgY29uZm9ybSB3aXRoIG91ciBjb2RlIHN0eWxpbmcgZ3VpZGVsaW5lcywgd2h5IGNhbid0
-IHlvdSBtb3ZlIGwycHNtIG91dHNpZGUgdGhlIGRvIHdoaWxlIHNjb3BlIGFuZCBqdXN0IHVzZSBp
-dCBkaXJlY3RseT8NCiBPaywgSWBsbCB1cGRhdGUgY29kZSBpbiBuZXh0IHZlcnNpb24gZm9sbG93
-aW5nIHlvdXIgYWR2aWNlLg0KDQpUaGFua3MuDQpOYW1pDQo=
+Hi Nami,
+
+On Tue, Jun 21, 2011 at 9:25 AM, Li, Nami <nami@qca.qualcomm.com> wrote:
+> Hi, Luiz
+>  Thanks for your reply. I understand and agree with your opinion. The "start_l2cap" and "l2cap_confirm_event" functions were written according to "start" and "confirm_event".
+> I just keep the parameters passed same with "start" and "confirm_event" functions. I find that "user_data" passed by "start" is also not used in "confirm_event".
+> I think keep same parameters is more unified on the structure.
+> What do you think ?
+
+I would fix the RFCOMM listen to pass service instead and completely
+remove the use of find_service.
+
+
+-- 
+Luiz Augusto von Dentz
