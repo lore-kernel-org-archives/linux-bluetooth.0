@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Adamek <adamek.kuba@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd v2 00/11] Support user defined headers in gwobex
-Date: Wed, 22 Jun 2011 00:24:14 +0200
-Message-Id: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
+Date: Wed, 22 Jun 2011 00:27:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Add extfeatures to struct hci_dev
+Message-ID: <20110621205505.GA8124@dell.ger.corp.intel.com>
+References: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi André,
 
-these patches will enable sending and receiving of user defined headers
-in gwobex.
+On Tue, Jun 21, 2011, Andre Guedes wrote:
+> @@ -224,6 +225,11 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+>  	/* Read Local Supported Features */
+>  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+>  
+> +	/* Read Local Extended Features */
+> +	ext_cp.page = 0x01;
+> +	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(ext_cp),
+> +								&ext_cp);
 
-Two new functions will enable to start an asynchronous get or put
-transfer, taking as an argument a list of structures describing
-the headers to be sent. The headers are sent out in the order
-of appearance on the list.
+Since the extended features command is only available from 1.2 onwards I
+don't think it's right to unconditionally send it in hci_init_req.
+Instead, you should probably be checking for the feature bit in the
+(non-extended) feature mask, i.e. in the command complete callback for
+HCI_Read_Local_Features and only send the command if the feature bit is
+set.
 
-Likewise all response headers that would have been previously ignored
-by gwobex are now inserted to a list in the current gw_obex_xfer
-object, and so can be retrieved later after the asynchrous transfer
-has finished.
-
-Additionally, the order of sending headers in gwobex is changed
-to the one mandated by BIP, i.e.:
-Connection ID->Type->Name->Application Parameters->User Defined Headers.
-
-This series incorporates Luiz's changes.
-
-Jakub Adamek (11):
-  Add a_header struct for additional header data
-  Add list to store received headers
-  Add function to create fresh a_header
-  Store received headers in gw_obex_xfer object
-  Add functions to get, put w. a_header list
-  Parse headers in a PUT response packet
-  Add functions for async requests w a_header list
-  Reorder headers to conform to BIP's requirements
-  Handle partial content response from server
-  Convenience method to make deep copy of a_header
-  Add func for fetching header by id from list
-
- gwobex/gw-obex.h   |   39 +++++++++++++++
- gwobex/obex-priv.c |  135 +++++++++++++++++++++++++++++++++++----------------
- gwobex/obex-priv.h |   29 +++++++++++
- gwobex/obex-xfer.c |   97 +++++++++++++++++++++++++++++++++++++
- gwobex/obex-xfer.h |   18 +++++++
- 5 files changed, 275 insertions(+), 43 deletions(-)
-
+Johan
