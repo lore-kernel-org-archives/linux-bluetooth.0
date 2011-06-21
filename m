@@ -2,57 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Adamek <adamek.kuba@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd v2 10/11] Convenience method to make deep copy of a_header
-Date: Wed, 22 Jun 2011 00:24:24 +0200
-Message-Id: <1308695065-3784-11-git-send-email-adamek.kuba@gmail.com>
+Subject: [PATCH obexd v2 09/11] Handle partial content response from server
+Date: Wed, 22 Jun 2011 00:24:23 +0200
+Message-Id: <1308695065-3784-10-git-send-email-adamek.kuba@gmail.com>
 In-Reply-To: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
 References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gwobex/obex-xfer.c |   14 ++++++++++++++
- gwobex/obex-xfer.h |    2 ++
- 2 files changed, 16 insertions(+), 0 deletions(-)
+ gwobex/obex-priv.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
-index fc85fbf..0ce476f 100644
---- a/gwobex/obex-xfer.c
-+++ b/gwobex/obex-xfer.c
-@@ -475,6 +475,20 @@ struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
-     return ah;
- }
+diff --git a/gwobex/obex-priv.c b/gwobex/obex-priv.c
+index c92160d..259400b 100644
+--- a/gwobex/obex-priv.c
++++ b/gwobex/obex-priv.c
+@@ -346,7 +346,7 @@ static void obex_request_done(GwObex *ctx, obex_object_t *object,
  
-+struct a_header *a_header_copy(struct a_header *ah) {
-+    struct a_header *res;
-+    if (ah == NULL)
-+        return NULL;
-+    res = g_memdup(ah, sizeof(struct a_header));
-+    switch (res->hi & OBEX_HDR_TYPE_MASK) {
-+        case OBEX_HDR_TYPE_BYTES:
-+        case OBEX_HDR_TYPE_UNICODE:
-+            res->hv.bs = g_memdup(ah->hv.bs, ah->hv_size);
-+            break;
-+    }
-+    return res;
-+}
-+
- void a_header_free(struct a_header *ah) {
-     switch (ah->hi & OBEX_HDR_TYPE_MASK) {
-         case OBEX_HDR_TYPE_BYTES:
-diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
-index 7c59827..844d726 100644
---- a/gwobex/obex-xfer.h
-+++ b/gwobex/obex-xfer.h
-@@ -96,6 +96,8 @@ void a_header_free(struct a_header *ah);
- struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
-                                              unsigned int hlen);
+     ctx->obex_rsp = obex_rsp;
  
-+struct a_header *a_header_copy(struct a_header *ah);
-+
- struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
- 
- void _gw_obex_xfer_free(struct gw_obex_xfer *xfer);
+-    if (obex_rsp != OBEX_RSP_SUCCESS) {
++    if (obex_rsp != OBEX_RSP_SUCCESS && obex_rsp != OBEX_RSP_PARTIAL_CONTENT) {
+         debug("%s command (0x%02x) failed: %s (0x%02x)\n",
+                 optostr((uint8_t)obex_cmd), (uint8_t)obex_cmd,
+                 OBEX_ResponseToString(obex_rsp), (uint8_t)obex_rsp);
 -- 
 1.7.0.4
 
