@@ -1,34 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
-References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
-	<1308563100-18917-5-git-send-email-nami.li@atheros.com>
-	<BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
-	<EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
-Date: Tue, 21 Jun 2011 09:43:18 +0300
-Message-ID: <BANLkTikWV=B5U8EswBqDjOWj-sr2c1k-aA@mail.gmail.com>
-Subject: Re: [PATCH obexd 05/14] Server listen on both RFCOMM and L2CAP sockets.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Li, Nami" <nami@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	"Liu, Haijun" <haijun@qca.qualcomm.com>,
 	"Li, Steven" <yongli@qca.qualcomm.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: RE: [PATCH obexd 05/14] Server listen on both RFCOMM and L2CAP
+ sockets.
+Date: Tue, 21 Jun 2011 06:25:33 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
+References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
+	<1308563100-18917-5-git-send-email-nami.li@atheros.com>
+ <BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
+In-Reply-To: <BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nami,
-
-On Tue, Jun 21, 2011 at 9:25 AM, Li, Nami <nami@qca.qualcomm.com> wrote:
-> Hi, Luiz
->  Thanks for your reply. I understand and agree with your opinion. The "start_l2cap" and "l2cap_confirm_event" functions were written according to "start" and "confirm_event".
-> I just keep the parameters passed same with "start" and "confirm_event" functions. I find that "user_data" passed by "start" is also not used in "confirm_event".
-> I think keep same parameters is more unified on the structure.
-> What do you think ?
-
-I would fix the RFCOMM listen to pass service instead and completely
-remove the use of find_service.
-
-
--- 
-Luiz Augusto von Dentz
+SGksIEx1aXoNCiAgVGhhbmtzIGZvciB5b3VyIHJlcGx5LiBJIHVuZGVyc3RhbmQgYW5kIGFncmVl
+IHdpdGggeW91ciBvcGluaW9uLiBUaGUgInN0YXJ0X2wyY2FwIiBhbmQgImwyY2FwX2NvbmZpcm1f
+ZXZlbnQiIGZ1bmN0aW9ucyB3ZXJlIHdyaXR0ZW4gYWNjb3JkaW5nIHRvICJzdGFydCIgYW5kICJj
+b25maXJtX2V2ZW50Ii4gDQpJIGp1c3Qga2VlcCB0aGUgcGFyYW1ldGVycyBwYXNzZWQgc2FtZSB3
+aXRoICJzdGFydCIgYW5kICJjb25maXJtX2V2ZW50IiBmdW5jdGlvbnMuIEkgZmluZCB0aGF0ICJ1
+c2VyX2RhdGEiIHBhc3NlZCBieSAic3RhcnQiIGlzIGFsc28gbm90IHVzZWQgaW4gImNvbmZpcm1f
+ZXZlbnQiLg0KSSB0aGluayBrZWVwIHNhbWUgcGFyYW1ldGVycyBpcyBtb3JlIHVuaWZpZWQgb24g
+dGhlIHN0cnVjdHVyZS4NCldoYXQgZG8geW91IHRoaW5rID8NCg0KVGhhbmtzLg0KTmFtaQ0K
