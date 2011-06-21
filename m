@@ -1,112 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Jun 2011 15:20:24 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next-2.6 2011-06-21
-Message-ID: <20110621182024.GD2628@joana>
-MIME-Version: 1.0
+Subject: Re: [RFC] Health Thermometer Profile API
+Mime-Version: 1.0 (Apple Message framework v1084)
 Content-Type: text/plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+From: Elvis Pfutzenreuter <epx@signove.com>
+In-Reply-To: <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
+Date: Tue, 21 Jun 2011 15:06:25 -0300
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
+To: Santiago Carot <sancane@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On Jun 21, 2011, at 12:56 PM, Santiago Carot wrote:
 
-Another batch for 3.1. More L2CAP rewrite patches by myself, now we have an API
-that in the future will allow other pieces like l2cap_sock.c/rfcomm/AMP manager
-to use. It still an unfinished work. We also have here the first bit of the 
-Low Energy Security Manager Protocol by Vinicius Gomes and Another Briglia. And
-support for blacklist devices in the management interface by Antti Julku. The
-rest are just fixes and clean ups.
+(cut) 
 
-Please pull, thanks!
+>> 
+>> Another option would be to guarantee that MeasureReceived() is called
+>> right after agent registering, in order to give the client an
+>> initial value to show (having in mind that notification interval might
+>> be very long).
+> 
+> I would prefer to use the Final and Intermediate properties too. The
+> problem that we should address occurs when an application wich hasn't
+> got a watcher registered sets Intermediate or Final measurement
+> property and the last watcher is removed. I think that the best option
+> may be turn off measurments for power safe due that no watcher will
+> get the measures.
 
-	Gustavo
+I'm not sure I follow. Enabling intermediate and/or final notifications
+is done per-agent basis; if any of active agents needs intermediate
+measurements, device is configured to send them. Disabling it on one
+agent should not hurt another.
 
-The following changes since commit e10542c447abf7c840931ff12f7d0dee976ca2ea:
+> 
+> We can change the API to do that. What do you think?
+> 
+> 
+>> 
+>>> +
+>>> +
+>>> +Health Thermometer Watcher hierarchy
+>>> +====================================
+>>> +Service              unique name
+>>> +Interface    org.bluez.ThermometerWatcher
+>>> +Object path  freely definable
+>>> +
+>>> +Methods              void MeasureReceived(dict measure)
+>>> +
+>>> +                     This callback gets called when a measure has been
+>>> +                     scanned in the thermometer. The Value entry corresponds
+>>> +                     to IEEE-11073 32-bit FLOAT.The Time entry in the dict
+>>> +                     will be only present if the device supports storing of
+>>> +                     data. The time value is expressed in seconds since epoch.
+>> 
+>> Using such a special type (FLOAT) looks funny. Not sure whether it is the best option
+>> for this API.
+>> 
+>> At the very least, a description of FLOAT type should be added to the API, since
+>> IEEE 11073 specs are not public/free, and API users would have to resort to unofficial
+>> source to learn it.
+>> 
+>> I understand why you used this type (keeps the thermometer transcodable through this
+>> API and there are the special values), so BTW the lack of device information service
+>> access through this API should at least be mentioned, so we ammend that later (either
+>> here or adding another API).
+> 
+> ...or we can split the value in their exponent and mantissa
+> components. Any suggestion?
 
-  rtlwifi: rtl8192{c,ce,cu,se}: Remove comparisons of booleans with true (2011-06-20 15:47:43 -0400)
-
-are available in the git repository at:
-  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git master
-
-Anderson Briglia (6):
-      Bluetooth: Implement the first SMP commands
-      Bluetooth: Start SMP procedure
-      Bluetooth: Add simple SMP pairing negotiation
-      Bluetooth: Add LE SMP Cryptoolbox functions
-      Bluetooth: Add SMP confirmation structs
-      Bluetooth: Add SMP confirmation checks methods
-
-Anderson Lizardo (1):
-      Bluetooth: fix missing parameter for HCI_OP_DISCONNECT
-
-Antti Julku (2):
-      Bluetooth: Move blacklisting functions to hci_core
-      Bluetooth: Add blacklisting support for mgmt interface
-
-David Miller (1):
-      Bluetooth: Do not ignore errors returned from strict_strtol()
-
-Gustavo F. Padovan (13):
-      Bluetooth: Merge l2cap_chan_create() in the l2cap_sock_alloc()
-      Bluetooth: Add l2cap_chan_ops abstraction
-      Bluetooth: add recv() callback to l2cap_chan_ops
-      Bluetooth: add close() callback to l2cap_chan_ops
-      Bluetooth: Add state tracking to struct l2cap_chan
-      Bluetooth: Add refcnt to struct l2cap_chan
-      Bluetooth: Make timer functions generic
-      Bluetooth: keep reference if any ERTM timer is enabled
-      Bluetooth: Don't forget to check for LE_LINK
-      Bluetooth: use bit operation on conf_state
-      Bluetooth: Use bit operations on conn_state
-      Bluetooth: Fix locking in blacklist code
-      Merge master.kernel.org:/.../padovan/bluetooth-2.6
-
-Ilia Kolomisnky (1):
-      Bluetooth: Fix L2CAP connection establishment
-
-Johan Hedberg (1):
-      Bluetooth: Fix accepting connect requests for defer_setup
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: fix shutdown on SCO sockets
-      Bluetooth: Fix L2CAP security check
-
-Ville Tervo (1):
-      Bluetooth: Do not send SET_EVENT_MASK for 1.1 and earlier devices
-
-Vinicius Costa Gomes (13):
-      Bluetooth: Add support for using the crypto subsystem
-      Bluetooth: Add support for LE Start Encryption
-      Bluetooth: Remove debug statements
-      Bluetooth: Add support for resuming socket when SMP is finished
-      Bluetooth: Fix initial security level of LE links
-      Bluetooth: Update the security level when link is encrypted
-      Bluetooth: Add support for building pairing commands
-      Bluetooth: Add support for Pairing features exchange
-      Bluetooth: Add support for SMP timeout
-      Bluetooth: Add key size checks for SMP
-      Bluetooth: Fix crash when setting a LE socket to ready
-      Bluetooth: Remove useless access to the socket
-      Bluetooth: Fix not setting the chan state
-
- include/net/bluetooth/hci.h      |   34 ++
- include/net/bluetooth/hci_core.h |   13 +
- include/net/bluetooth/l2cap.h    |   95 ++++--
- include/net/bluetooth/mgmt.h     |   10 +
- include/net/bluetooth/smp.h      |   46 +++
- net/bluetooth/Kconfig            |    8 +
- net/bluetooth/Makefile           |    2 +-
- net/bluetooth/hci_conn.c         |   56 +++-
- net/bluetooth/hci_core.c         |  113 ++++++
- net/bluetooth/hci_event.c        |   69 ++++
- net/bluetooth/hci_sock.c         |   70 +----
- net/bluetooth/l2cap_core.c       |  700 +++++++++++++++++++-------------------
- net/bluetooth/l2cap_sock.c       |   97 +++++-
- net/bluetooth/mgmt.c             |   72 ++++-
- net/bluetooth/smp.c              |  533 +++++++++++++++++++++++++++++
- 15 files changed, 1460 insertions(+), 458 deletions(-)
- create mode 100644 net/bluetooth/smp.c
-
+I'd go for that, but we need to take a look on special values to see if it makes sense.
+It would be really ugly to say something like "if mantissa=5 and exponent=-3 then
+temperature is actually zero" :)
