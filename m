@@ -1,54 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] Fix crash introduced by f5279bfcedd669bc5d4e88cc1c59807c92226dfb
-Date: Tue, 21 Jun 2011 11:37:34 +0300
-Message-Id: <1308645454-2724-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1308645454-2724-1-git-send-email-luiz.dentz@gmail.com>
-References: <1308645454-2724-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd] Add copy and move support for filesystem plugin
+Date: Tue, 21 Jun 2011 11:37:33 +0300
+Message-Id: <1308645454-2724-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The callback function actually needs the bluetooth_service structure not
-obex_service_driver.
+Move is implemented using rename and copy uses sendfile, both part of
+POSIX.
 ---
- plugins/bluetooth.c |   11 +++++++++--
- 1 files changed, 9 insertions(+), 2 deletions(-)
+ plugins/filesystem.c |   96 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 96 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index fe508f4..1037b24 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -459,10 +459,11 @@ static int request_service_authorization(struct bluetooth_service *service,
+diff --git a/plugins/filesystem.c b/plugins/filesystem.c
+index b4ff556..4b0665f 100644
+--- a/plugins/filesystem.c
++++ b/plugins/filesystem.c
+@@ -36,6 +36,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/statvfs.h>
++#include <sys/sendfile.h>
+ #include <fcntl.h>
+ #include <wait.h>
  
- static void confirm_event(GIOChannel *io, void *user_data)
- {
--	struct bluetooth_service *service = user_data;
-+	struct bluetooth_service *service;
- 	GError *err = NULL;
- 	char address[18];
- 	uint8_t channel;
-+	struct obex_service_driver *driver = user_data;
+@@ -234,6 +235,99 @@ static ssize_t filesystem_write(void *object, const void *buf, size_t count)
+ 	return ret;
+ }
  
- 	bt_io_get(io, BT_IO_RFCOMM, &err,
- 			BT_IO_OPT_DEST, address,
-@@ -477,7 +478,13 @@ static void confirm_event(GIOChannel *io, void *user_data)
- 	info("bluetooth: New connection from: %s, channel %u", address,
- 			channel);
- 
--	if (service->driver->service != OBEX_OPP) {
-+	service = find_service(driver, 0);
-+	if (service == NULL) {
-+		error("bluetooth: Unable to find service");
-+		goto drop;
++static int filesystem_rename(const char *name, const char *destname)
++{
++	int ret;
++
++	ret = rename(name, destname);
++	if (ret < 0) {
++		error("rename(%s, %s): %s (%d)", name, destname,
++						strerror(errno), errno);
++		return -errno;
 +	}
 +
-+	if (driver->service != OBEX_OPP) {
- 		if (request_service_authorization(service, io, address) < 0)
- 			goto drop;
++	return ret;
++}
++
++static int sendfile_async(int out_fd, int in_fd, off_t *offset, size_t count)
++{
++	int pid;
++
++	/* Run sendfile on child process */
++	pid = fork();
++	switch (pid) {
++		case 0:
++			break;
++		case -1:
++			error("fork() %s (%d)", strerror(errno), errno);
++			return -errno;
++		default:
++			DBG("child %d forked", pid);
++			return pid;
++	}
++
++	/* At child */
++	if (sendfile(out_fd, in_fd, offset, count) < 0)
++		error("sendfile(): %s (%d)", strerror(errno), errno);
++
++	close(in_fd);
++	close(out_fd);
++
++	exit(errno);
++}
++
++static int filesystem_copy(const char *name, const char *destname)
++{
++	void *in, *out;
++	ssize_t ret;
++	size_t size;
++	struct stat st;
++	int in_fd, out_fd, err;
++
++	in = filesystem_open(name, O_RDONLY, 0, NULL, &size, &err);
++	if (in == NULL) {
++		error("open(%s): %s (%d)", name, strerror(-err), -err);
++		return -err;
++	}
++
++	in_fd = GPOINTER_TO_INT(in);
++	ret = fstat(in_fd, &st);
++	if (ret < 0) {
++		error("stat(%s): %s (%d)", name, strerror(errno), errno);
++		return -errno;
++	}
++
++	out = filesystem_open(destname, O_WRONLY | O_CREAT | O_TRUNC,
++					st.st_mode, NULL, &size, &err);
++	if (out == NULL) {
++		error("open(%s): %s (%d)", destname, strerror(-err), -err);
++		filesystem_close(in);
++		return -errno;
++	}
++
++	out_fd = GPOINTER_TO_INT(out);
++
++	/* Check if sendfile is supported */
++	ret = sendfile(out_fd, in_fd, NULL, 0);
++	if (ret < 0) {
++		ret = -errno;
++		error("sendfile: %s (%zd)", strerror(-ret), -ret);
++		goto done;
++	}
++
++	ret = sendfile_async(out_fd, in_fd, NULL, st.st_size);
++	if (ret < 0)
++		goto done;
++
++	return 0;
++
++done:
++	filesystem_close(in);
++	filesystem_close(out);
++
++	return ret;
++}
++
+ struct capability_object {
+ 	int pid;
+ 	int output;
+@@ -555,6 +649,8 @@ static struct obex_mime_type_driver file = {
+ 	.read = filesystem_read,
+ 	.write = filesystem_write,
+ 	.remove = remove,
++	.move = filesystem_rename,
++	.copy = filesystem_copy,
+ };
  
+ static struct obex_mime_type_driver capability = {
 -- 
 1.7.5.4
 
