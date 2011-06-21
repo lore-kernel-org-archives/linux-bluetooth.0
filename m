@@ -2,49 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Adamek <adamek.kuba@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd v2 11/11] Add func for fetching header by id from list
-Date: Wed, 22 Jun 2011 00:24:25 +0200
-Message-Id: <1308695065-3784-12-git-send-email-adamek.kuba@gmail.com>
+Subject: [PATCH obexd v2 10/11] Convenience method to make deep copy of a_header
+Date: Wed, 22 Jun 2011 00:24:24 +0200
+Message-Id: <1308695065-3784-11-git-send-email-adamek.kuba@gmail.com>
 In-Reply-To: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
 References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- gwobex/obex-xfer.c |   10 ++++++++++
+ gwobex/obex-xfer.c |   14 ++++++++++++++
  gwobex/obex-xfer.h |    2 ++
- 2 files changed, 12 insertions(+), 0 deletions(-)
+ 2 files changed, 16 insertions(+), 0 deletions(-)
 
 diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
-index 0ce476f..7779d4f 100644
+index fc85fbf..0ce476f 100644
 --- a/gwobex/obex-xfer.c
 +++ b/gwobex/obex-xfer.c
-@@ -499,6 +499,16 @@ void a_header_free(struct a_header *ah) {
-     g_free(ah);
+@@ -475,6 +475,20 @@ struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+     return ah;
  }
  
-+struct a_header *a_header_find(GSList *aheaders, uint8_t hi) {
-+    while (aheaders) {
-+        struct a_header *ah = aheaders->data;
-+        if (ah->hi == hi)
-+            return aheaders->data;
-+        aheaders = g_slist_next(aheaders);
++struct a_header *a_header_copy(struct a_header *ah) {
++    struct a_header *res;
++    if (ah == NULL)
++        return NULL;
++    res = g_memdup(ah, sizeof(struct a_header));
++    switch (res->hi & OBEX_HDR_TYPE_MASK) {
++        case OBEX_HDR_TYPE_BYTES:
++        case OBEX_HDR_TYPE_UNICODE:
++            res->hv.bs = g_memdup(ah->hv.bs, ah->hv_size);
++            break;
 +    }
-+    return NULL;
++    return res;
 +}
 +
- void _gw_obex_xfer_free(struct gw_obex_xfer *xfer) {
-     GSList *aheaders = xfer->aheaders;
-     while (aheaders) {
+ void a_header_free(struct a_header *ah) {
+     switch (ah->hi & OBEX_HDR_TYPE_MASK) {
+         case OBEX_HDR_TYPE_BYTES:
 diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
-index 844d726..66717b9 100644
+index 7c59827..844d726 100644
 --- a/gwobex/obex-xfer.h
 +++ b/gwobex/obex-xfer.h
-@@ -98,6 +98,8 @@ struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+@@ -96,6 +96,8 @@ void a_header_free(struct a_header *ah);
+ struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+                                              unsigned int hlen);
  
- struct a_header *a_header_copy(struct a_header *ah);
- 
-+struct a_header *a_header_find(GSList *aheaders, uint8_t hi);
++struct a_header *a_header_copy(struct a_header *ah);
 +
  struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
  
