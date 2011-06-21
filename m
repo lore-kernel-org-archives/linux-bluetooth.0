@@ -1,49 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/3] Bluetooth: Add extfeatures to struct hci_dev
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 21 Jun 2011 19:16:38 -0700
-In-Reply-To: <20110621205505.GA8124@dell.ger.corp.intel.com>
-References: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
-	 <20110621205505.GA8124@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1308709001.2196.64.camel@aeonflux>
-Mime-Version: 1.0
+From: Jakub Adamek <adamek.kuba@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Adamek <adamek.kuba@gmail.com>
+Subject: [PATCH obexd v2 11/11] Add func for fetching header by id from list
+Date: Wed, 22 Jun 2011 00:24:25 +0200
+Message-Id: <1308695065-3784-12-git-send-email-adamek.kuba@gmail.com>
+In-Reply-To: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
+References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ gwobex/obex-xfer.c |   10 ++++++++++
+ gwobex/obex-xfer.h |    2 ++
+ 2 files changed, 12 insertions(+), 0 deletions(-)
 
-> > @@ -224,6 +225,11 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
-> >  	/* Read Local Supported Features */
-> >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-> >  
-> > +	/* Read Local Extended Features */
-> > +	ext_cp.page = 0x01;
-> > +	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(ext_cp),
-> > +								&ext_cp);
-> 
-> Since the extended features command is only available from 1.2 onwards I
-> don't think it's right to unconditionally send it in hci_init_req.
-> Instead, you should probably be checking for the feature bit in the
-> (non-extended) feature mask, i.e. in the command complete callback for
-> HCI_Read_Local_Features and only send the command if the feature bit is
-> set.
-
-exactly and with your work on the management interface, I hope we can
-get rid of hci_init_req at some point. And then do a proper async and
-well defined init of the adapter. Especially with things like LE, single
-mode, AMP, SSP and other factors on the init process, we need to get
-this fixed once and for all.
-
-The AMP init will look fundamentally different from the BR/EDR and init.
-And so will the LE only init. And it all depends on Bluetooth adapter
-version and feature bits of course.
-
-Regards
-
-Marcel
-
+diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
+index 0ce476f..7779d4f 100644
+--- a/gwobex/obex-xfer.c
++++ b/gwobex/obex-xfer.c
+@@ -499,6 +499,16 @@ void a_header_free(struct a_header *ah) {
+     g_free(ah);
+ }
+ 
++struct a_header *a_header_find(GSList *aheaders, uint8_t hi) {
++    while (aheaders) {
++        struct a_header *ah = aheaders->data;
++        if (ah->hi == hi)
++            return aheaders->data;
++        aheaders = g_slist_next(aheaders);
++    }
++    return NULL;
++}
++
+ void _gw_obex_xfer_free(struct gw_obex_xfer *xfer) {
+     GSList *aheaders = xfer->aheaders;
+     while (aheaders) {
+diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
+index 844d726..66717b9 100644
+--- a/gwobex/obex-xfer.h
++++ b/gwobex/obex-xfer.h
+@@ -98,6 +98,8 @@ struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+ 
+ struct a_header *a_header_copy(struct a_header *ah);
+ 
++struct a_header *a_header_find(GSList *aheaders, uint8_t hi);
++
+ struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
+ 
+ void _gw_obex_xfer_free(struct gw_obex_xfer *xfer);
+-- 
+1.7.0.4
 
