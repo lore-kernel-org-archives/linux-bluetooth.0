@@ -1,98 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <EC94610F2568494D8D9291885C48D3103CFDB3@nasanexd01a.na.qualcomm.com>
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Liu, Haijun" <haijun@qca.qualcomm.com>,
+	"Fan, Hong" <hongfan@qca.qualcomm.com>
+Subject: RE: [PATCH obexd] Fix crash introduced by
+ f5279bfcedd669bc5d4e88cc1c59807c92226dfb
+Date: Tue, 21 Jun 2011 10:19:24 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103CFDB3@nasanexd01a.na.qualcomm.com>
 References: <1308645454-2724-1-git-send-email-luiz.dentz@gmail.com>
 	<1308645454-2724-2-git-send-email-luiz.dentz@gmail.com>
 	<EC94610F2568494D8D9291885C48D3103CFD96@nasanexd01a.na.qualcomm.com>
-	<BANLkTinNy_eNeQ5WfvhJHwYgdwcdgzHGMw@mail.gmail.com>
-	<EC94610F2568494D8D9291885C48D3103CFDB3@nasanexd01a.na.qualcomm.com>
-Date: Tue, 21 Jun 2011 13:23:26 +0300
-Message-ID: <BANLkTimRTnKHxL8csLDdm4HXp0+FV3_VHA@mail.gmail.com>
-Subject: Re: [PATCH obexd] Fix crash introduced by f5279bfcedd669bc5d4e88cc1c59807c92226dfb
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Li, Nami" <nami@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Liu, Haijun" <haijun@qca.qualcomm.com>,
-	"Fan, Hong" <hongfan@qca.qualcomm.com>
-Content-Type: text/plain; charset=GB2312
+ <BANLkTinNy_eNeQ5WfvhJHwYgdwcdgzHGMw@mail.gmail.com>
+In-Reply-To: <BANLkTinNy_eNeQ5WfvhJHwYgdwcdgzHGMw@mail.gmail.com>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nami,
-
-2011/6/21 Li, Nami <nami@qca.qualcomm.com>:
-> Hi, Luiz
->
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: 2011年6月21日 17:48
-> To: Li, Nami
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH obexd] Fix crash introduced by f5279bfcedd669bc5d4e88cc1c59807c92226dfb
->
-> Hi Nami,
->
-> 2011/6/21 Li, Nami <nami@qca.qualcomm.com>:
->> Hi,
->>
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org
->> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Luiz
->> Augusto von Dentz
->> Sent: 2011年6月21日 16:38
->> To: linux-bluetooth@vger.kernel.org
->> Subject: [PATCH obexd] Fix crash introduced by
->> f5279bfcedd669bc5d4e88cc1c59807c92226dfb
->>
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> The callback function actually needs the bluetooth_service structure not obex_service_driver.
->> ---
->>  plugins/bluetooth.c |   11 +++++++++--
->>  1 files changed, 9 insertions(+), 2 deletions(-)
->>
->> diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c index
->> fe508f4..1037b24 100644
->> --- a/plugins/bluetooth.c
->> +++ b/plugins/bluetooth.c
->> @@ -459,10 +459,11 @@ static int request_service_authorization(struct
->> bluetooth_service *service,
->>
->>  static void confirm_event(GIOChannel *io, void *user_data)  {
->> -       struct bluetooth_service *service = user_data;
->> +       struct bluetooth_service *service;
->>        GError *err = NULL;
->>        char address[18];
->>        uint8_t channel;
->> +       struct obex_service_driver *driver = user_data;
->>
->>        bt_io_get(io, BT_IO_RFCOMM, &err,
->>                        BT_IO_OPT_DEST, address, @@ -477,7 +478,13 @@
->> static void confirm_event(GIOChannel *io, void *user_data)
->>        info("bluetooth: New connection from: %s, channel %u", address,
->>                        channel);
->>
->> -       if (service->driver->service != OBEX_OPP) {
->> +       service = find_service(driver, 0);
->>
->> Will it be better to write as "service = find_service(driver, channel);" ?
->> Or if you choose not to use channel, I think you could omit channel
->> variable and omit bt_io_get(BT_IO_OPT_CHANNEL, &channel);
->
->>I only leave the channel there for logging, as for the find_service it is really useless to use the channel if we are going to support L2CAP in future, so in theory this should work regardless of the transport.
->
->
-> Yeah, it`s better when support L2CAP.  If the channel is only use for logging, can we delete it?
-> There are only two functions calling find_service, one in your commit , another in register_record function:
->        service = find_service(driver, 0);
-> Seems the channel parameter is useless.
-> And considering OBEX over L2CAP, should we modify find_service to
->   static struct bluetooth_service *find_service(struct obex_service_driver *driver)
-> just delete uint8_t channel parameter.
-> If ok, you or me can upload a patch for this issue.
-
-Yep, I gonna send a new version that just remove it since we no longer
-need it after this changes
-
--- 
-Luiz Augusto von Dentz
+SGksIEx1aXoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEx1aXogQXVndXN0
+byB2b24gRGVudHogW21haWx0bzpsdWl6LmRlbnR6QGdtYWlsLmNvbV0gDQpTZW50OiAyMDExxOo2
+1MIyMcjVIDE3OjQ4DQpUbzogTGksIE5hbWkNCkNjOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
+ZWwub3JnDQpTdWJqZWN0OiBSZTogW1BBVENIIG9iZXhkXSBGaXggY3Jhc2ggaW50cm9kdWNlZCBi
+eSBmNTI3OWJmY2VkZDY2OWJjNWQ0ZTg4Y2MxYzU5ODA3YzkyMjI2ZGZiDQoNCkhpIE5hbWksDQoN
+CjIwMTEvNi8yMSBMaSwgTmFtaSA8bmFtaUBxY2EucXVhbGNvbW0uY29tPjoNCj4gSGksDQo+DQo+
+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWJsdWV0b290aC1vd25l
+ckB2Z2VyLmtlcm5lbC5vcmcgDQo+IFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIu
+a2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEx1aXogDQo+IEF1Z3VzdG8gdm9uIERlbnR6DQo+IFNl
+bnQ6IDIwMTHE6jbUwjIxyNUgMTY6MzgNCj4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
+bC5vcmcNCj4gU3ViamVjdDogW1BBVENIIG9iZXhkXSBGaXggY3Jhc2ggaW50cm9kdWNlZCBieSAN
+Cj4gZjUyNzliZmNlZGQ2NjliYzVkNGU4OGNjMWM1OTgwN2M5MjIyNmRmYg0KPg0KPiBGcm9tOiBM
+dWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50ekBpbnRlbC5jb20+DQo+DQo+IFRo
+ZSBjYWxsYmFjayBmdW5jdGlvbiBhY3R1YWxseSBuZWVkcyB0aGUgYmx1ZXRvb3RoX3NlcnZpY2Ug
+c3RydWN0dXJlIG5vdCBvYmV4X3NlcnZpY2VfZHJpdmVyLg0KPiAtLS0NCj4gIHBsdWdpbnMvYmx1
+ZXRvb3RoLmMgfCAgIDExICsrKysrKysrKy0tDQo+ICAxIGZpbGVzIGNoYW5nZWQsIDkgaW5zZXJ0
+aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBhL3BsdWdpbnMvYmx1ZXRv
+b3RoLmMgYi9wbHVnaW5zL2JsdWV0b290aC5jIGluZGV4IA0KPiBmZTUwOGY0Li4xMDM3YjI0IDEw
+MDY0NA0KPiAtLS0gYS9wbHVnaW5zL2JsdWV0b290aC5jDQo+ICsrKyBiL3BsdWdpbnMvYmx1ZXRv
+b3RoLmMNCj4gQEAgLTQ1OSwxMCArNDU5LDExIEBAIHN0YXRpYyBpbnQgcmVxdWVzdF9zZXJ2aWNl
+X2F1dGhvcml6YXRpb24oc3RydWN0IA0KPiBibHVldG9vdGhfc2VydmljZSAqc2VydmljZSwNCj4N
+Cj4gIHN0YXRpYyB2b2lkIGNvbmZpcm1fZXZlbnQoR0lPQ2hhbm5lbCAqaW8sIHZvaWQgKnVzZXJf
+ZGF0YSkgIHsNCj4gLSAgICAgICBzdHJ1Y3QgYmx1ZXRvb3RoX3NlcnZpY2UgKnNlcnZpY2UgPSB1
+c2VyX2RhdGE7DQo+ICsgICAgICAgc3RydWN0IGJsdWV0b290aF9zZXJ2aWNlICpzZXJ2aWNlOw0K
+PiAgICAgICAgR0Vycm9yICplcnIgPSBOVUxMOw0KPiAgICAgICAgY2hhciBhZGRyZXNzWzE4XTsN
+Cj4gICAgICAgIHVpbnQ4X3QgY2hhbm5lbDsNCj4gKyAgICAgICBzdHJ1Y3Qgb2JleF9zZXJ2aWNl
+X2RyaXZlciAqZHJpdmVyID0gdXNlcl9kYXRhOw0KPg0KPiAgICAgICAgYnRfaW9fZ2V0KGlvLCBC
+VF9JT19SRkNPTU0sICZlcnIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgQlRfSU9fT1BUX0RF
+U1QsIGFkZHJlc3MsIEBAIC00NzcsNyArNDc4LDEzIEBAIA0KPiBzdGF0aWMgdm9pZCBjb25maXJt
+X2V2ZW50KEdJT0NoYW5uZWwgKmlvLCB2b2lkICp1c2VyX2RhdGEpDQo+ICAgICAgICBpbmZvKCJi
+bHVldG9vdGg6IE5ldyBjb25uZWN0aW9uIGZyb206ICVzLCBjaGFubmVsICV1IiwgYWRkcmVzcywN
+Cj4gICAgICAgICAgICAgICAgICAgICAgICBjaGFubmVsKTsNCj4NCj4gLSAgICAgICBpZiAoc2Vy
+dmljZS0+ZHJpdmVyLT5zZXJ2aWNlICE9IE9CRVhfT1BQKSB7DQo+ICsgICAgICAgc2VydmljZSA9
+IGZpbmRfc2VydmljZShkcml2ZXIsIDApOw0KPg0KPiBXaWxsIGl0IGJlIGJldHRlciB0byB3cml0
+ZSBhcyAic2VydmljZSA9IGZpbmRfc2VydmljZShkcml2ZXIsIGNoYW5uZWwpOyIgPw0KPiBPciBp
+ZiB5b3UgY2hvb3NlIG5vdCB0byB1c2UgY2hhbm5lbCwgSSB0aGluayB5b3UgY291bGQgb21pdCBj
+aGFubmVsIA0KPiB2YXJpYWJsZSBhbmQgb21pdCBidF9pb19nZXQoQlRfSU9fT1BUX0NIQU5ORUws
+ICZjaGFubmVsKTsNCg0KPkkgb25seSBsZWF2ZSB0aGUgY2hhbm5lbCB0aGVyZSBmb3IgbG9nZ2lu
+ZywgYXMgZm9yIHRoZSBmaW5kX3NlcnZpY2UgaXQgaXMgcmVhbGx5IHVzZWxlc3MgdG8gdXNlIHRo
+ZSBjaGFubmVsIGlmIHdlIGFyZSBnb2luZyB0byBzdXBwb3J0IEwyQ0FQIGluIGZ1dHVyZSwgc28g
+aW4gdGhlb3J5IHRoaXMgc2hvdWxkIHdvcmsgcmVnYXJkbGVzcyBvZiB0aGUgdHJhbnNwb3J0Lg0K
+DQoNClllYWgsIGl0YHMgYmV0dGVyIHdoZW4gc3VwcG9ydCBMMkNBUC4gIElmIHRoZSBjaGFubmVs
+IGlzIG9ubHkgdXNlIGZvciBsb2dnaW5nLCBjYW4gd2UgZGVsZXRlIGl0PyANClRoZXJlIGFyZSBv
+bmx5IHR3byBmdW5jdGlvbnMgY2FsbGluZyBmaW5kX3NlcnZpY2UsIG9uZSBpbiB5b3VyIGNvbW1p
+dCAsIGFub3RoZXIgaW4gcmVnaXN0ZXJfcmVjb3JkIGZ1bmN0aW9uOg0KCXNlcnZpY2UgPSBmaW5k
+X3NlcnZpY2UoZHJpdmVyLCAwKTsNClNlZW1zIHRoZSBjaGFubmVsIHBhcmFtZXRlciBpcyB1c2Vs
+ZXNzLg0KQW5kIGNvbnNpZGVyaW5nIE9CRVggb3ZlciBMMkNBUCwgc2hvdWxkIHdlIG1vZGlmeSBm
+aW5kX3NlcnZpY2UgdG8NCiAgIHN0YXRpYyBzdHJ1Y3QgYmx1ZXRvb3RoX3NlcnZpY2UgKmZpbmRf
+c2VydmljZShzdHJ1Y3Qgb2JleF9zZXJ2aWNlX2RyaXZlciAqZHJpdmVyKQ0KanVzdCBkZWxldGUg
+dWludDhfdCBjaGFubmVsIHBhcmFtZXRlci4NCklmIG9rLCB5b3Ugb3IgbWUgY2FuIHVwbG9hZCBh
+IHBhdGNoIGZvciB0aGlzIGlzc3VlLg0KDQpOYW1pDQoNCg==
