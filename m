@@ -1,118 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E00C755.1070501@orange-ftgroup.com>
-Date: Tue, 21 Jun 2011 18:31:17 +0200
-From: beyler olivier <olivier.beyler@orange-ftgroup.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: PIN code pb
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
+	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+Date: Tue, 21 Jun 2011 17:56:39 +0200
+Message-ID: <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Santiago Carot <sancane@gmail.com>
+To: Elvis Pfutzenreuter <epx@signove.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I've try to connect to the Serial Port Device
+Hello Elvis,
 
-hcitool scan
-Scanning ...
-     00:03:C9:74:AA:90    n/a
-     00:0F:B3:91:1C:70    G-NC6000-95
-     00:15:0E:E2:3E:21    n/a
-     00:18:B2:00:0B:83    Serial Port Device
+2011/6/21 Elvis Pfutzenreuter <epx@signove.com>:
+>
+> On Jun 21, 2011, at 10:03 AM, Santiago Carot-Nemesio wrote:
+>
+>> ---
+>> doc/thermometer.txt |  111 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 files changed, 111 insertions(+), 0 deletions(-)
+>> create mode 100644 doc/thermometer.txt
+>>
+>> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
+>> new file mode 100644
+>> index 0000000..4635fdf
+>> --- /dev/null
+>> +++ b/doc/thermometer.txt
+>> @@ -0,0 +1,111 @@
+>> +BlueZ D-Bus Thermomether API description
+>> +****************************************
+>> +
+>> +     Santiago Carot-Nemesio <sancane@gmail.com>
+>> +
+>> +Health Thermomether Profile hierarchy
+>> +=====================================
+>> +
+>> +Service              org.bluez
+>> +Interface    org.bluez.Thermometer
+>> +Object path  [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>> +
+>> +
+>> +Methods              void SetProperty(string name, variant value)
+>> +
+>> +                     Changes the value of the specified property. Only
+>> +                     read-write properties can be changed. On success
+>> +                     this will emit a PropertyChanged signal.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +             dict GetProperties()
+>> +
+>> +                     Returns all properties for the interface. See the
+>> +                     Properties section for the available properties.
+>> +
+>> +             RegisterThermometerWatcher(object agent)
+>> +
+>> +                     Register a watcher to monitor scanned measures.
+>> +
+>> +                     The agent registered for the health thermometer
+>> +                     service will be notified about measures scanned.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +             UnregisterThermometerWatcher(object agent)
+>> +
+>> +                     Unregister a watcher.
+>> +
+>> +                     Final and intermediate temperatures won't be notified to
+>> +                     the agent any more.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                     org.bluez.Error.NotFound
+>> +
+>> +             EnableIntermediateMeasures(object agent)
+>> +
+>> +                     Enable notifications about intermediate measures. Agent
+>> +                     should have registered a watcher for health thermometer
+>> +                     service before to enable this feature.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                     org.bluez.Error.NotAllowed
+>> +
+>> +             DisableIntermediateMeasures(object agent)
+>> +
+>> +                     Disable intermediate temperatures. It will disable
+>> +                     intermediate measure notifications in the device when
+>> +                     the last agent disables this feature.
+>> +
+>> +                     Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                     org.bluez.Error.NotFound
+>
+> Not sure whether there is a need to have these. Out of simplicity we could just
+> accept that intermediate temperatures will be notified, if the thermometer
+> provides this feature.
+>
+> In the other hand, a good reason to keep this would be saving energy when
+> intermediate measures are not needed. LE profiles to into great lengths to
+> save a couple bytes of traffic (literally).
+
+That's the reason which I put them in the API but I was just wondering
+if we could use the Final and Intermediate properties for that as you
+suggest below.
+
+>
+>> +
+>> +Signals              PropertyChanged(string name, variant value)
+>> +
+>> +                     This signal indicates a changed value of the given
+>> +                     property.
+>> +
+>> +Properties   uint16 Interval (optional) [readwrite]
+>> +
+>> +                     The Measurement Interval defines the time (in seconds)
+>> +                     between measurements. This interval is not related to
+>> +                     the intermediates measures and must be defined into
+>> +                     a valid range. Setting it to zero meaning that no
+>> +                     periodic measurements will be taken.
+>> +
+>> +             uint16 Minimum (optional) [readonly]
+>> +
+>> +                     Defines the maximum value allowed for the interval
+>> +                     between periodic measurements.
+>> +
+>> +             uint16 Maximum (optional) [readonly]
+>> +
+>> +                     Defines the minimuum value allowed for the interval
+>> +                     between periodic measurements.
+>
+> I would still like to have temperature (final and intermediate) among properties
+> so an app could read them out without having to register an agent, either to
+> take a single measurement or to update display upon loading. (That's why
+> the respective GATT characteristics support read along with notification.)
+> Reading the property provokes actual characteristic reading.
+>
+> Disvantage: generating PropertyChanged signals along with agent calls, which
+> puts the usefulness of the agent into question.
+>
+> Another option would be to guarantee that MeasureReceived() is called
+> right after agent registering, in order to give the client an
+> initial value to show (having in mind that notification interval might
+> be very long).
+
+I would prefer to use the Final and Intermediate properties too. The
+problem that we should address occurs when an application wich hasn't
+got a watcher registered sets Intermediate or Final measurement
+property and the last watcher is removed. I think that the best option
+may be turn off measurments for power safe due that no watcher will
+get the measures.
+
+We can change the API to do that. What do you think?
 
 
-./simple-agent hci0 00:18:B2:00:0B:83
-Creating device failed: org.bluez.Error.AuthenticationRejected: 
-Authentication Rejected
+>
+>> +
+>> +
+>> +Health Thermometer Watcher hierarchy
+>> +====================================
+>> +Service              unique name
+>> +Interface    org.bluez.ThermometerWatcher
+>> +Object path  freely definable
+>> +
+>> +Methods              void MeasureReceived(dict measure)
+>> +
+>> +                     This callback gets called when a measure has been
+>> +                     scanned in the thermometer. The Value entry corresponds
+>> +                     to IEEE-11073 32-bit FLOAT.The Time entry in the dict
+>> +                     will be only present if the device supports storing of
+>> +                     data. The time value is expressed in seconds since epoch.
+>
+> Using such a special type (FLOAT) looks funny. Not sure whether it is the best option
+> for this API.
+>
+> At the very least, a description of FLOAT type should be added to the API, since
+> IEEE 11073 specs are not public/free, and API users would have to resort to unofficial
+> source to learn it.
+>
+> I understand why you used this type (keeps the thermometer transcodable through this
+> API and there are the special values), so BTW the lack of device information service
+> access through this API should at least be mentioned, so we ammend that later (either
+> here or adding another API).
 
-The pin code is normaly "0000" but I don't know where to put it.
+...or we can split the value in their exponent and mantissa
+components. Any suggestion?
 
-I try many answers without succed when I use minicom
-minicom: cannot open /dev/rfcomm0 : the Connection refused
-
-and on the hcidump I see this log :
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
- > HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Max Slots Change (0x1b) plen 3
- > HCI Event: Read Remote Supported Features (0x0b) plen 11
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-< ACL data: handle 1 flags 0x02 dlen 10
-     L2CAP(s): Info req: type 2
- > HCI Event: Command Status (0x0f) plen 4
- > HCI Event: Remote Name Req Complete (0x07) plen 255
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 1 flags 0x02 dlen 12
-     L2CAP(s): Info rsp: type 2 result 1
-       Not supported
-< ACL data: handle 1 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 3 scid 0x0040
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Remote Name Req Complete (0x07) plen 255
- > ACL data: handle 1 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-       Connection successful
-< ACL data: handle 1 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 1013
- > ACL data: handle 1 flags 0x02 dlen 16
-     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-       MTU 32772
-< ACL data: handle 1 flags 0x02 dlen 18
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-       MTU 32772
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 1 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-       Success
-< ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: QoS Setup Complete (0x0d) plen 21
- > ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 1 flags 0x02 dlen 18
-     L2CAP(d): cid 0x0040 len 14 [psm 3]
-       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-       dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
-       frame_size 1008 max_retrans 0 credits 7
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 1 flags 0x02 dlen 18
-     L2CAP(d): cid 0x0040 len 14 [psm 3]
-       RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-       dlci 2 frame_type 0 credit_flow 14 pri 7 ack_timer 0
-       frame_size 1008 max_retrans 0 credits 1
-< ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: PIN Code Request (0x16) plen 6
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
- > HCI Event: Command Complete (0x0e) plen 10
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
- > HCI Event: Command Complete (0x0e) plen 10
- > ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73
-< ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 1 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > HCI Event: Number of Completed Packets (0x13) plen 5
- > ACL data: handle 1 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0040 len 4 [psm 3]
-       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
- > ACL data: handle 1 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-
-Best regards
-
+>
+>> +
+>> +                     Dict is defined as below:
+>> +                     {
+>> +                             "Value" : uint32,
+>> +                             "Unit" : ("Celsius" or "Fahrenheit"),
+>> +                             "Time" : uint64,
+>> +                             "Type" : ("Armpit", "Body", "Ear", "Finger",
+>> +                                     "Intestines", "Mouth", "Rectum", "Toe",
+>> +                                     "Tympanum"),
+>> +                             "Measurement" : ("Final" or "Intermediate"),
+>> +                     }
+>> --
+>> 1.7.5.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
