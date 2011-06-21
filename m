@@ -1,135 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [RFC] Health Thermometer Profile API
-Date: Tue, 21 Jun 2011 15:03:28 +0200
-Message-Id: <1308661408-8364-1-git-send-email-sancane@gmail.com>
+Subject: [PATCH obexd v2] Fix crash introduced by f5279bfcedd669bc5d4e88cc1c59807c92226dfb
+Date: Tue, 21 Jun 2011 13:37:12 +0300
+Message-Id: <1308652632-2028-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/thermometer.txt |  111 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 111 insertions(+), 0 deletions(-)
- create mode 100644 doc/thermometer.txt
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/doc/thermometer.txt b/doc/thermometer.txt
-new file mode 100644
-index 0000000..4635fdf
---- /dev/null
-+++ b/doc/thermometer.txt
-@@ -0,0 +1,111 @@
-+BlueZ D-Bus Thermomether API description
-+****************************************
+The callback function actually needs the bluetooth_service structure not
+obex_service_driver.
+---
+ plugins/bluetooth.c |   25 +++++++++++++------------
+ 1 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
+index fe508f4..b126717 100644
+--- a/plugins/bluetooth.c
++++ b/plugins/bluetooth.c
+@@ -126,21 +126,15 @@ failed:
+ }
+ 
+ static struct bluetooth_service *find_service(
+-					struct obex_service_driver *driver,
+-					uint8_t channel)
++					struct obex_service_driver *driver)
+ {
+ 	GSList *l;
+ 
+ 	for (l = any->services; l; l = l->next) {
+ 		struct bluetooth_service *service = l->data;
+ 
+-		if (driver != NULL && service->driver != driver)
+-			continue;
+-
+-		if (channel != 0 && service->driver->channel != channel)
+-			continue;
+-
+-		return service;
++		if (service->driver == driver)
++			return service;
+ 	}
+ 
+ 	return NULL;
+@@ -158,7 +152,7 @@ static void register_record(struct obex_server *server)
+ 		struct bluetooth_service *service;
+ 		char *xml;
+ 
+-		service = find_service(driver, 0);
++		service = find_service(driver);
+ 		if (service == NULL) {
+ 			service = g_new0(struct bluetooth_service, 1);
+ 			service->driver = driver;
+@@ -459,10 +453,11 @@ static int request_service_authorization(struct bluetooth_service *service,
+ 
+ static void confirm_event(GIOChannel *io, void *user_data)
+ {
+-	struct bluetooth_service *service = user_data;
++	struct bluetooth_service *service;
+ 	GError *err = NULL;
+ 	char address[18];
+ 	uint8_t channel;
++	struct obex_service_driver *driver = user_data;
+ 
+ 	bt_io_get(io, BT_IO_RFCOMM, &err,
+ 			BT_IO_OPT_DEST, address,
+@@ -477,7 +472,13 @@ static void confirm_event(GIOChannel *io, void *user_data)
+ 	info("bluetooth: New connection from: %s, channel %u", address,
+ 			channel);
+ 
+-	if (service->driver->service != OBEX_OPP) {
++	service = find_service(driver);
++	if (service == NULL) {
++		error("bluetooth: Unable to find service");
++		goto drop;
++	}
 +
-+	Santiago Carot-Nemesio <sancane@gmail.com>
-+
-+Health Thermomether Profile hierarchy
-+=====================================
-+
-+Service		org.bluez
-+Interface	org.bluez.Thermometer
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-+
-+
-+Methods		void SetProperty(string name, variant value)
-+
-+			Changes the value of the specified property. Only
-+			read-write properties can be changed. On success
-+			this will emit a PropertyChanged signal.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		dict GetProperties()
-+
-+			Returns all properties for the interface. See the
-+			Properties section for the available properties.
-+
-+		RegisterThermometerWatcher(object agent)
-+
-+			Register a watcher to monitor scanned measures.
-+
-+			The agent registered for the health thermometer
-+			service will be notified about measures scanned.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+
-+		UnregisterThermometerWatcher(object agent)
-+
-+			Unregister a watcher.
-+
-+			Final and intermediate temperatures won't be notified to
-+			the agent any more.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					org.bluez.Error.NotFound
-+
-+		EnableIntermediateMeasures(object agent)
-+
-+			Enable notifications about intermediate measures. Agent
-+			should have registered a watcher for health thermometer
-+			service before to enable this feature.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					org.bluez.Error.NotAllowed
-+
-+		DisableIntermediateMeasures(object agent)
-+
-+			Disable intermediate temperatures. It will disable
-+			intermediate measure notifications in the device when
-+			the last agent disables this feature.
-+
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					org.bluez.Error.NotFound
-+
-+Signals		PropertyChanged(string name, variant value)
-+
-+			This signal indicates a changed value of the given
-+			property.
-+
-+Properties	uint16 Interval (optional) [readwrite]
-+
-+			The Measurement Interval defines the time (in seconds)
-+			between measurements. This interval is not related to
-+			the intermediates measures and must be defined into
-+			a valid range. Setting it to zero meaning that no
-+			periodic measurements will be taken.
-+
-+		uint16 Minimum (optional) [readonly]
-+
-+			Defines the maximum value allowed for the interval
-+			between periodic measurements.
-+
-+		uint16 Maximum (optional) [readonly]
-+
-+			Defines the minimuum value allowed for the interval
-+			between periodic measurements.
-+
-+
-+Health Thermometer Watcher hierarchy
-+====================================
-+Service		unique name
-+Interface	org.bluez.ThermometerWatcher
-+Object path	freely definable
-+
-+Methods		void MeasureReceived(dict measure)
-+
-+			This callback gets called when a measure has been
-+			scanned	in the thermometer. The Value entry corresponds
-+			to IEEE-11073 32-bit FLOAT.The Time entry in the dict
-+			will be only present if the device supports storing of
-+			data. The time value is expressed in seconds since epoch.
-+
-+			Dict is defined as below:
-+			{
-+				"Value" : uint32,
-+				"Unit" : ("Celsius" or "Fahrenheit"),
-+				"Time" : uint64,
-+				"Type" : ("Armpit", "Body", "Ear", "Finger",
-+					"Intestines", "Mouth", "Rectum", "Toe",
-+					"Tympanum"),
-+				"Measurement" : ("Final" or "Intermediate"),
-+			}
++	if (driver->service != OBEX_OPP) {
+ 		if (request_service_authorization(service, io, address) < 0)
+ 			goto drop;
+ 
 -- 
-1.7.5.2
+1.7.5.4
 
