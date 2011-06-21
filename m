@@ -3,30 +3,23 @@ From: "Li, Nami" <nami@qca.qualcomm.com>
 To: "openobex-users@lists.sourceforge.net"
 	<openobex-users@lists.sourceforge.net>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v3 openobex 3/3] Modify code to read entire packet when
- fd transport format is SEQPACKET.
-Date: Tue, 21 Jun 2011 05:22:07 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CFC8E@nasanexd01a.na.qualcomm.com>
-References: <EC94610F2568494D8D9291885C48D3103CFC7A@nasanexd01a.na.qualcomm.com>
-In-Reply-To: <EC94610F2568494D8D9291885C48D3103CFC7A@nasanexd01a.na.qualcomm.com>
+CC: "Liu, Haijun" <haijun@qca.qualcomm.com>,
+	"Fan, Hong" <hongfan@qca.qualcomm.com>
+Subject: [PATCH v3 openobex 3/3] Modify code to read entire packet when fd
+ transport format is SEQPACKET.
+Date: Tue, 21 Jun 2011 05:17:25 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103CFC7A@nasanexd01a.na.qualcomm.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-U29ycnksIHBsZWFzZSBpZ25vcmUgdGhpcyBtYWlsLg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2Ut
-LS0tLQ0KRnJvbTogbGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRv
-OmxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBMaSwg
-TmFtaQ0KU2VudDogMjAxMeW5tDbmnIgyMeaXpSAxMzoxNw0KVG86IG9wZW5vYmV4LXVzZXJzQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldDsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KQ2M6
-IExpdSwgSGFpanVuOyBGYW4sIEhvbmcNClN1YmplY3Q6IFtQQVRDSCB2MyBvcGVub2JleCAzLzNd
-IE1vZGlmeSBjb2RlIHRvIHJlYWQgZW50aXJlIHBhY2tldCB3aGVuIGZkIHRyYW5zcG9ydCBmb3Jt
-YXQgaXMgU0VRUEFDS0VULg0KDQotLS0NCiBsaWIvZmRvYmV4LmMgfCAgICAzICsrKw0KIDEgZmls
-ZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0
-IGEvbGliL2Zkb2JleC5jIGIvbGliL2Zkb2JleC5jIGluZGV4IDdmYTRhMjEuLjQ2YTA3OTYgMTAw
-NjQ0DQotLS0gYS9saWIvZmRvYmV4LmMNCisrKyBiL2xpYi9mZG9iZXguYw0KQEAgLTc5LDYgKzc5
-LDkgQEAgc3RhdGljIGludCBmZG9iZXhfcmVhZChvYmV4X3QgKnNlbGYsIHZvaWQgKmJ1ZiwgaW50
-IGJ1ZmxlbikgIHsNCiAJc3RydWN0IG9iZXhfdHJhbnNwb3J0ICp0cmFucyA9ICZzZWxmLT50cmFu
-czsNCg0KKwlpZih0cmFucy0+ZGF0YS5mZC5mbXQgPT0gRkRPQkVYX01UX1NFUVBBQ0tFVCkNCisJ
-CWJ1ZmxlbiA9IHNlbGYtPm10dV9yeDsNCisNCiAjaWZkZWYgX1dJTjMyDQogCXJldHVybiAgX3Jl
-YWQodHJhbnMtPmZkLCBidWYsIGJ1Zmxlbik7ICAjZWxzZQ0KLS0NCjEuNy4xDQo=
+LS0tDQogbGliL2Zkb2JleC5jIHwgICAgMyArKysNCiAxIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0
+aW9ucygrKSwgMCBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2xpYi9mZG9iZXguYyBiL2xp
+Yi9mZG9iZXguYw0KaW5kZXggN2ZhNGEyMS4uNDZhMDc5NiAxMDA2NDQNCi0tLSBhL2xpYi9mZG9i
+ZXguYw0KKysrIGIvbGliL2Zkb2JleC5jDQpAQCAtNzksNiArNzksOSBAQCBzdGF0aWMgaW50IGZk
+b2JleF9yZWFkKG9iZXhfdCAqc2VsZiwgdm9pZCAqYnVmLCBpbnQgYnVmbGVuKQ0KIHsNCiAJc3Ry
+dWN0IG9iZXhfdHJhbnNwb3J0ICp0cmFucyA9ICZzZWxmLT50cmFuczsNCg0KKwlpZih0cmFucy0+
+ZGF0YS5mZC5mbXQgPT0gRkRPQkVYX01UX1NFUVBBQ0tFVCkNCisJCWJ1ZmxlbiA9IHNlbGYtPm10
+dV9yeDsNCisNCiAjaWZkZWYgX1dJTjMyDQogCXJldHVybiAgX3JlYWQodHJhbnMtPmZkLCBidWYs
+IGJ1Zmxlbik7DQogI2Vsc2UNCi0tDQoxLjcuMQ0K
