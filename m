@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH obexd] Fix crash introduced by
- f5279bfcedd669bc5d4e88cc1c59807c92226dfb
-Date: Tue, 21 Jun 2011 09:37:27 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CFD96@nasanexd01a.na.qualcomm.com>
-References: <1308645454-2724-1-git-send-email-luiz.dentz@gmail.com>
- <1308645454-2724-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1308645454-2724-2-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="gb2312"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<ulrik.lauren@stericsson.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] Fix hid2hci compilation error
+Date: Tue, 21 Jun 2011 11:14:44 +0200
+Message-ID: <1308647684-22612-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51eC1ibHVldG9vdGgt
-b3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIu
-a2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEx1aXogQXVndXN0byB2b24gRGVudHoNClNlbnQ6IDIw
-MTHE6jbUwjIxyNUgMTY6MzgNClRvOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpT
-dWJqZWN0OiBbUEFUQ0ggb2JleGRdIEZpeCBjcmFzaCBpbnRyb2R1Y2VkIGJ5IGY1Mjc5YmZjZWRk
-NjY5YmM1ZDRlODhjYzFjNTk4MDdjOTIyMjZkZmINCg0KRnJvbTogTHVpeiBBdWd1c3RvIHZvbiBE
-ZW50eiA8bHVpei52b24uZGVudHpAaW50ZWwuY29tPg0KDQpUaGUgY2FsbGJhY2sgZnVuY3Rpb24g
-YWN0dWFsbHkgbmVlZHMgdGhlIGJsdWV0b290aF9zZXJ2aWNlIHN0cnVjdHVyZSBub3Qgb2JleF9z
-ZXJ2aWNlX2RyaXZlci4NCi0tLQ0KIHBsdWdpbnMvYmx1ZXRvb3RoLmMgfCAgIDExICsrKysrKysr
-Ky0tDQogMSBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQoN
-CmRpZmYgLS1naXQgYS9wbHVnaW5zL2JsdWV0b290aC5jIGIvcGx1Z2lucy9ibHVldG9vdGguYyBp
-bmRleCBmZTUwOGY0Li4xMDM3YjI0IDEwMDY0NA0KLS0tIGEvcGx1Z2lucy9ibHVldG9vdGguYw0K
-KysrIGIvcGx1Z2lucy9ibHVldG9vdGguYw0KQEAgLTQ1OSwxMCArNDU5LDExIEBAIHN0YXRpYyBp
-bnQgcmVxdWVzdF9zZXJ2aWNlX2F1dGhvcml6YXRpb24oc3RydWN0IGJsdWV0b290aF9zZXJ2aWNl
-ICpzZXJ2aWNlLA0KIA0KIHN0YXRpYyB2b2lkIGNvbmZpcm1fZXZlbnQoR0lPQ2hhbm5lbCAqaW8s
-IHZvaWQgKnVzZXJfZGF0YSkgIHsNCi0Jc3RydWN0IGJsdWV0b290aF9zZXJ2aWNlICpzZXJ2aWNl
-ID0gdXNlcl9kYXRhOw0KKwlzdHJ1Y3QgYmx1ZXRvb3RoX3NlcnZpY2UgKnNlcnZpY2U7DQogCUdF
-cnJvciAqZXJyID0gTlVMTDsNCiAJY2hhciBhZGRyZXNzWzE4XTsNCiAJdWludDhfdCBjaGFubmVs
-Ow0KKwlzdHJ1Y3Qgb2JleF9zZXJ2aWNlX2RyaXZlciAqZHJpdmVyID0gdXNlcl9kYXRhOw0KIA0K
-IAlidF9pb19nZXQoaW8sIEJUX0lPX1JGQ09NTSwgJmVyciwNCiAJCQlCVF9JT19PUFRfREVTVCwg
-YWRkcmVzcywNCkBAIC00NzcsNyArNDc4LDEzIEBAIHN0YXRpYyB2b2lkIGNvbmZpcm1fZXZlbnQo
-R0lPQ2hhbm5lbCAqaW8sIHZvaWQgKnVzZXJfZGF0YSkNCiAJaW5mbygiYmx1ZXRvb3RoOiBOZXcg
-Y29ubmVjdGlvbiBmcm9tOiAlcywgY2hhbm5lbCAldSIsIGFkZHJlc3MsDQogCQkJY2hhbm5lbCk7
-DQogDQotCWlmIChzZXJ2aWNlLT5kcml2ZXItPnNlcnZpY2UgIT0gT0JFWF9PUFApIHsNCisJc2Vy
-dmljZSA9IGZpbmRfc2VydmljZShkcml2ZXIsIDApOw0KDQpXaWxsIGl0IGJlIGJldHRlciB0byB3
-cml0ZSBhcyAic2VydmljZSA9IGZpbmRfc2VydmljZShkcml2ZXIsIGNoYW5uZWwpOyIgPyANCk9y
-IGlmIHlvdSBjaG9vc2Ugbm90IHRvIHVzZSBjaGFubmVsLCBJIHRoaW5rIHlvdSBjb3VsZCBvbWl0
-IGNoYW5uZWwgdmFyaWFibGUgYW5kIG9taXQgYnRfaW9fZ2V0KEJUX0lPX09QVF9DSEFOTkVMLCAm
-Y2hhbm5lbCk7DQoNCisJaWYgKHNlcnZpY2UgPT0gTlVMTCkgew0KKwkJZXJyb3IoImJsdWV0b290
-aDogVW5hYmxlIHRvIGZpbmQgc2VydmljZSIpOw0KKwkJZ290byBkcm9wOw0KKwl9DQorDQorCWlm
-IChkcml2ZXItPnNlcnZpY2UgIT0gT0JFWF9PUFApIHsNCiAJCWlmIChyZXF1ZXN0X3NlcnZpY2Vf
-YXV0aG9yaXphdGlvbihzZXJ2aWNlLCBpbywgYWRkcmVzcykgPCAwKQ0KIAkJCWdvdG8gZHJvcDsN
-CiANCi0tDQoxLjcuNS40DQoNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2Vu
-ZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBh
-IG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZyBNb3JlIG1ham9yZG9tbyBpbmZv
-IGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCg==
+Do not compile hid2hci if udev is not present.
+---
+ acinclude.m4 |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index d77937b..10e648d 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -400,7 +400,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(TOOLS, test "${tools_enable}" = "yes")
+ 	AM_CONDITIONAL(BCCMD, test "${bccmd_enable}" = "yes")
+ 	AM_CONDITIONAL(PCMCIA, test "${pcmcia_enable}" = "yes")
+-	AM_CONDITIONAL(HID2HCI, test "${hid2hci_enable}" = "yes" && test "${usb_found}" = "yes")
++	AM_CONDITIONAL(HID2HCI, test "${hid2hci_enable}" = "yes" && test "${usb_found}" = "yes" && test "${udev_found}" = "yes")
+ 	AM_CONDITIONAL(DFUTOOL, test "${dfutool_enable}" = "yes" && test "${usb_found}" = "yes")
+ 	AM_CONDITIONAL(UDEVRULES, test "${udevrules_enable}" = "yes")
+ 	AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" = "yes")
+-- 
+on behalf of ST-Ericsson
+
