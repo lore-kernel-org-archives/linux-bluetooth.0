@@ -1,27 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Liu, Haijun" <haijun@qca.qualcomm.com>,
-	"Li, Steven" <yongli@qca.qualcomm.com>
-Subject: RE: [PATCH obexd 05/14] Server listen on both RFCOMM and L2CAP
- sockets.
-Date: Tue, 21 Jun 2011 06:25:33 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CFCE6@nasanexd01a.na.qualcomm.com>
-References: <1308563100-18917-1-git-send-email-nami.li@atheros.com>
-	<1308563100-18917-5-git-send-email-nami.li@atheros.com>
- <BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
-In-Reply-To: <BANLkTikwMNxUsv9XeiVnAGJS_2_f-2ugnw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+From: Nami <nami.li@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+Date: Tue, 21 Jun 2011 11:35:42 +0800
+Message-ID: <1308627344-8757-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Nami <nami.li@atheros.com>, openobex-users@lists.sourceforge.net,
+	haijun@qca.qualcomm.com, hongfan@qca.qualcomm.com
+Subject: [openobex-users] [PATCH v2 openobex 1/3] Add transport format
+	member in fdobex_data struct.
+Reply-To: openobex-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=openobex-users>
+List-Post: <mailto:openobex-users@lists.sourceforge.net>
+List-Help: <mailto:openobex-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: openobex-users-bounces@lists.sourceforge.net
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIEx1aXoNCiAgVGhhbmtzIGZvciB5b3VyIHJlcGx5LiBJIHVuZGVyc3RhbmQgYW5kIGFncmVl
-IHdpdGggeW91ciBvcGluaW9uLiBUaGUgInN0YXJ0X2wyY2FwIiBhbmQgImwyY2FwX2NvbmZpcm1f
-ZXZlbnQiIGZ1bmN0aW9ucyB3ZXJlIHdyaXR0ZW4gYWNjb3JkaW5nIHRvICJzdGFydCIgYW5kICJj
-b25maXJtX2V2ZW50Ii4gDQpJIGp1c3Qga2VlcCB0aGUgcGFyYW1ldGVycyBwYXNzZWQgc2FtZSB3
-aXRoICJzdGFydCIgYW5kICJjb25maXJtX2V2ZW50IiBmdW5jdGlvbnMuIEkgZmluZCB0aGF0ICJ1
-c2VyX2RhdGEiIHBhc3NlZCBieSAic3RhcnQiIGlzIGFsc28gbm90IHVzZWQgaW4gImNvbmZpcm1f
-ZXZlbnQiLg0KSSB0aGluayBrZWVwIHNhbWUgcGFyYW1ldGVycyBpcyBtb3JlIHVuaWZpZWQgb24g
-dGhlIHN0cnVjdHVyZS4NCldoYXQgZG8geW91IHRoaW5rID8NCg0KVGhhbmtzLg0KTmFtaQ0K
+---
+ include/openobex/obex_const.h |    5 +++++
+ lib/fdobex.c                  |    1 +
+ lib/fdobex.h                  |    1 +
+ 3 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
+index cb7afeb..700bacb 100644
+--- a/include/openobex/obex_const.h
++++ b/include/openobex/obex_const.h
+@@ -302,6 +302,11 @@ enum obex_rsp_mode {
+   OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+ };
+
++enum fdobex_transport_format {
++  FDOBEX_MT_STREAM    = 0, /**< stream transport format */
++  FDOBEX_MT_SEQPACKET = 1, /**< seqpacket transport format */
++};
++
+ /* Min, Max and default transport MTU */
+ #define OBEX_DEFAULT_MTU	1024
+ #define OBEX_MINIMUM_MTU	255
+diff --git a/lib/fdobex.c b/lib/fdobex.c
+index 45c56ff..7fa4a21 100644
+--- a/lib/fdobex.c
++++ b/lib/fdobex.c
+@@ -14,6 +14,7 @@
+ static int fdobex_init(obex_t *self)
+ {
+ 	self->trans.data.fd.writefd = INVALID_SOCKET;
++	self->trans.data.fd.fmt = FDOBEX_MT_STREAM;
+
+ 	return 0;
+ }
+diff --git a/lib/fdobex.h b/lib/fdobex.h
+index 07e33ab..01741c8 100644
+--- a/lib/fdobex.h
++++ b/lib/fdobex.h
+@@ -6,5 +6,6 @@ void fdobex_get_ops(struct obex_transport_ops* ops);
+
+ struct fdobex_data {
+ 	socket_t writefd; /* write descriptor */
++	enum fdobex_transport_format fmt;  /* transport format */
+ };
+ #endif
+--
+1.7.1
+
+
+------------------------------------------------------------------------------
+EditLive Enterprise is the world's most technically advanced content
+authoring tool. Experience the power of Track Changes, Inline Image
+Editing and ensure content is compliant with Accessibility Checking.
+http://p.sf.net/sfu/ephox-dev2dev
+_______________________________________________
+Openobex-users mailing list
+Openobex-users@lists.sourceforge.net
+http://lists.sourceforge.net/lists/listinfo/openobex-users
