@@ -1,75 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Health Thermometer Profile API
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
-Date: Tue, 21 Jun 2011 15:06:25 -0300
+Date: Tue, 21 Jun 2011 15:01:20 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Antti Julku <antti.julku@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
-To: Santiago Carot <sancane@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+Message-ID: <20110621180120.GB2628@joana>
+References: <1308303828-1982-1-git-send-email-antti.julku@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1308303828-1982-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jun 21, 2011, at 12:56 PM, Santiago Carot wrote:
+Hi Antti,
 
-(cut) 
+* Antti Julku <antti.julku@nokia.com> [2011-06-17 12:43:48 +0300]:
 
->> 
->> Another option would be to guarantee that MeasureReceived() is called
->> right after agent registering, in order to give the client an
->> initial value to show (having in mind that notification interval might
->> be very long).
+> Add command to management interface for enabling/disabling the
+> fast connectable mode.
 > 
-> I would prefer to use the Final and Intermediate properties too. The
-> problem that we should address occurs when an application wich hasn't
-> got a watcher registered sets Intermediate or Final measurement
-> property and the last watcher is removed. I think that the best option
-> may be turn off measurments for power safe due that no watcher will
-> get the measures.
+> Signed-off-by: Antti Julku <antti.julku@nokia.com>
+> ---
+>  include/net/bluetooth/hci.h  |   10 +++++++
+>  include/net/bluetooth/mgmt.h |    5 +++
+>  net/bluetooth/mgmt.c         |   62 ++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 77 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 65345cd..d7b9600 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+>  
+> +#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
+> +struct hci_cp_write_page_scan_activity {
+> +	__le16   interval;
+> +	__le16   window;
+> +} __packed;
+> +
+> +#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
+> +	#define PAGE_SCAN_TYPE_STANDARD		0x00
+> +	#define PAGE_SCAN_TYPE_INTERLACED	0x01
+> +
+>  #define HCI_OP_LE_SET_EVENT_MASK	0x2001
+>  struct hci_cp_le_set_event_mask {
+>  	__u8     mask[8];
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 45bea25..7196d04 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+>  
+> +#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
+> +struct mgmt_cp_set_fast_connectable {
+> +	__u8 enable;
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE		0x0001
+>  struct mgmt_ev_cmd_complete {
+>  	__le16 opcode;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 64c0418..b4bed16 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1730,6 +1730,64 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+>  	return err;
+>  }
+>  
+> +static int set_fast_connectable(struct sock *sk, u16 index,
+> +					unsigned char *data, u16 len)
+> +{
+> +	struct hci_dev *hdev;
+> +	struct mgmt_cp_set_fast_connectable *cp;
 
-I'm not sure I follow. Enabling intermediate and/or final notifications
-is done per-agent basis; if any of active agents needs intermediate
-measurements, device is configured to send them. Disabling it on one
-agent should not hurt another.
+set cp = data here.
 
-> 
-> We can change the API to do that. What do you think?
-> 
-> 
->> 
->>> +
->>> +
->>> +Health Thermometer Watcher hierarchy
->>> +====================================
->>> +Service              unique name
->>> +Interface    org.bluez.ThermometerWatcher
->>> +Object path  freely definable
->>> +
->>> +Methods              void MeasureReceived(dict measure)
->>> +
->>> +                     This callback gets called when a measure has been
->>> +                     scanned in the thermometer. The Value entry corresponds
->>> +                     to IEEE-11073 32-bit FLOAT.The Time entry in the dict
->>> +                     will be only present if the device supports storing of
->>> +                     data. The time value is expressed in seconds since epoch.
->> 
->> Using such a special type (FLOAT) looks funny. Not sure whether it is the best option
->> for this API.
->> 
->> At the very least, a description of FLOAT type should be added to the API, since
->> IEEE 11073 specs are not public/free, and API users would have to resort to unofficial
->> source to learn it.
->> 
->> I understand why you used this type (keeps the thermometer transcodable through this
->> API and there are the special values), so BTW the lack of device information service
->> access through this API should at least be mentioned, so we ammend that later (either
->> here or adding another API).
-> 
-> ...or we can split the value in their exponent and mantissa
-> components. Any suggestion?
+> +	struct hci_cp_write_page_scan_activity acp;
+> +	u8 type;
+> +	int err;
+> +
+> +	BT_DBG("hci%u", index);
+> +
+> +	cp = (void *) data;
+> +
+> +	if (len != sizeof(*cp))
+> +		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
+> +								EINVAL);
+> +
+> +	hdev = hci_dev_get(index);
+> +	if (!hdev)
+> +		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
+> +								ENODEV);
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	if (cp->enable) {
+> +		type = PAGE_SCAN_TYPE_INTERLACED;
+> +		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
+> +	} else {
+> +		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
+> +		acp.interval = 0x0800;	/* default 1.28 sec page scan */
+> +	}
+> +
+> +	acp.window = 0x0012;	/* default 11.25 msec page scan window */
+> +
+> +	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
+> +						sizeof(acp), &acp);
+> +	if (err < 0) {
+> +		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
+> +								-err);
+> +		goto failed;
+> +	}
+> +
+> +	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+> +	if (err < 0) {
+> +		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
+> +								-err);
+> +		goto failed;
+> +	}
+> +
+> +	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
+> +							NULL, 0);
+> +failed:
 
-I'd go for that, but we need to take a look on special values to see if it makes sense.
-It would be really ugly to say something like "if mantissa=5 and exponent=-3 then
-temperature is actually zero" :)
+Call this "done" as the normal code path ends here as well.
+
+	Gustavo
