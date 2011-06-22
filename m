@@ -1,138 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti Julku <antti.julku@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
-Date: Wed, 22 Jun 2011 13:11:56 +0300
-Message-Id: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTik0xGCny7z3U_7duqjAV5vLn9_GuA@mail.gmail.com>
+References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
+	<BANLkTik0xGCny7z3U_7duqjAV5vLn9_GuA@mail.gmail.com>
+Date: Wed, 22 Jun 2011 10:35:49 +0300
+Message-ID: <BANLkTinWKwXQFxOwKBYn-tTVDXwd12O=kw@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 00/11] Support user defined headers in gwobex
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Adamek <adamek.kuba@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add command to management interface for enabling/disabling the
-fast connectable mode.
+Hi,
 
-Signed-off-by: Antti Julku <antti.julku@nokia.com>
----
- include/net/bluetooth/hci.h  |   10 +++++++
- include/net/bluetooth/mgmt.h |    5 +++
- net/bluetooth/mgmt.c         |   60 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 75 insertions(+), 0 deletions(-)
+On Wed, Jun 22, 2011 at 10:33 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Wed, Jun 22, 2011 at 1:24 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
+>> Hi,
+>>
+>> these patches will enable sending and receiving of user defined headers
+>> in gwobex.
+>>
+>> Two new functions will enable to start an asynchronous get or put
+>> transfer, taking as an argument a list of structures describing
+>> the headers to be sent. The headers are sent out in the order
+>> of appearance on the list.
+>>
+>> Likewise all response headers that would have been previously ignored
+>> by gwobex are now inserted to a list in the current gw_obex_xfer
+>> object, and so can be retrieved later after the asynchrous transfer
+>> has finished.
+>>
+>> Additionally, the order of sending headers in gwobex is changed
+>> to the one mandated by BIP, i.e.:
+>> Connection ID->Type->Name->Application Parameters->User Defined Headers.
+>>
+>> This series incorporates Luiz's changes.
+>>
+>> Jakub Adamek (11):
+>>  Add a_header struct for additional header data
+>>  Add list to store received headers
+>>  Add function to create fresh a_header
+>>  Store received headers in gw_obex_xfer object
+>>  Add functions to get, put w. a_header list
+>>  Parse headers in a PUT response packet
+>>  Add functions for async requests w a_header list
+>>  Reorder headers to conform to BIP's requirements
+>>  Handle partial content response from server
+>>  Convenience method to make deep copy of a_header
+>>  Add func for fetching header by id from list
+>>
+>>  gwobex/gw-obex.h   |   39 +++++++++++++++
+>>  gwobex/obex-priv.c |  135 +++++++++++++++++++++++++++++++++++----------------
+>>  gwobex/obex-priv.h |   29 +++++++++++
+>>  gwobex/obex-xfer.c |   97 +++++++++++++++++++++++++++++++++++++
+>>  gwobex/obex-xfer.h |   18 +++++++
+>>  5 files changed, 275 insertions(+), 43 deletions(-)
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> I didn't spot more problems with code itself, but you should fix the
+> function parameter alignment, try to make them similar to what have
+> been used in code e.g.:
+>
+> gboolean gw_obex_put_buf_with_apparam(GwObex *ctx, const gchar
+> *remote, const gchar *type,
+>                                                             const
+> guint8 *apparam, gint apparam_size,
+>                                                             const
+> gchar *buf, gint buf_size, gint time, gint *error);
+>
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 65345cd..d7b9600 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
-+struct hci_cp_write_page_scan_activity {
-+	__le16   interval;
-+	__le16   window;
-+} __packed;
-+
-+#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
-+
- #define HCI_OP_LE_SET_EVENT_MASK	0x2001
- struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 45bea25..7196d04 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
-+struct mgmt_cp_set_fast_connectable {
-+	__u8 enable;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 64c0418..a472a60 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1730,6 +1730,62 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 	return err;
- }
- 
-+static int set_fast_connectable(struct sock *sk, u16 index,
-+					unsigned char *data, u16 len)
-+{
-+	struct hci_dev *hdev;
-+	struct mgmt_cp_set_fast_connectable *cp = (void *) data;
-+	struct hci_cp_write_page_scan_activity acp;
-+	u8 type;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								EINVAL);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								ENODEV);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (cp->enable) {
-+		type = PAGE_SCAN_TYPE_INTERLACED;
-+		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
-+	} else {
-+		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-+		acp.interval = 0x0800;	/* default 1.28 sec page scan */
-+	}
-+
-+	acp.window = 0x0012;	/* default 11.25 msec page scan window */
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
-+						sizeof(acp), &acp);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto done;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto done;
-+	}
-+
-+	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+							NULL, 0);
-+done:
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1850,6 +1906,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_UNBLOCK_DEVICE:
- 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
- 		break;
-+	case MGMT_OP_SET_FAST_CONNECTABLE:
-+		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-+								len);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
+Obviously copy-past screw the alignment, but if you look at the code
+you gonna see how the alignment should be.
+
+
+
 -- 
-1.7.2.5
-
+Luiz Augusto von Dentz
