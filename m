@@ -1,91 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: =?gb2312?B?UGlvdHIgWmeornJlY2tp?= <pzgorecki@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Liu, Haijun" <haijun@qca.qualcomm.com>,
+	"Fan, Hong" <hongfan@qca.qualcomm.com>
+Subject: RE: SRM support in OBEX
+Date: Wed, 22 Jun 2011 03:55:07 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103CFE7E@nasanexd01a.na.qualcomm.com>
+References: <BANLkTi=T4dqgKW_7WA9BT7EQ9UY4mRZ7JA@mail.gmail.com>
+In-Reply-To: <BANLkTi=T4dqgKW_7WA9BT7EQ9UY4mRZ7JA@mail.gmail.com>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-In-Reply-To: <1308695065-3784-4-git-send-email-adamek.kuba@gmail.com>
-References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
-	<1308695065-3784-4-git-send-email-adamek.kuba@gmail.com>
-Date: Wed, 22 Jun 2011 10:05:46 +0300
-Message-ID: <BANLkTimaKzGiy8tOHUKws3R0hbuVmSwRbg@mail.gmail.com>
-Subject: Re: [PATCH obexd v2 03/11] Add function to create fresh a_header
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Adamek <adamek.kuba@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
-
-On Wed, Jun 22, 2011 at 1:24 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
-> ---
->  gwobex/obex-xfer.c |   25 +++++++++++++++++++++++++
->  gwobex/obex-xfer.h |    3 +++
->  2 files changed, 28 insertions(+), 0 deletions(-)
->
-> diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
-> index 1430f10..55ea842 100644
-> --- a/gwobex/obex-xfer.c
-> +++ b/gwobex/obex-xfer.c
-> @@ -422,6 +422,31 @@ out:
->     return ret;
->  }
->
-> +struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
-> +        unsigned int hlen) {
-
-Align this to right until you cross the parentesis or reaches the 80
-columns limit, iirc the gwobex uses a different code style but I guess
-this is also valid here.
-
-> +    struct a_header *ah = g_new0(struct a_header, 1);
-> +    ah->hi = hi;
-> +    ah->hv_size = hlen;
-> +    switch (hi & OBEX_HDR_TYPE_MASK) {
-> +        case OBEX_HDR_TYPE_UINT8:
-> +        case OBEX_HDR_TYPE_UINT32:
-> +            ah->hv = hv;
-> +            break;
-> +        case OBEX_HDR_TYPE_BYTES:
-> +        case OBEX_HDR_TYPE_UNICODE:
-> +            ah->hv.bs = g_try_malloc(hlen);
-> +            if (ah->hv.bs != NULL)
-> +                memcpy((void *) ah->hv.bs, hv.bs, hlen);
-> +            else if (hlen > 0) {
-> +                g_free(ah);
-> +                return NULL;
-> +            }
-> +            ah->hv_size = hlen;
-> +        break;
-> +    }
-> +    return ah;
-> +}
-> +
->  void a_header_free(struct a_header *ah) {
->     switch (ah->hi & OBEX_HDR_TYPE_MASK) {
->         case OBEX_HDR_TYPE_BYTES:
-> diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
-> index b1e2ff0..7c59827 100644
-> --- a/gwobex/obex-xfer.h
-> +++ b/gwobex/obex-xfer.h
-> @@ -93,6 +93,9 @@ struct a_header {
->
->  void a_header_free(struct a_header *ah);
->
-> +struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
-> +                                             unsigned int hlen);
-> +
->  struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
->
->  void _gw_obex_xfer_free(struct gw_obex_xfer *xfer);
-> --
-> 1.7.0.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
-
--- 
-Luiz Augusto von Dentz
+SGksIFBpb3RyDQogIEkgd29ya2VkIG9uIFNSTSBzZXZlcmFsIHdlZWtzIGFnbyBidXQgZmluYWxs
+eSBzdG9wcGVkLg0KICBJdGBzIGVhc3kgdG8gc2V0IGFuZCBjaGVjayBTUk0gaGVhZGVyLCBhcyB3
+ZWxsIGFzIHNldCB0aGUgcmVzcG9uc2UgbW9kZSB0byBPQkVYX1JTUF9NT0RFX1NJTkdMRS4gQW5k
+IGl0IGlzIGFscmVhZHkgd2VsbCBzdXBwb3J0ZWQgaW4gb2JleF93b3JrIGZ1bmN0aW9uIHdoZW4g
+dGhlIHJlc3BvbnNlIG1vZGUgaXMgU1JNLCBjbGllbnQgYW5kIHNlcnZlciBjYW4gY29udGludWUg
+c2VuZCBkYXRhIHdpdGhvdXQgcmVtb3RlIHNpZGUgcmVzcG9uc2Ugb3IgcmVxdWVzdC4gVGhlIG9i
+ZXhfd29yayBjYWxsYmFjayByZWxhdGlvbnNoaXAgaXM6DQpvYmV4X3Nlc3Npb25fc3RhcnQoKQ0K
+CQkJCQkuLi4NCgkJCWdfaW9fYWRkX3dhdGNoX2Z1bGwoaW8sIEdfUFJJT1JJVFlfREVGQVVMVCwJ
+R19JT19JTiB8IEdfSU9fSFVQIHwgR19JT19FUlIgfCBHX0lPX05WQUwsCW9iZXhfaGFuZGxlX2lu
+cHV0LCBvYmV4LCBvYmV4X2hhbmRsZV9kZXN0cm95KTsNCgkJCQkJLi4uDQpvYmV4X2hhbmRsZV9p
+bnB1dCgpDQoJCQkJCS4uLg0KCQkJT0JFWF9IYW5kbGVJbnB1dChvYmV4LCAxKQ0KCQkJCQkuLi4N
+Ck9CRVhfSGFuZGxlSW5wdXQoKQ0KCQkJCQkuLi4NCgkJCW9iZXhfd29yayhzZWxmLCB0aW1lb3V0
+KTsNCg0KVGhlIHByb2JsZW0gaW4gU1JNIGlzOg0KSWYgcmVtb3RlIHNpZGUgZG9lc25gdCBzZW5k
+IGFueSBkYXRhIHRvIGxvY2FsIHNpZGUsIHRoZW4gdGhlIEdfSU9fSU4gY29uZGl0aW9uIGNvdWxk
+bmB0IGJlIHNldC4gU28gaG93IG9iZXhfd29yayBjYW4gYmUgY2FsbGVkPw0KDQpJIGhhdmVuYHQg
+Zm91bmQgYW55IGdvb2Qgc29sdXRpb24gZm9yIHRoaXMgaXNzdWUuIFNvIGlmIHlvdSBjYW4gc3Bl
+bmQgc29tZSB0aW1lIG9uIFNSTSwgSWBsbCBiZSB2ZXJ5IGhhcHB5OikNCg0KDQpCZXN0IHdpc2hl
+cy4NCk5hbWkNCg0KDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4
+LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
+b3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgUGlvdHIgWmeornJlY2tpDQpTZW50
+OiAyMDExxOo21MIyMcjVIDIxOjQ0DQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
+Zw0KU3ViamVjdDogU1JNIHN1cHBvcnQgaW4gT0JFWA0KDQpIaSwNCg0KSXMgYW55Ym9keSB3b3Jr
+aW5nIG9uIFNSTSBzdXBwb3J0IGluIG9iZXhkID8gSSBtaWdodCBiZSBhYmxlIHRvIHNwZW5kIHNv
+bWUgdGltZSBvbiB0aGlzIGJ1dCB3b3VsZCBsaWtlIHRvIGF2b2lkIGR1cGxpY2F0aW9uIG9mIGVm
+Zm9ydCBpZiBpdCdzIGluIHRoZSBwaXBlbGluZS4NCg0KQ2hlZXJzLA0KUGlvdHINCi0tDQpUbyB1
+bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGlu
+dXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIu
+a2VybmVsLm9yZyBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3Jn
+L21ham9yZG9tby1pbmZvLmh0bWwNCg==
