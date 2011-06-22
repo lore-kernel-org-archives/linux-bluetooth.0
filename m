@@ -1,129 +1,465 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Health Thermometer Profile API
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
-Date: Wed, 22 Jun 2011 09:46:07 -0300
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com> <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com> <BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
-To: Santiago Carot <sancane@gmail.com>
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [PATCH 3/3] Add adaptername plugin
+Date: Wed, 22 Jun 2011 12:29:58 +0100
+Message-Id: <1308742198-6024-3-git-send-email-hadess@hadess.net>
+In-Reply-To: <1308742198-6024-1-git-send-email-hadess@hadess.net>
+References: <1308742198-6024-1-git-send-email-hadess@hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jun 22, 2011, at 7:20 AM, Santiago Carot wrote:
+Replacing the name setting code in src/adapter.c.
 
-> Hi,
-> 
-> 2011/6/21 Elvis Pfutzenreuter <epx@signove.com>:
->> On Jun 21, 2011, at 12:56 PM, Santiago Carot wrote:
->> 
->> (cut)
->> 
->>>> 
->>>> Another option would be to guarantee that MeasureReceived() is called
->>>> right after agent registering, in order to give the client an
->>>> initial value to show (having in mind that notification interval might
->>>> be very long).
->>> 
->>> I would prefer to use the Final and Intermediate properties too. The
->>> problem that we should address occurs when an application wich hasn't
->>> got a watcher registered sets Intermediate or Final measurement
->>> property and the last watcher is removed. I think that the best option
->>> may be turn off measurments for power safe due that no watcher will
->>> get the measures.
->> 
->> I'm not sure I follow. Enabling intermediate and/or final notifications
->> is done per-agent basis; if any of active agents needs intermediate
->> measurements, device is configured to send them. Disabling it on one
->> agent should not hurt another.
->> 
-> 
-> I mean the case when a process (it is not neccesary it has to be an
-> agent) is enabling intermediate and/or final notifications through
-> setProperty method in D-Bus API. Please, note that any process can do
-> this in current API because no extra control is done for this
-> operation.
-> 
-> May be I'm misundertanding what you want to said with per-agent basis
-> but as far as I see the only way to manage enabling/disabling
-> properties in this way is by adding a new parameter in setProperty
-> method with the agent path and checkicng if it is already registered
-> before enabling or disabling intermediate and final notifications. IMO
-> If we do this we would break the BlueZ APIs where no extra parameters
-> are required in such methods. I'm not sure if this would be a problem
-> but I don't feel comfortable with this solution.
-> 
-> On the other hands, if we discard adding the agent parameter in that
-> method (which I think that it fits better in BlueZ API), we can ignore
-> the case when there aren't any agents registered for the thermometer
-> service and a process enables some of this properties. In this case it
-> wouldn't be necessary to activate these properties since no one will
-> receive notifications for the measures.
+Moving the adapter naming allows us to use the /etc/machine-info [1]
+pretty hostname, as implemented by hostnamed [2] in systemd.
 
-True, I did not remember that those were properties. They would have
-to go, otherwise it is too easy for an app to "break" another, by
-disabling notifications.
+If /etc/machine-info is not present, the adapter name stored
+on disk in /var/lib/bluetooth will be used. If no adapter name
+has been set yet, the default from the main.conf will be used.
 
-A pair of Enable/DisableIntermediate methods taking an agent as
-parameter would be more adequate.
+We don't currently number the name of hci0 if a pretty name is
+available, but we should instead number it if it happens not
+to be the default adapter. As we cannot be told when the default
+adapter changes, we'll behave this way for now.
 
-IMHO there would not be a need of such
-methods for final measure, because the final measurement (which is
-the only one guaranteed to be precise) is the final objective, there
-is no point in registering an agent and not wanting a final measurement.
+Note that when an adapter name is set automatically from
+the pretty hostname, changing it through the D-Bus interface
+will fail.
 
-So, inside the driver, final measurement indications are enabled if there
-is at least one agent; and intermediate notifications are enabled if at
-least one agent has requested it.
+[1]: http://0pointer.de/public/systemd-man/machine-info.html
+[2]: http://www.freedesktop.org/wiki/Software/systemd/hostnamed
+---
+ Makefile.am           |    3 +
+ configure.ac          |    4 +
+ plugins/adaptername.c |  303 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.c         |   66 -----------
+ 4 files changed, 310 insertions(+), 66 deletions(-)
+ create mode 100644 plugins/adaptername.c
 
-> 
->>> 
->>> We can change the API to do that. What do you think?
->>> 
->>> 
->>>> 
->>>>> +
->>>>> +
->>>>> +Health Thermometer Watcher hierarchy
->>>>> +====================================
->>>>> +Service              unique name
->>>>> +Interface    org.bluez.ThermometerWatcher
->>>>> +Object path  freely definable
->>>>> +
->>>>> +Methods              void MeasureReceived(dict measure)
->>>>> +
->>>>> +                     This callback gets called when a measure has been
->>>>> +                     scanned in the thermometer. The Value entry corresponds
->>>>> +                     to IEEE-11073 32-bit FLOAT.The Time entry in the dict
->>>>> +                     will be only present if the device supports storing of
->>>>> +                     data. The time value is expressed in seconds since epoch.
->>>> 
->>>> Using such a special type (FLOAT) looks funny. Not sure whether it is the best option
->>>> for this API.
->>>> 
->>>> At the very least, a description of FLOAT type should be added to the API, since
->>>> IEEE 11073 specs are not public/free, and API users would have to resort to unofficial
->>>> source to learn it.
->>>> 
->>>> I understand why you used this type (keeps the thermometer transcodable through this
->>>> API and there are the special values), so BTW the lack of device information service
->>>> access through this API should at least be mentioned, so we ammend that later (either
->>>> here or adding another API).
->>> 
->>> ...or we can split the value in their exponent and mantissa
->>> components. Any suggestion?
->> 
->> I'd go for that, but we need to take a look on special values to see if it makes sense.
->> It would be really ugly to say something like "if mantissa=5 and exponent=-3 then
->> temperature is actually zero" :)
-> 
-> We could provide special values in the API so that end users can know
-> when they are treating with those special cases. As far as I remember
-> the only special cases are NaN, NRes, +INIFINITY, - INFINITY and RFU.
-> Do you see anything else?
+diff --git a/Makefile.am b/Makefile.am
+index c2a6976..ba9a89d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -218,6 +218,9 @@ EXTRA_DIST += plugins/hal.c plugins/formfactor.c
+ builtin_modules += storage
+ builtin_sources += plugins/storage.c
+ 
++builtin_modules += adaptername
++builtin_sources += plugins/adaptername.c
++
+ if MAEMO6PLUGIN
+ builtin_modules += maemo6
+ builtin_sources += plugins/maemo6.c
+diff --git a/configure.ac b/configure.ac
+index 07b9e55..084ece5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,6 +35,10 @@ AC_FUNC_PPOLL
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+ 
++AC_CHECK_HEADER([sys/inotify.h],
++		[AC_DEFINE([HAVE_SYS_INOTIFY_H], 1,
++			   [Define to 1 if you have <sys/inotify.h>.])],
++			   [AC_MSG_ERROR(inotify headers are required and missing)])
+ AC_PATH_DBUS
+ AC_PATH_GLIB
+ AC_PATH_ALSA
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+new file mode 100644
+index 0000000..d7eef57
+--- /dev/null
++++ b/plugins/adaptername.c
+@@ -0,0 +1,303 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++#include <unistd.h>
++#include <errno.h>
++
++#include <glib.h>
++#include <bluetooth/bluetooth.h>
++
++#include "plugin.h"
++#include "hcid.h" /* For main_opts */
++#include "adapter.h"
++#include "manager.h"
++#include "device.h" /* Needed for storage.h */
++#include "storage.h"
++#include "log.h"
++
++#include <sys/inotify.h>
++#define EVENT_SIZE  (sizeof (struct inotify_event))
++#define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
++
++#define MACHINE_INFO_DIR "/etc/"
++#define MACHINE_INFO_FILE "machine-info"
++
++static GIOChannel *inotify = NULL;
++static int watch_fd = -1;
++
++/* This file is part of systemd's hostnamed functionality:
++ * http://0pointer.de/public/systemd-man/machine-info.html
++ * http://www.freedesktop.org/wiki/Software/systemd/hostnamed
++ */
++static char *read_pretty_host_name(void)
++{
++	char *contents, *ret;
++	char **lines;
++	guint i;
++
++	if (g_file_get_contents(MACHINE_INFO_DIR MACHINE_INFO_FILE,
++			&contents, NULL, NULL) == FALSE) {
++		return NULL;
++	}
++	lines = g_strsplit_set(contents, "\r\n", 0);
++	g_free(contents);
++
++	if (lines == NULL)
++		return NULL;
++
++	ret = NULL;
++	for (i = 0; lines[i] != NULL; i++) {
++		if (g_str_has_prefix(lines[i], "PRETTY_HOSTNAME=")) {
++			ret = g_strdup(lines[i] + strlen("PRETTY_HOSTNAME="));
++			break;
++		}
++	}
++
++	g_strfreev(lines);
++
++	return ret;
++}
++
++/*
++ * Device name expansion
++ *   %d - device id
++ *   %h - hostname
++ */
++static char *expand_name(char *dst, int size, char *str, int dev_id)
++{
++	register int sp, np, olen;
++	char *opt, buf[10];
++
++	if (!str || !dst)
++		return NULL;
++
++	sp = np = 0;
++	while (np < size - 1 && str[sp]) {
++		switch (str[sp]) {
++		case '%':
++			opt = NULL;
++
++			switch (str[sp+1]) {
++			case 'd':
++				sprintf(buf, "%d", dev_id);
++				opt = buf;
++				break;
++
++			case 'h':
++				opt = main_opts.host_name;
++				break;
++
++			case '%':
++				dst[np++] = str[sp++];
++				/* fall through */
++			default:
++				sp++;
++				continue;
++			}
++
++			if (opt) {
++				/* substitute */
++				olen = strlen(opt);
++				if (np + olen < size - 1)
++					memcpy(dst + np, opt, olen);
++				np += olen;
++			}
++			sp += 2;
++			continue;
++
++		case '\\':
++			sp++;
++			/* fall through */
++		default:
++			dst[np++] = str[sp++];
++			break;
++		}
++	}
++	dst[np] = '\0';
++	return dst;
++}
++
++static int
++get_default_adapter_id(void)
++{
++	struct btd_adapter *default_adapter;
++	default_adapter = manager_get_default_adapter();
++	if (default_adapter == NULL)
++		return -1;
++	return adapter_get_dev_id(default_adapter);
++}
++
++static int adaptername_probe(struct btd_adapter *adapter)
++{
++	int current_id;
++	char name[MAX_NAME_LENGTH + 1];
++	char *pretty_hostname;
++	bdaddr_t bdaddr;
++
++	current_id = adapter_get_dev_id(adapter);
++
++	pretty_hostname = read_pretty_host_name();
++	if (pretty_hostname != NULL) {
++		int default_adapter;
++
++		default_adapter = get_default_adapter_id();
++
++		/* Allow us to change the name */
++		adapter_set_allow_name_changes(adapter, TRUE);
++
++		/* If it's the first device, let's assume it will
++		 * be the default one, as we're not told when
++		 * the default adapter changes */
++		if (default_adapter < 0)
++			default_adapter = current_id;
++
++		if (default_adapter != current_id) {
++			char *str;
++
++			/* +1 because we don't want an adapter called "Foobar's laptop #0" */
++			str = g_strdup_printf("%s #%d", pretty_hostname, current_id + 1);
++			DBG("Setting name '%s' for device 'hci%d'", str, current_id);
++
++			adapter_update_local_name(adapter, str);
++			g_free(str);
++		} else {
++			DBG("Setting name '%s' for device 'hci%d'", pretty_hostname, current_id);
++			adapter_update_local_name(adapter, pretty_hostname);
++		}
++		g_free(pretty_hostname);
++
++		/* And disable the name change now */
++		adapter_set_allow_name_changes(adapter, FALSE);
++
++		return 0;
++	}
++
++	adapter_set_allow_name_changes(adapter, TRUE);
++	adapter_get_address(adapter, &bdaddr);
++
++	if (read_local_name(&bdaddr, name) < 0)
++		expand_name(name, MAX_NAME_LENGTH, main_opts.name,
++							current_id);
++	DBG("Setting name '%s' for device 'hci%d'", name, current_id);
++	adapter_update_local_name(adapter, name);
++
++	return 0;
++}
++
++static gboolean handle_inotify_cb(GIOChannel *channel,
++		GIOCondition condition, gpointer data)
++{
++	char buf[EVENT_BUF_LEN];
++	GIOStatus err;
++	gsize len, i;
++	gboolean changed;
++
++	changed = FALSE;
++
++	err = g_io_channel_read_chars(channel, buf, EVENT_BUF_LEN, &len, NULL);
++	if (err != G_IO_STATUS_NORMAL) {
++		error("Error reading inotify event: %d\n", err);
++		return FALSE;
++	}
++
++	i = 0;
++	while (i < len) {
++		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
++
++		/* check that it's ours */
++		if (pevent->len &&
++		    pevent->name != NULL &&
++		    strcmp(pevent->name, MACHINE_INFO_FILE) == 0) {
++			changed = TRUE;
++		}
++		i += EVENT_SIZE + pevent->len;
++	}
++
++	if (changed != FALSE) {
++		DBG(MACHINE_INFO_DIR MACHINE_INFO_FILE
++				" changed, changing names for adapters");
++		manager_foreach_adapter((adapter_cb) adaptername_probe, NULL);
++	}
++
++	return TRUE;
++}
++
++static void adaptername_remove(struct btd_adapter *adapter)
++{
++	if (watch_fd >= 0)
++		close(watch_fd);
++	if (inotify != NULL)
++		g_io_channel_shutdown(inotify, FALSE, NULL);
++}
++
++static struct btd_adapter_driver adaptername_driver = {
++	.name	= "adaptername",
++	.probe	= adaptername_probe,
++	.remove	= adaptername_remove,
++};
++
++static int adaptername_init(void)
++{
++	int ret;
++	int inot_fd;
++
++	ret = btd_register_adapter_driver(&adaptername_driver);
++
++	if (ret != 0)
++		return ret;
++
++	inot_fd = inotify_init();
++	if (inot_fd < 0) {
++		error("Failed to setup inotify");
++		return 0;
++	}
++	watch_fd = inotify_add_watch(inot_fd,
++				     MACHINE_INFO_DIR,
++				     IN_CLOSE_WRITE | IN_DELETE | IN_CREATE);
++	if (watch_fd < 0) {
++		error("Failed to setup watch for '%s'",
++		      MACHINE_INFO_DIR);
++		return 0;
++	}
++
++	inotify = g_io_channel_unix_new(inot_fd);
++	g_io_channel_set_close_on_unref(inotify, TRUE);
++	g_io_channel_set_encoding(inotify, NULL, NULL);
++	g_io_channel_set_flags(inotify, G_IO_FLAG_NONBLOCK, NULL);
++	g_io_add_watch(inotify, G_IO_IN, handle_inotify_cb, NULL);
++
++	return 0;
++}
++
++static void adaptername_exit(void)
++{
++	btd_unregister_adapter_driver(&adaptername_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(adaptername, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_LOW, adaptername_init, adaptername_exit)
+diff --git a/src/adapter.c b/src/adapter.c
+index 5420acd..156d534 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -183,64 +183,6 @@ static void dev_info_free(struct remote_dev_info *dev)
+ 	g_free(dev);
+ }
+ 
+-/*
+- * Device name expansion
+- *   %d - device id
+- */
+-static char *expand_name(char *dst, int size, char *str, int dev_id)
+-{
+-	register int sp, np, olen;
+-	char *opt, buf[10];
+-
+-	if (!str || !dst)
+-		return NULL;
+-
+-	sp = np = 0;
+-	while (np < size - 1 && str[sp]) {
+-		switch (str[sp]) {
+-		case '%':
+-			opt = NULL;
+-
+-			switch (str[sp+1]) {
+-			case 'd':
+-				sprintf(buf, "%d", dev_id);
+-				opt = buf;
+-				break;
+-
+-			case 'h':
+-				opt = main_opts.host_name;
+-				break;
+-
+-			case '%':
+-				dst[np++] = str[sp++];
+-				/* fall through */
+-			default:
+-				sp++;
+-				continue;
+-			}
+-
+-			if (opt) {
+-				/* substitute */
+-				olen = strlen(opt);
+-				if (np + olen < size - 1)
+-					memcpy(dst + np, opt, olen);
+-				np += olen;
+-			}
+-			sp += 2;
+-			continue;
+-
+-		case '\\':
+-			sp++;
+-			/* fall through */
+-		default:
+-			dst[np++] = str[sp++];
+-			break;
+-		}
+-	}
+-	dst[np] = '\0';
+-	return dst;
+-}
+-
+ int btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
+ 								uint8_t minor)
+ {
+@@ -2576,14 +2518,6 @@ gboolean adapter_init(struct btd_adapter *adapter)
+ 		return FALSE;
+ 	}
+ 
+-	if (read_local_name(&adapter->bdaddr, adapter->name) < 0)
+-		expand_name(adapter->name, MAX_NAME_LENGTH, main_opts.name,
+-							adapter->dev_id);
+-
+-	if (main_opts.attrib_server)
+-		attrib_gap_set(GATT_CHARAC_DEVICE_NAME,
+-			(const uint8_t *) adapter->name, strlen(adapter->name));
+-
+ 	sdp_init_services_list(&adapter->bdaddr);
+ 	load_drivers(adapter);
+ 	clear_blocked(adapter);
+-- 
+1.7.5.4
 
-I think that these are all. Can't see a way to represent those special
-values in a clean fashion. For the next RFC just include the mantissa/exponent
-pairs related to them, and see if someone else complains.
