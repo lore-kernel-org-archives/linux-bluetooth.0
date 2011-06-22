@@ -1,140 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti Julku <antti.julku@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
-Date: Wed, 22 Jun 2011 12:18:42 +0300
-Message-Id: <1308734322-32476-1-git-send-email-antti.julku@nokia.com>
+MIME-Version: 1.0
+In-Reply-To: <1308695065-3784-4-git-send-email-adamek.kuba@gmail.com>
+References: <1308695065-3784-1-git-send-email-adamek.kuba@gmail.com>
+	<1308695065-3784-4-git-send-email-adamek.kuba@gmail.com>
+Date: Wed, 22 Jun 2011 10:05:46 +0300
+Message-ID: <BANLkTimaKzGiy8tOHUKws3R0hbuVmSwRbg@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 03/11] Add function to create fresh a_header
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Adamek <adamek.kuba@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add command to management interface for enabling/disabling the
-fast connectable mode.
+Hi Jakub,
 
-Signed-off-by: Antti Julku <antti.julku@nokia.com>
----
- include/net/bluetooth/hci.h  |   10 +++++++
- include/net/bluetooth/mgmt.h |    5 +++
- net/bluetooth/mgmt.c         |   62 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 77 insertions(+), 0 deletions(-)
+On Wed, Jun 22, 2011 at 1:24 AM, Jakub Adamek <adamek.kuba@gmail.com> wrote:
+> ---
+>  gwobex/obex-xfer.c |   25 +++++++++++++++++++++++++
+>  gwobex/obex-xfer.h |    3 +++
+>  2 files changed, 28 insertions(+), 0 deletions(-)
+>
+> diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
+> index 1430f10..55ea842 100644
+> --- a/gwobex/obex-xfer.c
+> +++ b/gwobex/obex-xfer.c
+> @@ -422,6 +422,31 @@ out:
+>     return ret;
+>  }
+>
+> +struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+> +        unsigned int hlen) {
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 65345cd..d7b9600 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
-+struct hci_cp_write_page_scan_activity {
-+	__le16   interval;
-+	__le16   window;
-+} __packed;
-+
-+#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
-+	#define PAGE_SCAN_TYPE_STANDARD		0x00
-+	#define PAGE_SCAN_TYPE_INTERLACED	0x01
-+
- #define HCI_OP_LE_SET_EVENT_MASK	0x2001
- struct hci_cp_le_set_event_mask {
- 	__u8     mask[8];
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 45bea25..7196d04 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
- 	bdaddr_t bdaddr;
- } __packed;
- 
-+#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
-+struct mgmt_cp_set_fast_connectable {
-+	__u8 enable;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 64c0418..087355f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1730,6 +1730,64 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
- 	return err;
- }
- 
-+static int set_fast_connectable(struct sock *sk, u16 index,
-+					unsigned char *data, u16 len)
-+{
-+	struct hci_dev *hdev;
-+	struct mgmt_cp_set_fast_connectable *cp;
-+	struct hci_cp_write_page_scan_activity acp;
-+	u8 type;
-+	int err;
-+
-+	BT_DBG("hci%u", index);
-+
-+	cp = (void *) data;
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								EINVAL);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								ENODEV);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (cp->enable) {
-+		type = PAGE_SCAN_TYPE_INTERLACED;
-+		acp.interval = 0x0024;	/* 22.5 msec page scan interval */
-+	} else {
-+		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-+		acp.interval = 0x0800;	/* default 1.28 sec page scan */
-+	}
-+
-+	acp.window = 0x0012;	/* default 11.25 msec page scan window */
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
-+						sizeof(acp), &acp);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto done;
-+	}
-+
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	if (err < 0) {
-+		err = cmd_status(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+								-err);
-+		goto done;
-+	}
-+
-+	err = cmd_complete(sk, index, MGMT_OP_SET_FAST_CONNECTABLE,
-+							NULL, 0);
-+done:
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
-+}
-+
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- {
- 	unsigned char *buf;
-@@ -1850,6 +1908,10 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_UNBLOCK_DEVICE:
- 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
- 		break;
-+	case MGMT_OP_SET_FAST_CONNECTABLE:
-+		err = set_fast_connectable(sk, index, buf + sizeof(*hdr),
-+								len);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
+Align this to right until you cross the parentesis or reaches the 80
+columns limit, iirc the gwobex uses a different code style but I guess
+this is also valid here.
+
+> +    struct a_header *ah = g_new0(struct a_header, 1);
+> +    ah->hi = hi;
+> +    ah->hv_size = hlen;
+> +    switch (hi & OBEX_HDR_TYPE_MASK) {
+> +        case OBEX_HDR_TYPE_UINT8:
+> +        case OBEX_HDR_TYPE_UINT32:
+> +            ah->hv = hv;
+> +            break;
+> +        case OBEX_HDR_TYPE_BYTES:
+> +        case OBEX_HDR_TYPE_UNICODE:
+> +            ah->hv.bs = g_try_malloc(hlen);
+> +            if (ah->hv.bs != NULL)
+> +                memcpy((void *) ah->hv.bs, hv.bs, hlen);
+> +            else if (hlen > 0) {
+> +                g_free(ah);
+> +                return NULL;
+> +            }
+> +            ah->hv_size = hlen;
+> +        break;
+> +    }
+> +    return ah;
+> +}
+> +
+>  void a_header_free(struct a_header *ah) {
+>     switch (ah->hi & OBEX_HDR_TYPE_MASK) {
+>         case OBEX_HDR_TYPE_BYTES:
+> diff --git a/gwobex/obex-xfer.h b/gwobex/obex-xfer.h
+> index b1e2ff0..7c59827 100644
+> --- a/gwobex/obex-xfer.h
+> +++ b/gwobex/obex-xfer.h
+> @@ -93,6 +93,9 @@ struct a_header {
+>
+>  void a_header_free(struct a_header *ah);
+>
+> +struct a_header *make_a_header(uint8_t hi, obex_headerdata_t hv,
+> +                                             unsigned int hlen);
+> +
+>  struct gw_obex_xfer *gw_obex_xfer_new(struct gw_obex *ctx, gboolean async, int stream_fd);
+>
+>  void _gw_obex_xfer_free(struct gw_obex_xfer *xfer);
+> --
+> 1.7.0.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+
 -- 
-1.7.2.5
-
+Luiz Augusto von Dentz
