@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2] build: Add support for systemd service configuration
-From: Bastien Nocera <hadess@hadess.net>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
+	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+Date: Wed, 22 Jun 2011 12:27:47 +0200
+Message-ID: <BANLkTi=Qb7-kx0Kr6i7FXGfuNM=uDqeh+A@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Santiago Carot <sancane@gmail.com>
+To: Elvis Pfutzenreuter <epx@signove.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 22 Jun 2011 12:13:30 +0100
-In-Reply-To: <1308275200-17393-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1308275200-17393-1-git-send-email-lucas.demarchi@profusion.mobi>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1308741214.6042.81.camel@novo.hadess.net>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2011-06-16 at 22:46 -0300, Lucas De Marchi wrote:
-> ---
->  .gitignore               |    1 +
->  Makefile.am              |    8 +++++++-
->  configure.ac             |   11 ++++++++++-
->  src/bluetooth.service.in |   12 ++++++++++++
->  4 files changed, 30 insertions(+), 2 deletions(-)
->  create mode 100644 src/bluetooth.service.in
+Hi Elvis,
 
-It seems to be pretty much the same as Lennart's patch which I posted
-last year:
-http://thread.gmane.org/gmane.linux.bluez.kernel/8645
+(cut)
+>
+> I understand why you used this type (keeps the thermometer transcodable through this
+> API and there are the special values), so BTW the lack of device information service
+> access through this API should at least be mentioned, so we ammend that later (either
+> here or adding another API).
 
-Any reasons why you cooked up your own? What are the differences?
+I don't forget the DIS issue but so far I think it's better address a
+part of the problem, when we fix the thermomether API we must treat
+this one. Let's split the problem in subproblems ;)
 
+Regards.
