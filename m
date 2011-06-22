@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: =?gb2312?B?UGlvdHIgWmeornJlY2tp?= <pzgorecki@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Liu, Haijun" <haijun@qca.qualcomm.com>,
-	"Fan, Hong" <hongfan@qca.qualcomm.com>
-Subject: RE: SRM support in OBEX
-Date: Wed, 22 Jun 2011 03:55:07 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103CFE7E@nasanexd01a.na.qualcomm.com>
-References: <BANLkTi=T4dqgKW_7WA9BT7EQ9UY4mRZ7JA@mail.gmail.com>
-In-Reply-To: <BANLkTi=T4dqgKW_7WA9BT7EQ9UY4mRZ7JA@mail.gmail.com>
-Content-Type: text/plain; charset="gb2312"
-MIME-Version: 1.0
+Subject: Re: [PATCH 1/3] Bluetooth: Add extfeatures to struct hci_dev
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Tue, 21 Jun 2011 19:16:38 -0700
+In-Reply-To: <20110621205505.GA8124@dell.ger.corp.intel.com>
+References: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
+	 <20110621205505.GA8124@dell.ger.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308709001.2196.64.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIFBpb3RyDQogIEkgd29ya2VkIG9uIFNSTSBzZXZlcmFsIHdlZWtzIGFnbyBidXQgZmluYWxs
-eSBzdG9wcGVkLg0KICBJdGBzIGVhc3kgdG8gc2V0IGFuZCBjaGVjayBTUk0gaGVhZGVyLCBhcyB3
-ZWxsIGFzIHNldCB0aGUgcmVzcG9uc2UgbW9kZSB0byBPQkVYX1JTUF9NT0RFX1NJTkdMRS4gQW5k
-IGl0IGlzIGFscmVhZHkgd2VsbCBzdXBwb3J0ZWQgaW4gb2JleF93b3JrIGZ1bmN0aW9uIHdoZW4g
-dGhlIHJlc3BvbnNlIG1vZGUgaXMgU1JNLCBjbGllbnQgYW5kIHNlcnZlciBjYW4gY29udGludWUg
-c2VuZCBkYXRhIHdpdGhvdXQgcmVtb3RlIHNpZGUgcmVzcG9uc2Ugb3IgcmVxdWVzdC4gVGhlIG9i
-ZXhfd29yayBjYWxsYmFjayByZWxhdGlvbnNoaXAgaXM6DQpvYmV4X3Nlc3Npb25fc3RhcnQoKQ0K
-CQkJCQkuLi4NCgkJCWdfaW9fYWRkX3dhdGNoX2Z1bGwoaW8sIEdfUFJJT1JJVFlfREVGQVVMVCwJ
-R19JT19JTiB8IEdfSU9fSFVQIHwgR19JT19FUlIgfCBHX0lPX05WQUwsCW9iZXhfaGFuZGxlX2lu
-cHV0LCBvYmV4LCBvYmV4X2hhbmRsZV9kZXN0cm95KTsNCgkJCQkJLi4uDQpvYmV4X2hhbmRsZV9p
-bnB1dCgpDQoJCQkJCS4uLg0KCQkJT0JFWF9IYW5kbGVJbnB1dChvYmV4LCAxKQ0KCQkJCQkuLi4N
-Ck9CRVhfSGFuZGxlSW5wdXQoKQ0KCQkJCQkuLi4NCgkJCW9iZXhfd29yayhzZWxmLCB0aW1lb3V0
-KTsNCg0KVGhlIHByb2JsZW0gaW4gU1JNIGlzOg0KSWYgcmVtb3RlIHNpZGUgZG9lc25gdCBzZW5k
-IGFueSBkYXRhIHRvIGxvY2FsIHNpZGUsIHRoZW4gdGhlIEdfSU9fSU4gY29uZGl0aW9uIGNvdWxk
-bmB0IGJlIHNldC4gU28gaG93IG9iZXhfd29yayBjYW4gYmUgY2FsbGVkPw0KDQpJIGhhdmVuYHQg
-Zm91bmQgYW55IGdvb2Qgc29sdXRpb24gZm9yIHRoaXMgaXNzdWUuIFNvIGlmIHlvdSBjYW4gc3Bl
-bmQgc29tZSB0aW1lIG9uIFNSTSwgSWBsbCBiZSB2ZXJ5IGhhcHB5OikNCg0KDQpCZXN0IHdpc2hl
-cy4NCk5hbWkNCg0KDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4
-LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
-b3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgUGlvdHIgWmeornJlY2tpDQpTZW50
-OiAyMDExxOo21MIyMcjVIDIxOjQ0DQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-Zw0KU3ViamVjdDogU1JNIHN1cHBvcnQgaW4gT0JFWA0KDQpIaSwNCg0KSXMgYW55Ym9keSB3b3Jr
-aW5nIG9uIFNSTSBzdXBwb3J0IGluIG9iZXhkID8gSSBtaWdodCBiZSBhYmxlIHRvIHNwZW5kIHNv
-bWUgdGltZSBvbiB0aGlzIGJ1dCB3b3VsZCBsaWtlIHRvIGF2b2lkIGR1cGxpY2F0aW9uIG9mIGVm
-Zm9ydCBpZiBpdCdzIGluIHRoZSBwaXBlbGluZS4NCg0KQ2hlZXJzLA0KUGlvdHINCi0tDQpUbyB1
-bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGlu
-dXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIu
-a2VybmVsLm9yZyBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3Jn
-L21ham9yZG9tby1pbmZvLmh0bWwNCg==
+Hi Johan,
+
+> > @@ -224,6 +225,11 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
+> >  	/* Read Local Supported Features */
+> >  	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
+> >  
+> > +	/* Read Local Extended Features */
+> > +	ext_cp.page = 0x01;
+> > +	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(ext_cp),
+> > +								&ext_cp);
+> 
+> Since the extended features command is only available from 1.2 onwards I
+> don't think it's right to unconditionally send it in hci_init_req.
+> Instead, you should probably be checking for the feature bit in the
+> (non-extended) feature mask, i.e. in the command complete callback for
+> HCI_Read_Local_Features and only send the command if the feature bit is
+> set.
+
+exactly and with your work on the management interface, I hope we can
+get rid of hci_init_req at some point. And then do a proper async and
+well defined init of the adapter. Especially with things like LE, single
+mode, AMP, SSP and other factors on the init process, we need to get
+this fixed once and for all.
+
+The AMP init will look fundamentally different from the BR/EDR and init.
+And so will the LE only init. And it all depends on Bluetooth adapter
+version and feature bits of course.
+
+Regards
+
+Marcel
+
+
