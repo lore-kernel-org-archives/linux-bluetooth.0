@@ -1,81 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Wed, 22 Jun 2011 16:20:37 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add MGMT_OP_SET_LE_SUPPORT command
-Message-ID: <20110622192037.GA2583@joana>
-References: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
- <1308686870-26101-3-git-send-email-andre.guedes@openbossa.org>
- <1308688620.2196.61.camel@aeonflux>
- <BANLkTik_5+s9coWFR0Nd2GsH6gO=pRBKUQ@mail.gmail.com>
- <1308761865.2196.77.camel@aeonflux>
- <BANLkTinTRAcNgdVZPygyfukXSpB8LhZpeg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTinTRAcNgdVZPygyfukXSpB8LhZpeg@mail.gmail.com>
+In-Reply-To: <BANLkTimaJSHEx0GoR1659tOWnYRBWV9Z0Q@mail.gmail.com>
+References: <BANLkTimaJSHEx0GoR1659tOWnYRBWV9Z0Q@mail.gmail.com>
+Date: Wed, 22 Jun 2011 14:17:15 -0500
+Message-ID: <BANLkTik9GX_KOubOiStpjpYMBXQzEFOh+g@mail.gmail.com>
+Subject: Re: audio/manager.c:hf_io_cb() Refusing new connection since one
+ already exists
+From: Mike <puffy.taco@gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+On Mon, May 23, 2011 at 4:45 PM, Mike <puffy.taco@gmail.com> wrote:
+> I am having a problem where I can not connect my phone using HFP after
+> it has been once disconnected from bluetoothd.
+>
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-06-22 15:33:19 -0300]:
+I'm still having this problem (just tested on bluez 4.94).  I can
+disconnect my phone and execute the GetProperties method on
+org.bluez.HandsfreeGateway and the return State is connected.  If I
+execute the Disconnect method over DBus (org.bluez.HandsfreeGateway),
+the state of the connection is set properly to disconnected.  After
+doing this, I can reconnect my phone without error (of course it will
+fail again if I disconnect/reconnect).
 
-> Hi Marcel,
-> 
-> On Wed, Jun 22, 2011 at 1:57 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Andre,
-> >
-> >> > any reason why we want this separated and being under host stack control
-> >> > in the first place. Should we not always enable LE if we can support it?
-> >> > What are the reason to run an LE capable BlueZ on an LE capable dongle
-> >> > and then not enable LE?
-> >> >
-> >>
-> >> I don't know the reason why, but today LE enabling is separated and is
-> >> under host control. There is an option in main.conf (EnableLE) to
-> >> enable/disable LE.
-> >>
-> >> AFAIK, the reason we want to disable LE is qualification tests only. Also,
-> >> since LE support is under development we may not wanna have LE enabled
-> >> by default (maybe this is another reason).
-> >
-> > for that I would have used a enable_le kernel module option since it
-> > should be all triggered by the kernel anyway.
-> >
-> >> > Maybe we should just have a generic kernel mgmt features enabling
-> >> > command. One thing that I do not wanna do is to just blindly make a copy
-> >> > of HCI commands for mgmt interface. The controller abstraction for the
-> >> > mgmt interface is suppose to have a feature list so we can check what
-> >> > the kernel supports and what not.
-> >> >
-> >>
-> >> We had a little discussion here and we came up with this idea of having
-> >> new parameter to the module (e. g. enable_le) to enable/disable LE. If
-> >> the module is loaded with enable_le=y we would enable LE host support.
-> >> Once LE support is stable enough, we have enable_le=y by default.
-> >> This approach we don't need a mgmt command.
-> >
-> > See above ;)
-> >
-> > I am open for discussion on how we might solve this in a bit more
-> > generic way on let this control by the user. Mainly for qualification
-> > testing and UPF testing. However we need a clear story for LE and SSP
-> > since both are host stack driven features.
-> 
-> For LE story, the enable_le module param should be enough. IMHO, LE
-> support shouldn't be controlled by the user. If hardware, kernel and BlueZ
-> support LE then LE should be enabled.
-> 
-> If you have LE supported hardware, kernel and BlueZ but for some reason
-> (e.g. qualification tests) you want to disable LE, then you load the module
-> with enable_le=n parameter.
-> 
-> For now, while LE support is under development, enable_le default value
-> would be false. Once we have LE support stable enough, we change its
-> default value to true.
+The one thing that has me curious is the lack of a call to
+"g_io_add_watch" for the hands free rfcomm.  It looks like most other
+io connections use this to detect the channel closing (e.g. the sco
+channel or the ag_confirm code).  Is this an oversight?
 
-Once we add enable_le I think we can also remove enable_smp, unless this is
-needed for for some qualification test. But I don't think so.
-
-	Gustavo
+Mike
