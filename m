@@ -1,85 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
-Date: Thu, 23 Jun 2011 09:49:50 +0300
-Message-ID: <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-Subject: Re: Media API with more than one headset
+In-Reply-To: <1308746878.4616.1.camel@THOR>
+References: <1308746878.4616.1.camel@THOR>
+Date: Thu, 23 Jun 2011 09:37:57 +0300
+Message-ID: <BANLkTi=tmmMvR=Shico7bWZiLaCAMpm33A@mail.gmail.com>
+Subject: Re: [PATCH] Finalize discovery if all stream end points are In Use
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Kornatowski <pkorn@gmx.net>
-Cc: linux-bluetooth@vger.kernel.org
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Peter,
 
-On Thu, Jun 23, 2011 at 12:23 AM, Peter Kornatowski <pkorn@gmx.net> wrote:
-> Hi,
+On Wed, Jun 22, 2011 at 3:47 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> When handling the discover response, if all stream end points are
+> in use, then we must finalize discovery, as no GET_CAPABILITIES
+> command will be issued.
+> ---
+>  audio/avdtp.c |   11 +++++++----
+>  1 files changed, 7 insertions(+), 4 deletions(-)
 >
-> I'm using the new bluez media api to set bluetooth headsets into playing
-> mode and get the fd's of the corresponding sockets with a program written in
-> C. This works fine with just one headset, but I'm using up to three at the
-> same time over three bluetooth adapters. So my program (bt-audio) creates a
-> dbus-service with three paths (/test/endpoint0, ...1, ...2) and each path
-> has an interface org.bluez.MediaEndpoint with the four needed methods
-> (SetConfiguration etc.). Then it scans for turned on headsets and calls
-> RegisterEndpoint on the appropriate adapter-path. Then bluez calls three
-> times SetConfiguration on my service. So basically like in the
-> python-example "simple-endpoint". After that my app calls three times
-> Acquire with "rw" on each of the given transport-paths to receive the
-> socket-fd's.
-> As I said, this works well and I can play and record some raw-files with
-> very good quality. But when one of the headsets is turned off, the other two
-> are put out of playing-mode. When I retry to put them back in playing-mode
-> by calling UnregisterEndpoint and then RegisterEndpoint again, I just get
-> "GDBus.Error:org.bluez.Error.NotAuthorized: Operation Not Authorized" and
-> see "sco_bind: Address already in use" in syslog. When retrying too often,
-> bluetoothd segfaults (but this may be related to the way i tried some
-> recovery of this problem in my code) with:
-> kernel: [34309.873606] bluetoothd[29235]: segfault at 6e652f74 ip b76b9b20
-> sp bf93c430 error 4 in bluetoothd[b768c000+7e000]
+> diff --git a/audio/avdtp.c b/audio/avdtp.c
+> index ead956e..0650bc3 100644
+> --- a/audio/avdtp.c
+> +++ b/audio/avdtp.c
+> @@ -2736,6 +2736,8 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
+>  {
+>        int sep_count, i;
+>        uint8_t getcap_cmd;
+> +       int ret = 0;
+> +       gboolean getcap_pending = FALSE;
 >
-> Only after restarting my program (and thus re-registering my dbus-service),
-> I am able to put the headsets back in playing mode again.
+>        if (session->version >= 0x0103 && session->server->version >= 0x0103)
+>                getcap_cmd = AVDTP_GET_ALL_CAPABILITIES;
+> @@ -2748,7 +2750,6 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
+>                struct avdtp_remote_sep *sep;
+>                struct avdtp_stream *stream;
+>                struct seid_req req;
+> -               int ret;
 >
-> I also tried this use-case with your simple-endpoint python-script by
-> modifying it like this:
+>                DBG("seid %d type %d media %d in use %d",
+>                                resp->seps[i].seid, resp->seps[i].type,
+> @@ -2774,12 +2775,14 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
 >
-> def acquire_cb(fd, imtu, omtu):
->        print "Acquire successfull! New fd: %s with iMTU %i and oMTU %i" %
-> (fd, imtu, omtu)
-> def acquire_error(error):
->        print "Acquire failed: %s" % (error)
->        mainloop.quit()
+>                ret = send_request(session, TRUE, NULL, getcap_cmd,
+>                                                        &req, sizeof(req));
+> -               if (ret < 0) {
+> -                       finalize_discovery(session, -ret);
+> +               if (ret < 0)
+>                        break;
+> -               }
+> +               getcap_pending = TRUE;
+>        }
 >
-> ...
->
-> @dbus.service.method("org.bluez.MediaEndpoint", in_signature="oay",
-> out_signature="")
-> def SetConfiguration(self, transport, config):
->        print "SetConfiguration (%s, %s)" % (transport, config)
->        media_transport = dbus.Interface(bus.get_object("org.bluez",
-> transport), "org.bluez.MediaTransport")
->        media_transport.Acquire("rw", reply_handler=acquire_cb,
-> error_handler=acquire_error)
->        return
->
-> So even after starting two or three processes of this script (each with a
-> different hciX), I get the same behaviour: putting all headsets in playing
-> mode is no problem, but turning off one headset puts the others out of
-> playing mode. Trying to put them back in playing mode requires a restart of
-> the scripts, otherwise I just get the same error: "Acquire failed:
-> org.bluez.Error.NotAuthorized: Operation Not Authorized".
->
-> So why are the other headsets always put out of playing mode and why can't
-> you put them back in playing mode again? Looks like a bug to me, hopefully
-> someone of you can help. I attached the syslog cutout of this problem, too
-> (first section is with my C-program, second with the python-script).
+> +       if (!getcap_pending)
+> +               finalize_discovery(session, -ret);
+> +
+>        return TRUE;
+>  }
 
-Interesting, this could be a bug in SCO socket can you try that with
-a2dp too? In the meantime I gonna try to reproduce it myself, btw what
-kernel are you using?
+Sounds like a bug to me not an improvement so I suggest you start your
+commit message with the word 'Fix ...', patch itself looks good
+though.
 
 -- 
 Luiz Augusto von Dentz
