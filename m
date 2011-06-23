@@ -11,19 +11,19 @@ References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
 	<7B7AE0E9-F6A0-4EBD-9FEA-44DD9C7996D0@signove.com>
 	<BANLkTin-gXA7fWCA98j8U1Vv=L39OC-nOw@mail.gmail.com>
 	<D360EBE5-466B-41F7-9837-786786B153B9@signove.com>
-Date: Thu, 23 Jun 2011 17:35:50 +0200
-Message-ID: <BANLkTimerKtd7FypbQ7MzC9CXAzM5c5rvA@mail.gmail.com>
+Date: Thu, 23 Jun 2011 08:27:38 -0700
+Message-ID: <BANLkTimqnYOrdb+5MHsbsy6oawQbRC6Q9A@mail.gmail.com>
 Subject: Re: [RFC] Health Thermometer Profile API
-From: Santiago Carot <sancane@gmail.com>
+From: mike tsai <mikeyhtsai@gmail.com>
 To: Elvis Pfutzenreuter <epx@signove.com>
-Cc: mike tsai <mikeyhtsai@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Elvis,
 
-2011/6/23 Elvis Pfutzenreuter <epx@signove.com>:
+On Thu, Jun 23, 2011 at 7:08 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
 > On 22 Jun 2011, at 18:44 , mike tsai wrote:
 >
 >> Hi,
@@ -88,24 +88,6 @@ Hi,
 > and indications. BlueZ could store the last temperature locally,
 > should some app wants it immediately. (The special IEEE FLOAT values
 > take care of the case where a measurement hasn't been taken yet.)
-
-I would prefer not to use properties for the measures for several
-reasons. First of them is because of we should  have to store the last
-temperature locally, Sometimes the device does not include time stamp
-in the measure because is not mandatory. if the device does not
-support storing of data we should to include a timestamp because after
-a while an application may want to read the last measure. That is not
-severe but we are adding extra information to the data that it isn't
-provided by the thermometer, IMO it seems a little ugly. The same case
-for intermediate temperature.
-
-On the other hands, a new PropertyChange signal would be triggered on
-the bus each time a measure arrives, I think that it may be too heavy
-specially in the case of intermediate measures where the rate of
-updates is higher.
-
-For above reasons I think that we should use a callback in the agent
-side whenever it is possible.
 >
 >>
 >>> c) those properties generate PropertyChanged signals only when
@@ -121,3 +103,29 @@ side whenever it is possible.
 >> link is established with the temperature sensor.
 >
 > Ok, but we can disable it when no agent is active, right?
+
+Actually, from "Health" thermometer profile point of view, the desire
+processing should be like this.
+
+Application registers with profile (or agent?)
+Application decides to connect to thermometer, bond and enable
+indication/notification(Profile shall return OK immediately if device
+was bonded before)
+Profile should add thermometer device into white list
+Application disconnects thermometer
+Application ends (user exits the application)
+
+User press a button in Health thermometer sensor to measure the temperature
+Thermometer starts directed connectable advertising, then indirected
+connectable advertising
+Profile does white list selective connection and connects to thermometer
+thermometer sends intermediate temperature (if enabled) notification
+Profile invokes application(s) and passes the intermediate temperature
+Application processes the intermediate temperature (display as number
+or draw a graphic)
+Profile sends final measurement to application
+User sees the data and ends the application
+
+So, since the current architecture has thermometer profile as part of
+bluetoothd, then it shall remember the registered application(s) and
+invoke it(or them) automatically.
