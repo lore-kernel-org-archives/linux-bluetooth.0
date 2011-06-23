@@ -1,84 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH obexd v2] Fix crash introduced by
- f5279bfcedd669bc5d4e88cc1c59807c92226dfb
-Date: Thu, 23 Jun 2011 10:25:02 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103D01E6@nasanexd01a.na.qualcomm.com>
-References: <1308652632-2028-1-git-send-email-luiz.dentz@gmail.com>
- <BANLkTinmv-FpH+U13YQggYyQSab-SCBT3g@mail.gmail.com>
-In-Reply-To: <BANLkTinmv-FpH+U13YQggYyQSab-SCBT3g@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <BANLkTin-gXA7fWCA98j8U1Vv=L39OC-nOw@mail.gmail.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
+	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+	<BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
+	<A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
+	<BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
+	<544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
+	<BANLkTikyqm9ysgT47XQvr_vYQL1vdGPBuA@mail.gmail.com>
+	<7B7AE0E9-F6A0-4EBD-9FEA-44DD9C7996D0@signove.com>
+	<BANLkTin-gXA7fWCA98j8U1Vv=L39OC-nOw@mail.gmail.com>
+Date: Thu, 23 Jun 2011 11:51:32 +0200
+Message-ID: <BANLkTikgeU2aUF0srbgCuG6MVf4UtVJdmw@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Santiago Carot <sancane@gmail.com>
+To: mike tsai <mikeyhtsai@gmail.com>
+Cc: Elvis Pfutzenreuter <epx@signove.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIEx1aXoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0
-b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJA
-dmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KU2Vu
-dDogMjAxMeW5tDbmnIgyM+aXpSAxNzoyMA0KVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
-bC5vcmcNClN1YmplY3Q6IFJlOiBbUEFUQ0ggb2JleGQgdjJdIEZpeCBjcmFzaCBpbnRyb2R1Y2Vk
-IGJ5IGY1Mjc5YmZjZWRkNjY5YmM1ZDRlODhjYzFjNTk4MDdjOTIyMjZkZmINCg0KSGkgTmFtaSwN
-Cg0KT24gVHVlLCBKdW4gMjEsIDIwMTEgYXQgMTozNyBQTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50
-eiA8bHVpei5kZW50ekBnbWFpbC5jb20+IHdyb3RlOg0KPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9u
-IERlbnR6IDxsdWl6LnZvbi5kZW50ekBpbnRlbC5jb20+DQo+DQo+IFRoZSBjYWxsYmFjayBmdW5j
-dGlvbiBhY3R1YWxseSBuZWVkcyB0aGUgYmx1ZXRvb3RoX3NlcnZpY2Ugc3RydWN0dXJlIA0KPiBu
-b3Qgb2JleF9zZXJ2aWNlX2RyaXZlci4NCj4gLS0tDQo+IMKgcGx1Z2lucy9ibHVldG9vdGguYyB8
-IMKgIDI1ICsrKysrKysrKysrKystLS0tLS0tLS0tLS0NCj4gwqAxIGZpbGVzIGNoYW5nZWQsIDEz
-IGluc2VydGlvbnMoKyksIDEyIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvcGx1Z2lu
-cy9ibHVldG9vdGguYyBiL3BsdWdpbnMvYmx1ZXRvb3RoLmMgaW5kZXggDQo+IGZlNTA4ZjQuLmIx
-MjY3MTcgMTAwNjQ0DQo+IC0tLSBhL3BsdWdpbnMvYmx1ZXRvb3RoLmMNCj4gKysrIGIvcGx1Z2lu
-cy9ibHVldG9vdGguYw0KPiBAQCAtMTI2LDIxICsxMjYsMTUgQEAgZmFpbGVkOg0KPiDCoH0NCj4N
-Cj4gwqBzdGF0aWMgc3RydWN0IGJsdWV0b290aF9zZXJ2aWNlICpmaW5kX3NlcnZpY2UoDQo+IC0g
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-c3RydWN0IG9iZXhfc2VydmljZV9kcml2ZXIgDQo+ICpkcml2ZXIsDQo+IC0gwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgdWludDhfdCBjaGFu
-bmVsKQ0KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIHN0cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVyIA0KPiArICpkcml2ZXIpDQo+IMKg
-ew0KPiDCoCDCoCDCoCDCoEdTTGlzdCAqbDsNCj4NCj4gwqAgwqAgwqAgwqBmb3IgKGwgPSBhbnkt
-PnNlcnZpY2VzOyBsOyBsID0gbC0+bmV4dCkgew0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHN0
-cnVjdCBibHVldG9vdGhfc2VydmljZSAqc2VydmljZSA9IGwtPmRhdGE7DQo+DQo+IC0gwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgaWYgKGRyaXZlciAhPSBOVUxMICYmIHNlcnZpY2UtPmRyaXZlciAhPSBk
-cml2ZXIpDQo+IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgY29udGludWU7DQo+
-IC0NCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCBpZiAoY2hhbm5lbCAhPSAwICYmIHNlcnZpY2Ut
-PmRyaXZlci0+Y2hhbm5lbCAhPSANCj4gY2hhbm5lbCkNCj4gLSDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCBjb250aW51ZTsNCj4gLQ0KPiAtIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJl
-dHVybiBzZXJ2aWNlOw0KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlmIChzZXJ2aWNlLT5kcml2
-ZXIgPT0gZHJpdmVyKQ0KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHJldHVy
-biBzZXJ2aWNlOw0KPiDCoCDCoCDCoCDCoH0NCj4NCj4gwqAgwqAgwqAgwqByZXR1cm4gTlVMTDsN
-Cj4gQEAgLTE1OCw3ICsxNTIsNyBAQCBzdGF0aWMgdm9pZCByZWdpc3Rlcl9yZWNvcmQoc3RydWN0
-IG9iZXhfc2VydmVyIA0KPiAqc2VydmVyKQ0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHN0cnVj
-dCBibHVldG9vdGhfc2VydmljZSAqc2VydmljZTsNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBj
-aGFyICp4bWw7DQo+DQo+IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgc2VydmljZSA9IGZpbmRfc2Vy
-dmljZShkcml2ZXIsIDApOw0KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHNlcnZpY2UgPSBmaW5k
-X3NlcnZpY2UoZHJpdmVyKTsNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBpZiAoc2VydmljZSA9
-PSBOVUxMKSB7DQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgc2VydmljZSA9
-IGdfbmV3MChzdHJ1Y3QgYmx1ZXRvb3RoX3NlcnZpY2UsIDEpOw0KPiDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoHNlcnZpY2UtPmRyaXZlciA9IGRyaXZlcjsgQEAgLTQ1OSwxMCAr
-NDUzLDExIEBAIA0KPiBzdGF0aWMgaW50IHJlcXVlc3Rfc2VydmljZV9hdXRob3JpemF0aW9uKHN0
-cnVjdCBibHVldG9vdGhfc2VydmljZSANCj4gKnNlcnZpY2UsDQo+DQo+IMKgc3RhdGljIHZvaWQg
-Y29uZmlybV9ldmVudChHSU9DaGFubmVsICppbywgdm9pZCAqdXNlcl9kYXRhKQ0KPiDCoHsNCj4g
-LSDCoCDCoCDCoCBzdHJ1Y3QgYmx1ZXRvb3RoX3NlcnZpY2UgKnNlcnZpY2UgPSB1c2VyX2RhdGE7
-DQo+ICsgwqAgwqAgwqAgc3RydWN0IGJsdWV0b290aF9zZXJ2aWNlICpzZXJ2aWNlOw0KPiDCoCDC
-oCDCoCDCoEdFcnJvciAqZXJyID0gTlVMTDsNCj4gwqAgwqAgwqAgwqBjaGFyIGFkZHJlc3NbMThd
-Ow0KPiDCoCDCoCDCoCDCoHVpbnQ4X3QgY2hhbm5lbDsNCj4gKyDCoCDCoCDCoCBzdHJ1Y3Qgb2Jl
-eF9zZXJ2aWNlX2RyaXZlciAqZHJpdmVyID0gdXNlcl9kYXRhOw0KPg0KPiDCoCDCoCDCoCDCoGJ0
-X2lvX2dldChpbywgQlRfSU9fUkZDT01NLCAmZXJyLA0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoEJUX0lPX09QVF9ERVNULCBhZGRyZXNzLCBAQCAtNDc3LDcgKzQ3MiwxMyBA
-QCANCj4gc3RhdGljIHZvaWQgY29uZmlybV9ldmVudChHSU9DaGFubmVsICppbywgdm9pZCAqdXNl
-cl9kYXRhKQ0KPiDCoCDCoCDCoCDCoGluZm8oImJsdWV0b290aDogTmV3IGNvbm5lY3Rpb24gZnJv
-bTogJXMsIGNoYW5uZWwgJXUiLCBhZGRyZXNzLA0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoGNoYW5uZWwpOw0KPg0KPiAtIMKgIMKgIMKgIGlmIChzZXJ2aWNlLT5kcml2ZXIt
-PnNlcnZpY2UgIT0gT0JFWF9PUFApIHsNCj4gKyDCoCDCoCDCoCBzZXJ2aWNlID0gZmluZF9zZXJ2
-aWNlKGRyaXZlcik7DQo+ICsgwqAgwqAgwqAgaWYgKHNlcnZpY2UgPT0gTlVMTCkgew0KPiArIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIGVycm9yKCJibHVldG9vdGg6IFVuYWJsZSB0byBmaW5kIHNlcnZp
-Y2UiKTsNCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBnb3RvIGRyb3A7DQo+ICsgwqAgwqAgwqAg
-fQ0KPiArDQo+ICsgwqAgwqAgwqAgaWYgKGRyaXZlci0+c2VydmljZSAhPSBPQkVYX09QUCkgew0K
-PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGlmIChyZXF1ZXN0X3NlcnZpY2VfYXV0aG9yaXphdGlv
-bihzZXJ2aWNlLCBpbywgYWRkcmVzcykgDQo+IDwgMCkNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqBnb3RvIGRyb3A7DQo+DQo+IC0tDQo+IDEuNy41LjQNCg0KQW55IGNvbW1l
-bnRzIG9uIHRoaXMsIHdlIHNob3VsZCBiZSBhcHBseWluZyB0aGlzIEFTQVAgYmVjYXVzZSByaWdo
-dCBub3cgb2JleGQgY3Jhc2hlcyB1cG9uIGNvbm5lY3RpbmcgYXR0ZW1wdC4NCg0KLS0NCkx1aXog
-QXVndXN0byB2b24gRGVudHoNCi0tDQoNCkkgdGhpbmsgaXRgcyBvay4NCg0KUmVnYXJkcywNCk5h
-bWkNCg0KDQoNCg==
+Hi all,
+
+2011/6/22 mike tsai <mikeyhtsai@gmail.com>:
+> Hi,
+>
+> On Wed, Jun 22, 2011 at 6:50 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
+>>>>> (cut)
+>>>>
+>>>> True, I did not remember that those were properties. They would have
+>>>> to go, otherwise it is too easy for an app to "break" another, by
+>>>> disabling notifications.
+>>>>
+>>>> A pair of Enable/DisableIntermediate methods taking an agent as
+>>>> parameter would be more adequate.
+>>>>
+>>>> IMHO there would not be a need of such
+>>>> methods for final measure, because the final measurement (which is
+>>>> the only one guaranteed to be precise) is the final objective, there
+>>>> is no point in registering an agent and not wanting a final measurement.
+>>>>
+>>>
+>>> They werent in this RFC. I only see a problem now, for example if an
+>>> agent wants to get only a single *final* measure without setting an
+>>> interval and after a while the same agents decides that it wants to
+>>> get a new single measure without setting an interval for periodic
+>>> measurements. I don't see how it could do this with current API (where
+>>> get final measure methods are not present).
+>>
+>> For that, having temperature as one of the properties would be great
+>> (allowing apps unable/unwilling to set up an agent to read it).
+>>
+>> Or setting a convention that, if you register an agent, a GATT read is
+>> fired and you get a measurement right after. (It seems that you said
+>> something in that direction below.) Disvantage is that registering
+>> and unregistering agents just to get 1 measurement would cycle
+>> GATT indications needlessly.
+>>
+>>> We could think that an agent is only registered during the time it is
+>>> interested in being notified about final measures, after that, it
+>>> should unregister itself from the service. In that scenario we can set
+>>> notify property for final measures each time an agent is registered
+>>> (if not periodic interval is already set).
+>>
+>> In terms of minimizing energy consumption and API methods, the 'best'
+>> would be:
+>>
+>> a) intermediate and final temperatures being properties (intermediate
+>>   property is there only if thermometer supports it).
+>>
+>> b) There are GATT reads on them when some app reads the property;
+>>
+> [MT] Final temperature can only be indicated and intermediate
+> temperature can only be notified. Client can't read them from server,
+> according to the Thermometer profile spec.
+
+With reference to final measurement, I think that the best solution
+may be a mix between previous RFC and this one. We could have a
+feature "Final" that applications can enable through SetProperty
+method. If some process change its value the proper signal is emmited
+as usual. When the final measure arrived, the callack and
+propertychange signal is emmited too indicating that its value has
+changed from true to False and no more final measures will be scanned.
+In this way, everybody could get final measures without have to set
+periodic intervals.
+
+Of course, we can ignore this action if some process set this property
+and no watchers are registered. In this way we can save GATT traffic
+and power consumption because in this case there are'nt agents
+interested in getting measures.
+
+>> c) those properties generate PropertyChanged signals only when
+>> notifications are enabled for one or another, or there was a GATT read;
+>>
+>> d) applications signal interest in notifications by registering
+>> an agent (or by some other way). Registering an agent automatically
+>> means interest in final temp notifications, an additional method
+>> enables/disables interest in intermediate temp notifications.
+
+It seems a mix between both RFCs. What do you think if I prepare a new
+API to send it to the mailing list during the day?
+
+Regards
