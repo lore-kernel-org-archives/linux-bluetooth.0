@@ -1,69 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1308746878.4616.1.camel@THOR>
-References: <1308746878.4616.1.camel@THOR>
-Date: Thu, 23 Jun 2011 09:37:57 +0300
-Message-ID: <BANLkTi=tmmMvR=Shico7bWZiLaCAMpm33A@mail.gmail.com>
-Subject: Re: [PATCH] Finalize discovery if all stream end points are In Use
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 3/3] Bluetooth: Add MGMT_OP_SET_LE_SUPPORT command
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 22 Jun 2011 20:40:27 -0700
+In-Reply-To: <BANLkTinTRAcNgdVZPygyfukXSpB8LhZpeg@mail.gmail.com>
+References: <1308686870-26101-1-git-send-email-andre.guedes@openbossa.org>
+	 <1308686870-26101-3-git-send-email-andre.guedes@openbossa.org>
+	 <1308688620.2196.61.camel@aeonflux>
+	 <BANLkTik_5+s9coWFR0Nd2GsH6gO=pRBKUQ@mail.gmail.com>
+	 <1308761865.2196.77.camel@aeonflux>
+	 <BANLkTinTRAcNgdVZPygyfukXSpB8LhZpeg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1308800430.2196.81.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Andre,
 
-On Wed, Jun 22, 2011 at 3:47 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> When handling the discover response, if all stream end points are
-> in use, then we must finalize discovery, as no GET_CAPABILITIES
-> command will be issued.
-> ---
->  audio/avdtp.c |   11 +++++++----
->  1 files changed, 7 insertions(+), 4 deletions(-)
->
-> diff --git a/audio/avdtp.c b/audio/avdtp.c
-> index ead956e..0650bc3 100644
-> --- a/audio/avdtp.c
-> +++ b/audio/avdtp.c
-> @@ -2736,6 +2736,8 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
->  {
->        int sep_count, i;
->        uint8_t getcap_cmd;
-> +       int ret = 0;
-> +       gboolean getcap_pending = FALSE;
->
->        if (session->version >= 0x0103 && session->server->version >= 0x0103)
->                getcap_cmd = AVDTP_GET_ALL_CAPABILITIES;
-> @@ -2748,7 +2750,6 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
->                struct avdtp_remote_sep *sep;
->                struct avdtp_stream *stream;
->                struct seid_req req;
-> -               int ret;
->
->                DBG("seid %d type %d media %d in use %d",
->                                resp->seps[i].seid, resp->seps[i].type,
-> @@ -2774,12 +2775,14 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
->
->                ret = send_request(session, TRUE, NULL, getcap_cmd,
->                                                        &req, sizeof(req));
-> -               if (ret < 0) {
-> -                       finalize_discovery(session, -ret);
-> +               if (ret < 0)
->                        break;
-> -               }
-> +               getcap_pending = TRUE;
->        }
->
-> +       if (!getcap_pending)
-> +               finalize_discovery(session, -ret);
-> +
->        return TRUE;
->  }
+> >> > any reason why we want this separated and being under host stack control
+> >> > in the first place. Should we not always enable LE if we can support it?
+> >> > What are the reason to run an LE capable BlueZ on an LE capable dongle
+> >> > and then not enable LE?
+> >> >
+> >>
+> >> I don't know the reason why, but today LE enabling is separated and is
+> >> under host control. There is an option in main.conf (EnableLE) to
+> >> enable/disable LE.
+> >>
+> >> AFAIK, the reason we want to disable LE is qualification tests only. Also,
+> >> since LE support is under development we may not wanna have LE enabled
+> >> by default (maybe this is another reason).
+> >
+> > for that I would have used a enable_le kernel module option since it
+> > should be all triggered by the kernel anyway.
+> >
+> >> > Maybe we should just have a generic kernel mgmt features enabling
+> >> > command. One thing that I do not wanna do is to just blindly make a copy
+> >> > of HCI commands for mgmt interface. The controller abstraction for the
+> >> > mgmt interface is suppose to have a feature list so we can check what
+> >> > the kernel supports and what not.
+> >> >
+> >>
+> >> We had a little discussion here and we came up with this idea of having
+> >> new parameter to the module (e. g. enable_le) to enable/disable LE. If
+> >> the module is loaded with enable_le=y we would enable LE host support.
+> >> Once LE support is stable enough, we have enable_le=y by default.
+> >> This approach we don't need a mgmt command.
+> >
+> > See above ;)
+> >
+> > I am open for discussion on how we might solve this in a bit more
+> > generic way on let this control by the user. Mainly for qualification
+> > testing and UPF testing. However we need a clear story for LE and SSP
+> > since both are host stack driven features.
+> 
+> For LE story, the enable_le module param should be enough. IMHO, LE
+> support shouldn't be controlled by the user. If hardware, kernel and BlueZ
+> support LE then LE should be enabled.
+> 
+> If you have LE supported hardware, kernel and BlueZ but for some reason
+> (e.g. qualification tests) you want to disable LE, then you load the module
+> with enable_le=n parameter.
+> 
+> For now, while LE support is under development, enable_le default value
+> would be false. Once we have LE support stable enough, we change its
+> default value to true.
 
-Sounds like a bug to me not an improvement so I suggest you start your
-commit message with the word 'Fix ...', patch itself looks good
-though.
+sounds good to me. I am always for the minimal approach. Since adding
+something later is easy. Removing/deprecating is hard. So if we feel
+like a mgmt command is needed, we can add it any time.
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
+
