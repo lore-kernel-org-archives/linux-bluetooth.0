@@ -1,36 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Thu, 23 Jun 2011 09:58:27 -0400
-Subject: [PATCH v2] Fix finalize discovery if all stream end points are In
- Use
-Message-ID: <1308837507.14190.2.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Add adaptername plugin
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Date: Thu, 23 Jun 2011 14:44:05 +0100
+In-Reply-To: <1308836553-12460-1-git-send-email-hadess@hadess.net>
+References: <1308742198-6024-3-git-send-email-hadess@hadess.net>
+	 <1308836553-12460-1-git-send-email-hadess@hadess.net>
+Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1308836645.6042.102.camel@novo.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V2hlbiBoYW5kbGluZyB0aGUgZGlzY292ZXIgcmVzcG9uc2UsIGlmIGFsbCBzdHJlYW0gZW5kIHBv
-aW50cyBhcmUNCmluIHVzZSwgdGhlbiB3ZSBtdXN0IGZpbmFsaXplIGRpc2NvdmVyeSwgYXMgbm8g
-R0VUX0NBUEFCSUxJVElFUw0KY29tbWFuZCB3aWxsIGJlIGlzc3VlZC4NCi0tLQ0KIGF1ZGlvL2F2
-ZHRwLmMgfCAgIDExICsrKysrKystLS0tDQogMSBmaWxlcyBjaGFuZ2VkLCA3IGluc2VydGlvbnMo
-KyksIDQgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9hdWRpby9hdmR0cC5jIGIvYXVkaW8v
-YXZkdHAuYw0KaW5kZXggZWFkOTU2ZS4uMDY1MGJjMyAxMDA2NDQNCi0tLSBhL2F1ZGlvL2F2ZHRw
-LmMNCisrKyBiL2F1ZGlvL2F2ZHRwLmMNCkBAIC0yNzM2LDYgKzI3MzYsOCBAQCBzdGF0aWMgZ2Jv
-b2xlYW4gYXZkdHBfZGlzY292ZXJfcmVzcChzdHJ1Y3QgYXZkdHAgKnNlc3Npb24sDQogew0KIAlp
-bnQgc2VwX2NvdW50LCBpOw0KIAl1aW50OF90IGdldGNhcF9jbWQ7DQorCWludCByZXQgPSAwOw0K
-KwlnYm9vbGVhbiBnZXRjYXBfcGVuZGluZyA9IEZBTFNFOw0KIA0KIAlpZiAoc2Vzc2lvbi0+dmVy
-c2lvbiA+PSAweDAxMDMgJiYgc2Vzc2lvbi0+c2VydmVyLT52ZXJzaW9uID49IDB4MDEwMykNCiAJ
-CWdldGNhcF9jbWQgPSBBVkRUUF9HRVRfQUxMX0NBUEFCSUxJVElFUzsNCkBAIC0yNzQ4LDcgKzI3
-NTAsNiBAQCBzdGF0aWMgZ2Jvb2xlYW4gYXZkdHBfZGlzY292ZXJfcmVzcChzdHJ1Y3QgYXZkdHAg
-KnNlc3Npb24sDQogCQlzdHJ1Y3QgYXZkdHBfcmVtb3RlX3NlcCAqc2VwOw0KIAkJc3RydWN0IGF2
-ZHRwX3N0cmVhbSAqc3RyZWFtOw0KIAkJc3RydWN0IHNlaWRfcmVxIHJlcTsNCi0JCWludCByZXQ7
-DQogDQogCQlEQkcoInNlaWQgJWQgdHlwZSAlZCBtZWRpYSAlZCBpbiB1c2UgJWQiLA0KIAkJCQly
-ZXNwLT5zZXBzW2ldLnNlaWQsIHJlc3AtPnNlcHNbaV0udHlwZSwNCkBAIC0yNzc0LDEyICsyNzc1
-LDE0IEBAIHN0YXRpYyBnYm9vbGVhbiBhdmR0cF9kaXNjb3Zlcl9yZXNwKHN0cnVjdCBhdmR0cCAq
-c2Vzc2lvbiwNCiANCiAJCXJldCA9IHNlbmRfcmVxdWVzdChzZXNzaW9uLCBUUlVFLCBOVUxMLCBn
-ZXRjYXBfY21kLA0KIAkJCQkJCQkmcmVxLCBzaXplb2YocmVxKSk7DQotCQlpZiAocmV0IDwgMCkg
-ew0KLQkJCWZpbmFsaXplX2Rpc2NvdmVyeShzZXNzaW9uLCAtcmV0KTsNCisJCWlmIChyZXQgPCAw
-KQ0KIAkJCWJyZWFrOw0KLQkJfQ0KKwkJZ2V0Y2FwX3BlbmRpbmcgPSBUUlVFOw0KIAl9DQogDQor
-CWlmICghZ2V0Y2FwX3BlbmRpbmcpDQorCQlmaW5hbGl6ZV9kaXNjb3Zlcnkoc2Vzc2lvbiwgLXJl
-dCk7DQorDQogCXJldHVybiBUUlVFOw0KIH0NCiANCi0tIA0KMS43LjQuMQ0KDQo=
+On Thu, 2011-06-23 at 14:42 +0100, Bastien Nocera wrote:
+> Replacing the name setting code in src/adapter.c.
+
+This new patch corrects the copyright of the plugin, and makes inotify
+look for a few more events (so that you can test the code my
+renaming /etc/machine-info to a .bak or something).
+
