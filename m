@@ -1,93 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Health Thermometer Profile API
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <BANLkTin-gXA7fWCA98j8U1Vv=L39OC-nOw@mail.gmail.com>
-Date: Thu, 23 Jun 2011 11:08:32 -0300
-Cc: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
-Message-Id: <D360EBE5-466B-41F7-9837-786786B153B9@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com> <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com> <BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com> <544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com> <BANLkTikyqm9ysgT47XQvr_vYQL1vdGPBuA@mail.gmail.com> <7B7AE0E9-F6A0-4EBD-9FEA-44DD9C7996D0@signove.com> <BANLkTin-gXA7fWCA98j8U1Vv=L39OC-nOw@mail.gmail.com>
-To: mike tsai <mikeyhtsai@gmail.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Thu, 23 Jun 2011 09:58:27 -0400
+Subject: [PATCH v2] Fix finalize discovery if all stream end points are In
+ Use
+Message-ID: <1308837507.14190.2.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 22 Jun 2011, at 18:44 , mike tsai wrote:
-
-> Hi,
-> 
-> On Wed, Jun 22, 2011 at 6:50 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
->>>>> (cut)
->>>> 
->>>> True, I did not remember that those were properties. They would have
->>>> to go, otherwise it is too easy for an app to "break" another, by
->>>> disabling notifications.
->>>> 
->>>> A pair of Enable/DisableIntermediate methods taking an agent as
->>>> parameter would be more adequate.
->>>> 
->>>> IMHO there would not be a need of such
->>>> methods for final measure, because the final measurement (which is
->>>> the only one guaranteed to be precise) is the final objective, there
->>>> is no point in registering an agent and not wanting a final measurement.
->>>> 
->>> 
->>> They werent in this RFC. I only see a problem now, for example if an
->>> agent wants to get only a single *final* measure without setting an
->>> interval and after a while the same agents decides that it wants to
->>> get a new single measure without setting an interval for periodic
->>> measurements. I don't see how it could do this with current API (where
->>> get final measure methods are not present).
->> 
->> For that, having temperature as one of the properties would be great
->> (allowing apps unable/unwilling to set up an agent to read it).
->> 
->> Or setting a convention that, if you register an agent, a GATT read is
->> fired and you get a measurement right after. (It seems that you said
->> something in that direction below.) Disvantage is that registering
->> and unregistering agents just to get 1 measurement would cycle
->> GATT indications needlessly.
->> 
->>> We could think that an agent is only registered during the time it is
->>> interested in being notified about final measures, after that, it
->>> should unregister itself from the service. In that scenario we can set
->>> notify property for final measures each time an agent is registered
->>> (if not periodic interval is already set).
->> 
->> In terms of minimizing energy consumption and API methods, the 'best'
->> would be:
->> 
->> a) intermediate and final temperatures being properties (intermediate
->>   property is there only if thermometer supports it).
->> 
->> b) There are GATT reads on them when some app reads the property;
->> 
-> [MT] Final temperature can only be indicated and intermediate
-> temperature can only be notified. Client can't read them from server,
-> according to the Thermometer profile spec.
-
-Glup, that is true :\
-
-In other profiles people are taking care of making notifiable 
-characteristics readable as well, but it slipped for thermometer.
-
-In this case, the only reason one could argue using properties for
-temperatures would be to reuse the PropertyChanged for notifications
-and indications. BlueZ could store the last temperature locally,
-should some app wants it immediately. (The special IEEE FLOAT values
-take care of the case where a measurement hasn't been taken yet.)
-
-> 
->> c) those properties generate PropertyChanged signals only when
->> notifications are enabled for one or another, or there was a GATT read;
->> 
->> d) applications signal interest in notifications by registering
->> an agent (or by some other way). Registering an agent automatically
->> means interest in final temp notifications, an additional method
->> enables/disables interest in intermediate temp notifications.
->> 
-> [MT] Once indication or notification is enabled, client has to be
-> ready to receive notification or indication as soon as the physical
-> link is established with the temperature sensor.
-
-Ok, but we can disable it when no agent is active, right?
+V2hlbiBoYW5kbGluZyB0aGUgZGlzY292ZXIgcmVzcG9uc2UsIGlmIGFsbCBzdHJlYW0gZW5kIHBv
+aW50cyBhcmUNCmluIHVzZSwgdGhlbiB3ZSBtdXN0IGZpbmFsaXplIGRpc2NvdmVyeSwgYXMgbm8g
+R0VUX0NBUEFCSUxJVElFUw0KY29tbWFuZCB3aWxsIGJlIGlzc3VlZC4NCi0tLQ0KIGF1ZGlvL2F2
+ZHRwLmMgfCAgIDExICsrKysrKystLS0tDQogMSBmaWxlcyBjaGFuZ2VkLCA3IGluc2VydGlvbnMo
+KyksIDQgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9hdWRpby9hdmR0cC5jIGIvYXVkaW8v
+YXZkdHAuYw0KaW5kZXggZWFkOTU2ZS4uMDY1MGJjMyAxMDA2NDQNCi0tLSBhL2F1ZGlvL2F2ZHRw
+LmMNCisrKyBiL2F1ZGlvL2F2ZHRwLmMNCkBAIC0yNzM2LDYgKzI3MzYsOCBAQCBzdGF0aWMgZ2Jv
+b2xlYW4gYXZkdHBfZGlzY292ZXJfcmVzcChzdHJ1Y3QgYXZkdHAgKnNlc3Npb24sDQogew0KIAlp
+bnQgc2VwX2NvdW50LCBpOw0KIAl1aW50OF90IGdldGNhcF9jbWQ7DQorCWludCByZXQgPSAwOw0K
+KwlnYm9vbGVhbiBnZXRjYXBfcGVuZGluZyA9IEZBTFNFOw0KIA0KIAlpZiAoc2Vzc2lvbi0+dmVy
+c2lvbiA+PSAweDAxMDMgJiYgc2Vzc2lvbi0+c2VydmVyLT52ZXJzaW9uID49IDB4MDEwMykNCiAJ
+CWdldGNhcF9jbWQgPSBBVkRUUF9HRVRfQUxMX0NBUEFCSUxJVElFUzsNCkBAIC0yNzQ4LDcgKzI3
+NTAsNiBAQCBzdGF0aWMgZ2Jvb2xlYW4gYXZkdHBfZGlzY292ZXJfcmVzcChzdHJ1Y3QgYXZkdHAg
+KnNlc3Npb24sDQogCQlzdHJ1Y3QgYXZkdHBfcmVtb3RlX3NlcCAqc2VwOw0KIAkJc3RydWN0IGF2
+ZHRwX3N0cmVhbSAqc3RyZWFtOw0KIAkJc3RydWN0IHNlaWRfcmVxIHJlcTsNCi0JCWludCByZXQ7
+DQogDQogCQlEQkcoInNlaWQgJWQgdHlwZSAlZCBtZWRpYSAlZCBpbiB1c2UgJWQiLA0KIAkJCQly
+ZXNwLT5zZXBzW2ldLnNlaWQsIHJlc3AtPnNlcHNbaV0udHlwZSwNCkBAIC0yNzc0LDEyICsyNzc1
+LDE0IEBAIHN0YXRpYyBnYm9vbGVhbiBhdmR0cF9kaXNjb3Zlcl9yZXNwKHN0cnVjdCBhdmR0cCAq
+c2Vzc2lvbiwNCiANCiAJCXJldCA9IHNlbmRfcmVxdWVzdChzZXNzaW9uLCBUUlVFLCBOVUxMLCBn
+ZXRjYXBfY21kLA0KIAkJCQkJCQkmcmVxLCBzaXplb2YocmVxKSk7DQotCQlpZiAocmV0IDwgMCkg
+ew0KLQkJCWZpbmFsaXplX2Rpc2NvdmVyeShzZXNzaW9uLCAtcmV0KTsNCisJCWlmIChyZXQgPCAw
+KQ0KIAkJCWJyZWFrOw0KLQkJfQ0KKwkJZ2V0Y2FwX3BlbmRpbmcgPSBUUlVFOw0KIAl9DQogDQor
+CWlmICghZ2V0Y2FwX3BlbmRpbmcpDQorCQlmaW5hbGl6ZV9kaXNjb3Zlcnkoc2Vzc2lvbiwgLXJl
+dCk7DQorDQogCXJldHVybiBUUlVFOw0KIH0NCiANCi0tIA0KMS43LjQuMQ0KDQo=
