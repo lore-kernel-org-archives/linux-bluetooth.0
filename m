@@ -1,61 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E03DA75.2080606@goop.org>
-Date: Thu, 23 Jun 2011 17:29:41 -0700
-From: Jeremy Fitzhardinge <jeremy@goop.org>
-MIME-Version: 1.0
+Subject: Re: Memory leak on failed connection attempt
+From: Tomas Targownik <ttargownik@geicp.com>
+Reply-To: ttargownik@geicp.com
 To: linux-bluetooth@vger.kernel.org
-CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Linux 3.0-rc4: regression reconnecting bluetooth headset (A2DP fails)
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20110616212645.GF2594@joana>
+References: <1306997293.1926.83.camel@rnd3> <20110602135720.GB2790@joana>
+	 <1308035004.1926.611.camel@rnd3> <1308180155.1926.640.camel@rnd3>
+	 <20110616212645.GF2594@joana>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 24 Jun 2011 08:34:41 +1000
+Message-ID: <1308868481.2042.58.camel@rnd3>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have a Nokia BH-905i headset.  With a stock F15 kernel, it all works
-well. With current linux-2.6.git, it fails to reconnect properly.
+I have isolated the memory leak to the hci_conn struct not being freed
+on a hci_conn_del() call if the remote bluetooth device is not present.
+The patch below remedies this.
 
-On connection, the headphones only beep once, whereas they normally beep
-twice; I think this is one beep per profile, and its only connecting HSP
-and failing A2DP.  In the sound control panel, it either comes up with
-"profile: off" or with the HSP/HFP (Telephony) profile rather than A2DP,
-and it fails to switch if I try to change profiles via the sound control
-panel.
+---
+net/bluetooth/hci_conn.c |    5 +++++
+1 file changed, 5 insertions(+)
 
-However, if I re-pair the device from scratch each time I use it, it
-connects properly and it all works fine.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7a6f56b..62510f7 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -375,6 +375,11 @@ int hci_conn_del(struct hci_conn *conn)
 
-pactl list shows:
+hci_dev_put(hdev);
 
-Card #2
-	Name: bluez_card.00_0B_E4_A6_6C_0D
-	Driver: module-bluetooth-device.c
-	Owner Module: 23
-	Properties:
-		device.description = "Nokia BH-905i"
-		device.string = "00:0B:E4:A6:6C:0D"
-		device.api = "bluez"
-		device.class = "sound"
-		device.bus = "bluetooth"
-		device.form_factor = "headset"
-		bluez.path = "/org/bluez/843/hci0/dev_00_0B_E4_A6_6C_0D"
-		bluez.class = "0x240404"
-		bluez.name = "Nokia BH-905i"
-		device.icon_name = "audio-headset-bluetooth"
-		device.intended_roles = "phone"
-	Profiles:
-		a2dp: High Fidelity Playback (A2DP) (sinks: 1, sources: 0, priority. 10)
-		hsp: Telephony Duplex (HSP/HFP) (sinks: 1, sources: 1, priority. 20)
-		off: Off (sinks: 0, sources: 0, priority. 0)
-	Active Profile: hsp
++   if (conn->handle == 0)
++   {
++       kfree(conn);
++   }
++
+return 0;
+}
 
-If I try to switch profiles on the command line it says:
-$ pactl set-card-profile 2 a2dp
-Failure: Input/Output error
 
-and /var/log/messages shows:
-module-bluetooth-device.c: A2DP is not connected, refused to switch profile
-
-Why isn't A2DP connecting?  How can I debug this further?
-
-Thanks,
-	J
+Best regards, 
+Tomas Targownik
 
