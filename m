@@ -1,71 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Hendrik Sattler <post@hendrik-sattler.de>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: =?utf-8?B?UGlvdHIgWmfDs3JlY2tp?= <pzgorecki@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Liu, Haijun" <haijun@qca.qualcomm.com>,
-	"Fan, Hong" <hongfan@qca.qualcomm.com>
-Subject: RE: SRM support in OBEX
-Date: Thu, 23 Jun 2011 08:23:09 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103D01AC@nasanexd01a.na.qualcomm.com>
-References: <BANLkTi=T4dqgKW_7WA9BT7EQ9UY4mRZ7JA@mail.gmail.com>
- <EC94610F2568494D8D9291885C48D3103CFE7E@nasanexd01a.na.qualcomm.com>
- <BANLkTimQ-KuUwpn_7-97KBM36vb0gf1gOg@mail.gmail.com>
- <20110622131818.15044knmo3u145ts@mail.hendrik-sattler.de>
-In-Reply-To: <20110622131818.15044knmo3u145ts@mail.hendrik-sattler.de>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+Date: Thu, 23 Jun 2011 09:49:50 +0300
+Message-ID: <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+Subject: Re: Media API with more than one headset
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Kornatowski <pkorn@gmx.net>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51eC1ibHVldG9vdGgtb3du
-ZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2Vy
-bmVsLm9yZ10gT24gQmVoYWxmIE9mIEhlbmRyaWsgU2F0dGxlcg0KU2VudDogMjAxMeW5tDbmnIgy
-MuaXpSAxOToxOA0KVG86IEx1aXogQXVndXN0byB2b24gRGVudHoNCkNjOiBMaSwgTmFtaTsgUGlv
-dHIgWmfDs3JlY2tpOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnOyBMaXUsIEhhaWp1
-bjsgRmFuLCBIb25nDQpTdWJqZWN0OiBSZTogU1JNIHN1cHBvcnQgaW4gT0JFWA0KDQpaaXRhdCB2
-b24gTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8bHVpei5kZW50ekBnbWFpbC5jb20+Og0KDQo+IEhp
-IE5hbWksDQo+DQo+IDIwMTEvNi8yMiBMaSwgTmFtaSA8bmFtaUBxY2EucXVhbGNvbW0uY29tPjoN
-Cj4+IEhpLCBQaW90cg0KPj4gwqBJIHdvcmtlZCBvbiBTUk0gc2V2ZXJhbCB3ZWVrcyBhZ28gYnV0
-IGZpbmFsbHkgc3RvcHBlZC4NCj4+IMKgSXRgcyBlYXN5IHRvIHNldCBhbmQgY2hlY2sgU1JNIGhl
-YWRlciwgYXMgd2VsbCBhcyBzZXQgdGhlIHJlc3BvbnNlIA0KPj4gbW9kZSB0byBPQkVYX1JTUF9N
-T0RFX1NJTkdMRS4gQW5kIGl0IGlzIGFscmVhZHkgd2VsbCBzdXBwb3J0ZWQgaW4gDQo+PiBvYmV4
-X3dvcmsgZnVuY3Rpb24gd2hlbiB0aGUgcmVzcG9uc2UgbW9kZSBpcyBTUk0sIGNsaWVudCBhbmQg
-c2VydmVyIA0KPj4gY2FuIGNvbnRpbnVlIHNlbmQgZGF0YSB3aXRob3V0IHJlbW90ZSBzaWRlIHJl
-c3BvbnNlIG9yIHJlcXVlc3QuIFRoZSANCj4+IG9iZXhfd29yayBjYWxsYmFjayByZWxhdGlvbnNo
-aXAgaXM6DQo+PiBvYmV4X3Nlc3Npb25fc3RhcnQoKQ0KPj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAuLi4NCj4+IMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgZ19pb19hZGRfd2F0Y2hfZnVsbChpbywgR19QUklPUklU
-WV9ERUZBVUxULA0KPj4gwqAgwqAgR19JT19JTiB8IEdfSU9fSFVQIHwgR19JT19FUlIgfCBHX0lP
-X05WQUwsDQo+PiDCoG9iZXhfaGFuZGxlX2lucHV0LCBvYmV4LCBvYmV4X2hhbmRsZV9kZXN0cm95
-KTsNCj4+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgLi4uDQo+PiBvYmV4X2hhbmRsZV9pbnB1dCgpDQo+PiDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoC4uLg0KPj4gwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBPQkVYX0hhbmRsZUlucHV0KG9iZXgsIDEpDQo+
-PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoC4uLg0KPj4gT0JFWF9IYW5kbGVJbnB1dCgpDQo+PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoC4uLg0KPj4gwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBvYmV4X3dvcmsoc2VsZiwgdGltZW91dCk7DQo+Pg0KPj4g
-VGhlIHByb2JsZW0gaW4gU1JNIGlzOg0KPj4gSWYgcmVtb3RlIHNpZGUgZG9lc25gdCBzZW5kIGFu
-eSBkYXRhIHRvIGxvY2FsIHNpZGUsIHRoZW4gdGhlIEdfSU9fSU4gDQo+PiBjb25kaXRpb24gY291
-bGRuYHQgYmUgc2V0LiBTbyBob3cgb2JleF93b3JrIGNhbiBiZSBjYWxsZWQ/DQo+Pg0KPj4gSSBo
-YXZlbmB0IGZvdW5kIGFueSBnb29kIHNvbHV0aW9uIGZvciB0aGlzIGlzc3VlLiBTbyBpZiB5b3Ug
-Y2FuIHNwZW5kIA0KPj4gc29tZSB0aW1lIG9uIFNSTSwgSWBsbCBiZSB2ZXJ5IGhhcHB5OikNCj4N
-Cj4gTm8gdG9wIHBvc3RpbmcgaW4gdGhpcyBsaXN0LCBwbGVhc2UuDQo+DQo+IFNvIGJhY2sgdG8g
-dGhlIHRvcGljLCB3ZSBwcm9iYWJseSBuZWVkIHRvIGFkZCBhbm90aGVyIHdhdGNoIHdpdGggDQo+
-IEdfSU9fT1VUIHdoZW4gdXNpbmcgU1JNIHNvIHRoYXQgaXQgd2FrZSB1cHMgd2hlbmV2ZXIgd2Ug
-Y2FuIHdyaXRlIHRvIA0KPiB0aGUgc29ja2V0L2ZkLCBvYnZpb3VzbHkgdGhpcyBzaG91bGQgb25s
-eSBiZSBhY3RpdmUgd2hlbiB3ZSBhcmUgDQo+IHNlbmRpbmcgZGF0YSAoR0VUKSBhbmQgdGhlcmUg
-aXMgbm8gbmVlZCB0byBjYWxsIE9CRVhfSGFuZGxlSW5wdXQuDQoNCllvdSBoYXZlIHRvIGNhbGwg
-T0JFWF9IYW5kbGVJbnB1dCgpIGZvciBzdXJlLiBJdCBkb2VzIHRoZSB3b3JrIGFsc28gZm9yIHRo
-ZSBTUk0gY2FzZS4gSSBhbSBhbHNvIHJlZGVzaWduaW5nIHRoZSBzdGF0ZSBtYWNoaW5lIGluIE9w
-ZW5PQkVYIHNvIHRoYXQgaW5jb21wbGV0ZSB3cml0ZXMgb24gbm9uLWJsb2NraW5nIHNvY2tldHMg
-YXJlIHBvc3NpYmxlLiBUaGlzIGZlYXR1cmUgd2lsbCBiZSBwcm90ZWN0ZWQgYnkgYSBmbGFnIGJl
-Y2F1c2UgaXQgY3JlYXRlcyBhIHNtYWxsIHByb2JsZW0gbGlrZSBmb3IgU1JNLg0KSWYgeW91IG5l
-ZWQgYSBmdW5jdGlvbiBpbiBPcGVuT0JFWCB0aGF0IHRlbGxzIHlvdSBpZiBpbnB1dC1pbmRlcGVu
-ZGVudCB3cml0ZXMgYXJlIG5lZWRlZCwganVzdCB0ZWxsIG1lIG9yIGNyZWF0ZSBvbmUgOi0pDQoN
-CkhTDQoNCldoYXQgZG8geW91IG1lYW4gImluY29tcGxldGUgd3JpdGVzIG9uIG5vbi1ibG9ja2lu
-ZyBzb2NrZXRzICIgYW5kICIgaW5wdXQtaW5kZXBlbmRlbnQgd3JpdGVzICI/IERvIHlvdSBtZWFu
-IHRvIHdyaXRlIGxvdHMgb2YgZGF0YSBvbmUgdGltZSBhbmQgdXNlIEdfSU9fT1VUIHRvIHdha2V1
-cCBvYmV4X3dvcms/DQoNClJlZ2FyZHMsDQpOYW1pDQoNCg0KDQotLQ0K
+Hi Peter,
+
+On Thu, Jun 23, 2011 at 12:23 AM, Peter Kornatowski <pkorn@gmx.net> wrote:
+> Hi,
+>
+> I'm using the new bluez media api to set bluetooth headsets into playing
+> mode and get the fd's of the corresponding sockets with a program written in
+> C. This works fine with just one headset, but I'm using up to three at the
+> same time over three bluetooth adapters. So my program (bt-audio) creates a
+> dbus-service with three paths (/test/endpoint0, ...1, ...2) and each path
+> has an interface org.bluez.MediaEndpoint with the four needed methods
+> (SetConfiguration etc.). Then it scans for turned on headsets and calls
+> RegisterEndpoint on the appropriate adapter-path. Then bluez calls three
+> times SetConfiguration on my service. So basically like in the
+> python-example "simple-endpoint". After that my app calls three times
+> Acquire with "rw" on each of the given transport-paths to receive the
+> socket-fd's.
+> As I said, this works well and I can play and record some raw-files with
+> very good quality. But when one of the headsets is turned off, the other two
+> are put out of playing-mode. When I retry to put them back in playing-mode
+> by calling UnregisterEndpoint and then RegisterEndpoint again, I just get
+> "GDBus.Error:org.bluez.Error.NotAuthorized: Operation Not Authorized" and
+> see "sco_bind: Address already in use" in syslog. When retrying too often,
+> bluetoothd segfaults (but this may be related to the way i tried some
+> recovery of this problem in my code) with:
+> kernel: [34309.873606] bluetoothd[29235]: segfault at 6e652f74 ip b76b9b20
+> sp bf93c430 error 4 in bluetoothd[b768c000+7e000]
+>
+> Only after restarting my program (and thus re-registering my dbus-service),
+> I am able to put the headsets back in playing mode again.
+>
+> I also tried this use-case with your simple-endpoint python-script by
+> modifying it like this:
+>
+> def acquire_cb(fd, imtu, omtu):
+>        print "Acquire successfull! New fd: %s with iMTU %i and oMTU %i" %
+> (fd, imtu, omtu)
+> def acquire_error(error):
+>        print "Acquire failed: %s" % (error)
+>        mainloop.quit()
+>
+> ...
+>
+> @dbus.service.method("org.bluez.MediaEndpoint", in_signature="oay",
+> out_signature="")
+> def SetConfiguration(self, transport, config):
+>        print "SetConfiguration (%s, %s)" % (transport, config)
+>        media_transport = dbus.Interface(bus.get_object("org.bluez",
+> transport), "org.bluez.MediaTransport")
+>        media_transport.Acquire("rw", reply_handler=acquire_cb,
+> error_handler=acquire_error)
+>        return
+>
+> So even after starting two or three processes of this script (each with a
+> different hciX), I get the same behaviour: putting all headsets in playing
+> mode is no problem, but turning off one headset puts the others out of
+> playing mode. Trying to put them back in playing mode requires a restart of
+> the scripts, otherwise I just get the same error: "Acquire failed:
+> org.bluez.Error.NotAuthorized: Operation Not Authorized".
+>
+> So why are the other headsets always put out of playing mode and why can't
+> you put them back in playing mode again? Looks like a bug to me, hopefully
+> someone of you can help. I attached the syslog cutout of this problem, too
+> (first section is with my C-program, second with the python-script).
+
+Interesting, this could be a bug in SCO socket can you try that with
+a2dp too? In the meantime I gonna try to reproduce it myself, btw what
+kernel are you using?
+
+-- 
+Luiz Augusto von Dentz
