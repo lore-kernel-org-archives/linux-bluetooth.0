@@ -1,40 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Bluetooth: Prevent buffer overflow in l2cap config request
-From: Dan Rosenberg <drosenberg@vsecurity.com>
-To: marcel@holtmann.org, padovan@profusion.mobi, davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 24 Jun 2011 08:38:05 -0400
-Message-ID: <1308919085.5295.11.camel@dan>
-Mime-Version: 1.0
-Sender: netdev-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <201106241124.45874.szymon.janc@tieto.com>
+References: <1308752563-16991-1-git-send-email-luiz.dentz@gmail.com>
+	<201106241124.45874.szymon.janc@tieto.com>
+Date: Fri, 24 Jun 2011 15:02:55 +0300
+Message-ID: <BANLkTim+bdomiZeQ0onxzK9OCmyjBkWX_g@mail.gmail.com>
+Subject: Re: [PATCH hcidump 1/3] Add basic AVCTP parsing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A remote user can provide a small value for the command size field in
-the command header of an l2cap configuration request, resulting in an
-integer underflow when subtracting the size of the configuration request
-header.  This results in copying a very large amount of data via
-memcpy() and destroying the kernel heap.  Check for underflow.
+Hi,
 
-Signed-off-by: Dan Rosenberg <drosenberg@vsecurity.com>
-Cc: stable <stable@kernel.org>
----
- net/bluetooth/l2cap_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Jun 24, 2011 at 12:24 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Luiz,
+>
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  parser/avctp.c  |   29 +++++++++++++++++++++++++++--
+>>  parser/parser.h |    1 +
+>>  2 files changed, 28 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/parser/avctp.c b/parser/avctp.c
+>> index 4a8876c..aa2def1 100644
+>> --- a/parser/avctp.c
+>> +++ b/parser/avctp.c
+>> @@ -36,10 +36,35 @@
+>>
+>>  #include "parser.h"
+>>
+>> +static char *pt2str(uint8_t hdr)
+>> +{
+>> +     switch (hdr & 0x0c) {
+>> +     case 0x00:
+>> +             return "";
+>> +     case 0x04:
+>> +             return "Start";
+>> +     case 0x08:
+>> +             return "Cont";
+>> +     case 0x0c:
+>> +             return "End";
+>> +     default:
+>> +             return "Unk";
+>> +     }
+>> +}
+>> +
+>>  void avctp_dump(int level, struct frame *frm)
+>>  {
+>> +     uint8_t hdr;
+>> +     uint16_t pid;
+>> +
+>>       p_indent(level, frm);
+>> -     printf("AVCTP:\n");
+>>
+>> -     raw_dump(level, frm);
+>> +     hdr = get_u8(frm);
+>> +     pid = get_u16(frm);
+>> +
+>> +     printf("AVCTP: %s %s: pt 0x%02x transaction %d pid 0x%04x \n",
+>> +                             hdr & 0x02 ? "Response" : "Command",
+>> +                             pt2str(hdr), hdr & 0x0c, hdr >> 4, pid);
+>> +
+>> +     raw_dump(level + 1, frm);
+>>  }
+>> diff --git a/parser/parser.h b/parser/parser.h
+>> index bbdfc01..cf40034 100644
+>> --- a/parser/parser.h
+>> +++ b/parser/parser.h
+>> @@ -231,6 +231,7 @@ void hidp_dump(int level, struct frame *frm);
+>>  void hcrp_dump(int level, struct frame *frm);
+>>  void avdtp_dump(int level, struct frame *frm);
+>>  void avctp_dump(int level, struct frame *frm);
+>> +void avrcp_dump(int level, struct frame *frm);
+>
+> Shouldn't this go to "[PATCH hcidump 2/3] Add basic AVRCP parsing" ?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e64a1c2..06ea272 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2334,7 +2334,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 
- 	/* Reject if config buffer is too small. */
- 	len = cmd_len - sizeof(*req);
--	if (chan->conf_len + len > sizeof(chan->conf_req)) {
-+	if (len < 0 || chan->conf_len + len > sizeof(chan->conf_req)) {
- 		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
- 				l2cap_build_conf_rsp(chan, rsp,
- 					L2CAP_CONF_REJECT, flags), rsp);
+Opps, gonna fix it, thanks.
 
-
+-- 
+Luiz Augusto von Dentz
