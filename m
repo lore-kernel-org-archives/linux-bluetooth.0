@@ -1,105 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Jun 2011 19:31:09 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
-Message-ID: <20110624223109.GB22619@joana>
-References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
- <1307143270-2655-2-git-send-email-mathewm@codeaurora.org>
- <20110606173153.GA30641@joana>
- <alpine.DEB.2.02.1106081612210.5280@mathewm-linux>
- <20110609184747.GB2533@joana>
- <alpine.DEB.2.02.1106091548010.18748@mathewm-linux>
- <20110615000406.GF2613@joana>
- <alpine.DEB.2.02.1106161438390.17210@mathewm-linux>
- <20110620192346.GB7240@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110620192346.GB7240@joana>
+In-Reply-To: <BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
+	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
+	<BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
+	<A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
+	<BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
+	<544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
+	<BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com>
+Date: Fri, 24 Jun 2011 17:41:41 -0400
+Message-ID: <BANLkTi=VkwnSCTMFyYiuzPQphvjYQ-befg@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Santiago Carot <sancane@gmail.com>
+Cc: Elvis Pfutzenreuter <epx@signove.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-20 16:23:46 -0300]:
+Hi Santiago,
 
-> Hi Mat,
-> 
-> * Mat Martineau <mathewm@codeaurora.org> [2011-06-16 14:48:03 -0700]:
-> 
-> > 
-> > On Tue, 14 Jun 2011, Gustavo F. Padovan wrote:
-> > 
-> > >* Mat Martineau <mathewm@codeaurora.org> [2011-06-09 16:09:52 -0700]:
-> > >
-> > >>
-> > >>On Thu, 9 Jun 2011, Gustavo F. Padovan wrote:
-> > >>
-> > >>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-08 16:24:05 -0700]:
-> > >>>
-> > >>>>
-> > >>>>On Mon, 6 Jun 2011, Gustavo F. Padovan wrote:
-> > >>>>
-> > >>>>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
-> > >>>>>
-> > >>>>>>This workqueue will be used for general L2CAP work, not just dealing
-> > >>>>>>with "busy" frames.
-> > >>>>>
-> > >>>>>which general L2CAP work are we talking about?
-> > >>>>
-> > >>>>I'll update the commit message and resubmit, but to immediately
-> > >>>>answer your question:
-> > >>>>
-> > >>>>* ERTM tx queue callbacks (patch 3/4 in this series)
-> > >>>>* ERTM timers (ack, retrans, monitor) that can utilize proper locking.
-> > >>>
-> > >>>What are the problems with ERTM timers? From what I remember it was not using
-> > >>>reference count on them, I fixed this. Patch is on this mailing for review.
-> > >>
-> > >>The ERTM timer handlers modify l2cap_chan data, but use
-> > >>bh_lock_sock() and bh_unlock_sock() instead of lock_sock() and
-> > >>release_sock().  The socket might be locked in userspace context,
-> > >>but these timers can fire and start executing code concurrently.
-> > >>
-> > >>See http://article.gmane.org/gmane.linux.bluez.kernel/6808 for the
-> > >>full description.
-> > >>
-> > >>With the refactoring of L2CAP to separate out the socket code, we
-> > >>will still need a per-channel lock to protect l2cap_chan data.
-> > >
-> > >I understand. I'm just having a similar problem with the workqueue patch.
-> > >
-> > >>
-> > >>>>* Updating the ERTM tx queue after an AMP channel move and L2CAP
-> > >>>>reconfiguration
-> > >>>>* Moving various AMP-related work out of interrupt context
-> > >>>
-> > >>>Marcel wrote a patch sometime ago the move the whole Bluetooth core work out
-> > >>>of the interrupt context. That will help with many issues we have today,
-> > >>>including these you are talking about.
-> > >>>We need to take that patch, fix it, and push it no bluetooth-next.
-> > >>>This task is on my TODO list, but my TODO list is getting bigger. ;)
-> > >>
-> > >>This would be a big help, do you have a pointer to this patch?
-> > >
-> > >http://permalink.gmane.org/gmane.linux.bluez.kernel/6966
-> > >
-> > >It only moves the cmd rx task to workqueue, but it has problems, see the
-> > >comments. I took this patches today and changed it to handle all rx events and
-> > >data in an workqueue. But it still has a issue with timers, because those run
-> > >in interrupt context. I just had no time to think on this, but will tomorrow.
-> > >
-> > 
-> > Could the timers be changed to use the "delayed_work" workqueue
-> > APIs? Then all of those timeouts would be handled on workqueues and
-> > locking would be much more manageable.
-> 
-> Yes, that is the solution I found. If everything runs in process context is
-> better.
+On Fri, Jun 24, 2011 at 6:06 AM, Santiago Carot <sancane@gmail.com> wrote:
+> Coming back to this issue. I was just wondering that we may not need
+> worried about this issue because the same case may occurs at GATT
+> level. I mean, an application using GATT could disturb the behaviour
+> of other one when it enables/disables characteristics.
 
-Btw, my latest patches on this are here
+Actually, the current D-Bus "generic" GATT API does not enable/disable
+notifications (it assumes it has been enabled by some other mean, e.g.
+using gatttool). I had a patch to enable it when the first D-Bus
+client was interested on a characteristic (disabling was not possible
+yet), but it has not been submitted upstream (we are currently
+focusing on the core API for profiles AKA "attio driver").
 
-http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-testing.git;a=summary
+So, as of now, some application using the generic D-Bus API will not
+affect the profile specific behavior, as it can only read/write
+characteristic values, and watch for already enabled
+notifications/indications.
 
-But they are ready for merge yet.
+> Because of any application can enable/disable characteristics we don't
+> need to worry about to manage this in the Thermometer API. Remember
+> that in other threads in the mailing list people were speaking about
+> making a D-Bus API for GATT. Those applications using GATT could
+> enable notification for measures and disable it. On account of this,
+> it will be inevitable collisions in the use cases.
 
-	Gustavo
+I think we should adopt a refcount like behavior for
+notifications/indications, and bluez core should manage this. IOW,
+applications registered over d-bus grab a counter, on the first ref()
+the notification/indication is enabled on peer device, on last unref()
+it is disabled.
+
+My two cents,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
