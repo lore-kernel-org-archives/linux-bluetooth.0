@@ -1,74 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC] Health Thermometer Profile API
-Mime-Version: 1.0 (Apple Message framework v1084)
+Date: Fri, 24 Jun 2011 19:31:09 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/4] Bluetooth: Rename _busy_wq to _l2cap_wq
+Message-ID: <20110624223109.GB22619@joana>
+References: <1307143270-2655-1-git-send-email-mathewm@codeaurora.org>
+ <1307143270-2655-2-git-send-email-mathewm@codeaurora.org>
+ <20110606173153.GA30641@joana>
+ <alpine.DEB.2.02.1106081612210.5280@mathewm-linux>
+ <20110609184747.GB2533@joana>
+ <alpine.DEB.2.02.1106091548010.18748@mathewm-linux>
+ <20110615000406.GF2613@joana>
+ <alpine.DEB.2.02.1106161438390.17210@mathewm-linux>
+ <20110620192346.GB7240@joana>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <BANLkTi=YHkhEiffbRuXWyqKa_Xw31W6JXw@mail.gmail.com>
-Date: Fri, 24 Jun 2011 23:14:18 -0300
-Cc: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
-Message-Id: <092E3C75-499E-4E78-A167-F2DB57A0051E@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com> <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com> <BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com> <544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com> <BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com> <75C285AD-9C2B-4F57-A998-D1346A68AEEE@signove.com> <BANLkTi=YHkhEiffbRuXWyqKa_Xw31W6JXw@mail.gmail.com>
-To: mike tsai <mikeyhtsai@gmail.com>
+In-Reply-To: <20110620192346.GB7240@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Jun 24, 2011, at 11:27 AM, mike tsai wrote:
+* Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-20 16:23:46 -0300]:
 
-> On Fri, Jun 24, 2011 at 6:20 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
->>>> (cut)
->>> 
->>> Coming back to this issue. I was just wondering that we may not need
->>> worried about this issue because the same case may occurs at GATT
->>> level. I mean, an application using GATT could disturb the behaviour
->>> of other one when it enables/disables characteristics.
->> 
->> Ok, but then the risk is clear. My feeling is that people are already
->> "toning down" this API because of this. (One of the reasons my patch
->> to add descriptor manipulation capability was rejected is that it was
->> not meant to be a complete API and effort should go to profile-specific
->> APIs. Without this, you can't toggle notifications and indications
->> using generic GATT API anyway.)
->> 
->>> 
->>> Because of any application can enable/disable characteristics we don't
->>> need to worry about to manage this in the Thermometer API. Remember
->>> that in other threads in the mailing list people were speaking about
->>> making a D-Bus API for GATT. Those applications using GATT could
->>> enable notification for measures and disable it. On account of this,
->>> it will be inevitable collisions in the use cases.
->>> 
->>> For this reason I think that the Thermometer API should be the most
->>> permissive possible. If any application disable intermediate or final
->>> measures, the PropertyChanged signal will be triggered, well, there is
->>> no problem, if there are agents interested in such measures they only
->>> will have to enable the proterty in the API once again as usual.
->> 
->> I can see two apps monitoring PropertyChanged to enforce opposite
->> states of notification. It would create a lot of heat.
->> 
->>> To summarize, I think we should add the properties to enable and
->>> disable intermediate and final measures and to leave to applications
->>> to take deccisions about how they are going to behave when this stuff
->>> happen.
->> 
->> I remember Marcel saying once that applications always do the wrong
->> thing when given the chance :) In this respect, our opinions are
->> pretty much opposite; IMHO one application must not have a way to
->> create a problem to others. Notification interval is impossible to
->> insulate, for there is just one per device, but we can do better for
->> toggling of notifications.
->> 
->> It would be nice to have more opinions on this.
-> could we apply an 'OR' logic to this inside the profile? Each
-> application will have its own property setting.
-> So if App-A enables both, then it will receive both immediate/.final
-> temperatures indication/notification.
-> if App-B enables only final, then it receives final temperature indication only.
-> There are still the issue of how profile can "wake up" application(s)
-> when notification/indication come.
+> Hi Mat,
+> 
+> * Mat Martineau <mathewm@codeaurora.org> [2011-06-16 14:48:03 -0700]:
+> 
+> > 
+> > On Tue, 14 Jun 2011, Gustavo F. Padovan wrote:
+> > 
+> > >* Mat Martineau <mathewm@codeaurora.org> [2011-06-09 16:09:52 -0700]:
+> > >
+> > >>
+> > >>On Thu, 9 Jun 2011, Gustavo F. Padovan wrote:
+> > >>
+> > >>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-08 16:24:05 -0700]:
+> > >>>
+> > >>>>
+> > >>>>On Mon, 6 Jun 2011, Gustavo F. Padovan wrote:
+> > >>>>
+> > >>>>>* Mat Martineau <mathewm@codeaurora.org> [2011-06-03 16:21:08 -0700]:
+> > >>>>>
+> > >>>>>>This workqueue will be used for general L2CAP work, not just dealing
+> > >>>>>>with "busy" frames.
+> > >>>>>
+> > >>>>>which general L2CAP work are we talking about?
+> > >>>>
+> > >>>>I'll update the commit message and resubmit, but to immediately
+> > >>>>answer your question:
+> > >>>>
+> > >>>>* ERTM tx queue callbacks (patch 3/4 in this series)
+> > >>>>* ERTM timers (ack, retrans, monitor) that can utilize proper locking.
+> > >>>
+> > >>>What are the problems with ERTM timers? From what I remember it was not using
+> > >>>reference count on them, I fixed this. Patch is on this mailing for review.
+> > >>
+> > >>The ERTM timer handlers modify l2cap_chan data, but use
+> > >>bh_lock_sock() and bh_unlock_sock() instead of lock_sock() and
+> > >>release_sock().  The socket might be locked in userspace context,
+> > >>but these timers can fire and start executing code concurrently.
+> > >>
+> > >>See http://article.gmane.org/gmane.linux.bluez.kernel/6808 for the
+> > >>full description.
+> > >>
+> > >>With the refactoring of L2CAP to separate out the socket code, we
+> > >>will still need a per-channel lock to protect l2cap_chan data.
+> > >
+> > >I understand. I'm just having a similar problem with the workqueue patch.
+> > >
+> > >>
+> > >>>>* Updating the ERTM tx queue after an AMP channel move and L2CAP
+> > >>>>reconfiguration
+> > >>>>* Moving various AMP-related work out of interrupt context
+> > >>>
+> > >>>Marcel wrote a patch sometime ago the move the whole Bluetooth core work out
+> > >>>of the interrupt context. That will help with many issues we have today,
+> > >>>including these you are talking about.
+> > >>>We need to take that patch, fix it, and push it no bluetooth-next.
+> > >>>This task is on my TODO list, but my TODO list is getting bigger. ;)
+> > >>
+> > >>This would be a big help, do you have a pointer to this patch?
+> > >
+> > >http://permalink.gmane.org/gmane.linux.bluez.kernel/6966
+> > >
+> > >It only moves the cmd rx task to workqueue, but it has problems, see the
+> > >comments. I took this patches today and changed it to handle all rx events and
+> > >data in an workqueue. But it still has a issue with timers, because those run
+> > >in interrupt context. I just had no time to think on this, but will tomorrow.
+> > >
+> > 
+> > Could the timers be changed to use the "delayed_work" workqueue
+> > APIs? Then all of those timeouts would be handled on workqueues and
+> > locking would be much more manageable.
+> 
+> Yes, that is the solution I found. If everything runs in process context is
+> better.
 
-It is a tempting alternative, would render a very clean API.
+Btw, my latest patches on this are here
 
-Thing is, you need to show each client app process a different 'view' of
-those D-Bus properties. It is feasible, but it is a new trick, not
-employed in other APIs.
+http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-testing.git;a=summary
+
+But they are ready for merge yet.
+
+	Gustavo
