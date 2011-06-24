@@ -1,75 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH hcidump 1/3] Add basic AVCTP parsing
+Date: Fri, 24 Jun 2011 11:24:45 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1308752563-16991-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1308752563-16991-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
-	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
-	<BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
-	<A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
-	<BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
-	<544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
-Date: Fri, 24 Jun 2011 12:06:31 +0200
-Message-ID: <BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com>
-Subject: Re: [RFC] Health Thermometer Profile API
-From: Santiago Carot <sancane@gmail.com>
-To: Elvis Pfutzenreuter <epx@signove.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201106241124.45874.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-(cut)
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+>  parser/avctp.c  |   29 +++++++++++++++++++++++++++--
+>  parser/parser.h |    1 +
+>  2 files changed, 28 insertions(+), 2 deletions(-)
+> 
+> diff --git a/parser/avctp.c b/parser/avctp.c
+> index 4a8876c..aa2def1 100644
+> --- a/parser/avctp.c
+> +++ b/parser/avctp.c
+> @@ -36,10 +36,35 @@
+>  
+>  #include "parser.h"
+>  
+> +static char *pt2str(uint8_t hdr)
+> +{
+> +	switch (hdr & 0x0c) {
+> +	case 0x00:
+> +		return "";
+> +	case 0x04:
+> +		return "Start";
+> +	case 0x08:
+> +		return "Cont";
+> +	case 0x0c:
+> +		return "End";
+> +	default:
+> +		return "Unk";
+> +	}
+> +}
+> +
+>  void avctp_dump(int level, struct frame *frm)
+>  {
+> +	uint8_t hdr;
+> +	uint16_t pid;
+> +
+>  	p_indent(level, frm);
+> -	printf("AVCTP:\n");
+>  
+> -	raw_dump(level, frm);
+> +	hdr = get_u8(frm);
+> +	pid = get_u16(frm);
+> +
+> +	printf("AVCTP: %s %s: pt 0x%02x transaction %d pid 0x%04x \n",
+> +				hdr & 0x02 ? "Response" : "Command",
+> +				pt2str(hdr), hdr & 0x0c, hdr >> 4, pid);
+> +
+> +	raw_dump(level + 1, frm);
+>  }
+> diff --git a/parser/parser.h b/parser/parser.h
+> index bbdfc01..cf40034 100644
+> --- a/parser/parser.h
+> +++ b/parser/parser.h
+> @@ -231,6 +231,7 @@ void hidp_dump(int level, struct frame *frm);
+>  void hcrp_dump(int level, struct frame *frm);
+>  void avdtp_dump(int level, struct frame *frm);
+>  void avctp_dump(int level, struct frame *frm);
+> +void avrcp_dump(int level, struct frame *frm);
 
->> I mean the case when a process (it is not neccesary it has to be an
->> agent) is enabling intermediate and/or final notifications through
->> setProperty method in D-Bus API. Please, note that any process can do
->> this in current API because no extra control is done for this
->> operation.
->>
->> May be I'm misundertanding what you want to said with per-agent basis
->> but as far as I see the only way to manage enabling/disabling
->> properties in this way is by adding a new parameter in setProperty
->> method with the agent path and checkicng if it is already registered
->> before enabling or disabling intermediate and final notifications. IMO
->> If we do this we would break the BlueZ APIs where no extra parameters
->> are required in such methods. I'm not sure if this would be a problem
->> but I don't feel comfortable with this solution.
->>
->> On the other hands, if we discard adding the agent parameter in that
->> method (which I think that it fits better in BlueZ API), we can ignore
->> the case when there aren't any agents registered for the thermometer
->> service and a process enables some of this properties. In this case it
->> wouldn't be necessary to activate these properties since no one will
->> receive notifications for the measures.
->
-> True, I did not remember that those were properties. They would have
-> to go, otherwise it is too easy for an app to "break" another, by
-> disabling notifications.
+Shouldn't this go to "[PATCH hcidump 2/3] Add basic AVRCP parsing" ?
 
-Coming back to this issue. I was just wondering that we may not need
-worried about this issue because the same case may occurs at GATT
-level. I mean, an application using GATT could disturb the behaviour
-of other one when it enables/disables characteristics.
+>  void att_dump(int level, struct frame *frm);
+>  void smp_dump(int level, struct frame *frm);
+>  
 
-Because of any application can enable/disable characteristics we don't
-need to worry about to manage this in the Thermometer API. Remember
-that in other threads in the mailing list people were speaking about
-making a D-Bus API for GATT. Those applications using GATT could
-enable notification for measures and disable it. On account of this,
-it will be inevitable collisions in the use cases.
-
-For this reason I think that the Thermometer API should be the most
-permissive possible. If any application disable intermediate or final
-measures, the PropertyChanged signal will be triggered, well, there is
-no problem, if there are agents interested in such measures they only
-will have to enable the proterty in the API once again as usual.
-
-To summarize, I think we should add the properties to enable and
-disable intermediate and final measures and to leave to applications
-to take deccisions about how they are going to behave when this stuff
-happen.
-
-Waiting for you comments before sending a new RFC.
-
-Regards.
+-- 
+BR
+Szymon Janc
