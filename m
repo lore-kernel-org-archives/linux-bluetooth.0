@@ -1,142 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Adamek <adamek.kuba@gmail.com>
+Message-ID: <4E03DA75.2080606@goop.org>
+Date: Thu, 23 Jun 2011 17:29:41 -0700
+From: Jeremy Fitzhardinge <jeremy@goop.org>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [PATCH obexd v3 05/11] Add functions to get, put w. a_header list
-Date: Fri, 24 Jun 2011 02:39:11 +0200
-Message-Id: <1308875957-13397-6-git-send-email-adamek.kuba@gmail.com>
-In-Reply-To: <1308875957-13397-1-git-send-email-adamek.kuba@gmail.com>
-References: <1308875957-13397-1-git-send-email-adamek.kuba@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Linux 3.0-rc4: regression reconnecting bluetooth headset (A2DP fails)
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- gwobex/obex-priv.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- gwobex/obex-priv.h |   34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 81 insertions(+), 0 deletions(-)
+I have a Nokia BH-905i headset.  With a stock F15 kernel, it all works
+well. With current linux-2.6.git, it fails to reconnect properly.
 
-diff --git a/gwobex/obex-priv.c b/gwobex/obex-priv.c
-index 7d85045..2073c2c 100644
---- a/gwobex/obex-priv.c
-+++ b/gwobex/obex-priv.c
-@@ -847,6 +847,17 @@ gboolean gw_obex_get(GwObex *ctx,
-                      const guint8 *apparam, gint apparam_size,
-                      gchar **buf, gint *buf_size, int stream_fd,
-                      gboolean async) {
-+    return gw_obex_get_with_aheaders(ctx, local, remote, type,
-+                                     apparam, apparam_size,
-+                                     NULL, buf, buf_size, stream_fd, async);
-+}
-+
-+gboolean gw_obex_get_with_aheaders(GwObex *ctx, const gchar *local,
-+                                   const gchar *remote, const gchar *type,
-+                                   const guint8 *apparam, gint apparam_size,
-+                                   const GSList *aheaders,
-+                                   gchar **buf, gint *buf_size, int stream_fd,
-+                                   gboolean async) {
-     gboolean ret = FALSE;
-     obex_headerdata_t hv;
-     obex_object_t *object;
-@@ -911,6 +922,17 @@ gboolean gw_obex_get(GwObex *ctx,
-         }
-     }
- 
-+    if (aheaders) {
-+        const GSList *hlist = aheaders;
-+        struct a_header *ah;
-+        while (hlist) {
-+            ah = hlist->data;
-+            hv = ah->hv;
-+            OBEX_ObjectAddHeader(ctx->handle, object, ah->hi, hv, ah->hv_size, 0);
-+            hlist = g_slist_next(hlist);
-+        }
-+    }
-+
-     OBEX_ObjectReadStream(ctx->handle, object, NULL);
- 
-     if (async) {
-@@ -964,6 +986,20 @@ gboolean gw_obex_put(GwObex *ctx,
-                      const guint8 *apparam, gint apparam_size,
-                      const gchar *buf, gint object_size, time_t object_time,
-                      int stream_fd, gboolean async) {
-+    return gw_obex_put_with_aheaders(ctx, local, remote, type,
-+                                     apparam, apparam_size,
-+                                     NULL, buf, object_size, object_time,
-+                                     stream_fd, async);
-+}
-+
-+gboolean gw_obex_put_with_aheaders(GwObex *ctx,
-+                                   const gchar *local, const gchar *remote,
-+                                   const gchar *type,
-+                                   const guint8 *apparam, gint apparam_size,
-+                                   const GSList *aheaders,
-+                                   const gchar *buf,
-+                                   gint object_size, time_t object_time,
-+                                   int stream_fd, gboolean async) {
-     gboolean ret = FALSE;
-     obex_headerdata_t hv;
-     obex_object_t *object;
-@@ -1042,6 +1078,17 @@ gboolean gw_obex_put(GwObex *ctx,
-         OBEX_ObjectAddHeader(ctx->handle, object, OBEX_HDR_APPARAM, hv, apparam_size, 0);
-     }
- 
-+    if (aheaders) {
-+        const GSList *hlist = aheaders;
-+        struct a_header *ah;
-+        while (hlist) {
-+            ah = hlist->data;
-+            hv = ah->hv;
-+            OBEX_ObjectAddHeader(ctx->handle, object, ah->hi, hv, ah->hv_size, 0);
-+            hlist = g_slist_next(hlist);
-+        }
-+    }
-+
-     /* Try to figure out modification time if none was given */
-     if (ctx->xfer->stream_fd >= 0) {
-         struct stat stats;
-diff --git a/gwobex/obex-priv.h b/gwobex/obex-priv.h
-index f4e3e5b..0ae942c 100644
---- a/gwobex/obex-priv.h
-+++ b/gwobex/obex-priv.h
-@@ -214,4 +214,38 @@ gboolean gw_obex_put(GwObex *ctx,
-                      const gchar *buf, gint buf_size, time_t object_time,
-                      int stream_fd, gboolean async);
- 
-+
-+/** Get an object from the server, specifying additional headers
-+ * @param ctx Pointer returned by gw_obex_setup()
-+ * @param local Local filename which contains the object
-+ * @param remote Remote filename to store the object in
-+ * @param type MIME-type of the object (NULL if not known)
-+ * @param aheaders list of additional headers (NULL if empty)
-+ * @returns TRUE on success, FALSE on failure
-+ */
-+gboolean gw_obex_get_with_aheaders(GwObex *ctx,
-+                                   const gchar *local, const gchar *remote,
-+                                   const gchar *type,
-+                                   const guint8 *apparam, gint apparam_size,
-+                                   const GSList *aheaders,
-+                                   gchar **buf, gint *buf_size, int stream_fd,
-+                                   gboolean async);
-+
-+/** Send an object to the server
-+ * @param ctx Pointer returned by gw_obex_setup()
-+ * @param local Local filename to store the objec in
-+ * @param remote Remote filename which contains the object
-+ * @param type MIME-type of the object (NULL if not known)
-+ * @param aheaders list of additional headers (NULL if empty)
-+ * @returns TRUE on success, FALSE on failure
-+ */
-+gboolean gw_obex_put_with_aheaders(GwObex *ctx,
-+                                   const gchar *local, const gchar *remote,
-+                                   const gchar *type,
-+                                   const guint8 *apparam, gint apparam_size,
-+                                   const GSList *aheaders,
-+                                   const gchar *buf, gint buf_size,
-+                                   time_t object_time,
-+                                   int stream_fd, gboolean async);
-+
- #endif /* _OBEX_PRIV_H_ */
--- 
-1.7.0.4
+On connection, the headphones only beep once, whereas they normally beep
+twice; I think this is one beep per profile, and its only connecting HSP
+and failing A2DP.  In the sound control panel, it either comes up with
+"profile: off" or with the HSP/HFP (Telephony) profile rather than A2DP,
+and it fails to switch if I try to change profiles via the sound control
+panel.
+
+However, if I re-pair the device from scratch each time I use it, it
+connects properly and it all works fine.
+
+pactl list shows:
+
+Card #2
+	Name: bluez_card.00_0B_E4_A6_6C_0D
+	Driver: module-bluetooth-device.c
+	Owner Module: 23
+	Properties:
+		device.description = "Nokia BH-905i"
+		device.string = "00:0B:E4:A6:6C:0D"
+		device.api = "bluez"
+		device.class = "sound"
+		device.bus = "bluetooth"
+		device.form_factor = "headset"
+		bluez.path = "/org/bluez/843/hci0/dev_00_0B_E4_A6_6C_0D"
+		bluez.class = "0x240404"
+		bluez.name = "Nokia BH-905i"
+		device.icon_name = "audio-headset-bluetooth"
+		device.intended_roles = "phone"
+	Profiles:
+		a2dp: High Fidelity Playback (A2DP) (sinks: 1, sources: 0, priority. 10)
+		hsp: Telephony Duplex (HSP/HFP) (sinks: 1, sources: 1, priority. 20)
+		off: Off (sinks: 0, sources: 0, priority. 0)
+	Active Profile: hsp
+
+If I try to switch profiles on the command line it says:
+$ pactl set-card-profile 2 a2dp
+Failure: Input/Output error
+
+and /var/log/messages shows:
+module-bluetooth-device.c: A2DP is not connected, refused to switch profile
+
+Why isn't A2DP connecting?  How can I debug this further?
+
+Thanks,
+	J
 
