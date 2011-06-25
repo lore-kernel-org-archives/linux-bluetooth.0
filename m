@@ -1,46 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Sat, 25 Jun 2011 16:40:32 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Jeremy Fitzhardinge <jeremy@goop.org>
-Cc: Keith Packard <keithp@keithp.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Waldemar.Rymarkiewicz@tieto.com, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key
- requirements"
-Message-ID: <20110625194032.GE22619@joana>
-References: <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com>
- <20110609083345.GA2894@dell.ccr.corp.intel.com>
- <yuny61b3pnm.fsf@aiko.keithp.com>
- <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com>
- <20110610055558.GA1832@dell>
- <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com>
- <yun8vsynkiy.fsf@aiko.keithp.com>
- <20110619175937.GA24188@dell.ger.corp.intel.com>
- <yunliwxabmz.fsf@aiko.keithp.com>
- <4E0575DE.4070004@goop.org>
+Message-ID: <1309029750.36748.YahooMailClassic@web26507.mail.ukl.yahoo.com>
+Date: Sat, 25 Jun 2011 20:22:30 +0100 (BST)
+From: Mark Hobley <markhobley@yahoo.co.uk>
+Reply-To: markhobley@yahoo.co.uk
+Subject: Re: How do I make the computer visible to the mobile phone?
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1309019239.14190.31.camel@THOR>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E0575DE.4070004@goop.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-24 22:45:02 -0700]:
+--- On Sat, 25/6/11, Peter Hurley <peter@hurleysoftware.com> wrote:
 
-> On 06/19/2011 12:01 PM, Keith Packard wrote:
-> >> I think you'll need both of them to fix the pairing/security issues.
-> > Yup, with both of those patches, I get syncml and dun working again.
-> >
-> > (sorry for the delayed testing, I'm traveling)
-> 
-> I just bisected the problems I had reconnecting my Nokia BH-905i
-> headphones to the same change that Keith identified, and merging
-> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-> into my tree fixed it.
-> 
-> So +1 from me to get this into mainline soon.
+> The typical way to debug bluetooth issues is:
+> 1. add debug flag "-d" to bluetoothd command line and then
+> review system log
 
-It's on the way. Right now patches are on David Miller' tree.
+There is some strange stuff going on:
 
-	Gustavo
+Jun 25 19:48:27 venus udevd[25268]: failed to execute '/usr/local/sbin/bluetoothd' '/usr/local/sbin/bluetoothd --udev': No such file or directory
+
+bluetoothd is in /usr/sbin not /usr/local/sbin. I don't know how to switch that.
+
+Jun 25 19:48:41 venus bluetoothd[916]: input-headset driver probe failed for device 00:1F:CC:C2:E4:86
+
+I don't know what that is. I don't have a bluetooth headset. That is the address of my mobile phone.
+
+Mark.
+
