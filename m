@@ -1,32 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E0575DE.4070004@goop.org>
-Date: Fri, 24 Jun 2011 22:45:02 -0700
-From: Jeremy Fitzhardinge <jeremy@goop.org>
-MIME-Version: 1.0
-To: Keith Packard <keithp@keithp.com>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Waldemar.Rymarkiewicz@tieto.com, padovan@profusion.mobi,
- marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key requirements"
-References: <yunboy7a2so.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com> <20110609083345.GA2894@dell.ccr.corp.intel.com> <yuny61b3pnm.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com> <20110610055558.GA1832@dell> <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com> <yun8vsynkiy.fsf@aiko.keithp.com> <20110619175937.GA24188@dell.ger.corp.intel.com> <yunliwxabmz.fsf@aiko.keithp.com>
-In-Reply-To: <yunliwxabmz.fsf@aiko.keithp.com>
-Content-Type: text/plain; charset=ISO-8859-15
+Subject: Re: [RFC] Health Thermometer Profile API
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Elvis Pfutzenreuter <epx@signove.com>
+In-Reply-To: <BANLkTi=YHkhEiffbRuXWyqKa_Xw31W6JXw@mail.gmail.com>
+Date: Fri, 24 Jun 2011 23:14:18 -0300
+Cc: Santiago Carot <sancane@gmail.com>, linux-bluetooth@vger.kernel.org
+Message-Id: <092E3C75-499E-4E78-A167-F2DB57A0051E@signove.com>
+References: <1308661408-8364-1-git-send-email-sancane@gmail.com> <C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com> <BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com> <A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com> <BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com> <544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com> <BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com> <75C285AD-9C2B-4F57-A998-D1346A68AEEE@signove.com> <BANLkTi=YHkhEiffbRuXWyqKa_Xw31W6JXw@mail.gmail.com>
+To: mike tsai <mikeyhtsai@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/19/2011 12:01 PM, Keith Packard wrote:
->> I think you'll need both of them to fix the pairing/security issues.
-> Yup, with both of those patches, I get syncml and dun working again.
->
-> (sorry for the delayed testing, I'm traveling)
+On Jun 24, 2011, at 11:27 AM, mike tsai wrote:
 
-I just bisected the problems I had reconnecting my Nokia BH-905i
-headphones to the same change that Keith identified, and merging
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-into my tree fixed it.
+> On Fri, Jun 24, 2011 at 6:20 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
+>>>> (cut)
+>>> 
+>>> Coming back to this issue. I was just wondering that we may not need
+>>> worried about this issue because the same case may occurs at GATT
+>>> level. I mean, an application using GATT could disturb the behaviour
+>>> of other one when it enables/disables characteristics.
+>> 
+>> Ok, but then the risk is clear. My feeling is that people are already
+>> "toning down" this API because of this. (One of the reasons my patch
+>> to add descriptor manipulation capability was rejected is that it was
+>> not meant to be a complete API and effort should go to profile-specific
+>> APIs. Without this, you can't toggle notifications and indications
+>> using generic GATT API anyway.)
+>> 
+>>> 
+>>> Because of any application can enable/disable characteristics we don't
+>>> need to worry about to manage this in the Thermometer API. Remember
+>>> that in other threads in the mailing list people were speaking about
+>>> making a D-Bus API for GATT. Those applications using GATT could
+>>> enable notification for measures and disable it. On account of this,
+>>> it will be inevitable collisions in the use cases.
+>>> 
+>>> For this reason I think that the Thermometer API should be the most
+>>> permissive possible. If any application disable intermediate or final
+>>> measures, the PropertyChanged signal will be triggered, well, there is
+>>> no problem, if there are agents interested in such measures they only
+>>> will have to enable the proterty in the API once again as usual.
+>> 
+>> I can see two apps monitoring PropertyChanged to enforce opposite
+>> states of notification. It would create a lot of heat.
+>> 
+>>> To summarize, I think we should add the properties to enable and
+>>> disable intermediate and final measures and to leave to applications
+>>> to take deccisions about how they are going to behave when this stuff
+>>> happen.
+>> 
+>> I remember Marcel saying once that applications always do the wrong
+>> thing when given the chance :) In this respect, our opinions are
+>> pretty much opposite; IMHO one application must not have a way to
+>> create a problem to others. Notification interval is impossible to
+>> insulate, for there is just one per device, but we can do better for
+>> toggling of notifications.
+>> 
+>> It would be nice to have more opinions on this.
+> could we apply an 'OR' logic to this inside the profile? Each
+> application will have its own property setting.
+> So if App-A enables both, then it will receive both immediate/.final
+> temperatures indication/notification.
+> if App-B enables only final, then it receives final temperature indication only.
+> There are still the issue of how profile can "wake up" application(s)
+> when notification/indication come.
 
-So +1 from me to get this into mainline soon.
+It is a tempting alternative, would render a very clean API.
 
-Thanks,
-    J
+Thing is, you need to show each client app process a different 'view' of
+those D-Bus properties. It is feasible, but it is a new trick, not
+employed in other APIs.
