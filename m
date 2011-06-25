@@ -1,39 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: "markhobley@yahoo.co.uk" <markhobley@yahoo.co.uk>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sat, 25 Jun 2011 12:27:19 -0400
-Subject: Re: How do I make the computer visible to the mobile phone?
-Message-ID: <1309019239.14190.31.camel@THOR>
-References: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
-In-Reply-To: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
+Date: Sat, 25 Jun 2011 13:44:32 +0100 (BST)
+From: Mark Hobley <markhobley@yahoo.co.uk>
+Reply-To: markhobley@yahoo.co.uk
+Subject: How do I make the computer visible to the mobile phone?
+To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T24gU2F0LCAyMDExLTA2LTI1IGF0IDA4OjQ0IC0wNDAwLCBNYXJrIEhvYmxleSB3cm90ZToNCj4g
-SSBhbSB1c2luZyBEZWJpYW4gKE1peGVkL1Vuc3RhYmxlKSBhbmQgSSBoYXZlIGEgTmFubyBUaW55
-IEJsdWV0b290aCBhZGFwdGVyDQo+IHRoYXQgdXNlcyBhbiBBY2NlbCBTZW1pY29uZHVjdG9yIG1p
-Y3JvY2hpcC4gVGhlIG1vYmlsZSBwaG9uZSBpcyB2aXNpYmxlIHRvDQo+IHRoZSBjb21wdXRlciwg
-YnV0IEkgY2Fubm90IHNlZSB0aGUgY29tcHV0ZXIgZnJvbSB0aGUgbW9iaWxlIHBob25lLiBIb3cg
-ZG8gSQ0KPiBtYWtlIHRoZSBjb21wdXRlciB2aXNpYmxlIHRvIG15IG1vYmlsZSBwaG9uZT8NCg0K
-CXN1ZG8gaGNpY29uZmlnIGhjaTAgcGlzY2FuDQoNClNob3VsZCB3b3JrLg0KDQpEaWQgeW91IHJl
-c29sdmUgeW91ciBlYXJsaWVyIHByb2JsZW0gd2l0aCB0aW1lb3V0cz8NCmh0dHA6Ly9tYXJjLmlu
-Zm8vP2w9bGludXgtYmx1ZXRvb3RoJm09MTMwODc3NDE2MjEzMzA3Jnc9Mg0KDQpJbiBhIHRlcm1p
-bmFsOg0KCWhjaXRvb2wgc2Nhbg0Kc2hvdWxkIHByaW50IG91dCB0aGUgQkRfQUREUiBvZiB0aGUg
-cGhvbmUNCglibHVlei1zaW1wbGUtYWdlbnQgaGNpMCBCRF9BRERSDQpzaG91bGQgcGFpci4NCldo
-YXQgaGFwcGVucz8NCg0KVGhlIHR5cGljYWwgd2F5IHRvIGRlYnVnIGJsdWV0b290aCBpc3N1ZXMg
-aXM6DQoxLiBhZGQgZGVidWcgZmxhZyAiLWQiIHRvIGJsdWV0b290aGQgY29tbWFuZCBsaW5lIGFu
-ZCB0aGVuIHJldmlldyBzeXN0ZW0NCmxvZw0KMi4gcnVuIGhjaWR1bXAgd2hpbGUgcGVyZm9ybWlu
-ZyBvcGVyYXRpb24gdGhhdCdzIG5vdCB3b3JraW5nDQoJc3VkbyBoY2lkdW1wIC10VlggPiBmaWxl
-bmFtZQ0KICAgLW9yLQ0KCXN1ZG8gaGNpZHVtcCAtdCAtLXNhdmUtZHVtcD1maWxlbmFtZQ0KCWhj
-aWR1bXAgLXRWWHIgZmlsZW5hbWUNClBvc3QgdGhlIGR1bXAgYW5kIGxldCBzb21lb25lIGxvb2sg
-YXQgaXQuDQoNCj4gICAgICAgICBDbGFzczogMHg0YTAxMDANCj4gICAgICAgICBTZXJ2aWNlIENs
-YXNzZXM6IE5ldHdvcmtpbmcsIENhcHR1cmluZywgVGVsZXBob255DQo+ICAgICAgICAgRGV2aWNl
-IENsYXNzOiBDb21wdXRlciwgVW5jYXRlZ29yaXplZA0KDQpUaGVzZSBsb29rIG9rIHRvIG1lLg0K
-DQo+IERvZXMgYW55b25lIGtub3cgd2hhdCB0aGUgY2xhc3MgY29kZXMgYXJlPyANCg0KQ2xhc3Nf
-b2ZfZGV2aWNlIGlzIGRlZmluZWQgaGVyZToNCmh0dHBzOi8vd3d3LmJsdWV0b290aC5vcmcvVGVj
-aG5pY2FsL0Fzc2lnbmVkTnVtYmVycy9iYXNlYmFuZC5odG0NCg0KPiBTaG91bGQgSSBjaGFuZ2Ug
-dGhlIGNsYXNzIGNvZGUgDQo+IGluIHRoZSAvZXRjL2JsdWV0b290aC9tYWluLmNvbmYgY29uZmln
-dXJhdGlvbiBmaWxlPw0KDQpOby4NCg==
+I am using Debian (Mixed/Unstable) and I have a Nano Tiny Bluetooth adapter
+that uses an Accel Semiconductor microchip. The mobile phone is visible to
+the computer, but I cannot see the computer from the mobile phone. How do I
+make the computer visible to my mobile phone?
+
+I have enabled both pscan and iscan as follows:
+
+ hciconfig hci0 piscan
+
+The hciconfig tool reveals the following configuration:
+
+hciconfig -a                                                       
+hci0:   Type: BR/EDR  Bus: USB
+        BD Address: 00:1F:81:00:01:1C  ACL MTU: 1021:4  SCO MTU: 180:1
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:2273 acl:0 sco:0 events:59 errors:0
+        TX bytes:479 acl:0 sco:0 commands:45 errors:0
+        Features: 0xff 0x3e 0x09 0x76 0x80 0x01 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF 
+        Link mode: SLAVE ACCEPT 
+        Name: 'Accel-OB2'
+        Class: 0x4a0100
+        Service Classes: Networking, Capturing, Telephony
+        Device Class: Computer, Uncategorized
+        HCI Version: 2.0 (0x3)  Revision: 0x44
+        LMP Version: 2.0 (0x3)  Subversion: 0x3
+        Manufacturer: Cambridge Silicon Radio (10)
+
+Does anyone know what the class codes are? Should I change the class code 
+in the /etc/bluetooth/main.conf configuration file?
+
+Mark.
+
