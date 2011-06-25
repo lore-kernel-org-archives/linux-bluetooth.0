@@ -1,46 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
-Date: Sat, 25 Jun 2011 13:44:32 +0100 (BST)
-From: Mark Hobley <markhobley@yahoo.co.uk>
-Reply-To: markhobley@yahoo.co.uk
-Subject: How do I make the computer visible to the mobile phone?
-To: linux-bluetooth@vger.kernel.org
+Message-ID: <4E0575DE.4070004@goop.org>
+Date: Fri, 24 Jun 2011 22:45:02 -0700
+From: Jeremy Fitzhardinge <jeremy@goop.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Keith Packard <keithp@keithp.com>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Waldemar.Rymarkiewicz@tieto.com, padovan@profusion.mobi,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key requirements"
+References: <yunboy7a2so.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com> <20110609083345.GA2894@dell.ccr.corp.intel.com> <yuny61b3pnm.fsf@aiko.keithp.com> <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com> <20110610055558.GA1832@dell> <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com> <yun8vsynkiy.fsf@aiko.keithp.com> <20110619175937.GA24188@dell.ger.corp.intel.com> <yunliwxabmz.fsf@aiko.keithp.com>
+In-Reply-To: <yunliwxabmz.fsf@aiko.keithp.com>
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am using Debian (Mixed/Unstable) and I have a Nano Tiny Bluetooth adapter
-that uses an Accel Semiconductor microchip. The mobile phone is visible to
-the computer, but I cannot see the computer from the mobile phone. How do I
-make the computer visible to my mobile phone?
+On 06/19/2011 12:01 PM, Keith Packard wrote:
+>> I think you'll need both of them to fix the pairing/security issues.
+> Yup, with both of those patches, I get syncml and dun working again.
+>
+> (sorry for the delayed testing, I'm traveling)
 
-I have enabled both pscan and iscan as follows:
+I just bisected the problems I had reconnecting my Nokia BH-905i
+headphones to the same change that Keith identified, and merging
+git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
+into my tree fixed it.
 
- hciconfig hci0 piscan
+So +1 from me to get this into mainline soon.
 
-The hciconfig tool reveals the following configuration:
-
-hciconfig -a                                                       
-hci0:   Type: BR/EDR  Bus: USB
-        BD Address: 00:1F:81:00:01:1C  ACL MTU: 1021:4  SCO MTU: 180:1
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:2273 acl:0 sco:0 events:59 errors:0
-        TX bytes:479 acl:0 sco:0 commands:45 errors:0
-        Features: 0xff 0x3e 0x09 0x76 0x80 0x01 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF 
-        Link mode: SLAVE ACCEPT 
-        Name: 'Accel-OB2'
-        Class: 0x4a0100
-        Service Classes: Networking, Capturing, Telephony
-        Device Class: Computer, Uncategorized
-        HCI Version: 2.0 (0x3)  Revision: 0x44
-        LMP Version: 2.0 (0x3)  Subversion: 0x3
-        Manufacturer: Cambridge Silicon Radio (10)
-
-Does anyone know what the class codes are? Should I change the class code 
-in the /etc/bluetooth/main.conf configuration file?
-
-Mark.
-
+Thanks,
+    J
