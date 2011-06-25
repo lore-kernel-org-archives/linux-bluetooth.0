@@ -1,50 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sat, 25 Jun 2011 17:32:35 -0400
-Subject: [PATCH] Bluetooth: Fix hidp disconnect deadlock
-Message-ID: <1309037555.2143.5.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Sat, 25 Jun 2011 16:40:32 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: Keith Packard <keithp@keithp.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Waldemar.Rymarkiewicz@tieto.com, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Regression caused by "Bluetooth: Map sec_level to link key
+ requirements"
+Message-ID: <20110625194032.GE22619@joana>
+References: <99B09243E1A5DA4898CDD8B700111448175AA2DB2A@EXMB04.eu.tieto.com>
+ <20110609083345.GA2894@dell.ccr.corp.intel.com>
+ <yuny61b3pnm.fsf@aiko.keithp.com>
+ <99B09243E1A5DA4898CDD8B700111448175AA2DE98@EXMB04.eu.tieto.com>
+ <20110610055558.GA1832@dell>
+ <BANLkTim4F8ZvWPMHSXpcBj9Eb2uFThcz4w@mail.gmail.com>
+ <yun8vsynkiy.fsf@aiko.keithp.com>
+ <20110619175937.GA24188@dell.ger.corp.intel.com>
+ <yunliwxabmz.fsf@aiko.keithp.com>
+ <4E0575DE.4070004@goop.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4E0575DE.4070004@goop.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Release reader lock on r/w sem before stopping khidp thread (which needs to
-claim the writer lock on sem before unlinking the session).
+* Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-24 22:45:02 -0700]:
 
-NB: kthread_stop waits for thread completion.
----
- net/bluetooth/hidp/core.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+> On 06/19/2011 12:01 PM, Keith Packard wrote:
+> >> I think you'll need both of them to fix the pairing/security issues.
+> > Yup, with both of those patches, I get syncml and dun working again.
+> >
+> > (sorry for the delayed testing, I'm traveling)
+> 
+> I just bisected the problems I had reconnecting my Nokia BH-905i
+> headphones to the same change that Keith identified, and merging
+> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
+> into my tree fixed it.
+> 
+> So +1 from me to get this into mainline soon.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index c405a95..16d75d7 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -1096,6 +1096,7 @@ int hidp_del_connection(struct hidp_conndel_req *req)
- {
- 	struct hidp_session *session;
- 	int err = 0;
-+	bool stop_thread = false;
- 
- 	BT_DBG("");
- 
-@@ -1111,12 +1112,14 @@ int hidp_del_connection(struct hidp_conndel_req *req)
- 			skb_queue_purge(&session->ctrl_transmit);
- 			skb_queue_purge(&session->intr_transmit);
- 
--			kthread_stop(session->task);
-+			stop_thread = true;
- 		}
- 	} else
- 		err = -ENOENT;
- 
- 	up_read(&hidp_session_sem);
-+	if (stop_thread)
-+		kthread_stop(session->task);
- 	return err;
- }
- 
--- 
-1.7.4.1
+It's on the way. Right now patches are on David Miller' tree.
 
+	Gustavo
