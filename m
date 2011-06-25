@@ -1,23 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1309026911.60600.YahooMailClassic@web26506.mail.ukl.yahoo.com>
-Date: Sat, 25 Jun 2011 19:35:11 +0100 (BST)
-From: Mark Hobley <markhobley@yahoo.co.uk>
-Reply-To: markhobley@yahoo.co.uk
+From: Peter Hurley <peter@hurleysoftware.com>
+To: "markhobley@yahoo.co.uk" <markhobley@yahoo.co.uk>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 25 Jun 2011 12:27:19 -0400
 Subject: Re: How do I make the computer visible to the mobile phone?
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1309019239.14190.31.camel@THOR>
+Message-ID: <1309019239.14190.31.camel@THOR>
+References: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
+In-Reply-To: <1309005872.69060.YahooMailClassic@web26503.mail.ukl.yahoo.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---- On Sat, 25/6/11, Peter Hurley <peter@hurleysoftware.com> wrote:
-
-> Did you resolve your earlier problem with timeouts?
-> http://marc.info/?l=linux-bluetooth&m=130877416213307&w=2
-
-No. I still get that error. However, once in a blue moon, my mobile phone does becomes visibile and the timeout does not occur. I then try to take advantage of this uptime, and I get stung by the invisible computer problem. I am trying to solve both issues.
-
-Mark.
-
+T24gU2F0LCAyMDExLTA2LTI1IGF0IDA4OjQ0IC0wNDAwLCBNYXJrIEhvYmxleSB3cm90ZToNCj4g
+SSBhbSB1c2luZyBEZWJpYW4gKE1peGVkL1Vuc3RhYmxlKSBhbmQgSSBoYXZlIGEgTmFubyBUaW55
+IEJsdWV0b290aCBhZGFwdGVyDQo+IHRoYXQgdXNlcyBhbiBBY2NlbCBTZW1pY29uZHVjdG9yIG1p
+Y3JvY2hpcC4gVGhlIG1vYmlsZSBwaG9uZSBpcyB2aXNpYmxlIHRvDQo+IHRoZSBjb21wdXRlciwg
+YnV0IEkgY2Fubm90IHNlZSB0aGUgY29tcHV0ZXIgZnJvbSB0aGUgbW9iaWxlIHBob25lLiBIb3cg
+ZG8gSQ0KPiBtYWtlIHRoZSBjb21wdXRlciB2aXNpYmxlIHRvIG15IG1vYmlsZSBwaG9uZT8NCg0K
+CXN1ZG8gaGNpY29uZmlnIGhjaTAgcGlzY2FuDQoNClNob3VsZCB3b3JrLg0KDQpEaWQgeW91IHJl
+c29sdmUgeW91ciBlYXJsaWVyIHByb2JsZW0gd2l0aCB0aW1lb3V0cz8NCmh0dHA6Ly9tYXJjLmlu
+Zm8vP2w9bGludXgtYmx1ZXRvb3RoJm09MTMwODc3NDE2MjEzMzA3Jnc9Mg0KDQpJbiBhIHRlcm1p
+bmFsOg0KCWhjaXRvb2wgc2Nhbg0Kc2hvdWxkIHByaW50IG91dCB0aGUgQkRfQUREUiBvZiB0aGUg
+cGhvbmUNCglibHVlei1zaW1wbGUtYWdlbnQgaGNpMCBCRF9BRERSDQpzaG91bGQgcGFpci4NCldo
+YXQgaGFwcGVucz8NCg0KVGhlIHR5cGljYWwgd2F5IHRvIGRlYnVnIGJsdWV0b290aCBpc3N1ZXMg
+aXM6DQoxLiBhZGQgZGVidWcgZmxhZyAiLWQiIHRvIGJsdWV0b290aGQgY29tbWFuZCBsaW5lIGFu
+ZCB0aGVuIHJldmlldyBzeXN0ZW0NCmxvZw0KMi4gcnVuIGhjaWR1bXAgd2hpbGUgcGVyZm9ybWlu
+ZyBvcGVyYXRpb24gdGhhdCdzIG5vdCB3b3JraW5nDQoJc3VkbyBoY2lkdW1wIC10VlggPiBmaWxl
+bmFtZQ0KICAgLW9yLQ0KCXN1ZG8gaGNpZHVtcCAtdCAtLXNhdmUtZHVtcD1maWxlbmFtZQ0KCWhj
+aWR1bXAgLXRWWHIgZmlsZW5hbWUNClBvc3QgdGhlIGR1bXAgYW5kIGxldCBzb21lb25lIGxvb2sg
+YXQgaXQuDQoNCj4gICAgICAgICBDbGFzczogMHg0YTAxMDANCj4gICAgICAgICBTZXJ2aWNlIENs
+YXNzZXM6IE5ldHdvcmtpbmcsIENhcHR1cmluZywgVGVsZXBob255DQo+ICAgICAgICAgRGV2aWNl
+IENsYXNzOiBDb21wdXRlciwgVW5jYXRlZ29yaXplZA0KDQpUaGVzZSBsb29rIG9rIHRvIG1lLg0K
+DQo+IERvZXMgYW55b25lIGtub3cgd2hhdCB0aGUgY2xhc3MgY29kZXMgYXJlPyANCg0KQ2xhc3Nf
+b2ZfZGV2aWNlIGlzIGRlZmluZWQgaGVyZToNCmh0dHBzOi8vd3d3LmJsdWV0b290aC5vcmcvVGVj
+aG5pY2FsL0Fzc2lnbmVkTnVtYmVycy9iYXNlYmFuZC5odG0NCg0KPiBTaG91bGQgSSBjaGFuZ2Ug
+dGhlIGNsYXNzIGNvZGUgDQo+IGluIHRoZSAvZXRjL2JsdWV0b290aC9tYWluLmNvbmYgY29uZmln
+dXJhdGlvbiBmaWxlPw0KDQpOby4NCg==
