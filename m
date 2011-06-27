@@ -2,157 +2,153 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 4/5] Modify pbap plugin to utilize get_next_header()
-Date: Mon, 27 Jun 2011 16:20:54 +0200
-Message-Id: <1309184455-29752-5-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 3/5] Add get_next_header() function
+Date: Mon, 27 Jun 2011 16:20:53 +0200
+Message-Id: <1309184455-29752-4-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1309184455-29752-1-git-send-email-lkslawek@gmail.com>
 References: <1309184455-29752-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds the function for mime drivers that allows adding OBEX headers
+before body streaming is started.
 ---
- plugins/pbap.c |   97 +++++++++++++++++++++++++++++++++++--------------------
- 1 files changed, 62 insertions(+), 35 deletions(-)
+ src/mimetype.h  |    2 +
+ src/obex-priv.h |    1 +
+ src/obex.c      |   60 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 59 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 0208731..dc43867 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -963,6 +963,26 @@ static ssize_t array_read(GByteArray *array, void *buf, size_t count)
- 	return len;
+diff --git a/src/mimetype.h b/src/mimetype.h
+index 8472684..511ab6a 100644
+--- a/src/mimetype.h
++++ b/src/mimetype.h
+@@ -33,6 +33,8 @@ struct obex_mime_type_driver {
+ 	void *(*open) (const char *name, int oflag, mode_t mode,
+ 			void *driver_data, size_t *size, int *err);
+ 	int (*close) (void *object);
++	ssize_t (*get_next_header)(void *object, void *buf, size_t mtu,
++								uint8_t *hi);
+ 	ssize_t (*read) (void *object, void *buf, size_t count, uint8_t *hi);
+ 	ssize_t (*write) (void *object, const void *buf, size_t count);
+ 	int (*flush) (void *object);
+diff --git a/src/obex-priv.h b/src/obex-priv.h
+index 8c722dc..51a7739 100644
+--- a/src/obex-priv.h
++++ b/src/obex-priv.h
+@@ -46,6 +46,7 @@ struct obex_session {
+ 	obex_object_t *obj;
+ 	struct obex_mime_type_driver *driver;
+ 	gboolean streaming;
++	gboolean headers_sent;
+ };
+ 
+ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+diff --git a/src/obex.c b/src/obex.c
+index 3ab81d4..596da6a 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -310,6 +310,7 @@ static void os_reset_session(struct obex_session *os)
+ 	os->pending = 0;
+ 	os->offset = 0;
+ 	os->size = OBJECT_SIZE_DELETE;
++	os->headers_sent = FALSE;
+ 	os->streaming = FALSE;
  }
  
-+static ssize_t vobject_pull_get_next_header(void *object, void *buf, size_t mtu,
-+								uint8_t *hi)
+@@ -685,6 +686,53 @@ static int obex_write_stream(struct obex_session *os,
+ 	return 0;
+ }
+ 
++static int obex_write(struct obex_session *os, obex_t *obex, obex_object_t *obj)
 +{
-+	struct pbap_object *obj = object;
-+	struct pbap_session *pbap = obj->session;
++	obex_headerdata_t hd;
++	ssize_t len;
++	uint8_t hi;
 +
-+	if (!obj->buffer && !obj->aparams)
-+		return -EAGAIN;
++	DBG("name=%s type=%s tx_mtu=%d file=%p",
++		os->name ? os->name : "", os->type ? os->type : "",
++		os->tx_mtu, os->object);
 +
-+	*hi = OBEX_HDR_APPARAM;
++	if (os->aborted)
++		return -EPERM;
 +
-+	if (pbap->params->maxlistcount == 0 || obj->firstpacket) {
-+		obj->firstpacket = FALSE;
++	if (os->object == NULL)
++		return -EIO;
 +
-+		return array_read(obj->aparams, buf, mtu);
++	if (os->headers_sent)
++		return obex_write_stream(os, obex, obj);
++
++	if (!os->driver->get_next_header)
++		goto skip;
++
++	while ((len = os->driver->get_next_header(os->object, os->buf,
++					os->tx_mtu, &hi)) != 0) {
++		if (len < 0) {
++			error("get_next_header(): %s (%zd)", strerror(-len),
++								-len);
++
++			if (len == -EAGAIN)
++				return len;
++
++			g_free(os->buf);
++			os->buf = NULL;
++
++			return len;
++		}
++
++		hd.bs = os->buf;
++		OBEX_ObjectAddHeader(obex, obj, hi, hd, len, 0);
 +	}
 +
-+	return 0;
++skip:
++	os->headers_sent = TRUE;
++
++	return obex_write_stream(os, obex, obj);
 +}
 +
- static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
- 								uint8_t *hi)
+ static gboolean handle_async_io(void *object, int flags, int err,
+ 						void *user_data)
  {
-@@ -976,33 +996,43 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
- 	if (!obj->buffer && !obj->aparams)
- 		return -EAGAIN;
- 
--	if (pbap->params->maxlistcount == 0) {
--		/* PhoneBookSize */
--		*hi = obj->aparams->len ? OBEX_HDR_APPARAM : OBEX_HDR_BODY;
--		return array_read(obj->aparams, buf, count);
--	} else if (obj->firstpacket) {
--		/* NewMissedCalls */
--		*hi = obj->aparams->len ? OBEX_HDR_APPARAM : OBEX_HDR_BODY;
--		obj->firstpacket = FALSE;
--		return array_read(obj->aparams, buf, count);
--	} else {
--		/* Stream data */
--		*hi = OBEX_HDR_BODY;
--		len = string_read(obj->buffer, buf, count);
--		if (len == 0 && !obj->lastpart) {
--			/* in case when buffer is empty and we know that more
--			 * data is still available in backend, requesting new
--			 * data part via phonebook_pull_read and returning
--			 * -EAGAIN to suspend request for now */
--			ret = phonebook_pull_read(obj->request);
--			if (ret)
--				return -EPERM;
--
--			return -EAGAIN;
--		}
-+	if (pbap->params->maxlistcount == 0)
-+		return -ENOSTR;
-+
-+	*hi = OBEX_HDR_BODY;
- 
--		return len;
-+	len = string_read(obj->buffer, buf, count);
-+	if (len == 0 && !obj->lastpart) {
-+		/* in case when buffer is empty and we know that more
-+		 * data is still available in backend, requesting new
-+		 * data part via phonebook_pull_read and returning
-+		 * -EAGAIN to suspend request for now */
-+		ret = phonebook_pull_read(obj->request);
-+		if (ret)
-+			return -EPERM;
-+
-+		return -EAGAIN;
+@@ -697,16 +745,19 @@ static gboolean handle_async_io(void *object, int flags, int err,
  	}
-+
-+	return len;
-+}
-+
-+static ssize_t vobject_list_get_next_header(void *object, void *buf, size_t mtu,
-+								uint8_t *hi)
-+{
-+	struct pbap_object *obj = object;
-+	struct pbap_session *pbap = obj->session;
-+
-+	/* Backend still busy reading contacts */
-+	if (!pbap->cache.valid)
-+		return -EAGAIN;
-+
-+	*hi = OBEX_HDR_APPARAM;
-+
-+	if (pbap->params->maxlistcount == 0)
-+		return array_read(obj->aparams, buf, mtu);
-+
-+	return 0;
+ 
+ 	if (flags & (G_IO_IN | G_IO_PRI))
+-		ret = obex_write_stream(os, os->obex, os->obj);
++		ret = obex_write(os, os->obex, os->obj);
+ 	else if ((flags & G_IO_OUT) && os->pending > 0)
+ 		ret = obex_read_stream(os, os->obex, os->obj);
+ 
+ proceed:
+-	if (ret < 0) {
++	if (ret == -EAGAIN) {
++		return TRUE;
++	} else if (ret < 0) {
+ 		os_set_response(os->obj, ret);
+ 		OBEX_CancelRequest(os->obex, TRUE);
+-	} else
++	} else {
+ 		OBEX_ResumeRequest(os->obex);
++	}
+ 
+ 	return FALSE;
  }
+@@ -729,6 +780,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
  
- static ssize_t vobject_list_read(void *object, void *buf, size_t count,
-@@ -1014,17 +1044,12 @@ static ssize_t vobject_list_read(void *object, void *buf, size_t count,
- 	DBG("valid %d maxlistcount %d", pbap->cache.valid,
- 						pbap->params->maxlistcount);
+ 	g_return_if_fail(chk_cid(obex, obj, os->cid));
  
--	/* Backend still busy reading contacts */
--	if (!pbap->cache.valid)
--		return -EAGAIN;
-+	if (pbap->params->maxlistcount == 0)
-+		return -ENOSTR;
++	os->headers_sent = FALSE;
+ 	os->streaming = FALSE;
  
--	if (pbap->params->maxlistcount == 0) {
--		*hi = obj->aparams->len ? OBEX_HDR_APPARAM : OBEX_HDR_BODY;
--		return array_read(obj->aparams, buf, count);
--	} else {
--		*hi = OBEX_HDR_BODY;
--		return string_read(obj->buffer, buf, count);
--	}
-+	*hi = OBEX_HDR_BODY;
-+
-+	return string_read(obj->buffer, buf, count);
- }
+ 	while (OBEX_ObjectGetNextHeader(obex, obj, &hi, &hd, &hlen)) {
+@@ -813,7 +865,7 @@ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
  
- static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
-@@ -1048,6 +1073,7 @@ static struct obex_mime_type_driver mime_pull = {
- 	.open = vobject_pull_open,
- 	.close = vobject_close,
- 	.read = vobject_pull_read,
-+	.get_next_header = vobject_pull_get_next_header,
- };
- 
- static struct obex_mime_type_driver mime_list = {
-@@ -1057,6 +1083,7 @@ static struct obex_mime_type_driver mime_list = {
- 	.open = vobject_list_open,
- 	.close = vobject_close,
- 	.read = vobject_list_read,
-+	.get_next_header = vobject_list_get_next_header,
- };
- 
- static struct obex_mime_type_driver mime_vcard = {
+ 	/* Try to write to stream and suspend the stream immediately
+ 	 * if no data available to send. */
+-	err = obex_write_stream(os, obex, obj);
++	err = obex_write(os, obex, obj);
+ 	if (err == -EAGAIN) {
+ 		OBEX_SuspendRequest(obex, obj);
+ 		os->obj = obj;
 -- 
 1.7.4.1
 
