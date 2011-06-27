@@ -2,79 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 4/6] Add adapter ReleaseSession to obex-client
-Date: Tue, 28 Jun 2011 00:39:39 +0300
-Message-Id: <1309210781-2674-5-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 6/6] Code clean-up: remove unnecessary brackets
+Date: Tue, 28 Jun 2011 00:39:41 +0300
+Message-Id: <1309210781-2674-7-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Release of adapter session is added to obex-client upon closing OBEX
-transfer.
 ---
- client/session.c |   38 +++++++++++++++++++++++++++++++++++++-
- 1 files changed, 37 insertions(+), 1 deletions(-)
+ client/session.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 75cd32e..423eb8c 100644
+index d8e3bf2..ae7e213 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -302,9 +302,34 @@ static struct pending_req *send_method_call(DBusConnection *connection,
- 	return req;
- }
+@@ -241,9 +241,8 @@ static void session_free(struct session_data *session)
+ 	if (session->path)
+ 		session_unregistered(session);
  
-+static void adapter_release_reply(DBusPendingCall *call, void *user_data)
-+{
-+	DBusError err;
-+	DBusMessage *reply;
-+	struct session_data *session = user_data;
-+	struct pending_req *req = find_session_request(session, call);
-+
-+	reply = dbus_pending_call_steal_reply(call);
-+
-+	dbus_error_init(&err);
-+	if (dbus_set_error_from_message(&err, reply)) {
-+		error("manager replied with an error: %s, %s",
-+				err.name, err.message);
-+		dbus_error_free(&err);
-+	}
-+
-+	dbus_message_unref(reply);
-+
-+	session->pending_calls = g_slist_remove(session->pending_calls, req);
-+	pending_req_finalize(req);
-+
-+	session_free(session);
-+}
-+
- void session_unref(struct session_data *session)
- {
- 	gboolean ret;
-+	struct pending_req *req;
+-	if (session->conn) {
++	if (session->conn)
+ 		dbus_connection_unref(session->conn);
+-	}
  
- 	ret = g_atomic_int_dec_and_test(&session->refcount);
- 
-@@ -313,7 +338,18 @@ void session_unref(struct session_data *session)
- 	if (ret == FALSE)
- 		return;
- 
--	session_free(session);
-+	req = send_method_call(session->conn_system,
-+				BT_BUS_NAME, session->adapter,
-+				BT_ADAPTER_IFACE, "ReleaseSession",
-+				adapter_release_reply, session,
-+				DBUS_TYPE_INVALID);
-+	if (!req) {
-+		g_free(session->adapter);
-+		session_free(session);
-+		return;
-+	}
-+
-+	session->pending_calls = g_slist_prepend(session->pending_calls, req);
- }
- 
- static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
+ 	if (session->conn_system)
+ 		dbus_connection_unref(session->conn_system);
 -- 
 1.7.4.1
 
