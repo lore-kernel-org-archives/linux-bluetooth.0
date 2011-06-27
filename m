@@ -1,63 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <syamsidhardh@gmail.com>
-Subject: [PATCH obexd 4/4] Fix space after function name coding style issue for gwobex
-Date: Tue, 28 Jun 2011 00:42:11 +0530
-Message-Id: <1309201931-30026-1-git-send-email-syamsidhardh@gmail.com>
+Message-Id: <7.0.1.0.2.20110627205517.03250550@gmx.net>
+Date: Mon, 27 Jun 2011 21:08:06 +0200
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Peter Kornatowski <pkorn@gmx.net>
+Subject: Re: Media API with more than one headset
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+ <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-- Corrected white space between the function name and '('
----
- gwobex/gw-obex.c |    2 +-
- gwobex/utils.c   |    6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Hi Luiz,
 
-diff --git a/gwobex/gw-obex.c b/gwobex/gw-obex.c
-index 4481212..0ac92a9 100644
---- a/gwobex/gw-obex.c
-+++ b/gwobex/gw-obex.c
-@@ -362,7 +362,7 @@ GwObex *gw_obex_setup_fd(int fd, const gchar *uuid, gint uuid_len,
-     debug("Connected (Connection ID: %#x)\n", ctx->conid);
- 
-     ctx->gio = g_io_channel_unix_new(ctx->conn_fd);
--    ctx->gio_source = g_io_create_watch (ctx->gio,
-+    ctx->gio_source = g_io_create_watch(ctx->gio,
-                                          G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL);
-     g_source_set_callback(ctx->gio_source, (GSourceFunc)gw_obex_cb, ctx, NULL);
-     (void) g_source_attach(ctx->gio_source, context);
-diff --git a/gwobex/utils.c b/gwobex/utils.c
-index f47b68a..ad0e20c 100644
---- a/gwobex/utils.c
-+++ b/gwobex/utils.c
-@@ -134,7 +134,7 @@ time_t parse_iso8601(const gchar *str, int len) {
-     time_t    time;
-     time_t    tz_offset = 0;
- 
--    memset (&tm, 0, sizeof(struct tm));
-+    memset(&tm, 0, sizeof(struct tm));
- 
-     /* According to spec the time doesn't have to be null terminated */
-     if (str[len - 1] != '\0') {
-@@ -145,7 +145,7 @@ time_t parse_iso8601(const gchar *str, int len) {
-     else
-         tstr = g_strdup(str);
- 
--    nr = sscanf (tstr, "%04u%02u%02uT%02u%02u%02u%c",
-+    nr = sscanf(tstr, "%04u%02u%02uT%02u%02u%02u%c",
-             &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-             &tm.tm_hour, &tm.tm_min, &tm.tm_sec,
-             &tz);
-@@ -162,7 +162,7 @@ time_t parse_iso8601(const gchar *str, int len) {
-         return -1;
-     }
- 
--    time = mktime (&tm);
-+    time = mktime(&tm);
- 
- #if defined(HAVE_TM_GMTOFF)
-     tz_offset = tm.tm_gmtoff;
--- 
-1.7.4.1
+At 08:49 23.06.2011, Luiz Augusto von Dentz wrote:
+>Hi Peter,
+>
+>On Thu, Jun 23, 2011 at 12:23 AM, Peter Kornatowski <pkorn@gmx.net> wrote:
+> > Hi,
+> >
+> > I'm using the new bluez media api to set bluetooth headsets into playing
+> > mode and get the fd's of the corresponding sockets with a program 
+> written in
+> > C. This works fine with just one headset, but I'm using up to three at the
+> > same time over three bluetooth adapters. So my program (bt-audio) creates a
+> > dbus-service with three paths (/test/endpoint0, ...1, ...2) and each path
+> > has an interface org.bluez.MediaEndpoint with the four needed methods
+> > (SetConfiguration etc.). Then it scans for turned on headsets and calls
+> > RegisterEndpoint on the appropriate adapter-path. Then bluez calls three
+> > times SetConfiguration on my service. So basically like in the
+> > python-example "simple-endpoint". After that my app calls three times
+> > Acquire with "rw" on each of the given transport-paths to receive the
+> > socket-fd's.
+> > As I said, this works well and I can play and record some raw-files with
+> > very good quality. But when one of the headsets is turned off, 
+> the other two
+> > are put out of playing-mode. When I retry to put them back in playing-mode
+> > by calling UnregisterEndpoint and then RegisterEndpoint again, I just get
+> > "GDBus.Error:org.bluez.Error.NotAuthorized: Operation Not Authorized" and
+> > see "sco_bind: Address already in use" in syslog. When retrying too often,
+> > bluetoothd segfaults (but this may be related to the way i tried some
+> > recovery of this problem in my code) with:
+> > kernel: [34309.873606] bluetoothd[29235]: segfault at 6e652f74 ip b76b9b20
+> > sp bf93c430 error 4 in bluetoothd[b768c000+7e000]
+> >
+> > Only after restarting my program (and thus re-registering my dbus-service),
+> > I am able to put the headsets back in playing mode again.
+> >
+> > I also tried this use-case with your simple-endpoint python-script by
+> > modifying it like this:
+> >
+> > def acquire_cb(fd, imtu, omtu):
+> >        print "Acquire successfull! New fd: %s with iMTU %i and oMTU %i" %
+> > (fd, imtu, omtu)
+> > def acquire_error(error):
+> >        print "Acquire failed: %s" % (error)
+> >        mainloop.quit()
+> >
+> > ...
+> >
+> > @dbus.service.method("org.bluez.MediaEndpoint", in_signature="oay",
+> > out_signature="")
+> > def SetConfiguration(self, transport, config):
+> >        print "SetConfiguration (%s, %s)" % (transport, config)
+> >        media_transport = dbus.Interface(bus.get_object("org.bluez",
+> > transport), "org.bluez.MediaTransport")
+> >        media_transport.Acquire("rw", reply_handler=acquire_cb,
+> > error_handler=acquire_error)
+> >        return
+> >
+> > So even after starting two or three processes of this script (each with a
+> > different hciX), I get the same behaviour: putting all headsets in playing
+> > mode is no problem, but turning off one headset puts the others out of
+> > playing mode. Trying to put them back in playing mode requires a restart of
+> > the scripts, otherwise I just get the same error: "Acquire failed:
+> > org.bluez.Error.NotAuthorized: Operation Not Authorized".
+> >
+> > So why are the other headsets always put out of playing mode and why can't
+> > you put them back in playing mode again? Looks like a bug to me, hopefully
+> > someone of you can help. I attached the syslog cutout of this problem, too
+> > (first section is with my C-program, second with the python-script).
+>
+>Interesting, this could be a bug in SCO socket can you try that with
+>a2dp too? In the meantime I gonna try to reproduce it myself, btw what
+>kernel are you using?
+>
+>--
+>Luiz Augusto von Dentz
+>--
+
+I'm using Debian with kernel 2.6.32-5.
+I tried to reproduce the problem with a2dp, but got stuck before 
+getting a headset into playing mode. Tried it with two different 
+headsets (both a2dp capable), connected them through all different 
+interfaces (headset, audio, audiosink) and always got the the 
+headsets into connected state. But then after starting the 
+simple-endpoint script for sbcsource or mp3source, the dbus-service 
+registered with path /test/endpoint, but bluez didn't call 
+SetConfiguration, so I couldn't call "Acquire" because the interface 
+and the fdX path weren't there (checked with d-feet, too). The only 
+stuff i got from syslog (with bluetoothd -d) was:
+Jun 27 19:35:49 peter bluetoothd[27327]: 
+audio/avdtp.c:avdtp_register_sep() SEP 0xb8b2e1a8 registered: type:0 
+codec:1 seid:2
+Jun 27 19:35:49 peter bluetoothd[27327]: Endpoint registered: 
+sender=:1.673 path=/test/endpoint
+
+When trying to start the simple-endpoint script with sbcsink or 
+mp3sink, all I got was:
+dbus.exceptions.DBusException: org.bluez.Error.NotSupported: 
+Operation is not supported
+
+So, what am I missing? Have you tried to reproduce the bug with hfp?
+
+Best regards,
+Peter
 
