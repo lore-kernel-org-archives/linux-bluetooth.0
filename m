@@ -1,101 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <092E3C75-499E-4E78-A167-F2DB57A0051E@signove.com>
-References: <1308661408-8364-1-git-send-email-sancane@gmail.com>
-	<C521DA9B-E3C6-46F2-834E-6E33C12B18C7@signove.com>
-	<BANLkTikNQac7UsMgKdnoVR7kVQSV6tVn6g@mail.gmail.com>
-	<A2B092BC-BE3C-4C0A-917D-0253EF23943A@signove.com>
-	<BANLkTik9muPgh_Xx3UTh7rEpzj-C7fVxuQ@mail.gmail.com>
-	<544C7016-5346-4C99-AEA9-C91AA84E3A42@signove.com>
-	<BANLkTim60FHUp0B+2LkrsEG9vW4awFvvwQ@mail.gmail.com>
-	<75C285AD-9C2B-4F57-A998-D1346A68AEEE@signove.com>
-	<BANLkTi=YHkhEiffbRuXWyqKa_Xw31W6JXw@mail.gmail.com>
-	<092E3C75-499E-4E78-A167-F2DB57A0051E@signove.com>
-Date: Mon, 27 Jun 2011 12:24:08 +0200
-Message-ID: <BANLkTikH10YNTycwJ5nUxL7fjrhaLn_PAQ@mail.gmail.com>
-Subject: Re: [RFC] Health Thermometer Profile API
-From: Santiago Carot <sancane@gmail.com>
-To: Elvis Pfutzenreuter <epx@signove.com>
-Cc: mike tsai <mikeyhtsai@gmail.com>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] Mark Headset.Play method deprecated
+Date: Mon, 27 Jun 2011 12:25:54 +0300
+Message-Id: <1309166754-6473-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-2011/6/25 Elvis Pfutzenreuter <epx@signove.com>:
-> On Jun 24, 2011, at 11:27 AM, mike tsai wrote:
->
->> On Fri, Jun 24, 2011 at 6:20 AM, Elvis Pfutzenreuter <epx@signove.com> wrote:
->>>>> (cut)
->>>>
->>>> Coming back to this issue. I was just wondering that we may not need
->>>> worried about this issue because the same case may occurs at GATT
->>>> level. I mean, an application using GATT could disturb the behaviour
->>>> of other one when it enables/disables characteristics.
->>>
->>> Ok, but then the risk is clear. My feeling is that people are already
->>> "toning down" this API because of this. (One of the reasons my patch
->>> to add descriptor manipulation capability was rejected is that it was
->>> not meant to be a complete API and effort should go to profile-specific
->>> APIs. Without this, you can't toggle notifications and indications
->>> using generic GATT API anyway.)
->>>
->>>>
->>>> Because of any application can enable/disable characteristics we don't
->>>> need to worry about to manage this in the Thermometer API. Remember
->>>> that in other threads in the mailing list people were speaking about
->>>> making a D-Bus API for GATT. Those applications using GATT could
->>>> enable notification for measures and disable it. On account of this,
->>>> it will be inevitable collisions in the use cases.
->>>>
->>>> For this reason I think that the Thermometer API should be the most
->>>> permissive possible. If any application disable intermediate or final
->>>> measures, the PropertyChanged signal will be triggered, well, there is
->>>> no problem, if there are agents interested in such measures they only
->>>> will have to enable the proterty in the API once again as usual.
->>>
->>> I can see two apps monitoring PropertyChanged to enforce opposite
->>> states of notification. It would create a lot of heat.
->>>
->>>> To summarize, I think we should add the properties to enable and
->>>> disable intermediate and final measures and to leave to applications
->>>> to take deccisions about how they are going to behave when this stuff
->>>> happen.
->>>
->>> I remember Marcel saying once that applications always do the wrong
->>> thing when given the chance :) In this respect, our opinions are
->>> pretty much opposite; IMHO one application must not have a way to
->>> create a problem to others. Notification interval is impossible to
->>> insulate, for there is just one per device, but we can do better for
->>> toggling of notifications.
->>>
->>> It would be nice to have more opinions on this.
->> could we apply an 'OR' logic to this inside the profile? Each
->> application will have its own property setting.
->> So if App-A enables both, then it will receive both immediate/.final
->> temperatures indication/notification.
->> if App-B enables only final, then it receives final temperature indication only.
->> There are still the issue of how profile can "wake up" application(s)
->> when notification/indication come.
->
-> It is a tempting alternative, would render a very clean API.
->
-> Thing is, you need to show each client app process a different 'view' of
-> those D-Bus properties. It is feasible, but it is a new trick, not
-> employed in other APIs.
+SCO socket should be connected using either unix socket ipc or Media API
+---
+ audio/headset.c   |    3 ++-
+ doc/audio-api.txt |    2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-I think that it may work for Final and Intermediate but not for the
-Interval property that is common for all agents. Besides, this
-characteristic can be readed/writed through the D-Bus attribute API
-too as Anderson said.
+diff --git a/audio/headset.c b/audio/headset.c
+index 2864257..664f393 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -2060,7 +2060,8 @@ static GDBusMethodTable headset_methods[] = {
+ 	{ "IndicateCall",	"",	"",	hs_ring },
+ 	{ "CancelCall",		"",	"",	hs_cancel_call },
+ 	{ "Play",		"",	"",	hs_play,
+-						G_DBUS_METHOD_FLAG_ASYNC },
++						G_DBUS_METHOD_FLAG_ASYNC |
++						G_DBUS_METHOD_FLAG_DEPRECATED },
+ 	{ "Stop",		"",	"",	hs_stop },
+ 	{ "IsPlaying",		"",	"b",	hs_is_playing,
+ 						G_DBUS_METHOD_FLAG_DEPRECATED },
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index d2f3996..0cf7884 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -81,7 +81,7 @@ Methods		void Connect()
+ 
+ 			Cancel the incoming call indication.
+ 
+-		void Play()
++		void Play() {deprecated}
+ 
+ 			Open the audio connection to the headset.
+ 
+-- 
+1.7.5.4
 
-IMO we should adopt a refcount like behavior for
-notifications/indications. On the other hands, we can assume that
-there will be agents registered during the time they are interested
-for final measures so we can activate this notification whenever there
-are agents registered for the health thermometer service.
-
-Opinions?
-
-Best regards.
