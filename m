@@ -1,31 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: "thilo@cestona.ro" <thilo@cestona.ro>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 27 Jun 2011 14:26:57 -0400
-Subject: Re: Support for 0489:e031 Foxconn / Hon Hai
-Message-ID: <1309199217.2143.23.camel@THOR>
-References: <44c0c13.6e1d3014b80fb8f0331e4275187e6b1d@1oca1host.de>
-In-Reply-To: <44c0c13.6e1d3014b80fb8f0331e4275187e6b1d@1oca1host.de>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+Date: Mon, 27 Jun 2011 23:51:30 +0530
+Message-ID: <BANLkTi=ku2nnVc0DgduHtxZ6xQvzW-d+zA@mail.gmail.com>
+Subject: SCORouting to PCM in Desktop
+From: Koustuv Ghosh <koustuvg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2011-06-27 at 10:57 -0400, thilo@cestona.ro wrote:
-> Hey again,
-> 
-> >>As Virtualbox does a direct usb passthrough to the client I could install the bluetooth adapter in windows with the original broadcom bluetooth driver.
-> >>Once I opened the settings there and "saved" theses, the adapter finds bluetooth devices nicely under windows AND linux.
-> >>
-> >>Sadly I have no idea what the broadcom driver did to "activate" the adapter.
-....
-> I still have no idea how I might figure out what is done during the init of the windows driver. Since I need to unload the btusb module so windows can use the device, I have no chance to use hcidump.
-> Any ideas what I should try?
+Hello ,
 
-There are several decent usb sniffers for windows - although I've never
-tried them in a vm.  This is a tough route to go though - even with a
-complete device capture, separating what's relevant to your problem will
-be *very* difficult.
+I have query  for HFP in bluez.
+As we know in Desktop PC ,  SCORouting is default routed to HCI and I
+used to get sco data on HCI.
+But is there anyway to route it to my desktop PCM.
 
-Peter
+I can't use audio.conf file(available at  /etc/bluetooth) as in my PC
+dbus is having some problem.
+Apart from that is their any option so that it could be changed to PCM
+ either by doing any tweak to bluez user space or kernal space?
+
+Any help is welcome.
+rgds
+Koustuv
