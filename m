@@ -1,120 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <7.0.1.0.2.20110627205517.03250550@gmx.net>
-Date: Mon, 27 Jun 2011 21:08:06 +0200
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: Peter Kornatowski <pkorn@gmx.net>
-Subject: Re: Media API with more than one headset
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
- <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
+From: Peter Hurley <peter@hurleysoftware.com>
+To: "thilo@cestona.ro" <thilo@cestona.ro>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 27 Jun 2011 14:26:57 -0400
+Subject: Re: Support for 0489:e031 Foxconn / Hon Hai
+Message-ID: <1309199217.2143.23.camel@THOR>
+References: <44c0c13.6e1d3014b80fb8f0331e4275187e6b1d@1oca1host.de>
+In-Reply-To: <44c0c13.6e1d3014b80fb8f0331e4275187e6b1d@1oca1host.de>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Mon, 2011-06-27 at 10:57 -0400, thilo@cestona.ro wrote:
+> Hey again,
+> 
+> >>As Virtualbox does a direct usb passthrough to the client I could install the bluetooth adapter in windows with the original broadcom bluetooth driver.
+> >>Once I opened the settings there and "saved" theses, the adapter finds bluetooth devices nicely under windows AND linux.
+> >>
+> >>Sadly I have no idea what the broadcom driver did to "activate" the adapter.
+....
+> I still have no idea how I might figure out what is done during the init of the windows driver. Since I need to unload the btusb module so windows can use the device, I have no chance to use hcidump.
+> Any ideas what I should try?
 
-At 08:49 23.06.2011, Luiz Augusto von Dentz wrote:
->Hi Peter,
->
->On Thu, Jun 23, 2011 at 12:23 AM, Peter Kornatowski <pkorn@gmx.net> wrote:
-> > Hi,
-> >
-> > I'm using the new bluez media api to set bluetooth headsets into playing
-> > mode and get the fd's of the corresponding sockets with a program 
-> written in
-> > C. This works fine with just one headset, but I'm using up to three at the
-> > same time over three bluetooth adapters. So my program (bt-audio) creates a
-> > dbus-service with three paths (/test/endpoint0, ...1, ...2) and each path
-> > has an interface org.bluez.MediaEndpoint with the four needed methods
-> > (SetConfiguration etc.). Then it scans for turned on headsets and calls
-> > RegisterEndpoint on the appropriate adapter-path. Then bluez calls three
-> > times SetConfiguration on my service. So basically like in the
-> > python-example "simple-endpoint". After that my app calls three times
-> > Acquire with "rw" on each of the given transport-paths to receive the
-> > socket-fd's.
-> > As I said, this works well and I can play and record some raw-files with
-> > very good quality. But when one of the headsets is turned off, 
-> the other two
-> > are put out of playing-mode. When I retry to put them back in playing-mode
-> > by calling UnregisterEndpoint and then RegisterEndpoint again, I just get
-> > "GDBus.Error:org.bluez.Error.NotAuthorized: Operation Not Authorized" and
-> > see "sco_bind: Address already in use" in syslog. When retrying too often,
-> > bluetoothd segfaults (but this may be related to the way i tried some
-> > recovery of this problem in my code) with:
-> > kernel: [34309.873606] bluetoothd[29235]: segfault at 6e652f74 ip b76b9b20
-> > sp bf93c430 error 4 in bluetoothd[b768c000+7e000]
-> >
-> > Only after restarting my program (and thus re-registering my dbus-service),
-> > I am able to put the headsets back in playing mode again.
-> >
-> > I also tried this use-case with your simple-endpoint python-script by
-> > modifying it like this:
-> >
-> > def acquire_cb(fd, imtu, omtu):
-> >        print "Acquire successfull! New fd: %s with iMTU %i and oMTU %i" %
-> > (fd, imtu, omtu)
-> > def acquire_error(error):
-> >        print "Acquire failed: %s" % (error)
-> >        mainloop.quit()
-> >
-> > ...
-> >
-> > @dbus.service.method("org.bluez.MediaEndpoint", in_signature="oay",
-> > out_signature="")
-> > def SetConfiguration(self, transport, config):
-> >        print "SetConfiguration (%s, %s)" % (transport, config)
-> >        media_transport = dbus.Interface(bus.get_object("org.bluez",
-> > transport), "org.bluez.MediaTransport")
-> >        media_transport.Acquire("rw", reply_handler=acquire_cb,
-> > error_handler=acquire_error)
-> >        return
-> >
-> > So even after starting two or three processes of this script (each with a
-> > different hciX), I get the same behaviour: putting all headsets in playing
-> > mode is no problem, but turning off one headset puts the others out of
-> > playing mode. Trying to put them back in playing mode requires a restart of
-> > the scripts, otherwise I just get the same error: "Acquire failed:
-> > org.bluez.Error.NotAuthorized: Operation Not Authorized".
-> >
-> > So why are the other headsets always put out of playing mode and why can't
-> > you put them back in playing mode again? Looks like a bug to me, hopefully
-> > someone of you can help. I attached the syslog cutout of this problem, too
-> > (first section is with my C-program, second with the python-script).
->
->Interesting, this could be a bug in SCO socket can you try that with
->a2dp too? In the meantime I gonna try to reproduce it myself, btw what
->kernel are you using?
->
->--
->Luiz Augusto von Dentz
->--
+There are several decent usb sniffers for windows - although I've never
+tried them in a vm.  This is a tough route to go though - even with a
+complete device capture, separating what's relevant to your problem will
+be *very* difficult.
 
-I'm using Debian with kernel 2.6.32-5.
-I tried to reproduce the problem with a2dp, but got stuck before 
-getting a headset into playing mode. Tried it with two different 
-headsets (both a2dp capable), connected them through all different 
-interfaces (headset, audio, audiosink) and always got the the 
-headsets into connected state. But then after starting the 
-simple-endpoint script for sbcsource or mp3source, the dbus-service 
-registered with path /test/endpoint, but bluez didn't call 
-SetConfiguration, so I couldn't call "Acquire" because the interface 
-and the fdX path weren't there (checked with d-feet, too). The only 
-stuff i got from syslog (with bluetoothd -d) was:
-Jun 27 19:35:49 peter bluetoothd[27327]: 
-audio/avdtp.c:avdtp_register_sep() SEP 0xb8b2e1a8 registered: type:0 
-codec:1 seid:2
-Jun 27 19:35:49 peter bluetoothd[27327]: Endpoint registered: 
-sender=:1.673 path=/test/endpoint
-
-When trying to start the simple-endpoint script with sbcsink or 
-mp3sink, all I got was:
-dbus.exceptions.DBusException: org.bluez.Error.NotSupported: 
-Operation is not supported
-
-So, what am I missing? Have you tried to reproduce the bug with hfp?
-
-Best regards,
 Peter
-
