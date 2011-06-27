@@ -2,87 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/6] Split up session_create in separate functions
-Date: Tue, 28 Jun 2011 00:39:37 +0300
-Message-Id: <1309210781-2674-3-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/6] Add system bus connection in obex-client
+Date: Tue, 28 Jun 2011 00:39:36 +0300
+Message-Id: <1309210781-2674-2-git-send-email-dmitriy.paliy@nokia.com>
 In-Reply-To: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
 References: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Connection of RFCOMM and SDP are extracted from session_create function
-into session_connect. Such allows making asynchronous calls before
-creating connections.
+Connection to system bus is added in obex-client. Purpose is to carry
+out OBEX transfers within a single adapter's session.
 ---
- client/session.c |   41 ++++++++++++++++++++++++-----------------
- 1 files changed, 24 insertions(+), 17 deletions(-)
+ client/session.c |    9 +++++++++
+ client/session.h |    1 +
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
 diff --git a/client/session.c b/client/session.c
-index 4a4922f..4016e35 100644
+index 266d00c..4a4922f 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -534,6 +534,29 @@ static struct session_data *session_find(const char *source,
- 	return NULL;
- }
+@@ -201,6 +201,9 @@ static void session_free(struct session_data *session)
+ 		dbus_connection_unref(session->conn);
+ 	}
  
-+static int session_connect(struct session_data *session,
-+						struct callback_data *callback)
-+{
-+	int err;
++	if (session->conn_system)
++		dbus_connection_unref(session->conn_system);
 +
-+	if (session->obex) {
-+		g_idle_add(connection_complete, callback);
-+		err = 0;
-+	} else if (session->channel > 0) {
-+		session->io = rfcomm_connect(&session->src, &session->dst,
-+							session->channel,
-+							rfcomm_callback,
-+							callback);
-+		err = (session->io == NULL) ? -EINVAL : 0;
-+	} else {
-+		callback->sdp = service_connect(&session->src, &session->dst,
-+						service_callback, callback);
-+		err = (callback->sdp == NULL) ? -ENOMEM : 0;
+ 	sessions = g_slist_remove(sessions, session);
+ 
+ 	g_free(session->callback);
+@@ -565,6 +568,12 @@ struct session_data *session_create(const char *source,
+ 		return NULL;
+ 	}
+ 
++	session->conn_system = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++	if (session->conn_system == NULL) {
++		session_free(session);
++		return NULL;
 +	}
 +
-+	return err;
-+}
-+
- struct session_data *session_create(const char *source,
- 						const char *destination,
- 						const char *service,
-@@ -544,7 +567,6 @@ struct session_data *session_create(const char *source,
- {
- 	struct session_data *session;
- 	struct callback_data *callback;
--	int err;
- 
- 	if (destination == NULL)
- 		return NULL;
-@@ -613,22 +635,7 @@ proceed:
- 	callback->func = function;
- 	callback->data = user_data;
- 
--	if (session->obex) {
--		g_idle_add(connection_complete, callback);
--		err = 0;
--	} else if (session->channel > 0) {
--		session->io = rfcomm_connect(&session->src, &session->dst,
--							session->channel,
--							rfcomm_callback,
--							callback);
--		err = (session->io == NULL) ? -EINVAL : 0;
--	} else {
--		callback->sdp = service_connect(&session->src, &session->dst,
--						service_callback, callback);
--		err = (callback->sdp == NULL) ? -ENOMEM : 0;
--	}
--
--	if (err < 0) {
-+	if (session_connect(session, callback) < 0) {
- 		session_unref(session);
- 		g_free(callback);
- 		return NULL;
+ 	if (source == NULL)
+ 		bacpy(&session->src, BDADDR_ANY);
+ 	else
+diff --git a/client/session.h b/client/session.h
+index 6f8a434..554b494 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -42,6 +42,7 @@ struct session_data {
+ 	uuid_t uuid;		/* Bluetooth Service Class */
+ 	gchar *path;		/* Session path */
+ 	DBusConnection *conn;
++	DBusConnection *conn_system; /* system bus connection */
+ 	DBusMessage *msg;
+ 	GwObex *obex;
+ 	GIOChannel *io;
 -- 
 1.7.4.1
 
