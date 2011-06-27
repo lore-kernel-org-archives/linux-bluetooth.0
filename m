@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: "openobex-users@lists.sourceforge.net"
+	<openobex-users@lists.sourceforge.net>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "Marcel Holtmann (marcel@holtmann.org)"
+	<marcel@holtmann.org>
+CC: "Liu, Haijun" <haijun@qca.qualcomm.com>, "Li, Steven"
+	<yongli@qca.qualcomm.com>
+Subject: RE: [PATCH v2 openobex 3/3] Modify code to read entire packet when
+ fd transport format is SEQPACKET.
+Date: Mon, 27 Jun 2011 06:25:25 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103D0389@nasanexd01a.na.qualcomm.com>
+References: <EC94610F2568494D8D9291885C48D3103CFC9D@nasanexd01a.na.qualcomm.com>
+In-Reply-To: <EC94610F2568494D8D9291885C48D3103CFC9D@nasanexd01a.na.qualcomm.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1309125366-29016-2-git-send-email-syamsidhardh@gmail.com>
-References: <1309125366-29016-1-git-send-email-syamsidhardh@gmail.com>
-	<1309125366-29016-2-git-send-email-syamsidhardh@gmail.com>
-Date: Mon, 27 Jun 2011 10:05:31 +0200
-Message-ID: <BANLkTimXxwQHSdjFHYYt-Dw3+dRaMbDKQg@mail.gmail.com>
-Subject: Re: [PATCH obexd 2/3] Fix white space related coding style issues for gwobex
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jun 26, 2011 at 11:56 PM, Syam Sidhardhan
-<syamsidhardh@gmail.com> wrote:
-> @@ -134,7 +134,7 @@ time_t parse_iso8601(const gchar *str, int len) {
->     time_t    time;
->     time_t    tz_offset = 0;
->
-> -    memset (&tm, 0, sizeof (struct tm));
-> +    memset (&tm, 0, sizeof(struct tm));
->
->     /* According to spec the time doesn't have to be null terminated */
->     if (str[len - 1] != '\0') {
-
-I suppose space before '(' can also be removed here and in some other
-(possibly 3) calls in gwobex.
-
--- 
-Slawomir Bochenski
+SGksIE1hcmNlbA0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1
+ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25l
+ckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBMaSwgTmFtaQ0KU2VudDogMjAxMeW5tDbm
+nIgyMeaXpSAxMzoyMw0KVG86IG9wZW5vYmV4LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDsg
+bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KQ2M6IExpdSwgSGFpanVuDQpTdWJqZWN0
+OiBbUEFUQ0ggdjIgb3Blbm9iZXggMy8zXSBNb2RpZnkgY29kZSB0byByZWFkIGVudGlyZSBwYWNr
+ZXQgd2hlbiBmZCB0cmFuc3BvcnQgZm9ybWF0IGlzIFNFUVBBQ0tFVC4NCg0KLS0tDQogbGliL2Zk
+b2JleC5jIHwgICAgMyArKysNCiAxIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMCBk
+ZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2xpYi9mZG9iZXguYyBiL2xpYi9mZG9iZXguYyBp
+bmRleCA3ZmE0YTIxLi40NmEwNzk2IDEwMDY0NA0KLS0tIGEvbGliL2Zkb2JleC5jDQorKysgYi9s
+aWIvZmRvYmV4LmMNCkBAIC03OSw2ICs3OSw5IEBAIHN0YXRpYyBpbnQgZmRvYmV4X3JlYWQob2Jl
+eF90ICpzZWxmLCB2b2lkICpidWYsIGludCBidWZsZW4pICB7DQogCXN0cnVjdCBvYmV4X3RyYW5z
+cG9ydCAqdHJhbnMgPSAmc2VsZi0+dHJhbnM7DQoNCisJaWYodHJhbnMtPmRhdGEuZmQuZm10ID09
+IEZET0JFWF9NVF9TRVFQQUNLRVQpDQorCQlidWZsZW4gPSBzZWxmLT5tdHVfcng7DQorDQogI2lm
+ZGVmIF9XSU4zMg0KIAlyZXR1cm4gIF9yZWFkKHRyYW5zLT5mZCwgYnVmLCBidWZsZW4pOyAgI2Vs
+c2UNCi0tDQoxLjcuMQ0KDQpIb3cgZG8geW91IHRoaW5rIG9mIHRoZSAzIHBhdGNoZXM/IFdvdWxk
+IHlvdSBnaXZlIG1lIHNvbWUgYWR2aWNlPw0KDQoNClJlZ2FyZHMsDQpOYW1pDQoNCg0KDQo=
