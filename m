@@ -1,91 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
- the patch and radio table
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Li, Steven" <yongli@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 28 Jun 2011 17:51:23 -0700
-In-Reply-To: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
-References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1309308687.2208.22.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
+References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+	<BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+	<7.0.1.0.2.20110627205517.03250550@gmx.net>
+	<BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
+	<BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
+Date: Wed, 29 Jun 2011 00:16:30 +0200
+Message-ID: <BANLkTiknkbZcS2AASzS_qeXbNJ3_Qa2e1A@mail.gmail.com>
+Subject: Re: Media API with more than one headset
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Peter Kornatowski <pkorn@gmx.net>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steven,
+Hi Luiz,
 
-> The new Ath3k needs to download patch and radio table,
-> and it keeps same PID/VID even after downloading the patch and radio table.
-> This patch is to use the bcdDevice (Device Release Number) to judge whether the
-> chip has been patched or not. The init bcdDevice value of the chip is 0x0001,
-> this value increases after patch and radio table downloading.
-> 
-> Signed-off-by: Steven.Li <yongli@qca.qualcomm.com>
-> ---
->  drivers/bluetooth/ath3k.c |    3 +++
->  drivers/bluetooth/btusb.c |    9 ++++++++-
->  2 files changed, 11 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 6bacef3..7ae1098 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -375,6 +375,9 @@ static int ath3k_probe(struct usb_interface *intf,
->  
->  	/* load patch and sysconfig files for AR3012 */
->  	if (id->driver_info & BTUSB_ATH3012) {
-> +		if(le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
-> +			return -ENODEV;
-> +
+On Tue, Jun 28, 2011 at 11:48 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Tue, Jun 28, 2011 at 11:07 PM, Lukasz Rymanowski
+> <lukasz.rymanowski@gmail.com> wrote:
+>> Hi Peter,
+>>
+>> Can you try attached patch ?
+>> At least you should not lose audio on all the headsets when
+>> disconnecting one of them.
+>
+> Good catch, the headset watch is not registered per device so we have
+> to do the matching inside the callback like you did, one thing that
+> perhaps is worth doing is to make the matching before the switch so if
+> the endpoint has a device then we match it with the device given to
+> the callback.
 
-please fix the coding style. It is if[space](.
+I thought about it but we can do matching only if transport exist.
+Second thing is that in state HEADSET_STATE_CONNECTING we are actually
+interested to do something if transport does not exist yet (look into
+media_endpoint_set_configuration() )
+So it looks like different states have different approach.
+Anyway, let's wait for test result.
 
-Also you might wanna put a comment on top of this bcdDevice check and
-mention what it actually does.
+>
+>
+> --
+> Luiz Augusto von Dentz
+>
 
->  		ret = ath3k_load_patch(udev);
->  		if (ret < 0) {
->  			BT_ERR("Loading patch file failed");
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index c2de895..9d01e25 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -54,6 +54,7 @@ static struct usb_driver btusb_driver;
->  #define BTUSB_BCM92035		0x10
->  #define BTUSB_BROKEN_ISOC	0x20
->  #define BTUSB_WRONG_SCO_MTU	0x40
-> +#define BTUSB_ATH3012		0x80
->  
->  static struct usb_device_id btusb_table[] = {
->  	/* Generic Bluetooth USB device */
-> @@ -110,7 +111,7 @@ static struct usb_device_id blacklist_table[] = {
->  	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
->  
->  	/* Atheros 3012 with sflash firmware */
-> -	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_IGNORE },
-> +	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
->  
->  	/* Atheros AR5BBU12 with sflash firmware */
->  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-> @@ -914,6 +915,12 @@ static int btusb_probe(struct usb_interface *intf,
->  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
->  		return -ENODEV;
->  
-> +	if (id->driver_info & BTUSB_ATH3012) {
-> +		struct usb_device *udev = interface_to_usbdev(intf);
-> +		if(le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
-> +			return -ENODEV;
-> +	}
-
-Coding style fix as well please. I would say something similar in style
-to what I have done for the older CSR chips. See workaround above.
-
-And on that note, you could use data->udev to get the usb_device
-struct ;)
-
-Regards
-
-Marcel
-
-
+/Lukasz
