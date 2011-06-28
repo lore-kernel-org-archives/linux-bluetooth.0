@@ -1,168 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add adaptername plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 28 Jun 2011 10:21:38 +0100
-In-Reply-To: <20110628085132.GH18047@dell.ger.corp.intel.com>
-References: <1308742198-6024-3-git-send-email-hadess@hadess.net>
-	 <1308836553-12460-1-git-send-email-hadess@hadess.net>
-	 <20110628085132.GH18047@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1309252899.5023.6.camel@novo.hadess.net>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump 3/3 v2] Add basic parsing support for AVRCP PDU
+Date: Tue, 28 Jun 2011 11:57:25 +0300
+Message-Id: <1309251445-16053-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2011-06-28 at 11:51 +0300, Johan Hedberg wrote:
-> Hi Bastien,
-> 
-> I've pushed the two first patches and was also about to push this one
-> after doing some minor fixes first myself. However, I kept on finding
-> more and more issues to fix, so unfortunately here goes another feedback
-> round...
-> 
-> On Thu, Jun 23, 2011, Bastien Nocera wrote:
-> > + *  BlueZ - Bluetooth protocol stack for Linux
-> > + *
-> > + *  Copyright (C) 2011  Red Hat, Inc.
-> > + *
-> 
-> You'll still need to keep also Marcel's copyright here due to
-> considerable portions (such as the expand_name function) having been
-> copied from elsewhere.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Done.
+---
+ parser/avrcp.c |  110 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 109 insertions(+), 1 deletions(-)
 
-> > +static int adaptername_probe(struct btd_adapter *adapter)
-> > +{
-> > +	int current_id;
-> > +	char name[MAX_NAME_LENGTH + 1];
-> > +	char *pretty_hostname;
-> > +	bdaddr_t bdaddr;
-> > +
-> > +	current_id = adapter_get_dev_id(adapter);
-> > +
-> > +	pretty_hostname = read_pretty_host_name();
-> > +	if (pretty_hostname != NULL) {
-> > +		int default_adapter;
-> > +
-> > +		default_adapter = get_default_adapter_id();
-> > +
-> > +		/* Allow us to change the name */
-> > +		adapter_set_allow_name_changes(adapter, TRUE);
-> > +
-> > +		/* If it's the first device, let's assume it will
-> > +		 * be the default one, as we're not told when
-> > +		 * the default adapter changes */
-> > +		if (default_adapter < 0)
-> > +			default_adapter = current_id;
-> > +
-> > +		if (default_adapter != current_id) {
-> > +			char *str;
-> > +
-> > +			/* +1 because we don't want an adapter called "Foobar's laptop #0" */
-> > +			str = g_strdup_printf("%s #%d", pretty_hostname, current_id + 1);
-> > +			DBG("Setting name '%s' for device 'hci%d'", str, current_id);
-> > +
-> > +			adapter_update_local_name(adapter, str);
-> > +			g_free(str);
-> > +		} else {
-> > +			DBG("Setting name '%s' for device 'hci%d'", pretty_hostname, current_id);
-> > +			adapter_update_local_name(adapter, pretty_hostname);
-> > +		}
-> > +		g_free(pretty_hostname);
-> > +
-> > +		/* And disable the name change now */
-> > +		adapter_set_allow_name_changes(adapter, FALSE);
-> > +
-> > +		return 0;
-> > +	}
-> 
-> I think I already mentioned this in another email, but this longish
-> if-branch should really be its own function. E.g. something like:
-
-Done.
-
-> 	if (pretty_hostname != NULL) {
-> 		set_pretty_host_name(adapter, pretty_hostname);
-> 		return 0;
-> 	}
-> 
-> > +	while (i < len) {
-> > +		struct inotify_event *pevent = (struct inotify_event *) &buf[i];
-> > +
-> > +		/* check that it's ours */
-> > +		if (pevent->len &&
-> > +		    pevent->name != NULL &&
-> > +		    strcmp(pevent->name, MACHINE_INFO_FILE) == 0) {
-> 
-> The above two lines mix tabs and spaces for indentation.
-
-Fixed.
-
-> > +static void adaptername_remove(struct btd_adapter *adapter)
-> > +{
-> > +	if (watch_fd >= 0)
-> > +		close(watch_fd);
-> > +	if (inotify != NULL)
-> > +		g_io_channel_shutdown(inotify, FALSE, NULL);
-> > +}
-> > +
-> > +static struct btd_adapter_driver adaptername_driver = {
-> > +	.name	= "adaptername",
-> > +	.probe	= adaptername_probe,
-> > +	.remove	= adaptername_remove,
-> > +};
-> > +
-> > +static int adaptername_init(void)
-> > +{
-> > +	int ret;
-> > +	int inot_fd;
-> > +
-> > +	ret = btd_register_adapter_driver(&adaptername_driver);
-> > +
-> > +	if (ret != 0)
-> > +		return ret;
-> 
-> Please use "err" and the check should be if (err < 0). Also, no empty
-> line before the if-statement.
-
-Fixed.
-
-> > +	inot_fd = inotify_init();
-> > +	if (inot_fd < 0) {
-> > +		error("Failed to setup inotify");
-> > +		return 0;
-> > +	}
-> > +	watch_fd = inotify_add_watch(inot_fd,
-> 
-> Empty line after after the } line please.
-
-done.
-
-> > +				     MACHINE_INFO_DIR,
-> > +				     IN_CLOSE_WRITE | IN_DELETE | IN_CREATE |
-> > +				     IN_MOVED_FROM | IN_MOVED_TO);
-> 
-> Mixed tabs and spaces in the above lines. The code might get easier to
-> read if you created a "uint32_t mask" variable in the function and
-> passed that to the inotify_add_watch call.
-
-Done.
-
-> > +	if (watch_fd < 0) {
-> > +		error("Failed to setup watch for '%s'",
-> > +		      MACHINE_INFO_DIR);
-> 
-> Mixed tabs and spaces in the above line.
-
-Done.
-
-> > +		return 0;
-> > +	}
-> 
-> Shouldn't you close(inot_fd) before the above return?
-
-Done.
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index 203d1d0..0fa38d1 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -86,6 +86,31 @@
+ #define AVC_PANEL_FORWARD		0x4b
+ #define AVC_PANEL_BACKWARD		0x4c
+ 
++/* pdu ids */
++#define AVRCP_GET_CAPABILITIES		0x10
++#define AVRCP_LIST_PLAYER_ATTRIBUTES	0x11
++#define AVRCP_LIST_PLAYER_VALUES	0x12
++#define AVRCP_GET_CURRENT_PLAYER_VALUE	0x13
++#define AVRCP_SET_PLAYER_VALUE		0x14
++#define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT	0x15
++#define AVRCP_GET_PLAYER_VALUE_TEXT	0x16
++#define AVRCP_DISPLAYABLE_CHARSET	0x17
++#define AVRCP_CT_BATTERY_STATUS		0x18
++#define AVRCP_GET_ELEMENT_ATTRIBUTES	0x20
++#define AVRCP_GET_PLAY_STATUS		0x30
++#define AVRCP_REGISTER_NOTIFICATION	0x31
++#define AVRCP_REQUEST_CONTINUING	0x40
++#define AVRCP_ABORT_CONTINUING		0x41
++#define AVRCP_SET_ABSOLUTE_VOLUME	0x50
++#define AVRCP_SET_ADDRESSED_PLAYER	0x60
++#define AVRCP_SET_BROWSED_PLAYER	0x70
++#define AVRCP_GET_FOLDER_ITEMS		0x71
++#define AVRCP_CHANGE_PATH		0x72
++#define AVRCP_GET_ITEM_ATTRIBUTES	0x73
++#define AVRCP_PLAY_ITEM			0x74
++#define AVRCP_SEARCH			0x80
++#define AVRCP_ADD_TO_NOW_PLAYING	0x90
++
+ static const char *ctype2str(uint8_t ctype)
+ {
+ 	switch (ctype & 0x0f) {
+@@ -134,6 +159,76 @@ static const char *opcode2str(uint8_t opcode)
+ 	}
+ }
+ 
++static const char *pdu2str(uint8_t pduid)
++{
++	switch (pduid) {
++	case AVRCP_GET_CAPABILITIES:
++		return "GetCapabilities";
++	case AVRCP_LIST_PLAYER_ATTRIBUTES:
++		return "ListPlayerApplicationSettingAttributes";
++	case AVRCP_LIST_PLAYER_VALUES:
++		return "ListPlayerApplicationSettingValues";
++	case AVRCP_GET_CURRENT_PLAYER_VALUE:
++		return "GetCurrentPlayerApplicationSettingValue";
++	case AVRCP_SET_PLAYER_VALUE:
++		return "SetPlayerApplicationSettingValue";
++	case AVRCP_GET_PLAYER_ATTRIBUTE_TEXT:
++		return "GetPlayerApplicationSettingAttributeText";
++	case AVRCP_GET_PLAYER_VALUE_TEXT:
++		return "GetPlayerApplicationSettingValueText";
++	case AVRCP_DISPLAYABLE_CHARSET:
++		return "InformDisplayableCharacterSet";
++	case AVRCP_CT_BATTERY_STATUS:
++		return "InformBatteryStatusOfCT";
++	case AVRCP_GET_ELEMENT_ATTRIBUTES:
++		return "GetElementAttributes";
++	case AVRCP_GET_PLAY_STATUS:
++		return "GetPlayStatus";
++	case AVRCP_REGISTER_NOTIFICATION:
++		return "RegisterNotification";
++	case AVRCP_REQUEST_CONTINUING:
++		return "RequestContinuingResponse";
++	case AVRCP_ABORT_CONTINUING:
++		return "AbortContinuingResponse";
++	case AVRCP_SET_ABSOLUTE_VOLUME:
++		return "SetAbsoluteVolume";
++	case AVRCP_SET_ADDRESSED_PLAYER:
++		return "SetAddressedPlayer";
++	case AVRCP_SET_BROWSED_PLAYER:
++		return "SetBrowsedPlayer";
++	case AVRCP_GET_FOLDER_ITEMS:
++		return "GetFolderItems";
++	case AVRCP_CHANGE_PATH:
++		return "ChangePath";
++	case AVRCP_GET_ITEM_ATTRIBUTES:
++		return "GetItemAttributes";
++	case AVRCP_PLAY_ITEM:
++		return "PlayItem";
++	case AVRCP_SEARCH:
++		return "Search";
++	case AVRCP_ADD_TO_NOW_PLAYING:
++		return "AddToNowPlaying";
++	default:
++		return "Unknown";
++	}
++}
++
++static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
++{
++	uint8_t pduid, pt;
++	uint16_t len;
++
++	p_indent(level, frm);
++
++	pduid = get_u8(frm);
++	pt = get_u8(frm);
++	len = get_u16(frm);
++
++	printf("AVRCP: %s: pt 0x%02x len 0x%04x\n", pdu2str(pduid), pt, len);
++
++	raw_dump(level, frm);
++}
++
+ static char *op2str(uint8_t op)
+ {
+ 	switch (op & 0x7f) {
+@@ -224,7 +319,8 @@ static const char *subunit2str(uint8_t subunit)
+ 
+ void avrcp_dump(int level, struct frame *frm)
+ {
+-	uint8_t ctype, address, subunit, opcode;
++	uint8_t ctype, address, subunit, opcode, company[3];
++	int i;
+ 
+ 	p_indent(level, frm);
+ 
+@@ -254,6 +350,18 @@ void avrcp_dump(int level, struct frame *frm)
+ 	case AVC_OP_PASSTHROUGH:
+ 		avrcp_passthrough_dump(level + 1, frm);
+ 		break;
++	case AVC_OP_VENDORDEP:
++		p_indent(level + 1, frm);
++
++		printf("Company ID: 0x");
++		for (i = 0; i < 3; i++) {
++			company[i] = get_u8(frm);
++			printf("%02x", company[i]);
++		}
++		printf("\n");
++
++		avrcp_pdu_dump(level + 1, frm, ctype);
++		break;
+ 	default:
+ 		raw_dump(level, frm);
+ 	}
+-- 
+1.7.5.4
 
