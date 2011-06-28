@@ -1,39 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: chen.ganir@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Chen Ganir <chen.ganir@ti.com>
-Subject: [PATCH] Fixed wrong AVCTP response to unregistered PID
-Date: Tue, 28 Jun 2011 14:28:41 +0300
-Message-Id: <1309260521-9943-1-git-send-email-chen.ganir@ti.com>
+Date: Tue, 28 Jun 2011 13:26:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH hcidump 3/3 v2] Add basic parsing support for AVRCP PDU
+Message-ID: <20110628102653.GB4652@dell.ger.corp.intel.com>
+References: <1309251445-16053-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1309251445-16053-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chen Ganir <chen.ganir@ti.com>
+Hi Luiz,
 
-AVCTP response to unregistered PID should consist only
-from the first 3 octets of the AVCTP header, without
-any additional frame data (Fix for PTS certification
-issue)
----
- audio/control.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+On Tue, Jun 28, 2011, Luiz Augusto von Dentz wrote:
+> ---
+>  parser/avrcp.c |  110 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 109 insertions(+), 1 deletions(-)
 
-diff --git a/audio/control.c b/audio/control.c
-index ceb3d88..7c92d10 100755
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -580,9 +580,10 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
- 		avctp->cr = AVCTP_RESPONSE;
- 		avrcp->code = CTYPE_NOT_IMPLEMENTED;
- 	} else if (avctp->pid != htons(AV_REMOTE_SVCLASS_ID)) {
-+		DBG("AVCTP invalid pid (%d) specified. Rejecting request",avctp->pid);
- 		avctp->ipid = 1;
- 		avctp->cr = AVCTP_RESPONSE;
--		avrcp->code = CTYPE_REJECTED;
-+		packet_size = sizeof(struct avctp_header);
- 	} else if (avctp->cr == AVCTP_COMMAND &&
- 			avrcp->code == CTYPE_CONTROL &&
- 			avrcp->subunit_type == SUBUNIT_PANEL &&
--- 
-1.7.1
+All three patches have been pushed upstream. Thanks.
 
+Johan
