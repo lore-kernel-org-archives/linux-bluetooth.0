@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E09CFF6.40805@libresoft.es>
-Date: Tue, 28 Jun 2011 14:58:30 +0200
+Message-ID: <4E09CDD9.2010600@libresoft.es>
+Date: Tue, 28 Jun 2011 14:49:29 +0200
 From: =?ISO-8859-1?Q?Jorge_Fern=E1ndez_Gonz=E1lez?=
 	<jfernandez@libresoft.es>
 MIME-Version: 1.0
@@ -13,7 +13,7 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi all,
 
 I would like to know if someone could say me what's the current state of 
-the Bluetooth Low Energy standard within the BlueZ stack, like 
+the Blueetooth Low Energy standard within the BlueZ stack, like 
 implementations in progress, etc. Any information is welcome.
 
 On the other hand, I have been consulting the following Bluetooth Low 
