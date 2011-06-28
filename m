@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
 From: Nami <nami.li@atheros.com>
 To: <linux-bluetooth@vger.kernel.org>
-Date: Tue, 28 Jun 2011 15:47:51 +0800
-Message-ID: <1309247272-11329-2-git-send-email-nami.li@atheros.com>
+Date: Tue, 28 Jun 2011 15:47:52 +0800
+Message-ID: <1309247272-11329-3-git-send-email-nami.li@atheros.com>
 In-Reply-To: <1309247272-11329-1-git-send-email-nami.li@atheros.com>
 References: <1309247272-11329-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
 Cc: Nami <nami.li@atheros.com>, openobex-users@lists.sourceforge.net,
 	haijun@qca.qualcomm.com, hongfan@qca.qualcomm.com
-Subject: [openobex-users] [PATCH v3 openobex 2/3] Create new API to set fd
-	obex transport format.
+Subject: [openobex-users] [PATCH v3 openobex 3/3] Modify code to read entire
+	packet when fd transport format is SEQPACKET.
 Reply-To: openobex-users@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
 	<mailto:openobex-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,62 +23,25 @@ Errors-To: openobex-users-bounces@lists.sourceforge.net
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- include/openobex/obex.h |    1 +
- lib/obex.c              |   16 ++++++++++++++++
- lib/obex.sym            |    1 +
- 3 files changed, 18 insertions(+), 0 deletions(-)
+ lib/fdobex.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/include/openobex/obex.h b/include/openobex/obex.h
-index f948113..cb1d66a 100644
---- a/include/openobex/obex.h
-+++ b/include/openobex/obex.h
-@@ -148,6 +148,7 @@ OPENOBEX_SYMBOL(int) BtOBEX_TransportConnect(obex_t *self, bt_addr_t *src, bt_ad
-  * OBEX File API
-  */
- OPENOBEX_SYMBOL(int) FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu);
-+OPENOBEX_SYMBOL(void)FdOBEX_SetTransportFormat(obex_t *self, enum fdobex_transport_format fmt);
+diff --git a/lib/fdobex.c b/lib/fdobex.c
+index 7fa4a21..1c97e08 100644
+--- a/lib/fdobex.c
++++ b/lib/fdobex.c
+@@ -79,6 +79,11 @@ static int fdobex_read(obex_t *self, void *buf, int buflen)
+ {
+ 	struct obex_transport *trans = &self->trans;
 
- /*
-  * OBEX interface discovery API
-diff --git a/lib/obex.c b/lib/obex.c
-index 165fcb8..8679648 100644
---- a/lib/obex.c
-+++ b/lib/obex.c
-@@ -1136,6 +1136,22 @@ int CALLAPI FdOBEX_TransportSetup(obex_t *self, int rfd, int wfd, int mtu)
- }
-
- /**
-+	FdOBEX_SetTransportFormat - set transport format for OBEX_TRANS_FD transport.
++	if(trans->data.fd.fmt == FDOBEX_MT_SEQPACKET){
++		/* set buflen large enough to read entire packet */
++		buflen = self->mtu_rx;
++	}
 +
-+	\param self OBEX handle
-+	\param fmt transport format: FDOBEX_MT_STREAM - default
-+ */
-+LIB_SYMBOL
-+void FdOBEX_SetTransportFormat(obex_t *self, enum fdobex_transport_format fmt)
-+{
-+	DEBUG(4, "\n");
-+
-+	obex_return_if_fail(self != NULL);
-+
-+	self->trans.data.fd.fmt = fmt;
-+}
-+
-+/**
- 	Connect USB interface.
- 	\param self OBEX handle
- 	\param intf USB interface to connect to
-diff --git a/lib/obex.sym b/lib/obex.sym
-index 0c33b63..0f59042 100644
---- a/lib/obex.sym
-+++ b/lib/obex.sym
-@@ -39,6 +39,7 @@ IrOBEX_TransportConnect
- BtOBEX_ServerRegister
- BtOBEX_TransportConnect
- FdOBEX_TransportSetup
-+FdOBEX_SetTransportFormat
- OBEX_InterfaceConnect
- OBEX_EnumerateInterfaces
- OBEX_GetInterfaceByIndex
+ #ifdef _WIN32
+ 	return  _read(trans->fd, buf, buflen);
+ #else
 --
 1.7.1
 
