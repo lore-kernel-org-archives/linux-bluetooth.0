@@ -1,60 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
+From: Nami <nami.li@atheros.com>
+To: <linux-bluetooth@vger.kernel.org>
+Date: Tue, 28 Jun 2011 15:47:50 +0800
+Message-ID: <1309247272-11329-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-In-Reply-To: <1309210781-2674-6-git-send-email-dmitriy.paliy@nokia.com>
-References: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1309210781-2674-6-git-send-email-dmitriy.paliy@nokia.com>
-Date: Tue, 28 Jun 2011 10:48:11 +0300
-Message-ID: <BANLkTi=pJhVwZaKszrPGSg4aQezd77d+xQ@mail.gmail.com>
-Subject: Re: [PATCH 5/6] Add FindAdapter method call to obex-client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Nami <nami.li@atheros.com>, openobex-users@lists.sourceforge.net,
+	haijun@qca.qualcomm.com, hongfan@qca.qualcomm.com
+Subject: [openobex-users] [PATCH v3 openobex 1/3] Add transport format
+	member in fdobex_data struct. Support STREAM and SEQPACKET
+	transport format.
+Reply-To: openobex-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=openobex-users>
+List-Post: <mailto:openobex-users@lists.sourceforge.net>
+List-Help: <mailto:openobex-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: openobex-users-bounces@lists.sourceforge.net
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+These patches enable fd obex transport to support SEQPACKET format to read entire packet at a time.
+Add fmt member to indicate transport format, the init value is STREAM format.
+Create a new api for upper layer to set transport format when using OBEX over L2CAP.
 
-On Tue, Jun 28, 2011 at 12:39 AM, Dmitriy Paliy <dmitriy.paliy@gmail.com> wrote:
-> ---
->  client/session.c |   12 +++++++++++-
->  1 files changed, 11 insertions(+), 1 deletions(-)
->
-> diff --git a/client/session.c b/client/session.c
-> index 423eb8c..d8e3bf2 100644
-> --- a/client/session.c
-> +++ b/client/session.c
-> @@ -848,11 +848,21 @@ proceed:
->        callback->func = function;
->        callback->data = user_data;
->
-> -       req = send_method_call(session->conn_system,
-> +       if (source) {
-> +               req = send_method_call(session->conn_system,
-> +                               BT_BUS_NAME, BT_PATH,
-> +                               BT_MANAGER_IFACE, "FindAdapter",
-> +                               manager_reply, callback,
-> +                               DBUS_TYPE_STRING, &source,
-> +                               DBUS_TYPE_INVALID);
-> +       } else {
-> +               req = send_method_call(session->conn_system,
->                                BT_BUS_NAME, BT_PATH,
->                                BT_MANAGER_IFACE, "DefaultAdapter",
->                                manager_reply, callback,
->                                DBUS_TYPE_INVALID);
-> +       }
-> +
->        if (!req) {
->                session_unref(session);
->                g_free(callback);
-> --
-> 1.7.4.1
+---
+ include/openobex/obex_const.h |    5 +++++
+ lib/fdobex.c                  |    1 +
+ lib/fdobex.h                  |    1 +
+ 3 files changed, 7 insertions(+), 0 deletions(-)
 
-I guess this one belong to the same patch where DefaultAdapter call
-was introduced since it actually fix requesting the session to the
-wrong adapter in case it the address is not from the default.
+diff --git a/include/openobex/obex_const.h b/include/openobex/obex_const.h
+index cb7afeb..700bacb 100644
+--- a/include/openobex/obex_const.h
++++ b/include/openobex/obex_const.h
+@@ -302,6 +302,11 @@ enum obex_rsp_mode {
+   OBEX_RSP_MODE_SINGLE = 1, /**< single response mode (SRM) */
+ };
+
++enum fdobex_transport_format {
++  FDOBEX_MT_STREAM    = 0, /**< stream transport format */
++  FDOBEX_MT_SEQPACKET = 1, /**< seqpacket transport format */
++};
++
+ /* Min, Max and default transport MTU */
+ #define OBEX_DEFAULT_MTU	1024
+ #define OBEX_MINIMUM_MTU	255
+diff --git a/lib/fdobex.c b/lib/fdobex.c
+index 45c56ff..7fa4a21 100644
+--- a/lib/fdobex.c
++++ b/lib/fdobex.c
+@@ -14,6 +14,7 @@
+ static int fdobex_init(obex_t *self)
+ {
+ 	self->trans.data.fd.writefd = INVALID_SOCKET;
++	self->trans.data.fd.fmt = FDOBEX_MT_STREAM;
+
+ 	return 0;
+ }
+diff --git a/lib/fdobex.h b/lib/fdobex.h
+index 07e33ab..01741c8 100644
+--- a/lib/fdobex.h
++++ b/lib/fdobex.h
+@@ -6,5 +6,6 @@ void fdobex_get_ops(struct obex_transport_ops* ops);
+
+ struct fdobex_data {
+ 	socket_t writefd; /* write descriptor */
++	enum fdobex_transport_format fmt;  /* transport format */
+ };
+ #endif
+--
+1.7.1
 
 
--- 
-Luiz Augusto von Dentz
+------------------------------------------------------------------------------
+All of the data generated in your IT infrastructure is seriously valuable.
+Why? It contains a definitive record of application performance, security 
+threats, fraudulent activity, and more. Splunk takes this data and makes 
+sense of it. IT sense. And common sense.
+http://p.sf.net/sfu/splunk-d2d-c2
+_______________________________________________
+Openobex-users mailing list
+Openobex-users@lists.sourceforge.net
+http://lists.sourceforge.net/lists/listinfo/openobex-users
