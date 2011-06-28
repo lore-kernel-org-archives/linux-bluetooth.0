@@ -1,63 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: help needed harvesting photos from nokia phone
-From: acousmetre <acousmetre@gmail.com>
-Reply-To: acousmetre@gmail.com
+Message-ID: <4E09CFF6.40805@libresoft.es>
+Date: Tue, 28 Jun 2011 14:58:30 +0200
+From: =?ISO-8859-1?Q?Jorge_Fern=E1ndez_Gonz=E1lez?=
+	<jfernandez@libresoft.es>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 28 Jun 2011 10:11:59 -0300
-Message-ID: <1309266719.3003.29.camel@localhost>
-Mime-Version: 1.0
+Subject: Bluetooth Low Energy Questions
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear list,
+Hi all,
 
-I recently volunteered to help a group of actors in a performance. They
-wish to use a mobile phone to take photos during a performance and have
-these snaps automatically projected. A laptop with bluetooth and a
-projector will be placed on the stage - where they can place the mobile
-between shots in order to make the file transfer - they will move in and
-out of range of the laptop. 
+I would like to know if someone could say me what's the current state of 
+the Bluetooth Low Energy standard within the BlueZ stack, like 
+implementations in progress, etc. Any information is welcome.
 
-I thought this should be easy to do and patched together a script to
-fetch and display the most recent photo taken. I'm not much of a
-programmer however. With a pre-coupled phone and laptop, the script
-works some of the time - other times it gets stuck - and I have to
-physically remove and replace to bluetooth dongle to get it running
-again (this works again, only sometimes!). I'll paste my script below -
-can anyone suggest what I might be doing wrong - or a better way? At
-present the script is too unreliable to use.
+On the other hand, I have been consulting the following Bluetooth Low 
+Energy Dongle [1]. Does anyone have used this dongle? Is it a good 
+option to start working?
 
-Here it is - cheers, Iain :
+Regards.
 
-#!/bin/sh
-folder='Images' #Nokia folder
-name='/home/iain/projetos/chuvadesangue/fotos'
-address='00:26:69:4D:D1:7C'
-cd $name
-touch ./preto.jpg
-killall geeqie
-/usr/bin/geeqie -f -t preto.jpg&
+         Jorge.
 
-while : ; do
-obexftp -b $address -l $folder > /tmp/list_files
-trap "rm -f /tmp/list_files; exit 1" INT
-cat /tmp/list_files | grep -o "file name="*.*"\ s" | sed 's/name="//' |
-sed 's/file//' | sed 's/" s//' > /tmp/list_files2
-if [ -s /tmp/list_files2 ] ; then
-    sleep 2
-    obexftp -b $address  -c $folder -G `cat /tmp/list_files2`
-    lastimage=$(ls -c|head -n1)
-#     echo "If there was a photo taken since the last loop, show it"
-    /usr/bin/geeqie -r file: $lastimage
-fi ;        
-        sleep 3
-done
-  rm -f /tmp/list_files
-  rm -f /tmp/list_files2
-  echo "Done"
-
-
-
-
-
+[1] http://www.bluegiga.com/BLED112_Bluetooth_low_energy_dongle
