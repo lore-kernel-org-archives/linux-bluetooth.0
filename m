@@ -1,36 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
-	<BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-	<7.0.1.0.2.20110627205517.03250550@gmx.net>
-	<BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
-Date: Wed, 29 Jun 2011 00:48:20 +0300
-Message-ID: <BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
-Subject: Re: Media API with more than one headset
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-Cc: Peter Kornatowski <pkorn@gmx.net>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH obexd v2 4/4] Add adapter ReleaseSession to obex-client
+Date: Wed, 29 Jun 2011 00:40:42 +0300
+Message-Id: <1309297242-4154-5-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Release of adapter session is added to obex-client when closing OBEX
+transfer.
+---
+ client/session.c |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-On Tue, Jun 28, 2011 at 11:07 PM, Lukasz Rymanowski
-<lukasz.rymanowski@gmail.com> wrote:
-> Hi Peter,
->
-> Can you try attached patch ?
-> At least you should not lose audio on all the headsets when
-> disconnecting one of them.
-
-Good catch, the headset watch is not registered per device so we have
-to do the matching inside the callback like you did, one thing that
-perhaps is worth doing is to make the matching before the switch so if
-the endpoint has a device then we match it with the device given to
-the callback.
-
-
+diff --git a/client/session.c b/client/session.c
+index 4b8cf09..a2a3b2d 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -284,6 +284,11 @@ static struct pending_req *send_method_call(DBusConnection *connection,
+ 
+ 	va_end(args);
+ 
++	if (!cb) {
++		g_dbus_send_message(connection, msg);
++		return 0;
++	}
++
+ 	if (!dbus_connection_send_with_reply(connection, msg, &call, -1)) {
+ 		error("Sending %s failed", method);
+ 		dbus_message_unref(msg);
+@@ -312,6 +317,11 @@ void session_unref(struct session_data *session)
+ 	if (ret == FALSE)
+ 		return;
+ 
++	send_method_call(session->conn_system,
++				BT_BUS_NAME, session->adapter,
++				BT_ADAPTER_IFACE, "ReleaseSession",
++				NULL, NULL,
++				DBUS_TYPE_INVALID);
+ 	session_free(session);
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
