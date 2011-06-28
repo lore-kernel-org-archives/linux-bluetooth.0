@@ -1,26 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Jun 2011 10:51:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
-Subject: Re: [PATCH] Fix SAP message padding macro
-Message-ID: <20110628075153.GB18047@dell.ger.corp.intel.com>
-References: <1308645245-21791-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1308645245-21791-1-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1309210781-2674-6-git-send-email-dmitriy.paliy@nokia.com>
+References: <1309210781-2674-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1309210781-2674-6-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 28 Jun 2011 10:48:11 +0300
+Message-ID: <BANLkTi=pJhVwZaKszrPGSg4aQezd77d+xQ@mail.gmail.com>
+Subject: Re: [PATCH 5/6] Add FindAdapter method call to obex-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Dmitriy,
 
-On Tue, Jun 21, 2011, Lukasz Rymanowski wrote:
-> With this patch it is not possible to have incorrect padding equal to 4.
+On Tue, Jun 28, 2011 at 12:39 AM, Dmitriy Paliy <dmitriy.paliy@gmail.com> wrote:
 > ---
->  sap/server.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  client/session.c |   12 +++++++++++-
+>  1 files changed, 11 insertions(+), 1 deletions(-)
+>
+> diff --git a/client/session.c b/client/session.c
+> index 423eb8c..d8e3bf2 100644
+> --- a/client/session.c
+> +++ b/client/session.c
+> @@ -848,11 +848,21 @@ proceed:
+>        callback->func = function;
+>        callback->data = user_data;
+>
+> -       req = send_method_call(session->conn_system,
+> +       if (source) {
+> +               req = send_method_call(session->conn_system,
+> +                               BT_BUS_NAME, BT_PATH,
+> +                               BT_MANAGER_IFACE, "FindAdapter",
+> +                               manager_reply, callback,
+> +                               DBUS_TYPE_STRING, &source,
+> +                               DBUS_TYPE_INVALID);
+> +       } else {
+> +               req = send_method_call(session->conn_system,
+>                                BT_BUS_NAME, BT_PATH,
+>                                BT_MANAGER_IFACE, "DefaultAdapter",
+>                                manager_reply, callback,
+>                                DBUS_TYPE_INVALID);
+> +       }
+> +
+>        if (!req) {
+>                session_unref(session);
+>                g_free(callback);
+> --
+> 1.7.4.1
 
-Applied. Thanks.
+I guess this one belong to the same patch where DefaultAdapter call
+was introduced since it actually fix requesting the session to the
+wrong adapter in case it the address is not from the default.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
