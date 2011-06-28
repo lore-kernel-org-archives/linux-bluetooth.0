@@ -1,73 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <7.0.1.0.2.20110627205517.03250550@gmx.net>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
-	<BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-	<7.0.1.0.2.20110627205517.03250550@gmx.net>
-Date: Tue, 28 Jun 2011 22:07:25 +0200
-Message-ID: <BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
-Subject: Re: Media API with more than one headset
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Peter Kornatowski <pkorn@gmx.net>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001636ed643177e02f04a6cb371a
+In-Reply-To: <1309263917-14931-1-git-send-email-sancane@gmail.com>
+References: <1309263917-14931-1-git-send-email-sancane@gmail.com>
+Date: Tue, 28 Jun 2011 13:05:25 -0700
+Message-ID: <BANLkTikzCPdi2nW3SNmg58miQjEPhg=T=g@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: mike tsai <mikeyhtsai@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001636ed643177e02f04a6cb371a
-Content-Type: text/plain; charset=ISO-8859-1
+On Tue, Jun 28, 2011 at 5:25 AM, Santiago Carot-Nemesio
+<sancane@gmail.com> wrote:
+> ---
+>  doc/thermometer.txt |  125 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 125 insertions(+), 0 deletions(-)
+>  create mode 100644 doc/thermometer.txt
+>
+> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
+> new file mode 100644
+> index 0000000..9afd2b2
+> --- /dev/null
+> +++ b/doc/thermometer.txt
+> @@ -0,0 +1,125 @@
+> +BlueZ D-Bus Thermomether API description
+> +****************************************
+> +
+> +       Santiago Carot-Nemesio <sancane@gmail.com>
+> +
+> +Health Thermomether Profile hierarchy
+> +=====================================
+> +
+> +Service                org.bluez
+> +Interface      org.bluez.Thermometer
+> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +
+> +Methods                void SetProperty(string name, variant value)
+> +
+> +                       Changes the value of the specified property. Only
+> +                       read-write properties can be changed. On success
+> +                       this will emit a PropertyChanged signal.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +
+> +               dict GetProperties()
+> +
+> +                       Returns all properties for the interface. See the
+> +                       Properties section for the available properties.
+> +
+> +               RegisterThermometerWatcher(object agent)
+> +
+> +                       Registers a watcher to monitor scanned measures.The agent
+> +                       will be notified about final.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +
+> +               UnregisterThermometerWatcher(object agent)
+> +
+> +                       Unregisters a watcher.
+> +
+> +                       Final and intermediate temperatures won't be notified to
+> +                       this agent any more.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                       org.bluez.Error.NotFound
+> +
+> +               EnableIntermediateMeasures(object agent)
+> +
+> +                       Enables intermediate measure notifications for this agent
+> +                       if the thermometer supports it.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                       org.bluez.Error.NotSupported
+> +
+> +               DisableIntermediateMeasures(object agent)
+> +
+> +                       Disables intermediate measure notifications for this
+> +                       agent. It will disable notifications in the thermometer
+> +                       when the last agent removes the watcher for intermediate
+> +                       measures.
+> +
+> +                       Possible Errors: org.bluez.Error.InvalidArguments
+> +                                       org.bluez.Error.NotFound
+> +
+> +Signals                PropertyChanged(string name, variant value)
+> +
+> +                       This signal indicates a changed value of the given
+> +                       property.
+> +
+> +Properties     boolean Intermediate [readonly]
+> +
+> +                       True if the thermometer supports intermediate measure
+> +                       notifications.
+> +
+> +               uint16 Interval (optional) [readwrite]
+> +
+> +                       The Measurement Interval defines the time (in seconds)
+> +                       between measurements. This interval is not related to
+> +                       the intermediates measures and must be defined into
+> +                       a valid range. Setting it to zero meaning that no
+> +                       periodic measurements will be taken.
+> +
+> +               uint16 Minimum (optional) [readonly]
+> +
+> +                       Defines the maximum value allowed for the interval
+> +                       between periodic measurements.
+> +
+> +               uint16 Maximum (optional) [readonly]
+> +
+> +                       Defines the minimuum value allowed for the interval
+> +                       between periodic measurements.
+> +
+> +
+> +Health Thermometer Watcher hierarchy
+> +====================================
+> +Service                unique name
+> +Interface      org.bluez.ThermometerWatcher
+> +Object path    freely definable
+> +
+> +Methods                void MeasureReceived(dict measure)
+> +
+> +                       This callback gets called when a measure has been
+> +                       scanned in the thermometer. The Time entry in the dict
+> +                       will be only present if the device supports storing of
+> +                       data. The time value is expressed in seconds since epoch.
+> +                       The value represented is (mantissa) x (10**exponent)
+> +                       See foot note for special values when treating with
+> +                       health devices.
+> +
+> +                       Dict is defined as below:
+> +                       {
+> +                               "Exponent" : int8,
+> +                               "Mantissa" : int32,
+> +                               "Unit" : ("Celsius" or "Fahrenheit"),
+> +                               "Time" : uint64,
+> +                               "Type" : ("Armpit", "Body", "Ear", "Finger",
+> +                                       "Intestines", "Mouth", "Rectum", "Toe",
+> +                                       "Tympanum"),
+> +                               "Measurement" : ("Final" or "Intermediate"),
+> +                       }
+> +
+> +                       For special cases, the exponent shall always be zero and
+> +                       the mantissa should be one of following values:
+> +
+> +                       NRes = -(2**23)
+> +                       NaN = +(2**23-1)
+> +                       INFINITY = (2**23-2)
+> +                       -INFINITY = -(2**23-2)
+> --
+> 1.7.5.2
+>
+> --
 
-Hi Peter,
+Is this proposal going to use reference count for property setting of
+notification/indication? and if one of the applications enables
+immediate alert notification, then all other applications will receive
+the notification even if they have not registered it?
 
-Can you try attached patch ?
-At least you should not lose audio on all the headsets when
-disconnecting one of them.
 
-\Lukasz
-
---001636ed643177e02f04a6cb371a
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-Fix-for-media-callback-handling.patch"
-Content-Disposition: attachment;
-	filename="0001-Fix-for-media-callback-handling.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gphadc8t0
-
-RnJvbSA4NWJlMmVjZDJmNmQ3NjlmN2E2ZmQ1MWYyNTU2ZWVhYWMzOGU4NWEwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWthc3ogUnltYW5vd3NraSA8bHVrYXN6LnJ5bWFub3dza2lA
-Z21haWwuY29tPgpEYXRlOiBUdWUsIDI4IEp1biAyMDExIDE5OjA4OjQ4ICswMjAwClN1YmplY3Q6
-IFtQQVRDSF0gRml4IGZvciBtZWRpYSBjYWxsYmFjayBoYW5kbGluZwoKLS0tCiBhdWRpby9tZWRp
-YS5jICAgICB8ICAgIDcgKysrKysrLQogYXVkaW8vdHJhbnNwb3J0LmMgfCAgICA1ICsrKysrCiBh
-dWRpby90cmFuc3BvcnQuaCB8ICAgIDEgKwogMyBmaWxlcyBjaGFuZ2VkLCAxMiBpbnNlcnRpb25z
-KCspLCAxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1ZGlvL21lZGlhLmMgYi9hdWRpby9t
-ZWRpYS5jCmluZGV4IGJiYjc3Y2YuLmViNWZlZDkgMTAwNjQ0Ci0tLSBhL2F1ZGlvL21lZGlhLmMK
-KysrIGIvYXVkaW8vbWVkaWEuYwpAQCAtMTY2LDcgKzE2NiwxMiBAQCBzdGF0aWMgdm9pZCBoZWFk
-c2V0X3N0YXRlX2NoYW5nZWQoc3RydWN0IGF1ZGlvX2RldmljZSAqZGV2LAogCiAJc3dpdGNoIChu
-ZXdfc3RhdGUpIHsKIAljYXNlIEhFQURTRVRfU1RBVEVfRElTQ09OTkVDVEVEOgotCQltZWRpYV9l
-bmRwb2ludF9jbGVhcl9jb25maWd1cmF0aW9uKGVuZHBvaW50KTsKKwkJaWYgKGVuZHBvaW50LT50
-cmFuc3BvcnQgJiYKKwkJCW1lZGlhX3RyYW5zcG9ydF9nZXRfZGV2KGVuZHBvaW50LT50cmFuc3Bv
-cnQpID09IGRldikgeworCisJCQlEQkcoIkNsZWFyIGVuZHBvaW50ICVwIiwgZW5kcG9pbnQpOwor
-CQkJbWVkaWFfZW5kcG9pbnRfY2xlYXJfY29uZmlndXJhdGlvbihlbmRwb2ludCk7CisJCX0KIAkJ
-YnJlYWs7CiAJY2FzZSBIRUFEU0VUX1NUQVRFX0NPTk5FQ1RJTkc6CiAJCW1lZGlhX2VuZHBvaW50
-X3NldF9jb25maWd1cmF0aW9uKGVuZHBvaW50LCBkZXYsIE5VTEwsIDAsCmRpZmYgLS1naXQgYS9h
-dWRpby90cmFuc3BvcnQuYyBiL2F1ZGlvL3RyYW5zcG9ydC5jCmluZGV4IDdjOTkyMDcuLmNkMmRl
-MzcgMTAwNjQ0Ci0tLSBhL2F1ZGlvL3RyYW5zcG9ydC5jCisrKyBiL2F1ZGlvL3RyYW5zcG9ydC5j
-CkBAIC05MTgsMyArOTE4LDggQEAgdm9pZCBtZWRpYV90cmFuc3BvcnRfdXBkYXRlX2RlbGF5KHN0
-cnVjdCBtZWRpYV90cmFuc3BvcnQgKnRyYW5zcG9ydCwKIAkJCQlNRURJQV9UUkFOU1BPUlRfSU5U
-RVJGQUNFLCAiRGVsYXkiLAogCQkJCURCVVNfVFlQRV9VSU5UMTYsICZ0cmFuc3BvcnQtPmRlbGF5
-KTsKIH0KKworc3RydWN0IGF1ZGlvX2RldmljZSAqbWVkaWFfdHJhbnNwb3J0X2dldF9kZXYoc3Ry
-dWN0IG1lZGlhX3RyYW5zcG9ydCAqdHJhbnNwb3J0KQoreworCXJldHVybiB0cmFuc3BvcnQtPmRl
-dmljZTsKK30KXCBObyBuZXdsaW5lIGF0IGVuZCBvZiBmaWxlCmRpZmYgLS1naXQgYS9hdWRpby90
-cmFuc3BvcnQuaCBiL2F1ZGlvL3RyYW5zcG9ydC5oCmluZGV4IGJlNGQ2NjYuLjFmODZjZGUgMTAw
-NjQ0Ci0tLSBhL2F1ZGlvL3RyYW5zcG9ydC5oCisrKyBiL2F1ZGlvL3RyYW5zcG9ydC5oCkBAIC0z
-Miw2ICszMiw3IEBAIHN0cnVjdCBtZWRpYV90cmFuc3BvcnQgKm1lZGlhX3RyYW5zcG9ydF9jcmVh
-dGUoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCiAKIHZvaWQgbWVkaWFfdHJhbnNwb3J0X2Rlc3Ryb3ko
-c3RydWN0IG1lZGlhX3RyYW5zcG9ydCAqdHJhbnNwb3J0KTsKIGNvbnN0IGNoYXIgKm1lZGlhX3Ry
-YW5zcG9ydF9nZXRfcGF0aChzdHJ1Y3QgbWVkaWFfdHJhbnNwb3J0ICp0cmFuc3BvcnQpOworc3Ry
-dWN0IGF1ZGlvX2RldmljZSAqbWVkaWFfdHJhbnNwb3J0X2dldF9kZXYoc3RydWN0IG1lZGlhX3Ry
-YW5zcG9ydCAqdHJhbnNwb3J0KTsKIHZvaWQgbWVkaWFfdHJhbnNwb3J0X3VwZGF0ZV9kZWxheShz
-dHJ1Y3QgbWVkaWFfdHJhbnNwb3J0ICp0cmFuc3BvcnQsCiAJCQkJCQkJdWludDE2X3QgZGVsYXkp
-Owogdm9pZCB0cmFuc3BvcnRfZ2V0X3Byb3BlcnRpZXMoc3RydWN0IG1lZGlhX3RyYW5zcG9ydCAq
-dHJhbnNwb3J0LAotLSAKMS43LjAuNAoK
---001636ed643177e02f04a6cb371a--
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
