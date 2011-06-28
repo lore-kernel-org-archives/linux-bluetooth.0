@@ -1,167 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 28 Jun 2011 17:02:16 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Linux 3.0-rc4: regression reconnecting bluetooth headset (A2DP
+ fails)
+Message-ID: <20110628200216.GE23183@joana>
+References: <4E03DA75.2080606@goop.org>
+ <20110628182117.GD23183@joana>
+ <4E0A2FC7.6020109@goop.org>
 MIME-Version: 1.0
-In-Reply-To: <1309263917-14931-1-git-send-email-sancane@gmail.com>
-References: <1309263917-14931-1-git-send-email-sancane@gmail.com>
-Date: Tue, 28 Jun 2011 13:05:25 -0700
-Message-ID: <BANLkTikzCPdi2nW3SNmg58miQjEPhg=T=g@mail.gmail.com>
-Subject: Re: [RFC] Health Thermometer Profile API
-From: mike tsai <mikeyhtsai@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <4E0A2FC7.6020109@goop.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 28, 2011 at 5:25 AM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> ---
->  doc/thermometer.txt |  125 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 125 insertions(+), 0 deletions(-)
->  create mode 100644 doc/thermometer.txt
->
-> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
-> new file mode 100644
-> index 0000000..9afd2b2
-> --- /dev/null
-> +++ b/doc/thermometer.txt
-> @@ -0,0 +1,125 @@
-> +BlueZ D-Bus Thermomether API description
-> +****************************************
-> +
-> +       Santiago Carot-Nemesio <sancane@gmail.com>
-> +
-> +Health Thermomether Profile hierarchy
-> +=====================================
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.Thermometer
-> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +
-> +Methods                void SetProperty(string name, variant value)
-> +
-> +                       Changes the value of the specified property. Only
-> +                       read-write properties can be changed. On success
-> +                       this will emit a PropertyChanged signal.
-> +
-> +                       Possible Errors: org.bluez.Error.InvalidArguments
-> +
-> +               dict GetProperties()
-> +
-> +                       Returns all properties for the interface. See the
-> +                       Properties section for the available properties.
-> +
-> +               RegisterThermometerWatcher(object agent)
-> +
-> +                       Registers a watcher to monitor scanned measures.The agent
-> +                       will be notified about final.
-> +
-> +                       Possible Errors: org.bluez.Error.InvalidArguments
-> +
-> +               UnregisterThermometerWatcher(object agent)
-> +
-> +                       Unregisters a watcher.
-> +
-> +                       Final and intermediate temperatures won't be notified to
-> +                       this agent any more.
-> +
-> +                       Possible Errors: org.bluez.Error.InvalidArguments
-> +                                       org.bluez.Error.NotFound
-> +
-> +               EnableIntermediateMeasures(object agent)
-> +
-> +                       Enables intermediate measure notifications for this agent
-> +                       if the thermometer supports it.
-> +
-> +                       Possible Errors: org.bluez.Error.InvalidArguments
-> +                                       org.bluez.Error.NotSupported
-> +
-> +               DisableIntermediateMeasures(object agent)
-> +
-> +                       Disables intermediate measure notifications for this
-> +                       agent. It will disable notifications in the thermometer
-> +                       when the last agent removes the watcher for intermediate
-> +                       measures.
-> +
-> +                       Possible Errors: org.bluez.Error.InvalidArguments
-> +                                       org.bluez.Error.NotFound
-> +
-> +Signals                PropertyChanged(string name, variant value)
-> +
-> +                       This signal indicates a changed value of the given
-> +                       property.
-> +
-> +Properties     boolean Intermediate [readonly]
-> +
-> +                       True if the thermometer supports intermediate measure
-> +                       notifications.
-> +
-> +               uint16 Interval (optional) [readwrite]
-> +
-> +                       The Measurement Interval defines the time (in seconds)
-> +                       between measurements. This interval is not related to
-> +                       the intermediates measures and must be defined into
-> +                       a valid range. Setting it to zero meaning that no
-> +                       periodic measurements will be taken.
-> +
-> +               uint16 Minimum (optional) [readonly]
-> +
-> +                       Defines the maximum value allowed for the interval
-> +                       between periodic measurements.
-> +
-> +               uint16 Maximum (optional) [readonly]
-> +
-> +                       Defines the minimuum value allowed for the interval
-> +                       between periodic measurements.
-> +
-> +
-> +Health Thermometer Watcher hierarchy
-> +====================================
-> +Service                unique name
-> +Interface      org.bluez.ThermometerWatcher
-> +Object path    freely definable
-> +
-> +Methods                void MeasureReceived(dict measure)
-> +
-> +                       This callback gets called when a measure has been
-> +                       scanned in the thermometer. The Time entry in the dict
-> +                       will be only present if the device supports storing of
-> +                       data. The time value is expressed in seconds since epoch.
-> +                       The value represented is (mantissa) x (10**exponent)
-> +                       See foot note for special values when treating with
-> +                       health devices.
-> +
-> +                       Dict is defined as below:
-> +                       {
-> +                               "Exponent" : int8,
-> +                               "Mantissa" : int32,
-> +                               "Unit" : ("Celsius" or "Fahrenheit"),
-> +                               "Time" : uint64,
-> +                               "Type" : ("Armpit", "Body", "Ear", "Finger",
-> +                                       "Intestines", "Mouth", "Rectum", "Toe",
-> +                                       "Tympanum"),
-> +                               "Measurement" : ("Final" or "Intermediate"),
-> +                       }
-> +
-> +                       For special cases, the exponent shall always be zero and
-> +                       the mantissa should be one of following values:
-> +
-> +                       NRes = -(2**23)
-> +                       NaN = +(2**23-1)
-> +                       INFINITY = (2**23-2)
-> +                       -INFINITY = -(2**23-2)
-> --
-> 1.7.5.2
->
-> --
+* Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-28 20:47:19 +0100]:
 
-Is this proposal going to use reference count for property setting of
-notification/indication? and if one of the applications enables
-immediate alert notification, then all other applications will receive
-the notification even if they have not registered it?
+> On 06/28/2011 07:21 PM, Gustavo F. Padovan wrote:
+> > Hi Jeremy,
+> >
+> > * Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-23 17:29:41 -0700]:
+> >
+> >> I have a Nokia BH-905i headset.  With a stock F15 kernel, it all works
+> >> well. With current linux-2.6.git, it fails to reconnect properly.
+> >>
+> >> On connection, the headphones only beep once, whereas they normally beep
+> >> twice; I think this is one beep per profile, and its only connecting HSP
+> >> and failing A2DP.  In the sound control panel, it either comes up with
+> >> "profile: off" or with the HSP/HFP (Telephony) profile rather than A2DP,
+> >> and it fails to switch if I try to change profiles via the sound control
+> >> panel.
+> >>
+> >> However, if I re-pair the device from scratch each time I use it, it
+> >> connects properly and it all works fine.
+> >>
+> >> pactl list shows:
+> >>
+> >> Card #2
+> >> 	Name: bluez_card.00_0B_E4_A6_6C_0D
+> >> 	Driver: module-bluetooth-device.c
+> >> 	Owner Module: 23
+> >> 	Properties:
+> >> 		device.description = "Nokia BH-905i"
+> >> 		device.string = "00:0B:E4:A6:6C:0D"
+> >> 		device.api = "bluez"
+> >> 		device.class = "sound"
+> >> 		device.bus = "bluetooth"
+> >> 		device.form_factor = "headset"
+> >> 		bluez.path = "/org/bluez/843/hci0/dev_00_0B_E4_A6_6C_0D"
+> >> 		bluez.class = "0x240404"
+> >> 		bluez.name = "Nokia BH-905i"
+> >> 		device.icon_name = "audio-headset-bluetooth"
+> >> 		device.intended_roles = "phone"
+> >> 	Profiles:
+> >> 		a2dp: High Fidelity Playback (A2DP) (sinks: 1, sources: 0, priority. 10)
+> >> 		hsp: Telephony Duplex (HSP/HFP) (sinks: 1, sources: 1, priority. 20)
+> >> 		off: Off (sinks: 0, sources: 0, priority. 0)
+> >> 	Active Profile: hsp
+> >>
+> >> If I try to switch profiles on the command line it says:
+> >> $ pactl set-card-profile 2 a2dp
+> >> Failure: Input/Output error
+> >>
+> >> and /var/log/messages shows:
+> >> module-bluetooth-device.c: A2DP is not connected, refused to switch profile
+> >>
+> >> Why isn't A2DP connecting?  How can I debug this further?
+> > Can you send the output of hcidump with F15 kernel and with linux-2.6.git
+> > kernel?
+> 
+> This is already fixed in
+> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
 
+Great, these fixes will be in linus-2.6 soon.
 
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+	Gustavo
