@@ -1,28 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Jun 2011 11:12:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2] Fix finalize discovery if all stream end points are
- In Use
-Message-ID: <20110628081209.GG18047@dell.ger.corp.intel.com>
-References: <1308837507.14190.2.camel@THOR>
+Message-ID: <20110628103424.4427602n9v0xrhc0@mail.hendrik-sattler.de>
+Date: Tue, 28 Jun 2011 10:34:24 +0200
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: openobex-users@lists.sourceforge.net, Nami <nami.li@atheros.com>
+References: <1309247272-11329-1-git-send-email-nami.li@atheros.com>
+In-Reply-To: <1309247272-11329-1-git-send-email-nami.li@atheros.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1308837507.14190.2.camel@THOR>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [openobex-users] [PATCH v3 openobex 1/3] Add transport format
+ member in fdobex_data struct. Support STREAM and SEQPACKET transport
+ format.
+Reply-To: openobex-users@lists.sourceforge.net
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=openobex-users>
+List-Post: <mailto:openobex-users@lists.sourceforge.net>
+List-Help: <mailto:openobex-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/openobex-users>,
+	<mailto:openobex-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: openobex-users-bounces@lists.sourceforge.net
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Zitat von Nami <nami.li@atheros.com>:
 
-On Thu, Jun 23, 2011, Peter Hurley wrote:
-> When handling the discover response, if all stream end points are
-> in use, then we must finalize discovery, as no GET_CAPABILITIES
-> command will be issued.
-> ---
->  audio/avdtp.c |   11 +++++++----
->  1 files changed, 7 insertions(+), 4 deletions(-)
+> These patches enable fd obex transport to support SEQPACKET format  
+> to read entire packet at a time.
+> Add fmt member to indicate transport format, the init value is STREAM format.
+> Create a new api for upper layer to set transport format when using  
+> OBEX over L2CAP.
 
-Applied, thanks.
+All 3 patches look ok to me. So even if it is not needed for L2CAP on  
+bluez, it is a useful addition for FdOBEX.
 
-Johan
+@Johan: please submit them to the openobex tree.
+
+HS
+
+
+
+
+------------------------------------------------------------------------------
+All of the data generated in your IT infrastructure is seriously valuable.
+Why? It contains a definitive record of application performance, security 
+threats, fraudulent activity, and more. Splunk takes this data and makes 
+sense of it. IT sense. And common sense.
+http://p.sf.net/sfu/splunk-d2d-c2
+_______________________________________________
+Openobex-users mailing list
+Openobex-users@lists.sourceforge.net
+http://lists.sourceforge.net/lists/listinfo/openobex-users
