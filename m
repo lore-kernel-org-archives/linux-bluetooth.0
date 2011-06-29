@@ -1,83 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Steven" <yongli@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
- the patch and radio table
-Date: Wed, 29 Jun 2011 03:51:03 +0000
-Message-ID: <73DDB75979F36A42B75F3E2B6EB2943401031CF1@nasanexd02c.na.qualcomm.com>
-References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
- <1309308687.2208.22.camel@aeonflux>
-In-Reply-To: <1309308687.2208.22.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 28 Jun 2011 17:58:09 -0700
+In-Reply-To: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1309309092.2208.25.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsOg0KDQo+IHBsZWFzZSBmaXggdGhlIGNvZGluZyBzdHlsZS4gSXQgaXMgaWZbc3Bh
-Y2VdKC4NCk9rYXksIEkgc2VlLg0KDQo+IEkgd291bGQgc2F5IHNvbWV0aGluZyBzaW1pbGFyIGlu
-IHN0eWxlDQo+IHRvIHdoYXQgSSBoYXZlIGRvbmUgZm9yIHRoZSBvbGRlciBDU1IgY2hpcHMuIFNl
-ZSB3b3JrYXJvdW5kIGFib3ZlLg0KPiBBbmQgb24gdGhhdCBub3RlLCB5b3UgY291bGQgdXNlIGRh
-dGEtPnVkZXYgdG8gZ2V0IHRoZSB1c2JfZGV2aWNlDQo+IHN0cnVjdCA7KQ0KQXMgdG8gdGhpcyBw
-b2ludCwgIHNpbmNlIG5vdyB3ZSBhcmUgbm90IHVzaW5nIHRoZSBidHVzYiB0byBkb3dubG9hZCB0
-aGUgcGF0Y2ggYW5kIHJhZGlvIHRhYmxlLA0KIEkgdGhpbmsgd2UgZG8gbm90IG5lZWQgdG8gYWxs
-b2MgdGhlIGRhdGEgc3RydWN0IGFuZCB1c2UgZGF0YS0+dWRldiBiZWZvcmUgdGhlIHdvcmthcm91
-bmQuICANClNvIEknbGwgc3RpbGwga2VlcCBpdCB3YXMuICBIb3cgZG8geW91IHRoaW5rIGl0ID8N
-Cg0KDQpUaGFuayB5b3UgdmVyeSBtdWNoICENCg0KQmVzdCBSZWdhcmRzLA0KU3RldmVuLA0KDQoN
-Cj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFtt
-YWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10NCj4gU2VudDogV2VkbmVzZGF5LCBKdW5lIDI5LCAy
-MDExIDg6NTEgQU0NCj4gVG86IExpLCBTdGV2ZW4NCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2Vy
-Lmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gQmx1ZXRvb3RoOiBBdGgzayBrZWVw
-cyBzYW1lIFBJRC9WSUQgYWZ0ZXINCj4gZG93bmxvYWRpbmcgdGhlIHBhdGNoIGFuZCByYWRpbyB0
-YWJsZQ0KPiANCj4gSGkgU3RldmVuLA0KPiANCj4gPiBUaGUgbmV3IEF0aDNrIG5lZWRzIHRvIGRv
-d25sb2FkIHBhdGNoIGFuZCByYWRpbyB0YWJsZSwNCj4gPiBhbmQgaXQga2VlcHMgc2FtZSBQSUQv
-VklEIGV2ZW4gYWZ0ZXIgZG93bmxvYWRpbmcgdGhlIHBhdGNoIGFuZCByYWRpbw0KPiB0YWJsZS4N
-Cj4gPiBUaGlzIHBhdGNoIGlzIHRvIHVzZSB0aGUgYmNkRGV2aWNlIChEZXZpY2UgUmVsZWFzZSBO
-dW1iZXIpIHRvIGp1ZGdlDQo+IHdoZXRoZXIgdGhlDQo+ID4gY2hpcCBoYXMgYmVlbiBwYXRjaGVk
-IG9yIG5vdC4gVGhlIGluaXQgYmNkRGV2aWNlIHZhbHVlIG9mIHRoZSBjaGlwIGlzIDB4MDAwMSwN
-Cj4gPiB0aGlzIHZhbHVlIGluY3JlYXNlcyBhZnRlciBwYXRjaCBhbmQgcmFkaW8gdGFibGUgZG93
-bmxvYWRpbmcuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTdGV2ZW4uTGkgPHlvbmdsaUBxY2Eu
-cXVhbGNvbW0uY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL2JsdWV0b290aC9hdGgzay5jIHwg
-ICAgMyArKysNCj4gPiAgZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8ICAgIDkgKysrKysrKyst
-DQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkN
-Cj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5jIGIvZHJpdmVy
-cy9ibHVldG9vdGgvYXRoM2suYw0KPiA+IGluZGV4IDZiYWNlZjMuLjdhZTEwOTggMTAwNjQ0DQo+
-ID4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYw0KPiA+ICsrKyBiL2RyaXZlcnMvYmx1
-ZXRvb3RoL2F0aDNrLmMNCj4gPiBAQCAtMzc1LDYgKzM3NSw5IEBAIHN0YXRpYyBpbnQgYXRoM2tf
-cHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UgKmludGYsDQo+ID4NCj4gPiAgCS8qIGxvYWQgcGF0
-Y2ggYW5kIHN5c2NvbmZpZyBmaWxlcyBmb3IgQVIzMDEyICovDQo+ID4gIAlpZiAoaWQtPmRyaXZl
-cl9pbmZvICYgQlRVU0JfQVRIMzAxMikgew0KPiA+ICsJCWlmKGxlMTZfdG9fY3B1KHVkZXYtPmRl
-c2NyaXB0b3IuYmNkRGV2aWNlKSA+IDB4MDAwMSkNCj4gPiArCQkJcmV0dXJuIC1FTk9ERVY7DQo+
-ID4gKw0KPiANCj4gcGxlYXNlIGZpeCB0aGUgY29kaW5nIHN0eWxlLiBJdCBpcyBpZltzcGFjZV0o
-Lg0KPiANCj4gQWxzbyB5b3UgbWlnaHQgd2FubmEgcHV0IGEgY29tbWVudCBvbiB0b3Agb2YgdGhp
-cyBiY2REZXZpY2UgY2hlY2sgYW5kDQo+IG1lbnRpb24gd2hhdCBpdCBhY3R1YWxseSBkb2VzLg0K
-PiANCj4gPiAgCQlyZXQgPSBhdGgza19sb2FkX3BhdGNoKHVkZXYpOw0KPiA+ICAJCWlmIChyZXQg
-PCAwKSB7DQo+ID4gIAkJCUJUX0VSUigiTG9hZGluZyBwYXRjaCBmaWxlIGZhaWxlZCIpOw0KPiA+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9v
-dGgvYnR1c2IuYw0KPiA+IGluZGV4IGMyZGU4OTUuLjlkMDFlMjUgMTAwNjQ0DQo+ID4gLS0tIGEv
-ZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0
-dXNiLmMNCj4gPiBAQCAtNTQsNiArNTQsNyBAQCBzdGF0aWMgc3RydWN0IHVzYl9kcml2ZXIgYnR1
-c2JfZHJpdmVyOw0KPiA+ICAjZGVmaW5lIEJUVVNCX0JDTTkyMDM1CQkweDEwDQo+ID4gICNkZWZp
-bmUgQlRVU0JfQlJPS0VOX0lTT0MJMHgyMA0KPiA+ICAjZGVmaW5lIEJUVVNCX1dST05HX1NDT19N
-VFUJMHg0MA0KPiA+ICsjZGVmaW5lIEJUVVNCX0FUSDMwMTIJCTB4ODANCj4gPg0KPiA+ICBzdGF0
-aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYnR1c2JfdGFibGVbXSA9IHsNCj4gPiAgCS8qIEdlbmVy
-aWMgQmx1ZXRvb3RoIFVTQiBkZXZpY2UgKi8NCj4gPiBAQCAtMTEwLDcgKzExMSw3IEBAIHN0YXRp
-YyBzdHJ1Y3QgdXNiX2RldmljZV9pZCBibGFja2xpc3RfdGFibGVbXSA9IHsNCj4gPiAgCXsgVVNC
-X0RFVklDRSgweDAzZjAsIDB4MzExZCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9SRSB9LA0K
-PiA+DQo+ID4gIAkvKiBBdGhlcm9zIDMwMTIgd2l0aCBzZmxhc2ggZmlybXdhcmUgKi8NCj4gPiAt
-CXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9S
-RSB9LA0KPiA+ICsJeyBVU0JfREVWSUNFKDB4MGNmMywgMHgzMDA0KSwgLmRyaXZlcl9pbmZvID0g
-QlRVU0JfQVRIMzAxMiB9LA0KPiA+DQo+ID4gIAkvKiBBdGhlcm9zIEFSNUJCVTEyIHdpdGggc2Zs
-YXNoIGZpcm13YXJlICovDQo+ID4gIAl7IFVTQl9ERVZJQ0UoMHgwNDg5LCAweGUwMmMpLCAuZHJp
-dmVyX2luZm8gPSBCVFVTQl9JR05PUkUgfSwNCj4gPiBAQCAtOTE0LDYgKzkxNSwxMiBAQCBzdGF0
-aWMgaW50IGJ0dXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLA0KPiA+ICAJaWYg
-KGlnbm9yZV9zbmlmZmVyICYmIGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX1NOSUZGRVIpDQo+ID4g
-IAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4NCj4gPiArCWlmIChpZC0+ZHJpdmVyX2luZm8gJiBCVFVT
-Ql9BVEgzMDEyKSB7DQo+ID4gKwkJc3RydWN0IHVzYl9kZXZpY2UgKnVkZXYgPSBpbnRlcmZhY2Vf
-dG9fdXNiZGV2KGludGYpOw0KPiA+ICsJCWlmKGxlMTZfdG9fY3B1KHVkZXYtPmRlc2NyaXB0b3Iu
-YmNkRGV2aWNlKSA8PSAweDAwMDEpDQo+ID4gKwkJCXJldHVybiAtRU5PREVWOw0KPiA+ICsJfQ0K
-PiANCj4gQ29kaW5nIHN0eWxlIGZpeCBhcyB3ZWxsIHBsZWFzZS4gSSB3b3VsZCBzYXkgc29tZXRo
-aW5nIHNpbWlsYXIgaW4gc3R5bGUNCj4gdG8gd2hhdCBJIGhhdmUgZG9uZSBmb3IgdGhlIG9sZGVy
-IENTUiBjaGlwcy4gU2VlIHdvcmthcm91bmQgYWJvdmUuDQo+IA0KPiBBbmQgb24gdGhhdCBub3Rl
-LCB5b3UgY291bGQgdXNlIGRhdGEtPnVkZXYgdG8gZ2V0IHRoZSB1c2JfZGV2aWNlDQo+IHN0cnVj
-dCA7KQ0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQo+IA0KDQo=
+Hi Antti,
+
+> Add command to management interface for enabling/disabling the
+> fast connectable mode.
+> 
+> Signed-off-by: Antti Julku <antti.julku@nokia.com>
+> ---
+>  include/net/bluetooth/hci.h  |   10 +++++++
+>  include/net/bluetooth/mgmt.h |    5 +++
+>  net/bluetooth/mgmt.c         |   60 ++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 75 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 65345cd..d7b9600 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+>  
+> +#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
+> +struct hci_cp_write_page_scan_activity {
+> +	__le16   interval;
+> +	__le16   window;
+> +} __packed;
+> +
+> +#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
+> +	#define PAGE_SCAN_TYPE_STANDARD		0x00
+> +	#define PAGE_SCAN_TYPE_INTERLACED	0x01
+> +
+>  #define HCI_OP_LE_SET_EVENT_MASK	0x2001
+>  struct hci_cp_le_set_event_mask {
+>  	__u8     mask[8];
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 45bea25..7196d04 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
+>  	bdaddr_t bdaddr;
+>  } __packed;
+>  
+> +#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
+> +struct mgmt_cp_set_fast_connectable {
+> +	__u8 enable;
+> +} __packed;
+> +
+
+so I am not 100% sure that doing it this way is the best way.
+
+What is the down side of just enabling interlaced page scan all the
+time? And then maybe allow tuning of the timeout via debugfs for testing
+purposes.
+
+If we really wanna differentiate between connectable and fast
+connectable, then we need to fix up also the controller information to
+export this kind of detail. That will get pretty messy right now. So I
+would really just prefer to go with interlaced page scan by default and
+see what downside this gives us.
+
+Regards
+
+Marcel
+
+
