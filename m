@@ -1,80 +1,177 @@
 Return-Path: <cyrus@holtmann.org>
-From: Joe Perches <joe@perches.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 0/2] bluetooth: Use current logging styles
-Date: Wed, 29 Jun 2011 18:18:28 -0700
-Message-Id: <cover.1309396408.git.joe@perches.com>
-In-Reply-To: <1309370457.2208.48.camel@aeonflux>
-References: <1309370457.2208.48.camel@aeonflux>
+Message-ID: <78b536a7d359e37bf8a147079a114b78.squirrel@www.codeaurora.org>
+In-Reply-To: <BANLkTin4uZTLMeFM8ZZNUQ-Os3ob8eB6iQ@mail.gmail.com>
+References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
+    <BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com>
+    <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
+    <BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
+    <BANLkTin4uZTLMeFM8ZZNUQ-Os3ob8eB6iQ@mail.gmail.com>
+Date: Wed, 29 Jun 2011 16:50:52 -0700 (PDT)
+Subject: Re: Generic Attribute API race condition
+From: ingas@codeaurora.org
+To: "Claudio Takahasi" <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2011-06-29 at 11:00 -0700, Marcel Holtmann wrote:
-> I did not know that. Then we might should go ahead and also cleanup the
-> Bluetooth subsystem.
-> 
-> We do use an implied "Bluetooth: " prefix when calling BT_INFO, but that
-> can be easily changed to bt_info() as well since I do not care about
-> that part. 
-> 
-> The Bluetooth subsystem has a Linux 2.4 legacy history and a lot of
-> things can be done a lot nicer these days.
+Hi Claudio,
 
-Here you go Marcel.
+> Hi Jaikumar
+>
+> On Wed, Jun 8, 2011 at 11:06 PM, Jaikumar Ganesh <jaikumarg@gmail.com>
+> wrote:
+>> Hey Claudio:
+>>
+>> On Thu, Jun 9, 2011 at 2:44 AM, Claudio Takahasi
+>> <claudio.takahasi@openbossa.org> wrote:
+>>> Hi Jaikumar,
+>>>
+>>> On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com>
+>>> wrote:
+>>>> Hi Claudio:
+>>>>
+>>>> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
+>>>> <claudio.takahasi@openbossa.org> wrote:
+>>>>> Hi All,
+>>>>>
+>>>>> There is a potential race condition in the Generic Attribute API. I'd
+>>>>> like to collect opinions to avoid re-work later.
+>>>>>
+>>>>> How to reproduce:
+>>>>> - call CreateDevice() for a device which exports a GATT based
+>>>>> service:
+>>>>> CreateDevice will discover all primary services
+>>>>>  and the Generic API will register the object paths for all found
+>>>>> services
+>>>>> - Call DiscoverCharacteristics() of the primary service followed by
+>>>>> Characteristic GetProperties(), expected result: read all
+>>>>> characteristics properties outcome: partial characteristics
+>>>>> properties
+>>>>> may appear.
+>>>>>
+>>>>> This problem happens because DiscoverCharacteristics() doesn't wait
+>>>>> for all characteristic VALUES, it returns after discovering all
+>>>>> characteristic DECLARATIONS.
+>>>>> Wait for characteristic values is a problem, attributes may require
+>>>>> authentication or authorization.
+>>>>>
+>>>>> Suggestions are:
+>>>>> 1. Report discovered characteristic values using PropertyChanged:
+>>>>> Returning empty properties values (for GetProperties) if the
+>>>>> discovery
+>>>>> is in progress
+>>>>>
+>>>>> 2. Block GetProperties() if there is a discovery pending: returning
+>>>>> after discovery finishes. Timeout can still happen!
+>>>>>
+>>>>> 3. Return Busy for GetProperties() if there is a characteristic
+>>>>> discovery in progress
+>>>>>
+>>>>> Comments?
+>>>>
+>>>> I don't think we should read characteristic value till the application
+>>>> asks for it.
+>>> Are you suggesting to trigger the characteristic value and descriptors
+>>> read when Characteristic GetProperties() is called and block it?
+>>> Remember that GATT timeout is 30seconds and the default D-Bus message
+>>> reply timeout is smaller.
+>>>
+>>>> DiscoverCharacteristics() should just return after getting the
+>>>> DECLARATIONS.
+>>> This is current behaviour.
+>>
+>> Sorry misread your email a bit.
+>>
+>> I assume you are referring to the Characteristic Watcher when you are
+>> talking about the PropertyChanged signal,
+>> since there is no explicit PropertyChanged signal.
+>>
+>> I don't think we should block GetProperties. But then if we are
+>> returning null and depending on PropertyChanged signal when we have to
+>> read the values, clients will need to wait for it after calling
+>> GetProperties. We need to guarantee that this signal will be sent
+>> (with a timeout, unless we want the clients to have the timeout at
+>> their end) even if we are unable to get the value - because of some
+>> kind of error.
+>
+> Signal with a timeout? I don't think that it is necessary.
+> We can use persistent storage returning "old" values on GetProperties
+> calls and use PropertyChanged to notify "new" values asynchronously.
+> This approach should be enough.
 
-It reduces code/text a couple/few percent too.
- 
-Joe Perches (2):
-  bluetooth: Rename function bt_err to bt_to_errno
-  bluetooth: Add bt_printk, convert logging macros to lower case
+Just noticed this thread.
+I ran into a similar problem. Cannot we just delay the return of
+DiscoverCharacteristics method call until after the characteristic
+values/properties have been acquired? I tried out this solution and it
+seems to work fine. The trick is to implement internal counter for
+received responses from the remote device + timeout that is reset on each
+successful response. Any thoughts on this?
 
- drivers/bluetooth/ath3k.c          |   48 ++++----
- drivers/bluetooth/bcm203x.c        |   38 +++---
- drivers/bluetooth/bfusb.c          |   94 +++++++-------
- drivers/bluetooth/bluecard_cs.c    |   18 ++--
- drivers/bluetooth/bpa10x.c         |   38 +++---
- drivers/bluetooth/bt3c_cs.c        |   34 +++---
- drivers/bluetooth/btmrvl_debugfs.c |    2 +-
- drivers/bluetooth/btmrvl_main.c    |   74 ++++++------
- drivers/bluetooth/btmrvl_sdio.c    |  112 +++++++++---------
- drivers/bluetooth/btsdio.c         |   26 ++--
- drivers/bluetooth/btuart_cs.c      |   24 ++--
- drivers/bluetooth/btusb.c          |   64 +++++-----
- drivers/bluetooth/btwilink.c       |   34 +++---
- drivers/bluetooth/dtl1_cs.c        |   20 ++--
- drivers/bluetooth/hci_ath.c        |   14 +-
- drivers/bluetooth/hci_bcsp.c       |   58 +++++-----
- drivers/bluetooth/hci_h4.c         |   18 ++--
- drivers/bluetooth/hci_ldisc.c      |   36 +++---
- drivers/bluetooth/hci_ll.c         |   76 ++++++------
- drivers/bluetooth/hci_vhci.c       |    8 +-
- include/net/bluetooth/bluetooth.h  |   11 +-
- net/bluetooth/af_bluetooth.c       |   20 ++--
- net/bluetooth/bnep/core.c          |   26 ++--
- net/bluetooth/bnep/netdev.c        |   14 +-
- net/bluetooth/bnep/sock.c          |   10 +-
- net/bluetooth/cmtp/capi.c          |   46 ++++----
- net/bluetooth/cmtp/core.c          |   30 +++---
- net/bluetooth/cmtp/sock.c          |   10 +-
- net/bluetooth/hci_conn.c           |   52 ++++----
- net/bluetooth/hci_core.c           |  142 +++++++++++-----------
- net/bluetooth/hci_event.c          |  234 ++++++++++++++++++------------------
- net/bluetooth/hci_sock.c           |   26 ++--
- net/bluetooth/hci_sysfs.c          |   12 +-
- net/bluetooth/hidp/core.c          |   50 ++++----
- net/bluetooth/hidp/sock.c          |   10 +-
- net/bluetooth/l2cap_core.c         |  172 +++++++++++++-------------
- net/bluetooth/l2cap_sock.c         |   40 +++---
- net/bluetooth/lib.c                |   23 ++++-
- net/bluetooth/mgmt.c               |   80 ++++++------
- net/bluetooth/rfcomm/core.c        |  152 ++++++++++++------------
- net/bluetooth/rfcomm/sock.c        |   56 +++++-----
- net/bluetooth/rfcomm/tty.c         |  100 ++++++++--------
- net/bluetooth/sco.c                |   84 +++++++-------
- net/bluetooth/smp.c                |   30 +++---
- 44 files changed, 1144 insertions(+), 1122 deletions(-)
+Also, "Property Changed" on characteristic obj path/interface signal is
+mentioned in the attribute API doc, but I cannot seem to find
+implementation for the signal in the code. Am I missing something?
 
--- 
-1.7.6.rc1
+>
+>>
+>> In all other places we use PropertyChanged signal when the property
+>> value actually changes, whereas here we are tying it with the reading
+>> of the properties.
+>>
+>> How about providing separate calls for read and writing values and
+>> decoupling it from the Properties ?
+>
+> I don't think it will help, authorization and GATT timeout is still a
+> problem.
+> We are trying to cover unusual scenarios, IMO change the API to cover
+> these cases doesn't look correct.
+>
+> BR,
+> Claudio.
+>
+>>
+>> Thanks
+>>
+>>>
+>>>> A client might not be interested in all the values and thus we should
+>>>> read them only
+>>>> when needed by the client. This will save both time and power and
+>>>> solve this problem too.
+>>>
+>>> I don't think it is critical, we are not reading them on all
+>>> connections/re-connections and the profiles available at the moment
+>>> don't expose "complex" characteristics.
+>>
+>> I am talking about GATT clients written using the attribute DBUS apis.
+>> Accessory vendors
+>> want to get started on LE and not wait till all the profiles are
+>> approved the SIG and developed
+>> and they want to develop things based on the GATT clients APIs.
+>>
+>>>
+>>> BR,
+>>> Claudio
+>>>
+>>>>
+>>>> Thanks
+>>>> Jaikumar
+>>>>>
+>>>>> BR,
+>>>>> Claudio
+>>>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+Thanks,
+
+Inga Stotland
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
+
+
