@@ -1,30 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 29 Jun 2011 03:31:54 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "Li, Steven" <yongli@qca.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
+ the patch and radio table
+Message-ID: <20110629063154.GC2712@joana>
+References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
+ <1309308687.2208.22.camel@aeonflux>
+ <73DDB75979F36A42B75F3E2B6EB2943401031CF1@nasanexd02c.na.qualcomm.com>
+ <20110629043130.GA2712@joana>
+ <73DDB75979F36A42B75F3E2B6EB2943401031D2E@nasanexd02c.na.qualcomm.com>
 MIME-Version: 1.0
-In-Reply-To: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
-Date: Wed, 29 Jun 2011 09:32:44 +0300
-Message-ID: <BANLkTim+9YxFUoJM2XjWD15D7p2dmFxhyg@mail.gmail.com>
-Subject: Re: [PATCH obexd v2 0/4] Add adapter session request/release to obex-client
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <73DDB75979F36A42B75F3E2B6EB2943401031D2E@nasanexd02c.na.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+* Li, Steven <yongli@qca.qualcomm.com> [2011-06-29 06:14:34 +0000]:
 
-On Wed, Jun 29, 2011 at 12:40 AM, Dmitriy Paliy <dmitriy.paliy@gmail.com> wrote:
-> Hi,
->
-> Luiz, thanks for the detailed review. However, I'm not sure that
-> fully understood you. Whole idea was to request session before
-> transfer and release it afterwards. Therefore, still I would like
-> to have adapter ReleaseSession.
->
-> Please, see subsequent patches if those reflect your comments.
+> 
+> Hi Padovan:
+> 
+> > -----Original Message-----
+> > From: Gustavo F. Padovan [mailto:pao@profusion.mobi] On Behalf Of
+> > Gustavo F. Padovan
+> > Sent: Wednesday, June 29, 2011 12:32 PM
+> > To: Li, Steven
+> > Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org
+> > Subject: Re: [PATCH] Bluetooth: Ath3k keeps same PID/VID after
+> > downloading the patch and radio table
+> > 
+> > Hi Steven,
+> > 
+> > Please stop messy top postings like this one. It's not allowed on this mailing
+> > list. Thanks.
+> > 
+> > * Li, Steven <yongli@qca.qualcomm.com> [2011-06-29 03:51:03 +0000]:
+> > 
+> > > Hi Marcel:
+> > >
+> > > > please fix the coding style. It is if[space](.
+> > > Okay, I see.
+> > >
+> > > > I would say something similar in style
+> > > > to what I have done for the older CSR chips. See workaround above.
+> > > > And on that note, you could use data->udev to get the usb_device
+> > > > struct ;)
+> > > As to this point,  since now we are not using the btusb to download the
+> > patch and radio table,
+> > >  I think we do not need to alloc the data struct and use data->udev before
+> > the workaround.
+> > > So I'll still keep it was.  How do you think it ?
+> > 
+> > No, there is no extra allocation. data->udev is already there. Just use it as
+> > Marcel said.
+> 
+> There is somehow different with  the older CSR chips.
+> We need to return -NODEV directly if the bcd version of the 3012 chip is lower or equal to 0x0001,
+> And I think in such "return -NODEV" case, we totally do not need to alloc the btusb_data.
 
-Looks good.
+Ah yes, you right, I misread the patch.
 
--- 
-Luiz Augusto von Dentz
+	Gustavo
