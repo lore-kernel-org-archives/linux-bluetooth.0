@@ -1,177 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <78b536a7d359e37bf8a147079a114b78.squirrel@www.codeaurora.org>
-In-Reply-To: <BANLkTin4uZTLMeFM8ZZNUQ-Os3ob8eB6iQ@mail.gmail.com>
-References: <BANLkTinUNvtonVmErqwz-t=YufQha+k+HQ@mail.gmail.com>
-    <BANLkTinJt+K3sYOEbpBu8oqfZoC1ir3dxQ@mail.gmail.com>
-    <BANLkTimjqM7HL8yxb2pd8OC8q=MhyRZobg@mail.gmail.com>
-    <BANLkTikbU2H_GJdy4-BOb7zjXgPv5D6z-w@mail.gmail.com>
-    <BANLkTin4uZTLMeFM8ZZNUQ-Os3ob8eB6iQ@mail.gmail.com>
-Date: Wed, 29 Jun 2011 16:50:52 -0700 (PDT)
-Subject: Re: Generic Attribute API race condition
-From: ingas@codeaurora.org
-To: "Claudio Takahasi" <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi
+Subject: [PATCH 0/6] Bluetooth: ERTM fixes and local busy enhancement
+Date: Wed, 29 Jun 2011 14:35:18 -0700
+Message-Id: <1309383324-12002-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+These patches fix various ERTM issues, mostly having to do with
+receiver-side handling of flow control (the "local busy" state). This
+new approach will not keep very much incoming data beyond what fits in
+the socket receive buffer, so memory use is more tightly
+controlled. When incoming data does not immediately fit in the socket
+buffer, the L2CAP socket layer will now only check for available space
+when the socket is read from instead of polling on a workqueue thread.
 
-> Hi Jaikumar
->
-> On Wed, Jun 8, 2011 at 11:06 PM, Jaikumar Ganesh <jaikumarg@gmail.com>
-> wrote:
->> Hey Claudio:
->>
->> On Thu, Jun 9, 2011 at 2:44 AM, Claudio Takahasi
->> <claudio.takahasi@openbossa.org> wrote:
->>> Hi Jaikumar,
->>>
->>> On Wed, Jun 8, 2011 at 11:18 AM, Jaikumar Ganesh <jaikumarg@gmail.com>
->>> wrote:
->>>> Hi Claudio:
->>>>
->>>> On Tue, Jun 7, 2011 at 11:41 PM, Claudio Takahasi
->>>> <claudio.takahasi@openbossa.org> wrote:
->>>>> Hi All,
->>>>>
->>>>> There is a potential race condition in the Generic Attribute API. I'd
->>>>> like to collect opinions to avoid re-work later.
->>>>>
->>>>> How to reproduce:
->>>>> - call CreateDevice() for a device which exports a GATT based
->>>>> service:
->>>>> CreateDevice will discover all primary services
->>>>>  and the Generic API will register the object paths for all found
->>>>> services
->>>>> - Call DiscoverCharacteristics() of the primary service followed by
->>>>> Characteristic GetProperties(), expected result: read all
->>>>> characteristics properties outcome: partial characteristics
->>>>> properties
->>>>> may appear.
->>>>>
->>>>> This problem happens because DiscoverCharacteristics() doesn't wait
->>>>> for all characteristic VALUES, it returns after discovering all
->>>>> characteristic DECLARATIONS.
->>>>> Wait for characteristic values is a problem, attributes may require
->>>>> authentication or authorization.
->>>>>
->>>>> Suggestions are:
->>>>> 1. Report discovered characteristic values using PropertyChanged:
->>>>> Returning empty properties values (for GetProperties) if the
->>>>> discovery
->>>>> is in progress
->>>>>
->>>>> 2. Block GetProperties() if there is a discovery pending: returning
->>>>> after discovery finishes. Timeout can still happen!
->>>>>
->>>>> 3. Return Busy for GetProperties() if there is a characteristic
->>>>> discovery in progress
->>>>>
->>>>> Comments?
->>>>
->>>> I don't think we should read characteristic value till the application
->>>> asks for it.
->>> Are you suggesting to trigger the characteristic value and descriptors
->>> read when Characteristic GetProperties() is called and block it?
->>> Remember that GATT timeout is 30seconds and the default D-Bus message
->>> reply timeout is smaller.
->>>
->>>> DiscoverCharacteristics() should just return after getting the
->>>> DECLARATIONS.
->>> This is current behaviour.
->>
->> Sorry misread your email a bit.
->>
->> I assume you are referring to the Characteristic Watcher when you are
->> talking about the PropertyChanged signal,
->> since there is no explicit PropertyChanged signal.
->>
->> I don't think we should block GetProperties. But then if we are
->> returning null and depending on PropertyChanged signal when we have to
->> read the values, clients will need to wait for it after calling
->> GetProperties. We need to guarantee that this signal will be sent
->> (with a timeout, unless we want the clients to have the timeout at
->> their end) even if we are unable to get the value - because of some
->> kind of error.
->
-> Signal with a timeout? I don't think that it is necessary.
-> We can use persistent storage returning "old" values on GetProperties
-> calls and use PropertyChanged to notify "new" values asynchronously.
-> This approach should be enough.
-
-Just noticed this thread.
-I ran into a similar problem. Cannot we just delay the return of
-DiscoverCharacteristics method call until after the characteristic
-values/properties have been acquired? I tried out this solution and it
-seems to work fine. The trick is to implement internal counter for
-received responses from the remote device + timeout that is reset on each
-successful response. Any thoughts on this?
-
-Also, "Property Changed" on characteristic obj path/interface signal is
-mentioned in the attribute API doc, but I cannot seem to find
-implementation for the signal in the code. Am I missing something?
-
->
->>
->> In all other places we use PropertyChanged signal when the property
->> value actually changes, whereas here we are tying it with the reading
->> of the properties.
->>
->> How about providing separate calls for read and writing values and
->> decoupling it from the Properties ?
->
-> I don't think it will help, authorization and GATT timeout is still a
-> problem.
-> We are trying to cover unusual scenarios, IMO change the API to cover
-> these cases doesn't look correct.
->
-> BR,
-> Claudio.
->
->>
->> Thanks
->>
->>>
->>>> A client might not be interested in all the values and thus we should
->>>> read them only
->>>> when needed by the client. This will save both time and power and
->>>> solve this problem too.
->>>
->>> I don't think it is critical, we are not reading them on all
->>> connections/re-connections and the profiles available at the moment
->>> don't expose "complex" characteristics.
->>
->> I am talking about GATT clients written using the attribute DBUS apis.
->> Accessory vendors
->> want to get started on LE and not wait till all the profiles are
->> approved the SIG and developed
->> and they want to develop things based on the GATT clients APIs.
->>
->>>
->>> BR,
->>> Claudio
->>>
->>>>
->>>> Thanks
->>>> Jaikumar
->>>>>
->>>>> BR,
->>>>> Claudio
->>>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-Thanks,
-
-Inga Stotland
+--
+Mat Martineau
 Employee of Qualcomm Innovation Center, Inc.
 Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
 
 
