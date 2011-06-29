@@ -1,56 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Li, Steven" <yongli@qca.qualcomm.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
- the patch and radio table
-Date: Wed, 29 Jun 2011 07:19:13 +0000
-Message-ID: <73DDB75979F36A42B75F3E2B6EB2943401031D7B@nasanexd02c.na.qualcomm.com>
-References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
- <1309308687.2208.22.camel@aeonflux>
- <73DDB75979F36A42B75F3E2B6EB2943401031CF1@nasanexd02c.na.qualcomm.com>
- <20110629043130.GA2712@joana>
- <73DDB75979F36A42B75F3E2B6EB2943401031D2E@nasanexd02c.na.qualcomm.com>
- <20110629063154.GC2712@joana>
-In-Reply-To: <20110629063154.GC2712@joana>
-Content-Type: text/plain; charset="Windows-1252"
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: Add Atheros AR3012 one PID/VID supported
+Date: Wed, 29 Jun 2011 07:14:47 +0000
+Message-ID: <73DDB75979F36A42B75F3E2B6EB2943401031D5E@nasanexd02c.na.qualcomm.com>
+Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Padovan :
-
-> > > > > I would say something similar in style
-> > > > > to what I have done for the older CSR chips. See workaround above=
-.
-> > > > > And on that note, you could use data->udev to get the usb_device
-> > > > > struct ;)
-> > > > As to this point,  since now we are not using the btusb to download=
- the
-> > > patch and radio table,
-> > > >  I think we do not need to alloc the data struct and use data->udev
-> before
-> > > the workaround.
-> > > > So I'll still keep it was.  How do you think it ?
-> > >
-> > > No, there is no extra allocation. data->udev is already there. Just u=
-se it as
-> > > Marcel said.
-> >
-> > There is somehow different with  the older CSR chips.
-> > We need to return -NODEV directly if the bcd version of the 3012 chip i=
-s
-> lower or equal to 0x0001,
-> > And I think in such "return -NODEV" case, we totally do not need to all=
-oc
-> the btusb_data.
->=20
-> Ah yes, you right, I misread the patch.
->=20
-
-I have re-sent the patch to the mail list.
-Btw, I changed the subject of the PATCH to make it be less than 60 characte=
-rs.
-
-Thanks, Padovan,
-Steven,
+DQpUaGUgbmV3IEF0aDNrIG5lZWRzIHRvIGRvd25sb2FkIHBhdGNoIGFuZCByYWRpbyB0YWJsZSwN
+CmFuZCBpdCBrZWVwcyBzYW1lIFBJRC9WSUQgZXZlbiBhZnRlciBkb3dubG9hZGluZyB0aGUgcGF0
+Y2ggYW5kIHJhZGlvDQp0YWJsZS4gVGhpcyBwYXRjaCBpcyB0byB1c2UgdGhlIGJjZERldmljZSAo
+RGV2aWNlIFJlbGVhc2UgTnVtYmVyKSB0bw0KanVkZ2Ugd2hldGhlciB0aGUgY2hpcCBoYXMgYmVl
+biBwYXRjaGVkIG9yIG5vdC4gVGhlIGluaXQgYmNkRGV2aWNlDQp2YWx1ZSBvZiB0aGUgY2hpcCBp
+cyAweDAwMDEsIHRoaXMgdmFsdWUgaW5jcmVhc2VzIGFmdGVyIHBhdGNoIGFuZA0KcmFkaW8gdGFi
+bGUgZG93bmxvYWRpbmcuDQoNClNpZ25lZC1vZmYtYnk6IFN0ZXZlbi5MaSA8eW9uZ2xpQHFjYS5x
+dWFsY29tbS5jb20+DQotLS0NCiBkcml2ZXJzL2JsdWV0b290aC9hdGgzay5jIHwgICAgNSArKysr
+Kw0KIGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAgIDEyICsrKysrKysrKysrLQ0KIDIgZmls
+ZXMgY2hhbmdlZCwgMTYgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdp
+dCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2F0aDNrLmMgYi9kcml2ZXJzL2JsdWV0b290aC9hdGgzay5j
+DQppbmRleCA2YmFjZWYzLi5hNTg1NDczIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibHVldG9vdGgv
+YXRoM2suYw0KKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYXRoM2suYw0KQEAgLTM3NSw2ICszNzUs
+MTEgQEAgc3RhdGljIGludCBhdGgza19wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwN
+CiANCiAJLyogbG9hZCBwYXRjaCBhbmQgc3lzY29uZmlnIGZpbGVzIGZvciBBUjMwMTIgKi8NCiAJ
+aWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX0FUSDMwMTIpIHsNCisNCisJCS8qIE5ldyBmaXJt
+d2FyZSB3aXRoIHBhdGNoIGFuZCBzeXNjb25maWcgZmlsZXMgYWxyZWFkeSBsb2FkZWQgKi8NCisJ
+CWlmIChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9yLmJjZERldmljZSkgPiAweDAwMDEpDQor
+CQkJcmV0dXJuIC1FTk9ERVY7DQorDQogCQlyZXQgPSBhdGgza19sb2FkX3BhdGNoKHVkZXYpOw0K
+IAkJaWYgKHJldCA8IDApIHsNCiAJCQlCVF9FUlIoIkxvYWRpbmcgcGF0Y2ggZmlsZSBmYWlsZWQi
+KTsNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVl
+dG9vdGgvYnR1c2IuYw0KaW5kZXggYzJkZTg5NS4uOTFkMTNhOSAxMDA2NDQNCi0tLSBhL2RyaXZl
+cnMvYmx1ZXRvb3RoL2J0dXNiLmMNCisrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCkBA
+IC01NCw2ICs1NCw3IEBAIHN0YXRpYyBzdHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXI7DQog
+I2RlZmluZSBCVFVTQl9CQ005MjAzNQkJMHgxMA0KICNkZWZpbmUgQlRVU0JfQlJPS0VOX0lTT0MJ
+MHgyMA0KICNkZWZpbmUgQlRVU0JfV1JPTkdfU0NPX01UVQkweDQwDQorI2RlZmluZSBCVFVTQl9B
+VEgzMDEyCQkweDgwDQogDQogc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJ0dXNiX3RhYmxl
+W10gPSB7DQogCS8qIEdlbmVyaWMgQmx1ZXRvb3RoIFVTQiBkZXZpY2UgKi8NCkBAIC0xMTAsNyAr
+MTExLDcgQEAgc3RhdGljIHN0cnVjdCB1c2JfZGV2aWNlX2lkIGJsYWNrbGlzdF90YWJsZVtdID0g
+ew0KIAl7IFVTQl9ERVZJQ0UoMHgwM2YwLCAweDMxMWQpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9J
+R05PUkUgfSwNCiANCiAJLyogQXRoZXJvcyAzMDEyIHdpdGggc2ZsYXNoIGZpcm13YXJlICovDQot
+CXsgVVNCX0RFVklDRSgweDBjZjMsIDB4MzAwNCksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX0lHTk9S
+RSB9LA0KKwl7IFVTQl9ERVZJQ0UoMHgwY2YzLCAweDMwMDQpLCAuZHJpdmVyX2luZm8gPSBCVFVT
+Ql9BVEgzMDEyIH0sDQogDQogCS8qIEF0aGVyb3MgQVI1QkJVMTIgd2l0aCBzZmxhc2ggZmlybXdh
+cmUgKi8NCiAJeyBVU0JfREVWSUNFKDB4MDQ4OSwgMHhlMDJjKSwgLmRyaXZlcl9pbmZvID0gQlRV
+U0JfSUdOT1JFIH0sDQpAQCAtOTE0LDYgKzkxNSwxNSBAQCBzdGF0aWMgaW50IGJ0dXNiX3Byb2Jl
+KHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLA0KIAlpZiAoaWdub3JlX3NuaWZmZXIgJiYgaWQt
+PmRyaXZlcl9pbmZvICYgQlRVU0JfU05JRkZFUikNCiAJCXJldHVybiAtRU5PREVWOw0KIA0KKwlp
+ZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfQVRIMzAxMikgew0KKwkJc3RydWN0IHVzYl9kZXZp
+Y2UgKnVkZXYgPSBpbnRlcmZhY2VfdG9fdXNiZGV2KGludGYpOw0KKw0KKwkJLyogT2xkIGZpcm13
+YXJlIHdvdWxkIG90aGVyd2lzZSBsZXQgYXRoM2sgZHJpdmVyIGxvYWQNCisJCSAqIHBhdGNoIGFu
+ZCBzeXNjb25maWcgZmlsZXMgKi8NCisJCWlmIChsZTE2X3RvX2NwdSh1ZGV2LT5kZXNjcmlwdG9y
+LmJjZERldmljZSkgPD0gMHgwMDAxKQ0KKwkJCXJldHVybiAtRU5PREVWOw0KKwl9DQorDQogCWRh
+dGEgPSBremFsbG9jKHNpemVvZigqZGF0YSksIEdGUF9LRVJORUwpOw0KIAlpZiAoIWRhdGEpDQog
+CQlyZXR1cm4gLUVOT01FTTsNCi0tIA0KMS43LjENCg==
