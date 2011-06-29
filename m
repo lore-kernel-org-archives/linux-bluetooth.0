@@ -1,75 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+Subject: Re: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
+ the patch and radio table
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Antti Julku <antti.julku@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 28 Jun 2011 17:58:09 -0700
-In-Reply-To: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
-References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+To: "Li, Steven" <yongli@qca.qualcomm.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 28 Jun 2011 17:51:23 -0700
+In-Reply-To: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
+References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1309309092.2208.25.camel@aeonflux>
+Message-ID: <1309308687.2208.22.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antti,
+Hi Steven,
 
-> Add command to management interface for enabling/disabling the
-> fast connectable mode.
+> The new Ath3k needs to download patch and radio table,
+> and it keeps same PID/VID even after downloading the patch and radio table.
+> This patch is to use the bcdDevice (Device Release Number) to judge whether the
+> chip has been patched or not. The init bcdDevice value of the chip is 0x0001,
+> this value increases after patch and radio table downloading.
 > 
-> Signed-off-by: Antti Julku <antti.julku@nokia.com>
+> Signed-off-by: Steven.Li <yongli@qca.qualcomm.com>
 > ---
->  include/net/bluetooth/hci.h  |   10 +++++++
->  include/net/bluetooth/mgmt.h |    5 +++
->  net/bluetooth/mgmt.c         |   60 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 75 insertions(+), 0 deletions(-)
+>  drivers/bluetooth/ath3k.c |    3 +++
+>  drivers/bluetooth/btusb.c |    9 ++++++++-
+>  2 files changed, 11 insertions(+), 1 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 65345cd..d7b9600 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -698,6 +698,16 @@ struct hci_rp_read_bd_addr {
->  	bdaddr_t bdaddr;
->  } __packed;
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 6bacef3..7ae1098 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -375,6 +375,9 @@ static int ath3k_probe(struct usb_interface *intf,
 >  
-> +#define HCI_OP_WRITE_PAGE_SCAN_ACTIVITY	0x0c1c
-> +struct hci_cp_write_page_scan_activity {
-> +	__le16   interval;
-> +	__le16   window;
-> +} __packed;
+>  	/* load patch and sysconfig files for AR3012 */
+>  	if (id->driver_info & BTUSB_ATH3012) {
+> +		if(le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
+> +			return -ENODEV;
 > +
-> +#define HCI_OP_WRITE_PAGE_SCAN_TYPE	0x0c47
-> +	#define PAGE_SCAN_TYPE_STANDARD		0x00
-> +	#define PAGE_SCAN_TYPE_INTERLACED	0x01
-> +
->  #define HCI_OP_LE_SET_EVENT_MASK	0x2001
->  struct hci_cp_le_set_event_mask {
->  	__u8     mask[8];
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 45bea25..7196d04 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -209,6 +209,11 @@ struct mgmt_cp_unblock_device {
->  	bdaddr_t bdaddr;
->  } __packed;
+
+please fix the coding style. It is if[space](.
+
+Also you might wanna put a comment on top of this bcdDevice check and
+mention what it actually does.
+
+>  		ret = ath3k_load_patch(udev);
+>  		if (ret < 0) {
+>  			BT_ERR("Loading patch file failed");
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index c2de895..9d01e25 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -54,6 +54,7 @@ static struct usb_driver btusb_driver;
+>  #define BTUSB_BCM92035		0x10
+>  #define BTUSB_BROKEN_ISOC	0x20
+>  #define BTUSB_WRONG_SCO_MTU	0x40
+> +#define BTUSB_ATH3012		0x80
 >  
-> +#define MGMT_OP_SET_FAST_CONNECTABLE	0x001F
-> +struct mgmt_cp_set_fast_connectable {
-> +	__u8 enable;
-> +} __packed;
-> +
+>  static struct usb_device_id btusb_table[] = {
+>  	/* Generic Bluetooth USB device */
+> @@ -110,7 +111,7 @@ static struct usb_device_id blacklist_table[] = {
+>  	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+>  
+>  	/* Atheros 3012 with sflash firmware */
+> -	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_IGNORE },
+> +	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+>  
+>  	/* Atheros AR5BBU12 with sflash firmware */
+>  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+> @@ -914,6 +915,12 @@ static int btusb_probe(struct usb_interface *intf,
+>  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
+>  		return -ENODEV;
+>  
+> +	if (id->driver_info & BTUSB_ATH3012) {
+> +		struct usb_device *udev = interface_to_usbdev(intf);
+> +		if(le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
+> +			return -ENODEV;
+> +	}
 
-so I am not 100% sure that doing it this way is the best way.
+Coding style fix as well please. I would say something similar in style
+to what I have done for the older CSR chips. See workaround above.
 
-What is the down side of just enabling interlaced page scan all the
-time? And then maybe allow tuning of the timeout via debugfs for testing
-purposes.
-
-If we really wanna differentiate between connectable and fast
-connectable, then we need to fix up also the controller information to
-export this kind of detail. That will get pretty messy right now. So I
-would really just prefer to go with interlaced page scan by default and
-see what downside this gives us.
+And on that note, you could use data->udev to get the usb_device
+struct ;)
 
 Regards
 
