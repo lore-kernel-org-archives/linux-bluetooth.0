@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] Make use of g_slist_free_full on serial plugin
-Date: Wed, 29 Jun 2011 11:52:52 +0300
-Message-Id: <1309337573-8295-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/6] Make use of g_slist_free_full on network plugin
+Date: Wed, 29 Jun 2011 11:52:51 +0300
+Message-Id: <1309337573-8295-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1309337573-8295-1-git-send-email-luiz.dentz@gmail.com>
 References: <1309337573-8295-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,56 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- serial/port.c |   13 +++++++------
- 1 files changed, 7 insertions(+), 6 deletions(-)
+ network/connection.c |    7 ++++---
+ network/server.c     |    5 +----
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/serial/port.c b/serial/port.c
-index 7d56faa..d011084 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -189,8 +189,9 @@ static int port_release(struct serial_port *port)
- 	return -err;
+diff --git a/network/connection.c b/network/connection.c
+index 181274a..ac27cf2 100644
+--- a/network/connection.c
++++ b/network/connection.c
+@@ -477,8 +477,10 @@ static DBusMessage *connection_get_properties(DBusConnection *conn,
+ 	return reply;
  }
  
--static void serial_port_free(struct serial_port *port)
-+static void serial_port_free(void *data)
+-static void connection_free(struct network_conn *nc)
++static void connection_free(void *data)
  {
-+	struct serial_port *port = data;
- 	struct serial_device *device = port->device;
- 
- 	if (device && port->listener_id > 0)
-@@ -202,8 +203,10 @@ static void serial_port_free(struct serial_port *port)
- 	g_free(port);
- }
- 
--static void serial_device_free(struct serial_device *device)
-+static void serial_device_free(void *data)
- {
-+	struct serial_device *device = data;
++	struct network_conn *nc = data;
 +
- 	g_free(device->path);
- 	if (device->conn)
- 		dbus_connection_unref(device->conn);
-@@ -232,8 +235,7 @@ static void path_unregister(void *data)
+ 	if (nc->dc_id)
+ 		device_remove_disconnect_watch(nc->peer->device, nc->dc_id);
  
- void port_release_all(void)
+@@ -490,8 +492,7 @@ static void connection_free(struct network_conn *nc)
+ 
+ static void peer_free(struct network_peer *peer)
  {
--	g_slist_foreach(devices, (GFunc) serial_device_free, NULL);
--	g_slist_free(devices);
-+	g_slist_free_full(devices, serial_device_free);
+-	g_slist_foreach(peer->connections, (GFunc) connection_free, NULL);
+-	g_slist_free(peer->connections);
++	g_slist_free_full(peer->connections, connection_free);
+ 	btd_device_unref(peer->device);
+ 	g_free(peer->path);
+ 	g_free(peer);
+diff --git a/network/server.c b/network/server.c
+index 5feb9d0..7865f39 100644
+--- a/network/server.c
++++ b/network/server.c
+@@ -677,10 +677,7 @@ static void server_free(struct network_server *ns)
+ 	g_free(ns->name);
+ 	g_free(ns->bridge);
+ 
+-	if (ns->sessions) {
+-		g_slist_foreach(ns->sessions, (GFunc) session_free, NULL);
+-		g_slist_free(ns->sessions);
+-	}
++	g_slist_free_full(ns->sessions, session_free);
+ 
+ 	g_free(ns);
  }
- 
- static void open_notify(int fd, int err, struct serial_port *port)
-@@ -613,8 +615,7 @@ int port_unregister(const char *path)
- 	if (!device)
- 		return -ENOENT;
- 
--	g_slist_foreach(device->ports, (GFunc) serial_port_free, NULL);
--	g_slist_free(device->ports);
-+	g_slist_free_full(device->ports, serial_port_free);
- 
- 	g_dbus_unregister_interface(device->conn, path, SERIAL_PORT_INTERFACE);
- 
 -- 
 1.7.5.4
 
