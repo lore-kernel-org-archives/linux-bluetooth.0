@@ -1,90 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Jun 2011 17:24:56 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix hidp disconnect deadlock
-Message-ID: <20110629202456.GA6490@joana>
-References: <1309037555.2143.5.camel@THOR>
- <AC090B9732AB2B4DB7FF476E907FE66001315315BF@dnce02.ent.ti.com>
+Date: Wed, 29 Jun 2011 23:18:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/6] Make use of g_slist_free_full when elements
+ are dynamically-allocated
+Message-ID: <20110629201833.GA11241@dell.ger.corp.intel.com>
+References: <1309337573-8295-1-git-send-email-luiz.dentz@gmail.com>
+ <BANLkTika3jp4Y2vyU-PWpgf+oDBX_xgN_Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE66001315315BF@dnce02.ent.ti.com>
+In-Reply-To: <BANLkTika3jp4Y2vyU-PWpgf+oDBX_xgN_Q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Ilia, Kolominsky <iliak@ti.com> [2011-06-26 09:16:58 +0200]:
+Hi Lucas,
 
-> Hi!
-> IMHO the fix isnt good due to possible race condition which 
-> will destroy session/task objects - either by a call to kthread_stop
-> from the timer func or reentry to hidp_del_connection() on 
-> smp platforms.
-> see the intopic comments
-> 
-> 
-> > -----Original Message-----
-> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> > owner@vger.kernel.org] On Behalf Of Peter Hurley
-> > Sent: Sunday, June 26, 2011 12:33 AM
-> > To: linux-bluetooth
-> > Subject: [PATCH] Bluetooth: Fix hidp disconnect deadlock
-> > 
-> > Release reader lock on r/w sem before stopping khidp thread (which
-> > needs to
-> > claim the writer lock on sem before unlinking the session).
-> > 
-> > NB: kthread_stop waits for thread completion.
-> > ---
-> >  net/bluetooth/hidp/core.c |    5 ++++-
-> >  1 files changed, 4 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> > index c405a95..16d75d7 100644
-> > --- a/net/bluetooth/hidp/core.c
-> > +++ b/net/bluetooth/hidp/core.c
-> > @@ -1096,6 +1096,7 @@ int hidp_del_connection(struct hidp_conndel_req
-> > *req)
-> >  {
-> >  	struct hidp_session *session;
-> >  	int err = 0;
-> > +	bool stop_thread = false;
-> > 
-> >  	BT_DBG("");
-> > 
-> > @@ -1111,12 +1112,14 @@ int hidp_del_connection(struct hidp_conndel_req
-> > *req)
-> >  			skb_queue_purge(&session->ctrl_transmit);
-> >  			skb_queue_purge(&session->intr_transmit);
-> > 
-> > -			kthread_stop(session->task);
-> > +			stop_thread = true;
-> >  		}
-> >  	} else
-> >  		err = -ENOENT;
-> > 
-> >  	up_read(&hidp_session_sem);
-> > +	if (stop_thread)
-> 
-> Timer fires here - session is destroyed.
-> 
-> > +		kthread_stop(session->task);
-> >  	return err;
-> >  }
-> > 
-> > --
-> > 1.7.4.1
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-
-> > bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> I am working on a better solution which will ensure the async deletion
-> of session kthread operates correctly from different exec. contexts
+On Wed, Jun 29, 2011, Lucas De Marchi wrote:
+> Another thing that I think it'd be nice to use is
+> g_io_channel_set_close_on_unref() instead of unref() + shutdown() in
+> several places. What do you think?
 
-Are you going to deliver this soon? This needs to be fixed on 3.0.
+You need to be careful with that since those two methods are not
+identical: unref() + shutdown() will close the link immediately, whereas
+close_on_unref() + unref() will not do anything (except the unref) if
+there are any other references around. E.g. all IO callbacks own a
+reference to the GIOChannel so doing a simple unref() on the GIOChannel
+elsewhere will not actually close the link even if close_on_unref is
+TRUE.
 
-	Gustavo
+There are several places which expect the IO callback to check for
+G_IO_NVAL and return FALSE if set (thereby removing the IO callback and
+its GIOChannel reference). The only way you'd be able to convert such
+cases is to change the unref() + shutdown() to a unref() +
+g_source_remove(). However, this would eliminate most/some of the
+simplification gain you're trying to accomplish.
+
+Johan
