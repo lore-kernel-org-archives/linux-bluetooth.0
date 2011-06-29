@@ -1,292 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] Make use of g_slist_free_full when elements are dynamically-allocated
-Date: Wed, 29 Jun 2011 11:52:48 +0300
-Message-Id: <1309337573-8295-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BANLkTi=VFT++3BN9KumrXczvCmzuaJTb9w@mail.gmail.com>
+References: <1309263917-14931-1-git-send-email-sancane@gmail.com>
+	<BANLkTi=VFT++3BN9KumrXczvCmzuaJTb9w@mail.gmail.com>
+Date: Wed, 29 Jun 2011 10:45:36 +0200
+Message-ID: <BANLkTi=im7gkOygGP1_GhNt+Xzqj9q5UGQ@mail.gmail.com>
+Subject: Re: [RFC] Health Thermometer Profile API
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Anderson,
 
-This avoid having to iterate twice in the list to free its elements.
----
- acinclude.m4        |    4 ++--
- src/adapter.c       |   33 ++++++++++++++-------------------
- src/attrib-server.c |   18 ++++++------------
- src/device.c        |   14 ++++----------
- src/eir.c           |    3 +--
- src/manager.c       |    3 +--
- src/storage.c       |    6 ++----
- 7 files changed, 30 insertions(+), 51 deletions(-)
+2011/6/28 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Santiago,
+>
+> On Tue, Jun 28, 2011 at 8:25 AM, Santiago Carot-Nemesio
+> <sancane@gmail.com> wrote:
+>> ---
+>>  doc/thermometer.txt |  125 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 files changed, 125 insertions(+), 0 deletions(-)
+>>  create mode 100644 doc/thermometer.txt
+>>
+>> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
+>> new file mode 100644
+>> index 0000000..9afd2b2
+>> --- /dev/null
+>> +++ b/doc/thermometer.txt
+>> @@ -0,0 +1,125 @@
+>> +BlueZ D-Bus Thermomether API description
+>
+> Typo: Thermomether -> Thermometer
+>
+>> +****************************************
+>> +
+>> +       Santiago Carot-Nemesio <sancane@gmail.com>
+>> +
+>> +Health Thermomether Profile hierarchy
+>> +=====================================
+>
+> Typo: Thermomether -> Thermometer
+>
+>> +
+>> +Service                org.bluez
+>> +Interface      org.bluez.Thermometer
+>> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>> +
+>> +
+>> +Methods                void SetProperty(string name, variant value)
+>> +
+>> +                       Changes the value of the specified property. Only
+>> +                       read-write properties can be changed. On success
+>> +                       this will emit a PropertyChanged signal.
+>> +
+>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +               dict GetProperties()
+>> +
+>> +                       Returns all properties for the interface. See the
+>> +                       Properties section for the available properties.
+>> +
+>> +               RegisterThermometerWatcher(object agent)
+>> +
+>> +                       Registers a watcher to monitor scanned measures.The agent
+>
+> Typo: measures -> measurements
+>
+>> +                       will be notified about final.
+>> +
+>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +               UnregisterThermometerWatcher(object agent)
+>> +
+>> +                       Unregisters a watcher.
+>> +
+>> +                       Final and intermediate temperatures won't be notified to
+>> +                       this agent any more.
+>> +
+>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                       org.bluez.Error.NotFound
+>> +
+>> +               EnableIntermediateMeasures(object agent)
+>> +
+>> +                       Enables intermediate measure notifications for this agent
+>
+> Typo: measure -> measurement
+>
+>> +                       if the thermometer supports it.
+>> +
+>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                       org.bluez.Error.NotSupported
+>> +
+>> +               DisableIntermediateMeasures(object agent)
+>
+> What about a second argument to RegisterThermometerWatcher() that
+> enables/disables intermediate measurements ?
+>
+>> +
+>> +                       Disables intermediate measure notifications for this
+>
+> Typo: measure -> measurement
+>
+>> +                       agent. It will disable notifications in the thermometer
+>> +                       when the last agent removes the watcher for intermediate
+>> +                       measures.
+>
+> Typo: measures -> measurements
+>
+>> +
+>> +                       Possible Errors: org.bluez.Error.InvalidArguments
+>> +                                       org.bluez.Error.NotFound
+>> +
+>> +Signals                PropertyChanged(string name, variant value)
+>> +
+>> +                       This signal indicates a changed value of the given
+>> +                       property.
+>> +
+>> +Properties     boolean Intermediate [readonly]
+>> +
+>> +                       True if the thermometer supports intermediate measure
+>
+> Typo: measure -> measurement
+>
+>> +                       notifications.
+>> +
+>> +               uint16 Interval (optional) [readwrite]
+>> +
+>> +                       The Measurement Interval defines the time (in seconds)
+>> +                       between measurements. This interval is not related to
+>> +                       the intermediates measures and must be defined into
+>
+> Typo: intermediates -> intermediate
+> Typo: measures -> measurements
+>
+>> +                       a valid range. Setting it to zero meaning that no
+>
+> Typo: meaning -> means
+>
+>> +                       periodic measurements will be taken.
+>> +
+>> +               uint16 Minimum (optional) [readonly]
+>
+> This is inverted with Maximum.
+>
+>> +
+>> +                       Defines the maximum value allowed for the interval
+>> +                       between periodic measurements.
+>> +
+>> +               uint16 Maximum (optional) [readonly]
+>> +
+>> +                       Defines the minimuum value allowed for the interval
+>
+> Typo: minimuum -> minimum
+>
+>> +                       between periodic measurements.
+>> +
+>> +
+>> +Health Thermometer Watcher hierarchy
+>> +====================================
+>> +Service                unique name
+>> +Interface      org.bluez.ThermometerWatcher
+>> +Object path    freely definable
+>> +
+>> +Methods                void MeasureReceived(dict measure)
+>
+> typo (measure vs. measurement)
+>
+>> +
+>> +                       This callback gets called when a measure has been
+>> +                       scanned in the thermometer. The Time entry in the dict
+>> +                       will be only present if the device supports storing of
+>> +                       data. The time value is expressed in seconds since epoch.
+>> +                       The value represented is (mantissa) x (10**exponent)
+>> +                       See foot note for special values when treating with
+>> +                       health devices.
+>
+> IIRC, the "Type" value is also optional.
+>
+>> +
+>> +                       Dict is defined as below:
+>> +                       {
+>> +                               "Exponent" : int8,
+>> +                               "Mantissa" : int32,
+>> +                               "Unit" : ("Celsius" or "Fahrenheit"),
+>> +                               "Time" : uint64,
+>> +                               "Type" : ("Armpit", "Body", "Ear", "Finger",
+>> +                                       "Intestines", "Mouth", "Rectum", "Toe",
+>> +                                       "Tympanum"),
+>> +                               "Measurement" : ("Final" or "Intermediate"),
+>> +                       }
+>> +
+>> +                       For special cases, the exponent shall always be zero and
+>> +                       the mantissa should be one of following values:
+>> +
+>> +                       NRes = -(2**23)
+>> +                       NaN = +(2**23-1)
+>> +                       INFINITY = (2**23-2)
+>> +                       -INFINITY = -(2**23-2)
+>> --
+>> 1.7.5.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+>
+> Regards,
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 10e648d..a37959a 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -106,8 +106,8 @@ AC_DEFUN([AC_PATH_DBUS], [
- ])
- 
- AC_DEFUN([AC_PATH_GLIB], [
--	PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.16, dummy=yes,
--				AC_MSG_ERROR(GLib library version 2.16 or later is required))
-+	PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
-+				AC_MSG_ERROR(GLib library version 2.28 or later is required))
- 	AC_SUBST(GLIB_CFLAGS)
- 	AC_SUBST(GLIB_LIBS)
- ])
-diff --git a/src/adapter.c b/src/adapter.c
-index 99d3eee..0909a22 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -173,12 +173,13 @@ static int found_device_cmp(const struct remote_dev_info *d1,
- 	return 0;
- }
- 
--static void dev_info_free(struct remote_dev_info *dev)
-+static void dev_info_free(void *data)
- {
-+	struct remote_dev_info *dev = data;
-+
- 	g_free(dev->name);
- 	g_free(dev->alias);
--	g_slist_foreach(dev->services, (GFunc) g_free, NULL);
--	g_slist_free(dev->services);
-+	g_slist_free_full(dev->services, g_free);
- 	g_strfreev(dev->uuids);
- 	g_free(dev);
- }
-@@ -698,8 +699,10 @@ static void session_remove(struct session_req *req)
- 	}
- }
- 
--static void session_free(struct session_req *req)
-+static void session_free(void *data)
- {
-+	struct session_req *req = data;
-+
- 	if (req->id)
- 		g_dbus_remove_watch(req->conn, req->id);
- 
-@@ -1181,8 +1184,7 @@ static DBusMessage *adapter_start_discovery(DBusConnection *conn,
- 	if (adapter->disc_sessions)
- 		goto done;
- 
--	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
--	g_slist_free(adapter->found_devices);
-+	g_slist_free_full(adapter->found_devices, dev_info_free);
- 	adapter->found_devices = NULL;
- 
- 	g_slist_free(adapter->oor_devices);
-@@ -1879,8 +1881,7 @@ static void create_stored_device_from_profiles(char *key, char *value,
- 	if (list)
- 		device_register_services(connection, device, list, ATT_PSM);
- 
--	g_slist_foreach(uuids, (GFunc) g_free, NULL);
--	g_slist_free(uuids);
-+	g_slist_free_full(uuids, g_free);
- }
- 
- struct adapter_keys {
-@@ -2081,8 +2082,7 @@ static void load_devices(struct btd_adapter *adapter)
- 	if (err < 0) {
- 		error("Unable to load keys to adapter_ops: %s (%d)",
- 							strerror(-err), -err);
--		g_slist_foreach(keys.keys, (GFunc) g_free, NULL);
--		g_slist_free(keys.keys);
-+		g_slist_free_full(keys.keys, g_free);
- 	}
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
-@@ -2166,8 +2166,7 @@ static void load_connections(struct btd_adapter *adapter)
- 			adapter_add_connection(adapter, device);
- 	}
- 
--	g_slist_foreach(conns, (GFunc) g_free, NULL);
--	g_slist_free(conns);
-+	g_slist_free_full(conns, g_free);
- }
- 
- static int get_discoverable_timeout(const char *src)
-@@ -2222,8 +2221,7 @@ static void emit_device_disappeared(gpointer data, gpointer user_data)
- static void update_oor_devices(struct btd_adapter *adapter)
- {
- 	g_slist_foreach(adapter->oor_devices, emit_device_disappeared, adapter);
--	g_slist_foreach(adapter->oor_devices, (GFunc) dev_info_free, NULL);
--	g_slist_free(adapter->oor_devices);
-+	g_slist_free_full(adapter->oor_devices, dev_info_free);
- 	adapter->oor_devices =  g_slist_copy(adapter->found_devices);
- }
- 
-@@ -2400,9 +2398,7 @@ int btd_adapter_stop(struct btd_adapter *adapter)
- 	stop_discovery(adapter);
- 
- 	if (adapter->disc_sessions) {
--		g_slist_foreach(adapter->disc_sessions, (GFunc) session_free,
--				NULL);
--		g_slist_free(adapter->disc_sessions);
-+		g_slist_free_full(adapter->disc_sessions, session_free);
- 		adapter->disc_sessions = NULL;
- 	}
- 
-@@ -2467,8 +2463,7 @@ static void adapter_free(gpointer user_data)
- 
- 	sdp_list_free(adapter->services, NULL);
- 
--	g_slist_foreach(adapter->found_devices, (GFunc) dev_info_free, NULL);
--	g_slist_free(adapter->found_devices);
-+	g_slist_free_full(adapter->found_devices, dev_info_free);
- 
- 	g_slist_free(adapter->oor_devices);
- 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index c55167f..c02d575 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -351,8 +351,7 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 			status = a->read_cb(a, a->cb_user_data);
- 
- 		if (status) {
--			g_slist_foreach(groups, (GFunc) g_free, NULL);
--			g_slist_free(groups);
-+			g_slist_free_full(groups, g_free);
- 			return enc_error_resp(ATT_OP_READ_BY_GROUP_REQ,
- 						a->handle, status, pdu, len);
- 		}
-@@ -399,8 +398,7 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
- 	length = enc_read_by_grp_resp(adl, pdu, len);
- 
- 	att_data_list_free(adl);
--	g_slist_foreach(groups, (GFunc) g_free, NULL);
--	g_slist_free(groups);
-+	g_slist_free_full(groups, g_free);
- 
- 	return length;
- }
-@@ -614,8 +612,7 @@ static int find_by_type(uint16_t start, uint16_t end, bt_uuid_t *uuid,
- 
- 	len = enc_find_by_type_resp(matches, opdu, mtu);
- 
--	g_slist_foreach(matches, (GFunc) g_free, NULL);
--	g_slist_free(matches);
-+	g_slist_free_full(matches, g_free);
- 
- 	return len;
- }
-@@ -786,8 +783,7 @@ static void channel_disconnect(void *user_data)
- 
- 	g_slist_free(channel->notify);
- 	g_slist_free(channel->indicate);
--	g_slist_foreach(channel->configs, (GFunc) g_free, NULL);
--	g_slist_free(channel->configs);
-+	g_slist_free_full(channel->configs, g_free);
- 
- 	g_free(channel);
- }
-@@ -1132,8 +1128,7 @@ void attrib_server_exit(void)
- {
- 	GSList *l;
- 
--	g_slist_foreach(database, (GFunc) g_free, NULL);
--	g_slist_free(database);
-+	g_slist_free_full(database, g_free);
- 
- 	if (l2cap_io) {
- 		g_io_channel_unref(l2cap_io);
-@@ -1150,8 +1145,7 @@ void attrib_server_exit(void)
- 
- 		g_slist_free(channel->notify);
- 		g_slist_free(channel->indicate);
--		g_slist_foreach(channel->configs, (GFunc) g_free, NULL);
--		g_slist_free(channel->configs);
-+		g_slist_free_full(channel->configs, g_free);
- 
- 		g_attrib_unref(channel->attrib);
- 		g_free(channel);
-diff --git a/src/device.c b/src/device.c
-index ae6a0d5..82759a4 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -156,8 +156,7 @@ static void browse_request_free(struct browse_req *req)
- 		dbus_connection_unref(req->conn);
- 	if (req->device)
- 		btd_device_unref(req->device);
--	g_slist_foreach(req->profiles_added, (GFunc) g_free, NULL);
--	g_slist_free(req->profiles_added);
-+	g_slist_free_full(req->profiles_added, g_free);
- 	g_slist_free(req->profiles_removed);
- 	if (req->records)
- 		sdp_list_free(req->records, (sdp_free_func_t) sdp_record_free);
-@@ -198,14 +197,9 @@ static void device_free(gpointer user_data)
- 				agent_is_busy(agent, device->authr)))
- 		agent_cancel(agent);
- 
--	g_slist_foreach(device->services, (GFunc) g_free, NULL);
--	g_slist_free(device->services);
--
--	g_slist_foreach(device->uuids, (GFunc) g_free, NULL);
--	g_slist_free(device->uuids);
--
--	g_slist_foreach(device->primaries, (GFunc) g_free, NULL);
--	g_slist_free(device->primaries);
-+	g_slist_free_full(device->services, g_free);
-+	g_slist_free_full(device->uuids, g_free);
-+	g_slist_free_full(device->primaries, g_free);
- 
- 	if (device->tmp_records)
- 		sdp_list_free(device->tmp_records,
-diff --git a/src/eir.c b/src/eir.c
-index 01b6ac5..ac23064 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -47,8 +47,7 @@
- 
- void eir_data_free(struct eir_data *eir)
- {
--	g_slist_foreach(eir->services, (GFunc) g_free, NULL);
--	g_slist_free(eir->services);
-+	g_slist_free_full(eir->services, g_free);
- 	g_free(eir->name);
- }
- 
-diff --git a/src/manager.c b/src/manager.c
-index 254ace4..dd8cb50 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -295,8 +295,7 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
- 
- void manager_cleanup(DBusConnection *conn, const char *path)
- {
--	g_slist_foreach(adapters, (GFunc) manager_remove_adapter, NULL);
--	g_slist_free(adapters);
-+	g_slist_free_full(adapters, (GDestroyNotify) manager_remove_adapter);
- 
- 	g_dbus_unregister_interface(conn, "/", MANAGER_INTERFACE);
- }
-diff --git a/src/storage.c b/src/storage.c
-index d416d75..73bbc36 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -1211,8 +1211,7 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
- 		textfile_del(filename, key);
- 	}
- 
--	g_slist_foreach(match.keys, (GFunc) g_free, NULL);
--	g_slist_free(match.keys);
-+	g_slist_free_full(match.keys, g_free);
- 
- 	/* Deleting all attributes values of a given address */
- 	memset(&match, 0, sizeof(match));
-@@ -1228,8 +1227,7 @@ int delete_device_service(const bdaddr_t *sba, const bdaddr_t *dba)
- 		textfile_del(filename, key);
- 	}
- 
--	g_slist_foreach(match.keys, (GFunc) g_free, NULL);
--	g_slist_free(match.keys);
-+	g_slist_free_full(match.keys, g_free);
- 
- 	return 0;
- }
--- 
-1.7.5.4
 
+Thanks for your notes.
+I'll submit a patch fixing this issues during the day if nobody has
+more comments about this API.
+
+Best regards.
