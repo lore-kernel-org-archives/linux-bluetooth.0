@@ -1,176 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 29 Jun 2011 01:31:30 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "Li, Steven" <yongli@qca.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Ath3k keeps same PID/VID after downloading
+ the patch and radio table
+Message-ID: <20110629043130.GA2712@joana>
+References: <73DDB75979F36A42B75F3E2B6EB2943401031018@nasanexd02c.na.qualcomm.com>
+ <1309308687.2208.22.camel@aeonflux>
+ <73DDB75979F36A42B75F3E2B6EB2943401031CF1@nasanexd02c.na.qualcomm.com>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTikzCPdi2nW3SNmg58miQjEPhg=T=g@mail.gmail.com>
-References: <1309263917-14931-1-git-send-email-sancane@gmail.com>
-	<BANLkTikzCPdi2nW3SNmg58miQjEPhg=T=g@mail.gmail.com>
-Date: Wed, 29 Jun 2011 07:33:27 +0200
-Message-ID: <BANLkTi=w7xcnA_VYuxoUNmqt2thFh3vJ-w@mail.gmail.com>
-Subject: Re: [RFC] Health Thermometer Profile API
-From: Santiago Carot <sancane@gmail.com>
-To: mike tsai <mikeyhtsai@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <73DDB75979F36A42B75F3E2B6EB2943401031CF1@nasanexd02c.na.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi mike,
+Hi Steven,
 
-2011/6/28 mike tsai <mikeyhtsai@gmail.com>:
-> On Tue, Jun 28, 2011 at 5:25 AM, Santiago Carot-Nemesio
-> <sancane@gmail.com> wrote:
->> ---
->>  doc/thermometer.txt |  125 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 files changed, 125 insertions(+), 0 deletions(-)
->>  create mode 100644 doc/thermometer.txt
->>
->> diff --git a/doc/thermometer.txt b/doc/thermometer.txt
->> new file mode 100644
->> index 0000000..9afd2b2
->> --- /dev/null
->> +++ b/doc/thermometer.txt
->> @@ -0,0 +1,125 @@
->> +BlueZ D-Bus Thermomether API description
->> +****************************************
->> +
->> +       Santiago Carot-Nemesio <sancane@gmail.com>
->> +
->> +Health Thermomether Profile hierarchy
->> +=====================================
->> +
->> +Service                org.bluez
->> +Interface      org.bluez.Thermometer
->> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
->> +
->> +
->> +Methods                void SetProperty(string name, variant value)
->> +
->> +                       Changes the value of the specified property. Only
->> +                       read-write properties can be changed. On success
->> +                       this will emit a PropertyChanged signal.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +
->> +               dict GetProperties()
->> +
->> +                       Returns all properties for the interface. See the
->> +                       Properties section for the available properties.
->> +
->> +               RegisterThermometerWatcher(object agent)
->> +
->> +                       Registers a watcher to monitor scanned measures.The agent
->> +                       will be notified about final.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +
->> +               UnregisterThermometerWatcher(object agent)
->> +
->> +                       Unregisters a watcher.
->> +
->> +                       Final and intermediate temperatures won't be notified to
->> +                       this agent any more.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotFound
->> +
->> +               EnableIntermediateMeasures(object agent)
->> +
->> +                       Enables intermediate measure notifications for this agent
->> +                       if the thermometer supports it.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotSupported
->> +
->> +               DisableIntermediateMeasures(object agent)
->> +
->> +                       Disables intermediate measure notifications for this
->> +                       agent. It will disable notifications in the thermometer
->> +                       when the last agent removes the watcher for intermediate
->> +                       measures.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotFound
->> +
->> +Signals                PropertyChanged(string name, variant value)
->> +
->> +                       This signal indicates a changed value of the given
->> +                       property.
->> +
->> +Properties     boolean Intermediate [readonly]
->> +
->> +                       True if the thermometer supports intermediate measure
->> +                       notifications.
->> +
->> +               uint16 Interval (optional) [readwrite]
->> +
->> +                       The Measurement Interval defines the time (in seconds)
->> +                       between measurements. This interval is not related to
->> +                       the intermediates measures and must be defined into
->> +                       a valid range. Setting it to zero meaning that no
->> +                       periodic measurements will be taken.
->> +
->> +               uint16 Minimum (optional) [readonly]
->> +
->> +                       Defines the maximum value allowed for the interval
->> +                       between periodic measurements.
->> +
->> +               uint16 Maximum (optional) [readonly]
->> +
->> +                       Defines the minimuum value allowed for the interval
->> +                       between periodic measurements.
->> +
->> +
->> +Health Thermometer Watcher hierarchy
->> +====================================
->> +Service                unique name
->> +Interface      org.bluez.ThermometerWatcher
->> +Object path    freely definable
->> +
->> +Methods                void MeasureReceived(dict measure)
->> +
->> +                       This callback gets called when a measure has been
->> +                       scanned in the thermometer. The Time entry in the dict
->> +                       will be only present if the device supports storing of
->> +                       data. The time value is expressed in seconds since epoch.
->> +                       The value represented is (mantissa) x (10**exponent)
->> +                       See foot note for special values when treating with
->> +                       health devices.
->> +
->> +                       Dict is defined as below:
->> +                       {
->> +                               "Exponent" : int8,
->> +                               "Mantissa" : int32,
->> +                               "Unit" : ("Celsius" or "Fahrenheit"),
->> +                               "Time" : uint64,
->> +                               "Type" : ("Armpit", "Body", "Ear", "Finger",
->> +                                       "Intestines", "Mouth", "Rectum", "Toe",
->> +                                       "Tympanum"),
->> +                               "Measurement" : ("Final" or "Intermediate"),
->> +                       }
->> +
->> +                       For special cases, the exponent shall always be zero and
->> +                       the mantissa should be one of following values:
->> +
->> +                       NRes = -(2**23)
->> +                       NaN = +(2**23-1)
->> +                       INFINITY = (2**23-2)
->> +                       -INFINITY = -(2**23-2)
->> --
->> 1.7.5.2
->>
->> --
->
-> Is this proposal going to use reference count for property setting of
-> notification/indication? and if one of the applications enables
-> immediate alert notification, then all other applications will receive
-> the notification even if they have not registered it?
+Please stop messy top postings like this one. It's not allowed on this mailing
+list. Thanks.
 
-Yes, the idea is just the same as suggested by Anderson. We will use a
-reference counter to enable/disable indications and notification.
-Applications won't manage characteristics and properties directly, the
-plugin will do it based on the number of watchers subscribed.
+* Li, Steven <yongli@qca.qualcomm.com> [2011-06-29 03:51:03 +0000]:
 
-With respect to second question, no, only agents which enable
-intermediate notifications will be notified. Rest of agents only will
-be notified about final measures.
+> Hi Marcel:
+> 
+> > please fix the coding style. It is if[space](.
+> Okay, I see.
+> 
+> > I would say something similar in style
+> > to what I have done for the older CSR chips. See workaround above.
+> > And on that note, you could use data->udev to get the usb_device
+> > struct ;)
+> As to this point,  since now we are not using the btusb to download the patch and radio table,
+>  I think we do not need to alloc the data struct and use data->udev before the workaround.  
+> So I'll still keep it was.  How do you think it ?
 
-Regards.
+No, there is no extra allocation. data->udev is already there. Just use it as
+Marcel said.
+
+	Gustavo
