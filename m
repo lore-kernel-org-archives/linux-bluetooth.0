@@ -2,65 +2,86 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 4/5] Bluetooth: Add lmp_host_le_capable() macro
-Date: Thu, 30 Jun 2011 19:20:55 -0300
-Message-Id: <1309472456-24674-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 3/5] Bluetooth: Add enable_le module parameter
+Date: Thu, 30 Jun 2011 19:20:54 -0300
+Message-Id: <1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
 References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since we have the extended LMP features properly implemented, we
-should check the LMP_HOST_LE bit to know if the host supports LE.
+This patch adds a new module parameter to enable/disable host LE
+support. By default host LE support is disabled.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci.h      |    3 +++
- include/net/bluetooth/hci_core.h |    3 +++
- net/bluetooth/hci_core.c         |    2 +-
- 3 files changed, 7 insertions(+), 1 deletions(-)
+ include/net/bluetooth/hci.h |    1 +
+ net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5f37822..5004e36 100644
+index ed1de1b..5f37822 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -219,6 +219,9 @@ enum {
- #define LMP_INQ_TX_PWR	0x02
- #define LMP_EXTFEATURES	0x80
+@@ -211,6 +211,7 @@ enum {
+ #define LMP_EDR_3S_ESCO	0x80
  
-+/* Extended LMP features */
-+#define LMP_HOST_LE	0x02
+ #define LMP_EXT_INQ	0x01
++#define LMP_SIMUL_LE_BR	0x02
+ #define LMP_SIMPLE_PAIR	0x08
+ #define LMP_NO_FLUSH	0x40
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4ed59a8..298cd9b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -45,6 +45,8 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
++static int enable_le;
 +
- /* Connection modes */
- #define HCI_CM_ACTIVE	0x0000
- #define HCI_CM_HOLD	0x0001
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index cd65f0e..005e3bb 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -580,6 +580,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
- #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+ /* Handle HCI Event packets */
  
-+/* ----- Extended LMP capabilities ----- */
-+#define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & LMP_HOST_LE)
+ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -525,6 +527,20 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+ 	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
+ }
+ 
++static void hci_set_le_support(struct hci_dev *hdev)
++{
++	struct hci_cp_write_le_host_supported cp;
 +
- /* ----- HCI protocols ----- */
- struct hci_proto {
- 	char		*name;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0029e17..ecc584d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -542,7 +542,7 @@ int hci_dev_open(__u16 dev)
- 		ret = __hci_request(hdev, hci_init_req, 0,
- 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
++	memset(&cp, 0, sizeof(cp));
++
++	if (enable_le) {
++		cp.le = 1;
++		cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
++	}
++
++	hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp), &cp);
++}
++
+ static void hci_setup(struct hci_dev *hdev)
+ {
+ 	hci_setup_event_mask(hdev);
+@@ -550,6 +566,9 @@ static void hci_setup(struct hci_dev *hdev)
+ 		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES,
+ 							sizeof(cp), &cp);
+ 	}
++
++	if (hdev->features[4] & LMP_LE)
++		hci_set_le_support(hdev);
+ }
  
--		if (lmp_le_capable(hdev))
-+		if (lmp_host_le_capable(hdev))
- 			ret = __hci_request(hdev, hci_le_init_req, 0,
- 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
- 
+ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3068,3 +3087,6 @@ void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
+ 	hci_send_to_sock(hdev, skb, NULL);
+ 	kfree_skb(skb);
+ }
++
++module_param(enable_le, bool, 0444);
++MODULE_PARM_DESC(enable_le, "Enable LE support");
 -- 
 1.7.4.1
 
