@@ -1,37 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jun 2011 12:28:25 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Koustuv Ghosh <koustuvg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: SCORouting to PCM in Desktop
-Message-ID: <20110630092824.GA26690@dell.ger.corp.intel.com>
-References: <BANLkTi=ku2nnVc0DgduHtxZ6xQvzW-d+zA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BANLkTi=ku2nnVc0DgduHtxZ6xQvzW-d+zA@mail.gmail.com>
+In-Reply-To: <4E0A38C8.6090402@gmail.com>
+References: <4E0A38C8.6090402@gmail.com>
+From: Jakub Adamek <adamek.kuba@gmail.com>
+Date: Thu, 30 Jun 2011 11:23:12 +0200
+Message-ID: <BANLkTin2QRpk6ZeJ3KQbgepAsdUayRdu+Q@mail.gmail.com>
+Subject: Re: BIP/BPP client profile support?
+To: Syam Sidhardhan <syamsidhardh@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Koustuv,
+Hi,
+concerning BIP, there are plans and I'm working on a server and client
+implementation. My repo is here:
+https://github.com/enkait/Basic-Imaging-Profile-in-obexd
 
-On Mon, Jun 27, 2011, Koustuv Ghosh wrote:
-> I have query  for HFP in bluez.
-> As we know in Desktop PC ,  SCORouting is default routed to HCI and I
-> used to get sco data on HCI.
-> But is there anyway to route it to my desktop PCM.
-> 
-> I can't use audio.conf file(available at  /etc/bluetooth) as in my PC
-> dbus is having some problem.
-> Apart from that is their any option so that it could be changed to PCM
->  either by doing any tweak to bluez user space or kernal space?
+Cheers,
+Kuba
 
-PCM routing requires a special hardware line to be connected to your
-Bluetooth controller. Typically this is only found on embedded systems
-and your desktop PC (most likely) doesn't have it. The audio.conf
-setting is only there to document the underlying hardware state and
-doesn't actually change anything as such. The only thing that the
-setting impacts is the possibility to call Headset.Play() and once that
-method is gone (it's already marked as deprecated) the setting will also
-be removed from audio.conf.
-
-Johan
+2011/6/28 Syam Sidhardhan <syamsidhardh@gmail.com>:
+> Hi,
+>
+> I would like to know,
+>
+> 1. Any plan to support BIP & BPP client in the obexd in the near future?
+>
+> 2. Does anyone working on the BIP/BPP client profile implementation  in
+> obexd?
+>
+>
+> Thanks,
+> Syam.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
