@@ -1,39 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC BlueZ] Add Proximity API
-From: Bastien Nocera <hadess@hadess.net>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Date: Thu, 30 Jun 2011 22:55:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 30 Jun 2011 21:16:49 +0100
-In-Reply-To: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Message-ID: <1309465011.5023.85.camel@novo.hadess.net>
-Mime-Version: 1.0
+Subject: Re: [PATCH 0/3] Fixes for AVRCP 1.0 and preparation for AVRCP 1.3
+Message-ID: <20110630195511.GA18253@dell.ger.corp.intel.com>
+References: <1309459835-11434-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1309459835-11434-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2011-06-30 at 15:24 -0300, Claudio Takahasi wrote:
-> Covers the Proximity Reporter for Link Loss, Tx Power and Immediate
-> Alert services. This first proposal considers that the connections
-> will be managed by the bluetoothd core based on the registered
-> connection callbacks.
+Hi Lucas,
 
-Any examples of possible uses, or hardware implementing those? Is this
-good enough to implement both sides of the profile, or just one side of
-it?
+On Thu, Jun 30, 2011, Lucas De Marchi wrote:
+> These are simple fixes for AVRCP 1.0 and a preparation for the upcoming 1.3.
+> I'm working on the task of implementing AVRCP 1.3 now, based when possible on
+> previous patches sent to this list.
+> 
+> Lucas De Marchi (3):
+>   avrcp: Check that AVCTP packet is of type COMMAND
+>   avrcp: Factor out function to handle vendordep pdu
+>   avrcp: return NOT_IMPLEMENTED on request for vendor dep command
+> 
+>  audio/control.c |   31 +++++++++++++++----------------
+>  1 files changed, 15 insertions(+), 16 deletions(-)
 
-Is this something that could require UI being written?
+All three patches have been applied. Thanks.
 
-> Only one instance of Immediate Alert service is allowed, "Alert Level"
-> characteristic of this service is used by Find Me and Path Loss. Note
-> that "Alert Level" for Path Loss is a LOCAL property written in the
-> Immediate Alert service when the threshold is reached. For Find Me
-> the user/application needs to actively enable the alert in the Immediate
-> Alert service. Link Loss has it's own instance of Alert Level
-
-its.
-
-> characteristic.
-
-Cheers
-
+Johan
