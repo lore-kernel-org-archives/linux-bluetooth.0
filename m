@@ -2,32 +2,24 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/3] avrcp: Check that AVCTP packet is of type COMMAND
-Date: Thu, 30 Jun 2011 15:50:33 -0300
-Message-Id: <1309459835-11434-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1309459835-11434-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1309459835-11434-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 0/3] Fixes for AVRCP 1.0 and preparation for AVRCP 1.3
+Date: Thu, 30 Jun 2011 15:50:32 -0300
+Message-Id: <1309459835-11434-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/control.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+These are simple fixes for AVRCP 1.0 and a preparation for the upcoming 1.3.
+I'm working on the task of implementing AVRCP 1.3 now, based when possible on
+previous patches sent to this list.
 
-diff --git a/audio/control.c b/audio/control.c
-index 3db7d8e..57a4edc 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -590,7 +590,8 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
- 			operands[1] = SUBUNIT_PANEL << 3;
- 		DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
- 				"OP_UNITINFO" : "OP_SUBUNITINFO");
--	} else if (avrcp->opcode == OP_VENDORDEP) {
-+	} else if (avctp->cr == AVCTP_COMMAND &&
-+			avrcp->opcode == OP_VENDORDEP) {
- 		/* Reply with REJECT msg with error code 0x0
- 		 * (Invalid Command) as defined in AVRCP spec (6.15.1) */
- 		struct avrcp_spec_avc_pdu *pdu = (void *) operands;
+Lucas De Marchi (3):
+  avrcp: Check that AVCTP packet is of type COMMAND
+  avrcp: Factor out function to handle vendordep pdu
+  avrcp: return NOT_IMPLEMENTED on request for vendor dep command
+
+ audio/control.c |   31 +++++++++++++++----------------
+ 1 files changed, 15 insertions(+), 16 deletions(-)
+
 -- 
 1.7.6
 
