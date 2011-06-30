@@ -1,108 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Thu, 30 Jun 2011 13:53:53 -0400
-Subject: [PATCH v2] Bluetooth: Fix hidp disconnect deadlocks and lost wakeup
-Message-ID: <1309456433.2446.2.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
+Date: Thu, 30 Jun 2011 14:47:33 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "Ilia, Kolominsky" <iliak@ti.com>
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Fix hidp disconnect deadlock
+Message-ID: <20110630174733.GB25602@joana>
+References: <1309037555.2143.5.camel@THOR>
+ <AC090B9732AB2B4DB7FF476E907FE66001315315BF@dnce02.ent.ti.com>
+ <20110629202456.GA6490@joana>
+ <20110629205202.GB6490@joana>
+ <1309444475.2276.96.camel@THOR>
+ <AC090B9732AB2B4DB7FF476E907FE66001316415C9@dnce02.ent.ti.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE66001316415C9@dnce02.ent.ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Partial revert of commit aabf6f89. When the hidp session thread
-was converted from kernel_thread to kthread, the atomic/wakeups
-were replaced with kthread_stop. kthread_stop has blocking semantics
-which are inappropriate for the hidp session kthread. In addition,
-the kthread signals itself to terminate in hidp_process_hid_control()
-- it cannot do this with kthread_stop().
+* Ilia, Kolominsky <iliak@ti.com> [2011-06-30 16:55:52 +0200]:
 
-Lastly, a wakeup can be lost if the wakeup happens between checking
-for the loop exit condition and setting the current state to
-TASK_INTERRUPTIBLE. (Without appropriate synchronization mechanisms,
-the task state should not be changed between the condition test and
-the yield - via schedule() - as this creates a race between the
-wakeup and resetting the state back to interruptible.)
----
- net/bluetooth/hidp/core.c |   18 +++++++++++-------
- net/bluetooth/hidp/hidp.h |    1 +
- 2 files changed, 12 insertions(+), 7 deletions(-)
+> > -----Original Message-----
+> > From: Peter Hurley [mailto:peter@hurleysoftware.com]
+> > Sent: Thursday, June 30, 2011 5:35 PM
+> > To: Gustavo F. Padovan
+> > Cc: Ilia, Kolominsky; linux-bluetooth
+> > Subject: Re: [PATCH] Bluetooth: Fix hidp disconnect deadlock
+> > 
+> > On Wed, 2011-06-29 at 16:52 -0400, Gustavo F. Padovan wrote:
+> > > * Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-29 17:24:56 -
+> > 0300]:
+> > >
+> > > > * Ilia, Kolominsky <iliak@ti.com> [2011-06-26 09:16:58 +0200]:
+> > > >
+> > > > > Hi!
+> > > > > IMHO the fix isnt good due to possible race condition which
+> > > > > will destroy session/task objects - either by a call to
+> > kthread_stop
+> > > > > from the timer func or reentry to hidp_del_connection() on
+> > > > > smp platforms.
+> > ....
+> > > This should fix the timer issue. Please test.
+> > >
+> > > 	Gustavo
+> > 
+> > Hi Ilia & Gustavo,
+> > 
+> > After Ilia pointed out the problem with the timer function, I went back
+> > and reviewed *all* the synchronization code relevant to the hid session
+> > thread.
+> > 
+> > A number of problems were introduced with commit aabf6f89 - when the
+> > session thread was converted from a kernel_thread to a kthread.
+> > Although
+> > a kthread is a better choice for representing the session thread, the
+> > naive conversion of atomic/wakeup to kthread_stop() was inappropriate.
+> > 
+> > kthread_stop() has usage semantics that different significantly from
+> > atomic/wakeup. As we already know, because kthread_stop() blocks on
+> > thread completion, it can introduce deadlocks in code that already uses
+> > exclusion mechanisms. Even with Ilia's new patch, consider the
+> > following
+> > sequence:
+> > 
+> > Thread 0                 Thread 1                 Thread 2
+> > in hidp_del_connection                            in hidp session
+> >   claim r/w sem                                     .
+> >                          timer triggers             .
+> >                            kthread_stop() --------->.
+> >                            *blocks on thread 2*     exits loop
+> >                                                     *blocks for r/w
+> 
+> Guys, as far as I know - it is not possible to use kthread_stop from
+> The timer func - since it may sleep and we are in soft_irq...
+> What I did is added kthread_stop_async in the kthread use it in both 
+> Timer func and hidp_del_connection(). I am still polishing the code
+> though...
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index c405a95..3a74612 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -464,7 +464,8 @@ static void hidp_idle_timeout(unsigned long arg)
- {
- 	struct hidp_session *session = (struct hidp_session *) arg;
- 
--	kthread_stop(session->task);
-+	atomic_inc(&session->terminate);
-+	wake_up_process(session->task);
- }
- 
- static void hidp_set_timer(struct hidp_session *session)
-@@ -535,7 +536,8 @@ static void hidp_process_hid_control(struct hidp_session *session,
- 		skb_queue_purge(&session->ctrl_transmit);
- 		skb_queue_purge(&session->intr_transmit);
- 
--		kthread_stop(session->task);
-+		atomic_inc(&session->terminate);
-+		wake_up_process(session->task);
- 	}
- }
- 
-@@ -706,9 +708,8 @@ static int hidp_session(void *arg)
- 	add_wait_queue(sk_sleep(intr_sk), &intr_wait);
- 	session->waiting_for_startup = 0;
- 	wake_up_interruptible(&session->startup_queue);
--	while (!kthread_should_stop()) {
--		set_current_state(TASK_INTERRUPTIBLE);
--
-+	set_current_state(TASK_INTERRUPTIBLE);
-+	while (!atomic_read(&session->terminate)) {
- 		if (ctrl_sk->sk_state != BT_CONNECTED ||
- 				intr_sk->sk_state != BT_CONNECTED)
- 			break;
-@@ -726,6 +727,7 @@ static int hidp_session(void *arg)
- 		hidp_process_transmit(session);
- 
- 		schedule();
-+		set_current_state(TASK_INTERRUPTIBLE);
- 	}
- 	set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(intr_sk), &intr_wait);
-@@ -1060,7 +1062,8 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
- err_add_device:
- 	hid_destroy_device(session->hid);
- 	session->hid = NULL;
--	kthread_stop(session->task);
-+	atomic_inc(&session->terminate);
-+	wake_up_process(session->task);
- 
- unlink:
- 	hidp_del_timer(session);
-@@ -1111,7 +1114,8 @@ int hidp_del_connection(struct hidp_conndel_req *req)
- 			skb_queue_purge(&session->ctrl_transmit);
- 			skb_queue_purge(&session->intr_transmit);
- 
--			kthread_stop(session->task);
-+			atomic_inc(&session->terminate);
-+			wake_up_process(session->task);
- 		}
- 	} else
- 		err = -ENOENT;
-diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
-index 19e9500..af1bcc8 100644
---- a/net/bluetooth/hidp/hidp.h
-+++ b/net/bluetooth/hidp/hidp.h
-@@ -142,6 +142,7 @@ struct hidp_session {
- 	uint ctrl_mtu;
- 	uint intr_mtu;
- 
-+	atomic_t terminate;
- 	struct task_struct *task;
- 
- 	unsigned char keys[8];
--- 
-1.7.4.1
+Yes, you right, we really can't call kthread_stop there.
 
+> Gustavo, is adding the new api to kthread feasible?
+> How to upstream such change?
+
+I don't know the kthread internals to tell you if this is feasible or not. You
+have to send the patch to the maintainer of kthread
+(./scripts/get_maintainer.pl tells you the maintainer) and explain why you
+need this to him.
+
+But we also need a solution in the short term, this week, in order to fix this
+in the up coming 3.0 release.
+
+	Gustavo
