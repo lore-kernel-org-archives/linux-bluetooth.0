@@ -1,84 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jun 2011 14:40:08 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: "Ilia, Kolominsky" <iliak@ti.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix hidp disconnect deadlock
-Message-ID: <20110630174008.GA25602@joana>
-References: <1309037555.2143.5.camel@THOR>
- <AC090B9732AB2B4DB7FF476E907FE66001315315BF@dnce02.ent.ti.com>
- <20110629202456.GA6490@joana>
- <20110629205202.GB6490@joana>
- <1309444475.2276.96.camel@THOR>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309444475.2276.96.camel@THOR>
+Subject: Re: L2CAP connection on insecure link
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tejaswini.purandare@wipro.com
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 30 Jun 2011 09:08:52 -0700
+In-Reply-To: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com>
+References: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1309450135.2208.52.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Peter Hurley <peter@hurleysoftware.com> [2011-06-30 10:34:35 -0400]:
+Hi Tejaswini,
 
-> On Wed, 2011-06-29 at 16:52 -0400, Gustavo F. Padovan wrote:
-> > * Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-29 17:24:56 -0300]:
-> > 
-> > > * Ilia, Kolominsky <iliak@ti.com> [2011-06-26 09:16:58 +0200]:
-> > > 
-> > > > Hi!
-> > > > IMHO the fix isnt good due to possible race condition which 
-> > > > will destroy session/task objects - either by a call to kthread_stop
-> > > > from the timer func or reentry to hidp_del_connection() on 
-> > > > smp platforms.
-> ....
-> > This should fix the timer issue. Please test.
-> > 
-> > 	Gustavo
+> We are facing an issue as below. 
 > 
-> Hi Ilia & Gustavo,
+> Problem statement:
+> This is with reference to the patch http://kernel.ubuntu.com/git?p=ubuntu/linux-2.6/.git;a=commit;h=e7c29cb16c833441fd2160642bb13025f4e7ac70 for handling L2CAP connection requests on an insecure link. I am pasting below the details of this patch.
 > 
-> After Ilia pointed out the problem with the timer function, I went back
-> and reviewed *all* the synchronization code relevant to the hid session
-> thread.
+> "The Security Mode 4 of the Bluetooth 2.1 specification has strict authentication and encryption requirements. It is the initiators job to create a secure ACL link. However in case of malicious devices, the acceptor has to make sure that the ACL is encrypted before allowing any kind of L2CAP connection. The only exception here is the PSM 1 for the service discovery protocol, because that is allowed to run on an insecure ACL link.
+> Previously it was enough to reject a L2CAP connection during the connection setup phase, but with Bluetooth 2.1 it is forbidden to do any L2CAP protocol exchange on an insecure link (except SDP).
+> The new hci_conn_check_link_mode() function can be used to check the integrity of an ACL link. This functions also takes care of the cases where Security Mode 4 is disabled or one of the devices is based on an older specification."
 > 
-> A number of problems were introduced with commit aabf6f89 - when the
-> session thread was converted from a kernel_thread to a kthread. Although
-> a kthread is a better choice for representing the session thread, the
-> naive conversion of atomic/wakeup to kthread_stop() was inappropriate.
+> On receipt of a L2CAP_Connect_Req (function l2cap_connect_req()), the function hci_conn_check_link_mode() checks is encryption is enabled on the link when SSP is enabled. If encryption is not yet enabled then the function l2cap_connect_req() returns L2CAP_Connect_Rsp with error Security Block. 
 > 
-> kthread_stop() has usage semantics that different significantly from
-> atomic/wakeup. As we already know, because kthread_stop() blocks on
-> thread completion, it can introduce deadlocks in code that already uses
-> exclusion mechanisms. Even with Ilia's new patch, consider the following
-> sequence:
+> Due to this patch, if the HCI encryption change event arrives after the Initiator sends the L2CAP Connection Request, then the connection request is rejected with response Security Block.
 > 
-> Thread 0                 Thread 1                 Thread 2
-> in hidp_del_connection                            in hidp session
->   claim r/w sem                                     .
->                          timer triggers             .
->                            kthread_stop() --------->.
->                            *blocks on thread 2*     exits loop
->                                                     *blocks for r/w sem*
->   in hidp_del_timer
->     del_timer_sync()
->       *blocks on thread 1*
-> 
-> Deadlock occurs because:
-> + thread 0 holds reader lock but is waiting for the timer function on
-> thread 1 to finish
-> + thread 1 has stopped kthread and is waiting for thread completion
-> + thread 2 (aka kthread) is waiting to claim writer lock held by thread
-> 0
-> 
-> In addition to the deadlocks and races, kthread_stop() is being called
-> by hidp_process_hid_control() which is *in the session thread context* -
-> kthread_stop() cannot be called on itself!
-> 
-> I've been testing patch v2 since Monday which continues to use kthread
-> but reverts back to the old behavior of atomic/wakeup. It also fixes the
-> potential for a lost wakeup. Of course, "testing" means running it and
-> looking at it carefully - as someone on IRC pointed out, kthread really
-> needs to get instrumented with lockdep.
+> Query: 
+> I wanted to know if this can be handled by sending an L2CAP Connection response with Connection Pending and on receiving the Encryption Change event send the L2CAP Connection response with success; else with error Security Block. 
 
-Where is this v2 patch? I wanna take a look on it.
+no it can not. The specification is pretty damn clear here. Any
+Connect_Request needs to be rejected if the underlying link is not know
+to be secure.
 
-	Gustavo
+And with some chips this is a race conditions in their LMP+BB and the
+transport layer. They end up sending the ACL packet before the send the
+HCI event for signaling that the encryption is active.
+
+If you do look at the air traffic you might see that the ACL packet
+actually was encrypted, but that is not what they have signaled to the
+host stack. There is nothing we can do from our side. The chips need to
+be fixed to do this in the right order.
+
+Regards
+
+Marcel
+
+
