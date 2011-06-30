@@ -1,50 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: L2CAP connection on insecure link
-From: Marcel Holtmann <marcel@holtmann.org>
-To: tejaswini.purandare@wipro.com
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 30 Jun 2011 09:08:52 -0700
-In-Reply-To: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com>
-References: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1309450135.2208.52.camel@aeonflux>
-Mime-Version: 1.0
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Eponymous - <the.epon@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 30 Jun 2011 11:47:18 -0400
+Subject: Re: HCI data payload not getting through when using BlueZ
+Message-ID: <1309448838.2276.137.camel@THOR>
+References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
+	 <1307122514.2622.75.camel@THOR>
+	 <BANLkTi=aFRa7wm5EUyq9kLur1Cp0sxchhA@mail.gmail.com>
+In-Reply-To: <BANLkTi=aFRa7wm5EUyq9kLur1Cp0sxchhA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tejaswini,
-
-> We are facing an issue as below. 
-> 
-> Problem statement:
-> This is with reference to the patch http://kernel.ubuntu.com/git?p=ubuntu/linux-2.6/.git;a=commit;h=e7c29cb16c833441fd2160642bb13025f4e7ac70 for handling L2CAP connection requests on an insecure link. I am pasting below the details of this patch.
-> 
-> "The Security Mode 4 of the Bluetooth 2.1 specification has strict authentication and encryption requirements. It is the initiators job to create a secure ACL link. However in case of malicious devices, the acceptor has to make sure that the ACL is encrypted before allowing any kind of L2CAP connection. The only exception here is the PSM 1 for the service discovery protocol, because that is allowed to run on an insecure ACL link.
-> Previously it was enough to reject a L2CAP connection during the connection setup phase, but with Bluetooth 2.1 it is forbidden to do any L2CAP protocol exchange on an insecure link (except SDP).
-> The new hci_conn_check_link_mode() function can be used to check the integrity of an ACL link. This functions also takes care of the cases where Security Mode 4 is disabled or one of the devices is based on an older specification."
-> 
-> On receipt of a L2CAP_Connect_Req (function l2cap_connect_req()), the function hci_conn_check_link_mode() checks is encryption is enabled on the link when SSP is enabled. If encryption is not yet enabled then the function l2cap_connect_req() returns L2CAP_Connect_Rsp with error Security Block. 
-> 
-> Due to this patch, if the HCI encryption change event arrives after the Initiator sends the L2CAP Connection Request, then the connection request is rejected with response Security Block.
-> 
-> Query: 
-> I wanted to know if this can be handled by sending an L2CAP Connection response with Connection Pending and on receiving the Encryption Change event send the L2CAP Connection response with success; else with error Security Block. 
-
-no it can not. The specification is pretty damn clear here. Any
-Connect_Request needs to be rejected if the underlying link is not know
-to be secure.
-
-And with some chips this is a race conditions in their LMP+BB and the
-transport layer. They end up sending the ACL packet before the send the
-HCI event for signaling that the encryption is active.
-
-If you do look at the air traffic you might see that the ACL packet
-actually was encrypted, but that is not what they have signaled to the
-host stack. There is nothing we can do from our side. The chips need to
-be fixed to do this in the right order.
-
-Regards
-
-Marcel
-
-
+T24gV2VkLCAyMDExLTA2LTI5IGF0IDA2OjIyIC0wNDAwLCBFcG9ueW1vdXMgLSB3cm90ZToNCj4g
+VGhhbmtzIGZvciB5b3VyIHJlcGx5IFBldGVyLg0KPiANCj4gU29ycnkgaWYgSSBjYW1lIGFjcm9z
+cyBhIGJpdCBydWRlIHRoZXJlLCBpdCBpcyBqdXN0IHZlcnkgZnJ1c3RyYXRpbmcNCj4gc29tZXRp
+bWVzIDopDQoNCkkgZ2V0IGl0LiBCVCBjYW4gYmUgPGFyZ2dnaGhoPi4uLg0KDQo+IFlvdSBtZW50
+aW9uZWQgZW5hYmxpbmcgZGVidWcgbWVzc2FnZXMgZm9yIGJ0dXNiIGFuZCBibHVldG9vdGguIERv
+IHlvdQ0KPiBieSBhbnkgY2hhbmNlIGtub3cgaG93IHRvIGRvIHRoaXM/DQoNCkkgYWx3YXlzIHJ1
+biBhIGRlYnVnIGtlcm5lbC4gTXkgcmVsZXZhbnQgYnVpbGQgc2V0dGluZ3MgaW4gdGhlICJLZXJu
+ZWwNCmhhY2tpbmciIHN1Ym1lbnUgYXJlOg0KIEtlcm5lbCBEZWJ1Z2dpbmcgPT4gREVCVUdfS0VS
+TkVMPXkNCiBEZWJ1ZyBGaWxlc3lzdGVtID0+IERFQlVHX0ZTPXkNCiBDb21waWxlIHRoZSBrZXJu
+ZWwgd2l0aCBkZWJ1ZyBpbmZvID0+IERFQlVHX0lORk89eQ0KYW5kIG1vc3QgaW1wb3J0YW50bHks
+DQogRW5hYmxlIGR5bmFtaWMgcHJpbnRrKCkgc3VwcG9ydCBEWU5BTUlDX0RFQlVHPXkNCg0KVGhl
+biByZWFkIHRoZSBzaG9ydCBkeW5hbWljIGRlYnVnIGhvd3RvIGluIHRoZSBrZXJuZWwgZG9jdW1l
+bnRhdGlvbjoNCkRvY3VtZW50YXRpb24vZHluYW1pYy1kZWJ1Zy1ob3d0by50eHQgKHRoZXJlIGFy
+ZSBzb21lIGNvcGllcyBvbmxpbmUgYXMNCndlbGwgaWYgdGhhdCdzIGVhc2llcikuDQoNClRoZW4g
+d2hlbiBJIHdhbnQgdG8gc2VlIGRlYnVnIG1lc3NhZ2VzLCBJIGp1c3QgZW5hYmxlIHRob3NlIHNv
+dXJjZQ0KZmlsZXMuIEVnLiwNCiMgZWNobyAtbiAnZmlsZSBoY2lfY29yZS5jICtwJyA+IC9zeXMv
+a2VybmVsL2RlYnVnL2R5bmFtaWNfZGVidWcvY29udHJvbA0KIyBlY2hvIC1uICdmaWxlIGhjaV9j
+b25uLmMgK3AnIC4uLg0KIyBlY2hvIC1uICdmaWxlIGhjaV9ldmVudC5jICtwJyAuLi4NCg0KUGx1
+cywgaXQncyBlYXN5IHRvIGFkZCB5b3VyIG93biBpZiB5b3Ugc3VzcGVjdCBhIHBhcnRpY3VsYXIg
+Y29kZSBwYXRoLg0KDQpJZiB5b3UgaGF2ZSBtb3JlIHF1ZXN0aW9ucyBhYm91dCB0aGlzLCBjb21l
+IGFzayBvbiBJUkMgI2JsdWV6Lg0KDQo+IE9uIEZyaSwgSnVuIDMsIDIwMTEgYXQgNjozNSBQTSwg
+UGV0ZXIgSHVybGV5IDxwZXRlckBodXJsZXlzb2Z0d2FyZS5jb20+IHdyb3RlOg0KPiA+IEFsdGhv
+dWdoIGl0J3Mgbm90IGF0IGFsbCBjbGVhciBmcm9tIHlvdXIgcG9zdHMsIEknbSBhc3N1bWluZyB0
+aGF0IHlvdSdyZQ0KPiA+IHVzaW5nIGEgcmF3IEhDSSBzb2NrZXQgaW4gYSB1c2VyLXNwYWNlIHV0
+aWxpdHkuDQoNCkFyZSB5b3UgdXNpbmcgYSByYXcgSENJIHNvY2tldD8NCg0KPiA+IE15IGd1ZXNz
+IGlzIHRoYXQgdGhlIGJ0dXNiIGtlcm5lbCBkcml2ZXIgaXMgZHJvcHBpbmcgeW91ciBBQ0wgcGFj
+a2V0DQo+ID4gd2l0aG91dCB0cmFuc21pdHRpbmcgaXQuIElmIHlvdSBsb29rIGF0IGRyaXZlcnMv
+Ymx1ZXRvb3RoL2J0dXNiLmMuIGluDQo+ID4gdGhlIGJ0dXNiX3NlbmRfZnJhbWUoKSBmdW5jdGlv
+biwgeW91J2xsIHNlZToNCj4gPg0KPiA+ICAgICAgICBzd2l0Y2ggKGJ0X2NiKHNrYiktPnBrdF90
+eXBlKSB7DQo+ID4gICAgICAgICAgICAgICAgLi4uLg0KPiA+ICAgICAgICBjYXNlIEhDSV9BQ0xE
+QVRBX1BLVDoNCj4gPiAgICAgICAgICAgICAgICBpZiAoIWRhdGEtPmJ1bGtfdHhfZXAgfHwgaGRl
+di0+Y29ubl9oYXNoLmFjbF9udW0gPCAxKQ0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgcmV0
+dXJuIC1FTk9ERVY7DQo+ID4NCj4gPiBUaGUgb25seSB3YXkgdGhhdCBoZGV2LT5jb25uX2hhc2gu
+YWNsX251bSB3aWxsIGJlIDErIGlzIGlmIHRoZQ0KPiA+IGVzdGFibGlzaG1lbnQgb2YgYW4gQUNM
+IGNvbm5lY3Rpb24gd2VudCB0aHJvdWdoIGhjaV9jb25uZWN0KCkgd2l0aCBhDQo+ID4gY29ubmVj
+dGlvbiB0eXBlIG9mIEFDTF9MSU5LLiBUaGlzIGNvZGUgd2FzIGFkZGVkIHdoZW4gU0NPIHN1cHBv
+cnQgd2FzDQo+ID4gYWRkZWQgYmFjayBpbiBBdWcgMjAwOC4NCg0KTXkgcG9pbnQgaGVyZSBpcyB0
+aGlzIGlzIHByb2JhYmx5IGEgYnVnIGluIGJ0dXNiIC0gcmF3IEhDSSBzb2NrZXRzDQpzaG91bGQg
+YmUgYWJsZSB0byBzZW5kICphbnkqIHBhY2tldC4NCg0KSWYgeW91IGNhbiBjb25maXJtIHlvdSdy
+ZSBvbiBhIHJhdyBIQ0kgc29ja2V0LCBJIGNhbiBleHBsb3JlIGEgZml4IGJ1dA0KeW91J2xsIGJl
+IHRoZSB0ZXN0IHN1YmplY3QgPGdyaW4+Lg0KDQpMZXQgbWUga25vdywNClBldGVyIEh1cmxleSAN
+Cg0KDQo=
