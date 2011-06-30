@@ -1,35 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Thu, 30 Jun 2011 14:32:35 -0400
-Message-ID: <BANLkTinJ8SFNmE4wHCmsx1wev7ZfQu-Qmw@mail.gmail.com>
-Subject: Re: [RFC BlueZ] Add Proximity API
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ] Add Proximity API
+Date: Thu, 30 Jun 2011 15:24:37 -0300
+Message-Id: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Covers the Proximity Reporter for Link Loss, Tx Power and Immediate
+Alert services. This first proposal considers that the connections
+will be managed by the bluetoothd core based on the registered
+connection callbacks.
 
-On Thu, Jun 30, 2011 at 2:24 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Covers the Proximity Reporter for Link Loss, Tx Power and Immediate
-> Alert services. This first proposal considers that the connections
-> will be managed by the bluetoothd core based on the registered
-> connection callbacks.
+Only one instance of Immediate Alert service is allowed, "Alert Level"
+characteristic of this service is used by Find Me and Path Loss. Note
+that "Alert Level" for Path Loss is a LOCAL property written in the
+Immediate Alert service when the threshold is reached. For Find Me
+the user/application needs to actively enable the alert in the Immediate
+Alert service. Link Loss has it's own instance of Alert Level
+characteristic.
+---
+ doc/proximity-api.txt |   75 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 75 insertions(+), 0 deletions(-)
+ create mode 100644 doc/proximity-api.txt
 
-BTW, the Proximity & Find Me profiles and related services have just
-been made available on:
-https://www.bluetooth.org/Technical/Specifications/adopted.htm \o/
-
-This RFC covers both Proximity and Find Me (find me share the same
-immediate alert service from Proximity).
-
-Regards,
+diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
+new file mode 100644
+index 0000000..d9ed71d
+--- /dev/null
++++ b/doc/proximity-api.txt
+@@ -0,0 +1,75 @@
++BlueZ D-Bus Proximity API description
++***********************************
++
++Copyright (C) 2011  Claudio Takahasi <claudio.takahasi@openbossa.org>
++
++
++Proximity hierarchy
++=================
++
++Service		org.bluez
++Interface	org.bluez.ProximityMonitor
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++Methods		dict GetProperties()
++
++			Returns all properties for the interface. See the
++			properties section for available properties.
++
++		void SetProperty(string name, variant value)
++
++			Changes the value of the specified property. Only
++			properties that are listed a read-write are changeable.
++			On success this will emit a PropertyChanged signal.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++Properties
++		uint8 PathLoss[readonly]
++
++			If Tx Power Service is available, this property value
++			will be reported on regular intervals when the peer is
++			connected. Range: 0 - 100. The number is a relative
++			value to represent inaccurately the signal strength,
++			where 0 represents out of range and 100 close to the
++			reporter.
++
++		string Threshold [readwrite]
++
++			Persistent property. Trigger for immediate alert.
++			Values: "low", "medium", "high". Enabled only if Tx
++			Power and Immediate Alert services are available in
++			the reporter. Controls when the immediate alert is
++			triggered in the reporter.
++
++		boolean ThresholdAlert[readonly]
++
++			Alert indicating that threshold has been reached or the
++			path loss returned to a value below the threshold. It is
++			up to the implementation catch this property value and
++			emit a sound in the proximity monitor.
++
++		string LinkLossAlertLevel [readwrite]
++
++			Persistent property. Sets the alert level in the
++			proximity reporter for link loss scenario. Values:
++			"none", "mild", "high".
++
++		string PathLossAlertLevel [readwrite]
++
++			Persistent property. Alert level for path loss scenario.
++			It's a local property value written in the Alert Level of
++			the Immediate Alert service when the threshold alert is
++			triggered. Values: "none", "mild", "high".
++
++		string FindMeAlertLevel [readwrite]
++
++			Alert level to be written in the Find Me target.
++			Values: "none", "mild", "high". Default value is
++			"none". Applications should disable the alert setting
++			the value to "none".
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.6
+
