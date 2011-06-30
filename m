@@ -1,19 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 30 Jun 2011 18:42:02 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] Bluetooth: Remove L2CAP busy queue
+Message-ID: <20110630214202.GJ25602@joana>
+References: <1309383324-12002-1-git-send-email-mathewm@codeaurora.org>
+ <1309383324-12002-7-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Date: Thu, 30 Jun 2011 15:16:41 -0700
-Message-ID: <BANLkTinaWe5A1T1zqkbKrSD-bLRUMwPr8A@mail.gmail.com>
-Subject: How to build gatttool
-From: mike tsai <mikeyhtsai@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1309383324-12002-7-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mat,
 
-   Adding --enable-attrib in bootstrap-configure does not work any
-more. Is there a new way to build gatttool?
+* Mat Martineau <mathewm@codeaurora.org> [2011-06-29 14:35:24 -0700]:
 
-Regards,
+> The ERTM receive buffer is now handled in a way that does not require
+> the busy queue and the associated polling code.
 
-Mike
+This one is fine as a separate patch.
+
+	Gustavo
