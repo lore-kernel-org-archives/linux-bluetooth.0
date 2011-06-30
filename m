@@ -1,30 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	Koustuv Ghosh <koustuvg@gmail.com>
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: SCORouting to PCM in Desktop
-Date: Thu, 30 Jun 2011 10:07:15 +0000
-Message-ID: <480687D4EEFE7447A2E09AADFF667362049C48F1@nasanexd02c.na.qualcomm.com>
-References: <BANLkTi=ku2nnVc0DgduHtxZ6xQvzW-d+zA@mail.gmail.com>
- <20110630092824.GA26690@dell.ger.corp.intel.com>
-In-Reply-To: <20110630092824.GA26690@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: RE: [PATCH obexd] Return correct obex service driver in
+ obex_session_start
+Date: Thu, 30 Jun 2011 10:01:48 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103D08A1@nasanexd01a.na.qualcomm.com>
+References: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
+ <BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
+In-Reply-To: <BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan
-
-Sometime ago we had a situation where we were testing a BT chip that did NOT support SCO over HCI and supported only SCO over PCM.
-
-The problem was whenever SCO connection was made; my host (Ubuntu) sent 2 or 3 SCO packets over HCI to the controller. 
-The controller could not handle these packets as it meant as only a SCO over PCM device and crashed.
-
- So we had to drop the SCO packets in the HCI transport driver explicitly.
-So, when we say in the configuration file that SCO is over PCM should the stack make sure that no SCO packets are sent over HCI?
-
-Note: This was observed long time before, not sure if it is relevant now.
-
-Regards
-Suraj
+SGksIEx1aXoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEx1aXogQXVndXN0
+byB2b24gRGVudHogW21haWx0bzpsdWl6LmRlbnR6QGdtYWlsLmNvbV0gDQpTZW50OiAyMDEx5bm0
+NuaciDMw5pelIDE2OjI1DQpUbzogTGksIE5hbWkNCkNjOiBsaW51eC1ibHVldG9vdGhAdmdlci5r
+ZXJuZWwub3JnOyBMaSwgTmFtaQ0KU3ViamVjdDogUmU6IFtQQVRDSCBvYmV4ZF0gUmV0dXJuIGNv
+cnJlY3Qgb2JleCBzZXJ2aWNlIGRyaXZlciBpbiBvYmV4X3Nlc3Npb25fc3RhcnQNCg0KSGksDQoN
+Ck9uIFRodSwgSnVuIDMwLCAyMDExIGF0IDEwOjM0IEFNLCBIdWkgTGkgPG5hbWkubGlAYXRoZXJv
+cy5jb20+IHdyb3RlOg0KPiBGcm9tOiBIdWkgTGkgPG5hbWlAcWNhLnF1YWxjb21tLmNvbT4NCj4N
+Cj4gwqBUaGUgb3JpZ2luYWwgcmV0dXJuIHZhbHVlIGlzIE5VTEwuDQo+IC0tLQ0KPiDCoHNyYy9v
+YmV4LmMgfCDCoCDCoDMgKy0tDQo+IMKgMSBmaWxlcyBjaGFuZ2VkLCAxIGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9zcmMvb2JleC5jIGIvc3JjL29iZXgu
+Yw0KPiBpbmRleCA0OWQ5YzE4Li45Nzg4OTRlIDEwMDY0NA0KPiAtLS0gYS9zcmMvb2JleC5jDQo+
+ICsrKyBiL3NyYy9vYmV4LmMNCj4gQEAgLTEzNzcsOCArMTM3Nyw3IEBAIGludCBvYmV4X3Nlc3Np
+b25fc3RhcnQoR0lPQ2hhbm5lbCAqaW8sIHVpbnQxNl90IA0KPiB0eF9tdHUsIHVpbnQxNl90IHJ4
+X210dSwNCj4NCj4gwqAgwqAgwqAgwqBvcyA9IGdfbmV3MChzdHJ1Y3Qgb2JleF9zZXNzaW9uLCAx
+KTsNCj4NCj4gLSDCoCDCoCDCoCBvcy0+c2VydmljZSA9IG9iZXhfc2VydmljZV9kcml2ZXJfZmlu
+ZChzZXJ2ZXItPmRyaXZlcnMsIE5VTEwsDQo+IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgMCwg
+TlVMTCwgMCk7DQo+ICsgwqAgwqAgwqAgb3MtPnNlcnZpY2UgPSBzZXJ2ZXItPmRyaXZlcnMtPmRh
+dGE7DQo+IMKgIMKgIMKgIMKgb3MtPnNlcnZlciA9IHNlcnZlcjsNCj4gwqAgwqAgwqAgwqBvcy0+
+cnhfbXR1ID0gcnhfbXR1ICE9IDAgPyByeF9tdHUgOiBERUZBVUxUX1JYX01UVTsNCj4gwqAgwqAg
+wqAgwqBvcy0+dHhfbXR1ID0gdHhfbXR1ICE9IDAgPyB0eF9tdHUgOiBERUZBVUxUX1RYX01UVTsN
+Cj4gLS0NCj4gMS43LjENCj4NCj4gLS0NCg0KVGhlIGlkZWEgaGVyZSBpcyB0byBpbml0aWFsaXpl
+ZCB3aXRoIE9QUCBkcml2ZXIgd2hpY2ggaGFzIG5vIHRhcmdldCB0aHVzIHRoZSBOVUxMLCBzbyBw
+aWNraW5nIHVwIHRoZSBmaXJzdCBkcml2ZXIgaW4gdGhlIGxpc3QgbWF5IG5vdCBlbm91Z2guIEJ0
+dywgaWYgcGFzc2luZyBhIE5VTEwgd2FzIGEgYnVnIE9QUCBkcml2ZXIgd291bGQgbmV2ZXIgaGF2
+ZSB3b3JrZWQsIHNvIEkgd29uZGVyIGhvdyB5b3UgbWFuYWdlZCB0byBnZXQgbm8gZHJpdmVyIGFz
+IGEgcmVzcG9uc2UgdG8gTlVMTCB0YXJnZXQ/DQoNCg0KDQotLQ0KTHVpeiBBdWd1c3RvIHZvbiBE
+ZW50eg0KDQoNCldlbGwsIGlmIHRoZSBwcm9maWxlIGlzIE9QUCwgdGhlbiB5b3UgY2FuIGdldCBj
+b3JyZWN0IHNlcnZpY2UgZHJpdmVyLiBCdXQgaWYgdGhlIHByb2ZpbGUgaXMgRlRQLCBiZWNhdXNl
+IGluIGZ0cC5jOg0KDQpzdGF0aWMgc3RydWN0IG9iZXhfc2VydmljZV9kcml2ZXIgZnRwID0gew0K
+CS5uYW1lID0gIkZpbGUgVHJhbnNmZXIgc2VydmVyIiwNCgkuc2VydmljZSA9IE9CRVhfRlRQLA0K
+CS5jaGFubmVsID0gRlRQX0NIQU5ORUwsDQoJLnBzbSA9IEZUUF9QU00sDQoJLnJlY29yZCA9IEZU
+UF9SRUNPUkQsDQoJLnRhcmdldCA9IEZUUF9UQVJHRVQsDQoJLnRhcmdldF9zaXplID0gVEFSR0VU
+X1NJWkUsDQoJLmNvbm5lY3QgPSBmdHBfY29ubmVjdCwNCgkuZ2V0ID0gZnRwX2dldCwNCgkucHV0
+ID0gZnRwX3B1dCwNCgkuY2hrcHV0ID0gZnRwX2Noa3B1dCwNCgkuc2V0cGF0aCA9IGZ0cF9zZXRw
+YXRoLA0KCS5kaXNjb25uZWN0ID0gZnRwX2Rpc2Nvbm5lY3QNCn07DQpJdGBzIHRhcmdldCBpcyBu
+b3QgbnVsbCwgdGFyZ2V0X3NpemUgaXMgMTYsIHNvICIgb2JleF9zZXJ2aWNlX2RyaXZlcl9maW5k
+KHNlcnZlci0+ZHJpdmVycywgTlVMTCwwLCBOVUxMLCAwKSIgd2lsbCByZXR1cm4gbnVsbC4NCg0K
+QW5kIElgbSBub3QgcGlja2luZyB1cCB0aGUgZmlyc3QgZHJpdmVyIGluIHRoZSBsaXN0LCBhY3R1
+YWxseSBpdCBpcyB0aGUgb25seSBvbmUgaW4gdGhlIGxpc3QuDQoNCg0KDQpSZWdhcmRzLA0KTmFt
+aQ0KDQoNCg0K
