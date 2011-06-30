@@ -1,20 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 30 Jun 2011 02:47:05 -0600
-Message-ID: <BANLkTikVuJ4RdV4Ng1ROh9Oc80K6p8ZQBw@mail.gmail.com>
-Subject: sco routing
-From: Brad Midgley <bmidgley@gmail.com>
+From: ilia.kolominsky@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Ilia Kolomisnky <iliak@ti.com>
+Subject: [PATCH] bluetooth-next: Fixes l2cap incomming connection establishment when defer_setup is enabled.
+Date: Thu, 30 Jun 2011 06:40:58 +0300
+Message-Id: <1309405258-25697-1-git-send-email-iliak@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+From: Ilia Kolomisnky <iliak@ti.com>
 
-I'm experimenting with a gumstix board that routes sco over pcm. Is
-there any way to automate this, or should I be rolling my own helper
-using d-bus to make the connection and then point the audio client at
-the codec where the pcm arrives?
+PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
+( probably after the df3c3931e commit ) the l2cap connection
+could not be established in case when the "Auth Complete" HCI
+event does not arive before the initiator send "Configuration
+request", in which case l2cap replies with "Command rejected"
+since the channel is still in BT_CONNECT2 state.
 
+Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+---
+ net/bluetooth/l2cap_core.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9ec9c8c..0d9699b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2530,7 +2530,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 
+ 	sk = chan->sk;
+ 
+-	if (chan->state != BT_CONFIG) {
++	if ((!bt_sk(sk)->defer_setup) && (chan->state != BT_CONFIG)) {
+ 		struct l2cap_cmd_rej rej;
+ 
+ 		rej.reason = cpu_to_le16(0x0002);
 -- 
-Brad Midgley
+1.7.1
+
