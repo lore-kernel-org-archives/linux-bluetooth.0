@@ -2,94 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 5/5] Bluetooth: Remove enable_smp parameter
-Date: Thu, 30 Jun 2011 19:20:56 -0300
-Message-Id: <1309472456-24674-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 4/5] Bluetooth: Add lmp_host_le_capable() macro
+Date: Thu, 30 Jun 2011 19:20:55 -0300
+Message-Id: <1309472456-24674-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
 References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The enable_smp parameter is no longer needed. It can be replaced by
-checking lmp_host_le_capable.
+Since we have the extended LMP features properly implemented, we
+should check the LMP_HOST_LE bit to know if the host supports LE.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c |   15 +--------------
- net/bluetooth/smp.c      |    9 +++++++++
- 2 files changed, 10 insertions(+), 14 deletions(-)
+ include/net/bluetooth/hci.h      |    3 +++
+ include/net/bluetooth/hci_core.h |    3 +++
+ net/bluetooth/hci_core.c         |    2 +-
+ 3 files changed, 7 insertions(+), 1 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5f37822..5004e36 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -219,6 +219,9 @@ enum {
+ #define LMP_INQ_TX_PWR	0x02
+ #define LMP_EXTFEATURES	0x80
+ 
++/* Extended LMP features */
++#define LMP_HOST_LE	0x02
++
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+ #define HCI_CM_HOLD	0x0001
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cd65f0e..005e3bb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -580,6 +580,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+ #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+ 
++/* ----- Extended LMP capabilities ----- */
++#define lmp_host_le_capable(dev)   ((dev)->extfeatures[0] & LMP_HOST_LE)
++
+ /* ----- HCI protocols ----- */
+ struct hci_proto {
+ 	char		*name;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ecc584d..5742aee 100644
+index 0029e17..ecc584d 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -60,8 +60,6 @@ static void hci_tx_task(unsigned long arg);
+@@ -542,7 +542,7 @@ int hci_dev_open(__u16 dev)
+ 		ret = __hci_request(hdev, hci_init_req, 0,
+ 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
  
- static DEFINE_RWLOCK(hci_task_lock);
+-		if (lmp_le_capable(hdev))
++		if (lmp_host_le_capable(hdev))
+ 			ret = __hci_request(hdev, hci_le_init_req, 0,
+ 					msecs_to_jiffies(HCI_INIT_TIMEOUT));
  
--static int enable_smp;
--
- /* HCI device list */
- LIST_HEAD(hci_dev_list);
- DEFINE_RWLOCK(hci_dev_list_lock);
-@@ -1368,14 +1366,6 @@ int hci_add_adv_entry(struct hci_dev *hdev,
- 	return 0;
- }
- 
--static struct crypto_blkcipher *alloc_cypher(void)
--{
--	if (enable_smp)
--		return crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
--
--	return ERR_PTR(-ENOTSUPP);
--}
--
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
- {
-@@ -1460,7 +1450,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	if (!hdev->workqueue)
- 		goto nomem;
- 
--	hdev->tfm = alloc_cypher();
-+	hdev->tfm = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(hdev->tfm))
- 		BT_INFO("Failed to load transform for ecb(aes): %ld",
- 							PTR_ERR(hdev->tfm));
-@@ -2352,6 +2342,3 @@ static void hci_cmd_task(unsigned long arg)
- 		}
- 	}
- }
--
--module_param(enable_smp, bool, 0644);
--MODULE_PARM_DESC(enable_smp, "Enable SMP support (LE only)");
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a36f870..ba55bd4 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -434,6 +434,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 
- 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
- 
-+	if (!lmp_host_le_capable(hcon->hdev))
-+		return 1;
-+
- 	if (IS_ERR(hcon->hdev->tfm))
- 		return 1;
- 
-@@ -477,6 +480,12 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 	__u8 reason;
- 	int err = 0;
- 
-+	if (!lmp_host_le_capable(conn->hcon->hdev)) {
-+		err = -ENOTSUPP;
-+		reason = SMP_PAIRING_NOTSUPP;
-+		goto done;
-+	}
-+
- 	if (IS_ERR(conn->hcon->hdev->tfm)) {
- 		err = PTR_ERR(conn->hcon->hdev->tfm);
- 		reason = SMP_PAIRING_NOTSUPP;
 -- 
 1.7.4.1
 
