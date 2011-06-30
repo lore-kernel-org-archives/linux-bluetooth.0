@@ -1,54 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jun 2011 18:07:17 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-2.6 2011-06-30
-Message-ID: <20110630210717.GD25602@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1309465011.5023.85.camel@novo.hadess.net>
+References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1309465011.5023.85.camel@novo.hadess.net>
+Date: Thu, 30 Jun 2011 16:59:06 -0400
+Message-ID: <BANLkTi=X__bC+4gAKuYzhvYPP-S3+QWGkw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] Add Proximity API
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi,
 
-A lot of new code, a lot of new bugs. This pull request has really important
-fixes for 3.0. There are here two regression fixes, a hidp deadlock hang up
-of the system fix from Peter Hurley. As the commit messages says it is a
-partial revert from a commit that adds kthread to hidp. And L2CAP incoming
-connection request fix that was breaking one test in the PTS suit,
-that is, breaking interop. Patch is based on code from Ilia Kolomisnky.
-Also, a buffer overflow fix by Dan Rosenberg and finally Tomas Targownik fixed
-a memory leak on failed connections attempts that seems to be around since
-2006!!
+On Thu, Jun 30, 2011 at 4:16 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Thu, 2011-06-30 at 15:24 -0300, Claudio Takahasi wrote:
+>> Covers the Proximity Reporter for Link Loss, Tx Power and Immediate
+>> Alert services. This first proposal considers that the connections
+>> will be managed by the bluetoothd core based on the registered
+>> connection callbacks.
+>
+> Any examples of possible uses, or hardware implementing those?
 
-Please pull, or let me know any concerns you have.
+It is a LE-only GATT profile. So any Bluetooth 4.0 certified hardware
+should be able to run the Proximity and Find Me profiles. But I'm not
+aware of any Bluetooth 4.0 hardware selling for general consumers (I
+heard of a notebook with it sometime ago on this list).
 
-	Gustavo
+For use cases, you should really take a look at the Bluetooth Low
+Energy concept as a whole. See bluetooth.org for details.
 
-The following changes since commit fa7ccfb17033bfb5bca86f6b909cab0b807efbc0:
+> Is this
+> good enough to implement both sides of the profile, or just one side of
+> it?
 
-  rtlwifi: rtl8192se: Handle duplicate PCI ID 0x10ec:0x8192 conflict with r8192e_pci (2011-06-20 14:56:56 -0400)
+The API is for the Proximity Monitor role. The Proximity Reporter role
+will usually run on LE single mode (very low power, coin cell battery)
+devices, but we will have a basic Proximity Reporter for testing
+purposes as well, which could be later expanded to a full featured
+Reporter.
 
-are available in the git repository at:
-  master.kernel.org:/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git master
+> Is this something that could require UI being written?
 
-Dan Rosenberg (1):
-      Bluetooth: Prevent buffer overflow in l2cap config request
+For sure. This is just the D-Bus API, some graphical/console
+application must be written to use it. We will provide test scripts
+under the test/ directory.
 
-Gustavo F. Padovan (1):
-      Bluetooth: Fix regression with incoming L2CAP connections
-
-Peter Hurley (1):
-      Bluetooth: Fix hidp disconnect deadlocks and lost wakeup
-
-Tomas Targownik (1):
-      Bluetooth: Fix memory leak under page timeouts
-
- net/bluetooth/hci_conn.c   |    3 +++
- net/bluetooth/hidp/core.c  |   18 +++++++++++-------
- net/bluetooth/hidp/hidp.h  |    1 +
- net/bluetooth/l2cap_core.c |    5 +++--
- 4 files changed, 18 insertions(+), 9 deletions(-)
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
