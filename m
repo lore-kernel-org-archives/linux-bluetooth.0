@@ -1,153 +1,312 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] Make use of g_slist_free_full when elements are dynamically-allocated
-Date: Thu, 30 Jun 2011 14:11:34 +0300
-Message-Id: <1309432294-14898-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/6 v3] Make use of g_slist_free_full on audio plugin
+Date: Thu, 30 Jun 2011 13:55:08 +0300
+Message-Id: <1309431308-13570-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This avoid having to iterate twice in the list to free its elements.
 ---
- plugins/bluetooth.c         |    8 +++-----
- plugins/pbap.c              |    7 ++++---
- plugins/phonebook-dummy.c   |    3 +--
- plugins/phonebook-tracker.c |    5 ++---
- plugins/vcard.c             |   17 +++++------------
- 5 files changed, 15 insertions(+), 25 deletions(-)
+v2 did not apply upstream
 
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index b126717..0c50a54 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -546,7 +546,7 @@ static void *bluetooth_start(struct obex_server *server, int *err)
- 	return ios;
+ audio/a2dp.c             |   16 +++++-----------
+ audio/avdtp.c            |   13 ++++---------
+ audio/headset.c          |    7 +++----
+ audio/media.c            |    5 ++---
+ audio/telephony-maemo6.c |   17 +++++++++--------
+ audio/telephony-ofono.c  |   24 ++++++++++++++++--------
+ audio/unix.c             |   19 +++++++------------
+ 7 files changed, 46 insertions(+), 55 deletions(-)
+
+diff --git a/audio/a2dp.c b/audio/a2dp.c
+index f3e7af3..4fbd651 100644
+--- a/audio/a2dp.c
++++ b/audio/a2dp.c
+@@ -163,10 +163,8 @@ static void setup_free(struct a2dp_setup *s)
+ 	setups = g_slist_remove(setups, s);
+ 	if (s->session)
+ 		avdtp_unref(s->session);
+-	g_slist_foreach(s->cb, (GFunc) g_free, NULL);
+-	g_slist_free(s->cb);
+-	g_slist_foreach(s->caps, (GFunc) g_free, NULL);
+-	g_slist_free(s->caps);
++	g_slist_free_full(s->cb, g_free);
++	g_slist_free_full(s->caps, g_free);
+ 	g_free(s);
  }
  
--static void stop(gpointer data, gpointer user_data)
-+static void stop(gpointer data)
- {
- 	GIOChannel *io = data;
- 
-@@ -558,8 +558,7 @@ static void bluetooth_stop(void *data)
- {
- 	GSList *ios = data;
- 
--	g_slist_foreach(ios, stop, NULL);
--	g_slist_free(ios);
-+	g_slist_free_full(ios, stop);
- }
- 
- static struct obex_transport_driver driver = {
-@@ -589,8 +588,7 @@ static void bluetooth_exit(void)
- 	g_dbus_remove_watch(connection, listener_id);
- 
- 	if (any) {
--		g_slist_foreach(any->services, (GFunc) g_free, NULL);
--		g_slist_free(any->services);
-+		g_slist_free_full(any->services, g_free);
- 		g_free(any->path);
- 		g_free(any);
- 	}
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 0356ae7..3bb50ad 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -160,8 +160,10 @@ static const uint8_t PBAP_TARGET[TARGET_SIZE] = {
- typedef int (*cache_entry_find_f) (const struct cache_entry *entry,
- 			const char *value);
- 
--static void cache_entry_free(struct cache_entry *entry)
-+static void cache_entry_free(void *data)
- {
-+	struct cache_entry *entry = data;
-+
- 	g_free(entry->id);
- 	g_free(entry->name);
- 	g_free(entry->sound);
-@@ -222,8 +224,7 @@ static const char *cache_find(struct cache *cache, uint32_t handle)
- 
- static void cache_clear(struct cache *cache)
- {
--	g_slist_foreach(cache->entries, (GFunc) cache_entry_free, NULL);
--	g_slist_free(cache->entries);
-+	g_slist_free_full(cache->entries, cache_entry_free);
- 	cache->entries = NULL;
- }
- 
-diff --git a/plugins/phonebook-dummy.c b/plugins/phonebook-dummy.c
-index ede4643..035ec35 100644
---- a/plugins/phonebook-dummy.c
-+++ b/plugins/phonebook-dummy.c
-@@ -186,8 +186,7 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
- 		close(fd);
- 	}
- 
--	g_slist_foreach(sorted, (GFunc) g_free, NULL);
--	g_slist_free(sorted);
-+	g_slist_free_full(sorted, g_free);
- 
- 	if (count)
- 		*count = n;
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d396203..35f1076 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1435,15 +1435,14 @@ static gboolean find_checked_number(GSList *numbers, const char *number)
- 	return FALSE;
- }
- 
--static void gstring_free_helper(gpointer data, gpointer user_data)
-+static void gstring_free_helper(gpointer data)
- {
- 	g_string_free(data, TRUE);
- }
- 
- static void free_data_numbers(struct phonebook_data *data)
- {
--	g_slist_foreach(data->numbers, gstring_free_helper, NULL);
--	g_slist_free(data->numbers);
-+	g_slist_free_full(data->numbers, gstring_free_helper);
- 	data->numbers = NULL;
- }
- 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index efeba17..218b7b8 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -598,7 +598,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- }
- 
- 
--static void field_free(gpointer data, gpointer user_data)
-+static void field_free(gpointer data)
- {
- 	struct phonebook_field *field = data;
- 
-@@ -611,17 +611,10 @@ void phonebook_contact_free(struct phonebook_contact *contact)
- 	if (contact == NULL)
+@@ -1548,11 +1546,8 @@ void a2dp_unregister(const bdaddr_t *src)
+ 	if (!server)
  		return;
  
--	g_slist_foreach(contact->numbers, field_free, NULL);
--	g_slist_free(contact->numbers);
+-	g_slist_foreach(server->sinks, (GFunc) a2dp_remove_sep, NULL);
+-	g_slist_free(server->sinks);
 -
--	g_slist_foreach(contact->emails, field_free, NULL);
--	g_slist_free(contact->emails);
--
--	g_slist_foreach(contact->addresses, field_free, NULL);
--	g_slist_free(contact->addresses);
--
--	g_slist_foreach(contact->urls, field_free, NULL);
--	g_slist_free(contact->urls);
-+	g_slist_free_full(contact->numbers, field_free);
-+	g_slist_free_full(contact->emails, field_free);
-+	g_slist_free_full(contact->addresses, field_free);
-+	g_slist_free_full(contact->urls, field_free);
+-	g_slist_foreach(server->sources, (GFunc) a2dp_remove_sep, NULL);
+-	g_slist_free(server->sources);
++	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_remove_sep);
++	g_slist_free_full(server->sources, (GDestroyNotify) a2dp_remove_sep);
  
- 	g_free(contact->uid);
- 	g_free(contact->fullname);
+ 	avdtp_exit(src);
+ 
+@@ -2073,8 +2068,7 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+ 
+ 	/* Copy given caps if they are different than current caps */
+ 	if (setup->caps != caps) {
+-		g_slist_foreach(setup->caps, (GFunc) g_free, NULL);
+-		g_slist_free(setup->caps);
++		g_slist_free_full(setup->caps, g_free);
+ 		setup->caps = g_slist_copy(caps);
+ 	}
+ 
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 44df636..e8a4007 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -797,11 +797,8 @@ static void stream_free(struct avdtp_stream *stream)
+ 	if (stream->io_id)
+ 		g_source_remove(stream->io_id);
+ 
+-	g_slist_foreach(stream->callbacks, (GFunc) g_free, NULL);
+-	g_slist_free(stream->callbacks);
+-
+-	g_slist_foreach(stream->caps, (GFunc) g_free, NULL);
+-	g_slist_free(stream->caps);
++	g_slist_free_full(stream->callbacks, g_free);
++	g_slist_free_full(stream->caps, g_free);
+ 
+ 	g_free(stream);
+ }
+@@ -1235,8 +1232,7 @@ void avdtp_unref(struct avdtp *session)
+ 	if (session->req)
+ 		pending_req_free(session->req);
+ 
+-	g_slist_foreach(session->seps, (GFunc) g_free, NULL);
+-	g_slist_free(session->seps);
++	g_slist_free_full(session->seps, g_free);
+ 
+ 	g_free(session->buf);
+ 
+@@ -2800,8 +2796,7 @@ static gboolean avdtp_get_capabilities_resp(struct avdtp *session,
+ 					sep->type, sep->media_type);
+ 
+ 	if (sep->caps) {
+-		g_slist_foreach(sep->caps, (GFunc) g_free, NULL);
+-		g_slist_free(sep->caps);
++		g_slist_free_full(sep->caps, g_free);
+ 		sep->caps = NULL;
+ 		sep->codec = NULL;
+ 		sep->delay_reporting = FALSE;
+diff --git a/audio/headset.c b/audio/headset.c
+index 5a38877..8e63afc 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -445,8 +445,7 @@ static void pending_connect_finalize(struct audio_device *dev)
+ 
+ 	g_slist_foreach(p->callbacks, (GFunc) pending_connect_complete, dev);
+ 
+-	g_slist_foreach(p->callbacks, (GFunc) g_free, NULL);
+-	g_slist_free(p->callbacks);
++	g_slist_free_full(p->callbacks, g_free);
+ 
+ 	if (p->io) {
+ 		g_io_channel_shutdown(p->io, TRUE, NULL);
+@@ -2051,6 +2050,7 @@ static DBusMessage *hs_set_property(DBusConnection *conn,
+ 
+ 	return btd_error_invalid_args(msg);
+ }
++
+ static GDBusMethodTable headset_methods[] = {
+ 	{ "Connect",		"",	"",	hs_connect,
+ 						G_DBUS_METHOD_FLAG_ASYNC },
+@@ -2163,8 +2163,7 @@ static void headset_free(struct audio_device *dev)
+ 
+ 	headset_close_rfcomm(dev);
+ 
+-	g_slist_foreach(hs->nrec_cbs, (GFunc) g_free, NULL);
+-	g_slist_free(hs->nrec_cbs);
++	g_slist_free_full(hs->nrec_cbs, g_free);
+ 
+ 	g_free(hs);
+ 	dev->headset = NULL;
+diff --git a/audio/media.c b/audio/media.c
+index bbb77cf..a58e96f 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -408,9 +408,8 @@ static void path_free(void *data)
+ {
+ 	struct media_adapter *adapter = data;
+ 
+-	g_slist_foreach(adapter->endpoints, (GFunc) media_endpoint_release,
+-									NULL);
+-	g_slist_free(adapter->endpoints);
++	g_slist_free_full(adapter->endpoints,
++				(GDestroyNotify) media_endpoint_release);
+ 
+ 	dbus_connection_unref(adapter->conn);
+ 
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index cad4475..14d1ead 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -448,8 +448,10 @@ void telephony_device_connected(void *telephony_device)
+ 	}
+ }
+ 
+-static void pending_req_finalize(struct pending_req *req)
++static void pending_req_finalize(void *data)
+ {
++	struct pending_req *req = data;
++
+ 	if (!dbus_pending_call_get_completed(req->call))
+ 		dbus_pending_call_cancel(req->call);
+ 
+@@ -1486,8 +1488,10 @@ static void handle_hal_property_modified(DBusMessage *msg)
+ 	}
+ }
+ 
+-static void csd_call_free(struct csd_call *call)
++static void csd_call_free(void *data)
+ {
++	struct csd_call *call = data;
++
+ 	if (!call)
+ 		return;
+ 
+@@ -1975,16 +1979,13 @@ void telephony_exit(void)
+ 	g_slist_free(active_calls);
+ 	active_calls = NULL;
+ 
+-	g_slist_foreach(calls, (GFunc) csd_call_free, NULL);
+-	g_slist_free(calls);
++	g_slist_free_full(calls, csd_call_free);
+ 	calls = NULL;
+ 
+-	g_slist_foreach(pending, (GFunc) pending_req_finalize, NULL);
+-	g_slist_free(pending);
++	g_slist_free_full(pending, pending_req_finalize);
+ 	pending = NULL;
+ 
+-	g_slist_foreach(watches, (GFunc) remove_watch, NULL);
+-	g_slist_free(watches);
++	g_slist_free_full(pending, remove_watch);
+ 	watches = NULL;
+ 
+ 	dbus_connection_unref(connection);
+diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
+index 20dc907..e72734c 100644
+--- a/audio/telephony-ofono.c
++++ b/audio/telephony-ofono.c
+@@ -638,8 +638,10 @@ static gboolean iter_get_basic_args(DBusMessageIter *iter,
+ 	return type == DBUS_TYPE_INVALID ? TRUE : FALSE;
+ }
+ 
+-static void call_free(struct voice_call *vc)
++static void call_free(void *data)
+ {
++	struct voice_call *vc = data;
++
+ 	DBG("%s", vc->obj_path);
+ 
+ 	if (vc->status == CALL_STATUS_ACTIVE)
+@@ -1024,8 +1026,7 @@ static void modem_removed(const char *path)
+ 
+ 	DBG("%s", path);
+ 
+-	g_slist_foreach(calls, (GFunc) call_free, NULL);
+-	g_slist_free(calls);
++	g_slist_free_full(calls, call_free);
+ 	calls = NULL;
+ 
+ 	g_free(net.operator_name);
+@@ -1601,6 +1602,16 @@ static void remove_watch(gpointer data)
+ 	g_dbus_remove_watch(connection, GPOINTER_TO_UINT(data));
+ }
+ 
++static void pending_free(void *data)
++{
++	DBusPendingCall *call = data;
++
++	if (!dbus_pending_call_get_completed(call))
++		dbus_pending_call_cancel(call);
++
++	dbus_pending_call_unref(call);
++}
++
+ void telephony_exit(void)
+ {
+ 	DBG("");
+@@ -1611,13 +1622,10 @@ void telephony_exit(void)
+ 	if (modem_obj_path)
+ 		modem_removed(modem_obj_path);
+ 
+-	g_slist_foreach(watches, (GFunc) remove_watch, NULL);
+-	g_slist_free(watches);
++	g_slist_free_full(watches, remove_watch);
+ 	watches = NULL;
+ 
+-	g_slist_foreach(pending, (GFunc) dbus_pending_call_cancel, NULL);
+-	g_slist_foreach(pending, (GFunc) dbus_pending_call_unref, NULL);
+-	g_slist_free(pending);
++	g_slist_free_full(pending, pending_free);
+ 	pending = NULL;
+ 
+ 	dbus_connection_unref(connection);
+diff --git a/audio/unix.c b/audio/unix.c
+index b29f5f5..8ce50b0 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -97,8 +97,10 @@ static GSList *clients = NULL;
+ 
+ static int unix_sock = -1;
+ 
+-static void client_free(struct unix_client *client)
++static void client_free(void *data)
+ {
++	struct unix_client *client = data;
++
+ 	DBG("client_free(%p)", client);
+ 
+ 	if (client->cancel && client->dev && client->req_id > 0)
+@@ -107,10 +109,7 @@ static void client_free(struct unix_client *client)
+ 	if (client->sock >= 0)
+ 		close(client->sock);
+ 
+-	if (client->caps) {
+-		g_slist_foreach(client->caps, (GFunc) g_free, NULL);
+-		g_slist_free(client->caps);
+-	}
++	g_slist_free_full(client->caps, g_free);
+ 
+ 	g_free(client->interface);
+ 	g_free(client);
+@@ -1493,11 +1492,8 @@ static int handle_a2dp_transport(struct unix_client *client,
+ 			!g_str_equal(client->interface, AUDIO_SOURCE_INTERFACE))
+ 		return -EIO;
+ 
+-	if (client->caps) {
+-		g_slist_foreach(client->caps, (GFunc) g_free, NULL);
+-		g_slist_free(client->caps);
+-		client->caps = NULL;
+-	}
++	g_slist_free_full(client->caps, g_free);
++	client->caps = NULL;
+ 
+ 	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+ 						NULL, 0);
+@@ -1907,8 +1903,7 @@ int unix_init(void)
+ 
+ void unix_exit(void)
+ {
+-	g_slist_foreach(clients, (GFunc) client_free, NULL);
+-	g_slist_free(clients);
++	g_slist_free_full(clients, client_free);
+ 	if (unix_sock >= 0) {
+ 		close(unix_sock);
+ 		unix_sock = -1;
 -- 
 1.7.5.4
 
