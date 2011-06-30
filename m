@@ -1,40 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: ilia.kolominsky@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH] bluetooth-next: Fixes l2cap incomming connection establishment when defer_setup is enabled.
-Date: Thu, 30 Jun 2011 06:40:58 +0300
-Message-Id: <1309405258-25697-1-git-send-email-iliak@ti.com>
+MIME-Version: 1.0
+In-Reply-To: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
+References: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
+Date: Thu, 30 Jun 2011 11:24:44 +0300
+Message-ID: <BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
+Subject: Re: [PATCH obexd] Return correct obex service driver in obex_session_start
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Hui Li <nami.li@atheros.com>
+Cc: linux-bluetooth@vger.kernel.org, Hui Li <nami@qca.qualcomm.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ilia Kolomisnky <iliak@ti.com>
+Hi,
 
-PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
-( probably after the df3c3931e commit ) the l2cap connection
-could not be established in case when the "Auth Complete" HCI
-event does not arive before the initiator send "Configuration
-request", in which case l2cap replies with "Command rejected"
-since the channel is still in BT_CONNECT2 state.
+On Thu, Jun 30, 2011 at 10:34 AM, Hui Li <nami.li@atheros.com> wrote:
+> From: Hui Li <nami@qca.qualcomm.com>
+>
+>  The original return value is NULL.
+> ---
+>  src/obex.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/obex.c b/src/obex.c
+> index 49d9c18..978894e 100644
+> --- a/src/obex.c
+> +++ b/src/obex.c
+> @@ -1377,8 +1377,7 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+>
+>        os = g_new0(struct obex_session, 1);
+>
+> -       os->service = obex_service_driver_find(server->drivers, NULL,
+> -                                                       0, NULL, 0);
+> +       os->service = server->drivers->data;
+>        os->server = server;
+>        os->rx_mtu = rx_mtu != 0 ? rx_mtu : DEFAULT_RX_MTU;
+>        os->tx_mtu = tx_mtu != 0 ? tx_mtu : DEFAULT_TX_MTU;
+> --
+> 1.7.1
+>
+> --
 
-Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
----
- net/bluetooth/l2cap_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+The idea here is to initialized with OPP driver which has no target
+thus the NULL, so picking up the first driver in the list may not
+enough. Btw, if passing a NULL was a bug OPP driver would never have
+worked, so I wonder how you managed to get no driver as a response to
+NULL target?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9ec9c8c..0d9699b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2530,7 +2530,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 
- 	sk = chan->sk;
- 
--	if (chan->state != BT_CONFIG) {
-+	if ((!bt_sk(sk)->defer_setup) && (chan->state != BT_CONFIG)) {
- 		struct l2cap_cmd_rej rej;
- 
- 		rej.reason = cpu_to_le16(0x0002);
+
+
 -- 
-1.7.1
-
+Luiz Augusto von Dentz
