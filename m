@@ -2,89 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 6/8] Add support for getting the Encryption Key Size via btio
-Date: Fri,  1 Jul 2011 16:12:36 -0300
-Message-Id: <1309547558-9617-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 5/8] Fix using "magic" values for key types
+Date: Fri,  1 Jul 2011 16:12:35 -0300
+Message-Id: <1309547558-9617-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1309547558-9617-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1309547558-9617-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some profiles specify some restriction depending on the length
-of the key used to encrypt the link, this adds an way to retrieve
-that value from the kernel.
-
-Current kernels don't provide this information so the size is
-always zero.
+Now that we have macros for the different type of keys we should
+use them to make the code clearer.
 ---
- btio/btio.c     |   21 +++++++++++++++++++++
- btio/btio.h     |    1 +
- lib/bluetooth.h |    1 +
- 3 files changed, 23 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   10 ++++++----
+ src/event.c      |   19 ++++++++++++++++---
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index e84f6d0..426c584 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -501,6 +501,22 @@ static int l2cap_set_flushable(int sock, gboolean flushable)
- 	return 0;
- }
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9df348a..db8a79f 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -954,12 +954,12 @@ static void link_key_notify(int index, void *ptr)
+ 	DBG("local auth 0x%02x and remote auth 0x%02x",
+ 					conn->loc_auth, conn->rem_auth);
  
-+static gboolean get_key_size(int sock, BtIOType type, int *size,
-+								GError **err)
-+{
-+	struct bt_security sec;
-+	socklen_t len;
-+
-+	memset(&sec, 0, sizeof(sec));
-+	len = sizeof(sec);
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
-+		*size = sec.key_size;
-+		return TRUE;
+-	if (key_type == 0x06) {
++	if (key_type == HCI_LK_CHANGED_COMBINATION) {
+ 		/* Some buggy controller combinations generate a changed
+ 		 * combination key for legacy pairing even when there's no
+ 		 * previous key */
+ 		if (conn->rem_auth == 0xff && old_key_type == 0xff)
+-			key_type = 0x00;
++			key_type = HCI_LK_COMBINATION;
+ 		else if (old_key_type != 0xff)
+ 			key_type = old_key_type;
+ 		else
+@@ -971,7 +971,7 @@ static void link_key_notify(int index, void *ptr)
+ 	key_info->type = key_type;
+ 
+ 	/* Skip the storage check if this is a debug key */
+-	if (key_type == 0x03)
++	if (key_type == HCI_LK_DEBUG_COMBINATION)
+ 		goto done;
+ 
+ 	/* Store the link key persistently if one of the following is true:
+@@ -985,7 +985,9 @@ static void link_key_notify(int index, void *ptr)
+ 	 * If none of the above match only keep the link key around for
+ 	 * this connection and set the temporary flag for the device.
+ 	 */
+-	if (key_type < 0x03 || (key_type == 0x06 && old_key_type != 0xff) ||
++	if (key_type < HCI_LK_DEBUG_COMBINATION ||
++			(key_type == HCI_LK_CHANGED_COMBINATION
++					&& old_key_type != 0xff) ||
+ 			(conn->loc_auth > 0x01 && conn->rem_auth > 0x01) ||
+ 			(conn->loc_auth == 0x02 || conn->loc_auth == 0x03) ||
+ 			(conn->rem_auth == 0x02 || conn->rem_auth == 0x03)) {
+diff --git a/src/event.c b/src/event.c
+index 9cdb5e1..2d7958b 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -444,11 +444,24 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 
+ 	DBG("storing link key of type 0x%02x", key_type);
+ 
+-	if (key_type & 0x10)
++	switch (key_type) {
++	case HCI_LK_COMBINATION:
++	case HCI_LK_LOCAL_UNIT:
++	case HCI_LK_REMOTE_UNIT:
++	case HCI_LK_DEBUG_COMBINATION:
++	case HCI_LK_UNAUTH_COMBINATION:
++	case HCI_LK_AUTH_COMBINATION:
++	case HCI_LK_CHANGED_COMBINATION:
++		ret = write_link_key(local, peer, key, key_type, pin_length);
++		break;
++	case HCI_LK_SMP_LTK:
+ 		ret = store_longtermkey(local, peer, key, key_type, pin_length,
+ 								dlen, data);
+-	else
+-		ret = write_link_key(local, peer, key, key_type, pin_length);
++		break;
++	default:
++		ret = -ENOTSUP;
++		break;
 +	}
-+
-+	return FALSE;
-+}
-+
- static gboolean l2cap_set(int sock, int sec_level, uint16_t imtu,
- 				uint16_t omtu, uint8_t mode, int master,
- 				int flushable, GError **err)
-@@ -845,6 +861,11 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 						va_arg(args, int *), err))
- 				return FALSE;
- 			break;
-+		case BT_IO_OPT_KEY_SIZE:
-+			if (!get_key_size(sock, BT_IO_L2CAP,
-+						va_arg(args, int *), err))
-+				return FALSE;
-+			break;
- 		case BT_IO_OPT_PSM:
- 			*(va_arg(args, uint16_t *)) = src.l2_psm ?
- 						src.l2_psm : dst.l2_psm;
-diff --git a/btio/btio.h b/btio/btio.h
-index c6b736f..eaa9874 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -52,6 +52,7 @@ typedef enum {
- 	BT_IO_OPT_DEST_BDADDR,
- 	BT_IO_OPT_DEFER_TIMEOUT,
- 	BT_IO_OPT_SEC_LEVEL,
-+	BT_IO_OPT_KEY_SIZE,
- 	BT_IO_OPT_CHANNEL,
- 	BT_IO_OPT_SOURCE_CHANNEL,
- 	BT_IO_OPT_DEST_CHANNEL,
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 738e07a..1492139 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -63,6 +63,7 @@ extern "C" {
- #define BT_SECURITY	4
- struct bt_security {
- 	uint8_t level;
-+	uint8_t key_size;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
+ 
+ 	if (ret == 0 && device_is_temporary(device))
+ 		device_set_temporary(device, FALSE);
 -- 
 1.7.6
 
