@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
-References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
-	<1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
-	<20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
-Date: Fri, 1 Jul 2011 06:56:31 -0400
-Message-ID: <BANLkTinRy=wJHPduQ0QUvKq7jtnvHhUycw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] Bluetooth: Add enable_le module parameter
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A2BA4C12@EXDCVYMBSTM005.EQ1STM.local>
+References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1309465011.5023.85.camel@novo.hadess.net>
+	<BANLkTi=X__bC+4gAKuYzhvYPP-S3+QWGkw@mail.gmail.com>
+	<AFCDDB4A3EA003429EEF1E7B211FDBBA33A2BA4C12@EXDCVYMBSTM005.EQ1STM.local>
+Date: Fri, 1 Jul 2011 06:50:15 -0400
+Message-ID: <BANLkTikCHccP+-_dopoAWrAMFdwh8LHaQw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] Add Proximity API
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: Andre Guedes <andre.guedes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Arun,
 
-On Fri, Jul 1, 2011 at 5:09 AM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
->> +static void hci_set_le_support(struct hci_dev *hdev)
->> +{
->> +     struct hci_cp_write_le_host_supported cp;
->> +
->> +     memset(&cp, 0, sizeof(cp));
->> +
->> +     if (enable_le) {
->> +             cp.le = 1;
->> +             cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
+On Fri, Jul 1, 2011 at 3:22 AM, Arun Kumar SINGH
+<arunkr.singh@stericsson.com> wrote:
+> Hello Anderson,
 >
-> Typo?
+>>>> Covers the Proximity Reporter for Link Loss, Tx Power and Immediate
+>
+> [clip ...]
+>
+>>> Is this
+>>> good enough to implement both sides of the profile, or just one side of
+>>> it?
+>>
+>>The API is for the Proximity Monitor role.
+>
+> Sounds bit confusing.. Ain't these API's being proposed for Proximity Reporter Role which is what Claudio mentioned in the original RFC? Which bring me to the next question- since a GATT client makes more sense for a dual mode stack such as Bluez, shouldn't we focus first on Monitor kind of roles for LE profiles and later consider Reporter type roles for testing only?
 
-Usually this is a trick (used in other parts of the kernel) to assign
-only 0 or 1 to a variable based on a value where non-zero means
-"true". It is equivalent to:
+Sorry, actually it was a mistake from Claudio (which I hadn't noticed
+when I made my comments) :) This is a *Monitor* API as I mentioned.
+The doc itself mentions:
 
-if (hdev->features[6] & LMP_SIMUL_LE_BR)
-    cp.simul = 1;
-else
-    cp.simul = 0;
++Interface      org.bluez.ProximityMonitor
 
-(yes, I came across this same feeling when I saw this for the first
-time on bluetooth kernel code)
+And you are correct, our current focus is on Proximity Monitor & Find
+Me Locator (AKA "client") roles. The "server" roles will be initially
+implemented for testing purposes.
 
 Regards,
 -- 
