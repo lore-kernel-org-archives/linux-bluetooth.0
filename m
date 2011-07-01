@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH obexd 1/2] Return empty body instead -ENOENT when phonebook is empty
-Date: Fri,  1 Jul 2011 13:42:42 +0200
-Message-Id: <1309520562-19408-1-git-send-email-michalski.raf@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
+References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
+	<1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
+	<20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
+Date: Fri, 1 Jul 2011 06:56:31 -0400
+Message-ID: <BANLkTinRy=wJHPduQ0QUvKq7jtnvHhUycw@mail.gmail.com>
+Subject: Re: [PATCH 3/5] Bluetooth: Add enable_le module parameter
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously, when doing pull of empty phonebook, NOT FOUND error was
-returned. Now returning empty body - this change is needed to pass PTS
-testcase TC_PSE_PDF_BV_05_I (this testcase is optional).
+Hi Andrei,
 
-PBAP spec says, that error NOT_FOUND should be returned when phonebook object
-could not be found - very strict clients may think that phonebook does not exist
-(and in scenario described above phonebook exists but its content is empty).
----
- plugins/pbap.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Fri, Jul 1, 2011 at 5:09 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+>> +static void hci_set_le_support(struct hci_dev *hdev)
+>> +{
+>> +     struct hci_cp_write_le_host_supported cp;
+>> +
+>> +     memset(&cp, 0, sizeof(cp));
+>> +
+>> +     if (enable_le) {
+>> +             cp.le = 1;
+>> +             cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
+>
+> Typo?
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 0356ae7..ab1d9ce 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -301,7 +301,7 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
- 
- 	pbap->obj->lastpart = lastpart;
- 
--	if (vcards <= 0) {
-+	if (vcards < 0) {
- 		obex_object_set_io_flags(pbap->obj, G_IO_ERR, -ENOENT);
- 		return;
- 	}
+Usually this is a trick (used in other parts of the kernel) to assign
+only 0 or 1 to a variable based on a value where non-zero means
+"true". It is equivalent to:
+
+if (hdev->features[6] & LMP_SIMUL_LE_BR)
+    cp.simul = 1;
+else
+    cp.simul = 0;
+
+(yes, I came across this same feeling when I saw this for the first
+time on bluetooth kernel code)
+
+Regards,
 -- 
-1.6.3.3
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
