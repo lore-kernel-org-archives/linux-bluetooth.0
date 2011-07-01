@@ -1,40 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1308741214.6042.81.camel@novo.hadess.net>
-References: <1308275200-17393-1-git-send-email-lucas.demarchi@profusion.mobi> <1308741214.6042.81.camel@novo.hadess.net>
+In-Reply-To: <1309557544.8855.5.camel@aeonflux>
+References: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi> <1309557544.8855.5.camel@aeonflux>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 1 Jul 2011 19:43:39 -0300
-Message-ID: <BANLkTimZvHdFCHMfTAHXjXzzre6ccMO9CQ@mail.gmail.com>
-Subject: Re: [PATCH v2] build: Add support for systemd service configuration
-To: Bastien Nocera <hadess@hadess.net>
+Date: Fri, 1 Jul 2011 19:32:06 -0300
+Message-ID: <BANLkTikkQYXvJGqtXH2ecywO2OWaqAf2WQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add common macro for safely deriving the size of array
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Marcel,
 
-On Wed, Jun 22, 2011 at 8:13 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Thu, 2011-06-16 at 22:46 -0300, Lucas De Marchi wrote:
->> ---
->>  .gitignore               |    1 +
->>  Makefile.am              |    8 +++++++-
->>  configure.ac             |   11 ++++++++++-
->>  src/bluetooth.service.in |   12 ++++++++++++
->>  4 files changed, 30 insertions(+), 2 deletions(-)
->>  create mode 100644 src/bluetooth.service.in
+On Fri, Jul 1, 2011 at 6:59 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> It seems to be pretty much the same as Lennart's patch which I posted
-> last year:
-> http://thread.gmane.org/gmane.linux.bluez.kernel/8645
+> Hi Lucas,
 >
-> Any reasons why you cooked up your own? What are the differences?
+> > This provides a simple ARRAY_SIZE() macro, which (given a good compiler)
+> > will also break compile if you try to use it on a pointer. This can
+> > ensure your code is robust to changes, without needing a gratuitous
+> > macro or constant. Credits to Rusty Russell
+> > (http://ccan.ozlabs.org/info/array_size.html)
+> >
+> > Having a util.h file, this kind of things can be shared among all users
+> > and we can remove all the declarations of ARRAY_SIZE.
+> > ---
+> >  acinclude.m4 |   22 ++++++++++++++++++++++
+> >  configure.ac |    1 +
+> >  src/util.h   |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 78 insertions(+), 0 deletions(-)
+> >  create mode 100644 src/util.h
+>
+> I am not sure that I actually want this. Where are the use cases of
+> ARRAY_SIZE actually. Maybe we should just change them with proper NULL
+> terminated arrays or other constants.
 
-I didn't see that patch before sending these ones.
+The uses cases are in the second patch. I added this because I was
+going to use it for the AVRCP patches.
 
-But it's a bit different from what we have in ConnMan and oFono. I've
-based mine on these other projects since I already participated on
-them and I'm starting on BlueZ now.
+Why do you prefer NULL terminated arrays in case the content is static?
 
-regards,
+
+
+Regards,
 Lucas De Marchi
