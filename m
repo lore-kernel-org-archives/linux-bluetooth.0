@@ -1,83 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <000e0ce00a58298def04a6fca5b9@google.com>
-References: <BANLkTim5MekMVbzZE34g_V6v0QJVj7c9xA@mail.gmail.com>
-	<000e0ce00a58298def04a6fca5b9@google.com>
-Date: Fri, 1 Jul 2011 08:06:58 +0100
-Message-ID: <BANLkTinMnC3VsCKkxz5NP400yPotfj8bxA@mail.gmail.com>
-Subject: Re: Delivery Status Notification (Failure)
-From: Eponymous - <the.epon@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <EC94610F2568494D8D9291885C48D3103D0DC8@nasanexd01a.na.qualcomm.com>
+References: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
+	<BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
+	<EC94610F2568494D8D9291885C48D3103D08A1@nasanexd01a.na.qualcomm.com>
+	<BANLkTi=YQcF-s+k2b26Rj5WeB--TOGsoHw@mail.gmail.com>
+	<EC94610F2568494D8D9291885C48D3103D0DC8@nasanexd01a.na.qualcomm.com>
+Date: Fri, 1 Jul 2011 09:52:19 +0300
+Message-ID: <BANLkTim9SSkDPpaeQbADkFMBobC2nvXiag@mail.gmail.com>
+Subject: Re: [PATCH obexd] Return correct obex service driver in obex_session_start
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Li, Nami" <nami@qca.qualcomm.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hmm, is this patch included/due to be included in later releases of
-btusb? It sounds like a bug if you can't send ACL/SCO packets over a
-RAW socket.... Am I wrong?
+Hi,
 
-How exactly is everything packaged up? Is btusb part of the bluez
-suite or is it a separate packaged?
-
-Cheers.
-
-
-> On Fri, Jul 1, 2011 at 7:59 AM, Markus Burvall <
-> markus.burvall@swedenconnectivity.com> wrote:
+On Fri, Jul 1, 2011 at 5:50 AM, Li, Nami <nami@qca.qualcomm.com> wrote:
 >
->> **
->> Hello,
+>
+> -----Original Message-----
+> From: Slawomir Bochenski [mailto:lkslawek@gmail.com]
+> Sent: 2011年6月30日 18:26
+> To: Li, Nami
+> Cc: Luiz Augusto von Dentz; linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH obexd] Return correct obex service driver in obex_session_start
+>
+> On Thu, Jun 30, 2011 at 12:01 PM, Li, Nami <nami@qca.qualcomm.com> wrote:
+>> Well, if the profile is OPP, then you can get correct service driver. But if the profile is FTP, because in ftp.c:
 >>
->> For non SCO packets the fix from Kim works.
+>> static struct obex_service_driver ftp = {
+>>        .name = "File Transfer server",
+>>        .service = OBEX_FTP,
+>>        .channel = FTP_CHANNEL,
+>>        .psm = FTP_PSM,
+>>        .record = FTP_RECORD,
+>>        .target = FTP_TARGET,
+>>        .target_size = TARGET_SIZE,
+>>        .connect = ftp_connect,
+>>        .get = ftp_get,
+>>        .put = ftp_put,
+>>        .chkput = ftp_chkput,
+>>        .setpath = ftp_setpath,
+>>        .disconnect = ftp_disconnect
+>> };
+>> It`s target is not null, target_size is 16, so " obex_service_driver_find(server->drivers, NULL,0, NULL, 0)" will return null.
 >>
->> Recompile btusb.c and use RAW mode.
->>
->> However it didn't work work SCO over RAW.
->>
->> http://lkml.org/lkml/2010/4/7/146
->>
->> Best Regards, Markus
->>
->>
->> On 2011-07-01 08:46, Eponymous - wrote:
->>
->> Thanks for the information.
->>
->> Hmm, I'm not sure what you mean about a "raw hci" socket. Could you
->> tell me how I can check this?
->>
->> I'm using a custom program that can communicate directly to the chip
->> over hci using bluez as a go-between. Does this help?
->>
->> Cheers.
->>
->> On Thu, Jun 30, 2011 at 4:47 PM, Peter Hurley <peter@hurleysoftware.com> <peter@hurleysoftware.com> wrote:
->>
->> �On Wed, 2011-06-29 at 06:22 -0400, Eponymous - wrote:
->>
->> �Thanks for your reply Peter.
->>
->> Sorry if I came across a bit rude there, it is just very frustrating
->> sometimes :)
->>
->> �I get it. BT can be <arggghhh>...
->>
->>
->> �You mentioned enabling debug messages for btusb and bluetooth. Do you
->> by any chance know how to do this?
->>
->> �I always run a debug kernel. My relevant build settings in the "Kernel
->> hacking" submenu are:
->> �Kernel Debugging => DEBUG_KERNEL=y
->> �Debug Filesystem => DEBUG_FS=y
->> �Compile the kernel with debug info => DEBUG_INFO=y
->> and most importantly,
->> �Enable dynamic printk() support DYNAMIC_DEBUG=y
->>
->> Then read the short dynamic debug howto in the kernel documentation:
->> Documentation/dynamic-debug-howto.txt (there are some copies online as
->> well if that's easier).
->>
->> Then when I want to see debug messages, I just enable those source
->> files. Eg.,
->> # echo -n 'file hci_core.
+>> And I`m not picking up the first driver in the list, actually it is the only one in the list.
+>
+> In case of other profiles, there is OBEX connect command required, and then the appropriate driver will be selected in callback for OBEX connect event (see cmd_connect()).
+>
+> --
+> Slawomir Bochenski
+>
+>
+> Yep, you can get right diver after cmd_connect(). But I think user should get correct driver once obex session start, not after connect cmd. What if user want to use driver in obex_session_start() ? I need to use it when add OBEX over L2CAP.
+> For OPP, it doesn`t register target and target size in opp.c. So when you call "obex_service_driver_find(server->drivers, NULL, 0, NULL, 0); ", it also returns on first and only list member:
+>
+>                                          if (memncmp0(target, target_size, driver->target,driver->target_size) == 0)                   return driver;
+> which is actually ===>    if (memncmp0(NULL,0, NULL,0) == 0)                    return driver;
+>
+>
+> So I think my patch is OK.
+
+There is no guarantee that the opp will be the first in the list, nor
+that the first driver will have no target which is consider the
+default, so Im not sure why you are needing this for OBEX over L2CAP
+since you still need to figure out what is the real driver on
+connect_cmd. Also the sentence about the obex_session_start having to
+get the correct driver makes no sense to me, we only know the target
+on connect_cmd so we can only guess on obex_session_start that it is
+an OPP session, or do you have a better default? Btw, if you are
+planning to match the psm/channel with service driver, I believe that
+is not a good idea since on some transports there could be no such
+separation e.g. usb.
+
+-- 
+Luiz Augusto von Dentz
