@@ -1,93 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 1 Jul 2011 01:57:25 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: "Li, Steven" <yongli@qca.qualcomm.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Add Atheros AR3012 one PID/VID supported
+Message-ID: <20110701045725.GC5117@joana>
+References: <73DDB75979F36A42B75F3E2B6EB2943401031D5E@nasanexd02c.na.qualcomm.com>
+ <20110630211149.GE25602@joana>
 MIME-Version: 1.0
-In-Reply-To: <1309448838.2276.137.camel@THOR>
-References: <BANLkTimHaJaCjawT2JuW0kH18ihkyVr5Yg@mail.gmail.com>
-	<1307122514.2622.75.camel@THOR>
-	<BANLkTi=aFRa7wm5EUyq9kLur1Cp0sxchhA@mail.gmail.com>
-	<1309448838.2276.137.camel@THOR>
-Date: Fri, 1 Jul 2011 07:46:02 +0100
-Message-ID: <BANLkTin45Kchz-=1+W=XUWYSXt1o48kerg@mail.gmail.com>
-Subject: Re: HCI data payload not getting through when using BlueZ
-From: Eponymous - <the.epon@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110630211149.GE25602@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for the information.
+* Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-30 18:11:49 -0300]:
 
-Hmm, I'm not sure what you mean about a "raw hci" socket. Could you
-tell me how I can check this?
+> * Li, Steven <yongli@qca.qualcomm.com> [2011-06-29 07:14:47 +0000]:
+> 
+> > 
+> > The new Ath3k needs to download patch and radio table,
+> > and it keeps same PID/VID even after downloading the patch and radio
+> > table. This patch is to use the bcdDevice (Device Release Number) to
+> > judge whether the chip has been patched or not. The init bcdDevice
+> > value of the chip is 0x0001, this value increases after patch and
+> > radio table downloading.
+> > 
+> > Signed-off-by: Steven.Li <yongli@qca.qualcomm.com>
+> > ---
+> >  drivers/bluetooth/ath3k.c |    5 +++++
+> >  drivers/bluetooth/btusb.c |   12 +++++++++++-
+> >  2 files changed, 16 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> > index 6bacef3..a585473 100644
+> > --- a/drivers/bluetooth/ath3k.c
+> > +++ b/drivers/bluetooth/ath3k.c
+> > @@ -375,6 +375,11 @@ static int ath3k_probe(struct usb_interface *intf,
+> >  
+> >  	/* load patch and sysconfig files for AR3012 */
+> >  	if (id->driver_info & BTUSB_ATH3012) {
+> > +
+> > +		/* New firmware with patch and sysconfig files already loaded */
+> > +		if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
+> > +			return -ENODEV;
+> > +
+> >  		ret = ath3k_load_patch(udev);
+> >  		if (ret < 0) {
+> >  			BT_ERR("Loading patch file failed");
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index c2de895..91d13a9 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -54,6 +54,7 @@ static struct usb_driver btusb_driver;
+> >  #define BTUSB_BCM92035		0x10
+> >  #define BTUSB_BROKEN_ISOC	0x20
+> >  #define BTUSB_WRONG_SCO_MTU	0x40
+> > +#define BTUSB_ATH3012		0x80
+> >  
+> >  static struct usb_device_id btusb_table[] = {
+> >  	/* Generic Bluetooth USB device */
+> > @@ -110,7 +111,7 @@ static struct usb_device_id blacklist_table[] = {
+> >  	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+> >  
+> >  	/* Atheros 3012 with sflash firmware */
+> > -	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_IGNORE },
+> > +	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+> >  
+> >  	/* Atheros AR5BBU12 with sflash firmware */
+> >  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+> > @@ -914,6 +915,15 @@ static int btusb_probe(struct usb_interface *intf,
+> >  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
+> >  		return -ENODEV;
+> >  
+> > +	if (id->driver_info & BTUSB_ATH3012) {
+> > +		struct usb_device *udev = interface_to_usbdev(intf);
+> > +
+> > +		/* Old firmware would otherwise let ath3k driver load
+> > +		 * patch and sysconfig files */
+> > +		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
+> > +			return -ENODEV;
+> > +	}
+> > +
+> 
+> Patch does no apply
+> 
+> Applying: Bluetooth: Add Atheros AR3012 one PID/VID supported
+> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:14: trailing whitespace.
+> 
+> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:15: trailing whitespace.
+>                 /* New firmware with patch and sysconfig files already loaded */
+> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:16: trailing whitespace.
+>                 if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
+> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:17: trailing whitespace.
+>                         return -ENODEV;
+> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:18: trailing whitespace.
 
-I'm using a custom program that can communicate directly to the chip
-over hci using bluez as a go-between. Does this help?
+Heh, your patch is in base64, hence why it does not apply. Resend it using
+git-send-email, please.
 
-Cheers.
-
-On Thu, Jun 30, 2011 at 4:47 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> On Wed, 2011-06-29 at 06:22 -0400, Eponymous - wrote:
->> Thanks for your reply Peter.
->>
->> Sorry if I came across a bit rude there, it is just very frustrating
->> sometimes :)
->
-> I get it. BT can be <arggghhh>...
->
->> You mentioned enabling debug messages for btusb and bluetooth. Do you
->> by any chance know how to do this?
->
-> I always run a debug kernel. My relevant build settings in the "Kernel
-> hacking" submenu are:
->  Kernel Debugging => DEBUG_KERNEL=y
->  Debug Filesystem => DEBUG_FS=y
->  Compile the kernel with debug info => DEBUG_INFO=y
-> and most importantly,
->  Enable dynamic printk() support DYNAMIC_DEBUG=y
->
-> Then read the short dynamic debug howto in the kernel documentation:
-> Documentation/dynamic-debug-howto.txt (there are some copies online as
-> well if that's easier).
->
-> Then when I want to see debug messages, I just enable those source
-> files. Eg.,
-> # echo -n 'file hci_core.c +p' > /sys/kernel/debug/dynamic_debug/control
-> # echo -n 'file hci_conn.c +p' ...
-> # echo -n 'file hci_event.c +p' ...
->
-> Plus, it's easy to add your own if you suspect a particular code path.
->
-> If you have more questions about this, come ask on IRC #bluez.
->
->> On Fri, Jun 3, 2011 at 6:35 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
->> > Although it's not at all clear from your posts, I'm assuming that you're
->> > using a raw HCI socket in a user-space utility.
->
-> Are you using a raw HCI socket?
->
->> > My guess is that the btusb kernel driver is dropping your ACL packet
->> > without transmitting it. If you look at drivers/bluetooth/btusb.c. in
->> > the btusb_send_frame() function, you'll see:
->> >
->> >        switch (bt_cb(skb)->pkt_type) {
->> >                ....
->> >        case HCI_ACLDATA_PKT:
->> >                if (!data->bulk_tx_ep || hdev->conn_hash.acl_num < 1)
->> >                        return -ENODEV;
->> >
->> > The only way that hdev->conn_hash.acl_num will be 1+ is if the
->> > establishment of an ACL connection went through hci_connect() with a
->> > connection type of ACL_LINK. This code was added when SCO support was
->> > added back in Aug 2008.
->
-> My point here is this is probably a bug in btusb - raw HCI sockets
-> should be able to send *any* packet.
->
-> If you can confirm you're on a raw HCI socket, I can explore a fix but
-> you'll be the test subject <grin>.
->
-> Let me know,
-> Peter Hurley
->
->
->
+	Gustavo
