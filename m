@@ -1,101 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jul 2011 01:57:25 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: "Li, Steven" <yongli@qca.qualcomm.com>,
+From: "Li, Nami" <nami@qca.qualcomm.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Add Atheros AR3012 one PID/VID supported
-Message-ID: <20110701045725.GC5117@joana>
-References: <73DDB75979F36A42B75F3E2B6EB2943401031D5E@nasanexd02c.na.qualcomm.com>
- <20110630211149.GE25602@joana>
+Subject: RE: [PATCH obexd] Return correct obex service driver in
+ obex_session_start
+Date: Fri, 1 Jul 2011 02:50:46 +0000
+Message-ID: <EC94610F2568494D8D9291885C48D3103D0DC8@nasanexd01a.na.qualcomm.com>
+References: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
+	<BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
+	<EC94610F2568494D8D9291885C48D3103D08A1@nasanexd01a.na.qualcomm.com>
+ <BANLkTi=YQcF-s+k2b26Rj5WeB--TOGsoHw@mail.gmail.com>
+In-Reply-To: <BANLkTi=YQcF-s+k2b26Rj5WeB--TOGsoHw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110630211149.GE25602@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Gustavo F. Padovan <padovan@profusion.mobi> [2011-06-30 18:11:49 -0300]:
-
-> * Li, Steven <yongli@qca.qualcomm.com> [2011-06-29 07:14:47 +0000]:
-> 
-> > 
-> > The new Ath3k needs to download patch and radio table,
-> > and it keeps same PID/VID even after downloading the patch and radio
-> > table. This patch is to use the bcdDevice (Device Release Number) to
-> > judge whether the chip has been patched or not. The init bcdDevice
-> > value of the chip is 0x0001, this value increases after patch and
-> > radio table downloading.
-> > 
-> > Signed-off-by: Steven.Li <yongli@qca.qualcomm.com>
-> > ---
-> >  drivers/bluetooth/ath3k.c |    5 +++++
-> >  drivers/bluetooth/btusb.c |   12 +++++++++++-
-> >  2 files changed, 16 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> > index 6bacef3..a585473 100644
-> > --- a/drivers/bluetooth/ath3k.c
-> > +++ b/drivers/bluetooth/ath3k.c
-> > @@ -375,6 +375,11 @@ static int ath3k_probe(struct usb_interface *intf,
-> >  
-> >  	/* load patch and sysconfig files for AR3012 */
-> >  	if (id->driver_info & BTUSB_ATH3012) {
-> > +
-> > +		/* New firmware with patch and sysconfig files already loaded */
-> > +		if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
-> > +			return -ENODEV;
-> > +
-> >  		ret = ath3k_load_patch(udev);
-> >  		if (ret < 0) {
-> >  			BT_ERR("Loading patch file failed");
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index c2de895..91d13a9 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -54,6 +54,7 @@ static struct usb_driver btusb_driver;
-> >  #define BTUSB_BCM92035		0x10
-> >  #define BTUSB_BROKEN_ISOC	0x20
-> >  #define BTUSB_WRONG_SCO_MTU	0x40
-> > +#define BTUSB_ATH3012		0x80
-> >  
-> >  static struct usb_device_id btusb_table[] = {
-> >  	/* Generic Bluetooth USB device */
-> > @@ -110,7 +111,7 @@ static struct usb_device_id blacklist_table[] = {
-> >  	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
-> >  
-> >  	/* Atheros 3012 with sflash firmware */
-> > -	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_IGNORE },
-> > +	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-> >  
-> >  	/* Atheros AR5BBU12 with sflash firmware */
-> >  	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
-> > @@ -914,6 +915,15 @@ static int btusb_probe(struct usb_interface *intf,
-> >  	if (ignore_sniffer && id->driver_info & BTUSB_SNIFFER)
-> >  		return -ENODEV;
-> >  
-> > +	if (id->driver_info & BTUSB_ATH3012) {
-> > +		struct usb_device *udev = interface_to_usbdev(intf);
-> > +
-> > +		/* Old firmware would otherwise let ath3k driver load
-> > +		 * patch and sysconfig files */
-> > +		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
-> > +			return -ENODEV;
-> > +	}
-> > +
-> 
-> Patch does no apply
-> 
-> Applying: Bluetooth: Add Atheros AR3012 one PID/VID supported
-> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:14: trailing whitespace.
-> 
-> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:15: trailing whitespace.
->                 /* New firmware with patch and sysconfig files already loaded */
-> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:16: trailing whitespace.
->                 if (le16_to_cpu(udev->descriptor.bcdDevice) > 0x0001)
-> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:17: trailing whitespace.
->                         return -ENODEV;
-> /home/padovan/p/linux-trees/bluetooth-next-2.6/.git/rebase-apply/patch:18: trailing whitespace.
-
-Heh, your patch is in base64, hence why it does not apply. Resend it using
-git-send-email, please.
-
-	Gustavo
+DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBTbGF3b21pciBCb2NoZW5za2kg
+W21haWx0bzpsa3NsYXdla0BnbWFpbC5jb21dIA0KU2VudDogMjAxMeW5tDbmnIgzMOaXpSAxODoy
+Ng0KVG86IExpLCBOYW1pDQpDYzogTHVpeiBBdWd1c3RvIHZvbiBEZW50ejsgbGludXgtYmx1ZXRv
+b3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSCBvYmV4ZF0gUmV0dXJuIGNv
+cnJlY3Qgb2JleCBzZXJ2aWNlIGRyaXZlciBpbiBvYmV4X3Nlc3Npb25fc3RhcnQNCg0KT24gVGh1
+LCBKdW4gMzAsIDIwMTEgYXQgMTI6MDEgUE0sIExpLCBOYW1pIDxuYW1pQHFjYS5xdWFsY29tbS5j
+b20+IHdyb3RlOg0KPiBXZWxsLCBpZiB0aGUgcHJvZmlsZSBpcyBPUFAsIHRoZW4geW91IGNhbiBn
+ZXQgY29ycmVjdCBzZXJ2aWNlIGRyaXZlci4gQnV0IGlmIHRoZSBwcm9maWxlIGlzIEZUUCwgYmVj
+YXVzZSBpbiBmdHAuYzoNCj4NCj4gc3RhdGljIHN0cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVyIGZ0
+cCA9IHsNCj4gwqAgwqAgwqAgwqAubmFtZSA9ICJGaWxlIFRyYW5zZmVyIHNlcnZlciIsDQo+IMKg
+IMKgIMKgIMKgLnNlcnZpY2UgPSBPQkVYX0ZUUCwNCj4gwqAgwqAgwqAgwqAuY2hhbm5lbCA9IEZU
+UF9DSEFOTkVMLA0KPiDCoCDCoCDCoCDCoC5wc20gPSBGVFBfUFNNLA0KPiDCoCDCoCDCoCDCoC5y
+ZWNvcmQgPSBGVFBfUkVDT1JELA0KPiDCoCDCoCDCoCDCoC50YXJnZXQgPSBGVFBfVEFSR0VULA0K
+PiDCoCDCoCDCoCDCoC50YXJnZXRfc2l6ZSA9IFRBUkdFVF9TSVpFLA0KPiDCoCDCoCDCoCDCoC5j
+b25uZWN0ID0gZnRwX2Nvbm5lY3QsDQo+IMKgIMKgIMKgIMKgLmdldCA9IGZ0cF9nZXQsDQo+IMKg
+IMKgIMKgIMKgLnB1dCA9IGZ0cF9wdXQsDQo+IMKgIMKgIMKgIMKgLmNoa3B1dCA9IGZ0cF9jaGtw
+dXQsDQo+IMKgIMKgIMKgIMKgLnNldHBhdGggPSBmdHBfc2V0cGF0aCwNCj4gwqAgwqAgwqAgwqAu
+ZGlzY29ubmVjdCA9IGZ0cF9kaXNjb25uZWN0DQo+IH07DQo+IEl0YHMgdGFyZ2V0IGlzIG5vdCBu
+dWxsLCB0YXJnZXRfc2l6ZSBpcyAxNiwgc28gIiBvYmV4X3NlcnZpY2VfZHJpdmVyX2ZpbmQoc2Vy
+dmVyLT5kcml2ZXJzLCBOVUxMLDAsIE5VTEwsIDApIiB3aWxsIHJldHVybiBudWxsLg0KPg0KPiBB
+bmQgSWBtIG5vdCBwaWNraW5nIHVwIHRoZSBmaXJzdCBkcml2ZXIgaW4gdGhlIGxpc3QsIGFjdHVh
+bGx5IGl0IGlzIHRoZSBvbmx5IG9uZSBpbiB0aGUgbGlzdC4NCg0KSW4gY2FzZSBvZiBvdGhlciBw
+cm9maWxlcywgdGhlcmUgaXMgT0JFWCBjb25uZWN0IGNvbW1hbmQgcmVxdWlyZWQsIGFuZCB0aGVu
+IHRoZSBhcHByb3ByaWF0ZSBkcml2ZXIgd2lsbCBiZSBzZWxlY3RlZCBpbiBjYWxsYmFjayBmb3Ig
+T0JFWCBjb25uZWN0IGV2ZW50IChzZWUgY21kX2Nvbm5lY3QoKSkuDQoNCi0tDQpTbGF3b21pciBC
+b2NoZW5za2kNCg0KDQpZZXAsIHlvdSBjYW4gZ2V0IHJpZ2h0IGRpdmVyIGFmdGVyIGNtZF9jb25u
+ZWN0KCkuIEJ1dCBJIHRoaW5rIHVzZXIgc2hvdWxkIGdldCBjb3JyZWN0IGRyaXZlciBvbmNlIG9i
+ZXggc2Vzc2lvbiBzdGFydCwgbm90IGFmdGVyIGNvbm5lY3QgY21kLiBXaGF0IGlmIHVzZXIgd2Fu
+dCB0byB1c2UgZHJpdmVyIGluIG9iZXhfc2Vzc2lvbl9zdGFydCgpID8gSSBuZWVkIHRvIHVzZSBp
+dCB3aGVuIGFkZCBPQkVYIG92ZXIgTDJDQVAuDQpGb3IgT1BQLCBpdCBkb2VzbmB0IHJlZ2lzdGVy
+IHRhcmdldCBhbmQgdGFyZ2V0IHNpemUgaW4gb3BwLmMuIFNvIHdoZW4geW91IGNhbGwgIm9iZXhf
+c2VydmljZV9kcml2ZXJfZmluZChzZXJ2ZXItPmRyaXZlcnMsIE5VTEwsIDAsIE5VTEwsIDApOyAi
+LCBpdCBhbHNvIHJldHVybnMgb24gZmlyc3QgYW5kIG9ubHkgbGlzdCBtZW1iZXI6DQoNCgkJCQkJ
+ICBpZiAobWVtbmNtcDAodGFyZ2V0LCB0YXJnZXRfc2l6ZSwgZHJpdmVyLT50YXJnZXQsZHJpdmVy
+LT50YXJnZXRfc2l6ZSkgPT0gMCkJCQlyZXR1cm4gZHJpdmVyOw0Kd2hpY2ggaXMgYWN0dWFsbHkg
+PT09PiAgICBpZiAobWVtbmNtcDAoTlVMTCwwLCBOVUxMLDApID09IDApCQkJcmV0dXJuIGRyaXZl
+cjsNCg0KDQpTbyBJIHRoaW5rIG15IHBhdGNoIGlzIE9LLg0KDQpSZWdhcmRzLA0KTmFtaQ0KDQoN
+Cg0K
