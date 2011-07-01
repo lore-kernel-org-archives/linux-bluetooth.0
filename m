@@ -2,72 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 07/12] Bluetooth: Use the link key list to temporarily store the STK
-Date: Fri,  1 Jul 2011 16:07:42 -0300
-Message-Id: <1309547267-9514-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 06/12] Bluetooth: Add support for storing the LTK
+Date: Fri,  1 Jul 2011 16:07:41 -0300
+Message-Id: <1309547267-9514-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this we can use only one place to store all keys, without
-need to use a field in the connection structure for this
-purpose.
+Now when the LTK is received from the remote or generated it is stored,
+so it can later be used.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   23 +++++++++++++++--------
- 1 files changed, 15 insertions(+), 8 deletions(-)
+ net/bluetooth/smp.c |   20 ++++++++++++++------
+ 1 files changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 024bb3e..34d236d 100644
+index c7a0cbe..024bb3e 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -390,29 +390,36 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	}
+@@ -493,18 +493,23 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
  
- 	if (conn->hcon->out) {
-+		u8 stk[16], rand[8];
- 		__le16 ediv;
--		u8 rand[8];
+ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	BT_DBG("conn %p", conn);
+-	/* FIXME: store the ltk */
++	struct smp_cmd_encrypt_info *rp = (void *) skb->data;
 +
-+		memset(rand, 0, sizeof(rand));
-+		ediv = 0;
- 
- 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
--		swap128(key, hcon->ltk);
-+		swap128(key, stk);
- 
--		memset(hcon->ltk + conn->smp_key_size, 0,
-+		memset(stk + conn->smp_key_size, 0,
- 				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
- 
-+		hci_le_start_enc(hcon, ediv, rand, stk);
-+	} else {
-+		u8 stk[16], r[16], rand[8];
-+		__le16 ediv;
++	skb_pull(skb, sizeof(*rp));
 +
- 		memset(rand, 0, sizeof(rand));
- 		ediv = 0;
--		hci_le_start_enc(hcon, ediv, rand, hcon->ltk);
--	} else {
--		u8 r[16];
- 
- 		swap128(conn->prnd, r);
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(r), r);
- 
- 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
--		swap128(key, hcon->ltk);
-+		swap128(key, stk);
- 
--		memset(hcon->ltk + conn->smp_key_size, 0,
-+		memset(stk + conn->smp_key_size, 0,
- 				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++	memcpy(conn->tk, rp->ltk, sizeof(conn->tk));
 +
-+		hci_add_ltk(conn->hcon->hdev, 0, conn->dst, ediv, rand, stk);
- 	}
- 
  	return 0;
+ }
+ 
+ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+-	struct smp_cmd_pairing *paircmd = (void *) &conn->prsp[1];
+-	u8 keydist = paircmd->init_key_dist;
++	struct smp_cmd_master_ident *rp = (void *) skb->data;
++
++	skb_pull(skb, sizeof(*rp));
+ 
+-	BT_DBG("keydist 0x%x", keydist);
+-	/* FIXME: store ediv and rand */
++	hci_add_ltk(conn->hcon->hdev, 1, conn->src, rp->ediv,
++						rp->rand, conn->tk);
+ 
+ 	smp_distribute_keys(conn, 1);
+ 
+@@ -623,6 +628,9 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
+ 
++		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, ediv,
++							ident.rand, enc.ltk);
++
+ 		ident.ediv = cpu_to_le16(ediv);
+ 
+ 		smp_send_cmd(conn, SMP_CMD_MASTER_IDENT, sizeof(ident), &ident);
 -- 
 1.7.6
 
