@@ -1,42 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 1 Jul 2011 15:06:42 -0700
-Message-ID: <BANLkTimAe6uRCdfM2_tNSf5j9mvnA_W4Qw@mail.gmail.com>
-Subject: endless loop in client.c when read request is rejected
-From: mike tsai <mikeyhtsai@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/2] Add common macro for safely deriving the size of
+ array
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Fri, 01 Jul 2011 14:59:02 -0700
+In-Reply-To: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1309557544.8855.5.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
- While running an IOP between blueZ and a LE device, I found that if
-the LE device rejects the read_char_req with error_response
-(insufficient Encryption), the following code will make the read_req
-an endless loop,
+> This provides a simple ARRAY_SIZE() macro, which (given a good compiler)
+> will also break compile if you try to use it on a pointer. This can
+> ensure your code is robust to changes, without needing a gratuitous
+> macro or constant. Credits to Rusty Russell
+> (http://ccan.ozlabs.org/info/array_size.html)
+> 
+> Having a util.h file, this kind of things can be shared among all users
+> and we can remove all the declarations of ARRAY_SIZE.
+> ---
+>  acinclude.m4 |   22 ++++++++++++++++++++++
+>  configure.ac |    1 +
+>  src/util.h   |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 78 insertions(+), 0 deletions(-)
+>  create mode 100644 src/util.h
 
-	if (status == 0)
-		characteristic_set_value(chr, pdu + 1, len - 1);
-	else if (status == ATT_ECODE_INSUFF_ENC) {
-		GIOChannel *io = g_attrib_get_channel(gatt->attrib);
+I am not sure that I actually want this. Where are the use cases of
+ARRAY_SIZE actually. Maybe we should just change them with proper NULL
+terminated arrays or other constants.
 
-		if (bt_io_set(io, BT_IO_L2CAP, NULL,
-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
-				BT_IO_OPT_INVALID)) {
+Regards
 
-                        //End Less loop here
-			gatt_read_char(gatt->attrib, chr->handle, 0,
-					update_char_value, current);
-			return;
-		}
-	}
+Marcel
 
-   I am not sure what effect bt_io_set should have to improve the
-security (bonding?), but the code simply has no effect in my
-environment (with 2.6.39.1 kernel and latest bluez), therefore the
-read_req, error_response will continue until link is disconnected.
 
-Regards,
-
-Mike
