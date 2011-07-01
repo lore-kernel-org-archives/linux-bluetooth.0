@@ -2,133 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/2] Add common macro for safely deriving the size of array
-Date: Fri,  1 Jul 2011 15:53:20 -0300
-Message-Id: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 2/2] Use new macro for ARRAY_SIZE
+Date: Fri,  1 Jul 2011 15:53:21 -0300
+Message-Id: <1309546401-19867-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This provides a simple ARRAY_SIZE() macro, which (given a good compiler)
-will also break compile if you try to use it on a pointer. This can
-ensure your code is robust to changes, without needing a gratuitous
-macro or constant. Credits to Rusty Russell
-(http://ccan.ozlabs.org/info/array_size.html)
-
-Having a util.h file, this kind of things can be shared among all users
-and we can remove all the declarations of ARRAY_SIZE.
 ---
- acinclude.m4 |   22 ++++++++++++++++++++++
- configure.ac |    1 +
- src/util.h   |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 78 insertions(+), 0 deletions(-)
- create mode 100644 src/util.h
+ audio/ipc.c           |    3 +--
+ audio/pcm_bluetooth.c |   13 ++++++-------
+ lib/sdp.c             |    3 +--
+ test/ipctest.c        |    3 +--
+ 4 files changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index a37959a..8c2ae92 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -31,6 +31,28 @@ AC_DEFUN([AC_FUNC_PPOLL], [
- 			[Define to 1 if you need the ppoll() function.]))
- ])
+diff --git a/audio/ipc.c b/audio/ipc.c
+index 1bdad78..cf4e8e4 100644
+--- a/audio/ipc.c
++++ b/audio/ipc.c
+@@ -21,8 +21,7 @@
+  */
  
-+AC_DEFUN([AC_FUNC_TYPES_COMPATIBLE_P], [
-+	AC_CACHE_CHECK([if compiler has __builtin_types_compatible_p function],
-+		[cc_cv_func_types_compatible_p],
-+		[ac_save_CFLAGS="$CFLAGS"
-+		CFLAGS="$CFLAGS -Werror"
-+		AC_COMPILE_IFELSE([AC_LANG_SOURCE(
-+			[int some_function();
-+			int some_function() {
-+			return __builtin_types_compatible_p(char *, int) ? 1 : 0;
-+			}])],
-+			[cc_cv_func_types_compatible_p=yes],
-+			[cc_cv_func_types_compatible_p=no])
-+		CFLAGS="$ac_save_CFLAGS"
-+	])
-+
-+	AS_IF([test "x$cc_cv_func_types_compatible_p" = "xyes"],
-+		[AC_DEFINE([SUPPORT__BUILTIN_TYPES_COMPATIBLE_P], 1,
-+			[Define this if the compiler supports __builtin_types_compatible_p() function])
-+			$1],
-+		[$2])
-+])
-+
- AC_DEFUN([AC_INIT_BLUEZ], [
- 	AC_PREFIX_DEFAULT(/usr/local)
+ #include "ipc.h"
+-
+-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
++#include "util.h"
  
-diff --git a/configure.ac b/configure.ac
-index 223c9d1..fed730f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -31,6 +31,7 @@ AC_DISABLE_STATIC
- AC_PROG_LIBTOOL
+ /* This table contains the string representation for messages types */
+ static const char *strtypes[] = {
+diff --git a/audio/pcm_bluetooth.c b/audio/pcm_bluetooth.c
+index e633d1a..b20c653 100644
+--- a/audio/pcm_bluetooth.c
++++ b/audio/pcm_bluetooth.c
+@@ -43,6 +43,7 @@
+ #include "ipc.h"
+ #include "sbc.h"
+ #include "rtp.h"
++#include "util.h"
  
- AC_FUNC_PPOLL
-+AC_FUNC_TYPES_COMPATIBLE_P
+ /* #define ENABLE_DEBUG */
  
- AC_CHECK_LIB(dl, dlopen, dummy=yes,
- 			AC_MSG_ERROR(dynamic linking loader is required))
-diff --git a/src/util.h b/src/util.h
-new file mode 100644
-index 0000000..2c8a554
---- /dev/null
-+++ b/src/util.h
-@@ -0,0 +1,55 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Texas Instruments, Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+/**
-+ * BUILD_ASSERT_OR_ZERO - assert a build-time dependency, as an expression.
-+ * @cond: the compile-time condition which must be true.
-+ *
-+ * Your compile will fail if the condition isn't true, or can't be evaluated
-+ * by the compiler.  This can be used in an expression: its value is "0".
-+ *
-+ * Example:
-+ *      #define foo_to_char(foo)                                            \
-+ *              ((char *)(foo)                                              \
-+ *              + BUILD_ASSERT_OR_ZERO(offsetof(struct foo, string) == 0))
-+ */
-+#define BUILD_ASSERT_OR_ZERO(cond) \
-+	(sizeof(char [1 - 2*!(cond)]) - 1)
-+
-+#if SUPPORT__BUILTIN_TYPES_COMPATIBLE_P
-+#define _array_size_chk(arr)						\
-+	BUILD_ASSERT_OR_ZERO(!__builtin_types_compatible_p(typeof(arr), \
-+							typeof(&(arr)[0])))
-+#else
-+#define _array_size_chk(arr) 0
-+#endif
-+
-+/**
-+ * ARRAY_SIZE - get the number of elements in a visible array
-+ * @arr: the array whose size you want.
-+ *
-+ * This does not work on pointers, or arrays declared as [], or
-+ * function parameters.  With correct compiler support, such usage
-+ * will cause a build error (see build_assert).
-+ */
-+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + _array_size_chk(arr))
+@@ -1213,8 +1214,6 @@ static snd_pcm_ioplug_callback_t bluetooth_a2dp_capture = {
+ 	.poll_revents		= bluetooth_poll_revents,
+ };
+ 
+-#define ARRAY_NELEMS(a) (sizeof((a)) / sizeof((a)[0]))
+-
+ static int bluetooth_hsp_hw_constraint(snd_pcm_ioplug_t *io)
+ {
+ 	struct bluetooth_data *data = io->private_data;
+@@ -1232,13 +1231,13 @@ static int bluetooth_hsp_hw_constraint(snd_pcm_ioplug_t *io)
+ 
+ 	/* access type */
+ 	err = snd_pcm_ioplug_set_param_list(io, SND_PCM_IOPLUG_HW_ACCESS,
+-					ARRAY_NELEMS(access_list), access_list);
++					ARRAY_SIZE(access_list), access_list);
+ 	if (err < 0)
+ 		return err;
+ 
+ 	/* supported formats */
+ 	err = snd_pcm_ioplug_set_param_list(io, SND_PCM_IOPLUG_HW_FORMAT,
+-					ARRAY_NELEMS(format_list), format_list);
++					ARRAY_SIZE(format_list), format_list);
+ 	if (err < 0)
+ 		return err;
+ 
+@@ -1294,13 +1293,13 @@ static int bluetooth_a2dp_hw_constraint(snd_pcm_ioplug_t *io)
+ 
+ 	/* access type */
+ 	err = snd_pcm_ioplug_set_param_list(io, SND_PCM_IOPLUG_HW_ACCESS,
+-					ARRAY_NELEMS(access_list), access_list);
++					ARRAY_SIZE(access_list), access_list);
+ 	if (err < 0)
+ 		return err;
+ 
+ 	/* supported formats */
+ 	err = snd_pcm_ioplug_set_param_list(io, SND_PCM_IOPLUG_HW_FORMAT,
+-					ARRAY_NELEMS(format_list), format_list);
++					ARRAY_SIZE(format_list), format_list);
+ 	if (err < 0)
+ 		return err;
+ 
+@@ -1335,7 +1334,7 @@ static int bluetooth_a2dp_hw_constraint(snd_pcm_ioplug_t *io)
+ 
+ 	/* supported block sizes: */
+ 	err = snd_pcm_ioplug_set_param_list(io, SND_PCM_IOPLUG_HW_PERIOD_BYTES,
+-				ARRAY_NELEMS(period_list), period_list);
++				ARRAY_SIZE(period_list), period_list);
+ 	if (err < 0)
+ 		return err;
+ 
+diff --git a/lib/sdp.c b/lib/sdp.c
+index a48ee14..7f94cd9 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -48,12 +48,11 @@
+ #include "l2cap.h"
+ #include "sdp.h"
+ #include "sdp_lib.h"
++#include "util.h"
+ 
+ #define SDPINF(fmt, arg...) syslog(LOG_INFO, fmt "\n", ## arg)
+ #define SDPERR(fmt, arg...) syslog(LOG_ERR, "%s: " fmt "\n", __func__ , ## arg)
+ 
+-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+-
+ #ifdef SDP_DEBUG
+ #define SDPDBG(fmt, arg...) syslog(LOG_DEBUG, "%s: " fmt "\n", __func__ , ## arg)
+ #else
+diff --git a/test/ipctest.c b/test/ipctest.c
+index 9fdfac4..33801ba 100644
+--- a/test/ipctest.c
++++ b/test/ipctest.c
+@@ -42,14 +42,13 @@
+ 
+ #include "ipc.h"
+ #include "sbc.h"
++#include "util.h"
+ 
+ #define DBG(fmt, arg...)				\
+ 	printf("debug %s: " fmt "\n" , __FUNCTION__ , ## arg)
+ #define ERR(fmt, arg...)				\
+ 	fprintf(stderr, "ERROR %s: " fmt "\n" , __FUNCTION__ , ## arg)
+ 
+-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+-
+ #ifndef MIN
+ # define MIN(x, y) ((x) < (y) ? (x) : (y))
+ #endif
 -- 
 1.7.6
 
