@@ -1,61 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 1 Jul 2011 16:03:27 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Joe Perches <joe@perches.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] bluetooth: Add bt_printk
-Message-ID: <20110701190327.GD23683@joana>
-References: <20110630033119.GA3438@joana>
- <f06f1d8f4185db431a038c328c42caf4fe270dd0.1309418368.git.joe@perches.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <f06f1d8f4185db431a038c328c42caf4fe270dd0.1309418368.git.joe@perches.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 1/2] Add common macro for safely deriving the size of array
+Date: Fri,  1 Jul 2011 15:53:20 -0300
+Message-Id: <1309546401-19867-1-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joe,
+This provides a simple ARRAY_SIZE() macro, which (given a good compiler)
+will also break compile if you try to use it on a pointer. This can
+ensure your code is robust to changes, without needing a gratuitous
+macro or constant. Credits to Rusty Russell
+(http://ccan.ozlabs.org/info/array_size.html)
 
-* Joe Perches <joe@perches.com> [2011-06-30 00:19:51 -0700]:
+Having a util.h file, this kind of things can be shared among all users
+and we can remove all the declarations of ARRAY_SIZE.
+---
+ acinclude.m4 |   22 ++++++++++++++++++++++
+ configure.ac |    1 +
+ src/util.h   |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 78 insertions(+), 0 deletions(-)
+ create mode 100644 src/util.h
 
-> Add a local logging function to emit bluetooth specific
-> messages.  Using vsprintf extension %pV saves code/text
-> space.
-> 
-> Convert the current BT_INFO and BT_ERR macros to use bt_printk.
-> Remove __func__ from BT_ERR macro (and the uses).
-> Prefix "Bluetooth: " to BT_ERR
-> Remove __func__ from BT_DBG as function can be prefixed when
-> using dynamic_debug.
-> 
-> With allyesconfig:
-> 
->    text	   data	    bss	    dec	    hex	filename
->  129956	   8632	  36096	 174684	  2aa5c	drivers/bluetooth/built-in.o.new2
->  134402	   8632	  36064	 179098	  2bb9a	drivers/bluetooth/built-in.o.old
->   14778	   1012	   3408	  19198	   4afe	net/bluetooth/bnep/built-in.o.new2
->   15067	   1012	   3408	  19487	   4c1f	net/bluetooth/bnep/built-in.o.old
->  346595	  19163	  86080	 451838	  6e4fe	net/bluetooth/built-in.o.new2
->  353751	  19163	  86064	 458978	  700e2	net/bluetooth/built-in.o.old
->   18483	   1172	   4264	  23919	   5d6f	net/bluetooth/cmtp/built-in.o.new2
->   18927	   1172	   4264	  24363	   5f2b	net/bluetooth/cmtp/built-in.o.old
->   19237	   1172	   5152	  25561	   63d9	net/bluetooth/hidp/built-in.o.new2
->   19581	   1172	   5152	  25905	   6531	net/bluetooth/hidp/built-in.o.old
->   59461	   3884	  14464	  77809	  12ff1	net/bluetooth/rfcomm/built-in.o.new2
->   61206	   3884	  14464	  79554	  136c2	net/bluetooth/rfcomm/built-in.o.old
-> 
-> with x86 defconfig (and just bluetooth):
-> 
-> $ size net/bluetooth/built-in.o.defconfig.*
->    text	   data	    bss	    dec	    hex	filename
->   66358	    933	    100	  67391	  1073f	net/bluetooth/built-in.o.defconfig.new
->   66643	    933	    100	  67676	  1085c	net/bluetooth/built-in.o.defconfig.old
-> 
-> Signed-off-by: Joe Perches <joe@perches.com>
+diff --git a/acinclude.m4 b/acinclude.m4
+index a37959a..8c2ae92 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -31,6 +31,28 @@ AC_DEFUN([AC_FUNC_PPOLL], [
+ 			[Define to 1 if you need the ppoll() function.]))
+ ])
+ 
++AC_DEFUN([AC_FUNC_TYPES_COMPATIBLE_P], [
++	AC_CACHE_CHECK([if compiler has __builtin_types_compatible_p function],
++		[cc_cv_func_types_compatible_p],
++		[ac_save_CFLAGS="$CFLAGS"
++		CFLAGS="$CFLAGS -Werror"
++		AC_COMPILE_IFELSE([AC_LANG_SOURCE(
++			[int some_function();
++			int some_function() {
++			return __builtin_types_compatible_p(char *, int) ? 1 : 0;
++			}])],
++			[cc_cv_func_types_compatible_p=yes],
++			[cc_cv_func_types_compatible_p=no])
++		CFLAGS="$ac_save_CFLAGS"
++	])
++
++	AS_IF([test "x$cc_cv_func_types_compatible_p" = "xyes"],
++		[AC_DEFINE([SUPPORT__BUILTIN_TYPES_COMPATIBLE_P], 1,
++			[Define this if the compiler supports __builtin_types_compatible_p() function])
++			$1],
++		[$2])
++])
++
+ AC_DEFUN([AC_INIT_BLUEZ], [
+ 	AC_PREFIX_DEFAULT(/usr/local)
+ 
+diff --git a/configure.ac b/configure.ac
+index 223c9d1..fed730f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,6 +31,7 @@ AC_DISABLE_STATIC
+ AC_PROG_LIBTOOL
+ 
+ AC_FUNC_PPOLL
++AC_FUNC_TYPES_COMPATIBLE_P
+ 
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+diff --git a/src/util.h b/src/util.h
+new file mode 100644
+index 0000000..2c8a554
+--- /dev/null
++++ b/src/util.h
+@@ -0,0 +1,55 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  Texas Instruments, Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++/**
++ * BUILD_ASSERT_OR_ZERO - assert a build-time dependency, as an expression.
++ * @cond: the compile-time condition which must be true.
++ *
++ * Your compile will fail if the condition isn't true, or can't be evaluated
++ * by the compiler.  This can be used in an expression: its value is "0".
++ *
++ * Example:
++ *      #define foo_to_char(foo)                                            \
++ *              ((char *)(foo)                                              \
++ *              + BUILD_ASSERT_OR_ZERO(offsetof(struct foo, string) == 0))
++ */
++#define BUILD_ASSERT_OR_ZERO(cond) \
++	(sizeof(char [1 - 2*!(cond)]) - 1)
++
++#if SUPPORT__BUILTIN_TYPES_COMPATIBLE_P
++#define _array_size_chk(arr)						\
++	BUILD_ASSERT_OR_ZERO(!__builtin_types_compatible_p(typeof(arr), \
++							typeof(&(arr)[0])))
++#else
++#define _array_size_chk(arr) 0
++#endif
++
++/**
++ * ARRAY_SIZE - get the number of elements in a visible array
++ * @arr: the array whose size you want.
++ *
++ * This does not work on pointers, or arrays declared as [], or
++ * function parameters.  With correct compiler support, such usage
++ * will cause a build error (see build_assert).
++ */
++#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + _array_size_chk(arr))
+-- 
+1.7.6
 
-I applied this patch with a minimal change in the print format. I changed
-'bluetooth' to 'Bluetooth'. Thanks a lot for the patch. ;)
-
-	Gustavo
