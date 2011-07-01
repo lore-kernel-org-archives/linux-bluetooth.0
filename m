@@ -2,48 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 0/8] Permanent storage of SMP keys
-Date: Fri,  1 Jul 2011 16:12:30 -0300
-Message-Id: <1309547558-9617-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 12/12] Bluetooth: Add support for returning the encryption key size
+Date: Fri,  1 Jul 2011 16:07:47 -0300
+Message-Id: <1309547267-9514-13-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is the companion series for userspace to add support for
-storing SMP keys.
+This will be useful when userspace wants to restrict some kinds of
+operations based on the length of the key size used to encrypt the
+link.
 
-Notes:
- - Only Long Term Keys (LTKs) are stored at the moment;
- - A new file was created for storing LTKs;
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ include/net/bluetooth/bluetooth.h |    1 +
+ net/bluetooth/l2cap_sock.c        |    4 ++++
+ 2 files changed, 5 insertions(+), 0 deletions(-)
 
-Cheers,
-
-Vinicius Costa Gomes (8):
-  Add stubs for storing SMP keys
-  Add support for storing SMP keys
-  Add support for creating the device from the SMP keys
-  Define macros for link key types
-  Fix using "magic" values for key types
-  Add support for getting the Encryption Key Size via btio
-  Add support for passing the CID to btiotest
-  Add support for btiotest to returning the key size
-
- btio/btio.c       |   21 +++++++++++++++
- btio/btio.h       |    1 +
- doc/mgmt-api.txt  |    2 +
- lib/bluetooth.h   |    1 +
- lib/hci.h         |   13 +++++++++
- lib/mgmt.h        |    2 +
- plugins/hciops.c  |   12 +++++---
- plugins/mgmtops.c |   33 +++++++++++++++++------
- src/adapter.c     |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- src/adapter.h     |    2 +
- src/event.c       |   61 ++++++++++++++++++++++++++++++++++++++++---
- src/event.h       |    2 +-
- src/storage.c     |   28 ++++++++++++++++++++
- src/storage.h     |    2 +
- test/btiotest.c   |   24 +++++++++++++++--
- 15 files changed, 253 insertions(+), 25 deletions(-)
-
---
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 7bccaf9..ec10fb5 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -56,6 +56,7 @@
+ #define BT_SECURITY	4
+ struct bt_security {
+ 	__u8 level;
++	__u8 key_size;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 39082d4..4ece64f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -422,8 +422,12 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 			break;
+ 		}
+ 
++		memset(&sec, 0, sizeof(sec));
+ 		sec.level = chan->sec_level;
+ 
++		if (sk->sk_state == BT_CONNECTED)
++			sec.key_size = chan->conn->hcon->enc_key_size;
++
+ 		len = min_t(unsigned int, len, sizeof(sec));
+ 		if (copy_to_user(optval, (char *) &sec, len))
+ 			err = -EFAULT;
+-- 
 1.7.6
 
