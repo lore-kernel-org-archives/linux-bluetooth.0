@@ -1,60 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2] build: Add support for systemd service configuration
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Date: Fri, 01 Jul 2011 19:38:38 -0700
-In-Reply-To: <BANLkTinSB_DGVHHpb8PVy3j5SuWrDdb1dw@mail.gmail.com>
-References: <1308275200-17393-1-git-send-email-lucas.demarchi@profusion.mobi>
-	 <1308284110.2196.29.camel@aeonflux>
-	 <BANLkTi=K7f5n9Wb6KAoD2sCHiWG9tBRqdA@mail.gmail.com>
-	 <1309463046.2208.56.camel@aeonflux>
-	 <BANLkTinSB_DGVHHpb8PVy3j5SuWrDdb1dw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1309574321.17415.0.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <BANLkTi=iHCLfqhqtZJ-XMahXrprk0fBnWw@mail.gmail.com>
+References: <BANLkTimAe6uRCdfM2_tNSf5j9mvnA_W4Qw@mail.gmail.com>
+	<BANLkTi=iHCLfqhqtZJ-XMahXrprk0fBnWw@mail.gmail.com>
+Date: Fri, 1 Jul 2011 19:40:32 -0400
+Message-ID: <BANLkTimrY5o5hQhVfRf7UyBn-WNE1GgMNA@mail.gmail.com>
+Subject: Re: endless loop in client.c when read request is rejected
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: mike tsai <mikeyhtsai@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi again,
 
-> >> >> -DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules
-> >> >> +DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules --with-systemdunitdir=
-> >> >
-> >> > can we please do it the same way I did it for oFono and ConnMan. I have
-> >> > no idea what you are doing here. If --with-systemdunitdir is not given,
-> >> > then it should be disabled and it should be that by default.
-> >>
-> >> This is indeed the same code as in oFono and ConnMann. If
-> >> `--with-systemdunitdir' is not given it defaults to checking
-> >> `pkg-config --variable systemdsystemunitdir systemd'. So in case we
-> >> call `make distcheck' and systemd is installed, this will fail, as it
-> >> will in oFono and ConnMann. The difference is that there we have
-> >> `DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles'. I may do the same
-> >> and let `DISTCHECK_CONFIGURE_FLAGS = --disable-configfiles'. What do
-> >> you think? Then I think I could remove the `--disable-udevrules' as
-> >> well.
-> >
-> > lets do the same as we have done in ConnMan and oFono.
-> >
-> > We might just rename --disable-configfiles into --disable-datafiles to
-> > bring all three projects in sync here.
-> >
-> > The --disable-udevrules has to stay since otherwise we would install
-> > into a system directory. However we can put that under the DATAFILES
-> > conditional.
-> >
-> > Care to send a new set of patches?
-> 
-> Ok.
-> 
-> Bastien, are you going to do it or I can do it myself?
+On Fri, Jul 1, 2011 at 7:38 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Mike,
+>
+> On Fri, Jul 1, 2011 at 6:06 PM, mike tsai <mikeyhtsai@gmail.com> wrote:
+>>   I am not sure what effect bt_io_set should have to improve the
+>> security (bonding?), but the code simply has no effect in my
+>> environment (with 2.6.39.1 kernel and latest bluez), therefore the
+>> read_req, error_response will continue until link is disconnected.
+>
+> bt_io_set(..., BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH, ...) will trigger
+> SMP pairing (and block further writes until pairing is complete). I
+> believe you see the loop because your kernel does not have SMP
+> support, which has been added upstream only a few weeks ago (so should
+> come only on 3.0, I believe). Therefore SMP does never happen in your
+> case.
 
-just send me an updated patch. I wanna get this merged upstream. I was
-under the impression this got already fixed, but I was wrong.
+Forgot to mention: I still think we need a fix on BlueZ though, which
+cannot assume SMP pairing will succeed. Therefore we should have a way
+to abort the write attempt.
 
-Regards
-
-Marcel
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
