@@ -2,57 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 08/12] Bluetooth: Use the stored LTK for restabilishing security
-Date: Fri,  1 Jul 2011 16:07:43 -0300
-Message-Id: <1309547267-9514-9-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 07/12] Bluetooth: Use the link key list to temporarily store the STK
+Date: Fri,  1 Jul 2011 16:07:42 -0300
+Message-Id: <1309547267-9514-8-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that it's possible that the exchanged key is present in
-the link key list, we may be able to estabilish security with
-an already existing key, without need to perform any SMP
-procedure.
+With this we can use only one place to store all keys, without
+need to use a field in the connection structure for this
+purpose.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   15 +++++++++++++++
- 1 files changed, 15 insertions(+), 0 deletions(-)
+ net/bluetooth/smp.c |   23 +++++++++++++++--------
+ 1 files changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 34d236d..191aaec 100644
+index 024bb3e..34d236d 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -476,6 +476,20 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 	authreq = seclevel_to_authreq(sec_level);
- 
- 	if (hcon->link_mode & HCI_LM_MASTER) {
-+		struct link_key *key;
-+
-+		key = hci_find_link_key_type(hcon->hdev, conn->dst,
-+							HCI_LK_SMP_LTK);
-+		if (key) {
-+			struct key_master_id *master = (void *) key->data;
-+
-+			hci_le_start_enc(hcon, master->ediv, master->rand,
-+								key->val);
-+			goto done;
-+		}
-+	}
-+
-+	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
- 
- 		build_pairing_cmd(conn, &cp, NULL, authreq);
-@@ -492,6 +506,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+@@ -390,29 +390,36 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
  	}
  
-+done:
- 	hcon->pending_sec_level = sec_level;
- 	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
+ 	if (conn->hcon->out) {
++		u8 stk[16], rand[8];
+ 		__le16 ediv;
+-		u8 rand[8];
++
++		memset(rand, 0, sizeof(rand));
++		ediv = 0;
  
+ 		smp_s1(tfm, conn->tk, random, conn->prnd, key);
+-		swap128(key, hcon->ltk);
++		swap128(key, stk);
+ 
+-		memset(hcon->ltk + conn->smp_key_size, 0,
++		memset(stk + conn->smp_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
+ 
++		hci_le_start_enc(hcon, ediv, rand, stk);
++	} else {
++		u8 stk[16], r[16], rand[8];
++		__le16 ediv;
++
+ 		memset(rand, 0, sizeof(rand));
+ 		ediv = 0;
+-		hci_le_start_enc(hcon, ediv, rand, hcon->ltk);
+-	} else {
+-		u8 r[16];
+ 
+ 		swap128(conn->prnd, r);
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(r), r);
+ 
+ 		smp_s1(tfm, conn->tk, conn->prnd, random, key);
+-		swap128(key, hcon->ltk);
++		swap128(key, stk);
+ 
+-		memset(hcon->ltk + conn->smp_key_size, 0,
++		memset(stk + conn->smp_key_size, 0,
+ 				SMP_MAX_ENC_KEY_SIZE - conn->smp_key_size);
++
++		hci_add_ltk(conn->hcon->hdev, 0, conn->dst, ediv, rand, stk);
+ 	}
+ 
+ 	return 0;
 -- 
 1.7.6
 
