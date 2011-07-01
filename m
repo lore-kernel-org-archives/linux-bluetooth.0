@@ -1,97 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jul 2011 16:23:50 -0300
+Date: Fri, 1 Jul 2011 16:13:48 -0300
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 03/12] Bluetooth: Add functions to manipulate the link
- key list for SMP
-Message-ID: <20110701192350.GG23683@joana>
-References: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
- <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 1/6] Bluetooth: Check earlier for L2CAP ERTM frames to
+ drop
+Message-ID: <20110701191348.GF23683@joana>
+References: <1309383324-12002-1-git-send-email-mathewm@codeaurora.org>
+ <1309383324-12002-2-git-send-email-mathewm@codeaurora.org>
+ <20110630212419.GF25602@joana>
+ <alpine.DEB.2.02.1106301449130.18354@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <alpine.DEB.2.02.1106301449130.18354@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-07-01 16:07:38 -0300]:
+* Mat Martineau <mathewm@codeaurora.org> [2011-06-30 16:36:01 -0700]:
 
-> As the LTK (the new type of key being handled now) has more data
-> associated with it, we need to store this extra data and retrieve
-> the keys based on that data.
 > 
-> Methods for searching for a key and for adding a new LTK are
-> introduced here.
+> Hi Gustavo -
 > 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    5 ++
->  net/bluetooth/hci_core.c         |   81 ++++++++++++++++++++++++++++++++++++++
->  2 files changed, 86 insertions(+), 0 deletions(-)
+> On Thu, 30 Jun 2011, Gustavo F. Padovan wrote:
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index c92e89b..751104a 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -554,6 +554,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
->  struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
->  int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
->  			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
-> +struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
-> +struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-> +					bdaddr_t *bdaddr, u8 type);
-> +int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-> +					__le16 ediv, u8 rand[8], u8 ltk[16]);
->  int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
->  
->  int hci_remote_oob_data_clear(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 0029e17..bf9c023 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1059,6 +1059,50 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
->  	return 0;
->  }
->  
-> +struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-> +{
-> +	struct list_head *p;
-> +
-> +	list_for_each(p, &hdev->link_keys) {
-> +		struct link_key *k;
-> +		struct key_master_id *id;
-> +
-> +		k = list_entry(p, struct link_key, list);
+> >* Mat Martineau <mathewm@codeaurora.org> [2011-06-29 14:35:19 -0700]:
+> >
+> >>Even when the received tx_seq is expected, the frame still needs to be
+> >>dropped if the TX window is exceeded or the receiver is in the local
+> >>busy state.
+> >
+> >The check doesn't mean that TX window is exceeded, it means that we have an
+> >invalid tx_seq and connection should be closed. I don't see the point in
+> >moving the expected check to after this one.
+> >About the local busy check. Is it worth to drop expected frames when on local
+> >busy? What are the advantages/disadvantages? Drop will trigger SREJ while
+> >Store will press the buffer. Do you have measures to prove this?
+> 
+> 
+> It's possible for expected_tx_seq to be invalid if the tx window is
+> full.  Therefore it is important to check for an invalid tx_seq
+> before checking if it is expected.
+> 
+> 
+> Dropping frames during local busy is a good idea because:
+> 
+>  * Queuing frames during local busy ignores the receive buffer
+> limits requested by the application with SO_RCVBUF.  This problem
+> gets worse with extended window sizes, where the busy_q could be
+> quite large
+>  * ERTM senders are not supposed to send frames during local busy
+> anyway
+>  * The spec allows for packets to be dropped in local busy (look for
+> "StoreOrIgnore")
+> 
+> It's the memory that's most important, though. Dropping all incoming
+> iframes during local busy is a simple way to keep data buffer size
+> bounded while still allowing for larger tx windows.
+> 
+> If the application can't keep up with the data rate and is
+> triggering local busy, throughput isn't going to be improved
+> significatnly by queuing those frames during local busy.
 
-list_for_each_entry() please.
-
-> +
-> +		if (k->type != HCI_LK_SMP_LTK)
-> +			continue;
-> +
-> +		if (k->dlen != sizeof(*id))
-> +			continue;
-> +
-> +		id = (void *) &k->data;
-> +		if (id->ediv == ediv &&
-> +				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
-> +			return k;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +EXPORT_SYMBOL(hci_find_ltk);
-> +
-> +struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-> +					bdaddr_t *bdaddr, u8 type)
-> +{
-> +	struct list_head *p;
-> +
-> +	list_for_each(p, &hdev->link_keys) {
-> +		struct link_key *k;
-> +
-> +		k = list_entry(p, struct link_key, list);
-
-same here.
+You convinced me, applied! Thanks.
 
 	Gustavo
