@@ -1,103 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Jul 2011 12:09:59 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/5] Bluetooth: Add enable_le module parameter
-Message-ID: <20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
-References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
- <1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: SCORouting to PCM in Desktop
+From: kchai1 <kai.chai@windriver.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "Sumangala, Suraj" <surajs@qca.qualcomm.com>,
+	Koustuv Ghosh <koustuvg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20110630113825.GA3949@dell.ger.corp.intel.com>
+References: <BANLkTi=ku2nnVc0DgduHtxZ6xQvzW-d+zA@mail.gmail.com>
+	 <20110630092824.GA26690@dell.ger.corp.intel.com>
+	 <480687D4EEFE7447A2E09AADFF667362049C48F1@nasanexd02c.na.qualcomm.com>
+	 <20110630113825.GA3949@dell.ger.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 1 Jul 2011 16:50:12 +0800
+Message-ID: <1309510212.2306.8.camel@kchai1-Latitude-E6410>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-On Thu, Jun 30, 2011 at 07:20:54PM -0300, Andre Guedes wrote:
-> This patch adds a new module parameter to enable/disable host LE
-> support. By default host LE support is disabled.
+About the Headset.Play() function you mentioned, what is the main
+purpose?
+If it was marked as deprecated, what is  the replaced solution?
+
+Could you give me some information?
+
+Kai
+
+On Thu, 2011-06-30 at 14:38 +0300, Johan Hedberg wrote:
+> Hi Suraj,
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci.h |    1 +
->  net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
->  2 files changed, 23 insertions(+), 0 deletions(-)
+> On Thu, Jun 30, 2011, Sumangala, Suraj wrote:
+> > Sometime ago we had a situation where we were testing a BT chip that
+> > did NOT support SCO over HCI and supported only SCO over PCM.
+> > 
+> > The problem was whenever SCO connection was made; my host (Ubuntu)
+> > sent 2 or 3 SCO packets over HCI to the controller.  The controller
+> > could not handle these packets as it meant as only a SCO over PCM
+> > device and crashed.
+> > 
+> >  So we had to drop the SCO packets in the HCI transport driver
+> >  explicitly.  So, when we say in the configuration file that SCO is
+> >  over PCM should the stack make sure that no SCO packets are sent over
+> >  HCI?
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ed1de1b..5f37822 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -211,6 +211,7 @@ enum {
->  #define LMP_EDR_3S_ESCO	0x80
->  
->  #define LMP_EXT_INQ	0x01
-> +#define LMP_SIMUL_LE_BR	0x02
->  #define LMP_SIMPLE_PAIR	0x08
->  #define LMP_NO_FLUSH	0x40
->  
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 4ed59a8..298cd9b 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -45,6 +45,8 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> +static int enable_le;
-> +
->  /* Handle HCI Event packets */
->  
->  static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
-> @@ -525,6 +527,20 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
->  	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
->  }
->  
-> +static void hci_set_le_support(struct hci_dev *hdev)
-> +{
-> +	struct hci_cp_write_le_host_supported cp;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +
-> +	if (enable_le) {
-> +		cp.le = 1;
-> +		cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
-
-Typo?
-
-Best regards 
-Andrei Emeltchenko 
-
-> +	}
-> +
-> +	hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp), &cp);
-> +}
-> +
->  static void hci_setup(struct hci_dev *hdev)
->  {
->  	hci_setup_event_mask(hdev);
-> @@ -550,6 +566,9 @@ static void hci_setup(struct hci_dev *hdev)
->  		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES,
->  							sizeof(cp), &cp);
->  	}
-> +
-> +	if (hdev->features[4] & LMP_LE)
-> +		hci_set_le_support(hdev);
->  }
->  
->  static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
-> @@ -3068,3 +3087,6 @@ void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
->  	hci_send_to_sock(hdev, skb, NULL);
->  	kfree_skb(skb);
->  }
-> +
-> +module_param(enable_le, bool, 0444);
-> +MODULE_PARM_DESC(enable_le, "Enable LE support");
-> -- 
-> 1.7.4.1
+> The user space part of BlueZ isn't actually responsible for sending any
+> data over SCO at all. Instead this is the job of the audio subsystem
+> (PulseAudio, GStreamer, ALSA, etc). If you have special hardware that
+> only supports SCO over PCM you need to tell your audio subsystem about
+> that. E.g. in PulseAudio there are parameters for giving an ALSA device
+> to use for reading/writing the audio instead of using the SCO socket
+> given by BlueZ. I.e. for a system where you have a dedicated PCM line to
+> the controller you implement a kernel ALSA driver which abstracts this
+> line to user space and then give the ALSA device exposed by that driver
+> to PulseAudio (or whatever audio susbystem you might have).
 > 
+> Johan
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
