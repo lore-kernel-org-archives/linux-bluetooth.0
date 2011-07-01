@@ -1,61 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E0D959F.5050201@wp.pl>
-Date: Fri, 01 Jul 2011 11:38:39 +0200
-From: "W.P." <laurentp@wp.pl>
+Date: Fri, 1 Jul 2011 12:09:59 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/5] Bluetooth: Add enable_le module parameter
+Message-ID: <20110701090957.GA14945@aemeltch-MOBL1.ger.corp.intel.com>
+References: <1309472456-24674-1-git-send-email-andre.guedes@openbossa.org>
+ <1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: pairing device in text mode
-References: <4E0D82DA.7090501@wp.pl> <20110701084439.GA6461@dell.ger.corp.intel.com>
-In-Reply-To: <20110701084439.GA6461@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1309472456-24674-3-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Użytkownik Johan Hedberg napisał:
-> On Fri, Jul 01, 2011, W.P. wrote:
->   
->> How can I do this in text mode?
->>     
->
-> You can pair with "simple-agent hci0 <remote address>". To simply create
-> a new device object without pairing you can use "test-device create
-> <remote address>". Once you've created the object you can connect HID to
-> the device with "test-input connect <remote address". To make it
-> possible for the remote device to connect back to you later without user
-> interaction do "test-device trusted <remote address> yes". simple-agent,
-> test-input and test-device can be found under the test subdirectory in
-> the source tree.
->
->   
-[root@laurent-home test]# test-device create 00:1A:40:01:AE:09
-New device (/org/bluez/2269/hci0/dev_00_1A_40_01_AE_09)
+Hi,
 
-But:
-[root@laurent-home test]# test-input connect 00:1A:40:01:AE:09
-Traceback (most recent call last):
-  File "/usr/bin/test-input", line 40, in <module>
-    input.Connect()
-  File "/usr/lib/python2.5/site-packages/dbus/proxies.py", line 68, in
-__call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib/python2.5/site-packages/dbus/proxies.py", line 140, in
-__call__
-    **keywords)
-  File "/usr/lib/python2.5/site-packages/dbus/connection.py", line 630,
-in call_blocking
-    message, timeout)
-dbus.exceptions.DBusException: org.bluez.Error.Failed: Connection
-refused (111)
+On Thu, Jun 30, 2011 at 07:20:54PM -0300, Andre Guedes wrote:
+> This patch adds a new module parameter to enable/disable host LE
+> support. By default host LE support is disabled.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci.h |    1 +
+>  net/bluetooth/hci_event.c   |   22 ++++++++++++++++++++++
+>  2 files changed, 23 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index ed1de1b..5f37822 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -211,6 +211,7 @@ enum {
+>  #define LMP_EDR_3S_ESCO	0x80
+>  
+>  #define LMP_EXT_INQ	0x01
+> +#define LMP_SIMUL_LE_BR	0x02
+>  #define LMP_SIMPLE_PAIR	0x08
+>  #define LMP_NO_FLUSH	0x40
+>  
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 4ed59a8..298cd9b 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -45,6 +45,8 @@
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+>  
+> +static int enable_le;
+> +
+>  /* Handle HCI Event packets */
+>  
+>  static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -525,6 +527,20 @@ static void hci_setup_event_mask(struct hci_dev *hdev)
+>  	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
+>  }
+>  
+> +static void hci_set_le_support(struct hci_dev *hdev)
+> +{
+> +	struct hci_cp_write_le_host_supported cp;
+> +
+> +	memset(&cp, 0, sizeof(cp));
+> +
+> +	if (enable_le) {
+> +		cp.le = 1;
+> +		cp.simul = !!(hdev->features[6] & LMP_SIMUL_LE_BR);
 
-linkkeys not added.
+Typo?
 
-What should I do / check?
-> That doesn't make any sense. A PIN is a mandatory input parameter to the
-> pairing process with any Bluetooth 2.0 or older device. Or do you mean
-> to say that the mouse doesn't require pairing at all?
->
->   
-It does require pairing. But in Win$ I simply choose option "without
-security code", as said in manual.
+Best regards 
+Andrei Emeltchenko 
 
-W.P.
+> +	}
+> +
+> +	hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp), &cp);
+> +}
+> +
+>  static void hci_setup(struct hci_dev *hdev)
+>  {
+>  	hci_setup_event_mask(hdev);
+> @@ -550,6 +566,9 @@ static void hci_setup(struct hci_dev *hdev)
+>  		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES,
+>  							sizeof(cp), &cp);
+>  	}
+> +
+> +	if (hdev->features[4] & LMP_LE)
+> +		hci_set_le_support(hdev);
+>  }
+>  
+>  static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -3068,3 +3087,6 @@ void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
+>  	hci_send_to_sock(hdev, skb, NULL);
+>  	kfree_skb(skb);
+>  }
+> +
+> +module_param(enable_le, bool, 0444);
+> +MODULE_PARM_DESC(enable_le, "Enable LE support");
+> -- 
+> 1.7.4.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
