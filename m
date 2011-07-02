@@ -1,62 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sat, 2 Jul 2011 13:48:09 -0400
-Subject: [PATCH] Improve input server connect log messages
-Message-ID: <1309628889.22449.15.camel@THOR>
+Date: Sat, 2 Jul 2011 13:44:56 -0400
+Subject: [PATCH] Add NULL packet stat to hciconfig
+Message-ID: <1309628696.22449.13.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added error log message for connection refusals and added
-remote device BDADDR to existing debug messages.
 ---
- input/server.c |   12 ++++++++++--
- 1 files changed, 10 insertions(+), 2 deletions(-)
+ lib/hci.h         |    1 +
+ tools/hciconfig.c |    5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/input/server.c b/input/server.c
-index 7fd00f2..cea08d1 100644
---- a/input/server.c
-+++ b/input/server.c
-@@ -62,6 +62,7 @@ static void connect_event_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	uint16_t psm;
- 	bdaddr_t src, dst;
-+	char address[18];
- 	GError *gerr = NULL;
- 	int ret;
+diff --git a/lib/hci.h b/lib/hci.h
+index 51184ee..7f4812d 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -2284,6 +2284,7 @@ struct hci_filter {
  
-@@ -82,12 +83,15 @@ static void connect_event_cb(GIOChannel *chan, GError *err, gpointer data)
- 		return;
- 	}
+ /* Ioctl requests structures */
+ struct hci_dev_stats {
++	uint32_t null_rx;	/* # NULL pkts recvd */
+ 	uint32_t err_rx;
+ 	uint32_t err_tx;
+ 	uint32_t cmd_tx;
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index cbd0d0e..cb65c06 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -1863,8 +1863,9 @@ static void print_dev_info(int ctl, struct hci_dev_info *di)
+ 	printf("\t%s\n", str);
+ 	bt_free(str);
  
--	DBG("Incoming connection on PSM %d", psm);
-+	ba2str(&dst, address);
-+	DBG("Incoming connection from %s on PSM %d", address, psm);
+-	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d\n",
+-		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx);
++	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d nulls:%d\n",
++		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx,
++		st->null_rx);
  
- 	ret = input_device_set_channel(&src, &dst, psm, chan);
- 	if (ret == 0)
- 		return;
- 
-+	error("Refusing input device connect: %s (%d)", strerror(-ret), -ret);
-+
- 	/* Send unplug virtual cable to unknown devices */
- 	if (ret == -ENOENT && psm == L2CAP_PSM_HIDP_CTRL) {
- 		unsigned char unplug = 0x15;
-@@ -157,7 +161,11 @@ static void confirm_event_cb(GIOChannel *chan, gpointer user_data)
- 	}
- 
- 	if (server->confirm) {
--		error("Refusing connection: setup in progress");
-+		char address[18];
-+
-+		ba2str(&dst, address);
-+		error("Refusing connection from %s: setup in progress",
-+								address);
- 		goto drop;
- 	}
- 
+ 	printf("\tTX bytes:%d acl:%d sco:%d commands:%d errors:%d\n",
+ 		st->byte_tx, st->acl_tx, st->sco_tx, st->cmd_tx, st->err_tx);
 -- 
 1.7.4.1
 
