@@ -1,39 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BANLkTinhYCGbzLXTeMJo7uf_0+-dA_zSig@mail.gmail.com>
-References: <BANLkTikVuJ4RdV4Ng1ROh9Oc80K6p8ZQBw@mail.gmail.com>
-	<BANLkTinhYCGbzLXTeMJo7uf_0+-dA_zSig@mail.gmail.com>
-Date: Sat, 2 Jul 2011 19:35:33 -0600
-Message-ID: <CAKLsOONx6QgTPLRX=tm7KhYpfkeEq+A4JgXocmsLHONmTBZo8Q@mail.gmail.com>
-Subject: Re: sco routing
-From: Brad Midgley <bmidgley@gmail.com>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH] avrcp: mark signals as deprecated
+Date: Sat,  2 Jul 2011 19:42:11 -0300
+Message-Id: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-test-audio connect xx seems to work, I can hear the audio channel
-firing up and see it in the hcitool con output. But it changes from
-esco to sco then sco closes and only the acl is left. I want to test
-sco routing on my board, so I'd like it to keep a sco connection up.
-Is that possible? Would problems in the pcm setup on the board cause
-the bt chip to close sco?
+Connected and Disconnected are deprecated signals
+---
+ doc/control-api.txt |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-# ./test-audio connect 00:0D:3C:37:46:22 ; hcitool con
-Connections:
-	< eSCO 00:0D:3C:37:46:22 handle 0 state 5 lm SLAVE
-	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
-root@linaro:~# hcitool con
-Connections:
-	< SCO 00:0D:3C:37:46:22 handle 46 state 1 lm SLAVE
-	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
-root@linaro:~# hcitool con
-Connections:
-	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
+diff --git a/doc/control-api.txt b/doc/control-api.txt
+index 1a42846..7d72c1c 100644
+--- a/doc/control-api.txt
++++ b/doc/control-api.txt
+@@ -83,12 +83,12 @@ Methods		void Connect()
+ 				System		powered, unpowered, unplugged
+ 				Volume		uint8
+ 
+-Signals		Connected()
++Signals		Connected() {deprecated}
+ 
+ 			Sent when a successful AVRCP connection has been made
+ 			to the remote device.
+ 
+-		Disconnected()
++		Disconnected() {deprecated}
+ 
+ 			Sent when the AVRCP connection to the remote device
+ 			has been disconnected.
+-- 
+1.7.6
 
-hcidump is at https://gist.github.com/1061877
-
-thanks guys
-Brad
