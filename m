@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH] avrcp: mark signals as deprecated
-Date: Sat,  2 Jul 2011 19:42:11 -0300
-Message-Id: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH v2 1/1] Bluetooth: l2cap: fix NULL ACL packet handling
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sat, 02 Jul 2011 15:11:51 -0700
+In-Reply-To: <1309628689.22449.12.camel@THOR>
+References: <1309628689.22449.12.camel@THOR>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1309644714.21109.7.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Hi Peter,
 
-Connected and Disconnected are deprecated signals
----
- doc/control-api.txt |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+> A 0-length ACL continuation-fragment is a valid NULL packet. Remote
+> devices can use the FLOW indicator in the ACL packet header to
+> flow-control ACL packets without sending a payload.
+> 
+> Track as a device stat instead of logging.
+> 
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> ---
+>  include/net/bluetooth/hci.h |    1 +
+>  net/bluetooth/l2cap_core.c  |    8 ++++++++
+>  2 files changed, 9 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 0c20227..de7ed81 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1142,6 +1142,7 @@ struct hci_ufilter {
+>  
+>  /* ---- HCI Ioctl requests structures ---- */
+>  struct hci_dev_stats {
+> +	__u32 null_rx;		/* # NULL pkts recvd */
+>  	__u32 err_rx;
+>  	__u32 err_tx;
+>  	__u32 cmd_tx;
 
-diff --git a/doc/control-api.txt b/doc/control-api.txt
-index 1a42846..7d72c1c 100644
---- a/doc/control-api.txt
-+++ b/doc/control-api.txt
-@@ -83,12 +83,12 @@ Methods		void Connect()
- 				System		powered, unpowered, unplugged
- 				Volume		uint8
- 
--Signals		Connected()
-+Signals		Connected() {deprecated}
- 
- 			Sent when a successful AVRCP connection has been made
- 			to the remote device.
- 
--		Disconnected()
-+		Disconnected() {deprecated}
- 
- 			Sent when the AVRCP connection to the remote device
- 			has been disconnected.
--- 
-1.7.6
+you can not do it like this. This will break userspace API/ABI.
+
+Regards
+
+Marcel
+
 
