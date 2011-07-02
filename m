@@ -2,2383 +2,342 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/2] Convert dos file to unix
-Date: Sat,  2 Jul 2011 12:32:39 -0300
-Message-Id: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 2/2] Fix common misspelled words
+Date: Sat,  2 Jul 2011 12:32:40 -0300
+Message-Id: <1309620760-17968-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Call `tr -d \\r < tools/ubcsp.c', and since this will change all the
-lines, remove the trailing white spaces too.
----
- tools/ubcsp.c | 2360 ++++++++++++++++++++++++++++----------------------------
- 1 files changed, 1180 insertions(+), 1180 deletions(-)
+Accounting of misspelled words, as detected by codespell:
 
+acording      2
+ancilliary    1
+appropiate    1
+atribute      1
+cant          1
+comming       2
+gracefull     1
+lenght        1
+mispelled     1
+occured       1
+occurences    1
+ocurred       3
+prefered      1
+presense      1
+reponse       1
+seperate      1
+succesful     1
+successully   1
+sucessfull    1
+sucessfully   1
+---
+ attrib/att.c         |    2 +-
+ attrib/gatttool.c    |    2 +-
+ audio/avdtp.c        |    4 ++--
+ audio/gstavdtpsink.c |    6 +++---
+ audio/gstsbcutil.c   |    2 +-
+ audio/ipc.h          |    2 +-
+ doc/adapter-api.txt  |    2 +-
+ doc/audio-api.txt    |    2 +-
+ health/mcap.c        |    2 +-
+ serial/proxy.c       |    2 +-
+ src/sdpd-request.c   |    4 ++--
+ test/apitest         |    2 +-
+ test/bdaddr.c        |    2 +-
+ test/sap-client      |    2 +-
+ test/test-health     |    2 +-
+ tools/hciattach.c    |    4 ++--
+ tools/rfcomm.1       |    2 +-
+ tools/ubcsp.c        |    4 ++--
+ 18 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/attrib/att.c b/attrib/att.c
+index 972f8bf..1ce0f7b 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -39,7 +39,7 @@ const char *att_ecode2str(uint8_t status)
+ 	case ATT_ECODE_INVALID_HANDLE:
+ 		return "Invalid handle";
+ 	case ATT_ECODE_READ_NOT_PERM:
+-		return "Atribute can't be read";
++		return "Attribute can't be read";
+ 	case ATT_ECODE_WRITE_NOT_PERM:
+ 		return "Attribute can't be written";
+ 	case ATT_ECODE_INVALID_PDU:
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index cf052db..17ee913 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -370,7 +370,7 @@ static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		goto done;
+ 	}
+ 
+-	g_print("Characteristic value was written sucessfully\n");
++	g_print("Characteristic value was written successfully\n");
+ 
+ done:
+ 	if (opt_listen == FALSE)
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index e8a4007..c7e5f87 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -2168,7 +2168,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+ 	}
+ 
+ 	if (session->in.signal_id != session->req->signal_id) {
+-		error("Reponse signal doesn't match");
++		error("Response signal doesn't match");
+ 		return TRUE;
+ 	}
+ 
+@@ -3753,7 +3753,7 @@ const char *avdtp_strerror(struct avdtp_error *err)
+ 	case AVDTP_BAD_HEADER_FORMAT:
+ 		return "Bad Header Format";
+ 	case AVDTP_BAD_LENGTH:
+-		return "Bad Packet Lenght";
++		return "Bad Packet Length";
+ 	case AVDTP_BAD_ACP_SEID:
+ 		return "Bad Acceptor SEID";
+ 	case AVDTP_SEP_IN_USE:
+diff --git a/audio/gstavdtpsink.c b/audio/gstavdtpsink.c
+index cab366b..0f3abf3 100644
+--- a/audio/gstavdtpsink.c
++++ b/audio/gstavdtpsink.c
+@@ -1491,7 +1491,7 @@ static gboolean gst_avdtp_sink_stream_start(GstAvdtpSink *self)
+ 
+ 	err = gst_avdtp_sink_audioservice_send(self, &req->h);
+ 	if (err < 0) {
+-		GST_ERROR_OBJECT(self, "Error ocurred while sending "
++		GST_ERROR_OBJECT(self, "Error occurred while sending "
+ 					"start packet");
+ 		return FALSE;
+ 	}
+@@ -1643,7 +1643,7 @@ static gboolean gst_avdtp_sink_configure(GstAvdtpSink *self,
+ 
+ 	err = gst_avdtp_sink_audioservice_send(self, &open_req->h);
+ 	if (err < 0) {
+-		GST_ERROR_OBJECT(self, "Error ocurred while sending "
++		GST_ERROR_OBJECT(self, "Error occurred while sending "
+ 					"open packet");
+ 		return FALSE;
+ 	}
+@@ -1679,7 +1679,7 @@ static gboolean gst_avdtp_sink_configure(GstAvdtpSink *self,
+ 	req->h.length += req->codec.length - sizeof(req->codec);
+ 	err = gst_avdtp_sink_audioservice_send(self, &req->h);
+ 	if (err < 0) {
+-		GST_ERROR_OBJECT(self, "Error ocurred while sending "
++		GST_ERROR_OBJECT(self, "Error occurred while sending "
+ 					"configurarion packet");
+ 		return FALSE;
+ 	}
+diff --git a/audio/gstsbcutil.c b/audio/gstsbcutil.c
+index 63c90c2..ac5fcbf 100644
+--- a/audio/gstsbcutil.c
++++ b/audio/gstsbcutil.c
+@@ -311,7 +311,7 @@ GstCaps *gst_sbc_parse_caps_from_sbc(sbc_t *sbc)
+ }
+ 
+ /*
+- * Given a GstCaps, this will return a fixed GstCaps on sucessfull conversion.
++ * Given a GstCaps, this will return a fixed GstCaps on successful conversion.
+  * If an error occurs, it will return NULL and error_message will contain the
+  * error message.
+  *
+diff --git a/audio/ipc.h b/audio/ipc.h
+index d69b97e..f595775 100644
+--- a/audio/ipc.h
++++ b/audio/ipc.h
+@@ -264,7 +264,7 @@ struct bt_start_stream_rsp {
+ } __attribute__ ((packed));
+ 
+ /* This message is followed by one byte of data containing the stream data fd
+-   as ancilliary data */
++   as ancillary data */
+ struct bt_new_stream_ind {
+ 	bt_audio_msg_header_t	h;
+ } __attribute__ ((packed));
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index f34d58f..3a29295 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -228,7 +228,7 @@ Properties	string Address [readonly]
+ 		boolean Powered [readwrite]
+ 
+ 			Switch an adapter on or off. This will also set the
+-			appropiate connectable state.
++			appropriate connectable state.
+ 
+ 		boolean Discoverable [readwrite]
+ 
+diff --git a/doc/audio-api.txt b/doc/audio-api.txt
+index 0f320d9..b85400b 100644
+--- a/doc/audio-api.txt
++++ b/doc/audio-api.txt
+@@ -430,7 +430,7 @@ properties	boolean Connected [readonly]
+ 
+ 			Service availability indicatior of AG, where:
+ 			0 implies no service. No Home/Roam network available.
+-			1 implies presense of service. Home/Roam network
++			1 implies presence of service. Home/Roam network
+ 			available.
+ 
+ 		uint16 SignalStrength [readonly]
+diff --git a/health/mcap.c b/health/mcap.c
+index 793c32d..7bfc0dc 100644
+--- a/health/mcap.c
++++ b/health/mcap.c
+@@ -791,7 +791,7 @@ static void mcap_cache_mcl(struct mcap_mcl *mcl)
+ 		last->ctrl &= ~MCAP_CTRL_CACHED;
+ 		if (last->ctrl & MCAP_CTRL_CONN) {
+ 			/* We have to release this MCL if */
+-			/* connection is not succesful    */
++			/* connection is not successful    */
+ 			last->ctrl |= MCAP_CTRL_FREE;
+ 		} else {
+ 			mcap_mcl_release(last);
+diff --git a/serial/proxy.c b/serial/proxy.c
+index 457959c..f9aa41b 100644
+--- a/serial/proxy.c
++++ b/serial/proxy.c
+@@ -810,7 +810,7 @@ static int proxy_tty_register(struct serial_adapter *adapter,
+ 
+ 	sk = open(address, O_RDONLY | O_NOCTTY);
+ 	if (sk < 0) {
+-		error("Cant open TTY: %s(%d)", strerror(errno), errno);
++		error("Can't open TTY: %s(%d)", strerror(errno), errno);
+ 		return -EINVAL;
+ 	}
+ 
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 9920e9b..ff00df7 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -698,7 +698,7 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	}
+ 
+ 	/*
+-	 * Calculate Attribute size acording to MTU
++	 * Calculate Attribute size according to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
+ 	max_rsp_size = MIN(max_rsp_size, req->mtu - sizeof(sdp_pdu_hdr_t) -
+@@ -853,7 +853,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	memset(tmpbuf.data, 0, USHRT_MAX);
+ 
+ 	/*
+-	 * Calculate Attribute size acording to MTU
++	 * Calculate Attribute size according to MTU
+ 	 * We can send only (MTU - sizeof(sdp_pdu_hdr_t) - sizeof(sdp_cont_state_t))
+ 	 */
+ 	max = MIN(max, req->mtu - sizeof(sdp_pdu_hdr_t) - SDP_CONT_STATE_SIZE - sizeof(uint16_t));
+diff --git a/test/apitest b/test/apitest
+index b1c3f10..f1d51f1 100755
+--- a/test/apitest
++++ b/test/apitest
+@@ -403,7 +403,7 @@ class Tester:
+                    print 'Usage: %s -i <dev> ListRecentRemoteDevices date' % self.name
+            else:
+                 # FIXME: remove at future version
+-                print 'Script Error: Method %s not found. Maybe a mispelled word.' % (self.cmd_args)
++                print 'Script Error: Method %s not found. Maybe a misspelled word.' % (self.cmd_args)
+        except dbus.DBusException, e:
+            print '%s failed: %s' % (self.cmd, e)
+            sys.exit(1)
+diff --git a/test/bdaddr.c b/test/bdaddr.c
+index 683b3b9..f87fa38 100644
+--- a/test/bdaddr.c
++++ b/test/bdaddr.c
+@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
+ 					printf("Reset device manually\n");
+ 				} else {
+ 					ioctl(dd, HCIDEVRESET, dev);
+-					printf("Device reset successully\n");
++					printf("Device reset successfully\n");
+ 				}
+ 			} else {
+ 				printf("Reset device now\n");
+diff --git a/test/sap-client b/test/sap-client
+index b12d455..413424c 100644
+--- a/test/sap-client
++++ b/test/sap-client
+@@ -829,7 +829,7 @@ class SAPClient:
+         try:
+             params = self.__rcvMsg(SAPMessage_DISCONNECT_IND()).getParams()
+ 
+-            """gracefull"""
++            """graceful"""
+             if params[0].getValue() == 0x00:
+                 if not self.proc_transferAPDU():
+                     return False
+diff --git a/test/test-health b/test/test-health
+index 28cc894..16a5a2b 100755
+--- a/test/test-health
++++ b/test/test-health
+@@ -83,7 +83,7 @@ pref = None
+ if role == "Source":
+ 	while pref == None:
+ 		try:
+-			print "Select a prefered data channel type 1.",
++			print "Select a preferred data channel type 1.",
+ 			print "reliable 2. streaming: ",
+ 			sel = int(sys.stdin.readline())
+ 			if sel == 1:
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 93bdaac..1b577ec 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -780,12 +780,12 @@ static int swave(int fd, struct uart_t *u, struct termios *ti)
+ 	nanosleep(&tm, NULL);
+ 
+ 	// now the uart baud rate on the silicon wave module is set and effective.
+-	// change our own baud rate as well. Then there is a reset event comming in
++	// change our own baud rate as well. Then there is a reset event coming in
+  	// on the *new* baud rate. This is *undocumented*! The packet looks like this:
+ 	// 04 FF 01 0B (which would make that a confirmation of 0x0B = "Param
+ 	// subcommand class". So: change to new baud rate, read with timeout, parse
+ 	// data, error handling. BTW: all param access in Silicon Wave is done this way.
+-	// Maybe this code would belong in a seperate file, or at least code reuse...
++	// Maybe this code would belong in a separate file, or at least code reuse...
+ 
+ 	return 0;
+ }
+diff --git a/tools/rfcomm.1 b/tools/rfcomm.1
+index 06252e5..06303cd 100644
+--- a/tools/rfcomm.1
++++ b/tools/rfcomm.1
+@@ -99,7 +99,7 @@ If no channel is specified, it will use the channel number 1, but
+ a channel must be specified before cmd. If cmd is given, it will be
+ executed as soon as a client connects. When the child process
+ terminates or the client disconnect, the command will terminate.
+-Occurences of {} in cmd will be replaced by the name of the device
++Occurrences of {} in cmd will be replaced by the name of the device
+ used by the connection. This command can be terminated with the key
+ sequence CTRL-C.
+ .TP
 diff --git a/tools/ubcsp.c b/tools/ubcsp.c
-index 93b8c0f..3d4cd99 100644
+index 3d4cd99..a4edd9c 100644
 --- a/tools/ubcsp.c
 +++ b/tools/ubcsp.c
-@@ -1,1180 +1,1180 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2000-2005  CSR Ltd.
-- *
-- *
-- *  Permission is hereby granted, free of charge, to any person obtaining
-- *  a copy of this software and associated documentation files (the
-- *  "Software"), to deal in the Software without restriction, including
-- *  without limitation the rights to use, copy, modify, merge, publish,
-- *  distribute, sublicense, and/or sell copies of the Software, and to
-- *  permit persons to whom the Software is furnished to do so, subject to
-- *  the following conditions:
-- *
-- *  The above copyright notice and this permission notice shall be included
-- *  in all copies or substantial portions of the Software.
-- *
-- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-- *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-- *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-- *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-- *  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-- *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-- *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--/*****************************************************************************/
--/*****************************************************************************/
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp,c                                                                 **/
--/**                                                                         **/
--/** MicroBCSP - a very low cost implementation of the BCSP protocol         **/
--/**                                                                         **/
--/*****************************************************************************/
--
--#include "ubcsp.h"
--
--#if SHOW_PACKET_ERRORS || SHOW_LE_STATES
--#include <stdio.h>
--#include <windows.h>
--#endif
--
--static uint16 ubcsp_calc_crc (uint8 ch, uint16 crc);
--static uint16 ubcsp_crc_reverse (uint16);
--
--/*****************************************************************************/
--/**                                                                         **/
--/** Constant Data - ROM                                                     **/
--/**                                                                         **/
--/*****************************************************************************/
--
--/* This is the storage for the link establishment messages */
--
--static const uint8 ubcsp_le_buffer[4][4] =
--	{
--		{ 0xDA, 0xDC, 0xED, 0xED },
--		{ 0xAC, 0xAF, 0xEF, 0xEE },
--		{ 0xAD, 0xEF, 0xAC, 0xED },
--		{ 0xDE, 0xAD, 0xD0, 0xD0 },
--	};
--
--/* These are the link establishment headers */
--/* The two version are for the CRC and non-CRC varients */
--
--#if UBCSP_CRC
--static const uint8 ubcsp_send_le_header[4] = 
--	{
--		0x40, 0x41, 0x00, 0x7E
--	};
--#else
--static const uint8 ubcsp_send_le_header[4] = 
--	{
--		0x00, 0x41, 0x00, 0xBE
--	};
--#endif
--
--/*****************************************************************************/
--/**                                                                         **/
--/** Static Data - RAM                                                       **/
--/**                                                                         **/
--/*****************************************************************************/
--
--/* This is the storage for all state data for ubcsp */
--
--static struct ubcsp_configuration ubcsp_config;
--
--/* This is the ACK packet header - this will be overwritten when
--   we create an ack packet */
--
--static uint8 ubcsp_send_ack_header[4] = 
--	{
--		0x00, 0x00, 0x00, 0x00
--	};
--
--/* This is the deslip lookup table */
--
--static const uint8 ubcsp_deslip[2] =
--	{
--		SLIP_FRAME, SLIP_ESCAPE,
--	};
--
--/* This is a state machine table for link establishment */
--
--static uint8 next_le_packet[16] =
--	{
--		ubcsp_le_sync,			// uninit
--		ubcsp_le_conf,			// init
--		ubcsp_le_none,			// active
--		ubcsp_le_none,
--		ubcsp_le_sync_resp,		// sync_resp
--		ubcsp_le_sync_resp,
--		ubcsp_le_none,
--		ubcsp_le_none,
--		ubcsp_le_none,			// conf_resp
--		ubcsp_le_conf_resp,
--		ubcsp_le_conf_resp,
--		ubcsp_le_none,
--	};
--
--/* This is the storage required for building send and crc data */
--
--static uint8 ubcsp_send_header[4];
--static uint8 ubcsp_send_crc[2];
--
--/* This is where the receive header is stored before the payload arrives */
--
--static uint8 ubcsp_receive_header[4];
--
--/*****************************************************************************/
--/**                                                                         **/
--/** Code - ROM or RAM                                                       **/
--/**                                                                         **/
--/*****************************************************************************/
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_initialize                                                        **/
--/**                                                                         **/
--/** This initializes the state of the ubcsp engine to a known values        **/
--/**                                                                         **/
--/*****************************************************************************/
--
--void ubcsp_initialize (void)
--{
--	ubcsp_config.ack_number = 0;
--	ubcsp_config.sequence_number = 0;
--	ubcsp_config.send_ptr = 0;
--	ubcsp_config.send_size = 0;
--	ubcsp_config.receive_index = -4;
--
--	ubcsp_config.delay = 0;
--
--#if SHOW_LE_STATES
--	printf ("Hello Link Uninitialized\n");
--#endif
--
--	ubcsp_config.link_establishment_state = ubcsp_le_uninitialized;
--	ubcsp_config.link_establishment_packet = ubcsp_le_sync;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_send_packet                                                       **/
--/**                                                                         **/
--/** This sends a packet structure for sending to the ubcsp engine           **/
--/** This can only be called when the activity indication from ubcsp_poll    **/
--/** indicates that a packet can be sent with UBCSP_PACKET_SENT              **/
--/**                                                                         **/
--/*****************************************************************************/
--
--void ubcsp_send_packet (struct ubcsp_packet *send_packet)
--{
--	/* Initialize the send data to the packet we want to send */
--
--	ubcsp_config.send_packet = send_packet;
--
--	/* we cannot send the packet at the moment
--	   when we can at the moment, just set things to 0 */
--
--	ubcsp_config.send_size = 0;
--	ubcsp_config.send_ptr = 0;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_receive_packet                                                    **/
--/**                                                                         **/
--/** This sends a packet structure for receiving to the ubcsp engine         **/
--/** This can only be called when the activity indication from ubcsp_poll    **/
--/** indicates that a packet can be sent with UBCSP_PACKET_RECEIVED          **/
--/**                                                                         **/
--/*****************************************************************************/
--
--void ubcsp_receive_packet (struct ubcsp_packet *receive_packet)
--{
--	/* Initialize the receive data to the packet we want to receive */
--
--	ubcsp_config.receive_packet = receive_packet;
--
--	/* setup to receive the header first */
--
--	ubcsp_config.receive_index = -4;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_calc_crc                                                          **/
--/**                                                                         **/
--/** Takes the next 8 bit value ch, and updates the crc with this value      **/
--/**                                                                         **/
--/*****************************************************************************/
--
--
--#ifdef UBCSP_CRC
--
--static uint16 ubcsp_calc_crc (uint8 ch, uint16 crc)
--{
--	/* Calculate the CRC using the above 16 entry lookup table */
--
--	static const uint16 crc_table[] =
--		{
--			0x0000, 0x1081, 0x2102, 0x3183,
--			0x4204, 0x5285, 0x6306, 0x7387,
--			0x8408, 0x9489, 0xa50a, 0xb58b,
--			0xc60c, 0xd68d, 0xe70e, 0xf78f
--		};
--
--	/* Do this four bits at a time - more code, less space */
--
--    crc = (crc >> 4) ^ crc_table[(crc ^ ch) & 0x000f];
--    crc = (crc >> 4) ^ crc_table[(crc ^ (ch >> 4)) & 0x000f];
--
--	return crc;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_crc_reverse                                                       **/
--/**                                                                         **/
--/** Reserves the bits in crc and returns the new value                      **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static uint16 ubcsp_crc_reverse (uint16 crc)
--{
--	int32
--		b,
--		rev;
--
--	/* Reserse the bits to compute the actual CRC value */
--
--	for (b = 0, rev=0; b < 16; b++)
--	{
--		rev = rev << 1;
--		rev |= (crc & 1);
--		crc = crc >> 1;
--	}
--
--	return rev;
--}
--
--#endif
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_put_slip_uart                                                     **/
--/**                                                                         **/
--/** Outputs a single octet to the uart                                      **/
--/** If the octet needs to be escaped, then output the escape value          **/
--/** and then store the second octet to be output later                      **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static void ubcsp_put_slip_uart (uint8 ch)
--{
--	/* output a single UART octet */
--
--	/* If it needs to be escaped, then output the escape octet
--	   and set the send_slip_escape so that the next time we
--	   output the second octet for the escape correctly.
--	   This is done right at the top of ubcsp_poll */
--
--	if (ch == SLIP_FRAME)
--	{
--		put_uart (SLIP_ESCAPE);
--		ubcsp_config.send_slip_escape = SLIP_ESCAPE_FRAME;
--	}
--	else if (ch == SLIP_ESCAPE)
--	{
--		put_uart (SLIP_ESCAPE);
--		ubcsp_config.send_slip_escape = SLIP_ESCAPE_ESCAPE;
--	}
--	else
--	{
--		/* Not escaped, so just output octet */
--
--		put_uart (ch);
--	}
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_which_le_payload                                                  **/
--/**                                                                         **/
--/** Check the payload of this packet, and determine which of the four       **/
--/** link establishment packets this was.                                    **/
--/** Can return 5 if it is not a valid link establishment packet             **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static uint32 ubcsp_which_le_payload (const uint8 *payload)
--{
--	static int32
--		octet,
--		loop;
--
--	/* Search through the various link establishment payloads to find
--	   which one we have received */
--
--	for (loop = 0; loop < 4; loop ++)
--	{
--		for (octet = 0; octet < 4; octet ++)
--		{
--			if (payload[octet] != ubcsp_le_buffer[loop][octet])
--			{
--				/* Bad match, just to loop again */
--				goto bad_match_loop;
--			}
--		}
--
--		/* All the octets matched, return the value */
--
--		return loop;
--
--		/* Jumps out of octet loop if we got a bad match */
--bad_match_loop:
--		{}
--	}
--
--	/* Non of the link establishment payloads matched - return invalid value */
--
--	return 5;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_recevied_packet                                                   **/
--/**                                                                         **/
--/** This function is called when we have a SLIP END octet and a full        **/
--/** packet header and possibly data in the receive packet                   **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static uint8 ubcsp_recevied_packet (void)
--{
--	static uint8
--		receive_crc,
--		receive_seq,
--		receive_ack,
--		activity;
--
--#if UBCSP_CRC
--	static int32
--		loop;
--
--	static uint16
--		crc;
--#endif
--
--	static uint16
--		length;
--
--	/* Keep track of what activity this received packet will cause */
--
--	activity = 0;
--
--	/*** Do all error checks that we can ***/
--
--	/* First check the header checksum */
--
--	if (((ubcsp_receive_header[0] + ubcsp_receive_header[1] + ubcsp_receive_header[2] + ubcsp_receive_header[3]) & 0xff) != 0xff)
--	{
--		/* Header Checksum Error */
--
--#if SHOW_PACKET_ERRORS
--		printf ("\n######################## Header Checksum Error %02X %02X %02X %02X\n",
--			ubcsp_receive_header[0],
--			ubcsp_receive_header[1],
--			ubcsp_receive_header[2],
--			ubcsp_receive_header[3]);
--#endif
--
--		/* If we have a header checksum error, send an ack in return
--		   this gets a packet to be resent as quickly as possible */
--
--		ubcsp_config.send_ack = 1;
--
--		return activity;
--	}
--
--	/* Decode the received packets header */
--
--	ubcsp_config.receive_packet->reliable = (ubcsp_receive_header[0] & 0x80) >> 7;
--
--	receive_crc = (ubcsp_receive_header[0] & 0x40) >> 6;
--	receive_ack = (ubcsp_receive_header[0] & 0x38) >> 3;
--	receive_seq = (ubcsp_receive_header[0] & 0x07);
--
--	ubcsp_config.receive_packet->channel = (ubcsp_receive_header[1] & 0x0f);
--
--	length =
--		((ubcsp_receive_header[1] & 0xf0) >> 4) |
--		(ubcsp_receive_header[2] << 4);
--
--#if SHOW_PACKET_ERRORS
--	if (ubcsp_config.receive_packet->reliable)
--	{
--		printf (" : %10d         Recv SEQ: %d ACK %d\n",
--			GetTickCount () % 100000,
--			receive_seq,
--			receive_ack);
--	}
--	else if (ubcsp_config.receive_packet->channel != 1)
--	{
--		printf (" : %10d          Recv        ACK %d\n",
--			GetTickCount () % 100000,
--			receive_ack);
--	}
--#endif
--
--	/* Check for length errors */
--
--#if UBCSP_CRC
--	if (receive_crc)
--	{
--		/* If this packet had a CRC, then the length of the payload 
--		   should be 2 less than the received size of the payload */
--
--		if (length + 2 != ubcsp_config.receive_index)
--		{
--			/* Slip Length Error */
--
--#if SHOW_PACKET_ERRORS
--			printf ("\n######################## Slip Length Error (With CRC) %d,%d\n", length, ubcsp_config.receive_index - 2);
--#endif
--
--			/* If we have a payload length error, send an ack in return
--			   this gets a packet to be resent as quickly as possible */
--
--			ubcsp_config.send_ack = 1;
--			return activity;
--		}
--
--		/* We have a CRC at the end of this packet */
--
--		ubcsp_config.receive_index -= 2;
--
--		/* Calculate the packet CRC */
--
--		crc = 0xffff;
--
--		/* CRC the packet header */
--
--		for (loop = 0; loop < 4; loop ++)
--		{
--			crc = ubcsp_calc_crc (ubcsp_receive_header[loop], crc);
--		}
--
--		/* CRC the packet payload - without the CRC bytes */
--
--		for (loop = 0; loop < ubcsp_config.receive_index; loop ++)
--		{
--			crc = ubcsp_calc_crc (ubcsp_config.receive_packet->payload[loop], crc);
--		}
--
--		/* Reverse the CRC */
--
--		crc = ubcsp_crc_reverse (crc);
--
--		/* Check the CRC is correct */
--
--		if
--		(
--			(((crc & 0xff00) >> 8) != ubcsp_config.receive_packet->payload[ubcsp_config.receive_index]) ||
--			((crc & 0xff) != ubcsp_config.receive_packet->payload[ubcsp_config.receive_index + 1])
--		)
--		{
--#if SHOW_PACKET_ERRORS
--			printf ("\n######################## CRC Error\n");
--#endif
--
--			/* If we have a packet crc error, send an ack in return
--			   this gets a packet to be resent as quickly as possible */
--
--			ubcsp_config.send_ack = 1;
--			return activity;
--		}
--	}
--	else
--	{
--#endif
--		/* No CRC present, so just check the length of payload with that received */
--
--		if (length != ubcsp_config.receive_index)
--		{
--			/* Slip Length Error */
--
--#if SHOW_PACKET_ERRORS
--			printf ("\n######################## Slip Length Error (No CRC) %d,%d\n", length, ubcsp_config.receive_index);
--#endif
--
--			/* If we have a payload length error, send an ack in return
--			   this gets a packet to be resent as quickly as possible */
--
--			ubcsp_config.send_ack = 1;
--			return activity;
--		}
--#if UBCSP_CRC
--	}
--#endif
--
--	/*** We have a fully formed packet having passed all data integrity checks ***/
--
--	/* Check if we have an ACK for the last packet we sent */
--
--	if (receive_ack != ubcsp_config.sequence_number)
--	{
--		/* Since we only have a window size of 1, if the ACK is not equal to SEQ
--		   then the packet was sent */
--
--		if
--		(
--			(ubcsp_config.send_packet) &&
--			(ubcsp_config.send_packet->reliable)
--		)
--		{
--			/* We had sent a reliable packet, so clear this packet
--			   Then increament the sequence number for the next packet */
--
--			ubcsp_config.send_packet = 0;
--			ubcsp_config.sequence_number ++;
--			ubcsp_config.delay = 0;
--
--			/* Notify the caller that we have SENT a packet */
--
--			activity |= UBCSP_PACKET_SENT;
--		}
--	}
--
--	/*** Now we can concentrate of the packet we have received ***/
--
--	/* Check for Link Establishment packets */
--
--	if (ubcsp_config.receive_packet->channel == 1)
--	{
--		/* Link Establishment */
--
--		ubcsp_config.delay = 0;
--
--		/* Find which link establishment packet this payload means
--		   This could return 5, meaning none */
--
--		switch (ubcsp_which_le_payload (ubcsp_config.receive_packet->payload))
--		{
--			case 0:
--			{
--				/* SYNC Recv'd */
--
--#if SHOW_LE_STATES
--				printf ("Recv SYNC\n");
--#endif
--
--				/* If we receive a SYNC, then we respond to it with a SYNC RESP
--				   but only if we are not active.
--				   If we are active, then we have a PEER RESET */
--
--				if (ubcsp_config.link_establishment_state < ubcsp_le_active)
--				{
--					ubcsp_config.link_establishment_resp = 1;
--				}
--				else
--				{
--					/* Peer reset !!!! */
--
--#if SHOW_LE_STATES
--					printf ("\n\n\n\n\nPEER RESET\n\n");
--#endif
--
--					/* Reinitialize the link */
--
--					ubcsp_initialize ();
--
--					/* Tell the host what has happened */
--
--					return UBCSP_PEER_RESET;
--				}
--				break;
--			}
--
--			case 1:
--			{
--				/* SYNC RESP Recv'd */
--
--#if SHOW_LE_STATES
--				printf ("Recv SYNC RESP\n");
--#endif
--
--				/* If we receive a SYNC RESP, push us into the initialized state */
--
--				if (ubcsp_config.link_establishment_state < ubcsp_le_initialized)
--				{
--#if SHOW_LE_STATES
--					printf ("Link Initialized\n");
--#endif
--					ubcsp_config.link_establishment_state = ubcsp_le_initialized;
--				}
--
--				break;
--			}
--
--			case 2:
--			{
--				/* CONF Recv'd */
--
--#if SHOW_LE_STATES
--				printf ("Recv CONF\n");
--#endif
--
--				/* If we receive a CONF, and we are initialized or active
--				   then respond with a CONF RESP */
--
--				if (ubcsp_config.link_establishment_state >= ubcsp_le_initialized)
--				{
--					ubcsp_config.link_establishment_resp = 2;
--				}
--
--				break;
--			}
--
--			case 3:
--			{
--				/* CONF RESP Recv'd */
--
--#if SHOW_LE_STATES
--				printf ("Recv CONF RESP\n");
--#endif
--
--				/* If we received a CONF RESP, then push us into the active state */
--
--				if (ubcsp_config.link_establishment_state < ubcsp_le_active)
--				{
--#if SHOW_LE_STATES
--					printf ("Link Active\n");
--#endif
--
--					ubcsp_config.link_establishment_state = ubcsp_le_active;
--					ubcsp_config.send_size = 0;
--
--					return activity | UBCSP_PACKET_SENT;
--				}
--
--				break;
--			}
--		}
--
--		/* We have finished processing Link Establishment packets */
--	}
--	else if (ubcsp_config.receive_index)
--	{
--		/* We have some payload data we need to process
--		   but only if we are active - otherwise, we just ignore it */
--
--		if (ubcsp_config.link_establishment_state == ubcsp_le_active)
--		{
--			if (ubcsp_config.receive_packet->reliable)
--			{
--				/* If the packet we've just received was reliable
--				   then send an ACK */
--
--				ubcsp_config.send_ack = 1;
--
--				/* We the sequence number we received is the same as 
--				   the last ACK we sent, then we have received a packet in sequence */
--
--				if (receive_seq == ubcsp_config.ack_number)
--				{
--					/* Increase the ACK number - which will be sent in the next ACK 
--					   or normal packet we send */
--
--					ubcsp_config.ack_number ++;
--
--					/* Set the values in the receive_packet structure, so the caller
--					   knows how much data we have */
--
--					ubcsp_config.receive_packet->length = length;
--					ubcsp_config.receive_packet = 0;
--
--					/* Tell the caller that we have received a packet, and that it
--					   will be ACK'ed */
--
--					activity |= UBCSP_PACKET_RECEIVED | UBCSP_PACKET_ACK;
--				}
--			}
--			else 
--			{
--				/* Set the values in the receive_packet structure, so the caller
--				   knows how much data we have */
--
--				ubcsp_config.receive_packet->length = length;
--				ubcsp_config.receive_packet = 0;
--
--				/* Tell the caller that we have received a packet */
--
--				activity |= UBCSP_PACKET_RECEIVED;
--			}
--		}
--	}
--
+@@ -723,7 +723,7 @@ static uint8 ubcsp_recevied_packet (void)
+ 		}
+ 	}
+ 
 -	/* Just return any activity that occured */
--
--	return activity;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_setup_packet                                                      **/
--/**                                                                         **/
--/** This function is called to setup a packet to be sent                    **/
--/** This allows just a header, or a header and payload to be sent           **/
--/** It also allows the header checksum to be precalcuated                   **/
--/** or calculated here                                                      **/
--/** part1 is always 4 bytes                                                 **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static void ubcsp_setup_packet (uint8 *part1, uint8 calc, uint8 *part2, uint16 len2)
--{
--	/* If we need to calculate the checksum, do that now */
--
--	if (calc)
--	{
--		part1[3] =
--			~(part1[0] + part1[1] + part1[2]);
--	}
--
--	/* Setup the header send pointer and size so we can clock this out */
--
--	ubcsp_config.send_ptr = part1;
--	ubcsp_config.send_size = 4;
--
--	/* Setup the payload send pointer and size */
--
--	ubcsp_config.next_send_ptr = part2;
--	ubcsp_config.next_send_size = len2;
--
--#if UBCSP_CRC
--	/* Initialize the crc as required */
--
--	ubcsp_config.send_crc = -1;
--
--	ubcsp_config.need_send_crc = 1;
--#endif
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_sent_packet                                                       **/
--/**                                                                         **/
--/** Called when we have finished sending a packet                           **/
--/** If this packet was unreliable, then notify caller, and clear the data   **/
--/**                                                                         **/
--/*****************************************************************************/
--
--static uint8 ubcsp_sent_packet (void)
--{
--	if (ubcsp_config.send_packet)
--	{
--		if (!ubcsp_config.send_packet->reliable)
--		{
--			/* We had a packet sent that was unreliable */
--
--			/* Forget about this packet */
--
--			ubcsp_config.send_packet = 0;
--
--			/* Notify caller that they can send another one */
--
--			return UBCSP_PACKET_SENT;
--		}
--	}
--
--	/* We didn't have a packet, or it was reliable
--	   Must wait for ACK before allowing another packet to be sent */
--
--	return 0;
--}
--
--/*****************************************************************************/
--/**                                                                         **/
--/** ubcsp_poll                                                              **/
--/**                                                                         **/
--/** This is the main function for ubcsp                                     **/
--/** It performs a number of tasks                                           **/
--/**                                                                         **/
--/** 1) Send another octet to the UART - escaping as required                **/
--/** 2) Setup the payload to be sent after the header has been sent          **/
--/** 3) Send the CRC for the packet if required                              **/
--/**                                                                         **/
--/** 4) Calculate the next Link Establishment State                          **/
--/** 5) Send a Link Establishment packet                                     **/
--/** 6) Send a normal packet if available                                    **/
--/** 7) Send an ACK packet if required                                       **/
--/**                                                                         **/
--/** 8) Receive octets from UART and deslip them as required                 **/
--/** 9) Place received octets into receive header or receive payload buffer  **/
--/** 10) Process received packet when SLIP_END is received                   **/
--/**                                                                         **/
--/** 11) Keep track of ability of caller to delay recalling                  **/
--/**                                                                         **/
--/*****************************************************************************/
--
--uint8 ubcsp_poll (uint8 *activity)
--{
--	uint8
--		delay = UBCSP_POLL_TIME_IMMEDIATE;
--
--	uint8
--		value;
--
--	/* Assume no activity to start with */
--
--	*activity = 0;
--
--	/* If we don't have to delay, then send something if we can */
--
--	if (!ubcsp_config.delay)
--	{
--		/* Do we have something we are sending to send */
--
--		if (ubcsp_config.send_size)
--		{
--			/* We have something to send so send it */
--
--			if (ubcsp_config.send_slip_escape)
--			{
--				/* Last time we send a SLIP_ESCAPE octet
--				   this time send the second escape code */
--
--				put_uart (ubcsp_config.send_slip_escape);
--
--				ubcsp_config.send_slip_escape = 0;
--			}
--			else
--			{
--#if UBCSP_CRC
--				/* get the value to send, and calculate CRC as we go */
--
--				value = *ubcsp_config.send_ptr ++;
--
--				ubcsp_config.send_crc = ubcsp_calc_crc (value, ubcsp_config.send_crc);
--
--				/* Output the octet */
--
--				ubcsp_put_slip_uart (value);
--#else
--				/* Just output the octet*/
--
--				ubcsp_put_slip_uart (*ubcsp_config.send_ptr ++);
--#endif
--			}
--
--			/* If we did output a SLIP_ESCAPE, then don't process the end of a block */
--
--			if ((!ubcsp_config.send_slip_escape) && ((ubcsp_config.send_size = ubcsp_config.send_size - 1) == 0))
--			{
--				/*** We are at the end of a block - either header or payload ***/
--
--				/* setup the next block */
--
--				ubcsp_config.send_ptr = ubcsp_config.next_send_ptr;
--				ubcsp_config.send_size = ubcsp_config.next_send_size;
--				ubcsp_config.next_send_ptr = 0;
--				ubcsp_config.next_send_size = 0;
--
--#if UBCSP_CRC
--				/* If we have no successor block
--				   then we might need to send the CRC */
--
--				if (!ubcsp_config.send_ptr)
--				{
--					if (ubcsp_config.need_send_crc)
--					{
--						/* reverse the CRC from what we computed along the way */
--
--						ubcsp_config.need_send_crc = 0;
--
--						ubcsp_config.send_crc = ubcsp_crc_reverse (ubcsp_config.send_crc);
--
--						/* Save in the send_crc buffer */
--
--						ubcsp_send_crc[0] = (uint8) (ubcsp_config.send_crc >> 8);
--						ubcsp_send_crc[1] = (uint8) ubcsp_config.send_crc;
--
--						/* Setup to send this buffer */
--
--						ubcsp_config.send_ptr = ubcsp_send_crc;
--						ubcsp_config.send_size = 2;
--					}
--					else
--					{
--						/* We don't need to send the crc
--						   either we just have, or this packet doesn't include it */
--
--						/* Output the end of FRAME marker */
--
--						put_uart (SLIP_FRAME);
--
--						/* Check if this is an unreliable packet */
--
--						*activity |= ubcsp_sent_packet ();
--
--						/* We've sent the packet, so don't need to have be called quickly soon */
--
--						delay = UBCSP_POLL_TIME_DELAY;
--					}
--				}
--#else
--				/* If we have no successor block
--				   then we might need to send the CRC */
--
--				if (!ubcsp_config.send_ptr)
--				{
--					/* Output the end of FRAME marker */
--
--					put_uart (SLIP_FRAME);
--
--					/* Check if this is an unreliable packet */
--
--					*activity |= ubcsp_sent_packet ();
--
--					/* We've sent the packet, so don't need to have be called quickly soon */
--
--					delay = UBCSP_POLL_TIME_DELAY;
--				}
--#endif
--			}
--		}
--		else if (ubcsp_config.link_establishment_packet == ubcsp_le_none)
--		{
--			/* We didn't have something to send
--			   AND we have no Link Establishment packet to send */
--
--			if (ubcsp_config.link_establishment_resp & 2)
--			{
--				/* Send the start of FRAME packet */
--
--				put_uart (SLIP_FRAME);
--
--				/* We did require a RESP packet - so setup the send */
--
--				ubcsp_setup_packet ((uint8*) ubcsp_send_le_header, 0, (uint8*) ubcsp_le_buffer[ubcsp_le_conf_resp], 4);
--
--				/* We have now "sent" this packet */
--
--				ubcsp_config.link_establishment_resp = 0;
--			}
--			else if (ubcsp_config.send_packet)
--			{
--				/* There is a packet ready to be sent */
--
--				/* Send the start of FRAME packet */
--
--				put_uart (SLIP_FRAME);
--
--				/* Encode up the packet header using ACK and SEQ numbers */
--
--				ubcsp_send_header[0] =
--					(ubcsp_config.send_packet->reliable << 7) |
--#if UBCSP_CRC
--					0x40 |	/* Always use CRC's */
--#endif
--					(ubcsp_config.ack_number << 3) | 
--					(ubcsp_config.sequence_number);
--
--				/* Encode up the packet header's channel and length */
--				ubcsp_send_header[1] =
--					(ubcsp_config.send_packet->channel & 0x0f) |
--					((ubcsp_config.send_packet->length << 4) & 0xf0);
--
--				ubcsp_send_header[2] =
--					(ubcsp_config.send_packet->length >> 4) & 0xff;
--
--				/* Let the ubcsp_setup_packet function calculate the header checksum */
--
--				ubcsp_setup_packet ((uint8*) ubcsp_send_header, 1, ubcsp_config.send_packet->payload, ubcsp_config.send_packet->length);
--
--				/* Don't need to send an ACK - we just place on in this packet */
--
--				ubcsp_config.send_ack = 0;
--				
--#if SHOW_PACKET_ERRORS
--				printf (" : %10d Send %d Ack %d\n",
--					GetTickCount () % 100000,
--					ubcsp_config.sequence_number,
--					ubcsp_config.ack_number);
--#endif
--			}
--			else if (ubcsp_config.send_ack)
--			{
--				/* Send the start of FRAME packet */
--
--				put_uart (SLIP_FRAME);
--
--#if SHOW_PACKET_ERRORS
--				printf (" : %10d Send ACK %d\n",
--					GetTickCount () % 100000,
--					ubcsp_config.ack_number);
--#endif
--
--				/* The ack packet is already computed apart from the first octet */
--
--				ubcsp_send_ack_header[0] =
--#if UBCSP_CRC
--					0x40 | 
--#endif
--					(ubcsp_config.ack_number << 3);
--
--				/* Let the ubcsp_setup_packet function calculate the header checksum */
--
--				ubcsp_setup_packet (ubcsp_send_ack_header, 1, 0, 0);
--
--				/* We've now sent the ack */
--
--				ubcsp_config.send_ack = 0;
--			}
--			else
--			{
--				/* We didn't have a Link Establishment response packet,
--				   a normal packet or an ACK packet to send */
--
--				delay = UBCSP_POLL_TIME_DELAY;
--			}
--		}
--		else
--		{
--#if SHOW_PACKET_ERRORS
--//			printf (" : %10d Send LE %d\n",
--//				GetTickCount () % 100000,
--//				ubcsp_config.link_establishment_packet);
--#endif
--
--			/* Send A Link Establishment Message */
--
--			put_uart (SLIP_FRAME);
--
--			/* Send the Link Establishment header followed by the 
--			   Link Establishment packet */
--
--			ubcsp_setup_packet ((uint8*) ubcsp_send_le_header, 0, (uint8*) ubcsp_le_buffer[ubcsp_config.link_establishment_packet], 4);
--
--			/* start sending immediately */
--
--			ubcsp_config.delay = 0;
--
--			/* workout what the next link establishment packet should be */
--
--			ubcsp_config.link_establishment_packet = next_le_packet[ubcsp_config.link_establishment_state + ubcsp_config.link_establishment_resp * 4];
--
--			/* We have now delt with any response packet that we needed */
--
--			ubcsp_config.link_establishment_resp = 0;
--
--			return 0;
--		}
--	}
--
--	/* We now need to receive any octets from the UART */
--
--	while ((ubcsp_config.receive_packet) && (get_uart (&value)))
--	{
--		/* If the last octet was SLIP_ESCAPE, then special processing is required */
--
--		if (ubcsp_config.receive_slip_escape)
--		{
--			/* WARNING - out of range values are not detected !!!
--			   This will probably be caught with the checksum or CRC check */
--
--			value = ubcsp_deslip[value - SLIP_ESCAPE_FRAME];
--
--			ubcsp_config.receive_slip_escape = 0;
--		}
--		else
--		{
--			/* Check for the SLIP_FRAME octet - must be start or end of packet */
--			if (value == SLIP_FRAME)
--			{
--				/* If we had a full header then we have a packet */
--
--				if (ubcsp_config.receive_index >= 0)
--				{
--					/* process the received packet */
--
--					*activity |= ubcsp_recevied_packet ();
--
--					if (*activity & UBCSP_PACKET_ACK)
--					{
--						/* We need to ACK this packet, then don't delay its sending */
--						ubcsp_config.delay = 0;
--					}
--				}
--
--				/* Setup to receive the next packet */
--
--				ubcsp_config.receive_index = -4;
--
--				/* Ok, next octet */
--
--				goto finished_receive;
--			}
--			else if (value == SLIP_ESCAPE)
--			{
--				/* If we receive a SLIP_ESCAPE,
--				   then remember to process the next special octet */
--
--				ubcsp_config.receive_slip_escape = 1;
--
--				goto finished_receive;
--			}
--		}
--
--		if (ubcsp_config.receive_index < 0)
--		{
--			/* We are still receiving the header */
--
--			ubcsp_receive_header[ubcsp_config.receive_index + 4] = value;
--
--			ubcsp_config.receive_index ++;
--		}
--		else if (ubcsp_config.receive_index < ubcsp_config.receive_packet->length)
--		{
--			/* We are receiving the payload */
++	/* Just return any activity that occurred */
+ 
+ 	return activity;
+ }
+@@ -1146,7 +1146,7 @@ uint8 ubcsp_poll (uint8 *activity)
+ 		else if (ubcsp_config.receive_index < ubcsp_config.receive_packet->length)
+ 		{
+ 			/* We are receiving the payload */
 -			/* We might stop comming here if we are receiving a
--			   packet which is longer than the receive_packet->length
--			   given by the host */
--
--			ubcsp_config.receive_packet->payload[ubcsp_config.receive_index] = value;
--
--			ubcsp_config.receive_index ++;
--		}
--
--finished_receive:
--		{
--		}
--	}
--
--	if (ubcsp_config.delay > 0)
--	{
--		/* We were delayed so delay some more
--		   this could be cancelled if we received something */
--
--		ubcsp_config.delay --;
--	}
--	else
--	{
--		/* We had no delay, so use the delay we just decided to us */
--
--		ubcsp_config.delay = delay;
--	}
--
--	/* Report the current delay to the user */
--
--	return ubcsp_config.delay;
--}
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2000-2005  CSR Ltd.
-+ *
-+ *
-+ *  Permission is hereby granted, free of charge, to any person obtaining
-+ *  a copy of this software and associated documentation files (the
-+ *  "Software"), to deal in the Software without restriction, including
-+ *  without limitation the rights to use, copy, modify, merge, publish,
-+ *  distribute, sublicense, and/or sell copies of the Software, and to
-+ *  permit persons to whom the Software is furnished to do so, subject to
-+ *  the following conditions:
-+ *
-+ *  The above copyright notice and this permission notice shall be included
-+ *  in all copies or substantial portions of the Software.
-+ *
-+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-+ *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-+ *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-+ *  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-+ *  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-+ *  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-+ *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+/*****************************************************************************/
-+/*****************************************************************************/
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp,c                                                                 **/
-+/**                                                                         **/
-+/** MicroBCSP - a very low cost implementation of the BCSP protocol         **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+#include "ubcsp.h"
-+
-+#if SHOW_PACKET_ERRORS || SHOW_LE_STATES
-+#include <stdio.h>
-+#include <windows.h>
-+#endif
-+
-+static uint16 ubcsp_calc_crc (uint8 ch, uint16 crc);
-+static uint16 ubcsp_crc_reverse (uint16);
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** Constant Data - ROM                                                     **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+/* This is the storage for the link establishment messages */
-+
-+static const uint8 ubcsp_le_buffer[4][4] =
-+	{
-+		{ 0xDA, 0xDC, 0xED, 0xED },
-+		{ 0xAC, 0xAF, 0xEF, 0xEE },
-+		{ 0xAD, 0xEF, 0xAC, 0xED },
-+		{ 0xDE, 0xAD, 0xD0, 0xD0 },
-+	};
-+
-+/* These are the link establishment headers */
-+/* The two version are for the CRC and non-CRC varients */
-+
-+#if UBCSP_CRC
-+static const uint8 ubcsp_send_le_header[4] =
-+	{
-+		0x40, 0x41, 0x00, 0x7E
-+	};
-+#else
-+static const uint8 ubcsp_send_le_header[4] =
-+	{
-+		0x00, 0x41, 0x00, 0xBE
-+	};
-+#endif
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** Static Data - RAM                                                       **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+/* This is the storage for all state data for ubcsp */
-+
-+static struct ubcsp_configuration ubcsp_config;
-+
-+/* This is the ACK packet header - this will be overwritten when
-+   we create an ack packet */
-+
-+static uint8 ubcsp_send_ack_header[4] =
-+	{
-+		0x00, 0x00, 0x00, 0x00
-+	};
-+
-+/* This is the deslip lookup table */
-+
-+static const uint8 ubcsp_deslip[2] =
-+	{
-+		SLIP_FRAME, SLIP_ESCAPE,
-+	};
-+
-+/* This is a state machine table for link establishment */
-+
-+static uint8 next_le_packet[16] =
-+	{
-+		ubcsp_le_sync,			// uninit
-+		ubcsp_le_conf,			// init
-+		ubcsp_le_none,			// active
-+		ubcsp_le_none,
-+		ubcsp_le_sync_resp,		// sync_resp
-+		ubcsp_le_sync_resp,
-+		ubcsp_le_none,
-+		ubcsp_le_none,
-+		ubcsp_le_none,			// conf_resp
-+		ubcsp_le_conf_resp,
-+		ubcsp_le_conf_resp,
-+		ubcsp_le_none,
-+	};
-+
-+/* This is the storage required for building send and crc data */
-+
-+static uint8 ubcsp_send_header[4];
-+static uint8 ubcsp_send_crc[2];
-+
-+/* This is where the receive header is stored before the payload arrives */
-+
-+static uint8 ubcsp_receive_header[4];
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** Code - ROM or RAM                                                       **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_initialize                                                        **/
-+/**                                                                         **/
-+/** This initializes the state of the ubcsp engine to a known values        **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+void ubcsp_initialize (void)
-+{
-+	ubcsp_config.ack_number = 0;
-+	ubcsp_config.sequence_number = 0;
-+	ubcsp_config.send_ptr = 0;
-+	ubcsp_config.send_size = 0;
-+	ubcsp_config.receive_index = -4;
-+
-+	ubcsp_config.delay = 0;
-+
-+#if SHOW_LE_STATES
-+	printf ("Hello Link Uninitialized\n");
-+#endif
-+
-+	ubcsp_config.link_establishment_state = ubcsp_le_uninitialized;
-+	ubcsp_config.link_establishment_packet = ubcsp_le_sync;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_send_packet                                                       **/
-+/**                                                                         **/
-+/** This sends a packet structure for sending to the ubcsp engine           **/
-+/** This can only be called when the activity indication from ubcsp_poll    **/
-+/** indicates that a packet can be sent with UBCSP_PACKET_SENT              **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+void ubcsp_send_packet (struct ubcsp_packet *send_packet)
-+{
-+	/* Initialize the send data to the packet we want to send */
-+
-+	ubcsp_config.send_packet = send_packet;
-+
-+	/* we cannot send the packet at the moment
-+	   when we can at the moment, just set things to 0 */
-+
-+	ubcsp_config.send_size = 0;
-+	ubcsp_config.send_ptr = 0;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_receive_packet                                                    **/
-+/**                                                                         **/
-+/** This sends a packet structure for receiving to the ubcsp engine         **/
-+/** This can only be called when the activity indication from ubcsp_poll    **/
-+/** indicates that a packet can be sent with UBCSP_PACKET_RECEIVED          **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+void ubcsp_receive_packet (struct ubcsp_packet *receive_packet)
-+{
-+	/* Initialize the receive data to the packet we want to receive */
-+
-+	ubcsp_config.receive_packet = receive_packet;
-+
-+	/* setup to receive the header first */
-+
-+	ubcsp_config.receive_index = -4;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_calc_crc                                                          **/
-+/**                                                                         **/
-+/** Takes the next 8 bit value ch, and updates the crc with this value      **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+
-+#ifdef UBCSP_CRC
-+
-+static uint16 ubcsp_calc_crc (uint8 ch, uint16 crc)
-+{
-+	/* Calculate the CRC using the above 16 entry lookup table */
-+
-+	static const uint16 crc_table[] =
-+		{
-+			0x0000, 0x1081, 0x2102, 0x3183,
-+			0x4204, 0x5285, 0x6306, 0x7387,
-+			0x8408, 0x9489, 0xa50a, 0xb58b,
-+			0xc60c, 0xd68d, 0xe70e, 0xf78f
-+		};
-+
-+	/* Do this four bits at a time - more code, less space */
-+
-+    crc = (crc >> 4) ^ crc_table[(crc ^ ch) & 0x000f];
-+    crc = (crc >> 4) ^ crc_table[(crc ^ (ch >> 4)) & 0x000f];
-+
-+	return crc;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_crc_reverse                                                       **/
-+/**                                                                         **/
-+/** Reserves the bits in crc and returns the new value                      **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static uint16 ubcsp_crc_reverse (uint16 crc)
-+{
-+	int32
-+		b,
-+		rev;
-+
-+	/* Reserse the bits to compute the actual CRC value */
-+
-+	for (b = 0, rev=0; b < 16; b++)
-+	{
-+		rev = rev << 1;
-+		rev |= (crc & 1);
-+		crc = crc >> 1;
-+	}
-+
-+	return rev;
-+}
-+
-+#endif
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_put_slip_uart                                                     **/
-+/**                                                                         **/
-+/** Outputs a single octet to the uart                                      **/
-+/** If the octet needs to be escaped, then output the escape value          **/
-+/** and then store the second octet to be output later                      **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static void ubcsp_put_slip_uart (uint8 ch)
-+{
-+	/* output a single UART octet */
-+
-+	/* If it needs to be escaped, then output the escape octet
-+	   and set the send_slip_escape so that the next time we
-+	   output the second octet for the escape correctly.
-+	   This is done right at the top of ubcsp_poll */
-+
-+	if (ch == SLIP_FRAME)
-+	{
-+		put_uart (SLIP_ESCAPE);
-+		ubcsp_config.send_slip_escape = SLIP_ESCAPE_FRAME;
-+	}
-+	else if (ch == SLIP_ESCAPE)
-+	{
-+		put_uart (SLIP_ESCAPE);
-+		ubcsp_config.send_slip_escape = SLIP_ESCAPE_ESCAPE;
-+	}
-+	else
-+	{
-+		/* Not escaped, so just output octet */
-+
-+		put_uart (ch);
-+	}
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_which_le_payload                                                  **/
-+/**                                                                         **/
-+/** Check the payload of this packet, and determine which of the four       **/
-+/** link establishment packets this was.                                    **/
-+/** Can return 5 if it is not a valid link establishment packet             **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static uint32 ubcsp_which_le_payload (const uint8 *payload)
-+{
-+	static int32
-+		octet,
-+		loop;
-+
-+	/* Search through the various link establishment payloads to find
-+	   which one we have received */
-+
-+	for (loop = 0; loop < 4; loop ++)
-+	{
-+		for (octet = 0; octet < 4; octet ++)
-+		{
-+			if (payload[octet] != ubcsp_le_buffer[loop][octet])
-+			{
-+				/* Bad match, just to loop again */
-+				goto bad_match_loop;
-+			}
-+		}
-+
-+		/* All the octets matched, return the value */
-+
-+		return loop;
-+
-+		/* Jumps out of octet loop if we got a bad match */
-+bad_match_loop:
-+		{}
-+	}
-+
-+	/* Non of the link establishment payloads matched - return invalid value */
-+
-+	return 5;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_recevied_packet                                                   **/
-+/**                                                                         **/
-+/** This function is called when we have a SLIP END octet and a full        **/
-+/** packet header and possibly data in the receive packet                   **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static uint8 ubcsp_recevied_packet (void)
-+{
-+	static uint8
-+		receive_crc,
-+		receive_seq,
-+		receive_ack,
-+		activity;
-+
-+#if UBCSP_CRC
-+	static int32
-+		loop;
-+
-+	static uint16
-+		crc;
-+#endif
-+
-+	static uint16
-+		length;
-+
-+	/* Keep track of what activity this received packet will cause */
-+
-+	activity = 0;
-+
-+	/*** Do all error checks that we can ***/
-+
-+	/* First check the header checksum */
-+
-+	if (((ubcsp_receive_header[0] + ubcsp_receive_header[1] + ubcsp_receive_header[2] + ubcsp_receive_header[3]) & 0xff) != 0xff)
-+	{
-+		/* Header Checksum Error */
-+
-+#if SHOW_PACKET_ERRORS
-+		printf ("\n######################## Header Checksum Error %02X %02X %02X %02X\n",
-+			ubcsp_receive_header[0],
-+			ubcsp_receive_header[1],
-+			ubcsp_receive_header[2],
-+			ubcsp_receive_header[3]);
-+#endif
-+
-+		/* If we have a header checksum error, send an ack in return
-+		   this gets a packet to be resent as quickly as possible */
-+
-+		ubcsp_config.send_ack = 1;
-+
-+		return activity;
-+	}
-+
-+	/* Decode the received packets header */
-+
-+	ubcsp_config.receive_packet->reliable = (ubcsp_receive_header[0] & 0x80) >> 7;
-+
-+	receive_crc = (ubcsp_receive_header[0] & 0x40) >> 6;
-+	receive_ack = (ubcsp_receive_header[0] & 0x38) >> 3;
-+	receive_seq = (ubcsp_receive_header[0] & 0x07);
-+
-+	ubcsp_config.receive_packet->channel = (ubcsp_receive_header[1] & 0x0f);
-+
-+	length =
-+		((ubcsp_receive_header[1] & 0xf0) >> 4) |
-+		(ubcsp_receive_header[2] << 4);
-+
-+#if SHOW_PACKET_ERRORS
-+	if (ubcsp_config.receive_packet->reliable)
-+	{
-+		printf (" : %10d         Recv SEQ: %d ACK %d\n",
-+			GetTickCount () % 100000,
-+			receive_seq,
-+			receive_ack);
-+	}
-+	else if (ubcsp_config.receive_packet->channel != 1)
-+	{
-+		printf (" : %10d          Recv        ACK %d\n",
-+			GetTickCount () % 100000,
-+			receive_ack);
-+	}
-+#endif
-+
-+	/* Check for length errors */
-+
-+#if UBCSP_CRC
-+	if (receive_crc)
-+	{
-+		/* If this packet had a CRC, then the length of the payload
-+		   should be 2 less than the received size of the payload */
-+
-+		if (length + 2 != ubcsp_config.receive_index)
-+		{
-+			/* Slip Length Error */
-+
-+#if SHOW_PACKET_ERRORS
-+			printf ("\n######################## Slip Length Error (With CRC) %d,%d\n", length, ubcsp_config.receive_index - 2);
-+#endif
-+
-+			/* If we have a payload length error, send an ack in return
-+			   this gets a packet to be resent as quickly as possible */
-+
-+			ubcsp_config.send_ack = 1;
-+			return activity;
-+		}
-+
-+		/* We have a CRC at the end of this packet */
-+
-+		ubcsp_config.receive_index -= 2;
-+
-+		/* Calculate the packet CRC */
-+
-+		crc = 0xffff;
-+
-+		/* CRC the packet header */
-+
-+		for (loop = 0; loop < 4; loop ++)
-+		{
-+			crc = ubcsp_calc_crc (ubcsp_receive_header[loop], crc);
-+		}
-+
-+		/* CRC the packet payload - without the CRC bytes */
-+
-+		for (loop = 0; loop < ubcsp_config.receive_index; loop ++)
-+		{
-+			crc = ubcsp_calc_crc (ubcsp_config.receive_packet->payload[loop], crc);
-+		}
-+
-+		/* Reverse the CRC */
-+
-+		crc = ubcsp_crc_reverse (crc);
-+
-+		/* Check the CRC is correct */
-+
-+		if
-+		(
-+			(((crc & 0xff00) >> 8) != ubcsp_config.receive_packet->payload[ubcsp_config.receive_index]) ||
-+			((crc & 0xff) != ubcsp_config.receive_packet->payload[ubcsp_config.receive_index + 1])
-+		)
-+		{
-+#if SHOW_PACKET_ERRORS
-+			printf ("\n######################## CRC Error\n");
-+#endif
-+
-+			/* If we have a packet crc error, send an ack in return
-+			   this gets a packet to be resent as quickly as possible */
-+
-+			ubcsp_config.send_ack = 1;
-+			return activity;
-+		}
-+	}
-+	else
-+	{
-+#endif
-+		/* No CRC present, so just check the length of payload with that received */
-+
-+		if (length != ubcsp_config.receive_index)
-+		{
-+			/* Slip Length Error */
-+
-+#if SHOW_PACKET_ERRORS
-+			printf ("\n######################## Slip Length Error (No CRC) %d,%d\n", length, ubcsp_config.receive_index);
-+#endif
-+
-+			/* If we have a payload length error, send an ack in return
-+			   this gets a packet to be resent as quickly as possible */
-+
-+			ubcsp_config.send_ack = 1;
-+			return activity;
-+		}
-+#if UBCSP_CRC
-+	}
-+#endif
-+
-+	/*** We have a fully formed packet having passed all data integrity checks ***/
-+
-+	/* Check if we have an ACK for the last packet we sent */
-+
-+	if (receive_ack != ubcsp_config.sequence_number)
-+	{
-+		/* Since we only have a window size of 1, if the ACK is not equal to SEQ
-+		   then the packet was sent */
-+
-+		if
-+		(
-+			(ubcsp_config.send_packet) &&
-+			(ubcsp_config.send_packet->reliable)
-+		)
-+		{
-+			/* We had sent a reliable packet, so clear this packet
-+			   Then increament the sequence number for the next packet */
-+
-+			ubcsp_config.send_packet = 0;
-+			ubcsp_config.sequence_number ++;
-+			ubcsp_config.delay = 0;
-+
-+			/* Notify the caller that we have SENT a packet */
-+
-+			activity |= UBCSP_PACKET_SENT;
-+		}
-+	}
-+
-+	/*** Now we can concentrate of the packet we have received ***/
-+
-+	/* Check for Link Establishment packets */
-+
-+	if (ubcsp_config.receive_packet->channel == 1)
-+	{
-+		/* Link Establishment */
-+
-+		ubcsp_config.delay = 0;
-+
-+		/* Find which link establishment packet this payload means
-+		   This could return 5, meaning none */
-+
-+		switch (ubcsp_which_le_payload (ubcsp_config.receive_packet->payload))
-+		{
-+			case 0:
-+			{
-+				/* SYNC Recv'd */
-+
-+#if SHOW_LE_STATES
-+				printf ("Recv SYNC\n");
-+#endif
-+
-+				/* If we receive a SYNC, then we respond to it with a SYNC RESP
-+				   but only if we are not active.
-+				   If we are active, then we have a PEER RESET */
-+
-+				if (ubcsp_config.link_establishment_state < ubcsp_le_active)
-+				{
-+					ubcsp_config.link_establishment_resp = 1;
-+				}
-+				else
-+				{
-+					/* Peer reset !!!! */
-+
-+#if SHOW_LE_STATES
-+					printf ("\n\n\n\n\nPEER RESET\n\n");
-+#endif
-+
-+					/* Reinitialize the link */
-+
-+					ubcsp_initialize ();
-+
-+					/* Tell the host what has happened */
-+
-+					return UBCSP_PEER_RESET;
-+				}
-+				break;
-+			}
-+
-+			case 1:
-+			{
-+				/* SYNC RESP Recv'd */
-+
-+#if SHOW_LE_STATES
-+				printf ("Recv SYNC RESP\n");
-+#endif
-+
-+				/* If we receive a SYNC RESP, push us into the initialized state */
-+
-+				if (ubcsp_config.link_establishment_state < ubcsp_le_initialized)
-+				{
-+#if SHOW_LE_STATES
-+					printf ("Link Initialized\n");
-+#endif
-+					ubcsp_config.link_establishment_state = ubcsp_le_initialized;
-+				}
-+
-+				break;
-+			}
-+
-+			case 2:
-+			{
-+				/* CONF Recv'd */
-+
-+#if SHOW_LE_STATES
-+				printf ("Recv CONF\n");
-+#endif
-+
-+				/* If we receive a CONF, and we are initialized or active
-+				   then respond with a CONF RESP */
-+
-+				if (ubcsp_config.link_establishment_state >= ubcsp_le_initialized)
-+				{
-+					ubcsp_config.link_establishment_resp = 2;
-+				}
-+
-+				break;
-+			}
-+
-+			case 3:
-+			{
-+				/* CONF RESP Recv'd */
-+
-+#if SHOW_LE_STATES
-+				printf ("Recv CONF RESP\n");
-+#endif
-+
-+				/* If we received a CONF RESP, then push us into the active state */
-+
-+				if (ubcsp_config.link_establishment_state < ubcsp_le_active)
-+				{
-+#if SHOW_LE_STATES
-+					printf ("Link Active\n");
-+#endif
-+
-+					ubcsp_config.link_establishment_state = ubcsp_le_active;
-+					ubcsp_config.send_size = 0;
-+
-+					return activity | UBCSP_PACKET_SENT;
-+				}
-+
-+				break;
-+			}
-+		}
-+
-+		/* We have finished processing Link Establishment packets */
-+	}
-+	else if (ubcsp_config.receive_index)
-+	{
-+		/* We have some payload data we need to process
-+		   but only if we are active - otherwise, we just ignore it */
-+
-+		if (ubcsp_config.link_establishment_state == ubcsp_le_active)
-+		{
-+			if (ubcsp_config.receive_packet->reliable)
-+			{
-+				/* If the packet we've just received was reliable
-+				   then send an ACK */
-+
-+				ubcsp_config.send_ack = 1;
-+
-+				/* We the sequence number we received is the same as
-+				   the last ACK we sent, then we have received a packet in sequence */
-+
-+				if (receive_seq == ubcsp_config.ack_number)
-+				{
-+					/* Increase the ACK number - which will be sent in the next ACK
-+					   or normal packet we send */
-+
-+					ubcsp_config.ack_number ++;
-+
-+					/* Set the values in the receive_packet structure, so the caller
-+					   knows how much data we have */
-+
-+					ubcsp_config.receive_packet->length = length;
-+					ubcsp_config.receive_packet = 0;
-+
-+					/* Tell the caller that we have received a packet, and that it
-+					   will be ACK'ed */
-+
-+					activity |= UBCSP_PACKET_RECEIVED | UBCSP_PACKET_ACK;
-+				}
-+			}
-+			else
-+			{
-+				/* Set the values in the receive_packet structure, so the caller
-+				   knows how much data we have */
-+
-+				ubcsp_config.receive_packet->length = length;
-+				ubcsp_config.receive_packet = 0;
-+
-+				/* Tell the caller that we have received a packet */
-+
-+				activity |= UBCSP_PACKET_RECEIVED;
-+			}
-+		}
-+	}
-+
-+	/* Just return any activity that occured */
-+
-+	return activity;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_setup_packet                                                      **/
-+/**                                                                         **/
-+/** This function is called to setup a packet to be sent                    **/
-+/** This allows just a header, or a header and payload to be sent           **/
-+/** It also allows the header checksum to be precalcuated                   **/
-+/** or calculated here                                                      **/
-+/** part1 is always 4 bytes                                                 **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static void ubcsp_setup_packet (uint8 *part1, uint8 calc, uint8 *part2, uint16 len2)
-+{
-+	/* If we need to calculate the checksum, do that now */
-+
-+	if (calc)
-+	{
-+		part1[3] =
-+			~(part1[0] + part1[1] + part1[2]);
-+	}
-+
-+	/* Setup the header send pointer and size so we can clock this out */
-+
-+	ubcsp_config.send_ptr = part1;
-+	ubcsp_config.send_size = 4;
-+
-+	/* Setup the payload send pointer and size */
-+
-+	ubcsp_config.next_send_ptr = part2;
-+	ubcsp_config.next_send_size = len2;
-+
-+#if UBCSP_CRC
-+	/* Initialize the crc as required */
-+
-+	ubcsp_config.send_crc = -1;
-+
-+	ubcsp_config.need_send_crc = 1;
-+#endif
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_sent_packet                                                       **/
-+/**                                                                         **/
-+/** Called when we have finished sending a packet                           **/
-+/** If this packet was unreliable, then notify caller, and clear the data   **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+static uint8 ubcsp_sent_packet (void)
-+{
-+	if (ubcsp_config.send_packet)
-+	{
-+		if (!ubcsp_config.send_packet->reliable)
-+		{
-+			/* We had a packet sent that was unreliable */
-+
-+			/* Forget about this packet */
-+
-+			ubcsp_config.send_packet = 0;
-+
-+			/* Notify caller that they can send another one */
-+
-+			return UBCSP_PACKET_SENT;
-+		}
-+	}
-+
-+	/* We didn't have a packet, or it was reliable
-+	   Must wait for ACK before allowing another packet to be sent */
-+
-+	return 0;
-+}
-+
-+/*****************************************************************************/
-+/**                                                                         **/
-+/** ubcsp_poll                                                              **/
-+/**                                                                         **/
-+/** This is the main function for ubcsp                                     **/
-+/** It performs a number of tasks                                           **/
-+/**                                                                         **/
-+/** 1) Send another octet to the UART - escaping as required                **/
-+/** 2) Setup the payload to be sent after the header has been sent          **/
-+/** 3) Send the CRC for the packet if required                              **/
-+/**                                                                         **/
-+/** 4) Calculate the next Link Establishment State                          **/
-+/** 5) Send a Link Establishment packet                                     **/
-+/** 6) Send a normal packet if available                                    **/
-+/** 7) Send an ACK packet if required                                       **/
-+/**                                                                         **/
-+/** 8) Receive octets from UART and deslip them as required                 **/
-+/** 9) Place received octets into receive header or receive payload buffer  **/
-+/** 10) Process received packet when SLIP_END is received                   **/
-+/**                                                                         **/
-+/** 11) Keep track of ability of caller to delay recalling                  **/
-+/**                                                                         **/
-+/*****************************************************************************/
-+
-+uint8 ubcsp_poll (uint8 *activity)
-+{
-+	uint8
-+		delay = UBCSP_POLL_TIME_IMMEDIATE;
-+
-+	uint8
-+		value;
-+
-+	/* Assume no activity to start with */
-+
-+	*activity = 0;
-+
-+	/* If we don't have to delay, then send something if we can */
-+
-+	if (!ubcsp_config.delay)
-+	{
-+		/* Do we have something we are sending to send */
-+
-+		if (ubcsp_config.send_size)
-+		{
-+			/* We have something to send so send it */
-+
-+			if (ubcsp_config.send_slip_escape)
-+			{
-+				/* Last time we send a SLIP_ESCAPE octet
-+				   this time send the second escape code */
-+
-+				put_uart (ubcsp_config.send_slip_escape);
-+
-+				ubcsp_config.send_slip_escape = 0;
-+			}
-+			else
-+			{
-+#if UBCSP_CRC
-+				/* get the value to send, and calculate CRC as we go */
-+
-+				value = *ubcsp_config.send_ptr ++;
-+
-+				ubcsp_config.send_crc = ubcsp_calc_crc (value, ubcsp_config.send_crc);
-+
-+				/* Output the octet */
-+
-+				ubcsp_put_slip_uart (value);
-+#else
-+				/* Just output the octet*/
-+
-+				ubcsp_put_slip_uart (*ubcsp_config.send_ptr ++);
-+#endif
-+			}
-+
-+			/* If we did output a SLIP_ESCAPE, then don't process the end of a block */
-+
-+			if ((!ubcsp_config.send_slip_escape) && ((ubcsp_config.send_size = ubcsp_config.send_size - 1) == 0))
-+			{
-+				/*** We are at the end of a block - either header or payload ***/
-+
-+				/* setup the next block */
-+
-+				ubcsp_config.send_ptr = ubcsp_config.next_send_ptr;
-+				ubcsp_config.send_size = ubcsp_config.next_send_size;
-+				ubcsp_config.next_send_ptr = 0;
-+				ubcsp_config.next_send_size = 0;
-+
-+#if UBCSP_CRC
-+				/* If we have no successor block
-+				   then we might need to send the CRC */
-+
-+				if (!ubcsp_config.send_ptr)
-+				{
-+					if (ubcsp_config.need_send_crc)
-+					{
-+						/* reverse the CRC from what we computed along the way */
-+
-+						ubcsp_config.need_send_crc = 0;
-+
-+						ubcsp_config.send_crc = ubcsp_crc_reverse (ubcsp_config.send_crc);
-+
-+						/* Save in the send_crc buffer */
-+
-+						ubcsp_send_crc[0] = (uint8) (ubcsp_config.send_crc >> 8);
-+						ubcsp_send_crc[1] = (uint8) ubcsp_config.send_crc;
-+
-+						/* Setup to send this buffer */
-+
-+						ubcsp_config.send_ptr = ubcsp_send_crc;
-+						ubcsp_config.send_size = 2;
-+					}
-+					else
-+					{
-+						/* We don't need to send the crc
-+						   either we just have, or this packet doesn't include it */
-+
-+						/* Output the end of FRAME marker */
-+
-+						put_uart (SLIP_FRAME);
-+
-+						/* Check if this is an unreliable packet */
-+
-+						*activity |= ubcsp_sent_packet ();
-+
-+						/* We've sent the packet, so don't need to have be called quickly soon */
-+
-+						delay = UBCSP_POLL_TIME_DELAY;
-+					}
-+				}
-+#else
-+				/* If we have no successor block
-+				   then we might need to send the CRC */
-+
-+				if (!ubcsp_config.send_ptr)
-+				{
-+					/* Output the end of FRAME marker */
-+
-+					put_uart (SLIP_FRAME);
-+
-+					/* Check if this is an unreliable packet */
-+
-+					*activity |= ubcsp_sent_packet ();
-+
-+					/* We've sent the packet, so don't need to have be called quickly soon */
-+
-+					delay = UBCSP_POLL_TIME_DELAY;
-+				}
-+#endif
-+			}
-+		}
-+		else if (ubcsp_config.link_establishment_packet == ubcsp_le_none)
-+		{
-+			/* We didn't have something to send
-+			   AND we have no Link Establishment packet to send */
-+
-+			if (ubcsp_config.link_establishment_resp & 2)
-+			{
-+				/* Send the start of FRAME packet */
-+
-+				put_uart (SLIP_FRAME);
-+
-+				/* We did require a RESP packet - so setup the send */
-+
-+				ubcsp_setup_packet ((uint8*) ubcsp_send_le_header, 0, (uint8*) ubcsp_le_buffer[ubcsp_le_conf_resp], 4);
-+
-+				/* We have now "sent" this packet */
-+
-+				ubcsp_config.link_establishment_resp = 0;
-+			}
-+			else if (ubcsp_config.send_packet)
-+			{
-+				/* There is a packet ready to be sent */
-+
-+				/* Send the start of FRAME packet */
-+
-+				put_uart (SLIP_FRAME);
-+
-+				/* Encode up the packet header using ACK and SEQ numbers */
-+
-+				ubcsp_send_header[0] =
-+					(ubcsp_config.send_packet->reliable << 7) |
-+#if UBCSP_CRC
-+					0x40 |	/* Always use CRC's */
-+#endif
-+					(ubcsp_config.ack_number << 3) |
-+					(ubcsp_config.sequence_number);
-+
-+				/* Encode up the packet header's channel and length */
-+				ubcsp_send_header[1] =
-+					(ubcsp_config.send_packet->channel & 0x0f) |
-+					((ubcsp_config.send_packet->length << 4) & 0xf0);
-+
-+				ubcsp_send_header[2] =
-+					(ubcsp_config.send_packet->length >> 4) & 0xff;
-+
-+				/* Let the ubcsp_setup_packet function calculate the header checksum */
-+
-+				ubcsp_setup_packet ((uint8*) ubcsp_send_header, 1, ubcsp_config.send_packet->payload, ubcsp_config.send_packet->length);
-+
-+				/* Don't need to send an ACK - we just place on in this packet */
-+
-+				ubcsp_config.send_ack = 0;
-+
-+#if SHOW_PACKET_ERRORS
-+				printf (" : %10d Send %d Ack %d\n",
-+					GetTickCount () % 100000,
-+					ubcsp_config.sequence_number,
-+					ubcsp_config.ack_number);
-+#endif
-+			}
-+			else if (ubcsp_config.send_ack)
-+			{
-+				/* Send the start of FRAME packet */
-+
-+				put_uart (SLIP_FRAME);
-+
-+#if SHOW_PACKET_ERRORS
-+				printf (" : %10d Send ACK %d\n",
-+					GetTickCount () % 100000,
-+					ubcsp_config.ack_number);
-+#endif
-+
-+				/* The ack packet is already computed apart from the first octet */
-+
-+				ubcsp_send_ack_header[0] =
-+#if UBCSP_CRC
-+					0x40 |
-+#endif
-+					(ubcsp_config.ack_number << 3);
-+
-+				/* Let the ubcsp_setup_packet function calculate the header checksum */
-+
-+				ubcsp_setup_packet (ubcsp_send_ack_header, 1, 0, 0);
-+
-+				/* We've now sent the ack */
-+
-+				ubcsp_config.send_ack = 0;
-+			}
-+			else
-+			{
-+				/* We didn't have a Link Establishment response packet,
-+				   a normal packet or an ACK packet to send */
-+
-+				delay = UBCSP_POLL_TIME_DELAY;
-+			}
-+		}
-+		else
-+		{
-+#if SHOW_PACKET_ERRORS
-+//			printf (" : %10d Send LE %d\n",
-+//				GetTickCount () % 100000,
-+//				ubcsp_config.link_establishment_packet);
-+#endif
-+
-+			/* Send A Link Establishment Message */
-+
-+			put_uart (SLIP_FRAME);
-+
-+			/* Send the Link Establishment header followed by the
-+			   Link Establishment packet */
-+
-+			ubcsp_setup_packet ((uint8*) ubcsp_send_le_header, 0, (uint8*) ubcsp_le_buffer[ubcsp_config.link_establishment_packet], 4);
-+
-+			/* start sending immediately */
-+
-+			ubcsp_config.delay = 0;
-+
-+			/* workout what the next link establishment packet should be */
-+
-+			ubcsp_config.link_establishment_packet = next_le_packet[ubcsp_config.link_establishment_state + ubcsp_config.link_establishment_resp * 4];
-+
-+			/* We have now delt with any response packet that we needed */
-+
-+			ubcsp_config.link_establishment_resp = 0;
-+
-+			return 0;
-+		}
-+	}
-+
-+	/* We now need to receive any octets from the UART */
-+
-+	while ((ubcsp_config.receive_packet) && (get_uart (&value)))
-+	{
-+		/* If the last octet was SLIP_ESCAPE, then special processing is required */
-+
-+		if (ubcsp_config.receive_slip_escape)
-+		{
-+			/* WARNING - out of range values are not detected !!!
-+			   This will probably be caught with the checksum or CRC check */
-+
-+			value = ubcsp_deslip[value - SLIP_ESCAPE_FRAME];
-+
-+			ubcsp_config.receive_slip_escape = 0;
-+		}
-+		else
-+		{
-+			/* Check for the SLIP_FRAME octet - must be start or end of packet */
-+			if (value == SLIP_FRAME)
-+			{
-+				/* If we had a full header then we have a packet */
-+
-+				if (ubcsp_config.receive_index >= 0)
-+				{
-+					/* process the received packet */
-+
-+					*activity |= ubcsp_recevied_packet ();
-+
-+					if (*activity & UBCSP_PACKET_ACK)
-+					{
-+						/* We need to ACK this packet, then don't delay its sending */
-+						ubcsp_config.delay = 0;
-+					}
-+				}
-+
-+				/* Setup to receive the next packet */
-+
-+				ubcsp_config.receive_index = -4;
-+
-+				/* Ok, next octet */
-+
-+				goto finished_receive;
-+			}
-+			else if (value == SLIP_ESCAPE)
-+			{
-+				/* If we receive a SLIP_ESCAPE,
-+				   then remember to process the next special octet */
-+
-+				ubcsp_config.receive_slip_escape = 1;
-+
-+				goto finished_receive;
-+			}
-+		}
-+
-+		if (ubcsp_config.receive_index < 0)
-+		{
-+			/* We are still receiving the header */
-+
-+			ubcsp_receive_header[ubcsp_config.receive_index + 4] = value;
-+
-+			ubcsp_config.receive_index ++;
-+		}
-+		else if (ubcsp_config.receive_index < ubcsp_config.receive_packet->length)
-+		{
-+			/* We are receiving the payload */
-+			/* We might stop comming here if we are receiving a
-+			   packet which is longer than the receive_packet->length
-+			   given by the host */
-+
-+			ubcsp_config.receive_packet->payload[ubcsp_config.receive_index] = value;
-+
-+			ubcsp_config.receive_index ++;
-+		}
-+
-+finished_receive:
-+		{
-+		}
-+	}
-+
-+	if (ubcsp_config.delay > 0)
-+	{
-+		/* We were delayed so delay some more
-+		   this could be cancelled if we received something */
-+
-+		ubcsp_config.delay --;
-+	}
-+	else
-+	{
-+		/* We had no delay, so use the delay we just decided to us */
-+
-+		ubcsp_config.delay = delay;
-+	}
-+
-+	/* Report the current delay to the user */
-+
-+	return ubcsp_config.delay;
-+}
++			/* We might stop coming here if we are receiving a
+ 			   packet which is longer than the receive_packet->length
+ 			   given by the host */
+ 
 -- 
 1.7.6
 
