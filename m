@@ -1,98 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/3] build: Rename configfiles option to datafiles
-Date: Sat,  2 Jul 2011 00:35:10 -0300
-Message-Id: <1309577712-3828-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: Re: [PATCH v2] build: Add support for systemd service configuration
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Date: Fri, 01 Jul 2011 19:38:38 -0700
+In-Reply-To: <BANLkTinSB_DGVHHpb8PVy3j5SuWrDdb1dw@mail.gmail.com>
+References: <1308275200-17393-1-git-send-email-lucas.demarchi@profusion.mobi>
+	 <1308284110.2196.29.camel@aeonflux>
+	 <BANLkTi=K7f5n9Wb6KAoD2sCHiWG9tBRqdA@mail.gmail.com>
+	 <1309463046.2208.56.camel@aeonflux>
+	 <BANLkTinSB_DGVHHpb8PVy3j5SuWrDdb1dw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1309574321.17415.0.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of passing --[disable|enable]-configfiles, now we use
---[disable|enable]-datafiles as not all of the files are installed for
-configuration but are rather data files.
----
- Makefile.am    |    6 +++---
- Makefile.tools |    2 +-
- acinclude.m4   |    8 ++++----
- 3 files changed, 8 insertions(+), 8 deletions(-)
+Hi Lucas,
 
-diff --git a/Makefile.am b/Makefile.am
-index e320105..2268890 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -23,7 +23,7 @@ includedir = @includedir@/bluetooth
- 
- include_HEADERS =
- 
--if CONFIGFILES
-+if DATAFILES
- dbusdir = $(sysconfdir)/dbus-1/system.d
- 
- dbus_DATA = src/bluetooth.conf
-@@ -270,7 +270,7 @@ CLEANFILES += $(builtin_files)
- 
- man_MANS = src/bluetoothd.8
- 
--if CONFIGFILES
-+if DATAFILES
- conf_DATA += src/main.conf
- endif
- 
-@@ -301,7 +301,7 @@ audio_libasound_module_ctl_bluetooth_la_LDFLAGS = -module -avoid-version #-expor
- audio_libasound_module_ctl_bluetooth_la_LIBADD = lib/libbluetooth.la @ALSA_LIBS@
- audio_libasound_module_ctl_bluetooth_la_CFLAGS = @ALSA_CFLAGS@
- 
--if CONFIGFILES
-+if DATAFILES
- alsaconfdir = $(datadir)/alsa
- 
- alsaconf_DATA = audio/bluetooth.conf
-diff --git a/Makefile.tools b/Makefile.tools
-index bec10b5..1cd8c9e 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -1,6 +1,6 @@
- 
- if TOOLS
--if CONFIGFILES
-+if DATAFILES
- conf_DATA += tools/rfcomm.conf
- endif
- 
-diff --git a/acinclude.m4 b/acinclude.m4
-index a37959a..089d775 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -206,7 +206,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	hid2hci_enable=no
- 	dfutool_enable=no
- 	udevrules_enable=yes
--	configfiles_enable=yes
-+	datafiles_enable=yes
- 	telephony_driver=dummy
- 	maemo6_enable=no
- 	sap_driver=dummy
-@@ -325,8 +325,8 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 		udevrules_enable=${enableval}
- 	])
- 
--	AC_ARG_ENABLE(configfiles, AC_HELP_STRING([--enable-configfiles], [install Bluetooth configuration files]), [
--		configfiles_enable=${enableval}
-+	AC_ARG_ENABLE(datafiles, AC_HELP_STRING([--enable-datafiles], [install Bluetooth configuration and data files]), [
-+		datafiles_enable=${enableval}
- 	])
- 
- 	AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug], [enable compiling with debugging information]), [
-@@ -403,7 +403,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(HID2HCI, test "${hid2hci_enable}" = "yes" && test "${usb_found}" = "yes" && test "${udev_found}" = "yes")
- 	AM_CONDITIONAL(DFUTOOL, test "${dfutool_enable}" = "yes" && test "${usb_found}" = "yes")
- 	AM_CONDITIONAL(UDEVRULES, test "${udevrules_enable}" = "yes")
--	AM_CONDITIONAL(CONFIGFILES, test "${configfiles_enable}" = "yes")
-+	AM_CONDITIONAL(DATAFILES, test "${datafiles_enable}" = "yes")
- 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
- 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
- ])
--- 
-1.7.6
+> >> >> -DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules
+> >> >> +DISTCHECK_CONFIGURE_FLAGS = --disable-udevrules --with-systemdunitdir=
+> >> >
+> >> > can we please do it the same way I did it for oFono and ConnMan. I have
+> >> > no idea what you are doing here. If --with-systemdunitdir is not given,
+> >> > then it should be disabled and it should be that by default.
+> >>
+> >> This is indeed the same code as in oFono and ConnMann. If
+> >> `--with-systemdunitdir' is not given it defaults to checking
+> >> `pkg-config --variable systemdsystemunitdir systemd'. So in case we
+> >> call `make distcheck' and systemd is installed, this will fail, as it
+> >> will in oFono and ConnMann. The difference is that there we have
+> >> `DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles'. I may do the same
+> >> and let `DISTCHECK_CONFIGURE_FLAGS = --disable-configfiles'. What do
+> >> you think? Then I think I could remove the `--disable-udevrules' as
+> >> well.
+> >
+> > lets do the same as we have done in ConnMan and oFono.
+> >
+> > We might just rename --disable-configfiles into --disable-datafiles to
+> > bring all three projects in sync here.
+> >
+> > The --disable-udevrules has to stay since otherwise we would install
+> > into a system directory. However we can put that under the DATAFILES
+> > conditional.
+> >
+> > Care to send a new set of patches?
+> 
+> Ok.
+> 
+> Bastien, are you going to do it or I can do it myself?
+
+just send me an updated patch. I wanna get this merged upstream. I was
+under the impression this got already fixed, but I was wrong.
+
+Regards
+
+Marcel
+
 
