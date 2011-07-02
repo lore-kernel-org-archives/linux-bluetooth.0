@@ -1,39 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sat, 2 Jul 2011 13:44:46 -0400
-Subject: [PATCH v2 0/1] Bluetooth: Add NULL ACL packet stat
-Message-ID: <1309628686.22449.11.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
+Date: Sat, 2 Jul 2011 13:44:49 -0400
+Subject: [PATCH v2 1/1] Bluetooth: l2cap: fix NULL ACL packet handling
+Message-ID: <1309628689.22449.12.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remote devices use the FLOW indicator in the ACL baseband 
-packet header to indicate to transmitting devices that the RX
-buffer is full. In heavily asymmetric traffic, this can generate
-NULL ACL packets (0-length, ACL continuation fragments).
-
-Rather than emit log errors, track this as a device statistic instead.
-The corresponding user-space patch to hciconfig outputs the accumulated
-NULL packets with the other device statistics.
-
-In reviewing the ioctl (HCIGETDEVINFO) used between km <-> um, I noticed
-there is no versioning or size information to prevent km from
-overwriting the um stack (eg., using an earlier version of user-space
-tools).
-
-Is it generally accepted to force new Bluez with new kernel (and vice
-versa)?  In a related query, will the mgmtops interface subsume/replace
-this ioctl usage as well?
-
-Peter Hurley (1):
-  Bluetooth: l2cap: fix NULL ACL packet handling
-
- include/net/bluetooth/hci.h |    1 +
- net/bluetooth/l2cap_core.c  |    8 ++++++++
- 2 files changed, 9 insertions(+), 0 deletions(-)
-
--- 
-1.7.4.1
-
+QSAwLWxlbmd0aCBBQ0wgY29udGludWF0aW9uLWZyYWdtZW50IGlzIGEgdmFsaWQgTlVMTCBwYWNr
+ZXQuIFJlbW90ZQ0KZGV2aWNlcyBjYW4gdXNlIHRoZSBGTE9XIGluZGljYXRvciBpbiB0aGUgQUNM
+IHBhY2tldCBoZWFkZXIgdG8NCmZsb3ctY29udHJvbCBBQ0wgcGFja2V0cyB3aXRob3V0IHNlbmRp
+bmcgYSBwYXlsb2FkLg0KDQpUcmFjayBhcyBhIGRldmljZSBzdGF0IGluc3RlYWQgb2YgbG9nZ2lu
+Zy4NCg0KU2lnbmVkLW9mZi1ieTogUGV0ZXIgSHVybGV5IDxwZXRlckBodXJsZXlzb2Z0d2FyZS5j
+b20+DQotLS0NCiBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggfCAgICAxICsNCiBuZXQvYmx1
+ZXRvb3RoL2wyY2FwX2NvcmUuYyAgfCAgICA4ICsrKysrKysrDQogMiBmaWxlcyBjaGFuZ2VkLCA5
+IGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9pbmNsdWRlL25l
+dC9ibHVldG9vdGgvaGNpLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgNCmluZGV4IDBj
+MjAyMjcuLmRlN2VkODEgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgN
+CisrKyBiL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaA0KQEAgLTExNDIsNiArMTE0Miw3IEBA
+IHN0cnVjdCBoY2lfdWZpbHRlciB7DQogDQogLyogLS0tLSBIQ0kgSW9jdGwgcmVxdWVzdHMgc3Ry
+dWN0dXJlcyAtLS0tICovDQogc3RydWN0IGhjaV9kZXZfc3RhdHMgew0KKwlfX3UzMiBudWxsX3J4
+OwkJLyogIyBOVUxMIHBrdHMgcmVjdmQgKi8NCiAJX191MzIgZXJyX3J4Ow0KIAlfX3UzMiBlcnJf
+dHg7DQogCV9fdTMyIGNtZF90eDsNCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2wyY2FwX2Nv
+cmUuYyBiL25ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jDQppbmRleCBlNjRhMWMyLi40ODY5MTgx
+IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMNCisrKyBiL25ldC9ibHVl
+dG9vdGgvbDJjYXBfY29yZS5jDQpAQCAtNDEwOSw2ICs0MTA5LDE0IEBAIHN0YXRpYyBpbnQgbDJj
+YXBfcmVjdl9hY2xkYXRhKHN0cnVjdCBoY2lfY29ubiAqaGNvbiwgc3RydWN0IHNrX2J1ZmYgKnNr
+YiwgdTE2IGZsDQogCQlCVF9EQkcoIkNvbnQ6IGZyYWcgbGVuICVkIChleHBlY3RpbmcgJWQpIiwg
+c2tiLT5sZW4sIGNvbm4tPnJ4X2xlbik7DQogDQogCQlpZiAoIWNvbm4tPnJ4X2xlbikgew0KKwkJ
+CS8qIEEgMC1sZW5ndGgsIGNvbnRpbnVhdGlvbiBmcmFnbWVudCBpcyBhIE5VTEwgcGFja2V0DQor
+CQkJICogKENvcmUgMi4xLCBWb2wgMiwgUGFydCBCLCA2LjUuMS4yLCA2LjQuMyAmIDYuNi4yKQ0K
+KwkJCSAqIFRoZSByZW1vdGUgZGV2aWNlIGlzIGxpa2VseSBjb250cm9sbGluZyBwYWNrZXQgZmxv
+dw0KKwkJCSAqIHdpdGggQUNMIHBheWxvYWQgaGVhZGVyIEZMT1cgaW5kaWNhdG9yLiAqLw0KKwkJ
+CWlmICghc2tiLT5sZW4pIHsNCisJCQkJaGNvbi0+aGRldi0+c3RhdC5udWxsX3J4Kys7DQorCQkJ
+CWdvdG8gZHJvcDsNCisJCQl9DQogCQkJQlRfRVJSKCJVbmV4cGVjdGVkIGNvbnRpbnVhdGlvbiBm
+cmFtZSAobGVuICVkKSIsIHNrYi0+bGVuKTsNCiAJCQlsMmNhcF9jb25uX3VucmVsaWFibGUoY29u
+biwgRUNPTU0pOw0KIAkJCWdvdG8gZHJvcDsNCi0tIA0KMS43LjQuMQ0KDQo=
