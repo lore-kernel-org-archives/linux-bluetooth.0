@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sat, 2 Jul 2011 13:44:56 -0400
-Subject: [PATCH] Add NULL packet stat to hciconfig
-Message-ID: <1309628696.22449.13.camel@THOR>
+Date: Sat, 2 Jul 2011 13:44:46 -0400
+Subject: [PATCH v2 0/1] Bluetooth: Add NULL ACL packet stat
+Message-ID: <1309628686.22449.11.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/hci.h         |    1 +
- tools/hciconfig.c |    5 +++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Remote devices use the FLOW indicator in the ACL baseband 
+packet header to indicate to transmitting devices that the RX
+buffer is full. In heavily asymmetric traffic, this can generate
+NULL ACL packets (0-length, ACL continuation fragments).
 
-diff --git a/lib/hci.h b/lib/hci.h
-index 51184ee..7f4812d 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -2284,6 +2284,7 @@ struct hci_filter {
- 
- /* Ioctl requests structures */
- struct hci_dev_stats {
-+	uint32_t null_rx;	/* # NULL pkts recvd */
- 	uint32_t err_rx;
- 	uint32_t err_tx;
- 	uint32_t cmd_tx;
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index cbd0d0e..cb65c06 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -1863,8 +1863,9 @@ static void print_dev_info(int ctl, struct hci_dev_info *di)
- 	printf("\t%s\n", str);
- 	bt_free(str);
- 
--	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d\n",
--		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx);
-+	printf("\tRX bytes:%d acl:%d sco:%d events:%d errors:%d nulls:%d\n",
-+		st->byte_rx, st->acl_rx, st->sco_rx, st->evt_rx, st->err_rx,
-+		st->null_rx);
- 
- 	printf("\tTX bytes:%d acl:%d sco:%d commands:%d errors:%d\n",
- 		st->byte_tx, st->acl_tx, st->sco_tx, st->cmd_tx, st->err_tx);
+Rather than emit log errors, track this as a device statistic instead.
+The corresponding user-space patch to hciconfig outputs the accumulated
+NULL packets with the other device statistics.
+
+In reviewing the ioctl (HCIGETDEVINFO) used between km <-> um, I noticed
+there is no versioning or size information to prevent km from
+overwriting the um stack (eg., using an earlier version of user-space
+tools).
+
+Is it generally accepted to force new Bluez with new kernel (and vice
+versa)?  In a related query, will the mgmtops interface subsume/replace
+this ioctl usage as well?
+
+Peter Hurley (1):
+  Bluetooth: l2cap: fix NULL ACL packet handling
+
+ include/net/bluetooth/hci.h |    1 +
+ net/bluetooth/l2cap_core.c  |    8 ++++++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
+
 -- 
 1.7.4.1
 
