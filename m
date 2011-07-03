@@ -1,76 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E10B97B.8060703@kernelconcepts.de>
-Date: Sun, 03 Jul 2011 20:48:27 +0200
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
-MIME-Version: 1.0
+Date: Sun, 3 Jul 2011 15:31:41 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Disable pnat-server
-References: <4E108D72.3010006@kernelconcepts.de> <20110703180444.GA19576@dell.ger.corp.intel.com>
-In-Reply-To: <20110703180444.GA19576@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] avrcp: mark signals as deprecated
+Message-ID: <20110703183141.GB2706@joana>
+References: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
+ <20110703114445.GD10186@dell.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110703114445.GD10186@dell.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 03.07.2011 20:04, schrieb Johan Hedberg:
-> Hi Nils,
-Hi Johan!
+Hi Johan,
 
-> On Sun, Jul 03, 2011, Nils Faerber wrote:
->> I have developed a small app which registers its own RFCOMM based
->> service and service ID using libbluetooth and the SDP services. This
->> worked great until some recent Ubuntu update which upgraded the
->> Bluetooth services (I guess).
->> Now I get an error in syslog whenever my device tries to connect:
->>
->> Jul  3 17:23:13 tlb bluetoothd[27590]: Unable to spawn pnatd: Failed to
->> execute child process "/usr/bin/phonet-at" (No such file or directory)
->>
->> It took me quite some time to figure out that this is part of the (new?)
->> bluetoothd plugin system which is pitily not documented anywhere -
->> especially not which plugins there are, what they do and how they can be
->> en- or disabled.
+* Johan Hedberg <johan.hedberg@gmail.com> [2011-07-03 14:44:45 +0300]:
+
+> Hi Gustavo,
 > 
-> There should be absolutely no reason for Ubuntu have this plugin enabled
-> or even compiled. You might wanna file a bug to them to disable it. The
-> only place where it makes sense to be compiled is in Nokia's Maemo
-> Harmattan platform. For everything else it should be disabled (as it is
-> by default).
-
-Yes, indeed - I have not tried, what is the default when compiling the
-BlueZ package, en- or disabled?
-
-> Btw, if you have your own RFCOMM based service you should take a look at
-> doc/assigned-numbers.txt to be sure not to conflict with any of those
-> services. The range of possible RFCOMM channels (1-31) is so small that
-> it's easy to get conflicts.
-
-I was not the one to choose that ;)
-It is for the Sony Ericsson LiveView and I have to use what they did.
-
->> After some more searching and reading sources I found that plugins can
->> theoretically be disabled in bluetoothd's config file main.conf. So I added
->>
->> DisablePlugins = pnat-server
+> On Sat, Jul 02, 2011, Gustavo F. Padovan wrote:
+> > From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> > 
+> > Connected and Disconnected are deprecated signals
+> > ---
+> >  doc/control-api.txt |    4 ++--
+> >  1 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> The plugin is called pnat, so that line should read DisablePlugins=pnat
+> Why do you think these should be deprecated? Right now there are no
+> other signals available in the org.bluez.Control interface that'd give
+> the same information.
 
-Sure?
-The pnat.c source sais:
+I'm just following the code:
 
-static struct btd_adapter_driver pnat_server = {
-        .name   = "pnat-server",
-        .probe  = pnat_probe,
-        .remove = pnat_remove,
-};
+static GDBusSignalTable control_signals[] = {
+        { "Connected",                  "",     G_DBUS_SIGNAL_FLAG_DEPRECATED},
+        { "Disconnected",               "",     G_DBUS_SIGNAL_FLAG_DEPRECATED},
 
-I'll retry with pnat again ;)
+But now see that PropertyChanged is not used anywhere.
 
-> Johan
-Cheers
-  nils
-
--- 
-kernel concepts GbR        Tel: +49-271-771091-12
-Sieghuetter Hauptweg 48
-D-57072 Siegen             Mob: +49-176-21024535
-http://www.kernelconcepts.de
+	Gustavo
