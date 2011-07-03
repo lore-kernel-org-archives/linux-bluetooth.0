@@ -1,51 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Sat, 2 Jul 2011 22:49:58 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 1/1] Bluetooth: l2cap: fix NULL ACL packet handling
-Message-ID: <20110703014958.GA2706@joana>
-References: <1309628689.22449.12.camel@THOR>
- <1309644714.21109.7.camel@aeonflux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309644714.21109.7.camel@aeonflux>
+In-Reply-To: <BANLkTinhYCGbzLXTeMJo7uf_0+-dA_zSig@mail.gmail.com>
+References: <BANLkTikVuJ4RdV4Ng1ROh9Oc80K6p8ZQBw@mail.gmail.com>
+	<BANLkTinhYCGbzLXTeMJo7uf_0+-dA_zSig@mail.gmail.com>
+Date: Sat, 2 Jul 2011 19:35:33 -0600
+Message-ID: <CAKLsOONx6QgTPLRX=tm7KhYpfkeEq+A4JgXocmsLHONmTBZo8Q@mail.gmail.com>
+Subject: Re: sco routing
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Marcel Holtmann <marcel@holtmann.org> [2011-07-02 15:11:51 -0700]:
+Hey
 
-> Hi Peter,
-> 
-> > A 0-length ACL continuation-fragment is a valid NULL packet. Remote
-> > devices can use the FLOW indicator in the ACL packet header to
-> > flow-control ACL packets without sending a payload.
-> > 
-> > Track as a device stat instead of logging.
-> > 
-> > Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-> > ---
-> >  include/net/bluetooth/hci.h |    1 +
-> >  net/bluetooth/l2cap_core.c  |    8 ++++++++
-> >  2 files changed, 9 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 0c20227..de7ed81 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -1142,6 +1142,7 @@ struct hci_ufilter {
-> >  
-> >  /* ---- HCI Ioctl requests structures ---- */
-> >  struct hci_dev_stats {
-> > +	__u32 null_rx;		/* # NULL pkts recvd */
-> >  	__u32 err_rx;
-> >  	__u32 err_tx;
-> >  	__u32 cmd_tx;
-> 
-> you can not do it like this. This will break userspace API/ABI.
+test-audio connect xx seems to work, I can hear the audio channel
+firing up and see it in the hcitool con output. But it changes from
+esco to sco then sco closes and only the acl is left. I want to test
+sco routing on my board, so I'd like it to keep a sco connection up.
+Is that possible? Would problems in the pcm setup on the board cause
+the bt chip to close sco?
 
-Actually I don't see a point to have null_rx counter, just drop the packet and
-we are done.
+# ./test-audio connect 00:0D:3C:37:46:22 ; hcitool con
+Connections:
+	< eSCO 00:0D:3C:37:46:22 handle 0 state 5 lm SLAVE
+	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
+root@linaro:~# hcitool con
+Connections:
+	< SCO 00:0D:3C:37:46:22 handle 46 state 1 lm SLAVE
+	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
+root@linaro:~# hcitool con
+Connections:
+	< ACL 00:0D:3C:37:46:22 handle 42 state 1 lm SLAVE AUTH ENCRYPT
 
-	Gustavo
+hcidump is at https://gist.github.com/1061877
+
+thanks guys
+Brad
