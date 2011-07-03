@@ -1,64 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 3 Jul 2011 14:38:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Fix common misspelled words
-Message-ID: <20110703113817.GA10186@dell.ger.corp.intel.com>
-References: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1309620760-17968-2-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Sat, 2 Jul 2011 22:49:58 -0300
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 1/1] Bluetooth: l2cap: fix NULL ACL packet handling
+Message-ID: <20110703014958.GA2706@joana>
+References: <1309628689.22449.12.camel@THOR>
+ <1309644714.21109.7.camel@aeonflux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309620760-17968-2-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1309644714.21109.7.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+* Marcel Holtmann <marcel@holtmann.org> [2011-07-02 15:11:51 -0700]:
 
-On Sat, Jul 02, 2011, Lucas De Marchi wrote:
-> Accounting of misspelled words, as detected by codespell:
+> Hi Peter,
 > 
-> acording      2
-> ancilliary    1
-> appropiate    1
-> atribute      1
-> cant          1
-> comming       2
-> gracefull     1
-> lenght        1
-> mispelled     1
-> occured       1
-> occurences    1
-> ocurred       3
-> prefered      1
-> presense      1
-> reponse       1
-> seperate      1
-> succesful     1
-> successully   1
-> sucessfull    1
-> sucessfully   1
-> ---
->  attrib/att.c         |    2 +-
->  attrib/gatttool.c    |    2 +-
->  audio/avdtp.c        |    4 ++--
->  audio/gstavdtpsink.c |    6 +++---
->  audio/gstsbcutil.c   |    2 +-
->  audio/ipc.h          |    2 +-
->  doc/adapter-api.txt  |    2 +-
->  doc/audio-api.txt    |    2 +-
->  health/mcap.c        |    2 +-
->  serial/proxy.c       |    2 +-
->  src/sdpd-request.c   |    4 ++--
->  test/apitest         |    2 +-
->  test/bdaddr.c        |    2 +-
->  test/sap-client      |    2 +-
->  test/test-health     |    2 +-
->  tools/hciattach.c    |    4 ++--
->  tools/rfcomm.1       |    2 +-
->  tools/ubcsp.c        |    4 ++--
->  18 files changed, 24 insertions(+), 24 deletions(-)
+> > A 0-length ACL continuation-fragment is a valid NULL packet. Remote
+> > devices can use the FLOW indicator in the ACL packet header to
+> > flow-control ACL packets without sending a payload.
+> > 
+> > Track as a device stat instead of logging.
+> > 
+> > Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> > ---
+> >  include/net/bluetooth/hci.h |    1 +
+> >  net/bluetooth/l2cap_core.c  |    8 ++++++++
+> >  2 files changed, 9 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 0c20227..de7ed81 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -1142,6 +1142,7 @@ struct hci_ufilter {
+> >  
+> >  /* ---- HCI Ioctl requests structures ---- */
+> >  struct hci_dev_stats {
+> > +	__u32 null_rx;		/* # NULL pkts recvd */
+> >  	__u32 err_rx;
+> >  	__u32 err_tx;
+> >  	__u32 cmd_tx;
+> 
+> you can not do it like this. This will break userspace API/ABI.
 
-Applied. Thanks.
+Actually I don't see a point to have null_rx counter, just drop the packet and
+we are done.
 
-Johan
+	Gustavo
