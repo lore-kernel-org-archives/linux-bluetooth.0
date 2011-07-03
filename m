@@ -1,50 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 3 Jul 2011 21:04:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Nils Faerber <nils.faerber@kernelconcepts.de>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Disable pnat-server
-Message-ID: <20110703180444.GA19576@dell.ger.corp.intel.com>
-References: <4E108D72.3010006@kernelconcepts.de>
+Message-ID: <4E108D72.3010006@kernelconcepts.de>
+Date: Sun, 03 Jul 2011 17:40:34 +0200
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E108D72.3010006@kernelconcepts.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Disable pnat-server
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nils,
+Hello!
+I have developed a small app which registers its own RFCOMM based
+service and service ID using libbluetooth and the SDP services. This
+worked great until some recent Ubuntu update which upgraded the
+Bluetooth services (I guess).
+Now I get an error in syslog whenever my device tries to connect:
 
-On Sun, Jul 03, 2011, Nils Faerber wrote:
-> I have developed a small app which registers its own RFCOMM based
-> service and service ID using libbluetooth and the SDP services. This
-> worked great until some recent Ubuntu update which upgraded the
-> Bluetooth services (I guess).
-> Now I get an error in syslog whenever my device tries to connect:
-> 
-> Jul  3 17:23:13 tlb bluetoothd[27590]: Unable to spawn pnatd: Failed to
-> execute child process "/usr/bin/phonet-at" (No such file or directory)
-> 
-> It took me quite some time to figure out that this is part of the (new?)
-> bluetoothd plugin system which is pitily not documented anywhere -
-> especially not which plugins there are, what they do and how they can be
-> en- or disabled.
+Jul  3 17:23:13 tlb bluetoothd[27590]: Unable to spawn pnatd: Failed to
+execute child process "/usr/bin/phonet-at" (No such file or directory)
 
-There should be absolutely no reason for Ubuntu have this plugin enabled
-or even compiled. You might wanna file a bug to them to disable it. The
-only place where it makes sense to be compiled is in Nokia's Maemo
-Harmattan platform. For everything else it should be disabled (as it is
-by default).
+It took me quite some time to figure out that this is part of the (new?)
+bluetoothd plugin system which is pitily not documented anywhere -
+especially not which plugins there are, what they do and how they can be
+en- or disabled.
 
-Btw, if you have your own RFCOMM based service you should take a look at
-doc/assigned-numbers.txt to be sure not to conflict with any of those
-services. The range of possible RFCOMM channels (1-31) is so small that
-it's easy to get conflicts.
+After some more searching and reading sources I found that plugins can
+theoretically be disabled in bluetoothd's config file main.conf. So I added
 
-> After some more searching and reading sources I found that plugins can
-> theoretically be disabled in bluetoothd's config file main.conf. So I added
-> 
-> DisablePlugins = pnat-server
+DisablePlugins = pnat-server
 
-The plugin is called pnat, so that line should read DisablePlugins=pnat
+there but still bluetoothd tries to spawn pnatd upon incoming connection!?
 
-Johan
+This is pretty annoying.
+
+Additionally I really wonder if this is a reasonable default for a PC?
+Which PC has an AT command device that it would want to export over
+Bluetooth? A mobile, yes, maybe, but on a PC?
+And even then, there is no appropriate pnatd application coming with the
+Bluetooth BlueZ package so this default does not even work. I would
+therefor strongly suggest to disable pnatd by default and only enable it
+where it is actually needed.
+
+So, how can I get rid of this pnatd pseudo service so that my service
+will work again?
+
+
+PS: If you wonder what my service is about it is a small app for the
+SonyEricsson LiveView mobile display device...
+
+Cheers
+  nils
+
+-- 
+kernel concepts GbR        Tel: +49-271-771091-12
+Sieghuetter Hauptweg 48
+D-57072 Siegen             Mob: +49-176-21024535
+http://www.kernelconcepts.de
