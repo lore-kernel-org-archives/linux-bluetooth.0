@@ -1,41 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 3 Jul 2011 15:31:41 -0300
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] avrcp: mark signals as deprecated
-Message-ID: <20110703183141.GB2706@joana>
-References: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
- <20110703114445.GD10186@dell.ger.corp.intel.com>
+Date: Sun, 3 Jul 2011 21:04:44 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Nils Faerber <nils.faerber@kernelconcepts.de>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Disable pnat-server
+Message-ID: <20110703180444.GA19576@dell.ger.corp.intel.com>
+References: <4E108D72.3010006@kernelconcepts.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110703114445.GD10186@dell.ger.corp.intel.com>
+In-Reply-To: <4E108D72.3010006@kernelconcepts.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Nils,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2011-07-03 14:44:45 +0300]:
-
-> Hi Gustavo,
+On Sun, Jul 03, 2011, Nils Faerber wrote:
+> I have developed a small app which registers its own RFCOMM based
+> service and service ID using libbluetooth and the SDP services. This
+> worked great until some recent Ubuntu update which upgraded the
+> Bluetooth services (I guess).
+> Now I get an error in syslog whenever my device tries to connect:
 > 
-> On Sat, Jul 02, 2011, Gustavo F. Padovan wrote:
-> > From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> > 
-> > Connected and Disconnected are deprecated signals
-> > ---
-> >  doc/control-api.txt |    4 ++--
-> >  1 files changed, 2 insertions(+), 2 deletions(-)
+> Jul  3 17:23:13 tlb bluetoothd[27590]: Unable to spawn pnatd: Failed to
+> execute child process "/usr/bin/phonet-at" (No such file or directory)
 > 
-> Why do you think these should be deprecated? Right now there are no
-> other signals available in the org.bluez.Control interface that'd give
-> the same information.
+> It took me quite some time to figure out that this is part of the (new?)
+> bluetoothd plugin system which is pitily not documented anywhere -
+> especially not which plugins there are, what they do and how they can be
+> en- or disabled.
 
-I'm just following the code:
+There should be absolutely no reason for Ubuntu have this plugin enabled
+or even compiled. You might wanna file a bug to them to disable it. The
+only place where it makes sense to be compiled is in Nokia's Maemo
+Harmattan platform. For everything else it should be disabled (as it is
+by default).
 
-static GDBusSignalTable control_signals[] = {
-        { "Connected",                  "",     G_DBUS_SIGNAL_FLAG_DEPRECATED},
-        { "Disconnected",               "",     G_DBUS_SIGNAL_FLAG_DEPRECATED},
+Btw, if you have your own RFCOMM based service you should take a look at
+doc/assigned-numbers.txt to be sure not to conflict with any of those
+services. The range of possible RFCOMM channels (1-31) is so small that
+it's easy to get conflicts.
 
-But now see that PropertyChanged is not used anywhere.
+> After some more searching and reading sources I found that plugins can
+> theoretically be disabled in bluetoothd's config file main.conf. So I added
+> 
+> DisablePlugins = pnat-server
 
-	Gustavo
+The plugin is called pnat, so that line should read DisablePlugins=pnat
+
+Johan
