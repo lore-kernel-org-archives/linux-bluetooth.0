@@ -1,30 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 3 Jul 2011 14:41:50 +0300
+Date: Sun, 3 Jul 2011 14:38:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH 1/2] Convert dos file to unix
-Message-ID: <20110703114150.GB10186@dell.ger.corp.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Fix common misspelled words
+Message-ID: <20110703113817.GA10186@dell.ger.corp.intel.com>
 References: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1309620760-17968-2-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1309620760-17968-2-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lucas,
 
 On Sat, Jul 02, 2011, Lucas De Marchi wrote:
-> Call `tr -d \\r < tools/ubcsp.c', and since this will change all the
-> lines, remove the trailing white spaces too.
+> Accounting of misspelled words, as detected by codespell:
+> 
+> acording      2
+> ancilliary    1
+> appropiate    1
+> atribute      1
+> cant          1
+> comming       2
+> gracefull     1
+> lenght        1
+> mispelled     1
+> occured       1
+> occurences    1
+> ocurred       3
+> prefered      1
+> presense      1
+> reponse       1
+> seperate      1
+> succesful     1
+> successully   1
+> sucessfull    1
+> sucessfully   1
 > ---
->  tools/ubcsp.c | 2360 ++++++++++++++++++++++++++++----------------------------
->  1 files changed, 1180 insertions(+), 1180 deletions(-)
+>  attrib/att.c         |    2 +-
+>  attrib/gatttool.c    |    2 +-
+>  audio/avdtp.c        |    4 ++--
+>  audio/gstavdtpsink.c |    6 +++---
+>  audio/gstsbcutil.c   |    2 +-
+>  audio/ipc.h          |    2 +-
+>  doc/adapter-api.txt  |    2 +-
+>  doc/audio-api.txt    |    2 +-
+>  health/mcap.c        |    2 +-
+>  serial/proxy.c       |    2 +-
+>  src/sdpd-request.c   |    4 ++--
+>  test/apitest         |    2 +-
+>  test/bdaddr.c        |    2 +-
+>  test/sap-client      |    2 +-
+>  test/test-health     |    2 +-
+>  tools/hciattach.c    |    4 ++--
+>  tools/rfcomm.1       |    2 +-
+>  tools/ubcsp.c        |    4 ++--
+>  18 files changed, 24 insertions(+), 24 deletions(-)
 
-I'm not really sure this is worth it since it'll e.g. screw up "git
-blame" for this file. If it was a file that's likely to receive updates
-it'd be different, but since the last change to it was from 2008 I don't
-see that as likely. OTOH I don't really have such a strong opinion about
-this, so if Marcel is fine with it we can apply the patch upstream.
+Applied. Thanks.
 
 Johan
