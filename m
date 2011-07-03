@@ -1,29 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 3 Jul 2011 14:44:45 +0300
+Date: Sun, 3 Jul 2011 14:42:40 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] avrcp: mark signals as deprecated
-Message-ID: <20110703114445.GD10186@dell.ger.corp.intel.com>
-References: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Improve input server connect log messages
+Message-ID: <20110703114240.GC10186@dell.ger.corp.intel.com>
+References: <1309628889.22449.15.camel@THOR>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309646531-3681-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1309628889.22449.15.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Peter,
 
-On Sat, Jul 02, 2011, Gustavo F. Padovan wrote:
-> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> 
-> Connected and Disconnected are deprecated signals
+On Sat, Jul 02, 2011, Peter Hurley wrote:
+> Added error log message for connection refusals and added
+> remote device BDADDR to existing debug messages.
 > ---
->  doc/control-api.txt |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+>  input/server.c |   12 ++++++++++--
+>  1 files changed, 10 insertions(+), 2 deletions(-)
 
-Why do you think these should be deprecated? Right now there are no
-other signals available in the org.bluez.Control interface that'd give
-the same information.
+Applied. Thanks.
 
 Johan
