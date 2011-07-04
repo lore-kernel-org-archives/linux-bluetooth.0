@@ -2,17 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Health Thermometer Profile API
-Date: Mon,  4 Jul 2011 11:32:41 +0200
-Message-Id: <1309771961-4696-1-git-send-email-sancane@gmail.com>
+Subject: [BlueZ PATCH] Health Thermometer Profile API
+Date: Mon,  4 Jul 2011 11:07:38 +0200
+Message-Id: <1309770458-4112-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/thermometer.txt |  126 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 126 insertions(+), 0 deletions(-)
+ attrib/interactive.c |    2 +
+ doc/thermometer.txt  |  126 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 128 insertions(+), 0 deletions(-)
  create mode 100644 doc/thermometer.txt
 
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index a772362..0e4bb1e 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -811,6 +811,8 @@ int interactive(const gchar *src, const gchar *dst, int psm)
+ 	opt_dst = g_strdup(dst);
+ 	opt_psm = psm;
+ 
++	printf("src: %s, dst: %s, psm %d\n", src, dst, psm);
++
+ 	prompt = g_string_new(NULL);
+ 
+ 	event_loop = g_main_loop_new(NULL, FALSE);
 diff --git a/doc/thermometer.txt b/doc/thermometer.txt
 new file mode 100644
 index 0000000..6392d39
