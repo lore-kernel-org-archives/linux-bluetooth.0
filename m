@@ -1,39 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 4 Jul 2011 15:23:30 +0200
+Subject: RE: [RFC BlueZ] Add Proximity API
+Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A2C00E66@EXDCVYMBSTM005.EQ1STM.local>
+References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1309465011.5023.85.camel@novo.hadess.net>
+	<BANLkTi=X__bC+4gAKuYzhvYPP-S3+QWGkw@mail.gmail.com>
+	<AFCDDB4A3EA003429EEF1E7B211FDBBA33A2BA4C12@EXDCVYMBSTM005.EQ1STM.local>
+	<BANLkTikCHccP+-_dopoAWrAMFdwh8LHaQw@mail.gmail.com>
+ <BANLkTikdgm==V3onWH+-fHEGmvT2ZTBrdw@mail.gmail.com>
+In-Reply-To: <BANLkTikdgm==V3onWH+-fHEGmvT2ZTBrdw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20110703114150.GB10186@dell.ger.corp.intel.com>
-References: <1309620760-17968-1-git-send-email-lucas.demarchi@profusion.mobi> <20110703114150.GB10186@dell.ger.corp.intel.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 4 Jul 2011 10:25:32 -0300
-Message-ID: <CAMOw1v4CH4FEGv8b=keanZ0D+MvH0asi=1jEeYFO9ykTUMssdg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Convert dos file to unix
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jul 3, 2011 at 8:41 AM, Johan Hedberg <johan.hedberg@gmail.com> wro=
-te:
-> Hi Lucas,
->
-> On Sat, Jul 02, 2011, Lucas De Marchi wrote:
->> Call `tr -d \\r < tools/ubcsp.c', and since this will change all the
->> lines, remove the trailing white spaces too.
->> ---
->> =A0tools/ubcsp.c | 2360 ++++++++++++++++++++++++++++--------------------=
---------
->> =A01 files changed, 1180 insertions(+), 1180 deletions(-)
->
-> I'm not really sure this is worth it since it'll e.g. screw up "git
-> blame" for this file. If it was a file that's likely to receive updates
-> it'd be different, but since the last change to it was from 2008 I don't
-> see that as likely. OTOH I don't really have such a strong opinion about
-> this, so if Marcel is fine with it we can apply the patch upstream.
-
-I didn't notice the second patch could be applied regardless of this
-first one (unless you removed the part that touches this file).
-
-This \r char was screwing up codespell output and I'm not really happy
-fixing it (though I'd welcome a patch).
-
-
-Lucas De Marchi
+SGkgQ2xhdWRpbywgQW5kZXJzb24sDQoNCj4+IFNvcnJ5LCBhY3R1YWxseSBpdCB3YXMgYSBtaXN0
+YWtlIGZyb20gQ2xhdWRpbyAod2hpY2ggSSBoYWRuJ3Qgbm90aWNlZA0KPj4gd2hlbiBJIG1hZGUg
+bXkgY29tbWVudHMpIDopIFRoaXMgaXMgYSAqTW9uaXRvciogQVBJIGFzIEkgbWVudGlvbmVkLg0K
+Pj4gVGhlIGRvYyBpdHNlbGYgbWVudGlvbnM6DQo+Pg0KPj4gK0ludGVyZmFjZSDCoCDCoCDCoG9y
+Zy5ibHVlei5Qcm94aW1pdHlNb25pdG9yDQo+Pg0KPj4gQW5kIHlvdSBhcmUgY29ycmVjdCwgb3Vy
+IGN1cnJlbnQgZm9jdXMgaXMgb24gUHJveGltaXR5IE1vbml0b3IgJiBGaW5kDQo+PiBNZSBMb2Nh
+dG9yIChBS0EgImNsaWVudCIpIHJvbGVzLiBUaGUgInNlcnZlciIgcm9sZXMgd2lsbCBiZSBpbml0
+aWFsbHkNCj4+IGltcGxlbWVudGVkIGZvciB0ZXN0aW5nIHB1cnBvc2VzLg0KPj4NCj4NCj5JdCB3
+aWxsIGJlIGZpeGVkLiBTb3JyeSENClRoYW5rcyBmb3IgY2xhcmlmeWluZy4NCg0KPlllc3RlcmRh
+eSBkaXNjdXNzaW5nIGludGVybmFsbHkgaGVyZSB3ZSBmb3VuZCBzb21lIGlzc3VlczoNCj4xLiBT
+ZXRQcm9wZXJ0eSgiRmluZE1lQWxlcnRMZXZlbCIsIGxldmVsKTogbmVlZHMgYSB0aW1lb3V0LiBM
+RSBDcmVhdGUNCj5Db25uZWN0aW9uIENvbW1hbmQgZG9lc24ndCBoYXZlIGEgdGltZW91dCwgYnV0
+IHRoZSBMMkNBUCBzb2NrZXQofjQwcykNCj5hbmQgRC1CdXMgbWVzc2FnZSh+MjBzKSBoYXZlLg0K
+PjIuIFNldFByb3BlcnR5KCJGaW5kTWVBbGVydExldmVsIiwgbGV2ZWwpOiBuZWVkcyBhIGNhbmNl
+bCBtZWNoYW5pc20/DQo+TWF5YmUgc2V0dGluZyBpdCB0byAibm9uZSIgaXMgZW5vdWdoLg0KPg0K
+PkxpbmtMb3NzQWxlcnRMZXZlbCBhbmQgUGF0aExvc3NBbGVydExldmVsIGFyZSBvazogdGltZW91
+dCBub3QNCj5uZWNlc3NhcnkuIFRoZSBsYXN0IG9uZSBpcyBMT0NBTCBhbmQgdXNlZCBvbmx5IHdo
+ZW4gdGhlIHRocmVzaG9sZCBpcw0KPnJlYWNoZWQuIA0KDQpIb3cgYWJvdXQgaWYgdGhlcmUgaXMg
+YSBjb25uZWN0aW9uIGxvc3MgYmVmb3JlIE1vbml0b3IgY291bGQgd3JpdGUgdGhlIEFsZXJ0IExl
+dmVsIGludG8gUmVwb3J0ZXI/IEluIHRoaXMgY2FzZSBNb25pdG9yIHdvdWxkIHRyeSB0byByZWNv
+bm5lY3QgYmFzZWQgb24gQXV0byBjb25uZWN0aW9uIHByb2NlZHVyZXMgYnV0IHdvbid0IFBhdGhM
+b3NzQWxlcnRMZXZlbCBuZWVkIGEgdGltZW91dCBoZXJlIC4uLiBbd2lsZCBzcGVjdWxhdGlvbnMg
+Oi0pXQ0KDQoNCkFsc28gaG93IGFib3V0IHNldHRpbmcgcHJvZmlsZSBzcGVjaWZpYyBMU1RPPyBQ
+cm94aW1pdHkgc3BlY3MgcmVjb21tZW5kcyB0aGlzIHZhbHVlIHRvIGJlIDZYIGNvbm5lY3Rpb24g
+aW50ZXJ2YWwgYnV0IEkgZ3Vlc3Mgd2UgbWF5IGdpdmUgdGhlIHVzZXIvYXBwbGljYXRpb24gc29t
+ZSBmbGV4aWJpbGl0eSB0byBwbGF5IGFyb3VuZCBvbiB0aGlzPyBTYW1lIG1heSBiZSB0aGUgY2Fz
+ZSBmb3IgY29ubmVjdGlvbiBpbnRlcnZhbCwgc2NhbiBpbnRlcnZhbCwgbGF0ZW5jeSB2YWx1ZXMg
+ZXRjLi4uSSBiZWxpZXZlIHRoZXNlIHZhbHVlcyBjYW4gYmUgcHJldHR5IG11Y2ggdXNlci9wbGF0
+Zm9ybSBzcGVjaWZpYyBhbmQgdXNlciBzaG91bGQgaGF2ZSBjb250cm9sIG92ZXIgdGhlc2UgLi4u
+DQoNClRoYW5rcywNCkFydW4NCg==
