@@ -1,51 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Bastien Nocera <hadess@hadess.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 4 Jul 2011 15:23:30 +0200
-Subject: RE: [RFC BlueZ] Add Proximity API
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A2C00E66@EXDCVYMBSTM005.EQ1STM.local>
-References: <1309458277-30407-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1309465011.5023.85.camel@novo.hadess.net>
-	<BANLkTi=X__bC+4gAKuYzhvYPP-S3+QWGkw@mail.gmail.com>
-	<AFCDDB4A3EA003429EEF1E7B211FDBBA33A2BA4C12@EXDCVYMBSTM005.EQ1STM.local>
-	<BANLkTikCHccP+-_dopoAWrAMFdwh8LHaQw@mail.gmail.com>
- <BANLkTikdgm==V3onWH+-fHEGmvT2ZTBrdw@mail.gmail.com>
-In-Reply-To: <BANLkTikdgm==V3onWH+-fHEGmvT2ZTBrdw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1309777369-21475-1-git-send-email-szymon.janc@tieto.com>
+References: <1309777369-21475-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 4 Jul 2011 08:20:08 -0400
+Message-ID: <CAJdJm_MgPgniRrnExvWoavJTZObDzDUJSUno5z-DoqEaV8+t1w@mail.gmail.com>
+Subject: Re: [PATCH] Add SAP driver for ST-Ericsson U8500 platform
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywgQW5kZXJzb24sDQoNCj4+IFNvcnJ5LCBhY3R1YWxseSBpdCB3YXMgYSBtaXN0
-YWtlIGZyb20gQ2xhdWRpbyAod2hpY2ggSSBoYWRuJ3Qgbm90aWNlZA0KPj4gd2hlbiBJIG1hZGUg
-bXkgY29tbWVudHMpIDopIFRoaXMgaXMgYSAqTW9uaXRvciogQVBJIGFzIEkgbWVudGlvbmVkLg0K
-Pj4gVGhlIGRvYyBpdHNlbGYgbWVudGlvbnM6DQo+Pg0KPj4gK0ludGVyZmFjZSDCoCDCoCDCoG9y
-Zy5ibHVlei5Qcm94aW1pdHlNb25pdG9yDQo+Pg0KPj4gQW5kIHlvdSBhcmUgY29ycmVjdCwgb3Vy
-IGN1cnJlbnQgZm9jdXMgaXMgb24gUHJveGltaXR5IE1vbml0b3IgJiBGaW5kDQo+PiBNZSBMb2Nh
-dG9yIChBS0EgImNsaWVudCIpIHJvbGVzLiBUaGUgInNlcnZlciIgcm9sZXMgd2lsbCBiZSBpbml0
-aWFsbHkNCj4+IGltcGxlbWVudGVkIGZvciB0ZXN0aW5nIHB1cnBvc2VzLg0KPj4NCj4NCj5JdCB3
-aWxsIGJlIGZpeGVkLiBTb3JyeSENClRoYW5rcyBmb3IgY2xhcmlmeWluZy4NCg0KPlllc3RlcmRh
-eSBkaXNjdXNzaW5nIGludGVybmFsbHkgaGVyZSB3ZSBmb3VuZCBzb21lIGlzc3VlczoNCj4xLiBT
-ZXRQcm9wZXJ0eSgiRmluZE1lQWxlcnRMZXZlbCIsIGxldmVsKTogbmVlZHMgYSB0aW1lb3V0LiBM
-RSBDcmVhdGUNCj5Db25uZWN0aW9uIENvbW1hbmQgZG9lc24ndCBoYXZlIGEgdGltZW91dCwgYnV0
-IHRoZSBMMkNBUCBzb2NrZXQofjQwcykNCj5hbmQgRC1CdXMgbWVzc2FnZSh+MjBzKSBoYXZlLg0K
-PjIuIFNldFByb3BlcnR5KCJGaW5kTWVBbGVydExldmVsIiwgbGV2ZWwpOiBuZWVkcyBhIGNhbmNl
-bCBtZWNoYW5pc20/DQo+TWF5YmUgc2V0dGluZyBpdCB0byAibm9uZSIgaXMgZW5vdWdoLg0KPg0K
-PkxpbmtMb3NzQWxlcnRMZXZlbCBhbmQgUGF0aExvc3NBbGVydExldmVsIGFyZSBvazogdGltZW91
-dCBub3QNCj5uZWNlc3NhcnkuIFRoZSBsYXN0IG9uZSBpcyBMT0NBTCBhbmQgdXNlZCBvbmx5IHdo
-ZW4gdGhlIHRocmVzaG9sZCBpcw0KPnJlYWNoZWQuIA0KDQpIb3cgYWJvdXQgaWYgdGhlcmUgaXMg
-YSBjb25uZWN0aW9uIGxvc3MgYmVmb3JlIE1vbml0b3IgY291bGQgd3JpdGUgdGhlIEFsZXJ0IExl
-dmVsIGludG8gUmVwb3J0ZXI/IEluIHRoaXMgY2FzZSBNb25pdG9yIHdvdWxkIHRyeSB0byByZWNv
-bm5lY3QgYmFzZWQgb24gQXV0byBjb25uZWN0aW9uIHByb2NlZHVyZXMgYnV0IHdvbid0IFBhdGhM
-b3NzQWxlcnRMZXZlbCBuZWVkIGEgdGltZW91dCBoZXJlIC4uLiBbd2lsZCBzcGVjdWxhdGlvbnMg
-Oi0pXQ0KDQoNCkFsc28gaG93IGFib3V0IHNldHRpbmcgcHJvZmlsZSBzcGVjaWZpYyBMU1RPPyBQ
-cm94aW1pdHkgc3BlY3MgcmVjb21tZW5kcyB0aGlzIHZhbHVlIHRvIGJlIDZYIGNvbm5lY3Rpb24g
-aW50ZXJ2YWwgYnV0IEkgZ3Vlc3Mgd2UgbWF5IGdpdmUgdGhlIHVzZXIvYXBwbGljYXRpb24gc29t
-ZSBmbGV4aWJpbGl0eSB0byBwbGF5IGFyb3VuZCBvbiB0aGlzPyBTYW1lIG1heSBiZSB0aGUgY2Fz
-ZSBmb3IgY29ubmVjdGlvbiBpbnRlcnZhbCwgc2NhbiBpbnRlcnZhbCwgbGF0ZW5jeSB2YWx1ZXMg
-ZXRjLi4uSSBiZWxpZXZlIHRoZXNlIHZhbHVlcyBjYW4gYmUgcHJldHR5IG11Y2ggdXNlci9wbGF0
-Zm9ybSBzcGVjaWZpYyBhbmQgdXNlciBzaG91bGQgaGF2ZSBjb250cm9sIG92ZXIgdGhlc2UgLi4u
-DQoNClRoYW5rcywNCkFydW4NCg==
+Hi Szymon,
+
+On Mon, Jul 4, 2011 at 7:02 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> +       gstatus = g_io_channel_read_chars(io, buf, sizeof(buf), &bytes_read,
+> +                                                                       &gerr);
+> +       if (gstatus != G_IO_STATUS_NORMAL) {
+> +               if (gerr)
+> +                       g_error_free(gerr);
+> +
+> +               sap_error("error while reading from channel (%d)", gstatus);
+> +               return TRUE;
+> +       }
+
+You can pass NULL to the last argument of g_io_channel_read_chars() if
+you are not using the gerr (as in the case above).
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
