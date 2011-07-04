@@ -2,40 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 5/5] Add proper finishing/canceling requests
-Date: Mon,  4 Jul 2011 23:51:41 +0200
-Message-Id: <1309816301-18377-5-git-send-email-bulislaw@linux.com>
+Subject: [PATCH obexd 4/5] Add 0.vcf (me contact) when generating cache
+Date: Mon,  4 Jul 2011 23:51:40 +0200
+Message-Id: <1309816301-18377-4-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1309816301-18377-1-git-send-email-bulislaw@linux.com>
 References: <1309816301-18377-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+When pulling all contacts self is already present, but it have to
+be manually added when generating cache.
 ---
- plugins/phonebook-ebook.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ plugins/phonebook-ebook.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 40 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index 395c54a..e4fcbe0 100644
+index 54b764b..395c54a 100644
 --- a/plugins/phonebook-ebook.c
 +++ b/plugins/phonebook-ebook.c
-@@ -501,9 +501,17 @@ done:
- void phonebook_req_finalize(void *request)
- {
- 	struct query_context *data = request;
-+	GSList *ebook = ebooks;
- 
- 	DBG("");
- 
-+	while (ebook != NULL) {
-+		if (e_book_cancel(ebook->data, NULL) == TRUE)
-+			data->queued_calls--;
+@@ -600,6 +600,13 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 	EBookQuery *query;
+ 	gboolean ret;
+ 	GSList *ebook;
++	EContact *me;
++	EVCard *evcard;
++	GError *gerr;
++	EBook *eb;
++	EVCardAttribute *attrib;
++	char *uid, *tel, *cname;
 +
-+		ebook = ebook->next;
+ 
+ 	if (g_strcmp0("/telecom/pb", name) != 0) {
+ 		if (err)
+@@ -618,6 +625,39 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
+ 	data->user_data = user_data;
+ 	data->query = query;
+ 
++	/* Add 0.vcf */
++	if (e_book_get_self(&me, &eb, &gerr) == FALSE) {
++		g_error_free(gerr);
++		goto next;
 +	}
 +
- 	if (data != NULL && data->queued_calls == 0)
- 		free_query_context(data);
- }
++	evcard = E_VCARD(me);
++
++	cname = evcard_name_attribute_to_string(evcard);
++	if (!cname)
++		cname = g_strdup("");
++
++	attrib = e_vcard_get_attribute(evcard, EVC_UID);
++	uid = e_vcard_attribute_get_value(attrib);
++	if (!uid)
++		uid = g_strdup("");
++
++	attrib = e_vcard_get_attribute(evcard, EVC_TEL);
++	if (attrib)
++		tel =  e_vcard_attribute_get_value(attrib);
++	else
++		tel = g_strdup("");
++
++	data->entry_cb(uid, 0, cname, NULL, tel, data->user_data);
++
++	data->count++;
++
++	g_free(cname);
++	g_free(uid);
++	g_free(tel);
++	g_object_unref(eb);
++
++next:
+ 	ebook = ebooks;
+ 	while (ebook != NULL) {
+ 		if (e_book_is_opened(ebook->data) == TRUE) {
 -- 
 1.7.5.3
 
