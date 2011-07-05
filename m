@@ -1,45 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Jul 2011 12:57:15 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluez: l2test: enhance L2CAP mode option
-Message-ID: <20110705155715.GA29925@joana>
-References: <1309876163-30261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1309876163-30261-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+CC: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>
+Date: Tue, 5 Jul 2011 11:13:41 -0400
+Subject: Re: [PATCH v2 1/1] Bluetooth: l2cap: fix NULL ACL packet handling
+Message-ID: <1309878821.4125.23.camel@THOR>
+References: <1309628689.22449.12.camel@THOR>
+	 <1309644714.21109.7.camel@aeonflux>  <20110703014958.GA2706@joana>
+In-Reply-To: <20110703014958.GA2706@joana>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309876163-30261-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gustavo,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-07-05 17:29:23 +0300]:
+On Sat, 2011-07-02 at 21:49 -0400, Gustavo F. Padovan wrote:
+> * Marcel Holtmann <marcel@holtmann.org> [2011-07-02 15:11:51 -0700]:
+>=20
+> > Hi Peter,
+> >=20
+> > > A 0-length ACL continuation-fragment is a valid NULL packet. Remote
+> > > devices can use the FLOW indicator in the ACL packet header to
+> > > flow-control ACL packets without sending a payload.
+> > >=20
+> > > Track as a device stat instead of logging.
+> > >=20
+> > > Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> > > ---
+> > >  include/net/bluetooth/hci.h |    1 +
+> > >  net/bluetooth/l2cap_core.c  |    8 ++++++++
+> > >  2 files changed, 9 insertions(+), 0 deletions(-)
+> > >=20
+> > > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.=
+h
+> > > index 0c20227..de7ed81 100644
+> > > --- a/include/net/bluetooth/hci.h
+> > > +++ b/include/net/bluetooth/hci.h
+> > > @@ -1142,6 +1142,7 @@ struct hci_ufilter {
+> > > =20
+> > >  /* ---- HCI Ioctl requests structures ---- */
+> > >  struct hci_dev_stats {
+> > > +	__u32 null_rx;		/* # NULL pkts recvd */
+> > >  	__u32 err_rx;
+> > >  	__u32 err_tx;
+> > >  	__u32 cmd_tx;
+> >=20
+> > you can not do it like this. This will break userspace API/ABI.
+>=20
+> Actually I don't see a point to have null_rx counter, just drop the packe=
+t and
+> we are done.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> ---
->  test/l2test.c |   41 +++++++++++++++++++++++++++++++++++------
->  1 files changed, 35 insertions(+), 6 deletions(-)
-> 
-> diff --git a/test/l2test.c b/test/l2test.c
-> index 3b606d2..44c617c 100644
-> --- a/test/l2test.c
-> +++ b/test/l2test.c
-> @@ -112,6 +112,28 @@ static int reliable = 0;
->  static int timestamp = 0;
->  static int defer_setup = 0;
->  
-> +static struct {
-> +	char	*name;
-> +	int	flag;
-> +} l2cap_modes[] = {
-> +	{ "basic",	L2CAP_MODE_BASIC	},
-> +	{ "flowctl",	L2CAP_MODE_FLOWCTL	},
-> +	{ "retrans",	L2CAP_MODE_RETRANS	},
+Although a null_rx counter doesn't really qualify as critical or even
+necessary, I thought it might be useful in helping users troubleshoot
+apparent link quality issues - especially those relating to A2DP, like
+dropouts and sputter.
 
-We don't implement retransmission and flow control mode, so just leave them
-out.
+Currently, some users experience significant audio quality issues that I
+suspect is actually *not* related to link quality nor old LMP
+implementations. Often these are accompanied by logs full of "Unexpected
+continuation frame ..." messages. By 'full', I mean on the order of
+30,000 messages in < 10 minutes.
 
-	Gustavo
+Although I thought it appropriate to not log an error message for an
+accepted flow control method, it seems a shame to simply ignore it.
+
+Regards,
+Peter
