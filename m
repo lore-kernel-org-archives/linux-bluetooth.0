@@ -1,75 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Jul 2011 10:45:53 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] Bluetooth: Check earlier for L2CAP ERTM frames to
- drop
-In-Reply-To: <20110701191348.GF23683@joana>
-Message-ID: <alpine.DEB.2.02.1107051042440.19392@mathewm-linux>
-References: <1309383324-12002-1-git-send-email-mathewm@codeaurora.org> <1309383324-12002-2-git-send-email-mathewm@codeaurora.org> <20110630212419.GF25602@joana> <alpine.DEB.2.02.1106301449130.18354@mathewm-linux> <20110701191348.GF23683@joana>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] btio: Fix the return value of bt_io functions
+Date: Tue,  5 Jul 2011 14:00:00 -0300
+Message-Id: <1309885200-27393-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Some bt_io methods were ignoring the value stored in errno when
+reporting the error to the caller.
+---
+ btio/btio.c |   15 +++++++++------
+ 1 files changed, 9 insertions(+), 6 deletions(-)
 
-On Fri, 1 Jul 2011, Gustavo F. Padovan wrote:
-
-> * Mat Martineau <mathewm@codeaurora.org> [2011-06-30 16:36:01 -0700]:
->
->>
->> Hi Gustavo -
->>
->> On Thu, 30 Jun 2011, Gustavo F. Padovan wrote:
->>
->>> * Mat Martineau <mathewm@codeaurora.org> [2011-06-29 14:35:19 -0700]:
->>>
->>>> Even when the received tx_seq is expected, the frame still needs to be
->>>> dropped if the TX window is exceeded or the receiver is in the local
->>>> busy state.
->>>
->>> The check doesn't mean that TX window is exceeded, it means that we have an
->>> invalid tx_seq and connection should be closed. I don't see the point in
->>> moving the expected check to after this one.
->>> About the local busy check. Is it worth to drop expected frames when on local
->>> busy? What are the advantages/disadvantages? Drop will trigger SREJ while
->>> Store will press the buffer. Do you have measures to prove this?
->>
->>
->> It's possible for expected_tx_seq to be invalid if the tx window is
->> full.  Therefore it is important to check for an invalid tx_seq
->> before checking if it is expected.
->>
->>
->> Dropping frames during local busy is a good idea because:
->>
->>  * Queuing frames during local busy ignores the receive buffer
->> limits requested by the application with SO_RCVBUF.  This problem
->> gets worse with extended window sizes, where the busy_q could be
->> quite large
->>  * ERTM senders are not supposed to send frames during local busy
->> anyway
->>  * The spec allows for packets to be dropped in local busy (look for
->> "StoreOrIgnore")
->>
->> It's the memory that's most important, though. Dropping all incoming
->> iframes during local busy is a simple way to keep data buffer size
->> bounded while still allowing for larger tx windows.
->>
->> If the application can't keep up with the data rate and is
->> triggering local busy, throughput isn't going to be improved
->> significatnly by queuing those frames during local busy.
->
-> You convinced me, applied! Thanks.
-
-
-Thanks for applying this!  Have you had a chance to consider the other 
-local busy changes for recv_cb?
-
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+diff --git a/btio/btio.c b/btio/btio.c
+index e84f6d0..2cc9082 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -271,8 +271,9 @@ static int l2cap_bind(int sock, const bdaddr_t *src, uint16_t psm,
+ 		addr.l2_psm = htobs(psm);
+ 
+ 	if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		int error = -errno;
+ 		ERROR_FAILED(err, "l2cap_bind", errno);
+-		return -1;
++		return error;
+ 	}
+ 
+ 	return 0;
+@@ -294,7 +295,7 @@ static int l2cap_connect(int sock, const bdaddr_t *dst,
+ 
+ 	err = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
+ 	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS))
+-		return err;
++		return -errno;
+ 
+ 	return 0;
+ }
+@@ -558,8 +559,9 @@ static int rfcomm_bind(int sock,
+ 	addr.rc_channel = channel;
+ 
+ 	if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		int error = -errno;
+ 		ERROR_FAILED(err, "rfcomm_bind", errno);
+-		return -1;
++		return error;
+ 	}
+ 
+ 	return 0;
+@@ -577,7 +579,7 @@ static int rfcomm_connect(int sock, const bdaddr_t *dst, uint8_t channel)
+ 
+ 	err = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
+ 	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS))
+-		return err;
++		return -errno;
+ 
+ 	return 0;
+ }
+@@ -604,8 +606,9 @@ static int sco_bind(int sock, const bdaddr_t *src, GError **err)
+ 	bacpy(&addr.sco_bdaddr, src);
+ 
+ 	if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		int error = -errno;
+ 		ERROR_FAILED(err, "sco_bind", errno);
+-		return -1;
++		return error;
+ 	}
+ 
+ 	return 0;
+@@ -622,7 +625,7 @@ static int sco_connect(int sock, const bdaddr_t *dst)
+ 
+ 	err = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
+ 	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS))
+-		return err;
++		return -errno;
+ 
+ 	return 0;
+ }
+-- 
+1.7.6
 
