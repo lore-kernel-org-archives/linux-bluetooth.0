@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK06-923p4t6briUk72qQEbAzWXgoSg5PxF2TUrXaohPA@mail.gmail.com>
+In-Reply-To: <CAPGrrxVitebn-vjn-uGO9BCLGOWnbzVrB8Cn=+QoqVVhACArkA@mail.gmail.com>
 References: <1309816301-18377-1-git-send-email-bulislaw@linux.com>
 	<CABBYNZL3C1hLbgGMvtka8-Pd9bo4zHM0saa2awbdN=vHEddteQ@mail.gmail.com>
 	<CAPGrrxWcWr_bQ-_B+jvOWJZJ_2pSt0zEJ4rubgtDnJFPHjSehg@mail.gmail.com>
@@ -8,69 +8,58 @@ References: <1309816301-18377-1-git-send-email-bulislaw@linux.com>
 	<CAPGrrxXzkVRLAPxuC86eJCp4hUkPj-TEHZF7h0hzGwb2CwUP1Q@mail.gmail.com>
 	<CABBYNZKriHan=oVqsonGYH_y-N1XOzxZbM0ukugoO_HxeLyrAw@mail.gmail.com>
 	<CAPGrrxVitebn-vjn-uGO9BCLGOWnbzVrB8Cn=+QoqVVhACArkA@mail.gmail.com>
-	<CABBYNZK06-923p4t6briUk72qQEbAzWXgoSg5PxF2TUrXaohPA@mail.gmail.com>
-Date: Tue, 5 Jul 2011 13:40:59 +0200
-Message-ID: <CAPGrrxX7ZPaC0PORJ3pPyAN1RkDZVu_zxc_rOy8oUEOWYSi5VA@mail.gmail.com>
+Date: Tue, 5 Jul 2011 13:33:51 +0300
+Message-ID: <CABBYNZK06-923p4t6briUk72qQEbAzWXgoSg5PxF2TUrXaohPA@mail.gmail.com>
 Subject: Re: [PATCH obexd 1/5] Change EDS backend to support multiple ebooks
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 5, 2011 at 12:33 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Tue, Jul 5, 2011 at 1:30 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->> On Tue, Jul 5, 2011 at 12:13 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi,
->>>
->>> On Tue, Jul 5, 2011 at 1:07 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->>>> On Tue, Jul 5, 2011 at 11:58 AM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> Hi Bartosz,
+Hi,
+
+On Tue, Jul 5, 2011 at 1:30 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+> On Tue, Jul 5, 2011 at 12:13 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> On Tue, Jul 5, 2011 at 1:07 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>> On Tue, Jul 5, 2011 at 11:58 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> Hi Bartosz,
+>>>>
+>>>> On Tue, Jul 5, 2011 at 12:00 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
 >>>>>
->>>>> On Tue, Jul 5, 2011 at 12:00 PM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->>>>>>
->>>>>> Don't know anything about it, but is there really any other choice?
->>>>>>
->>>>>
->>>>> I guess the idea is to use D-Bus directly, removing the ebook dependency.
->>>>>
->>>>> --
->>>>> Luiz Augusto von Dentz
+>>>>> Don't know anything about it, but is there really any other choice?
 >>>>>
 >>>>
->>>> And what the "original" problems with libebook was? So i could test it
->>>> further. BTW I'v tested this backend and it's working fine - no
->>>> problem with obexd itself either ...
+>>>> I guess the idea is to use D-Bus directly, removing the ebook dependency.
+>>>>
+>>>> --
+>>>> Luiz Augusto von Dentz
+>>>>
 >>>
->>> iirc it uses dbus-glib which once initialized replaces the gdbus
->>> callbacks, in other words D-Bus signals and method calls stop working
->>> for anything that is not using dbus-glib.
->>>
->>>
->>> --
->>> Luiz Augusto von Dentz
->>>
+>>> And what the "original" problems with libebook was? So i could test it
+>>> further. BTW I'v tested this backend and it's working fine - no
+>>> problem with obexd itself either ...
 >>
->> So for example signals would stop being emitted?
+>> iirc it uses dbus-glib which once initialized replaces the gdbus
+>> callbacks, in other words D-Bus signals and method calls stop working
+>> for anything that is not using dbus-glib.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>>
 >
-> It the receiving parts that becomes problematic, because the mainloop
-> callbacks are know being handled by dbus-glib so any handler/watch
-> using gdbus won't work.
->
->
-> --
-> Luiz Augusto von Dentz
->
+> So for example signals would stop being emitted?
 
-I've checked it and manage to successfully registered agent in obexd
-when libebook was in use -- so i believe its working just fine.
+It the receiving parts that becomes problematic, because the mainloop
+callbacks are know being handled by dbus-glib so any handler/watch
+using gdbus won't work.
+
 
 -- 
-Pozdrowienia,
-Bartosz Szatkowski
+Luiz Augusto von Dentz
