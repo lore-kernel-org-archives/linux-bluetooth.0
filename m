@@ -1,38 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 2/5 v2] Add constraint on pulled path
-Date: Tue,  5 Jul 2011 22:53:19 +0200
-Message-Id: <1309899202-23849-2-git-send-email-bulislaw@linux.com>
-In-Reply-To: <1309899202-23849-1-git-send-email-bulislaw@linux.com>
-References: <1309899202-23849-1-git-send-email-bulislaw@linux.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH] avrcp: remove unused dbus reply message
+Date: Tue,  5 Jul 2011 17:24:46 -0300
+Message-Id: <1309897486-20006-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-EDS backend supports only phonebook (/telecom/pb.vcf).
+Fix leak of dbus messages being created but not unreferenced after
+method returns.
 ---
- plugins/phonebook-ebook.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ audio/control.c |   10 ----------
+ 1 files changed, 0 insertions(+), 10 deletions(-)
 
-diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index 067bcc7..9c55860 100644
---- a/plugins/phonebook-ebook.c
-+++ b/plugins/phonebook-ebook.c
-@@ -529,6 +529,13 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
+diff --git a/audio/control.c b/audio/control.c
+index defbbc8..c3ef737 100644
+--- a/audio/control.c
++++ b/audio/control.c
+@@ -1045,13 +1045,8 @@ static DBusMessage *volume_up(DBusConnection *conn, DBusMessage *msg,
  {
- 	struct query_context *data;
+ 	struct audio_device *device = data;
+ 	struct control *control = device->control;
+-	DBusMessage *reply;
+ 	int err;
  
-+	if (g_strcmp0("/telecom/pb.vcf", name) != 0) {
-+		if (err)
-+			*err = -ENOENT;
-+
-+		return NULL;
-+	}
-+
- 	data = g_new0(struct query_context, 1);
- 	data->contacts_cb = cb;
- 	data->params = params;
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+ 	if (control->state != AVCTP_STATE_CONNECTED)
+ 		return btd_error_not_connected(msg);
+ 
+@@ -1070,13 +1065,8 @@ static DBusMessage *volume_down(DBusConnection *conn, DBusMessage *msg,
+ {
+ 	struct audio_device *device = data;
+ 	struct control *control = device->control;
+-	DBusMessage *reply;
+ 	int err;
+ 
+-	reply = dbus_message_new_method_return(msg);
+-	if (!reply)
+-		return NULL;
+-
+ 	if (control->state != AVCTP_STATE_CONNECTED)
+ 		return btd_error_not_connected(msg);
+ 
 -- 
-1.7.5.3
+1.7.6
 
