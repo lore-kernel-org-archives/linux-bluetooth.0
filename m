@@ -1,93 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluez: l2test: enhance L2CAP mode option
-Date: Tue,  5 Jul 2011 17:29:23 +0300
-Message-Id: <1309876163-30261-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1309876163-30261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1309876163-30261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] BlueZ: l2test: Use defined L2CAP extended feature mask
+Date: Tue,  5 Jul 2011 17:29:22 +0300
+Message-Id: <1309876163-30261-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Sync l2cap.h from kernel concerning L2CAP extended feature mask.
 ---
- test/l2test.c |   41 +++++++++++++++++++++++++++++++++++------
- 1 files changed, 35 insertions(+), 6 deletions(-)
+ lib/l2cap.h   |   12 ++++++++++++
+ test/l2test.c |   20 ++++++++++----------
+ 2 files changed, 22 insertions(+), 10 deletions(-)
 
+diff --git a/lib/l2cap.h b/lib/l2cap.h
+index e59cfdd..bc87f72 100644
+--- a/lib/l2cap.h
++++ b/lib/l2cap.h
+@@ -83,6 +83,18 @@ struct l2cap_conninfo {
+ #define L2CAP_INFO_REQ		0x0a
+ #define L2CAP_INFO_RSP		0x0b
+ 
++/* L2CAP extended feature mask */
++#define L2CAP_FEAT_FLOWCTL	0x00000001
++#define L2CAP_FEAT_RETRANS	0x00000002
++#define L2CAP_FEAT_BIDIR_QOS	0x00000004
++#define L2CAP_FEAT_ERTM		0x00000008
++#define L2CAP_FEAT_STREAMING	0x00000010
++#define L2CAP_FEAT_FCS		0x00000020
++#define L2CAP_FEAT_EXT_FLOW	0x00000040
++#define L2CAP_FEAT_FIXED_CHAN	0x00000080
++#define L2CAP_FEAT_EXT_WINDOW	0x00000100
++#define L2CAP_FEAT_UCD		0x00000200
++
+ /* L2CAP structures */
+ typedef struct {
+ 	uint16_t	len;
 diff --git a/test/l2test.c b/test/l2test.c
-index 3b606d2..44c617c 100644
+index 3ac332f..3b606d2 100644
 --- a/test/l2test.c
 +++ b/test/l2test.c
-@@ -112,6 +112,28 @@ static int reliable = 0;
- static int timestamp = 0;
- static int defer_setup = 0;
- 
-+static struct {
-+	char	*name;
-+	int	flag;
-+} l2cap_modes[] = {
-+	{ "basic",	L2CAP_MODE_BASIC	},
-+	{ "flowctl",	L2CAP_MODE_FLOWCTL	},
-+	{ "retrans",	L2CAP_MODE_RETRANS	},
-+	{ "ertm",	L2CAP_MODE_ERTM		},
-+	{ "streaming",	L2CAP_MODE_STREAMING	},
-+	{ 0 }
-+};
-+
-+static void list_l2cap_modes(void)
-+{
-+	int i;
-+
-+	printf("l2test - L2CAP testing\n"
-+		"List L2CAP modes:\n");
-+	for (i=0; l2cap_modes[i].name; i++)
-+		printf("\t%s\n", l2cap_modes[i].name);
-+}
-+
- static float tv2fl(struct timeval tv)
- {
- 	return (float)tv.tv_sec + (float)(tv.tv_usec/1000000.0);
-@@ -1083,7 +1105,7 @@ static void usage(void)
- 		"\t[-N num] send num frames (default = infinite)\n"
- 		"\t[-C num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
--		"\t[-X mode] select retransmission/flow-control mode\n"
-+		"\t[-X mode] l2cap mode(help for list, default = basic)\n"
- 		"\t[-F fcs] use CRC16 check (default = 1)\n"
- 		"\t[-Q num] Max Transmit value (default = 3)\n"
- 		"\t[-Z size] Transmission Window size (default = 63)\n"
-@@ -1100,7 +1122,7 @@ static void usage(void)
- int main(int argc, char *argv[])
- {
- 	struct sigaction sa;
--	int opt, sk, mode = RECV, need_addr = 0;
-+	int opt, sk, i, mode = RECV, need_addr = 0;
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
-@@ -1218,10 +1240,17 @@ int main(int argc, char *argv[])
- 			break;
- 
- 		case 'X':
--			if (strcasecmp(optarg, "ertm") == 0)
--				rfcmode = L2CAP_MODE_ERTM;
--			else
--				rfcmode = atoi(optarg);
-+			rfcmode = -1;
-+
-+			for (i = 0; l2cap_modes[i].name; i++)
-+				if (!strcasecmp(l2cap_modes[i].name, optarg))
-+					rfcmode = l2cap_modes[i].flag;
-+			
-+			if (!strcasecmp(optarg, "help") || rfcmode == -1) {
-+				list_l2cap_modes();
-+				exit(1);
-+			}
-+
- 			break;
- 
- 		case 'F':
+@@ -948,25 +948,25 @@ static void info_request(char *svr)
+ 	case 0x0000:
+ 		memcpy(&mask, rsp->data, sizeof(mask));
+ 		printf("Extended feature mask is 0x%04x\n", btohl(mask));
+-		if (mask & 0x01)
++		if (mask & L2CAP_FEAT_FLOWCTL)
+ 			printf("  Flow control mode\n");
+-		if (mask & 0x02)
++		if (mask & L2CAP_FEAT_RETRANS)
+ 			printf("  Retransmission mode\n");
+-		if (mask & 0x04)
++		if (mask & L2CAP_FEAT_BIDIR_QOS)
+ 			printf("  Bi-directional QoS\n");
+-		if (mask & 0x08)
++		if (mask & L2CAP_FEAT_ERTM)
+ 			printf("  Enhanced Retransmission mode\n");
+-		if (mask & 0x10)
++		if (mask & L2CAP_FEAT_STREAMING)
+ 			printf("  Streaming mode\n");
+-		if (mask & 0x20)
++		if (mask & L2CAP_FEAT_FCS)
+ 			printf("  FCS Option\n");
+-		if (mask & 0x40)
++		if (mask & L2CAP_FEAT_EXT_FLOW)
+ 			printf("  Extended Flow Specification\n");
+-		if (mask & 0x80)
++		if (mask & L2CAP_FEAT_FIXED_CHAN)
+ 			printf("  Fixed Channels\n");
+-		if (mask & 0x0100)
++		if (mask & L2CAP_FEAT_EXT_WINDOW)
+ 			printf("  Extended Window Size\n");
+-		if (mask & 0x0200)
++		if (mask & L2CAP_FEAT_UCD)
+ 			printf("  Unicast Connectionless Data Reception\n");
+ 		break;
+ 	case 0x0001:
 -- 
 1.7.4.1
 
