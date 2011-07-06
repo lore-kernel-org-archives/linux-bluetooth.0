@@ -1,70 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPGrrxV_hpVhsp2pkkSgy+oSgeRNSxz3WP4hk8AzjjjZZH+j6g@mail.gmail.com>
-References: <1309790985-32143-1-git-send-email-bulislaw@linux.com>
-	<CABBYNZ+B_dDGRnoic6xyn4N1kRpOPTGrMJ7xBkmB7M=ZBsZzDQ@mail.gmail.com>
-	<CAPGrrxVT-xugggk_CcNn_Zd+ZSJjuVPrMn64XVnNoUqK2sm60Q@mail.gmail.com>
-	<CABBYNZJHkqk5dQZrYzNiVTs4Fdx8WUk70CfAzLbVHhUHWuos+Q@mail.gmail.com>
-	<CAPGrrxV_hpVhsp2pkkSgy+oSgeRNSxz3WP4hk8AzjjjZZH+j6g@mail.gmail.com>
-Date: Wed, 6 Jul 2011 10:03:00 +0200
-Message-ID: <CAPGrrxUwYsRXkaYomM5FS+OJLt7fL4u-DKKASNx76Of3wg6fcQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Add SetRemoteProperty method for OOB mechanism
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 1/2] BlueZ: l2test: Use defined L2CAP extended feature mask
+Date: Wed,  6 Jul 2011 10:48:35 +0300
+Message-Id: <1309938516-510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 5, 2011 at 11:59 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
-> On Tue, Jul 5, 2011 at 11:51 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Bartosz,
->>
->> On Tue, Jul 5, 2011 at 11:55 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
->>>
->>> Right, i'v discussed this approach with Johan and Szymon on freenode
->>> -- i'v changed few things after that (mostly because implementing it
->>> in AddRemoteData would break api, so i moved it to separate method) --
->>> maybe it would be a good idea to have this functionality now in this
->>> form and change it when the api break would be possible (5.0?)?
->>>
->>
->> Apparently the idea is to use this interface is to emulate a
->> DeviceFound result, which I guess would make sense if the user pairs
->> using the bt application/agent, but in the other hand this can be
->> misused by application and they actually start overwriting device
->> properties e.g. restore tool. So the question is how much do we trust
->> application to provide this information without properly creating a
->> device? To me it sounds that we either need the agent to actually
->> accept this information as valid, which btw normally requires an
->> object path to identify the device to query its properties, or we do
->> it all together as I suggested in CreateDevice so we validate the
->> information by pairing/connecting to the device.
->>
->> Btw, there is also the problem that D-Bus round trips are expensive
->> and with such API one have to set one by one the properties to finally
->> do a CreateDevice in the end, so at least the current design should
->> make sure that an application can set all its known properties in one
->> call e.g. SetRemoteProperties(string address, dict properties).
->>
->> --
->> Luiz Augusto von Dentz
->>
->
-> Yeah it sound good, but are we sure that there is need for setting
-> other parameters via OOB? The idea that was cleared on irc wast to add
-> CoD parameter to OOB.AddRemoteData(address, hash, randomizer, CoD)
->
-> --
-> Pozdrowienia,
-> Bartosz Szatkowski
->
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Is there any conclusion ? :)
-Are we leaving it that way or changing it as Luiz suggested (array)?
-Or maybe something else?
+Sync l2cap.h from kernel concerning L2CAP extended feature mask.
+---
+ lib/l2cap.h   |   12 ++++++++++++
+ test/l2test.c |   20 ++++++++++----------
+ 2 files changed, 22 insertions(+), 10 deletions(-)
 
+diff --git a/lib/l2cap.h b/lib/l2cap.h
+index e59cfdd..bc87f72 100644
+--- a/lib/l2cap.h
++++ b/lib/l2cap.h
+@@ -83,6 +83,18 @@ struct l2cap_conninfo {
+ #define L2CAP_INFO_REQ		0x0a
+ #define L2CAP_INFO_RSP		0x0b
+ 
++/* L2CAP extended feature mask */
++#define L2CAP_FEAT_FLOWCTL	0x00000001
++#define L2CAP_FEAT_RETRANS	0x00000002
++#define L2CAP_FEAT_BIDIR_QOS	0x00000004
++#define L2CAP_FEAT_ERTM		0x00000008
++#define L2CAP_FEAT_STREAMING	0x00000010
++#define L2CAP_FEAT_FCS		0x00000020
++#define L2CAP_FEAT_EXT_FLOW	0x00000040
++#define L2CAP_FEAT_FIXED_CHAN	0x00000080
++#define L2CAP_FEAT_EXT_WINDOW	0x00000100
++#define L2CAP_FEAT_UCD		0x00000200
++
+ /* L2CAP structures */
+ typedef struct {
+ 	uint16_t	len;
+diff --git a/test/l2test.c b/test/l2test.c
+index 3ac332f..3b606d2 100644
+--- a/test/l2test.c
++++ b/test/l2test.c
+@@ -948,25 +948,25 @@ static void info_request(char *svr)
+ 	case 0x0000:
+ 		memcpy(&mask, rsp->data, sizeof(mask));
+ 		printf("Extended feature mask is 0x%04x\n", btohl(mask));
+-		if (mask & 0x01)
++		if (mask & L2CAP_FEAT_FLOWCTL)
+ 			printf("  Flow control mode\n");
+-		if (mask & 0x02)
++		if (mask & L2CAP_FEAT_RETRANS)
+ 			printf("  Retransmission mode\n");
+-		if (mask & 0x04)
++		if (mask & L2CAP_FEAT_BIDIR_QOS)
+ 			printf("  Bi-directional QoS\n");
+-		if (mask & 0x08)
++		if (mask & L2CAP_FEAT_ERTM)
+ 			printf("  Enhanced Retransmission mode\n");
+-		if (mask & 0x10)
++		if (mask & L2CAP_FEAT_STREAMING)
+ 			printf("  Streaming mode\n");
+-		if (mask & 0x20)
++		if (mask & L2CAP_FEAT_FCS)
+ 			printf("  FCS Option\n");
+-		if (mask & 0x40)
++		if (mask & L2CAP_FEAT_EXT_FLOW)
+ 			printf("  Extended Flow Specification\n");
+-		if (mask & 0x80)
++		if (mask & L2CAP_FEAT_FIXED_CHAN)
+ 			printf("  Fixed Channels\n");
+-		if (mask & 0x0100)
++		if (mask & L2CAP_FEAT_EXT_WINDOW)
+ 			printf("  Extended Window Size\n");
+-		if (mask & 0x0200)
++		if (mask & L2CAP_FEAT_UCD)
+ 			printf("  Unicast Connectionless Data Reception\n");
+ 		break;
+ 	case 0x0001:
 -- 
-Pozdrowienia,
-Bartosz Szatkowski
+1.7.4.1
+
