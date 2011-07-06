@@ -1,22 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 6 Jul 2011 11:17:58 +0200
-Message-ID: <CACLukzJSY0dXp8Ns5bRARN6OwWUh+_474NS5jEQ4mD-85Nxh0w@mail.gmail.com>
-Subject: High level GATT based profiles development
-From: Santiago Carot <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <CAPGrrxV_hpVhsp2pkkSgy+oSgeRNSxz3WP4hk8AzjjjZZH+j6g@mail.gmail.com>
+References: <1309790985-32143-1-git-send-email-bulislaw@linux.com>
+	<CABBYNZ+B_dDGRnoic6xyn4N1kRpOPTGrMJ7xBkmB7M=ZBsZzDQ@mail.gmail.com>
+	<CAPGrrxVT-xugggk_CcNn_Zd+ZSJjuVPrMn64XVnNoUqK2sm60Q@mail.gmail.com>
+	<CABBYNZJHkqk5dQZrYzNiVTs4Fdx8WUk70CfAzLbVHhUHWuos+Q@mail.gmail.com>
+	<CAPGrrxV_hpVhsp2pkkSgy+oSgeRNSxz3WP4hk8AzjjjZZH+j6g@mail.gmail.com>
+Date: Wed, 6 Jul 2011 10:03:00 +0200
+Message-ID: <CAPGrrxUwYsRXkaYomM5FS+OJLt7fL4u-DKKASNx76Of3wg6fcQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Add SetRemoteProperty method for OOB mechanism
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Tue, Jul 5, 2011 at 11:59 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+> On Tue, Jul 5, 2011 at 11:51 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Bartosz,
+>>
+>> On Tue, Jul 5, 2011 at 11:55 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>>>
+>>> Right, i'v discussed this approach with Johan and Szymon on freenode
+>>> -- i'v changed few things after that (mostly because implementing it
+>>> in AddRemoteData would break api, so i moved it to separate method) --
+>>> maybe it would be a good idea to have this functionality now in this
+>>> form and change it when the api break would be possible (5.0?)?
+>>>
+>>
+>> Apparently the idea is to use this interface is to emulate a
+>> DeviceFound result, which I guess would make sense if the user pairs
+>> using the bt application/agent, but in the other hand this can be
+>> misused by application and they actually start overwriting device
+>> properties e.g. restore tool. So the question is how much do we trust
+>> application to provide this information without properly creating a
+>> device? To me it sounds that we either need the agent to actually
+>> accept this information as valid, which btw normally requires an
+>> object path to identify the device to query its properties, or we do
+>> it all together as I suggested in CreateDevice so we validate the
+>> information by pairing/connecting to the device.
+>>
+>> Btw, there is also the problem that D-Bus round trips are expensive
+>> and with such API one have to set one by one the properties to finally
+>> do a CreateDevice in the end, so at least the current design should
+>> make sure that an application can set all its known properties in one
+>> call e.g. SetRemoteProperties(string address, dict properties).
+>>
+>> --
+>> Luiz Augusto von Dentz
+>>
+>
+> Yeah it sound good, but are we sure that there is need for setting
+> other parameters via OOB? The idea that was cleared on irc wast to add
+> CoD parameter to OOB.AddRemoteData(address, hash, randomizer, CoD)
+>
+> --
+> Pozdrowienia,
+> Bartosz Szatkowski
+>
 
-I'd like to start coding a plugin for the Health Thermmeter Profile
-(TFP) but I have some doubts about where I should put the source code.
-I was thinking in to place the TFP plugin into the health folder but I
-don't know if you are planning to gather all High level GATT based
-plugins in the same directory or anything else.
+Is there any conclusion ? :)
+Are we leaving it that way or changing it as Luiz suggested (array)?
+Or maybe something else?
 
-Any suggestion?
-
-Regards.
+-- 
+Pozdrowienia,
+Bartosz Szatkowski
