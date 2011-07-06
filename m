@@ -1,95 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 6 Jul 2011 10:17:26 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/2] Bluez: l2test: enhance L2CAP mode option
-Date: Wed,  6 Jul 2011 10:48:36 +0300
-Message-Id: <1309938516-510-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1309938516-510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1309938516-510-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP extended feature mask update
+Message-ID: <20110706071724.GA31348@aemeltch-MOBL1>
+References: <1309869322-26307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20110705160028.GB29925@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110705160028.GB29925@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
----
- test/l2test.c |   43 +++++++++++++++++++++++++++++++++++++------
- 1 files changed, 37 insertions(+), 6 deletions(-)
+On Tue, Jul 05, 2011 at 01:00:28PM -0300, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-07-05 15:35:22 +0300]:
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Update L2CAP extended feature mask to reflect recent BT spec.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/l2cap.h |    6 +++++-
+> >  1 files changed, 5 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index 9c18e55..d85e55c 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -92,13 +92,17 @@ struct l2cap_conninfo {
+> >  #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
+> >  #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
+> >  
+> > -/* L2CAP feature mask */
+> > +/* L2CAP extended feature mask */
+> >  #define L2CAP_FEAT_FLOWCTL	0x00000001
+> >  #define L2CAP_FEAT_RETRANS	0x00000002
+> > +#define L2CAP_FEAT_BIDIR_QOS	0x00000004
+> >  #define L2CAP_FEAT_ERTM		0x00000008
+> >  #define L2CAP_FEAT_STREAMING	0x00000010
+> >  #define L2CAP_FEAT_FCS		0x00000020
+> > +#define L2CAP_FEAT_EXT_FLOW	0x00000040
+> >  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
+> > +#define L2CAP_FEAT_EXT_WINDOW	0x00000100
+> > +#define L2CAP_FEAT_UCD		0x00000200
+> 
+> I don't see the point in adding if we are not using them. Let's add them when
+> we have code that uses such macros.
 
-diff --git a/test/l2test.c b/test/l2test.c
-index 3b606d2..e719c65 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -112,6 +112,30 @@ static int reliable = 0;
- static int timestamp = 0;
- static int defer_setup = 0;
- 
-+static struct {
-+	char	*name;
-+	int	flag;
-+} l2cap_modes[] = {
-+	{ "basic",	L2CAP_MODE_BASIC	},
-+	/* Not implemented
-+	{ "flowctl",	L2CAP_MODE_FLOWCTL	},
-+	{ "retrans",	L2CAP_MODE_RETRANS	},
-+	*/
-+	{ "ertm",	L2CAP_MODE_ERTM		},
-+	{ "streaming",	L2CAP_MODE_STREAMING	},
-+	{ 0 }
-+};
-+
-+static void list_l2cap_modes(void)
-+{
-+	int i;
-+
-+	printf("l2test - L2CAP testing\n"
-+		"List L2CAP modes:\n");
-+	for (i=0; l2cap_modes[i].name; i++)
-+		printf("\t%s\n", l2cap_modes[i].name);
-+}
-+
- static float tv2fl(struct timeval tv)
- {
- 	return (float)tv.tv_sec + (float)(tv.tv_usec/1000000.0);
-@@ -1083,7 +1107,7 @@ static void usage(void)
- 		"\t[-N num] send num frames (default = infinite)\n"
- 		"\t[-C num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
--		"\t[-X mode] select retransmission/flow-control mode\n"
-+		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
- 		"\t[-F fcs] use CRC16 check (default = 1)\n"
- 		"\t[-Q num] Max Transmit value (default = 3)\n"
- 		"\t[-Z size] Transmission Window size (default = 63)\n"
-@@ -1100,7 +1124,7 @@ static void usage(void)
- int main(int argc, char *argv[])
- {
- 	struct sigaction sa;
--	int opt, sk, mode = RECV, need_addr = 0;
-+	int opt, sk, i, mode = RECV, need_addr = 0;
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
-@@ -1218,10 +1242,17 @@ int main(int argc, char *argv[])
- 			break;
- 
- 		case 'X':
--			if (strcasecmp(optarg, "ertm") == 0)
--				rfcmode = L2CAP_MODE_ERTM;
--			else
--				rfcmode = atoi(optarg);
-+			rfcmode = -1;
-+
-+			for (i = 0; l2cap_modes[i].name; i++)
-+				if (!strcasecmp(l2cap_modes[i].name, optarg))
-+					rfcmode = l2cap_modes[i].flag;
-+			
-+			if (!strcasecmp(optarg, "help") || rfcmode == -1) {
-+				list_l2cap_modes();
-+				exit(1);
-+			}
-+
- 			break;
- 
- 		case 'F':
--- 
-1.7.4.1
+Those values are used in user space tools like l2test and hcidump, so I
+was thinking to keep headers for userspace/kernel in sync.
 
+BTW: Do we really need to have 2 sets of headers? 
+Can we use (#if defined __KERNEL__) to separate kernel-specific code?
+
+Best regards 
+Andrei Emeltchenko 
