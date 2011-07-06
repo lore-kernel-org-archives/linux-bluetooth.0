@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <7.0.1.0.2.20110706214918.03262000@gmx.net>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
-	<BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
-	<7.0.1.0.2.20110627205517.03250550@gmx.net>
-	<BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
-	<BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
-	<BANLkTiknkbZcS2AASzS_qeXbNJ3_Qa2e1A@mail.gmail.com>
-	<7.0.1.0.2.20110629214327.0321b4e0@gmx.net>
-	<7.0.1.0.2.20110706214918.03262000@gmx.net>
-Date: Wed, 6 Jul 2011 23:35:37 +0300
-Message-ID: <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.gmail.com>
-Subject: Re: Media API with more than one headset
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Kornatowski <pkorn@gmx.net>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 9/9] Add support for btiotest to returning the key size
+Date: Wed,  6 Jul 2011 17:10:41 -0300
+Message-Id: <1309983041-23744-10-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <y>
+ <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+---
+ test/btiotest.c |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
 
-On Wed, Jul 6, 2011 at 10:54 PM, Peter Kornatowski <pkorn@gmx.net> wrote:
-> I downloaded and checked the new bluez version 4.95. I'm wondering why the
-> patch of Lukasz didn't get applied? As I wrote in my last e-mail, it works
-> for not losing playing mode of all headsets when disconnecting just one.
-
-I don't remember actually seeing a proper patch to the mailing list,
-that might explain why it wasn't applied yet.
-
-> Did someone of you had a chance to look into the other problems I wrote
-> about in my last e-mail? This would help me a lot.
-
-Nope, I was actually waiting for more input since you mentioned this
-only happened with some code your wrote.
-
+diff --git a/test/btiotest.c b/test/btiotest.c
+index c4d8f4f..fdf2234 100644
+--- a/test/btiotest.c
++++ b/test/btiotest.c
+@@ -135,6 +135,19 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 			printf("imtu=%u, omtu=%u\n", imtu, omtu);
+ 	}
+ 
++	if (data->type == BT_IO_L2CAP) {
++		uint8_t key_size;
++
++		if (!bt_io_get(io, data->type, &err,
++					BT_IO_OPT_KEY_SIZE, &key_size,
++					BT_IO_OPT_INVALID)) {
++			printf("Unable to get L2CAP Key size: %s\n",
++								err->message);
++			g_clear_error(&err);
++		} else
++			printf("key_size=%u\n", key_size);
++	}
++
+ 	if (data->disconn == 0) {
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 		printf("Disconnected\n");
 -- 
-Luiz Augusto von Dentz
+1.7.6
+
