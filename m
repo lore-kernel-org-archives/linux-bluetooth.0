@@ -2,54 +2,134 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v3 08/12] Bluetooth: Use the stored LTK for restabilishing security
-Date: Wed,  6 Jul 2011 16:24:24 -0300
-Message-Id: <1309980264-14455-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1309547267-9514-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v3 03/12] Bluetooth: Add functions to manipulate the link key list for SMP
+Date: Wed,  6 Jul 2011 16:23:07 -0300
+Message-Id: <1309980187-14404-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
+References: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that it's possible that the exchanged key is present in
-the link key list, we may be able to estabilish security with
-an already existing key, without need to perform any SMP
-procedure.
+As the LTK (the new type of key being handled now) has more data
+associated with it, we need to store this extra data and retrieve
+the keys based on that data.
+
+Methods for searching for a key and for adding a new LTK are
+introduced here.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    5 +++
+ net/bluetooth/hci_core.c         |   73 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 34d236d..e6fc731 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -477,6 +477,17 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a3d49d8..353d4a9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -552,6 +552,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
++struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
++struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
++					bdaddr_t *bdaddr, u8 type);
++int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
++					__le16 ediv, u8 rand[8], u8 ltk[16]);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
  
- 	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
-+		struct link_key *key;
+ int hci_remote_oob_data_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cd59b84..1cf8b89 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1059,6 +1059,42 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+ 	return 0;
+ }
+ 
++struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
++{
++	struct link_key *k;
 +
-+		key = hci_find_link_key_type(hcon->hdev, conn->dst,
-+							HCI_LK_SMP_LTK);
-+		if (key) {
-+			struct key_master_id *master = (void *) key->data;
++	list_for_each_entry(k, &hdev->link_keys, list) {
++		struct key_master_id *id;
 +
-+			hci_le_start_enc(hcon, master->ediv, master->rand,
-+								key->val);
-+			goto done;
-+		}
++		if (k->type != HCI_LK_SMP_LTK)
++			continue;
++
++		if (k->dlen != sizeof(*id))
++			continue;
++
++		id = (void *) &k->data;
++		if (id->ediv == ediv &&
++				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
++			return k;
++	}
++
++	return NULL;
++}
++EXPORT_SYMBOL(hci_find_ltk);
++
++struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
++					bdaddr_t *bdaddr, u8 type)
++{
++	struct link_key *k;
++
++	list_for_each_entry(k, &hdev->link_keys, list)
++		if ((k->type == type) && (bacmp(bdaddr, &k->bdaddr) == 0))
++			return k;
++
++	return NULL;
++}
++EXPORT_SYMBOL(hci_find_link_key_type);
++
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 				bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
+ {
+@@ -1114,6 +1150,43 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 	return 0;
+ }
  
- 		build_pairing_cmd(conn, &cp, NULL, authreq);
- 		conn->preq[0] = SMP_CMD_PAIRING_REQ;
-@@ -492,6 +503,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
- 	}
- 
-+done:
- 	hcon->pending_sec_level = sec_level;
- 	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
- 
++int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
++					__le16 ediv, u8 rand[8], u8 ltk[16])
++{
++	struct link_key *key, *old_key;
++	struct key_master_id *id;
++	u8 old_key_type;
++
++	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
++
++	old_key = hci_find_link_key_type(hdev, bdaddr, HCI_LK_SMP_LTK);
++	if (old_key) {
++		key = old_key;
++		old_key_type = old_key->type;
++	} else {
++		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
++		if (!key)
++			return -ENOMEM;
++		list_add(&key->list, &hdev->link_keys);
++		old_key_type = 0xff;
++	}
++
++	key->dlen = sizeof(*id);
++
++	bacpy(&key->bdaddr, bdaddr);
++	memcpy(key->val, ltk, sizeof(key->val));
++	key->type = HCI_LK_SMP_LTK;
++
++	id = (void *) &key->data;
++	id->ediv = ediv;
++	memcpy(id->rand, rand, sizeof(id->rand));
++
++	if (new_key)
++		mgmt_new_key(hdev->id, key, old_key_type);
++
++	return 0;
++}
++
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct link_key *key;
 -- 
 1.7.6
 
