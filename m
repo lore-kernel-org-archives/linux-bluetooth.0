@@ -2,90 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 7/9] Add support for getting the Encryption Key Size via btio
-Date: Wed,  6 Jul 2011 17:10:39 -0300
-Message-Id: <1309983041-23744-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 6/9] Fix memory leak when loading keys
+Date: Wed,  6 Jul 2011 17:10:38 -0300
+Message-Id: <1309983041-23744-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <y>
  <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some profiles specify some restriction depending on the length
-of the key used to encrypt the link, this adds an way to retrieve
-that value from the kernel.
-
-Current kernels don't provide this information so the size is
-always zero.
+Core bluetoothd doesn't need to have a reference to the link key list,
+so we pass a reference to the list and free it as soon as possible. If any
+user need to keep a copy of that list around, they need to copy it. This makes
+the memory management more consistent.
 ---
- btio/btio.c     |   21 +++++++++++++++++++++
- btio/btio.h     |    1 +
- lib/bluetooth.h |    1 +
- 3 files changed, 23 insertions(+), 0 deletions(-)
+ plugins/hciops.c |   14 +++++++++++++-
+ src/adapter.c    |    6 +++---
+ 2 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 2cc9082..337dcb9 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -502,6 +502,22 @@ static int l2cap_set_flushable(int sock, gboolean flushable)
- 	return 0;
- }
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 207e187..56daf0d 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3450,6 +3450,7 @@ static int hciops_restore_powered(int index)
+ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+ {
+ 	struct dev_info *dev = &devs[index];
++	GSList *l, *n, *new;
  
-+static gboolean get_key_size(int sock, BtIOType type, int *size,
-+								GError **err)
-+{
-+	struct bt_security sec;
-+	socklen_t len;
+ 	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
+ 								debug_keys);
+@@ -3457,7 +3458,18 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+ 	if (dev->keys != NULL)
+ 		return -EEXIST;
+ 
+-	dev->keys = keys;
++	new = g_slist_copy(keys);
 +
-+	memset(&sec, 0, sizeof(sec));
-+	len = sizeof(sec);
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) == 0) {
-+		*size = sec.key_size;
-+		return TRUE;
++	for (n = new, l = keys; l && n; l = l->next, n = n->next) {
++		struct link_key_info *orig;
++
++		orig = l->data;
++
++		n->data = g_malloc0(sizeof(*orig) + orig->dlen);
++		memcpy(n->data, orig, sizeof(*orig) + orig->dlen);
 +	}
 +
-+	return FALSE;
-+}
++	dev->keys = new;
+ 	dev->debug_keys = debug_keys;
+ 
+ 	return 0;
+diff --git a/src/adapter.c b/src/adapter.c
+index 85979f5..cde0244 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2154,11 +2154,11 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 	err = adapter_ops->load_keys(adapter->dev_id, keys.keys,
+ 							main_opts.debug_keys);
+-	if (err < 0) {
++	if (err < 0)
+ 		error("Unable to load keys to adapter_ops: %s (%d)",
+ 							strerror(-err), -err);
+-		g_slist_free_full(keys.keys, g_free);
+-	}
 +
- static gboolean l2cap_set(int sock, int sec_level, uint16_t imtu,
- 				uint16_t omtu, uint8_t mode, int master,
- 				int flushable, GError **err)
-@@ -848,6 +864,11 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 						va_arg(args, int *), err))
- 				return FALSE;
- 			break;
-+		case BT_IO_OPT_KEY_SIZE:
-+			if (!get_key_size(sock, BT_IO_L2CAP,
-+						va_arg(args, int *), err))
-+				return FALSE;
-+			break;
- 		case BT_IO_OPT_PSM:
- 			*(va_arg(args, uint16_t *)) = src.l2_psm ?
- 						src.l2_psm : dst.l2_psm;
-diff --git a/btio/btio.h b/btio/btio.h
-index c6b736f..eaa9874 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -52,6 +52,7 @@ typedef enum {
- 	BT_IO_OPT_DEST_BDADDR,
- 	BT_IO_OPT_DEFER_TIMEOUT,
- 	BT_IO_OPT_SEC_LEVEL,
-+	BT_IO_OPT_KEY_SIZE,
- 	BT_IO_OPT_CHANNEL,
- 	BT_IO_OPT_SOURCE_CHANNEL,
- 	BT_IO_OPT_DEST_CHANNEL,
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 738e07a..1492139 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -63,6 +63,7 @@ extern "C" {
- #define BT_SECURITY	4
- struct bt_security {
- 	uint8_t level;
-+	uint8_t key_size;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
++	g_slist_free_full(keys.keys, g_free);
+ 
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
+ 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
 -- 
 1.7.6
 
