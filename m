@@ -1,35 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH v2 0/3] ERTM local busy enhancement
-Date: Wed,  6 Jul 2011 14:54:29 -0700
-Message-Id: <1309989272-24103-1-git-send-email-mathewm@codeaurora.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 12/12] Address remote initiated disconnection
+Date: Wed,  6 Jul 2011 18:24:24 -0300
+Message-Id: <1309987464-10255-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1309874168-32716-13-git-send-email-claudio.takahasi@openbossa.org>
+References: <1309874168-32716-13-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches change receiver-side handling of flow control. This new
-approach will not keep very much incoming data beyond what fits in the
-socket receive buffer, so memory use is more tightly controlled. When
-incoming data does not immediately fit in the socket buffer, the L2CAP
-socket layer will now only check for available space when the socket
-is read from instead of polling on a workqueue thread.
+Local initiated disconnection will be triggered when the last GAttrib
+reference is dropped. For remote initiated disconnection it is necessary
+to track the socket HUP registering disconnection GAttrib callback.
+---
+ src/device.c |   11 ++++++++++-
+ 1 files changed, 10 insertions(+), 1 deletions(-)
 
-
-Mat Martineau (3):
-  Bluetooth: Move code for ERTM local busy state to separate functions
-  Bluetooth: Use event-driven approach for handling ERTM receive buffer
-  Bluetooth: Remove L2CAP busy queue
-
- include/net/bluetooth/l2cap.h |    6 +-
- net/bluetooth/l2cap_core.c    |  174 +++++++++++------------------------------
- net/bluetooth/l2cap_sock.c    |   66 +++++++++++++++-
- 3 files changed, 109 insertions(+), 137 deletions(-)
-
+diff --git a/src/device.c b/src/device.c
+index 52462be..90761d4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1615,7 +1615,7 @@ static void attio_disconnected(gpointer data, gpointer user_data)
+ 
+ static gboolean att_auto_connect(gpointer user_data);
+ 
+-static void attrib_destroyed(gpointer user_data)
++static void attrib_disconnected(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+ 
+@@ -1627,6 +1627,13 @@ static void attrib_destroyed(gpointer user_data)
+ 							att_auto_connect,
+ 							device);
+ 
++	g_attrib_unref(device->attrib);
++}
++
++static void attrib_destroyed(gpointer user_data)
++{
++	struct btd_device *device = user_data;
++
+ 	device->attrib = NULL;
+ }
+ 
+@@ -1697,6 +1704,8 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	}
+ 
+ 	device->attrib = g_attrib_new(io);
++	g_attrib_set_disconnect_function(device->attrib, attrib_disconnected,
++								device);
+ 	g_attrib_set_destroy_function(device->attrib, attrib_destroyed, device);
+ 
+ 	if (req)
 -- 
 1.7.6
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
