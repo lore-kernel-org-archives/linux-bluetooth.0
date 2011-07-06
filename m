@@ -1,81 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1309772865-5083-1-git-send-email-sancane@gmail.com>
-References: <1309772865-5083-1-git-send-email-sancane@gmail.com>
-Date: Wed, 6 Jul 2011 10:02:44 -0300
-Message-ID: <CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
-Subject: Re: [PATCH] Health Thermometer Profile API
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAKT1EBcaK2KkpSs=jznV1e8UbGA9bv3nWyx79d1c=YOxbr25dA@mail.gmail.com>
+References: <CACLukzJSY0dXp8Ns5bRARN6OwWUh+_474NS5jEQ4mD-85Nxh0w@mail.gmail.com>
+	<CAJdJm_PaGa7Q-nmHx341FT8Qr-KzV1197Vc383P4tsdmHg8BKg@mail.gmail.com>
+	<CAKT1EBcaK2KkpSs=jznV1e8UbGA9bv3nWyx79d1c=YOxbr25dA@mail.gmail.com>
+Date: Wed, 6 Jul 2011 15:01:33 +0200
+Message-ID: <CACLukzJf8gqejE0tBw6BMGXyOdfTU5YKw0GJC9=yETq4A==0_A@mail.gmail.com>
+Subject: Re: High level GATT based profiles development
+From: Santiago Carot <sancane@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgU2FudGlhZ28sCgo8c25pcD4KCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBSZWdpc3Rlcldh
-dGNoZXIob2JqZWN0IGFnZW50KQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIFJlZ2lzdGVycyBhIHdhdGNoZXIgdG8gbW9uaXRvciBzY2FubmVkIG1lYXN1cmVtZW50cy4K
-PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoaXMgYWdlbnQgd2lsbCBiZSBu
-b3RpZmllZCBhYm91dCBmaW5hbCB0ZW1wZXJhdHVyZQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgbWVhc3VyZW1lbnRzLgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIFBvc3NpYmxlIEVycm9yczogb3JnLmJsdWV6LkVycm9yLkludmFsaWRBcmd1bWVu
-dHMKPiArCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBVbnJlZ2lzdGVyV2F0Y2hlcihvYmplY3Qg
-YWdlbnQpCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgVW5yZWdpc3Rl
-cnMgYSB3YXRjaGVyLgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIEZp
-bmFsIGFuZCBpbnRlcm1lZGlhdGUgdGVtcGVyYXR1cmVzIHdvbid0IGJlIG5vdGlmaWVkIHRvCj4g
-KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB0aGlzIGFnZW50IGFueSBtb3JlLgo+
-ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFBvc3NpYmxlIEVycm9yczog
-b3JnLmJsdWV6LkVycm9yLkludmFsaWRBcmd1bWVudHMKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG9yZy5ibHVlei5FcnJvci5Ob3RG
-b3VuZAo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIEVuYWJsZUludGVybWVkaWF0ZU1lYXN1
-cmVtZW50KG9iamVjdCBhZ2VudCkKCkl0J2QgYmUgZ29vZCB0byB0cnkgaGlkZSBmcm9tIHRoZSBh
-cHBzIG5vdGlmaWNhdGlvbnMgYW5kIGluZGljYXRpb25zLgpNeSBvcGluaW9uIGlzOiB3YXRjaGVy
-cyBkb2Vzbid0IG5lZWQgdG8ga25vdyBpZiB0aGUgY2hhcmFjdGVyaXN0aWMKdmFsdWUgaXMgYSBu
-b3RpZmljYXRpb24gb3IgaW5kaWNhdGlvbi4KVGhlIHRoZXJtb21ldGVyIGltcGxlbWVudGF0aW9u
-IGNvdWxkIGVuYWJsZSBhdXRvbWF0aWNhbGx5Cm5vdGlmaWNhdGlvbnMgaWYgdGhlcmUgaXMgYXQg
-bGVhc3Qgb25lIHdhdGNoZXIgcmVnaXN0ZXJlZC4KCklzIGl0IGltcG9ydGFudCB0byBrbm93IGlm
-IHRoZSBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSBpcyBpbnRlcm1lZGlhdGUgb3Igbm90PwoKPiArCj4g
-KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBFbmFibGVzIGludGVybWVkaWF0ZSBt
-ZWFzdXJlbWVudCBub3RpZmljYXRpb25zIGZvciB0aGlzCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCBhZ2VudCBpZiB0aGUgdGhlcm1vbWV0ZXIgc3VwcG9ydHMgaXQuCj4gKwo+
-ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgUG9zc2libGUgRXJyb3JzOiBvcmcu
-Ymx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgb3JnLmJsdWV6LkVycm9yLk5vdFN1cHBv
-cnRlZAo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIERpc2FibGVJbnRlcm1lZGlhdGVNZWFz
-dXJlbWVudChvYmplY3QgYWdlbnQpCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgRGlzYWJsZXMgaW50ZXJtZWRpYXRlIG1lYXN1cmVtZW50IG5vdGlmaWNhdGlvbnMgZm9y
-IHRoaXMKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGFnZW50LiBJdCB3aWxs
-IGRpc2FibGUgbm90aWZpY2F0aW9ucyBpbiB0aGUgdGhlcm1vbWV0ZXIKPiArIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHdoZW4gdGhlIGxhc3QgYWdlbnQgcmVtb3ZlcyB0aGUgd2F0
-Y2hlciBmb3IgaW50ZXJtZWRpYXRlCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCBtZWFzdXJlbWVudHMuCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-UG9zc2libGUgRXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cwo+ICsgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgb3Jn
-LmJsdWV6LkVycm9yLk5vdEZvdW5kCj4gKwo+ICtTaWduYWxzIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgUHJvcGVydHlDaGFuZ2VkKHN0cmluZyBuYW1lLCB2YXJpYW50IHZhbHVlKQo+ICsKPiArIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoaXMgc2lnbmFsIGluZGljYXRlcyBhIGNo
-YW5nZWQgdmFsdWUgb2YgdGhlIGdpdmVuCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCBwcm9wZXJ0eS4KPiArCj4gK1Byb3BlcnRpZXMgwqAgwqAgYm9vbGVhbiBJbnRlcm1lZGlh
-dGUgW3JlYWRvbmx5XQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRy
-dWUgaWYgdGhlIHRoZXJtb21ldGVyIHN1cHBvcnRzIGludGVybWVkaWF0ZSBtZWFzdXJlbWVudAo+
-ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90aWZpY2F0aW9ucy4KPiArCj4g
-KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCB1aW50MTYgSW50ZXJ2YWwgKG9wdGlvbmFsKSBbcmVhZHdy
-aXRlXQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoZSBNZWFzdXJl
-bWVudCBJbnRlcnZhbCBkZWZpbmVzIHRoZSB0aW1lIChpbiBzZWNvbmRzKQo+ICsgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgYmV0d2VlbiBtZWFzdXJlbWVudHMuIFRoaXMgaW50ZXJ2
-YWwgaXMgbm90IHJlbGF0ZWQgdG8KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IHRoZSBpbnRlcm1lZGlhdGUgbWVhc3VyZW1lbnRzIGFuZCBtdXN0IGJlIGRlZmluZWQgaW50bwo+
-ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgYSB2YWxpZCByYW5nZS4gU2V0dGlu
-ZyBpdCB0byB6ZXJvIG1lYW5zIHRoYXQgbm8gcGVyaW9kaWMKPiArIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIG1lYXN1cmVtZW50cyB3aWxsIGJlIHRha2VuLgo+ICsKPiArIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIHVpbnQxNiBNYXhpbXVtIChvcHRpb25hbCkgW3JlYWRvbmx5XQo+ICsK
-PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIERlZmluZXMgdGhlIG1heGltdW0g
-dmFsdWUgYWxsb3dlZCBmb3IgdGhlIGludGVydmFsCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCBiZXR3ZWVuIHBlcmlvZGljIG1lYXN1cmVtZW50cy4KPiArCj4gKyDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCB1aW50MTYgTWluaW11bSAob3B0aW9uYWwpIFtyZWFkb25seV0KPiArCj4g
-KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBEZWZpbmVzIHRoZSBtaW5pbXVtIHZh
-bHVlIGFsbG93ZWQgZm9yIHRoZSBpbnRlcnZhbAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgYmV0d2VlbiBwZXJpb2RpYyBtZWFzdXJlbWVudHMuCj4gKwoKSW50ZXJ2YWxzIGNv
-dWxkIGJlIGEgY29uZmlnIG9wdGlvbi4gSXQgY2FuIGJlIGV4dGVuZGVkIGxhdGVyIGlmCm5lY2Vz
-c2FyeSwgbW92ZSB0aGUgY29uZmlnIG9wdGlvbiB0byB0aGUgQVBJKFByb3BlcnR5KSBpcyBlYXNp
-ZXIgdGhhbgpyZW1vdmUgYSBwcm9wZXJ0eS4KClJlZ2FyZHMsCkNsYXVkaW8K
+Hi Claudio,
+
+2011/7/6 Claudio Takahasi <claudio.takahasi@openbossa.org>:
+> Hi Santiago,
+>
+> On Wed, Jul 6, 2011 at 8:05 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi Santiago,
+>>
+>> On Wed, Jul 6, 2011 at 5:17 AM, Santiago Carot <sancane@gmail.com> wrote:
+>>> Hello,
+>>>
+>>> I'd like to start coding a plugin for the Health Thermmeter Profile
+>>> (TFP) but I have some doubts about where I should put the source code.
+>>> I was thinking in to place the TFP plugin into the health folder but I
+>>> don't know if you are planning to gather all High level GATT based
+>>> plugins in the same directory or anything else.
+>
+> IMO it could be added in the health folder. Maybe GATT and non GATT
+> health profiles will share some functions.
+>
+
+As far as I know there is nothing in common. I've got the idea idea of
+​​putting in the same folder just to gather health purpose profiles in
+the same place.
+
+On the other hand, I thought that may be interesting to keep all GATT
+profiles in the same place too.
+
+>>>
+>>> Any suggestion?
+>>
+>> So far we have been using separate directories for each profile, in a
+>> structure like:
+>>
+>> <profile>/main.c (init/exit functions)
+>> <profile>/manager.c (device driver registration)
+>> <profile>/<role>.c (actual implementation of the profile role)
+>>
+>> For instance, for Proximity we have:
+>
+> Actually two profiles: Proximity and Find Me.
+>
+
+I like the idea of creating a directory for the plugin too but I want
+to be sure that all of us are following the same criteria before to
+start to code.
+
+Regards.
