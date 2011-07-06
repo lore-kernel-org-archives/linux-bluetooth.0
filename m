@@ -2,31 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH obexd 1/2] Fix invalid memory read when pulling phone book
-Date: Wed,  6 Jul 2011 18:57:06 +0300
-Message-Id: <1309967827-23772-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH obexd 2/2] Fix finalize request in callback function
+Date: Wed,  6 Jul 2011 18:57:07 +0300
+Message-Id: <1309967827-23772-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1309967827-23772-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1309967827-23772-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Data contacts are freed already in finalize function which is called
-in query_result callback function. Calling free_data_contacts(data)
-twice causes invalid memory read when dereferencing data->contacts.
----
- plugins/phonebook-tracker.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+Request shell be finalized in cache_ready_notify callback function.
+Otherwise, reference to the request is kept until vobject is closed.
+It is correct in current implementation since there are no nested
+backend requests when pulling vcard listing.
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d396203..7a1a003 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1154,7 +1154,6 @@ static void send_pull_part(struct phonebook_data *data,
- 	data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
- 			data->newmissedcalls, lastpart, data->user_data);
+However, this contradicts to current design (see phonebook_size_result,
+query_result, cache_entry_done) and may cause problems when such would
+be needed.
+---
+ plugins/pbap.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 0356ae7..bbd06c7 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -490,6 +490,9 @@ static void cache_ready_notify(void *user_data)
  
--	free_data_contacts(data);
- 	g_string_free(vcards, TRUE);
- }
+ 	DBG("");
  
++	phonebook_req_finalize(pbap->obj->request);
++	pbap->obj->request = NULL;
++
+ 	pbap->cache.valid = TRUE;
+ 
+ 	err = generate_response(pbap);
 -- 
 1.7.4.1
 
