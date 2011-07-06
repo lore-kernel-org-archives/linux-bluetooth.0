@@ -2,143 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ v2 2/9] Add support for storing SMP keys
-Date: Wed,  6 Jul 2011 17:10:34 -0300
-Message-Id: <1309983041-23744-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ v2 1/9] Add stubs for storing SMP keys
+Date: Wed,  6 Jul 2011 17:10:33 -0300
+Message-Id: <1309983041-23744-2-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <y>
  <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/mgmtops.c |    4 ++--
- src/event.c       |   44 +++++++++++++++++++++++++++++++++++++++++---
- src/storage.c     |   25 ++++++++++++++++++++++++-
- src/storage.h     |    1 +
- 4 files changed, 68 insertions(+), 6 deletions(-)
+As we begin to support pairing over LE links, we need to store those
+keys in permanent storage.
 
+This patch changes the data types according to the current kernel interface
+and adds new methods that will be used to store those keys. The documentation
+of the Management API is updated to reflect this.
+---
+ doc/mgmt-api.txt  |    2 ++
+ lib/mgmt.h        |    2 ++
+ plugins/hciops.c  |    2 +-
+ plugins/mgmtops.c |    5 +++--
+ src/adapter.h     |    2 ++
+ src/event.c       |   10 ++++++----
+ src/event.h       |    2 +-
+ src/storage.c     |    5 +++++
+ src/storage.h     |    1 +
+ 9 files changed, 23 insertions(+), 8 deletions(-)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index d89467c..eea460d 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -172,6 +172,8 @@ Load Keys Command
+ 					Type (1 Octet)
+ 					Value (16 Octets)
+ 					PIN_Length (1 Octet)
++					Data Length (1 Octet)
++					Data (Data Length Octets)
+ 				}
+ 				Key2 { }
+ 				...
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index f22434e..dd0334c 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -111,6 +111,8 @@ struct mgmt_key_info {
+ 	uint8_t type;
+ 	uint8_t val[16];
+ 	uint8_t pin_len;
++	uint8_t dlen;
++	uint8_t data[0];
+ } __packed;
+ 
+ #define MGMT_OP_LOAD_KEYS		0x000D
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index ecc0e86..3daccac 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -994,7 +994,7 @@ static void link_key_notify(int index, void *ptr)
+ 
+ 		err = btd_event_link_key_notify(&dev->bdaddr, dba,
+ 						evt->link_key, key_type,
+-						dev->pin_length);
++						dev->pin_length, 0, NULL);
+ 
+ 		if (err == -ENODEV)
+ 			status = HCI_OE_LOW_RESOURCES;
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 6b5422e..f11ff50 100644
+index 3cdb97e..6b5422e 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -383,8 +383,8 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
- 	struct mgmt_ev_new_key *ev = buf;
- 	struct controller_info *info;
+@@ -407,8 +407,9 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
  
--	if (len != sizeof(*ev)) {
--		error("new_key event size mismatch (%zu != %zu)",
-+	if (len < sizeof(*ev)) {
-+		error("new_key event size mismatch (%zu < %zu)",
- 							len, sizeof(*ev));
- 		return;
- 	}
+ 	if (ev->store_hint)
+ 		btd_event_link_key_notify(&info->bdaddr, &ev->key.bdaddr,
+-						ev->key.val, ev->key.type,
+-						ev->key.pin_len);
++					ev->key.val, ev->key.type,
++					ev->key.pin_len, ev->key.dlen,
++					ev->key.data);
+ 
+ 	btd_event_bonding_complete(&info->bdaddr, &ev->key.bdaddr, 0);
+ }
+diff --git a/src/adapter.h b/src/adapter.h
+index 38ea3ca..5250341 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -61,6 +61,8 @@ struct link_key_info {
+ 	unsigned char key[16];
+ 	uint8_t type;
+ 	uint8_t pin_len;
++	uint8_t dlen;
++	uint8_t data[0];
+ };
+ 
+ struct remote_dev_info {
 diff --git a/src/event.c b/src/event.c
-index 3f0f454..9cdb5e1 100644
+index 86a413e..3f0f454 100644
 --- a/src/event.c
 +++ b/src/event.c
-@@ -395,6 +395,43 @@ proceed:
+@@ -395,9 +395,8 @@ proceed:
  	adapter_set_state(adapter, STATE_IDLE);
  }
  
-+static gchar *buf2str(uint8_t *data, int datalen)
-+{
-+	gchar *buf;
-+	int i;
-+
-+	buf = g_new0(gchar, (datalen * 2) + 1);
-+
-+	for (i = 0; i < datalen; i++)
-+		sprintf(buf + (i * 2), "%2.2x", data[i]);
-+
-+	return buf;
-+}
-+
-+static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer, unsigned char *key,
-+			uint8_t type, int length, int dlen, uint8_t *data)
-+{
-+	GString *newkey;
-+	char *val, *str;
-+	int err;
-+
-+	val = buf2str(key, 16);
-+	newkey = g_string_new(val);
-+	g_free(val);
-+
-+	g_string_append_printf(newkey, " %d %d %d ", type, length, dlen);
-+
-+	str = buf2str(data, dlen);
-+	newkey = g_string_append(newkey, str);
-+	g_free(str);
-+
-+	err = write_longtermkeys(local, peer, newkey->str);
-+
-+	g_string_free(newkey, TRUE);
-+
-+	return err;
-+}
-+
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
- 		uint8_t key_type, uint8_t pin_length, int dlen, uint8_t *data)
+-int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+-				uint8_t *key, uint8_t key_type,
+-				uint8_t pin_length)
++int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
++		uint8_t key_type, uint8_t pin_length, int dlen, uint8_t *data)
  {
-@@ -407,10 +444,11 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+@@ -408,7 +407,10 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
  
  	DBG("storing link key of type 0x%02x", key_type);
  
--	if (key_type < 0x10)
--		ret = write_link_key(local, peer, key, key_type, pin_length);
-+	if (key_type & 0x10)
-+		ret = store_longtermkey(local, peer, key, key_type, pin_length,
-+								dlen, data);
- 	else
--		ret = write_longtermkeys(local, peer, NULL);
+-	ret = write_link_key(local, peer, key, key_type, pin_length);
++	if (key_type < 0x10)
 +		ret = write_link_key(local, peer, key, key_type, pin_length);
++	else
++		ret = write_longtermkeys(local, peer, NULL);
  
  	if (ret == 0 && device_is_temporary(device))
  		device_set_temporary(device, FALSE);
+diff --git a/src/event.h b/src/event.h
+index 1268edf..7dabd44 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -39,4 +39,4 @@ int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
+ int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba);
+ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+-					uint8_t key_type, uint8_t pin_length);
++		uint8_t key_type, uint8_t pin_length, int dlen, uint8_t *data);
 diff --git a/src/storage.c b/src/storage.c
-index fb7561b..3d95adb 100644
+index 73bbc36..fb7561b 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -1344,5 +1344,28 @@ device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba)
+@@ -1341,3 +1341,8 @@ device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba)
  
- int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
- {
--	return 0;
-+	char filename[PATH_MAX + 1], addr[18];
-+
-+	if (!key)
-+		return -EINVAL;
-+
-+	create_filename(filename, PATH_MAX, local, "longtermkeys");
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	ba2str(peer, addr);
-+	return textfile_put(filename, addr, key);
-+}
-+
-+char *read_longtermkeys(bdaddr_t *local, bdaddr_t *peer)
-+{
-+	char filename[PATH_MAX + 1], addr[18];
-+
-+	create_filename(filename, PATH_MAX, local, "longtermkeys");
-+
-+	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-+
-+	ba2str(peer, addr);
-+
-+	return textfile_caseget(filename, addr);
+ 	return type;
  }
++
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
++{
++	return 0;
++}
 diff --git a/src/storage.h b/src/storage.h
-index 923e819..23d9ab6 100644
+index 6929ada..923e819 100644
 --- a/src/storage.h
 +++ b/src/storage.h
-@@ -88,6 +88,7 @@ int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
+@@ -87,6 +87,7 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
+ int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
  						device_type_t type);
  device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba);
- int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
-+char *read_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
++int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
  
  #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
  
