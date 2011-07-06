@@ -1,121 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
-References: <1309772865-5083-1-git-send-email-sancane@gmail.com>
-	<CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
-Date: Wed, 6 Jul 2011 15:29:10 +0200
-Message-ID: <CACLukzLnRLGXqQnYFxU+b4QW_nCxfcmZHyu9Gu1rsh=2Z1Nucw@mail.gmail.com>
-Subject: Re: [PATCH] Health Thermometer Profile API
-From: Santiago Carot <sancane@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <CAE-CKuiPG92Jtj=oNFqG-9f=54sNjCxysMnsVAnE3oj_=-3hng@mail.gmail.com>
+References: <BANLkTimAe6uRCdfM2_tNSf5j9mvnA_W4Qw@mail.gmail.com>
+	<BANLkTi=iHCLfqhqtZJ-XMahXrprk0fBnWw@mail.gmail.com>
+	<BANLkTimrY5o5hQhVfRf7UyBn-WNE1GgMNA@mail.gmail.com>
+	<CAE-CKuiPG92Jtj=oNFqG-9f=54sNjCxysMnsVAnE3oj_=-3hng@mail.gmail.com>
+Date: Wed, 6 Jul 2011 10:26:01 -0300
+Message-ID: <CAKT1EBdmVvYcEy1FheVrbpxHymbL56UHvx8-VJbuD9F4Gcf_QQ@mail.gmail.com>
+Subject: Re: endless loop in client.c when read request is rejected
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: mike tsai <mikeyhtsai@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Mike,
 
-
-2011/7/6 Claudio Takahasi <claudio.takahasi@openbossa.org>:
-> Hi Santiago,
+> After upgrade the kernel to 2.6-next branch, it does initiate the
+> just-work, no-bonding operation and it does work.(no more endless
+> loop). However, I found another issue is that during discovery, the
+> client will try to read every characteristic it found, regardless the
+> property setting. This causes "Read Not Permitted" error response for
+> some characteristic that does not allowed to be read (like the
+> alert-level). I am not sure why the discovery process wants to read
+> the characteristic value though, that should be invoked by profile
+> later when needed,
 >
-> <snip>
+> Regards,
 >
->> +               RegisterWatcher(object agent)
->> +
->> +                       Registers a watcher to monitor scanned measurements.
->> +                       This agent will be notified about final temperature
->> +                       measurements.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +
->> +               UnregisterWatcher(object agent)
->> +
->> +                       Unregisters a watcher.
->> +
->> +                       Final and intermediate temperatures won't be notified to
->> +                       this agent any more.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotFound
->> +
->> +               EnableIntermediateMeasurement(object agent)
->
-> It'd be good to try hide from the apps notifications and indications.
-> My opinion is: watchers doesn't need to know if the characteristic
-> value is a notification or indication.
+> Mike
 
-The Notification word in the API refers to way that the plugin will
-report to applications about measures received. Nothing related with
-the property of the characteristic. The idea is that applications does
-not worried about that. Always a measurement (notification or
-indication) is received the callback in the watcher gets called.
+The Generic Attribute is still experimental. DiscoverCharacteristics
+method returns after discovering all characteristic declarations,
+characteristic values and descriptor are read in "background".
 
-> The thermometer implementation could enable automatically
-> notifications if there is at least one watcher registered.
->
-> Is it important to know if the characteristic value is intermediate or not?
+"Read Not Permitted" needs to be fixed. Feel free to send a patch for it.
 
-Yes, for example there may be watchers that want to feed a display
-with intermediate values until the final measurement arrives, in
-opposite, EEE11073-20601 watchers dont need get intermediate ones to
-work so we dont need to bother them with intermediate measurements.
+The characteristic value is required due the GetProperties method of
+the characteristic "object". At the moment, the characteristics
+storage is not being used properly. For example, Proximity could read
+the handle from the storage if available.
 
->
->> +
->> +                       Enables intermediate measurement notifications for this
->> +                       agent if the thermometer supports it.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotSupported
->> +
->> +               DisableIntermediateMeasurement(object agent)
->> +
->> +                       Disables intermediate measurement notifications for this
->> +                       agent. It will disable notifications in the thermometer
->> +                       when the last agent removes the watcher for intermediate
->> +                       measurements.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotFound
->> +
->> +Signals                PropertyChanged(string name, variant value)
->> +
->> +                       This signal indicates a changed value of the given
->> +                       property.
->> +
->> +Properties     boolean Intermediate [readonly]
->> +
->> +                       True if the thermometer supports intermediate measurement
->> +                       notifications.
->> +
->> +               uint16 Interval (optional) [readwrite]
->> +
->> +                       The Measurement Interval defines the time (in seconds)
->> +                       between measurements. This interval is not related to
->> +                       the intermediate measurements and must be defined into
->> +                       a valid range. Setting it to zero means that no periodic
->> +                       measurements will be taken.
->> +
->> +               uint16 Maximum (optional) [readonly]
->> +
->> +                       Defines the maximum value allowed for the interval
->> +                       between periodic measurements.
->> +
->> +               uint16 Minimum (optional) [readonly]
->> +
->> +                       Defines the minimum value allowed for the interval
->> +                       between periodic measurements.
->> +
->
-> Intervals could be a config option. It can be extended later if
-> necessary, move the config option to the API(Property) is easier than
-> remove a property.
->
-
-Do you mean to move it to the bluetoothd configuration file?
-I think that it's not a good a idea because this value should be in a
-determinated range imposed by the device. Each device can have it own
-range and it may differ among all those kind of devices.
-
-Regards.
+Regards,
+Claudio.
