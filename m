@@ -1,135 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v3 03/12] Bluetooth: Add functions to manipulate the link key list for SMP
-Date: Wed,  6 Jul 2011 16:23:07 -0300
-Message-Id: <1309980187-14404-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
-References: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1309967827-23772-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1309967827-23772-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Wed, 6 Jul 2011 18:39:37 +0200
+Message-ID: <CADUB2Y47hPbSuYobJVar5+LWntda5=CsOUzWDuxKfxTbth_cDA@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/2] Fix invalid memory read when pulling phone book
+From: Radek <radoslawjablonski@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the LTK (the new type of key being handled now) has more data
-associated with it, we need to store this extra data and retrieve
-the keys based on that data.
+Hi Dmitriy,
 
-Methods for searching for a key and for adding a new LTK are
-introduced here.
+On Wed, Jul 6, 2011 at 5:57 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
+>
+> Data contacts are freed already in finalize function which is called
+> in query_result callback function. Calling free_data_contacts(data)
+> twice causes invalid memory read when dereferencing data->contacts.
+> ---
+>  plugins/phonebook-tracker.c |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
+>
+> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+> index d396203..7a1a003 100644
+> --- a/plugins/phonebook-tracker.c
+> +++ b/plugins/phonebook-tracker.c
+> @@ -1154,7 +1154,6 @@ static void send_pull_part(struct phonebook_data *data,
+>        data->cb(vcards->str, vcards->len, g_slist_length(data->contacts),
+>                        data->newmissedcalls, lastpart, data->user_data);
+>
+> -       free_data_contacts(data);
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- include/net/bluetooth/hci_core.h |    5 +++
- net/bluetooth/hci_core.c         |   73 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 78 insertions(+), 0 deletions(-)
+This free_data_contacts is used here for scenarios when there is more than
+one part of data to send (for clearing data of contacts that are already fetched
+from db).
+So simply removing this will cause very weird behaviour - every part
+of new vcard
+data will have "old" data on the beginning..
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a3d49d8..353d4a9 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -552,6 +552,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
-+struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
-+struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-+					bdaddr_t *bdaddr, u8 type);
-+int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-+					__le16 ediv, u8 rand[8], u8 ltk[16]);
- int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
- 
- int hci_remote_oob_data_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cd59b84..1cf8b89 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1059,6 +1059,42 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
- 	return 0;
- }
- 
-+struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
-+{
-+	struct link_key *k;
-+
-+	list_for_each_entry(k, &hdev->link_keys, list) {
-+		struct key_master_id *id;
-+
-+		if (k->type != HCI_LK_SMP_LTK)
-+			continue;
-+
-+		if (k->dlen != sizeof(*id))
-+			continue;
-+
-+		id = (void *) &k->data;
-+		if (id->ediv == ediv &&
-+				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
-+			return k;
-+	}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(hci_find_ltk);
-+
-+struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
-+					bdaddr_t *bdaddr, u8 type)
-+{
-+	struct link_key *k;
-+
-+	list_for_each_entry(k, &hdev->link_keys, list)
-+		if ((k->type == type) && (bacmp(bdaddr, &k->bdaddr) == 0))
-+			return k;
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(hci_find_link_key_type);
-+
- int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 				bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
- {
-@@ -1114,6 +1150,43 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 	return 0;
- }
- 
-+int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
-+					__le16 ediv, u8 rand[8], u8 ltk[16])
-+{
-+	struct link_key *key, *old_key;
-+	struct key_master_id *id;
-+	u8 old_key_type;
-+
-+	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
-+
-+	old_key = hci_find_link_key_type(hdev, bdaddr, HCI_LK_SMP_LTK);
-+	if (old_key) {
-+		key = old_key;
-+		old_key_type = old_key->type;
-+	} else {
-+		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
-+		if (!key)
-+			return -ENOMEM;
-+		list_add(&key->list, &hdev->link_keys);
-+		old_key_type = 0xff;
-+	}
-+
-+	key->dlen = sizeof(*id);
-+
-+	bacpy(&key->bdaddr, bdaddr);
-+	memcpy(key->val, ltk, sizeof(key->val));
-+	key->type = HCI_LK_SMP_LTK;
-+
-+	id = (void *) &key->data;
-+	id->ediv = ediv;
-+	memcpy(id->rand, rand, sizeof(id->rand));
-+
-+	if (new_key)
-+		mgmt_new_key(hdev->id, key, old_key_type);
-+
-+	return 0;
-+}
-+
- int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct link_key *key;
--- 
-1.7.6
+To avoid these invalid reads some more sophisticated changes in
+phonebook_tracker
+logic will be needed - contacts data should be cleared only from one
+place in the code
+(now free_data_contacts is called from 2 places..)
 
+BR,
+Radek
