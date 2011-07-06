@@ -1,50 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 00/12] On demand connection management
-Date: Wed,  6 Jul 2011 18:22:40 -0300
-Message-Id: <1309987360-9821-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1309874168-32716-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1309874168-32716-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <7.0.1.0.2.20110706214918.03262000@gmx.net>
+References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+	<BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+	<7.0.1.0.2.20110627205517.03250550@gmx.net>
+	<BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
+	<BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
+	<BANLkTiknkbZcS2AASzS_qeXbNJ3_Qa2e1A@mail.gmail.com>
+	<7.0.1.0.2.20110629214327.0321b4e0@gmx.net>
+	<7.0.1.0.2.20110706214918.03262000@gmx.net>
+Date: Wed, 6 Jul 2011 23:35:37 +0300
+Message-ID: <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.gmail.com>
+Subject: Re: Media API with more than one headset
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Kornatowski <pkorn@gmx.net>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patches implement a mechanism to allow GATT based profiles
-to request on demand connections. The ideia is to control connections based
-on registered "connection" callbacks.
+Hi Peter,
 
-This patch series replaces partially the initial proposal "[RFC] Attribute
-IO Driver". GATT based profiles can use "device" driver, we will extend later
-if necessary or create a new "driver" to addresss LSTO, connection intervals
-and other connection requirements for GATT based profiles.
+On Wed, Jul 6, 2011 at 10:54 PM, Peter Kornatowski <pkorn@gmx.net> wrote:
+> I downloaded and checked the new bluez version 4.95. I'm wondering why the
+> patch of Lukasz didn't get applied? As I wrote in my last e-mail, it works
+> for not losing playing mode of all headsets when disconnecting just one.
 
-No changes from the RFC.
+I don't remember actually seeing a proper patch to the mailing list,
+that might explain why it wasn't applied yet.
 
-Links for curious developers:
-[1] git://git.infradead.org/users/cktakahasi/bluez.git generic-api (using on demand connection)
-[2] git://git.infradead.org/users/cktakahasi/bluez.git proximity-devel (under development)
+> Did someone of you had a chance to look into the other problems I wrote
+> about in my last e-mail? This would help me a lot.
 
-Claudio Takahasi (12):
-  Add ATT connection callback registration
-  Add a function to remove ATT connection callback
-  Fix crash when create device is cancelled
-  Notify the GAttrib instance if already connected
-  Add ATT disconnect callback
-  Add auto connection based on registered callbacks
-  Enable ATT re-connection
-  Drop GAttrib ref if callback list is empty
-  Try to connect when registering the first callback
-  Manage GAttrib refs based on registered callbacks
-  Postpone calling connected callback
-  Address remote initiated disconnection
-
- Makefile.am  |    2 +-
- src/attio.h  |   33 +++++++
- src/device.c |  265 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 276 insertions(+), 24 deletions(-)
- create mode 100644 src/attio.h
+Nope, I was actually waiting for more input since you mentioned this
+only happened with some code your wrote.
 
 -- 
-1.7.6
-
+Luiz Augusto von Dentz
