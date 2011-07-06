@@ -1,58 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1309772865-5083-1-git-send-email-sancane@gmail.com>
+References: <1309772865-5083-1-git-send-email-sancane@gmail.com>
+Date: Wed, 6 Jul 2011 10:02:44 -0300
+Message-ID: <CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
 Subject: Re: [PATCH] Health Thermometer Profile API
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Elvis Pfutzenreuter <epx@signove.com>
-In-Reply-To: <CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
-Date: Wed, 6 Jul 2011 10:09:17 -0300
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <64409A01-A392-4BA5-9817-6F10D3D51297@signove.com>
-References: <1309772865-5083-1-git-send-email-sancane@gmail.com> <CAKT1EBeNMDh4CYigJM4tfF=7V80EtZg4BjPPCVg4C+TcQtuN_A@mail.gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-On Jul 6, 2011, at 10:02 AM, Claudio Takahasi wrote:
-
-> Hi Santiago,
-> 
-> <snip>
-> 
->> +               RegisterWatcher(object agent)
->> +
->> +                       Registers a watcher to monitor scanned measurements.
->> +                       This agent will be notified about final temperature
->> +                       measurements.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +
->> +               UnregisterWatcher(object agent)
->> +
->> +                       Unregisters a watcher.
->> +
->> +                       Final and intermediate temperatures won't be notified to
->> +                       this agent any more.
->> +
->> +                       Possible Errors: org.bluez.Error.InvalidArguments
->> +                                       org.bluez.Error.NotFound
->> +
->> +               EnableIntermediateMeasurement(object agent)
-> 
-> It'd be good to try hide from the apps notifications and indications.
-> My opinion is: watchers doesn't need to know if the characteristic
-> value is a notification or indication.
-> The thermometer implementation could enable automatically
-> notifications if there is at least one watcher registered.
-
-The API does that for final measurements. This only enables/disables
-the intermediate ones.
-
-> 
-> Is it important to know if the characteristic value is intermediate or not?
-
-Yes. Intermediate is a "rough" measurement that is sent for display purposes
-only, to keep the user happy, and not necessary when there is nobody watching.
-The final measurement is the "trusted" one.
-
+SGkgU2FudGlhZ28sCgo8c25pcD4KCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBSZWdpc3Rlcldh
+dGNoZXIob2JqZWN0IGFnZW50KQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIFJlZ2lzdGVycyBhIHdhdGNoZXIgdG8gbW9uaXRvciBzY2FubmVkIG1lYXN1cmVtZW50cy4K
+PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoaXMgYWdlbnQgd2lsbCBiZSBu
+b3RpZmllZCBhYm91dCBmaW5hbCB0ZW1wZXJhdHVyZQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgbWVhc3VyZW1lbnRzLgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIFBvc3NpYmxlIEVycm9yczogb3JnLmJsdWV6LkVycm9yLkludmFsaWRBcmd1bWVu
+dHMKPiArCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCBVbnJlZ2lzdGVyV2F0Y2hlcihvYmplY3Qg
+YWdlbnQpCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgVW5yZWdpc3Rl
+cnMgYSB3YXRjaGVyLgo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIEZp
+bmFsIGFuZCBpbnRlcm1lZGlhdGUgdGVtcGVyYXR1cmVzIHdvbid0IGJlIG5vdGlmaWVkIHRvCj4g
+KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB0aGlzIGFnZW50IGFueSBtb3JlLgo+
+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFBvc3NpYmxlIEVycm9yczog
+b3JnLmJsdWV6LkVycm9yLkludmFsaWRBcmd1bWVudHMKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG9yZy5ibHVlei5FcnJvci5Ob3RG
+b3VuZAo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIEVuYWJsZUludGVybWVkaWF0ZU1lYXN1
+cmVtZW50KG9iamVjdCBhZ2VudCkKCkl0J2QgYmUgZ29vZCB0byB0cnkgaGlkZSBmcm9tIHRoZSBh
+cHBzIG5vdGlmaWNhdGlvbnMgYW5kIGluZGljYXRpb25zLgpNeSBvcGluaW9uIGlzOiB3YXRjaGVy
+cyBkb2Vzbid0IG5lZWQgdG8ga25vdyBpZiB0aGUgY2hhcmFjdGVyaXN0aWMKdmFsdWUgaXMgYSBu
+b3RpZmljYXRpb24gb3IgaW5kaWNhdGlvbi4KVGhlIHRoZXJtb21ldGVyIGltcGxlbWVudGF0aW9u
+IGNvdWxkIGVuYWJsZSBhdXRvbWF0aWNhbGx5Cm5vdGlmaWNhdGlvbnMgaWYgdGhlcmUgaXMgYXQg
+bGVhc3Qgb25lIHdhdGNoZXIgcmVnaXN0ZXJlZC4KCklzIGl0IGltcG9ydGFudCB0byBrbm93IGlm
+IHRoZSBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSBpcyBpbnRlcm1lZGlhdGUgb3Igbm90PwoKPiArCj4g
+KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBFbmFibGVzIGludGVybWVkaWF0ZSBt
+ZWFzdXJlbWVudCBub3RpZmljYXRpb25zIGZvciB0aGlzCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCBhZ2VudCBpZiB0aGUgdGhlcm1vbWV0ZXIgc3VwcG9ydHMgaXQuCj4gKwo+
+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgUG9zc2libGUgRXJyb3JzOiBvcmcu
+Ymx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgb3JnLmJsdWV6LkVycm9yLk5vdFN1cHBv
+cnRlZAo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIERpc2FibGVJbnRlcm1lZGlhdGVNZWFz
+dXJlbWVudChvYmplY3QgYWdlbnQpCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgRGlzYWJsZXMgaW50ZXJtZWRpYXRlIG1lYXN1cmVtZW50IG5vdGlmaWNhdGlvbnMgZm9y
+IHRoaXMKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGFnZW50LiBJdCB3aWxs
+IGRpc2FibGUgbm90aWZpY2F0aW9ucyBpbiB0aGUgdGhlcm1vbWV0ZXIKPiArIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHdoZW4gdGhlIGxhc3QgYWdlbnQgcmVtb3ZlcyB0aGUgd2F0
+Y2hlciBmb3IgaW50ZXJtZWRpYXRlCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCBtZWFzdXJlbWVudHMuCj4gKwo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+UG9zc2libGUgRXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3VtZW50cwo+ICsgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgb3Jn
+LmJsdWV6LkVycm9yLk5vdEZvdW5kCj4gKwo+ICtTaWduYWxzIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgUHJvcGVydHlDaGFuZ2VkKHN0cmluZyBuYW1lLCB2YXJpYW50IHZhbHVlKQo+ICsKPiArIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoaXMgc2lnbmFsIGluZGljYXRlcyBhIGNo
+YW5nZWQgdmFsdWUgb2YgdGhlIGdpdmVuCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCBwcm9wZXJ0eS4KPiArCj4gK1Byb3BlcnRpZXMgwqAgwqAgYm9vbGVhbiBJbnRlcm1lZGlh
+dGUgW3JlYWRvbmx5XQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRy
+dWUgaWYgdGhlIHRoZXJtb21ldGVyIHN1cHBvcnRzIGludGVybWVkaWF0ZSBtZWFzdXJlbWVudAo+
+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgbm90aWZpY2F0aW9ucy4KPiArCj4g
+KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCB1aW50MTYgSW50ZXJ2YWwgKG9wdGlvbmFsKSBbcmVhZHdy
+aXRlXQo+ICsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIFRoZSBNZWFzdXJl
+bWVudCBJbnRlcnZhbCBkZWZpbmVzIHRoZSB0aW1lIChpbiBzZWNvbmRzKQo+ICsgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgYmV0d2VlbiBtZWFzdXJlbWVudHMuIFRoaXMgaW50ZXJ2
+YWwgaXMgbm90IHJlbGF0ZWQgdG8KPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IHRoZSBpbnRlcm1lZGlhdGUgbWVhc3VyZW1lbnRzIGFuZCBtdXN0IGJlIGRlZmluZWQgaW50bwo+
+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgYSB2YWxpZCByYW5nZS4gU2V0dGlu
+ZyBpdCB0byB6ZXJvIG1lYW5zIHRoYXQgbm8gcGVyaW9kaWMKPiArIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIG1lYXN1cmVtZW50cyB3aWxsIGJlIHRha2VuLgo+ICsKPiArIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIHVpbnQxNiBNYXhpbXVtIChvcHRpb25hbCkgW3JlYWRvbmx5XQo+ICsK
+PiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIERlZmluZXMgdGhlIG1heGltdW0g
+dmFsdWUgYWxsb3dlZCBmb3IgdGhlIGludGVydmFsCj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCBiZXR3ZWVuIHBlcmlvZGljIG1lYXN1cmVtZW50cy4KPiArCj4gKyDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCB1aW50MTYgTWluaW11bSAob3B0aW9uYWwpIFtyZWFkb25seV0KPiArCj4g
+KyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBEZWZpbmVzIHRoZSBtaW5pbXVtIHZh
+bHVlIGFsbG93ZWQgZm9yIHRoZSBpbnRlcnZhbAo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgYmV0d2VlbiBwZXJpb2RpYyBtZWFzdXJlbWVudHMuCj4gKwoKSW50ZXJ2YWxzIGNv
+dWxkIGJlIGEgY29uZmlnIG9wdGlvbi4gSXQgY2FuIGJlIGV4dGVuZGVkIGxhdGVyIGlmCm5lY2Vz
+c2FyeSwgbW92ZSB0aGUgY29uZmlnIG9wdGlvbiB0byB0aGUgQVBJKFByb3BlcnR5KSBpcyBlYXNp
+ZXIgdGhhbgpyZW1vdmUgYSBwcm9wZXJ0eS4KClJlZ2FyZHMsCkNsYXVkaW8K
