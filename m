@@ -1,136 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "ilia.kolominsky@gmail.com" <ilia.kolominsky@gmail.com>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Date: Wed, 6 Jul 2011 09:13:34 +0200
-Subject: RE: [PATCH] Bluetooth-next: Fixes l2cap "command reject" reply
- according to spec.
-Message-ID: <AC090B9732AB2B4DB7FF476E907FE660013174598D@dnce02.ent.ti.com>
-References: <1309676174-20157-1-git-send-email-iliak@ti.com>
-In-Reply-To: <1309676174-20157-1-git-send-email-iliak@ti.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <BANLkTimrY5o5hQhVfRf7UyBn-WNE1GgMNA@mail.gmail.com>
+References: <BANLkTimAe6uRCdfM2_tNSf5j9mvnA_W4Qw@mail.gmail.com>
+	<BANLkTi=iHCLfqhqtZJ-XMahXrprk0fBnWw@mail.gmail.com>
+	<BANLkTimrY5o5hQhVfRf7UyBn-WNE1GgMNA@mail.gmail.com>
+Date: Tue, 5 Jul 2011 18:13:49 -0700
+Message-ID: <CAE-CKuiPG92Jtj=oNFqG-9f=54sNjCxysMnsVAnE3oj_=-3hng@mail.gmail.com>
+Subject: Re: endless loop in client.c when read request is rejected
+From: mike tsai <mikeyhtsai@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping
+Hi Anderson,
 
+On Fri, Jul 1, 2011 at 4:40 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi again,
+>
+> On Fri, Jul 1, 2011 at 7:38 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi Mike,
+>>
+>> On Fri, Jul 1, 2011 at 6:06 PM, mike tsai <mikeyhtsai@gmail.com> wrote:
+>>>   I am not sure what effect bt_io_set should have to improve the
+>>> security (bonding?), but the code simply has no effect in my
+>>> environment (with 2.6.39.1 kernel and latest bluez), therefore the
+>>> read_req, error_response will continue until link is disconnected.
+>>
+>> bt_io_set(..., BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH, ...) will trigger
+>> SMP pairing (and block further writes until pairing is complete). I
+>> believe you see the loop because your kernel does not have SMP
+>> support, which has been added upstream only a few weeks ago (so should
+>> come only on 3.0, I believe). Therefore SMP does never happen in your
+>> case.
+>
+> Forgot to mention: I still think we need a fix on BlueZ though, which
+> cannot assume SMP pairing will succeed. Therefore we should have a way
+> to abort the write attempt.
+>
+After upgrade the kernel to 2.6-next branch, it does initiate the
+just-work, no-bonding operation and it does work.(no more endless
+loop). However, I found another issue is that during discovery, the
+client will try to read every characteristic it found, regardless the
+property setting. This causes "Read Not Permitted" error response for
+some characteristic that does not allowed to be read (like the
+alert-level). I am not sure why the discovery process wants to read
+the characteristic value though, that should be invoked by profile
+later when needed,
 
+Regards,
 
-> -----Original Message-----
-> From: ilia.kolominsky@gmail.com [mailto:ilia.kolominsky@gmail.com]
-> Sent: Sunday, July 03, 2011 9:56 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Ilia, Kolominsky
-> Subject: [PATCH] Bluetooth-next: Fixes l2cap "command reject" reply
-> according to spec.
-> 
-> From: Ilia Kolomisnky <iliak@ti.com>
-> 
-> There can 3 reasons for the "command reject" reply produced
-> by the stack. Each such reply should be accompanied by the
-> relevand data ( as defined in spec. ). Currently there is one
-> instance of "command reject" reply with reason "invalid cid"
-> wich is fixed. Also, added clean-up definitions related to the
-> "command reject" replies.
-> 
-> Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
-> ---
->  include/net/bluetooth/l2cap.h |   19 ++++++++++++++++++-
->  net/bluetooth/l2cap_core.c    |   15 +++++++++------
->  2 files changed, 27 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h
-> b/include/net/bluetooth/l2cap.h
-> index 9c18e55..6dee791 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -130,6 +130,12 @@ struct l2cap_conninfo {
->  #define L2CAP_SDU_END               0x8000
->  #define L2CAP_SDU_CONTINUE          0xC000
-> 
-> +/* L2CAP Command rej. reasons */
-> +#define L2CAP_CMD_NOT_UNDERSTOOD      0x0000
-> +#define L2CAP_CMD_MTU_EXCEEDED	       0x0001
-> +#define L2CAP_CMD_INV_CID             0x0002
-> +
-> +
->  /* L2CAP structures */
->  struct l2cap_hdr {
->  	__le16     len;
-> @@ -144,8 +150,19 @@ struct l2cap_cmd_hdr {
->  } __packed;
->  #define L2CAP_CMD_HDR_SIZE	4
-> 
-> -struct l2cap_cmd_rej {
-> +struct l2cap_cmd_rej_unk {
-> +	__le16     reason;
-> +} __packed;
-> +
-> +struct l2cap_cmd_rej_mtu {
-> +	__le16     reason;
-> +	__le16     max_mtu;
-> +} __packed;
-> +
-> +struct l2cap_cmd_rej_cid {
->  	__le16     reason;
-> +	__le16     loc_cid;
-> +	__le16     rem_cid;
->  } __packed;
-> 
->  struct l2cap_conn_req {
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index bd5d992..951c311 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -2284,9 +2284,9 @@ done:
-> 
->  static inline int l2cap_command_rej(struct l2cap_conn *conn, struct
-> l2cap_cmd_hdr *cmd, u8 *data)
->  {
-> -	struct l2cap_cmd_rej *rej = (struct l2cap_cmd_rej *) data;
-> +	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *)
-> data;
-> 
-> -	if (rej->reason != 0x0000)
-> +	if (rej->reason != L2CAP_CMD_NOT_UNDERSTOOD)
->  		return 0;
-> 
->  	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
-> @@ -2531,9 +2531,12 @@ static inline int l2cap_config_req(struct
-> l2cap_conn *conn, struct l2cap_cmd_hdr
->  	sk = chan->sk;
-> 
->  	if (chan->state != BT_CONFIG) {
-> -		struct l2cap_cmd_rej rej;
-> +		struct l2cap_cmd_rej_cid rej;
-> +
-> +		rej.reason = cpu_to_le16(L2CAP_CMD_INV_CID);
-> +		rej.loc_cid = cpu_to_le16(chan->scid);
-> +		rej.rem_cid = cpu_to_le16(chan->dcid);
-> 
-> -		rej.reason = cpu_to_le16(0x0002);
->  		l2cap_send_cmd(conn, cmd->ident, L2CAP_COMMAND_REJ,
->  				sizeof(rej), &rej);
->  		goto unlock;
-> @@ -3024,12 +3027,12 @@ static inline void l2cap_sig_channel(struct
-> l2cap_conn *conn,
->  			err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
-> 
->  		if (err) {
-> -			struct l2cap_cmd_rej rej;
-> +			struct l2cap_cmd_rej_unk rej;
-> 
->  			BT_ERR("Wrong link type (%d)", err);
-> 
->  			/* FIXME: Map err to a valid reason */
-> -			rej.reason = cpu_to_le16(0);
-> +			rej.reason = cpu_to_le16(L2CAP_CMD_NOT_UNDERSTOOD);
->  			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
-> sizeof(rej), &rej);
->  		}
-> 
+Mike
+
+> Regards,
 > --
-> 1.7.1
-
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
