@@ -1,62 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Jul 2011 10:17:26 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP extended feature mask update
-Message-ID: <20110706071724.GA31348@aemeltch-MOBL1>
-References: <1309869322-26307-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20110705160028.GB29925@joana>
+From: "Ilia, Kolominsky" <iliak@ti.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "ilia.kolominsky@gmail.com" <ilia.kolominsky@gmail.com>,
+	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Date: Wed, 6 Jul 2011 09:13:34 +0200
+Subject: RE: [PATCH] Bluetooth-next: Fixes l2cap "command reject" reply
+ according to spec.
+Message-ID: <AC090B9732AB2B4DB7FF476E907FE660013174598D@dnce02.ent.ti.com>
+References: <1309676174-20157-1-git-send-email-iliak@ti.com>
+In-Reply-To: <1309676174-20157-1-git-send-email-iliak@ti.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110705160028.GB29925@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Ping
 
-On Tue, Jul 05, 2011 at 01:00:28PM -0300, Gustavo Padovan wrote:
-> Hi Andrei,
+
+
+> -----Original Message-----
+> From: ilia.kolominsky@gmail.com [mailto:ilia.kolominsky@gmail.com]
+> Sent: Sunday, July 03, 2011 9:56 AM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Ilia, Kolominsky
+> Subject: [PATCH] Bluetooth-next: Fixes l2cap "command reject" reply
+> according to spec.
 > 
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-07-05 15:35:22 +0300]:
+> From: Ilia Kolomisnky <iliak@ti.com>
 > 
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Update L2CAP extended feature mask to reflect recent BT spec.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> >  include/net/bluetooth/l2cap.h |    6 +++++-
-> >  1 files changed, 5 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > index 9c18e55..d85e55c 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -92,13 +92,17 @@ struct l2cap_conninfo {
-> >  #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
-> >  #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
-> >  
-> > -/* L2CAP feature mask */
-> > +/* L2CAP extended feature mask */
-> >  #define L2CAP_FEAT_FLOWCTL	0x00000001
-> >  #define L2CAP_FEAT_RETRANS	0x00000002
-> > +#define L2CAP_FEAT_BIDIR_QOS	0x00000004
-> >  #define L2CAP_FEAT_ERTM		0x00000008
-> >  #define L2CAP_FEAT_STREAMING	0x00000010
-> >  #define L2CAP_FEAT_FCS		0x00000020
-> > +#define L2CAP_FEAT_EXT_FLOW	0x00000040
-> >  #define L2CAP_FEAT_FIXED_CHAN	0x00000080
-> > +#define L2CAP_FEAT_EXT_WINDOW	0x00000100
-> > +#define L2CAP_FEAT_UCD		0x00000200
+> There can 3 reasons for the "command reject" reply produced
+> by the stack. Each such reply should be accompanied by the
+> relevand data ( as defined in spec. ). Currently there is one
+> instance of "command reject" reply with reason "invalid cid"
+> wich is fixed. Also, added clean-up definitions related to the
+> "command reject" replies.
 > 
-> I don't see the point in adding if we are not using them. Let's add them when
-> we have code that uses such macros.
+> Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+> ---
+>  include/net/bluetooth/l2cap.h |   19 ++++++++++++++++++-
+>  net/bluetooth/l2cap_core.c    |   15 +++++++++------
+>  2 files changed, 27 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h
+> b/include/net/bluetooth/l2cap.h
+> index 9c18e55..6dee791 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -130,6 +130,12 @@ struct l2cap_conninfo {
+>  #define L2CAP_SDU_END               0x8000
+>  #define L2CAP_SDU_CONTINUE          0xC000
+> 
+> +/* L2CAP Command rej. reasons */
+> +#define L2CAP_CMD_NOT_UNDERSTOOD      0x0000
+> +#define L2CAP_CMD_MTU_EXCEEDED	       0x0001
+> +#define L2CAP_CMD_INV_CID             0x0002
+> +
+> +
+>  /* L2CAP structures */
+>  struct l2cap_hdr {
+>  	__le16     len;
+> @@ -144,8 +150,19 @@ struct l2cap_cmd_hdr {
+>  } __packed;
+>  #define L2CAP_CMD_HDR_SIZE	4
+> 
+> -struct l2cap_cmd_rej {
+> +struct l2cap_cmd_rej_unk {
+> +	__le16     reason;
+> +} __packed;
+> +
+> +struct l2cap_cmd_rej_mtu {
+> +	__le16     reason;
+> +	__le16     max_mtu;
+> +} __packed;
+> +
+> +struct l2cap_cmd_rej_cid {
+>  	__le16     reason;
+> +	__le16     loc_cid;
+> +	__le16     rem_cid;
+>  } __packed;
+> 
+>  struct l2cap_conn_req {
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index bd5d992..951c311 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -2284,9 +2284,9 @@ done:
+> 
+>  static inline int l2cap_command_rej(struct l2cap_conn *conn, struct
+> l2cap_cmd_hdr *cmd, u8 *data)
+>  {
+> -	struct l2cap_cmd_rej *rej = (struct l2cap_cmd_rej *) data;
+> +	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *)
+> data;
+> 
+> -	if (rej->reason != 0x0000)
+> +	if (rej->reason != L2CAP_CMD_NOT_UNDERSTOOD)
+>  		return 0;
+> 
+>  	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
+> @@ -2531,9 +2531,12 @@ static inline int l2cap_config_req(struct
+> l2cap_conn *conn, struct l2cap_cmd_hdr
+>  	sk = chan->sk;
+> 
+>  	if (chan->state != BT_CONFIG) {
+> -		struct l2cap_cmd_rej rej;
+> +		struct l2cap_cmd_rej_cid rej;
+> +
+> +		rej.reason = cpu_to_le16(L2CAP_CMD_INV_CID);
+> +		rej.loc_cid = cpu_to_le16(chan->scid);
+> +		rej.rem_cid = cpu_to_le16(chan->dcid);
+> 
+> -		rej.reason = cpu_to_le16(0x0002);
+>  		l2cap_send_cmd(conn, cmd->ident, L2CAP_COMMAND_REJ,
+>  				sizeof(rej), &rej);
+>  		goto unlock;
+> @@ -3024,12 +3027,12 @@ static inline void l2cap_sig_channel(struct
+> l2cap_conn *conn,
+>  			err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
+> 
+>  		if (err) {
+> -			struct l2cap_cmd_rej rej;
+> +			struct l2cap_cmd_rej_unk rej;
+> 
+>  			BT_ERR("Wrong link type (%d)", err);
+> 
+>  			/* FIXME: Map err to a valid reason */
+> -			rej.reason = cpu_to_le16(0);
+> +			rej.reason = cpu_to_le16(L2CAP_CMD_NOT_UNDERSTOOD);
+>  			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
+> sizeof(rej), &rej);
+>  		}
+> 
+> --
+> 1.7.1
 
-Those values are used in user space tools like l2test and hcidump, so I
-was thinking to keep headers for userspace/kernel in sync.
-
-BTW: Do we really need to have 2 sets of headers? 
-Can we use (#if defined __KERNEL__) to separate kernel-specific code?
-
-Best regards 
-Andrei Emeltchenko 
