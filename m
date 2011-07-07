@@ -2,53 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v4 12/12] Bluetooth: Add support for returning the encryption key size
-Date: Thu,  7 Jul 2011 18:59:45 -0300
-Message-Id: <1310075985-15489-12-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH v4 08/12] Bluetooth: Use the stored LTK for restabilishing security
+Date: Thu,  7 Jul 2011 18:59:41 -0300
+Message-Id: <1310075985-15489-8-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1310075985-15489-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1310075985-15489-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be useful when userspace wants to restrict some kinds of
-operations based on the length of the key size used to encrypt the
-link.
+Now that it's possible that the exchanged key is present in
+the link key list, we may be able to estabilish security with
+an already existing key, without need to perform any SMP
+procedure.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/bluetooth.h |    1 +
- net/bluetooth/l2cap_sock.c        |    4 ++++
- 2 files changed, 5 insertions(+), 0 deletions(-)
+ net/bluetooth/smp.c |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 0cfa75b..e727555 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -56,6 +56,7 @@
- #define BT_SECURITY	4
- struct bt_security {
- 	__u8 level;
-+	__u8 key_size;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 39082d4..4ece64f 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -422,8 +422,12 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 6df5101..5b72179 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -480,6 +480,17 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
  
-+		memset(&sec, 0, sizeof(sec));
- 		sec.level = chan->sec_level;
- 
-+		if (sk->sk_state == BT_CONNECTED)
-+			sec.key_size = chan->conn->hcon->enc_key_size;
+ 	if (hcon->link_mode & HCI_LM_MASTER) {
+ 		struct smp_cmd_pairing cp;
++		struct link_key *key;
 +
- 		len = min_t(unsigned int, len, sizeof(sec));
- 		if (copy_to_user(optval, (char *) &sec, len))
- 			err = -EFAULT;
++		key = hci_find_link_key_type(hcon->hdev, conn->dst,
++							HCI_LK_SMP_LTK);
++		if (key) {
++			struct key_master_id *master = (void *) key->data;
++
++			hci_le_start_enc(hcon, master->ediv, master->rand,
++								key->val);
++			goto done;
++		}
+ 
+ 		build_pairing_cmd(conn, &cp, NULL, authreq);
+ 		conn->preq[0] = SMP_CMD_PAIRING_REQ;
+@@ -495,6 +506,7 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+ 	}
+ 
++done:
+ 	hcon->pending_sec_level = sec_level;
+ 	set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend);
+ 
 -- 
 1.7.6
 
