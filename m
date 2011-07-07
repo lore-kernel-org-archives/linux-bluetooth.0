@@ -1,61 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <7.0.1.0.2.20110707101900.03230f68@gmx.net>
-Date: Thu, 07 Jul 2011 10:25:48 +0200
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: Peter Kornatowski <pkorn@gmx.net>
-Subject: Re: Media API with more than one headset
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.g
- mail.com>
-References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
- <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
- <7.0.1.0.2.20110627205517.03250550@gmx.net>
- <BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
- <BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
- <BANLkTiknkbZcS2AASzS_qeXbNJ3_Qa2e1A@mail.gmail.com>
- <7.0.1.0.2.20110629214327.0321b4e0@gmx.net>
- <7.0.1.0.2.20110706214918.03262000@gmx.net>
- <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/12] Bluetooth: Add functions to manipulate the
+ link key list for SMP
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 07 Jul 2011 10:09:11 +0200
+In-Reply-To: <1309980187-14404-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1309547267-9514-4-git-send-email-vinicius.gomes@openbossa.org>
+	 <1309980187-14404-1-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1310026154.21109.51.camel@aeonflux>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Vinicius,
 
-At 22:35 06.07.2011, Luiz Augusto von Dentz wrote:
->Hi Peter,
->
->On Wed, Jul 6, 2011 at 10:54 PM, Peter Kornatowski <pkorn@gmx.net> wrote:
-> > I downloaded and checked the new bluez version 4.95. I'm wondering why the
-> > patch of Lukasz didn't get applied? As I wrote in my last e-mail, it works
-> > for not losing playing mode of all headsets when disconnecting just one.
->
->I don't remember actually seeing a proper patch to the mailing list,
->that might explain why it wasn't applied yet.
+> As the LTK (the new type of key being handled now) has more data
+> associated with it, we need to store this extra data and retrieve
+> the keys based on that data.
+> 
+> Methods for searching for a key and for adding a new LTK are
+> introduced here.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/hci_core.h |    5 +++
+>  net/bluetooth/hci_core.c         |   73 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 78 insertions(+), 0 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index a3d49d8..353d4a9 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -552,6 +552,11 @@ int hci_link_keys_clear(struct hci_dev *hdev);
+>  struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+>  int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+>  			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
+> +struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
+> +struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
+> +					bdaddr_t *bdaddr, u8 type);
+> +int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+> +					__le16 ediv, u8 rand[8], u8 ltk[16]);
+>  int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+>  
+>  int hci_remote_oob_data_clear(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index cd59b84..1cf8b89 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1059,6 +1059,42 @@ static int hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+>  	return 0;
+>  }
+>  
+> +struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8])
+> +{
+> +	struct link_key *k;
+> +
+> +	list_for_each_entry(k, &hdev->link_keys, list) {
+> +		struct key_master_id *id;
+> +
+> +		if (k->type != HCI_LK_SMP_LTK)
+> +			continue;
+> +
+> +		if (k->dlen != sizeof(*id))
+> +			continue;
+> +
+> +		id = (void *) &k->data;
+> +		if (id->ediv == ediv &&
+> +				(memcmp(rand, id->rand, sizeof(id->rand)) == 0))
+> +			return k;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(hci_find_ltk);
+> +
+> +struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
+> +					bdaddr_t *bdaddr, u8 type)
+> +{
+> +	struct link_key *k;
+> +
+> +	list_for_each_entry(k, &hdev->link_keys, list)
+> +		if ((k->type == type) && (bacmp(bdaddr, &k->bdaddr) == 0))
+> +			return k;
 
-So Lukasz, could you make a proper patch out of it, cause it's your code?
+please just do if (k->type == type && bacmp(....) == 0). No need for the
+extra braces.
 
-> > Did someone of you had a chance to look into the other problems I wrote
-> > about in my last e-mail? This would help me a lot.
->
->Nope, I was actually waiting for more input since you mentioned this
->only happened with some code your wrote.
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(hci_find_link_key_type);
+> +
+>  int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+>  				bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len)
+>  {
+> @@ -1114,6 +1150,43 @@ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+>  	return 0;
+>  }
+>  
+> +int hci_add_ltk(struct hci_dev *hdev, int new_key, bdaddr_t *bdaddr,
+> +					__le16 ediv, u8 rand[8], u8 ltk[16])
+> +{
+> +	struct link_key *key, *old_key;
+> +	struct key_master_id *id;
+> +	u8 old_key_type;
+> +
+> +	BT_DBG("%s addr %s", hdev->name, batostr(bdaddr));
+> +
+> +	old_key = hci_find_link_key_type(hdev, bdaddr, HCI_LK_SMP_LTK);
+> +	if (old_key) {
+> +		key = old_key;
+> +		old_key_type = old_key->type;
+> +	} else {
+> +		key = kzalloc(sizeof(*key) + sizeof(*id), GFP_ATOMIC);
+> +		if (!key)
+> +			return -ENOMEM;
+> +		list_add(&key->list, &hdev->link_keys);
+> +		old_key_type = 0xff;
+> +	}
+> +
+> +	key->dlen = sizeof(*id);
+> +
+> +	bacpy(&key->bdaddr, bdaddr);
+> +	memcpy(key->val, ltk, sizeof(key->val));
+> +	key->type = HCI_LK_SMP_LTK;
+> +
+> +	id = (void *) &key->data;
+> +	id->ediv = ediv;
+> +	memcpy(id->rand, rand, sizeof(id->rand));
+> +
+> +	if (new_key)
+> +		mgmt_new_key(hdev->id, key, old_key_type);
+> +
+> +	return 0;
+> +}
+> +
+>  int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>  {
+>  	struct link_key *key;
 
-The first problem I wrote about also occures with the simple-endpoint 
-script located in the test directory of bluez. You just have to add 
-the "Acquire" call to "SetConfiguration" to actually set the headset 
-in playing mode. I also posted the lines of code I added, so you can 
-easily try to reproduce it. The second problem just occurs with my 
-code, that's right. But maybe you have some general ideas. Otherwise 
-I'll have to dig in by myself. But it would be very helpful when you 
-look at least into the first problem.
-
->--
->Luiz Augusto von Dentz
->--
-
-Thanks,
-Peter 
 
