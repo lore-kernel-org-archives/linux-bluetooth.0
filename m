@@ -1,247 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Jul 2011 08:43:40 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] Bluetooth: Use event-driven approach for handling
- ERTM receive buffer
-In-Reply-To: <20110706234351.GA14399@joana>
-Message-ID: <alpine.DEB.2.02.1107070826520.564@mathewm-linux>
-References: <1309989272-24103-1-git-send-email-mathewm@codeaurora.org> <1309989272-24103-3-git-send-email-mathewm@codeaurora.org> <20110706223635.GD7786@joana> <alpine.DEB.2.02.1107061537440.26908@mathewm-linux> <20110706234351.GA14399@joana>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Thu, 7 Jul 2011 10:51:34 -0400
+Subject: [PATCH] Audio: fix race condition when starting a stream
+Message-ID: <1310050294.5639.1.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The AVDTP spec allows for a race condition between remote and local
+device when issuing an AVDTP_START cmd on a stream in the OPEN state.
 
-Hi Gustavo -
+However, the internal state must continue to be consistent. For example,
+suppose that avdtp_start() has been called while in the OPEN state and
+a AVDTP_START cmd is sent.  Now before we have received a response (and
+thus entered the STREAMING state), we *receive* a START cmd. Prior to
+this fix, since the sep is still in the OPEN state, we would accept
+the new START cmd. This will leads us to send both a Start_Ind and
+Start_Cfm - not good.
 
-On Wed, 6 Jul 2011, Gustavo Padovan wrote:
+Now, we track this transitional state (starting == TRUE).
 
-> Hi Mat,
->
-> * Mat Martineau <mathewm@codeaurora.org> [2011-07-06 16:01:43 -0700]:
->
->>
->> Hi Gustavo -
->>
->> On Wed, 6 Jul 2011, Gustavo Padovan wrote:
->>
->>> Hi Mat,
->>>
->>> * Mat Martineau <mathewm@codeaurora.org> [2011-07-06 14:54:31 -0700]:
->>>
->>>> This change moves most L2CAP ERTM receive buffer handling out of the
->>>> L2CAP core and in to the socket code.  It's up to the higher layer
->>>> (the socket code, in this case) to tell the core when its buffer is
->>>> full or has space available.  The recv op should always accept
->>>> incoming ERTM data or else the connection will go down.
->>>>
->>>> Within the socket layer, an skb that does not fit in the socket
->>>> receive buffer will be temporarily stored.  When the socket is read
->>>> from, that skb will be placed in the receive buffer if possible.  Once
->>>> adequate buffer space becomes available, the L2CAP core is informed
->>>> and the ERTM local busy state is cleared.
->>>>
->>>> Receive buffer management for non-ERTM modes is unchanged.
->>>>
->>>> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->>>> ---
->>>> include/net/bluetooth/l2cap.h |    2 +
->>>> net/bluetooth/l2cap_core.c    |   41 ++++++++++++++++---------
->>>> net/bluetooth/l2cap_sock.c    |   66 ++++++++++++++++++++++++++++++++++++++--
->>>> 3 files changed, 90 insertions(+), 19 deletions(-)
->>>>
->>>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->>>> index 9c18e55..66b8d96 100644
->>>> --- a/include/net/bluetooth/l2cap.h
->>>> +++ b/include/net/bluetooth/l2cap.h
->>>> @@ -422,6 +422,7 @@ struct l2cap_conn {
->>>> struct l2cap_pinfo {
->>>> 	struct bt_sock	bt;
->>>> 	struct l2cap_chan	*chan;
->>>> +	struct sk_buff	*rx_busy_skb;
->>>> };
->>>>
->>>> enum {
->>>> @@ -498,5 +499,6 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
->>>> void l2cap_chan_destroy(struct l2cap_chan *chan);
->>>> int l2cap_chan_connect(struct l2cap_chan *chan);
->>>> int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
->>>> +void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
->>>>
->>>> #endif /* __L2CAP_H */
->>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->>>> index f7ada4a..ea9c7d0 100644
->>>> --- a/net/bluetooth/l2cap_core.c
->>>> +++ b/net/bluetooth/l2cap_core.c
->>>> @@ -3350,21 +3350,21 @@ static int l2cap_push_rx_skb(struct l2cap_chan *chan, struct sk_buff *skb, u16 c
->>>> 	}
->>>>
->>>> 	err = l2cap_ertm_reassembly_sdu(chan, skb, control);
->>>> -	if (err >= 0) {
->>>> -		chan->buffer_seq = (chan->buffer_seq + 1) % 64;
->>>> -		return err;
->>>> -	}
->>>> -
->>>> -	l2cap_ertm_enter_local_busy(chan);
->>>> -
->>>> -	bt_cb(skb)->sar = control >> L2CAP_CTRL_SAR_SHIFT;
->>>> -	__skb_queue_tail(&chan->busy_q, skb);
->>>> -
->>>> -	queue_work(_busy_wq, &chan->busy_work);
->>>> +	chan->buffer_seq = (chan->buffer_seq + 1) % 64;
->>>>
->>>> 	return err;
->>>> }
->>>>
->>>> +void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
->>>> +{
->>>> +	if (chan->mode == L2CAP_MODE_ERTM) {
->>>> +		if (busy)
->>>> +			l2cap_ertm_enter_local_busy(chan);
->>>> +		else
->>>> +			l2cap_ertm_exit_local_busy(chan);
->>>> +	}
->>>> +}
->>>> +
->>>> static int l2cap_streaming_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u16 control)
->>>> {
->>>> 	struct sk_buff *_skb;
->>>> @@ -3463,13 +3463,22 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u8 tx_seq)
->>>> 	struct sk_buff *skb;
->>>> 	u16 control;
->>>>
->>>> -	while ((skb = skb_peek(&chan->srej_q))) {
->>>> +	while ((skb = skb_peek(&chan->srej_q)) &&
->>>> +			!test_bit(CONN_LOCAL_BUSY, &chan->conn_state)) {
->>>> +		int err;
->>>> +
->>>> 		if (bt_cb(skb)->tx_seq != tx_seq)
->>>> 			break;
->>>>
->>>> 		skb = skb_dequeue(&chan->srej_q);
->>>> 		control = bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
->>>> -		l2cap_ertm_reassembly_sdu(chan, skb, control);
->>>> +		err = l2cap_ertm_reassembly_sdu(chan, skb, control);
->>>> +
->>>> +		if (err < 0) {
->>>> +			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
->>>> +			break;
->>>> +		}
->>>> +
->>>> 		chan->buffer_seq_srej =
->>>> 			(chan->buffer_seq_srej + 1) % 64;
->>>> 		tx_seq = (tx_seq + 1) % 64;
->>>> @@ -3625,8 +3634,10 @@ expected:
->>>> 	}
->>>>
->>>> 	err = l2cap_push_rx_skb(chan, skb, rx_control);
->>>> -	if (err < 0)
->>>> -		return 0;
->>>> +	if (err < 0) {
->>>> +		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
->>>> +		return err;
->>>> +	}
->>>>
->>>> 	if (rx_control & L2CAP_CTRL_FINAL) {
->>>> 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
->>>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->>>> index 39082d4..9bf7313 100644
->>>> --- a/net/bluetooth/l2cap_sock.c
->>>> +++ b/net/bluetooth/l2cap_sock.c
->>>> @@ -711,13 +711,15 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
->>>> static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct msghdr *msg, size_t len, int flags)
->>>> {
->>>> 	struct sock *sk = sock->sk;
->>>> +	struct l2cap_pinfo *pi = l2cap_pi(sk);
->>>> +	int err;
->>>>
->>>> 	lock_sock(sk);
->>>>
->>>> 	if (sk->sk_state == BT_CONNECT2 && bt_sk(sk)->defer_setup) {
->>>> 		sk->sk_state = BT_CONFIG;
->>>>
->>>> -		__l2cap_connect_rsp_defer(l2cap_pi(sk)->chan);
->>>> +		__l2cap_connect_rsp_defer(pi->chan);
->>>> 		release_sock(sk);
->>>> 		return 0;
->>>> 	}
->>>> @@ -725,9 +727,38 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock, struct ms
->>>> 	release_sock(sk);
->>>>
->>>> 	if (sock->type == SOCK_STREAM)
->>>> -		return bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
->>>> +		err = bt_sock_stream_recvmsg(iocb, sock, msg, len, flags);
->>>> +	else
->>>> +		err = bt_sock_recvmsg(iocb, sock, msg, len, flags);
->>>> +
->>>> +	if (pi->chan->mode == L2CAP_MODE_ERTM) {
->>>
->>> 	if (pi->chan->mode != L2CAP_MODE_ERTM) {
->>> 		return err;
->>>
->>> 	lock_sock()...
->>
->> Ok.
->>
->>>> +		int threshold;
->>>> +
->>>> +		/* Attempt to put pending rx data in the socket buffer */
->>>> +
->>>> +		lock_sock(sk);
->>>> +		if (pi->rx_busy_skb) {
->>>> +			int queue_err;
->>>> +			queue_err = sock_queue_rcv_skb(sk, pi->rx_busy_skb);
->>>> +
->>>> +			if (!queue_err)
->>>> +				pi->rx_busy_skb = NULL;
->>>
->>> 			if (!sock_queue_rcv_skb())
->>> 				pi->rx_busy_skb = NULL;
->>> 			else
->>> 				return err;
->>>
->>> What I understood is that if sock_queue_rcv_skb() fails there is no need to
->>> check if there is available space in the buffer, then we just return. The
->>> locks also needs to be released.
->>
->> You're right - it's better to make sure we don't exit local busy in
->> this case.
->>
->>>> +		}
->>>> +
->>>> +		/* Restore data flow when half of the receive buffer is
->>>> +		 * available.  This avoids resending large numbers of
->>>> +		 * frames.
->>>> +		 */
->>>> +		threshold = sk->sk_rcvbuf >> 1;
->>>> +		if (test_bit(CONN_LOCAL_BUSY, &pi->chan->conn_state) &&
->>>> +				!pi->rx_busy_skb &&
->>>> +				atomic_read(&sk->sk_rmem_alloc) <= threshold)
->>>> +			l2cap_chan_busy(pi->chan, 0);
->>>
->>> Then this if can be just
->>>
->>> 		if (atomic_read(sk_rmem_alloc) <= sk_rcvbuf >> 1)
->>> 			l2cap_chan_busy(pi->chan, 0);
->>>
->>
->> It's still important to see if the channel is currently LOCAL_BUSY,
->> this code path will be executed every time an ERTM socket is read
->> from (busy or not).
->
-> what about this in beginning?
->
-> 	if (pi->chan->mode != L2CAP_MODE_ERTM || !LOCAL_BUSY) {
->
-> Then we avoid all the rest of the code if we are in Local Busy.
+NB - 'starting' is only in a valid state while the sep is in the
+OPEN state. 'starting' is reset when we return to the OPEN state.
+---
+ audio/avdtp.c |   29 +++++++++++++++++++++++++----
+ 1 files changed, 25 insertions(+), 4 deletions(-)
 
-The lock needs to be held to check the local busy bit.  I can check 
-LOCAL_BUSY after the lock, and release/return early if not busy.
+diff --git a/audio/avdtp.c b/audio/avdtp.c
+index 44df636..c12f5a3 100644
+--- a/audio/avdtp.c
++++ b/audio/avdtp.c
+@@ -378,6 +378,7 @@ struct avdtp_stream {
+ 	guint idle_timer;
+ 	gboolean delay_reporting;
+ 	uint16_t delay;		/* AVDTP 1.3 Delay Reporting feature */
++	gboolean starting;	/* only valid while sep state == OPEN */
+ };
+ 
+ /* Structure describing an AVDTP connection between two devices */
+@@ -1068,6 +1069,7 @@ static void avdtp_sep_set_state(struct avdtp *session,
+ 			avdtp_delay_report(session, stream, stream->delay);
+ 		break;
+ 	case AVDTP_STATE_OPEN:
++		stream->starting = FALSE;
+ 		if (old_state > AVDTP_STATE_OPEN && session->auto_dc)
+ 			stream->idle_timer = g_timeout_add_seconds(STREAM_TIMEOUT,
+ 								stream_timeout,
+@@ -1712,10 +1714,13 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+ 
+ 		stream = sep->stream;
+ 
+-		if (sep->state != AVDTP_STATE_OPEN) {
++		/* Also reject start cmd if we already initiated start */
++		if (sep->state != AVDTP_STATE_OPEN ||
++				stream->starting == TRUE) {
+ 			err = AVDTP_BAD_STATE;
+ 			goto failed;
+ 		}
++		stream->starting = TRUE;
+ 
+ 		if (sep->ind && sep->ind->start) {
+ 			if (!sep->ind->start(session, sep, stream, &err,
+@@ -1730,6 +1735,7 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+ 						AVDTP_START, NULL, 0);
+ 
+ failed:
++	DBG("Rejecting (%d)", err);
+ 	memset(&rej, 0, sizeof(rej));
+ 	rej.acp_seid = failed_seid;
+ 	rej.error = err;
+@@ -2584,9 +2590,12 @@ static int cancel_request(struct avdtp *session, int err)
+ 		break;
+ 	case AVDTP_START:
+ 		error("Start: %s (%d)", strerror(err), err);
+-		if (lsep && lsep->cfm && lsep->cfm->start)
++		if (lsep && lsep->cfm && lsep->cfm->start) {
+ 			lsep->cfm->start(session, lsep, stream, &averr,
+ 						lsep->user_data);
++			if (stream)
++				stream->starting = FALSE;
++		}
+ 		break;
+ 	case AVDTP_SUSPEND:
+ 		error("Suspend: %s (%d)", strerror(err), err);
+@@ -3092,9 +3101,11 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
+ 			return FALSE;
+ 		error("START request rejected: %s (%d)",
+ 				avdtp_strerror(&err), err.err.error_code);
+-		if (sep && sep->cfm && sep->cfm->start)
++		if (sep && sep->cfm && sep->cfm->start) {
+ 			sep->cfm->start(session, sep, stream, &err,
+ 					sep->user_data);
++			stream->starting = FALSE;
++		}
+ 		return TRUE;
+ 	case AVDTP_SUSPEND:
+ 		if (!stream_rej_to_err(buf, size, &err, &acp_seid))
+@@ -3552,6 +3563,7 @@ int avdtp_open(struct avdtp *session, struct avdtp_stream *stream)
+ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+ {
+ 	struct start_req req;
++	int ret;
+ 
+ 	if (!g_slist_find(session->streams, stream))
+ 		return -EINVAL;
+@@ -3564,11 +3576,20 @@ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
+ 		return -EINVAL;
+ 	}
+ 
++	if (stream->starting == TRUE) {
++		DBG("stream already started");
++		return -EINVAL;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.first_seid.seid = stream->rseid;
+ 
+-	return send_request(session, FALSE, stream, AVDTP_START,
++	ret = send_request(session, FALSE, stream, AVDTP_START,
+ 							&req, sizeof(req));
++	if (ret == 0)
++		stream->starting = TRUE;
++
++	return ret;
+ }
+ 
+ int avdtp_close(struct avdtp *session, struct avdtp_stream *stream,
+-- 
+1.7.4.1
 
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
