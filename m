@@ -1,112 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: ilia.kolominsky@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH Bluetooth-next v2] Fixes l2cap "command reject" reply according to spec.
-Date: Thu,  7 Jul 2011 06:36:02 +0300
-Message-Id: <1310009762-18032-1-git-send-email-iliak@ti.com>
+Subject: Re: [PATCH BlueZ v2 6/9] Fix memory leak when loading keys
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 07 Jul 2011 10:35:41 +0200
+In-Reply-To: <1309983041-23744-7-git-send-email-vinicius.gomes@openbossa.org>
+References: <y>
+	 <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
+	 <1309983041-23744-7-git-send-email-vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1310027746.21109.56.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ilia Kolomisnky <iliak@ti.com>
+Hi Vincius.
 
-There can 3 reasons for the "command reject" reply produced
-by the stack. Each such reply should be accompanied by the
-relevand data ( as defined in spec. ). Currently there is one
-instance of "command reject" reply with reason "invalid cid"
-wich is fixed. Also, added clean-up definitions related to the
-"command reject" replies.
+> Core bluetoothd doesn't need to have a reference to the link key list,
+> so we pass a reference to the list and free it as soon as possible. If any
+> user need to keep a copy of that list around, they need to copy it. This makes
+> the memory management more consistent.
+> ---
+>  plugins/hciops.c |   14 +++++++++++++-
+>  src/adapter.c    |    6 +++---
+>  2 files changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/plugins/hciops.c b/plugins/hciops.c
+> index 207e187..56daf0d 100644
+> --- a/plugins/hciops.c
+> +++ b/plugins/hciops.c
+> @@ -3450,6 +3450,7 @@ static int hciops_restore_powered(int index)
+>  static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+>  {
+>  	struct dev_info *dev = &devs[index];
+> +	GSList *l, *n, *new;
+>  
+>  	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
+>  								debug_keys);
+> @@ -3457,7 +3458,18 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
+>  	if (dev->keys != NULL)
+>  		return -EEXIST;
+>  
+> -	dev->keys = keys;
+> +	new = g_slist_copy(keys);
+> +
+> +	for (n = new, l = keys; l && n; l = l->next, n = n->next) {
+> +		struct link_key_info *orig;
+> +
+> +		orig = l->data;
+> +
+> +		n->data = g_malloc0(sizeof(*orig) + orig->dlen);
+> +		memcpy(n->data, orig, sizeof(*orig) + orig->dlen);
 
-Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
----
- include/net/bluetooth/l2cap.h |   19 ++++++++++++++++++-
- net/bluetooth/l2cap_core.c    |   15 +++++++++------
- 2 files changed, 27 insertions(+), 7 deletions(-)
+you don't need to add a memset via g_malloc0 here. And do we really not
+wanna check the memory allocation here?
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9c18e55..6dee791 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -130,6 +130,12 @@ struct l2cap_conninfo {
- #define L2CAP_SDU_END               0x8000
- #define L2CAP_SDU_CONTINUE          0xC000
- 
-+/* L2CAP Command rej. reasons */
-+#define L2CAP_REJ_NOT_UNDERSTOOD      0x0000
-+#define L2CAP_REJ_MTU_EXCEEDED	       0x0001
-+#define L2CAP_REJ_INVALID_CID         0x0002
-+
-+
- /* L2CAP structures */
- struct l2cap_hdr {
- 	__le16     len;
-@@ -144,8 +150,19 @@ struct l2cap_cmd_hdr {
- } __packed;
- #define L2CAP_CMD_HDR_SIZE	4
- 
--struct l2cap_cmd_rej {
-+struct l2cap_cmd_rej_unk {
-+	__le16     reason;
-+} __packed;
-+
-+struct l2cap_cmd_rej_mtu {
-+	__le16     reason;
-+	__le16     max_mtu;
-+} __packed;
-+
-+struct l2cap_cmd_rej_cid {
- 	__le16     reason;
-+	__le16     scid;
-+	__le16     dcid;
- } __packed;
- 
- struct l2cap_conn_req {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bd5d992..951c311 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2284,9 +2284,9 @@ done:
- 
- static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
- {
--	struct l2cap_cmd_rej *rej = (struct l2cap_cmd_rej *) data;
-+	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *) data;
- 
--	if (rej->reason != 0x0000)
-+	if (rej->reason != L2CAP_REJ_NOT_UNDERSTOOD)
- 		return 0;
- 
- 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
-@@ -2531,9 +2531,12 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+Regards
 
-	if ((bt_sk(sk)->defer_setup && sk->sk_state != BT_CONNECT2) ||
-                (!bt_sk(sk)->defer_setup && sk->sk_state != BT_CONFIG)) { 
--		struct l2cap_cmd_rej rej;
-+		struct l2cap_cmd_rej_cid rej;
-+
-+		rej.reason = cpu_to_le16(L2CAP_REJ_INVALID_CID);
-+		rej.scid = cpu_to_le16(chan->scid);
-+		rej.dcid = cpu_to_le16(chan->dcid);
- 
--		rej.reason = cpu_to_le16(0x0002);
- 		l2cap_send_cmd(conn, cmd->ident, L2CAP_COMMAND_REJ,
- 				sizeof(rej), &rej);
- 		goto unlock;
-@@ -3024,12 +3027,12 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 			err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
- 
- 		if (err) {
--			struct l2cap_cmd_rej rej;
-+			struct l2cap_cmd_rej_unk rej;
- 
- 			BT_ERR("Wrong link type (%d)", err);
- 
- 			/* FIXME: Map err to a valid reason */
--			rej.reason = cpu_to_le16(0);
-+			rej.reason = cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
- 		}
- 
--- 
-1.7.1
+Marcel
+
 
