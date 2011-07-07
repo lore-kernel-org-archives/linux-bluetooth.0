@@ -1,70 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH BlueZ v2 2/9] Add support for storing SMP keys
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 07 Jul 2011 10:28:02 +0200
-In-Reply-To: <1309983041-23744-3-git-send-email-vinicius.gomes@openbossa.org>
-References: <y>
-	 <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
-	 <1309983041-23744-3-git-send-email-vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1310027300.21109.55.camel@aeonflux>
+Message-Id: <7.0.1.0.2.20110707101900.03230f68@gmx.net>
+Date: Thu, 07 Jul 2011 10:25:48 +0200
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Peter Kornatowski <pkorn@gmx.net>
+Subject: Re: Media API with more than one headset
+Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.g
+ mail.com>
+References: <7.0.1.0.2.20110622230344.031f5790@gmx.net>
+ <BANLkTikuRgeFW-fXckR4ST14idxPSmNP7g@mail.gmail.com>
+ <7.0.1.0.2.20110627205517.03250550@gmx.net>
+ <BANLkTinFieuN8HSLu8-pTaMix9r48d6HBw@mail.gmail.com>
+ <BANLkTimMQcjj3A=cNaUWY4xByY2WrhA9RA@mail.gmail.com>
+ <BANLkTiknkbZcS2AASzS_qeXbNJ3_Qa2e1A@mail.gmail.com>
+ <7.0.1.0.2.20110629214327.0321b4e0@gmx.net>
+ <7.0.1.0.2.20110706214918.03262000@gmx.net>
+ <CABBYNZ+y1EkxNOr53Cr2SkbYfgKV3SCDK10ejo1mjHzdcB2BvQ@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Luiz,
 
->  plugins/mgmtops.c |    4 ++--
->  src/event.c       |   44 +++++++++++++++++++++++++++++++++++++++++---
->  src/storage.c     |   25 ++++++++++++++++++++++++-
->  src/storage.h     |    1 +
->  4 files changed, 68 insertions(+), 6 deletions(-)
-> 
-> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-> index 6b5422e..f11ff50 100644
-> --- a/plugins/mgmtops.c
-> +++ b/plugins/mgmtops.c
-> @@ -383,8 +383,8 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
->  	struct mgmt_ev_new_key *ev = buf;
->  	struct controller_info *info;
->  
-> -	if (len != sizeof(*ev)) {
-> -		error("new_key event size mismatch (%zu != %zu)",
-> +	if (len < sizeof(*ev)) {
-> +		error("new_key event size mismatch (%zu < %zu)",
->  							len, sizeof(*ev));
->  		return;
->  	}
-> diff --git a/src/event.c b/src/event.c
-> index 3f0f454..9cdb5e1 100644
-> --- a/src/event.c
-> +++ b/src/event.c
-> @@ -395,6 +395,43 @@ proceed:
->  	adapter_set_state(adapter, STATE_IDLE);
->  }
->  
-> +static gchar *buf2str(uint8_t *data, int datalen)
-> +{
-> +	gchar *buf;
-> +	int i;
+At 22:35 06.07.2011, Luiz Augusto von Dentz wrote:
+>Hi Peter,
+>
+>On Wed, Jul 6, 2011 at 10:54 PM, Peter Kornatowski <pkorn@gmx.net> wrote:
+> > I downloaded and checked the new bluez version 4.95. I'm wondering why the
+> > patch of Lukasz didn't get applied? As I wrote in my last e-mail, it works
+> > for not losing playing mode of all headsets when disconnecting just one.
+>
+>I don't remember actually seeing a proper patch to the mailing list,
+>that might explain why it wasn't applied yet.
 
-please that not use more gchar anymore. Just use plain char.
+So Lukasz, could you make a proper patch out of it, cause it's your code?
 
-> +	buf = g_new0(gchar, (datalen * 2) + 1);
+> > Did someone of you had a chance to look into the other problems I wrote
+> > about in my last e-mail? This would help me a lot.
+>
+>Nope, I was actually waiting for more input since you mentioned this
+>only happened with some code your wrote.
 
-Is it okay to not use g_try_new0.
+The first problem I wrote about also occures with the simple-endpoint 
+script located in the test directory of bluez. You just have to add 
+the "Acquire" call to "SetConfiguration" to actually set the headset 
+in playing mode. I also posted the lines of code I added, so you can 
+easily try to reproduce it. The second problem just occurs with my 
+code, that's right. But maybe you have some general ideas. Otherwise 
+I'll have to dig in by myself. But it would be very helpful when you 
+look at least into the first problem.
 
-> +
-> +	for (i = 0; i < datalen; i++)
-> +		sprintf(buf + (i * 2), "%2.2x", data[i]);
-> +
-> +	return buf;
-> +}
+>--
+>Luiz Augusto von Dentz
+>--
 
-Regards
-
-Marcel
-
+Thanks,
+Peter 
 
