@@ -1,59 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH BlueZ v2 6/9] Fix memory leak when loading keys
+Subject: Re: [PATCH BlueZ v2 2/9] Add support for storing SMP keys
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 07 Jul 2011 10:35:41 +0200
-In-Reply-To: <1309983041-23744-7-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 07 Jul 2011 10:28:02 +0200
+In-Reply-To: <1309983041-23744-3-git-send-email-vinicius.gomes@openbossa.org>
 References: <y>
 	 <1309983041-23744-1-git-send-email-vinicius.gomes@openbossa.org>
-	 <1309983041-23744-7-git-send-email-vinicius.gomes@openbossa.org>
+	 <1309983041-23744-3-git-send-email-vinicius.gomes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1310027746.21109.56.camel@aeonflux>
+Message-ID: <1310027300.21109.55.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vincius.
+Hi Vinicius,
 
-> Core bluetoothd doesn't need to have a reference to the link key list,
-> so we pass a reference to the list and free it as soon as possible. If any
-> user need to keep a copy of that list around, they need to copy it. This makes
-> the memory management more consistent.
-> ---
->  plugins/hciops.c |   14 +++++++++++++-
->  src/adapter.c    |    6 +++---
->  2 files changed, 16 insertions(+), 4 deletions(-)
+>  plugins/mgmtops.c |    4 ++--
+>  src/event.c       |   44 +++++++++++++++++++++++++++++++++++++++++---
+>  src/storage.c     |   25 ++++++++++++++++++++++++-
+>  src/storage.h     |    1 +
+>  4 files changed, 68 insertions(+), 6 deletions(-)
 > 
-> diff --git a/plugins/hciops.c b/plugins/hciops.c
-> index 207e187..56daf0d 100644
-> --- a/plugins/hciops.c
-> +++ b/plugins/hciops.c
-> @@ -3450,6 +3450,7 @@ static int hciops_restore_powered(int index)
->  static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
->  {
->  	struct dev_info *dev = &devs[index];
-> +	GSList *l, *n, *new;
+> diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+> index 6b5422e..f11ff50 100644
+> --- a/plugins/mgmtops.c
+> +++ b/plugins/mgmtops.c
+> @@ -383,8 +383,8 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
+>  	struct mgmt_ev_new_key *ev = buf;
+>  	struct controller_info *info;
 >  
->  	DBG("hci%d keys %d debug_keys %d", index, g_slist_length(keys),
->  								debug_keys);
-> @@ -3457,7 +3458,18 @@ static int hciops_load_keys(int index, GSList *keys, gboolean debug_keys)
->  	if (dev->keys != NULL)
->  		return -EEXIST;
+> -	if (len != sizeof(*ev)) {
+> -		error("new_key event size mismatch (%zu != %zu)",
+> +	if (len < sizeof(*ev)) {
+> +		error("new_key event size mismatch (%zu < %zu)",
+>  							len, sizeof(*ev));
+>  		return;
+>  	}
+> diff --git a/src/event.c b/src/event.c
+> index 3f0f454..9cdb5e1 100644
+> --- a/src/event.c
+> +++ b/src/event.c
+> @@ -395,6 +395,43 @@ proceed:
+>  	adapter_set_state(adapter, STATE_IDLE);
+>  }
 >  
-> -	dev->keys = keys;
-> +	new = g_slist_copy(keys);
-> +
-> +	for (n = new, l = keys; l && n; l = l->next, n = n->next) {
-> +		struct link_key_info *orig;
-> +
-> +		orig = l->data;
-> +
-> +		n->data = g_malloc0(sizeof(*orig) + orig->dlen);
-> +		memcpy(n->data, orig, sizeof(*orig) + orig->dlen);
+> +static gchar *buf2str(uint8_t *data, int datalen)
+> +{
+> +	gchar *buf;
+> +	int i;
 
-you don't need to add a memset via g_malloc0 here. And do we really not
-wanna check the memory allocation here?
+please that not use more gchar anymore. Just use plain char.
+
+> +	buf = g_new0(gchar, (datalen * 2) + 1);
+
+Is it okay to not use g_try_new0.
+
+> +
+> +	for (i = 0; i < datalen; i++)
+> +		sprintf(buf + (i * 2), "%2.2x", data[i]);
+> +
+> +	return buf;
+> +}
 
 Regards
 
