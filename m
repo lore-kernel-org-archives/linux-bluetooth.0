@@ -1,65 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Bastien Nocera <hadess@hadess.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>
-Date: Fri, 8 Jul 2011 09:19:25 +0200
-Subject: RE: Connection parameters and multiple profiles (was: Re: [RFC
- BlueZ] Add Proximity API)
-Message-ID: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A2C6DE23@EXDCVYMBSTM005.EQ1STM.local>
-References: <CAJdJm_OM4xExkBiy=oLpwFuPz5xx95i5ibh9bmWbAnokp7GC4w@mail.gmail.com>
-In-Reply-To: <CAJdJm_OM4xExkBiy=oLpwFuPz5xx95i5ibh9bmWbAnokp7GC4w@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: lukasz.rymanowski@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: pkorn@gmx.net, luiz.dentz@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Subject: [PATCH] Fix for headset state callback
+Date: Fri,  8 Jul 2011 08:12:49 +0200
+Message-Id: <1310105569-23441-1-git-send-email-lukasz.rymanowski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 
->> Also how about setting profile specific LSTO? Proximity specs recommends this
->value to be 6X connection interval but I guess we may give the user/application some
->flexibility to play around on this? Same may be the case for connection interval, scan
->interval, latency values etc...I believe these values can be pretty much user/platform
->specific and user should have control over these ...
->
->I still think we should try to come up with a "connection parameter
->profile" (e.g. "low latency/fast connection", "low power",
->"reconnection" etc.), instead of allowing applications to tune
->specific values by hand. A couple of reasons:
+Headset watch is not registered per device.
+Therefore, when headset disconnects, there is need to
+check for which audio device it is called.
+---
+ audio/media.c     |    7 ++++++-
+ audio/transport.c |    5 +++++
+ audio/transport.h |    1 +
+ 3 files changed, 12 insertions(+), 1 deletions(-)
 
-Agree. This should be the most valid proposition for connection parameters as long as identify a common "set" of these that is agreeable to all LE profiles. I guess Proximity and Phone Alert Service seem to have GAP conn parm recommendation. So arriving at a common union shouldn't be hard.
->
->* Exposing every single parameter to userspace will require one or
->more mgmt commands which will just reflect the actual HCI commands.
->This is usually not desirable (see Marcel's comments on this list
->regarding the mgmt API being more "intelligent" than HCI)
-Agree with the philosophy in general but not sure what should be the granularity of mgmt command as compared to hci commands. For example in case of conn params I am not sure if you can stuff all conn params into one mgmt command for this?
-
-
->* It will be too easy for custom/proprietary profiles to interfere
->with core profiles (or with other custom/proprietary profiles).
-Agree.
-
->* Some parameters are just "hints" for the controller, so there is no
->need (IMHO) to use the exact same values recommended by the profile.
->Note that (in adopted profiles), the connection parameters are usually
->recommendations ("should") not requirements ("shall").
-
-Yes but these recommendations are for optimal performance of each profile/usecase. Even though these are recommendations, ideally each profile programmer should try to stay close to these ...
-
->(I will use the word "mode" to avoid confusion below... better names
->are welcome)
->
->With just a few "modes", we should be able to cover all currently
->adopted profiles. And we could easily extend by adding more "modes",
->or a mgmt API to allow registering temporary modes whose parameters
->can be checked against those of currently running profiles, making
->sure they will not be affected. What do you think?
-
-Why should these modes be "temp"? As long as the LE profiles which would need these modes run, these modes should be effective for same time. Unless we provide an option to disable LE profiles at run-time .. which in my opinion is still configurable only at start of bluetoothd? 
-Eitherways the idea of modes should be good and if we are able to check existing parameters before setting via new modes, that should alert the programmer/user as what he is playing with ...
+diff --git a/audio/media.c b/audio/media.c
+index 3978a17..57bf7c9 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -167,7 +167,12 @@ static void headset_state_changed(struct audio_device *dev,
  
-Thanks,
-Arun
+ 	switch (new_state) {
+ 	case HEADSET_STATE_DISCONNECTED:
+-		media_endpoint_clear_configuration(endpoint);
++		if (endpoint->transport &&
++			media_transport_get_dev(endpoint->transport) == dev) {
++
++			DBG("Clear endpoint %p", endpoint);
++			media_endpoint_clear_configuration(endpoint);
++		}
+ 		break;
+ 	case HEADSET_STATE_CONNECTING:
+ 		media_endpoint_set_configuration(endpoint, dev, NULL, 0,
+diff --git a/audio/transport.c b/audio/transport.c
+index 7c99207..cd2de37 100644
+--- a/audio/transport.c
++++ b/audio/transport.c
+@@ -918,3 +918,8 @@ void media_transport_update_delay(struct media_transport *transport,
+ 				MEDIA_TRANSPORT_INTERFACE, "Delay",
+ 				DBUS_TYPE_UINT16, &transport->delay);
+ }
++
++struct audio_device *media_transport_get_dev(struct media_transport *transport)
++{
++	return transport->device;
++}
+\ No newline at end of file
+diff --git a/audio/transport.h b/audio/transport.h
+index be4d666..1f86cde 100644
+--- a/audio/transport.h
++++ b/audio/transport.h
+@@ -32,6 +32,7 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+ 
+ void media_transport_destroy(struct media_transport *transport);
+ const char *media_transport_get_path(struct media_transport *transport);
++struct audio_device *media_transport_get_dev(struct media_transport *transport);
+ void media_transport_update_delay(struct media_transport *transport,
+ 							uint16_t delay);
+ void transport_get_properties(struct media_transport *transport,
+-- 
+
+
