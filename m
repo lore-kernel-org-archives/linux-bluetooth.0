@@ -1,131 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi,
-	johan.hedberg@gmail.com,
-	marcel@holtmann.org,
-	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/2] Add pin-code hook to adapter api
-Date: Fri,  8 Jul 2011 18:34:54 +0200
-Message-Id: <1310142895-20224-1-git-send-email-dh.herrmann@googlemail.com>
+MIME-Version: 1.0
+In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A2C6DE23@EXDCVYMBSTM005.EQ1STM.local>
+References: <CAJdJm_OM4xExkBiy=oLpwFuPz5xx95i5ibh9bmWbAnokp7GC4w@mail.gmail.com>
+	<AFCDDB4A3EA003429EEF1E7B211FDBBA33A2C6DE23@EXDCVYMBSTM005.EQ1STM.local>
+Date: Fri, 8 Jul 2011 08:07:53 -0400
+Message-ID: <CAJdJm_MTOHX1o+_RFJSfwXJDmrwx4nETugKAwnP5N8OhkK7u-w@mail.gmail.com>
+Subject: Re: Connection parameters and multiple profiles (was: Re: [RFC BlueZ]
+ Add Proximity API)
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Bastien Nocera <hadess@hadess.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Ville Tervo <ville.tervo@nokia.com>
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Plugins may now register pincode callbacks which are called when the
-authentication of a new device requires a pincode. This allows to have
-hard-coded binary pins inside the daemon to circumvent the public dbus
-api restrictions (only valid UTF8 strings).
+Hi Arun,
 
-The callbacks shall check via VID/PID information whether they support
-the device and if not, return 0 so the dbus api is used to query the
-current agent for pin input.
----
- src/adapter.c |   19 +++++++++++++++++++
- src/adapter.h |    8 ++++++++
- src/event.c   |   22 +++++++++++++++++++++-
- 3 files changed, 48 insertions(+), 1 deletions(-)
+On Fri, Jul 8, 2011 at 3:19 AM, Arun Kumar SINGH
+<arunkr.singh@stericsson.com> wrote:
+>>* Exposing every single parameter to userspace will require one or
+>>more mgmt commands which will just reflect the actual HCI commands.
+>>This is usually not desirable (see Marcel's comments on this list
+>>regarding the mgmt API being more "intelligent" than HCI)
+> Agree with the philosophy in general but not sure what should be the granularity of mgmt command as compared to hci commands. For example in case of conn params I am not sure if you can stuff all conn params into one mgmt command for this?
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 0909a22..689b73b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -146,6 +146,7 @@ struct btd_adapter {
- 	guint off_timer;
- 
- 	GSList *powered_callbacks;
-+	GSList *pin_callbacks;
- 
- 	GSList *loaded_drivers;
- };
-@@ -2573,6 +2574,7 @@ void adapter_remove(struct btd_adapter *adapter)
- 	g_slist_free(adapter->devices);
- 
- 	unload_drivers(adapter);
-+	g_slist_free(adapter->pin_callbacks);
- 
- 	/* Return adapter to down state if it was not up on init */
- 	adapter_ops->restore_powered(adapter->dev_id);
-@@ -3435,6 +3437,23 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
- 	return 0;
- }
- 
-+void btd_adapter_register_pincb(struct btd_adapter *adapter,
-+							btd_adapter_pincb_t cb)
-+{
-+	adapter->pin_callbacks = g_slist_prepend(adapter->pin_callbacks, cb);
-+}
-+
-+void btd_adapter_unregister_pincb(struct btd_adapter *adapter,
-+							btd_adapter_pincb_t cb)
-+{
-+	adapter->pin_callbacks = g_slist_remove(adapter->pin_callbacks, cb);
-+}
-+
-+GSList *btd_adapter_get_pincbs(struct btd_adapter *adapter)
-+{
-+	return adapter->pin_callbacks;
-+}
-+
- int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority)
- {
- 	if (ops->setup == NULL)
-diff --git a/src/adapter.h b/src/adapter.h
-index 38ea3ca..84b0bb0 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -165,6 +165,14 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter);
- int btd_adapter_switch_online(struct btd_adapter *adapter);
- int btd_adapter_switch_offline(struct btd_adapter *adapter);
- 
-+typedef int (*btd_adapter_pincb_t) (struct btd_adapter *adapter,
-+					struct btd_device *dev, char *out);
-+void btd_adapter_register_pincb(struct btd_adapter *adapter,
-+							btd_adapter_pincb_t cb);
-+void btd_adapter_unregister_pincb(struct btd_adapter *adapter,
-+							btd_adapter_pincb_t cb);
-+GSList *btd_adapter_get_pincbs(struct btd_adapter *adapter);
-+
- typedef void (*bt_hci_result_t) (uint8_t status, gpointer user_data);
- 
- struct btd_adapter_ops {
-diff --git a/src/event.c b/src/event.c
-index 86a413e..ecbdaa0 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -123,6 +123,26 @@ fail:
- 	error("Sending PIN code reply failed: %s (%d)", strerror(-err), -err);
- }
- 
-+static int get_pin(struct btd_adapter *adapter, struct btd_device *device,
-+				bdaddr_t *sba, bdaddr_t *dba, char *pinbuf)
-+{
-+	GSList *ele;
-+	btd_adapter_pincb_t cb;
-+	int ret;
-+
-+	ele = btd_adapter_get_pincbs(adapter);
-+	while (ele) {
-+		cb = (void*)ele->data;
-+		ret = cb(adapter, device, pinbuf);
-+		if (ret > 0)
-+			return ret;
-+
-+		ele = ele->next;
-+	}
-+
-+	return read_pin_code(sba, dba, pinbuf);
-+}
-+
- int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, gboolean secure)
- {
- 	struct btd_adapter *adapter;
-@@ -134,7 +154,7 @@ int btd_event_request_pin(bdaddr_t *sba, bdaddr_t *dba, gboolean secure)
- 		return -ENODEV;
- 
- 	memset(pin, 0, sizeof(pin));
--	pinlen = read_pin_code(sba, dba, pin);
-+	pinlen = get_pin(adapter, device, sba, dba, pin);
- 	if (pinlen > 0 && (!secure || pinlen == 16)) {
- 		btd_adapter_pincode_reply(adapter, dba, pin, pinlen);
- 		return 0;
+I believe it will need to be evaluated on per case basis. I.e. we send
+a draft patch to the list and see what other developers think about
+it.
+
+>>* Some parameters are just "hints" for the controller, so there is no
+>>need (IMHO) to use the exact same values recommended by the profile.
+>>Note that (in adopted profiles), the connection parameters are usually
+>>recommendations ("should") not requirements ("shall").
+>
+> Yes but these recommendations are for optimal performance of each profile/usecase. Even though these are recommendations, ideally each profile programmer should try to stay close to these ...
+
+Correct. What I meant is that in some cases we need to slightly modify
+e.g. connection interval min/max depending on the currently loaded
+profiles, and on characteristics of the local controller (e.g.
+firmware limitations).
+
+>
+>>(I will use the word "mode" to avoid confusion below... better names
+>>are welcome)
+>>
+>>With just a few "modes", we should be able to cover all currently
+>>adopted profiles. And we could easily extend by adding more "modes",
+>>or a mgmt API to allow registering temporary modes whose parameters
+>>can be checked against those of currently running profiles, making
+>>sure they will not be affected. What do you think?
+>
+> Why should these modes be "temp"? As long as the LE profiles which would need these modes run, these modes should be effective for same time. Unless we provide an option to disable LE profiles at run-time .. which in my opinion is still configurable only at start of bluetoothd?
+
+So far there are no plans to disable LE after bluetoothd started. The
+current approach is to enable/disable LE on kernel side, by using a
+module parameter. (There is also "EnableLE" in bluez, but I believe it
+will go away, as bluetoothd can query the controller for supported
+features).
+
+> Eitherways the idea of modes should be good and if we are able to check existing parameters before setting via new modes, that should alert the programmer/user as what he is playing with ...
+
+Either that, or clearly document parameters. In any case, I believe
+each vendor will tune these parameters anyway for their products
+(depending on controller limitations, power consumption restrictions
+etc.), we just need to come up with proper kernel API to add custom
+"modes", and sane defaults.
+
+BTW, we are not currently working on this feature, so feel free to
+expand the idea or send RFC patches :).
+
+Regards,
 -- 
-1.7.6
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
