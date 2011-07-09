@@ -1,27 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 Jul 2011 19:15:03 +0300
+Date: Sat, 9 Jul 2011 18:44:00 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/3] Fix white space related coding style issues
- for gdbus
-Message-ID: <20110709161503.GA11005@dell.ger.corp.intel.com>
-References: <1309125366-29016-1-git-send-email-syamsidhardh@gmail.com>
+Subject: Re: [PATCH BlueZ v2] Fix unpair device when disconnected for No
+ Bonding
+Message-ID: <20110709154400.GA10054@dell.ger.corp.intel.com>
+References: <1309786828-11792-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1309786828-11792-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309125366-29016-1-git-send-email-syamsidhardh@gmail.com>
+In-Reply-To: <1309786828-11792-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Dmitriy,
 
-On Mon, Jun 27, 2011, Syam Sidhardhan wrote:
-> - corrected the space before '{'
-> ---
->  gdbus/object.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Jul 04, 2011, Dmitriy Paliy wrote:
+> @@ -2069,6 +2076,9 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
+>  
+>  	device_auth_req_free(device);
+>  
+> +	if (bonding)
+> +		device->bonded = TRUE;
 
-All three patches have been applied (with some additional fixes to the
-third one). The gdbus patch was also pushed to bluez.git. Thanks.
+The "bonding" variable will only be set if we are the initiators. What
+about us acting as acceptors? Wouldn't you need to check the storage
+anyway here to be completely sure if you're bonded or not?
 
 Johan
