@@ -1,62 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 10 Jul 2011 01:36:59 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Gottfried Haider <gottfried.haider@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, hadess@hadess.net, marcel@holtmann.org
-Subject: Re: PS3 Sixaxis status (input/sixaxis.c)
-Message-Id: <20110710013659.0aeb5fea9e9c1f482cdaa301@studenti.unina.it>
-In-Reply-To: <CAPoCmYKYc9K=cCAMQ2_y1QDCa=cL8QxtVcp7_g_Kkp6oHYEeFA@mail.gmail.com>
-References: <CAPoCmYLDnpi-=zdfPiTUad_AuYRcOtasapFSp-uSF_E8oy4Cew@mail.gmail.com>
-	<CAPoCmYKYc9K=cCAMQ2_y1QDCa=cL8QxtVcp7_g_Kkp6oHYEeFA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sun__10_Jul_2011_01_36_59_+0200_46vz+KOYfbkfs8ii"
+From: Tom Rini <tom_rini@mentor.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Makefile.am: Mark local_headers as BUILT_SOURCES
+Date: Sat,  9 Jul 2011 08:10:53 -0700
+Message-Id: <1310224253-4557-1-git-send-email-tom_rini@mentor.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Sun__10_Jul_2011_01_36_59_+0200_46vz+KOYfbkfs8ii
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+As these files are auto-generated they need to be marked as BUILT_SOURCES
+so that we don't run into a build race later on.  lib/bluetooth is removed
+by clean-local so this doesn't need to be in CLEAN_FILES
 
-On Sat, 9 Jul 2011 18:40:58 +0200
-Gottfried Haider <gottfried.haider@gmail.com> wrote:
+Signed-off-by: Tom Rini <tom_rini@mentor.com>
+---
+ Makefile.am |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-> > I had high expectations when I found sixaxis.c in the bluez git tree -
-> > but even after getting it to compile against the bluez version (4.91)
-> > that comes with my xubuntu version, it still does not seem to work
->=20
-> Forgot to add: I am running a recent kernel version (3.0.0-rc5).
+diff --git a/Makefile.am b/Makefile.am
+index fab05eb..356b09f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -53,6 +53,8 @@ lib_headers = lib/bluetooth.h lib/hci.h lib/hci_lib.h lib/mgmt.h \
+ 		lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
+ local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
+ 
++BUILT_SOURCES = $(local_headers)
++
+ include_HEADERS += $(lib_headers)
+ 
+ lib_LTLIBRARIES += lib/libbluetooth.la
+@@ -62,9 +64,6 @@ lib_libbluetooth_la_SOURCES = $(lib_headers) \
+ lib_libbluetooth_la_LDFLAGS = -version-info 14:3:11
+ lib_libbluetooth_la_DEPENDENCIES = $(local_headers)
+ 
+-CLEANFILES += $(local_headers)
+-
+-
+ if SBC
+ noinst_LTLIBRARIES += sbc/libsbc.la
+ 
+-- 
+1.7.1
 
-input/sixaxis.c is going away, apply this patch to bluez for now,
-it adds a new plugin which runs with bluez and does all the
-paring/association work in background:
-https://patchwork.kernel.org/patch/861522/
-
-I plan to send an updated version soon-ish.
-
-Regards,
-   Antonio
-
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Sun__10_Jul_2011_01_36_59_+0200_46vz+KOYfbkfs8ii
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk4Y5hsACgkQ5xr2akVTsAGORACcDf3IqasX7q4w69f5lPJs4n9y
-7SgAn3WAGZkgmEvLNYVexBDyodpXx8/n
-=FwtU
------END PGP SIGNATURE-----
-
---Signature=_Sun__10_Jul_2011_01_36_59_+0200_46vz+KOYfbkfs8ii--
