@@ -1,26 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 Jul 2011 19:23:33 +0300
+Date: Sat, 9 Jul 2011 19:22:09 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Rafal Michalski <michalski.raf@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] btio: Fix the return value of bt_io functions
-Message-ID: <20110709162333.GF11005@dell.ger.corp.intel.com>
-References: <1309885200-27393-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH obexd 1/2] Return empty body instead -ENOENT when
+ phonebook is empty
+Message-ID: <20110709162209.GE11005@dell.ger.corp.intel.com>
+References: <1309520562-19408-1-git-send-email-michalski.raf@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309885200-27393-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1309520562-19408-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Rafal,
 
-On Tue, Jul 05, 2011, Vinicius Costa Gomes wrote:
-> Some bt_io methods were ignoring the value stored in errno when
-> reporting the error to the caller.
+On Fri, Jul 01, 2011, Rafal Michalski wrote:
+> Previously, when doing pull of empty phonebook, NOT FOUND error was
+> returned. Now returning empty body - this change is needed to pass PTS
+> testcase TC_PSE_PDF_BV_05_I (this testcase is optional).
+> 
+> PBAP spec says, that error NOT_FOUND should be returned when phonebook
+> object could not be found - very strict clients may think that
+> phonebook does not exist (and in scenario described above phonebook
+> exists but its content is empty).
 > ---
->  btio/btio.c |   15 +++++++++------
->  1 files changed, 9 insertions(+), 6 deletions(-)
+>  plugins/pbap.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
