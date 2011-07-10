@@ -1,113 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: ilia.kolominsky@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Ilia Kolomisnky <iliak@ti.com>
-Subject: [PATCH Bluetooth-next v3] Fixes l2cap "command reject" reply according to spec.
-Date: Sun, 10 Jul 2011 08:47:44 +0300
-Message-Id: <1310276864-6193-1-git-send-email-iliak@ti.com>
+Date: Sun, 10 Jul 2011 10:58:43 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: lukasz.rymanowski@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, pkorn@gmx.net,
+	luiz.dentz@gmail.com
+Subject: Re: [PATCH] Fix for headset state callback
+Message-ID: <20110710075843.GE1808@dell.ger.corp.intel.com>
+References: <1310105569-23441-1-git-send-email-lukasz.rymanowski@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1310105569-23441-1-git-send-email-lukasz.rymanowski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ilia Kolomisnky <iliak@ti.com>
+Hi Lucasz,
 
-There can 3 reasons for the "command reject" reply produced
-by the stack. Each such reply should be accompanied by the
-relevand data ( as defined in spec. ). Currently there is one
-instance of "command reject" reply with reason "invalid cid"
-wich is fixed. Also, added clean-up definitions related to the
-"command reject" replies.
+On Fri, Jul 08, 2011, lukasz.rymanowski@gmail.com wrote:
+> Headset watch is not registered per device. Therefore, when headset
+> disconnects, there is need to check for which audio device it is
+> called.
+> ---
+>  audio/media.c     |    7 ++++++-
+>  audio/transport.c |    5 +++++
+>  audio/transport.h |    1 +
+>  3 files changed, 12 insertions(+), 1 deletions(-)
 
-Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
----
- include/net/bluetooth/l2cap.h |   19 ++++++++++++++++++-
- net/bluetooth/l2cap_core.c    |   15 +++++++++------
- 2 files changed, 27 insertions(+), 7 deletions(-)
+Applied. Thanks.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9c18e55..6dee791 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -130,6 +130,12 @@ struct l2cap_conninfo {
- #define L2CAP_SDU_END               0x8000
- #define L2CAP_SDU_CONTINUE          0xC000
- 
-+/* L2CAP Command rej. reasons */
-+#define L2CAP_REJ_NOT_UNDERSTOOD      0x0000
-+#define L2CAP_REJ_MTU_EXCEEDED        0x0001
-+#define L2CAP_REJ_INVALID_CID         0x0002
-+
-+
- /* L2CAP structures */
- struct l2cap_hdr {
- 	__le16     len;
-@@ -144,8 +150,19 @@ struct l2cap_cmd_hdr {
- } __packed;
- #define L2CAP_CMD_HDR_SIZE	4
- 
--struct l2cap_cmd_rej {
-+struct l2cap_cmd_rej_unk {
-+	__le16     reason;
-+} __packed;
-+
-+struct l2cap_cmd_rej_mtu {
-+	__le16     reason;
-+	__le16     max_mtu;
-+} __packed;
-+
-+struct l2cap_cmd_rej_cid {
- 	__le16     reason;
-+	__le16     scid;
-+	__le16     dcid;
- } __packed;
- 
- struct l2cap_conn_req {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index bd5d992..951c311 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2284,9 +2284,9 @@ done:
- 
- static inline int l2cap_command_rej(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd, u8 *data)
- {
--	struct l2cap_cmd_rej *rej = (struct l2cap_cmd_rej *) data;
-+	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *) data;
- 
--	if (rej->reason != 0x0000)
-+	if (rej->reason != L2CAP_REJ_NOT_UNDERSTOOD)
- 		return 0;
- 
- 	if ((conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) &&
-@@ -2531,9 +2531,12 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	sk = chan->sk;
- 
- 	if (chan->state != BT_CONFIG) {
--		struct l2cap_cmd_rej rej;
-+		struct l2cap_cmd_rej_cid rej;
-+
-+		rej.reason = cpu_to_le16(L2CAP_REJ_INVALID_CID);
-+		rej.scid = cpu_to_le16(chan->scid);
-+		rej.dcid = cpu_to_le16(chan->dcid);
- 
--		rej.reason = cpu_to_le16(0x0002);
- 		l2cap_send_cmd(conn, cmd->ident, L2CAP_COMMAND_REJ,
- 				sizeof(rej), &rej);
- 		goto unlock;
-@@ -3024,12 +3027,12 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 			err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
- 
- 		if (err) {
--			struct l2cap_cmd_rej rej;
-+			struct l2cap_cmd_rej_unk rej;
- 
- 			BT_ERR("Wrong link type (%d)", err);
- 
- 			/* FIXME: Map err to a valid reason */
--			rej.reason = cpu_to_le16(0);
-+			rej.reason = cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ, sizeof(rej), &rej);
- 		}
- 
--- 
-1.7.1
-
-
+Johan
