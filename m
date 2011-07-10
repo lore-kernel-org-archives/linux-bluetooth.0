@@ -1,14 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+MIME-Version: 1.0
+Date: Sun, 10 Jul 2011 16:10:22 +0200
+Message-ID: <CAAbSJMWHNbSV9r7Cw3+3NHoZMzWth3h1_GWrxDf9ANGA=cLnfQ@mail.gmail.com>
+Subject: Compile failure
+From: Mickael Chazaux <mickael.chazaux@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd v3] Fix finalize request in callback function
-Date: Mon, 11 Jul 2011 00:01:14 +0300
-Message-Id: <1310331675-10665-1-git-send-email-dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is rebased version, no structural changes.
+git://git.kernel.org/pub/scm/bluetooth/bluez.git, branch master,
+commit c34e7956441 fails to build :
 
-Br,
-Dmitriy
+  CC     tools/lexer.o
+cc1: warnings being treated as errors
+tools/lexer.c: In function ‘yy_get_next_buffer’:
+tools/lexer.c:1095: erreur: comparaison entre des expressions entières
+signée et non signée
+tools/lexer.c: In function ‘yy_init_buffer’:
+tools/lexer.c:1415: erreur: implicit declaration of function ‘isatty’
+make[1]: *** [tools/lexer.o] Erreur 1
 
+Regards,
+
+Mickael
