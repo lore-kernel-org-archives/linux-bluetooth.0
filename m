@@ -1,28 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 10 Jul 2011 10:49:58 +0300
+Date: Sun, 10 Jul 2011 10:41:34 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org, radoslawjablonski@gmail.com
-Subject: Re: [PATCH obexd v2] Fix invalid memory read when pulling phone book
-Message-ID: <20110710074958.GA1808@dell.ger.corp.intel.com>
-References: <1310040100-31241-1-git-send-email-dmitriy.paliy@nokia.com>
- <1310040100-31241-2-git-send-email-dmitriy.paliy@nokia.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] avrcp: remove unused dbus reply message
+Message-ID: <20110710074134.GA30472@dell.ger.corp.intel.com>
+References: <1309897486-20006-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310040100-31241-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1309897486-20006-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Lucas,
 
-On Thu, Jul 07, 2011, Dmitriy Paliy wrote:
-> Data contacts are freed ones in finalize function which is called in
-> query_result callback function. Calling free_data_contacts(data) twice
-> for last phone book part causes invalid memory read when dereferencing
-> data->contacts.
+On Tue, Jul 05, 2011, Lucas De Marchi wrote:
+> Fix leak of dbus messages being created but not unreferenced after
+> method returns.
 > ---
->  plugins/phonebook-tracker.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  audio/control.c |   10 ----------
+>  1 files changed, 0 insertions(+), 10 deletions(-)
 
 Applied. Thanks.
 
