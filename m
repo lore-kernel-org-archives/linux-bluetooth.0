@@ -1,31 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Jul 2011 11:37:34 -0300
+Date: Mon, 11 Jul 2011 11:33:52 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Mickael Chazaux <mickael.chazaux@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Compile failure
-Message-ID: <20110711143734.GB2816@joana>
-References: <CAAbSJMWHNbSV9r7Cw3+3NHoZMzWth3h1_GWrxDf9ANGA=cLnfQ@mail.gmail.com>
+To: ilia.kolominsky@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Ilia Kolomisnky <iliak@ti.com>
+Subject: Re: [PATCH Bluetooth-next v3] Fixes l2cap "command reject" reply
+ according to spec.
+Message-ID: <20110711143352.GA2816@joana>
+References: <1310276864-6193-1-git-send-email-iliak@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAAbSJMWHNbSV9r7Cw3+3NHoZMzWth3h1_GWrxDf9ANGA=cLnfQ@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1310276864-6193-1-git-send-email-iliak@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Mickael Chazaux <mickael.chazaux@gmail.com> [2011-07-10 16:10:22 +0200]:
+Hi Ilia,
 
-> git://git.kernel.org/pub/scm/bluetooth/bluez.git, branch master,
-> commit c34e7956441 fails to build :
+* ilia.kolominsky@gmail.com <ilia.kolominsky@gmail.com> [2011-07-10 08:47:44 +0300]:
+
+> From: Ilia Kolomisnky <iliak@ti.com>
 > 
->   CC     tools/lexer.o
-> cc1: warnings being treated as errors
-> tools/lexer.c: In function ‘yy_get_next_buffer’:
-> tools/lexer.c:1095: erreur: comparaison entre des expressions entières
-> signée et non signée
-> tools/lexer.c: In function ‘yy_init_buffer’:
-> tools/lexer.c:1415: erreur: implicit declaration of function ‘isatty’
-> make[1]: *** [tools/lexer.o] Erreur 1
+> There can 3 reasons for the "command reject" reply produced
+> by the stack. Each such reply should be accompanied by the
+> relevand data ( as defined in spec. ). Currently there is one
+> instance of "command reject" reply with reason "invalid cid"
+> wich is fixed. Also, added clean-up definitions related to the
+> "command reject" replies.
+> 
+> Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+> ---
+>  include/net/bluetooth/l2cap.h |   19 ++++++++++++++++++-
+>  net/bluetooth/l2cap_core.c    |   15 +++++++++------
+>  2 files changed, 27 insertions(+), 7 deletions(-)
 
-Are you using gentoo? There is a bug in gentoo flex ebuild that cause this.
+Applied, thanks.
 
 	Gustavo
