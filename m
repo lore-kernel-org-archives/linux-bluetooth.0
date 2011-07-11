@@ -1,118 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ v3] Fix unpair device when disconnected for No Bonding
-Date: Mon, 11 Jul 2011 15:20:06 +0300
-Message-Id: <1310386806-19305-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1310386806-19305-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1310386806-19305-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v3 0/1] Fix unpair device when disconnected for No Bonding
+Date: Mon, 11 Jul 2011 15:20:05 +0300
+Message-Id: <1310386806-19305-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix Paired device property if 'No Bonding' authentication is used. It is
-set to be false when device is disconnected and no link key is stored.
-Otherwise, there can be cases when device is still valid and being
-claimed as paired without available bonding information.
+Hi,
 
-For instanse, use of CreateDevice method call and obex client file
-transfer is such use case.
----
- src/device.c |   19 ++++++++++++++++++-
- src/device.h |    1 +
- src/event.c  |    8 ++++++--
- 3 files changed, 25 insertions(+), 3 deletions(-)
+This version includes the fix regarding comment of Johan. Function
+device_set_bonded is created and invoked when link key is stored to
+file system which covers both pairing as initiator or acceptor cases.
 
-diff --git a/src/device.c b/src/device.c
-index 82759a4..0230203 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -132,6 +132,7 @@ struct btd_device {
- 	gboolean	trusted;
- 	gboolean	paired;
- 	gboolean	blocked;
-+	gboolean	bonded;
- 
- 	gboolean	authorizing;
- 	gint		ref;
-@@ -824,6 +825,9 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn)
- 		device->disconnects = g_slist_remove(device->disconnects, msg);
- 	}
- 
-+	if (device_is_paired(device) && !device->bonded)
-+		device_set_paired(device, FALSE);
-+
- 	emit_property_changed(conn, device->path,
- 					DEVICE_INTERFACE, "Connected",
- 					DBUS_TYPE_BOOLEAN, &device->connected);
-@@ -906,8 +910,10 @@ struct btd_device *device_create(DBusConnection *conn,
- 	if (read_blocked(&src, &device->bdaddr))
- 		device_block(conn, device);
- 
--	if (read_link_key(&src, &device->bdaddr, NULL, NULL) == 0)
-+	if (read_link_key(&src, &device->bdaddr, NULL, NULL) == 0) {
- 		device->paired = TRUE;
-+		device_set_bonded(device, TRUE);
-+	}
- 
- 	return btd_device_ref(device);
- }
-@@ -958,6 +964,7 @@ void device_remove_bonding(struct btd_device *device)
- 
- 	/* Delete the link key from storage */
- 	textfile_casedel(filename, dstaddr);
-+	device_set_bonded(device, FALSE);
- 
- 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr,
- 						"aliases");
-@@ -1792,6 +1799,16 @@ void device_set_temporary(struct btd_device *device, gboolean temporary)
- 	device->temporary = temporary;
- }
- 
-+void device_set_bonded(struct btd_device *device, gboolean bonded)
-+{
-+	if (!device)
-+		return;
-+
-+	DBG("bonded %d", bonded);
-+
-+	device->bonded = bonded;
-+}
-+
- void device_set_type(struct btd_device *device, device_type_t type)
- {
- 	if (!device)
-diff --git a/src/device.h b/src/device.h
-index bd8a431..18b21ae 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -72,6 +72,7 @@ gboolean device_is_trusted(struct btd_device *device);
- void device_set_paired(struct btd_device *device, gboolean paired);
- void device_set_temporary(struct btd_device *device, gboolean temporary);
- void device_set_type(struct btd_device *device, device_type_t type);
-+void device_set_bonded(struct btd_device *device, gboolean bonded);
- gboolean device_is_connected(struct btd_device *device);
- DBusMessage *device_create_bonding(struct btd_device *device,
- 				DBusConnection *conn, DBusMessage *msg,
-diff --git a/src/event.c b/src/event.c
-index 86a413e..d5462f6 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -410,8 +410,12 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
- 
- 	ret = write_link_key(local, peer, key, key_type, pin_length);
- 
--	if (ret == 0 && device_is_temporary(device))
--		device_set_temporary(device, FALSE);
-+	if (ret == 0) {
-+		device_set_bonded(device, TRUE);
-+
-+		if (device_is_temporary(device))
-+			device_set_temporary(device, FALSE);
-+	}
- 
- 	return ret;
- }
--- 
-1.7.4.1
+BR,
+Dmitriy
 
