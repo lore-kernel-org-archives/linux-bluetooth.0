@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 00/16] Full support discovery procedure
-Date: Mon, 11 Jul 2011 18:11:43 -0300
-Message-Id: <1310418719-12296-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20110711125254.GA16751@dell.ger.corp.intel.com>
+References: <1310386806-19305-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1310386806-19305-2-git-send-email-dmitriy.paliy@nokia.com>
+	<20110711125254.GA16751@dell.ger.corp.intel.com>
+Date: Mon, 11 Jul 2011 20:39:34 +0300
+Message-ID: <CAHMBquXkBSqXudGaMBZZF=cGUci+6yT8AuU+NO-c_vp5=8nrkw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3] Fix unpair device when disconnected for No Bonding
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Johan,
 
-The main changes from previous RFC series are:
-    - 'status' parameter added to *_discovery_failed() functions. This
-       way, we provide a more meaningful value to command status events.
-    - Some code refactoring in stop_discovery() race condition prevention.
-    - Minor code refactoring in BR/EDR/LE discovery support.
+On Mon, Jul 11, 2011 at 3:52 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Applied, and I also pushed a cleanup patch on top of it because
+> device_remove_bonding was essentially useless. One thing that I'm
+> thinking of is maybe it'd be better to get rid of the paired and bonded
+> booleans have a single enum for them since they are dependent on each
+> other and one combination of boolean values (!paired && bonded) is not
+> possible. Maybe something like the following inside struct btd_device:
+>
+>        enum {
+>                DEVICE_PAIRING_STATUS_NONE,
+>                DEVICE_PAIRING_STATUS_PAIRED,
+>                DEVICE_PAIRING_STATUS_BONDED,
+>        } pairing_status;
+>
+> Thoughts?
 
-Thanks,
+Sounds wise, I will check solution for hci_ops and mgmt_ops.
 
-Andre Guedes.
-
-Andre Guedes (16):
-  Bluetooth: Periodic Inquiry and mgmt discovering event
-  Bluetooth: Add failed/complete functions to discovery commands
-  Bluetooth: Remove pending discovery commands
-  Bluetooth: Check pending command in start_discovery()
-  Bluetooth: Check pending commands in stop_discovery()
-  Bluetooth: Create do_inquiry()
-  Bluetooth: Create cancel_inquiry()
-  Bluetooth: Fix stop_discovery()
-  Bluetooth: Prepare for full support discovery procedures
-  Bluetooth: Check 'dev_class' in mgmt_device_found()
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: Add 'le_scan_timer' to struct hci_dev
-  Bluetooth: Add LE Scan helper functions
-  Bluetooth: Support LE-Only discovery procedure
-  Bluetooth: Support BR/EDR/LE discovery procedure
-
- include/net/bluetooth/hci.h      |   12 ++
- include/net/bluetooth/hci_core.h |   13 ++-
- net/bluetooth/hci_core.c         |   13 ++
- net/bluetooth/hci_event.c        |  134 +++++++++++++------
- net/bluetooth/mgmt.c             |  282 ++++++++++++++++++++++++++++++++++++--
- 5 files changed, 402 insertions(+), 52 deletions(-)
-
--- 
-1.7.4.1
-
+BR,
+Dmitriy
