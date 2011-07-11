@@ -1,82 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] Fix possible invalid read/free on manager.c
-Date: Mon, 11 Jul 2011 12:10:30 +0300
-Message-Id: <1310375432-18449-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd v2] Escape all text fields in vCard
+Date: Mon, 11 Jul 2011 10:37:39 +0200
+Message-Id: <1310373459-6655-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-==6091== Invalid read of size 4
-==6091==    at 0x178A20: adapter_get_address (string3.h:52)
-==6091==    by 0x174C28: adapter_cmp (manager.c:324)
-==6091==    by 0x4EA95B0: g_slist_find_custom (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x174ED9: manager_find_adapter (manager.c:333)
-==6091==    by 0x16ABFA: sdp_record_remove (sdpd-database.c:270)
-==6091==    by 0x16A4D6: remove_record_from_server (sdpd-service.c:286)
-==6091==    by 0x12A947: avrcp_unregister (control.c:972)
-==6091==    by 0x1208CC: avrcp_server_remove (manager.c:1066)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x178985: adapter_remove (adapter.c:2326)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==  Address 0x603ccd0 is 16 bytes inside a block of size 448 free'd
-==6091==    at 0x4A055FE: free (vg_replace_malloc.c:366)
-==6091==    by 0x4E938F2: g_free (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x11EB59: remove_interface (object.c:563)
-==6091==    by 0x11F380: g_dbus_unregister_interface (object.c:715)
-==6091==    by 0x1787EC: btd_adapter_unref (adapter.c:2496)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x174E96: manager_cleanup (manager.c:301)
-==6091==    by 0x11CCE8: main (main.c:305)
-==6091==
-==6091== Invalid read of size 2
-==6091==    at 0x178A25: adapter_get_address (string3.h:52)
-==6091==    by 0x174C28: adapter_cmp (manager.c:324)
-==6091==    by 0x4EA95B0: g_slist_find_custom (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x174ED9: manager_find_adapter (manager.c:333)
-==6091==    by 0x16ABFA: sdp_record_remove (sdpd-database.c:270)
-==6091==    by 0x16A4D6: remove_record_from_server (sdpd-service.c:286)
-==6091==    by 0x12A947: avrcp_unregister (control.c:972)
-==6091==    by 0x1208CC: avrcp_server_remove (manager.c:1066)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x178985: adapter_remove (adapter.c:2326)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==  Address 0x603ccd4 is 20 bytes inside a block of size 448 free'd
-==6091==    at 0x4A055FE: free (vg_replace_malloc.c:366)
-==6091==    by 0x4E938F2: g_free (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x11EB59: remove_interface (object.c:563)
-==6091==    by 0x11F380: g_dbus_unregister_interface (object.c:715)
-==6091==    by 0x1787EC: btd_adapter_unref (adapter.c:2496)
-==6091==    by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
-==6091==    by 0x174E96: manager_cleanup (manager.c:301)
-==6091==    by 0x11CCE8: main (main.c:305)
+This adds previously missing escaping of some text attributes in vCards.
 ---
- src/manager.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+v2: Fix conflicts coming from 1666935c5ae68bf645ca10b18303378adf77f599
 
-diff --git a/src/manager.c b/src/manager.c
-index a725588..8dde48c 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -298,9 +298,11 @@ static void manager_remove_adapter(struct btd_adapter *adapter)
+ plugins/vcard.c |   82 ++++++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 48 insertions(+), 34 deletions(-)
+
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index 76e760b..5a09e23 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -124,6 +124,31 @@ static void add_slash(char *dest, const char *src, int len_max, int len)
+ 	return;
+ }
  
- void manager_cleanup(DBusConnection *conn, const char *path)
- {
--	g_slist_free_full(adapters, (GDestroyNotify) adapter_remove);
-+	GSList *l = adapters;
- 
- 	adapters = NULL;
-+	g_slist_free_full(l, (GDestroyNotify) adapter_remove);
++static void get_escaped_fields(char **fields, ...)
++{
++	va_list ap;
++	GString *line;
++	char *field;
++	char escaped[LEN_MAX];
 +
- 	btd_start_exit_timer();
++	va_start(ap, fields);
++	line = g_string_new("");
++
++	for (field = va_arg(ap, char *); field; ) {
++		add_slash(escaped, field, LEN_MAX, strlen(field));
++		g_string_append(line, escaped);
++
++		field = va_arg(ap, char *);
++
++		if (field)
++			g_string_append(line, ";");
++	}
++
++	va_end(ap);
++
++	*fields = g_string_free(line, FALSE);
++}
++
+ static void vcard_printf_begin(GString *vcards, uint8_t format)
+ {
+ 	vcard_printf(vcards, "BEGIN:VCARD");
+@@ -177,6 +202,8 @@ gboolean address_fields_present(const char *address)
+ static void vcard_printf_name(GString *vcards,
+ 					struct phonebook_contact *contact)
+ {
++	char *fields;
++
+ 	if (contact_fields_present(contact) == FALSE) {
+ 		/* If fields are empty, add only 'N:' as parameter.
+ 		 * This is crucial for some devices (Nokia BH-903) which
+@@ -189,9 +216,15 @@ static void vcard_printf_name(GString *vcards,
+ 		return;
+ 	}
  
- 	g_dbus_unregister_interface(conn, "/", MANAGER_INTERFACE);
+-	vcard_printf(vcards, "N:%s;%s;%s;%s;%s", contact->family,
++
++	get_escaped_fields(&fields, contact->family,
+ 				contact->given, contact->additional,
+-				contact->prefix, contact->suffix);
++				contact->prefix, contact->suffix,
++				NULL);
++
++	vcard_printf(vcards, "N:%s", fields);
++
++	g_free(fields);
+ }
+ 
+ static void vcard_printf_fullname(GString *vcards, const char *text)
+@@ -256,34 +289,7 @@ static void vcard_printf_number(GString *vcards, uint8_t format,
+ 	vcard_printf(vcards, buf, number);
+ }
+ 
+-static void vcard_printf_tag(GString *vcards, uint8_t format, const char *tag,
+-					const char *category, const char *fld)
+-{
+-	char *separator = "", *type = "";
+-	char buf[LEN_MAX];
+-
+-	if (tag == NULL || strlen(tag) == 0)
+-		return;
+-
+-	if (fld == NULL || strlen(fld) == 0) {
+-		vcard_printf(vcards, "%s:", tag);
+-		return;
+-	}
+-
+-	if (category && strlen(category)) {
+-		separator = ";";
+-		if (format == FORMAT_VCARD30)
+-			type = "TYPE=";
+-	} else {
+-		category = "";
+-	}
+-
+-	snprintf(buf, LEN_MAX, "%s%s%s%s", tag, separator, type, category);
+-
+-	vcard_printf(vcards, "%s:%s", buf, fld);
+-}
+-
+-static void vcard_printf_slash_tag(GString *vcards, uint8_t format,
++static void vcard_printf_tag(GString *vcards, uint8_t format,
+ 					const char *tag, const char *category,
+ 					const char *fld)
+ {
+@@ -354,6 +360,7 @@ static void vcard_printf_url(GString *vcards, uint8_t format,
+ 					enum phonebook_field_type category)
+ {
+ 	const char *category_string = "";
++	char *field[LEN_MAX];
+ 
+ 	if (!url || strlen(url) == 0) {
+ 		vcard_printf(vcards, "URL:");
+@@ -381,7 +388,8 @@ static void vcard_printf_url(GString *vcards, uint8_t format,
+ 		break;
+ 	}
+ 
+-	vcard_printf(vcards,"URL;%s:%s", category_string, url);
++	add_slash(field, url, LEN_MAX, strlen(url));
++	vcard_printf(vcards, "URL;%s:%s", category_string, field);
+ }
+ 
+ static gboolean org_fields_present(struct phonebook_contact *contact)
+@@ -398,11 +406,17 @@ static gboolean org_fields_present(struct phonebook_contact *contact)
+ static void vcard_printf_org(GString *vcards,
+ 					struct phonebook_contact *contact)
+ {
++	char *fields;
++
+ 	if (org_fields_present(contact) == FALSE)
+ 		return;
+ 
+-	vcard_printf(vcards, "ORG:%s;%s", contact->company,
+-				contact->department);
++	get_escaped_fields(&fields, contact->company,
++			contact->department, NULL);
++
++	vcard_printf(vcards, "ORG:%s", fields);
++
++	g_free(fields);
+ }
+ 
+ static void vcard_printf_address(GString *vcards, uint8_t format,
+@@ -553,7 +567,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
+ 						contact->birthday);
+ 
+ 	if (filter & FILTER_NICKNAME && *contact->nickname)
+-		vcard_printf_slash_tag(vcards, format, "NICKNAME", NULL,
++		vcard_printf_tag(vcards, format, "NICKNAME", NULL,
+ 							contact->nickname);
+ 
+ 	if (filter & FILTER_URL) {
 -- 
-1.7.6
+1.7.4.1
 
