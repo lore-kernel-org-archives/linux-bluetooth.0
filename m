@@ -1,82 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1310458074-27360-2-git-send-email-luiz.dentz@gmail.com>
-References: <1310458074-27360-1-git-send-email-luiz.dentz@gmail.com> <1310458074-27360-2-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Tue, 12 Jul 2011 09:01:00 -0300
-Message-ID: <CAMOw1v5HYDPTQXzfLgjpTJKXQraFzWp8=B=iEgkvBNy4DX9pfg@mail.gmail.com>
-Subject: Re: [PATCH hcidump 2/2] Add parsing for AVRCP GetCapabilities
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+	charset="UTF-8"
+Subject: RE: L2CAP connection on insecure link
+Date: Tue, 12 Jul 2011 17:04:42 +0530
+Message-ID: <A3D770027F3D024D8AA74E0D0C63081303A66332@PNE-HJN-MBX02.wipro.com>
+In-Reply-To: <1309450135.2208.52.camel@aeonflux>
+References: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com> <1309450135.2208.52.camel@aeonflux>
+From: <tejaswini.purandare@wipro.com>
+To: <marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 12, 2011 at 5:07 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  parser/avrcp.c |   58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 57 insertions(+), 1 deletions(-)
->
-> diff --git a/parser/avrcp.c b/parser/avrcp.c
-> index 43e8a8b..9529b33 100644
-> --- a/parser/avrcp.c
-> +++ b/parser/avrcp.c
-> @@ -213,6 +213,54 @@ static const char *pdu2str(uint8_t pduid)
->        }
->  }
->
-> +static char *cap2str(uint8_t cap)
-> +{
-> +       switch (cap) {
-> +       case 0x2:
-> +               return "CompanyID";
-> +       case 0x3:
-> +               return "EventsID";
-> +       default:
-> +               return "Unknown";
-> +       }
-> +}
-> +
-> +static void avrcp_get_capabilities_dump(int level, struct frame *frm, uint16_t len)
-> +{
-> +       uint8_t cap;
-> +       uint8_t count;
-> +
-> +       p_indent(level, frm);
-> +
-> +       if (len < 1) {
-> +               printf("PDU Malformed\n");
-> +               raw_dump(level, frm);
-> +               return;
-> +       }
-> +
-> +       cap = get_u8(frm);
-> +       printf("Capability ID: 0x%02x (%s)\n", cap, cap2str(cap));
-> +
-> +       if (len == 1)
-> +               return;
-> +
-> +       p_indent(level, frm);
-> +
-> +       count = get_u8(frm);
-> +       printf("Capability Count: 0x%02x\n", count);
-> +
-> +       for (; count > 0; count--) {
-> +               int i;
-> +
-> +               p_indent(level, frm);
-> +
-> +               printf("%s: 0x", cap2str(cap));
-> +               for (i = 0; i < 3; i++)
-> +                       printf("0x%02x", get_u8(frm));
-
-Whouldn't it be better to print the company id as a whole instead of split it?
-
-Also, if it is a response to EVENTS_SUPPORTED, this field is not
-3-byte long (table 5.5 of AVRCP 1.3).
-
-
-Lucas De Marchi
+SGVsbG8gTWFyY2VsLA0KDQpUaGFua3MgZm9yIHlvdXIgcmVzcG9uc2UuIA0KDQpDYW4geW91
+IHBsZWFzZSBsZXQgbWUga25vdyB0aGUgZXhhY3Qgc2VjdGlvbiBvZiB0aGUgQlQgMi4xIENv
+cmUgc3BlY2lmaWNhdGlvbiB3aGljaCBtZW50aW9ucyAiVGhlIHNwZWNpZmljYXRpb24gaXMg
+cHJldHR5IGRhbW4gY2xlYXIgaGVyZS4gQW55IENvbm5lY3RfUmVxdWVzdCBuZWVkcyB0byBi
+ZSByZWplY3RlZCBpZiB0aGUgdW5kZXJseWluZyBsaW5rIGlzIG5vdCBrbm93biB0byBiZSBz
+ZWN1cmUuIg0KDQpSZWdhcmRzLA0KVGVqYXN3aW5pDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCkZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFu
+bi5vcmddIA0KU2VudDogVGh1cnNkYXksIEp1bmUgMzAsIDIwMTEgOTozOSBQTQ0KVG86IFRl
+amFzd2luaSBQdXJhbmRhcmUgKFdUMDEgLSBQcm9kdWN0IEVuZ2luZWVyaW5nIFNlcnZpY2Vz
+KQ0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBM
+MkNBUCBjb25uZWN0aW9uIG9uIGluc2VjdXJlIGxpbmsNCg0KSGkgVGVqYXN3aW5pLA0KDQo+
+IFdlIGFyZSBmYWNpbmcgYW4gaXNzdWUgYXMgYmVsb3cuIA0KPiANCj4gUHJvYmxlbSBzdGF0
+ZW1lbnQ6DQo+IFRoaXMgaXMgd2l0aCByZWZlcmVuY2UgdG8gdGhlIHBhdGNoIGh0dHA6Ly9r
+ZXJuZWwudWJ1bnR1LmNvbS9naXQ/cD11YnVudHUvbGludXgtMi42Ly5naXQ7YT1jb21taXQ7
+aD1lN2MyOWNiMTZjODMzNDQxZmQyMTYwNjQyYmIxMzAyNWY0ZTdhYzcwIGZvciBoYW5kbGlu
+ZyBMMkNBUCBjb25uZWN0aW9uIHJlcXVlc3RzIG9uIGFuIGluc2VjdXJlIGxpbmsuIEkgYW0g
+cGFzdGluZyBiZWxvdyB0aGUgZGV0YWlscyBvZiB0aGlzIHBhdGNoLg0KPiANCj4gIlRoZSBT
+ZWN1cml0eSBNb2RlIDQgb2YgdGhlIEJsdWV0b290aCAyLjEgc3BlY2lmaWNhdGlvbiBoYXMg
+c3RyaWN0IGF1dGhlbnRpY2F0aW9uIGFuZCBlbmNyeXB0aW9uIHJlcXVpcmVtZW50cy4gSXQg
+aXMgdGhlIGluaXRpYXRvcnMgam9iIHRvIGNyZWF0ZSBhIHNlY3VyZSBBQ0wgbGluay4gSG93
+ZXZlciBpbiBjYXNlIG9mIG1hbGljaW91cyBkZXZpY2VzLCB0aGUgYWNjZXB0b3IgaGFzIHRv
+IG1ha2Ugc3VyZSB0aGF0IHRoZSBBQ0wgaXMgZW5jcnlwdGVkIGJlZm9yZSBhbGxvd2luZyBh
+bnkga2luZCBvZiBMMkNBUCBjb25uZWN0aW9uLiBUaGUgb25seSBleGNlcHRpb24gaGVyZSBp
+cyB0aGUgUFNNIDEgZm9yIHRoZSBzZXJ2aWNlIGRpc2NvdmVyeSBwcm90b2NvbCwgYmVjYXVz
+ZSB0aGF0IGlzIGFsbG93ZWQgdG8gcnVuIG9uIGFuIGluc2VjdXJlIEFDTCBsaW5rLg0KPiBQ
+cmV2aW91c2x5IGl0IHdhcyBlbm91Z2ggdG8gcmVqZWN0IGEgTDJDQVAgY29ubmVjdGlvbiBk
+dXJpbmcgdGhlIGNvbm5lY3Rpb24gc2V0dXAgcGhhc2UsIGJ1dCB3aXRoIEJsdWV0b290aCAy
+LjEgaXQgaXMgZm9yYmlkZGVuIHRvIGRvIGFueSBMMkNBUCBwcm90b2NvbCBleGNoYW5nZSBv
+biBhbiBpbnNlY3VyZSBsaW5rIChleGNlcHQgU0RQKS4NCj4gVGhlIG5ldyBoY2lfY29ubl9j
+aGVja19saW5rX21vZGUoKSBmdW5jdGlvbiBjYW4gYmUgdXNlZCB0byBjaGVjayB0aGUgaW50
+ZWdyaXR5IG9mIGFuIEFDTCBsaW5rLiBUaGlzIGZ1bmN0aW9ucyBhbHNvIHRha2VzIGNhcmUg
+b2YgdGhlIGNhc2VzIHdoZXJlIFNlY3VyaXR5IE1vZGUgNCBpcyBkaXNhYmxlZCBvciBvbmUg
+b2YgdGhlIGRldmljZXMgaXMgYmFzZWQgb24gYW4gb2xkZXIgc3BlY2lmaWNhdGlvbi4iDQo+
+IA0KPiBPbiByZWNlaXB0IG9mIGEgTDJDQVBfQ29ubmVjdF9SZXEgKGZ1bmN0aW9uIGwyY2Fw
+X2Nvbm5lY3RfcmVxKCkpLCB0aGUgZnVuY3Rpb24gaGNpX2Nvbm5fY2hlY2tfbGlua19tb2Rl
+KCkgY2hlY2tzIGlzIGVuY3J5cHRpb24gaXMgZW5hYmxlZCBvbiB0aGUgbGluayB3aGVuIFNT
+UCBpcyBlbmFibGVkLiBJZiBlbmNyeXB0aW9uIGlzIG5vdCB5ZXQgZW5hYmxlZCB0aGVuIHRo
+ZSBmdW5jdGlvbiBsMmNhcF9jb25uZWN0X3JlcSgpIHJldHVybnMgTDJDQVBfQ29ubmVjdF9S
+c3Agd2l0aCBlcnJvciBTZWN1cml0eSBCbG9jay4gDQo+IA0KPiBEdWUgdG8gdGhpcyBwYXRj
+aCwgaWYgdGhlIEhDSSBlbmNyeXB0aW9uIGNoYW5nZSBldmVudCBhcnJpdmVzIGFmdGVyIHRo
+ZSBJbml0aWF0b3Igc2VuZHMgdGhlIEwyQ0FQIENvbm5lY3Rpb24gUmVxdWVzdCwgdGhlbiB0
+aGUgY29ubmVjdGlvbiByZXF1ZXN0IGlzIHJlamVjdGVkIHdpdGggcmVzcG9uc2UgU2VjdXJp
+dHkgQmxvY2suDQo+IA0KPiBRdWVyeTogDQo+IEkgd2FudGVkIHRvIGtub3cgaWYgdGhpcyBj
+YW4gYmUgaGFuZGxlZCBieSBzZW5kaW5nIGFuIEwyQ0FQIENvbm5lY3Rpb24gcmVzcG9uc2Ug
+d2l0aCBDb25uZWN0aW9uIFBlbmRpbmcgYW5kIG9uIHJlY2VpdmluZyB0aGUgRW5jcnlwdGlv
+biBDaGFuZ2UgZXZlbnQgc2VuZCB0aGUgTDJDQVAgQ29ubmVjdGlvbiByZXNwb25zZSB3aXRo
+IHN1Y2Nlc3M7IGVsc2Ugd2l0aCBlcnJvciBTZWN1cml0eSBCbG9jay4gDQoNCm5vIGl0IGNh
+biBub3QuIFRoZSBzcGVjaWZpY2F0aW9uIGlzIHByZXR0eSBkYW1uIGNsZWFyIGhlcmUuIEFu
+eQ0KQ29ubmVjdF9SZXF1ZXN0IG5lZWRzIHRvIGJlIHJlamVjdGVkIGlmIHRoZSB1bmRlcmx5
+aW5nIGxpbmsgaXMgbm90IGtub3cNCnRvIGJlIHNlY3VyZS4NCg0KQW5kIHdpdGggc29tZSBj
+aGlwcyB0aGlzIGlzIGEgcmFjZSBjb25kaXRpb25zIGluIHRoZWlyIExNUCtCQiBhbmQgdGhl
+DQp0cmFuc3BvcnQgbGF5ZXIuIFRoZXkgZW5kIHVwIHNlbmRpbmcgdGhlIEFDTCBwYWNrZXQg
+YmVmb3JlIHRoZSBzZW5kIHRoZQ0KSENJIGV2ZW50IGZvciBzaWduYWxpbmcgdGhhdCB0aGUg
+ZW5jcnlwdGlvbiBpcyBhY3RpdmUuDQoNCklmIHlvdSBkbyBsb29rIGF0IHRoZSBhaXIgdHJh
+ZmZpYyB5b3UgbWlnaHQgc2VlIHRoYXQgdGhlIEFDTCBwYWNrZXQNCmFjdHVhbGx5IHdhcyBl
+bmNyeXB0ZWQsIGJ1dCB0aGF0IGlzIG5vdCB3aGF0IHRoZXkgaGF2ZSBzaWduYWxlZCB0byB0
+aGUNCmhvc3Qgc3RhY2suIFRoZXJlIGlzIG5vdGhpbmcgd2UgY2FuIGRvIGZyb20gb3VyIHNp
+ZGUuIFRoZSBjaGlwcyBuZWVkIHRvDQpiZSBmaXhlZCB0byBkbyB0aGlzIGluIHRoZSByaWdo
+dCBvcmRlci4NCg0KUmVnYXJkcw0KDQpNYXJjZWwNCg0KDQoNClBsZWFzZSBkbyBub3QgcHJp
+bnQgdGhpcyBlbWFpbCB1bmxlc3MgaXQgaXMgYWJzb2x1dGVseSBuZWNlc3NhcnkuIAoKVGhl
+IGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIGVsZWN0cm9uaWMgbWVzc2FnZSBhbmQg
+YW55IGF0dGFjaG1lbnRzIHRvIHRoaXMgbWVzc2FnZSBhcmUgaW50ZW5kZWQgZm9yIHRoZSBl
+eGNsdXNpdmUgdXNlIG9mIHRoZSBhZGRyZXNzZWUocykgYW5kIG1heSBjb250YWluIHByb3By
+aWV0YXJ5LCBjb25maWRlbnRpYWwgb3IgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbi4gSWYgeW91
+IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgeW91IHNob3VsZCBub3QgZGlzc2Vt
+aW5hdGUsIGRpc3RyaWJ1dGUgb3IgY29weSB0aGlzIGUtbWFpbC4gUGxlYXNlIG5vdGlmeSB0
+aGUgc2VuZGVyIGltbWVkaWF0ZWx5IGFuZCBkZXN0cm95IGFsbCBjb3BpZXMgb2YgdGhpcyBt
+ZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMuIAoKV0FSTklORzogQ29tcHV0ZXIgdmlydXNl
+cyBjYW4gYmUgdHJhbnNtaXR0ZWQgdmlhIGVtYWlsLiBUaGUgcmVjaXBpZW50IHNob3VsZCBj
+aGVjayB0aGlzIGVtYWlsIGFuZCBhbnkgYXR0YWNobWVudHMgZm9yIHRoZSBwcmVzZW5jZSBv
+ZiB2aXJ1c2VzLiBUaGUgY29tcGFueSBhY2NlcHRzIG5vIGxpYWJpbGl0eSBmb3IgYW55IGRh
+bWFnZSBjYXVzZWQgYnkgYW55IHZpcnVzIHRyYW5zbWl0dGVkIGJ5IHRoaXMgZW1haWwuIAoK
+d3d3LndpcHJvLmNvbQ0K
