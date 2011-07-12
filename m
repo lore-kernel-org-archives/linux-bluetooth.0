@@ -2,90 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] Set primary services before probing
-Date: Tue, 12 Jul 2011 16:10:09 -0300
-Message-Id: <1310497809-19636-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH] Move attrib server init/exit declaration to hcid.h
+Date: Tue, 12 Jul 2011 16:05:18 -0300
+Message-Id: <1310497518-19526-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix accessing primary services data in the probing function of GATT
-based plugins.
+Avoids GATT/ATT headers dependency in main.c.
 ---
- src/adapter.c |    6 ++++--
- src/device.c  |    9 ++++-----
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ src/attrib-server.h |    3 ---
+ src/hcid.h          |    3 +++
+ src/main.c          |    1 -
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 0909a22..4cc2a68 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1876,11 +1876,12 @@ static void create_stored_device_from_profiles(char *key, char *value,
- 	device_set_temporary(device, FALSE);
- 	adapter->devices = g_slist_append(adapter->devices, device);
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index 83484fc..cde6eff 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -22,9 +22,6 @@
+  *
+  */
  
--	device_probe_drivers(device, uuids);
- 	list = device_services_from_record(device, uuids);
- 	if (list)
- 		device_register_services(connection, device, list, ATT_PSM);
- 
-+	device_probe_drivers(device, uuids);
-+
- 	g_slist_free_full(uuids, g_free);
- }
- 
-@@ -2051,9 +2052,10 @@ static void create_stored_device_from_primary(char *key, char *value,
- 		uuids = g_slist_append(uuids, prim->uuid);
- 	}
- 
--	device_probe_drivers(device, uuids);
- 	device_register_services(connection, device, services, -1);
- 
-+	device_probe_drivers(device, uuids);
-+
- 	g_slist_free(uuids);
- }
- 
-diff --git a/src/device.c b/src/device.c
-index 21b3d8d..4d17082 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1448,12 +1448,12 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	if (req->profiles_added) {
- 		GSList *list;
- 
--		device_probe_drivers(device, req->profiles_added);
+-int attrib_server_init(void);
+-void attrib_server_exit(void);
 -
- 		list = device_services_from_record(device, req->profiles_added);
- 		if (list)
- 			device_register_services(req->conn, device, list,
- 								ATT_PSM);
+ uint16_t attrib_db_find_avail(uint16_t nitems);
+ struct attribute *attrib_db_add(uint16_t handle, bt_uuid_t *uuid, int read_reqs,
+ 				int write_reqs, const uint8_t *value, int len);
+diff --git a/src/hcid.h b/src/hcid.h
+index fcfd45b..ea038e9 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -63,3 +63,6 @@ void plugin_cleanup(void);
+ 
+ void rfkill_init(void);
+ void rfkill_exit(void);
 +
-+		device_probe_drivers(device, req->profiles_added);
- 	}
++int attrib_server_init(void);
++void attrib_server_exit(void);
+diff --git a/src/main.c b/src/main.c
+index e451e72..b161a98 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -49,7 +49,6 @@
  
- 	/* Remove drivers for services removed */
-@@ -1652,9 +1652,8 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
- 		uuids = g_slist_append(uuids, prim->uuid);
- 	}
- 
--	device_probe_drivers(device, uuids);
--
- 	device_register_services(req->conn, device, g_slist_copy(services), -1);
-+	device_probe_drivers(device, uuids);
- 
- 	g_slist_free(uuids);
- 
-@@ -2463,9 +2462,9 @@ void device_set_authorizing(struct btd_device *device, gboolean auth)
- void device_register_services(DBusConnection *conn, struct btd_device *device,
- 						GSList *prim_list, int psm)
- {
-+	device->primaries = g_slist_concat(device->primaries, prim_list);
- 	device->services = attrib_client_register(conn, device, psm, NULL,
- 								prim_list);
--	device->primaries = g_slist_concat(device->primaries, prim_list);
- }
- 
- GSList *btd_device_get_primaries(struct btd_device *device)
+ #include "hcid.h"
+ #include "sdpd.h"
+-#include "attrib-server.h"
+ #include "adapter.h"
+ #include "dbus-common.h"
+ #include "agent.h"
 -- 
 1.7.6
 
