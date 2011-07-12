@@ -1,93 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: "tejaswini.purandare@wipro.com" <tejaswini.purandare@wipro.com>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 12 Jul 2011 10:12:43 -0400
-Subject: RE: L2CAP connection on insecure link
-Message-ID: <1310479963.5670.11.camel@THOR>
-References: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com>
-	 <1309450135.2208.52.camel@aeonflux>
-	 <A3D770027F3D024D8AA74E0D0C63081303A66332@PNE-HJN-MBX02.wipro.com>
-In-Reply-To: <A3D770027F3D024D8AA74E0D0C63081303A66332@PNE-HJN-MBX02.wipro.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CAMOw1v5HYDPTQXzfLgjpTJKXQraFzWp8=B=iEgkvBNy4DX9pfg@mail.gmail.com>
+References: <1310458074-27360-1-git-send-email-luiz.dentz@gmail.com>
+	<1310458074-27360-2-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v5HYDPTQXzfLgjpTJKXQraFzWp8=B=iEgkvBNy4DX9pfg@mail.gmail.com>
+Date: Tue, 12 Jul 2011 15:32:44 +0300
+Message-ID: <CABBYNZ+9A3JtQuT-FxrCaLuu5avVeE58V4gSE_4-EJNU-m7CnQ@mail.gmail.com>
+Subject: Re: [PATCH hcidump 2/2] Add parsing for AVRCP GetCapabilities
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgVGVqYXN3aW5pLA0KDQpPbiBUdWUsIDIwMTEtMDctMTIgYXQgMDc6MzQgLTA0MDAsIHRlamFz
-d2luaS5wdXJhbmRhcmVAd2lwcm8uY29tIHdyb3RlOg0KPiBIZWxsbyBNYXJjZWwsDQo+IA0KPiBU
-aGFua3MgZm9yIHlvdXIgcmVzcG9uc2UuIA0KPiANCj4gQ2FuIHlvdSBwbGVhc2UgbGV0IG1lIGtu
-b3cgdGhlIGV4YWN0IHNlY3Rpb24gb2YgdGhlIEJUIDIuMSBDb3JlIHNwZWNpZmljYXRpb24gd2hp
-Y2ggbWVudGlvbnMgIlRoZSBzcGVjaWZpY2F0aW9uIGlzIHByZXR0eSBkYW1uIGNsZWFyIGhlcmUu
-IEFueSBDb25uZWN0X1JlcXVlc3QgbmVlZHMgdG8gYmUgcmVqZWN0ZWQgaWYgdGhlIHVuZGVybHlp
-bmcgbGluayBpcyBub3Qga25vd24gdG8gYmUgc2VjdXJlLiINCg0KRnJvbSBWb2wgMywgUGFydCBD
-LiBHZW5lcmljIEFjY2VzcyBQcm9maWxlLCBTZWN0aW9uIDUuMi4yLjIuIFNlY3VyaXR5DQpmb3Ig
-QWNjZXNzIHRvIExvY2FsIFNlcnZpY2UgYnkgUmVtb3RlIERldmljZSAoUmVzcG9uZGluZyBTaWRl
-KSwgcGFyYS4gNToNCg0KIklmIHRoZSByZW1vdGUgZGV2aWNlIGhhcyBpbmRpY2F0ZWQgc3VwcG9y
-dCBmb3IgU2VjdXJlIFNpbXBsZSBQYWlyaW5nLCBhDQpjaGFubmVsIGVzdGFibGlzaG1lbnQgcmVx
-dWVzdCBpcyByZWNlaXZlZCBmb3IgYSBzZXJ2aWNlIG90aGVyIHRoYW4gU0RQLA0KYW5kIGVuY3J5
-cHRpb24gaGFzIG5vdCB5ZXQgYmVlbiBlbmFibGVkLCB0aGVuIHRoZSBsb2NhbCBkZXZpY2Ugc2hh
-bGwNCmRpc2Nvbm5lY3QgdGhlIEFDTCBsaW5rIHdpdGggZXJyb3IgY29kZSAweDA1IC0gQXV0aGVu
-dGljYXRpb24gRmFpbHVyZS4iDQoNCg0KUmVnYXJkbGVzcywgdGhlIGlzc3VlIHdpdGggdGhlIExN
-UC9CQiByYWNlIGNhbiBiZSBleGhpYml0ZWQgYXMgdGhlDQpMMkNBUF9Db25uZWN0X1JlcSBiZWlu
-ZyByZWNlaXZlZCBwcmlvciB0byByZWNlaXB0IG9mIHRoZSBDb25uZWN0aW9uDQpDb21wbGV0ZSBF
-dmVudCAoaW4gd2hpY2ggY2FzZSB0aGUgQUNMIGNvbm5lY3Rpb24gaGFuZGxlIGlzIHVua25vd24p
-Lg0KU2hvdWxkIHRoZSBIQ0kgY29yZSBwZW5kIHRoYXQgcmVxdWVzdCB0b28/DQoNClJlZ2FyZHMs
-DQpQZXRlcg0KDQo+IFJlZ2FyZHMsDQo+IFRlamFzd2luaQ0KPiANCj4gDQo+IC0tLS0tT3JpZ2lu
-YWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBo
-b2x0bWFubi5vcmddIA0KPiBTZW50OiBUaHVyc2RheSwgSnVuZSAzMCwgMjAxMSA5OjM5IFBNDQo+
-IFRvOiBUZWphc3dpbmkgUHVyYW5kYXJlIChXVDAxIC0gUHJvZHVjdCBFbmdpbmVlcmluZyBTZXJ2
-aWNlcykNCj4gQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDog
-UmU6IEwyQ0FQIGNvbm5lY3Rpb24gb24gaW5zZWN1cmUgbGluaw0KPiANCj4gSGkgVGVqYXN3aW5p
-LA0KPiANCj4gPiBXZSBhcmUgZmFjaW5nIGFuIGlzc3VlIGFzIGJlbG93LiANCj4gPiANCj4gPiBQ
-cm9ibGVtIHN0YXRlbWVudDoNCj4gPiBUaGlzIGlzIHdpdGggcmVmZXJlbmNlIHRvIHRoZSBwYXRj
-aCBodHRwOi8va2VybmVsLnVidW50dS5jb20vZ2l0P3A9dWJ1bnR1L2xpbnV4LTIuNi8uZ2l0O2E9
-Y29tbWl0O2g9ZTdjMjljYjE2YzgzMzQ0MWZkMjE2MDY0MmJiMTMwMjVmNGU3YWM3MCBmb3IgaGFu
-ZGxpbmcgTDJDQVAgY29ubmVjdGlvbiByZXF1ZXN0cyBvbiBhbiBpbnNlY3VyZSBsaW5rLiBJIGFt
-IHBhc3RpbmcgYmVsb3cgdGhlIGRldGFpbHMgb2YgdGhpcyBwYXRjaC4NCj4gPiANCj4gPiAiVGhl
-IFNlY3VyaXR5IE1vZGUgNCBvZiB0aGUgQmx1ZXRvb3RoIDIuMSBzcGVjaWZpY2F0aW9uIGhhcyBz
-dHJpY3QgYXV0aGVudGljYXRpb24gYW5kIGVuY3J5cHRpb24gcmVxdWlyZW1lbnRzLiBJdCBpcyB0
-aGUgaW5pdGlhdG9ycyBqb2IgdG8gY3JlYXRlIGEgc2VjdXJlIEFDTCBsaW5rLiBIb3dldmVyIGlu
-IGNhc2Ugb2YgbWFsaWNpb3VzIGRldmljZXMsIHRoZSBhY2NlcHRvciBoYXMgdG8gbWFrZSBzdXJl
-IHRoYXQgdGhlIEFDTCBpcyBlbmNyeXB0ZWQgYmVmb3JlIGFsbG93aW5nIGFueSBraW5kIG9mIEwy
-Q0FQIGNvbm5lY3Rpb24uIFRoZSBvbmx5IGV4Y2VwdGlvbiBoZXJlIGlzIHRoZSBQU00gMSBmb3Ig
-dGhlIHNlcnZpY2UgZGlzY292ZXJ5IHByb3RvY29sLCBiZWNhdXNlIHRoYXQgaXMgYWxsb3dlZCB0
-byBydW4gb24gYW4gaW5zZWN1cmUgQUNMIGxpbmsuDQo+ID4gUHJldmlvdXNseSBpdCB3YXMgZW5v
-dWdoIHRvIHJlamVjdCBhIEwyQ0FQIGNvbm5lY3Rpb24gZHVyaW5nIHRoZSBjb25uZWN0aW9uIHNl
-dHVwIHBoYXNlLCBidXQgd2l0aCBCbHVldG9vdGggMi4xIGl0IGlzIGZvcmJpZGRlbiB0byBkbyBh
-bnkgTDJDQVAgcHJvdG9jb2wgZXhjaGFuZ2Ugb24gYW4gaW5zZWN1cmUgbGluayAoZXhjZXB0IFNE
-UCkuDQo+ID4gVGhlIG5ldyBoY2lfY29ubl9jaGVja19saW5rX21vZGUoKSBmdW5jdGlvbiBjYW4g
-YmUgdXNlZCB0byBjaGVjayB0aGUgaW50ZWdyaXR5IG9mIGFuIEFDTCBsaW5rLiBUaGlzIGZ1bmN0
-aW9ucyBhbHNvIHRha2VzIGNhcmUgb2YgdGhlIGNhc2VzIHdoZXJlIFNlY3VyaXR5IE1vZGUgNCBp
-cyBkaXNhYmxlZCBvciBvbmUgb2YgdGhlIGRldmljZXMgaXMgYmFzZWQgb24gYW4gb2xkZXIgc3Bl
-Y2lmaWNhdGlvbi4iDQo+ID4gDQo+ID4gT24gcmVjZWlwdCBvZiBhIEwyQ0FQX0Nvbm5lY3RfUmVx
-IChmdW5jdGlvbiBsMmNhcF9jb25uZWN0X3JlcSgpKSwgdGhlIGZ1bmN0aW9uIGhjaV9jb25uX2No
-ZWNrX2xpbmtfbW9kZSgpIGNoZWNrcyBpcyBlbmNyeXB0aW9uIGlzIGVuYWJsZWQgb24gdGhlIGxp
-bmsgd2hlbiBTU1AgaXMgZW5hYmxlZC4gSWYgZW5jcnlwdGlvbiBpcyBub3QgeWV0IGVuYWJsZWQg
-dGhlbiB0aGUgZnVuY3Rpb24gbDJjYXBfY29ubmVjdF9yZXEoKSByZXR1cm5zIEwyQ0FQX0Nvbm5l
-Y3RfUnNwIHdpdGggZXJyb3IgU2VjdXJpdHkgQmxvY2suIA0KPiA+IA0KPiA+IER1ZSB0byB0aGlz
-IHBhdGNoLCBpZiB0aGUgSENJIGVuY3J5cHRpb24gY2hhbmdlIGV2ZW50IGFycml2ZXMgYWZ0ZXIg
-dGhlIEluaXRpYXRvciBzZW5kcyB0aGUgTDJDQVAgQ29ubmVjdGlvbiBSZXF1ZXN0LCB0aGVuIHRo
-ZSBjb25uZWN0aW9uIHJlcXVlc3QgaXMgcmVqZWN0ZWQgd2l0aCByZXNwb25zZSBTZWN1cml0eSBC
-bG9jay4NCj4gPiANCj4gPiBRdWVyeTogDQo+ID4gSSB3YW50ZWQgdG8ga25vdyBpZiB0aGlzIGNh
-biBiZSBoYW5kbGVkIGJ5IHNlbmRpbmcgYW4gTDJDQVAgQ29ubmVjdGlvbiByZXNwb25zZSB3aXRo
-IENvbm5lY3Rpb24gUGVuZGluZyBhbmQgb24gcmVjZWl2aW5nIHRoZSBFbmNyeXB0aW9uIENoYW5n
-ZSBldmVudCBzZW5kIHRoZSBMMkNBUCBDb25uZWN0aW9uIHJlc3BvbnNlIHdpdGggc3VjY2Vzczsg
-ZWxzZSB3aXRoIGVycm9yIFNlY3VyaXR5IEJsb2NrLiANCj4gDQo+IG5vIGl0IGNhbiBub3QuIFRo
-ZSBzcGVjaWZpY2F0aW9uIGlzIHByZXR0eSBkYW1uIGNsZWFyIGhlcmUuIEFueQ0KPiBDb25uZWN0
-X1JlcXVlc3QgbmVlZHMgdG8gYmUgcmVqZWN0ZWQgaWYgdGhlIHVuZGVybHlpbmcgbGluayBpcyBu
-b3Qga25vdw0KPiB0byBiZSBzZWN1cmUuDQo+IA0KPiBBbmQgd2l0aCBzb21lIGNoaXBzIHRoaXMg
-aXMgYSByYWNlIGNvbmRpdGlvbnMgaW4gdGhlaXIgTE1QK0JCIGFuZCB0aGUNCj4gdHJhbnNwb3J0
-IGxheWVyLiBUaGV5IGVuZCB1cCBzZW5kaW5nIHRoZSBBQ0wgcGFja2V0IGJlZm9yZSB0aGUgc2Vu
-ZCB0aGUNCj4gSENJIGV2ZW50IGZvciBzaWduYWxpbmcgdGhhdCB0aGUgZW5jcnlwdGlvbiBpcyBh
-Y3RpdmUuDQo+IA0KPiBJZiB5b3UgZG8gbG9vayBhdCB0aGUgYWlyIHRyYWZmaWMgeW91IG1pZ2h0
-IHNlZSB0aGF0IHRoZSBBQ0wgcGFja2V0DQo+IGFjdHVhbGx5IHdhcyBlbmNyeXB0ZWQsIGJ1dCB0
-aGF0IGlzIG5vdCB3aGF0IHRoZXkgaGF2ZSBzaWduYWxlZCB0byB0aGUNCj4gaG9zdCBzdGFjay4g
-VGhlcmUgaXMgbm90aGluZyB3ZSBjYW4gZG8gZnJvbSBvdXIgc2lkZS4gVGhlIGNoaXBzIG5lZWQg
-dG8NCj4gYmUgZml4ZWQgdG8gZG8gdGhpcyBpbiB0aGUgcmlnaHQgb3JkZXIuDQo+IA0KPiBSZWdh
-cmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA0KPiAT77+977+97Lm7HO+/vSbvv71+77+9Ju+/vRjv
-v73vv70rLe+/ve+/vd22F++/ve+/vXfvv73vv73Lm++/ve+/ve+/vW3vv71i77+977+9W++/veet
-ou+/vWHvv717YXnvv70dyofame+/vSxqB++/ve+/vWbvv73vv73vv71o77+977+977+9eu+/vR7v
-v71377+977+977+9DO+/ve+/ve+/vWo6K3bvv73vv73vv71377+9au+/vW3vv73vv73vv73vv70H
-77+977+977+977+9elor77+977+977+977+977+93aJqIu+/ve+/vSHvv71pDQoNCg==
+Hi Lucas,
+
+On Tue, Jul 12, 2011 at 3:01 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Tue, Jul 12, 2011 at 5:07 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  parser/avrcp.c |   58 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  1 files changed, 57 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/parser/avrcp.c b/parser/avrcp.c
+>> index 43e8a8b..9529b33 100644
+>> --- a/parser/avrcp.c
+>> +++ b/parser/avrcp.c
+>> @@ -213,6 +213,54 @@ static const char *pdu2str(uint8_t pduid)
+>>        }
+>>  }
+>>
+>> +static char *cap2str(uint8_t cap)
+>> +{
+>> +       switch (cap) {
+>> +       case 0x2:
+>> +               return "CompanyID";
+>> +       case 0x3:
+>> +               return "EventsID";
+>> +       default:
+>> +               return "Unknown";
+>> +       }
+>> +}
+>> +
+>> +static void avrcp_get_capabilities_dump(int level, struct frame *frm, uint16_t len)
+>> +{
+>> +       uint8_t cap;
+>> +       uint8_t count;
+>> +
+>> +       p_indent(level, frm);
+>> +
+>> +       if (len < 1) {
+>> +               printf("PDU Malformed\n");
+>> +               raw_dump(level, frm);
+>> +               return;
+>> +       }
+>> +
+>> +       cap = get_u8(frm);
+>> +       printf("Capability ID: 0x%02x (%s)\n", cap, cap2str(cap));
+>> +
+>> +       if (len == 1)
+>> +               return;
+>> +
+>> +       p_indent(level, frm);
+>> +
+>> +       count = get_u8(frm);
+>> +       printf("Capability Count: 0x%02x\n", count);
+>> +
+>> +       for (; count > 0; count--) {
+>> +               int i;
+>> +
+>> +               p_indent(level, frm);
+>> +
+>> +               printf("%s: 0x", cap2str(cap));
+>> +               for (i = 0; i < 3; i++)
+>> +                       printf("0x%02x", get_u8(frm));
+>
+> Whouldn't it be better to print the company id as a whole instead of split it?
+
+Its a bug, Im actually following the spec examples how to display the
+company ids e.g 0xXXXXXX
+
+> Also, if it is a response to EVENTS_SUPPORTED, this field is not
+> 3-byte long (table 5.5 of AVRCP 1.3).
+
+Yep, I was planning to add it latter but I guess it makes more to
+sense add only complete pdu parsers, btw lets use the latest adopted
+spec (1.4) as reference.
+
+
+
+-- 
+Luiz Augusto von Dentz
