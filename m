@@ -1,136 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Jul 2011 17:15:16 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 08/16] Bluetooth: Fix stop_discovery()
-Message-ID: <20110713201516.GB23921@joana>
-References: <1310418719-12296-1-git-send-email-andre.guedes@openbossa.org>
- <1310418719-12296-9-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310418719-12296-9-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <CABBYNZKQVzUEcZnEkf3QJpsf7iJJfU+KcapywiXBh-5UvRa53Q@mail.gmail.com>
+References: <1310482245-2734-1-git-send-email-luiz.dentz@gmail.com>
+ <CAMOw1v6ue=3u1NfS7ZC+3g9q-XaqLi+8mm0ZW9k0rqJvfQaMLw@mail.gmail.com> <CABBYNZKQVzUEcZnEkf3QJpsf7iJJfU+KcapywiXBh-5UvRa53Q@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Wed, 13 Jul 2011 16:47:50 -0300
+Message-ID: <CAMOw1v7BFNPxy0EKXeULuV70x-w47CVtEWx8BJE4J5pg=keydw@mail.gmail.com>
+Subject: Re: [PATCH hcidump 2/2 v2] Add parsing for AVRCP GetCapabilities
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi, Luiz
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-07-11 18:11:51 -0300]:
+On Wed, Jul 13, 2011 at 4:37 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>>> +                       printf("%s: 0x", cap2str(cap));
+>>> +                       for (i = 0; i < 3; i++)
+>>> +                               printf("%02x", get_u8(frm));
+>>
+>> Humn... I think this is not what you want. Since this information is
+>> always in big endian order, you may need to convert it to host
+>> architecture in order to see meaningful numbers. E.g.: if you do like
+>> you're doing, when receiving a packet with COMPANY_ID == IEEE_BTSIG,
+>> the information printed will be 0x581900 instead of the expected
+>> 0x001958.
+>
+> It works just fine, we are printing byte by byte as it comes e.g. sony mw600:
+>
+>> AVCTP: Command : pt 0x00 transaction 5 pid 0x110e
+>    AV/C: Status: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0001
+>        CapabilityID: 0x02 (CompanyID)
 
-> According to the Bluetooth spec, the inquiry cancel command should
-> only be issued after the inquiry command has been issued, a command
-> status event has been received for the inquiry command, and before
-> the inquiry complete event occurs.
-> 
-> As HCI_INQUIRY flag is only set just after an inquiry command status
-> event occurs and it is cleared just after an inquiry complete event
-> occurs, the inquiry cancel command should be issued only if HCI_INQUIRY
-> flag is set.
-> 
-> This spec constraint raises two possible race condition we must handle.
-> 
-> 1. A MGMT_OP_STOP_DISCOVERY command is issued just after a
->    MGMT_OP_START_DISCOVERY. The controller didn't send the inquiry
->    command status yet therefore the HCI_INQUIRY flag is not set. Thus,
->    stop_discovery() will send no inquiry cancel command and the
->    discovery procedure won't be stopped. This race is addressed by
->    checking for pending MGMT_OP_STOP_DISCOVERY command in inquiry
->    command status event handler.
-> 
-> 2. While the MGMT_OP_STOP_DISCOVERY is being processed the controller
->    sends the inquiry complete event and the HCI_INQUIRY flag is
->    cleared. stop_discovery() will add a pending MGMT_OP_STOP_DISCOVERY
->    command which won't be removed since there is no ongoing discovery.
->    This race is addressed by synchronizing stop_discovery and inquiry
->    complete event handler threads.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    2 ++
->  net/bluetooth/hci_event.c        |   10 ++++++++++
->  net/bluetooth/mgmt.c             |   25 ++++++++++++++++++++++++-
->  3 files changed, 36 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 0ccd724..1ff59f2 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -861,6 +861,8 @@ int mgmt_start_discovery_complete(u16 index);
->  int mgmt_start_discovery_failed(u16 index, u8 status);
->  int mgmt_stop_discovery_complete(u16 index);
->  int mgmt_stop_discovery_failed(u16 index, u8 status);
-> +int mgmt_has_pending_stop_discov(u16 index);
-> +int mgmt_cancel_discovery(u16 index);
->  
->  /* HCI info for socket */
->  #define hci_pi(sk) ((struct hci_pinfo *) sk)
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index ea9e105..c75211c 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -963,6 +963,11 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
->  
->  	set_bit(HCI_INQUIRY, &hdev->flags);
->  
-> +	if (mgmt_has_pending_stop_discov(hdev->id)) {
+Right... After all it comes as big endian, so you indeed shouldn't
+have any issue.
 
-Isn't a new bit flag log HCI_INQUIRY_CANCEL better that this? First this has
-read a list, second it is a really ugly  function name.
+Sorry, for the noise. It looks good now.
 
-> +		mgmt_cancel_discovery(hdev->id);
 
-Just call hci_send_cmd(HCI_OP_INQUIRY_CANCEL)
 
-> +		return;
-> +	}
-> +
->  	mgmt_discovering(hdev->id, 1);
->  }
->  
-> @@ -1356,7 +1361,12 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
->  	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
->  
->  	mgmt_discovering(hdev->id, 0);
-> +
-> +	hci_dev_lock(hdev);
-> +
->  	mgmt_start_discovery_complete(hdev->id);
-> +
-> +	hci_dev_unlock(hdev);
->  }
->  
->  static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index e43940e..bbb0daa 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1670,6 +1670,21 @@ static int cancel_inquiry(struct hci_dev *hdev)
->  	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
->  }
->  
-> +int mgmt_cancel_discovery(u16 index)
-> +{
-> +	struct hci_dev *hdev;
-> +	int res = 0;
-> +
-> +	hdev = hci_dev_get(index);
-> +
-> +	if (test_bit(HCI_INQUIRY, &hdev->flags))
-> +		res = cancel_inquiry(hdev);
-> +
-> +	hci_dev_put(hdev);
-> +
-> +	return res;
-> +}
-> +
->  static int stop_discovery(struct sock *sk, u16 index)
->  {
->  	struct hci_dev *hdev;
-> @@ -1701,7 +1716,7 @@ static int stop_discovery(struct sock *sk, u16 index)
->  		goto failed;
->  	}
-
-You can check here with mgmt_pending_find() if the HCI_OP_INQUIRY_CANCEL was
-already issued or not. This simplifies code a bit.
-
-	Gustavo
+Lucas De Marchi
