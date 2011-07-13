@@ -1,61 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1310580766.21109.96.camel@aeonflux>
-References: <4e1da4a5.04bfec0a.4243.00d9@mx.google.com> <1310580766.21109.96.camel@aeonflux>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Wed, 13 Jul 2011 14:27:25 -0400
-Message-ID: <CALJ2SBL=Fdcmrbrs69pQybXxMq1yh4=Gzmx4Xa32_qnFwDe-YA@mail.gmail.com>
-Subject: Re: [RFC 1/3] Bluetooth: Implement Read RSSI command
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC 2/3] Bluetooth: Implement Read Transmit Power Level command
+From: Marcel Holtmann <marcel@holtmann.org>
+To: anderson.briglia@openbossa.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Bruna Moreira <bruna.moreira@openbossa.org>
+Date: Wed, 13 Jul 2011 20:13:59 +0200
+In-Reply-To: <4e1da4a8.04bfec0a.4243.00da@mx.google.com>
+References: <y> <1310565997-31927-1-git-send-email-y>
+	 <4e1da4a8.04bfec0a.4243.00da@mx.google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1310580840.21109.97.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Anderson,
 
-On Wed, Jul 13, 2011 at 2:12 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andreson,
->
->> This patch implements helper functions to make Read RSSI command
->> interceptable by MGMT Interface. It adds a new wrapper in HCI layer and
->> add a hook to call mgmt_read_rssi_complete when MGMT Interface has been
->> loaded.
->>
->> Read RSSI command is defined on Part E, section 7.5.4 of Bluetooth 4.0
->> Spec.
->
-> I think that I mentioned this before. This is not something I like to
-> see at all. 1:1 copies of HCI commands is pointless.
->
-> If you need RSSI results, then something like proper interval and
-> thresholds should be supported. Also with future Bluetooth SIG work on
-> having controller driven notifications in this area.
+> Add Read Transmit Power Level command in MGMT Interface and all
+> infrastructure need for that.
+> 
+> Read Transmit Power Level command is defined on Part E, section 7.3.35
+> of Bluetooth 4.0 Spec.
 
-Note that even the RSSI and TX Power are implemented, it is not
-possible to userspace request a RSSI or TX Power actively. If
-userspace wants to receive RSSI and TX Power from the kernel, it must
-add to the "monitored commands" and wait for the responses. Read RSSI
-and TX Power Level are not being parsed on mgmt_control().
-Maybe I should change the commit message of this patch and the next one.
+same applies here. If you want this then let the kernel drive and
+automatic poll of these information.
 
-New Management commands were implemented in the last RFC patch to
-monitor selected commands.
+Regards
 
-Regards,
-
-Anderson Briglia
-
->
-> Regards
->
-> Marcel
->
->
->
+Marcel
 
 
-
--- 
-INdT - Instituto Nokia de tecnologia
-+55 2126 1122
-+55 92 8423 3183
