@@ -1,32 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Jul 2011 15:31:42 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: ilia.kolominsky@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Ilia Kolomisnky <iliak@ti.com>
-Subject: Re: [PATCH bluetooth-next] Fixes kernel panic in incomming l2cap
- connections with defer_setup
-Message-ID: <20110713183142.GA23921@joana>
-References: <1310554946-765-1-git-send-email-iliak@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310554946-765-1-git-send-email-iliak@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1310580766.21109.96.camel@aeonflux>
+References: <4e1da4a5.04bfec0a.4243.00d9@mx.google.com> <1310580766.21109.96.camel@aeonflux>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
+Date: Wed, 13 Jul 2011 14:27:25 -0400
+Message-ID: <CALJ2SBL=Fdcmrbrs69pQybXxMq1yh4=Gzmx4Xa32_qnFwDe-YA@mail.gmail.com>
+Subject: Re: [RFC 1/3] Bluetooth: Implement Read RSSI command
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia,
+Hi Marcel,
 
-* ilia.kolominsky@gmail.com <ilia.kolominsky@gmail.com> [2011-07-13 14:02:26 +0300]:
+On Wed, Jul 13, 2011 at 2:12 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andreson,
+>
+>> This patch implements helper functions to make Read RSSI command
+>> interceptable by MGMT Interface. It adds a new wrapper in HCI layer and
+>> add a hook to call mgmt_read_rssi_complete when MGMT Interface has been
+>> loaded.
+>>
+>> Read RSSI command is defined on Part E, section 7.5.4 of Bluetooth 4.0
+>> Spec.
+>
+> I think that I mentioned this before. This is not something I like to
+> see at all. 1:1 copies of HCI commands is pointless.
+>
+> If you need RSSI results, then something like proper interval and
+> thresholds should be supported. Also with future Bluetooth SIG work on
+> having controller driven notifications in this area.
 
-> From: Ilia Kolomisnky <iliak@ti.com>
-> 
-> Another fix considering incomming l2cap connections with
-> defer_setup enabled. In situations when incomming connection is
-> extracted with l2cap_sock_accept, it's bt_sock info will have
-> 'parent' member zerroed, but 'parent' may be used unconditionally
-> in l2cap_conn_start() and l2cap_security_cfm() when defer_setup
-> is enabled.
+Note that even the RSSI and TX Power are implemented, it is not
+possible to userspace request a RSSI or TX Power actively. If
+userspace wants to receive RSSI and TX Power from the kernel, it must
+add to the "monitored commands" and wait for the responses. Read RSSI
+and TX Power Level are not being parsed on mgmt_control().
+Maybe I should change the commit message of this patch and the next one.
 
-I want to see a hcidump and kernel log with dynamic debug enabled first.
-The fix might be somewhere else and not here.
+New Management commands were implemented in the last RFC patch to
+monitor selected commands.
 
-	Gustavo
+Regards,
+
+Anderson Briglia
+
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+
+
+
+-- 
+INdT - Instituto Nokia de tecnologia
++55 2126 1122
++55 92 8423 3183
