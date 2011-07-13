@@ -1,119 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E1D2146.2050508@bluewatersys.com>
+Date: Wed, 13 Jul 2011 16:38:30 +1200
+From: Andre Renaud <andre@bluewatersys.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Subject: RE: L2CAP connection on insecure link
-Date: Wed, 13 Jul 2011 10:57:25 +0530
-Message-ID: <A3D770027F3D024D8AA74E0D0C63081303A66674@PNE-HJN-MBX02.wipro.com>
-In-Reply-To: <1310479963.5670.11.camel@THOR>
-References: <A3D770027F3D024D8AA74E0D0C630813038FAC31@PNE-HJN-MBX02.wipro.com> <1309450135.2208.52.camel@aeonflux> <A3D770027F3D024D8AA74E0D0C63081303A66332@PNE-HJN-MBX02.wipro.com> <1310479963.5670.11.camel@THOR>
-From: <tejaswini.purandare@wipro.com>
-To: <peter@hurleysoftware.com>
-Cc: <marcel@holtmann.org>,
-	<linux-bluetooth@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Headset+Alsa problems (without Pulse Audio)
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8gUGV0ZXIsDQoNClRoYW5rcyBmb3IgdGhlIGluZm9ybWF0aW9uLiBQbGVhc2UgZmlu
-ZCBteSBpbnB1dHMgYmVsb3cuIA0KDQpSZWdhcmRzLA0KVGVqYXN3aW5pDQoNCg0KLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBldGVyIEh1cmxleSBbbWFpbHRvOnBldGVy
-QGh1cmxleXNvZnR3YXJlLmNvbV0gDQpTZW50OiBUdWVzZGF5LCBKdWx5IDEyLCAyMDExIDc6
-NDMgUE0NClRvOiBUZWphc3dpbmkgUHVyYW5kYXJlIChXVDAxIC0gUHJvZHVjdCBFbmdpbmVl
-cmluZyBTZXJ2aWNlcykNCkNjOiBtYXJjZWxAaG9sdG1hbm4ub3JnOyBsaW51eC1ibHVldG9v
-dGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSRTogTDJDQVAgY29ubmVjdGlvbiBvbiBp
-bnNlY3VyZSBsaW5rDQoNCkhpIFRlamFzd2luaSwNCg0KT24gVHVlLCAyMDExLTA3LTEyIGF0
-IDA3OjM0IC0wNDAwLCB0ZWphc3dpbmkucHVyYW5kYXJlQHdpcHJvLmNvbSB3cm90ZToNCj4g
-SGVsbG8gTWFyY2VsLA0KPiANCj4gVGhhbmtzIGZvciB5b3VyIHJlc3BvbnNlLiANCj4gDQo+
-IENhbiB5b3UgcGxlYXNlIGxldCBtZSBrbm93IHRoZSBleGFjdCBzZWN0aW9uIG9mIHRoZSBC
-VCAyLjEgQ29yZSBzcGVjaWZpY2F0aW9uIHdoaWNoIG1lbnRpb25zICJUaGUgc3BlY2lmaWNh
-dGlvbiBpcyBwcmV0dHkgZGFtbiBjbGVhciBoZXJlLiBBbnkgQ29ubmVjdF9SZXF1ZXN0IG5l
-ZWRzIHRvIGJlIHJlamVjdGVkIGlmIHRoZSB1bmRlcmx5aW5nIGxpbmsgaXMgbm90IGtub3du
-IHRvIGJlIHNlY3VyZS4iDQoNCkZyb20gVm9sIDMsIFBhcnQgQy4gR2VuZXJpYyBBY2Nlc3Mg
-UHJvZmlsZSwgU2VjdGlvbiA1LjIuMi4yLiBTZWN1cml0eQ0KZm9yIEFjY2VzcyB0byBMb2Nh
-bCBTZXJ2aWNlIGJ5IFJlbW90ZSBEZXZpY2UgKFJlc3BvbmRpbmcgU2lkZSksIHBhcmEuIDU6
-DQoNCiJJZiB0aGUgcmVtb3RlIGRldmljZSBoYXMgaW5kaWNhdGVkIHN1cHBvcnQgZm9yIFNl
-Y3VyZSBTaW1wbGUgUGFpcmluZywgYQ0KY2hhbm5lbCBlc3RhYmxpc2htZW50IHJlcXVlc3Qg
-aXMgcmVjZWl2ZWQgZm9yIGEgc2VydmljZSBvdGhlciB0aGFuIFNEUCwNCmFuZCBlbmNyeXB0
-aW9uIGhhcyBub3QgeWV0IGJlZW4gZW5hYmxlZCwgdGhlbiB0aGUgbG9jYWwgZGV2aWNlIHNo
-YWxsDQpkaXNjb25uZWN0IHRoZSBBQ0wgbGluayB3aXRoIGVycm9yIGNvZGUgMHgwNSAtIEF1
-dGhlbnRpY2F0aW9uIEZhaWx1cmUuIg0KDQoNClJlZ2FyZGxlc3MsIHRoZSBpc3N1ZSB3aXRo
-IHRoZSBMTVAvQkIgcmFjZSBjYW4gYmUgZXhoaWJpdGVkIGFzIHRoZQ0KTDJDQVBfQ29ubmVj
-dF9SZXEgYmVpbmcgcmVjZWl2ZWQgcHJpb3IgdG8gcmVjZWlwdCBvZiB0aGUgQ29ubmVjdGlv
-bg0KQ29tcGxldGUgRXZlbnQgKGluIHdoaWNoIGNhc2UgdGhlIEFDTCBjb25uZWN0aW9uIGhh
-bmRsZSBpcyB1bmtub3duKS4NClNob3VsZCB0aGUgSENJIGNvcmUgcGVuZCB0aGF0IHJlcXVl
-c3QgdG9vPw0KDQo+PiBBY3R1YWxseSB3ZSBoYXZlIGEgcmFjZSBjb25kaXRpb24gYmV0d2Vl
-biB0aGUgTDJDQVBfQ29ubmVjdF9SZXEgYW5kIHRoZSBFbmNyeXB0aW9uIENoYW5nZSBldmVu
-dCBhbmQgbm90IHRoZSBDb25uZWN0aW9uIENvbXBsZXRlIEV2ZW50LiANCg0KUmVnYXJkcywN
-ClBldGVyDQoNCj4gUmVnYXJkcywNCj4gVGVqYXN3aW5pDQo+IA0KPiANCj4gLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTWFyY2VsIEhvbHRtYW5uIFttYWlsdG86bWFy
-Y2VsQGhvbHRtYW5uLm9yZ10gDQo+IFNlbnQ6IFRodXJzZGF5LCBKdW5lIDMwLCAyMDExIDk6
-MzkgUE0NCj4gVG86IFRlamFzd2luaSBQdXJhbmRhcmUgKFdUMDEgLSBQcm9kdWN0IEVuZ2lu
-ZWVyaW5nIFNlcnZpY2VzKQ0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-Zw0KPiBTdWJqZWN0OiBSZTogTDJDQVAgY29ubmVjdGlvbiBvbiBpbnNlY3VyZSBsaW5rDQo+
-IA0KPiBIaSBUZWphc3dpbmksDQo+IA0KPiA+IFdlIGFyZSBmYWNpbmcgYW4gaXNzdWUgYXMg
-YmVsb3cuIA0KPiA+IA0KPiA+IFByb2JsZW0gc3RhdGVtZW50Og0KPiA+IFRoaXMgaXMgd2l0
-aCByZWZlcmVuY2UgdG8gdGhlIHBhdGNoIGh0dHA6Ly9rZXJuZWwudWJ1bnR1LmNvbS9naXQ/
-cD11YnVudHUvbGludXgtMi42Ly5naXQ7YT1jb21taXQ7aD1lN2MyOWNiMTZjODMzNDQxZmQy
-MTYwNjQyYmIxMzAyNWY0ZTdhYzcwIGZvciBoYW5kbGluZyBMMkNBUCBjb25uZWN0aW9uIHJl
-cXVlc3RzIG9uIGFuIGluc2VjdXJlIGxpbmsuIEkgYW0gcGFzdGluZyBiZWxvdyB0aGUgZGV0
-YWlscyBvZiB0aGlzIHBhdGNoLg0KPiA+IA0KPiA+ICJUaGUgU2VjdXJpdHkgTW9kZSA0IG9m
-IHRoZSBCbHVldG9vdGggMi4xIHNwZWNpZmljYXRpb24gaGFzIHN0cmljdCBhdXRoZW50aWNh
-dGlvbiBhbmQgZW5jcnlwdGlvbiByZXF1aXJlbWVudHMuIEl0IGlzIHRoZSBpbml0aWF0b3Jz
-IGpvYiB0byBjcmVhdGUgYSBzZWN1cmUgQUNMIGxpbmsuIEhvd2V2ZXIgaW4gY2FzZSBvZiBt
-YWxpY2lvdXMgZGV2aWNlcywgdGhlIGFjY2VwdG9yIGhhcyB0byBtYWtlIHN1cmUgdGhhdCB0
-aGUgQUNMIGlzIGVuY3J5cHRlZCBiZWZvcmUgYWxsb3dpbmcgYW55IGtpbmQgb2YgTDJDQVAg
-Y29ubmVjdGlvbi4gVGhlIG9ubHkgZXhjZXB0aW9uIGhlcmUgaXMgdGhlIFBTTSAxIGZvciB0
-aGUgc2VydmljZSBkaXNjb3ZlcnkgcHJvdG9jb2wsIGJlY2F1c2UgdGhhdCBpcyBhbGxvd2Vk
-IHRvIHJ1biBvbiBhbiBpbnNlY3VyZSBBQ0wgbGluay4NCj4gPiBQcmV2aW91c2x5IGl0IHdh
-cyBlbm91Z2ggdG8gcmVqZWN0IGEgTDJDQVAgY29ubmVjdGlvbiBkdXJpbmcgdGhlIGNvbm5l
-Y3Rpb24gc2V0dXAgcGhhc2UsIGJ1dCB3aXRoIEJsdWV0b290aCAyLjEgaXQgaXMgZm9yYmlk
-ZGVuIHRvIGRvIGFueSBMMkNBUCBwcm90b2NvbCBleGNoYW5nZSBvbiBhbiBpbnNlY3VyZSBs
-aW5rIChleGNlcHQgU0RQKS4NCj4gPiBUaGUgbmV3IGhjaV9jb25uX2NoZWNrX2xpbmtfbW9k
-ZSgpIGZ1bmN0aW9uIGNhbiBiZSB1c2VkIHRvIGNoZWNrIHRoZSBpbnRlZ3JpdHkgb2YgYW4g
-QUNMIGxpbmsuIFRoaXMgZnVuY3Rpb25zIGFsc28gdGFrZXMgY2FyZSBvZiB0aGUgY2FzZXMg
-d2hlcmUgU2VjdXJpdHkgTW9kZSA0IGlzIGRpc2FibGVkIG9yIG9uZSBvZiB0aGUgZGV2aWNl
-cyBpcyBiYXNlZCBvbiBhbiBvbGRlciBzcGVjaWZpY2F0aW9uLiINCj4gPiANCj4gPiBPbiBy
-ZWNlaXB0IG9mIGEgTDJDQVBfQ29ubmVjdF9SZXEgKGZ1bmN0aW9uIGwyY2FwX2Nvbm5lY3Rf
-cmVxKCkpLCB0aGUgZnVuY3Rpb24gaGNpX2Nvbm5fY2hlY2tfbGlua19tb2RlKCkgY2hlY2tz
-IGlzIGVuY3J5cHRpb24gaXMgZW5hYmxlZCBvbiB0aGUgbGluayB3aGVuIFNTUCBpcyBlbmFi
-bGVkLiBJZiBlbmNyeXB0aW9uIGlzIG5vdCB5ZXQgZW5hYmxlZCB0aGVuIHRoZSBmdW5jdGlv
-biBsMmNhcF9jb25uZWN0X3JlcSgpIHJldHVybnMgTDJDQVBfQ29ubmVjdF9Sc3Agd2l0aCBl
-cnJvciBTZWN1cml0eSBCbG9jay4gDQo+ID4gDQo+ID4gRHVlIHRvIHRoaXMgcGF0Y2gsIGlm
-IHRoZSBIQ0kgZW5jcnlwdGlvbiBjaGFuZ2UgZXZlbnQgYXJyaXZlcyBhZnRlciB0aGUgSW5p
-dGlhdG9yIHNlbmRzIHRoZSBMMkNBUCBDb25uZWN0aW9uIFJlcXVlc3QsIHRoZW4gdGhlIGNv
-bm5lY3Rpb24gcmVxdWVzdCBpcyByZWplY3RlZCB3aXRoIHJlc3BvbnNlIFNlY3VyaXR5IEJs
-b2NrLg0KPiA+IA0KPiA+IFF1ZXJ5OiANCj4gPiBJIHdhbnRlZCB0byBrbm93IGlmIHRoaXMg
-Y2FuIGJlIGhhbmRsZWQgYnkgc2VuZGluZyBhbiBMMkNBUCBDb25uZWN0aW9uIHJlc3BvbnNl
-IHdpdGggQ29ubmVjdGlvbiBQZW5kaW5nIGFuZCBvbiByZWNlaXZpbmcgdGhlIEVuY3J5cHRp
-b24gQ2hhbmdlIGV2ZW50IHNlbmQgdGhlIEwyQ0FQIENvbm5lY3Rpb24gcmVzcG9uc2Ugd2l0
-aCBzdWNjZXNzOyBlbHNlIHdpdGggZXJyb3IgU2VjdXJpdHkgQmxvY2suIA0KPiANCj4gbm8g
-aXQgY2FuIG5vdC4gVGhlIHNwZWNpZmljYXRpb24gaXMgcHJldHR5IGRhbW4gY2xlYXIgaGVy
-ZS4gQW55DQo+IENvbm5lY3RfUmVxdWVzdCBuZWVkcyB0byBiZSByZWplY3RlZCBpZiB0aGUg
-dW5kZXJseWluZyBsaW5rIGlzIG5vdCBrbm93DQo+IHRvIGJlIHNlY3VyZS4NCj4gDQo+IEFu
-ZCB3aXRoIHNvbWUgY2hpcHMgdGhpcyBpcyBhIHJhY2UgY29uZGl0aW9ucyBpbiB0aGVpciBM
-TVArQkIgYW5kIHRoZQ0KPiB0cmFuc3BvcnQgbGF5ZXIuIFRoZXkgZW5kIHVwIHNlbmRpbmcg
-dGhlIEFDTCBwYWNrZXQgYmVmb3JlIHRoZSBzZW5kIHRoZQ0KPiBIQ0kgZXZlbnQgZm9yIHNp
-Z25hbGluZyB0aGF0IHRoZSBlbmNyeXB0aW9uIGlzIGFjdGl2ZS4NCj4gDQo+IElmIHlvdSBk
-byBsb29rIGF0IHRoZSBhaXIgdHJhZmZpYyB5b3UgbWlnaHQgc2VlIHRoYXQgdGhlIEFDTCBw
-YWNrZXQNCj4gYWN0dWFsbHkgd2FzIGVuY3J5cHRlZCwgYnV0IHRoYXQgaXMgbm90IHdoYXQg
-dGhleSBoYXZlIHNpZ25hbGVkIHRvIHRoZQ0KPiBob3N0IHN0YWNrLiBUaGVyZSBpcyBub3Ro
-aW5nIHdlIGNhbiBkbyBmcm9tIG91ciBzaWRlLiBUaGUgY2hpcHMgbmVlZCB0bw0KPiBiZSBm
-aXhlZCB0byBkbyB0aGlzIGluIHRoZSByaWdodCBvcmRlci4NCj4gDQo+IFJlZ2FyZHMNCj4g
-DQo+IE1hcmNlbA0KPiANCj4gDQo+IBPvv73vv73subsc77+9Ju+/vX7vv70m77+9GO+/ve+/
-vSst77+977+93bYX77+977+9d++/ve+/vcub77+977+977+9be+/vWLvv73vv71b77+9562i
-77+9Ye+/vXthee+/vR3Kh9qZ77+9LGoNCu+/ve+/vWbvv73vv73vv71o77+977+977+9eu+/
-vR7vv71377+977+977+9DQrvv73vv73vv71qOit277+977+977+9d++/vWrvv71t77+977+9
-77+977+9DQrvv73vv73vv73vv716Wivvv73vv73vv73vv73vv73domoi77+977+9Ie+/vWkN
-Cg0KDQpQbGVhc2UgZG8gbm90IHByaW50IHRoaXMgZW1haWwgdW5sZXNzIGl0IGlzIGFic29s
-dXRlbHkgbmVjZXNzYXJ5LiAKClRoZSBpbmZvcm1hdGlvbiBjb250YWluZWQgaW4gdGhpcyBl
-bGVjdHJvbmljIG1lc3NhZ2UgYW5kIGFueSBhdHRhY2htZW50cyB0byB0aGlzIG1lc3NhZ2Ug
-YXJlIGludGVuZGVkIGZvciB0aGUgZXhjbHVzaXZlIHVzZSBvZiB0aGUgYWRkcmVzc2VlKHMp
-IGFuZCBtYXkgY29udGFpbiBwcm9wcmlldGFyeSwgY29uZmlkZW50aWFsIG9yIHByaXZpbGVn
-ZWQgaW5mb3JtYXRpb24uIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQs
-IHlvdSBzaG91bGQgbm90IGRpc3NlbWluYXRlLCBkaXN0cmlidXRlIG9yIGNvcHkgdGhpcyBl
-LW1haWwuIFBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZGVzdHJv
-eSBhbGwgY29waWVzIG9mIHRoaXMgbWVzc2FnZSBhbmQgYW55IGF0dGFjaG1lbnRzLiAKCldB
-Uk5JTkc6IENvbXB1dGVyIHZpcnVzZXMgY2FuIGJlIHRyYW5zbWl0dGVkIHZpYSBlbWFpbC4g
-VGhlIHJlY2lwaWVudCBzaG91bGQgY2hlY2sgdGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1l
-bnRzIGZvciB0aGUgcHJlc2VuY2Ugb2YgdmlydXNlcy4gVGhlIGNvbXBhbnkgYWNjZXB0cyBu
-byBsaWFiaWxpdHkgZm9yIGFueSBkYW1hZ2UgY2F1c2VkIGJ5IGFueSB2aXJ1cyB0cmFuc21p
-dHRlZCBieSB0aGlzIGVtYWlsLiAKCnd3dy53aXByby5jb20NCg==
+Hello,
+I'm trying to get a bluetooth headset working on an embedded Linux 
+environment. I don't have the available resources to drag in all of
+Pulse Audio, so this is being done with essentially just bluez 
+and the alsa-libs.
+
+It all seems to connect & pair properly, but when I go to play audio 
+no sound comes out. There are no complaints, and the 'aplay' command 
+runs for approximately the correct amount of time before exiting 
+cleanly. Using hcidump, I can see that the audio data is being 
+transmitted.
+
+In the process of investigating this, I found that the amixer command 
+was unable to talk to the bluetooth controls. I eventually tracked 
+this down to a bug in audio/ctl_bluetooth.c. Having fixed it,
+I am now able to list the controls, but unable to change their values
+(I have also made it so that it errors out if it goes to change
+an integer, and the change doesn't take, rather than looping forever).
+
+Does anyone know what I might be missing, or where I should start
+looking next?
+
+Regards,
+Andre
+
+--- a/audio/ctl_bluetooth.c	2011-07-13 15:53:11.000000000 +1200
++++ b/audio/ctl_bluetooth.c	2011-07-13 16:27:04.000000000 +1200
+@@ -156,7 +156,7 @@
+ 	req->mode = mode;
+ 	req->key = key;
+ 
+-	ret = send(data->sock, req, BT_SUGGESTED_BUFFER_SIZE, MSG_NOSIGNAL);
++	ret = send(data->sock, req, sizeof(*req), MSG_NOSIGNAL);
+ 	if (ret <= 0) {
+ 		SYSERR("Unable to request new volume value to server");
+ 		return  -errno;
+@@ -225,7 +225,7 @@
+ 	struct bluetooth_data *data = ext->private_data;
+ 	char buf[BT_SUGGESTED_BUFFER_SIZE];
+ 	struct bt_control_rsp *rsp = (void *) buf;
+-	long current;
++	long current, new;
+ 	int ret, keyvalue;
+ 
+ 	DBG("ext %p key %ld", ext, key);
+@@ -245,7 +245,16 @@
+ 		if (ret < 0)
+ 			break;
+ 
+-		current = keyvalue;
++                ret = bluetooth_read_integer(ext, key, &new);
++                if (ret < 0)
++                    return ret;
++
++                if (new == current) {
++                    SNDERR("Unable to move volume %s",
++                            keyvalue == BT_CONTROL_KEY_VOL_UP ? "up" : "down");
++                    return  -EAGAIN;
++                }
++                current = new;
+ 	}
+ 
+ 	return ret;
+
