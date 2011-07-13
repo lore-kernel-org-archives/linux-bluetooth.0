@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Jul 2011 11:53:38 +0300
+Date: Wed, 13 Jul 2011 11:31:17 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
-Subject: Re: [PATCH v2] Add SAP driver for ST-Ericsson U8500 platform
-Message-ID: <20110713085338.GD15147@dell.ger.corp.intel.com>
-References: <CAJdJm_MgPgniRrnExvWoavJTZObDzDUJSUno5z-DoqEaV8+t1w@mail.gmail.com>
- <1309860226-16919-1-git-send-email-szymon.janc@tieto.com>
+To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: Re: [PATCH obexd v2 3/4] Add handling of system D-Bus method calls
+Message-ID: <20110713083117.GC15147@dell.ger.corp.intel.com>
+References: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1309297242-4154-4-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309860226-16919-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1309297242-4154-4-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Dmitriy,
 
-On Tue, Jul 05, 2011, Szymon Janc wrote:
+On Wed, Jun 29, 2011, Dmitriy Paliy wrote:
+> Sending system D-Bus method calls (DefaultAdapter, FindAdapter
+> and RequestSession) and handling of pending D-Bus calls is added
+> to obex-client.
 > ---
->  Makefile.am     |    4 +-
->  sap/sap-u8500.c |  708 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 710 insertions(+), 2 deletions(-)
->  create mode 100644 sap/sap-u8500.c
+>  client/session.c |  196 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  client/session.h |    2 +
+>  2 files changed, 197 insertions(+), 1 deletions(-)
 
-The patch has been applied, thanks. I had to fix whitespace in the
-sim2sap_result table first though.
+I've applied the first two patches but this third one doesn't compile:
+
+client/session.c:189:21: error: no previous declaration for ‘find_session_request’ [-Werror=missing-declarations]
+
+Please fix and resend.
 
 Johan
