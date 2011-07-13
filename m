@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E1E1E59.2000602@bluewatersys.com>
-Date: Thu, 14 Jul 2011 10:38:17 +1200
-From: Andre Renaud <andre@bluewatersys.com>
-MIME-Version: 1.0
+From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Headset+Alsa problems (without Pulse Audio)
-References: <4E1D2146.2050508@bluewatersys.com> <20110713080934.GA14678@dell.ger.corp.intel.com>
-In-Reply-To: <20110713080934.GA14678@dell.ger.corp.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd 5/5] Fix freeing buffer before transfer is complete
+Date: Wed, 13 Jul 2011 22:10:10 +0000
+Message-Id: <1310595010-1033-5-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1310595010-1033-1-git-send-email-bulislaw@linux.com>
+References: <1310595010-1033-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-On 13/07/11 20:09, Johan Hedberg wrote:
-> Regarding the other issues, unfortunately I can't really help you there.
-> I've never really looked into these ALSA user-space plugins in detail.
-> It's not a big surprise though that it doesn't work: it seems like the
-> last time ctl_bluetooth.c got major changes was back in 2007 (i.e.
-> no-one seems to have had much interest in maintaining it since then).
-> 
-> You should also know that unless someone puts effort into adding support
-> for the D-Bus Media API (doc/media-api.txt) then pcm_bluetooth.c and
-> ctl_bluetooth.c will be removed in the BlueZ 5.0 release along with the
-> pure unix socket based interface for audio.
+phonebook_req_finalize is called before actual transport taking place,
+so buffers kept in user_data may cause invalid reads in valgrind and
+prevent transport being completed.
+---
+ plugins/phonebook-ebook.c |   10 ++++++++--
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
-Can you confirm for me then that Pulse Audio is the only real supported
-mechanism for getting Bluetooth headsets to work under Linux? If support
-for the ctl/pcm bluetooth modules is about to be dropped, I'm pretty
-sure we're not going to want to start out with that mechanism.
+diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+index 06ae1ec..4a14eca 100644
+--- a/plugins/phonebook-ebook.c
++++ b/plugins/phonebook-ebook.c
+@@ -208,9 +208,15 @@ done:
+ 	DBG("collected %d vcards", count);
+ 
+ 	data->queued_calls--;
+-	if (data->queued_calls == 0)
+-		data->contacts_cb(data->buf->str, data->buf->len, data->count,
++	if (data->queued_calls == 0) {
++		GString *buf = data->buf;
++		data->buf = NULL;
++
++		data->contacts_cb(buf->str, buf->len, data->count,
+ 						0, TRUE, data->user_data);
++
++		g_string_free(buf, TRUE);
++	}
+ }
+ 
+ static void ebook_entry_cb(EBook *book, const GError *gerr,
+-- 
+1.7.5.3
 
-Regards,
-Andre
