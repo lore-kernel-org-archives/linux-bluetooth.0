@@ -1,351 +1,259 @@
 Return-Path: <cyrus@holtmann.org>
 From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 3/3] Bluetooth: Implement Management command listener
-Date: Wed, 13 Jul 2011 10:06:37 -0400
-Message-Id: <4e1da4a9.04bfec0a.4243.00db@mx.google.com>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC 2/3] Bluetooth: Implement Read Transmit Power Level command
+Date: Wed, 13 Jul 2011 10:06:36 -0400
+Message-Id: <4e1da4a8.04bfec0a.4243.00da@mx.google.com>
 In-Reply-To: <1310565997-31927-1-git-send-email-y>
 References: <y>
  <1310565997-31927-1-git-send-email-y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-This patch implements new Management commands used to make a type of
-monitor for selected HCI commands. It is useful when userspace needs to
-receive updates from the kernel, periodically, without the need to
-actively do requests.
+Add Read Transmit Power Level command in MGMT Interface and all
+infrastructure need for that.
 
-Userspace via management can register an HCI command and start receiving
-updates from the controller. For now, the monitor can listen Read RSSI
-and Read TX Power level commands. But the addition of other commands
-should not be a problem. It was necessary since we have profiles that
-need to monitor some connection aspects, like Proximity.
+Read Transmit Power Level command is defined on Part E, section 7.3.35
+of Bluetooth 4.0 Spec.
 
-For now, the timer is constant and has a value of 2 seconds, but this
-is a RFC and this value or approach can be modified.
-
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
 ---
+ include/net/bluetooth/hci.h      |   10 ++++
  include/net/bluetooth/hci_core.h |    3 +
- include/net/bluetooth/mgmt.h     |   12 ++
- net/bluetooth/hci_core.c         |   12 ++
- net/bluetooth/mgmt.c             |  205 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 232 insertions(+), 0 deletions(-)
+ include/net/bluetooth/mgmt.h     |   10 ++++
+ net/bluetooth/hci_event.c        |   25 +++++++++
+ net/bluetooth/mgmt.c             |  102 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 150 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 870f31f..8266505 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -211,6 +211,8 @@ struct hci_dev {
- 
- 	struct timer_list	le_scan_timer;
- 
-+	struct timer_list	cmd_listener_timer;
-+
- 	struct hci_dev_stats	stat;
- 
- 	struct sk_buff_head	driver_init;
-@@ -873,6 +875,7 @@ int mgmt_has_pending_stop_discov(u16 index);
- int mgmt_cancel_discovery(u16 index);
- int mgmt_is_interleaved_discovery(u16 index);
- int mgmt_do_interleaved_discovery(u16 index);
-+int mgmt_request_monitored_cmds(struct hci_dev *hdev);
- 
- /* HCI info for socket */
- #define hci_pi(sk) ((struct hci_pinfo *) sk)
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 7122aa3..4b9513f 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -231,6 +231,18 @@ struct mgmt_rp_read_tx_power_level {
- 	__s8 level;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 276be6e..7c6016e 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -637,6 +637,16 @@ struct hci_cp_write_voice_setting {
+ 	__le16   voice_setting;
  } __packed;
  
-+#define MGMT_OP_ADD_LISTENER		0x0021
-+struct mgmt_cp_add_listener {
-+	__u16 cmd_op_code;
-+	bdaddr_t bdaddr;
++#define HCI_OP_READ_TX_POWER	0x0c2d
++struct hci_cp_read_tx_power {
++	__le16   handle;
++} __packed;
++struct hci_rp_read_tx_power {
++	__u8     status;
++	__le16   handle;
++	__s8     level;
 +} __packed;
 +
-+#define MGMT_OP_REMOVE_LISTENER		0x0022
-+struct mgmt_cp_remove_listener {
-+	__u16 cmd_op_code;
+ #define HCI_OP_HOST_BUFFER_SIZE		0x0c33
+ struct hci_cp_host_buffer_size {
+ 	__le16   acl_mtu;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2a5b804..870f31f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -858,6 +858,9 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ 								u8 status);
+ int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status);
+ int mgmt_read_rssi_failed(u16 index);
++int mgmt_read_tx_power_complete(u16 index, bdaddr_t *bdaddr, s8 level,
++								u8 status);
++int mgmt_read_tx_power_failed(u16 index);
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 							u8 *eir, u8 eir_len);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index ae0358b..7122aa3 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -221,6 +221,16 @@ struct mgmt_rp_read_rssi {
+ 	__s8 rssi;
+ } __packed;
+ 
++#define MGMT_OP_READ_TX_POWER_LEVEL	0x0020
++struct mgmt_cp_read_tx_power_level {
 +	bdaddr_t bdaddr;
++} __packed;
++struct mgmt_rp_read_tx_power_level {
++	bdaddr_t bdaddr;
++	__u8 status;
++	__s8 level;
 +} __packed;
 +
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	__le16 opcode;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c0c46bf..626922b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1449,6 +1449,14 @@ static void hci_disable_le_scan(unsigned long arg)
- 	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e13a98b..bf13fa3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -818,6 +818,26 @@ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ 		conn->pin_length = cp->pin_len;
  }
  
-+static void hci_cmd_listener(unsigned long arg)
++static void hci_cc_read_tx_power(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct hci_dev *hdev = (void *) arg;
++	struct hci_rp_read_tx_power *rp = (void *) skb->data;
++	struct hci_conn *conn;
 +
-+	if (test_bit(HCI_MGMT, &hdev->flags))
-+		mgmt_request_monitored_cmds(hdev);
++	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++
++	if (!test_bit(HCI_MGMT, &hdev->flags))
++		return;
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
++	if(!conn) {
++		mgmt_read_tx_power_failed(hdev->id);
++		return;
++	}
++
++	mgmt_read_tx_power_complete(hdev->id, &conn->dst, rp->level,
++								rp->status);
 +}
 +
- /* Register HCI device */
- int hci_register_dev(struct hci_dev *hdev)
+ static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
  {
-@@ -1522,6 +1530,9 @@ int hci_register_dev(struct hci_dev *hdev)
- 	setup_timer(&hdev->le_scan_timer, hci_disable_le_scan,
- 						(unsigned long) hdev);
- 
-+	setup_timer(&hdev->cmd_listener_timer, hci_cmd_listener,
-+			(unsigned long) hdev);
+ 	struct hci_rp_pin_code_neg_reply *rp = (void *) skb->data;
+@@ -828,6 +848,7 @@ static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ 		mgmt_pin_code_neg_reply_complete(hdev->id, &rp->bdaddr,
+ 								rp->status);
+ }
 +
- 	INIT_WORK(&hdev->power_on, hci_power_on);
- 	INIT_WORK(&hdev->power_off, hci_power_off);
- 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
-@@ -1604,6 +1615,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 	hci_del_off_timer(hdev);
- 	del_timer(&hdev->adv_timer);
- 	del_timer(&hdev->le_scan_timer);
-+	del_timer(&hdev->cmd_listener_timer);
+ static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
+ 				       struct sk_buff *skb)
+ {
+@@ -2036,6 +2057,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_rssi(hdev, skb);
+ 		break;
  
- 	destroy_workqueue(hdev->workqueue);
- 
++	case HCI_OP_READ_TX_POWER:
++		hci_cc_read_tx_power(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d7bcfc6..532b4c6 100644
+index 18049d0..d7bcfc6 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -55,6 +55,18 @@ struct pending_cmd {
- 
- static LIST_HEAD(cmd_list);
- 
-+#define CMD_MONITOR_TIMEOUT	2000
-+struct monitored_cmd {
-+	struct list_head list;
-+	__u16 opcode;
-+	int index;
-+	bdaddr_t bdaddr;
-+	void *cp;
-+	struct sock *sk;
-+};
-+
-+static LIST_HEAD(monitored_cmd_list);
-+
- static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
- {
- 	struct sk_buff *skb;
-@@ -2043,6 +2055,193 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+@@ -1686,6 +1686,69 @@ unlock:
  	return err;
  }
  
-+static void mgmt_restart_monitor(u16 index)
++static int read_tx_power_level(struct sock *sk, u16 index,
++						unsigned char *data, u16 len)
 +{
 +	struct hci_dev *hdev;
-+
-+	hdev = hci_dev_get(index);
-+	mod_timer(&hdev->cmd_listener_timer, jiffies +
-+			msecs_to_jiffies(CMD_MONITOR_TIMEOUT));
-+	hci_dev_put(hdev);
-+}
-+
-+static int mgmt_monitored_add(struct sock *sk, u16 index,
-+						u16 opcode, bdaddr_t *bdaddr)
-+{
-+	struct monitored_cmd *cmd;
-+	struct mgmt_cp_read_rssi cp_rssi;
-+	struct mgmt_cp_read_tx_power_level cp_tx_power;
-+	int err = 0;
-+
-+	cmd = kzalloc(sizeof(*cmd), GFP_ATOMIC);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+	memset(cmd, 0, sizeof(*cmd));
-+
-+	cmd->opcode = opcode;
-+	cmd->index = index;
-+	bacpy(&cmd->bdaddr, bdaddr);
-+
-+	cmd->sk = sk;
-+	sock_hold(sk);
-+
-+	switch(cmd->opcode) {
-+	case MGMT_OP_READ_RSSI:
-+		bacpy(&cp_rssi.bdaddr, bdaddr);
-+		cmd->cp = kmalloc(sizeof(cp_rssi), GFP_ATOMIC);
-+		if (!cmd->cp) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
-+		memcpy(cmd->cp, &cp_rssi, sizeof(cp_rssi));
-+		break;
-+	case MGMT_OP_READ_TX_POWER_LEVEL:
-+		bacpy(&cp_tx_power.bdaddr, bdaddr);
-+		cmd->cp = kmalloc(sizeof(cp_tx_power), GFP_ATOMIC);
-+		if (!cmd->cp) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
-+		memcpy(cmd->cp, &cp_tx_power, sizeof(cp_tx_power));
-+		break;
-+	default:
-+		BT_DBG("Unknown op %u", opcode);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (!list_empty(&cmd->list))
-+		mgmt_restart_monitor(index);
-+
-+	list_add(&cmd->list, &monitored_cmd_list);
-+
-+out:
-+	if (err) {
-+		sock_put(sk);
-+		kfree(cmd->cp);
-+		kfree(cmd);
-+	}
-+	return err;
-+}
-+
-+static struct monitored_cmd *mgmt_monitored_cmd_find(u16 index,
-+					u16 opcode, bdaddr_t *bdaddr)
-+{
-+	struct monitored_cmd *cmd;
-+
-+	list_for_each_entry(cmd, &monitored_cmd_list, list) {
-+
-+		if (cmd->opcode != opcode)
-+			continue;
-+
-+		if (index >= 0 && cmd->index != index)
-+			continue;
-+
-+		if (bacmp(&cmd->bdaddr, bdaddr) != 0)
-+			continue;
-+
-+		return cmd;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int mgmt_monitored_remove(u16 index, u16 opcode, bdaddr_t *bdaddr)
-+{
-+	struct monitored_cmd *cmd;
-+	struct hci_dev *hdev;
-+
-+	cmd = mgmt_monitored_cmd_find(index, opcode, bdaddr);
-+	if (!cmd)
-+		return -EINVAL;
-+
-+	list_del_init(&cmd->list);
-+	sock_put(cmd->sk);
-+	kfree(cmd->cp);
-+
-+	hdev = hci_dev_get(index);
-+	if (list_empty(&cmd->list) && hdev) {
-+		del_timer(&hdev->cmd_listener_timer);
-+		hci_dev_put(hdev);
-+	}
-+
-+	kfree(cmd);
-+
-+	return 0;
-+}
-+
-+static int add_listener(struct sock *sk, u16 index, unsigned char *data,
-+								u16 len)
-+{
-+	struct mgmt_cp_add_listener *cp;
-+
-+	BT_DBG("hci%u", index);
-+
-+	cp = (void *) data;
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_ADD_LISTENER, EINVAL);
-+
-+	return mgmt_monitored_add(sk, index, cp->cmd_op_code, &cp->bdaddr);
-+}
-+
-+static int remove_listener(struct sock *sk, u16 index, unsigned char *data,
-+								u16 len)
-+{
-+	struct mgmt_cp_remove_listener *cp;
-+	int err = 0;
-+
-+	BT_DBG("hci%u", index);
-+
-+	cp = (void *) data;
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_REMOVE_LISTENER, EINVAL);
-+
-+	err = mgmt_monitored_remove(index, cp->cmd_op_code, &cp->bdaddr);
-+
-+	return err;
-+}
-+
-+int mgmt_request_monitored_cmds(struct hci_dev *hdev)
-+{
-+	struct list_head *p, *n;
++	struct mgmt_cp_read_tx_power_level *cp = (void *) data;
++	struct hci_cp_read_tx_power hci_cp;
++	struct pending_cmd *cmd;
++	struct hci_conn *conn;
 +	int err;
 +
-+	err = 0;
++	BT_DBG("hci%u", index);
 +
-+	list_for_each_safe(p, n, &monitored_cmd_list) {
-+		struct monitored_cmd *cmd;
++	if (len != sizeof(*cp))
++		return cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
++									EINVAL);
 +
-+		cmd = list_entry(p, struct monitored_cmd, list);
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
++									ENODEV);
 +
-+		if (hdev->id >= 0 && cmd->index != hdev->id)
-+			continue;
++	hci_dev_lock_bh(hdev);
 +
-+		switch(cmd->opcode) {
-+		case MGMT_OP_READ_RSSI:
-+			err = read_rssi(cmd->sk, cmd->index, cmd->cp,
-+					sizeof(struct mgmt_cp_read_rssi));
-+			break;
-+		case MGMT_OP_READ_TX_POWER_LEVEL:
-+			err = read_tx_power_level(cmd->sk, cmd->index, cmd->cp,
-+				sizeof(struct mgmt_cp_read_tx_power_level));
-+			break;
-+		default:
-+			BT_DBG("Unknown op %u", cmd->opcode);
-+			err = cmd_status(cmd->sk, cmd->index, cmd->opcode, 0x01);
-+			break;
-+		}
++	if (!test_bit(HCI_UP, &hdev->flags)) {
++		err = cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
++								ENETDOWN);
++		goto unlock;
 +	}
 +
-+	if (!err)
-+		mgmt_restart_monitor(hdev->id);
++	if (mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index)) {
++		err = cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL, EBUSY);
++		goto unlock;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_READ_TX_POWER_LEVEL, index, data,
++									len);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto unlock;
++	}
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
++	if (!conn)
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
++
++	if (!conn) {
++		err = cmd_status(sk, index, MGMT_OP_DISCONNECT, ENOTCONN);
++		goto unlock;
++	}
++
++	put_unaligned_le16(conn->handle, &hci_cp.handle);
++
++	err = hci_send_cmd(hdev, HCI_OP_READ_TX_POWER, sizeof(hci_cp), &hci_cp);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
 +
 +	return err;
 +}
 +
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ int mgmt_read_rssi_failed(u16 index)
  {
- 	unsigned char *buf;
-@@ -2163,6 +2362,12 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 	case MGMT_OP_UNBLOCK_DEVICE:
- 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
- 		break;
-+	case MGMT_OP_ADD_LISTENER:
-+		err = add_listener(sk, index, buf + sizeof(*hdr), len);
-+		break;
-+	case MGMT_OP_REMOVE_LISTENER:
-+		err = remove_listener(sk, index, buf + sizeof(*hdr), len);
-+		break;
- 	default:
- 		BT_DBG("Unknown op %u", opcode);
- 		err = cmd_status(sk, index, opcode, 0x01);
+ 	struct pending_cmd *cmd;
+@@ -2483,6 +2546,45 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ 	return err;
+ }
+ 
++int mgmt_read_tx_power_failed(u16 index)
++{
++	struct pending_cmd *cmd;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index);
++	if (!cmd)
++		return -ENOENT;
++
++	err = cmd_status(cmd->sk, index, MGMT_OP_READ_TX_POWER_LEVEL, EIO);
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
++int mgmt_read_tx_power_complete(u16 index, bdaddr_t *bdaddr, s8 level,
++								u8 status)
++{
++	struct pending_cmd *cmd;
++	struct mgmt_rp_read_tx_power_level rp;
++	int err;
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index);
++	if (!cmd)
++		return -ENOENT;
++
++	bacpy(&rp.bdaddr, bdaddr);
++	rp.status = status;
++	rp.level = level;
++
++	err = cmd_complete(cmd->sk, index, MGMT_OP_READ_TX_POWER_LEVEL, &rp,
++								sizeof(rp));
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 							u8 *eir, u8 eir_len)
+ {
 -- 
 1.7.4.1
 
