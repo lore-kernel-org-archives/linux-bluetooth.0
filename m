@@ -1,38 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mat Martineau <mathewm@codeaurora.org>
+From: ilia.kolominsky@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 0/3] Zero-copy L2CAP ERTM & streaming reassembly
-Date: Wed, 13 Jul 2011 10:58:36 -0700
-Message-Id: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
+Cc: Ilia Kolomisnky <iliak@ti.com>
+Subject: [PATCH bluetooth-next] Fixes kernel panic in incomming l2cap connections with defer_setup
+Date: Wed, 13 Jul 2011 14:02:26 +0300
+Message-Id: <1310554946-765-1-git-send-email-iliak@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch series changes SDU reassembly to link together PDU skbs
-using a frag list instead of copying all data bytes to a single,
-linear skb.  The reduction in overhead is especially helpful with high
-speed AMP links.
+From: Ilia Kolomisnky <iliak@ti.com>
 
+Another fix considering incomming l2cap connections with
+defer_setup enabled. In situations when incomming connection is
+extracted with l2cap_sock_accept, it's bt_sock info will have
+'parent' member zerroed, but 'parent' may be used unconditionally
+in l2cap_conn_start() and l2cap_security_cfm() when defer_setup
+is enabled.
 
-Mat Martineau (3):
-  Bluetooth: Linearize skbs for use in BNEP, CMTP, HIDP, and RFCOMM
-  Bluetooth: Handle fragmented skbs in bt_sock_stream_recvmsg()
-  Bluetooth: Perform L2CAP SDU reassembly without copying data
+Signed-off-by: Ilia Kolomisnky <iliak@ti.com>
+---
+ net/bluetooth/l2cap_core.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
- include/net/bluetooth/l2cap.h |    3 +-
- net/bluetooth/af_bluetooth.c  |   30 +++++-
- net/bluetooth/bnep/core.c     |    5 +-
- net/bluetooth/cmtp/core.c     |    5 +-
- net/bluetooth/hidp/core.c     |   10 ++-
- net/bluetooth/l2cap_core.c    |  239 ++++++++++++++---------------------------
- net/bluetooth/rfcomm/core.c   |    5 +-
- 7 files changed, 128 insertions(+), 169 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f7f8e2c..2ffa09b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -763,7 +763,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 					struct sock *parent = bt_sk(sk)->parent;
+ 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+-					parent->sk_data_ready(parent, 0);
++					if (parent)
++						parent->sk_data_ready(parent, 0);
+ 
+ 				} else {
+ 					l2cap_state_change(chan, BT_CONFIG);
+@@ -4150,7 +4151,8 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 					struct sock *parent = bt_sk(sk)->parent;
+ 					res = L2CAP_CR_PEND;
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+-					parent->sk_data_ready(parent, 0);
++					if (parent)
++						parent->sk_data_ready(parent, 0);
+ 				} else {
+ 					l2cap_state_change(chan, BT_CONFIG);
+ 					res = L2CAP_CR_SUCCESS;
 -- 
-1.7.6
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+1.7.1
 
