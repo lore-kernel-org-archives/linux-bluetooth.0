@@ -1,100 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: anderson.briglia@openbossa.org
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC 2/3] Bluetooth: Implement Read Transmit Power Level command
-Date: Wed, 13 Jul 2011 10:06:36 -0400
-Message-Id: <4e1da4a8.04bfec0a.4243.00da@mx.google.com>
-In-Reply-To: <1310565997-31927-1-git-send-email-y>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [RFC 1/3] Bluetooth: Implement Read RSSI command
+Date: Wed, 13 Jul 2011 10:06:35 -0400
+Message-Id: <4e1da4a5.04bfec0a.4243.00d9@mx.google.com>
+In-Reply-To: <y>
 References: <y>
- <1310565997-31927-1-git-send-email-y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 
-Add Read Transmit Power Level command in MGMT Interface and all
-infrastructure need for that.
+This patch implements helper functions to make Read RSSI command
+interceptable by MGMT Interface. It adds a new wrapper in HCI layer and
+add a hook to call mgmt_read_rssi_complete when MGMT Interface has been
+loaded.
 
-Read Transmit Power Level command is defined on Part E, section 7.3.35
-of Bluetooth 4.0 Spec.
+Read RSSI command is defined on Part E, section 7.5.4 of Bluetooth 4.0
+Spec.
 
-Signed-off-by: Bruna Moreira <bruna.moreira@openbossa.org>
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
  include/net/bluetooth/hci.h      |   10 ++++
- include/net/bluetooth/hci_core.h |    3 +
+ include/net/bluetooth/hci_core.h |    2 +
  include/net/bluetooth/mgmt.h     |   10 ++++
- net/bluetooth/hci_event.c        |   25 +++++++++
- net/bluetooth/mgmt.c             |  102 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 150 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_event.c        |   24 +++++++++
+ net/bluetooth/mgmt.c             |   96 ++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 142 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 276be6e..7c6016e 100644
+index c4fdeeb..276be6e 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -637,6 +637,16 @@ struct hci_cp_write_voice_setting {
- 	__le16   voice_setting;
+@@ -550,6 +550,16 @@ struct hci_cp_set_event_flt {
+ 	__u8     condition[0];
  } __packed;
  
-+#define HCI_OP_READ_TX_POWER	0x0c2d
-+struct hci_cp_read_tx_power {
-+	__le16   handle;
++#define HCI_OP_READ_RSSI		0x1405
++struct hci_cp_read_rssi {
++	__le16	handle;
 +} __packed;
-+struct hci_rp_read_tx_power {
-+	__u8     status;
-+	__le16   handle;
-+	__s8     level;
++struct hci_rp_read_rssi {
++	__u8	status;
++	__le16	handle;
++	__s8	rssi;
 +} __packed;
 +
- #define HCI_OP_HOST_BUFFER_SIZE		0x0c33
- struct hci_cp_host_buffer_size {
- 	__le16   acl_mtu;
+ /* Filter types */
+ #define HCI_FLT_CLEAR_ALL	0x00
+ #define HCI_FLT_INQ_RESULT	0x01
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2a5b804..870f31f 100644
+index 9e5736b..2a5b804 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -858,6 +858,9 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+@@ -856,6 +856,8 @@ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
+ int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
+ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
  								u8 status);
- int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status);
- int mgmt_read_rssi_failed(u16 index);
-+int mgmt_read_tx_power_complete(u16 index, bdaddr_t *bdaddr, s8 level,
-+								u8 status);
-+int mgmt_read_tx_power_failed(u16 index);
++int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status);
++int mgmt_read_rssi_failed(u16 index);
  int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
  							u8 *eir, u8 eir_len);
  int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index ae0358b..7122aa3 100644
+index 5428fd3..ae0358b 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -221,6 +221,16 @@ struct mgmt_rp_read_rssi {
- 	__s8 rssi;
+@@ -211,6 +211,16 @@ struct mgmt_cp_unblock_device {
+ 	bdaddr_t bdaddr;
  } __packed;
  
-+#define MGMT_OP_READ_TX_POWER_LEVEL	0x0020
-+struct mgmt_cp_read_tx_power_level {
++#define MGMT_OP_READ_RSSI		0x001F
++struct mgmt_cp_read_rssi {
 +	bdaddr_t bdaddr;
 +} __packed;
-+struct mgmt_rp_read_tx_power_level {
-+	bdaddr_t bdaddr;
++struct mgmt_rp_read_rssi {
 +	__u8 status;
-+	__s8 level;
++	bdaddr_t bdaddr;
++	__s8 rssi;
 +} __packed;
 +
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	__le16 opcode;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e13a98b..bf13fa3 100644
+index 55872ff..e13a98b 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -818,6 +818,26 @@ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->pin_length = cp->pin_len;
+@@ -982,6 +982,26 @@ static inline void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp), &cp);
  }
  
-+static void hci_cc_read_tx_power(struct hci_dev *hdev, struct sk_buff *skb)
++static void hci_cc_read_rssi(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct hci_rp_read_tx_power *rp = (void *) skb->data;
++	struct hci_rp_read_rssi *rp = (void *) skb->data;
 +	struct hci_conn *conn;
 +
 +	BT_DBG("%s status 0x%x", hdev->name, rp->status);
@@ -103,81 +103,68 @@ index e13a98b..bf13fa3 100644
 +		return;
 +
 +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+	if(!conn) {
-+		mgmt_read_tx_power_failed(hdev->id);
++	if (!conn) {
++		mgmt_read_rssi_failed(hdev->id);
 +		return;
 +	}
 +
-+	mgmt_read_tx_power_complete(hdev->id, &conn->dst, rp->level,
-+								rp->status);
++	mgmt_read_rssi_complete(hdev->id, &conn->dst, rp->rssi,
++							rp->status);
 +}
 +
- static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
  {
- 	struct hci_rp_pin_code_neg_reply *rp = (void *) skb->data;
-@@ -828,6 +848,7 @@ static void hci_cc_pin_code_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
- 		mgmt_pin_code_neg_reply_complete(hdev->id, &rp->bdaddr,
- 								rp->status);
- }
-+
- static void hci_cc_le_read_buffer_size(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -2036,6 +2057,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_rssi(hdev, skb);
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+@@ -2012,6 +2032,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_write_le_host_supported(hdev, skb);
  		break;
  
-+	case HCI_OP_READ_TX_POWER:
-+		hci_cc_read_tx_power(hdev, skb);
++	case HCI_OP_READ_RSSI:
++		hci_cc_read_rssi(hdev, skb);
 +		break;
 +
  	default:
  		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
  		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 18049d0..d7bcfc6 100644
+index f2d9078..18049d0 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1686,6 +1686,69 @@ unlock:
+@@ -1628,6 +1628,102 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
  	return err;
  }
  
-+static int read_tx_power_level(struct sock *sk, u16 index,
-+						unsigned char *data, u16 len)
++static int read_rssi(struct sock *sk, u16 index, unsigned char *data, u16 len)
 +{
 +	struct hci_dev *hdev;
-+	struct mgmt_cp_read_tx_power_level *cp = (void *) data;
-+	struct hci_cp_read_tx_power hci_cp;
-+	struct pending_cmd *cmd;
++	struct mgmt_cp_read_rssi *cp = (void *) data;
++	struct hci_cp_read_rssi rs;
 +	struct hci_conn *conn;
++	struct pending_cmd *cmd;
 +	int err;
 +
 +	BT_DBG("hci%u", index);
 +
 +	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
-+									EINVAL);
++		return cmd_status(sk, index, MGMT_OP_READ_RSSI, EINVAL);
 +
 +	hdev = hci_dev_get(index);
 +	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
-+									ENODEV);
++		return cmd_status(sk, index, MGMT_OP_READ_RSSI, ENODEV);
 +
 +	hci_dev_lock_bh(hdev);
 +
 +	if (!test_bit(HCI_UP, &hdev->flags)) {
-+		err = cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL,
-+								ENETDOWN);
++		err = cmd_status(sk, index, MGMT_OP_READ_RSSI, ENETDOWN);
 +		goto unlock;
 +	}
 +
-+	if (mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index)) {
-+		err = cmd_status(sk, index, MGMT_OP_READ_TX_POWER_LEVEL, EBUSY);
++	if (mgmt_pending_find(MGMT_OP_READ_RSSI, index)) {
++		err = cmd_status(sk, index, MGMT_OP_READ_RSSI, EBUSY);
 +		goto unlock;
 +	}
 +
-+	cmd = mgmt_pending_add(sk, MGMT_OP_READ_TX_POWER_LEVEL, index, data,
-+									len);
++	cmd = mgmt_pending_add(sk, MGMT_OP_READ_RSSI, index, NULL, 0);
 +	if (!cmd) {
 +		err = -ENOMEM;
 +		goto unlock;
@@ -192,9 +179,9 @@ index 18049d0..d7bcfc6 100644
 +		goto unlock;
 +	}
 +
-+	put_unaligned_le16(conn->handle, &hci_cp.handle);
++	put_unaligned_le16(conn->handle, &rs.handle);
 +
-+	err = hci_send_cmd(hdev, HCI_OP_READ_TX_POWER, sizeof(hci_cp), &hci_cp);
++	err = hci_send_cmd(hdev, HCI_OP_READ_RSSI, sizeof(rs), &rs);
 +	if (err < 0)
 +		mgmt_pending_remove(cmd);
 +
@@ -205,45 +192,37 @@ index 18049d0..d7bcfc6 100644
 +	return err;
 +}
 +
- int mgmt_read_rssi_failed(u16 index)
- {
- 	struct pending_cmd *cmd;
-@@ -2483,6 +2546,45 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- 	return err;
- }
- 
-+int mgmt_read_tx_power_failed(u16 index)
++int mgmt_read_rssi_failed(u16 index)
 +{
 +	struct pending_cmd *cmd;
-+	int err;
++	int err = 0;
 +
-+	cmd = mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index);
++	cmd = mgmt_pending_find(MGMT_OP_READ_RSSI, index);
 +	if (!cmd)
 +		return -ENOENT;
 +
-+	err = cmd_status(cmd->sk, index, MGMT_OP_READ_TX_POWER_LEVEL, EIO);
++	err = cmd_status(cmd->sk, index, MGMT_OP_READ_RSSI, EIO);
 +
 +	mgmt_pending_remove(cmd);
 +
 +	return err;
 +}
 +
-+int mgmt_read_tx_power_complete(u16 index, bdaddr_t *bdaddr, s8 level,
-+								u8 status)
++int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status)
 +{
 +	struct pending_cmd *cmd;
-+	struct mgmt_rp_read_tx_power_level rp;
++	struct mgmt_rp_read_rssi rp;
 +	int err;
 +
-+	cmd = mgmt_pending_find(MGMT_OP_READ_TX_POWER_LEVEL, index);
++	cmd = mgmt_pending_find(MGMT_OP_READ_RSSI, index);
 +	if (!cmd)
 +		return -ENOENT;
 +
 +	bacpy(&rp.bdaddr, bdaddr);
 +	rp.status = status;
-+	rp.level = level;
++	rp.rssi = rssi;
 +
-+	err = cmd_complete(cmd->sk, index, MGMT_OP_READ_TX_POWER_LEVEL, &rp,
++	err = cmd_complete(cmd->sk, index, MGMT_OP_READ_RSSI, &rp,
 +								sizeof(rp));
 +
 +	mgmt_pending_remove(cmd);
@@ -251,9 +230,9 @@ index 18049d0..d7bcfc6 100644
 +	return err;
 +}
 +
- int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
- 							u8 *eir, u8 eir_len)
+ static int do_inquiry(struct hci_dev *hdev, __u8 inq_length)
  {
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
 -- 
 1.7.4.1
 
