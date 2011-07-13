@@ -1,142 +1,367 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1310482245-2734-1-git-send-email-luiz.dentz@gmail.com>
-References: <1310482245-2734-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 13 Jul 2011 15:01:32 -0300
-Message-ID: <CAMOw1v6ue=3u1NfS7ZC+3g9q-XaqLi+8mm0ZW9k0rqJvfQaMLw@mail.gmail.com>
-Subject: Re: [PATCH hcidump 2/2 v2] Add parsing for AVRCP GetCapabilities
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 3/3] Bluetooth: Perform L2CAP SDU reassembly without copying data
+Date: Wed, 13 Jul 2011 10:58:39 -0700
+Message-Id: <1310579919-24546-4-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
+References: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 12, 2011 at 11:50 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  parser/avrcp.c |  124 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 123 insertions(+), 1 deletions(-)
->
-> diff --git a/parser/avrcp.c b/parser/avrcp.c
-> index 43e8a8b..ff6862d 100644
-> --- a/parser/avrcp.c
-> +++ b/parser/avrcp.c
-> @@ -111,6 +111,21 @@
->  #define AVRCP_SEARCH                   0x80
->  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
->
-> +/* notification events */
-> +#define AVRCP_EVENT_PLAYBACK_STATUS_CHANGED            0x01
-> +#define AVRCP_EVENT_TRACK_CHANGED                      0x02
-> +#define AVRCP_EVENT_TRACK_REACHED_END                  0x03
-> +#define AVRCP_EVENT_TRACK_REACHED_START                        0x04
-> +#define AVRCP_EVENT_PLAYBACK_POS_CHANGED               0x05
-> +#define AVRCP_EVENT_BATT_STATUS_CHANGED                        0x06
-> +#define AVRCP_EVENT_SYSTEM_STATUS_CHANGED              0x07
-> +#define AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED 0x08
-> +#define AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED                0x09
-> +#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED          0x0a
-> +#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED           0x0b
-> +#define AVRCP_EVENT_UIDS_CHANGED                       0x0c
-> +#define AVRCP_EVENT_VOLUME_CHANGED                     0x0d
-> +
->  static const char *ctype2str(uint8_t ctype)
->  {
->        switch (ctype & 0x0f) {
-> @@ -213,6 +228,105 @@ static const char *pdu2str(uint8_t pduid)
->        }
->  }
->
-> +static char *cap2str(uint8_t cap)
-> +{
-> +       switch (cap) {
-> +       case 0x2:
-> +               return "CompanyID";
-> +       case 0x3:
-> +               return "EventsID";
-> +       default:
-> +               return "Unknown";
-> +       }
-> +}
-> +
-> +static char *event2str(uint8_t event)
-> +{
-> +       switch (event) {
-> +       case AVRCP_EVENT_PLAYBACK_STATUS_CHANGED:
-> +               return "EVENT_PLAYBACK_STATUS_CHANGED";
-> +       case AVRCP_EVENT_TRACK_CHANGED:
-> +               return "EVENT_TRACK_CHANGED";
-> +       case AVRCP_EVENT_TRACK_REACHED_END:
-> +               return "EVENT_TRACK_REACHED_END";
-> +       case AVRCP_EVENT_TRACK_REACHED_START:
-> +               return "EVENT_TRACK_REACHED_START";
-> +       case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-> +               return "EVENT_PLAYBACK_POS_CHANGED";
-> +       case AVRCP_EVENT_BATT_STATUS_CHANGED:
-> +               return "EVENT_BATT_STATUS_CHANGED";
-> +       case AVRCP_EVENT_SYSTEM_STATUS_CHANGED:
-> +               return "EVENT_SYSTEM_STATUS_CHANGED";
-> +       case AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED:
-> +               return "EVENT_PLAYER_APPLICATION_SETTING_CHANGED";
-> +       case AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED:
-> +               return "EVENT_NOW_PLAYING_CONTENT_CHANGED";
-> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-> +               return "EVENT_AVAILABLE_PLAYERS_CHANGED";
-> +       case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
-> +               return "EVENT_ADDRESSED_PLAYER_CHANGED";
-> +       case AVRCP_EVENT_UIDS_CHANGED:
-> +               return "EVENT_UIDS_CHANGED";
-> +       case AVRCP_EVENT_VOLUME_CHANGED:
-> +               return "EVENT_VOLUME_CHANGED";
-> +       default:
-> +               return "Reserved";
-> +       }
-> +}
-> +
-> +static void avrcp_get_capabilities_dump(int level, struct frame *frm, uint16_t len)
-> +{
-> +       uint8_t cap;
-> +       uint8_t count;
-> +
-> +       p_indent(level, frm);
-> +
-> +       if (len < 1) {
-> +               printf("PDU Malformed\n");
-> +               raw_dump(level, frm);
-> +               return;
-> +       }
-> +
-> +       cap = get_u8(frm);
-> +       printf("CapabilityID: 0x%02x (%s)\n", cap, cap2str(cap));
-> +
-> +       if (len == 1)
-> +               return;
-> +
-> +       p_indent(level, frm);
-> +
-> +       count = get_u8(frm);
-> +       printf("CapabilityCount: 0x%02x\n", count);
-> +
-> +       switch (cap) {
-> +       case 0x2:
-> +               for (; count > 0; count--) {
-> +                       int i;
-> +
-> +                       p_indent(level, frm);
-> +
-> +                       printf("%s: 0x", cap2str(cap));
-> +                       for (i = 0; i < 3; i++)
-> +                               printf("%02x", get_u8(frm));
+Use sk_buff fragment capabilities to link together incoming skbs
+instead of allocating a new skb for reassembly and copying.
 
-Humn... I think this is not what you want. Since this information is
-always in big endian order, you may need to convert it to host
-architecture in order to see meaningful numbers. E.g.: if you do like
-you're doing, when receiving a packet with COMPANY_ID == IEEE_BTSIG,
-the information printed will be 0x581900 instead of the expected
-0x001958.
+The new reassembly code works equally well for ERTM and streaming
+mode, so there is now one reassembly function instead of two.
 
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ include/net/bluetooth/l2cap.h |    3 +-
+ net/bluetooth/l2cap_core.c    |  239 ++++++++++++++---------------------------
+ 2 files changed, 80 insertions(+), 162 deletions(-)
 
-Lucas De Marchi
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 4f34ad2..6fa1140 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -354,8 +354,8 @@ struct l2cap_chan {
+ 	__u8		retry_count;
+ 	__u8		num_acked;
+ 	__u16		sdu_len;
+-	__u16		partial_sdu_len;
+ 	struct sk_buff	*sdu;
++	struct sk_buff	*sdu_last_frag;
+ 
+ 	__u8		remote_tx_win;
+ 	__u8		remote_max_tx;
+@@ -454,7 +454,6 @@ enum {
+ #define L2CAP_CONF_MAX_CONF_RSP 2
+ 
+ enum {
+-	CONN_SAR_SDU,
+ 	CONN_SREJ_SENT,
+ 	CONN_WAIT_F,
+ 	CONN_SREJ_ACT,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 52c791e..e82fff1 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3120,102 +3120,104 @@ static int l2cap_add_to_srej_queue(struct l2cap_chan *chan, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
+-static int l2cap_ertm_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u16 control)
++static void append_skb_frag(struct sk_buff *skb,
++			struct sk_buff *new_frag, struct sk_buff **last_frag)
+ {
+-	struct sk_buff *_skb;
+-	int err;
++	/* skb->len reflects data in skb as well as all fragments
++	 * skb->data_len reflects only data in fragments
++	 */
++	if (!skb_has_frag_list(skb))
++		skb_shinfo(skb)->frag_list = new_frag;
++
++	new_frag->next = NULL;
++
++	(*last_frag)->next = new_frag;
++	*last_frag = new_frag;
++
++	skb->len += new_frag->len;
++	skb->data_len += new_frag->len;
++	skb->truesize += new_frag->truesize;
++}
++
++static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u16 control)
++{
++	int err = -EINVAL;
+ 
+ 	switch (control & L2CAP_CTRL_SAR) {
+ 	case L2CAP_SDU_UNSEGMENTED:
+-		if (test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			goto drop;
++		if (chan->sdu)
++			break;
+ 
+-		return chan->ops->recv(chan->data, skb);
++		err = chan->ops->recv(chan->data, skb);
++		break;
+ 
+ 	case L2CAP_SDU_START:
+-		if (test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			goto drop;
++		if (chan->sdu)
++			break;
+ 
+ 		chan->sdu_len = get_unaligned_le16(skb->data);
++		skb_pull(skb, 2);
+ 
+-		if (chan->sdu_len > chan->imtu)
+-			goto disconnect;
+-
+-		chan->sdu = bt_skb_alloc(chan->sdu_len, GFP_ATOMIC);
+-		if (!chan->sdu)
+-			return -ENOMEM;
++		if (chan->sdu_len > chan->imtu) {
++			err = -EMSGSIZE;
++			break;
++		}
+ 
+-		/* pull sdu_len bytes only after alloc, because of Local Busy
+-		 * condition we have to be sure that this will be executed
+-		 * only once, i.e., when alloc does not fail */
+-		skb_pull(skb, 2);
++		if (skb->len >= chan->sdu_len)
++			break;
+ 
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
++		chan->sdu = skb;
++		chan->sdu_last_frag = skb;
+ 
+-		set_bit(CONN_SAR_SDU, &chan->conn_state);
+-		chan->partial_sdu_len = skb->len;
++		skb = NULL;
++		err = 0;
+ 		break;
+ 
+ 	case L2CAP_SDU_CONTINUE:
+-		if (!test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			goto disconnect;
+-
+ 		if (!chan->sdu)
+-			goto disconnect;
++			break;
+ 
+-		chan->partial_sdu_len += skb->len;
+-		if (chan->partial_sdu_len > chan->sdu_len)
+-			goto drop;
++		append_skb_frag(chan->sdu, skb,
++				&chan->sdu_last_frag);
++		skb = NULL;
+ 
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
++		if (chan->sdu->len >= chan->sdu_len)
++			break;
+ 
++		err = 0;
+ 		break;
+ 
+ 	case L2CAP_SDU_END:
+-		if (!test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			goto disconnect;
+-
+ 		if (!chan->sdu)
+-			goto disconnect;
+-
+-		chan->partial_sdu_len += skb->len;
+-
+-		if (chan->partial_sdu_len > chan->imtu)
+-			goto drop;
++			break;
+ 
+-		if (chan->partial_sdu_len != chan->sdu_len)
+-			goto drop;
++		append_skb_frag(chan->sdu, skb,
++				&chan->sdu_last_frag);
++		skb = NULL;
+ 
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
++		if (chan->sdu->len != chan->sdu_len)
++			break;
+ 
+-		_skb = skb_clone(chan->sdu, GFP_ATOMIC);
+-		if (!_skb) {
+-			return -ENOMEM;
+-		}
++		err = chan->ops->recv(chan->data, chan->sdu);
+ 
+-		err = chan->ops->recv(chan->data, _skb);
+-		if (err < 0) {
+-			kfree_skb(_skb);
+-			return err;
++		if (!err) {
++			/* Reassembly complete */
++			chan->sdu = NULL;
++			chan->sdu_last_frag = NULL;
++			chan->sdu_len = 0;
+ 		}
+-
+-		clear_bit(CONN_SAR_SDU, &chan->conn_state);
+-
+-		kfree_skb(chan->sdu);
+ 		break;
+ 	}
+ 
+-	kfree_skb(skb);
+-	return 0;
+-
+-drop:
+-	kfree_skb(chan->sdu);
+-	chan->sdu = NULL;
++	if (err) {
++		kfree_skb(skb);
++		kfree_skb(chan->sdu);
++		chan->sdu = NULL;
++		chan->sdu_last_frag = NULL;
++		chan->sdu_len = 0;
++	}
+ 
+-disconnect:
+-	l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+-	kfree_skb(skb);
+-	return 0;
++	return err;
+ }
+ 
+ static void l2cap_ertm_enter_local_busy(struct l2cap_chan *chan)
+@@ -3269,99 +3271,6 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)
+ 	}
+ }
+ 
+-static int l2cap_streaming_reassembly_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u16 control)
+-{
+-	struct sk_buff *_skb;
+-	int err = -EINVAL;
+-
+-	/*
+-	 * TODO: We have to notify the userland if some data is lost with the
+-	 * Streaming Mode.
+-	 */
+-
+-	switch (control & L2CAP_CTRL_SAR) {
+-	case L2CAP_SDU_UNSEGMENTED:
+-		if (test_bit(CONN_SAR_SDU, &chan->conn_state)) {
+-			kfree_skb(chan->sdu);
+-			break;
+-		}
+-
+-		err = chan->ops->recv(chan->data, skb);
+-		if (!err)
+-			return 0;
+-
+-		break;
+-
+-	case L2CAP_SDU_START:
+-		if (test_bit(CONN_SAR_SDU, &chan->conn_state)) {
+-			kfree_skb(chan->sdu);
+-			break;
+-		}
+-
+-		chan->sdu_len = get_unaligned_le16(skb->data);
+-		skb_pull(skb, 2);
+-
+-		if (chan->sdu_len > chan->imtu) {
+-			err = -EMSGSIZE;
+-			break;
+-		}
+-
+-		chan->sdu = bt_skb_alloc(chan->sdu_len, GFP_ATOMIC);
+-		if (!chan->sdu) {
+-			err = -ENOMEM;
+-			break;
+-		}
+-
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
+-
+-		set_bit(CONN_SAR_SDU, &chan->conn_state);
+-		chan->partial_sdu_len = skb->len;
+-		err = 0;
+-		break;
+-
+-	case L2CAP_SDU_CONTINUE:
+-		if (!test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			break;
+-
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
+-
+-		chan->partial_sdu_len += skb->len;
+-		if (chan->partial_sdu_len > chan->sdu_len)
+-			kfree_skb(chan->sdu);
+-		else
+-			err = 0;
+-
+-		break;
+-
+-	case L2CAP_SDU_END:
+-		if (!test_bit(CONN_SAR_SDU, &chan->conn_state))
+-			break;
+-
+-		memcpy(skb_put(chan->sdu, skb->len), skb->data, skb->len);
+-
+-		clear_bit(CONN_SAR_SDU, &chan->conn_state);
+-		chan->partial_sdu_len += skb->len;
+-
+-		if (chan->partial_sdu_len > chan->imtu)
+-			goto drop;
+-
+-		if (chan->partial_sdu_len == chan->sdu_len) {
+-			_skb = skb_clone(chan->sdu, GFP_ATOMIC);
+-			err = chan->ops->recv(chan->data, _skb);
+-			if (err < 0)
+-				kfree_skb(_skb);
+-		}
+-		err = 0;
+-
+-drop:
+-		kfree_skb(chan->sdu);
+-		break;
+-	}
+-
+-	kfree_skb(skb);
+-	return err;
+-}
+-
+ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u8 tx_seq)
+ {
+ 	struct sk_buff *skb;
+@@ -3376,7 +3285,7 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u8 tx_seq)
+ 
+ 		skb = skb_dequeue(&chan->srej_q);
+ 		control = bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
+-		err = l2cap_ertm_reassembly_sdu(chan, skb, control);
++		err = l2cap_reassemble_sdu(chan, skb, control);
+ 
+ 		if (err < 0) {
+ 			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+@@ -3536,7 +3445,7 @@ expected:
+ 		return 0;
+ 	}
+ 
+-	err = l2cap_ertm_reassembly_sdu(chan, skb, rx_control);
++	err = l2cap_reassemble_sdu(chan, skb, rx_control);
+ 	chan->buffer_seq = (chan->buffer_seq + 1) % 64;
+ 	if (err < 0) {
+ 		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+@@ -3854,10 +3763,20 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 
+ 		if (chan->expected_tx_seq == tx_seq)
+ 			chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
+-		else
++		else {
+ 			chan->expected_tx_seq = (tx_seq + 1) % 64;
+ 
+-		l2cap_streaming_reassembly_sdu(chan, skb, control);
++			/* Frame(s) missing - must discard partial SDU */
++			kfree_skb(chan->sdu);
++			chan->sdu = NULL;
++			chan->sdu_last_frag = NULL;
++			chan->sdu_len = 0;
++
++			/* TODO: Notify userland of missing data */
++		}
++
++		if (l2cap_reassemble_sdu(chan, skb, control) == -EMSGSIZE)
++			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+ 
+ 		goto done;
+ 
+-- 
+1.7.6
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+
