@@ -1,238 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
-From: anderson.briglia@openbossa.org
+From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 1/3] Bluetooth: Implement Read RSSI command
-Date: Wed, 13 Jul 2011 10:06:35 -0400
-Message-Id: <4e1da4a5.04bfec0a.4243.00d9@mx.google.com>
-In-Reply-To: <y>
-References: <y>
+Cc: johan.hedberg@gmail.com, padovan@profusion.mobi,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH v2 3/3] Add support for wiimote pairing
+Date: Wed, 13 Jul 2011 15:40:15 +0200
+Message-Id: <1310564415-26093-3-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1310564415-26093-1-git-send-email-dh.herrmann@googlemail.com>
+References: <1310564415-26093-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-
-This patch implements helper functions to make Read RSSI command
-interceptable by MGMT Interface. It adds a new wrapper in HCI layer and
-add a hook to call mgmt_read_rssi_complete when MGMT Interface has been
-loaded.
-
-Read RSSI command is defined on Part E, section 7.5.4 of Bluetooth 4.0
-Spec.
-
-Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+The Nintendo Wii Remote requires binary bluetooth addresses as PINs.
+This is not possible via dbus agent API. So this adds a plugin that
+registers a pin-callback and forces the right pin for every
+authentication request of wiimotes.
 ---
- include/net/bluetooth/hci.h      |   10 ++++
- include/net/bluetooth/hci_core.h |    2 +
- include/net/bluetooth/mgmt.h     |   10 ++++
- net/bluetooth/hci_event.c        |   24 +++++++++
- net/bluetooth/mgmt.c             |   96 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 142 insertions(+), 0 deletions(-)
+V2: Rename *pincb* to *pin_cb*
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c4fdeeb..276be6e 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -550,6 +550,16 @@ struct hci_cp_set_event_flt {
- 	__u8     condition[0];
- } __packed;
+ Makefile.am       |    5 ++
+ acinclude.m4      |    6 +++
+ plugins/wiimote.c |  111 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 122 insertions(+), 0 deletions(-)
+ create mode 100644 plugins/wiimote.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 5f54b5b..6a9c76f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -227,6 +227,11 @@ builtin_sources += plugins/storage.c
+ builtin_modules += adaptername
+ builtin_sources += plugins/adaptername.c
  
-+#define HCI_OP_READ_RSSI		0x1405
-+struct hci_cp_read_rssi {
-+	__le16	handle;
-+} __packed;
-+struct hci_rp_read_rssi {
-+	__u8	status;
-+	__le16	handle;
-+	__s8	rssi;
-+} __packed;
++if WIIMOTEPLUGIN
++builtin_modules += wiimote
++builtin_sources += plugins/wiimote.c
++endif
 +
- /* Filter types */
- #define HCI_FLT_CLEAR_ALL	0x00
- #define HCI_FLT_INQ_RESULT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9e5736b..2a5b804 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -856,6 +856,8 @@ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
- int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- 								u8 status);
-+int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status);
-+int mgmt_read_rssi_failed(u16 index);
- int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
- 							u8 *eir, u8 eir_len);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 5428fd3..ae0358b 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -211,6 +211,16 @@ struct mgmt_cp_unblock_device {
- 	bdaddr_t bdaddr;
- } __packed;
+ if MAEMO6PLUGIN
+ builtin_modules += maemo6
+ builtin_sources += plugins/maemo6.c
+diff --git a/acinclude.m4 b/acinclude.m4
+index af97cce..4073f59 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -213,6 +213,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	maemo6_enable=no
+ 	sap_driver=dummy
+ 	dbusoob_enable=no
++	wiimote_enable=no
  
-+#define MGMT_OP_READ_RSSI		0x001F
-+struct mgmt_cp_read_rssi {
-+	bdaddr_t bdaddr;
-+} __packed;
-+struct mgmt_rp_read_rssi {
-+	__u8 status;
-+	bdaddr_t bdaddr;
-+	__s8 rssi;
-+} __packed;
+ 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+ 		optimization_enable=${enableval}
+@@ -345,6 +346,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		dbusoob_enable=${enableval}
+ 	])
+ 
++	AC_ARG_ENABLE(wiimote, AC_HELP_STRING([--enable-wiimote], [compile with Wii Remote plugin]), [
++		wiimote_enable=${enableval}
++	])
 +
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16 opcode;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 55872ff..e13a98b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -982,6 +982,26 @@ static inline void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp), &cp);
- }
- 
-+static void hci_cc_read_rssi(struct hci_dev *hdev, struct sk_buff *skb)
+ 	AC_ARG_ENABLE(hal, AC_HELP_STRING([--enable-hal], [Use HAL to determine adapter class]), [
+ 		hal_enable=${enableval}
+ 	])
+@@ -403,4 +408,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(DATAFILES, test "${datafiles_enable}" = "yes")
+ 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
+ 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
++	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
+ ])
+diff --git a/plugins/wiimote.c b/plugins/wiimote.c
+new file mode 100644
+index 0000000..e60231b
+--- /dev/null
++++ b/plugins/wiimote.c
+@@ -0,0 +1,111 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011  David Herrmann <dh.herrmann@googlemail.com>
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <bluetooth/bluetooth.h>
++
++#include "plugin.h"
++#include "adapter.h"
++#include "device.h"
++#include "log.h"
++#include "storage.h"
++
++/*
++ * Nintendo Wii Remote devices require the bdaddr of the host as pin input for
++ * authentication. This plugin registers a pin-callback and forces this pin
++ * to be used for authentication.
++ *
++ * There are two ways to place the wiimote into discoverable mode.
++ *  - Pressing the red-sync button on the back of the wiimote. This module
++ *    supports pairing via this method. Auto-reconnect should be possible after
++ *    the device was paired once.
++ *  - Pressing the 1+2 buttons on the front of the wiimote. This module does
++ *    not support this method since this method never enables auto-reconnect.
++ *    Hence, pairing is not needed. Use it without pairing if you want.
++ * After connecting the wiimote you should immediately connect to the input
++ * service of the wiimote. If you don't, the wiimote will close the connection.
++ * The wiimote waits about 5 seconds until it turns off again.
++ * Auto-reconnect is only enabled when pairing with the wiimote via the red
++ * sync-button and then connecting to the input service. If you do not connect
++ * to the input service, then auto-reconnect is not enabled.
++ * If enabled, the wiimote connects to the host automatically when any button
++ * is pressed.
++ */
++
++static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
++								char *pinbuf)
 +{
-+	struct hci_rp_read_rssi *rp = (void *) skb->data;
-+	struct hci_conn *conn;
++	uint16_t vendor, product;
++	bdaddr_t sba, dba;
++	char src_addr[18], dst_addr[18];
 +
-+	BT_DBG("%s status 0x%x", hdev->name, rp->status);
++	adapter_get_address(adapter, &sba);
++	device_get_address(device, &dba);
++	ba2str(&sba, src_addr);
++	ba2str(&dba, dst_addr);
 +
-+	if (!test_bit(HCI_MGMT, &hdev->flags))
-+		return;
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+	if (!conn) {
-+		mgmt_read_rssi_failed(hdev->id);
-+		return;
++	if (0 == read_device_id(src_addr, dst_addr, NULL, &vendor, &product,
++									NULL)) {
++		if (vendor == 0x057e && product == 0x0306) {
++			DBG("Forcing fixed pin on detected wiimote %s", dst_addr);
++			memcpy(pinbuf, &sba, 6);
++			return 6;
++		}
 +	}
 +
-+	mgmt_read_rssi_complete(hdev->id, &conn->dst, rp->rssi,
-+							rp->status);
++	return 0;
 +}
 +
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-@@ -2012,6 +2032,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_write_le_host_supported(hdev, skb);
- 		break;
- 
-+	case HCI_OP_READ_RSSI:
-+		hci_cc_read_rssi(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f2d9078..18049d0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1628,6 +1628,102 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
- }
- 
-+static int read_rssi(struct sock *sk, u16 index, unsigned char *data, u16 len)
++static int wii_probe(struct btd_adapter *adapter)
 +{
-+	struct hci_dev *hdev;
-+	struct mgmt_cp_read_rssi *cp = (void *) data;
-+	struct hci_cp_read_rssi rs;
-+	struct hci_conn *conn;
-+	struct pending_cmd *cmd;
-+	int err;
++	btd_adapter_register_pin_cb(adapter, wii_pincb);
 +
-+	BT_DBG("hci%u", index);
-+
-+	if (len != sizeof(*cp))
-+		return cmd_status(sk, index, MGMT_OP_READ_RSSI, EINVAL);
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return cmd_status(sk, index, MGMT_OP_READ_RSSI, ENODEV);
-+
-+	hci_dev_lock_bh(hdev);
-+
-+	if (!test_bit(HCI_UP, &hdev->flags)) {
-+		err = cmd_status(sk, index, MGMT_OP_READ_RSSI, ENETDOWN);
-+		goto unlock;
-+	}
-+
-+	if (mgmt_pending_find(MGMT_OP_READ_RSSI, index)) {
-+		err = cmd_status(sk, index, MGMT_OP_READ_RSSI, EBUSY);
-+		goto unlock;
-+	}
-+
-+	cmd = mgmt_pending_add(sk, MGMT_OP_READ_RSSI, index, NULL, 0);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &cp->bdaddr);
-+	if (!conn)
-+		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
-+
-+	if (!conn) {
-+		err = cmd_status(sk, index, MGMT_OP_DISCONNECT, ENOTCONN);
-+		goto unlock;
-+	}
-+
-+	put_unaligned_le16(conn->handle, &rs.handle);
-+
-+	err = hci_send_cmd(hdev, HCI_OP_READ_RSSI, sizeof(rs), &rs);
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
-+unlock:
-+	hci_dev_unlock_bh(hdev);
-+	hci_dev_put(hdev);
-+
-+	return err;
++	return 0;
 +}
 +
-+int mgmt_read_rssi_failed(u16 index)
++static void wii_remove(struct btd_adapter *adapter)
 +{
-+	struct pending_cmd *cmd;
-+	int err = 0;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_READ_RSSI, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	err = cmd_status(cmd->sk, index, MGMT_OP_READ_RSSI, EIO);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
++	btd_adapter_unregister_pin_cb(adapter, wii_pincb);
 +}
 +
-+int mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status)
++static struct btd_adapter_driver wii_driver = {
++	.name	= "wiimote",
++	.probe	= wii_probe,
++	.remove	= wii_remove,
++};
++
++static int wii_init(void)
 +{
-+	struct pending_cmd *cmd;
-+	struct mgmt_rp_read_rssi rp;
-+	int err;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_READ_RSSI, index);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	bacpy(&rp.bdaddr, bdaddr);
-+	rp.status = status;
-+	rp.rssi = rssi;
-+
-+	err = cmd_complete(cmd->sk, index, MGMT_OP_READ_RSSI, &rp,
-+								sizeof(rp));
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
++	return btd_register_adapter_driver(&wii_driver);
 +}
 +
- static int do_inquiry(struct hci_dev *hdev, __u8 inq_length)
- {
- 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
++static void wii_exit(void)
++{
++	btd_unregister_adapter_driver(&wii_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(wiimote, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_LOW, wii_init, wii_exit)
 -- 
-1.7.4.1
+1.7.6
 
