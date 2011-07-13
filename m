@@ -1,284 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed; delsp=yes
+Reply-To: ssc@tziranda.com
+Subject: A couple of questions related to a rfcomm server
 To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 5/5 v2] Remove *hi from mime driver read()
-Date: Wed, 13 Jul 2011 14:01:18 +0200
-Message-Id: <1310558478-16968-1-git-send-email-lkslawek@gmail.com>
+Date: Wed, 13 Jul 2011 11:51:53 +0100
+MIME-Version: 1.0
+From: =?iso-8859-15?Q?S=E9rgio_Capela?= <ssc@tziranda.com>
+Message-ID: <op.vyj0grkdv7v2p6@capela.tziranda.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This removes possibility of setting header type in mime driver read()
-function as the functionality of adding different header types is now
-supported by get_next_header().
----
-v2: Rebase
 
- plugins/filesystem.c    |   13 +++----------
- plugins/irmc.c          |    3 +--
- plugins/mas.c           |    4 +---
- plugins/pbap.c          |   14 +++-----------
- plugins/pcsuite.c       |    4 +---
- plugins/syncevolution.c |    6 ++----
- src/mimetype.h          |    2 +-
- src/obex.c              |   27 ++++++++-------------------
- 8 files changed, 20 insertions(+), 53 deletions(-)
+Hello,
 
-diff --git a/plugins/filesystem.c b/plugins/filesystem.c
-index 4d611de..041cca6 100644
---- a/plugins/filesystem.c
-+++ b/plugins/filesystem.c
-@@ -210,8 +210,7 @@ static int filesystem_close(void *object)
- 	return 0;
- }
- 
--static ssize_t filesystem_read(void *object, void *buf, size_t count,
--								uint8_t *hi)
-+static ssize_t filesystem_read(void *object, void *buf, size_t count)
- {
- 	ssize_t ret;
- 
-@@ -219,8 +218,6 @@ static ssize_t filesystem_read(void *object, void *buf, size_t count,
- 	if (ret < 0)
- 		return -errno;
- 
--	*hi = OBEX_HDR_BODY;
--
- 	return ret;
- }
- 
-@@ -593,19 +590,15 @@ ssize_t string_read(void *object, void *buf, size_t count)
- 	return len;
- }
- 
--static ssize_t folder_read(void *object, void *buf, size_t count, uint8_t *hi)
-+static ssize_t folder_read(void *object, void *buf, size_t count)
- {
--	*hi = OBEX_HDR_BODY;
- 	return string_read(object, buf, count);
- }
- 
--static ssize_t capability_read(void *object, void *buf, size_t count,
--								uint8_t *hi)
-+static ssize_t capability_read(void *object, void *buf, size_t count)
- {
- 	struct capability_object *obj = object;
- 
--	*hi = OBEX_HDR_BODY;
--
- 	if (obj->buffer)
- 		return string_read(obj->buffer, buf, count);
- 
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-index cc0b9db..0fb92be 100644
---- a/plugins/irmc.c
-+++ b/plugins/irmc.c
-@@ -462,7 +462,7 @@ static int irmc_close(void *object)
- 	return 0;
- }
- 
--static ssize_t irmc_read(void *object, void *buf, size_t count, uint8_t *hi)
-+static ssize_t irmc_read(void *object, void *buf, size_t count)
- {
- 	struct irmc_session *irmc = object;
- 	int len;
-@@ -471,7 +471,6 @@ static ssize_t irmc_read(void *object, void *buf, size_t count, uint8_t *hi)
- 	if (!irmc->buffer)
-                 return -EAGAIN;
- 
--	*hi = OBEX_HDR_BODY;
- 	len = string_read(irmc->buffer, buf, count);
- 	DBG("returning %d bytes", len);
- 	return len;
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 08e47a2..0ef8c81 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -222,12 +222,10 @@ static ssize_t any_write(void *object, const void *buf, size_t count)
- 	return count;
- }
- 
--static ssize_t any_read(void *obj, void *buf, size_t count, uint8_t *hi)
-+static ssize_t any_read(void *obj, void *buf, size_t count)
- {
- 	DBG("");
- 
--	*hi = OBEX_HDR_BODY;
--
- 	return 0;
- }
- 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index b230218..5455cce 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -978,8 +978,7 @@ static ssize_t vobject_pull_get_next_header(void *object, void *buf, size_t mtu,
- 	return 0;
- }
- 
--static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
--								uint8_t *hi)
-+static ssize_t vobject_pull_read(void *object, void *buf, size_t count)
- {
- 	struct pbap_object *obj = object;
- 	struct pbap_session *pbap = obj->session;
-@@ -994,8 +993,6 @@ static ssize_t vobject_pull_read(void *object, void *buf, size_t count,
- 	if (pbap->params->maxlistcount == 0)
- 		return -ENOSTR;
- 
--	*hi = OBEX_HDR_BODY;
--
- 	len = string_read(obj->buffer, buf, count);
- 	if (len == 0 && !obj->lastpart) {
- 		/* in case when buffer is empty and we know that more
-@@ -1030,8 +1027,7 @@ static ssize_t vobject_list_get_next_header(void *object, void *buf, size_t mtu,
- 	return 0;
- }
- 
--static ssize_t vobject_list_read(void *object, void *buf, size_t count,
--								uint8_t *hi)
-+static ssize_t vobject_list_read(void *object, void *buf, size_t count)
- {
- 	struct pbap_object *obj = object;
- 	struct pbap_session *pbap = obj->session;
-@@ -1042,13 +1038,10 @@ static ssize_t vobject_list_read(void *object, void *buf, size_t count,
- 	if (pbap->params->maxlistcount == 0)
- 		return -ENOSTR;
- 
--	*hi = OBEX_HDR_BODY;
--
- 	return string_read(obj->buffer, buf, count);
- }
- 
--static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
--								uint8_t *hi)
-+static ssize_t vobject_vcard_read(void *object, void *buf, size_t count)
- {
- 	struct pbap_object *obj = object;
- 
-@@ -1057,7 +1050,6 @@ static ssize_t vobject_vcard_read(void *object, void *buf, size_t count,
- 	if (!obj->buffer)
- 		return -EAGAIN;
- 
--	*hi = OBEX_HDR_BODY;
- 	return string_read(obj->buffer, buf, count);
- }
- 
-diff --git a/plugins/pcsuite.c b/plugins/pcsuite.c
-index 9b93372..5276ed9 100644
---- a/plugins/pcsuite.c
-+++ b/plugins/pcsuite.c
-@@ -428,13 +428,11 @@ static int backup_close(void *object)
- 	return 0;
- }
- 
--static ssize_t backup_read(void *object, void *buf, size_t count, uint8_t *hi)
-+static ssize_t backup_read(void *object, void *buf, size_t count)
- {
- 	struct backup_object *obj = object;
- 	ssize_t ret = 0;
- 
--	*hi = OBEX_HDR_BODY;
--
- 	if (obj->pending_call) {
- 		DBG("cmd = %s, IN WAITING STAGE", obj->cmd);
- 		return -EAGAIN;
-diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
-index 77c1bd6..7a78669 100644
---- a/plugins/syncevolution.c
-+++ b/plugins/syncevolution.c
-@@ -328,7 +328,7 @@ done:
- 	return 0;
- }
- 
--static ssize_t synce_read(void *object, void *buf, size_t count, uint8_t *hi)
-+static ssize_t synce_read(void *object, void *buf, size_t count)
- {
- 	struct synce_context *context = object;
- 	DBusConnection *conn;
-@@ -339,10 +339,8 @@ static ssize_t synce_read(void *object, void *buf, size_t count, uint8_t *hi)
- 	gboolean authenticate;
- 	DBusPendingCall *call;
- 
--	if (context->buffer) {
--		*hi = OBEX_HDR_BODY;
-+	if (context->buffer)
- 		return string_read(context->buffer, buf, count);
--	}
- 
- 	conn = obex_dbus_get_connection();
- 	if (conn == NULL)
-diff --git a/src/mimetype.h b/src/mimetype.h
-index 3426cac..79529b8 100644
---- a/src/mimetype.h
-+++ b/src/mimetype.h
-@@ -35,7 +35,7 @@ struct obex_mime_type_driver {
- 	int (*close) (void *object);
- 	ssize_t (*get_next_header)(void *object, void *buf, size_t mtu,
- 								uint8_t *hi);
--	ssize_t (*read) (void *object, void *buf, size_t count, uint8_t *hi);
-+	ssize_t (*read) (void *object, void *buf, size_t count);
- 	ssize_t (*write) (void *object, const void *buf, size_t count);
- 	int (*flush) (void *object);
- 	int (*copy) (const char *name, const char *destname);
-diff --git a/src/obex.c b/src/obex.c
-index b4f3714..49a110d 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -635,8 +635,6 @@ static int obex_write_stream(struct obex_session *os,
- {
- 	obex_headerdata_t hd;
- 	ssize_t len;
--	unsigned int flags;
--	uint8_t hi;
- 
- 	DBG("name=%s type=%s tx_mtu=%d file=%p",
- 		os->name ? os->name : "", os->type ? os->type : "",
-@@ -648,7 +646,7 @@ static int obex_write_stream(struct obex_session *os,
- 	if (os->object == NULL)
- 		return -EIO;
- 
--	len = os->driver->read(os->object, os->buf, os->tx_mtu, &hi);
-+	len = os->driver->read(os->object, os->buf, os->tx_mtu);
- 	if (len < 0) {
- 		error("read(): %s (%zd)", strerror(-len), -len);
- 		if (len == -EAGAIN)
-@@ -670,27 +668,18 @@ static int obex_write_stream(struct obex_session *os,
- 		os->streaming = TRUE;
- 	}
- 
--	hd.bs = os->buf;
--
--	switch (hi) {
--	case OBEX_HDR_BODY:
--		flags = len ? OBEX_FL_STREAM_DATA : OBEX_FL_STREAM_DATAEND;
--		break;
--	case OBEX_HDR_APPARAM:
--		flags =  0;
--		break;
--	default:
--		error("read(): unkown header type %u", hi);
--		return -EIO;
--	}
--
--	OBEX_ObjectAddHeader(obex, obj, hi, hd, len, flags);
--
- 	if (len == 0) {
-+		hd.bs = NULL;
-+		OBEX_ObjectAddHeader(obex, obj, OBEX_HDR_BODY, hd, 0,
-+						OBEX_FL_STREAM_DATAEND);
- 		g_free(os->buf);
- 		os->buf = NULL;
- 	}
- 
-+	hd.bs = os->buf;
-+	OBEX_ObjectAddHeader(obex, obj, OBEX_HDR_BODY, hd, len,
-+						OBEX_FL_STREAM_DATA);
-+
- 	return 0;
- }
- 
+since this is the only contact available at bluez.com I'm sending these  
+questions to this list. If this is not the contact to be used please  
+direct me to the one which is.
+
+I'm trying to make a sort of content server using bluetooth. As such I  
+coded a non blocking rfcomm server which accepts remote connections and  
+according to the received connections sends data back. The machine doing  
+this uses two bluetooth adapters and one is binded to the accepting  
+socket, however the same machine, in this case the same application is  
+supposed to scan visible remote bluetooth adapters for rssi values and so  
+my first question arises.
+
+Is it possible to accept connections at the same time a inquiry is running  
+or is the inquiry a blocking operation at the stack level? With two  
+adapters my server accepts remote connections and receives and sends data  
+but when an inquiry is running it stops accepting connections. The inquiry  
+is done in a separate thread.
+
+Another question is related to a rfcomm client getting into D state and  
+thus not killable. Due to my setup (two adapters in the same computer) I  
+can use the computer as both the server and the client. For test purposes  
+only I made a simple rfcomm client and I put it in a shell cycle thus  
+stressing the system regarding bluetooth connections. In this situation  
+the rfcomm client application becomes unresponsive after some time due to  
+a non exiting disk sleep. I then end up with multiple instances of the  
+same application and I can't kill them. By launching the application after  
+this I can see that the code blocks at a socket connection command  
+entering in a disk sleep state from which it doesn't exit. When this  
+happens I have to unplug the bluetooth adapter to get it working again  
+since it starts to give timeouts with hciconfig commands like "hciconfig  
+reset".
+
+Any ideas about this? The problem itself is not serious since it shouldn't  
+arise in normal conditions but it does require a reboot because of the  
+state D processes and makes the adapter unusable unless it is unplugged.
+
+Best regards,
 -- 
-1.7.4.1
+Sérgio Pedro dos Santos Capela - Tziranda
 
+Polo Tecnológico de Lisboa
+Edifício Empresarial 3
+1600-546 Lisboa
+
+Telf:  21 314 09 83
+Telml: 96 491 94 37
+Email: ssc@tziranda.com
