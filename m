@@ -1,41 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E1E8B64.9060402@bluewatersys.com>
-Date: Thu, 14 Jul 2011 18:23:32 +1200
+Message-ID: <4E1E2813.4040408@bluewatersys.com>
+Date: Thu, 14 Jul 2011 11:19:47 +1200
 From: Andre Renaud <andre@bluewatersys.com>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Minimal Bluetooth Audio
+Subject: Re: Headset+Alsa problems (without Pulse Audio)
+References: <4E1D2146.2050508@bluewatersys.com> <20110713080934.GA14678@dell.ger.corp.intel.com> <4E1E1E59.2000602@bluewatersys.com> <20110713230417.GA15596@dell.ger.corp.intel.com>
+In-Reply-To: <20110713230417.GA15596@dell.ger.corp.intel.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-As a follow up to the previous Alsa discussion - can anyone tell 
-me what minimum system required to generate audio out to a headset 
-is? I have had some success with pulse audio, although not complete
-(no audio produced on the headset, although I am able to perform
-some system control, such as volume). I was hoping that a program
-such as tests/scotest might be sufficient to just transmit raw audio
-and have it played on a bluetooth headset.
+Hi Johan,
+> You can use whatever audio subsystem you like as long as it can hook up
+> to the interface that BlueZ provides. The Media API itself hasn't been
+> designed for any specific audio subsystem as such, but PulseAudio
+> support for it was developed in parallel so it's what probably works
+> best right now. And as I said, if you really need something else, such
+> as ALSA user space plugins, feel free to take on the effort to port them
+> to the Media API. The only reason they're about to get dropped is that
+> no-one has shown the interest and resources to port them over and it
+> doesn't make sense to keep maintaining two parallel API's (the old unix
+> socket based and the new D-Bus based Media API). Btw, I also hope that
+> you've done some proper study to conclude that PulseAudio doesn't suit
+> your needs and are not just going on a "hunch" about it.
 
-I've had a look at hcidump output on a working system, and
-comparing that to the output of scotest, and the main differences 
-appear to be some L2CAP/ACL transactions near the beginning:
-< ACL data: handle 41 flags 0x02 dlen 18
-   L2CAP(d): cid 0x0043 len 14 [psm 0]
-      0000: 1b ef 15 0d 0a 2b 56 47  53 3d 37 0d 0a 8f        .....+VGS=7...
-< ACL data: handle 41 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0043 len 15 [psm 0]
-      0000: 1b ef 17 0d 0a 2b 56 47  4d 3d 31 35 0d 0a 8f     .....+VGM=15...
+Thanks for that. Can you tell me if there are any other upper layer
+systems that support the Media API?
 
-Having a look in audio/headset.c these appear to be setting the gain.
-
-Can anyone tell me how to construct these manually?
-
-I also feel that I'm going about this completely the wrong way -
-that there must be an easier way. However given the limited system
-that I'm working with bringing in all of DBus + pulse audio just
-doesn't seem feasible. Can anyone suggest an alternative method?
+Regarding the usage of pulse audio, our primary restriction at the
+moment is disk space, so minimising the number of libraries used is of
+great importance. We only have 8MB available on the final system, so as
+you can imagine bringing in large libraries is not always possible. The
+study you mention is what we're conducting at the moment. I'd welcome
+any alternatives that you can suggest. Given what has been discussed so
+far, we are currently doing further investigation into using PulseAudio.
 
 Regards,
 Andre
