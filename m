@@ -2,88 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/3] Add Proximity Monitor skeleton
-Date: Wed, 13 Jul 2011 09:37:56 -0300
-Message-Id: <1310560677-2773-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/3] Add Proximity Profile plugin skeleton
+Date: Wed, 13 Jul 2011 09:37:55 -0300
+Message-Id: <1310560677-2773-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1310560677-2773-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1310560677-2773-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Registers hard-coded D-Bus object path for Proximity Monitor and
-exports GetProperties and SetProperty.
 ---
- Makefile.am         |    4 ++-
- proximity/main.c    |   18 +++++++++++
- proximity/manager.c |   59 +++++++++++++++++++++++++++++++++++
- proximity/manager.h |   26 ++++++++++++++++
- proximity/monitor.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++++
- proximity/monitor.h |   26 ++++++++++++++++
- 6 files changed, 216 insertions(+), 1 deletions(-)
- create mode 100644 proximity/manager.c
- create mode 100644 proximity/manager.h
- create mode 100644 proximity/monitor.c
- create mode 100644 proximity/monitor.h
+ Makefile.am         |    5 +++++
+ acinclude.m4        |    6 ++++++
+ bootstrap-configure |    1 +
+ proximity/main.c    |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 54 insertions(+), 0 deletions(-)
+ create mode 100644 proximity/main.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 0fd52fd..293a8cc 100644
+index 5f54b5b..0fd52fd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -192,7 +192,9 @@ endif
- 
- if PROXIMITYPLUGIN
- builtin_modules += proximity
--builtin_sources += proximity/main.c
-+builtin_sources += proximity/main.c \
-+			proximity/manager.h proximity/manager.c \
-+			proximity/monitor.h proximity/monitor.c
+@@ -190,6 +190,11 @@ builtin_sources += network/main.c \
+ 			network/connection.h network/connection.c
  endif
  
++if PROXIMITYPLUGIN
++builtin_modules += proximity
++builtin_sources += proximity/main.c
++endif
++
  if SERVICEPLUGIN
+ builtin_modules += service
+ builtin_sources += plugins/service.c
+diff --git a/acinclude.m4 b/acinclude.m4
+index af97cce..d613086 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -193,6 +193,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	serial_enable=yes
+ 	network_enable=yes
+ 	sap_enable=no
++	proximity_enable=no
+ 	service_enable=yes
+ 	health_enable=no
+ 	pnat_enable=no
+@@ -239,6 +240,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	])
+ 	AC_SUBST([SAP_DRIVER], [sap-${sap_driver}.c])
+ 
++	AC_ARG_ENABLE(proximity, AC_HELP_STRING([--enable-proximity], [enable proximity plugin]), [
++		proximity_enable=${enableval}
++	])
++
+ 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--disable-serial], [disable serial plugin]), [
+ 		serial_enable=${enableval}
+ 	])
+@@ -381,6 +386,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(SERIALPLUGIN, test "${serial_enable}" = "yes")
+ 	AM_CONDITIONAL(NETWORKPLUGIN, test "${network_enable}" = "yes")
+ 	AM_CONDITIONAL(SAPPLUGIN, test "${sap_enable}" = "yes")
++	AM_CONDITIONAL(PROXIMITYPLUGIN, test "${proximity_enable}" = "yes")
+ 	AM_CONDITIONAL(SERVICEPLUGIN, test "${service_enable}" = "yes")
+ 	AM_CONDITIONAL(HEALTHPLUGIN, test "${health_enable}" = "yes")
+ 	AM_CONDITIONAL(MCAP, test "${health_enable}" = "yes")
+diff --git a/bootstrap-configure b/bootstrap-configure
+index 55c1049..b0020cb 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -18,6 +18,7 @@ fi
+ 		--libexecdir=/lib \
+ 		--enable-capng \
+ 		--enable-gatt-example \
++		--enable-proximity \
+ 		--enable-health \
+ 		--enable-tracer \
+ 		--enable-tools \
 diff --git a/proximity/main.c b/proximity/main.c
-index dccd619..ee7e4fb 100644
---- a/proximity/main.c
-+++ b/proximity/main.c
-@@ -26,15 +26,33 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
-+
-+#include <gdbus.h>
-+
- #include "plugin.h"
-+#include "manager.h"
-+
-+static DBusConnection *connection = NULL;
- 
- static int proximity_init(void)
- {
-+	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-+	if (connection == NULL)
-+		return -EIO;
-+
-+	if (proximity_manager_init(connection) < 0) {
-+		dbus_connection_unref(connection);
-+		return -EIO;
-+	}
-+
- 	return 0;
- }
- 
- static void proximity_exit(void)
- {
-+	proximity_manager_exit();
-+	dbus_connection_unref(connection);
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(proximity, VERSION,
-diff --git a/proximity/manager.c b/proximity/manager.c
 new file mode 100644
-index 0000000..795bdee
+index 0000000..dccd619
 --- /dev/null
-+++ b/proximity/manager.c
-@@ -0,0 +1,59 @@
++++ b/proximity/main.c
+@@ -0,0 +1,42 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -112,191 +111,20 @@ index 0000000..795bdee
 +#include <config.h>
 +#endif
 +
-+#include <gdbus.h>
++#include "plugin.h"
 +
-+#include "monitor.h"
-+#include "manager.h"
-+
-+static DBusConnection *connection = NULL;
-+
-+int proximity_manager_init(DBusConnection *conn)
++static int proximity_init(void)
 +{
-+	int ret;
-+	/* TODO: Add Proximity Monitor/Reporter config */
-+
-+	/* TODO: Register Proximity Monitor/Reporter drivers */
-+
-+	connection = dbus_connection_ref(conn);
-+
-+	ret = monitor_register(connection);
-+
-+	if (ret < 0) {
-+		dbus_connection_unref(connection);
-+		return ret;
-+	}
-+
 +	return 0;
 +}
 +
-+void proximity_manager_exit(void)
++static void proximity_exit(void)
 +{
-+	monitor_unregister(connection);
-+	dbus_connection_unref(connection);
-+}
-diff --git a/proximity/manager.h b/proximity/manager.h
-new file mode 100644
-index 0000000..7557a68
---- /dev/null
-+++ b/proximity/manager.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int proximity_manager_init(DBusConnection *conn);
-+void proximity_manager_exit(void);
-diff --git a/proximity/monitor.c b/proximity/monitor.c
-new file mode 100644
-index 0000000..4928c7a
---- /dev/null
-+++ b/proximity/monitor.c
-@@ -0,0 +1,84 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <gdbus.h>
-+
-+#include "log.h"
-+
-+#include "monitor.h"
-+
-+#define PROXIMITY_INTERFACE "org.bluez.Proximity"
-+#define PROXIMITY_PATH "/org/bluez/proximity"
-+
-+static DBusMessage *get_properties(DBusConnection *conn,
-+					DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
 +}
 +
-+static DBusMessage *set_property(DBusConnection *conn,
-+					DBusMessage *msg, void *data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static GDBusMethodTable monitor_methods[] = {
-+	{ "GetProperties",	"",	"a{sv}",	get_properties	},
-+	{ "SetProperty",	"sv",	"",		set_property,
-+						G_DBUS_METHOD_FLAG_ASYNC},
-+	{ }
-+};
-+
-+static GDBusSignalTable monitor_signals[] = {
-+	{ "PropertyChanged",	"sv"	},
-+	{ }
-+};
-+
-+int monitor_register(DBusConnection *conn)
-+{
-+	int ret = -1;
-+
-+	if (g_dbus_register_interface(conn, PROXIMITY_PATH,
-+					PROXIMITY_INTERFACE,
-+					monitor_methods, monitor_signals,
-+					NULL, NULL, NULL) == TRUE) {
-+		DBG("Registered interface %s on path %s", PROXIMITY_INTERFACE,
-+							PROXIMITY_PATH);
-+		ret = 0;
-+
-+	}
-+
-+	error("D-Bus failed to register %s interface", PROXIMITY_INTERFACE);
-+
-+	return ret;
-+}
-+
-+void monitor_unregister(DBusConnection *conn)
-+{
-+	g_dbus_unregister_interface(conn, PROXIMITY_PATH, PROXIMITY_INTERFACE);
-+}
-diff --git a/proximity/monitor.h b/proximity/monitor.h
-new file mode 100644
-index 0000000..d4913ac
---- /dev/null
-+++ b/proximity/monitor.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011  Nokia Corporation
-+ *  Copyright (C) 2011  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int monitor_register(DBusConnection *conn);
-+void monitor_unregister(DBusConnection *conn);
++BLUETOOTH_PLUGIN_DEFINE(proximity, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			proximity_init, proximity_exit)
 -- 
 1.7.6
 
