@@ -1,34 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Jul 2011 11:31:17 +0300
+Date: Wed, 13 Jul 2011 11:24:14 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-	Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: Re: [PATCH obexd v2 3/4] Add handling of system D-Bus method calls
-Message-ID: <20110713083117.GC15147@dell.ger.corp.intel.com>
-References: <1309297242-4154-1-git-send-email-dmitriy.paliy@nokia.com>
- <1309297242-4154-4-git-send-email-dmitriy.paliy@nokia.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 5/5] Remove *hi from mime driver read()
+Message-ID: <20110713082414.GB15147@dell.ger.corp.intel.com>
+References: <1309184455-29752-1-git-send-email-lkslawek@gmail.com>
+ <1309184455-29752-6-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1309297242-4154-4-git-send-email-dmitriy.paliy@nokia.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1309184455-29752-6-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Slawek,
 
-On Wed, Jun 29, 2011, Dmitriy Paliy wrote:
-> Sending system D-Bus method calls (DefaultAdapter, FindAdapter
-> and RequestSession) and handling of pending D-Bus calls is added
-> to obex-client.
+On Mon, Jun 27, 2011, Slawomir Bochenski wrote:
+> This removes possibility of setting header type in mime driver read()
+> function as the functionality of adding different header types is now
+> supported by get_next_header().
 > ---
->  client/session.c |  196 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  client/session.h |    2 +
->  2 files changed, 197 insertions(+), 1 deletions(-)
+>  plugins/filesystem.c    |   13 +++----------
+>  plugins/irmc.c          |    3 +--
+>  plugins/mas.c           |    4 +---
+>  plugins/pbap.c          |   14 +++-----------
+>  plugins/pcsuite.c       |    4 +---
+>  plugins/syncevolution.c |    6 ++----
+>  src/mimetype.h          |    2 +-
+>  src/obex.c              |   27 ++++++++-------------------
+>  8 files changed, 20 insertions(+), 53 deletions(-)
 
-I've applied the first two patches but this third one doesn't compile:
-
-client/session.c:189:21: error: no previous declaration for ‘find_session_request’ [-Werror=missing-declarations]
-
-Please fix and resend.
+I've applied the other four patches but this one doesn't apply cleanly.
+I suspect this is due to some other cleanup patches that have gone in
+lately.
 
 Johan
