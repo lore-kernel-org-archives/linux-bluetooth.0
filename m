@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 16:40:09 +0300
+Date: Thu, 14 Jul 2011 16:38:55 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 5/5 v2] Remove *hi from mime driver read()
-Message-ID: <20110714134009.GD2770@dell.ger.corp.intel.com>
-References: <1310558478-16968-1-git-send-email-lkslawek@gmail.com>
+Subject: Re: [PATCH obexd v3 0/2] Add handling of system D-Bus method calls
+Message-ID: <20110714133855.GC2770@dell.ger.corp.intel.com>
+References: <1310550226-9656-1-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310558478-16968-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1310550226-9656-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+Hi Dmitriy,
 
-On Wed, Jul 13, 2011, Slawomir Bochenski wrote:
-> This removes possibility of setting header type in mime driver read()
-> function as the functionality of adding different header types is now
-> supported by get_next_header().
-> ---
-> v2: Rebase
+On Wed, Jul 13, 2011, Dmitriy Paliy wrote:
+> This is updated version where
+> client/session.c:189: error: no previous declaration for 'find_session_request'
+> make[1]: *** [client/session.o] Error 1
+> is fixed.
 > 
->  plugins/filesystem.c    |   13 +++----------
->  plugins/irmc.c          |    3 +--
->  plugins/mas.c           |    4 +---
->  plugins/pbap.c          |   14 +++-----------
->  plugins/pcsuite.c       |    4 +---
->  plugins/syncevolution.c |    6 ++----
->  src/mimetype.h          |    2 +-
->  src/obex.c              |   27 ++++++++-------------------
->  8 files changed, 20 insertions(+), 53 deletions(-)
+> Please, check if
+> +static struct pending_req *find_session_request(
+> +				const struct session_data *session,
+> 
+> is coding-style-wise acceptable.
 
-Applied. Thanks.
+That's fine. Both patches have been applied. Thanks.
 
 Johan
