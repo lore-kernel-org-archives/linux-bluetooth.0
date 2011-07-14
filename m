@@ -1,27 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 16:59:11 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Add tracker backend stump for MAP
-Message-ID: <20110714135911.GG2770@dell.ger.corp.intel.com>
-References: <1310651174-11945-1-git-send-email-bulislaw@linux.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310651174-11945-1-git-send-email-bulislaw@linux.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ] Remove unneeded hcid.h header include
+Date: Thu, 14 Jul 2011 10:52:43 -0300
+Message-Id: <1310651563-21492-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+---
+ src/agent.c |    1 -
+ src/event.c |    1 -
+ 2 files changed, 0 insertions(+), 2 deletions(-)
 
-On Thu, Jul 14, 2011, Bartosz Szatkowski wrote:
-> ---
->  plugins/messages-tracker.c |   98 ++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 98 insertions(+), 0 deletions(-)
->  create mode 100644 plugins/messages-tracker.c
+diff --git a/src/agent.c b/src/agent.c
+index 7bba849..607d8c2 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -41,7 +41,6 @@
+ 
+ #include "log.h"
+ 
+-#include "hcid.h"
+ #include "adapter.h"
+ #include "device.h"
+ #include "agent.h"
+diff --git a/src/event.c b/src/event.c
+index f72c579..4d68fb3 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -47,7 +47,6 @@
+ #include "log.h"
+ #include "textfile.h"
+ 
+-#include "hcid.h"
+ #include "adapter.h"
+ #include "manager.h"
+ #include "device.h"
+-- 
+1.7.6
 
-This patch should also add the new file to Makefile.am (EXTRA_DIST I
-suppose). Otherwise the file will be left out of the tarball when doing
-"make dist".
-
-Johan
