@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 16:43:20 +0300
+Date: Thu, 14 Jul 2011 16:40:09 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Revert handling CALL-DATETIME in PullvCardEntry
-Message-ID: <20110714134320.GE2770@dell.ger.corp.intel.com>
-References: <1310566804-26748-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH obexd 5/5 v2] Remove *hi from mime driver read()
+Message-ID: <20110714134009.GD2770@dell.ger.corp.intel.com>
+References: <1310558478-16968-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310566804-26748-1-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1310558478-16968-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Slawek,
 
-On Wed, Jul 13, 2011, Bartosz Szatkowski wrote:
-> This reverts commit 02d8dea9490b8852b837e143a09891817a4965f9.
-> The constraints for pulling single vCard are to loose and causes other
-> numbers to be merged into same vCard. Also there is more elegant way of
-> applying the new changes.
+On Wed, Jul 13, 2011, Slawomir Bochenski wrote:
+> This removes possibility of setting header type in mime driver read()
+> function as the functionality of adding different header types is now
+> supported by get_next_header().
 > ---
->  plugins/phonebook-tracker.c |   30 +++++++-----------------------
->  1 files changed, 7 insertions(+), 23 deletions(-)
+> v2: Rebase
+> 
+>  plugins/filesystem.c    |   13 +++----------
+>  plugins/irmc.c          |    3 +--
+>  plugins/mas.c           |    4 +---
+>  plugins/pbap.c          |   14 +++-----------
+>  plugins/pcsuite.c       |    4 +---
+>  plugins/syncevolution.c |    6 ++----
+>  src/mimetype.h          |    2 +-
+>  src/obex.c              |   27 ++++++++-------------------
+>  8 files changed, 20 insertions(+), 53 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
