@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 16:38:55 +0300
+Date: Thu, 14 Jul 2011 16:37:06 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd v3 0/2] Add handling of system D-Bus method calls
-Message-ID: <20110714133855.GC2770@dell.ger.corp.intel.com>
-References: <1310550226-9656-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: Re: [PATCH] Move attrib server init/exit declaration to hcid.h
+Message-ID: <20110714133706.GB2770@dell.ger.corp.intel.com>
+References: <1310497518-19526-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310550226-9656-1-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1310497518-19526-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Claudio,
 
-On Wed, Jul 13, 2011, Dmitriy Paliy wrote:
-> This is updated version where
-> client/session.c:189: error: no previous declaration for 'find_session_request'
-> make[1]: *** [client/session.o] Error 1
-> is fixed.
-> 
-> Please, check if
-> +static struct pending_req *find_session_request(
-> +				const struct session_data *session,
-> 
-> is coding-style-wise acceptable.
+On Tue, Jul 12, 2011, Claudio Takahasi wrote:
+> Avoids GATT/ATT headers dependency in main.c.
+> ---
+>  src/attrib-server.h |    3 ---
+>  src/hcid.h          |    3 +++
+>  src/main.c          |    1 -
+>  3 files changed, 3 insertions(+), 4 deletions(-)
 
-That's fine. Both patches have been applied. Thanks.
+Applied. I supposed it'd make sense to come up with a new name for
+hcid.h since there's no such thing as hcid anymore. Suggestions?
 
 Johan
