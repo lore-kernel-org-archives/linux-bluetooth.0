@@ -1,45 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110714144444.GB26341@dell.ger.corp.intel.com>
-References: <1309874168-32716-9-git-send-email-claudio.takahasi@openbossa.org>
-	<1309987430-10111-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20110714144444.GB26341@dell.ger.corp.intel.com>
-Date: Thu, 14 Jul 2011 10:52:33 -0400
-Message-ID: <CAJdJm_PuzO+vSjLuM=eWnjif64Ki8kcEJSgarBOizELNw-xH0A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 08/12] Drop GAttrib ref if callback list is empty
+In-Reply-To: <CAKT1EBe6Qqgd7h=tQ4EfVVq9NkTWRzQE25Rn8tJT5NYrOWf0Hg@mail.gmail.com>
+References: <1310497518-19526-1-git-send-email-claudio.takahasi@openbossa.org>
+	<20110714133706.GB2770@dell.ger.corp.intel.com>
+	<CAKT1EBe6Qqgd7h=tQ4EfVVq9NkTWRzQE25Rn8tJT5NYrOWf0Hg@mail.gmail.com>
+Date: Thu, 14 Jul 2011 10:47:49 -0400
+Message-ID: <CAJdJm_MbUeYRZmja6z08GAG8vU_iGLqot0i1AUFOXS1DAKb0SQ@mail.gmail.com>
+Subject: Re: [PATCH] Move attrib server init/exit declaration to hcid.h
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-On Thu, Jul 14, 2011 at 10:44 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> @@ -2605,10 +2605,15 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
->>
->>       g_free(attio);
->>
->> +     if (device->attios != NULL)
->> +             return TRUE;
->> +
->>       if (device->attioid) {
->>               g_source_remove(device->attioid);
->>               device->attioid = 0;
->>       }
->>
->> +     g_attrib_unref(device->attrib);
->> +
->>       return TRUE;
->>  }
->
-> Looks like you're missing a device->attrib = NULL; after the unref.
+On Thu, Jul 14, 2011 at 10:24 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> BTW: maybe we could create another header for main_opts or try to move
+> it to main.c. hciops and gatt servers implementations are including
+> it, which looks wrong to me.
 
-I really don't see the point in setting a reference counted variable
-to NULL. How would we know whether this is the last usage or not? In
-this case we are just removing a callback. What if we registered two
-callbacks?
+Or we can make accessor functions instead of exporting main_opts
+directly. (e.g. like btd_device_* functions for struct btd_device).
 
 Regards,
 -- 
