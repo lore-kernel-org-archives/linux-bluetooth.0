@@ -1,46 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ed Tomlinson <edt@aei.ca>
-To: linux-kernel@vger.kernel.org
-Subject: [BUG] Bluetooth broken post rc7
-Date: Thu, 14 Jul 2011 23:18:32 -0400
-Cc: linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Ilia Kolomisnky <iliak@ti.com>,
-	David Miller <davem@davemloft.net>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201107142318.33080.edt@aei.ca>
+From: VISHWANATH KM <a21174@motorola.com>
+Date: Thu, 14 Jul 2011 22:34:17 +0530
+Message-ID: <CACbkbULaTeWVtcpFxhUMRMO-r+QuKU8NkX7o5nQBXHKApJbqgQ@mail.gmail.com>
+Subject: Security level for Primary Services discovery during pairing
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I booted to todays linux git and bluetooth is no longer working.  My magic mouse will not connect correctly.
+As per GAP spec section 10.1 Requirements, for both peripheral and
+central security is optional,
+in adapter.c create_paired_device_generic  we have
+device_browse_primary with secure set to TRUE,
+due to which we are connecting to other device with Security level
+high, this is causing failure for those
+peripherals where security is not supported hence those devices
+doesn't respond to the pairing request initiated
 
-Reverting: 
+device_browse_primary with secure to FALSE goes through, where
+peripheral initiates Slave security request
+and SMP just works completes as expected, since security is optional,
+should the secure for device_browse_primary
+be set to FALSE in create_paired_device_generic ? please let us know
+your comments. thx
 
-commit 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95
-Author: Gustavo F. Padovan <padovan@profusion.mobi>
-Date:   Thu Jun 30 16:11:30 2011 -0300
-
-    Bluetooth: Fix regression with incoming L2CAP connections
-    
-    PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
-    ( probably after the df3c3931e commit ) the l2cap connection
-    could not be established in case when the "Auth Complete" HCI
-    event does not arive before the initiator send "Configuration
-    request", in which case l2cap replies with "Command rejected"
-    since the channel is still in BT_CONNECT2 state.
-    
-    Based on patch from: Ilia Kolomisnky <iliak@ti.com>
-    
-    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
-
-Fixes the bug here (things work like rc7).
-
-Do we really need 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95 in 3.0?
-
-Thanks,
-
-Ed Tomlinson
+Regards
+Vishwanath
