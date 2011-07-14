@@ -1,42 +1,232 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] Remove unneeded hcid.h header include
-Date: Thu, 14 Jul 2011 10:52:43 -0300
-Message-Id: <1310651563-21492-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd 2/2] Add SetFolder function for MAP tracker backend
+Date: Thu, 14 Jul 2011 15:46:14 +0200
+Message-Id: <1310651174-11945-2-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1310651174-11945-1-git-send-email-bulislaw@linux.com>
+References: <1310651174-11945-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/agent.c |    1 -
- src/event.c |    1 -
- 2 files changed, 0 insertions(+), 2 deletions(-)
+ plugins/messages-tracker.c |  175 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 173 insertions(+), 2 deletions(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index 7bba849..607d8c2 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -41,7 +41,6 @@
+diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
+index 88e7493..63d7fc6 100644
+--- a/plugins/messages-tracker.c
++++ b/plugins/messages-tracker.c
+@@ -26,27 +26,157 @@
+ #endif
  
- #include "log.h"
+ #include <errno.h>
++#include <glib.h>
++#include <string.h>
  
--#include "hcid.h"
- #include "adapter.h"
- #include "device.h"
- #include "agent.h"
-diff --git a/src/event.c b/src/event.c
-index f72c579..4d68fb3 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -47,7 +47,6 @@
- #include "log.h"
- #include "textfile.h"
+ #include "messages.h"
  
--#include "hcid.h"
- #include "adapter.h"
- #include "manager.h"
- #include "device.h"
++struct message_folder {
++	char *name;
++	GSList *subfolders;
++	char *query;
++};
++
++struct session {
++	char *cwd;
++	struct message_folder *folder;
++};
++
++static char *root_folder = "/";
++static struct message_folder *folder_tree = NULL;
++
++static struct message_folder *get_folder(const char *folder)
++{
++	GSList *current = folder_tree->subfolders;
++	GSList *last;
++	int i = 1;
++	char **path;
++
++	if (g_strcmp0(folder, "/") == 0)
++		return folder_tree;
++
++	path = g_strsplit(folder, "/", 0);
++
++	while (path[i] != NULL) {
++		GSList *next = current;
++		int find = 0;
++
++		while (next != NULL) {
++			struct message_folder *next_data = next->data;
++
++			if (g_strcmp0(next_data->name, path[i]) == 0) {
++				find = 1;
++				last = next;
++				current = next_data->subfolders;
++
++				break;
++			}
++
++			next = g_slist_next(next);
++		}
++
++		if (find == 0) {
++			g_strfreev(path);
++			return NULL;
++		}
++
++		i++;
++	}
++
++	g_strfreev(path);
++	return last->data;
++}
++
++static struct message_folder *create_folder(const char *name, const char *query)
++{
++	struct message_folder *folder = g_new0(struct message_folder, 1);
++
++	folder->name = g_strdup(name);
++	folder->query = g_strdup(query);
++
++	return folder;
++}
++
++static void destroy_folder_tree(void *root)
++{
++	struct message_folder *folder = root;
++	GSList *tmp, *next;
++
++	if (folder == NULL)
++		return;
++
++	g_free(folder->name);
++	g_free(folder->query);
++
++	tmp = folder->subfolders;
++	while (tmp != NULL) {
++		next = g_slist_next(tmp);
++		destroy_folder_tree(tmp->data);
++		tmp = next;
++	}
++
++	g_slist_free(folder->subfolders);
++	g_free(folder);
++}
++
++static void create_folder_tree()
++{
++	struct message_folder *parent, *child;
++
++	folder_tree = create_folder("/", NULL);
++
++	parent = create_folder("telecom", NULL);
++	folder_tree->subfolders = g_slist_append(folder_tree->subfolders,
++						 parent);
++
++	child = create_folder("msg", NULL);
++	parent->subfolders = g_slist_append(parent->subfolders, child);
++
++	parent = child;
++
++	child = create_folder("inbox", "?msg nmo:isSent \"false\" ; "
++				"nmo:isDeleted \"false\" ; "
++				"nmo:isDraft \"false\". ");
++	parent->subfolders = g_slist_append(parent->subfolders, child);
++
++	child = create_folder("sent", "?msg nmo:isDeleted \"false\" ; "
++				"nmo:isSent \"true\" . ");
++	parent->subfolders = g_slist_append(parent->subfolders, child);
++
++	child = create_folder("deleted", "?msg nmo:isDeleted \"true\" . ");
++	parent->subfolders = g_slist_append(parent->subfolders, child);
++}
++
+ int messages_init(void)
+ {
++	create_folder_tree();
++
+ 	return 0;
+ }
+ 
+ void messages_exit(void)
+ {
++	destroy_folder_tree(folder_tree);
+ }
+ 
+ int messages_connect(void **s)
+ {
+-	*s = NULL;
++	struct session *session = g_new0(struct session, 1);
++
++	session->cwd = g_strdup(root_folder);
++	session->folder = folder_tree;
++
++	*s = session;
+ 
+ 	return 0;
+ }
+ 
+ void messages_disconnect(void *s)
+ {
++	struct session *session = s;
++
++	g_free(session->cwd);
++	g_free(session);
+ }
+ 
+ int messages_set_notification_registration(void *session,
+@@ -59,7 +189,48 @@ int messages_set_notification_registration(void *session,
+ 
+ int messages_set_folder(void *s, const char *name, gboolean cdup)
+ {
+-	return -EINVAL;
++	struct session *session = s;
++	char *newrel = NULL;
++	char *newabs;
++	char *tmp;
++
++	if (name && (strchr(name, '/') || strcmp(name, "..") == 0))
++		return -EBADR;
++
++	if (cdup) {
++		if (session->cwd[0] == 0)
++			return -ENOENT;
++
++		newrel = g_path_get_dirname(session->cwd);
++
++		/* We use empty string for indication of the root directory */
++		if (newrel[0] == '.' && newrel[1] == 0)
++			newrel[0] = 0;
++	}
++
++	tmp = newrel;
++	if (!cdup && (!name || name[0] == 0))
++		newrel = g_strdup("");
++	else
++		newrel = g_build_filename(newrel ? newrel : session->cwd, name,
++									NULL);
++	g_free(tmp);
++
++	newabs = g_build_filename(root_folder, newrel, NULL);
++
++	session->folder = get_folder(newabs);
++	if (session->folder == NULL) {
++		g_free(newrel);
++		g_free(newabs);
++
++		return -ENOENT;
++	}
++
++	g_free(newrel);
++	g_free(session->cwd);
++	session->cwd = newabs;
++
++	return 0;
+ }
+ 
+ int messages_get_folder_listing(void *session,
 -- 
-1.7.6
+1.7.4.1
 
