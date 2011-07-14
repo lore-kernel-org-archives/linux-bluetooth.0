@@ -1,27 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 17:36:41 +0300
+Date: Thu, 14 Jul 2011 17:34:33 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Set primary services before probing
-Message-ID: <20110714143641.GA26341@dell.ger.corp.intel.com>
-References: <1310497809-19636-1-git-send-email-claudio.takahasi@openbossa.org>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+Subject: Re: [PATCH v2 1/3] Fix read_pin_code to return ssize_t
+Message-ID: <20110714143433.GA11928@dell.ger.corp.intel.com>
+References: <1310564415-26093-1-git-send-email-dh.herrmann@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310497809-19636-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1310564415-26093-1-git-send-email-dh.herrmann@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi David,
 
-On Tue, Jul 12, 2011, Claudio Takahasi wrote:
-> Fix accessing primary services data in the probing function of GATT
-> based plugins.
+On Wed, Jul 13, 2011, David Herrmann wrote:
+> read_pin_code returns the length of a memory block and hence should use
+> ssize_t as type.
 > ---
->  src/adapter.c |    6 ++++--
->  src/device.c  |    9 ++++-----
->  2 files changed, 8 insertions(+), 7 deletions(-)
+>  src/event.c   |    2 +-
+>  src/storage.c |    4 ++--
+>  src/storage.h |    2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
