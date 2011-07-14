@@ -1,61 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 20:12:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 10/12] Manage GAttrib refs based on registered
- callbacks
-Message-ID: <20110714171213.GA30789@dell.ger.corp.intel.com>
-References: <1309874168-32716-11-git-send-email-claudio.takahasi@openbossa.org>
- <1309987448-10183-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1309987448-10183-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 08/12] Drop GAttrib ref if callback list is empty
+Date: Thu, 14 Jul 2011 13:36:58 -0300
+Message-Id: <1310661418-31047-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <CAKT1EBdM2rPSBj5SFsGj_k5FAuifK83o+msRNjBzyfeHdRU3MQ@mail.gmail.com>
+References: <CAKT1EBdM2rPSBj5SFsGj_k5FAuifK83o+msRNjBzyfeHdRU3MQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+If all ATT connection callbacks are unregistered, GAttrib reference
+can be dropped.
+---
+ src/device.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-On Wed, Jul 06, 2011, Claudio Takahasi wrote:
-> Connection should not be dropped if there is at least one ATT connection
-> callback registered.
-> ---
->  src/device.c |   19 ++++++++++++-------
->  1 files changed, 12 insertions(+), 7 deletions(-)
+diff --git a/src/device.c b/src/device.c
+index 1f45211..571a287 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2603,10 +2603,18 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
+ 
+ 	g_free(attio);
+ 
++	if (device->attios != NULL)
++		return TRUE;
++
+ 	if (device->attioid) {
+ 		g_source_remove(device->attioid);
+ 		device->attioid = 0;
+ 	}
+ 
++	if (device->attrib) {
++		g_attrib_unref(device->attrib);
++		device->attrib = NULL;
++	}
++
+ 	return TRUE;
+ }
+-- 
+1.7.6
 
-Patches 8 and 9 have now been pushed, but there's some reference
-counting weirdness going on here again:
-
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1664,6 +1664,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
->  done:
->  	device->browse = NULL;
->  	browse_request_free(req, shutdown);
-> +	g_attrib_unref(device->attrib);
->  }
-
-Where's the device->attrib = NULL?
-
-> @@ -2568,18 +2569,22 @@ guint btd_device_add_attio_callback(struct btd_device *device,
->  	attio->dcfunc = dcfunc;
->  	attio->user_data = user_data;
->  
-> -	device->attios = g_slist_append(device->attios, attio);
-> -
-> -	if (device->attrib && cfunc)
-> -		cfunc(device->attrib, user_data);
-> +	if (device->attrib) {
-> +		/* First element */
-> +		if (device->attios == NULL)
-> +			device->attrib = g_attrib_ref(device->attrib);
-
-Eh? It looks like attio is supposed to own this reference created by
-g_attrib_ref() so you should really be assigning the return value to
-attio->attrib. Or is it so that device->attrib is actually there only
-for any elements in the device->attios list? If that's the case then
-it's fine to have just create device->attrib when you add the first
-element to the list and unref + set to NULL when you remove the last
-element from the list.
-
-Johan
