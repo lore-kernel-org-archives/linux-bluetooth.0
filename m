@@ -1,27 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 17:14:22 +0300
+Date: Thu, 14 Jul 2011 17:10:19 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2 v2] Add tracker backend stump for MAP
-Message-ID: <20110714141422.GJ2770@dell.ger.corp.intel.com>
-References: <20110714135911.GG2770@dell.ger.corp.intel.com>
- <1310652459-16881-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH BlueZ] Remove unneeded hcid.h header include
+Message-ID: <20110714141019.GI2770@dell.ger.corp.intel.com>
+References: <1310651563-21492-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310652459-16881-1-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1310651563-21492-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Claudio,
 
-On Thu, Jul 14, 2011, Bartosz Szatkowski wrote:
+On Thu, Jul 14, 2011, Claudio Takahasi wrote:
 > ---
->  Makefile.am                |    2 +-
->  plugins/messages-tracker.c |   98 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 99 insertions(+), 1 deletions(-)
->  create mode 100644 plugins/messages-tracker.c
+>  src/agent.c |    1 -
+>  src/event.c |    1 -
+>  2 files changed, 0 insertions(+), 2 deletions(-)
 
-This patch has been applied. Thanks.
+Applied. Thanks.
 
 Johan
