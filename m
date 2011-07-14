@@ -1,72 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 14 Jul 2011 15:55:00 -0700
-Message-ID: <CAH9SEo76kfgbvPbzw2jgCf1rvhQ4VRz0EDGiGg99HyUFq53t5Q@mail.gmail.com>
-Subject: g++ 4.6 complains about code in bluez/lib/bluetooth.h
-From: =?UTF-8?B?RG91ZyBLd2FuICjpl5zmjK/lvrcp?= <dougkwan@google.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1310624928-17720-1-git-send-email-luiz.dentz@gmail.com>
+References: <1310624928-17720-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 14 Jul 2011 20:45:27 +0300
+Message-ID: <CAHMBquUuOLAYCSBbAG41AQqvC4hutfCxbkFTbd4bPYr9Bs3mHg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] Fix possible invalid read/free on manager.c
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-  I have a project with C++ code that includes the header
-bluez/lib/bluetooth.  g++-4.6 complains about some code in the header:
+On Thu, Jul 14, 2011 at 9:28 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> †Invalid read of size 4
+> † †at 0x178A20: adapter_get_address (string3.h:52)
+> † †by 0x174C28: adapter_cmp (manager.c:324)
+> † †by 0x4EA95B0: g_slist_find_custom (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x174ED9: manager_find_adapter (manager.c:333)
+> † †by 0x16ABFA: sdp_record_remove (sdpd-database.c:270)
+> † †by 0x16A4D6: remove_record_from_server (sdpd-service.c:286)
+> † †by 0x12A947: avrcp_unregister (control.c:972)
+> † †by 0x1208CC: avrcp_server_remove (manager.c:1066)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x178985: adapter_remove (adapter.c:2326)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
+> †Address 0x603ccd0 is 16 bytes inside a block of size 448 free'd
+> † †at 0x4A055FE: free (vg_replace_malloc.c:366)
+> † †by 0x4E938F2: g_free (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x11EB59: remove_interface (object.c:563)
+> † †by 0x11F380: g_dbus_unregister_interface (object.c:715)
+> † †by 0x1787EC: btd_adapter_unref (adapter.c:2496)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x174E96: manager_cleanup (manager.c:301)
+> † †by 0x11CCE8: main (main.c:305)
+>
+> †Invalid read of size 2
+> † †at 0x178A25: adapter_get_address (string3.h:52)
+> † †by 0x174C28: adapter_cmp (manager.c:324)
+> † †by 0x4EA95B0: g_slist_find_custom (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x174ED9: manager_find_adapter (manager.c:333)
+> † †by 0x16ABFA: sdp_record_remove (sdpd-database.c:270)
+> † †by 0x16A4D6: remove_record_from_server (sdpd-service.c:286)
+> † †by 0x12A947: avrcp_unregister (control.c:972)
+> † †by 0x1208CC: avrcp_server_remove (manager.c:1066)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x178985: adapter_remove (adapter.c:2326)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
+> †Address 0x603ccd4 is 20 bytes inside a block of size 448 free'd
+> † †at 0x4A055FE: free (vg_replace_malloc.c:366)
+> † †by 0x4E938F2: g_free (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x11EB59: remove_interface (object.c:563)
+> † †by 0x11F380: g_dbus_unregister_interface (object.c:715)
+> † †by 0x1787EC: btd_adapter_unref (adapter.c:2496)
+> † †by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x4EA984A: g_slist_free_full (in /lib64/libglib-2.0.so.0.2908.0)
+> † †by 0x174E96: manager_cleanup (manager.c:301)
+> † †by 0x11CCE8: main (main.c:305)
+> ---
+> †src/adapter.c | † †2 --
+> †src/manager.c | † 16 +++++++++++++---
+> †2 files changed, 13 insertions(+), 5 deletions(-)
 
-#define BDADDR_ANY   (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
-#define BDADDR_ALL   (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
-#define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+Wouldn't it be better to shorten commit messages like this one? It is
+not very convenient to have full screen message that doesn't bring
+much addition explanation to its title.
 
-frameworks/base/core/jni/android_bluetooth_BluetoothAudioGateway.cpp:
-In function 'int android::setup_listening_socket(int, int)':
-frameworks/base/core/jni/android_bluetooth_BluetoothAudioGateway.cpp:494:30:
-error: taking address of temporary [-fpermissive]
-make: *** [out/target/product/stingray/obj/SHARED_LIBRARIES/libandroid_runtime_intermediates/android_bluetooth_BluetoothAudioGateway.o]
-Error 1
-
-The code in question was:
-
-   memcpy(&laddr.rc_bdaddr, BDADDR_ANY, sizeof(bdaddr_t));
-
-The macros above expand into expressions taking addresses of temporary
-object.  My copy of draft C++ standards says:
-
-5.3.1 Unary operators
-
-The result of the unary & operator is a pointer to its operand. The
-operand shall be an lvalue or a qualiÔ¨Åed-id. In the Ô¨Årst
-case, if the type of the expression is ‚ÄúT,‚Äù the type of the result is
-‚Äúpointer to T.‚Äù In particular, the address of an object of
-type ‚Äúcv T‚Äù is ‚Äúpointer to cv T,‚Äù with the same cv-qualiÔ¨Åers. For a
-qualiÔ¨Åed-id, if the member is a static member of type
-‚ÄúT‚Äù, the type of the result is plain ‚Äúpointer to T.‚Äù If the member is
-a non-static member of class C of type T, the type of
-the result is ‚Äúpointer to member of class C of type T.‚Äù
-
-(bdaddr_t) {{0, 0, 0, 0, 0, 0}} is neither an lvalue nor a qualified-id.
-
-Is this problem in bluetooth.h a known issue?
-
-I would like to fix this.  I can see different ways of fixing it.
-Instead of temporary objects,  globals variables can be used for the
-special value.  There is a risk that code may modified the globals.
-That would lead to hard to find bugs. Alternatively, we can define
-macros like:
-
-#define BDADDR_ANY_INITIALIZER   {{0, 0, 0, 0, 0, 0}}
-#define BDADDR_ALL _INITIALIZER  {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}}
-#define BDADDR_LOCAL_INITIALIZER {{0, 0, 0, 0xff, 0xff, 0xff}}
-
-#define BDADDR_ANY   (&(bdaddr_t) BDADDR_ANY_INITIALIZER)
-#define BDADDR_ALL   (&(bdaddr_t) BDADDR_ALL_INITIALIZER)
-#define BDADDR_LOCAL   (&(bdaddr_t) BDADDR_LOCAL_INITIALIZER)
-
-This preserves the old interface.  Standard conforming C++ code can do
-something like
-
-  bdaddr_t any = BDADDR_ANY_INITIALIZER;
-
-  ... &any
-
-Comments?
+Thanks,
+Dmitriy
