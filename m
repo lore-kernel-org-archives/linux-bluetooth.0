@@ -1,26 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Jul 2011 16:45:54 +0300
+Date: Thu, 14 Jul 2011 16:43:20 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/5] Fix pulling vCard for multiple ebooks
-Message-ID: <20110714134554.GF2770@dell.ger.corp.intel.com>
-References: <1310595010-1033-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH obexd 1/2] Revert handling CALL-DATETIME in PullvCardEntry
+Message-ID: <20110714134320.GE2770@dell.ger.corp.intel.com>
+References: <1310566804-26748-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310595010-1033-1-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1310566804-26748-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bartosz,
 
 On Wed, Jul 13, 2011, Bartosz Szatkowski wrote:
-> Problem occurred when there were multiple ebooks and the last one was
-> empty. Reported vCard number was 0 and no data was transported.
+> This reverts commit 02d8dea9490b8852b837e143a09891817a4965f9.
+> The constraints for pulling single vCard are to loose and causes other
+> numbers to be merged into same vCard. Also there is more elegant way of
+> applying the new changes.
 > ---
->  plugins/phonebook-ebook.c |   15 ++++++++-------
->  1 files changed, 8 insertions(+), 7 deletions(-)
+>  plugins/phonebook-tracker.c |   30 +++++++-----------------------
+>  1 files changed, 7 insertions(+), 23 deletions(-)
 
-All five patches have been applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
