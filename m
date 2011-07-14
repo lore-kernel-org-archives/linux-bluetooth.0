@@ -1,44 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110714133706.GB2770@dell.ger.corp.intel.com>
-References: <1310497518-19526-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20110714133706.GB2770@dell.ger.corp.intel.com>
-Date: Thu, 14 Jul 2011 11:24:47 -0300
-Message-ID: <CAKT1EBe6Qqgd7h=tQ4EfVVq9NkTWRzQE25Rn8tJT5NYrOWf0Hg@mail.gmail.com>
-Subject: Re: [PATCH] Move attrib server init/exit declaration to hcid.h
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: johan.hedberg@gmail.com
+Date: Thu, 14 Jul 2011 17:14:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH obexd 1/2 v2] Add tracker backend stump for MAP
+Message-ID: <20110714141422.GJ2770@dell.ger.corp.intel.com>
+References: <20110714135911.GG2770@dell.ger.corp.intel.com>
+ <1310652459-16881-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1310652459-16881-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Bartosz,
 
-On Thu, Jul 14, 2011 at 10:37 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Tue, Jul 12, 2011, Claudio Takahasi wrote:
->> Avoids GATT/ATT headers dependency in main.c.
->> ---
->>  src/attrib-server.h |    3 ---
->>  src/hcid.h          |    3 +++
->>  src/main.c          |    1 -
->>  3 files changed, 3 insertions(+), 4 deletions(-)
->
-> Applied. I supposed it'd make sense to come up with a new name for
-> hcid.h since there's no such thing as hcid anymore. Suggestions?
->
-> Johan
->
+On Thu, Jul 14, 2011, Bartosz Szatkowski wrote:
+> ---
+>  Makefile.am                |    2 +-
+>  plugins/messages-tracker.c |   98 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 99 insertions(+), 1 deletions(-)
+>  create mode 100644 plugins/messages-tracker.c
 
-My suggestions are:
-1) core.h
-2) main.h
+This patch has been applied. Thanks.
 
-BTW: maybe we could create another header for main_opts or try to move
-it to main.c. hciops and gatt servers implementations are including
-it, which looks wrong to me.
-
-Regards,
-Claudio
+Johan
