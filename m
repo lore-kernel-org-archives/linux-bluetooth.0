@@ -1,74 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201107142318.33080.edt@aei.ca>
-References: <201107142318.33080.edt@aei.ca>
-Date: Fri, 15 Jul 2011 13:11:04 +0300
-Message-ID: <CABBYNZ+fxUWhi0uF0b_6Z8iqYd7Pp_4zPBRyM6Gyh3zJH1am5Q@mail.gmail.com>
-Subject: Re: [BUG] Bluetooth broken post rc7
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ed Tomlinson <edt@aei.ca>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	Ilia Kolomisnky <iliak@ti.com>,
-	David Miller <davem@davemloft.net>
-Content-Type: text/plain; charset=ISO-8859-1
+From: zheng wu <wu.zheng@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: zheng wu <wu.zheng@intel.com>
+Subject: [PATCH] fixing crash in irmc.c when vcard=0
+Date: Fri, 15 Jul 2011 15:20:42 +0800
+Message-Id: <1310714442-14565-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When using sync profile, if getting the number of vcard is 0 in server,obexd will crash.
+The reason is that the null point is used in query_result of irmc.c.The patch is for fixing it.
+Signed-off-by: wu.zheng@intel.com  
+---
+ plugins/irmc.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-On Fri, Jul 15, 2011 at 6:18 AM, Ed Tomlinson <edt@aei.ca> wrote:
-> Hi,
->
-> I booted to todays linux git and bluetooth is no longer working.  My magic mouse will not connect correctly.
->
-> Reverting:
->
-> commit 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95
-> Author: Gustavo F. Padovan <padovan@profusion.mobi>
-> Date:   Thu Jun 30 16:11:30 2011 -0300
->
->    Bluetooth: Fix regression with incoming L2CAP connections
->
->    PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
->    ( probably after the df3c3931e commit ) the l2cap connection
->    could not be established in case when the "Auth Complete" HCI
->    event does not arive before the initiator send "Configuration
->    request", in which case l2cap replies with "Command rejected"
->    since the channel is still in BT_CONNECT2 state.
->
->    Based on patch from: Ilia Kolomisnky <iliak@ti.com>
->
->    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
->
-> Fixes the bug here (things work like rc7).
->
-> Do we really need 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95 in 3.0?
->
-> Thanks,
->
-> Ed Tomlinson
-> --
-
-I've changed the check to something like this:
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ebff14c..f88b9c8 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2323,8 +2323,7 @@ static inline int l2cap_config_req(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
-
-        sk = chan->sk;
-
--       if ((bt_sk(sk)->defer_setup && sk->sk_state != BT_CONNECT2) ||
--                (!bt_sk(sk)->defer_setup && sk->sk_state != BT_CONFIG)) {
-+       if ((sk->sk_state != BT_CONNECT2) && (sk->sk_state != BT_CONFIG)) {
-                struct l2cap_cmd_rej rej;
-
-                rej.reason = cpu_to_le16(0x0002);
-
-Seems to work fine.
-
+diff --git a/plugins/irmc.c b/plugins/irmc.c
+index 0fb92be..2ecae21 100644
+--- a/plugins/irmc.c
++++ b/plugins/irmc.c
+@@ -167,6 +167,8 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
+ 	else
+ 		irmc->buffer = g_string_append(irmc->buffer, owner_vcard);
+ 
++	if (buffer == NULL)
++		goto finish;
+ 	/* loop around buffer and add X-IRMC-LUID attribs */
+ 	s = buffer;
+ 	while ((t = strstr(s, "UID:")) != NULL) {
+@@ -189,7 +191,7 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
+ 	}
+ 	/* add remaining bit of buffer */
+ 	irmc->buffer = g_string_append(irmc->buffer, s);
+-
++finish:
+ 	obex_object_set_io_flags(irmc, G_IO_IN, 0);
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+1.7.3.4
+
