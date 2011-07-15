@@ -1,42 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: zheng wu <wu.zheng@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: zheng wu <wu.zheng@intel.com>
-Subject: [PATCH] fixing crash in irmc.c when vcard=0
-Date: Fri, 15 Jul 2011 15:20:42 +0800
-Message-Id: <1310714442-14565-1-git-send-email-wu.zheng@intel.com>
+From: Ed Tomlinson <edt@aei.ca>
+To: linux-kernel@vger.kernel.org
+Subject: [BUG] Bluetooth broken post rc7
+Date: Thu, 14 Jul 2011 23:18:32 -0400
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	Ilia Kolomisnky <iliak@ti.com>,
+	David Miller <davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201107142318.33080.edt@aei.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When using sync profile, if getting the number of vcard is 0 in server,obexd will crash.
-The reason is that the null point is used in query_result of irmc.c.The patch is for fixing it.
-Signed-off-by: wu.zheng@intel.com  
----
- plugins/irmc.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+Hi,
 
-diff --git a/plugins/irmc.c b/plugins/irmc.c
-index 0fb92be..2ecae21 100644
---- a/plugins/irmc.c
-+++ b/plugins/irmc.c
-@@ -167,6 +167,8 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
- 	else
- 		irmc->buffer = g_string_append(irmc->buffer, owner_vcard);
- 
-+	if (buffer == NULL)
-+		goto finish;
- 	/* loop around buffer and add X-IRMC-LUID attribs */
- 	s = buffer;
- 	while ((t = strstr(s, "UID:")) != NULL) {
-@@ -189,7 +191,7 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
- 	}
- 	/* add remaining bit of buffer */
- 	irmc->buffer = g_string_append(irmc->buffer, s);
--
-+finish:
- 	obex_object_set_io_flags(irmc, G_IO_IN, 0);
- }
- 
--- 
-1.7.3.4
+I booted to todays linux git and bluetooth is no longer working.  My magic mouse will not connect correctly.
 
+Reverting: 
+
+commit 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95
+Author: Gustavo F. Padovan <padovan@profusion.mobi>
+Date:   Thu Jun 30 16:11:30 2011 -0300
+
+    Bluetooth: Fix regression with incoming L2CAP connections
+    
+    PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
+    ( probably after the df3c3931e commit ) the l2cap connection
+    could not be established in case when the "Auth Complete" HCI
+    event does not arive before the initiator send "Configuration
+    request", in which case l2cap replies with "Command rejected"
+    since the channel is still in BT_CONNECT2 state.
+    
+    Based on patch from: Ilia Kolomisnky <iliak@ti.com>
+    
+    Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
+
+Fixes the bug here (things work like rc7).
+
+Do we really need 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95 in 3.0?
+
+Thanks,
+
+Ed Tomlinson
