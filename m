@@ -1,28 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sat, 16 Jul 2011 14:54:30 -0400
-Subject: Unencrypted keyboard allows password visibility
-Message-ID: <1310842470.4874.35.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+Date: Sat, 16 Jul 2011 10:15:18 -0700 (PDT)
+Message-Id: <20110716.101518.1007939482226184514.davem@davemloft.net>
+To: padovan@profusion.mobi
+Cc: linville@tuxdriver.com, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/2] Bluetooth: Fix regressions for 3.0
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
+References: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a keyboard remote device does not initially require encryption during
-initial ACL connection, then passwords (or other initial input) may be
-transmitted unencrypted.
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Date: Sat, 16 Jul 2011 01:30:19 -0300
 
-The main problem is that the input server does not force link encryption
-until *after* both the ctrl and intr l2cap channels are connected. This
-will allow the remote device to begin transmitting unencrypted hid input
-reports -- which is often a password!
+> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+> 
+> Gustavo F. Padovan (1):
+>   Bluetooth: Fix regression in L2CAP connection procedure
+> 
+> Ilia Kolomisnky (1):
+>   Bluetooth: Fix crash with incoming L2CAP connections
+> 
+>  net/bluetooth/l2cap_core.c |    9 +++++----
+>  1 files changed, 5 insertions(+), 4 deletions(-)
 
-Inquiring minds can review hidp_add_connection() in input/device.c for
-details.
+John I'm going to apply these directly so I can get them to
+Linus in time for 3.0-final.
 
-However, before I submit a patch, is the device class from the sdp/hid
-record preferable to the l2cap socket device class (via btio)?
-
-Regards,
-Peter
+Thanks Gustavo.
