@@ -4,51 +4,23 @@ To: davem@davemloft.net
 Cc: linville@tuxdriver.com, netdev@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org,
 	"Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 1/2] Bluetooth: Fix regression in L2CAP connection procedure
-Date: Sat, 16 Jul 2011 01:30:20 -0300
-Message-Id: <1310790621-28510-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
-References: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: [PATCH 0/2] Bluetooth: Fix regressions for 3.0
+Date: Sat, 16 Jul 2011 01:30:19 -0300
+Message-Id: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Caused by the following commit, partially revert it.
+Gustavo F. Padovan (1):
+  Bluetooth: Fix regression in L2CAP connection procedure
 
-commit 9fa7e4f76f3658ba1f44fbdb95c77e7df3f53f95
-Author: Gustavo F. Padovan <padovan@profusion.mobi>
-Date:   Thu Jun 30 16:11:30 2011 -0300
+Ilia Kolomisnky (1):
+  Bluetooth: Fix crash with incoming L2CAP connections
 
-    Bluetooth: Fix regression with incoming L2CAP connections
+ net/bluetooth/l2cap_core.c |    9 +++++----
+ 1 files changed, 5 insertions(+), 4 deletions(-)
 
-    PTS test A2DP/SRC/SRC_SET/TC_SRC_SET_BV_02_I revealed that
-    ( probably after the df3c3931e commit ) the l2cap connection
-    could not be established in case when the "Auth Complete" HCI
-    event does not arive before the initiator send "Configuration
-    request", in which case l2cap replies with "Command rejected"
-    since the channel is still in BT_CONNECT2 state.
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Gustavo F. Padovan <padovan@profusion.mobi>
----
- net/bluetooth/l2cap_core.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ebff14c..4fbf67e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2323,8 +2323,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 
- 	sk = chan->sk;
- 
--	if ((bt_sk(sk)->defer_setup && sk->sk_state != BT_CONNECT2) ||
--		 (!bt_sk(sk)->defer_setup && sk->sk_state != BT_CONFIG)) {
-+	if (sk->sk_state != BT_CONFIG && sk->sk_state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej rej;
- 
- 		rej.reason = cpu_to_le16(0x0002);
 -- 
 1.7.6
 
