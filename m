@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Allow ACL packets over USB in HCI_RAW mode
+Subject: Re: Unencrypted keyboard allows password visibility
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Peter Hurley <peter@hurleysoftware.com>
 Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sun, 17 Jul 2011 13:02:13 +0200
-In-Reply-To: <1310647712.3208.3.camel@THOR>
-References: <1310647712.3208.3.camel@THOR>
+Date: Sun, 17 Jul 2011 12:58:39 +0200
+In-Reply-To: <1310842470.4874.35.camel@THOR>
+References: <1310842470.4874.35.camel@THOR>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1310900534.21109.116.camel@aeonflux>
+Message-ID: <1310900320.21109.115.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Peter,
 
-> Removed tests which prevent transmission of ACL packets
-> when the device is in HCI_RAW mode. These tests verified that
-> there are ACL or LE links currently tracked by the HCI
-> connection manager. However, a HCI_RAW mode device does not
-> use the connection manager. In these circumstances, the connection
-> counts will be zero, and thus, transmitted ACL packets dropped.
+> If a keyboard remote device does not initially require encryption during
+> initial ACL connection, then passwords (or other initial input) may be
+> transmitted unencrypted.
 > 
-> The acl_num test is actually a vestige of a previous bulk URB
-> scheme that is no longer used by this driver (bulk URBs were not
-> started until at least one ACL connection was created). This was
-> incompatible with some endpoint implementations and was dropped -
-> see commit 43c2e57f94.
-> 
-> The utility of these tests is marginal - currently, the hci tx
-> scheduler cannot send an ACL or LE packet for an untracked connection
-> (except if the device is in HCI_RAW mode).
-> 
-> Lastly, no other transport layer driver enforces these same tests.
+> The main problem is that the input server does not force link encryption
+> until *after* both the ctrl and intr l2cap channels are connected. This
+> will allow the remote device to begin transmitting unencrypted hid input
+> reports -- which is often a password!
 
-for kernel patches, we do require the Signed-off-by line.
+are you sure keyboards transmit data if only one channel is connected.
+If I remember this correctly then they should not. Only when both
+channels are setup, the HID connection is complete. And only then
+encryption should be required.
 
-Gustavo, I am fine with this btw. So Acked-by.
+> Inquiring minds can review hidp_add_connection() in input/device.c for
+> details.
+> 
+> However, before I submit a patch, is the device class from the sdp/hid
+> record preferable to the l2cap socket device class (via btio)?
+
+Anyhow, in theory this is still all a race condition. It would be better
+to use our DEFER_ACCEPT support in the kernel and allow in between that
+phase to set the encryption requirement on that socket. And then have
+the kernel ensure a secured link before allowing any L2CAP packets
+coming in. Something similar to what is ensured with Security Modem 4
+for non-SDP channels.
 
 Regards
 
