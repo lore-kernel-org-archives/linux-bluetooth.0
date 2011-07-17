@@ -1,41 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 17 Jul 2011 12:46:31 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: David Miller <davem@davemloft.net>
-Cc: padovan@profusion.mobi, netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] Bluetooth: Fix regressions for 3.0
-Message-ID: <20110717164631.GA18545@tuxdriver.com>
-References: <1310790621-28510-1-git-send-email-padovan@profusion.mobi>
- <20110716.101518.1007939482226184514.davem@davemloft.net>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sun, 17 Jul 2011 11:23:13 -0400
+Subject: Re: Unencrypted keyboard allows password visibility
+Message-ID: <1310916193.17476.35.camel@THOR>
+References: <1310842470.4874.35.camel@THOR>
+	 <1310900320.21109.115.camel@aeonflux>
+In-Reply-To: <1310900320.21109.115.camel@aeonflux>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110716.101518.1007939482226184514.davem@davemloft.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jul 16, 2011 at 10:15:18AM -0700, David Miller wrote:
-> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> Date: Sat, 16 Jul 2011 01:30:19 -0300
-> 
-> > From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> > 
-> > Gustavo F. Padovan (1):
-> >   Bluetooth: Fix regression in L2CAP connection procedure
-> > 
-> > Ilia Kolomisnky (1):
-> >   Bluetooth: Fix crash with incoming L2CAP connections
-> > 
-> >  net/bluetooth/l2cap_core.c |    9 +++++----
-> >  1 files changed, 5 insertions(+), 4 deletions(-)
-> 
-> John I'm going to apply these directly so I can get them to
-> Linus in time for 3.0-final.
-> 
-> Thanks Gustavo.
+Hi Marcel,
 
-Yup, looks great -- thanks!
+> Hi Peter,
+>=20
+> > If a keyboard remote device does not initially require encryption durin=
+g
+> > initial ACL connection, then passwords (or other initial input) may be
+> > transmitted unencrypted.
+> >=20
+> > The main problem is that the input server does not force link encryptio=
+n
+> > until *after* both the ctrl and intr l2cap channels are connected. This
+> > will allow the remote device to begin transmitting unencrypted hid inpu=
+t
+> > reports -- which is often a password!
+>=20
+> are you sure keyboards transmit data if only one channel is connected.
+> If I remember this correctly then they should not. Only when both
+> channels are setup, the HID connection is complete. And only then
+> encryption should be required.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Your understanding is correct here. The order is:
+  1. Establish ctrl l2cap channel (PSM 17).
+  2. Establish intr l2cap channel (PSM 19).
+  3. HID input reports recv'd on intr channel.
+
+The keyboard can begin delivering data as soon as it gets the l2cap
+config response for the _intr_ channel.
+
+The input server requests encryption (via btd_adapter_encrypt_link)
+*after* the intr channel has been established. This allows the keyboard
+to transmit unencrypted HID input reports while,
+  1. Authentication is requested.
+  2. The link key is exchanged.
+  3. Encryption mode is set.
+
+Most keyboards queue up all the input typed prior to link establishment
+and then spit it out as soon as it can. So what happens is,
+  1. User presses first key of password.
+  2. Keyboard wakes up and initiates ACL connection.
+  3. User keeps typing password - which keyboard internally queues.
+  4. Keyboard establishes first ctrl, then intr l2cap channel.
+  5. Input server requests authentication upon establishing intr channel
+  6. Keyboard sends HID input reports very fast (dequeuing password).
+  7. Link key is exchanged - keyboard still sending queued HID reports.
+  8. Auth is completed - Set Connection Encryption sent.
+  9. Only now is the link encrypted.=20
+
+> > Inquiring minds can review hidp_add_connection() in input/device.c for
+> > details.
+> >=20
+> > However, before I submit a patch, is the device class from the sdp/hid
+> > record preferable to the l2cap socket device class (via btio)?
+>=20
+> Anyhow, in theory this is still all a race condition. It would be better
+> to use our DEFER_ACCEPT support in the kernel and allow in between that
+> phase to set the encryption requirement on that socket. And then have
+> the kernel ensure a secured link before allowing any L2CAP packets
+> coming in. Something similar to what is ensured with Security Modem 4
+> for non-SDP channels.
+
+Ok. I'll look into that. And I answered my own question regarding the
+class_of_device preference: sdp record is preferable in case the device
+is a composite.
+
+Regards,
+Peter
