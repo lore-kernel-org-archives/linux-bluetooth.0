@@ -1,44 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 3/7] Load HTP plugin only if LE is enabled
-Date: Mon, 18 Jul 2011 15:10:38 +0200
-Message-Id: <1310994642-16375-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1310994642-16375-2-git-send-email-sancane@gmail.com>
-References: <1310994642-16375-1-git-send-email-sancane@gmail.com>
- <1310994642-16375-2-git-send-email-sancane@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1310993650.21109.159.camel@aeonflux>
+References: <1310988546-8187-1-git-send-email-lkslawek@gmail.com>
+	<1310993650.21109.159.camel@aeonflux>
+Date: Mon, 18 Jul 2011 15:09:43 +0200
+Message-ID: <CA+i+Aw1m4=ce7tAw64dH8dsDWX4uMSgb2AS-X5V0w7ELyKaaCw@mail.gmail.com>
+Subject: Re: [PATCH obexd] Fix compiler warning
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- thermometer/main.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+On Mon, Jul 18, 2011 at 2:54 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> what compiler warning does this fix. Lets fix this properly and not
+> introduce more magic casting.
+>
+> Regards
+>
+> Marcel
 
-diff --git a/thermometer/main.c b/thermometer/main.c
-index 33649a7..df3f1ff 100644
---- a/thermometer/main.c
-+++ b/thermometer/main.c
-@@ -30,14 +30,19 @@
- #include <glib.h>
- #include <errno.h>
- #include <gdbus.h>
-+#include <stdint.h>
- 
- #include "plugin.h"
-+#include "hcid.h"
- #include "manager.h"
- 
- static DBusConnection *connection = NULL;
- 
- static int thermometer_init(void)
- {
-+	if (!main_opts.le)
-+		return -EINVAL;
-+
- 	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
- 	if (connection == NULL)
- 		return -EIO;
+Still - no longer valid. As I mentioned, Johan pushed his own fix for
+this few minutes after I've sent patch.
+
 -- 
-1.7.6
-
+Slawomir Bochenski
