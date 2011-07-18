@@ -1,27 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Jul 2011 00:13:27 +0300
+Date: Mon, 18 Jul 2011 23:56:14 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
-Subject: Re: [PATCH] Fix compilation with --disable-sap and glib < 2.28
-Message-ID: <20110718211327.GA27879@dell.ger.corp.intel.com>
-References: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/6 v2] Make use of g_slist_free_full when elements
+ are dynamically-allocated
+Message-ID: <20110718205614.GA16958@dell.ger.corp.intel.com>
+References: <1310995152-24121-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1310995152-24121-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Mon, Jul 18, 2011, Szymon Janc wrote:
+On Mon, Jul 18, 2011, Luiz Augusto von Dentz wrote:
+> This avoid having to iterate twice in the list to free its elements.
 > ---
->  audio/telephony-maemo6.c |    3 +++
->  audio/telephony-ofono.c  |    3 +++
->  2 files changed, 6 insertions(+), 0 deletions(-)
+>  configure.ac                |    3 +++
+>  plugins/bluetooth.c         |    8 +++-----
+>  plugins/pbap.c              |    7 ++++---
+>  plugins/phonebook-dummy.c   |    3 +--
+>  plugins/phonebook-tracker.c |    5 ++---
+>  plugins/vcard.c             |   18 ++++++------------
+>  src/obex.h                  |    8 ++++++++
+>  7 files changed, 27 insertions(+), 25 deletions(-)
 
-Thanks, the patch has been upstream (after I rewrote the commit message
-since I don't see how this has anything to do with SAP).
+Doesn't compile:
+
+  CC     plugins/vcard.o
+In file included from plugins/vcard.c:33:0:
+./src/obex.h:66:51: error: unknown type name ‘obex_object_t’
+./src/obex.h:68:48: error: unknown type name ‘obex_object_t’
+make[1]: *** [plugins/vcard.o] Error 1
+
+Please fix and resend.
 
 Johan
