@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 18 Jul 2011 13:02:49 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: padovan@profusion.mobi
+cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH 0/3] Zero-copy L2CAP ERTM & streaming reassembly
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org
-Date: Mon, 18 Jul 2011 22:33:42 +0200
-In-Reply-To: <alpine.DEB.2.02.1107181300360.7338@mathewm-linux>
+In-Reply-To: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
+Message-ID: <alpine.DEB.2.02.1107181300360.7338@mathewm-linux>
 References: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
-	 <alpine.DEB.2.02.1107181300360.7338@mathewm-linux>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1311021225.21109.165.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
 
-> > This patch series changes SDU reassembly to link together PDU skbs
-> > using a frag list instead of copying all data bytes to a single,
-> > linear skb.  The reduction in overhead is especially helpful with high
-> > speed AMP links.
+Gustavo -
 
-I have not looked at these at all, but one thing that came up in a
-discussion between Johan and myself with OBEX zero-copy was that we like
-to also see MSG_MORE support for L2CAP and RFCOMM sockets. Something to
-keep in mind ;)
+On Wed, 13 Jul 2011, Mat Martineau wrote:
 
-Regards
+> This patch series changes SDU reassembly to link together PDU skbs
+> using a frag list instead of copying all data bytes to a single,
+> linear skb.  The reduction in overhead is especially helpful with high
+> speed AMP links.
+>
+>
+> Mat Martineau (3):
+>  Bluetooth: Linearize skbs for use in BNEP, CMTP, HIDP, and RFCOMM
+>  Bluetooth: Handle fragmented skbs in bt_sock_stream_recvmsg()
+>  Bluetooth: Perform L2CAP SDU reassembly without copying data
+>
+> include/net/bluetooth/l2cap.h |    3 +-
+> net/bluetooth/af_bluetooth.c  |   30 +++++-
+> net/bluetooth/bnep/core.c     |    5 +-
+> net/bluetooth/cmtp/core.c     |    5 +-
+> net/bluetooth/hidp/core.c     |   10 ++-
+> net/bluetooth/l2cap_core.c    |  239 ++++++++++++++---------------------------
+> net/bluetooth/rfcomm/core.c   |    5 +-
+> 7 files changed, 128 insertions(+), 169 deletions(-)
+>
+> -- 
+> 1.7.6
 
-Marcel
+Have you had a chance to look at these patches?
 
+Thanks,
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
