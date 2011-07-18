@@ -1,193 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/6 v2] Make use of g_slist_free_full when elements are dynamically-allocated
-Date: Mon, 18 Jul 2011 16:19:12 +0300
-Message-Id: <1310995152-24121-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 5/7] Add thermometer driver skeleton
+Date: Mon, 18 Jul 2011 15:10:40 +0200
+Message-Id: <1310994642-16375-5-git-send-email-sancane@gmail.com>
+In-Reply-To: <1310994642-16375-4-git-send-email-sancane@gmail.com>
+References: <1310994642-16375-1-git-send-email-sancane@gmail.com>
+ <1310994642-16375-2-git-send-email-sancane@gmail.com>
+ <1310994642-16375-3-git-send-email-sancane@gmail.com>
+ <1310994642-16375-4-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This avoid having to iterate twice in the list to free its elements.
 ---
- configure.ac                |    3 +++
- plugins/bluetooth.c         |    8 +++-----
- plugins/pbap.c              |    7 ++++---
- plugins/phonebook-dummy.c   |    3 +--
- plugins/phonebook-tracker.c |    5 ++---
- plugins/vcard.c             |   18 ++++++------------
- src/obex.h                  |    8 ++++++++
- 7 files changed, 27 insertions(+), 25 deletions(-)
+ Makefile.am               |    3 ++-
+ thermometer/manager.c     |   10 +++-------
+ thermometer/thermometer.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ thermometer/thermometer.h |   30 ++++++++++++++++++++++++++++++
+ 4 files changed, 76 insertions(+), 8 deletions(-)
+ create mode 100644 thermometer/thermometer.c
+ create mode 100644 thermometer/thermometer.h
 
-diff --git a/configure.ac b/configure.ac
-index 708e40b..e02f218 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -71,6 +71,9 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+diff --git a/Makefile.am b/Makefile.am
+index 8c25eab..4a7f34f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -211,7 +211,8 @@ endif
+ if THERMOMETERPLUGIN
+ builtin_modules += thermometer
+ builtin_sources += thermometer/main.c \
+-			thermometer/manager.h thermometer/manager.c
++			thermometer/manager.h thermometer/manager.c \
++			thermometer/thermometer.h thermometer/thermometer.c
+ endif
  
- PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.16, dummy=yes,
- 				AC_MSG_ERROR(libglib 2.16 or later is required))
-+AC_CHECK_LIB(glib-2.0, g_slist_free_full, dummy=yes,
-+		AC_DEFINE(NEED_G_SLIST_FREE_FULL, 1,
-+			[Define to 1 if you need g_slist_free_full() function.]))
- AC_SUBST(GLIB_CFLAGS)
- AC_SUBST(GLIB_LIBS)
+ builtin_modules += hciops mgmtops
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+index 988bd57..b5fba4c 100644
+--- a/thermometer/manager.c
++++ b/thermometer/manager.c
+@@ -27,23 +27,19 @@
  
-diff --git a/plugins/bluetooth.c b/plugins/bluetooth.c
-index b126717..0c50a54 100644
---- a/plugins/bluetooth.c
-+++ b/plugins/bluetooth.c
-@@ -546,7 +546,7 @@ static void *bluetooth_start(struct obex_server *server, int *err)
- 	return ios;
+ #include "adapter.h"
+ #include "device.h"
+-#include "log.h"
++#include "thermometer.h"
+ #include "manager.h"
+ 
+-#define HEALTH_THERMOMETER_SVC_UUID	0x1809
+-#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
+-
+ static DBusConnection *connection = NULL;
+ 
+ static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
+ {
+-	/* TODO; */
+-	return 0;
++	return thermometer_register(connection, device);
  }
  
--static void stop(gpointer data, gpointer user_data)
-+static void stop(gpointer data)
+ static void thermometer_driver_remove(struct btd_device *device)
  {
- 	GIOChannel *io = data;
- 
-@@ -558,8 +558,7 @@ static void bluetooth_stop(void *data)
- {
- 	GSList *ios = data;
- 
--	g_slist_foreach(ios, stop, NULL);
--	g_slist_free(ios);
-+	g_slist_free_full(ios, stop);
+-	/* TODO: */
++	thermometer_unregister(device);
  }
  
- static struct obex_transport_driver driver = {
-@@ -589,8 +588,7 @@ static void bluetooth_exit(void)
- 	g_dbus_remove_watch(connection, listener_id);
- 
- 	if (any) {
--		g_slist_foreach(any->services, (GFunc) g_free, NULL);
--		g_slist_free(any->services);
-+		g_slist_free_full(any->services, g_free);
- 		g_free(any->path);
- 		g_free(any);
- 	}
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index 5455cce..1925b5f 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -160,8 +160,10 @@ static const uint8_t PBAP_TARGET[TARGET_SIZE] = {
- typedef int (*cache_entry_find_f) (const struct cache_entry *entry,
- 			const char *value);
- 
--static void cache_entry_free(struct cache_entry *entry)
-+static void cache_entry_free(void *data)
- {
-+	struct cache_entry *entry = data;
+ static struct btd_device_driver thermometer_device_driver = {
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+new file mode 100644
+index 0000000..a05d37d
+--- /dev/null
++++ b/thermometer/thermometer.c
+@@ -0,0 +1,41 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *  Authors:
++ *  Santiago Carot Nemesio <sancane at gmail.com>
++ *  Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- 	g_free(entry->id);
- 	g_free(entry->name);
- 	g_free(entry->sound);
-@@ -222,8 +224,7 @@ static const char *cache_find(struct cache *cache, uint32_t handle)
- 
- static void cache_clear(struct cache *cache)
- {
--	g_slist_foreach(cache->entries, (GFunc) cache_entry_free, NULL);
--	g_slist_free(cache->entries);
-+	g_slist_free_full(cache->entries, cache_entry_free);
- 	cache->entries = NULL;
- }
- 
-diff --git a/plugins/phonebook-dummy.c b/plugins/phonebook-dummy.c
-index ede4643..035ec35 100644
---- a/plugins/phonebook-dummy.c
-+++ b/plugins/phonebook-dummy.c
-@@ -186,8 +186,7 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
- 		close(fd);
- 	}
- 
--	g_slist_foreach(sorted, (GFunc) g_free, NULL);
--	g_slist_free(sorted);
-+	g_slist_free_full(sorted, g_free);
- 
- 	if (count)
- 		*count = n;
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index d1f4cd7..2ff2056 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -1442,15 +1442,14 @@ static gboolean find_checked_number(GSList *numbers, const char *number)
- 	return FALSE;
- }
- 
--static void gstring_free_helper(gpointer data, gpointer user_data)
-+static void gstring_free_helper(gpointer data)
- {
- 	g_string_free(data, TRUE);
- }
- 
- static void free_data_numbers(struct phonebook_data *data)
- {
--	g_slist_foreach(data->numbers, gstring_free_helper, NULL);
--	g_slist_free(data->numbers);
-+	g_slist_free_full(data->numbers, gstring_free_helper);
- 	data->numbers = NULL;
- }
- 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index b997fc4..604dc96 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -30,6 +30,7 @@
- #include <gdbus.h>
- 
- #include "vcard.h"
-+#include "obex.h"
- 
- #define ADDR_FIELD_AMOUNT 7
- #define LEN_MAX 128
-@@ -599,7 +600,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- }
- 
- 
--static void field_free(gpointer data, gpointer user_data)
-+static void field_free(gpointer data)
- {
- 	struct phonebook_field *field = data;
- 
-@@ -612,17 +613,10 @@ void phonebook_contact_free(struct phonebook_contact *contact)
- 	if (contact == NULL)
- 		return;
- 
--	g_slist_foreach(contact->numbers, field_free, NULL);
--	g_slist_free(contact->numbers);
--
--	g_slist_foreach(contact->emails, field_free, NULL);
--	g_slist_free(contact->emails);
--
--	g_slist_foreach(contact->addresses, field_free, NULL);
--	g_slist_free(contact->addresses);
--
--	g_slist_foreach(contact->urls, field_free, NULL);
--	g_slist_free(contact->urls);
-+	g_slist_free_full(contact->numbers, field_free);
-+	g_slist_free_full(contact->emails, field_free);
-+	g_slist_free_full(contact->addresses, field_free);
-+	g_slist_free_full(contact->urls, field_free);
- 
- 	g_free(contact->uid);
- 	g_free(contact->fullname);
-diff --git a/src/obex.h b/src/obex.h
-index 03243f1..b1afe56 100644
---- a/src/obex.h
-+++ b/src/obex.h
-@@ -73,3 +73,11 @@ gboolean obex_option_symlinks(void);
- 
- /* Just a thin wrapper around memcmp to deal with NULL values */
- int memncmp0(const void *a, size_t na, const void *b, size_t nb);
++#include <gdbus.h>
 +
-+#ifdef NEED_G_SLIST_FREE_FULL
-+static inline void g_slist_free_full(GSList *list, GDestroyNotify free_func)
++#include "adapter.h"
++#include "device.h"
++#include "thermometer.h"
++
++int thermometer_register(DBusConnection *connection, struct btd_device *device)
 +{
-+	g_slist_foreach(list, (GFunc) free_func, NULL);
-+	g_slist_free(list);
++	/* TODO: Register Health Thermometer Interface */
++	return 0;
 +}
-+#endif
++
++void thermometer_unregister(struct btd_device *device)
++{
++	/* TODO: Unregister Health Thermometer Interface */
++}
+\ No newline at end of file
+diff --git a/thermometer/thermometer.h b/thermometer/thermometer.h
+new file mode 100644
+index 0000000..28c9d18
+--- /dev/null
++++ b/thermometer/thermometer.h
+@@ -0,0 +1,30 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *  Authors:
++ *  Santiago Carot Nemesio <sancane at gmail.com>
++ *  Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#define HEALTH_THERMOMETER_SVC_UUID	0x1809
++#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
++
++int thermometer_register(DBusConnection *connection, struct btd_device *device);
++void thermometer_unregister(struct btd_device *device);
+\ No newline at end of file
 -- 
 1.7.6
 
