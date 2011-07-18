@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez@gmail.com>
-Subject: [PATCH] Fix a GLib-Warning in adaptername plugin.
-Date: Mon, 18 Jul 2011 16:22:19 +0200
-Message-Id: <1310998939-15143-1-git-send-email-jorge.fernandez.gonzalez@gmail.com>
+From: Arek Lichwa <arkadiusz.lichwa@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<ulrik.lauren@stericsson.com>,
+	Arek Lichwa <arkadiusz.lichwa@tieto.com>
+Subject: [PATCH] Remove too early null assignment to working rfcomm channel in sap server.
+Date: Mon, 18 Jul 2011 15:21:34 +0200
+Message-ID: <1310995294-3215-1-git-send-email-arkadiusz.lichwa@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A -GLib-WARNING **: Invalid file descriptor.- was showed when the
-bluetooth daemon is killed.
+When dropping rfcomm channel to sap server, the component's channel
+cleanup process doesn't trigger disallocation of assigned glib resources
+since reference to working channel is already marked as null.
 ---
- plugins/adaptername.c |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
+ sap/server.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-index 2a54cc0..a7ebf37 100644
---- a/plugins/adaptername.c
-+++ b/plugins/adaptername.c
-@@ -262,10 +262,15 @@ static gboolean handle_inotify_cb(GIOChannel *channel, GIOCondition cond,
+diff --git a/sap/server.c b/sap/server.c
+index c55aa6e..8bd8fe1 100644
+--- a/sap/server.c
++++ b/sap/server.c
+@@ -1122,7 +1122,6 @@ static void sap_io_destroy(void *data)
+ 				conn->state == SAP_STATE_GRACEFUL_DISCONNECT)
+ 			sap_disconnect_req(NULL, 1);
  
- static void adaptername_remove(struct btd_adapter *adapter)
- {
--	if (watch_fd >= 0)
-+	if (watch_fd >= 0) {
- 		close(watch_fd);
--	if (inotify != NULL)
-+		watch_fd = -1;
-+	}
-+	if (inotify != NULL) {
- 		g_io_channel_shutdown(inotify, FALSE, NULL);
-+		g_io_channel_unref(inotify);
-+		inotify = NULL;
-+	}
+-		conn->io = NULL;
+ 		sap_conn_remove(conn);
+ 	}
  }
- 
- static struct btd_adapter_driver adaptername_driver = {
 -- 
-1.7.4.1
+1.7.6
 
