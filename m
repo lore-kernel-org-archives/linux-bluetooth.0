@@ -1,39 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Jul 2011 15:18:11 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/3] Zero-copy L2CAP ERTM & streaming reassembly
-In-Reply-To: <1311021225.21109.165.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1107181458360.8933@mathewm-linux>
-References: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>  <alpine.DEB.2.02.1107181300360.7338@mathewm-linux> <1311021225.21109.165.camel@aeonflux>
+Date: Tue, 19 Jul 2011 00:13:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
+Subject: Re: [PATCH] Fix compilation with --disable-sap and glib < 2.28
+Message-ID: <20110718211327.GA27879@dell.ger.corp.intel.com>
+References: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Szymon,
 
-Hi Marcel -
+On Mon, Jul 18, 2011, Szymon Janc wrote:
+> ---
+>  audio/telephony-maemo6.c |    3 +++
+>  audio/telephony-ofono.c  |    3 +++
+>  2 files changed, 6 insertions(+), 0 deletions(-)
 
-On Mon, 18 Jul 2011, Marcel Holtmann wrote:
+Thanks, the patch has been upstream (after I rewrote the commit message
+since I don't see how this has anything to do with SAP).
 
-> Hi Mat,
->
->>> This patch series changes SDU reassembly to link together PDU skbs
->>> using a frag list instead of copying all data bytes to a single,
->>> linear skb.  The reduction in overhead is especially helpful with high
->>> speed AMP links.
->
-> I have not looked at these at all, but one thing that came up in a
-> discussion between Johan and myself with OBEX zero-copy was that we like
-> to also see MSG_MORE support for L2CAP and RFCOMM sockets. Something to
-> keep in mind ;)
-
-Noted!  It would be nice to build up OBEX packets in the kernel, 
-rather than having to assemble entire packets in an application 
-buffer.
-
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Johan
