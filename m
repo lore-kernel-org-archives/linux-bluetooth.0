@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Fix compilation with --disable-sap and glib < 2.28
-Date: Mon, 18 Jul 2011 13:01:14 +0200
-Message-ID: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1310985570.21109.157.camel@aeonflux>
+References: <1310985316-2197-1-git-send-email-luiz.dentz@gmail.com>
+	<1310985570.21109.157.camel@aeonflux>
+Date: Mon, 18 Jul 2011 13:54:40 +0300
+Message-ID: <CABBYNZKdHjOcKuvhVF_BNcNxf3oJT19CQjVYx8Kb17CbT5M-2w@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/6] Make use of g_slist_free_full when elements are dynamically-allocated
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/telephony-maemo6.c |    3 +++
- audio/telephony-ofono.c  |    3 +++
- 2 files changed, 6 insertions(+), 0 deletions(-)
+Hi Marcel,
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 14d1ead..4430cc1 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -36,6 +36,9 @@
- #include <dbus/dbus.h>
- #include <gdbus.h>
- 
-+#include <bluetooth/sdp.h>
-+
-+#include "glib-helper.h"
- #include "log.h"
- #include "telephony.h"
- #include "error.h"
-diff --git a/audio/telephony-ofono.c b/audio/telephony-ofono.c
-index e72734c..26815cf 100644
---- a/audio/telephony-ofono.c
-+++ b/audio/telephony-ofono.c
-@@ -35,6 +35,9 @@
- #include <dbus/dbus.h>
- #include <gdbus.h>
- 
-+#include <bluetooth/sdp.h>
-+
-+#include "glib-helper.h"
- #include "log.h"
- #include "telephony.h"
- 
+On Mon, Jul 18, 2011 at 1:39 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luis,
+>
+>> This avoid having to iterate twice in the list to free its elements.
+>
+> please make sure we have the same workaround for older GLib versions
+> without this function. At this point of time, I wanna allow building it
+> with older GLib versions. We can revisit that at some point in the
+> future and remove that cruft, but for now it seems reasonable.
+
+Right, Ive forgot about that.. gonna add in v2
+
+
 -- 
-on behalf of ST-Ericsson
-
+Luiz Augusto von Dentz
