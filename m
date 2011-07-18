@@ -1,618 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 6/6] client: separate manager interface code from main
-Date: Mon, 18 Jul 2011 13:35:16 +0300
-Message-Id: <1310985316-2197-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 4/6] client: separate ftp code from session
+Date: Mon, 18 Jul 2011 13:35:14 +0300
+Message-Id: <1310985316-2197-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1310985316-2197-1-git-send-email-luiz.dentz@gmail.com>
 References: <1310985316-2197-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Move manager interface code to it own file.
+This should improve modularization of code
 ---
- Makefile.am      |    1 +
- client/main.c    |  540 +-------------------------------------------------
- client/manager.c |  589 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/manager.h |   25 +++
- 4 files changed, 619 insertions(+), 536 deletions(-)
- create mode 100644 client/manager.c
- create mode 100644 client/manager.h
+ Makefile.am      |    2 +
+ client/ftp.c     |  382 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/ftp.h     |   29 ++++
+ client/session.c |  323 +---------------------------------------------
+ 4 files changed, 417 insertions(+), 319 deletions(-)
+ create mode 100644 client/ftp.c
+ create mode 100644 client/ftp.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 8b80da3..5080ee1 100644
+index 049fc10..ab73539 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -125,6 +125,7 @@ libexec_PROGRAMS += client/obex-client
- client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				$(gwobex_sources) $(btio_sources) \
- 				client/main.c src/log.h src/log.c \
-+				client/manager.h client/manager.c \
+@@ -128,8 +128,10 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
  				client/session.h client/session.c \
  				client/pbap.h client/pbap.c \
  				client/sync.h client/sync.c \
-diff --git a/client/main.c b/client/main.c
-index 19ca436..618ad21 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -35,521 +35,7 @@
- #include <gdbus.h>
++				client/ftp.h client/ftp.c \
+ 				client/transfer.h client/transfer.c
  
- #include "log.h"
--#include "transfer.h"
--#include "session.h"
--
--#define CLIENT_SERVICE  "org.openobex.client"
--
--#define CLIENT_INTERFACE  "org.openobex.Client"
--#define CLIENT_PATH       "/"
--
--struct send_data {
--	DBusConnection *connection;
--	DBusMessage *message;
--	gchar *sender;
--	gchar *agent;
--	char *filename;
--	GPtrArray *files;
--};
--
--static GSList *sessions = NULL;
--
--static void shutdown_session(struct session_data *session)
--{
--	sessions = g_slist_remove(sessions, session);
--	session_shutdown(session);
--	session_unref(session);
--}
--
--static void unregister_session(void *data)
--{
--	struct session_data *session = data;
--
--	if (g_slist_find(sessions, session) == NULL)
--		return;
--
--	sessions = g_slist_remove(sessions, session);
--	session_unref(session);
--}
--
--static void create_callback(struct session_data *session, GError *err,
--							void *user_data)
--{
--	struct send_data *data = user_data;
--	unsigned int i;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		shutdown_session(session);
--		goto done;
--	}
--
--	if (session_get_target(session) != NULL) {
--		const char *path;
--
--		path = session_register(session, unregister_session);
--
--		g_dbus_send_reply(data->connection, data->message,
--				DBUS_TYPE_OBJECT_PATH, &path,
--				DBUS_TYPE_INVALID);
--		goto done;
--	}
--
--	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
--
--	session_set_agent(session, data->sender, data->agent);
--
--	for (i = 0; i < data->files->len; i++) {
--		const gchar *filename = g_ptr_array_index(data->files, i);
--		gchar *basename = g_path_get_basename(filename);
--
--		if (session_send(session, filename, basename) < 0) {
--			g_free(basename);
--			break;
--		}
--
--		g_free(basename);
--	}
--
--	/* No need to keep a reference for SendFiles */
--	sessions = g_slist_remove(sessions, session);
--	session_unref(session);
--
--done:
--	if (data->files)
--		g_ptr_array_free(data->files, TRUE);
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data->agent);
--	g_free(data);
--}
--
--static int parse_device_dict(DBusMessageIter *iter,
--		const char **source, const char **dest, const char **target,
--		uint8_t *channel)
--{
--	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
--		DBusMessageIter entry, value;
--		const char *key;
--
--		dbus_message_iter_recurse(iter, &entry);
--		dbus_message_iter_get_basic(&entry, &key);
--
--		dbus_message_iter_next(&entry);
--		dbus_message_iter_recurse(&entry, &value);
--
--		switch (dbus_message_iter_get_arg_type(&value)) {
--		case DBUS_TYPE_STRING:
--			if (g_str_equal(key, "Source") == TRUE)
--				dbus_message_iter_get_basic(&value, source);
--			else if (g_str_equal(key, "Destination") == TRUE)
--				dbus_message_iter_get_basic(&value, dest);
--			else if (g_str_equal(key, "Target") == TRUE)
--				dbus_message_iter_get_basic(&value, target);
--			break;
--		case DBUS_TYPE_BYTE:
--			if (g_str_equal(key, "Channel") == TRUE)
--				dbus_message_iter_get_basic(&value, channel);
--			break;
--		}
--
--		dbus_message_iter_next(iter);
--	}
--
--	return 0;
--}
--
--static DBusMessage *send_files(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	DBusMessageIter iter, array;
--	struct session_data *session;
--	GPtrArray *files;
--	struct send_data *data;
--	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
--	const char *sender;
--	uint8_t channel = 0;
--
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &array);
--
--	parse_device_dict(&array, &source, &dest, &target, &channel);
--	if (dest == NULL)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	dbus_message_iter_next(&iter);
--	dbus_message_iter_recurse(&iter, &array);
--
--	files = g_ptr_array_new();
--	if (files == NULL)
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--
--	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
--		char *value;
--
--		dbus_message_iter_get_basic(&array, &value);
--		g_ptr_array_add(files, value);
--
--		dbus_message_iter_next(&array);
--	}
--
--	dbus_message_iter_next(&iter);
--	dbus_message_iter_get_basic(&iter, &agent);
--
--	if (files->len == 0) {
--		g_ptr_array_free(files, TRUE);
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--	}
--
--	sender = dbus_message_get_sender(message);
--
--	data = g_try_malloc0(sizeof(*data));
--	if (data == NULL) {
--		g_ptr_array_free(files, TRUE);
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--	}
--
--	data->connection = dbus_connection_ref(connection);
--	data->message = dbus_message_ref(message);
--	data->sender = g_strdup(sender);
--	data->agent = g_strdup(agent);
--	data->files = files;
--
--	session = session_create(source, dest, "OPP", channel, sender,
--							create_callback, data);
--	if (session != NULL) {
--		sessions = g_slist_append(sessions, session);
--		return NULL;
--	}
--
--	g_ptr_array_free(data->files, TRUE);
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data->agent);
--	g_free(data);
--
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
--static void pull_complete_callback(struct session_data *session,
--					GError *err, void *user_data)
--{
--	struct send_data *data = user_data;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		goto done;
--	}
--
--	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
--
--done:
--	shutdown_session(session);
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->filename);
--	g_free(data->sender);
--	g_free(data);
--}
--
--static void pull_session_callback(struct session_data *session,
--					GError *err, void *user_data)
--{
--	struct send_data *data = user_data;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		shutdown_session(session);
--		goto done;
--	}
--
--	session_pull(session, "text/x-vcard", data->filename,
--						pull_complete_callback, data);
--
--	return;
--
--done:
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->filename);
--	g_free(data->sender);
--	g_free(data);
--}
--
--static DBusMessage *pull_business_card(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	DBusMessageIter iter, dict;
--	struct session_data *session;
--	struct send_data *data;
--	const char *source = NULL, *dest = NULL, *target = NULL;
--	const char *name = NULL;
--	uint8_t channel = 0;
--
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &dict);
--
--	parse_device_dict(&dict, &source, &dest, &target, &channel);
--	if (dest == NULL)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	dbus_message_iter_next(&iter);
--
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	dbus_message_iter_get_basic(&iter, &name);
--
--	data = g_try_malloc0(sizeof(*data));
--	if (data == NULL)
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--
--	data->connection = dbus_connection_ref(connection);
--	data->message = dbus_message_ref(message);
--	data->sender = g_strdup(dbus_message_get_sender(message));
--	data->filename = g_strdup(name);
--
--	session = session_create(source, dest, "OPP", channel, data->sender,
--					pull_session_callback, data);
--	if (session != NULL) {
--		sessions = g_slist_append(sessions, session);
--		return NULL;
--	}
--
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data->filename);
--	g_free(data);
--
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
--static DBusMessage *exchange_business_cards(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
--static struct session_data *find_session(const char *path)
--{
--	GSList *l;
--
--	for (l = sessions; l; l = l->next) {
--		struct session_data *session = l->data;
--
--		if (g_str_equal(session_get_path(session), path) == TRUE)
--			return session;
--	}
--
--	return NULL;
--}
--
--static DBusMessage *create_session(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	DBusMessageIter iter, dict;
--	struct session_data *session;
--	struct send_data *data;
--	const char *source = NULL, *dest = NULL, *target = NULL;
--	uint8_t channel = 0;
--
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &dict);
--
--	parse_device_dict(&dict, &source, &dest, &target, &channel);
--	if (dest == NULL || target == NULL)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	data = g_try_malloc0(sizeof(*data));
--	if (data == NULL)
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--
--	data->connection = dbus_connection_ref(connection);
--	data->message = dbus_message_ref(message);
--	data->sender = g_strdup(dbus_message_get_sender(message));
--
--	session = session_create(source, dest, target, channel, data->sender,
--							create_callback, data);
--	if (session != NULL) {
--		sessions = g_slist_append(sessions, session);
--		return NULL;
--	}
--
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data);
--
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
--static DBusMessage *remove_session(DBusConnection *connection,
--				DBusMessage *message, void *user_data)
--{
--	struct session_data *session;
--	const gchar *sender, *path;
--
--	if (dbus_message_get_args(message, NULL,
--			DBUS_TYPE_OBJECT_PATH, &path,
--			DBUS_TYPE_INVALID) == FALSE)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	session = find_session(path);
--	if (session == NULL)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	sender = dbus_message_get_sender(message);
--	if (g_str_equal(sender, session_get_owner(session)) == FALSE)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.NotAuthorized",
--				"Not Authorized");
--
--	shutdown_session(session);
--
--	return dbus_message_new_method_return(message);
--}
--
--static void capabilities_complete_callback(struct session_data *session,
--						GError *err, void *user_data)
--{
--	struct transfer_data *transfer = session_get_transfer(session);
--	struct send_data *data = user_data;
--	const char *capabilities;
--	int size;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		goto done;
--	}
--
--	capabilities = transfer_get_buffer(transfer, &size);
--	if (size == 0)
--		capabilities = "";
--
--	g_dbus_send_reply(data->connection, data->message,
--			DBUS_TYPE_STRING, &capabilities,
--			DBUS_TYPE_INVALID);
--
--done:
--
--	shutdown_session(session);
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data);
--}
--
--static void capability_session_callback(struct session_data *session,
--						GError *err, void *user_data)
--{
--	struct send_data *data = user_data;
--
--	if (err != NULL) {
--		DBusMessage *error = g_dbus_create_error(data->message,
--					"org.openobex.Error.Failed",
--					"%s", err->message);
--		g_dbus_send_message(data->connection, error);
--		shutdown_session(session);
--		goto done;
--	}
--
--	session_pull(session, "x-obex/capability", NULL,
--				capabilities_complete_callback, data);
--
--	return;
--
--done:
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data);
--}
--
--static DBusMessage *get_capabilities(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
--{
--	DBusMessageIter iter, dict;
--	struct session_data *session;
--	struct send_data *data;
--	const char *source = NULL, *dest = NULL, *target = NULL;
--	uint8_t channel = 0;
--
--	dbus_message_iter_init(message, &iter);
--	dbus_message_iter_recurse(&iter, &dict);
--
--	parse_device_dict(&dict, &source, &dest, &target, &channel);
--	if (dest == NULL)
--		return g_dbus_create_error(message,
--				"org.openobex.Error.InvalidArguments", NULL);
--
--	data = g_try_malloc0(sizeof(*data));
--	if (data == NULL)
--		return g_dbus_create_error(message,
--					"org.openobex.Error.NoMemory", NULL);
--
--	data->connection = dbus_connection_ref(connection);
--	data->message = dbus_message_ref(message);
--	data->sender = g_strdup(dbus_message_get_sender(message));
--
--	if (!target)
--		target = "OPP";
--
--	session = session_create(source, dest, target, channel, data->sender,
--					capability_session_callback, data);
--	if (session != NULL) {
--		sessions = g_slist_append(sessions, session);
--		return NULL;
--	}
--
--	dbus_message_unref(data->message);
--	dbus_connection_unref(data->connection);
--	g_free(data->sender);
--	g_free(data);
--
--	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
--}
--
--static GDBusMethodTable client_methods[] = {
--	{ "SendFiles", "a{sv}aso", "", send_files,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "PullBusinessCard", "a{sv}s", "", pull_business_card,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "ExchangeBusinessCards", "a{sv}ss", "", exchange_business_cards,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "CreateSession", "a{sv}", "o", create_session,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "RemoveSession", "o", "", remove_session,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ "GetCapabilities", "a{sv}", "s", get_capabilities,
--						G_DBUS_METHOD_FLAG_ASYNC },
--	{ }
--};
-+#include "manager.h"
++
+ client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@
+ endif
  
- static GMainLoop *event_loop = NULL;
- 
-@@ -585,8 +71,6 @@ int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
- 	struct sigaction sa;
--	DBusConnection *conn;
--	DBusError derr;
- 	GError *gerr = NULL;
- 
- 	context = g_option_context_new(NULL);
-@@ -601,24 +85,10 @@ int main(int argc, char *argv[])
- 
- 	g_option_context_free(context);
- 
--	dbus_error_init(&derr);
-+	event_loop = g_main_loop_new(NULL, FALSE);
- 
--	conn = g_dbus_setup_bus(DBUS_BUS_SESSION, CLIENT_SERVICE, &derr);
--	if (dbus_error_is_set(&derr) == TRUE) {
--		g_printerr("%s: %s\n", derr.name, derr.message);
--		dbus_error_free(&derr);
-+	if (manager_init() < 0)
- 		exit(EXIT_FAILURE);
--	}
--
--	if (g_dbus_register_interface(conn, CLIENT_PATH, CLIENT_INTERFACE,
--						client_methods, NULL, NULL,
--							NULL, NULL) == FALSE) {
--		g_printerr("Can't register client interface\n");
--		dbus_connection_unref(conn);
--		exit(EXIT_FAILURE);
--	}
--
--	event_loop = g_main_loop_new(NULL, FALSE);
- 
- 	__obex_log_init("obex-client", option_debug, !option_stderr);
- 
-@@ -631,9 +101,7 @@ int main(int argc, char *argv[])
- 
- 	g_main_loop_run(event_loop);
- 
--	g_dbus_unregister_interface(conn, CLIENT_PATH, CLIENT_INTERFACE);
--
--	dbus_connection_unref(conn);
-+	manager_exit();
- 
- 	g_main_loop_unref(event_loop);
- 
-diff --git a/client/manager.c b/client/manager.c
+diff --git a/client/ftp.c b/client/ftp.c
 new file mode 100644
-index 0000000..e7eb70d
+index 0000000..d8557f2
 --- /dev/null
-+++ b/client/manager.c
-@@ -0,0 +1,589 @@
++++ b/client/ftp.c
+@@ -0,0 +1,382 @@
 +/*
 + *
 + *  OBEX Client
@@ -640,578 +69,372 @@ index 0000000..e7eb70d
 +#include <config.h>
 +#endif
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <syslog.h>
-+
-+#include <glib.h>
-+#include <gdbus.h>
-+
-+#include "log.h"
-+#include "transfer.h"
 +#include "session.h"
-+#include "manager.h"
++#include "transfer.h"
++#include "ftp.h"
 +
-+#define CLIENT_SERVICE  "org.openobex.client"
++#define FTP_INTERFACE  "org.openobex.FileTransfer"
 +
-+#define CLIENT_INTERFACE  "org.openobex.Client"
-+#define CLIENT_PATH       "/"
-+
-+struct send_data {
-+	DBusConnection *connection;
-+	DBusMessage *message;
-+	gchar *sender;
-+	gchar *agent;
-+	char *filename;
-+	GPtrArray *files;
++struct ftp_data {
++	struct session_data *session;
++	DBusConnection *conn;
++	DBusMessage *msg;
 +};
 +
-+static GSList *sessions = NULL;
-+
-+static void shutdown_session(struct session_data *session)
-+{
-+	sessions = g_slist_remove(sessions, session);
-+	session_shutdown(session);
-+	session_unref(session);
-+}
-+
-+static void unregister_session(void *data)
-+{
-+	struct session_data *session = data;
-+
-+	if (g_slist_find(sessions, session) == NULL)
-+		return;
-+
-+	sessions = g_slist_remove(sessions, session);
-+	session_unref(session);
-+}
-+
-+static void create_callback(struct session_data *session, GError *err,
-+							void *user_data)
-+{
-+	struct send_data *data = user_data;
-+	unsigned int i;
-+
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(data->message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(data->connection, error);
-+		shutdown_session(session);
-+		goto done;
-+	}
-+
-+	if (session_get_target(session) != NULL) {
-+		const char *path;
-+
-+		path = session_register(session, unregister_session);
-+
-+		g_dbus_send_reply(data->connection, data->message,
-+				DBUS_TYPE_OBJECT_PATH, &path,
-+				DBUS_TYPE_INVALID);
-+		goto done;
-+	}
-+
-+	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
-+
-+	session_set_agent(session, data->sender, data->agent);
-+
-+	for (i = 0; i < data->files->len; i++) {
-+		const gchar *filename = g_ptr_array_index(data->files, i);
-+		gchar *basename = g_path_get_basename(filename);
-+
-+		if (session_send(session, filename, basename) < 0) {
-+			g_free(basename);
-+			break;
-+		}
-+
-+		g_free(basename);
-+	}
-+
-+	/* No need to keep a reference for SendFiles */
-+	sessions = g_slist_remove(sessions, session);
-+	session_unref(session);
-+
-+done:
-+	if (data->files)
-+		g_ptr_array_free(data->files, TRUE);
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data->agent);
-+	g_free(data);
-+}
-+
-+static int parse_device_dict(DBusMessageIter *iter,
-+		const char **source, const char **dest, const char **target,
-+		uint8_t *channel)
-+{
-+	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter entry, value;
-+		const char *key;
-+
-+		dbus_message_iter_recurse(iter, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		switch (dbus_message_iter_get_arg_type(&value)) {
-+		case DBUS_TYPE_STRING:
-+			if (g_str_equal(key, "Source") == TRUE)
-+				dbus_message_iter_get_basic(&value, source);
-+			else if (g_str_equal(key, "Destination") == TRUE)
-+				dbus_message_iter_get_basic(&value, dest);
-+			else if (g_str_equal(key, "Target") == TRUE)
-+				dbus_message_iter_get_basic(&value, target);
-+			break;
-+		case DBUS_TYPE_BYTE:
-+			if (g_str_equal(key, "Channel") == TRUE)
-+				dbus_message_iter_get_basic(&value, channel);
-+			break;
-+		}
-+
-+		dbus_message_iter_next(iter);
-+	}
-+
-+	return 0;
-+}
-+
-+static DBusMessage *send_files(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	DBusMessageIter iter, array;
-+	struct session_data *session;
-+	GPtrArray *files;
-+	struct send_data *data;
-+	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
-+	const char *sender;
-+	uint8_t channel = 0;
-+
-+	dbus_message_iter_init(message, &iter);
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	parse_device_dict(&array, &source, &dest, &target, &channel);
-+	if (dest == NULL)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	dbus_message_iter_next(&iter);
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	files = g_ptr_array_new();
-+	if (files == NULL)
-+		return g_dbus_create_error(message,
-+					"org.openobex.Error.NoMemory", NULL);
-+
-+	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
-+		char *value;
-+
-+		dbus_message_iter_get_basic(&array, &value);
-+		g_ptr_array_add(files, value);
-+
-+		dbus_message_iter_next(&array);
-+	}
-+
-+	dbus_message_iter_next(&iter);
-+	dbus_message_iter_get_basic(&iter, &agent);
-+
-+	if (files->len == 0) {
-+		g_ptr_array_free(files, TRUE);
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+	}
-+
-+	sender = dbus_message_get_sender(message);
-+
-+	data = g_try_malloc0(sizeof(*data));
-+	if (data == NULL) {
-+		g_ptr_array_free(files, TRUE);
-+		return g_dbus_create_error(message,
-+					"org.openobex.Error.NoMemory", NULL);
-+	}
-+
-+	data->connection = dbus_connection_ref(connection);
-+	data->message = dbus_message_ref(message);
-+	data->sender = g_strdup(sender);
-+	data->agent = g_strdup(agent);
-+	data->files = files;
-+
-+	session = session_create(source, dest, "OPP", channel, sender,
-+							create_callback, data);
-+	if (session != NULL) {
-+		sessions = g_slist_append(sessions, session);
-+		return NULL;
-+	}
-+
-+	g_ptr_array_free(data->files, TRUE);
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data->agent);
-+	g_free(data);
-+
-+	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
-+}
-+
-+static void pull_complete_callback(struct session_data *session,
-+					GError *err, void *user_data)
-+{
-+	struct send_data *data = user_data;
-+
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(data->message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(data->connection, error);
-+		goto done;
-+	}
-+
-+	g_dbus_send_reply(data->connection, data->message, DBUS_TYPE_INVALID);
-+
-+done:
-+	shutdown_session(session);
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->filename);
-+	g_free(data->sender);
-+	g_free(data);
-+}
-+
-+static void pull_session_callback(struct session_data *session,
-+					GError *err, void *user_data)
-+{
-+	struct send_data *data = user_data;
-+
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(data->message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(data->connection, error);
-+		shutdown_session(session);
-+		goto done;
-+	}
-+
-+	session_pull(session, "text/x-vcard", data->filename,
-+						pull_complete_callback, data);
-+
-+	return;
-+
-+done:
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->filename);
-+	g_free(data->sender);
-+	g_free(data);
-+}
-+
-+static DBusMessage *pull_business_card(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	DBusMessageIter iter, dict;
-+	struct session_data *session;
-+	struct send_data *data;
-+	const char *source = NULL, *dest = NULL, *target = NULL;
-+	const char *name = NULL;
-+	uint8_t channel = 0;
-+
-+	dbus_message_iter_init(message, &iter);
-+	dbus_message_iter_recurse(&iter, &dict);
-+
-+	parse_device_dict(&dict, &source, &dest, &target, &channel);
-+	if (dest == NULL)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	dbus_message_iter_next(&iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	dbus_message_iter_get_basic(&iter, &name);
-+
-+	data = g_try_malloc0(sizeof(*data));
-+	if (data == NULL)
-+		return g_dbus_create_error(message,
-+					"org.openobex.Error.NoMemory", NULL);
-+
-+	data->connection = dbus_connection_ref(connection);
-+	data->message = dbus_message_ref(message);
-+	data->sender = g_strdup(dbus_message_get_sender(message));
-+	data->filename = g_strdup(name);
-+
-+	session = session_create(source, dest, "OPP", channel, data->sender,
-+					pull_session_callback, data);
-+	if (session != NULL) {
-+		sessions = g_slist_append(sessions, session);
-+		return NULL;
-+	}
-+
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data->filename);
-+	g_free(data);
-+
-+	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
-+}
-+
-+static DBusMessage *exchange_business_cards(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
-+}
-+
-+static struct session_data *find_session(const char *path)
-+{
-+	GSList *l;
-+
-+	for (l = sessions; l; l = l->next) {
-+		struct session_data *session = l->data;
-+
-+		if (g_str_equal(session_get_path(session), path) == TRUE)
-+			return session;
-+	}
-+
-+	return NULL;
-+}
-+
-+static DBusMessage *create_session(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	DBusMessageIter iter, dict;
-+	struct session_data *session;
-+	struct send_data *data;
-+	const char *source = NULL, *dest = NULL, *target = NULL;
-+	uint8_t channel = 0;
-+
-+	dbus_message_iter_init(message, &iter);
-+	dbus_message_iter_recurse(&iter, &dict);
-+
-+	parse_device_dict(&dict, &source, &dest, &target, &channel);
-+	if (dest == NULL || target == NULL)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	data = g_try_malloc0(sizeof(*data));
-+	if (data == NULL)
-+		return g_dbus_create_error(message,
-+					"org.openobex.Error.NoMemory", NULL);
-+
-+	data->connection = dbus_connection_ref(connection);
-+	data->message = dbus_message_ref(message);
-+	data->sender = g_strdup(dbus_message_get_sender(message));
-+
-+	session = session_create(source, dest, target, channel, data->sender,
-+							create_callback, data);
-+	if (session != NULL) {
-+		sessions = g_slist_append(sessions, session);
-+		return NULL;
-+	}
-+
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data);
-+
-+	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
-+}
-+
-+static DBusMessage *remove_session(DBusConnection *connection,
++static DBusMessage *change_folder(DBusConnection *connection,
 +				DBusMessage *message, void *user_data)
 +{
-+	struct session_data *session;
-+	const gchar *sender, *path;
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++	GwObex *obex = session_get_obex(session);
++	const char *folder;
++	int err;
 +
 +	if (dbus_message_get_args(message, NULL,
-+			DBUS_TYPE_OBJECT_PATH, &path,
-+			DBUS_TYPE_INVALID) == FALSE)
++				DBUS_TYPE_STRING, &folder,
++				DBUS_TYPE_INVALID) == FALSE)
 +		return g_dbus_create_error(message,
 +				"org.openobex.Error.InvalidArguments", NULL);
 +
-+	session = find_session(path);
-+	if (session == NULL)
++	if (gw_obex_chdir(obex, folder, &err) == FALSE) {
 +		return g_dbus_create_error(message,
-+				"org.openobex.Error.InvalidArguments", NULL);
-+
-+	sender = dbus_message_get_sender(message);
-+	if (g_str_equal(sender, session_get_owner(session)) == FALSE)
-+		return g_dbus_create_error(message,
-+				"org.openobex.Error.NotAuthorized",
-+				"Not Authorized");
-+
-+	shutdown_session(session);
++				"org.openobex.Error.Failed",
++				"%s", OBEX_ResponseToString(err));
++	}
 +
 +	return dbus_message_new_method_return(message);
 +}
 +
-+static void capabilities_complete_callback(struct session_data *session,
-+						GError *err, void *user_data)
++static void append_variant(DBusMessageIter *iter, int type, void *val)
 +{
++	DBusMessageIter value;
++	char sig[2] = { type, '\0' };
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
++
++	dbus_message_iter_append_basic(&value, type, val);
++
++	dbus_message_iter_close_container(iter, &value);
++}
++
++static void dict_append_entry(DBusMessageIter *dict,
++			const char *key, int type, void *val)
++{
++	DBusMessageIter entry;
++
++	if (type == DBUS_TYPE_STRING) {
++		const char *str = *((const char **) val);
++		if (str == NULL)
++			return;
++	}
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++							NULL, &entry);
++
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++
++	append_variant(&entry, type, val);
++
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++static void xml_element(GMarkupParseContext *ctxt,
++			const gchar *element,
++			const gchar **names,
++			const gchar **values,
++			gpointer user_data,
++			GError **gerr)
++{
++	DBusMessageIter dict, *iter = user_data;
++	gchar *key;
++	gint i;
++
++	if (strcasecmp("folder", element) != 0 && strcasecmp("file", element) != 0)
++		return;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &element);
++
++	/* FIXME: User, Group, Other permission must be reviewed */
++
++	i = 0;
++	for (key = (gchar *) names[i]; key; key = (gchar *) names[++i]) {
++		key[0] = g_ascii_toupper(key[0]);
++		if (g_str_equal("Size", key) == TRUE) {
++			guint64 size;
++			size = g_ascii_strtoll(values[i], NULL, 10);
++			dict_append_entry(&dict, key, DBUS_TYPE_UINT64, &size);
++		} else
++			dict_append_entry(&dict, key, DBUS_TYPE_STRING, &values[i]);
++	}
++
++	dbus_message_iter_close_container(iter, &dict);
++}
++
++static const GMarkupParser parser = {
++	xml_element,
++	NULL,
++	NULL,
++	NULL,
++	NULL
++};
++
++static void get_file_callback(struct session_data *session, GError *err,
++							void *user_data)
++{
++	struct ftp_data *ftp = user_data;
++	DBusMessage *reply;
++
++	if (!ftp->msg)
++		return;
++
++	if (err)
++		reply = g_dbus_create_error(ftp->msg,
++					"org.openobex.Error.Failed",
++					"%s", err->message);
++	else
++		reply = dbus_message_new_method_return(ftp->msg);
++
++	g_dbus_send_message(ftp->conn, reply);
++
++	dbus_message_unref(ftp->msg);
++	ftp->msg = NULL;
++}
++
++static void list_folder_callback(struct session_data *session,
++					GError *err, void *user_data)
++{
++	struct ftp_data *ftp = user_data;
 +	struct transfer_data *transfer = session_get_transfer(session);
-+	struct send_data *data = user_data;
-+	const char *capabilities;
++	GMarkupParseContext *ctxt;
++	DBusMessage *reply;
++	DBusMessageIter iter, array;
++	const char *buf;
 +	int size;
 +
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(data->message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(data->connection, error);
-+		goto done;
-+	}
++	reply = dbus_message_new_method_return(ftp->msg);
 +
-+	capabilities = transfer_get_buffer(transfer, &size);
++	buf = transfer_get_buffer(transfer, &size);
 +	if (size == 0)
-+		capabilities = "";
-+
-+	g_dbus_send_reply(data->connection, data->message,
-+			DBUS_TYPE_STRING, &capabilities,
-+			DBUS_TYPE_INVALID);
-+
-+done:
-+
-+	shutdown_session(session);
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data);
-+}
-+
-+static void capability_session_callback(struct session_data *session,
-+						GError *err, void *user_data)
-+{
-+	struct send_data *data = user_data;
-+
-+	if (err != NULL) {
-+		DBusMessage *error = g_dbus_create_error(data->message,
-+					"org.openobex.Error.Failed",
-+					"%s", err->message);
-+		g_dbus_send_message(data->connection, error);
-+		shutdown_session(session);
 +		goto done;
-+	}
 +
-+	session_pull(session, "x-obex/capability", NULL,
-+				capabilities_complete_callback, data);
++	dbus_message_iter_init_append(reply, &iter);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_TYPE_ARRAY_AS_STRING
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
++	ctxt = g_markup_parse_context_new(&parser, 0, &array, NULL);
++	g_markup_parse_context_parse(ctxt, buf, strlen(buf) - 1, NULL);
++	g_markup_parse_context_free(ctxt);
++	dbus_message_iter_close_container(&iter, &array);
 +
-+	return;
++	transfer_clear_buffer(transfer);
 +
 +done:
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data);
++	g_dbus_send_message(ftp->conn, reply);
++	dbus_message_unref(ftp->msg);
++	ftp->msg = NULL;
 +}
 +
-+static DBusMessage *get_capabilities(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
++static DBusMessage *create_folder(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
 +{
-+	DBusMessageIter iter, dict;
-+	struct session_data *session;
-+	struct send_data *data;
-+	const char *source = NULL, *dest = NULL, *target = NULL;
-+	uint8_t channel = 0;
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++	GwObex *obex = session_get_obex(session);
++	const char *folder;
++	int err;
 +
-+	dbus_message_iter_init(message, &iter);
-+	dbus_message_iter_recurse(&iter, &dict);
-+
-+	parse_device_dict(&dict, &source, &dest, &target, &channel);
-+	if (dest == NULL)
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &folder,
++				DBUS_TYPE_INVALID) == FALSE)
 +		return g_dbus_create_error(message,
 +				"org.openobex.Error.InvalidArguments", NULL);
 +
-+	data = g_try_malloc0(sizeof(*data));
-+	if (data == NULL)
++	if (gw_obex_mkdir(obex, folder, &err) == FALSE)
 +		return g_dbus_create_error(message,
-+					"org.openobex.Error.NoMemory", NULL);
++				"org.openobex.Error.Failed",
++				"%s", OBEX_ResponseToString(err));
 +
-+	data->connection = dbus_connection_ref(connection);
-+	data->message = dbus_message_ref(message);
-+	data->sender = g_strdup(dbus_message_get_sender(message));
-+
-+	if (!target)
-+		target = "OPP";
-+
-+	session = session_create(source, dest, target, channel, data->sender,
-+					capability_session_callback, data);
-+	if (session != NULL) {
-+		sessions = g_slist_append(sessions, session);
-+		return NULL;
-+	}
-+
-+	dbus_message_unref(data->message);
-+	dbus_connection_unref(data->connection);
-+	g_free(data->sender);
-+	g_free(data);
-+
-+	return g_dbus_create_error(message, "org.openobex.Error.Failed", NULL);
++	return dbus_message_new_method_return(message);
 +}
 +
-+static GDBusMethodTable client_methods[] = {
-+	{ "SendFiles", "a{sv}aso", "", send_files,
++static DBusMessage *list_folder(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++
++	if (ftp->msg)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InProgress",
++				"Transfer in progress");
++
++	if (session_get(session, "x-obex/folder-listing",
++			NULL, NULL, NULL, 0, list_folder_callback, ftp) < 0)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.Failed",
++				"Failed");
++
++	ftp->msg = dbus_message_ref(message);
++
++	return NULL;
++}
++
++static DBusMessage *get_file(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++	const char *target_file, *source_file;
++
++	if (ftp->msg)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InProgress",
++				"Transfer in progress");
++
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &target_file,
++				DBUS_TYPE_STRING, &source_file,
++				DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments", NULL);
++
++	if (session_get(session, NULL, source_file,
++			target_file, NULL, 0, get_file_callback, NULL) < 0)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.Failed",
++				"Failed");
++
++	ftp->msg = dbus_message_ref(message);
++
++	return NULL;
++}
++
++static DBusMessage *put_file(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++	gchar *sourcefile, *targetfile;
++
++	if (dbus_message_get_args(message, NULL,
++					DBUS_TYPE_STRING, &sourcefile,
++					DBUS_TYPE_STRING, &targetfile,
++					DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments",
++				"Invalid arguments in method call");
++
++	if (session_send(session, sourcefile, targetfile) < 0)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.Failed",
++				"Failed");
++
++	return dbus_message_new_method_return(message);
++}
++
++static DBusMessage *copy_file(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	return dbus_message_new_method_return(message);
++}
++
++static DBusMessage *move_file(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	return dbus_message_new_method_return(message);
++}
++
++static DBusMessage *delete(DBusConnection *connection,
++				DBusMessage *message, void *user_data)
++{
++	struct ftp_data *ftp = user_data;
++	struct session_data *session = ftp->session;
++	GwObex *obex = session_get_obex(session);
++	const char *file;
++	int err;
++
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &file,
++				DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++				"org.openobex.Error.InvalidArguments", NULL);
++
++	if (gw_obex_delete(obex, file, &err) == FALSE) {
++		return g_dbus_create_error(message,
++				"org.openobex.Error.Failed",
++				"%s", OBEX_ResponseToString(err));
++	}
++
++	return dbus_message_new_method_return(message);
++}
++
++static GDBusMethodTable ftp_methods[] = {
++	{ "ChangeFolder",	"s", "",	change_folder	},
++	{ "CreateFolder",	"s", "",	create_folder	},
++	{ "ListFolder",		"", "aa{sv}",	list_folder,
 +						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "PullBusinessCard", "a{sv}s", "", pull_business_card,
++	{ "GetFile",		"ss", "",	get_file,
 +						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "ExchangeBusinessCards", "a{sv}ss", "", exchange_business_cards,
-+						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "CreateSession", "a{sv}", "o", create_session,
-+						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "RemoveSession", "o", "", remove_session,
-+						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "GetCapabilities", "a{sv}", "s", get_capabilities,
-+						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "PutFile",		"ss", "",	put_file	},
++	{ "CopyFile",		"ss", "",	copy_file	},
++	{ "MoveFile",		"ss", "",	move_file	},
++	{ "Delete",		"s", "",	delete		},
 +	{ }
 +};
 +
-+static DBusConnection *conn = NULL;
-+
-+int manager_init(void)
++static void ftp_free(void *data)
 +{
-+	DBusError derr;
++	struct ftp_data *ftp = data;
 +
-+	dbus_error_init(&derr);
-+
-+	conn = g_dbus_setup_bus(DBUS_BUS_SESSION, CLIENT_SERVICE, &derr);
-+	if (dbus_error_is_set(&derr) == TRUE) {
-+		g_printerr("%s: %s\n", derr.name, derr.message);
-+		dbus_error_free(&derr);
-+		return -1;
-+	}
-+
-+	if (g_dbus_register_interface(conn, CLIENT_PATH, CLIENT_INTERFACE,
-+						client_methods, NULL, NULL,
-+							NULL, NULL) == FALSE) {
-+		g_printerr("Can't register client interface\n");
-+		dbus_connection_unref(conn);
-+		conn = NULL;
-+		return -1;
-+	}
-+
-+	return 0;
++	session_unref(ftp->session);
++	dbus_connection_unref(ftp->conn);
++	g_free(ftp);
 +}
 +
-+void manager_exit(void)
++gboolean ftp_register_interface(DBusConnection *connection, const char *path,
++							void *user_data)
 +{
-+	if (conn == NULL)
-+		return;
++	struct session_data *session = user_data;
++	struct ftp_data *ftp;
 +
-+	g_dbus_unregister_interface(conn, CLIENT_PATH, CLIENT_INTERFACE);
-+	dbus_connection_unref(conn);
++	ftp = g_try_new0(struct ftp_data, 1);
++	if (!ftp)
++		return FALSE;
++
++	ftp->session = session_ref(session);
++	ftp->conn = dbus_connection_ref(connection);
++
++	if (!g_dbus_register_interface(connection, path, FTP_INTERFACE,
++				ftp_methods, NULL, NULL, ftp, ftp_free)) {
++		ftp_free(ftp);
++		return FALSE;
++	}
++
++	return TRUE;
 +}
-diff --git a/client/manager.h b/client/manager.h
++
++void ftp_unregister_interface(DBusConnection *connection, const char *path)
++{
++	g_dbus_unregister_interface(connection, path, FTP_INTERFACE);
++}
+diff --git a/client/ftp.h b/client/ftp.h
 new file mode 100644
-index 0000000..8756982
+index 0000000..1af2a3d
 --- /dev/null
-+++ b/client/manager.h
-@@ -0,0 +1,25 @@
++++ b/client/ftp.h
+@@ -0,0 +1,29 @@
 +/*
 + *
-+ *  OBEX Server
++ *  OBEX Client
 + *
++ *  Copyright (C) 2007-2010  Intel Corporation
 + *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
 + *
 + *
@@ -1231,8 +454,394 @@ index 0000000..8756982
 + *
 + */
 +
-+int manager_init(void);
-+void manager_exit(void);
++#include <gdbus.h>
++
++gboolean ftp_register_interface(DBusConnection *connection, const char *path,
++							void *user_data);
++void ftp_unregister_interface(DBusConnection *connection, const char *path);
+diff --git a/client/session.c b/client/session.c
+index 8ad9a49..f2168b4 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -43,6 +43,7 @@
+ #include "log.h"
+ #include "pbap.h"
+ #include "sync.h"
++#include "ftp.h"
+ #include "transfer.h"
+ #include "session.h"
+ #include "btio.h"
+@@ -52,8 +53,6 @@
+ #define SESSION_INTERFACE  "org.openobex.Session"
+ #define SESSION_BASEPATH   "/org/openobex"
+ 
+-#define FTP_INTERFACE  "org.openobex.FileTransfer"
+-
+ #define OBEX_IO_ERROR obex_io_error_quark()
+ 
+ #define BT_BUS_NAME		"org.bluez"
+@@ -193,8 +192,7 @@ static void session_unregistered(struct session_data *session)
+ 
+ 	switch (session->uuid.value.uuid16) {
+ 	case OBEX_FILETRANS_SVCLASS_ID:
+-		g_dbus_unregister_interface(session->conn, session->path,
+-						FTP_INTERFACE);
++		ftp_unregister_interface(session->conn, session->path);
+ 		break;
+ 	case PBAP_PSE_SVCLASS_ID:
+ 		pbap_unregister_interface(session->conn, session->path);
+@@ -1034,131 +1032,6 @@ static GDBusMethodTable session_methods[] = {
+ 	{ }
+ };
+ 
+-static void append_variant(DBusMessageIter *iter, int type, void *val)
+-{
+-	DBusMessageIter value;
+-	char sig[2] = { type, '\0' };
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+-
+-	dbus_message_iter_append_basic(&value, type, val);
+-
+-	dbus_message_iter_close_container(iter, &value);
+-}
+-
+-static void dict_append_entry(DBusMessageIter *dict,
+-			const char *key, int type, void *val)
+-{
+-	DBusMessageIter entry;
+-
+-	if (type == DBUS_TYPE_STRING) {
+-		const char *str = *((const char **) val);
+-		if (str == NULL)
+-			return;
+-	}
+-
+-	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+-							NULL, &entry);
+-
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+-
+-	append_variant(&entry, type, val);
+-
+-	dbus_message_iter_close_container(dict, &entry);
+-}
+-
+-static void xml_element(GMarkupParseContext *ctxt,
+-			const gchar *element,
+-			const gchar **names,
+-			const gchar **values,
+-			gpointer user_data,
+-			GError **gerr)
+-{
+-	DBusMessageIter dict, *iter = user_data;
+-	gchar *key;
+-	gint i;
+-
+-	if (strcasecmp("folder", element) != 0 && strcasecmp("file", element) != 0)
+-		return;
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &element);
+-
+-	/* FIXME: User, Group, Other permission must be reviewed */
+-
+-	i = 0;
+-	for (key = (gchar *) names[i]; key; key = (gchar *) names[++i]) {
+-		key[0] = g_ascii_toupper(key[0]);
+-		if (g_str_equal("Size", key) == TRUE) {
+-			guint64 size;
+-			size = g_ascii_strtoll(values[i], NULL, 10);
+-			dict_append_entry(&dict, key, DBUS_TYPE_UINT64, &size);
+-		} else
+-			dict_append_entry(&dict, key, DBUS_TYPE_STRING, &values[i]);
+-	}
+-
+-	dbus_message_iter_close_container(iter, &dict);
+-}
+-
+-static const GMarkupParser parser = {
+-	xml_element,
+-	NULL,
+-	NULL,
+-	NULL,
+-	NULL
+-};
+-
+-static void list_folder_callback(struct session_data *session,
+-					GError *err, void *user_data)
+-{
+-	struct transfer_data *transfer = session->pending->data;
+-	GMarkupParseContext *ctxt;
+-	DBusMessage *reply;
+-	DBusMessageIter iter, array;
+-	const char *buf;
+-	int size;
+-
+-	if (err != NULL) {
+-		reply = g_dbus_create_error(session->msg,
+-						"org.openobex.Error.Failed",
+-						"%s", err->message);
+-		goto done;
+-	} else
+-		reply = dbus_message_new_method_return(session->msg);
+-
+-	buf = transfer_get_buffer(transfer, &size);
+-	if (size == 0)
+-		buf = "";
+-
+-	dbus_message_iter_init_append(reply, &iter);
+-	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+-			DBUS_TYPE_ARRAY_AS_STRING
+-			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+-			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &array);
+-	ctxt = g_markup_parse_context_new(&parser, 0, &array, NULL);
+-	g_markup_parse_context_parse(ctxt, buf, strlen(buf) - 1, NULL);
+-	g_markup_parse_context_free(ctxt);
+-	dbus_message_iter_close_container(&iter, &array);
+-
+-	transfer_clear_buffer(transfer);
+-
+-done:
+-	g_dbus_send_message(session->conn, reply);
+-	dbus_message_unref(session->msg);
+-	session->msg = NULL;
+-}
+-
+-static void get_file_callback(struct session_data *session, GError *err,
+-							void *user_data)
+-{
+-
+-}
+-
+ static void session_request_reply(DBusPendingCall *call, gpointer user_data)
+ {
+ 	struct session_data *session = user_data;
+@@ -1321,18 +1194,6 @@ static void session_notify_error(struct session_data *session,
+ 	DBusMessage *message;
+ 	const char *path;
+ 
+-	if (session->msg) {
+-		DBusMessage *reply;
+-
+-		reply = g_dbus_create_error(session->msg,
+-					"org.openobex.Error.Failed",
+-					"%s", err->message);
+-		g_dbus_send_message(session->conn, reply);
+-
+-		dbus_message_unref(session->msg);
+-		session->msg = NULL;
+-	}
+-
+ 	path = transfer_get_path(transfer);
+ 	if (agent == NULL || path == NULL)
+ 		goto done;
+@@ -1365,18 +1226,6 @@ static void session_notify_progress(struct session_data *session,
+ 	DBusMessage *message;
+ 	const char *path;
+ 
+-	/* For GetFile reply on the first received stream */
+-	if (session->msg &&
+-			dbus_message_has_member(session->msg, "GetFile")) {
+-		DBusMessage *reply;
+-
+-		reply = dbus_message_new_method_return(session->msg);
+-		g_dbus_send_message(session->conn, reply);
+-
+-		dbus_message_unref(session->msg);
+-		session->msg = NULL;
+-	}
+-
+ 	path = transfer_get_path(transfer);
+ 	if (agent == NULL || path == NULL)
+ 		goto done;
+@@ -1486,169 +1335,6 @@ int session_get(struct session_data *session, const char *type,
+ 	return 0;
+ }
+ 
+-static DBusMessage *change_folder(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-	const char *folder;
+-	int err;
+-
+-	if (dbus_message_get_args(message, NULL,
+-				DBUS_TYPE_STRING, &folder,
+-				DBUS_TYPE_INVALID) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	if (gw_obex_chdir(session->obex, folder, &err) == FALSE) {
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"%s", OBEX_ResponseToString(err));
+-	}
+-
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static DBusMessage *create_folder(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-	const char *folder;
+-	int err;
+-
+-	if (dbus_message_get_args(message, NULL,
+-				DBUS_TYPE_STRING, &folder,
+-				DBUS_TYPE_INVALID) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	if (gw_obex_mkdir(session->obex, folder, &err) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"%s", OBEX_ResponseToString(err));
+-
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static DBusMessage *list_folder(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-
+-	if (session->msg)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InProgress",
+-				"Transfer in progress");
+-
+-	if (session_get(session, "x-obex/folder-listing",
+-			NULL, NULL, NULL, 0, list_folder_callback, NULL) < 0)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"Failed");
+-
+-	session->msg = dbus_message_ref(message);
+-
+-	return NULL;
+-}
+-
+-static DBusMessage *get_file(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-	const char *target_file, *source_file;
+-
+-	if (session->msg)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InProgress",
+-				"Transfer in progress");
+-
+-	if (dbus_message_get_args(message, NULL,
+-				DBUS_TYPE_STRING, &target_file,
+-				DBUS_TYPE_STRING, &source_file,
+-				DBUS_TYPE_INVALID) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	if (session_get(session, NULL, source_file,
+-			target_file, NULL, 0, get_file_callback, NULL) < 0)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"Failed");
+-
+-	session->msg = dbus_message_ref(message);
+-
+-	return NULL;
+-}
+-
+-static DBusMessage *put_file(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-	gchar *sourcefile, *targetfile;
+-
+-	if (dbus_message_get_args(message, NULL,
+-					DBUS_TYPE_STRING, &sourcefile,
+-					DBUS_TYPE_STRING, &targetfile,
+-					DBUS_TYPE_INVALID) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments",
+-				"Invalid arguments in method call");
+-
+-	if (session_send(session, sourcefile, targetfile) < 0)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"Failed");
+-
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static DBusMessage *copy_file(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static DBusMessage *move_file(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static DBusMessage *delete(DBusConnection *connection,
+-				DBusMessage *message, void *user_data)
+-{
+-	struct session_data *session = user_data;
+-	const char *file;
+-	int err;
+-
+-	if (dbus_message_get_args(message, NULL,
+-				DBUS_TYPE_STRING, &file,
+-				DBUS_TYPE_INVALID) == FALSE)
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.InvalidArguments", NULL);
+-
+-	if (gw_obex_delete(session->obex, file, &err) == FALSE) {
+-		return g_dbus_create_error(message,
+-				"org.openobex.Error.Failed",
+-				"%s", OBEX_ResponseToString(err));
+-	}
+-
+-	return dbus_message_new_method_return(message);
+-}
+-
+-static GDBusMethodTable ftp_methods[] = {
+-	{ "ChangeFolder",	"s", "",	change_folder	},
+-	{ "CreateFolder",	"s", "",	create_folder	},
+-	{ "ListFolder",		"", "aa{sv}",	list_folder,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "GetFile",		"ss", "",	get_file,
+-						G_DBUS_METHOD_FLAG_ASYNC },
+-	{ "PutFile",		"ss", "",	put_file	},
+-	{ "CopyFile",		"ss", "",	copy_file	},
+-	{ "MoveFile",		"ss", "",	move_file	},
+-	{ "Delete",		"s", "",	delete		},
+-	{ }
+-};
+-
+ int session_send(struct session_data *session, const char *filename,
+ 				const char *targetname)
+ {
+@@ -1729,9 +1415,8 @@ const char *session_register(struct session_data *session,
+ 
+ 	switch (session->uuid.value.uuid16) {
+ 	case OBEX_FILETRANS_SVCLASS_ID:
+-		result = g_dbus_register_interface(session->conn,
+-					session->path, FTP_INTERFACE,
+-					ftp_methods, NULL, NULL, session, NULL);
++		result = ftp_register_interface(session->conn, session->path,
++								session);
+ 		break;
+ 	case PBAP_PSE_SVCLASS_ID:
+ 		result = pbap_register_interface(session->conn, session->path,
 -- 
 1.7.6
 
