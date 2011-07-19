@@ -2,153 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 1/3] Infrastructure for MAP function selection
-Date: Tue, 19 Jul 2011 13:16:10 +0200
-Message-Id: <1311074172-15953-2-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
-References: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd] Fix handling asynchronous plugin reads
+Date: Tue, 19 Jul 2011 12:48:34 +0200
+Message-Id: <1311072514-10572-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- plugins/mas.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 64 insertions(+), 14 deletions(-)
+Calling OBEX_ResumeRequest() from handle_async_io() may result in direct
+calling obex_event_cb() (this happens when obex_write_stream() will
+deliver not enough bytes to fully fill OpenOBEX TX packet). In this case
+set_io_watch will fail if handle_async_io() is called from
+obex_object_set_io_flags(), because the watch is already installed.
+Originally when code returns from OBEX_ResumeRequest(), handle_async_io()
+returns FALSE which makes obex_object_set_io_flags() remove this watch.
 
-diff --git a/plugins/mas.c b/plugins/mas.c
-index 0ef8c81..e88a0f0 100644
---- a/plugins/mas.c
-+++ b/plugins/mas.c
-@@ -27,6 +27,9 @@
- 
- #include <errno.h>
- #include <glib.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
- #include <openobex/obex.h>
- 
- #include "plugin.h"
-@@ -86,9 +89,19 @@
-   </attribute>								\
- </record>"
- 
-+#define EVENT_TYPE		"x-bt/MAP-event-report"
-+#define MESSAGE_TYPE		"x-bt/message"
-+#define FOLDER_LISTING_TYPE	"x-obex/folder-listing"
-+#define MESSAGES_LISTING_TYPE	"x-bt/MAP-msg-listing"
-+#define NOTIFICATION_TYPE	"x-bt/MAP-NotificationRegistration"
-+#define STATUS_TYPE		"x-bt/messageStatus"
-+#define UPDATE_TYPE		"x-bt/MAP-messageUpdate"
-+
- struct mas_session {
- 	struct mas_request *request;
- 	void *backend_data;
-+	const char *name;
-+	const char *type;
+This patch adds variable for tracking whether subsequent calls suspended
+get request, causing obex_object_set_io_flags() remove the watch only
+when the request is not suspended.
+---
+ src/obex-priv.h |    1 +
+ src/obex.c      |    6 +++++-
+ 2 files changed, 6 insertions(+), 1 deletions(-)
+
+diff --git a/src/obex-priv.h b/src/obex-priv.h
+index d640ae0..74b42d3 100644
+--- a/src/obex-priv.h
++++ b/src/obex-priv.h
+@@ -49,6 +49,7 @@ struct obex_session {
+ 	struct obex_mime_type_driver *driver;
+ 	gboolean streaming;
+ 	gboolean headers_sent;
++	gboolean suspended;
  };
  
- static const uint8_t MAS_TARGET[TARGET_SIZE] = {
-@@ -137,17 +150,14 @@ static void mas_disconnect(struct obex_session *os, void *user_data)
- static int mas_get(struct obex_session *os, obex_object_t *obj, void *user_data)
- {
- 	struct mas_session *mas = user_data;
--	const char *type = obex_get_type(os);
--	const char *name = obex_get_name(os);
- 	int ret;
- 
--	DBG("GET: name %s type %s mas %p",
--			name, type, mas);
-+	mas->name = obex_get_name(os);
-+	mas->type = obex_get_type(os);
- 
--	if (type == NULL)
--		return -EBADR;
-+	DBG("GET: name %s type %s mas %p", mas->name, mas->type, mas);
- 
--	ret = obex_get_stream_start(os, name);
-+	ret = obex_get_stream_start(os, mas->name);
- 	if (ret < 0)
- 		goto failed;
- 
-@@ -160,16 +170,14 @@ failed:
- static int mas_put(struct obex_session *os, obex_object_t *obj, void *user_data)
- {
- 	struct mas_session *mas = user_data;
--	const char *type = obex_get_type(os);
--	const char *name = obex_get_name(os);
- 	int ret;
- 
--	DBG("PUT: name %s type %s mas %p", name, type, mas);
-+	mas->name = obex_get_name(os);
-+	mas->type = obex_get_type(os);
- 
--	if (type == NULL)
--		return -EBADR;
-+	DBG("PUT: name %s type %s mas %p", mas->name, mas->type, mas);
- 
--	ret = obex_put_stream_start(os, name);
-+	ret = obex_put_stream_start(os, mas->name);
- 	if (ret < 0)
- 		goto failed;
- 
-@@ -179,6 +187,38 @@ failed:
- 	return ret;
+ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+diff --git a/src/obex.c b/src/obex.c
+index 49a110d..29dea20 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -320,6 +320,7 @@ static void os_reset_session(struct obex_session *os)
+ 	os->size = OBJECT_SIZE_DELETE;
+ 	os->headers_sent = FALSE;
+ 	os->streaming = FALSE;
++	os->suspended = FALSE;
  }
  
-+static int start_get(struct mas_session *mas)
-+{
-+	/* NOTE: type is case-insensitive! */
-+	if (g_ascii_strcasecmp(mas->type, FOLDER_LISTING_TYPE) == 0)
-+		return -EINVAL;
-+	else if (g_ascii_strcasecmp(mas->type, MESSAGES_LISTING_TYPE) == 0)
-+		return -EINVAL;
-+	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
-+		return -EINVAL;
-+	else {
-+		DBG("Incorrect type for get: %s", mas->type);
-+		return -EBADR;
-+	}
-+}
-+
-+static int start_put(struct mas_session *mas)
-+{
-+	/* NOTE: type is case-insensitive! */
-+	if (g_ascii_strcasecmp(mas->type, NOTIFICATION_TYPE) == 0)
-+		return -EINVAL;
-+	else if (g_ascii_strcasecmp(mas->type, STATUS_TYPE) == 0)
-+		return -EINVAL;
-+	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
-+		return -EINVAL;
-+	else if (g_ascii_strcasecmp(mas->type, UPDATE_TYPE) == 0)
-+		return -EINVAL;
-+	else {
-+		DBG("Incorrect type for put: %s", mas->type);
-+		return -EBADR;
-+	}
-+}
-+
- static int mas_setpath(struct obex_session *os, obex_object_t *obj,
- 		void *user_data)
- {
-@@ -210,7 +250,17 @@ static void *any_open(const char *name, int oflag, mode_t mode,
+ static void obex_session_free(struct obex_session *os)
+@@ -747,6 +748,8 @@ static gboolean handle_async_io(void *object, int flags, int err,
+ 		ret = obex_read_stream(os, os->obex, os->obj);
  
- 	DBG("");
- 
--	*err = 0;
-+	if ((oflag & O_RDONLY) == O_RDONLY) {
-+		*err = start_get(mas);
-+	} else if ((oflag & O_WRONLY) == O_WRONLY) {
-+		*err = start_put(mas);
-+	} else {
-+		DBG("Invalid open flag!");
-+		*err = -EIO;
-+	}
+ proceed:
++	os->suspended = FALSE;
 +
-+	if (*err)
-+		return NULL;
+ 	if (ret == -EAGAIN) {
+ 		return TRUE;
+ 	} else if (ret < 0) {
+@@ -756,7 +759,7 @@ proceed:
+ 		OBEX_ResumeRequest(os->obex);
+ 	}
  
- 	return mas;
+-	return FALSE;
++	return os->suspended;
  }
+ 
+ static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
+@@ -1355,6 +1358,7 @@ static void obex_event_cb(obex_t *obex, obex_object_t *obj, int mode,
+ 		err = obex_write_stream(os, obex, obj);
+ 		if (err == -EAGAIN) {
+ 			OBEX_SuspendRequest(obex, obj);
++			os->suspended = TRUE;
+ 			os->obj = obj;
+ 			os->driver->set_io_watch(os->object, handle_async_io,
+ 									os);
 -- 
 1.7.4.1
 
