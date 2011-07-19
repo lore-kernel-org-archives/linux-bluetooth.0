@@ -2,46 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [RFC 08/19] avrcp: handle InformDisplayableCharacterSet pdu
-Date: Tue, 19 Jul 2011 16:49:19 -0300
-Message-Id: <1311104970-18600-9-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 07/19] avrcp: handle commands for future extension
+Date: Tue, 19 Jul 2011 16:49:18 -0300
+Message-Id: <1311104970-18600-8-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+AVRCP_GET_PLAYER_ATTRIBUTE_TEXT and AVRCP_GET_PLAYER_VALUE_TEXT shall
+only be used if TG has extended attributes.
+
+For the ones defined in AVRCP spec these commands should not be called.
+Since we do not have extended attributes yet we can ignore those
+commands.
 ---
- audio/control.c |   13 +++++++++++++
- 1 files changed, 13 insertions(+), 0 deletions(-)
+ audio/control.c |   16 ++++++++++++++++
+ 1 files changed, 16 insertions(+), 0 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 36f727f..2825e6c 100644
+index 2d6d9e6..36f727f 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -119,6 +119,7 @@
+@@ -117,6 +117,8 @@
+ #define AVRCP_LIST_PLAYER_VALUES	0x12
+ #define AVRCP_GET_CURRENT_PLAYER_VALUE	0x13
  #define AVRCP_SET_PLAYER_VALUE		0x14
- #define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT	0x15
- #define AVRCP_GET_PLAYER_VALUE_TEXT	0x16
-+#define AVRCP_DISPLAYABLE_CHARSET	0x17
++#define AVRCP_GET_PLAYER_ATTRIBUTE_TEXT	0x15
++#define AVRCP_GET_PLAYER_VALUE_TEXT	0x16
  
  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
  #define CAP_COMPANY_ID		0x02
-@@ -840,6 +841,18 @@ static int handle_vendordep_pdu(struct control *control,
- 		 */
- 		pdu->params[0] = E_INVALID_PARAM;
- 		goto err_metadata;
-+	case AVRCP_DISPLAYABLE_CHARSET:
-+		if (len < 3 || avrcp->code != CTYPE_STATUS)
+@@ -824,6 +826,20 @@ static int handle_vendordep_pdu(struct control *control,
+ 		}
+ 
+ 		break;
++	case AVRCP_GET_PLAYER_ATTRIBUTE_TEXT:
++	case AVRCP_GET_PLAYER_VALUE_TEXT:
++		if (avrcp->code != CTYPE_STATUS)
 +			break;
 +
 +		/*
-+		 * We acknowledge the commands, but we always use UTF-8 for
-+		 * encoding since CT is obliged to support it
++		 * As per sec. 5.2.5 of AVRCP 1.3 spec, this command is
++		 * expected to be used only for extended attributes, i.e.
++		 * custom attributes defined by the application. As we
++		 * currently don't have any such attribute, we respond with
++		 * invalid param id.
 +		 */
-+		pdu->params_len = 0;
-+
-+		return AVRCP_HEADER_LENGTH +
-+			AVRCP_SPECAVCPDU_HEADER_LENGTH;
++		pdu->params[0] = E_INVALID_PARAM;
++		goto err_metadata;
  	}
  
  	/*
