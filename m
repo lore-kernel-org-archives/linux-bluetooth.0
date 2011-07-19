@@ -1,50 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110719111924.GA17297@dell.ger.corp.intel.com>
-References: <1311072514-10572-1-git-send-email-lkslawek@gmail.com>
-	<20110719111924.GA17297@dell.ger.corp.intel.com>
-Date: Tue, 19 Jul 2011 13:51:06 +0200
-Message-ID: <CA+i+Aw1Xh_uDJkznE9cy_m3pjLUCJRC7SiMfkjAe9w6RsGCrtw@mail.gmail.com>
-Subject: Re: [PATCH obexd] Fix handling asynchronous plugin reads
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZ+RmdxgAbDSyjHeQj3nYmAMBPCt6jZxNrpbR2o6GOUi4A@mail.gmail.com>
+References: <BANLkTind9qu33viRE+eSB6b7SiGhr_DTLQ@mail.gmail.com>
+	<1307554688-21555-1-git-send-email-hadess@hadess.net>
+	<20110614080730.GC28890@dell.ger.corp.intel.com>
+	<1308043116.26522.1.camel@air.hadess.net>
+	<20110614094338.GA18317@dell.ger.corp.intel.com>
+	<1308133135.9190.11.camel@air.hadess.net>
+	<20110615210400.GA8352@dell.ger.corp.intel.com>
+	<CABBYNZ+RmdxgAbDSyjHeQj3nYmAMBPCt6jZxNrpbR2o6GOUi4A@mail.gmail.com>
+Date: Tue, 19 Jul 2011 14:35:16 +0300
+Message-ID: <CABBYNZKCm0F=xLm0QqthhcOjK7e1DgweX2cXLzV6FeMijy2UCw@mail.gmail.com>
+Subject: Re: [PATCH] adaptername: Move adapter naming into a plugin
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>,
+	Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+Hi Bastien,
 
-On Tue, Jul 19, 2011 at 1:19 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Slawek,
+On Tue, Jul 19, 2011 at 2:26 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Bastien,
 >
-> On Tue, Jul 19, 2011, Slawomir Bochenski wrote:
->> @@ -49,6 +49,7 @@ struct obex_session {
->>       struct obex_mime_type_driver *driver;
->>       gboolean streaming;
->>       gboolean headers_sent;
->> +     gboolean suspended;
->
-> There's something redundant or unintuitive about the streaming vs.
-> suspended variable naming. I would expect suspended to be the logical
-> inverse of streaming, i.e. when streaming == TRUE then suspended ==
-> FALSE and vice versa. So one of them shouldn't be needed. And if this is
-> not their meaning then they should probably be renamed more intuitively.
-> Btw, is any of this relevant once the migration to gobex has been done?
-> I think this is something important to keep in mind whenever you do any
-> changes due to some quirkiness of OpenOBEX.
->
-> Johan
->
+> Apparently there is something wrong when removing last adapter
+> bluetoothd start burning cpu, disabling adaptername fix the problem so
+> there might be something wrong in adapter remove callback, can you
+> take a look? Btw, Im using rawhide so I suppose adaptername should
+> work, right?
 
-The issue is still present in current upstream tree and seems to
-prevent MAP from working.
 
-If it goes about names that would be one of streaming_started instead
-of streaming *or* streaming_suspended instead of suspended. First one
-is used for indication whether streaming was actually started (which
-is done once) and the second one is for checking whether chain of
-called functions suspended currently streamed body.
+It seems .remove is closing and removing the watch for every adapter
+but the watch is initialized in the plugin init so it is not really
+per-adapter, so I moved to .exit:
+
+diff --git a/plugins/adaptername.c b/plugins/adaptername.c
+index 2a54cc0..9e99e6a 100644
+--- a/plugins/adaptername.c
++++ b/plugins/adaptername.c
+@@ -262,10 +262,6 @@ static gboolean handle_inotify_cb(GIOChannel
+*channel, GIOCondition cond,
+
+ static void adaptername_remove(struct btd_adapter *adapter)
+ {
+-       if (watch_fd >= 0)
+-               close(watch_fd);
+-       if (inotify != NULL)
+-               g_io_channel_shutdown(inotify, FALSE, NULL);
+ }
+
+ static struct btd_adapter_driver adaptername_driver = {
+@@ -314,6 +310,13 @@ static int adaptername_init(void)
+
+ static void adaptername_exit(void)
+ {
++       if (watch_fd >= 0)
++               close(watch_fd);
++       if (inotify != NULL) {
++               g_io_channel_shutdown(inotify, FALSE, NULL);
++               g_io_channel_unref(inotify);
++       }
++
+        btd_unregister_adapter_driver(&adaptername_driver);
+ }
+
+
+It seems to work fine.
 
 -- 
-Slawomir Bochenski
+Luiz Augusto von Dentz
