@@ -1,79 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd] Fix handling asynchronous plugin reads
-Date: Tue, 19 Jul 2011 12:48:34 +0200
-Message-Id: <1311072514-10572-1-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20110718205614.GA16958@dell.ger.corp.intel.com>
+References: <1310995152-24121-1-git-send-email-luiz.dentz@gmail.com>
+	<20110718205614.GA16958@dell.ger.corp.intel.com>
+Date: Tue, 19 Jul 2011 12:04:57 +0300
+Message-ID: <CABBYNZKcj1WA8j5VZYy1F=ettBh7gbPDe3xEX+_+HGfrdntQOQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 1/6 v2] Make use of g_slist_free_full when elements
+ are dynamically-allocated
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Calling OBEX_ResumeRequest() from handle_async_io() may result in direct
-calling obex_event_cb() (this happens when obex_write_stream() will
-deliver not enough bytes to fully fill OpenOBEX TX packet). In this case
-set_io_watch will fail if handle_async_io() is called from
-obex_object_set_io_flags(), because the watch is already installed.
-Originally when code returns from OBEX_ResumeRequest(), handle_async_io()
-returns FALSE which makes obex_object_set_io_flags() remove this watch.
+Hi,
 
-This patch adds variable for tracking whether subsequent calls suspended
-get request, causing obex_object_set_io_flags() remove the watch only
-when the request is not suspended.
----
- src/obex-priv.h |    1 +
- src/obex.c      |    6 +++++-
- 2 files changed, 6 insertions(+), 1 deletions(-)
+On Mon, Jul 18, 2011 at 11:56 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Mon, Jul 18, 2011, Luiz Augusto von Dentz wrote:
+>> This avoid having to iterate twice in the list to free its elements.
+>> ---
+>>  configure.ac                |    3 +++
+>>  plugins/bluetooth.c         |    8 +++-----
+>>  plugins/pbap.c              |    7 ++++---
+>>  plugins/phonebook-dummy.c   |    3 +--
+>>  plugins/phonebook-tracker.c |    5 ++---
+>>  plugins/vcard.c             |   18 ++++++------------
+>>  src/obex.h                  |    8 ++++++++
+>>  7 files changed, 27 insertions(+), 25 deletions(-)
+>
+> Doesn't compile:
+>
+>  CC     plugins/vcard.o
+> In file included from plugins/vcard.c:33:0:
+> ./src/obex.h:66:51: error: unknown type name ‘obex_object_t’
+> ./src/obex.h:68:48: error: unknown type name ‘obex_object_t’
+> make[1]: *** [plugins/vcard.o] Error 1
 
-diff --git a/src/obex-priv.h b/src/obex-priv.h
-index d640ae0..74b42d3 100644
---- a/src/obex-priv.h
-+++ b/src/obex-priv.h
-@@ -49,6 +49,7 @@ struct obex_session {
- 	struct obex_mime_type_driver *driver;
- 	gboolean streaming;
- 	gboolean headers_sent;
-+	gboolean suspended;
- };
- 
- int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
-diff --git a/src/obex.c b/src/obex.c
-index 49a110d..29dea20 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -320,6 +320,7 @@ static void os_reset_session(struct obex_session *os)
- 	os->size = OBJECT_SIZE_DELETE;
- 	os->headers_sent = FALSE;
- 	os->streaming = FALSE;
-+	os->suspended = FALSE;
- }
- 
- static void obex_session_free(struct obex_session *os)
-@@ -747,6 +748,8 @@ static gboolean handle_async_io(void *object, int flags, int err,
- 		ret = obex_read_stream(os, os->obex, os->obj);
- 
- proceed:
-+	os->suspended = FALSE;
-+
- 	if (ret == -EAGAIN) {
- 		return TRUE;
- 	} else if (ret < 0) {
-@@ -756,7 +759,7 @@ proceed:
- 		OBEX_ResumeRequest(os->obex);
- 	}
- 
--	return FALSE;
-+	return os->suspended;
- }
- 
- static void cmd_get(struct obex_session *os, obex_t *obex, obex_object_t *obj)
-@@ -1355,6 +1358,7 @@ static void obex_event_cb(obex_t *obex, obex_object_t *obj, int mode,
- 		err = obex_write_stream(os, obex, obj);
- 		if (err == -EAGAIN) {
- 			OBEX_SuspendRequest(obex, obj);
-+			os->suspended = TRUE;
- 			os->obj = obj;
- 			os->driver->set_io_watch(os->object, handle_async_io,
- 									os);
+How about handling this as a macro directly on AC_DEFINE e.g:
+
+diff --git a/configure.ac b/configure.ac
+index e02f218..40f4d9b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -72,8 +72,11 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.16, dummy=yes,
+                                AC_MSG_ERROR(libglib 2.16 or later is required))
+ AC_CHECK_LIB(glib-2.0, g_slist_free_full, dummy=yes,
+-               AC_DEFINE(NEED_G_SLIST_FREE_FULL, 1,
+-                       [Define to 1 if you need g_slist_free_full()
+function.]))
++               AC_DEFINE(g_slist_free_full(list, destroy),
++               { \
++                       g_slist_foreach((GSList *) list, (GFunc)
+destroy, NULL); \
++                       g_slist_free((GSList *) list); \
++               }, [Define if you need g_slist_free_full() function.]))
+ AC_SUBST(GLIB_CFLAGS)
+ AC_SUBST(GLIB_LIBS)
+
+
+This would work for whatever file that includes config.h which seems
+to be the perfect place for wrappers like this, but it doesn't seems
+common to have this type of macros inside configure.ac/config.h so
+perhaps it is a bad idea.
+
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
