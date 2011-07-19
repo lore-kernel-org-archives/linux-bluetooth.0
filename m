@@ -2,106 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [RFC 14/19] avrcp: handle RegisterNotification pdu
-Date: Tue, 19 Jul 2011 16:49:25 -0300
-Message-Id: <1311104970-18600-15-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 13/19] Add script to test control interface
+Date: Tue, 19 Jul 2011 16:49:24 -0300
+Message-Id: <1311104970-18600-14-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handle mandatory events according to AVRCP 1.3 spec.
 ---
- audio/control.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 51 insertions(+), 0 deletions(-)
+ test/test-control |   67 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 67 insertions(+), 0 deletions(-)
+ create mode 100755 test/test-control
 
-diff --git a/audio/control.c b/audio/control.c
-index 670660f..212e95c 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -74,10 +74,12 @@
- /* ctype entries */
- #define CTYPE_CONTROL		0x0
- #define CTYPE_STATUS		0x1
-+#define CTYPE_NOTIFY		0x3
- #define CTYPE_NOT_IMPLEMENTED	0x8
- #define CTYPE_ACCEPTED		0x9
- #define CTYPE_REJECTED		0xA
- #define CTYPE_STABLE		0xC
-+#define CTYPE_INTERIM		0xF
- 
- /* opcodes */
- #define OP_VENDORDEP		0x00
-@@ -122,6 +124,22 @@
- #define AVRCP_DISPLAYABLE_CHARSET	0x17
- #define AVRCP_CT_BATTERY_STATUS		0x18
- #define AVRCP_GET_PLAY_STATUS		0x30
-+#define AVRCP_REGISTER_NOTIFICATION	0x31
+diff --git a/test/test-control b/test/test-control
+new file mode 100755
+index 0000000..4351d73
+--- /dev/null
++++ b/test/test-control
+@@ -0,0 +1,67 @@
++#!/usr/bin/python
 +
-+/* Notification events */
-+#define AVRCP_EVENT_PLAYBACK_STATUS_CHANGED		0x01
-+#define AVRCP_EVENT_TRACK_CHANGED			0x02
-+#define AVRCP_EVENT_TRACK_REACHED_END			0x03
-+#define AVRCP_EVENT_TRACK_REACHED_START			0x04
-+#define AVRCP_EVENT_PLAYBACK_POS_CHANGED		0x05
-+#define AVRCP_EVENT_BATT_STATUS_CHANGED			0x06
-+#define AVRCP_EVENT_SYSTEM_STATUS_CHANGED		0x07
-+#define AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED	0x08
-+#define AVRCP_EVENT_NOW_PLAYING_CONTENT_CHANGED		0x09
-+#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED		0x0a
-+#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED		0x0b
-+#define AVRCP_EVENT_UIDS_CHANGED			0x0c
-+#define AVRCP_EVENT_VOLUME_CHANGED			0x0d
- 
- /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
- #define CAP_COMPANY_ID		0x02
-@@ -289,6 +307,7 @@ struct control {
- 
- 	uint8_t player_setting[PLAYER_SETTING_SCAN + 1];
- 	struct media_info mi;
-+	uint16_t registered_events;
- };
- 
- static struct {
-@@ -944,6 +963,38 @@ static int handle_vendordep_pdu(struct control *control,
- 		}
- 
- 		break;
-+	case AVRCP_REGISTER_NOTIFICATION:
-+		if (len == 5 && avrcp->code == CTYPE_NOTIFY) {
-+			int size;
++import sys
++import dbus
++from optparse import OptionParser, make_option
 +
-+			switch (pdu->params[0]) {
-+			case (AVRCP_EVENT_PLAYBACK_STATUS_CHANGED):
-+				size = 2;
-+				pdu->params[1] = control->mi.status;
++USAGE = """Usage: %s <command> [args]
 +
-+				break;
-+			case (AVRCP_EVENT_TRACK_CHANGED):
-+				size = 9;
-+				memset(&pdu->params[1], 0, 8);
++	changetrack <bdaddr> <key> <value> [<key> <value> ...]
++	""" % sys.argv[0]
 +
-+				break;
-+			default:
-+				/* All other events are not supported yet */
-+				pdu->params[0] = E_INVALID_PARAM;
-+				goto err_metadata;
-+			}
++bus = dbus.SystemBus()
 +
-+			/* Register event */
-+			control->registered_events |= (1 << pdu->params[0]);
++manager = dbus.Interface(bus.get_object("org.bluez", "/"), "org.bluez.Manager")
 +
-+			avrcp->code = CTYPE_INTERIM;
-+			pdu->params_len = htons(size);
++option_list = [
++		make_option("-i", "--device", action="store",
++				type="string", dest="dev_id"),
++		]
++parser = OptionParser(option_list=option_list)
 +
-+			return AVRCP_HEADER_LENGTH +
-+				AVRCP_SPECAVCPDU_HEADER_LENGTH + size;
-+		}
++(options, args) = parser.parse_args()
 +
-+		break;
- 	}
- 
- 	/*
++if options.dev_id:
++	adapter_path = manager.FindAdapter(options.dev_id)
++else:
++	adapter_path = manager.DefaultAdapter()
++
++adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++if len(args) < 2:
++	print(USAGE)
++	sys.exit(1)
++
++device = adapter.FindDevice(args[1])
++control = dbus.Interface(bus.get_object("org.bluez", device),
++                                "org.bluez.Control")
++
++def handle_change_track(control, args):
++    if len(args) % 2 != 0:
++        print("Don't know how to handle odd number of parameters")
++        print(USAGE)
++        sys.exit(1)
++
++    d = dict()
++    for i in range(2, len(args), 2):
++        key = args[i]
++        if key == "Title" or key == "Artist" or key == "Album" \
++                                            or key == "Genre":
++            d[key] = dbus.String(args[i + 1].decode(sys.stdin.encoding))
++        elif key == "NumberOfTracks" or key == "TrackNumber"       \
++                                            or key == "TrackDuration":
++            d[key] = dbus.UInt32(int(args[i + 1]))
++        else:
++            print("Unknown metadata: %s" % key)
++            sys.exit(1)
++
++    d = dbus.Dictionary(d, signature='sv')
++    control.ChangeTrack(d)
++
++if args[0] == "changetrack":
++    handle_change_track(control, args)
++else:
++    print("Unknown command -- %s" % argv[1])
++    print(USAGE)
++    sys.exit(1)
 -- 
 1.7.6
 
