@@ -2,91 +2,148 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [RFC 11/19] avrcp: handle GetPlayStatus pdu
-Date: Tue, 19 Jul 2011 16:49:22 -0300
-Message-Id: <1311104970-18600-12-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 10/19] avrcp: implement ChangePlayback() method
+Date: Tue, 19 Jul 2011 16:49:21 -0300
+Message-Id: <1311104970-18600-11-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+ChangePlayback() is used by applications to inform BlueZ of the current
+status of playback. It's expected to work only when the device is in TG
+role.
 ---
- audio/control.c |   34 ++++++++++++++++++++++++++++++++++
- 1 files changed, 34 insertions(+), 0 deletions(-)
+ audio/control.c     |   66 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/control-api.txt |    3 +-
+ 2 files changed, 68 insertions(+), 1 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 77e0e6d..03f1cb4 100644
+index 866a558..77e0e6d 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -121,6 +121,7 @@
- #define AVRCP_GET_PLAYER_VALUE_TEXT	0x16
- #define AVRCP_DISPLAYABLE_CHARSET	0x17
- #define AVRCP_CT_BATTERY_STATUS		0x18
-+#define AVRCP_GET_PLAY_STATUS		0x30
- 
- /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
- #define CAP_COMPANY_ID		0x02
-@@ -260,6 +261,7 @@ struct avctp_server {
- struct media_info {
- 	enum play_status status;
- 	uint32_t current_position;
-+	uint32_t track_length;
+@@ -167,6 +167,15 @@ enum battery_status {
+ 	BATTERY_STATUS_FULL_CHARGE =	4,
  };
  
++enum play_status {
++	PLAY_STATUS_STOPPED =		0x00,
++	PLAY_STATUS_PLAYING =		0x01,
++	PLAY_STATUS_PAUSED =		0x02,
++	PLAY_STATUS_FWD_SEEK =		0x03,
++	PLAY_STATUS_REV_SEEK =		0x04,
++	PLAY_STATUS_ERROR =		0xFF
++};
++
+ static DBusConnection *connection = NULL;
+ 
+ static GSList *servers = NULL;
+@@ -248,6 +257,11 @@ struct avctp_server {
+ 	uint32_t ct_record_id;
+ };
+ 
++struct media_info {
++	enum play_status status;
++	uint32_t current_position;
++};
++
  struct control {
-@@ -918,6 +920,23 @@ static int handle_vendordep_pdu(struct control *control,
- 		}
+ 	struct audio_device *dev;
  
- 		break;
-+	case AVRCP_GET_PLAY_STATUS:
-+		if (len == 0 && avrcp->code == CTYPE_STATUS) {
-+			uint32_t track_length = htonl(control->mi.track_length);
-+			uint32_t pos = htonl(control->mi.current_position);
-+
-+			memcpy(&pdu->params[0], &track_length, 4);
-+			memcpy(&pdu->params[4], &pos, 4);
-+			pdu->params[8] = control->mi.status;
-+
-+			avrcp->code = CTYPE_STABLE;
-+			pdu->params_len = htons(9);
-+
-+			return AVRCP_HEADER_LENGTH +
-+				AVRCP_SPECAVCPDU_HEADER_LENGTH + 9;
-+		}
-+
-+		break;
- 	}
+@@ -265,6 +279,7 @@ struct control {
+ 	uint8_t key_quirks[256];
  
- 	/*
-@@ -1207,6 +1226,20 @@ static void init_uinput(struct control *control)
- 		DBG("AVRCP: uinput initialized for %s", address);
+ 	uint8_t player_setting[PLAYER_SETTING_SCAN + 1];
++	struct media_info mi;
+ };
+ 
+ static struct {
+@@ -1653,6 +1668,24 @@ static int setting_string_to_val(uint8_t setting, const char *value) {
+ 	return -EINVAL;
  }
  
-+static void media_info_init(struct media_info *mi)
++static int play_status_string_to_val(const char *status)
 +{
-+	memset(mi, 0, sizeof(*mi));
-+	mi->status = PLAY_STATUS_ERROR;
++	if (!strcmp(status, "stopped"))
++		return PLAY_STATUS_STOPPED;
++	else if (!strcmp(status, "playing"))
++		return PLAY_STATUS_PLAYING;
++	else if (!strcmp(status, "paused"))
++		return PLAY_STATUS_PAUSED;
++	else if (!strcmp(status, "forward-seek"))
++		return PLAY_STATUS_FWD_SEEK;
++	else if (!strcmp(status, "reverse-seek"))
++		return PLAY_STATUS_REV_SEEK;
++	else if (!strcmp(status, "error"))
++		return PLAY_STATUS_ERROR;
 +
-+	/*
-+	 * As per section 5.4.1 of AVRCP 1.3 spec, return 0xFFFFFFFF if TG
-+	 * does not support these attributes (i.e. they were never set via
-+	 * D-Bus)
-+	 */
-+	mi->track_length = 0xFFFFFFFF;
-+	mi->current_position = 0xFFFFFFFF;
++	return -EINVAL;
 +}
 +
- static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ static DBusMessage *setting_set(DBusMessage *msg, struct control *control,
+ 				const char *settingstr, const char *valstr)
  {
- 	struct control *control = data;
-@@ -1237,6 +1270,7 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 		control->io = g_io_channel_ref(chan);
+@@ -1718,6 +1751,38 @@ static DBusMessage *control_change_setting(DBusConnection *conn,
+ 	return setting_set(msg, control, setting, value);
+ }
  
- 	init_uinput(control);
-+	media_info_init(&control->mi);
++static DBusMessage *control_change_playback(DBusConnection *conn,
++					DBusMessage *msg, void *data)
++{
++	struct audio_device *device = data;
++	struct control *control = device->control;
++	const char *statusstr;
++	int status;
++	uint32_t elapsed;
++
++	if (control->state != AVCTP_STATE_CONNECTED)
++		return btd_error_not_connected(msg);
++
++	if (control->target) /* Only supported if this device is in TG role */
++		return btd_error_not_supported(msg);
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &statusstr,
++						DBUS_TYPE_UINT32, &elapsed,
++						DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	status = play_status_string_to_val(statusstr);
++	if (status < 0)
++		return btd_error_invalid_args(msg);
++
++	control->mi.status = status;
++	control->mi.current_position = elapsed;
++
++	DBG("Change playback: %s %u", statusstr, elapsed);
++
++	return dbus_message_new_method_return(msg);
++}
++
+ static GDBusMethodTable control_methods[] = {
+ 	{ "IsConnected",	"",	"b",	control_is_connected,
+ 						G_DBUS_METHOD_FLAG_DEPRECATED },
+@@ -1725,6 +1790,7 @@ static GDBusMethodTable control_methods[] = {
+ 	{ "VolumeUp",		"",	"",	volume_up },
+ 	{ "VolumeDown",		"",	"",	volume_down },
+ 	{ "ChangeSetting",	"sv",	"",	control_change_setting },
++	{ "ChangePlayback",	"su",	"",	control_change_playback },
+ 	{ NULL, NULL, NULL, NULL }
+ };
  
- 	avctp_set_state(control, AVCTP_STATE_CONNECTED);
- 	control->mtu = imtu;
+diff --git a/doc/control-api.txt b/doc/control-api.txt
+index 931fa10..ca97544 100644
+--- a/doc/control-api.txt
++++ b/doc/control-api.txt
+@@ -49,7 +49,8 @@ Methods		void Connect()
+ 
+ 			The status can be "playing", "stopped", "paused",
+ 			"forward-seek", "reverse-seek" or "error". Elapsed is
+-			the position within the track in milliseconds.
++			the position within the track in milliseconds. ONLY
++			valid if BlueZ device is in TG role.
+ 
+ 		void ChangeTrack(dict metadata)
+ 
 -- 
 1.7.6
 
