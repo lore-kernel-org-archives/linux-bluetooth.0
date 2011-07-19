@@ -1,77 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110716.131733.1746593505234880481.davem@davemloft.net>
-References: <CABBYNZ+fxUWhi0uF0b_6Z8iqYd7Pp_4zPBRyM6Gyh3zJH1am5Q@mail.gmail.com>
-	<201107150728.04355.edt@aei.ca>
-	<alpine.LRH.2.00.1107162141340.7178@twin.jikos.cz>
-	<20110716.131733.1746593505234880481.davem@davemloft.net>
-Date: Tue, 19 Jul 2011 13:58:26 -0500
-Message-ID: <CABUK1agxh+YWa462m98Sti0pkH0cGa23Lfmm_tcGjUeR5+XHNA@mail.gmail.com>
-Subject: Re: [BUG] Bluetooth broken post rc7
-From: Pavan Savoy <pavan_savoy@sify.com>
-To: David Miller <davem@davemloft.net>
-Cc: jkosina@suse.cz, edt@aei.ca, luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	padovan@profusion.mobi, iliak@ti.com, torvalds@linux-foundation.org
+In-Reply-To: <CAKT1EBcgkTqSb63dHSwMnfw2tp_uwQPvgMZZe+=cEGSmmOLifg@mail.gmail.com>
+References: <1311010504-15060-1-git-send-email-claudio.takahasi@openbossa.org>
+	<CALJ2SBLju51yhOuK+nMrXBoyLs23SCdD+SN7kup0f+kzvEmcqQ@mail.gmail.com>
+	<CAKT1EBcgkTqSb63dHSwMnfw2tp_uwQPvgMZZe+=cEGSmmOLifg@mail.gmail.com>
+Date: Tue, 19 Jul 2011 14:59:59 -0300
+Message-ID: <CAKT1EBepAMrUzRvOMMiEyr5Zmist-rzD55pfnkSe+hRMdtM26A@mail.gmail.com>
+Subject: Re: [RFC BlueZ] Proximity API simplification
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Anderson Briglia <anderson.briglia@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jul 16, 2011 at 3:17 PM, David Miller <davem@davemloft.net> wrote:
-> From: Jiri Kosina <jkosina@suse.cz>
-> Date: Sat, 16 Jul 2011 21:43:06 +0200 (CEST)
+Hi Briglia,
+
+On Tue, Jul 19, 2011 at 12:11 PM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi Briglia,
 >
->> could you please repost the patch with proper changelog and your
->> Signed-off-by, so that it could (hopefully) be applied for 3.0 still?
+> On Tue, Jul 19, 2011 at 11:34 AM, Anderson Briglia
+> <anderson.briglia@openbossa.org> wrote:
+>> Hi Claudio,
+>>
+>> On Mon, Jul 18, 2011 at 2:35 PM, Claudio Takahasi
+>> <claudio.takahasi@openbossa.org> wrote:
+>>> Delegates the Immediate Alert Level control to the caller(client).
+>>> Immediate Alert Service is shared between Path Loss and Find Me.
+>>>
+>>> Cons: distributed actions may impact qualification. Client needs to
+>>> control when to write the Immediate Alert based on the received
+>>> SignalLevel received.
+>>> ---
+>>>
+>>>  I'd like to collect feedbacks before proceeding with this change.
+>>>  Does it look more clear than the previous API version?
+>>>
+>>>  The ideia is to move to the kernel the RSSI value polling. The
+>>>  userspace will receive notifications when one of the SignalLevel
+>>>  threshold is triggered: "good", "regular", "week".
+>>
+>> How about simplify more and have just two alert levels? Is there any
+>> reason to have three? It could simplify the RSSI Monitor in the
+>> kernel.
+>>
+>> Regards,
+>>
+>> Anderson Briglia
 >
-> It's already in my networking tree and on the way to Linus, and has
-> been so for half a day.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Choosing two levels only, clients will not be able to map directly the
+> 3 alert levels values of the Immediate Alert Characteristic: none,
+> mild, high.
+> My suggestion is to implement the following mapping:
+> good->none
+> regular->mild
+> weak->high
+>
+> Of course, based on the proposal of delegating the write
+> operation(SetProperty) to the client, it up to the client to choose
+> when and which alert level to use.
+> Clients could also consider the selected phone profile(eg: silent,
+> meeting, normal) also to choose the alert level.
+>
+> Resuming, I don't have a strong argument to have 3 levels, I defined 3
+> to simplify the mapping of immediate alert level characteristic. But
+> this is implementation specific.
+>
+> Regards,
+> Claudio.
+>
 
-I can't seem to get BNEP working, and I have a feeling it has got to
-do something with this patch.
-I actually hit the error condition NULL @ [ 8882.843017] chan->scid 64
-[ 8882.845977] Bluetooth: parent is NULL
-[ 8882.850067] conn e53e5e00, code 0x03, ident 0x66, len 8
-[ 8882.855895] code 0x03
-[ 8882.858581] hci0: type 2 len 21
+We had a small misunderstanding about thresholds and alerts. 2
+thresholds should be mapped into 3 states/intervals. The changes that
+I proposed is aligned with your RSSI monitor(in the kernel) proposal.
+Please send the Management API RFC.
 
-which is at +//
-parent->sk_data_ready(parent, 0);
-+                                       if (parent) {
-+                                               BT_ERR("hitting condition @\
-+                                               %d", __LINE__);
-+                                               parent->sk_data_ready(parent,
-+                                               0);
-+                                       } else {
-+                                               BT_ERR("parent is NULL");
-+                                       }
-
-my l2cap_config_req does say this now,
-@@ -2524,7 +2525,7 @@ static inline int l2cap_config_req(struct
-l2cap_conn *conn, struct l2cap_cmd_hdr
-
-        sk = chan->sk;
-
--       if (chan->state != BT_CONFIG) {
-+       if (chan->state != BT_CONFIG && sk->sk_state != BT_CONNECT2) {
-                struct l2cap_cmd_rej rej;
+SignalLevel in the Proximity API doesn't need to be mapped directly in
+the RSSI monitor states, we are aligning it to expose to the clients
+all transitions.
 
 
-However, I can seem to connect because of the following reason,
-[ 8887.914703] l2cap_chan_timeout: reason: 110
-[ 8887.919342] chan e26fc800 state 6 socket cfc38a00
-[ 8887.924560] conn e53e5e00, code 0x03, ident 0x66, len 8
-[ 8887.930328] code 0x03
-[ 8887.932830] chan e26fc800 state 8
-[ 8887.936614] chan e26fc800, conn e53e5e00, err 110
-[ 8887.941925] hci0: type 2 len 21
-[ 8891.047576] hcon d44c7000 reason 19
-[ 8891.051666] hcon d44c7000 conn e53e5e00, err 104
-[ 8942.897979] chan e26fc800 state 9 socket cfc38a00
-
-
-Any suggestions ??
+Regards,
+Claudio
