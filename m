@@ -2,214 +2,89 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [RFC 06/19] avrcp: handle SetPlayerApplicationSettingValue pdu
-Date: Tue, 19 Jul 2011 16:49:17 -0300
-Message-Id: <1311104970-18600-7-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 05/19] avrcp: handle GetCurrentPlayerAplicationSettingValue pdu
+Date: Tue, 19 Jul 2011 16:49:16 -0300
+Message-Id: <1311104970-18600-6-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/control.c |  177 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 177 insertions(+), 0 deletions(-)
+ audio/control.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 59 insertions(+), 0 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 884e01c..2d6d9e6 100644
+index cd3beb7..884e01c 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -116,6 +116,7 @@
+@@ -115,6 +115,7 @@
+ #define AVRCP_GET_CAPABILITIES		0x10
  #define AVRCP_LIST_PLAYER_ATTRIBUTES	0X11
  #define AVRCP_LIST_PLAYER_VALUES	0x12
- #define AVRCP_GET_CURRENT_PLAYER_VALUE	0x13
-+#define AVRCP_SET_PLAYER_VALUE		0x14
++#define AVRCP_GET_CURRENT_PLAYER_VALUE	0x13
  
  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
  #define CAP_COMPANY_ID		0x02
-@@ -492,6 +493,133 @@ static unsigned int setting_get_max_val(uint8_t setting)
- 	return 0;
- }
+@@ -588,6 +589,64 @@ static int handle_vendordep_pdu(struct control *control,
  
-+static const char *setting_equalizer_to_string(enum equalizer_mode value)
-+{
-+	switch (value) {
-+	case (EQUALIZER_MODE_ON):
-+		return "on";
-+	case (EQUALIZER_MODE_OFF):
-+		return "off";
-+	}
+ 		return AVRCP_HEADER_LENGTH +
+ 				AVRCP_SPECAVCPDU_HEADER_LENGTH + len + 1;
++	case AVRCP_GET_CURRENT_PLAYER_VALUE:
++		if (len > 1 && pdu->params[0] == len - 1 &&
++						avrcp->code == CTYPE_STATUS) {
++			uint8_t settings[pdu->params[0]];
 +
-+	return NULL;
-+}
-+
-+static const char *setting_repeat_to_string(enum repeat_mode value)
-+{
-+	switch (value) {
-+	case (REPEAT_MODE_OFF):
-+		return "off";
-+	case (REPEAT_MODE_SINGLE):
-+		return "singletrack";
-+	case (REPEAT_MODE_ALL):
-+		return "alltracks";
-+	case (REPEAT_MODE_GROUP):
-+		return "group";
-+	}
-+
-+	return NULL;
-+}
-+
-+static const char *setting_shuffle_to_string(enum shuffle_mode value)
-+{
-+	switch (value) {
-+	case (SHUFFLE_MODE_OFF):
-+		return "off";
-+	case (SHUFFLE_MODE_ALL):
-+		return "alltracks";
-+	case (SHUFFLE_MODE_GROUP):
-+		return "group";
-+	}
-+
-+	return NULL;
-+}
-+
-+static const char *setting_scan_to_string(enum scan_mode value)
-+{
-+	switch (value) {
-+	case (SCAN_MODE_OFF):
-+		return "off";
-+	case (SCAN_MODE_ALL):
-+		return "alltracks";
-+	case (SCAN_MODE_GROUP):
-+		return "group";
-+	}
-+
-+	return NULL;
-+}
-+
-+static const char *setting_value_to_string(enum player_setting setting,
-+								uint8_t value)
-+{
-+	switch (setting) {
-+	case (PLAYER_SETTING_EQUALIZER):
-+		return setting_equalizer_to_string(value);
-+	case(PLAYER_SETTING_REPEAT):
-+		return setting_repeat_to_string(value);
-+	case(PLAYER_SETTING_SHUFFLE):
-+		return setting_shuffle_to_string(value);
-+	case(PLAYER_SETTING_SCAN):
-+		return setting_scan_to_string(value);
-+	}
-+
-+	return NULL;
-+}
-+
-+static const char *setting_to_string(enum player_setting setting)
-+{
-+	switch (setting) {
-+	case (PLAYER_SETTING_EQUALIZER):
-+		return "Equalizer";
-+	case(PLAYER_SETTING_REPEAT):
-+		return "Repeat";
-+	case(PLAYER_SETTING_SHUFFLE):
-+		return "Shuffle";
-+	case(PLAYER_SETTING_SCAN):
-+		return "Scan";
-+	}
-+
-+	return NULL;
-+}
-+
-+static void append_variant(DBusMessageIter *iter, int type, void *val)
-+{
-+	DBusMessageIter value;
-+	char sig[2] = { type, '\0' };
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
-+
-+	dbus_message_iter_append_basic(&value, type, val);
-+
-+	dbus_message_iter_close_container(iter, &value);
-+}
-+
-+static dbus_bool_t emit_setting_changed(DBusConnection *conn,
-+						const char *path,
-+						const char *interface,
-+						const char *name,
-+						int type, void *value)
-+{
-+	DBusMessage *signal;
-+	DBusMessageIter iter;
-+
-+	signal = dbus_message_new_signal(path, interface, "SettingChanged");
-+
-+	if (!signal) {
-+		error("Unable to allocate new %s.SettingChanged signal",
-+				interface);
-+		return FALSE;
-+	}
-+
-+	dbus_message_iter_init_append(signal, &iter);
-+
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
-+
-+	append_variant(&iter, type, value);
-+
-+	return g_dbus_send_message(conn, signal);
-+}
-+
- /* handle vendordep pdu inside an avctp packet */
- static int handle_vendordep_pdu(struct control *control,
- 					struct avrcp_header *avrcp,
-@@ -647,6 +775,55 @@ static int handle_vendordep_pdu(struct control *control,
- 		}
- 
- 		break;
-+	case AVRCP_SET_PLAYER_VALUE:
-+		if (len > 2 && avrcp->code == CTYPE_CONTROL) {
++			memcpy(settings, &pdu->params[1], len);
 +			len = 0;
 +
 +			/*
 +			 * From sec. 5.7 of AVRCP 1.3 spec, we should igore
-+			 * non-existent IDs and set the existent ones. Sec.
-+			 * 5.2.4 is not clear however how to indicate that a
-+			 * certain ID was not accepted. If at least one
-+			 * attribute we respond with no parameters. Otherwise
-+			 * an E_INVALID_PARAM is sent.
++			 * non-existent IDs and send a response with the
++			 * existent ones. Only if all IDs are non-existent we
++			 * should send an error.
 +			 */
 +			for (i = 0; i < pdu->params[0]; i++) {
-+				uint8_t setting = pdu->params[i * 2 + 1];
-+				uint8_t val = pdu->params[i * 2 + 2];
-+				const char *settingstr;
-+				const char *valstr;
++				uint8_t val;
 +
-+				settingstr = setting_to_string(setting);
-+				if (!setting)
++				if (settings[i] < PLAYER_SETTING_EQUALIZER) {
++					DBG("Ignoring invalid setting %u",
++								settings[i]);
 +					continue;
++				}
 +
-+				valstr = setting_value_to_string(setting, val);
-+				if (!valstr)
++				if (settings[i] > PLAYER_SETTING_SCAN) {
++					DBG("Ignoring invalid setting %u",
++								settings[i]);
 +					continue;
++				}
 +
++				val = control->player_setting[settings[i]];
++				if (!val) {
++					DBG("Ignoring setting %u since value"
++							"has never been set",
++							settings[i]);
++					continue;
++				}
++
++				pdu->params[len * 2 + 1] = settings[i];
++				pdu->params[len * 2 + 2] = val;
 +				len++;
-+				control->player_setting[setting] = val;
-+
-+				emit_setting_changed(control->dev->conn,
-+						control->dev->path,
-+						AUDIO_CONTROL_INTERFACE,
-+						settingstr,
-+						DBUS_TYPE_STRING, &valstr);
 +			}
 +
 +			if (!len) {
++				error("GetCurrentPlayerValue: no valid "
++						"attribute found in request");
 +				pdu->params[0] = E_INVALID_PARAM;
 +				goto err_metadata;
 +			}
 +
 +			avrcp->code = CTYPE_STABLE;
-+			pdu->params_len = 0;
++			pdu->params[0] = len;
++			pdu->params_len = htons(2 * len + 1);
 +
 +			return AVRCP_HEADER_LENGTH +
-+				AVRCP_SPECAVCPDU_HEADER_LENGTH;
++				AVRCP_SPECAVCPDU_HEADER_LENGTH + 2 * len + 1;
 +		}
 +
 +		break;
