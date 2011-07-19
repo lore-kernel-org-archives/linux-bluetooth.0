@@ -2,238 +2,209 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 3/3] MAP: Folder listing for messages-dummy.c
-Date: Tue, 19 Jul 2011 13:16:12 +0200
-Message-Id: <1311074172-15953-4-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 2/3] MAP: Folder listing support
+Date: Tue, 19 Jul 2011 13:16:11 +0200
+Message-Id: <1311074172-15953-3-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
 References: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds a basic (without parsing or sending back application
+parameters) handling of folder listing requests for Message Access
+Profile.
 ---
- plugins/messages-dummy.c |  181 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 176 insertions(+), 5 deletions(-)
+ plugins/mas.c      |  103 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ plugins/messages.h |    6 ++-
+ 2 files changed, 105 insertions(+), 4 deletions(-)
 
-diff --git a/plugins/messages-dummy.c b/plugins/messages-dummy.c
-index 295eb61..1cadb4d 100644
---- a/plugins/messages-dummy.c
-+++ b/plugins/messages-dummy.c
-@@ -25,10 +25,12 @@
- #include <config.h>
- #endif
+diff --git a/plugins/mas.c b/plugins/mas.c
+index e88a0f0..4e1e07f 100644
+--- a/plugins/mas.c
++++ b/plugins/mas.c
+@@ -37,6 +37,7 @@
+ #include "obex.h"
+ #include "service.h"
+ #include "mimetype.h"
++#include "filesystem.h"
+ #include "dbus.h"
  
-+#include <dirent.h>
- #include <errno.h>
- #include <stdlib.h>
- #include <string.h>
- 
-+#include "log.h"
  #include "messages.h"
+@@ -97,19 +98,44 @@
+ #define STATUS_TYPE		"x-bt/messageStatus"
+ #define UPDATE_TYPE		"x-bt/MAP-messageUpdate"
  
- static char *root_folder = NULL;
-@@ -36,6 +38,16 @@ static char *root_folder = NULL;
- struct session {
- 	char *cwd;
- 	char *cwd_absolute;
-+	void *request;
-+};
++#define XML_DECL "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 +
-+struct folder_listing_data {
-+	struct session *session;
-+	const char *name;
-+	messages_folder_listing_cb callback;
-+	void *user_data;
-+	uint16_t max;
-+	uint16_t offset;
++/* Building blocks for x-obex/folder-listing */
++#define FL_DTD "<!DOCTYPE folder-listing SYSTEM \"obex-folder-listing.dtd\">"
++#define FL_BODY_BEGIN "<folder-listing version=\"1.0\">"
++#define FL_BODY_EMPTY "<folder-listing version=\"1.0\"/>"
++#define FL_PARENT_FOLDER_ELEMENT "<parent-folder/>"
++#define FL_FOLDER_ELEMENT "<folder name=\"%s\"/>"
++#define FL_BODY_END "</folder-listing>"
++
+ struct mas_session {
+ 	struct mas_request *request;
+ 	void *backend_data;
+ 	const char *name;
+ 	const char *type;
++	gboolean nth_call;
++	gboolean finished;
++	GString *buffer;
  };
  
- int messages_init(void)
-@@ -142,14 +154,167 @@ int messages_set_folder(void *s, const char *name, gboolean cdup)
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+ 			0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb,
+ 			0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66  };
+ 
++static void reset_request(struct mas_session *mas)
++{
++	if (mas->buffer) {
++		g_string_free(mas->buffer, TRUE);
++		mas->buffer = NULL;
++	}
++
++	mas->nth_call = FALSE;
++	mas->finished = FALSE;
++}
++
+ static void mas_clean(struct mas_session *mas)
+ {
++	reset_request(mas);
+ 	g_free(mas);
+ }
+ 
+@@ -187,11 +213,65 @@ failed:
+ 	return ret;
+ }
+ 
++/* FIXME: Preserve whitespaces */
++static void g_string_append_escaped_printf(GString *string, const gchar *format,
++		...)
++{
++	va_list ap;
++	char *escaped;
++
++	va_start(ap, format);
++	escaped = g_markup_vprintf_escaped(format, ap);
++	g_string_append(string, escaped);
++	g_free(escaped);
++	va_end(ap);
++}
++
++static void get_folder_listing_cb(void *session, int err, uint16_t size,
++					const char *name, void *user_data)
++{
++	struct mas_session *mas = user_data;
++
++	if (err < 0 && err != -EAGAIN) {
++		obex_object_set_io_flags(mas, G_IO_ERR, err);
++		return;
++	}
++
++	if (!mas->nth_call) {
++		g_string_append(mas->buffer, XML_DECL);
++		g_string_append(mas->buffer, FL_DTD);
++		if (!name) {
++			g_string_append(mas->buffer, FL_BODY_EMPTY);
++			mas->finished = TRUE;
++			goto proceed;
++		}
++		g_string_append(mas->buffer, FL_BODY_BEGIN);
++		mas->nth_call = TRUE;
++	}
++
++	if (!name) {
++		g_string_append(mas->buffer, FL_BODY_END);
++		mas->finished = TRUE;
++		goto proceed;
++	}
++
++	if (g_strcmp0(name, "..") == 0)
++		g_string_append(mas->buffer, FL_PARENT_FOLDER_ELEMENT);
++	else
++		g_string_append_escaped_printf(mas->buffer, FL_FOLDER_ELEMENT,
++									name);
++
++proceed:
++	if (err != -EAGAIN)
++		obex_object_set_io_flags(mas, G_IO_IN, err);
++}
++
+ static int start_get(struct mas_session *mas)
+ {
+ 	/* NOTE: type is case-insensitive! */
+ 	if (g_ascii_strcasecmp(mas->type, FOLDER_LISTING_TYPE) == 0)
+-		return -EINVAL;
++		return messages_get_folder_listing(mas->backend_data, mas->name,
++					0xffff, 0, get_folder_listing_cb, mas);
+ 	else if (g_ascii_strcasecmp(mas->type, MESSAGES_LISTING_TYPE) == 0)
+ 		return -EINVAL;
+ 	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
+@@ -262,6 +342,10 @@ static void *any_open(const char *name, int oflag, mode_t mode,
+ 	if (*err)
+ 		return NULL;
+ 
++	mas->finished = FALSE;
++	mas->nth_call = FALSE;
++	mas->buffer = g_string_new("");
++
+ 	return mas;
+ }
+ 
+@@ -274,15 +358,30 @@ static ssize_t any_write(void *object, const void *buf, size_t count)
+ 
+ static ssize_t any_read(void *obj, void *buf, size_t count)
+ {
++	struct mas_session *mas = obj;
++	ssize_t len;
++
+ 	DBG("");
+ 
+-	return 0;
++	len = string_read(mas->buffer, buf, count);
++
++	if (len == 0 && !mas->finished)
++		return -EAGAIN;
++
++	return len;
+ }
+ 
+ static int any_close(void *obj)
+ {
++	struct mas_session *mas = obj;
++
+ 	DBG("");
+ 
++	if (!mas->finished)
++		messages_abort(mas->backend_data);
++
++	reset_request(mas);
++
  	return 0;
  }
  
--int messages_get_folder_listing(void *session,
-+/* NOTE: Neither IrOBEX nor MAP specs says that folder listing needs to
-+ * be sorted (in IrOBEX examples it is not). However existing implementations
-+ * seem to follow the fig. 3-2 from MAP specification v1.0, and I've seen a
-+ * test suite requiring folder listing to be in that order.
-+ */
-+static gint folder_names_cmp(gconstpointer a, gconstpointer b,
-+						gpointer user_data)
-+{
-+	static const char *order[] = {
-+		"inbox", "outbox", "sent", "deleted", "draft", NULL
-+	};
-+	struct session *session = user_data;
-+	int ia, ib;
+diff --git a/plugins/messages.h b/plugins/messages.h
+index c862b07..d9348c7 100644
+--- a/plugins/messages.h
++++ b/plugins/messages.h
+@@ -202,11 +202,13 @@ int messages_set_folder(void *session, const char *name, gboolean cdup);
+  * Callback shall be called for every entry of the listing. 'name' is the
+  * subdirectory name.
+  */
++typedef void (*messages_folder_listing_cb)(void *session, int err,
++		uint16_t size, const char *name, void *user_data);
 +
-+	if (g_strcmp0(session->cwd, "telecom/msg") == 0) {
-+		for (ia = 0; order[ia]; ++ia) {
-+			if (g_strcmp0(a, order[ia]) == 0)
-+				break;
-+		}
-+		for (ib = 0; order[ib]; ++ib) {
-+			if (g_strcmp0(b, order[ib]) == 0)
-+				break;
-+		}
-+		if (ia != ib)
-+			return ia - ib;
-+	}
-+
-+	return g_strcmp0(a, b);
-+}
-+
-+static int get_subdirs(struct folder_listing_data *fld, GSList **list,
-+								uint16_t *n)
-+{
-+	DIR *dp;
-+	struct dirent *ep;
-+	char *path;
-+	char *abs;
-+	char *name;
-+
-+	*n = 0;
-+
-+	path = g_build_filename(fld->session->cwd_absolute, fld->name, NULL);
-+	dp = opendir(path);
-+
-+	if (dp == NULL) {
-+		int err = errno;
-+
-+		DBG("opendir(): %d, %s", err, strerror(err));
-+		g_free(path);
-+
-+		return -err;
-+	}
-+
-+	while ((ep = readdir(dp)) != NULL) {
-+		if (ep->d_name[0] == '.' &&
-+				(ep->d_name[1] == 0 || ep->d_name[1] == '.'))
-+			continue;
-+
-+		abs = g_build_filename(path, ep->d_name,
-+				NULL);
-+
-+		if (!g_file_test(abs, G_FILE_TEST_IS_DIR)) {
-+			g_free(abs);
-+			continue;
-+		}
-+
-+		g_free(abs);
-+		name = g_filename_to_utf8(ep->d_name, -1, NULL, NULL, NULL);
-+
-+		if (name == NULL) {
-+			error("g_filename_to_utf8(): invalid filename");
-+			continue;
-+		}
-+
-+		++*n;
-+
-+		if (fld->max != 0)
-+			*list = g_slist_prepend(*list, name);
-+	}
-+
-+	closedir(dp);
-+	g_free(path);
-+
-+	*list = g_slist_sort_with_data(*list, folder_names_cmp, fld->session);
-+
-+	return 0;
-+}
-+
-+static gboolean get_folder_listing(void *d)
-+{
-+	struct folder_listing_data *fld = d;
-+	struct session *session = fld->session;
-+	uint16_t n;
-+	uint16_t o;
-+	GSList *list = NULL;
-+	GSList *cur;
-+	int err;
-+
-+	err = get_subdirs(fld, &list, &n);
-+
-+	if (err < 0) {
-+		fld->callback(session, 0, err, NULL, fld->user_data);
-+		return FALSE;
-+	}
-+
-+	if (fld->max == 0) {
-+		fld->callback(session, 0, n, NULL, fld->user_data);
-+		return FALSE;
-+	}
-+
-+	n = 0;
-+	o = 0;
-+
-+	/* XXX: This isn't really documented for MAP. Need to take a look at
-+	 * other implementations.
-+	 */
-+	if (session->cwd[0] != 0 && fld->offset == 0) {
-+		++n;
-+		fld->callback(session, 0, -EAGAIN, "..", fld->user_data);
-+	} else {
-+		++o;
-+	}
-+
-+	for (cur = list; o < fld->offset; ++o) {
-+		cur = cur->next;
-+		if (cur == NULL)
-+			break;
-+	}
-+
-+	for (; cur != NULL && n < fld->max; cur = cur->next, ++n)
-+		fld->callback(session, -EAGAIN, 0, cur->data, fld->user_data);
-+
-+	fld->callback(session, 0, 0, NULL, fld->user_data);
-+
-+	g_slist_free_full(list, g_free);
-+
-+	return FALSE;
-+}
-+
-+int messages_get_folder_listing(void *s,
+ int messages_get_folder_listing(void *session,
  		const char *name,
  		uint16_t max, uint16_t offset,
 -		void (*callback)(void *session, int err, uint16_t size,
 -			const char *name, void *user_data),
 +		messages_folder_listing_cb callback,
- 		void *user_data)
- {
--	return -EINVAL;
-+	struct session *session = s;
-+	struct folder_listing_data *fld;
-+
-+	fld = g_new0(struct folder_listing_data, 1);
-+	fld->name = name;
-+	fld->max = max;
-+	fld->offset = offset;
-+	fld->callback = callback;
-+	fld->session = session;
-+	fld->user_data = user_data;
-+	session->request = fld;
-+
-+	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, get_folder_listing,
-+				fld, g_free);
-+
-+	return 0;
- }
+ 		void *user_data);
  
- int messages_get_messages_listing(void *session,
-@@ -173,6 +338,12 @@ int messages_get_message(void *session,
- 	return -EINVAL;
- }
- 
--void messages_abort(void *session)
-+void messages_abort(void *s)
- {
-+	struct session *session = s;
-+
-+	if (session->request) {
-+		g_idle_remove_by_data(session->request);
-+		session->request = NULL;
-+	}
- }
+ /* Retrieves messages listing from a current directory.
 -- 
 1.7.4.1
 
