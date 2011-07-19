@@ -1,86 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] Proximity API simplification
-Date: Tue, 19 Jul 2011 19:36:30 -0300
-Message-Id: <1311114990-21762-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <CAKT1EBepAMrUzRvOMMiEyr5Zmist-rzD55pfnkSe+hRMdtM26A@mail.gmail.com>
-References: <CAKT1EBepAMrUzRvOMMiEyr5Zmist-rzD55pfnkSe+hRMdtM26A@mail.gmail.com>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH] Add RSSI Monitor documentation API
+Date: Tue, 19 Jul 2011 19:15:33 -0300
+Message-Id: <1311113733-7425-2-git-send-email-anderson.briglia@openbossa.org>
+In-Reply-To: <1311113733-7425-1-git-send-email-anderson.briglia@openbossa.org>
+References: <1311113733-7425-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Delegates the Immediate Alert Level control to the caller(client).
-Immediate Alert Service is shared between Path Loss and Find Me.
-
-Three signal level states are defined: "good", "regular" and "weak".
-Meaning that at least two thresholds are necessary to implement a
-proper state transition. "unknown" will be returned if the link is not
-active. For Path Loss, the logic to trigger the writting operation of
-the Immediate Alert Level characteristic needs to be implemented in
-the client. SignalLevel can be only one of the inputs to define when
-and which value to write in the characteristic.
+This patch adds new Management API in order to implement a RSSI Monitor.
+It will be used on Proximity profile, at least.
 ---
- doc/proximity-api.txt |   36 ++++++------------------------------
- 1 files changed, 6 insertions(+), 30 deletions(-)
+ doc/mgmt-api.txt |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 40 insertions(+), 0 deletions(-)
 
-diff --git a/doc/proximity-api.txt b/doc/proximity-api.txt
-index ed78fb5..cf64bbf 100644
---- a/doc/proximity-api.txt
-+++ b/doc/proximity-api.txt
-@@ -30,29 +30,11 @@ Signals		PropertyChanged(string name, variant value)
- 			property.
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index e5cf5de..4e7cd03 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -388,6 +388,30 @@ Write Controller Tracing Filter Command
+ 	Return Parameters:	Status (1 Octet)
  
- Properties
--		uint8 PathLoss[readonly]
  
--			If Tx Power Service is available, this property value
--			will be reported on regular intervals when the peer is
--			connected. Range: 0 - 100. The number is a relative
--			value to represent inaccurately the signal strength,
--			where 0 represents out of range and 100 close to the
--			reporter.
-+		string SignalLevel[readonly]
++Enable RSSI Monitor Command
++===========================
++
++	Command Code:		<not yet assigned>
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octects)
++				Low_Alert_Trigger (1 Octect)
++				High_Alert_Trigger (1 Octect)
++	Return Parameters:	Status (1 Octet)
++
++	Low/High_Alert_Trigger range: -128 to 127 dBm
++	The alert trigger values are used to determine when a RSSI Monitor
++	Alert event will be sent.
++
++
++Disable RSSI Monitor Command
++============================
++
++	Command Code:		<not yet assigned>
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octects)
++	Return Parameters:	Status (1 Octet)
++
++
+ Command Complete Event
+ ======================
  
--		string Threshold [readwrite]
--
--			Persistent property. Trigger for immediate alert.
--			Values: "low", "medium", "high". Enabled only if Tx
--			Power and Immediate Alert services are available in
--			the reporter. Controls when the immediate alert is
--			triggered in the reporter.
--
--		boolean ThresholdAlert[readonly]
--
--			Alert indicating that threshold has been reached or the
--			path loss returned to a value below the threshold. It is
--			up to the implementation catch this property value and
--			emit a sound in the proximity monitor.
-+			Alert indicating that a threshold has been reached.
-+			Possible values: "unknown", "good", "regular", "weak"
- 
- 		string LinkLossAlertLevel [readwrite]
- 
-@@ -60,16 +42,10 @@ Properties
- 			proximity reporter for link loss scenario. Values:
- 			"none", "mild", "high".
- 
--		string PathLossAlertLevel [readwrite]
--
--			Persistent property. Alert level for path loss scenario.
--			It's a LOCAL property value written in the Alert Level of
--			the Immediate Alert service when the threshold alert is
--			triggered. Values: "none", "mild", "high".
--
--		string FindMeAlertLevel [readwrite]
-+		string ImmediateAlertLevel [readwrite]
- 
--			Alert level to be written in the Find Me Target.
-+			Alert level to be written in the Immediate Alert Level.
-+			Property shared between Path Loss and Find Me.
- 			Values: "none", "mild", "high". Default value is
- 			"none". Applications can disable the alert setting
- 			the value to "none". If the "Target" is not found,
+@@ -552,3 +576,19 @@ Discovering Event
+ Event Code		0x00014
+ Controller Index	<controller id>
+ Event Parameters	Discovering (1 Octet)
++
++
++RSSI Monitor Alert Event
++========================
++
++Event Code		<not yet assigned>
++Controller Index	<controller id>
++Event Parameters	Address (6 octets)
++			Alert_Type (1 Octet)
++
++	Alert_Type:	0x00 In Range
++			0x01 Low
++			0x02 High
++
++	The Monitor Alert Event is sent when a configured trigger
++	is reached (see Enable RSSI Monitor cmd).
 -- 
-1.7.6
+1.7.4.1
 
