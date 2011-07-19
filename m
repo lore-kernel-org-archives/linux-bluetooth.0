@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Briglia <anderson.briglia@openbossa.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 0/1] RSSI Monitor
-Date: Tue, 19 Jul 2011 19:15:32 -0300
-Message-Id: <1311113733-7425-1-git-send-email-anderson.briglia@openbossa.org>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [RFC 19/19] avrcp: update copyright
+Date: Tue, 19 Jul 2011 16:49:30 -0300
+Message-Id: <1311104970-18600-20-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This RFC is about RSSI monitoring. This feature is needed by Proximity
-profile, at least. The suggested proposal adds two Management commands in order
-to handle a list of RSSI Monitors. Each connection can have just one registered
-RSSI monitor. Each monitor has two triggers for RSSI values and alerts will be
-sent from kernel to userspace when a trigger is reached. The kernel will be
-responsible to decide when and to send the alerts to userspace.
+---
+ audio/control.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-Anderson Briglia (1):
-  Add RSSI Monitor documentation API
-
- doc/mgmt-api.txt |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 48 insertions(+), 0 deletions(-)
-
+diff --git a/audio/control.c b/audio/control.c
+index 1704c0a..0f03ec0 100644
+--- a/audio/control.c
++++ b/audio/control.c
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2006-2010  Nokia Corporation
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2011  Texas Instruments, Inc.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
 -- 
-1.7.4.1
+1.7.6
 
