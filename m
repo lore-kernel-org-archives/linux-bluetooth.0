@@ -2,209 +2,153 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 2/3] MAP: Folder listing support
-Date: Tue, 19 Jul 2011 13:16:11 +0200
-Message-Id: <1311074172-15953-3-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 1/3] Infrastructure for MAP function selection
+Date: Tue, 19 Jul 2011 13:16:10 +0200
+Message-Id: <1311074172-15953-2-git-send-email-lkslawek@gmail.com>
 In-Reply-To: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
 References: <1311074172-15953-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds a basic (without parsing or sending back application
-parameters) handling of folder listing requests for Message Access
-Profile.
 ---
- plugins/mas.c      |  103 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- plugins/messages.h |    6 ++-
- 2 files changed, 105 insertions(+), 4 deletions(-)
+ plugins/mas.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 64 insertions(+), 14 deletions(-)
 
 diff --git a/plugins/mas.c b/plugins/mas.c
-index e88a0f0..4e1e07f 100644
+index 0ef8c81..e88a0f0 100644
 --- a/plugins/mas.c
 +++ b/plugins/mas.c
-@@ -37,6 +37,7 @@
- #include "obex.h"
- #include "service.h"
- #include "mimetype.h"
-+#include "filesystem.h"
- #include "dbus.h"
+@@ -27,6 +27,9 @@
  
- #include "messages.h"
-@@ -97,19 +98,44 @@
- #define STATUS_TYPE		"x-bt/messageStatus"
- #define UPDATE_TYPE		"x-bt/MAP-messageUpdate"
+ #include <errno.h>
+ #include <glib.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
+ #include <openobex/obex.h>
  
-+#define XML_DECL "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-+
-+/* Building blocks for x-obex/folder-listing */
-+#define FL_DTD "<!DOCTYPE folder-listing SYSTEM \"obex-folder-listing.dtd\">"
-+#define FL_BODY_BEGIN "<folder-listing version=\"1.0\">"
-+#define FL_BODY_EMPTY "<folder-listing version=\"1.0\"/>"
-+#define FL_PARENT_FOLDER_ELEMENT "<parent-folder/>"
-+#define FL_FOLDER_ELEMENT "<folder name=\"%s\"/>"
-+#define FL_BODY_END "</folder-listing>"
+ #include "plugin.h"
+@@ -86,9 +89,19 @@
+   </attribute>								\
+ </record>"
+ 
++#define EVENT_TYPE		"x-bt/MAP-event-report"
++#define MESSAGE_TYPE		"x-bt/message"
++#define FOLDER_LISTING_TYPE	"x-obex/folder-listing"
++#define MESSAGES_LISTING_TYPE	"x-bt/MAP-msg-listing"
++#define NOTIFICATION_TYPE	"x-bt/MAP-NotificationRegistration"
++#define STATUS_TYPE		"x-bt/messageStatus"
++#define UPDATE_TYPE		"x-bt/MAP-messageUpdate"
 +
  struct mas_session {
  	struct mas_request *request;
  	void *backend_data;
- 	const char *name;
- 	const char *type;
-+	gboolean nth_call;
-+	gboolean finished;
-+	GString *buffer;
++	const char *name;
++	const char *type;
  };
  
  static const uint8_t MAS_TARGET[TARGET_SIZE] = {
- 			0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb,
- 			0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66  };
- 
-+static void reset_request(struct mas_session *mas)
-+{
-+	if (mas->buffer) {
-+		g_string_free(mas->buffer, TRUE);
-+		mas->buffer = NULL;
-+	}
-+
-+	mas->nth_call = FALSE;
-+	mas->finished = FALSE;
-+}
-+
- static void mas_clean(struct mas_session *mas)
+@@ -137,17 +150,14 @@ static void mas_disconnect(struct obex_session *os, void *user_data)
+ static int mas_get(struct obex_session *os, obex_object_t *obj, void *user_data)
  {
-+	reset_request(mas);
- 	g_free(mas);
- }
+ 	struct mas_session *mas = user_data;
+-	const char *type = obex_get_type(os);
+-	const char *name = obex_get_name(os);
+ 	int ret;
  
-@@ -187,11 +213,65 @@ failed:
+-	DBG("GET: name %s type %s mas %p",
+-			name, type, mas);
++	mas->name = obex_get_name(os);
++	mas->type = obex_get_type(os);
+ 
+-	if (type == NULL)
+-		return -EBADR;
++	DBG("GET: name %s type %s mas %p", mas->name, mas->type, mas);
+ 
+-	ret = obex_get_stream_start(os, name);
++	ret = obex_get_stream_start(os, mas->name);
+ 	if (ret < 0)
+ 		goto failed;
+ 
+@@ -160,16 +170,14 @@ failed:
+ static int mas_put(struct obex_session *os, obex_object_t *obj, void *user_data)
+ {
+ 	struct mas_session *mas = user_data;
+-	const char *type = obex_get_type(os);
+-	const char *name = obex_get_name(os);
+ 	int ret;
+ 
+-	DBG("PUT: name %s type %s mas %p", name, type, mas);
++	mas->name = obex_get_name(os);
++	mas->type = obex_get_type(os);
+ 
+-	if (type == NULL)
+-		return -EBADR;
++	DBG("PUT: name %s type %s mas %p", mas->name, mas->type, mas);
+ 
+-	ret = obex_put_stream_start(os, name);
++	ret = obex_put_stream_start(os, mas->name);
+ 	if (ret < 0)
+ 		goto failed;
+ 
+@@ -179,6 +187,38 @@ failed:
  	return ret;
  }
  
-+/* FIXME: Preserve whitespaces */
-+static void g_string_append_escaped_printf(GString *string, const gchar *format,
-+		...)
++static int start_get(struct mas_session *mas)
 +{
-+	va_list ap;
-+	char *escaped;
-+
-+	va_start(ap, format);
-+	escaped = g_markup_vprintf_escaped(format, ap);
-+	g_string_append(string, escaped);
-+	g_free(escaped);
-+	va_end(ap);
++	/* NOTE: type is case-insensitive! */
++	if (g_ascii_strcasecmp(mas->type, FOLDER_LISTING_TYPE) == 0)
++		return -EINVAL;
++	else if (g_ascii_strcasecmp(mas->type, MESSAGES_LISTING_TYPE) == 0)
++		return -EINVAL;
++	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
++		return -EINVAL;
++	else {
++		DBG("Incorrect type for get: %s", mas->type);
++		return -EBADR;
++	}
 +}
 +
-+static void get_folder_listing_cb(void *session, int err, uint16_t size,
-+					const char *name, void *user_data)
++static int start_put(struct mas_session *mas)
 +{
-+	struct mas_session *mas = user_data;
-+
-+	if (err < 0 && err != -EAGAIN) {
-+		obex_object_set_io_flags(mas, G_IO_ERR, err);
-+		return;
++	/* NOTE: type is case-insensitive! */
++	if (g_ascii_strcasecmp(mas->type, NOTIFICATION_TYPE) == 0)
++		return -EINVAL;
++	else if (g_ascii_strcasecmp(mas->type, STATUS_TYPE) == 0)
++		return -EINVAL;
++	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
++		return -EINVAL;
++	else if (g_ascii_strcasecmp(mas->type, UPDATE_TYPE) == 0)
++		return -EINVAL;
++	else {
++		DBG("Incorrect type for put: %s", mas->type);
++		return -EBADR;
 +	}
-+
-+	if (!mas->nth_call) {
-+		g_string_append(mas->buffer, XML_DECL);
-+		g_string_append(mas->buffer, FL_DTD);
-+		if (!name) {
-+			g_string_append(mas->buffer, FL_BODY_EMPTY);
-+			mas->finished = TRUE;
-+			goto proceed;
-+		}
-+		g_string_append(mas->buffer, FL_BODY_BEGIN);
-+		mas->nth_call = TRUE;
-+	}
-+
-+	if (!name) {
-+		g_string_append(mas->buffer, FL_BODY_END);
-+		mas->finished = TRUE;
-+		goto proceed;
-+	}
-+
-+	if (g_strcmp0(name, "..") == 0)
-+		g_string_append(mas->buffer, FL_PARENT_FOLDER_ELEMENT);
-+	else
-+		g_string_append_escaped_printf(mas->buffer, FL_FOLDER_ELEMENT,
-+									name);
-+
-+proceed:
-+	if (err != -EAGAIN)
-+		obex_object_set_io_flags(mas, G_IO_IN, err);
 +}
 +
- static int start_get(struct mas_session *mas)
+ static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+ 		void *user_data)
  {
- 	/* NOTE: type is case-insensitive! */
- 	if (g_ascii_strcasecmp(mas->type, FOLDER_LISTING_TYPE) == 0)
--		return -EINVAL;
-+		return messages_get_folder_listing(mas->backend_data, mas->name,
-+					0xffff, 0, get_folder_listing_cb, mas);
- 	else if (g_ascii_strcasecmp(mas->type, MESSAGES_LISTING_TYPE) == 0)
- 		return -EINVAL;
- 	else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
-@@ -262,6 +342,10 @@ static void *any_open(const char *name, int oflag, mode_t mode,
- 	if (*err)
- 		return NULL;
+@@ -210,7 +250,17 @@ static void *any_open(const char *name, int oflag, mode_t mode,
  
-+	mas->finished = FALSE;
-+	mas->nth_call = FALSE;
-+	mas->buffer = g_string_new("");
+ 	DBG("");
+ 
+-	*err = 0;
++	if ((oflag & O_RDONLY) == O_RDONLY) {
++		*err = start_get(mas);
++	} else if ((oflag & O_WRONLY) == O_WRONLY) {
++		*err = start_put(mas);
++	} else {
++		DBG("Invalid open flag!");
++		*err = -EIO;
++	}
 +
++	if (*err)
++		return NULL;
+ 
  	return mas;
  }
- 
-@@ -274,15 +358,30 @@ static ssize_t any_write(void *object, const void *buf, size_t count)
- 
- static ssize_t any_read(void *obj, void *buf, size_t count)
- {
-+	struct mas_session *mas = obj;
-+	ssize_t len;
-+
- 	DBG("");
- 
--	return 0;
-+	len = string_read(mas->buffer, buf, count);
-+
-+	if (len == 0 && !mas->finished)
-+		return -EAGAIN;
-+
-+	return len;
- }
- 
- static int any_close(void *obj)
- {
-+	struct mas_session *mas = obj;
-+
- 	DBG("");
- 
-+	if (!mas->finished)
-+		messages_abort(mas->backend_data);
-+
-+	reset_request(mas);
-+
- 	return 0;
- }
- 
-diff --git a/plugins/messages.h b/plugins/messages.h
-index c862b07..d9348c7 100644
---- a/plugins/messages.h
-+++ b/plugins/messages.h
-@@ -202,11 +202,13 @@ int messages_set_folder(void *session, const char *name, gboolean cdup);
-  * Callback shall be called for every entry of the listing. 'name' is the
-  * subdirectory name.
-  */
-+typedef void (*messages_folder_listing_cb)(void *session, int err,
-+		uint16_t size, const char *name, void *user_data);
-+
- int messages_get_folder_listing(void *session,
- 		const char *name,
- 		uint16_t max, uint16_t offset,
--		void (*callback)(void *session, int err, uint16_t size,
--			const char *name, void *user_data),
-+		messages_folder_listing_cb callback,
- 		void *user_data);
- 
- /* Retrieves messages listing from a current directory.
 -- 
 1.7.4.1
 
