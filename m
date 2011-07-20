@@ -1,58 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1311155904-20104-1-git-send-email-radoslawjablonski@gmail.com>
-References: <1311155904-20104-1-git-send-email-radoslawjablonski@gmail.com>
-Date: Wed, 20 Jul 2011 13:15:05 +0300
-Message-ID: <CABBYNZLsJwUtxQvetkFf82__pDOiWCkLAq=FRfvt4sOYB9z9xw@mail.gmail.com>
-Subject: Re: [PATCH obexd] Show owner vcard in phonebook pb pull
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Question about bluez audio plug-in license
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Chanyeol,Park" <chanyeol.park@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz-von@nokia.com
+Date: Wed, 20 Jul 2011 12:13:44 +0200
+In-Reply-To: <CAJx1FMOaDBWHGP8+-FkKVD_pTKC7n8NYm8fAdDGHzRwZw8ikyA@mail.gmail.com>
+References: <CAJx1FMOaDBWHGP8+-FkKVD_pTKC7n8NYm8fAdDGHzRwZw8ikyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1311156825.21109.204.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi,
 
-On Wed, Jul 20, 2011 at 12:58 PM, Radoslaw Jablonski
-<radoslawjablonski@gmail.com> wrote:
-> Previously 'owner' vcard was visible in vcardlisting of 'pb'
-> but not in result of pull 'pb' phonebook.
-> Due to that, vcardlisting and pull operations were returning
-> different number of results(also return values of PhonebookSize
-> request were inconsistent)
-> ---
->  plugins/phonebook-tracker.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
->
-> diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-> index d1f4cd7..29dd05c 100644
-> --- a/plugins/phonebook-tracker.c
-> +++ b/plugins/phonebook-tracker.c
-> @@ -139,7 +139,6 @@
->  "WHERE {"                                                              \
->  "      ?_contact a nco:PersonContact ."                                \
->  "      OPTIONAL {?_contact nco:hasAffiliation ?_role .}"               \
-> -"      FILTER (regex(str(?_contact), \"urn:uuid:\"))"                  \
->  "}"                                                                    \
->  "ORDER BY tracker:id(?_contact)"
->
-> @@ -361,7 +360,6 @@ COMBINED_CONSTRAINT         \
->        "SELECT COUNT(?c) "                                             \
->        "WHERE {"                                                       \
->                "?c a nco:PersonContact ."                              \
-> -               "FILTER (regex(str(?c), \"urn:uuid:\"))"                \
->        "}"
->
->  #define MISSED_CALLS_COUNT_QUERY                                       \
-> --
-> 1.7.0.4
+> I have a question about bluez audio plug-in license. Is it possible to use
+> bluez audio plug-in as LGPL? About half year ago I saw bluez and pulseaudio
+> introduced â€œa2dp-codecs.hâ€. As far as I understand bluez audio plug-in
+> license could be LGPL. However the header file license is GPL.
+> 
+> and I think even if we use MediaEndpoint with dbus, we need to include
+> â€œa2dp-codec.hâ€.
+> 
+> If you know, could you explain this?
 
-I wonder if we came to any conclusion about having the queries in
-separate files, the way it is right now the queries only works for
-harmattan which makes tracker backend harmattan specific as they are
-hard coded in it, it is also much more convenient for testing if you
-we can just change the queries without having to recompile every time.
+the specific file a2dp-codec.h can be easily licensed under LGPL. Same
+as with rth.h. Both file are clearly an oversight on our part. Code that
+is shared between PA and BlueZ should be LGPL license. For the SBC
+encoder/decoder and IPC parts we have done that right. So yes, we can
+just re-license these two header files.
 
--- 
-Luiz Augusto von Dentz
+However for the whole audio plugin, no that is GPL only.
+
+Regards
+
+Marcel
+
+
