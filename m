@@ -1,82 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110714171213.GA30789@dell.ger.corp.intel.com>
-References: <1309874168-32716-11-git-send-email-claudio.takahasi@openbossa.org>
-	<1309987448-10183-1-git-send-email-claudio.takahasi@openbossa.org>
-	<20110714171213.GA30789@dell.ger.corp.intel.com>
-Date: Wed, 20 Jul 2011 16:53:17 -0300
-Message-ID: <CAKT1EBf9xw_mjYB=-TmAS08A1ww7UuJ8Hq6GXn04jQGi9Nrr=w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 10/12] Manage GAttrib refs based on registered callbacks
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Szymon Janc <szymon@janc.net.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH] Bluetooth: Increase command tx timeout
+Date: Wed, 20 Jul 2011 21:12:11 +0200
+Message-Id: <1311189131-8592-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Some CSR chips require more time for HCI reset command to complete.
+Too short timeout caused next command being sent before reset
+complete event resulting in
+[23101.792031] hci_cmd_timer: hci0 command tx timeout
+[23102.792046] hci_cmd_timer: hci0 command tx timeout
+after pluging in dongle and non functional bt.
 
-On Thu, Jul 14, 2011 at 2:12 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
->
-> On Wed, Jul 06, 2011, Claudio Takahasi wrote:
->> Connection should not be dropped if there is at least one ATT connection
->> callback registered.
->> ---
->>  src/device.c |   19 ++++++++++++-------
->>  1 files changed, 12 insertions(+), 7 deletions(-)
->
-> Patches 8 and 9 have now been pushed, but there's some reference
-> counting weirdness going on here again:
->
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -1664,6 +1664,7 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
->>  done:
->>       device->browse = NULL;
->>       browse_request_free(req, shutdown);
->> +     g_attrib_unref(device->attrib);
->>  }
->
-> Where's the device->attrib = NULL?
->
->> @@ -2568,18 +2569,22 @@ guint btd_device_add_attio_callback(struct btd_device *device,
->>       attio->dcfunc = dcfunc;
->>       attio->user_data = user_data;
->>
->> -     device->attios = g_slist_append(device->attios, attio);
->> -
->> -     if (device->attrib && cfunc)
->> -             cfunc(device->attrib, user_data);
->> +     if (device->attrib) {
->> +             /* First element */
->> +             if (device->attios == NULL)
->> +                     device->attrib = g_attrib_ref(device->attrib);
->
-> Eh? It looks like attio is supposed to own this reference created by
-> g_attrib_ref() so you should really be assigning the return value to
-> attio->attrib. Or is it so that device->attrib is actually there only
-> for any elements in the device->attios list? If that's the case then
-> it's fine to have just create device->attrib when you add the first
-> element to the list and unref + set to NULL when you remove the last
-> element from the list.
->
-> Johan
->
+Signed-off-by: Szymon Janc <szymon@janc.net.pl>
+---
+ include/net/bluetooth/hci.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Create attio->attrib is not a good approach, GAttrib is created after
-the connection establishment and attio callbacks can be registered
-anytime.
-The patch that I will send will fix the reference counting using
-device->attrib to hold the reference for attios. A new GAttrib pointer
-will added in the "struct browse_req" and it will be used in the
-discovery primary services. device->attrib reference will be
-"released" if device->attios list is empty.
-
-I realized that "shutdown" parameter used in browse_request_free
-function can be removed if we use the list to control disconnections.
-I gonna send this cleanup patch after you apply this patch series.
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index be30aab..12a527c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -121,7 +121,7 @@ enum {
+ #define HCI_PAIRING_TIMEOUT	(60000)	/* 60 seconds */
+ #define HCI_IDLE_TIMEOUT	(6000)	/* 6 seconds */
+ #define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
+-#define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
++#define HCI_CMD_TIMEOUT		(3000)	/* 3 seconds */
+ 
+ /* HCI data types */
+ #define HCI_COMMAND_PKT		0x01
+-- 
+1.7.5.4
 
 
-Regards,
-Claudio.
