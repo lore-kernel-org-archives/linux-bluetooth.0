@@ -1,83 +1,266 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1310586426.21109.100.camel@aeonflux>
-References: <4e1da4a5.04bfec0a.4243.00d9@mx.google.com>
-	<1310580766.21109.96.camel@aeonflux>
-	<CALJ2SBL=Fdcmrbrs69pQybXxMq1yh4=Gzmx4Xa32_qnFwDe-YA@mail.gmail.com>
-	<1310586426.21109.100.camel@aeonflux>
-Date: Wed, 20 Jul 2011 11:48:27 -0300
-Message-ID: <CAKT1EBeJEzq3kWbFQy7HD0fmapMsA1KHQSxPUwWGAk+0y2Mocw@mail.gmail.com>
-Subject: Re: [RFC 1/3] Bluetooth: Implement Read RSSI command
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZK02FeSDJLPx89eqCX-b1vUdA8m29sUvsBRqnzecH8-_w@mail.gmail.com>
+References: <1311077177-18979-1-git-send-email-lkslawek@gmail.com>
+	<1311077177-18979-2-git-send-email-lkslawek@gmail.com>
+	<CABBYNZK2G9hwHaZwdyxfQRZUKkA0YArvECgXMkyZdEfQdhbXxQ@mail.gmail.com>
+	<CA+i+Aw3HXBOMcLFqmPbirZyW-fcxh48+Bq=ZpxUE+OJtXjESjA@mail.gmail.com>
+	<CABBYNZJHay6mx3QXYYRC_sPk=wnn7s9dzmTjnxbgFydpv71d8g@mail.gmail.com>
+	<CA+i+Aw2BP1MT+hsSHzAAY-qdLwNF=6k1yZ0y2SGsGzBy+MuZ4g@mail.gmail.com>
+	<CABBYNZK02FeSDJLPx89eqCX-b1vUdA8m29sUvsBRqnzecH8-_w@mail.gmail.com>
+Date: Wed, 20 Jul 2011 15:13:02 +0200
+Message-ID: <CA+i+Aw3pfL8M6DFmyj8v_56iQ3JkUyCesiVA6bqhSxg5hf=O4g@mail.gmail.com>
+Subject: Re: [PATCH obexd v2 1/3] Infrastructure for MAP function selection
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Wed, Jul 13, 2011 at 4:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Anderson,
+On Wed, Jul 20, 2011 at 2:23 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
 >
->> >> This patch implements helper functions to make Read RSSI command
->> >> interceptable by MGMT Interface. It adds a new wrapper in HCI layer and
->> >> add a hook to call mgmt_read_rssi_complete when MGMT Interface has been
->> >> loaded.
->> >>
->> >> Read RSSI command is defined on Part E, section 7.5.4 of Bluetooth 4.0
->> >> Spec.
->> >
->> > I think that I mentioned this before. This is not something I like to
->> > see at all. 1:1 copies of HCI commands is pointless.
->> >
->> > If you need RSSI results, then something like proper interval and
->> > thresholds should be supported. Also with future Bluetooth SIG work on
->> > having controller driven notifications in this area.
+> On Wed, Jul 20, 2011 at 2:14 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>> On Wed, Jul 20, 2011 at 12:47 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> On Wed, Jul 20, 2011 at 1:08 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>>>> Hi,
+>>>>
+>>>> On Wed, Jul 20, 2011 at 11:50 AM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Tue, Jul 19, 2011 at 3:06 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>>>>>> ---
+>>>>>>  plugins/mas.c |   78 ++++++++++++++++++++++++++++++++++++++++++++++----------
+>>>>>>  1 files changed, 64 insertions(+), 14 deletions(-)
+>>>>>>
+>>>>>> diff --git a/plugins/mas.c b/plugins/mas.c
+>>>>>> index 0ef8c81..e88a0f0 100644
+>>>>>> --- a/plugins/mas.c
+>>>>>> +++ b/plugins/mas.c
+>>>>>> @@ -27,6 +27,9 @@
+>>>>>>
+>>>>>>  #include <errno.h>
+>>>>>>  #include <glib.h>
+>>>>>> +#include <sys/types.h>
+>>>>>> +#include <sys/stat.h>
+>>>>>> +#include <fcntl.h>
+>>>>>>  #include <openobex/obex.h>
+>>>>>>
+>>>>>>  #include "plugin.h"
+>>>>>> @@ -86,9 +89,19 @@
+>>>>>>   </attribute>                                                         \
+>>>>>>  </record>"
+>>>>>>
+>>>>>> +#define EVENT_TYPE             "x-bt/MAP-event-report"
+>>>>>> +#define MESSAGE_TYPE           "x-bt/message"
+>>>>>> +#define FOLDER_LISTING_TYPE    "x-obex/folder-listing"
+>>>>>> +#define MESSAGES_LISTING_TYPE  "x-bt/MAP-msg-listing"
+>>>>>> +#define NOTIFICATION_TYPE      "x-bt/MAP-NotificationRegistration"
+>>>>>> +#define STATUS_TYPE            "x-bt/messageStatus"
+>>>>>> +#define UPDATE_TYPE            "x-bt/MAP-messageUpdate"
+>>>>>> +
+>>>>>>  struct mas_session {
+>>>>>>        struct mas_request *request;
+>>>>>>        void *backend_data;
+>>>>>> +       const char *name;
+>>>>>> +       const char *type;
+>>>>>>  };
+>>>>>>
+>>>>>>  static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+>>>>>> @@ -137,17 +150,14 @@ static void mas_disconnect(struct obex_session *os, void *user_data)
+>>>>>>  static int mas_get(struct obex_session *os, obex_object_t *obj, void *user_data)
+>>>>>>  {
+>>>>>>        struct mas_session *mas = user_data;
+>>>>>> -       const char *type = obex_get_type(os);
+>>>>>> -       const char *name = obex_get_name(os);
+>>>>>>        int ret;
+>>>>>>
+>>>>>> -       DBG("GET: name %s type %s mas %p",
+>>>>>> -                       name, type, mas);
+>>>>>> +       mas->name = obex_get_name(os);
+>>>>>> +       mas->type = obex_get_type(os);
+>>>>>>
+>>>>>> -       if (type == NULL)
+>>>>>> -               return -EBADR;
+>>>>>> +       DBG("GET: name %s type %s mas %p", mas->name, mas->type, mas);
+>>>>>>
+>>>>>> -       ret = obex_get_stream_start(os, name);
+>>>>>> +       ret = obex_get_stream_start(os, mas->name);
+>>>>>>        if (ret < 0)
+>>>>>>                goto failed;
+>>>>>>
+>>>>>> @@ -160,16 +170,14 @@ failed:
+>>>>>>  static int mas_put(struct obex_session *os, obex_object_t *obj, void *user_data)
+>>>>>>  {
+>>>>>>        struct mas_session *mas = user_data;
+>>>>>> -       const char *type = obex_get_type(os);
+>>>>>> -       const char *name = obex_get_name(os);
+>>>>>>        int ret;
+>>>>>>
+>>>>>> -       DBG("PUT: name %s type %s mas %p", name, type, mas);
+>>>>>> +       mas->name = obex_get_name(os);
+>>>>>> +       mas->type = obex_get_type(os);
+>>>>>>
+>>>>>> -       if (type == NULL)
+>>>>>> -               return -EBADR;
+>>>>>> +       DBG("PUT: name %s type %s mas %p", mas->name, mas->type, mas);
+>>>>>>
+>>>>>> -       ret = obex_put_stream_start(os, name);
+>>>>>> +       ret = obex_put_stream_start(os, mas->name);
+>>>>>>        if (ret < 0)
+>>>>>>                goto failed;
+>>>>>>
+>>>>>> @@ -179,6 +187,38 @@ failed:
+>>>>>>        return ret;
+>>>>>>  }
+>>>>>
+>>>>> I would suggest adding a mimetype driver for each type so you don't
+>>>>> have to do the check inside the service driver and it is also
+>>>>> consistent with what other plugins do when they support multiple
+>>>>> types.
+>>>>>
+>>>> I would not. That's the whole point. Functions for the mime driver
+>>>> would do exactly the same.
+>>>
+>>> There we go again, so your point is that you don't want to be
+>>> consistent with other plugins and you like to see duplicated code
+>>> checking for matching types the very same way the core does for
+>>> mimetype drivers? Or do you mean the spec got this wrong and there is
+>>> no use of types because all of them do exactly the same?
 >>
->> Note that even the RSSI and TX Power are implemented, it is not
->> possible to userspace request a RSSI or TX Power actively. If
->> userspace wants to receive RSSI and TX Power from the kernel, it must
->> add to the "monitored commands" and wait for the responses. Read RSSI
->> and TX Power Level are not being parsed on mgmt_control().
->> Maybe I should change the commit message of this patch and the next one.
+>> This was discussed before. More than half of "types" are not really
+>> mime types at all (there's no even body involved in request). Type is
+>> used in MAP merely as a function selector (this _is_ called a function
+>> in MAP). All specific handling of request is done in callback from MAP
+>> API. The only thing that each and every mime driver would do is to
+>> read buffer prepared by a callback. I've specifically chosen to use
+>> the already present feature of universal target-specific mime driver
+>> in order to avoid registering 6 mime drivers with the same handlers,
+>> or worse - 6 times identical functions. The approach is minimalistic
+>> and pretty. Implementation is easy to understand in terms of MAP
+>> specification instead of putting it into some obexd specific
+>> abstraction.
+>
+> What does a function selection mean? Doesn't it means they do
+> something different? Why you are saying you will have 6 driver with
+> the same handlers if they map to different functions? I would
+> understand if you said you have done this way and it works just fine,
+Yes, I've done it. Works just fine.
+> but arguing that your approach is minimalistic and pretty? What about
+> consistency, reliability and maintainability? The abstraction is there
+> no matter how hard you try to make it go away, it is the interface to
+> which the core daemon talks to backends, it doesn't really matter what
+> you put in between. Your minimalistic approach just confuses the core
+> daemon making it believe there is no driver for a specific mimetype
+> selecting its default fallback for the target.
+Nothing confusing here. Just the normal driver selection.
+>
+>>>Sorry but I
+>>> don't think this has any valid technical point, in fact the mimetype
+>>> and service separation does help plugins to not mix object and session
+>>> handling.
 >>
->> New Management commands were implemented in the last RFC patch to
->> monitor selected commands.
+>> There can be only one active request per session. No mixing problems there.
 >
-> no matter what, this needs to be done future proof in conjunction with
-> where the Bluetooth SIG is going for the controller driven notifications
-> of RSSI changes.
+> Partially correct, basically you can only handle one request per
+> session, period. Note, it doesn't break OBEX or MAP, but if we already
+> have infrastructure in place to handle this properly why not do it?
+> Why not doing it right since the beginning? Shall our answer be
+> minimalism and prettiness?
+"Right" is quite a subjective term here.
 >
-> With older controllers we just have to emulate the behavior via a simple
-> poll mechanism.
+>>>>>> +static int start_get(struct mas_session *mas)
+>>>>>> +{
+>>>>>> +       /* NOTE: type is case-insensitive! */
+>>>>>> +       if (g_ascii_strcasecmp(mas->type, FOLDER_LISTING_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else if (g_ascii_strcasecmp(mas->type, MESSAGES_LISTING_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else {
+>>>>>> +               DBG("Incorrect type for get: %s", mas->type);
+>>>>>> +               return -EBADR;
+>>>>>> +       }
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int start_put(struct mas_session *mas)
+>>>>>> +{
+>>>>>> +       /* NOTE: type is case-insensitive! */
+>>>>>> +       if (g_ascii_strcasecmp(mas->type, NOTIFICATION_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else if (g_ascii_strcasecmp(mas->type, STATUS_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else if (g_ascii_strcasecmp(mas->type, MESSAGE_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else if (g_ascii_strcasecmp(mas->type, UPDATE_TYPE) == 0)
+>>>>>> +               return -EINVAL;
+>>>>>> +       else {
+>>>>>> +               DBG("Incorrect type for put: %s", mas->type);
+>>>>>> +               return -EBADR;
+>>>>>> +       }
+>>>>>> +}
+>>>>>> +
+>>>>>>  static int mas_setpath(struct obex_session *os, obex_object_t *obj,
+>>>>>>                void *user_data)
+>>>>>>  {
+>>>>>> @@ -210,7 +250,17 @@ static void *any_open(const char *name, int oflag, mode_t mode,
+>>>>>>
+>>>>>>        DBG("");
+>>>>>>
+>>>>>> -       *err = 0;
+>>>>>> +       if ((oflag & O_RDONLY) == O_RDONLY) {
+>>>>>> +               *err = start_get(mas);
+>>>>>> +       } else if ((oflag & O_WRONLY) == O_WRONLY) {
+>>>>>> +               *err = start_put(mas);
+>>>>>> +       } else {
+>>>>>> +               DBG("Invalid open flag!");
+>>>>>> +               *err = -EIO;
+>>>>>> +       }
+>>>>>> +
+>>>>>> +       if (*err)
+>>>>>> +               return NULL;
+>>>>>>
+>>>>>>        return mas;
+>>>>>>  }
+>>>>>> --
+>>>>>> 1.7.4.1
+>>>>>
+>>>>> --
+>>>>> Luiz Augusto von Dentz
+>>>>>
+>>>>
+>>>>
+>>>>
+>>>> --
+>>>> Slawomir Bochenski
+>>>>
+>>>
+>>>
+>>>
+>>> --
+>>> Luiz Augusto von Dentz
+>>>
+>>
+>>
+>>
+>> --
+>> Slawomir Bochenski
+>>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+>
 
-The command to enable RSSI changes notification is not public, I hope
-the changes in the Management API proposed by Briglia yesterday is
-aligned with this new command.
 
->
-> However such monitored commands things seems like a hack as well. Please
-> use proper interfaces for threshold and interval values. Otherwise this
-> is all pointless. And you just wake up userspace for no real reason. The
-> plan is to get away from pointless userspace wakeups.
->
-> Regards
->
-> Marcel
->
 
-About Tx Power... I understand that you don't want 1:1 mapping for HCI
-commands in the management interface. Tx Power doesn't need to be
-monitored, for LE it doesn't change. We could add a new management
-command for Link Information command, but which relevant information
-could be exposed by this Link Information command? Some commands are
-applied to BREDR only, others to LE or AMP only.
-
-At the moment we need Tx Power only, putting together Remote and Link
-Information can be one alternative. Do you have other suggestion?
-For example, we could create a management command called "Remote
-Information" which returns: Tx Power, Features, version, ... Does it
-make sense?
-
-Regards,
-Claudio
+-- 
+Slawomir Bochenski
