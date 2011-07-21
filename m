@@ -1,40 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Radoslaw Jablonski <radoslawjablonski@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd] Fix finding mime driver by type
-Date: Thu, 21 Jul 2011 12:56:39 +0200
-Message-Id: <1311245799-8662-1-git-send-email-lkslawek@gmail.com>
+Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+Subject: [PATCH obexd] Fix writing out of bounds in add_slash func
+Date: Thu, 21 Jul 2011 09:22:19 +0200
+Message-Id: <1311232939-32431-1-git-send-email-radoslawjablonski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-IrOBEX specification chap. 2.2.3 states that the Type header is an ASCII
-null-terminated string which values are case insensitive (as it is also
-defined by RFC 1521).
----
- src/mimetype.c |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
-
-diff --git a/src/mimetype.c b/src/mimetype.c
-index 078d97c..4e3573c 100644
---- a/src/mimetype.c
-+++ b/src/mimetype.c
-@@ -135,7 +135,14 @@ static struct obex_mime_type_driver *find_driver(const uint8_t *target,
- 		if (memncmp0(who, who_size, driver->who, driver->who_size))
- 			continue;
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index b997fc4..a6eb5f5 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -101,27 +101,41 @@ static void add_slash(char *dest, const char *src, int len_max, int len)
+ {
+ 	int i, j;
  
--		if (g_strcmp0(mimetype, driver->mimetype) == 0)
-+		if (mimetype == NULL || driver->mimetype == NULL) {
-+			if (mimetype == driver->mimetype)
-+				return driver;
-+			else
-+				continue;
-+		}
+-	for (i = 0, j = 0; i < len && j < len_max; i++, j++) {
++	for (i = 0, j = 0; i < len && j < len_max - 1; i++, j++) {
++		/* filling dest buffer - last field need to be reserved
++		 * for '\0'*/
+ 		switch (src[i]) {
+ 		case '\n':
++			if (j == len_max - 2)
++				/* not enough space in the buffer to put char
++				 * preceded with escaping sequence */
++				goto done;
 +
-+		if (g_ascii_strcasecmp(mimetype, driver->mimetype) == 0)
- 			return driver;
+ 			dest[j++] = '\\';
+ 			dest[j] = 'n';
+ 			break;
+ 		case '\r':
++			if (j == len_max - 2)
++				goto done;
++
+ 			dest[j++] = '\\';
+ 			dest[j] = 'r';
+ 			break;
+ 		case '\\':
+ 		case ';':
+ 		case ',':
++			if (j == len_max - 2)
++				goto done;
++
+ 			dest[j++] = '\\';
+ 		default:
+ 			dest[j] = src[i];
+ 			break;
+ 		}
  	}
++
++done:
+ 	dest[j] = 0;
+-	return;
+ }
  
+ static void get_escaped_fields(char **fields, ...)
 -- 
-1.7.4.1
+1.7.0.4
 
