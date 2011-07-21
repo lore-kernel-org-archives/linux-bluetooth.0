@@ -1,58 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Szymon Janc <szymon@janc.net.pl>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 21 Jul 2011 12:14:43 -0400
-Subject: Re: [PATCH] Bluetooth: Increase command tx timeout
-Message-ID: <1311264883.17476.65.camel@THOR>
-References: <1311189131-8592-1-git-send-email-szymon@janc.net.pl>
-In-Reply-To: <1311189131-8592-1-git-send-email-szymon@janc.net.pl>
-Content-Type: text/plain; charset=US-ASCII
+Date: Thu, 21 Jul 2011 12:09:45 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Allow ACL packets over USB in HCI_RAW mode
+Message-ID: <20110721150945.GA3387@joana>
+References: <1310647712.3208.3.camel@THOR>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1310647712.3208.3.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Peter,
 
-On Wed, 2011-07-20 at 15:12 -0400, Szymon Janc wrote:
-> Some CSR chips require more time for HCI reset command to complete.
-> Too short timeout caused next command being sent before reset
-> complete event resulting in
-> [23101.792031] hci_cmd_timer: hci0 command tx timeout
-> [23102.792046] hci_cmd_timer: hci0 command tx timeout
-> after pluging in dongle and non functional bt.
+* Peter Hurley <peter@hurleysoftware.com> [2011-07-14 08:48:32 -0400]:
+
+> Removed tests which prevent transmission of ACL packets
+> when the device is in HCI_RAW mode. These tests verified that
+> there are ACL or LE links currently tracked by the HCI
+> connection manager. However, a HCI_RAW mode device does not
+> use the connection manager. In these circumstances, the connection
+> counts will be zero, and thus, transmitted ACL packets dropped.
 > 
-> Signed-off-by: Szymon Janc <szymon@janc.net.pl>
+> The acl_num test is actually a vestige of a previous bulk URB
+> scheme that is no longer used by this driver (bulk URBs were not
+> started until at least one ACL connection was created). This was
+> incompatible with some endpoint implementations and was dropped -
+> see commit 43c2e57f94.
+> 
+> The utility of these tests is marginal - currently, the hci tx
+> scheduler cannot send an ACL or LE packet for an untracked connection
+> (except if the device is in HCI_RAW mode).
+> 
+> Lastly, no other transport layer driver enforces these same tests.
 > ---
->  include/net/bluetooth/hci.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index be30aab..12a527c 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -121,7 +121,7 @@ enum {
->  #define HCI_PAIRING_TIMEOUT	(60000)	/* 60 seconds */
->  #define HCI_IDLE_TIMEOUT	(6000)	/* 6 seconds */
->  #define HCI_INIT_TIMEOUT	(10000)	/* 10 seconds */
-> -#define HCI_CMD_TIMEOUT		(1000)	/* 1 seconds */
-> +#define HCI_CMD_TIMEOUT		(3000)	/* 3 seconds */
->  
->  /* HCI data types */
->  #define HCI_COMMAND_PKT		0x01
+>  drivers/bluetooth/btusb.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
 
-Respectfully, I disagree that this is the correct fix for this problem.
+Applied, thanks.
 
-After an HCI_Reset, *no* hci commands should be issued until after the
-*successful* Command Complete is received. IMHO, the current code
-suffers two defects:
-  - it doesn't wait for Command Complete after the Reset command is sent
-  - it ignores the result code from that Command Complete
-
-I believe the proper fix is to _loop_ over the HCI_Reset until a
-successful Command Complete is received.
-
-Regards,
-Peter
-
- 
+	Gustavo
