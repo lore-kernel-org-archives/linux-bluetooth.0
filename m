@@ -1,28 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <480687D4EEFE7447A2E09AADFF667362049EE77C@nasanexd02c.na.qualcomm.com>
-References: <480687D4EEFE7447A2E09AADFF667362049EE77C@nasanexd02c.na.qualcomm.com>
-Date: Thu, 21 Jul 2011 21:17:29 +0300
-Message-ID: <CABBYNZJqJxJaiJVczPFyOdwtJsRwhCCRqJg5b+ChzSdPJRL5bg@mail.gmail.com>
-Subject: Re: bluez d-bus signal to traclk ACL link
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1311200621-2073-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1311200621-2073-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 21 Jul 2011 14:06:45 -0300
+Message-ID: <CAJdJm_NNXc06JFnaxFcf9xYr4gHV6+Mhr06Tz7yCNTbZycGndQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix "make distcheck" when libbluetooth is not installed
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Jul 21, 2011 at 4:31 PM, Sumangala, Suraj
-<surajs@qca.qualcomm.com> wrote:
-> Hi,
->
-> Is there any bluez d-bus signal available to track if a local adapter is ACL connected to any remote device?
+On Wed, Jul 20, 2011 at 7:23 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Recently, the audio plugin began to include <bluetooth/sdp.h>. This only
+> works after the symbolic links in lib/bluetooth/ have been created (or
+> the BlueZ headers are installed on /usr/include). The BUILT_SOURCES
+> automake variable can be used to force generating these symlinks prior
+> to other build targets.
 
-Sure, there is take a look at Connected property:
-http://git.kernel.org/?p=bluetooth/bluez.git;a=blob;f=doc/device-api.txt;h=d1feb1823362b06cebbe3240b15618bd0944c24c;hb=HEAD
+A similar patch was sent by Tom Rini (see
+http://article.gmane.org/gmane.linux.bluez.kernel/14625), so feel free
+to ignore this one.
 
-
+Regards,
 -- 
-Luiz Augusto von Dentz
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
