@@ -1,61 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-Subject: [PATCH obexd] Fix writing out of bounds in add_slash func
-Date: Thu, 21 Jul 2011 09:22:19 +0200
-Message-Id: <1311232939-32431-1-git-send-email-radoslawjablonski@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v6pqzZHum1-1_SzUWNgsn4C6joYSBDghB_cLe7wwCRbFQ@mail.gmail.com>
+References: <1311104970-18600-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<CABBYNZLG9E46Ls1Rtj76OKNb1bFnPvM89Ru3EtXZsV0A+sffGQ@mail.gmail.com>
+	<CAMOw1v6pqzZHum1-1_SzUWNgsn4C6joYSBDghB_cLe7wwCRbFQ@mail.gmail.com>
+Date: Thu, 21 Jul 2011 10:11:56 +0300
+Message-ID: <CABBYNZLfh1dwn9jeDSnbvjrvN8-QdywnTbxGngdbCcRCvQP6yg@mail.gmail.com>
+Subject: Re: [RFC 00/19] Implement AVRCP 1.3 profile - TG role
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index b997fc4..a6eb5f5 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -101,27 +101,41 @@ static void add_slash(char *dest, const char *src, int len_max, int len)
- {
- 	int i, j;
- 
--	for (i = 0, j = 0; i < len && j < len_max; i++, j++) {
-+	for (i = 0, j = 0; i < len && j < len_max - 1; i++, j++) {
-+		/* filling dest buffer - last field need to be reserved
-+		 * for '\0'*/
- 		switch (src[i]) {
- 		case '\n':
-+			if (j == len_max - 2)
-+				/* not enough space in the buffer to put char
-+				 * preceded with escaping sequence */
-+				goto done;
-+
- 			dest[j++] = '\\';
- 			dest[j] = 'n';
- 			break;
- 		case '\r':
-+			if (j == len_max - 2)
-+				goto done;
-+
- 			dest[j++] = '\\';
- 			dest[j] = 'r';
- 			break;
- 		case '\\':
- 		case ';':
- 		case ',':
-+			if (j == len_max - 2)
-+				goto done;
-+
- 			dest[j++] = '\\';
- 		default:
- 			dest[j] = src[i];
- 			break;
- 		}
- 	}
-+
-+done:
- 	dest[j] = 0;
--	return;
- }
- 
- static void get_escaped_fields(char **fields, ...)
--- 
-1.7.0.4
+Hi Lucas,
 
+On Wed, Jul 20, 2011 at 3:55 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>> I think we might need an agent API anyway, since MPRIS players might
+>> be siting in the session bus so bluetoothd cannot really connect to
+>> them directly, in the other hand there is nothing preventing someone
+>> to write an agent that uses MPRIS to talk to players.
+>
+> In that case, the agent could perfectly talk to our D-Bus interface
+> and use MPRIS to talk to players. Or use MPRIS on both ends.
+
+Yep, but I think we don't want to use agents as proxy because D-Bus
+round trips are expensive and sometimes we need to contact the agent
+to respond to a request.
+
+-- 
+Luiz Augusto von Dentz
