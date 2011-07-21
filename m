@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 21 Jul 2011 12:09:45 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Allow ACL packets over USB in HCI_RAW mode
-Message-ID: <20110721150945.GA3387@joana>
-References: <1310647712.3208.3.camel@THOR>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310647712.3208.3.camel@THOR>
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd] Fix proper data escaping for vCard listing
+Date: Thu, 21 Jul 2011 15:55:07 +0200
+Message-Id: <1311256507-10744-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Up until now it was possible to inject some XML or just broke returned
+vCard listing by preparing contact with some special characters.
+---
+ plugins/pbap.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-* Peter Hurley <peter@hurleysoftware.com> [2011-07-14 08:48:32 -0400]:
+diff --git a/plugins/pbap.c b/plugins/pbap.c
+index 5455cce..82963af 100644
+--- a/plugins/pbap.c
++++ b/plugins/pbap.c
+@@ -469,9 +469,12 @@ static int generate_response(void *user_data)
+ 	pbap->obj->buffer = g_string_new(VCARD_LISTING_BEGIN);
+ 	for (; l && max; l = l->next, max--) {
+ 		const struct cache_entry *entry = l->data;
++		char *escaped_name = g_markup_escape_text(entry->name, -1);
+ 
+ 		g_string_append_printf(pbap->obj->buffer,
+-			VCARD_LISTING_ELEMENT, entry->handle, entry->name);
++			VCARD_LISTING_ELEMENT, entry->handle, escaped_name);
++
++		g_free(escaped_name);
+ 	}
+ 
+ 	pbap->obj->buffer = g_string_append(pbap->obj->buffer,
+-- 
+1.7.4.1
 
-> Removed tests which prevent transmission of ACL packets
-> when the device is in HCI_RAW mode. These tests verified that
-> there are ACL or LE links currently tracked by the HCI
-> connection manager. However, a HCI_RAW mode device does not
-> use the connection manager. In these circumstances, the connection
-> counts will be zero, and thus, transmitted ACL packets dropped.
-> 
-> The acl_num test is actually a vestige of a previous bulk URB
-> scheme that is no longer used by this driver (bulk URBs were not
-> started until at least one ACL connection was created). This was
-> incompatible with some endpoint implementations and was dropped -
-> see commit 43c2e57f94.
-> 
-> The utility of these tests is marginal - currently, the hci tx
-> scheduler cannot send an ACL or LE packet for an untracked connection
-> (except if the device is in HCI_RAW mode).
-> 
-> Lastly, no other transport layer driver enforces these same tests.
-> ---
->  drivers/bluetooth/btusb.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
-
-Applied, thanks.
-
-	Gustavo
