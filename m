@@ -1,80 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 22 Jul 2011 13:43:55 -0300
+Date: Fri, 22 Jul 2011 12:24:59 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Handle fragmented skbs in
- bt_sock_stream_recvmsg()
-Message-ID: <20110722164355.GB2650@joana>
-References: <1310579919-24546-1-git-send-email-mathewm@codeaurora.org>
- <1310579919-24546-3-git-send-email-mathewm@codeaurora.org>
+Subject: Re: [PATCH 08/16] Bluetooth: Fix stop_discovery()
+Message-ID: <20110722152459.GA2650@joana>
+References: <1310418719-12296-1-git-send-email-andre.guedes@openbossa.org>
+ <1310418719-12296-9-git-send-email-andre.guedes@openbossa.org>
+ <20110713201516.GB23921@joana>
+ <CACJA=fUXQ_QgLCr-TURFOr-2aWva8_gCpPfYC1g=oX099V-stQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310579919-24546-3-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CACJA=fUXQ_QgLCr-TURFOr-2aWva8_gCpPfYC1g=oX099V-stQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-07-13 10:58:38 -0700]:
+* Andre Guedes <andre.guedes@openbossa.org> [2011-07-14 11:31:01 -0300]:
 
-> ERTM reassembly will be more efficient when skbs are linked together
-> rather than copying every incoming data byte. The existing stream recv
-> function assumes skbs are linear, so it needs to know how to handle
-> fragments before reassembly is changed.
+> Hi Gustavo,
 > 
-> bt_sock_recvmsg() already handles fragmented skbs.
+> On Wed, Jul 13, 2011 at 5:15 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
+> >> @@ -963,6 +963,11 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+> >>
+> >>       set_bit(HCI_INQUIRY, &hdev->flags);
+> >>
+> >> +     if (mgmt_has_pending_stop_discov(hdev->id)) {
+> >
+> > Isn't a new bit flag log HCI_INQUIRY_CANCEL better that this? First this has
+> > read a list, second it is a really ugly  function name.
 > 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/af_bluetooth.c |   30 ++++++++++++++++++++++++++++--
->  1 files changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 8add9b4..9a43520 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -349,7 +349,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->  		}
->  
->  		chunk = min_t(unsigned int, skb->len, size);
-> -		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
-> +		if (skb_copy_datagram_iovec(skb, 0, msg->msg_iov, chunk)) {
->  			skb_queue_head(&sk->sk_receive_queue, skb);
->  			if (!copied)
->  				copied = -EFAULT;
-> @@ -361,7 +361,33 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
->  		sock_recv_ts_and_drops(msg, sk, skb);
->  
->  		if (!(flags & MSG_PEEK)) {
-> -			skb_pull(skb, chunk);
-> +			int skb_len = skb_headlen(skb);
-> +
-> +			if (chunk <= skb_len) {
-> +				__skb_pull(skb, chunk);
-> +			} else {
-> +				struct sk_buff *frag;
-> +
-> +				__skb_pull(skb, skb_len);
-> +				chunk -= skb_len;
-> +
-> +				skb_walk_frags(skb, frag) {
-> +					if (chunk <= frag->len) {
-> +						/* Pulling partial data */
-> +						skb->len -= chunk;
-> +						skb->data_len -= chunk;
-> +						__skb_pull(frag, chunk);
-> +						break;
-> +					} else if (frag->len) {
-> +						/* Pulling all frag data */
-> +						chunk -= frag->len;
-> +						skb->len -= frag->len;
-> +						skb->data_len -= frag->len;
-> +						__skb_pull(frag, frag->len);
-> +					}
-> +				}
-> +			}
-> +
+> A flag called HCI_CANCEL_DISCOV would be more appropriated since it
+> would be used to cancel the discovery procedure (inquiry/le scan).
 
-ERTM and Streaming mode can also use SOCK_SEQPACKET, I think you also need to
-handle this for SOCK_SEQPACKET.
+Let it be HCI_CANCEL_DISCOV then.
+
+> 
+> My point is: I don't need a new flag to tell me the same information I already
+> have by checking for pending stop discovery command. IMO, traversing the
+> pending command list is not a issue today since it isn't that large.
+> If that list
+> becomes too large in future, then we'll have a bigger issue because lots of
+> mgmt commands do traversing the command pending list. In that case we
+> would need to come up with some optimization like pending list per hdev,
+> for instance.
+> 
+> Besides, I don't think mixing up mgmt layer and hci layer logic is a good
+> idea. The whole discovery procedure logic should go in mgmt layer, so no
+> discovery logic should be implemented in hci layer.
+> 
+> >> +             mgmt_cancel_discovery(hdev->id);
+> >
+> > Just call hci_send_cmd(HCI_OP_INQUIRY_CANCEL)
+> 
+> It would mix up mgmt and hci layer logic.
+
+No, the only thing mgmt_cancel_discovery does is call hci_send_cmd. So what
+you want is do the same thing but with some more functions in your call chain.
 
 	Gustavo
