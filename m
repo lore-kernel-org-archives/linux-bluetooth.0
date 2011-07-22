@@ -1,90 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sun, 24 Jul 2011 00:10:31 -0400
-Subject: [PATCH 0/7] Fix various lost wakeups
-Message-ID: <1311480631.4106.25.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH v2 1/3] Bluetooth: Linearize skbs for use in BNEP, CMTP, HIDP, and RFCOMM
+Date: Fri, 22 Jul 2011 14:53:58 -0700
+Message-Id: <1311371640-10324-2-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
+References: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Several kthreads, and some other functions which also wait/sleep, exhibit
-race conditions when using set_current_state(TASK_INTERRUPTIBLE). A common,
-but incorrect, usage pattern is:
+Fragmented skbs are only encountered when receiving ERTM or streaming
+mode L2CAP data.  BNEP, CMTP, HIDP, and RFCOMM generally use basic
+mode, but they need to handle fragments without crashing.
 
-1:  add_wait_queue(...);
-2:  while (!condition) {
-3:          set_current_state(TASK_INTERRUPTIBLE);
-4:          do_work();
-5:          schedule();
-6:  }
-7:  set current_state(TASK_RUNNING);
-8:  remove_wait_queue(...); 
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/bnep/core.c   |    5 ++++-
+ net/bluetooth/cmtp/core.c   |    5 ++++-
+ net/bluetooth/hidp/core.c   |   10 ++++++++--
+ net/bluetooth/rfcomm/core.c |    5 ++++-
+ 4 files changed, 20 insertions(+), 5 deletions(-)
 
-The problem here develops after line 2 executes but before line 3 executes.
-If, at this point, another task now sets the 'condition' and issues a wakeup
-for the first task, it will be 'lost' as line 3 is now executed (ie, the
-task is moved off the run queue).
-
-A more robust general pattern is:
-
- 1:  add_wait_queue(...);
- 2:  while (1) {
- 3:          set_current_state(TASK_INTERRUPTIBLE);
- 4:          if (condition)
- 5:                  break;
- 6:          do_work();
- 7:          schedule();
- 8:  }
- 9:  set current_state(TASK_RUNNING);
-10:  remove_wait_queue(...); 
-
-This pattern also allows for multiple-condition tests without further
-complications.
-
-Another usage pattern without race conditions:
-
- 1:  add_wait_queue(...);
- 2:  set_current_state(TASK_INTERRUPTIBLE);
- 3:  while (!condition) {
- 4:          do_work();
- 5:          schedule();
- 6:          set_current_state(TASK_INTERRUPTIBLE);
- 7:          if (condition2)
- 8:                  break;
- 9:  }
-10:  set current_state(TASK_RUNNING);
-11:  remove_wait_queue(...); 
-
-This approach is required when condition2 is only valid after sleeping,
-for example.
-
-Regards,
-Peter
-
-PS - I did not fix the usage in l2cap_core.c pending if the new ERTM
-reassembly will make that work unnecessary.
-
-
-Peter Hurley (7):
-  Bluetooth: rfcomm: Remove unnecessary krfcommd event
-  Bluetooth: rfcomm: Fix lost wakeups waiting to accept socket
-  Bluetooth: Fix lost wakeups waiting for sock state change
-  Bluetooth: l2cap: Fix lost wakeups waiting to accept socket
-  Bluetooth: sco: Fix lost wakeups waiting to accept socket
-  Bluetooth: bnep: Fix lost wakeup of session thread
-  Bluetooth: cmtp: Fix lost wakeup of session thread
-
- net/bluetooth/af_bluetooth.c |    6 +++---
- net/bluetooth/bnep/core.c    |    6 ++++--
- net/bluetooth/cmtp/core.c    |    6 ++++--
- net/bluetooth/l2cap_sock.c   |   28 ++++++++++++++--------------
- net/bluetooth/rfcomm/core.c  |   17 +++++++----------
- net/bluetooth/rfcomm/sock.c  |   28 ++++++++++++++--------------
- net/bluetooth/sco.c          |   28 ++++++++++++++--------------
- 7 files changed, 60 insertions(+), 59 deletions(-)
-
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index ca39fcf..dfadb65 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -490,7 +490,10 @@ static int bnep_session(void *arg)
+ 		/* RX */
+ 		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-			bnep_rx_frame(s, skb);
++			if (!skb_linearize(skb))
++				bnep_rx_frame(s, skb);
++			else
++				kfree_skb(skb);
+ 		}
+ 
+ 		if (sk->sk_state != BT_CONNECTED)
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index c5b11af..2487b84 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -300,7 +300,10 @@ static int cmtp_session(void *arg)
+ 
+ 		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-			cmtp_recv_frame(session, skb);
++			if (!skb_linearize(skb))
++				cmtp_recv_frame(session, skb);
++			else
++				kfree_skb(skb);
+ 		}
+ 
+ 		cmtp_process_transmit(session);
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 43b4c2d..b046061 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -716,12 +716,18 @@ static int hidp_session(void *arg)
+ 
+ 		while ((skb = skb_dequeue(&ctrl_sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-			hidp_recv_ctrl_frame(session, skb);
++			if (!skb_linearize(skb))
++				hidp_recv_ctrl_frame(session, skb);
++			else
++				kfree_skb(skb);
+ 		}
+ 
+ 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
+ 			skb_orphan(skb);
+-			hidp_recv_intr_frame(session, skb);
++			if (!skb_linearize(skb))
++				hidp_recv_intr_frame(session, skb);
++			else
++				kfree_skb(skb);
+ 		}
+ 
+ 		hidp_process_transmit(session);
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 5759bb7..6bbd317 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1855,7 +1855,10 @@ static inline void rfcomm_process_rx(struct rfcomm_session *s)
+ 	/* Get data directly from socket receive queue without copying it. */
+ 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+ 		skb_orphan(skb);
+-		rfcomm_recv_frame(s, skb);
++		if (!skb_linearize(skb))
++			rfcomm_recv_frame(s, skb);
++		else
++			kfree_skb(skb);
+ 	}
+ 
+ 	if (sk->sk_state == BT_CLOSED) {
 -- 
-1.7.4.1
+1.7.6
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
