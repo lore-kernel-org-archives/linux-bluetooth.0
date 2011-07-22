@@ -2,99 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Mat Martineau <mathewm@codeaurora.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH v2 1/3] Bluetooth: Linearize skbs for use in BNEP, CMTP, HIDP, and RFCOMM
-Date: Fri, 22 Jul 2011 14:53:58 -0700
-Message-Id: <1311371640-10324-2-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH v2 2/3] Bluetooth: Handle fragmented skbs in bt_sock_stream_recvmsg()
+Date: Fri, 22 Jul 2011 14:53:59 -0700
+Message-Id: <1311371640-10324-3-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
 References: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fragmented skbs are only encountered when receiving ERTM or streaming
-mode L2CAP data.  BNEP, CMTP, HIDP, and RFCOMM generally use basic
-mode, but they need to handle fragments without crashing.
+ERTM reassembly will be more efficient when skbs are linked together
+rather than copying every incoming data byte. The existing stream recv
+function assumes skbs are linear, so it needs to know how to handle
+fragments before reassembly is changed.
+
+bt_sock_recvmsg() already handles fragmented skbs.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/bnep/core.c   |    5 ++++-
- net/bluetooth/cmtp/core.c   |    5 ++++-
- net/bluetooth/hidp/core.c   |   10 ++++++++--
- net/bluetooth/rfcomm/core.c |    5 ++++-
- 4 files changed, 20 insertions(+), 5 deletions(-)
+ net/bluetooth/af_bluetooth.c |   30 ++++++++++++++++++++++++++++--
+ 1 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index ca39fcf..dfadb65 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -490,7 +490,10 @@ static int bnep_session(void *arg)
- 		/* RX */
- 		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
- 			skb_orphan(skb);
--			bnep_rx_frame(s, skb);
-+			if (!skb_linearize(skb))
-+				bnep_rx_frame(s, skb);
-+			else
-+				kfree_skb(skb);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 8add9b4..9a43520 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -349,7 +349,7 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
  		}
  
- 		if (sk->sk_state != BT_CONNECTED)
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index c5b11af..2487b84 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -300,7 +300,10 @@ static int cmtp_session(void *arg)
+ 		chunk = min_t(unsigned int, skb->len, size);
+-		if (memcpy_toiovec(msg->msg_iov, skb->data, chunk)) {
++		if (skb_copy_datagram_iovec(skb, 0, msg->msg_iov, chunk)) {
+ 			skb_queue_head(&sk->sk_receive_queue, skb);
+ 			if (!copied)
+ 				copied = -EFAULT;
+@@ -361,7 +361,33 @@ int bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 		sock_recv_ts_and_drops(msg, sk, skb);
  
- 		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
- 			skb_orphan(skb);
--			cmtp_recv_frame(session, skb);
-+			if (!skb_linearize(skb))
-+				cmtp_recv_frame(session, skb);
-+			else
-+				kfree_skb(skb);
- 		}
- 
- 		cmtp_process_transmit(session);
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 43b4c2d..b046061 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -716,12 +716,18 @@ static int hidp_session(void *arg)
- 
- 		while ((skb = skb_dequeue(&ctrl_sk->sk_receive_queue))) {
- 			skb_orphan(skb);
--			hidp_recv_ctrl_frame(session, skb);
-+			if (!skb_linearize(skb))
-+				hidp_recv_ctrl_frame(session, skb);
-+			else
-+				kfree_skb(skb);
- 		}
- 
- 		while ((skb = skb_dequeue(&intr_sk->sk_receive_queue))) {
- 			skb_orphan(skb);
--			hidp_recv_intr_frame(session, skb);
-+			if (!skb_linearize(skb))
-+				hidp_recv_intr_frame(session, skb);
-+			else
-+				kfree_skb(skb);
- 		}
- 
- 		hidp_process_transmit(session);
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 5759bb7..6bbd317 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1855,7 +1855,10 @@ static inline void rfcomm_process_rx(struct rfcomm_session *s)
- 	/* Get data directly from socket receive queue without copying it. */
- 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
- 		skb_orphan(skb);
--		rfcomm_recv_frame(s, skb);
-+		if (!skb_linearize(skb))
-+			rfcomm_recv_frame(s, skb);
-+		else
-+			kfree_skb(skb);
- 	}
- 
- 	if (sk->sk_state == BT_CLOSED) {
+ 		if (!(flags & MSG_PEEK)) {
+-			skb_pull(skb, chunk);
++			int skb_len = skb_headlen(skb);
++
++			if (chunk <= skb_len) {
++				__skb_pull(skb, chunk);
++			} else {
++				struct sk_buff *frag;
++
++				__skb_pull(skb, skb_len);
++				chunk -= skb_len;
++
++				skb_walk_frags(skb, frag) {
++					if (chunk <= frag->len) {
++						/* Pulling partial data */
++						skb->len -= chunk;
++						skb->data_len -= chunk;
++						__skb_pull(frag, chunk);
++						break;
++					} else if (frag->len) {
++						/* Pulling all frag data */
++						chunk -= frag->len;
++						skb->len -= frag->len;
++						skb->data_len -= frag->len;
++						__skb_pull(frag, frag->len);
++					}
++				}
++			}
++
+ 			if (skb->len) {
+ 				skb_queue_head(&sk->sk_receive_queue, skb);
+ 				break;
 -- 
 1.7.6
 
