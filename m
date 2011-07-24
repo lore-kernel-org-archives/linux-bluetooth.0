@@ -1,75 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Sun, 24 Jul 2011 00:10:35 -0400
-Subject: [PATCH 1/7] Bluetooth: rfcomm: Remove unnecessary krfcommd event
-Message-ID: <1311480635.4106.26.camel@THOR>
+Date: Sun, 24 Jul 2011 00:10:31 -0400
+Subject: [PATCH 0/7] Fix various lost wakeups
+Message-ID: <1311480631.4106.25.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Removed superfluous event handling which was used to signal
-that the rfcomm kthread had been woken. This appears to have been
-used to prevent lost wakeups. Correctly ordering when the task
-state is set to TASK_INTERRUPTIBLE is sufficient to prevent lost wakeups.
+Several kthreads, and some other functions which also wait/sleep, exhibit
+race conditions when using set_current_state(TASK_INTERRUPTIBLE). A common,
+but incorrect, usage pattern is:
 
-To prevent wakeups which occurred prior to initially setting
-TASK_INTERRUPTIBLE from being lost, the main work of the thread loop -
-rfcomm_process_sessions() - is performed prior to sleeping.
+1:  add_wait_queue(...);
+2:  while (!condition) {
+3:          set_current_state(TASK_INTERRUPTIBLE);
+4:          do_work();
+5:          schedule();
+6:  }
+7:  set current_state(TASK_RUNNING);
+8:  remove_wait_queue(...); 
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
- net/bluetooth/rfcomm/core.c |   17 +++++++----------
- 1 files changed, 7 insertions(+), 10 deletions(-)
+The problem here develops after line 2 executes but before line 3 executes.
+If, at this point, another task now sets the 'condition' and issues a wakeup
+for the first task, it will be 'lost' as line 3 is now executed (ie, the
+task is moved off the run queue).
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 5759bb7..5ba3f6d 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -62,7 +62,6 @@ static DEFINE_MUTEX(rfcomm_mutex);
- #define rfcomm_lock()	mutex_lock(&rfcomm_mutex)
- #define rfcomm_unlock()	mutex_unlock(&rfcomm_mutex)
- 
--static unsigned long rfcomm_event;
- 
- static LIST_HEAD(session_list);
- 
-@@ -120,7 +119,6 @@ static inline void rfcomm_schedule(void)
- {
- 	if (!rfcomm_thread)
- 		return;
--	set_bit(RFCOMM_SCHED_WAKEUP, &rfcomm_event);
- 	wake_up_process(rfcomm_thread);
- }
- 
-@@ -2038,19 +2036,18 @@ static int rfcomm_run(void *unused)
- 
- 	rfcomm_add_listener(BDADDR_ANY);
- 
--	while (!kthread_should_stop()) {
-+	while (1) {
- 		set_current_state(TASK_INTERRUPTIBLE);
--		if (!test_bit(RFCOMM_SCHED_WAKEUP, &rfcomm_event)) {
--			/* No pending events. Let's sleep.
--			 * Incoming connections and data will wake us up. */
--			schedule();
--		}
--		set_current_state(TASK_RUNNING);
-+
-+		if (kthread_should_stop())
-+			break;
- 
- 		/* Process stuff */
--		clear_bit(RFCOMM_SCHED_WAKEUP, &rfcomm_event);
- 		rfcomm_process_sessions();
-+
-+		schedule();
- 	}
-+	__set_current_state(TASK_RUNNING);
- 
- 	rfcomm_kill_listener();
- 
+A more robust general pattern is:
+
+ 1:  add_wait_queue(...);
+ 2:  while (1) {
+ 3:          set_current_state(TASK_INTERRUPTIBLE);
+ 4:          if (condition)
+ 5:                  break;
+ 6:          do_work();
+ 7:          schedule();
+ 8:  }
+ 9:  set current_state(TASK_RUNNING);
+10:  remove_wait_queue(...); 
+
+This pattern also allows for multiple-condition tests without further
+complications.
+
+Another usage pattern without race conditions:
+
+ 1:  add_wait_queue(...);
+ 2:  set_current_state(TASK_INTERRUPTIBLE);
+ 3:  while (!condition) {
+ 4:          do_work();
+ 5:          schedule();
+ 6:          set_current_state(TASK_INTERRUPTIBLE);
+ 7:          if (condition2)
+ 8:                  break;
+ 9:  }
+10:  set current_state(TASK_RUNNING);
+11:  remove_wait_queue(...); 
+
+This approach is required when condition2 is only valid after sleeping,
+for example.
+
+Regards,
+Peter
+
+PS - I did not fix the usage in l2cap_core.c pending if the new ERTM
+reassembly will make that work unnecessary.
+
+
+Peter Hurley (7):
+  Bluetooth: rfcomm: Remove unnecessary krfcommd event
+  Bluetooth: rfcomm: Fix lost wakeups waiting to accept socket
+  Bluetooth: Fix lost wakeups waiting for sock state change
+  Bluetooth: l2cap: Fix lost wakeups waiting to accept socket
+  Bluetooth: sco: Fix lost wakeups waiting to accept socket
+  Bluetooth: bnep: Fix lost wakeup of session thread
+  Bluetooth: cmtp: Fix lost wakeup of session thread
+
+ net/bluetooth/af_bluetooth.c |    6 +++---
+ net/bluetooth/bnep/core.c    |    6 ++++--
+ net/bluetooth/cmtp/core.c    |    6 ++++--
+ net/bluetooth/l2cap_sock.c   |   28 ++++++++++++++--------------
+ net/bluetooth/rfcomm/core.c  |   17 +++++++----------
+ net/bluetooth/rfcomm/sock.c  |   28 ++++++++++++++--------------
+ net/bluetooth/sco.c          |   28 ++++++++++++++--------------
+ 7 files changed, 60 insertions(+), 59 deletions(-)
+
 -- 
 1.7.4.1
 
