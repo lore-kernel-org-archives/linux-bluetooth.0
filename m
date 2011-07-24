@@ -1,354 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Fix debug messages logging from non-built-in plugins
-Date: Mon, 25 Jul 2011 13:09:04 +0200
-Message-ID: <1311592144-14140-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed; delsp=yes
+To: "Peter Hurley" <peter@hurleysoftware.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: A couple of questions related to a rfcomm server
+Reply-To: santoscapela@gmail.com
+References: <op.vyj0grkdv7v2p6@capela.tziranda.net>
+ <1311524784.2657.21.camel@THOR>
+Date: Sun, 24 Jul 2011 23:08:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+From: =?iso-8859-15?Q?S=E9rgio_Capela?= <santoscapela@gmail.com>
+Message-ID: <op.vy483mhctnyi5l@mediacenter.lan>
+In-Reply-To: <1311524784.2657.21.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/main.c           |    2 +-
- health/hdp_main.c      |    1 +
- input/main.c           |    2 +-
- network/main.c         |    1 +
- plugins/adaptername.c  |    2 +-
- plugins/formfactor.c   |    2 +-
- plugins/gatt-example.c |    2 +-
- plugins/hciops.c       |    2 +-
- plugins/mgmtops.c      |    2 +-
- plugins/service.c      |    2 +-
- plugins/storage.c      |    2 +-
- sap/main.c             |    1 +
- serial/main.c          |    1 +
- src/log.c              |   25 +++++++++++++++++++++++++
- src/log.h              |    8 ++++++++
- src/plugin.c           |   10 +++++++---
- src/plugin.h           |    8 ++++++--
- 17 files changed, 59 insertions(+), 14 deletions(-)
+Hi Peter,
 
-diff --git a/audio/main.c b/audio/main.c
-index 745c307..f2042f0 100644
---- a/audio/main.c
-+++ b/audio/main.c
-@@ -39,8 +39,8 @@
- 
- #include "glib-helper.h"
- #include "btio.h"
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "device.h"
- #include "headset.h"
- #include "manager.h"
-diff --git a/health/hdp_main.c b/health/hdp_main.c
-index b40a37c..ae2340d 100644
---- a/health/hdp_main.c
-+++ b/health/hdp_main.c
-@@ -31,6 +31,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hdp_manager.h"
- 
-diff --git a/input/main.c b/input/main.c
-index e165ab4..33d7493 100644
---- a/input/main.c
-+++ b/input/main.c
-@@ -31,8 +31,8 @@
- 
- #include <gdbus.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "manager.h"
- 
- static GKeyFile *load_config_file(const char *file)
-diff --git a/network/main.c b/network/main.c
-index 88e77ee..17e5731 100644
---- a/network/main.c
-+++ b/network/main.c
-@@ -29,6 +29,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-index 2a54cc0..ddf50d2 100644
---- a/plugins/adaptername.c
-+++ b/plugins/adaptername.c
-@@ -36,13 +36,13 @@
- #include <glib.h>
- #include <bluetooth/bluetooth.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hcid.h" /* For main_opts */
- #include "adapter.h"
- #include "manager.h"
- #include "device.h" /* Needed for storage.h */
- #include "storage.h"
--#include "log.h"
- 
- #include <sys/inotify.h>
- #define EVENT_SIZE  (sizeof (struct inotify_event))
-diff --git a/plugins/formfactor.c b/plugins/formfactor.c
-index 758d481..300e723 100644
---- a/plugins/formfactor.c
-+++ b/plugins/formfactor.c
-@@ -30,9 +30,9 @@
- 
- #include <bluetooth/bluetooth.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "adapter.h"
--#include "log.h"
- 
- #define DMI_CHASSIS_FILE "/sys/class/dmi/id/chassis_type"
- #define DMI_CHASSIS_FILE_FALLBACK "/sys/devices/virtual/dmi/id/chassis_type"
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index f86e76d..40f19aa 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -29,9 +29,9 @@
- #include <glib.h>
- #include <bluetooth/uuid.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hcid.h"
--#include "log.h"
- #include "attrib-server.h"
- #include "att.h"
- 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index ecc0e86..da4738d 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -46,8 +46,8 @@
- #include "btio.h"
- #include "adapter.h"
- #include "device.h"
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "storage.h"
- #include "event.h"
- #include "manager.h"
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 3cdb97e..5647065 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -41,8 +41,8 @@
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/mgmt.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "adapter.h"
- #include "manager.h"
- #include "device.h"
-diff --git a/plugins/service.c b/plugins/service.c
-index d73cdea..01ed7bb 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -38,10 +38,10 @@
- 
- #include "sdpd.h"
- #include "sdp-xml.h"
-+#include "log.h"
- #include "plugin.h"
- #include "adapter.h"
- #include "error.h"
--#include "log.h"
- 
- #define SERVICE_INTERFACE "org.bluez.Service"
- 
-diff --git a/plugins/storage.c b/plugins/storage.c
-index 04a02c7..56ee04a 100644
---- a/plugins/storage.c
-+++ b/plugins/storage.c
-@@ -27,8 +27,8 @@
- 
- #include <bluetooth/bluetooth.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- 
- static int storage_init(void)
- {
-diff --git a/sap/main.c b/sap/main.c
-index c9c90bd..57a7028 100644
---- a/sap/main.c
-+++ b/sap/main.c
-@@ -24,6 +24,7 @@
- 
- #include <errno.h>
- #include <gdbus.h>
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
-diff --git a/serial/main.c b/serial/main.c
-index 38ded03..d640aba 100644
---- a/serial/main.c
-+++ b/serial/main.c
-@@ -29,6 +29,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
-diff --git a/src/log.c b/src/log.c
-index 2c492e9..c5e0c74 100644
---- a/src/log.c
-+++ b/src/log.c
-@@ -70,6 +70,7 @@ extern struct btd_debug_desc __start___debug[];
- extern struct btd_debug_desc __stop___debug[];
- 
- static gchar **enabled = NULL;
-+static GSList *ext_debugs = NULL;
- 
- static gboolean is_enabled(struct btd_debug_desc *desc)
- {
-@@ -89,9 +90,17 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
- void __btd_toggle_debug(void)
- {
- 	struct btd_debug_desc *desc;
-+	GSList *l;
- 
- 	for (desc = __start___debug; desc < __stop___debug; desc++)
- 		desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+
-+	for (l = ext_debugs; l; l = l->next) {
-+		struct btd_debug_section *debug = l->data;
-+
-+		for (desc = debug->start; desc < debug->stop; desc++)
-+			desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+	}
- }
- 
- void __btd_log_init(const char *debug, int detach)
-@@ -120,3 +129,19 @@ void __btd_log_cleanup(void)
- 
- 	g_strfreev(enabled);
- }
-+
-+void __btd_log_add(struct btd_debug_section *debug)
-+{
-+	struct btd_debug_desc *desc;
-+
-+	ext_debugs = g_slist_prepend(ext_debugs, debug);
-+
-+	for (desc = debug->start; desc < debug->stop; desc++)
-+		if (is_enabled(desc))
-+			desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+}
-+
-+void __btd_log_remove(struct btd_debug_section *debug)
-+{
-+	ext_debugs = g_slist_remove(ext_debugs, debug);
-+}
-diff --git a/src/log.h b/src/log.h
-index 78bbdd8..1f2d13d 100644
---- a/src/log.h
-+++ b/src/log.h
-@@ -37,6 +37,14 @@ struct btd_debug_desc {
- 	unsigned int flags;
- } __attribute__((aligned(8)));
- 
-+struct btd_debug_section {
-+	struct btd_debug_desc *start;
-+	struct btd_debug_desc *stop;
-+};
-+
-+void __btd_log_add(struct btd_debug_section *debug);
-+void __btd_log_remove(struct btd_debug_section *debug);
-+
- /**
-  * DBG:
-  * @fmt: format string
-diff --git a/src/plugin.c b/src/plugin.c
-index 3506553..79db9b3 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
-@@ -34,8 +34,8 @@
- 
- #include <glib.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "hcid.h"
- #include "btio.h"
- 
-@@ -202,7 +202,9 @@ gboolean plugin_init(GKeyFile *config, const char *enable, const char *disable)
- 			continue;
- 		}
- 
--		if (add_plugin(handle, desc) == FALSE)
-+		if (add_plugin(handle, desc) == TRUE)
-+			__btd_log_add(&desc->debug);
-+		else
- 			dlclose(handle);
- 	}
- 
-@@ -239,8 +241,10 @@ void plugin_cleanup(void)
- 		if (plugin->active == TRUE && plugin->desc->exit)
- 			plugin->desc->exit();
- 
--		if (plugin->handle != NULL)
-+		if (plugin->handle != NULL) {
-+			__btd_log_remove(&plugin->desc->debug);
- 			dlclose(plugin->handle);
-+		}
- 
- 		g_free(plugin);
- 	}
-diff --git a/src/plugin.h b/src/plugin.h
-index 30bd415..2327735 100644
---- a/src/plugin.h
-+++ b/src/plugin.h
-@@ -30,18 +30,22 @@ struct bluetooth_plugin_desc {
- 	int priority;
- 	int (*init) (void);
- 	void (*exit) (void);
-+	struct btd_debug_section debug;
- };
- 
- #ifdef BLUETOOTH_PLUGIN_BUILTIN
- #define BLUETOOTH_PLUGIN_DEFINE(name, version, priority, init, exit) \
- 		struct bluetooth_plugin_desc __bluetooth_builtin_ ## name = { \
--			#name, version, priority, init, exit \
-+			#name, version, priority, init, exit, { NULL, NULL } \
- 		};
- #else
- #define BLUETOOTH_PLUGIN_DEFINE(name, version, priority, init, exit) \
-+		extern struct btd_debug_desc __start___debug[]; \
-+		extern struct btd_debug_desc __stop___debug[]; \
- 		extern struct bluetooth_plugin_desc bluetooth_plugin_desc \
- 				__attribute__ ((visibility("default"))); \
- 		struct bluetooth_plugin_desc bluetooth_plugin_desc = { \
--			#name, version, priority, init, exit \
-+			#name, version, priority, init, exit, \
-+			{ __start___debug, __stop___debug } \
- 		};
- #endif
+On Sun, 24 Jul 2011 17:26:24 +0100, Peter Hurley  
+<peter@hurleysoftware.com> wrote:
+
+> Hi Sérgio,
+>
+> On Wed, 2011-07-13 at 06:51 -0400, Sérgio Capela wrote:
+>> Hello,
+>>
+> ...
+>> Is it possible to accept connections at the same time a inquiry is  
+>> running
+>> or is the inquiry a blocking operation at the stack level? With two
+>> adapters my server accepts remote connections and receives and sends  
+>> data
+>> but when an inquiry is running it stops accepting connections. The  
+>> inquiry
+>> is done in a separate thread.
+>
+> That's handled in the controller at the baseband level. I don't know of
+> any controllers that will accept connections while in the Inquiry
+> substate - I'm not even sure if it's possible.
+>
+> Why are you initiating discovery from the server-side?
+>
+
+Well, this is a test where I'm trying to see if content delivery is viable  
+through bluetooth and in this case the content depends on context. Imagine  
+a number of rooms which should serve differentiated content accordingly.  
+The server side discovery would try to automatically infer which content  
+should be delivered to a given possible client. For this purpose I perform  
+inquiries with rssi and thus the servers would act like tracking devices  
+which would transmit inquiry data to a central database. These are only  
+trials for now and I know that inquiries with rssi values are not that  
+good for this type of decision so in the future this operation can be  
+dropped in favor of other solution even if it end up as a choice at the  
+user side.
+
+
+> If you have to have server-side discovery, you could only perform
+> inquiry with one controller at a time. That way, the other controller's
+> available for new rfcomm connections (assuming your client load-balances
+> like that...).
+>
+
+Yep, that is what I'm doing. I bind one adapter to the rfcomm server and  
+use the other one for discovery and content delivery. The main process  
+thread is the accept server and both the inquiry and the content delivery  
+are done in threads launched for the purpose. I also made more tests  
+recently and what is happening is that as soon as the inquiry starts the  
+server stops accepting connections and starts processing inquiry result  
+events, however, after a couple of minutes I can see the server both  
+accepting and processing new connections and new inquiry result events.  
+The end result is that launching an inquiry leads me to loose possible  
+connections during a few minutes which is excessive for this case where  
+inquiries would be launched regularly.
+
+>> Another question is related to a rfcomm client getting into D state and
+>> thus not killable. Due to my setup (two adapters in the same computer) I
+>> can use the computer as both the server and the client. For test  
+>> purposes
+>> only I made a simple rfcomm client and I put it in a shell cycle thus
+>> stressing the system regarding bluetooth connections. In this situation
+>> the rfcomm client application becomes unresponsive after some time due  
+>> to
+>> a non exiting disk sleep. I then end up with multiple instances of the
+>> same application and I can't kill them. By launching the application  
+>> after
+>> this I can see that the code blocks at a socket connection command
+>> entering in a disk sleep state from which it doesn't exit. When this
+>> happens I have to unplug the bluetooth adapter to get it working again
+>> since it starts to give timeouts with hciconfig commands like "hciconfig
+>> reset".
+>>
+>> Any ideas about this? The problem itself is not serious since it  
+>> shouldn't
+>> arise in normal conditions but it does require a reboot because of the
+>> state D processes and makes the adapter unusable unless it is unplugged.
+>
+> Although I'm not certain that they would fix the problem you're having,
+> I just posted a patch series that resolves some issues with lost wakeups
+> in rfcomm and l2cap. They need testing. You'd need patches 1~4 of 7.
+>
+> Please feel free to reply direct regarding whether you can test these
+> and what that outcome was.
+
+I suppose those patches would be available in the git sources right? At  
+the moment I can't test it but in a week or two I will try to compile the  
+sources and unless I encounter some problem I will reply in this topic.
+
+
+Regards,
+Sérgio
+
+>
+> Regards,
+> Peter
+
+
 -- 
-on behalf of ST-Ericsson
-
+Sérgio Capela
