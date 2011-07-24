@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E2C46CE.2060000@kernelconcepts.de>
-Date: Sun, 24 Jul 2011 18:22:38 +0200
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sun, 24 Jul 2011 00:11:10 -0400
+Subject: [PATCH 7/7] Bluetooth: cmtp: Fix lost wakeup of session thread
+Message-ID: <1311480670.4106.32.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: RFCOMM connection lag (slow)
-Content-Type: text/plain; charset=ISO-8859-15
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
-I recently found a strange behaviour...
+Fix race condition which can result in missing the wakeup intended
+to stop the session thread.
 
-I have a device which accepts an RFCOMM connection on channel 1.
-Creating the connection works just fine and I can basically communicate.
+Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+---
+ net/bluetooth/cmtp/core.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-But as soon as larger chunks of data are sent (something like 128 bytes
-at a time) it starts to take a pretty long time to transfer it (in the
-range of about a second). The connection stays connected and data can be
-sent but at a very slow pace.
-This is from a 2.6.39 kernel to the device, my PC has a Bluetooth3.0 USB
-device.
-
-The interesting part is that if I try the same thing from an HTC G1
-phone it works as expected, i.e. "fast". I tried to compare the HCI
-settings between the HTC G1 and my notebook and did the same on my
-notebook which did not help (the only obvious difference was disabled
-PARK mode and a slightly different ACL MTU).
-
-It is pretty likely that the device also has an RFCOMM bug here but
-since it works with the HTC phone it must be possible to make it work
-with my notebook too.
-
-Any hint would be very much appreciated ;)
-
-Thanks!
-
-Cheers
-  nils
-
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index c5b11af..2eb854a 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -292,9 +292,11 @@ static int cmtp_session(void *arg)
+ 
+ 	init_waitqueue_entry(&wait, current);
+ 	add_wait_queue(sk_sleep(sk), &wait);
+-	while (!kthread_should_stop()) {
++	while (1) {
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 
++		if (kthread_should_stop())
++			break;
+ 		if (sk->sk_state != BT_CONNECTED)
+ 			break;
+ 
+@@ -307,7 +309,7 @@ static int cmtp_session(void *arg)
+ 
+ 		schedule();
+ 	}
+-	set_current_state(TASK_RUNNING);
++	__set_current_state(TASK_RUNNING);
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 
+ 	down_write(&cmtp_session_sem);
 -- 
-kernel concepts GbR        Tel: +49-271-771091-12
-Sieghuetter Hauptweg 48
-D-57072 Siegen             Mob: +49-176-21024535
-http://www.kernelconcepts.de
+1.7.4.1
+
