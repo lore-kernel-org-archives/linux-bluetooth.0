@@ -1,57 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: "ssc@tziranda.com" <ssc@tziranda.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Sun, 24 Jul 2011 12:26:24 -0400
-Subject: Re: A couple of questions related to a rfcomm server
-Message-ID: <1311524784.2657.21.camel@THOR>
-References: <op.vyj0grkdv7v2p6@capela.tziranda.net>
-In-Reply-To: <op.vyj0grkdv7v2p6@capela.tziranda.net>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <4E2C46CE.2060000@kernelconcepts.de>
+Date: Sun, 24 Jul 2011 18:22:38 +0200
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: RFCOMM connection lag (slow)
+Content-Type: text/plain; charset=ISO-8859-15
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgU8OpcmdpbywNCg0KT24gV2VkLCAyMDExLTA3LTEzIGF0IDA2OjUxIC0wNDAwLCBTw6lyZ2lv
-IENhcGVsYSB3cm90ZTogDQo+IEhlbGxvLA0KPiANCi4uLiANCj4gSXMgaXQgcG9zc2libGUgdG8g
-YWNjZXB0IGNvbm5lY3Rpb25zIGF0IHRoZSBzYW1lIHRpbWUgYSBpbnF1aXJ5IGlzIHJ1bm5pbmcg
-IA0KPiBvciBpcyB0aGUgaW5xdWlyeSBhIGJsb2NraW5nIG9wZXJhdGlvbiBhdCB0aGUgc3RhY2sg
-bGV2ZWw/IFdpdGggdHdvICANCj4gYWRhcHRlcnMgbXkgc2VydmVyIGFjY2VwdHMgcmVtb3RlIGNv
-bm5lY3Rpb25zIGFuZCByZWNlaXZlcyBhbmQgc2VuZHMgZGF0YSAgDQo+IGJ1dCB3aGVuIGFuIGlu
-cXVpcnkgaXMgcnVubmluZyBpdCBzdG9wcyBhY2NlcHRpbmcgY29ubmVjdGlvbnMuIFRoZSBpbnF1
-aXJ5ICANCj4gaXMgZG9uZSBpbiBhIHNlcGFyYXRlIHRocmVhZC4NCg0KVGhhdCdzIGhhbmRsZWQg
-aW4gdGhlIGNvbnRyb2xsZXIgYXQgdGhlIGJhc2ViYW5kIGxldmVsLiBJIGRvbid0IGtub3cgb2YN
-CmFueSBjb250cm9sbGVycyB0aGF0IHdpbGwgYWNjZXB0IGNvbm5lY3Rpb25zIHdoaWxlIGluIHRo
-ZSBJbnF1aXJ5DQpzdWJzdGF0ZSAtIEknbSBub3QgZXZlbiBzdXJlIGlmIGl0J3MgcG9zc2libGUu
-DQoNCldoeSBhcmUgeW91IGluaXRpYXRpbmcgZGlzY292ZXJ5IGZyb20gdGhlIHNlcnZlci1zaWRl
-Pw0KDQpJZiB5b3UgaGF2ZSB0byBoYXZlIHNlcnZlci1zaWRlIGRpc2NvdmVyeSwgeW91IGNvdWxk
-IG9ubHkgcGVyZm9ybQ0KaW5xdWlyeSB3aXRoIG9uZSBjb250cm9sbGVyIGF0IGEgdGltZS4gVGhh
-dCB3YXksIHRoZSBvdGhlciBjb250cm9sbGVyJ3MNCmF2YWlsYWJsZSBmb3IgbmV3IHJmY29tbSBj
-b25uZWN0aW9ucyAoYXNzdW1pbmcgeW91ciBjbGllbnQgbG9hZC1iYWxhbmNlcw0KbGlrZSB0aGF0
-Li4uKS4NCg0KPiBBbm90aGVyIHF1ZXN0aW9uIGlzIHJlbGF0ZWQgdG8gYSByZmNvbW0gY2xpZW50
-IGdldHRpbmcgaW50byBEIHN0YXRlIGFuZCAgDQo+IHRodXMgbm90IGtpbGxhYmxlLiBEdWUgdG8g
-bXkgc2V0dXAgKHR3byBhZGFwdGVycyBpbiB0aGUgc2FtZSBjb21wdXRlcikgSSAgDQo+IGNhbiB1
-c2UgdGhlIGNvbXB1dGVyIGFzIGJvdGggdGhlIHNlcnZlciBhbmQgdGhlIGNsaWVudC4gRm9yIHRl
-c3QgcHVycG9zZXMgIA0KPiBvbmx5IEkgbWFkZSBhIHNpbXBsZSByZmNvbW0gY2xpZW50IGFuZCBJ
-IHB1dCBpdCBpbiBhIHNoZWxsIGN5Y2xlIHRodXMgIA0KPiBzdHJlc3NpbmcgdGhlIHN5c3RlbSBy
-ZWdhcmRpbmcgYmx1ZXRvb3RoIGNvbm5lY3Rpb25zLiBJbiB0aGlzIHNpdHVhdGlvbiAgDQo+IHRo
-ZSByZmNvbW0gY2xpZW50IGFwcGxpY2F0aW9uIGJlY29tZXMgdW5yZXNwb25zaXZlIGFmdGVyIHNv
-bWUgdGltZSBkdWUgdG8gIA0KPiBhIG5vbiBleGl0aW5nIGRpc2sgc2xlZXAuIEkgdGhlbiBlbmQg
-dXAgd2l0aCBtdWx0aXBsZSBpbnN0YW5jZXMgb2YgdGhlICANCj4gc2FtZSBhcHBsaWNhdGlvbiBh
-bmQgSSBjYW4ndCBraWxsIHRoZW0uIEJ5IGxhdW5jaGluZyB0aGUgYXBwbGljYXRpb24gYWZ0ZXIg
-IA0KPiB0aGlzIEkgY2FuIHNlZSB0aGF0IHRoZSBjb2RlIGJsb2NrcyBhdCBhIHNvY2tldCBjb25u
-ZWN0aW9uIGNvbW1hbmQgIA0KPiBlbnRlcmluZyBpbiBhIGRpc2sgc2xlZXAgc3RhdGUgZnJvbSB3
-aGljaCBpdCBkb2Vzbid0IGV4aXQuIFdoZW4gdGhpcyAgDQo+IGhhcHBlbnMgSSBoYXZlIHRvIHVu
-cGx1ZyB0aGUgYmx1ZXRvb3RoIGFkYXB0ZXIgdG8gZ2V0IGl0IHdvcmtpbmcgYWdhaW4gIA0KPiBz
-aW5jZSBpdCBzdGFydHMgdG8gZ2l2ZSB0aW1lb3V0cyB3aXRoIGhjaWNvbmZpZyBjb21tYW5kcyBs
-aWtlICJoY2ljb25maWcgIA0KPiByZXNldCIuDQo+IA0KPiBBbnkgaWRlYXMgYWJvdXQgdGhpcz8g
-VGhlIHByb2JsZW0gaXRzZWxmIGlzIG5vdCBzZXJpb3VzIHNpbmNlIGl0IHNob3VsZG4ndCAgDQo+
-IGFyaXNlIGluIG5vcm1hbCBjb25kaXRpb25zIGJ1dCBpdCBkb2VzIHJlcXVpcmUgYSByZWJvb3Qg
-YmVjYXVzZSBvZiB0aGUgIA0KPiBzdGF0ZSBEIHByb2Nlc3NlcyBhbmQgbWFrZXMgdGhlIGFkYXB0
-ZXIgdW51c2FibGUgdW5sZXNzIGl0IGlzIHVucGx1Z2dlZC4NCg0KQWx0aG91Z2ggSSdtIG5vdCBj
-ZXJ0YWluIHRoYXQgdGhleSB3b3VsZCBmaXggdGhlIHByb2JsZW0geW91J3JlIGhhdmluZywNCkkg
-anVzdCBwb3N0ZWQgYSBwYXRjaCBzZXJpZXMgdGhhdCByZXNvbHZlcyBzb21lIGlzc3VlcyB3aXRo
-IGxvc3Qgd2FrZXVwcw0KaW4gcmZjb21tIGFuZCBsMmNhcC4gVGhleSBuZWVkIHRlc3RpbmcuIFlv
-dSdkIG5lZWQgcGF0Y2hlcyAxfjQgb2YgNy4NCg0KUGxlYXNlIGZlZWwgZnJlZSB0byByZXBseSBk
-aXJlY3QgcmVnYXJkaW5nIHdoZXRoZXIgeW91IGNhbiB0ZXN0IHRoZXNlDQphbmQgd2hhdCB0aGF0
-IG91dGNvbWUgd2FzLg0KDQpSZWdhcmRzLA0KUGV0ZXINCg==
+Hi!
+I recently found a strange behaviour...
+
+I have a device which accepts an RFCOMM connection on channel 1.
+Creating the connection works just fine and I can basically communicate.
+
+But as soon as larger chunks of data are sent (something like 128 bytes
+at a time) it starts to take a pretty long time to transfer it (in the
+range of about a second). The connection stays connected and data can be
+sent but at a very slow pace.
+This is from a 2.6.39 kernel to the device, my PC has a Bluetooth3.0 USB
+device.
+
+The interesting part is that if I try the same thing from an HTC G1
+phone it works as expected, i.e. "fast". I tried to compare the HCI
+settings between the HTC G1 and my notebook and did the same on my
+notebook which did not help (the only obvious difference was disabled
+PARK mode and a slightly different ACL MTU).
+
+It is pretty likely that the device also has an RFCOMM bug here but
+since it works with the HTC phone it must be possible to make it work
+with my notebook too.
+
+Any hint would be very much appreciated ;)
+
+Thanks!
+
+Cheers
+  nils
+
+-- 
+kernel concepts GbR        Tel: +49-271-771091-12
+Sieghuetter Hauptweg 48
+D-57072 Siegen             Mob: +49-176-21024535
+http://www.kernelconcepts.de
