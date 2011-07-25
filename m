@@ -1,47 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH v2 00/16] Full support discovery procedure
-Date: Mon, 25 Jul 2011 16:49:49 -0300
-Message-Id: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 25 Jul 2011 12:18:57 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Peter Hurley <peter@hurleysoftware.com>
+cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 0/7] Fix various lost wakeups
+In-Reply-To: <1311480631.4106.25.camel@THOR>
+Message-ID: <alpine.DEB.2.02.1107251205130.15852@mathewm-linux>
+References: <1311480631.4106.25.camel@THOR>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
 
-According to what we discussed, the main changes in this v2 is the definition
-of lmp_bredr_capable macro instead of lmp_no_bredr_capable.
+Hi Peter -
+
+On Sun, 24 Jul 2011, Peter Hurley wrote:
+
+> Several kthreads, and some other functions which also wait/sleep, exhibit
+> race conditions when using set_current_state(TASK_INTERRUPTIBLE). A common,
+> but incorrect, usage pattern is:
+>
+> 1:  add_wait_queue(...);
+> 2:  while (!condition) {
+> 3:          set_current_state(TASK_INTERRUPTIBLE);
+> 4:          do_work();
+> 5:          schedule();
+> 6:  }
+> 7:  set current_state(TASK_RUNNING);
+> 8:  remove_wait_queue(...);
+
+<snip>
+
+> PS - I did not fix the usage in l2cap_core.c pending if the new ERTM
+> reassembly will make that work unnecessary.
+
+I think your fix is needed in l2cap_core.c.  ERTM reassembly (and 
+other pending changes) won't be modifying that code.
 
 Thanks,
 
-Andre.
-
-Andre Guedes (16):
-  Bluetooth: Periodic Inquiry and mgmt discovering event
-  Bluetooth: Add failed/complete functions to discovery commands
-  Bluetooth: Remove pending discovery commands
-  Bluetooth: Check pending command in start_discovery()
-  Bluetooth: Check pending commands in stop_discovery()
-  Bluetooth: Create do_inquiry()
-  Bluetooth: Create cancel_inquiry()
-  Bluetooth: Fix stop_discovery()
-  Bluetooth: Prepare for full support discovery procedures
-  Bluetooth: Check 'dev_class' in mgmt_device_found()
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: Add 'le_scan_timer' to struct hci_dev
-  Bluetooth: Add LE Scan helper functions
-  Bluetooth: Support LE-Only discovery procedure
-  Bluetooth: Support BR/EDR/LE discovery procedure
-
- include/net/bluetooth/hci.h      |   12 ++
- include/net/bluetooth/hci_core.h |   13 ++-
- net/bluetooth/hci_core.c         |   13 ++
- net/bluetooth/hci_event.c        |  134 +++++++++++++------
- net/bluetooth/mgmt.c             |  282 ++++++++++++++++++++++++++++++++++++--
- 5 files changed, 402 insertions(+), 52 deletions(-)
-
--- 
-1.7.4.1
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
