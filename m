@@ -2,62 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH v2 06/16] Bluetooth: Create do_inquiry()
-Date: Mon, 25 Jul 2011 16:49:55 -0300
-Message-Id: <1311623405-31108-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 05/16] Bluetooth: Check pending commands in stop_discovery()
+Date: Mon, 25 Jul 2011 16:49:54 -0300
+Message-Id: <1311623405-31108-6-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
 References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves all inquiry code from start_discovery() to a new
-function called do_inquiry().
+This patch adds extra checks in stop_discovery().
+
+The MGMT_OP_STOP_DISCOVERY command should be executed if the device
+is running the discovery procedure. So, if there is no discovery
+procedure running then EINVAL command status should be returned.
+
+Also, if a MGMT_OP_STOP_DISCOVERY command has been already issued
+then EINPROGRESS command status should returned.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/mgmt.c |   19 ++++++++++++-------
- 1 files changed, 12 insertions(+), 7 deletions(-)
+ net/bluetooth/mgmt.c |   11 +++++++++++
+ 1 files changed, 11 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d673ea3..7ea8f95 100644
+index 83693ac..d673ea3 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1616,10 +1616,20 @@ static int remove_remote_oob_data(struct sock *sk, u16 index,
- 	return err;
- }
+@@ -1674,6 +1674,17 @@ static int stop_discovery(struct sock *sk, u16 index)
  
--static int start_discovery(struct sock *sk, u16 index)
-+static int do_inquiry(struct hci_dev *hdev, __u8 inq_length)
- {
- 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
- 	struct hci_cp_inquiry cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(&cp.lap, lap, 3);
-+	cp.length  = inq_length;
-+
-+	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
-+}
-+
-+static int start_discovery(struct sock *sk, u16 index)
-+{
- 	struct pending_cmd *cmd;
- 	struct hci_dev *hdev;
- 	int err;
-@@ -1644,12 +1654,7 @@ static int start_discovery(struct sock *sk, u16 index)
- 		goto failed;
- 	}
+ 	hci_dev_lock_bh(hdev);
  
--	memset(&cp, 0, sizeof(cp));
--	memcpy(&cp.lap, lap, 3);
--	cp.length  = 0x08;
--	cp.num_rsp = 0x00;
--
--	err = hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
-+	err = do_inquiry(hdev, 0x08);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
++	if (!mgmt_pending_find(MGMT_OP_START_DISCOVERY, index)) {
++		err = cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY, EINVAL);
++		goto failed;
++	}
++
++	if (mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index)) {
++		err = cmd_status(sk, index, MGMT_OP_STOP_DISCOVERY,
++								EINPROGRESS);
++		goto failed;
++	}
++
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, index, NULL, 0);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
 -- 
 1.7.4.1
 
