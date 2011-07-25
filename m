@@ -1,35 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Jul 2011 19:50:53 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] Bluetooth: Perform L2CAP SDU reassembly without
- copying data
-Message-ID: <20110725225053.GB3267@joana>
-References: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
- <1311371640-10324-4-git-send-email-mathewm@codeaurora.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 25 Jul 2011 18:36:26 -0400
+Subject: [PATCH] Bluetooth: l2cap: Fix lost wakeup waiting for ERTM acks
+Message-ID: <1311633386.4311.79.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1311371640-10324-4-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Fix race condition which can result in missing wakeup during
+l2cap socket shutdown.
 
-* Mat Martineau <mathewm@codeaurora.org> [2011-07-22 14:54:00 -0700]:
+Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+---
+ net/bluetooth/l2cap_core.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-> Use sk_buff fragment capabilities to link together incoming skbs
-> instead of allocating a new skb for reassembly and copying.
-> 
-> The new reassembly code works equally well for ERTM and streaming
-> mode, so there is now one reassembly function instead of two.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  include/net/bluetooth/l2cap.h |    3 +-
->  net/bluetooth/l2cap_core.c    |  243 ++++++++++++++---------------------------
->  2 files changed, 81 insertions(+), 165 deletions(-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7705e26..2969ef0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -997,9 +997,8 @@ int __l2cap_wait_ack(struct sock *sk)
+ 	int timeo = HZ/5;
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+-	while ((chan->unacked_frames > 0 && chan->conn)) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
++	set_current_state(TASK_INTERRUPTIBLE);
++	while (chan->unacked_frames > 0 && chan->conn) {
+ 		if (!timeo)
+ 			timeo = HZ/5;
+ 
+@@ -1011,6 +1010,7 @@ int __l2cap_wait_ack(struct sock *sk)
+ 		release_sock(sk);
+ 		timeo = schedule_timeout(timeo);
+ 		lock_sock(sk);
++		set_current_state(TASK_INTERRUPTIBLE);
+ 
+ 		err = sock_error(sk);
+ 		if (err)
+-- 
+1.7.4.1
 
-All 3 patches applied, thanks.
-
-	Gustavo
