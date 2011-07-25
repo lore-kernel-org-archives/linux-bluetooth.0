@@ -2,112 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH v2 14/16] Bluetooth: Add LE Scan helper functions
-Date: Mon, 25 Jul 2011 16:50:03 -0300
-Message-Id: <1311623405-31108-15-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 13/16] Bluetooth: Add 'le_scan_timer' to struct hci_dev
+Date: Mon, 25 Jul 2011 16:50:02 -0300
+Message-Id: <1311623405-31108-14-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
 References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds some helper functions to perform LE scan according
-to the general discovery procedure recommendations.
+This patch adds a timer to disable LE Scan after some amount of
+time. The timer will be controlled by the management interface and
+it will be used to carry out discovery procedure in LE capable
+devices.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci.h |    9 +++++++
- net/bluetooth/mgmt.c        |   51 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 60 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   13 +++++++++++++
+ 2 files changed, 15 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 653daec..fb40388 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -729,6 +729,15 @@ struct hci_rp_le_read_buffer_size {
- 	__u8     le_max_pkt;
- } __packed;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1ca4e60..f23102a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -209,6 +209,8 @@ struct hci_dev {
+ 	struct list_head	adv_entries;
+ 	struct timer_list	adv_timer;
  
-+#define HCI_OP_LE_SET_SCAN_PARAM	0x200b
-+struct hci_cp_le_set_scan_param {
-+	__u8    type;
-+	__le16  interval;
-+	__le16  window;
-+	__u8    own_address_type;
-+	__u8    filter_policy;
-+} __packed;
++	struct timer_list	le_scan_timer;
 +
- #define HCI_OP_LE_SET_SCAN_ENABLE	0x200c
- struct hci_cp_le_set_scan_enable {
- 	__u8     enable;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c0d3321..c805377 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1637,6 +1637,50 @@ static int do_inquiry(struct hci_dev *hdev, __u8 inq_length)
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
+ 	struct hci_dev_stats	stat;
+ 
+ 	struct sk_buff_head	driver_init;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 908fcd3..c0c46bf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1440,6 +1440,15 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+ 	return 0;
  }
  
-+static int set_le_scan_param(struct hci_dev *hdev)
-+{
-+	struct hci_cp_le_set_scan_param cp;
-+
-+	/*
-+	 * These values are set according to LE General Discovery Procedure
-+	 * specification.
-+	 */
-+	cp.type = 0x01; /* Active scanning */
-+	cp.interval = cpu_to_le16(0x0012); /* TGAP(gen_disc_scan_int) */
-+	cp.window = cpu_to_le16(0x0012); /* TGAP(gen_disc_scan_wind) */
-+	cp.own_address_type = 0x00; /* Public */
-+	cp.filter_policy = 0x00; /* Accept all advertisement packets */
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
-+}
-+
-+static int enable_le_scan(struct hci_dev *hdev, __u8 enable)
++static void hci_disable_le_scan(unsigned long arg)
 +{
 +	struct hci_cp_le_set_scan_enable cp;
++	struct hci_dev *hdev = (void *) arg;
 +
 +	memset(&cp, 0, sizeof(cp));
-+	cp.enable = enable;
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
 +}
 +
-+static int do_le_scan(struct hci_dev *hdev, int timeout)
-+{
-+	int err;
-+
-+	err = set_le_scan_param(hdev);
-+	if (err < 0)
-+		return err;
-+
-+	err = enable_le_scan(hdev, 1);
-+	if (err < 0)
-+		return err;
-+
-+	mod_timer(&hdev->le_scan_timer,	jiffies + msecs_to_jiffies(timeout));
-+
-+	return 0;
-+}
-+
- static int get_device_type(struct hci_dev *hdev)
+ /* Register HCI device */
+ int hci_register_dev(struct hci_dev *hdev)
  {
- 	if (lmp_bredr_capable(hdev) && lmp_host_le_capable(hdev))
-@@ -1705,6 +1749,13 @@ static int cancel_inquiry(struct hci_dev *hdev)
- 	return hci_send_cmd(hdev, HCI_OP_INQUIRY_CANCEL, 0, NULL);
- }
+@@ -1510,6 +1519,9 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	setup_timer(&hdev->adv_timer, hci_clear_adv_cache,
+ 						(unsigned long) hdev);
  
-+static int cancel_le_scan(struct hci_dev *hdev)
-+{
++	setup_timer(&hdev->le_scan_timer, hci_disable_le_scan,
++						(unsigned long) hdev);
++
+ 	INIT_WORK(&hdev->power_on, hci_power_on);
+ 	INIT_WORK(&hdev->power_off, hci_power_off);
+ 	setup_timer(&hdev->off_timer, hci_auto_off, (unsigned long) hdev);
+@@ -1591,6 +1603,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	hci_del_off_timer(hdev);
+ 	del_timer(&hdev->adv_timer);
 +	del_timer(&hdev->le_scan_timer);
-+
-+	return enable_le_scan(hdev, 0);
-+}
-+
- int mgmt_cancel_discovery(u16 index)
- {
- 	struct hci_dev *hdev;
+ 
+ 	destroy_workqueue(hdev->workqueue);
+ 
 -- 
 1.7.4.1
 
