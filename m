@@ -1,46 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Mon, 25 Jul 2011 18:36:26 -0400
-Subject: [PATCH] Bluetooth: l2cap: Fix lost wakeup waiting for ERTM acks
-Message-ID: <1311633386.4311.79.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
+To: "santoscapela@gmail.com" <santoscapela@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 25 Jul 2011 18:05:17 -0400
+Subject: Re: A couple of questions related to a rfcomm server
+Message-ID: <1311631517.4311.73.camel@THOR>
+References: <op.vyj0grkdv7v2p6@capela.tziranda.net>
+	 <1311524784.2657.21.camel@THOR>  <op.vy483mhctnyi5l@mediacenter.lan>
+In-Reply-To: <op.vy483mhctnyi5l@mediacenter.lan>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix race condition which can result in missing wakeup during
-l2cap socket shutdown.
-
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
- net/bluetooth/l2cap_core.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7705e26..2969ef0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -997,9 +997,8 @@ int __l2cap_wait_ack(struct sock *sk)
- 	int timeo = HZ/5;
- 
- 	add_wait_queue(sk_sleep(sk), &wait);
--	while ((chan->unacked_frames > 0 && chan->conn)) {
--		set_current_state(TASK_INTERRUPTIBLE);
--
-+	set_current_state(TASK_INTERRUPTIBLE);
-+	while (chan->unacked_frames > 0 && chan->conn) {
- 		if (!timeo)
- 			timeo = HZ/5;
- 
-@@ -1011,6 +1010,7 @@ int __l2cap_wait_ack(struct sock *sk)
- 		release_sock(sk);
- 		timeo = schedule_timeout(timeo);
- 		lock_sock(sk);
-+		set_current_state(TASK_INTERRUPTIBLE);
- 
- 		err = sock_error(sk);
- 		if (err)
--- 
-1.7.4.1
-
+SGkgU8OpcmdpbywNCg0KT24gU3VuLCAyMDExLTA3LTI0IGF0IDE4OjA4IC0wNDAwLCBTw6lyZ2lv
+IENhcGVsYSB3cm90ZToNCj4gSGkgUGV0ZXIsDQo+IA0KLi4uLg0KPiA+IElmIHlvdSBoYXZlIHRv
+IGhhdmUgc2VydmVyLXNpZGUgZGlzY292ZXJ5LCB5b3UgY291bGQgb25seSBwZXJmb3JtDQo+ID4g
+aW5xdWlyeSB3aXRoIG9uZSBjb250cm9sbGVyIGF0IGEgdGltZS4gVGhhdCB3YXksIHRoZSBvdGhl
+ciBjb250cm9sbGVyJ3MNCj4gPiBhdmFpbGFibGUgZm9yIG5ldyByZmNvbW0gY29ubmVjdGlvbnMg
+KGFzc3VtaW5nIHlvdXIgY2xpZW50IGxvYWQtYmFsYW5jZXMNCj4gPiBsaWtlIHRoYXQuLi4pLg0K
+PiA+DQo+IA0KPiBZZXAsIHRoYXQgaXMgd2hhdCBJJ20gZG9pbmcuIEkgYmluZCBvbmUgYWRhcHRl
+ciB0byB0aGUgcmZjb21tIHNlcnZlciBhbmQgIA0KPiB1c2UgdGhlIG90aGVyIG9uZSBmb3IgZGlz
+Y292ZXJ5IGFuZCBjb250ZW50IGRlbGl2ZXJ5LiBUaGUgbWFpbiBwcm9jZXNzICANCj4gdGhyZWFk
+IGlzIHRoZSBhY2NlcHQgc2VydmVyIGFuZCBib3RoIHRoZSBpbnF1aXJ5IGFuZCB0aGUgY29udGVu
+dCBkZWxpdmVyeSAgDQo+IGFyZSBkb25lIGluIHRocmVhZHMgbGF1bmNoZWQgZm9yIHRoZSBwdXJw
+b3NlLiBJIGFsc28gbWFkZSBtb3JlIHRlc3RzICANCj4gcmVjZW50bHkgYW5kIHdoYXQgaXMgaGFw
+cGVuaW5nIGlzIHRoYXQgYXMgc29vbiBhcyB0aGUgaW5xdWlyeSBzdGFydHMgdGhlICANCj4gc2Vy
+dmVyIHN0b3BzIGFjY2VwdGluZyBjb25uZWN0aW9ucyBhbmQgc3RhcnRzIHByb2Nlc3NpbmcgaW5x
+dWlyeSByZXN1bHQgIA0KPiBldmVudHMsIGhvd2V2ZXIsIGFmdGVyIGEgY291cGxlIG9mIG1pbnV0
+ZXMgSSBjYW4gc2VlIHRoZSBzZXJ2ZXIgYm90aCAgDQo+IGFjY2VwdGluZyBhbmQgcHJvY2Vzc2lu
+ZyBuZXcgY29ubmVjdGlvbnMgYW5kIG5ldyBpbnF1aXJ5IHJlc3VsdCBldmVudHMuICANCj4gVGhl
+IGVuZCByZXN1bHQgaXMgdGhhdCBsYXVuY2hpbmcgYW4gaW5xdWlyeSBsZWFkcyBtZSB0byBsb29z
+ZSBwb3NzaWJsZSAgDQo+IGNvbm5lY3Rpb25zIGR1cmluZyBhIGZldyBtaW51dGVzIHdoaWNoIGlz
+IGV4Y2Vzc2l2ZSBmb3IgdGhpcyBjYXNlIHdoZXJlICANCj4gaW5xdWlyaWVzIHdvdWxkIGJlIGxh
+dW5jaGVkIHJlZ3VsYXJseS4NCg0KSW5xdWlyeSBpbiB0aGUgaG9zdCBzdGFjayBkb2VzIHNlcmlh
+bGl6ZSB3cnQuIHNldmVyYWwgb3RoZXIgaW9jdGwNCmZ1bmN0aW9uczsgaG93ZXZlciwgdGhpcyBp
+cyBwZXIgZGV2aWNlLiBSdW5uaW5nIGEgc2ltcGxlIHRlc3QgaGVyZQ0KcHJvZHVjZXMgZXhwZWN0
+ZWQgcmVzdWx0cywgaWUuIGNvbmN1cnJlbnQgZGlzY292ZXJ5IGFuZCBjb25uZWN0aW9uczoNCiAg
+MS4gU3RhcnQgaW5xdWlyeSBvbiBkZXZpY2UgaGNpMS4gZWcuLCANCiAgICAgICAgIGhjaXRvb2wg
+LWkgaGNpMSBpbnEgLS1sZW5ndGg9MzANCiAgMi4gSW5pdGlhdGUgY29ubmVjdGlvbiBvbiBkZXZp
+Y2UgaGNpMC4gSW4gbXkgY2FzZSwgdHVybmluZyBvbiBhDQogICAgIGJsdWV0b290aCBoZWFkc2V0
+IGluaXRpYXRlcyBhIGNvbm5lY3Rpb24uIE9mIGNvdXJzZSwgdGhlIGhlYWRzZXQNCiAgICAgd2Fz
+IHByZXZpb3VzbHkgcGFpcmVkLg0KDQpZb3UgbWF5IG5lZWQgdG8gY29uZmlybSB3aGVyZS93aGF0
+IHlvdXIgdGhyZWFkcyBhcmUgYmxvY2tlZCBvbiAod2VsbCwgYXQNCmxlYXN0IHlvdXIgbWFpbiBw
+cm9jZXNzIHRocmVhZCB0aGF0IHNob3VsZCBiZSBibG9ja2VkIG9uIHRoZSBhY2NlcHQNCnN5c2Nh
+bGwpLiBTdGFjayBiYWNrdHJhY2UgaW4gZ2RiIHdvdWxkIGNsZWFyIHRoYXQgdXAuDQoNCj4gPj4g
+QW5vdGhlciBxdWVzdGlvbiBpcyByZWxhdGVkIHRvIGEgcmZjb21tIGNsaWVudCBnZXR0aW5nIGlu
+dG8gRCBzdGF0ZSBhbmQNCj4gPj4gdGh1cyBub3Qga2lsbGFibGUuDQouLi4NCj4gPg0KPiA+IEFs
+dGhvdWdoIEknbSBub3QgY2VydGFpbiB0aGF0IHRoZXkgd291bGQgZml4IHRoZSBwcm9ibGVtIHlv
+dSdyZSBoYXZpbmcsDQo+ID4gSSBqdXN0IHBvc3RlZCBhIHBhdGNoIHNlcmllcyB0aGF0IHJlc29s
+dmVzIHNvbWUgaXNzdWVzIHdpdGggbG9zdCB3YWtldXBzDQo+ID4gaW4gcmZjb21tIGFuZCBsMmNh
+cC4gVGhleSBuZWVkIHRlc3RpbmcuIFlvdSdkIG5lZWQgcGF0Y2hlcyAxfjQgb2YgNy4NCj4gPg0K
+PiA+IFBsZWFzZSBmZWVsIGZyZWUgdG8gcmVwbHkgZGlyZWN0IHJlZ2FyZGluZyB3aGV0aGVyIHlv
+dSBjYW4gdGVzdCB0aGVzZQ0KPiA+IGFuZCB3aGF0IHRoYXQgb3V0Y29tZSB3YXMuDQo+IA0KPiBJ
+IHN1cHBvc2UgdGhvc2UgcGF0Y2hlcyB3b3VsZCBiZSBhdmFpbGFibGUgaW4gdGhlIGdpdCBzb3Vy
+Y2VzIHJpZ2h0PyBBdCAgDQo+IHRoZSBtb21lbnQgSSBjYW4ndCB0ZXN0IGl0IGJ1dCBpbiBhIHdl
+ZWsgb3IgdHdvIEkgd2lsbCB0cnkgdG8gY29tcGlsZSB0aGUgIA0KPiBzb3VyY2VzIGFuZCB1bmxl
+c3MgSSBlbmNvdW50ZXIgc29tZSBwcm9ibGVtIEkgd2lsbCByZXBseSBpbiB0aGlzIHRvcGljLg0K
+DQpXZWxsLCByaWdodCBub3csIHRob3NlIHBhdGNoZXMgYXJlIG9uIHRoZSBtYWlsaW5nIGxpc3Qu
+IEkgd2FzIHJlYWxseQ0KbG9va2luZyB0byBnZXQgc29tZSBtb3JlIHRlc3Rpbmcgb24gdGhlbSBf
+cHJpb3JfIHRvIHRoZW0gbWFraW5nIHRoZWlyDQp3YXkgaW50byB0aGUga2VybmVsLiBUaGV5J3Jl
+IG1vc3RseSBhc3NvY2lhdGVkIHdpdGggbWlzc2luZyB3YWtldXBzIC0tDQphbHRob3VnaCBpdCdz
+IHBvc3NpYmxlIHRoZXkgY291bGQgZml4IHRoZSBEIHN0YXRlIGNsaWVudCwgSSBjb3VsZG4ndA0K
+aHlwb3RoZXNpemUgaG93IHRoZSByZmNvbW0gc29ja2V0IGNvdWxkIGJlY29tZSB1bmludGVycnVw
+dGlibGUgZnJvbSB3aGF0DQpJIGZpeGVkLiBUaGV5IG1heSBiZSB1bnJlbGF0ZWQuDQoNClJlZ2Fy
+ZHMsDQpQZXRlcg0KDQo=
