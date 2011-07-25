@@ -1,62 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1309547558-9617-2-git-send-email-vinicius.gomes@openbossa.org>
-References: <1309547558-9617-1-git-send-email-vinicius.gomes@openbossa.org>
-	<1309547558-9617-2-git-send-email-vinicius.gomes@openbossa.org>
-Date: Mon, 25 Jul 2011 16:40:12 -0700
-Message-ID: <CAE-CKuhXwsUnQta4VjBvRxmXobC__=hutJre7y_uNDxjpQmthQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/8] Add stubs for storing SMP keys
-From: mike tsai <mikeyhtsai@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Date: Mon, 25 Jul 2011 19:50:53 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v2 3/3] Bluetooth: Perform L2CAP SDU reassembly without
+ copying data
+Message-ID: <20110725225053.GB3267@joana>
+References: <1311371640-10324-1-git-send-email-mathewm@codeaurora.org>
+ <1311371640-10324-4-git-send-email-mathewm@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1311371640-10324-4-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Mat,
 
-<cut>
-> diff --git a/src/event.c b/src/event.c
-> index 86a413e..3f0f454 100644
-> --- a/src/event.c
-> +++ b/src/event.c
-> @@ -395,9 +395,8 @@ proceed:
->        adapter_set_state(adapter, STATE_IDLE);
->  }
->
-> -int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
-> -                               uint8_t *key, uint8_t key_type,
-> -                               uint8_t pin_length)
-> +int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
-> +               uint8_t key_type, uint8_t pin_length, int dlen, uint8_t *data)
->  {
->        struct btd_adapter *adapter;
->        struct btd_device *device;
-> @@ -408,7 +407,10 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
->
->        DBG("storing link key of type 0x%02x", key_type);
->
-> -       ret = write_link_key(local, peer, key, key_type, pin_length);
-> +       if (key_type < 0x10)
-> +               ret = write_link_key(local, peer, key, key_type, pin_length);
-> +       else
-> +               ret = write_longtermkeys(local, peer, NULL);
->
->        if (ret == 0 && device_is_temporary(device))
->                device_set_temporary(device, FALSE);
-[MT] The event.c in the mainline is different from this, It is currently as
-	if (ret == 0) {
-		device_set_bonded(device, TRUE);
+* Mat Martineau <mathewm@codeaurora.org> [2011-07-22 14:54:00 -0700]:
 
-		if (device_is_temporary(device))
-			device_set_temporary(device, FALSE);
-	}
-this causes applying patches failed.
+> Use sk_buff fragment capabilities to link together incoming skbs
+> instead of allocating a new skb for reassembly and copying.
+> 
+> The new reassembly code works equally well for ERTM and streaming
+> mode, so there is now one reassembly function instead of two.
+> 
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    3 +-
+>  net/bluetooth/l2cap_core.c    |  243 ++++++++++++++---------------------------
+>  2 files changed, 81 insertions(+), 165 deletions(-)
 
-I am also wandering why these patches are not up-streamed yet. It
-would seem to me that the kernel SMP patches will need these to
-support full capability.
+All 3 patches applied, thanks.
 
-Regards,
-
-Mike
+	Gustavo
