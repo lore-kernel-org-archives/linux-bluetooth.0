@@ -3,19 +3,60 @@ From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 1/3] Include log.h before plugin.h
-Date: Tue, 26 Jul 2011 15:57:10 +0200
-Message-ID: <1311688632-19334-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
-References: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 0/3] Fix debug messages logging from non-built-in plugins
+Date: Tue, 26 Jul 2011 15:57:09 +0200
+Message-ID: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a preparation for fixing up debug messages logging from
-external plugins.
----
+Hi All,
+
+As requested by Marcel I'm sending this as RFC and with some more comments
+from my side how this was done. Also patch is splitted to make review easier.
+
+Currently we are not able to see any debug messages from external plugins.
+This regression was introduced with dynamic debug support and mostly (probably)
+hits android platform which does build some plugins as external .so files.
+
+This is due to debug message enabling flags are stored in debug section. Main
+binary and external plugins have separated debug sections and current debug
+enabling code make use only of main binary debug section, and flags in
+external plugins are always not set.
+
+The idea to fix that is to make it possible for external plugin to 'register'
+its debug section so logging code can make use of it. This is to be done via
+__btd_log_add() function after external plugin is loaded (but before it is
+initialized). Logging code keep list and make use of them to enable
+debugging. When external plugin is unloaded its debug section is 
+deregistered with __btd_log_remove().
+
+Access to external plugin debug section is done via btd_debug_section added
+to bluetooth_plugin_desc structure. External plugins store pointers
+__start___debug and __stop___debug there. For builin plugins these field are
+not used and NULLed.
+
+This does not affect plugins loading order as built-in plugins get their
+debug intialized in main() function via __btd_log_init() and external plugins
+gets their debug section initialized in __btd_log_add() called
+from plugin_init(). __btd_toggle_debug() iterates over all built-in and
+registered external debug sections to enable all debugs.
+
+two more things:
+ * should SIGUSR2 be blocked when __btd_log_add/remove are executed?
+ * log code can be more generic if built-in debug section was also
+   registered via __btd_log_add() from main.c and not kept in log.c
+
+What do you think about that?
+Comments are welcome.
+
+
+Szymon Janc (3):
+  Include log.h before plugin.h
+  Enhance dynamic debug with support for external debug sections
+  Enhance plugin interface with external debug section
+
  audio/main.c           |    2 +-
  health/hdp_main.c      |    1 +
  input/main.c           |    2 +-
@@ -29,191 +70,12 @@ external plugins.
  plugins/storage.c      |    2 +-
  sap/main.c             |    1 +
  serial/main.c          |    1 +
- 13 files changed, 13 insertions(+), 9 deletions(-)
+ src/log.c              |   25 +++++++++++++++++++++++++
+ src/log.h              |    8 ++++++++
+ src/plugin.c           |   10 +++++++---
+ src/plugin.h           |    8 ++++++--
+ 17 files changed, 59 insertions(+), 14 deletions(-)
 
-diff --git a/audio/main.c b/audio/main.c
-index 745c307..f2042f0 100644
---- a/audio/main.c
-+++ b/audio/main.c
-@@ -39,8 +39,8 @@
- 
- #include "glib-helper.h"
- #include "btio.h"
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "device.h"
- #include "headset.h"
- #include "manager.h"
-diff --git a/health/hdp_main.c b/health/hdp_main.c
-index b40a37c..ae2340d 100644
---- a/health/hdp_main.c
-+++ b/health/hdp_main.c
-@@ -31,6 +31,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hdp_manager.h"
- 
-diff --git a/input/main.c b/input/main.c
-index e165ab4..33d7493 100644
---- a/input/main.c
-+++ b/input/main.c
-@@ -31,8 +31,8 @@
- 
- #include <gdbus.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "manager.h"
- 
- static GKeyFile *load_config_file(const char *file)
-diff --git a/network/main.c b/network/main.c
-index 88e77ee..17e5731 100644
---- a/network/main.c
-+++ b/network/main.c
-@@ -29,6 +29,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
-diff --git a/plugins/adaptername.c b/plugins/adaptername.c
-index 2a54cc0..ddf50d2 100644
---- a/plugins/adaptername.c
-+++ b/plugins/adaptername.c
-@@ -36,13 +36,13 @@
- #include <glib.h>
- #include <bluetooth/bluetooth.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hcid.h" /* For main_opts */
- #include "adapter.h"
- #include "manager.h"
- #include "device.h" /* Needed for storage.h */
- #include "storage.h"
--#include "log.h"
- 
- #include <sys/inotify.h>
- #define EVENT_SIZE  (sizeof (struct inotify_event))
-diff --git a/plugins/formfactor.c b/plugins/formfactor.c
-index 758d481..300e723 100644
---- a/plugins/formfactor.c
-+++ b/plugins/formfactor.c
-@@ -30,9 +30,9 @@
- 
- #include <bluetooth/bluetooth.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "adapter.h"
--#include "log.h"
- 
- #define DMI_CHASSIS_FILE "/sys/class/dmi/id/chassis_type"
- #define DMI_CHASSIS_FILE_FALLBACK "/sys/devices/virtual/dmi/id/chassis_type"
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index f86e76d..40f19aa 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -29,9 +29,9 @@
- #include <glib.h>
- #include <bluetooth/uuid.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "hcid.h"
--#include "log.h"
- #include "attrib-server.h"
- #include "att.h"
- 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index ecc0e86..da4738d 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -46,8 +46,8 @@
- #include "btio.h"
- #include "adapter.h"
- #include "device.h"
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "storage.h"
- #include "event.h"
- #include "manager.h"
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 3cdb97e..5647065 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -41,8 +41,8 @@
- #include <bluetooth/sdp_lib.h>
- #include <bluetooth/mgmt.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "adapter.h"
- #include "manager.h"
- #include "device.h"
-diff --git a/plugins/service.c b/plugins/service.c
-index d73cdea..01ed7bb 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -38,10 +38,10 @@
- 
- #include "sdpd.h"
- #include "sdp-xml.h"
-+#include "log.h"
- #include "plugin.h"
- #include "adapter.h"
- #include "error.h"
--#include "log.h"
- 
- #define SERVICE_INTERFACE "org.bluez.Service"
- 
-diff --git a/plugins/storage.c b/plugins/storage.c
-index 04a02c7..56ee04a 100644
---- a/plugins/storage.c
-+++ b/plugins/storage.c
-@@ -27,8 +27,8 @@
- 
- #include <bluetooth/bluetooth.h>
- 
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- 
- static int storage_init(void)
- {
-diff --git a/sap/main.c b/sap/main.c
-index c9c90bd..57a7028 100644
---- a/sap/main.c
-+++ b/sap/main.c
-@@ -24,6 +24,7 @@
- 
- #include <errno.h>
- #include <gdbus.h>
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
-diff --git a/serial/main.c b/serial/main.c
-index 38ded03..d640aba 100644
---- a/serial/main.c
-+++ b/serial/main.c
-@@ -29,6 +29,7 @@
- 
- #include <gdbus.h>
- 
-+#include "log.h"
- #include "plugin.h"
- #include "manager.h"
- 
 -- 
 on behalf of ST-Ericsson
 
