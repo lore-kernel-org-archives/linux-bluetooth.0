@@ -1,31 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Jul 2011 13:36:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+Date: Tue, 26 Jul 2011 13:13:29 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Rafal Michalski <michalski.raf@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] Show owner vcard in phonebook pb pull
-Message-ID: <20110726103623.GA5470@dell>
-References: <1311155904-20104-1-git-send-email-radoslawjablonski@gmail.com>
+Subject: Re: [PATCH obexd 1/6] Support for semicolon escaping
+Message-ID: <20110726101329.GF28891@dell>
+References: <1311145907-3874-1-git-send-email-michalski.raf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1311155904-20104-1-git-send-email-radoslawjablonski@gmail.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1311145907-3874-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi Rafal,
 
-On Wed, Jul 20, 2011, Radoslaw Jablonski wrote:
-> Previously 'owner' vcard was visible in vcardlisting of 'pb' but not
-> in result of pull 'pb' phonebook. Due to that, vcardlisting and pull
-> operations were returning different number of results (also return
-> values of PhonebookSize request were inconsistent)
+On Wed, Jul 20, 2011, Rafal Michalski wrote:
+> According to specification of vcard 2.1, semicolon is only character
+> which is escaped with a backslash character (in vcard's property field
+> content). This patch provides "escape_semicolon" function which handles
+> this issue.
 > ---
->  plugins/phonebook-tracker.c |    2 --
->  1 files changed, 0 insertions(+), 2 deletions(-)
+>  plugins/vcard.c |   14 ++++++++++++++
+>  1 files changed, 14 insertions(+), 0 deletions(-)
 
-The patch itself seems fine, but before applying I just wanna
-double-check if your git author email change from @nokia.com to
-@gmail.com is intentional (all your patches so far have been with
-@nokia.com).
+Doesn't compile:
+
+plugins/vcard.c:152:13: error: ‘escape_semicolon’ defined but not used [-Werror=unused-function]
+
+If you're going to add a static function you also need to have at least
+one user of it in the same patch.
 
 Johan
