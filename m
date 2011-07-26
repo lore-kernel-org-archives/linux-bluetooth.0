@@ -2,101 +2,84 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 3/3] Add thermometer driver skeleton
-Date: Tue, 26 Jul 2011 14:15:54 +0200
-Message-Id: <1311682554-21241-4-git-send-email-sancane@gmail.com>
-In-Reply-To: <1311682554-21241-3-git-send-email-sancane@gmail.com>
+Subject: [PATCH 1/3] Initial support for Health Thermometer Profile (HTP)
+Date: Tue, 26 Jul 2011 14:15:52 +0200
+Message-Id: <1311682554-21241-2-git-send-email-sancane@gmail.com>
+In-Reply-To: <1311682554-21241-1-git-send-email-sancane@gmail.com>
 References: <1311682554-21241-1-git-send-email-sancane@gmail.com>
- <1311682554-21241-2-git-send-email-sancane@gmail.com>
- <1311682554-21241-3-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am               |    3 ++-
- thermometer/manager.c     |   38 ++++++++++++++++++++++++++++++++++++--
- thermometer/thermometer.c |   41 +++++++++++++++++++++++++++++++++++++++++
- thermometer/thermometer.h |   27 +++++++++++++++++++++++++++
- 4 files changed, 106 insertions(+), 3 deletions(-)
- create mode 100644 thermometer/thermometer.c
- create mode 100644 thermometer/thermometer.h
+ Makefile.am         |    5 +++++
+ acinclude.m4        |    6 ++++++
+ bootstrap-configure |    1 +
+ thermometer/main.c  |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+), 0 deletions(-)
+ create mode 100644 thermometer/main.c
 
 diff --git a/Makefile.am b/Makefile.am
-index 87b21a6..2735728 100644
+index f61c9a8..99b48d9 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -218,7 +218,8 @@ endif
- if THERMOMETERPLUGIN
- builtin_modules += thermometer
- builtin_sources += thermometer/main.c \
--			thermometer/manager.h thermometer/manager.c
-+			thermometer/manager.h thermometer/manager.c \
-+			thermometer/thermometer.h thermometer/thermometer.c
+@@ -215,6 +215,11 @@ builtin_sources += health/hdp_main.c health/hdp_types.h \
+ 			health/hdp_util.h health/hdp_util.c
  endif
  
++if THERMOMETERPLUGIN
++builtin_modules += thermometer
++builtin_sources += thermometer/main.c
++endif
++
  builtin_modules += hciops mgmtops
-diff --git a/thermometer/manager.c b/thermometer/manager.c
-index a243de0..4fad5ed 100644
---- a/thermometer/manager.c
-+++ b/thermometer/manager.c
-@@ -24,15 +24,49 @@
-  */
+ builtin_sources += plugins/hciops.c plugins/mgmtops.c
  
- #include <gdbus.h>
-+
-+#include "adapter.h"
-+#include "device.h"
-+#include "thermometer.h"
- #include "manager.h"
+diff --git a/acinclude.m4 b/acinclude.m4
+index 68ece35..3cb9459 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -215,6 +215,7 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	sap_driver=dummy
+ 	dbusoob_enable=no
+ 	wiimote_enable=no
++	thermometer_enable=no
  
-+#define HEALTH_THERMOMETER_UUID		"00001809-0000-1000-8000-00805f9b34fb"
-+
-+static DBusConnection *connection = NULL;
-+
-+static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
-+{
-+	return thermometer_register(connection, device);
-+}
-+
-+static void thermometer_driver_remove(struct btd_device *device)
-+{
-+	thermometer_unregister(device);
-+}
-+
-+static struct btd_device_driver thermometer_device_driver = {
-+	.name	= "thermometer-device-driver",
-+	.uuids	= BTD_UUIDS(HEALTH_THERMOMETER_UUID),
-+	.probe	= thermometer_driver_probe,
-+	.remove	= thermometer_driver_remove
-+};
-+
- int thermometer_manager_init(DBusConnection *conn)
- {
--	/*TODO: */
-+	int ret;
-+
-+	ret = btd_register_device_driver(&thermometer_device_driver);
-+	if (ret < 0)
-+                return ret;
-+
-+	connection = dbus_connection_ref(conn);
- 	return 0;
- }
+ 	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization], [disable code optimization]), [
+ 		optimization_enable=${enableval}
+@@ -359,6 +360,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 		hal_enable=${enableval}
+ 	])
  
- void thermometer_manager_exit(void)
- {
--	/*TODO: */
-+	btd_unregister_device_driver(&thermometer_device_driver);
++	AC_ARG_ENABLE(thermometer, AC_HELP_STRING([--enable-thermometer], [enable thermometer plugin]), [
++		thermometer_enable=${enableval}
++	])
 +
-+	dbus_connection_unref(connection);
-+	connection = NULL;
- }
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+ 	if (test "${fortify_enable}" = "yes"); then
+ 		CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+ 	fi
+@@ -415,4 +420,5 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(MAEMO6PLUGIN, test "${maemo6_enable}" = "yes")
+ 	AM_CONDITIONAL(DBUSOOBPLUGIN, test "${dbusoob_enable}" = "yes")
+ 	AM_CONDITIONAL(WIIMOTEPLUGIN, test "${wiimote_enable}" = "yes")
++	AM_CONDITIONAL(THERMOMETERPLUGIN, test "${thermometer_enable}" = "yes")
+ ])
+diff --git a/bootstrap-configure b/bootstrap-configure
+index b0020cb..ec5d821 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -31,5 +31,6 @@ fi
+ 		--enable-test \
+ 		--enable-cups \
+ 		--enable-sap \
++		--enable-thermometer \
+ 		--disable-pcmcia \
+ 		--disable-datafiles $*
+diff --git a/thermometer/main.c b/thermometer/main.c
 new file mode 100644
-index 0000000..8b521e3
+index 0000000..c47d396
 --- /dev/null
-+++ b/thermometer/thermometer.c
-@@ -0,0 +1,41 @@
++++ b/thermometer/main.c
+@@ -0,0 +1,45 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -122,55 +105,26 @@ index 0000000..8b521e3
 + *
 + */
 +
-+#include <gdbus.h>
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+#include "adapter.h"
-+#include "device.h"
-+#include "thermometer.h"
++#include "plugin.h"
 +
-+int thermometer_register(DBusConnection *connection, struct btd_device *device)
++
++static int thermometer_init(void)
 +{
-+	/* TODO: Register Health Thermometer Interface */
++	/*TODO: */
 +	return 0;
 +}
 +
-+void thermometer_unregister(struct btd_device *device)
++static void thermometer_exit(void)
 +{
-+	/* TODO: Unregister Health Thermometer Interface */
++	/*TODO: */
 +}
-diff --git a/thermometer/thermometer.h b/thermometer/thermometer.h
-new file mode 100644
-index 0000000..2f64e21
---- /dev/null
-+++ b/thermometer/thermometer.h
-@@ -0,0 +1,27 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *  Authors:
-+ *  Santiago Carot Nemesio <sancane at gmail.com>
-+ *  Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez at gmail.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+int thermometer_register(DBusConnection *connection, struct btd_device *device);
-+void thermometer_unregister(struct btd_device *device);
++BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++					thermometer_init, thermometer_exit)
 -- 
 1.7.6
 
