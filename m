@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon@janc.net.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] Don't use cmd_timer to timeout HCI reset command
-Date: Tue, 26 Jul 2011 22:46:54 +0200
-Message-Id: <1311713214-2414-1-git-send-email-szymon@janc.net.pl>
+To: Peter Hurley <peter@hurleysoftware.com>
+Subject: Re: [PATCH] Bluetooth: Increase command tx timeout
+Date: Tue, 26 Jul 2011 21:52:23 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1311189131-8592-1-git-send-email-szymon@janc.net.pl> <1311264883.17476.65.camel@THOR>
+In-Reply-To: <1311264883.17476.65.camel@THOR>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201107262152.23761.szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No command should be send before Command Complete event for HCI
-reset is received. This fix regression introduced by commit
-6bd32326cda(Bluetooth: Use proper timer for hci command timout)
-for chips whose reset command takes longer to complete (e.g. CSR)
-resulting in next command being send before HCI reset completed.
+Hi Peter,
 
-Signed-off-by: Szymon Janc <szymon@janc.net.pl>
----
- net/bluetooth/hci_core.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+> Respectfully, I disagree that this is the correct fix for this problem.
+> 
+> After an HCI_Reset, *no* hci commands should be issued until after the
+> *successful* Command Complete is received. IMHO, the current code
+> suffers two defects:
+>   - it doesn't wait for Command Complete after the Reset command is sent
+>   - it ignores the result code from that Command Complete
+> 
+> I believe the proper fix is to _loop_ over the HCI_Reset until a
+> successful Command Complete is received.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 908fcd3..3b39198 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1209,7 +1209,6 @@ static void hci_cmd_timer(unsigned long arg)
- 
- 	BT_ERR("%s command tx timeout", hdev->name);
- 	atomic_set(&hdev->cmd_cnt, 1);
--	clear_bit(HCI_RESET, &hdev->flags);
- 	tasklet_schedule(&hdev->cmd_task);
- }
- 
-@@ -2408,7 +2407,10 @@ static void hci_cmd_task(unsigned long arg)
- 		if (hdev->sent_cmd) {
- 			atomic_dec(&hdev->cmd_cnt);
- 			hci_send_frame(skb);
--			mod_timer(&hdev->cmd_timer,
-+			if (test_bit(HCI_RESET, &hdev->flags))
-+				del_timer(&hdev->cmd_timer);
-+			else
-+				mod_timer(&hdev->cmd_timer,
- 				  jiffies + msecs_to_jiffies(HCI_CMD_TIMEOUT));
- 		} else {
- 			skb_queue_head(&hdev->cmd_q, skb);
+Yes, You've got a point.. I've already prepared and tested a proper fix and 
+will send it shortly.
+
+Thanks for advice!
+
 -- 
-1.7.5.4
-
+Szymon K. Janc
+szymon@janc.net.pl // GG: 1383435
 
