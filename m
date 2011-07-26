@@ -1,75 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Reply-To: <wyrles@ytram.com>
-From: "Tom Allebrandi" <wyrles@ytram.com>
-To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
-	<wyrles@ytram.com>
-Cc: "linux-bluetooth" <linux-bluetooth@vger.kernel.org>
-References: <AcxH8lGl8ak3xCaSSCmiX6HP8t/C5Q==>	<04f101cc47f2$652cbbf0$2f8633d0$@ytram.com> <CABBYNZ+ZS77M7-iPUx-TTO_b8MWokPgO3ATahd6Hb_otAo2TKg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+ZS77M7-iPUx-TTO_b8MWokPgO3ATahd6Hb_otAo2TKg@mail.gmail.com>
-Subject: RE: DBus APIs for HCI/L2CAP?
-Date: Tue, 26 Jul 2011 09:40:04 -0700
-Message-ID: <00b801cc4bb2$b9f2f0f0$2dd8d2d0$@ytram.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <20110726143637.GA3587@dell.ger.corp.intel.com>
+References: <1311689387-10114-1-git-send-email-prasadbhat22@gmail.com>
+	<4E2ECCF0.6050106@kernelconcepts.de>
+	<20110726143637.GA3587@dell.ger.corp.intel.com>
+Date: Tue, 26 Jul 2011 20:53:24 +0530
+Message-ID: <CA+y7xkER2Y+jJum=JBwzNcY0Pg_drvnjG_E12jDQ6kKZYbkQVw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] Initial VDP implementation.
+From: Prasad Bhat <prasadbhat22@gmail.com>
+To: Nils Faerber <nils.faerber@kernelconcepts.de>,
+	Prasad Bhat <prasadbhat22@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz  -
+Hi,
 
-Tuesday, July 26, 2011 12:27 AM, Luiz Augusto von Dentz said:
-> Hi Tom,
-> 
-> On Fri, Jul 22, 2011 at 1:05 AM, Tom Allebrandi <wyrles@ytram.com> wrote:
-> > Hi -
-> >
-> > Is there a DBus API for issuing HCI commands? I want to be able to
-> > issue vendor specific commands.
-> >
-> > Also, I want to be able set the Limited Inquiry Access Code for both
-> > discovery and discoverability. I see the Discoverable property in
-> > org.bluez.Adapter but I don't see any way to set the IAC.
-> >
-> > Similarly, is there a DBus API for L2CAP? I need to be able to
-> > manually setup channels and control the packets that I send over those
-> channels.
-> >
-> > I'm working with profiles that are not yet implemented in BlueZ. Also,
-> > I need to be able to generate malformed packets for test purposes.
-> >
-> > I'm pretty sure that I can do all of the above with BTIO or the socket
-> > interface. I'm just trying to be a good boy and use DBus :-).
-> 
-> D-Bus is not really meant for data, it is a high level/convenient API for
-> applications, so if you are trying to implement a profile you should
-probably
-> stick with sockets or use BTIO as bluetoothd and obexd does.
-> 
+On Tue, Jul 26, 2011 at 8:06 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Jul 26, 2011, Nils Faerber wrote:
+>> Am 26.07.2011 16:09, schrieb Prasad Bhat:
+>> > --- /dev/null
+>> > +++ b/audio/vdp.c
+>> > @@ -0,0 +1,2303 @@
+>> > +/*
+>> > + *
+>> > + *  BlueZ - Bluetooth protocol stack for Linux
+>> > + *
+>> > + *  Copyright (C) 2006-2010  Nokia Corporation
+>> > + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+>>
+>>
+>> I think this is your code, is it?
+>>
+>> Why do you assign the copyright to Nokia and Marcel then?
+>
+> Looking at the code it seems to a large part copy-paste + minor
+> modifications from a2dp.c, so to that extent those copyright
+> declarations would be correct. However, I would also have expected Prasad
+> to add either his personal copyright or the copyright of the company
+> that he's working for.
+>
+> Couple of other notes:
+>
+> - The patch is huge. Any chance of splitting it up into smaller chunks?
+> - Since there's so much in common with a2dp.c it'd make sense to attempt
+>  some refactoring.
+> - Now that audio/*.c does video too we might consider renaming the
+>  audio plugin and directory to something else.
+>
+> Johan
+>
 
-Ok. As I said, I'm trying to be a good boy. I've heard Marcel say words like
-"use DBus not sockets" enough times that I was starting in from that end
-:-). BTIO looks like a reasonable compromise.
+Thanks for the inputs, I will work on it and will resend it with other patches.
 
-Do you (or anyone) know if there is a Perl<->.so interface? (Perl for
-Windows has an interface package that allows arbitrary functions to be
-called from any old DLL. (I've never figured out XS.))
-
-I'm not afraid of C/C++ programming, I just do a lot of my scripted type
-stuff in Perl.
-
------
-
-In my case, I'm not actually implementing whole profiles. I'm more
-interested in creating feature/function centric parts of profiles similar to
-the way test cases work in PTS.
-
-That, and some downstack support API thingies since {system("hcitool");} is
-just clumsy.
-
-Thanks for the info.
-
-Cheers!
-
---- tom
-
-
+Regards
+Prasad
