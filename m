@@ -1,81 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 0/3] Fix debug messages logging from non-built-in plugins
-Date: Tue, 26 Jul 2011 15:57:09 +0200
-Message-ID: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 2/3] Add manager files for HTP
+Date: Tue, 26 Jul 2011 14:15:53 +0200
+Message-Id: <1311682554-21241-3-git-send-email-sancane@gmail.com>
+In-Reply-To: <1311682554-21241-2-git-send-email-sancane@gmail.com>
+References: <1311682554-21241-1-git-send-email-sancane@gmail.com>
+ <1311682554-21241-2-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+---
+ Makefile.am           |    3 ++-
+ thermometer/main.c    |   21 +++++++++++++++++++--
+ thermometer/manager.c |   38 ++++++++++++++++++++++++++++++++++++++
+ thermometer/manager.h |   27 +++++++++++++++++++++++++++
+ 4 files changed, 86 insertions(+), 3 deletions(-)
+ create mode 100644 thermometer/manager.c
+ create mode 100644 thermometer/manager.h
 
-As requested by Marcel I'm sending this as RFC and with some more comments
-from my side how this was done. Also patch is splitted to make review easier.
-
-Currently we are not able to see any debug messages from external plugins.
-This regression was introduced with dynamic debug support and mostly (probably)
-hits android platform which does build some plugins as external .so files.
-
-This is due to debug message enabling flags are stored in debug section. Main
-binary and external plugins have separated debug sections and current debug
-enabling code make use only of main binary debug section, and flags in
-external plugins are always not set.
-
-The idea to fix that is to make it possible for external plugin to 'register'
-its debug section so logging code can make use of it. This is to be done via
-__btd_log_add() function after external plugin is loaded (but before it is
-initialized). Logging code keep list and make use of them to enable
-debugging. When external plugin is unloaded its debug section is 
-deregistered with __btd_log_remove().
-
-Access to external plugin debug section is done via btd_debug_section added
-to bluetooth_plugin_desc structure. External plugins store pointers
-__start___debug and __stop___debug there. For builin plugins these field are
-not used and NULLed.
-
-This does not affect plugins loading order as built-in plugins get their
-debug intialized in main() function via __btd_log_init() and external plugins
-gets their debug section initialized in __btd_log_add() called
-from plugin_init(). __btd_toggle_debug() iterates over all built-in and
-registered external debug sections to enable all debugs.
-
-two more things:
- * should SIGUSR2 be blocked when __btd_log_add/remove are executed?
- * log code can be more generic if built-in debug section was also
-   registered via __btd_log_add() from main.c and not kept in log.c
-
-What do you think about that?
-Comments are welcome.
-
-
-Szymon Janc (3):
-  Include log.h before plugin.h
-  Enhance dynamic debug with support for external debug sections
-  Enhance plugin interface with external debug section
-
- audio/main.c           |    2 +-
- health/hdp_main.c      |    1 +
- input/main.c           |    2 +-
- network/main.c         |    1 +
- plugins/adaptername.c  |    2 +-
- plugins/formfactor.c   |    2 +-
- plugins/gatt-example.c |    2 +-
- plugins/hciops.c       |    2 +-
- plugins/mgmtops.c      |    2 +-
- plugins/service.c      |    2 +-
- plugins/storage.c      |    2 +-
- sap/main.c             |    1 +
- serial/main.c          |    1 +
- src/log.c              |   25 +++++++++++++++++++++++++
- src/log.h              |    8 ++++++++
- src/plugin.c           |   10 +++++++---
- src/plugin.h           |    8 ++++++--
- 17 files changed, 59 insertions(+), 14 deletions(-)
-
+diff --git a/Makefile.am b/Makefile.am
+index 99b48d9..87b21a6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -217,7 +217,8 @@ endif
+ 
+ if THERMOMETERPLUGIN
+ builtin_modules += thermometer
+-builtin_sources += thermometer/main.c
++builtin_sources += thermometer/main.c \
++			thermometer/manager.h thermometer/manager.c
+ endif
+ 
+ builtin_modules += hciops mgmtops
+diff --git a/thermometer/main.c b/thermometer/main.c
+index c47d396..4a0ea34 100644
+--- a/thermometer/main.c
++++ b/thermometer/main.c
+@@ -27,18 +27,35 @@
+ #include <config.h>
+ #endif
+ 
++#include <glib.h>
++#include <errno.h>
++#include <gdbus.h>
++
+ #include "plugin.h"
++#include "manager.h"
+ 
++static DBusConnection *connection = NULL;
+ 
+ static int thermometer_init(void)
+ {
+-	/*TODO: */
++	connection = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (connection == NULL)
++		return -EIO;
++
++	if (thermometer_manager_init(connection) < 0) {
++		dbus_connection_unref(connection);
++		return -EIO;
++	}
++
+ 	return 0;
+ }
+ 
+ static void thermometer_exit(void)
+ {
+-	/*TODO: */
++	thermometer_manager_exit();
++
++	dbus_connection_unref(connection);
++	connection = NULL;
+ }
+ 
+ BLUETOOTH_PLUGIN_DEFINE(thermometer, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+diff --git a/thermometer/manager.c b/thermometer/manager.c
+new file mode 100644
+index 0000000..a243de0
+--- /dev/null
++++ b/thermometer/manager.c
+@@ -0,0 +1,38 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *  Authors:
++ *  Santiago Carot Nemesio <sancane at gmail.com>
++ *  Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <gdbus.h>
++#include "manager.h"
++
++int thermometer_manager_init(DBusConnection *conn)
++{
++	/*TODO: */
++	return 0;
++}
++
++void thermometer_manager_exit(void)
++{
++	/*TODO: */
++}
+diff --git a/thermometer/manager.h b/thermometer/manager.h
+new file mode 100644
+index 0000000..8cf6fd0
+--- /dev/null
++++ b/thermometer/manager.h
+@@ -0,0 +1,27 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011 GSyC/LibreSoft, Universidad Rey Juan Carlos.
++ *  Authors:
++ *  Santiago Carot Nemesio <sancane at gmail.com>
++ *  Jorge Fernandez Gonzalez <jorge.fernandez.gonzalez at gmail.com>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int thermometer_manager_init(DBusConnection *conn);
++void thermometer_manager_exit(void);
 -- 
-on behalf of ST-Ericsson
+1.7.6
 
