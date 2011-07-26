@@ -3,9 +3,9 @@ From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
 	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 3/3] Enhance plugin interface with external debug section
-Date: Tue, 26 Jul 2011 15:57:12 +0200
-Message-ID: <1311688632-19334-4-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 2/3] Enhance dynamic debug with support for external debug sections
+Date: Tue, 26 Jul 2011 15:57:11 +0200
+Message-ID: <1311688632-19334-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
 References: <1311688632-19334-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -13,80 +13,83 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Store pointers to debug section of non-built-in plugin in
-bluetooth_plugin_desc structure. This is used to register plugin's
-debug section in logging system when plugin is not of built-in type.
+This will allow to enable debug messages whose control flag is not
+stored in debug section of main binary but i.e. in external plugin
+foo.so file.
 ---
- src/plugin.c |   10 +++++++---
- src/plugin.h |    8 ++++++--
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ src/log.c |   25 +++++++++++++++++++++++++
+ src/log.h |    8 ++++++++
+ 2 files changed, 33 insertions(+), 0 deletions(-)
 
-diff --git a/src/plugin.c b/src/plugin.c
-index 3506553..79db9b3 100644
---- a/src/plugin.c
-+++ b/src/plugin.c
-@@ -34,8 +34,8 @@
+diff --git a/src/log.c b/src/log.c
+index 2c492e9..c5e0c74 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -70,6 +70,7 @@ extern struct btd_debug_desc __start___debug[];
+ extern struct btd_debug_desc __stop___debug[];
  
- #include <glib.h>
+ static gchar **enabled = NULL;
++static GSList *ext_debugs = NULL;
  
--#include "plugin.h"
- #include "log.h"
-+#include "plugin.h"
- #include "hcid.h"
- #include "btio.h"
+ static gboolean is_enabled(struct btd_debug_desc *desc)
+ {
+@@ -89,9 +90,17 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
+ void __btd_toggle_debug(void)
+ {
+ 	struct btd_debug_desc *desc;
++	GSList *l;
  
-@@ -202,7 +202,9 @@ gboolean plugin_init(GKeyFile *config, const char *enable, const char *disable)
- 			continue;
- 		}
+ 	for (desc = __start___debug; desc < __stop___debug; desc++)
+ 		desc->flags |= BTD_DEBUG_FLAG_PRINT;
++
++	for (l = ext_debugs; l; l = l->next) {
++		struct btd_debug_section *debug = l->data;
++
++		for (desc = debug->start; desc < debug->stop; desc++)
++			desc->flags |= BTD_DEBUG_FLAG_PRINT;
++	}
+ }
  
--		if (add_plugin(handle, desc) == FALSE)
-+		if (add_plugin(handle, desc) == TRUE)
-+			__btd_log_add(&desc->debug);
-+		else
- 			dlclose(handle);
- 	}
+ void __btd_log_init(const char *debug, int detach)
+@@ -120,3 +129,19 @@ void __btd_log_cleanup(void)
  
-@@ -239,8 +241,10 @@ void plugin_cleanup(void)
- 		if (plugin->active == TRUE && plugin->desc->exit)
- 			plugin->desc->exit();
+ 	g_strfreev(enabled);
+ }
++
++void __btd_log_add(struct btd_debug_section *debug)
++{
++	struct btd_debug_desc *desc;
++
++	ext_debugs = g_slist_prepend(ext_debugs, debug);
++
++	for (desc = debug->start; desc < debug->stop; desc++)
++		if (is_enabled(desc))
++			desc->flags |= BTD_DEBUG_FLAG_PRINT;
++}
++
++void __btd_log_remove(struct btd_debug_section *debug)
++{
++	ext_debugs = g_slist_remove(ext_debugs, debug);
++}
+diff --git a/src/log.h b/src/log.h
+index 78bbdd8..1f2d13d 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -37,6 +37,14 @@ struct btd_debug_desc {
+ 	unsigned int flags;
+ } __attribute__((aligned(8)));
  
--		if (plugin->handle != NULL)
-+		if (plugin->handle != NULL) {
-+			__btd_log_remove(&plugin->desc->debug);
- 			dlclose(plugin->handle);
-+		}
- 
- 		g_free(plugin);
- 	}
-diff --git a/src/plugin.h b/src/plugin.h
-index 30bd415..2327735 100644
---- a/src/plugin.h
-+++ b/src/plugin.h
-@@ -30,18 +30,22 @@ struct bluetooth_plugin_desc {
- 	int priority;
- 	int (*init) (void);
- 	void (*exit) (void);
-+	struct btd_debug_section debug;
- };
- 
- #ifdef BLUETOOTH_PLUGIN_BUILTIN
- #define BLUETOOTH_PLUGIN_DEFINE(name, version, priority, init, exit) \
- 		struct bluetooth_plugin_desc __bluetooth_builtin_ ## name = { \
--			#name, version, priority, init, exit \
-+			#name, version, priority, init, exit, { NULL, NULL } \
- 		};
- #else
- #define BLUETOOTH_PLUGIN_DEFINE(name, version, priority, init, exit) \
-+		extern struct btd_debug_desc __start___debug[]; \
-+		extern struct btd_debug_desc __stop___debug[]; \
- 		extern struct bluetooth_plugin_desc bluetooth_plugin_desc \
- 				__attribute__ ((visibility("default"))); \
- 		struct bluetooth_plugin_desc bluetooth_plugin_desc = { \
--			#name, version, priority, init, exit \
-+			#name, version, priority, init, exit, \
-+			{ __start___debug, __stop___debug } \
- 		};
- #endif
++struct btd_debug_section {
++	struct btd_debug_desc *start;
++	struct btd_debug_desc *stop;
++};
++
++void __btd_log_add(struct btd_debug_section *debug);
++void __btd_log_remove(struct btd_debug_section *debug);
++
+ /**
+  * DBG:
+  * @fmt: format string
 -- 
 on behalf of ST-Ericsson
 
