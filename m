@@ -1,55 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E2E7E0B.20006@kernelconcepts.de>
-Date: Tue, 26 Jul 2011 10:42:51 +0200
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
 MIME-Version: 1.0
-To: Peter Hurley <peter@hurleysoftware.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: RFCOMM connection lag (slow)
-References: <4E2C46CE.2060000@kernelconcepts.de>	 <1311527208.2657.27.camel@THOR> <4E2C5D32.5030108@kernelconcepts.de>	 <4E2C67A1.7060601@kernelconcepts.de> <1311535249.4311.25.camel@THOR>
-In-Reply-To: <1311535249.4311.25.camel@THOR>
+In-Reply-To: <20110726081121.GD9775@dell>
+References: <1309790985-32143-1-git-send-email-bulislaw@linux.com>
+	<CABBYNZ+B_dDGRnoic6xyn4N1kRpOPTGrMJ7xBkmB7M=ZBsZzDQ@mail.gmail.com>
+	<CAPGrrxVT-xugggk_CcNn_Zd+ZSJjuVPrMn64XVnNoUqK2sm60Q@mail.gmail.com>
+	<CABBYNZJHkqk5dQZrYzNiVTs4Fdx8WUk70CfAzLbVHhUHWuos+Q@mail.gmail.com>
+	<CAPGrrxV_hpVhsp2pkkSgy+oSgeRNSxz3WP4hk8AzjjjZZH+j6g@mail.gmail.com>
+	<CAPGrrxUwYsRXkaYomM5FS+OJLt7fL4u-DKKASNx76Of3wg6fcQ@mail.gmail.com>
+	<20110726081121.GD9775@dell>
+Date: Tue, 26 Jul 2011 10:17:18 +0200
+Message-ID: <CAPGrrxX8brOU5OxXuNR5NGhV2twF293-SqgySb3mgBCHw9jtCQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Add SetRemoteProperty method for OOB mechanism
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 24.07.2011 21:20, schrieb Peter Hurley:
-> On Sun, 2011-07-24 at 14:42 -0400, Nils Faerber wrote:
->> Am 24.07.2011 19:58, schrieb Nils Faerber:
->>> Am 24.07.2011 19:06, schrieb Peter Hurley:
->>>> 1. What does an hcidump -tX of the session say?
->>>
->>> The complete log would be a little longer.
->>> Is there something special that I could watch for?
-> ...
+Hi Johan,
+OK, I'll change it probably tomorrow.
+
+On Tue, Jul 26, 2011 at 10:11 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bartosz,
+>
+> On Wed, Jul 06, 2011, Bartosz Szatkowski wrote:
+>> On Tue, Jul 5, 2011 at 11:59 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> > On Tue, Jul 5, 2011 at 11:51 AM, Luiz Augusto von Dentz
+>> >> On Tue, Jul 5, 2011 at 11:55 AM, Bartosz Szatkowski <bulislaw@linux.com> wrote:
+>> >>> Right, i'v discussed this approach with Johan and Szymon on freenode
+>> >>> -- i'v changed few things after that (mostly because implementing it
+>> >>> in AddRemoteData would break api, so i moved it to separate method) --
+>> >>> maybe it would be a good idea to have this functionality now in this
+>> >>> form and change it when the api break would be possible (5.0?)?
+>> >>
+>> >> Apparently the idea is to use this interface is to emulate a
+>> >> DeviceFound result, which I guess would make sense if the user pairs
+>> >> using the bt application/agent, but in the other hand this can be
+>> >> misused by application and they actually start overwriting device
+>> >> properties e.g. restore tool. So the question is how much do we trust
+>> >> application to provide this information without properly creating a
+>> >> device? To me it sounds that we either need the agent to actually
+>> >> accept this information as valid, which btw normally requires an
+>> >> object path to identify the device to query its properties, or we do
+>> >> it all together as I suggested in CreateDevice so we validate the
+>> >> information by pairing/connecting to the device.
+>> >>
+>> >> Btw, there is also the problem that D-Bus round trips are expensive
+>> >> and with such API one have to set one by one the properties to finally
+>> >> do a CreateDevice in the end, so at least the current design should
+>> >> make sure that an application can set all its known properties in one
+>> >> call e.g. SetRemoteProperties(string address, dict properties).
+>> >
+>> > Yeah it sound good, but are we sure that there is need for setting
+>> > other parameters via OOB? The idea that was cleared on irc wast to add
+>> > CoD parameter to OOB.AddRemoteData(address, hash, randomizer, CoD)
 >>
->> Why does the hcidump from Linux not show RFCOMM(d) parts like the G1 dump?
-> 
-> The new l2cap code now sets the first ACL data packet
-> Packet_Boundary_Flag to 'not automatically flushable' on l2cap channels
-> not marked flushable (the default is not flushable).
-> 
-> The decode of this in hcidump was fixed back in February. 
+>> Is there any conclusion ? :)
+>> Are we leaving it that way or changing it as Luiz suggested (array)?
+>> Or maybe something else?
+>
+> For things like name and class (I suppose a list of UUIDs can also come
+> through the OOB data?). I think a single method call taking a dictionary
+> would be best. For the hash and randomizer, we could either keep the
+> existing method, or just define new "Hash" and "Rand" dictionary
+> entries. Since it's likely that all of this data comes in the same
+> instant over OOB I'm leaning towards the later solution.
+>
+> Johan
+>
 
-OK, great, with a new one I see the RFCOMM now, thanks!
 
-I also found another hint towards the RFCOMM lag...
-If I disable SNIFF on the Linux side it behaves normal again. Once it
-has entered SNIFF mode for the first time the connection starts to lag.
-
-So I am almost suspecting not an RFCOMM but rather HCI/SNIFF issue and
-this is most likely caused by the Bluetooth device rather the Linux
-host. I just can not come up with an explanation why it work including
-SNIFF from the older HTC G1 - there the Linux kernel is for sure much
-older than on my notebook. Did something concerning SNIFF mode change
-more or less recently?
-
-> Regards,
-> Peter
-Cheers
-  nils
 
 -- 
-kernel concepts GbR        Tel: +49-271-771091-12
-Sieghuetter Hauptweg 48
-D-57072 Siegen             Mob: +49-176-21024535
-http://www.kernelconcepts.de
+Pozdrowienia,
+Bartosz Szatkowski
