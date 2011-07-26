@@ -1,42 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 26 Jul 2011 13:47:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] Fix pulling phonebook size
+Message-ID: <20110726104752.GD5470@dell>
+References: <1311368287-5284-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <20110726103623.GA5470@dell>
-References: <1311155904-20104-1-git-send-email-radoslawjablonski@gmail.com>
-	<20110726103623.GA5470@dell>
-Date: Tue, 26 Jul 2011 13:07:10 +0200
-Message-ID: <CADUB2Y66LROsZYO=Z__yr-UfawKNPg6hfTb_s8ZvwnN-Bn233A@mail.gmail.com>
-Subject: Re: [PATCH obexd] Show owner vcard in phonebook pb pull
-From: Radek <radoslawjablonski@gmail.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1311368287-5284-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Bartosz,
 
-On Tue, Jul 26, 2011 at 12:36 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Radek,
->
-> On Wed, Jul 20, 2011, Radoslaw Jablonski wrote:
->> Previously 'owner' vcard was visible in vcardlisting of 'pb' but not
->> in result of pull 'pb' phonebook. Due to that, vcardlisting and pull
->> operations were returning different number of results (also return
->> values of PhonebookSize request were inconsistent)
->> ---
->>  plugins/phonebook-tracker.c |    2 --
->>  1 files changed, 0 insertions(+), 2 deletions(-)
->
-> The patch itself seems fine, but before applying I just wanna
-> double-check if your git author email change from @nokia.com to
-> @gmail.com is intentional (all your patches so far have been with
-> @nokia.com).
-Yes, that change of email is intentional - all my patches now will be sent
-using gmail account (network configutation issues - problem with using
-@nokia account outside Finland:) )
+On Fri, Jul 22, 2011, Bartosz Szatkowski wrote:
+> ---
+>  plugins/phonebook-ebook.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
+> index 9cb32c3..91d0c0b 100644
+> --- a/plugins/phonebook-ebook.c
+> +++ b/plugins/phonebook-ebook.c
+> @@ -180,7 +180,7 @@ static void ebookpull_cb(EBook *book, const GError *gerr, GList *contacts,
+>  	 */
+>  	maxcount = data->params->maxlistcount;
+>  	if (maxcount == 0) {
+> -		count += g_list_length(contacts);
+> +		data->count += g_list_length(contacts);
+>  		goto done;
+>  	}
 
-BR,
-Radek
->
-> Johan
->
+Since you're doing this I suppose it also makes sense to move the
+initialization of the count variable (to 0) to the initialization part
+of the for loop in the same function.
+
+Johan
