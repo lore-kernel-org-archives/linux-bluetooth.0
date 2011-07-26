@@ -1,32 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1311188278-7747-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1311188278-7747-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Tue, 26 Jul 2011 19:12:37 -0300
-Message-ID: <CAJdJm_PqNP3M4aEiVamdiB+9cAQN8HaU998SyVHdMYt3i-Q+FA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] Simplify the handling of attribute callbacks
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	Szymon Janc <szymon@janc.net.pl>
+Subject: [PATCH] Don't use cmd_timer to timeout HCI reset command
+Date: Tue, 26 Jul 2011 22:46:54 +0200
+Message-Id: <1311713214-2414-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+No command should be send before Command Complete event for HCI
+reset is received. This fix regression introduced by commit
+6bd32326cda(Bluetooth: Use proper timer for hci command timout)
+for chips whose reset command takes longer to complete (e.g. CSR)
+resulting in next command being send before HCI reset completed.
 
-On Wed, Jul 20, 2011 at 3:57 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
->
-> If we add a way for a attribute to store its own callbacks we can
-> simplify the handling of custom callbacks.
+Signed-off-by: Szymon Janc <szymon@janc.net.pl>
+---
+ net/bluetooth/hci_core.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-Please ignore the two patches in this series. We are currently
-designing a new approach which would deprecate the changes added in
-this code.
-
-Regards,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 908fcd3..3b39198 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1209,7 +1209,6 @@ static void hci_cmd_timer(unsigned long arg)
+ 
+ 	BT_ERR("%s command tx timeout", hdev->name);
+ 	atomic_set(&hdev->cmd_cnt, 1);
+-	clear_bit(HCI_RESET, &hdev->flags);
+ 	tasklet_schedule(&hdev->cmd_task);
+ }
+ 
+@@ -2408,7 +2407,10 @@ static void hci_cmd_task(unsigned long arg)
+ 		if (hdev->sent_cmd) {
+ 			atomic_dec(&hdev->cmd_cnt);
+ 			hci_send_frame(skb);
+-			mod_timer(&hdev->cmd_timer,
++			if (test_bit(HCI_RESET, &hdev->flags))
++				del_timer(&hdev->cmd_timer);
++			else
++				mod_timer(&hdev->cmd_timer,
+ 				  jiffies + msecs_to_jiffies(HCI_CMD_TIMEOUT));
+ 		} else {
+ 			skb_queue_head(&hdev->cmd_q, skb);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.5.4
+
+
