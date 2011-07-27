@@ -1,27 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Jul 2011 00:48:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Tom Rini <tom_rini@mentor.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Makefile.am: Mark local_headers as BUILT_SOURCES
-Message-ID: <20110727214831.GA6175@dell.Elisa>
-References: <1310224253-4557-1-git-send-email-tom_rini@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1310224253-4557-1-git-send-email-tom_rini@mentor.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 6/6] Return LinkLossAlertLevel if enabled
+Date: Wed, 27 Jul 2011 18:53:06 -0300
+Message-Id: <1311803586-5405-7-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tom,
+GetProperties method of Proximity Monitor should not append the
+LinkLossAlertLevel property if the LinkLoss service is not enabled
+in the configuration file.
+---
+ proximity/monitor.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-On Sat, Jul 09, 2011, Tom Rini wrote:
-> As these files are auto-generated they need to be marked as BUILT_SOURCES
-> so that we don't run into a build race later on.  lib/bluetooth is removed
-> by clean-local so this doesn't need to be in CLEAN_FILES
-> ---
->  Makefile.am |    5 ++---
->  1 files changed, 2 insertions(+), 3 deletions(-)
+diff --git a/proximity/monitor.c b/proximity/monitor.c
+index 5aa954d..96a2ee1 100644
+--- a/proximity/monitor.c
++++ b/proximity/monitor.c
+@@ -229,8 +229,9 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ 
+-	dict_append_entry(&dict, "LinkLossAlertLevel",
+-			DBUS_TYPE_STRING, &monitor->linklosslevel);
++	if (monitor->enabled.linkloss)
++		dict_append_entry(&dict, "LinkLossAlertLevel",
++				DBUS_TYPE_STRING, &monitor->linklosslevel);
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+-- 
+1.7.6
 
-The patch has now (finally) been pushed upstream. Thanks.
-
-Johan
