@@ -2,37 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 6/6] Return LinkLossAlertLevel if enabled
-Date: Wed, 27 Jul 2011 18:53:06 -0300
-Message-Id: <1311803586-5405-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/6] Add Tx Power and Immediate Alert UUID
+Date: Wed, 27 Jul 2011 18:53:02 -0300
+Message-Id: <1311803586-5405-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GetProperties method of Proximity Monitor should not append the
-LinkLossAlertLevel property if the LinkLoss service is not enabled
-in the configuration file.
+Changes Proximity Monitor driver declaration adding the Tx Power and
+Immediate Alert UUIDs. UUIDs are required to support Path Loss and
+Find ME.
 ---
- proximity/monitor.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ proximity/manager.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/proximity/monitor.c b/proximity/monitor.c
-index 5aa954d..96a2ee1 100644
---- a/proximity/monitor.c
-+++ b/proximity/monitor.c
-@@ -229,8 +229,9 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
- 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+diff --git a/proximity/manager.c b/proximity/manager.c
+index 8d0aee1..98ac59f 100644
+--- a/proximity/manager.c
++++ b/proximity/manager.c
+@@ -35,7 +35,9 @@
+ #include "reporter.h"
+ #include "manager.h"
  
--	dict_append_entry(&dict, "LinkLossAlertLevel",
--			DBUS_TYPE_STRING, &monitor->linklosslevel);
-+	if (monitor->enabled.linkloss)
-+		dict_append_entry(&dict, "LinkLossAlertLevel",
-+				DBUS_TYPE_STRING, &monitor->linklosslevel);
+-#define LINK_LOSS_UUID "00001803-0000-1000-8000-00805f9b34fb"
++#define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
++#define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
++#define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
  
- 	dbus_message_iter_close_container(&iter, &dict);
+ static DBusConnection *connection = NULL;
  
+@@ -51,7 +53,7 @@ static void attio_device_remove(struct btd_device *device)
+ 
+ static struct btd_device_driver monitor_driver = {
+ 	.name = "Proximity GATT Driver",
+-	.uuids = BTD_UUIDS(LINK_LOSS_UUID),
++	.uuids = BTD_UUIDS(IMMEDIATE_ALERT_UUID, LINK_LOSS_UUID, TX_POWER_UUID),
+ 	.probe = attio_device_probe,
+ 	.remove = attio_device_remove,
+ };
 -- 
 1.7.6
 
