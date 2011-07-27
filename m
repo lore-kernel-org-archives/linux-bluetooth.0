@@ -2,26 +2,22 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH v2 obexd] Make mime type matching case-insensitive
-Date: Wed, 27 Jul 2011 17:02:07 +0200
-Message-Id: <1311778927-8002-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1311778652-7652-1-git-send-email-lkslawek@gmail.com>
-References: <1311778652-7652-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd] Make mime type matching case-insensitive
+Date: Wed, 27 Jul 2011 16:57:32 +0200
+Message-Id: <1311778652-7652-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This makes mime type checking performed inside plugins case-insensitive, to
 be in line with d37af12d8cb76d1eb893955938cb6475333dddb9.
 ---
-v2: add check for non-NULL type in ftp.c:get_by_type()
-
  plugins/ftp.c  |    2 +-
  plugins/opp.c  |    2 +-
  plugins/pbap.c |    6 +++---
  3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/plugins/ftp.c b/plugins/ftp.c
-index 2ec008f..8e17b6f 100644
+index 2ec008f..08d4e34 100644
 --- a/plugins/ftp.c
 +++ b/plugins/ftp.c
 @@ -179,7 +179,7 @@ static int get_by_type(struct ftp_session *ftp, const char *type)
@@ -29,7 +25,7 @@ index 2ec008f..8e17b6f 100644
  		return -EBADR;
  
 -	if (g_strcmp0(type, CAP_TYPE) == 0)
-+	if (type != NULL && g_ascii_strcasecmp(type, CAP_TYPE) == 0)
++	if (g_ascii_strcasecmp(type, CAP_TYPE) == 0)
  		return obex_get_stream_start(os, capability);
  
  	path = g_build_filename(ftp->folder, name, NULL);
