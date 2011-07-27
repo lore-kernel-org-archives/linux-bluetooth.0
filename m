@@ -1,71 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: =?UTF-8?b?xYF1a2Fzeg==?= Stelmach <stlman@poczta.fm>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH] Bluetooth: use recommended LE connection parameters
-Date: Wed, 27 Jul 2011 18:40:09 -0300
-Message-Id: <1311802809-10565-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: =?UTF-8?b?xYF1a2Fzeg==?= Stelmach <stlman@poczta.fm>
+Subject: [PATCH] Fix off-by-one error in form factor detection.
+Date: Wed, 27 Jul 2011 22:55:31 +0200
+Message-Id: <1311800131-11121-1-git-send-email-stlman@poczta.fm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The new connection parameters now match the recommended values for
-Proximity and Health Thermometer profiles. The previous values were
-ramdomly chosen, and are either too low or too high for most cases.
+The keywords we are looking for are at odd positions.
 
-New values:
-
-Scan Interval: 60 ms
-Scan Window: 30 ms
-Minimum Connection Interval: 50 ms
-Maximum Connection Interval: 70 ms
-Supervision Timeout: 420 ms
-
-See "Table 5.2: Recommended Scan Interval and Scan Window Values" and
-"Table 5.3: Recommended Connection Interval Values" for both profiles
-for details. Note that the "fast connection" parameters were chosen,
-because we do not support yet dynamically changing these parameters from
-initiator side.
-
-Additionally, the Proximity profile recommends (section "4.4 Alert on
-Link Loss"):
-
-"It is recommended that the Link Supervision Timeout (LSTO) is set to 6x
-the connection interval."
-
-Minimum_CE_Length and Maximum_CE_Length were also changed from 0x0001 to
-0x0000 because they are informational and optional, and old value was
-not reflecting reality.
+Signed-off-by: Łukasz Stelmach <stlman@poczta.fm>
 ---
- net/bluetooth/hci_conn.c |   14 +++++++-------
- 1 files changed, 7 insertions(+), 7 deletions(-)
+ plugins/formfactor.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ea7f031..fa6820e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -56,15 +56,15 @@ static void hci_le_connect(struct hci_conn *conn)
- 	conn->sec_level = BT_SECURITY_LOW;
+diff --git a/plugins/formfactor.c b/plugins/formfactor.c
+index 758d481..33a8b32 100644
+--- a/plugins/formfactor.c
++++ b/plugins/formfactor.c
+@@ -104,7 +104,7 @@ static int formfactor_probe(struct btd_adapter *adapter)
+ 		return 0;
+ 	}
  
- 	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = cpu_to_le16(0x0004);
--	cp.scan_window = cpu_to_le16(0x0004);
-+	cp.scan_interval = cpu_to_le16(0x0060);
-+	cp.scan_window = cpu_to_le16(0x0030);
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
--	cp.conn_interval_min = cpu_to_le16(0x0008);
--	cp.conn_interval_max = cpu_to_le16(0x0100);
--	cp.supervision_timeout = cpu_to_le16(0x0064);
--	cp.min_ce_len = cpu_to_le16(0x0001);
--	cp.max_ce_len = cpu_to_le16(0x0001);
-+	cp.conn_interval_min = cpu_to_le16(0x0028);
-+	cp.conn_interval_max = cpu_to_le16(0x0038);
-+	cp.supervision_timeout = cpu_to_le16(0x002a);
-+	cp.min_ce_len = cpu_to_le16(0x0000);
-+	cp.max_ce_len = cpu_to_le16(0x0000);
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
- }
+-	formfactor = chassis_map[chassis_type * 2];
++	formfactor = chassis_map[chassis_type * 2 + 1];
+ 	if (formfactor != NULL) {
+ 		if (g_str_equal(formfactor, "laptop") == TRUE)
+ 			minor |= (1 << 2) | (1 << 3);
 -- 
-1.7.0.4
+1.7.3.4
 
+
+----------------------------------------------------------------
+Najwieksza baza samochodow nowych i uzywanych
+Sprawdz >> http://linkint.pl/f29e3
