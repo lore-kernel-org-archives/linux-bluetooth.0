@@ -2,39 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 0/6] Proximity configs and LinkLoss alert write
-Date: Wed, 27 Jul 2011 18:53:00 -0300
-Message-Id: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 5/6] Return an error if LinkLoss is disabled
+Date: Wed, 27 Jul 2011 18:53:05 -0300
+Message-Id: <1311803586-5405-6-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dependency: "[PATCH BlueZ 0/5] Add Get/Set Property for Link Loss"
+Changes SetProperty method of the Proximity Monitor to verify if the
+LinkLoss service is enabled before allowing to change the alert level.
+Not available error is returned if LinkLoss service is disabled in the
+Proximity configuration file.
+---
+ proximity/monitor.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-The following patches implement the configuration file to allow
-disabling Proximity Monitor services and Find Me. First patch using
-attio connection callback registration mechanism to write Link Loss
-Alert level.
-
-Anderson Lizardo (1):
-  Proximity Monitor: Write Alert Level to Reporter
-
-Claudio Takahasi (5):
-  Add Tx Power and Immediate Alert UUID
-  Add config file for proximity monitor
-  Match probed UUIDs and enabled services
-  Return an error if LinkLoss is disabled
-  Return LinkLossAlertLevel if enabled
-
- Makefile.am              |    4 +-
- proximity/main.c         |   30 ++++++++++++-
- proximity/manager.c      |   52 ++++++++++++++++++++--
- proximity/manager.h      |    2 +-
- proximity/monitor.c      |  108 ++++++++++++++++++++++++++++++++++++++++++++-
- proximity/monitor.h      |    9 +++-
- proximity/proximity.conf |    9 ++++
- 7 files changed, 201 insertions(+), 13 deletions(-)
- create mode 100644 proximity/proximity.conf
-
+diff --git a/proximity/monitor.c b/proximity/monitor.c
+index 6cea5df..5aa954d 100644
+--- a/proximity/monitor.c
++++ b/proximity/monitor.c
+@@ -240,6 +240,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ static DBusMessage *set_property(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
++	struct monitor *monitor = data;
+ 	const char *property;
+ 	DBusMessageIter iter;
+ 	DBusMessageIter sub;
+@@ -259,6 +260,9 @@ static DBusMessage *set_property(DBusConnection *conn,
+ 	dbus_message_iter_recurse(&iter, &sub);
+ 
+ 	if (g_str_equal("LinkLossAlertLevel", property)) {
++		if (monitor->enabled.linkloss == FALSE)
++			return btd_error_not_available(msg);
++
+ 		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
+ 			return btd_error_invalid_args(msg);
+ 
 -- 
 1.7.6
 
