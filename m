@@ -1,48 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "Hedberg, Johan" <johan.hedberg@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 27 Jul 2011 11:05:13 +0800
-Subject: RE: [PATCH] fixing crash in irmc.c when vcard=0
-Message-ID: <CE761E84DADF2947A4AF22FB8D97A473697B5976@shsmsx501.ccr.corp.intel.com>
-References: <1310714442-14565-1-git-send-email-wu.zheng@intel.com>
- <20110726092909.GB28891@dell>
-In-Reply-To: <20110726092909.GB28891@dell>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1311624955-22360-5-git-send-email-anderson.lizardo@openbossa.org>
+References: <1311624955-22360-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1311624955-22360-5-git-send-email-anderson.lizardo@openbossa.org>
+Date: Tue, 26 Jul 2011 17:08:02 -0700
+Message-ID: <CAE-CKujoGHF+8PgnhKZyXdQ1+eVjYzcaFVFsAR+BcnhwBCT2Eg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] Register primary service for Immediate Alert
+From: mike tsai <mikeyhtsai@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan:
+Hi Anderson,
 
-For your comments, I will send the patch again after modifying git settings.
+>
+> +static void register_immediate_alert(void)
+> +{
+> +       uint16_t start_handle, h;
+> +       const int svc_size = 3;
+> +       uint8_t atval[256];
+> +       bt_uuid_t uuid;
+> +
+> +       start_handle = attrib_db_find_avail(svc_size);
+> +       if (start_handle == 0) {
+> +               error("Not enough free handles to register service");
+> +               return;
+> +       }
+> +
+> +       DBG("start_handle=0x%04x", start_handle);
+> +
+> +       h = start_handle;
+> +
+> +       /* Primary service definition */
+> +       bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
+> +       att_put_u16(IMMEDIATE_ALERT_SVC_UUID, &atval[0]);
+> +       attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
+> +
+> +       /* Alert level characteristic */
+> +       bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+> +       atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_WRITE;
+> +       att_put_u16(h + 1, &atval[1]);
+> +       att_put_u16(ALERT_LEVEL_CHR_UUID, &atval[3]);
+> +       attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
+> +
+> +       /* Alert level value */
+> +       bt_uuid16_create(&uuid, ALERT_LEVEL_CHR_UUID);
+> +       att_put_u8(NO_ALERT, &atval[0]);
+> +       attrib_db_add(h++, &uuid, ATT_NONE, ATT_NONE, atval, 1);
+> +
+> +       g_assert(h - start_handle == svc_size);
+> +}
+> +
+[MT] a couple things here, first, should the attrib_db_add function
+allow input parameters  "wgardrite_cb" and "read_cb"?
+        second, should this function register a write_cb for immediate
+alert characteristic? so if the client writes a value to this
+characteristic, the write_cb can be called?  And I think a signal will
+be sent to application that has registered with immediate alert
+service?
 
-Best regards
-Zheng wu
+Regards,
 
-> -----Original Message-----
-> From: Johan Hedberg [mailto:johan.hedberg@intel.com]
-> Sent: Tuesday, July 26, 2011 5:29 PM
-> To: Zheng, Wu
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] fixing crash in irmc.c when vcard=0
-> 
-> Hi,
-> 
-> On Fri, Jul 15, 2011, zheng wu wrote:
-> > When using sync profile, if getting the number of vcard is 0 in
-> server,obexd will crash.
-> > The reason is that the null point is used in query_result of
-> irmc.c.The patch is for fixing it.
-> > Signed-off-by: wu.zheng@intel.com
-> > ---
-> >  plugins/irmc.c |    4 +++-
-> >  1 files changed, 3 insertions(+), 1 deletions(-)
-> 
-> The patch itself seems ok to me, but you need to fix your git settings:
-> 
-> 1. Don't use Signed-off-by (this is only used for kernel patches).
-> 2. Format your commit message lines to max 72 characters
-> 3. Fix your git author name (first letter capitalized, etc.)
-> 
-> Johan
+Mike
