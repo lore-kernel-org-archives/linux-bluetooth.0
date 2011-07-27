@@ -1,24 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Jul 2011 10:59:03 +0300
+Date: Wed, 27 Jul 2011 10:55:19 +0300
 From: Johan Hedberg <johan.hedberg@intel.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+To: Zheng Wu <wu.zheng@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 obexd 1/2] Remove unnecessary return in add_slash func
-Message-ID: <20110727075903.GB26718@dell>
-References: <1311752388-1391-1-git-send-email-radoslawjablonski@gmail.com>
+Subject: Re: [PATCH] fixing crash in irmc.c when vcard=0
+Message-ID: <20110727075519.GA26718@dell>
+References: <1311735947-4835-1-git-send-email-wu.zheng@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1311752388-1391-1-git-send-email-radoslawjablonski@gmail.com>
+In-Reply-To: <1311735947-4835-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
+Hi,
 
-On Wed, Jul 27, 2011, Radoslaw Jablonski wrote:
+On Wed, Jul 27, 2011, Zheng Wu wrote:
+> If getting the number of vcard is 0 in sync server, obexd will crash.
+> The reason is that null point is used in query_result of irmc.c.
 > ---
->  plugins/vcard.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+>  plugins/irmc.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
-Thanks. Both patches have now been applied.
+Applied after a couple of minor cosmetic fixes. Thanks.
 
 Johan
