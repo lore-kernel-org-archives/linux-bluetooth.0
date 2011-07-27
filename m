@@ -1,39 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?b?xYF1a2Fzeg==?= Stelmach <stlman@poczta.fm>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?b?xYF1a2Fzeg==?= Stelmach <stlman@poczta.fm>
-Subject: [PATCH] Fix off-by-one error in form factor detection.
-Date: Wed, 27 Jul 2011 22:55:31 +0200
-Message-Id: <1311800131-11121-1-git-send-email-stlman@poczta.fm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAJdJm_PiY-xyV89DTqKTXBawfvDtufqn+Mz97-KNJKLsLcgTNw@mail.gmail.com>
+References: <1310986874-30015-1-git-send-email-szymon.janc@tieto.com>
+	<CAB7rCTihq=vZBhUSNvFuJmtEPU_OOCABXugZKVTnFe61TkaGMQ@mail.gmail.com>
+	<CAJdJm_PiY-xyV89DTqKTXBawfvDtufqn+Mz97-KNJKLsLcgTNw@mail.gmail.com>
+Date: Wed, 27 Jul 2011 15:56:34 -0500
+Message-ID: <CAB7rCThO2w43fN2f91fHQG6zF_Y8Yuep_BMFgBwvgtq+7a5V4w@mail.gmail.com>
+Subject: Re: [PATCH] Fix compilation with --disable-sap and glib < 2.28
+From: Mike <puffy.taco@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The keywords we are looking for are at odd positions.
+On Wed, Jul 27, 2011 at 3:48 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Mike,
+>
+> On Wed, Jul 27, 2011 at 5:05 PM, Mike <puffy.taco@gmail.com> wrote:
+>>> +#include <bluetooth/sdp.h>
+>>
+>> I must be missing something, because I'm trying to compile from git
+>> (d7f192a) and I get an error "audio/telephony-ofono.c:38: fatal error:
+>> bluetooth/sdp.h: No such file or directory". †I was previously
+>> compiling bluez 4.94 just fine. †Ideas?
+>
+> Try applying the patch from this email:
+>
+> http://article.gmane.org/gmane.linux.bluez.kernel/14625
 
-Signed-off-by: ≈Åukasz Stelmach <stlman@poczta.fm>
----
- plugins/formfactor.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/plugins/formfactor.c b/plugins/formfactor.c
-index 758d481..33a8b32 100644
---- a/plugins/formfactor.c
-+++ b/plugins/formfactor.c
-@@ -104,7 +104,7 @@ static int formfactor_probe(struct btd_adapter *adapter)
- 		return 0;
- 	}
- 
--	formfactor = chassis_map[chassis_type * 2];
-+	formfactor = chassis_map[chassis_type * 2 + 1];
- 	if (formfactor != NULL) {
- 		if (g_str_equal(formfactor, "laptop") == TRUE)
- 			minor |= (1 << 2) | (1 << 3);
--- 
-1.7.3.4
-
-
-----------------------------------------------------------------
-Najwieksza baza samochodow nowych i uzywanych
-Sprawdz >> http://linkint.pl/f29e3
+That fixes it!  Thanks!
