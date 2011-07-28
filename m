@@ -1,88 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] Bluetooth: Mark not declared l2cap_core functions as static
-Date: Thu, 28 Jul 2011 16:24:33 +0200
-Message-ID: <1311863073-12296-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1311861656.3714.13.camel@THOR>
+References: <CAJ+AEyNxFa0OeYG2qGhUXk0iQvapOJEJOZ_Nxnn0J5fZ=UdWUA@mail.gmail.com>
+	<1311861656.3714.13.camel@THOR>
+Date: Thu, 28 Jul 2011 15:02:48 +0100
+Message-ID: <CAJ+AEyN1A8Mk+h5kfX3Qr85EpUu72+kqSuBaBchBFh_xD0GxmQ@mail.gmail.com>
+Subject: Re: ACL/SCO packets not transferred to slave device with new
+ btusb/BlueZ driver
+From: Eponymous - <the.epon@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
----
- net/bluetooth/l2cap_core.c |   14 +++++++-------
- 1 files changed, 7 insertions(+), 7 deletions(-)
+Thanks. I'll give it a try.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f7f8e2c..c1d19336 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1239,7 +1239,7 @@ static void l2cap_drop_acked_frames(struct l2cap_chan *chan)
- 		__clear_retrans_timer(chan);
- }
- 
--void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
-+static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- {
- 	struct hci_conn *hcon = chan->conn->hcon;
- 	u16 flags;
-@@ -1255,7 +1255,7 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 	hci_send_acl(hcon, skb, flags);
- }
- 
--void l2cap_streaming_send(struct l2cap_chan *chan)
-+static void l2cap_streaming_send(struct l2cap_chan *chan)
- {
- 	struct sk_buff *skb;
- 	u16 control, fcs;
-@@ -1321,7 +1321,7 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u8 tx_seq)
- 	l2cap_do_send(chan, tx_skb);
- }
- 
--int l2cap_ertm_send(struct l2cap_chan *chan)
-+static int l2cap_ertm_send(struct l2cap_chan *chan)
- {
- 	struct sk_buff *skb, *tx_skb;
- 	u16 control, fcs;
-@@ -1459,7 +1459,7 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
- 	return sent;
- }
- 
--struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- {
- 	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1489,7 +1489,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
- 	return skb;
- }
- 
--struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- {
- 	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1518,7 +1518,7 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
- 	return skb;
- }
- 
--struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
-+static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
- {
- 	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1564,7 +1564,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
- 	return skb;
- }
- 
--int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- {
- 	struct sk_buff *skb;
- 	struct sk_buff_head sar_queue;
--- 
-on behalf of ST-Ericsson
-
+On Thu, Jul 28, 2011 at 3:00 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> On Thu, 2011-07-28 at 04:33 -0400, Eponymous - wrote:
+>> Thanks for your reply Peter.
+>>
+>> The problem I've got is that I work for a company testing Bluetooth so
+>> I have my hands tied as to how much information I can give - this is
+>> obviously a nightmare for both you who is trying to help me and for me
+>> who is trying to get the issue fixed :)
+>>
+>> It could be very well that the program I'm using (that used to work
+>> with BlueZ just fine when the hci_usb driver was around) is no longer
+>> compatible.
+>>
+>> I need to speak to the developers of the program I'm using to work out
+>> how they communicate with BlueZ/the chip.
+>>
+>> Cheers.
+>
+> Hi,
+>
+> The patch to the btusb driver (which may or may not fix the issue you're
+> having) is on the bluetooth-next development tree and is slated for
+> inclusion in the next kernel release (probably sometime in September,
+> based on current release cycle times).
+>
+> If your familiar with how to build a kernel module, you could grab the
+> patch from this list here:
+> http://permalink.gmane.org/gmane.linux.bluez.kernel/14758
+> Then rebuild 'drivers/bluetooth/btusb'.
+>
+> Let us know whether or not that resolves the problem.
+>
+> Regards,
+> Peter
+>
