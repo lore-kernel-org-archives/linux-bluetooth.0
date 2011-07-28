@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ] Fix global_mode shall be updated by plug-in
-Date: Fri, 29 Jul 2011 11:33:48 +0300
-Message-Id: <1311928428-5708-1-git-send-email-dmitriy.paliy@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 28 Jul 2011 20:09:26 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: can adapters have a say in automatic setup procedure?
+Message-ID: <20110728170926.GA5426@dell.Elisa>
+References: <CABUK1ahn-HxWWwaqO=eeYUvLoJcBRLeg1Z+sPikRTbg=zimYWQ@mail.gmail.com>
+ <20110728084948.GA13243@dell>
+ <CABUK1aiSG4JHMEB-EB+Po_oTWTpAvYPvW1Ku8rn2R=96DKnrdA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABUK1aiSG4JHMEB-EB+Po_oTWTpAvYPvW1Ku8rn2R=96DKnrdA@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, use of RequestSession and SetProperty adapter method
-calls sets global_mode to on. Switching adapter off via plug-in
-interface in this scenario releases all sessions, that, in turn,
-restores adapter's state to global_mode, which is on.
+Hi Pavan,
 
-Result is the adapter is switched off and immediately switched on.
-This patch fixes such inconsistency by overwriting global_mode to
-mode off when request comes from plug-in.
----
- src/adapter.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+On Thu, Jul 28, 2011, Pavan Savoy wrote:
+> would a patch like this work ? where in each adapter can have the
+> AUTO_ON or some better name like MGMT feature required or not....
+> I kind of understand why this one's required, but what would be the
+> effects of not having this for an adapter ?
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e1b8d5d..4c88a0e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3425,6 +3425,8 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
- 	if (adapter->off_timer)
- 		return 0;
- 
-+	adapter->global_mode = MODE_OFF;
-+
- 	if (adapter->connections == NULL)
- 		return adapter_ops->set_powered(adapter->dev_id, FALSE);
- 
--- 
-1.7.4.1
+As I mentioned a user-space that only uses the management interface
+would never know that the adapter exists in this case and would thereby
+be unable to switch it on. If we keep the model that an adapter exists
+(through the management interface) only when it has been initialized for
+the first time then we'd still need the kernel to trigger the very first
+power-on. The only idea that comes to mind for this is to have the
+kernel detect somehow when user-space is available and then proceed with
+doing the initial power-on (thereby letting user-space know about
+available adapters).
 
+Johan
