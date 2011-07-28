@@ -2,36 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 6/6] Return LinkLossAlertLevel if enabled
-Date: Thu, 28 Jul 2011 11:43:43 -0300
-Message-Id: <1311864223-16337-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1311803586-5405-7-git-send-email-claudio.takahasi@openbossa.org>
-References: <1311803586-5405-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 5/6] Return an error if LinkLoss is disabled
+Date: Thu, 28 Jul 2011 11:43:35 -0300
+Message-Id: <1311864215-16299-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1311803586-5405-6-git-send-email-claudio.takahasi@openbossa.org>
+References: <1311803586-5405-6-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GetProperties method of Proximity Monitor should not append the
-LinkLossAlertLevel property if the LinkLoss service is not enabled
-in the configuration file.
+Changes SetProperty method of the Proximity Monitor to verify if the
+LinkLoss service is enabled before allowing to change the alert level.
+Not available error is returned if LinkLoss service is disabled in the
+Proximity configuration file.
 ---
- proximity/monitor.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ proximity/monitor.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/proximity/monitor.c b/proximity/monitor.c
-index dc480ab..d068142 100644
+index 31691ff..dc480ab 100644
 --- a/proximity/monitor.c
 +++ b/proximity/monitor.c
-@@ -230,8 +230,9 @@ static DBusMessage *get_properties(DBusConnection *conn,
- 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
- 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+@@ -241,6 +241,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ static DBusMessage *set_property(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
++	struct monitor *monitor = data;
+ 	const char *property;
+ 	DBusMessageIter iter;
+ 	DBusMessageIter sub;
+@@ -260,6 +261,9 @@ static DBusMessage *set_property(DBusConnection *conn,
+ 	dbus_message_iter_recurse(&iter, &sub);
  
--	dict_append_entry(&dict, "LinkLossAlertLevel",
--			DBUS_TYPE_STRING, &monitor->linklosslevel);
-+	if (monitor->enabled.linkloss)
-+		dict_append_entry(&dict, "LinkLossAlertLevel",
-+				DBUS_TYPE_STRING, &monitor->linklosslevel);
- 
- 	dbus_message_iter_close_container(&iter, &dict);
+ 	if (g_str_equal("LinkLossAlertLevel", property)) {
++		if (monitor->enabled.linkloss == FALSE)
++			return btd_error_not_available(msg);
++
+ 		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
+ 			return btd_error_invalid_args(msg);
  
 -- 
 1.7.6
