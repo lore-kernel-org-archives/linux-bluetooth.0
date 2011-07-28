@@ -2,44 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 5/6] Return an error if LinkLoss is disabled
-Date: Thu, 28 Jul 2011 11:43:35 -0300
-Message-Id: <1311864215-16299-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1311803586-5405-6-git-send-email-claudio.takahasi@openbossa.org>
-References: <1311803586-5405-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 4/6] Match probed UUIDs and enabled services
+Date: Thu, 28 Jul 2011 11:43:26 -0300
+Message-Id: <1311864206-16263-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1311803586-5405-5-git-send-email-claudio.takahasi@openbossa.org>
+References: <1311803586-5405-5-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes SetProperty method of the Proximity Monitor to verify if the
-LinkLoss service is enabled before allowing to change the alert level.
-Not available error is returned if LinkLoss service is disabled in the
-Proximity configuration file.
+Verify if the service is enabled in the proximity configuration file
+before to register the Proximity Monitor.
 ---
- proximity/monitor.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ proximity/manager.c |   22 ++++++++++++++++------
+ proximity/monitor.c |    7 ++++++-
+ proximity/monitor.h |    9 ++++++++-
+ 3 files changed, 30 insertions(+), 8 deletions(-)
 
+diff --git a/proximity/manager.c b/proximity/manager.c
+index e3e049d..a9526a1 100644
+--- a/proximity/manager.c
++++ b/proximity/manager.c
+@@ -41,11 +41,7 @@
+ 
+ static DBusConnection *connection = NULL;
+ 
+-static struct {
+-	gboolean linkloss;
+-	gboolean pathloss;
+-	gboolean findme;
+-} enabled  = {
++static struct enabled enabled  = {
+ 	.linkloss = TRUE,
+ 	.pathloss = TRUE,
+ 	.findme = TRUE,
+@@ -53,7 +49,21 @@ static struct {
+ 
+ static int attio_device_probe(struct btd_device *device, GSList *uuids)
+ {
+-	return monitor_register(connection, device);
++	gboolean linkloss = FALSE, pathloss = FALSE, findme = FALSE;
++
++	if (g_slist_find_custom(uuids, IMMEDIATE_ALERT_UUID,
++					(GCompareFunc) strcasecmp)) {
++		findme = enabled.findme;
++		if (g_slist_find_custom(uuids, TX_POWER_UUID,
++					(GCompareFunc) strcasecmp))
++			pathloss = enabled.pathloss;
++	}
++
++	if (g_slist_find_custom(uuids, LINK_LOSS_UUID,
++				(GCompareFunc) strcasecmp))
++		linkloss = enabled.linkloss;
++
++	return monitor_register(connection, device, linkloss, pathloss, findme);
+ }
+ 
+ static void attio_device_remove(struct btd_device *device)
 diff --git a/proximity/monitor.c b/proximity/monitor.c
-index 31691ff..dc480ab 100644
+index c16385a..31691ff 100644
 --- a/proximity/monitor.c
 +++ b/proximity/monitor.c
-@@ -241,6 +241,7 @@ static DBusMessage *get_properties(DBusConnection *conn,
- static DBusMessage *set_property(DBusConnection *conn,
- 					DBusMessage *msg, void *data)
+@@ -57,6 +57,7 @@
+ struct monitor {
+ 	struct btd_device *device;
+ 	GAttrib *attrib;
++	struct enabled enabled;
+ 	char *linklosslevel;		/* Link Loss Alert Level */
+ };
+ 
+@@ -291,7 +292,8 @@ static void monitor_destroy(gpointer user_data)
+ 	g_free(monitor);
+ }
+ 
+-int monitor_register(DBusConnection *conn, struct btd_device *device)
++int monitor_register(DBusConnection *conn, struct btd_device *device,
++			gboolean linkloss, gboolean pathloss, gboolean findme)
  {
-+	struct monitor *monitor = data;
- 	const char *property;
- 	DBusMessageIter iter;
- 	DBusMessageIter sub;
-@@ -260,6 +261,9 @@ static DBusMessage *set_property(DBusConnection *conn,
- 	dbus_message_iter_recurse(&iter, &sub);
+ 	const char *path = device_get_path(device);
+ 	struct monitor *monitor;
+@@ -306,6 +308,9 @@ int monitor_register(DBusConnection *conn, struct btd_device *device)
+ 	monitor = g_new0(struct monitor, 1);
+ 	monitor->device = btd_device_ref(device);
+ 	monitor->linklosslevel = (level ? : g_strdup("none"));
++	monitor->enabled.linkloss = linkloss;
++	monitor->enabled.pathloss = pathloss;
++	monitor->enabled.findme = findme;
  
- 	if (g_str_equal("LinkLossAlertLevel", property)) {
-+		if (monitor->enabled.linkloss == FALSE)
-+			return btd_error_not_available(msg);
+ 	if (g_dbus_register_interface(conn, path,
+ 				PROXIMITY_INTERFACE,
+diff --git a/proximity/monitor.h b/proximity/monitor.h
+index 5c6ebf6..ef47ee1 100644
+--- a/proximity/monitor.h
++++ b/proximity/monitor.h
+@@ -22,5 +22,12 @@
+  *
+  */
+ 
+-int monitor_register(DBusConnection *conn, struct btd_device *device);
++struct enabled {
++	gboolean linkloss;
++	gboolean pathloss;
++	gboolean findme;
++};
 +
- 		if (dbus_message_iter_get_arg_type(&sub) != DBUS_TYPE_STRING)
- 			return btd_error_invalid_args(msg);
- 
++int monitor_register(DBusConnection *conn, struct btd_device *device,
++			gboolean linkloss, gboolean pathloss, gboolean findme);
+ void monitor_unregister(DBusConnection *conn, struct btd_device *device);
 -- 
 1.7.6
 
