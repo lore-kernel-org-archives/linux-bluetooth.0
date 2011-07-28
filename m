@@ -1,62 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 28 Jul 2011 09:44:17 -0300
-Message-ID: <CAKT1EBfK1P7oJpLrm2HNTQTOKoN0Z+6mh7BoeaVeA8gUQpD49g@mail.gmail.com>
-Subject: Current status on BLE development
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: chen.ganir@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Chen Ganir <chen.ganir@ti.com>
+Subject: [PATCH] Bluetooth-next:Fixed wrong L2CAP Sock timer value
+Date: Thu, 28 Jul 2011 15:42:09 +0300
+Message-Id: <1311856929-10464-1-git-send-email-chen.ganir@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Chen Ganir <chen.ganir@ti.com>
 
-It is common to see questions in the ML or in the IRC asking the
-status of BLE development and where the get the source code.
-Below a short summary of our latest development on Bluetooth Low Energy:
+L2CAP connection timeout needs to be assigned as miliseconds
+and not as jiffies.
 
-* Discovery procedure over management interface (kernel): patches sent
-to the mailing list, waiting maintainer approval
+Signed-off-by: Chen Ganir <chen.ganir@ti.com>
+---
+ net/bluetooth/l2cap_sock.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-* SM(Security Manager): kernel & userspace
-- Just Works key generation method is working and accepted upstream;
-- Key Exchange and Storage: a first version of the implementation is
-implemented and working, but before being accepted upstream it needs
-some changes;
-- Passkey Entry: Still not implemented;
-- Out of Band: Still not implemented;
-- Address Resolution: Planned but still not implemented;
-- Command Signing: Still not implemented;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5c36b3e..e5e8db9 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -993,7 +993,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock, int p
+ 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
+ 
+ 	sk->sk_destruct = l2cap_sock_destruct;
+-	sk->sk_sndtimeo = msecs_to_jiffies(L2CAP_CONN_TIMEOUT);
++	sk->sk_sndtimeo = L2CAP_CONN_TIMEOUT;
+ 
+ 	sock_reset_flag(sk, SOCK_ZAPPED);
+ 
+-- 
+1.7.4.1
 
-* LE connection improvements: under development
-
-Proximity Monitor
-=============
-* Userspace
-- New D-Bus API(improvement) was proposed and implemented, patches not
-upstream[3]
-
-* Kernel
-- New RSSI Threshold Monitoring implemented. Required by Proximity
-Path Loss. Under internal revision and will be sent to mailing list
-after it.
-
-git trees
-===============
-* For stable LE support on kernel, use Gustavo Padovan's
-bluetooth-next tree:
-git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next-2.6.git
-(it doesn't contain the patches for interleaved discovery using
-management. Missing SM key distribution(SM phase 3).
-
-* Unstable kernel with Interleaved Discovery, RSSI Threshold monitor,
-remaining SM patches, changes in connection parameters based on
-Proximity and Thermometer requirements:
-http://git.infradead.org/users/vcgomes/linux-2.6.git (branch
-proximity-integration)
-
-* BlueZ Userspace
-[3] git://git.infradead.org/users/cktakahasi/bluez.git proximity-devel
-
-Regards,
-Claudio
