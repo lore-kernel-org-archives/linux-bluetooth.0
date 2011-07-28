@@ -1,53 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1311861656.3714.13.camel@THOR>
-References: <CAJ+AEyNxFa0OeYG2qGhUXk0iQvapOJEJOZ_Nxnn0J5fZ=UdWUA@mail.gmail.com>
-	<1311861656.3714.13.camel@THOR>
-Date: Thu, 28 Jul 2011 15:02:48 +0100
-Message-ID: <CAJ+AEyN1A8Mk+h5kfX3Qr85EpUu72+kqSuBaBchBFh_xD0GxmQ@mail.gmail.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Eponymous - <the.epon@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 28 Jul 2011 10:00:56 -0400
 Subject: Re: ACL/SCO packets not transferred to slave device with new
  btusb/BlueZ driver
-From: Eponymous - <the.epon@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1311861656.3714.13.camel@THOR>
+References: <CAJ+AEyNxFa0OeYG2qGhUXk0iQvapOJEJOZ_Nxnn0J5fZ=UdWUA@mail.gmail.com>
+In-Reply-To: <CAJ+AEyNxFa0OeYG2qGhUXk0iQvapOJEJOZ_Nxnn0J5fZ=UdWUA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks. I'll give it a try.
-
-On Thu, Jul 28, 2011 at 3:00 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> On Thu, 2011-07-28 at 04:33 -0400, Eponymous - wrote:
->> Thanks for your reply Peter.
->>
->> The problem I've got is that I work for a company testing Bluetooth so
->> I have my hands tied as to how much information I can give - this is
->> obviously a nightmare for both you who is trying to help me and for me
->> who is trying to get the issue fixed :)
->>
->> It could be very well that the program I'm using (that used to work
->> with BlueZ just fine when the hci_usb driver was around) is no longer
->> compatible.
->>
->> I need to speak to the developers of the program I'm using to work out
->> how they communicate with BlueZ/the chip.
->>
->> Cheers.
->
-> Hi,
->
-> The patch to the btusb driver (which may or may not fix the issue you're
-> having) is on the bluetooth-next development tree and is slated for
-> inclusion in the next kernel release (probably sometime in September,
-> based on current release cycle times).
->
-> If your familiar with how to build a kernel module, you could grab the
-> patch from this list here:
-> http://permalink.gmane.org/gmane.linux.bluez.kernel/14758
-> Then rebuild 'drivers/bluetooth/btusb'.
->
-> Let us know whether or not that resolves the problem.
->
-> Regards,
-> Peter
->
+T24gVGh1LCAyMDExLTA3LTI4IGF0IDA0OjMzIC0wNDAwLCBFcG9ueW1vdXMgLSB3cm90ZToNCj4g
+VGhhbmtzIGZvciB5b3VyIHJlcGx5IFBldGVyLg0KPiANCj4gVGhlIHByb2JsZW0gSSd2ZSBnb3Qg
+aXMgdGhhdCBJIHdvcmsgZm9yIGEgY29tcGFueSB0ZXN0aW5nIEJsdWV0b290aCBzbw0KPiBJIGhh
+dmUgbXkgaGFuZHMgdGllZCBhcyB0byBob3cgbXVjaCBpbmZvcm1hdGlvbiBJIGNhbiBnaXZlIC0g
+dGhpcyBpcw0KPiBvYnZpb3VzbHkgYSBuaWdodG1hcmUgZm9yIGJvdGggeW91IHdobyBpcyB0cnlp
+bmcgdG8gaGVscCBtZSBhbmQgZm9yIG1lDQo+IHdobyBpcyB0cnlpbmcgdG8gZ2V0IHRoZSBpc3N1
+ZSBmaXhlZCA6KQ0KPiANCj4gSXQgY291bGQgYmUgdmVyeSB3ZWxsIHRoYXQgdGhlIHByb2dyYW0g
+SSdtIHVzaW5nICh0aGF0IHVzZWQgdG8gd29yaw0KPiB3aXRoIEJsdWVaIGp1c3QgZmluZSB3aGVu
+IHRoZSBoY2lfdXNiIGRyaXZlciB3YXMgYXJvdW5kKSBpcyBubyBsb25nZXINCj4gY29tcGF0aWJs
+ZS4NCj4gDQo+IEkgbmVlZCB0byBzcGVhayB0byB0aGUgZGV2ZWxvcGVycyBvZiB0aGUgcHJvZ3Jh
+bSBJJ20gdXNpbmcgdG8gd29yayBvdXQNCj4gaG93IHRoZXkgY29tbXVuaWNhdGUgd2l0aCBCbHVl
+Wi90aGUgY2hpcC4NCj4gDQo+IENoZWVycy4NCg0KSGksDQoNClRoZSBwYXRjaCB0byB0aGUgYnR1
+c2IgZHJpdmVyICh3aGljaCBtYXkgb3IgbWF5IG5vdCBmaXggdGhlIGlzc3VlIHlvdSdyZQ0KaGF2
+aW5nKSBpcyBvbiB0aGUgYmx1ZXRvb3RoLW5leHQgZGV2ZWxvcG1lbnQgdHJlZSBhbmQgaXMgc2xh
+dGVkIGZvcg0KaW5jbHVzaW9uIGluIHRoZSBuZXh0IGtlcm5lbCByZWxlYXNlIChwcm9iYWJseSBz
+b21ldGltZSBpbiBTZXB0ZW1iZXIsDQpiYXNlZCBvbiBjdXJyZW50IHJlbGVhc2UgY3ljbGUgdGlt
+ZXMpLg0KDQpJZiB5b3VyIGZhbWlsaWFyIHdpdGggaG93IHRvIGJ1aWxkIGEga2VybmVsIG1vZHVs
+ZSwgeW91IGNvdWxkIGdyYWIgdGhlDQpwYXRjaCBmcm9tIHRoaXMgbGlzdCBoZXJlOg0KaHR0cDov
+L3Blcm1hbGluay5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXoua2VybmVsLzE0NzU4DQpUaGVu
+IHJlYnVpbGQgJ2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiJy4NCg0KTGV0IHVzIGtub3cgd2hldGhl
+ciBvciBub3QgdGhhdCByZXNvbHZlcyB0aGUgcHJvYmxlbS4NCg0KUmVnYXJkcywNClBldGVyDQo=
