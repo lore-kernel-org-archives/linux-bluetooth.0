@@ -2,34 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Antti Julku <antti.julku@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Antti Julku <antti.julku@nokia.com>
-Subject: [PATCH BlueZ] Add support for blacklisting events
-Date: Thu, 28 Jul 2011 15:00:22 +0300
-Message-Id: <1311854423-1471-1-git-send-email-antti.julku@nokia.com>
+Subject: [PATCH] Bluetooth: Add mgmt events for blacklisting
+Date: Thu, 28 Jul 2011 15:00:23 +0300
+Message-Id: <1311854423-1471-2-git-send-email-antti.julku@nokia.com>
+In-Reply-To: <1311854423-1471-1-git-send-email-antti.julku@nokia.com>
+References: <1311854423-1471-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for mgmt interface events for device blocking/unblocking.
-Kernel sends a mgmt event when a device has been blocked by another
-management socket or with ioctl command (e.g. by hciconfig).
+Add management interface events for blocking/unblocking a device.
+Sender of the block device command gets cmd complete and other
+mgmt sockets get the event. Event is also sent to mgmt sockets when
+blocking is done with ioctl, e.g when blocking a device with
+hciconfig. This makes it possible for bluetoothd to track status
+of blocked devices when a third party block or unblocks a device.
 
-Parameter update_only is added to device_block/unblock functions in
-device.c to avoid code copying. When update_only is true, blocking
-command is not sent to kernel, but only device status is updated and
-dbus signal is sent.
+Event sending is handled in mgmt_device_blocked function which gets
+called from hci_blacklist_add in hci_core.c. A pending command is
+added in mgmt_block_device, so that it can found when sending the
+event - the event is not sent to the socket from which the pending
+command came. Locks were moved out from hci_core.c to hci_sock.c
+and mgmt.c, because locking is needed also for mgmt_pending_add in
+mgmt.c.
+
+Signed-off-by: Antti Julku <antti.julku@nokia.com>
 ---
- lib/mgmt.h        |   10 +++++++++
- plugins/mgmtops.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.c      |   27 +++++++++++++++----------
- src/device.h      |    5 ++++
- src/event.c       |   26 +++++++++++++++++++++++++
- src/event.h       |    2 +
- 6 files changed, 113 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +
+ include/net/bluetooth/mgmt.h     |   10 ++++++
+ net/bluetooth/hci_core.c         |   30 ++++++------------
+ net/bluetooth/hci_sock.c         |   18 +++++++++-
+ net/bluetooth/mgmt.c             |   64 +++++++++++++++++++++++++++++++++----
+ 5 files changed, 95 insertions(+), 29 deletions(-)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index f22434e..260f8c0 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -305,3 +305,13 @@ struct mgmt_ev_remote_name {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c41e275..42bbd0b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -857,6 +857,8 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_discovering(u16 index, u8 discovering);
++int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
++int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 5428fd3..c2a052a 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -301,3 +301,13 @@ struct mgmt_ev_remote_name {
  } __packed;
  
  #define MGMT_EV_DISCOVERING		0x0014
@@ -43,221 +65,243 @@ index f22434e..260f8c0 100644
 +struct mgmt_ev_device_unblocked {
 +	bdaddr_t bdaddr;
 +} __packed;
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 3cdb97e..9f6450c 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1385,6 +1385,54 @@ static void mgmt_discovering(int sk, uint16_t index, void *buf, size_t len)
- 	adapter_set_state(adapter, state);
- }
- 
-+static void mgmt_device_blocked(int sk, uint16_t index, void *buf, size_t len)
-+{
-+	struct controller_info *info;
-+	struct mgmt_ev_device_blocked *ev = buf;
-+	char addr[18];
-+
-+	if (len < sizeof(*ev)) {
-+		error("Too small mgmt_device_blocked event packet");
-+		return;
-+	}
-+
-+	ba2str(&ev->bdaddr, addr);
-+	DBG("Device blocked, index %u, addr %s", index, addr);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in device_blocked event", index);
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	btd_event_device_blocked(&info->bdaddr, &ev->bdaddr);
-+}
-+
-+static void mgmt_device_unblocked(int sk, uint16_t index, void *buf, size_t len)
-+{
-+	struct controller_info *info;
-+	struct mgmt_ev_device_unblocked *ev = buf;
-+	char addr[18];
-+
-+	if (len < sizeof(*ev)) {
-+		error("Too small mgmt_device_unblocked event packet");
-+		return;
-+	}
-+
-+	ba2str(&ev->bdaddr, addr);
-+	DBG("Device unblocked, index %u, addr %s", index, addr);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in device_unblocked event", index);
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	btd_event_device_unblocked(&info->bdaddr, &ev->bdaddr);
-+}
-+
- static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 908fcd3..658f9ec 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1313,59 +1313,49 @@ int hci_blacklist_clear(struct hci_dev *hdev)
+ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
  {
- 	char buf[MGMT_BUF_SIZE];
-@@ -1489,6 +1537,12 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
- 	case MGMT_EV_DISCOVERING:
- 		mgmt_discovering(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
-+	case MGMT_EV_DEVICE_BLOCKED:
-+		mgmt_device_blocked(sk, index, buf + MGMT_HDR_SIZE, len);
-+		break;
-+	case MGMT_EV_DEVICE_UNBLOCKED:
-+		mgmt_device_unblocked(sk, index, buf + MGMT_HDR_SIZE, len);
-+		break;
- 	default:
- 		error("Unknown Management opcode %u (index %u)", opcode, index);
- 		break;
-diff --git a/src/device.c b/src/device.c
-index 9dd657c..895c304 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -445,9 +445,10 @@ static gboolean do_disconnect(gpointer user_data)
- 	return FALSE;
- }
- 
--static int device_block(DBusConnection *conn, struct btd_device *device)
-+int device_block(DBusConnection *conn, struct btd_device *device,
-+						gboolean update_only)
- {
+ 	struct bdaddr_list *entry;
 -	int err;
-+	int err = 0;
- 	bdaddr_t src;
  
- 	if (device->blocked)
-@@ -458,7 +459,9 @@ static int device_block(DBusConnection *conn, struct btd_device *device)
+ 	if (bacmp(bdaddr, BDADDR_ANY) == 0)
+ 		return -EBADF;
  
- 	g_slist_foreach(device->drivers, (GFunc) driver_remove, device);
+-	hci_dev_lock_bh(hdev);
+-
+ 	if (hci_blacklist_lookup(hdev, bdaddr)) {
+-		err = -EEXIST;
+-		goto err;
++		return -EEXIST;
+ 	}
  
--	err = btd_adapter_block_address(device->adapter, &device->bdaddr);
-+	if (!update_only)
-+		err = btd_adapter_block_address(device->adapter, &device->bdaddr);
-+
- 	if (err < 0)
- 		return err;
+ 	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
+ 	if (!entry) {
+ 		return -ENOMEM;
+-		goto err;
+ 	}
  
-@@ -478,16 +481,18 @@ static int device_block(DBusConnection *conn, struct btd_device *device)
- 	return 0;
+ 	bacpy(&entry->bdaddr, bdaddr);
+ 
+ 	list_add(&entry->list, &hdev->blacklist);
+ 
+-	err = 0;
++	if (test_bit(HCI_MGMT, &hdev->flags))
++		return mgmt_device_blocked(hdev->id, bdaddr);
+ 
+-err:
+-	hci_dev_unlock_bh(hdev);
+-	return err;
++	return 0;
  }
  
--static int device_unblock(DBusConnection *conn, struct btd_device *device,
--							gboolean silent)
-+int device_unblock(DBusConnection *conn, struct btd_device *device,
-+				gboolean silent, gboolean update_only)
+ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
  {
--	int err;
-+	int err = 0;
- 	bdaddr_t src;
+ 	struct bdaddr_list *entry;
+-	int err = 0;
+-
+-	hci_dev_lock_bh(hdev);
  
- 	if (!device->blocked)
- 		return 0;
+ 	if (bacmp(bdaddr, BDADDR_ANY) == 0) {
+-		hci_blacklist_clear(hdev);
+-		goto done;
++		return hci_blacklist_clear(hdev);
+ 	}
  
--	err = btd_adapter_unblock_address(device->adapter, &device->bdaddr);
-+	if (!update_only)
-+		err = btd_adapter_unblock_address(device->adapter, &device->bdaddr);
+ 	entry = hci_blacklist_lookup(hdev, bdaddr);
+ 	if (!entry) {
+-		err = -ENOENT;
+-		goto done;
++		return -ENOENT;
+ 	}
+ 
+ 	list_del(&entry->list);
+ 	kfree(entry);
+ 
+-done:
+-	hci_dev_unlock_bh(hdev);
+-	return err;
++	if (test_bit(HCI_MGMT, &hdev->flags))
++		return mgmt_device_unblocked(hdev->id, bdaddr);
 +
- 	if (err < 0)
- 		return err;
++	return 0;
+ }
  
-@@ -516,9 +521,9 @@ static DBusMessage *set_blocked(DBusConnection *conn, DBusMessage *msg,
+ static void hci_clear_adv_cache(unsigned long arg)
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index ff02cf5..f6afe3d 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -183,21 +183,35 @@ static int hci_sock_release(struct socket *sock)
+ static int hci_sock_blacklist_add(struct hci_dev *hdev, void __user *arg)
+ {
+ 	bdaddr_t bdaddr;
++	int err;
+ 
+ 	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+ 		return -EFAULT;
+ 
+-	return hci_blacklist_add(hdev, &bdaddr);
++	hci_dev_lock_bh(hdev);
++
++	err = hci_blacklist_add(hdev, &bdaddr);
++
++	hci_dev_unlock_bh(hdev);
++
++	return err;
+ }
+ 
+ static int hci_sock_blacklist_del(struct hci_dev *hdev, void __user *arg)
+ {
+ 	bdaddr_t bdaddr;
++	int err;
+ 
+ 	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+ 		return -EFAULT;
+ 
+-	return hci_blacklist_del(hdev, &bdaddr);
++	hci_dev_lock_bh(hdev);
++
++	err = hci_blacklist_del(hdev, &bdaddr);
++
++	hci_dev_unlock_bh(hdev);
++
++	return err;
+ }
+ 
+ /* Ioctls that require bound socket */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 53e109e..f8581ff 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1689,13 +1689,12 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
+ 								u16 len)
+ {
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_block_device *cp;
++	struct pending_cmd *cmd;
++	struct mgmt_cp_block_device *cp = (void *) data;
  	int err;
  
- 	if (value)
--		err = device_block(conn, device);
-+		err = device_block(conn, device, FALSE);
+ 	BT_DBG("hci%u", index);
+ 
+-	cp = (void *) data;
+-
+ 	if (len != sizeof(*cp))
+ 		return cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							EINVAL);
+@@ -1705,6 +1704,14 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
+ 		return cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							ENODEV);
+ 
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_BLOCK_DEVICE, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
+ 	err = hci_blacklist_add(hdev, &cp->bdaddr);
+ 
+ 	if (err < 0)
+@@ -1712,6 +1719,11 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
  	else
--		err = device_unblock(conn, device, FALSE);
-+		err = device_unblock(conn, device, FALSE, FALSE);
- 
- 	switch (-err) {
- 	case 0:
-@@ -938,7 +943,7 @@ struct btd_device *device_create(DBusConnection *conn,
- 	device->trusted = read_trust(&src, address, GLOBAL_TRUST);
- 
- 	if (read_blocked(&src, &device->bdaddr))
--		device_block(conn, device);
-+		device_block(conn, device, FALSE);
- 
- 	if (read_link_key(&src, &device->bdaddr, NULL, NULL) == 0) {
- 		device_set_paired(device, TRUE);
-@@ -1003,7 +1008,7 @@ static void device_remove_stored(struct btd_device *device)
- 	delete_device_service(&src, &device->bdaddr);
- 
- 	if (device->blocked)
--		device_unblock(conn, device, TRUE);
-+		device_unblock(conn, device, TRUE, FALSE);
- }
- 
- void device_remove(struct btd_device *device, gboolean remove_stored)
-diff --git a/src/device.h b/src/device.h
-index 6efcf63..b6349bc 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -116,3 +116,8 @@ void btd_unregister_device_driver(struct btd_device_driver *driver);
- 
- struct btd_device *btd_device_ref(struct btd_device *device);
- void btd_device_unref(struct btd_device *device);
+ 		err = cmd_complete(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							NULL, 0);
 +
-+int device_block(DBusConnection *conn, struct btd_device *device,
-+						gboolean update_only);
-+int device_unblock(DBusConnection *conn, struct btd_device *device,
-+					gboolean silent, gboolean update_only);
-diff --git a/src/event.c b/src/event.c
-index d86eb28..b17da62 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -469,6 +469,32 @@ void btd_event_disconn_complete(bdaddr_t *local, bdaddr_t *peer)
- 	adapter_remove_connection(adapter, device);
- }
++	mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
  
-+void btd_event_device_blocked(bdaddr_t *local, bdaddr_t *peer)
+ 	return err;
+@@ -1721,13 +1733,12 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 								u16 len)
+ {
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_unblock_device *cp;
++	struct pending_cmd *cmd;
++	struct mgmt_cp_unblock_device *cp = (void *) data;
+ 	int err;
+ 
+ 	BT_DBG("hci%u", index);
+ 
+-	cp = (void *) data;
+-
+ 	if (len != sizeof(*cp))
+ 		return cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+ 								EINVAL);
+@@ -1737,13 +1748,26 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 		return cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+ 								ENODEV);
+ 
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_UNBLOCK_DEVICE, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
+ 	err = hci_blacklist_del(hdev, &cp->bdaddr);
+ 
+ 	if (err < 0)
+ 		err = cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE, -err);
+ 	else
+ 		err = cmd_complete(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+-								NULL, 0);
++							NULL, 0);
++
++	mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
+ 
+ 	return err;
+@@ -2286,3 +2310,29 @@ int mgmt_discovering(u16 index, u8 discovering)
+ 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
+ 						sizeof(discovering), NULL);
+ }
++
++int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr)
 +{
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
++	struct pending_cmd *cmd;
++	struct mgmt_ev_device_blocked ev;
 +
-+	DBusConnection *conn = get_dbus_connection();
++	cmd = mgmt_pending_find(MGMT_OP_BLOCK_DEVICE, index);
 +
-+	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
-+		return;
++	bacpy(&ev.bdaddr, bdaddr);
 +
-+	device_block(conn, device, TRUE);
++	return mgmt_event(MGMT_EV_DEVICE_BLOCKED, index, &ev, sizeof(ev),
++						cmd ? cmd->sk : NULL);
 +}
 +
-+void btd_event_device_unblocked(bdaddr_t *local, bdaddr_t *peer)
++int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr)
 +{
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
++	struct pending_cmd *cmd;
++	struct mgmt_ev_device_unblocked ev;
 +
-+	DBusConnection *conn = get_dbus_connection();
++	cmd = mgmt_pending_find(MGMT_OP_UNBLOCK_DEVICE, index);
 +
-+	if (!get_adapter_and_device(local, peer, &adapter, &device, FALSE))
-+		return;
++	bacpy(&ev.bdaddr, bdaddr);
 +
-+	device_unblock(conn, device, FALSE, TRUE);
++	return mgmt_event(MGMT_EV_DEVICE_UNBLOCKED, index, &ev, sizeof(ev),
++						cmd ? cmd->sk : NULL);
 +}
-+
- /* Section reserved to device HCI callbacks */
- 
- void btd_event_returned_link_key(bdaddr_t *local, bdaddr_t *peer)
-diff --git a/src/event.h b/src/event.h
-index 1268edf..d93a361 100644
---- a/src/event.h
-+++ b/src/event.h
-@@ -38,5 +38,7 @@ void btd_event_returned_link_key(bdaddr_t *local, bdaddr_t *peer);
- int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
- int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba);
- int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
-+void btd_event_device_blocked(bdaddr_t *local, bdaddr_t *peer);
-+void btd_event_device_unblocked(bdaddr_t *local, bdaddr_t *peer);
- int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
- 					uint8_t key_type, uint8_t pin_length);
 -- 
 1.7.2.5
 
