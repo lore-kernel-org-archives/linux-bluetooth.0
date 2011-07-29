@@ -1,57 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E3400F7.4000504@poczta.fm>
-Date: Sat, 30 Jul 2011 15:02:47 +0200
-From: Lukasz Stelmach <stlman@poczta.fm>
-MIME-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] configuring device class
-Content-Type: text/plain; charset="UTF-8"
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH BlueZ] Test script for LinkLossAlertLevel property
+Date: Fri, 29 Jul 2011 14:47:37 -0300
+Message-Id: <1311961657-28925-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 
-I am investigating ways to set the device class (computer/laptop
-etc) of a bluetooth device. There is a key in main.conf named
-Class to set the class but aparently it is overridden by the
-class field of /var/lib/bluetooth/<bdaddr>/config. Once the class
-is stored there changes in main.conf don't affect the actual class
-the device presents. IMHO it is quite obutse and it took me an hour
-or more with a debugger to find out how to change it so I'd like to
-propose the following patch. Are there any reasons that the config
-file in /var should override the value from /etc?
+Initial test script for Proximity Monitor. This patch allows the
+user to set the Link Loss alert level of a given Reporter.
+Usage example:
+$test-proximity.py -i hci1 --device <mac> LinkLossAlertLevel mild
+---
+ test/test-proximity.py |   65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 65 insertions(+), 0 deletions(-)
+ create mode 100755 test/test-proximity.py
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4c88a0e..7faa881 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2261,6 +2261,7 @@ void btd_adapter_start(struct btd_adapter *adapter)
- {
- 	char address[18];
- 	uint8_t cls[3];
-+	uint32_t class;
- 	gboolean powered;
-
- 	ba2str(&adapter->bdaddr, address);
-@@ -2279,10 +2280,11 @@ void btd_adapter_start(struct btd_adapter *adapter)
-
- 	adapter_ops->set_name(adapter->dev_id, adapter->name);
-
--	if (read_local_class(&adapter->bdaddr, cls) < 0) {
--		uint32_t class = htobl(main_opts.class);
-+	class = htobl(main_opts.class);
-+	if (class != 0)
- 		memcpy(cls, &class, 3);
--	}
-+	else
-+		read_local_class(&adapter->bdaddr, cls);
-
- 	btd_adapter_set_class(adapter, cls[1], cls[0]);
-
+diff --git a/test/test-proximity.py b/test/test-proximity.py
+new file mode 100755
+index 0000000..04faf4e
+--- /dev/null
++++ b/test/test-proximity.py
+@@ -0,0 +1,65 @@
++#!/usr/bin/python
++
++'''
++Proximity Monitor test script
++'''
++
++import gobject
++
++import sys
++import dbus
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++
++def property_changed(name, value):
++
++	print "PropertyChanged('%s', '%s')" % (name, value)
++	mainloop.quit()
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="dev_id"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++
++		]
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if options.dev_id:
++		adapter_path = manager.FindAdapter(options.dev_id)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	if (len(args) < 1):
++		print "Usage: %s <command>" % (sys.argv[0])
++		print ""
++		print "  LinkLossAlertLevel <none|mild|high>"
++		sys.exit(1)
++
++	device_path = adapter.FindDevice(options.address)
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Proximity",
++				signal_name="PropertyChanged")
++
++	proximity = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.Proximity")
++
++	print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
++	proximity.SetProperty(args[0], args[1])
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
 -- 
-Było mi bardzo miło.               Czwarta pospolita klęska, [...]
->Łukasz<                 Już nie katolicka lecz złodziejska.  (c)PP
+1.7.6
 
-----------------------------------------------------------------
-Znajdz samochod idealny dla siebie!
-Szukaj >> http://linkint.pl/f29e2
