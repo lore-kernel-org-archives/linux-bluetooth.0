@@ -1,95 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sheldon Demario <sheldon.demario@openbossa.org>
-Subject: [PATCH BlueZ] Test script for LinkLossAlertLevel property
-Date: Fri, 29 Jul 2011 14:47:37 -0300
-Message-Id: <1311961657-28925-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20110729100719.GB3880@dell>
+References: <1311758618-23826-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<20110729100719.GB3880@dell>
+Date: Fri, 29 Jul 2011 19:59:56 +0300
+Message-ID: <CABBYNZK0gFv7uDvhaOLw0TvbqVBMOa0XBSp4p9_Z9tqkK7AMEQ@mail.gmail.com>
+Subject: Re: [PATCH] hcidump: decode extended flow spec option
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sheldon Demario <sheldon.demario@openbossa.org>
+Hi Andrei,
 
-Initial test script for Proximity Monitor. This patch allows the
-user to set the Link Loss alert level of a given Reporter.
-Usage example:
-$test-proximity.py -i hci1 --device <mac> LinkLossAlertLevel mild
----
- test/test-proximity.py |   65 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 65 insertions(+), 0 deletions(-)
- create mode 100755 test/test-proximity.py
+On Fri, Jul 29, 2011 at 1:07 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andrei,
+>
+> On Wed, Jul 27, 2011, Emeltchenko Andrei wrote:
+>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>
+>> Decode EFS option in l2cap configuration packets
+>> ---
+>>  parser/l2cap.c |   52 ++++++++++++++++++++++++++++++++++++++++++++--------
+>>  1 files changed, 44 insertions(+), 8 deletions(-)
+>
+> Applied. Thanks.
+>
+> Johan
+> --
 
-diff --git a/test/test-proximity.py b/test/test-proximity.py
-new file mode 100755
-index 0000000..04faf4e
---- /dev/null
-+++ b/test/test-proximity.py
-@@ -0,0 +1,65 @@
-+#!/usr/bin/python
-+
-+'''
-+Proximity Monitor test script
-+'''
-+
-+import gobject
-+
-+import sys
-+import dbus
-+import dbus.mainloop.glib
-+from optparse import OptionParser, make_option
-+
-+def property_changed(name, value):
-+
-+	print "PropertyChanged('%s', '%s')" % (name, value)
-+	mainloop.quit()
-+
-+if __name__ == "__main__":
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+					"org.bluez.Manager")
-+
-+	option_list = [
-+		make_option("-i", "--adapter", action="store",
-+			type="string", dest="dev_id"),
-+		make_option("-b", "--device", action="store",
-+			type="string", dest="address"),
-+
-+		]
-+	parser = OptionParser(option_list=option_list)
-+
-+	(options, args) = parser.parse_args()
-+
-+	if options.dev_id:
-+		adapter_path = manager.FindAdapter(options.dev_id)
-+	else:
-+		adapter_path = manager.DefaultAdapter()
-+
-+	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
-+
-+	if (len(args) < 1):
-+		print "Usage: %s <command>" % (sys.argv[0])
-+		print ""
-+		print "  LinkLossAlertLevel <none|mild|high>"
-+		sys.exit(1)
-+
-+	device_path = adapter.FindDevice(options.address)
-+
-+	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
-+				dbus_interface="org.bluez.Proximity",
-+				signal_name="PropertyChanged")
-+
-+	proximity = dbus.Interface(bus.get_object("org.bluez",
-+					device_path), "org.bluez.Proximity")
-+
-+	print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
-+	proximity.SetProperty(args[0], args[1])
-+
-+	mainloop = gobject.MainLoop()
-+	mainloop.run()
+I think we might want to check the version of libbluetooth, otherwise
+this might fail to compile with older version.
+
 -- 
-1.7.6
-
+Luiz Augusto von Dentz
