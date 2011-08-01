@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 1 Aug 2011 16:30:06 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Szymon Janc <szymon@janc.net.pl>
+Cc: linux-bluetooth@vger.kernel.org,
+	Peter Hurley <peter@hurleysoftware.com>
+Subject: Re: [PATCH] Don't use cmd_timer to timeout HCI reset command
+Message-ID: <20110801193006.GC18480@joana>
+References: <1311713214-2414-1-git-send-email-szymon@janc.net.pl>
 MIME-Version: 1.0
-In-Reply-To: <20110801192043.GB4430@joana>
-References: <1311802809-10565-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20110801192043.GB4430@joana>
-Date: Mon, 1 Aug 2011 15:36:31 -0400
-Message-ID: <CAJdJm_OC7A7XUC-HrATR9_a3AkSyLgTJJzXsUa=-JaAtubpiCg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: use recommended LE connection parameters
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1311713214-2414-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Szymon,
 
-On Mon, Aug 1, 2011 at 3:20 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
-> Applied, and also added the Signed-off-by line that you forgot. Thanks.
+* Szymon Janc <szymon@janc.net.pl> [2011-07-26 22:46:54 +0200]:
 
-Thanks, I will change my tree's .git/config so the sign-off is not missed.
+> No command should be send before Command Complete event for HCI
+> reset is received. This fix regression introduced by commit
+> 6bd32326cda(Bluetooth: Use proper timer for hci command timout)
+> for chips whose reset command takes longer to complete (e.g. CSR)
+> resulting in next command being send before HCI reset completed.
+> 
+> Signed-off-by: Szymon Janc <szymon@janc.net.pl>
+> ---
+>  net/bluetooth/hci_core.c |    6 ++++--
+>  1 files changed, 4 insertions(+), 2 deletions(-)
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Applied, thanks.
+
+	Gustavo
