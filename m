@@ -1,29 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Aug 2011 10:57:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] Remove unneeded textfile header includes
-Message-ID: <20110802075702.GA15720@dell>
-References: <1311773526-15856-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1311773526-15856-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <20110801192043.GB4430@joana>
+References: <1311802809-10565-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20110801192043.GB4430@joana>
+Date: Mon, 1 Aug 2011 15:36:31 -0400
+Message-ID: <CAJdJm_OC7A7XUC-HrATR9_a3AkSyLgTJJzXsUa=-JaAtubpiCg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: use recommended LE connection parameters
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Gustavo,
 
-On Wed, Jul 27, 2011, Claudio Takahasi wrote:
-> ---
->  audio/device.c   |    1 -
->  audio/manager.c  |    1 -
->  input/device.c   |    1 -
->  serial/manager.c |    1 -
->  serial/proxy.c   |    1 -
->  src/event.c      |    1 -
->  6 files changed, 0 insertions(+), 6 deletions(-)
+On Mon, Aug 1, 2011 at 3:20 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
+> Applied, and also added the Signed-off-by line that you forgot. Thanks.
 
-Both patches have been applied. Thanks.
+Thanks, I will change my tree's .git/config so the sign-off is not missed.
 
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
