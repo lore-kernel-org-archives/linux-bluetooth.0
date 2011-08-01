@@ -1,29 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: VISHWANATH KM <a21174@motorola.com>
-Date: Mon, 1 Aug 2011 18:59:30 +0530
-Message-ID: <CACbkbUJ9wC4ZgAuhJ89ee4MVV+QugHNu0uAh+vhc8A7aJ1MwXw@mail.gmail.com>
-Subject: Advertising cache and random address support
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
+References: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 1 Aug 2011 10:25:11 -0300
+Message-ID: <CAMOw1v4bHdNNAoc4BARgKt4b8z-g48RkmLcMkiQGihgQt8meMw@mail.gmail.com>
+Subject: Re: [PATCH hcidump 00/13] AVRCP 1.3 pdus
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz
 
-Advertising cache seem to temporarily store the peer_addr_type info,
-if we reboot, then we loose the information and subsequent connection
-fails as we don't have the peer_addr_type, unless we re-scan
+On Mon, Aug 1, 2011 at 5:42 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds parsing for remaining pdus defined by AVRCP 1.3 spec, here is
+> an example of what it would generate using current upstream agains Sony
+> MW600 headset (note that current upstream has a bug in which it sets an
+> invalid pdu length for not implemented response):
+>
+>> AVCTP: Command : pt 0x00 transaction 5 pid 0x110e
+>    AV/C: Status: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0001
+>        CapabilityID: 0x02 (CompanyID)
+> < AVCTP: Response : pt 0x00 transaction 5 pid 0x110e
+>    AV/C: Not Implemented: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0001
+>      PDU Malformed
+>> AVCTP: Command : pt 0x00 transaction 6 pid 0x110e
+>    AV/C: Notify: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: RegisterNotification: pt 0x00 len 0x0005
+>        EventID: 0x02 (EVENT_TRACK_CHANGED)
+>        Interval: 0x0000000a (10 seconds)
+> < AVCTP: Response : pt 0x00 transaction 6 pid 0x110e
+>    AV/C: Not Implemented: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: RegisterNotification: pt 0x00 len 0x0005
+>      PDU Malformed
+>
+> Same thing but now using Lucas's tree:
+>
+> < AVCTP: Response : pt 0x00 transaction 5 pid 0x110e
+>    AV/C: Stable: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0005
+>        CapabilityID: 0x02 (CompanyID)
+>        CapabilityCount: 0x01
+>        CompanyID: 0x001958
+>> AVCTP: Command : pt 0x00 transaction 6 pid 0x110e
+>    AV/C: Status: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0001
+>        CapabilityID: 0x03 (EventsID)
+> < AVCTP: Response : pt 0x00 transaction 6 pid 0x110e
+>    AV/C: Stable: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetCapabilities: pt 0x00 len 0x0004
+>        CapabilityID: 0x03 (EventsID)
+>        CapabilityCount: 0x02
+>        EventsID: 0x01 (EVENT_PLAYBACK_STATUS_CHANGED)
+>        EventsID: 0x02 (EVENT_TRACK_CHANGED)
+>> AVCTP: Command : pt 0x00 transaction 7 pid 0x110e
+>    AV/C: Notify: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: RegisterNotification: pt 0x00 len 0x0005
+>        EventID: 0x02 (EVENT_TRACK_CHANGED)
+>        Interval: 0x0000000a (10 seconds)
+> < AVCTP: Response : pt 0x00 transaction 7 pid 0x110e
+>    AV/C: Interim: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: RegisterNotification: pt 0x00 len 0x0009
+>        EventID: 0x02 (EVENT_TRACK_CHANGED)
+>        Identifier: 0xffffffffffffffff (Reserved)
+>> AVCTP: Command : pt 0x00 transaction 8 pid 0x110e
+>    AV/C: Status: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetElementAttributes: pt 0x00 len 0x000d
+>        Identifier: 0x0 (PLAYING)
+>        AttributeCount: 0x01
+>        Attribute: 0x00000001 (Title)
+> < AVCTP: Response : pt 0x00 transaction 8 pid 0x110e
+>    AV/C: Stable: address 0x48 opcode 0x00
+>      Subunit: Panel
+>      Opcode: Vendor Dependent
+>      Company ID: 0x001958
+>      AVRCP: GetElementAttributes: pt 0x00 len 0x0009
+>        AttributeCount: 0x01
+>        Attribute: 0x00000001 (Title)
+>        CharsetID: 0x006a (UTF-8)
+>        AttributeValueLength: 0x0000
+>        AttributeValue:
+>
 
-The better approach may be
-1) bluez while receiving the advertising events would also store the
-peer_addr_type info ( may be in dev_info structure in hciops )
-2) while initiating connection bluez may pass the peer_addr_type as
-part of  bt_io_connect in l2cap_connect (attrib/client.c) as part of
-new option BT_IO_OPT_
+Nice, I've been using this with my implementation of AVRCP 1.3 and
+it's working fine.
 
-Please let me know your comments on above, or if any better
-approaches/alternatives on the same, thx
-
-Regards
-Vishwanath
+thanks,
+Lucas De Marchi
