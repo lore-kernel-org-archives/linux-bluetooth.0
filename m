@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 09/13] Add parsing for AVRCP InformDisplayableCharacterSet pdu
-Date: Mon,  1 Aug 2011 11:42:14 +0300
-Message-Id: <1312188138-32265-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH hcidump 10/13] Add parsing for AVRCP InformBatteryStatusOfCT pdu
+Date: Mon,  1 Aug 2011 11:42:15 +0300
+Message-Id: <1312188138-32265-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
 References: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,56 +12,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- parser/avrcp.c |   33 +++++++++++++++++++++++++++++++++
- 1 files changed, 33 insertions(+), 0 deletions(-)
+ parser/avrcp.c |   35 +++++++++++++++++++++++++++++++++++
+ 1 files changed, 35 insertions(+), 0 deletions(-)
 
 diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 5fb5cbe..ababe03 100644
+index ababe03..bb7bcbb 100644
 --- a/parser/avrcp.c
 +++ b/parser/avrcp.c
-@@ -817,6 +817,36 @@ response:
+@@ -847,6 +847,38 @@ static void avrcp_displayable_charset(int level, struct frame *frm,
  	}
  }
  
-+static void avrcp_displayable_charset(int level, struct frame *frm,
++static const char *status2str(uint8_t status)
++{
++	switch (status) {
++	case 0x0:
++		return "NORMAL";
++	case 0x1:
++		return "WARNING";
++	case 0x2:
++		return "CRITICAL";
++	case 0x3:
++		return "EXTERNAL";
++	case 0x4:
++		return "FULL_CHARGE";
++	default:
++		return "Reserved";
++	}
++}
++
++static void avrcp_ct_battery_status_dump(int level, struct frame *frm,
 +						uint8_t ctype, uint16_t len)
 +{
-+	uint8_t num;
++	uint8_t status;
 +
 +	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
 +		return;
 +
 +	p_indent(level, frm);
 +
-+	if (len < 2) {
-+		printf("PDU Malformed\n");
-+		raw_dump(level, frm);
-+		return;
-+	}
-+
-+	num = get_u8(frm);
-+	printf("CharsetCount: 0x%02x\n", num);
-+
-+	for (; num > 0; num--) {
-+		uint16_t charset;
-+
-+		p_indent(level, frm);
-+
-+		charset = get_u16(frm);
-+		printf("CharsetID: 0x%04x (%s)\n", charset,
-+							charset2str(charset));
-+	}
++	status = get_u8(frm);
++	printf("BatteryStatus: 0x%02x (%s)\n", status, status2str(status));
 +}
 +
  static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
  {
  	uint8_t pduid, pt;
-@@ -869,6 +899,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 	case AVRCP_GET_PLAYER_VALUE_TEXT:
- 		avrcp_get_player_value_text_dump(level + 1, frm, ctype, len);
+@@ -902,6 +934,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
+ 	case AVRCP_DISPLAYABLE_CHARSET:
+ 		avrcp_displayable_charset(level + 1, frm, ctype, len);
  		break;
-+	case AVRCP_DISPLAYABLE_CHARSET:
-+		avrcp_displayable_charset(level + 1, frm, ctype, len);
++	case AVRCP_CT_BATTERY_STATUS:
++		avrcp_ct_battery_status_dump(level + 1, frm, ctype, len);
 +		break;
  	default:
  		raw_dump(level, frm);
