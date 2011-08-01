@@ -1,126 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH hcidump 11/13] Add parsing for AVRCP GetElementAttributes pdu
+Date: Mon,  1 Aug 2011 11:42:16 +0300
+Message-Id: <1312188138-32265-12-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
 References: <1312188138-32265-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 1 Aug 2011 10:25:11 -0300
-Message-ID: <CAMOw1v4bHdNNAoc4BARgKt4b8z-g48RkmLcMkiQGihgQt8meMw@mail.gmail.com>
-Subject: Re: [PATCH hcidump 00/13] AVRCP 1.3 pdus
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Aug 1, 2011 at 5:42 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds parsing for remaining pdus defined by AVRCP 1.3 spec, here is
-> an example of what it would generate using current upstream agains Sony
-> MW600 headset (note that current upstream has a bug in which it sets an
-> invalid pdu length for not implemented response):
->
->> AVCTP: Command : pt 0x00 transaction 5 pid 0x110e
->    AV/C: Status: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetCapabilities: pt 0x00 len 0x0001
->        CapabilityID: 0x02 (CompanyID)
-> < AVCTP: Response : pt 0x00 transaction 5 pid 0x110e
->    AV/C: Not Implemented: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetCapabilities: pt 0x00 len 0x0001
->      PDU Malformed
->> AVCTP: Command : pt 0x00 transaction 6 pid 0x110e
->    AV/C: Notify: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: RegisterNotification: pt 0x00 len 0x0005
->        EventID: 0x02 (EVENT_TRACK_CHANGED)
->        Interval: 0x0000000a (10 seconds)
-> < AVCTP: Response : pt 0x00 transaction 6 pid 0x110e
->    AV/C: Not Implemented: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: RegisterNotification: pt 0x00 len 0x0005
->      PDU Malformed
->
-> Same thing but now using Lucas's tree:
->
-> < AVCTP: Response : pt 0x00 transaction 5 pid 0x110e
->    AV/C: Stable: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetCapabilities: pt 0x00 len 0x0005
->        CapabilityID: 0x02 (CompanyID)
->        CapabilityCount: 0x01
->        CompanyID: 0x001958
->> AVCTP: Command : pt 0x00 transaction 6 pid 0x110e
->    AV/C: Status: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetCapabilities: pt 0x00 len 0x0001
->        CapabilityID: 0x03 (EventsID)
-> < AVCTP: Response : pt 0x00 transaction 6 pid 0x110e
->    AV/C: Stable: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetCapabilities: pt 0x00 len 0x0004
->        CapabilityID: 0x03 (EventsID)
->        CapabilityCount: 0x02
->        EventsID: 0x01 (EVENT_PLAYBACK_STATUS_CHANGED)
->        EventsID: 0x02 (EVENT_TRACK_CHANGED)
->> AVCTP: Command : pt 0x00 transaction 7 pid 0x110e
->    AV/C: Notify: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: RegisterNotification: pt 0x00 len 0x0005
->        EventID: 0x02 (EVENT_TRACK_CHANGED)
->        Interval: 0x0000000a (10 seconds)
-> < AVCTP: Response : pt 0x00 transaction 7 pid 0x110e
->    AV/C: Interim: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: RegisterNotification: pt 0x00 len 0x0009
->        EventID: 0x02 (EVENT_TRACK_CHANGED)
->        Identifier: 0xffffffffffffffff (Reserved)
->> AVCTP: Command : pt 0x00 transaction 8 pid 0x110e
->    AV/C: Status: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetElementAttributes: pt 0x00 len 0x000d
->        Identifier: 0x0 (PLAYING)
->        AttributeCount: 0x01
->        Attribute: 0x00000001 (Title)
-> < AVCTP: Response : pt 0x00 transaction 8 pid 0x110e
->    AV/C: Stable: address 0x48 opcode 0x00
->      Subunit: Panel
->      Opcode: Vendor Dependent
->      Company ID: 0x001958
->      AVRCP: GetElementAttributes: pt 0x00 len 0x0009
->        AttributeCount: 0x01
->        Attribute: 0x00000001 (Title)
->        CharsetID: 0x006a (UTF-8)
->        AttributeValueLength: 0x0000
->        AttributeValue:
->
+---
+ parser/avrcp.c |  114 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 114 insertions(+), 0 deletions(-)
 
-Nice, I've been using this with my implementation of AVRCP 1.3 and
-it's working fine.
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index bb7bcbb..49a7145 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -158,6 +158,16 @@
+ #define AVRCP_ATTRIBUTE_SHUFFLE		0x03
+ #define AVRCP_ATTRIBUTE_SCAN		0x04
+ 
++/* media attributes */
++#define AVRCP_MEDIA_ATTRIBUTE_ILLEGAL	0x0
++#define AVRCP_MEDIA_ATTRIBUTE_TITLE	0x1
++#define AVRCP_MEDIA_ATTRIBUTE_ARTIST	0x2
++#define AVRCP_MEDIA_ATTRIBUTE_ALBUM	0x3
++#define AVRCP_MEDIA_ATTRIBUTE_TRACK	0x4
++#define AVRCP_MEDIA_ATTRIBUTE_TOTAL	0x5
++#define AVRCP_MEDIA_ATTRIBUTE_GENRE	0x6
++#define AVRCP_MEDIA_ATTRIBUTE_PROGRESS	0x7
++
+ static const char *ctype2str(uint8_t ctype)
+ {
+ 	switch (ctype & 0x0f) {
+@@ -879,6 +889,107 @@ static void avrcp_ct_battery_status_dump(int level, struct frame *frm,
+ 	printf("BatteryStatus: 0x%02x (%s)\n", status, status2str(status));
+ }
+ 
++static const char *mediattr2str(uint32_t attr)
++{
++	switch (attr) {
++	case AVRCP_MEDIA_ATTRIBUTE_ILLEGAL:
++		return "Illegal";
++	case AVRCP_MEDIA_ATTRIBUTE_TITLE:
++		return "Title";
++	case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
++		return "Artist";
++	case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
++		return "Album";
++	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
++		return "Track";
++	case AVRCP_MEDIA_ATTRIBUTE_TOTAL:
++		return "Track Total";
++	case AVRCP_MEDIA_ATTRIBUTE_GENRE:
++		return "Genre";
++	case AVRCP_MEDIA_ATTRIBUTE_PROGRESS:
++		return "Progress";
++	default:
++		return "Reserved";
++	}
++}
++
++static void avrcp_get_element_attributes_dump(int level, struct frame *frm,
++						uint8_t ctype, uint16_t len)
++{
++	uint64_t id;
++	uint8_t num;
++
++	p_indent(level, frm);
++
++	if (ctype > AVC_CTYPE_GENERAL_INQUIRY)
++		goto response;
++
++	if (len < 9) {
++		printf("PDU Malformed\n");
++		raw_dump(level, frm);
++		return;
++	}
++
++	id = get_u64(frm);
++	printf("Identifier: 0x%jx (%s)\n", id, id ? "Reserved" : "PLAYING");
++
++	p_indent(level, frm);
++
++	num = get_u8(frm);
++	printf("AttributeCount: 0x%02x\n", num);
++
++	for (; num > 0; num--) {
++		uint32_t attr;
++
++		p_indent(level, frm);
++
++		attr = get_u32(frm);
++		printf("Attribute: 0x%08x (%s)\n", attr, mediattr2str(attr));
++	}
++
++	return;
++
++response:
++	if (len < 1) {
++		printf("PDU Malformed\n");
++		raw_dump(level, frm);
++		return;
++	}
++
++	num = get_u8(frm);
++	printf("AttributeCount: 0x%02x\n", num);
++
++	for (; num > 0; num--) {
++		uint32_t attr;
++		uint16_t charset, len;
++
++		p_indent(level, frm);
++
++		attr = get_u32(frm);
++		printf("Attribute: 0x%08x (%s)\n", attr, mediattr2str(attr));
++
++		p_indent(level, frm);
++
++		charset = get_u16(frm);
++		printf("CharsetID: 0x%04x (%s)\n", charset,
++							charset2str(charset));
++
++		p_indent(level, frm);
++
++		len = get_u16(frm);
++		printf("AttributeValueLength: 0x%04x\n", len);
++
++		p_indent(level, frm);
++
++		printf("AttributeValue: ");
++		for (; len > 0; len--) {
++			uint8_t c = get_u8(frm);
++			printf("%1c", isprint(c) ? c : '.');
++		}
++		printf("\n");
++	}
++}
++
+ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
+ {
+ 	uint8_t pduid, pt;
+@@ -937,6 +1048,9 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
+ 	case AVRCP_CT_BATTERY_STATUS:
+ 		avrcp_ct_battery_status_dump(level + 1, frm, ctype, len);
+ 		break;
++	case AVRCP_GET_ELEMENT_ATTRIBUTES:
++		avrcp_get_element_attributes_dump(level + 1, frm, ctype, len);
++		break;
+ 	default:
+ 		raw_dump(level, frm);
+ 	}
+-- 
+1.7.6
 
-thanks,
-Lucas De Marchi
