@@ -1,61 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CACbkbUJ9wC4ZgAuhJ89ee4MVV+QugHNu0uAh+vhc8A7aJ1MwXw@mail.gmail.com>
-References: <CACbkbUJ9wC4ZgAuhJ89ee4MVV+QugHNu0uAh+vhc8A7aJ1MwXw@mail.gmail.com>
-Date: Mon, 1 Aug 2011 14:46:14 -0300
-Message-ID: <CAKT1EBerKVhx8tL_i_9DJ+kYobaYBRoQ46PR7PK+At00qaPD8Q@mail.gmail.com>
-Subject: Re: Advertising cache and random address support
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: VISHWANATH KM <a21174@motorola.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Andre Guedes <andre.guedes@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1312213432-4364-1-git-send-email-luiz.dentz@gmail.com>
+References: <1312213432-4364-1-git-send-email-luiz.dentz@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 1 Aug 2011 12:45:02 -0300
+Message-ID: <CAMOw1v4Uu=pcHKpRHOG8Nm3zq2EhZuGJcbPyNN8YfkViXucVOw@mail.gmail.com>
+Subject: Re: [PATCH hcidump 01/13 v2] Don't parse response AVRCP pdu if ctype
+ is NOT_IMPLETED
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vishwanath,
-
-On Mon, Aug 1, 2011 at 10:29 AM, VISHWANATH KM <a21174@motorola.com> wrote:
-> Hi,
+On Mon, Aug 1, 2011 at 12:43 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Advertising cache seem to temporarily store the peer_addr_type info,
-> if we reboot, then we loose the information and subsequent connection
-> fails as we don't have the peer_addr_type, unless we re-scan
-
-we are aware about this limitation. Andre Guedes is already working on it.
-
+> ---
+>  parser/avrcp.c |    6 ++++++
+>  1 files changed, 6 insertions(+), 0 deletions(-)
 >
-> The better approach may be
-> 1) bluez while receiving the advertising events would also store the
-> peer_addr_type info ( may be in dev_info structure in hciops )
-> 2) while initiating connection bluez may pass the peer_addr_type as
-> part of Â bt_io_connect in l2cap_connect (attrib/client.c) as part of
-> new option BT_IO_OPT_
+> diff --git a/parser/avrcp.c b/parser/avrcp.c
+> index ff6862d..1b3afad 100644
+> --- a/parser/avrcp.c
+> +++ b/parser/avrcp.c
+> @@ -473,6 +473,12 @@ void avrcp_dump(int level, struct frame *frm)
+>                return;
+>        }
 >
-> Please let me know your comments on above, or if any better
-> approaches/alternatives on the same, thx
+> +       /* Not implemented should not contain any operand */
+> +       if (ctype == AVC_CTYPE_NOT_IMPLEMENTED) {
+> +               raw_dump(level, frm);
+> +               return;
+> +       }
+> +
 
-We are trying to keep the consistency between Basic Rate and BLE,
-avoiding transport specific parameters in the Bluetooth socket
-operations.
-Passive scanning needs to be executed if the address is not found in
-the cache, otherwise re-connections will not work. In BlueZ it is
-necessary to address multiple connections, so probably the final
-solution will use passive scanning "together" with LE create
-connection(using whitelist or general connection procedure). Remember
-that address resolution is handled by the host, this is another
-argument to implement passive scanning in the kernel.
+Now it seems good.
 
-Are you working in the Android team? I'd be good cooperation and
-interoperability tests.
-I sent some Proximity patches to the ML, let me know if you have
-comments about the proposed Proximity API changes and the
-implementation. You can find the git repository address in the email
-that I sent last week: "Current status on BLE development".
 
-Regards,
-Claudio.
-
->
-> Regards
-> Vishwanath
+thanks,
+Lucas De Marchi
