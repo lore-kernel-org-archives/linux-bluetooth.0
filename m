@@ -2,92 +2,146 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 3/8] Add enable RSSI threshold monitoring
-Date: Tue,  2 Aug 2011 18:37:35 -0300
-Message-Id: <1312321060-19283-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 2/8] Add RSSI threshold monitor implementation
+Date: Tue,  2 Aug 2011 18:37:34 -0300
+Message-Id: <1312321060-19283-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1312321060-19283-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1312321060-19283-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial RSSI threshold monitoring in the adapter. RSSI monitor callback
-will be called when the RSSI monitor state changes triggered by one of
-the thresholds transition. Not yet functional.
+Implements new commands to enable and disable the RSSI threshold
+monitoring through the management interface.
 ---
- src/adapter.c |   27 +++++++++++++++++++++++++++
- src/adapter.h |    6 ++++++
- 2 files changed, 33 insertions(+), 0 deletions(-)
+ plugins/hciops.c  |   13 +++++++++++
+ plugins/mgmtops.c |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h     |    3 ++
+ 3 files changed, 77 insertions(+), 0 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 4c88a0e..37ed727 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -104,6 +104,11 @@ struct service_auth {
- 	struct btd_adapter *adapter;
- };
- 
-+struct rssi_monitor_data {
-+	rssi_monitor cb;
-+	gpointer user_data;
-+};
-+
- struct btd_adapter {
- 	uint16_t dev_id;
- 	int up;
-@@ -148,6 +153,8 @@ struct btd_adapter {
- 	GSList *powered_callbacks;
- 	GSList *pin_callbacks;
- 
-+	GSList *rssi_monitors;		/* RSSI Threshold monitors */
-+
- 	GSList *loaded_drivers;
- };
- 
-@@ -2467,6 +2474,7 @@ static void adapter_free(gpointer user_data)
- 	sdp_list_free(adapter->services, NULL);
- 
- 	g_slist_free_full(adapter->found_devices, dev_info_free);
-+	g_slist_free_full(adapter->rssi_monitors, g_free);
- 
- 	g_slist_free(adapter->oor_devices);
- 
-@@ -3625,3 +3633,22 @@ int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
- {
- 	return adapter_ops->remove_remote_oob_data(adapter->dev_id, bdaddr);
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index ecc0e86..1f7bd52 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -3193,6 +3193,17 @@ static int hciops_unblock_device(int index, bdaddr_t *bdaddr)
+ 	return 0;
  }
-+
-+gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
-+					bdaddr_t *bdaddr, int8_t low,
-+					int high, rssi_monitor cb,
-+					gpointer user_data)
+ 
++static int hciops_enable_rssi_monitor(int index, bdaddr_t *bdaddr,
++						int8_t low, int8_t high)
 +{
-+	struct rssi_monitor_data *monitor;
-+
-+	monitor = g_try_new(struct rssi_monitor_data, 1);
-+	if (monitor == NULL)
-+		return FALSE;
-+
-+	monitor->cb = cb;
-+	monitor->user_data = user_data;
-+
-+	adapter->rssi_monitors = g_slist_append(adapter->rssi_monitors, monitor);
-+
-+	return TRUE;
++	return -ENOSYS;
 +}
++
++static int hciops_disable_rssi_monitor(int index, bdaddr_t *bdaddr)
++{
++	return -ENOSYS;
++}
++
+ static int hciops_get_conn_list(int index, GSList **conns)
+ {
+ 	struct dev_info *dev = &devs[index];
+@@ -3652,6 +3663,8 @@ static struct btd_adapter_ops hci_ops = {
+ 	.read_bdaddr = hciops_read_bdaddr,
+ 	.block_device = hciops_block_device,
+ 	.unblock_device = hciops_unblock_device,
++	.enable_rssi_monitor = hciops_enable_rssi_monitor,
++	.disable_rssi_monitor = hciops_disable_rssi_monitor,
+ 	.get_conn_list = hciops_get_conn_list,
+ 	.disconnect = hciops_disconnect,
+ 	.remove_bonding = hciops_remove_bonding,
+diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
+index 3cdb97e..e01f330 100644
+--- a/plugins/mgmtops.c
++++ b/plugins/mgmtops.c
+@@ -1751,6 +1751,65 @@ static int mgmt_unblock_device(int index, bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
++static int mgmt_enable_rssi_monitor(int index, bdaddr_t *bdaddr,
++						int8_t low, int8_t high)
++{
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_enable_rssi_monitor)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_enable_rssi_monitor *cp;
++	size_t buf_len;
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("index %d addr %s", index, addr);
++
++	memset(buf, 0, sizeof(buf));
++
++	hdr->opcode = htobs(MGMT_OP_ENABLE_RSSI_MONITOR);
++	hdr->len = htobs(sizeof(*cp));
++	hdr->index = htobs(index);
++
++	cp = (void *) &buf[sizeof(*hdr)];
++	bacpy(&cp->bdaddr, bdaddr);
++	cp->low = low;
++	cp->high = high;
++
++	buf_len = sizeof(*hdr) + sizeof(*cp);
++
++	if (write(mgmt_sock, buf, buf_len) < 0)
++		return -errno;
++
++	return 0;
++}
++
++static int mgmt_disable_rssi_monitor(int index, bdaddr_t *bdaddr)
++{
++	char buf[MGMT_HDR_SIZE + sizeof(struct mgmt_cp_disable_rssi_monitor)];
++	struct mgmt_hdr *hdr = (void *) buf;
++	struct mgmt_cp_disable_rssi_monitor *cp;
++	size_t buf_len;
++	char addr[18];
++
++	ba2str(bdaddr, addr);
++	DBG("index %d addr %s", index, addr);
++
++	memset(buf, 0, sizeof(buf));
++
++	hdr->opcode = htobs(MGMT_OP_DISABLE_RSSI_MONITOR);
++	hdr->len = htobs(sizeof(*cp));
++	hdr->index = htobs(index);
++
++	cp = (void *) &buf[sizeof(*hdr)];
++	bacpy(&cp->bdaddr, bdaddr);
++
++	buf_len = sizeof(*hdr) + sizeof(*cp);
++
++	if (write(mgmt_sock, buf, buf_len) < 0)
++		return -errno;
++
++	return 0;
++}
++
+ static int mgmt_get_conn_list(int index, GSList **conns)
+ {
+ 	struct controller_info *info = &controllers[index];
+@@ -2047,6 +2106,8 @@ static struct btd_adapter_ops mgmt_ops = {
+ 	.read_bdaddr = mgmt_read_bdaddr,
+ 	.block_device = mgmt_block_device,
+ 	.unblock_device = mgmt_unblock_device,
++	.enable_rssi_monitor = mgmt_enable_rssi_monitor,
++	.disable_rssi_monitor = mgmt_disable_rssi_monitor,
+ 	.get_conn_list = mgmt_get_conn_list,
+ 	.disconnect = mgmt_disconnect,
+ 	.remove_bonding = mgmt_remove_bonding,
 diff --git a/src/adapter.h b/src/adapter.h
-index 658a211..ca53152 100644
+index 687275a..658a211 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -279,3 +279,9 @@ int btd_adapter_add_remote_oob_data(struct btd_adapter *adapter,
- 
- int btd_adapter_remove_remote_oob_data(struct btd_adapter *adapter,
- 							bdaddr_t *bdaddr);
-+
-+typedef void (*rssi_monitor) (uint8_t alert, gpointer user_data);
-+gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
-+					bdaddr_t *bdaddr, int8_t low,
-+					int high, rssi_monitor cb,
-+					gpointer user_data);
+@@ -196,6 +196,9 @@ struct btd_adapter_ops {
+ 	int (*read_bdaddr) (int index, bdaddr_t *bdaddr);
+ 	int (*block_device) (int index, bdaddr_t *bdaddr);
+ 	int (*unblock_device) (int index, bdaddr_t *bdaddr);
++	int (*enable_rssi_monitor) (int index, bdaddr_t *bdaddr, int8_t low,
++								int8_t high);
++	int (*disable_rssi_monitor) (int index, bdaddr_t *bdaddr);
+ 	int (*get_conn_list) (int index, GSList **conns);
+ 	int (*disconnect) (int index, bdaddr_t *bdaddr);
+ 	int (*remove_bonding) (int index, bdaddr_t *bdaddr);
 -- 
 1.7.6
 
