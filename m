@@ -2,62 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 6/8] Add adapter_ops calls for RSSI Enable/Disable
-Date: Tue,  2 Aug 2011 18:37:38 -0300
-Message-Id: <1312321060-19283-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 5/8] Add disable for RSSI threshold monitor
+Date: Tue,  2 Aug 2011 18:37:37 -0300
+Message-Id: <1312321060-19283-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1312321060-19283-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1312321060-19283-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ src/adapter.c |   20 ++++++++++++++++++++
+ src/adapter.h |    2 ++
+ 2 files changed, 22 insertions(+), 0 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index aa65135..33ad41f 100644
+index 08675a1..aa65135 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3649,6 +3649,7 @@ gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
- 					gpointer user_data)
- {
- 	struct rssi_monitor_data *monitor;
-+	int err;
+@@ -3666,3 +3666,23 @@ gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
  
- 	if (g_slist_find_custom(adapter->rssi_monitors, bdaddr,
- 						rssi_monitor_bacmp))
-@@ -3658,6 +3659,14 @@ gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
- 	if (monitor == NULL)
- 		return FALSE;
- 
-+	err = adapter_ops->enable_rssi_monitor(adapter->dev_id, bdaddr, low,
-+									high);
-+	if (err < 0) {
-+		error("Enable RSSI threshold monitor: %s", strerror(-err));
-+		g_free(monitor);
-+		return FALSE;
-+	}
-+
- 	bacpy(&monitor->bdaddr, bdaddr);
- 	monitor->cb = cb;
- 	monitor->user_data = user_data;
-@@ -3672,6 +3681,7 @@ gboolean btd_adapter_disable_rssi_monitor(struct btd_adapter *adapter,
- {
- 	struct rssi_monitor_data *monitor;
- 	GSList *l;
-+	int err;
- 
- 	l = g_slist_find_custom(adapter->rssi_monitors, bdaddr,
- 						rssi_monitor_bacmp);
-@@ -3684,5 +3694,7 @@ gboolean btd_adapter_disable_rssi_monitor(struct btd_adapter *adapter,
- 								monitor);
- 	g_free(monitor);
- 
--	return TRUE;
-+	err = adapter_ops->disable_rssi_monitor(adapter->dev_id, bdaddr);
-+
-+	return (err < 0 ? FALSE : TRUE);
+ 	return TRUE;
  }
++
++gboolean btd_adapter_disable_rssi_monitor(struct btd_adapter *adapter,
++							bdaddr_t *bdaddr)
++{
++	struct rssi_monitor_data *monitor;
++	GSList *l;
++
++	l = g_slist_find_custom(adapter->rssi_monitors, bdaddr,
++						rssi_monitor_bacmp);
++	if (!l)
++		return FALSE;
++
++	monitor = l->data;
++
++	adapter->rssi_monitors = g_slist_remove(adapter->rssi_monitors,
++								monitor);
++	g_free(monitor);
++
++	return TRUE;
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index ca53152..66949e7 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -285,3 +285,5 @@ gboolean btd_adapter_enable_rssi_monitor(struct btd_adapter *adapter,
+ 					bdaddr_t *bdaddr, int8_t low,
+ 					int high, rssi_monitor cb,
+ 					gpointer user_data);
++gboolean btd_adapter_disable_rssi_monitor(struct btd_adapter *adapter,
++							bdaddr_t *bdaddr);
 -- 
 1.7.6
 
