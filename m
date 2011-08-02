@@ -2,144 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Briglia <anderson.briglia@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC 5/7] Bluetooth: Implement Read RSSI command
-Date: Tue,  2 Aug 2011 14:35:07 -0400
-Message-Id: <1312310109-27082-6-git-send-email-anderson.briglia@openbossa.org>
+Subject: [RFC 4/7] Bluetooth: Implement RSSI Monitor Alert event
+Date: Tue,  2 Aug 2011 14:35:06 -0400
+Message-Id: <1312310109-27082-5-git-send-email-anderson.briglia@openbossa.org>
 In-Reply-To: <1312310109-27082-1-git-send-email-anderson.briglia@openbossa.org>
 References: <y>
  <1312310109-27082-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command is used for RSSI Monitoring since the controller did not
-have this feature.
-When Read RSSI Command completes, the RSSI alert level is calculated for
-monitored connections and if the alert type has changed, an alert event
-is sent to user space according to configured threshold values.
+This patch implements functions to calculate and send a Management event
+according to RSSI value from a monitored connection. The event was
+divided in three types: high, in range and low. The RSSI Monitor Alert
+event is sent when a monitored RSSI value (stored into RSSI Monitor
+list), reaches one of the two thresholds (low and high).
 
 Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
 ---
- include/net/bluetooth/hci.h      |   10 ++++++++++
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_event.c        |   24 ++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |   32 ++++++++++++++++++++++++++++++++
- 4 files changed, 67 insertions(+), 0 deletions(-)
+ include/net/bluetooth/mgmt.h |    6 ++++++
+ net/bluetooth/mgmt.c         |   32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c4fdeeb..276be6e 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -550,6 +550,16 @@ struct hci_cp_set_event_flt {
- 	__u8     condition[0];
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index ef3b636..f254f40 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -313,3 +313,9 @@ struct mgmt_ev_remote_name {
  } __packed;
  
-+#define HCI_OP_READ_RSSI		0x1405
-+struct hci_cp_read_rssi {
-+	__le16	handle;
+ #define MGMT_EV_DISCOVERING		0x0014
++
++#define MGMT_EV_RSSI_MONITOR_ALERT	0x0015
++struct mgmt_ev_rssi_monitor_alert {
++	bdaddr_t bdaddr;
++	__u8 alert_type;
 +} __packed;
-+struct hci_rp_read_rssi {
-+	__u8	status;
-+	__le16	handle;
-+	__s8	rssi;
-+} __packed;
-+
- /* Filter types */
- #define HCI_FLT_CLEAR_ALL	0x00
- #define HCI_FLT_INQ_RESULT	0x01
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1bc1c3a..a3cf433 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -856,6 +856,7 @@ int mgmt_auth_failed(u16 index, bdaddr_t *bdaddr, u8 status);
- int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
- int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
- 								u8 status);
-+void mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status);
- int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
- 							u8 *eir, u8 eir_len);
- int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 55872ff..4379de0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -982,6 +982,26 @@ static inline void hci_cc_write_le_host_supported(struct hci_dev *hdev,
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp), &cp);
- }
- 
-+static void hci_cc_read_rssi(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_rp_read_rssi *rp = (void *) skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%x", hdev->name, rp->status);
-+
-+	if (!test_bit(HCI_MGMT, &hdev->flags))
-+		return;
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+	if (!conn) {
-+		BT_DBG("%s read rssi failed", hdev->name);
-+		return;
-+	}
-+
-+	mgmt_read_rssi_complete(hdev->id, &conn->dst, rp->rssi,
-+							rp->status);
-+}
-+
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-@@ -2012,6 +2032,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_write_le_host_supported(hdev, skb);
- 		break;
- 
-+	case HCI_OP_READ_RSSI:
-+		hci_cc_read_rssi(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a1955df..65ddbff 100644
+index e655542..a1955df 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2686,3 +2686,35 @@ int mgmt_do_interleaved_discovery(u16 index)
+@@ -44,6 +44,10 @@ enum bt_device_type {
+ #define BREDR_LE_SCAN_TIMEOUT 5120 /* TGAP(100)/2 */
+ #define LE_ONLY_SCAN_TIMEOUT 10240 /* TGAP(gen_disc_scan_min) */
  
- 	return err;
++#define RSSI_MONITOR_ALERT_IN_RANGE	0x00
++#define RSSI_MONITOR_ALERT_LOW		0x01
++#define RSSI_MONITOR_ALERT_HIGH		0x02
++
+ struct pending_cmd {
+ 	struct list_head list;
+ 	__u16 opcode;
+@@ -1932,6 +1936,7 @@ static int rssi_monitor_add(u16 index, bdaddr_t *bdaddr, s8 low_trigger,
+ 	bacpy(&rm->bdaddr, bdaddr);
+ 	rm->low_trigger = low_trigger;
+ 	rm->high_trigger = high_trigger;
++	rm->last_alert = RSSI_MONITOR_ALERT_HIGH;
+ 
+ 	list_add(&rm->list, &rssi_monitor_list);
+ 
+@@ -1984,6 +1989,33 @@ static int disable_rssi_monitor(struct sock *sk, u16 index,
+ 	return rssi_monitor_remove(index, &cp->bdaddr);
  }
-+
-+static int mgmt_read_rssi(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 
++static int rssi_monitor_send_alert(u16 index, bdaddr_t *bdaddr, s8 rssi)
 +{
-+	struct hci_cp_read_rssi rs;
-+	struct hci_conn *conn;
++	struct rssi_monitor *rm;
++	struct mgmt_ev_rssi_monitor_alert ev;
++	u8 alert;
 +
-+	BT_DBG("hci%u", hdev->id);
-+
-+	if (!test_bit(HCI_UP, &hdev->flags))
-+		return -ENETDOWN;
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
-+	if (!conn)
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
-+
-+	if (!conn)
-+		return -ENOTCONN;
-+
-+	put_unaligned_le16(conn->handle, &rs.handle);
-+
-+	return hci_send_cmd(hdev, HCI_OP_READ_RSSI, sizeof(rs), &rs);
-+}
-+
-+void mgmt_read_rssi_complete(u16 index, bdaddr_t *bdaddr, s8 rssi, u8 status)
-+{
-+	BT_DBG("hci%d status %0x", index, status);
-+
-+	if (status)
++	rm = rssi_monitor_find(index, bdaddr);
++	if (!rm)
 +		return -EINVAL;
 +
-+	rssi_monitor_send_alert(index, bdaddr, rssi);
++	if (rssi <= rm->high_trigger)
++		alert = RSSI_MONITOR_ALERT_HIGH;
++	else if (rssi <= rm->low_trigger)
++		alert = RSSI_MONITOR_ALERT_LOW;
++	else
++		alert = RSSI_MONITOR_ALERT_IN_RANGE;
++
++	if (rm->last_alert == alert)
++		return 0;
++
++	bacpy(&ev.bdaddr, bdaddr);
++	ev.alert_type = alert;
++	rm->last_alert = alert;
++	return mgmt_event(MGMT_EV_RSSI_MONITOR_ALERT, index, &ev,
++							sizeof(ev), NULL);
 +}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
 -- 
 1.7.4.1
 
