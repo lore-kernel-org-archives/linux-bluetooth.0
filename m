@@ -1,28 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] add profile version to HandsfreeAgent
-Date: Tue,  2 Aug 2011 12:25:30 +0200
-Message-Id: <1312280732-5952-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Tue, 2 Aug 2011 13:14:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/6 v3] Make use of g_slist_free_full when elements
+ are dynamically-allocated
+Message-ID: <20110802101414.GA6441@dell.ger.corp.intel.com>
+References: <1312279206-15500-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312279206-15500-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some phones with HFP Audio Gateway version previous to 1.5 (i.e.
-Samsung SGH-D600 returning 0x0101 as profile version) do not accept
-an AT+BRSF with latest features.
-The Handsfree agent should adapt its AT+BRSF command depending on the
-remote version, so add version information as parameter of
-NewConnection method.
+Hi Luiz,
 
-Frédéric Danis (2):
-  doc: add remote version to NewConnection method
-  audio: add profile version to NewConnection method
+On Tue, Aug 02, 2011, Luiz Augusto von Dentz wrote:
+> This avoid having to iterate twice in the list to free its elements.
+> ---
+>  Makefile.am                 |    2 +-
+>  configure.ac                |    4 ++++
+>  plugins/bluetooth.c         |    9 ++++-----
+>  plugins/pbap.c              |    8 +++++---
+>  plugins/phonebook-dummy.c   |    4 ++--
+>  plugins/phonebook-ebook.c   |    1 +
+>  plugins/phonebook-tracker.c |    6 +++---
+>  plugins/vcard.c             |   22 ++++++++++------------
+>  src/glib-helper.h           |   30 ++++++++++++++++++++++++++++++
+>  tools/test-server.c         |    2 ++
+>  10 files changed, 62 insertions(+), 26 deletions(-)
+>  create mode 100644 src/glib-helper.h
 
- audio/gateway.c |   86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- doc/hfp-api.txt |    2 +-
- 2 files changed, 86 insertions(+), 2 deletions(-)
+This and the other five patches have been pushed upstream. Thanks.
 
+Johan
