@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Anderson Briglia <anderson.briglia@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 0/8] Userspace patches for RSSI threshold monitor
-Date: Tue,  2 Aug 2011 18:37:32 -0300
-Message-Id: <1312321060-19283-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [RFC 7/7] Bluetooth: Remove RSSI monitor on disconnection
+Date: Tue,  2 Aug 2011 14:35:09 -0400
+Message-Id: <1312310109-27082-8-git-send-email-anderson.briglia@openbossa.org>
+In-Reply-To: <1312310109-27082-1-git-send-email-anderson.briglia@openbossa.org>
+References: <y>
+ <1312310109-27082-1-git-send-email-anderson.briglia@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patches are implementing the userspace functions to handle
-RSSI threshold monitor. The mgmt-api changes was proposed by:
-[PATCH] Add RSSI Monitor documentation API(see ML)
+Remove RSSI monitor from list when remote has been disconnected.
 
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ net/bluetooth/mgmt.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Claudio Takahasi (8):
-  Add RSSI threshold monitor definition in mgmt
-  Add RSSI threshold monitor implementation
-  Add enable RSSI threshold monitoring
-  Return FALSE if RSSI monitor is already enabled
-  Add disable for RSSI threshold monitor
-  Add adapter_ops calls for RSSI Enable/Disable
-  Notify registered monitors when alert is triggered
-  Add handle for RSSI monitor alert event in mgmt
-
- lib/mgmt.h        |   18 +++++++++++
- plugins/hciops.c  |   13 ++++++++
- plugins/mgmtops.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.c     |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h     |   13 ++++++++
- src/event.c       |   14 ++++++++
- src/event.h       |    2 +
- 7 files changed, 234 insertions(+), 0 deletions(-)
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b034290..e2379d15 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2374,6 +2374,8 @@ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr)
+ 	if (sk)
+ 		sock_put(sk);
+ 
++	err = rssi_monitor_remove(index, bdaddr);
++
+ 	return err;
+ }
+ 
 -- 
-1.7.6
+1.7.4.1
 
