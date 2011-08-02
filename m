@@ -1,35 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Aug 2011 16:49:33 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Proximity API simplification
-Message-ID: <20110802134933.GA17778@dell.ger.corp.intel.com>
-References: <CAKT1EBepAMrUzRvOMMiEyr5Zmist-rzD55pfnkSe+hRMdtM26A@mail.gmail.com>
- <1311114990-21762-1-git-send-email-claudio.takahasi@openbossa.org>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: "Min Jun,Xi" <xi.minjun@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 2 Aug 2011 15:11:34 +0200
+Subject: RE: Regarding to TI WL1283 support in the "hciattach" command
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01D400E18D@dnce01.ent.ti.com>
+References: <CAB0WyvmynL15E0PegWmS3Kisxi4QY5k=q5-4Pg7pT3d8yagvjA@mail.gmail.com>
+In-Reply-To: <CAB0WyvmynL15E0PegWmS3Kisxi4QY5k=q5-4Pg7pT3d8yagvjA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1311114990-21762-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
-
-On Tue, Jul 19, 2011, Claudio Takahasi wrote:
-> Delegates the Immediate Alert Level control to the caller(client).
-> Immediate Alert Service is shared between Path Loss and Find Me.
-> 
-> Three signal level states are defined: "good", "regular" and "weak".
-> Meaning that at least two thresholds are necessary to implement a
-> proper state transition. "unknown" will be returned if the link is not
-> active. For Path Loss, the logic to trigger the writting operation of
-> the Immediate Alert Level characteristic needs to be implemented in
-> the client. SignalLevel can be only one of the inputs to define when
-> and which value to write in the characteristic.
-> ---
->  doc/proximity-api.txt |   36 ++++++------------------------------
->  1 files changed, 6 insertions(+), 30 deletions(-)
-
-Applied. Thanks.
-
-Johan
+SGkgWGkgTWluanVuLg0KDQpJcyB0aGVyZSBhIHJlYXNvbiBmb3IgdXNpbmcgdGhlIHRleGFzYWx0
+ID8gSSd2ZSBhbHdheXMgdXNlZCB0aGUgdGV4YXMgY29tbWFuZCBhbmQgaXQgd29ya2VkLg0KDQpJ
+J3ZlIGJlZW4gdXNpbmcgdGhlIHdsMTI4MyBhbmQgdGhlIHdsMTI3MyB3aXRoIHRoZSBoY2lhdHRh
+Y2gsIHdpdGggdGhlIGZvbGxvd2luZyBjb21tYW5kIDoNCnN1ZG8gaGNpYXR0YWNoIC1uIC9kZXYv
+dHR5VVNCMCB0ZXhhcyAxMTUyMDAgLXQgMTAwMDANCg0KdGhlIC10IDEwMDAwIG1heSBub3QgYmUg
+bmVlZGVkLCBkZXBlbmRpbmcgb24gdGhlIFRJIEluaXQgc2NyaXB0IHlvdSBhcmUgdXNpbmcuDQoN
+CkluIGFkZGl0aW9uIG9mIGNvdXJzZSwgeW91IHdpbGwgbmVlZCB0byBwdXQgdGhlIFRJSW5pdF8x
+MC54LnkuYnRzIGluIC9saWIvZmlybXdhcmUuDQoNCg0KVGhhbmtzLA0KQ2hlbiBHYW5pcg0KDQoN
+Cj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtYmx1ZXRvb3RoLW93
+bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC0NCj4gb3duZXJAdmdl
+ci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTWluIEp1bixYaQ0KPiBTZW50OiBUdWVzZGF5LCBB
+dWd1c3QgMDIsIDIwMTEgMTE6MTggQU0NCj4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
+bC5vcmcNCj4gU3ViamVjdDogUmVnYXJkaW5nIHRvIFRJIFdMMTI4MyBzdXBwb3J0IGluIHRoZSAi
+aGNpYXR0YWNoIiBjb21tYW5kDQo+IA0KPiBIaSBBbGwsDQo+IA0KPiBSZWNlbnRseSwgSSBnb3Qg
+b25lIFRJIFdMMTI4MyBkZXZraXQsIHdoaWNoIGlzIG5vdCBzdXBwb3J0ZWQgaW4gdGhlDQo+IGN1
+cnJlbnQgYmx1ZXogY29kZS4gV2hlbiBJIGFtIHRyeWluZyB0byBhdHRhY2ggaXQgdG8gbXkgdWJ1
+bnR1IGRlc2t0b3ANCj4gYnkgcnVubmluZyB0aGUNCj4gICAgICJoY2lhdHRhY2ggdHR5VVNCMCB0
+ZXhhc2FsdCAxMTUyMDAiDQo+IGNvbW1hbmQsIEkgZmFpbGVkIGJlY2F1c2UgIndsMTI4MyIgY2Fu
+IG5vdCBiZSByZWNvZ25pemVkLg0KPiBJbiBvcmRlciB0byBtYWtlIGl0IHdvcmssIEkgcmVhZCB0
+aHJvdWdoIHRoZSBjb2RlIGluDQo+ICJ0b29scy9oY2lhdHRhY2hfdGlhbHQuYyIsIGFuZCBtYWRl
+IHNldmVyYWwgY29kZSBjaGFuZ2VzIGluDQo+ICJ0ZXhhc2FsdF9pbml0KCkiIGZ1bmN0aW9uLiBB
+bmQgaGVyZSBpcyB0aGUgZGlmZjoNCj4gDQo+IGluZGV4IDFiYTAwOWMuLjI1MTRlZTAgMTAwNjQ0
+DQo+IC0tLSBhL3Rvb2xzL2hjaWF0dGFjaF90aWFsdC5jDQo+ICsrKyBiL3Rvb2xzL2hjaWF0dGFj
+aF90aWFsdC5jDQo+IEBAIC0yMTEsNyArMjExLDcgQEAgaW50IHRleGFzYWx0X2luaXQoaW50IGZk
+LCBpbnQgc3BlZWQsIHN0cnVjdCB0ZXJtaW9zDQo+ICp0aSkNCj4gICAgICAgICB7DQo+ICAgICAg
+ICAgICAgICAgICB1bnNpZ25lZCBzaG9ydCBsbXBfc3VidiA9IHJlc3BbMTNdIHwgKHJlc3BbMTRd
+IDw8IDgpOw0KPiAgICAgICAgICAgICAgICAgdW5zaWduZWQgc2hvcnQgYnJmX2NoaXAgPSAobG1w
+X3N1YnYgJiAweDdjMDApID4+IDEwOw0KPiAtICAgICAgICAgICAgICAgc3RhdGljIGNvbnN0IGNo
+YXIgKmNfYnJmX2NoaXBbOF0gPSB7DQo+ICsgICAgICAgICAgICAgICBzdGF0aWMgY29uc3QgY2hh
+ciAqY19icmZfY2hpcFsxMV0gPSB7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICJ1bmtub3du
+IiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgInVua25vd24iLA0KPiAgICAgICAgICAgICAg
+ICAgICAgICAgICAiYnJmNjEwMCIsDQo+IEBAIC0yMTksNyArMjE5LDEwIEBAIGludCB0ZXhhc2Fs
+dF9pbml0KGludCBmZCwgaW50IHNwZWVkLCBzdHJ1Y3QNCj4gdGVybWlvcyAqdGkpDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICJicmY2MzAwIiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ImJyZjYzNTAiLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAidW5rbm93biIsDQo+IC0gICAg
+ICAgICAgICAgICAgICAgICAgICJ3bDEyNzEiDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICJ3
+bDEyNzEiLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAidW5rbm93biIsDQo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICJ1bmtub3duIiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgInds
+MTI4MyINCj4gICAgICAgICAgICAgICAgIH07DQo+ICAgICAgICAgICAgICAgICBjaGFyIGZ3WzEw
+MF07DQo+IA0KPiBAQCAtMjMxLDcgKzIzNCw3IEBAIGludCB0ZXhhc2FsdF9pbml0KGludCBmZCwg
+aW50IHNwZWVkLCBzdHJ1Y3QgdGVybWlvcw0KPiAqdGkpDQo+ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIlx0Y2hpcDogJXMgKCVkKVxuIiwNCj4gICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBsbXBfc3VidiAmIDB4N2YsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgKChsbXBfc3VidiAmIDB4ODAwMCkgPj4gKDE1LTMpKSB8DQo+ICgobG1wX3N1YnYgJiAw
+eDM4MCkgPj4gNyksDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKChicmZfY2hp
+cCA+IDcpID8gInVua25vd24iIDoNCj4gY19icmZfY2hpcFticmZfY2hpcF0pLA0KPiArICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICgoYnJmX2NoaXAgPiAxMCkgPyAidW5rbm93biIgOg0K
+PiBjX2JyZl9jaGlwW2JyZl9jaGlwXSksDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgYnJmX2NoaXApOw0KPiANCj4gICAgICAgICAgICAgICAgIHNwcmludGYoZncsICIvZXRjL2Zp
+cm13YXJlLyVzLmJpbiIsDQo+IGNfYnJmX2NoaXBbYnJmX2NoaXBdKTsNCj4gDQo+IElzIHRoZXJl
+IGFueWJvZHkgZnJvbSBUSSBjYW4gdXBkYXRlIHRoZSBjb2RlIHRvIHN1cHBvcnQgV0wxMjgzPyBP
+ciBjYW4NCj4gSSBjb21taXQgdGhlIGNvZGUgdG8gYmx1ZXo/IFRoYW5rIHlvdSENCj4gDQo+IC0t
+DQo+IGJlc3QgcmVnYXJkcywNCj4gWGkgTWluanVuDQo+IC0tDQo+IFRvIHVuc3Vic2NyaWJlIGZy
+b20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC0NCj4gYmx1ZXRv
+b3RoIiBpbg0KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVs
+Lm9yZw0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21h
+am9yZG9tby1pbmZvLmh0bWwNCg==
