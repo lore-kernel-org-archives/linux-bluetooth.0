@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAG9fbzbpJZgUO7VkEu-AJj72p9o_JZtydQ08dhyyfosDDehr9Q@mail.gmail.com>
-References: <CAG9fbzbpJZgUO7VkEu-AJj72p9o_JZtydQ08dhyyfosDDehr9Q@mail.gmail.com>
-Date: Wed, 3 Aug 2011 12:39:28 +0300
-Message-ID: <CABBYNZL0iqzady5v=EiNjTm-u95VnFywj_w+YY5qSFjUX=_GhA@mail.gmail.com>
-Subject: Re: bluetooth and OPP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: ranjith kumar <ranjithproxy@gmail.com>
+Date: Wed, 3 Aug 2011 12:38:48 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ v2 0/6] Proximity configs and LinkLoss alert write
+Message-ID: <20110803093848.GC31600@dell>
+References: <1311803586-5405-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1311864173-16118-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1311864173-16118-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Aug 3, 2011 at 11:11 AM, ranjith kumar <ranjithproxy@gmail.com> wrote:
-> Hi,
-> I am new to bluetooth and bluez.
-> I installed bluez on my linux PC.
-> Please let me  know weather bluez contains OPP(Object Push Profile)
-> implementation or not.
-> Where can I find an application which calls bluez API for OPP profile?
-> Also I am searching for OPP  full description. I could not found it.
-> Please let me know if there are any links.
+On Thu, Jul 28, 2011, Claudio Takahasi wrote:
+> Dependency: "[PATCH BlueZ 0/5] Add Get/Set Property for Link Loss"
+> 
+> Changes from the last series: ref counting inside Proximity Monitor based
+> on the feedbacks/comments in the ML.
+> 
+> The following patches implement the configuration file to allow
+> disabling Proximity Monitor services and Find Me. First patch using
+> attio connection callback registration mechanism to write Link Loss
+> Alert level.
+> 
+> Anderson Lizardo (1):
+>   Proximity Monitor: Write Alert Level to Reporter
+> 
+> Claudio Takahasi (5):
+>   Add Tx Power and Immediate Alert UUID
+>   Add config file for proximity monitor
+>   Match probed UUIDs and enabled services
+>   Return an error if LinkLoss is disabled
+>   Return LinkLossAlertLevel if enabled
+> 
+>  Makefile.am              |    4 +-
+>  proximity/main.c         |   30 ++++++++++++-
+>  proximity/manager.c      |   52 ++++++++++++++++++++--
+>  proximity/manager.h      |    2 +-
+>  proximity/monitor.c      |  109 ++++++++++++++++++++++++++++++++++++++++++++-
+>  proximity/monitor.h      |    9 +++-
+>  proximity/proximity.conf |    9 ++++
+>  7 files changed, 202 insertions(+), 13 deletions(-)
+>  create mode 100644 proximity/proximity.conf
 
+This patch-set has also been applied. Thanks.
 
-OPP, FTP and other OBEX related profiles are implemented in obexd:
-
-http://git.kernel.org/?p=bluetooth/obexd.git;a=summary
-
--- 
-Luiz Augusto von Dentz
+Johan
