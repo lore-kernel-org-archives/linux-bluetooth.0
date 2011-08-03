@@ -1,47 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
-	<ulrik.lauren@stericsson.com>, Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 0/2] Fix debug messages logging from non-built-in plugins
-Date: Wed, 3 Aug 2011 17:30:50 +0200
-Message-ID: <1312385452-9770-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 3 Aug 2011 17:22:45 +0300
+From: Dan Carpenter <error27@gmail.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org
+Subject: [patch] bluetooth: unlock if allocation fails in hci_blacklist_add()
+Message-ID: <20110803142244.GL3839@shale.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+There was a small typo here so we never actually hit the goto which
+would call hci_dev_unlock_bh().
 
-This is a second version, much simpler. Uses dlsym() to locate __debug
-section both in external plugin and main binary. Thanks to this we have
-common path for all debug messages.
+Signed-off-by: Dan Carpenter <error27@gmail.com>
 
-Also added dummy external plugin for test purposes.
-
-Some comments about it:
-__start___debug and __stop___debug symbols must be produced explicite
-with -usymbol linker flag (see [1]) if not referenced in code directly.
-
-
-Comments welcome.
-
-[1] http://lists.gnu.org/archive/html/bug-binutils/2007-11/msg00088.html
-
-Szymon Janc (2):
-  Fix debug messages logging from non-built-in plugins
-  Add external dummy plugin for testing
-
- Makefile.am              |   12 ++++++++++-
- acinclude.m4             |    6 +++++
- plugins/external-dummy.c |   42 +++++++++++++++++++++++++++++++++++++++
- src/bluetooth.ver        |    2 +
- src/log.c                |   49 ++++++++++++++++++++++++++++++++++++---------
- src/log.h                |    2 +
- src/plugin.c             |    8 +++++-
- 7 files changed, 108 insertions(+), 13 deletions(-)
- create mode 100644 plugins/external-dummy.c
-
--- 
-on behalf of ST-Ericsson
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index baaf5eb..56943ad 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1326,7 +1326,7 @@ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 
+ 	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
+ 	if (!entry) {
+-		return -ENOMEM;
++		err = -ENOMEM;
+ 		goto err;
+ 	}
+ 
