@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/3] Bluetooth: make use sk_priority to priritize RFCOMM packets
-Date: Wed,  3 Aug 2011 16:11:34 +0300
-Message-Id: <1312377094-11285-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 2/3] Bluetooth: set skbuffer priority based on L2CAP socket priority
+Date: Wed,  3 Aug 2011 16:11:33 +0300
+Message-Id: <1312377094-11285-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
 References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,189 +11,212 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This uses SO_PRIORITY to set the skbuffer priority field
+
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/rfcomm/core.c |   51 +++++++++++++++++++++++++++++-------------
- 1 files changed, 35 insertions(+), 16 deletions(-)
+ include/net/bluetooth/l2cap.h |    3 +-
+ net/bluetooth/l2cap_core.c    |   47 +++++++++++++++++++++++++++++-----------
+ net/bluetooth/l2cap_sock.c    |    2 +-
+ 3 files changed, 37 insertions(+), 15 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 5759bb7..3ec98bd 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -66,7 +66,8 @@ static unsigned long rfcomm_event;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 4f34ad2..f018e5d 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+ int l2cap_chan_connect(struct l2cap_chan *chan);
+-int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
++int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
++								u32 priority);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
  
- static LIST_HEAD(session_list);
- 
--static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
-+static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
-+							u32 priority);
- static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
- static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
- static int rfcomm_queue_disc(struct rfcomm_dlc *d);
-@@ -751,19 +752,34 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
- }
- 
- /* ---- RFCOMM frame sending ---- */
--static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len)
-+static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
-+							u32 priority)
- {
- 	struct socket *sock = s->sock;
-+	struct sock *sk = sock->sk;
- 	struct kvec iv = { data, len };
- 	struct msghdr msg;
- 
--	BT_DBG("session %p len %d", s, len);
-+	BT_DBG("session %p len %d priority %u", s, len, priority);
-+
-+	if (sk->sk_priority != priority) {
-+		lock_sock(sk);
-+		sk->sk_priority = priority;
-+		release_sock(sk);
-+	}
- 
- 	memset(&msg, 0, sizeof(msg));
- 
- 	return kernel_sendmsg(sock, &msg, &iv, 1, len);
- }
- 
-+static int rfcomm_send_cmd(struct rfcomm_session *s, struct rfcomm_cmd *cmd)
-+{
-+	BT_DBG("%p cmd %u", s, cmd->ctrl);
-+
-+	return rfcomm_send_frame(s, (void *) cmd, sizeof(*cmd), HCI_PRIO_MAX);
-+}
-+
- static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
- {
- 	struct rfcomm_cmd cmd;
-@@ -775,7 +791,7 @@ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
- 	cmd.len  = __len8(0);
- 	cmd.fcs  = __fcs2((u8 *) &cmd);
- 
--	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
-+	return rfcomm_send_cmd(s, &cmd);
- }
- 
- static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
-@@ -789,7 +805,7 @@ static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
- 	cmd.len  = __len8(0);
- 	cmd.fcs  = __fcs2((u8 *) &cmd);
- 
--	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
-+	return rfcomm_send_cmd(s, &cmd);
- }
- 
- static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
-@@ -803,7 +819,7 @@ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
- 	cmd.len  = __len8(0);
- 	cmd.fcs  = __fcs2((u8 *) &cmd);
- 
--	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
-+	return rfcomm_send_cmd(s, &cmd);
- }
- 
- static int rfcomm_queue_disc(struct rfcomm_dlc *d)
-@@ -817,6 +833,8 @@ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+ #endif /* __L2CAP_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3204ba8..2be08ba 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -550,6 +550,8 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
  	if (!skb)
- 		return -ENOMEM;
+ 		return;
  
 +	skb->priority = HCI_PRIO_MAX;
 +
- 	cmd = (void *) __skb_put(skb, sizeof(*cmd));
- 	cmd->addr = d->addr;
- 	cmd->ctrl = __ctrl(RFCOMM_DISC, 1);
-@@ -839,7 +857,7 @@ static int rfcomm_send_dm(struct rfcomm_session *s, u8 dlci)
- 	cmd.len  = __len8(0);
- 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 	if (lmp_no_flush_capable(conn->hcon->hdev))
+ 		flags = ACL_START_NO_FLUSH;
+ 	else
+@@ -1245,7 +1247,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	struct hci_conn *hcon = chan->conn->hcon;
+ 	u16 flags;
  
--	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
-+	return rfcomm_send_cmd(s, &cmd);
- }
- 
- static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
-@@ -864,7 +882,7 @@ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d)
-@@ -906,7 +924,7 @@ static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
-@@ -944,7 +962,7 @@ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
-@@ -971,7 +989,7 @@ static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig)
-@@ -998,7 +1016,7 @@ static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
-@@ -1020,7 +1038,7 @@ static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
-@@ -1042,7 +1060,7 @@ static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static int rfcomm_send_test(struct rfcomm_session *s, int cr, u8 *pattern, int len)
-@@ -1093,7 +1111,7 @@ static int rfcomm_send_credits(struct rfcomm_session *s, u8 addr, u8 credits)
- 
- 	*ptr = __fcs(buf); ptr++;
- 
--	return rfcomm_send_frame(s, buf, ptr - buf);
-+	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
- }
- 
- static void rfcomm_make_uih(struct sk_buff *skb, u8 addr)
-@@ -1771,7 +1789,8 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
- 		return skb_queue_len(&d->tx_queue);
- 
- 	while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
--		err = rfcomm_send_frame(d->session, skb->data, skb->len);
-+		err = rfcomm_send_frame(d->session, skb->data, skb->len,
+-	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
++	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
 +							skb->priority);
- 		if (err < 0) {
- 			skb_queue_head(&d->tx_queue, skb);
- 			break;
+ 
+ 	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
+ 		flags = ACL_START_NO_FLUSH;
+@@ -1451,6 +1454,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+ 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+ 			return -EFAULT;
+ 
++		(*frag)->priority = skb->priority;
++
+ 		sent += count;
+ 		len  -= count;
+ 
+@@ -1460,7 +1465,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+ 	return sent;
+ }
+ 
+-struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1468,7 +1475,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 	skb = bt_skb_send_alloc(sk, count + hlen,
+@@ -1476,6 +1483,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1490,7 +1499,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	return skb;
+ }
+ 
+-struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1506,6 +1517,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1519,7 +1532,10 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+ 	return skb;
+ }
+ 
+-struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
++static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority, u16 control,
++						u16 sdulen)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1527,7 +1543,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+ 	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 
+ 	if (!conn)
+ 		return ERR_PTR(-ENOTCONN);
+@@ -1544,6 +1560,8 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1574,7 +1592,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 
+ 	skb_queue_head_init(&sar_queue);
+ 	control = L2CAP_SDU_START;
+-	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
++	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps,
++						HCI_PRIO_MAX, control, len);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+@@ -1593,7 +1612,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 			buflen = len;
+ 		}
+ 
+-		skb = l2cap_create_iframe_pdu(chan, msg, buflen, control, 0);
++		skb = l2cap_create_iframe_pdu(chan, msg, buflen, HCI_PRIO_MAX,
++								control, 0);
+ 		if (IS_ERR(skb)) {
+ 			skb_queue_purge(&sar_queue);
+ 			return PTR_ERR(skb);
+@@ -1610,7 +1630,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 	return size;
+ }
+ 
+-int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
++								u32 priority)
+ {
+ 	struct sk_buff *skb;
+ 	u16 control;
+@@ -1618,7 +1639,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 
+ 	/* Connectionless channel */
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
+-		skb = l2cap_create_connless_pdu(chan, msg, len);
++		skb = l2cap_create_connless_pdu(chan, msg, len, priority);
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
+@@ -1633,7 +1654,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 			return -EMSGSIZE;
+ 
+ 		/* Create a basic PDU */
+-		skb = l2cap_create_basic_pdu(chan, msg, len);
++		skb = l2cap_create_basic_pdu(chan, msg, len, priority);
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
+@@ -1646,8 +1667,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		/* Entire SDU fits into one PDU */
+ 		if (len <= chan->remote_mps) {
+ 			control = L2CAP_SDU_UNSEGMENTED;
+-			skb = l2cap_create_iframe_pdu(chan, msg, len, control,
+-									0);
++			skb = l2cap_create_iframe_pdu(chan, msg, len, priority,
++								control, 0);
+ 			if (IS_ERR(skb))
+ 				return PTR_ERR(skb);
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5c36b3e..abe302b 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -706,7 +706,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 		return -ENOTCONN;
+ 	}
+ 
+-	err = l2cap_chan_send(chan, msg, len);
++	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+ 
+ 	release_sock(sk);
+ 	return err;
 -- 
 1.7.6
 
