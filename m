@@ -1,237 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] audio: add profile version to HandsfreeAgent
-Date: Wed,  3 Aug 2011 15:34:17 +0200
-Message-Id: <1312378457-12732-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [RFC 3/3] Bluetooth: make use sk_priority to priritize RFCOMM packets
+Date: Wed,  3 Aug 2011 16:11:34 +0300
+Message-Id: <1312377094-11285-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some phones with HFP Audio Gateway version previous to 1.5 (i.e.
-Samsung SGH-D600 returning 0x0101 as profile version) do not accept
-an AT+BRSF with latest features.
-The Handsfree agent should adapt its AT+BRSF command depending on the
-remote version, so add version information as parameter of
-NewConnection method.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Here is traces of buggy exchange:
-
-< ACL data: handle 12 flags 0x02 dlen 20
-    L2CAP(d): cid 0x0046 len 16 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 10 pf 0 ilen 12 fcs 0xb0
-      0000: 41 54 2b 42 52 53 46 3d  31 31 38 0d              AT+BRSF=118.
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 2
-> ACL data: handle 12 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0042 flags 0x00 result 0 clen 0
-      Success
-> ACL data: handle 12 flags 0x02 dlen 25
-    L2CAP(d): cid 0x0042 len 21 [psm 1]
-        SDP SSA Req: tid 0x0 len 0x10
-          pat uuid-16 0x111e (Handsfree)
-          max 240
-          aid(s) 0x0001 (SrvClassIDList) 0x0311 (SuppFeatures)
-          cont 00
-< ACL data: handle 12 flags 0x02 dlen 27
-    L2CAP(d): cid 0x0040 len 23 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x12
-          count 15
-          record #0
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-16 0x111e (Handsfree) uuid-16 0x1203 (Audio) >
-          cont 00
-> ACL data: handle 12 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0041 len 14 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 10 pf 1 ilen 9 fcs 0x76 credits 1
-      0000: 0d 0a 45 52 52 4f 52 0d  0a                       ..ERROR..
-< ACL data: handle 12 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0046 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 10 pf 1 ilen 0 fcs 0x6d
-
-
-
-and after the fix (and corresponding fix in oFono):
-
-< ACL data: handle 12 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0048 len 15 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 10 pf 0 ilen 11 fcs 0xb0
-      0000: 41 54 2b 42 52 53 46 3d  32 32 0d                 AT+BRSF=22.
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 2
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 12 packets 2
-> ACL data: handle 12 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0041
-< ACL data: handle 12 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0041
-> ACL data: handle 12 flags 0x02 dlen 28
-    L2CAP(d): cid 0x0041 len 24 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 10 pf 1 ilen 19 fcs 0x76 credits 1
-      0000: 0d 0a 2b 42 52 53 46 3a  20 33 33 0d 0a 0d 0a 4f  ..+BRSF: 33....O
-      0010: 4b 0d 0a                                          K..
-< ACL data: handle 12 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0048 len 14 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 10 pf 0 ilen 10 fcs 0xb0
-      0000: 41 54 2b 43 49 4e 44 3d  3f 0d                    AT+CIND=?.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- audio/gateway.c |   87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- doc/hfp-api.txt |    2 +-
- 2 files changed, 87 insertions(+), 2 deletions(-)
+ net/bluetooth/rfcomm/core.c |   51 +++++++++++++++++++++++++++++-------------
+ 1 files changed, 35 insertions(+), 16 deletions(-)
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index ec0ec5d..29d8c9c 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -64,10 +64,12 @@ struct gateway {
- 	gateway_state_t state;
- 	GIOChannel *rfcomm;
- 	GIOChannel *sco;
-+	GIOChannel *incoming;
- 	gateway_stream_cb_t sco_start_cb;
- 	void *sco_start_cb_data;
- 	struct hf_agent *agent;
- 	DBusMessage *msg;
-+	int version;
- };
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 5759bb7..3ec98bd 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -66,7 +66,8 @@ static unsigned long rfcomm_event;
  
- int gateway_close(struct audio_device *device);
-@@ -128,6 +130,7 @@ static gboolean agent_sendfd(struct hf_agent *agent, int fd,
- 		DBusPendingCallNotifyFunction notify, void *data)
- {
- 	struct audio_device *dev = data;
-+	struct gateway *gw = dev->gateway;
- 	DBusMessage *msg;
- 	DBusPendingCall *call;
+ static LIST_HEAD(session_list);
  
-@@ -135,6 +138,7 @@ static gboolean agent_sendfd(struct hf_agent *agent, int fd,
- 			"org.bluez.HandsfreeAgent", "NewConnection");
- 
- 	dbus_message_append_args(msg, DBUS_TYPE_UNIX_FD, &fd,
-+					DBUS_TYPE_UINT16, &gw->version,
- 					DBUS_TYPE_INVALID);
- 
- 	if (dbus_connection_send_with_reply(dev->conn, msg, &call, -1) == FALSE)
-@@ -263,6 +267,80 @@ fail:
- 	change_state(dev, GATEWAY_STATE_DISCONNECTED);
+-static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
++static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
++							u32 priority);
+ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
+ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
+ static int rfcomm_queue_disc(struct rfcomm_dlc *d);
+@@ -751,19 +752,34 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
  }
  
-+static int get_remote_profile_version(sdp_record_t *rec)
-+{
-+	uuid_t uuid;
-+	sdp_list_t *profiles;
-+	sdp_profile_desc_t *desc;
-+	int ver = 0;
-+
-+	sdp_uuid16_create(&uuid, HANDSFREE_PROFILE_ID);
-+
-+	sdp_get_profile_descs(rec, &profiles);
-+	if (profiles == NULL)
-+		goto done;
-+
-+	desc = profiles->data;
-+
-+	if (sdp_uuid16_cmp(&desc->uuid, &uuid) == 0)
-+		ver = desc->version;
-+
-+	sdp_list_free(profiles, free);
-+
-+done:
-+	return ver;
-+}
-+
-+static void get_incoming_record_cb(sdp_list_t *recs, int err,
-+					gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	struct gateway *gw = dev->gateway;
-+	GError *gerr = NULL;
-+
-+	if (err < 0) {
-+		error("Unable to get service record: %s (%d)", strerror(-err),
-+					-err);
-+		return;
-+	}
-+
-+	if (!recs || !recs->data) {
-+		error("No records found");
-+		return;
-+	}
-+
-+	gw->version = get_remote_profile_version(recs->data);
-+	if (gw->version > 0)
-+		rfcomm_connect_cb(gw->incoming, gerr, dev);
-+}
-+
-+static void unregister_incoming(gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	struct gateway *gw = dev->gateway;
-+
-+	if (gw->incoming) {
-+		g_io_channel_unref(gw->incoming);
-+		gw->incoming = NULL;
-+	}
-+}
-+
-+static void rfcomm_incoming_cb(GIOChannel *chan, GError *err,
-+				gpointer user_data)
-+{
-+	struct audio_device *dev = user_data;
-+	struct gateway *gw = dev->gateway;
-+	uuid_t uuid;
-+
-+	gw->incoming = g_io_channel_ref(chan);
-+
-+	sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
-+	if (bt_search_service(&dev->src, &dev->dst, &uuid,
-+				get_incoming_record_cb, dev,
-+				unregister_incoming))
-+		unregister_incoming(dev);
-+}
-+
- static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+ /* ---- RFCOMM frame sending ---- */
+-static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len)
++static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
++							u32 priority)
  {
- 	struct audio_device *dev = user_data;
-@@ -297,6 +375,13 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 		goto fail;
- 	}
+ 	struct socket *sock = s->sock;
++	struct sock *sk = sock->sk;
+ 	struct kvec iv = { data, len };
+ 	struct msghdr msg;
  
-+	gw->version = get_remote_profile_version(recs->data);
-+	if (gw->version == 0) {
-+		error("Unable to get profile version from record");
-+		err = -EINVAL;
-+		goto fail;
-+	}
+-	BT_DBG("session %p len %d", s, len);
++	BT_DBG("session %p len %d priority %u", s, len, priority);
 +
- 	memcpy(&uuid, classes->data, sizeof(uuid));
- 	sdp_list_free(classes, free);
++	if (sk->sk_priority != priority) {
++		lock_sock(sk);
++		sk->sk_priority = priority;
++		release_sock(sk);
++	}
  
-@@ -625,7 +710,7 @@ void gateway_start_service(struct audio_device *dev)
- 	if (gw->rfcomm == NULL)
- 		return;
+ 	memset(&msg, 0, sizeof(msg));
  
--	if (!bt_io_accept(gw->rfcomm, rfcomm_connect_cb, dev, NULL, &err)) {
-+	if (!bt_io_accept(gw->rfcomm, rfcomm_incoming_cb, dev, NULL, &err)) {
- 		error("bt_io_accept: %s", err->message);
- 		g_error_free(err);
- 	}
-diff --git a/doc/hfp-api.txt b/doc/hfp-api.txt
-index 93251e8..cf2e730 100644
---- a/doc/hfp-api.txt
-+++ b/doc/hfp-api.txt
-@@ -62,7 +62,7 @@ Service         unique name
- Interface       org.bluez.HandsfreeAgent
- Object path     freely definable
+ 	return kernel_sendmsg(sock, &msg, &iv, 1, len);
+ }
  
--Methods		void NewConnection(filedescriptor fd)
-+Methods		void NewConnection(filedescriptor fd, uint16 version)
++static int rfcomm_send_cmd(struct rfcomm_session *s, struct rfcomm_cmd *cmd)
++{
++	BT_DBG("%p cmd %u", s, cmd->ctrl);
++
++	return rfcomm_send_frame(s, (void *) cmd, sizeof(*cmd), HCI_PRIO_MAX);
++}
++
+ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
+ {
+ 	struct rfcomm_cmd cmd;
+@@ -775,7 +791,7 @@ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
  
- 			This method gets called whenever a new handsfree
- 			connection has been established.  The objectpath
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
+@@ -789,7 +805,7 @@ static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
+@@ -803,7 +819,7 @@ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+@@ -817,6 +833,8 @@ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
++	skb->priority = HCI_PRIO_MAX;
++
+ 	cmd = (void *) __skb_put(skb, sizeof(*cmd));
+ 	cmd->addr = d->addr;
+ 	cmd->ctrl = __ctrl(RFCOMM_DISC, 1);
+@@ -839,7 +857,7 @@ static int rfcomm_send_dm(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
+@@ -864,7 +882,7 @@ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d)
+@@ -906,7 +924,7 @@ static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
+@@ -944,7 +962,7 @@ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
+@@ -971,7 +989,7 @@ static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig)
+@@ -998,7 +1016,7 @@ static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
+@@ -1020,7 +1038,7 @@ static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
+@@ -1042,7 +1060,7 @@ static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_test(struct rfcomm_session *s, int cr, u8 *pattern, int len)
+@@ -1093,7 +1111,7 @@ static int rfcomm_send_credits(struct rfcomm_session *s, u8 addr, u8 credits)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr)
+@@ -1771,7 +1789,8 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
+ 		return skb_queue_len(&d->tx_queue);
+ 
+ 	while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
+-		err = rfcomm_send_frame(d->session, skb->data, skb->len);
++		err = rfcomm_send_frame(d->session, skb->data, skb->len,
++							skb->priority);
+ 		if (err < 0) {
+ 			skb_queue_head(&d->tx_queue, skb);
+ 			break;
 -- 
-1.7.1
+1.7.6
 
