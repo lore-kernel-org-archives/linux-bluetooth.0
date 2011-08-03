@@ -1,62 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AFCDDB4A3EA003429EEF1E7B211FDBBA33A435FBDE@EXDCVYMBSTM005.EQ1STM.local>
-References: <CAKT1EBfK1P7oJpLrm2HNTQTOKoN0Z+6mh7BoeaVeA8gUQpD49g@mail.gmail.com>
-	<AFCDDB4A3EA003429EEF1E7B211FDBBA33A435FBDE@EXDCVYMBSTM005.EQ1STM.local>
-Date: Wed, 3 Aug 2011 08:54:24 -0300
-Message-ID: <CAKT1EBebYWwjNURbciEM9s3saKX5tYHp2Jtr-VTcqV+eUrMSvA@mail.gmail.com>
-Subject: Re: Current status on BLE development
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Arun Kumar SINGH <arunkr.singh@stericsson.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Sheldon Demario <sheldon.demario@openbossa.org>
+Subject: [PATCH BlueZ v2] Test script for LinkLossAlertLevel property
+Date: Wed,  3 Aug 2011 08:42:50 -0300
+Message-Id: <1312371770-943-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <20110803093504.GA21750@dell>
+References: <20110803093504.GA21750@dell>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arun,
+From: Sheldon Demario <sheldon.demario@openbossa.org>
 
-On Tue, Aug 2, 2011 at 8:49 AM, Arun Kumar SINGH
-<arunkr.singh@stericsson.com> wrote:
-> Hi Claudio,
->
->>It is common to see questions in the ML or in the IRC asking the
->>status of BLE development and where the get the source code.
->>Below a short summary of our latest development on Bluetooth Low Energy:
->>
->>* Discovery procedure over management interface (kernel): patches sent
->>to the mailing list, waiting maintainer approval
->>
->>* SM(Security Manager): kernel & userspace
->>- Just Works key generation method is working and accepted upstream;
->>- Key Exchange and Storage: a first version of the implementation is
->>implemented and working, but before being accepted upstream it needs
->>some changes;
->>- Passkey Entry: Still not implemented;
->>- Out of Band: Still not implemented;
->>- Address Resolution: Planned but still not implemented;
->>- Command Signing: Still not implemented;
->>
->>* LE connection improvements: under development
-> <snip ..>
->
-> Thanks for the detailed summary. However I would also like to understand the status of mgmt interface in terms of its completeness for BR/EDR and LE support. I can see LE Discovery related patches being pushed upstream for mgmt i/f however what intrigues me is whether its totally unavoidable to upgrade to mgmt interface for LE/profiles?
-> Since for SMP key exchange, hciops is inadequate, I am trying to understand as to how far hciops can be relied in terms of LE profiles which would need SMP key distribution and storage?
->
+Initial test script for Proximity Monitor. This patch allows the
+user to set the Link Loss alert level of a given Reporter.
+Usage example:
+$test-proximity -i hci1 --device <mac> LinkLossAlertLevel mild
+---
+ test/test-proximity |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 65 insertions(+), 0 deletions(-)
+ create mode 100755 test/test-proximity
 
-If the LE profile requires SM/encryption it is necessary to use mgmt.
-The RSSI threshold monitor is another feature missing for Proximity
-Path Loss, it can be implemented in hciops but I am pretty sure that
-the maintainers will complain about it.
+diff --git a/test/test-proximity b/test/test-proximity
+new file mode 100755
+index 0000000..04faf4e
+--- /dev/null
++++ b/test/test-proximity
+@@ -0,0 +1,65 @@
++#!/usr/bin/python
++
++'''
++Proximity Monitor test script
++'''
++
++import gobject
++
++import sys
++import dbus
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++
++def property_changed(name, value):
++
++	print "PropertyChanged('%s', '%s')" % (name, value)
++	mainloop.quit()
++
++if __name__ == "__main__":
++	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++	bus = dbus.SystemBus()
++
++	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.bluez.Manager")
++
++	option_list = [
++		make_option("-i", "--adapter", action="store",
++			type="string", dest="dev_id"),
++		make_option("-b", "--device", action="store",
++			type="string", dest="address"),
++
++		]
++	parser = OptionParser(option_list=option_list)
++
++	(options, args) = parser.parse_args()
++
++	if options.dev_id:
++		adapter_path = manager.FindAdapter(options.dev_id)
++	else:
++		adapter_path = manager.DefaultAdapter()
++
++	adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
++							"org.bluez.Adapter")
++
++	if (len(args) < 1):
++		print "Usage: %s <command>" % (sys.argv[0])
++		print ""
++		print "  LinkLossAlertLevel <none|mild|high>"
++		sys.exit(1)
++
++	device_path = adapter.FindDevice(options.address)
++
++	bus.add_signal_receiver(property_changed, bus_name="org.bluez",
++				dbus_interface="org.bluez.Proximity",
++				signal_name="PropertyChanged")
++
++	proximity = dbus.Interface(bus.get_object("org.bluez",
++					device_path), "org.bluez.Proximity")
++
++	print "Proximity SetProperty('%s', '%s')" % (args[0], args[1])
++	proximity.SetProperty(args[0], args[1])
++
++	mainloop = gobject.MainLoop()
++	mainloop.run()
+-- 
+1.7.6
 
-Currently, it is not possible to open a socket for the SM L2CAP fixed
-channel, change the code(moving all logic to the userspace) at this
-point is not feasible. Interleaved discovery works on both interfaces,
-bonding only using mgmt.
-
-BR,
-Claudio.
-
->
->
-> Thanks,
-> Arun
