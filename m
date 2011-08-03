@@ -1,75 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 3 Aug 2011 17:44:38 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 1/3] Bluetooth: prioritizing data over HCI
+Message-ID: <20110803204438.GG28119@joana>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+ <1312377094-11285-2-git-send-email-luiz.dentz@gmail.com>
+ <1312388716.3358.58.camel@THOR>
+ <CABBYNZJ9DVr5kPE3ZrWgyWUGBayZTyY+=rfEXpckXT3xkL6X8w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20110803202550.GF28119@joana>
-References: <1312310109-27082-1-git-send-email-anderson.briglia@openbossa.org>
-	<CAKT1EBeh+BxAkt-k+CchSMGwV--RgtiPkhi=JqAajgLYF0CiOw@mail.gmail.com>
-	<20110803202550.GF28119@joana>
-Date: Wed, 3 Aug 2011 17:52:20 -0300
-Message-ID: <CAKT1EBfA5wPvE8Xvm-sEgY=Po8LrX=hDHVeckmqaCmi0wTWQ3w@mail.gmail.com>
-Subject: Re: [RFC 0/7] RSSI Monitor
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Anderson Briglia <anderson.briglia@openbossa.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZJ9DVr5kPE3ZrWgyWUGBayZTyY+=rfEXpckXT3xkL6X8w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-On Wed, Aug 3, 2011 at 5:25 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
-> * Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-08-03 16:36:43 -0300]:
->
->> Hi Briglia/Marcel/Padovan:
->>
->> On Tue, Aug 2, 2011 at 3:35 PM, Anderson Briglia
->> <anderson.briglia@openbossa.org> wrote:
->> > This RFC is about RSSI monitoring since controllers do not have a specific
->> > command for this and we need it for Proximity Profile, at least.
->> >
->> > The RFC implements a mechanism to set threshold levels in order to send
->> > alerts to userspace when a RSSI value reaches one of the configured thresholds.
->> >
->> > Management Interface contains a list of RSSI Monitors. Elements are inserted
->> > or deleted from this list using two new Management commands: Enable and Disable
->> > RSSI Monitor.
->> >
->> > A timer was added to do HCI Read RSSI requests to the controller and get RSSI
->> > values updated. If there is monitored connection (eg.: RSSI Monitor list size >
->> > 0), the timer is reseted after two seconds and the RSSI for each monitored conn
->> > is updated. Using the RSSI value, a Management Event is sent if one of the
->> > thresholds were reached and the alert is different from the last one sent.
->> >
->> > Userspace is responsible to add and remove RSSI Monitors. Each monitor must
->> > have low and high thresholds values for RSSI. A RSSI Monitor is disabled when
->> > the connection is no longer available or the userspace sends a command to
->> > remove it. If there is no RSSI Monitor remaining in the list, the RSSI Read
->> > polling timer is removed.
->>
->> Should be the entries persistent across connections? In the suggested
->> approach the RSSI threshold monitor for a given address is
->> automatically removed when the connection is lost.
->> By other hand, persistence introduces another problem: trust that the
->> userspace will disable the monitor.
->
-> Is it really worth? There are some reconnections to justify the persistent
-> entry? The wast of memory worth the savings in interactions between
-> kernel-userpace through the mgmt?
->
-> Â  Â  Â  Â Gustavo
->
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-03 20:49:19 +0300]:
 
-It saves logic in the userspace. Memory is not critical, how many
-keyfobs a "normal" user will have?
-Removing automatically means the kernel and userspace will be out of
-sync, there isn't an event notifying that an entry was removed.
+> Hi Peter,
+> 
+> On Wed, Aug 3, 2011 at 7:25 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> >
+> > I believe that the existing tx scheduler is already inefficient and that
+> > this approach significantly compounds that inefficiency.
+> >
+> > Consider the following scenarios with 4 ACL connections (keyboard,
+> > mouse, phone, headset):
+> >
+> > For *one* scheduled ACL tx packet, the connection list will be searched
+> > 35~42 times -- that's 140~168 connection list node visits to find one
+> > packet! Here's the math:
+> >        (7 - priority of tx packet) x 4 connections => found the packet
+> >        7 pri levels x 4 connections => no more ACL tx packets
+> >        7 pri levels x 4 connections => no SCO tx packets
+> >        7 pri levels x 4 connections => no ESCO tx packets
+> >        7 pri levels x 4 connections => no LE tx packets
+> >        7 pri levels x 4 connections => recalc priority
+> >
+> > If the connection type doesn't match, it's not going to match at any
+> > priority level.
+> 
+> Obviously there are a few things that we might change to not traverse
+> the list of connection over and over, remember this is an RFC, besides
+> it 8 priorities (0-7), but we can skip much earlier if connection
+> doesn't match as you said. Also I guess for SCO/ESCO/LE e doesn't make
+> much sense to have many queues/priorities, it is basically ACL only,
+> that simplify a lot already.
 
-For Proximity, the RSSI threshold needs to be calculated, remote's Tx
-power(read using ATT) is an input. In theory, Tx Power will not change
-in the next connection, meaning that an additional logic can be added
-in the Proximity Monitor to avoid enable/disable the RSSI threshold
-monitor if the new calculated RSSI threshold doesn't change.
+Maybe 8 is too much, I think it could work with 4. We keep the high
+priority queue 7 and more 3. A2DP and SCO could have the 6, HID the queue 5,
+Obex transfers, PAN, AVRCP, etc goes queue 4. Queueing in 3, 2, 1 and 0 could
+actually queue on 4.
 
-Regards,
-Claudio
+	Gustavo
