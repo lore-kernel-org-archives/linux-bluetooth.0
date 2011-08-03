@@ -1,97 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaikumar Ganesh <jaikumar@google.com>
+From: Daniele Forsi <dforsi@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaikumar Ganesh <jaikumar@google.com>
-Subject: [PATCH] Bluetooth: bnep: Fix deadlock in session deletion.
-Date: Wed,  3 Aug 2011 18:59:06 -0700
-Message-Id: <1312423146-99276-1-git-send-email-jaikumar@google.com>
+Subject: [PATCH obexd] Fix compilation when NEED_G_SLIST_FREE_FULL is defined
+Date: Thu,  4 Aug 2011 00:20:38 +0200
+Message-Id: <1312410038-21169-1-git-send-email-dforsi@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit f4d7cd4a4c25cb4a5c30a675d4cc0052c93b925a introduced
-usage of <linux/kthread.h> API. kthread_stop is a blocking
-function which returns only when the thread exits. In this
-case, the thread couldn't exit because it was waiting to get
-a write semaphore. bnep_del_connection function which calls
-kthread_stop also held the read semaphore.
+From: Daniele Forsi <daniele@forsi.it>
 
-Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
+To use the replacement for g_slist_free_full() both compat.h and
+glib-helper.h need to be included.
+
+Fixes:
+gobex/gobex.c:911: error: implicit declaration of function 'g_slist_free_full'
+tools/test-server.c:344: error: implicit declaration of function ‘g_slist_free_full’
 ---
- net/bluetooth/bnep/core.c |   47 ++++++++++++++++++++++++++------------------
- 1 files changed, 28 insertions(+), 19 deletions(-)
+ gobex/gobex.c       |    5 +++++
+ tools/test-server.c |    4 ++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index eb8486f..f587b81 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -470,6 +470,31 @@ send:
- 	return len;
- }
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 2a64849..ff35830 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -19,11 +19,16 @@
+  *
+  */
  
-+static int cleanup_bnep_session(struct bnep_session *s)
-+{
-+	struct net_device *dev = s->dev;
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
 +
-+	/* Cleanup session */
-+	down_write(&bnep_session_sem);
-+
-+	/* Delete network device */
-+	unregister_netdev(dev);
-+
-+	/* Wakeup user-space polling for socket errors */
-+	s->sock->sk->sk_err = EUNATCH;
-+
-+	wake_up_interruptible(sk_sleep(s->sock->sk));
-+
-+	/* Release the socket */
-+	fput(s->sock->file);
-+
-+	__bnep_unlink_session(s);
-+
-+	up_write(&bnep_session_sem);
-+	free_netdev(dev);
-+	return 0;
-+}
-+
- static int bnep_session(void *arg)
- {
- 	struct bnep_session *s = arg;
-@@ -511,25 +536,6 @@ static int bnep_session(void *arg)
- 	}
- 	__set_current_state(TASK_RUNNING);
- 	remove_wait_queue(sk_sleep(sk), &wait);
--
--	/* Cleanup session */
--	down_write(&bnep_session_sem);
--
--	/* Delete network device */
--	unregister_netdev(dev);
--
--	/* Wakeup user-space polling for socket errors */
--	s->sock->sk->sk_err = EUNATCH;
--
--	wake_up_interruptible(sk_sleep(s->sock->sk));
--
--	/* Release the socket */
--	fput(s->sock->file);
--
--	__bnep_unlink_session(s);
--
--	up_write(&bnep_session_sem);
--	free_netdev(dev);
- 	return 0;
- }
+ #include <unistd.h>
+ #include <string.h>
+ #include <errno.h>
  
-@@ -651,6 +657,9 @@ int bnep_del_connection(struct bnep_conndel_req *req)
- 		err = -ENOENT;
+ #include "gobex.h"
++#include "glib-helper.h"
  
- 	up_read(&bnep_session_sem);
+ #define G_OBEX_DEFAULT_MTU	4096
+ #define G_OBEX_MINIMUM_MTU	255
+diff --git a/tools/test-server.c b/tools/test-server.c
+index 87742ec..6096737 100644
+--- a/tools/test-server.c
++++ b/tools/test-server.c
+@@ -19,6 +19,10 @@
+  *
+  */
+ 
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
 +
-+	if (!err)
-+		cleanup_bnep_session(s);
- 	return err;
- }
- 
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <fcntl.h>
 -- 
-1.7.3.1
+1.7.1
 
