@@ -1,76 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1312410038-21169-1-git-send-email-dforsi@gmail.com>
-References: <1312410038-21169-1-git-send-email-dforsi@gmail.com>
-Date: Thu, 4 Aug 2011 11:23:44 +0300
-Message-ID: <CABBYNZ+BAH-FzFRRFzObK7q3aA94iKuG=OHyGL53NvTffoNRiA@mail.gmail.com>
-Subject: Re: [PATCH obexd] Fix compilation when NEED_G_SLIST_FREE_FULL is defined
+In-Reply-To: <1312406086.3358.187.camel@THOR>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+	<1312406086.3358.187.camel@THOR>
+Date: Thu, 4 Aug 2011 11:20:51 +0300
+Message-ID: <CABBYNZ+ZLJd17xMS1LpMn92T04gGKr7xGxe6eMbWOa_3k+tFfQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Daniele Forsi <dforsi@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniele,
+Hi Peter,
 
-On Thu, Aug 4, 2011 at 1:20 AM, Daniele Forsi <dforsi@gmail.com> wrote:
-> From: Daniele Forsi <daniele@forsi.it>
+On Thu, Aug 4, 2011 at 12:14 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> Hi Luiz,
 >
-> To use the replacement for g_slist_free_full() both compat.h and
-> glib-helper.h need to be included.
+> On Wed, 2011-08-03 at 09:11 -0400, Luiz Augusto von Dentz wrote:
+> ....
+>> The main use case for this is A2DP, many people complained that when they
+>> are using their HID devices (mouses) together with headset the mouse has
+>> higher priority, which btw is not true since currently there is no
+>> priority and connections receives the same quote.
+>>
+>> With this changes it may reduce the problem since PulseAudio already sets
+>> A2DP socket as low latency (priority 6), which means audio packets will be
+>> processed before the HID packets, but this only affects tx and there still
+>> exist the problem of some HID not letting us being master.
 >
-> Fixes:
-> gobex/gobex.c:911: error: implicit declaration of function 'g_slist_free_full'
-> tools/test-server.c:344: error: implicit declaration of function ‘g_slist_free_full’
-> ---
->  gobex/gobex.c       |    5 +++++
->  tools/test-server.c |    4 ++++
->  2 files changed, 9 insertions(+), 0 deletions(-)
->
-> diff --git a/gobex/gobex.c b/gobex/gobex.c
-> index 2a64849..ff35830 100644
-> --- a/gobex/gobex.c
-> +++ b/gobex/gobex.c
-> @@ -19,11 +19,16 @@
->  *
->  */
->
-> +#ifdef HAVE_CONFIG_H
-> +# include "config.h"
-> +#endif
-> +
->  #include <unistd.h>
->  #include <string.h>
->  #include <errno.h>
->
->  #include "gobex.h"
-> +#include "glib-helper.h"
->
->  #define G_OBEX_DEFAULT_MTU     4096
->  #define G_OBEX_MINIMUM_MTU     255
-> diff --git a/tools/test-server.c b/tools/test-server.c
-> index 87742ec..6096737 100644
-> --- a/tools/test-server.c
-> +++ b/tools/test-server.c
-> @@ -19,6 +19,10 @@
->  *
->  */
->
-> +#ifdef HAVE_CONFIG_H
-> +# include "config.h"
-> +#endif
-> +
->  #include <sys/types.h>
->  #include <sys/socket.h>
->  #include <fcntl.h>
-> --
-> 1.7.1
->
-> --
+> What packets are being transmitted _to_ the HID devices during audio
+> streaming?  In all my captures of A2DP crackle/skips, there's not a
+> single HID packet being transmitted out. Of course, I was carefully not
+> to press any of the led-transition keys during the capture :).
 
-Thank you for catching this.
+Well with HID you will probably be only receiving, but that doesn't
+change anything does it? I mean you still got less bandwidth to use
+and we probably want low latency packets to be prioritized in any
+case, besides there is probably some use case where HID transmit too,
+see net/bluetooth/hidp/core.c:666(hidp_process_transmit).
 
+> It's my belief that the incredibly complicated way that PulseAudio
+> handles the stream indices and computed latency is really the issue (at
+> least with A2DP).
+
+Really, so you have a fix for that? I would be happy to see your
+proposal and discussion on PulseAudio mailing list.
+
+> For example, in several configuration I have, PulseAudio is rendering
+> *too fast*. This is evidenced by the remote device sending STOP packets
+> (which can flood the syslog as 0-length L2CAP packets) because its recv
+> buffers are full! (Of course, these DM1 packets are eating up air time
+> too -- which is slowing legitimate rx packets from the HID devices!)
+
+But why the kernel is not stopping PulseAudio? I mean PA does use
+POLLOUT to check if the socket is writable, it then writes as much as
+possible and sleep, but without using guaranteed channels with proper
+QoS support I don't this changing anytime soon.
+
+> You should hear the 'skipping' when the sleep timer which delays the
+> next block render is IFDEF'd out of the
+> module-bluetooth-device.c/threadfn(). With other subsystems but not with
+> Bluez, PulseAudio uses a 'smoother' to fine-tune when to render the next
+> block.
+
+This can be fixed, the source already uses the smoother anyway, but Im
+afraid this can cause bad effects like much frequent wakeups and even
+auto of sync with some headsets.
+
+> My point here is I think it's premature to conclude that PulseAudio
+> doesn't have a part to play.
+
+It probably does, but it doesn't change the fact the prioritization is
+pretty much needed, actually it will probably make such problems more
+visible than ever.
 
 -- 
 Luiz Augusto von Dentz
