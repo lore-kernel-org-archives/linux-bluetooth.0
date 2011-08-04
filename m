@@ -1,65 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E3AEE44.10702@goop.org>
+Date: Thu, 04 Aug 2011 12:08:52 -0700
+From: Jeremy Fitzhardinge <jeremy@goop.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
-References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
-	<alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
-Date: Fri, 5 Aug 2011 09:09:38 +0300
-Message-ID: <CABBYNZ+OPDnR=e2sPx=mLmOkd80z2sPNAPX+ss7GCh+7rndH1g@mail.gmail.com>
-Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	peter@hurleysoftware.com
+To: linux-bluetooth@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Linux 3.0-rc4: regression reconnecting bluetooth headset (A2DP
+ fails)
+References: <4E03DA75.2080606@goop.org> <20110628182117.GD23183@joana> <4E0A2FC7.6020109@goop.org> <20110628200216.GE23183@joana>
+In-Reply-To: <20110628200216.GE23183@joana>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
-
-On Thu, Aug 4, 2011 at 8:37 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
-> One concern I have is that an application that changes sk_priority while it
-> has data in the HCI tx queue could have its frames delivered out of order.
->  While we can't control when sk_priority is set, it is possible to make a
-> choice when setting the priority of each skb.  Does it make sense to detect
-> an sk_priority change and only apply the new value when there are no skbs
-> for the channel in the HCI tx queue?
-
-Yep, if we need to maintain the order I guess this would make sense,
-the problem is that this could be a bit expensive.
-
-> I had a recent discussion with Gustavo about HCI queuing issues with ERTM:
+On 06/28/2011 01:02 PM, Gustavo F. Padovan wrote:
+> * Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-28 20:47:19 +0100]:
 >
-> http://www.spinics.net/lists/linux-bluetooth/msg13774.html
->
-> My proposal is to move tx queuing up to L2CAP, and have the HCI tx task only
-> handle scheduling.  Senders would tell HCI they have data to send, and HCI
-> would call back to pull data.  I've been focused on L2CAP - it would be
-> possible to make a similar queuing change to SCO/eSCO/LE, but not strictly
-> necessary.
+>> On 06/28/2011 07:21 PM, Gustavo F. Padovan wrote:
+>>> Hi Jeremy,
+>>>
+>>> * Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-23 17:29:41 -0700]:
+>>>
+>>>> I have a Nokia BH-905i headset.  With a stock F15 kernel, it all works
+>>>> well. With current linux-2.6.git, it fails to reconnect properly.
+>>>>
+>>>> On connection, the headphones only beep once, whereas they normally beep
+>>>> twice; I think this is one beep per profile, and its only connecting HSP
+>>>> and failing A2DP.  In the sound control panel, it either comes up with
+>>>> "profile: off" or with the HSP/HFP (Telephony) profile rather than A2DP,
+>>>> and it fails to switch if I try to change profiles via the sound control
+>>>> panel.
+>>>>
+>>>> However, if I re-pair the device from scratch each time I use it, it
+>>>> connects properly and it all works fine.
+>>>>
+>>>> pactl list shows:
+>>>>
+>>>> Card #2
+>>>> 	Name: bluez_card.00_0B_E4_A6_6C_0D
+>>>> 	Driver: module-bluetooth-device.c
+>>>> 	Owner Module: 23
+>>>> 	Properties:
+>>>> 		device.description = "Nokia BH-905i"
+>>>> 		device.string = "00:0B:E4:A6:6C:0D"
+>>>> 		device.api = "bluez"
+>>>> 		device.class = "sound"
+>>>> 		device.bus = "bluetooth"
+>>>> 		device.form_factor = "headset"
+>>>> 		bluez.path = "/org/bluez/843/hci0/dev_00_0B_E4_A6_6C_0D"
+>>>> 		bluez.class = "0x240404"
+>>>> 		bluez.name = "Nokia BH-905i"
+>>>> 		device.icon_name = "audio-headset-bluetooth"
+>>>> 		device.intended_roles = "phone"
+>>>> 	Profiles:
+>>>> 		a2dp: High Fidelity Playback (A2DP) (sinks: 1, sources: 0, priority. 10)
+>>>> 		hsp: Telephony Duplex (HSP/HFP) (sinks: 1, sources: 1, priority. 20)
+>>>> 		off: Off (sinks: 0, sources: 0, priority. 0)
+>>>> 	Active Profile: hsp
+>>>>
+>>>> If I try to switch profiles on the command line it says:
+>>>> $ pactl set-card-profile 2 a2dp
+>>>> Failure: Input/Output error
+>>>>
+>>>> and /var/log/messages shows:
+>>>> module-bluetooth-device.c: A2DP is not connected, refused to switch profile
+>>>>
+>>>> Why isn't A2DP connecting?  How can I debug this further?
+>>> Can you send the output of hcidump with F15 kernel and with linux-2.6.git
+>>> kernel?
+>> This is already fixed in
+>> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
+> Great, these fixes will be in linus-2.6 soon.
 
-> This is different from the problem you're solving, but as long as we're
-> talking about big changes to HCI tx, I think we could make some changes that
-> help out with prioritization and queuing across all channels (whether
-> they're going to the same remote device or different remote devices).
->
-> It could be more efficient to schedule this way since HCI wouldn't have to
-> iterate over all of the connections and queues - it would only have to
-> review the prioritized list of pending sends. Might be a more fitting
-> structure for QoS too.
->
-> Since HCI wouldn't have a bunch of queued-up skbs, it would also eliminate
-> the sk_priority change problem I noted above.
->
-> Your thoughts?
+There seems to have been a regression since then and the release 3.0
+kernel (and the F15 "2.6.40" kernel), which have gone back to showing
+the original symptoms: I can use my headphones when I first pair them,
+but I can't reconnect from then.
 
-If the idea is to have a list of chan/sockets and each having its own
-queue, I guess that would make sense and we could possible preserve
-the packet order in that case, but we still have to maintain the
-fairness when dealing with the same priority so I would still have to
-iterate to each connection and then to each channel evaluating their
-priority. This way we don't have to defined any arbitrary number of
-queues which is probably less items to visit on tx task, but the
-locking may be a lot more complicated.
-
--- 
-Luiz Augusto von Dentz
+Thanks,
+    J
