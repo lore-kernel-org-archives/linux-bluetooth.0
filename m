@@ -1,49 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Mat Martineau <mathewm@codeaurora.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"padovan@profusion.mobi" <padovan@profusion.mobi>
-Date: Thu, 4 Aug 2011 19:09:37 -0400
-Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
-Message-ID: <1312499377.2158.36.camel@THOR>
-References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
-	 <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
-In-Reply-To: <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1312474380.2158.21.camel@THOR>
+References: <1312423146-99276-1-git-send-email-jaikumar@google.com> <1312474380.2158.21.camel@THOR>
+From: Jaikumar Ganesh <jaikumar@google.com>
+Date: Thu, 4 Aug 2011 14:37:35 -0700
+Message-ID: <CAA8bQNjQ_U7FCLnVUcjB34Jr9brrDEVYx97JH08e81Y7TS=qMA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: bnep: Fix deadlock in session deletion.
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWF0LA0KDQpPbiBUaHUsIDIwMTEtMDgtMDQgYXQgMTM6MzcgLTA0MDAsIE1hdCBNYXJ0aW5l
-YXUgd3JvdGU6DQoNCj4gSSBoYWQgYSByZWNlbnQgZGlzY3Vzc2lvbiB3aXRoIEd1c3Rhdm8gYWJv
-dXQgSENJIHF1ZXVpbmcgaXNzdWVzIHdpdGggDQo+IEVSVE06DQo+IA0KPiBodHRwOi8vd3d3LnNw
-aW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9tc2cxMzc3NC5odG1sDQo+IA0KPiBNeSBw
-cm9wb3NhbCBpcyB0byBtb3ZlIHR4IHF1ZXVpbmcgdXAgdG8gTDJDQVAsIGFuZCBoYXZlIHRoZSBI
-Q0kgdHggDQo+IHRhc2sgb25seSBoYW5kbGUgc2NoZWR1bGluZy4gIFNlbmRlcnMgd291bGQgdGVs
-bCBIQ0kgdGhleSBoYXZlIGRhdGEgdG8gDQo+IHNlbmQsIGFuZCBIQ0kgd291bGQgY2FsbCBiYWNr
-IHRvIHB1bGwgZGF0YS4gIEkndmUgYmVlbiBmb2N1c2VkIG9uIA0KPiBMMkNBUCAtIGl0IHdvdWxk
-IGJlIHBvc3NpYmxlIHRvIG1ha2UgYSBzaW1pbGFyIHF1ZXVpbmcgY2hhbmdlIHRvIA0KPiBTQ08v
-ZVNDTy9MRSwgYnV0IG5vdCBzdHJpY3RseSBuZWNlc3NhcnkuDQoNCldvdWxkIHlvdSBwbGVhc2Ug
-Y2xhcmlmeSB0aGlzIGFwcHJvYWNoIChwZXJoYXBzIGluIGEgc2VwYXJhdGUgdGhyZWFkKT8NCg0K
-Rm9yIGV4YW1wbGUsIGhvdyBkb2VzIGhhdmluZyB0eCBxdWV1ZXMgaW4gbDJjYXBfY2hhbiAoaW5z
-dGVhZCBvZiB0aGUNCmhjaV9jb25uKSBzb2x2ZSB0aGUgbGF0ZW5jeSBwcm9ibGVtcyBpbiBFUlRN
-IHdoZW4gcmVwbHlpbmcgdG8NClJFSi9TUkVKL3BvbGw/IFdvbid0IHRoZXJlIHBvdGVudGlhbGx5
-IGJlIGp1c3QgYXMgbXVjaCBkYXRhIGFscmVhZHkNCnF1ZXVlZCB1cD8gSXMgdGhlIHBsYW4gdG8g
-bW92ZSB0aGUgcmVwbHkgdG8gdGhlIGZyb250IG9mIHRoZSB0eCBxdWV1ZQ0KYmVjYXVzZSByZXFz
-ZXEgd29uJ3QgbmVlZCB0byBiZSBhc3NpZ25lZCB1bnRpbCB0aGUgZnJhbWUgaXMgYWN0dWFsbHkN
-CnB1bGxlZCBvZmYgdGhlIHF1ZXVlPw0KDQo+IFRoaXMgaXMgZGlmZmVyZW50IGZyb20gdGhlIHBy
-b2JsZW0geW91J3JlIHNvbHZpbmcsIGJ1dCBhcyBsb25nIGFzIA0KPiB3ZSdyZSB0YWxraW5nIGFi
-b3V0IGJpZyBjaGFuZ2VzIHRvIEhDSSB0eCwgSSB0aGluayB3ZSBjb3VsZCBtYWtlIHNvbWUgDQo+
-IGNoYW5nZXMgdGhhdCBoZWxwIG91dCB3aXRoIHByaW9yaXRpemF0aW9uIGFuZCBxdWV1aW5nIGFj
-cm9zcyBhbGwgDQo+IGNoYW5uZWxzICh3aGV0aGVyIHRoZXkncmUgZ29pbmcgdG8gdGhlIHNhbWUg
-cmVtb3RlIGRldmljZSBvciBkaWZmZXJlbnQgDQo+IHJlbW90ZSBkZXZpY2VzKS4NCj4gDQo+IEl0
-IGNvdWxkIGJlIG1vcmUgZWZmaWNpZW50IHRvIHNjaGVkdWxlIHRoaXMgd2F5IHNpbmNlIEhDSSB3
-b3VsZG4ndCANCj4gaGF2ZSB0byBpdGVyYXRlIG92ZXIgYWxsIG9mIHRoZSBjb25uZWN0aW9ucyBh
-bmQgcXVldWVzIC0gaXQgd291bGQgb25seSANCj4gaGF2ZSB0byByZXZpZXcgdGhlIHByaW9yaXRp
-emVkIGxpc3Qgb2YgcGVuZGluZyBzZW5kcy4gTWlnaHQgYmUgYSBtb3JlIA0KPiBmaXR0aW5nIHN0
-cnVjdHVyZSBmb3IgUW9TIHRvby4NCg0KV291bGRuJ3QgdGhpcyAncHJpb3JpdGl6ZWQgbGlzdCBv
-ZiBwZW5kaW5nIHNlbmRzJyBuZWVkIHRvIGJlIGxvY2tlZCB0bw0KcHJldmVudCB1cGRhdGUgd2hp
-bGUgcmVhZGluZz8gSVNUTSB0aGF0IGNvbnRlbnRpb24gbWlnaHQgYmUgZmFpcmx5IGhpZ2gNCmZv
-ciBhIHNpbmdsZSwgc2hhcmVkIHJlc291cmNlIGxpa2UgdGhhdC4NCg0KDQpSZWdhcmRzLA0KUGV0
-ZXIgSHVybGV5DQoNCg==
+Hi Peter,
+
+On Thu, Aug 4, 2011 at 9:13 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> On Wed, 2011-08-03 at 21:59 -0400, Jaikumar Ganesh wrote:
+>> Commit f4d7cd4a4c25cb4a5c30a675d4cc0052c93b925a introduced
+>> usage of <linux/kthread.h> API. kthread_stop is a blocking
+>> function which returns only when the thread exits. In this
+>> case, the thread couldn't exit because it was waiting to get
+>> a write semaphore. bnep_del_connection function which calls
+>> kthread_stop also held the read semaphore.
+>>
+>> Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
+>> ---
+>>  net/bluetooth/bnep/core.c |   47 ++++++++++++++++++++++++++------------------
+>>  1 files changed, 28 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+>> index eb8486f..f587b81 100644
+>> --- a/net/bluetooth/bnep/core.c
+>> +++ b/net/bluetooth/bnep/core.c
+>> @@ -470,6 +470,31 @@ send:
+>>       return len;
+>>  }
+>>
+>> +static int cleanup_bnep_session(struct bnep_session *s)
+>> +{
+>> +     struct net_device *dev = s->dev;
+>> +
+>> +     /* Cleanup session */
+>> +     down_write(&bnep_session_sem);
+>> +
+>> +     /* Delete network device */
+>> +     unregister_netdev(dev);
+>> +
+>> +     /* Wakeup user-space polling for socket errors */
+>> +     s->sock->sk->sk_err = EUNATCH;
+>> +
+>> +     wake_up_interruptible(sk_sleep(s->sock->sk));
+>> +
+>> +     /* Release the socket */
+>> +     fput(s->sock->file);
+>> +
+>> +     __bnep_unlink_session(s);
+>> +
+>> +     up_write(&bnep_session_sem);
+>> +     free_netdev(dev);
+>> +     return 0;
+>> +}
+>> +
+>>  static int bnep_session(void *arg)
+>>  {
+>>       struct bnep_session *s = arg;
+>> @@ -511,25 +536,6 @@ static int bnep_session(void *arg)
+>>       }
+>>       __set_current_state(TASK_RUNNING);
+>>       remove_wait_queue(sk_sleep(sk), &wait);
+>> -
+>> -     /* Cleanup session */
+>> -     down_write(&bnep_session_sem);
+>> -
+>> -     /* Delete network device */
+>> -     unregister_netdev(dev);
+>> -
+>> -     /* Wakeup user-space polling for socket errors */
+>> -     s->sock->sk->sk_err = EUNATCH;
+>> -
+>> -     wake_up_interruptible(sk_sleep(s->sock->sk));
+>> -
+>> -     /* Release the socket */
+>> -     fput(s->sock->file);
+>> -
+>> -     __bnep_unlink_session(s);
+>> -
+>> -     up_write(&bnep_session_sem);
+>> -     free_netdev(dev);
+>>       return 0;
+>>  }
+>
+> This won't work because the session thread can exit itself (like if it
+> discovers that the sk_state is no longer BT_CONNECTED).
+>
+>> @@ -651,6 +657,9 @@ int bnep_del_connection(struct bnep_conndel_req *req)
+>>               err = -ENOENT;
+>>
+>>       up_read(&bnep_session_sem);
+>> +
+>> +     if (!err)
+>> +             cleanup_bnep_session(s);
+>
+> Since the thread can exit itself, the session s may no longer be valid
+> after the read lock is released.
+
+I agree.
+
+>
+>>       return err;
+>>  }
+>>
+>
+> Does the patch below work for you?
+>
+> ---
+>  net/bluetooth/bnep/bnep.h |    1 +
+>  net/bluetooth/bnep/core.c |    9 +++++----
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+> index 8e6c061..e7ee531 100644
+> --- a/net/bluetooth/bnep/bnep.h
+> +++ b/net/bluetooth/bnep/bnep.h
+> @@ -155,6 +155,7 @@ struct bnep_session {
+>        unsigned int  role;
+>        unsigned long state;
+>        unsigned long flags;
+> +       atomic_t      terminate;
+>        struct task_struct *task;
+>
+>        struct ethhdr eh;
+> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+> index 7e8ff3c..d9edfe8 100644
+> --- a/net/bluetooth/bnep/core.c
+> +++ b/net/bluetooth/bnep/core.c
+> @@ -487,7 +487,7 @@ static int bnep_session(void *arg)
+>        while (1) {
+>                set_current_state(TASK_INTERRUPTIBLE);
+>
+> -               if (kthread_should_stop())
+> +               if (atomic_read(&s->terminate))
+>                        break;
+>                /* RX */
+>                while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+> @@ -642,9 +642,10 @@ int bnep_del_connection(struct bnep_conndel_req
+> *req)
+>        down_read(&bnep_session_sem);
+>
+>        s = __bnep_get_session(req->dst);
+> -       if (s)
+> -               kthread_stop(s->task);
+> -       else
+> +       if (s) {
+> +               atomic_inc(&s->terminate);
+> +               wake_up_process(s->task);
+> +       } else
+>                err = -ENOENT;
+>
+>        up_read(&bnep_session_sem);
+> --
+> 1.7.4.1
+>
+>
+
+The patch works fine.
+
+Thanks
+>
