@@ -1,59 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Jaikumar Ganesh <jaikumar@google.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 4 Aug 2011 12:13:00 -0400
+Subject: Re: [PATCH] Bluetooth: bnep: Fix deadlock in session deletion.
+Message-ID: <1312474380.2158.21.camel@THOR>
+References: <1312423146-99276-1-git-send-email-jaikumar@google.com>
+In-Reply-To: <1312423146-99276-1-git-send-email-jaikumar@google.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1312396907-14524-6-git-send-email-claudio.takahasi@openbossa.org>
-References: <1312396907-14524-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1312396907-14524-6-git-send-email-claudio.takahasi@openbossa.org>
-Date: Thu, 4 Aug 2011 14:00:15 -0300
-Message-ID: <CAKT1EBcz7UevM8Q+fwUKsrkH6GaW+8DUT4S=RH-RHPjz37r=0Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/7] Add enum for alert level values
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-On Wed, Aug 3, 2011 at 3:41 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> From: Bruna Moreira <bruna.moreira@openbossa.org>
->
-> ---
->  proximity/monitor.c |   12 +++++++++---
->  1 files changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/proximity/monitor.c b/proximity/monitor.c
-> index 6470db4..ca19a8f 100644
-> --- a/proximity/monitor.c
-> +++ b/proximity/monitor.c
-> @@ -53,6 +53,12 @@
->
->  #define ALERT_LEVEL_CHR_UUID 0x2A06
->
-> +enum {
-> +       ALERT_NONE = 0,
-> +       ALERT_MILD,
-> +       ALERT_HIGH,
-> +};
-> +
->  struct monitor {
->        struct btd_device *device;
->        GAttrib *attrib;
-> @@ -116,11 +122,11 @@ static char *read_proximity_config(bdaddr_t *sba, bdaddr_t *dba,
->  static uint8_t str2level(const char *level)
->  {
->        if (g_strcmp0("high", level) == 0)
-> -               return 0x02;
-> +               return ALERT_HIGH;
->        else if (g_strcmp0("mild", level) == 0)
-> -               return 0x01;
-> +               return ALERT_MILD;
->
-> -       return 0x00;
-> +       return ALERT_NONE;;
-
-I gonna send a -v2 patch fixing this extra semicolon.
-
-BR,
-Claudio
+T24gV2VkLCAyMDExLTA4LTAzIGF0IDIxOjU5IC0wNDAwLCBKYWlrdW1hciBHYW5lc2ggd3JvdGU6
+DQo+IENvbW1pdCBmNGQ3Y2Q0YTRjMjVjYjRhNWMzMGE2NzVkNGNjMDA1MmM5M2I5MjVhIGludHJv
+ZHVjZWQNCj4gdXNhZ2Ugb2YgPGxpbnV4L2t0aHJlYWQuaD4gQVBJLiBrdGhyZWFkX3N0b3AgaXMg
+YSBibG9ja2luZw0KPiBmdW5jdGlvbiB3aGljaCByZXR1cm5zIG9ubHkgd2hlbiB0aGUgdGhyZWFk
+IGV4aXRzLiBJbiB0aGlzDQo+IGNhc2UsIHRoZSB0aHJlYWQgY291bGRuJ3QgZXhpdCBiZWNhdXNl
+IGl0IHdhcyB3YWl0aW5nIHRvIGdldA0KPiBhIHdyaXRlIHNlbWFwaG9yZS4gYm5lcF9kZWxfY29u
+bmVjdGlvbiBmdW5jdGlvbiB3aGljaCBjYWxscw0KPiBrdGhyZWFkX3N0b3AgYWxzbyBoZWxkIHRo
+ZSByZWFkIHNlbWFwaG9yZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEphaWt1bWFyIEdhbmVzaCA8
+amFpa3VtYXJAZ29vZ2xlLmNvbT4NCj4gLS0tDQo+ICBuZXQvYmx1ZXRvb3RoL2JuZXAvY29yZS5j
+IHwgICA0NyArKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAg
+MSBmaWxlcyBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAxOSBkZWxldGlvbnMoLSkNCj4gDQo+
+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2JuZXAvY29yZS5jIGIvbmV0L2JsdWV0b290aC9i
+bmVwL2NvcmUuYw0KPiBpbmRleCBlYjg0ODZmLi5mNTg3YjgxIDEwMDY0NA0KPiAtLS0gYS9uZXQv
+Ymx1ZXRvb3RoL2JuZXAvY29yZS5jDQo+ICsrKyBiL25ldC9ibHVldG9vdGgvYm5lcC9jb3JlLmMN
+Cj4gQEAgLTQ3MCw2ICs0NzAsMzEgQEAgc2VuZDoNCj4gIAlyZXR1cm4gbGVuOw0KPiAgfQ0KPiAg
+DQo+ICtzdGF0aWMgaW50IGNsZWFudXBfYm5lcF9zZXNzaW9uKHN0cnVjdCBibmVwX3Nlc3Npb24g
+KnMpDQo+ICt7DQo+ICsJc3RydWN0IG5ldF9kZXZpY2UgKmRldiA9IHMtPmRldjsNCj4gKw0KPiAr
+CS8qIENsZWFudXAgc2Vzc2lvbiAqLw0KPiArCWRvd25fd3JpdGUoJmJuZXBfc2Vzc2lvbl9zZW0p
+Ow0KPiArDQo+ICsJLyogRGVsZXRlIG5ldHdvcmsgZGV2aWNlICovDQo+ICsJdW5yZWdpc3Rlcl9u
+ZXRkZXYoZGV2KTsNCj4gKw0KPiArCS8qIFdha2V1cCB1c2VyLXNwYWNlIHBvbGxpbmcgZm9yIHNv
+Y2tldCBlcnJvcnMgKi8NCj4gKwlzLT5zb2NrLT5zay0+c2tfZXJyID0gRVVOQVRDSDsNCj4gKw0K
+PiArCXdha2VfdXBfaW50ZXJydXB0aWJsZShza19zbGVlcChzLT5zb2NrLT5zaykpOw0KPiArDQo+
+ICsJLyogUmVsZWFzZSB0aGUgc29ja2V0ICovDQo+ICsJZnB1dChzLT5zb2NrLT5maWxlKTsNCj4g
+Kw0KPiArCV9fYm5lcF91bmxpbmtfc2Vzc2lvbihzKTsNCj4gKw0KPiArCXVwX3dyaXRlKCZibmVw
+X3Nlc3Npb25fc2VtKTsNCj4gKwlmcmVlX25ldGRldihkZXYpOw0KPiArCXJldHVybiAwOw0KPiAr
+fQ0KPiArDQo+ICBzdGF0aWMgaW50IGJuZXBfc2Vzc2lvbih2b2lkICphcmcpDQo+ICB7DQo+ICAJ
+c3RydWN0IGJuZXBfc2Vzc2lvbiAqcyA9IGFyZzsNCj4gQEAgLTUxMSwyNSArNTM2LDYgQEAgc3Rh
+dGljIGludCBibmVwX3Nlc3Npb24odm9pZCAqYXJnKQ0KPiAgCX0NCj4gIAlfX3NldF9jdXJyZW50
+X3N0YXRlKFRBU0tfUlVOTklORyk7DQo+ICAJcmVtb3ZlX3dhaXRfcXVldWUoc2tfc2xlZXAoc2sp
+LCAmd2FpdCk7DQo+IC0NCj4gLQkvKiBDbGVhbnVwIHNlc3Npb24gKi8NCj4gLQlkb3duX3dyaXRl
+KCZibmVwX3Nlc3Npb25fc2VtKTsNCj4gLQ0KPiAtCS8qIERlbGV0ZSBuZXR3b3JrIGRldmljZSAq
+Lw0KPiAtCXVucmVnaXN0ZXJfbmV0ZGV2KGRldik7DQo+IC0NCj4gLQkvKiBXYWtldXAgdXNlci1z
+cGFjZSBwb2xsaW5nIGZvciBzb2NrZXQgZXJyb3JzICovDQo+IC0Jcy0+c29jay0+c2stPnNrX2Vy
+ciA9IEVVTkFUQ0g7DQo+IC0NCj4gLQl3YWtlX3VwX2ludGVycnVwdGlibGUoc2tfc2xlZXAocy0+
+c29jay0+c2spKTsNCj4gLQ0KPiAtCS8qIFJlbGVhc2UgdGhlIHNvY2tldCAqLw0KPiAtCWZwdXQo
+cy0+c29jay0+ZmlsZSk7DQo+IC0NCj4gLQlfX2JuZXBfdW5saW5rX3Nlc3Npb24ocyk7DQo+IC0N
+Cj4gLQl1cF93cml0ZSgmYm5lcF9zZXNzaW9uX3NlbSk7DQo+IC0JZnJlZV9uZXRkZXYoZGV2KTsN
+Cj4gIAlyZXR1cm4gMDsNCj4gIH0NCg0KVGhpcyB3b24ndCB3b3JrIGJlY2F1c2UgdGhlIHNlc3Np
+b24gdGhyZWFkIGNhbiBleGl0IGl0c2VsZiAobGlrZSBpZiBpdA0KZGlzY292ZXJzIHRoYXQgdGhl
+IHNrX3N0YXRlIGlzIG5vIGxvbmdlciBCVF9DT05ORUNURUQpLg0KIA0KPiBAQCAtNjUxLDYgKzY1
+Nyw5IEBAIGludCBibmVwX2RlbF9jb25uZWN0aW9uKHN0cnVjdCBibmVwX2Nvbm5kZWxfcmVxICpy
+ZXEpDQo+ICAJCWVyciA9IC1FTk9FTlQ7DQo+ICANCj4gIAl1cF9yZWFkKCZibmVwX3Nlc3Npb25f
+c2VtKTsNCj4gKw0KPiArCWlmICghZXJyKQ0KPiArCQljbGVhbnVwX2JuZXBfc2Vzc2lvbihzKTsN
+Cg0KU2luY2UgdGhlIHRocmVhZCBjYW4gZXhpdCBpdHNlbGYsIHRoZSBzZXNzaW9uIHMgbWF5IG5v
+IGxvbmdlciBiZSB2YWxpZA0KYWZ0ZXIgdGhlIHJlYWQgbG9jayBpcyByZWxlYXNlZC4NCg0KPiAg
+CXJldHVybiBlcnI7DQo+ICB9DQo+ICANCg0KRG9lcyB0aGUgcGF0Y2ggYmVsb3cgd29yayBmb3Ig
+eW91Pw0KDQotLS0NCiBuZXQvYmx1ZXRvb3RoL2JuZXAvYm5lcC5oIHwgICAgMSArDQogbmV0L2Js
+dWV0b290aC9ibmVwL2NvcmUuYyB8ICAgIDkgKysrKystLS0tDQogMiBmaWxlcyBjaGFuZ2VkLCA2
+IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRv
+b3RoL2JuZXAvYm5lcC5oIGIvbmV0L2JsdWV0b290aC9ibmVwL2JuZXAuaA0KaW5kZXggOGU2YzA2
+MS4uZTdlZTUzMSAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgvYm5lcC9ibmVwLmgNCisrKyBi
+L25ldC9ibHVldG9vdGgvYm5lcC9ibmVwLmgNCkBAIC0xNTUsNiArMTU1LDcgQEAgc3RydWN0IGJu
+ZXBfc2Vzc2lvbiB7DQogCXVuc2lnbmVkIGludCAgcm9sZTsNCiAJdW5zaWduZWQgbG9uZyBzdGF0
+ZTsNCiAJdW5zaWduZWQgbG9uZyBmbGFnczsNCisJYXRvbWljX3QgICAgICB0ZXJtaW5hdGU7DQog
+CXN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzazsNCiANCiAJc3RydWN0IGV0aGhkciBlaDsNCmRpZmYg
+LS1naXQgYS9uZXQvYmx1ZXRvb3RoL2JuZXAvY29yZS5jIGIvbmV0L2JsdWV0b290aC9ibmVwL2Nv
+cmUuYw0KaW5kZXggN2U4ZmYzYy4uZDllZGZlOCAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgv
+Ym5lcC9jb3JlLmMNCisrKyBiL25ldC9ibHVldG9vdGgvYm5lcC9jb3JlLmMNCkBAIC00ODcsNyAr
+NDg3LDcgQEAgc3RhdGljIGludCBibmVwX3Nlc3Npb24odm9pZCAqYXJnKQ0KIAl3aGlsZSAoMSkg
+ew0KIAkJc2V0X2N1cnJlbnRfc3RhdGUoVEFTS19JTlRFUlJVUFRJQkxFKTsNCiANCi0JCWlmIChr
+dGhyZWFkX3Nob3VsZF9zdG9wKCkpDQorCQlpZiAoYXRvbWljX3JlYWQoJnMtPnRlcm1pbmF0ZSkp
+DQogCQkJYnJlYWs7DQogCQkvKiBSWCAqLw0KIAkJd2hpbGUgKChza2IgPSBza2JfZGVxdWV1ZSgm
+c2stPnNrX3JlY2VpdmVfcXVldWUpKSkgew0KQEAgLTY0Miw5ICs2NDIsMTAgQEAgaW50IGJuZXBf
+ZGVsX2Nvbm5lY3Rpb24oc3RydWN0IGJuZXBfY29ubmRlbF9yZXENCipyZXEpDQogCWRvd25fcmVh
+ZCgmYm5lcF9zZXNzaW9uX3NlbSk7DQogDQogCXMgPSBfX2JuZXBfZ2V0X3Nlc3Npb24ocmVxLT5k
+c3QpOw0KLQlpZiAocykNCi0JCWt0aHJlYWRfc3RvcChzLT50YXNrKTsNCi0JZWxzZQ0KKwlpZiAo
+cykgew0KKwkJYXRvbWljX2luYygmcy0+dGVybWluYXRlKTsNCisJCXdha2VfdXBfcHJvY2Vzcyhz
+LT50YXNrKTsNCisJfSBlbHNlDQogCQllcnIgPSAtRU5PRU5UOw0KIA0KIAl1cF9yZWFkKCZibmVw
+X3Nlc3Npb25fc2VtKTsNCi0tIA0KMS43LjQuMQ0KDQoNCg==
