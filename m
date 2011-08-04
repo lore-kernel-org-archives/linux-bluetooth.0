@@ -1,52 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Colin Beckingham <colbec@start.ca>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 4 Aug 2011 10:54:26 -0400
-Subject: Re: Permission denied (13) on Samsung WEP475 headset?
-Message-ID: <1312469666.2158.8.camel@THOR>
-References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>
-In-Reply-To: <20110804121703.GA23534@dell>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd 2/2] Fix several issues in FTP action support
+Date: Thu,  4 Aug 2011 15:45:04 +0200
+Message-Id: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1312465504-26373-1-git-send-email-lkslawek@gmail.com>
+References: <1312465504-26373-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ29saW4sDQoNCk9uIFRodSwgMjAxMS0wOC0wNCBhdCAwODoxNyAtMDQwMCwgSm9oYW4gSGVk
-YmVyZyB3cm90ZToNCj4gSGkgQ29saW4sDQo+IA0KPiBPbiBUaHUsIEF1ZyAwNCwgMjAxMSwgQ29s
-aW4gQmVja2luZ2hhbSB3cm90ZToNCj4gPiBJJ2QgbGlrZSB0byBwcm92aWRlIHNvbWUgZmVlZGJh
-Y2sgcmVnYXJkaW5nIGEgU2Ftc3VuZyBXRVA0NzUgaGVhZHNldA0KPiA+IHdoaWNoIGZhaWxzIHRv
-IGNvbm5lY3QgdG8gbGludXggc3BlY2lmaWNhbGx5Lg0KPiA+IA0KPiA+IFRoZSBVU0IgYmx1ZXRv
-b3RoIGFkYXB0ZXIgaXMgYSBNb2RlbDogQmVsa2luIEJMVUVUT09USCBVU0IgK0VEUg0KPiA+IEFE
-QVBURVIgdjIuMSBVSEUgd2hpY2ggc3VjY2Vzc2Z1bGx5IGludGVyY29ubmVjdHMgd2l0aCAyIEph
-YnJhIGFuZCAxDQo+ID4gUGxhbnRyb25pY3MgaGVhZHNldHMsIHBsdXMgYSBOb2tpYSBFNzEgcGhv
-bmUuIFNhbXN1bmcgV0VQNDc1DQo+ID4gc3VjY2Vzc2Z1bGx5IGNvbm5lY3RzIHRvIGEgV2luZG93
-cyBYUCBtYWNoaW5lIGFuZCB0byB0aGUgTm9raWEgRTcxLg0KPiA+IA0KPiA+IFVzaW5nIE9wZW5z
-dXNlIDExLjQgd2l0aCBjdXN0b20ga2VybmVsIDMuMCBjdXJyZW50bHksIChhbHNvIGZhaWxzDQo+
-ID4gd2l0aCAyLjYuMzgpLCBibHVleiA0Ljk2IGFuZCBibHVlZGV2aWwgbWFuYWdlci4NCj4gPiAN
-Cj4gPiBTeW1wdG9tcyBhcmUgdGhhdCBibHVlZGV2aWwgc2VlcyB0aGUgaGVhZHNldCBpbiBwYWly
-aW5nIG1vZGUgYW5kDQo+ID4gY29ycmVjdGx5IHJldHJpZXZlcyB0aGUgbmFtZSBXRVA0NzUsIGNv
-bm5lY3RlZCBidXR0b24gZmxhc2hlcyBncmVlbg0KPiA+IGFuZCB0aGVuIHJldHVybnMgdG8gZ3Jl
-eSAobm90IGNvbm5lY3RlZCkuIFdFUDQ3NSBsZWQgY2hhbmdlcyB0bw0KPiA+IGNvbm5lY3RlZCBz
-dGF0dXMgYnV0IGJsdWVkZXZpbCBzaG93cyBoZWFkc2V0IG5vdCBjb25uZWN0ZWQgYW5kDQo+ID4g
-aGVhZHNldCBkb2VzIG5vdCB3b3JrLg0KPiA+IA0KPiA+IFdpdGggYmx1ZXRvb3RoZCBpbiBkZWJ1
-ZyBtb2RlLCBJIGdldCB0aGUgZm9sbG93aW5nIHRyYW5zYWN0aW9ucyBpbg0KPiA+IC92YXIvbG9n
-L21lc3NhZ2VzOg0KPiANCj4gVGhlcmUgc2VlbXMgdG8gYmUgc29tZXRoaW5nIHN0cmFuZ2UgZ29p
-bmcgb24gd2l0aCB0aGUgc2VjdXJlIHNpbXBsZQ0KPiBwYWlyaW5nIGxvZ2ljLiBGb3Igc29tZSBy
-ZWFzb24gdGhlIGluaXRpYWwgbGluayBrZXkgaXNuJ3QgZ29vZCBlbm91Z2gNCj4gKGF1dGggcmVx
-dWVzdCArIGxpbmsga2V5IG5lZ2F0aXZlIHJlcGx5IGFmdGVyIHRoZSBpbml0aWFsIGtleSBoYXMg
-YmVlbg0KPiBnZW5lcmF0ZWQpIGFuZCB0aGVuIHRoZXJlJ3MgYSB1c2VyIGNvbmZpcm0gbmVnYXRp
-dmUgcmVwbHkgZm9yIHRoZSBzZWNvbmQNCj4gYXR0ZW1wdC4gSXQnZCBiZSBnb29kIHRvIGdldCB0
-byB0aGUgYm90dG9tIG9mIHRoaXMgYW5kIGZpeCBpdCBwcm9wZXJseSwNCj4gYnV0IG1lYW53aGls
-ZSB5b3UgY2FuIHByb2JhYmx5IHdvcmsgYXJvdW5kIHRoaXMgYnkgZGlzYWJsaW5nIFNTUCBvbiB5
-b3VyDQo+IHNpZGUgKGhjaWNvbmZpZyBoY2kwIHNzcG1vZGUgMCkgYW5kIHJldHJ5aW5nIHBhaXJp
-bmcuDQoNCllvdSdyZSBoYXZpbmcgdGhpcyBwcm9ibGVtIGJlY2F1c2UgdGhlIHJlbW90ZSBkZXZp
-Y2Ugc3VwcG9ydHMgU1NQIGJ1dA0Kbm90IE1JVE0gcHJvdGVjdGlvbi4gU29tZSBzb2NrZXQgaXMg
-cmVxdWlyaW5nIEJUX1NFQ1VSSVRZX0hJR0ggKHRodXMNCnJlcXVpcmluZyBNSVRNKSAtLSB0aGVy
-ZWZvcmUgdGhlIGtlcm5lbCBpcyBjb3JyZWN0bHkgZGlzY29ubmVjdGluZyBhbmQNCnJldHVybmlu
-ZyAnQXV0aGVudGljYXRpb24gRmFpbHVyZScgKGFsdGhvdWdoIHJldHVybmluZyAnSW5zdWZmaWNp
-ZW50DQpBdXRoZW50aWNhdGlvbicgd291bGQgcHJvYmFibHkgYmUgYmV0dGVyKS4NCg0KSSB0aGlu
-ayB0aGUgR0FUVCBicm93c2VyIGlzIGRlbWFuZGluZyBCVF9TRUNVUklUWV9ISUdIIC0tIG5vdCBz
-dXJlIHdoeQ0KdGhvdWdoIChJIGRvbid0IHRoaW5rIGl0IG5lZWRzIHRvLiBJJ2xsIGdldCBiYWNr
-IHRvIHlvdSBvbiB0aGF0Li4uKQ0KDQpSZWdhcmRzLA0KUGV0ZXINCg==
+Fixed issues:
+- Incorrect handling of absolute path in DestName header
+- Possibility of exploiting DestName header to escape FTP plugin root
+- Incorrect checking of whether path resides inside FTP root (not
+  allowing to move or copy files up)
+- Ignoring symbolic links and options regarding them
+---
+ plugins/ftp.c |   51 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 47 insertions(+), 4 deletions(-)
+
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index e191339..e30c57d 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -410,18 +410,45 @@ done:
+ 	return err;
+ }
+ 
++static gboolean is_correct_path(const char *path)
++{
++        gchar **elements;
++        gchar **cur;
++        int depth = 0;
++
++        elements = g_strsplit(path, "/", 0);
++
++        for (cur = elements; *cur != NULL; ++cur) {
++                if (**cur == '\0' || strcmp(*cur, ".") == 0)
++                        continue;
++
++                if (strcmp(*cur, "..") == 0) {
++                        --depth;
++                        if (depth < 0)
++                                break;
++                        continue;
++                }
++
++                ++depth;
++        }
++
++        g_strfreev(elements);
++
++        return depth >= 0 ? TRUE : FALSE;
++}
++
+ static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
+ {
+ 	char *filename;
+ 
+ 	/* DestName can either be relative or absolute (FTP style) */
+-	if (g_path_is_absolute(destname))
+-		filename = g_build_filename(destname, NULL);
++	if (destname[0] == '/')
++		filename = g_build_filename(obex_get_root_folder(ftp->os),
++                                                                destname, NULL);
+ 	else
+ 		filename = g_build_filename(ftp->folder, destname, NULL);
+ 
+-	/* Check if destination is inside root path */
+-	if (g_str_has_prefix(filename, ftp->folder))
++	if (is_correct_path(filename + strlen(obex_get_root_folder(ftp->os))))
+ 		return filename;
+ 
+ 	g_free(filename);
+@@ -447,6 +474,14 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
+ 
+ 	destination = ftp_build_filename(ftp, destname);
+ 
++	if (destination == NULL)
++		return -EBADR;
++
++	ret = verify_path(destination);
++
++	if (ret < 0)
++		return ret;
++
+ 	source = g_build_filename(ftp->folder, name, NULL);
+ 
+ 	ret = obex_copy(ftp->os, source, destination);
+@@ -475,6 +510,14 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
+ 
+ 	destination = ftp_build_filename(ftp, destname);
+ 
++	if (destination == NULL)
++		return -EBADR;
++
++	ret = verify_path(destination);
++
++	if (ret < 0)
++		return ret;
++
+ 	source = g_build_filename(ftp->folder, name, NULL);
+ 
+ 	ret = obex_move(ftp->os, source, destination);
+-- 
+1.7.4.1
+
