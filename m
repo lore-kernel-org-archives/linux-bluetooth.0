@@ -1,45 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Aug 2011 15:58:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add watch for RFCOMM disconnect to HFP HF role
-Message-ID: <20110804125810.GA24323@dell>
-References: <1312462310-16965-1-git-send-email-frederic.dalleau@linux.intel.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 4 Aug 2011 08:55:08 -0400
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
+Message-ID: <1312462508.15718.46.camel@THOR>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+	 <1312406086.3358.187.camel@THOR>
+	 <CABBYNZ+ZLJd17xMS1LpMn92T04gGKr7xGxe6eMbWOa_3k+tFfQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+ZLJd17xMS1LpMn92T04gGKr7xGxe6eMbWOa_3k+tFfQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1312462310-16965-1-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
-
-On Thu, Aug 04, 2011, Frédéric Dalleau wrote:
-> ---
->  audio/gateway.c |   22 ++++++++++++++++++++++
->  1 files changed, 22 insertions(+), 0 deletions(-)
-> 
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index ec0ec5d..200930f 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -188,9 +188,29 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
->  				(GIOFunc) sco_io_cb, dev);
->  }
->  
-> +static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
-> +			struct audio_device *dev)
-> +{
-> +	struct gateway *gw = dev->gateway;
-> +
-> +	if (cond & G_IO_NVAL)
-> +		return FALSE;
-> +
-> +	if (cond & (G_IO_ERR | G_IO_HUP)) {
-
-Since this function is only called for NVAL, ERR and HUP, do you even
-need to have this check here. Maybe you could just get rid of this
-second if-statement.
-
-Johan
+SGkgTHVpeiwNCg0KT24gVGh1LCAyMDExLTA4LTA0IGF0IDA0OjIwIC0wNDAwLCBMdWl6IEF1Z3Vz
+dG8gdm9uIERlbnR6IHdyb3RlOg0KPiBIaSBQZXRlciwNCj4gDQo+IE9uIFRodSwgQXVnIDQsIDIw
+MTEgYXQgMTI6MTQgQU0sIFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPiB3
+cm90ZToNCj4gPiBIaSBMdWl6LA0KPiA+DQo+ID4gLi4uLi4NCj4gPg0KPiA+IEl0J3MgbXkgYmVs
+aWVmIHRoYXQgdGhlIGluY3JlZGlibHkgY29tcGxpY2F0ZWQgd2F5IHRoYXQgUHVsc2VBdWRpbw0K
+PiA+IGhhbmRsZXMgdGhlIHN0cmVhbSBpbmRpY2VzIGFuZCBjb21wdXRlZCBsYXRlbmN5IGlzIHJl
+YWxseSB0aGUgaXNzdWUgKGF0DQo+ID4gbGVhc3Qgd2l0aCBBMkRQKS4NCj4gDQo+IFJlYWxseSwg
+c28geW91IGhhdmUgYSBmaXggZm9yIHRoYXQ/IEkgd291bGQgYmUgaGFwcHkgdG8gc2VlIHlvdXIN
+Cj4gcHJvcG9zYWwgYW5kIGRpc2N1c3Npb24gb24gUHVsc2VBdWRpbyBtYWlsaW5nIGxpc3QuDQoN
+CkknZCByYXRoZXIgc3RhcnQgb3ZlciA6KQ0KDQo+ID4gRm9yIGV4YW1wbGUsIGluIHNldmVyYWwg
+Y29uZmlndXJhdGlvbiBJIGhhdmUsIFB1bHNlQXVkaW8gaXMgcmVuZGVyaW5nDQo+ID4gKnRvbyBm
+YXN0Ki4gVGhpcyBpcyBldmlkZW5jZWQgYnkgdGhlIHJlbW90ZSBkZXZpY2Ugc2VuZGluZyBTVE9Q
+IHBhY2tldHMNCj4gPiAod2hpY2ggY2FuIGZsb29kIHRoZSBzeXNsb2cgYXMgMC1sZW5ndGggTDJD
+QVAgcGFja2V0cykgYmVjYXVzZSBpdHMgcmVjdg0KPiA+IGJ1ZmZlcnMgYXJlIGZ1bGwhIChPZiBj
+b3Vyc2UsIHRoZXNlIERNMSBwYWNrZXRzIGFyZSBlYXRpbmcgdXAgYWlyIHRpbWUNCj4gPiB0b28g
+LS0gd2hpY2ggaXMgc2xvd2luZyBsZWdpdGltYXRlIHJ4IHBhY2tldHMgZnJvbSB0aGUgSElEIGRl
+dmljZXMhKQ0KPiANCj4gQnV0IHdoeSB0aGUga2VybmVsIGlzIG5vdCBzdG9wcGluZyBQdWxzZUF1
+ZGlvPyBJIG1lYW4gUEEgZG9lcyB1c2UNCj4gUE9MTE9VVCB0byBjaGVjayBpZiB0aGUgc29ja2V0
+IGlzIHdyaXRhYmxlLCBpdCB0aGVuIHdyaXRlcyBhcyBtdWNoIGFzDQo+IHBvc3NpYmxlIGFuZCBz
+bGVlcCwgYnV0IHdpdGhvdXQgdXNpbmcgZ3VhcmFudGVlZCBjaGFubmVscyB3aXRoIHByb3Blcg0K
+PiBRb1Mgc3VwcG9ydCBJIGRvbid0IHRoaXMgY2hhbmdpbmcgYW55dGltZSBzb29uLg0KDQpUaGUg
+a2VybmVsIGNhbid0IHN0b3AgdGhlIHNvY2tldCBiZWNhdXNlIHRoZXJlJ3Mgbm90IGVub3VnaCBp
+bmZvcm1hdGlvbg0KdG8ga25vdyB3aGVuIHRvIHJlc3RhcnQgaXQgKGFuZCBJIGRvdWJ0IG90aGVy
+IGNvbnRyb2xsZXJzIGZvcndhcmQgU1RPUA0KcGFja2V0cyB0byB0aGUgaG9zdCBsaWtlIEJDTSku
+DQoNClRoaXMgaXMgbXkgd2hvbGUgcG9pbnQgYWJvdXQgdGhlIHN0cmVhbSBpbmRpY2VzIGFuZCBj
+b21wdXRlZCBsYXRlbmN5Og0KUHVsc2VBdWRpbydzIGRlc2lnbiBpcyBwcmVkaWNhdGVkIG9uICpr
+bm93aW5nKiB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4NCmVsYXBzZWQgdGltZSBhbmQgc3RyZWFt
+IGluZGV4LCBhbmQgdGh1cyBiZWluZyBhYmxlIHRvIGRlbGl2ZXIgZGF0YSB0bw0KdGhlIHNpbmsg
+anVzdCBiZWZvcmUgaXQncyBuZWVkZWQgKGVzcGVjaWFsbHkgd2l0aCBwcmUtZW1wdGlibGUga2Vy
+bmVsKS4NCg0KQnV0IGZvciBhIHJlbW90ZSBkZXZpY2UgdG8gYmUgZmxvdy1jb250cm9sbGluZyBp
+bXBsaWVzIHRoYXQgUHVsc2VBdWRpbw0KaXMgd2F5IGFoZWFkIG9mIHdoYXQncyBhY3R1YWxseSBw
+bGF5aW5nLiBGdWxsIHJlbW90ZSByZWN2IGJ1ZmZlcnMgKyBmdWxsDQpob3N0IHR4IGJ1ZmZlcnMg
+KiA4NTMtYnl0ZSBwYWNrZXRzIG9mIFJUUCBkYXRhIGlzIHByZXR0eSBmYXIgYWhlYWQhDQoNCj4g
+PiBZb3Ugc2hvdWxkIGhlYXIgdGhlICdza2lwcGluZycgd2hlbiB0aGUgc2xlZXAgdGltZXIgd2hp
+Y2ggZGVsYXlzIHRoZQ0KPiA+IG5leHQgYmxvY2sgcmVuZGVyIGlzIElGREVGJ2Qgb3V0IG9mIHRo
+ZQ0KPiA+IG1vZHVsZS1ibHVldG9vdGgtZGV2aWNlLmMvdGhyZWFkZm4oKS4gV2l0aCBvdGhlciBz
+dWJzeXN0ZW1zIGJ1dCBub3Qgd2l0aA0KPiA+IEJsdWV6LCBQdWxzZUF1ZGlvIHVzZXMgYSAnc21v
+b3RoZXInIHRvIGZpbmUtdHVuZSB3aGVuIHRvIHJlbmRlciB0aGUgbmV4dA0KPiA+IGJsb2NrLg0K
+PiANCj4gVGhpcyBjYW4gYmUgZml4ZWQsIHRoZSBzb3VyY2UgYWxyZWFkeSB1c2VzIHRoZSBzbW9v
+dGhlciBhbnl3YXksIGJ1dCBJbQ0KPiBhZnJhaWQgdGhpcyBjYW4gY2F1c2UgYmFkIGVmZmVjdHMg
+bGlrZSBtdWNoIGZyZXF1ZW50IHdha2V1cHMgYW5kIGV2ZW4NCj4gYXV0byBvZiBzeW5jIHdpdGgg
+c29tZSBoZWFkc2V0cy4NCg0KRXhhY3RseS4gVGhlIGVsZW1lbnQgKHNtb290aGVyKSBkZXNpZ25l
+ZCBzcGVjaWZpY2FsbHkgdG8gZW5zdXJlIHRoZQ0KY29ycmVjdCBsYXRlbmN5IGNhbGN1bGF0aW9u
+LCBkb2Vzbid0Lg0KDQpbQXNpZGU6IHRoZSBwcm9ibGVtcyBjYXVzZWQgYnkgcmVtb3ZpbmcgdGhl
+IHNsZWVwIHRpbWVyIGdvIGRlZXBlciB0aGFuDQpqdXN0IGZsb29kaW5nIEJUIC0gaXQgYWxzbyBl
+eHBvc2VzIHNvbWUgc291cmNlIGluZGV4IHByb2JsZW1zLiBKdXN0DQpoYXZlbid0IGhhZCB0aW1l
+IHRvIGludmVzdGlnYXRlIHRoYXQgZnVydGhlciB5ZXRdDQoNCj4gPiBNeSBwb2ludCBoZXJlIGlz
+IEkgdGhpbmsgaXQncyBwcmVtYXR1cmUgdG8gY29uY2x1ZGUgdGhhdCBQdWxzZUF1ZGlvDQo+ID4g
+ZG9lc24ndCBoYXZlIGEgcGFydCB0byBwbGF5Lg0KPiANCj4gSXQgcHJvYmFibHkgZG9lcywgYnV0
+IGl0IGRvZXNuJ3QgY2hhbmdlIHRoZSBmYWN0IHRoZSBwcmlvcml0aXphdGlvbiBpcw0KPiBwcmV0
+dHkgbXVjaCBuZWVkZWQsIGFjdHVhbGx5IGl0IHdpbGwgcHJvYmFibHkgbWFrZSBzdWNoIHByb2Js
+ZW1zIG1vcmUNCj4gdmlzaWJsZSB0aGFuIGV2ZXIuDQoNCkFncmVlZC4gQXMgSSB3cm90ZSBpbiB0
+aGUgb3RoZXIgcG9zdCwgSSB0aGluayBwcmlvcml0eS1iYXNlZCB0eA0Kc2NoZWR1bGluZyBpcyBh
+biBleGNlbGxlbnQgaWRlYS4NCg0KUmVnYXJkcywNClBldGVyDQoNCg==
