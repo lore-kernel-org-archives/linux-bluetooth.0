@@ -1,32 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E3A9A0B.3030804@linux.intel.com>
-Date: Thu, 04 Aug 2011 15:09:31 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Reply-To: frederic.dalleau@linux.intel.com
+Date: Thu, 4 Aug 2011 15:58:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd] Add Name header check to ftp_chkput
+Message-ID: <20110804125850.GB24323@dell>
+References: <1312462196-18443-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add watch for RFCOMM disconnect to HFP HF role
-References: <1312462310-16965-1-git-send-email-frederic.dalleau@linux.intel.com> <20110804125810.GA24323@dell>
-In-Reply-To: <20110804125810.GA24323@dell>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312462196-18443-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Slawek,
 
->> +	if (cond&  (G_IO_ERR | G_IO_HUP)) {
->
-> Since this function is only called for NVAL, ERR and HUP, do you even
-> need to have this check here. Maybe you could just get rid of this
-> second if-statement.
+On Thu, Aug 04, 2011, Slawomir Bochenski wrote:
+> Validation of Name header was missing from ftp_chkput, thus still allowing
+> actual putting.
+> ---
+>  plugins/ftp.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-To be rigorous the test is not needed. This is more a matter of 
-consistency, since the code is nearly a copy paste of the existing 
-sco_io_cb.
+Applied. Thanks.
 
-If it is ok for you, I'll update both funcs.
-
-Regards,
-Frédéric
+Johan
