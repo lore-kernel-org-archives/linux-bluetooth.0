@@ -1,136 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E3A5BFB.1050201@nokia.com>
+Date: Thu, 04 Aug 2011 11:44:43 +0300
+From: Antti Julku <antti.julku@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <1312404825.3358.173.camel@THOR>
-References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
-	<1312377094-11285-2-git-send-email-luiz.dentz@gmail.com>
-	<1312388716.3358.58.camel@THOR>
-	<CABBYNZJ9DVr5kPE3ZrWgyWUGBayZTyY+=rfEXpckXT3xkL6X8w@mail.gmail.com>
-	<1312404825.3358.173.camel@THOR>
-Date: Thu, 4 Aug 2011 12:04:57 +0300
-Message-ID: <CABBYNZ+Z6CvFdekTQmw8e=Z0fDw3+vC8RqZnXLZ3PiCTEBLupQ@mail.gmail.com>
-Subject: Re: [RFC 1/3] Bluetooth: prioritizing data over HCI
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: ext Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: Dmitriy Paliy <dmitriy.paliy@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>	<1309309092.2208.25.camel@aeonflux>	<CAHMBquWSLjzKKyM2xuMUakHeBb-FMLUWXLj2_Tz4Ye1MWj37qw@mail.gmail.com> <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com>
+In-Reply-To: <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
 
-On Wed, Aug 3, 2011 at 11:53 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> My point here (besides pointing out the massive iteration) was to
-> suggest that perhaps some scheduler state should be preserved such that
-> already-visited priority levels are not revisited more than once per tx
-> tasklet schedule.
+Hi Claudio and Marcel,
 
-That is a valid point, Im gonna try to come up with something that address that.
+On 07/25/2011 03:46 PM, ext Claudio Takahasi wrote:
 
->>  Also I guess for SCO/ESCO/LE e doesn't make
->> much sense to have many queues/priorities, it is basically ACL only,
->> that simplify a lot already.
+> BTW, I think we need to align BR and LE. Proximity and Thermometer
+> Profiles also have recommended parameters for fast connection(first
+> 30sec) and 2 reduced power options. Both profiles use the same
+> configuration. If we add a new command to control page/connection
+> parameters it needs to be aligned with BR and LE and if possible
+> avoiding transport specific parameters.
 >
-> LE should still have priorities. In fact, in a private test we've been
-> running here, we've merged the scheduler so that LE conns that share ACL
-> buffers are scheduled alongside other ACL conns (because they share the
-> same resource -- namely, the acl_cnt. We also merged SCO/ESCO scheduling
-> together as well).
+> BR,
+> Claudio
 
-Well I guess it would make sense, specially for SCO/ESCO, now LE Im
-not sure, it is not always the case the it uses acl_cnt, but in case
-it does it should be prioritized according.
+This issue was discussed in the IRC. It seem that for LE, fast 
+connection is needed only on the initiator side for outgoing connections 
+(LE scan/connection establishment parameters), since 4.0 spec forbids LE 
+connections between dual mode devices. So fast connectable mode on the 
+LE acceptor side would be only used for testing purposes, or if spec is 
+changed, or if single mode hw is supported in the future.
 
->>
->> >> +
->> >> +                       if (c->state != BT_CONNECTED && c->state != BT_CONFIG)
->> >> +                               continue;
->> >>
->> >> -               num++;
->> >> +                       num++;
->> >>
->> >> -               if (c->sent < min) {
->> >> -                       min  = c->sent;
->> >> -                       conn = c;
->> >> +                       if (c->sent < min) {
->> >> +                               min  = c->sent;
->> >> +                               conn = c;
->> >> +                               *queue = &c->data_q[i];
->> >> +                       }
->> >
->> > Why preserve the fairness logic?
->>
->> It does need to fair if there is 2 or more sockets with the same
->> priority, otherwise the first connection in the list might get all the
->> quote and even if we promote the starving queues it may still happen
->> to top most priority since there it cannot be promoted anymore.
->
-> Right. What I meant here was this: if the tx scheduler is re-made as
-> priority-based, then it seems logical to discard the fairness logic and
-> design the priority scheme such that starvation is not possible. For
-> example, the pri levels could be like this:
->        0 ~ 5   socket-programmable priorities
->        6       special CAP_NET_ADMIN priority
->        7       only possible via promotion
-> (Not that I'm suggesting that's the only or even best way to make
-> starvation not possible).
+For BR/EDR, as Dmitriy explained, the fast connectable use case is to 
+make headset to be able to connect faster when there is an incoming call 
+(user switches headset on when call is alerting). It's an enhancement 
+for headset connection time and usability.
 
-I would like to stick with current approach with bigger than 6 needing
-CAP_NET_ADMIN which is aligned with with SO_PRIORITY current does,
-otherwise it would immediately break the current application that uses
-priority 6. Besides I don't think having one possible promotion index
-is a good idea, it would completely ignore priorities in starvation
-case, but there is exactly where it is most needed to throttle lower
-priorities in favor of higher.
+It is currently implemented in hciops by changing page scan settings 
+while incoming call is alerting. HCI commands Write Page Scan Activity 
+and Write Page Scan Type are used to change page scan type from standard 
+to interlaced and interval 1.28 s => 22.5 ms. This makes the incoming 
+connection about 1 s faster. Settings are changed only for a short time 
+to minimize impact on power consumption.
 
->> You probably have never run this code did you? Only priority 7 can
->> really monopolize the connection, and that is on purpose, and yes
->> lower priority are throttled so higher priority can get lower latency,
->> what is wrong with that?
->
-> With no offense meant, simply running this code would be insufficient to
-> qualify it's appropriateness as a replacement scheduler. A bare-minimum
-> test matrix would ascertain comparative values for minimum/mean/maximum
-> latency and throughput for best-case/nominal/worst-case tx loads.
+In my opinion BR and LE cases are quite different, so I think it would 
+make sense to keep these separate and not to put them in one mgmt 
+command. Could we just add a generic mgmt command for setting BR page 
+scan parameters, for example "Set Page Scan Parameters Command" which 
+would take parameters type (standard or interlaced), interval, and window?
 
-But it would give a hint if your assumption are correct or not.
-
-> My main concern here is that app-level socket settings can have dramatic
-> effects on tx scheduling behavior, especially at near max tx loads.
-
-An that is ultimately what is needed for guaranteed channels (priority
-7), best effort is nearly unchanged because there is no guarantees of
-latency or throughput.
-
-> What I meant about near monopolization is this:  a priority 6 link that
-> retires 2 packets every 55 ms would mean that priority 0 links could
-> only xmit every 330 ms (1/3 sec.), assuming the controller was already
-> saturated by the priority 6 link. Even priority 3 links are only going
-> to be able to xmit every 165ms under these conditions.
-
-So what? the application can and should be set its priority according
-to not get throttled, it should only be fair with the same priority,
-the other are left behind. Im gonna be repeating this over and over,
-best effort channel as we have today have no guarantees (latency,
-throughput), so it is perfectly ok to throttle them.
-
-> What if, instead, links that are being promoted because the controller
-> is saturated, are promoted to the same (or maybe, higher) priority level
-> than was last successful?
-
-Ive tried that, it breaks the prioritization when it is most needed
-because it returns the schedulers to its fairness state and complete
-ignores the priorities.
-
->> Right now it promotes starving queues, all of them, but maybe it
->> shouldn't so that we simplify the complexity a little bit.
->
-> My thinking here is that the tx tasklet shouldn't be scheduled at all if
-> no work can be performed. Of course, the existing code suffers from the
-> same defect. Really, the only reason the tx tasklet *needs* to be
-> scheduled when the relevant buffer counter is 0 is to catch tx timeouts.
-
-Yep, that can indeed be fixed but then we need to find some other
-place to detect tx timeouts.
-
--- 
-Luiz Augusto von Dentz
+Br,
+Antti
