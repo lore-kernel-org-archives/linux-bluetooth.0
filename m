@@ -1,81 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E3AEE44.10702@goop.org>
-Date: Thu, 04 Aug 2011 12:08:52 -0700
-From: Jeremy Fitzhardinge <jeremy@goop.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"padovan@profusion.mobi" <padovan@profusion.mobi>
+Date: Thu, 4 Aug 2011 19:09:37 -0400
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
+Message-ID: <1312499377.2158.36.camel@THOR>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+	 <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+In-Reply-To: <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Linux 3.0-rc4: regression reconnecting bluetooth headset (A2DP
- fails)
-References: <4E03DA75.2080606@goop.org> <20110628182117.GD23183@joana> <4E0A2FC7.6020109@goop.org> <20110628200216.GE23183@joana>
-In-Reply-To: <20110628200216.GE23183@joana>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/28/2011 01:02 PM, Gustavo F. Padovan wrote:
-> * Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-28 20:47:19 +0100]:
->
->> On 06/28/2011 07:21 PM, Gustavo F. Padovan wrote:
->>> Hi Jeremy,
->>>
->>> * Jeremy Fitzhardinge <jeremy@goop.org> [2011-06-23 17:29:41 -0700]:
->>>
->>>> I have a Nokia BH-905i headset.  With a stock F15 kernel, it all works
->>>> well. With current linux-2.6.git, it fails to reconnect properly.
->>>>
->>>> On connection, the headphones only beep once, whereas they normally beep
->>>> twice; I think this is one beep per profile, and its only connecting HSP
->>>> and failing A2DP.  In the sound control panel, it either comes up with
->>>> "profile: off" or with the HSP/HFP (Telephony) profile rather than A2DP,
->>>> and it fails to switch if I try to change profiles via the sound control
->>>> panel.
->>>>
->>>> However, if I re-pair the device from scratch each time I use it, it
->>>> connects properly and it all works fine.
->>>>
->>>> pactl list shows:
->>>>
->>>> Card #2
->>>> 	Name: bluez_card.00_0B_E4_A6_6C_0D
->>>> 	Driver: module-bluetooth-device.c
->>>> 	Owner Module: 23
->>>> 	Properties:
->>>> 		device.description = "Nokia BH-905i"
->>>> 		device.string = "00:0B:E4:A6:6C:0D"
->>>> 		device.api = "bluez"
->>>> 		device.class = "sound"
->>>> 		device.bus = "bluetooth"
->>>> 		device.form_factor = "headset"
->>>> 		bluez.path = "/org/bluez/843/hci0/dev_00_0B_E4_A6_6C_0D"
->>>> 		bluez.class = "0x240404"
->>>> 		bluez.name = "Nokia BH-905i"
->>>> 		device.icon_name = "audio-headset-bluetooth"
->>>> 		device.intended_roles = "phone"
->>>> 	Profiles:
->>>> 		a2dp: High Fidelity Playback (A2DP) (sinks: 1, sources: 0, priority. 10)
->>>> 		hsp: Telephony Duplex (HSP/HFP) (sinks: 1, sources: 1, priority. 20)
->>>> 		off: Off (sinks: 0, sources: 0, priority. 0)
->>>> 	Active Profile: hsp
->>>>
->>>> If I try to switch profiles on the command line it says:
->>>> $ pactl set-card-profile 2 a2dp
->>>> Failure: Input/Output error
->>>>
->>>> and /var/log/messages shows:
->>>> module-bluetooth-device.c: A2DP is not connected, refused to switch profile
->>>>
->>>> Why isn't A2DP connecting?  How can I debug this further?
->>> Can you send the output of hcidump with F15 kernel and with linux-2.6.git
->>> kernel?
->> This is already fixed in
->> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git
-> Great, these fixes will be in linus-2.6 soon.
-
-There seems to have been a regression since then and the release 3.0
-kernel (and the F15 "2.6.40" kernel), which have gone back to showing
-the original symptoms: I can use my headphones when I first pair them,
-but I can't reconnect from then.
-
-Thanks,
-    J
+SGkgTWF0LA0KDQpPbiBUaHUsIDIwMTEtMDgtMDQgYXQgMTM6MzcgLTA0MDAsIE1hdCBNYXJ0aW5l
+YXUgd3JvdGU6DQoNCj4gSSBoYWQgYSByZWNlbnQgZGlzY3Vzc2lvbiB3aXRoIEd1c3Rhdm8gYWJv
+dXQgSENJIHF1ZXVpbmcgaXNzdWVzIHdpdGggDQo+IEVSVE06DQo+IA0KPiBodHRwOi8vd3d3LnNw
+aW5pY3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9tc2cxMzc3NC5odG1sDQo+IA0KPiBNeSBw
+cm9wb3NhbCBpcyB0byBtb3ZlIHR4IHF1ZXVpbmcgdXAgdG8gTDJDQVAsIGFuZCBoYXZlIHRoZSBI
+Q0kgdHggDQo+IHRhc2sgb25seSBoYW5kbGUgc2NoZWR1bGluZy4gIFNlbmRlcnMgd291bGQgdGVs
+bCBIQ0kgdGhleSBoYXZlIGRhdGEgdG8gDQo+IHNlbmQsIGFuZCBIQ0kgd291bGQgY2FsbCBiYWNr
+IHRvIHB1bGwgZGF0YS4gIEkndmUgYmVlbiBmb2N1c2VkIG9uIA0KPiBMMkNBUCAtIGl0IHdvdWxk
+IGJlIHBvc3NpYmxlIHRvIG1ha2UgYSBzaW1pbGFyIHF1ZXVpbmcgY2hhbmdlIHRvIA0KPiBTQ08v
+ZVNDTy9MRSwgYnV0IG5vdCBzdHJpY3RseSBuZWNlc3NhcnkuDQoNCldvdWxkIHlvdSBwbGVhc2Ug
+Y2xhcmlmeSB0aGlzIGFwcHJvYWNoIChwZXJoYXBzIGluIGEgc2VwYXJhdGUgdGhyZWFkKT8NCg0K
+Rm9yIGV4YW1wbGUsIGhvdyBkb2VzIGhhdmluZyB0eCBxdWV1ZXMgaW4gbDJjYXBfY2hhbiAoaW5z
+dGVhZCBvZiB0aGUNCmhjaV9jb25uKSBzb2x2ZSB0aGUgbGF0ZW5jeSBwcm9ibGVtcyBpbiBFUlRN
+IHdoZW4gcmVwbHlpbmcgdG8NClJFSi9TUkVKL3BvbGw/IFdvbid0IHRoZXJlIHBvdGVudGlhbGx5
+IGJlIGp1c3QgYXMgbXVjaCBkYXRhIGFscmVhZHkNCnF1ZXVlZCB1cD8gSXMgdGhlIHBsYW4gdG8g
+bW92ZSB0aGUgcmVwbHkgdG8gdGhlIGZyb250IG9mIHRoZSB0eCBxdWV1ZQ0KYmVjYXVzZSByZXFz
+ZXEgd29uJ3QgbmVlZCB0byBiZSBhc3NpZ25lZCB1bnRpbCB0aGUgZnJhbWUgaXMgYWN0dWFsbHkN
+CnB1bGxlZCBvZmYgdGhlIHF1ZXVlPw0KDQo+IFRoaXMgaXMgZGlmZmVyZW50IGZyb20gdGhlIHBy
+b2JsZW0geW91J3JlIHNvbHZpbmcsIGJ1dCBhcyBsb25nIGFzIA0KPiB3ZSdyZSB0YWxraW5nIGFi
+b3V0IGJpZyBjaGFuZ2VzIHRvIEhDSSB0eCwgSSB0aGluayB3ZSBjb3VsZCBtYWtlIHNvbWUgDQo+
+IGNoYW5nZXMgdGhhdCBoZWxwIG91dCB3aXRoIHByaW9yaXRpemF0aW9uIGFuZCBxdWV1aW5nIGFj
+cm9zcyBhbGwgDQo+IGNoYW5uZWxzICh3aGV0aGVyIHRoZXkncmUgZ29pbmcgdG8gdGhlIHNhbWUg
+cmVtb3RlIGRldmljZSBvciBkaWZmZXJlbnQgDQo+IHJlbW90ZSBkZXZpY2VzKS4NCj4gDQo+IEl0
+IGNvdWxkIGJlIG1vcmUgZWZmaWNpZW50IHRvIHNjaGVkdWxlIHRoaXMgd2F5IHNpbmNlIEhDSSB3
+b3VsZG4ndCANCj4gaGF2ZSB0byBpdGVyYXRlIG92ZXIgYWxsIG9mIHRoZSBjb25uZWN0aW9ucyBh
+bmQgcXVldWVzIC0gaXQgd291bGQgb25seSANCj4gaGF2ZSB0byByZXZpZXcgdGhlIHByaW9yaXRp
+emVkIGxpc3Qgb2YgcGVuZGluZyBzZW5kcy4gTWlnaHQgYmUgYSBtb3JlIA0KPiBmaXR0aW5nIHN0
+cnVjdHVyZSBmb3IgUW9TIHRvby4NCg0KV291bGRuJ3QgdGhpcyAncHJpb3JpdGl6ZWQgbGlzdCBv
+ZiBwZW5kaW5nIHNlbmRzJyBuZWVkIHRvIGJlIGxvY2tlZCB0bw0KcHJldmVudCB1cGRhdGUgd2hp
+bGUgcmVhZGluZz8gSVNUTSB0aGF0IGNvbnRlbnRpb24gbWlnaHQgYmUgZmFpcmx5IGhpZ2gNCmZv
+ciBhIHNpbmdsZSwgc2hhcmVkIHJlc291cmNlIGxpa2UgdGhhdC4NCg0KDQpSZWdhcmRzLA0KUGV0
+ZXIgSHVybGV5DQoNCg==
