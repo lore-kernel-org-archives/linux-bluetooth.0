@@ -1,60 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZL9RYyeqAGZXEUSRaY-M4f=M9-m3k3mbZh4-ff-0PiyPQ@mail.gmail.com>
-References: <1312465504-26373-1-git-send-email-lkslawek@gmail.com>
-	<CABBYNZL9RYyeqAGZXEUSRaY-M4f=M9-m3k3mbZh4-ff-0PiyPQ@mail.gmail.com>
-Date: Thu, 4 Aug 2011 22:06:12 +0200
-Message-ID: <CA+i+Aw1ifjyDJzdambocmZsps3FxH-6sVYsPd9bAgYWH+=r+Xw@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/2] Simplify symbolic links support
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 7/7] doc: add SimAccess client API
+Date: Thu,  4 Aug 2011 16:39:34 -0300
+Message-Id: <1312486774-20350-8-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1312486774-20350-7-git-send-email-padovan@profusion.mobi>
+References: <1312486774-20350-1-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-2-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-3-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-4-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-5-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-6-git-send-email-padovan@profusion.mobi>
+ <1312486774-20350-7-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 
-On Thu, Aug 4, 2011 at 5:09 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Thu, Aug 4, 2011 at 4:45 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
->> This patch changes the way the symbolic links are treated by FTP, making code a
->> bit simpler and FTP more intuitive.
->>
->> Previously symlinks were supposed to be disallowed unless the -l option was
->> used, and with that option, only symlinks present directly inside root folder
->> were followed. This did not work for file links, as fstat() check on open()-ed
->> won't result in S_IFLNK set, so symbolic links to files were followed
->> regardless to options.
->>
->> Now links inside root folder are always allowed. Without -l (--symlinks)
->> option, following them is only allowed when the resulting real path is still
->> inside the given root directory. When -l is given, all symlinks are followed.
->
-> This only resolves the security problem of following the symbolic
-> links, but what we do with the clients not being able to see it is a
-> link since it is not part of the folder listing, this can be
-> inconsistent since the user can try to remove the file, which is what
-> we will be stating, but end up removing only the link (see remove
-> manpage), in the other hand if we remove both the user still have no
-> clue that other files maybe affected.
+---
+ doc/simaccess-api.txt |   90 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 90 insertions(+), 0 deletions(-)
+ create mode 100644 doc/simaccess-api.txt
 
-There is also no possibility to read link itself or - what is more
-important, to put new one. Thus from the client's perspective this is
-just a regular file and when it deletes it, link should be the only
-thing deleted. And this operation would work as expected.
+diff --git a/doc/simaccess-api.txt b/doc/simaccess-api.txt
+new file mode 100644
+index 0000000..e79bae7
+--- /dev/null
++++ b/doc/simaccess-api.txt
+@@ -0,0 +1,90 @@
++SimAccess client hierarchy
++==========================
++
++Service		org.bluez
++Interface	org.bluez.SimAccessServer
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
++
++This interface is available for remote devices which support remote Sim Access profile.
++It is intended to be used with external application which wants to manage connections and/or
++read remote SIM information.
++
++Methods		void Connect()
++
++			Connect to the Sim Access service on the remote device.
++
++			Possible Errors: org.bluez.Error.AlreadyConnected
++					 org.bluez.Error.AgentNotAvailable
++					 org.bluez.Error.Failed
++
++		void Disconnect()
++
++			Disconnect from the Sim Access service on the remote device
++
++			Possible Errors: org.bluez.Error.NotConnected
++					 org.bluez.Error.InProgress
++
++		dict GetProperties()
++
++			Returns all properties for the interface. See the
++			properties section for available properties.
++
++		void RegisterAgent(object path)
++
++			The object path defines the path the of the agent
++			that will be called when a new Sim Access connection
++			is established.
++
++			If an application disconnects from the bus, agent will be
++			automatically unregistered.
++
++			Possible Errors: org.bluez.Error.AlreadyExists
++					 org.bluez.Error.InvalidArguments
++
++		void UnregisterAgent(object path)
++
++			This unregisters the agent that has been previously
++			registered. The object path parameter must match the
++			same value that has been used on registration.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotAuthorized
++
++Signals		PropertyChanged(string name, variant value)
++
++			This signal indicates a changed value of the given
++			property.
++
++Properties	string State [readonly]
++
++			Indicates the state of the connection.  Possible
++			values are:
++				"disconnected"
++				"connecting"
++				"connected"
++
++SimAccessAgent hierarchy
++=========================
++
++Service         unique name
++Interface       org.bluez.SimAccessServerAgent
++Object path     freely definable
++
++Methods		void NewConnection(filedescriptor fd)
++
++			This method gets called whenever a new Sim Access
++			connection has been established. This method assumes
++			that DBus daemon with file descriptor passing
++			capability is being used.
++
++			The agent should only return successfully once the
++			remote Sim Access mode has been enabled successfuly.
++
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.Failed
++
++		void Release()
++
++			This method gets called whenever the service daemon
++			unregisters the agent. Reply is not required for this
++			method call.
+-- 
+1.7.6
 
-I think we can call this side-effect a feature ;). As the obexd admin
-is the only one who can create links in obexd he can even use this for
-his own evil needs, like pretending that something can be deleted
-(despite he fact that he could do the same with hard links).
-
-And after all "rm symlink" removes the link.
-
-Maybe one day someone will find adding links support to OBEX specs
-useful and then we will be able to do this really good.
-
-BR,
-Slawomir Bochenski
