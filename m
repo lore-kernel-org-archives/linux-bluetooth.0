@@ -1,40 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Colin Beckingham <colbec@start.ca>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 4 Aug 2011 10:54:26 -0400
+Subject: Re: Permission denied (13) on Samsung WEP475 headset?
+Message-ID: <1312469666.2158.8.camel@THOR>
+References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>
+In-Reply-To: <20110804121703.GA23534@dell>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1312465504-26373-1-git-send-email-lkslawek@gmail.com>
-References: <1312465504-26373-1-git-send-email-lkslawek@gmail.com>
-Date: Thu, 4 Aug 2011 18:09:59 +0300
-Message-ID: <CABBYNZL9RYyeqAGZXEUSRaY-M4f=M9-m3k3mbZh4-ff-0PiyPQ@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/2] Simplify symbolic links support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Thu, Aug 4, 2011 at 4:45 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> This patch changes the way the symbolic links are treated by FTP, making code a
-> bit simpler and FTP more intuitive.
->
-> Previously symlinks were supposed to be disallowed unless the -l option was
-> used, and with that option, only symlinks present directly inside root folder
-> were followed. This did not work for file links, as fstat() check on open()-ed
-> won't result in S_IFLNK set, so symbolic links to files were followed
-> regardless to options.
->
-> Now links inside root folder are always allowed. Without -l (--symlinks)
-> option, following them is only allowed when the resulting real path is still
-> inside the given root directory. When -l is given, all symlinks are followed.
-
-This only resolves the security problem of following the symbolic
-links, but what we do with the clients not being able to see it is a
-link since it is not part of the folder listing, this can be
-inconsistent since the user can try to remove the file, which is what
-we will be stating, but end up removing only the link (see remove
-manpage), in the other hand if we remove both the user still have no
-clue that other files maybe affected.
-
--- 
-Luiz Augusto von Dentz
+SGkgQ29saW4sDQoNCk9uIFRodSwgMjAxMS0wOC0wNCBhdCAwODoxNyAtMDQwMCwgSm9oYW4gSGVk
+YmVyZyB3cm90ZToNCj4gSGkgQ29saW4sDQo+IA0KPiBPbiBUaHUsIEF1ZyAwNCwgMjAxMSwgQ29s
+aW4gQmVja2luZ2hhbSB3cm90ZToNCj4gPiBJJ2QgbGlrZSB0byBwcm92aWRlIHNvbWUgZmVlZGJh
+Y2sgcmVnYXJkaW5nIGEgU2Ftc3VuZyBXRVA0NzUgaGVhZHNldA0KPiA+IHdoaWNoIGZhaWxzIHRv
+IGNvbm5lY3QgdG8gbGludXggc3BlY2lmaWNhbGx5Lg0KPiA+IA0KPiA+IFRoZSBVU0IgYmx1ZXRv
+b3RoIGFkYXB0ZXIgaXMgYSBNb2RlbDogQmVsa2luIEJMVUVUT09USCBVU0IgK0VEUg0KPiA+IEFE
+QVBURVIgdjIuMSBVSEUgd2hpY2ggc3VjY2Vzc2Z1bGx5IGludGVyY29ubmVjdHMgd2l0aCAyIEph
+YnJhIGFuZCAxDQo+ID4gUGxhbnRyb25pY3MgaGVhZHNldHMsIHBsdXMgYSBOb2tpYSBFNzEgcGhv
+bmUuIFNhbXN1bmcgV0VQNDc1DQo+ID4gc3VjY2Vzc2Z1bGx5IGNvbm5lY3RzIHRvIGEgV2luZG93
+cyBYUCBtYWNoaW5lIGFuZCB0byB0aGUgTm9raWEgRTcxLg0KPiA+IA0KPiA+IFVzaW5nIE9wZW5z
+dXNlIDExLjQgd2l0aCBjdXN0b20ga2VybmVsIDMuMCBjdXJyZW50bHksIChhbHNvIGZhaWxzDQo+
+ID4gd2l0aCAyLjYuMzgpLCBibHVleiA0Ljk2IGFuZCBibHVlZGV2aWwgbWFuYWdlci4NCj4gPiAN
+Cj4gPiBTeW1wdG9tcyBhcmUgdGhhdCBibHVlZGV2aWwgc2VlcyB0aGUgaGVhZHNldCBpbiBwYWly
+aW5nIG1vZGUgYW5kDQo+ID4gY29ycmVjdGx5IHJldHJpZXZlcyB0aGUgbmFtZSBXRVA0NzUsIGNv
+bm5lY3RlZCBidXR0b24gZmxhc2hlcyBncmVlbg0KPiA+IGFuZCB0aGVuIHJldHVybnMgdG8gZ3Jl
+eSAobm90IGNvbm5lY3RlZCkuIFdFUDQ3NSBsZWQgY2hhbmdlcyB0bw0KPiA+IGNvbm5lY3RlZCBz
+dGF0dXMgYnV0IGJsdWVkZXZpbCBzaG93cyBoZWFkc2V0IG5vdCBjb25uZWN0ZWQgYW5kDQo+ID4g
+aGVhZHNldCBkb2VzIG5vdCB3b3JrLg0KPiA+IA0KPiA+IFdpdGggYmx1ZXRvb3RoZCBpbiBkZWJ1
+ZyBtb2RlLCBJIGdldCB0aGUgZm9sbG93aW5nIHRyYW5zYWN0aW9ucyBpbg0KPiA+IC92YXIvbG9n
+L21lc3NhZ2VzOg0KPiANCj4gVGhlcmUgc2VlbXMgdG8gYmUgc29tZXRoaW5nIHN0cmFuZ2UgZ29p
+bmcgb24gd2l0aCB0aGUgc2VjdXJlIHNpbXBsZQ0KPiBwYWlyaW5nIGxvZ2ljLiBGb3Igc29tZSBy
+ZWFzb24gdGhlIGluaXRpYWwgbGluayBrZXkgaXNuJ3QgZ29vZCBlbm91Z2gNCj4gKGF1dGggcmVx
+dWVzdCArIGxpbmsga2V5IG5lZ2F0aXZlIHJlcGx5IGFmdGVyIHRoZSBpbml0aWFsIGtleSBoYXMg
+YmVlbg0KPiBnZW5lcmF0ZWQpIGFuZCB0aGVuIHRoZXJlJ3MgYSB1c2VyIGNvbmZpcm0gbmVnYXRp
+dmUgcmVwbHkgZm9yIHRoZSBzZWNvbmQNCj4gYXR0ZW1wdC4gSXQnZCBiZSBnb29kIHRvIGdldCB0
+byB0aGUgYm90dG9tIG9mIHRoaXMgYW5kIGZpeCBpdCBwcm9wZXJseSwNCj4gYnV0IG1lYW53aGls
+ZSB5b3UgY2FuIHByb2JhYmx5IHdvcmsgYXJvdW5kIHRoaXMgYnkgZGlzYWJsaW5nIFNTUCBvbiB5
+b3VyDQo+IHNpZGUgKGhjaWNvbmZpZyBoY2kwIHNzcG1vZGUgMCkgYW5kIHJldHJ5aW5nIHBhaXJp
+bmcuDQoNCllvdSdyZSBoYXZpbmcgdGhpcyBwcm9ibGVtIGJlY2F1c2UgdGhlIHJlbW90ZSBkZXZp
+Y2Ugc3VwcG9ydHMgU1NQIGJ1dA0Kbm90IE1JVE0gcHJvdGVjdGlvbi4gU29tZSBzb2NrZXQgaXMg
+cmVxdWlyaW5nIEJUX1NFQ1VSSVRZX0hJR0ggKHRodXMNCnJlcXVpcmluZyBNSVRNKSAtLSB0aGVy
+ZWZvcmUgdGhlIGtlcm5lbCBpcyBjb3JyZWN0bHkgZGlzY29ubmVjdGluZyBhbmQNCnJldHVybmlu
+ZyAnQXV0aGVudGljYXRpb24gRmFpbHVyZScgKGFsdGhvdWdoIHJldHVybmluZyAnSW5zdWZmaWNp
+ZW50DQpBdXRoZW50aWNhdGlvbicgd291bGQgcHJvYmFibHkgYmUgYmV0dGVyKS4NCg0KSSB0aGlu
+ayB0aGUgR0FUVCBicm93c2VyIGlzIGRlbWFuZGluZyBCVF9TRUNVUklUWV9ISUdIIC0tIG5vdCBz
+dXJlIHdoeQ0KdGhvdWdoIChJIGRvbid0IHRoaW5rIGl0IG5lZWRzIHRvLiBJJ2xsIGdldCBiYWNr
+IHRvIHlvdSBvbiB0aGF0Li4uKQ0KDQpSZWdhcmRzLA0KUGV0ZXINCg==
