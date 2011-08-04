@@ -1,81 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] Remove bogus extra semicolons
-Date: Thu,  4 Aug 2011 13:33:54 -0400
-Message-Id: <1312479234-20142-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ v2 5/7] Add enum for alert level values
+Date: Thu,  4 Aug 2011 14:04:19 -0300
+Message-Id: <1312477459-28313-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <CAKT1EBcz7UevM8Q+fwUKsrkH6GaW+8DUT4S=RH-RHPjz37r=0Q@mail.gmail.com>
+References: <CAKT1EBcz7UevM8Q+fwUKsrkH6GaW+8DUT4S=RH-RHPjz37r=0Q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/avdtp.c            |    4 ++--
- audio/telephony-maemo5.c |    2 +-
- audio/telephony-maemo6.c |    2 +-
- health/mcap.c            |    2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-diff --git a/audio/avdtp.c b/audio/avdtp.c
-index 76526b6..00762f2 100644
---- a/audio/avdtp.c
-+++ b/audio/avdtp.c
-@@ -3393,7 +3393,7 @@ unsigned int avdtp_stream_add_cb(struct avdtp *session,
- 	stream_cb->user_data = data;
- 	stream_cb->id = ++id;
+---
+ proximity/monitor.c |   12 +++++++++---
+ 1 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/proximity/monitor.c b/proximity/monitor.c
+index 6470db4..60f91bd 100644
+--- a/proximity/monitor.c
++++ b/proximity/monitor.c
+@@ -53,6 +53,12 @@
  
--	stream->callbacks = g_slist_append(stream->callbacks, stream_cb);;
-+	stream->callbacks = g_slist_append(stream->callbacks, stream_cb);
+ #define ALERT_LEVEL_CHR_UUID 0x2A06
  
- 	return stream_cb->id;
- }
-@@ -3932,7 +3932,7 @@ unsigned int avdtp_add_state_cb(avdtp_session_state_cb cb, void *user_data)
- 	state_cb->user_data = user_data;
- 	state_cb->id = ++id;
- 
--	avdtp_callbacks = g_slist_append(avdtp_callbacks, state_cb);;
-+	avdtp_callbacks = g_slist_append(avdtp_callbacks, state_cb);
- 
- 	return state_cb->id;
- }
-diff --git a/audio/telephony-maemo5.c b/audio/telephony-maemo5.c
-index 350df9e..23801c0 100644
---- a/audio/telephony-maemo5.c
-+++ b/audio/telephony-maemo5.c
-@@ -1684,7 +1684,7 @@ static void call_info_reply(DBusPendingCall *call, void *user_data)
++enum {
++	ALERT_NONE = 0,
++	ALERT_MILD,
++	ALERT_HIGH,
++};
++
+ struct monitor {
+ 	struct btd_device *device;
+ 	GAttrib *attrib;
+@@ -116,11 +122,11 @@ static char *read_proximity_config(bdaddr_t *sba, bdaddr_t *dba,
+ static uint8_t str2level(const char *level)
  {
- 	DBusError err;
- 	DBusMessage *reply;
--	DBusMessageIter iter, sub;;
-+	DBusMessageIter iter, sub;
+ 	if (g_strcmp0("high", level) == 0)
+-		return 0x02;
++		return ALERT_HIGH;
+ 	else if (g_strcmp0("mild", level) == 0)
+-		return 0x01;
++		return ALERT_MILD;
  
- 	get_calls_active = FALSE;
- 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 4430cc1..1e4a23c 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -1656,7 +1656,7 @@ static void call_info_reply(DBusPendingCall *call, void *user_data)
- {
- 	DBusError err;
- 	DBusMessage *reply;
--	DBusMessageIter iter, sub;;
-+	DBusMessageIter iter, sub;
- 
- 	get_calls_active = FALSE;
- 
-diff --git a/health/mcap.c b/health/mcap.c
-index d251a39..bc8c606 100644
---- a/health/mcap.c
-+++ b/health/mcap.c
-@@ -2058,7 +2058,7 @@ struct mcap_instance *mcap_create_instance(bdaddr_t *src,
- 	/* Initialize random seed to generate mdlids for this instance */
- 	srand(time(NULL));
- 
--	return mcap_instance_ref(mi);;
-+	return mcap_instance_ref(mi);
+-	return 0x00;
++	return ALERT_NONE;
  }
  
- void mcap_release_instance(struct mcap_instance *mi)
+ static void char_discovered_cb(GSList *characteristics, guint8 status,
 -- 
-1.7.0.4
+1.7.6
 
