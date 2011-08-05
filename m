@@ -2,33 +2,86 @@ Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 2/2] Fix cancel pending D-Bus call to ohmd
-Date: Fri,  5 Aug 2011 10:19:37 +0300
-Message-Id: <1312528777-4152-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH 1/2] Add stop playing ringtone to maemo6 telephony driver
+Date: Fri,  5 Aug 2011 10:19:36 +0300
+Message-Id: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pending D-Bus call to ohmd daemon is canceled if telephony driver is
-unloaded before reply comes.
+If ringtone is loud enough, it may leak to microphone when call is
+answered via Bluetooth headset. As result, it can be heard on remote
+end. Therefore, playing ringtone shall be stopped as fast as possible
+before answering a call.
 ---
- audio/telephony-maemo6.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ audio/telephony-maemo6.c |   34 +++++++++++++++++++++++++++++++++-
+ 1 files changed, 33 insertions(+), 1 deletions(-)
 
 diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 94feda2..86a045f 100644
+index 4430cc1..94feda2 100644
 --- a/audio/telephony-maemo6.c
 +++ b/audio/telephony-maemo6.c
-@@ -1533,6 +1533,8 @@ static void csd_call_free(void *data)
- 	g_free(call->object_path);
- 	g_free(call->number);
+@@ -113,6 +113,11 @@ enum net_registration_status {
+ #define CSD_SIMPB_TYPE_EN			"EN"
+ #define CSD_SIMPB_TYPE_MSISDN			"MSISDN"
  
-+	g_slist_foreach(pending, remove_pending_by_data, call);
++/* OHM plugin D-Bus definitions */
++#define OHM_BUS_NAME		"com.nokia.NonGraphicFeedback1"
++#define OHM_INTERFACE		"com.nokia.NonGraphicFeedback1"
++#define OHM_PATH		"/com/nokia/NonGraphicFeedback1"
 +
- 	g_free(call);
+ struct csd_call {
+ 	char *object_path;
+ 	int status;
+@@ -143,6 +148,11 @@ struct pending_req {
+ };
+ 
+ static int get_property(const char *iface, const char *prop);
++static int send_method_call(const char *dest, const char *path,
++				const char *interface, const char *method,
++				DBusPendingCallNotifyFunction cb,
++				void *user_data, int type, ...);
++static void remove_pending(DBusPendingCall *call);
+ 
+ static DBusConnection *connection = NULL;
+ 
+@@ -320,6 +330,28 @@ static int answer_call(struct csd_call *call)
+ 	return 0;
  }
  
++static void stop_ringtone_reply(DBusPendingCall *call, void *user_data)
++{
++	struct csd_call *coming = user_data;
++
++	remove_pending(call);
++	answer_call(coming);
++}
++
++static int stop_ringtone_and_answer(struct csd_call *call)
++{
++	int ret;
++
++	ret = send_method_call(OHM_BUS_NAME, OHM_PATH,
++				OHM_INTERFACE, "StopRingtone",
++				stop_ringtone_reply, call,
++				DBUS_TYPE_INVALID);
++	if (ret < 0)
++		return answer_call(call);
++
++	return 0;
++}
++
+ static int split_call(struct csd_call *call)
+ {
+ 	DBusMessage *msg;
+@@ -545,7 +577,7 @@ void telephony_answer_call_req(void *telephony_device)
+ 		return;
+ 	}
+ 
+-	if (answer_call(call) < 0)
++	if (stop_ringtone_and_answer(call) < 0)
+ 		telephony_answer_call_rsp(telephony_device,
+ 						CME_ERROR_AG_FAILURE);
+ 	else
 -- 
 1.7.4.1
 
