@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 01/23] audio: move interface declarations to their headers
-Date: Fri,  5 Aug 2011 15:15:10 -0300
-Message-Id: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Fri, 5 Aug 2011 10:53:52 -0400
+Subject: [PATCH] Bluetooth: cmtp: Fix session cleanup on failed conn add
+Message-ID: <1312556032.2172.16.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/device.h |    4 ----
- audio/unix.c   |    1 +
- 2 files changed, 1 insertions(+), 4 deletions(-)
+Once the session thread is running, cleanup must be handled
+by the session thread only.
 
-diff --git a/audio/device.h b/audio/device.h
-index 35af788..5117fca 100644
---- a/audio/device.h
-+++ b/audio/device.h
-@@ -38,10 +38,6 @@
- #define AVRCP_REMOTE_UUID	"0000110e-0000-1000-8000-00805f9b34fb"
- #define AVRCP_TARGET_UUID	"0000110c-0000-1000-8000-00805f9b34fb"
+Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+---
+ net/bluetooth/cmtp/core.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 42cb2f4..521baa4 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -382,16 +382,17 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
  
--/* Move these to respective .h files once they exist */
--#define AUDIO_SOURCE_INTERFACE		"org.bluez.AudioSource"
--#define AUDIO_CONTROL_INTERFACE		"org.bluez.Control"
+ 	if (!(session->flags & (1 << CMTP_LOOPBACK))) {
+ 		err = cmtp_attach_device(session);
+-		if (err < 0)
+-			goto detach;
++		if (err < 0) {
++			atomic_inc(&session->terminate);
++			wake_up_process(session->task);
++			up_write(&cmtp_session_sem);
++			return err;
++		}
+ 	}
+ 
+ 	up_write(&cmtp_session_sem);
+ 	return 0;
+ 
+-detach:
+-	cmtp_detach_device(session);
 -
- struct source;
- struct control;
- struct target;
-diff --git a/audio/unix.c b/audio/unix.c
-index 8ce50b0..1e0ab30 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -49,6 +49,7 @@
- #include "a2dp.h"
- #include "headset.h"
- #include "sink.h"
-+#include "source.h"
- #include "gateway.h"
- #include "unix.h"
- #include "glib-helper.h"
+ unlink:
+ 	__cmtp_unlink_session(session);
+ 
 -- 
-1.7.6
+1.7.4.1
 
