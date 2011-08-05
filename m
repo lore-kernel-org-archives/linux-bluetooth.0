@@ -1,30 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Aug 2011 12:42:01 +0300
+Date: Fri, 5 Aug 2011 12:29:00 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Add stop playing ringtone to maemo6 telephony driver
-Message-ID: <20110805094201.GA29768@dell>
-References: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: Re: [PATCH obexd v2 2/2] Fix several issues in FTP action support
+Message-ID: <20110805092900.GB19836@dell>
+References: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
+ <1312526431-5192-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1312526431-5192-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Slawek,
 
-On Fri, Aug 05, 2011, Dmitriy Paliy wrote:
-> If ringtone is loud enough, it may leak to microphone when call is
-> answered via Bluetooth headset. As result, it can be heard on remote
-> end. Therefore, playing ringtone shall be stopped as fast as possible
-> before answering a call.
+On Fri, Aug 05, 2011, Slawomir Bochenski wrote:
+> Fixed issues:
+> - Incorrect handling of absolute path in DestName header
+> - Possibility of exploiting DestName header to escape FTP plugin root
+> - Incorrect checking of whether path resides inside FTP root (not
+>   allowing to move or copy files up)
+> - Ignoring symbolic links and options regarding them
 > ---
->  audio/telephony-maemo6.c |   34 +++++++++++++++++++++++++++++++++-
->  1 files changed, 33 insertions(+), 1 deletions(-)
+> v2: fixed incorrect path verification for DestName
+> 
+>  plugins/ftp.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 files changed, 53 insertions(+), 4 deletions(-)
 
-Both patches have been applied. Thanks. I also pushed a patch which
-moves around the static functions so that forward-declarations of them
-are not needed.
+After some coding style fixes both patches have now been pushed
+upstream. Thanks.
 
 Johan
