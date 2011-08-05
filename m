@@ -1,79 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 5 Aug 2011 10:44:21 -0400
-Subject: [PATCH] Bluetooth: cmtp: Fix deadlock in session deletion
-Message-ID: <1312555461.2172.5.camel@THOR>
+CC: Jaikumar Ganesh <jaikumar@google.com>
+Date: Fri, 5 Aug 2011 10:41:35 -0400
+Subject: [PATCH v2] Bluetooth: bnep: Fix deadlock in session deletion
+Message-ID: <1312555295.2172.2.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit fada4ac339 introduced the usage of kthread API.
+Commit f4d7cd4a4c introduced the usage of kthread API.
 kthread_stop is a blocking function which returns only when
 the thread exits. In this case, the thread can't exit because it's
-waiting for the write lock, which is being held by cmtp_del_connection()
+waiting for the write lock, which is being held by bnep_del_connection()
 which is waiting for the thread to exit -- deadlock.
 
-Revert cmtp_reset_ctr to its original behavior: non-blocking signalling
-for the session to terminate.
+Use atomic_t/wake_up_process instead to signal to the thread to exit.
 
+Signed-off-by: Jaikumar Ganesh <jaikumar@google.com>
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/cmtp/capi.c |    3 ++-
- net/bluetooth/cmtp/cmtp.h |    1 +
- net/bluetooth/cmtp/core.c |    5 +++--
- 3 files changed, 6 insertions(+), 3 deletions(-)
+ net/bluetooth/bnep/bnep.h |    1 +
+ net/bluetooth/bnep/core.c |    9 +++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c
-index 744233c..e080b0d 100644
---- a/net/bluetooth/cmtp/capi.c
-+++ b/net/bluetooth/cmtp/capi.c
-@@ -387,7 +387,8 @@ static void cmtp_reset_ctr(struct capi_ctr *ctrl)
- 
- 	capi_ctr_down(ctrl);
- 
--	kthread_stop(session->task);
-+	atomic_inc(&session->terminate);
-+	wake_up_process(session->task);
- }
- 
- static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
-diff --git a/net/bluetooth/cmtp/cmtp.h b/net/bluetooth/cmtp/cmtp.h
-index db43b54..c32638d 100644
---- a/net/bluetooth/cmtp/cmtp.h
-+++ b/net/bluetooth/cmtp/cmtp.h
-@@ -81,6 +81,7 @@ struct cmtp_session {
- 
- 	char name[BTNAMSIZ];
- 
-+	atomic_t terminate;
+diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+index 8e6c061..e7ee531 100644
+--- a/net/bluetooth/bnep/bnep.h
++++ b/net/bluetooth/bnep/bnep.h
+@@ -155,6 +155,7 @@ struct bnep_session {
+ 	unsigned int  role;
+ 	unsigned long state;
+ 	unsigned long flags;
++	atomic_t      terminate;
  	struct task_struct *task;
  
- 	wait_queue_head_t wait;
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 2eb854a..42cb2f4 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -295,7 +295,7 @@ static int cmtp_session(void *arg)
+ 	struct ethhdr eh;
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 7e8ff3c..d9edfe8 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -487,7 +487,7 @@ static int bnep_session(void *arg)
  	while (1) {
  		set_current_state(TASK_INTERRUPTIBLE);
  
 -		if (kthread_should_stop())
-+		if (atomic_read(&session->terminate))
++		if (atomic_read(&s->terminate))
  			break;
- 		if (sk->sk_state != BT_CONNECTED)
- 			break;
-@@ -416,7 +416,8 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
- 		skb_queue_purge(&session->transmit);
+ 		/* RX */
+ 		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+@@ -642,9 +642,10 @@ int bnep_del_connection(struct bnep_conndel_req *req)
+ 	down_read(&bnep_session_sem);
  
- 		/* Stop session thread */
--		kthread_stop(session->task);
-+		atomic_inc(&session->terminate);
-+		wake_up_process(session->task);
- 	} else
+ 	s = __bnep_get_session(req->dst);
+-	if (s)
+-		kthread_stop(s->task);
+-	else
++	if (s) {
++		atomic_inc(&s->terminate);
++		wake_up_process(s->task);
++	} else
  		err = -ENOENT;
  
+ 	up_read(&bnep_session_sem);
 -- 
 1.7.4.1
 
