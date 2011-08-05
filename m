@@ -1,57 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACbkbUL-mP0iKtF2Z3fuUgF8bBfENHNOP7Dbj=KO=ZYTerao0g@mail.gmail.com>
-References: <CACbkbULaTeWVtcpFxhUMRMO-r+QuKU8NkX7o5nQBXHKApJbqgQ@mail.gmail.com>
-	<CAJdJm_N+vAPjAmTFLLH-p_iaiPjWF3aV-TAsUn6m8Vnbtfv1=w@mail.gmail.com>
-	<CACbkbUL-mP0iKtF2Z3fuUgF8bBfENHNOP7Dbj=KO=ZYTerao0g@mail.gmail.com>
-Date: Fri, 5 Aug 2011 07:10:38 -0400
-Message-ID: <CAJdJm_NAabSBh75cvHHgyRSRirO6r5MQggPLLtCcC84SVRNqaA@mail.gmail.com>
-Subject: Re: Security level for Primary Services discovery during pairing
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: VISHWANATH KM <a21174@motorola.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH obexd] Fix handling vCard type "OTHER" emails in PBAP
+Date: Fri,  5 Aug 2011 13:01:30 +0200
+Message-Id: <1312542090-11434-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Until now contacts with emails, without type specified, were not included
+in vCards. Also default type for vCard 3.0 is set to "OTHER" - not
+empty field as it is in vCard 2.1.
+---
+ plugins/phonebook-tracker.c |    6 +++---
+ plugins/vcard.c             |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-On Fri, Aug 5, 2011 at 5:21 AM, VISHWANATH KM <a21174@motorola.com> wrote:
-> As you mentioned in case if we don't want to trigger SMP we should use
-> CreateDevice, but how do we know before calling CreateDevice or
-> CreatePairedDevice if remote supports SMP or not. Does bluez exposes this
-> info to app. We can use LE_Read_Remote_Used_Features only after LE ACL is
-> established and that is done as part of either CreateDevice or
-> CreatePairedDevice (bt_io_connect). Please clarify. thx
-
-Now I understand your issue.
-
-Currently, BlueZ (and kernel) does not support the "Features Exchange"
-procedure described on message chart from Vol. 6 Part D Section 6.5
-(page 2276). Actually, I could not find any other part of the Core 4.0
-spec pointing to this procedure. Do you know where it is used, how it
-is triggered and whether it is mandatory?
-
-I think you have two options:
-
-1) Always use CreateDevice(). Then if you want to issue SMP pairing,
-you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
-(I haven't tested this lately, but I remember it used to work).
-
-2) Extend the kernel Management API to allow Features Exchange. See
-doc/mgmt-api.txt for the existing commands, to have an idea on how it
-works (I recommend first sending an API proposal here to the list).
-
-Also note that *all* currently adopted LE profiles (Find Me, Heart
-Rate, Health Thermometer, Proximity) require that both sides
-(initiator and acceptor) support Security Mode 1, Levels 2 or 3 (i.e.
-SMP pairing is mandatory for them). So, if you are working with a
-custom profile, you may need to implement the missing bits.
-
-I would also like to hear from other BlueZ developers :). Any other ideas?
-
-Regards,
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 3ac1c44..8bc070f 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -129,7 +129,7 @@
+ "nco:fullname(nco:org(?_role))"						\
+ "nco:department(?_role) "						\
+ "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
+-	"rdfs:label(?_role)),"						\
++	"tracker:coalesce(rdfs:label(?_role), \"\")),"			\
+ 	"\"\30\") "							\
+ 	"WHERE { "							\
+ 	"?_role nco:hasEmailAddress "					\
+@@ -241,7 +241,7 @@ CALLS_CONSTRAINTS(CONSTRAINT)						\
+ 	"nco:fullname(nco:org(?_role)) "				\
+ 	"nco:department(?_role) "					\
+ "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
+-	"rdfs:label(?c_role)),"						\
++	"tracker:coalesce(rdfs:label(?c_role), \"\")),"			\
+ 	"\"\30\") "							\
+ 	"WHERE { "							\
+ 	"?_contact nco:hasAffiliation ?c_role . "			\
+@@ -334,7 +334,7 @@ COMBINED_CONSTRAINT		\
+ "nco:fullname(nco:org(?_role))"						\
+ "nco:department(?_role) "						\
+ "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
+-	"rdfs:label(?_role)),"						\
++	"tracker:coalesce(rdfs:label(?_role), \"\")),"			\
+ 	"\"\30\") "							\
+ 	"WHERE { "							\
+ 	"?_role nco:hasEmailAddress "					\
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index 4d12687..5a5bcf4 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -368,7 +368,7 @@ static void vcard_printf_email(GString *vcards, uint8_t format,
+ 		if (format == FORMAT_VCARD21)
+ 			category_string = "INTERNET";
+ 		else if (format == FORMAT_VCARD30)
+-			category_string = "TYPE=INTERNET";
++			category_string = "TYPE=INTERNET;TYPE=OTHER";
+ 	}
+ 
+ 	add_slash(field, address, LEN_MAX, len);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.4.1
+
