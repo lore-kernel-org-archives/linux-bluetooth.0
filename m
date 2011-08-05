@@ -1,87 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH 1/2] Add stop playing ringtone to maemo6 telephony driver
-Date: Fri,  5 Aug 2011 10:19:36 +0300
-Message-Id: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd v2 2/2] Fix several issues in FTP action support
+Date: Fri,  5 Aug 2011 08:40:31 +0200
+Message-Id: <1312526431-5192-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
+References: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If ringtone is loud enough, it may leak to microphone when call is
-answered via Bluetooth headset. As result, it can be heard on remote
-end. Therefore, playing ringtone shall be stopped as fast as possible
-before answering a call.
+Fixed issues:
+- Incorrect handling of absolute path in DestName header
+- Possibility of exploiting DestName header to escape FTP plugin root
+- Incorrect checking of whether path resides inside FTP root (not
+  allowing to move or copy files up)
+- Ignoring symbolic links and options regarding them
 ---
- audio/telephony-maemo6.c |   34 +++++++++++++++++++++++++++++++++-
- 1 files changed, 33 insertions(+), 1 deletions(-)
+v2: fixed incorrect path verification for DestName
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 4430cc1..94feda2 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -113,6 +113,11 @@ enum net_registration_status {
- #define CSD_SIMPB_TYPE_EN			"EN"
- #define CSD_SIMPB_TYPE_MSISDN			"MSISDN"
- 
-+/* OHM plugin D-Bus definitions */
-+#define OHM_BUS_NAME		"com.nokia.NonGraphicFeedback1"
-+#define OHM_INTERFACE		"com.nokia.NonGraphicFeedback1"
-+#define OHM_PATH		"/com/nokia/NonGraphicFeedback1"
-+
- struct csd_call {
- 	char *object_path;
- 	int status;
-@@ -143,6 +148,11 @@ struct pending_req {
- };
- 
- static int get_property(const char *iface, const char *prop);
-+static int send_method_call(const char *dest, const char *path,
-+				const char *interface, const char *method,
-+				DBusPendingCallNotifyFunction cb,
-+				void *user_data, int type, ...);
-+static void remove_pending(DBusPendingCall *call);
- 
- static DBusConnection *connection = NULL;
- 
-@@ -320,6 +330,28 @@ static int answer_call(struct csd_call *call)
- 	return 0;
+ plugins/ftp.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 53 insertions(+), 4 deletions(-)
+
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index e191339..fbfdb37 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -410,18 +410,45 @@ done:
+ 	return err;
  }
  
-+static void stop_ringtone_reply(DBusPendingCall *call, void *user_data)
++static gboolean is_correct_path(const char *path)
 +{
-+	struct csd_call *coming = user_data;
++        gchar **elements;
++        gchar **cur;
++        int depth = 0;
 +
-+	remove_pending(call);
-+	answer_call(coming);
++        elements = g_strsplit(path, "/", 0);
++
++        for (cur = elements; *cur != NULL; ++cur) {
++                if (**cur == '\0' || strcmp(*cur, ".") == 0)
++                        continue;
++
++                if (strcmp(*cur, "..") == 0) {
++                        --depth;
++                        if (depth < 0)
++                                break;
++                        continue;
++                }
++
++                ++depth;
++        }
++
++        g_strfreev(elements);
++
++        return depth >= 0 ? TRUE : FALSE;
 +}
 +
-+static int stop_ringtone_and_answer(struct csd_call *call)
-+{
-+	int ret;
-+
-+	ret = send_method_call(OHM_BUS_NAME, OHM_PATH,
-+				OHM_INTERFACE, "StopRingtone",
-+				stop_ringtone_reply, call,
-+				DBUS_TYPE_INVALID);
-+	if (ret < 0)
-+		return answer_call(call);
-+
-+	return 0;
-+}
-+
- static int split_call(struct csd_call *call)
+ static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
  {
- 	DBusMessage *msg;
-@@ -545,7 +577,7 @@ void telephony_answer_call_req(void *telephony_device)
- 		return;
- 	}
+ 	char *filename;
  
--	if (answer_call(call) < 0)
-+	if (stop_ringtone_and_answer(call) < 0)
- 		telephony_answer_call_rsp(telephony_device,
- 						CME_ERROR_AG_FAILURE);
+ 	/* DestName can either be relative or absolute (FTP style) */
+-	if (g_path_is_absolute(destname))
+-		filename = g_build_filename(destname, NULL);
++	if (destname[0] == '/')
++		filename = g_build_filename(obex_get_root_folder(ftp->os),
++                                                                destname, NULL);
  	else
+ 		filename = g_build_filename(ftp->folder, destname, NULL);
+ 
+-	/* Check if destination is inside root path */
+-	if (g_str_has_prefix(filename, ftp->folder))
++	if (is_correct_path(filename + strlen(obex_get_root_folder(ftp->os))))
+ 		return filename;
+ 
+ 	g_free(filename);
+@@ -434,6 +461,7 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
+ {
+ 	char *source, *destination;
+ 	int ret;
++	char *destdir;
+ 
+ 	DBG("%p name %s destination %s", ftp, name, destname);
+ 
+@@ -447,6 +475,16 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
+ 
+ 	destination = ftp_build_filename(ftp, destname);
+ 
++	if (destination == NULL)
++		return -EBADR;
++
++	destdir = g_path_get_dirname(destination);
++	ret = verify_path(destdir);
++	g_free(destdir);
++
++	if (ret < 0)
++		return ret;
++
+ 	source = g_build_filename(ftp->folder, name, NULL);
+ 
+ 	ret = obex_copy(ftp->os, source, destination);
+@@ -462,6 +500,7 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
+ {
+ 	char *source, *destination;
+ 	int ret;
++	char *destdir;
+ 
+ 	DBG("%p name %s destname %s", ftp, name, destname);
+ 
+@@ -475,6 +514,16 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
+ 
+ 	destination = ftp_build_filename(ftp, destname);
+ 
++	if (destination == NULL)
++		return -EBADR;
++
++	destdir = g_path_get_dirname(destination);
++	ret = verify_path(destdir);
++	g_free(destdir);
++
++	if (ret < 0)
++		return ret;
++
+ 	source = g_build_filename(ftp->folder, name, NULL);
+ 
+ 	ret = obex_move(ftp->os, source, destination);
 -- 
 1.7.4.1
 
