@@ -1,47 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110805191416.GB2537@joana>
-References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
-	<alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
-	<CABBYNZ+OPDnR=e2sPx=mLmOkd80z2sPNAPX+ss7GCh+7rndH1g@mail.gmail.com>
-	<20110805191416.GB2537@joana>
-Date: Sat, 6 Aug 2011 01:49:24 +0300
-Message-ID: <CABBYNZLCO6aesaXa15B6kKYy2HEohF+ySCq4kGEgJF7_Ai37kA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Mat Martineau <mathewm@codeaurora.org>,
+Date: Fri, 5 Aug 2011 16:14:16 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Mat Martineau <mathewm@codeaurora.org>,
 	linux-bluetooth@vger.kernel.org, peter@hurleysoftware.com
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
+Message-ID: <20110805191416.GB2537@joana>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+ <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+ <CABBYNZ+OPDnR=e2sPx=mLmOkd80z2sPNAPX+ss7GCh+7rndH1g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZ+OPDnR=e2sPx=mLmOkd80z2sPNAPX+ss7GCh+7rndH1g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-05 09:09:38 +0300]:
 
-On Fri, Aug 5, 2011 at 10:14 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
->
-> Only ERTM needs to have its own queue, Basic and Streaming mode doesn't need
-> to change, they can use the same queue they are using now.
+> Hi Mat,
+> 
+> On Thu, Aug 4, 2011 at 8:37 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
+> > One concern I have is that an application that changes sk_priority while it
+> > has data in the HCI tx queue could have its frames delivered out of order.
+> >  While we can't control when sk_priority is set, it is possible to make a
+> > choice when setting the priority of each skb.  Does it make sense to detect
+> > an sk_priority change and only apply the new value when there are no skbs
+> > for the channel in the HCI tx queue?
+> 
+> Yep, if we need to maintain the order I guess this would make sense,
+> the problem is that this could be a bit expensive.
+> 
+> > I had a recent discussion with Gustavo about HCI queuing issues with ERTM:
+> >
+> > http://www.spinics.net/lists/linux-bluetooth/msg13774.html
+> >
+> > My proposal is to move tx queuing up to L2CAP, and have the HCI tx task only
+> > handle scheduling.  Senders would tell HCI they have data to send, and HCI
+> > would call back to pull data.  I've been focused on L2CAP - it would be
+> > possible to make a similar queuing change to SCO/eSCO/LE, but not strictly
+> > necessary.
+> 
+> > This is different from the problem you're solving, but as long as we're
+> > talking about big changes to HCI tx, I think we could make some changes that
+> > help out with prioritization and queuing across all channels (whether
+> > they're going to the same remote device or different remote devices).
+> >
+> > It could be more efficient to schedule this way since HCI wouldn't have to
+> > iterate over all of the connections and queues - it would only have to
+> > review the prioritized list of pending sends. Might be a more fitting
+> > structure for QoS too.
+> >
+> > Since HCI wouldn't have a bunch of queued-up skbs, it would also eliminate
+> > the sk_priority change problem I noted above.
+> >
+> > Your thoughts?
+> 
+> If the idea is to have a list of chan/sockets and each having its own
+> queue, I guess that would make sense and we could possible preserve
+> the packet order in that case, but we still have to maintain the
+> fairness when dealing with the same priority so I would still have to
+> iterate to each connection and then to each channel evaluating their
+> priority. This way we don't have to defined any arbitrary number of
+> queues which is probably less items to visit on tx task, but the
+> locking may be a lot more complicated.
 
-The guaranteed channels also seems to need separated queue, actually
-even best effort channels could use QoS (see page 1442  :5.3 QUALITY
-OF SERVICE (QOS) OPTION). Note this is a general option which is then
-negotiated also on HCI level, it seems completely independent of ERTM.
+Only ERTM needs to have its own queue, Basic and Streaming mode doesn't need
+to change, they can use the same queue they are using now.
 
-The per channel queuing is almost a must have if we really want to be
-able to implement any QoS, because then we can track exactly what
-channels are sending, calculate if we can attend the QoS needs and so
-on. But I don't think doing this on L2CAP level is a good idea,
-because it create a circular dependency with HCI  and the pull mode
-might create a locking nightmare, not to mention L2CAP is already
-quite big.
-
-One of the solution Ive been thinking is to have an HCI Channel (e.g.
-struct hci_chan) abstraction, which would be responsible for queueing
-and storing necessary information for scheduling. This could be
-implemented directly in HCI level (hci_conn.c) so L2CAP can still push
-data to HCI by using the HCI Channel (l2cap_chan->hci_chan). How about
-that?
-
--- 
-Luiz Augusto von Dentz
+	Gustavo
