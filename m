@@ -1,48 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 5 Aug 2011 10:53:52 -0400
-Subject: [PATCH] Bluetooth: cmtp: Fix session cleanup on failed conn add
-Message-ID: <1312556032.2172.16.camel@THOR>
+Date: Fri, 5 Aug 2011 10:52:01 -0400
+Subject: [PATCH 4/4] Bluetooth: hidp: Don't release device ref if never held
+Message-ID: <1312555921.2172.14.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Once the session thread is running, cleanup must be handled
-by the session thread only.
+When an hidp connection is added for a boot protocol input
+device, don't release a device reference that was never
+acquired. The device reference is acquired when the session
+is linked to the session list (which hasn't happened yet when
+hidp_setup_input is called).
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/cmtp/core.c |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+ net/bluetooth/hidp/core.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 42cb2f4..521baa4 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -382,16 +382,17 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
- 
- 	if (!(session->flags & (1 << CMTP_LOOPBACK))) {
- 		err = cmtp_attach_device(session);
--		if (err < 0)
--			goto detach;
-+		if (err < 0) {
-+			atomic_inc(&session->terminate);
-+			wake_up_process(session->task);
-+			up_write(&cmtp_session_sem);
-+			return err;
-+		}
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index a859f90..fb68f34 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -844,7 +844,6 @@ static int hidp_setup_input(struct hidp_session *session,
+ 	if (err < 0) {
+ 		input_free_device(input);
+ 		session->input = NULL;
+-		hci_conn_put_device(session->conn);
+ 		return err;
  	}
- 
- 	up_write(&cmtp_session_sem);
- 	return 0;
- 
--detach:
--	cmtp_detach_device(session);
--
- unlink:
- 	__cmtp_unlink_session(session);
  
 -- 
 1.7.4.1
