@@ -2,146 +2,204 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 05/23] avrcp: implement ChangePlayback() method
-Date: Fri,  5 Aug 2011 15:15:14 -0300
-Message-Id: <1312568132-21112-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 04/23] avrcp: implement ChangeSetting() method of MediaPlayer
+Date: Fri,  5 Aug 2011 15:15:13 -0300
+Message-Id: <1312568132-21112-4-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ChangePlayback() is used by applications to inform bluetoothd of the
-current status of playback.
+ChangeSetting() is used by an application to inform bluetoothd that a
+certain media player setting was changed.
 ---
- audio/control.c |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 77 insertions(+), 0 deletions(-)
+ audio/control.c |  152 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 152 insertions(+), 0 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index ceff561..e05a66f 100644
+index 168cfc0..ceff561 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -135,6 +135,15 @@ enum scan_mode {
- 	SCAN_MODE_GROUP =	3,
- };
+@@ -104,6 +104,37 @@
  
-+enum play_status {
-+	PLAY_STATUS_STOPPED =		0x00,
-+	PLAY_STATUS_PLAYING =		0x01,
-+	PLAY_STATUS_PAUSED =		0x02,
-+	PLAY_STATUS_FWD_SEEK =		0x03,
-+	PLAY_STATUS_REV_SEEK =		0x04,
-+	PLAY_STATUS_ERROR =		0xFF
+ #define QUIRK_NO_RELEASE	1 << 0
+ 
++enum player_setting {
++	PLAYER_SETTING_EQUALIZER =	1,
++	PLAYER_SETTING_REPEAT =		2,
++	PLAYER_SETTING_SHUFFLE =	3,
++	PLAYER_SETTING_SCAN =		4,
++};
++
++enum equalizer_mode {
++	EQUALIZER_MODE_OFF =	1,
++	EQUALIZER_MODE_ON =	2,
++};
++
++enum repeat_mode {
++	REPEAT_MODE_OFF =	1,
++	REPEAT_MODE_SINGLE =	2,
++	REPEAT_MODE_ALL =	3,
++	REPEAT_MODE_GROUP =	4,
++};
++
++enum shuffle_mode {
++	SHUFFLE_MODE_OFF =	1,
++	SHUFFLE_MODE_ALL =	2,
++	SHUFFLE_MODE_GROUP =	3,
++};
++
++enum scan_mode {
++	SCAN_MODE_OFF =		1,
++	SCAN_MODE_ALL =		2,
++	SCAN_MODE_GROUP =	3,
 +};
 +
  static DBusConnection *connection = NULL;
  
  static GSList *servers = NULL;
-@@ -216,8 +225,16 @@ struct avctp_server {
- 	uint32_t ct_record_id;
+@@ -186,6 +217,7 @@ struct avctp_server {
  };
  
-+struct media_info {
-+	uint32_t elapsed;
-+};
-+
  struct media_player {
- 	uint8_t settings[PLAYER_SETTING_SCAN + 1];
-+	enum play_status status;
-+
-+	struct media_info mi;
-+	GTimer *timer;
++	uint8_t settings[PLAYER_SETTING_SCAN + 1];
  };
  
  struct control {
-@@ -522,6 +539,40 @@ static int attr_to_val(const char *str)
- 	return -EINVAL;
+@@ -423,6 +455,81 @@ static void handle_panel_passthrough(struct control *control,
+ 						operands[0] & 0x7F, status);
  }
  
-+static int play_status_to_val(const char *status)
-+{
-+	if (!strcmp(status, "stopped"))
-+		return PLAY_STATUS_STOPPED;
-+	else if (!strcmp(status, "playing"))
-+		return PLAY_STATUS_PLAYING;
-+	else if (!strcmp(status, "paused"))
-+		return PLAY_STATUS_PAUSED;
-+	else if (!strcmp(status, "forward-seek"))
-+		return PLAY_STATUS_FWD_SEEK;
-+	else if (!strcmp(status, "reverse-seek"))
-+		return PLAY_STATUS_REV_SEEK;
-+	else if (!strcmp(status, "error"))
-+		return PLAY_STATUS_ERROR;
++static int attrval_to_val(uint8_t attr, const char *value) {
++	int ret;
++
++	switch (attr) {
++	case PLAYER_SETTING_EQUALIZER:
++		if (!strcmp(value, "off"))
++			ret = EQUALIZER_MODE_OFF;
++		else if (!strcmp(value, "on"))
++			ret = EQUALIZER_MODE_ON;
++		else
++			ret = -EINVAL;
++
++		return ret;
++	case PLAYER_SETTING_REPEAT:
++		if (!strcmp(value, "off"))
++			ret = REPEAT_MODE_OFF;
++		else if (!strcmp(value, "singletrack"))
++			ret = REPEAT_MODE_SINGLE;
++		else if (!strcmp(value, "alltracks"))
++			ret = REPEAT_MODE_ALL;
++		else if (!strcmp(value, "group"))
++			ret = REPEAT_MODE_GROUP;
++		else
++			ret = -EINVAL;
++
++		return ret;
++	case PLAYER_SETTING_SHUFFLE:
++		if (!strcmp(value, "off"))
++			ret = SHUFFLE_MODE_OFF;
++		else if (!strcmp(value, "alltracks"))
++			ret = SHUFFLE_MODE_ALL;
++		else if (!strcmp(value, "group"))
++			ret = SHUFFLE_MODE_GROUP;
++		else
++			ret = -EINVAL;
++
++		return ret;
++	case PLAYER_SETTING_SCAN:
++		if (!strcmp(value, "off"))
++			ret = SCAN_MODE_OFF;
++		else if (!strcmp(value, "alltracks"))
++			ret = SCAN_MODE_ALL;
++		else if (!strcmp(value, "group"))
++			ret = SCAN_MODE_GROUP;
++		else
++			ret = -EINVAL;
++
++		return ret;
++	}
 +
 +	return -EINVAL;
 +}
 +
-+static void mp_set_playback_status(struct control *control, uint8_t status,
-+							uint32_t elapsed)
++static int attr_to_val(const char *str)
 +{
-+	struct media_player *mp = control->mp;
++	if (!strcmp(str, "Equalizer"))
++		return PLAYER_SETTING_EQUALIZER;
++	else if (!strcmp(str, "Repeat"))
++		return PLAYER_SETTING_REPEAT;
++	else if (!strcmp(str, "Shuffle"))
++		return PLAYER_SETTING_SHUFFLE;
++	else if (!strcmp(str, "Scan"))
++		return PLAYER_SETTING_SCAN;
 +
-+	DBG("Change playback: %u %u", status, elapsed);
-+
-+	mp->mi.elapsed = elapsed;
-+	g_timer_start(mp->timer);
-+
-+	if (status == mp->status)
-+		return;
-+
-+	mp->status = status;
++	return -EINVAL;
 +}
 +
- static void mp_set_attribute(struct media_player *mp,
- 						uint8_t attr, uint8_t val)
- {
-@@ -1280,8 +1331,32 @@ static DBusMessage *mp_change_setting(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
++static void mp_set_attribute(struct media_player *mp,
++						uint8_t attr, uint8_t val)
++{
++	DBG("Change attribute: %u %u", attr, val);
++
++	mp->settings[attr] = val;
++}
++
+ /* handle vendordep pdu inside an avctp packet */
+ static int handle_vendordep_pdu(struct control *control,
+ 					struct avrcp_header *avrcp,
+@@ -1129,7 +1236,52 @@ static GDBusSignalTable control_signals[] = {
+ 	{ NULL, NULL }
+ };
  
-+static DBusMessage *mp_change_playback(DBusConnection *conn,
++static DBusMessage *mp_change_setting(DBusConnection *conn,
 +					DBusMessage *msg, void *data)
 +{
 +	struct audio_device *device = data;
 +	struct control *control = device->control;
-+	const char *statusstr;
-+	int status;
-+	uint32_t elapsed;
++	DBusMessageIter iter;
++	DBusMessageIter var;
++	const char *attrstr, *valstr;
++	int attr, val;
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &statusstr,
-+						DBUS_TYPE_UINT32, &elapsed,
-+						DBUS_TYPE_INVALID))
++	if (!dbus_message_iter_init(msg, &iter))
 +		return btd_error_invalid_args(msg);
 +
-+	status = play_status_to_val(statusstr);
-+	if (status < 0)
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
 +		return btd_error_invalid_args(msg);
 +
-+	mp_set_playback_status(control, status, elapsed);
++	dbus_message_iter_get_basic(&iter, &attrstr);
++
++	attr = attr_to_val(attrstr);
++	if (attr < 0)
++		return btd_error_not_supported(msg);
++
++	dbus_message_iter_next(&iter);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &var);
++
++	/* Only string arguments are supported for now */
++	if (dbus_message_iter_get_arg_type(&var) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&var, &valstr);
++
++	val = attrval_to_val(attr, valstr);
++	if (val < 0)
++		return btd_error_not_supported(msg);
++
++	mp_set_attribute(control->mp, attr, val);
 +
 +	return dbus_message_new_method_return(msg);
 +}
 +
  static GDBusMethodTable mp_methods[] = {
- 	{ "ChangeSetting",	"sv",	"",	mp_change_setting },
-+	{ "ChangePlayback",	"su",	"",	mp_change_playback },
++	{ "ChangeSetting",	"sv",	"",	mp_change_setting },
  	{ }
  };
- 
-@@ -1313,6 +1388,7 @@ static void mp_path_unregister(void *data)
- 	DBG("Unregistered interface %s on path %s",
- 		MEDIA_PLAYER_INTERFACE, dev->path);
- 
-+	g_timer_destroy(mp->timer);
- 	g_free(mp);
- 	control->mp = NULL;
- }
-@@ -1373,6 +1449,7 @@ struct control *control_init(struct audio_device *dev, uint16_t uuid16,
- 		DBG("Registered interface %s on path %s",
- 					MEDIA_PLAYER_INTERFACE, dev->path);
- 
-+		mp->timer = g_timer_new();
- 		control->mp = mp;
- 	}
  
 -- 
 1.7.6
