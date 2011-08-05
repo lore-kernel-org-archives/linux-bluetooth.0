@@ -2,40 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 02/23] avrcp: use C99 instead of gcc extension
-Date: Fri,  5 Aug 2011 15:15:11 -0300
-Message-Id: <1312568132-21112-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 01/23] audio: move interface declarations to their headers
+Date: Fri,  5 Aug 2011 15:15:10 -0300
+Message-Id: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/control.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ audio/device.h |    4 ----
+ audio/unix.c   |    1 +
+ 2 files changed, 1 insertions(+), 4 deletions(-)
 
-diff --git a/audio/control.c b/audio/control.c
-index c3ef737..1ec736f 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -134,7 +134,7 @@ struct avrcp_spec_avc_pdu {
- 	uint8_t packet_type:2;
- 	uint8_t rsvd:6;
- 	uint16_t params_len;
--	uint8_t params[0];
-+	uint8_t params[];
- } __attribute__ ((packed));
- #define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
+diff --git a/audio/device.h b/audio/device.h
+index 35af788..5117fca 100644
+--- a/audio/device.h
++++ b/audio/device.h
+@@ -38,10 +38,6 @@
+ #define AVRCP_REMOTE_UUID	"0000110e-0000-1000-8000-00805f9b34fb"
+ #define AVRCP_TARGET_UUID	"0000110c-0000-1000-8000-00805f9b34fb"
  
-@@ -164,7 +164,7 @@ struct avrcp_spec_avc_pdu {
- 	uint8_t rsvd:6;
- 	uint8_t packet_type:2;
- 	uint16_t params_len;
--	uint8_t params[0];
-+	uint8_t params[];
- } __attribute__ ((packed));
- #define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
- 
+-/* Move these to respective .h files once they exist */
+-#define AUDIO_SOURCE_INTERFACE		"org.bluez.AudioSource"
+-#define AUDIO_CONTROL_INTERFACE		"org.bluez.Control"
+-
+ struct source;
+ struct control;
+ struct target;
+diff --git a/audio/unix.c b/audio/unix.c
+index 8ce50b0..1e0ab30 100644
+--- a/audio/unix.c
++++ b/audio/unix.c
+@@ -49,6 +49,7 @@
+ #include "a2dp.h"
+ #include "headset.h"
+ #include "sink.h"
++#include "source.h"
+ #include "gateway.h"
+ #include "unix.h"
+ #include "glib-helper.h"
 -- 
 1.7.6
 
