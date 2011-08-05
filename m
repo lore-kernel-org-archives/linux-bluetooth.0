@@ -1,65 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd] Fix handling vCard type "OTHER" emails in PBAP
-Date: Fri,  5 Aug 2011 13:01:30 +0200
-Message-Id: <1312542090-11434-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+In-Reply-To: <20110805094201.GA29768@dell>
+References: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+	<20110805094201.GA29768@dell>
+Date: Fri, 5 Aug 2011 12:54:33 +0300
+Message-ID: <CAHMBquUuWHVyz=zTwpk85SMtcSbCFjbMitJLAwxGVNdzesSWLA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Add stop playing ringtone to maemo6 telephony driver
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Until now contacts with emails, without type specified, were not included
-in vCards. Also default type for vCard 3.0 is set to "OTHER" - not
-empty field as it is in vCard 2.1.
----
- plugins/phonebook-tracker.c |    6 +++---
- plugins/vcard.c             |    2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Hi Johan,
 
-diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
-index 3ac1c44..8bc070f 100644
---- a/plugins/phonebook-tracker.c
-+++ b/plugins/phonebook-tracker.c
-@@ -129,7 +129,7 @@
- "nco:fullname(nco:org(?_role))"						\
- "nco:department(?_role) "						\
- "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
--	"rdfs:label(?_role)),"						\
-+	"tracker:coalesce(rdfs:label(?_role), \"\")),"			\
- 	"\"\30\") "							\
- 	"WHERE { "							\
- 	"?_role nco:hasEmailAddress "					\
-@@ -241,7 +241,7 @@ CALLS_CONSTRAINTS(CONSTRAINT)						\
- 	"nco:fullname(nco:org(?_role)) "				\
- 	"nco:department(?_role) "					\
- "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
--	"rdfs:label(?c_role)),"						\
-+	"tracker:coalesce(rdfs:label(?c_role), \"\")),"			\
- 	"\"\30\") "							\
- 	"WHERE { "							\
- 	"?_contact nco:hasAffiliation ?c_role . "			\
-@@ -334,7 +334,7 @@ COMBINED_CONSTRAINT		\
- "nco:fullname(nco:org(?_role))"						\
- "nco:department(?_role) "						\
- "(SELECT GROUP_CONCAT(fn:concat(?emailaddress,\"\31\","			\
--	"rdfs:label(?_role)),"						\
-+	"tracker:coalesce(rdfs:label(?_role), \"\")),"			\
- 	"\"\30\") "							\
- 	"WHERE { "							\
- 	"?_role nco:hasEmailAddress "					\
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index 4d12687..5a5bcf4 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -368,7 +368,7 @@ static void vcard_printf_email(GString *vcards, uint8_t format,
- 		if (format == FORMAT_VCARD21)
- 			category_string = "INTERNET";
- 		else if (format == FORMAT_VCARD30)
--			category_string = "TYPE=INTERNET";
-+			category_string = "TYPE=INTERNET;TYPE=OTHER";
- 	}
- 
- 	add_slash(field, address, LEN_MAX, len);
--- 
-1.7.4.1
+On Fri, Aug 5, 2011 at 12:42 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Dmitriy,
+>
+> On Fri, Aug 05, 2011, Dmitriy Paliy wrote:
+>> If ringtone is loud enough, it may leak to microphone when call is
+>> answered via Bluetooth headset. As result, it can be heard on remote
+>> end. Therefore, playing ringtone shall be stopped as fast as possible
+>> before answering a call.
+>> ---
+>>  audio/telephony-maemo6.c |   34 +++++++++++++++++++++++++++++++++-
+>>  1 files changed, 33 insertions(+), 1 deletions(-)
+>
+> Both patches have been applied. Thanks. I also pushed a patch which
+> moves around the static functions so that forward-declarations of them
+> are not needed.
 
+Thanks. Actually I have added forward declaration on purpose in order
+not to move functions anymore.
+
+Dmitriy
