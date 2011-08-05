@@ -1,131 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd v2 2/2] Fix several issues in FTP action support
-Date: Fri,  5 Aug 2011 08:40:31 +0200
-Message-Id: <1312526431-5192-1-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
-References: <1312465504-26373-2-git-send-email-lkslawek@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+	<alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+Date: Fri, 5 Aug 2011 09:09:38 +0300
+Message-ID: <CABBYNZ+OPDnR=e2sPx=mLmOkd80z2sPNAPX+ss7GCh+7rndH1g@mail.gmail.com>
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	peter@hurleysoftware.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed issues:
-- Incorrect handling of absolute path in DestName header
-- Possibility of exploiting DestName header to escape FTP plugin root
-- Incorrect checking of whether path resides inside FTP root (not
-  allowing to move or copy files up)
-- Ignoring symbolic links and options regarding them
----
-v2: fixed incorrect path verification for DestName
+Hi Mat,
 
- plugins/ftp.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 53 insertions(+), 4 deletions(-)
+On Thu, Aug 4, 2011 at 8:37 PM, Mat Martineau <mathewm@codeaurora.org> wrote:
+> One concern I have is that an application that changes sk_priority while it
+> has data in the HCI tx queue could have its frames delivered out of order.
+>  While we can't control when sk_priority is set, it is possible to make a
+> choice when setting the priority of each skb.  Does it make sense to detect
+> an sk_priority change and only apply the new value when there are no skbs
+> for the channel in the HCI tx queue?
 
-diff --git a/plugins/ftp.c b/plugins/ftp.c
-index e191339..fbfdb37 100644
---- a/plugins/ftp.c
-+++ b/plugins/ftp.c
-@@ -410,18 +410,45 @@ done:
- 	return err;
- }
- 
-+static gboolean is_correct_path(const char *path)
-+{
-+        gchar **elements;
-+        gchar **cur;
-+        int depth = 0;
-+
-+        elements = g_strsplit(path, "/", 0);
-+
-+        for (cur = elements; *cur != NULL; ++cur) {
-+                if (**cur == '\0' || strcmp(*cur, ".") == 0)
-+                        continue;
-+
-+                if (strcmp(*cur, "..") == 0) {
-+                        --depth;
-+                        if (depth < 0)
-+                                break;
-+                        continue;
-+                }
-+
-+                ++depth;
-+        }
-+
-+        g_strfreev(elements);
-+
-+        return depth >= 0 ? TRUE : FALSE;
-+}
-+
- static char *ftp_build_filename(struct ftp_session *ftp, const char *destname)
- {
- 	char *filename;
- 
- 	/* DestName can either be relative or absolute (FTP style) */
--	if (g_path_is_absolute(destname))
--		filename = g_build_filename(destname, NULL);
-+	if (destname[0] == '/')
-+		filename = g_build_filename(obex_get_root_folder(ftp->os),
-+                                                                destname, NULL);
- 	else
- 		filename = g_build_filename(ftp->folder, destname, NULL);
- 
--	/* Check if destination is inside root path */
--	if (g_str_has_prefix(filename, ftp->folder))
-+	if (is_correct_path(filename + strlen(obex_get_root_folder(ftp->os))))
- 		return filename;
- 
- 	g_free(filename);
-@@ -434,6 +461,7 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
- {
- 	char *source, *destination;
- 	int ret;
-+	char *destdir;
- 
- 	DBG("%p name %s destination %s", ftp, name, destname);
- 
-@@ -447,6 +475,16 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
- 
- 	destination = ftp_build_filename(ftp, destname);
- 
-+	if (destination == NULL)
-+		return -EBADR;
-+
-+	destdir = g_path_get_dirname(destination);
-+	ret = verify_path(destdir);
-+	g_free(destdir);
-+
-+	if (ret < 0)
-+		return ret;
-+
- 	source = g_build_filename(ftp->folder, name, NULL);
- 
- 	ret = obex_copy(ftp->os, source, destination);
-@@ -462,6 +500,7 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
- {
- 	char *source, *destination;
- 	int ret;
-+	char *destdir;
- 
- 	DBG("%p name %s destname %s", ftp, name, destname);
- 
-@@ -475,6 +514,16 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
- 
- 	destination = ftp_build_filename(ftp, destname);
- 
-+	if (destination == NULL)
-+		return -EBADR;
-+
-+	destdir = g_path_get_dirname(destination);
-+	ret = verify_path(destdir);
-+	g_free(destdir);
-+
-+	if (ret < 0)
-+		return ret;
-+
- 	source = g_build_filename(ftp->folder, name, NULL);
- 
- 	ret = obex_move(ftp->os, source, destination);
+Yep, if we need to maintain the order I guess this would make sense,
+the problem is that this could be a bit expensive.
+
+> I had a recent discussion with Gustavo about HCI queuing issues with ERTM:
+>
+> http://www.spinics.net/lists/linux-bluetooth/msg13774.html
+>
+> My proposal is to move tx queuing up to L2CAP, and have the HCI tx task only
+> handle scheduling.  Senders would tell HCI they have data to send, and HCI
+> would call back to pull data.  I've been focused on L2CAP - it would be
+> possible to make a similar queuing change to SCO/eSCO/LE, but not strictly
+> necessary.
+
+> This is different from the problem you're solving, but as long as we're
+> talking about big changes to HCI tx, I think we could make some changes that
+> help out with prioritization and queuing across all channels (whether
+> they're going to the same remote device or different remote devices).
+>
+> It could be more efficient to schedule this way since HCI wouldn't have to
+> iterate over all of the connections and queues - it would only have to
+> review the prioritized list of pending sends. Might be a more fitting
+> structure for QoS too.
+>
+> Since HCI wouldn't have a bunch of queued-up skbs, it would also eliminate
+> the sk_priority change problem I noted above.
+>
+> Your thoughts?
+
+If the idea is to have a list of chan/sockets and each having its own
+queue, I guess that would make sense and we could possible preserve
+the packet order in that case, but we still have to maintain the
+fairness when dealing with the same priority so I would still have to
+iterate to each connection and then to each channel evaluating their
+priority. This way we don't have to defined any arbitrary number of
+queues which is probably less items to visit on tx task, but the
+locking may be a lot more complicated.
+
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
