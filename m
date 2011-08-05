@@ -2,205 +2,198 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 04/23] avrcp: implement ChangeSetting() method of MediaPlayer
-Date: Fri,  5 Aug 2011 15:15:13 -0300
-Message-Id: <1312568132-21112-4-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 03/23] avrcp: add skeleton of MediaPlayer interface
+Date: Fri,  5 Aug 2011 15:15:12 -0300
+Message-Id: <1312568132-21112-3-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ChangeSetting() is used by an application to inform bluetoothd that a
-certain media player setting was changed.
 ---
- audio/control.c |  152 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 152 insertions(+), 0 deletions(-)
+ audio/control.c |   56 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ audio/control.h |    4 ++-
+ audio/manager.c |   11 ++++++++-
+ audio/manager.h |    1 +
+ 4 files changed, 67 insertions(+), 5 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 168cfc0..ceff561 100644
+index 1ec736f..168cfc0 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -104,6 +104,37 @@
- 
- #define QUIRK_NO_RELEASE	1 << 0
- 
-+enum player_setting {
-+	PLAYER_SETTING_EQUALIZER =	1,
-+	PLAYER_SETTING_REPEAT =		2,
-+	PLAYER_SETTING_SHUFFLE =	3,
-+	PLAYER_SETTING_SCAN =		4,
-+};
-+
-+enum equalizer_mode {
-+	EQUALIZER_MODE_OFF =	1,
-+	EQUALIZER_MODE_ON =	2,
-+};
-+
-+enum repeat_mode {
-+	REPEAT_MODE_OFF =	1,
-+	REPEAT_MODE_SINGLE =	2,
-+	REPEAT_MODE_ALL =	3,
-+	REPEAT_MODE_GROUP =	4,
-+};
-+
-+enum shuffle_mode {
-+	SHUFFLE_MODE_OFF =	1,
-+	SHUFFLE_MODE_ALL =	2,
-+	SHUFFLE_MODE_GROUP =	3,
-+};
-+
-+enum scan_mode {
-+	SCAN_MODE_OFF =		1,
-+	SCAN_MODE_ALL =		2,
-+	SCAN_MODE_GROUP =	3,
-+};
-+
- static DBusConnection *connection = NULL;
- 
- static GSList *servers = NULL;
-@@ -186,6 +217,7 @@ struct avctp_server {
+@@ -185,8 +185,12 @@ struct avctp_server {
+ 	uint32_t ct_record_id;
  };
  
- struct media_player {
-+	uint8_t settings[PLAYER_SETTING_SCAN + 1];
- };
- 
++struct media_player {
++};
++
  struct control {
-@@ -423,6 +455,81 @@ static void handle_panel_passthrough(struct control *control,
- 						operands[0] & 0x7F, status);
- }
+ 	struct audio_device *dev;
++	struct media_player *mp;
  
-+static int attrval_to_val(uint8_t attr, const char *value) {
-+	int ret;
-+
-+	switch (attr) {
-+	case PLAYER_SETTING_EQUALIZER:
-+		if (!strcmp(value, "off"))
-+			ret = EQUALIZER_MODE_OFF;
-+		else if (!strcmp(value, "on"))
-+			ret = EQUALIZER_MODE_ON;
-+		else
-+			ret = -EINVAL;
-+
-+		return ret;
-+	case PLAYER_SETTING_REPEAT:
-+		if (!strcmp(value, "off"))
-+			ret = REPEAT_MODE_OFF;
-+		else if (!strcmp(value, "singletrack"))
-+			ret = REPEAT_MODE_SINGLE;
-+		else if (!strcmp(value, "alltracks"))
-+			ret = REPEAT_MODE_ALL;
-+		else if (!strcmp(value, "group"))
-+			ret = REPEAT_MODE_GROUP;
-+		else
-+			ret = -EINVAL;
-+
-+		return ret;
-+	case PLAYER_SETTING_SHUFFLE:
-+		if (!strcmp(value, "off"))
-+			ret = SHUFFLE_MODE_OFF;
-+		else if (!strcmp(value, "alltracks"))
-+			ret = SHUFFLE_MODE_ALL;
-+		else if (!strcmp(value, "group"))
-+			ret = SHUFFLE_MODE_GROUP;
-+		else
-+			ret = -EINVAL;
-+
-+		return ret;
-+	case PLAYER_SETTING_SCAN:
-+		if (!strcmp(value, "off"))
-+			ret = SCAN_MODE_OFF;
-+		else if (!strcmp(value, "alltracks"))
-+			ret = SCAN_MODE_ALL;
-+		else if (!strcmp(value, "group"))
-+			ret = SCAN_MODE_GROUP;
-+		else
-+			ret = -EINVAL;
-+
-+		return ret;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int attr_to_val(const char *str)
-+{
-+	if (!strcmp(str, "Equalizer"))
-+		return PLAYER_SETTING_EQUALIZER;
-+	else if (!strcmp(str, "Repeat"))
-+		return PLAYER_SETTING_REPEAT;
-+	else if (!strcmp(str, "Shuffle"))
-+		return PLAYER_SETTING_SHUFFLE;
-+	else if (!strcmp(str, "Scan"))
-+		return PLAYER_SETTING_SCAN;
-+
-+	return -EINVAL;
-+}
-+
-+static void mp_set_attribute(struct media_player *mp,
-+						uint8_t attr, uint8_t val)
-+{
-+	DBG("Change attribute: %u %u", attr, val);
-+
-+	mp->settings[attr] = val;
-+}
-+
- /* handle vendordep pdu inside an avctp packet */
- static int handle_vendordep_pdu(struct control *control,
- 					struct avrcp_header *avrcp,
-@@ -1129,7 +1236,52 @@ static GDBusSignalTable control_signals[] = {
+ 	avctp_state_t state;
+ 
+@@ -1125,6 +1129,14 @@ static GDBusSignalTable control_signals[] = {
  	{ NULL, NULL }
  };
  
-+static DBusMessage *mp_change_setting(DBusConnection *conn,
-+					DBusMessage *msg, void *data)
++static GDBusMethodTable mp_methods[] = {
++	{ }
++};
++
++static GDBusSignalTable mp_signals[] = {
++	{ }
++};
++
+ static void path_unregister(void *data)
+ {
+ 	struct audio_device *dev = data;
+@@ -1140,10 +1152,29 @@ static void path_unregister(void *data)
+ 	dev->control = NULL;
+ }
+ 
++static void mp_path_unregister(void *data)
 +{
-+	struct audio_device *device = data;
-+	struct control *control = device->control;
-+	DBusMessageIter iter;
-+	DBusMessageIter var;
-+	const char *attrstr, *valstr;
-+	int attr, val;
++	struct audio_device *dev = data;
++	struct control *control = dev->control;
++	struct media_player *mp = control->mp;
 +
-+	if (!dbus_message_iter_init(msg, &iter))
-+		return btd_error_invalid_args(msg);
++	DBG("Unregistered interface %s on path %s",
++		MEDIA_PLAYER_INTERFACE, dev->path);
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter, &attrstr);
-+
-+	attr = attr_to_val(attrstr);
-+	if (attr < 0)
-+		return btd_error_not_supported(msg);
-+
-+	dbus_message_iter_next(&iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_VARIANT)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_recurse(&iter, &var);
-+
-+	/* Only string arguments are supported for now */
-+	if (dbus_message_iter_get_arg_type(&var) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&var, &valstr);
-+
-+	val = attrval_to_val(attr, valstr);
-+	if (val < 0)
-+		return btd_error_not_supported(msg);
-+
-+	mp_set_attribute(control->mp, attr, val);
-+
-+	return dbus_message_new_method_return(msg);
++	g_free(mp);
++	control->mp = NULL;
 +}
 +
- static GDBusMethodTable mp_methods[] = {
-+	{ "ChangeSetting",	"sv",	"",	mp_change_setting },
- 	{ }
+ void control_unregister(struct audio_device *dev)
+ {
++	struct control *control = dev->control;
++
++	if (control->mp)
++		g_dbus_unregister_interface(dev->conn, dev->path,
++						MEDIA_PLAYER_INTERFACE);
++
+ 	g_dbus_unregister_interface(dev->conn, dev->path,
+-		AUDIO_CONTROL_INTERFACE);
++						AUDIO_CONTROL_INTERFACE);
+ }
+ 
+ void control_update(struct audio_device *dev, uint16_t uuid16)
+@@ -1154,7 +1185,8 @@ void control_update(struct audio_device *dev, uint16_t uuid16)
+ 		control->target = TRUE;
+ }
+ 
+-struct control *control_init(struct audio_device *dev, uint16_t uuid16)
++struct control *control_init(struct audio_device *dev, uint16_t uuid16,
++							gboolean media_player)
+ {
+ 	struct control *control;
+ 
+@@ -1172,6 +1204,26 @@ struct control *control_init(struct audio_device *dev, uint16_t uuid16)
+ 	control->state = AVCTP_STATE_DISCONNECTED;
+ 	control->uinput = -1;
+ 
++	if (media_player) {
++		struct media_player *mp;
++
++		mp = g_new0(struct media_player, 1);
++
++		if (!g_dbus_register_interface(dev->conn, dev->path,
++						MEDIA_PLAYER_INTERFACE,
++						mp_methods, mp_signals, NULL,
++						dev, mp_path_unregister)) {
++			error("D-Bus failed do register %s on path %s",
++					MEDIA_PLAYER_INTERFACE, dev->path);
++			g_free(mp);
++		}
++
++		DBG("Registered interface %s on path %s",
++					MEDIA_PLAYER_INTERFACE, dev->path);
++
++		control->mp = mp;
++	}
++
+ 	if (uuid16 == AV_REMOTE_TARGET_SVCLASS_ID)
+ 		control->target = TRUE;
+ 
+diff --git a/audio/control.h b/audio/control.h
+index 49f25c2..635a2d5 100644
+--- a/audio/control.h
++++ b/audio/control.h
+@@ -23,6 +23,7 @@
+  */
+ 
+ #define AUDIO_CONTROL_INTERFACE "org.bluez.Control"
++#define MEDIA_PLAYER_INTERFACE "org.bluez.MediaPlayer"
+ 
+ typedef enum {
+ 	AVCTP_STATE_DISCONNECTED = 0,
+@@ -44,7 +45,8 @@ void avrcp_unregister(const bdaddr_t *src);
+ gboolean avrcp_connect(struct audio_device *dev);
+ void avrcp_disconnect(struct audio_device *dev);
+ 
+-struct control *control_init(struct audio_device *dev, uint16_t uuid16);
++struct control *control_init(struct audio_device *dev, uint16_t uuid16,
++							gboolean media_player);
+ void control_update(struct audio_device *dev, uint16_t uuid16);
+ void control_unregister(struct audio_device *dev);
+ gboolean control_is_active(struct audio_device *dev);
+diff --git a/audio/manager.c b/audio/manager.c
+index 05ca654..4afa688 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -117,7 +117,8 @@ static struct enabled_interfaces enabled = {
+ 	.source		= FALSE,
+ 	.control	= TRUE,
+ 	.socket		= TRUE,
+-	.media		= FALSE
++	.media		= FALSE,
++	.media_player	= FALSE,
  };
  
+ static struct audio_adapter *find_adapter(GSList *list,
+@@ -220,7 +221,8 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
+ 		if (device->control)
+ 			control_update(device, uuid16);
+ 		else
+-			device->control = control_init(device, uuid16);
++			device->control = control_init(device, uuid16,
++							enabled.media_player);
+ 		if (device->sink && sink_is_active(device))
+ 			avrcp_connect(device);
+ 		break;
+@@ -1169,6 +1171,9 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
+ 			enabled.socket = TRUE;
+ 		else if (g_str_equal(list[i], "Media"))
+ 			enabled.media = TRUE;
++		else if (g_str_equal(list[i], "MediaPlayer"))
++			enabled.media_player = TRUE;
++
+ 	}
+ 	g_strfreev(list);
+ 
+@@ -1189,6 +1194,8 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
+ 			enabled.socket = FALSE;
+ 		else if (g_str_equal(list[i], "Media"))
+ 			enabled.media = FALSE;
++		else if (g_str_equal(list[i], "MediaPlayer"))
++			enabled.media_player = FALSE;
+ 	}
+ 	g_strfreev(list);
+ 
+diff --git a/audio/manager.h b/audio/manager.h
+index 0bf7663..cfc646c 100644
+--- a/audio/manager.h
++++ b/audio/manager.h
+@@ -31,6 +31,7 @@ struct enabled_interfaces {
+ 	gboolean control;
+ 	gboolean socket;
+ 	gboolean media;
++	gboolean media_player;
+ };
+ 
+ int audio_manager_init(DBusConnection *conn, GKeyFile *config,
 -- 
 1.7.6
 
