@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Aug 2011 12:20:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Add watch for RFCOMM disconnect to HFP HF role
-Message-ID: <20110805092013.GA19836@dell>
-References: <1312464674-18828-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1312464674-18828-1-git-send-email-frederic.dalleau@linux.intel.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH 2/2] Fix cancel pending D-Bus call to ohmd
+Date: Fri,  5 Aug 2011 10:19:37 +0300
+Message-Id: <1312528777-4152-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1312528777-4152-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Pending D-Bus call to ohmd daemon is canceled if telephony driver is
+unloaded before reply comes.
+---
+ audio/telephony-maemo6.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-On Thu, Aug 04, 2011, Frédéric Dalleau wrote:
-> ---
->  audio/gateway.c |   19 +++++++++++++++++++
->  1 files changed, 19 insertions(+), 0 deletions(-)
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 94feda2..86a045f 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -1533,6 +1533,8 @@ static void csd_call_free(void *data)
+ 	g_free(call->object_path);
+ 	g_free(call->number);
+ 
++	g_slist_foreach(pending, remove_pending_by_data, call);
++
+ 	g_free(call);
+ }
+ 
+-- 
+1.7.4.1
 
-Both patches have been applied. Thanks.
-
-Johan
