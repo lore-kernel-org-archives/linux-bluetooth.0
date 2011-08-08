@@ -2,44 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 06/11] Request connection when writting Immediate alert
-Date: Mon,  8 Aug 2011 15:46:45 -0300
-Message-Id: <1312829210-6781-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 05/11] Write Immediate Alert after discovering handle
+Date: Mon,  8 Aug 2011 15:46:44 -0300
+Message-Id: <1312829210-6781-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When Link and Path Loss are disabled, ATT connection callback will
-be registered. Client using FindMe Profile needs to request ATT
-connection before writting the Immediate Alert characteristic value.
+Write the Immediate Alert level characteristic if there is a pending
+alert value to be written after discovering the characteristic handle.
 ---
- proximity/monitor.c |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
+ proximity/monitor.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/proximity/monitor.c b/proximity/monitor.c
-index 95e0f8e..5664c4b 100644
+index 2d405be..95e0f8e 100644
 --- a/proximity/monitor.c
 +++ b/proximity/monitor.c
-@@ -369,6 +369,18 @@ static DBusMessage *set_immediate_alert(DBusConnection *conn, DBusMessage *msg,
+@@ -273,6 +273,9 @@ static void immediate_handle_cb(GSList *characteristics, guint8 status,
+ 	monitor->immediatehandle = chr->value_handle;
  
- 	monitor->immediatelevel = g_strdup(level);
- 
-+	/*
-+	 * Means that Link/Path Loss are disabled or there is a pending
-+	 * writting for Find Me(Immediate Alert characteristic value).
-+	 * If enabled, Path Loss always registers a connection callback
-+	 * when the Proximity Monitor starts.
-+	 */
-+	if (monitor->attioid == 0)
-+		monitor->attioid = btd_device_add_attio_callback(monitor->device,
-+							attio_connected_cb,
-+							attio_disconnected_cb,
-+							monitor);
+ 	DBG("Immediate Alert handle: 0x%04x", monitor->immediatehandle);
 +
- 	return dbus_message_new_method_return(msg);
++	if (monitor->fallbacklevel)
++		write_immediate_alert(monitor);
  }
  
+ static void discover_immediate_handle(struct monitor *monitor)
 -- 
 1.7.6
 
