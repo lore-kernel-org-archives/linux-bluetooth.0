@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1312568132-21112-10-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1312568132-21112-16-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1312568132-21112-10-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 8 Aug 2011 11:08:57 +0300
-Message-ID: <CABBYNZLGOc3a1N4+j3sR+Qa46frL2Ajm2drzXwmbHfEHsY_JKw@mail.gmail.com>
-Subject: Re: [PATCH 10/23] avrcp: handle GetCurrentPlayerAplicationSettingValue
- pdu
+	<1312568132-21112-16-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 8 Aug 2011 10:54:37 +0300
+Message-ID: <CABBYNZKU71FQUKu7u_pshc=6OLC2w_YyaR13t8Ht0nkdNGVD5Q@mail.gmail.com>
+Subject: Re: [PATCH 16/23] avrcp: handle RegisterNotification pdu
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -18,115 +17,111 @@ Hi Lucas,
 
 On Fri, Aug 5, 2011 at 9:15 PM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
-> Example response for PTS test TC_TG_PAS_BV_10_C:
->
->> ACL data: handle 11 flags 0x02 dlen 19
->    L2CAP(d): cid 0x0043 len 15 [psm 23]
->      AVCTP: Command : pt 0x00 transaction 3 pid 0x110e
->        AV/C: Status: address 0x48 opcode 0x00
->          Subunit: Panel
->          Opcode: Vendor Dependent
->          Company ID: 0x001958
->          AVRCP: GetCurrentPlayerApplicationSettingValue: pt 0x00 len 0x0002
->            AttributeCount: 0x01
->            AttributeID: 0x01 (Equalizer ON/OFF Status)
-> < ACL data: handle 11 flags 0x02 dlen 20
->    L2CAP(d): cid 0x0043 len 16 [psm 23]
->      AVCTP: Response : pt 0x00 transaction 3 pid 0x110e
->        AV/C: Stable: address 0x48 opcode 0x00
->          Subunit: Panel
->          Opcode: Vendor Dependent
->          Company ID: 0x001958
->          AVRCP: GetCurrentPlayerApplicationSettingValue: pt 0x00 len 0x0003
->            ValueCount: 0x01
->            AttributeID: 0x01 (Equalizer ON/OFF Status)
->            ValueID: 0x02 (ON)
+> Handle mandatory events according to AVRCP 1.3 spec.
 > ---
->  audio/control.c |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 77 insertions(+), 0 deletions(-)
+>  audio/control.c |   74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 74 insertions(+), 0 deletions(-)
 >
 > diff --git a/audio/control.c b/audio/control.c
-> index 2e910cd..22fb35a 100644
+> index 3ea5123..00cd192 100644
 > --- a/audio/control.c
 > +++ b/audio/control.c
-> @@ -115,6 +115,7 @@
->  #define AVRCP_GET_CAPABILITIES         0x10
->  #define AVRCP_LIST_PLAYER_ATTRIBUTES   0X11
->  #define AVRCP_LIST_PLAYER_VALUES       0x12
-> +#define AVRCP_GET_CURRENT_PLAYER_VALUE 0x13
+> @@ -74,10 +74,12 @@
+>  /* ctype entries */
+>  #define CTYPE_CONTROL          0x0
+>  #define CTYPE_STATUS           0x1
+> +#define CTYPE_NOTIFY           0x3
+>  #define CTYPE_NOT_IMPLEMENTED  0x8
+>  #define CTYPE_ACCEPTED         0x9
+>  #define CTYPE_REJECTED         0xA
+>  #define CTYPE_STABLE           0xC
+> +#define CTYPE_INTERIM          0xF
+>
+>  /* opcodes */
+>  #define OP_VENDORDEP           0x00
+> @@ -122,6 +124,11 @@
+>  #define AVRCP_DISPLAYABLE_CHARSET      0x17
+>  #define AVRCP_CT_BATTERY_STATUS                0x18
+>  #define AVRCP_GET_PLAY_STATUS          0x30
+> +#define AVRCP_REGISTER_NOTIFICATION    0x31
+> +
+> +/* Notification events */
+> +#define AVRCP_EVENT_PLAYBACK_STATUS_CHANGED            0x01
+> +#define AVRCP_EVENT_TRACK_CHANGED                      0x02
 >
 >  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
 >  #define CAP_COMPANY_ID         0x02
-> @@ -759,6 +760,69 @@ err:
->        return -EINVAL;
+> @@ -292,6 +299,8 @@ struct control {
+>        gboolean target;
+>
+>        uint8_t key_quirks[256];
+> +
+> +       uint16_t registered_events;
+>  };
+>
+>  static struct {
+> @@ -1085,6 +1094,58 @@ static int avrcp_handle_get_play_status(struct control *control,
+>        return 9;
 >  }
 >
-> +static int avrcp_handle_get_current_player_value(struct control *control,
+> +static int avrcp_handle_register_notification(struct control *control,
 > +                                               struct avrcp_spec_avc_pdu *pdu)
 > +{
 > +       uint16_t len = ntohs(pdu->params_len);
-> +       struct media_player *mp = control->mp;
+> +       uint8_t status;
 > +
-> +       if (!mp)
-> +               goto done;
+> +       /*
+> +        * 1 byte for EventID, 4 bytes for Playback interval but the latest
+> +        * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
+> +        * 1.3 spec, section 5.4.2.
+> +        */
+> +       if (len != 5)
+> +               goto err;
 > +
-> +       if (len > 1 && pdu->params[0] == len - 1) {
+> +       switch (pdu->params[0]) {
+> +       case (AVRCP_EVENT_PLAYBACK_STATUS_CHANGED):
 
-This if statement is quite long, perhaps you could do check the
-opposite e.g. if (len <=1 || pdu->params[0] != len - 1) goto done;
+I guess the parenthesis here is not necessary
 
-> +               uint8_t settings[pdu->params[0]];
-> +               unsigned int i;
-> +
-> +               /* save a copy of requested settings */
-> +               memcpy(settings, &pdu->params[1], len);
-> +               len = 0;
-> +
-> +               /*
-> +                * From sec. 5.7 of AVRCP 1.3 spec, we should igore
-> +                * non-existent IDs and send a response with the existent
-> +                * ones. Only if all IDs are non-existent we should send an
-> +                * error.
-> +                */
-> +               for (i = 0; i < pdu->params[0]; i++) {
-> +                       uint8_t val;
-> +
-> +                       if (settings[i] < PLAYER_SETTING_EQUALIZER) {
-> +                               DBG("Ignoring %u", settings[i]);
-> +                               continue;
-> +                       }
-> +
-> +                       if (settings[i] > PLAYER_SETTING_SCAN) {
-> +                               DBG("Ignoring %u", settings[i]);
-> +                               continue;
-> +                       }
-> +
-> +                       val = mp_get_attribute(mp, settings[i]);
-> +                       if (!val) {
-> +                               DBG("Ignoring %u: not supported by player",
-> +                                                               settings[i]);
-> +                               continue;
-> +                       }
-> +
-> +                       pdu->params[len * 2 + 1] = settings[i];
-> +                       pdu->params[len * 2 + 2] = val;
-> +                       len++;
+> +               len = 2;
+> +               if (control->mp) {
+> +                       mp_get_playback_status(control->mp, &status,
+> +                                                               NULL, NULL);
+> +                       pdu->params[1] = status;
+> +               } else {
+> +                       pdu->params[1] = PLAY_STATUS_ERROR;
 > +               }
 > +
-> +               if (len) {
-> +                       pdu->params[0] = len;
-> +                       pdu->params_len = htons(2 * len + 1);
+> +               break;
+> +       case (AVRCP_EVENT_TRACK_CHANGED):
+
+Here too.
+
+> +               len = 9;
 > +
-> +                       return 2 * len + 1;
-> +               }
+> +               if (!control->mp)
+> +                       memset(&pdu->params[1], 0xFF, 8);
+> +               else
+> +                       memset(&pdu->params[1], 0, 8);
+> +
+> +               break;
+> +       default:
+> +               /* All other events are not supported yet */
+> +               goto err;
 > +       }
 > +
-> +done:
-> +       error("No valid attributes in request");
-> +       pdu->params[0] = E_INVALID_PARAM;
+> +       /* Register event */
+> +       control->registered_events |= (1 << pdu->params[0]);
 > +
+> +       pdu->params_len = htons(len);
+> +
+> +       return len;
+> +
+> +err:
+> +       pdu->params[0] = E_INVALID_PARAM;
 > +       return -EINVAL;
 > +}
+> +
 
 
 -- 
