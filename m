@@ -1,72 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Mon, 8 Aug 2011 15:27:12 -0400
-Subject: Local security-level 4 with security-level 3 remotes
-Message-ID: <1312831632.2289.26.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 8 Aug 2011 22:21:56 +0300
+Message-ID: <CABBYNZKvw+YdTdZzmXPy=4s8DMasCnca1c2kuZKDunLmtBddUQ@mail.gmail.com>
+Subject: Re: [PATCH] Fix response for GetCurrentPlayerApplicationSettingValue
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SSd2ZSBqdXN0IG5vdGljZWQgdGhhdCB3aGVuIGEgMi4xKyBob3N0IGNvbnRyb2xsZXIgY29ubmVj
-dHMgdG8gYSAyLjAtDQpyZW1vdGUgZGV2aWNlLCB0aGUga2VybmVsIHJlLWF1dGhlbnRpY2F0ZXMg
-YW5kIHJlLWVuY3J5cHRzIHRoZSBBQ0wgbGluaw0KLS0gYWx0aG91Z2ggdGhlIGxpbmsgd2FzIGFs
-cmVhZHkgZW5jcnlwdGVkLiBGb3IgZXhhbXBsZSwNCg0KMjAxMS0wOC0wOCAxMjo0MzoxOC41NTg1
-ODQgPCBIQ0kgQ29tbWFuZDogQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkp
-IHBsZW4gNw0KICAgIGJkYWRkciAwMDowRDpGRDoxRTo5OTozMCByb2xlIDB4MDANCiAgICBSb2xl
-OiBNYXN0ZXINCjIwMTEtMDgtMDggMTI6NDM6MTguNTYxNTU4ID4gSENJIEV2ZW50OiBDb21tYW5k
-IFN0YXR1cyAoMHgwZikgcGxlbiA0DQogICAgQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgw
-MXwweDAwMDkpIHN0YXR1cyAweDAwIG5jbWQgMQ0KMjAxMS0wOC0wOCAxMjo0MzoxOC43Mzc2NDcg
-PiBIQ0kgRXZlbnQ6IFJvbGUgQ2hhbmdlICgweDEyKSBwbGVuIDgNCiAgICBzdGF0dXMgMHgwMCBi
-ZGFkZHIgMDA6MEQ6RkQ6MUU6OTk6MzAgcm9sZSAweDAwDQogICAgUm9sZTogTWFzdGVyDQoyMDEx
-LTA4LTA4IDEyOjQzOjE4Ljg3NjcxNyA+IEhDSSBFdmVudDogTGluayBLZXkgUmVxdWVzdCAoMHgx
-NykgcGxlbiA2DQogICAgYmRhZGRyIDAwOjBEOkZEOjFFOjk5OjMwDQoyMDExLTA4LTA4IDEyOjQz
-OjE4Ljg3NjgyNCA8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4
-MDAwYikgcGxlbiAyMg0KICAgIGJkYWRkciAwMDowRDpGRDoxRTo5OTozMCBrZXkgQUYyMDExMEVF
-MUQzMkUyQzI3ODIxRUMzNzE5RkU3RkYNCjIwMTEtMDgtMDggMTI6NDM6MTguOTU2NzU3ID4gSENJ
-IEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwDQogICAgTGluayBLZXkgUmVx
-dWVzdCBSZXBseSAoMHgwMXwweDAwMGIpIG5jbWQgMQ0KICAgIHN0YXR1cyAweDAwIGJkYWRkciAw
-MDowRDpGRDoxRTo5OTozMA0KMjAxMS0wOC0wOCAxMjo0MzoxOS4xNDM4NTAgPiBIQ0kgRXZlbnQ6
-IENvbm5lY3QgQ29tcGxldGUgKDB4MDMpIHBsZW4gMTENCiAgICBzdGF0dXMgMHgwMCBoYW5kbGUg
-MTMgYmRhZGRyIDAwOjBEOkZEOjFFOjk5OjMwIHR5cGUgQUNMIGVuY3J5cHQgMHgwMQ0KDQpMZWdh
-Y3kgc2VjdXJpdHktbGV2ZWwgMyByZW1vdGUgZGV2aWNlIHRoYXQgY3JlYXRlcyBhbiBlbmNyeXB0
-ZWQNCmNvbm5lY3Rpb24uDQoNCi4uLiA8IHNuaXAgPiAuLi4gSW5jb21pbmcgUkZDT01NIGNvbm5l
-Y3Rpb24NCg0KMjAxMS0wOC0wOCAxMjo0MzoxOS41MTAwMzUgPiBBQ0wgZGF0YTogaGFuZGxlIDEz
-IGZsYWdzIDB4MDIgZGxlbiAxMg0KICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJlcTogcHNtIDMgc2Np
-ZCAweDAwNDENCjIwMTEtMDgtMDggMTI6NDM6MTkuNTEwMDUxIDwgQUNMIGRhdGE6IGhhbmRsZSAx
-MyBmbGFncyAweDAwIGRsZW4gMTYNCiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgw
-MDQwIHNjaWQgMHgwMDQxIHJlc3VsdCAwIHN0YXR1cyAwDQogICAgICBDb25uZWN0aW9uIHN1Y2Nl
-c3NmdWwNCg0KLi4uIDwgc25pcCA+IC4uLiBSZS1hdXRoICYgcmUtZW5jcnlwdCAoc2VjX2xldmVs
-IG9mIFJGQ09NTSBkbGMgd2FzIG1lZGl1bSkNCg0KMjAxMS0wOC0wOCAxMjo0MzoxOS42NzcxMTkg
-PiBBQ0wgZGF0YTogaGFuZGxlIDEzIGZsYWdzIDB4MDIgZGxlbiA4DQogICAgTDJDQVAoZCk6IGNp
-ZCAweDAwNDAgbGVuIDQgW3BzbSAzXQ0KICAgICAgUkZDT01NKHMpOiBTQUJNOiBjciAxIGRsY2kg
-MjYgcGYgMSBpbGVuIDAgZmNzIDB4ZTcgDQoyMDExLTA4LTA4IDEyOjQzOjE5LjY3NzE0NCA8IEhD
-SSBDb21tYW5kOiBBdXRoZW50aWNhdGlvbiBSZXF1ZXN0ZWQgKDB4MDF8MHgwMDExKSBwbGVuIDIN
-CiAgICBoYW5kbGUgMTMNCjIwMTEtMDgtMDggMTI6NDM6MTkuNjc5MTE4ID4gSENJIEV2ZW50OiBD
-b21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQogICAgQXV0aGVudGljYXRpb24gUmVxdWVzdGVk
-ICgweDAxfDB4MDAxMSkgc3RhdHVzIDB4MDAgbmNtZCAxDQoyMDExLTA4LTA4IDEyOjQzOjE5Ljc1
-NDE1NiA+IEhDSSBFdmVudDogTGluayBLZXkgUmVxdWVzdCAoMHgxNykgcGxlbiA2DQogICAgYmRh
-ZGRyIDAwOjBEOkZEOjFFOjk5OjMwDQoyMDExLTA4LTA4IDEyOjQzOjE5Ljc1NDIzNCA8IEhDSSBD
-b21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikgcGxlbiAyMg0KICAg
-IGJkYWRkciAwMDowRDpGRDoxRTo5OTozMCBrZXkgQUYyMDExMEVFMUQzMkUyQzI3ODIxRUMzNzE5
-RkU3RkYNCjIwMTEtMDgtMDggMTI6NDM6MTkuODM2MTk2ID4gSENJIEV2ZW50OiBDb21tYW5kIENv
-bXBsZXRlICgweDBlKSBwbGVuIDEwDQogICAgTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXww
-eDAwMGIpIG5jbWQgMQ0KICAgIHN0YXR1cyAweDAwIGJkYWRkciAwMDowRDpGRDoxRTo5OTozMA0K
-MjAxMS0wOC0wOCAxMjo0MzoxOS44MzcxOTcgPiBIQ0kgRXZlbnQ6IEF1dGggQ29tcGxldGUgKDB4
-MDYpIHBsZW4gMw0KICAgIHN0YXR1cyAweDAwIGhhbmRsZSAxMw0KMjAxMS0wOC0wOCAxMjo0Mzox
-OS44MzcyMDcgPCBIQ0kgQ29tbWFuZDogU2V0IENvbm5lY3Rpb24gRW5jcnlwdGlvbiAoMHgwMXww
-eDAwMTMpIHBsZW4gMw0KICAgIGhhbmRsZSAxMyBlbmNyeXB0IDB4MDENCjIwMTEtMDgtMDggMTI6
-NDM6MTkuODM5MTk4ID4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4
-MTMpIHBsZW4gNQ0KICAgIGhhbmRsZSAxMyBwYWNrZXRzIDENCjIwMTEtMDgtMDggMTI6NDM6MTku
-ODQxMTk3ID4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQogICAgU2V0
-IENvbm5lY3Rpb24gRW5jcnlwdGlvbiAoMHgwMXwweDAwMTMpIHN0YXR1cyAweDAwIG5jbWQgMQ0K
-MjAxMS0wOC0wOCAxMjo0MzoxOS44NDMxOTkgPiBIQ0kgRXZlbnQ6IEVuY3J5cHQgQ2hhbmdlICgw
-eDA4KSBwbGVuIDQNCiAgICBzdGF0dXMgMHgwMCBoYW5kbGUgMTMgZW5jcnlwdCAweDAxDQoNCg0K
-V2hhdCBpcyB0aGUgY29uc2Vuc3VzIG9waW5pb24gcmVnYXJkaW5nIHJlZHVuZGFudCBhdXRoICsg
-ZW5jcnlwdCBmb3INCmxlZ2FjeSBkZXZpY2VzPw0KDQpGV0lXLCBpbiBteSBvcGluaW9uLCBGaWd1
-cmUgNS41IG9mIHRoZSBDb3JlIDQuMCBzcGVjLCBWb2wgMywgUGFydCBDIC0NCkdlbmVyaWMgQWNj
-ZXNzIFByb2ZpbGUgKHBnIDMwNSBvZiA2NTYpIHNob3dzIGEgZmxvd2NoYXJ0IHdpdGggYSBkZWNp
-c2lvbg0KYnJhbmNoIGxhYmVsZWQgIkVuY3J5cHRpb24gRW5hYmxlZD8iIHRoYXQgYWxsb3dzIGFu
-IGltbWVkaWF0ZSBieXBhc3Mgb2YNCmF1dGggKyBlbmNyeXB0IHRvIGEgcG9zaXRpdmUgTDJDQVBf
-Q29ubmVjdF9SZXNwLg0KDQpSZWdhcmRzLA0KUGV0ZXIgSHVybGV5DQo=
+Hi Lucas,
+
+On Mon, Aug 8, 2011 at 5:48 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> According to AVRCP spec there's no player id in response.
+> ---
+>  parser/avrcp.c |    7 +------
+>  1 files changed, 1 insertions(+), 6 deletions(-)
+>
+> diff --git a/parser/avrcp.c b/parser/avrcp.c
+> index 485bb55..f8e4443 100644
+> --- a/parser/avrcp.c
+> +++ b/parser/avrcp.c
+> @@ -612,7 +612,7 @@ response:
+>        printf("ValueCount: 0x%02x\n", num);
+>
+>        for (; num > 0; num--) {
+> -               uint8_t attr, player, value;
+> +               uint8_t attr, value;
+>
+>                p_indent(level, frm);
+>
+> @@ -621,11 +621,6 @@ response:
+>
+>                p_indent(level, frm);
+>
+> -               player = get_u8(frm);
+> -               printf("Player: 0x%02x\n", player);
+> -
+> -               p_indent(level, frm);
+> -
+>                value = get_u8(frm);
+>                printf("ValueID: 0x%02x (%s)\n", value,
+>                                                value2str(attr, value));
+> --
+> 1.7.6
+
+Nice catch, I guess I got confused because of the page break.
+
+
+
+-- 
+Luiz Augusto von Dentz
