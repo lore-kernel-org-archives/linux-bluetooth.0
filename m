@@ -1,32 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Mon, 8 Aug 2011 13:33:09 -0400
-Subject: [PATCH] Bluetooth: Fix l2cap conn failures for ssp devices
-Message-ID: <1312824789.2289.2.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Date: Mon, 8 Aug 2011 11:32:07 -0400
+Message-ID: <CAJdJm_OmwPrc_3nT3zOSa0PLQBfr8hzyXuWHj=JJXYdWagoG7w@mail.gmail.com>
+Subject: [RFC] New mgmt API for Features Exchange (was: Re: Security level for
+ Primary Services discovery during pairing)
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: VISHWANATH KM <a21174@motorola.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Q29tbWl0IDMzMDYwNTQyM2MgZml4ZWQgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBub24t
-c3NwIHJlbW90ZQ0KZGV2aWNlcyBieSBub3Qgc2V0dGluZyBIQ0lfQ09OTl9FTkNSWVBUX1BFTkQg
-ZXZlcnkgdGltZSBjb25uIHNlY3VyaXR5DQppcyB0ZXN0ZWQgKHdoaWNoIHdhcyBhbHdheXMgcmV0
-dXJuaW5nIGZhaWx1cmUgb24gYW55IHN1YnNlcXVlbnQNCnNlY3VyaXR5IGNoZWNrcykuDQoNCkhv
-d2V2ZXIsIHRoaXMgYnJva2UgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBzc3AgcmVtb3Rl
-IGRldmljZXMNCndoZW4gYW4gQUNMIGxpbmsgd2FzIGFscmVhZHkgZXN0YWJsaXNoZWQgYXQgU0RQ
-LWxldmVsIHNlY3VyaXR5LiBUaGlzDQpmaXggZW5zdXJlcyB0aGF0IGVuY3J5cHRpb24gbXVzdCBi
-ZSBwZW5kaW5nIHdoZW5ldmVyIGF1dGhlbnRpY2F0aW9uDQppcyBhbHNvIHBlbmRpbmcuDQoNClNp
-Z25lZC1vZmYtYnk6IFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPg0KLS0t
-DQogbmV0L2JsdWV0b290aC9oY2lfY29ubi5jIHwgICAgNSArKysrLQ0KIDEgZmlsZXMgY2hhbmdl
-ZCwgNCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L2Js
-dWV0b290aC9oY2lfY29ubi5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jDQppbmRleCA1MzBm
-OTAxLi42M2Q5OTQ5IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jDQorKysg
-Yi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCkBAIC02MjAsOCArNjIwLDExIEBAIGF1dGg6DQog
-CWlmICh0ZXN0X2JpdChIQ0lfQ09OTl9FTkNSWVBUX1BFTkQsICZjb25uLT5wZW5kKSkNCiAJCXJl
-dHVybiAwOw0KIA0KLQlpZiAoIWhjaV9jb25uX2F1dGgoY29ubiwgc2VjX2xldmVsLCBhdXRoX3R5
-cGUpKQ0KKwlpZiAoIWhjaV9jb25uX2F1dGgoY29ubiwgc2VjX2xldmVsLCBhdXRoX3R5cGUpKSB7
-DQorCQkvKiBlbmNyeXB0IG11c3QgYmUgcGVuZGluZyBpZiBhdXRoIGlzIGFsc28gcGVuZGluZyAq
-Lw0KKwkJc2V0X2JpdChIQ0lfQ09OTl9FTkNSWVBUX1BFTkQsICZjb25uLT5wZW5kKTsNCiAJCXJl
-dHVybiAwOw0KKwl9DQogDQogZW5jcnlwdDoNCiAJaWYgKGNvbm4tPmxpbmtfbW9kZSAmIEhDSV9M
-TV9FTkNSWVBUKQ0KLS0gDQoxLjcuNC4xDQoNCg==
+Hi,
+
+On Mon, Aug 8, 2011 at 10:59 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+>> I think you have two options:
+>>
+>> 1) Always use CreateDevice(). Then if you want to issue SMP pairing,
+>> you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
+>> (I haven't tested this lately, but I remember it used to work).
+>>
+>> 2) Extend the kernel Management API to allow Features Exchange. See
+>> doc/mgmt-api.txt for the existing commands, to have an idea on how it
+>> works (I recommend first sending an API proposal here to the list).
+>
+> Option 2 sounds better, where we use CreatePairedDevice and after the LE ACL
+> is established we can do LE Read Remote features, (similar to what we do for
+> BR i.e we do HCI Read Remote features in conn complete ) and if Encryption
+> feature bit is set then we trigger SMP else we don't, pls let me know if any
+> comments, if this sounds ok then i will mail the changes to this maillist
+> for further review
+
+Let's hear others opinions. Johan, Marcel, Gustavo?
+
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
