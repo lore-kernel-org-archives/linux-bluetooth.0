@@ -1,101 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Colin Beckingham <colbec@start.ca>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Mon, 8 Aug 2011 09:53:13 -0400
-Subject: Re: Permission denied (13) on Samsung WEP475 headset?
-Message-ID: <1312811593.2202.64.camel@THOR>
-References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>
-	 <1312469666.2158.8.camel@THOR> <1312641412.2202.12.camel@THOR>
-	 <4E3D5EC9.9040400@start.ca> <1312649428.2202.26.camel@THOR>
-	 <4E3D7866.2020804@start.ca> <1312807101.2202.48.camel@THOR>
-	 <4E3FE530.4090508@start.ca>
-In-Reply-To: <4E3FE530.4090508@start.ca>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+amA0pcN0jEdE_dT4r-bcBJ59SgG1vqdZPneAoy8xeHg@mail.gmail.com>
+References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1312568132-21112-2-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZ+amA0pcN0jEdE_dT4r-bcBJ59SgG1vqdZPneAoy8xeHg@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 8 Aug 2011 10:50:57 -0300
+Message-ID: <CAMOw1v7rPDjpsgAjEaQxRPP8WT=F2Tb7ubVeYYJTuyL5mYtd2w@mail.gmail.com>
+Subject: Re: [PATCH 02/23] avrcp: use C99 instead of gcc extension
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T24gTW9uLCAyMDExLTA4LTA4IGF0IDA5OjMxIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdyb3Rl
-Og0KPiANCj4gT24gMDgvMDgvMjAxMSAwODozOCBBTSwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiA+
-IE9uIFNhdCwgMjAxMS0wOC0wNiBhdCAxMzoyMiAtMDQwMCwgQ29saW4gQmVja2luZ2hhbSB3cm90
-ZToNCj4gPj4gT24gMDgvMDYvMjAxMSAxMjo1MCBQTSwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiA+
-Pj4gT24gU2F0LCAyMDExLTA4LTA2IGF0IDExOjMzIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdy
-b3RlOg0KPiA+Pj4+IEhpIFBldGVyOg0KPiA+Pj4+DQo+ID4+PiAuLi48c25pcD4uLi4NCj4gPj4+
-PiBJIHJhbiAjIGhjaWNvbmZpZyBoY2kwIHNzcG1vZGUgMSB0byBmb3JjZSB0aGUgYWRhcHRlciBp
-bnRvIGEgc2VjdXJlIGF0dGVtcHQuDQo+ID4+Pj4NCj4gPj4+PiBJIGRvd25sb2FkZWQgYW5kIGlu
-c3RhbGxlZCB0aGUgbGF0ZXN0IGhjaWR1bXAgd2hpY2ggaWRlbnRpZmllcyBpdHNlbGYNCj4gPj4+
-PiAoaGNpZHVtcCAtdikgYXMgMi4wIGV2ZW4gdGhvdWdoIGl0IGlzIG1hcmtlZCBhcyAyLjEgdmVy
-c2lvbiBvbiB0aGUgd2VicGFnZS4NCj4gPj4+Pg0KPiA+Pj4+IE1hZGUgYW5vdGhlciBhdHRlbXB0
-IHRvIGNvbm5lY3QsIGhlcmUgaXMgdGhlIHN5c2xvZw0KPiA+Pj4+DQo+ID4+Pj4gIyB0YWlsIC1u
-IDEwMCAvdmFyL2xvZy9tZXNzYWdlcyB8IGdyZXAgYmx1ZXRvb3RoZA0KPiA+Pj4+IEF1ZyAgNiAw
-NToxNTozOSBsaW51eC1jOTZoIGJsdWV0b290aGRbMTI0Nl06IEF1ZGlvIGNvbm5lY3Rpb24gZ290
-DQo+ID4+Pj4gZGlzY29ubmVjdGVkDQo+ID4+Pj4gQXVnICA2IDExOjIzOjI5IGxpbnV4LWM5Nmgg
-Ymx1ZXRvb3RoZFsxMjQ2XTogUmVqZWN0aW5nIHJlcXVlc3Q6IHJlbW90ZQ0KPiA+Pj4+IGRldmlj
-ZSBjYW4ndCBwcm92aWRlIE1JVE0NCj4gPj4+PiBBdWcgIDYgMTE6MjM6NTYgbGludXgtYzk2aCBi
-bHVldG9vdGhkWzEyNDZdOiBEaXNjb3Zlcnkgc2Vzc2lvbg0KPiA+Pj4+IDB4N2Y4MDFkMGE2Y2Ew
-IHdpdGggOjEuNDE3OCBhY3RpdmF0ZWQNCj4gPj4+PiBBdWcgIDYgMTE6MjQ6MDEgbGludXgtYzk2
-aCBibHVldG9vdGhkWzEyNDZdOiBTdG9wcGluZyBkaXNjb3ZlcnkNCj4gPj4+PiBBdWcgIDYgMTE6
-MjQ6MTMgbGludXgtYzk2aCBibHVldG9vdGhkWzEyNDZdOiBQZXJtaXNzaW9uIGRlbmllZCAoMTMp
-DQo+ID4+Pj4NCj4gPj4+PiBhbmQgYSBiaW5hcnkgaGNpZHVtcCBpcyBhdHRhY2hlZC4NCj4gPj4+
-DQo+ID4+PiBIaSBDb2xpbiwNCj4gPj4+DQo+ID4+PiBUaGF0IG1ha2VzIGEgbG90IG1vcmUgc2Vu
-c2UhDQo+ID4+Pg0KPiA+Pj4gV291bGQgeW91IHBsZWFzZSByZXBlYXQgdGhlIGV4cGVyaW1lbnQg
-d2l0aCBibHVldG9vdGhkIGluIGRlYnVnIG1vZGUsDQo+ID4+PiB0aG91Z2g/IFRoYXQgd291bGQg
-Z2l2ZSBtZSBhIGxvdCBtb3JlIGluZm9ybWF0aW9uIHRvIHdvcmsgd2l0aCBhYm91dCBob3cNCj4g
-Pj4+IGJsdWV0b290aGQgZ290IHRvIHRoYXQgcG9pbnQuDQo+ID4+Pg0KPiA+Pj4gQXMgYmVmb3Jl
-LCBwbGVhc2UgY2FwdHVyZSBoY2lkdW1wIGJpbmFyeSBhdCB0aGUgc2FtZSB0aW1lLiBBbHNvIHBs
-ZWFzZQ0KPiA+Pj4gaW5jbHVkZSBldmVyeSBibHVldG9vdGhkIHN5c2xvZyBtZXNzYWdlIHN0YXJ0
-aW5nIGZyb20gdGhlIHN0YXJ0IG9mIHRoZQ0KPiA+Pj4gZXhwZXJpbWVudC4NCj4gPj4+DQo+ID4+
-PiBJIGFwcHJlY2lhdGUgeW91ciBwYXRpZW5jZSBoZWxwaW5nIG1lIHRvIHRyYWNrIGRvd24gdGhp
-cyBidWcuDQo+ID4+Pg0KPiA+Pj4gUmVnYXJkcywNCj4gPj4+IFBldGVyIEh1cmxleQ0KPiA+Pg0K
-PiA+PiBTb3JyeSwgZm9yZ290IHRvIHNldCBibHVldG9vdGhkIGluIGRlYnVnIG1vZGUuDQo+ID4+
-DQo+ID4+IEF0dGFjaGVkIGFyZSBteSBsYXRlc3QgbG9ncywgMiBmaWxlcywgd2VwNDc1YS4qLiBO
-b3RlIGluIHRoZSBzeXNsb2cgdGhhdA0KPiA+PiB0aGUgZmlyc3QgZW50cnkgaXMgdGltZXN0YW1w
-ZWQgd2F5IGJlZm9yZSB0aGUgZXhwZXJpbWVudCB3YXMgbGF1bmNoZWQsDQo+ID4+IHNvIHRoZSBs
-b2cgc2hvdWxkIGhhdmUgZXZlcnl0aGluZyB0aGF0IGJsdWV0b290aGQgd3JvdGUgZm9yIHRoZSBj
-dXJyZW50DQo+ID4+IGV4cGVyaW1lbnQuDQo+ID4NCj4gPiBIaSBDb2xpbiwNCj4gPg0KPiA+IFdl
-bGwsIHRoZSBuZXcgbG9ncyBkaWQgbm90IHJlY3JlYXRlIHRoZSAiUmVqZWN0aW5nIHJlcXVlc3Q6
-IHJlbW90ZQ0KPiA+IGRldmljZSBjYW4ndCBwcm92aWRlIE1JVE0iLiBIb3dldmVyLCB0aGV5IGRp
-ZCBzaG93IDIgdGhpbmdzOg0KPiA+DQo+ID4gMS4gVGhlIGhvc3QgY29udHJvbGxlciBoYXMgYSBy
-YWNlIGNvbmRpdGlvbiBidWcgd2hpY2ggaGFzIGJlZW4gc2Vlbg0KPiA+IGJlZm9yZSAoc2VlIHRo
-aXMgdGhyZWFkDQo+ID4gaHR0cDovL2NvbW1lbnRzLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVl
-ei5rZXJuZWwvMTQyODYgZm9yIHRoZSByZWFsbHkNCj4gPiB0ZWNobmljYWwgZGlzY3Vzc2lvbikN
-Cj4gPg0KPiA+IFRoYXQncyB3aHkgdGhlIGluaXRpYWwgYXR0ZW1wdCBieSB0aGUgZGV2aWNlIGF0
-IGNvbm5lY3RpbmcgYW4gUkZDT01NDQo+ID4gY2hhbm5lbCBpcyByZWplY3RlZCAoQCAxMzoxMzow
-Mi41MzM3MTMpLg0KPiA+DQo+ID4gTmV2ZXJ0aGVsZXNzLCB0aGUgaGVhZHNldCBpcyBmb3VuZCBh
-bnl3YXkgYW5kIEJsdWV6IGNvbm5lY3RzIHRvIHRoZQ0KPiA+IGhlYWRzZXQuIEFmdGVyIGVzdGFi
-bGlzaGluZyBhbiBpbnNlY3VyZSBTRFAgbGluaywgQmx1ZXogYXR0ZW1wdHMgdG8gb3Blbg0KPiA+
-IGFuIFJGQ09NTSBjaGFubmVsIHRvIHRoZSBkZXZpY2UsIGFuZA0KPiA+DQo+ID4gMi4gdGhlIGtl
-cm5lbCBhdHRlbXB0cyB0byBjb25uZWN0IHRoZSBSRkNPTU0gY2hhbm5lbCBwcmlvciB0byB0aGUg
-bGluaw0KPiA+IGJlaW5nIGVuY3J5cHRlZCwgc28gdGhlIGRldmljZSByZWplY3RzIHRoZSBjb25u
-ZWN0aW9uLg0KPiA+DQo+ID4gVGhlcmUgd2VyZSBzb21lIGxhc3QgbWludXRlIGNoYW5nZXMgdG8g
-My4wIGZpbmFsIHRoYXQgZGlyZWN0bHkgaW1wYWN0cw0KPiA+IGhvdyB0aGlzIGlzIHN1cHBvc2Vk
-IHRvIHdvcmsuIEhvd2V2ZXIsIGV2ZW4gd2l0aCB0aG9zZSBjaGFuZ2VzIGl0J3MNCj4gPiB1bmNs
-ZWFyIHRvIG1lIGhvdyAjMiBpcyBoYXBwZW5pbmcuDQo+ID4NCj4gPiBXb3VsZCB5b3UgYmUgd2ls
-bGluZyB0byBydW4gdGhlIHNhbWUgZXhwZXJpbWVudCBhcyBiZWZvcmUgYnV0IHdpdGggdGhlDQo+
-ID4ga2VybmVsIGJsdWV0b290aCBtb2R1bGUgZW5hYmxlZCBmb3IgZGVidWcgb3V0cHV0PyAgSWYg
-eW91ciBrZXJuZWwgaXMNCj4gPiBjb25maWd1cmVkIGZvciBkeW5hbWljIGRlYnVnIChLZXJuZWwg
-aGFja2luZy9FbmFibGUgZHluYW1pYyBwcmludGsoKQ0KPiA+IHN1cHBvcnQgPT4gIFkpLCBkb2lu
-ZyB0aGlzIGlzIHRyaXZpYWw6DQo+ID4gIyBzdWRvIHN1DQo+ID4gIyBlY2hvIC1uICJtb2R1bGUg
-Ymx1ZXRvb3RoICtwIg0KPiA+ICAgICAgICAgICAgICAgICAgICAgID4gIC9zeXMva2VybmVsL2Rl
-YnVnL2R5bmFtaWNfZGVidWcvY29udHJvbA0KPiA+IDwgIHBlcmZvcm0gZXhwZXJpbWVudD4NCj4g
-PiAjIGVjaG8gLW4gIm1vZHVsZSBibHVldG9vdGggLXAiDQo+ID4gICAgICAgICAgICAgICAgICAg
-ICAgPiAgL3N5cy9rZXJuZWwvZGVidWcvZHluYW1pY19kZWJ1Zy9jb250cm9sDQo+ID4NCj4gPiBS
-ZWdhcmRzLA0KPiA+IFBldGVyIEh1cmxleQ0KPiANCj4gUGV0ZXIsIGJlZm9yZSBJIGRvIHRoaXMs
-IGxldCBtZSBqdXN0IHZlcmlmeSB0aGF0IG15IGtlcm5lbCBpcyBzZXQgdXAgDQo+IHJpZ2h0LiBJ
-IGNoZWNrZWQgZm9yIGR5bmFtaWMgcHJpbnRrIGFuZCBJIGFtIG5vdCBjbGVhciB0aGF0IEkgaGF2
-ZSB0aGUgDQo+IHNldHRpbmcgbmVlZGVkLiBIZXJlIGlzIHdoYXQgbXkgLmNvbmZpZyB0ZWxscyBt
-ZSBmb3IgZHluYW1pYyBhbmQgcHJpbnRrIA0KPiBzZXBhcmF0ZWx5Lg0KPiANCj4gID4gY2F0IC5j
-b25maWcgfCBncmVwIERZTkFNSUMNCj4gQ09ORklHX05FVENPTlNPTEVfRFlOQU1JQz15DQo+IENP
-TkZJR19EVkJfRFlOQU1JQ19NSU5PUlM9eQ0KPiBDT05GSUdfU05EX0RZTkFNSUNfTUlOT1JTPXkN
-Cj4gIyBDT05GSUdfVVNCX0RZTkFNSUNfTUlOT1JTIGlzIG5vdCBzZXQNCj4gQ09ORklHX0hBVkVf
-RFlOQU1JQ19GVFJBQ0U9eQ0KPiBDT05GSUdfRFlOQU1JQ19ERUJVRz15DQogIF5eXl5eXl5eDQoN
-ClRoaXMgaXMgdGhlIG9uZSBhbmQgaXQncyBzZXQgY29ycmVjdGx5Lg0KDQo+ICA+IGNhdCAuY29u
-ZmlnIHwgZ3JlcCBQUklOVEsNCj4gQ09ORklHX1BSSU5USz15DQo+IENPTkZJR19TTkRfVkVSQk9T
-RV9QUklOVEs9eQ0KPiBDT05GSUdfUFJJTlRLX1RJTUU9eQ0KPiAjIENPTkZJR19CT09UX1BSSU5U
-S19ERUxBWSBpcyBub3Qgc2V0DQo+IENPTkZJR19FQVJMWV9QUklOVEs9eQ0KPiBDT05GSUdfRUFS
-TFlfUFJJTlRLX0RCR1A9eQ0KPiANCj4gQ291bGQgeW91IGNvbmZpcm0gdGhhdCBJIGFtIG9rIHRv
-IGdvPw0KDQpCVFcsIEkganVzdCBmaWd1cmVkIG91dCBob3cgdGhlIGtlcm5lbCBkb2VzIHRoZSB3
-cm9uZyB0aGluZyBub3cuIElmIHlvdQ0Kd2FudCB0byB3YWl0IG9uIHJ1bm5pbmcgdGhpcyBleHBl
-cmltZW50LCB0aGF0J3MgZmluZSB3aXRoIG1lLiBJIGNhbg0KY29udGFjdCB5b3UgaWYgc29tZW9u
-ZSB3YW50cyBwcm9vZiB0aGF0IHRoaXMgaGFwcGVucy4NCg0KflBldGVyDQo=
+On Mon, Aug 8, 2011 at 5:41 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Fri, Aug 5, 2011 at 9:15 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> ---
+>>  audio/control.c |    4 ++--
+>>  1 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/audio/control.c b/audio/control.c
+>> index c3ef737..1ec736f 100644
+>> --- a/audio/control.c
+>> +++ b/audio/control.c
+>> @@ -134,7 +134,7 @@ struct avrcp_spec_avc_pdu {
+>>        uint8_t packet_type:2;
+>>        uint8_t rsvd:6;
+>>        uint16_t params_len;
+>> -       uint8_t params[0];
+>> +       uint8_t params[];
+>>  } __attribute__ ((packed));
+>>  #define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
+>>
+>> @@ -164,7 +164,7 @@ struct avrcp_spec_avc_pdu {
+>>        uint8_t rsvd:6;
+>>        uint8_t packet_type:2;
+>>        uint16_t params_len;
+>> -       uint8_t params[0];
+>> +       uint8_t params[];
+>>  } __attribute__ ((packed));
+>>  #define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
+>
+> Not sure if this is really necessary, there several places where we do
+> that and we normally use __attribute__((packed)) is we still depend on
+> gcc extension in one way or the other.
+
+Fair enough. I just try to use C99 whenever possible.
+
+
+Lucas De Marchi
