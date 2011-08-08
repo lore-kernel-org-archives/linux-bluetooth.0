@@ -1,57 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 8 Aug 2011 22:21:56 +0300
-Message-ID: <CABBYNZKvw+YdTdZzmXPy=4s8DMasCnca1c2kuZKDunLmtBddUQ@mail.gmail.com>
-Subject: Re: [PATCH] Fix response for GetCurrentPlayerApplicationSettingValue
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+In-Reply-To: <CABBYNZJPnLWtHbYRQp3twtd=kuuB6wMARU96QwDWncunJjHUBQ@mail.gmail.com>
+References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1312568132-21112-11-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZJPnLWtHbYRQp3twtd=kuuB6wMARU96QwDWncunJjHUBQ@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 8 Aug 2011 15:58:15 -0300
+Message-ID: <CAMOw1v5tORbGzZ+hVp1j98MbuMKhc89gjDE+AAc-s9+PSJtMBQ@mail.gmail.com>
+Subject: Re: [PATCH 11/23] avrcp: handle SetPlayerApplicationSettingValue pdu
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Luiz,
 
-On Mon, Aug 8, 2011 at 5:48 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> According to AVRCP spec there's no player id in response.
-> ---
->  parser/avrcp.c |    7 +------
->  1 files changed, 1 insertions(+), 6 deletions(-)
+On Mon, Aug 8, 2011 at 5:31 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
 >
-> diff --git a/parser/avrcp.c b/parser/avrcp.c
-> index 485bb55..f8e4443 100644
-> --- a/parser/avrcp.c
-> +++ b/parser/avrcp.c
-> @@ -612,7 +612,7 @@ response:
->        printf("ValueCount: 0x%02x\n", num);
+> On Fri, Aug 5, 2011 at 9:15 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> +static void append_variant(DBusMessageIter *iter, int type, void *val)
+>> +{
+>> +       DBusMessageIter value;
+>> +       char sig[2] = { type, '\0' };
+>> +
+>> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+>> +
+>> +       dbus_message_iter_append_basic(&value, type, val);
+>> +
+>> +       dbus_message_iter_close_container(iter, &value);
+>> +}
 >
->        for (; num > 0; num--) {
-> -               uint8_t attr, player, value;
-> +               uint8_t attr, value;
+> There should be possible to use dict_append_entry(src/dbus-common.h)
+> here, isn't it?
 >
->                p_indent(level, frm);
+>> +static dbus_bool_t emit_setting_changed(DBusConnection *conn,
+>> +                                               const char *path,
+>> +                                               const char *interface,
+>> +                                               const char *name,
+>> +                                               int type, void *value)
+>> +{
+>> +       DBusMessage *signal;
+>> +       DBusMessageIter iter;
+>> +
+>> +       signal = dbus_message_new_signal(path, interface, "SettingChanged");
+>> +
+>> +       if (!signal) {
+>> +               error("Unable to allocate new %s.SettingChanged signal",
+>> +                               interface);
+>> +               return FALSE;
+>> +       }
+>> +
+>> +       dbus_message_iter_init_append(signal, &iter);
+>> +
+>> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
+>> +
+>> +       append_variant(&iter, type, value);
+>> +
+>> +       return g_dbus_send_message(conn, signal);
+>> +}
+>> +
 >
-> @@ -621,11 +621,6 @@ response:
->
->                p_indent(level, frm);
->
-> -               player = get_u8(frm);
-> -               printf("Player: 0x%02x\n", player);
-> -
-> -               p_indent(level, frm);
-> -
->                value = get_u8(frm);
->                printf("ValueID: 0x%02x (%s)\n", value,
->                                                value2str(attr, value));
-> --
-> 1.7.6
+> I wonder if the settings cannot use PropertyChanged instead?
 
-Nice catch, I guess I got confused because of the page break.
+If I use PropertyChanged, I can use emit_property_changed(). Then I
+don't need this method. I'll do it, thanks.
 
 
-
--- 
-Luiz Augusto von Dentz
+Lucas De Marchi
