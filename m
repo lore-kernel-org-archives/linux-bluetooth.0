@@ -1,65 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1312568132-21112-11-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1312568132-21112-11-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 8 Aug 2011 11:31:30 +0300
-Message-ID: <CABBYNZJPnLWtHbYRQp3twtd=kuuB6wMARU96QwDWncunJjHUBQ@mail.gmail.com>
-Subject: Re: [PATCH 11/23] avrcp: handle SetPlayerApplicationSettingValue pdu
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 8 Aug 2011 11:30:43 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH obexd] Fix memory issues in EDS PBAP
+Message-ID: <20110808083043.GA8902@dell>
+References: <1312658839-26919-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312658839-26919-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Bartosz,
 
-On Fri, Aug 5, 2011 at 9:15 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> +static void append_variant(DBusMessageIter *iter, int type, void *val)
-> +{
-> +       DBusMessageIter value;
-> +       char sig[2] = { type, '\0' };
+On Sat, Aug 06, 2011, Bartosz Szatkowski wrote:
+> --- a/plugins/phonebook-ebook.c
+> +++ b/plugins/phonebook-ebook.c
+> @@ -58,6 +58,7 @@ struct query_context {
+>  	unsigned queued_calls;
+>  	void *user_data;
+>  	GSList *ebooks;
+> +	gboolean canceled;
+>  };
+>  
+>  static char *attribute_mask[] = {
+> @@ -172,6 +173,9 @@ static void ebookpull_cb(EBook *book, const GError *gerr, GList *contacts,
+>  		goto done;
+>  	}
+>  
+> +	if (data->canceled)
+> +		goto canceled;
 > +
-> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+>  	DBG("");
+>  
+>  	/*
+> @@ -217,6 +221,9 @@ done:
+>  						0, TRUE, data->user_data);
+>  
+>  		g_string_free(buf, TRUE);
 > +
-> +       dbus_message_iter_append_basic(&value, type, val);
-> +
-> +       dbus_message_iter_close_container(iter, &value);
-> +}
+> +canceled:
+> +		free_query_context(data);
+>  	}
+>  }
 
-There should be possible to use dict_append_entry(src/dbus-common.h)
-here, isn't it?
+Here you're jumping from a higher level into a deeper level
+if-statement. Please don't do that. If you use goto stay on the same
+level, otherwise the code flow & logic become too hard to follow.
 
-> +static dbus_bool_t emit_setting_changed(DBusConnection *conn,
-> +                                               const char *path,
-> +                                               const char *interface,
-> +                                               const char *name,
-> +                                               int type, void *value)
-> +{
-> +       DBusMessage *signal;
-> +       DBusMessageIter iter;
+> @@ -233,6 +240,9 @@ static void ebook_entry_cb(EBook *book, const GError *gerr,
+>  		goto done;
+>  	}
+>  
+> +	if (data->canceled)
+> +		goto canceled;
 > +
-> +       signal = dbus_message_new_signal(path, interface, "SettingChanged");
-> +
-> +       if (!signal) {
-> +               error("Unable to allocate new %s.SettingChanged signal",
-> +                               interface);
-> +               return FALSE;
-> +       }
-> +
-> +       dbus_message_iter_init_append(signal, &iter);
-> +
-> +       dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
-> +
-> +       append_variant(&iter, type, value);
-> +
-> +       return g_dbus_send_message(conn, signal);
-> +}
-> +
+>  	DBG("");
+>  
+>  	evcard = E_VCARD(contact);
+> @@ -255,6 +265,7 @@ done:
+>  			data->contacts_cb(NULL, 0, 1, 0, TRUE,
+>  						data->user_data);
+>  
+> +canceled:
+>  		free_query_context(data);
+>  	}
+>  }
 
-I wonder if the settings cannot use PropertyChanged instead?
+Same here.
 
--- 
-Luiz Augusto von Dentz
+> @@ -300,6 +311,9 @@ static void cache_cb(EBook *book, const GError *gerr, GList *contacts,
+>  		goto done;
+>  	}
+>  
+> +	if (data->canceled)
+> +		goto canceled;
+> +
+>  	DBG("");
+>  
+>  	for (l = contacts; l; l = g_list_next(l)) {
+> @@ -338,15 +352,20 @@ done:
+>  	g_list_free_full(contacts, g_object_unref);
+>  
+>  	data->queued_calls--;
+> -	if (data->queued_calls == 0)
+> +	if (data->queued_calls == 0) {
+>  		data->ready_cb(data->user_data);
+> +
+> +canceled:
+> +		free_query_context(data);
+> +	}
+>  }
+
+And here.
+
+Johan
