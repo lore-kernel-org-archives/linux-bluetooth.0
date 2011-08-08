@@ -1,49 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Aug 2011 15:40:14 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] Use 'nice abort' when canceling outgoing OPP
- transer
-Message-ID: <20110808124014.GA21425@dell>
-References: <1312804898-4117-1-git-send-email-radoslawjablonski@gmail.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Colin Beckingham <colbec@start.ca>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 8 Aug 2011 08:38:21 -0400
+Subject: Re: Permission denied (13) on Samsung WEP475 headset?
+Message-ID: <1312807101.2202.48.camel@THOR>
+References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>
+	 <1312469666.2158.8.camel@THOR> <1312641412.2202.12.camel@THOR>
+	 <4E3D5EC9.9040400@start.ca> <1312649428.2202.26.camel@THOR>
+	 <4E3D7866.2020804@start.ca>
+In-Reply-To: <4E3D7866.2020804@start.ca>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312804898-4117-1-git-send-email-radoslawjablonski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Radek,
-
-On Mon, Aug 08, 2011, Radoslaw Jablonski wrote:
-> Previously client was suddenly disconnecting to cancel
-> outgoing OPP transfer. Now ABORT command will be sent
-> before disconnecting with server in that scenario.
-> 
-> This change is required to pass TC_CLIENT_OPH_BV_27_I PTS
-> test case (not mandatory for qualification).
-> ---
->  Makefile.am |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index d412f02..009bab3 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -142,7 +142,7 @@ service_DATA = $(service_in_files:.service.in=.service)
->  AM_CFLAGS = @OPENOBEX_CFLAGS@ @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ \
->  			@GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
->  			@LIBICAL_CFLAGS@ -D_FILE_OFFSET_BITS=64 \
-> -			@TRACKER_CFLAGS@ \
-> +			@TRACKER_CFLAGS@ -DUSE_NICE_ABORT \
->  			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\"
->  
->  INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
-
-Could you instead just remove the whole #ifdef section from obex_xfer.c
-and make "nice abort" the only option that doesn't need separately
-enabling. There's no reason to keep the non-nice abort around anymore.
-It was only there since ancient versions of OpenOBEX didn't support
-proper abort.
-
-Johan
+T24gU2F0LCAyMDExLTA4LTA2IGF0IDEzOjIyIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdyb3Rl
+Og0KPiBPbiAwOC8wNi8yMDExIDEyOjUwIFBNLCBQZXRlciBIdXJsZXkgd3JvdGU6DQo+ID4gT24g
+U2F0LCAyMDExLTA4LTA2IGF0IDExOjMzIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdyb3RlOg0K
+PiA+PiBIaSBQZXRlcjoNCj4gPj4NCj4gPiAuLi48c25pcD4uLi4NCj4gPj4gSSByYW4gIyBoY2lj
+b25maWcgaGNpMCBzc3Btb2RlIDEgdG8gZm9yY2UgdGhlIGFkYXB0ZXIgaW50byBhIHNlY3VyZSBh
+dHRlbXB0Lg0KPiA+Pg0KPiA+PiBJIGRvd25sb2FkZWQgYW5kIGluc3RhbGxlZCB0aGUgbGF0ZXN0
+IGhjaWR1bXAgd2hpY2ggaWRlbnRpZmllcyBpdHNlbGYNCj4gPj4gKGhjaWR1bXAgLXYpIGFzIDIu
+MCBldmVuIHRob3VnaCBpdCBpcyBtYXJrZWQgYXMgMi4xIHZlcnNpb24gb24gdGhlIHdlYnBhZ2Uu
+DQo+ID4+DQo+ID4+IE1hZGUgYW5vdGhlciBhdHRlbXB0IHRvIGNvbm5lY3QsIGhlcmUgaXMgdGhl
+IHN5c2xvZw0KPiA+Pg0KPiA+PiAjIHRhaWwgLW4gMTAwIC92YXIvbG9nL21lc3NhZ2VzIHwgZ3Jl
+cCBibHVldG9vdGhkDQo+ID4+IEF1ZyAgNiAwNToxNTozOSBsaW51eC1jOTZoIGJsdWV0b290aGRb
+MTI0Nl06IEF1ZGlvIGNvbm5lY3Rpb24gZ290DQo+ID4+IGRpc2Nvbm5lY3RlZA0KPiA+PiBBdWcg
+IDYgMTE6MjM6MjkgbGludXgtYzk2aCBibHVldG9vdGhkWzEyNDZdOiBSZWplY3RpbmcgcmVxdWVz
+dDogcmVtb3RlDQo+ID4+IGRldmljZSBjYW4ndCBwcm92aWRlIE1JVE0NCj4gPj4gQXVnICA2IDEx
+OjIzOjU2IGxpbnV4LWM5NmggYmx1ZXRvb3RoZFsxMjQ2XTogRGlzY292ZXJ5IHNlc3Npb24NCj4g
+Pj4gMHg3ZjgwMWQwYTZjYTAgd2l0aCA6MS40MTc4IGFjdGl2YXRlZA0KPiA+PiBBdWcgIDYgMTE6
+MjQ6MDEgbGludXgtYzk2aCBibHVldG9vdGhkWzEyNDZdOiBTdG9wcGluZyBkaXNjb3ZlcnkNCj4g
+Pj4gQXVnICA2IDExOjI0OjEzIGxpbnV4LWM5NmggYmx1ZXRvb3RoZFsxMjQ2XTogUGVybWlzc2lv
+biBkZW5pZWQgKDEzKQ0KPiA+Pg0KPiA+PiBhbmQgYSBiaW5hcnkgaGNpZHVtcCBpcyBhdHRhY2hl
+ZC4NCj4gPg0KPiA+IEhpIENvbGluLA0KPiA+DQo+ID4gVGhhdCBtYWtlcyBhIGxvdCBtb3JlIHNl
+bnNlIQ0KPiA+DQo+ID4gV291bGQgeW91IHBsZWFzZSByZXBlYXQgdGhlIGV4cGVyaW1lbnQgd2l0
+aCBibHVldG9vdGhkIGluIGRlYnVnIG1vZGUsDQo+ID4gdGhvdWdoPyBUaGF0IHdvdWxkIGdpdmUg
+bWUgYSBsb3QgbW9yZSBpbmZvcm1hdGlvbiB0byB3b3JrIHdpdGggYWJvdXQgaG93DQo+ID4gYmx1
+ZXRvb3RoZCBnb3QgdG8gdGhhdCBwb2ludC4NCj4gPg0KPiA+IEFzIGJlZm9yZSwgcGxlYXNlIGNh
+cHR1cmUgaGNpZHVtcCBiaW5hcnkgYXQgdGhlIHNhbWUgdGltZS4gQWxzbyBwbGVhc2UNCj4gPiBp
+bmNsdWRlIGV2ZXJ5IGJsdWV0b290aGQgc3lzbG9nIG1lc3NhZ2Ugc3RhcnRpbmcgZnJvbSB0aGUg
+c3RhcnQgb2YgdGhlDQo+ID4gZXhwZXJpbWVudC4NCj4gPg0KPiA+IEkgYXBwcmVjaWF0ZSB5b3Vy
+IHBhdGllbmNlIGhlbHBpbmcgbWUgdG8gdHJhY2sgZG93biB0aGlzIGJ1Zy4NCj4gPg0KPiA+IFJl
+Z2FyZHMsDQo+ID4gUGV0ZXIgSHVybGV5DQo+IA0KPiBTb3JyeSwgZm9yZ290IHRvIHNldCBibHVl
+dG9vdGhkIGluIGRlYnVnIG1vZGUuDQo+IA0KPiBBdHRhY2hlZCBhcmUgbXkgbGF0ZXN0IGxvZ3Ms
+IDIgZmlsZXMsIHdlcDQ3NWEuKi4gTm90ZSBpbiB0aGUgc3lzbG9nIHRoYXQgDQo+IHRoZSBmaXJz
+dCBlbnRyeSBpcyB0aW1lc3RhbXBlZCB3YXkgYmVmb3JlIHRoZSBleHBlcmltZW50IHdhcyBsYXVu
+Y2hlZCwgDQo+IHNvIHRoZSBsb2cgc2hvdWxkIGhhdmUgZXZlcnl0aGluZyB0aGF0IGJsdWV0b290
+aGQgd3JvdGUgZm9yIHRoZSBjdXJyZW50IA0KPiBleHBlcmltZW50Lg0KDQpIaSBDb2xpbiwNCg0K
+V2VsbCwgdGhlIG5ldyBsb2dzIGRpZCBub3QgcmVjcmVhdGUgdGhlICJSZWplY3RpbmcgcmVxdWVz
+dDogcmVtb3RlDQpkZXZpY2UgY2FuJ3QgcHJvdmlkZSBNSVRNIi4gSG93ZXZlciwgdGhleSBkaWQg
+c2hvdyAyIHRoaW5nczoNCg0KMS4gVGhlIGhvc3QgY29udHJvbGxlciBoYXMgYSByYWNlIGNvbmRp
+dGlvbiBidWcgd2hpY2ggaGFzIGJlZW4gc2Vlbg0KYmVmb3JlIChzZWUgdGhpcyB0aHJlYWQNCmh0
+dHA6Ly9jb21tZW50cy5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXoua2VybmVsLzE0Mjg2IGZv
+ciB0aGUgcmVhbGx5DQp0ZWNobmljYWwgZGlzY3Vzc2lvbikNCg0KVGhhdCdzIHdoeSB0aGUgaW5p
+dGlhbCBhdHRlbXB0IGJ5IHRoZSBkZXZpY2UgYXQgY29ubmVjdGluZyBhbiBSRkNPTU0NCmNoYW5u
+ZWwgaXMgcmVqZWN0ZWQgKEAgMTM6MTM6MDIuNTMzNzEzKS4NCg0KTmV2ZXJ0aGVsZXNzLCB0aGUg
+aGVhZHNldCBpcyBmb3VuZCBhbnl3YXkgYW5kIEJsdWV6IGNvbm5lY3RzIHRvIHRoZQ0KaGVhZHNl
+dC4gQWZ0ZXIgZXN0YWJsaXNoaW5nIGFuIGluc2VjdXJlIFNEUCBsaW5rLCBCbHVleiBhdHRlbXB0
+cyB0byBvcGVuDQphbiBSRkNPTU0gY2hhbm5lbCB0byB0aGUgZGV2aWNlLCBhbmQNCg0KMi4gdGhl
+IGtlcm5lbCBhdHRlbXB0cyB0byBjb25uZWN0IHRoZSBSRkNPTU0gY2hhbm5lbCBwcmlvciB0byB0
+aGUgbGluaw0KYmVpbmcgZW5jcnlwdGVkLCBzbyB0aGUgZGV2aWNlIHJlamVjdHMgdGhlIGNvbm5l
+Y3Rpb24uDQoNClRoZXJlIHdlcmUgc29tZSBsYXN0IG1pbnV0ZSBjaGFuZ2VzIHRvIDMuMCBmaW5h
+bCB0aGF0IGRpcmVjdGx5IGltcGFjdHMNCmhvdyB0aGlzIGlzIHN1cHBvc2VkIHRvIHdvcmsuIEhv
+d2V2ZXIsIGV2ZW4gd2l0aCB0aG9zZSBjaGFuZ2VzIGl0J3MNCnVuY2xlYXIgdG8gbWUgaG93ICMy
+IGlzIGhhcHBlbmluZy4NCg0KV291bGQgeW91IGJlIHdpbGxpbmcgdG8gcnVuIHRoZSBzYW1lIGV4
+cGVyaW1lbnQgYXMgYmVmb3JlIGJ1dCB3aXRoIHRoZQ0Ka2VybmVsIGJsdWV0b290aCBtb2R1bGUg
+ZW5hYmxlZCBmb3IgZGVidWcgb3V0cHV0PyAgSWYgeW91ciBrZXJuZWwgaXMNCmNvbmZpZ3VyZWQg
+Zm9yIGR5bmFtaWMgZGVidWcgKEtlcm5lbCBoYWNraW5nL0VuYWJsZSBkeW5hbWljIHByaW50aygp
+DQpzdXBwb3J0ID0+IFkpLCBkb2luZyB0aGlzIGlzIHRyaXZpYWw6DQojIHN1ZG8gc3UNCiMgZWNo
+byAtbiAibW9kdWxlIGJsdWV0b290aCArcCINCiAgICAgICAgICAgICAgICAgICAgPiAvc3lzL2tl
+cm5lbC9kZWJ1Zy9keW5hbWljX2RlYnVnL2NvbnRyb2wNCjwgcGVyZm9ybSBleHBlcmltZW50ID4N
+CiMgZWNobyAtbiAibW9kdWxlIGJsdWV0b290aCAtcCINCiAgICAgICAgICAgICAgICAgICAgPiAv
+c3lzL2tlcm5lbC9kZWJ1Zy9keW5hbWljX2RlYnVnL2NvbnRyb2wNCg0KUmVnYXJkcywNClBldGVy
+IEh1cmxleQ0K
