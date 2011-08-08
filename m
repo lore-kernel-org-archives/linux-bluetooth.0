@@ -1,53 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Aug 2011 17:02:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 10/23] avrcp: handle
- GetCurrentPlayerAplicationSettingValue pdu
-Message-ID: <20110808140213.GA23380@dell>
-References: <1312568132-21112-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1312568132-21112-10-git-send-email-lucas.demarchi@profusion.mobi>
- <CABBYNZLGOc3a1N4+j3sR+Qa46frL2Ajm2drzXwmbHfEHsY_JKw@mail.gmail.com>
- <CAMOw1v7xvyYO6VA33kZ_VYM=yYzZ+e703xOEDaE7nWmHmkLyig@mail.gmail.com>
+Message-ID: <4E3FEC47.3040000@start.ca>
+Date: Mon, 08 Aug 2011 10:01:43 -0400
+From: Colin Beckingham <colbec@start.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CAMOw1v7xvyYO6VA33kZ_VYM=yYzZ+e703xOEDaE7nWmHmkLyig@mail.gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: Permission denied (13) on Samsung WEP475 headset?
+References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>  <1312469666.2158.8.camel@THOR> <1312641412.2202.12.camel@THOR>  <4E3D5EC9.9040400@start.ca> <1312649428.2202.26.camel@THOR>  <4E3D7866.2020804@start.ca> <1312807101.2202.48.camel@THOR>  <4E3FE530.4090508@start.ca> <1312811593.2202.64.camel@THOR>
+In-Reply-To: <1312811593.2202.64.camel@THOR>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
 
-On Mon, Aug 08, 2011, Lucas De Marchi wrote:
-> >> +static int avrcp_handle_get_current_player_value(struct control *control,
-> >> +                                               struct avrcp_spec_avc_pdu *pdu)
-> >> +{
-> >> +       uint16_t len = ntohs(pdu->params_len);
-> >> +       struct media_player *mp = control->mp;
-> >> +
-> >> +       if (!mp)
-> >> +               goto done;
-> >> +
-> >> +       if (len > 1 && pdu->params[0] == len - 1) {
-> >
-> > This if statement is quite long, perhaps you could do check the
-> > opposite e.g. if (len <=1 || pdu->params[0] != len - 1) goto done;
-> 
-> In all other parts of the code I do like you said because it's much
-> cleaner. Here however I can't because of the following declaration:
-> 
-> >> +               uint8_t settings[pdu->params[0]];
-> 
-> It depends on the value of pdu->params[0]
+On 08/08/2011 09:53 AM, Peter Hurley wrote:
+> On Mon, 2011-08-08 at 09:31 -0400, Colin Beckingham wrote:
+>>
+>> On 08/08/2011 08:38 AM, Peter Hurley wrote:
+>>> On Sat, 2011-08-06 at 13:22 -0400, Colin Beckingham wrote:
+>>>> On 08/06/2011 12:50 PM, Peter Hurley wrote:
+>>>>> On Sat, 2011-08-06 at 11:33 -0400, Colin Beckingham wrote:
+>>>>>> Hi Peter:
+>>>>>>
+>>>>> ...<snip>...
+>>>>>> I ran # hciconfig hci0 sspmode 1 to force the adapter into a secure attempt.
+>>>>>>
+>>>>>> I downloaded and installed the latest hcidump which identifies itself
+>>>>>> (hcidump -v) as 2.0 even though it is marked as 2.1 version on the webpage.
+>>>>>>
+>>>>>> Made another attempt to connect, here is the syslog
+>>>>>>
+>>>>>> # tail -n 100 /var/log/messages | grep bluetoothd
+>>>>>> Aug  6 05:15:39 linux-c96h bluetoothd[1246]: Audio connection got
+>>>>>> disconnected
+>>>>>> Aug  6 11:23:29 linux-c96h bluetoothd[1246]: Rejecting request: remote
+>>>>>> device can't provide MITM
+>>>>>> Aug  6 11:23:56 linux-c96h bluetoothd[1246]: Discovery session
+>>>>>> 0x7f801d0a6ca0 with :1.4178 activated
+>>>>>> Aug  6 11:24:01 linux-c96h bluetoothd[1246]: Stopping discovery
+>>>>>> Aug  6 11:24:13 linux-c96h bluetoothd[1246]: Permission denied (13)
+>>>>>>
+>>>>>> and a binary hcidump is attached.
+>>>>>
+>>>>> Hi Colin,
+>>>>>
+>>>>> That makes a lot more sense!
+>>>>>
+>>>>> Would you please repeat the experiment with bluetoothd in debug mode,
+>>>>> though? That would give me a lot more information to work with about how
+>>>>> bluetoothd got to that point.
+>>>>>
+>>>>> As before, please capture hcidump binary at the same time. Also please
+>>>>> include every bluetoothd syslog message starting from the start of the
+>>>>> experiment.
+>>>>>
+>>>>> I appreciate your patience helping me to track down this bug.
+>>>>>
+>>>>> Regards,
+>>>>> Peter Hurley
+>>>>
+>>>> Sorry, forgot to set bluetoothd in debug mode.
+>>>>
+>>>> Attached are my latest logs, 2 files, wep475a.*. Note in the syslog that
+>>>> the first entry is timestamped way before the experiment was launched,
+>>>> so the log should have everything that bluetoothd wrote for the current
+>>>> experiment.
+>>>
+>>> Hi Colin,
+>>>
+>>> Well, the new logs did not recreate the "Rejecting request: remote
+>>> device can't provide MITM". However, they did show 2 things:
+>>>
+>>> 1. The host controller has a race condition bug which has been seen
+>>> before (see this thread
+>>> http://comments.gmane.org/gmane.linux.bluez.kernel/14286 for the really
+>>> technical discussion)
+>>>
+>>> That's why the initial attempt by the device at connecting an RFCOMM
+>>> channel is rejected (@ 13:13:02.533713).
+>>>
+>>> Nevertheless, the headset is found anyway and Bluez connects to the
+>>> headset. After establishing an insecure SDP link, Bluez attempts to open
+>>> an RFCOMM channel to the device, and
+>>>
+>>> 2. the kernel attempts to connect the RFCOMM channel prior to the link
+>>> being encrypted, so the device rejects the connection.
+>>>
+>>> There were some last minute changes to 3.0 final that directly impacts
+>>> how this is supposed to work. However, even with those changes it's
+>>> unclear to me how #2 is happening.
+>>>
+>>> Would you be willing to run the same experiment as before but with the
+>>> kernel bluetooth module enabled for debug output?  If your kernel is
+>>> configured for dynamic debug (Kernel hacking/Enable dynamic printk()
+>>> support =>   Y), doing this is trivial:
+>>> # sudo su
+>>> # echo -n "module bluetooth +p"
+>>>                       >   /sys/kernel/debug/dynamic_debug/control
+>>> <   perform experiment>
+>>> # echo -n "module bluetooth -p"
+>>>                       >   /sys/kernel/debug/dynamic_debug/control
+>>>
+>>> Regards,
+>>> Peter Hurley
+>>
+>> Peter, before I do this, let me just verify that my kernel is set up
+>> right. I checked for dynamic printk and I am not clear that I have the
+>> setting needed. Here is what my .config tells me for dynamic and printk
+>> separately.
+>>
+>>   >  cat .config | grep DYNAMIC
+>> CONFIG_NETCONSOLE_DYNAMIC=y
+>> CONFIG_DVB_DYNAMIC_MINORS=y
+>> CONFIG_SND_DYNAMIC_MINORS=y
+>> # CONFIG_USB_DYNAMIC_MINORS is not set
+>> CONFIG_HAVE_DYNAMIC_FTRACE=y
+>> CONFIG_DYNAMIC_DEBUG=y
+>    ^^^^^^^^
+>
+> This is the one and it's set correctly.
+>
+>>   >  cat .config | grep PRINTK
+>> CONFIG_PRINTK=y
+>> CONFIG_SND_VERBOSE_PRINTK=y
+>> CONFIG_PRINTK_TIME=y
+>> # CONFIG_BOOT_PRINTK_DELAY is not set
+>> CONFIG_EARLY_PRINTK=y
+>> CONFIG_EARLY_PRINTK_DBGP=y
+>>
+>> Could you confirm that I am ok to go?
+>
+> BTW, I just figured out how the kernel does the wrong thing now. If you
+> want to wait on running this experiment, that's fine with me. I can
+> contact you if someone wants proof that this happens.
+>
+> ~Peter
 
-Actually Luiz should have objected to that even more than to the coding
-style. I don't think we use anywhere else array size initializers which
-are not determinable upon compile time (I suppose this is also a very
-recent C feature?). Furthermore, since these values are coming from the
-remote side you're effectively allowing them to to "explode" our stack
-here. So, dynamically allocating memory from the heap would be a (much)
-better idea in this case (and then you can easily use the coding style
-fix suggested by Luiz).
-
-Johan
+OK, Peter, I will put a hold on this. Let me know if you need further input.
+-- 
+---
+Colin Beckingham
