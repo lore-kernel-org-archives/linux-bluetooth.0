@@ -1,42 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Aug 2011 13:36:24 +0300
+Date: Mon, 8 Aug 2011 13:23:48 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/7] Proximity Monitor optimizations and checks
-Message-ID: <20110808103624.GA16107@dell>
-References: <1312396907-14524-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ] Fix error when proximity config file is missing
+Message-ID: <20110808102348.GC14171@dell>
+References: <1312382727-32709-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312396907-14524-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1312382727-32709-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
 On Wed, Aug 03, 2011, Claudio Takahasi wrote:
-> Dependency: "[PATCH BlueZ 0/3] Add Proximity Monitor properties" needs
-> to be applied first.
-> 
-> The following patches contain optimizations and configuration checking
-> based on proximity config file values.
-> 
-> Bruna Moreira (1):
->   Add enum for alert level values
-> 
-> Claudio Takahasi (6):
->   Parse handles when probing on Proximity
->   Request connection if Link or Path Loss is enabled
->   Write Link Loss alert if the service is enabled
->   Add utility function to convert alert levels
->   Add function to check invalid alert level value
->   Skip Link Loss handle discovery
-> 
->  proximity/manager.c |   36 +++++++++-----
->  proximity/monitor.c |  137 ++++++++++++++++++++++++++++++++++-----------------
->  proximity/monitor.h |    3 +-
->  3 files changed, 118 insertions(+), 58 deletions(-)
+> Adds checking to avoid the following GLib critical error:
+> Parsing /etc/bluetooth/proximity.conf failed: No such file or directory
+> GLib-CRITICAL **: g_key_file_get_string_list: assertion `key_file !=
+> NULL' failed
+> ---
+>  proximity/manager.c |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+This one has also been applied. Thanks.
 
 Johan
