@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3] Fix possible invalid read/free on media.c
-Date: Mon,  8 Aug 2011 16:22:12 +0300
-Message-Id: <1312809732-18235-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2] Fix possible invalid read/free on media.c
+Date: Mon,  8 Aug 2011 15:45:50 +0300
+Message-Id: <1312807550-9603-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -39,11 +39,11 @@ This also fix the circular dependency of media.c and a2dp.c
     by 0x4EA9826: g_slist_foreach (in /lib64/libglib-2.0.so.0.2908.0)
 ---
  audio/a2dp.c      |   92 ++++---
- audio/a2dp.h      |   31 +++-
- audio/media.c     |  698 +++++++++++++++++++++++++++++++----------------------
+ audio/a2dp.h      |   32 +++-
+ audio/media.c     |  706 +++++++++++++++++++++++++++++++----------------------
  audio/media.h     |   17 --
  audio/transport.c |    3 +-
- 5 files changed, 493 insertions(+), 348 deletions(-)
+ 5 files changed, 502 insertions(+), 348 deletions(-)
 
 diff --git a/audio/a2dp.c b/audio/a2dp.c
 index 72a0df5..8347a60 100644
@@ -303,10 +303,10 @@ index 72a0df5..8347a60 100644
  
  fail:
 diff --git a/audio/a2dp.h b/audio/a2dp.h
-index 5c4232d..1637580 100644
+index 5c4232d..ed123e4 100644
 --- a/audio/a2dp.h
 +++ b/audio/a2dp.h
-@@ -121,6 +121,33 @@ struct mpeg_codec_cap {
+@@ -121,6 +121,34 @@ struct mpeg_codec_cap {
  
  struct a2dp_sep;
  
@@ -314,6 +314,7 @@ index 5c4232d..1637580 100644
 +							void *ret, int size);
 +typedef void (*a2dp_endpoint_config_t) (struct a2dp_sep *sep, guint setup_id,
 +								gboolean ret);
++
 +
 +struct a2dp_endpoint {
 +	const char *(*get_name) (struct a2dp_sep *sep, void *user_data);
@@ -340,7 +341,7 @@ index 5c4232d..1637580 100644
  
  typedef void (*a2dp_select_cb_t) (struct avdtp *session,
  					struct a2dp_sep *sep, GSList *caps,
-@@ -138,7 +165,9 @@ void a2dp_unregister(const bdaddr_t *src);
+@@ -138,7 +166,9 @@ void a2dp_unregister(const bdaddr_t *src);
  
  struct a2dp_sep *a2dp_add_sep(const bdaddr_t *src, uint8_t type,
  				uint8_t codec, gboolean delay_reporting,
@@ -352,7 +353,7 @@ index 5c4232d..1637580 100644
  
  struct a2dp_sep *a2dp_get(struct avdtp *session, struct avdtp_remote_sep *sep);
 diff --git a/audio/media.c b/audio/media.c
-index 57bf7c9..42d8637 100644
+index 57bf7c9..1303a90 100644
 --- a/audio/media.c
 +++ b/audio/media.c
 @@ -65,6 +65,7 @@ struct endpoint_request {
@@ -420,7 +421,7 @@ index 57bf7c9..42d8637 100644
  static void media_endpoint_exit(DBusConnection *connection, void *user_data)
  {
  	struct media_endpoint *endpoint = user_data;
-@@ -156,35 +168,388 @@ static void headset_setconf_cb(struct media_endpoint *endpoint, void *ret,
+@@ -156,35 +168,396 @@ static void headset_setconf_cb(struct media_endpoint *endpoint, void *ret,
  	headset_set_state(dev, HEADSET_STATE_DISCONNECTED);
  }
  
@@ -692,15 +693,16 @@ index 57bf7c9..42d8637 100644
 +	}
 +}
 +
-+static const char *get_name(struct a2dp_sep *sep, void *user_data)
++static const char *a2dp_get_name(struct a2dp_sep *sep, void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +
 +	return endpoint->sender;
 +}
 +
-+static size_t get_capabilities(struct a2dp_sep *sep, uint8_t **capabilities,
-+							void *user_data)
++static size_t a2dp_get_capabilities(struct a2dp_sep *sep,
++						uint8_t **capabilities,
++						void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +
@@ -718,17 +720,20 @@ index 57bf7c9..42d8637 100644
 +	a2dp_endpoint_select_t cb;
 +};
 +
-+static void select_cb(struct media_endpoint *endpoint, void *ret, int size,
-+							void *user_data)
++static void endpoint_select_cb(struct media_endpoint *endpoint,
++					void *ret, int size, void *user_data)
 +{
 +	struct a2dp_select_data *data = user_data;
 +
 +	data->cb(endpoint->sep, data->setup_id, ret, size);
 +}
 +
-+static int select_config(struct a2dp_sep *sep, uint8_t *capabilities,
-+				size_t length, guint setup_id,
-+				a2dp_endpoint_select_t cb, void *user_data)
++static int a2dp_select_configuration(struct a2dp_sep *sep,
++						uint8_t *capabilities,
++						size_t length,
++						guint setup_id,
++						a2dp_endpoint_select_t cb,
++						void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +	struct a2dp_select_data *data;
@@ -738,25 +743,28 @@ index 57bf7c9..42d8637 100644
 +	data->cb = cb;
 +
 +	if (select_configuration(endpoint, capabilities, length,
-+					select_cb, data, g_free) == TRUE)
++				endpoint_select_cb, data, g_free) == TRUE)
 +		return 0;
 +
 +	g_free(data);
 +	return -ENOMEM;
 +}
 +
-+static void config_cb(struct media_endpoint *endpoint, void *ret, int size,
-+							void *user_data)
++static void endpoint_config_cb(struct media_endpoint *endpoint,
++					void *ret, int size, void *user_data)
 +{
 +	struct a2dp_config_data *data = user_data;
 +
 +	data->cb(endpoint->sep, data->setup_id, ret ? TRUE : FALSE);
 +}
 +
-+static int set_config(struct a2dp_sep *sep, struct audio_device *dev,
-+				uint8_t *configuration, size_t length,
-+				guint setup_id, a2dp_endpoint_config_t cb,
-+				void *user_data)
++static int a2dp_set_configuration(struct a2dp_sep *sep,
++						struct audio_device *dev,
++						uint8_t *configuration,
++						size_t length,
++						guint setup_id,
++						a2dp_endpoint_config_t cb,
++						void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +	struct a2dp_config_data *data;
@@ -766,21 +774,22 @@ index 57bf7c9..42d8637 100644
 +	data->cb = cb;
 +
 +	if (set_configuration(endpoint, dev, configuration, length,
-+					config_cb, data, g_free) == TRUE)
++				endpoint_config_cb, data, g_free) == TRUE)
 +		return 0;
 +
 +	g_free(data);
 +	return -ENOMEM;
 +}
 +
-+static void clear_config(struct a2dp_sep *sep, void *user_data)
++static void a2dp_clear_configuration(struct a2dp_sep *sep, void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +
 +	clear_configuration(endpoint);
 +}
 +
-+static void set_delay(struct a2dp_sep *sep, uint16_t delay, void *user_data)
++static void a2dp_set_delay(struct a2dp_sep *sep, uint16_t delay,
++							void *user_data)
 +{
 +	struct media_endpoint *endpoint = user_data;
 +
@@ -791,12 +800,12 @@ index 57bf7c9..42d8637 100644
 +}
 +
 +static struct a2dp_endpoint a2dp_endpoint = {
-+	.get_name = get_name,
-+	.get_capabilities = get_capabilities,
-+	.select_configuration = select_config,
-+	.set_configuration = set_config,
-+	.clear_configuration = clear_config,
-+	.set_delay = set_delay
++	.get_name = a2dp_get_name,
++	.get_capabilities = a2dp_get_capabilities,
++	.select_configuration = a2dp_select_configuration,
++	.set_configuration = a2dp_set_configuration,
++	.clear_configuration = a2dp_clear_configuration,
++	.set_delay = a2dp_set_delay
 +};
 +
 +static void a2dp_destroy_endpoint(void *user_data)
@@ -834,7 +843,7 @@ index 57bf7c9..42d8637 100644
  }
  
  static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
-@@ -216,13 +581,15 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+@@ -216,13 +589,15 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
  	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
  		endpoint->sep = a2dp_add_sep(&adapter->src,
  					AVDTP_SEP_TYPE_SOURCE, codec,
@@ -853,7 +862,7 @@ index 57bf7c9..42d8637 100644
  		if (endpoint->sep == NULL)
  			goto failed;
  	} else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
-@@ -234,9 +601,8 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+@@ -234,9 +609,8 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
  		dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
  						AUDIO_HEADSET_INTERFACE, TRUE);
  		if (dev)
@@ -865,7 +874,7 @@ index 57bf7c9..42d8637 100644
  	} else {
  		if (err)
  			*err = -EINVAL;
-@@ -285,11 +651,6 @@ static struct media_endpoint *media_adapter_find_endpoint(
+@@ -285,11 +659,6 @@ static struct media_endpoint *media_adapter_find_endpoint(
  	return NULL;
  }
  
@@ -877,7 +886,7 @@ index 57bf7c9..42d8637 100644
  static int parse_properties(DBusMessageIter *props, const char **uuid,
  				gboolean *delay_reporting, uint8_t *codec,
  				uint8_t **capabilities, int *size)
-@@ -414,8 +775,8 @@ static void path_free(void *data)
+@@ -414,8 +783,8 @@ static void path_free(void *data)
  {
  	struct media_adapter *adapter = data;
  
@@ -888,7 +897,7 @@ index 57bf7c9..42d8637 100644
  
  	dbus_connection_unref(adapter->conn);
  
-@@ -465,239 +826,6 @@ void media_unregister(const char *path)
+@@ -465,239 +834,6 @@ void media_unregister(const char *path)
  	}
  }
  
@@ -1128,7 +1137,7 @@ index 57bf7c9..42d8637 100644
  struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint)
  {
  	return endpoint->sep;
-@@ -712,9 +840,3 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint)
+@@ -712,9 +848,3 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint)
  {
  	return endpoint->codec;
  }
