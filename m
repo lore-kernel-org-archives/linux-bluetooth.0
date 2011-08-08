@@ -1,142 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E3FEC47.3040000@start.ca>
-Date: Mon, 08 Aug 2011 10:01:43 -0400
-From: Colin Beckingham <colbec@start.ca>
-MIME-Version: 1.0
-To: Peter Hurley <peter@hurleysoftware.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Colin Beckingham <colbec@start.ca>
 CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 8 Aug 2011 09:53:13 -0400
 Subject: Re: Permission denied (13) on Samsung WEP475 headset?
-References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>  <1312469666.2158.8.camel@THOR> <1312641412.2202.12.camel@THOR>  <4E3D5EC9.9040400@start.ca> <1312649428.2202.26.camel@THOR>  <4E3D7866.2020804@start.ca> <1312807101.2202.48.camel@THOR>  <4E3FE530.4090508@start.ca> <1312811593.2202.64.camel@THOR>
-In-Reply-To: <1312811593.2202.64.camel@THOR>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-ID: <1312811593.2202.64.camel@THOR>
+References: <4E3A7E09.6040503@start.ca>  <20110804121703.GA23534@dell>
+	 <1312469666.2158.8.camel@THOR> <1312641412.2202.12.camel@THOR>
+	 <4E3D5EC9.9040400@start.ca> <1312649428.2202.26.camel@THOR>
+	 <4E3D7866.2020804@start.ca> <1312807101.2202.48.camel@THOR>
+	 <4E3FE530.4090508@start.ca>
+In-Reply-To: <4E3FE530.4090508@start.ca>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-On 08/08/2011 09:53 AM, Peter Hurley wrote:
-> On Mon, 2011-08-08 at 09:31 -0400, Colin Beckingham wrote:
->>
->> On 08/08/2011 08:38 AM, Peter Hurley wrote:
->>> On Sat, 2011-08-06 at 13:22 -0400, Colin Beckingham wrote:
->>>> On 08/06/2011 12:50 PM, Peter Hurley wrote:
->>>>> On Sat, 2011-08-06 at 11:33 -0400, Colin Beckingham wrote:
->>>>>> Hi Peter:
->>>>>>
->>>>> ...<snip>...
->>>>>> I ran # hciconfig hci0 sspmode 1 to force the adapter into a secure attempt.
->>>>>>
->>>>>> I downloaded and installed the latest hcidump which identifies itself
->>>>>> (hcidump -v) as 2.0 even though it is marked as 2.1 version on the webpage.
->>>>>>
->>>>>> Made another attempt to connect, here is the syslog
->>>>>>
->>>>>> # tail -n 100 /var/log/messages | grep bluetoothd
->>>>>> Aug  6 05:15:39 linux-c96h bluetoothd[1246]: Audio connection got
->>>>>> disconnected
->>>>>> Aug  6 11:23:29 linux-c96h bluetoothd[1246]: Rejecting request: remote
->>>>>> device can't provide MITM
->>>>>> Aug  6 11:23:56 linux-c96h bluetoothd[1246]: Discovery session
->>>>>> 0x7f801d0a6ca0 with :1.4178 activated
->>>>>> Aug  6 11:24:01 linux-c96h bluetoothd[1246]: Stopping discovery
->>>>>> Aug  6 11:24:13 linux-c96h bluetoothd[1246]: Permission denied (13)
->>>>>>
->>>>>> and a binary hcidump is attached.
->>>>>
->>>>> Hi Colin,
->>>>>
->>>>> That makes a lot more sense!
->>>>>
->>>>> Would you please repeat the experiment with bluetoothd in debug mode,
->>>>> though? That would give me a lot more information to work with about how
->>>>> bluetoothd got to that point.
->>>>>
->>>>> As before, please capture hcidump binary at the same time. Also please
->>>>> include every bluetoothd syslog message starting from the start of the
->>>>> experiment.
->>>>>
->>>>> I appreciate your patience helping me to track down this bug.
->>>>>
->>>>> Regards,
->>>>> Peter Hurley
->>>>
->>>> Sorry, forgot to set bluetoothd in debug mode.
->>>>
->>>> Attached are my latest logs, 2 files, wep475a.*. Note in the syslog that
->>>> the first entry is timestamped way before the experiment was launched,
->>>> so the log should have everything that bluetoothd wrote for the current
->>>> experiment.
->>>
->>> Hi Colin,
->>>
->>> Well, the new logs did not recreate the "Rejecting request: remote
->>> device can't provide MITM". However, they did show 2 things:
->>>
->>> 1. The host controller has a race condition bug which has been seen
->>> before (see this thread
->>> http://comments.gmane.org/gmane.linux.bluez.kernel/14286 for the really
->>> technical discussion)
->>>
->>> That's why the initial attempt by the device at connecting an RFCOMM
->>> channel is rejected (@ 13:13:02.533713).
->>>
->>> Nevertheless, the headset is found anyway and Bluez connects to the
->>> headset. After establishing an insecure SDP link, Bluez attempts to open
->>> an RFCOMM channel to the device, and
->>>
->>> 2. the kernel attempts to connect the RFCOMM channel prior to the link
->>> being encrypted, so the device rejects the connection.
->>>
->>> There were some last minute changes to 3.0 final that directly impacts
->>> how this is supposed to work. However, even with those changes it's
->>> unclear to me how #2 is happening.
->>>
->>> Would you be willing to run the same experiment as before but with the
->>> kernel bluetooth module enabled for debug output?  If your kernel is
->>> configured for dynamic debug (Kernel hacking/Enable dynamic printk()
->>> support =>   Y), doing this is trivial:
->>> # sudo su
->>> # echo -n "module bluetooth +p"
->>>                       >   /sys/kernel/debug/dynamic_debug/control
->>> <   perform experiment>
->>> # echo -n "module bluetooth -p"
->>>                       >   /sys/kernel/debug/dynamic_debug/control
->>>
->>> Regards,
->>> Peter Hurley
->>
->> Peter, before I do this, let me just verify that my kernel is set up
->> right. I checked for dynamic printk and I am not clear that I have the
->> setting needed. Here is what my .config tells me for dynamic and printk
->> separately.
->>
->>   >  cat .config | grep DYNAMIC
->> CONFIG_NETCONSOLE_DYNAMIC=y
->> CONFIG_DVB_DYNAMIC_MINORS=y
->> CONFIG_SND_DYNAMIC_MINORS=y
->> # CONFIG_USB_DYNAMIC_MINORS is not set
->> CONFIG_HAVE_DYNAMIC_FTRACE=y
->> CONFIG_DYNAMIC_DEBUG=y
->    ^^^^^^^^
->
-> This is the one and it's set correctly.
->
->>   >  cat .config | grep PRINTK
->> CONFIG_PRINTK=y
->> CONFIG_SND_VERBOSE_PRINTK=y
->> CONFIG_PRINTK_TIME=y
->> # CONFIG_BOOT_PRINTK_DELAY is not set
->> CONFIG_EARLY_PRINTK=y
->> CONFIG_EARLY_PRINTK_DBGP=y
->>
->> Could you confirm that I am ok to go?
->
-> BTW, I just figured out how the kernel does the wrong thing now. If you
-> want to wait on running this experiment, that's fine with me. I can
-> contact you if someone wants proof that this happens.
->
-> ~Peter
-
-OK, Peter, I will put a hold on this. Let me know if you need further input.
--- 
----
-Colin Beckingham
+T24gTW9uLCAyMDExLTA4LTA4IGF0IDA5OjMxIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdyb3Rl
+Og0KPiANCj4gT24gMDgvMDgvMjAxMSAwODozOCBBTSwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiA+
+IE9uIFNhdCwgMjAxMS0wOC0wNiBhdCAxMzoyMiAtMDQwMCwgQ29saW4gQmVja2luZ2hhbSB3cm90
+ZToNCj4gPj4gT24gMDgvMDYvMjAxMSAxMjo1MCBQTSwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiA+
+Pj4gT24gU2F0LCAyMDExLTA4LTA2IGF0IDExOjMzIC0wNDAwLCBDb2xpbiBCZWNraW5naGFtIHdy
+b3RlOg0KPiA+Pj4+IEhpIFBldGVyOg0KPiA+Pj4+DQo+ID4+PiAuLi48c25pcD4uLi4NCj4gPj4+
+PiBJIHJhbiAjIGhjaWNvbmZpZyBoY2kwIHNzcG1vZGUgMSB0byBmb3JjZSB0aGUgYWRhcHRlciBp
+bnRvIGEgc2VjdXJlIGF0dGVtcHQuDQo+ID4+Pj4NCj4gPj4+PiBJIGRvd25sb2FkZWQgYW5kIGlu
+c3RhbGxlZCB0aGUgbGF0ZXN0IGhjaWR1bXAgd2hpY2ggaWRlbnRpZmllcyBpdHNlbGYNCj4gPj4+
+PiAoaGNpZHVtcCAtdikgYXMgMi4wIGV2ZW4gdGhvdWdoIGl0IGlzIG1hcmtlZCBhcyAyLjEgdmVy
+c2lvbiBvbiB0aGUgd2VicGFnZS4NCj4gPj4+Pg0KPiA+Pj4+IE1hZGUgYW5vdGhlciBhdHRlbXB0
+IHRvIGNvbm5lY3QsIGhlcmUgaXMgdGhlIHN5c2xvZw0KPiA+Pj4+DQo+ID4+Pj4gIyB0YWlsIC1u
+IDEwMCAvdmFyL2xvZy9tZXNzYWdlcyB8IGdyZXAgYmx1ZXRvb3RoZA0KPiA+Pj4+IEF1ZyAgNiAw
+NToxNTozOSBsaW51eC1jOTZoIGJsdWV0b290aGRbMTI0Nl06IEF1ZGlvIGNvbm5lY3Rpb24gZ290
+DQo+ID4+Pj4gZGlzY29ubmVjdGVkDQo+ID4+Pj4gQXVnICA2IDExOjIzOjI5IGxpbnV4LWM5Nmgg
+Ymx1ZXRvb3RoZFsxMjQ2XTogUmVqZWN0aW5nIHJlcXVlc3Q6IHJlbW90ZQ0KPiA+Pj4+IGRldmlj
+ZSBjYW4ndCBwcm92aWRlIE1JVE0NCj4gPj4+PiBBdWcgIDYgMTE6MjM6NTYgbGludXgtYzk2aCBi
+bHVldG9vdGhkWzEyNDZdOiBEaXNjb3Zlcnkgc2Vzc2lvbg0KPiA+Pj4+IDB4N2Y4MDFkMGE2Y2Ew
+IHdpdGggOjEuNDE3OCBhY3RpdmF0ZWQNCj4gPj4+PiBBdWcgIDYgMTE6MjQ6MDEgbGludXgtYzk2
+aCBibHVldG9vdGhkWzEyNDZdOiBTdG9wcGluZyBkaXNjb3ZlcnkNCj4gPj4+PiBBdWcgIDYgMTE6
+MjQ6MTMgbGludXgtYzk2aCBibHVldG9vdGhkWzEyNDZdOiBQZXJtaXNzaW9uIGRlbmllZCAoMTMp
+DQo+ID4+Pj4NCj4gPj4+PiBhbmQgYSBiaW5hcnkgaGNpZHVtcCBpcyBhdHRhY2hlZC4NCj4gPj4+
+DQo+ID4+PiBIaSBDb2xpbiwNCj4gPj4+DQo+ID4+PiBUaGF0IG1ha2VzIGEgbG90IG1vcmUgc2Vu
+c2UhDQo+ID4+Pg0KPiA+Pj4gV291bGQgeW91IHBsZWFzZSByZXBlYXQgdGhlIGV4cGVyaW1lbnQg
+d2l0aCBibHVldG9vdGhkIGluIGRlYnVnIG1vZGUsDQo+ID4+PiB0aG91Z2g/IFRoYXQgd291bGQg
+Z2l2ZSBtZSBhIGxvdCBtb3JlIGluZm9ybWF0aW9uIHRvIHdvcmsgd2l0aCBhYm91dCBob3cNCj4g
+Pj4+IGJsdWV0b290aGQgZ290IHRvIHRoYXQgcG9pbnQuDQo+ID4+Pg0KPiA+Pj4gQXMgYmVmb3Jl
+LCBwbGVhc2UgY2FwdHVyZSBoY2lkdW1wIGJpbmFyeSBhdCB0aGUgc2FtZSB0aW1lLiBBbHNvIHBs
+ZWFzZQ0KPiA+Pj4gaW5jbHVkZSBldmVyeSBibHVldG9vdGhkIHN5c2xvZyBtZXNzYWdlIHN0YXJ0
+aW5nIGZyb20gdGhlIHN0YXJ0IG9mIHRoZQ0KPiA+Pj4gZXhwZXJpbWVudC4NCj4gPj4+DQo+ID4+
+PiBJIGFwcHJlY2lhdGUgeW91ciBwYXRpZW5jZSBoZWxwaW5nIG1lIHRvIHRyYWNrIGRvd24gdGhp
+cyBidWcuDQo+ID4+Pg0KPiA+Pj4gUmVnYXJkcywNCj4gPj4+IFBldGVyIEh1cmxleQ0KPiA+Pg0K
+PiA+PiBTb3JyeSwgZm9yZ290IHRvIHNldCBibHVldG9vdGhkIGluIGRlYnVnIG1vZGUuDQo+ID4+
+DQo+ID4+IEF0dGFjaGVkIGFyZSBteSBsYXRlc3QgbG9ncywgMiBmaWxlcywgd2VwNDc1YS4qLiBO
+b3RlIGluIHRoZSBzeXNsb2cgdGhhdA0KPiA+PiB0aGUgZmlyc3QgZW50cnkgaXMgdGltZXN0YW1w
+ZWQgd2F5IGJlZm9yZSB0aGUgZXhwZXJpbWVudCB3YXMgbGF1bmNoZWQsDQo+ID4+IHNvIHRoZSBs
+b2cgc2hvdWxkIGhhdmUgZXZlcnl0aGluZyB0aGF0IGJsdWV0b290aGQgd3JvdGUgZm9yIHRoZSBj
+dXJyZW50DQo+ID4+IGV4cGVyaW1lbnQuDQo+ID4NCj4gPiBIaSBDb2xpbiwNCj4gPg0KPiA+IFdl
+bGwsIHRoZSBuZXcgbG9ncyBkaWQgbm90IHJlY3JlYXRlIHRoZSAiUmVqZWN0aW5nIHJlcXVlc3Q6
+IHJlbW90ZQ0KPiA+IGRldmljZSBjYW4ndCBwcm92aWRlIE1JVE0iLiBIb3dldmVyLCB0aGV5IGRp
+ZCBzaG93IDIgdGhpbmdzOg0KPiA+DQo+ID4gMS4gVGhlIGhvc3QgY29udHJvbGxlciBoYXMgYSBy
+YWNlIGNvbmRpdGlvbiBidWcgd2hpY2ggaGFzIGJlZW4gc2Vlbg0KPiA+IGJlZm9yZSAoc2VlIHRo
+aXMgdGhyZWFkDQo+ID4gaHR0cDovL2NvbW1lbnRzLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVl
+ei5rZXJuZWwvMTQyODYgZm9yIHRoZSByZWFsbHkNCj4gPiB0ZWNobmljYWwgZGlzY3Vzc2lvbikN
+Cj4gPg0KPiA+IFRoYXQncyB3aHkgdGhlIGluaXRpYWwgYXR0ZW1wdCBieSB0aGUgZGV2aWNlIGF0
+IGNvbm5lY3RpbmcgYW4gUkZDT01NDQo+ID4gY2hhbm5lbCBpcyByZWplY3RlZCAoQCAxMzoxMzow
+Mi41MzM3MTMpLg0KPiA+DQo+ID4gTmV2ZXJ0aGVsZXNzLCB0aGUgaGVhZHNldCBpcyBmb3VuZCBh
+bnl3YXkgYW5kIEJsdWV6IGNvbm5lY3RzIHRvIHRoZQ0KPiA+IGhlYWRzZXQuIEFmdGVyIGVzdGFi
+bGlzaGluZyBhbiBpbnNlY3VyZSBTRFAgbGluaywgQmx1ZXogYXR0ZW1wdHMgdG8gb3Blbg0KPiA+
+IGFuIFJGQ09NTSBjaGFubmVsIHRvIHRoZSBkZXZpY2UsIGFuZA0KPiA+DQo+ID4gMi4gdGhlIGtl
+cm5lbCBhdHRlbXB0cyB0byBjb25uZWN0IHRoZSBSRkNPTU0gY2hhbm5lbCBwcmlvciB0byB0aGUg
+bGluaw0KPiA+IGJlaW5nIGVuY3J5cHRlZCwgc28gdGhlIGRldmljZSByZWplY3RzIHRoZSBjb25u
+ZWN0aW9uLg0KPiA+DQo+ID4gVGhlcmUgd2VyZSBzb21lIGxhc3QgbWludXRlIGNoYW5nZXMgdG8g
+My4wIGZpbmFsIHRoYXQgZGlyZWN0bHkgaW1wYWN0cw0KPiA+IGhvdyB0aGlzIGlzIHN1cHBvc2Vk
+IHRvIHdvcmsuIEhvd2V2ZXIsIGV2ZW4gd2l0aCB0aG9zZSBjaGFuZ2VzIGl0J3MNCj4gPiB1bmNs
+ZWFyIHRvIG1lIGhvdyAjMiBpcyBoYXBwZW5pbmcuDQo+ID4NCj4gPiBXb3VsZCB5b3UgYmUgd2ls
+bGluZyB0byBydW4gdGhlIHNhbWUgZXhwZXJpbWVudCBhcyBiZWZvcmUgYnV0IHdpdGggdGhlDQo+
+ID4ga2VybmVsIGJsdWV0b290aCBtb2R1bGUgZW5hYmxlZCBmb3IgZGVidWcgb3V0cHV0PyAgSWYg
+eW91ciBrZXJuZWwgaXMNCj4gPiBjb25maWd1cmVkIGZvciBkeW5hbWljIGRlYnVnIChLZXJuZWwg
+aGFja2luZy9FbmFibGUgZHluYW1pYyBwcmludGsoKQ0KPiA+IHN1cHBvcnQgPT4gIFkpLCBkb2lu
+ZyB0aGlzIGlzIHRyaXZpYWw6DQo+ID4gIyBzdWRvIHN1DQo+ID4gIyBlY2hvIC1uICJtb2R1bGUg
+Ymx1ZXRvb3RoICtwIg0KPiA+ICAgICAgICAgICAgICAgICAgICAgID4gIC9zeXMva2VybmVsL2Rl
+YnVnL2R5bmFtaWNfZGVidWcvY29udHJvbA0KPiA+IDwgIHBlcmZvcm0gZXhwZXJpbWVudD4NCj4g
+PiAjIGVjaG8gLW4gIm1vZHVsZSBibHVldG9vdGggLXAiDQo+ID4gICAgICAgICAgICAgICAgICAg
+ICAgPiAgL3N5cy9rZXJuZWwvZGVidWcvZHluYW1pY19kZWJ1Zy9jb250cm9sDQo+ID4NCj4gPiBS
+ZWdhcmRzLA0KPiA+IFBldGVyIEh1cmxleQ0KPiANCj4gUGV0ZXIsIGJlZm9yZSBJIGRvIHRoaXMs
+IGxldCBtZSBqdXN0IHZlcmlmeSB0aGF0IG15IGtlcm5lbCBpcyBzZXQgdXAgDQo+IHJpZ2h0LiBJ
+IGNoZWNrZWQgZm9yIGR5bmFtaWMgcHJpbnRrIGFuZCBJIGFtIG5vdCBjbGVhciB0aGF0IEkgaGF2
+ZSB0aGUgDQo+IHNldHRpbmcgbmVlZGVkLiBIZXJlIGlzIHdoYXQgbXkgLmNvbmZpZyB0ZWxscyBt
+ZSBmb3IgZHluYW1pYyBhbmQgcHJpbnRrIA0KPiBzZXBhcmF0ZWx5Lg0KPiANCj4gID4gY2F0IC5j
+b25maWcgfCBncmVwIERZTkFNSUMNCj4gQ09ORklHX05FVENPTlNPTEVfRFlOQU1JQz15DQo+IENP
+TkZJR19EVkJfRFlOQU1JQ19NSU5PUlM9eQ0KPiBDT05GSUdfU05EX0RZTkFNSUNfTUlOT1JTPXkN
+Cj4gIyBDT05GSUdfVVNCX0RZTkFNSUNfTUlOT1JTIGlzIG5vdCBzZXQNCj4gQ09ORklHX0hBVkVf
+RFlOQU1JQ19GVFJBQ0U9eQ0KPiBDT05GSUdfRFlOQU1JQ19ERUJVRz15DQogIF5eXl5eXl5eDQoN
+ClRoaXMgaXMgdGhlIG9uZSBhbmQgaXQncyBzZXQgY29ycmVjdGx5Lg0KDQo+ICA+IGNhdCAuY29u
+ZmlnIHwgZ3JlcCBQUklOVEsNCj4gQ09ORklHX1BSSU5USz15DQo+IENPTkZJR19TTkRfVkVSQk9T
+RV9QUklOVEs9eQ0KPiBDT05GSUdfUFJJTlRLX1RJTUU9eQ0KPiAjIENPTkZJR19CT09UX1BSSU5U
+S19ERUxBWSBpcyBub3Qgc2V0DQo+IENPTkZJR19FQVJMWV9QUklOVEs9eQ0KPiBDT05GSUdfRUFS
+TFlfUFJJTlRLX0RCR1A9eQ0KPiANCj4gQ291bGQgeW91IGNvbmZpcm0gdGhhdCBJIGFtIG9rIHRv
+IGdvPw0KDQpCVFcsIEkganVzdCBmaWd1cmVkIG91dCBob3cgdGhlIGtlcm5lbCBkb2VzIHRoZSB3
+cm9uZyB0aGluZyBub3cuIElmIHlvdQ0Kd2FudCB0byB3YWl0IG9uIHJ1bm5pbmcgdGhpcyBleHBl
+cmltZW50LCB0aGF0J3MgZmluZSB3aXRoIG1lLiBJIGNhbg0KY29udGFjdCB5b3UgaWYgc29tZW9u
+ZSB3YW50cyBwcm9vZiB0aGF0IHRoaXMgaGFwcGVucy4NCg0KflBldGVyDQo=
