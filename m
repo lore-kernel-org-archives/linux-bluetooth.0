@@ -1,37 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 00/11] Immediate Alert patches
-Date: Mon,  8 Aug 2011 15:46:39 -0300
-Message-Id: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 8 Aug 2011 13:33:09 -0400
+Subject: [PATCH] Bluetooth: Fix l2cap conn failures for ssp devices
+Message-ID: <1312824789.2289.2.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dependency: none. RSSI threshold monitor patches are not required for
-this patch series.
-
-Implementation of D-Bus properties and GATT/ATT operations related to
-alert level of the Immediate alert service.
-
-Bruna Moreira (1):
-  Add read remote Tx Power
-
-Claudio Takahasi (10):
-  Add Immediate Alert handle discovery
-  Write Immediate Alert if necessary
-  Emit PropertyChanged after writting alert
-  Write Immediate Alert after discovering handle
-  Request connection when writting Immediate alert
-  Reset Immediate Alert after 5 seconds
-  Reset the Immediate Alert at disconnection
-  Set default value for ImmediateAlertLevel
-  Write Immediate Alert if connected
-  Fix wrong alert value for ImmediateAlertLevel
-
- proximity/monitor.c |  205 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 199 insertions(+), 6 deletions(-)
-
--- 
-1.7.6
-
+Q29tbWl0IDMzMDYwNTQyM2MgZml4ZWQgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBub24t
+c3NwIHJlbW90ZQ0KZGV2aWNlcyBieSBub3Qgc2V0dGluZyBIQ0lfQ09OTl9FTkNSWVBUX1BFTkQg
+ZXZlcnkgdGltZSBjb25uIHNlY3VyaXR5DQppcyB0ZXN0ZWQgKHdoaWNoIHdhcyBhbHdheXMgcmV0
+dXJuaW5nIGZhaWx1cmUgb24gYW55IHN1YnNlcXVlbnQNCnNlY3VyaXR5IGNoZWNrcykuDQoNCkhv
+d2V2ZXIsIHRoaXMgYnJva2UgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBzc3AgcmVtb3Rl
+IGRldmljZXMNCndoZW4gYW4gQUNMIGxpbmsgd2FzIGFscmVhZHkgZXN0YWJsaXNoZWQgYXQgU0RQ
+LWxldmVsIHNlY3VyaXR5LiBUaGlzDQpmaXggZW5zdXJlcyB0aGF0IGVuY3J5cHRpb24gbXVzdCBi
+ZSBwZW5kaW5nIHdoZW5ldmVyIGF1dGhlbnRpY2F0aW9uDQppcyBhbHNvIHBlbmRpbmcuDQoNClNp
+Z25lZC1vZmYtYnk6IFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPg0KLS0t
+DQogbmV0L2JsdWV0b290aC9oY2lfY29ubi5jIHwgICAgNSArKysrLQ0KIDEgZmlsZXMgY2hhbmdl
+ZCwgNCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L2Js
+dWV0b290aC9oY2lfY29ubi5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jDQppbmRleCA1MzBm
+OTAxLi42M2Q5OTQ5IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jDQorKysg
+Yi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCkBAIC02MjAsOCArNjIwLDExIEBAIGF1dGg6DQog
+CWlmICh0ZXN0X2JpdChIQ0lfQ09OTl9FTkNSWVBUX1BFTkQsICZjb25uLT5wZW5kKSkNCiAJCXJl
+dHVybiAwOw0KIA0KLQlpZiAoIWhjaV9jb25uX2F1dGgoY29ubiwgc2VjX2xldmVsLCBhdXRoX3R5
+cGUpKQ0KKwlpZiAoIWhjaV9jb25uX2F1dGgoY29ubiwgc2VjX2xldmVsLCBhdXRoX3R5cGUpKSB7
+DQorCQkvKiBlbmNyeXB0IG11c3QgYmUgcGVuZGluZyBpZiBhdXRoIGlzIGFsc28gcGVuZGluZyAq
+Lw0KKwkJc2V0X2JpdChIQ0lfQ09OTl9FTkNSWVBUX1BFTkQsICZjb25uLT5wZW5kKTsNCiAJCXJl
+dHVybiAwOw0KKwl9DQogDQogZW5jcnlwdDoNCiAJaWYgKGNvbm4tPmxpbmtfbW9kZSAmIEhDSV9M
+TV9FTkNSWVBUKQ0KLS0gDQoxLjcuNC4xDQoNCg==
