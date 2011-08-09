@@ -1,30 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Linux Bluetooth mini-summit in Prague
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Date: Tue, 09 Aug 2011 09:24:14 +0200
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1312874654.3373.97.camel@aeonflux>
-Mime-Version: 1.0
+Date: Tue, 9 Aug 2011 10:22:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: Re: [PATCH] Fix response for GetCurrentPlayerApplicationSettingValue
+Message-ID: <20110809072212.GA14581@dell>
+References: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312814927-2371-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everybody,
+Hi Lucas,
 
-we decided to have Bluetooth mini-summit in Prague along with the Kernel
-summit and the LinuxCon Europe.
+On Mon, Aug 08, 2011, Lucas De Marchi wrote:
+> According to AVRCP spec there's no player id in response.
+> ---
+>  parser/avrcp.c |    7 +------
+>  1 files changed, 1 insertions(+), 6 deletions(-)
 
-http://events.linuxfoundation.org/events/linux-kernel-summit/schedule
+Applied. Thanks.
 
-If you are interested in joining us, please contact Gustavo and myself
-for getting you on the invitation list.
+Feel free to tag hcidump patches with [PATCH hcidump] in the future.
 
-We are also collecting proposal for the agenda now. Right now everything
-is wide open, but the Bluetooth 3.0 and 4.0 will be two major topics as
-it seems.
-
-Regards
-
-Marcel
-
-
+Johan
