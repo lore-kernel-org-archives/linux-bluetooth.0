@@ -1,79 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 1/2] Fix memory issues in EDS PBAP
-Date: Wed, 10 Aug 2011 01:05:39 +0200
-Message-Id: <1312931140-9143-1-git-send-email-bulislaw@linux.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 14/14] Reset SignalLevel to unknown when disconnected
+Date: Tue,  9 Aug 2011 18:00:41 -0300
+Message-Id: <1312923641-12028-15-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1312923641-12028-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1312923641-12028-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/phonebook-ebook.c |   19 +++++++++++++------
- 1 files changed, 13 insertions(+), 6 deletions(-)
+ proximity/monitor.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/phonebook-ebook.c b/plugins/phonebook-ebook.c
-index e53da12..903cd01 100644
---- a/plugins/phonebook-ebook.c
-+++ b/plugins/phonebook-ebook.c
-@@ -343,10 +343,11 @@ done:
- }
+diff --git a/proximity/monitor.c b/proximity/monitor.c
+index 4b5a4ff..e28a79d 100644
+--- a/proximity/monitor.c
++++ b/proximity/monitor.c
+@@ -396,6 +396,13 @@ static void attio_disconnected_cb(gpointer user_data)
+ 	g_attrib_unref(monitor->attrib);
+ 	monitor->attrib = NULL;
  
- static GSList *traverse_sources(GSList *ebooks, GSList *sources,
--							char *default_src) {
-+							char **default_src) {
- 	GError *gerr;
- 
- 	while (sources != NULL) {
-+		char *uri;
- 		EBook *ebook = e_book_new(E_SOURCE(sources->data), &gerr);
- 		if (ebook == NULL) {
- 			error("Can't create user's address book: %s",
-@@ -357,12 +358,14 @@ static GSList *traverse_sources(GSList *ebooks, GSList *sources,
- 			continue;
- 		}
- 
--		if (g_strcmp0(default_src, e_source_get_uri(
--					E_SOURCE(sources->data))) == 0) {
-+		uri = e_source_get_uri(E_SOURCE(sources->data));
-+		if (g_strcmp0(*default_src, uri) == 0) {
- 			sources = sources->next;
-+			g_free(uri);
- 
- 			continue;
- 		}
-+		g_free(uri);
- 
- 		if (e_book_open(ebook, FALSE, &gerr) == FALSE) {
- 			error("Can't open e-book address book: %s",
-@@ -374,8 +377,9 @@ static GSList *traverse_sources(GSList *ebooks, GSList *sources,
- 			continue;
- 		}
- 
--		if (default_src == NULL)
--			default_src = e_source_get_uri(E_SOURCE(sources->data));
-+		if (*default_src == NULL)
-+			*default_src = e_source_get_uri(
-+						E_SOURCE(sources->data));
- 
- 		DBG("%s address book opened",
- 					e_source_peek_name(sources->data));
-@@ -416,11 +420,14 @@ static GSList *open_ebooks(void)
- 
- 		GSList *sources = e_source_group_peek_sources(group);
- 
--		ebooks = traverse_sources(ebooks, sources, default_src);
-+		ebooks = traverse_sources(ebooks, sources, &default_src);
- 
- 		list = list->next;
- 	}
- 
-+	g_free(default_src);
-+	g_object_unref(src_list);
++	g_free(monitor->signallevel);
++	monitor->signallevel = g_strdup("unknown");
 +
- 	return ebooks;
- }
- 
++	emit_property_changed(monitor->conn, path, PROXIMITY_INTERFACE,
++					"SignalLevel", DBUS_TYPE_STRING,
++					&monitor->signallevel);
++
+ 	device_get_address(device, &dba);
+ 	btd_adapter_disable_rssi_monitor(adapter, &dba);
+ 	monitor->rssimon = FALSE;
 -- 
 1.7.6
 
