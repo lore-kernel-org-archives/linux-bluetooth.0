@@ -2,85 +2,83 @@ Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH 1/4] Bluetooth: hci_cc_le_set_scan_enable() critical region
-Date: Tue,  9 Aug 2011 19:52:37 -0300
-Message-Id: <1312930360-30860-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1312930360-30860-1-git-send-email-andre.guedes@openbossa.org>
-References: <1312930360-30860-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 0/4] LE connection improvements
+Date: Tue,  9 Aug 2011 19:52:36 -0300
+Message-Id: <1312930360-30860-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch reduces the critial region (protected by hdev->lock) in
-hci_cc_le_set_scan_enable(). This way, only really needed code is
-protected.
+Hi all,
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_event.c |   21 +++++++++++----------
- 1 files changed, 11 insertions(+), 10 deletions(-)
+Currently, in order to establish a LE connection, the user must actively scan
+for LE devices (e.g. discovery or hcitool lescan command) before trying to
+connect to any device.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 55872ff..9910f81 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -894,23 +894,24 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 	if (!cp)
- 		return;
- 
--	hci_dev_lock(hdev);
--
- 	if (cp->enable == 0x01) {
- 		if (status) {
- 			mgmt_start_discovery_failed(hdev->id,
- 							bt_to_errno(status));
--			goto unlock;
-+			return;
- 		}
- 
- 		set_bit(HCI_LE_SCAN, &hdev->flags);
- 
- 		del_timer(&hdev->adv_timer);
-+
-+		hci_dev_lock(hdev);
- 		hci_adv_entries_clear(hdev);
-+		hci_dev_unlock(hdev);
- 
- 		if (mgmt_has_pending_stop_discov(hdev->id)) {
- 			mgmt_cancel_discovery(hdev->id);
--			goto unlock;
-+			return;
- 		}
- 
- 		if (!mgmt_is_interleaved_discovery(hdev->id))
-@@ -924,7 +925,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 				mgmt_start_discovery_failed(hdev->id,
- 							bt_to_errno(status));
- 
--			goto unlock;
-+			return;
- 		}
- 
- 		clear_bit(HCI_LE_SCAN, &hdev->flags);
-@@ -933,14 +934,14 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 		mgmt_discovering(hdev->id, 0);
- 
--		if (mgmt_has_pending_stop_discov(hdev->id))
-+		if (mgmt_has_pending_stop_discov(hdev->id)) {
- 			mgmt_stop_discovery_complete(hdev->id);
--		else
-+		} else {
-+			hci_dev_lock(hdev);
- 			mgmt_start_discovery_complete(hdev->id);
-+			hci_dev_unlock(hdev);
-+		}
- 	}
--
--unlock:
--	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_le_ltk_reply(struct hci_dev *hdev, struct sk_buff *skb)
+This approach is fine in common discovery + connect scenario (the user lists
+in-range devices and then choose one to connect to), but it isn't suitable for
+LE GATT profiles. In this later scenario, we're not interested in performing
+discovery because dual mode devices will waste 5.12 seconds performing inquiry
+which results we're not interested at all.
+
+To address this issue we've come up with some LE connection improvements which
+we plan to take in two steps:
+	1. Passive scan trigger
+	2. Early stop scan
+
+1. Passive scan trigger
+During LE connection, the destination address (the address we want to connect
+to) may not be in the advertising cache. Instead of returning error, we trigger
+the LE passive scan.
+
+The scan window and interval is 30 ms and 60 ms, respectively, and it runs for
+3869 ms. These parameters were chosen based on some simulation results sent to
+Bluetooth SIG mailing list (GATT Profile Architecture Working Group) in April
+2011.
+
+Once the passive scan is finished, we check if we have the advertising entry
+from the destination device. If so, we create the connection, otherwise the
+connection attempt fails.
+
+2. Early stop scan
+Once we find the LE advertising from the destination address, we don't need to
+continue scanning LE devices. If that happens, we cancel the ongoing scanning
+and create the connection.
+
+
+After those improvements we'll have a sort of optimized version of the General
+Connection Establishment Procedure describe in Bluetooth spec (volume 3,
+session 9.3.6).
+
+The optimization is done by always checking the advertising cache before
+triggering the passive scan. The idea is: if we already have cached the
+advertising report from the destination device we don't need to carry out the
+passive scan. This way, we have faster LE connection establishment.
+
+Those steps are a beginning effort to improve the LE connection establishment
+procedure. This RFC series* implements the "Passive scan trigger" step.
+
+Feedback are welcome.
+
+Regards,
+
+Andre Guedes.
+
+[*] Patch 1/4 isn't originally part of this patch series, but it may be needed
+to understand the following patches. We're waiting for discovery patches been
+pushed upstream to send it to the ML.
+
+Andre Guedes (4):
+  Bluetooth: hci_cc_le_set_scan_enable() critical region
+  Bluetooth: Add hci_do_le_scan() helper function
+  Bluetooth: Extend hci_conn_check_pending()
+  Bluetooth: LE passive scan trigger in hci_connect()
+
+ include/net/bluetooth/hci_core.h |    4 ++-
+ net/bluetooth/hci_conn.c         |   53 ++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_core.c         |   46 +++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |   35 +++++++++++++-----------
+ 4 files changed, 113 insertions(+), 25 deletions(-)
+
 -- 
 1.7.5.2
 
