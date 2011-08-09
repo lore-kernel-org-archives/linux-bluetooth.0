@@ -1,35 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 9 Aug 2011 16:26:55 -0400
-Subject: [PATCH v3] Bluetooth: Fix l2cap conn failures for ssp devices
-Message-ID: <1312921615.2261.1.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: anderson.briglia@openbossa.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH 7/7] Bluetooth: Remove RSSI monitor on disconnection
+Date: Tue,  9 Aug 2011 16:29:42 -0400
+Message-Id: <4e4198d3.0750640a.58f6.0ec9@mx.google.com>
+In-Reply-To: <1312921782-27523-1-git-send-email-y>
+References: <y>
+ <1312921782-27523-1-git-send-email-y>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Q29tbWl0IDMzMDYwNTQyM2MgZml4ZWQgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBub24t
-c3NwIHJlbW90ZQ0KZGV2aWNlcyBieSBub3Qgc2V0dGluZyBIQ0lfQ09OTl9FTkNSWVBUX1BFTkQg
-ZXZlcnkgdGltZSBjb25uIHNlY3VyaXR5DQppcyB0ZXN0ZWQgKHdoaWNoIHdhcyBhbHdheXMgcmV0
-dXJuaW5nIGZhaWx1cmUgb24gYW55IHN1YnNlcXVlbnQNCnNlY3VyaXR5IGNoZWNrcykuDQoNCkhv
-d2V2ZXIsIHRoaXMgYnJva2UgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBzc3AgcmVtb3Rl
-IGRldmljZXMNCndoZW4gYW4gQUNMIGxpbmsgd2FzIGFscmVhZHkgZXN0YWJsaXNoZWQgYXQgU0RQ
-LWxldmVsIHNlY3VyaXR5LiBUaGlzDQpmaXggZW5zdXJlcyB0aGF0IGVuY3J5cHRpb24gbXVzdCBi
-ZSBwZW5kaW5nIHdoZW5ldmVyIGF1dGhlbnRpY2F0aW9uDQppcyBhbHNvIHBlbmRpbmcuDQoNClNp
-Z25lZC1vZmYtYnk6IFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPg0KLS0t
-DQoNCnYyOiBBdm9pZHMgcG9zc2libGUgcmFjZSBjb25kaXRpb24gYmV0d2VlbiBoY2lfY29ubl9z
-ZWN1cml0eSBhbmQNCmhjaV9jb25uX2NvbXBsZXRlX2V2dA0KdjM6IEFjdHVhbGx5IGNvbXBpbGVz
-IDopDQoNCiBuZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMgfCAgICA0ICsrKysNCiAxIGZpbGVzIGNo
-YW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25l
-dC9ibHVldG9vdGgvaGNpX2Nvbm4uYyBiL25ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYw0KaW5kZXgg
-NTMwZjkwMS4uZTMzMzI3NCAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYw0K
-KysrIGIvbmV0L2JsdWV0b290aC9oY2lfY29ubi5jDQpAQCAtNTUzLDYgKzU1MywxMCBAQCBzdGF0
-aWMgaW50IGhjaV9jb25uX2F1dGgoc3RydWN0IGhjaV9jb25uICpjb25uLCBfX3U4IHNlY19sZXZl
-bCwgX191OCBhdXRoX3R5cGUpDQogDQogCWlmICghdGVzdF9hbmRfc2V0X2JpdChIQ0lfQ09OTl9B
-VVRIX1BFTkQsICZjb25uLT5wZW5kKSkgew0KIAkJc3RydWN0IGhjaV9jcF9hdXRoX3JlcXVlc3Rl
-ZCBjcDsNCisNCisJCS8qIGVuY3J5cHQgbXVzdCBiZSBwZW5kaW5nIGlmIGF1dGggaXMgYWxzbyBw
-ZW5kaW5nICovDQorCQlzZXRfYml0KEhDSV9DT05OX0VOQ1JZUFRfUEVORCwgJmNvbm4tPnBlbmQp
-Ow0KKw0KIAkJY3AuaGFuZGxlID0gY3B1X3RvX2xlMTYoY29ubi0+aGFuZGxlKTsNCiAJCWhjaV9z
-ZW5kX2NtZChjb25uLT5oZGV2LCBIQ0lfT1BfQVVUSF9SRVFVRVNURUQsDQogCQkJCQkJCXNpemVv
-ZihjcCksICZjcCk7DQotLSANCjEuNy40LjENCg0K
+From: Anderson Briglia <anderson.briglia@openbossa.org>
+
+Remove RSSI monitor from list when remote has been disconnected.
+
+Signed-off-by: Anderson Briglia <anderson.briglia@openbossa.org>
+---
+ net/bluetooth/mgmt.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9c90090..0174637 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2376,6 +2376,8 @@ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr)
+ 	if (sk)
+ 		sock_put(sk);
+ 
++	err = rssi_monitor_remove(index, bdaddr);
++
+ 	return err;
+ }
+ 
+-- 
+1.7.4.1
+
