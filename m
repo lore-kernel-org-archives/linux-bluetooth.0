@@ -1,44 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Aug 2011 10:24:26 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/11] Immediate Alert patches
-Message-ID: <20110809072426.GB14581@dell>
-References: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Linux Bluetooth mini-summit in Prague
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Date: Tue, 09 Aug 2011 09:24:14 +0200
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1312874654.3373.97.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi everybody,
 
-On Mon, Aug 08, 2011, Claudio Takahasi wrote:
-> Dependency: none. RSSI threshold monitor patches are not required for
-> this patch series.
-> 
-> Implementation of D-Bus properties and GATT/ATT operations related to
-> alert level of the Immediate alert service.
-> 
-> Bruna Moreira (1):
->   Add read remote Tx Power
-> 
-> Claudio Takahasi (10):
->   Add Immediate Alert handle discovery
->   Write Immediate Alert if necessary
->   Emit PropertyChanged after writting alert
->   Write Immediate Alert after discovering handle
->   Request connection when writting Immediate alert
->   Reset Immediate Alert after 5 seconds
->   Reset the Immediate Alert at disconnection
->   Set default value for ImmediateAlertLevel
->   Write Immediate Alert if connected
->   Fix wrong alert value for ImmediateAlertLevel
-> 
->  proximity/monitor.c |  205 +++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 files changed, 199 insertions(+), 6 deletions(-)
+we decided to have Bluetooth mini-summit in Prague along with the Kernel
+summit and the LinuxCon Europe.
 
-Applied. Thanks.
+http://events.linuxfoundation.org/events/linux-kernel-summit/schedule
 
-Johan
+If you are interested in joining us, please contact Gustavo and myself
+for getting you on the invitation list.
+
+We are also collecting proposal for the agenda now. Right now everything
+is wide open, but the Bluetooth 3.0 and 4.0 will be two major topics as
+it seems.
+
+Regards
+
+Marcel
+
+
