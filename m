@@ -1,63 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 9 Aug 2011 15:26:00 -0400
+Subject: [PATCH v2] Bluetooth: Fix l2cap conn failures for ssp devices
+Message-ID: <1312917960.2380.2.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAHymeZq774dz2nsP0Jonb_W4Oqu=O6XXV=hPuxBV0LM0_5Yf7A@mail.gmail.com>
-References: <CAHymeZq774dz2nsP0Jonb_W4Oqu=O6XXV=hPuxBV0LM0_5Yf7A@mail.gmail.com>
-From: Ash K <ashoksarf@gmail.com>
-Date: Tue, 9 Aug 2011 15:02:56 -0500
-Message-ID: <CAMhHtTz6WFcHsDrvC9P=e=HqcrgUizJ5y7NDJT_icszkijLXFA@mail.gmail.com>
-Subject: Re: can BT create N independent channels?
-To: james pruett <gpscruise@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
-
-Comments bellow:
-
-On Tue, Aug 9, 2011 at 12:14 PM, james pruett <gpscruise@gmail.com> wrote:
-> I am writing an Android APP using BT for a control application.
->
-> Q: If I am on a BT-headset call already, can I create a second BT-connection?
->
-> Eg, will the stack allow two independent BT audio channels?
-
-BlueZ does allow you to do it, but Android framework does not have
-this facility in it (Since it was meant to handle all the normal
-cases, which is to handle one call). You probably have to hack into
-Android to create two audio channels.
-
-Also remember that HF/HS audio means SCO connections and not all
-controllers support multiple SCO connections (Not sure if two
-controllers can provide you parallel SCO connections, though I know
-controllers supporting 2 SCO connections connecting two different
-controllers. Let me know if you find out if some one provides 2 SCOs
-between 2 devices).
-
->
-> I want normal calls in one channel, and I create a second signalling
-> channel for an unrelated purpose. I know there is Serial protocol, but
-> I want to avoid that if possible (Serial devices are more expensive
-> than audio devices...) I am going to send the audio into a DTMF
-> decoder to get ON/OFF control bits only.
-
-Why can't you use same AUDIO channel for both audio data and DTMF
-tone? A phone connection will not be established until you get
-ring/dial tone, on ring AUDIO will be sent to DTMF encoder and switch
-the AUDIO destination to speakers once the connection is established.
-
->
-> Thanks for any leads!
-> jim pruett
-> wikiSPEEDia.org
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
-
--- 
-Ash
+Q29tbWl0IDMzMDYwNTQyM2MgZml4ZWQgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBub24t
+c3NwIHJlbW90ZQ0KZGV2aWNlcyBieSBub3Qgc2V0dGluZyBIQ0lfQ09OTl9FTkNSWVBUX1BFTkQg
+ZXZlcnkgdGltZSBjb25uIHNlY3VyaXR5DQppcyB0ZXN0ZWQgKHdoaWNoIHdhcyBhbHdheXMgcmV0
+dXJuaW5nIGZhaWx1cmUgb24gYW55IHN1YnNlcXVlbnQNCnNlY3VyaXR5IGNoZWNrcykuDQoNCkhv
+d2V2ZXIsIHRoaXMgYnJva2UgbDJjYXAgY29ubiBlc3RhYmxpc2htZW50IGZvciBzc3AgcmVtb3Rl
+IGRldmljZXMNCndoZW4gYW4gQUNMIGxpbmsgd2FzIGFscmVhZHkgZXN0YWJsaXNoZWQgYXQgU0RQ
+LWxldmVsIHNlY3VyaXR5LiBUaGlzDQpmaXggZW5zdXJlcyB0aGF0IGVuY3J5cHRpb24gbXVzdCBi
+ZSBwZW5kaW5nIHdoZW5ldmVyIGF1dGhlbnRpY2F0aW9uDQppcyBhbHNvIHBlbmRpbmcuDQoNClNp
+Z25lZC1vZmYtYnk6IFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPg0KLS0t
+DQoNCnYyOiBBdm9pZHMgcG9zc2libGUgcmFjZSBjb25kaXRpb24gYmV0d2VlbiBoY2lfY29ubl9z
+ZWN1cml0eSBhbmQNCmhjaV9jb25uX2NvbXBsZXRlX2V2dA0KDQogbmV0L2JsdWV0b290aC9oY2lf
+Y29ubi5jIHwgICAgMyArKysNCiAxIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMCBk
+ZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYyBiL25l
+dC9ibHVldG9vdGgvaGNpX2Nvbm4uYw0KaW5kZXggNTMwZjkwMS4uNzAwZGFmNSAxMDA2NDQNCi0t
+LSBhL25ldC9ibHVldG9vdGgvaGNpX2Nvbm4uYw0KKysrIGIvbmV0L2JsdWV0b290aC9oY2lfY29u
+bi5jDQpAQCAtNTUyLDYgKzU1Miw5IEBAIHN0YXRpYyBpbnQgaGNpX2Nvbm5fYXV0aChzdHJ1Y3Qg
+aGNpX2Nvbm4gKmNvbm4sIF9fdTggc2VjX2xldmVsLCBfX3U4IGF1dGhfdHlwZSkNCiAJY29ubi0+
+YXV0aF90eXBlID0gYXV0aF90eXBlOw0KIA0KIAlpZiAoIXRlc3RfYW5kX3NldF9iaXQoSENJX0NP
+Tk5fQVVUSF9QRU5ELCAmY29ubi0+cGVuZCkpIHsNCisJCS8qIGVuY3J5cHQgbXVzdCBiZSBwZW5k
+aW5nIGlmIGF1dGggaXMgYWxzbyBwZW5kaW5nICovDQorCQlzZXRfYml0KEhDSV9DT05OX0VOQ1JZ
+UFRfUEVORCwgJmNvbm4tPnBlbmQpOw0KKw0KIAkJc3RydWN0IGhjaV9jcF9hdXRoX3JlcXVlc3Rl
+ZCBjcDsNCiAJCWNwLmhhbmRsZSA9IGNwdV90b19sZTE2KGNvbm4tPmhhbmRsZSk7DQogCQloY2lf
+c2VuZF9jbWQoY29ubi0+aGRldiwgSENJX09QX0FVVEhfUkVRVUVTVEVELA0KLS0gDQoxLjcuNC4x
+DQoNCg==
