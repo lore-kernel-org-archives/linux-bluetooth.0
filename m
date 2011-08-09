@@ -1,170 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC obexd 1/8] client: add plugin support
-Date: Tue,  9 Aug 2011 14:03:42 +0300
-Message-Id: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC obexd 2/8] client: add driver support
+Date: Tue,  9 Aug 2011 14:03:43 +0300
+Message-Id: <1312887829-4770-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
+References: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-Plugins can be enable/disable using -p/P options similarly to BlueZ,
-ofono and connman.
 ---
- Makefile.am       |   32 +++++++--
- client/genbuiltin |   17 +++++
- client/main.c     |   11 +++
- client/plugin.c   |  203 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/plugin.h   |   45 ++++++++++++
- 5 files changed, 302 insertions(+), 6 deletions(-)
- create mode 100755 client/genbuiltin
- create mode 100644 client/plugin.c
- create mode 100644 client/plugin.h
+ Makefile.am      |    3 +-
+ client/driver.c  |   85 ++++++++++++++++++++++++++++++++++++++
+ client/driver.h  |   35 ++++++++++++++++
+ client/ftp.c     |    2 +
+ client/pbap.c    |    2 +
+ client/session.c |  120 +++++++++++++++++++++++++-----------------------------
+ client/session.h |    3 -
+ 7 files changed, 182 insertions(+), 68 deletions(-)
+ create mode 100644 client/driver.c
+ create mode 100644 client/driver.h
 
 diff --git a/Makefile.am b/Makefile.am
-index d412f02..d3e89b9 100644
+index d3e89b9..d23114e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -120,9 +120,13 @@ endif
- if CLIENT
- service_in_files += client/obex-client.service.in
- 
-+client_builtin_modules =
-+client_builtin_sources =
-+client_builtin_nodist =
-+
- libexec_PROGRAMS += client/obex-client
- 
--client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
-+client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
- 				$(gwobex_sources) $(btio_sources) \
- 				client/main.c src/log.h src/log.c \
- 				client/manager.h client/manager.c \
-@@ -131,10 +135,24 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
- 				client/sync.h client/sync.c \
+@@ -136,7 +136,8 @@ client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
  				client/ftp.h client/ftp.c \
  				client/transfer.h client/transfer.c \
--				client/agent.h client/agent.c
-+				client/agent.h client/agent.c \
-+				client/plugin.h client/plugin.c
-+
-+client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@ -ldl
-+
-+client_obex_client_LDFLAGS = -Wl,--export-dynamic
-+
-+client_builtin_files = client/builtin.h $(client_builtin_nodist)
-+
-+nodist_client_obex_client_SOURCES = $(client_builtin_files)
-+
-+clientplugindir = $(libdir)/obex/client/plugins
-+
-+client/plugin.$(OBJEXT): client/builtin.h
+ 				client/agent.h client/agent.c \
+-				client/plugin.h client/plugin.c
++				client/plugin.h client/plugin.c \
++				client/driver.h client/driver.c
  
-+client/builtin.h: client/genbuiltin $(client_builtin_sources)
-+	$(AM_V_GEN)$(srcdir)/client/genbuiltin $(client_builtin_modules) > $@
+ client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@ -ldl
  
--client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@
- endif
- 
- service_DATA = $(service_in_files:.service.in=.service)
-@@ -143,15 +161,17 @@ AM_CFLAGS = @OPENOBEX_CFLAGS@ @BLUEZ_CFLAGS@ @EBOOK_CFLAGS@ \
- 			@GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
- 			@LIBICAL_CFLAGS@ -D_FILE_OFFSET_BITS=64 \
- 			@TRACKER_CFLAGS@ \
--			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\"
-+			-DOBEX_PLUGIN_BUILTIN -DPLUGINDIR=\""$(plugindir)"\" \
-+			-DOBEX_CLIENT_PLUGIN_BUILTIN -DCLIENTPLUGINDIR=\""$(clientplugindir)"\"
- 
- INCLUDES = -I$(builddir)/src -I$(srcdir)/src -I$(srcdir)/plugins \
- 				-I$(srcdir)/gdbus -I$(srcdir)/gwobex \
- 				-I$(srcdir)/btio -I$(srcdir)/gobex
- 
--CLEANFILES = $(service_DATA) $(builtin_files)
-+CLEANFILES = $(service_DATA) $(builtin_files) $(client_builtin_files)
- 
--EXTRA_DIST = src/genbuiltin $(doc_files) $(test_files) \
-+EXTRA_DIST = src/genbuiltin client/genbuiltin \
-+			$(doc_files) $(test_files) \
- 			src/obexd.service.in client/obex-client.service.in \
- 			plugins/phonebook-dummy.c plugins/phonebook-ebook.c \
- 			plugins/phonebook-tracker.c \
-diff --git a/client/genbuiltin b/client/genbuiltin
-new file mode 100755
-index 0000000..f3a549f
---- /dev/null
-+++ b/client/genbuiltin
-@@ -0,0 +1,17 @@
-+#!/bin/sh
-+
-+for i in $*
-+do
-+	echo "extern struct obex_client_plugin_desc __obex_client_builtin_$i;"
-+done
-+
-+echo
-+echo "static struct obex_client_plugin_desc *__obex_client_builtin[] = {"
-+
-+for i in $*
-+do
-+	echo "  &__obex_client_builtin_$i,"
-+done
-+
-+echo "  NULL"
-+echo "};"
-diff --git a/client/main.c b/client/main.c
-index 618ad21..053a482 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -36,10 +36,13 @@
- 
- #include "log.h"
- #include "manager.h"
-+#include "plugin.h"
- 
- static GMainLoop *event_loop = NULL;
- 
- static char *option_debug = NULL;
-+static char *option_plugin = NULL;
-+static char *option_noplugin = NULL;
- static gboolean option_stderr = FALSE;
- 
- static gboolean parse_debug(const char *key, const char *value,
-@@ -59,6 +62,10 @@ static GOptionEntry options[] = {
- 				"Enable debug information output", "DEBUG" },
- 	{ "stderr", 's', 0, G_OPTION_ARG_NONE, &option_stderr,
- 				"Write log information to stderr" },
-+	{ "plugin", 'p', 0, G_OPTION_ARG_STRING, &option_plugin,
-+				"Specify plugins to load", "NAME,..." },
-+	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
-+				"Specify plugins not to load", "NAME,..." },
- 	{ NULL },
- };
- 
-@@ -92,6 +99,8 @@ int main(int argc, char *argv[])
- 
- 	__obex_log_init("obex-client", option_debug, !option_stderr);
- 
-+	plugin_init(option_plugin, option_noplugin);
-+
- 	DBG("Entering main loop");
- 
- 	memset(&sa, 0, sizeof(sa));
-@@ -103,6 +112,8 @@ int main(int argc, char *argv[])
- 
- 	manager_exit();
- 
-+	plugin_cleanup();
-+
- 	g_main_loop_unref(event_loop);
- 
- 	__obex_log_cleanup();
-diff --git a/client/plugin.c b/client/plugin.c
+diff --git a/client/driver.c b/client/driver.c
 new file mode 100644
-index 0000000..e43e855
+index 0000000..54c5c3b
 --- /dev/null
-+++ b/client/plugin.c
-@@ -0,0 +1,203 @@
++++ b/client/driver.c
+@@ -0,0 +1,85 @@
 +/*
 + *
 + *  OBEX Server
@@ -192,188 +70,70 @@ index 0000000..e43e855
 +#include <config.h>
 +#endif
 +
-+#include <errno.h>
-+#include <dlfcn.h>
 +#include <string.h>
-+#include <sys/stat.h>
-+
++#include <errno.h>
 +#include <glib.h>
 +
-+#include "plugin.h"
++#include "session.h"
++#include "driver.h"
 +#include "log.h"
 +
-+/*
-+ * Plugins that are using libraries with threads and their own mainloop
-+ * will crash on exit. This is a bug inside these libraries, but there is
-+ * nothing much that can be done about it. One bad example is libebook.
-+ */
-+#ifdef NEED_THREADS
-+#define PLUGINFLAG (RTLD_NOW | RTLD_NODELETE)
-+#else
-+#define PLUGINFLAG (RTLD_NOW)
-+#endif
++static GSList *drivers = NULL;
 +
-+static GSList *plugins = NULL;
-+
-+struct obex_client_plugin {
-+	void *handle;
-+	struct obex_client_plugin_desc *desc;
-+};
-+
-+static gboolean add_plugin(void *handle, struct obex_client_plugin_desc *desc)
++struct driver_data *driver_find(const char *pattern)
 +{
-+	struct obex_client_plugin *plugin;
++	GSList *l;
 +
-+	if (desc->init == NULL)
-+		return FALSE;
++	for (l = drivers; l; l = l->next) {
++		struct driver_data *driver = l->data;
 +
-+	plugin = g_try_new0(struct obex_client_plugin, 1);
-+	if (plugin == NULL)
-+		return FALSE;
++		if (strcasecmp(pattern, driver->service) == 0)
++			return driver;
 +
-+	plugin->handle = handle;
-+	plugin->desc = desc;
-+
-+	if (desc->init() < 0) {
-+		g_free(plugin);
-+		return FALSE;
++		if (strcasecmp(pattern, driver->uuid) == 0)
++			return driver;
 +	}
 +
-+	plugins = g_slist_append(plugins, plugin);
-+	DBG("Plugin %s loaded", desc->name);
-+
-+	return TRUE;
++	return NULL;
 +}
 +
-+static gboolean check_plugin(struct obex_client_plugin_desc *desc,
-+				char **patterns, char **excludes)
++int driver_register(struct driver_data *driver)
 +{
-+	if (excludes) {
-+		for (; *excludes; excludes++)
-+			if (g_pattern_match_simple(*excludes, desc->name))
-+				break;
-+		if (*excludes) {
-+			info("Excluding %s", desc->name);
-+			return FALSE;
-+		}
++	if (!driver) {
++		error("Invalid driver");
++		return -EINVAL;
 +	}
 +
-+	if (patterns) {
-+		for (; *patterns; patterns++)
-+			if (g_pattern_match_simple(*patterns, desc->name))
-+				break;
-+		if (*patterns == NULL) {
-+			info("Ignoring %s", desc->name);
-+			return FALSE;
-+		}
++	if (driver_find(driver->service)) {
++		error("Permission denied: service %s already registered",
++			driver->service);
++		return -EPERM;
 +	}
 +
-+	return TRUE;
++	DBG("driver %p service %s registered", driver, driver->service);
++
++	drivers = g_slist_append(drivers, driver);
++
++	return 0;
 +}
 +
-+#include "builtin.h"
-+
-+gboolean plugin_init(const char *pattern, const char *exclude)
++void driver_unregister(struct driver_data *driver)
 +{
-+	gchar **patterns = NULL;
-+	gchar **excludes = NULL;
-+	GDir *dir;
-+	const char *file;
-+	unsigned int i;
-+
-+	if (strlen(CLIENTPLUGINDIR) == 0)
-+		return FALSE;
-+
-+	if (pattern)
-+		patterns = g_strsplit_set(pattern, ":, ", -1);
-+
-+	if (exclude)
-+		excludes = g_strsplit_set(exclude, ":, ", -1);
-+
-+	DBG("Loading builtin plugins");
-+
-+	for (i = 0; __obex_client_builtin[i]; i++) {
-+		if (check_plugin(__obex_client_builtin[i],
-+					patterns, excludes) == FALSE)
-+			continue;
-+
-+		add_plugin(NULL,  __obex_client_builtin[i]);
++	if (!g_slist_find(drivers, driver)) {
++		error("Unable to unregister: No such driver %p", driver);
++		return;
 +	}
 +
-+	DBG("Loading plugins %s", CLIENTPLUGINDIR);
++	DBG("driver %p service %s unregistered", driver, driver->service);
 +
-+	dir = g_dir_open(CLIENTPLUGINDIR, 0, NULL);
-+	if (!dir)
-+		return FALSE;
-+
-+	while ((file = g_dir_read_name(dir)) != NULL) {
-+		struct obex_client_plugin_desc *desc;
-+		void *handle;
-+		char *filename;
-+
-+		if (g_str_has_prefix(file, "lib") == TRUE ||
-+				g_str_has_suffix(file, ".so") == FALSE)
-+			continue;
-+
-+		filename = g_build_filename(CLIENTPLUGINDIR, file, NULL);
-+
-+		handle = dlopen(filename, PLUGINFLAG);
-+		if (handle == NULL) {
-+			error("Can't load plugin %s: %s", filename,
-+								dlerror());
-+			g_free(filename);
-+			continue;
-+		}
-+
-+		g_free(filename);
-+
-+		desc = dlsym(handle, "obex_client_plugin_desc");
-+		if (desc == NULL) {
-+			error("Can't load plugin description: %s", dlerror());
-+			dlclose(handle);
-+			continue;
-+		}
-+
-+		if (check_plugin(desc, patterns, excludes) == FALSE) {
-+			dlclose(handle);
-+			continue;
-+		}
-+
-+		if (add_plugin(handle, desc) == FALSE)
-+			dlclose(handle);
-+	}
-+
-+	g_dir_close(dir);
-+
-+	return TRUE;
++	drivers = g_slist_remove(drivers, driver);
 +}
-+
-+void plugin_cleanup(void)
-+{
-+	GSList *list;
-+
-+	DBG("Cleanup plugins");
-+
-+	for (list = plugins; list; list = list->next) {
-+		struct obex_client_plugin *plugin = list->data;
-+
-+		if (plugin->desc->exit)
-+			plugin->desc->exit();
-+
-+		if (plugin->handle != NULL)
-+			dlclose(plugin->handle);
-+
-+		g_free(plugin);
-+	}
-+
-+	g_slist_free(plugins);
-+}
-diff --git a/client/plugin.h b/client/plugin.h
+diff --git a/client/driver.h b/client/driver.h
 new file mode 100644
-index 0000000..1e2b906
+index 0000000..5979fe8
 --- /dev/null
-+++ b/client/plugin.h
-@@ -0,0 +1,45 @@
++++ b/client/driver.h
+@@ -0,0 +1,35 @@
 +/*
 + *
 + *  OBEX Server
@@ -397,28 +157,301 @@ index 0000000..1e2b906
 + *
 + */
 +
-+struct obex_client_plugin_desc {
-+	const char *name;
-+	int (*init) (void);
-+	void (*exit) (void);
++struct driver_data {
++	const char *service;
++	const char *uuid;
++	void *target;
++	int target_len;
++	int (*probe) (struct session_data *session);
++	void (*remove) (struct session_data *session);
 +};
 +
-+#ifdef OBEX_CLIENT_PLUGIN_BUILTIN
-+#define OBEX_CLIENT_PLUGIN_DEFINE(name, init, exit) \
-+		struct obex_client_plugin_desc __obex_client_builtin_ ## name = { \
-+			#name, init, exit \
-+		};
-+#else
-+#define OBEX_CLIENT_PLUGIN_DEFINE(name,init,exit) \
-+		extern struct obex_client_plugin_desc obex_client_plugin_desc \
-+				__attribute__ ((visibility("default"))); \
-+		struct obex_client_plugin_desc obex_plugin_desc = { \
-+			#name, init, exit \
-+		};
-+#endif
++int driver_register(struct driver_data *driver);
++void driver_unregister(struct driver_data *driver);
++struct driver_data *driver_find(const char *pattern);
+diff --git a/client/ftp.c b/client/ftp.c
+index d8557f2..98514fd 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -25,6 +25,8 @@
+ #include <config.h>
+ #endif
+ 
++#include <string.h>
 +
-+gboolean plugin_init(const char *pattern, const char *exclude);
-+void plugin_cleanup(void);
+ #include "session.h"
+ #include "transfer.h"
+ #include "ftp.h"
+diff --git a/client/pbap.c b/client/pbap.c
+index 38d5a47..a87ec07 100644
+--- a/client/pbap.c
++++ b/client/pbap.c
+@@ -27,6 +27,8 @@
+ #endif
+ 
+ #include <errno.h>
++#include <string.h>
++#include <stdio.h>
+ #include <glib.h>
+ #include <gdbus.h>
+ 
+diff --git a/client/session.c b/client/session.c
+index a89c760..79c178d 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -48,6 +48,7 @@
+ #include "session.h"
+ #include "btio.h"
+ #include "agent.h"
++#include "driver.h"
+ 
+ #define SESSION_INTERFACE  "org.openobex.Session"
+ #define SESSION_BASEPATH   "/org/openobex"
+@@ -61,10 +62,6 @@
+ 
+ static guint64 counter = 0;
+ 
+-static unsigned char pcsuite_uuid[] = { 0x00, 0x00, 0x50, 0x05, 0x00, 0x00,
+-					0x10, 0x00, 0x80, 0x00, 0x00, 0x02,
+-					0xEE, 0x00, 0x00, 0x01 };
+-
+ struct callback_data {
+ 	struct session_data *session;
+ 	sdp_session_t *sdp;
+@@ -93,10 +90,7 @@ struct session_data {
+ 	bdaddr_t src;
+ 	bdaddr_t dst;
+ 	uint8_t channel;
+-	char *service;		/* Service friendly name */
+-	const char *target;	/* OBEX Target UUID */
+-	int target_len;
+-	uuid_t uuid;		/* Bluetooth Service Class */
++	struct driver_data *driver;
+ 	gchar *path;		/* Session path */
+ 	DBusConnection *conn;
+ 	DBusConnection *conn_system; /* system bus connection */
+@@ -139,16 +133,8 @@ static void session_unregistered(struct session_data *session)
+ {
+ 	char *path;
+ 
+-	switch (session->uuid.value.uuid16) {
+-	case OBEX_FILETRANS_SVCLASS_ID:
+-		ftp_unregister_interface(session->conn, session->path);
+-		break;
+-	case PBAP_PSE_SVCLASS_ID:
+-		pbap_unregister_interface(session->conn, session->path);
+-		break;
+-	case IRMC_SYNC_SVCLASS_ID:
+-		sync_unregister_interface(session->conn, session->path);
+-	}
++	if (session->driver && session->driver->remove)
++		session->driver->remove(session);
+ 
+ 	path = session->path;
+ 	session->path = NULL;
+@@ -229,7 +215,6 @@ static void session_free(struct session_data *session)
+ 	g_free(session->adapter);
+ 	g_free(session->callback);
+ 	g_free(session->path);
+-	g_free(session->service);
+ 	g_free(session->owner);
+ 	g_free(session);
+ }
+@@ -306,6 +291,7 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	struct callback_data *callback = user_data;
+ 	struct session_data *session = callback->session;
++	struct driver_data *driver = session->driver;
+ 	GwObex *obex;
+ 	int fd;
+ 
+@@ -323,8 +309,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	fd = g_io_channel_unix_get_fd(io);
+ 
+-	obex = gw_obex_setup_fd(fd, session->target,
+-			session->target_len, NULL, NULL);
++	obex = gw_obex_setup_fd(fd, driver->target, driver->target_len,
++								NULL, NULL);
+ 
+ 	session->obex = obex;
+ 
+@@ -458,6 +444,37 @@ static gboolean process_callback(GIOChannel *io, GIOCondition cond,
+ 	return TRUE;
+ }
+ 
++static int bt_string2uuid(uuid_t *uuid, const char *string)
++{
++	uint32_t data0, data4;
++	uint16_t data1, data2, data3, data5;
++
++	if (sscanf(string, "%08x-%04hx-%04hx-%04hx-%08x%04hx",
++				&data0, &data1, &data2, &data3, &data4, &data5) == 6) {
++		uint8_t val[16];
++
++		data0 = g_htonl(data0);
++		data1 = g_htons(data1);
++		data2 = g_htons(data2);
++		data3 = g_htons(data3);
++		data4 = g_htonl(data4);
++		data5 = g_htons(data5);
++
++		memcpy(&val[0], &data0, 4);
++		memcpy(&val[4], &data1, 2);
++		memcpy(&val[6], &data2, 2);
++		memcpy(&val[8], &data3, 2);
++		memcpy(&val[10], &data4, 4);
++		memcpy(&val[14], &data5, 2);
++
++		sdp_uuid128_create(uuid, val);
++
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
+ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -466,6 +483,7 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
+ 	sdp_list_t *search, *attrid;
+ 	uint32_t range = 0x0000ffff;
+ 	GError *gerr = NULL;
++	uuid_t uuid;
+ 
+ 	if (cond & (G_IO_NVAL | G_IO_ERR))
+ 		goto failed;
+@@ -473,7 +491,10 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
+ 	if (sdp_set_notify(callback->sdp, search_callback, callback) < 0)
+ 		goto failed;
+ 
+-	search = sdp_list_append(NULL, &callback->session->uuid);
++	if (bt_string2uuid(&uuid, session->driver->uuid) < 0)
++		goto failed;
++
++	search = sdp_list_append(NULL, &uuid);
+ 	attrid = sdp_list_append(NULL, &range);
+ 
+ 	if (sdp_service_search_attr_async(callback->sdp,
+@@ -594,7 +615,7 @@ static struct session_data *session_find(const char *source,
+ 		if (bacmp(&session->dst, &adr))
+ 			continue;
+ 
+-		if (g_strcmp0(service, session->service))
++		if (g_strcmp0(service, session->driver->service))
+ 			continue;
+ 
+ 		if (channel && session->channel != channel)
+@@ -730,6 +751,7 @@ struct session_data *session_create(const char *source,
+ 	struct session_data *session;
+ 	struct callback_data *callback;
+ 	struct pending_req *req;
++	struct driver_data *driver;
+ 
+ 	if (destination == NULL)
+ 		return NULL;
+@@ -740,6 +762,10 @@ struct session_data *session_create(const char *source,
+ 		goto proceed;
+ 	}
+ 
++	driver = driver_find(service);
++	if (!driver)
++		return NULL;
++
+ 	session = g_try_malloc0(sizeof(*session));
+ 	if (session == NULL)
+ 		return NULL;
+@@ -765,27 +791,9 @@ struct session_data *session_create(const char *source,
+ 		str2ba(source, &session->src);
+ 
+ 	str2ba(destination, &session->dst);
+-	session->service = g_strdup(service);
+-
+-	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
+-		sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
+-	} else if (!g_ascii_strncasecmp(service, "FTP", 3)) {
+-		sdp_uuid16_create(&session->uuid, OBEX_FILETRANS_SVCLASS_ID);
+-		session->target = OBEX_FTP_UUID;
+-		session->target_len = OBEX_FTP_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(service, "PBAP", 4)) {
+-		sdp_uuid16_create(&session->uuid, PBAP_PSE_SVCLASS_ID);
+-		session->target = OBEX_PBAP_UUID;
+-		session->target_len = OBEX_PBAP_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(service, "SYNC", 4)) {
+-		sdp_uuid16_create(&session->uuid, IRMC_SYNC_SVCLASS_ID);
+-		session->target = OBEX_SYNC_UUID;
+-		session->target_len = OBEX_SYNC_UUID_LEN;
+-	} else if (!g_ascii_strncasecmp(service, "PCSUITE", 7)) {
+-		sdp_uuid128_create(&session->uuid, pcsuite_uuid);
+-	} else {
+-		return NULL;
+-	}
++	session->driver = driver;
++
++	DBG("driver %s", driver->service);
+ 
+ proceed:
+ 	callback = g_try_malloc0(sizeof(*callback));
+@@ -1286,8 +1294,6 @@ int session_pull(struct session_data *session,
+ const char *session_register(struct session_data *session,
+ 						GDBusDestroyFunction destroy)
+ {
+-	gboolean result = FALSE;
+-
+ 	if (session->path)
+ 		return session->path;
+ 
+@@ -1299,23 +1305,9 @@ const char *session_register(struct session_data *session,
+ 					NULL, NULL, session, destroy) == FALSE)
+ 		goto fail;
+ 
+-	switch (session->uuid.value.uuid16) {
+-	case OBEX_FILETRANS_SVCLASS_ID:
+-		result = ftp_register_interface(session->conn, session->path,
+-								session);
+-		break;
+-	case PBAP_PSE_SVCLASS_ID:
+-		result = pbap_register_interface(session->conn, session->path,
+-								session);
+-		break;
+-	case IRMC_SYNC_SVCLASS_ID:
+-		result = sync_register_interface(session->conn, session->path,
+-								session);
+-	}
+-
+-	if (result == FALSE) {
+-		g_dbus_unregister_interface(session->conn,
+-					session->path, SESSION_INTERFACE);
++	if (session->driver == NULL || session->driver->probe(session) < 0) {
++		g_dbus_unregister_interface(session->conn, session->path,
++							SESSION_INTERFACE);
+ 		goto fail;
+ 	}
+ 
+@@ -1432,7 +1424,7 @@ const char *session_get_path(struct session_data *session)
+ 
+ const char *session_get_target(struct session_data *session)
+ {
+-	return session->target;
++	return session->driver->target;
+ }
+ 
+ GwObex *session_get_obex(struct session_data *session)
+diff --git a/client/session.h b/client/session.h
+index 081a2c3..014daaf 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -25,9 +25,6 @@
+ #include <gdbus.h>
+ #include <gw-obex.h>
+ 
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-
+ struct session_data;
+ 
+ typedef void (*session_callback_t) (struct session_data *session,
 -- 
 1.7.6
 
