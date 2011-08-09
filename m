@@ -1,46 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>
-Subject: [PATCHv2 obexd] Use 'nice abort' when canceling outgoing OPP transer
-Date: Tue,  9 Aug 2011 11:41:06 +0200
-Message-Id: <1312882866-14011-1-git-send-email-radoslawjablonski@gmail.com>
+Cc: Slawomir Bochenski <lkslawek@gmail.com>
+Subject: [PATCH obexd] Fix missing Name header check in FTP action code
+Date: Tue,  9 Aug 2011 10:44:39 +0200
+Message-Id: <1312879479-4577-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously client was suddenly disconnecting to cancel
-outgoing OPP transfer. Now ABORT command will be sent
-before disconnecting with server in that scenario.
-
-This change is required to pass TC_CLIENT_OPH_BV_27_I PTS
-test case (not mandatory for qualification).
 ---
- gwobex/obex-xfer.c |    8 --------
- 1 files changed, 0 insertions(+), 8 deletions(-)
+ plugins/ftp.c |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/gwobex/obex-xfer.c b/gwobex/obex-xfer.c
-index 4013687..3a2ada8 100644
---- a/gwobex/obex-xfer.c
-+++ b/gwobex/obex-xfer.c
-@@ -98,18 +98,10 @@ gboolean gw_obex_xfer_do_abort(struct gw_obex_xfer *xfer) {
+diff --git a/plugins/ftp.c b/plugins/ftp.c
+index 57fd23b..8705975 100644
+--- a/plugins/ftp.c
++++ b/plugins/ftp.c
+@@ -541,6 +541,10 @@ int ftp_action(struct obex_session *os, obex_object_t *obj, void *user_data)
+ 	uint8_t action_id;
  
-     xfer->abort = TRUE;
+ 	name = obex_get_name(os);
++
++	if (name == NULL || !is_filename(name))
++		return -EBADR;
++
+ 	destname = obex_get_destname(os);
+ 	action_id = obex_get_action_id(os);
  
--#ifdef USE_NICE_ABORT
-     debug("Performing nice abort\n");
-     if (OBEX_CancelRequest(xfer->ctx->handle, TRUE) != 0)
-         return FALSE;
-     return TRUE;
--#else
--    debug("Performing abort through disconnection (without ABORT command)\n");
--    xfer->ctx->done = TRUE;
--    OBEX_CancelRequest(xfer->ctx->handle, FALSE);
--    obex_link_error(xfer->ctx);
--    return FALSE;
--#endif
- }
- 
- GwObexXfer *gw_obex_put_async(GwObex *ctx, const char *name, const char *type,
 -- 
-1.7.0.4
+1.7.4.1
 
