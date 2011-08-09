@@ -1,457 +1,254 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC obexd 2/8] client: add driver support
-Date: Tue,  9 Aug 2011 14:03:43 +0300
-Message-Id: <1312887829-4770-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
-References: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [RFC v2 1/2] Fix debug messages logging from non-built-in
+ plugins
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"par-gunnar.p.hjalmdahl@stericsson.com"
+	<par-gunnar.p.hjalmdahl@stericsson.com>,
+	"ulrik.lauren@stericsson.com" <ulrik.lauren@stericsson.com>
+Date: Tue, 09 Aug 2011 13:02:06 +0200
+In-Reply-To: <201108091239.10030.szymon.janc@tieto.com>
+References: <1312385452-9770-1-git-send-email-szymon.janc@tieto.com>
+	 <1312385452-9770-2-git-send-email-szymon.janc@tieto.com>
+	 <1312714979.3373.71.camel@aeonflux>
+	 <201108091239.10030.szymon.janc@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1312887726.3373.108.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
+Hi Szymon,
 
----
- Makefile.am      |    3 +-
- client/driver.c  |   85 ++++++++++++++++++++++++++++++++++++++
- client/driver.h  |   35 ++++++++++++++++
- client/ftp.c     |    2 +
- client/pbap.c    |    2 +
- client/session.c |  120 +++++++++++++++++++++++++-----------------------------
- client/session.h |    3 -
- 7 files changed, 182 insertions(+), 68 deletions(-)
- create mode 100644 client/driver.c
- create mode 100644 client/driver.h
+> > >  Makefile.am       |    3 ++-
+> > >  src/bluetooth.ver |    2 ++
+> > >  src/log.c         |   49 +++++++++++++++++++++++++++++++++++++++----------
+> > >  src/log.h         |    2 ++
+> > >  src/plugin.c      |    8 ++++++--
+> > >  5 files changed, 51 insertions(+), 13 deletions(-)
+> > > 
+> > > diff --git a/Makefile.am b/Makefile.am
+> > > index 68380d9..083ad27 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -285,7 +285,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+> > >  src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
+> > >  							@CAPNG_LIBS@ -ldl -lrt
+> > >  src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
+> > > -				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
+> > > +			 -Wl,--version-script=$(srcdir)/src/bluetooth.ver \
+> > > +			 -Wl,-u__start___debug -Wl,-u__stop___debug
+> > 
+> > Remind me again, we we need them here and in the bluetooth.ver file?
+> 
+> This (-u) make (force) those symbols to be generated (Linker is not generating
+> them if they are not dereferenced in code) and bluetooth.ver is used to
+> tell linker which symbols should be visible or not. 
 
-diff --git a/Makefile.am b/Makefile.am
-index d3e89b9..d23114e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -136,7 +136,8 @@ client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
- 				client/ftp.h client/ftp.c \
- 				client/transfer.h client/transfer.c \
- 				client/agent.h client/agent.c \
--				client/plugin.h client/plugin.c
-+				client/plugin.h client/plugin.c \
-+				client/driver.h client/driver.c
- 
- client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@ -ldl
- 
-diff --git a/client/driver.c b/client/driver.c
-new file mode 100644
-index 0000000..54c5c3b
---- /dev/null
-+++ b/client/driver.c
-@@ -0,0 +1,85 @@
-+/*
-+ *
-+ *  OBEX Server
-+ *
-+ *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <string.h>
-+#include <errno.h>
-+#include <glib.h>
-+
-+#include "session.h"
-+#include "driver.h"
-+#include "log.h"
-+
-+static GSList *drivers = NULL;
-+
-+struct driver_data *driver_find(const char *pattern)
-+{
-+	GSList *l;
-+
-+	for (l = drivers; l; l = l->next) {
-+		struct driver_data *driver = l->data;
-+
-+		if (strcasecmp(pattern, driver->service) == 0)
-+			return driver;
-+
-+		if (strcasecmp(pattern, driver->uuid) == 0)
-+			return driver;
-+	}
-+
-+	return NULL;
-+}
-+
-+int driver_register(struct driver_data *driver)
-+{
-+	if (!driver) {
-+		error("Invalid driver");
-+		return -EINVAL;
-+	}
-+
-+	if (driver_find(driver->service)) {
-+		error("Permission denied: service %s already registered",
-+			driver->service);
-+		return -EPERM;
-+	}
-+
-+	DBG("driver %p service %s registered", driver, driver->service);
-+
-+	drivers = g_slist_append(drivers, driver);
-+
-+	return 0;
-+}
-+
-+void driver_unregister(struct driver_data *driver)
-+{
-+	if (!g_slist_find(drivers, driver)) {
-+		error("Unable to unregister: No such driver %p", driver);
-+		return;
-+	}
-+
-+	DBG("driver %p service %s unregistered", driver, driver->service);
-+
-+	drivers = g_slist_remove(drivers, driver);
-+}
-diff --git a/client/driver.h b/client/driver.h
-new file mode 100644
-index 0000000..5979fe8
---- /dev/null
-+++ b/client/driver.h
-@@ -0,0 +1,35 @@
-+/*
-+ *
-+ *  OBEX Server
-+ *
-+ *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct driver_data {
-+	const char *service;
-+	const char *uuid;
-+	void *target;
-+	int target_len;
-+	int (*probe) (struct session_data *session);
-+	void (*remove) (struct session_data *session);
-+};
-+
-+int driver_register(struct driver_data *driver);
-+void driver_unregister(struct driver_data *driver);
-+struct driver_data *driver_find(const char *pattern);
-diff --git a/client/ftp.c b/client/ftp.c
-index d8557f2..98514fd 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -25,6 +25,8 @@
- #include <config.h>
- #endif
- 
-+#include <string.h>
-+
- #include "session.h"
- #include "transfer.h"
- #include "ftp.h"
-diff --git a/client/pbap.c b/client/pbap.c
-index 38d5a47..a87ec07 100644
---- a/client/pbap.c
-+++ b/client/pbap.c
-@@ -27,6 +27,8 @@
- #endif
- 
- #include <errno.h>
-+#include <string.h>
-+#include <stdio.h>
- #include <glib.h>
- #include <gdbus.h>
- 
-diff --git a/client/session.c b/client/session.c
-index a89c760..79c178d 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -48,6 +48,7 @@
- #include "session.h"
- #include "btio.h"
- #include "agent.h"
-+#include "driver.h"
- 
- #define SESSION_INTERFACE  "org.openobex.Session"
- #define SESSION_BASEPATH   "/org/openobex"
-@@ -61,10 +62,6 @@
- 
- static guint64 counter = 0;
- 
--static unsigned char pcsuite_uuid[] = { 0x00, 0x00, 0x50, 0x05, 0x00, 0x00,
--					0x10, 0x00, 0x80, 0x00, 0x00, 0x02,
--					0xEE, 0x00, 0x00, 0x01 };
--
- struct callback_data {
- 	struct session_data *session;
- 	sdp_session_t *sdp;
-@@ -93,10 +90,7 @@ struct session_data {
- 	bdaddr_t src;
- 	bdaddr_t dst;
- 	uint8_t channel;
--	char *service;		/* Service friendly name */
--	const char *target;	/* OBEX Target UUID */
--	int target_len;
--	uuid_t uuid;		/* Bluetooth Service Class */
-+	struct driver_data *driver;
- 	gchar *path;		/* Session path */
- 	DBusConnection *conn;
- 	DBusConnection *conn_system; /* system bus connection */
-@@ -139,16 +133,8 @@ static void session_unregistered(struct session_data *session)
- {
- 	char *path;
- 
--	switch (session->uuid.value.uuid16) {
--	case OBEX_FILETRANS_SVCLASS_ID:
--		ftp_unregister_interface(session->conn, session->path);
--		break;
--	case PBAP_PSE_SVCLASS_ID:
--		pbap_unregister_interface(session->conn, session->path);
--		break;
--	case IRMC_SYNC_SVCLASS_ID:
--		sync_unregister_interface(session->conn, session->path);
--	}
-+	if (session->driver && session->driver->remove)
-+		session->driver->remove(session);
- 
- 	path = session->path;
- 	session->path = NULL;
-@@ -229,7 +215,6 @@ static void session_free(struct session_data *session)
- 	g_free(session->adapter);
- 	g_free(session->callback);
- 	g_free(session->path);
--	g_free(session->service);
- 	g_free(session->owner);
- 	g_free(session);
- }
-@@ -306,6 +291,7 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
- {
- 	struct callback_data *callback = user_data;
- 	struct session_data *session = callback->session;
-+	struct driver_data *driver = session->driver;
- 	GwObex *obex;
- 	int fd;
- 
-@@ -323,8 +309,8 @@ static void rfcomm_callback(GIOChannel *io, GError *err, gpointer user_data)
- 
- 	fd = g_io_channel_unix_get_fd(io);
- 
--	obex = gw_obex_setup_fd(fd, session->target,
--			session->target_len, NULL, NULL);
-+	obex = gw_obex_setup_fd(fd, driver->target, driver->target_len,
-+								NULL, NULL);
- 
- 	session->obex = obex;
- 
-@@ -458,6 +444,37 @@ static gboolean process_callback(GIOChannel *io, GIOCondition cond,
- 	return TRUE;
- }
- 
-+static int bt_string2uuid(uuid_t *uuid, const char *string)
-+{
-+	uint32_t data0, data4;
-+	uint16_t data1, data2, data3, data5;
-+
-+	if (sscanf(string, "%08x-%04hx-%04hx-%04hx-%08x%04hx",
-+				&data0, &data1, &data2, &data3, &data4, &data5) == 6) {
-+		uint8_t val[16];
-+
-+		data0 = g_htonl(data0);
-+		data1 = g_htons(data1);
-+		data2 = g_htons(data2);
-+		data3 = g_htons(data3);
-+		data4 = g_htonl(data4);
-+		data5 = g_htons(data5);
-+
-+		memcpy(&val[0], &data0, 4);
-+		memcpy(&val[4], &data1, 2);
-+		memcpy(&val[6], &data2, 2);
-+		memcpy(&val[8], &data3, 2);
-+		memcpy(&val[10], &data4, 4);
-+		memcpy(&val[14], &data5, 2);
-+
-+		sdp_uuid128_create(uuid, val);
-+
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
- static gboolean service_callback(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -466,6 +483,7 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
- 	sdp_list_t *search, *attrid;
- 	uint32_t range = 0x0000ffff;
- 	GError *gerr = NULL;
-+	uuid_t uuid;
- 
- 	if (cond & (G_IO_NVAL | G_IO_ERR))
- 		goto failed;
-@@ -473,7 +491,10 @@ static gboolean service_callback(GIOChannel *io, GIOCondition cond,
- 	if (sdp_set_notify(callback->sdp, search_callback, callback) < 0)
- 		goto failed;
- 
--	search = sdp_list_append(NULL, &callback->session->uuid);
-+	if (bt_string2uuid(&uuid, session->driver->uuid) < 0)
-+		goto failed;
-+
-+	search = sdp_list_append(NULL, &uuid);
- 	attrid = sdp_list_append(NULL, &range);
- 
- 	if (sdp_service_search_attr_async(callback->sdp,
-@@ -594,7 +615,7 @@ static struct session_data *session_find(const char *source,
- 		if (bacmp(&session->dst, &adr))
- 			continue;
- 
--		if (g_strcmp0(service, session->service))
-+		if (g_strcmp0(service, session->driver->service))
- 			continue;
- 
- 		if (channel && session->channel != channel)
-@@ -730,6 +751,7 @@ struct session_data *session_create(const char *source,
- 	struct session_data *session;
- 	struct callback_data *callback;
- 	struct pending_req *req;
-+	struct driver_data *driver;
- 
- 	if (destination == NULL)
- 		return NULL;
-@@ -740,6 +762,10 @@ struct session_data *session_create(const char *source,
- 		goto proceed;
- 	}
- 
-+	driver = driver_find(service);
-+	if (!driver)
-+		return NULL;
-+
- 	session = g_try_malloc0(sizeof(*session));
- 	if (session == NULL)
- 		return NULL;
-@@ -765,27 +791,9 @@ struct session_data *session_create(const char *source,
- 		str2ba(source, &session->src);
- 
- 	str2ba(destination, &session->dst);
--	session->service = g_strdup(service);
--
--	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
--		sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
--	} else if (!g_ascii_strncasecmp(service, "FTP", 3)) {
--		sdp_uuid16_create(&session->uuid, OBEX_FILETRANS_SVCLASS_ID);
--		session->target = OBEX_FTP_UUID;
--		session->target_len = OBEX_FTP_UUID_LEN;
--	} else if (!g_ascii_strncasecmp(service, "PBAP", 4)) {
--		sdp_uuid16_create(&session->uuid, PBAP_PSE_SVCLASS_ID);
--		session->target = OBEX_PBAP_UUID;
--		session->target_len = OBEX_PBAP_UUID_LEN;
--	} else if (!g_ascii_strncasecmp(service, "SYNC", 4)) {
--		sdp_uuid16_create(&session->uuid, IRMC_SYNC_SVCLASS_ID);
--		session->target = OBEX_SYNC_UUID;
--		session->target_len = OBEX_SYNC_UUID_LEN;
--	} else if (!g_ascii_strncasecmp(service, "PCSUITE", 7)) {
--		sdp_uuid128_create(&session->uuid, pcsuite_uuid);
--	} else {
--		return NULL;
--	}
-+	session->driver = driver;
-+
-+	DBG("driver %s", driver->service);
- 
- proceed:
- 	callback = g_try_malloc0(sizeof(*callback));
-@@ -1286,8 +1294,6 @@ int session_pull(struct session_data *session,
- const char *session_register(struct session_data *session,
- 						GDBusDestroyFunction destroy)
- {
--	gboolean result = FALSE;
--
- 	if (session->path)
- 		return session->path;
- 
-@@ -1299,23 +1305,9 @@ const char *session_register(struct session_data *session,
- 					NULL, NULL, session, destroy) == FALSE)
- 		goto fail;
- 
--	switch (session->uuid.value.uuid16) {
--	case OBEX_FILETRANS_SVCLASS_ID:
--		result = ftp_register_interface(session->conn, session->path,
--								session);
--		break;
--	case PBAP_PSE_SVCLASS_ID:
--		result = pbap_register_interface(session->conn, session->path,
--								session);
--		break;
--	case IRMC_SYNC_SVCLASS_ID:
--		result = sync_register_interface(session->conn, session->path,
--								session);
--	}
--
--	if (result == FALSE) {
--		g_dbus_unregister_interface(session->conn,
--					session->path, SESSION_INTERFACE);
-+	if (session->driver == NULL || session->driver->probe(session) < 0) {
-+		g_dbus_unregister_interface(session->conn, session->path,
-+							SESSION_INTERFACE);
- 		goto fail;
- 	}
- 
-@@ -1432,7 +1424,7 @@ const char *session_get_path(struct session_data *session)
- 
- const char *session_get_target(struct session_data *session)
- {
--	return session->target;
-+	return session->driver->target;
- }
- 
- GwObex *session_get_obex(struct session_data *session)
-diff --git a/client/session.h b/client/session.h
-index 081a2c3..014daaf 100644
---- a/client/session.h
-+++ b/client/session.h
-@@ -25,9 +25,6 @@
- #include <gdbus.h>
- #include <gw-obex.h>
- 
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--
- struct session_data;
- 
- typedef void (*session_callback_t) (struct session_data *session,
--- 
-1.7.6
+but if no DBG calls are present, why bother. It is fine if dlsym fails
+for the main symbols. Or am I missing something?
+
+> > >  src_bluetoothd_DEPENDENCIES = lib/libbluetooth.la
+> > >  
+> > > diff --git a/src/bluetooth.ver b/src/bluetooth.ver
+> > > index b71c70d..6ff0df2 100644
+> > > --- a/src/bluetooth.ver
+> > > +++ b/src/bluetooth.ver
+> > > @@ -5,6 +5,8 @@
+> > >  		info;
+> > >  		error;
+> > >  		debug;
+> > > +		__start___debug;
+> > > +		__stop___debug;
+> > >  	local:
+> > >  		*;
+> > >  };
+> > 
+> > And why are they needed to be exported here. This means that also every
+> > single plugin can access them.
+> 
+> Otherwise those symbols will not be accessible via dlsym().
+
+I see. We have to get rid of dlsym() and do something similar to
+EXPORT_SYMBOL like the kernel does. Just default visibility to hidden
+and change it on a per symbol basis.
+
+> > > diff --git a/src/log.c b/src/log.c
+> > > index 2c492e9..9d89f7d 100644
+> > > --- a/src/log.c
+> > > +++ b/src/log.c
+> > > @@ -28,6 +28,7 @@
+> > >  #include <stdio.h>
+> > >  #include <stdarg.h>
+> > >  #include <syslog.h>
+> > > +#include <dlfcn.h>
+> > >  
+> > >  #include <glib.h>
+> > >  
+> > > @@ -66,10 +67,8 @@ void btd_debug(const char *format, ...)
+> > >  	va_end(ap);
+> > >  }
+> > >  
+> > > -extern struct btd_debug_desc __start___debug[];
+> > > -extern struct btd_debug_desc __stop___debug[];
+> > > -
+> > >  static gchar **enabled = NULL;
+> > > +static GSList *handles = NULL;
+> > >  
+> > >  static gboolean is_enabled(struct btd_debug_desc *desc)
+> > >  {
+> > > @@ -88,23 +87,27 @@ static gboolean is_enabled(struct btd_debug_desc *desc)
+> > >  
+> > >  void __btd_toggle_debug(void)
+> > >  {
+> > > -	struct btd_debug_desc *desc;
+> > > +	GSList *l;
+> > > +
+> > > +	for (l = handles; l; l = l->next) {
+> > > +		struct btd_debug_desc *start, *stop;
+> > >  
+> > > -	for (desc = __start___debug; desc < __stop___debug; desc++)
+> > > -		desc->flags |= BTD_DEBUG_FLAG_PRINT;
+> > > +		start = dlsym(l->data, "__start___debug");
+> > > +		stop = dlsym(l->data, "__stop___debug");
+> > > +
+> > > +		for (; start < stop; start++)
+> > > +			start->flags |= BTD_DEBUG_FLAG_PRINT;
+> > > +	}
+> > >  }
+> > 
+> > We might wanna check if the symbols actually exist first. It think it is
+> > perfectly valid to have plugins without any debug symbols.
+> 
+> We add handler to this list only if those symbols were found so no need to
+> check this here as well.
+> 
+> > 
+> > And after reading the rest of this patch, you confused me even more. Why
+> > to we have to dlsym the symbols again. Can we not just store them. I
+> > think this is a bit of waste.
+> 
+> I wanted to minimize need of memory allocations. Since we need to store two
+> pointers, we need to allocate structure for that and now we just store pointer
+> to handler.
+> 
+> But if you prefer to store those pointers directly I will do that (it was that
+> way in first version anyway..)
+
+I am not sure what is actually cheaper in the end. I prefer not to have
+the dlsym calls since eventually we wanna allow full dynamic changes for
+the debug settings.
+
+> > >  void __btd_log_init(const char *debug, int detach)
+> > >  {
+> > >  	int option = LOG_NDELAY | LOG_PID;
+> > > -	struct btd_debug_desc *desc;
+> > >  
+> > >  	if (debug != NULL)
+> > >  		enabled = g_strsplit_set(debug, ":, ", 0);
+> > >  
+> > > -	for (desc = __start___debug; desc < __stop___debug; desc++)
+> > > -		if (is_enabled(desc))
+> > > -			desc->flags |= BTD_DEBUG_FLAG_PRINT;
+> > > +	__btd_log_add(NULL);
+> > >  
+> > >  	if (!detach)
+> > >  		option |= LOG_PERROR;
+> > > @@ -116,7 +119,33 @@ void __btd_log_init(const char *debug, int detach)
+> > >  
+> > >  void __btd_log_cleanup(void)
+> > >  {
+> > > +	__btd_log_remove(NULL);
+> > > +
+> > >  	closelog();
+> > >  
+> > >  	g_strfreev(enabled);
+> > >  }
+> > > +
+> > > +void __btd_log_add(void *handle)
+> > > +{
+> > > +	struct btd_debug_desc *start, *stop;
+> > > +
+> > > +	start = dlsym(handle, "__start___debug");
+> > > +	stop = dlsym(handle, "__stop___debug");
+> > > +
+> > > +	if (!start || !stop) {
+> > > +		DBG("No __debug section found");
+> > > +		return;
+> > > +	}
+> > 
+> > So here you check the existence of start and stop. So why not store
+> > these entry points as well.
+> 
+> The idea was to store only handler with those symbols available.
+>  
+> > And please to start == NULL || stop == NULL.
+> > 
+> > > +	for (; start < stop; start++)
+> > > +		if (is_enabled(start))
+> > > +			start->flags |= BTD_DEBUG_FLAG_PRINT;
+> > > +
+> > > +	handles = g_slist_prepend(handles, handle);
+> > > +}
+> > > +
+> > > +void __btd_log_remove(void *handle)
+> > > +{
+> > > +	handles = g_slist_remove(handles, handle);
+> > > +}
+> > > diff --git a/src/log.h b/src/log.h
+> > > index 78bbdd8..6bb1a96 100644
+> > > --- a/src/log.h
+> > > +++ b/src/log.h
+> > > @@ -29,6 +29,8 @@ void btd_debug(const char *format, ...) __attribute__((format(printf, 1, 2)));
+> > >  void __btd_log_init(const char *debug, int detach);
+> > >  void __btd_log_cleanup(void);
+> > >  void __btd_toggle_debug(void);
+> > > +void __btd_log_add(void *handle);
+> > > +void __btd_log_remove(void *handle);
+> > >  
+> > >  struct btd_debug_desc {
+> > >  	const char *file;
+> > > diff --git a/src/plugin.c b/src/plugin.c
+> > > index 3506553..05855de 100644
+> > > --- a/src/plugin.c
+> > > +++ b/src/plugin.c
+> > > @@ -202,7 +202,9 @@ gboolean plugin_init(GKeyFile *config, const char *enable, const char *disable)
+> > >  			continue;
+> > >  		}
+> > >  
+> > > -		if (add_plugin(handle, desc) == FALSE)
+> > > +		if (add_plugin(handle, desc) == TRUE)
+> > > +			__btd_log_add(handle);
+> > > +		else
+> > >  			dlclose(handle);
+> > >  	}
+> > >  
+> > > @@ -239,8 +241,10 @@ void plugin_cleanup(void)
+> > >  		if (plugin->active == TRUE && plugin->desc->exit)
+> > >  			plugin->desc->exit();
+> > >  
+> > > -		if (plugin->handle != NULL)
+> > > +		if (plugin->handle != NULL) {
+> > > +			__btd_log_remove(plugin->handle);
+> > >  			dlclose(plugin->handle);
+> > > +		}
+> > >  
+> > >  		g_free(plugin);
+> > >  	}
+> > 
+> > So besides the fact that I think we should store the plugin start and
+> > stop symbols and the weird linker requirements, this looks good.
+> 
+> I'll store those pointers directly. As for linker stuff the only solution
+> other than using -u flag is to dereference those symbols in code directly.
+> 
+> I'll send V3 shortly that will try to address those issues.
+
+Sounds good.
+
+Regards
+
+Marcel
+
 
