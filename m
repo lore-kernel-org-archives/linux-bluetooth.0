@@ -1,53 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 00/14] Userspace patches for RSSI threshold monitor
-Date: Tue,  9 Aug 2011 18:00:27 -0300
-Message-Id: <1312923641-12028-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 9 Aug 2011 16:42:41 -0400
+Subject: [PATCH v2] Bluetooth: Preserve auth + encrypt for sec mode 3 remotes
+Message-ID: <1312922561.2261.9.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dependency: kernel patches sent from Anderson Briglia implementing the
-RSSI threshold monitor in the kernel: "[PATCH 0/7] RSSI Monitor"
-
-The following patches are implementing the userspace functions to handle
-RSSI threshold monitor, required for Proximity Path Loss. The mgmt-api
-changes was proposed by: "[PATCH] Add RSSI Monitor documentation API"
-(sent to ML)
-
-Initial RFC of this patch series: "[RFC BlueZ 0/8] Userspace patches
-for RSSI threshold monitor".
-
-Changes since the RFC: Included changes in the Proximity Monitor.
-Initial RFC was including changes in the mgmtops and adapter only.
-
-Claudio Takahasi (14):
-  Add RSSI threshold monitor definition in mgmt
-  Add RSSI threshold monitor implementation
-  Add enable RSSI threshold monitoring
-  Return FALSE if RSSI monitor is already enabled
-  Add disable for RSSI threshold monitor
-  Add adapter_ops calls for RSSI Enable/Disable
-  Notify registered monitors when alert is triggered
-  Add handle for RSSI monitor alert event in mgmt
-  Add RSSI threshold monitor in Proximity Monitor
-  Disable RSSI monitor when device is removed
-  Disable RSSI threshold monitor when disconnected
-  Emit SignalLevel when RSSI alert is received
-  Define low/high RSSI threshold for Proximity
-  Reset SignalLevel to unknown when disconnected
-
- lib/mgmt.h          |   18 ++++++++++
- plugins/hciops.c    |   13 +++++++
- plugins/mgmtops.c   |   85 ++++++++++++++++++++++++++++++++++++++++++++++++
- proximity/monitor.c |   75 +++++++++++++++++++++++++++++++++++++++++--
- src/adapter.c       |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h       |   13 +++++++
- src/event.c         |   14 ++++++++
- src/event.h         |    2 +
- 8 files changed, 306 insertions(+), 3 deletions(-)
-
--- 
-1.7.6
-
+TGVnYWN5IHJlbW90ZSBkZXZpY2VzICh2IDIuMC0pIGNhbiBlc3RhYmxpc2ggbGluay1sZXZlbA0K
+ZW5jcnlwdGlvbiBhcyBwYXJ0IG9mIEFDTCBjb25uZWN0aW9uIGVzdGFibGlzaG1lbnQNCihpZS4s
+IHNlY3VyaXR5IG1vZGUgMykuIFRoZSBob3N0IGNvbnRyb2xsZXIgaW5kaWNhdGVzIGxpbmstbGV2
+ZWwNCmVuY3J5cHRpb24gaXMgZXN0YWJsaXNoZWQgaW4gdGhpcyBjYXNlIHdpdGggdGhlDQpFbmNy
+eXB0aW9uX0VuYWJsZWQgZmxhZyBvZiB0aGUgQ29ubmVjdGlvbiBDb21wbGV0ZSBldmVudC4NCg0K
+VGhpcyB0d28tcGFydCBmaXggZmlyc3Qgc2V0cyB0aGUgY29ycmVjdCBsaW5rIHN0YXRlIGZvciB0
+aGlzDQpjb25kaXRpb24gYW5kLCBzZWNvbmQsIGJ5cGFzc2VzIGFkZGl0aW9uYWwgYXV0aCArIGVu
+Y3J5cHQgZm9yDQpzdWJzZXF1ZW50IHNlY3VyaXR5IGxldmVsIGVsZXZhdGlvbnMgKHVwIHRvIGJ1
+dCBub3QgaW5jbHVkaW5nDQpCVF9TRUNVUklUWV9ISUdIKS4NCg0KU2lnbmVkLW9mZi1ieTogUGV0
+ZXIgSHVybGV5IDxwZXRlckBodXJsZXlzb2Z0d2FyZS5jb20+DQotLS0NCg0KdjI6IFJlbW92ZSBy
+ZWR1bmRhbnQgc3NwX21vZGUgdGVzdHMgYW5kIHNldCBjb25uZWN0aW9uDQpzZWN1cml0eSBsZXZl
+bCBmcm9tIHBlbmRpbmcgd2hlbiBoYW5kbGluZyBjb25uX2NvbXBsZXRlIGV2dCANCg0KIG5ldC9i
+bHVldG9vdGgvaGNpX2Nvbm4uYyAgfCAgIDEzICsrKysrKysrKysrLS0NCiBuZXQvYmx1ZXRvb3Ro
+L2hjaV9ldmVudC5jIHwgICAgOSArKysrKysrKysNCiAyIGZpbGVzIGNoYW5nZWQsIDIwIGluc2Vy
+dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hj
+aV9jb25uLmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCmluZGV4IGUzMzMyNzQuLmJmZGQ2
+M2YgMTAwNjQ0DQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCisrKyBiL25ldC9ibHVl
+dG9vdGgvaGNpX2Nvbm4uYw0KQEAgLTU0MSw5ICs1NDEsMTggQEAgc3RhdGljIGludCBoY2lfY29u
+bl9hdXRoKHN0cnVjdCBoY2lfY29ubiAqY29ubiwgX191OCBzZWNfbGV2ZWwsIF9fdTggYXV0aF90
+eXBlKQ0KIAlpZiAoY29ubi0+cGVuZGluZ19zZWNfbGV2ZWwgPiBzZWNfbGV2ZWwpDQogCQlzZWNf
+bGV2ZWwgPSBjb25uLT5wZW5kaW5nX3NlY19sZXZlbDsNCiANCi0JaWYgKHNlY19sZXZlbCA+IGNv
+bm4tPnNlY19sZXZlbCkNCisJaWYgKHNlY19sZXZlbCA+IGNvbm4tPnNlY19sZXZlbCkgew0KIAkJ
+Y29ubi0+cGVuZGluZ19zZWNfbGV2ZWwgPSBzZWNfbGV2ZWw7DQotCWVsc2UgaWYgKGNvbm4tPmxp
+bmtfbW9kZSAmIEhDSV9MTV9BVVRIKQ0KKwkJLyogTGVnYWN5IHNlY3VyaXR5IG1vZGUgMyByZW1v
+dGUgZGV2aWNlcyB0aGF0IGFyZSBhbHJlYWR5DQorCQkgKiBhdXRoJ2QgZG8gbm90IG5lZWQgdG8g
+cmUtYXV0aCB1bmxlc3MgcHJvbW90aW5nIHRvDQorCQkgKiBCVF9TRUNVUklUWV9ISUdIICovDQor
+CQlpZiAoIShjb25uLT5oZGV2LT5zc3BfbW9kZSA+IDAgJiYgY29ubi0+c3NwX21vZGUgPiAwKSAm
+Jg0KKwkJCQkoc2VjX2xldmVsICE9IEJUX1NFQ1VSSVRZX0hJR0gpICYmDQorCQkJCShjb25uLT5s
+aW5rX21vZGUgJiBIQ0lfTE1fQVVUSCkpIHsNCisJCQljb25uLT5zZWNfbGV2ZWwgPSBzZWNfbGV2
+ZWw7DQorCQkJcmV0dXJuIDE7DQorCQl9DQorCX0gZWxzZSBpZiAoY29ubi0+bGlua19tb2RlICYg
+SENJX0xNX0FVVEgpDQogCQlyZXR1cm4gMTsNCiANCiAJLyogTWFrZSBzdXJlIHdlIHByZXNlcnZl
+IGFuIGV4aXN0aW5nIE1JVE0gcmVxdWlyZW1lbnQqLw0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9v
+dGgvaGNpX2V2ZW50LmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQppbmRleCA3NzkzMGFh
+Li40NjRjZmI0IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KKysrIGIv
+bmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KQEAgLTEzMTEsNiArMTMxMSwxNSBAQCBzdGF0aWMg
+aW5saW5lIHZvaWQgaGNpX2Nvbm5fY29tcGxldGVfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBz
+dHJ1Y3Qgc2tfYnVmZiAqcw0KIAkJaWYgKHRlc3RfYml0KEhDSV9FTkNSWVBULCAmaGRldi0+Zmxh
+Z3MpKQ0KIAkJCWNvbm4tPmxpbmtfbW9kZSB8PSBIQ0lfTE1fRU5DUllQVDsNCiANCisJCS8qIElu
+ZGljYXRlIHRoZSBjb3JyZWN0IGxpbmsgc3RhdGUgZm9yIGxlZ2FjeSBzZWMgbW9kZSAzDQorCQkg
+KiByZW1vdGUgZGV2aWNlcyBmb3Igd2hpY2ggdGhlIExNIGhhcyBhbHJlYWR5IGVzdGFibGlzaGVk
+DQorCQkgKiBsaW5rIGVuY3J5cHRpb24gKi8NCisJCWlmIChjb25uLT50eXBlID09IEFDTF9MSU5L
+ICYmIGV2LT5lbmNyX21vZGUgPT0gMHgwMSAmJg0KKwkJCQljb25uLT5wZW5kaW5nX3NlY19sZXZl
+bCAhPSBCVF9TRUNVUklUWV9ISUdIKSB7DQorCQkJY29ubi0+bGlua19tb2RlIHw9IEhDSV9MTV9B
+VVRIIHwgSENJX0xNX0VOQ1JZUFQ7DQorCQkJY29ubi0+c2VjX2xldmVsID0gY29ubi0+cGVuZGlu
+Z19zZWNfbGV2ZWw7DQorCQl9DQorDQogCQkvKiBHZXQgcmVtb3RlIGZlYXR1cmVzICovDQogCQlp
+ZiAoY29ubi0+dHlwZSA9PSBBQ0xfTElOSykgew0KIAkJCXN0cnVjdCBoY2lfY3BfcmVhZF9yZW1v
+dGVfZmVhdHVyZXMgY3A7DQotLSANCjEuNy40LjENCg0K
