@@ -1,99 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] [RFC] BTUSB: be quiet on device disconnect
-From: Paul Bolle <pebolle@tiscali.nl>
-To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan"
- <padovan@profusion.mobi>, Greg Kroah-Hartman <gregkh@suse.de>
-Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 09 Aug 2011 17:16:28 +0200
-Message-ID: <1312902988.1853.24.camel@x61.thuisdomein>
-Mime-Version: 1.0
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 9 Aug 2011 09:21:30 -0400
+Subject: [PATCH] Bluetooth: Preserve auth + encrypt for sec mode 3 remotes
+Message-ID: <1312896090.2320.2.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disabling the bluetooth usb device embedded in (some) ThinkPads tends to
-lead to errors like these:
-    btusb_bulk_complete: hci0 urb ffff88011b9bfd68 failed to resubmit (19)
-    btusb_intr_complete: hci0 urb ffff88011b46a318 failed to resubmit (19)
-    btusb_bulk_complete: hci0 urb ffff88011b46a000 failed to resubmit (19)
-
-That is because usb_disconnect() doesn't "quiesces" pending urbs.
-
-Disconnecting a device is a normal thing to happen so it's no big deal
-that usb_submit_urb() returns -ENODEV. The simplest way to get rid of
-these errors is to stop treating that return as an error. Trivial,
-actually.
-
-While we're at it, add comments to be explicit about the reasons we're
-not complaining about -EPERM and -ENODEV.
-
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
----
-0) This patch seems to put an end to a pet peeve of mine: the errors in
-the logs of a ThinkPad when I disable its embedded bluetooth.
-
-1) I added Greg and linux-usb@vger.kernel.org because usb_submit_urb()
-doesn't specify the meaning of its negative return values. I traced
--EPERM to usb_hcd_link_urb_to_ep(). That returns -EPERM if the urb is
-"being killed". Did I trace the calls made by usb_submit_urb()
-correctly? I also just assumed that -ENODEV always means device got
-disconnected or something comparable. Is that correct too?
-
-2) Sent as an RFC because btusb's btusb_*_complete() functions puzzle
-me. If I read their code correctly these three functions will be an
-urb's completion handler when usb_submit_urb() is called on that urb.
-This means they will be called when usb_submit_urb() is done doing its
-stuff. But they themselves also call usb_submit_urb()! So, apparently,
-there's this endless loop:
-    usb_submit_urb()
-        btusb_*_complete()
-           usb_submit_urb()
-               [...]
-
-It seems that usb_submit_urb() returning -EPERM is the expected way for
-this loop to end. Am I reading this correctly? If so, doesn't this need
-some comments to explain that? But perhaps calling usb_submit_urb() in a
-completion handler is a common pattern for usb devices.
-
- drivers/bluetooth/btusb.c |   12 +++++++++---
- 1 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 91d13a9..9e4448e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -256,7 +256,9 @@ static void btusb_intr_complete(struct urb *urb)
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
--		if (err != -EPERM)
-+		/* -EPERM: urb is being killed;
-+		 * -ENODEV: device got disconnected */
-+		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
-@@ -341,7 +343,9 @@ static void btusb_bulk_complete(struct urb *urb)
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
--		if (err != -EPERM)
-+		/* -EPERM: urb is being killed;
-+		 * -ENODEV: device got disconnected */
-+		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
-@@ -431,7 +435,9 @@ static void btusb_isoc_complete(struct urb *urb)
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
--		if (err != -EPERM)
-+		/* -EPERM: urb is being killed;
-+		 * -ENODEV: device got disconnected */
-+		if (err != -EPERM && err != -ENODEV)
- 			BT_ERR("%s urb %p failed to resubmit (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--- 
-1.7.4.4
+TGVnYWN5IHJlbW90ZSBkZXZpY2VzICh2IDIuMC0pIGNhbiBlc3RhYmxpc2ggbGluay1sZXZlbA0K
+ZW5jcnlwdGlvbiBhcyBwYXJ0IG9mIEFDTCBjb25uZWN0aW9uIGVzdGFibGlzaG1lbnQNCihpZS4s
+IHNlY3VyaXR5IG1vZGUgMykuIFRoZSBob3N0IGNvbnRyb2xsZXIgaW5kaWNhdGVzIGxpbmstbGV2
+ZWwNCmVuY3J5cHRpb24gaXMgZXN0YWJsaXNoZWQgaW4gdGhpcyBjYXNlIHdpdGggdGhlDQpFbmNy
+eXB0aW9uX0VuYWJsZWQgZmxhZyBvZiB0aGUgQ29ubmVjdGlvbiBDb21wbGV0ZSBldmVudC4NCg0K
+VGhpcyB0d28tcGFydCBmaXggZmlyc3Qgc2V0cyB0aGUgY29ycmVjdCBsaW5rIHN0YXRlIGZvciB0
+aGlzDQpjb25kaXRpb24gYW5kLCBzZWNvbmQsIGJ5cGFzc2VzIGFkZGl0aW9uYWwgYXV0aCArIGVu
+Y3J5cHQgZm9yDQpzdWJzZXF1ZW50IHNlY3VyaXR5IGxldmVsIGVsZXZhdGlvbnMgKHVwIHRvIGJ1
+dCBub3QgaW5jbHVkaW5nDQpCVF9TRUNVUklUWV9ISUdIKS4NCg0KU2lnbmVkLW9mZi1ieTogUGV0
+ZXIgSHVybGV5IDxwZXRlckBodXJsZXlzb2Z0d2FyZS5jb20+DQotLS0NCiBuZXQvYmx1ZXRvb3Ro
+L2hjaV9jb25uLmMgIHwgICAxMyArKysrKysrKysrKy0tDQogbmV0L2JsdWV0b290aC9oY2lfZXZl
+bnQuYyB8ICAgIDggKysrKysrKysNCiAyIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMg
+Yi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCmluZGV4IDYzZDk5NDkuLjYxN2I1MWQgMTAwNjQ0
+DQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCisrKyBiL25ldC9ibHVldG9vdGgvaGNp
+X2Nvbm4uYw0KQEAgLTU0MSw5ICs1NDEsMTggQEAgc3RhdGljIGludCBoY2lfY29ubl9hdXRoKHN0
+cnVjdCBoY2lfY29ubiAqY29ubiwgX191OCBzZWNfbGV2ZWwsIF9fdTggYXV0aF90eXBlKQ0KIAlp
+ZiAoY29ubi0+cGVuZGluZ19zZWNfbGV2ZWwgPiBzZWNfbGV2ZWwpDQogCQlzZWNfbGV2ZWwgPSBj
+b25uLT5wZW5kaW5nX3NlY19sZXZlbDsNCiANCi0JaWYgKHNlY19sZXZlbCA+IGNvbm4tPnNlY19s
+ZXZlbCkNCisJaWYgKHNlY19sZXZlbCA+IGNvbm4tPnNlY19sZXZlbCkgew0KIAkJY29ubi0+cGVu
+ZGluZ19zZWNfbGV2ZWwgPSBzZWNfbGV2ZWw7DQotCWVsc2UgaWYgKGNvbm4tPmxpbmtfbW9kZSAm
+IEhDSV9MTV9BVVRIKQ0KKwkJLyogTGVnYWN5IHNlY3VyaXR5IG1vZGUgMyByZW1vdGUgZGV2aWNl
+cyB0aGF0IGFyZSBhbHJlYWR5DQorCQkgKiBhdXRoJ2QgZG8gbm90IG5lZWQgdG8gcmUtYXV0aCB1
+bmxlc3MgcHJvbW90aW5nIHRvDQorCQkgKiBCVF9TRUNVUklUWV9ISUdIICovDQorCQlpZiAoIShj
+b25uLT5oZGV2LT5zc3BfbW9kZSA+IDAgJiYgY29ubi0+c3NwX21vZGUgPiAwKSAmJg0KKwkJCQko
+c2VjX2xldmVsICE9IEJUX1NFQ1VSSVRZX0hJR0gpICYmDQorCQkJCShjb25uLT5saW5rX21vZGUg
+JiBIQ0lfTE1fQVVUSCkpIHsNCisJCQljb25uLT5zZWNfbGV2ZWwgPSBzZWNfbGV2ZWw7DQorCQkJ
+cmV0dXJuIDE7DQorCQl9DQorCX0gZWxzZSBpZiAoY29ubi0+bGlua19tb2RlICYgSENJX0xNX0FV
+VEgpDQogCQlyZXR1cm4gMTsNCiANCiAJLyogTWFrZSBzdXJlIHdlIHByZXNlcnZlIGFuIGV4aXN0
+aW5nIE1JVE0gcmVxdWlyZW1lbnQqLw0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2V2
+ZW50LmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQppbmRleCA3NzkzMGFhLi45ZTg5YjY1
+IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KKysrIGIvbmV0L2JsdWV0
+b290aC9oY2lfZXZlbnQuYw0KQEAgLTEzMTEsNiArMTMxMSwxNCBAQCBzdGF0aWMgaW5saW5lIHZv
+aWQgaGNpX2Nvbm5fY29tcGxldGVfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tf
+YnVmZiAqcw0KIAkJaWYgKHRlc3RfYml0KEhDSV9FTkNSWVBULCAmaGRldi0+ZmxhZ3MpKQ0KIAkJ
+CWNvbm4tPmxpbmtfbW9kZSB8PSBIQ0lfTE1fRU5DUllQVDsNCiANCisJCS8qIEluZGljYXRlIHRo
+ZSBjb3JyZWN0IGxpbmsgc3RhdGUgZm9yIGxlZ2FjeSBzZWMgbW9kZSAzDQorCQkgKiByZW1vdGUg
+ZGV2aWNlcyBmb3Igd2hpY2ggdGhlIExNIGhhcyBhbHJlYWR5IGVzdGFibGlzaGVkDQorCQkgKiBs
+aW5rIGVuY3J5cHRpb24gKi8NCisJCWlmIChjb25uLT50eXBlID09IEFDTF9MSU5LICYmIGV2LT5l
+bmNyX21vZGUgPT0gMHgwMSAmJg0KKwkJCQkhKGhkZXYtPnNzcF9tb2RlID4gMCAmJiBjb25uLT5z
+c3BfbW9kZSA+IDApICYmDQorCQkJCWNvbm4tPnBlbmRpbmdfc2VjX2xldmVsICE9IEJUX1NFQ1VS
+SVRZX0hJR0gpDQorCQkJY29ubi0+bGlua19tb2RlIHw9IEhDSV9MTV9BVVRIIHwgSENJX0xNX0VO
+Q1JZUFQ7DQorDQogCQkvKiBHZXQgcmVtb3RlIGZlYXR1cmVzICovDQogCQlpZiAoY29ubi0+dHlw
+ZSA9PSBBQ0xfTElOSykgew0KIAkJCXN0cnVjdCBoY2lfY3BfcmVhZF9yZW1vdGVfZmVhdHVyZXMg
+Y3A7DQotLSANCjEuNy40LjENCg0K
