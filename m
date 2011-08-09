@@ -1,56 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 9 Aug 2011 09:21:30 -0400
-Subject: [PATCH] Bluetooth: Preserve auth + encrypt for sec mode 3 remotes
-Message-ID: <1312896090.2320.2.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE6600131C84B8E@dnce02.ent.ti.com>
+References: <1310554946-765-1-git-send-email-iliak@ti.com>
+	<20110713183142.GA23921@joana>
+	<AC090B9732AB2B4DB7FF476E907FE66001318A5DDC@dnce02.ent.ti.com>
+	<AC090B9732AB2B4DB7FF476E907FE6600131C84B8E@dnce02.ent.ti.com>
+Date: Tue, 9 Aug 2011 15:27:05 +0300
+Message-ID: <CABBYNZ+a0OjBd_+VKDMK01smt+J-WeKLBXhYvA=-6T26sUPp9g@mail.gmail.com>
+Subject: Re: Question regarding SET_CONFIGURATION avdtp command handling
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Ilia, Kolominsky" <iliak@ti.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-TGVnYWN5IHJlbW90ZSBkZXZpY2VzICh2IDIuMC0pIGNhbiBlc3RhYmxpc2ggbGluay1sZXZlbA0K
-ZW5jcnlwdGlvbiBhcyBwYXJ0IG9mIEFDTCBjb25uZWN0aW9uIGVzdGFibGlzaG1lbnQNCihpZS4s
-IHNlY3VyaXR5IG1vZGUgMykuIFRoZSBob3N0IGNvbnRyb2xsZXIgaW5kaWNhdGVzIGxpbmstbGV2
-ZWwNCmVuY3J5cHRpb24gaXMgZXN0YWJsaXNoZWQgaW4gdGhpcyBjYXNlIHdpdGggdGhlDQpFbmNy
-eXB0aW9uX0VuYWJsZWQgZmxhZyBvZiB0aGUgQ29ubmVjdGlvbiBDb21wbGV0ZSBldmVudC4NCg0K
-VGhpcyB0d28tcGFydCBmaXggZmlyc3Qgc2V0cyB0aGUgY29ycmVjdCBsaW5rIHN0YXRlIGZvciB0
-aGlzDQpjb25kaXRpb24gYW5kLCBzZWNvbmQsIGJ5cGFzc2VzIGFkZGl0aW9uYWwgYXV0aCArIGVu
-Y3J5cHQgZm9yDQpzdWJzZXF1ZW50IHNlY3VyaXR5IGxldmVsIGVsZXZhdGlvbnMgKHVwIHRvIGJ1
-dCBub3QgaW5jbHVkaW5nDQpCVF9TRUNVUklUWV9ISUdIKS4NCg0KU2lnbmVkLW9mZi1ieTogUGV0
-ZXIgSHVybGV5IDxwZXRlckBodXJsZXlzb2Z0d2FyZS5jb20+DQotLS0NCiBuZXQvYmx1ZXRvb3Ro
-L2hjaV9jb25uLmMgIHwgICAxMyArKysrKysrKysrKy0tDQogbmV0L2JsdWV0b290aC9oY2lfZXZl
-bnQuYyB8ICAgIDggKysrKysrKysNCiAyIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyks
-IDIgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMg
-Yi9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCmluZGV4IDYzZDk5NDkuLjYxN2I1MWQgMTAwNjQ0
-DQotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMNCisrKyBiL25ldC9ibHVldG9vdGgvaGNp
-X2Nvbm4uYw0KQEAgLTU0MSw5ICs1NDEsMTggQEAgc3RhdGljIGludCBoY2lfY29ubl9hdXRoKHN0
-cnVjdCBoY2lfY29ubiAqY29ubiwgX191OCBzZWNfbGV2ZWwsIF9fdTggYXV0aF90eXBlKQ0KIAlp
-ZiAoY29ubi0+cGVuZGluZ19zZWNfbGV2ZWwgPiBzZWNfbGV2ZWwpDQogCQlzZWNfbGV2ZWwgPSBj
-b25uLT5wZW5kaW5nX3NlY19sZXZlbDsNCiANCi0JaWYgKHNlY19sZXZlbCA+IGNvbm4tPnNlY19s
-ZXZlbCkNCisJaWYgKHNlY19sZXZlbCA+IGNvbm4tPnNlY19sZXZlbCkgew0KIAkJY29ubi0+cGVu
-ZGluZ19zZWNfbGV2ZWwgPSBzZWNfbGV2ZWw7DQotCWVsc2UgaWYgKGNvbm4tPmxpbmtfbW9kZSAm
-IEhDSV9MTV9BVVRIKQ0KKwkJLyogTGVnYWN5IHNlY3VyaXR5IG1vZGUgMyByZW1vdGUgZGV2aWNl
-cyB0aGF0IGFyZSBhbHJlYWR5DQorCQkgKiBhdXRoJ2QgZG8gbm90IG5lZWQgdG8gcmUtYXV0aCB1
-bmxlc3MgcHJvbW90aW5nIHRvDQorCQkgKiBCVF9TRUNVUklUWV9ISUdIICovDQorCQlpZiAoIShj
-b25uLT5oZGV2LT5zc3BfbW9kZSA+IDAgJiYgY29ubi0+c3NwX21vZGUgPiAwKSAmJg0KKwkJCQko
-c2VjX2xldmVsICE9IEJUX1NFQ1VSSVRZX0hJR0gpICYmDQorCQkJCShjb25uLT5saW5rX21vZGUg
-JiBIQ0lfTE1fQVVUSCkpIHsNCisJCQljb25uLT5zZWNfbGV2ZWwgPSBzZWNfbGV2ZWw7DQorCQkJ
-cmV0dXJuIDE7DQorCQl9DQorCX0gZWxzZSBpZiAoY29ubi0+bGlua19tb2RlICYgSENJX0xNX0FV
-VEgpDQogCQlyZXR1cm4gMTsNCiANCiAJLyogTWFrZSBzdXJlIHdlIHByZXNlcnZlIGFuIGV4aXN0
-aW5nIE1JVE0gcmVxdWlyZW1lbnQqLw0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2V2
-ZW50LmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQppbmRleCA3NzkzMGFhLi45ZTg5YjY1
-IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KKysrIGIvbmV0L2JsdWV0
-b290aC9oY2lfZXZlbnQuYw0KQEAgLTEzMTEsNiArMTMxMSwxNCBAQCBzdGF0aWMgaW5saW5lIHZv
-aWQgaGNpX2Nvbm5fY29tcGxldGVfZXZ0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tf
-YnVmZiAqcw0KIAkJaWYgKHRlc3RfYml0KEhDSV9FTkNSWVBULCAmaGRldi0+ZmxhZ3MpKQ0KIAkJ
-CWNvbm4tPmxpbmtfbW9kZSB8PSBIQ0lfTE1fRU5DUllQVDsNCiANCisJCS8qIEluZGljYXRlIHRo
-ZSBjb3JyZWN0IGxpbmsgc3RhdGUgZm9yIGxlZ2FjeSBzZWMgbW9kZSAzDQorCQkgKiByZW1vdGUg
-ZGV2aWNlcyBmb3Igd2hpY2ggdGhlIExNIGhhcyBhbHJlYWR5IGVzdGFibGlzaGVkDQorCQkgKiBs
-aW5rIGVuY3J5cHRpb24gKi8NCisJCWlmIChjb25uLT50eXBlID09IEFDTF9MSU5LICYmIGV2LT5l
-bmNyX21vZGUgPT0gMHgwMSAmJg0KKwkJCQkhKGhkZXYtPnNzcF9tb2RlID4gMCAmJiBjb25uLT5z
-c3BfbW9kZSA+IDApICYmDQorCQkJCWNvbm4tPnBlbmRpbmdfc2VjX2xldmVsICE9IEJUX1NFQ1VS
-SVRZX0hJR0gpDQorCQkJY29ubi0+bGlua19tb2RlIHw9IEhDSV9MTV9BVVRIIHwgSENJX0xNX0VO
-Q1JZUFQ7DQorDQogCQkvKiBHZXQgcmVtb3RlIGZlYXR1cmVzICovDQogCQlpZiAoY29ubi0+dHlw
-ZSA9PSBBQ0xfTElOSykgew0KIAkJCXN0cnVjdCBoY2lfY3BfcmVhZF9yZW1vdGVfZmVhdHVyZXMg
-Y3A7DQotLSANCjEuNy40LjENCg0K
+Hi,
+
+2011/8/7 Ilia, Kolominsky <iliak@ti.com>:
+> Hello!
+> Can anybody help me to understand the process of handling avdtp
+> SET_CONFIGURATION command in scenario when a2dp headset initializes
+> connection to linux machine? I see that the headset sends
+> SET_CONFIGURATION avdtp command (with appropriate SBC params),
+> but i cant find out how this ultimately translates to actual
+> configuration of a player (totem in my case).
+>
+> What layers are involved in general?
+>
+> I see that handling of the command follows the following path (approx.):
+> avdtp.c::sbc_setconf_ind()
+>        a2dp.c::auto_config()
+
+If it went to sbc_setconf_ind it probably means the system is not
+using Media API, so it auto configure but at this point nobody is
+using it.
+
+>                avdtp.c::avdtp_sep_set_state()
+>                        a2dp.c::stream_state_changed()
+>                        sink.c::stream_state_changed()
+
+This will eventually wakeup interested process that need to connect
+over unix socket (see audio/unix.c) to acquire the fd.
+
+> At no stage I am able to spot the actual configuration of the sbc...
+> (there should be probably some sort of d-bus messages, but, again,
+> I don’t see that neither SelectConfiguration nor SetConfiguration
+> from the media-api are used).
+
+As I said according to your traces it is picking a bluetoothd internal
+sep, so in that case it won't call SetConfiguration instead it will
+auto configure using the local sep. Note that it could be you enabled
+the Media API but forgot to disable the unix socket (Disable=Socket),
+in that case you can have a mix of bluetoothd internal sep and
+external seps (registered via Media API).
+
+> In addition, there is BT_SET_CONFIGURATION command that is handled
+> in unix.c (after SET_CONFIGURATION is handled); how does it fits
+> in the configuration picture?
+
+This is the old API, in this case the client is using our internal ipc
+BT_SET_CONFIGURATION command to set its configuration, this could
+match the current configuration (if it doesn't it does CLOSE and
+SET_CONFIGURATION again).
+
+> Any info (or reference where it can be found) will be much
+> appreciated.
+
+You can use test/simple-endpoint to emulate an MediaEndpoint (make
+sure PulseAudio don't interfere), for the old API (not recommended)
+you can take a look at test/ipctest.c
+
+-- 
+Luiz Augusto von Dentz
