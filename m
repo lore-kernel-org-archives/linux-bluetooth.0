@@ -1,59 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAN_we7Mu76-iFWpphd+Hxnq314-xOURLomDRHGfXrsc2k5+qNA@mail.gmail.com>
-References: <CAN_we7Mu76-iFWpphd+Hxnq314-xOURLomDRHGfXrsc2k5+qNA@mail.gmail.com>
-Date: Tue, 9 Aug 2011 10:50:38 +0300
-Message-ID: <CABBYNZK8J8zPz4bagc1VUdPab8jZdu_Xxgxu_izHN4QEEPWHtw@mail.gmail.com>
-Subject: Re: Memory leak in obexd/plugins/opp.c
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Daniele Forsi <dforsi@gmail.com>
+Date: Tue, 9 Aug 2011 10:24:26 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ 00/11] Immediate Alert patches
+Message-ID: <20110809072426.GB14581@dell>
+References: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312829210-6781-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniele,
+Hi Claudio,
 
-On Sat, Aug 6, 2011 at 1:40 PM, Daniele Forsi <dforsi@gmail.com> wrote:
-> cppcheck shows this:
-> [./plugins/opp.c:146]: (error) Memory leak: folder
->
-> I'm not sending a patch because I can't test it and it seems that the
-> g_strdup()'s can be removed because the folder and name variables are
-> only used as arguments to g_build_filename()
+On Mon, Aug 08, 2011, Claudio Takahasi wrote:
+> Dependency: none. RSSI threshold monitor patches are not required for
+> this patch series.
+> 
+> Implementation of D-Bus properties and GATT/ATT operations related to
+> alert level of the Immediate alert service.
+> 
+> Bruna Moreira (1):
+>   Add read remote Tx Power
+> 
+> Claudio Takahasi (10):
+>   Add Immediate Alert handle discovery
+>   Write Immediate Alert if necessary
+>   Emit PropertyChanged after writting alert
+>   Write Immediate Alert after discovering handle
+>   Request connection when writting Immediate alert
+>   Reset Immediate Alert after 5 seconds
+>   Reset the Immediate Alert at disconnection
+>   Set default value for ImmediateAlertLevel
+>   Write Immediate Alert if connected
+>   Fix wrong alert value for ImmediateAlertLevel
+> 
+>  proximity/monitor.c |  205 +++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 files changed, 199 insertions(+), 6 deletions(-)
 
-Thanks for reporting this, in fact both folder and name ('\0') seems
-to be leaking, they are always allocated because of
-manager_request_authorization can return new strings. I think the
-following should fix the problem:
+Applied. Thanks.
 
-diff --git a/plugins/opp.c b/plugins/opp.c
-index 644a2c6..fd78af4 100644
---- a/plugins/opp.c
-+++ b/plugins/opp.c
-@@ -142,8 +142,10 @@ static int opp_chkput(struct obex_session *os,
-void *user_data)
-                name = g_strdup(obex_get_name(os));
-
- skip_auth:
--       if (name == NULL || strlen(name) == 0)
--               return -EBADR;
-+       if (name == NULL || strlen(name) == 0) {
-+               ret = -EBADR;
-+               goto failed;
-+       }
-
-        if (g_strcmp0(name, obex_get_name(os)) != 0)
-                obex_set_name(os, name);
-@@ -155,6 +157,8 @@ skip_auth:
-        ret = obex_put_stream_start(os, path);
-
-        g_free(path);
-+
-+failed:
-        g_free(folder);
-        g_free(name);
-
-
--- 
-Luiz Augusto von Dentz
+Johan
