@@ -1,75 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE6600131C84B8E@dnce02.ent.ti.com>
-References: <1310554946-765-1-git-send-email-iliak@ti.com>
-	<20110713183142.GA23921@joana>
-	<AC090B9732AB2B4DB7FF476E907FE66001318A5DDC@dnce02.ent.ti.com>
-	<AC090B9732AB2B4DB7FF476E907FE6600131C84B8E@dnce02.ent.ti.com>
-Date: Tue, 9 Aug 2011 15:27:05 +0300
-Message-ID: <CABBYNZ+a0OjBd_+VKDMK01smt+J-WeKLBXhYvA=-6T26sUPp9g@mail.gmail.com>
-Subject: Re: Question regarding SET_CONFIGURATION avdtp command handling
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC obexd 8/8] Add Makefile.client to handle client code build
+Date: Tue,  9 Aug 2011 14:03:49 +0300
+Message-Id: <1312887829-4770-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
+References: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-2011/8/7 Ilia, Kolominsky <iliak@ti.com>:
-> Hello!
-> Can anybody help me to understand the process of handling avdtp
-> SET_CONFIGURATION command in scenario when a2dp headset initializes
-> connection to linux machine? I see that the headset sends
-> SET_CONFIGURATION avdtp command (with appropriate SBC params),
-> but i cant find out how this ultimately translates to actual
-> configuration of a player (totem in my case).
->
-> What layers are involved in general?
->
-> I see that handling of the command follows the following path (approx.):
-> avdtp.c::sbc_setconf_ind()
->        a2dp.c::auto_config()
+---
+ Makefile.am     |   48 +-----------------------------------------------
+ Makefile.client |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 47 deletions(-)
+ create mode 100644 Makefile.client
 
-If it went to sbc_setconf_ind it probably means the system is not
-using Media API, so it auto configure but at this point nobody is
-using it.
-
->                avdtp.c::avdtp_sep_set_state()
->                        a2dp.c::stream_state_changed()
->                        sink.c::stream_state_changed()
-
-This will eventually wakeup interested process that need to connect
-over unix socket (see audio/unix.c) to acquire the fd.
-
-> At no stage I am able to spot the actual configuration of the sbc...
-> (there should be probably some sort of d-bus messages, but, again,
-> I don’t see that neither SelectConfiguration nor SetConfiguration
-> from the media-api are used).
-
-As I said according to your traces it is picking a bluetoothd internal
-sep, so in that case it won't call SetConfiguration instead it will
-auto configure using the local sep. Note that it could be you enabled
-the Media API but forgot to disable the unix socket (Disable=Socket),
-in that case you can have a mix of bluetoothd internal sep and
-external seps (registered via Media API).
-
-> In addition, there is BT_SET_CONFIGURATION command that is handled
-> in unix.c (after SET_CONFIGURATION is handled); how does it fits
-> in the configuration picture?
-
-This is the old API, in this case the client is using our internal ipc
-BT_SET_CONFIGURATION command to set its configuration, this could
-match the current configuration (if it doesn't it does CLOSE and
-SET_CONFIGURATION again).
-
-> Any info (or reference where it can be found) will be much
-> appreciated.
-
-You can use test/simple-endpoint to emulate an MediaEndpoint (make
-sure PulseAudio don't interfere), for the old API (not recommended)
-you can take a look at test/ipctest.c
-
+diff --git a/Makefile.am b/Makefile.am
+index 151865c..1b3b196 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -117,53 +117,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 
+ endif
+ 
+-if CLIENT
+-service_in_files += client/obex-client.service.in
+-
+-client_builtin_modules =
+-client_builtin_sources =
+-client_builtin_nodist =
+-
+-client_builtin_modules += opp
+-client_builtin_sources += client/plugins/opp.c
+-
+-client_builtin_modules += ftp
+-client_builtin_sources += client/plugins/ftp.c
+-
+-client_builtin_modules += pbap
+-client_builtin_sources += client/plugins/pbap.c
+-
+-client_builtin_modules += sync
+-client_builtin_sources += client/plugins/sync.c
+-
+-libexec_PROGRAMS += client/obex-client
+-
+-client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
+-				$(gwobex_sources) $(btio_sources) \
+-				client/main.c src/log.h src/log.c \
+-				client/manager.h client/manager.c \
+-				client/session.h client/session.c \
+-				client/transfer.h client/transfer.c \
+-				client/agent.h client/agent.c \
+-				client/plugin.h client/plugin.c \
+-				client/driver.h client/driver.c
+-
+-client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@ -ldl
+-
+-client_obex_client_LDFLAGS = -Wl,--export-dynamic
+-
+-client_builtin_files = client/builtin.h $(client_builtin_nodist)
+-
+-nodist_client_obex_client_SOURCES = $(client_builtin_files)
+-
+-clientplugindir = $(libdir)/obex/client/plugins
+-
+-client/plugin.$(OBJEXT): client/builtin.h
+-
+-client/builtin.h: client/genbuiltin $(client_builtin_sources)
+-	$(AM_V_GEN)$(srcdir)/client/genbuiltin $(client_builtin_modules) > $@
+-
+-endif
++include Makefile.client
+ 
+ service_DATA = $(service_in_files:.service.in=.service)
+ 
+diff --git a/Makefile.client b/Makefile.client
+new file mode 100644
+index 0000000..7e7c247
+--- /dev/null
++++ b/Makefile.client
+@@ -0,0 +1,47 @@
++if CLIENT
++service_in_files += client/obex-client.service.in
++
++client_builtin_modules =
++client_builtin_sources =
++client_builtin_nodist =
++
++client_builtin_modules += opp
++client_builtin_sources += client/plugins/opp.c
++
++client_builtin_modules += ftp
++client_builtin_sources += client/plugins/ftp.c
++
++client_builtin_modules += pbap
++client_builtin_sources += client/plugins/pbap.c
++
++client_builtin_modules += sync
++client_builtin_sources += client/plugins/sync.c
++
++libexec_PROGRAMS += client/obex-client
++
++client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
++				$(gwobex_sources) $(btio_sources) \
++				client/main.c src/log.h src/log.c \
++				client/manager.h client/manager.c \
++				client/session.h client/session.c \
++				client/transfer.h client/transfer.c \
++				client/agent.h client/agent.c \
++				client/plugin.h client/plugin.c \
++				client/driver.h client/driver.c
++
++client_obex_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ @OPENOBEX_LIBS@ @BLUEZ_LIBS@ -ldl
++
++client_obex_client_LDFLAGS = -Wl,--export-dynamic
++
++client_builtin_files = client/builtin.h $(client_builtin_nodist)
++
++nodist_client_obex_client_SOURCES = $(client_builtin_files)
++
++clientplugindir = $(libdir)/obex/client/plugins
++
++client/plugin.$(OBJEXT): client/builtin.h
++
++client/builtin.h: client/genbuiltin $(client_builtin_sources)
++	$(AM_V_GEN)$(srcdir)/client/genbuiltin $(client_builtin_modules) > $@
++
++endif
 -- 
-Luiz Augusto von Dentz
+1.7.6
+
