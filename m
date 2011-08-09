@@ -2,57 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 12/14] Emit SignalLevel when RSSI alert is received
-Date: Tue,  9 Aug 2011 18:00:39 -0300
-Message-Id: <1312923641-12028-13-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 11/14] Disable RSSI threshold monitor when disconnected
+Date: Tue,  9 Aug 2011 18:00:38 -0300
+Message-Id: <1312923641-12028-12-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1312923641-12028-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1312923641-12028-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes Proximity Monitor emitting a signal when the RSSI threshold
-monitoring event is received.
 ---
- proximity/monitor.c |   26 +++++++++++++++++++++++++-
- 1 files changed, 25 insertions(+), 1 deletions(-)
+ proximity/monitor.c |    9 ++++++++-
+ 1 files changed, 8 insertions(+), 1 deletions(-)
 
 diff --git a/proximity/monitor.c b/proximity/monitor.c
-index 4bd4506..818325a 100644
+index eea77cb..4bd4506 100644
 --- a/proximity/monitor.c
 +++ b/proximity/monitor.c
-@@ -186,7 +186,31 @@ static int write_alert_level(struct monitor *monitor)
- 
- static void monitor_rssi_alert(uint8_t alert, gpointer user_data)
+@@ -358,11 +358,18 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void attio_disconnected_cb(gpointer user_data)
  {
--	DBG("");
-+	struct monitor *monitor = user_data;
-+	const char *level, *path = device_get_path(monitor->device);
-+
-+	switch (alert) {
-+	case 0x00:
-+		level = "good";
-+		break;
-+	case 0x01:
-+		level = "regular";
-+		break;
-+	case 0x02:
-+		level = "weak";
-+		break;
-+	default:
-+		level = "unknown";
-+		break;
-+	}
-+
-+	emit_property_changed(monitor->conn, path, PROXIMITY_INTERFACE,
-+					"SignalLevel", DBUS_TYPE_STRING,
-+					&level);
-+	g_free(monitor->signallevel);
-+	monitor->signallevel = g_strdup(level);
-+
-+	DBG("SignalLevel: %s", level);
- }
+ 	struct monitor *monitor = user_data;
+-	const char *path = device_get_path(monitor->device);
++	struct btd_device *device = monitor->device;
++	struct btd_adapter *adapter = device_get_adapter(device);
++	const char *path = device_get_path(device);
++	bdaddr_t dba;
  
- static void tx_power_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	g_attrib_unref(monitor->attrib);
+ 	monitor->attrib = NULL;
+ 
++	device_get_address(device, &dba);
++	btd_adapter_disable_rssi_monitor(adapter, &dba);
++	monitor->rssimon = FALSE;
++
+ 	if (monitor->immediateto == 0)
+ 		return;
+ 
 -- 
 1.7.6
 
