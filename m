@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC obexd 6/8] client: add pbap plugin
-Date: Tue,  9 Aug 2011 14:03:47 +0300
-Message-Id: <1312887829-4770-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC obexd 5/8] client: add ftp plugin
+Date: Tue,  9 Aug 2011 14:03:46 +0300
+Message-Id: <1312887829-4770-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
 References: <1312887829-4770-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.dentz-von@nokia.com>
 
-pbap plugin implements phonebook access driver
+ftp plugin implements file transfer and Nokia Pc Suite drivers.
 ---
- Makefile.am                 |    4 +-
- client/pbap.h               |   29 --------------
- client/{ => plugins}/pbap.c |   90 ++++++++++++++++++++++++++++++++++---------
- client/session.c            |    1 -
- 4 files changed, 74 insertions(+), 50 deletions(-)
- delete mode 100644 client/pbap.h
- rename client/{ => plugins}/pbap.c (94%)
+ Makefile.am                |    4 +-
+ client/ftp.h               |   29 -----------
+ client/{ => plugins}/ftp.c |  112 ++++++++++++++++++++++++++++++++++++-------
+ client/session.c           |    1 -
+ 4 files changed, 96 insertions(+), 50 deletions(-)
+ delete mode 100644 client/ftp.h
+ rename client/{ => plugins}/ftp.c (83%)
 
 diff --git a/Makefile.am b/Makefile.am
-index 1f7071a..b2cedba 100644
+index 89546ce..1f7071a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -130,6 +130,9 @@ client_builtin_sources += client/plugins/opp.c
- client_builtin_modules += ftp
- client_builtin_sources += client/plugins/ftp.c
+@@ -127,6 +127,9 @@ client_builtin_nodist =
+ client_builtin_modules += opp
+ client_builtin_sources += client/plugins/opp.c
  
-+client_builtin_modules += pbap
-+client_builtin_sources += client/plugins/pbap.c
++client_builtin_modules += ftp
++client_builtin_sources += client/plugins/ftp.c
 +
  libexec_PROGRAMS += client/obex-client
  
  client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
-@@ -137,7 +140,6 @@ client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
- 				client/main.c src/log.h src/log.c \
- 				client/manager.h client/manager.c \
+@@ -136,7 +139,6 @@ client_obex_client_SOURCES = $(gdbus_sources) $(client_builtin_sources) \
  				client/session.h client/session.c \
--				client/pbap.h client/pbap.c \
+ 				client/pbap.h client/pbap.c \
  				client/sync.h client/sync.c \
+-				client/ftp.h client/ftp.c \
  				client/transfer.h client/transfer.c \
  				client/agent.h client/agent.c \
-diff --git a/client/pbap.h b/client/pbap.h
+ 				client/plugin.h client/plugin.c \
+diff --git a/client/ftp.h b/client/ftp.h
 deleted file mode 100644
-index 3ae1159..0000000
---- a/client/pbap.h
+index 1af2a3d..0000000
+--- a/client/ftp.h
 +++ /dev/null
 @@ -1,29 +0,0 @@
 -/*
@@ -75,142 +75,138 @@ index 3ae1159..0000000
 -
 -#include <gdbus.h>
 -
--gboolean pbap_register_interface(DBusConnection *connection, const char *path,
+-gboolean ftp_register_interface(DBusConnection *connection, const char *path,
 -							void *user_data);
--void pbap_unregister_interface(DBusConnection *connection, const char *path);
-diff --git a/client/pbap.c b/client/plugins/pbap.c
-similarity index 94%
-rename from client/pbap.c
-rename to client/plugins/pbap.c
-index 2b8afbf..ab104a4 100644
---- a/client/pbap.c
-+++ b/client/plugins/pbap.c
-@@ -32,10 +32,14 @@
- #include <glib.h>
- #include <gdbus.h>
+-void ftp_unregister_interface(DBusConnection *connection, const char *path);
+diff --git a/client/ftp.c b/client/plugins/ftp.c
+similarity index 83%
+rename from client/ftp.c
+rename to client/plugins/ftp.c
+index 5d1fa5c..1f804bc 100644
+--- a/client/ftp.c
++++ b/client/plugins/ftp.c
+@@ -25,17 +25,27 @@
+ #include <config.h>
+ #endif
  
-+#include <bluetooth/bluetooth.h>
-+
- #include "log.h"
--#include "transfer.h"
++#include <errno.h>
+ #include <string.h>
+ 
 -#include "session.h"
--#include "pbap.h"
+-#include "transfer.h"
+-#include "ftp.h"
++#include <gw-obex.h>
++#include <gdbus.h>
+ 
+-#define FTP_INTERFACE  "org.openobex.FileTransfer"
++#include "log.h"
 +
-+#include "client/transfer.h"
 +#include "client/session.h"
++#include "client/transfer.h"
 +#include "client/plugin.h"
 +#include "client/driver.h"
++
++#define FTP_INTERFACE "org.openobex.FileTransfer"
++#define FTP_UUID "00001106-0000-1000-8000-00805f9b34fb"
++#define PCSUITE_UUID "00005005-0000-1000-8000-0002ee000001"
++
++static DBusConnection *conn = NULL;
  
- #define ERROR_INF PBAP_INTERFACE ".Error"
- 
-@@ -115,11 +119,11 @@ static const char *filter_list[] = {
- #define FILTER_ALL	0xFFFFFFFFFFFFFFFFULL
- 
- #define PBAP_INTERFACE  "org.openobex.PhonebookAccess"
-+#define PBAP_UUID "0000112f-0000-1000-8000-00805f9b34fb"
- 
- struct pbap_data {
+ struct ftp_data {
  	struct obc_session *session;
- 	char *path;
 -	DBusConnection *conn;
  	DBusMessage *msg;
- 	guint8 format;
- 	guint8 order;
-@@ -158,6 +162,8 @@ struct apparam_hdr {
+ };
  
- #define APPARAM_HDR_SIZE 2
+@@ -157,7 +167,7 @@ static void get_file_callback(struct obc_session *session, GError *err,
+ 	else
+ 		reply = dbus_message_new_method_return(ftp->msg);
  
-+static DBusConnection *conn = NULL;
-+
- static void listing_element(GMarkupParseContext *ctxt,
- 				const gchar *element,
- 				const gchar **names,
-@@ -374,7 +380,7 @@ static void pull_phonebook_callback(struct obc_session *session,
+-	g_dbus_send_message(ftp->conn, reply);
++	g_dbus_send_message(conn, reply);
+ 
+ 	dbus_message_unref(ftp->msg);
+ 	ftp->msg = NULL;
+@@ -194,7 +204,7 @@ static void list_folder_callback(struct obc_session *session,
  	obc_transfer_clear_buffer(transfer);
  
- send:
--	g_dbus_send_message(pbap->conn, reply);
+ done:
+-	g_dbus_send_message(ftp->conn, reply);
 +	g_dbus_send_message(conn, reply);
- 	dbus_message_unref(pbap->msg);
- 	pbap->msg = NULL;
+ 	dbus_message_unref(ftp->msg);
+ 	ftp->msg = NULL;
+ }
+@@ -352,33 +362,97 @@ static void ftp_free(void *data)
+ 	struct ftp_data *ftp = data;
  
-@@ -412,7 +418,7 @@ static void phonebook_size_callback(struct obc_session *session,
- 	obc_transfer_clear_buffer(transfer);
- 
- send:
--	g_dbus_send_message(pbap->conn, reply);
-+	g_dbus_send_message(conn, reply);
- 	dbus_message_unref(pbap->msg);
- 	pbap->msg = NULL;
- 
-@@ -460,7 +466,7 @@ static void pull_vcard_listing_callback(struct obc_session *session,
- 	obc_transfer_clear_buffer(transfer);
- 
- send:
--	g_dbus_send_message(pbap->conn, reply);
-+	g_dbus_send_message(conn, reply);
- 	dbus_message_unref(pbap->msg);
- 	pbap->msg = NULL;
- complete:
-@@ -986,33 +992,79 @@ static void pbap_free(void *data)
- 	struct pbap_data *pbap = data;
- 
- 	obc_session_unref(pbap->session);
--	dbus_connection_unref(pbap->conn);
- 	g_free(pbap);
+ 	obc_session_unref(ftp->session);
+-	dbus_connection_unref(ftp->conn);
+ 	g_free(ftp);
  }
  
--gboolean pbap_register_interface(DBusConnection *connection, const char *path,
+-gboolean ftp_register_interface(DBusConnection *connection, const char *path,
 -							void *user_data)
-+static int pbap_probe(struct obc_session *session)
++static int ftp_probe(struct obc_session *session)
  {
 -	struct obc_session *session = user_data;
- 	struct pbap_data *pbap;
+ 	struct ftp_data *ftp;
 +	const char *path;
 +
 +	path = obc_session_get_path(session);
 +
 +	DBG("%s", path);
  
- 	pbap = g_try_new0(struct pbap_data, 1);
- 	if (!pbap)
+ 	ftp = g_try_new0(struct ftp_data, 1);
+ 	if (!ftp)
 -		return FALSE;
 +		return -ENOMEM;
  
- 	pbap->session = obc_session_ref(session);
--	pbap->conn = dbus_connection_ref(connection);
+ 	ftp->session = obc_session_ref(session);
+-	ftp->conn = dbus_connection_ref(connection);
  
--	if (g_dbus_register_interface(connection, path, PBAP_INTERFACE,
--			pbap_methods, NULL, NULL, pbap, pbap_free) == FALSE) {
-+	if (!g_dbus_register_interface(conn, path, PBAP_INTERFACE, pbap_methods,
-+						NULL, NULL, pbap, pbap_free)) {
- 		pbap_free(pbap);
+-	if (!g_dbus_register_interface(connection, path, FTP_INTERFACE,
+-				ftp_methods, NULL, NULL, ftp, ftp_free)) {
++	if (!g_dbus_register_interface(conn, path, FTP_INTERFACE, ftp_methods,
++						NULL, NULL, ftp, ftp_free)) {
+ 		ftp_free(ftp);
 -		return FALSE;
 +		return -ENOMEM;
-+	}
-+
+ 	}
+ 
+-	return TRUE;
 +	return 0;
-+}
-+
-+static void pbap_remove(struct obc_session *session)
-+{
+ }
+ 
+-void ftp_unregister_interface(DBusConnection *connection, const char *path)
++static void ftp_remove(struct obc_session *session)
+ {
+-	g_dbus_unregister_interface(connection, path, FTP_INTERFACE);
 +	const char *path = obc_session_get_path(session);
 +
 +	DBG("%s", path);
 +
-+	g_dbus_unregister_interface(conn, path, PBAP_INTERFACE);
-+}
++	g_dbus_unregister_interface(conn, path, FTP_INTERFACE);
+ }
 +
-+static struct obc_driver pbap = {
-+	.service = "PBAP",
-+	.uuid = PBAP_UUID,
-+	.target = OBEX_PBAP_UUID,
-+	.target_len = OBEX_PBAP_UUID_LEN,
-+	.probe = pbap_probe,
-+	.remove = pbap_remove
++static struct obc_driver ftp = {
++	.service = "FTP",
++	.uuid = FTP_UUID,
++	.target = OBEX_FTP_UUID,
++	.target_len = OBEX_FTP_UUID_LEN,
++	.probe = ftp_probe,
++	.remove = ftp_remove
 +};
 +
-+static int pbap_init(void)
++static struct obc_driver pcsuite = {
++	.service = "PCSUITE",
++	.uuid = PCSUITE_UUID,
++	.target = OBEX_FTP_UUID,
++	.target_len = OBEX_FTP_UUID_LEN,
++	.probe = ftp_probe,
++	.remove = ftp_remove
++};
++
++static int ftp_init(void)
 +{
 +	int err;
 +
@@ -220,42 +216,48 @@ index 2b8afbf..ab104a4 100644
 +	if (!conn)
 +		return -EIO;
 +
-+	err = obc_driver_register(&pbap);
++	err = obc_driver_register(&ftp);
++	if (err < 0)
++		goto failed;
++
++	err = obc_driver_register(&pcsuite);
 +	if (err < 0) {
-+		dbus_connection_unref(conn);
-+		conn = NULL;
-+		return err;
- 	}
- 
--	return TRUE;
++		obc_driver_unregister(&ftp);
++		goto failed;
++	}
++
 +	return 0;
- }
- 
--void pbap_unregister_interface(DBusConnection *connection, const char *path)
-+static void pbap_exit(void)
- {
--	g_dbus_unregister_interface(connection, path, PBAP_INTERFACE);
++
++failed:
++	dbus_connection_unref(conn);
++	conn = NULL;
++	return err;
++}
++
++static void ftp_exit(void)
++{
 +	DBG("");
 +
 +	dbus_connection_unref(conn);
 +	conn = NULL;
 +
-+	obc_driver_unregister(&pbap);
- }
++	obc_driver_unregister(&ftp);
++	obc_driver_unregister(&pcsuite);
++}
 +
-+OBC_PLUGIN_DEFINE(pbap, pbap_init, pbap_exit)
++OBC_PLUGIN_DEFINE(ftp, ftp_init, ftp_exit)
 diff --git a/client/session.c b/client/session.c
-index 6fa6367..d1807d5 100644
+index 8141d17..6fa6367 100644
 --- a/client/session.c
 +++ b/client/session.c
-@@ -41,7 +41,6 @@
- #include <bluetooth/sdp_lib.h>
- 
+@@ -43,7 +43,6 @@
  #include "log.h"
--#include "pbap.h"
+ #include "pbap.h"
  #include "sync.h"
+-#include "ftp.h"
  #include "transfer.h"
  #include "session.h"
+ #include "btio.h"
 -- 
 1.7.6
 
