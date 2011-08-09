@@ -1,26 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: james pruett <gpscruise@gmail.com>
-Date: Tue, 9 Aug 2011 12:14:13 -0500
-Message-ID: <CAHymeZq774dz2nsP0Jonb_W4Oqu=O6XXV=hPuxBV0LM0_5Yf7A@mail.gmail.com>
-Subject: can BT create N independent channels?
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/2] Fix ATT disconnect callback not being called
+Date: Tue,  9 Aug 2011 13:47:44 -0300
+Message-Id: <1312908464-20064-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1312908464-20064-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1312908464-20064-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am writing an Android APP using BT for a control application.
+GAttrib disconnect function needs to be set after discovering the
+primary services if the connection callback list is not empty. After
+creating a device the connection can stay up, for this scenario the
+registered disconnection callbacks are not being called.
+---
+ src/device.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-Q: If I am on a BT-headset call already, can I create a second BT-connection?
+diff --git a/src/device.c b/src/device.c
+index 9dd657c..13749bf 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1661,7 +1661,9 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 	if (device->attios == NULL && device->attios_offline == NULL) {
+ 		g_attrib_unref(device->attrib);
+ 		device->attrib = NULL;
+-	}
++	} else
++		g_attrib_set_disconnect_function(device->attrib,
++						attrib_disconnected, device);
+ 
+ 	g_slist_free(uuids);
+ 
+-- 
+1.7.6
 
-Eg, will the stack allow two independent BT audio channels?
-
-I want normal calls in one channel, and I create a second signalling
-channel for an unrelated purpose. I know there is Serial protocol, but
-I want to avoid that if possible (Serial devices are more expensive
-than audio devices...) I am going to send the audio into a DTMF
-decoder to get ON/OFF control bits only.
-
-Thanks for any leads!
-jim pruett
-wikiSPEEDia.org
