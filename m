@@ -1,55 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org>
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
-	<1311623405-31108-12-git-send-email-andre.guedes@openbossa.org>
-	<1312984225.3373.118.camel@aeonflux>
-	<CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com>
-	<1312989466.3373.126.camel@aeonflux>
-	<7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org>
-Date: Wed, 10 Aug 2011 16:58:42 -0400
-Message-ID: <CAJdJm_Mg4e1bLqYFmQxSctWT6y+GMg2xtJLwavtYoM5yWYJPcw@mail.gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1312989466.3373.126.camel@aeonflux>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
 Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to mgmt_device_found()
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Wed, 10 Aug 2011 16:51:47 -0300
+References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org> <1312984225.3373.118.camel@aeonflux> <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com> <1312989466.3373.126.camel@aeonflux>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel/Lizardo,
 
-On Wed, Aug 10, 2011 at 3:51 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> The advertising report event has the 'Length' field to inform the
-> 'Data' field length, so I believe it has a variable length.
-> According to its description, the 'Length' field may vary from 0x00
-> to 0x1F (31) bytes.
+On Aug 10, 2011, at 12:17 PM, Marcel Holtmann wrote:
 
-You are right. Although the section 11 gives the impression the size
-is always 31, this is not what happens on actual hardware, which
-usually sends only the significant bytes (and the length is know from
-the "Length" field.
+> Hi Anderson,
+>
+>>>> This patch adds a new parameter to mgmt_device_found() to inform
+>>>> the length of 'eir' pointer.
+>>>>
+>>>> EIR data from LE advertising report event doesn't have a fixed  
+>>>> length
+>>>> as EIR data from extended inquiry result event does. We needed to
+>>>> change mgmt_device_found() so it copies 'eir_len' bytes instead of
+>>>> HCI_MAX_EIR_LENGTH.
+>>>
+>>> what is the max EIR length for LE? Is it more than with BR/EDR. Or  
+>>> is it
+>>> just variable length?
+>>
+>> From page 1735:
+>>
+>> "The data consists of a significant part and a non-significant part.
+>> [...] The non-significant part extends the Advertising and Scan
+>> Response data to 31 octets and shall contain all-zero octets."
+>>
+>> So actually it is not variable length, it has 31 octets, with the
+>> non-significant part zero padded. BR/EDR EIR, on the other hand is  
+>> 240
+>> bytes (with zero padding for non-significant part as well)
+>
+> do we have a deep impact (memory wise) if we always pad this up to  
+> 240.
+> If we do, then we might wanna be smarter here anyway.
 
-> The only drawback I see so far is copying extra ~200 bytes each time
-> we get a advertising report data.
+The advertising report event has the 'Length' field to inform the
+'Data' field length, so I believe it has a variable length.
+According to its description, the 'Length' field may vary from 0x00
+to 0x1F (31) bytes.
 
-I agree. If this event is being sent on each adv. data report event,
-it will be more than 6 times the amount of data (with non-significant
-bytes containing only zeroes) sent to userspace.
+The only drawback I see so far is copying extra ~200 bytes each time
+we get a advertising report data.
 
-Now one idea: if we guarantee that the EIR/Adv. data field will always
-be the last one, can we assume all remaining bytes on the event are
-EIR/Adv info? I.e. the equivalent in C of:
-
-struct device_found {
-    bdaddr_t addr;
-    uint8_t class_of_device[3];
-    int8_t rssi;
-    uint8_t eir[];
-};
-
-Regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+- Andre
