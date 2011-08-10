@@ -1,134 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arek Lichwa <arkadiusz.lichwa@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Arek Lichwa <arkadiusz.lichwa@tieto.com>
-Subject: [PATCH] Fix PTS DID test case TP/SDI/BV-03-I
-Date: Wed, 10 Aug 2011 16:06:44 +0200
-Message-ID: <1312985204-10311-1-git-send-email-arkadiusz.lichwa@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: johan.hedberg@gmail.com,
+	ext Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 10 Aug 2011 06:55:57 -0700
+In-Reply-To: <4E425061.6080206@nokia.com>
+References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+		<1309309092.2208.25.camel@aeonflux>
+		<CAHMBquWSLjzKKyM2xuMUakHeBb-FMLUWXLj2_Tz4Ye1MWj37qw@mail.gmail.com>
+	 <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com>
+	 <4E3A5BFB.1050201@nokia.com> <4E425061.6080206@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1312984559.3373.122.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now it's allowed to specify arbitrary vendor ID assigner in main.conf
-file to be able verify PTS against DID test case TP/SDI/BV-03-I.
-Available supported vendor assigner's are: BT SIG (0x1) and
-USB Implementer's Forum (0x2).
----
- src/hcid.h         |    2 +-
- src/main.conf      |    7 ++++---
- src/sdpd-server.c  |   18 +++++++-----------
- src/sdpd-service.c |   14 +++++++++++---
- src/sdpd.h         |    4 ++--
- 5 files changed, 25 insertions(+), 20 deletions(-)
+Hi Antti,
 
-diff --git a/src/hcid.h b/src/hcid.h
-index ea038e9..60e0ede 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -42,7 +42,7 @@ struct main_opts {
- 
- 	uint8_t		mode;
- 	uint8_t		discov_interval;
--	char		deviceid[15]; /* FIXME: */
-+	char		deviceid[20]; /* FIXME: */
- };
- 
- enum {
-diff --git a/src/main.conf b/src/main.conf
-index 8cd132f..76779ba 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -37,9 +37,10 @@ InitiallyPowered = true
- # Remember the previously stored Powered state when initializing adapters
- RememberPowered = true
- 
--# Use vendor, product and version information for DID profile support.
--# The values are separated by ":" and VID, PID and version.
--#DeviceID = 1234:5678:abcd
-+# Use vendor assigner, vendor, product and version information for DID profile
-+# support. The values are separated by ":" and VID assigner, VID, PID and
-+# version. The values need to be in hex format.
-+#DeviceID = 2:1234:5678:abcd
- 
- # Do reverse service discovery for previously unknown devices that connect to
- # us. This option is really only needed for qualification since the BITE tester
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index a92ae2c..e54c397 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -241,17 +241,13 @@ int start_sdp_server(uint16_t mtu, const char *did, uint32_t flags)
- 	}
- 
- 	if (did && strlen(did) > 0) {
--		const char *ptr = did;
--		uint16_t vid = 0x0000, pid = 0x0000, ver = 0x0000;
--
--		vid = (uint16_t) strtol(ptr, NULL, 16);
--		ptr = strchr(ptr, ':');
--		if (ptr) {
--			pid = (uint16_t) strtol(ptr + 1, NULL, 16);
--			ptr = strchr(ptr + 1, ':');
--			if (ptr)
--				ver = (uint16_t) strtol(ptr + 1, NULL, 16);
--			register_device_id(vid, pid, ver);
-+		uint16_t vid = 0x0000, pid = 0x0000, ver = 0x0000, vid_assigner = 0x0000;
-+		int result = EOF;
-+		result = sscanf(did, "%4hx:%4hx:%4hx:%4hx", &vid_assigner, &vid, &pid, &ver);
-+		if (result != EOF && result > 3) {
-+			register_device_id(vid_assigner, vid, pid, ver);
-+		} else {
-+			info("DeviceID record not registered");
- 		}
- 	}
- 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index de11562..86f7d73 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -172,8 +172,8 @@ void register_server_service(void)
- 	update_db_timestamp();
- }
- 
--void register_device_id(const uint16_t vendor, const uint16_t product,
--						const uint16_t version)
-+void register_device_id(const uint16_t vendor_assigner, const uint16_t vendor,
-+                        const uint16_t product, const uint16_t version)
- {
- 	const uint16_t spec = 0x0102, source = 0x0002;
- 	const uint8_t primary = 1;
-@@ -225,7 +225,15 @@ void register_device_id(const uint16_t vendor, const uint16_t product,
- 	primary_data = sdp_data_alloc(SDP_BOOL, &primary);
- 	sdp_attr_add(record, 0x0204, primary_data);
- 
--	source_data = sdp_data_alloc(SDP_UINT16, &source);
-+	/* check whether config's vendor ID assigner is valid
-+	 * 0x0001 - BT SIG vendor id assigner
-+	 * 0x0002 - USB Implementer's forum vendor id assigner (here default)
-+	 */
-+	if (vendor_assigner > 0 &&  vendor_assigner < 3)
-+		source_data = sdp_data_alloc(SDP_UINT16, &vendor_assigner);
-+	else
-+		source_data = sdp_data_alloc(SDP_UINT16, &source);
-+
- 	sdp_attr_add(record, 0x0205, source_data);
- 
- 	update_db_timestamp();
-diff --git a/src/sdpd.h b/src/sdpd.h
-index 9f5415f..5ad44b2 100644
---- a/src/sdpd.h
-+++ b/src/sdpd.h
-@@ -53,8 +53,8 @@ int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp);
- 
- void register_public_browse_group(void);
- void register_server_service(void);
--void register_device_id(const uint16_t vendor, const uint16_t product,
--						const uint16_t version);
-+void register_device_id(const uint16_t vendor_assigner, const uint16_t vendor,
-+                        const uint16_t product, const uint16_t version);
- 
- int record_sort(const void *r1, const void *r2);
- void sdp_svcdb_reset(void);
--- 
-1.7.6.433.g1421f
+> > This issue was discussed in the IRC. It seem that for LE, fast
+> > connection is needed only on the initiator side for outgoing connections
+> > (LE scan/connection establishment parameters), since 4.0 spec forbids LE
+> > connections between dual mode devices. So fast connectable mode on the
+> > LE acceptor side would be only used for testing purposes, or if spec is
+> > changed, or if single mode hw is supported in the future.
+> >
+> > For BR/EDR, as Dmitriy explained, the fast connectable use case is to
+> > make headset to be able to connect faster when there is an incoming call
+> > (user switches headset on when call is alerting). It's an enhancement
+> > for headset connection time and usability.
+> >
+> > It is currently implemented in hciops by changing page scan settings
+> > while incoming call is alerting. HCI commands Write Page Scan Activity
+> > and Write Page Scan Type are used to change page scan type from standard
+> > to interlaced and interval 1.28 s => 22.5 ms. This makes the incoming
+> > connection about 1 s faster. Settings are changed only for a short time
+> > to minimize impact on power consumption.
+> >
+> > In my opinion BR and LE cases are quite different, so I think it would
+> > make sense to keep these separate and not to put them in one mgmt
+> > command. Could we just add a generic mgmt command for setting BR page
+> > scan parameters, for example "Set Page Scan Parameters Command" which
+> > would take parameters type (standard or interlaced), interval, and window?
+> >
+> > Br,
+> > Antti
+> 
+> Any comments on this one? There has been lot of ideas about how the 
+> "fast connectable mode" for incoming connections should be implemented 
+> for management interface, and whether the same mgmt command should be 
+> used for both BR and LE. It's not totally clear yet what is needed for 
+> LE, but at least the Proximity profile requires changing the advertising 
+> parameters to make connecting faster.
+> 
+> Which option do you prefer?
+> 
+> 1) Unified mgmt command for both BR and LE: fast connectable mode toggling.
+>   + simple interface for both BR and LE
+>   - scan/advertising parameters are hardcoded to kernel
+>   - BR page scan and LE advertising are two different things, why to mix 
+> them in same mgmt command?
+>   - not even needed currently by LE: only if single mode dongles will be 
+> supported, or spec is changed to allow dual mode device to accept LE 
+> connections
+> 
+> 2) Command for BR and LE as in option 1, in addition we could define 3 
+> values. e.g. slow, normal, fast.
+>   + flexible to support LE advertising settings (when we support single 
+> mode dongles)
+> 
+> 3) The patch I sent, fast connectable mode only for BR. If on/off 
+> toggling is enough for LE, it's easy to add LE support later.
+> 
+> 4) Mgmt command for setting parameters for BR/LE/both to kernel, and 
+> another for toggling fast connectable on/off
+>   + more flexible than just toggling
+>   - two mgmt commands needed
+> 
+> 5) Mgmt command for changing BR page scan parameters, e.g "Set Page Scan 
+> Parameters".
+>   + simplest solution for BR, since it's currently only needed for 
+> optimizing scan parameters for HFP connections
+>   + generic interface which can be used also for other purposes, no need 
+> to have concept of "fast connectable mode" in the kernel
+>   + more flexible for user space, if values need to be changed, or 
+> optimized for another purpose
+>   - too low level stuff for mgmt interface?
+>   - another solution needed for LE
+> 
+> 6) Something else.
+
+I recap, then fast connectable mode is something that is controlled by
+one or multiple profiles. So this is just really a on/off switch. And if
+we support it then all profiles should just use the same settings for
+it. So far correct? Or do we need different values/parameters on a per
+profile basis?
+
+If I just assume the above, then we need a set of commands that can
+configure the settings of fast connectable mode. And that is done once
+when we start bluetoothd. After that it is really just toggle on and
+toggle off. And bluetoothd internally can keep a reference count for
+that.
+
+And then it makes sense to do the same for LE and BR/EDR. It is either
+on or off. Just the initial parameter set for LE is configured
+differently.
+
+Regards
+
+Marcel
+
 
