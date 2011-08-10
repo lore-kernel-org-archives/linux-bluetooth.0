@@ -1,58 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <59EF67F7-A9E0-4C6D-963E-C4EF90F611FC@openbossa.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1312989466.3373.126.camel@aeonflux>
+In-Reply-To: <1312984092.3373.116.camel@aeonflux>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v936)
-Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to mgmt_device_found()
-Date: Wed, 10 Aug 2011 16:51:47 -0300
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org> <1312984225.3373.118.camel@aeonflux> <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com> <1312989466.3373.126.camel@aeonflux>
+Subject: Re: [PATCH v2 09/16] Bluetooth: Prepare for full support discovery procedures
+Date: Wed, 10 Aug 2011 16:51:33 -0300
+References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-10-git-send-email-andre.guedes@openbossa.org> <1312984092.3373.116.camel@aeonflux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel/Lizardo,
+Hi Marcel,
 
-On Aug 10, 2011, at 12:17 PM, Marcel Holtmann wrote:
+On Aug 10, 2011, at 10:48 AM, Marcel Holtmann wrote:
 
-> Hi Anderson,
+> Hi Andre,
 >
->>>> This patch adds a new parameter to mgmt_device_found() to inform
->>>> the length of 'eir' pointer.
->>>>
->>>> EIR data from LE advertising report event doesn't have a fixed  
->>>> length
->>>> as EIR data from extended inquiry result event does. We needed to
->>>> change mgmt_device_found() so it copies 'eir_len' bytes instead of
->>>> HCI_MAX_EIR_LENGTH.
->>>
->>> what is the max EIR length for LE? Is it more than with BR/EDR. Or  
->>> is it
->>> just variable length?
+>> This patch prepares start_discovery() to support LE-Only and BR/EDR/ 
+>> LE
+>> devices discovery procedures (BR/EDR devices are already supported).
 >>
->> From page 1735:
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> include/net/bluetooth/hci.h      |    1 +
+>> include/net/bluetooth/hci_core.h |    1 +
+>> net/bluetooth/mgmt.c             |   37 ++++++++++++++++++++++++++++ 
+>> ++++++++-
+>> 3 files changed, 38 insertions(+), 1 deletions(-)
 >>
->> "The data consists of a significant part and a non-significant part.
->> [...] The non-significant part extends the Advertising and Scan
->> Response data to 31 octets and shall contain all-zero octets."
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/ 
+>> hci.h
+>> index be30aab..653daec 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -202,6 +202,7 @@ enum {
 >>
->> So actually it is not variable length, it has 31 octets, with the
->> non-significant part zero padded. BR/EDR EIR, on the other hand is  
->> 240
->> bytes (with zero padding for non-significant part as well)
+>> #define LMP_EV4		0x01
+>> #define LMP_EV5		0x02
+>> +#define LMP_NO_BREDR	0x20
+>> #define LMP_LE		0x40
+>>
+>> #define LMP_SNIFF_SUBR	0x02
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/ 
+>> bluetooth/hci_core.h
+>> index 1ff59f2..0d2e703 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -597,6 +597,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>> #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+>> #define lmp_ssp_capable(dev)       ((dev)->features[6] &  
+>> LMP_SIMPLE_PAIR)
+>> #define lmp_no_flush_capable(dev)  ((dev)->features[6] &  
+>> LMP_NO_FLUSH)
+>> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] &  
+>> LMP_NO_BREDR))
 >
-> do we have a deep impact (memory wise) if we always pad this up to  
-> 240.
-> If we do, then we might wanna be smarter here anyway.
+> I don't think this is a good idea. You keep forgetting if you actually
+> have LE switched on or not.
+>
+> I think we should keep it like this and just keep a global hci_dev  
+> state
+> which discovery procedure to use. Depending on if the device is just
+> really LE-Only, it is dual-stack, but LE got switched off (we will  
+> need
+> this eventually for testing) or it is just only BR/EDR.
 
-The advertising report event has the 'Length' field to inform the
-'Data' field length, so I believe it has a variable length.
-According to its description, the 'Length' field may vary from 0x00
-to 0x1F (31) bytes.
+I agree. What really matters for the discovery procedure is the
+operation mode not the device type. The term "device type" was
+misused here.
 
-The only drawback I see so far is copying extra ~200 bytes each time
-we get a advertising report data.
+About the global hci_dev state, IMO we may not need it. By looking
+at the controller's LMP features we are able to infer what is the
+controller's operation mode.
 
-- Andre
+>> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+>>
+>> /* ----- Extended LMP capabilities ----- */
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index bbb0daa..dcfb466 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -32,6 +32,15 @@
+>> #define MGMT_VERSION	0
+>> #define MGMT_REVISION	1
+>>
+>> +enum bt_device_type {
+>> +	BREDR_ONLY,
+>> +	LE_ONLY,
+>> +	BREDR_LE,
+>> +	UNKNOWN,
+>> +};
+>
+> What is this for? We essentially have a local device capabilities  
+> and an
+> operation mode. They are both different. We do not have a device type.
+
+I'll change this. I may call this bt_operation_mode or something.
+
+>
+>> +
+>> +#define BREDR_ONLY_INQ_LENGTH 0x08 /* TGAP(100) */
+>> +
+>> struct pending_cmd {
+>> 	struct list_head list;
+>> 	__u16 opcode;
+>> @@ -1628,10 +1637,23 @@ static int do_inquiry(struct hci_dev *hdev,  
+>> __u8 inq_length)
+>> 	return hci_send_cmd(hdev, HCI_OP_INQUIRY, sizeof(cp), &cp);
+>> }
+>>
+>> +static int get_device_type(struct hci_dev *hdev)
+>> +{
+>> +	if (lmp_bredr_capable(hdev) && lmp_host_le_capable(hdev))
+>> +		return BREDR_LE;
+>> +	else if (lmp_host_le_capable(hdev))
+>> +		return LE_ONLY;
+>> +	else if (lmp_bredr_capable(hdev))
+>> +		return BREDR_ONLY;
+>> +	else
+>> +		return UNKNOWN;
+>> +}
+>> +
+>> static int start_discovery(struct sock *sk, u16 index)
+>> {
+>> 	struct pending_cmd *cmd;
+>> 	struct hci_dev *hdev;
+>> +	int dev_type;
+>> 	int err;
+>>
+>> 	BT_DBG("hci%u", index);
+>> @@ -1654,7 +1676,20 @@ static int start_discovery(struct sock *sk,  
+>> u16 index)
+>> 		goto failed;
+>> 	}
+>>
+>> -	err = do_inquiry(hdev, 0x08);
+>> +	dev_type = get_device_type(hdev);
+>> +
+>> +	switch (dev_type) {
+>> +	case BREDR_ONLY:
+>> +		err = do_inquiry(hdev, BREDR_ONLY_INQ_LENGTH);
+>> +		break;
+>> +	case LE_ONLY:
+>> +	case BREDR_LE:
+>> +		err = -ENOSYS;
+>> +		break;
+>> +	default:
+>> +		err = -EINVAL;
+>> +	}
+>> +
+>> 	if (err < 0)
+>> 		mgmt_pending_remove(cmd);
+>>
+>
+> As I said, device type is fundamentally wrong approach. You need to go
+> for operation mode here.
+
+I'll change this too.
+
+Thanks,
+
+Andre.
