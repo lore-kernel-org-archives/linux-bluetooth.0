@@ -2,46 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v3 01/22] audio: move interface declarations to their headers
-Date: Wed, 10 Aug 2011 10:06:15 -0300
-Message-Id: <1312981596-7291-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1312981596-7291-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1312981596-7291-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v3 00/22] Implement AVRCP 1.3 for TG role
+Date: Wed, 10 Aug 2011 10:06:14 -0300
+Message-Id: <1312981596-7291-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/device.h |    4 ----
- audio/unix.c   |    1 +
- 2 files changed, 1 insertions(+), 4 deletions(-)
+Changes from previous version:
+- Removal of patch to use C99 instead of gcc extension
+- Use of heap instead of relying on VLA to use memory from stack
+- Coding style fixes
+- SettingChanged signal and ChangeSetting method were renamed to
+  PropertyChanged and SetProperty in order to use the common infrastructure
+  already present in BlueZ.
 
-diff --git a/audio/device.h b/audio/device.h
-index 35af788..5117fca 100644
---- a/audio/device.h
-+++ b/audio/device.h
-@@ -38,10 +38,6 @@
- #define AVRCP_REMOTE_UUID	"0000110e-0000-1000-8000-00805f9b34fb"
- #define AVRCP_TARGET_UUID	"0000110c-0000-1000-8000-00805f9b34fb"
- 
--/* Move these to respective .h files once they exist */
--#define AUDIO_SOURCE_INTERFACE		"org.bluez.AudioSource"
--#define AUDIO_CONTROL_INTERFACE		"org.bluez.Control"
--
- struct source;
- struct control;
- struct target;
-diff --git a/audio/unix.c b/audio/unix.c
-index 8ce50b0..1e0ab30 100644
---- a/audio/unix.c
-+++ b/audio/unix.c
-@@ -49,6 +49,7 @@
- #include "a2dp.h"
- #include "headset.h"
- #include "sink.h"
-+#include "source.h"
- #include "gateway.h"
- #include "unix.h"
- #include "glib-helper.h"
+
+regads,
+Lucas De Marchi
+
+
+
+Lucas De Marchi (22):
+  audio: move interface declarations to their headers
+  avrcp: add skeleton of MediaPlayer interface
+  avrcp: implement SetProperty() method of MediaPlayer
+  avrcp: implement ChangePlayback() method
+  avrcp: implement ChangeTrack() method
+  avrcp: handle query for company ids
+  avrcp: handle ListPlayerApplicationSettingAttributes pdu
+  avrcp: handle ListPlayerApplicationSettingValues pdu
+  avrcp: handle GetCurrentPlayerAplicationSettingValue pdu
+  avrcp: handle SetPlayerApplicationSettingValue pdu
+  avrcp: handle commands for future extension
+  avrcp: handle InformDisplayableCharacterSet pdu
+  avrcp: handle InformBatteryStatusOfCT pdu
+  avrcp: handle GetPlayStatus pdu
+  avrcp: handle RegisterNotification pdu
+  avrcp: handle query for supported events
+  avrcp: handle GetElementAttributes pdu
+  avrcp: send response for registered events
+  avrcp: change TG record to use version 1.3
+  avrcp: update copyright
+  Add script to test MediaPlayer interface
+  Update Control documentation
+
+ audio/control.c        | 1399 +++++++++++++++++++++++++++++++++++++++++++++++-
+ audio/control.h        |    4 +-
+ audio/device.h         |    4 -
+ audio/manager.c        |   11 +-
+ audio/manager.h        |    1 +
+ audio/unix.c           |    1 +
+ doc/control-api.txt    |   94 ++--
+ test/test-media-player |  108 ++++
+ 8 files changed, 1562 insertions(+), 60 deletions(-)
+ create mode 100755 test/test-media-player
+
 -- 
 1.7.6
 
