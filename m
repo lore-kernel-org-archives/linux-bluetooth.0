@@ -2,31 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <syamsidhardh@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <syamsidhardh@gmail.com>
-Subject: [PATCH hcidump] Add support for parsing SRM headers
-Date: Thu, 11 Aug 2011 00:15:49 +0530
-Message-Id: <1313001949-29686-1-git-send-email-syamsidhardh@gmail.com>
+Subject: [PATCH 2/2] gdbus: Remove reduntant copy of GSList* from function
+Date: Thu, 11 Aug 2011 00:14:47 +0530
+Message-Id: <1313001887-29644-2-git-send-email-syamsidhardh@gmail.com>
+In-Reply-To: <1313001887-29644-1-git-send-email-syamsidhardh@gmail.com>
+References: <1313001887-29644-1-git-send-email-syamsidhardh@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Local copy of the pointer to list is not required, because these
+functions already has a copy, through the arguments.
 ---
- parser/obex.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ gdbus/object.c |    6 ++----
+ 1 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/parser/obex.c b/parser/obex.c
-index ede6748..d745d89 100644
---- a/parser/obex.c
-+++ b/parser/obex.c
-@@ -187,6 +187,10 @@ static char *hi2str(uint8_t hi)
- 		return "DestName";
- 	case 0x16:
- 		return "Permission";
-+	case 0x17:
-+		return "Single Response Mode";
-+	case 0x18:
-+		return "Single Response Mode Parameter";
- 	default:
- 		return "Unknown";
- 	}
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 8bc12f5..dafb6b5 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -399,15 +399,13 @@ static void generic_unregister(DBusConnection *connection, void *user_data)
+ 	g_free(data);
+ }
+ 
+-static struct interface_data *find_interface(GSList *interfaces,
++static struct interface_data *find_interface(GSList *list,
+ 						const char *name)
+ {
+-	GSList *list;
+-
+ 	if (name == NULL)
+ 		return NULL;
+ 
+-	for (list = interfaces; list; list = list->next) {
++	for (; list; list = list->next) {
+ 		struct interface_data *iface = list->data;
+ 		if (!strcmp(name, iface->name))
+ 			return iface;
 -- 
 1.7.4.1
 
