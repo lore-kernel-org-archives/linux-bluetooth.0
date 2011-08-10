@@ -2,54 +2,129 @@ Return-Path: <cyrus@holtmann.org>
 From: Syam Sidhardhan <syamsidhardh@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <syamsidhardh@gmail.com>
-Subject: [PATCH obexd 2/3] doc: Fix typo in client-api
-Date: Thu, 11 Aug 2011 00:13:27 +0530
-Message-Id: <1313001808-29597-2-git-send-email-syamsidhardh@gmail.com>
-In-Reply-To: <1313001808-29597-1-git-send-email-syamsidhardh@gmail.com>
-References: <1313001808-29597-1-git-send-email-syamsidhardh@gmail.com>
+Subject: [PATCH obexd 1/3] Remove redundant copy of GSlist* from functions
+Date: Thu, 11 Aug 2011 00:13:26 +0530
+Message-Id: <1313001808-29597-1-git-send-email-syamsidhardh@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Local copy of the pointer to list is not required, because these
+functions already has a copy, through the arguments.
 ---
- doc/client-api.txt |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ plugins/phonebook-tracker.c |   31 ++++++++++++-------------------
+ src/service.c               |    8 +++-----
+ src/service.h               |    2 +-
+ 3 files changed, 16 insertions(+), 25 deletions(-)
 
-diff --git a/doc/client-api.txt b/doc/client-api.txt
-index 4104adb..3e61cf7 100644
---- a/doc/client-api.txt
-+++ b/doc/client-api.txt
-@@ -130,7 +130,7 @@ Methods		void ChangeFolder(string folder)
+diff --git a/plugins/phonebook-tracker.c b/plugins/phonebook-tracker.c
+index 8bc070f..79458a3 100644
+--- a/plugins/phonebook-tracker.c
++++ b/plugins/phonebook-tracker.c
+@@ -783,13 +783,11 @@ static gboolean contact_matches(struct contact_data *c_data, const char *id,
+ 	return (cmp_ret == 0) ? TRUE : FALSE;
+ }
  
- 		void MoveFile(string sourcefile, string targetfile)
+-static struct phonebook_contact *find_contact(GSList *contacts, const char *id,
++static struct phonebook_contact *find_contact(GSList *list, const char *id,
+ 							const char *datetime)
+ {
+-	GSList *l;
+-
+-	for (l = contacts; l; l = l->next) {
+-		struct contact_data *c_data = l->data;
++	for (; list; list = list->next) {
++		struct contact_data *c_data = list->data;
  
--			Movea file within the remote device from source file
-+			Move a file within the remote device from source file
- 			to the target file.
+ 		if (contact_matches(c_data, id, datetime))
+ 			return c_data->contact;
+@@ -798,13 +796,11 @@ static struct phonebook_contact *find_contact(GSList *contacts, const char *id,
+ 	return NULL;
+ }
  
- 		void Delete(string file)
-@@ -245,11 +245,11 @@ Methods		void SetLocation(string location)
+-static struct phonebook_field *find_field(GSList *fields, const char *value,
++static struct phonebook_field *find_field(GSList *list, const char *value,
+ 								int type)
+ {
+-	GSList *l;
+-
+-	for (l = fields; l; l = l->next) {
+-		struct phonebook_field *field = l->data;
++	for (; list; list = list->next) {
++		struct phonebook_field *field = list->data;
+ 		/* Returning phonebook number if phone values and type values
+ 		 * are equal */
+ 		if (g_strcmp0(field->text, value) == 0 && field->type == type)
+@@ -892,17 +888,16 @@ static void add_url(struct phonebook_contact *contact, const char *url_val,
+ 	contact->urls = g_slist_append(contact->urls, url);
+ }
  
- 		string GetPhonebook()
+-static GString *gen_vcards(GSList *contacts,
++static GString *gen_vcards(GSList *list,
+ 					const struct apparam_field *params)
+ {
+-	GSList *l;
+ 	GString *vcards;
  
--			retrieve an entire Phonebook Object store from remote device
-+			Retrieve an entire Phonebook Object store from remote device
+ 	vcards = g_string_new(NULL);
  
- 		void PutPhonebook(string obj)
+ 	/* Generating VCARD string from contacts and freeing used contacts */
+-	for (l = contacts; l; l = l->next) {
+-		struct contact_data *c_data = l->data;
++	for (; list; list = list->next) {
++		struct contact_data *c_data = list->data;
+ 		phonebook_add_contact(vcards, c_data->contact,
+ 					params->filter, params->format);
+ 	}
+@@ -1428,12 +1423,10 @@ done:
+ 	return path;
+ }
  
--			send an entire Phonebook Object store to remote device
-+			Send an entire Phonebook Object store to remote device
+-static gboolean find_checked_number(GSList *numbers, const char *number)
++static gboolean find_checked_number(GSList *list, const char *number)
+ {
+-	GSList *l;
+-
+-	for (l = numbers; l; l = l->next) {
+-		GString *ph_num = l->data;
++	for (; list; list = list->next) {
++		GString *ph_num = list->data;
+ 		if (g_strcmp0(ph_num->str, number) == 0)
+ 			return TRUE;
+ 	}
+diff --git a/src/service.c b/src/service.c
+index f7c5a61..8cf5b27 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -37,14 +37,12 @@
  
- Transfer hierarchy
- ==================
-@@ -317,7 +317,7 @@ Methods		void Release()
+ static GSList *drivers = NULL;
  
- 		void Complete(object transfer)
+-struct obex_service_driver *obex_service_driver_find(GSList *drivers,
++struct obex_service_driver *obex_service_driver_find(GSList *list,
+ 			const uint8_t *target, unsigned int target_size,
+ 			const uint8_t *who, unsigned int who_size)
+ {
+-	GSList *l;
+-
+-	for (l = drivers; l; l = l->next) {
+-		struct obex_service_driver *driver = l->data;
++	for (; list; list = list->next) {
++		struct obex_service_driver *driver = list->data;
  
--			Informs that the transfer has completed sucessfully.
-+			Informs that the transfer has completed successfully.
- 
- 		void Error(object transfer, string message)
- 
+ 		/* who is optional, so only check for it if not NULL */
+ 		if (who != NULL && memncmp0(who, who_size, driver->who,
+diff --git a/src/service.h b/src/service.h
+index 6633be3..3906cfd 100644
+--- a/src/service.h
++++ b/src/service.h
+@@ -48,6 +48,6 @@ struct obex_service_driver {
+ int obex_service_driver_register(struct obex_service_driver *driver);
+ void obex_service_driver_unregister(struct obex_service_driver *driver);
+ GSList *obex_service_driver_list(uint16_t services);
+-struct obex_service_driver *obex_service_driver_find(GSList *drivers,
++struct obex_service_driver *obex_service_driver_find(GSList *list,
+ 			const uint8_t *target, unsigned int target_size,
+ 			const uint8_t *who, unsigned int who_size);
 -- 
 1.7.4.1
 
