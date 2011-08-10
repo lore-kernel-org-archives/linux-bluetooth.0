@@ -1,44 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1312990866.4e42a6925110a@netmail.pipex.net>
-Date: Wed, 10 Aug 2011 16:41:06 +0100
-From: dave higton <davehigton@dsl.pipex.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluetooth encryption algorithms
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to
+ mgmt_device_found()
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Date: Wed, 10 Aug 2011 08:17:44 -0700
+In-Reply-To: <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com>
+References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
+	 <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org>
+	 <1312984225.3373.118.camel@aeonflux>
+	 <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1312989466.3373.126.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My friend Google has been of no help, and my searches
-through the bluez source have not found what I was
-looking for: information, and ideally source code,
-for the Bluetooth encryption algorithms.
+Hi Anderson,
 
-I'm trying to create a simple Bluetooth stack for
-RISC OS.  Rather than attempt to port an existing
-open source stack, I'm trying to write from scratch
-as far as possible.  This may be a naive idea, but I
-want to do it as much for the educational value to me
-as for the end product.
+> >> This patch adds a new parameter to mgmt_device_found() to inform
+> >> the length of 'eir' pointer.
+> >>
+> >> EIR data from LE advertising report event doesn't have a fixed length
+> >> as EIR data from extended inquiry result event does. We needed to
+> >> change mgmt_device_found() so it copies 'eir_len' bytes instead of
+> >> HCI_MAX_EIR_LENGTH.
+> >
+> > what is the max EIR length for LE? Is it more than with BR/EDR. Or is it
+> > just variable length?
+> 
+> From page 1735:
+> 
+> "The data consists of a significant part and a non-significant part.
+> [...] The non-significant part extends the Advertising and Scan
+> Response data to 31 octets and shall contain all-zero octets."
+> 
+> So actually it is not variable length, it has 31 octets, with the
+> non-significant part zero padded. BR/EDR EIR, on the other hand is 240
+> bytes (with zero padding for non-significant part as well)
 
-I have been able to perform an inquiry, get the names
-of discoverable devices, and perform the first step
-of pairing.  So far, so good - and, yes, that's the
-easy stuff.
+do we have a deep impact (memory wise) if we always pad this up to 240.
+If we do, then we might wanna be smarter here anyway.
 
-So if anyone can point me to sources of information
-detailed and explicit enough to show me how Bluetooth
-encryption and decryption are done, I would very much
-appreciate it.  I have the Bluetooth core specification,
-but I'm not confident that I can implement correctly
-from it alone.  I'm also looking for test data, ideally
-for each step through each algorithm.
+Regards
 
-If there is a book that covers the subject in enough
-detail, I'd be happy to buy it.
-
-Tia,
-
-Dave
+Marcel
 
 
