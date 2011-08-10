@@ -1,28 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Aug 2011 12:30:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Fix memory issues in EDS PBAP
-Message-ID: <20110810093029.GA21443@dell>
-References: <1312931140-9143-1-git-send-email-bulislaw@linux.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1312931140-9143-1-git-send-email-bulislaw@linux.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd] Fix memory leak on opp plugin
+Date: Wed, 10 Aug 2011 11:17:50 +0300
+Message-Id: <1312964270-8806-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Aug 10, 2011, Bartosz Szatkowski wrote:
-> ---
->  plugins/phonebook-ebook.c |   19 +++++++++++++------
->  1 files changed, 13 insertions(+), 6 deletions(-)
+Folder and name can point to allocated memory so they need to be freed
+before returning.
 
-Both patches have been applied. Thanks.
+Thanks for Daniele Forsi <dforsi@gmail.com> for reporting it.
+---
+ plugins/opp.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-I additionally pushed a cleanup patch to phonebook-ebook.c since there
-were quite a lot of coding style issues in it as well as GError misuse
-(you always need to initialize them to NULL).
+diff --git a/plugins/opp.c b/plugins/opp.c
+index 644a2c6..fd78af4 100644
+--- a/plugins/opp.c
++++ b/plugins/opp.c
+@@ -142,8 +142,10 @@ static int opp_chkput(struct obex_session *os, void *user_data)
+ 		name = g_strdup(obex_get_name(os));
+ 
+ skip_auth:
+-	if (name == NULL || strlen(name) == 0)
+-		return -EBADR;
++	if (name == NULL || strlen(name) == 0) {
++		ret = -EBADR;
++		goto failed;
++	}
+ 
+ 	if (g_strcmp0(name, obex_get_name(os)) != 0)
+ 		obex_set_name(os, name);
+@@ -155,6 +157,8 @@ skip_auth:
+ 	ret = obex_put_stream_start(os, path);
+ 
+ 	g_free(path);
++
++failed:
+ 	g_free(folder);
+ 	g_free(name);
+ 
+-- 
+1.7.6
 
-Johan
