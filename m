@@ -1,40 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Adamek <adamek.kuba@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Adamek <adamek.kuba@gmail.com>
-Subject: [RFC obexd 0/4] Rework get_next_header function
-Date: Fri, 12 Aug 2011 01:43:04 +0200
-Message-Id: <1313106188-30273-1-git-send-email-adamek.kuba@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 11 Aug 2011 18:51:42 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [RFC] BTUSB: be quiet on device disconnect
+Message-ID: <20110811215142.GG19699@joana>
+References: <1312902988.1853.24.camel@x61.thuisdomein>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312902988.1853.24.camel@x61.thuisdomein>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-the existing code provides a mimetype driver function that allows
-drivers to specify their own return headers - get_next_header.
+Hi Paul,
 
-These patches change this function and the code that uses it
-to be able to:
-a) specify return headers in PUT operations (currently the function
-is only called for GET),
-b) change criteria for signaling that all headers have been sent
-to setting the header number to OBEX_HEADER_EMPTY (currently this
-is done by setting the header data length to 0, which prevents us
-from actually returning headers with 0 data length),
-c) provide way to return 8 and 32 bit headers (current code only
-supports the variable length header types).
+* Paul Bolle <pebolle@tiscali.nl> [2011-08-09 17:16:28 +0200]:
 
-Jakub Adamek (4):
-  Call get_next_header in PUT operations
-  Stop get_next_headers on OBEX_HEADER_EMPTY
-  Adapt get_next_header for 1 and 4 byte headers
-  Adapt PBAP to changes in get_next_header behaviour
+> Disabling the bluetooth usb device embedded in (some) ThinkPads tends to
+> lead to errors like these:
+>     btusb_bulk_complete: hci0 urb ffff88011b9bfd68 failed to resubmit (19)
+>     btusb_intr_complete: hci0 urb ffff88011b46a318 failed to resubmit (19)
+>     btusb_bulk_complete: hci0 urb ffff88011b46a000 failed to resubmit (19)
+> 
+> That is because usb_disconnect() doesn't "quiesces" pending urbs.
+> 
+> Disconnecting a device is a normal thing to happen so it's no big deal
+> that usb_submit_urb() returns -ENODEV. The simplest way to get rid of
+> these errors is to stop treating that return as an error. Trivial,
+> actually.
+> 
+> While we're at it, add comments to be explicit about the reasons we're
+> not complaining about -EPERM and -ENODEV.
+> 
+> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> ---
+> 0) This patch seems to put an end to a pet peeve of mine: the errors in
+> the logs of a ThinkPad when I disable its embedded bluetooth.
+> 
+> 1) I added Greg and linux-usb@vger.kernel.org because usb_submit_urb()
+> doesn't specify the meaning of its negative return values. I traced
+> -EPERM to usb_hcd_link_urb_to_ep(). That returns -EPERM if the urb is
+> "being killed". Did I trace the calls made by usb_submit_urb()
+> correctly? I also just assumed that -ENODEV always means device got
+> disconnected or something comparable. Is that correct too?
+> 
+> 2) Sent as an RFC because btusb's btusb_*_complete() functions puzzle
+> me. If I read their code correctly these three functions will be an
+> urb's completion handler when usb_submit_urb() is called on that urb.
+> This means they will be called when usb_submit_urb() is done doing its
+> stuff. But they themselves also call usb_submit_urb()! So, apparently,
+> there's this endless loop:
+>     usb_submit_urb()
+>         btusb_*_complete()
+>            usb_submit_urb()
+>                [...]
+> 
+> It seems that usb_submit_urb() returning -EPERM is the expected way for
+> this loop to end. Am I reading this correctly? If so, doesn't this need
+> some comments to explain that? But perhaps calling usb_submit_urb() in a
+> completion handler is a common pattern for usb devices.
+> 
+>  drivers/bluetooth/btusb.c |   12 +++++++++---
+>  1 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 91d13a9..9e4448e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -256,7 +256,9 @@ static void btusb_intr_complete(struct urb *urb)
+>  
+>  	err = usb_submit_urb(urb, GFP_ATOMIC);
+>  	if (err < 0) {
+> -		if (err != -EPERM)
+> +		/* -EPERM: urb is being killed;
+> +		 * -ENODEV: device got disconnected */
+> +		if (err != -EPERM && err != -ENODEV)
+>  			BT_ERR("%s urb %p failed to resubmit (%d)",
+>  						hdev->name, urb, -err);
+>  		usb_unanchor_urb(urb);
+> @@ -341,7 +343,9 @@ static void btusb_bulk_complete(struct urb *urb)
+>  
+>  	err = usb_submit_urb(urb, GFP_ATOMIC);
+>  	if (err < 0) {
+> -		if (err != -EPERM)
+> +		/* -EPERM: urb is being killed;
+> +		 * -ENODEV: device got disconnected */
+> +		if (err != -EPERM && err != -ENODEV)
+>  			BT_ERR("%s urb %p failed to resubmit (%d)",
+>  						hdev->name, urb, -err);
+>  		usb_unanchor_urb(urb);
+> @@ -431,7 +435,9 @@ static void btusb_isoc_complete(struct urb *urb)
+>  
+>  	err = usb_submit_urb(urb, GFP_ATOMIC);
+>  	if (err < 0) {
+> -		if (err != -EPERM)
+> +		/* -EPERM: urb is being killed;
+> +		 * -ENODEV: device got disconnected */
+> +		if (err != -EPERM && err != -ENODEV)
+>  			BT_ERR("%s urb %p failed to resubmit (%d)",
+>  						hdev->name, urb, -err);
+>  		usb_unanchor_urb(urb);
 
- plugins/pbap.c  |    2 +
- src/obex-priv.h |    1 +
- src/obex.c      |  224 ++++++++++++++++++++++++++++++++++++-------------------
- src/obex.h      |    3 +
- 4 files changed, 153 insertions(+), 77 deletions(-)
+Applied. Thanks.
 
--- 
-1.7.4.1
-
+	Gustavo
