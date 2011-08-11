@@ -1,267 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Aug 2011 13:51:58 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Bartosz Szatkowski <bulislaw@linux.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] Add SetRemoteProperties method for OOB COD
- setting
-Message-ID: <20110811165157.GA3256@piper>
-References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v2 1/3] Remove paired and bonded from btd_device structure
+Date: Thu, 11 Aug 2011 18:54:40 +0300
+Message-Id: <1313078082-20192-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1313078082-20192-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1313078082-20192-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+paired and bonded device properties are replaced by pairing_status.
+---
+ src/device.c |   43 ++++++++++++++++++++++++++++++-------------
+ 1 files changed, 30 insertions(+), 13 deletions(-)
 
-On 13:14 Thu 11 Aug, Bartosz Szatkowski wrote:
-> Add method for suppling class of device through OOB mechanism, to be
-> available at pairing phase. At this point it may be presented to the
-> user, by agent, in confirmation request (or whatever).
-> ---
->  doc/oob-api.txt   |   13 ++++
->  plugins/dbusoob.c |  170 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 183 insertions(+), 0 deletions(-)
-> 
-> diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-> index d838712..0324758 100644
-> --- a/doc/oob-api.txt
-> +++ b/doc/oob-api.txt
-> @@ -36,3 +36,16 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
->  
->  			Possible errors: org.bluez.Error.Failed
->  					 org.bluez.Error.InvalidArguments
-> +
-> +		void SetRemoteProperties(string address, dict data)
-> +
-> +			This method set new properties for device with specified
-> +			address, to be used when device is created.
-> +			On success DeviceFound signal will be emitted.
-> +
-> +			Currently supported keys:
-> +
-> +				Class		uint32
-> +
-> +			Possible errors: org.bluez.Error.Failed
-> +					 org.bluez.Error.InvalidArguments
-> diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-> index 2c03780..ca0c635 100644
-> --- a/plugins/dbusoob.c
-> +++ b/plugins/dbusoob.c
-> @@ -43,6 +43,7 @@
->  #include "event.h"
->  #include "error.h"
->  #include "oob.h"
-> +#include "storage.h"
->  
->  #define OOB_INTERFACE	"org.bluez.OutOfBand"
->  
-> @@ -51,6 +52,13 @@ struct oob_request {
->  	DBusMessage *msg;
->  };
->  
-> +struct oob_remote_parameters {
-> +	bdaddr_t local;
-> +	bdaddr_t peer;
-> +	const char *address;
-> +	uint32_t class;
-> +};
-> +
->  static GSList *oob_requests = NULL;
->  static DBusConnection *connection = NULL;
->  
-> @@ -153,6 +161,167 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
->  	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
->  }
->  
-> +static void emit_device_found(const char *path,
-> +				struct oob_remote_parameters *params)
-> +{
-> +	DBusMessage *signal;
-> +	DBusMessageIter iter, dict;
-> +
-> +	signal = dbus_message_new_signal(path, ADAPTER_INTERFACE,
-> +								"DeviceFound");
-> +	if (signal == NULL) {
-> +		error("Unable to allocate new %s.DeviceFound signal",
-> +							ADAPTER_INTERFACE);
-> +		return;
-> +	}
-> +
-> +	dbus_message_iter_init_append(signal, &iter);
-> +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
-> +							&params->address);
-> +
-> +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-> +			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-> +			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-> +			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-> +
-> +	if (params->class != 0)
-> +		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
-> +							&params->class);
-> +
-> +	dbus_message_iter_close_container(&iter, &dict);
-> +
-> +	g_dbus_send_message(connection, signal);
-> +}
-> +
-> +static DBusMessage *parse_class(DBusMessageIter *value,
-> +			struct oob_remote_parameters *params, DBusMessage *msg)
-> +{
-> +	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
-> +		return btd_error_invalid_args(msg);
-> +
-> +	dbus_message_iter_get_basic(value, &params->class);
-> +
-> +	return NULL;
-> +}
-> +
-> +static gboolean set_class(struct oob_remote_parameters *params)
-> +{
-> +	if (params->class == 0)
-> +		return FALSE;
-> +
-> +	if (write_remote_class(&params->local, &params->peer,
-> +							params->class) < 0) {
-> +		error("Setting device class failed");
-> +
-> +		return FALSE;
-> +	}
-> +
-> +	return TRUE;
-> +}
-> +
-> +static DBusMessage *parse_property(const char *property,
-> +				DBusMessageIter *value, DBusMessage *msg,
-> +				struct oob_remote_parameters *params)
-> +{
-> +	if (g_str_equal("Class", property))
-> +		return parse_class(value, params, msg);
-> +
-> +	return NULL;
-> +}
-> +
-> +static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
-> +				struct oob_remote_parameters *params)
-> +{
-
-Why is DBusMessage needed here?
-
-> +	gboolean device_found = FALSE;
-> +
-> +	if (set_class(params))
-> +		device_found = TRUE;
-> +
-> +	if (device_found)
-> +		emit_device_found(adapter_get_path(adapter), params);
-> +}
-> +
-> +static DBusMessage *set_remote_properties(DBusConnection *conn,
-> +						DBusMessage *msg, void *data)
-> +{
-> +	struct btd_adapter *adapter = data;
-> +	DBusMessageIter iter_msg, iter_dict, iter_entry, iter_variant;
-> +	struct oob_remote_parameters *params;
-> +	char *addr;
-> +	DBusMessage *result;
-> +
-> +	if (!dbus_message_iter_init(msg, &iter_msg))
-> +		return btd_error_invalid_args(msg);
-> +
-> +	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_STRING)
-> +		return btd_error_invalid_args(msg);
-> +
-> +	dbus_message_iter_get_basic(&iter_msg, &addr);
-> +
-> +	if (bachk(addr))
-> +		return btd_error_invalid_args(msg);
-> +
-> +	dbus_message_iter_get_basic(&iter_msg, &addr);
-
-I may be missing something obvious here, but this loooks uneeded. You are
-doing the same thing you did a few lines above.
-
-> +	dbus_message_iter_next(&iter_msg);
-> +
-> +	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_ARRAY)
-> +		return btd_error_invalid_args(msg);
-> +
-> +	params = g_new0(struct oob_remote_parameters, 1);
-> +
-> +	params->address = addr;
-> +	adapter_get_address(adapter, &params->local);
-> +	str2ba(addr, &params->peer);
-> +
-> +	dbus_message_iter_recurse(&iter_msg, &iter_dict);
-> +
-> +	for (; dbus_message_iter_get_arg_type(&iter_dict) != DBUS_TYPE_INVALID;
-> +					dbus_message_iter_next(&iter_dict)) {
-> +		char *property;
-> +
-> +		if (dbus_message_iter_get_arg_type(&iter_dict) !=
-> +							DBUS_TYPE_DICT_ENTRY) {
-> +			result = btd_error_invalid_args(msg);
-> +
-> +			goto done;
-> +		}
-> +
-> +		dbus_message_iter_recurse(&iter_dict, &iter_entry);
-> +
-> +		if (dbus_message_iter_get_arg_type(&iter_entry) !=
-> +							DBUS_TYPE_STRING) {
-> +			result = btd_error_invalid_args(msg);
-> +
-> +			goto done;
-> +		}
-> +
-> +		dbus_message_iter_get_basic(&iter_entry, &property);
-> +		dbus_message_iter_next(&iter_entry);
-> +
-> +		if (dbus_message_iter_get_arg_type(&iter_entry) !=
-> +							DBUS_TYPE_VARIANT) {
-> +			result = btd_error_invalid_args(msg);
-> +
-> +			goto done;
-> +		}
-> +
-> +		dbus_message_iter_recurse(&iter_entry, &iter_variant);
-> +
-> +		result = parse_property(property, &iter_variant, msg, params);
-> +		if (result != NULL)
-> +			goto done;
-> +	}
-> +
-> +	set_properties(adapter, msg, params);
-> +
-> +	result = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-> +
-> +done:
-> +	g_free(params);
-> +
-> +	return result;
-> +}
-> +
->  static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
->  								void *data)
->  {
-> @@ -177,6 +346,7 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
->  
->  static GDBusMethodTable oob_methods[] = {
->  	{"AddRemoteData",	"sayay",	"",	add_remote_data},
-> +	{"SetRemoteProperties",	"sa{sv}",	"",	set_remote_properties},
->  	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
->  	{"ReadLocalData",	"",		"ayay",	read_local_data,
->  						G_DBUS_METHOD_FLAG_ASYNC},
-> -- 
-> 1.7.4.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Cheers,
+diff --git a/src/device.c b/src/device.c
+index 9dd657c..7ff26c1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -114,6 +114,12 @@ struct attio_data {
+ 	gpointer user_data;
+ };
+ 
++typedef enum {
++	DEVICE_PAIRING_STATUS_NONE,
++	DEVICE_PAIRING_STATUS_PAIRED,
++	DEVICE_PAIRING_STATUS_BONDED
++} pairing_status_t;
++
+ struct btd_device {
+ 	bdaddr_t	bdaddr;
+ 	device_type_t	type;
+@@ -144,9 +150,8 @@ struct btd_device {
+ 	sdp_list_t	*tmp_records;
+ 
+ 	gboolean	trusted;
+-	gboolean	paired;
+ 	gboolean	blocked;
+-	gboolean	bonded;
++	pairing_status_t	pairing_status;
+ 
+ 	gboolean	authorizing;
+ 	gint		ref;
+@@ -247,12 +252,13 @@ static void device_free(gpointer user_data)
+ 
+ gboolean device_is_paired(struct btd_device *device)
+ {
+-	return device->paired;
++	return (device->pairing_status == DEVICE_PAIRING_STATUS_PAIRED) ||
++		(device->pairing_status == DEVICE_PAIRING_STATUS_BONDED);
+ }
+ 
+ gboolean device_is_bonded(struct btd_device *device)
+ {
+-	return device->bonded;
++	return device->pairing_status == DEVICE_PAIRING_STATUS_BONDED;
+ }
+ 
+ gboolean device_is_trusted(struct btd_device *device)
+@@ -855,7 +861,7 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn)
+ 		device->disconnects = g_slist_remove(device->disconnects, msg);
+ 	}
+ 
+-	if (device_is_paired(device) && !device_is_bonded(device))
++	if (!device_is_bonded(device))
+ 		device_set_paired(device, FALSE);
+ 
+ 	emit_property_changed(conn, device->path,
+@@ -941,7 +947,6 @@ struct btd_device *device_create(DBusConnection *conn,
+ 		device_block(conn, device);
+ 
+ 	if (read_link_key(&src, &device->bdaddr, NULL, NULL) == 0) {
+-		device_set_paired(device, TRUE);
+ 		device_set_bonded(device, TRUE);
+ 	}
+ 
+@@ -992,7 +997,6 @@ static void device_remove_stored(struct btd_device *device)
+ 		delete_entry(&src, "linkkeys", addr);
+ 		delete_entry(&src, "aliases", addr);
+ 		device_set_bonded(device, FALSE);
+-		device_set_paired(device, FALSE);
+ 		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
+ 	}
+ 	delete_entry(&src, "profiles", addr);
+@@ -1912,12 +1916,20 @@ void device_set_temporary(struct btd_device *device, gboolean temporary)
+ 
+ void device_set_bonded(struct btd_device *device, gboolean bonded)
+ {
+-	if (!device)
++	DBusConnection *conn = get_dbus_connection();
++
++	if (device_is_bonded(device) == bonded)
+ 		return;
+ 
+-	DBG("bonded %d", bonded);
++	DBG("%s", bonded ? "TRUE" : "FALSE");
+ 
+-	device->bonded = bonded;
++	if (bonded)
++		device->pairing_status = DEVICE_PAIRING_STATUS_BONDED;
++	else
++		device->pairing_status = DEVICE_PAIRING_STATUS_NONE;
++
++	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "Paired",
++				DBUS_TYPE_BOOLEAN, &bonded);
+ }
+ 
+ void device_set_type(struct btd_device *device, device_type_t type)
+@@ -2035,10 +2047,15 @@ void device_set_paired(struct btd_device *device, gboolean value)
+ {
+ 	DBusConnection *conn = get_dbus_connection();
+ 
+-	if (device->paired == value)
++	if (device_is_paired(device) == value)
+ 		return;
+ 
+-	device->paired = value;
++	DBG("%s", value ? "TRUE" : "FALSE");
++
++	if (value)
++		device->pairing_status = DEVICE_PAIRING_STATUS_PAIRED;
++	else
++		device->pairing_status = DEVICE_PAIRING_STATUS_NONE;
+ 
+ 	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "Paired",
+ 				DBUS_TYPE_BOOLEAN, &value);
+@@ -2198,7 +2215,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t status)
+ 	device_auth_req_free(device);
+ 
+ 	/* If we're already paired nothing more is needed */
+-	if (device->paired)
++	if (device_is_paired(device) && !bonding)
+ 		return;
+ 
+ 	device_set_paired(device, TRUE);
 -- 
-Vinicius
+1.7.4.1
+
