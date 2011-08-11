@@ -1,129 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
 From: David Stockwell <dstockwell@frequency-one.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] Added structs for AVRCP baseline messages
-Date: Thu, 11 Aug 2011 09:13:19 -0500
-Cc: lucas.demarchi@profusion.mobi, luiz.dentz@gmail.com,
+Subject: [PATCH 1/5] Added more complete set of AVCTP/AVRCP defines
+Date: Thu, 11 Aug 2011 09:12:01 -0500
+Cc: luiz.dentz@gmail.com, lucas.demarchi@profusion.mobi,
 	david_stockwell@att.net
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="us-ascii"
-Message-Id: <201108110913.20006.dstockwell@frequency-one.com>
+Message-Id: <201108110912.02268.dstockwell@frequency-one.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added structs for AVRCP baseline messages:
-  UnitInfo, SubUnitInfo, Passthrough and Vendor Dependent
+Added more complete set of AVCTP/AVRCP defines:
+  command type/response codes
+  passthrough key operation codes (CT->TG)
+  vendor-dependent message opcode (TG->CT)
+  AVRCP 1.3+ Protocol Definition Unit codes
+  AVRCP 1.3+ Event-IDs
+  Bluetooth SIG Company ID
+  1394 Trade Association AVC MTU for Control channel
 
 Based on Release 4.96
+
 ---
- audio/control.c |   92 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 92 insertions(+), 0 deletions(-)
+ audio/control.c |  120 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 115 insertions(+), 5 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 188297a..8ddcc10 100644
+index c3ef737..188297a 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -282,6 +282,98 @@ struct avrcp_spec_avc_pdu {
- #error "Unknown byte order"
- #endif
+@@ -67,28 +67,66 @@
  
-+/* structs for AVRCP UnitInfo, SubUnitInfo, and Passthrough messages. */
+ /* Packet types */
+ #define AVCTP_PACKET_SINGLE	0
+-#define AVCTP_PACKET_START	1
++#define AVCTP_PACKET_FIRST	1
+ #define AVCTP_PACKET_CONTINUE	2
+ #define AVCTP_PACKET_END	3
+ 
+ /* ctype entries */
+ #define CTYPE_CONTROL		0x0
+ #define CTYPE_STATUS		0x1
++#define CTYPE_SPEC_INQUIRY	0x2
++#define CTYPE_NOTIFY		0x3
++#define CTYPE_GEN_INQUIRY	0x4
 +
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
++/* ctype responses */
+ #define CTYPE_NOT_IMPLEMENTED	0x8
+ #define CTYPE_ACCEPTED		0x9
+ #define CTYPE_REJECTED		0xA
++#define CTYPE_IN_TRANSITION	0xB
+ #define CTYPE_STABLE		0xC
++#define CTYPE_CHANGED		0xD
++#define CTYPE_INTERIM		0xF
+ 
+ /* opcodes */
+ #define OP_VENDORDEP		0x00
+ #define OP_UNITINFO		0x30
+ #define OP_SUBUNITINFO		0x31
+-#define OP_PASSTHROUGH		0x7c
++#define OP_PASSTHROUGH		0x7C
++#define OP_VENDOR_DEPENDENT	0x00
+ 
+ /* subunits of interest */
+ #define SUBUNIT_PANEL		0x09
+ 
+ /* operands in passthrough commands */
++#define SELECT_OP		0x00
++#define UP_OP			0x01
++#define DOWN_OP			0x02
++#define LEFT_OP			0x03
++#define RIGHT_OP		0x04
++#define RIGHT_UP_OP		0x05
++#define RIGHT_DOWN_OP		0x06
++#define LEFT_UP_OP		0x07
++#define LEFT_DOWN_OP		0x08
++#define ROOT_MENU_OP		0x09
++#define SETUP_MENU_OP		0x0A
++#define CONTENTS_OP		0x0B
++#define FAVORITES_OP		0x0C
 +
-+struct	avrcp_unitinfo {
-+	struct avrcp_header	hdr;
-+	uint8_t		ext_code;
-+	uint8_t		unit:3;
-+	uint8_t		unit_type:5;
-+	uint8_t		company_id[3];
-+} __attribute__ ((packed));
++#define NUMBER_0_OP		0x20
++#define NUMBER_1_OP		0x21
++#define NUMBER_2_OP		0x22
++#define NUMBER_3_OP		0x23
++#define NUMBER_4_OP		0x24
++#define NUMBER_5_OP		0x25
++#define NUMBER_6_OP		0x26
++#define NUMBER_7_OP		0x27
++#define NUMBER_8_OP		0x28
++#define NUMBER_9_OP		0x29
++#define DOT_OP			0x2A
++#define ENTER_OP		0x2B
++#define CLEAR_OP		0x2C
 +
-+struct	avrcp_subunit {
-+	uint8_t		subunit_id_max:3;
-+	uint8_t		subunit_type:5;
-+} __attribute__ ((packed));
++#define POWER_OP		0x40
+ #define VOL_UP_OP		0x41
+ #define VOL_DOWN_OP		0x42
+ #define MUTE_OP			0x43
+@@ -98,9 +136,81 @@
+ #define RECORD_OP		0x47
+ #define REWIND_OP		0x48
+ #define FAST_FORWARD_OP		0x49
+-#define EJECT_OP		0x4a
+-#define FORWARD_OP		0x4b
+-#define BACKWARD_OP		0x4c
++#define EJECT_OP		0x4A
++#define FORWARD_OP		0x4B
++#define BACKWARD_OP		0x4C
 +
-+struct	avrcp_subunitinfo {
-+	struct avrcp_header	hdr;
-+	uint8_t		extension:3;
-+	uint8_t		_rs1:1;
-+	uint8_t		page:3;
-+	uint8_t		_rs0:1;
-+	struct avrcp_subunit subunit[4];
-+} __attribute__ ((packed));
++#define ANGLE_OP		0x50
++#define SUBPICTURE_OP		0x51
 +
-+struct	avrcp_passthru {
-+	struct avrcp_header	hdr;
-+	uint8_t		key:7;
-+	uint8_t		key_state:1;
-+	uint8_t		op_len;	/* =length(company_id+op_data) */
-+	uint8_t		company_id[3];
-+	uint8_t		op_data[];
-+} __attribute__ ((packed));
++#define F1_OP			0x71
++#define F2_OP			0x72
++#define F3_OP			0x73
++#define F4_OP			0x74
++#define F5_OP			0x75
 +
-+struct	avrcp_vendor_dep {
-+	struct avrcp_header	hdr;
-+	uint8_t		company_id[3];
-+	uint8_t		pdu_id;
-+	uint8_t		packet_type:2;
-+	uint8_t		_reserved:6;
-+	uint16_t	length;
-+	uint8_t		pdu_data[];
-+} __attribute__ ((packed));
++#define VENDOR_UNIQUE_OP	0x7E
 +
-+#elif __BYTE_ORDER == __BIG_ENDIAN
++/* AVRCP 1.3 (and later) Protocol Definition Units (PDUs) */
++#define PDU_GET_CAPABILITIES			0x10
 +
-+struct	avrcp_unitinfo {
-+	struct avrcp_header	hdr;
-+	uint8_t		ext_code;
-+	uint8_t		unit_type:5;
-+	uint8_t		unit:3;
-+	uint8_t		company_id[3];
-+} __attribute__ ((packed));
++#define	PDU_LIST_PLAYER_APP_SETTING_ATTRS	0x11
++#define	PDU_LIST_PLAYER_APP_SETTING_VALS	0x12
++#define	PDU_GET_CURR_PLAYER_APP_SETTING_VALUE	0x13
++#define	PDU_SET_PLAYER_APP_SETTING_VALUE	0x14
++#define	PDU_GET_PLAYER_APP_SETTING_ATTR_TEXT	0x15
++#define	PDU_GET_PLAYER_APP_SETTING_VALUE_TEXT	0x16
 +
-+struct	avrcp_subunit {
-+	uint8_t		subunit_type:5;
-+	uint8_t		subunit_id_max:3;
-+} __attribute__ ((packed));
++#define	PDU_INFORM_DISPLAYABLE_CHAR_SET		0x17
++#define	PDU_INFORM_CT_BATTERY_STAT		0x18
 +
-+struct	avrcp_subunitinfo {
-+	struct avrcp_header	hdr;
-+	uint8_t		_rs0:1;
-+	uint8_t		page:3;
-+	uint8_t		_rs1:1;
-+	uint8_t		extension:3;
-+	struct avrcp_subunit subunit[4];
-+} __attribute__ ((packed));
++#define	PDU_GET_ELEMENT_ATTRS			0x20
 +
-+struct	avrcp_passthru {
-+	struct avrcp_header	hdr;
-+	uint8_t		key_state:1;
-+	uint8_t		key:7;
-+	uint8_t		op_len;	/* =length(company_id+op_data) */
-+	uint8_t		company_id[3];
-+	uint8_t		op_data[];
-+} __attribute__ ((packed));
++#define	PDU_GET_PLAY_STATUS			0x30
++#define	PDU_REGISTER_NOTIFICATION		0x31
 +
-+struct	avrcp_vendor_dep {
-+	struct avrcp_header	hdr;
-+	uint8_t		company_id[3];
-+	uint8_t		pdu_id;
-+	uint8_t		_reserved:6;
-+	uint8_t		packet_type:2;
-+	uint16_t	length;
-+	uint8_t		pdu_data[];
-+} __attribute__ ((packed));
++#define	PDU_REGISTER_CONTINUING_RESPONSE	0x40
++#define	PDU_ABORT_CONTINUING_RESPONSE		0x41
 +
-+#else
-+#error "Unknown byte order"
-+#endif
++/* AVRCP 1.4 Protocol Definition Units (PDUs) */
++#define	PDU_SET_ABSOLUTE_VOLUME			0x50
 +
- struct avctp_state_callback {
- 	avctp_state_cb cb;
- 	void *user_data;
++#define	PDU_SET_ADDRESSED_PLAYER		0x60
++
++#define	PDU_SET_BROWSED_PLAYER			0x70
++#define	PDU_GET_FOLDER_ITEMS			0x71
++#define	PDU_CHANGE_PATH				0x72
++#define	PDU_GET_ITEM_ATTRS			0x73
++#define	PDU_PLAY_ITEM				0x74
++
++#define	PDU_SEARCH				0x80
++
++#define	PDU_ADD_TO_NOW_PLAYING			0x90
++
++#define	PDU_GENERAL_REJECT			0xA0
++
++/* AVRCP 1.3 (and later) Event-IDs */
++#define	EVENT_PLAYBACK_STATUS_CHANGED		0x01
++#define	EVENT_TRACK_CHANGED			0x02
++#define	EVENT_TRACK_REACHED_END			0x03
++#define	EVENT_TRACK_REACHED_START		0x04
++#define	EVENT_PLAYBACK_POS_CHANGED		0x05
++#define	EVENT_BATT_STATUS_CHANGED		0x06
++#define	EVENT_SYSTEM_STATUS_CHANGED		0x07
++#define	EVENT_PLAYER_APP_SETTING_CHANGED	0x08
++
++/* AVRCP 1.4 Event-IDs */
++#define	EVENT_NOW_PLAYING_CONTENT_CHANGED	0x09
++#define	EVENT_NOTIFY_AVBL_PLAYERS_CHANGED	0x0A
++#define	EVENT_ADDRESSED_PLAYER_CHANGED		0x0B
++#define	EVENT_UIDS_CHANGED			0x0C
++#define	EVENT_VOLUME_CHANGED			0x0D
++
++/* BT-SIG defined Company ID for Metadata */
++#define BTSIG_COMPANY_ID	0x001958
++
++/* 1394 Trade Association-defined AV/C MTU for Control channel */
++#define AVC_MTU			512
+ 
+ #define QUIRK_NO_RELEASE	1 << 0
+ 
 -- 
 1.7.4.4
 
