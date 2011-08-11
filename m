@@ -1,244 +1,251 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bartosz Szatkowski <bulislaw@linux.com>
+From: Jakub Adamek <adamek.kuba@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH 1/3] Add SetRemoteProperties method for OOB COD setting
-Date: Fri, 12 Aug 2011 09:15:49 +0200
-Message-Id: <1313133349-4215-1-git-send-email-bulislaw@linux.com>
-In-Reply-To: <CAPGrrxU2otU=wmvtsq=xdcc35FOA5p02h=stg-h4WV-u=dJb7g@mail.gmail.com>
-References: <CAPGrrxU2otU=wmvtsq=xdcc35FOA5p02h=stg-h4WV-u=dJb7g@mail.gmail.com>
+Cc: Jakub Adamek <adamek.kuba@gmail.com>
+Subject: [RFC obexd] Support more fine-grained filtering of sdp records
+Date: Fri, 12 Aug 2011 01:52:12 +0200
+Message-Id: <1313106732-30484-1-git-send-email-adamek.kuba@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add method for suppling class of device through OOB mechanism, to be
-available at pairing phase. At this point it may be presented to the
-user, by agent, in confirmation request (or whatever).
----
- doc/oob-api.txt   |   13 ++++
- plugins/dbusoob.c |  168 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 181 insertions(+), 0 deletions(-)
+Obex-client provides currently a method to filter sdp
+records by service class. The service class is determined
+from the Target dictionary entry passed to the CreateSession
+method.
 
-diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-index d838712..0324758 100644
---- a/doc/oob-api.txt
-+++ b/doc/oob-api.txt
-@@ -36,3 +36,16 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+For some profiles it is usefull to provide better control
+over the filtering process in order to weed out services
+that do not provide the necessary functionality we need.
+This patch provides this by adding an sdp_filter callback
+to session_data. This method can be set based on the Target
+dictionary entry.
+
+This functionality in not strictly necessary, since one
+can always specify the exact channel to use in an argument
+to CreateSession, bypassing SDP querying entirely.
+
+Additionally, a Parameters entry is added to the dictionary
+passed to CreateSession. This is later passed to the sdp_filter
+callback. A use case for this is for eg. to connect
+to a service that has a specific Service ID, where the ID
+is passed in string form through the Parameters entry.
+
+Should obex-client be broken up into plugins as per Luiz's
+patches, the sdp_filter callback could become part
+of the driver_data structure.
+---
+ client/manager.c |   32 +++++++++++++++++++-------------
+ client/session.c |   16 ++++++++++++++++
+ client/session.h |    1 +
+ 3 files changed, 36 insertions(+), 13 deletions(-)
+
+diff --git a/client/manager.c b/client/manager.c
+index e7eb70d..4dc66d8 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -131,7 +131,7 @@ done:
  
- 			Possible errors: org.bluez.Error.Failed
- 					 org.bluez.Error.InvalidArguments
-+
-+		void SetRemoteProperties(string address, dict data)
-+
-+			This method set new properties for device with specified
-+			address, to be used when device is created.
-+			On success DeviceFound signal will be emitted.
-+
-+			Currently supported keys:
-+
-+				Class		uint32
-+
-+			Possible errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InvalidArguments
-diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index 2c03780..cdf894a 100644
---- a/plugins/dbusoob.c
-+++ b/plugins/dbusoob.c
-@@ -43,6 +43,7 @@
- #include "event.h"
- #include "error.h"
- #include "oob.h"
-+#include "storage.h"
+ static int parse_device_dict(DBusMessageIter *iter,
+ 		const char **source, const char **dest, const char **target,
+-		uint8_t *channel)
++		const char **params, uint8_t *channel)
+ {
+ 	while (dbus_message_iter_get_arg_type(iter) == DBUS_TYPE_DICT_ENTRY) {
+ 		DBusMessageIter entry, value;
+@@ -151,6 +151,8 @@ static int parse_device_dict(DBusMessageIter *iter,
+ 				dbus_message_iter_get_basic(&value, dest);
+ 			else if (g_str_equal(key, "Target") == TRUE)
+ 				dbus_message_iter_get_basic(&value, target);
++			else if (g_str_equal(key, "Parameters") == TRUE)
++				dbus_message_iter_get_basic(&value, params);
+ 			break;
+ 		case DBUS_TYPE_BYTE:
+ 			if (g_str_equal(key, "Channel") == TRUE)
+@@ -172,13 +174,13 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 	GPtrArray *files;
+ 	struct send_data *data;
+ 	const char *agent, *source = NULL, *dest = NULL, *target = NULL;
+-	const char *sender;
++	const char *sender, *params = NULL;
+ 	uint8_t channel = 0;
  
- #define OOB_INTERFACE	"org.bluez.OutOfBand"
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &array);
  
-@@ -51,6 +52,13 @@ struct oob_request {
- 	DBusMessage *msg;
+-	parse_device_dict(&array, &source, &dest, &target, &channel);
++	parse_device_dict(&array, &source, &dest, &target, &params, &channel);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -224,7 +226,7 @@ static DBusMessage *send_files(DBusConnection *connection,
+ 	data->agent = g_strdup(agent);
+ 	data->files = files;
+ 
+-	session = session_create(source, dest, "OPP", channel, sender,
++	session = session_create(source, dest, "OPP", params, channel, sender,
+ 							create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -299,13 +301,13 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
+ 	struct session_data *session;
+ 	struct send_data *data;
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
+-	const char *name = NULL;
++	const char *name = NULL, *params = NULL;
+ 	uint8_t channel = 0;
+ 
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
+ 
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &params, &channel);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -328,7 +330,7 @@ static DBusMessage *pull_business_card(DBusConnection *connection,
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+ 	data->filename = g_strdup(name);
+ 
+-	session = session_create(source, dest, "OPP", channel, data->sender,
++	session = session_create(source, dest, "OPP", params, channel, data->sender,
+ 					pull_session_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+@@ -371,12 +373,13 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	struct session_data *session;
+ 	struct send_data *data;
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
++	const char *params = NULL;
+ 	uint8_t channel = 0;
+ 
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
+ 
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &params, &channel);
+ 	if (dest == NULL || target == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -390,8 +393,8 @@ static DBusMessage *create_session(DBusConnection *connection,
+ 	data->message = dbus_message_ref(message);
+ 	data->sender = g_strdup(dbus_message_get_sender(message));
+ 
+-	session = session_create(source, dest, target, channel, data->sender,
+-							create_callback, data);
++	session = session_create(source, dest, target, params, channel,
++					data->sender, create_callback, data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+@@ -499,12 +502,13 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	struct session_data *session;
+ 	struct send_data *data;
+ 	const char *source = NULL, *dest = NULL, *target = NULL;
++	const char *params = NULL;
+ 	uint8_t channel = 0;
+ 
+ 	dbus_message_iter_init(message, &iter);
+ 	dbus_message_iter_recurse(&iter, &dict);
+ 
+-	parse_device_dict(&dict, &source, &dest, &target, &channel);
++	parse_device_dict(&dict, &source, &dest, &target, &params, &channel);
+ 	if (dest == NULL)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+@@ -521,8 +525,10 @@ static DBusMessage *get_capabilities(DBusConnection *connection,
+ 	if (!target)
+ 		target = "OPP";
+ 
+-	session = session_create(source, dest, target, channel, data->sender,
+-					capability_session_callback, data);
++	session = session_create(source, dest, target, params,
++					channel, data->sender,
++					capability_session_callback,
++					data);
+ 	if (session != NULL) {
+ 		sessions = g_slist_append(sessions, session);
+ 		return NULL;
+diff --git a/client/session.c b/client/session.c
+index a89c760..59dd7eb 100644
+--- a/client/session.c
++++ b/client/session.c
+@@ -88,6 +88,10 @@ struct pending_req {
+ 	void *user_data;
  };
  
-+struct oob_remote_parameters {
-+	bdaddr_t local;
-+	bdaddr_t peer;
-+	const char *address;
-+	uint32_t class;
-+};
++typedef gboolean (*sdp_filter_func) (const void *user_data,
++						const sdp_record_t *record,
++						const char *params);
 +
- static GSList *oob_requests = NULL;
- static DBusConnection *connection = NULL;
+ struct session_data {
+ 	gint refcount;
+ 	bdaddr_t src;
+@@ -111,6 +115,9 @@ struct session_data {
+ 	GSList *pending_calls;
+ 	void *priv;
+ 	char *adapter;
++	sdp_filter_func sdp_filter;
++	const void *sdp_filter_data;
++	char *params;
+ };
  
-@@ -153,6 +161,165 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ static GSList *sessions = NULL;
+@@ -231,6 +238,7 @@ static void session_free(struct session_data *session)
+ 	g_free(session->path);
+ 	g_free(session->service);
+ 	g_free(session->owner);
++	g_free(session->params);
+ 	g_free(session);
  }
  
-+static void emit_device_found(const char *path,
-+				struct oob_remote_parameters *params)
-+{
-+	DBusMessage *signal;
-+	DBusMessageIter iter, dict;
-+
-+	signal = dbus_message_new_signal(path, ADAPTER_INTERFACE,
-+								"DeviceFound");
-+	if (signal == NULL) {
-+		error("Unable to allocate new %s.DeviceFound signal",
-+							ADAPTER_INTERFACE);
-+		return;
-+	}
-+
-+	dbus_message_iter_init_append(signal, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
-+							&params->address);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
-+
-+	if (params->class != 0)
-+		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
-+							&params->class);
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	g_dbus_send_message(connection, signal);
-+}
-+
-+static DBusMessage *parse_class(DBusMessageIter *value,
-+			struct oob_remote_parameters *params, DBusMessage *msg)
-+{
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(value, &params->class);
-+
-+	return NULL;
-+}
-+
-+static gboolean set_class(struct oob_remote_parameters *params)
-+{
-+	if (params->class == 0)
-+		return FALSE;
-+
-+	if (write_remote_class(&params->local, &params->peer,
-+							params->class) < 0) {
-+		error("Setting device class failed");
-+
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static DBusMessage *parse_property(const char *property,
-+				DBusMessageIter *value, DBusMessage *msg,
-+				struct oob_remote_parameters *params)
-+{
-+	if (g_str_equal("Class", property))
-+		return parse_class(value, params, msg);
-+
-+	return NULL;
-+}
-+
-+static void set_properties(struct btd_adapter *adapter,
-+					struct oob_remote_parameters *params)
-+{
-+	gboolean device_found = FALSE;
-+
-+	if (set_class(params))
-+		device_found = TRUE;
-+
-+	if (device_found)
-+		emit_device_found(adapter_get_path(adapter), params);
-+}
-+
-+static DBusMessage *set_remote_properties(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	struct btd_adapter *adapter = data;
-+	DBusMessageIter iter_msg, iter_dict, iter_entry, iter_variant;
-+	struct oob_remote_parameters *params;
-+	char *addr;
-+	DBusMessage *result;
-+
-+	if (!dbus_message_iter_init(msg, &iter_msg))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_STRING)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter_msg, &addr);
-+	if (bachk(addr))
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_next(&iter_msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_ARRAY)
-+		return btd_error_invalid_args(msg);
-+
-+	params = g_new0(struct oob_remote_parameters, 1);
-+
-+	params->address = addr;
-+	adapter_get_address(adapter, &params->local);
-+	str2ba(addr, &params->peer);
-+
-+	dbus_message_iter_recurse(&iter_msg, &iter_dict);
-+
-+	for (; dbus_message_iter_get_arg_type(&iter_dict) != DBUS_TYPE_INVALID;
-+					dbus_message_iter_next(&iter_dict)) {
-+		char *property;
-+
-+		if (dbus_message_iter_get_arg_type(&iter_dict) !=
-+							DBUS_TYPE_DICT_ENTRY) {
-+			result = btd_error_invalid_args(msg);
-+
-+			goto done;
-+		}
-+
-+		dbus_message_iter_recurse(&iter_dict, &iter_entry);
-+
-+		if (dbus_message_iter_get_arg_type(&iter_entry) !=
-+							DBUS_TYPE_STRING) {
-+			result = btd_error_invalid_args(msg);
-+
-+			goto done;
-+		}
-+
-+		dbus_message_iter_get_basic(&iter_entry, &property);
-+		dbus_message_iter_next(&iter_entry);
-+
-+		if (dbus_message_iter_get_arg_type(&iter_entry) !=
-+							DBUS_TYPE_VARIANT) {
-+			result = btd_error_invalid_args(msg);
-+
-+			goto done;
-+		}
-+
-+		dbus_message_iter_recurse(&iter_entry, &iter_variant);
-+
-+		result = parse_property(property, &iter_variant, msg, params);
-+		if (result != NULL)
-+			goto done;
-+	}
-+
-+	set_properties(adapter, params);
-+
-+	result = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+
-+done:
-+	g_free(params);
-+
-+	return result;
-+}
-+
- static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -177,6 +344,7 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+@@ -395,6 +403,11 @@ static void search_callback(uint8_t type, uint16_t status,
+ 			break;
+ 		}
  
- static GDBusMethodTable oob_methods[] = {
- 	{"AddRemoteData",	"sayay",	"",	add_remote_data},
-+	{"SetRemoteProperties",	"sa{sv}",	"",	set_remote_properties},
- 	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
- 	{"ReadLocalData",	"",		"ayay",	read_local_data,
- 						G_DBUS_METHOD_FLAG_ASYNC},
++		if (session->sdp_filter)
++			if (!session->sdp_filter(session->sdp_filter_data,
++							rec, session->params))
++				goto pass;
++
+ 		if (!sdp_get_access_protos(rec, &protos)) {
+ 			ch = sdp_get_proto_port(protos, RFCOMM_UUID);
+ 			sdp_list_foreach(protos,
+@@ -403,6 +416,7 @@ static void search_callback(uint8_t type, uint16_t status,
+ 			protos = NULL;
+ 		}
+ 
++pass:
+ 		sdp_record_free(rec);
+ 
+ 		if (ch > 0) {
+@@ -722,6 +736,7 @@ proceed:
+ struct session_data *session_create(const char *source,
+ 						const char *destination,
+ 						const char *service,
++						const char *params,
+ 						uint8_t channel,
+ 						const char *owner,
+ 						session_callback_t function,
+@@ -766,6 +781,7 @@ struct session_data *session_create(const char *source,
+ 
+ 	str2ba(destination, &session->dst);
+ 	session->service = g_strdup(service);
++	session->params = g_strdup(params);
+ 
+ 	if (!g_ascii_strncasecmp(service, "OPP", 3)) {
+ 		sdp_uuid16_create(&session->uuid, OBEX_OBJPUSH_SVCLASS_ID);
+diff --git a/client/session.h b/client/session.h
+index 081a2c3..1454405 100644
+--- a/client/session.h
++++ b/client/session.h
+@@ -36,6 +36,7 @@ typedef void (*session_callback_t) (struct session_data *session,
+ struct session_data *session_create(const char *source,
+ 						const char *destination,
+ 						const char *service,
++						const char *params,
+ 						uint8_t channel,
+ 						const char *owner,
+ 						session_callback_t function,
 -- 
 1.7.4.1
 
