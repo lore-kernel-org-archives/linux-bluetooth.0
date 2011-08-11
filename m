@@ -1,54 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 11 Aug 2011 14:56:01 -0400
-Message-ID: <CAJLFYtqqVRU920HwvNm1tfxW7F_QnB-ESK3HR21eO6Of4P_yzw@mail.gmail.com>
-Subject: =?UTF-8?Q?A_problem_about_Authentication=E2=80=8F?=
-From: cheng zheng <czheng4ml@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+ linux-bluetooth@vger.kernel.org
+Message-Id: <A943531F-02F0-4809-A45F-03FE4923B6EF@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1313022419.3373.137.camel@aeonflux>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v936)
+Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to mgmt_device_found()
+Date: Thu, 11 Aug 2011 14:12:21 -0300
+References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org> <1312984225.3373.118.camel@aeonflux> <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com> <1312989466.3373.126.camel@aeonflux> <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org> <CAJdJm_Mg4e1bLqYFmQxSctWT6y+GMg2xtJLwavtYoM5yWYJPcw@mail.gmail.com> <1313022419.3373.137.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I am using bluez on Gentoo and meet a problem recently.
-I was trying to connect to a medical device via bluetooth.
-(00:11:B1:B3:4E:B4    clock offset: 0x1242    class: 0x001f00). When I
-connect it at first, it works. However, if I accidentally shut off the
-device manually and reconnect it, I got the failed message like this,
+Hi Marcel/Lizardo,
 
-localhost ~ # rfcomm connect 0 00:11:B1:B3:4E:B4 1
-Can't connect RFCOMM socket: Permission denied
+On Aug 10, 2011, at 9:26 PM, Marcel Holtmann wrote:
 
-The message from hcidump is
+> Hi Anderson,
+>
+>>> The advertising report event has the 'Length' field to inform the
+>>> 'Data' field length, so I believe it has a variable length.
+>>> According to its description, the 'Length' field may vary from 0x00
+>>> to 0x1F (31) bytes.
+>>
+>> You are right. Although the section 11 gives the impression the size
+>> is always 31, this is not what happens on actual hardware, which
+>> usually sends only the significant bytes (and the length is know from
+>> the "Length" field.
+>>
+>>> The only drawback I see so far is copying extra ~200 bytes each time
+>>> we get a advertising report data.
+>>
+>> I agree. If this event is being sent on each adv. data report event,
+>> it will be more than 6 times the amount of data (with non-significant
+>> bytes containing only zeroes) sent to userspace.
+>
+> if we wanna save bytes copied and send to userspace, then we might  
+> even
+> fix this for BR/EDR. Since while it is fixed there only a fraction is
+> used there most of the times.
 
+IMO changing the struct device_found is another issue (this would
+require userspace changes too).
 
-localhost ~ # hcidump hci0
-HCI sniffer - Bluetooth packet analyzer ver 2.0
-device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:11:B1:B3:4E:B4 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:11:B1:B3:4E:B4
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:11:B1:B3:4E:B4 key C0451619A2D93536E094FCFFE8DA160E
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 00:11:B1:B3:4E:B4
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 12 bdaddr 00:11:B1:B3:4E:B4 type ACL encrypt 0x00
-    Error: Authentication Failure
+The point in adding the eir_len parameter is to avoid:
+     * preparing (memset and copy EIR from adv report) a 240-bytes
+       temporary buffer to pass to mgmt_device_found()
+     * to memcpy() ~200 useless bytes to ev.eir in mgmt_device_found()
 
-So I think I should clean up some residues to finish the process of
-authentication. But I don't know where they are under linux filesystem
-hierarchy. Of course I can delete them through some GUI bluetooth
-manager like gnome-bluetooth. But my supervisor expects that I can
-write a code to clean them up.
+For each advertising data we gather from the LE scan (which can be
+a lot) we would need to do that.
 
-Can anyone help me?
+BR,
 
-Thanks
-
-Cheng
+Andre.
