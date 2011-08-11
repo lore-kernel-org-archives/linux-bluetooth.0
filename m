@@ -2,135 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH BlueZ 3/3] Add support for name in OOB SetRemoteProperties
-Date: Thu, 11 Aug 2011 13:14:57 +0200
-Message-Id: <1313061297-16884-3-git-send-email-bulislaw@linux.com>
+Subject: [PATCH BlueZ 2/3] Add support for OOB data in SetRemoteProperties
+Date: Thu, 11 Aug 2011 13:14:56 +0200
+Message-Id: <1313061297-16884-2-git-send-email-bulislaw@linux.com>
 In-Reply-To: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
 References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Now its possible to exchange OOB simple pairing data through DBus API
+method with other device properties.
 ---
- doc/oob-api.txt   |    1 +
- plugins/dbusoob.c |   37 +++++++++++++++++++++++++++++++++++++
- src/storage.c     |    2 +-
- src/storage.h     |    2 +-
- 4 files changed, 40 insertions(+), 2 deletions(-)
+ doc/oob-api.txt   |    5 ++++-
+ plugins/dbusoob.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 1 deletions(-)
 
 diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-index 500ef15..2d0d096 100644
+index 0324758..500ef15 100644
 --- a/doc/oob-api.txt
 +++ b/doc/oob-api.txt
-@@ -49,6 +49,7 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+@@ -41,11 +41,14 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+ 
+ 			This method set new properties for device with specified
+ 			address, to be used when device is created.
+-			On success DeviceFound signal will be emitted.
++			On success DeviceFound signal will be emitted (except
++			situations when only hash and randomizer is supplied).
+ 
+ 			Currently supported keys:
+ 
  				Class		uint32
- 				Hash		array{byte}
- 				Randomizer	array{byte}
-+				Name		String
++				Hash		array{byte}
++				Randomizer	array{byte}
  
  			Possible errors: org.bluez.Error.Failed
  					 org.bluez.Error.InvalidArguments
 diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index c6237f9..d83c982 100644
+index ca0c635..c6237f9 100644
 --- a/plugins/dbusoob.c
 +++ b/plugins/dbusoob.c
-@@ -59,6 +59,7 @@ struct oob_remote_parameters {
+@@ -57,6 +57,8 @@ struct oob_remote_parameters {
+ 	bdaddr_t peer;
+ 	const char *address;
  	uint32_t class;
- 	uint8_t *hash;
- 	uint8_t *randomizer;
-+	const char *name;
++	uint8_t *hash;
++	uint8_t *randomizer;
  };
  
  static GSList *oob_requests = NULL;
-@@ -190,6 +191,10 @@ static void emit_device_found(const char *path,
- 		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
- 							&params->class);
- 
-+	if (params->name != NULL)
-+		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
-+							&params->name);
-+
- 	dbus_message_iter_close_container(&iter, &dict);
- 
- 	g_dbus_send_message(connection, signal);
-@@ -263,6 +268,32 @@ static void set_oob_data(struct btd_adapter *adapter,
- 	}
+@@ -219,6 +221,48 @@ static gboolean set_class(struct oob_remote_parameters *params)
+ 	return TRUE;
  }
  
-+static DBusMessage *parse_name(DBusMessageIter *value,
-+			struct oob_remote_parameters *params, DBusMessage *msg)
++static DBusMessage *parse_oob_data(DBusMessageIter *value, uint8_t **data,
++							DBusMessage *msg)
 +{
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
++	DBusMessageIter array_iter;
++	int32_t len;
++	uint8_t *tmp;
++
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
 +		return btd_error_invalid_args(msg);
 +
-+	dbus_message_iter_get_basic(value, &params->name);
++	dbus_message_iter_recurse(value, &array_iter);
++
++	dbus_message_iter_get_fixed_array(&array_iter, &tmp, &len);
++
++	if (len != 16)
++		return btd_error_invalid_args(msg);
++
++	*data = tmp;
 +
 +	return NULL;
 +}
 +
-+static gboolean set_name(struct oob_remote_parameters *params)
++static void set_oob_data(struct btd_adapter *adapter,
++				struct oob_remote_parameters *parameters)
 +{
-+	if (params->name == NULL)
-+		return FALSE;
++	if (parameters->hash == NULL && parameters->randomizer == NULL)
++		return;
 +
-+	if (write_device_name(&params->local, &params->peer,
-+							params->name) < 0) {
-+		error("Setting device name failed");
++	if (parameters->hash == NULL || parameters->randomizer == NULL) {
++		error("OOB data incomplete");
 +
-+		return FALSE;
++		return;
 +	}
 +
-+	return TRUE;
++	if (btd_adapter_add_remote_oob_data(adapter, &parameters->peer,
++				parameters->hash, parameters->randomizer)) {
++		error("Adding remote OOB data failed");
++
++		return;
++	}
 +}
 +
  static DBusMessage *parse_property(const char *property,
  				DBusMessageIter *value, DBusMessage *msg,
  				struct oob_remote_parameters *params)
-@@ -270,6 +301,9 @@ static DBusMessage *parse_property(const char *property,
+@@ -226,6 +270,12 @@ static DBusMessage *parse_property(const char *property,
  	if (g_str_equal("Class", property))
  		return parse_class(value, params, msg);
  
-+	if (g_str_equal("Name", property))
-+		return parse_name(value, params, msg);
++	if (g_str_equal("Hash", property))
++		return parse_oob_data(value, &params->hash, msg);
 +
- 	if (g_str_equal("Hash", property))
- 		return parse_oob_data(value, &params->hash, msg);
++	if (g_str_equal("Randomizer", property))
++		return parse_oob_data(value, &params->randomizer, msg);
++
+ 	return NULL;
+ }
  
-@@ -287,6 +321,9 @@ static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
+@@ -237,6 +287,8 @@ static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
  	if (set_class(params))
  		device_found = TRUE;
  
-+	if (set_name(params))
-+		device_found = TRUE;
++	set_oob_data(adapter, params);
 +
- 	set_oob_data(adapter, params);
- 
  	if (device_found)
-diff --git a/src/storage.c b/src/storage.c
-index 1f3da6e..414d158 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -321,7 +321,7 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
- 	return 0;
+ 		emit_device_found(adapter_get_path(adapter), params);
  }
- 
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
-+int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name)
- {
- 	char filename[PATH_MAX + 1], addr[18], str[249];
- 	int i;
-diff --git a/src/storage.h b/src/storage.h
-index bb64727..78513ac 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -38,7 +38,7 @@ int write_local_class(bdaddr_t *bdaddr, uint8_t *class);
- int read_local_class(bdaddr_t *bdaddr, uint8_t *class);
- int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
- int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
--int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
-+int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name);
- int read_device_name(const char *src, const char *dst, char *name);
- int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
- int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
 -- 
 1.7.4.1
 
