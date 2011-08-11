@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 4/7] client: add ftp target
-Date: Thu, 11 Aug 2011 16:49:51 +0300
-Message-Id: <1313070594-31068-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 3/7] client: add opp target
+Date: Thu, 11 Aug 2011 16:49:50 +0300
+Message-Id: <1313070594-31068-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1313070594-31068-1-git-send-email-luiz.dentz@gmail.com>
 References: <1313070594-31068-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,229 +11,195 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ftp target implements file transfer and Nokia Pc Suite drivers.
+opp target implements object push driver
 ---
- client/ftp.c     |  104 +++++++++++++++++++++++++++++++++++++++++++++--------
- client/ftp.h     |    8 +---
- client/manager.c |    2 +
- client/session.c |    1 -
- 4 files changed, 92 insertions(+), 23 deletions(-)
+ Makefile.am      |    1 +
+ client/manager.c |   23 +++++++++++++++++
+ client/opp.c     |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/opp.h     |   25 +++++++++++++++++++
+ 4 files changed, 120 insertions(+), 0 deletions(-)
+ create mode 100644 client/opp.c
+ create mode 100644 client/opp.h
 
-diff --git a/client/ftp.c b/client/ftp.c
-index 5d1fa5c..e81d443 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -25,17 +25,27 @@
- #include <config.h>
- #endif
+diff --git a/Makefile.am b/Makefile.am
+index 314afc4..8888401 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -130,6 +130,7 @@ client_obex_client_SOURCES = $(gdbus_sources) $(gobex_sources) \
+ 				client/pbap.h client/pbap.c \
+ 				client/sync.h client/sync.c \
+ 				client/ftp.h client/ftp.c \
++				client/opp.h client/opp.c \
+ 				client/transfer.h client/transfer.c \
+ 				client/agent.h client/agent.c \
+ 				client/driver.h client/driver.c
+diff --git a/client/manager.c b/client/manager.c
+index 71e3780..81d091b 100644
+--- a/client/manager.c
++++ b/client/manager.c
+@@ -38,6 +38,7 @@
+ #include "transfer.h"
+ #include "session.h"
+ #include "manager.h"
++#include "opp.h"
  
-+#include <errno.h>
- #include <string.h>
+ #define CLIENT_SERVICE  "org.openobex.client"
  
-+#include <gw-obex.h>
-+#include <gdbus.h>
+@@ -554,9 +555,19 @@ static GDBusMethodTable client_methods[] = {
+ 
+ static DBusConnection *conn = NULL;
+ 
++static struct vtable {
++	const char *name;
++	int (*init) (void);
++	void (*exit) (void);
++} targets[] = {
++	{ "opp", opp_init, opp_exit },
++	{ }
++};
++
+ int manager_init(void)
+ {
+ 	DBusError derr;
++	struct vtable *target;
+ 
+ 	dbus_error_init(&derr);
+ 
+@@ -576,14 +587,26 @@ int manager_init(void)
+ 		return -1;
+ 	}
+ 
++	for (target = targets; target && target->init; target++) {
++		if (target->init() < 0)
++			continue;
++
++		DBG("Target %s loaded", target->name);
++	}
++
+ 	return 0;
+ }
+ 
+ void manager_exit(void)
+ {
++	struct vtable *target;
++
+ 	if (conn == NULL)
+ 		return;
+ 
++	for (target = targets; target && target->exit; target++)
++		target->exit();
++
+ 	g_dbus_unregister_interface(conn, CLIENT_PATH, CLIENT_INTERFACE);
+ 	dbus_connection_unref(conn);
+ }
+diff --git a/client/opp.c b/client/opp.c
+new file mode 100644
+index 0000000..c9d1d60
+--- /dev/null
++++ b/client/opp.c
+@@ -0,0 +1,71 @@
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2011 Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
 +#include "log.h"
 +
- #include "session.h"
- #include "transfer.h"
-+#include "driver.h"
- #include "ftp.h"
- 
--#define FTP_INTERFACE  "org.openobex.FileTransfer"
-+#define FTP_INTERFACE "org.openobex.FileTransfer"
-+#define FTP_UUID "00001106-0000-1000-8000-00805f9b34fb"
-+#define PCSUITE_UUID "00005005-0000-1000-8000-0002ee000001"
++#include "client/session.h"
++#include "client/driver.h"
++#include "client/opp.h"
 +
-+static DBusConnection *conn = NULL;
- 
- struct ftp_data {
- 	struct obc_session *session;
--	DBusConnection *conn;
- 	DBusMessage *msg;
- };
- 
-@@ -157,7 +167,7 @@ static void get_file_callback(struct obc_session *session, GError *err,
- 	else
- 		reply = dbus_message_new_method_return(ftp->msg);
- 
--	g_dbus_send_message(ftp->conn, reply);
-+	g_dbus_send_message(conn, reply);
- 
- 	dbus_message_unref(ftp->msg);
- 	ftp->msg = NULL;
-@@ -194,7 +204,7 @@ static void list_folder_callback(struct obc_session *session,
- 	obc_transfer_clear_buffer(transfer);
- 
- done:
--	g_dbus_send_message(ftp->conn, reply);
-+	g_dbus_send_message(conn, reply);
- 	dbus_message_unref(ftp->msg);
- 	ftp->msg = NULL;
- }
-@@ -352,33 +362,95 @@ static void ftp_free(void *data)
- 	struct ftp_data *ftp = data;
- 
- 	obc_session_unref(ftp->session);
--	dbus_connection_unref(ftp->conn);
- 	g_free(ftp);
- }
- 
--gboolean ftp_register_interface(DBusConnection *connection, const char *path,
--							void *user_data)
-+static int ftp_probe(struct obc_session *session)
- {
--	struct obc_session *session = user_data;
- 	struct ftp_data *ftp;
-+	const char *path;
++#define OPP_UUID "00001105-0000-1000-8000-00805f9b34fb"
 +
-+	path = obc_session_get_path(session);
-+
-+	DBG("%s", path);
- 
- 	ftp = g_try_new0(struct ftp_data, 1);
- 	if (!ftp)
--		return FALSE;
-+		return -ENOMEM;
- 
- 	ftp->session = obc_session_ref(session);
--	ftp->conn = dbus_connection_ref(connection);
- 
--	if (!g_dbus_register_interface(connection, path, FTP_INTERFACE,
--				ftp_methods, NULL, NULL, ftp, ftp_free)) {
-+	if (!g_dbus_register_interface(conn, path, FTP_INTERFACE, ftp_methods,
-+						NULL, NULL, ftp, ftp_free)) {
- 		ftp_free(ftp);
--		return FALSE;
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static void ftp_remove(struct obc_session *session)
++static int opp_probe(struct obc_session *session)
 +{
 +	const char *path = obc_session_get_path(session);
 +
 +	DBG("%s", path);
 +
-+	g_dbus_unregister_interface(conn, path, FTP_INTERFACE);
++	return 0;
 +}
 +
-+static struct obc_driver ftp = {
-+	.service = "FTP",
-+	.uuid = FTP_UUID,
-+	.target = OBEX_FTP_UUID,
-+	.target_len = OBEX_FTP_UUID_LEN,
-+	.probe = ftp_probe,
-+	.remove = ftp_remove
-+};
-+
-+static struct obc_driver pcsuite = {
-+	.service = "PCSUITE",
-+	.uuid = PCSUITE_UUID,
-+	.target = OBEX_FTP_UUID,
-+	.target_len = OBEX_FTP_UUID_LEN,
-+	.probe = ftp_probe,
-+	.remove = ftp_remove
-+};
-+
-+int ftp_init(void)
++static void opp_remove(struct obc_session *session)
 +{
-+	int err;
++	const char *path = obc_session_get_path(session);
 +
++	DBG("%s", path);
++}
++
++static struct obc_driver opp = {
++	.service = "OPP",
++	.uuid = OPP_UUID,
++	.probe = opp_probe,
++	.remove = opp_remove
++};
++
++int opp_init(void)
++{
 +	DBG("");
 +
-+	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
-+	if (!conn)
-+		return -EIO;
++	return obc_driver_register(&opp);
++}
 +
-+	err = obc_driver_register(&ftp);
-+	if (err < 0)
-+		goto failed;
-+
-+	err = obc_driver_register(&pcsuite);
-+	if (err < 0) {
-+		obc_driver_unregister(&ftp);
-+		goto failed;
- 	}
- 
--	return TRUE;
-+	return 0;
-+
-+failed:
-+	dbus_connection_unref(conn);
-+	conn = NULL;
-+	return err;
- }
- 
--void ftp_unregister_interface(DBusConnection *connection, const char *path)
-+void ftp_exit(void)
- {
--	g_dbus_unregister_interface(connection, path, FTP_INTERFACE);
++void opp_exit(void)
++{
 +	DBG("");
 +
-+	dbus_connection_unref(conn);
-+	conn = NULL;
++	obc_driver_unregister(&opp);
++}
+diff --git a/client/opp.h b/client/opp.h
+new file mode 100644
+index 0000000..a23e94e
+--- /dev/null
++++ b/client/opp.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2011 Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	obc_driver_unregister(&ftp);
-+	obc_driver_unregister(&pcsuite);
- }
-diff --git a/client/ftp.h b/client/ftp.h
-index 1af2a3d..3d90968 100644
---- a/client/ftp.h
-+++ b/client/ftp.h
-@@ -2,7 +2,6 @@
-  *
-  *  OBEX Client
-  *
-- *  Copyright (C) 2007-2010  Intel Corporation
-  *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-  *
-  *
-@@ -22,8 +21,5 @@
-  *
-  */
- 
--#include <gdbus.h>
--
--gboolean ftp_register_interface(DBusConnection *connection, const char *path,
--							void *user_data);
--void ftp_unregister_interface(DBusConnection *connection, const char *path);
-+int ftp_init(void);
-+void ftp_exit(void);
-diff --git a/client/manager.c b/client/manager.c
-index 81d091b..06b53f7 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -39,6 +39,7 @@
- #include "session.h"
- #include "manager.h"
- #include "opp.h"
-+#include "ftp.h"
- 
- #define CLIENT_SERVICE  "org.openobex.client"
- 
-@@ -561,6 +562,7 @@ static struct vtable {
- 	void (*exit) (void);
- } targets[] = {
- 	{ "opp", opp_init, opp_exit },
-+	{ "ftp", ftp_init, ftp_exit },
- 	{ }
- };
- 
-diff --git a/client/session.c b/client/session.c
-index 8141d17..6fa6367 100644
---- a/client/session.c
-+++ b/client/session.c
-@@ -43,7 +43,6 @@
- #include "log.h"
- #include "pbap.h"
- #include "sync.h"
--#include "ftp.h"
- #include "transfer.h"
- #include "session.h"
- #include "btio.h"
++int opp_init(void);
++void opp_exit(void);
 -- 
 1.7.6
 
