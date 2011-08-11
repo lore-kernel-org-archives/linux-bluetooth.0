@@ -1,98 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 09/16] Bluetooth: Prepare for full support discovery
- procedures
+Subject: Re: [PATCH 0/3] RFC: prioritizing data over HCI
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 10 Aug 2011 17:24:50 -0700
-In-Reply-To: <59EF67F7-A9E0-4C6D-963E-C4EF90F611FC@openbossa.org>
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
-	 <1311623405-31108-10-git-send-email-andre.guedes@openbossa.org>
-	 <1312984092.3373.116.camel@aeonflux>
-	 <59EF67F7-A9E0-4C6D-963E-C4EF90F611FC@openbossa.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Gustavo Padovan <padovan@profusion.mobi>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Date: Wed, 10 Aug 2011 17:18:18 -0700
+In-Reply-To: <alpine.DEB.2.02.1108100942580.25878@mathewm-linux>
+References: <1312377094-11285-1-git-send-email-luiz.dentz@gmail.com>
+	 <alpine.DEB.2.02.1108040901420.13578@mathewm-linux>
+	 <1312499377.2158.36.camel@THOR> <20110805191210.GA2537@joana>
+	 <alpine.DEB.2.02.1108081628030.29183@mathewm-linux>
+	 <20110809043210.GA2594@joana>
+	 <alpine.DEB.2.02.1108100942580.25878@mathewm-linux>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1313022292.3373.135.camel@aeonflux>
+Message-ID: <1313021902.3373.130.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Mat,
 
 <snip>
 
-> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/ 
-> >> bluetooth/hci_core.h
-> >> index 1ff59f2..0d2e703 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -597,6 +597,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-> >> #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
-> >> #define lmp_ssp_capable(dev)       ((dev)->features[6] &  
-> >> LMP_SIMPLE_PAIR)
-> >> #define lmp_no_flush_capable(dev)  ((dev)->features[6] &  
-> >> LMP_NO_FLUSH)
-> >> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] &  
-> >> LMP_NO_BREDR))
-> >
-> > I don't think this is a good idea. You keep forgetting if you actually
-> > have LE switched on or not.
-> >
-> > I think we should keep it like this and just keep a global hci_dev  
-> > state
-> > which discovery procedure to use. Depending on if the device is just
-> > really LE-Only, it is dual-stack, but LE got switched off (we will  
-> > need
-> > this eventually for testing) or it is just only BR/EDR.
+> > So in the next step for ERTM we move the queue to L2CAP and create a callback
+> > to call from HCI at the moment of push data to the baseband. The function in
+> > L2CAP would set the last control bits in the first packet of the queue and
+> > sent it through.
 > 
-> I agree. What really matters for the discovery procedure is the
-> operation mode not the device type. The term "device type" was
-> misused here.
+> This actually causes some problems for ERTM, since skbs are cloned 
+> before they are pushed to HCI.  skb data is not supposed to be 
+> modified after cloning.
 > 
-> About the global hci_dev state, IMO we may not need it. By looking
-> at the controller's LMP features we are able to infer what is the
-> controller's operation mode.
-
-you need to look at the extended features page 1, but yes, if you have
-that available, the it might be as simple as have the global state.
-
-It really depends on how often you have to check. Maybe it is worth to
-just have a simple operation mode variable compared to always have to
-access multiple bits in the features array. Depends on how often you
-need to use it.
-
-> >> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
-> >>
-> >> /* ----- Extended LMP capabilities ----- */
-> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> >> index bbb0daa..dcfb466 100644
-> >> --- a/net/bluetooth/mgmt.c
-> >> +++ b/net/bluetooth/mgmt.c
-> >> @@ -32,6 +32,15 @@
-> >> #define MGMT_VERSION	0
-> >> #define MGMT_REVISION	1
-> >>
-> >> +enum bt_device_type {
-> >> +	BREDR_ONLY,
-> >> +	LE_ONLY,
-> >> +	BREDR_LE,
-> >> +	UNKNOWN,
-> >> +};
-> >
-> > What is this for? We essentially have a local device capabilities  
-> > and an
-> > operation mode. They are both different. We do not have a device type.
+> If there's a callback to L2CAP anyway, why not have L2CAP provide the 
+> skb at that time instead of modifying data it provided earlier?
 > 
-> I'll change this. I may call this bt_operation_mode or something.
+> 
+> > Then the queue can be split in two by adding a pointer that will mark which
+> > element divides the queue between prio and normal. New prio skbs would just be
+> > queued after this element and before the rest.
+> 
+> I think it's simpler and less bug-prone to just have two queues. 
+> Either way, it's one more pointer.
+> 
+> However, I'm still not sure we want any queues in hci_chan.  It's not 
+> very complicated to have the queue in the L2CAP layer, and gives ERTM 
+> the control it needs.
 
-Call it bt_opermode or similar. Something shorter than some long crazy
-name that takes a lot of space at least ;)
+I am fine if we just queue in L2CAP actually. Since nobody should send
+ACL packets directly (besides the crazy people that wanna abuse BlueZ's
+support for HCI_RAW for 3rd party stacks) anyway.
 
-Also remove the UNKNOWN thing. That is useless. The devices is either
-BREDR or LE_ONLY anyway. And worst case it is really BREDR. That has
-been the default for a long time now.
-
-And while at it just call it BREDR. And prefix this with
-BT_OPERMODE_BREDR or so.
+In a real fully integrated stack only L2CAP will send ACL data packets
+and we can just rely on that fact if want to.
 
 Regards
 
