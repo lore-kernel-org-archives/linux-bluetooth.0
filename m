@@ -1,56 +1,267 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
- linux-bluetooth@vger.kernel.org
-Message-Id: <A943531F-02F0-4809-A45F-03FE4923B6EF@openbossa.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1313022419.3373.137.camel@aeonflux>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v936)
-Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to mgmt_device_found()
-Date: Thu, 11 Aug 2011 14:12:21 -0300
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org> <1312984225.3373.118.camel@aeonflux> <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com> <1312989466.3373.126.camel@aeonflux> <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org> <CAJdJm_Mg4e1bLqYFmQxSctWT6y+GMg2xtJLwavtYoM5yWYJPcw@mail.gmail.com> <1313022419.3373.137.camel@aeonflux>
+Date: Thu, 11 Aug 2011 13:51:58 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Bartosz Szatkowski <bulislaw@linux.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/3] Add SetRemoteProperties method for OOB COD
+ setting
+Message-ID: <20110811165157.GA3256@piper>
+References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel/Lizardo,
+Hi Bartosz,
 
-On Aug 10, 2011, at 9:26 PM, Marcel Holtmann wrote:
+On 13:14 Thu 11 Aug, Bartosz Szatkowski wrote:
+> Add method for suppling class of device through OOB mechanism, to be
+> available at pairing phase. At this point it may be presented to the
+> user, by agent, in confirmation request (or whatever).
+> ---
+>  doc/oob-api.txt   |   13 ++++
+>  plugins/dbusoob.c |  170 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 183 insertions(+), 0 deletions(-)
+> 
+> diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+> index d838712..0324758 100644
+> --- a/doc/oob-api.txt
+> +++ b/doc/oob-api.txt
+> @@ -36,3 +36,16 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+>  
+>  			Possible errors: org.bluez.Error.Failed
+>  					 org.bluez.Error.InvalidArguments
+> +
+> +		void SetRemoteProperties(string address, dict data)
+> +
+> +			This method set new properties for device with specified
+> +			address, to be used when device is created.
+> +			On success DeviceFound signal will be emitted.
+> +
+> +			Currently supported keys:
+> +
+> +				Class		uint32
+> +
+> +			Possible errors: org.bluez.Error.Failed
+> +					 org.bluez.Error.InvalidArguments
+> diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+> index 2c03780..ca0c635 100644
+> --- a/plugins/dbusoob.c
+> +++ b/plugins/dbusoob.c
+> @@ -43,6 +43,7 @@
+>  #include "event.h"
+>  #include "error.h"
+>  #include "oob.h"
+> +#include "storage.h"
+>  
+>  #define OOB_INTERFACE	"org.bluez.OutOfBand"
+>  
+> @@ -51,6 +52,13 @@ struct oob_request {
+>  	DBusMessage *msg;
+>  };
+>  
+> +struct oob_remote_parameters {
+> +	bdaddr_t local;
+> +	bdaddr_t peer;
+> +	const char *address;
+> +	uint32_t class;
+> +};
+> +
+>  static GSList *oob_requests = NULL;
+>  static DBusConnection *connection = NULL;
+>  
+> @@ -153,6 +161,167 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
+>  	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>  }
+>  
+> +static void emit_device_found(const char *path,
+> +				struct oob_remote_parameters *params)
+> +{
+> +	DBusMessage *signal;
+> +	DBusMessageIter iter, dict;
+> +
+> +	signal = dbus_message_new_signal(path, ADAPTER_INTERFACE,
+> +								"DeviceFound");
+> +	if (signal == NULL) {
+> +		error("Unable to allocate new %s.DeviceFound signal",
+> +							ADAPTER_INTERFACE);
+> +		return;
+> +	}
+> +
+> +	dbus_message_iter_init_append(signal, &iter);
+> +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
+> +							&params->address);
+> +
+> +	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+> +			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+> +			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+> +			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+> +
+> +	if (params->class != 0)
+> +		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
+> +							&params->class);
+> +
+> +	dbus_message_iter_close_container(&iter, &dict);
+> +
+> +	g_dbus_send_message(connection, signal);
+> +}
+> +
+> +static DBusMessage *parse_class(DBusMessageIter *value,
+> +			struct oob_remote_parameters *params, DBusMessage *msg)
+> +{
+> +	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
+> +		return btd_error_invalid_args(msg);
+> +
+> +	dbus_message_iter_get_basic(value, &params->class);
+> +
+> +	return NULL;
+> +}
+> +
+> +static gboolean set_class(struct oob_remote_parameters *params)
+> +{
+> +	if (params->class == 0)
+> +		return FALSE;
+> +
+> +	if (write_remote_class(&params->local, &params->peer,
+> +							params->class) < 0) {
+> +		error("Setting device class failed");
+> +
+> +		return FALSE;
+> +	}
+> +
+> +	return TRUE;
+> +}
+> +
+> +static DBusMessage *parse_property(const char *property,
+> +				DBusMessageIter *value, DBusMessage *msg,
+> +				struct oob_remote_parameters *params)
+> +{
+> +	if (g_str_equal("Class", property))
+> +		return parse_class(value, params, msg);
+> +
+> +	return NULL;
+> +}
+> +
+> +static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
+> +				struct oob_remote_parameters *params)
+> +{
 
-> Hi Anderson,
->
->>> The advertising report event has the 'Length' field to inform the
->>> 'Data' field length, so I believe it has a variable length.
->>> According to its description, the 'Length' field may vary from 0x00
->>> to 0x1F (31) bytes.
->>
->> You are right. Although the section 11 gives the impression the size
->> is always 31, this is not what happens on actual hardware, which
->> usually sends only the significant bytes (and the length is know from
->> the "Length" field.
->>
->>> The only drawback I see so far is copying extra ~200 bytes each time
->>> we get a advertising report data.
->>
->> I agree. If this event is being sent on each adv. data report event,
->> it will be more than 6 times the amount of data (with non-significant
->> bytes containing only zeroes) sent to userspace.
->
-> if we wanna save bytes copied and send to userspace, then we might  
-> even
-> fix this for BR/EDR. Since while it is fixed there only a fraction is
-> used there most of the times.
+Why is DBusMessage needed here?
 
-IMO changing the struct device_found is another issue (this would
-require userspace changes too).
+> +	gboolean device_found = FALSE;
+> +
+> +	if (set_class(params))
+> +		device_found = TRUE;
+> +
+> +	if (device_found)
+> +		emit_device_found(adapter_get_path(adapter), params);
+> +}
+> +
+> +static DBusMessage *set_remote_properties(DBusConnection *conn,
+> +						DBusMessage *msg, void *data)
+> +{
+> +	struct btd_adapter *adapter = data;
+> +	DBusMessageIter iter_msg, iter_dict, iter_entry, iter_variant;
+> +	struct oob_remote_parameters *params;
+> +	char *addr;
+> +	DBusMessage *result;
+> +
+> +	if (!dbus_message_iter_init(msg, &iter_msg))
+> +		return btd_error_invalid_args(msg);
+> +
+> +	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_STRING)
+> +		return btd_error_invalid_args(msg);
+> +
+> +	dbus_message_iter_get_basic(&iter_msg, &addr);
+> +
+> +	if (bachk(addr))
+> +		return btd_error_invalid_args(msg);
+> +
+> +	dbus_message_iter_get_basic(&iter_msg, &addr);
 
-The point in adding the eir_len parameter is to avoid:
-     * preparing (memset and copy EIR from adv report) a 240-bytes
-       temporary buffer to pass to mgmt_device_found()
-     * to memcpy() ~200 useless bytes to ev.eir in mgmt_device_found()
+I may be missing something obvious here, but this loooks uneeded. You are
+doing the same thing you did a few lines above.
 
-For each advertising data we gather from the LE scan (which can be
-a lot) we would need to do that.
+> +	dbus_message_iter_next(&iter_msg);
+> +
+> +	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_ARRAY)
+> +		return btd_error_invalid_args(msg);
+> +
+> +	params = g_new0(struct oob_remote_parameters, 1);
+> +
+> +	params->address = addr;
+> +	adapter_get_address(adapter, &params->local);
+> +	str2ba(addr, &params->peer);
+> +
+> +	dbus_message_iter_recurse(&iter_msg, &iter_dict);
+> +
+> +	for (; dbus_message_iter_get_arg_type(&iter_dict) != DBUS_TYPE_INVALID;
+> +					dbus_message_iter_next(&iter_dict)) {
+> +		char *property;
+> +
+> +		if (dbus_message_iter_get_arg_type(&iter_dict) !=
+> +							DBUS_TYPE_DICT_ENTRY) {
+> +			result = btd_error_invalid_args(msg);
+> +
+> +			goto done;
+> +		}
+> +
+> +		dbus_message_iter_recurse(&iter_dict, &iter_entry);
+> +
+> +		if (dbus_message_iter_get_arg_type(&iter_entry) !=
+> +							DBUS_TYPE_STRING) {
+> +			result = btd_error_invalid_args(msg);
+> +
+> +			goto done;
+> +		}
+> +
+> +		dbus_message_iter_get_basic(&iter_entry, &property);
+> +		dbus_message_iter_next(&iter_entry);
+> +
+> +		if (dbus_message_iter_get_arg_type(&iter_entry) !=
+> +							DBUS_TYPE_VARIANT) {
+> +			result = btd_error_invalid_args(msg);
+> +
+> +			goto done;
+> +		}
+> +
+> +		dbus_message_iter_recurse(&iter_entry, &iter_variant);
+> +
+> +		result = parse_property(property, &iter_variant, msg, params);
+> +		if (result != NULL)
+> +			goto done;
+> +	}
+> +
+> +	set_properties(adapter, msg, params);
+> +
+> +	result = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> +
+> +done:
+> +	g_free(params);
+> +
+> +	return result;
+> +}
+> +
+>  static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+>  								void *data)
+>  {
+> @@ -177,6 +346,7 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+>  
+>  static GDBusMethodTable oob_methods[] = {
+>  	{"AddRemoteData",	"sayay",	"",	add_remote_data},
+> +	{"SetRemoteProperties",	"sa{sv}",	"",	set_remote_properties},
+>  	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
+>  	{"ReadLocalData",	"",		"ayay",	read_local_data,
+>  						G_DBUS_METHOD_FLAG_ASYNC},
+> -- 
+> 1.7.4.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-BR,
-
-Andre.
+Cheers,
+-- 
+Vinicius
