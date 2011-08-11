@@ -1,67 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E08AB77C-CFED-4C47-ACE2-5BF773B2BC2F@openbossa.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1312984325.3373.119.camel@aeonflux>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v936)
-Subject: Re: [PATCH v2 15/16] Bluetooth: Support LE-Only discovery procedure
-Date: Thu, 11 Aug 2011 17:08:58 -0300
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-16-git-send-email-andre.guedes@openbossa.org> <1312984325.3373.119.camel@aeonflux>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 11 Aug 2011 16:35:34 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Dan Carpenter <error27@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [patch] bluetooth: unlock if allocation fails in
+ hci_blacklist_add()
+Message-ID: <20110811193533.GB19699@joana>
+References: <20110803142244.GL3839@shale.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110803142244.GL3839@shale.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Dan,
 
-On Aug 10, 2011, at 10:52 AM, Marcel Holtmann wrote:
+* Dan Carpenter <error27@gmail.com> [2011-08-03 17:22:45 +0300]:
 
-> Hi Andre,
->
->> This patch adds support for LE-Only discovery procedure through
->> management interface.
->>
->> A new flag (HCI_LE_SCAN) was created to inform if the controller is
->> performing LE scan. The HCI_LE_SCAN flag is set/cleared when the
->> controller starts/stops scanning.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> include/net/bluetooth/hci.h |    2 ++
->> net/bluetooth/hci_event.c   |   39 +++++++++++++++++++++++++++++++++ 
->> +++---
->> net/bluetooth/mgmt.c        |    5 +++++
->> 3 files changed, 43 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/ 
->> hci.h
->> index fb40388..c4fdeeb 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -86,6 +86,8 @@ enum {
->> 	HCI_DEBUG_KEYS,
->>
->> 	HCI_RESET,
->> +
->> +	HCI_LE_SCAN,
->> };
->
-> I am really against adding any new flags here. This is a public API  
-> and
-> a horrible one actually.
->
-> We need to have these states internal and stop adding more flags to  
-> this
-> public API.
+> There was a small typo here so we never actually hit the goto which
+> would call hci_dev_unlock_bh().
+> 
+> Signed-off-by: Dan Carpenter <error27@gmail.com>
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index baaf5eb..56943ad 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1326,7 +1326,7 @@ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
+>  
+>  	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
+>  	if (!entry) {
+> -		return -ENOMEM;
+> +		err = -ENOMEM;
+>  		goto err;
+>  	}
 
-The HCI_LE_SCAN flag is really device/controller related as well as
-HCI_INQURY flag is. They both have similar meaning and using. Besides,
-the userspace (hciconfig) might be interested in checking this flag to
-know if the controller is carrying out the LE scan (just like it does
-with HCI_INQUIRY flag).
+Patch has been applied, thanks.
 
-So, may you consider we keep this flag here?
-
-Thanks,
-
-Andre.
+	Gustavo
