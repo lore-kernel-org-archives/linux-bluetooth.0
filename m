@@ -1,51 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLPYQKtiSTfD-H1svLrSgOTmMuHyFhb0t673FgFEkYnmQ@mail.gmail.com>
-References: <1312981596-7291-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1312981596-7291-19-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZLPYQKtiSTfD-H1svLrSgOTmMuHyFhb0t673FgFEkYnmQ@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 11 Aug 2011 08:23:36 -0300
-Message-ID: <CAMOw1v4K-B-Aay4-iUYdhuv3VHqaMuaPOC70puR+mzn6QxCjiA@mail.gmail.com>
-Subject: Re: [PATCH v3 18/22] avrcp: send response for registered events
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH BlueZ 3/3] Add support for name in OOB SetRemoteProperties
+Date: Thu, 11 Aug 2011 13:14:57 +0200
+Message-Id: <1313061297-16884-3-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
+References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ doc/oob-api.txt   |    1 +
+ plugins/dbusoob.c |   37 +++++++++++++++++++++++++++++++++++++
+ src/storage.c     |    2 +-
+ src/storage.h     |    2 +-
+ 4 files changed, 40 insertions(+), 2 deletions(-)
 
-On Thu, Aug 11, 2011 at 5:15 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
->
-> On Wed, Aug 10, 2011 at 4:06 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->>  static void mp_get_playback_status(struct media_player *mp, uint8_t *status,
->>                                        uint32_t *elapsed, uint32_t *track_len)
->>  {
->> @@ -754,6 +823,13 @@ static void mp_set_playback_status(struct control *control, uint8_t status,
->>                return;
->>
->>        mp->status = status;
->> +
->> +       if (control->state == AVCTP_STATE_CONNECTED &&  !control->target &&
->> +                       (control->registered_events &
->> +                               (1 << AVRCP_EVENT_PLAYBACK_STATUS_CHANGED))) {
->> +               avctp_send_event(control, AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
->> +                                                               &status);
->> +       }
->
-> Are you sure it would be valid to call mp_set_playback_status when
-> acting as a controller? Im afraid we should not cache anything, or
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index 500ef15..2d0d096 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -49,6 +49,7 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+ 				Class		uint32
+ 				Hash		array{byte}
+ 				Randomizer	array{byte}
++				Name		String
+ 
+ 			Possible errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InvalidArguments
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index c6237f9..d83c982 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -59,6 +59,7 @@ struct oob_remote_parameters {
+ 	uint32_t class;
+ 	uint8_t *hash;
+ 	uint8_t *randomizer;
++	const char *name;
+ };
+ 
+ static GSList *oob_requests = NULL;
+@@ -190,6 +191,10 @@ static void emit_device_found(const char *path,
+ 		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
+ 							&params->class);
+ 
++	if (params->name != NULL)
++		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
++							&params->name);
++
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	g_dbus_send_message(connection, signal);
+@@ -263,6 +268,32 @@ static void set_oob_data(struct btd_adapter *adapter,
+ 	}
+ }
+ 
++static DBusMessage *parse_name(DBusMessageIter *value,
++			struct oob_remote_parameters *params, DBusMessage *msg)
++{
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(value, &params->name);
++
++	return NULL;
++}
++
++static gboolean set_name(struct oob_remote_parameters *params)
++{
++	if (params->name == NULL)
++		return FALSE;
++
++	if (write_device_name(&params->local, &params->peer,
++							params->name) < 0) {
++		error("Setting device name failed");
++
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
+ static DBusMessage *parse_property(const char *property,
+ 				DBusMessageIter *value, DBusMessage *msg,
+ 				struct oob_remote_parameters *params)
+@@ -270,6 +301,9 @@ static DBusMessage *parse_property(const char *property,
+ 	if (g_str_equal("Class", property))
+ 		return parse_class(value, params, msg);
+ 
++	if (g_str_equal("Name", property))
++		return parse_name(value, params, msg);
++
+ 	if (g_str_equal("Hash", property))
+ 		return parse_oob_data(value, &params->hash, msg);
+ 
+@@ -287,6 +321,9 @@ static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
+ 	if (set_class(params))
+ 		device_found = TRUE;
+ 
++	if (set_name(params))
++		device_found = TRUE;
++
+ 	set_oob_data(adapter, params);
+ 
+ 	if (device_found)
+diff --git a/src/storage.c b/src/storage.c
+index 1f3da6e..414d158 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -321,7 +321,7 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
+ 	return 0;
+ }
+ 
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name)
+ {
+ 	char filename[PATH_MAX + 1], addr[18], str[249];
+ 	int i;
+diff --git a/src/storage.h b/src/storage.h
+index bb64727..78513ac 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -38,7 +38,7 @@ int write_local_class(bdaddr_t *bdaddr, uint8_t *class);
+ int read_local_class(bdaddr_t *bdaddr, uint8_t *class);
+ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
+ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name);
+ int read_device_name(const char *src, const char *dst, char *name);
+ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
+ int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
+-- 
+1.7.4.1
 
-No it's not valid. But in all cases it's implemented in this patch
-we're actually acting as target, not controller. The control->target
-fields refers to the remote device.
-
-> perhaps not even register MediaPlayer interface in case the device is
-> a target.
-
-We can't since MediaPlayer accepts commands before it's connected.
-
-Lucas De Marchi
