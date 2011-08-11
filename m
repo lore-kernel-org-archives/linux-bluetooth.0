@@ -1,42 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1313001887-29644-1-git-send-email-syamsidhardh@gmail.com>
-References: <1313001887-29644-1-git-send-email-syamsidhardh@gmail.com>
-Date: Thu, 11 Aug 2011 11:26:06 +0300
-Message-ID: <CABBYNZLbg14wLrG2zge_OvgtvcQULdBq-kqt+MOi7ufh6SHrEw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Fix crash when disconnecting the a2dp
+In-Reply-To: <1312981596-7291-19-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1312981596-7291-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1312981596-7291-19-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 11 Aug 2011 11:15:53 +0300
+Message-ID: <CABBYNZLPYQKtiSTfD-H1svLrSgOTmMuHyFhb0t673FgFEkYnmQ@mail.gmail.com>
+Subject: Re: [PATCH v3 18/22] avrcp: send response for registered events
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
-On Wed, Aug 10, 2011 at 9:44 PM, Syam Sidhardhan <syamsidhardh@gmail.com> wrote:
-> When we disconnect the a2dp Headset by immediate power off and soon if we
-> initiate a disconnection from our side, a crash is occurring. This is
-> happening because of the disconnect_timeout coming after freeing the session.
-> ---
->  audio/avdtp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/avdtp.c b/audio/avdtp.c
-> index 76526b6..d8d9d7e 100644
-> --- a/audio/avdtp.c
-> +++ b/audio/avdtp.c
-> @@ -690,7 +690,7 @@ static void set_disconnect_timer(struct avdtp *session)
->                remove_disconnect_timer(session);
->
->        if (session->device_disconnect) {
-> -               g_idle_add(disconnect_timeout, session);
-> +               session->dc_timer = g_idle_add(disconnect_timeout, session);
+On Wed, Aug 10, 2011 at 4:06 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>  static void mp_get_playback_status(struct media_player *mp, uint8_t *status,
+>                                        uint32_t *elapsed, uint32_t *track_len)
+>  {
+> @@ -754,6 +823,13 @@ static void mp_set_playback_status(struct control *control, uint8_t status,
 >                return;
->        }
 >
+>        mp->status = status;
+> +
+> +       if (control->state == AVCTP_STATE_CONNECTED &&  !control->target &&
+> +                       (control->registered_events &
+> +                               (1 << AVRCP_EVENT_PLAYBACK_STATUS_CHANGED))) {
+> +               avctp_send_event(control, AVRCP_EVENT_PLAYBACK_STATUS_CHANGED,
+> +                                                               &status);
+> +       }
 
-Nice catch, ack.
+Are you sure it would be valid to call mp_set_playback_status when
+acting as a controller? Im afraid we should not cache anything, or
+perhaps not even register MediaPlayer interface in case the device is
+a target.
+
+>
+>  /*
+> @@ -901,6 +977,12 @@ static void mp_set_media_attributes(struct control *control,
+>                           "\tTrack number: %u\n\tTrack duration: %u",
+>                           mi->title, mi->artist, mi->album, mi->genre,
+>                           mi->ntracks, mi->track, mi->track_len);
+> +
+> +       if (control->state == AVCTP_STATE_CONNECTED && !control->target &&
+> +                                       (control->registered_events &
+> +                                        (1 << AVRCP_EVENT_TRACK_CHANGED))) {
+> +               avctp_send_event(control, AVRCP_EVENT_TRACK_CHANGED, NULL);
+> +       }
+
+Same here.
+
 
 -- 
 Luiz Augusto von Dentz
