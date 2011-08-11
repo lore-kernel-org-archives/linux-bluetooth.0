@@ -1,278 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20110811165157.GA3256@piper>
-References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
-	<20110811165157.GA3256@piper>
-Date: Thu, 11 Aug 2011 21:16:05 +0200
-Message-ID: <CAPGrrxU2otU=wmvtsq=xdcc35FOA5p02h=stg-h4WV-u=dJb7g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] Add SetRemoteProperties method for OOB COD setting
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Thu, 11 Aug 2011 14:56:01 -0400
+Message-ID: <CAJLFYtqqVRU920HwvNm1tfxW7F_QnB-ESK3HR21eO6Of4P_yzw@mail.gmail.com>
+Subject: =?UTF-8?Q?A_problem_about_Authentication=E2=80=8F?=
+From: cheng zheng <czheng4ml@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 11, 2011 at 6:51 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Bartosz,
->
-> On 13:14 Thu 11 Aug, Bartosz Szatkowski wrote:
->> Add method for suppling class of device through OOB mechanism, to be
->> available at pairing phase. At this point it may be presented to the
->> user, by agent, in confirmation request (or whatever).
->> ---
->>  doc/oob-api.txt   |   13 ++++
->>  plugins/dbusoob.c |  170 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 183 insertions(+), 0 deletions(-)
->>
->> diff --git a/doc/oob-api.txt b/doc/oob-api.txt
->> index d838712..0324758 100644
->> --- a/doc/oob-api.txt
->> +++ b/doc/oob-api.txt
->> @@ -36,3 +36,16 @@ Methods            array{byte} hash, array{byte} randomizer ReadLocalData()
->>
->>                       Possible errors: org.bluez.Error.Failed
->>                                        org.bluez.Error.InvalidArguments
->> +
->> +             void SetRemoteProperties(string address, dict data)
->> +
->> +                     This method set new properties for device with specified
->> +                     address, to be used when device is created.
->> +                     On success DeviceFound signal will be emitted.
->> +
->> +                     Currently supported keys:
->> +
->> +                             Class           uint32
->> +
->> +                     Possible errors: org.bluez.Error.Failed
->> +                                      org.bluez.Error.InvalidArguments
->> diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
->> index 2c03780..ca0c635 100644
->> --- a/plugins/dbusoob.c
->> +++ b/plugins/dbusoob.c
->> @@ -43,6 +43,7 @@
->>  #include "event.h"
->>  #include "error.h"
->>  #include "oob.h"
->> +#include "storage.h"
->>
->>  #define OOB_INTERFACE        "org.bluez.OutOfBand"
->>
->> @@ -51,6 +52,13 @@ struct oob_request {
->>       DBusMessage *msg;
->>  };
->>
->> +struct oob_remote_parameters {
->> +     bdaddr_t local;
->> +     bdaddr_t peer;
->> +     const char *address;
->> +     uint32_t class;
->> +};
->> +
->>  static GSList *oob_requests = NULL;
->>  static DBusConnection *connection = NULL;
->>
->> @@ -153,6 +161,167 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
->>       return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
->>  }
->>
->> +static void emit_device_found(const char *path,
->> +                             struct oob_remote_parameters *params)
->> +{
->> +     DBusMessage *signal;
->> +     DBusMessageIter iter, dict;
->> +
->> +     signal = dbus_message_new_signal(path, ADAPTER_INTERFACE,
->> +                                                             "DeviceFound");
->> +     if (signal == NULL) {
->> +             error("Unable to allocate new %s.DeviceFound signal",
->> +                                                     ADAPTER_INTERFACE);
->> +             return;
->> +     }
->> +
->> +     dbus_message_iter_init_append(signal, &iter);
->> +     dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
->> +                                                     &params->address);
->> +
->> +     dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
->> +                     DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
->> +                     DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
->> +                     DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
->> +
->> +     if (params->class != 0)
->> +             dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
->> +                                                     &params->class);
->> +
->> +     dbus_message_iter_close_container(&iter, &dict);
->> +
->> +     g_dbus_send_message(connection, signal);
->> +}
->> +
->> +static DBusMessage *parse_class(DBusMessageIter *value,
->> +                     struct oob_remote_parameters *params, DBusMessage *msg)
->> +{
->> +     if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
->> +             return btd_error_invalid_args(msg);
->> +
->> +     dbus_message_iter_get_basic(value, &params->class);
->> +
->> +     return NULL;
->> +}
->> +
->> +static gboolean set_class(struct oob_remote_parameters *params)
->> +{
->> +     if (params->class == 0)
->> +             return FALSE;
->> +
->> +     if (write_remote_class(&params->local, &params->peer,
->> +                                                     params->class) < 0) {
->> +             error("Setting device class failed");
->> +
->> +             return FALSE;
->> +     }
->> +
->> +     return TRUE;
->> +}
->> +
->> +static DBusMessage *parse_property(const char *property,
->> +                             DBusMessageIter *value, DBusMessage *msg,
->> +                             struct oob_remote_parameters *params)
->> +{
->> +     if (g_str_equal("Class", property))
->> +             return parse_class(value, params, msg);
->> +
->> +     return NULL;
->> +}
->> +
->> +static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
->> +                             struct oob_remote_parameters *params)
->> +{
->
-> Why is DBusMessage needed here?
->
->> +     gboolean device_found = FALSE;
->> +
->> +     if (set_class(params))
->> +             device_found = TRUE;
->> +
->> +     if (device_found)
->> +             emit_device_found(adapter_get_path(adapter), params);
->> +}
->> +
->> +static DBusMessage *set_remote_properties(DBusConnection *conn,
->> +                                             DBusMessage *msg, void *data)
->> +{
->> +     struct btd_adapter *adapter = data;
->> +     DBusMessageIter iter_msg, iter_dict, iter_entry, iter_variant;
->> +     struct oob_remote_parameters *params;
->> +     char *addr;
->> +     DBusMessage *result;
->> +
->> +     if (!dbus_message_iter_init(msg, &iter_msg))
->> +             return btd_error_invalid_args(msg);
->> +
->> +     if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_STRING)
->> +             return btd_error_invalid_args(msg);
->> +
->> +     dbus_message_iter_get_basic(&iter_msg, &addr);
->> +
->> +     if (bachk(addr))
->> +             return btd_error_invalid_args(msg);
->> +
->> +     dbus_message_iter_get_basic(&iter_msg, &addr);
->
-> I may be missing something obvious here, but this loooks uneeded. You are
-> doing the same thing you did a few lines above.
->
->> +     dbus_message_iter_next(&iter_msg);
->> +
->> +     if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_ARRAY)
->> +             return btd_error_invalid_args(msg);
->> +
->> +     params = g_new0(struct oob_remote_parameters, 1);
->> +
->> +     params->address = addr;
->> +     adapter_get_address(adapter, &params->local);
->> +     str2ba(addr, &params->peer);
->> +
->> +     dbus_message_iter_recurse(&iter_msg, &iter_dict);
->> +
->> +     for (; dbus_message_iter_get_arg_type(&iter_dict) != DBUS_TYPE_INVALID;
->> +                                     dbus_message_iter_next(&iter_dict)) {
->> +             char *property;
->> +
->> +             if (dbus_message_iter_get_arg_type(&iter_dict) !=
->> +                                                     DBUS_TYPE_DICT_ENTRY) {
->> +                     result = btd_error_invalid_args(msg);
->> +
->> +                     goto done;
->> +             }
->> +
->> +             dbus_message_iter_recurse(&iter_dict, &iter_entry);
->> +
->> +             if (dbus_message_iter_get_arg_type(&iter_entry) !=
->> +                                                     DBUS_TYPE_STRING) {
->> +                     result = btd_error_invalid_args(msg);
->> +
->> +                     goto done;
->> +             }
->> +
->> +             dbus_message_iter_get_basic(&iter_entry, &property);
->> +             dbus_message_iter_next(&iter_entry);
->> +
->> +             if (dbus_message_iter_get_arg_type(&iter_entry) !=
->> +                                                     DBUS_TYPE_VARIANT) {
->> +                     result = btd_error_invalid_args(msg);
->> +
->> +                     goto done;
->> +             }
->> +
->> +             dbus_message_iter_recurse(&iter_entry, &iter_variant);
->> +
->> +             result = parse_property(property, &iter_variant, msg, params);
->> +             if (result != NULL)
->> +                     goto done;
->> +     }
->> +
->> +     set_properties(adapter, msg, params);
->> +
->> +     result = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
->> +
->> +done:
->> +     g_free(params);
->> +
->> +     return result;
->> +}
->> +
->>  static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
->>                                                               void *data)
->>  {
->> @@ -177,6 +346,7 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
->>
->>  static GDBusMethodTable oob_methods[] = {
->>       {"AddRemoteData",       "sayay",        "",     add_remote_data},
->> +     {"SetRemoteProperties", "sa{sv}",       "",     set_remote_properties},
->>       {"RemoveRemoteData",    "s",            "",     remove_remote_data},
->>       {"ReadLocalData",       "",             "ayay", read_local_data,
->>                                               G_DBUS_METHOD_FLAG_ASYNC},
->> --
->> 1.7.4.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Cheers,
-> --
-> Vinicius
->
+Hi
+I am using bluez on Gentoo and meet a problem recently.
+I was trying to connect to a medical device via bluetooth.
+(00:11:B1:B3:4E:B4    clock offset: 0x1242    class: 0x001f00). When I
+connect it at first, it works. However, if I accidentally shut off the
+device manually and reconnect it, I got the failed message like this,
 
-Of course you are right -- I've been moving this around a bit and must
-lost it in the process.
-Will fix it tomorrow. Thanks!
+localhost ~ # rfcomm connect 0 00:11:B1:B3:4E:B4 1
+Can't connect RFCOMM socket: Permission denied
 
--- 
-Pozdrowienia,
-Bartosz Szatkowski
+The message from hcidump is
+
+
+localhost ~ # hcidump hci0
+HCI sniffer - Bluetooth packet analyzer ver 2.0
+device: hci0 snap_len: 1028 filter: 0xffffffffffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:11:B1:B3:4E:B4 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:11:B1:B3:4E:B4
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 00:11:B1:B3:4E:B4 key C0451619A2D93536E094FCFFE8DA160E
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:11:B1:B3:4E:B4
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x05 handle 12 bdaddr 00:11:B1:B3:4E:B4 type ACL encrypt 0x00
+    Error: Authentication Failure
+
+So I think I should clean up some residues to finish the process of
+authentication. But I don't know where they are under linux filesystem
+hierarchy. Of course I can delete them through some GUI bluetooth
+manager like gnome-bluetooth. But my supervisor expects that I can
+write a code to clean them up.
+
+Can anyone help me?
+
+Thanks
+
+Cheng
