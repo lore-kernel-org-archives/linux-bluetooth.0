@@ -2,125 +2,243 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH BlueZ 2/3] Add support for OOB data in SetRemoteProperties
-Date: Thu, 11 Aug 2011 13:14:56 +0200
-Message-Id: <1313061297-16884-2-git-send-email-bulislaw@linux.com>
-In-Reply-To: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
-References: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
+Subject: [PATCH BlueZ 1/3] Add SetRemoteProperties method for OOB COD setting
+Date: Thu, 11 Aug 2011 13:14:55 +0200
+Message-Id: <1313061297-16884-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now its possible to exchange OOB simple pairing data through DBus API
-method with other device properties.
+Add method for suppling class of device through OOB mechanism, to be
+available at pairing phase. At this point it may be presented to the
+user, by agent, in confirmation request (or whatever).
 ---
- doc/oob-api.txt   |    5 ++++-
- plugins/dbusoob.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 56 insertions(+), 1 deletions(-)
+ doc/oob-api.txt   |   13 ++++
+ plugins/dbusoob.c |  170 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 183 insertions(+), 0 deletions(-)
 
 diff --git a/doc/oob-api.txt b/doc/oob-api.txt
-index 0324758..500ef15 100644
+index d838712..0324758 100644
 --- a/doc/oob-api.txt
 +++ b/doc/oob-api.txt
-@@ -41,11 +41,14 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
- 
- 			This method set new properties for device with specified
- 			address, to be used when device is created.
--			On success DeviceFound signal will be emitted.
-+			On success DeviceFound signal will be emitted (except
-+			situations when only hash and randomizer is supplied).
- 
- 			Currently supported keys:
- 
- 				Class		uint32
-+				Hash		array{byte}
-+				Randomizer	array{byte}
+@@ -36,3 +36,16 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
  
  			Possible errors: org.bluez.Error.Failed
  					 org.bluez.Error.InvalidArguments
++
++		void SetRemoteProperties(string address, dict data)
++
++			This method set new properties for device with specified
++			address, to be used when device is created.
++			On success DeviceFound signal will be emitted.
++
++			Currently supported keys:
++
++				Class		uint32
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.InvalidArguments
 diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
-index ca0c635..c6237f9 100644
+index 2c03780..ca0c635 100644
 --- a/plugins/dbusoob.c
 +++ b/plugins/dbusoob.c
-@@ -57,6 +57,8 @@ struct oob_remote_parameters {
- 	bdaddr_t peer;
- 	const char *address;
- 	uint32_t class;
-+	uint8_t *hash;
-+	uint8_t *randomizer;
+@@ -43,6 +43,7 @@
+ #include "event.h"
+ #include "error.h"
+ #include "oob.h"
++#include "storage.h"
+ 
+ #define OOB_INTERFACE	"org.bluez.OutOfBand"
+ 
+@@ -51,6 +52,13 @@ struct oob_request {
+ 	DBusMessage *msg;
  };
  
++struct oob_remote_parameters {
++	bdaddr_t local;
++	bdaddr_t peer;
++	const char *address;
++	uint32_t class;
++};
++
  static GSList *oob_requests = NULL;
-@@ -219,6 +221,48 @@ static gboolean set_class(struct oob_remote_parameters *params)
- 	return TRUE;
+ static DBusConnection *connection = NULL;
+ 
+@@ -153,6 +161,167 @@ static DBusMessage *add_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
-+static DBusMessage *parse_oob_data(DBusMessageIter *value, uint8_t **data,
-+							DBusMessage *msg)
++static void emit_device_found(const char *path,
++				struct oob_remote_parameters *params)
 +{
-+	DBusMessageIter array_iter;
-+	int32_t len;
-+	uint8_t *tmp;
++	DBusMessage *signal;
++	DBusMessageIter iter, dict;
 +
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
++	signal = dbus_message_new_signal(path, ADAPTER_INTERFACE,
++								"DeviceFound");
++	if (signal == NULL) {
++		error("Unable to allocate new %s.DeviceFound signal",
++							ADAPTER_INTERFACE);
++		return;
++	}
++
++	dbus_message_iter_init_append(signal, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
++							&params->address);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (params->class != 0)
++		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
++							&params->class);
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	g_dbus_send_message(connection, signal);
++}
++
++static DBusMessage *parse_class(DBusMessageIter *value,
++			struct oob_remote_parameters *params, DBusMessage *msg)
++{
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
 +		return btd_error_invalid_args(msg);
 +
-+	dbus_message_iter_recurse(value, &array_iter);
-+
-+	dbus_message_iter_get_fixed_array(&array_iter, &tmp, &len);
-+
-+	if (len != 16)
-+		return btd_error_invalid_args(msg);
-+
-+	*data = tmp;
++	dbus_message_iter_get_basic(value, &params->class);
 +
 +	return NULL;
 +}
 +
-+static void set_oob_data(struct btd_adapter *adapter,
-+				struct oob_remote_parameters *parameters)
++static gboolean set_class(struct oob_remote_parameters *params)
 +{
-+	if (parameters->hash == NULL && parameters->randomizer == NULL)
-+		return;
++	if (params->class == 0)
++		return FALSE;
 +
-+	if (parameters->hash == NULL || parameters->randomizer == NULL) {
-+		error("OOB data incomplete");
++	if (write_remote_class(&params->local, &params->peer,
++							params->class) < 0) {
++		error("Setting device class failed");
 +
-+		return;
++		return FALSE;
 +	}
 +
-+	if (btd_adapter_add_remote_oob_data(adapter, &parameters->peer,
-+				parameters->hash, parameters->randomizer)) {
-+		error("Adding remote OOB data failed");
-+
-+		return;
-+	}
++	return TRUE;
 +}
 +
- static DBusMessage *parse_property(const char *property,
- 				DBusMessageIter *value, DBusMessage *msg,
- 				struct oob_remote_parameters *params)
-@@ -226,6 +270,12 @@ static DBusMessage *parse_property(const char *property,
- 	if (g_str_equal("Class", property))
- 		return parse_class(value, params, msg);
- 
-+	if (g_str_equal("Hash", property))
-+		return parse_oob_data(value, &params->hash, msg);
++static DBusMessage *parse_property(const char *property,
++				DBusMessageIter *value, DBusMessage *msg,
++				struct oob_remote_parameters *params)
++{
++	if (g_str_equal("Class", property))
++		return parse_class(value, params, msg);
 +
-+	if (g_str_equal("Randomizer", property))
-+		return parse_oob_data(value, &params->randomizer, msg);
++	return NULL;
++}
 +
- 	return NULL;
- }
- 
-@@ -237,6 +287,8 @@ static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
- 	if (set_class(params))
- 		device_found = TRUE;
- 
-+	set_oob_data(adapter, params);
++static void set_properties(struct btd_adapter *adapter, DBusMessage *msg,
++				struct oob_remote_parameters *params)
++{
++	gboolean device_found = FALSE;
 +
- 	if (device_found)
- 		emit_device_found(adapter_get_path(adapter), params);
- }
++	if (set_class(params))
++		device_found = TRUE;
++
++	if (device_found)
++		emit_device_found(adapter_get_path(adapter), params);
++}
++
++static DBusMessage *set_remote_properties(DBusConnection *conn,
++						DBusMessage *msg, void *data)
++{
++	struct btd_adapter *adapter = data;
++	DBusMessageIter iter_msg, iter_dict, iter_entry, iter_variant;
++	struct oob_remote_parameters *params;
++	char *addr;
++	DBusMessage *result;
++
++	if (!dbus_message_iter_init(msg, &iter_msg))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter_msg, &addr);
++
++	if (bachk(addr))
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter_msg, &addr);
++	dbus_message_iter_next(&iter_msg);
++
++	if (dbus_message_iter_get_arg_type(&iter_msg) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++	params = g_new0(struct oob_remote_parameters, 1);
++
++	params->address = addr;
++	adapter_get_address(adapter, &params->local);
++	str2ba(addr, &params->peer);
++
++	dbus_message_iter_recurse(&iter_msg, &iter_dict);
++
++	for (; dbus_message_iter_get_arg_type(&iter_dict) != DBUS_TYPE_INVALID;
++					dbus_message_iter_next(&iter_dict)) {
++		char *property;
++
++		if (dbus_message_iter_get_arg_type(&iter_dict) !=
++							DBUS_TYPE_DICT_ENTRY) {
++			result = btd_error_invalid_args(msg);
++
++			goto done;
++		}
++
++		dbus_message_iter_recurse(&iter_dict, &iter_entry);
++
++		if (dbus_message_iter_get_arg_type(&iter_entry) !=
++							DBUS_TYPE_STRING) {
++			result = btd_error_invalid_args(msg);
++
++			goto done;
++		}
++
++		dbus_message_iter_get_basic(&iter_entry, &property);
++		dbus_message_iter_next(&iter_entry);
++
++		if (dbus_message_iter_get_arg_type(&iter_entry) !=
++							DBUS_TYPE_VARIANT) {
++			result = btd_error_invalid_args(msg);
++
++			goto done;
++		}
++
++		dbus_message_iter_recurse(&iter_entry, &iter_variant);
++
++		result = parse_property(property, &iter_variant, msg, params);
++		if (result != NULL)
++			goto done;
++	}
++
++	set_properties(adapter, msg, params);
++
++	result = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++
++done:
++	g_free(params);
++
++	return result;
++}
++
+ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -177,6 +346,7 @@ static DBusMessage *remove_remote_data(DBusConnection *conn, DBusMessage *msg,
+ 
+ static GDBusMethodTable oob_methods[] = {
+ 	{"AddRemoteData",	"sayay",	"",	add_remote_data},
++	{"SetRemoteProperties",	"sa{sv}",	"",	set_remote_properties},
+ 	{"RemoveRemoteData",	"s",		"",	remove_remote_data},
+ 	{"ReadLocalData",	"",		"ayay",	read_local_data,
+ 						G_DBUS_METHOD_FLAG_ASYNC},
 -- 
 1.7.4.1
 
