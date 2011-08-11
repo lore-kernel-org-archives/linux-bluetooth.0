@@ -2,124 +2,169 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v4 07/22] avrcp: handle ListPlayerApplicationSettingAttributes pdu
-Date: Thu, 11 Aug 2011 12:53:18 -0300
-Message-Id: <1313078013-19103-8-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v4 06/22] avrcp: handle query for company ids
+Date: Thu, 11 Aug 2011 12:53:17 -0300
+Message-Id: <1313078013-19103-7-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1313078013-19103-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1313078013-19103-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Example of response obtained with PTS test TC_TG_PAS_BV_06_C:
+Example of response for PTS test TC_TG_CFG_BV_02_C:
 
-> ACL data: handle 11 flags 0x02 dlen 17
-    L2CAP(d): cid 0x0043 len 13 [psm 23]
+> ACL data: handle 11 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0043 len 14 [psm 23]
       AVCTP: Command : pt 0x00 transaction 2 pid 0x110e
         AV/C: Status: address 0x48 opcode 0x00
           Subunit: Panel
           Opcode: Vendor Dependent
           Company ID: 0x001958
-          AVRCP: ListPlayerApplicationSettingAttributes: pt 0x00 len 0x0000
-< ACL data: handle 11 flags 0x02 dlen 20
-    L2CAP(d): cid 0x0043 len 16 [psm 23]
+          AVRCP: GetCapabilities: pt 0x00 len 0x0001
+            CapabilityID: 0x02 (CompanyID)
+< ACL data: handle 11 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0043 len 18 [psm 23]
       AVCTP: Response : pt 0x00 transaction 2 pid 0x110e
         AV/C: Stable: address 0x48 opcode 0x00
           Subunit: Panel
           Opcode: Vendor Dependent
           Company ID: 0x001958
-          AVRCP: ListPlayerApplicationSettingAttributes: pt 0x00 len 0x0003
-            AttributeCount: 0x02
-            AttributeID: 0x01 (Equalizer ON/OFF Status)
-            AttributeID: 0x04 (Scan ON/OFF Status)
+          AVRCP: GetCapabilities: pt 0x00 len 0x0005
+            CapabilityID: 0x02 (CompanyID)
+            CapabilityCount: 0x01
+            CompanyID: 0x001958
 ---
- audio/control.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 53 insertions(+), 0 deletions(-)
+ audio/control.c |   99 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 97 insertions(+), 2 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 87dcdbf..bd40e4d 100644
+index 7fe4af5..87dcdbf 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -113,6 +113,7 @@
+@@ -102,6 +102,21 @@
+ #define FORWARD_OP		0x4b
+ #define BACKWARD_OP		0x4c
  
- /* PDU types for metadata transfer */
- #define AVRCP_GET_CAPABILITIES		0x10
-+#define AVRCP_LIST_PLAYER_ATTRIBUTES	0X11
++/* Company IDs for vendor dependent commands */
++#define IEEEID_BTSIG		0x001958
++
++/* Error codes for metadata transfer */
++#define E_INVALID_COMMAND	0x00
++#define E_INVALID_PARAM		0x01
++#define E_PARAM_NOT_FOUND	0x02
++#define E_INTERNAL		0x03
++
++/* PDU types for metadata transfer */
++#define AVRCP_GET_CAPABILITIES		0x10
++
++/* Capabilities for AVRCP_GET_CAPABILITIES pdu */
++#define CAP_COMPANY_ID		0x02
++
+ #define QUIRK_NO_RELEASE	1 << 0
  
- /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
- #define CAP_COMPANY_ID		0x02
-@@ -609,6 +610,13 @@ static void mp_set_attribute(struct media_player *mp,
- 	mp->settings[attr] = val;
+ enum player_setting {
+@@ -277,6 +292,11 @@ static struct {
+ 	{ NULL }
+ };
+ 
++/* Company IDs supported by this device */
++static uint32_t company_ids[] = {
++	IEEEID_BTSIG,
++};
++
+ static GSList *avctp_callbacks = NULL;
+ 
+ static void auth_cb(DBusError *derr, void *user_data);
+@@ -624,13 +644,88 @@ static void mp_set_media_attributes(struct control *control,
+ 			   mi->ntracks, mi->track, mi->track_len);
  }
  
-+static int mp_get_attribute(struct media_player *mp, uint8_t attr)
-+{
-+	DBG("Get attribute: %u", attr);
-+
-+	return mp->settings[attr];
-+}
-+
- static void mp_set_media_attributes(struct control *control,
- 							struct media_info *mi)
- {
-@@ -674,6 +682,38 @@ err:
- 	return -EINVAL;
- }
- 
-+static int avrcp_handle_list_player_attributes(struct control *control,
++static int avrcp_handle_get_capabilities(struct control *control,
 +						struct avrcp_spec_avc_pdu *pdu)
 +{
 +	uint16_t len = ntohs(pdu->params_len);
-+	struct media_player *mp = control->mp;
 +	unsigned int i;
 +
-+	if (len != 0) {
-+		pdu->params[0] = E_INVALID_PARAM;
-+		return -EINVAL;
-+	}
++	if (len != 1)
++		goto err;
 +
-+	if (!mp)
-+		goto done;
++	DBG("id=%u", pdu->params[0]);
 +
-+	for (i = 1; i <= PLAYER_SETTING_SCAN; i++) {
-+		if (!mp_get_attribute(mp, i)) {
-+			DBG("Ignoring setting %u: not supported by player", i);
-+			continue;
++	switch (pdu->params[0]) {
++	case CAP_COMPANY_ID:
++		for (i = 0; i < G_N_ELEMENTS(company_ids); i++) {
++			pdu->params[2 + i * 3] = company_ids[i] >> 16;
++			pdu->params[3 + i * 3] = (company_ids[i] >> 8) & 0xFF;
++			pdu->params[4 + i * 3] = company_ids[i] & 0xFF;
 +		}
 +
-+		len++;
-+		pdu->params[len] = i;
++		pdu->params_len = htons(2 + (3 * G_N_ELEMENTS(company_ids)));
++		pdu->params[1] = G_N_ELEMENTS(company_ids);
++
++		return 2 + (3 * G_N_ELEMENTS(company_ids));
 +	}
 +
-+done:
-+	pdu->params[0] = len;
-+	pdu->params_len = htons(len + 1);
-+
-+	return len + 1;
++err:
++	pdu->params[0] = E_INVALID_PARAM;
++	return -EINVAL;
 +}
 +
  /* handle vendordep pdu inside an avctp packet */
  static int handle_vendordep_pdu(struct control *control,
  					struct avrcp_header *avrcp,
-@@ -713,6 +753,19 @@ static int handle_vendordep_pdu(struct control *control,
- 		avrcp->code = CTYPE_STABLE;
- 
- 		break;
-+	case AVRCP_LIST_PLAYER_ATTRIBUTES:
+ 					int operand_count)
+ {
+-	avrcp->code = CTYPE_NOT_IMPLEMENTED;
+-	return AVRCP_HEADER_LENGTH;
++	struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
++	uint32_t company_id = (pdu->company_id[0] << 16) |
++				(pdu->company_id[1] << 8) |
++				(pdu->company_id[2]);
++	int len;
++
++	if (company_id != IEEEID_BTSIG ||
++				pdu->packet_type != AVCTP_PACKET_SINGLE) {
++		avrcp->code = CTYPE_NOT_IMPLEMENTED;
++		return AVRCP_HEADER_LENGTH;
++	}
++
++	pdu->packet_type = 0;
++	pdu->rsvd = 0;
++
++	if (operand_count + 3 < AVRCP_SPECAVCPDU_HEADER_LENGTH) {
++		pdu->params[0] = E_INVALID_COMMAND;
++		goto err_metadata;
++	}
++
++	switch (pdu->pdu_id) {
++	case AVRCP_GET_CAPABILITIES:
 +		if (avrcp->code != CTYPE_STATUS) {
 +			pdu->params[0] = E_INVALID_COMMAND;
 +			goto err_metadata;
 +		}
 +
-+		len = avrcp_handle_list_player_attributes(control, pdu);
++		len = avrcp_handle_get_capabilities(control, pdu);
 +		if (len < 0)
 +			goto err_metadata;
 +
 +		avrcp->code = CTYPE_STABLE;
 +
 +		break;
- 	default:
- 		/* Invalid pdu_id */
- 		pdu->params[0] = E_INVALID_COMMAND;
++	default:
++		/* Invalid pdu_id */
++		pdu->params[0] = E_INVALID_COMMAND;
++		goto err_metadata;
++	}
++
++	return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + len;
++
++err_metadata:
++	avrcp->code = CTYPE_REJECTED;
++	pdu->params_len = htons(1);
++
++	return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
+ }
+ 
+ static void avctp_disconnected(struct audio_device *dev)
 -- 
 1.7.6
 
