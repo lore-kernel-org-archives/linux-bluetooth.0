@@ -1,71 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Fri, 12 Aug 2011 11:00:15 -0400
+Subject: [PATCH BlueZ v2] Increase timeout before initiating AVDTP connection
+Message-ID: <1313161215.2254.6.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20110812083422.GD19448@dell>
-References: <1313078013-19103-1-git-send-email-lucas.demarchi@profusion.mobi> <20110812083422.GD19448@dell>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 12 Aug 2011 12:10:57 -0300
-Message-ID: <CAMOw1v7q-d=n1+gCDUji=5e8H5HvR1cCmfc1j783gefAYftQ4Q@mail.gmail.com>
-Subject: Re: [PATCH v4 00/22] Implement AVRCP 1.3 for TG role
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-On Fri, Aug 12, 2011 at 5:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->
-> Hi Lucas,
->
-> On Thu, Aug 11, 2011, Lucas De Marchi wrote:
-> > Change from previous version:
-> >
-> > - MediaPlayer interface is created only if remote device is the controller (and
-> >   thus we are TG) as suggested by Luiz.
-> >
-> > Lucas De Marchi (22):
-> >   audio: move interface declarations to their headers
-> >   avrcp: add skeleton of MediaPlayer interface
-> >   avrcp: implement SetProperty() method of MediaPlayer
-> >   avrcp: implement ChangePlayback() method
-> >   avrcp: implement ChangeTrack() method
-> >   avrcp: handle query for company ids
-> >   avrcp: handle ListPlayerApplicationSettingAttributes pdu
-> >   avrcp: handle ListPlayerApplicationSettingValues pdu
-> >   avrcp: handle GetCurrentPlayerAplicationSettingValue pdu
-> >   avrcp: handle SetPlayerApplicationSettingValue pdu
-> >   avrcp: handle commands for future extension
-> >   avrcp: handle InformDisplayableCharacterSet pdu
-> >   avrcp: handle InformBatteryStatusOfCT pdu
-> >   avrcp: handle GetPlayStatus pdu
-> >   avrcp: handle RegisterNotification pdu
-> >   avrcp: handle query for supported events
-> >   avrcp: handle GetElementAttributes pdu
-> >   avrcp: send response for registered events
-> >   avrcp: change TG record to use version 1.3
-> >   avrcp: update copyright
-> >   Add script to test MediaPlayer interface
-> >   Update Control documentation
-> >
-> >  audio/control.c        | 1417 +++++++++++++++++++++++++++++++++++++++++++++++-
-> >  audio/control.h        |    7 +-
-> >  audio/device.h         |    4 -
-> >  audio/manager.c        |   14 +-
-> >  audio/manager.h        |    1 +
-> >  audio/unix.c           |    1 +
-> >  doc/control-api.txt    |   94 ++--
-> >  test/test-media-player |  108 ++++
-> >  8 files changed, 1580 insertions(+), 66 deletions(-)
-> >  create mode 100755 test/test-media-player
->
-> All patches have been applied. Thanks.
->
-> Additionally applied an extra cleanup patch on top of them for some
-> coding style issues. Please take a look that e.g. the avctp_send_event
-> change is correct.
-
-Thanks for applying them and doing this cleanup. They are right.
-
-
-Lucas De Marchi
+QVZEVFBfQ09OTkVDVF9USU1FT1VUIGNvbnRyb2xzIHRoZSBkZWxheSBiZXR3ZWVuIEhTUC9IRlAN
+CmNvbm5lY3Rpb24gZXN0YWJsaXNobWVudCBhbmQgQVZEVFAgc2lnbmFsIGNoYW5uZWwgZXN0YWJs
+aXNobWVudC4NClRoZSBvcmlnaW5hbCB2YWx1ZSBvZiAxIHNlYy4gaXMgdG9vIHNob3J0IHRvIGF2
+b2lkIHJhY2luZyBmb3IgQVZEVFANCmNvbm5lY3Rpb24gZXN0YWJsaXNobWVudCAoZWcuLCBpZiB0
+aGUgZGV2aWNlIGNvbnRpbnVlcyB0byBjb25maWd1cmUNCnRoZSBIRlAgc2VydmljZSBsZXZlbCBj
+b25uZWN0aW9uIHdpdGggYWRkJ2wgQVQgY21kcykuDQoNClNvbWUgZGV2aWNlcyBoYXZlIGJyb2tl
+biBBVkRUUCBpbXBsZW1lbnRhdGlvbnMgdGhhdCBqdXN0IGNhbm5vdA0KaGFuZGxlIHRoZSByYWNl
+IGNvbmRpdGlvbnMgdGhhdCBhcmlzZSBpZiBib3RoIGRldmljZXMgYXJlIGF0dGVtcHRpbmcNCnN0
+cmVhbSBlc3RhYmxpc2htZW50IGF0IHRoZSBzYW1lIHRpbWUuIEhvd2V2ZXIsIHRoZXNlIGNvbmRp
+dGlvbnMgYXJpc2UNCm9ubHkgd2hlbiB0aGUgcmVtb3RlIGRldmljZSBpcyB0aGUgQUNMIGluaXRp
+YXRvciAoYW5kIGluIHByYWN0aWNlLCB0aGUNClJGQ09NTSBpbml0aWF0b3IgYXMgd2VsbCkuICBU
+aGlzIGZpeCBidW1wcyBvdXQgdGhlIHRpbWVvdXQgdmFsdWUgb25seQ0Kd2hlbiB0aGUgaGVhZHNl
+dCBoYXMgaW5pdGlhdGVkIHRoZSBsaW5rLg0KLS0tDQoNCnYyOiBGb2xsb3cgZXN0YWJsaXNoZWQg
+bmFtaW5nIGNvbnZlbnRpb24NCg0KIGF1ZGlvL2RldmljZS5jICB8ICAgIDkgKysrKysrKystDQog
+YXVkaW8vaGVhZHNldC5jIHwgICAxNyArKysrKysrKysrKysrKysrKw0KIGF1ZGlvL2hlYWRzZXQu
+aCB8ICAgIDQgKysrKw0KIGF1ZGlvL21hbmFnZXIuYyB8ICAgIDEgKw0KIDQgZmlsZXMgY2hhbmdl
+ZCwgMzAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2F1ZGlv
+L2RldmljZS5jIGIvYXVkaW8vZGV2aWNlLmMNCmluZGV4IDE4ZTg3M2UuLjRlMWU5ZTMgMTAwNjQ0
+DQotLS0gYS9hdWRpby9kZXZpY2UuYw0KKysrIGIvYXVkaW8vZGV2aWNlLmMNCkBAIC02MSw2ICs2
+MSw3IEBADQogDQogI2RlZmluZSBDT05UUk9MX0NPTk5FQ1RfVElNRU9VVCAyDQogI2RlZmluZSBB
+VkRUUF9DT05ORUNUX1RJTUVPVVQgMQ0KKyNkZWZpbmUgQVZEVFBfQ09OTkVDVF9USU1FT1VUX0JP
+T1NUIDENCiAjZGVmaW5lIEhFQURTRVRfQ09OTkVDVF9USU1FT1VUIDENCiANCiB0eXBlZGVmIGVu
+dW0gew0KQEAgLTMwNSw2ICszMDYsNyBAQCBzdGF0aWMgZ2Jvb2xlYW4gYXZkdHBfY29ubmVjdF90
+aW1lb3V0KGdwb2ludGVyIHVzZXJfZGF0YSkNCiBzdGF0aWMgZ2Jvb2xlYW4gZGV2aWNlX3NldF9h
+dmR0cF90aW1lcihzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYpDQogew0KIAlzdHJ1Y3QgZGV2X3By
+aXYgKnByaXYgPSBkZXYtPnByaXY7DQorCWd1aW50IHRpbWVvdXQgPSBBVkRUUF9DT05ORUNUX1RJ
+TUVPVVQ7DQogDQogCWlmICghZGV2LT5zaW5rKQ0KIAkJcmV0dXJuIEZBTFNFOw0KQEAgLTMxMiw3
+ICszMTQsMTIgQEAgc3RhdGljIGdib29sZWFuIGRldmljZV9zZXRfYXZkdHBfdGltZXIoc3RydWN0
+IGF1ZGlvX2RldmljZSAqZGV2KQ0KIAlpZiAocHJpdi0+YXZkdHBfdGltZXIpDQogCQlyZXR1cm4g
+RkFMU0U7DQogDQotCXByaXYtPmF2ZHRwX3RpbWVyID0gZ190aW1lb3V0X2FkZF9zZWNvbmRzKEFW
+RFRQX0NPTk5FQ1RfVElNRU9VVCwNCisJLyogaWYgdGhlIGhlYWRzZXQgaXMgdGhlIEhTUC9IRlAg
+UkZDT01NIGluaXRpYXRvciwgZ2l2ZSB0aGUgaGVhZHNldA0KKwkgICB0aW1lIHRvIGluaXRpYXRl
+IEFWRFRQIHNpZ25hbGxpbmcgKGFuZCBhdm9pZCBmdXJ0aGVyIHJhY2luZykgKi8NCisJaWYgKGRl
+di0+aGVhZHNldCAmJiBoZWFkc2V0X2dldF9yZmNvbW1faW5pdGlhdG9yKGRldikpDQorCQl0aW1l
+b3V0ICs9IEFWRFRQX0NPTk5FQ1RfVElNRU9VVF9CT09TVDsNCisNCisJcHJpdi0+YXZkdHBfdGlt
+ZXIgPSBnX3RpbWVvdXRfYWRkX3NlY29uZHModGltZW91dCwNCiAJCQkJCQkJYXZkdHBfY29ubmVj
+dF90aW1lb3V0LA0KIAkJCQkJCQlkZXYpOw0KIA0KZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQu
+YyBiL2F1ZGlvL2hlYWRzZXQuYw0KaW5kZXggOGU2M2FmYy4uYmRjOTFkYSAxMDA2NDQNCi0tLSBh
+L2F1ZGlvL2hlYWRzZXQuYw0KKysrIGIvYXVkaW8vaGVhZHNldC5jDQpAQCAtMTY3LDYgKzE2Nyw3
+IEBAIHN0cnVjdCBoZWFkc2V0IHsNCiANCiAJZ2Jvb2xlYW4gaGZwX2FjdGl2ZTsNCiAJZ2Jvb2xl
+YW4gc2VhcmNoX2hmcDsNCisJZ2Jvb2xlYW4gcmZjb21tX2luaXRpYXRvcjsNCiANCiAJaGVhZHNl
+dF9zdGF0ZV90IHN0YXRlOw0KIAlzdHJ1Y3QgcGVuZGluZ19jb25uZWN0ICpwZW5kaW5nOw0KQEAg
+LTE2MzMsNiArMTYzNCw3IEBAIHN0YXRpYyBpbnQgcmZjb21tX2Nvbm5lY3Qoc3RydWN0IGF1ZGlv
+X2RldmljZSAqZGV2LCBoZWFkc2V0X3N0cmVhbV9jYl90IGNiLA0KIAl9DQogDQogCWhzLT5oZnBf
+YWN0aXZlID0gaHMtPmhmcF9oYW5kbGUgIT0gMCA/IFRSVUUgOiBGQUxTRTsNCisJaHMtPnJmY29t
+bV9pbml0aWF0b3IgPSBGQUxTRTsNCiANCiAJaGVhZHNldF9zZXRfc3RhdGUoZGV2LCBIRUFEU0VU
+X1NUQVRFX0NPTk5FQ1RJTkcpOw0KIA0KQEAgLTI0NDIsNiArMjQ0NCwyMSBAQCB2b2lkIHNldF9o
+ZnBfYWN0aXZlKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwgZ2Jvb2xlYW4gYWN0aXZlKQ0KIAlo
+cy0+aGZwX2FjdGl2ZSA9IGFjdGl2ZTsNCiB9DQogDQorZ2Jvb2xlYW4gaGVhZHNldF9nZXRfcmZj
+b21tX2luaXRpYXRvcihzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYpDQorew0KKwlzdHJ1Y3QgaGVh
+ZHNldCAqaHMgPSBkZXYtPmhlYWRzZXQ7DQorDQorCXJldHVybiBocy0+cmZjb21tX2luaXRpYXRv
+cjsNCit9DQorDQordm9pZCBoZWFkc2V0X3NldF9yZmNvbW1faW5pdGlhdG9yKHN0cnVjdCBhdWRp
+b19kZXZpY2UgKmRldiwgDQorCQkJCQlnYm9vbGVhbiBpbml0aWF0b3IpDQorew0KKwlzdHJ1Y3Qg
+aGVhZHNldCAqaHMgPSBkZXYtPmhlYWRzZXQ7DQorDQorCWhzLT5yZmNvbW1faW5pdGlhdG9yID0g
+aW5pdGlhdG9yOw0KK30NCisNCiBHSU9DaGFubmVsICpoZWFkc2V0X2dldF9yZmNvbW0oc3RydWN0
+IGF1ZGlvX2RldmljZSAqZGV2KQ0KIHsNCiAJc3RydWN0IGhlYWRzZXQgKmhzID0gZGV2LT5oZWFk
+c2V0Ow0KZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQuaCBiL2F1ZGlvL2hlYWRzZXQuaA0KaW5k
+ZXggN2NlODhjOC4uODE4MGQ2OSAxMDA2NDQNCi0tLSBhL2F1ZGlvL2hlYWRzZXQuaA0KKysrIGIv
+YXVkaW8vaGVhZHNldC5oDQpAQCAtODIsNiArODIsMTAgQEAgZ2Jvb2xlYW4gaGVhZHNldF9jYW5j
+ZWxfc3RyZWFtKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwgdW5zaWduZWQgaW50IGlkKTsNCiBn
+Ym9vbGVhbiBnZXRfaGZwX2FjdGl2ZShzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYpOw0KIHZvaWQg
+c2V0X2hmcF9hY3RpdmUoc3RydWN0IGF1ZGlvX2RldmljZSAqZGV2LCBnYm9vbGVhbiBhY3RpdmUp
+Ow0KIA0KK2dib29sZWFuIGhlYWRzZXRfZ2V0X3JmY29tbV9pbml0aWF0b3Ioc3RydWN0IGF1ZGlv
+X2RldmljZSAqZGV2KTsNCit2b2lkIGhlYWRzZXRfc2V0X3JmY29tbV9pbml0aWF0b3Ioc3RydWN0
+IGF1ZGlvX2RldmljZSAqZGV2LA0KKwkJCQkJCQlnYm9vbGVhbiBpbml0aWF0b3IpOw0KKw0KIHZv
+aWQgaGVhZHNldF9zZXRfYXV0aG9yaXplZChzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYpOw0KIGlu
+dCBoZWFkc2V0X2Nvbm5lY3RfcmZjb21tKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwgR0lPQ2hh
+bm5lbCAqY2hhbik7DQogaW50IGhlYWRzZXRfY29ubmVjdF9zY28oc3RydWN0IGF1ZGlvX2Rldmlj
+ZSAqZGV2LCBHSU9DaGFubmVsICppbyk7DQpkaWZmIC0tZ2l0IGEvYXVkaW8vbWFuYWdlci5jIGIv
+YXVkaW8vbWFuYWdlci5jDQppbmRleCAwNWNhNjU0Li40ZTRjY2E1IDEwMDY0NA0KLS0tIGEvYXVk
+aW8vbWFuYWdlci5jDQorKysgYi9hdWRpby9tYW5hZ2VyLmMNCkBAIC01MDgsNiArNTA4LDcgQEAg
+c3RhdGljIHZvaWQgYWdfY29uZmlybShHSU9DaGFubmVsICpjaGFuLCBncG9pbnRlciBkYXRhKQ0K
+IAl9DQogDQogCXNldF9oZnBfYWN0aXZlKGRldmljZSwgaGZwX2FjdGl2ZSk7DQorCWhlYWRzZXRf
+c2V0X3JmY29tbV9pbml0aWF0b3IoZGV2aWNlLCBUUlVFKTsNCiANCiAJaWYgKGhlYWRzZXRfY29u
+bmVjdF9yZmNvbW0oZGV2aWNlLCBjaGFuKSA8IDApIHsNCiAJCWVycm9yKCJoZWFkc2V0X2Nvbm5l
+Y3RfcmZjb21tIGZhaWxlZCIpOw0KLS0gDQoxLjcuNC4xDQoNCg==
