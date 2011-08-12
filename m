@@ -1,72 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 1/8] client: add target module vtable
-Date: Fri, 12 Aug 2011 11:45:07 +0300
-Message-Id: <1313138714-6443-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1313138714-6443-1-git-send-email-luiz.dentz@gmail.com>
-References: <1313138714-6443-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 12 Aug 2011 11:36:34 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: David Stockwell <dstockwell@frequency-one.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	lucas.demarchi@profusion.mobi, david_stockwell@att.net
+Subject: Re: [PATCH 1/5] Added more complete set of AVCTP/AVRCP defines
+Message-ID: <20110812083634.GA26421@dell>
+References: <201108110912.02268.dstockwell@frequency-one.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201108110912.02268.dstockwell@frequency-one.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi David,
 
-New targets/profiles can be introduced by just adding an entry to the
-table and register their drivers similarly to a plugin.
----
- client/manager.c |   21 +++++++++++++++++++++
- 1 files changed, 21 insertions(+), 0 deletions(-)
+On Thu, Aug 11, 2011, David Stockwell wrote:
+> Added more complete set of AVCTP/AVRCP defines:
+>   command type/response codes
+>   passthrough key operation codes (CT->TG)
+>   vendor-dependent message opcode (TG->CT)
+>   AVRCP 1.3+ Protocol Definition Unit codes
+>   AVRCP 1.3+ Event-IDs
+>   Bluetooth SIG Company ID
+>   1394 Trade Association AVC MTU for Control channel
+> 
+> Based on Release 4.96
+> 
+> ---
+>  audio/control.c |  120 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 files changed, 115 insertions(+), 5 deletions(-)
 
-diff --git a/client/manager.c b/client/manager.c
-index e7eb70d..b13dd78 100644
---- a/client/manager.c
-+++ b/client/manager.c
-@@ -554,9 +554,18 @@ static GDBusMethodTable client_methods[] = {
- 
- static DBusConnection *conn = NULL;
- 
-+static struct target_module {
-+	const char *name;
-+	int (*init) (void);
-+	void (*exit) (void);
-+} targets[] = {
-+	{ }
-+};
-+
- int manager_init(void)
- {
- 	DBusError derr;
-+	struct target_module *target;
- 
- 	dbus_error_init(&derr);
- 
-@@ -576,14 +585,26 @@ int manager_init(void)
- 		return -1;
- 	}
- 
-+	for (target = targets; target && target->init; target++) {
-+		if (target->init() < 0)
-+			continue;
-+
-+		DBG("Target %s loaded", target->name);
-+	}
-+
- 	return 0;
- }
- 
- void manager_exit(void)
- {
-+	struct target_module *target;
-+
- 	if (conn == NULL)
- 		return;
- 
-+	for (target = targets; target && target->exit; target++)
-+		target->exit();
-+
- 	g_dbus_unregister_interface(conn, CLIENT_PATH, CLIENT_INTERFACE);
- 	dbus_connection_unref(conn);
- }
--- 
-1.7.6
+Please rebase these patches against latest git (now that I applied the
+patches from Lucas).
 
+Johan
