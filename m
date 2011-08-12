@@ -1,58 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E45B5F1.4020807@Dartmouth.edu>
-Date: Fri, 12 Aug 2011 19:23:29 -0400
-From: Isaiah Sarju <Isaiah.Sarju@Dartmouth.edu>
-MIME-Version: 1.0
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: RFCOMM channel 1 behavior differences
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH 7/7] Introduce new state GATEWAY_STATE_PLAY_IN_PROGRESS
+Date: Fri, 12 Aug 2011 17:27:57 +0200
+Message-Id: <1313162877-14945-8-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1313162877-14945-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1313162877-14945-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+---
+ audio/device.c  |    1 +
+ audio/gateway.c |    5 +++++
+ audio/gateway.h |    1 +
+ audio/media.c   |    2 +-
+ 4 files changed, 8 insertions(+), 1 deletions(-)
 
-Does Ubuntu, linux kernel 2.6.38.10, running bluez 4.91-0ubuntu1 have a 
-special security policy for incoming rfcomm connections on channel 1, 
-and not other channels?
+diff --git a/audio/device.c b/audio/device.c
+index abf8da4..667bab0 100644
+--- a/audio/device.c
++++ b/audio/device.c
+@@ -549,6 +549,7 @@ static void device_gateway_cb(struct audio_device *dev,
+ 				priv->sink_state == SINK_STATE_CONNECTING)
+ 			device_set_state(dev, AUDIO_STATE_CONNECTED);
+ 		break;
++	case GATEWAY_STATE_PLAY_IN_PROGRESS:
+ 	case GATEWAY_STATE_PLAYING:
+ 		break;
+ 	}
+diff --git a/audio/gateway.c b/audio/gateway.c
+index 805b8cb..60f84e0 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -90,6 +90,7 @@ static const char *state2str(gateway_state_t state)
+ 	case GATEWAY_STATE_CONNECTING:
+ 		return "connecting";
+ 	case GATEWAY_STATE_CONNECTED:
++	case GATEWAY_STATE_PLAY_IN_PROGRESS:
+ 		return "connected";
+ 	case GATEWAY_STATE_PLAYING:
+ 		return "playing";
+@@ -140,6 +141,7 @@ void gateway_set_state(struct audio_device *dev, gateway_state_t new_state)
+ 		break;
+ 	case GATEWAY_STATE_CONNECTING:
+ 	case GATEWAY_STATE_CONNECTED:
++	case GATEWAY_STATE_PLAY_IN_PROGRESS:
+ 	case GATEWAY_STATE_PLAYING:
+ 		break;
+ 	}
+@@ -216,6 +218,8 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 
+ 	g_io_add_watch(gw->sco, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 				(GIOFunc) sco_io_cb, dev);
++
++	change_state(dev, GATEWAY_STATE_PLAYING);
+ }
+ 
+ static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
+@@ -786,6 +790,7 @@ gboolean gateway_request_stream(struct audio_device *dev,
+ 			g_error_free(err);
+ 			return FALSE;
+ 		}
++		change_state(dev, GATEWAY_STATE_PLAY_IN_PROGRESS);
+ 	} else if (cb)
+ 		cb(dev, err, user_data);
+ 
+diff --git a/audio/gateway.h b/audio/gateway.h
+index 32b5d6d..80d3dfc 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -30,6 +30,7 @@ typedef enum {
+ 	GATEWAY_STATE_DISCONNECTED,
+ 	GATEWAY_STATE_CONNECTING,
+ 	GATEWAY_STATE_CONNECTED,
++	GATEWAY_STATE_PLAY_IN_PROGRESS,
+ 	GATEWAY_STATE_PLAYING,
+ } gateway_state_t;
+ 
+diff --git a/audio/media.c b/audio/media.c
+index 5ab3eab..db16b71 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -592,7 +592,7 @@ static void gateway_state_changed(struct audio_device *dev,
+ 					gateway_setconf_cb, dev, NULL);
+ 		break;
+ 	case GATEWAY_STATE_CONNECTED:
+-		break;
++	case GATEWAY_STATE_PLAY_IN_PROGRESS:
+ 	case GATEWAY_STATE_PLAYING:
+ 		break;
+ 	}
+-- 
+1.7.1
 
-I ask this because I can create rfcomm connections between two computers 
-on other channels (2, 3, 11, 13, etc.) but the listening computer 
-refuses connections when connection requests come in for channel 1.
-
-I use the following commands:
-
-on listening computer:
-	sudo rfcomm listen hci0 <channel>
-
-on connecting computer:
-	sudo rfcomm connect hci0 <BD_ADDR> <channel>
-
-When <channel> does not equal 1 both computers connect no with no 
-problem. When <channel> equals 1 I receive the error "Can't connect 
-RFCOMM socket: Connection refused"
-
-I tried this in to two different environments. 1) in a X-session and 2) 
-in command line
-
-1) in GUI on the listing computer a dialogue box pops up requesting a 
-pin for pairing. When I click cancel on the dialogue box of the 
-listening machine the error "Can't connect RFCOMM socket: Connection 
-refused" appears on the command line of the connecting machine.
-
-2) in command line mode on the listening computer nothing appears and I 
-immediately receive the error "Can't connect RFCOMM socket: Connection 
-refused" on in the command line of the connecting machine
-
-These problems do not arise when attempting to connect on any other 
-channels.
-
-I have searched Google, looked at multiple forum posts on rfcomm 
-connections, looked at forum posts on peoples' problems with rfcomm 
-connections, reviewed this mailing list's archives, and I cannot find my 
-specific problem.
-
-Thank you for any advice you can provide or resources to which you can 
-point me.
-
-Regards,
-Isaiah
