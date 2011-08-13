@@ -1,33 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E46E95B.8060500@Dartmouth.edu>
+Date: Sat, 13 Aug 2011 17:15:07 -0400
+From: Isaiah Sarju <Isaiah.Sarju@Dartmouth.edu>
 MIME-Version: 1.0
-Date: Sun, 14 Aug 2011 21:12:14 +1100
-Message-ID: <CADhZqEfUBm3eTVpvhWxiDjar7c3jRewpEU+u1ZxKUDwnQR6LEA@mail.gmail.com>
-Subject: bluez hierarchy overview
-From: gahcep man <promdev@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: RFCOMM channel 1 behavior differences
+References: <4E45B5F1.4020807@Dartmouth.edu> <20110813000615.GA32541@piper> <20110813082621.GA11338@dell.Elisa>
+In-Reply-To: <20110813082621.GA11338@dell.Elisa>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, everybody.
+On 8/13/11 4:26 AM, Johan Hedberg wrote:
+> Hi,
+>
+> On Fri, Aug 12, 2011, Vinicius Costa Gomes wrote:
+>> On 19:23 Fri 12 Aug, Isaiah Sarju wrote:
+>>> Hello,
+>>>
+>>> Does Ubuntu, linux kernel 2.6.38.10, running bluez 4.91-0ubuntu1
+>>> have a special security policy for incoming rfcomm connections on
+>>> channel 1, and not other channels?
+>>>
+>>
+>> Most probably this is caused by a problem in how Ubuntu packages
+>> BlueZ.
+>>
+>> Could you try this: edit /etc/bluetooth/main.conf and add "pnat-server"
+>> to the DisabledPlugins field (perhaps you will need to uncomment that
+>> line). Restart bluetoothd and see if it works.
+>
+> That could be the reason, however the plugin name is "pnat" and not
+> "pnat-server" (pnat-server is just the adapter driver name that the pnat
+> plugin registers).
 
-First of all, i must say, that in Bluetooth and Bluez i am very novice.
+Thank you both for the advice. Adding "pnat" to the comma separated list 
+worked for me.
 
-I need some help in understanding Bluez file hierarchy and purposes of
-each file in it. Folder structure is still unclear for me. Ok, i
-understand, that in folder "spb" lays SBC codec driver, in "doc"
-folder - Bluez D-Bus API documentation. It's obviously. But in Bluez
-root there are a lot of other folders with a lot of files. For example
-in which folder i can find a linux kernel's modules? Which is the
-"main" bluez folder? "Lib"? What does "plugin" mean for Bluez?
+main.conf now contains line:
+DisablePlugins = network,input,pnat
 
-Is there any document which can give full description for all files
-and directories? The architecture of modern (i mean 4.95 or last
-version) Bluez stack?
+What I could find on pnat-server in the archives stated that it has a 
+use on some Nokia device. What function does the pnat plugin serve?
 
-Sure, i can open and learn what each file designed for, but it will
-grab a lot of time for me.
-
-Is there anybody, who can clarify the picture?
-
-Thanks a lot
+Thank you,
+Isaiah
