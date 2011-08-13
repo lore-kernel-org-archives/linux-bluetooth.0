@@ -1,49 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E46E95B.8060500@Dartmouth.edu>
-Date: Sat, 13 Aug 2011 17:15:07 -0400
-From: Isaiah Sarju <Isaiah.Sarju@Dartmouth.edu>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Sat, 13 Aug 2011 13:31:36 -0400
+Subject: [PATCH Bluez v2] Fix get/set_hfp_active to match name conventions
+Message-ID: <1313256696.2254.11.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: RFCOMM channel 1 behavior differences
-References: <4E45B5F1.4020807@Dartmouth.edu> <20110813000615.GA32541@piper> <20110813082621.GA11338@dell.Elisa>
-In-Reply-To: <20110813082621.GA11338@dell.Elisa>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 8/13/11 4:26 AM, Johan Hedberg wrote:
-> Hi,
->
-> On Fri, Aug 12, 2011, Vinicius Costa Gomes wrote:
->> On 19:23 Fri 12 Aug, Isaiah Sarju wrote:
->>> Hello,
->>>
->>> Does Ubuntu, linux kernel 2.6.38.10, running bluez 4.91-0ubuntu1
->>> have a special security policy for incoming rfcomm connections on
->>> channel 1, and not other channels?
->>>
->>
->> Most probably this is caused by a problem in how Ubuntu packages
->> BlueZ.
->>
->> Could you try this: edit /etc/bluetooth/main.conf and add "pnat-server"
->> to the DisabledPlugins field (perhaps you will need to uncomment that
->> line). Restart bluetoothd and see if it works.
->
-> That could be the reason, however the plugin name is "pnat" and not
-> "pnat-server" (pnat-server is just the adapter driver name that the pnat
-> plugin registers).
-
-Thank you both for the advice. Adding "pnat" to the comma separated list 
-worked for me.
-
-main.conf now contains line:
-DisablePlugins = network,input,pnat
-
-What I could find on pnat-server in the archives stated that it has a 
-use on some Nokia device. What function does the pnat plugin serve?
-
-Thank you,
-Isaiah
+VGhlc2UgdHdvIGZ1bmN0aW9ucyBhcmUgZGVmaW5lZCBleGNsdXNpdmVseSBmb3IgaGVhZHNldHMs
+IHNvDQpmb2xsb3cgZXN0YWJsaXNoZWQgbmFtZSBjb252ZW50aW9ucy4NCi0tLQ0KDQp2MjogQ29t
+bWl0IHdhcyBtaXNzaW5nIGEgZmlsZQ0KDQogYXVkaW8vaGVhZHNldC5jIHwgICAgNCArKy0tDQog
+YXVkaW8vaGVhZHNldC5oIHwgICAgNCArKy0tDQogYXVkaW8vbWFpbi5jICAgIHwgICAgMiArLQ0K
+IGF1ZGlvL21hbmFnZXIuYyB8ICAgIDIgKy0NCiA0IGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9u
+cygrKSwgNiBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQuYyBiL2F1
+ZGlvL2hlYWRzZXQuYw0KaW5kZXggYmRjOTFkYS4uZWU3OGI1ZCAxMDA2NDQNCi0tLSBhL2F1ZGlv
+L2hlYWRzZXQuYw0KKysrIGIvYXVkaW8vaGVhZHNldC5jDQpAQCAtMjQzMCwxNCArMjQzMCwxNCBA
+QCB1bnNpZ25lZCBpbnQgaGVhZHNldF9zdXNwZW5kX3N0cmVhbShzdHJ1Y3QgYXVkaW9fZGV2aWNl
+ICpkZXYsDQogCXJldHVybiBpZDsNCiB9DQogDQotZ2Jvb2xlYW4gZ2V0X2hmcF9hY3RpdmUoc3Ry
+dWN0IGF1ZGlvX2RldmljZSAqZGV2KQ0KK2dib29sZWFuIGhlYWRzZXRfZ2V0X2hmcF9hY3RpdmUo
+c3RydWN0IGF1ZGlvX2RldmljZSAqZGV2KQ0KIHsNCiAJc3RydWN0IGhlYWRzZXQgKmhzID0gZGV2
+LT5oZWFkc2V0Ow0KIA0KIAlyZXR1cm4gaHMtPmhmcF9hY3RpdmU7DQogfQ0KIA0KLXZvaWQgc2V0
+X2hmcF9hY3RpdmUoc3RydWN0IGF1ZGlvX2RldmljZSAqZGV2LCBnYm9vbGVhbiBhY3RpdmUpDQor
+dm9pZCBoZWFkc2V0X3NldF9oZnBfYWN0aXZlKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwgZ2Jv
+b2xlYW4gYWN0aXZlKQ0KIHsNCiAJc3RydWN0IGhlYWRzZXQgKmhzID0gZGV2LT5oZWFkc2V0Ow0K
+IA0KZGlmZiAtLWdpdCBhL2F1ZGlvL2hlYWRzZXQuaCBiL2F1ZGlvL2hlYWRzZXQuaA0KaW5kZXgg
+ODE4MGQ2OS4uOTllZWNhOCAxMDA2NDQNCi0tLSBhL2F1ZGlvL2hlYWRzZXQuaA0KKysrIGIvYXVk
+aW8vaGVhZHNldC5oDQpAQCAtNzksOCArNzksOCBAQCB1bnNpZ25lZCBpbnQgaGVhZHNldF9zdXNw
+ZW5kX3N0cmVhbShzdHJ1Y3QgYXVkaW9fZGV2aWNlICpkZXYsDQogCQkJCQl2b2lkICp1c2VyX2Rh
+dGEpOw0KIGdib29sZWFuIGhlYWRzZXRfY2FuY2VsX3N0cmVhbShzdHJ1Y3QgYXVkaW9fZGV2aWNl
+ICpkZXYsIHVuc2lnbmVkIGludCBpZCk7DQogDQotZ2Jvb2xlYW4gZ2V0X2hmcF9hY3RpdmUoc3Ry
+dWN0IGF1ZGlvX2RldmljZSAqZGV2KTsNCi12b2lkIHNldF9oZnBfYWN0aXZlKHN0cnVjdCBhdWRp
+b19kZXZpY2UgKmRldiwgZ2Jvb2xlYW4gYWN0aXZlKTsNCitnYm9vbGVhbiBoZWFkc2V0X2dldF9o
+ZnBfYWN0aXZlKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldik7DQordm9pZCBoZWFkc2V0X3NldF9o
+ZnBfYWN0aXZlKHN0cnVjdCBhdWRpb19kZXZpY2UgKmRldiwgZ2Jvb2xlYW4gYWN0aXZlKTsNCiAN
+CiBnYm9vbGVhbiBoZWFkc2V0X2dldF9yZmNvbW1faW5pdGlhdG9yKHN0cnVjdCBhdWRpb19kZXZp
+Y2UgKmRldik7DQogdm9pZCBoZWFkc2V0X3NldF9yZmNvbW1faW5pdGlhdG9yKHN0cnVjdCBhdWRp
+b19kZXZpY2UgKmRldiwNCmRpZmYgLS1naXQgYS9hdWRpby9tYWluLmMgYi9hdWRpby9tYWluLmMN
+CmluZGV4IDc0NWMzMDcuLjVjNzUxYWYgMTAwNjQ0DQotLS0gYS9hdWRpby9tYWluLmMNCisrKyBi
+L2F1ZGlvL21haW4uYw0KQEAgLTEwNSw3ICsxMDUsNyBAQCBzdGF0aWMgdm9pZCBzY29fc2VydmVy
+X2NiKEdJT0NoYW5uZWwgKmNoYW4sIEdFcnJvciAqZXJyLCBncG9pbnRlciBkYXRhKQ0KIAkJCWdv
+dG8gZHJvcDsNCiAJCX0NCiANCi0JCWlmICghZ2V0X2hmcF9hY3RpdmUoZGV2aWNlKSkgew0KKwkJ
+aWYgKCFoZWFkc2V0X2dldF9oZnBfYWN0aXZlKGRldmljZSkpIHsNCiAJCQllcnJvcigiUmVmdXNp
+bmcgbm9uLUhGUCBTQ08gY29ubmVjdCBhdHRlbXB0IGZyb20gJXMiLA0KIAkJCQkJCQkJCWFkZHIp
+Ow0KIAkJCWdvdG8gZHJvcDsNCmRpZmYgLS1naXQgYS9hdWRpby9tYW5hZ2VyLmMgYi9hdWRpby9t
+YW5hZ2VyLmMNCmluZGV4IDRlNGNjYTUuLjI4YzZhZDMgMTAwNjQ0DQotLS0gYS9hdWRpby9tYW5h
+Z2VyLmMNCisrKyBiL2F1ZGlvL21hbmFnZXIuYw0KQEAgLTUwNyw3ICs1MDcsNyBAQCBzdGF0aWMg
+dm9pZCBhZ19jb25maXJtKEdJT0NoYW5uZWwgKmNoYW4sIGdwb2ludGVyIGRhdGEpDQogCQlnb3Rv
+IGRyb3A7DQogCX0NCiANCi0Jc2V0X2hmcF9hY3RpdmUoZGV2aWNlLCBoZnBfYWN0aXZlKTsNCisJ
+aGVhZHNldF9zZXRfaGZwX2FjdGl2ZShkZXZpY2UsIGhmcF9hY3RpdmUpOw0KIAloZWFkc2V0X3Nl
+dF9yZmNvbW1faW5pdGlhdG9yKGRldmljZSwgVFJVRSk7DQogDQogCWlmIChoZWFkc2V0X2Nvbm5l
+Y3RfcmZjb21tKGRldmljZSwgY2hhbikgPCAwKSB7DQotLSANCjEuNy40LjENCg0K
