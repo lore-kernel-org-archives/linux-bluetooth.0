@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC v3 1/2] Add external dummy plugin for testing
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com
-Date: Sun, 14 Aug 2011 14:12:55 -0700
-In-Reply-To: <1313068216-16802-2-git-send-email-szymon.janc@tieto.com>
-References: <1313068216-16802-1-git-send-email-szymon.janc@tieto.com>
-	 <1313068216-16802-2-git-send-email-szymon.janc@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1313356383.3373.168.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1313161215.2254.6.camel@THOR>
+References: <1313161215.2254.6.camel@THOR>
+Date: Sun, 14 Aug 2011 22:57:43 +0300
+Message-ID: <CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] Increase timeout before initiating AVDTP connection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Peter,
 
->  Makefile.am              |    7 +++++++
->  plugins/external-dummy.c |   42 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 49 insertions(+), 0 deletions(-)
->  create mode 100644 plugins/external-dummy.c
+On Fri, Aug 12, 2011 at 6:00 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> AVDTP_CONNECT_TIMEOUT controls the delay between HSP/HFP
+> connection establishment and AVDTP signal channel establishment.
+> The original value of 1 sec. is too short to avoid racing for AVDTP
+> connection establishment (eg., if the device continues to configure
+> the HFP service level connection with add'l AT cmds).
+>
+> Some devices have broken AVDTP implementations that just cannot
+> handle the race conditions that arise if both devices are attempting
+> stream establishment at the same time. However, these conditions arise
+> only when the remote device is the ACL initiator (and in practice, the
+> RFCOMM initiator as well).  This fix bumps out the timeout value only
+> when the headset has initiated the link.
+> ---
+>
+> v2: Follow established naming convention
 
-I prefer if patches are actually tested if the apply cleanly:
+How about if we add some retry logic? I think it would be more
+efficient since it would not add an extra delay for devices that do
+not have such problem, perhaps we can even eliminate the 1 sec we
+currently have and just retry if we detect a collision has happened.
 
-Applying: Add external dummy plugin for testing
-/data/devel/bluez/.git/rebase-apply/patch:30: new blank line at EOF.
-+
-fatal: 1 line adds whitespace errors.
-
-Since my patch and git foo is reaching guru status, I fixed this up for
-you ;)
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
