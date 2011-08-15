@@ -1,27 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cufi, Carles" <carles.cufi@nordicsemi.no>
-To: dave higton <davehigton@dsl.pipex.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 15 Aug 2011 14:54:37 +0200
-Subject: RE: Bluetooth encryption algorithms
-Message-ID: <5B4B9A479BF6994B88EA975675EC5B790580AC7068@MES1OS2SXC003.mes1.tconet.net>
-References: <1312990866.4e42a6925110a@netmail.pipex.net>
-In-Reply-To: <1312990866.4e42a6925110a@netmail.pipex.net>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+DY-ZKxcOXi7F46miGKTP=QkMiaUUXRmgZtuVx-TXdsg@mail.gmail.com>
+References: <1311689387-10114-1-git-send-email-prasadbhat22@gmail.com>
+	<4E2ECCF0.6050106@kernelconcepts.de>
+	<20110726143637.GA3587@dell.ger.corp.intel.com>
+	<CA+y7xkER2Y+jJum=JBwzNcY0Pg_drvnjG_E12jDQ6kKZYbkQVw@mail.gmail.com>
+	<CABBYNZ+DY-ZKxcOXi7F46miGKTP=QkMiaUUXRmgZtuVx-TXdsg@mail.gmail.com>
+Date: Mon, 15 Aug 2011 15:09:13 +0300
+Message-ID: <CABBYNZKTDLGjtSZTZQ5YhTJnqPdQQw7-6UsuNe-r3rvx_eVLLA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] Initial VDP implementation.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Prasad Bhat <prasadbhat22@gmail.com>
+Cc: Nils Faerber <nils.faerber@kernelconcepts.de>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
-> So if anyone can point me to sources of information detailed and
-> explicit enough to show me how Bluetooth encryption and decryption are
-> done, I would very much appreciate it.  I have the Bluetooth core
-> specification, but I'm not confident that I can implement correctly from
-> it alone.  I'm also looking for test data, ideally for each step through
-> each algorithm.
+Hi,
 
-Just register with bluetooth.org and get the Core Spec v4.0. All the information you need is there.
+On Wed, Jul 27, 2011 at 2:10 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Jul 26, 2011 at 6:23 PM, Prasad Bhat <prasadbhat22@gmail.com> wrote:
+>> Hi,
+>>
+>> On Tue, Jul 26, 2011 at 8:06 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>
+>>> Couple of other notes:
+>>>
+>>> - The patch is huge. Any chance of splitting it up into smaller chunks?
+>>> - Since there's so much in common with a2dp.c it'd make sense to attempt
+>>>  some refactoring.
+>>> - Now that audio/*.c does video too we might consider renaming the
+>>>  audio plugin and directory to something else.
+>
+> Maybe we can have e.g. sep.c which implements generic sep handling
+> which can be reused by both vdp and a2dp, how about that?
 
-https://www.bluetooth.org/Technical/Specifications/adopted.htm
+Is this coming anytime soon?
 
-Carles
+
+-- 
+Luiz Augusto von Dentz
