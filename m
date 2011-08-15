@@ -1,218 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1313407360.2144.69.camel@THOR>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 15 Aug 2011 07:22:40 -0400
+Subject: Re: [PATCH BlueZ v2] Increase timeout before initiating AVDTP
+ connection
+Message-ID: <1313407360.2144.69.camel@THOR>
 References: <1313161215.2254.6.camel@THOR>
-	<CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
-	<1313370363.2144.46.camel@THOR>
-	<CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
-	<1313407360.2144.69.camel@THOR>
-Date: Mon, 15 Aug 2011 15:00:48 +0300
-Message-ID: <CABBYNZ+nf=hFxy8G5df__zNvxOKv2B8Sda3YR5B4b62uy2DRxg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] Increase timeout before initiating AVDTP connection
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	 <CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
+	 <1313370363.2144.46.camel@THOR>
+	 <CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
+In-Reply-To: <CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
-
-On Mon, Aug 15, 2011 at 2:22 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> Hi Luiz,
->
-> On Mon, 2011-08-15 at 04:21 -0400, Luiz Augusto von Dentz wrote:
->> Hi Peter,
->>
->> On Mon, Aug 15, 2011 at 4:06 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
->> > .... AVDTP Set Configuration ....
->> >
->> > 2011-08-11 18:35:04.637300 < ACL data: handle 13 flags 0x00 dlen 18
->> >    L2CAP(d): cid 0x0055 len 14 [psm 25]
->> >      AVDTP(s): Set config cmd: transaction 7 nsp 0x00
->> >        ACP SEID 1 - INT SEID 1
->> >        Media Transport
->> >        Media Codec - SBC
->> >          44.1kHz
->> >          JointStereo
->> >          16 Blocks
->> >          8 Subbands
->> >          Loudness
->> >          Bitpool Range 2-44
->> >
->> > .... Now, what can we do about what happens next? ....
->> >
->> > 2011-08-11 18:35:04.651185 > ACL data: handle 13 flags 0x02 dlen 6
->> >    L2CAP(d): cid 0x0041 len 2 [psm 25]
->> >      AVDTP(s): Discover cmd: transaction 10 nsp 0x00
->> > 2011-08-11 18:35:04.651237 < ACL data: handle 13 flags 0x00 dlen 8
->> >    L2CAP(d): cid 0x0055 len 4 [psm 25]
->> >      AVDTP(s): Discover rsp: transaction 10 nsp 0x00
->> >        ACP SEID 1 - Audio Source (InUse)
->> > 2011-08-11 18:35:04.653184 > HCI Event: Number of Completed Packets (0x13) plen 5
->> >    handle 13 packets 2
->> > 2011-08-11 18:35:04.693186 > ACL data: handle 13 flags 0x02 dlen 8
->> >    L2CAP(d): cid 0x0041 len 4 [psm 25]
->> >      AVDTP(s): Set config rej: transaction 7 nsp 0x00
->> >        Reserved
->> >        Error code 19
->> > 2011-08-11 18:35:04.761186 > ACL data: handle 13 flags 0x02 dlen 12
->> >    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0055
->> > 2011-08-11 18:35:04.761202 < ACL data: handle 13 flags 0x00 dlen 12
->> >    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0055
->> >
->> > The headset has disconnected the AVDTP signaling channel because we have
->> > marked the SEP as "in use" (which is, of course, exactly what was
->> > required prior to issuing the Set Config). Like I wrote in the commit
->> > message, "broken AVDTP implementations".
->>
->> Ouch, looks pretty much broken, btw what device is that?
->
-> This headset is a Motorola S9 HD.
->
->> > My point here is a lot has happened before discovering that something is
->> > wrong. I'm not even sure if this headset would respond to an attempt to
->> > restart from this - maybe.
->>
->> What happen if you try to connect A2DP manually (AudioSink.Connect)
->> latter? If it does succeeds then there is a chance retrying would
->> help.
->
-> It might take me a little while to re-test this approach. I'll let you
-> know what I find out.
->
->> > In the baseline trial with existing delay of 1 sec. (using HSP profile),
->> > the headset simply never responds to the GET_CAPABILITIES for seid 2 -
->> > the connection times out after 5 seconds and is disconnected:
->> >
->> > 2011-08-12 06:36:16.992657 < ACL data: handle 13 flags 0x00 dlen 6
->> >    L2CAP(d): cid 0x0056 len 2 [psm 25]
->> >      AVDTP(s): Discover cmd: transaction 3 nsp 0x00
->> > 2011-08-12 06:36:17.078604 > ACL data: handle 13 flags 0x02 dlen 10
->> >    L2CAP(d): cid 0x0041 len 6 [psm 25]
->> >      AVDTP(s): Discover rsp: transaction 3 nsp 0x00
->> >        ACP SEID 1 - Audio Sink
->> >        ACP SEID 2 - Audio Sink
->> > 2011-08-12 06:36:17.078692 < ACL data: handle 13 flags 0x00 dlen 7
->> >    L2CAP(d): cid 0x0056 len 3 [psm 25]
->> >      AVDTP(s): Capabilities cmd: transaction 4 nsp 0x00
->> >        ACP SEID 1
->> > 2011-08-12 06:36:17.083599 > HCI Event: Number of Completed Packets (0x13) plen 5
->> >    handle 13 packets 2
->> > 2011-08-12 06:36:17.122604 > HCI Event: Link Supervision Timeout Change (0x38) plen 4
->> >    handle 13 timeout 8064
->> > 2011-08-12 06:36:17.372605 > ACL data: handle 13 flags 0x02 dlen 16
->> >    L2CAP(d): cid 0x0041 len 12 [psm 25]
->> >      AVDTP(s): Capabilities rsp: transaction 4 nsp 0x00
->> >        Media Transport
->> >        Media Codec - SBC
->> >          16kHz 32kHz 44.1kHz 48kHz
->> >          Mono DualChannel Stereo JointStereo
->> >          4 8 12 16 Blocks
->> >          4 8 Subbands
->> >          SNR Loudness
->> >          Bitpool Range 2-44
->> > 2011-08-12 06:36:17.372720 < ACL data: handle 13 flags 0x00 dlen 7
->> >    L2CAP(d): cid 0x0056 len 3 [psm 25]
->> >      AVDTP(s): Capabilities cmd: transaction 5 nsp 0x00
->> >        ACP SEID 2
->> > 2011-08-12 06:36:17.594603 > HCI Event: Number of Completed Packets (0x13) plen 5
->> >    handle 13 packets 1
->> > 2011-08-12 06:36:22.406607 > HCI Event: Max Slots Change (0x1b) plen 3
->> >    handle 13 slots 1
->> > 2011-08-12 06:36:22.596605 > HCI Event: Mode Change (0x14) plen 6
->> >    status 0x00 handle 13 mode 0x02 interval 1024
->> >    Mode: Sniff
->> > 2011-08-12 06:36:23.573334 < ACL data: handle 13 flags 0x00 dlen 12
->> >    L2CAP(s): Disconn req: dcid 0x0056 scid 0x0041
->> > 2011-08-12 06:36:24.094607 > HCI Event: Number of Completed Packets (0x13) plen 5
->> >    handle 13 packets 1
->> > 2011-08-12 06:36:24.519609 > ACL data: handle 13 flags 0x02 dlen 12
->> >    L2CAP(s): Disconn rsp: dcid 0x0056 scid 0x0041
->>
->> Looks like the device really don't like that we start sending commands
->> while it is the initiator of the connection, afaik we are just
->> following the recommendations from the white paper but since they are
->> only recommendations some implementations may ignore them completely.
->
-> The GAVDP spec is so unclear regarding the INT and ACP roles that I
-> think there's support for both models.
->
->> Retrying should work in this case because it might force the remote
->> stack to enter acceptor mode, but this is only valid when we are
->> acting as A2DP source as a A2DP sink we should probably not retry at
->> all.
->
-> I will re-test this as soon as I can and report the results.
-
-Could you please try the following:
-
-diff --git a/audio/device.c b/audio/device.c
-index b2de468..46cecc4 100644
---- a/audio/device.c
-+++ b/audio/device.c
-@@ -62,6 +62,7 @@
- #define CONTROL_CONNECT_TIMEOUT 2
- #define AVDTP_CONNECT_TIMEOUT 1
- #define HEADSET_CONNECT_TIMEOUT 1
-+#define MAX_RETRIES 1
-
- typedef enum {
-        AUDIO_STATE_DISCONNECTED,
-@@ -89,6 +90,7 @@ struct dev_priv {
-        guint avdtp_timer;
-        guint headset_timer;
-        guint dc_id;
-+       guint retries;
-
-        gboolean disconnecting;
-        gboolean authorized;
-@@ -247,6 +249,8 @@ static void device_set_state(struct audio_device
-*dev, audio_state_t new_state)
-        } else if (new_state == AUDIO_STATE_CONNECTING)
-                priv->dc_id = device_add_disconnect_watch(dev->btd_dev,
-                                                disconnect_cb, dev, NULL);
-+       else
-+               dev->priv->retries = 0;
-
-        if (dev->priv->state == new_state) {
-                DBG("state change attempted from %s to %s",
-@@ -405,6 +409,10 @@ static void device_sink_cb(struct audio_device *dev,
-                        default:
-                                break;
-                        }
-+               } else if (dev->priv->retries != MAX_RETRIES &&
-+                                                       dev->auto_connect) {
-+                       dev->priv->retries++;
-+                       device_set_avdtp_timer(dev);
-                }
-                break;
-        case SINK_STATE_CONNECTING:
-@@ -477,10 +485,20 @@ static void device_headset_cb(struct audio_device *dev,
-                }
-                if (priv->sink_state == SINK_STATE_DISCONNECTED)
-                        device_set_state(dev, AUDIO_STATE_DISCONNECTED);
--               else if (old_state == HEADSET_STATE_CONNECTING &&
--                               (priv->sink_state == SINK_STATE_CONNECTED ||
--                               priv->sink_state == SINK_STATE_PLAYING))
--                       device_set_state(dev, AUDIO_STATE_CONNECTED);
-+               else if (old_state == HEADSET_STATE_CONNECTING) {
-+                       switch (priv->sink_state) {
-+                       case SINK_STATE_CONNECTED:
-+                       case SINK_STATE_RESUMING:
-+                       case SINK_STATE_PLAYING:
-+                               device_set_state(dev, AUDIO_STATE_CONNECTED);
-+                       default:
-+                               break;
-+                       }
-+               } else if (dev->priv->retries != MAX_RETRIES &&
-+                                                       dev->auto_connect) {
-+                       dev->priv->retries++;
-+                       device_set_headset_timer(dev);
-+               }
-                break;
-        case HEADSET_STATE_CONNECTING:
-                device_remove_headset_timer(dev);
-
--- 
-Luiz Augusto von Dentz
+SGkgTHVpeiwNCg0KT24gTW9uLCAyMDExLTA4LTE1IGF0IDA0OjIxIC0wNDAwLCBMdWl6IEF1Z3Vz
+dG8gdm9uIERlbnR6IHdyb3RlOg0KPiBIaSBQZXRlciwNCj4gDQo+IE9uIE1vbiwgQXVnIDE1LCAy
+MDExIGF0IDQ6MDYgQU0sIFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPiB3
+cm90ZToNCj4gPiAuLi4uIEFWRFRQIFNldCBDb25maWd1cmF0aW9uIC4uLi4NCj4gPg0KPiA+IDIw
+MTEtMDgtMTEgMTg6MzU6MDQuNjM3MzAwIDwgQUNMIGRhdGE6IGhhbmRsZSAxMyBmbGFncyAweDAw
+IGRsZW4gMTgNCj4gPiAgICBMMkNBUChkKTogY2lkIDB4MDA1NSBsZW4gMTQgW3BzbSAyNV0NCj4g
+PiAgICAgIEFWRFRQKHMpOiBTZXQgY29uZmlnIGNtZDogdHJhbnNhY3Rpb24gNyBuc3AgMHgwMA0K
+PiA+ICAgICAgICBBQ1AgU0VJRCAxIC0gSU5UIFNFSUQgMQ0KPiA+ICAgICAgICBNZWRpYSBUcmFu
+c3BvcnQNCj4gPiAgICAgICAgTWVkaWEgQ29kZWMgLSBTQkMNCj4gPiAgICAgICAgICA0NC4xa0h6
+DQo+ID4gICAgICAgICAgSm9pbnRTdGVyZW8NCj4gPiAgICAgICAgICAxNiBCbG9ja3MNCj4gPiAg
+ICAgICAgICA4IFN1YmJhbmRzDQo+ID4gICAgICAgICAgTG91ZG5lc3MNCj4gPiAgICAgICAgICBC
+aXRwb29sIFJhbmdlIDItNDQNCj4gPg0KPiA+IC4uLi4gTm93LCB3aGF0IGNhbiB3ZSBkbyBhYm91
+dCB3aGF0IGhhcHBlbnMgbmV4dD8gLi4uLg0KPiA+DQo+ID4gMjAxMS0wOC0xMSAxODozNTowNC42
+NTExODUgPiBBQ0wgZGF0YTogaGFuZGxlIDEzIGZsYWdzIDB4MDIgZGxlbiA2DQo+ID4gICAgTDJD
+QVAoZCk6IGNpZCAweDAwNDEgbGVuIDIgW3BzbSAyNV0NCj4gPiAgICAgIEFWRFRQKHMpOiBEaXNj
+b3ZlciBjbWQ6IHRyYW5zYWN0aW9uIDEwIG5zcCAweDAwDQo+ID4gMjAxMS0wOC0xMSAxODozNTow
+NC42NTEyMzcgPCBBQ0wgZGF0YTogaGFuZGxlIDEzIGZsYWdzIDB4MDAgZGxlbiA4DQo+ID4gICAg
+TDJDQVAoZCk6IGNpZCAweDAwNTUgbGVuIDQgW3BzbSAyNV0NCj4gPiAgICAgIEFWRFRQKHMpOiBE
+aXNjb3ZlciByc3A6IHRyYW5zYWN0aW9uIDEwIG5zcCAweDAwDQo+ID4gICAgICAgIEFDUCBTRUlE
+IDEgLSBBdWRpbyBTb3VyY2UgKEluVXNlKQ0KPiA+IDIwMTEtMDgtMTEgMTg6MzU6MDQuNjUzMTg0
+ID4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0K
+PiA+ICAgIGhhbmRsZSAxMyBwYWNrZXRzIDINCj4gPiAyMDExLTA4LTExIDE4OjM1OjA0LjY5MzE4
+NiA+IEFDTCBkYXRhOiBoYW5kbGUgMTMgZmxhZ3MgMHgwMiBkbGVuIDgNCj4gPiAgICBMMkNBUChk
+KTogY2lkIDB4MDA0MSBsZW4gNCBbcHNtIDI1XQ0KPiA+ICAgICAgQVZEVFAocyk6IFNldCBjb25m
+aWcgcmVqOiB0cmFuc2FjdGlvbiA3IG5zcCAweDAwDQo+ID4gICAgICAgIFJlc2VydmVkDQo+ID4g
+ICAgICAgIEVycm9yIGNvZGUgMTkNCj4gPiAyMDExLTA4LTExIDE4OjM1OjA0Ljc2MTE4NiA+IEFD
+TCBkYXRhOiBoYW5kbGUgMTMgZmxhZ3MgMHgwMiBkbGVuIDEyDQo+ID4gICAgTDJDQVAocyk6IERp
+c2Nvbm4gcmVxOiBkY2lkIDB4MDA0MSBzY2lkIDB4MDA1NQ0KPiA+IDIwMTEtMDgtMTEgMTg6MzU6
+MDQuNzYxMjAyIDwgQUNMIGRhdGE6IGhhbmRsZSAxMyBmbGFncyAweDAwIGRsZW4gMTINCj4gPiAg
+ICBMMkNBUChzKTogRGlzY29ubiByc3A6IGRjaWQgMHgwMDQxIHNjaWQgMHgwMDU1DQo+ID4NCj4g
+PiBUaGUgaGVhZHNldCBoYXMgZGlzY29ubmVjdGVkIHRoZSBBVkRUUCBzaWduYWxpbmcgY2hhbm5l
+bCBiZWNhdXNlIHdlIGhhdmUNCj4gPiBtYXJrZWQgdGhlIFNFUCBhcyAiaW4gdXNlIiAod2hpY2gg
+aXMsIG9mIGNvdXJzZSwgZXhhY3RseSB3aGF0IHdhcw0KPiA+IHJlcXVpcmVkIHByaW9yIHRvIGlz
+c3VpbmcgdGhlIFNldCBDb25maWcpLiBMaWtlIEkgd3JvdGUgaW4gdGhlIGNvbW1pdA0KPiA+IG1l
+c3NhZ2UsICJicm9rZW4gQVZEVFAgaW1wbGVtZW50YXRpb25zIi4NCj4gDQo+IE91Y2gsIGxvb2tz
+IHByZXR0eSBtdWNoIGJyb2tlbiwgYnR3IHdoYXQgZGV2aWNlIGlzIHRoYXQ/DQoNClRoaXMgaGVh
+ZHNldCBpcyBhIE1vdG9yb2xhIFM5IEhELg0KDQo+ID4gTXkgcG9pbnQgaGVyZSBpcyBhIGxvdCBo
+YXMgaGFwcGVuZWQgYmVmb3JlIGRpc2NvdmVyaW5nIHRoYXQgc29tZXRoaW5nIGlzDQo+ID4gd3Jv
+bmcuIEknbSBub3QgZXZlbiBzdXJlIGlmIHRoaXMgaGVhZHNldCB3b3VsZCByZXNwb25kIHRvIGFu
+IGF0dGVtcHQgdG8NCj4gPiByZXN0YXJ0IGZyb20gdGhpcyAtIG1heWJlLg0KPiANCj4gV2hhdCBo
+YXBwZW4gaWYgeW91IHRyeSB0byBjb25uZWN0IEEyRFAgbWFudWFsbHkgKEF1ZGlvU2luay5Db25u
+ZWN0KQ0KPiBsYXR0ZXI/IElmIGl0IGRvZXMgc3VjY2VlZHMgdGhlbiB0aGVyZSBpcyBhIGNoYW5j
+ZSByZXRyeWluZyB3b3VsZA0KPiBoZWxwLg0KDQpJdCBtaWdodCB0YWtlIG1lIGEgbGl0dGxlIHdo
+aWxlIHRvIHJlLXRlc3QgdGhpcyBhcHByb2FjaC4gSSdsbCBsZXQgeW91DQprbm93IHdoYXQgSSBm
+aW5kIG91dC4NCg0KPiA+IEluIHRoZSBiYXNlbGluZSB0cmlhbCB3aXRoIGV4aXN0aW5nIGRlbGF5
+IG9mIDEgc2VjLiAodXNpbmcgSFNQIHByb2ZpbGUpLA0KPiA+IHRoZSBoZWFkc2V0IHNpbXBseSBu
+ZXZlciByZXNwb25kcyB0byB0aGUgR0VUX0NBUEFCSUxJVElFUyBmb3Igc2VpZCAyIC0NCj4gPiB0
+aGUgY29ubmVjdGlvbiB0aW1lcyBvdXQgYWZ0ZXIgNSBzZWNvbmRzIGFuZCBpcyBkaXNjb25uZWN0
+ZWQ6DQo+ID4NCj4gPiAyMDExLTA4LTEyIDA2OjM2OjE2Ljk5MjY1NyA8IEFDTCBkYXRhOiBoYW5k
+bGUgMTMgZmxhZ3MgMHgwMCBkbGVuIDYNCj4gPiAgICBMMkNBUChkKTogY2lkIDB4MDA1NiBsZW4g
+MiBbcHNtIDI1XQ0KPiA+ICAgICAgQVZEVFAocyk6IERpc2NvdmVyIGNtZDogdHJhbnNhY3Rpb24g
+MyBuc3AgMHgwMA0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MTcuMDc4NjA0ID4gQUNMIGRhdGE6IGhh
+bmRsZSAxMyBmbGFncyAweDAyIGRsZW4gMTANCj4gPiAgICBMMkNBUChkKTogY2lkIDB4MDA0MSBs
+ZW4gNiBbcHNtIDI1XQ0KPiA+ICAgICAgQVZEVFAocyk6IERpc2NvdmVyIHJzcDogdHJhbnNhY3Rp
+b24gMyBuc3AgMHgwMA0KPiA+ICAgICAgICBBQ1AgU0VJRCAxIC0gQXVkaW8gU2luaw0KPiA+ICAg
+ICAgICBBQ1AgU0VJRCAyIC0gQXVkaW8gU2luaw0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MTcuMDc4
+NjkyIDwgQUNMIGRhdGE6IGhhbmRsZSAxMyBmbGFncyAweDAwIGRsZW4gNw0KPiA+ICAgIEwyQ0FQ
+KGQpOiBjaWQgMHgwMDU2IGxlbiAzIFtwc20gMjVdDQo+ID4gICAgICBBVkRUUChzKTogQ2FwYWJp
+bGl0aWVzIGNtZDogdHJhbnNhY3Rpb24gNCBuc3AgMHgwMA0KPiA+ICAgICAgICBBQ1AgU0VJRCAx
+DQo+ID4gMjAxMS0wOC0xMiAwNjozNjoxNy4wODM1OTkgPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
+b21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+ID4gICAgaGFuZGxlIDEzIHBhY2tldHMg
+Mg0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MTcuMTIyNjA0ID4gSENJIEV2ZW50OiBMaW5rIFN1cGVy
+dmlzaW9uIFRpbWVvdXQgQ2hhbmdlICgweDM4KSBwbGVuIDQNCj4gPiAgICBoYW5kbGUgMTMgdGlt
+ZW91dCA4MDY0DQo+ID4gMjAxMS0wOC0xMiAwNjozNjoxNy4zNzI2MDUgPiBBQ0wgZGF0YTogaGFu
+ZGxlIDEzIGZsYWdzIDB4MDIgZGxlbiAxNg0KPiA+ICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQxIGxl
+biAxMiBbcHNtIDI1XQ0KPiA+ICAgICAgQVZEVFAocyk6IENhcGFiaWxpdGllcyByc3A6IHRyYW5z
+YWN0aW9uIDQgbnNwIDB4MDANCj4gPiAgICAgICAgTWVkaWEgVHJhbnNwb3J0DQo+ID4gICAgICAg
+IE1lZGlhIENvZGVjIC0gU0JDDQo+ID4gICAgICAgICAgMTZrSHogMzJrSHogNDQuMWtIeiA0OGtI
+eg0KPiA+ICAgICAgICAgIE1vbm8gRHVhbENoYW5uZWwgU3RlcmVvIEpvaW50U3RlcmVvDQo+ID4g
+ICAgICAgICAgNCA4IDEyIDE2IEJsb2Nrcw0KPiA+ICAgICAgICAgIDQgOCBTdWJiYW5kcw0KPiA+
+ICAgICAgICAgIFNOUiBMb3VkbmVzcw0KPiA+ICAgICAgICAgIEJpdHBvb2wgUmFuZ2UgMi00NA0K
+PiA+IDIwMTEtMDgtMTIgMDY6MzY6MTcuMzcyNzIwIDwgQUNMIGRhdGE6IGhhbmRsZSAxMyBmbGFn
+cyAweDAwIGRsZW4gNw0KPiA+ICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDU2IGxlbiAzIFtwc20gMjVd
+DQo+ID4gICAgICBBVkRUUChzKTogQ2FwYWJpbGl0aWVzIGNtZDogdHJhbnNhY3Rpb24gNSBuc3Ag
+MHgwMA0KPiA+ICAgICAgICBBQ1AgU0VJRCAyDQo+ID4gMjAxMS0wOC0xMiAwNjozNjoxNy41OTQ2
+MDMgPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1
+DQo+ID4gICAgaGFuZGxlIDEzIHBhY2tldHMgMQ0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MjIuNDA2
+NjA3ID4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMNCj4gPiAgICBo
+YW5kbGUgMTMgc2xvdHMgMQ0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MjIuNTk2NjA1ID4gSENJIEV2
+ZW50OiBNb2RlIENoYW5nZSAoMHgxNCkgcGxlbiA2DQo+ID4gICAgc3RhdHVzIDB4MDAgaGFuZGxl
+IDEzIG1vZGUgMHgwMiBpbnRlcnZhbCAxMDI0DQo+ID4gICAgTW9kZTogU25pZmYNCj4gPiAyMDEx
+LTA4LTEyIDA2OjM2OjIzLjU3MzMzNCA8IEFDTCBkYXRhOiBoYW5kbGUgMTMgZmxhZ3MgMHgwMCBk
+bGVuIDEyDQo+ID4gICAgTDJDQVAocyk6IERpc2Nvbm4gcmVxOiBkY2lkIDB4MDA1NiBzY2lkIDB4
+MDA0MQ0KPiA+IDIwMTEtMDgtMTIgMDY6MzY6MjQuMDk0NjA3ID4gSENJIEV2ZW50OiBOdW1iZXIg
+b2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiA+ICAgIGhhbmRsZSAxMyBwYWNr
+ZXRzIDENCj4gPiAyMDExLTA4LTEyIDA2OjM2OjI0LjUxOTYwOSA+IEFDTCBkYXRhOiBoYW5kbGUg
+MTMgZmxhZ3MgMHgwMiBkbGVuIDEyDQo+ID4gICAgTDJDQVAocyk6IERpc2Nvbm4gcnNwOiBkY2lk
+IDB4MDA1NiBzY2lkIDB4MDA0MQ0KPiANCj4gTG9va3MgbGlrZSB0aGUgZGV2aWNlIHJlYWxseSBk
+b24ndCBsaWtlIHRoYXQgd2Ugc3RhcnQgc2VuZGluZyBjb21tYW5kcw0KPiB3aGlsZSBpdCBpcyB0
+aGUgaW5pdGlhdG9yIG9mIHRoZSBjb25uZWN0aW9uLCBhZmFpayB3ZSBhcmUganVzdA0KPiBmb2xs
+b3dpbmcgdGhlIHJlY29tbWVuZGF0aW9ucyBmcm9tIHRoZSB3aGl0ZSBwYXBlciBidXQgc2luY2Ug
+dGhleSBhcmUNCj4gb25seSByZWNvbW1lbmRhdGlvbnMgc29tZSBpbXBsZW1lbnRhdGlvbnMgbWF5
+IGlnbm9yZSB0aGVtIGNvbXBsZXRlbHkuDQoNClRoZSBHQVZEUCBzcGVjIGlzIHNvIHVuY2xlYXIg
+cmVnYXJkaW5nIHRoZSBJTlQgYW5kIEFDUCByb2xlcyB0aGF0IEkNCnRoaW5rIHRoZXJlJ3Mgc3Vw
+cG9ydCBmb3IgYm90aCBtb2RlbHMuDQoNCj4gUmV0cnlpbmcgc2hvdWxkIHdvcmsgaW4gdGhpcyBj
+YXNlIGJlY2F1c2UgaXQgbWlnaHQgZm9yY2UgdGhlIHJlbW90ZQ0KPiBzdGFjayB0byBlbnRlciBh
+Y2NlcHRvciBtb2RlLCBidXQgdGhpcyBpcyBvbmx5IHZhbGlkIHdoZW4gd2UgYXJlDQo+IGFjdGlu
+ZyBhcyBBMkRQIHNvdXJjZSBhcyBhIEEyRFAgc2luayB3ZSBzaG91bGQgcHJvYmFibHkgbm90IHJl
+dHJ5IGF0DQo+IGFsbC4NCg0KSSB3aWxsIHJlLXRlc3QgdGhpcyBhcyBzb29uIGFzIEkgY2FuIGFu
+ZCByZXBvcnQgdGhlIHJlc3VsdHMuDQoNClJlZ2FyZHMsDQpQZXRlciBIdXJsZXkgDQo=
