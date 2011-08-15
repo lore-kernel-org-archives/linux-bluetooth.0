@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Mon, 15 Aug 2011 06:40:30 -0400
-Subject: Re: [PATCH BlueZ v2] Increase timeout before initiating AVDTP
- connection
-Message-ID: <1313404830.2144.55.camel@THOR>
-References: <1313161215.2254.6.camel@THOR>
-	 <CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
-	 <1313370363.2144.46.camel@THOR>
-	 <CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
-	 <CABBYNZJq3eLk5zO4XGteT1r2u2raaAdHhuEQzgTuVrbJ2=JuFQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJq3eLk5zO4XGteT1r2u2raaAdHhuEQzgTuVrbJ2=JuFQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
+References: <1313161215.2254.6.camel@THOR>
+	<CABBYNZ+3jC+1LbvHgie5LX_8Xr_kRT6G-ed7dsn-pEUzoVam=g@mail.gmail.com>
+	<1313370363.2144.46.camel@THOR>
+	<CABBYNZJ5GMqnWr6=OzDcC=YxCTSMH2EEu8x4p04=OZYExyM6+g@mail.gmail.com>
+Date: Mon, 15 Aug 2011 12:42:52 +0300
+Message-ID: <CABBYNZJq3eLk5zO4XGteT1r2u2raaAdHhuEQzgTuVrbJ2=JuFQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] Increase timeout before initiating AVDTP connection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KT24gTW9uLCAyMDExLTA4LTE1IGF0IDA1OjQyIC0wNDAwLCBMdWl6IEF1Z3Vz
-dG8gdm9uIERlbnR6IHdyb3RlOg0KPiBIaSBQZXRlciwNCj4gDQo+IE9uIE1vbiwgQXVnIDE1LCAy
-MDExIGF0IDExOjIxIEFNLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo+IDxsdWl6LmRlbnR6QGdt
-YWlsLmNvbT4gd3JvdGU6DQo+ID4gTG9va3MgbGlrZSB0aGUgZGV2aWNlIHJlYWxseSBkb24ndCBs
-aWtlIHRoYXQgd2Ugc3RhcnQgc2VuZGluZyBjb21tYW5kcw0KPiA+IHdoaWxlIGl0IGlzIHRoZSBp
-bml0aWF0b3Igb2YgdGhlIGNvbm5lY3Rpb24sIGFmYWlrIHdlIGFyZSBqdXN0DQo+ID4gZm9sbG93
-aW5nIHRoZSByZWNvbW1lbmRhdGlvbnMgZnJvbSB0aGUgd2hpdGUgcGFwZXIgYnV0IHNpbmNlIHRo
-ZXkgYXJlDQo+ID4gb25seSByZWNvbW1lbmRhdGlvbnMgc29tZSBpbXBsZW1lbnRhdGlvbnMgbWF5
-IGlnbm9yZSB0aGVtIGNvbXBsZXRlbHkuDQo+ID4gUmV0cnlpbmcgc2hvdWxkIHdvcmsgaW4gdGhp
-cyBjYXNlIGJlY2F1c2UgaXQgbWlnaHQgZm9yY2UgdGhlIHJlbW90ZQ0KPiA+IHN0YWNrIHRvIGVu
-dGVyIGFjY2VwdG9yIG1vZGUsIGJ1dCB0aGlzIGlzIG9ubHkgdmFsaWQgd2hlbiB3ZSBhcmUNCj4g
-PiBhY3RpbmcgYXMgQTJEUCBzb3VyY2UgYXMgYSBBMkRQIHNpbmsgd2Ugc2hvdWxkIHByb2JhYmx5
-IG5vdCByZXRyeSBhdA0KPiA+IGFsbC4NCj4gDQo+IEl0IHNlZW1zIHRoZXJlIGlzIHNvbWV0aGlu
-ZyBjYWxsaW5nIEF1ZGlvLkNvbm5lY3QgaW4geW91ciBzeXN0ZW0gc2luY2UNCj4gZGV2aWNlX3Nl
-dF9hdmR0cF90aW1lciBpcyBvbmx5IGNhbGxlZCB3aGVuIGF1dG9fY29ubmVjdCBpcyBzZXQsIHRo
-aXMNCj4gbm9ybWFsbHkgaGFwcGVuIG9ubHkgYWZ0ZXIgcGFyaW5nLCBub3Qgc3VyZSBpZiB0aGF0
-IGlzIHRoZSBjYXNlLg0KDQpJIGJlbGlldmUgYXV0b19jb25uZWN0IGlzIGJlaW5nIHNldCBpbiBh
-Z19jb25maXJtICh3aGljaCBpcyB0aGUgUkZDT01NDQphY2NlcHQgY2FsbGJhY2spIGZyb20gdGhl
-IGRlZmF1bHQgdmFsdWUgaW4gbWFuYWdlci5jLiBUaGVzZSAyIHRyaWFscw0KZGlkbid0IGludm9s
-dmUgcGFpcmluZyAobGV0IG1lIGtub3cgaWYgeW91J2QgbGlrZSB0aGUgY29tcGxldGUNCmNhcHR1
-cmVzKS4NCg0KUmVnYXJkcywNClBldGVyIEh1cmxleSANCg==
+Hi Peter,
+
+On Mon, Aug 15, 2011 at 11:21 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Looks like the device really don't like that we start sending commands
+> while it is the initiator of the connection, afaik we are just
+> following the recommendations from the white paper but since they are
+> only recommendations some implementations may ignore them completely.
+> Retrying should work in this case because it might force the remote
+> stack to enter acceptor mode, but this is only valid when we are
+> acting as A2DP source as a A2DP sink we should probably not retry at
+> all.
+
+It seems there is something calling Audio.Connect in your system since
+device_set_avdtp_timer is only called when auto_connect is set, this
+normally happen only after paring, not sure if that is the case.
+
+-- 
+Luiz Augusto von Dentz
