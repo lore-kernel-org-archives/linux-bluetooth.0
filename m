@@ -1,39 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+Date: Tue, 16 Aug 2011 11:57:53 +0200
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "ovasik@redhat.com" <ovasik@redhat.com>
+Subject: [PATCH 8/8] Removed dropping of the list head
 MIME-Version: 1.0
-In-Reply-To: <op.v0av70tbh52hc0@dhcp-25-209.brq.redhat.com>
-References: <op.v0av70tbh52hc0@dhcp-25-209.brq.redhat.com>
-Date: Tue, 16 Aug 2011 13:31:57 +0300
-Message-ID: <CABBYNZJ3pUUQOcgRDUH21cMzPigiibQLem4ZViOLZJfFmvLpUQ@mail.gmail.com>
-Subject: Re: [PATCH 5/8] Added NULL check before dereferencing
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Pavel Raiskup <praiskup@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"ovasik@redhat.com" <ovasik@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Pavel Raiskup" <praiskup@redhat.com>
+Message-ID: <op.v0awmrh1h52hc0@dhcp-25-209.brq.redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+assigning sdp_list_append(0, ...) to "apseq" on line 2591 will
+drops first item in lint got by sdp_list_append three lines before.
 
-On Tue, Aug 16, 2011 at 12:49 PM, Pavel Raiskup <praiskup@redhat.com> wrote:
-> ---
->  plugins/hciops.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
->
-> diff --git a/plugins/hciops.c b/plugins/hciops.c
-> index ecc0e86..e975eb5 100644
-> --- a/plugins/hciops.c
-> +++ b/plugins/hciops.c
-> @@ -593,7 +593,8 @@ static gboolean init_adapter(int index)
->        } else {
->                adapter = manager_find_adapter(&dev->bdaddr);
->                /* FIXME: manager_find_adapter should return a new ref */
-> -               btd_adapter_ref(adapter);
-> +               if (adapter)
-> +                       btd_adapter_ref(adapter);
+Note: All bugs from this set was found by Coverity scan on bluez
+package from Fedora. If there was somebody who could look on whole
+coverity log, I'm able to send plain-text results on demand.
 
-Perhaps we should either make manager_find_adapter to return a new ref
-or create a function e.g. manager_get_adapter which does that for us.
+---
+  tools/sdptool.c |    2 +-
+  1 files changed, 1 insertions(+), 1 deletions(-)
 
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index aea4954..78c97ba 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -2588,7 +2588,7 @@ static int add_cip(sdp_session_t *session,  
+svc_info_t *si)
+  	proto[0] = sdp_list_append(0, &l2cap);
+  	apseq = sdp_list_append(0, proto[0]);
+  	proto[0] = sdp_list_append(proto[0], sdp_data_alloc(SDP_UINT16, &psm));
+-	apseq = sdp_list_append(0, proto[0]);
++	apseq = sdp_list_append(apseq, proto[0]);
+
+  	sdp_uuid16_create(&cmtp, CMTP_UUID);
+  	proto[1] = sdp_list_append(0, &cmtp);
 -- 
-Luiz Augusto von Dentz
+1.7.4.4
