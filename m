@@ -1,34 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+Date: Tue, 16 Aug 2011 11:45:37 +0200
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH 3/8] Off-by-one error in uses_rfcomm
-Date: Tue, 16 Aug 2011 11:46:44 +0200
 Cc: "ovasik@redhat.com" <ovasik@redhat.com>
+Subject: [PATCH 2/8] Missing comma
 MIME-Version: 1.0
 From: "Pavel Raiskup" <praiskup@redhat.com>
-Message-ID: <op.v0av36jth52hc0@dhcp-25-209.brq.redhat.com>
+Message-ID: <op.v0av2bteh52hc0@dhcp-25-209.brq.redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Variable len could be assigned to PATH_MAX + 1 length (returned
- from readlink) and this variable is used as index to array link
-of size only PATH_MAX + 1.
+Missing comma in static array chassis_map definition between
+"Blade" and "Blade Enclosure" field.
+
+Typing error fixed.
+
 ---
-  compat/dun.c |    2 +-
-  1 files changed, 1 insertions(+), 1 deletions(-)
+  plugins/formfactor.c |    4 ++--
+  1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/compat/dun.c b/compat/dun.c
-index 59f036f..de98830 100644
---- a/compat/dun.c
-+++ b/compat/dun.c
-@@ -104,7 +104,7 @@ static int uses_rfcomm(char *path, char *dev)
+diff --git a/plugins/formfactor.c b/plugins/formfactor.c
+index 3b31927..0e19ac6 100644
+--- a/plugins/formfactor.c
++++ b/plugins/formfactor.c
+@@ -73,10 +73,10 @@ static const char *chassis_map[] = {
+  	"Rack Mount Chassis",    "unknown",
+  	"Sealed-case PC",        "unknown",
+  	"Multi-system",          "unknown",
+-	"CompactPCI",            "unknonw",
++	"CompactPCI",            "unknown",
+  	"AdvancedTCA",           "unknown",
+  	"Blade",                 "server",
+-	"Blade Enclosure"        "unknown", /* 0x1D */
++	"Blade Enclosure",       "unknown", /* 0x1D */
+  	NULL
+  };
 
-  	while ((de = readdir(dir)) != NULL) {
-  		char link[PATH_MAX + 1];
--		int  len = readlink(de->d_name, link, sizeof(link));
-+		int  len = readlink(de->d_name, link, PATH_MAX);
-  		if (len > 0) {
-  			link[len] = 0;
-  			if (strstr(link, dev)) {
 -- 
 1.7.4.4
