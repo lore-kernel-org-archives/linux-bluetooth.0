@@ -1,52 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] Add support for listing all adapters using test-adapter
-Date: Tue, 16 Aug 2011 18:58:52 -0300
-Message-Id: <1313531932-10944-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <op.v0awcau9h52hc0@dhcp-25-209.brq.redhat.com>
+References: <op.v0awcau9h52hc0@dhcp-25-209.brq.redhat.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Tue, 16 Aug 2011 14:00:22 -0300
+Message-ID: <CAMOw1v6SMq3b-H_0uvg4NUUquWDt3iokZx=ToLx4u-y087jyjw@mail.gmail.com>
+Subject: Re: [PATCH 7/8] Possible static overrun removed
+To: Pavel Raiskup <praiskup@redhat.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"ovasik@redhat.com" <ovasik@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-adapter |   17 +++++++++++++++++
- 1 files changed, 17 insertions(+), 0 deletions(-)
+Hi Pavel,
 
-diff --git a/test/test-adapter b/test/test-adapter
-index 00ef6f5..33bdd47 100755
---- a/test/test-adapter
-+++ b/test/test-adapter
-@@ -29,6 +29,7 @@ if (len(args) < 1):
- 	print "Usage: %s <command>" % (sys.argv[0])
- 	print ""
- 	print "  address"
-+	print "  list"
- 	print "  name [name]"
- 	print "  powered [on/off]"
- 	print "  pairable [on/off]"
-@@ -51,6 +52,22 @@ if (args[0] == "name"):
- 		adapter.SetProperty("Name", args[1])
- 	sys.exit(0)
- 
-+if (args[0] == "list"):
-+	if (len(args) < 2):
-+		properties = manager.GetProperties()
-+		for adapter_path in properties["Adapters"]:
-+			adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+													"org.bluez.Adapter")
-+			prop = adapter.GetProperties()
-+			print " [ %s ]" % (adapter_path)
-+			for (key, value) in prop.iteritems():
-+				if (key == "Class"):
-+					print "    %s = 0x%06x" % (key, value)
-+				else:
-+					print "    %s = %s" % (key, value)
-+			print
-+	sys.exit(0)
-+
- if (args[0] == "powered"):
- 	if (len(args) < 2):
- 		properties = adapter.GetProperties()
--- 
-1.7.6
+On Tue, Aug 16, 2011 at 6:51 AM, Pavel Raiskup <praiskup@redhat.com> wrote:
+> There will be static overrun on c_brf_chip array when brf_chip
+> is greater than 7.
+> ---
+>  tools/hciattach_tialt.c |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
+>
+> diff --git a/tools/hciattach_tialt.c b/tools/hciattach_tialt.c
+> index 1ba009c..fc3ed20 100644
+> --- a/tools/hciattach_tialt.c
+> +++ b/tools/hciattach_tialt.c
+> @@ -234,7 +234,8 @@ int texasalt_init(int fd, int speed, struct termios *ti)
+>                                ((brf_chip > 7) ? "unknown" :
+> c_brf_chip[brf_chip]),
 
+Did you forget the line above? There's the same problem you fixed
+below. Maybe it's better to set
+brf_chip to 0 if it's greater than 7 here.
+
+>                                brf_chip);
+>
+> -               sprintf(fw, "/etc/firmware/%s.bin", c_brf_chip[brf_chip]);
+> +               sprintf(fw, "/etc/firmware/%s.bin",
+> +                       brf_chip > 7 ? "unknown" : c_brf_chip[brf_chip]);
+>                texas_load_firmware(fd, fw);
+>
+>                texas_change_speed(fd, speed);
+> --
+
+
+Lucas De Marchi
