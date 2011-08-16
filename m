@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
-Cc: "ovasik@redhat.com" <ovasik@redhat.com>
+Date: Tue, 16 Aug 2011 11:49:02 +0200
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 16 Aug 2011 11:50:40 +0200
-Subject: [PATCH 6/8] Removed unnecessary memset
+Subject: [PATCH 5/8] Added NULL check before dereferencing
+Cc: "ovasik@redhat.com" <ovasik@redhat.com>
 MIME-Version: 1.0
 From: "Pavel Raiskup" <praiskup@redhat.com>
-Message-ID: <op.v0awaqywh52hc0@dhcp-25-209.brq.redhat.com>
+Message-ID: <op.v0av70tbh52hc0@dhcp-25-209.brq.redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-zeroing memory with memset at "buf" position is useless because
-g_try_malloc0 zeroes is also. Actually parameter sizeof(buf) is
-wrong also (only 8 bytes cause it is a pointer).
 ---
-  plugins/mgmtops.c |    2 --
-  1 files changed, 0 insertions(+), 2 deletions(-)
+  plugins/hciops.c |    3 ++-
+  1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index 3cdb97e..79a898f 100644
---- a/plugins/mgmtops.c
-+++ b/plugins/mgmtops.c
-@@ -1877,8 +1877,6 @@ static int mgmt_load_keys(int index, GSList *keys,  
-gboolean debug_keys)
-  	if (buf == NULL)
-  		return -ENOMEM;
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index ecc0e86..e975eb5 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -593,7 +593,8 @@ static gboolean init_adapter(int index)
+  	} else {
+  		adapter = manager_find_adapter(&dev->bdaddr);
+  		/* FIXME: manager_find_adapter should return a new ref */
+-		btd_adapter_ref(adapter);
++		if (adapter)
++			btd_adapter_ref(adapter);
+  	}
 
--	memset(buf, 0, sizeof(buf));
--
-  	hdr = (void *) buf;
-  	hdr->opcode = htobs(MGMT_OP_LOAD_KEYS);
-  	hdr->len = htobs(cp_size);
+  	if (adapter == NULL)
 -- 
 1.7.4.4
