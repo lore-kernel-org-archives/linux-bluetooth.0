@@ -1,90 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 17 Aug 2011 20:37:37 -0400
-Subject: [RFC v2 3/5] Bluetooth: Add buffer count to tx scheduler parameters
-Message-ID: <1313627857.10336.11.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Subject: Re: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI
+ connection name.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: doron.keren.bluez@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Doron Keren <doronkeren@ti.com>,
+	Ilia Kolominsky <iliak@ti.com>
+Date: Wed, 17 Aug 2011 14:42:06 -0700
+In-Reply-To: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
+References: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1313617329.3373.188.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VXRpbGl6ZSBhbHJlYWR5IGtub3duIHR4IGJ1ZmZlciBjb3VudCB2YWx1ZXMgYXMgcGFyYW1ldGVy
-cyB0bw0KdGhlIHR4IHNjaGVkdWxlciwgcmF0aGVyIHRoYW4gZGV0ZXJtaW5pbmcgdGhlIHZhbHVl
-cyBvbiBlYWNoDQppdGVyYXRpb24gb2YgdGhlIHR4IHNjaGVkdWxlci4NCg0KVGhpcyBpcyBwcmVw
-YXJhdG9yeSBmb3IgbWVyZ2luZyB0cmFuc21pc3Npb24gdHlwZXMgKHN1Y2ggYXMgU0NPDQphbmQg
-RVNDTykgYW5kIGFsc28gZm9yIGhhbmRsaW5nIHR4IGJ1ZmZlciBjb3VudGVycyBhdG9taWNhbGx5
-Lg0KDQpTaWduZWQtb2ZmLWJ5OiBQZXRlciBIdXJsZXkgPHBldGVyQGh1cmxleXNvZnR3YXJlLmNv
-bT4NCi0tLQ0KIG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuYyB8ICAgNTEgKysrKysrKysrKysrKysr
-Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlcyBjaGFuZ2VkLCAxOCBpbnNl
-cnRpb25zKCspLCAzMyBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgv
-aGNpX2NvcmUuYyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KaW5kZXggMGRlZmE4My4uYjJh
-MWI5YSAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KKysrIGIvbmV0L2Js
-dWV0b290aC9oY2lfY29yZS5jDQpAQCAtMTc5OCw3ICsxNzk4LDggQEAgRVhQT1JUX1NZTUJPTCho
-Y2lfc2VuZF9zY28pOw0KIC8qIC0tLS0gSENJIFRYIHRhc2sgKG91dGdvaW5nIGRhdGEpIC0tLS0g
-Ki8NCiANCiAvKiBIQ0kgQ29ubmVjdGlvbiBzY2hlZHVsZXIgKi8NCi1zdGF0aWMgaW5saW5lIHN0
-cnVjdCBoY2lfY29ubiAqaGNpX2xvd19zZW50KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBfX3U4IHR5
-cGUsIGludCAqcXVvdGUpDQorc3RhdGljIGlubGluZSBzdHJ1Y3QgaGNpX2Nvbm4gKmhjaV9sb3df
-c2VudChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgX191OCB0eXBlLA0KKwkJCQkJCQlpbnQgY250LCBp
-bnQgKnF1b3RlKQ0KIHsNCiAJc3RydWN0IGhjaV9jb25uX2hhc2ggKmggPSAmaGRldi0+Y29ubl9o
-YXNoOw0KIAlzdHJ1Y3QgaGNpX2Nvbm4gKmNvbm4gPSBOVUxMOw0KQEAgLTE4MjUsMjggKzE4MjYs
-OCBAQCBzdGF0aWMgaW5saW5lIHN0cnVjdCBoY2lfY29ubiAqaGNpX2xvd19zZW50KHN0cnVjdCBo
-Y2lfZGV2ICpoZGV2LCBfX3U4IHR5cGUsIGludA0KIAkJfQ0KIAl9DQogDQotCWlmIChjb25uKSB7
-DQotCQlpbnQgY250Ow0KLQ0KLQkJc3dpdGNoIChjb25uLT50eXBlKSB7DQotCQljYXNlIEFDTF9M
-SU5LOg0KLQkJCWNudCA9IGhkZXYtPmFjbF9jbnQ7DQotCQkJYnJlYWs7DQotCQljYXNlIFNDT19M
-SU5LOg0KLQkJY2FzZSBFU0NPX0xJTks6DQotCQkJY250ID0gaGRldi0+c2NvX2NudDsNCi0JCQli
-cmVhazsNCi0JCWNhc2UgTEVfTElOSzoNCi0JCQljbnQgPSBoZGV2LT5sZV9tdHUgPyBoZGV2LT5s
-ZV9jbnQgOiBoZGV2LT5hY2xfY250Ow0KLQkJCWJyZWFrOw0KLQkJZGVmYXVsdDoNCi0JCQljbnQg
-PSAwOw0KLQkJCUJUX0VSUigiVW5rbm93biBsaW5rIHR5cGUiKTsNCi0JCX0NCi0NCisJaWYgKGNv
-bm4pDQogCQkqcXVvdGUgPSAoY250ICsgKG51bSAtIDEpKSAvIG51bTsNCi0JfSBlbHNlDQotCQkq
-cXVvdGUgPSAwOw0KIA0KIAlCVF9EQkcoImNvbm4gJXAgcXVvdGUgJWQiLCBjb25uLCAqcXVvdGUp
-Ow0KIAlyZXR1cm4gY29ubjsNCkBAIC0xODc1LDE4ICsxODU2LDE5IEBAIHN0YXRpYyBpbmxpbmUg
-dm9pZCBoY2lfc2NoZWRfYWNsKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KIHsNCiAJc3RydWN0IGhj
-aV9jb25uICpjb25uOw0KIAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOw0KLQlpbnQgcXVvdGU7DQorCWlu
-dCBxdW90ZSA9IDA7DQorCWludCBjbnQgPSBoZGV2LT5hY2xfY250Ow0KIA0KIAlCVF9EQkcoIiVz
-IiwgaGRldi0+bmFtZSk7DQogDQogCWlmICghdGVzdF9iaXQoSENJX1JBVywgJmhkZXYtPmZsYWdz
-KSkgew0KIAkJLyogQUNMIHR4IHRpbWVvdXQgbXVzdCBiZSBsb25nZXIgdGhhbiBtYXhpbXVtDQog
-CQkgKiBsaW5rIHN1cGVydmlzaW9uIHRpbWVvdXQgKDQwLjkgc2Vjb25kcykgKi8NCi0JCWlmICgh
-aGRldi0+YWNsX2NudCAmJiB0aW1lX2FmdGVyKGppZmZpZXMsIGhkZXYtPmFjbF9sYXN0X3R4ICsg
-SFogKiA0NSkpDQorCQlpZiAoIWNudCAmJiB0aW1lX2FmdGVyKGppZmZpZXMsIGhkZXYtPmFjbF9s
-YXN0X3R4ICsgSFogKiA0NSkpDQogCQkJaGNpX2xpbmtfdHhfdG8oaGRldiwgQUNMX0xJTkspOw0K
-IAl9DQogDQotCXdoaWxlIChoZGV2LT5hY2xfY250ICYmIChjb25uID0gaGNpX2xvd19zZW50KGhk
-ZXYsIEFDTF9MSU5LLCAmcXVvdGUpKSkgew0KKwl3aGlsZSAoY250ICYmIChjb25uID0gaGNpX2xv
-d19zZW50KGhkZXYsIEFDTF9MSU5LLCBjbnQsICZxdW90ZSkpKSB7DQogCQl3aGlsZSAocXVvdGUt
-LSAmJiAoc2tiID0gc2tiX2RlcXVldWUoJmNvbm4tPmRhdGFfcSkpKSB7DQogCQkJQlRfREJHKCJz
-a2IgJXAgbGVuICVkIiwgc2tiLCBza2ItPmxlbik7DQogDQpAQCAtMTg5NSwxMCArMTg3NywxMSBA
-QCBzdGF0aWMgaW5saW5lIHZvaWQgaGNpX3NjaGVkX2FjbChzdHJ1Y3QgaGNpX2RldiAqaGRldikN
-CiAJCQloY2lfc2VuZF9mcmFtZShza2IpOw0KIAkJCWhkZXYtPmFjbF9sYXN0X3R4ID0gamlmZmll
-czsNCiANCi0JCQloZGV2LT5hY2xfY250LS07DQorCQkJY250LS07DQogCQkJY29ubi0+c2VudCsr
-Ow0KIAkJfQ0KIAl9DQorCWhkZXYtPmFjbF9jbnQgPSBjbnQ7DQogfQ0KIA0KIC8qIFNjaGVkdWxl
-IFNDTyAqLw0KQEAgLTE5MDYsMTEgKzE4ODksMTIgQEAgc3RhdGljIGlubGluZSB2b2lkIGhjaV9z
-Y2hlZF9zY28oc3RydWN0IGhjaV9kZXYgKmhkZXYpDQogew0KIAlzdHJ1Y3QgaGNpX2Nvbm4gKmNv
-bm47DQogCXN0cnVjdCBza19idWZmICpza2I7DQotCWludCBxdW90ZTsNCisJaW50IHF1b3RlID0g
-MDsNCisJaW50IGNudCA9IGhkZXYtPnNjb19jbnQ7DQogDQogCUJUX0RCRygiJXMiLCBoZGV2LT5u
-YW1lKTsNCiANCi0Jd2hpbGUgKGhkZXYtPnNjb19jbnQgJiYgKGNvbm4gPSBoY2lfbG93X3NlbnQo
-aGRldiwgU0NPX0xJTkssICZxdW90ZSkpKSB7DQorCXdoaWxlIChjbnQgJiYgKGNvbm4gPSBoY2lf
-bG93X3NlbnQoaGRldiwgU0NPX0xJTkssIGNudCwgJnF1b3RlKSkpIHsNCiAJCXdoaWxlIChxdW90
-ZS0tICYmIChza2IgPSBza2JfZGVxdWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCiAJCQlCVF9EQkco
-InNrYiAlcCBsZW4gJWQiLCBza2IsIHNrYi0+bGVuKTsNCiAJCQloY2lfc2VuZF9mcmFtZShza2Ip
-Ow0KQEAgLTE5MjYsMTEgKzE5MTAsMTIgQEAgc3RhdGljIGlubGluZSB2b2lkIGhjaV9zY2hlZF9l
-c2NvKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KIHsNCiAJc3RydWN0IGhjaV9jb25uICpjb25uOw0K
-IAlzdHJ1Y3Qgc2tfYnVmZiAqc2tiOw0KLQlpbnQgcXVvdGU7DQorCWludCBxdW90ZSA9IDA7DQor
-CWludCBjbnQgPSBoZGV2LT5zY29fY250Ow0KIA0KIAlCVF9EQkcoIiVzIiwgaGRldi0+bmFtZSk7
-DQogDQotCXdoaWxlIChoZGV2LT5zY29fY250ICYmIChjb25uID0gaGNpX2xvd19zZW50KGhkZXYs
-IEVTQ09fTElOSywgJnF1b3RlKSkpIHsNCisJd2hpbGUgKGNudCAmJiAoY29ubiA9IGhjaV9sb3df
-c2VudChoZGV2LCBFU0NPX0xJTkssIGNudCwgJnF1b3RlKSkpIHsNCiAJCXdoaWxlIChxdW90ZS0t
-ICYmIChza2IgPSBza2JfZGVxdWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCiAJCQlCVF9EQkcoInNr
-YiAlcCBsZW4gJWQiLCBza2IsIHNrYi0+bGVuKTsNCiAJCQloY2lfc2VuZF9mcmFtZShza2IpOw0K
-QEAgLTE5NDYsNyArMTkzMSw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBoY2lfc2NoZWRfbGUoc3Ry
-dWN0IGhjaV9kZXYgKmhkZXYpDQogew0KIAlzdHJ1Y3QgaGNpX2Nvbm4gKmNvbm47DQogCXN0cnVj
-dCBza19idWZmICpza2I7DQotCWludCBxdW90ZSwgY250Ow0KKwlpbnQgcXVvdGUgPSAwOw0KKwlp
-bnQgY250ID0gaGRldi0+bGVfcGt0cyA/IGhkZXYtPmxlX2NudCA6IGhkZXYtPmFjbF9jbnQ7DQog
-DQogCUJUX0RCRygiJXMiLCBoZGV2LT5uYW1lKTsNCiANCkBAIC0xOTU4LDggKzE5NDQsNyBAQCBz
-dGF0aWMgaW5saW5lIHZvaWQgaGNpX3NjaGVkX2xlKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KIAkJ
-CWhjaV9saW5rX3R4X3RvKGhkZXYsIExFX0xJTkspOw0KIAl9DQogDQotCWNudCA9IGhkZXYtPmxl
-X3BrdHMgPyBoZGV2LT5sZV9jbnQgOiBoZGV2LT5hY2xfY250Ow0KLQl3aGlsZSAoY250ICYmIChj
-b25uID0gaGNpX2xvd19zZW50KGhkZXYsIExFX0xJTkssICZxdW90ZSkpKSB7DQorCXdoaWxlIChj
-bnQgJiYgKGNvbm4gPSBoY2lfbG93X3NlbnQoaGRldiwgTEVfTElOSywgY250LCAmcXVvdGUpKSkg
-ew0KIAkJd2hpbGUgKHF1b3RlLS0gJiYgKHNrYiA9IHNrYl9kZXF1ZXVlKCZjb25uLT5kYXRhX3Ep
-KSkgew0KIAkJCUJUX0RCRygic2tiICVwIGxlbiAlZCIsIHNrYiwgc2tiLT5sZW4pOw0KIA0KLS0g
-DQoxLjcuNC4xDQoNCg==
+Hi Doron,
+
+> The patch fixes kernel panic which is due to race condition
+> between the setup of incomming connection and clean-up of the
+> dead one. Observed in the following case: attached HID device
+> disconnects unexpectedly (without performing ACL disconnect ),
+> the device tries to connect again before the ACL link time-out
+> fires, this translates to the HCI_DISCONNECT, HCI_CONNECT_REQ
+> events on the same handle, since HCI_DISCONNECT trigers the clean
+> up of the HID device and handled in different context, the
+> linking/unlinking connection object to sysfs, may mess up.
+> 
+> Signed-off-by: Ilia Kolominsky <iliak@ti.com>
+> ---
+>  net/bluetooth/hci_sysfs.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index a6c3aa8..5967d63 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -9,6 +9,7 @@
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+>  
+> +static int acl_conn_index = 0;
+>  static struct class *bt_class;
+>  
+>  struct dentry *bt_debugfs;
+> @@ -91,7 +92,8 @@ static void add_conn(struct work_struct *work)
+>  	struct hci_conn *conn = container_of(work, struct hci_conn, work_add);
+>  	struct hci_dev *hdev = conn->hdev;
+>  
+> -	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+> +	acl_conn_index++;
+> +	dev_set_name(&conn->dev, "%s:%d:%d", hdev->name, conn->handle, acl_conn_index);
+>  
+>  	dev_set_drvdata(&conn->dev, conn);
+
+can we get a bit more of details on what this is actually trying to
+solve. I do not like this way of solving it at all. I think it is trying
+to cover up symptoms and not fixing the real issue.
+
+Regards
+
+Marcel
+
+
