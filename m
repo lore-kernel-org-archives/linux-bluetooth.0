@@ -1,64 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI
- connection name.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: doron.keren.bluez@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Doron Keren <doronkeren@ti.com>,
-	Ilia Kolominsky <iliak@ti.com>
-Date: Wed, 17 Aug 2011 14:42:06 -0700
-In-Reply-To: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
-References: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1313617329.3373.188.camel@aeonflux>
-Mime-Version: 1.0
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Wed, 17 Aug 2011 16:03:08 -0400
+Subject: [RFC 3/5] Bluetooth: Add buffer count to tx scheduler parameters
+Message-ID: <1313611388.2273.9.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Doron,
-
-> The patch fixes kernel panic which is due to race condition
-> between the setup of incomming connection and clean-up of the
-> dead one. Observed in the following case: attached HID device
-> disconnects unexpectedly (without performing ACL disconnect ),
-> the device tries to connect again before the ACL link time-out
-> fires, this translates to the HCI_DISCONNECT, HCI_CONNECT_REQ
-> events on the same handle, since HCI_DISCONNECT trigers the clean
-> up of the HID device and handled in different context, the
-> linking/unlinking connection object to sysfs, may mess up.
-> 
-> Signed-off-by: Ilia Kolominsky <iliak@ti.com>
-> ---
->  net/bluetooth/hci_sysfs.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index a6c3aa8..5967d63 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -9,6 +9,7 @@
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
->  
-> +static int acl_conn_index = 0;
->  static struct class *bt_class;
->  
->  struct dentry *bt_debugfs;
-> @@ -91,7 +92,8 @@ static void add_conn(struct work_struct *work)
->  	struct hci_conn *conn = container_of(work, struct hci_conn, work_add);
->  	struct hci_dev *hdev = conn->hdev;
->  
-> -	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
-> +	acl_conn_index++;
-> +	dev_set_name(&conn->dev, "%s:%d:%d", hdev->name, conn->handle, acl_conn_index);
->  
->  	dev_set_drvdata(&conn->dev, conn);
-
-can we get a bit more of details on what this is actually trying to
-solve. I do not like this way of solving it at all. I think it is trying
-to cover up symptoms and not fixing the real issue.
-
-Regards
-
-Marcel
-
-
+VXRpbGl6ZSBhbHJlYWR5IGtub3duIHR4IGJ1ZmZlciBjb3VudCB2YWx1ZXMgYXMgcGFyYW1ldGVy
+cyB0bw0KdGhlIHR4IHNjaGVkdWxlciwgcmF0aGVyIHRoYW4gZGV0ZXJtaW5pbmcgdGhlIHZhbHVl
+cyBvbiBlYWNoDQppdGVyYXRpb24gb2YgdGhlIHR4IHNjaGVkdWxlci4NCg0KVGhpcyBpcyBwcmVw
+YXJhdG9yeSBmb3IgbWVyZ2luZyB0cmFuc21pc3Npb24gdHlwZXMgKHN1Y2ggYXMgU0NPDQphbmQg
+RVNDTykgYW5kIGFsc28gZm9yIGhhbmRsaW5nIHR4IGJ1ZmZlciBjb3VudGVycyBhdG9taWNhbGx5
+Lg0KDQpTaWduZWQtb2ZmLWJ5OiBQZXRlciBIdXJsZXkgPHBldGVyQGh1cmxleXNvZnR3YXJlLmNv
+bT4NCi0tLQ0KIG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuYyB8ICAgNjAgKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNl
+cnRpb25zKCspLCAzOSBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgv
+aGNpX2NvcmUuYyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KaW5kZXggMGRlZmE4My4uNjY4
+MDg4ZiAxMDA2NDQNCi0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYw0KKysrIGIvbmV0L2Js
+dWV0b290aC9oY2lfY29yZS5jDQpAQCAtMTgyNSwyOCArMTgyNSw4IEBAIHN0YXRpYyBpbmxpbmUg
+c3RydWN0IGhjaV9jb25uICpoY2lfbG93X3NlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIF9fdTgg
+dHlwZSwgaW50DQogCQl9DQogCX0NCiANCi0JaWYgKGNvbm4pIHsNCi0JCWludCBjbnQ7DQotDQot
+CQlzd2l0Y2ggKGNvbm4tPnR5cGUpIHsNCi0JCWNhc2UgQUNMX0xJTks6DQotCQkJY250ID0gaGRl
+di0+YWNsX2NudDsNCi0JCQlicmVhazsNCi0JCWNhc2UgU0NPX0xJTks6DQotCQljYXNlIEVTQ09f
+TElOSzoNCi0JCQljbnQgPSBoZGV2LT5zY29fY250Ow0KLQkJCWJyZWFrOw0KLQkJY2FzZSBMRV9M
+SU5LOg0KLQkJCWNudCA9IGhkZXYtPmxlX210dSA/IGhkZXYtPmxlX2NudCA6IGhkZXYtPmFjbF9j
+bnQ7DQotCQkJYnJlYWs7DQotCQlkZWZhdWx0Og0KLQkJCWNudCA9IDA7DQotCQkJQlRfRVJSKCJV
+bmtub3duIGxpbmsgdHlwZSIpOw0KLQkJfQ0KLQ0KLQkJKnF1b3RlID0gKGNudCArIChudW0gLSAx
+KSkgLyBudW07DQotCX0gZWxzZQ0KLQkJKnF1b3RlID0gMDsNCisJaWYgKGNvbm4pDQorCQkqcXVv
+dGUgPSAoKnF1b3RlICsgKG51bSAtIDEpKSAvIG51bTsNCiANCiAJQlRfREJHKCJjb25uICVwIHF1
+b3RlICVkIiwgY29ubiwgKnF1b3RlKTsNCiAJcmV0dXJuIGNvbm47DQpAQCAtMTg3NSw3ICsxODU1
+LDcgQEAgc3RhdGljIGlubGluZSB2b2lkIGhjaV9zY2hlZF9hY2woc3RydWN0IGhjaV9kZXYgKmhk
+ZXYpDQogew0KIAlzdHJ1Y3QgaGNpX2Nvbm4gKmNvbm47DQogCXN0cnVjdCBza19idWZmICpza2I7
+DQotCWludCBxdW90ZTsNCisJaW50IHF1b3RlID0gaGRldi0+YWNsX2NudDsNCiANCiAJQlRfREJH
+KCIlcyIsIGhkZXYtPm5hbWUpOw0KIA0KQEAgLTE4ODYsOCArMTg2Niw4IEBAIHN0YXRpYyBpbmxp
+bmUgdm9pZCBoY2lfc2NoZWRfYWNsKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KIAkJCWhjaV9saW5r
+X3R4X3RvKGhkZXYsIEFDTF9MSU5LKTsNCiAJfQ0KIA0KLQl3aGlsZSAoaGRldi0+YWNsX2NudCAm
+JiAoY29ubiA9IGhjaV9sb3dfc2VudChoZGV2LCBBQ0xfTElOSywgJnF1b3RlKSkpIHsNCi0JCXdo
+aWxlIChxdW90ZS0tICYmIChza2IgPSBza2JfZGVxdWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCisJ
+d2hpbGUgKHF1b3RlICYmIChjb25uID0gaGNpX2xvd19zZW50KGhkZXYsIEFDTF9MSU5LLCAmcXVv
+dGUpKSkgew0KKwkJd2hpbGUgKHF1b3RlICYmIChza2IgPSBza2JfZGVxdWV1ZSgmY29ubi0+ZGF0
+YV9xKSkpIHsNCiAJCQlCVF9EQkcoInNrYiAlcCBsZW4gJWQiLCBza2IsIHNrYi0+bGVuKTsNCiAN
+CiAJCQloY2lfY29ubl9lbnRlcl9hY3RpdmVfbW9kZShjb25uKTsNCkBAIC0xODk1LDEwICsxODc1
+LDExIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBoY2lfc2NoZWRfYWNsKHN0cnVjdCBoY2lfZGV2ICpo
+ZGV2KQ0KIAkJCWhjaV9zZW5kX2ZyYW1lKHNrYik7DQogCQkJaGRldi0+YWNsX2xhc3RfdHggPSBq
+aWZmaWVzOw0KIA0KLQkJCWhkZXYtPmFjbF9jbnQtLTsNCisJCQlxdW90ZS0tOw0KIAkJCWNvbm4t
+PnNlbnQrKzsNCiAJCX0NCiAJfQ0KKwloZGV2LT5hY2xfY250ID0gcXVvdGU7DQogfQ0KIA0KIC8q
+IFNjaGVkdWxlIFNDTyAqLw0KQEAgLTE5MDYsMTUgKzE4ODcsMTYgQEAgc3RhdGljIGlubGluZSB2
+b2lkIGhjaV9zY2hlZF9zY28oc3RydWN0IGhjaV9kZXYgKmhkZXYpDQogew0KIAlzdHJ1Y3QgaGNp
+X2Nvbm4gKmNvbm47DQogCXN0cnVjdCBza19idWZmICpza2I7DQotCWludCBxdW90ZTsNCisJaW50
+IHF1b3RlID0gaGRldi0+c2NvX2NudDsNCiANCiAJQlRfREJHKCIlcyIsIGhkZXYtPm5hbWUpOw0K
+IA0KLQl3aGlsZSAoaGRldi0+c2NvX2NudCAmJiAoY29ubiA9IGhjaV9sb3dfc2VudChoZGV2LCBT
+Q09fTElOSywgJnF1b3RlKSkpIHsNCi0JCXdoaWxlIChxdW90ZS0tICYmIChza2IgPSBza2JfZGVx
+dWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCisJd2hpbGUgKHF1b3RlICYmIChjb25uID0gaGNpX2xv
+d19zZW50KGhkZXYsIFNDT19MSU5LLCAmcXVvdGUpKSkgew0KKwkJd2hpbGUgKHF1b3RlICYmIChz
+a2IgPSBza2JfZGVxdWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCiAJCQlCVF9EQkcoInNrYiAlcCBs
+ZW4gJWQiLCBza2IsIHNrYi0+bGVuKTsNCiAJCQloY2lfc2VuZF9mcmFtZShza2IpOw0KIA0KKwkJ
+CXF1b3RlLS07DQogCQkJY29ubi0+c2VudCsrOw0KIAkJCWlmIChjb25uLT5zZW50ID09IH4wKQ0K
+IAkJCQljb25uLT5zZW50ID0gMDsNCkBAIC0xOTI2LDE1ICsxOTA4LDE2IEBAIHN0YXRpYyBpbmxp
+bmUgdm9pZCBoY2lfc2NoZWRfZXNjbyhzdHJ1Y3QgaGNpX2RldiAqaGRldikNCiB7DQogCXN0cnVj
+dCBoY2lfY29ubiAqY29ubjsNCiAJc3RydWN0IHNrX2J1ZmYgKnNrYjsNCi0JaW50IHF1b3RlOw0K
+KwlpbnQgcXVvdGUgPSBoZGV2LT5zY29fY250Ow0KIA0KIAlCVF9EQkcoIiVzIiwgaGRldi0+bmFt
+ZSk7DQogDQotCXdoaWxlIChoZGV2LT5zY29fY250ICYmIChjb25uID0gaGNpX2xvd19zZW50KGhk
+ZXYsIEVTQ09fTElOSywgJnF1b3RlKSkpIHsNCi0JCXdoaWxlIChxdW90ZS0tICYmIChza2IgPSBz
+a2JfZGVxdWV1ZSgmY29ubi0+ZGF0YV9xKSkpIHsNCisJd2hpbGUgKHF1b3RlICYmIChjb25uID0g
+aGNpX2xvd19zZW50KGhkZXYsIEVTQ09fTElOSywgJnF1b3RlKSkpIHsNCisJCXdoaWxlIChxdW90
+ZSAmJiAoc2tiID0gc2tiX2RlcXVldWUoJmNvbm4tPmRhdGFfcSkpKSB7DQogCQkJQlRfREJHKCJz
+a2IgJXAgbGVuICVkIiwgc2tiLCBza2ItPmxlbik7DQogCQkJaGNpX3NlbmRfZnJhbWUoc2tiKTsN
+CiANCisJCQlxdW90ZS0tOw0KIAkJCWNvbm4tPnNlbnQrKzsNCiAJCQlpZiAoY29ubi0+c2VudCA9
+PSB+MCkNCiAJCQkJY29ubi0+c2VudCA9IDA7DQpAQCAtMTk0Niw3ICsxOTI5LDcgQEAgc3RhdGlj
+IGlubGluZSB2b2lkIGhjaV9zY2hlZF9sZShzdHJ1Y3QgaGNpX2RldiAqaGRldikNCiB7DQogCXN0
+cnVjdCBoY2lfY29ubiAqY29ubjsNCiAJc3RydWN0IHNrX2J1ZmYgKnNrYjsNCi0JaW50IHF1b3Rl
+LCBjbnQ7DQorCWludCBxdW90ZSA9IGhkZXYtPmxlX3BrdHMgPyBoZGV2LT5sZV9jbnQgOiBoZGV2
+LT5hY2xfY250Ow0KIA0KIAlCVF9EQkcoIiVzIiwgaGRldi0+bmFtZSk7DQogDQpAQCAtMTk1OCwy
+MiArMTk0MSwyMSBAQCBzdGF0aWMgaW5saW5lIHZvaWQgaGNpX3NjaGVkX2xlKHN0cnVjdCBoY2lf
+ZGV2ICpoZGV2KQ0KIAkJCWhjaV9saW5rX3R4X3RvKGhkZXYsIExFX0xJTkspOw0KIAl9DQogDQot
+CWNudCA9IGhkZXYtPmxlX3BrdHMgPyBoZGV2LT5sZV9jbnQgOiBoZGV2LT5hY2xfY250Ow0KLQl3
+aGlsZSAoY250ICYmIChjb25uID0gaGNpX2xvd19zZW50KGhkZXYsIExFX0xJTkssICZxdW90ZSkp
+KSB7DQotCQl3aGlsZSAocXVvdGUtLSAmJiAoc2tiID0gc2tiX2RlcXVldWUoJmNvbm4tPmRhdGFf
+cSkpKSB7DQorCXdoaWxlIChxdW90ZSAmJiAoY29ubiA9IGhjaV9sb3dfc2VudChoZGV2LCBMRV9M
+SU5LLCAmcXVvdGUpKSkgew0KKwkJd2hpbGUgKHF1b3RlICYmIChza2IgPSBza2JfZGVxdWV1ZSgm
+Y29ubi0+ZGF0YV9xKSkpIHsNCiAJCQlCVF9EQkcoInNrYiAlcCBsZW4gJWQiLCBza2IsIHNrYi0+
+bGVuKTsNCiANCiAJCQloY2lfc2VuZF9mcmFtZShza2IpOw0KIAkJCWhkZXYtPmxlX2xhc3RfdHgg
+PSBqaWZmaWVzOw0KIA0KLQkJCWNudC0tOw0KKwkJCXF1b3RlLS07DQogCQkJY29ubi0+c2VudCsr
+Ow0KIAkJfQ0KIAl9DQogCWlmIChoZGV2LT5sZV9wa3RzKQ0KLQkJaGRldi0+bGVfY250ID0gY250
+Ow0KKwkJaGRldi0+bGVfY250ID0gcXVvdGU7DQogCWVsc2UNCi0JCWhkZXYtPmFjbF9jbnQgPSBj
+bnQ7DQorCQloZGV2LT5hY2xfY250ID0gcXVvdGU7DQogfQ0KIA0KIHN0YXRpYyB2b2lkIGhjaV90
+eF90YXNrKHVuc2lnbmVkIGxvbmcgYXJnKQ0KLS0gDQoxLjcuNC4xDQoNCg==
