@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/5 v2] Bluetooth: recalculate priorities when channels are starving
-Date: Wed, 17 Aug 2011 16:23:04 +0300
-Message-Id: <1313587384-2653-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 3/5 v2] Bluetooth: make use sk_priority to priritize RFCOMM packets
+Date: Wed, 17 Aug 2011 16:23:02 +0300
+Message-Id: <1313587384-2653-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
 References: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,127 +11,203 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-To avoid starvation the priority is recalculated so that the starving
-channels are promoted to HCI_PRIO_MAX - 1 (6).
-
-HCI_PRIO_MAX (7) is considered special, because it requires CAP_NET_ADMIN
-capability which can be used to provide more guaranties, so it is not used
-when promoting.
-
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_core.c |   63 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 61 insertions(+), 2 deletions(-)
+ net/bluetooth/rfcomm/core.c |   51 +++++++++++++++++++++++++++++-------------
+ net/bluetooth/rfcomm/sock.c |    2 +
+ 2 files changed, 37 insertions(+), 16 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3a4c3a2..eabe84e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2184,7 +2184,7 @@ static inline struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 5759bb7..3ec98bd 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -66,7 +66,8 @@ static unsigned long rfcomm_event;
  
- 			tmp = list_entry(c, struct hci_chan, list);
+ static LIST_HEAD(session_list);
  
--			if (skb_queue_empty(&tmp->data_q))
-+			if (tmp->sent || skb_queue_empty(&tmp->data_q))
- 				continue;
- 
- 			skb = skb_peek(&tmp->data_q);
-@@ -2234,6 +2234,58 @@ static inline struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
- 	return chan;
+-static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
++static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
++							u32 priority);
+ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
+ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
+ static int rfcomm_queue_disc(struct rfcomm_dlc *d);
+@@ -751,19 +752,34 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
  }
  
-+static void hci_prio_recalculate(struct hci_dev *hdev, __u8 type)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct list_head *p, *c;
-+	int num = 0;
+ /* ---- RFCOMM frame sending ---- */
+-static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len)
++static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
++							u32 priority)
+ {
+ 	struct socket *sock = s->sock;
++	struct sock *sk = sock->sk;
+ 	struct kvec iv = { data, len };
+ 	struct msghdr msg;
+ 
+-	BT_DBG("session %p len %d", s, len);
++	BT_DBG("session %p len %d priority %u", s, len, priority);
 +
-+	BT_DBG("%s", hdev->name);
-+
-+	list_for_each(p, &h->list) {
-+		struct hci_conn *conn;
-+		struct hci_chan_hash *ch;
-+
-+		conn = list_entry(p, struct hci_conn, list);
-+		ch = &conn->chan_hash;
-+
-+		if (conn->type != type)
-+			continue;
-+
-+		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-+			continue;
-+
-+		num++;
-+
-+		list_for_each(c, &ch->list) {
-+			struct hci_chan *chan;
-+			struct sk_buff *skb;
-+
-+			chan = list_entry(c, struct hci_chan, list);
-+
-+			if (chan->sent) {
-+				chan->sent = 0;
-+				continue;
-+			}
-+
-+			if (skb_queue_empty(&chan->data_q))
-+				continue;
-+
-+			skb = skb_peek(&chan->data_q);
-+			if (skb->priority >= HCI_PRIO_MAX - 1)
-+				continue;
-+
-+			skb->priority = HCI_PRIO_MAX - 1;
-+
-+			BT_DBG("chan %p skb %p promoted to %d", chan, skb,
-+								skb->priority);
-+		}
-+
-+		if (hci_conn_num(hdev, type) == num)
-+			break;
++	if (sk->sk_priority != priority) {
++		lock_sock(sk);
++		sk->sk_priority = priority;
++		release_sock(sk);
 +	}
+ 
+ 	memset(&msg, 0, sizeof(msg));
+ 
+ 	return kernel_sendmsg(sock, &msg, &iv, 1, len);
+ }
+ 
++static int rfcomm_send_cmd(struct rfcomm_session *s, struct rfcomm_cmd *cmd)
++{
++	BT_DBG("%p cmd %u", s, cmd->ctrl);
++
++	return rfcomm_send_frame(s, (void *) cmd, sizeof(*cmd), HCI_PRIO_MAX);
 +}
 +
- static inline void hci_sched_acl(struct hci_dev *hdev)
+ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
  {
- 	struct hci_conn *conn;
-@@ -2288,6 +2340,9 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 			chan->conn->sent++;
- 		}
- 	}
-+
-+	if (cnt != hdev->acl_cnt)
-+		hci_prio_recalculate(hdev, ACL_LINK);
+ 	struct rfcomm_cmd cmd;
+@@ -775,7 +791,7 @@ static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
  }
  
- /* Schedule SCO */
-@@ -2342,7 +2397,7 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 	struct hci_conn *conn;
- 	struct hci_chan *chan;
- 	struct sk_buff *skb;
--	int quote, cnt;
-+	int quote, cnt, tmp;
+ static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
+@@ -789,7 +805,7 @@ static int rfcomm_send_ua(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
  
- 	BT_DBG("%s", hdev->name);
- 
-@@ -2370,6 +2425,7 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 		}
- 	}
- 
-+	tmp = cnt;
- 	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
- 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
-@@ -2388,6 +2444,9 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 		hdev->le_cnt = cnt;
- 	else
- 		hdev->acl_cnt = cnt;
-+
-+	if (cnt != tmp)
-+		hci_prio_recalculate(hdev, LE_LINK);
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
  }
  
- static void hci_tx_task(unsigned long arg)
+ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
+@@ -803,7 +819,7 @@ static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+@@ -817,6 +833,8 @@ static int rfcomm_queue_disc(struct rfcomm_dlc *d)
+ 	if (!skb)
+ 		return -ENOMEM;
+ 
++	skb->priority = HCI_PRIO_MAX;
++
+ 	cmd = (void *) __skb_put(skb, sizeof(*cmd));
+ 	cmd->addr = d->addr;
+ 	cmd->ctrl = __ctrl(RFCOMM_DISC, 1);
+@@ -839,7 +857,7 @@ static int rfcomm_send_dm(struct rfcomm_session *s, u8 dlci)
+ 	cmd.len  = __len8(0);
+ 	cmd.fcs  = __fcs2((u8 *) &cmd);
+ 
+-	return rfcomm_send_frame(s, (void *) &cmd, sizeof(cmd));
++	return rfcomm_send_cmd(s, &cmd);
+ }
+ 
+ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
+@@ -864,7 +882,7 @@ static int rfcomm_send_nsc(struct rfcomm_session *s, int cr, u8 type)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d)
+@@ -906,7 +924,7 @@ static int rfcomm_send_pn(struct rfcomm_session *s, int cr, struct rfcomm_dlc *d
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
+@@ -944,7 +962,7 @@ int rfcomm_send_rpn(struct rfcomm_session *s, int cr, u8 dlci,
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
+@@ -971,7 +989,7 @@ static int rfcomm_send_rls(struct rfcomm_session *s, int cr, u8 dlci, u8 status)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig)
+@@ -998,7 +1016,7 @@ static int rfcomm_send_msc(struct rfcomm_session *s, int cr, u8 dlci, u8 v24_sig
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
+@@ -1020,7 +1038,7 @@ static int rfcomm_send_fcoff(struct rfcomm_session *s, int cr)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
+@@ -1042,7 +1060,7 @@ static int rfcomm_send_fcon(struct rfcomm_session *s, int cr)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static int rfcomm_send_test(struct rfcomm_session *s, int cr, u8 *pattern, int len)
+@@ -1093,7 +1111,7 @@ static int rfcomm_send_credits(struct rfcomm_session *s, u8 addr, u8 credits)
+ 
+ 	*ptr = __fcs(buf); ptr++;
+ 
+-	return rfcomm_send_frame(s, buf, ptr - buf);
++	return rfcomm_send_frame(s, buf, ptr - buf, HCI_PRIO_MAX);
+ }
+ 
+ static void rfcomm_make_uih(struct sk_buff *skb, u8 addr)
+@@ -1771,7 +1789,8 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
+ 		return skb_queue_len(&d->tx_queue);
+ 
+ 	while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
+-		err = rfcomm_send_frame(d->session, skb->data, skb->len);
++		err = rfcomm_send_frame(d->session, skb->data, skb->len,
++							skb->priority);
+ 		if (err < 0) {
+ 			skb_queue_head(&d->tx_queue, skb);
+ 			break;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 8f01e6b..de8c386 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -597,6 +597,8 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 			break;
+ 		}
+ 
++		skb->priority = sk->sk_priority;
++
+ 		err = rfcomm_dlc_send(d, skb);
+ 		if (err < 0) {
+ 			kfree_skb(skb);
 -- 
 1.7.6
 
