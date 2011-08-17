@@ -1,42 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 17 Aug 2011 16:03:26 -0400
-Subject: [RFC 5/5] Bluetooth: Don't schedule tx tasklet if no work
-Message-ID: <1313611406.2273.11.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: doron.keren.bluez@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Doron Keren <doronkeren@ti.com>, Ilia Kolominsky <iliak@ti.com>
+Subject: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI connection name.
+Date: Wed, 17 Aug 2011 19:01:24 +0300
+Message-Id: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VXBvbiByZWNlaXB0IG9mIHRoZSBOdW1fQ29tcGxldGVkX1BrdHMgZXZlbnQsIGRvIG5vdCBzY2hl
-ZHVsZSB0aGUNCnR4IHRhc2tsZXQgaWYgdGhlcmUncyBubyB3b3JrIHRvIHBlcmZvcm0uIE5vcm1h
-bGx5LCB0aGUgdHggdGFza2xldA0Kd2lsbCBiZSBzY2hlZHVsZWQgd2hlbmV2ZXIgcGFja2V0cyBh
-cmUgcXVldWVkIGZvciB0eC4gRnVydGhlcg0Kc2NoZWR1bGluZyBpcyBuZWNlc3Nhcnkgb25seSBp
-ZiB0aGUgdHggdGFza2xldCB3YXMgdW5hYmxlIHRvDQpzZW5kIGFsbCBxdWV1ZWQgcGFja2V0cyBi
-ZWNhdXNlIGEgaG9zdCBidWZmZXIgY291bnQgZHJvcHBlZCB0byAwLg0KV2hpbGUgaXQgaXMgcG9z
-c2libGUgdGhhdCBubyBmdXJ0aGVyIHBhY2tldHMgYXJlIHF1ZXVlZCBpZiBhDQpidWZmZXIgY291
-bnQgaXMgemVybyAoYW5kIHRodXMgdGhlIHR4IHRhc2tsZXQgd2lsbCBiZSBuZWVkbGVzc2x5DQpz
-Y2hlZHVsZWQpLCB0aGlzIGNvbmRpdGlvbiBpcyBtdWNoIGxlc3MgZnJlcXVlbnQuDQoNClNpZ25l
-ZC1vZmYtYnk6IFBldGVyIEh1cmxleSA8cGV0ZXJAaHVybGV5c29mdHdhcmUuY29tPg0KLS0tDQog
-bmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYyB8ICAgIDggKysrKysrLS0NCiAxIGZpbGVzIGNoYW5n
-ZWQsIDYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25ldC9i
-bHVldG9vdGgvaGNpX2V2ZW50LmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQppbmRleCBk
-OWJjZjdlLi5lNmMzYTk0IDEwMDY0NA0KLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0K
-KysrIGIvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KQEAgLTE5NDcsNyArMTk0Nyw3IEBAIHN0
-YXRpYyBpbmxpbmUgdm9pZCBoY2lfbnVtX2NvbXBfcGt0c19ldnQoc3RydWN0IGhjaV9kZXYgKmhk
-ZXYsIHN0cnVjdCBza19idWZmICpzDQogew0KIAlzdHJ1Y3QgaGNpX2V2X251bV9jb21wX3BrdHMg
-KmV2ID0gKHZvaWQgKikgc2tiLT5kYXRhOw0KIAlfX2xlMTYgKnB0cjsNCi0JaW50IGk7DQorCWlu
-dCBpLCBzY2hlZHVsZSA9IDA7DQogDQogCXNrYl9wdWxsKHNrYiwgc2l6ZW9mKCpldikpOw0KIA0K
-QEAgLTE5NjAsNiArMTk2MCw5IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBoY2lfbnVtX2NvbXBfcGt0
-c19ldnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVjdCBza19idWZmICpzDQogDQogCXRhc2ts
-ZXRfZGlzYWJsZSgmaGRldi0+dHhfdGFzayk7DQogDQorCWlmICghaGRldi0+YWNsX2NudCB8fCAh
-aGRldi0+c2NvX2NudCB8fCAoaGRldi0+bGVfcGt0cyAmJiAhaGRldi0+bGVfY250KSkNCisJCXNj
-aGVkdWxlKys7DQorDQogCWZvciAoaSA9IDAsIHB0ciA9IChfX2xlMTYgKikgc2tiLT5kYXRhOyBp
-IDwgZXYtPm51bV9obmRsOyBpKyspIHsNCiAJCXN0cnVjdCBoY2lfY29ubiAqY29ubjsNCiAJCV9f
-dTE2ICBoYW5kbGUsIGNvdW50Ow0KQEAgLTE5OTMsNyArMTk5Niw4IEBAIHN0YXRpYyBpbmxpbmUg
-dm9pZCBoY2lfbnVtX2NvbXBfcGt0c19ldnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVjdCBz
-a19idWZmICpzDQogCQl9DQogCX0NCiANCi0JdGFza2xldF9zY2hlZHVsZSgmaGRldi0+dHhfdGFz
-ayk7DQorCWlmIChzY2hlZHVsZSkNCisJCXRhc2tsZXRfc2NoZWR1bGUoJmhkZXYtPnR4X3Rhc2sp
-Ow0KIA0KIAl0YXNrbGV0X2VuYWJsZSgmaGRldi0+dHhfdGFzayk7DQogfQ0KLS0gDQoxLjcuNC4x
-DQoNCg==
+From: Doron Keren <doronkeren@ti.com>
+
+The patch fixes kernel panic which is due to race condition
+between the setup of incomming connection and clean-up of the
+dead one. Observed in the following case: attached HID device
+disconnects unexpectedly (without performing ACL disconnect ),
+the device tries to connect again before the ACL link time-out
+fires, this translates to the HCI_DISCONNECT, HCI_CONNECT_REQ
+events on the same handle, since HCI_DISCONNECT trigers the clean
+up of the HID device and handled in different context, the
+linking/unlinking connection object to sysfs, may mess up.
+
+Signed-off-by: Ilia Kolominsky <iliak@ti.com>
+---
+ net/bluetooth/hci_sysfs.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index a6c3aa8..5967d63 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -9,6 +9,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
++static int acl_conn_index = 0;
+ static struct class *bt_class;
+ 
+ struct dentry *bt_debugfs;
+@@ -91,7 +92,8 @@ static void add_conn(struct work_struct *work)
+ 	struct hci_conn *conn = container_of(work, struct hci_conn, work_add);
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
++	acl_conn_index++;
++	dev_set_name(&conn->dev, "%s:%d:%d", hdev->name, conn->handle, acl_conn_index);
+ 
+ 	dev_set_drvdata(&conn->dev, conn);
+ 
+-- 
+1.7.4.1
+
