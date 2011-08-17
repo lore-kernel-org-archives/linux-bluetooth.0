@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 4/5 v2] Bluetooth: prioritizing data over HCI
-Date: Wed, 17 Aug 2011 16:23:03 +0300
-Message-Id: <1313587384-2653-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 2/5 v2] Bluetooth: set skbuffer priority based on L2CAP socket priority
+Date: Wed, 17 Aug 2011 16:23:01 +0300
+Message-Id: <1313587384-2653-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
 References: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,522 +11,218 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This implement priority based scheduler using skbuffer priority set via
-SO_PRIORITY socket option.
-
-It introduces hci_chan_hash (list of HCI Channel/hci_chan) per connection,
-each item in this list refer to a L2CAP connection and it is used to
-queue the data for transmission.
-
-Each connection continue to have a queue but it is only used for time
-critical packets such the L2CAP commands and it is always processed
-before the channels thus it can be considered the highest priority.
+This uses SO_PRIORITY to set the skbuffer priority field
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   42 +++++++++
- include/net/bluetooth/l2cap.h    |    1 +
- net/bluetooth/hci_conn.c         |   59 ++++++++++++
- net/bluetooth/hci_core.c         |  180 ++++++++++++++++++++++++++++++++++----
- net/bluetooth/l2cap_core.c       |    5 +-
- 5 files changed, 269 insertions(+), 18 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++
+ include/net/bluetooth/l2cap.h    |    3 +-
+ net/bluetooth/l2cap_core.c       |   45 +++++++++++++++++++++++++++-----------
+ net/bluetooth/l2cap_sock.c       |    2 +-
+ 4 files changed, 38 insertions(+), 15 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0742828..e0d29eb 100644
+index e2ba4d6..0742828 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -67,6 +67,12 @@ struct hci_conn_hash {
- 	unsigned int     le_num;
- };
+@@ -32,6 +32,9 @@
+ #define HCI_PROTO_L2CAP	0
+ #define HCI_PROTO_SCO	1
  
-+struct hci_chan_hash {
-+	struct list_head list;
-+	spinlock_t       lock;
-+	unsigned int     num;
-+};
++/* HCI priority */
++#define HCI_PRIO_MAX	7
 +
- struct bdaddr_list {
- 	struct list_head list;
- 	bdaddr_t bdaddr;
-@@ -278,6 +284,7 @@ struct hci_conn {
- 	unsigned int	sent;
- 
- 	struct sk_buff_head data_q;
-+	struct hci_chan_hash chan_hash;
- 
- 	struct timer_list disc_timer;
- 	struct timer_list idle_timer;
-@@ -300,6 +307,14 @@ struct hci_conn {
- 	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
- };
- 
-+struct hci_chan {
-+	struct list_head list;
-+
-+	struct hci_conn *conn;
-+	struct sk_buff_head data_q;
-+	unsigned int	sent;
-+};
-+
- extern struct hci_proto *hci_proto[];
- extern struct list_head hci_dev_list;
- extern struct list_head hci_cb_list;
-@@ -459,6 +474,28 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+static inline void hci_chan_hash_init(struct hci_conn *c)
-+{
-+	struct hci_chan_hash *h = &c->chan_hash;
-+	INIT_LIST_HEAD(&h->list);
-+	spin_lock_init(&h->lock);
-+	h->num = 0;
-+}
-+
-+static inline void hci_chan_hash_add(struct hci_conn *c, struct hci_chan *chan)
-+{
-+	struct hci_chan_hash *h = &c->chan_hash;
-+	list_add(&chan->list, &h->list);
-+	h->num++;
-+}
-+
-+static inline void hci_chan_hash_del(struct hci_conn *c, struct hci_chan *chan)
-+{
-+	struct hci_chan_hash *h = &c->chan_hash;
-+	list_del(&chan->list);
-+	h->num--;
-+}
-+
- void hci_acl_connect(struct hci_conn *conn);
- void hci_acl_disconn(struct hci_conn *conn, __u8 reason);
- void hci_add_sco(struct hci_conn *conn, __u16 handle);
-@@ -470,6 +507,10 @@ int hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
- 
-+struct hci_chan *hci_chan_create(struct hci_conn *conn);
-+int hci_chan_del(struct hci_chan *chan);
-+void hci_chan_hash_flush(struct hci_conn *conn);
-+
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 						__u8 sec_level, __u8 auth_type);
- int hci_conn_check_link_mode(struct hci_conn *conn);
-@@ -839,6 +880,7 @@ int hci_unregister_notifier(struct notifier_block *nb);
- 
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags);
-+void hci_chan_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
- void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
- 
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ /* HCI Core structures */
+ struct inquiry_data {
+ 	bdaddr_t	bdaddr;
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f018e5d..1e4dd6b 100644
+index 4f34ad2..f018e5d 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -301,6 +301,7 @@ struct srej_list {
- struct l2cap_chan {
- 	struct sock *sk;
+@@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+ void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+ void l2cap_chan_destroy(struct l2cap_chan *chan);
+ int l2cap_chan_connect(struct l2cap_chan *chan);
+-int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
++int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
++								u32 priority);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
  
-+	struct hci_chan		*hchan;
- 	struct l2cap_conn	*conn;
- 
- 	__u8		state;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ea7f031..19ae6b4 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -374,6 +374,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 
- 	skb_queue_head_init(&conn->data_q);
- 
-+	hci_chan_hash_init(conn);
-+
- 	setup_timer(&conn->disc_timer, hci_conn_timeout, (unsigned long)conn);
- 	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
- 	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
-@@ -432,6 +434,8 @@ int hci_conn_del(struct hci_conn *conn)
- 
- 	tasklet_disable(&hdev->tx_task);
- 
-+	hci_chan_hash_flush(conn);
-+
- 	hci_conn_hash_del(hdev, conn);
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
-@@ -956,3 +960,58 @@ int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
- 
- 	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
- }
-+
-+struct hci_chan *hci_chan_create(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_chan *chan;
-+
-+	BT_DBG("%s conn %p", hdev->name, conn);
-+
-+	chan = kzalloc(sizeof(struct hci_chan), GFP_ATOMIC);
-+	if (!chan)
-+		return NULL;
-+
-+	chan->conn = conn;
-+	skb_queue_head_init(&chan->data_q);
-+
-+	tasklet_disable(&hdev->tx_task);
-+	hci_chan_hash_add(conn, chan);
-+	tasklet_enable(&hdev->tx_task);
-+
-+	return chan;
-+}
-+
-+int hci_chan_del(struct hci_chan *chan)
-+{
-+	struct hci_conn *conn = chan->conn;
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("%s conn %p chan %p", hdev->name, conn, chan);
-+
-+	tasklet_disable(&hdev->tx_task);
-+	hci_chan_hash_del(conn, chan);
-+	tasklet_enable(&hdev->tx_task);
-+
-+	skb_queue_purge(&chan->data_q);
-+	kfree(chan);
-+
-+	return 0;
-+}
-+
-+void hci_chan_hash_flush(struct hci_conn *conn)
-+{
-+	struct hci_chan_hash *h = &conn->chan_hash;
-+	struct list_head *p;
-+
-+	BT_DBG("conn %p", conn);
-+	p = h->list.next;
-+	while (p != &h->list) {
-+		struct hci_chan *chan;
-+
-+		chan = list_entry(p, struct hci_chan, list);
-+		p = p->next;
-+
-+		hci_chan_del(chan);
-+	}
-+}
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9574752..3a4c3a2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1975,23 +1975,18 @@ static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
- 	hdr->dlen   = cpu_to_le16(len);
- }
- 
--void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
-+static void hci_queue_acl(struct hci_conn *conn, struct sk_buff_head *queue,
-+				struct sk_buff *skb, __u16 flags)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct sk_buff *list;
- 
--	BT_DBG("%s conn %p flags 0x%x", hdev->name, conn, flags);
--
--	skb->dev = (void *) hdev;
--	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
--	hci_add_acl_hdr(skb, conn->handle, flags);
--
- 	list = skb_shinfo(skb)->frag_list;
- 	if (!list) {
- 		/* Non fragmented */
- 		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
- 
--		skb_queue_tail(&conn->data_q, skb);
-+		skb_queue_tail(queue, skb);
- 	} else {
- 		/* Fragmented */
- 		BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-@@ -1999,9 +1994,9 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
- 		skb_shinfo(skb)->frag_list = NULL;
- 
- 		/* Queue all fragments atomically */
--		spin_lock_bh(&conn->data_q.lock);
-+		spin_lock_bh(&queue->lock);
- 
--		__skb_queue_tail(&conn->data_q, skb);
-+		__skb_queue_tail(queue, skb);
- 
- 		flags &= ~ACL_START;
- 		flags |= ACL_CONT;
-@@ -2014,16 +2009,46 @@ void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
- 
- 			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
- 
--			__skb_queue_tail(&conn->data_q, skb);
-+			__skb_queue_tail(queue, skb);
- 		} while (list);
- 
--		spin_unlock_bh(&conn->data_q.lock);
-+		spin_unlock_bh(&queue->lock);
- 	}
-+}
-+
-+void hci_send_acl(struct hci_conn *conn, struct sk_buff *skb, __u16 flags)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("%s conn %p flags 0x%x", hdev->name, conn, flags);
-+
-+	skb->dev = (void *) hdev;
-+	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
-+	hci_add_acl_hdr(skb, conn->handle, flags);
-+
-+	hci_queue_acl(conn, &conn->data_q, skb, flags);
- 
- 	tasklet_schedule(&hdev->tx_task);
- }
- EXPORT_SYMBOL(hci_send_acl);
- 
-+void hci_chan_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags)
-+{
-+	struct hci_conn *conn = chan->conn;
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("%s chan %p flags 0x%x", hdev->name, chan, flags);
-+
-+	skb->dev = (void *) hdev;
-+	bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
-+	hci_add_acl_hdr(skb, conn->handle, flags);
-+
-+	hci_queue_acl(conn, &chan->data_q, skb, flags);
-+
-+	tasklet_schedule(&hdev->tx_task);
-+}
-+EXPORT_SYMBOL(hci_chan_send_acl);
-+
- /* Send SCO data */
- void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
- {
-@@ -2127,11 +2152,95 @@ static inline void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
- 	}
- }
- 
-+static inline struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
-+						int *quote)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_chan *chan = NULL;
-+	int num = 0, min = ~0, cur_prio = 0;
-+	struct list_head *p, *c;
-+	int cnt, q, conn_num = 0;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	list_for_each(p, &h->list) {
-+		struct hci_conn *conn;
-+		struct hci_chan_hash *ch;
-+
-+		conn = list_entry(p, struct hci_conn, list);
-+		ch = &conn->chan_hash;
-+
-+		if (conn->type != type)
-+			continue;
-+
-+		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-+			continue;
-+
-+		conn_num++;
-+
-+		list_for_each(c, &ch->list) {
-+			struct hci_chan *tmp;
-+			struct sk_buff *skb;
-+
-+			tmp = list_entry(c, struct hci_chan, list);
-+
-+			if (skb_queue_empty(&tmp->data_q))
-+				continue;
-+
-+			skb = skb_peek(&tmp->data_q);
-+			if (skb->priority < cur_prio)
-+				continue;
-+
-+			if (skb->priority > cur_prio) {
-+				num = 0;
-+				min = ~0;
-+				cur_prio = skb->priority;
-+			}
-+
-+			num++;
-+
-+			if (conn->sent < min) {
-+				min  = conn->sent;
-+				chan = tmp;
-+			}
-+		}
-+
-+		if (hci_conn_num(hdev, type) == conn_num)
-+			break;
-+	}
-+
-+	if (!chan)
-+		return NULL;
-+
-+	switch (chan->conn->type) {
-+	case ACL_LINK:
-+		cnt = hdev->acl_cnt;
-+		break;
-+	case SCO_LINK:
-+	case ESCO_LINK:
-+		cnt = hdev->sco_cnt;
-+		break;
-+	case LE_LINK:
-+		cnt = hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
-+		break;
-+	default:
-+		cnt = 0;
-+		BT_ERR("Unknown link type");
-+	}
-+
-+	q = cnt / num;
-+	*quote = q ? q : 1;
-+	BT_DBG("chan %p quote %d", chan, *quote);
-+	return chan;
-+}
-+
- static inline void hci_sched_acl(struct hci_dev *hdev)
- {
- 	struct hci_conn *conn;
-+	struct hci_chan *chan;
- 	struct sk_buff *skb;
- 	int quote;
-+	unsigned int cnt;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -2145,9 +2254,10 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 			hci_link_tx_to(hdev, ACL_LINK);
- 	}
- 
--	while (hdev->acl_cnt && (conn = hci_low_sent(hdev, ACL_LINK, &quote))) {
-+	while (hdev->acl_cnt &&
-+			(conn = hci_low_sent(hdev, ACL_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			BT_DBG("conn %p skb %p len %d", conn, skb, skb->len);
- 
- 			hci_conn_enter_active_mode(conn, bt_cb(skb)->force_active);
- 
-@@ -2158,6 +2268,26 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
- 			conn->sent++;
- 		}
- 	}
-+
-+	cnt = hdev->acl_cnt;
-+
-+	while (hdev->acl_cnt &&
-+			(chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
-+		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
-+			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
-+					skb->len, skb->priority);
-+
-+			hci_conn_enter_active_mode(chan->conn,
-+						bt_cb(skb)->force_active);
-+
-+			hci_send_frame(skb);
-+			hdev->acl_last_tx = jiffies;
-+
-+			hdev->acl_cnt--;
-+			chan->sent++;
-+			chan->conn->sent++;
-+		}
-+	}
- }
- 
- /* Schedule SCO */
-@@ -2174,7 +2304,7 @@ static inline void hci_sched_sco(struct hci_dev *hdev)
- 
- 	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			BT_DBG("conn %p skb %p len %d", conn, skb, skb->len);
- 			hci_send_frame(skb);
- 
- 			conn->sent++;
-@@ -2197,7 +2327,7 @@ static inline void hci_sched_esco(struct hci_dev *hdev)
- 
- 	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			BT_DBG("conn %p skb %p len %d", conn, skb, skb->len);
- 			hci_send_frame(skb);
- 
- 			conn->sent++;
-@@ -2210,6 +2340,7 @@ static inline void hci_sched_esco(struct hci_dev *hdev)
- static inline void hci_sched_le(struct hci_dev *hdev)
- {
- 	struct hci_conn *conn;
-+	struct hci_chan *chan;
- 	struct sk_buff *skb;
- 	int quote, cnt;
- 
-@@ -2229,7 +2360,7 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
- 	while (cnt && (conn = hci_low_sent(hdev, LE_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
-+			BT_DBG("conn %p skb %p len %d", conn, skb, skb->len);
- 
- 			hci_send_frame(skb);
- 			hdev->le_last_tx = jiffies;
-@@ -2238,6 +2369,21 @@ static inline void hci_sched_le(struct hci_dev *hdev)
- 			conn->sent++;
- 		}
- 	}
-+
-+	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
-+		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
-+			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
-+					skb->len, skb->priority);
-+
-+			hci_send_frame(skb);
-+			hdev->le_last_tx = jiffies;
-+
-+			cnt--;
-+			chan->sent++;
-+			chan->conn->sent++;
-+		}
-+	}
-+
- 	if (hdev->le_pkts)
- 		hdev->le_cnt = cnt;
- 	else
+ #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3af0569..d30cb36 100644
+index 3204ba8..3af0569 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -313,6 +313,7 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	conn->disc_reason = 0x13;
+@@ -1245,7 +1245,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	struct hci_conn *hcon = chan->conn->hcon;
+ 	u16 flags;
  
- 	chan->conn = conn;
-+	chan->hchan = hci_chan_create(conn->hcon);
+-	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
++	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
++							skb->priority);
  
- 	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
- 		if (conn->hcon->type == LE_LINK) {
-@@ -357,6 +358,8 @@ static void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	if (conn) {
- 		/* Delete from channel list */
- 		write_lock_bh(&conn->chan_lock);
-+		hci_chan_del(chan->hchan);
-+		chan->hchan = NULL;
- 		list_del(&chan->list);
- 		write_unlock_bh(&conn->chan_lock);
- 		chan_put(chan);
-@@ -1254,7 +1257,7 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 		flags = ACL_START;
+ 	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
+ 		flags = ACL_START_NO_FLUSH;
+@@ -1451,6 +1452,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+ 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+ 			return -EFAULT;
  
- 	bt_cb(skb)->force_active = chan->force_active;
--	hci_send_acl(hcon, skb, flags);
-+	hci_chan_send_acl(chan->hchan, skb, flags);
++		(*frag)->priority = skb->priority;
++
+ 		sent += count;
+ 		len  -= count;
+ 
+@@ -1460,7 +1463,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+ 	return sent;
  }
  
- void l2cap_streaming_send(struct l2cap_chan *chan)
+-struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1468,7 +1473,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 	skb = bt_skb_send_alloc(sk, count + hlen,
+@@ -1476,6 +1481,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1490,7 +1497,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+ 	return skb;
+ }
+ 
+-struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1506,6 +1515,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1519,7 +1530,10 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+ 	return skb;
+ }
+ 
+-struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
++static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
++						struct msghdr *msg, size_t len,
++						u32 priority, u16 control,
++						u16 sdulen)
+ {
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1527,7 +1541,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+ 	int err, count, hlen = L2CAP_HDR_SIZE + 2;
+ 	struct l2cap_hdr *lh;
+ 
+-	BT_DBG("sk %p len %d", sk, (int)len);
++	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+ 
+ 	if (!conn)
+ 		return ERR_PTR(-ENOTCONN);
+@@ -1544,6 +1558,8 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+ 	if (!skb)
+ 		return ERR_PTR(err);
+ 
++	skb->priority = priority;
++
+ 	/* Create L2CAP header */
+ 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+ 	lh->cid = cpu_to_le16(chan->dcid);
+@@ -1574,7 +1590,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 
+ 	skb_queue_head_init(&sar_queue);
+ 	control = L2CAP_SDU_START;
+-	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
++	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps,
++						HCI_PRIO_MAX, control, len);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+@@ -1593,7 +1610,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 			buflen = len;
+ 		}
+ 
+-		skb = l2cap_create_iframe_pdu(chan, msg, buflen, control, 0);
++		skb = l2cap_create_iframe_pdu(chan, msg, buflen, HCI_PRIO_MAX,
++								control, 0);
+ 		if (IS_ERR(skb)) {
+ 			skb_queue_purge(&sar_queue);
+ 			return PTR_ERR(skb);
+@@ -1610,7 +1628,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+ 	return size;
+ }
+ 
+-int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
++int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
++								u32 priority)
+ {
+ 	struct sk_buff *skb;
+ 	u16 control;
+@@ -1618,7 +1637,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 
+ 	/* Connectionless channel */
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
+-		skb = l2cap_create_connless_pdu(chan, msg, len);
++		skb = l2cap_create_connless_pdu(chan, msg, len, priority);
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
+@@ -1633,7 +1652,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 			return -EMSGSIZE;
+ 
+ 		/* Create a basic PDU */
+-		skb = l2cap_create_basic_pdu(chan, msg, len);
++		skb = l2cap_create_basic_pdu(chan, msg, len, priority);
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
+@@ -1646,8 +1665,8 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 		/* Entire SDU fits into one PDU */
+ 		if (len <= chan->remote_mps) {
+ 			control = L2CAP_SDU_UNSEGMENTED;
+-			skb = l2cap_create_iframe_pdu(chan, msg, len, control,
+-									0);
++			skb = l2cap_create_iframe_pdu(chan, msg, len, priority,
++								control, 0);
+ 			if (IS_ERR(skb))
+ 				return PTR_ERR(skb);
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5c36b3e..abe302b 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -706,7 +706,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
+ 		return -ENOTCONN;
+ 	}
+ 
+-	err = l2cap_chan_send(chan, msg, len);
++	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+ 
+ 	release_sock(sk);
+ 	return err;
 -- 
 1.7.6
 
