@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 18 Aug 2011 16:13:57 +0200
 From: Antonio Ospite <ospite@studenti.unina.it>
 To: Alan Ott <alan@signal11.us>
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	linux-bluetooth@vger.kernel.org,
+Cc: linux-bluetooth@vger.kernel.org,
 	Bastien Nocera <hadess@hadess.net>,
 	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
 	Ranulf Doswell <ralf@ranulf.net>,
@@ -13,222 +13,163 @@ Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	Mikko Virkkila <virkkila@kapsi.fi>,
 	Simon Wood <simon@mungewell.org>,
 	Arc Riley <arcriley@gmail.com>
-Subject: [PATCH 0/4 incremental 1/2] Generalize controller handling to support different devices
-Date: Thu, 18 Aug 2011 16:22:19 +0200
-Message-Id: <1313677340-4441-1-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
-References: <20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
+Subject: Re: [PATCH BlueZ 2/4] Add sixaxis plugin: USB pairing and LEDs
+ settings
+Message-Id: <20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
+In-Reply-To: <4E41EBE5.7040908@signal11.us>
+References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
+	<1312553358-26280-3-git-send-email-ospite@studenti.unina.it>
+	<4E41EBE5.7040908@signal11.us>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4"
 Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove hardcoded #defines and put the values in a struct so we can handle 
-different device types.
+--Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->From the USB dumps I've seen[1], different devices have just different ways to 
-get and set the bdaddrs, the pairing algorithm is the same.
+On Tue, 09 Aug 2011 22:24:37 -0400
+Alan Ott <alan@signal11.us> wrote:
 
-[1] http://ps3.jim.sh/sixaxis/dumps/ 
+[...]
+> > +	ret =3D create_sixaxis_association(adapter,
+> > +					SIXAXIS_NAME,
+> > +					device_bdaddr,
+> > +					VENDOR, PRODUCT, SIXAXIS_PNP_RECORD);
+>=20
+> You create the association with a hard-coded VID/PID. You match the
+> device on string name below (not VID/PID), so what if you used the
+> actual VID/PID of the device for the association instead?
+>
 
----
- plugins/sixaxis.c |   80 ++++++++++++++++++++++++++++++++++------------------
- 1 files changed, 52 insertions(+), 28 deletions(-)
+Or use statically defined VID/PID to match the device, see below.
 
-diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index e08222c..608474f 100644
---- a/plugins/sixaxis.c
-+++ b/plugins/sixaxis.c
-@@ -70,12 +70,38 @@
- 
- #define BDADDR_STR_SIZE 18 /* strlen("00:00:00:00:00:00") + 1 */
- 
--/* Vendor and product ID for the Sixaxis PS3 controller */
--#define VENDOR 0x054c
--#define PRODUCT 0x0268
--#define SIXAXIS_NAME "PLAYSTATION(R)3 Controller"
--#define SIXAXIS_PNP_RECORD "3601920900000A000100000900013503191124090004350D35061901000900113503190011090006350909656E09006A0901000900093508350619112409010009000D350F350D350619010009001335031900110901002513576972656C65737320436F6E74726F6C6C65720901012513576972656C65737320436F6E74726F6C6C6572090102251B536F6E7920436F6D707574657220456E7465727461696E6D656E740902000901000902010901000902020800090203082109020428010902052801090206359A35980822259405010904A101A102850175089501150026FF00810375019513150025013500450105091901291381027501950D0600FF8103150026FF0005010901A10075089504350046FF0009300931093209358102C0050175089527090181027508953009019102750895300901B102C0A1028502750895300901B102C0A10285EE750895300901B102C0A10285EF750895300901B102C0C0090207350835060904090901000902082800090209280109020A280109020B09010009020C093E8009020D280009020E2800"
--#define HID_UUID "00001124-0000-1000-8000-00805f9b34fb"
-+struct sony_controller {
-+	uint16_t vendor_id;
-+	uint16_t product_id;
-+	char *name;
-+	char *pnp_record;
-+	char *hid_uuid;
-+
-+	/* device specific callbacks to get master/device bdaddr and set
-+	 * master bdaddr
-+	 */
-+	char * (*get_device_bdaddr)(int);
-+	char * (*get_master_bdaddr)(int);
-+	int (*set_master_bdaddr) (int, char *);
-+};
-+
-+static char *sixaxis_get_device_bdaddr(int fd);
-+static char *sixaxis_get_master_bdaddr(int fd);
-+static int sixaxis_set_master_bdaddr(int fd, char *adapter_bdaddr);
-+
-+static struct sony_controller controllers[] = {
-+	{
-+		.vendor_id = 0x054c,
-+		.product_id = 0x0268,
-+		.name = "PLAYSTATION(R)3 Controller",
-+		.pnp_record = "3601920900000A000100000900013503191124090004350D35061901000900113503190011090006350909656E09006A0901000900093508350619112409010009000D350F350D350619010009001335031900110901002513576972656C65737320436F6E74726F6C6C65720901012513576972656C65737320436F6E74726F6C6C6572090102251B536F6E7920436F6D707574657220456E7465727461696E6D656E740902000901000902010901000902020800090203082109020428010902052801090206359A35980822259405010904A101A102850175089501150026FF00810375019513150025013500450105091901291381027501950D0600FF8103150026FF0005010901A10075089504350046FF0009300931093209358102C0050175089527090181027508953009019102750895300901B102C0A1028502750895300901B102C0A10285EE750895300901B102C0A10285EF750895300901B102C0C0090207350835060904090901000902082800090209280109020A280109020B09010009020C093E8009020D280009020E2800",
-+		.hid_uuid = "00001124-0000-1000-8000-00805f9b34fb",
-+		.get_device_bdaddr = sixaxis_get_device_bdaddr,
-+		.get_master_bdaddr = sixaxis_get_master_bdaddr,
-+		.set_master_bdaddr = sixaxis_set_master_bdaddr,
-+	},
-+};
-+
- 
- #define LED_1 (0x01 << 1)
- #define LED_2 (0x01 << 2)
-@@ -90,12 +116,9 @@ static struct udev_monitor *monitor;
- static guint watch_id;
- 
- 
--static int create_sixaxis_association(struct btd_adapter *adapter,
--					const char *name,
-+static int create_controller_association(struct btd_adapter *adapter,
- 					const char *address,
--					guint32 vendor_id,
--					guint32 product_id,
--					const char *pnp_record)
-+					struct sony_controller *controller)
- {
- 	DBusConnection *conn;
- 	sdp_record_t *rec;
-@@ -108,15 +131,16 @@ static int create_sixaxis_association(struct btd_adapter *adapter,
- 	adapter_get_address(adapter, &src);
- 	ba2str(&src, srcaddr);
- 
--	write_device_name(&dst, &src, (char *) name);
-+	write_device_name(&dst, &src, controller->name);
- 
- 	/* Store the device's SDP record */
--	rec = record_from_string(pnp_record);
-+	rec = record_from_string(controller->pnp_record);
- 	store_record(srcaddr, address, rec);
- 	sdp_record_free(rec);
- 
- 	/* Set the device id */
--	store_device_id(srcaddr, address, 0xffff, vendor_id, product_id, 0);
-+	store_device_id(srcaddr, address, 0xffff, controller->vendor_id,
-+			controller->product_id, 0);
- 	/* Don't write a profile here,
- 	 * it will be updated when the device connects */
- 
-@@ -137,8 +161,8 @@ static int create_sixaxis_association(struct btd_adapter *adapter,
- 	}
- 
- 	device_set_temporary(device, FALSE);
--	device_set_name(device, name);
--	btd_device_add_uuid(device, HID_UUID);
-+	device_set_name(device, controller->name);
-+	btd_device_add_uuid(device, controller->hid_uuid);
- 
- fail_device:
- 	dbus_connection_unref(conn);
-@@ -184,7 +208,7 @@ static int set_feature_report(int fd, uint8_t *report, int len)
- 	return ret;
- }
- 
--static char *get_device_bdaddr(int fd)
-+static char *sixaxis_get_device_bdaddr(int fd)
- {
- 	unsigned char *buf;
- 	char *address;
-@@ -210,7 +234,7 @@ static char *get_device_bdaddr(int fd)
- 	return address;
- }
- 
--static char *get_master_bdaddr(int fd)
-+static char *sixaxis_get_master_bdaddr(int fd)
- {
- 	unsigned char *buf;
- 	char *address;
-@@ -236,7 +260,7 @@ static char *get_master_bdaddr(int fd)
- 	return address;
- }
- 
--static int set_master_bdaddr(int fd, char *adapter_bdaddr)
-+static int sixaxis_set_master_bdaddr(int fd, char *adapter_bdaddr)
- {
- 	uint8_t *report;
- 	uint8_t addr[6];
-@@ -282,7 +306,7 @@ out:
- 	return ret;
- }
- 
--static int sixpair(int fd, struct btd_adapter *adapter)
-+static int controller_pair(int fd, struct btd_adapter *adapter, struct sony_controller *controller)
- {
- 	char *device_bdaddr;
- 	char *master_bdaddr;
-@@ -294,7 +318,7 @@ static int sixpair(int fd, struct btd_adapter *adapter)
- 	ba2str(&dst, adapter_bdaddr);
- 	DBG("Adapter bdaddr %s", adapter_bdaddr);
- 
--	master_bdaddr = get_master_bdaddr(fd);
-+	master_bdaddr = controller->get_master_bdaddr(fd);
- 	if (master_bdaddr == NULL) {
- 		DBG("Failed to get the Old master Bluetooth address from the device");
- 		return -EPERM;
-@@ -305,7 +329,7 @@ static int sixpair(int fd, struct btd_adapter *adapter)
- 	 */
- 	if (g_strcmp0(master_bdaddr, adapter_bdaddr) != 0) {
- 		DBG("Old master Bluetooth address was: %s", master_bdaddr);
--		ret = set_master_bdaddr(fd, adapter_bdaddr);
-+		ret = controller->set_master_bdaddr(fd, adapter_bdaddr);
- 		if (ret < 0) {
- 			DBG("Failed to set the master Bluetooth address");
- 			free(master_bdaddr);
-@@ -313,7 +337,7 @@ static int sixpair(int fd, struct btd_adapter *adapter)
- 		}
- 	}
- 
--	device_bdaddr = get_device_bdaddr(fd);
-+	device_bdaddr = controller->get_device_bdaddr(fd);
- 	if (device_bdaddr == NULL) {
- 		DBG("Failed to get the Bluetooth address from the device");
- 		free(master_bdaddr);
-@@ -322,10 +346,7 @@ static int sixpair(int fd, struct btd_adapter *adapter)
- 
- 	DBG("Device bdaddr %s", device_bdaddr);
- 
--	ret = create_sixaxis_association(adapter,
--					SIXAXIS_NAME,
--					device_bdaddr,
--					VENDOR, PRODUCT, SIXAXIS_PNP_RECORD);
-+	ret = create_controller_association(adapter, device_bdaddr, controller);
- 	free(device_bdaddr);
- 	free(master_bdaddr);
- 	return ret;
-@@ -424,6 +445,7 @@ static void handle_device_plug(struct udev_device *udevice)
- 	unsigned char is_usb = FALSE;
- 	int js_num = 0;
- 	int fd;
-+	struct sony_controller *controller;
- 
- 	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
- 								"hid", NULL);
-@@ -439,6 +461,8 @@ static void handle_device_plug(struct udev_device *udevice)
- 	if (!is_sixaxis(hid_name))
- 		return;
- 
-+	controller = &controllers[0];
-+
- 	DBG("Found a Sixaxis device");
- 
- 	hidraw_node = udev_device_get_devnode(udevice);
-@@ -507,7 +531,7 @@ static void handle_device_plug(struct udev_device *udevice)
- 			DBG("No adapters, exiting");
- 			return;
- 		}
--		sixpair(fd, adapter);
-+		controller_pair(fd, adapter, controller);
- 	}
- 
- 	if (js_num > 0) {
--- 
-1.7.5.4
+[...]
+> > +	/*
+> > +	 * the total time the led is active (0xff means forever)
+> > +	 * |     duty_length: how long a cycle is in deciseconds:
+> > +	 * |     |                              (0 means "blink very fast")
+> > +	 * |     |     ??? (Maybe a phase shift or duty_length multiplier?)
+> > +	 * |     |     |     % of duty_length led is off (0xff means 100%)
+> > +	 * |     |     |     |     % of duty_length led is on (0xff is 100%)
+> > +	 * |     |     |     |     |
+> > +	 * 0xff, 0x27, 0x10, 0x00, 0x32,
+> > +	 */
+> > +	unsigned char leds_report[] =3D {
+> > +		0x01,
+> > +		0x00, 0x00, 0x00, 0x00, 0x00, /* rumble values TBD */
+> > +		0x00, 0x00, 0x00, 0x00, 0x1e, /* LED_1=3D0x02, LED_2=3D0x04 ... */
+> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_4 */
+> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_3 */
+> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_2 */
+> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
+> > +		0x00, 0x00, 0x00, 0x00, 0x00,
+> > +	};
+> > =20
+> > +	int leds =3D 0;
+> > +	if (leds_status[0])
+> > +		leds |=3D LED_1;
+> > +	if (leds_status[1])
+> > +		leds |=3D LED_2;
+> > +	if (leds_status[2])
+> > +		leds |=3D LED_3;
+> > +	if (leds_status[3])
+> > +		leds |=3D LED_4;
+> > +
+> > +	leds_report[10] =3D leds;
+>=20
+> If you are overwriting leds_report[10] unconditionally, why is it
+> initialized to 0x1e in the leds_report initializer (unless I counted wron=
+g)?
+>
 
+You are right having it initialized to 0x1e is not necessary at all,
+but I'd still keep it to 0x1e in the initializer because this is the
+"hardware default", meaning "all leds blinking", I see it as a form of
+documentation-inside-code, but if it is confusing I will avoid that.=20
+
+[...]
+> > +
+> > +static inline gboolean is_sixaxis(const char *hid_name)
+> > +{
+> > +	return g_str_has_suffix(hid_name, "PLAYSTATION(R)3 Controller") ||
+> > +		g_str_has_suffix(hid_name,
+> > +			"Sony Computer Entertainment Wireless Controller");
+> > +}
+>=20
+> Why do you key on the string name here. This seems problematic,
+> especially if you want to support things like the PSMove. I'd expect a
+> table of VID/PIDs or something.
+>
+
+Right, I like this suggestion, I generalized the code a little bit to
+handle different devices, see the two follow-up incremental patches, in
+the first one I remove static #defines in favor of a structure
+representing a device type, in the second one I match devices using
+VID/PID from a table of device types.
+
+If the idea looks OK I'll fold those patches in v5, along with the
+plugin renaming to "sony-controller", and maybe I'll split the plugin in
+several modules too:
+  sony-controller.c 	/* udev and bluez stuff */
+  sony-controller-hid.c	/* hidraw and device specific stuff */
+  sony-controlled-hid.h
+
+[...]
+> > +
+> > +static gboolean device_event_idle(struct udev_device *udevice)
+> > +{
+> > +	handle_device_plug(udevice);
+> > +	udev_device_unref(udevice);
+> > +	return FALSE;
+> > +}
+>=20
+> I'm a little confused why this is called "idle."
+>
+
+I don't know either, maybe trying to communicate that it is called
+asynchronously by glib (via g_timeout_add_seconds())? But even if so
+this is not a property of the function itself, so I think we can just
+call it device_event().
+
+Ah Bastien, I noticed we are using g_timeout_add_seconds() with the
+callback always returning FALSE, so the latter is called only once,
+can't we in this case just sleep and then call the function directly?
+Isn't the main loop in sixaxis_init() enough to handle multiple
+overlapping udev events? Maybe I asked that already... :P
+
+> Thanks for your work on this, Antonio. Linux working out of the box with
+> these controllers will be really cool.
+>=20
+> Alan.
+>
+
+Regards,
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5NHiUACgkQ5xr2akVTsAG/lgCfVbbRpr/3iguu1twdGTyMj0K9
+bEwAnRc/F/z9IPYJBhLCv451fFxL0Eog
+=UIeO
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4--
