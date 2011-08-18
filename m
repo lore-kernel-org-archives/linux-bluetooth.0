@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/7] Bluetooth: EFS: add disable_flowspec kernel param
-Date: Thu, 18 Aug 2011 10:44:58 +0300
-Message-Id: <1313653502-6303-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 7/7] Bluetooth: EFS: parse l2cap config rsp pending
+Date: Thu, 18 Aug 2011 10:45:02 +0300
+Message-Id: <1313653502-6303-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make extended flowspec option kernel parameter. Disabled by default.
+Add parsing for L2CAP pending response for EFS. Currently
+respond with success when we receive both configuration responses
+pending.
 ---
- net/bluetooth/l2cap_core.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |   32 ++++++++++++++++++++++++++++++++
+ 1 files changed, 32 insertions(+), 0 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index be30c32..4167cb0 100644
+index f3663ac..de9995d 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -57,6 +57,7 @@
- #include <net/bluetooth/smp.h>
+@@ -2765,6 +2765,15 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 		chan->num_conf_req++;
+ 	}
  
- int disable_ertm;
-+int disable_flowspec = 1;
- 
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { 0x02, };
-@@ -2775,6 +2776,9 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 		if (!disable_ertm)
- 			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
- 							 | L2CAP_FEAT_FCS;
-+		if (!disable_flowspec)
-+			feat_mask |= L2CAP_FEAT_EXT_FLOW;
++	if (test_bit(CONF_REMOTE_PEND, &chan->conf_state)) {
++		/* check compatibility */
++		clear_bit(CONF_LOCAL_PEND, &chan->conf_state);
++		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
++		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
++				l2cap_build_conf_rsp(chan, rsp,
++					L2CAP_CONF_SUCCESS, 0x0000), rsp);
++	}
 +
- 		put_unaligned_le32(feat_mask, rsp->data);
- 		l2cap_send_cmd(conn, cmd->ident,
- 					L2CAP_INFO_RSP, sizeof(buf), buf);
-@@ -4296,3 +4300,6 @@ void l2cap_exit(void)
+ unlock:
+ 	bh_unlock_sock(sk);
+ 	return 0;
+@@ -2794,8 +2803,31 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
+ 	switch (result) {
+ 	case L2CAP_CONF_SUCCESS:
+ 		l2cap_conf_rfc_get(chan, rsp->data, len);
++		clear_bit(CONF_REMOTE_PEND, &chan->conf_state);
+ 		break;
  
- module_param(disable_ertm, bool, 0644);
- MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
++	case L2CAP_CONF_PENDING:
++		set_bit(CONF_REMOTE_PEND, &chan->conf_state);
 +
-+module_param(disable_flowspec, bool, 0644);
-+MODULE_PARM_DESC(disable_flowspec, "Disable Extended Flow Specification");
++		if (test_bit(CONF_LOCAL_PEND, &chan->conf_state)) {
++			char buf[64];
++
++			len = l2cap_parse_conf_rsp(chan, rsp->data, len,
++					buf, &result);
++			if (len < 0) {
++				l2cap_send_disconn_req(conn, chan, ECONNRESET);
++				goto done;
++			}
++
++			/* check compatibility */
++			clear_bit(CONF_LOCAL_PEND, &chan->conf_state);
++			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
++			l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
++					l2cap_build_conf_rsp(chan, buf,
++						L2CAP_CONF_SUCCESS, 0x0000), buf);
++		}
++		goto done;
++
+ 	case L2CAP_CONF_UNACCEPT:
+ 		if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
+ 			char req[64];
 -- 
 1.7.4.1
 
