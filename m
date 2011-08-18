@@ -1,67 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH BlueZ 3/4] Link to udev only when needed
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
-	Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
-	Mikko Virkkila <virkkila@kapsi.fi>,
-	Simon Wood <simon@mungewell.org>,
-	Arc Riley <arcriley@gmail.com>
-Date: Thu, 18 Aug 2011 16:18:57 -0700
-In-Reply-To: <20110818124438.40e3e125c8de872e1320f511@studenti.unina.it>
-References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
-	 <1312553358-26280-4-git-send-email-ospite@studenti.unina.it>
-	 <20110818124438.40e3e125c8de872e1320f511@studenti.unina.it>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1313709545.3373.196.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-input-owner@vger.kernel.org
+Subject: Re: [RFC v2 1/5] Bluetooth: Only schedule LE tx links if LE-capable
+Mime-Version: 1.0 (Apple Message framework v1244.3)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <1313627847.10336.9.camel@THOR>
+Date: Thu, 18 Aug 2011 19:12:21 -0300
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <57D8EDBC-C4C6-423F-89F0-E1D1A5F6FCA8@openbossa.org>
+References: <1313627847.10336.9.camel@THOR>
+To: Peter Hurley <peter@hurleysoftware.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antonio,
+Hi Peter,
 
+On Aug 17, 2011, at 9:37 PM, Peter Hurley wrote:
+
+> Only perform tx scheduling for LE links if the host controller
+> is LE-capable.
 > 
-> > Don't link bluetoothd to udev unconditionally, but only when it is
-> > needed. For now bluetoothd needs to be linked to udev only when the
-> > sixaxis plugin is enabled.
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> ---
+> net/bluetooth/hci_core.c |    4 +++-
+> 1 files changed, 3 insertions(+), 1 deletions(-)
 > 
-> Any comment on this change? If it looks OK I'll fold it in v5.
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 815269b..47a31fa 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1995,7 +1995,9 @@ static void hci_tx_task(unsigned long arg)
 > 
-> Thanks,
->    Antonio
+> 	hci_sched_esco(hdev);
 > 
-> > ---
-> >  Makefile.am |    6 +++++-
-> >  1 files changed, 5 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/Makefile.am b/Makefile.am
-> > index dbe0170..219ca0f 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -288,7 +288,11 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
-> >  			src/event.h src/event.c \
-> >  			src/oob.h src/oob.c src/eir.h src/eir.c
-> >  src_bluetoothd_LDADD = lib/libbluetooth.la @GLIB_LIBS@ @DBUS_LIBS@ \
-> > -							@CAPNG_LIBS@ @UDEV_LIBS@ -ldl -lrt
-> > +							@CAPNG_LIBS@ -ldl -lrt
-> > +if SIXAXISPLUGIN
-> > +src_bluetoothd_LDADD += @UDEV_LIBS@
-> > +endif
-> > +
-> >  src_bluetoothd_LDFLAGS = -Wl,--export-dynamic \
-> >  				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
-
-I rather have the Sixaxis plugin being an external plugin only then. So
-you are not allowed to make this builtin.
-
-Regards
-
-Marcel
+> -	hci_sched_le(hdev);
+> +	/* Only schedule le links if device is le-capable */
+> +	if (lmp_le_capable(hdev))
+> +		hci_sched_le(hdev);
 
 
+You may use lmp_host_le_capable macro here since it tells you if
+the _host_ supports LE (lmp_le_capable macro tells you if the
+_controller_ supports LE).
+
+BR,
+Andre
