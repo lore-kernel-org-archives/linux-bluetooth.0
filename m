@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1313502238-7581-4-git-send-email-prasadbhat22@gmail.com>
+In-Reply-To: <1313502238-7581-3-git-send-email-prasadbhat22@gmail.com>
 References: <1313502238-7581-1-git-send-email-prasadbhat22@gmail.com>
-	<1313502238-7581-4-git-send-email-prasadbhat22@gmail.com>
-Date: Thu, 18 Aug 2011 10:20:35 +0300
-Message-ID: <CABBYNZJ84=wcfnmY0QGtf4Zm8JCGqL4bAgARQiGMZHa19KFcOw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/6] The changes in media.c required for VDP.
+	<1313502238-7581-3-git-send-email-prasadbhat22@gmail.com>
+Date: Thu, 18 Aug 2011 10:17:27 +0300
+Message-ID: <CABBYNZKLThyYMOPeQYD+a-dsPCyW=0T-tKG-YU6fSaM5-r_g=A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/6] Initial video-source implementation for VDP
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Prasad Bhat <prasadbhat22@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,203 +17,656 @@ Hi,
 
 On Tue, Aug 16, 2011 at 4:43 PM, Prasad Bhat <prasadbhat22@gmail.com> wrote:
 > ---
->  audio/media.c |  142 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 141 insertions(+), 1 deletions(-)
+>  Makefile.am          |    1 +
+>  audio/video-source.c |  570 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  audio/video-source.h |   45 ++++
+>  3 files changed, 616 insertions(+), 0 deletions(-)
+>  create mode 100644 audio/video-source.c
+>  create mode 100644 audio/video-source.h
 >
-> diff --git a/audio/media.c b/audio/media.c
-> index 42d8637..0aff0d4 100644
-> --- a/audio/media.c
-> +++ b/audio/media.c
-> @@ -42,6 +42,7 @@
->  #include "media.h"
->  #include "transport.h"
->  #include "a2dp.h"
+> diff --git a/Makefile.am b/Makefile.am
+> index 87b32a4..5498543 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -143,6 +143,7 @@ builtin_sources += audio/main.c \
+>                        audio/a2dp.h audio/a2dp.c \
+>                        audio/vdp.h audio/vdp.c \
+>                        audio/video-sink.h audio/video-sink.c \
+> +                       audio/video-source.h audio/video-source.c \
+>                        audio/avdtp.h audio/avdtp.c \
+>                        audio/ipc.h audio/ipc.c \
+>                        audio/unix.h audio/unix.c \
+> diff --git a/audio/video-source.c b/audio/video-source.c
+> new file mode 100644
+> index 0000000..aa71de7
+> --- /dev/null
+> +++ b/audio/video-source.c
+> @@ -0,0 +1,570 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2006-2010  Nokia Corporation
+> + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *  Copyright (C) 2009  Joao Paulo Rechi Vita
+> + *  Copyright (C) 2011 Prasad Bhat <prasadbhat22@gmail.com>
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdint.h>
+> +#include <errno.h>
+> +
+> +#include <bluetooth/bluetooth.h>
+> +#include <bluetooth/sdp.h>
+> +
+> +#include <glib.h>
+> +#include <dbus/dbus.h>
+> +#include <gdbus.h>
+> +
+> +#include "log.h"
+> +
+> +#include "device.h"
+> +#include "avdtp.h"
+> +#include "media.h"
 > +#include "vdp.h"
->  #include "headset.h"
->  #include "manager.h"
->
-> @@ -71,6 +72,7 @@ struct endpoint_request {
->
->  struct media_endpoint {
->        struct a2dp_sep         *sep;
-> +       struct vdp_sep          *vdp_sep;
->        char                    *sender;        /* Endpoint DBus bus id */
->        char                    *path;          /* Endpoint object path */
->        char                    *uuid;          /* Endpoint property UUID */
-> @@ -141,6 +143,10 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
->                return;
->        }
->
-> +       if (endpoint->vdp_sep) {
-> +               vdp_remove_sep(endpoint->vdp_sep);
+> +#include "error.h"
+> +#include "video-source.h"
+> +#include "dbus-common.h"
+> +#include "../src/adapter.h"
+> +#include "../src/device.h"
+> +
+> +#define STREAM_SETUP_RETRY_TIMER 2
+> +
+> +struct pending_request {
+> +       DBusConnection *conn;
+> +       DBusMessage *msg;
+> +       unsigned int id;
+> +};
+> +
+> +struct video_source {
+> +       struct audio_device *dev;
+> +       struct avdtp *session;
+> +       struct avdtp_stream *stream;
+> +       unsigned int cb_id;
+> +       guint retry_id;
+> +       avdtp_session_state_t session_state;
+> +       avdtp_state_t stream_state;
+> +       video_source_state_t state;
+> +       struct pending_request *connect;
+> +       struct pending_request *disconnect;
+> +       DBusConnection *conn;
+> +};
+> +
+> +struct video_source_state_callback {
+> +       video_source_state_cb cb;
+> +       void *user_data;
+> +       unsigned int id;
+> +};
+> +
+> +static GSList *source_callbacks = NULL;
+> +
+> +static unsigned int avdtp_callback_id = 0;
+> +
+> +static const char *state2str(video_source_state_t state)
+> +{
+> +       switch (state) {
+> +       case VIDEO_SOURCE_STATE_DISCONNECTED:
+> +               return "disconnected";
+> +       case VIDEO_SOURCE_STATE_CONNECTING:
+> +               return "connecting";
+> +       case VIDEO_SOURCE_STATE_CONNECTED:
+> +               return "connected";
+> +       case VIDEO_SOURCE_STATE_PLAYING:
+> +               return "playing";
+> +       default:
+> +               error("Invalid source state %d", state);
+> +               return NULL;
+> +       }
+> +}
+> +
+> +static void source_set_state(struct audio_device *dev, video_source_state_t new_state)
+> +{
+> +       struct video_source *source = dev->video_source;
+> +       const char *state_str;
+> +       video_source_state_t old_state = source->state;
+> +       GSList *l;
+> +
+> +       source->state = new_state;
+> +
+> +       state_str = state2str(new_state);
+> +       if (state_str)
+> +               emit_property_changed(dev->conn, dev->path,
+> +                                       VIDEO_SOURCE_INTERFACE, "State",
+> +                                       DBUS_TYPE_STRING, &state_str);
+> +
+> +       for (l = source_callbacks; l != NULL; l = l->next) {
+> +               struct video_source_state_callback *cb = l->data;
+> +               cb->cb(dev, old_state, new_state, cb->user_data);
+> +       }
+> +}
+> +
+> +static void avdtp_state_callback(struct audio_device *dev,
+> +                                       struct avdtp *session,
+> +                                       avdtp_session_state_t old_state,
+> +                                       avdtp_session_state_t new_state,
+> +                                       void *user_data)
+> +{
+> +       struct video_source *source = dev->video_source;
+> +
+> +       if (source == NULL)
+> +               return;
+> +
+> +       switch (new_state) {
+> +       case AVDTP_SESSION_STATE_DISCONNECTED:
+> +               source_set_state(dev, VIDEO_SOURCE_STATE_DISCONNECTED);
+> +               break;
+> +       case AVDTP_SESSION_STATE_CONNECTING:
+> +               source_set_state(dev, VIDEO_SOURCE_STATE_CONNECTING);
+> +               break;
+> +       case AVDTP_SESSION_STATE_CONNECTED:
+> +               break;
+> +       }
+> +
+> +       source->session_state = new_state;
+> +}
+> +
+> +static void pending_request_free(struct audio_device *dev,
+> +                                       struct pending_request *pending)
+> +{
+> +       if (pending->conn)
+> +               dbus_connection_unref(pending->conn);
+> +       if (pending->msg)
+> +               dbus_message_unref(pending->msg);
+> +       if (pending->id)
+> +               vdp_cancel(dev, pending->id);
+> +
+> +       g_free(pending);
+> +}
+> +
+> +static void stream_state_changed(struct avdtp_stream *stream,
+> +                                       avdtp_state_t old_state,
+> +                                       avdtp_state_t new_state,
+> +                                       struct avdtp_error *err,
+> +                                       void *user_data)
+> +{
+> +       struct audio_device *dev = user_data;
+> +       struct video_source *source = dev->video_source;
+> +
+> +       if (err)
+> +               return;
+> +
+> +       switch (new_state) {
+> +       case AVDTP_STATE_IDLE:
+> +               if (source->disconnect) {
+> +                       DBusMessage *reply;
+> +                       struct pending_request *p;
+> +
+> +                       p = source->disconnect;
+> +                       source->disconnect = NULL;
+> +
+> +                       reply = dbus_message_new_method_return(p->msg);
+> +                       g_dbus_send_message(p->conn, reply);
+> +                       pending_request_free(dev, p);
+> +               }
+> +
+> +               if (source->session) {
+> +                       avdtp_unref(source->session);
+> +                       source->session = NULL;
+> +               }
+> +               source->stream = NULL;
+> +               source->cb_id = 0;
+> +               break;
+> +       case AVDTP_STATE_OPEN:
+> +               source_set_state(dev, VIDEO_SOURCE_STATE_CONNECTED);
+> +               break;
+> +       case AVDTP_STATE_STREAMING:
+> +               source_set_state(dev, VIDEO_SOURCE_STATE_PLAYING);
+> +               break;
+> +       case AVDTP_STATE_CONFIGURED:
+> +       case AVDTP_STATE_CLOSING:
+> +       case AVDTP_STATE_ABORTING:
+> +       default:
+> +               break;
+> +       }
+> +
+> +       source->stream_state = new_state;
+> +}
+> +
+> +static void error_failed(DBusConnection *conn, DBusMessage *msg,
+> +                                                       const char *desc)
+> +{
+> +       DBusMessage *reply = btd_error_failed(msg, desc);
+> +       g_dbus_send_message(conn, reply);
+> +}
+> +
+> +static gboolean stream_setup_retry(gpointer user_data)
+> +{
+> +       struct video_source *source = user_data;
+> +       struct pending_request *pending = source->connect;
+> +
+> +       source->retry_id = 0;
+> +
+> +       if (source->stream_state >= AVDTP_STATE_OPEN) {
+> +               DBG("Stream successfully created, after XCASE connect:connect");
+> +               if (pending->msg) {
+> +                       DBusMessage *reply;
+> +                       reply = dbus_message_new_method_return(pending->msg);
+> +                       g_dbus_send_message(pending->conn, reply);
+> +               }
+> +       } else {
+> +               DBG("Stream setup failed, after XCASE connect:connect");
+> +               if (pending->msg)
+> +                       error_failed(pending->conn, pending->msg, "Stream setup failed");
+> +       }
+> +
+> +       source->connect = NULL;
+> +       pending_request_free(source->dev, pending);
+> +
+> +       return FALSE;
+> +}
+> +
+> +static void stream_setup_complete(struct avdtp *session, struct vdp_sep *sep,
+> +                                       struct avdtp_stream *stream,
+> +                                       struct avdtp_error *err, void *user_data)
+> +{
+> +       struct video_source *source = user_data;
+> +       struct pending_request *pending;
+> +
+> +       pending = source->connect;
+> +
+> +       pending->id = 0;
+> +
+> +       if (stream) {
+> +               DBG("Stream successfully created");
+> +
+> +               if (pending->msg) {
+> +                       DBusMessage *reply;
+> +                       reply = dbus_message_new_method_return(pending->msg);
+> +                       g_dbus_send_message(pending->conn, reply);
+> +               }
+> +
+> +               source->connect = NULL;
+> +               pending_request_free(source->dev, pending);
+> +
 > +               return;
 > +       }
->        info("Endpoint unregistered: sender=%s path=%s", endpoint->sender,
->                        endpoint->path);
->
-> @@ -539,6 +545,113 @@ static struct a2dp_endpoint a2dp_endpoint = {
->        .set_delay = set_delay
->  };
->
-> +static const char *vdp_get_name(struct vdp_sep *sep, void *user_data)
-> +{
-> +       struct media_endpoint *endpoint = user_data;
 > +
-> +       return endpoint->sender;
+> +       avdtp_unref(source->session);
+> +       source->session = NULL;
+> +       if (avdtp_error_category(err) == AVDTP_ERRNO
+> +                       && avdtp_error_posix_errno(err) != EHOSTDOWN) {
+> +               DBG("connect:connect XCASE detected");
+> +               source->retry_id = g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
+> +                                                       stream_setup_retry,
+> +                                                       source);
+> +       } else {
+> +               if (pending->msg)
+> +                       error_failed(pending->conn, pending->msg, "Stream setup failed");
+> +               source->connect = NULL;
+> +               pending_request_free(source->dev, pending);
+> +               DBG("Stream setup failed : %s", avdtp_strerror(err));
+> +       }
 > +}
 > +
-> +static size_t vdp_get_capabilities(struct vdp_sep *sep, uint8_t **capabilities,
-> +                                                       void *user_data)
+> +static void select_complete(struct avdtp *session, struct vdp_sep *sep,
+> +                       GSList *caps, void *user_data)
 > +{
-> +       struct media_endpoint *endpoint = user_data;
+> +       struct video_source *source = user_data;
+> +       struct pending_request *pending;
+> +       int id;
 > +
-> +       *capabilities = endpoint->capabilities;
-> +       return endpoint->size;
+> +       pending = source->connect;
+> +
+> +       pending->id = 0;
+> +
+> +       if (caps == NULL)
+> +               goto failed;
+> +
+> +       id = vdp_config(session, sep, stream_setup_complete, caps, source);
+> +       if (id == 0)
+> +               goto failed;
+> +
+> +       pending->id = id;
+> +       return;
+> +
+> +failed:
+> +       if (pending->msg)
+> +               error_failed(pending->conn, pending->msg, "Stream setup failed");
+> +       pending_request_free(source->dev, pending);
+> +       source->connect = NULL;
+> +       avdtp_unref(source->session);
+> +       source->session = NULL;
 > +}
 > +
-> +struct vdp_config_data {
-> +       guint setup_id;
-> +       vdp_endpoint_config_t cb;
-> +};
-> +
-> +struct vdp_select_data {
-> +       guint setup_id;
-> +       vdp_endpoint_select_t cb;
-> +};
-> +
-> +static void vdp_select_cb(struct media_endpoint *endpoint, void *ret, int size,
-> +                                                       void *user_data)
-> +{
-> +       struct vdp_select_data *data = user_data;
-> +
-> +       data->cb(endpoint->vdp_sep, data->setup_id, ret, size);
-> +}
-> +
-> +static int vdp_select_config(struct vdp_sep *sep, uint8_t *capabilities,
-> +                               size_t length, guint setup_id,
-> +                               vdp_endpoint_select_t cb, void *user_data)
-> +{
-> +       struct media_endpoint *endpoint = user_data;
-> +       struct vdp_select_data *data;
-> +
-> +       data = g_new0(struct vdp_select_data, 1);
-> +       data->setup_id = setup_id;
-> +       data->cb = cb;
-> +
-> +       if (select_configuration(endpoint, capabilities, length,
-> +                                       vdp_select_cb, data, g_free) == TRUE)
-> +               return 0;
-> +
-> +       g_free(data);
-> +       return -ENOMEM;
-> +}
-> +
-> +static void vdp_config_cb(struct media_endpoint *endpoint, void *ret, int size,
-> +                                                       void *user_data)
-> +{
-> +       struct vdp_config_data *data = user_data;
-> +
-> +       data->cb(endpoint->vdp_sep, data->setup_id, ret ? TRUE : FALSE);
-> +}
-> +
-> +static int vdp_set_config(struct vdp_sep *sep, struct audio_device *dev,
-> +                               uint8_t *configuration, size_t length,
-> +                               guint setup_id, vdp_endpoint_config_t cb,
+> +static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp_error *err,
 > +                               void *user_data)
 > +{
-> +       struct media_endpoint *endpoint = user_data;
-> +       struct vdp_config_data *data;
+> +       struct video_source *source = user_data;
+> +       struct pending_request *pending;
+> +       int id;
 > +
-> +       data = g_new0(struct vdp_config_data, 1);
-> +       data->setup_id = setup_id;
-> +       data->cb = cb;
+> +       pending = source->connect;
 > +
-> +       if (set_configuration(endpoint, dev, configuration, length,
-> +                                       vdp_config_cb, data, g_free) == TRUE)
-> +               return 0;
-> +
-> +       g_free(data);
-> +       return -ENOMEM;
-> +}
-> +
-> +static void vdp_clear_config(struct vdp_sep *sep, void *user_data)
-> +{
-> +       struct media_endpoint *endpoint = user_data;
-> +
-> +       clear_configuration(endpoint);
-> +}
-> +
-> +static void vdp_set_delay(struct vdp_sep *sep, uint16_t delay, void *user_data)
-> +{
-> +       struct media_endpoint *endpoint = user_data;
-> +
-> +       if (endpoint->transport == NULL)
+> +       if (err) {
+> +               avdtp_unref(source->session);
+> +               source->session = NULL;
+> +               if (avdtp_error_category(err) == AVDTP_ERRNO
+> +                               && avdtp_error_posix_errno(err) != EHOSTDOWN) {
+> +                       DBG("connect:connect XCASE detected");
+> +                       source->retry_id =
+> +                               g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
+> +                                                       stream_setup_retry,
+> +                                                       source);
+> +               } else
+> +                       goto failed;
 > +               return;
-> +
-> +       media_transport_update_delay(endpoint->transport, delay);
-> +}
-> +
-> +static struct vdp_endpoint vdp_endpoint = {
-> +       .get_name = vdp_get_name,
-> +       .get_capabilities = vdp_get_capabilities,
-> +       .select_configuration = vdp_select_config,
-> +       .set_configuration = vdp_set_config,
-> +       .clear_configuration = vdp_clear_config,
-> +       .set_delay = vdp_set_delay
-> +};
-> +
->  static void a2dp_destroy_endpoint(void *user_data)
->  {
->        struct media_endpoint *endpoint = user_data;
-> @@ -552,6 +665,19 @@ static void a2dp_destroy_endpoint(void *user_data)
->        release_endpoint(endpoint);
->  }
->
-> +static void vdp_destroy_endpoint(void *user_data)
-> +{
-> +       struct media_endpoint *endpoint = user_data;
-> +
-> +       if (endpoint->transport) {
-> +               media_transport_destroy(endpoint->transport);
-> +               endpoint->transport = NULL;
 > +       }
 > +
-> +       endpoint->sep = NULL;
-> +       release_endpoint(endpoint);
+> +       DBG("Discovery complete");
+> +
+> +       id = vdp_select_capabilities(source->session, AVDTP_SEP_TYPE_SOURCE, NULL,
+> +                                               select_complete, source);
+> +       if (id == 0)
+> +               goto failed;
+> +
+> +       pending->id = id;
+> +       return;
+> +
+> +failed:
+> +       if (pending->msg)
+> +               error_failed(pending->conn, pending->msg, "Stream setup failed");
+> +       pending_request_free(source->dev, pending);
+> +       source->connect = NULL;
+> +       avdtp_unref(source->session);
+> +       source->session = NULL;
 > +}
 > +
->  static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
->                                                const char *sender,
->                                                const char *path,
-> @@ -592,7 +718,21 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
->                                        endpoint, a2dp_destroy_endpoint, err);
->                if (endpoint->sep == NULL)
->                        goto failed;
-> -       } else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
-> +       } else if (strcasecmp(uuid, VDP_SOURCE_UUID) == 0) {
-> +               endpoint->vdp_sep = vdp_add_sep(&adapter->src,
-> +                                       AVDTP_SEP_TYPE_SOURCE, codec,
-> +                                       delay_reporting, &vdp_endpoint,
-> +                                       endpoint, vdp_destroy_endpoint, err);
-> +               if (endpoint->vdp_sep == NULL)
-> +                       goto failed;
-> +       } else if (strcasecmp(uuid, VDP_SINK_UUID) == 0) {
-> +               endpoint->vdp_sep = vdp_add_sep(&adapter->src,
-> +                                       AVDTP_SEP_TYPE_SINK, codec,
-> +                                       delay_reporting, &vdp_endpoint,
-> +                                       endpoint, vdp_destroy_endpoint, err);
-> +               if (endpoint->vdp_sep == NULL)
-> +                       goto failed;
-> +       }else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
->                                        g_strcmp0(uuid, HSP_AG_UUID) == 0) {
->                struct audio_device *dev;
->
+> +gboolean video_source_setup_stream(struct video_source *source, struct avdtp *session)
+> +{
+> +       if (source->connect || source->disconnect)
+> +               return FALSE;
+> +
+> +       if (session && !source->session)
+> +               source->session = avdtp_ref(session);
+> +
+> +       if (!source->session)
+> +               return FALSE;
+> +
+> +       avdtp_set_auto_disconnect(source->session, FALSE);
+> +
+> +       if (avdtp_discover(source->session, discovery_complete, source) < 0)
+> +               return FALSE;
+> +
+> +       source->connect = g_new0(struct pending_request, 1);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static DBusMessage *source_connect(DBusConnection *conn,
+> +                               DBusMessage *msg, void *data)
+> +{
+> +       struct audio_device *dev = data;
+> +       struct video_source *source = dev->video_source;
+> +       struct pending_request *pending;
+> +
+> +       if (!source->session)
+> +               source->session = avdtp_get(&dev->src, &dev->dst);
+> +
+> +       if (!source->session)
+> +               return btd_error_failed(msg, "Unable to get a session");
+> +
+> +       if (source->connect || source->disconnect)
+> +               return btd_error_busy(msg);
+> +
+> +       if (source->stream_state >= AVDTP_STATE_OPEN)
+> +               return btd_error_already_connected(msg);
+> +
+> +       if (!video_source_setup_stream(source, NULL))
+> +               return btd_error_failed(msg, "Failed to create a stream");
+> +
+> +       dev->auto_connect = FALSE;
+> +
+> +       pending = source->connect;
+> +
+> +       pending->conn = dbus_connection_ref(conn);
+> +       pending->msg = dbus_message_ref(msg);
+> +
+> +       DBG("stream creation in progress");
+> +
+> +       return NULL;
+> +}
+> +
+> +static DBusMessage *source_disconnect(DBusConnection *conn,
+> +                                       DBusMessage *msg, void *data)
+> +{
+> +       struct audio_device *device = data;
+> +       struct video_source *source = device->video_source;
+> +       struct pending_request *pending;
+> +       int err;
+> +
+> +       if (!source->session)
+> +               return btd_error_not_connected(msg);
+> +
+> +       if (source->connect || source->disconnect)
+> +               return btd_error_busy(msg);
+> +
+> +       if (source->stream_state < AVDTP_STATE_OPEN) {
+> +               DBusMessage *reply = dbus_message_new_method_return(msg);
+> +               if (!reply)
+> +                       return NULL;
+> +               avdtp_unref(source->session);
+> +               source->session = NULL;
+> +               return reply;
+> +       }
+> +
+> +       err = avdtp_close(source->session, source->stream, FALSE);
+> +       if (err < 0)
+> +               return btd_error_failed(msg, strerror(-err));
+> +
+> +       pending = g_new0(struct pending_request, 1);
+> +       pending->conn = dbus_connection_ref(conn);
+> +       pending->msg = dbus_message_ref(msg);
+> +       source->disconnect = pending;
+> +
+> +       return NULL;
+> +}
+> +
+> +static DBusMessage *source_get_properties(DBusConnection *conn,
+> +                                       DBusMessage *msg, void *data)
+> +{
+> +       struct audio_device *device = data;
+> +       struct video_source *source = device->video_source;
+> +       DBusMessage *reply;
+> +       DBusMessageIter iter;
+> +       DBusMessageIter dict;
+> +       const char *state;
+> +
+> +       reply = dbus_message_new_method_return(msg);
+> +       if (!reply)
+> +               return NULL;
+> +
+> +       dbus_message_iter_init_append(reply, &iter);
+> +
+> +       dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+> +                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+> +                       DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+> +                       DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+> +
+> +       /* State */
+> +       state = state2str(source->state);
+> +       if (state)
+> +               dict_append_entry(&dict, "State", DBUS_TYPE_STRING, &state);
+> +
+> +       dbus_message_iter_close_container(&iter, &dict);
+> +
+> +       return reply;
+> +}
+> +
+> +static GDBusMethodTable source_methods[] = {
+> +       { "Connect",            "",     "",     source_connect,
+> +                                               G_DBUS_METHOD_FLAG_ASYNC },
+> +       { "Disconnect",         "",     "",     source_disconnect,
+> +                                               G_DBUS_METHOD_FLAG_ASYNC },
+> +       { "GetProperties",      "",     "a{sv}",source_get_properties },
+> +       { NULL, NULL, NULL, NULL }
+> +};
+> +
+> +
+> +static GDBusSignalTable source_signals[] = {
+> +       { "PropertyChanged",            "sv"    },
+> +       { NULL, NULL }
+> +};
+> +
+> +static void video_source_free(struct audio_device *dev)
+> +{
+> +       struct video_source *source = dev->video_source;
+> +
+> +       if (source->cb_id)
+> +               avdtp_stream_remove_cb(source->session, source->stream,
+> +                                       source->cb_id);
+> +
+> +       if (source->session)
+> +               avdtp_unref(source->session);
+> +
+> +       if (source->connect)
+> +               pending_request_free(dev, source->connect);
+> +
+> +       if (source->disconnect)
+> +               pending_request_free(dev, source->disconnect);
+> +
+> +       if (source->retry_id)
+> +               g_source_remove(source->retry_id);
+> +
+> +       g_free(source);
+> +       dev->source = NULL;
+> +}
+> +
+> +static void path_unregister(void *data)
+> +{
+> +       struct audio_device *dev = data;
+> +
+> +       DBG("Unregistered interface %s on path %s",
+> +               VIDEO_SOURCE_INTERFACE, dev->path);
+> +
+> +       video_source_free(dev);
+> +}
+> +
+> +struct video_source *video_source_register(struct audio_device *dev)
+> +{
+> +       struct video_source *source;
+> +
+> +       if (!g_dbus_register_interface(dev->conn, dev->path,
+> +                                       VIDEO_SOURCE_INTERFACE,
+> +                                       source_methods, source_signals, NULL,
+> +                                       dev, path_unregister))
+> +               return NULL;
+> +
+> +       DBG("Registered interface %s on path %s", VIDEO_SOURCE_INTERFACE,
+> +                                                               dev->path);
+> +
+> +       if (avdtp_callback_id == 0)
+> +               avdtp_callback_id = avdtp_add_state_cb(avdtp_state_callback,
+> +                                                                       NULL);
+> +
+> +       source = g_new0(struct video_source, 1);
+> +
+> +       source->dev = dev;
+> +
+> +       return source;
+> +}
+> +
+> +gboolean video_source_new_stream(struct audio_device *dev, struct avdtp *session,
+> +                               struct avdtp_stream *stream)
+> +{
+> +       struct video_source *source = dev->video_source;
+> +
+> +       if (source->stream)
+> +               return FALSE;
+> +
+> +       if (!source->session)
+> +               source->session = avdtp_ref(session);
+> +
+> +       source->stream = stream;
+> +
+> +       source->cb_id = avdtp_stream_add_cb(session, stream,
+> +                                               stream_state_changed, dev);
+> +
+> +       return TRUE;
+> +}
+> diff --git a/audio/video-source.h b/audio/video-source.h
+> new file mode 100644
+> index 0000000..97af55f
+> --- /dev/null
+> +++ b/audio/video-source.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2006-2010  Nokia Corporation
+> + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *  Copyright (C) 2011 Prasad Bhat <prasadbhat22@gmail.com>
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#define VIDEO_SOURCE_INTERFACE "org.bluez.VideoSource"
+> +
+> +typedef enum {
+> +       VIDEO_SOURCE_STATE_DISCONNECTED,
+> +       VIDEO_SOURCE_STATE_CONNECTING,
+> +       VIDEO_SOURCE_STATE_CONNECTED,
+> +       VIDEO_SOURCE_STATE_PLAYING,
+> +} video_source_state_t;
+> +
+> +typedef void (*video_source_state_cb) (struct audio_device *dev,
+> +                               video_source_state_t old_state,
+> +                               video_source_state_t new_state,
+> +                               void *user_data);
+> +struct video_source *video_source_register(struct audio_device *dev);
+> +void video_source_unregister(struct audio_device *dev);
+> +
+> +gboolean video_source_new_stream(struct audio_device *dev,
+> +                                       struct avdtp *session,
+> +                                       struct avdtp_stream *stream);
+> +gboolean video_source_setup_stream(struct video_source *source, struct avdtp *session);
 > --
 > 1.7.6
 
-This is another reason why we want a common code to handle the seps,
-so a2dp_sep and vdp_sep could be merged, in fact they represent the
-same thing an AVDTP sep.
+Ack, note that this does not contain any deprecated code.
 
 -- 
 Luiz Augusto von Dentz
