@@ -1,175 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Aug 2011 16:13:57 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Alan Ott <alan@signal11.us>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
-	Ranulf Doswell <ralf@ranulf.net>,
-	"Pascal A . Brisset" <pascal44973@pabr.org>,
-	Marcin Tolysz <tolysz@gmail.com>,
-	Christian Birchinger <joker@netswarm.net>,
-	Filipe Lopes <falktx@gmail.com>,
-	Mikko Virkkila <virkkila@kapsi.fi>,
-	Simon Wood <simon@mungewell.org>,
-	Arc Riley <arcriley@gmail.com>
-Subject: Re: [PATCH BlueZ 2/4] Add sixaxis plugin: USB pairing and LEDs
- settings
-Message-Id: <20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
-In-Reply-To: <4E41EBE5.7040908@signal11.us>
-References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
-	<1312553358-26280-3-git-send-email-ospite@studenti.unina.it>
-	<4E41EBE5.7040908@signal11.us>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4"
-Sender: linux-input-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1313669526.17513.37.camel@THOR>
+References: <1313627852.10336.10.camel@THOR>
+	<CABBYNZLRMK7ADwFQUQj6FS7RfQqDR8o-SjAJsqHUeFxXVYhXWg@mail.gmail.com>
+	<1313669526.17513.37.camel@THOR>
+Date: Thu, 18 Aug 2011 15:40:56 +0300
+Message-ID: <CABBYNZJ=iKXKJy1YG1kvLcVT=Lb2+H86KbqjDw8r1prCrri-9g@mail.gmail.com>
+Subject: Re: [RFC v2 2/5] Bluetooth: Minor optimization for multiple tx connections
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Peter,
 
-On Tue, 09 Aug 2011 22:24:37 -0400
-Alan Ott <alan@signal11.us> wrote:
-
-[...]
-> > +	ret =3D create_sixaxis_association(adapter,
-> > +					SIXAXIS_NAME,
-> > +					device_bdaddr,
-> > +					VENDOR, PRODUCT, SIXAXIS_PNP_RECORD);
->=20
-> You create the association with a hard-coded VID/PID. You match the
-> device on string name below (not VID/PID), so what if you used the
-> actual VID/PID of the device for the association instead?
+On Thu, Aug 18, 2011 at 3:12 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> Thanks. Yes, in the current scheduler a connection can be scheduled
+> multiple times per tasklet run.
 >
-
-Or use statically defined VID/PID to match the device, see below.
-
-[...]
-> > +	/*
-> > +	 * the total time the led is active (0xff means forever)
-> > +	 * |     duty_length: how long a cycle is in deciseconds:
-> > +	 * |     |                              (0 means "blink very fast")
-> > +	 * |     |     ??? (Maybe a phase shift or duty_length multiplier?)
-> > +	 * |     |     |     % of duty_length led is off (0xff means 100%)
-> > +	 * |     |     |     |     % of duty_length led is on (0xff is 100%)
-> > +	 * |     |     |     |     |
-> > +	 * 0xff, 0x27, 0x10, 0x00, 0x32,
-> > +	 */
-> > +	unsigned char leds_report[] =3D {
-> > +		0x01,
-> > +		0x00, 0x00, 0x00, 0x00, 0x00, /* rumble values TBD */
-> > +		0x00, 0x00, 0x00, 0x00, 0x1e, /* LED_1=3D0x02, LED_2=3D0x04 ... */
-> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_4 */
-> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_3 */
-> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_2 */
-> > +		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
-> > +		0x00, 0x00, 0x00, 0x00, 0x00,
-> > +	};
-> > =20
-> > +	int leds =3D 0;
-> > +	if (leds_status[0])
-> > +		leds |=3D LED_1;
-> > +	if (leds_status[1])
-> > +		leds |=3D LED_2;
-> > +	if (leds_status[2])
-> > +		leds |=3D LED_3;
-> > +	if (leds_status[3])
-> > +		leds |=3D LED_4;
-> > +
-> > +	leds_report[10] =3D leds;
->=20
-> If you are overwriting leds_report[10] unconditionally, why is it
-> initialized to 0x1e in the leds_report initializer (unless I counted wron=
-g)?
+> For example, supposed that acl_cnt == 3 and 2 connections have packets
+> in their queue. Let's assume for the sake of simplicity that no
+> connections currently have unacked packets (c->sent == 0). Then (with
+> the current scheduler),
 >
-
-You are right having it initialized to 0x1e is not necessary at all,
-but I'd still keep it to 0x1e in the initializer because this is the
-"hardware default", meaning "all leds blinking", I see it as a form of
-documentation-inside-code, but if it is confusing I will avoid that.=20
-
-[...]
-> > +
-> > +static inline gboolean is_sixaxis(const char *hid_name)
-> > +{
-> > +	return g_str_has_suffix(hid_name, "PLAYSTATION(R)3 Controller") ||
-> > +		g_str_has_suffix(hid_name,
-> > +			"Sony Computer Entertainment Wireless Controller");
-> > +}
->=20
-> Why do you key on the string name here. This seems problematic,
-> especially if you want to support things like the PSMove. I'd expect a
-> table of VID/PIDs or something.
+>  1st iteration: conn list walked => conn A found (equal unacked)
+>                 quote = 3/2 => 1 for conn A
+>                 conn A now has 1 unacked packet (after send)
 >
-
-Right, I like this suggestion, I generalized the code a little bit to
-handle different devices, see the two follow-up incremental patches, in
-the first one I remove static #defines in favor of a structure
-representing a device type, in the second one I match devices using
-VID/PID from a table of device types.
-
-If the idea looks OK I'll fold those patches in v5, along with the
-plugin renaming to "sony-controller", and maybe I'll split the plugin in
-several modules too:
-  sony-controller.c 	/* udev and bluez stuff */
-  sony-controller-hid.c	/* hidraw and device specific stuff */
-  sony-controlled-hid.h
-
-[...]
-> > +
-> > +static gboolean device_event_idle(struct udev_device *udevice)
-> > +{
-> > +	handle_device_plug(udevice);
-> > +	udev_device_unref(udevice);
-> > +	return FALSE;
-> > +}
->=20
-> I'm a little confused why this is called "idle."
+>  2nd iteration: conn list walked => conn B found (lowest unacked)
+>                 quote = 2/2 => 1 for conn B
+>                 conn B now has 1 unacked packet (after send)
 >
-
-I don't know either, maybe trying to communicate that it is called
-asynchronously by glib (via g_timeout_add_seconds())? But even if so
-this is not a property of the function itself, so I think we can just
-call it device_event().
-
-Ah Bastien, I noticed we are using g_timeout_add_seconds() with the
-callback always returning FALSE, so the latter is called only once,
-can't we in this case just sleep and then call the function directly?
-Isn't the main loop in sixaxis_init() enough to handle multiple
-overlapping udev events? Maybe I asked that already... :P
-
-> Thanks for your work on this, Antonio. Linux working out of the box with
-> these controllers will be really cool.
->=20
-> Alan.
+>  3rd iteration: conn list walked => conn A found (equal unacked)
+>                 quote = 1/2 => 1 for conn A
+>                 conn A now has 2 unacked packets (after send)
 >
+> With the proposed change, only 2 iterations occur:
+>
+>  1st iteration: conn list walked => conn A found (equal unacked)
+>                 quote = 3/2 => 2 for conn A
+>                 conn A now has 2 unacked packets (after send)
+>
+>  2nd iteration: conn list walked => conn B found (lowest unacked)
+>                 quote = 1/2 => 1 for conn B
+>                 conn B now has 1 unacked packet (after send)
+>
+> However, even with this change it may be that connections are scheduled
+> multiple times per tasklet. This can happen if a connection still has
+> equal or fewer unacked packets even after spending it's quota.
+>
+> But I didn't see in your proposal where you assume that an HCI channel
+> can only be scheduled once (or at least where it breaks down if true).
 
-Regards,
-   Antonio
+My last patch checks if a channel has already sent any data in the
+current task and skip if it did (note that chan->sent != conn->sent),
+I was trying to reduce the complexity but it seems it breaks the logic
+with unacked packets.
 
---=20
-Antonio Ospite
-http://ao2.it
-
-PGP public key ID: 0x4553B001
-
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
-
---Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk5NHiUACgkQ5xr2akVTsAG/lgCfVbbRpr/3iguu1twdGTyMj0K9
-bEwAnRc/F/z9IPYJBhLCv451fFxL0Eog
-=UIeO
------END PGP SIGNATURE-----
-
---Signature=_Thu__18_Aug_2011_16_13_57_+0200_wh8+x2HmBd_OEii4--
+-- 
+Luiz Augusto von Dentz
