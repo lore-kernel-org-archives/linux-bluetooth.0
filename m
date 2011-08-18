@@ -2,85 +2,137 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 2/5] serial: fix unref of dbus message
-Date: Thu, 18 Aug 2011 17:10:00 -0300
-Message-Id: <1313698203-13201-2-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
-References: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 1/5] serial: add Serial.ConnectFD()
+Date: Thu, 18 Aug 2011 17:09:59 -0300
+Message-Id: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-port->msg needs unref when the reply is sent.
+It's similar to Serial.Connect() but returns the actual RFCOMM file
+descriptor instead of creating a device in /dev
 ---
- serial/port.c |   18 ++++++++++++++++++
- 1 files changed, 18 insertions(+), 0 deletions(-)
+ doc/serial-api.txt |   16 ++++++++++++++++
+ serial/port.c      |   36 ++++++++++++++++++++++++++++++++++--
+ 2 files changed, 50 insertions(+), 2 deletions(-)
 
+diff --git a/doc/serial-api.txt b/doc/serial-api.txt
+index 5f9bd5f..635b3ec 100644
+--- a/doc/serial-api.txt
++++ b/doc/serial-api.txt
+@@ -26,6 +26,22 @@ Methods		string Connect(string pattern)
+ 					 org.bluez.Error.ConnectionAttemptFailed
+ 					 org.bluez.Error.NotSupported
+ 
++Methods		fd ConnectFD(string pattern)
++
++			Connects to a specific RFCOMM based service on a
++			remote device and returns a file descriptor to talk
++			 with this device.
++
++			Possible patterns: UUID 128 bit as string
++					   Profile short names, e.g: spp, dun
++					   RFCOMM channel as string, 1-30
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.ConnectionAttemptFailed
++					 org.bluez.Error.NotSupported
++
++
+ 		void Disconnect(string device)
+ 
+ 			Disconnect a RFCOMM TTY device that has been
 diff --git a/serial/port.c b/serial/port.c
-index e359716..3f041a6 100644
+index d011084..e359716 100644
 --- a/serial/port.c
 +++ b/serial/port.c
-@@ -204,6 +204,11 @@ static void serial_port_free(void *data)
+@@ -63,6 +63,10 @@
+ #define MAX_OPEN_TRIES		5
+ #define OPEN_WAIT		300	/* ms. udev node creation retry wait */
  
- 	port_release(port);
++#ifndef DBUS_TYPE_UNIX_FD
++#define DBUS_TYPE_UNIX_FD -1
++#endif
++
+ struct serial_device {
+ 	DBusConnection	*conn;		/* for name listener handling */
+ 	bdaddr_t	src;		/* Source (local) address */
+@@ -80,6 +84,7 @@ struct serial_port {
+ 	int		fd;		/* Opened file descriptor */
+ 	GIOChannel	*io;		/* BtIO channel */
+ 	guint		listener_id;
++	gboolean	fd_passing;
+ 	struct serial_device *device;
+ };
  
-+	if (port->msg) {
-+		dbus_message_unref(port->msg);
-+		port->msg = NULL;
+@@ -329,6 +334,14 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
+ 	port->io = NULL;
+ 
+ 	sk = g_io_channel_unix_get_fd(chan);
++	if (port->fd_passing) {
++		reply = g_dbus_create_reply(port->msg,
++				DBUS_TYPE_UNIX_FD, &sk,
++				DBUS_TYPE_INVALID);
++		g_dbus_send_message(device->conn, reply);
++		return;
 +	}
 +
- 	g_free(port->uuid);
- 	g_free(port);
+ 	port->id = ioctl(sk, RFCOMMCREATEDEV, &req);
+ 	if (port->id < 0) {
+ 		int err = -errno;
+@@ -468,8 +481,8 @@ static struct serial_port *create_port(struct serial_device *device,
+ 	return port;
  }
-@@ -224,6 +229,11 @@ static void port_owner_exited(DBusConnection *conn, void *user_data)
  
- 	port_release(port);
+-static DBusMessage *port_connect(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
++static DBusMessage *_port_connect(DBusConnection *conn, DBusMessage *msg,
++					void *user_data, gboolean fd)
+ {
+ 	struct serial_device *device = user_data;
+ 	struct serial_port *port;
+@@ -501,6 +514,9 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 						NULL);
+ 	port->msg = dbus_message_ref(msg);
  
-+	if (port->msg) {
-+		dbus_message_unref(port->msg);
-+		port->msg = NULL;
-+	}
++	if (fd)
++		port->fd_passing = TRUE;
 +
- 	port->listener_id = 0;
+ 	err = connect_port(port);
+ 	if (err < 0) {
+ 		error("%s", strerror(-err));
+@@ -513,6 +529,21 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 	return NULL;
  }
  
-@@ -261,6 +271,8 @@ static void open_notify(int fd, int err, struct serial_port *port)
++static DBusMessage *port_connect(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	return _port_connect(conn, msg, user_data, FALSE);
++}
++
++static DBusMessage *port_connect_fd(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	if (DBUS_TYPE_UNIX_FD < 0)
++		return btd_error_not_supported(msg);
++
++	return _port_connect(conn, msg, user_data, TRUE);
++}
++
+ static DBusMessage *port_disconnect(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -546,6 +577,7 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
  
- 	/* Reply to the requestor */
- 	g_dbus_send_message(device->conn, reply);
-+	dbus_message_unref(port->msg);
-+	port->msg = NULL;
- }
- 
- static gboolean open_continue(gpointer user_data)
-@@ -339,6 +351,8 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 				DBUS_TYPE_UNIX_FD, &sk,
- 				DBUS_TYPE_INVALID);
- 		g_dbus_send_message(device->conn, reply);
-+		dbus_message_unref(port->msg);
-+		port->msg = NULL;
- 		return;
- 	}
- 
-@@ -368,6 +382,8 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 
- fail:
- 	g_dbus_send_message(device->conn, reply);
-+	dbus_message_unref(port->msg);
-+	port->msg = NULL;
- 	g_dbus_remove_watch(device->conn, port->listener_id);
- 	port->listener_id = 0;
- }
-@@ -431,6 +447,8 @@ failed:
- 	g_dbus_remove_watch(device->conn, port->listener_id);
- 	port->listener_id = 0;
- 	g_dbus_send_message(device->conn, reply);
-+	dbus_message_unref(port->msg);
-+	port->msg = NULL;
- }
- 
- static int connect_port(struct serial_port *port)
+ static GDBusMethodTable port_methods[] = {
+ 	{ "Connect",    "s", "s", port_connect, G_DBUS_METHOD_FLAG_ASYNC },
++	{ "ConnectFD",    "s", "h", port_connect_fd, G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "Disconnect", "s", "",  port_disconnect },
+ 	{ }
+ };
 -- 
 1.7.6
 
