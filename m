@@ -1,65 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1313627852.10336.10.camel@THOR>
-References: <1313627852.10336.10.camel@THOR>
-Date: Thu, 18 Aug 2011 10:49:48 +0300
-Message-ID: <CABBYNZLRMK7ADwFQUQj6FS7RfQqDR8o-SjAJsqHUeFxXVYhXWg@mail.gmail.com>
-Subject: Re: [RFC v2 2/5] Bluetooth: Minor optimization for multiple tx connections
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 3/7] Bluetooth: EFS: add disable_flowspec kernel param
+Date: Thu, 18 Aug 2011 10:44:58 +0300
+Message-Id: <1313653502-6303-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Aug 18, 2011 at 3:37 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> When assigning tx quotas for multiple connections, bump fractional
-> amounts to the next higher integer. This can reduce the number of
-> iterations through the tx scheduler. For example, if 5 avail acl
-> buffers are to be used by 3 transmitting connections, the current
-> scheduler will produce quotas of 1, 1, 1, 1, 1. This
-> optimization will instead produce quotas of 2, 2, 1 (ie., 2 less
-> iterations of the tx scheduler).
->
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-> ---
->  net/bluetooth/hci_core.c |    5 ++---
->  1 files changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 47a31fa..0defa83 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1826,7 +1826,7 @@ static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type, int
->        }
->
->        if (conn) {
-> -               int cnt, q;
-> +               int cnt;
->
->                switch (conn->type) {
->                case ACL_LINK:
-> @@ -1844,8 +1844,7 @@ static inline struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type, int
->                        BT_ERR("Unknown link type");
->                }
->
-> -               q = cnt / num;
-> -               *quote = q ? q : 1;
-> +               *quote = (cnt + (num - 1)) / num;
->        } else
->                *quote = 0;
->
-> --
-> 1.7.4.1
->
+Make extended flowspec option kernel parameter. Disabled by default.
+---
+ net/bluetooth/l2cap_core.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-Nice catch, actually after seeing your patch I realize one of my
-patches is wrong in assuming an HCI Channel can only be scheduled once
-per tx_task, but I guess with your changes we can probably assume so,
-right?
-
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index be30c32..4167cb0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -57,6 +57,7 @@
+ #include <net/bluetooth/smp.h>
+ 
+ int disable_ertm;
++int disable_flowspec = 1;
+ 
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+ static u8 l2cap_fixed_chan[8] = { 0x02, };
+@@ -2775,6 +2776,9 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 		if (!disable_ertm)
+ 			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
+ 							 | L2CAP_FEAT_FCS;
++		if (!disable_flowspec)
++			feat_mask |= L2CAP_FEAT_EXT_FLOW;
++
+ 		put_unaligned_le32(feat_mask, rsp->data);
+ 		l2cap_send_cmd(conn, cmd->ident,
+ 					L2CAP_INFO_RSP, sizeof(buf), buf);
+@@ -4296,3 +4300,6 @@ void l2cap_exit(void)
+ 
+ module_param(disable_ertm, bool, 0644);
+ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
++
++module_param(disable_flowspec, bool, 0644);
++MODULE_PARM_DESC(disable_flowspec, "Disable Extended Flow Specification");
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
