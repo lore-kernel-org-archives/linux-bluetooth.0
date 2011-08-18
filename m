@@ -2,80 +2,97 @@ Return-Path: <cyrus@holtmann.org>
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 5/5] serial: Add support to Disconnect fd passing connections
-Date: Thu, 18 Aug 2011 17:10:03 -0300
-Message-Id: <1313698203-13201-5-git-send-email-padovan@profusion.mobi>
-In-Reply-To: <1313698203-13201-4-git-send-email-padovan@profusion.mobi>
+Subject: [PATCH 4/5] serial: Add port->sender
+Date: Thu, 18 Aug 2011 17:10:02 -0300
+Message-Id: <1313698203-13201-4-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1313698203-13201-3-git-send-email-padovan@profusion.mobi>
 References: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
  <1313698203-13201-2-git-send-email-padovan@profusion.mobi>
  <1313698203-13201-3-git-send-email-padovan@profusion.mobi>
- <1313698203-13201-4-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-Disconnect can also be called for connections created with ConnectFD
+Now that port->msg is freed we need a field to track the owner of the
+rfcomm connection.
 ---
- doc/serial-api.txt |    3 +++
- serial/port.c      |   17 +++++++++++++----
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ serial/port.c |   13 ++++++++++---
+ 1 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/doc/serial-api.txt b/doc/serial-api.txt
-index 635b3ec..5c9ee9d 100644
---- a/doc/serial-api.txt
-+++ b/doc/serial-api.txt
-@@ -53,5 +53,8 @@ Methods		fd ConnectFD(string pattern)
- 			In that case one of patterns of the Connect method should
- 			be suplied instead of the TTY device.
- 
-+			Connection created with Serial.ConnectFD only accept
-+			as parameter the same parameters ConnectFD accepts.
-+
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
 diff --git a/serial/port.c b/serial/port.c
-index 784febd..e074cef 100644
+index bc4b4ea..784febd 100644
 --- a/serial/port.c
 +++ b/serial/port.c
-@@ -345,9 +345,6 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 	bacpy(&req.dst, &device->dst);
- 	req.channel = port->channel;
+@@ -85,6 +85,7 @@ struct serial_port {
+ 	GIOChannel	*io;		/* BtIO channel */
+ 	guint		listener_id;
+ 	gboolean	fd_passing;
++	char		*sender;
+ 	struct serial_device *device;
+ };
  
--	g_io_channel_unref(port->io);
--	port->io = NULL;
--
- 	sk = g_io_channel_unix_get_fd(chan);
- 	if (port->fd_passing) {
- 		reply = g_dbus_create_reply(port->msg,
-@@ -359,6 +356,9 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 		return;
+@@ -210,6 +211,7 @@ static void serial_port_free(void *data)
  	}
  
-+	g_io_channel_unref(port->io);
-+	port->io = NULL;
-+
- 	port->id = ioctl(sk, RFCOMMCREATEDEV, &req);
- 	if (port->id < 0) {
- 		int err = -errno;
-@@ -590,7 +590,16 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
- 	if (!g_str_equal(port->sender, caller))
+ 	g_free(port->uuid);
++	g_free(port->sender);
+ 	g_free(port);
+ }
+ 
+@@ -235,6 +237,7 @@ static void port_owner_exited(DBusConnection *conn, void *user_data)
+ 	}
+ 
+ 	port->listener_id = 0;
++	g_free(port->sender);
+ }
+ 
+ static void path_unregister(void *data)
+@@ -386,6 +389,8 @@ fail:
+ 	port->msg = NULL;
+ 	g_dbus_remove_watch(device->conn, port->listener_id);
+ 	port->listener_id = 0;
++	g_free(port->sender);
++	port->sender = NULL;
+ }
+ 
+ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+@@ -531,6 +536,7 @@ static DBusMessage *_port_connect(DBusConnection *conn, DBusMessage *msg,
+ 						port_owner_exited, port,
+ 						NULL);
+ 	port->msg = dbus_message_ref(msg);
++	port->sender = g_strdup(dbus_message_get_sender(port->msg));
+ 
+ 	if (fd)
+ 		port->fd_passing = TRUE;
+@@ -567,7 +573,7 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
+ {
+ 	struct serial_device *device = user_data;
+ 	struct serial_port *port;
+-	const char *dev, *owner, *caller;
++	const char *dev, *caller;
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &dev,
+ 						DBUS_TYPE_INVALID) == FALSE)
+@@ -580,15 +586,16 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
+ 	if (!port->listener_id)
+ 		return btd_error_not_connected(msg);
+ 
+-	owner = dbus_message_get_sender(port->msg);
+ 	caller = dbus_message_get_sender(msg);
+-	if (!g_str_equal(owner, caller))
++	if (!g_str_equal(port->sender, caller))
  		return btd_error_not_authorized(msg);
  
--	port_release(port);
-+	if (port->fd_passing == TRUE) {
-+		int sk = g_io_channel_unix_get_fd(port->io);
-+		shutdown(sk, SHUT_RDWR);
-+
-+		g_io_channel_unref(port->io);
-+		port->io = NULL;
-+	}
-+	else {
-+		port_release(port);
-+	}
+ 	port_release(port);
  
  	g_dbus_remove_watch(conn, port->listener_id);
  	port->listener_id = 0;
++	g_free(port->sender);
++	port->sender = NULL;
+ 
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
 -- 
 1.7.6
 
