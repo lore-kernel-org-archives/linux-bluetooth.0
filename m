@@ -1,82 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/7] Bluetooth: parse EFS in l2cap config response
-Date: Thu, 18 Aug 2011 10:45:00 +0300
-Message-Id: <1313653502-6303-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 0/7] EFS initial support
+Date: Thu, 18 Aug 2011 10:44:55 +0300
+Message-Id: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add parsing extended flowspec in l2cap config response
-Based upon haijun.liu <haijun.liu@atheros.com> series of patches
-(sent Sun, 22 Aug 2010)
----
- net/bluetooth/l2cap_core.c |   28 +++++++++++++++++++++++++++-
- 1 files changed, 27 insertions(+), 1 deletions(-)
+Add basic support for Extended Flow Specification option in L2CAP
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5378bc6..f64c9cb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2213,6 +2213,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 	int type, olen;
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc;
-+	struct l2cap_conf_efs efs;
- 
- 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
- 
-@@ -2248,6 +2249,19 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
- 					sizeof(rfc), (unsigned long) &rfc);
- 			break;
-+
-+		case L2CAP_CONF_EFS:
-+			if (olen == sizeof(efs))
-+				memcpy(&efs, (void *)val, olen);
-+
-+			if (chan->local_stype != L2CAP_SERVTYPE_NOTRAFIC &&
-+				efs.service_type != L2CAP_SERVTYPE_NOTRAFIC &&
-+				efs.service_type != chan->local_stype)
-+				return -ECONNREFUSED;
-+
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+					sizeof(efs), (unsigned long) &efs);
-+			break;
- 		}
- 	}
- 
-@@ -2256,13 +2270,25 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 
- 	chan->mode = rfc.mode;
- 
--	if (*result == L2CAP_CONF_SUCCESS) {
-+	if (*result == L2CAP_CONF_SUCCESS || *result == L2CAP_CONF_PENDING) {
- 		switch (rfc.mode) {
- 		case L2CAP_MODE_ERTM:
- 			chan->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
- 			chan->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
- 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
-+			if (chan->ext_flowspec_enable) {
-+				/* id, service type should not be changed */
-+				chan->local_msdu =
-+					le16_to_cpu(efs.max_sdu_size);
-+				chan->local_sdu_itime =
-+					le32_to_cpu(efs.sdu_inter_time);
-+				chan->local_acc_lat =
-+					le32_to_cpu(efs.access_latency);
-+				chan->local_flush_to =
-+					le32_to_cpu(efs.flush_timeout);
-+			}
- 			break;
-+
- 		case L2CAP_MODE_STREAMING:
- 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
- 		}
+Patch series based on patches sent by haijun.liu <haijun.liu@atheros.com> about
+one year ago. L2CAP sequence looks like the one below:
+(my patches for decoding EFS have been applied to hcidump)
+
+...
+< ACL data: handle 1 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00f8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Extended Flow Specification
+        Fixed Channels
+< ACL data: handle 1 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 3
+> ACL data: handle 1 flags 0x02 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list
+< ACL data: handle 1 flags 0x00 dlen 12
+    L2CAP(s): Connect req: psm 4113 scid 0x0040
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+      Connection pending - No futher information available
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+< ACL data: handle 1 flags 0x00 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00f8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Extended Flow Specification
+        Fixed Channels
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 3
+< ACL data: handle 1 flags 0x00 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 1 flags 0x00 dlen 41
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0,
+          MTo 0, MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime
+          0xffffffff, AccLat 0xffffffff, FlushTO 0x0000ffff) 
+> ACL data: handle 1 flags 0x02 dlen 41
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0, MTo 0,
+          MPS 1009) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+< ACL data: handle 1 flags 0x00 dlen 47
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
+      Pending
+      MTU 672 
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
+          MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+> ACL data: handle 1 flags 0x02 dlen 47
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
+      Pending
+      MTU 672 
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
+          MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+< ACL data: handle 1 flags 0x00 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 1 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+...
+< ACL data: handle 1 flags 0x00 dlen 510
+    L2CAP(d): cid 0x0040 len 506 ctrl 0x4000 fcs 0x5337 [psm 4113]
+      I-frame: Start (len 672) TxSeq 0 ReqSeq 0
+...
+
+Andrei Emeltchenko (7):
+  Bluetooth: L2CAP extended feature mask update
+  Bluetooth: EFS: definitions and headers for EFS
+  Bluetooth: EFS: add disable_flowspec kernel param
+  Bluetooth: parse EFS in l2cap config request
+  Bluetooth: parse EFS in l2cap config response
+  Bluetooth: add EFS option in l2cap conf req
+  Bluetooth: EFS: parse l2cap config rsp pending
+
+ include/net/bluetooth/l2cap.h |   45 +++++++++-
+ net/bluetooth/l2cap_core.c    |  216 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 256 insertions(+), 5 deletions(-)
+
 -- 
 1.7.4.1
 
