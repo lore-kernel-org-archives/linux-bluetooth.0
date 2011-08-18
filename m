@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1313502238-7581-5-git-send-email-prasadbhat22@gmail.com>
+In-Reply-To: <1313502238-7581-4-git-send-email-prasadbhat22@gmail.com>
 References: <1313502238-7581-1-git-send-email-prasadbhat22@gmail.com>
-	<1313502238-7581-5-git-send-email-prasadbhat22@gmail.com>
-Date: Thu, 18 Aug 2011 10:21:09 +0300
-Message-ID: <CABBYNZL4e4Ei6HMJr48GKXve8_H4Exh5hOV_GvE_V6V2+RMGUg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/6] This adds video-sink and video-source
- interfaces and vdp_server_driver to audio/manager{.c, .h}
+	<1313502238-7581-4-git-send-email-prasadbhat22@gmail.com>
+Date: Thu, 18 Aug 2011 10:20:35 +0300
+Message-ID: <CABBYNZJ84=wcfnmY0QGtf4Zm8JCGqL4bAgARQiGMZHa19KFcOw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/6] The changes in media.c required for VDP.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Prasad Bhat <prasadbhat22@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -18,206 +17,203 @@ Hi,
 
 On Tue, Aug 16, 2011 at 4:43 PM, Prasad Bhat <prasadbhat22@gmail.com> wrote:
 > ---
->  audio/manager.c |   87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  audio/manager.h |    2 +
->  2 files changed, 89 insertions(+), 0 deletions(-)
+>  audio/media.c |  142 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 141 insertions(+), 1 deletions(-)
 >
-> diff --git a/audio/manager.c b/audio/manager.c
-> index 6e583cf..352d91d 100644
-> --- a/audio/manager.c
-> +++ b/audio/manager.c
-> @@ -59,10 +59,13 @@
->  #include "avdtp.h"
+> diff --git a/audio/media.c b/audio/media.c
+> index 42d8637..0aff0d4 100644
+> --- a/audio/media.c
+> +++ b/audio/media.c
+> @@ -42,6 +42,7 @@
 >  #include "media.h"
+>  #include "transport.h"
 >  #include "a2dp.h"
 > +#include "vdp.h"
 >  #include "headset.h"
->  #include "gateway.h"
->  #include "sink.h"
->  #include "source.h"
-> +#include "video-sink.h"
-> +#include "video-source.h"
->  #include "control.h"
 >  #include "manager.h"
->  #include "sdpd.h"
-> @@ -119,6 +122,8 @@ static struct enabled_interfaces enabled = {
->        .socket         = TRUE,
->        .media          = FALSE,
->        .media_player   = FALSE,
-> +       .video_sink     = FALSE,
-> +       .video_source   = FALSE,
->  };
 >
->  static struct audio_adapter *find_adapter(GSList *list,
-> @@ -149,6 +154,10 @@ gboolean server_is_enabled(bdaddr_t *src, uint16_t svc)
->                return enabled.sink;
->        case AUDIO_SOURCE_SVCLASS_ID:
->                return enabled.source;
-> +       case VIDEO_SINK_SVCLASS_ID:
-> +               return enabled.video_sink;
-> +       case VIDEO_SOURCE_SVCLASS_ID:
-> +               return enabled.video_source;
->        case AV_REMOTE_TARGET_SVCLASS_ID:
->        case AV_REMOTE_SVCLASS_ID:
->                return enabled.control;
-> @@ -214,6 +223,16 @@ static void handle_uuid(const char *uuidstr, struct audio_device *device)
->                if (device->source == NULL)
->                        device->source = source_init(device);
->                break;
-> +       case VIDEO_SINK_SVCLASS_ID:
-> +               DBG("Found Video Sink");
-> +               if (device->video_sink == NULL)
-> +                       device->video_sink = video_sink_register(device);
-> +               break;
-> +       case VIDEO_SOURCE_SVCLASS_ID:
-> +               DBG("Found Video Source");
-> +               if (device->video_source == NULL)
-> +                       device->video_source = video_source_register(device);
-> +               break;
->        case AV_REMOTE_SVCLASS_ID:
->        case AV_REMOTE_TARGET_SVCLASS_ID:
->                DBG("Found AV %s", uuid16 == AV_REMOTE_SVCLASS_ID ?
-> @@ -1035,6 +1054,45 @@ static void a2dp_server_remove(struct btd_adapter *adapter)
->        audio_adapter_unref(adp);
->  }
+> @@ -71,6 +72,7 @@ struct endpoint_request {
 >
-> +static int vdp_server_probe(struct btd_adapter *adapter)
-> +{
-> +       struct audio_adapter *adp;
-> +       const gchar *path = adapter_get_path(adapter);
-> +       bdaddr_t src;
-> +       int err;
-> +
-> +       DBG("path %s", path);
-> +
-> +       adp = audio_adapter_get(adapter);
-> +       if (!adp)
-> +               return -EINVAL;
-> +
-> +       adapter_get_address(adapter, &src);
-> +
-> +       err = vdp_register(connection, &src, config);
-> +       if (err < 0)
-> +               audio_adapter_unref(adp);
-> +
-> +       return err;
-> +}
-> +
-> +static void vdp_server_remove(struct btd_adapter *adapter)
-> +{
-> +       struct audio_adapter *adp;
-> +       const gchar *path = adapter_get_path(adapter);
-> +       bdaddr_t src;
-> +
-> +       DBG("path %s", path);
-> +
-> +       adp = find_adapter(adapters, adapter);
-> +       if (!adp)
+>  struct media_endpoint {
+>        struct a2dp_sep         *sep;
+> +       struct vdp_sep          *vdp_sep;
+>        char                    *sender;        /* Endpoint DBus bus id */
+>        char                    *path;          /* Endpoint object path */
+>        char                    *uuid;          /* Endpoint property UUID */
+> @@ -141,6 +143,10 @@ static void media_endpoint_remove(struct media_endpoint *endpoint)
+>                return;
+>        }
+>
+> +       if (endpoint->vdp_sep) {
+> +               vdp_remove_sep(endpoint->vdp_sep);
 > +               return;
-> +
-> +       adapter_get_address(adapter, &src);
-> +       vdp_unregister(&src);
-> +       audio_adapter_unref(adp);
-> +}
-> +
->  static int avrcp_server_probe(struct btd_adapter *adapter)
->  {
->        struct audio_adapter *adp;
-> @@ -1105,6 +1163,7 @@ static struct btd_device_driver audio_driver = {
->        .name   = "audio",
->        .uuids  = BTD_UUIDS(HSP_HS_UUID, HFP_HS_UUID, HSP_AG_UUID, HFP_AG_UUID,
->                        ADVANCED_AUDIO_UUID, A2DP_SOURCE_UUID, A2DP_SINK_UUID,
-> +                       VIDEO_DISTRIBUTION_UUID, VDP_SOURCE_UUID, VDP_SINK_UUID,
->                        AVRCP_TARGET_UUID, AVRCP_REMOTE_UUID),
->        .probe  = audio_probe,
->        .remove = audio_remove,
-> @@ -1128,6 +1187,12 @@ static struct btd_adapter_driver a2dp_server_driver = {
->        .remove = a2dp_server_remove,
+> +       }
+>        info("Endpoint unregistered: sender=%s path=%s", endpoint->sender,
+>                        endpoint->path);
+>
+> @@ -539,6 +545,113 @@ static struct a2dp_endpoint a2dp_endpoint = {
+>        .set_delay = set_delay
 >  };
 >
-> +static struct btd_adapter_driver vdp_server_driver = {
-> +       .name   = "video-vdp",
-> +       .probe  = vdp_server_probe,
-> +       .remove = vdp_server_remove,
+> +static const char *vdp_get_name(struct vdp_sep *sep, void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +
+> +       return endpoint->sender;
+> +}
+> +
+> +static size_t vdp_get_capabilities(struct vdp_sep *sep, uint8_t **capabilities,
+> +                                                       void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +
+> +       *capabilities = endpoint->capabilities;
+> +       return endpoint->size;
+> +}
+> +
+> +struct vdp_config_data {
+> +       guint setup_id;
+> +       vdp_endpoint_config_t cb;
 > +};
 > +
->  static struct btd_adapter_driver avrcp_server_driver = {
->        .name   = "audio-control",
->        .probe  = avrcp_server_probe,
-> @@ -1166,6 +1231,10 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
->                        enabled.sink = TRUE;
->                else if (g_str_equal(list[i], "Source"))
->                        enabled.source = TRUE;
-> +               else if (g_str_equal(list[i], "VideoSink"))
-> +                       enabled.video_sink = TRUE;
-> +               else if (g_str_equal(list[i], "VideoSource"))
-> +                       enabled.video_source = TRUE;
->                else if (g_str_equal(list[i], "Control"))
->                        enabled.control = TRUE;
->                else if (g_str_equal(list[i], "Socket"))
-> @@ -1189,6 +1258,10 @@ int audio_manager_init(DBusConnection *conn, GKeyFile *conf,
->                        enabled.sink = FALSE;
->                else if (g_str_equal(list[i], "Source"))
->                        enabled.source = FALSE;
-> +               else if (g_str_equal(list[i], "VideoSink"))
-> +                       enabled.video_sink = FALSE;
-> +               else if (g_str_equal(list[i], "VideoSource"))
-> +                       enabled.video_source = FALSE;
->                else if (g_str_equal(list[i], "Control"))
->                        enabled.control = FALSE;
->                else if (g_str_equal(list[i], "Socket"))
-> @@ -1239,6 +1312,9 @@ proceed:
->        if (enabled.source || enabled.sink)
->                btd_register_adapter_driver(&a2dp_server_driver);
->
-> +       if (enabled.video_source || enabled.video_sink)
-> +               btd_register_adapter_driver(&vdp_server_driver);
+> +struct vdp_select_data {
+> +       guint setup_id;
+> +       vdp_endpoint_select_t cb;
+> +};
 > +
->        if (enabled.control)
->                btd_register_adapter_driver(&avrcp_server_driver);
->
-> @@ -1278,6 +1354,9 @@ void audio_manager_exit(void)
->        if (enabled.source || enabled.sink)
->                btd_unregister_adapter_driver(&a2dp_server_driver);
->
-> +       if (enabled.video_source || enabled.video_sink)
-> +               btd_unregister_adapter_driver(&vdp_server_driver);
+> +static void vdp_select_cb(struct media_endpoint *endpoint, void *ret, int size,
+> +                                                       void *user_data)
+> +{
+> +       struct vdp_select_data *data = user_data;
 > +
->        if (enabled.control)
->                btd_unregister_adapter_driver(&avrcp_server_driver);
->
-> @@ -1320,6 +1399,14 @@ struct audio_device *manager_find_device(const char *path,
->                                && !dev->source)
->                        continue;
->
-> +               if (interface && !strcmp(VIDEO_SINK_INTERFACE, interface)
-> +                               && !dev->video_sink)
-> +                       continue;
+> +       data->cb(endpoint->vdp_sep, data->setup_id, ret, size);
+> +}
 > +
-> +               if (interface && !strcmp(VIDEO_SOURCE_INTERFACE, interface)
-> +                               && !dev->video_source)
-> +                       continue;
+> +static int vdp_select_config(struct vdp_sep *sep, uint8_t *capabilities,
+> +                               size_t length, guint setup_id,
+> +                               vdp_endpoint_select_t cb, void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +       struct vdp_select_data *data;
 > +
->                if (interface && !strcmp(AUDIO_CONTROL_INTERFACE, interface)
->                                && !dev->control)
->                        continue;
-> diff --git a/audio/manager.h b/audio/manager.h
-> index cfc646c..6c61da4 100644
-> --- a/audio/manager.h
-> +++ b/audio/manager.h
-> @@ -28,6 +28,8 @@ struct enabled_interfaces {
->        gboolean gateway;
->        gboolean sink;
->        gboolean source;
-> +       gboolean video_sink;
-> +       gboolean video_source;
->        gboolean control;
->        gboolean socket;
->        gboolean media;
+> +       data = g_new0(struct vdp_select_data, 1);
+> +       data->setup_id = setup_id;
+> +       data->cb = cb;
+> +
+> +       if (select_configuration(endpoint, capabilities, length,
+> +                                       vdp_select_cb, data, g_free) == TRUE)
+> +               return 0;
+> +
+> +       g_free(data);
+> +       return -ENOMEM;
+> +}
+> +
+> +static void vdp_config_cb(struct media_endpoint *endpoint, void *ret, int size,
+> +                                                       void *user_data)
+> +{
+> +       struct vdp_config_data *data = user_data;
+> +
+> +       data->cb(endpoint->vdp_sep, data->setup_id, ret ? TRUE : FALSE);
+> +}
+> +
+> +static int vdp_set_config(struct vdp_sep *sep, struct audio_device *dev,
+> +                               uint8_t *configuration, size_t length,
+> +                               guint setup_id, vdp_endpoint_config_t cb,
+> +                               void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +       struct vdp_config_data *data;
+> +
+> +       data = g_new0(struct vdp_config_data, 1);
+> +       data->setup_id = setup_id;
+> +       data->cb = cb;
+> +
+> +       if (set_configuration(endpoint, dev, configuration, length,
+> +                                       vdp_config_cb, data, g_free) == TRUE)
+> +               return 0;
+> +
+> +       g_free(data);
+> +       return -ENOMEM;
+> +}
+> +
+> +static void vdp_clear_config(struct vdp_sep *sep, void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +
+> +       clear_configuration(endpoint);
+> +}
+> +
+> +static void vdp_set_delay(struct vdp_sep *sep, uint16_t delay, void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +
+> +       if (endpoint->transport == NULL)
+> +               return;
+> +
+> +       media_transport_update_delay(endpoint->transport, delay);
+> +}
+> +
+> +static struct vdp_endpoint vdp_endpoint = {
+> +       .get_name = vdp_get_name,
+> +       .get_capabilities = vdp_get_capabilities,
+> +       .select_configuration = vdp_select_config,
+> +       .set_configuration = vdp_set_config,
+> +       .clear_configuration = vdp_clear_config,
+> +       .set_delay = vdp_set_delay
+> +};
+> +
+>  static void a2dp_destroy_endpoint(void *user_data)
+>  {
+>        struct media_endpoint *endpoint = user_data;
+> @@ -552,6 +665,19 @@ static void a2dp_destroy_endpoint(void *user_data)
+>        release_endpoint(endpoint);
+>  }
+>
+> +static void vdp_destroy_endpoint(void *user_data)
+> +{
+> +       struct media_endpoint *endpoint = user_data;
+> +
+> +       if (endpoint->transport) {
+> +               media_transport_destroy(endpoint->transport);
+> +               endpoint->transport = NULL;
+> +       }
+> +
+> +       endpoint->sep = NULL;
+> +       release_endpoint(endpoint);
+> +}
+> +
+>  static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
+>                                                const char *sender,
+>                                                const char *path,
+> @@ -592,7 +718,21 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+>                                        endpoint, a2dp_destroy_endpoint, err);
+>                if (endpoint->sep == NULL)
+>                        goto failed;
+> -       } else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+> +       } else if (strcasecmp(uuid, VDP_SOURCE_UUID) == 0) {
+> +               endpoint->vdp_sep = vdp_add_sep(&adapter->src,
+> +                                       AVDTP_SEP_TYPE_SOURCE, codec,
+> +                                       delay_reporting, &vdp_endpoint,
+> +                                       endpoint, vdp_destroy_endpoint, err);
+> +               if (endpoint->vdp_sep == NULL)
+> +                       goto failed;
+> +       } else if (strcasecmp(uuid, VDP_SINK_UUID) == 0) {
+> +               endpoint->vdp_sep = vdp_add_sep(&adapter->src,
+> +                                       AVDTP_SEP_TYPE_SINK, codec,
+> +                                       delay_reporting, &vdp_endpoint,
+> +                                       endpoint, vdp_destroy_endpoint, err);
+> +               if (endpoint->vdp_sep == NULL)
+> +                       goto failed;
+> +       }else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
+>                                        g_strcmp0(uuid, HSP_AG_UUID) == 0) {
+>                struct audio_device *dev;
+>
 > --
 > 1.7.6
 
-Looks good, ack
+This is another reason why we want a common code to handle the seps,
+so a2dp_sep and vdp_sep could be merged, in fact they represent the
+same thing an AVDTP sep.
 
 -- 
 Luiz Augusto von Dentz
