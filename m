@@ -1,102 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 18 Aug 2011 16:26:56 -0700
+From: Greg KH <greg@kroah.com>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	Linux-pm mailing list <linux-pm@lists.linux-foundation.org>,
+	USB list <linux-usb@vger.kernel.org>, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
+	Takashi Iwai <tiwai@suse.de>
+Subject: Re: [PATCH] PM: add macro to test for runtime PM events
+Message-ID: <20110818232656.GA29608@kroah.com>
+References: <Pine.LNX.4.44L0.1108181600020.1628-100000@iolanthe.rowland.org>
+ <201108182252.10364.rjw@sisk.pl>
 MIME-Version: 1.0
-In-Reply-To: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
-References: <1313698203-13201-1-git-send-email-padovan@profusion.mobi>
-Date: Fri, 19 Aug 2011 10:07:30 +0300
-Message-ID: <CABBYNZ+_oSZ2f_dBv4P9hY_ORNaPK_mObwCA1oW_A0RH_woVRA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] serial: add Serial.ConnectFD()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201108182252.10364.rjw@sisk.pl>
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+On Thu, Aug 18, 2011 at 10:52:10PM +0200, Rafael J. Wysocki wrote:
+> Hi,
+> 
+> On Thursday, August 18, 2011, Alan Stern wrote:
+> > This patch (as1482) adds a macro for testing whether or not a
+> > pm_message value represents an autosuspend or autoresume (i.e., a
+> > runtime PM) event.  Encapsulating this notion seems preferable to
+> > open-coding the test all over the place.
+> > 
+> > Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
+> > 
+> > ---
+> > 
+> > This is a minor change in the PM API, but most of the affected files 
+> > are in the USB subsystem.  Therefore either Rafael or Greg might prefer 
+> > to accept this patch.
+> 
+> I can take the patch if Greg is fine with that.
 
-On Thu, Aug 18, 2011 at 11:09 PM, Gustavo F. Padovan
-<padovan@profusion.mobi> wrote:
-> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
->
-> It's similar to Serial.Connect() but returns the actual RFCOMM file
-> descriptor instead of creating a device in /dev
-> ---
->  doc/serial-api.txt |   16 ++++++++++++++++
->  serial/port.c      |   36 ++++++++++++++++++++++++++++++++++--
->  2 files changed, 50 insertions(+), 2 deletions(-)
->
-> diff --git a/doc/serial-api.txt b/doc/serial-api.txt
-> index 5f9bd5f..635b3ec 100644
-> --- a/doc/serial-api.txt
-> +++ b/doc/serial-api.txt
-> @@ -26,6 +26,22 @@ Methods              string Connect(string pattern)
->                                         org.bluez.Error.ConnectionAttemptFailed
->                                         org.bluez.Error.NotSupported
->
-> +Methods                fd ConnectFD(string pattern)
-> +
-> +                       Connects to a specific RFCOMM based service on a
-> +                       remote device and returns a file descriptor to talk
-> +                        with this device.
-> +
-> +                       Possible patterns: UUID 128 bit as string
-> +                                          Profile short names, e.g: spp, dun
-> +                                          RFCOMM channel as string, 1-30
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.InProgress
-> +                                        org.bluez.Error.ConnectionAttemptFailed
-> +                                        org.bluez.Error.NotSupported
-> +
-> +
+Fine with me:
+	Acked-by: Greg Kroah-Hartman <gregkh@suse.de>
 
-Please mark ConnectFD as experimental, I guess we might want to
-complete remove the old Connect with this one when we are allowed to
-break the API.
-
->                void Disconnect(string device)
->
->                        Disconnect a RFCOMM TTY device that has been
-> diff --git a/serial/port.c b/serial/port.c
-> index d011084..e359716 100644
-> --- a/serial/port.c
-> +++ b/serial/port.c
-> @@ -63,6 +63,10 @@
->  #define MAX_OPEN_TRIES         5
->  #define OPEN_WAIT              300     /* ms. udev node creation retry wait */
->
-> +#ifndef DBUS_TYPE_UNIX_FD
-> +#define DBUS_TYPE_UNIX_FD -1
-> +#endif
-> +
->  struct serial_device {
->        DBusConnection  *conn;          /* for name listener handling */
->        bdaddr_t        src;            /* Source (local) address */
-> @@ -80,6 +84,7 @@ struct serial_port {
->        int             fd;             /* Opened file descriptor */
->        GIOChannel      *io;            /* BtIO channel */
->        guint           listener_id;
-> +       gboolean        fd_passing;
->        struct serial_device *device;
->  };
->
-> @@ -329,6 +334,14 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
->        port->io = NULL;
->
->        sk = g_io_channel_unix_get_fd(chan);
-> +       if (port->fd_passing) {
-> +               reply = g_dbus_create_reply(port->msg,
-> +                               DBUS_TYPE_UNIX_FD, &sk,
-> +                               DBUS_TYPE_INVALID);
-> +               g_dbus_send_message(device->conn, reply);
-> +               return;
-> +       }
-> +
-
-Since you have the message you may just check what is the method call
-which triggered the connect, so instead of creating a flag you just do
-e.g. if (g_str_equal(dbus_message_get_member(msg), "ConnectFD")).
-
-
--- 
-Luiz Augusto von Dentz
