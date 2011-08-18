@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1313502238-7581-2-git-send-email-prasadbhat22@gmail.com>
+In-Reply-To: <1313502238-7581-1-git-send-email-prasadbhat22@gmail.com>
 References: <1313502238-7581-1-git-send-email-prasadbhat22@gmail.com>
-	<1313502238-7581-2-git-send-email-prasadbhat22@gmail.com>
-Date: Thu, 18 Aug 2011 10:14:49 +0300
-Message-ID: <CABBYNZKDWGCVwiwAjF=+-7Q7x9JUO+XxXbqgFRhPWMt3Q7H8Xw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/6] Implementation of video-sink for VDP
+Date: Thu, 18 Aug 2011 10:11:03 +0300
+Message-ID: <CABBYNZLMe5wAOcQGX_3zkArygObhL3muQLgM_BOLc2UuX3x_Mg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] Initial VDP implementation
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Prasad Bhat <prasadbhat22@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
@@ -13,35 +12,20 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi
 
 On Tue, Aug 16, 2011 at 4:43 PM, Prasad Bhat <prasadbhat22@gmail.com> wrote:
-> +static GDBusMethodTable sink_methods[] = {
-> +       { "Connect",            "",     "",     sink_connect,
-> +                                               G_DBUS_METHOD_FLAG_ASYNC },
-> +       { "Disconnect",         "",     "",     sink_disconnect,
-> +                                               G_DBUS_METHOD_FLAG_ASYNC },
-> +       { "IsConnected",        "",     "b",    sink_is_connected,
-> +                                               G_DBUS_METHOD_FLAG_DEPRECATED },
+> ---
+>  Makefile.am |    1 +
+>  audio/vdp.c | 2026 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  audio/vdp.h |  112 ++++
+>  3 files changed, 2139 insertions(+), 0 deletions(-)
+>  create mode 100644 audio/vdp.c
+>  create mode 100644 audio/vdp.h
+>
 
-I guess we won't need a deprecated method here.
-
-> +       { "GetProperties",      "",     "a{sv}",sink_get_properties },
-> +       { NULL, NULL, NULL, NULL }
-> +};
-> +
-> +static GDBusSignalTable sink_signals[] = {
-> +       { "Connected",                  "",     G_DBUS_SIGNAL_FLAG_DEPRECATED },
-> +       { "Disconnected",               "",     G_DBUS_SIGNAL_FLAG_DEPRECATED },
-> +       { "Playing",                    "",     G_DBUS_SIGNAL_FLAG_DEPRECATED },
-> +       { "Stopped",                    "",     G_DBUS_SIGNAL_FLAG_DEPRECATED },
-
-And here too. Please remember to remove in other parts of the code too.
-
-> +       { "PropertyChanged",            "sv"    },
-> +       { NULL, NULL }
-> +};
-> +
+This is pretty much a duplicate of a2dp.{c,h}, so it would be nice to
+have this in a common file e.g. sep.{c,h} as suggested last time.
 
 -- 
 Luiz Augusto von Dentz
