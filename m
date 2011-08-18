@@ -1,67 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMOw1v6YJJ64DCD9pnPyZGYDOQep3qWhuiWC+qaR=_+3ichQBA@mail.gmail.com>
-References: <CA+GuLwdbSoT-iZg9EjTbxidr+fEE-KU8qgOZAyr_h05Gq9Xrgg@mail.gmail.com>
-	<CAMOw1v6YJJ64DCD9pnPyZGYDOQep3qWhuiWC+qaR=_+3ichQBA@mail.gmail.com>
-Date: Thu, 18 Aug 2011 13:45:44 -0700
-Message-ID: <CA+GuLwfL0mK-VFimk=B64nqMDrQNReOoe0bMSLGwEKh7TRm=OA@mail.gmail.com>
-Subject: Re: need help with bluez pairing/connecting device
-From: Ram Bhamidipaty <rambham@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH] adapter: add Trusted to DeviceFound signal
+Date: Thu, 18 Aug 2011 17:15:11 -0300
+Message-Id: <1313698511-13365-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 18, 2011 at 1:12 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> On Thu, Aug 18, 2011 at 2:53 PM, Ram Bhamidipaty <rambham@gmail.com> wrote:
->> I am writing some new software that talks to bluez-4.96.
->>
->> I have some how gotten a device into a weird state. When I make
->> a dbus call to org.bluez.Adapter.GetProperties
->> I see my target device in the list:
->>
->>       dict entry(
->>         string "Devices"
->>         variant             array [
->>               object path "/org/bluez/8090/hci0/dev_00_22_48_85_50_1D"
->>            ]
->>      )
->>
->>
->> When a device is listed here - what does it mean? I am guessing that
->> at this point the pairing process is over. Or does it mean something else?
->
-> It's the list of devices already paired. So, if you paired anytime
-> before, the device will appear in this list.
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
+doc says that this signal is has the same parameters as GetProperties
+reply.
+---
 
-Thank you. This helps me understand this.
+Not sure if this is really need. It at least could save a call to GetProperties
 
+ src/adapter.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 4c88a0e..a184d08 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2785,7 +2785,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	struct btd_device *device;
+ 	char peer_addr[18], local_addr[18];
+ 	const char *icon, *paddr = peer_addr;
+-	dbus_bool_t paired = FALSE;
++	dbus_bool_t paired = FALSE, trusted = FALSE;
+ 	dbus_int16_t rssi = dev->rssi;
+ 	char *alias;
+ 	size_t uuid_count;
+@@ -2794,8 +2794,10 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 	ba2str(&adapter->bdaddr, local_addr);
+ 
+ 	device = adapter_find_device(adapter, paddr);
+-	if (device)
++	if (device) {
+ 		paired = device_is_paired(device);
++		trusted = device_is_trusted(device);
++	}
+ 
+ 	/* The uuids string array is updated only if necessary */
+ 	uuid_count = g_slist_length(dev->services);
+@@ -2844,6 +2846,7 @@ void adapter_emit_device_found(struct btd_adapter *adapter,
+ 			"Alias", DBUS_TYPE_STRING, &alias,
+ 			"LegacyPairing", DBUS_TYPE_BOOLEAN, &dev->legacy,
+ 			"Paired", DBUS_TYPE_BOOLEAN, &paired,
++			"Trusted", DBUS_TYPE_BOOLEAN, &trusted,
+ 			"UUIDs", DBUS_TYPE_ARRAY, &dev->uuids, uuid_count,
+ 			NULL);
+ 
+-- 
+1.7.6
 
-
->
->
->>
->> However the device is not yet connected. So I next try to connect:
->>
->> dbus-send --system --type=method_call --print-reply --dest=org.bluez
->> /org/bluez/8090/hci0/dev_00_22_48_85_50_1D org.bluez.Input.Connect
->>
->> This fails with a cryptic:
->>
->> Error org.bluez.Error.Failed: Host is down (112)
->
-> It's because the other host is down (sic.). The fact that this path
-> exists doesn't means the device is around, it just means that some
-> time ago you paired it with this adapter. Turn the devices on and try
-> again.
->
-
-Thanks! In this case the device was in fact on. But it might be that the
-pairing information was somehow stale. Removing the device and
-re-pairing seemed to help.
-
--Ram
