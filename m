@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E4E2821.5040206@linux.intel.com>
+Date: Fri, 19 Aug 2011 11:08:49 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1313666245.17513.9.camel@THOR>
-References: <1313627847.10336.9.camel@THOR>
-	<CABBYNZJwn5CrY73-+kJK5jn9+B0V-Jx0Q+-NVH4BJVSLm7dDbA@mail.gmail.com>
-	<1313666245.17513.9.camel@THOR>
-Date: Fri, 19 Aug 2011 06:52:30 -0400
-Message-ID: <CAJdJm_OxbhXeLckhSFAnatYEE0ikKNVKxb=2wjEQ5vnMWjPYdQ@mail.gmail.com>
-Subject: Re: [RFC v2 1/5] Bluetooth: Only schedule LE tx links if LE-capable
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] doc: add org.bluez.Handsfree interface
+References: <1313155680-10759-1-git-send-email-frederic.danis@linux.intel.com> <20110812135543.GA4168@joana>
+In-Reply-To: <20110812135543.GA4168@joana>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hello Gustavo,
 
-On Thu, Aug 18, 2011 at 7:17 AM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> On Thu, 2011-08-18 at 03:43 -0400, Luiz Augusto von Dentz wrote:
->> Any reasons why you choose to not add the check inside hci_sched_le?
+Le 12/08/2011 15:55, Gustavo Padovan a écrit :
+> * Frédéric Danis<frederic.danis@linux.intel.com>  [2011-08-12 15:28:00 +0200]:
 >
-> Only to make it really obvious that LE transmission is not required on
-> the vast majority of BT controllers :)
+>> This change allows to share the same interface for both Handsfree HF
+>> and AG (only diffrence is interface name), and most part of the code.
+>>
+>> This will imply to rename and update audio/gateway.[ch] to be more hfp
+>> generic (moving it to audio/hfp.[ch], renaming APIs from gateway_...()
+>> to hfp_...()).
+>
+> what will be the future of the current implementation of the HFP Audio Gateway
+> implementation in BlueZ. Will it be  deprecated?
+>
+> 	Gustavo
 
-... yet. Are you aware LE is not optional on Bluetooth 4.0? Therefore
-any modern BT device claiming to support 4.0 will have LE support on
-its controller (host support is another thing).
+I do not know what will be the future, this proposal just add a new 
+interface allowing an external application (like oFono) to implement the 
+Handsfree Audio Gateway profile in a similar way than for current 
+Handsfree headset.
 
-But I suppose we will still see plenty of 2.1 devices for a long time...
+This allows the application to focus on profile implementation, letting 
+management of Bluetooth part (SDP advertisement, connection, 
+authentication, authorization, ...) to BlueZ.
 
-My two cents,
+Fred
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Frederic Danis                            Open Source Technology Centre
+frederic.danis@intel.com                              Intel Corporation
+
