@@ -2,89 +2,131 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruno Dilly <bdilly@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruno Dilly <bdilly@profusion.mobi>
-Subject: [PATCH 3/3] Add test for serial proxy and serial proxy manager
-Date: Fri, 19 Aug 2011 19:10:42 -0300
-Message-Id: <1313791842-32558-3-git-send-email-bdilly@profusion.mobi>
-In-Reply-To: <1313791842-32558-1-git-send-email-bdilly@profusion.mobi>
-References: <1313791842-32558-1-git-send-email-bdilly@profusion.mobi>
+Subject: [PATCH 1/3] Add Serial Proxy and Serial Proxy Manager doc
+Date: Fri, 19 Aug 2011 19:10:40 -0300
+Message-Id: <1313791842-32558-1-git-send-email-bdilly@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/test-serial-proxy |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 64 insertions(+), 0 deletions(-)
- create mode 100755 test/test-serial-proxy
+ doc/serial-proxy-api.txt |  108 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 108 insertions(+), 0 deletions(-)
+ create mode 100644 doc/serial-proxy-api.txt
 
-diff --git a/test/test-serial-proxy b/test/test-serial-proxy
-new file mode 100755
-index 0000000..f6dbd6c
+diff --git a/doc/serial-proxy-api.txt b/doc/serial-proxy-api.txt
+new file mode 100644
+index 0000000..fa08bcb
 --- /dev/null
-+++ b/test/test-serial-proxy
-@@ -0,0 +1,64 @@
-+#!/usr/bin/python
++++ b/doc/serial-proxy-api.txt
+@@ -0,0 +1,108 @@
++BlueZ D-Bus Serial API description
++**********************************
 +
-+import sys
-+import time
-+import dbus
-+import socket
-+from optparse import OptionParser, make_option
++Serial Proxy Manager hierarchy
++=================
 +
-+bus = dbus.SystemBus()
++Service		org.bluez
++Interface	org.bluez.SerialProxyManager
++Object path	[variable prefix]/{hci0,hci1,...}
 +
-+manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+						"org.bluez.Manager")
-+option_list = [
-+		make_option("-i", "--device", action="store",
-+				type="string", dest="dev_id"),
-+		]
-+parser = OptionParser(option_list=option_list)
++Methods		array{string} ListProxies()
 +
-+(options, args) = parser.parse_args()
++			Returns an array of the object path strings of
++			all the proxies created for the adapter.
 +
-+if options.dev_id:
-+	adapter_path = manager.FindAdapter(options.dev_id)
-+else:
-+	adapter_path = manager.DefaultAdapter()
++		string CreateProxy(string pattern, string address)
 +
-+adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+							"org.bluez.Adapter")
++			Possible patterns: UUID 128 bit as string
++					   Profile short names, e.g: spp, dun
++					   RFCOMM channel as string, 1-30
 +
-+if (len(args) < 1):
-+	print "Usage: %s <socket_name> [service]" % (sys.argv[0])
-+	sys.exit(1)
++			Address is the path to the TTY or Unix socket to be used.
++			Only one proxy per address (TTY or Unix socket)
++			is allowed.
 +
-+socket_name = args[0]
++			The object path of created proxy is returned.
++			On success this will emit a ProxyCreated signal.
 +
-+if (len(args) < 2):
-+	service = "spp"
-+else:
-+	service = args[1]
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.Failed
 +
-+sk = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-+sk.bind(socket_name)
-+sk.listen(1)
++		void RemoveProxy(string path)
 +
-+proxy_manager = dbus.Interface(bus.get_object("org.bluez", adapter_path),
-+						"org.bluez.SerialProxyManager")
-+proxy_path = proxy_manager.CreateProxy(service, socket_name)
++			This removes the proxy object at the given path.
++			On success this will emit a ProxyRemoved signal.
 +
-+proxy = dbus.Interface(bus.get_object("org.bluez", proxy_path),
-+							"org.bluez.SerialProxy")
-+proxy.Enable()
++			Possible Errors: org.bluez.Error.DoesNotExist
++					 org.bluez.Error.NotAuthorized
 +
-+conn, addr = sk.accept()
++Signals		ProxyCreated(string path)
 +
-+print "Waiting for message"
++			This signal indicates a proxy was created.
++			Parameter is object path of created proxy.
 +
-+while 1:
-+	data = conn.recv(1024)
-+	if data:
-+		print(data)
-+		break
++		ProxyRemoved(string path)
 +
-+proxy.Disable()
-+proxy_manager.RemoveProxy(proxy_path)
-+conn.close()
++			This signal indicates a proxy was removed.
++			Parameter is object path of removed proxy.
++
++Serial Proxy hierarchy
++================
++
++Service		org.bluez
++Interface	org.bluez.SerialProxy
++Object path	[variable prefix]/{hci0,hci1,...}/{proxy0,proxy1,...}
++
++Methods		void Enable()
++
++			Starts to listen to the TTY or Unix socket, allocates
++			a RFCOMM channel and add record to the server.
++
++			Possible errors: org.bluez.Error.Failed
++
++		void Disable()
++
++			Stops to listen to the TTY or Unix socket, shutdown
++			the RFCOMM channel allocated for the proxy, and remove
++			record from the server.
++
++			Possible errors: org.bluez.Error.Failed
++
++		dict GetInfo()
++
++			Returns all properties for the proxy. See the
++			properties section for available properties.
++
++		void SetSerialParameters(string rate, uint8 data, uint8 stop,
++			string parity)
++
++			Configures serial communication setting baud rate,
++			data bits, stop bits and parity.
++
++			Doesn't allow change TTY settings if it is open.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotAuthorized
++
++Properties	string uuid [readonly]
++
++			128-bit UUID that represents the available remote service.
++
++		string address [readonly]
++
++			Address is the path to the TTY or Unix socket name used,
++			set when the proxy was created.
++
++		uint8 channel [readonly]
++
++			RFCOMM channel.
++
++		boolean enabled [readonly]
++
++			Indicates if the proxy is currently enabled.
++
++		boolean connected [readonly]
++
++			Indicates if the proxy is currently connected.
 -- 
 1.7.4.1
 
