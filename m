@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Aug 2011 22:13:36 +0100
+Date: Fri, 19 Aug 2011 22:25:23 +0100
 From: Dave Higton <davehigton@dsl.pipex.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: RE: Bluetooth encryption algorithms
-Message-ID: <2a72630552.davehigton@dsl.pipex.com>
-References: <1312990866.4e42a6925110a@netmail.pipex.net> <5B4B9A479BF6994B88EA975675EC5B790580AC7068@MES1OS2SXC003.mes1.tconet.net>
-In-Reply-To: <5B4B9A479BF6994B88EA975675EC5B790580AC7068@MES1OS2SXC003.mes1.tconet.net>
+Message-ID: <7b86640552.davehigton@dsl.pipex.com>
+Subject: Arguments to PIN Code Request Response
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In message <5B4B9A479BF6994B88EA975675EC5B790580AC7068@MES1OS2SXC003.mes1.tconet.net>
-          "Cufi, Carles" <carles.cufi@nordicsemi.no> wrote:
+According to the Core Spec versions 4.0, 3.0, 2.1 and 2.0, the
+arguments to PIN Code Request Reply are BD_ADDR, PIN length, and
+PIN code.  However, this doesn't work with the devices I've tried
+(an Android phone and a mini keyboard); there are several more
+bytes of argument in a capture that I have.  If I only send the
+args as per the spec, I get an args not understood error; if I
+add these other arg bytes, copied from the capture, the PIN code
+is accepted and the pairing process continues.
 
-> Hi there,
-> > So if anyone can point me to sources of information detailed and
-> > explicit enough to show me how Bluetooth encryption and decryption are
-> > done, I would very much appreciate it.  I have the Bluetooth core
-> > specification, but I'm not confident that I can implement correctly from
-> > it alone.  I'm also looking for test data, ideally for each step through
-> > each algorithm.
-> 
-> Just register with bluetooth.org and get the Core Spec v4.0. All the
-> information you need is there.
-> 
-> https://www.bluetooth.org/Technical/Specifications/adopted.htm
+Are these extra arguments documented in one of the earlier core
+specifications, now deprecated?
 
-Like I said in the bit you quoted, I have the specification (I have
-Core Spec v4.0, although I didn't specifically say that).  At least
-I have, since I first posted, found the test data - I was almost sure
-I'd seen them before, but I couldn't find them via the index.  I saw
-them by accident when browsing for something else.  (Encryption test
-data not in the Security section... who'd have thought it?)
+The bytes I have are:
 
-I'm still hoping for something more tutorial or explanatory, but if
-I can't find anything, at least the test data will give me more
-confidence to try implementing from the specification.
+0D 04 17 3F 1B AC 26 2C DC 04 30 30 30 30 17 00 0C 11 0A 11 0B 11 16 11 02 0A
+
+Unless I've badly misunderstood something, the PIN code length
+above is 4, and the PIN code is ASCII "0000".  I don't expect to
+see any bytes following "30 30 30 30".
 
 Dave
