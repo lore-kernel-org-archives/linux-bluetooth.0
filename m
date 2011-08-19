@@ -1,32 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Aug 2011 22:25:23 +0100
-From: Dave Higton <davehigton@dsl.pipex.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <7b86640552.davehigton@dsl.pipex.com>
-Subject: Arguments to PIN Code Request Response
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Fri, 19 Aug 2011 22:57:35 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Alan Ott <alan@signal11.us>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
+	Ranulf Doswell <ralf@ranulf.net>,
+	"Pascal A . Brisset" <pascal44973@pabr.org>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>,
+	Mikko Virkkila <virkkila@kapsi.fi>,
+	Simon Wood <simon@mungewell.org>,
+	Arc Riley <arcriley@gmail.com>
+Subject: Re: [PATCH 0/4 incremental 1/2] Generalize controller handling to
+ support different devices
+Message-Id: <20110819225735.ed1dbaa9aaa2f250d693c030@studenti.unina.it>
+In-Reply-To: <20110819211449.b17b35611f11979f9d59a8ab@studenti.unina.it>
+References: <20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
+	<1313677340-4441-1-git-send-email-ospite@studenti.unina.it>
+	<4E4D2F2E.20105@signal11.us>
+	<20110819211449.b17b35611f11979f9d59a8ab@studenti.unina.it>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Fri__19_Aug_2011_22_57_35_+0200_FIB_wGoo4BH9FBS9"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to the Core Spec versions 4.0, 3.0, 2.1 and 2.0, the
-arguments to PIN Code Request Reply are BD_ADDR, PIN length, and
-PIN code.  However, this doesn't work with the devices I've tried
-(an Android phone and a mini keyboard); there are several more
-bytes of argument in a capture that I have.  If I only send the
-args as per the spec, I get an args not understood error; if I
-add these other arg bytes, copied from the capture, the PIN code
-is accepted and the pairing process continues.
+--Signature=_Fri__19_Aug_2011_22_57_35_+0200_FIB_wGoo4BH9FBS9
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Are these extra arguments documented in one of the earlier core
-specifications, now deprecated?
+On Fri, 19 Aug 2011 21:14:49 +0200
+Antonio Ospite <ospite@studenti.unina.it> wrote:
 
-The bytes I have are:
+> WRT HID_UUID, maybe this is not device specific, it might just tell
+> "this is a HID device", I need confirmation about that so I can move the
+> field out of the structure.
+>
 
-0D 04 17 3F 1B AC 26 2C DC 04 30 30 30 30 17 00 0C 11 0A 11 0B 11 16 11 02 0A
+On a second thought, if this UUID is per device _type_, then it may
+still make sense to have it in the struct, in case the PS3 headset will
+need a different UUID, I'll just rename the field to just "uuid"
+because the HID part is relative to the _value_.
 
-Unless I've badly misunderstood something, the PIN code length
-above is 4, and the PIN code is ASCII "0000".  I don't expect to
-see any bytes following "30 30 30 30".
+Here's some doc about UUIDs I've found:
+http://www.bluetooth.org/Technical/AssignedNumbers/service_discovery.htm
 
-Dave
+About the PNP record, I can find some info about the "PnP Information"
+service in SDP, and I can see something with:
+	$ sdptool records --tree <device_bdaddr>
+
+but I don't know how to get the actual value currently used in the
+plugin.
+
+Thanks,
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Fri__19_Aug_2011_22_57_35_+0200_FIB_wGoo4BH9FBS9
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5Ozj8ACgkQ5xr2akVTsAFLoACfZJzq4GklNxUDz3GQVzGJWKab
+8MkAnie/PW+AvbJbNG6BjO2U8OsPG9v1
+=gEDV
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__19_Aug_2011_22_57_35_+0200_FIB_wGoo4BH9FBS9--
