@@ -2,97 +2,164 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 06/11] Bluetooth: Rename smp_key_size to enc_size
-Date: Fri, 19 Aug 2011 21:08:10 -0300
-Message-Id: <1313798895-8705-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 05/11] Bluetooth: Add handlers for the new mgmt messages
+Date: Fri, 19 Aug 2011 21:08:09 -0300
+Message-Id: <1313798895-8705-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes it more clear that the encryption size (effective
-size of the key used for encrypting the link) is a different
-concept than the pin code lenght.
-
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   20 ++++++++++----------
- 1 files changed, 10 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci.h      |    1 +
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/mgmt.c             |   97 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 99 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index fd5e1ca..eb9e3e7 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -41,7 +41,7 @@ struct smp_chan {
- 	u8		rrnd[16]; /* SMP Pairing Random (remote) */
- 	u8		pcnf[16]; /* SMP Pairing Confirm */
- 	u8		tk[16]; /* SMP Temporary Key */
--	u8		smp_key_size;
-+	u8		enc_size;
- 	struct crypto_blkcipher	*tfm;
- 	struct work_struct confirm;
- 	struct work_struct random;
-@@ -243,7 +243,7 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
- 			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
- 		return SMP_ENC_KEY_SIZE;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index be30aab..559f4d5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -260,6 +260,7 @@ enum {
+ #define HCI_LK_AUTH_COMBINATION		0x05
+ #define HCI_LK_CHANGED_COMBINATION	0x06
+ /* The spec doesn't define types for SMP keys */
++#define HCI_LK_SMP_STK			0x80
+ #define HCI_LK_SMP_LTK			0x81
+ #define HCI_LK_SMP_IRK			0x82
+ #define HCI_LK_SMP_CSRK			0x83
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f3a2e10..94097fd 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -882,6 +882,7 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_discovering(u16 index, u8 discovering);
++int mgmt_new_smp_key(u16 index, struct smp_link_key *key, u8 persistent);
  
--	smp->smp_key_size = max_key_size;
-+	smp->enc_size = max_key_size;
- 
- 	return 0;
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0e73880..ebe6c3f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1741,6 +1741,73 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 	return err;
  }
-@@ -337,8 +337,8 @@ static void random_work(struct work_struct *work)
- 		smp_s1(tfm, smp->tk, smp->rrnd, smp->prnd, key);
- 		swap128(key, stk);
  
--		memset(stk + smp->smp_key_size, 0,
--				SMP_MAX_ENC_KEY_SIZE - smp->smp_key_size);
-+		memset(stk + smp->enc_size, 0,
-+				SMP_MAX_ENC_KEY_SIZE - smp->enc_size);
- 
- 		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->pend)) {
- 			reason = SMP_UNSPECIFIED;
-@@ -346,7 +346,7 @@ static void random_work(struct work_struct *work)
- 		}
- 
- 		hci_le_start_enc(hcon, ediv, rand, stk);
--		hcon->enc_key_size = smp->smp_key_size;
-+		hcon->enc_key_size = smp->enc_size;
- 	} else {
- 		u8 stk[16], r[16], rand[8];
- 		__le16 ediv;
-@@ -360,10 +360,10 @@ static void random_work(struct work_struct *work)
- 		smp_s1(tfm, smp->tk, smp->prnd, smp->rrnd, key);
- 		swap128(key, stk);
- 
--		memset(stk + smp->smp_key_size, 0,
--				SMP_MAX_ENC_KEY_SIZE - smp->smp_key_size);
-+		memset(stk + smp->enc_size, 0,
-+				SMP_MAX_ENC_KEY_SIZE - smp->enc_size);
- 
--		hci_add_ltk(hcon->hdev, 0, conn->dst, smp->smp_key_size,
-+		hci_add_ltk(hcon->hdev, 0, conn->dst, smp->enc_size,
- 							ediv, rand, stk);
- 	}
- 
-@@ -630,7 +630,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	skb_pull(skb, sizeof(*rp));
- 
--	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->smp_key_size,
-+	hci_add_ltk(conn->hcon->hdev, 1, conn->src, smp->enc_size,
- 						rp->ediv, rp->rand, smp->tk);
- 
- 	smp_distribute_keys(conn, 1);
-@@ -754,7 +754,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
- 
- 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
- 
--		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->smp_key_size,
-+		hci_add_ltk(conn->hcon->hdev, 1, conn->dst, smp->enc_size,
- 						ediv, ident.rand, enc.ltk);
- 
- 		ident.ediv = cpu_to_le16(ediv);
++static int load_smp_keys(struct sock *sk, u16 index, unsigned char *data,
++								u16 len)
++{
++	struct hci_dev *hdev;
++	struct mgmt_cp_load_smp_keys *cp;
++	u16 key_count, expected_len;
++	int i;
++
++	cp = (void *) data;
++
++	if (len < sizeof(*cp))
++		return -EINVAL;
++
++	key_count = get_unaligned_le16(&cp->key_count);
++
++	expected_len = sizeof(*cp) + key_count *
++					sizeof(struct mgmt_smp_key_info);
++	if (expected_len != len) {
++		BT_ERR("load_keys: expected %u bytes, got %u bytes",
++							len, expected_len);
++		return -EINVAL;
++	}
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return cmd_status(sk, index, MGMT_OP_LOAD_KEYS, ENODEV);
++
++	BT_DBG("hci%u debug_keys %u key_count %u", index, cp->debug_keys,
++								key_count);
++
++	hci_dev_lock_bh(hdev);
++
++	hci_smp_keys_clear(hdev);
++
++	set_bit(HCI_LINK_KEYS, &hdev->flags);
++
++	if (cp->debug_keys)
++		set_bit(HCI_DEBUG_KEYS, &hdev->flags);
++	else
++		clear_bit(HCI_DEBUG_KEYS, &hdev->flags);
++
++	for (i = 0; i < key_count; i++) {
++		struct mgmt_smp_key_info *key = &cp->keys[i];
++		struct smp_ltk_info *ltk;
++
++		switch (key->type) {
++		case HCI_LK_SMP_STK:
++			BT_DBG("This key shouldn't be stored");
++			break;
++
++		case HCI_LK_SMP_LTK:
++			ltk = &key->ltk;
++			/* Add key to the smp list */
++			break;
++
++		default:
++			BT_DBG("Not supported");
++			break;
++		}
++	}
++
++	hci_dev_unlock_bh(hdev);
++	hci_dev_put(hdev);
++
++	return 0;
++}
++
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	unsigned char *buf;
+@@ -1861,6 +1928,9 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 	case MGMT_OP_UNBLOCK_DEVICE:
+ 		err = unblock_device(sk, index, buf + sizeof(*hdr), len);
+ 		break;
++	case MGMT_OP_LOAD_SMP_KEYS:
++		err = load_smp_keys(sk, index, buf + sizeof(*hdr), len);
++		break;
+ 	default:
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode, 0x01);
+@@ -2268,3 +2338,30 @@ int mgmt_discovering(u16 index, u8 discovering)
+ 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
+ 						sizeof(discovering), NULL);
+ }
++
++int mgmt_new_smp_key(u16 index, struct smp_link_key *key, u8 persistent)
++{
++	struct mgmt_ev_new_smp_key ev;
++	struct smp_ltk_info *ltk;
++	struct smp_irsk_info *irsk;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.store_hint = persistent;
++	bacpy(&ev.key.bdaddr, &key->bdaddr);
++	ev.key.type = key->type;
++	memcpy(ev.key.val, key->val, 16);
++
++	switch (key->type) {
++	case HCI_LK_SMP_LTK:
++		ltk = &ev.key.ltk;
++		memcpy(ltk, &key->ltk, sizeof(*ltk));
++		break;
++	case HCI_LK_SMP_IRK:
++		irsk = &ev.key.irsk;
++		memcpy(irsk, &key->irsk, sizeof(*irsk));
++		break;
++	}
++
++	return mgmt_event(MGMT_EV_NEW_SMP_KEY, index, &ev, sizeof(ev), NULL);
++}
 -- 
 1.7.6
 
