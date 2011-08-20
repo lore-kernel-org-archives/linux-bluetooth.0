@@ -2,65 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 6/8] Fix connecting to the local adapter when receiving new keys
-Date: Fri, 19 Aug 2011 21:09:27 -0300
-Message-Id: <1313798969-8772-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 5/8] Fix not using the "bonded" property for new bondings
+Date: Fri, 19 Aug 2011 21:09:26 -0300
+Message-Id: <1313798969-8772-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798969-8772-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798969-8772-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In some cases, we receive a key for when the local adapter is
-the responder and one key for when the local adapter is
-the initiator of the connection, so one key might have both address
-equal to the local adapter.
+When checking if a device was already bonded, we should
+use the paired property instead of reading the link key
+from storage. This method will work for LE links, also.
 ---
- src/event.c |   17 ++++++++++++++---
- 1 files changed, 14 insertions(+), 3 deletions(-)
+ src/device.c |   16 +---------------
+ 1 files changed, 1 insertions(+), 15 deletions(-)
 
-diff --git a/src/event.c b/src/event.c
-index 6d276f4..fb7d102 100644
---- a/src/event.c
-+++ b/src/event.c
-@@ -215,6 +215,9 @@ void btd_event_bonding_complete(bdaddr_t *local, bdaddr_t *peer,
- 
- 	create = status ? FALSE : TRUE;
- 
-+	if (bacmp(local, peer) == 0)
-+		return;
-+
- 	if (!get_adapter_and_device(local, peer, &adapter, &device, create))
- 		return;
- 
-@@ -430,9 +433,17 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+diff --git a/src/device.c b/src/device.c
+index b0adac0..04469d7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2125,29 +2125,15 @@ DBusMessage *device_create_bonding(struct btd_device *device,
+ 					const char *agent_path,
+ 					uint8_t capability)
  {
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
--	int ret;
-+	int ret, diff;
+-	char filename[PATH_MAX + 1];
+-	char *str, srcaddr[18], dstaddr[18];
+ 	struct btd_adapter *adapter = device->adapter;
+ 	struct bonding_req *bonding;
+-	bdaddr_t src;
+ 	int err;
  
--	if (!get_adapter_and_device(local, peer, &adapter, &device, TRUE))
-+	diff = bacmp(local, peer);
-+
-+	/*
-+	 * If local and peer addresses are equal it means that this key is a
-+	 * "slave" key, and it should be stored, but the device must not be
-+	 * created.
-+	 */
-+	if (diff && !get_adapter_and_device(local, peer,
-+						&adapter, &device, TRUE))
- 		return -ENODEV;
+-	adapter_get_address(adapter, &src);
+-	ba2str(&src, srcaddr);
+-	ba2str(&device->bdaddr, dstaddr);
+-
+ 	if (device->bonding)
+ 		return btd_error_in_progress(msg);
  
- 	DBG("storing link key of type 0x%02x", key_type);
-@@ -456,7 +467,7 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
- 		break;
- 	}
+-	/* check if a link key already exists */
+-	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr,
+-			"linkkeys");
+-
+-	str = textfile_caseget(filename, dstaddr);
+-	if (str) {
+-		free(str);
++	if (device_is_bonded(device))
+ 		return btd_error_already_exists(msg);
+-	}
  
--	if (ret == 0) {
-+	if (ret == 0 && diff) {
- 		device_set_bonded(device, TRUE);
- 
- 		if (device_is_temporary(device))
+ 	err = adapter_create_bonding(adapter, &device->bdaddr, capability);
+ 	if (err < 0)
 -- 
 1.7.6
 
