@@ -2,95 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 01/11] Bluetooth: Use the LTK after receiving a LE Security Request
-Date: Fri, 19 Aug 2011 21:08:05 -0300
-Message-Id: <1313798895-8705-2-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 04/11] Bluetooth: Add support for cleaning the SMP key list
+Date: Fri, 19 Aug 2011 21:08:08 -0300
+Message-Id: <1313798895-8705-5-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When receiving a security request from the remote device we should find
-if there is already a LTK associated with the remote device, if found
-we should use it to encrypt the link.
-
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/smp.c |   46 ++++++++++++++++++++++++++++------------------
- 1 files changed, 28 insertions(+), 18 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 74afdb7..fd5e1ca 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -513,6 +513,29 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e352f63..f3a2e10 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -577,6 +577,7 @@ int hci_link_keys_clear(struct hci_dev *hdev);
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
+ 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
++int hci_smp_keys_clear(struct hci_dev *hdev);
+ struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
+ struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
+ 					bdaddr_t *bdaddr, u8 type);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 534a271..c650e9b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1005,6 +1005,18 @@ int hci_link_keys_clear(struct hci_dev *hdev)
  	return 0;
  }
  
-+static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
++int hci_smp_keys_clear(struct hci_dev *hdev)
 +{
-+	struct link_key *key;
-+	struct key_master_id *master;
-+	struct hci_conn *hcon = conn->hcon;
++	struct smp_link_key *k, *tmp;
 +
-+	key = hci_find_link_key_type(hcon->hdev, conn->dst,
-+						HCI_LK_SMP_LTK);
-+	if (!key)
-+		return 0;
++	list_for_each_entry_safe(k, tmp, &hdev->smp_keys, list) {
++		list_del(&k->list);
++		kfree(k);
++	}
 +
-+	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND,
-+					&hcon->pend))
-+		return 1;
-+
-+	master = (void *) key->data;
-+	hci_le_start_enc(hcon, master->ediv, master->rand,
-+						key->val);
-+	hcon->enc_key_size = key->pin_len;
-+
-+	return 1;
-+
++	return 0;
 +}
- static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_security_req *rp = (void *) skb->data;
-@@ -522,6 +545,9 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	BT_DBG("conn %p", conn);
- 
-+	if (smp_ltk_encrypt(conn))
-+		return 0;
 +
- 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
- 		return 0;
+ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct list_head *p;
+@@ -1502,6 +1514,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	INIT_LIST_HEAD(&hdev->uuids);
  
-@@ -556,25 +582,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
- 	if (hcon->sec_level >= sec_level)
- 		return 1;
+ 	INIT_LIST_HEAD(&hdev->link_keys);
++	INIT_LIST_HEAD(&hdev->smp_keys);
  
--	if (hcon->link_mode & HCI_LM_MASTER) {
--		struct link_key *key;
--
--		key = hci_find_link_key_type(hcon->hdev, conn->dst,
--							HCI_LK_SMP_LTK);
--		if (key) {
--			struct key_master_id *master = (void *) key->data;
--
--			if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND,
--							&hcon->pend))
--				goto done;
--
--			hci_le_start_enc(hcon, master->ediv, master->rand,
--								key->val);
--			hcon->enc_key_size = key->pin_len;
--
-+	if (hcon->link_mode & HCI_LM_MASTER)
-+		if (smp_ltk_encrypt(conn))
- 			goto done;
--		}
--	}
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
  
- 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
- 		return 0;
+@@ -1589,6 +1602,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_blacklist_clear(hdev);
+ 	hci_uuids_clear(hdev);
+ 	hci_link_keys_clear(hdev);
++	hci_smp_keys_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_adv_entries_clear(hdev);
+ 	hci_dev_unlock_bh(hdev);
 -- 
 1.7.6
 
