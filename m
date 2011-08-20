@@ -2,92 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 7/7] Bluetooth: Add link_type information to the mgmt Connected event
-Date: Fri, 19 Aug 2011 21:06:56 -0300
-Message-Id: <1313798816-8647-8-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 6/7] Bluetooth: Add support for running SMP without a socket
+Date: Fri, 19 Aug 2011 21:06:55 -0300
+Message-Id: <1313798816-8647-7-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-One piece of information that was lost when using the mgmt interface,
-was the type of the connection. Using HCI events we used to know
-the type of the connection based on the type of the event, e.g.
-HCI_LE_Connection_Complete for LE links.
+When doing the pairing procedure we won't have an associated
+socket, but we still have to do the SMP negotiation. This
+adds support for encrypting the link and exchanging keys.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- include/net/bluetooth/mgmt.h     |    1 +
- net/bluetooth/hci_event.c        |    4 ++--
- net/bluetooth/mgmt.c             |    3 ++-
- 4 files changed, 6 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c |   10 ++++++++--
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index d8fc1f2..6e68e43 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -839,7 +839,7 @@ int mgmt_powered(u16 index, u8 powered);
- int mgmt_discoverable(u16 index, u8 discoverable);
- int mgmt_connectable(u16 index, u8 connectable);
- int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
--int mgmt_connected(u16 index, bdaddr_t *bdaddr);
-+int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
- int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
- int mgmt_disconnect_failed(u16 index);
- int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 5428fd3..1c914dd 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -249,6 +249,7 @@ struct mgmt_ev_new_key {
- #define MGMT_EV_CONNECTED		0x000B
- struct mgmt_ev_connected {
- 	bdaddr_t bdaddr;
-+	__u8 link_type;
- } __packed;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ed1d2bd..00e93d1 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -912,6 +912,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	if (!conn->hcon->out && conn->hcon->type == LE_LINK)
+ 		l2cap_le_conn_ready(conn);
  
- #define MGMT_EV_DISCONNECTED		0x000C
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a40170e..8483cab 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1413,7 +1413,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
- 			conn->state = BT_CONFIG;
- 			hci_conn_hold(conn);
- 			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
--			mgmt_connected(hdev->id, &ev->bdaddr);
-+			mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
- 		} else
- 			conn->state = BT_CONNECTED;
++	if (conn->hcon->out && conn->hcon->type == LE_LINK)
++		smp_conn_security(conn, conn->hcon->pending_sec_level);
++
+ 	read_lock(&conn->chan_lock);
  
-@@ -2817,7 +2817,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
- 		goto unlock;
- 	}
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+@@ -4034,6 +4037,11 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
  
--	mgmt_connected(hdev->id, &ev->bdaddr);
-+	mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
+ 	BT_DBG("conn %p", conn);
  
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->handle = __le16_to_cpu(ev->handle);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1ce8d80..dac7d39 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2012,11 +2012,12 @@ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
- 	return err;
- }
++	if (hcon->type == LE_LINK) {
++		smp_distribute_keys(conn, 0);
++		del_timer(&conn->security_timer);
++	}
++
+ 	read_lock(&conn->chan_lock);
  
--int mgmt_connected(u16 index, bdaddr_t *bdaddr)
-+int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
- {
- 	struct mgmt_ev_connected ev;
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+@@ -4046,9 +4054,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		if (chan->scid == L2CAP_CID_LE_DATA) {
+ 			if (!status && encrypt) {
+ 				chan->sec_level = hcon->sec_level;
+-				del_timer(&conn->security_timer);
+ 				l2cap_chan_ready(sk);
+-				smp_distribute_keys(conn, 0);
+ 			}
  
- 	bacpy(&ev.bdaddr, bdaddr);
-+	ev.link_type = link_type;
- 
- 	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
- }
+ 			bh_unlock_sock(sk);
 -- 
 1.7.6
 
