@@ -2,59 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 6/7] Bluetooth: Add support for running SMP without a socket
-Date: Fri, 19 Aug 2011 21:06:55 -0300
-Message-Id: <1313798816-8647-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 5/7] Bluetooth: Add support for pairing via mgmt over LE
+Date: Fri, 19 Aug 2011 21:06:54 -0300
+Message-Id: <1313798816-8647-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When doing the pairing procedure we won't have an associated
-socket, but we still have to do the SMP negotiation. This
-adds support for encrypting the link and exchanging keys.
+Using the advertising cache we are able to infer the type
+of the remote device, and so trigger pairing over the correct
+link type.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c |   10 ++++++++--
- 1 files changed, 8 insertions(+), 2 deletions(-)
+ net/bluetooth/mgmt.c |   15 +++++++++++++--
+ 1 files changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ed1d2bd..00e93d1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -912,6 +912,9 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 	if (!conn->hcon->out && conn->hcon->type == LE_LINK)
- 		l2cap_le_conn_ready(conn);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 53e109e..1ce8d80 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1347,6 +1347,7 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 	struct hci_dev *hdev;
+ 	struct mgmt_cp_pair_device *cp;
+ 	struct pending_cmd *cmd;
++	struct adv_entry *entry;
+ 	u8 sec_level, auth_type;
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -1372,7 +1373,14 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
+ 	}
  
-+	if (conn->hcon->out && conn->hcon->type == LE_LINK)
-+		smp_conn_security(conn, conn->hcon->pending_sec_level);
+-	conn = hci_connect(hdev, ACL_LINK, &cp->bdaddr, sec_level, auth_type);
++	entry = hci_find_adv_entry(hdev, &cp->bdaddr);
++	if (entry)
++		conn = hci_connect(hdev, LE_LINK, &cp->bdaddr, sec_level,
++								auth_type);
++	else
++		conn = hci_connect(hdev, ACL_LINK, &cp->bdaddr, sec_level,
++								auth_type);
 +
- 	read_lock(&conn->chan_lock);
+ 	if (IS_ERR(conn)) {
+ 		err = PTR_ERR(conn);
+ 		goto unlock;
+@@ -1391,7 +1399,10 @@ static int pair_device(struct sock *sk, u16 index, unsigned char *data, u16 len)
+ 		goto unlock;
+ 	}
  
- 	list_for_each_entry(chan, &conn->chan_l, list) {
-@@ -4034,6 +4037,11 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 	BT_DBG("conn %p", conn);
- 
-+	if (hcon->type == LE_LINK) {
-+		smp_distribute_keys(conn, 0);
-+		del_timer(&conn->security_timer);
-+	}
+-	conn->connect_cfm_cb = pairing_complete_cb;
++	/* For LE, just connecting isn't a proof that the pairing finished */
++	if (!entry)
++		conn->connect_cfm_cb = pairing_complete_cb;
 +
- 	read_lock(&conn->chan_lock);
- 
- 	list_for_each_entry(chan, &conn->chan_l, list) {
-@@ -4046,9 +4054,7 @@ static int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		if (chan->scid == L2CAP_CID_LE_DATA) {
- 			if (!status && encrypt) {
- 				chan->sec_level = hcon->sec_level;
--				del_timer(&conn->security_timer);
- 				l2cap_chan_ready(sk);
--				smp_distribute_keys(conn, 0);
- 			}
- 
- 			bh_unlock_sock(sk);
+ 	conn->security_cfm_cb = pairing_complete_cb;
+ 	conn->disconn_cfm_cb = pairing_complete_cb;
+ 	conn->io_capability = cp->io_cap;
 -- 
 1.7.6
 
