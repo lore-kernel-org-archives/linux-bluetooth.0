@@ -2,45 +2,92 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 00/11] Bluetooth: New mgmt messages for SMP Keys
-Date: Fri, 19 Aug 2011 21:08:04 -0300
-Message-Id: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 7/7] Bluetooth: Add link_type information to the mgmt Connected event
+Date: Fri, 19 Aug 2011 21:06:56 -0300
+Message-Id: <1313798816-8647-8-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+One piece of information that was lost when using the mgmt interface,
+was the type of the connection. Using HCI events we used to know
+the type of the connection based on the type of the event, e.g.
+HCI_LE_Connection_Complete for LE links.
 
-Using new messages for SMP keys allow for simpler code as it is always
-clear from context the kind of key that is necessary.
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |    2 +-
+ include/net/bluetooth/mgmt.h     |    1 +
+ net/bluetooth/hci_event.c        |    4 ++--
+ net/bluetooth/mgmt.c             |    3 ++-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-Along with this are some fixes for problems found while implementing the
-Proximity Profile.
-
---
-
-Vinicius Costa Gomes (11):
-  Bluetooth: Use the LTK after receiving a LE Security Request
-  Revert "Bluetooth: Add support for communicating keys with userspace"
-  Bluetooth: Add structures for the new SMP messages
-  Bluetooth: Add support for cleaning the SMP key list
-  Bluetooth: Add handlers for the new mgmt messages
-  Bluetooth: Rename smp_key_size to enc_size
-  Bluetooth: Use the smp_keys list for accessing SMP keys
-  Bluetooth: Remove the link key if LE pairing fails
-  Bluetooth: Fix not setting a pending security level
-  Bluetooth: Fix setting the connection sec_level when encryption fails
-  Bluetooth: Remove support for other SMP keys than the LTK
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   39 ++++++---
- include/net/bluetooth/mgmt.h     |   26 ++++++-
- net/bluetooth/hci_core.c         |  103 ++++++++++++++++---------
- net/bluetooth/hci_event.c        |   13 ++-
- net/bluetooth/l2cap_core.c       |    6 +-
- net/bluetooth/mgmt.c             |  159 +++++++++++++++++++++++++++-----------
- net/bluetooth/smp.c              |   78 +++++++++++--------
- 8 files changed, 291 insertions(+), 134 deletions(-)
-
---
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d8fc1f2..6e68e43 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -839,7 +839,7 @@ int mgmt_powered(u16 index, u8 powered);
+ int mgmt_discoverable(u16 index, u8 discoverable);
+ int mgmt_connectable(u16 index, u8 connectable);
+ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent);
+-int mgmt_connected(u16 index, bdaddr_t *bdaddr);
++int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type);
+ int mgmt_disconnected(u16 index, bdaddr_t *bdaddr);
+ int mgmt_disconnect_failed(u16 index);
+ int mgmt_connect_failed(u16 index, bdaddr_t *bdaddr, u8 status);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 5428fd3..1c914dd 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -249,6 +249,7 @@ struct mgmt_ev_new_key {
+ #define MGMT_EV_CONNECTED		0x000B
+ struct mgmt_ev_connected {
+ 	bdaddr_t bdaddr;
++	__u8 link_type;
+ } __packed;
+ 
+ #define MGMT_EV_DISCONNECTED		0x000C
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a40170e..8483cab 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1413,7 +1413,7 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+ 			conn->state = BT_CONFIG;
+ 			hci_conn_hold(conn);
+ 			conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-			mgmt_connected(hdev->id, &ev->bdaddr);
++			mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
+ 		} else
+ 			conn->state = BT_CONNECTED;
+ 
+@@ -2817,7 +2817,7 @@ static inline void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff
+ 		goto unlock;
+ 	}
+ 
+-	mgmt_connected(hdev->id, &ev->bdaddr);
++	mgmt_connected(hdev->id, &ev->bdaddr, conn->type);
+ 
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->handle = __le16_to_cpu(ev->handle);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1ce8d80..dac7d39 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2012,11 +2012,12 @@ int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
+ 	return err;
+ }
+ 
+-int mgmt_connected(u16 index, bdaddr_t *bdaddr)
++int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
+ {
+ 	struct mgmt_ev_connected ev;
+ 
+ 	bacpy(&ev.bdaddr, bdaddr);
++	ev.link_type = link_type;
+ 
+ 	return mgmt_event(MGMT_EV_CONNECTED, index, &ev, sizeof(ev), NULL);
+ }
+-- 
 1.7.6
 
