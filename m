@@ -2,35 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH 10/11] Bluetooth: Fix setting the connection sec_level when encryption fails
-Date: Fri, 19 Aug 2011 21:08:14 -0300
-Message-Id: <1313798895-8705-11-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH 09/11] Bluetooth: Fix not setting a pending security level
+Date: Fri, 19 Aug 2011 21:08:13 -0300
+Message-Id: <1313798895-8705-10-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the encryption changed event indicates that happened an error we
-should not set the security level of the connection.
+For slave initiated security, we should set a default security level,
+for now BT_SECURITY_MEDIUM.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/bluetooth/smp.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ec3815a..536f87a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -782,7 +782,7 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 	if (conn->sec_level == BT_SECURITY_SDP)
- 		conn->sec_level = BT_SECURITY_LOW;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 4531681..5e6ee28 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -545,6 +545,8 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
--	if (conn->pending_sec_level > conn->sec_level)
-+	if (!status && conn->pending_sec_level > conn->sec_level)
- 		conn->sec_level = conn->pending_sec_level;
+ 	BT_DBG("conn %p", conn);
  
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
++	hcon->pending_sec_level = BT_SECURITY_MEDIUM;
++
+ 	if (smp_ltk_encrypt(conn))
+ 		return 0;
+ 
 -- 
 1.7.6
 
