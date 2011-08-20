@@ -2,198 +2,148 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ 06/12] Add handlers for the new mgmt SMP messages
-Date: Fri, 19 Aug 2011 21:12:02 -0300
-Message-Id: <1313799128-8842-7-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ 05/12] Add support for storing the SMP Long Term Key
+Date: Fri, 19 Aug 2011 21:12:01 -0300
+Message-Id: <1313799128-8842-6-git-send-email-vinicius.gomes@openbossa.org>
 In-Reply-To: <1313799128-8842-1-git-send-email-vinicius.gomes@openbossa.org>
 References: <1313799128-8842-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds support for receiving keys with arbitrary data following
+it, this is because for SMP we may have different types of keys that
+have different kind of data associated with them.
+
+And we keep that associated data opaque, as only the communication
+functions need to be aware of its contents, for storage there's no
+need to export that information.
 ---
- plugins/hciops.c  |    6 +++
- plugins/mgmtops.c |   94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h     |   10 ++++++
- 3 files changed, 110 insertions(+), 0 deletions(-)
+ plugins/hciops.c  |    2 +-
+ plugins/mgmtops.c |    3 +-
+ src/event.c       |   64 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/event.h       |    3 +-
+ 4 files changed, 65 insertions(+), 7 deletions(-)
 
 diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 869a814..cf8dd3a 100644
+index 43f4f02..869a814 100644
 --- a/plugins/hciops.c
 +++ b/plugins/hciops.c
-@@ -3636,6 +3636,11 @@ static int hciops_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
- 	return 0;
- }
+@@ -996,7 +996,7 @@ static void link_key_notify(int index, void *ptr)
  
-+static int hciops_load_smp_keys(int index, GSList *keys)
-+{
-+	return -ENOSYS;
-+}
-+
- static struct btd_adapter_ops hci_ops = {
- 	.setup = hciops_setup,
- 	.cleanup = hciops_cleanup,
-@@ -3674,6 +3679,7 @@ static struct btd_adapter_ops hci_ops = {
- 	.read_local_oob_data = hciops_read_local_oob_data,
- 	.add_remote_oob_data = hciops_add_remote_oob_data,
- 	.remove_remote_oob_data = hciops_remove_remote_oob_data,
-+	.load_smp_keys = hciops_load_smp_keys,
- };
+ 		err = btd_event_link_key_notify(&dev->bdaddr, dba,
+ 						evt->link_key, key_type,
+-						dev->pin_length);
++						dev->pin_length, NULL, 0);
  
- static int hciops_init(void)
+ 		if (err == -ENODEV)
+ 			status = HCI_OE_LOW_RESOURCES;
 diff --git a/plugins/mgmtops.c b/plugins/mgmtops.c
-index bf9e9af..3fd1b3f 100644
+index 3cdb97e..bf9e9af 100644
 --- a/plugins/mgmtops.c
 +++ b/plugins/mgmtops.c
-@@ -1386,6 +1386,45 @@ static void mgmt_discovering(int sk, uint16_t index, void *buf, size_t len)
- 	adapter_set_state(adapter, state);
+@@ -408,7 +408,8 @@ static void mgmt_new_key(int sk, uint16_t index, void *buf, size_t len)
+ 	if (ev->store_hint)
+ 		btd_event_link_key_notify(&info->bdaddr, &ev->key.bdaddr,
+ 						ev->key.val, ev->key.type,
+-						ev->key.pin_len);
++						ev->key.pin_len, NULL, 0);
++
+ 
+ 	btd_event_bonding_complete(&info->bdaddr, &ev->key.bdaddr, 0);
+ }
+diff --git a/src/event.c b/src/event.c
+index dc45bd3..ade882e 100644
+--- a/src/event.c
++++ b/src/event.c
+@@ -385,9 +385,48 @@ proceed:
+ 	adapter_set_state(adapter, STATE_IDLE);
  }
  
-+static void mgmt_new_smp_key(int sk, uint16_t index, void *buf, size_t len)
-+{
-+	struct mgmt_ev_new_smp_key *ev = buf;
-+	struct controller_info *info;
-+
-+	if (len != sizeof(*ev)) {
-+		error("new_smp_key event size mismatch (%zu != %zu)",
-+							len, sizeof(*ev));
-+		return;
-+	}
-+
-+	DBG("Controller %u new key of type %u pin_len %u", index,
-+					ev->key.type, ev->key.pin_len);
-+
-+	if (index > max_index) {
-+		error("Unexpected index %u in new_key event", index);
-+		return;
-+	}
-+
-+	if (ev->key.pin_len > 16) {
-+		error("Invalid PIN length (%u) in new_key event",
-+							ev->key.pin_len);
-+		return;
-+	}
-+
-+	info = &controllers[index];
-+
-+	if (ev->store_hint) {
-+		struct smp_ltk_info *ltk = &ev->key.ltk;
-+
-+		btd_event_link_key_notify(&info->bdaddr, &ev->key.bdaddr,
-+					ev->key.val, ev->key.type,
-+					ev->key.pin_len, ev->key.data,
-+					sizeof(*ltk));
-+	}
-+
-+	btd_event_bonding_complete(&info->bdaddr, &ev->key.bdaddr, 0);
-+}
-+
- static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data)
- {
- 	char buf[MGMT_BUF_SIZE];
-@@ -1490,6 +1529,9 @@ static gboolean mgmt_event(GIOChannel *io, GIOCondition cond, gpointer user_data
- 	case MGMT_EV_DISCOVERING:
- 		mgmt_discovering(sk, index, buf + MGMT_HDR_SIZE, len);
- 		break;
-+	case MGMT_EV_NEW_SMP_KEY:
-+		mgmt_new_smp_key(sk, index, buf + MGMT_HDR_SIZE, len);
-+		break;
- 	default:
- 		error("Unknown Management opcode %u (index %u)", opcode, index);
- 		break;
-@@ -2030,6 +2072,57 @@ static int mgmt_remove_remote_oob_data(int index, bdaddr_t *bdaddr)
- 	return 0;
- }
- 
-+static int mgmtops_load_smp_keys(int index, GSList *keys)
+-int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
+-				uint8_t *key, uint8_t key_type,
+-				uint8_t pin_length)
++static gchar *buf2str(uint8_t *data, int datalen)
 +{
 +	char *buf;
-+	struct mgmt_hdr *hdr;
-+	struct mgmt_cp_load_smp_keys *cp;
-+	struct mgmt_smp_key_info *key;
-+	size_t key_count, cp_size;
-+	GSList *l;
++	int i;
++
++	buf = g_try_new0(gchar, (datalen * 2) + 1);
++	if (buf == NULL)
++		return NULL;
++
++	for (i = 0; i < datalen; i++)
++		sprintf(buf + (i * 2), "%2.2x", data[i]);
++
++	return buf;
++}
++
++static int store_longtermkey(bdaddr_t *local, bdaddr_t *peer, unsigned char *key,
++			uint8_t type, int length, int dlen, uint8_t *data)
++{
++	GString *newkey;
++	char *val, *str;
 +	int err;
 +
-+	key_count = g_slist_length(keys);
++	val = buf2str(key, 16);
++	newkey = g_string_new(val);
++	g_free(val);
 +
-+	DBG("index %d keys %zu", index, key_count);
++	g_string_append_printf(newkey, " %d %d %d ", type, length, dlen);
 +
-+	cp_size = sizeof(*cp) + (key_count * sizeof(*key));
++	str = buf2str(data, dlen);
++	newkey = g_string_append(newkey, str);
++	g_free(str);
 +
-+	buf = g_try_malloc0(sizeof(*hdr) + cp_size);
-+	if (buf == NULL)
-+		return -ENOMEM;
++	err = write_longtermkeys(local, peer, newkey->str);
 +
-+	memset(buf, 0, sizeof(buf));
-+
-+	hdr = (void *) buf;
-+	hdr->opcode = htobs(MGMT_OP_LOAD_SMP_KEYS);
-+	hdr->len = htobs(cp_size);
-+	hdr->index = htobs(index);
-+
-+	cp = (void *) (buf + sizeof(*hdr));
-+	cp->key_count = htobs(key_count);
-+
-+	for (l = keys, key = cp->keys; l != NULL; l = g_slist_next(l), key++) {
-+		struct smp_key_info *info = l->data;
-+
-+		bacpy(&key->bdaddr, &info->bdaddr);
-+		key->type = info->type;
-+		memcpy(key->val, info->val, 16);
-+		key->pin_len = info->pin_len;
-+
-+		memcpy(key->data, info->data, info->dlen);
-+	}
-+
-+	if (write(mgmt_sock, buf, sizeof(*hdr) + cp_size) < 0)
-+		err = -errno;
-+	else
-+		err = 0;
-+
-+	g_free(buf);
++	g_string_free(newkey, TRUE);
 +
 +	return err;
 +}
 +
- static struct btd_adapter_ops mgmt_ops = {
- 	.setup = mgmt_setup,
- 	.cleanup = mgmt_cleanup,
-@@ -2068,6 +2161,7 @@ static struct btd_adapter_ops mgmt_ops = {
- 	.read_local_oob_data = mgmt_read_local_oob_data,
- 	.add_remote_oob_data = mgmt_add_remote_oob_data,
- 	.remove_remote_oob_data = mgmt_remove_remote_oob_data,
-+	.load_smp_keys = mgmtops_load_smp_keys,
- };
++int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
++					uint8_t key_type, uint8_t pin_length,
++					uint8_t *data, int dlen)
+ {
+ 	struct btd_adapter *adapter;
+ 	struct btd_device *device;
+@@ -398,7 +437,24 @@ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer,
  
- static int mgmt_init(void)
-diff --git a/src/adapter.h b/src/adapter.h
-index 687275a..a835eed 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -63,6 +63,15 @@ struct link_key_info {
- 	uint8_t pin_len;
- };
+ 	DBG("storing link key of type 0x%02x", key_type);
  
-+struct smp_key_info {
-+	bdaddr_t bdaddr;
-+	uint8_t type;
-+	uint8_t pin_len;
-+	uint8_t val[16];
-+	int dlen;
-+	uint8_t *data;
-+};
-+
- struct remote_dev_info {
- 	bdaddr_t bdaddr;
- 	int8_t rssi;
-@@ -220,6 +229,7 @@ struct btd_adapter_ops {
- 	int (*add_remote_oob_data) (int index, bdaddr_t *bdaddr, uint8_t *hash,
- 							uint8_t *randomizer);
- 	int (*remove_remote_oob_data) (int index, bdaddr_t *bdaddr);
-+	int (*load_smp_keys) (int index, GSList *keys);
- };
+-	ret = write_link_key(local, peer, key, key_type, pin_length);
++	switch (key_type) {
++	case HCI_LK_COMBINATION:
++	case HCI_LK_LOCAL_UNIT:
++	case HCI_LK_REMOTE_UNIT:
++	case HCI_LK_DEBUG_COMBINATION:
++	case HCI_LK_UNAUTH_COMBINATION:
++	case HCI_LK_AUTH_COMBINATION:
++	case HCI_LK_CHANGED_COMBINATION:
++		ret = write_link_key(local, peer, key, key_type, pin_length);
++		break;
++	case HCI_LK_SMP_LTK:
++		ret = store_longtermkey(local, peer, key, key_type, pin_length,
++								dlen, data);
++		break;
++	default:
++		ret = -ENOTSUP;
++		break;
++	}
  
- int btd_register_adapter_ops(struct btd_adapter_ops *ops, gboolean priority);
+ 	if (ret == 0) {
+ 		device_set_bonded(device, TRUE);
+diff --git a/src/event.h b/src/event.h
+index 1268edf..5047db1 100644
+--- a/src/event.h
++++ b/src/event.h
+@@ -39,4 +39,5 @@ int btd_event_user_confirm(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
+ int btd_event_user_passkey(bdaddr_t *sba, bdaddr_t *dba);
+ int btd_event_user_notify(bdaddr_t *sba, bdaddr_t *dba, uint32_t passkey);
+ int btd_event_link_key_notify(bdaddr_t *local, bdaddr_t *peer, uint8_t *key,
+-					uint8_t key_type, uint8_t pin_length);
++					uint8_t key_type, uint8_t pin_length,
++					uint8_t *data, int dlen);
 -- 
 1.7.6
 
