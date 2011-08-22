@@ -1,28 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 10:40:04 +0300
+Date: Mon, 22 Aug 2011 10:37:33 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] phonebook-tracker.c: Calls query speed-up
-Message-ID: <20110822074004.GB31673@dell>
-References: <1313155128-26979-1-git-send-email-lkslawek@gmail.com>
+Subject: Re: [PATCH obexd 1/3] client: add FileTransfer.MoveFile
+ implementation
+Message-ID: <20110822073733.GA31673@dell>
+References: <1313153204-16301-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313155128-26979-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1313153204-16301-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+Hi Luiz,
 
-On Fri, Aug 12, 2011, Slawomir Bochenski wrote:
-> Another change regarding performance of call history queries. This
-> makes them non-sensitive (in terms of speed) to the corner case
-> situations when there are hundreds of contacts all having the same
-> phone number.
+On Fri, Aug 12, 2011, Luiz Augusto von Dentz wrote:
 > ---
->  plugins/phonebook-tracker.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+>  client/ftp.c |   19 +++++++++++++++++++
+>  1 files changed, 19 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+Thanks, all three patches have been applied (after a couple of small
+coding-style fixes to the first two).
 
 Johan
