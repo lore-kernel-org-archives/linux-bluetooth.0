@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 11:52:37 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 08/11] Bluetooth: Remove the link key if LE pairing fails
-Message-ID: <20110822145236.GB15726@piper>
-References: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
- <1313798895-8705-9-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313798895-8705-9-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote>
+References: <201108201753.32608.dstockwell@frequency-one.com>
+ <20110822103632.GC9949@dell> <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 22 Aug 2011 11:42:31 -0300
+Message-ID: <CAMOw1v7U3p99h+WA8U-Hp_fb37jZDsv+i--TSKAViyB-stAZ7Q@mail.gmail.com>
+Subject: Re: [PATCH 3/3] AVRCP: Corrected metadata: Playing Time
+To: David Stockwell <dstockwell@frequency-one.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi David,
 
-On 21:08 Fri 19 Aug, Vinicius Costa Gomes wrote:
-> If the pairing attempt fails, remove the link key.
-> 
-> In the case that the link key wasn't found by the remote device, force
-> pairing to happen again. This is the correct behaviour when one of the
-> devices "forgot" its keys.
-> 
+On Mon, Aug 22, 2011 at 8:58 AM, David Stockwell
+<dstockwell@frequency-one.com> wrote:
+> Btw, it looked like this avrcp_handle_get_element_attributes function
+> might not be properly checking the amount of actually received data in
+> all necessary places before accessing the buffer (i.e. having the risk
+> of remotely triggered buffer overflows). Could you please verify this
+> and fix it if the issue really exists.
+>
+> +++++ I will take a look this afternoon and either send a fix, or send a
+> note that it looks OK.
 
-This specific commit has some possible security implications, please
-ignore it.
+As I answered to Johan before seeing your response, it does have this
+problem. I have the PDU-continuation pending here in which I fix this.
+I'll probably send it by tomorrow. If you are into it and want to send
+a fix, I'm ok with that.
 
-
-Cheers,
--- 
-Vinicius
+regards,
+Lucas De Marchi
