@@ -1,62 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Mon, 22 Aug 2011 16:48:44 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Antti Julku <antti.julku@nokia.com>,
+	ext Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+Message-ID: <20110822194844.GC21949@joana>
+References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
+ <1309309092.2208.25.camel@aeonflux>
+ <CAHMBquWSLjzKKyM2xuMUakHeBb-FMLUWXLj2_Tz4Ye1MWj37qw@mail.gmail.com>
+ <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com>
+ <4E3A5BFB.1050201@nokia.com>
+ <4E425061.6080206@nokia.com>
+ <1312984559.3373.122.camel@aeonflux>
+ <4E4E592C.7060103@nokia.com>
+ <20110822180151.GB21949@joana>
+ <CAKT1EBfpB8DfOBgj=gwKTKGecmj-R-7gZ3zJm+8OQFekZPu7HQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <165376978.336156.1314031379433.JavaMail.open-xchange@oxusltgw02.schlund.de>
-References: <201108201753.32608.dstockwell@frequency-one.com>
- <20110822103632.GC9949@dell> <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote>
- <CAMOw1v7U3p99h+WA8U-Hp_fb37jZDsv+i--TSKAViyB-stAZ7Q@mail.gmail.com> <165376978.336156.1314031379433.JavaMail.open-xchange@oxusltgw02.schlund.de>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 22 Aug 2011 16:55:47 -0300
-Message-ID: <CAMOw1v6YJAn_p=5S6reDGeX2NdM5kP_XjAT_2wGj0SXV7MuO7A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] AVRCP: Corrected metadata: Playing Time
-To: "dstockwell@frequency-one.com" <dstockwell@frequency-one.com>
-Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CAKT1EBfpB8DfOBgj=gwKTKGecmj-R-7gZ3zJm+8OQFekZPu7HQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 22, 2011 at 1:42 PM, dstockwell@frequency-one.com
-<dstockwell@frequency-one.com> wrote:
-> Hello Lucas
->
-> On August 22, 2011 at 10:42 AM Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->
->> Hi David,
->>
->> On Mon, Aug 22, 2011 at 8:58 AM, David Stockwell
->> <dstockwell@frequency-one.com> wrote:
->> > Btw, it looked like this avrcp_handle_get_element_attributes function
->> > might not be properly checking the amount of actually received data in
->> > all necessary places before accessing the buffer (i.e. having the risk
->> > of remotely triggered buffer overflows). Could you please verify this
->> > and fix it if the issue really exists.
->> >
->> > +++++ I will take a look this afternoon and either send a fix, or send a
->> > note that it looks OK.
->>
->> As I answered to Johan before seeing your response, it does have this
->> problem. I have the PDU-continuation pending here in which I fix this.
->> I&apos;ll probably send it by tomorrow. If you are into it and want to
->> send
->> a fix, I&apos;m ok with that.
->
->
->
-> If you already have a fix for that function, go ahead and submit it.
->
->
->
-> Wondering what you mean by "PDU-continuation pending", though.  Does it have
->
-> to do with AVRCP-level RequestContinuingResponse (and Abort)?  Or
-> AVCTP-layer
->
-> fragmentation?
+* Claudio Takahasi <claudio.takahasi@openbossa.org> [2011-08-22 15:40:53 -0=
+300]:
 
+> Hi guys,
+>=20
+> On Mon, Aug 22, 2011 at 3:01 PM, Gustavo Padovan <padovan@profusion.mobi>=
+ wrote:
+> > Hi Antti,
+> >
+> > * Antti Julku <antti.julku@nokia.com> [2011-08-19 15:38:04 +0300]:
+> >
+> >>
+> >> Hi Marcel,
+> >>
+> >> On 08/10/2011 04:55 PM, ext Marcel Holtmann wrote:
+> >> >I recap, then fast connectable mode is something that is controlled by
+> >> >one or multiple profiles. So this is just really a on/off switch. And=
+ if
+> >> >we support it then all profiles should just use the same settings for
+> >> >it. So far correct? Or do we need different values/parameters on a per
+> >> >profile basis?
+> >>
+> >> All profiles use same settings currently, probably no need to have
+> >> different configurations for profiles.
+> >>
+> >> >
+> >> >If I just assume the above, then we need a set of commands that can
+> >> >configure the settings of fast connectable mode. And that is done once
+> >> >when we start bluetoothd. After that it is really just toggle on and
+> >> >toggle off. And bluetoothd internally can keep a reference count for
+> >> >that.
+> >> >
+> >> >And then it makes sense to do the same for LE and BR/EDR. It is either
+> >> >on or off. Just the initial parameter set for LE is configured
+> >> >differently.
+> >>
+> >> So one command which switches fast connectable on/off for both BR
+> >> and LE? And two for configuration? =A0Maybe something like this?
+> >>
+> >> Set Fast Connectable Command
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> >>
+> >> Command Code: =A0 =A0 =A0 =A0 =A0 0x0001F
+> >> Controller Index: =A0 =A0 =A0 <controller id>
+> >> Command Parameters: =A0 =A0 Enable (1 Octet)
+> >> Return Parameters: =A0 =A0 =A0Status (1 octet)
+> >>
+> >> Configure BR Fast Connectable Mode Command
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> Command Code: =A0 =A0 =A0 =A0 =A0 0x00020
+> >> Controller Index: =A0 =A0 =A0 <controller id>
+> >> Command Parameters: =A0 =A0 Page_scan_type (1 Octet)
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Page_scan_interval (1 =
+Octet)
+> >> Return Parameters: =A0 =A0 =A0Status (1 octet)
+> >>
+> >> Configure LE Fast Connectable Mode Command
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> Command Code: =A0 =A0 =A0 =A0 =A0 0x00021
+> >> Controller Index: =A0 =A0 =A0 <controller id>
+> >> Command Parameters: =A0 =A0 Adv_interval (1 Octet)
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ...and maybe some othe=
+r settings if needed
+> >> Return Parameters: =A0 =A0 =A0Status (1 octet)
+> >
+> > Can't both command be merged into one? LE Advertisement could be a scan=
+ type.
+> > But this won't work if we need more settings for LE.
+> >
+> > =A0 =A0 =A0 =A0Gustavo
+> >
+>=20
+> Another input: for GATT based profiles after the disconnection the
+> specs are recommending advertising interval values for fast
+> reconnection in the first 30 seconds and reduced power mode after 30
+> seconds.
+> Of course, there are some implementations that disable advertising
+> after some time.
+>=20
+> At the moment, the incoming connection for dual mode device are not
+> allowed by the spec.
+>=20
+> My opinion is: parameters could be omitted. BR/EDR and LE could use
+> hard-coded settings for on/off of each transport. Add BR/EDR or LE
+> specific parameter in the Management interface commands doesn't look a
+> suitable approach. A simple on/off command seems to be more flexible
+> for future changes.
 
-AVRCP-level RequestContinuingResponse (and Abort)
+Ok, so we could go only with Set Fast Connectable for now and use hardcoded
+values It's too early to say if we will need to to tune the those values for
+LE.
 
-
-regards,
-Lucas De Marchi
+	Gustavo
