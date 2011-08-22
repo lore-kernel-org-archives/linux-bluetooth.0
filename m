@@ -1,84 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 15:01:51 -0300
+Date: Mon, 22 Aug 2011 14:49:12 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Antti Julku <antti.julku@nokia.com>
-Cc: ext Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com,
-	ext Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
-Message-ID: <20110822180151.GB21949@joana>
-References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com>
- <1309309092.2208.25.camel@aeonflux>
- <CAHMBquWSLjzKKyM2xuMUakHeBb-FMLUWXLj2_Tz4Ye1MWj37qw@mail.gmail.com>
- <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com>
- <4E3A5BFB.1050201@nokia.com>
- <4E425061.6080206@nokia.com>
- <1312984559.3373.122.camel@aeonflux>
- <4E4E592C.7060103@nokia.com>
+To: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: HFP gateway and new incoming connection
+Message-ID: <20110822174912.GA21949@joana>
+References: <4E528879.5080103@invoxia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E4E592C.7060103@nokia.com>
+In-Reply-To: <4E528879.5080103@invoxia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antti,
+* Arnaud Mouiche <arnaud.mouiche@invoxia.com> [2011-08-22 18:48:57 +0200]:
 
-* Antti Julku <antti.julku@nokia.com> [2011-08-19 15:38:04 +0300]:
+> Hi all.
+> 
+> I'm currently playing with the HFP unit role provided by bluez (ie.
+> what is related to audio/gateway.c)
+> No problem concerning the connection to a HFP gateway (ie. GSM most
+> of the time).
+> 
+> I have more concern with the reverse side, to accept incoming HFP
+> connection, as, obviously I didn't get time to register a "Handsfree
+> agent" for the particular new connecting device, at the proper time.
+> 
+> Today, I'm using bluez v4.95, but no real difference with the
+> upstream for this case.
+> Also, I didn't plan to use oFono.... even if it is great piece of software.
+> 
+> I also saw a discussions concerning the initial design in the
+> mailling list :
+> http://marc.info/?l=linux-bluetooth&m=126390401614859&w=2
+> 
+> _My questions:_
+> 1) does this design is today "set in stone" ?
+
+Not sure, we just changed it to add HFP version information.
 
 > 
-> Hi Marcel,
-> 
-> On 08/10/2011 04:55 PM, ext Marcel Holtmann wrote:
-> >I recap, then fast connectable mode is something that is controlled by
-> >one or multiple profiles. So this is just really a on/off switch. And if
-> >we support it then all profiles should just use the same settings for
-> >it. So far correct? Or do we need different values/parameters on a per
-> >profile basis?
-> 
-> All profiles use same settings currently, probably no need to have
-> different configurations for profiles.
-> 
-> >
-> >If I just assume the above, then we need a set of commands that can
-> >configure the settings of fast connectable mode. And that is done once
-> >when we start bluetoothd. After that it is really just toggle on and
-> >toggle off. And bluetoothd internally can keep a reference count for
-> >that.
-> >
-> >And then it makes sense to do the same for LE and BR/EDR. It is either
-> >on or off. Just the initial parameter set for LE is configured
-> >differently.
-> 
-> So one command which switches fast connectable on/off for both BR
-> and LE? And two for configuration?  Maybe something like this?
-> 
-> Set Fast Connectable Command
-> ============================
-> 
-> Command Code:           0x0001F
-> Controller Index:       <controller id>
-> Command Parameters:     Enable (1 Octet)
-> Return Parameters:      Status (1 octet)
-> 
-> Configure BR Fast Connectable Mode Command
-> ==========================================
-> 
-> Command Code:           0x00020
-> Controller Index:       <controller id>
-> Command Parameters:     Page_scan_type (1 Octet)
->                         Page_scan_interval (1 Octet)
-> Return Parameters:      Status (1 octet)
-> 
-> Configure LE Fast Connectable Mode Command
-> ==========================================
-> 
-> Command Code:           0x00021
-> Controller Index:       <controller id>
-> Command Parameters:     Adv_interval (1 Octet)
->                         ...and maybe some other settings if needed
-> Return Parameters:      Status (1 octet)
+> 2) It seems the only ways to register an agent at the proper time are:
+> - to trace creation of new devices, and try to register an agent at
+> this time.
+>   But what if the device doesn't show HFP SDP record when connection
+> for the first time, and activate it later ?
+>   Any race conditions ?
 
-Can't both command be merged into one? LE Advertisement could be a scan type.
-But this won't work if we need more settings for LE.
+You should listen to DBus UUID property change for the device in the Agent
+side. Check the bluetooth plugin inside oFono to learn how to implement that.
+
+> or
+> - collect the authorization request in the adapter user agent, when
+> "audio_device_request_authorization" is called.
+> So it means that the user agent must forward request concerning the
+> HFP uuid to the HFP service.
+> 
+> True ?
+> 
+> 3) What do you think of the possibility to set a "adapter based"
+> Handsfree agent, and use it when there is no "device based" handsfee
+> argent matching ? 
+
+I think Luiz also wants that. Luiz?
 
 	Gustavo
