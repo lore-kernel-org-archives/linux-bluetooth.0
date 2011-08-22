@@ -1,26 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 22 Aug 2011 11:29:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pavel Raiskup <praiskup@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, ovasik@redhat.com,
+	stlman@poczta.fm
+Subject: Re: [PATCH 1/8] Off-by-one(two) error in form factor detection
+Message-ID: <20110822082933.GD11306@dell>
+References: <op.v0avzhpah52hc0@dhcp-25-209.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c04edd0552.davehigton@dsl.pipex.com>
-References: <c04edd0552.davehigton@dsl.pipex.com>
-Date: Mon, 22 Aug 2011 11:37:36 +0300
-Message-ID: <CABBYNZKUJLU31kahSxP58nTBu0922tZeyE-Z5-hzmbGQQog9pg@mail.gmail.com>
-Subject: Re: Use of the Bluetooth name
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dave Higton <davehigton@dsl.pipex.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <op.v0avzhpah52hc0@dhcp-25-209.brq.redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi Pavel,
 
-On Sat, Aug 20, 2011 at 10:24 PM, Dave Higton <davehigton@dsl.pipex.com> wrote:
-> Did all the Linux Bluetooth components have to go through approval
-> by the Bluetooth SIG in order to permit use of the Bluetooth name?
+On Tue, Aug 16, 2011, Pavel Raiskup wrote:
+> Indexing of chassis_map array has to be done like that:
+>     chassis_map[chassis_type * 2 - 1]
+> 
+> because if not, everything is shifted by one. When (e.g.) chassis_type
+> is 0x04 result should be "Low Profile Desktop" =>  "desktop" (not a
+> "Pizza Box" => "server"). Lets see the 2.6.1 document on:
+> 
+> http://www.dmtf.org/standards/smbios
+> ---
+>  plugins/formfactor.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-Yes, you need to pass qualification to be able to use Bluetooth name,
-you can find more information how to qualify your product in
-bluetooth.org.
+The patch doesn't apply (probably due to your email client splitting
+lines). You might want to consider using git send-email instead:
 
--- 
-Luiz Augusto von Dentz
+Applying: Off-by-one(two) error in form factor detection
+fatal: corrupt patch at line 10
+Patch failed at 0001 Off-by-one(two) error in form factor detection
+
+I also added Łukasz to CC since he sent a patch to this very same line a
+month ago or so (and introduced the "+ 1). Łukasz, did you really verify
+the correctness of your patch? (it seems you didn't)
+
+Johan
