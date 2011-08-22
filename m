@@ -1,63 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 22 Aug 2011 11:07:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH Bluez v2] Fix get/set_hfp_active to match name conventions
+Message-ID: <20110822080752.GB11306@dell>
+References: <1313256696.2254.11.camel@THOR>
 MIME-Version: 1.0
-In-Reply-To: <20110822072228.GA31063@dell>
-References: <CAPGrrxU2otU=wmvtsq=xdcc35FOA5p02h=stg-h4WV-u=dJb7g@mail.gmail.com>
-	<1313133349-4215-1-git-send-email-bulislaw@linux.com>
-	<20110822072228.GA31063@dell>
-Date: Mon, 22 Aug 2011 10:12:11 +0200
-Message-ID: <CAPGrrxUDgQOzX7zgHy28dxux3LkRy4Ap=dtuGZJSYPovNqELBg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Add SetRemoteProperties method for OOB COD setting
-From: Bartosz Szatkowski <bulislaw@linux.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1313256696.2254.11.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 22, 2011 at 9:22 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Bartosz,
->
-> On Fri, Aug 12, 2011, Bartosz Szatkowski wrote:
->> +struct oob_remote_parameters {
->> +     bdaddr_t local;
->> +     bdaddr_t peer;
->> +     const char *address;
->> +     uint32_t class;
->> +};
->
-> Could you add a "gboolean device_found;" to this struct and then use it
-> as follows:
+Hi Peter,
 
-OK
+On Sat, Aug 13, 2011, Peter Hurley wrote:
+> These two functions are defined exclusively for headsets, so
+> follow established name conventions.
+> ---
+> 
+> v2: Commit was missing a file
+> 
+>  audio/headset.c |    4 ++--
+>  audio/headset.h |    4 ++--
+>  audio/main.c    |    2 +-
+>  audio/manager.c |    2 +-
+>  4 files changed, 6 insertions(+), 6 deletions(-)
 
->
->> +static DBusMessage *parse_class(DBusMessageIter *value,
->> +                     struct oob_remote_parameters *params, DBusMessage *msg)
->> +{
->> +     if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT32)
->> +             return btd_error_invalid_args(msg);
->> +
->> +     dbus_message_iter_get_basic(value, &params->class);
->
->        params->device_found = TRUE;
+Applied, but again the patch wasn't clean. You really need to fix your
+editor settings to show you whitespace errors as well as check yourself
+with "git am" if you're still unsure if the patch is clean or not:
 
-I would move (above) line to set_class function (and same for other
-patches) as there is no point of emiting device_found in case of some
-error when trying to set it, it would look something like:
+/home/jh/src/bluez/.git/rebase-apply/patch:20: trailing whitespace.
+gboolean headset_get_hfp_active(struct audio_device *dev)
+/home/jh/src/bluez/.git/rebase-apply/patch:28: trailing whitespace.
+void headset_set_hfp_active(struct audio_device *dev, gboolean active)
+/home/jh/src/bluez/.git/rebase-apply/patch:42: trailing whitespace.
+gboolean headset_get_hfp_active(struct audio_device *dev);
+/home/jh/src/bluez/.git/rebase-apply/patch:43: trailing whitespace.
+void headset_set_hfp_active(struct audio_device *dev, gboolean active);
+/home/jh/src/bluez/.git/rebase-apply/patch:56: trailing whitespace.
+		if (!headset_get_hfp_active(device)) {
+warning: squelched 1 whitespace error
+warning: 6 lines add whitespace errors.
 
-static void set_class(struct oob_remote_parameters *params)
-+{
-+	if (write_remote_class(&params->local, &params->peer,
-+							params->class) < 0) {
-+		error("Setting device class failed");
-+
-+		return;
-+	}
-
-        params->device_found = TRUE;
-+}
-
-
--- 
-Pozdrowienia,
-Bartosz Szatkowski
+Johan
