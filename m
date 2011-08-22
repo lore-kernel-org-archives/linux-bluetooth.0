@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 11:07:52 +0300
+Date: Mon, 22 Aug 2011 11:04:07 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Peter Hurley <peter@hurleysoftware.com>
 Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH Bluez v2] Fix get/set_hfp_active to match name conventions
-Message-ID: <20110822080752.GB11306@dell>
-References: <1313256696.2254.11.camel@THOR>
+Subject: Re: [PATCH hcidump] Fix L2CAP cid matching
+Message-ID: <20110822080407.GA11306@dell>
+References: <1313254386.2254.8.camel@THOR>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313256696.2254.11.camel@THOR>
+In-Reply-To: <1313254386.2254.8.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Peter,
 
 On Sat, Aug 13, 2011, Peter Hurley wrote:
-> These two functions are defined exclusively for headsets, so
-> follow established name conventions.
+> If multiple ACL connections are using identical cid values, the L2CAP
+> parser will match the first avail cid found in the cid table. This
+> error often leads to incorrect psm determination, and thus incorrect
+> parsing of higher-layer frames.
+> 
+> When searching the cid table, a matching cid value must match by
+> ACL handle as well.
 > ---
-> 
-> v2: Commit was missing a file
-> 
->  audio/headset.c |    4 ++--
->  audio/headset.h |    4 ++--
->  audio/main.c    |    2 +-
->  audio/manager.c |    2 +-
->  4 files changed, 6 insertions(+), 6 deletions(-)
+>  parser/l2cap.c |   42 +++++++++++++++++++++++-------------------
+>  1 files changed, 23 insertions(+), 19 deletions(-)
 
-Applied, but again the patch wasn't clean. You really need to fix your
-editor settings to show you whitespace errors as well as check yourself
-with "git am" if you're still unsure if the patch is clean or not:
+Applied, but again I got this because of an unclean patch:
 
-/home/jh/src/bluez/.git/rebase-apply/patch:20: trailing whitespace.
-gboolean headset_get_hfp_active(struct audio_device *dev)
-/home/jh/src/bluez/.git/rebase-apply/patch:28: trailing whitespace.
-void headset_set_hfp_active(struct audio_device *dev, gboolean active)
-/home/jh/src/bluez/.git/rebase-apply/patch:42: trailing whitespace.
-gboolean headset_get_hfp_active(struct audio_device *dev);
-/home/jh/src/bluez/.git/rebase-apply/patch:43: trailing whitespace.
-void headset_set_hfp_active(struct audio_device *dev, gboolean active);
-/home/jh/src/bluez/.git/rebase-apply/patch:56: trailing whitespace.
-		if (!headset_get_hfp_active(device)) {
-warning: squelched 1 whitespace error
-warning: 6 lines add whitespace errors.
+/home/jh/src/bluez-hcidump/.git/rebase-apply/patch:14: trailing whitespace.
+static uint16_t get_psm(int in, uint16_t handle, uint16_t cid)
+/home/jh/src/bluez-hcidump/.git/rebase-apply/patch:21: trailing whitespace.
+		if (table[i].handle == handle && table[i].cid == cid)
+/home/jh/src/bluez-hcidump/.git/rebase-apply/patch:27: trailing whitespace.
+static uint16_t get_num(int in, uint16_t handle, uint16_t cid)
+/home/jh/src/bluez-hcidump/.git/rebase-apply/patch:34: trailing whitespace.
+		if (table[i].handle == handle && table[i].cid == cid)
+/home/jh/src/bluez-hcidump/.git/rebase-apply/patch:40: trailing whitespace.
+static void set_mode(int in, uint16_t handle, uint16_t cid, uint8_t mode)
+warning: squelched 18 whitespace errors
+warning: 23 lines add whitespace errors.
 
 Johan
