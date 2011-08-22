@@ -1,46 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 20:49:32 +0100
-From: Dave Higton <davehigton@dsl.pipex.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Arguments to PIN Code Request Response
-Message-ID: <c441e70652.davehigton@dsl.pipex.com>
-References: <7b86640552.davehigton@dsl.pipex.com> <CAMhHtTy7vStrSEZsj6Gcy_VO-JfL4tuYZ=TJWtQ4TxqMMGQpTQ@mail.gmail.com>
- <CAMhHtTytv2Q4JPE85T-zqgbrqpq+9XHRbgYtQWADeoip9yCP5A@mail.gmail.com>
-In-Reply-To: <CAMhHtTytv2Q4JPE85T-zqgbrqpq+9XHRbgYtQWADeoip9yCP5A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <165376978.336156.1314031379433.JavaMail.open-xchange@oxusltgw02.schlund.de>
+References: <201108201753.32608.dstockwell@frequency-one.com>
+ <20110822103632.GC9949@dell> <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote>
+ <CAMOw1v7U3p99h+WA8U-Hp_fb37jZDsv+i--TSKAViyB-stAZ7Q@mail.gmail.com> <165376978.336156.1314031379433.JavaMail.open-xchange@oxusltgw02.schlund.de>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 22 Aug 2011 16:55:47 -0300
+Message-ID: <CAMOw1v6YJAn_p=5S6reDGeX2NdM5kP_XjAT_2wGj0SXV7MuO7A@mail.gmail.com>
+Subject: Re: [PATCH 3/3] AVRCP: Corrected metadata: Playing Time
+To: "dstockwell@frequency-one.com" <dstockwell@frequency-one.com>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In message
-<CAMhHtTytv2Q4JPE85T-zqgbrqpq+9XHRbgYtQWADeoip9yCP5A@mail.gmail.com>
-          Ash K <ashoksarf@gmail.com> wrote:
+On Mon, Aug 22, 2011 at 1:42 PM, dstockwell@frequency-one.com
+<dstockwell@frequency-one.com> wrote:
+> Hello Lucas
+>
+> On August 22, 2011 at 10:42 AM Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>
+>> Hi David,
+>>
+>> On Mon, Aug 22, 2011 at 8:58 AM, David Stockwell
+>> <dstockwell@frequency-one.com> wrote:
+>> > Btw, it looked like this avrcp_handle_get_element_attributes function
+>> > might not be properly checking the amount of actually received data in
+>> > all necessary places before accessing the buffer (i.e. having the risk
+>> > of remotely triggered buffer overflows). Could you please verify this
+>> > and fix it if the issue really exists.
+>> >
+>> > +++++ I will take a look this afternoon and either send a fix, or send a
+>> > note that it looks OK.
+>>
+>> As I answered to Johan before seeing your response, it does have this
+>> problem. I have the PDU-continuation pending here in which I fix this.
+>> I&apos;ll probably send it by tomorrow. If you are into it and want to
+>> send
+>> a fix, I&apos;m ok with that.
+>
+>
+>
+> If you already have a fix for that function, go ahead and submit it.
+>
+>
+>
+> Wondering what you mean by "PDU-continuation pending", though.  Does it have
+>
+> to do with AVRCP-level RequestContinuingResponse (and Abort)?  Or
+> AVCTP-layer
+>
+> fragmentation?
 
-> Hi Dave,
-> 
-> If you see specification the PIN_Code parameter for
-> PIN_Code_request_reply command, it says
-> 
-> Value
-> ----
-> 0xXXXXXXXXXX
-> XXXXXXXXXXX
-> XXXXXXXXXXX
->  Parameter Description
-> ----
-> PIN code for the device that is to be connected. The Host should
-> ensure that strong PIN Codes are used. PIN Codes can be up to a
-> maximum of 128 bits. Note: The PIN_Code Parameter is a string
-> parameter. Endianess does therefore not apply to the PIN_Code
-> Parameter. The first octet of the PIN code should be transmitted first.
-> Which means, even if your PIN code of 4 byte length you have to send
-> 16 byte length of PIN code to controller. And controller uses initial
-> bytes from the 16byte PIN code, the length of the PIN code is defined
-> by length parameter.
-> What you are looking at is correct, after 4 bytes of PIN code, you
-> have some junk/host selected data which is of no interest to
-> controller.
 
-Many thanks for your explanation, Ash.
+AVRCP-level RequestContinuingResponse (and Abort)
 
-Dave
+
+regards,
+Lucas De Marchi
