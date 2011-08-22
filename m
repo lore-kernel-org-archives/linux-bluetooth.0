@@ -4,35 +4,33 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v2 7/9] Fix invalid state at SCO disconnect in gateway
-Date: Mon, 22 Aug 2011 17:30:45 +0200
-Message-Id: <1314027047-5476-8-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v2 6/9] Set state to "connecting" when AG connects.
+Date: Mon, 22 Aug 2011 17:30:44 +0200
+Message-Id: <1314027047-5476-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1314027047-5476-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1314027047-5476-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If SCO disconnects after RFCOMM, do not change state to connected.
+This state is used by media.c to trigger pulseaudio configuration.
 ---
- audio/gateway.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ audio/gateway.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
 diff --git a/audio/gateway.c b/audio/gateway.c
-index c3c4019..d41bbc3 100644
+index 425ad16..c3c4019 100644
 --- a/audio/gateway.c
 +++ b/audio/gateway.c
-@@ -191,7 +191,9 @@ static gboolean sco_io_cb(GIOChannel *chan, GIOCondition cond,
- 	g_io_channel_shutdown(gw->sco, TRUE, NULL);
- 	g_io_channel_unref(gw->sco);
- 	gw->sco = NULL;
--	change_state(dev, GATEWAY_STATE_CONNECTED);
-+
-+	if (gw->rfcomm)
-+		change_state(dev, GATEWAY_STATE_CONNECTED);
+@@ -284,6 +284,8 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
+ 		goto fail;
+ 	}
  
- 	return FALSE;
- }
++	change_state(dev, GATEWAY_STATE_CONNECTING);
++
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 
+ 	gw->rfcomm = g_io_channel_ref(chan);
 -- 
 1.7.1
 
