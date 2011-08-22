@@ -1,53 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ v3] Fix remove temporary link key for No Bonding
-Date: Mon, 22 Aug 2011 16:45:39 +0300
-Message-Id: <1314020739-15376-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1314020739-15376-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1314020739-15376-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v3 0/1] Fix remove temporary link key for No Bonding
+Date: Mon, 22 Aug 2011 16:45:38 +0300
+Message-Id: <1314020739-15376-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes regression caused by 33cdfcb0fabcfb5260953a13ae277b5abe9a322d.
-Temporary link key should be removed after device is disconnected if
-bonding information is not stored in file system.
+Hi,
 
-Currently, the key is deleted only when paired device is removed, or
-adapter is powered off. In case of No Bonding authentication, device is
-not paired after disconnection, which results in link key left in memory.
+This patch takes into account comment of Luiz about moving
+btd_adapter_remove_bonding in device_set_paired(device, FALSE).
 
-On the other hand, device is not necessarily removed after disconnection
-that also leaves unneeded temporary link key in memory. Therefore,
-btd_adapter_remove_bonding is moved to device_set_paired(device, FALSE)
-covering both cases.
----
- src/device.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 9dd657c..96e798f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -993,7 +993,6 @@ static void device_remove_stored(struct btd_device *device)
- 		delete_entry(&src, "aliases", addr);
- 		device_set_bonded(device, FALSE);
- 		device_set_paired(device, FALSE);
--		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
- 	}
- 	delete_entry(&src, "profiles", addr);
- 	delete_entry(&src, "trusts", addr);
-@@ -2038,6 +2037,9 @@ void device_set_paired(struct btd_device *device, gboolean value)
- 	if (device->paired == value)
- 		return;
- 
-+	if (!value)
-+		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
-+
- 	device->paired = value;
- 
- 	emit_property_changed(conn, device->path, DEVICE_INTERFACE, "Paired",
--- 
-1.7.4.1
+Br,
+Dmitriy
 
