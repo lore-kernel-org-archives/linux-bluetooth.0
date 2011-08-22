@@ -1,66 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Aug 2011 11:05:11 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Bluetooth: Initialize the SMP workqueue
-Message-ID: <20110822140510.GA15726@piper>
-References: <1313798415-8555-1-git-send-email-vinicius.gomes@openbossa.org>
- <1313798415-8555-3-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313798415-8555-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1314020739-15376-2-git-send-email-dmitriy.paliy@nokia.com>
+References: <1314020739-15376-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1314020739-15376-2-git-send-email-dmitriy.paliy@nokia.com>
+Date: Mon, 22 Aug 2011 17:02:05 +0300
+Message-ID: <CABBYNZJ5D56npnh0kvdFNMbP7AS0kYVWytxM9QkmZquNO2s5pg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3] Fix remove temporary link key for No Bonding
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 21:00 Fri 19 Aug, Vinicius Costa Gomes wrote:
-> The SMP workqueue is initialized along with the L2CAP module if the
-> enable_smp parameter is enabled, and destroyed along the L2CAP module.
-> 
+Hi Dmitriy,
 
-The commit message is wrong. Please disconsider it, will fix it before
-sending a new version.
-
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+On Mon, Aug 22, 2011 at 4:45 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
+> This fixes regression caused by 33cdfcb0fabcfb5260953a13ae277b5abe9a322d.
+> Temporary link key should be removed after device is disconnected if
+> bonding information is not stored in file system.
+>
+> Currently, the key is deleted only when paired device is removed, or
+> adapter is powered off. In case of No Bonding authentication, device is
+> not paired after disconnection, which results in link key left in memory.
+>
+> On the other hand, device is not necessarily removed after disconnection
+> that also leaves unneeded temporary link key in memory. Therefore,
+> btd_adapter_remove_bonding is moved to device_set_paired(device, FALSE)
+> covering both cases.
 > ---
->  net/bluetooth/l2cap_core.c |    7 +++++++
->  1 files changed, 7 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 00e93d1..3082a0e 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4293,6 +4293,10 @@ int __init l2cap_init(void)
->  	if (err < 0)
->  		return err;
->  
-> +	err = smp_crypto_init();
-> +	if (err < 0)
-> +		BT_DBG("SMP Initialization falied");
+>  src/device.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 9dd657c..96e798f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -993,7 +993,6 @@ static void device_remove_stored(struct btd_device *device)
+>                delete_entry(&src, "aliases", addr);
+>                device_set_bonded(device, FALSE);
+>                device_set_paired(device, FALSE);
+> -               btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
+>        }
+>        delete_entry(&src, "profiles", addr);
+>        delete_entry(&src, "trusts", addr);
+> @@ -2038,6 +2037,9 @@ void device_set_paired(struct btd_device *device, gboolean value)
+>        if (device->paired == value)
+>                return;
+>
+> +       if (!value)
+> +               btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
 > +
->  	err = hci_register_proto(&l2cap_hci_proto);
->  	if (err < 0) {
->  		BT_ERR("L2CAP protocol registration failed");
-> @@ -4310,6 +4314,7 @@ int __init l2cap_init(void)
->  	return 0;
->  
->  error:
-> +	smp_crypto_exit();
->  	l2cap_cleanup_sockets();
->  	return err;
->  }
-> @@ -4318,6 +4323,8 @@ void l2cap_exit(void)
->  {
->  	debugfs_remove(l2cap_debugfs);
->  
-> +	smp_crypto_exit();
-> +
->  	if (hci_unregister_proto(&l2cap_hci_proto) < 0)
->  		BT_ERR("L2CAP protocol unregistration failed");
->  
-> -- 
-> 1.7.6
-> 
+>        device->paired = value;
+>
+>        emit_property_changed(conn, device->path, DEVICE_INTERFACE, "Paired",
+> --
+> 1.7.4.1
 
-Cheers,
+There is one more place where we use btd_adapter_remove_bonding see
+device_remove_stored.
+
 -- 
-Vinicius
+Luiz Augusto von Dentz
