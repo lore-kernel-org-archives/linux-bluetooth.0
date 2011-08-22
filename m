@@ -1,45 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hcidump: decode extended window size option
-Date: Mon, 22 Aug 2011 11:52:50 +0300
-Message-Id: <1314003170-31093-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Definition for hcidump to decode Ext Window Size
+Date: Mon, 22 Aug 2011 11:51:43 +0300
+Message-Id: <1314003103-31042-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- parser/l2cap.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ lib/l2cap.h |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 6345f8d..217008d 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -560,6 +560,12 @@ static void conf_opt(int level, void *ptr, int len, int in, uint16_t cid)
- 			conf_efs(h->val);
- 			break;
+diff --git a/lib/l2cap.h b/lib/l2cap.h
+index 55fe88b..a40cb6c 100644
+--- a/lib/l2cap.h
++++ b/lib/l2cap.h
+@@ -175,6 +175,7 @@ typedef struct {
+ #define L2CAP_CONF_RFC		0x04
+ #define L2CAP_CONF_FCS		0x05
+ #define L2CAP_CONF_EFS		0x06
++#define L2CAP_CONF_EWS		0x07
  
-+		case L2CAP_CONF_EWS:
-+			printf("EWS");
-+			if (h->len > 0)
-+				printf(" %d", get_val(h->val, h->len));
-+			break;
-+
- 		default:
- 			printf("Unknown (type %2.2x, len %d)", h->type & 0x7f, h->len);
- 			break;
-@@ -598,6 +604,9 @@ static void conf_list(int level, uint8_t *list, int len)
- 		case L2CAP_CONF_EFS:
- 			printf("EFS ");
- 			break;
-+		case L2CAP_CONF_EWS:
-+			printf("EWS ");
-+			break;
- 		default:
- 			printf("%2.2x ", list[i] & 0x7f);
- 			break;
+ #define L2CAP_CONF_MAX_SIZE	22
+ 
 -- 
 1.7.4.1
 
