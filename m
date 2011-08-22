@@ -4,117 +4,139 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v2 3/9] Use state change callback from media interface
-Date: Mon, 22 Aug 2011 17:30:41 +0200
-Message-Id: <1314027047-5476-4-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v2 2/9] Add state change callback to HandsfreeGateway
+Date: Mon, 22 Aug 2011 17:30:40 +0200
+Message-Id: <1314027047-5476-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1314027047-5476-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1314027047-5476-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When a HFPHS endpoint is created, media will start to watch for
-HandsfreeGateway state changes. media call SetConfiguration upon
-connection and ClearConfiguration upon disconnection.
+Media interface needs to monitor state changes of HandsfreeGateway.
 ---
- audio/media.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 56 insertions(+), 0 deletions(-)
+ audio/gateway.c |   61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/gateway.h |    7 ++++++
+ 2 files changed, 68 insertions(+), 0 deletions(-)
 
-diff --git a/audio/media.c b/audio/media.c
-index 2076d04..ae2b471 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -43,6 +43,7 @@
- #include "transport.h"
- #include "a2dp.h"
- #include "headset.h"
-+#include "gateway.h"
- #include "manager.h"
+diff --git a/audio/gateway.c b/audio/gateway.c
+index e9485d0..805b8cb 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -72,6 +72,14 @@ struct gateway {
+ 	int version;
+ };
  
- #ifndef DBUS_TYPE_UNIX_FD
-@@ -78,6 +79,7 @@ struct media_endpoint {
- 	uint8_t			*capabilities;	/* Endpoint property capabilities */
- 	size_t			size;		/* Endpoint capabilities size */
- 	guint			hs_watch;
-+	guint			ag_watch;
- 	guint			watch;
- 	struct endpoint_request *request;
- 	struct media_transport	*transport;
-@@ -118,6 +120,9 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
- 	if (endpoint->hs_watch)
- 		headset_remove_state_cb(endpoint->hs_watch);
++struct gateway_state_callback {
++	gateway_state_cb cb;
++	void *user_data;
++	unsigned int id;
++};
++
++static GSList *gateway_callbacks = NULL;
++
+ int gateway_close(struct audio_device *device);
  
-+	if (endpoint->ag_watch)
-+		gateway_remove_state_cb(endpoint->ag_watch);
-+
- 	if (endpoint->request)
- 		media_endpoint_cancel(endpoint);
+ static const char *state2str(gateway_state_t state)
+@@ -104,16 +112,37 @@ static void change_state(struct audio_device *dev, gateway_state_t new_state)
+ {
+ 	struct gateway *gw = dev->gateway;
+ 	const char *val;
++	GSList *l;
++	gateway_state_t old_state;
  
-@@ -553,6 +558,46 @@ static void a2dp_destroy_endpoint(void *user_data)
- 	release_endpoint(endpoint);
- }
+ 	if (gw->state == new_state)
+ 		return;
  
-+static void gateway_setconf_cb(struct media_endpoint *endpoint, void *ret,
-+						int size, void *user_data)
-+{
-+	struct audio_device *dev = user_data;
+ 	val = state2str(new_state);
++	old_state = gw->state;
+ 	gw->state = new_state;
+ 
+ 	emit_property_changed(dev->conn, dev->path,
+ 			AUDIO_GATEWAY_INTERFACE, "State",
+ 			DBUS_TYPE_STRING, &val);
 +
-+	if (ret != NULL)
-+		return;
-+
-+	gateway_set_state(dev, GATEWAY_STATE_DISCONNECTED);
-+}
-+
-+static void gateway_state_changed(struct audio_device *dev,
-+					gateway_state_t old_state,
-+					gateway_state_t new_state,
-+					void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+
-+	DBG("");
-+
-+	switch (new_state) {
-+	case GATEWAY_STATE_DISCONNECTED:
-+		if (endpoint->transport &&
-+			media_transport_get_dev(endpoint->transport) == dev) {
-+
-+			DBG("Clear endpoint %p", endpoint);
-+			clear_configuration(endpoint);
-+		}
-+		break;
-+	case GATEWAY_STATE_CONNECTING:
-+		set_configuration(endpoint, dev, NULL, 0,
-+					gateway_setconf_cb, dev, NULL);
-+		break;
-+	case GATEWAY_STATE_CONNECTED:
-+		break;
-+	case GATEWAY_STATE_PLAYING:
-+		break;
++	for (l = gateway_callbacks; l != NULL; l = l->next) {
++		struct gateway_state_callback *cb = l->data;
++		cb->cb(dev, old_state, new_state, cb->user_data);
 +	}
 +}
 +
- static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
- 						const char *sender,
- 						const char *path,
-@@ -604,6 +649,17 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
- 		if (dev)
- 			set_configuration(endpoint, dev, NULL, 0,
- 						headset_setconf_cb, dev, NULL);
-+	} else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
-+					strcasecmp(uuid, HSP_HS_UUID) == 0) {
-+		struct audio_device *dev;
++void gateway_set_state(struct audio_device *dev, gateway_state_t new_state)
++{
++	switch (new_state) {
++	case GATEWAY_STATE_DISCONNECTED:
++		gateway_close(dev);
++		break;
++	case GATEWAY_STATE_CONNECTING:
++	case GATEWAY_STATE_CONNECTED:
++	case GATEWAY_STATE_PLAYING:
++		break;
++	}
+ }
+ 
+ static void agent_disconnect(struct audio_device *dev, struct hf_agent *agent)
+@@ -810,3 +839,35 @@ void gateway_suspend_stream(struct audio_device *dev)
+ 	gw->sco_start_cb_data = NULL;
+ 	change_state(dev, GATEWAY_STATE_CONNECTED);
+ }
 +
-+		endpoint->ag_watch = gateway_add_state_cb(gateway_state_changed,
-+								endpoint);
-+		dev = manager_find_device(NULL, &adapter->src, BDADDR_ANY,
-+						AUDIO_GATEWAY_INTERFACE, TRUE);
-+		if (dev)
-+			set_configuration(endpoint, dev, NULL, 0,
-+						gateway_setconf_cb, dev, NULL);
- 	} else {
- 		if (err)
- 			*err = -EINVAL;
++unsigned int gateway_add_state_cb(gateway_state_cb cb, void *user_data)
++{
++	struct gateway_state_callback *state_cb;
++	static unsigned int id = 0;
++
++	state_cb = g_new(struct gateway_state_callback, 1);
++	state_cb->cb = cb;
++	state_cb->user_data = user_data;
++	state_cb->id = ++id;
++
++	gateway_callbacks = g_slist_append(gateway_callbacks, state_cb);
++
++	return state_cb->id;
++}
++
++gboolean gateway_remove_state_cb(unsigned int id)
++{
++	GSList *l;
++
++	for (l = gateway_callbacks; l != NULL; l = l->next) {
++		struct gateway_state_callback *cb = l->data;
++		if (cb && cb->id == id) {
++			gateway_callbacks = g_slist_remove(gateway_callbacks,
++									cb);
++			g_free(cb);
++			return TRUE;
++		}
++	}
++
++	return FALSE;
++}
+diff --git a/audio/gateway.h b/audio/gateway.h
+index a45ef82..32b5d6d 100644
+--- a/audio/gateway.h
++++ b/audio/gateway.h
+@@ -33,9 +33,14 @@ typedef enum {
+ 	GATEWAY_STATE_PLAYING,
+ } gateway_state_t;
+ 
++typedef void (*gateway_state_cb) (struct audio_device *dev,
++					gateway_state_t old_state,
++					gateway_state_t new_state,
++					void *user_data);
+ typedef void (*gateway_stream_cb_t) (struct audio_device *dev, GError *err,
+ 		void *user_data);
+ 
++void gateway_set_state(struct audio_device *dev, gateway_state_t new_state);
+ void gateway_unregister(struct audio_device *dev);
+ struct gateway *gateway_init(struct audio_device *device);
+ gboolean gateway_is_connected(struct audio_device *dev);
+@@ -49,3 +54,5 @@ int gateway_config_stream(struct audio_device *dev, gateway_stream_cb_t cb,
+ gboolean gateway_cancel_stream(struct audio_device *dev, unsigned int id);
+ int gateway_get_sco_fd(struct audio_device *dev);
+ void gateway_suspend_stream(struct audio_device *dev);
++unsigned int gateway_add_state_cb(gateway_state_cb cb, void *user_data);
++gboolean gateway_remove_state_cb(unsigned int id);
 -- 
 1.7.1
 
