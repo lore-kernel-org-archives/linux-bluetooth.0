@@ -1,51 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Johan Hedberg" <johan.hedberg@gmail.com>
+Cc: "BlueZ devel list" <linux-bluetooth@vger.kernel.org>
+References: <201108201753.32608.dstockwell@frequency-one.com> <20110822103632.GC9949@dell>
+In-Reply-To: <20110822103632.GC9949@dell>
+Subject: Re: [PATCH 3/3] AVRCP: Corrected metadata: Playing Time
+Date: Mon, 22 Aug 2011 06:58:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1314006934-4953-2-git-send-email-dmitriy.paliy@nokia.com>
-References: <1314006934-4953-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1314006934-4953-2-git-send-email-dmitriy.paliy@nokia.com>
-Date: Mon, 22 Aug 2011 15:04:49 +0300
-Message-ID: <CABBYNZKuP3BwGTUt_t1h8XqrbXbt+RGzzTCKhxG-NvHSBStwuw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] Fix remove temporary link key for No Bonding
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hello, Johan
 
-On Mon, Aug 22, 2011 at 12:55 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
-> This fixes regression caused by 33cdfcb0fabcfb5260953a13ae277b5abe9a322d.
-> Temporary link key should be removed after device is disconnected if
-> bonding information is not stored in file system.
+-----Original Message----- 
+From: Johan Hedberg
+
+Hi David,
+
+On Sat, Aug 20, 2011, David Stockwell wrote:
+> Metadata item #7 should return total playing time of the track 
+> (TrackDuration)
+> in msec, not current position within the track.
 >
-> Currently, the key is deleted only when paired device is removed, or
-> adapter is powered off. In case of No Bonding authentication, device is
-> not paired after disconnection, which results in link key left in memory.
->
-> On the other hand, device is not necessarily removed after disconnection
-> that also leaves unneeded temporary link key in memory.
+> Signed-off-by: David Stockwell <dstockwell@frequency-one.com>
+
+Please remove the signed-off-by (same in the other patches)
+
+++++++ OK, will do, and not add the line in the future.  It is unnecessary, 
+but I noticed it in other submissions, and assumed that it was becoming 
+standard.
+
 > ---
->  src/device.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
+>  audio/control.c |   22 ++++++++--------------
+>  1 files changed, 8 insertions(+), 14 deletions(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index 9dd657c..f323bf8 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -855,8 +855,10 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn)
->                device->disconnects = g_slist_remove(device->disconnects, msg);
->        }
->
-> -       if (device_is_paired(device) && !device_is_bonded(device))
-> +       if (device_is_paired(device) && !device_is_bonded(device)) {
-> +               btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
->                device_set_paired(device, FALSE);
-> +       }
+> diff --git a/audio/control.c b/audio/control.c
+> index 4e10cac..047e6ac 100644
+> --- a/audio/control.c
+> +++ b/audio/control.c
+> @@ -196,7 +196,7 @@ enum media_info_id {
+>  MEDIA_INFO_TRACK = 4,
+>  MEDIA_INFO_N_TRACKS = 5,
+>  MEDIA_INFO_GENRE = 6,
+> - MEDIA_INFO_CURRENT_POSITION = 7,
+> + MEDIA_INFO_PLAYING_TIME = 7,
+>  };
 
-How about move btd_adapter_remove_bonding to device_set_paired e.g. if
-(!value) btd_adapter_remove_bonding?
+Would it make sense to add a MEDIA_INFO_LAST to the end of the above
+list and then instead of the following:
 
--- 
-Luiz Augusto von Dentz
+> - for (i = 1; i <= MEDIA_INFO_CURRENT_POSITION; i++) {
+> + for (i = 1; i <= MEDIA_INFO_PLAYING_TIME; i++) {
+>  size = mp_get_media_attribute(control->mp, i,
+>  &pdu->params[pos]);
+
+You'd have:
+
+for (i = 1; i < MEDIA_INFO_LAST; i++) {
+
++++++ Yes, it does make sense.  In fact in my "big bang" submission, that's 
+how I did it.  Will make the change and resubmit.
+
+Seems more readable to me at least and it'd make it easier to add new
+MEDIA_INFO types in the future (you only need to change the enum
+definition and protect yourself against forgetting to update both
+places).
+
++++++ I agree...absolutely.  FWIW, I do have a few MEDIA_INFO items that I 
+am sending to the BARB.  Seems a waste to have a space of 4 bn possible 
+metadata elements, and only seven used, with all the rest "reserved".  Not 
+even a space for vendor-defined elements.
+
+Btw, it looked like this avrcp_handle_get_element_attributes function
+might not be properly checking the amount of actually received data in
+all necessary places before accessing the buffer (i.e. having the risk
+of remotely triggered buffer overflows). Could you please verify this
+and fix it if the issue really exists.
+
++++++ I will take a look this afternoon and either send a fix, or send a 
+note that it looks OK.
+
+Cheers, David
+
+Johan 
+
