@@ -1,70 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <F05E1DCFC982471192B260934AA7449A@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
-Cc: "BlueZ devel list" <linux-bluetooth@vger.kernel.org>,
-	"Johan Hedberg" <johan.hedberg@gmail.com>,
-	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-References: <201108201753.32608.dstockwell@frequency-one.com> <20110822103632.GC9949@dell> <76D0096D2AE844EC9E2A4834E474AE0B@freqoneremote> <CAMOw1v7U3p99h+WA8U-Hp_fb37jZDsv+i--TSKAViyB-stAZ7Q@mail.gmail.com> <165376978.336156.1314031379433.JavaMail.open-xchange@oxusltgw02.schlund.de> <CAMOw1v6YJAn_p=5S6reDGeX2NdM5kP_XjAT_2wGj0SXV7MuO7A@mail.gmail.com>
-In-Reply-To: <CAMOw1v6YJAn_p=5S6reDGeX2NdM5kP_XjAT_2wGj0SXV7MuO7A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] AVRCP: Corrected metadata: Playing Time
-Date: Mon, 22 Aug 2011 22:02:38 -0500
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 22 Aug 2011 22:08:51 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Alan Ott <alan@signal11.us>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	linux-input@vger.kernel.org, Jim Paris <jim@jtan.com>,
+	Ranulf Doswell <ralf@ranulf.net>,
+	"Pascal A . Brisset" <pascal44973@pabr.org>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>,
+	Mikko Virkkila <virkkila@kapsi.fi>,
+	Simon Wood <simon@mungewell.org>,
+	Arc Riley <arcriley@gmail.com>,
+	Sergey Kondakov <virtuousfox@gmail.com>
+Subject: Re: [PATCH BlueZ 2/4] Add sixaxis plugin: USB pairing and LEDs
+ settings
+Message-Id: <20110822220851.38d346165c3afaa592888eed@studenti.unina.it>
+In-Reply-To: <20110819215716.71f6b39d3b5e783c4276f422@studenti.unina.it>
+References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
+	<1312553358-26280-3-git-send-email-ospite@studenti.unina.it>
+	<4E41EBE5.7040908@signal11.us>
+	<20110818161357.8084ab94bff57391e7ec3284@studenti.unina.it>
+	<20110819215716.71f6b39d3b5e783c4276f422@studenti.unina.it>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__22_Aug_2011_22_08_51_+0200_Yubf.9jMSO/izqmG"
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas, (back to the lame client):
------Original Message----- 
-From: Lucas De Marchi
->
-> Wondering what you mean by "PDU-continuation pending", though.  Does it 
-> have
->
-> to do with AVRCP-level RequestContinuingResponse (and Abort)?  Or
-> AVCTP-layer
->
-> fragmentation?
+--Signature=_Mon__22_Aug_2011_22_08_51_+0200_Yubf.9jMSO/izqmG
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 19 Aug 2011 21:57:16 +0200
+Antonio Ospite <ospite@studenti.unina.it> wrote:
 
-AVRCP-level RequestContinuingResponse (and Abort)
+> On Thu, 18 Aug 2011 16:13:57 +0200
+> Antonio Ospite <ospite@studenti.unina.it> wrote:
+>=20
+> [...]
+> > If the idea looks OK I'll fold those patches in v5, along with the
+> > plugin renaming to "sony-controller", and maybe I'll split the plugin in
+> > several modules too:
+> >   sony-controller.c 	/* udev and bluez stuff */
+> >   sony-controller-hid.c	/* hidraw and device specific stuff */
+> >   sony-controlled-hid.h
+> >=20
+>=20
+> Do you think "controller" fits the PS3 headset as well?
+>=20
 
-+++++
+OK, given that:
+  - all the possibly supported devices at this time are PS3 peripherals;
+  - some of them are not input controllers;
+  - the cable pairing/association  mechanism generally does not apply to
+    other sony BT hardware;
+  - someone imagined a future PS4 controller using the same pairing=20
+    mechanism;
 
-Yes, I know about that one, and am not sure it is really necessary.  And, I 
-think it is a bit messy to support since you also have to make sure that 
-only metadata is processed between CT and TG, but at the same time allow for 
-passthroughs.
+with Alan we came up with the name:
 
-As you know from the spec, an AV/C packet can be up to 512 bytes long. 
-There are only seven possible Metadata attributes, of which three are 
-number-strings (only a few bytes each).  Even if all seven 
-attributes/elements are set, there are 56 bytes of element headers, the 
-two-byte AVCTP header, the 10-byte AVRCP (PDU) header, etc.
+	playstation-peripheral
 
-This leaves at least 400 bytes of metadata, divided across the track title, 
-the artist name, the album name, and the genre. For most popular music, 
-these are kept as short as possible (so customers/fans can remember them), 
-so a typical track name, is much less than 40 bytes (satellite radio only 
-transmits 16 bytes).  Same with the artist name, etc.
+for the plugin; do you people like that, or does the variant
 
-I suggest a good way to handle this is to guarantee that the elements are 
-not pathologically long, limiting each to 80 bytes or so.  Or maybe, as we 
-scan the metadata, keep a counter to make sure that, in aggregate, we do not 
-exceed the 512-byte limit.
+	playstation-device
 
-The bigger issue for the future is AVCTP-level fragmentation, which becomes 
-an issue if either MTU drops below the default 672 bytes (noisy environment, 
-weak signal, etc.), or we implement 1.4 with browsing.  If/when we go in 
-that direction, we will probably need to layer the handling of AVCTP and 
-AVRCP.  I have code ready for that, but needs some cleanup and testing.
+sound better to you?
 
-Cheers,
-David
+Thanks,
+   Antonio
 
-regards,
-Lucas De Marchi 
+--=20
+Antonio Ospite
+http://ao2.it
 
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Mon__22_Aug_2011_22_08_51_+0200_Yubf.9jMSO/izqmG
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5St1MACgkQ5xr2akVTsAH/6QCffufxVZurGCwaGQOOeqqZ72wh
+O1oAniXNutCJBGDRpaNES6GYwXvufrM1
+=qyDR
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__22_Aug_2011_22_08_51_+0200_Yubf.9jMSO/izqmG--
