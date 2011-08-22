@@ -1,138 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
-Subject: [PATCH 1/2] serial: add Serial.ConnectFD()
-Date: Mon, 22 Aug 2011 14:19:44 -0300
-Message-Id: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <CAMhHtTy7vStrSEZsj6Gcy_VO-JfL4tuYZ=TJWtQ4TxqMMGQpTQ@mail.gmail.com>
+References: <7b86640552.davehigton@dsl.pipex.com> <CAMhHtTy7vStrSEZsj6Gcy_VO-JfL4tuYZ=TJWtQ4TxqMMGQpTQ@mail.gmail.com>
+From: Ash K <ashoksarf@gmail.com>
+Date: Mon, 22 Aug 2011 11:56:56 -0500
+Message-ID: <CAMhHtTytv2Q4JPE85T-zqgbrqpq+9XHRbgYtQWADeoip9yCP5A@mail.gmail.com>
+Subject: Re: Arguments to PIN Code Request Response
+To: davehigton@dsl.pipex.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Hi Dave,
 
-It's similar to Serial.Connect() but returns the actual RFCOMM file
-descriptor instead of creating a device in /dev
----
- doc/serial-api.txt |   16 ++++++++++++++++
- serial/port.c      |   36 ++++++++++++++++++++++++++++++++++--
- 2 files changed, 50 insertions(+), 2 deletions(-)
+If you see specification the PIN_Code parameter for
+PIN_Code_request_reply command, it says
 
-diff --git a/doc/serial-api.txt b/doc/serial-api.txt
-index 5f9bd5f..98b0ad4 100644
---- a/doc/serial-api.txt
-+++ b/doc/serial-api.txt
-@@ -26,6 +26,22 @@ Methods		string Connect(string pattern)
- 					 org.bluez.Error.ConnectionAttemptFailed
- 					 org.bluez.Error.NotSupported
- 
-+Methods		fd ConnectFD(string pattern) [experimental]
-+
-+			Connects to a specific RFCOMM based service on a
-+			remote device and returns a file descriptor to talk
-+			 with this device.
-+
-+			Possible patterns: UUID 128 bit as string
-+					   Profile short names, e.g: spp, dun
-+					   RFCOMM channel as string, 1-30
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.ConnectionAttemptFailed
-+					 org.bluez.Error.NotSupported
-+
-+
- 		void Disconnect(string device)
- 
- 			Disconnect a RFCOMM TTY device that has been
-diff --git a/serial/port.c b/serial/port.c
-index d011084..e359716 100644
---- a/serial/port.c
-+++ b/serial/port.c
-@@ -63,6 +63,10 @@
- #define MAX_OPEN_TRIES		5
- #define OPEN_WAIT		300	/* ms. udev node creation retry wait */
- 
-+#ifndef DBUS_TYPE_UNIX_FD
-+#define DBUS_TYPE_UNIX_FD -1
-+#endif
-+
- struct serial_device {
- 	DBusConnection	*conn;		/* for name listener handling */
- 	bdaddr_t	src;		/* Source (local) address */
-@@ -80,6 +84,7 @@ struct serial_port {
- 	int		fd;		/* Opened file descriptor */
- 	GIOChannel	*io;		/* BtIO channel */
- 	guint		listener_id;
-+	gboolean	fd_passing;
- 	struct serial_device *device;
- };
- 
-@@ -329,6 +334,14 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
- 	port->io = NULL;
- 
- 	sk = g_io_channel_unix_get_fd(chan);
-+	if (port->fd_passing) {
-+		reply = g_dbus_create_reply(port->msg,
-+				DBUS_TYPE_UNIX_FD, &sk,
-+				DBUS_TYPE_INVALID);
-+		g_dbus_send_message(device->conn, reply);
-+		return;
-+	}
-+
- 	port->id = ioctl(sk, RFCOMMCREATEDEV, &req);
- 	if (port->id < 0) {
- 		int err = -errno;
-@@ -468,8 +481,8 @@ static struct serial_port *create_port(struct serial_device *device,
- 	return port;
- }
- 
--static DBusMessage *port_connect(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+static DBusMessage *_port_connect(DBusConnection *conn, DBusMessage *msg,
-+					void *user_data, gboolean fd)
- {
- 	struct serial_device *device = user_data;
- 	struct serial_port *port;
-@@ -501,6 +514,9 @@ static DBusMessage *port_connect(DBusConnection *conn,
- 						NULL);
- 	port->msg = dbus_message_ref(msg);
- 
-+	if (fd)
-+		port->fd_passing = TRUE;
-+
- 	err = connect_port(port);
- 	if (err < 0) {
- 		error("%s", strerror(-err));
-@@ -513,6 +529,21 @@ static DBusMessage *port_connect(DBusConnection *conn,
- 	return NULL;
- }
- 
-+static DBusMessage *port_connect(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	return _port_connect(conn, msg, user_data, FALSE);
-+}
-+
-+static DBusMessage *port_connect_fd(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	if (DBUS_TYPE_UNIX_FD < 0)
-+		return btd_error_not_supported(msg);
-+
-+	return _port_connect(conn, msg, user_data, TRUE);
-+}
-+
- static DBusMessage *port_disconnect(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-@@ -546,6 +577,7 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
- 
- static GDBusMethodTable port_methods[] = {
- 	{ "Connect",    "s", "s", port_connect, G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "ConnectFD",    "s", "h", port_connect_fd, G_DBUS_METHOD_FLAG_ASYNC },
- 	{ "Disconnect", "s", "",  port_disconnect },
- 	{ }
- };
--- 
-1.7.6
+Value
+----
+0xXXXXXXXXXX
+XXXXXXXXXXX
+XXXXXXXXXXX
+ Parameter Description
+----
+PIN code for the device that is to be connected. The Host should
+ensure that strong PIN Codes are used. PIN Codes can be up to a
+maximum of 128 bits. Note: The PIN_Code Parameter is a string
+parameter. Endianess does therefore not apply to the PIN_Code
+Parameter. The first octet of the PIN code should be transmitted first.
+Which means, even if your PIN code of 4 byte length you have to send
+16 byte length of PIN code to controller. And controller uses initial
+bytes from the 16byte PIN code, the length of the PIN code is defined
+by length parameter.
+What you are looking at is correct, after 4 bytes of PIN code, you
+have some junk/host selected data which is of no interest to
+controller.
 
+On Fri, Aug 19, 2011 at 4:25 PM, Dave Higton <davehigton@dsl.pipex.com> wrote:
+> According to the Core Spec versions 4.0, 3.0, 2.1 and 2.0, the
+> arguments to PIN Code Request Reply are BD_ADDR, PIN length, and
+> PIN code.  However, this doesn't work with the devices I've tried
+> (an Android phone and a mini keyboard); there are several more
+> bytes of argument in a capture that I have.  If I only send the
+> args as per the spec, I get an args not understood error; if I
+> add these other arg bytes, copied from the capture, the PIN code
+> is accepted and the pairing process continues.
+>
+> Are these extra arguments documented in one of the earlier core
+> specifications, now deprecated?
+>
+> The bytes I have are:
+>
+> 0D 04 17 3F 1B AC 26 2C DC 04 30 30 30 30 17 00 0C 11 0A 11 0B 11 16 11 02 0A
+>
+> Unless I've badly misunderstood something, the PIN code length
+> above is 4, and the PIN code is ASCII "0000".  I don't expect to
+> see any bytes following "30 30 30 30".
+>
+> Dave
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+--
+Ash
