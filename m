@@ -1,64 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKuP3BwGTUt_t1h8XqrbXbt+RGzzTCKhxG-NvHSBStwuw@mail.gmail.com>
-References: <1314006934-4953-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1314006934-4953-2-git-send-email-dmitriy.paliy@nokia.com>
-	<CABBYNZKuP3BwGTUt_t1h8XqrbXbt+RGzzTCKhxG-NvHSBStwuw@mail.gmail.com>
-Date: Mon, 22 Aug 2011 15:44:28 +0300
-Message-ID: <CAHMBquVjum9xZHu4NGzNEpyDPVd0bHXgyBEBPtLvUa-Zq-Ec0g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] Fix remove temporary link key for No Bonding
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Bartosz Szatkowski <bulislaw@linux.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bartosz Szatkowski <bulislaw@linux.com>
+Subject: [PATCH BlueZ v2 3/3] Add support for name in OOB SetRemoteProperties
+Date: Mon, 22 Aug 2011 14:09:04 +0200
+Message-Id: <1314014944-21554-3-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1314014944-21554-1-git-send-email-bulislaw@linux.com>
+References: <1314014944-21554-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ doc/oob-api.txt   |    1 +
+ plugins/dbusoob.c |   34 ++++++++++++++++++++++++++++++++++
+ src/storage.c     |    2 +-
+ src/storage.h     |    2 +-
+ 4 files changed, 37 insertions(+), 2 deletions(-)
 
-On Mon, Aug 22, 2011 at 3:04 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Dmitriy,
->
-> On Mon, Aug 22, 2011 at 12:55 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
->> This fixes regression caused by 33cdfcb0fabcfb5260953a13ae277b5abe9a322d.
->> Temporary link key should be removed after device is disconnected if
->> bonding information is not stored in file system.
->>
->> Currently, the key is deleted only when paired device is removed, or
->> adapter is powered off. In case of No Bonding authentication, device is
->> not paired after disconnection, which results in link key left in memory.
->>
->> On the other hand, device is not necessarily removed after disconnection
->> that also leaves unneeded temporary link key in memory.
->> ---
->>  src/device.c |    4 +++-
->>  1 files changed, 3 insertions(+), 1 deletions(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index 9dd657c..f323bf8 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -855,8 +855,10 @@ void device_remove_connection(struct btd_device *device, DBusConnection *conn)
->>                device->disconnects = g_slist_remove(device->disconnects, msg);
->>        }
->>
->> -       if (device_is_paired(device) && !device_is_bonded(device))
->> +       if (device_is_paired(device) && !device_is_bonded(device)) {
->> +               btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
->>                device_set_paired(device, FALSE);
->> +       }
->
-> How about move btd_adapter_remove_bonding to device_set_paired e.g. if
-> (!value) btd_adapter_remove_bonding?
+diff --git a/doc/oob-api.txt b/doc/oob-api.txt
+index 500ef15..2d0d096 100644
+--- a/doc/oob-api.txt
++++ b/doc/oob-api.txt
+@@ -49,6 +49,7 @@ Methods		array{byte} hash, array{byte} randomizer ReadLocalData()
+ 				Class		uint32
+ 				Hash		array{byte}
+ 				Randomizer	array{byte}
++				Name		String
+ 
+ 			Possible errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InvalidArguments
+diff --git a/plugins/dbusoob.c b/plugins/dbusoob.c
+index f0bbd14..412cd67 100644
+--- a/plugins/dbusoob.c
++++ b/plugins/dbusoob.c
+@@ -59,6 +59,7 @@ struct oob_remote_parameters {
+ 	uint32_t class;
+ 	uint8_t *hash;
+ 	uint8_t *randomizer;
++	const char *name;
+ 	gboolean device_found;
+ };
+ 
+@@ -191,6 +192,10 @@ static void emit_device_found(const char *path,
+ 		dict_append_entry(&dict, "Class", DBUS_TYPE_UINT32,
+ 							&params->class);
+ 
++	if (params->name != NULL)
++		dict_append_entry(&dict, "Name", DBUS_TYPE_STRING,
++							&params->name);
++
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+ 	g_dbus_send_message(connection, signal);
+@@ -255,6 +260,29 @@ static void set_oob_data(struct btd_adapter *adapter,
+ 		error("Adding remote OOB data failed");
+ }
+ 
++static DBusMessage *parse_name(DBusMessageIter *value,
++			struct oob_remote_parameters *params, DBusMessage *msg)
++{
++	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(value, &params->name);
++
++	return NULL;
++}
++
++static void set_name(struct oob_remote_parameters *params)
++{
++	if (write_device_name(&params->local, &params->peer,
++							params->name) < 0) {
++		error("Setting device name failed");
++
++		return;
++	}
++
++	params->device_found = TRUE;
++}
++
+ static DBusMessage *parse_property(const char *property,
+ 				DBusMessageIter *value, DBusMessage *msg,
+ 				struct oob_remote_parameters *params)
+@@ -262,6 +290,9 @@ static DBusMessage *parse_property(const char *property,
+ 	if (g_str_equal("Class", property))
+ 		return parse_class(value, params, msg);
+ 
++	if (g_str_equal("Name", property))
++		return parse_name(value, params, msg);
++
+ 	if (g_str_equal("Hash", property))
+ 		return parse_oob_data(value, &params->hash, msg);
+ 
+@@ -277,6 +308,9 @@ static void set_properties(struct btd_adapter *adapter,
+ 	if (params->class != 0)
+ 		set_class(params);
+ 
++	if (params->name != NULL)
++		set_name(params);
++
+ 	if (params->hash != NULL && params->randomizer != NULL)
+ 		set_oob_data(adapter, params);
+ 
+diff --git a/src/storage.c b/src/storage.c
+index 1f3da6e..414d158 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -321,7 +321,7 @@ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class)
+ 	return 0;
+ }
+ 
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name)
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name)
+ {
+ 	char filename[PATH_MAX + 1], addr[18], str[249];
+ 	int i;
+diff --git a/src/storage.h b/src/storage.h
+index bb64727..78513ac 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -38,7 +38,7 @@ int write_local_class(bdaddr_t *bdaddr, uint8_t *class);
+ int read_local_class(bdaddr_t *bdaddr, uint8_t *class);
+ int write_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t class);
+ int read_remote_class(bdaddr_t *local, bdaddr_t *peer, uint32_t *class);
+-int write_device_name(bdaddr_t *local, bdaddr_t *peer, char *name);
++int write_device_name(bdaddr_t *local, bdaddr_t *peer, const char *name);
+ int read_device_name(const char *src, const char *dst, char *name);
+ int write_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
+ int read_remote_eir(bdaddr_t *local, bdaddr_t *peer, uint8_t *data);
+-- 
+1.7.4.1
 
-Since btd_adapter_remove_bonding is used only together with
-device_set_paired(device, FALSE), it makes sense code-wise. However,
-downside is that one may start thinking that device_set_paired(device,
-TRUE) creates bonding, which is not so. Therefore, it looks a bit
-questionable.
-
-I will submit new proposal.
-
-Dmitriy
