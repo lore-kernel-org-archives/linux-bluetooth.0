@@ -1,19 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: shy <shyboysby@gmail.com>
-Date: Tue, 23 Aug 2011 16:54:53 +0800
-Message-ID: <CAHabYV7pODc8ZNW_M4auZdwS+Qik8QfobUj6fK9_1rnkivcJ7g@mail.gmail.com>
-Subject: HID UNPLUG_VIRTUAL_CABLE event issue
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: padovan@profusion.mobi, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABUK1aiEJCCpmxMvob4PDtMS1PX8KA=rCxD+JZ2DGxuWavp18A@mail.gmail.com>
+References: <CABUK1aiEJCCpmxMvob4PDtMS1PX8KA=rCxD+JZ2DGxuWavp18A@mail.gmail.com>
+Date: Tue, 23 Aug 2011 10:16:47 +0200
+Message-ID: <CACLukzKd6g3_N3D1oeLx_uCUD499iLnPbxErzHrHi99GdkXTkw@mail.gmail.com>
+Subject: Re: using test-health and test-health-sink
+From: Santiago Carot <sancane@gmail.com>
+To: Pavan Savoy <pavan_savoy@sify.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-According to connection_disconnect in input/device.c(Bluez version
-4.93), it would disconnect INTR and CONTROL L2cap link and then send
-HIDP_CTRL_VIRTUAL_CABLE_UNPLUG message by the process sequence.
-That seems it doesn't comply to the spec Page120, HID version 1.0.
-Could you please confirm this case? If so, I would submit a patch.
-Best regards
-shy
+Hi Pavan,
+
+See commnets below.
+
+2011/8/22 Pavan Savoy <pavan_savoy@sify.com>:
+> I am trying to make my desktop running latest BlueZ (4.96) as a hdp
+> source, and want to use test-health to communicate with a sink that I
+> know off.
+> However, when I try to use the test-health service  - I see that the
+> hdp_device hasn't been probed and then the dbus service
+> "org.bluez.HealthDevice" isn't running and hence getting this
+> error....
+>
+> org.bluez.HealthManager seems to be running fine...
+> How do I make org.bluez.HealthDevice to be registered ?
+>
+
+Have you compiled your sources using --enable-health flag?
+
+Regards.
