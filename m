@@ -1,78 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: multipart/mixed; boundary=----------H7XKyR0bwZcKqZWLWLtjh9
-To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"ovasik@redhat.com" <ovasik@redhat.com>
-Subject: Re: [PATCH 2/8] Missing comma
-References: <op.v0av2bteh52hc0@dhcp-25-209.brq.redhat.com>
- <CAMOw1v5S+hcmvBW=_6h1RUsXt9af7fUm_eVmcdBP1vrif_t-Fg@mail.gmail.com>
-Date: Tue, 23 Aug 2011 08:06:09 +0200
+Message-ID: <4E5342AE.10908@nokia.com>
+Date: Tue, 23 Aug 2011 09:03:26 +0300
+From: Antti Julku <antti.julku@nokia.com>
 MIME-Version: 1.0
-From: "Pavel Raiskup" <praiskup@redhat.com>
-Message-ID: <op.v0nkkjwsh52hc0@dhcp-25-209.brq.redhat.com>
-In-Reply-To: <CAMOw1v5S+hcmvBW=_6h1RUsXt9af7fUm_eVmcdBP1vrif_t-Fg@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+        ext Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
+CC: johan.hedberg@gmail.com
+Subject: Re: [PATCH] Bluetooth: Add mgmt command for fast connectable mode
+References: <1308737516-3303-1-git-send-email-antti.julku@nokia.com> <1309309092.2208.25.camel@aeonflux> <CAHMBquWSLjzKKyM2xuMUakHeBb-FMLUWXLj2_Tz4Ye1MWj37qw@mail.gmail.com> <CAKT1EBfQaTSjQe6sZnC5Wx52iPmyo6SSfYD0Ci+_qb1Dbq32+g@mail.gmail.com> <4E3A5BFB.1050201@nokia.com> <4E425061.6080206@nokia.com> <1312984559.3373.122.camel@aeonflux> <4E4E592C.7060103@nokia.com> <20110822180151.GB21949@joana> <CAKT1EBfpB8DfOBgj=gwKTKGecmj-R-7gZ3zJm+8OQFekZPu7HQ@mail.gmail.com> <20110822194844.GC21949@joana>
+In-Reply-To: <20110822194844.GC21949@joana>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------------H7XKyR0bwZcKqZWLWLtjh9
-Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
-Content-Transfer-Encoding: 7bit
 
-Hi Lucas,
+Hi Gustavo,
 
->> Missing comma in static array chassis_map definition between
->> "Blade" and "Blade Enclosure" field.
->>
->> Typing error fixed.
->>
->> ....
->>
->> -       "CompactPCI",            "unknonw",
->> +       "CompactPCI",            "unknown",
->>        "AdvancedTCA",           "unknown",
->>        "Blade",                 "server",
->> -       "Blade Enclosure"        "unknown", /* 0x1D */
->> +       "Blade Enclosure",       "unknown", /* 0x1D */
+On 08/22/2011 10:48 PM, ext Gustavo Padovan wrote:
 
-> Lucas De Marchi wrote:
+>>>> Set Fast Connectable Command
+>>>> ============================
+>>>>
+>>>> Command Code:           0x0001F
+>>>> Controller Index:<controller id>
+>>>> Command Parameters:     Enable (1 Octet)
+>>>> Return Parameters:      Status (1 octet)
+>>>>
+>>>> Configure BR Fast Connectable Mode Command
+>>>> ==========================================
+>>>>
+>>>> Command Code:           0x00020
+>>>> Controller Index:<controller id>
+>>>> Command Parameters:     Page_scan_type (1 Octet)
+>>>>                          Page_scan_interval (1 Octet)
+>>>> Return Parameters:      Status (1 octet)
+>>>>
+>>>> Configure LE Fast Connectable Mode Command
+>>>> ==========================================
+>>>>
+>>>> Command Code:           0x00021
+>>>> Controller Index:<controller id>
+>>>> Command Parameters:     Adv_interval (1 Octet)
+>>>>                          ...and maybe some other settings if needed
+>>>> Return Parameters:      Status (1 octet)
+>>>
+>>> Can't both command be merged into one? LE Advertisement could be a scan type.
+>>> But this won't work if we need more settings for LE.
+>>>
+>>>         Gustavo
+>>>
+>>
+>> Another input: for GATT based profiles after the disconnection the
+>> specs are recommending advertising interval values for fast
+>> reconnection in the first 30 seconds and reduced power mode after 30
+>> seconds.
+>> Of course, there are some implementations that disable advertising
+>> after some time.
+>>
+>> At the moment, the incoming connection for dual mode device are not
+>> allowed by the spec.
+>>
+>> My opinion is: parameters could be omitted. BR/EDR and LE could use
+>> hard-coded settings for on/off of each transport. Add BR/EDR or LE
+>> specific parameter in the Management interface commands doesn't look a
+>> suitable approach. A simple on/off command seems to be more flexible
+>> for future changes.
 >
-> Nice catch, but because of errors like this, I think it'd be better to
-> use a struct with 2 "char *" fields, isn't it?
+> Ok, so we could go only with Set Fast Connectable for now and use hardcoded
+> values It's too early to say if we will need to to tune the those values for
+> LE.
+>
+> 	Gustavo
 
-You are right but anyway is this really necessary to make quite big change
-in struct/control code? There is possible to make other "switch-line"
-errors when 2 "char *" arrays used.
+So the initial fast connectable patch I sent is actually what we want? 
+Implementation for LE can be easily added later, when it's clear how LE 
+fast connectable should work. Please apply the patch then.
 
-Attaching previous patch again due to possible corruption by my email
-client.
-
-Pavel
-------------H7XKyR0bwZcKqZWLWLtjh9
-Content-Disposition: attachment; filename=0002-Missing-comma.patch
-Content-Type: application/octet-stream; name=0002-Missing-comma.patch
-Content-Transfer-Encoding: Base64
-
-RnJvbSA1MGM0NDI3ODk1ZTBlYTk5YTJkNTBhZjU3MzJiZWM1OTc1OGRlYzBkIE1v
-biBTZXAgMTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBSYWlza3VwIDxwcmFp
-c2t1cEByZWRoYXQuY29tPgpEYXRlOiBUaHUsIDExIEF1ZyAyMDExIDEzOjUyOjAw
-ICswMjAwClN1YmplY3Q6IFtQQVRDSCAyLzhdIE1pc3NpbmcgY29tbWEKCk1pc3Np
-bmcgY29tbWEgaW4gc3RhdGljIGFycmF5IGNoYXNzaXNfbWFwIGRlZmluaXRpb24g
-YmV0d2VlbgoiQmxhZGUiIGFuZCAiQmxhZGUgRW5jbG9zdXJlIiBmaWVsZC4KClR5
-cGluZyBlcnJvciBmaXhlZC4KLS0tCiBwbHVnaW5zL2Zvcm1mYWN0b3IuYyB8ICAg
-IDQgKystLQogMSBmaWxlcyBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvcGx1Z2lucy9mb3JtZmFjdG9yLmMgYi9w
-bHVnaW5zL2Zvcm1mYWN0b3IuYwppbmRleCAzYjMxOTI3Li4wZTE5YWM2IDEwMDY0
-NAotLS0gYS9wbHVnaW5zL2Zvcm1mYWN0b3IuYworKysgYi9wbHVnaW5zL2Zvcm1m
-YWN0b3IuYwpAQCAtNzMsMTAgKzczLDEwIEBAIHN0YXRpYyBjb25zdCBjaGFyICpj
-aGFzc2lzX21hcFtdID0gewogCSJSYWNrIE1vdW50IENoYXNzaXMiLCAgICAidW5r
-bm93biIsCiAJIlNlYWxlZC1jYXNlIFBDIiwgICAgICAgICJ1bmtub3duIiwKIAki
-TXVsdGktc3lzdGVtIiwgICAgICAgICAgInVua25vd24iLAotCSJDb21wYWN0UENJ
-IiwgICAgICAgICAgICAidW5rbm9udyIsCisJIkNvbXBhY3RQQ0kiLCAgICAgICAg
-ICAgICJ1bmtub3duIiwKIAkiQWR2YW5jZWRUQ0EiLCAgICAgICAgICAgInVua25v
-d24iLAogCSJCbGFkZSIsICAgICAgICAgICAgICAgICAic2VydmVyIiwKLQkiQmxh
-ZGUgRW5jbG9zdXJlIiAgICAgICAgInVua25vd24iLCAvKiAweDFEICovCisJIkJs
-YWRlIEVuY2xvc3VyZSIsICAgICAgICJ1bmtub3duIiwgLyogMHgxRCAqLwogCU5V
-TEwKIH07CiAKLS0gCjEuNy40LjQKCg==
-
-------------H7XKyR0bwZcKqZWLWLtjh9--
-
+Br,
+Antti
