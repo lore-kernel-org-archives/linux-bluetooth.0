@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 23 Aug 2011 14:59:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v3] Fix remove temporary link key for No Bonding
+Message-ID: <20110823115950.GA18032@dell>
+References: <1314020739-15376-1-git-send-email-dmitriy.paliy@nokia.com>
+ <1314020739-15376-2-git-send-email-dmitriy.paliy@nokia.com>
 MIME-Version: 1.0
-In-Reply-To: <op.v0nhuunjh52hc0@dhcp-25-209.brq.redhat.com>
-References: <op.v0avzhpah52hc0@dhcp-25-209.brq.redhat.com>
-	<20110822082933.GD11306@dell>
-	<op.v0nhuunjh52hc0@dhcp-25-209.brq.redhat.com>
-Date: Tue, 23 Aug 2011 11:36:49 -0400
-Message-ID: <CAJdJm_NMEGXX43EKovit_Pqn-knLHxuayjCnRh4W3CfjqwhKhA@mail.gmail.com>
-Subject: Re: [PATCH 1/8] Off-by-one(two) error in form factor detection
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Pavel Raiskup <praiskup@redhat.com>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, ovasik@redhat.com,
-	stlman@poczta.fm
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1314020739-15376-2-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi Dmitriy,
 
-On Tue, Aug 23, 2011 at 1:07 AM, Pavel Raiskup <praiskup@redhat.com> wrote:
->> The patch doesn't apply (probably due to your email client splitting
->> lines). You might want to consider using git send-email instead:
->
-> sorry for that, I'll use send-email for the next time. For now I'm sending
-> patches again as attachment because I don't want to break this thread.
+On Mon, Aug 22, 2011, Dmitriy Paliy wrote:
+> This fixes regression caused by 33cdfcb0fabcfb5260953a13ae277b5abe9a322d.
+> Temporary link key should be removed after device is disconnected if
+> bonding information is not stored in file system.
+> 
+> Currently, the key is deleted only when paired device is removed, or
+> adapter is powered off. In case of No Bonding authentication, device is
+> not paired after disconnection, which results in link key left in memory.
+> 
+> On the other hand, device is not necessarily removed after disconnection
+> that also leaves unneeded temporary link key in memory. Therefore,
+> btd_adapter_remove_bonding is moved to device_set_paired(device, FALSE)
+> covering both cases.
+> ---
+>  src/device.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
-Just a tip: you can use --in-reply-to=<message-id> to make sure your
-patch's email will be attached to a given thread.
+Applied. Thanks.
 
-<message-id> is the Message ID for the message you want to "reply"
-with the new patch (which you can get from the message headers, look
-for "Message-ID: ...").
-
-HTH,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
