@@ -1,53 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 From: Prasad Bhat <prasadbhat22@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] This is the vdp implemention after refactoring the code.
-Date: Tue, 23 Aug 2011 07:52:18 -0400
-Message-Id: <1314100338-13410-2-git-send-email-prasadbhat22@gmail.com>
-In-Reply-To: <1314100338-13410-1-git-send-email-prasadbhat22@gmail.com>
-References: <1314100338-13410-1-git-send-email-prasadbhat22@gmail.com>
+Subject: [PATCH BlueZ 1/2] This is the code refactoring for the vdp and a2dp.
+Date: Tue, 23 Aug 2011 07:52:17 -0400
+Message-Id: <1314100338-13410-1-git-send-email-prasadbhat22@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Prasad Bhat <prasadbhat22@.gmail.com>
 
 ---
- audio/vdp.c |  987 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- audio/vdp.h |   62 ++++
- 2 files changed, 1049 insertions(+), 0 deletions(-)
- create mode 100755 audio/vdp.c
- create mode 100755 audio/vdp.h
+ audio/sep.c | 1080 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ audio/sep.h |  207 ++++++++++++
+ 2 files changed, 1287 insertions(+), 0 deletions(-)
+ create mode 100644 audio/sep.c
+ create mode 100644 audio/sep.h
 
-diff --git a/audio/vdp.c b/audio/vdp.c
-new file mode 100755
-index 0000000..7541d4f
+diff --git a/audio/sep.c b/audio/sep.c
+new file mode 100644
+index 0000000..24847cb
 --- /dev/null
-+++ b/audio/vdp.c
-@@ -0,0 +1,987 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2006-2010  Nokia Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
++++ b/audio/sep.c
+@@ -0,0 +1,1080 @@
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
@@ -70,324 +44,259 @@ index 0000000..7541d4f
 +#include "video-source.h"
 +#include "unix.h"
 +#include "media.h"
-+#include "vdp.h"
++#include "sep.h"
 +#include "sdpd.h"
 +
-+#define RECONFIGURE_TIMEOUT 500
-+#define SUSPEND_TIMEOUT 5
-+
-+static DBusConnection *connection = NULL;
-+
-+static gboolean select_h263_params(struct h263_baseline_codec_cap *cap,
-+					struct h263_baseline_codec_cap *supported)
++struct avdtp_setup *setup_ref(struct avdtp_setup *setup)
 +{
-+	memset(cap, 0, sizeof(struct h263_baseline_codec_cap));
++        setup->ref++;
 +
-+	cap->cap.media_type = AVDTP_MEDIA_TYPE_VIDEO;
-+	cap->cap.media_codec_type = VDP_CODEC_H263_BASELINE;
++        DBG("%p: ref=%d", setup, setup->ref);
 +
-+	if (supported->level & H263_LEVEL_10)
-+		cap->level = H263_LEVEL_10;
-+	else {
-+		error("No supported level");
-+		return FALSE;
-+	}
-+	return TRUE;
++        return setup;
 +}
 +
-+
-+unsigned int vdp_config(struct avdtp *session, struct sep *sep,
-+				avdtp_config_cb_t cb, GSList *caps,
-+				void *user_data)
++struct audio_device *get_dev(struct avdtp *session)
 +{
-+	struct avdtp_setup_cb *cb_data;
-+	GSList *l;
-+	struct avdtp_server *server;
++        bdaddr_t src, dst;
++
++        avdtp_get_peers(session, &src, &dst);
++
++        return manager_find_device(NULL, &src, &dst, NULL, FALSE);
++}
++
++struct avdtp_setup *setup_new(struct avdtp *session)
++{
++	struct audio_device *dev;
 +	struct avdtp_setup *setup;
-+	struct sep *tmp;
-+	struct avdtp_service_capability *cap;
-+	struct avdtp_media_codec_capability *codec_cap = NULL;
-+	int posix_err;
-+	bdaddr_t src;
++
++	dev = get_dev(session);
++	if (!dev) {
++		error("Unable to create setup");
++		return NULL;
++	}
++
++	setup = g_new0(struct avdtp_setup, 1);
++	setup->session = avdtp_ref(session);
++	setup->dev = get_dev(session);
++	setups = g_slist_append(setups, setup);
++
++	return setup;
++}
++
++static void setup_free(struct avdtp_setup *s)
++{
++	DBG("%p", s);
++
++	setups = g_slist_remove(setups, s);
++	if (s->session)
++		avdtp_unref(s->session);
++	g_slist_foreach(s->cb, (GFunc) g_free, NULL);
++	g_slist_free(s->cb);
++	g_slist_foreach(s->caps, (GFunc) g_free, NULL);
++	g_slist_free(s->caps);
++	g_free(s);
++}
++
++void setup_unref(struct avdtp_setup *setup)
++{
++	setup->ref--;
++
++	DBG("%p: ref=%d", setup, setup->ref);
++
++	if (setup->ref > 0)
++		return;
++
++	setup_free(setup);
++}
++
++struct avdtp_setup_cb *setup_cb_new(struct avdtp_setup *setup)
++{
++        struct avdtp_setup_cb *cb;
++
++        cb = g_new0(struct avdtp_setup_cb, 1);
++        cb->setup = setup;
++        cb->id = ++cb_id;
++
++        setup->cb = g_slist_append(setup->cb, cb);
++        return cb;
++}
++
++void setup_cb_free(struct avdtp_setup_cb *cb)
++{
++	struct avdtp_setup *setup = cb->setup;
 +
 +	DBG("");
 +	
-+	avdtp_get_peers(session, &src, NULL);
-+	server = find_server(servers, &src);
-+	if (!server)
-+		return 0;
++	if (cb->source_id)
++		g_source_remove(cb->source_id);
 +
-+	for (l = caps; l != NULL; l = l->next) {
-+		cap = l->data;
++	setup->cb = g_slist_remove(setup->cb, cb);
++	setup_unref(cb->setup);
++	g_free(cb);
++}
 +
-+		if (cap->category != AVDTP_MEDIA_CODEC)
++static void finalize_setup_errno(struct avdtp_setup *s, int err,
++					GSourceFunc cb1, ...)
++{
++	GSourceFunc finalize;
++	va_list args;
++	struct avdtp_error avdtp_err;
++
++	DBG("");
++	
++	if (err < 0) {
++		avdtp_error_init(&avdtp_err, AVDTP_ERRNO, -err);
++		s->err = &avdtp_err;
++	}
++
++	va_start(args, cb1);
++	finalize = cb1;
++	setup_ref(s);
++	while (finalize != NULL) {
++		finalize(s);
++		finalize = va_arg(args, GSourceFunc);
++	}
++	setup_unref(s);
++	va_end(args);
++}
++
++gboolean finalize_config(gpointer data)
++{
++	struct avdtp_setup *s = data;
++	GSList *l;
++	struct avdtp_stream *stream = s->err ? NULL : s->stream;
++
++	DBG("");
++	
++	for (l = s->cb; l != NULL; ) {
++		struct avdtp_setup_cb *cb = l->data;
++
++		l = l->next;
++
++		if (!cb->config_cb)
 +			continue;
 +
-+		codec_cap = (void *) cap->data;
-+		break;
++		cb->config_cb(s->session, s->sep, stream, s->err,
++							cb->user_data);
++		setup_cb_free(cb);
 +	}
 +
-+	if (!codec_cap)
-+		return 0;
-+
-+	if (sep->codec != codec_cap->media_codec_type)
-+		return 0;
-+
-+	DBG("vdp_config: selected SEP %p", sep->lsep);
-+
-+	setup = setup_get(session);
-+	if (!setup)
-+		return 0;
-+
-+	cb_data = setup_cb_new(setup);
-+	cb_data->config_cb = cb;
-+	cb_data->user_data = user_data;
-+
-+	setup->sep = sep;
-+	setup->stream = sep->stream;
-+
-+	/* Copy given caps if they are different than current caps */
-+	if (setup->caps != caps) {
-+		g_slist_foreach(setup->caps, (GFunc) g_free, NULL);
-+		g_slist_free(setup->caps);
-+		setup->caps = g_slist_copy(caps);
-+	}
-+
-+	switch (avdtp_sep_get_state(sep->lsep)) {
-+	case AVDTP_STATE_IDLE:
-+		if (sep->type == AVDTP_SEP_TYPE_SOURCE)
-+			l = server->sources;
-+		else
-+			l = server->sinks;
-+
-+		for (; l != NULL; l = l->next) {
-+			tmp = l->data;
-+			if (avdtp_has_stream(session, tmp->stream))
-+				break;
-+		}
-+
-+		if (l != NULL) {
-+			if (sep_get_lock(tmp))
-+				goto failed;
-+			setup->reconfigure = TRUE;
-+			if (avdtp_close(session, tmp->stream, FALSE) < 0) {
-+				error("avdtp_close failed");
-+				goto failed;
-+			}
-+			break;
-+		}
-+
-+		setup->rsep = avdtp_find_remote_sep(session, sep->lsep);
-+		if (setup->rsep == NULL) {
-+			error("No matching ACP and INT SEPs found");
-+			goto failed;
-+		}
-+
-+		posix_err = avdtp_set_configuration(session, setup->rsep,
-+							sep->lsep, caps,
-+							&setup->stream);
-+		if (posix_err < 0) {
-+			error("avdtp_set_configuration: %s",
-+				strerror(-posix_err));
-+			goto failed;
-+		}
-+		break;
-+	case AVDTP_STATE_OPEN:
-+	case AVDTP_STATE_STREAMING:
-+		if (avdtp_stream_has_capabilities(setup->stream, caps)) {
-+			DBG("Configuration match: resuming");
-+			cb_data->source_id = g_idle_add(finalize_config,
-+								setup);
-+		} else if (!setup->reconfigure) {
-+			setup->reconfigure = TRUE;
-+			if (avdtp_close(session, sep->stream, FALSE) < 0) {
-+				error("avdtp_close failed");
-+				goto failed;
-+			}
-+		}
-+		break;
-+	default:
-+		error("SEP in bad state for requesting a new stream");
-+		goto failed;
-+	}
-+
-+	return cb_data->id;
-+
-+failed:
-+	setup_cb_free(cb_data);
-+	return 0;
++	return FALSE;
 +}
 +
-+static gboolean select_capabilities(struct avdtp *session,
-+                                        struct avdtp_remote_sep *rsep,
-+                                        GSList **caps)
++static gboolean finalize_resume(gpointer data)
 +{
-+        struct avdtp_service_capability *media_transport, *media_codec;
-+        struct h263_baseline_codec_cap h263_cap;
-+
-+        media_codec = avdtp_get_codec(rsep);
-+        if (!media_codec)
-+                return FALSE;
-+
-+        select_h263_params(&h263_cap, (struct h263_baseline_codec_cap *) media_codec->data);
-+
-+        media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-+                                                NULL, 0);
-+
-+        *caps = g_slist_append(*caps, media_transport);
-+
-+        media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &h263_cap,
-+                                                sizeof(h263_cap));
-+
-+        *caps = g_slist_append(*caps, media_codec);
-+
-+        if (avdtp_get_delay_reporting(rsep)) {
-+                struct avdtp_service_capability *delay_reporting;
-+                delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
-+                                                                NULL, 0);
-+                *caps = g_slist_append(*caps, delay_reporting);
-+        }
-+
-+        return TRUE;
-+}
-+
-+static void finalize_select(struct avdtp_setup *s)
-+{
++        struct avdtp_setup *s = data;
 +        GSList *l;
 +
 +        DBG("");
-+        
++
 +        for (l = s->cb; l != NULL; ) {
 +                struct avdtp_setup_cb *cb = l->data;
 +
 +                l = l->next;
 +
-+                if (!cb->select_cb)
++                if (!cb->resume_cb)
 +                        continue;
 +
-+                cb->select_cb(s->session, s->sep, s->caps, cb->user_data);
++                cb->resume_cb(s->session, s->err, cb->user_data);
 +                setup_cb_free(cb);
 +        }
-+}
-+
-+static gboolean auto_select(gpointer data)
-+{
-+        struct avdtp_setup *setup = data;
-+
-+        finalize_select(setup);
 +
 +        return FALSE;
 +}
 +
-+static void select_cb(struct sep *sep, guint setup_id, void *ret,
-+                                                                int size)
++static gboolean finalize_suspend(gpointer data)
 +{
-+        struct avdtp_setup *setup = GUINT_TO_POINTER(setup_id);
-+        struct avdtp_service_capability *media_transport, *media_codec;
-+        struct avdtp_media_codec_capability *cap;
++        struct avdtp_setup *s = data;
++        GSList *l;
++        
++        DBG("");
 +
-+        if (size < 0) {
-+                DBG("Endpoint replied an invalid configuration");
-+                goto done;
++        for (l = s->cb; l != NULL; ) {
++                struct avdtp_setup_cb *cb = l->data;
++
++                l = l->next;
++
++                if (!cb->suspend_cb)
++                        continue;
++
++                cb->suspend_cb(s->session, s->err, cb->user_data);
++                setup_cb_free(cb);
 +        }
 +
-+        media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-+                                                NULL, 0);
-+
-+        setup->caps = g_slist_append(setup->caps, media_transport);
-+
-+        cap = g_malloc0(sizeof(*cap) + size);
-+        cap->media_type = AVDTP_MEDIA_TYPE_VIDEO;
-+        cap->media_codec_type = setup->sep->codec;
-+        memcpy(cap->data, ret, size);
-+
-+        media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, cap,
-+                                                sizeof(*cap) + size);
-+
-+        setup->caps = g_slist_append(setup->caps, media_codec);
-+        g_free(cap);
-+
-+done:
-+        finalize_select(setup);
++        return FALSE;
 +}
 +
-+unsigned int vdp_select_capabilities(struct avdtp *session,
-+					uint8_t type, const char *sender,
-+					avdtp_select_cb_t cb,
++struct avdtp_setup *setup_get(struct avdtp *session)
++{
++        struct avdtp_setup *setup;
++
++        setup = find_setup_by_session(session);
++        if (!setup) {
++                setup = setup_new(session);
++                if (!setup)
++                        return NULL;
++        }
++
++        return setup_ref(setup);
++}
++
++struct avdtp_setup *find_setup_by_session(struct avdtp *session)
++{
++        GSList *l;
++
++        for (l = setups; l != NULL; l = l->next) {
++                struct avdtp_setup *setup = l->data;
++
++                if (setup->session == session)
++                        return setup;
++        }
++
++        return NULL;
++}
++
++struct avdtp_setup *find_setup_by_dev(struct audio_device *dev)
++{
++	GSList *l;
++
++	for (l = setups; l != NULL; l = l->next) {
++		struct avdtp_setup *setup = l->data;
++
++		if (setup->dev == dev)
++			return setup;
++	}
++
++	return NULL;
++}
++
++void avdtp_stream_state_changed(struct avdtp_stream *stream,
++					avdtp_state_t old_state,
++					avdtp_state_t new_state,
++					struct avdtp_error *err,
 +					void *user_data)
 +{
-+	struct avdtp_setup *setup;
-+	struct avdtp_setup_cb *cb_data;
-+	struct sep *sep;
-+	struct avdtp_service_capability *service;
-+	struct avdtp_media_codec_capability *codec;
-+	int err;
++	struct sep *sep = user_data;
 +
-+	DBG("");
-+	
-+	sep = select_sep(session, type, sender);
-+	if (!sep) {
-+		error("Unable to select SEP");
-+		return 0;
++	if (new_state != AVDTP_STATE_IDLE)
++		return;
++
++	if (sep->suspend_timer) {
++		g_source_remove(sep->suspend_timer);
++		sep->suspend_timer = 0;
 +	}
 +
-+	setup = setup_get(session);
-+	if (!setup)
-+		return 0;
-+
-+	cb_data = setup_cb_new(setup);
-+	cb_data->select_cb = cb;
-+	cb_data->user_data = user_data;
-+
-+	setup->sep = sep;
-+	setup->rsep = avdtp_find_remote_sep(session, sep->lsep);
-+
-+	if (setup->rsep == NULL) {
-+		error("Could not find remote sep");
-+		goto fail;
++	if (sep->session) {
++		avdtp_unref(sep->session);
++		sep->session = NULL;
 +	}
 +
-+	/* FIXME: Remove auto select when it is not longer possible to register
-+	endpoint in the configuration file */
-+	if (sep->endpoint == NULL) {
-+		if (!select_capabilities(session, setup->rsep,
-+					&setup->caps)) {
-+			error("Unable to auto select remote SEP capabilities");
-+			goto fail;
-+		}
++	sep->stream = NULL;
 +
-+		g_idle_add(auto_select, setup);
-+
-+		return cb_data->id;
-+	}
-+
-+	service = avdtp_get_codec(setup->rsep);
-+	codec = (struct avdtp_media_codec_capability *) service->data;
-+
-+	err = sep->endpoint->select_configuration(sep, codec->data,
-+					service->length - sizeof(*codec),
-+					GPOINTER_TO_UINT(setup),
-+					select_cb, sep->user_data);
-+	if (err == 0)
-+		return cb_data->id;
-+
-+fail:
-+	setup_cb_free(cb_data);
-+	return 0;
-+
++	if (sep->endpoint && sep->endpoint->clear_configuration)
++		sep->endpoint->clear_configuration(sep, sep->user_data);
 +}
-+
-+static struct avdtp_sep_cfm cfm = {
-+	.set_configuration	= setconf_cfm,
-+	.get_configuration	= getconf_cfm,
-+	.open			= open_cfm,
-+	.start			= start_cfm,
-+	.suspend		= suspend_cfm,
-+	.close			= close_cfm,
-+	.abort			= abort_cfm,
-+	.reconfigure		= reconf_cfm,
-+	.delay_report		= delay_report_cfm,
-+};
 +
 +gboolean auto_config(gpointer data)
 +{
@@ -422,663 +331,990 @@ index 0000000..7541d4f
 +        return FALSE;
 +}
 +
-+static struct avdtp_sep_ind endpoint_ind = {
-+	.get_capability		= endpoint_getcap_ind,
-+	.set_configuration	= endpoint_setconf_ind,
-+	.get_configuration	= getconf_ind,
-+	.open			= open_ind,
-+	.start			= start_ind,
-+	.suspend		= suspend_ind,
-+	.close			= close_ind,
-+	.abort			= abort_ind,
-+	.reconfigure		= reconf_ind,
-+	.delayreport		= endpoint_delayreport_ind,
-+};
-+
-+static gboolean h263_baseline_getcap_ind(struct avdtp *session,
-+				struct avdtp_local_sep *sep, gboolean get_all,
-+				GSList **caps, uint8_t *err, void *user_data)
++struct avdtp_server *find_server(GSList *list, const bdaddr_t *src)
 +{
-+	struct sep *vdp_sep = user_data;
-+	struct avdtp_service_capability *media_transport, *media_codec;
-+	struct h263_baseline_codec_cap h263_cap;
 +
-+	if (vdp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		DBG("Sink %p: Get_Capability_Ind", sep);
-+	else
-+		DBG("Source %p: Get_Capability_Ind", sep);
++        for (; list; list = list->next) {
++                struct avdtp_server *server = list->data;
 +
-+	*caps = NULL;
-+
-+	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-+						NULL, 0);
-+
-+	*caps = g_slist_append(*caps, media_transport);
-+
-+	memset(&h263_cap, 0, sizeof(struct h263_baseline_codec_cap));
-+
-+	h263_cap.cap.media_type = AVDTP_MEDIA_TYPE_VIDEO;
-+	h263_cap.cap.media_codec_type = VDP_CODEC_H263_BASELINE;
-+
-+	h263_cap.level = ( H263_LEVEL_10 |
-+				H263_LEVEL_20 |
-+				H263_LEVEL_30 );
-+
-+	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &h263_cap,
-+						sizeof(h263_cap));
-+
-+	*caps = g_slist_append(*caps, media_codec);
-+
-+	if (get_all) {
-+		struct avdtp_service_capability *delay_reporting;
-+		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
-+								NULL, 0);
-+		*caps = g_slist_append(*caps, delay_reporting);
-+	}
-+
-+	return TRUE;
++                if (bacmp(&server->src, src) == 0)
++                        return server;
++        }
++        DBG("find server no server found");
++        return NULL;
 +}
 +
-+static gboolean h263_baseline_setconf_ind(struct avdtp *session,
-+					struct avdtp_local_sep *sep,
-+					struct avdtp_stream *stream,
-+					GSList *caps,
-+					avdtp_set_configuration_cb cb,
-+					void *user_data)
++gboolean sep_get_lock(struct sep *sep)
 +{
-+	struct sep *vdp_sep = user_data;
-+	struct avdtp_setup *setup;
++	return sep->locked;
++}
 +
-+	if (vdp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		DBG("Sink %p: Set_Configuration_Ind", sep);
-+	else
-+		DBG("Source %p: Set_Configuration_Ind", sep);
++static void endpoint_open_cb(struct sep *sep, guint setup_id,
++								gboolean ret)
++{
++	struct avdtp_setup *setup = GUINT_TO_POINTER(setup_id);
++	int err;
 +
-+	setup = setup_get(session);
-+	if (!setup)
-+		return FALSE;
++	if (ret == FALSE) {
++		setup->stream = NULL;
++		finalize_setup_errno(setup, -EPERM, finalize_config, NULL);
++		return;
++	}
 +
-+	vdp_sep->stream = stream;
-+	setup->sep = vdp_sep;
-+	setup->stream = stream;
-+	setup->setconf_cb = cb;
++	err = avdtp_open(setup->session, setup->stream);
++	if (err == 0)
++		return;
 +
-+	/* Check valid settings */
-+	for (; caps != NULL; caps = g_slist_next(caps)) {
-+		struct avdtp_service_capability *cap = caps->data;
-+		struct avdtp_media_codec_capability *codec_cap;
++	error("Error on avdtp_open %s (%d)", strerror(-err), -err);
++	setup->stream = NULL;
++	finalize_setup_errno(setup, err, finalize_config, NULL);
++}
 +
-+		if (cap->category == AVDTP_DELAY_REPORTING &&
-+					!vdp_sep->delay_reporting) {
-+			setup->err = g_new(struct avdtp_error, 1);
-+			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
-+						AVDTP_UNSUPPORTED_CONFIGURATION);
-+			goto done;
++static struct sep *avdtp_find_sep(struct avdtp *session, GSList *list,
++                                        const char *sender)
++{
++	for (; list; list = list->next) {
++		struct sep *sep = list->data;
++
++		/* Use sender's endpoint if available */
++		if (sender) {
++			const char *name;
++
++			if (sep->endpoint == NULL)
++				continue;
++
++			name = sep->endpoint->get_name(sep, sep->user_data);
++			if (g_strcmp0(sender, name) != 0)
++				continue;
 +		}
 +
-+		if (cap->category != AVDTP_MEDIA_CODEC)
++		if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
 +			continue;
 +
-+		if (cap->length < sizeof(struct h263_baseline_codec_cap))
-+			continue;
-+
-+		codec_cap = (void *) cap->data;
-+
-+		if (codec_cap->media_codec_type != VDP_CODEC_H263_BASELINE)
-+			continue;
-+
++		return sep;
 +	}
 +
-+done:
-+	g_idle_add(auto_config, setup);
-+	return TRUE;
++	return NULL;
 +}
 +
-+static struct avdtp_sep_ind h263_baseline_ind = {
-+	.get_capability		= h263_baseline_getcap_ind,
-+	.set_configuration	= h263_baseline_setconf_ind,
-+	.get_configuration	= getconf_ind,
-+	.open			= open_ind,
-+	.start			= start_ind,
-+	.suspend		= suspend_ind,
-+	.close			= close_ind,
-+	.abort			= abort_ind,
-+	.reconfigure		= reconf_ind,
-+	.delayreport		= delayreport_ind,
-+};
-+
-+static gboolean mpeg4_getcap_ind(struct avdtp *session,
-+				struct avdtp_local_sep *sep, gboolean get_all,
-+				GSList **caps, uint8_t *err, void *user_data)
++static int stream_cmp(gconstpointer data, gconstpointer user_data)
 +{
-+	struct sep *vdp_sep = user_data;
-+	struct avdtp_service_capability *media_transport, *media_codec;
-+	struct mpeg4_codec_cap mpeg4_cap;
++	const struct sep *sep = data;
++	const struct avdtp_stream *stream = user_data;
 +
-+	if (vdp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		DBG("Sink %p: Get_Capability_Ind", sep);
-+	else
-+		DBG("Source %p: Get_Capability_Ind", sep);
++	return (sep->stream != stream);
++}
 +
-+	*caps = NULL;
++struct sep *avdtp_get_sep(struct avdtp *session,
++				struct avdtp_stream *stream)
++{
++	struct avdtp_server *server;
++	bdaddr_t src, dst;
++	GSList *l;
 +
-+	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-+						NULL, 0);
++	avdtp_get_peers(session, &src, &dst);
 +
-+	*caps = g_slist_append(*caps, media_transport);
++	for (l = servers; l; l = l->next) {
++		server = l->data;
 +
-+	memset(&mpeg4_cap, 0, sizeof(struct mpeg4_codec_cap));
-+
-+	mpeg4_cap.cap.media_type = AVDTP_MEDIA_TYPE_VIDEO;
-+	mpeg4_cap.cap.media_codec_type = VDP_CODEC_MPEG4_VISUAL_SAMPLE;
-+
-+	mpeg4_cap.level = ( MPEG4_LEVEL_0 |
-+				MPEG4_LEVEL_1 |
-+				MPEG4_LEVEL_2 );
-+
-+	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, &mpeg4_cap,
-+						sizeof(mpeg4_cap));
-+
-+	*caps = g_slist_append(*caps, media_codec);
-+
-+	if (get_all) {
-+		struct avdtp_service_capability *delay_reporting;
-+		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
-+								NULL, 0);
-+		*caps = g_slist_append(*caps, delay_reporting);
++		if (bacmp(&src, &server->src) == 0)
++			break;
 +	}
 +
-+	return TRUE;
-+}
-+
-+static gboolean mpeg4_setconf_ind(struct avdtp *session,
-+					struct avdtp_local_sep *sep,
-+					struct avdtp_stream *stream,
-+					GSList *caps,
-+					avdtp_set_configuration_cb cb,
-+					void *user_data)
-+{
-+	struct sep *vdp_sep = user_data;
-+	struct avdtp_setup *setup;
-+
-+	if (vdp_sep->type == AVDTP_SEP_TYPE_SINK)
-+		DBG("Sink %p: Set_Configuration_Ind", sep);
-+	else
-+		DBG("Source %p: Set_Configuration_Ind", sep);
-+
-+	setup = setup_get(session);
-+	if (!setup)
-+		return FALSE;
-+
-+	vdp_sep->stream = stream;
-+	setup->sep = vdp_sep;
-+	setup->stream = stream;
-+	setup->setconf_cb = cb;
-+
-+	/* Check valid settings */
-+	for (; caps != NULL; caps = g_slist_next(caps)) {
-+		struct avdtp_service_capability *cap = caps->data;
-+		struct avdtp_media_codec_capability *codec_cap;
-+
-+		if (cap->category == AVDTP_DELAY_REPORTING &&
-+					!vdp_sep->delay_reporting) {
-+			setup->err = g_new(struct avdtp_error, 1);
-+			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
-+						AVDTP_UNSUPPORTED_CONFIGURATION);
-+			goto done;
-+		}
-+
-+		if (cap->category != AVDTP_MEDIA_CODEC)
-+			continue;
-+
-+		if (cap->length < sizeof(struct h263_baseline_codec_cap))
-+			continue;
-+
-+		codec_cap = (void *) cap->data;
-+
-+		if (codec_cap->media_codec_type != VDP_CODEC_H263_BASELINE)
-+			continue;
-+
-+	}
-+
-+done:
-+	g_idle_add(auto_config, setup);
-+	return TRUE;
-+}
-+
-+static struct avdtp_sep_ind mpeg4_ind = {
-+        .get_capability         = mpeg4_getcap_ind,
-+        .set_configuration      = mpeg4_setconf_ind,
-+        .get_configuration      = getconf_ind,
-+        .open                   = open_ind,
-+        .start                  = start_ind,
-+        .suspend                = suspend_ind,
-+        .close                  = close_ind,
-+        .abort                  = abort_ind,
-+        .reconfigure            = reconf_ind,
-+        .delayreport            = delayreport_ind,
-+};
-+
-+static sdp_record_t *vdp_record(uint8_t type, uint16_t avdtp_ver)
-+{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, l2cap_uuid, avdtp_uuid, vdp_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_record_t *record;
-+	sdp_data_t *psm, *version, *features;
-+	uint16_t lp = AVDTP_UUID;
-+	uint16_t vdp_ver = 0x0001, feat = 0x000f;
-+
-+	DBG("VDP record");
-+	record = sdp_record_alloc();
-+	if (!record)
++	if (!l)
 +		return NULL;
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++	l = g_slist_find_custom(server->sources, stream, stream_cmp);
++	if (l)
++		return l->data;
 +
-+	if (type == AVDTP_SEP_TYPE_SOURCE)
-+		sdp_uuid16_create(&vdp_uuid, VIDEO_SOURCE_SVCLASS_ID);
-+	else
-+		sdp_uuid16_create(&vdp_uuid, VIDEO_SINK_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &vdp_uuid);
-+	sdp_set_service_classes(record, svclass_id);
++	l = g_slist_find_custom(server->sinks, stream, stream_cmp);
++	if (l)
++		return l->data;
 +
-+	sdp_uuid16_create(&profile[0].uuid, VIDEO_DISTRIBUTION_PROFILE_ID);
-+	profile[0].version = vdp_ver;
-+	pfseq = sdp_list_append(0, &profile[0]);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	psm = sdp_data_alloc(SDP_UINT16, &lp);
-+	proto[0] = sdp_list_append(proto[0], psm);
-+	apseq = sdp_list_append(0, proto[0]);
-+
-+	sdp_uuid16_create(&avdtp_uuid, AVDTP_UUID);
-+	proto[1] = sdp_list_append(0, &avdtp_uuid);
-+	version = sdp_data_alloc(SDP_UINT16, &avdtp_ver);
-+	proto[1] = sdp_list_append(proto[1], version);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	features = sdp_data_alloc(SDP_UINT16, &feat);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
-+
-+	if (type == AVDTP_SEP_TYPE_SOURCE)
-+		sdp_set_info_attr(record, "Video Source", 0, 0);
-+	else
-+		sdp_set_info_attr(record, "Video Sink", 0, 0);
-+
-+	free(psm);
-+	free(version);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
-+
-+	return record;
++	return NULL;
 +}
 +
-+struct sep *vdp_add_sep(const bdaddr_t *src, uint8_t type,
-+				uint8_t codec, gboolean delay_reporting,
-+				struct avdtp_endpoint *endpoint,
-+				void *user_data, GDestroyNotify destroy,
-+				int *err)
++struct sep *select_sep(struct avdtp *session, uint8_t type,
++					const char *sender)
 +{
 +	struct avdtp_server *server;
 +	struct sep *sep;
-+	GSList **l;
-+	uint32_t *record_id;
-+	sdp_record_t *record;
-+	struct avdtp_sep_ind *ind;
-+
-+	server = find_server(servers, src);
-+	if (server == NULL) {
-+		if (err)
-+			*err = -EINVAL;
-+		return NULL;
-+	}
-+
-+	if (type == AVDTP_SEP_TYPE_SINK && !server->sink_enabled) {
-+		if (err)
-+			*err = -EPROTONOSUPPORT;
-+		return NULL;
-+	}
-+
-+	if (type == AVDTP_SEP_TYPE_SOURCE && !server->source_enabled) {
-+		if (err)
-+			*err = -EPROTONOSUPPORT;
-+		return NULL;
-+	}
-+
-+	sep = g_new0(struct sep, 1);
-+
-+	if (endpoint) {
-+		ind = &endpoint_ind;
-+		goto proceed;
-+	}
-+
-+	ind = (codec == VDP_CODEC_H263_BASELINE) ? &h263_baseline_ind: &mpeg4_ind;
-+
-+proceed:
-+	sep->lsep = avdtp_register_sep(&server->src, type,
-+					AVDTP_MEDIA_TYPE_VIDEO, codec,
-+					delay_reporting, ind,&cfm, sep);
-+	if (sep->lsep == NULL) {
-+		g_free(sep);
-+		if (err)
-+			*err = -EINVAL;
-+		return NULL;
-+	}
-+
-+	sep->server = server;
-+	sep->endpoint = endpoint;
-+	sep->codec = codec;
-+	sep->type = type;
-+	sep->delay_reporting = delay_reporting;
-+	sep->user_data = user_data;
-+	sep->destroy = destroy;
-+
-+	if (type == AVDTP_SEP_TYPE_SOURCE) {
-+		l = &server->sources;
-+		record_id = &server->source_record_id;
-+	} else {
-+		l = &server->sinks;
-+		record_id = &server->sink_record_id;
-+	}
-+
-+	if (*record_id != 0)
-+		goto add;
-+
-+	record = vdp_record(type, server->version);
-+	if (!record) {
-+		error("Unable to allocate new service record");
-+		avdtp_unregister_sep(sep->lsep);
-+		g_free(sep);
-+		if (err)
-+			*err = -EINVAL;
-+		return NULL;
-+	}
-+
-+	if (add_record_to_server(&server->src, record) < 0) {
-+		error("Unable to register VDP service record");
-+		sdp_record_free(record);
-+		avdtp_unregister_sep(sep->lsep);
-+		g_free(sep);
-+		if (err)
-+			*err = -EINVAL;
-+		return NULL;
-+	}
-+	*record_id = record->handle;
-+
-+add:
-+	*l = g_slist_append(*l, sep);
-+
-+	if (err)
-+		*err = 0;
-+	return sep;
-+}
-+
-+int vdp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config)
-+{
-+	int h263_baseline_srcs = 1, h263_baseline_sinks = 1;
-+	int mpeg4_srcs = 0, mpeg4_sinks = 0;
-+	gboolean source = TRUE, sink = FALSE;
-+	struct avdtp_server *server;
-+	int i;
-+	char *str;
-+	GError *err = NULL;
-+
-+	if (!config)
-+		goto proceed;
-+
-+	str = g_key_file_get_string(config, "General", "Enable", &err);
-+
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		if (strstr(str, "VideoSink"))
-+			source = TRUE;
-+		if (strstr(str, "VideoSource"))
-+			sink = TRUE;
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(config, "General", "Disable", &err);
-+
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		if (strstr(str, "VideoSink"))
-+			source = FALSE;
-+		if (strstr(str, "VideoSource"))
-+			sink = FALSE;
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(config, "VDP", "H263BaselineSources", &err);
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		h263_baseline_srcs = atoi(str);
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(config, "VDP", "MPEG4Sources", &err);
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		mpeg4_srcs = atoi(str);
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(config, "VDP", "H263BaselineSinks", &err);
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		h263_baseline_sinks = atoi(str);
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(config, "VDP", "MPEG4Sinks", &err);
-+	if (err) {
-+		DBG("audio.conf: %s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		mpeg4_sinks = atoi(str);
-+		g_free(str);
-+	}
-+
-+proceed:
-+
-+	if(!conn)
-+		connection = dbus_connection_ref(conn);
-+	server = find_server(servers, src);
-+
-+	if (!server) {
-+		int av_err;
-+
-+		server = g_new0(struct avdtp_server, 1);
-+		if (!server)
-+			return -ENOMEM;
-+
-+		av_err = avdtp_init(src, config, &server->version);
-+		if (av_err < 0) {
-+			g_free(server);
-+			return av_err;
-+		}
-+
-+		bacpy(&server->src, src);
-+		servers = g_slist_append(servers, server);
-+	}
-+
-+	server->source_enabled = source;
-+	if (source) {
-+		for (i = 0; i < h263_baseline_srcs; i++)
-+			vdp_add_sep(src, AVDTP_SEP_TYPE_SOURCE,
-+				VDP_CODEC_H263_BASELINE, FALSE,
-+					NULL, NULL, NULL, NULL);
-+		
-+		for (i = 0; i < mpeg4_srcs; i++)
-+			vdp_add_sep(src, AVDTP_SEP_TYPE_SOURCE,
-+				VDP_CODEC_MPEG4_VISUAL_SAMPLE, FALSE,
-+					NULL, NULL, NULL, NULL);
-+	}
-+	server->sink_enabled = sink;
-+	if (sink) {
-+		for (i = 0; i < h263_baseline_sinks; i++)
-+			vdp_add_sep(src, AVDTP_SEP_TYPE_SINK,
-+				VDP_CODEC_H263_BASELINE, FALSE, 
-+					NULL, NULL, NULL, NULL);
-+		
-+		for (i = 0; i < mpeg4_sinks; i++)
-+			vdp_add_sep(src, AVDTP_SEP_TYPE_SINK,
-+                                VDP_CODEC_MPEG4_VISUAL_SAMPLE, FALSE,
-+					NULL, NULL, NULL, NULL);
-+	}
-+
-+	return 0;
-+}
-+
-+void vdp_unregister(const bdaddr_t *src)
-+{
-+	struct avdtp_server *server;
-+
-+	server = find_server(servers, src);
-+	if (!server)
-+		return;
-+
-+	g_slist_foreach(server->sinks, (GFunc) remove_sep, NULL);
-+	g_slist_free(server->sinks);
-+
-+	g_slist_foreach(server->sources, (GFunc) remove_sep, NULL);
-+	g_slist_free(server->sources);
-+
-+	avdtp_exit(src);
-+
-+	servers = g_slist_remove(servers, server);
-+	g_free(server);
-+
-+	if (servers)
-+		return;
-+
-+	dbus_connection_unref(connection);
-+	connection = NULL;
-+}
-+
-+gboolean vdp_cancel(struct audio_device *dev, unsigned int id)
-+{
-+	struct avdtp_setup *setup;
 +	GSList *l;
++	bdaddr_t src;
 +
-+	DBG("");
-+	
-+	setup = find_setup_by_dev(dev);
-+	if (!setup)
++	avdtp_get_peers(session, &src, NULL);
++	server = find_server(servers, &src);
++	if (!server)
++		return NULL;
++
++	l = type == AVDTP_SEP_TYPE_SINK ? server->sources : server->sinks;
++
++	// Check sender's seps first 
++	sep = avdtp_find_sep(session, l, sender);
++	if (sep != NULL)
++		return sep;
++
++	return avdtp_find_sep(session, l, NULL);
++}
++
++void unregister_sep(struct sep *sep)
++{
++	if (sep->destroy) {
++		sep->destroy(sep->user_data);
++		sep->endpoint = NULL;
++	}
++
++	avdtp_unregister_sep(sep->lsep);
++	g_free(sep);
++}
++
++void remove_sep(struct sep *sep)
++{
++	struct avdtp_server *server = sep->server;
++
++	if (sep->type == AVDTP_SEP_TYPE_SOURCE) {
++		if (g_slist_find(server->sources, sep) == NULL)
++			return;
++		server->sources = g_slist_remove(server->sources, sep);
++		if (server->sources == NULL && server->source_record_id) {
++			remove_record_from_server(server->source_record_id);
++			server->source_record_id = 0;
++		}
++	} else {
++		if (g_slist_find(server->sinks, sep) == NULL)
++			return;
++		server->sinks = g_slist_remove(server->sinks, sep);
++		if (server->sinks == NULL && server->sink_record_id) {
++			remove_record_from_server(server->sink_record_id);
++			server->sink_record_id = 0;
++		}
++	}
++
++	if (sep->locked)
++		return;
++
++	unregister_sep(sep);
++}
++
++gboolean endpoint_getcap_ind(struct avdtp *session,
++					struct avdtp_local_sep *sep,
++					gboolean get_all, GSList **caps,
++					uint8_t *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_service_capability *media_transport, *media_codec;
++	struct avdtp_media_codec_capability *codec_caps;
++	uint8_t *capabilities;
++	size_t length;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Get_Capability_Ind", sep);
++	else
++		DBG("Source %p: Get_Capability_Ind", sep);
++
++	*caps = NULL;
++
++	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
++						NULL, 0);
++
++	*caps = g_slist_append(*caps, media_transport);
++
++	length = avdtp_sep->endpoint->get_capabilities(avdtp_sep, &capabilities,
++							avdtp_sep->user_data);
++	codec_caps = g_malloc0(sizeof(*codec_caps) + length);
++	codec_caps->media_type = AVDTP_MEDIA_TYPE_VIDEO;
++	codec_caps->media_codec_type = avdtp_sep->codec;
++	memcpy(codec_caps->data, capabilities, length);
++
++	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec_caps,
++						sizeof(*codec_caps) + length);
++
++	*caps = g_slist_append(*caps, media_codec);
++	g_free(codec_caps);
++
++	if (get_all) {
++		struct avdtp_service_capability *delay_reporting;
++		delay_reporting = avdtp_service_cap_new(AVDTP_DELAY_REPORTING,
++								NULL, 0);
++		*caps = g_slist_append(*caps, delay_reporting);
++	}
++
++	return TRUE;
++}
++
++static void endpoint_setconf_cb(struct sep *sep, guint setup_id,
++							gboolean ret)
++{
++	struct avdtp_setup *setup = GUINT_TO_POINTER(setup_id);
++
++	if (ret == FALSE) {
++		setup->err = g_new(struct avdtp_error, 1);
++		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++					AVDTP_UNSUPPORTED_CONFIGURATION);
++	}
++
++	auto_config(setup);
++}
++
++gboolean endpoint_setconf_ind(struct avdtp *session,
++						struct avdtp_local_sep *sep,
++						struct avdtp_stream *stream,
++						GSList *caps,
++						avdtp_set_configuration_cb cb,
++						void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Set_Configuration_Ind", sep);
++	else
++		DBG("Source %p: Set_Configuration_Ind", sep);
++
++	setup = setup_get(session);
++	if (!session)
 +		return FALSE;
 +
-+	for (l = setup->cb; l != NULL; l = g_slist_next(l)) {
-+		struct avdtp_setup_cb *cb = l->data;
++	avdtp_sep->stream = stream;
++	setup->sep = avdtp_sep;
++	setup->stream = stream;
++	setup->setconf_cb = cb;
 +
-+		if (cb->id != id)
-+			continue;
++	for (; caps != NULL; caps = g_slist_next(caps)) {
++		struct avdtp_service_capability *cap = caps->data;
++		struct avdtp_media_codec_capability *codec;
++		gboolean ret;
 +
-+		setup_ref(setup);
-+		setup_cb_free(cb);
-+
-+		if (!setup->cb) {
-+			DBG("aborting setup %p", setup);
-+			avdtp_abort(setup->session, setup->stream);
-+			return TRUE;
++		if (cap->category == AVDTP_DELAY_REPORTING &&
++					!avdtp_sep->delay_reporting) {
++			setup->err = g_new(struct avdtp_error, 1);
++			avdtp_error_init(setup->err, AVDTP_DELAY_REPORTING,
++					AVDTP_UNSUPPORTED_CONFIGURATION);
++			goto done;
 +		}
 +
-+		setup_unref(setup);
-+		return TRUE;
++		if (cap->category != AVDTP_MEDIA_CODEC)
++			continue;
++
++		codec = (struct avdtp_media_codec_capability *) cap->data;
++
++		if (codec->media_codec_type != avdtp_sep->codec) {
++			setup->err = g_new(struct avdtp_error, 1);
++			avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++					AVDTP_UNSUPPORTED_CONFIGURATION);
++			goto done;
++		}
++
++		ret = avdtp_sep->endpoint->set_configuration(avdtp_sep,
++						setup->dev, codec->data,
++						cap->length - sizeof(*codec),
++						GPOINTER_TO_UINT(setup),
++						endpoint_setconf_cb,
++						avdtp_sep->user_data);
++		if (ret == 0)
++			return TRUE;
++
++		avdtp_error_init(setup->err, AVDTP_MEDIA_CODEC,
++					AVDTP_UNSUPPORTED_CONFIGURATION);
++		break;
 +	}
++
++done:
++	g_idle_add(auto_config, setup);
++	return TRUE;
++}
++
++gboolean getconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				uint8_t *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Get_Configuration_Ind", sep);
++	else
++		DBG("Source %p: Get_Configuration_Ind", sep);
++	return TRUE;
++}
++
++gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Open_Ind", sep);
++	else
++		DBG("Source %p: Open_Ind", sep);
++	return TRUE;
++}
++
++static gboolean suspend_timeout(struct sep *sep)
++{
++	if (avdtp_suspend(sep->session, sep->stream) == 0)
++		sep->suspending = TRUE;
++
++	sep->suspend_timer = 0;
++
++	avdtp_unref(sep->session);
++	sep->session = NULL;
 +
 +	return FALSE;
 +}
-diff --git a/audio/vdp.h b/audio/vdp.h
-new file mode 100755
-index 0000000..1fa4dcd
++
++
++gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Start_Ind", sep);
++	else
++		DBG("Source %p: Start_Ind", sep);
++
++	setup = find_setup_by_session(session);
++	if (setup)
++		finalize_resume(setup);
++
++	if (!avdtp_sep->locked) {
++		avdtp_sep->session = avdtp_ref(session);
++		avdtp_sep->suspend_timer = g_timeout_add_seconds(SUSPEND_TIMEOUT,
++						(GSourceFunc) suspend_timeout,
++						avdtp_sep);
++	}
++
++	return TRUE;
++}
++
++gboolean suspend_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Suspend_Ind", sep);
++	else
++		DBG("Source %p: Suspend_Ind", sep);
++
++	if (avdtp_sep->suspend_timer) {
++		g_source_remove(avdtp_sep->suspend_timer);
++		avdtp_sep->suspend_timer = 0;
++		avdtp_unref(avdtp_sep->session);
++		avdtp_sep->session = NULL;
++	}
++
++	return TRUE;
++}
++
++
++gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Close_Ind", sep);
++	else
++		DBG("Source %p: Close_Ind", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return TRUE;
++
++	finalize_setup_errno(setup, -ECONNRESET, finalize_suspend,
++							finalize_resume, NULL);
++
++	return TRUE;
++}
++
++gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Abort_Ind", sep);
++	else
++		DBG("Source %p: Abort_Ind", sep);
++
++	avdtp_sep->stream = NULL;
++
++	return TRUE;
++}
++
++gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				uint8_t *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: ReConfigure_Ind", sep);
++	else
++		DBG("Source %p: ReConfigure_Ind", sep);
++
++	return TRUE;
++}
++
++gboolean delayreport_ind(struct avdtp *session,
++				struct avdtp_local_sep *sep,
++				uint8_t rseid, uint16_t delay,
++				uint8_t *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct audio_device *dev = get_dev(session);
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: DelayReport_Ind", sep);
++	else
++		DBG("Source %p: DelayReport_Ind", sep);
++
++	unix_delay_report(dev, rseid, delay);
++
++	return TRUE;
++}
++
++gboolean endpoint_delayreport_ind(struct avdtp *session,
++						struct avdtp_local_sep *sep,
++						uint8_t rseid, uint16_t delay,
++						uint8_t *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: DelayReport_Ind", sep);
++	else
++		DBG("Source %p: DelayReport_Ind", sep);
++
++	if (avdtp_sep->endpoint == NULL ||
++				avdtp_sep->endpoint->set_delay == NULL)
++		return FALSE;
++
++	avdtp_sep->endpoint->set_delay(avdtp_sep, delay, avdtp_sep->user_data);
++
++	return TRUE;
++}
++
++
++void getconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Set_Configuration_Cfm", sep);
++	else
++		DBG("Source %p: Set_Configuration_Cfm", sep);
++}
++
++void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Open_Cfm", sep);
++	else
++		DBG("Source %p: Open_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	if (setup->reconfigure)
++		setup->reconfigure = FALSE;
++
++	if (err) {
++		setup->stream = NULL;
++		setup->err = err;
++	}
++
++	finalize_config(setup);
++}
++
++void start_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Start_Cfm", sep);
++	else
++		DBG("Source %p: Start_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	if (err) {
++		setup->stream = NULL;
++		setup->err = err;
++	}
++
++	finalize_resume(setup);
++}
++
++void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++	gboolean start;
++	int perr;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Suspend_Cfm", sep);
++	else
++		DBG("Source %p: Suspend_Cfm", sep);
++
++	avdtp_sep->suspending = FALSE;
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	start = setup->start;
++	setup->start = FALSE;
++
++	if (err) {
++		setup->stream = NULL;
++		setup->err = err;
++	}
++
++	finalize_suspend(setup);
++
++	if (!start)
++		return;
++
++	if (err) {
++		finalize_resume(setup);
++		return;
++	}
++
++	perr = avdtp_start(session, avdtp_sep->stream);
++	if (perr < 0) {
++		error("Error on avdtp_start %s (%d)", strerror(-perr), -perr);
++		finalize_setup_errno(setup, -EIO, finalize_suspend, NULL);
++	}
++}
++
++static gboolean vdp_reconfigure(gpointer data)
++{
++	struct avdtp_setup *setup = data;
++	struct sep *sep = setup->sep;
++	int posix_err;
++	struct avdtp_media_codec_capability *rsep_codec;
++	struct avdtp_service_capability *cap;
++
++	if (setup->rsep) {
++		cap = avdtp_get_codec(setup->rsep);
++		rsep_codec = (struct avdtp_media_codec_capability *) cap->data;
++	}
++
++	if (!setup->rsep || sep->codec != rsep_codec->media_codec_type)
++		setup->rsep = avdtp_find_remote_sep(setup->session, sep->lsep);
++
++	posix_err = avdtp_set_configuration(setup->session, setup->rsep,
++						sep->lsep,
++						setup->caps,
++						&setup->stream);
++	if (posix_err < 0) {
++		error("avdtp_set_configuration: %s", strerror(-posix_err));
++		goto failed;
++	}
++
++	return FALSE;
++
++failed:
++	finalize_setup_errno(setup, posix_err, finalize_config, NULL);
++	return FALSE;
++}
++
++void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Close_Cfm", sep);
++	else
++		DBG("Source %p: Close_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	if (err) {
++		setup->stream = NULL;
++		setup->err = err;
++		finalize_config(setup);
++		return;
++	}
++
++	if (!setup->rsep)
++		setup->rsep = avdtp_stream_get_remote_sep(stream);
++
++	if (setup->reconfigure)
++		g_timeout_add(RECONFIGURE_TIMEOUT, vdp_reconfigure, setup);
++}
++
++void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	DBG("");
++	
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Abort_Cfm", sep);
++	else
++		DBG("Source %p: Abort_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	setup_unref(setup);
++}
++
++void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: ReConfigure_Cfm", sep);
++	else
++		DBG("Source %p: ReConfigure_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++	if (!setup)
++		return;
++
++	if (err) {
++		setup->stream = NULL;
++		setup->err = err;
++	}
++
++	finalize_config(setup);
++}
++
++void delay_report_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream,
++				struct avdtp_error *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: DelayReport_Cfm", sep);
++	else
++		DBG("Source %p: DelayReport_Cfm", sep);
++}
++
++
++
++
++void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream,
++				struct avdtp_error *err, void *user_data)
++{
++	struct sep *avdtp_sep = user_data;
++	struct avdtp_setup *setup;
++	struct audio_device *dev;
++	int ret;
++
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Set_Configuration_Cfm", sep);
++	else
++		DBG("Source %p: Set_Configuration_Cfm", sep);
++
++	setup = find_setup_by_session(session);
++
++	if (err) {
++		if (setup) {
++			setup->err = err;
++			finalize_config(setup);
++		}
++		return;
++	}
++
++	avdtp_stream_add_cb(session, stream, avdtp_stream_state_changed, avdtp_sep);
++	avdtp_sep->stream = stream;
++
++	if (!setup)
++		return;
++
++	dev = get_dev(session);
++	
++	// Notify D-Bus interface of the new stream 
++	if (avdtp_sep->type == AVDTP_SEP_TYPE_SOURCE)
++		video_sink_new_stream(dev, session, setup->stream);
++	else
++		video_source_new_stream(dev, session, setup->stream);
++
++	// Notify Endpoint 
++	if (avdtp_sep->endpoint) {
++		struct avdtp_service_capability *service;
++		struct avdtp_media_codec_capability *codec;
++		int err;
++
++		service = avdtp_stream_get_codec(stream);
++		codec = (struct avdtp_media_codec_capability *) service->data;
++
++		err = avdtp_sep->endpoint->set_configuration(avdtp_sep, dev,
++						codec->data, service->length -
++						sizeof(*codec),
++						GPOINTER_TO_UINT(setup),
++						endpoint_open_cb,
++						avdtp_sep->user_data);
++		if (err == 0)
++			return;
++
++		setup->stream = NULL;
++		finalize_setup_errno(setup, -EPERM, finalize_config, NULL);
++		return;
++	}
++
++	ret = avdtp_open(session, stream);
++	if (ret < 0) {
++		error("Error on avdtp_open %s (%d)", strerror(-ret), -ret);
++		setup->stream = NULL;
++		finalize_setup_errno(setup, ret, finalize_config, NULL);
++	}
++}
++
+diff --git a/audio/sep.h b/audio/sep.h
+new file mode 100644
+index 0000000..8a662f4
 --- /dev/null
-+++ b/audio/vdp.h
-@@ -0,0 +1,62 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2006-2010  Nokia Corporation
-+ *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+#include "sep.h"
++++ b/audio/sep.h
+@@ -0,0 +1,207 @@
++#define RECONFIGURE_TIMEOUT 500
++#define SUSPEND_TIMEOUT 5
 +
-+#define VDP_CODEC_H263_BASELINE		0x01
-+#define VDP_CODEC_MPEG4_VISUAL_SAMPLE	0x02
-+#define VDP_CODEC_H263_PROFILE_3	0x03
-+#define VDP_CODEC_H263_PROFILE_8	0x04
++GSList *servers = NULL;
++GSList *setups = NULL;
++unsigned int cb_id = 0;
 +
-+#define H263_LEVEL_10			(1 << 7)
-+#define H263_LEVEL_20			(1 << 6)
-+#define H263_LEVEL_30			(1 << 5)
++struct sep {
++	struct avdtp_server *server;
++	struct avdtp_endpoint *endpoint;
++	uint8_t type;
++	uint8_t codec;
++	struct avdtp_local_sep *lsep;
++	struct avdtp *session;
++	struct avdtp_stream *stream;
++	guint suspend_timer;
++	gboolean delay_reporting;
++	gboolean locked;
++	gboolean suspending;
++	gboolean starting;
++	void *user_data;
++	GDestroyNotify destroy;
++};
 +
-+#define MPEG4_LEVEL_0			(1 << 7)
-+#define MPEG4_LEVEL_1			(1 << 6)
-+#define MPEG4_LEVEL_2			(1 << 5)
++struct avdtp_setup {
++	struct audio_device *dev;
++	struct avdtp *session;
++	struct sep *sep;
++	struct avdtp_remote_sep *rsep;
++	struct avdtp_stream *stream;
++	struct avdtp_error *err;
++	avdtp_set_configuration_cb setconf_cb;
++	GSList *caps;
++	gboolean reconfigure;
++	gboolean start;
++	GSList *cb;
++	int ref;
++};
 +
-+struct h263_baseline_codec_cap {
-+        struct avdtp_media_codec_capability cap;
-+        uint8_t level;
-+} __attribute__ ((packed));
++struct avdtp_server {
++	bdaddr_t src;
++	GSList *sinks;
++	GSList *sources;
++	uint32_t source_record_id;
++	uint32_t sink_record_id;
++	uint16_t version;
++	gboolean sink_enabled;
++	gboolean source_enabled;
++};
 +
-+struct mpeg4_codec_cap {
-+	struct avdtp_media_codec_capability cap;
-+	uint8_t level;
-+} __attribute__ ((packed));
++typedef void (*avdtp_endpoint_select_t) (struct sep *sep, guint setup_id,
++                                                        void *ret, int size);
++typedef void (*avdtp_endpoint_config_t) (struct sep *sep, guint setup_id,
++                                                                gboolean ret);
 +
-+int vdp_register(DBusConnection *conn, const bdaddr_t *src, GKeyFile *config);
-+void vdp_unregister(const bdaddr_t *src);
-+struct sep *vdp_add_sep(const bdaddr_t *src, uint8_t type,
-+				uint8_t codec, gboolean delay_reporting,
-+				struct avdtp_endpoint *endpoint,
-+				void *user_data, GDestroyNotify destroy,
-+				int *err);
-+unsigned int vdp_select_capabilities(struct avdtp *session, uint8_t type,
-+					const char *sender, avdtp_select_cb_t cb,
++struct avdtp_endpoint {
++        const char *(*get_name) (struct sep *sep, void *user_data);
++        size_t (*get_capabilities) (struct sep *sep,
++                                                uint8_t **capabilities,
++                                                void *user_data);
++        int (*select_configuration) (struct sep *sep,
++                                                uint8_t *capabilities,
++                                                size_t length,
++                                                guint setup_id,
++                                                avdtp_endpoint_select_t cb,
++                                                void *user_data);
++        int (*set_configuration) (struct sep *sep,
++                                                struct audio_device *dev,
++                                                uint8_t *configuration,
++                                                size_t length,
++                                                guint setup_id,
++                                                avdtp_endpoint_config_t cb,
++                                                void *user_data);
++        void (*clear_configuration) (struct sep *sep, void *user_data);
++        void (*set_delay) (struct sep *sep, uint16_t delay,
++                                                        void *user_data);
++};
++
++typedef void (*avdtp_select_cb_t) (struct avdtp *session,
++                                        struct sep *sep, GSList *caps,
++                                        void *user_data);
++typedef void (*avdtp_config_cb_t) (struct avdtp *session, struct sep *sep,
++                                        struct avdtp_stream *stream,
++                                        struct avdtp_error *err,
++                                        void *user_data);
++typedef void (*avdtp_stream_cb_t) (struct avdtp *session,
++                                        struct avdtp_error *err,
++                                        void *user_data);
++
++
++struct avdtp_setup_cb {
++        struct avdtp_setup *setup;
++        avdtp_select_cb_t select_cb;
++        avdtp_config_cb_t config_cb;
++        avdtp_stream_cb_t resume_cb;
++        avdtp_stream_cb_t suspend_cb;
++        guint source_id;
++        void *user_data;
++        unsigned int id;
++};
++
++void remove_sep(struct sep *sep);
++struct sep *select_sep(struct avdtp *session, uint8_t type,
++                                        const char *sender);
++gboolean sep_get_lock(struct sep *sep);
++struct sep *avdtp_get_sep(struct avdtp *session,
++				struct avdtp_stream *stream);
++void unregister_sep(struct sep *sep);
++
++
++gboolean auto_config(gpointer data);
++gboolean finalize_config(gpointer data);
++//gboolean auto_select(gpointer data);
++void setup_cb_free(struct avdtp_setup_cb *cb);
++
++void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                                struct avdtp_stream *stream,
++                                struct avdtp_error *err, void *user_data);
++
++struct avdtp_setup *setup_get(struct avdtp *session);
++struct avdtp_setup *setup_new(struct avdtp *session);
++struct avdtp_setup *setup_ref(struct avdtp_setup *setup);
++
++void avdtp_stream_state_changed(struct avdtp_stream *stream,
++					avdtp_state_t old_state,
++					avdtp_state_t new_state,
++					struct avdtp_error *err,
 +					void *user_data);
-+unsigned int vdp_config(struct avdtp *session, struct sep *sep,
-+				avdtp_config_cb_t cb, GSList *caps,
++
++struct avdtp_server *find_server(GSList *list, const bdaddr_t *src);
++struct audio_device *get_dev(struct avdtp *session);
++struct avdtp_setup_cb *setup_cb_new(struct avdtp_setup *setup);
++struct avdtp_setup *find_setup_by_session(struct avdtp *session);
++struct avdtp_setup *find_setup_by_dev(struct audio_device *dev);
++void setup_unref(struct avdtp_setup *setup);
++gboolean endpoint_delayreport_ind(struct avdtp *session,
++						struct avdtp_local_sep *sep,
++						uint8_t rseid, uint16_t delay,
++						uint8_t *err, void *user_data);
++
++gboolean delayreport_ind(struct avdtp *session,
++				struct avdtp_local_sep *sep,
++				uint8_t rseid, uint16_t delay,
++				uint8_t *err, void *user_data);
++
++gboolean reconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				uint8_t *err, void *user_data);
++
++gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
 +				void *user_data);
-+gboolean vdp_cancel(struct audio_device *dev, unsigned int id);
++
++gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data);
++
++gboolean suspend_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data);
++
++gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data);
++
++gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data);
++
++gboolean getconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				uint8_t *err, void *user_data);
++
++gboolean endpoint_setconf_ind(struct avdtp *session,
++						struct avdtp_local_sep *sep,
++						struct avdtp_stream *stream,
++						GSList *caps,
++						avdtp_set_configuration_cb cb,
++						void *user_data);
++gboolean endpoint_getcap_ind(struct avdtp *session,
++                                        struct avdtp_local_sep *sep,
++                                        gboolean get_all, GSList **caps,
++                                        uint8_t *err, void *user_data);
++void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void delay_report_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                                struct avdtp_stream *stream,
++                                struct avdtp_error *err, void *user_data);
++void getconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void start_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++                        struct avdtp_stream *stream, struct avdtp_error *err,
++                        void *user_data);
++
++
 -- 
 1.7.3.4
 
