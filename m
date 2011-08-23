@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	Gustavo Padovan <padovan@profusion.mobi>
-CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 23 Aug 2011 20:14:03 -0400
-Subject: Re: [PATCH Bluez v2] Fix get/set_hfp_active to match name
- conventions
-Message-ID: <1314144843.4095.50.camel@THOR>
-References: <1313256696.2254.11.camel@THOR>  <20110822080752.GB11306@dell>
-	 <1314010822.4957.2.camel@THOR>
-In-Reply-To: <1314010822.4957.2.camel@THOR>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+From: Dmitry Shipilov <dmitry.shipilov@gmail.com>
+Date: Tue, 23 Aug 2011 21:17:26 +0100
+Message-ID: <CAFpRq5k1425=uttf1f-a3996qWmMyEh-AJhXL4SeGXW_QYC25A@mail.gmail.com>
+Subject: L2CAP socket binding fails with gatttool over LE
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgSm9oYW4gYW5kIEd1c3Rhdm8sDQoNCk9uIE1vbiwgMjAxMS0wOC0yMiBhdCAwNzowMCAtMDQw
-MCwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiBIaSBKb2hhbiwNCj4gDQo+IE9uIE1vbiwgMjAxMS0w
-OC0yMiBhdCAwNDowNyAtMDQwMCwgSm9oYW4gSGVkYmVyZyB3cm90ZToNCj4gPiBBcHBsaWVkLCBi
-dXQgYWdhaW4gdGhlIHBhdGNoIHdhc24ndCBjbGVhbi4gWW91IHJlYWxseSBuZWVkIHRvIGZpeCB5
-b3VyDQo+ID4gZWRpdG9yIHNldHRpbmdzIHRvIHNob3cgeW91IHdoaXRlc3BhY2UgZXJyb3JzIGFz
-IHdlbGwgYXMgY2hlY2sgeW91cnNlbGYNCj4gPiB3aXRoICJnaXQgYW0iIGlmIHlvdSdyZSBzdGls
-bCB1bnN1cmUgaWYgdGhlIHBhdGNoIGlzIGNsZWFuIG9yIG5vdDoNCj4gDQo+IFRoYW5rcyBmb3Ig
-bGV0dGluZyBtZSBrbm93LiBJIG9idmlvdXNseSB3YXNuJ3QgYXdhcmUgdGhlIHBhdGNoZXMgd2Vy
-ZW4ndA0KPiBjbGVhbi4gSSdsbCBtYWtlIGFuIGV4dHJhIGVmZm9ydCB0byBlbnN1cmUgdGhleSBh
-cmUgaW4gdGhlIGZ1dHVyZS4NCg0KV2VsbCwgYWZ0ZXIgc29tZSB0cm91Ymxlc2hvb3RpbmcgaGVy
-ZSwgaXQgdHVybnMgb3V0IHRoZSBwcm9ibGVtIGlzIHdpdGgNCm15IGNvbW1lcmNpYWwgYW5kIHdl
-bGwta25vd24gYnV0IGJyb2tlbiBtYWlsIHRyYW5zcG9ydCBzZXJ2ZXIuIFRoZQ0KYm91bmRhcnkg
-c2VydmVyICphbHdheXMqIGVuY29kZXMgQ2hhclNldD0idXRmLTgiIGFzIGJhc2U2NC1lbmNvZGVk
-DQood2hpY2ggaXMgd2h5IHRoZSBsaXN0c2VydiB0YWcgaXMgZ2FyYmxlZCkuDQoNCklzIGl0IG9r
-IGlmIEkgdXNlIGlzbyA4ODU5LTEgaW5zdGVhZD8NCg0KUmVnYXJkcywNClBldGVyIEh1cmxleQ0K
+Hello!
+
+I was trying to use gatttool from the latest BlueZ 4.96 over LE link,
+but it immediately fails with error message:
+
+$ sudo gatttool --adapter=hci0 --device=<BD addr> --primary
+l2cap_bind: Invalid argument (22)
+
+There are no commands sent over HCI (according to hcidump) and nothing
+is logged in /var/log/syslog as well (bluetoothd is running with -d
+option).
+
+I can use HCI LE commands (e.g. lecc) and successfully connect to the
+remote LE slave (according to hcidump) and LE is enabled in main.conf.
+
+If I try to use gatttool over regular BT (by specifying psm), gatttool
+initiates the connection (but eventually fails since I'm trying to
+connect to the single mode LE device on the other end).
+
+It looks like I'm missing something fundamental. Other posts suggest
+that gatttool is working over LE - is that correct?
+
+Any help would be much appreciated. Thanks in advance!
+
+With best regards, Dmitry...
+[e-mail: dmitry.shipilov@gmail.com]
