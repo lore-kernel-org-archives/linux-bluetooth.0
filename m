@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Dmitry Shipilov <dmitry.shipilov@gmail.com>
-Date: Tue, 23 Aug 2011 21:17:26 +0100
-Message-ID: <CAFpRq5k1425=uttf1f-a3996qWmMyEh-AJhXL4SeGXW_QYC25A@mail.gmail.com>
-Subject: L2CAP socket binding fails with gatttool over LE
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
+ connections
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 23 Aug 2011 12:51:27 -0700
+In-Reply-To: <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
+References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
+	 <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
+	 <1314116296.3373.213.camel@aeonflux> <20110823162822.GA26522@joana>
+	 <1314117006.3373.214.camel@aeonflux> <20110823164501.GB26522@joana>
+	 <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1314129089.3373.218.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+Hi Luiz,
 
-I was trying to use gatttool from the latest BlueZ 4.96 over LE link,
-but it immediately fails with error message:
+> > This already fails today. Our code doesn't allow us to call twice the Connect
+> > method, so we can't have two of the same UUID connected.
+> 
+> Well with RFCOMM you can't really connect multiple times to the same
+> channel/UUID and if we return the same fd clients will probably have
+> conflicts.
 
-$ sudo gatttool --adapter=hci0 --device=<BD addr> --primary
-l2cap_bind: Invalid argument (22)
+you can not connect the same channel twice (except in the other
+direction), that is true, but you can connect to a different channel
+with a different UUID. That is the reason why we also allow connection
+by handles. Or at least we should.
 
-There are no commands sent over HCI (according to hcidump) and nothing
-is logged in /var/log/syslog as well (bluetoothd is running with -d
-option).
+So even if we would make this limitation of 1 connection per UUID, the
+API is a fully asymmetric then. You are suppose to disconnect with the
+result of the connect call. I do not like that at all. It is bad API
+design and we are trying to squeeze this in the wrong way.
 
-I can use HCI LE commands (e.g. lecc) and successfully connect to the
-remote LE slave (according to hcidump) and LE is enabled in main.conf.
+Regards
 
-If I try to use gatttool over regular BT (by specifying psm), gatttool
-initiates the connection (but eventually fails since I'm trying to
-connect to the single mode LE device on the other end).
+Marcel
 
-It looks like I'm missing something fundamental. Other posts suggest
-that gatttool is working over LE - is that correct?
 
-Any help would be much appreciated. Thanks in advance!
-
-With best regards, Dmitry...
-[e-mail: dmitry.shipilov@gmail.com]
