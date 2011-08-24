@@ -1,73 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 From: David Stockwell <dstockwell@frequency-one.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] AVRCP: Metadata item #7 should return TrackDuration
-Date: Tue, 23 Aug 2011 22:25:08 -0500
+Subject: [PATCH 1/3] AVRCP: get/set three-byte company-id
+Date: Tue, 23 Aug 2011 22:23:59 -0500
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="us-ascii"
-Message-Id: <201108232225.08328.dstockwell@frequency-one.com>
+Message-Id: <201108232223.59907.dstockwell@frequency-one.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Metadata item #7 should return TrackDuration
+AVRCP: get/set three-byte company-id
 
-Should be total playing time of the track (TrackDuration)
-in msec, not current position within track.
 ---
- audio/control.c |   21 ++++++++-------------
- 1 files changed, 8 insertions(+), 13 deletions(-)
+ audio/control.c |   35 ++++++++++++++++++++++++++---------
+ 1 files changed, 26 insertions(+), 9 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index be95c19..dd2930c 100644
+index 882c9fb..be95c19 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -194,7 +194,8 @@ enum media_info_id {
- 	MEDIA_INFO_TRACK =		4,
- 	MEDIA_INFO_N_TRACKS =		5,
- 	MEDIA_INFO_GENRE =		6,
--	MEDIA_INFO_CURRENT_POSITION =	7,
-+	MEDIA_INFO_PLAYING_TIME =	7,
-+	MEDIA_INFO_LAST = MEDIA_INFO_PLAYING_TIME,
- };
+@@ -470,6 +470,29 @@ static sdp_record_t *avrcp_tg_record(void)
+ 	return record;
+ }
  
- static DBusConnection *connection = NULL;
-@@ -928,19 +929,13 @@ static int mp_get_media_attribute(struct media_player 
-*mp,
- 		len = strlen(valstr);
- 		memcpy(elem->val, valstr, len);
- 		break;
--	case MEDIA_INFO_CURRENT_POSITION:
--		if (mi->elapsed != 0xFFFFFFFF) {
--			uint32_t elapsed;
--
--			mp_get_playback_status(mp, NULL, &elapsed, NULL);
--
--			snprintf(valstr, 20, "%u", elapsed);
--			len = strlen(valstr);
--			memcpy(elem->val, valstr, len);
--		} else {
-+	case MEDIA_INFO_PLAYING_TIME:
-+		if (!mi->track_len)
- 			return -ENOENT;
--		}
++/**
++ *	get_company_id:
++ *
++ *	Get three-byte Company_ID from incoming AVRCP message
++ */
++static uint32_t get_company_id(const uint8_t cid[3])
++{
++	return cid[0] << 16 | cid[1] << 8 | cid[2];
++}
++
++/**
++ *	set_company_id:
++ *
++ *	Set three-byte Company_ID into outgoing AVRCP message
++ */
++static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
++{
++	cid[0] = cid_in >> 16;
++	cid[1] = cid_in >> 8;
++	cid[2] = cid_in;
++	return;
++}
++
+ static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
+ {
+ 	struct uinput_event event;
+@@ -747,9 +770,7 @@ static int avctp_send_event(struct control *control, 
+uint8_t id, void *data)
+ 	avrcp->subunit_type = SUBUNIT_PANEL;
+ 	avrcp->opcode = OP_VENDORDEP;
  
-+		snprintf(valstr, 20, "%u", mi->track_len);
-+		len = strlen(valstr);
-+		memcpy(elem->val, valstr, len);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -1126,7 +1121,7 @@ static int avrcp_handle_get_element_attributes(struct 
-control *control,
- 		 * Return all available information, at least
- 		 * title must be returned.
- 		 */
--		for (i = 1; i <= MEDIA_INFO_CURRENT_POSITION; i++) {
-+		for (i = 1; i <= MEDIA_INFO_LAST; i++) {
- 			size = mp_get_media_attribute(control->mp, i,
- 							&pdu->params[pos]);
+-	pdu->company_id[0] = IEEEID_BTSIG >> 16;
+-	pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
+-	pdu->company_id[2] = IEEEID_BTSIG & 0xFF;
++	set_company_id(pdu->company_id, IEEEID_BTSIG);
  
+ 	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
+ 	pdu->params[0] = id;
+@@ -998,9 +1019,7 @@ static int avrcp_handle_get_capabilities(struct control 
+*control,
+ 	switch (pdu->params[0]) {
+ 	case CAP_COMPANY_ID:
+ 		for (i = 0; i < G_N_ELEMENTS(company_ids); i++) {
+-			pdu->params[2 + i * 3] = company_ids[i] >> 16;
+-			pdu->params[3 + i * 3] = (company_ids[i] >> 8) & 0xFF;
+-			pdu->params[4 + i * 3] = company_ids[i] & 0xFF;
++			set_company_id(&pdu->params[2 + i * 3], company_ids[i]);
+ 		}
+ 
+ 		pdu->params_len = htons(2 + (3 * G_N_ELEMENTS(company_ids)));
+@@ -1381,9 +1400,7 @@ static int handle_vendordep_pdu(struct control *control,
+ 					int operand_count)
+ {
+ 	struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
+-	uint32_t company_id = (pdu->company_id[0] << 16) |
+-				(pdu->company_id[1] << 8) |
+-				(pdu->company_id[2]);
++	uint32_t company_id = get_company_id(pdu->company_id);
+ 	int len;
+ 
+ 	if (company_id != IEEEID_BTSIG ||
 -- 
 1.7.3.4
 
