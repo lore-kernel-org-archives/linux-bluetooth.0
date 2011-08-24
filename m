@@ -1,193 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 16:37:08 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 2/5 v2] Bluetooth: set skbuffer priority based on L2CAP
- socket priority
-Message-ID: <20110824193708.GC2662@joana>
-References: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
- <1313587384-2653-3-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313587384-2653-3-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1314114448.4095.40.camel@THOR>
+References: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
+	<1313617329.3373.188.camel@aeonflux>
+	<13872098A06B02418CF379A158C0F1460162C51B1A@dnce02.ent.ti.com>
+	<CANq1E4TKSJZF+HoV+XuopnupRmSvDiEOu72b+7YX4O2wR6Hd9g@mail.gmail.com>
+	<1314114448.4095.40.camel@THOR>
+Date: Wed, 24 Aug 2011 21:27:43 +0200
+Message-ID: <CANq1E4SnHHRUV6PQpgxyiXvFyebjmfF9UVahG3VUOk2w+m4=FQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI
+ connection name.
+From: David Herrmann <dh.herrmann@googlemail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: "Keren, Doron" <doronkeren@ti.com>, Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Ilia, Kolominsky" <iliak@ti.com>,
+	"Hadar, Amir" <a-hadar@ti.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Peter
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-17 16:23:01 +0300]:
+On Tue, Aug 23, 2011 at 5:47 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+> David,
+> I know you already posted a patch for this (which looks ok for fixing
+> the oops specifically), but it'd still be helpful to see a debug kernel
+> log that led up to that. There's only a couple of reasons -- all bad --
+> why the hci connection could not be found in the connection list while
+> the ctrl & intr sockets are connected (which are tested just prior to
+> hidp_add_connection).
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This uses SO_PRIORITY to set the skbuffer priority field
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/hci_core.h |    3 ++
->  include/net/bluetooth/l2cap.h    |    3 +-
->  net/bluetooth/l2cap_core.c       |   45 +++++++++++++++++++++++++++-----------
->  net/bluetooth/l2cap_sock.c       |    2 +-
->  4 files changed, 38 insertions(+), 15 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e2ba4d6..0742828 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -32,6 +32,9 @@
->  #define HCI_PROTO_L2CAP	0
->  #define HCI_PROTO_SCO	1
->  
-> +/* HCI priority */
-> +#define HCI_PRIO_MAX	7
-> +
->  /* HCI Core structures */
->  struct inquiry_data {
->  	bdaddr_t	bdaddr;
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 4f34ad2..f018e5d 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
->  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
->  void l2cap_chan_destroy(struct l2cap_chan *chan);
->  int l2cap_chan_connect(struct l2cap_chan *chan);
-> -int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
-> +int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
-> +								u32 priority);
+Sorry for the delay. I currently have no other machine to run a debug
+kernel and I really don't like provoking oopses on my working machine.
+However, the next days I will setup a machine and try to send a full
+trace.
+Are there any useful config symbols for bluetooth debug? Despite the
+standard kernel-wide debug symbols.
 
-I think priority could be part of struct l2cap_chan, so we avoid an extra
-parameter in some calls here. Priority is also accessible from chan->sk, but I
-would like to avoid more references to sk in l2cap core.
+What are possible reasons why an l2cap connection can be available
+without an underlying ACL connection? My fix eliminates the oops but I
+still think that it is not fixing the real problem (anyway, I'd really
+like to see it upstream).
 
->  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
->  
->  #endif /* __L2CAP_H */
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 3204ba8..3af0569 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1245,7 +1245,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
->  	struct hci_conn *hcon = chan->conn->hcon;
->  	u16 flags;
->  
-> -	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
-> +	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
-> +							skb->priority);
->  
->  	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
->  		flags = ACL_START_NO_FLUSH;
-> @@ -1451,6 +1452,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
->  		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
->  			return -EFAULT;
->  
-> +		(*frag)->priority = skb->priority;
-> +
->  		sent += count;
->  		len  -= count;
->  
-> @@ -1460,7 +1463,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
->  	return sent;
->  }
->  
-> -struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-> +static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
-> +						struct msghdr *msg, size_t len,
-> +						u32 priority)
->  {
->  	struct sock *sk = chan->sk;
->  	struct l2cap_conn *conn = chan->conn;
-> @@ -1468,7 +1473,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
->  	int err, count, hlen = L2CAP_HDR_SIZE + 2;
->  	struct l2cap_hdr *lh;
->  
-> -	BT_DBG("sk %p len %d", sk, (int)len);
-> +	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
->  
->  	count = min_t(unsigned int, (conn->mtu - hlen), len);
->  	skb = bt_skb_send_alloc(sk, count + hlen,
-> @@ -1476,6 +1481,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
->  	if (!skb)
->  		return ERR_PTR(err);
->  
-> +	skb->priority = priority;
-> +
->  	/* Create L2CAP header */
->  	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
->  	lh->cid = cpu_to_le16(chan->dcid);
-> @@ -1490,7 +1497,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
->  	return skb;
->  }
->  
-> -struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-> +static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
-> +						struct msghdr *msg, size_t len,
-> +						u32 priority)
->  {
->  	struct sock *sk = chan->sk;
->  	struct l2cap_conn *conn = chan->conn;
-> @@ -1506,6 +1515,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
->  	if (!skb)
->  		return ERR_PTR(err);
->  
-> +	skb->priority = priority;
-> +
->  	/* Create L2CAP header */
->  	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
->  	lh->cid = cpu_to_le16(chan->dcid);
-> @@ -1519,7 +1530,10 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
->  	return skb;
->  }
->  
-> -struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
-> +static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
-> +						struct msghdr *msg, size_t len,
-> +						u32 priority, u16 control,
-> +						u16 sdulen)
->  {
->  	struct sock *sk = chan->sk;
->  	struct l2cap_conn *conn = chan->conn;
-> @@ -1527,7 +1541,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
->  	int err, count, hlen = L2CAP_HDR_SIZE + 2;
->  	struct l2cap_hdr *lh;
->  
-> -	BT_DBG("sk %p len %d", sk, (int)len);
-> +	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
->  
->  	if (!conn)
->  		return ERR_PTR(-ENOTCONN);
-> @@ -1544,6 +1558,8 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
->  	if (!skb)
->  		return ERR_PTR(err);
->  
-> +	skb->priority = priority;
-> +
->  	/* Create L2CAP header */
->  	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
->  	lh->cid = cpu_to_le16(chan->dcid);
-> @@ -1574,7 +1590,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
->  
->  	skb_queue_head_init(&sar_queue);
->  	control = L2CAP_SDU_START;
-> -	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
-> +	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps,
-> +						HCI_PRIO_MAX, control, len);
+I will try to send a debug log if I can reproduce it.
 
+> Regards,
+> Peter Hurley
 
-HCI_PRIO_MAX, why?
-
-
->  	if (IS_ERR(skb))
->  		return PTR_ERR(skb);
->  
-> @@ -1593,7 +1610,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
->  			buflen = len;
->  		}
->  
-> -		skb = l2cap_create_iframe_pdu(chan, msg, buflen, control, 0);
-> +		skb = l2cap_create_iframe_pdu(chan, msg, buflen, HCI_PRIO_MAX,
-> +								control, 0);
-
-same here.
-
-	Gustavo
+Cheers
+David
