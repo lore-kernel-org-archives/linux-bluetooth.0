@@ -1,172 +1,202 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4E53949C.7050804@invoxia.com>
-References: <4E528879.5080103@invoxia.com>
-	<20110822174912.GA21949@joana>
-	<CABBYNZLEkc8FWmJm9hU_n-KL2mhWeWPcUfxqX1jskH8ubU-aMw@mail.gmail.com>
-	<4E536DFF.8050205@invoxia.com>
-	<CABBYNZKyb=SFcaT-MvBLCTyZiENt=8W5xdpah6jiy8JX+8=Hfg@mail.gmail.com>
-	<4E53949C.7050804@invoxia.com>
-Date: Wed, 24 Aug 2011 14:03:05 +0300
-Message-ID: <CABBYNZ+yPF28bewUjw8Vjs5HFqB3vUVExJfZARBqXhYLpxHkHw@mail.gmail.com>
-Subject: Re: HFP gateway and new incoming connection
+In-Reply-To: <1314027047-5476-10-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1314027047-5476-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1314027047-5476-10-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Wed, 24 Aug 2011 13:59:02 +0300
+Message-ID: <CABBYNZ+euESVEnNpBHEfBcqVaADD1u64XhFZkKUayAQwGZ8Yvw@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] Implement media_transport for HFP_HS_UUID
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Frédéric,
 
-On Tue, Aug 23, 2011 at 2:53 PM, Arnaud Mouiche
-<arnaud.mouiche@invoxia.com> wrote:
-> On 08/23/2011 01:14 PM, Luiz Augusto von Dentz wrote:
->>
->> Hi Arnaud,
->>
->> On Tue, Aug 23, 2011 at 12:08 PM, Arnaud Mouiche
->> <arnaud.mouiche@invoxia.com>  wrote:
->>>
->>> Hi,
->>>
->>> On 08/22/2011 09:58 PM, Luiz Augusto von Dentz wrote:
->>>>
->>>> [...]
->>>> Yep, we have some plans to move the Agent registration to adapter
->>>> path, so it gonna be per adapter. This is necessary to set the
->>>> features bit properly in the record and probably gonna support both
->>>> roles (with different agents). My initial idea was to use Media API,
->>>> but perhaps is confusing since HFP is not entirely about audio but
->>>> call control too (mostly) so perhaps we gonna have a different
->>>> interface for it e.g. org.bluez.Telephony, in addition to that we are
->>>> planning to pass the endpoint bus and path together in the
->>>> NewConnection so the telephony agent (oFono) can communicate directly
->>>> to endpoint in use (PulseAudio).
->>>>
->>>> Those are my plans, but none of this is set in stone and Im pretty
->>>> open for ideas
->>>>
->>> what about using the org.bluez.Adapter / RegisterAgent API, and add:
->>> - the possibility to setup multiple agents (maintain a list of agents)
->>> - use the "capability" field as a filter definition to find the good
->>> agent
->>> for the particular request
->>> ex:
->>>    audio/gateway.c::agent_sendfd() will look for a agent in the list,
->>> with a
->>> "HFP" capability to send the "NewConnection" request
->>
->> I guess it would be confusing since with the same method we would have
->> different types of agents which implements different interfaces, there
->> is also the problem that by using Adapter interface it would have to
->> be implemented in the core daemon but my intention is to maintain this
->> inside the audio plugin to hook with Media API.
->>
-> You are right. I didn't see how the core was compartmentalized from plugins.
-> I need took more closely to the Media API...
+2011/8/22 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
+> The transport is used by pulseaudio to suspend and resume streams.
+> ---
+>  audio/transport.c |  130 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 130 insertions(+), 0 deletions(-)
 >
+> diff --git a/audio/transport.c b/audio/transport.c
+> index f915262..2739199 100644
+> --- a/audio/transport.c
+> +++ b/audio/transport.c
+> @@ -42,6 +42,7 @@
+>  #include "transport.h"
+>  #include "a2dp.h"
+>  #include "headset.h"
+> +#include "gateway.h"
+>
+>  #ifndef DBUS_TYPE_UNIX_FD
+>  #define DBUS_TYPE_UNIX_FD -1
+> @@ -436,6 +437,115 @@ static void cancel_headset(struct media_transport *transport, guint id)
+>        headset_cancel_stream(transport->device, id);
+>  }
+>
+> +static void gateway_resume_complete(struct audio_device *dev, GError *err,
+> +                                                       void *user_data)
+> +{
+> +       struct media_owner *owner = user_data;
+> +       struct media_request *req = owner->pending;
+> +       struct media_transport *transport = owner->transport;
+> +       int fd;
+> +       uint16_t imtu, omtu;
+> +       gboolean ret;
+> +
+> +       req->id = 0;
+> +
+> +       if (dev == NULL)
+> +               goto fail;
+> +
+> +       if (err) {
+> +               error("Failed to resume gateway: error %s", err->message);
+> +               goto fail;
+> +       }
+> +
+> +       fd = gateway_get_sco_fd(dev);
+> +       if (fd < 0)
+> +               goto fail;
+> +
+> +       imtu = 48;
+> +       omtu = 48;
+> +
+> +       media_transport_set_fd(transport, fd, imtu, omtu);
+> +
+> +       if (g_strstr_len(owner->accesstype, -1, "r") == NULL)
+> +               imtu = 0;
+> +
+> +       if (g_strstr_len(owner->accesstype, -1, "w") == NULL)
+> +               omtu = 0;
+> +
+> +       ret = g_dbus_send_reply(transport->conn, req->msg,
+> +                                               DBUS_TYPE_UNIX_FD, &fd,
+> +                                               DBUS_TYPE_UINT16, &imtu,
+> +                                               DBUS_TYPE_UINT16, &omtu,
+> +                                               DBUS_TYPE_INVALID);
+> +       if (ret == FALSE)
+> +               goto fail;
+> +
+> +       media_owner_remove(owner);
+> +
+> +       return;
+> +
+> +fail:
+> +       media_transport_remove(transport, owner);
+> +}
+> +
+> +static guint resume_gateway(struct media_transport *transport,
+> +                               struct media_owner *owner)
+> +{
+> +       struct audio_device *device = transport->device;
+> +
+> +       if (transport->in_use == TRUE)
+> +               goto done;
+> +
+> +       transport->in_use = gateway_lock(device, GATEWAY_LOCK_READ |
+> +                                               GATEWAY_LOCK_WRITE);
+> +       if (transport->in_use == FALSE)
+> +               return 0;
+> +
+> +done:
+> +       return gateway_request_stream(device, gateway_resume_complete,
+> +                                       owner);
+> +}
+> +
+> +static gboolean gateway_suspend_complete(gpointer user_data)
+> +{
+> +       struct media_owner *owner = user_data;
+> +       struct media_transport *transport = owner->transport;
+> +
+> +       /* Release always succeeds */
+> +       if (owner->pending) {
+> +               owner->pending->id = 0;
+> +               media_request_reply(owner->pending, transport->conn, 0);
+> +               media_owner_remove(owner);
+> +       }
+> +
+> +       transport->in_use = FALSE;
+> +       media_transport_remove(transport, owner);
+> +       return FALSE;
+> +}
+> +
+> +static guint suspend_gateway(struct media_transport *transport,
+> +                                               struct media_owner *owner)
+> +{
+> +       struct audio_device *device = transport->device;
+> +       static int id = 1;
+> +
+> +       if (!owner) {
+> +               gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+> +               transport->in_use = FALSE;
+> +               return 0;
+> +       }
+> +
+> +       gateway_suspend_stream(device);
+> +       gateway_unlock(device, GATEWAY_LOCK_READ | GATEWAY_LOCK_WRITE);
+> +       g_idle_add(gateway_suspend_complete, owner);
+> +       return id++;
+> +}
+> +
+> +static void cancel_gateway(struct media_transport *transport, guint id)
+> +{
+> +       gateway_cancel_stream(transport->device, id);
+> +}
+> +
+>  static void media_owner_exit(DBusConnection *connection, void *user_data)
+>  {
+>        struct media_owner *owner = user_data;
+> @@ -672,6 +782,13 @@ static int set_property_headset(struct media_transport *transport,
+>        return -EINVAL;
+>  }
+>
+> +static int set_property_gateway(struct media_transport *transport,
+> +                                               const char *property,
+> +                                               DBusMessageIter *value)
+> +{
+> +       return -EINVAL;
+> +}
+> +
+>  static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+>                                                                void *data)
+>  {
+> @@ -740,6 +857,12 @@ static void get_properties_headset(struct media_transport *transport,
+>        dict_append_entry(dict, "Routing", DBUS_TYPE_STRING, &routing);
+>  }
+>
+> +static void get_properties_gateway(struct media_transport *transport,
+> +                                               DBusMessageIter *dict)
+> +{
+> +       /* None */
+> +}
+> +
+>  void transport_get_properties(struct media_transport *transport,
+>                                                        DBusMessageIter *iter)
+>  {
+> @@ -881,6 +1004,13 @@ struct media_transport *media_transport_create(DBusConnection *conn,
+>                transport->nrec_id = headset_add_nrec_cb(device,
+>                                                        headset_nrec_changed,
+>                                                        transport);
+> +       } else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
+> +                       strcasecmp(uuid, HSP_HS_UUID) == 0) {
+> +               transport->resume = resume_gateway;
+> +               transport->suspend = suspend_gateway;
+> +               transport->cancel = cancel_gateway;
+> +               transport->get_properties = get_properties_gateway;
+> +               transport->set_property = set_property_gateway;
+>        } else
+>                goto fail;
+>
+> --
+> 1.7.1
+>
+> --
 
-How about the following:
-
-Telephony hierarchy [experiemental]
-===================
-
-Service		org.bluez
-Interface	org.bluez.Telephony
-Object path	[variable prefix]/{hci0,hci1,...}
-
-Methods		void RegisterAgent(object path, dict properties)
-
-			Register a TelephonyAgent to sender, the sender can
-			register as many agents as it likes.
-
-			Note: If the sender disconnects its agents are
-			automatically unregistered.
-
-			possible properties:
-
-				string UUID:
-
-					UUID of the profile which the agent is
-					for.
-
-				uint16 Version:
-
-					Version of the profile which the agent
-					implements.
-
-				byte Features:
-
-					Agent supported features as defined in
-					profile spec e.g. HFP.
-
-			Possible Errors: org.bluez.Error.InvalidArguments
-
-
-		void UnregisterAgent(object path)
-
-			Unregister sender agent.
-
-TelephonyAgent hierarchy
-========================
-
-Service		unique name
-Interface	org.bluez.TelephonyAgent
-Object path	freely definable
-
-ethods		void NewConnection(filedescriptor fd, dict properties)
-
-			This method gets called whenever a new connection
-			has been established. This method assumes that DBus
-			daemon with file descriptor passing capability is
-			being used.
-
-			The agent should only return successfully once the
-			establishment of the service level connection (SLC)
-			has been completed.  In the case of Handsfree this
-			means that BRSF exchange has been performed and
-			necessary initialization has been done.
-
-			If Endpoint is set the agent is responsible to
-			create an object implementing org.bluez.MediaTransport
-			and notify the Endpoint using org.bluez.MediaEndpoint.
-
-			possible properties:
-
-				strict Device:
-
-					BlueZ remote device object.
-
-				string UUID:
-
-					Profile UUID of the connection.
-
-				uint16 Version:
-
-					Remote profile version.
-
-				byte Features:
-
-					Remote profile features.
-
-				string Endpoint:
-
-					Optional. Endpoint bus id.
-
-				string EndpointPath:
-
-					Optional. Endpoint object path.
-
-			Possible Errors: org.bluez.Error.InvalidArguments
-					 org.bluez.Error.Failed
-
-		void Release()
-
-			This method gets called whenever the service daemon
-			unregisters the agent or whenever the Adapter where
-			the TelephonyAgent registers itself is removed.
-
+Looks good, ack.
 
 -- 
 Luiz Augusto von Dentz
