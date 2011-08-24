@@ -2,73 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/4] Remove unneeded header include
-Date: Wed, 24 Aug 2011 16:09:48 -0300
-Message-Id: <1314212990-13090-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1314212990-13090-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1314212990-13090-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/4] Remove forward declaration
+Date: Wed, 24 Aug 2011 16:09:47 -0300
+Message-Id: <1314212990-13090-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/adapter.c     |    1 -
- src/dbus-common.c |   11 +----------
- src/device.c      |    1 -
- 3 files changed, 1 insertions(+), 12 deletions(-)
+ src/adapter.c |   35 ++++++++++++++++-------------------
+ 1 files changed, 16 insertions(+), 19 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 5878a76..b37441a 100644
+index 7ee970c..5878a76 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -51,7 +51,6 @@
- #include "manager.h"
- #include "device.h"
- #include "dbus-common.h"
--#include "event.h"
- #include "error.h"
- #include "glib-helper.h"
- #include "agent.h"
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index 8436100..ef3b375 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -28,13 +28,7 @@
- #endif
+@@ -151,9 +151,6 @@ struct btd_adapter {
+ 	GSList *loaded_drivers;
+ };
  
- #include <stdio.h>
--#include <errno.h>
--#include <stdlib.h>
--#include <string.h>
--#include <unistd.h>
--#include <sys/ioctl.h>
+-static void adapter_set_pairable_timeout(struct btd_adapter *adapter,
+-					guint interval);
 -
--#include <bluetooth/bluetooth.h>
-+#include <stdint.h>
+ static int found_device_cmp(const struct remote_dev_info *d1,
+ 			const struct remote_dev_info *d2)
+ {
+@@ -522,22 +519,6 @@ static DBusMessage *set_powered(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
+ }
  
- #include <glib.h>
- #include <dbus/dbus.h>
-@@ -42,9 +36,6 @@
+-void btd_adapter_pairable_changed(struct btd_adapter *adapter,
+-							gboolean pairable)
+-{
+-	adapter->pairable = pairable;
+-
+-	write_device_pairable(&adapter->bdaddr, pairable);
+-
+-	emit_property_changed(connection, adapter->path,
+-				ADAPTER_INTERFACE, "Pairable",
+-				DBUS_TYPE_BOOLEAN, &pairable);
+-
+-	if (pairable && adapter->pairable_timeout)
+-		adapter_set_pairable_timeout(adapter,
+-						adapter->pairable_timeout);
+-}
+-
+ static DBusMessage *set_pairable(DBusConnection *conn, DBusMessage *msg,
+ 				gboolean pairable, void *data)
+ {
+@@ -587,6 +568,22 @@ static void adapter_set_pairable_timeout(struct btd_adapter *adapter,
+ 						adapter);
+ }
  
- #include "log.h"
- 
--#include "adapter.h"
--#include "manager.h"
--#include "event.h"
- #include "dbus-common.h"
- 
- static DBusConnection *connection = NULL;
-diff --git a/src/device.c b/src/device.c
-index 96e798f..8e55052 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -53,7 +53,6 @@
- #include "attio.h"
- #include "device.h"
- #include "dbus-common.h"
--#include "event.h"
- #include "error.h"
- #include "glib-helper.h"
- #include "gatt.h"
++void btd_adapter_pairable_changed(struct btd_adapter *adapter,
++							gboolean pairable)
++{
++	adapter->pairable = pairable;
++
++	write_device_pairable(&adapter->bdaddr, pairable);
++
++	emit_property_changed(connection, adapter->path,
++				ADAPTER_INTERFACE, "Pairable",
++				DBUS_TYPE_BOOLEAN, &pairable);
++
++	if (pairable && adapter->pairable_timeout)
++		adapter_set_pairable_timeout(adapter,
++						adapter->pairable_timeout);
++}
++
+ static struct session_req *find_session(GSList *list, const char *sender)
+ {
+ 	for (; list; list = list->next) {
 -- 
 1.7.6
 
