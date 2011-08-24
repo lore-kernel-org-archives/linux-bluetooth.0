@@ -1,136 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 18:13:59 -0300
+Date: Wed, 24 Aug 2011 17:46:31 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 4/7] Bluetooth: parse EFS in l2cap config request
-Message-ID: <20110824211359.GH2662@joana>
+Subject: Re: [RFC 2/7] Bluetooth: EFS: definitions and headers for EFS
+Message-ID: <20110824204631.GG2662@joana>
 References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1313653502-6303-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1313653502-6303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313653502-6303-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1313653502-6303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:44:59 +0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:44:57 +0300]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Add parsing extended flowspec option in L2cap config request
 > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
 > (sent Sun, 22 Aug 2010)
 > ---
->  net/bluetooth/l2cap_core.c |   70 ++++++++++++++++++++++++++++++++++++++++++-
->  1 files changed, 68 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/l2cap.h |   37 +++++++++++++++++++++++++++++++++++++
+>  1 files changed, 37 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 4167cb0..5378bc6 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1890,6 +1890,12 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
->  	}
->  }
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 9850cb5..d2154e0 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -38,6 +38,9 @@
+>  #define L2CAP_DEFAULT_MAX_PDU_SIZE	1009    /* Sized for 3-DH5 packet */
+>  #define L2CAP_DEFAULT_ACK_TO		200
+>  #define L2CAP_LE_DEFAULT_MTU		23
+> +#define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
+> +#define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
+> +#define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
 >  
-> +static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
-> +{
-> +	return !disable_flowspec &&
-> +			chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
-> +}
+>  #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
+>  #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
+> @@ -218,6 +221,8 @@ struct l2cap_conf_rsp {
+>  #define L2CAP_CONF_UNACCEPT	0x0001
+>  #define L2CAP_CONF_REJECT	0x0002
+>  #define L2CAP_CONF_UNKNOWN	0x0003
+> +#define L2CAP_CONF_PENDING	0x0004
+> +#define L2CAP_CONF_EFS_REJECT	0x0005
+>  
+>  struct l2cap_conf_opt {
+>  	__u8       type;
+> @@ -234,6 +239,7 @@ struct l2cap_conf_opt {
+>  #define L2CAP_CONF_QOS		0x03
+>  #define L2CAP_CONF_RFC		0x04
+>  #define L2CAP_CONF_FCS		0x05
+> +#define L2CAP_CONF_EFS		0x06
+>  
+>  #define L2CAP_CONF_MAX_SIZE	22
+>  
+> @@ -252,6 +258,19 @@ struct l2cap_conf_rfc {
+>  #define L2CAP_MODE_ERTM		0x03
+>  #define L2CAP_MODE_STREAMING	0x04
+>  
+> +struct l2cap_conf_efs {
+> +	__u8       id;
+> +	__u8       service_type;
+> +	__le16     max_sdu_size;
+> +	__le32     sdu_inter_time;
+> +	__le32     access_latency;
+> +	__le32     flush_timeout;
+> +} __packed;
 > +
->  static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
->  {
->  	struct l2cap_conf_req *req = data;
-> @@ -1996,6 +2002,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
->  	int type, hint, olen;
->  	unsigned long val;
->  	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
-> +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERVTYPE_BESTEFFORT };
-> +	u8 ext_flowspec_enable = 0;
+> +#define L2CAP_SERVTYPE_NOTRAFIC		0x00
+> +#define L2CAP_SERVTYPE_BESTEFFORT	0x01
+> +#define L2CAP_SERVTYPE_GUARANTEED	0x02
 
-	u8 remote_efs is better and shorter name.
-
->  	u16 mtu = L2CAP_DEFAULT_MTU;
->  	u16 result = L2CAP_CONF_SUCCESS;
->  
-> @@ -2030,6 +2038,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
->  
->  			break;
->  
-> +		case L2CAP_CONF_EFS:
-> +			ext_flowspec_enable = 1;
-> +			if (olen == sizeof(efs))
-> +				memcpy(&efs, (void *) val, olen);
-> +			break;
-> +
->  		default:
->  			if (hint)
->  				break;
-> @@ -2052,7 +2066,17 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
->  			break;
->  		}
->  
-> -		if (chan->mode != rfc.mode)
-> +		if (ext_flowspec_enable && __l2cap_efs_supported(chan)) {
-> +			chan->ext_flowspec_enable = 1;
-> +
-> +			chan->local_stype = L2CAP_SERVTYPE_BESTEFFORT;
-> +			chan->local_msdu = L2CAP_DEFAULT_MAX_SDU_SIZE;
-> +			chan->local_sdu_itime = L2CAP_DEFAULT_SDU_ARRIVAL_TIME;
-> +			chan->local_acc_lat = L2CAP_DEFAULT_ACCESS_LATENCY;
-> +			chan->local_flush_to = L2CAP_DEFAULT_FLUSH_TO;
-> +		}
-> +
-
-parse_conf_req isn't the best place to initialize channel data. Do in at
-channel initializions procedure.
-
-> +		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
->  			return -ECONNREFUSED;
->  
->  		break;
-> @@ -2070,8 +2094,34 @@ done:
->  					sizeof(rfc), (unsigned long) &rfc);
->  	}
->  
-> +	/*
-> +	   Add the ext flow spec and ext win size option parameters check here.
-> +	 */
-> +	if (result == L2CAP_CONF_SUCCESS && ext_flowspec_enable) {
-> +		if (!chan->ext_flowspec_enable) {
-> +			/* remote efs support , local efs not supported */
-> +
-> +			result = L2CAP_CONF_REJECT;
-> +			return -ECONNREFUSED;
-> +		} else if (chan->local_stype != L2CAP_SERVTYPE_NOTRAFIC &&
-> +				efs.service_type != L2CAP_SERVTYPE_NOTRAFIC &&
-> +				efs.service_type != chan->local_stype) {
-
-No need for else, just "if". And what do you want to check for here.
-
->  
-> -	if (result == L2CAP_CONF_SUCCESS) {
-> +			result = L2CAP_CONF_UNACCEPT;
-> +
-> +			if (chan->num_conf_req >= 1)
-> +				return -ECONNREFUSED;
-> +
-> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-> +					sizeof(efs), (unsigned long) &efs);
-> +
-> +		} else {
-> +			result = L2CAP_CONF_PENDING;
-> +			set_bit(CONF_LOCAL_PEND, &chan->conf_state);
-> +		}
-> +	}
-> +
-> +	if (result == L2CAP_CONF_SUCCESS || result == L2CAP_CONF_PENDING) {
->  		/* Configure output options and let the other side know
->  		 * which ones we don't like. */
-
-If the result is pending do we need to send configurations like RFC again?
-what does the spec says about it?
+And these could be only SERV instead of SERVTYPE
 
 	Gustavo
