@@ -1,66 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 12:02:09 -0300
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: David Stockwell <dstockwell@frequency-one.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Subject: Re: [PATCH 2/3] AVRCP: Metadata item #7 should return TrackDuration
-Message-ID: <20110824150209.GA11862@vigoh>
-References: <201108240805.59288.dstockwell@frequency-one.com>
+Date: Wed, 24 Aug 2011 22:15:21 +0800 (CST)
+From: xz_explorer <xz_explorer@163.com>
+To: maxk@qualcomm.com, marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc: "yulei.cao" <yulei.cao@samsung.com>
+Message-ID: <47b5ec47.192c7.131fc2533dd.Coremail.xz_explorer@163.com>
+Subject: About bluez
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <201108240805.59288.dstockwell@frequency-one.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/alternative;
+	boundary="----=_Part_316004_1937702520.1314195321821"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+------=_Part_316004_1937702520.1314195321821
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: 7bit
 
-* David Stockwell <dstockwell@frequency-one.com> [2011-08-24 08:05:59 -0500]:
+hello,gentlemen:
+    I have just used bluez for developing, now I have several question which puzzled me these days. 
+    I use bluez-4.96 release.
+    1.How can I compile and install the bluez?
+       I have download the bluez-4.96package and run ./configure, and make && make install on ubuntu, and I found these do nothing but generate a libbluetooth.so, won't this copy some header files to system directory for develope to include?
+ 
+    2.Whether health directory is built?
+       I find Makefile generated while configure don't contain the health? It is been commented.
+ 
+    3.What is the output of bluez after build? a static library or a dynamic library? If this, which header files should is include? Need I copy them from source code package? because I can't find them in other system directory after  make install.
+ 
+    4.How do I use health? Is therr develop guide for studying?
+ 
+    sorry for ask so many simple questions, but I find no answer by all ways,google etc. and expect your replay. Tank you very much.
+ 
+    Good wishes!!!
+ 
+                                                                                                                        Cao lei
+                                                                                                                        24th Aug.
+------=_Part_316004_1937702520.1314195321821
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: 7bit
 
-> [PATCH 2/3] AVRCP: Metadata item #7 should return TrackDuration
-> 
-> Should be total playing time of the track (TrackDuration)
-> in msec, not current position within track.
-> ---
->  audio/control.c |   21 ++++++++-------------
->  1 files changed, 8 insertions(+), 13 deletions(-)
-> 
-> diff --git a/audio/control.c b/audio/control.c
-> index be95c19..eb86029 100644
-> --- a/audio/control.c
-> +++ b/audio/control.c
-> @@ -194,7 +194,8 @@ enum media_info_id {
->  	MEDIA_INFO_TRACK =		4,
->  	MEDIA_INFO_N_TRACKS =		5,
->  	MEDIA_INFO_GENRE =		6,
-> -	MEDIA_INFO_CURRENT_POSITION =	7,
-> +	MEDIA_INFO_PLAYING_TIME =	7,
-> +	MEDIA_INFO_LAST,
->  };
->  
->  static DBusConnection *connection = NULL;
-> @@ -928,19 +929,13 @@ static int mp_get_media_attribute(struct media_player 
-> *mp,
->  		len = strlen(valstr);
->  		memcpy(elem->val, valstr, len);
->  		break;
-> -	case MEDIA_INFO_CURRENT_POSITION:
-> -		if (mi->elapsed != 0xFFFFFFFF) {
-> -			uint32_t elapsed;
-> -
-> -			mp_get_playback_status(mp, NULL, &elapsed, NULL);
-> -
-> -			snprintf(valstr, 20, "%u", elapsed);
-> -			len = strlen(valstr);
-> -			memcpy(elem->val, valstr, len);
-> -		} else {
-> +	case MEDIA_INFO_PLAYING_TIME:
-> +		if (!mi->track_len)
-
-track_len is initialized with 0xFFFFFFFF, because as per spec when it
-has this value it means it's not available (see media_info_init())
-
-
-Otherwise seems good.
-
-regards, 
-Lucas De Marchi
+<div style="line-height:1.7;color:#000000;font-size:14px;font-family:arial"><DIV>hello,gentlemen:</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; I have just used bluez for developing, now I have several question which puzzled me these days.&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; I use bluez-4.96 release.</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; 1.How can I compile and install the bluez?</DIV>
+<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I have download the bluez-4.96package and run ./configure, and make &amp;&amp; make install on ubuntu, and I found these do nothing but generate a libbluetooth.so, won't this copy some header files to system directory for develope to include? </DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; 2.Whether health directory is built?</DIV>
+<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I find Makefile generated while configure don't contain the health? It is been commented.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; 3.What is the output of bluez after build? a static library or a dynamic library? If this, which header files should is include? Need I copy them from source code package? because I can't find them in other system directory after&nbsp; make install.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; 4.How do I use health? Is therr develop guide for studying?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; sorry for ask so many simple questions, but I find no answer by all ways,google etc. and expect your replay. Tank you very much.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp; Good wishes!!!</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cao lei</DIV>
+<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 24th Aug.</DIV></div><br><br><span title="neteasefooter"><span id="netease_mail_footer"></span></span>
+------=_Part_316004_1937702520.1314195321821--
