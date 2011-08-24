@@ -1,31 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	Gustavo Padovan <padovan@profusion.mobi>
+CC: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 23 Aug 2011 20:14:03 -0400
+Subject: Re: [PATCH Bluez v2] Fix get/set_hfp_active to match name
+ conventions
+Message-ID: <1314144843.4095.50.camel@THOR>
+References: <1313256696.2254.11.camel@THOR>  <20110822080752.GB11306@dell>
+	 <1314010822.4957.2.camel@THOR>
+In-Reply-To: <1314010822.4957.2.camel@THOR>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Date: Wed, 24 Aug 2011 11:18:47 +0800
-Message-ID: <CAB0WyvkviAkCo7fak1osg5Kx8tuU-qD03eCkY4yezbtnV1oqYA@mail.gmail.com>
-Subject: In BlueZ, how can I get the "access address" of the Link layer
- connection for BT-LE?
-From: "Min Jun,Xi" <xi.minjun@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-I have one question about the "access address" of the link layer
-connection for BT-LE.
-In the volume 6 ("Low energy controller") of the current Bluetooth
-Specification V4.0, it is said that "The Access Address is a property
-of the physical channel. The Access Address is present at the start of
-every transmitted packet.". Also, in the Link Layer data format,
-there's one field to contain "Access Address". I know all of them are
-in the controller, but can I get the access address in Linux kernel?
-In the kernel's source code, I can only see the interface to operate
-on HCI layer and the upper layers.
-
-Can I use the HCI interface to get the "Access Address" property for
-one established BT-LE connection? I don't know how to do that. Can you
-help me? Thank you!
-
--- 
-best regards,
-Xi Minjun
+SGkgSm9oYW4gYW5kIEd1c3Rhdm8sDQoNCk9uIE1vbiwgMjAxMS0wOC0yMiBhdCAwNzowMCAtMDQw
+MCwgUGV0ZXIgSHVybGV5IHdyb3RlOg0KPiBIaSBKb2hhbiwNCj4gDQo+IE9uIE1vbiwgMjAxMS0w
+OC0yMiBhdCAwNDowNyAtMDQwMCwgSm9oYW4gSGVkYmVyZyB3cm90ZToNCj4gPiBBcHBsaWVkLCBi
+dXQgYWdhaW4gdGhlIHBhdGNoIHdhc24ndCBjbGVhbi4gWW91IHJlYWxseSBuZWVkIHRvIGZpeCB5
+b3VyDQo+ID4gZWRpdG9yIHNldHRpbmdzIHRvIHNob3cgeW91IHdoaXRlc3BhY2UgZXJyb3JzIGFz
+IHdlbGwgYXMgY2hlY2sgeW91cnNlbGYNCj4gPiB3aXRoICJnaXQgYW0iIGlmIHlvdSdyZSBzdGls
+bCB1bnN1cmUgaWYgdGhlIHBhdGNoIGlzIGNsZWFuIG9yIG5vdDoNCj4gDQo+IFRoYW5rcyBmb3Ig
+bGV0dGluZyBtZSBrbm93LiBJIG9idmlvdXNseSB3YXNuJ3QgYXdhcmUgdGhlIHBhdGNoZXMgd2Vy
+ZW4ndA0KPiBjbGVhbi4gSSdsbCBtYWtlIGFuIGV4dHJhIGVmZm9ydCB0byBlbnN1cmUgdGhleSBh
+cmUgaW4gdGhlIGZ1dHVyZS4NCg0KV2VsbCwgYWZ0ZXIgc29tZSB0cm91Ymxlc2hvb3RpbmcgaGVy
+ZSwgaXQgdHVybnMgb3V0IHRoZSBwcm9ibGVtIGlzIHdpdGgNCm15IGNvbW1lcmNpYWwgYW5kIHdl
+bGwta25vd24gYnV0IGJyb2tlbiBtYWlsIHRyYW5zcG9ydCBzZXJ2ZXIuIFRoZQ0KYm91bmRhcnkg
+c2VydmVyICphbHdheXMqIGVuY29kZXMgQ2hhclNldD0idXRmLTgiIGFzIGJhc2U2NC1lbmNvZGVk
+DQood2hpY2ggaXMgd2h5IHRoZSBsaXN0c2VydiB0YWcgaXMgZ2FyYmxlZCkuDQoNCklzIGl0IG9r
+IGlmIEkgdXNlIGlzbyA4ODU5LTEgaW5zdGVhZD8NCg0KUmVnYXJkcywNClBldGVyIEh1cmxleQ0K
