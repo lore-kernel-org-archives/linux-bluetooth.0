@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH] Add valid range descriptor uuid
-Date: Wed, 24 Aug 2011 10:37:45 +0200
-Message-Id: <1314175065-18096-1-git-send-email-sancane@gmail.com>
+Date: Wed, 24 Aug 2011 11:40:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Gustavo Padovan <padovan@profusion.mobi>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH Bluez v2] Fix get/set_hfp_active to match name conventions
+Message-ID: <20110824084030.GD19274@dell>
+References: <1313256696.2254.11.camel@THOR>
+ <20110822080752.GB11306@dell>
+ <1314010822.4957.2.camel@THOR>
+ <1314144843.4095.50.camel@THOR>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1314144843.4095.50.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/att.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Hi Peter,
 
-diff --git a/attrib/att.h b/attrib/att.h
-index 3b8c098..d962841 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -43,6 +43,7 @@
- #define GATT_SERVER_CHARAC_CFG_UUID	0x2903
- #define GATT_CHARAC_FMT_UUID		0x2904
- #define GATT_CHARAC_AGREG_FMT_UUID	0x2905
-+#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
- 
- /* Attribute Protocol Opcodes */
- #define ATT_OP_ERROR			0x01
--- 
-1.7.6
+On Tue, Aug 23, 2011, Peter Hurley wrote:
+> Well, after some troubleshooting here, it turns out the problem is with
+> my commercial and well-known but broken mail transport server. The
+> boundary server *always* encodes CharSet="utf-8" as base64-encoded
+> (which is why the listserv tag is garbled).
+> 
+> Is it ok if I use iso 8859-1 instead?
 
+I suppose it doesn't make much of a difference since we're using English
+here. Another option that could work is to use attachments, and yet
+another (what I'd actually prefer if it's possible) to switch to an
+un-broken mail server.
+
+Johan
