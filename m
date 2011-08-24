@@ -1,59 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 22:15:21 +0800 (CST)
-From: xz_explorer <xz_explorer@163.com>
-To: maxk@qualcomm.com, marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc: "yulei.cao" <yulei.cao@samsung.com>
-Message-ID: <47b5ec47.192c7.131fc2533dd.Coremail.xz_explorer@163.com>
-Subject: About bluez
+From: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Wed, 24 Aug 2011 10:05:09 -0400
+Subject: [RFC v3 4/4] Bluetooth: l2cap: fix NULL ACL packet handling
+Message-ID: <1314194709.2219.17.camel@THOR>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
-	boundary="----=_Part_316004_1937702520.1314195321821"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_Part_316004_1937702520.1314195321821
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: 7bit
+A 0-length ACL continuation-fragment is a valid NULL packet. Remote
+devices can use the FLOW indicator in the ACL packet header to
+flow-control ACL packets without sending a payload.
 
-hello,gentlemen:
-    I have just used bluez for developing, now I have several question which puzzled me these days. 
-    I use bluez-4.96 release.
-    1.How can I compile and install the bluez?
-       I have download the bluez-4.96package and run ./configure, and make && make install on ubuntu, and I found these do nothing but generate a libbluetooth.so, won't this copy some header files to system directory for develope to include?
- 
-    2.Whether health directory is built?
-       I find Makefile generated while configure don't contain the health? It is been commented.
- 
-    3.What is the output of bluez after build? a static library or a dynamic library? If this, which header files should is include? Need I copy them from source code package? because I can't find them in other system directory after  make install.
- 
-    4.How do I use health? Is therr develop guide for studying?
- 
-    sorry for ask so many simple questions, but I find no answer by all ways,google etc. and expect your replay. Tank you very much.
- 
-    Good wishes!!!
- 
-                                                                                                                        Cao lei
-                                                                                                                        24th Aug.
-------=_Part_316004_1937702520.1314195321821
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: 7bit
+Track as a connection stat instead of logging.
+---
 
-<div style="line-height:1.7;color:#000000;font-size:14px;font-family:arial"><DIV>hello,gentlemen:</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; I have just used bluez for developing, now I have several question which puzzled me these days.&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; I use bluez-4.96 release.</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; 1.How can I compile and install the bluez?</DIV>
-<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I have download the bluez-4.96package and run ./configure, and make &amp;&amp; make install on ubuntu, and I found these do nothing but generate a libbluetooth.so, won't this copy some header files to system directory for develope to include? </DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; 2.Whether health directory is built?</DIV>
-<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I find Makefile generated while configure don't contain the health? It is been commented.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; 3.What is the output of bluez after build? a static library or a dynamic library? If this, which header files should is include? Need I copy them from source code package? because I can't find them in other system directory after&nbsp; make install.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; 4.How do I use health? Is therr develop guide for studying?</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; sorry for ask so many simple questions, but I find no answer by all ways,google etc. and expect your replay. Tank you very much.</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp; Good wishes!!!</DIV>
-<DIV>&nbsp;</DIV>
-<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cao lei</DIV>
-<DIV>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 24th Aug.</DIV></div><br><br><span title="neteasefooter"><span id="netease_mail_footer"></span></span>
-------=_Part_316004_1937702520.1314195321821--
+v2 ensure the fragment is 0-length
+v3 use new hci_conn.stats rather than hci_dev.stat
+
+ net/bluetooth/l2cap_core.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2969ef0..67a3342 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4120,6 +4120,14 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
+ 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
+ 
+ 		if (!conn->rx_len) {
++			/* A 0-length, continuation fragment is a NULL packet
++			 * (Core 2.1, Vol 2, Part B, 6.5.1.2, 6.4.3 & 6.6.2)
++			 * The remote device is likely controlling packet flow
++			 * with ACL payload header FLOW indicator. */
++			if (!skb->len) {
++				hcon->stats.null_rx++;
++				goto drop;
++			}
+ 			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
+ 			l2cap_conn_unreliable(conn, ECOMM);
+ 			goto drop;
+-- 
+1.7.4.1
+
