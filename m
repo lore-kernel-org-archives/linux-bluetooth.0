@@ -1,75 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Stockwell <dstockwell@frequency-one.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] AVRCP: Metadata item #7 should return TrackDuration
-Date: Wed, 24 Aug 2011 19:14:07 -0500
-Cc: lucas.demarchi@profusion.mobi, luiz.dentz@gmail.com,
-	johan.hedberg@gmail.com
+Message-ID: <54172CBB083A479490A4625B74A68F82@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>, <johan.hedberg@gmail.com>
+References: <201108240807.09267.dstockwell@frequency-one.com> <CABBYNZLygk5nYnnLDL8zVcq52RReaWpK7jz+g46Ttdis5ZZjjQ@mail.gmail.com>
+In-Reply-To: <CABBYNZLygk5nYnnLDL8zVcq52RReaWpK7jz+g46Ttdis5ZZjjQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] AVRCP: Add Passthrough Signal
+Date: Wed, 24 Aug 2011 18:58:58 -0500
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201108241914.07574.dstockwell@frequency-one.com>
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AVRCP: Metadata item #7 should return TrackDuration
+Hi Luiz,
 
-Should be total playing time of the track (TrackDuration)
-in msec, not current position within track.
----
- audio/control.c |   21 ++++++++-------------
- 1 files changed, 8 insertions(+), 13 deletions(-)
+-----Original Message----- 
+From: Luiz Augusto von Dentz
+Sent: Wednesday, August 24, 2011 5:47 PM
+To: David Stockwell
+Cc: linux-bluetooth@vger.kernel.org ; johan.hedberg@gmail.com
+Subject: Re: [PATCH 3/3] AVRCP: Add Passthrough Signal
 
-diff --git a/audio/control.c b/audio/control.c
-index be95c19..4aad67d 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -194,7 +194,8 @@ enum media_info_id {
- 	MEDIA_INFO_TRACK =		4,
- 	MEDIA_INFO_N_TRACKS =		5,
- 	MEDIA_INFO_GENRE =		6,
--	MEDIA_INFO_CURRENT_POSITION =	7,
-+	MEDIA_INFO_PLAYING_TIME =	7,
-+	MEDIA_INFO_LAST,
- };
- 
- static DBusConnection *connection = NULL;
-@@ -928,19 +929,13 @@ static int mp_get_media_attribute(struct media_player 
-*mp,
- 		len = strlen(valstr);
- 		memcpy(elem->val, valstr, len);
- 		break;
--	case MEDIA_INFO_CURRENT_POSITION:
--		if (mi->elapsed != 0xFFFFFFFF) {
--			uint32_t elapsed;
--
--			mp_get_playback_status(mp, NULL, &elapsed, NULL);
--
--			snprintf(valstr, 20, "%u", elapsed);
--			len = strlen(valstr);
--			memcpy(elem->val, valstr, len);
--		} else {
-+	case MEDIA_INFO_PLAYING_TIME:
-+		if (mi->track_len == 0xFFFFFFFF)
- 			return -ENOENT;
--		}
- 
-+		snprintf(valstr, 20, "%u", mi->track_len);
-+		len = strlen(valstr);
-+		memcpy(elem->val, valstr, len);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -1126,7 +1121,7 @@ static int avrcp_handle_get_element_attributes(struct 
-control *control,
- 		 * Return all available information, at least
- 		 * title must be returned.
- 		 */
--		for (i = 1; i <= MEDIA_INFO_CURRENT_POSITION; i++) {
-+		for (i = 1; i < MEDIA_INFO_LAST; i++) {
- 			size = mp_get_media_attribute(control->mp, i,
- 							&pdu->params[pos]);
- 
+Hi David,
+
+On Wed, Aug 24, 2011 at 4:07 PM, David Stockwell
+<dstockwell@frequency-one.com> wrote:
+> [PATCH 3/3] AVRCP: Add Passthrough Signal
+>
+> Send Passthrough signal, not only for simple keystrokes,
+> but especially for Vendor Unique key, passing company-id
+> and vendor-unique string as well.
+
+I would like to do this differently, with target/controller/player
+registering themselves to avoid having to blindly emit signals like
+this which can no effect at all or loop effect, this should also make
+us able to detect if there are multiple entities and address them
+properly which is needed for 1.4.
+
++++++ OK, maybe a readwrite Passthrough property indicating how passthroughs 
+are handled: Signal, Uinput, Both, None?  Or simply a PassthruSignal 
+property (true/false, default false), given that the presence/absence of 
+/dev/uinput handles the other case?
+
+I really think the Control should emit the signal...since it comes from a CT 
+(and not really from a MediaPlayer or somesuch).
+
 -- 
-1.7.3.4
+Luiz Augusto von Dentz 
 
