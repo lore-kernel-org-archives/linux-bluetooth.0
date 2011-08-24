@@ -1,52 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3E5035FD3C7C4E208317F27CB66E46E3@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Johan Hedberg" <johan.hedberg@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <201108232225.08328.dstockwell@frequency-one.com> <20110824083023.GA19274@dell>
-In-Reply-To: <20110824083023.GA19274@dell>
-Subject: Re: [PATCH 2/3] AVRCP: Metadata item #7 should return TrackDuration
-Date: Wed, 24 Aug 2011 07:39:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+In-Reply-To: <CAFpRq5k1425=uttf1f-a3996qWmMyEh-AJhXL4SeGXW_QYC25A@mail.gmail.com>
+References: <CAFpRq5k1425=uttf1f-a3996qWmMyEh-AJhXL4SeGXW_QYC25A@mail.gmail.com>
+Date: Wed, 24 Aug 2011 09:37:52 -0300
+Message-ID: <CAKT1EBdVf6pchy4sAb2qrT_FWqD5fxDNC0tsHzmFKXP6jDjpxA@mail.gmail.com>
+Subject: Re: L2CAP socket binding fails with gatttool over LE
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Dmitry Shipilov <dmitry.shipilov@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan
+Hi Dmitry,
 
------Original Message----- 
-From: Johan Hedberg
-Sent: Wednesday, August 24, 2011 3:30 AM
-To: David Stockwell
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] AVRCP: Metadata item #7 should return TrackDuration
+On Tue, Aug 23, 2011 at 5:17 PM, Dmitry Shipilov
+<dmitry.shipilov@gmail.com> wrote:
+> Hello!
+>
+> I was trying to use gatttool from the latest BlueZ 4.96 over LE link,
+> but it immediately fails with error message:
+>
+> $ sudo gatttool --adapter=hci0 --device=<BD addr> --primary
+> l2cap_bind: Invalid argument (22)
 
-Hi David,
+It looks that you don't have a proper kernel.
 
-On Tue, Aug 23, 2011, David Stockwell wrote:
-> @@ -194,7 +194,8 @@ enum media_info_id {
->  MEDIA_INFO_TRACK = 4,
->  MEDIA_INFO_N_TRACKS = 5,
->  MEDIA_INFO_GENRE = 6,
-> - MEDIA_INFO_CURRENT_POSITION = 7,
-> + MEDIA_INFO_PLAYING_TIME = 7,
-> + MEDIA_INFO_LAST = MEDIA_INFO_PLAYING_TIME,
->  };
+I sent an email last week containing links for the kernel & BlueZ.
+Search for: "Current status on BLE development"
 
-Actually that's not quite what I meant. The idea was this:
-
-MEDIA_INFO_PLAYING_TIME = 7,
-MEDIA_INFO_LAST,
-
-That way you can just keep adding new entries above MEDIA_INFO_LAST and
-its value will always be the last "real" value + 1 (which also means
-that the comparison in the for-loop changes from <= to <).
-
-+++++ Thanks.  As you can tell, C is not my most frequently used language...
-I'll take care of it and resubmit.
-
-Johan 
-
+BR,
+Claudio
