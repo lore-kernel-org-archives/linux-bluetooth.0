@@ -1,46 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 24 Aug 2011 10:05:09 -0400
-Subject: [RFC v3 4/4] Bluetooth: l2cap: fix NULL ACL packet handling
-Message-ID: <1314194709.2219.17.camel@THOR>
+Date: Wed, 24 Aug 2011 10:05:01 -0400
+Subject: [RFC 2/4] Bluetooth: Expose hci connections through debugfs
+Message-ID: <1314194701.2219.15.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A 0-length ACL continuation-fragment is a valid NULL packet. Remote
-devices can use the FLOW indicator in the ACL packet header to
-flow-control ACL packets without sending a payload.
-
-Track as a connection stat instead of logging.
+Add "connections" file to "hciX" debugfs directory and output
+hci_conn internal state.
 ---
+ net/bluetooth/hci_sysfs.c |   46 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 46 insertions(+), 0 deletions(-)
 
-v2 ensure the fragment is 0-length
-v3 use new hci_conn.stats rather than hci_dev.stat
-
- net/bluetooth/l2cap_core.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2969ef0..67a3342 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4120,6 +4120,14 @@ static int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 fl
- 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 22f1a6c..3d00769 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -542,6 +542,49 @@ static int auto_accept_delay_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+ 					auto_accept_delay_set, "%llu\n");
  
- 		if (!conn->rx_len) {
-+			/* A 0-length, continuation fragment is a NULL packet
-+			 * (Core 2.1, Vol 2, Part B, 6.5.1.2, 6.4.3 & 6.6.2)
-+			 * The remote device is likely controlling packet flow
-+			 * with ACL payload header FLOW indicator. */
-+			if (!skb->len) {
-+				hcon->stats.null_rx++;
-+				goto drop;
-+			}
- 			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
- 			l2cap_conn_unreliable(conn, ECOMM);
- 			goto drop;
++static int connections_show(struct seq_file *f, void *p)
++{
++	struct hci_dev *hdev = f->private;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct list_head *l;
++	
++	hci_dev_lock_bh(hdev);
++
++	seq_printf(f, "                          s            a     p\n");
++	seq_printf(f, "                  h   t   t  o  s  k   u  s  s  p  r\n");
++	seq_printf(f, "                  n   y   a  u  s  e   t  e  e  i  e\n");
++	seq_printf(f, "Dest              l   p   t  t  p  y   h  c  c  n  f\n");
++
++	list_for_each(l, &h->list) {
++		struct hci_conn *c;
++		c = list_entry(l, struct hci_conn, list);
++
++		seq_printf(f, "%s %-3d %3s %d  %d  %d 0x%.2x %d  %d  %d %2d  %d\n",
++				batostr(&c->dst), c->handle, 
++				link_typetostr(c->type),
++				c->state, c->out, c->ssp_mode,
++				c->key_type, c->auth_type, c->sec_level,
++				c->pending_sec_level, c->pin_length,
++				atomic_read(&c->devref));
++	}
++
++	hci_dev_unlock_bh(hdev);
++
++	return 0;
++}
++
++static int connections_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, connections_show, inode->i_private);
++}
++
++static const struct file_operations connections_fops = {
++	.open		= connections_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ int hci_register_sysfs(struct hci_dev *hdev)
+ {
+ 	struct device *dev = &hdev->dev;
+@@ -578,6 +621,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
+ 
+ 	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
+ 						&auto_accept_delay_fops);
++
++	debugfs_create_file("connections", 0444, hdev->debugfs, hdev,
++						&connections_fops);
+ 	return 0;
+ }
+ 
 -- 
 1.7.4.1
 
