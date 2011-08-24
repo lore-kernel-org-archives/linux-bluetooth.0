@@ -1,97 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: David Herrmann <dh.herrmann@googlemail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Date: Wed, 24 Aug 2011 17:51:12 -0400
-Subject: Re: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI
- connection name.
-Message-ID: <1314222672.2219.66.camel@THOR>
-References: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
-	 <1313617329.3373.188.camel@aeonflux>
-	 <13872098A06B02418CF379A158C0F1460162C51B1A@dnce02.ent.ti.com>
-	 <CANq1E4TKSJZF+HoV+XuopnupRmSvDiEOu72b+7YX4O2wR6Hd9g@mail.gmail.com>
-	 <1314114448.4095.40.camel@THOR>
-	 <CANq1E4SnHHRUV6PQpgxyiXvFyebjmfF9UVahG3VUOk2w+m4=FQ@mail.gmail.com>
-In-Reply-To: <CANq1E4SnHHRUV6PQpgxyiXvFyebjmfF9UVahG3VUOk2w+m4=FQ@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Date: Wed, 24 Aug 2011 18:33:24 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 6/7] Bluetooth: add EFS option in l2cap conf req
+Message-ID: <20110824213324.GK2662@joana>
+References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1313653502-6303-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1313653502-6303-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:45:01 +0300]:
 
-On Wed, 2011-08-24 at 15:27 -0400, David Herrmann wrote:
-> Hi Peter
->=20
-> On Tue, Aug 23, 2011 at 5:47 PM, Peter Hurley <peter@hurleysoftware.com> =
-wrote:
-> > David,
-> > I know you already posted a patch for this (which looks ok for fixing
-> > the oops specifically), but it'd still be helpful to see a debug kernel
-> > log that led up to that. There's only a couple of reasons -- all bad --
-> > why the hci connection could not be found in the connection list while
-> > the ctrl & intr sockets are connected (which are tested just prior to
-> > hidp_add_connection).
->=20
-> Sorry for the delay. I currently have no other machine to run a debug
-> kernel and I really don't like provoking oopses on my working machine.
-> However, the next days I will setup a machine and try to send a full
-> trace.
-> Are there any useful config symbols for bluetooth debug? Despite the
-> standard kernel-wide debug symbols.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Adds extended flowspec option when building l2cap config request
+> Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> (sent Sun, 22 Aug 2010)
+> ---
+>  include/net/bluetooth/l2cap.h |    2 +
+>  net/bluetooth/l2cap_core.c    |   79 ++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 80 insertions(+), 1 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index d2154e0..2350057 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -446,6 +446,8 @@ struct l2cap_conn {
+>  	__u32		rx_len;
+>  	__u8		tx_ident;
+>  
+> +	__u8		flowspec_ident;
+> +
+>  	__u8		disc_reason;
+>  
+>  	__u8		preq[7]; /* SMP Pairing Request */
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index f64c9cb..f3663ac 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -541,6 +541,26 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
+>  	return id;
+>  }
+>  
+> +static inline u8 l2cap_flowspec_ident(struct l2cap_conn *conn)
+> +{
+> +	u8 id;
+> +
+> +	/* Get next available ident for the flow spec of guaranteed channel.
+> +	 *    2 - 255 are used.
+> +	 */
+> +
+> +	spin_lock_bh(&conn->lock);
+> +
+> +	if (++conn->flowspec_ident > 256)
+> +		conn->flowspec_ident = 2;
+> +
+> +	id = conn->flowspec_ident;
+> +
+> +	spin_unlock_bh(&conn->lock);
+> +
+> +	return id;
+> +}
+> +
+>  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+>  {
+>  	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
+> @@ -1900,6 +1920,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+>  {
+>  	struct l2cap_conf_req *req = data;
+>  	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
+> +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERVTYPE_BESTEFFORT };
+>  	void *ptr = req->data;
+>  
+>  	BT_DBG("chan %p", chan);
+> @@ -1913,7 +1934,20 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+>  		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
+>  			break;
+>  
+> -		/* fall through */
+> +		if (__l2cap_efs_supported(chan)) {
+> +			chan->ext_flowspec_enable = 1;
+> +
+> +			chan->local_stype = L2CAP_SERVTYPE_BESTEFFORT;
+> +			chan->local_msdu = L2CAP_DEFAULT_MAX_SDU_SIZE;
+> +			chan->local_sdu_itime = L2CAP_DEFAULT_SDU_ARRIVAL_TIME;
+> +			chan->local_acc_lat = L2CAP_DEFAULT_ACCESS_LATENCY;
+> +			chan->local_flush_to = L2CAP_DEFAULT_FLUSH_TO;
+> +		}
+> +
+> +		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
+> +			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+> +		break;
 
-I understand about trying to invoke oops. A one-line
-	BT_DBG("");
-in the NULL parent error pathway of hidp_setup_hid with your patch would
-be just as good (because it's the condition I'm trying to catch).
+Could you tell me what this l2cap_send_disconn_req is doing here? it wasn't in
+the original code.
 
-Don't need (or want) kernel-wide output. If your kernel is configured
-for dynamic debug output, this is as easy as:
-	$ sudo su
-	$ echo -n 'module bluetooth +p'
-			> /sys/kernel/debug/dynamic_debug/control
-	$ echo -n 'module hidp +p'
-			> /sys/kernel/debug/dynamic_debug/control
-
-Run test, then:
-	$ echo -n 'module bluetooth -p'
-			> /sys/kernel/debug/dynamic_debug/control
-	$ echo -n 'module hidp -p'
-			> /sys/kernel/debug/dynamic_debug/control
-	$ exit
-
-Dynamic debug output is enabled in the Kconfig here:
-	Kernel hacking / Enable dynamic printk() support =3D> Y
-
-> What are possible reasons why an l2cap connection can be available
-> without an underlying ACL connection?
-
-Well, if the ACL connection is gone, the l2cap channels should be gone
-as well, but the matching l2cap sockets stay around because of the
-references on them. But the sockets should be in state BT_CLOSED, which
-is tested just prior to calling hidp_add_connection.
-
-Possible reasons why the apparent contradiction:
-1. Neither socket is locked by the hidp driver AFAICT. If true, then the
-sock state (and by extension, the l2cap channels and hci connection list
-could change at any time). l2cap_conn_del acquires the socket lock prior
-to l2cap_chan_del.
-2. HCI connection list (conn_hash) is corrupted. hidp_get_device looks
-smp-unsafe to me. I think it needs to be acquiring device lock via
-hci_dev_lock_bh.
-3. Some other unknown race.
-
-That's why a debug log would help. It would help establish when
-l2cap_conn_del and hci_conn_del are called relative to
-hidp_add_connection, and what the other pre-conditions are.
-
->                                       My fix eliminates the oops but I
-> still think that it is not fixing the real problem (anyway, I'd really
-> like to see it upstream).
-
-Not my place to say re: the patch. Gustavo Padovan and Marcel Holtmann
-are the gatekeepers here. (Looks ok to me though, at least as far as
-preventing NULL dereferences and handling the error exit properly).
-
-Regards,
-Peter Hurley
+	Gustavo
