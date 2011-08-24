@@ -1,155 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 18:30:46 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 6/7] Bluetooth: add EFS option in l2cap conf req
-Message-ID: <20110824213046.GJ2662@joana>
-References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1313653502-6303-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313653502-6303-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20110824193708.GC2662@joana>
+References: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
+	<1313587384-2653-3-git-send-email-luiz.dentz@gmail.com>
+	<20110824193708.GC2662@joana>
+Date: Thu, 25 Aug 2011 00:27:31 +0300
+Message-ID: <CABBYNZJgHkqPE28UfbM1oO0WdSdhhaRtGzvRsLQ-Ur4tzOVQWQ@mail.gmail.com>
+Subject: Re: [RFC 2/5 v2] Bluetooth: set skbuffer priority based on L2CAP
+ socket priority
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Gustavo,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:45:01 +0300]:
+On Wed, Aug 24, 2011 at 10:37 PM, Gustavo Padovan
+<padovan@profusion.mobi> wrote:
+> Hi Luiz,
+>
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-17 16:23:01 +0300]:
+>
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This uses SO_PRIORITY to set the skbuffer priority field
+>>
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> ---
+>>  include/net/bluetooth/hci_core.h |    3 ++
+>>  include/net/bluetooth/l2cap.h    |    3 +-
+>>  net/bluetooth/l2cap_core.c       |   45 +++++++++++++++++++++++++++-----------
+>>  net/bluetooth/l2cap_sock.c       |    2 +-
+>>  4 files changed, 38 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index e2ba4d6..0742828 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -32,6 +32,9 @@
+>>  #define HCI_PROTO_L2CAP      0
+>>  #define HCI_PROTO_SCO        1
+>>
+>> +/* HCI priority */
+>> +#define HCI_PRIO_MAX 7
+>> +
+>>  /* HCI Core structures */
+>>  struct inquiry_data {
+>>       bdaddr_t        bdaddr;
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index 4f34ad2..f018e5d 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+>>  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+>>  void l2cap_chan_destroy(struct l2cap_chan *chan);
+>>  int l2cap_chan_connect(struct l2cap_chan *chan);
+>> -int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
+>> +int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+>> +                                                             u32 priority);
+>
+> I think priority could be part of struct l2cap_chan, so we avoid an extra
+> parameter in some calls here. Priority is also accessible from chan->sk, but I
+> would like to avoid more references to sk in l2cap core.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Adds extended flowspec option when building l2cap config request
-> Based upon haijun.liu <haijun.liu@atheros.com> series of patches
-> (sent Sun, 22 Aug 2010)
+It would be great and simplify a lot the scheduler, but Im afraid have
+to do it per skbuffer because of RFCOMM, besides it gives more
+flexibility if we latter need to move to another queueing discipline.
 
-Please provide more details in your commit message. 
+>>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+>>
+>>  #endif /* __L2CAP_H */
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 3204ba8..3af0569 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -1245,7 +1245,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>>       struct hci_conn *hcon = chan->conn->hcon;
+>>       u16 flags;
+>>
+>> -     BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
+>> +     BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
+>> +                                                     skb->priority);
+>>
+>>       if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
+>>               flags = ACL_START_NO_FLUSH;
+>> @@ -1451,6 +1452,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+>>               if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+>>                       return -EFAULT;
+>>
+>> +             (*frag)->priority = skb->priority;
+>> +
+>>               sent += count;
+>>               len  -= count;
+>>
+>> @@ -1460,7 +1463,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+>>       return sent;
+>>  }
+>>
+>> -struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+>> +static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+>> +                                             struct msghdr *msg, size_t len,
+>> +                                             u32 priority)
+>>  {
+>>       struct sock *sk = chan->sk;
+>>       struct l2cap_conn *conn = chan->conn;
+>> @@ -1468,7 +1473,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+>>       int err, count, hlen = L2CAP_HDR_SIZE + 2;
+>>       struct l2cap_hdr *lh;
+>>
+>> -     BT_DBG("sk %p len %d", sk, (int)len);
+>> +     BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+>>
+>>       count = min_t(unsigned int, (conn->mtu - hlen), len);
+>>       skb = bt_skb_send_alloc(sk, count + hlen,
+>> @@ -1476,6 +1481,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+>>       if (!skb)
+>>               return ERR_PTR(err);
+>>
+>> +     skb->priority = priority;
+>> +
+>>       /* Create L2CAP header */
+>>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+>>       lh->cid = cpu_to_le16(chan->dcid);
+>> @@ -1490,7 +1497,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+>>       return skb;
+>>  }
+>>
+>> -struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+>> +static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+>> +                                             struct msghdr *msg, size_t len,
+>> +                                             u32 priority)
+>>  {
+>>       struct sock *sk = chan->sk;
+>>       struct l2cap_conn *conn = chan->conn;
+>> @@ -1506,6 +1515,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+>>       if (!skb)
+>>               return ERR_PTR(err);
+>>
+>> +     skb->priority = priority;
+>> +
+>>       /* Create L2CAP header */
+>>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+>>       lh->cid = cpu_to_le16(chan->dcid);
+>> @@ -1519,7 +1530,10 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+>>       return skb;
+>>  }
+>>
+>> -struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
+>> +static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+>> +                                             struct msghdr *msg, size_t len,
+>> +                                             u32 priority, u16 control,
+>> +                                             u16 sdulen)
+>>  {
+>>       struct sock *sk = chan->sk;
+>>       struct l2cap_conn *conn = chan->conn;
+>> @@ -1527,7 +1541,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+>>       int err, count, hlen = L2CAP_HDR_SIZE + 2;
+>>       struct l2cap_hdr *lh;
+>>
+>> -     BT_DBG("sk %p len %d", sk, (int)len);
+>> +     BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+>>
+>>       if (!conn)
+>>               return ERR_PTR(-ENOTCONN);
+>> @@ -1544,6 +1558,8 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+>>       if (!skb)
+>>               return ERR_PTR(err);
+>>
+>> +     skb->priority = priority;
+>> +
+>>       /* Create L2CAP header */
+>>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+>>       lh->cid = cpu_to_le16(chan->dcid);
+>> @@ -1574,7 +1590,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+>>
+>>       skb_queue_head_init(&sar_queue);
+>>       control = L2CAP_SDU_START;
+>> -     skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
+>> +     skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps,
+>> +                                             HCI_PRIO_MAX, control, len);
+>
+>
+> HCI_PRIO_MAX, why?
 
-> ---
->  include/net/bluetooth/l2cap.h |    2 +
->  net/bluetooth/l2cap_core.c    |   79 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 80 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index d2154e0..2350057 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -446,6 +446,8 @@ struct l2cap_conn {
->  	__u32		rx_len;
->  	__u8		tx_ident;
->  
-> +	__u8		flowspec_ident;
-> +
->  	__u8		disc_reason;
->  
->  	__u8		preq[7]; /* SMP Pairing Request */
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index f64c9cb..f3663ac 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -541,6 +541,26 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
->  	return id;
->  }
->  
-> +static inline u8 l2cap_flowspec_ident(struct l2cap_conn *conn)
-> +{
-> +	u8 id;
-> +
-> +	/* Get next available ident for the flow spec of guaranteed channel.
-> +	 *    2 - 255 are used.
-> +	 */
-> +
-> +	spin_lock_bh(&conn->lock);
-> +
-> +	if (++conn->flowspec_ident > 256)
-> +		conn->flowspec_ident = 2;
-> +
-> +	id = conn->flowspec_ident;
-> +
-> +	spin_unlock_bh(&conn->lock);
-> +
-> +	return id;
-> +}
-> +
->  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
->  {
->  	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
-> @@ -1900,6 +1920,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
->  {
->  	struct l2cap_conf_req *req = data;
->  	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
-> +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERVTYPE_BESTEFFORT };
->  	void *ptr = req->data;
->  
->  	BT_DBG("chan %p", chan);
-> @@ -1913,7 +1934,20 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
->  		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
->  			break;
->  
-> -		/* fall through */
-> +		if (__l2cap_efs_supported(chan)) {
-> +			chan->ext_flowspec_enable = 1;
-> +
-> +			chan->local_stype = L2CAP_SERVTYPE_BESTEFFORT;
-> +			chan->local_msdu = L2CAP_DEFAULT_MAX_SDU_SIZE;
-> +			chan->local_sdu_itime = L2CAP_DEFAULT_SDU_ARRIVAL_TIME;
-> +			chan->local_acc_lat = L2CAP_DEFAULT_ACCESS_LATENCY;
-> +			chan->local_flush_to = L2CAP_DEFAULT_FLUSH_TO;
-> +		}
-> +
-> +		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
-> +			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
-> +		break;
-> +
->  	default:
->  		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
->  		break;
-> @@ -1961,6 +1995,34 @@ done:
->  			chan->fcs = L2CAP_FCS_NONE;
->  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
->  		}
-> +
-> +		if (chan->ext_flowspec_enable) {
-> +			efs.service_type = chan->local_stype;
-> +			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
-> +			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
-> +
-> +			if (chan->local_stype == L2CAP_SERVTYPE_BESTEFFORT) {
-> +				chan->local_id = 1;
-> +				efs.id = chan->local_id;
-> +				efs.access_latency =
-> +					cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
-> +				efs.flush_timeout =
-> +					cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
-> +			} else {
-> +				/* As spec, the ident shall be unique within
-> +				   the scope of a physical link.
-> +				 */
-> +				chan->local_id = l2cap_flowspec_ident(chan->conn);
-> +				efs.id = chan->local_id;
-> +				efs.access_latency =
-> +					cpu_to_le32(chan->local_acc_lat);
-> +				efs.flush_timeout =
-> +					cpu_to_le32(chan->local_flush_to);
-> +			}
-> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-> +					sizeof(efs), (unsigned long) &efs);
-> +		}
-> +
->  		break;
->  
->  	case L2CAP_MODE_STREAMING:
-> @@ -1984,6 +2046,21 @@ done:
->  			chan->fcs = L2CAP_FCS_NONE;
->  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
->  		}
-> +
-> +		if (chan->ext_flowspec_enable) {
-> +			efs.id = 1;
-> +			efs.service_type = L2CAP_SERVTYPE_BESTEFFORT;
+The idea is that everything that is time critical, has a timer/timeout
+associated, should use HCI_PRIO_MAX, I thought this was the case here.
 
-If this patches only adds supports for Best Effort why should care about the
-others services types now like the code you added above. Why is the if
-(local_service == L2CAP_SERVTYPE_BESTEFFORT) needed then?
+>
+>>       if (IS_ERR(skb))
+>>               return PTR_ERR(skb);
+>>
+>> @@ -1593,7 +1610,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+>>                       buflen = len;
+>>               }
+>>
+>> -             skb = l2cap_create_iframe_pdu(chan, msg, buflen, control, 0);
+>> +             skb = l2cap_create_iframe_pdu(chan, msg, buflen, HCI_PRIO_MAX,
+>> +                                                             control, 0);
+>
+> same here.
 
-	Gustavo
+Here too.
+
+-- 
+Luiz Augusto von Dentz
