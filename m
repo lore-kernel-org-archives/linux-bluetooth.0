@@ -1,27 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 12:47:59 +0300
+Date: Wed, 24 Aug 2011 12:45:11 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] Change default Link Loss alert level to high
-Message-ID: <20110824094759.GB21202@dell>
-References: <1313763119-8551-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] adapter: add Trusted to DeviceFound signal
+Message-ID: <20110824094511.GA21202@dell>
+References: <1313698511-13365-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313763119-8551-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1313698511-13365-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Gustavo,
 
-On Fri, Aug 19, 2011, Claudio Takahasi wrote:
-> After creating a Proximity device, Link Loss alert level is always
-> written. Setting the default value to "high" enables alert without
-> requiring an application to change it later.
+On Thu, Aug 18, 2011, Gustavo F. Padovan wrote:
+> doc says that this signal is has the same parameters as GetProperties
+> reply.
 > ---
->  proximity/monitor.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> Not sure if this is really need. It at least could save a call to GetProperties
+> 
+>  src/adapter.c |    7 +++++--
+>  1 files changed, 5 insertions(+), 2 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
