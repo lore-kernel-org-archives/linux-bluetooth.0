@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 17:46:31 -0300
+Date: Wed, 24 Aug 2011 17:43:04 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [RFC 2/7] Bluetooth: EFS: definitions and headers for EFS
-Message-ID: <20110824204631.GG2662@joana>
+Message-ID: <20110824204304.GF2662@joana>
 References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1313653502-6303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
@@ -13,6 +13,7 @@ In-Reply-To: <1313653502-6303-3-git-send-email-Andrei.Emeltchenko.news@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
 * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:44:57 +0300]:
 
@@ -71,7 +72,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 > +#define L2CAP_SERVTYPE_NOTRAFIC		0x00
 > +#define L2CAP_SERVTYPE_BESTEFFORT	0x01
 > +#define L2CAP_SERVTYPE_GUARANTEED	0x02
+> +
+>  struct l2cap_disconn_req {
+>  	__le16     dcid;
+>  	__le16     scid;
+> @@ -365,6 +384,22 @@ struct l2cap_chan {
+>  	__u8		remote_max_tx;
+>  	__u16		remote_mps;
+>  
+> +	__u8		local_id;
+> +	__u8		local_stype;
+> +	__u16		local_msdu;
+> +	__u32		local_sdu_itime;
+> +	__u32		local_acc_lat;
+> +	__u32		local_flush_to;
+> +
+> +	__u8		remote_id;
+> +	__u8		remote_stype;
+> +	__u16		remote_msdu;
+> +	__u32		remote_sdu_itime;
+> +	__u32		remote_acc_lat;
+> +	__u32		remote_flush_to;
+> +
+> +	__u8            ext_flowspec_enable;
 
-And these could be only SERV instead of SERVTYPE
+this one could be a flag into conf_state or conn_state.
+
+> +
+>  	struct timer_list	chan_timer;
+>  	struct timer_list	retrans_timer;
+>  	struct timer_list	monitor_timer;
+> @@ -452,6 +487,8 @@ enum {
+>  	CONF_CONNECT_PEND,
+>  	CONF_NO_FCS_RECV,
+>  	CONF_STATE2_DEVICE,
+> +	CONF_LOCAL_PEND,
+> +	CONF_REMOTE_PEND,
+
+What do CONF_LOCAL_PEND and CONF_REMOTE_PEND mean?
 
 	Gustavo
