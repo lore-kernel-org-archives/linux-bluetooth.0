@@ -1,84 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Wed, 24 Aug 2011 10:05:01 -0400
-Subject: [RFC 2/4] Bluetooth: Expose hci connections through debugfs
-Message-ID: <1314194701.2219.15.camel@THOR>
+Date: Wed, 24 Aug 2011 10:05:05 -0400
+Subject: [RFC 3/4] Bluetooth: Track per-connection stats
+Message-ID: <1314194705.2219.16.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add "connections" file to "hciX" debugfs directory and output
-hci_conn internal state.
+Add per-hci connection rx/tx stats and expose through debugfs
+"connections" file.
 ---
- net/bluetooth/hci_sysfs.c |   46 +++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 46 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |   12 ++++++++++++
+ net/bluetooth/hci_sysfs.c        |   17 +++++++++++++++++
+ 2 files changed, 29 insertions(+), 0 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6c994c0..1f2ed18 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -208,6 +208,16 @@ struct hci_dev {
+ 	int (*ioctl)(struct hci_dev *hdev, unsigned int cmd, unsigned long arg);
+ };
+ 
++struct hci_conn_stats {
++	__u32	null_rx;
++	__u32	err_rx;
++	__u32	err_tx;
++	__u32	pkt_rx;
++	__u32	pkt_tx;
++	__u32	byte_rx;
++	__u32	byte_tx;
++};
++
+ struct hci_conn {
+ 	struct list_head list;
+ 
+@@ -253,6 +263,8 @@ struct hci_conn {
+ 	struct work_struct work_add;
+ 	struct work_struct work_del;
+ 
++	struct hci_conn_stats stats;
++
+ 	struct device	dev;
+ 	atomic_t	devref;
+ 
 diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 22f1a6c..3d00769 100644
+index 3d00769..0775398 100644
 --- a/net/bluetooth/hci_sysfs.c
 +++ b/net/bluetooth/hci_sysfs.c
-@@ -542,6 +542,49 @@ static int auto_accept_delay_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
- 					auto_accept_delay_set, "%llu\n");
+@@ -568,6 +568,23 @@ static int connections_show(struct seq_file *f, void *p)
+ 				atomic_read(&c->devref));
+ 	}
  
-+static int connections_show(struct seq_file *f, void *p)
-+{
-+	struct hci_dev *hdev = f->private;
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct list_head *l;
-+	
-+	hci_dev_lock_bh(hdev);
-+
-+	seq_printf(f, "                          s            a     p\n");
-+	seq_printf(f, "                  h   t   t  o  s  k   u  s  s  p  r\n");
-+	seq_printf(f, "                  n   y   a  u  s  e   t  e  e  i  e\n");
-+	seq_printf(f, "Dest              l   p   t  t  p  y   h  c  c  n  f\n");
++	seq_printf(f, "\n\n                  Rx                           "
++					"Tx\n");
++	seq_printf(f,     "Dest              bytes       pkt    err null  "
++					"bytes       pkt    err unack\n");
 +
 +	list_for_each(l, &h->list) {
 +		struct hci_conn *c;
 +		c = list_entry(l, struct hci_conn, list);
 +
-+		seq_printf(f, "%s %-3d %3s %d  %d  %d 0x%.2x %d  %d  %d %2d  %d\n",
-+				batostr(&c->dst), c->handle, 
-+				link_typetostr(c->type),
-+				c->state, c->out, c->ssp_mode,
-+				c->key_type, c->auth_type, c->sec_level,
-+				c->pending_sec_level, c->pin_length,
-+				atomic_read(&c->devref));
-+	}
++		seq_printf(f,"%s %-11u %-6u %-3u %-5u %-11u %-6u %-3u %u\n",
++				batostr(&c->dst),
++				c->stats.byte_rx, c->stats.pkt_rx,
++				c->stats.err_rx, c->stats.null_rx,
++				c->stats.byte_tx, c->stats.pkt_tx,
++				c->stats.err_tx, c->sent);
++	};
 +
-+	hci_dev_unlock_bh(hdev);
-+
-+	return 0;
-+}
-+
-+static int connections_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, connections_show, inode->i_private);
-+}
-+
-+static const struct file_operations connections_fops = {
-+	.open		= connections_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- int hci_register_sysfs(struct hci_dev *hdev)
- {
- 	struct device *dev = &hdev->dev;
-@@ -578,6 +621,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
+ 	hci_dev_unlock_bh(hdev);
  
- 	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
- 						&auto_accept_delay_fops);
-+
-+	debugfs_create_file("connections", 0444, hdev->debugfs, hdev,
-+						&connections_fops);
  	return 0;
- }
- 
 -- 
 1.7.4.1
 
