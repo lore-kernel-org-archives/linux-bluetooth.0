@@ -1,71 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Aug 2011 21:26:21 -0300
+Date: Wed, 24 Aug 2011 21:18:51 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 4/5 v2] Bluetooth: prioritizing data over HCI
-Message-ID: <20110825002621.GB5462@joana>
+Subject: Re: [RFC 2/5 v2] Bluetooth: set skbuffer priority based on L2CAP
+ socket priority
+Message-ID: <20110825001851.GA5462@joana>
 References: <1313587384-2653-1-git-send-email-luiz.dentz@gmail.com>
- <1313587384-2653-5-git-send-email-luiz.dentz@gmail.com>
- <20110824200446.GD2662@joana>
- <CABBYNZJB8sOawyqJM-p3yyhRKQBq46Q2qm3V0Jio4FwFm-OWVA@mail.gmail.com>
+ <1313587384-2653-3-git-send-email-luiz.dentz@gmail.com>
+ <20110824193708.GC2662@joana>
+ <CABBYNZJgHkqPE28UfbM1oO0WdSdhhaRtGzvRsLQ-Ur4tzOVQWQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJB8sOawyqJM-p3yyhRKQBq46Q2qm3V0Jio4FwFm-OWVA@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZJgHkqPE28UfbM1oO0WdSdhhaRtGzvRsLQ-Ur4tzOVQWQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-25 00:53:04 +0300]:
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-25 00:27:31 +0300]:
 
 > Hi Gustavo,
 > 
-> On Wed, Aug 24, 2011 at 11:04 PM, Gustavo Padovan
+> On Wed, Aug 24, 2011 at 10:37 PM, Gustavo Padovan
 > <padovan@profusion.mobi> wrote:
 > > Hi Luiz,
 > >
-> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-17 16:23:03 +0300]:
+> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-17 16:23:01 +0300]:
 > >
 > >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > >>
-> >> This implement priority based scheduler using skbuffer priority set via
-> >> SO_PRIORITY socket option.
+> >> This uses SO_PRIORITY to set the skbuffer priority field
 > >>
-> >> It introduces hci_chan_hash (list of HCI Channel/hci_chan) per connection,
-> >> each item in this list refer to a L2CAP connection and it is used to
-> >> queue the data for transmission.
+> >> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >> ---
+> >>  include/net/bluetooth/hci_core.h |    3 ++
+> >>  include/net/bluetooth/l2cap.h    |    3 +-
+> >>  net/bluetooth/l2cap_core.c       |   45 +++++++++++++++++++++++++++-----------
+> >>  net/bluetooth/l2cap_sock.c       |    2 +-
+> >>  4 files changed, 38 insertions(+), 15 deletions(-)
 > >>
-> >> Each connection continue to have a queue but it is only used for time
-> >> critical packets such the L2CAP commands and it is always processed
-> >> before the channels thus it can be considered the highest priority.
+> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> index e2ba4d6..0742828 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -32,6 +32,9 @@
+> >>  #define HCI_PROTO_L2CAP      0
+> >>  #define HCI_PROTO_SCO        1
+> >>
+> >> +/* HCI priority */
+> >> +#define HCI_PRIO_MAX 7
+> >> +
+> >>  /* HCI Core structures */
+> >>  struct inquiry_data {
+> >>       bdaddr_t        bdaddr;
+> >> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >> index 4f34ad2..f018e5d 100644
+> >> --- a/include/net/bluetooth/l2cap.h
+> >> +++ b/include/net/bluetooth/l2cap.h
+> >> @@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
+> >>  void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+> >>  void l2cap_chan_destroy(struct l2cap_chan *chan);
+> >>  int l2cap_chan_connect(struct l2cap_chan *chan);
+> >> -int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
+> >> +int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+> >> +                                                             u32 priority);
 > >
-> > I think we can drop the connection and queue create a channel by default for
-> > the special L2CAP channels, BR/EDR and LE signalling, SMP and AMP Manager.
-> > Those will have high priority of course. Standardize this in just one way to
-> > send packets would be better. It simplifies the sending logic and reduces the
-> > code.
+> > I think priority could be part of struct l2cap_chan, so we avoid an extra
+> > parameter in some calls here. Priority is also accessible from chan->sk, but I
+> > would like to avoid more references to sk in l2cap core.
 > 
-> Sure, but then we need something to identify this special hci_chan and
-> it needs to be added to the list to be processed together, not sure if
-> it will simplify that much in the end.
+> It would be great and simplify a lot the scheduler, but Im afraid have
+> to do it per skbuffer because of RFCOMM, besides it gives more
+> flexibility if we latter need to move to another queueing discipline.
 
-It could be created and added to the connection hash when we create the
-l2cap_conn and then have a l2cap_conn->hchan for it. IMHO this simplifies the
-scheduler and the logic.
+It looks we still can do that without adding a parameter to l2cap_chan_send(),
+if needed we can step back on what I said before and use sk->priority inside
+l2cap_core.c.
 
-<...>
+Actually we need to fix the mess that the interaction between L2CAP and
+RFCOMM is, after that we will be able to handle rfcomm channels in the same
+way we are going to do for ERTM channels.
 
+> 
+> >>  void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+> >>
+> >>  #endif /* __L2CAP_H */
+> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >> index 3204ba8..3af0569 100644
+> >> --- a/net/bluetooth/l2cap_core.c
+> >> +++ b/net/bluetooth/l2cap_core.c
+> >> @@ -1245,7 +1245,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+> >>       struct hci_conn *hcon = chan->conn->hcon;
+> >>       u16 flags;
+> >>
+> >> -     BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
+> >> +     BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
+> >> +                                                     skb->priority);
+> >>
+> >>       if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
+> >>               flags = ACL_START_NO_FLUSH;
+> >> @@ -1451,6 +1452,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+> >>               if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+> >>                       return -EFAULT;
+> >>
+> >> +             (*frag)->priority = skb->priority;
+> >> +
+> >>               sent += count;
+> >>               len  -= count;
+> >>
+> >> @@ -1460,7 +1463,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
+> >>       return sent;
+> >>  }
+> >>
+> >> -struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+> >> +static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
+> >> +                                             struct msghdr *msg, size_t len,
+> >> +                                             u32 priority)
+> >>  {
+> >>       struct sock *sk = chan->sk;
+> >>       struct l2cap_conn *conn = chan->conn;
+> >> @@ -1468,7 +1473,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+> >>       int err, count, hlen = L2CAP_HDR_SIZE + 2;
+> >>       struct l2cap_hdr *lh;
+> >>
+> >> -     BT_DBG("sk %p len %d", sk, (int)len);
+> >> +     BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+> >>
+> >>       count = min_t(unsigned int, (conn->mtu - hlen), len);
+> >>       skb = bt_skb_send_alloc(sk, count + hlen,
+> >> @@ -1476,6 +1481,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+> >>       if (!skb)
+> >>               return ERR_PTR(err);
+> >>
+> >> +     skb->priority = priority;
+> >> +
+> >>       /* Create L2CAP header */
+> >>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+> >>       lh->cid = cpu_to_le16(chan->dcid);
+> >> @@ -1490,7 +1497,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
+> >>       return skb;
+> >>  }
+> >>
+> >> -struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+> >> +static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
+> >> +                                             struct msghdr *msg, size_t len,
+> >> +                                             u32 priority)
+> >>  {
+> >>       struct sock *sk = chan->sk;
+> >>       struct l2cap_conn *conn = chan->conn;
+> >> @@ -1506,6 +1515,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+> >>       if (!skb)
+> >>               return ERR_PTR(err);
+> >>
+> >> +     skb->priority = priority;
+> >> +
+> >>       /* Create L2CAP header */
+> >>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+> >>       lh->cid = cpu_to_le16(chan->dcid);
+> >> @@ -1519,7 +1530,10 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
+> >>       return skb;
+> >>  }
+> >>
+> >> -struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len, u16 control, u16 sdulen)
+> >> +static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+> >> +                                             struct msghdr *msg, size_t len,
+> >> +                                             u32 priority, u16 control,
+> >> +                                             u16 sdulen)
+> >>  {
+> >>       struct sock *sk = chan->sk;
+> >>       struct l2cap_conn *conn = chan->conn;
+> >> @@ -1527,7 +1541,7 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+> >>       int err, count, hlen = L2CAP_HDR_SIZE + 2;
+> >>       struct l2cap_hdr *lh;
+> >>
+> >> -     BT_DBG("sk %p len %d", sk, (int)len);
+> >> +     BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
+> >>
+> >>       if (!conn)
+> >>               return ERR_PTR(-ENOTCONN);
+> >> @@ -1544,6 +1558,8 @@ struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct msghdr *
+> >>       if (!skb)
+> >>               return ERR_PTR(err);
+> >>
+> >> +     skb->priority = priority;
+> >> +
+> >>       /* Create L2CAP header */
+> >>       lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+> >>       lh->cid = cpu_to_le16(chan->dcid);
+> >> @@ -1574,7 +1590,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
+> >>
+> >>       skb_queue_head_init(&sar_queue);
+> >>       control = L2CAP_SDU_START;
+> >> -     skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
+> >> +     skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps,
+> >> +                                             HCI_PRIO_MAX, control, len);
 > >
-> > IMHO when le_pkts equals zero(i.e., ACL and LE use the same buffer) we should
-> > handle LE sending together with the ACL sending. This way we are prioritizing
-> > ACL data over LE if we call hci_sched_acl before hci_sched_le.
+> >
+> > HCI_PRIO_MAX, why?
 > 
-> iirc Peter has some patch that merges them, the problem is that
-> conn->type cannot be set to ACL since it is used for other purposes,
-> but perhaps we gonna have a different type to identify the buffer type
-> the connection is using.
+> The idea is that everything that is time critical, has a timer/timeout
+> associated, should use HCI_PRIO_MAX, I thought this was the case here.
 
-Yeah, I've read it just after reply to this email. ;)
+I got that, but this is not the case here. These a re normal ERTM/Streaming
+packets ;)
 
 	Gustavo
