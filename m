@@ -1,80 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 25 Aug 2011 14:06:21 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org,
+	Jim Paris <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>,
+	"Pascal A . Brisset" <pascal44973@pabr.org>,
+	Marcin Tolysz <tolysz@gmail.com>,
+	Christian Birchinger <joker@netswarm.net>,
+	Filipe Lopes <falktx@gmail.com>, Alan Ott <alan@signal11.us>,
+	Mikko Virkkila <virkkila@kapsi.fi>,
+	Simon Wood <simon@mungewell.org>, Arc Riley <arcriley@gmail.com>
+Subject: Re: [PATCH BlueZ 3/4] Link to udev only when needed
+Message-ID: <20110825170621.GB27645@samus.indt.org>
+References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
+ <1312553358-26280-4-git-send-email-ospite@studenti.unina.it>
+ <20110818124438.40e3e125c8de872e1320f511@studenti.unina.it>
+ <1313709545.3373.196.camel@aeonflux>
+ <20110819105802.b7f5eda46e58b32677fdb804@studenti.unina.it>
+ <20110819210854.81dff694ad455da3ed0e6e96@studenti.unina.it>
+ <20110825161454.45a0b27998f577a737a2e579@studenti.unina.it>
 MIME-Version: 1.0
-In-Reply-To: <1314222672.2219.66.camel@THOR>
-References: <1313596884-8733-1-git-send-email-doronkeren@ti.com>
-	<1313617329.3373.188.camel@aeonflux>
-	<13872098A06B02418CF379A158C0F1460162C51B1A@dnce02.ent.ti.com>
-	<CANq1E4TKSJZF+HoV+XuopnupRmSvDiEOu72b+7YX4O2wR6Hd9g@mail.gmail.com>
-	<1314114448.4095.40.camel@THOR>
-	<CANq1E4SnHHRUV6PQpgxyiXvFyebjmfF9UVahG3VUOk2w+m4=FQ@mail.gmail.com>
-	<1314222672.2219.66.camel@THOR>
-Date: Thu, 25 Aug 2011 19:11:33 +0200
-Message-ID: <CANq1E4RuGAyjegMpfeCKNEQ-UP9xRyuCP7qMurbsMEEEfVRvKw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth-next: Add incremental indexing in sysfs HCI
- connection name.
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110825161454.45a0b27998f577a737a2e579@studenti.unina.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 24, 2011 at 11:51 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
-> Hi David,
->
->> What are possible reasons why an l2cap connection can be available
->> without an underlying ACL connection?
->
-> Well, if the ACL connection is gone, the l2cap channels should be gone
-> as well, but the matching l2cap sockets stay around because of the
-> references on them. But the sockets should be in state BT_CLOSED, which
-> is tested just prior to calling hidp_add_connection.
+Hi Antonio,
 
-If I disconnect my HID device, the l2cap sockets stay alive for 20
-seconds! Even though the baseband connection is closed. I think this
-bug is not related to the hid/sysfs bug here, but may be also
-interesting.
+On 16:14 Thu 25 Aug, Antonio Ospite wrote:
+> On Fri, 19 Aug 2011 21:08:54 +0200
+> Antonio Ospite <ospite@studenti.unina.it> wrote:
+> 
+> > On Fri, 19 Aug 2011 10:58:02 +0200
+> > Antonio Ospite <ospite@studenti.unina.it> wrote:
+> > 
+> > > On Thu, 18 Aug 2011 16:18:57 -0700
+> > > Marcel Holtmann <marcel@holtmann.org> wrote:
+> > > 
+> > [...]
+> > > > 
+> > > > I rather have the Sixaxis plugin being an external plugin only then. So
+> > > > you are not allowed to make this builtin.
+> > > > 
+> > > 
+> > > Marcel, I guess that an _external_ plugin in BlueZ context is one which
+> > > is not embedded in the bluetoothd binary but rather distributed as a
+> > > shared object, isn't it? Are there examples of such a plugin in bluez
+> > > tree I can copy from?
+> > >
+> > 
+> > OK, I think I've got it, it is external-dummy, this is how I did it:
+> > 
+> > ---
+> >  Makefile.am |   10 ++++++----
+> >  1 files changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/Makefile.am b/Makefile.am
+> > index 4bcff4d..ff33bf0 100644
+> > --- a/Makefile.am
+> > +++ b/Makefile.am
+> > @@ -230,8 +230,10 @@ builtin_sources += thermometer/main.c \
+> >  endif
+> >  
+> >  if SIXAXISPLUGIN
+> > -builtin_modules += sixaxis
+> > -builtin_sources += plugins/sixaxis.c
+> > +plugin_LTLIBRARIES += plugins/sixaxis.la
+> > +plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
+> > +plugins_sixaxis_la_LDFLAGS = -module -avoid-version -no-undefined @UDEV_LIBS@
+> > +plugins_sixaxis_la_CFLAGS = -fvisibility=hidden @DBUS_CFLAGS@ @GLIB_CFLAGS@ @UDEV_CFLAGS@
+> >  endif
+> > 
+> 
+> This is not enough, the external plugin can be compiled but I can be used
+> at runtime because it is using functions from src/storage.c and others,
+> which seem to be embedded inside bluetoothd only, so I get:
+> 
+> bluetoothd[23459]: Can't load plugin \
+>   /home/ao2/Proj/PS3/PS3_sixaxis/bluez/plugins/.libs/playstation-peripheral.so: \
+>   /home/ao2/Proj/PS3/PS3_sixaxis/bluez/plugins/.libs/playstation-peripheral.so: \
+>   undefined symbol: write_device_name
+> 
+> I could link the needed object files like storage.o and company into the
+> plugin binary, but definitely this doesn't look OK. Should a shared library
+> provide those "utility" functions to bluetoothd _and_ external plugins?
+> 
+> This plugin is the first non-trivial external plugin I can see in the tree,
+> so maybe this problem has never showed up before.
 
-> Possible reasons why the apparent contradiction:
-> 1. Neither socket is locked by the hidp driver AFAICT. If true, then the
-> sock state (and by extension, the l2cap channels and hci connection list
-> could change at any time). l2cap_conn_del acquires the socket lock prior
-> to l2cap_chan_del.
+The problem is the visibility of the symbols, src/bluetooth.ver defines
+which symbols should[1] be visible to plugins. Every plugin should only
+depend on those methods from the "core".
 
-I guess the problem is that the l2cap channels are BT_CONNECTED when
-HIDP checks them but while hidp_add_conenction is called the l2cap
-channels close and the ACL connection is removed. hidp_add_connection
-then fails because it can't find the ACL connection. This is fixed by
-my patch but there is still a race condition. The ACL lookup does not
-increase reference count of the connection and hence it may disappear
-while we hold a pointer to it.
+If we want to keep the sixaxis plugin external we need to make the
+symbols it need visible, but I wonder if that is right solution.
 
-> 2. HCI connection list (conn_hash) is corrupted. hidp_get_device looks
-> smp-unsafe to me. I think it needs to be acquiring device lock via
-> hci_dev_lock_bh.
-> 3. Some other unknown race.
->
-> That's why a debug log would help. It would help establish when
-> l2cap_conn_del and hci_conn_del are called relative to
-> hidp_add_connection, and what the other pre-conditions are.
+[1] Seems that with builtin plugins that visibility enforcement doesn't
+work, right?
 
-It is quite hard to reproduce this bug, but I tried again a couple of
-times and got a full debug log now. However, after looking at it I
-noticed that I did not apply the patch from Doron Keren so this log is
-triggered by the sysfs-duplicate bug and not by the one I discovered.
+> 
+> Thanks,
+>    Antonio
+> 
+> -- 
+> Antonio Ospite
+> http://ao2.it
+> 
+> PGP public key ID: 0x4553B001
+> 
+> A: Because it messes up the order in which people normally read text.
+>    See http://en.wikipedia.org/wiki/Posting_style
+> Q: Why is top-posting such a bad thing?
 
-Last few lines with OOPS message from the kernel log:
-https://gist.github.com/1171138
-Full kernel.log for the session (including the log above):
-http://dl.dropbox.com/u/1475019/kernel.txt
 
->
-> Regards,
-> Peter Hurley
->
 
-I will try again with this patch applied, but I think both bugs are
-related to each other.
-
-Regards
-David
+Cheers,
+-- 
+Vinicius
