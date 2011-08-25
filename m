@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 24 Aug 2011 22:30:55 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/7] Bluetooth: Add support for running SMP without a
+ socket
+Message-ID: <20110825013055.GH5462@joana>
+References: <1313798816-8647-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1313798816-8647-7-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <54172CBB083A479490A4625B74A68F82@freqoneremote>
-References: <201108240807.09267.dstockwell@frequency-one.com>
-	<CABBYNZLygk5nYnnLDL8zVcq52RReaWpK7jz+g46Ttdis5ZZjjQ@mail.gmail.com>
-	<54172CBB083A479490A4625B74A68F82@freqoneremote>
-Date: Thu, 25 Aug 2011 10:44:02 +0300
-Message-ID: <CABBYNZL-DYMK=+RVWJkpvD9HscQ-21Hwq=Qt706WXk28CR4eAQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] AVRCP: Add Passthrough Signal
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: David Stockwell <dstockwell@frequency-one.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1313798816-8647-7-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Vinicius,
 
-On Thu, Aug 25, 2011 at 2:58 AM, David Stockwell
-<dstockwell@frequency-one.com> wrote:
-> +++++ OK, maybe a readwrite Passthrough property indicating how passthroughs
-> are handled: Signal, Uinput, Both, None?  Or simply a PassthruSignal
-> property (true/false, default false), given that the presence/absence of
-> /dev/uinput handles the other case?
->
-> I really think the Control should emit the signal...since it comes from a CT
-> (and not really from a MediaPlayer or somesuch).
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-08-19 21:06:55 -0300]:
 
-You are missing a very important point here, parsing of these vendor
-specific commands would have to be split to each target thus we cannot
-guarantee a consistent handling of them, if we stick to uinput I think
-we should use KEY_VENDOR, otherwise we should send the commands
-directly to the player.
+> When doing the pairing procedure we won't have an associated
+> socket, but we still have to do the SMP negotiation. This
+> adds support for encrypting the link and exchanging keys.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/l2cap_core.c |   10 ++++++++--
+>  1 files changed, 8 insertions(+), 2 deletions(-)
 
--- 
-Luiz Augusto von Dentz
+Applied, thanks.
+
+	Gustavo
