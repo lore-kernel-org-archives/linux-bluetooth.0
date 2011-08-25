@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 03/13] Revert "Bluetooth: Add support for communicating keys with userspace"
-Date: Thu, 25 Aug 2011 20:02:29 -0300
-Message-Id: <1314313359-12652-4-git-send-email-vcgomes@gmail.com>
+Subject: [PATCH v2 02/13] Bluetooth: Use the LTK after receiving a LE Security Request
+Date: Thu, 25 Aug 2011 20:02:28 -0300
+Message-Id: <1314313359-12652-3-git-send-email-vcgomes@gmail.com>
 In-Reply-To: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 References: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,123 +12,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
-This reverts commit 5a0a8b49746771fba79866fb9185ffa051a6a183.
-
-If we use separate messages and list for SMP specific keys we can
-simplify the code.
-
-Conflicts:
-
-	net/bluetooth/mgmt.c
+When receiving a security request from the remote device we should find
+if there is already a LTK associated with the remote device, if found
+we should use it to encrypt the link.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/mgmt.c |   60 ++++++++++++-------------------------------------
- 1 files changed, 15 insertions(+), 45 deletions(-)
+ net/bluetooth/smp.c |   46 ++++++++++++++++++++++++++++------------------
+ 1 files changed, 28 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4f91a00..5809559 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -908,7 +908,7 @@ static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
- 	struct hci_dev *hdev;
- 	struct mgmt_cp_load_keys *cp;
- 	u16 key_count, expected_len;
--	int i, err;
-+	int i;
- 
- 	cp = (void *) data;
- 
-@@ -918,9 +918,9 @@ static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
- 	key_count = get_unaligned_le16(&cp->key_count);
- 
- 	expected_len = sizeof(*cp) + key_count * sizeof(struct mgmt_key_info);
--	if (expected_len > len) {
--		BT_ERR("load_keys: expected at least %u bytes, got %u bytes",
--							expected_len, len);
-+	if (expected_len != len) {
-+		BT_ERR("load_keys: expected %u bytes, got %u bytes",
-+							len, expected_len);
- 		return -EINVAL;
- 	}
- 
-@@ -942,36 +942,17 @@ static int load_keys(struct sock *sk, u16 index, unsigned char *data, u16 len)
- 	else
- 		clear_bit(HCI_DEBUG_KEYS, &hdev->flags);
- 
--	len -= sizeof(*cp);
--	i = 0;
--
--	while (i < len) {
--		struct mgmt_key_info *key = (void *) cp->keys + i;
--
--		i += sizeof(*key) + key->dlen;
--
--		if (key->type == HCI_LK_SMP_LTK) {
--			struct key_master_id *id = (void *) key->data;
--
--			if (key->dlen != sizeof(struct key_master_id))
--				continue;
--
--			hci_add_ltk(hdev, 0, &key->bdaddr, key->pin_len,
--						id->ediv, id->rand, key->val);
--
--			continue;
--		}
-+	for (i = 0; i < key_count; i++) {
-+		struct mgmt_key_info *key = &cp->keys[i];
- 
- 		hci_add_link_key(hdev, NULL, 0, &key->bdaddr, key->val, key->type,
- 								key->pin_len);
- 	}
- 
--	err = cmd_complete(sk, index, MGMT_OP_LOAD_KEYS, NULL, 0);
--
- 	hci_dev_unlock_bh(hdev);
- 	hci_dev_put(hdev);
- 
--	return err;
-+	return 0;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 74afdb7..fd5e1ca 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -513,6 +513,29 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return 0;
  }
  
- static int remove_key(struct sock *sk, u16 index, unsigned char *data, u16 len)
-@@ -2012,28 +1993,17 @@ int mgmt_connectable(u16 index, u8 connectable)
- 
- int mgmt_new_key(u16 index, struct link_key *key, u8 persistent)
++static u8 smp_ltk_encrypt(struct l2cap_conn *conn)
++{
++	struct link_key *key;
++	struct key_master_id *master;
++	struct hci_conn *hcon = conn->hcon;
++
++	key = hci_find_link_key_type(hcon->hdev, conn->dst,
++						HCI_LK_SMP_LTK);
++	if (!key)
++		return 0;
++
++	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND,
++					&hcon->pend))
++		return 1;
++
++	master = (void *) key->data;
++	hci_le_start_enc(hcon, master->ediv, master->rand,
++						key->val);
++	hcon->enc_key_size = key->pin_len;
++
++	return 1;
++
++}
+ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
  {
--	struct mgmt_ev_new_key *ev;
--	int err, total;
+ 	struct smp_cmd_security_req *rp = (void *) skb->data;
+@@ -522,6 +545,9 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	BT_DBG("conn %p", conn);
+ 
++	if (smp_ltk_encrypt(conn))
++		return 0;
++
+ 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
+ 		return 0;
+ 
+@@ -556,25 +582,9 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
+ 	if (hcon->sec_level >= sec_level)
+ 		return 1;
+ 
+-	if (hcon->link_mode & HCI_LM_MASTER) {
+-		struct link_key *key;
 -
--	total = sizeof(struct mgmt_ev_new_key) + key->dlen;
--	ev = kzalloc(total, GFP_ATOMIC);
--	if (!ev)
--		return -ENOMEM;
+-		key = hci_find_link_key_type(hcon->hdev, conn->dst,
+-							HCI_LK_SMP_LTK);
+-		if (key) {
+-			struct key_master_id *master = (void *) key->data;
 -
--	bacpy(&ev->key.bdaddr, &key->bdaddr);
--	ev->key.type = key->type;
--	memcpy(ev->key.val, key->val, 16);
--	ev->key.pin_len = key->pin_len;
--	ev->key.dlen = key->dlen;
--	ev->store_hint = persistent;
+-			if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND,
+-							&hcon->pend))
+-				goto done;
 -
--	memcpy(ev->key.data, key->data, key->dlen);
-+	struct mgmt_ev_new_key ev;
+-			hci_le_start_enc(hcon, master->ediv, master->rand,
+-								key->val);
+-			hcon->enc_key_size = key->pin_len;
+-
++	if (hcon->link_mode & HCI_LM_MASTER)
++		if (smp_ltk_encrypt(conn))
+ 			goto done;
+-		}
+-	}
  
--	err = mgmt_event(MGMT_EV_NEW_KEY, index, ev, total, NULL);
-+	memset(&ev, 0, sizeof(ev));
- 
--	kfree(ev);
-+	ev.store_hint = persistent;
-+	bacpy(&ev.key.bdaddr, &key->bdaddr);
-+	ev.key.type = key->type;
-+	memcpy(ev.key.val, key->val, 16);
-+	ev.key.pin_len = key->pin_len;
- 
--	return err;
-+	return mgmt_event(MGMT_EV_NEW_KEY, index, &ev, sizeof(ev), NULL);
- }
- 
- int mgmt_connected(u16 index, bdaddr_t *bdaddr, u8 link_type)
+ 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->pend))
+ 		return 0;
 -- 
 1.7.6
 
