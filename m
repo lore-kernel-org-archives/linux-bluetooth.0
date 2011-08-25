@@ -1,45 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/2] hcidump: decode extended window size option
-Date: Fri, 26 Aug 2011 10:17:43 +0300
-Message-Id: <1314343064-5181-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 11/13] Bluetooth: Remove support for other SMP keys than the LTK
+Date: Thu, 25 Aug 2011 20:02:37 -0300
+Message-Id: <1314313359-12652-12-git-send-email-vcgomes@gmail.com>
+In-Reply-To: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
+References: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
+For now, only the LTK is properly supported. We are able to receive
+and generate the other types of keys, but we are not able to use
+them. So it's better not request them to be distributed.
+
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- parser/l2cap.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ net/bluetooth/smp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 6345f8d..217008d 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -560,6 +560,12 @@ static void conf_opt(int level, void *ptr, int len, int in, uint16_t cid)
- 			conf_efs(h->val);
- 			break;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 5e6ee28..2a96621 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -213,7 +213,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
  
-+		case L2CAP_CONF_EWS:
-+			printf("EWS");
-+			if (h->len > 0)
-+				printf(" %d", get_val(h->val, h->len));
-+			break;
-+
- 		default:
- 			printf("Unknown (type %2.2x, len %d)", h->type & 0x7f, h->len);
- 			break;
-@@ -598,6 +604,9 @@ static void conf_list(int level, uint8_t *list, int len)
- 		case L2CAP_CONF_EFS:
- 			printf("EFS ");
- 			break;
-+		case L2CAP_CONF_EWS:
-+			printf("EWS ");
-+			break;
- 		default:
- 			printf("%2.2x ", list[i] & 0x7f);
- 			break;
+ 	dist_keys = 0;
+ 	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->flags)) {
+-		dist_keys = SMP_DIST_ENC_KEY | SMP_DIST_ID_KEY | SMP_DIST_SIGN;
++		dist_keys = SMP_DIST_ENC_KEY;
+ 		authreq |= SMP_AUTH_BONDING;
+ 	}
+ 
 -- 
-1.7.4.1
+1.7.6
 
