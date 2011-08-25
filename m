@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 05/13] Bluetooth: Add support for cleaning the SMP key list
-Date: Thu, 25 Aug 2011 20:02:31 -0300
-Message-Id: <1314313359-12652-6-git-send-email-vcgomes@gmail.com>
+Subject: [PATCH v2 04/13] Bluetooth: Add structures for the new SMP messages
+Date: Thu, 25 Aug 2011 20:02:30 -0300
+Message-Id: <1314313359-12652-5-git-send-email-vcgomes@gmail.com>
 In-Reply-To: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 References: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,61 +14,91 @@ From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   14 ++++++++++++++
- 2 files changed, 15 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |   24 ++++++++++++++++++++++++
+ include/net/bluetooth/mgmt.h     |   24 ++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 8ae02c7..4da0f16 100644
+index 5b92442..8ae02c7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -593,6 +593,7 @@ int hci_link_keys_clear(struct hci_dev *hdev);
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int hci_add_link_key(struct hci_dev *hdev, struct hci_conn *conn, int new_key,
- 			bdaddr_t *bdaddr, u8 *val, u8 type, u8 pin_len);
-+int hci_smp_keys_clear(struct hci_dev *hdev);
- struct link_key *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, u8 rand[8]);
- struct link_key *hci_find_link_key_type(struct hci_dev *hdev,
- 					bdaddr_t *bdaddr, u8 type);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0f1d2d8..6f05cc5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1005,6 +1005,18 @@ int hci_link_keys_clear(struct hci_dev *hdev)
- 	return 0;
- }
+@@ -89,6 +89,28 @@ struct link_key_data {
+ 	u8 data[0];
+ } __packed;
  
-+int hci_smp_keys_clear(struct hci_dev *hdev)
-+{
-+	struct smp_link_key *k, *tmp;
++struct smp_ltk_info {
++	u8 enc_size;
++	u16 ediv;
++	u8 rand[8];
++} __packed;
 +
-+	list_for_each_entry_safe(k, tmp, &hdev->smp_keys, list) {
-+		list_del(&k->list);
-+		kfree(k);
-+	}
++struct smp_irsk_info {
++	u8 addr_type;
++} __packed;
 +
-+	return 0;
-+}
++struct smp_link_key {
++	struct list_head list;
++	bdaddr_t bdaddr;
++	u8 type;
++	u8 pin_len;
++	u8 val[16];
++	union {
++		struct smp_ltk_info ltk;
++		struct smp_irsk_info irsk;
++	};
++} __packed;
 +
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
- 	struct list_head *p;
-@@ -1486,6 +1498,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	INIT_LIST_HEAD(&hdev->uuids);
+ struct link_key {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+@@ -203,6 +225,8 @@ struct hci_dev {
  
- 	INIT_LIST_HEAD(&hdev->link_keys);
-+	INIT_LIST_HEAD(&hdev->smp_keys);
+ 	struct list_head	link_keys;
  
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
++	struct list_head	smp_keys;
++
+ 	struct list_head	remote_oob_data;
  
-@@ -1573,6 +1586,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 	hci_blacklist_clear(hdev);
- 	hci_uuids_clear(hdev);
- 	hci_link_keys_clear(hdev);
-+	hci_smp_keys_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
- 	hci_adv_entries_clear(hdev);
- 	hci_dev_unlock_bh(hdev);
+ 	struct list_head	adv_entries;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 4ecf4a5..fcc6e5f 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -211,6 +211,24 @@ struct mgmt_cp_unblock_device {
+ 	bdaddr_t bdaddr;
+ } __packed;
+ 
++struct mgmt_smp_key_info {
++	bdaddr_t bdaddr;
++	u8 type;
++	u8 pin_len;
++	u8 val[16];
++	union {
++		struct smp_ltk_info ltk;
++		struct smp_irsk_info irsk;
++	};
++} __packed;
++
++#define MGMT_OP_LOAD_SMP_KEYS		0x001F
++struct mgmt_cp_load_smp_keys {
++	__u8 debug_keys;
++	__u16 key_count;
++	struct mgmt_smp_key_info keys[0];
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16 opcode;
+@@ -312,3 +330,9 @@ struct mgmt_ev_device_blocked {
+ struct mgmt_ev_device_unblocked {
+ 	bdaddr_t bdaddr;
+ } __packed;
++
++#define MGMT_EV_NEW_SMP_KEY		0x0017
++struct mgmt_ev_new_smp_key {
++	__u8 store_hint;
++	struct mgmt_smp_key_info key;
++} __packed;
 -- 
 1.7.6
 
