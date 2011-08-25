@@ -1,52 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [PATCH v2 00/13] Bluetooth: New mgmt messages for SMP Keys
-Date: Thu, 25 Aug 2011 20:02:26 -0300
-Message-Id: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH] Bluetooth: Initialize the SMP workqueue
+Date: Thu, 25 Aug 2011 19:23:04 -0300
+Message-Id: <1314310984-5697-1-git-send-email-vcgomes@gmail.com>
+In-Reply-To: <1313798415-8555-3-git-send-email-vinicius.gomes@openbossa.org>
+References: <1313798415-8555-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
-Changes from the last version:
-- Add support for removing the SMP Keys using mgmt Remove Key command;
-- Disconnect the link if the found LTK isn't accepted to encrypt the
-  link;
-- We still have no support for any key generation method that would give
-  us MITM protection, so we shouldn't say that we require it.
-- Changed the defines of the MGMT events, there was a conflict with the
-  blocked device events.
+The SMP workqueue is initialized unconditionally because it needs
+to be done during module initialization. And during this time we
+can't be sure that LE support is available.
 
-Cheers,
---
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+---
+ net/bluetooth/l2cap_core.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-Vinicius Costa Gomes (13):
-  Bluetooth: Fix sending wrong authentication requirements
-  Bluetooth: Use the LTK after receiving a LE Security Request
-  Revert "Bluetooth: Add support for communicating keys with userspace"
-  Bluetooth: Add structures for the new SMP messages
-  Bluetooth: Add support for cleaning the SMP key list
-  Bluetooth: Add handlers for the new mgmt messages
-  Bluetooth: Rename smp_key_size to enc_size
-  Bluetooth: Use the smp_keys list for accessing SMP keys
-  Bluetooth: Fix not setting a pending security level
-  Bluetooth: Fix setting the connection sec_level when encryption fails
-  Bluetooth: Remove support for other SMP keys than the LTK
-  Bluetooth: mgmt: Add support for removing SMP keys
-  Bluetooth: Disconnect the link if Encryption on LE links fails
-
- include/net/bluetooth/hci.h      |    1 +
- include/net/bluetooth/hci_core.h |   39 ++++++---
- include/net/bluetooth/mgmt.h     |   26 ++++++-
- net/bluetooth/hci_core.c         |  104 ++++++++++++++++--------
- net/bluetooth/hci_event.c        |   13 ++-
- net/bluetooth/l2cap_core.c       |    5 +-
- net/bluetooth/mgmt.c             |  165 +++++++++++++++++++++++++++----------
- net/bluetooth/smp.c              |   97 +++++++++++-----------
- 8 files changed, 298 insertions(+), 152 deletions(-)
-
---
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 09ca51e..b721f16 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4290,6 +4290,10 @@ int __init l2cap_init(void)
+ 	if (err < 0)
+ 		return err;
+ 
++	err = smp_crypto_init();
++	if (err < 0)
++		BT_DBG("SMP Initialization falied");
++
+ 	err = hci_register_proto(&l2cap_hci_proto);
+ 	if (err < 0) {
+ 		BT_ERR("L2CAP protocol registration failed");
+@@ -4307,6 +4311,7 @@ int __init l2cap_init(void)
+ 	return 0;
+ 
+ error:
++	smp_crypto_exit();
+ 	l2cap_cleanup_sockets();
+ 	return err;
+ }
+@@ -4315,6 +4320,8 @@ void l2cap_exit(void)
+ {
+ 	debugfs_remove(l2cap_debugfs);
+ 
++	smp_crypto_exit();
++
+ 	if (hci_unregister_proto(&l2cap_hci_proto) < 0)
+ 		BT_ERR("L2CAP protocol unregistration failed");
+ 
+-- 
 1.7.6
 
