@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v2 10/13] Bluetooth: Fix setting the connection sec_level when encryption fails
-Date: Thu, 25 Aug 2011 20:02:36 -0300
-Message-Id: <1314313359-12652-11-git-send-email-vcgomes@gmail.com>
+Subject: [PATCH v2 09/13] Bluetooth: Fix not setting a pending security level
+Date: Thu, 25 Aug 2011 20:02:35 -0300
+Message-Id: <1314313359-12652-10-git-send-email-vcgomes@gmail.com>
 In-Reply-To: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 References: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,27 +12,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 
-If the encryption changed event indicates that happened an error we
-should not set the security level of the connection.
+For slave initiated security, we should set a default security level,
+for now BT_SECURITY_MEDIUM.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ net/bluetooth/smp.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7aa02e2..b6f1865 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -797,7 +797,7 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 	if (conn->sec_level == BT_SECURITY_SDP)
- 		conn->sec_level = BT_SECURITY_LOW;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 4531681..5e6ee28 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -545,6 +545,8 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
--	if (conn->pending_sec_level > conn->sec_level)
-+	if (!status && conn->pending_sec_level > conn->sec_level)
- 		conn->sec_level = conn->pending_sec_level;
+ 	BT_DBG("conn %p", conn);
  
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
++	hcon->pending_sec_level = BT_SECURITY_MEDIUM;
++
+ 	if (smp_ltk_encrypt(conn))
+ 		return 0;
+ 
 -- 
 1.7.6
 
