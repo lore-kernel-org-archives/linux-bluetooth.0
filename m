@@ -1,79 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <36401DED86844B71A6F3B9DA8828616B@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>, <johan.hedberg@gmail.com>
-References: <201108240807.09267.dstockwell@frequency-one.com><CABBYNZLygk5nYnnLDL8zVcq52RReaWpK7jz+g46Ttdis5ZZjjQ@mail.gmail.com><54172CBB083A479490A4625B74A68F82@freqoneremote> <CABBYNZL-DYMK=+RVWJkpvD9HscQ-21Hwq=Qt706WXk28CR4eAQ@mail.gmail.com> <1F0E337666E14ACEB2FF4AA1846273F6@freqoneremote>
-In-Reply-To: <1F0E337666E14ACEB2FF4AA1846273F6@freqoneremote>
-Subject: Re: [PATCH 3/3] AVRCP: Add Passthrough Signal
-Date: Thu, 25 Aug 2011 08:14:53 -0500
+Date: Thu, 25 Aug 2011 10:03:14 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: Add mgmt events for blacklisting
+Message-ID: <20110825130314.GC25269@joana>
+References: <1314280082-1571-1-git-send-email-antti.julku@nokia.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=response
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1314280082-1571-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Luiz,
+Hi Antti,
 
------Original Message----- 
-From: David Stockwell
+* Antti Julku <antti.julku@nokia.com> [2011-08-25 16:48:02 +0300]:
 
-Hello, Luiz
+> Add management interface events for blocking/unblocking a device.
+> Sender of the block device command gets cmd complete and other
+> mgmt sockets get the event. Event is also sent to mgmt sockets when
+> blocking is done with ioctl, e.g when blocking a device with
+> hciconfig. This makes it possible for bluetoothd to track status
+> of blocked devices when a third party block or unblocks a device.
+> 
+> Event sending is handled in mgmt_device_blocked function which gets
+> called from hci_blacklist_add in hci_core.c. A pending command is
+> added in mgmt_block_device, so that it can found when sending the
+> event - the event is not sent to the socket from which the pending
+> command came. Locks were moved out from hci_core.c to hci_sock.c
+> and mgmt.c, because locking is needed also for mgmt_pending_add in
+> mgmt.c.
+> 
+> Signed-off-by: Antti Julku <antti.julku@nokia.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    2 +
+>  include/net/bluetooth/mgmt.h     |   10 ++++++
+>  net/bluetooth/hci_core.c         |   28 ++++-------------
+>  net/bluetooth/hci_sock.c         |   18 ++++++++++-
+>  net/bluetooth/mgmt.c             |   62 ++++++++++++++++++++++++++++++++++----
+>  5 files changed, 90 insertions(+), 30 deletions(-)
 
------Original Message----- 
-From: Luiz Augusto von Dentz
+Patch has been applied, thanks.
 
-Hi David,
-
-On Thu, Aug 25, 2011 at 2:58 AM, David Stockwell
-<dstockwell@frequency-one.com> wrote:
-> +++++ OK, maybe a readwrite Passthrough property indicating how 
-> passthroughs
-> are handled: Signal, Uinput, Both, None?  Or simply a PassthruSignal
-> property (true/false, default false), given that the presence/absence of
-> /dev/uinput handles the other case?
->
-> I really think the Control should emit the signal...since it comes from a 
-> CT
-> (and not really from a MediaPlayer or somesuch).
-
-You are missing a very important point here, parsing of these vendor
-specific commands would have to be split to each target thus we cannot
-guarantee a consistent handling of them, if we stick to uinput I think
-we should use KEY_VENDOR, otherwise we should send the commands
-directly to the player.
-
-+++++
-Actually, I expected that the routing of these passthroughs would be handled
-outside BlueZ, from Control(s) to (whatever) media playing app(s) in a
-supervisory app/daemon.  Whether the signal is issued from the Control or
-from the MediaPlayer interface is not significant to me; an easy code change
-in the patch and in my supervisory app.  Any additional thoughts or
-comments?
-+++++
-
-+++++
-
-On second/third thought: while right now the Path of the Control and the 
-MediaPlayer are the same (just different interfaces), this will probably not 
-be the same in the future.
-
-For my purposes, any Passthroughs received from a Control need to be tied 
-back to the Control, hopefully by the path (which includes the bdaddr of the 
-device).  Any routing from Control(s) to the media playing app(s) is really 
-better handled outside, in the supervisory app.  Any impacts on the state of 
-MediaPlayer are better handled outside BlueZ, looping back via the 
-supervisory app.
-
-Anyway, I know I am looking at things differently.  If this does not fit 
-into the BlueZ Scheme of things, I will be quite happy to maintain this (and 
-more) in a private fork, rebasing when warranted (while following GPL for 
-any redistribution, etc.).
-
-+++++
--- 
-Luiz Augusto von Dentz
-
-
+	Gustavo
