@@ -1,160 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Bluetooth: Add support for reusing the same hci_conn for LE links
-Date: Thu, 25 Aug 2011 19:13:16 -0300
-Message-Id: <1314310396-24432-1-git-send-email-vcgomes@gmail.com>
-In-Reply-To: <1313798816-8647-5-git-send-email-vinicius.gomes@openbossa.org>
-References: <1313798816-8647-5-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CA+i+Aw2_ZJfBbqukwVXhrOeXTpRENTNPu+225zCLRfanM7c5eQ@mail.gmail.com>
+References: <CAFVnFZafZxVJtZ1bSKSd1nSOSYBMnG9B_xs=+RqxR6OWpHUQog@mail.gmail.com>
+	<CA+i+Aw2_ZJfBbqukwVXhrOeXTpRENTNPu+225zCLRfanM7c5eQ@mail.gmail.com>
+Date: Thu, 25 Aug 2011 19:31:45 +0100
+Message-ID: <CAFVnFZYvCrSE9320t=C8hEAoO01kCqTFudnkU_NTKQinAxzqRw@mail.gmail.com>
+Subject: Re: MAP support in Obexd
+From: "spaceindaver0@gmail.com" <spaceindaver0@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Hi,
 
-As most LE devices leave advertising mode when they enter the connected
-state, we may want to "pass" that connection to other users.
+Just for confirmation - by "MAP Server" do you mean the MSE side -
+i.e. what would reside on a phone?
 
-The first user will be the pairing procedure, the connection is
-established without an associated socket, after the pairing is
-complete, userspace may want to discover via GATT what services the
-newly bonded device has.
+My interests lie on the MCE side, the IVI headunit functionality. What
+I would like in the end would be a sample email program that pairs
+with a phone (with MAP support, e.g. HTC Sensation) grabs the emails
+and displays them in a sample UI. How much (if any) of this is covered
+by your work?
 
-If userspace establishes the connection while the timeout still
-hasn't expired, the connection will be re-used.
+Quote from MAP spec
+Message Server Equipment (MSE) – is the device that provides the
+message repository engine i.e. has the ability to provide a client
+unit with messages that are stored in this device and notifications of
+changes in its message repository.
+Message Client Equipment (MCE) – is the device that uses the message
+repository engine of the MSE for browsing and displaying existing
+messages and to upload messages created on the MCE to the MSE.
 
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/hci_conn.c   |   31 +++++++++++++------------
- net/bluetooth/l2cap_core.c |   53 +++++++++++++++++++++++++++++--------------
- 2 files changed, 52 insertions(+), 32 deletions(-)
+Regards,
+David O Carroll
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fa6820e..f5e2bd8 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -501,23 +501,24 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst, __u8
- 	BT_DBG("%s dst %s", hdev->name, batostr(dst));
- 
- 	if (type == LE_LINK) {
--		struct adv_entry *entry;
-+		struct adv_entry *entry = NULL;
- 
- 		le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
--		if (le)
--			return ERR_PTR(-EBUSY);
--
--		entry = hci_find_adv_entry(hdev, dst);
--		if (!entry)
--			return ERR_PTR(-EHOSTUNREACH);
--
--		le = hci_conn_add(hdev, LE_LINK, dst);
--		if (!le)
--			return ERR_PTR(-ENOMEM);
--
--		le->dst_type = entry->bdaddr_type;
--
--		hci_le_connect(le);
-+		if (!le) {
-+			entry = hci_find_adv_entry(hdev, dst);
-+			if (!entry)
-+				return ERR_PTR(-EHOSTUNREACH);
-+
-+			le = hci_conn_add(hdev, LE_LINK, dst);
-+			if (!le)
-+				return ERR_PTR(-ENOMEM);
-+
-+			le->dst_type = entry->bdaddr_type;
-+			le->pending_sec_level = sec_level;
-+			le->sec_level = BT_SECURITY_LOW;
-+			le->auth_type = auth_type;
-+			hci_le_connect(le);
-+		}
- 
- 		hci_conn_hold(le);
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ebe2703..09ca51e 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -627,10 +627,32 @@ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
- 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
- }
- 
-+static void l2cap_chan_ready(struct sock *sk)
-+{
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-+	struct sock *parent = bt_sk(sk)->parent;
-+
-+	BT_DBG("sk %p, parent %p", sk, parent);
-+
-+	chan->conf_state = 0;
-+	__clear_chan_timer(chan);
-+
-+	l2cap_state_change(chan, BT_CONNECTED);
-+	sk->sk_state_change(sk);
-+
-+	if (parent)
-+		parent->sk_data_ready(parent, 0);
-+}
-+
- static void l2cap_do_start(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
- 
-+	if (conn->hcon->type == LE_LINK) {
-+		l2cap_chan_ready(chan->sk);
-+		return;
-+	}
-+
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT) {
- 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
- 			return;
-@@ -881,23 +903,6 @@ clean:
- 	bh_unlock_sock(parent);
- }
- 
--static void l2cap_chan_ready(struct sock *sk)
--{
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--	struct sock *parent = bt_sk(sk)->parent;
--
--	BT_DBG("sk %p, parent %p", sk, parent);
--
--	chan->conf_state = 0;
--	__clear_chan_timer(chan);
--
--	l2cap_state_change(chan, BT_CONNECTED);
--	sk->sk_state_change(sk);
--
--	if (parent)
--		parent->sk_data_ready(parent, 0);
--}
--
- static void l2cap_conn_ready(struct l2cap_conn *conn)
- {
- 	struct l2cap_chan *chan;
-@@ -1131,6 +1136,20 @@ int l2cap_chan_connect(struct l2cap_chan *chan)
- 		goto done;
- 	}
- 
-+	if (hcon->type == LE_LINK) {
-+		err = 0;
-+
-+		read_lock(&conn->chan_lock);
-+		if (!list_empty(&conn->chan_l)) {
-+			err = -EBUSY;
-+			hci_conn_put(hcon);
-+		}
-+		read_unlock(&conn->chan_lock);
-+
-+		if (err)
-+			goto done;
-+	}
-+
- 	/* Update source addr of the socket */
- 	bacpy(src, conn->src);
- 
--- 
-1.7.6
-
+On Fri, Aug 19, 2011 at 9:36 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+> On Fri, Aug 19, 2011 at 8:06 PM, spaceindaver0@gmail.com
+> <spaceindaver0@gmail.com> wrote:
+>> Hi All,
+>>
+>> I am a student enetering my final year of study and would like to
+>> contribute as part of my Final Year Project. I would like to implement
+>> the MAP profile in obexd as I have an interest in developing for
+>> bluetooth (and have done work in IVI where this would be usefull).
+>>
+>> Is anyone aware of anybody currently doing work in this area?
+> Yes, the work on MAP server is ongoing. I'm developing a protocol
+> infrastructure and Bartosz Szatkowski is working on backend for
+> accessing messages stored in GNOME Tracker). Most of the functionality
+> has been already coded but out of upstream tree and now it's being
+> refactored to the form appropriate for upstreaming. You can already
+> see small parts of it in obexd git tree (plugins/messages.h,
+> plugins/mas.c, plugins/messages-*.c)
+>
+> --
+> Slawomir Bochenski
+>
