@@ -1,44 +1,172 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E5609AC.5040604@invoxia.com>
+Date: Thu, 25 Aug 2011 10:37:00 +0200
 From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
-Subject: [Patch Bluez] HFP gateway: fix failure on very first GSM connection
-Date: Thu, 25 Aug 2011 12:09:05 +0200
-Message-Id: <1314266945-6149-1-git-send-email-arnaud.mouiche@invoxia.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: HFP gateway and new incoming connection
+References: <4E528879.5080103@invoxia.com>	<20110822174912.GA21949@joana>	<CABBYNZLEkc8FWmJm9hU_n-KL2mhWeWPcUfxqX1jskH8ubU-aMw@mail.gmail.com>	<4E536DFF.8050205@invoxia.com>	<CABBYNZKyb=SFcaT-MvBLCTyZiENt=8W5xdpah6jiy8JX+8=Hfg@mail.gmail.com>	<4E53949C.7050804@invoxia.com> <CABBYNZ+yPF28bewUjw8Vjs5HFqB3vUVExJfZARBqXhYLpxHkHw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+yPF28bewUjw8Vjs5HFqB3vUVExJfZARBqXhYLpxHkHw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fix the very first incoming connection from a GSM device
-(playing the gateway role), when 'device->gateway' is NULL (when we didn't
-perform a SDP browse request yet)
+Hi,
 
-we add the service with 'btd_device_add_uuid(device->btd_dev, remote_uuid)'
-but we provide HFP_HS_UUID as remote_uuid. Consequently, the HFP headset
-service is activated instead the gateway service.
+This looks fine to me.
+But I'm not the one with sufficiently good experience in this part of 
+bluez to be a good advise, and see long-term implications
+regards,
+arnaud
 
-Note: I failed to know which UUID is the good one to provide for
-audio_device_request_authorization()
 
-Signed-off-by: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
----
- audio/manager.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+On 08/24/2011 01:03 PM, Luiz Augusto von Dentz wrote:
+> Hi,
+>
+> On Tue, Aug 23, 2011 at 2:53 PM, Arnaud Mouiche
+> <arnaud.mouiche@invoxia.com>  wrote:
+>> On 08/23/2011 01:14 PM, Luiz Augusto von Dentz wrote:
+>>> Hi Arnaud,
+>>>
+>>> On Tue, Aug 23, 2011 at 12:08 PM, Arnaud Mouiche
+>>> <arnaud.mouiche@invoxia.com>    wrote:
+>>>> Hi,
+>>>>
+>>>> On 08/22/2011 09:58 PM, Luiz Augusto von Dentz wrote:
+>>>>> [...]
+>>>>> Yep, we have some plans to move the Agent registration to adapter
+>>>>> path, so it gonna be per adapter. This is necessary to set the
+>>>>> features bit properly in the record and probably gonna support both
+>>>>> roles (with different agents). My initial idea was to use Media API,
+>>>>> but perhaps is confusing since HFP is not entirely about audio but
+>>>>> call control too (mostly) so perhaps we gonna have a different
+>>>>> interface for it e.g. org.bluez.Telephony, in addition to that we are
+>>>>> planning to pass the endpoint bus and path together in the
+>>>>> NewConnection so the telephony agent (oFono) can communicate directly
+>>>>> to endpoint in use (PulseAudio).
+>>>>>
+>>>>> Those are my plans, but none of this is set in stone and Im pretty
+>>>>> open for ideas
+>>>>>
+>>>> what about using the org.bluez.Adapter / RegisterAgent API, and add:
+>>>> - the possibility to setup multiple agents (maintain a list of agents)
+>>>> - use the "capability" field as a filter definition to find the good
+>>>> agent
+>>>> for the particular request
+>>>> ex:
+>>>>     audio/gateway.c::agent_sendfd() will look for a agent in the list,
+>>>> with a
+>>>> "HFP" capability to send the "NewConnection" request
+>>> I guess it would be confusing since with the same method we would have
+>>> different types of agents which implements different interfaces, there
+>>> is also the problem that by using Adapter interface it would have to
+>>> be implemented in the core daemon but my intention is to maintain this
+>>> inside the audio plugin to hook with Media API.
+>>>
+>> You are right. I didn't see how the core was compartmentalized from plugins.
+>> I need took more closely to the Media API...
+>>
+> How about the following:
+>
+> Telephony hierarchy [experiemental]
+> ===================
+>
+> Service		org.bluez
+> Interface	org.bluez.Telephony
+> Object path	[variable prefix]/{hci0,hci1,...}
+>
+> Methods		void RegisterAgent(object path, dict properties)
+>
+> 			Register a TelephonyAgent to sender, the sender can
+> 			register as many agents as it likes.
+>
+> 			Note: If the sender disconnects its agents are
+> 			automatically unregistered.
+>
+> 			possible properties:
+>
+> 				string UUID:
+>
+> 					UUID of the profile which the agent is
+> 					for.
+>
+> 				uint16 Version:
+>
+> 					Version of the profile which the agent
+> 					implements.
+>
+> 				byte Features:
+>
+> 					Agent supported features as defined in
+> 					profile spec e.g. HFP.
+>
+> 			Possible Errors: org.bluez.Error.InvalidArguments
+>
+>
+> 		void UnregisterAgent(object path)
+>
+> 			Unregister sender agent.
+>
+> TelephonyAgent hierarchy
+> ========================
+>
+> Service		unique name
+> Interface	org.bluez.TelephonyAgent
+> Object path	freely definable
+>
+> ethods		void NewConnection(filedescriptor fd, dict properties)
+>
+> 			This method gets called whenever a new connection
+> 			has been established. This method assumes that DBus
+> 			daemon with file descriptor passing capability is
+> 			being used.
+>
+> 			The agent should only return successfully once the
+> 			establishment of the service level connection (SLC)
+> 			has been completed.  In the case of Handsfree this
+> 			means that BRSF exchange has been performed and
+> 			necessary initialization has been done.
+>
+> 			If Endpoint is set the agent is responsible to
+> 			create an object implementing org.bluez.MediaTransport
+> 			and notify the Endpoint using org.bluez.MediaEndpoint.
+>
+> 			possible properties:
+>
+> 				strict Device:
+>
+> 					BlueZ remote device object.
+>
+> 				string UUID:
+>
+> 					Profile UUID of the connection.
+>
+> 				uint16 Version:
+>
+> 					Remote profile version.
+>
+> 				byte Features:
+>
+> 					Remote profile features.
+>
+> 				string Endpoint:
+>
+> 					Optional. Endpoint bus id.
+>
+> 				string EndpointPath:
+>
+> 					Optional. Endpoint object path.
+>
+> 			Possible Errors: org.bluez.Error.InvalidArguments
+> 					 org.bluez.Error.Failed
+>
+> 		void Release()
+>
+> 			This method gets called whenever the service daemon
+> 			unregisters the agent or whenever the Adapter where
+> 			the TelephonyAgent registers itself is removed.
+>
+>
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 911af45..b356ed0 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -575,8 +575,8 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 		return;
- 	}
- 
--	server_uuid = HFP_AG_UUID;
--	remote_uuid = HFP_HS_UUID;
-+	server_uuid = HFP_HS_UUID;
-+	remote_uuid = HFP_AG_UUID;
- 
- 	device = manager_get_device(&src, &dst, TRUE);
- 	if (!device)
--- 
-1.7.0.4
 
