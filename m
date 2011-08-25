@@ -1,133 +1,300 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Aug 2011 09:30:41 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] hcidump: parse extended control field in l2cap
-Message-ID: <20110825123041.GA25269@joana>
-References: <1314268449-3528-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1314268449-3528-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314268449-3528-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Antti Julku <antti.julku@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Antti Julku <antti.julku@nokia.com>
+Subject: [PATCH v3] Bluetooth: Add mgmt events for blacklisting
+Date: Thu, 25 Aug 2011 16:48:02 +0300
+Message-Id: <1314280082-1571-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Add management interface events for blocking/unblocking a device.
+Sender of the block device command gets cmd complete and other
+mgmt sockets get the event. Event is also sent to mgmt sockets when
+blocking is done with ioctl, e.g when blocking a device with
+hciconfig. This makes it possible for bluetoothd to track status
+of blocked devices when a third party block or unblocks a device.
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-25 13:34:09 +0300]:
+Event sending is handled in mgmt_device_blocked function which gets
+called from hci_blacklist_add in hci_core.c. A pending command is
+added in mgmt_block_device, so that it can found when sending the
+event - the event is not sent to the socket from which the pending
+command came. Locks were moved out from hci_core.c to hci_sock.c
+and mgmt.c, because locking is needed also for mgmt_pending_add in
+mgmt.c.
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Adds support for parsing extended control field. Extended control
-> field may be used for ERTM and streaming mode (if EWS specified).
-> Remove magic numbers concerning the subject. Patch to bluez with
-> definitinos shall be applied.
-> ---
->  parser/l2cap.c |  129 ++++++++++++++++++++++++++++++++++++++++----------------
->  1 files changed, 93 insertions(+), 36 deletions(-)
-> 
-> diff --git a/parser/l2cap.c b/parser/l2cap.c
-> index 217008d..42d3974 100644
-> --- a/parser/l2cap.c
-> +++ b/parser/l2cap.c
-> @@ -60,6 +60,9 @@ typedef struct {
->  } cid_info;
->  #define CID_TABLE_SIZE 20
->  
-> +/* FIXME */
-> +static int ext_ctrl;
-> +
->  static cid_info cid_table[2][CID_TABLE_SIZE];
->  
->  #define SCID cid_table[0]
-> @@ -352,13 +355,13 @@ static char *fcs2str(uint8_t fcs)
->  static char *sar2str(uint8_t sar)
->  {
->  	switch (sar) {
-> -	case 0x00:
-> +	case L2CAP_SAR_UNSEGMENTED:
->  		return "Unsegmented";
-> -	case 0x01:
-> +	case L2CAP_SAR_START:
->  		return "Start";
-> -	case 0x02:
-> +	case L2CAP_SAR_END:
->  		return "End";
-> -	case 0x03:
-> +	case L2CAP_SAR_CONTINUE:
->  		return "Continuation";
->  	default:
->  		return "Bad SAR";
-> @@ -369,13 +372,13 @@ static char *sar2str(uint8_t sar)
->  static char *supervisory2str(uint8_t supervisory)
->  {
->  	switch (supervisory) {
-> -	case 0x00:
-> +	case L2CAP_SUPER_RR:
->  		return "Receiver Ready (RR)";
-> -	case 0x01:
-> +	case L2CAP_SUPER_REJ:
->  		return "Reject (REJ)";
-> -	case 0x02:
-> +	case L2CAP_SUPER_RNR:
->  		return "Receiver Not Ready (RNR)";
-> -	case 0x03:
-> +	case L2CAP_SUPER_SREJ:
->  		return "Select Reject (SREJ)";
->  	default:
->  		return "Bad Supervisory";
-> @@ -564,6 +567,7 @@ static void conf_opt(int level, void *ptr, int len, int in, uint16_t cid)
->  			printf("EWS");
->  			if (h->len > 0)
->  				printf(" %d", get_val(h->val, h->len));
-> +			ext_ctrl = 1;
->  			break;
->  
->  		default:
-> @@ -763,6 +767,63 @@ static inline void info_rsp(int level, l2cap_cmd_hdr *cmd, struct frame *frm)
->  	}
->  }
->  
-> +static void l2cap_ctrl_ext_parse(int level, struct frame *frm, uint32_t ctrl)
-> +{
-> +	p_indent(level, frm);
-> +
-> +	printf("%s:", ctrl & L2CAP_EXT_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
+Signed-off-by: Antti Julku <antti.julku@nokia.com>
+---
+ include/net/bluetooth/hci_core.h |    2 +
+ include/net/bluetooth/mgmt.h     |   10 ++++++
+ net/bluetooth/hci_core.c         |   28 ++++-------------
+ net/bluetooth/hci_sock.c         |   18 ++++++++++-
+ net/bluetooth/mgmt.c             |   62 ++++++++++++++++++++++++++++++++++----
+ 5 files changed, 90 insertions(+), 30 deletions(-)
 
-Blank line here.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4b17cd7..9ffd27e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -875,6 +875,8 @@ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+ 								u8 *eir);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_discovering(u16 index, u8 discovering);
++int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
++int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+ 
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 1c914dd..4ecf4a5 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -302,3 +302,13 @@ struct mgmt_ev_remote_name {
+ } __packed;
+ 
+ #define MGMT_EV_DISCOVERING		0x0014
++
++#define MGMT_EV_DEVICE_BLOCKED		0x0015
++struct mgmt_ev_device_blocked {
++	bdaddr_t bdaddr;
++} __packed;
++
++#define MGMT_EV_DEVICE_UNBLOCKED	0x0016
++struct mgmt_ev_device_unblocked {
++	bdaddr_t bdaddr;
++} __packed;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1d20683..446bfdb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1312,59 +1312,43 @@ int hci_blacklist_clear(struct hci_dev *hdev)
+ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct bdaddr_list *entry;
+-	int err;
+ 
+ 	if (bacmp(bdaddr, BDADDR_ANY) == 0)
+ 		return -EBADF;
+ 
+-	hci_dev_lock_bh(hdev);
+-
+ 	if (hci_blacklist_lookup(hdev, bdaddr)) {
+-		err = -EEXIST;
+-		goto err;
++		return -EEXIST;
+ 	}
+ 
+ 	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
+ 	if (!entry) {
+-		err = -ENOMEM;
+-		goto err;
++		return -ENOMEM;
+ 	}
+ 
+ 	bacpy(&entry->bdaddr, bdaddr);
+ 
+ 	list_add(&entry->list, &hdev->blacklist);
+ 
+-	err = 0;
+-
+-err:
+-	hci_dev_unlock_bh(hdev);
+-	return err;
++	return mgmt_device_blocked(hdev->id, bdaddr);
+ }
+ 
+ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ {
+ 	struct bdaddr_list *entry;
+-	int err = 0;
+-
+-	hci_dev_lock_bh(hdev);
+ 
+ 	if (bacmp(bdaddr, BDADDR_ANY) == 0) {
+-		hci_blacklist_clear(hdev);
+-		goto done;
++		return hci_blacklist_clear(hdev);
+ 	}
+ 
+ 	entry = hci_blacklist_lookup(hdev, bdaddr);
+ 	if (!entry) {
+-		err = -ENOENT;
+-		goto done;
++		return -ENOENT;
+ 	}
+ 
+ 	list_del(&entry->list);
+ 	kfree(entry);
+ 
+-done:
+-	hci_dev_unlock_bh(hdev);
+-	return err;
++	return mgmt_device_unblocked(hdev->id, bdaddr);
+ }
+ 
+ static void hci_clear_adv_cache(unsigned long arg)
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index ff02cf5..f6afe3d 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -183,21 +183,35 @@ static int hci_sock_release(struct socket *sock)
+ static int hci_sock_blacklist_add(struct hci_dev *hdev, void __user *arg)
+ {
+ 	bdaddr_t bdaddr;
++	int err;
+ 
+ 	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+ 		return -EFAULT;
+ 
+-	return hci_blacklist_add(hdev, &bdaddr);
++	hci_dev_lock_bh(hdev);
++
++	err = hci_blacklist_add(hdev, &bdaddr);
++
++	hci_dev_unlock_bh(hdev);
++
++	return err;
+ }
+ 
+ static int hci_sock_blacklist_del(struct hci_dev *hdev, void __user *arg)
+ {
+ 	bdaddr_t bdaddr;
++	int err;
+ 
+ 	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+ 		return -EFAULT;
+ 
+-	return hci_blacklist_del(hdev, &bdaddr);
++	hci_dev_lock_bh(hdev);
++
++	err = hci_blacklist_del(hdev, &bdaddr);
++
++	hci_dev_unlock_bh(hdev);
++
++	return err;
+ }
+ 
+ /* Ioctls that require bound socket */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index dac7d39..4f91a00 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1700,13 +1700,12 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
+ 								u16 len)
+ {
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_block_device *cp;
++	struct pending_cmd *cmd;
++	struct mgmt_cp_block_device *cp = (void *) data;
+ 	int err;
+ 
+ 	BT_DBG("hci%u", index);
+ 
+-	cp = (void *) data;
+-
+ 	if (len != sizeof(*cp))
+ 		return cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							EINVAL);
+@@ -1716,6 +1715,14 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
+ 		return cmd_status(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							ENODEV);
+ 
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_BLOCK_DEVICE, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
+ 	err = hci_blacklist_add(hdev, &cp->bdaddr);
+ 
+ 	if (err < 0)
+@@ -1723,6 +1730,11 @@ static int block_device(struct sock *sk, u16 index, unsigned char *data,
+ 	else
+ 		err = cmd_complete(sk, index, MGMT_OP_BLOCK_DEVICE,
+ 							NULL, 0);
++
++	mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
+ 
+ 	return err;
+@@ -1732,13 +1744,12 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 								u16 len)
+ {
+ 	struct hci_dev *hdev;
+-	struct mgmt_cp_unblock_device *cp;
++	struct pending_cmd *cmd;
++	struct mgmt_cp_unblock_device *cp = (void *) data;
+ 	int err;
+ 
+ 	BT_DBG("hci%u", index);
+ 
+-	cp = (void *) data;
+-
+ 	if (len != sizeof(*cp))
+ 		return cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+ 								EINVAL);
+@@ -1748,6 +1759,14 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 		return cmd_status(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+ 								ENODEV);
+ 
++	hci_dev_lock_bh(hdev);
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_UNBLOCK_DEVICE, index, NULL, 0);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto failed;
++	}
++
+ 	err = hci_blacklist_del(hdev, &cp->bdaddr);
+ 
+ 	if (err < 0)
+@@ -1755,6 +1774,11 @@ static int unblock_device(struct sock *sk, u16 index, unsigned char *data,
+ 	else
+ 		err = cmd_complete(sk, index, MGMT_OP_UNBLOCK_DEVICE,
+ 								NULL, 0);
++
++	mgmt_pending_remove(cmd);
++
++failed:
++	hci_dev_unlock_bh(hdev);
+ 	hci_dev_put(hdev);
+ 
+ 	return err;
+@@ -2298,3 +2322,29 @@ int mgmt_discovering(u16 index, u8 discovering)
+ 	return mgmt_event(MGMT_EV_DISCOVERING, index, &discovering,
+ 						sizeof(discovering), NULL);
+ }
++
++int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr)
++{
++	struct pending_cmd *cmd;
++	struct mgmt_ev_device_blocked ev;
++
++	cmd = mgmt_pending_find(MGMT_OP_BLOCK_DEVICE, index);
++
++	bacpy(&ev.bdaddr, bdaddr);
++
++	return mgmt_event(MGMT_EV_DEVICE_BLOCKED, index, &ev, sizeof(ev),
++						cmd ? cmd->sk : NULL);
++}
++
++int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr)
++{
++	struct pending_cmd *cmd;
++	struct mgmt_ev_device_unblocked ev;
++
++	cmd = mgmt_pending_find(MGMT_OP_UNBLOCK_DEVICE, index);
++
++	bacpy(&ev.bdaddr, bdaddr);
++
++	return mgmt_event(MGMT_EV_DEVICE_UNBLOCKED, index, &ev, sizeof(ev),
++						cmd ? cmd->sk : NULL);
++}
+-- 
+1.7.2.5
 
-> +	if (ctrl & L2CAP_EXT_CTRL_FRAME_TYPE) {
-> +		printf(" %s", supervisory2str((ctrl & L2CAP_EXT_CTRL_SUPERVISE_MASK) >>
-> +					L2CAP_EXT_CTRL_SUPER_SHIFT));
-> +	} else {
-> +		uint8_t sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
-> +			L2CAP_EXT_CTRL_SAR_SHIFT;
-> +		printf(" %s", sar2str(sar));
-> +		if (sar == L2CAP_SAR_START) {
-> +			uint16_t len;
-> +			len = btohs(bt_get_unaligned((uint16_t *) frm->ptr));
-> +			frm->ptr += L2CAP_SDULEN_SIZE;
-> +			frm->len -= L2CAP_SDULEN_SIZE;
-> +			printf(" (len %d)", len);
-> +		}
-> +		printf(" TxSeq %d", (ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
-> +				L2CAP_EXT_CTRL_TXSEQ_SHIFT);
-> +	}
-
-and here.
-
-> +	printf(" ReqSeq %d", (ctrl & L2CAP_EXT_CTRL_REQSEQ_MASK) >>
-> +			L2CAP_EXT_CTRL_REQSEQ_SHIFT);
-
-and here.
-
-> +	if (ctrl & L2CAP_EXT_CTRL_FINAL)
-> +		printf(" F-bit");
-
-and here.
-
-The same for the other function, these blank lines makes the code more
-readable.
-
-	Gustavo
