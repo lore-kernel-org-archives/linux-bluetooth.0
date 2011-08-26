@@ -1,95 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Fri, 26 Aug 2011 15:16:15 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
- connections
-Message-ID: <20110826181614.GB3512@joana>
-References: <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
- <1314116296.3373.213.camel@aeonflux>
- <20110823162822.GA26522@joana>
- <1314117006.3373.214.camel@aeonflux>
- <20110823164501.GB26522@joana>
- <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
- <1314129089.3373.218.camel@aeonflux>
- <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
- <20110825145508.GD25269@joana>
- <CABBYNZJZJPvr78b847Ch4EfPYJiVuPg7n7J0PKJMQ2Q+3tV4XA@mail.gmail.com>
+Date: Fri, 26 Aug 2011 14:50:54 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Burt Silverman <burtms@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Printing errors returned from dbus_error_is_set()
+Message-ID: <20110826175053.GA18683@samus.indt.org>
+References: <CAP0-SexLdcFXGL1qwwho4CPN80nPwUXXBUJj7xXrVe_SMr4dow@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJZJPvr78b847Ch4EfPYJiVuPg7n7J0PKJMQ2Q+3tV4XA@mail.gmail.com>
+In-Reply-To: <CAP0-SexLdcFXGL1qwwho4CPN80nPwUXXBUJj7xXrVe_SMr4dow@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-26 10:22:42 +0300]:
+Hi Burt,
 
-> Hi Gustavo,
+On 13:38 Fri 26 Aug, Burt Silverman wrote:
+> Here is a patch for connect_dbus() in src/main.c that follows the
+> usage suggested by the dbus package. This was very important for me
+> when I accidentally moved a configuration file
+> /etc/bluetooth/main.conf. Most other places in bluetooth handle the
+> error correctly.
 > 
-> On Thu, Aug 25, 2011 at 5:55 PM, Gustavo Padovan <padovan@profusion.mobi> wrote:
-> > Hi Luiz,
-> >
-> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-24 13:43:47 +0300]:
-> >
-> >> Hi Marcel,
-> >>
-> >> On Tue, Aug 23, 2011 at 10:51 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> >> > Hi Luiz,
-> >> >
-> >> >> > This already fails today. Our code doesn't allow us to call twice the Connect
-> >> >> > method, so we can't have two of the same UUID connected.
-> >> >>
-> >> >> Well with RFCOMM you can't really connect multiple times to the same
-> >> >> channel/UUID and if we return the same fd clients will probably have
-> >> >> conflicts.
-> >> >
-> >> > you can not connect the same channel twice (except in the other
-> >> > direction), that is true, but you can connect to a different channel
-> >> > with a different UUID. That is the reason why we also allow connection
-> >> > by handles. Or at least we should.
-> >>
-> >> You mean record handle? Currently we support connecting by UUID,
-> >> friendly name or channel.
-> >>
-> >> > So even if we would make this limitation of 1 connection per UUID, the
-> >> > API is a fully asymmetric then. You are suppose to disconnect with the
-> >> > result of the connect call. I do not like that at all. It is bad API
-> >> > design and we are trying to squeeze this in the wrong way.
-> >>
-> >> Currently we support disconnecting by UUID, friendly name, channel and
-> >> dev node. As you mentioned it doesn't really work for fd since it is
-> >> only unique per process, in the other hand the parameter is a pattern.
-> >>
-> >> Perhaps what we should be doing is to return a object path in
-> >> Serial.Connect e.g. [variable
-> >> prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serialXX then Disconnect
-> >> just get it as parameter, the drawback is that this does not return
-> >> the tty/fd immediately so we need another round-trip or return
-> >> multiple values to Connect.
-> >
-> > Then we would need some sort of agent. Don't you think that add a agent and
-> > one more round trip here is too much?
+> From dbus/dbus/dbus-errors.c:
+>  * In essence D-Bus error reporting works as follows:
+>  *
+>  * @code
+>  * DBusError error;
+>  * dbus_error_init (&error);
+>  * dbus_some_function (arg1, arg2, &error);
+>  * if (dbus_error_is_set (&error))
+>  *   {
+>  *     fprintf (stderr, "an error occurred: %s\n", error.message);
+>  *     dbus_error_free (&error);
+>  *   }
+>  * @endcode
 > 
-> I wouldn't consider it an agent since the client doesn't have to
-> implement the object returned by ConnectFD, bluetoothd does. The the
-> extra round trips can be a problem though.
+> Here's the patch:
+> diff --git a/src/main.c b/src/main.c
+> index 7fecc5a..db78da8 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -311,6 +311,7 @@ static int connect_dbus(void)
+>         conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
+>         if (!conn) {
+>                 if (dbus_error_is_set(&err)) {
+> +                       fprintf(stderr, "an error occurred: %s\n", err.message);
 
-So how do wanna to implement this extra round trip? I thought it would a
-NewConnection-like method to be called in the agent interface. That would be
-my idea, but I think it's too much to simple Serial Connections process.
+The patch looks good, you just may want to use g_printerr() instead.
+
+>                         dbus_error_free(&err);
+>                         return -EIO;
+>                 }
+> 
+> Is this the correct place to send the patch?
+
+Yes, this is the correct place. Just send a properly formatted patch,
+the easiest way is using git format-patch and git send-email.
 
 > 
-> > I would just add a handle to the Connect reply besides the fd, Disconnect
-> > then use this handle as parameter to Disconnect.
-> > If we want to disconnect before Connect replies we use the pattern as
-> > parameter like we with the current API. Is that bad?
-> 
-> Well that doesn't change much my proposal does it, I mean returning an
-> object or a handle is kind of the same idea and has almost the same
-> problems, actually with handle is worse because it doesn't return
-> anything meaningful so in that case we must have multiple values in
-> the return e.g handle + fd.
+> Thank you,
+> Burt Silverman
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Yeah, you right. You proposal works for this case.
-
-	Gustavo
+Cheers,
+-- 
+Vinicius
