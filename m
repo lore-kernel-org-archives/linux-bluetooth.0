@@ -1,44 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E574A35.30106@comarch.pl>
-Date: Fri, 26 Aug 2011 09:24:37 +0200
-From: =?UTF-8?B?UmFmYcWCIE1pY2hhbHNraQ==?= <rafal.michalski@comarch.pl>
 MIME-Version: 1.0
-To: johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Refactoring address fields handled in vcard
- module
-References: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
-In-Reply-To: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1314293588-29190-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1314293588-29190-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 26 Aug 2011 10:27:14 +0300
+Message-ID: <CABBYNZ+Y9g4rte=wukrHwdPwTHOJFyRGFTjKc3fxb34u8OfLTg@mail.gmail.com>
+Subject: Re: [PATCH] avrcp: do not get fd when not connected
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan
-> This patch introduces phonebook_addr struct for more intuitive
-> handling address fields from backend. Now address fields are managed
-> by linked list (wrapped by structure) and it is used for printing vCard
-> address fields, instead of buffers set (combined with g_strsplit
-> and snprintf functions).
+Hi Lucas,
+
+On Thu, Aug 25, 2011 at 8:33 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
 > ---
->  plugins/phonebook-tracker.c |   72 +++++++++++++++++++++++++++++++++++++-----
->  plugins/vcard.c             |   70 +++++++++++++++++++----------------------
->  plugins/vcard.h             |    7 +++-
->  3 files changed, 101 insertions(+), 48 deletions(-)
->   
+> †audio/control.c | † †4 +++-
+> †1 files changed, 3 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/control.c b/audio/control.c
+> index 882c9fb..9990b06 100644
+> --- a/audio/control.c
+> +++ b/audio/control.c
+> @@ -727,7 +727,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+> † † † †struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
+> † † † †struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
+> † † † † † † † † † † † † † † † † † † † † † † † † † † † †AVRCP_HEADER_LENGTH];
+> - † † † int sk = g_io_channel_unix_get_fd(control->io);
+> + † † † int sk;
+> † † † †uint16_t size;
+>
+> † † † †if (control->state != AVCTP_STATE_CONNECTED)
+> @@ -783,6 +783,8 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+> † † † †size += AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
+> † † † † † † † † † † † † † † † † † † † †AVRCP_SPECAVCPDU_HEADER_LENGTH;
+>
+> + † † † sk = g_io_channel_unix_get_fd(control->io);
+> +
+> † † † †if (write(sk, buf, size) < 0)
+> † † † † † † † †return -errno;
+>
+> --
+> 1.7.6
 
-I want to ask about patches review:
+This looks like a bug, in such case we usually use 'fix' in the
+description. But the patch looks good.
 
-[PATCH obexd 1/2] Refactoring address fields handled in vcard module
-[PATCH obexd 2/2] Fix semicolon delimiter issue in address fields
-
-Did you have time to take a look at these patches ?
-
-And please ignore patch I've sent earlier: "[PATCH obexd v2] Support for 
-Quoted Printable encoding".
-I will send new improved version later, with additional escaping 
-semicolons only (since it is required
-by vCard 2.1), if these two above patches accepted.
-
-Best Regards
-
-Rafa≈Ç Michalski
+-- 
+Luiz Augusto von Dentz
