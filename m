@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 2/6] gobex: fix setting final bit on PUT requests
-Date: Fri, 26 Aug 2011 12:49:32 +0300
-Message-Id: <1314352176-12244-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1314352176-12244-1-git-send-email-luiz.dentz@gmail.com>
-References: <1314352176-12244-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <4E574A35.30106@comarch.pl>
+Date: Fri, 26 Aug 2011 09:24:37 +0200
+From: =?UTF-8?B?UmFmYcWCIE1pY2hhbHNraQ==?= <rafal.michalski@comarch.pl>
+MIME-Version: 1.0
+To: johan.hedberg@gmail.com
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 1/2] Refactoring address fields handled in vcard
+ module
+References: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan
+> This patch introduces phonebook_addr struct for more intuitive
+> handling address fields from backend. Now address fields are managed
+> by linked list (wrapped by structure) and it is used for printing vCard
+> address fields, instead of buffers set (combined with g_strsplit
+> and snprintf functions).
+> ---
+>  plugins/phonebook-tracker.c |   72 +++++++++++++++++++++++++++++++++++++-----
+>  plugins/vcard.c             |   70 +++++++++++++++++++----------------------
+>  plugins/vcard.h             |    7 +++-
+>  3 files changed, 101 insertions(+), 48 deletions(-)
+>   
 
-Final bit should not be set when creating new request packets for PUT
-since it may be not be the end of the body.
----
- gobex/gobex-transfer.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+I want to ask about patches review:
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index fad641b..386ba9a 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -170,9 +170,11 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
- 		return;
- 	}
- 
--	req = g_obex_packet_new(transfer->opcode, TRUE, G_OBEX_HDR_INVALID);
-+	final = transfer->opcode == G_OBEX_OP_PUT ? FALSE : TRUE;
- 
--	if (transfer->opcode == G_OBEX_OP_PUT)
-+	req = g_obex_packet_new(transfer->opcode, final, G_OBEX_HDR_INVALID);
-+
-+	if (!final)
- 		g_obex_packet_add_body(req, put_get_data, transfer);
- 
- 	transfer->req_id = g_obex_send_req(obex, req, -1, transfer_response,
--- 
-1.7.6
+[PATCH obexd 1/2] Refactoring address fields handled in vcard module
+[PATCH obexd 2/2] Fix semicolon delimiter issue in address fields
 
+Did you have time to take a look at these patches ?
+
+And please ignore patch I've sent earlier: "[PATCH obexd v2] Support for 
+Quoted Printable encoding".
+I will send new improved version later, with additional escaping 
+semicolons only (since it is required
+by vCard 2.1), if these two above patches accepted.
+
+Best Regards
+
+Rafał Michalski
