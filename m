@@ -1,189 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E57AF22.2080903@linux.intel.com>
-Date: Fri, 26 Aug 2011 16:35:14 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: HFP gateway and new incoming connection
-References: <4E528879.5080103@invoxia.com>	<20110822174912.GA21949@joana>	<CABBYNZLEkc8FWmJm9hU_n-KL2mhWeWPcUfxqX1jskH8ubU-aMw@mail.gmail.com>	<4E536DFF.8050205@invoxia.com>	<CABBYNZKyb=SFcaT-MvBLCTyZiENt=8W5xdpah6jiy8JX+8=Hfg@mail.gmail.com>	<4E53949C.7050804@invoxia.com> <CABBYNZ+yPF28bewUjw8Vjs5HFqB3vUVExJfZARBqXhYLpxHkHw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+yPF28bewUjw8Vjs5HFqB3vUVExJfZARBqXhYLpxHkHw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 26 Aug 2011 14:49:25 +0200
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+ Bastien Nocera <hadess@hadess.net>, linux-input@vger.kernel.org, Jim Paris
+ <jim@jtan.com>, Ranulf Doswell <ralf@ranulf.net>, "Pascal A . Brisset"
+ <pascal44973@pabr.org>, Marcin Tolysz <tolysz@gmail.com>, Christian
+ Birchinger <joker@netswarm.net>, Filipe Lopes <falktx@gmail.com>, Alan Ott
+ <alan@signal11.us>, Mikko Virkkila <virkkila@kapsi.fi>, Simon Wood
+ <simon@mungewell.org>, Arc Riley <arcriley@gmail.com>
+Subject: Re: [PATCH BlueZ 3/4] Link to udev only when needed
+Message-Id: <20110826144925.7a769734ad9eda41b1206357@studenti.unina.it>
+In-Reply-To: <20110825170621.GB27645@samus.indt.org>
+References: <1312553358-26280-1-git-send-email-ospite@studenti.unina.it>
+	<1312553358-26280-4-git-send-email-ospite@studenti.unina.it>
+	<20110818124438.40e3e125c8de872e1320f511@studenti.unina.it>
+	<1313709545.3373.196.camel@aeonflux>
+	<20110819105802.b7f5eda46e58b32677fdb804@studenti.unina.it>
+	<20110819210854.81dff694ad455da3ed0e6e96@studenti.unina.it>
+	<20110825161454.45a0b27998f577a737a2e579@studenti.unina.it>
+	<20110825170621.GB27645@samus.indt.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Fri__26_Aug_2011_14_49_25_+0200_sKQi.xG7Vm0wXGqp"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+--Signature=_Fri__26_Aug_2011_14_49_25_+0200_sKQi.xG7Vm0wXGqp
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Le 24/08/2011 13:03, Luiz Augusto von Dentz a écrit :
-> Hi,
->
-> On Tue, Aug 23, 2011 at 2:53 PM, Arnaud Mouiche
-> <arnaud.mouiche@invoxia.com>  wrote:
->> On 08/23/2011 01:14 PM, Luiz Augusto von Dentz wrote:
->>>
->>> Hi Arnaud,
->>>
->>> On Tue, Aug 23, 2011 at 12:08 PM, Arnaud Mouiche
->>> <arnaud.mouiche@invoxia.com>    wrote:
->>>>
->>>> Hi,
->>>>
->>>> On 08/22/2011 09:58 PM, Luiz Augusto von Dentz wrote:
->>>>>
->>>>> [...]
->>>>> Yep, we have some plans to move the Agent registration to adapter
->>>>> path, so it gonna be per adapter. This is necessary to set the
->>>>> features bit properly in the record and probably gonna support both
->>>>> roles (with different agents). My initial idea was to use Media API,
->>>>> but perhaps is confusing since HFP is not entirely about audio but
->>>>> call control too (mostly) so perhaps we gonna have a different
->>>>> interface for it e.g. org.bluez.Telephony, in addition to that we are
->>>>> planning to pass the endpoint bus and path together in the
->>>>> NewConnection so the telephony agent (oFono) can communicate directly
->>>>> to endpoint in use (PulseAudio).
->>>>>
->>>>> Those are my plans, but none of this is set in stone and Im pretty
->>>>> open for ideas
->>>>>
->>>> what about using the org.bluez.Adapter / RegisterAgent API, and add:
->>>> - the possibility to setup multiple agents (maintain a list of agents)
->>>> - use the "capability" field as a filter definition to find the good
->>>> agent
->>>> for the particular request
->>>> ex:
->>>>     audio/gateway.c::agent_sendfd() will look for a agent in the list,
->>>> with a
->>>> "HFP" capability to send the "NewConnection" request
->>>
->>> I guess it would be confusing since with the same method we would have
->>> different types of agents which implements different interfaces, there
->>> is also the problem that by using Adapter interface it would have to
->>> be implemented in the core daemon but my intention is to maintain this
->>> inside the audio plugin to hook with Media API.
->>>
->> You are right. I didn't see how the core was compartmentalized from plugins.
->> I need took more closely to the Media API...
->>
->
-> How about the following:
->
-> Telephony hierarchy [experiemental]
-> ===================
->
-> Service		org.bluez
-> Interface	org.bluez.Telephony
-> Object path	[variable prefix]/{hci0,hci1,...}
->
-> Methods		void RegisterAgent(object path, dict properties)
->
-> 			Register a TelephonyAgent to sender, the sender can
-> 			register as many agents as it likes.
->
-> 			Note: If the sender disconnects its agents are
-> 			automatically unregistered.
->
-> 			possible properties:
->
-> 				string UUID:
->
-> 					UUID of the profile which the agent is
-> 					for.
->
-> 				uint16 Version:
->
-> 					Version of the profile which the agent
-> 					implements.
->
-> 				byte Features:
->
-> 					Agent supported features as defined in
-> 					profile spec e.g. HFP.
->
-> 			Possible Errors: org.bluez.Error.InvalidArguments
->
->
-> 		void UnregisterAgent(object path)
->
-> 			Unregister sender agent.
->
-> TelephonyAgent hierarchy
-> ========================
->
-> Service		unique name
-> Interface	org.bluez.TelephonyAgent
-> Object path	freely definable
->
-> ethods		void NewConnection(filedescriptor fd, dict properties)
->
-> 			This method gets called whenever a new connection
-> 			has been established. This method assumes that DBus
-> 			daemon with file descriptor passing capability is
-> 			being used.
->
-> 			The agent should only return successfully once the
-> 			establishment of the service level connection (SLC)
-> 			has been completed.  In the case of Handsfree this
-> 			means that BRSF exchange has been performed and
-> 			necessary initialization has been done.
->
-> 			If Endpoint is set the agent is responsible to
-> 			create an object implementing org.bluez.MediaTransport
-> 			and notify the Endpoint using org.bluez.MediaEndpoint.
->
-> 			possible properties:
->
-> 				strict Device:
->
-> 					BlueZ remote device object.
->
-> 				string UUID:
->
-> 					Profile UUID of the connection.
->
-> 				uint16 Version:
->
-> 					Remote profile version.
->
-> 				byte Features:
->
-> 					Remote profile features.
->
-> 				string Endpoint:
->
-> 					Optional. Endpoint bus id.
->
-> 				string EndpointPath:
->
-> 					Optional. Endpoint object path.
->
-> 			Possible Errors: org.bluez.Error.InvalidArguments
-> 					 org.bluez.Error.Failed
->
-> 		void Release()
->
-> 			This method gets called whenever the service daemon
-> 			unregisters the agent or whenever the Adapter where
-> 			the TelephonyAgent registers itself is removed.
->
+On Thu, 25 Aug 2011 14:06:21 -0300
+Vinicius Costa Gomes <vinicius.gomes@openbossa.org> wrote:
+
+[...]
+> > > diff --git a/Makefile.am b/Makefile.am
+> > > index 4bcff4d..ff33bf0 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -230,8 +230,10 @@ builtin_sources +=3D thermometer/main.c \
+> > >  endif
+> > > =20
+> > >  if SIXAXISPLUGIN
+> > > -builtin_modules +=3D sixaxis
+> > > -builtin_sources +=3D plugins/sixaxis.c
+> > > +plugin_LTLIBRARIES +=3D plugins/sixaxis.la
+> > > +plugins_sixaxis_la_SOURCES =3D plugins/sixaxis.c
+> > > +plugins_sixaxis_la_LDFLAGS =3D -module -avoid-version -no-undefined =
+@UDEV_LIBS@
+> > > +plugins_sixaxis_la_CFLAGS =3D -fvisibility=3Dhidden @DBUS_CFLAGS@ @G=
+LIB_CFLAGS@ @UDEV_CFLAGS@
+> > >  endif
+> > >=20
+> >=20
+> > This is not enough, the external plugin can be compiled but I can be us=
+ed
+> > at runtime because it is using functions from src/storage.c and others,
+> > which seem to be embedded inside bluetoothd only, so I get:
+> >=20
+> > bluetoothd[23459]: Can't load plugin \
+> >   /home/ao2/Proj/PS3/PS3_sixaxis/bluez/plugins/.libs/playstation-periph=
+eral.so: \
+> >   /home/ao2/Proj/PS3/PS3_sixaxis/bluez/plugins/.libs/playstation-periph=
+eral.so: \
+> >   undefined symbol: write_device_name
+> >=20
+> > I could link the needed object files like storage.o and company into the
+> > plugin binary, but definitely this doesn't look OK. Should a shared lib=
+rary
+> > provide those "utility" functions to bluetoothd _and_ external plugins?
+> >=20
+> > This plugin is the first non-trivial external plugin I can see in the t=
+ree,
+> > so maybe this problem has never showed up before.
+>=20
+> The problem is the visibility of the symbols, src/bluetooth.ver defines
+> which symbols should[1] be visible to plugins. Every plugin should only
+> depend on those methods from the "core".
 >
 
-This interface should be used with org.bluez.Media API, daemon 
-registering with org.bluez.Telephony will take care of control channel 
-while org.bluez.Media will be used to manage audio part, did I 
-understand correctly ?
+Indeed, adding the needed symbols to the linker script makes the plugin
+work:
 
-I understand how connection will be managed for server part (incoming 
-connections), but what will be used for client part (outgoing connections) ?
+diff --git a/src/bluetooth.ver b/src/bluetooth.ver
+index b71c70d..11fcd33 100644
+--- a/src/bluetooth.ver
++++ b/src/bluetooth.ver
+@@ -5,6 +5,19 @@
+                info;
+                error;
+                debug;
++               manager_get_default_adapter;
++               adapter_get_address;
++               write_device_name;
++               record_from_string;
++               store_record;
++               sdp_record_free;
++               store_device_id;
++               write_trust;
++               dbus_bus_get;
++               adapter_get_device;
++               device_set_temporary;
++               device_set_name;
++               dbus_connection_unref;
+        local:
+                *;
+ };
 
-It may be possible to use a per device interface similar to 
-org.bluez.HandsfreeGateway with only connect/disconnect methods (with 
-different interfaces for each HFP roles).
 
-Regards
+> If we want to keep the sixaxis plugin external we need to make the
+> symbols it need visible, but I wonder if that is right solution.
+>
 
-Fred
+If there was a public API for plugins to use with well defined prefixes,
+the linking scripts could use those, I am thinking to something like:
+	sdp_*;
+	storage_*;
+	device_*;
+	dbus_*;
 
--- 
-Frederic Danis                            Open Source Technology Centre
-frederic.danis@intel.com                              Intel Corporation
+But you bluez people have to tell me if this is the way to go and if
+you are willing to do that, of if I'd better have the plugin builtin for
+now.
 
+> [1] Seems that with builtin plugins that visibility enforcement doesn't
+> work, right?
+>
+
+This seems to be the case indeed, a bluiltin plugin can use any (non
+static?) symbol linked in the bluetoothd binary.
+
+Thanks,
+   Antonio
+
+--=20
+Antonio Ospite
+http://ao2.it
+
+PGP public key ID: 0x4553B001
+
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
+
+--Signature=_Fri__26_Aug_2011_14_49_25_+0200_sKQi.xG7Vm0wXGqp
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5XllUACgkQ5xr2akVTsAG+jACfWBh1MId8LmzR22i2JDwdPLlL
+kCYAoI0cUHVR/wxh+FmiN8WB9AdYTmHD
+=wVDc
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__26_Aug_2011_14_49_25_+0200_sKQi.xG7Vm0wXGqp--
