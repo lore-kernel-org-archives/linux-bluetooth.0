@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Burt Silverman <burtms@gmail.com>
+Date: Fri, 26 Aug 2011 16:06:56 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Burt Silverman <burtms@gmail.com>
-Subject: [PATCH] Print an error message if g_dbus_setup_bus fails.
-Date: Fri, 26 Aug 2011 18:39:01 -0400
-Message-Id: <1314398341-2733-1-git-send-email-burtms@gmail.com>
+Subject: Re: [PATCH BlueZ 00/12] Support for the new mgmt SMP messages
+Message-ID: <20110826190656.GB18683@samus.indt.org>
+References: <1313799128-8842-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1313799128-8842-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-That is standard processing when dbus_error_is_set() returns true, according to
-dbus/dbus/dbus-errors.c.
-In this case of g_dbus_setup_bus(), it provides extra help for determing the
-specific cause of the error.
----
- src/main.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/src/main.c b/src/main.c
-index 7fecc5a..6dc60a4 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -311,6 +311,7 @@ static int connect_dbus(void)
- 	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, BLUEZ_NAME, &err);
- 	if (!conn) {
- 		if (dbus_error_is_set(&err)) {
-+			g_printerr("an error occurred: %s\n", err.message);
- 			dbus_error_free(&err);
- 			return -EIO;
- 		}
+On 21:11 Fri 19 Aug, Vinicius Costa Gomes wrote:
+> Hi,
+> 
+> This patch series is the userspace side of the changes that introduced
+> the specific messages for communicating SMP keys.
+> 
+
+As the Blacklisting events patches were applied first to the kernel,
+there are a few conflicting types between those series. So if this 
+series is to be applied I need to send a new version that solve those 
+conflicts (already done, but I don't want to spam the list even more ;-)
+
+
+Cheers,
 -- 
-1.7.6
-
+Vinicius
