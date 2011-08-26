@@ -1,45 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/2] hcidump: decode extended window size option
-Date: Fri, 26 Aug 2011 15:05:36 +0300
-Message-Id: <1314360337-26395-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: luiz.dentz@gmail.com,
+	Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH] Fix fd usage when not connected
+Date: Fri, 26 Aug 2011 09:06:00 -0300
+Message-Id: <1314360360-1351-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <CABBYNZ+Y9g4rte=wukrHwdPwTHOJFyRGFTjKc3fxb34u8OfLTg@mail.gmail.com>
+References: <CABBYNZ+Y9g4rte=wukrHwdPwTHOJFyRGFTjKc3fxb34u8OfLTg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+When the avctp channel is not connected, we call
+g_io_channel_unix_get_fd() with a NULL pointer. Glib does not check the
+pointer before dereferencing it, causing bluetoothd to segv.
 
+Move the function call to the place it's actually needed, after the
+safety checks.
 ---
- parser/l2cap.c |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+ audio/control.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 6345f8d..217008d 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -560,6 +560,12 @@ static void conf_opt(int level, void *ptr, int len, int in, uint16_t cid)
- 			conf_efs(h->val);
- 			break;
+diff --git a/audio/control.c b/audio/control.c
+index 882c9fb..9990b06 100644
+--- a/audio/control.c
++++ b/audio/control.c
+@@ -727,7 +727,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+ 	struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
+ 	struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
+ 							AVRCP_HEADER_LENGTH];
+-	int sk = g_io_channel_unix_get_fd(control->io);
++	int sk;
+ 	uint16_t size;
  
-+		case L2CAP_CONF_EWS:
-+			printf("EWS");
-+			if (h->len > 0)
-+				printf(" %d", get_val(h->val, h->len));
-+			break;
+ 	if (control->state != AVCTP_STATE_CONNECTED)
+@@ -783,6 +783,8 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+ 	size += AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
+ 					AVRCP_SPECAVCPDU_HEADER_LENGTH;
+ 
++	sk = g_io_channel_unix_get_fd(control->io);
 +
- 		default:
- 			printf("Unknown (type %2.2x, len %d)", h->type & 0x7f, h->len);
- 			break;
-@@ -598,6 +604,9 @@ static void conf_list(int level, uint8_t *list, int len)
- 		case L2CAP_CONF_EFS:
- 			printf("EFS ");
- 			break;
-+		case L2CAP_CONF_EWS:
-+			printf("EWS ");
-+			break;
- 		default:
- 			printf("%2.2x ", list[i] & 0x7f);
- 			break;
+ 	if (write(sk, buf, size) < 0)
+ 		return -errno;
+ 
 -- 
-1.7.4.1
+1.7.6.1
 
