@@ -1,48 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+From: David Herrmann <dh.herrmann@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] Fix fd usage when not connected
-Date: Fri, 26 Aug 2011 09:06:00 -0300
-Message-Id: <1314360360-1351-1-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <CABBYNZ+Y9g4rte=wukrHwdPwTHOJFyRGFTjKc3fxb34u8OfLTg@mail.gmail.com>
-References: <CABBYNZ+Y9g4rte=wukrHwdPwTHOJFyRGFTjKc3fxb34u8OfLTg@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: padovan@profusion.mobi, linux-input@vger.kernel.org,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: [PATCH] Bluetooth: hidp: Add support for NO_INIT_REPORTS quirk
+Date: Fri, 26 Aug 2011 13:27:12 +0200
+Message-Id: <1314358032-23513-1-git-send-email-dh.herrmann@googlemail.com>
+Sender: linux-input-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the avctp channel is not connected, we call
-g_io_channel_unix_get_fd() with a NULL pointer. Glib does not check the
-pointer before dereferencing it, causing bluetoothd to segv.
+During setup the host initializes all HID reports. Some devices do not
+support this. If this quirk is set, we skip the initialization.
+See also usbhid_init_reports() for this quirk.
 
-Move the function call to the place it's actually needed, after the
-safety checks.
+Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- audio/control.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+ net/bluetooth/hidp/core.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/audio/control.c b/audio/control.c
-index 882c9fb..9990b06 100644
---- a/audio/control.c
-+++ b/audio/control.c
-@@ -727,7 +727,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
- 	struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
- 	struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
- 							AVRCP_HEADER_LENGTH];
--	int sk = g_io_channel_unix_get_fd(control->io);
-+	int sk;
- 	uint16_t size;
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 43b4c2d..4423e3a 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -870,6 +870,9 @@ static int hidp_start(struct hid_device *hid)
+ 	struct hidp_session *session = hid->driver_data;
+ 	struct hid_report *report;
  
- 	if (control->state != AVCTP_STATE_CONNECTED)
-@@ -783,6 +783,8 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
- 	size += AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
- 					AVRCP_SPECAVCPDU_HEADER_LENGTH;
- 
-+	sk = g_io_channel_unix_get_fd(control->io);
++	if (hid->quirks & HID_QUIRK_NO_INIT_REPORTS)
++		return 0;
 +
- 	if (write(sk, buf, size) < 0)
- 		return -errno;
- 
+ 	list_for_each_entry(report, &hid->report_enum[HID_INPUT_REPORT].
+ 			report_list, list)
+ 		hidp_send_report(session, report);
 -- 
-1.7.6.1
+1.7.6
 
