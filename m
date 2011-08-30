@@ -1,21 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Aug 2011 16:57:52 +0300
+Date: Tue, 30 Aug 2011 16:54:37 +0300
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: Re: [RFC 6/7] Bluetooth: add EFS option in l2cap conf req
-Message-ID: <20110830135751.GF15216@aemeltch-MOBL1>
+Message-ID: <20110830135431.GE15216@aemeltch-MOBL1>
 References: <1313653502-6303-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1313653502-6303-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20110824213324.GK2662@joana>
+ <20110824213046.GJ2662@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110824213324.GK2662@joana>
+In-Reply-To: <20110824213046.GJ2662@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Gustavo,
 
-On Wed, Aug 24, 2011 at 06:33:24PM -0300, Gustavo Padovan wrote:
+On Wed, Aug 24, 2011 at 06:30:46PM -0300, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
 > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-08-18 10:45:01 +0300]:
 > 
 > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
@@ -23,6 +25,9 @@ On Wed, Aug 24, 2011 at 06:33:24PM -0300, Gustavo Padovan wrote:
 > > Adds extended flowspec option when building l2cap config request
 > > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
 > > (sent Sun, 22 Aug 2010)
+> 
+> Please provide more details in your commit message. 
+> 
 > > ---
 > >  include/net/bluetooth/l2cap.h |    2 +
 > >  net/bluetooth/l2cap_core.c    |   79 ++++++++++++++++++++++++++++++++++++++++-
@@ -98,11 +103,59 @@ On Wed, Aug 24, 2011 at 06:33:24PM -0300, Gustavo Padovan wrote:
 > > +		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
 > > +			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
 > > +		break;
+> > +
+> >  	default:
+> >  		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
+> >  		break;
+> > @@ -1961,6 +1995,34 @@ done:
+> >  			chan->fcs = L2CAP_FCS_NONE;
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> > +
+> > +		if (chan->ext_flowspec_enable) {
+> > +			efs.service_type = chan->local_stype;
+> > +			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
+> > +			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
+> > +
+> > +			if (chan->local_stype == L2CAP_SERVTYPE_BESTEFFORT) {
+> > +				chan->local_id = 1;
+> > +				efs.id = chan->local_id;
+> > +				efs.access_latency =
+> > +					cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
+> > +				efs.flush_timeout =
+> > +					cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
+> > +			} else {
+> > +				/* As spec, the ident shall be unique within
+> > +				   the scope of a physical link.
+> > +				 */
+> > +				chan->local_id = l2cap_flowspec_ident(chan->conn);
+> > +				efs.id = chan->local_id;
+> > +				efs.access_latency =
+> > +					cpu_to_le32(chan->local_acc_lat);
+> > +				efs.flush_timeout =
+> > +					cpu_to_le32(chan->local_flush_to);
+> > +			}
+> > +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> > +					sizeof(efs), (unsigned long) &efs);
+> > +		}
+> > +
+> >  		break;
+> >  
+> >  	case L2CAP_MODE_STREAMING:
+> > @@ -1984,6 +2046,21 @@ done:
+> >  			chan->fcs = L2CAP_FCS_NONE;
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> > +
+> > +		if (chan->ext_flowspec_enable) {
+> > +			efs.id = 1;
+> > +			efs.service_type = L2CAP_SERVTYPE_BESTEFFORT;
 > 
-> Could you tell me what this l2cap_send_disconn_req is doing here? it wasn't in
-> the original code.
+> If this patches only adds supports for Best Effort why should care about the
+> others services types now like the code you added above. Why is the if
+> (local_service == L2CAP_SERVTYPE_BESTEFFORT) needed then?
 
-Removed. The chunk was in the Atheros code.
+This is done for the future development. 
 
 Best regards 
 Andrei Emeltchenko 
