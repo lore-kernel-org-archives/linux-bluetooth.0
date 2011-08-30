@@ -1,44 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 30 Aug 2011 09:22:17 -0400
-Subject: [PATCH 0/2] Fix unsafe hci conn add/del
-Message-ID: <1314710537.2232.9.camel@THOR>
+Date: Tue, 30 Aug 2011 09:22:23 -0400
+Subject: [PATCH 1/2] Bluetooth: Fix unsafe tx buffer count updates
+Message-ID: <1314710543.2232.10.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These two patches address several problems relating to concurrent
-access of the connection list and avail tx buffer counts when
-hci connections are added and deleted.
+The tx tasklet and rx tasklet (if not currently running on this cpu)
+must be disabled to prevent concurrent access while updating the
+tx buffer counts.
 
-Firstly, both the tx & rx tasklets must be disabled while the
-unacked pkts are added back to the avail tx buffers counts during
-a connection deletion (because the updates are not performed
-atomically here or elsewhere -- yet).
+Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+---
+ net/bluetooth/hci_conn.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-Since hci_conn_del is called in both rx_task context and process
-context, disabling the rx_task must be performed conditionally
-so as to avoid deadlock (if the local cpu is in rx_task tasklet
-context and attempts to disable the rx_task, it will wait forever
-for the tasklet it's running to end).
-
-Note that the re-enable of the rx_task is performed after the
-connection list is modified. This is because hci_num_comp_pkts_evt
-does not acquire the device lock while accessing the connection list.
-Rather than claim the device lock (which would render useless efforts to
-perform tx buffer count arithmetic atomically), instead disable the
-rx_task tasklet while the hci connection list is updated.
-
-Peter Hurley (2):
-  Bluetooth: Fix unsafe tx buffer count updates
-  Bluetooth: Fix unsafe connection list access
-
- net/bluetooth/hci_conn.c |   16 +++++++++++++---
- net/bluetooth/hci_core.c |    4 ----
- 2 files changed, 13 insertions(+), 7 deletions(-)
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3e0a4b5..38993f6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -359,6 +359,10 @@ int hci_conn_del(struct hci_conn *conn)
+ 
+ 	del_timer(&conn->auto_accept_timer);
+ 
++	tasklet_disable(&hdev->tx_task);
++	if (!in_serving_softirq())
++		tasklet_disable(&hdev->rx_task);
++
+ 	if (conn->type == ACL_LINK) {
+ 		struct hci_conn *sco = conn->link;
+ 		if (sco)
+@@ -379,12 +383,12 @@ int hci_conn_del(struct hci_conn *conn)
+ 		}
+ 	}
+ 
+-	tasklet_disable(&hdev->tx_task);
+-
+ 	hci_conn_hash_del(hdev, conn);
+ 	if (hdev->notify)
+ 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+ 
++	if (!in_serving_softirq())
++		tasklet_enable(&hdev->rx_task);
+ 	tasklet_enable(&hdev->tx_task);
+ 
+ 	skb_queue_purge(&conn->data_q);
 -- 
 1.7.4.1
 
