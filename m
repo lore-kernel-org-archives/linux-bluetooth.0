@@ -1,53 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 30 Aug 2011 09:22:23 -0400
-Subject: [PATCH 1/2] Bluetooth: Fix unsafe tx buffer count updates
-Message-ID: <1314710543.2232.10.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+From: Pavel Raiskup <praiskup@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ovasik@redhat.com
+Subject: [PATCH 8/8] Removed dropping of the list head
+Date: Tue, 30 Aug 2011 15:17:47 +0200
+Message-Id: <1314710267-13633-1-git-send-email-praiskup@redhat.com>
+In-Reply-To: <op.v0awmrh1h52hc0@dhcp-25-209.brq.redhat.com>
+References: <op.v0awmrh1h52hc0@dhcp-25-209.brq.redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The tx tasklet and rx tasklet (if not currently running on this cpu)
-must be disabled to prevent concurrent access while updating the
-tx buffer counts.
+assigning sdp_list_append(0, ...) to "apseq" on line 2591 will
+drop first item in list got by sdp_list_append three lines before.
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+Note: All bugs from this set was found by Coverity scan on bluez
+package from Fedora. If there was somebody who could look on whole
+coverity log, I'm able to send Coverity's plain-text results on
+demand.
+
 ---
- net/bluetooth/hci_conn.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ tools/sdptool.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3e0a4b5..38993f6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -359,6 +359,10 @@ int hci_conn_del(struct hci_conn *conn)
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index aea4954..78c97ba 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -2588,7 +2588,7 @@ static int add_cip(sdp_session_t *session, svc_info_t *si)
+ 	proto[0] = sdp_list_append(0, &l2cap);
+ 	apseq = sdp_list_append(0, proto[0]);
+ 	proto[0] = sdp_list_append(proto[0], sdp_data_alloc(SDP_UINT16, &psm));
+-	apseq = sdp_list_append(0, proto[0]);
++	apseq = sdp_list_append(apseq, proto[0]);
  
- 	del_timer(&conn->auto_accept_timer);
- 
-+	tasklet_disable(&hdev->tx_task);
-+	if (!in_serving_softirq())
-+		tasklet_disable(&hdev->rx_task);
-+
- 	if (conn->type == ACL_LINK) {
- 		struct hci_conn *sco = conn->link;
- 		if (sco)
-@@ -379,12 +383,12 @@ int hci_conn_del(struct hci_conn *conn)
- 		}
- 	}
- 
--	tasklet_disable(&hdev->tx_task);
--
- 	hci_conn_hash_del(hdev, conn);
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
- 
-+	if (!in_serving_softirq())
-+		tasklet_enable(&hdev->rx_task);
- 	tasklet_enable(&hdev->tx_task);
- 
- 	skb_queue_purge(&conn->data_q);
+ 	sdp_uuid16_create(&cmtp, CMTP_UUID);
+ 	proto[1] = sdp_list_append(0, &cmtp);
 -- 
-1.7.4.1
+1.7.4.4
 
