@@ -1,106 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: second scan timing out, bisected to 314b2381a79c6bfe3ddc4ba3806ecb6aec27a3db
-Date: Tue, 30 Aug 2011 15:52:18 +0200
-Cc: linux-bluetooth@vger.kernel.org
-References: <201108301005.20103.oliver@neukum.org> <20110830084322.GA15992@dell.ger.corp.intel.com>
-In-Reply-To: <20110830084322.GA15992@dell.ger.corp.intel.com>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: David Herrmann <dh.herrmann@googlemail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"padovan@profusion.mobi" <padovan@profusion.mobi>, "marcel@holtmann.org"
+	<marcel@holtmann.org>
+Date: Tue, 30 Aug 2011 09:40:25 -0400
+Subject: Re: [RFC] Bluetooth: hidp: Check for valid ACL connection
+Message-ID: <1314711625.2232.21.camel@THOR>
+References: <1313764878-3091-1-git-send-email-dh.herrmann@googlemail.com>
+In-Reply-To: <1313764878-3091-1-git-send-email-dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: Text/Plain; charset=US-ASCII
-Message-Id: <201108301552.19010.oliver@neukum.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Dienstag, 30. August 2011, 10:45:05 schrieb Johan Hedberg:
-> Hi Oliver,
-> 
-> On Tue, Aug 30, 2011, Oliver Neukum wrote:
+Hi David,
 
-> I think this is a real issue, but it only happens with the HCIINQUIRY
-> ioctl which bluetoothd doesn't use (but hcitool does). I think the
-> problems is with the following type of additions in the patch:
-> 
-> +       if (test_bit(HCI_MGMT, &hdev->flags) &&
-> +                               test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-> +               mgmt_discovering(hdev->id, 0);
-> 
-> Because of the ordering of the if-statement the HCI_INQUIRY flags
-> doesn't get cleared if HCI_MGMT is not set and so the HCIINQUIRY ioctl
-> doesn't trigger inquiry even though it should (see hci_inq_req in
-> net/bluetooth/hci_core.c). Can you try to flip the ordering of the
-> test_bit and test_and_clear_bit calls in all relevant if-statements in
-> the patch and see if it resolves your issue?
+On Fri, 2011-08-19 at 10:41 -0400, David Herrmann wrote:
+> Also I think it would make the code nicer when calling hidp_get_device() =
+in
+> hidp_add_connection and hidp_setup_input/hid just retrieves the parent-de=
+vice
+> from session->conn.
 
-Hi,
+What about something like this instead?
 
-this patch makes it work again.
+This:
+1. moves the hidp_get_device out into hidp_add_connection
+2. renames hidp_get_device to hidp_find_connection
+3. checks for null connection value return
+4. performs the connection list access with device lock held
+5. bumps the hci connection device hold with device lock held
 
-	Regards
-		Oliver
 
->From 06dedee9fb972748bb9240a498c954089ed1b41e Mon Sep 17 00:00:00 2001
-From: Oliver Neukum <oliver@neukum.org>
-Date: Tue, 30 Aug 2011 14:33:26 +0200
-Subject: [PATCH 1/2] BT:fix timeout on scanning for the second time
-
-The checks for HCI_INQUIRY and HCI_MGMT were in the wrong order,
-so that second scans always failed.
-
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
----
- net/bluetooth/hci_event.c |   17 ++++++++---------
- 1 files changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a40170e..7ef4eb4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -58,8 +58,8 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
--	if (test_bit(HCI_MGMT, &hdev->flags) &&
--				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-+	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
-+			test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_discovering(hdev->id, 0);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
-@@ -76,8 +76,8 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
--	if (test_bit(HCI_MGMT, &hdev->flags) &&
--				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-+	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
-+				test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_discovering(hdev->id, 0);
- 
- 	hci_conn_check_pending(hdev);
-@@ -959,9 +959,8 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 		return;
- 	}
- 
--	if (test_bit(HCI_MGMT, &hdev->flags) &&
--					!test_and_set_bit(HCI_INQUIRY,
--							&hdev->flags))
-+	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags) &&
-+				test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_discovering(hdev->id, 1);
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index e02c6a2..f6db935 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -97,8 +97,6 @@ static void __hidp_link_session(struct hidp_session *sess=
+ion)
+ {
+ 	__module_get(THIS_MODULE);
+ 	list_add(&session->list, &hidp_session_list);
+-
+-	hci_conn_hold_device(session->conn);
  }
- 
-@@ -1340,8 +1339,8 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	BT_DBG("%s status %d", hdev->name, status);
- 
--	if (test_bit(HCI_MGMT, &hdev->flags) &&
--				test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-+	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
-+				test_bit(HCI_MGMT, &hdev->flags))
- 		mgmt_discovering(hdev->id, 0);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
--- 
-1.7.1
+=20
+ static void __hidp_unlink_session(struct hidp_session *session)
+@@ -763,24 +761,26 @@ static int hidp_session(void *arg)
+ 	return 0;
+ }
+=20
+-static struct device *hidp_get_device(struct hidp_session *session)
++static struct hci_conn *hidp_find_connection(struct hidp_session *session)
+ {
+ 	bdaddr_t *src =3D &bt_sk(session->ctrl_sock->sk)->src;
+ 	bdaddr_t *dst =3D &bt_sk(session->ctrl_sock->sk)->dst;
+-	struct device *device =3D NULL;
++	struct hci_conn *conn;
+ 	struct hci_dev *hdev;
+=20
+ 	hdev =3D hci_get_route(dst, src);
+ 	if (!hdev)
+ 		return NULL;
+=20
+-	session->conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
+-	if (session->conn)
+-		device =3D &session->conn->dev;
++	hci_dev_lock_bh(hdev);
++	conn =3D hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
++	if (conn)
++		hci_conn_hold_device(conn);
++	hci_dev_unlock_bh(hdev);
+=20
+ 	hci_dev_put(hdev);
+=20
+-	return device;
++	return conn;
+ }
+=20
+ static int hidp_setup_input(struct hidp_session *session,
+@@ -830,7 +830,7 @@ static int hidp_setup_input(struct hidp_session *sessio=
+n,
+ 		input->relbit[0] |=3D BIT_MASK(REL_WHEEL);
+ 	}
+=20
+-	input->dev.parent =3D hidp_get_device(session);
++	input->dev.parent =3D &session->conn->dev;
+=20
+ 	input->event =3D hidp_input_event;
+=20
+@@ -934,7 +934,7 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	strncpy(hid->phys, batostr(&bt_sk(session->ctrl_sock->sk)->src), 64);
+ 	strncpy(hid->uniq, batostr(&bt_sk(session->ctrl_sock->sk)->dst), 64);
+=20
+-	hid->dev.parent =3D hidp_get_device(session);
++	hid->dev.parent =3D &session->conn->dev;
+ 	hid->ll_driver =3D &hidp_hid_driver;
+=20
+ 	hid->hid_get_raw_report =3D hidp_get_raw_report;
+@@ -975,6 +975,10 @@ int hidp_add_connection(struct hidp_connadd_req *req, =
+struct socket *ctrl_sock,
+ 		goto failed;
+ 	}
+=20
++	session->conn =3D hidp_find_connection(session);
++	if (!session->conn)
++		goto failed;
++
+ 	bacpy(&session->bdaddr, &bt_sk(ctrl_sock->sk)->dst);
+=20
+ 	session->ctrl_mtu =3D min_t(uint, l2cap_pi(ctrl_sock->sk)->chan->omtu,
+@@ -1000,6 +1004,8 @@ int hidp_add_connection(struct hidp_connadd_req *req,=
+ struct socket *ctrl_sock,
+ 	session->flags   =3D req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
+ 	session->idle_to =3D req->idle_to;
+=20
++	__hidp_link_session(session);
++
+ 	if (req->rd_size > 0) {
+ 		err =3D hidp_setup_hid(session, req);
+ 		if (err && err !=3D -ENODEV)
+@@ -1012,8 +1018,6 @@ int hidp_add_connection(struct hidp_connadd_req *req,=
+ struct socket *ctrl_sock,
+ 			goto purge;
+ 	}
+=20
+-	__hidp_link_session(session);
+-
+ 	hidp_set_timer(session);
+=20
+ 	if (session->hid) {
+@@ -1062,8 +1066,6 @@ int hidp_add_connection(struct hidp_connadd_req *req,=
+ struct socket *ctrl_sock,
+ unlink:
+ 	hidp_del_timer(session);
+=20
+-	__hidp_unlink_session(session);
+-
+ 	if (session->input) {
+ 		input_unregister_device(session->input);
+ 		session->input =3D NULL;
+@@ -1076,6 +1078,8 @@ unlink:
+ 	session->rd_data =3D NULL;
+=20
+ purge:
++	__hidp_unlink_session(session);
++
+ 	skb_queue_purge(&session->ctrl_transmit);
+ 	skb_queue_purge(&session->intr_transmit);
+=20
+--=20
 
+Regards,
+Peter Hurley
