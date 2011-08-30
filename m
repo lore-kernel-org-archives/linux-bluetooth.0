@@ -1,42 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pavel Raiskup <praiskup@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ovasik@redhat.com
-Subject: [PATCH 4/8] Null dereference fix
-Date: Tue, 30 Aug 2011 15:10:46 +0200
-Message-Id: <1314709846-13378-1-git-send-email-praiskup@redhat.com>
-In-Reply-To: <op.v0av49xmh52hc0@dhcp-25-209.brq.redhat.com>
-References: <op.v0av49xmh52hc0@dhcp-25-209.brq.redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20110830100743.GB20356@dell>
+References: <1313791842-32558-1-git-send-email-bdilly@profusion.mobi>
+	<1313791842-32558-3-git-send-email-bdilly@profusion.mobi>
+	<20110830100743.GB20356@dell>
+Date: Tue, 30 Aug 2011 10:07:11 -0300
+Message-ID: <CAND=sy97PS4Mtr_7bSqEmHXpdMPGxDUHjHBG36dHk2CcOu6riA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Add test for serial proxy and serial proxy manager
+From: Bruno Dilly <bdilly@profusion.mobi>
+To: Bruno Dilly <bdilly@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Variable ifindex dereferenced on line 242 before null check on
-line 249.
----
- network/common.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+On Tue, Aug 30, 2011 at 7:07 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Bruno,
 
-diff --git a/network/common.c b/network/common.c
-index 6da9f0a..f8cd721 100644
---- a/network/common.c
-+++ b/network/common.c
-@@ -239,13 +239,15 @@ int bnep_if_down(const char *devname)
- 
- int bnep_add_to_bridge(const char *devname, const char *bridge)
- {
--	int ifindex = if_nametoindex(devname);
-+	int ifindex;
- 	struct ifreq ifr;
- 	int sk, err;
- 
- 	if (!devname || !bridge)
- 		return -EINVAL;
- 
-+	ifindex = if_nametoindex(devname);
-+
- 	sk = socket(AF_INET, SOCK_STREAM, 0);
- 	if (sk < 0)
- 		return -1;
+Hey Johan,
+
+>
+> On Fri, Aug 19, 2011, Bruno Dilly wrote:
+>> ---
+>>  test/test-serial-proxy |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 files changed, 64 insertions(+), 0 deletions(-)
+>>  create mode 100755 test/test-serial-proxy
+>
+> This one is missing the corresponding update to EXTRA_DIST in
+> Makefile.tools. Without it the new script will not go to the "make dist"
+> tarball.
+
+Oops, I've sent a new version.
+
+Thank you very much,
+
+>
+> Johan
+>
+
+
+
 -- 
-1.7.4.4
-
+Bruno Dilly
+Senior Developer
+ProFUSION embedded systems
+http://profusion.mobi
