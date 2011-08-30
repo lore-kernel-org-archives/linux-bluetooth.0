@@ -1,72 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Tue, 30 Aug 2011 09:22:25 -0400
-Subject: [PATCH 2/2] Bluetooth: Fix unsafe connection list access
-Message-ID: <1314710545.2232.11.camel@THOR>
+Date: Tue, 30 Aug 2011 09:22:17 -0400
+Subject: [PATCH 0/2] Fix unsafe hci conn add/del
+Message-ID: <1314710537.2232.9.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_num_comp_pkts_evt accesses the hci connection list unsafely (does
-not acquire the dev lock). Considering the relatively infrequent
-updates to the hci connection list, disable the rx tasklet during
-hci connection list updates (rather than claiming dev lock in
-hci_num_comp_pkts_evt).
+These two patches address several problems relating to concurrent
+access of the connection list and avail tx buffer counts when
+hci connections are added and deleted.
 
-NB - this will be even more appropriate when tx buffer counts are
-updated atomically.
+Firstly, both the tx & rx tasklets must be disabled while the
+unacked pkts are added back to the avail tx buffers counts during
+a connection deletion (because the updates are not performed
+atomically here or elsewhere -- yet).
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
- net/bluetooth/hci_conn.c |    8 +++++++-
+Since hci_conn_del is called in both rx_task context and process
+context, disabling the rx_task must be performed conditionally
+so as to avoid deadlock (if the local cpu is in rx_task tasklet
+context and attempts to disable the rx_task, it will wait forever
+for the tasklet it's running to end).
+
+Note that the re-enable of the rx_task is performed after the
+connection list is modified. This is because hci_num_comp_pkts_evt
+does not acquire the device lock while accessing the connection list.
+Rather than claim the device lock (which would render useless efforts to
+perform tx buffer count arithmetic atomically), instead disable the
+rx_task tasklet while the hci connection list is updated.
+
+Peter Hurley (2):
+  Bluetooth: Fix unsafe tx buffer count updates
+  Bluetooth: Fix unsafe connection list access
+
+ net/bluetooth/hci_conn.c |   16 +++++++++++++---
  net/bluetooth/hci_core.c |    4 ----
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 38993f6..4c62a46 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -334,7 +334,13 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 
- 	tasklet_disable(&hdev->tx_task);
- 
--	hci_conn_hash_add(hdev, conn);
-+	if (!in_serving_softirq()) {
-+		tasklet_disable(&hdev->rx_task);
-+		hci_conn_hash_add(hdev, conn);
-+		tasklet_enable(&hdev->rx_task);
-+	} else {
-+		hci_conn_hash_add(hdev, conn);
-+	}
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c9b44c5..6e1817a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1994,9 +1994,7 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hdev->stat.acl_rx++;
- 
--	hci_dev_lock(hdev);
- 	conn = hci_conn_hash_lookup_handle(hdev, handle);
--	hci_dev_unlock(hdev);
- 
- 	if (conn) {
- 		register struct hci_proto *hp;
-@@ -2032,9 +2030,7 @@ static inline void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hdev->stat.sco_rx++;
- 
--	hci_dev_lock(hdev);
- 	conn = hci_conn_hash_lookup_handle(hdev, handle);
--	hci_dev_unlock(hdev);
- 
- 	if (conn) {
- 		register struct hci_proto *hp;
 -- 
 1.7.4.1
 
