@@ -1,85 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Aug 2011 10:53:02 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-    linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
-    padovan@profusion.mobi
-Subject: Re: [RFCv0 0/5] extended window size and extended control field
- support
-In-Reply-To: <1314728311.3373.246.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1108311044300.14580@mathewm-linux>
-References: <1314688721-16742-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>  <alpine.DEB.2.02.1108300842410.14580@mathewm-linux> <1314728311.3373.246.camel@aeonflux>
+Date: Wed, 31 Aug 2011 14:08:39 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 01/12] Add messages to the mgmt interface to handle
+ SMP key storage
+Message-ID: <20110831170839.GA27900@samus.indt.org>
+References: <1313799128-8842-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1313799128-8842-2-git-send-email-vinicius.gomes@openbossa.org>
+ <20110831080706.GA5861@dell.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110831080706.GA5861@dell.ger.corp.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-On Tue, 30 Aug 2011, Marcel Holtmann wrote:
+On 11:07 Wed 31 Aug, Johan Hedberg wrote:
+> Hi Vinicius,
+> 
+> On Fri, Aug 19, 2011, Vinicius Costa Gomes wrote:
+> > +Load SMP Keys Command
+> > +=====================
+> > +
+> > +	Command Code:		0x001F
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:	Debug Keys (1 Octet)
+> > +				Key Count (2 Octets)
+> > +				Key1 {
+> > +					Address (6 Octets)
+> > +					Type (1 Octet)
+> > +					PIN_Length (1 Octet)
+> 
+> Isn't the PIN Length completely irrelevant here since the "Passkey
+> Entry" pairing method of SSP always requires a 6-digit passkey?
 
-> Hi Mat,
->
->>> First draft patches applied to my previous EFS patches. Please comment.
->>>
->>> Adds support for extended window size option (EWS) and extended control
->>> field. Code partly based on Atheros patches sent a year ago and Qualcomm
->>> code git://codeaurora.org/kernel/msm.git.
->>>
->>> To decode EWS option and extended control field please apply patch to hcidump
->>> which I sent to linux-bluetooth.
->>>
->>> Andrei Emeltchenko (5):
->>>  Bluetooth: extended window size option support
->>>  Bluetooth: l2cap extended control field support
->>>  Bluetooth: EWS: support extended seq numbers
->>>  Bluetooth: remove magic numbers in l2cap
->>>  Bluetooth: prevent unneeded fragmentation in l2cap
->>>
->>> include/net/bluetooth/l2cap.h |  304 ++++++++++++++++++++++----
->>> net/bluetooth/l2cap_core.c    |  481 +++++++++++++++++++++++++----------------
->>> net/bluetooth/l2cap_sock.c    |   11 +-
->>> 3 files changed, 562 insertions(+), 234 deletions(-)
->>>
->>> --
->>> 1.7.4.1
->>
->> Extended window size is next on my list to upstream.  As you probably
->> noticed, the git://codeaurora.org/kernel/msm.git code has a slightly
->> different approach to handling the two control field types.  The
->> fields are handled in a struct that's part of the bt_cb control block,
->> and only read/written in wire format when the frame is first received
->> or about to be sent.  Are there any issues with this method (other
->> than the fact that I haven't upstreamed it yet)?  Some of the
->> subsequent L2CAP state machine changes depend on this.
->
-> in general using bt_cb is fine, but it depends a little bit on the
-> details. The space of the skb cb is limited. So we need to be cautious
-> here.
+_If_ the Passkey Entry method is used. If Just Works is used, PIN Length
+will be zero, and as Carles pointed out, if OOB is used it should be
+something else.
 
-Yes, I've been keeping that limited space in mind.  Some of the data 
-already in bt_cb was control field data, so I removed the redundant 
-entries.
+> 
+> > +					Value (16 Octets)
+> > +					[
+> > +						Encryption Size (1 Octet)
+> > +						Enc. Diversifier (2 Octets)
+> > +						Random Number (8 Octets)
+> > +					] || [
+> > +						Address Type (1 Octet)
+> > +					]
+> 
+> Having unions within mgmt messages starts to push their complexity over
+> the level that I feel comfortable with. Would it make sense to instead
+> have separate "Load LTKs" and "Load IRKs" commands (though you'd then
+> need to have two separate "New LTK" and "New IRK" events too).
 
-> We are also currently making bt_cb global for all protocols. Maybe one
-> way is to have l2cap_cb for this. We need to see what makes more sense
-> and what is more efficient.
->
->> Please let me know if there are specific features from the
->> git://codeaurora.org/kernel/msm.git code base that you would like to
->> prioritize for upstreaming - there's a lot to do to bring in those
->> L2CAP and AMP changes, and I'll have more time to devote to it in
->> mid-September.  I think we can gain a lot by reviewing each other's
->> patches and coordinating our efforts.
->
-> Maybe just for reference, you should post a set of patches to the
-> mailing list so they are archived and seen by others. Digging into a
-> generic msm.git tree is not really efficient.
+Glad that this discussion is happening, as it was not an easy decision
+and I made a compromise in favor of adding less messages to the mgmt
+protocol (less API) and less lines of code in exchange of adding 
+(debatably[1]) more complexity.
 
-I'll take a look at that - I'd have to split up the commits in that 
-git repository in order for them to be suitable for the mailing list.
+One point in favor of this union is that for most the time (if not all) 
+userspace doesn't need to know what is inside that union, userspace
+will only be storing those keys. 
+
+And there's one more key type, the Connection Signature Resolving Key,
+CSRK, used to sign commands, this key type doesn't have any associated
+data with it. So it will mean six more messages.
+
+[1] IMHO using new messages will mean just about moving the switch statement
+that selects what to do in each key type case nearer to the protocol
+level, the complexity will be almost the same, with just more repeated
+code.
+
+> 
+> Btw, what exactly do you need the Address Type for in the case of IRKs
+> and why don't you need it in the case of LTKs?
+
+I am just exporting all the information that I receive from the SMP
+messages. That address type is the address type of the _resolved_
+address not the address type that was used in the connection that
+was used for exchange the keys.
+
+Having the address type along with the LTK would be useful if I could
+use it for reconnections, but that's another problem.
+
+> 
+> Johan
 
 
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+Cheers,
+-- 
+Vinicius
