@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFVnFZYvCrSE9320t=C8hEAoO01kCqTFudnkU_NTKQinAxzqRw@mail.gmail.com>
-References: <CAFVnFZafZxVJtZ1bSKSd1nSOSYBMnG9B_xs=+RqxR6OWpHUQog@mail.gmail.com>
-	<CA+i+Aw2_ZJfBbqukwVXhrOeXTpRENTNPu+225zCLRfanM7c5eQ@mail.gmail.com>
-	<CAFVnFZYvCrSE9320t=C8hEAoO01kCqTFudnkU_NTKQinAxzqRw@mail.gmail.com>
-Date: Wed, 31 Aug 2011 13:15:14 +0100
-Message-ID: <CAFVnFZae_Axh51NGCG0GqshpQQBsQHRg3By6ULLiZ3q6izmCPQ@mail.gmail.com>
-Subject: Re: MAP support in Obexd
-From: "spaceindaver0@gmail.com" <spaceindaver0@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20110831075115.GA6348@dell.ger.corp.intel.com>
+References: <1313798969-8772-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1313798969-8772-2-git-send-email-vinicius.gomes@openbossa.org>
+	<20110831075115.GA6348@dell.ger.corp.intel.com>
+Date: Wed, 31 Aug 2011 14:25:20 +0300
+Message-ID: <CABBYNZ++5EG+4w=VzBNKNPXQVJ_17aRyHdH6=X_LyYWxY7TZhw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] Add link_type information to the mgmt "Device
+ Connected" event
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi,
 
-On Fri, Aug 19, 2011 at 9:36 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
->Yes, the work on MAP server is ongoing.
+On Wed, Aug 31, 2011 at 10:51 AM, Johan Hedberg <johan.hedberg@gmail.com> w=
+rote:
+> Hi Vinicius,
+>
+> On Fri, Aug 19, 2011, Vinicius Costa Gomes wrote:
+>> --- a/lib/hci.h
+>> +++ b/lib/hci.h
+>> @@ -212,6 +212,8 @@ enum {
+>> =A0#define SCO_LINK =A0 =A0 0x00
+>> =A0#define ACL_LINK =A0 =A0 0x01
+>> =A0#define ESCO_LINK =A0 =A00x02
+>> +/* Low Energy links do not have defined link type. Use invented one */
+>> +#define LE_LINK =A0 =A0 =A0 =A0 =A0 =A0 =A00x80
+>
+> I remember Marcel being against any self-invented additions like this.
+> Have you discussed this with him?
 
-Okay, I will assume that you are just working on the server side so I
-can begin work on the IVI client side.
+Actually this follows what kernel has being doing:
 
-I look forward to working with you and finding out more about working
-in an open source environment.
+include/net/bluetooth/hci.h:175:#define LE_LINK		0x80
 
-All the best,
-David O Carroll
+--=20
+Luiz Augusto von Dentz
