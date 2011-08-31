@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Aug 2011 15:27:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH BlueZ 1/8] Add link_type information to the mgmt "Device
- Connected" event
-Message-ID: <20110831122752.GA16805@dell.ger.corp.intel.com>
-References: <1313798969-8772-1-git-send-email-vinicius.gomes@openbossa.org>
- <1313798969-8772-2-git-send-email-vinicius.gomes@openbossa.org>
- <20110831075115.GA6348@dell.ger.corp.intel.com>
- <CABBYNZ++5EG+4w=VzBNKNPXQVJ_17aRyHdH6=X_LyYWxY7TZhw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <CABBYNZ++5EG+4w=VzBNKNPXQVJ_17aRyHdH6=X_LyYWxY7TZhw@mail.gmail.com>
+In-Reply-To: <CAFVnFZYvCrSE9320t=C8hEAoO01kCqTFudnkU_NTKQinAxzqRw@mail.gmail.com>
+References: <CAFVnFZafZxVJtZ1bSKSd1nSOSYBMnG9B_xs=+RqxR6OWpHUQog@mail.gmail.com>
+	<CA+i+Aw2_ZJfBbqukwVXhrOeXTpRENTNPu+225zCLRfanM7c5eQ@mail.gmail.com>
+	<CAFVnFZYvCrSE9320t=C8hEAoO01kCqTFudnkU_NTKQinAxzqRw@mail.gmail.com>
+Date: Wed, 31 Aug 2011 13:15:14 +0100
+Message-ID: <CAFVnFZae_Axh51NGCG0GqshpQQBsQHRg3By6ULLiZ3q6izmCPQ@mail.gmail.com>
+Subject: Re: MAP support in Obexd
+From: "spaceindaver0@gmail.com" <spaceindaver0@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi all,
 
-On Wed, Aug 31, 2011, Luiz Augusto von Dentz wrote:
-> >> +/* Low Energy links do not have defined link type. Use invented one */
-> >> +#define LE_LINK              0x80
-> >
-> > I remember Marcel being against any self-invented additions like this.
-> > Have you discussed this with him?
-> 
-> Actually this follows what kernel has being doing:
-> 
-> include/net/bluetooth/hci.h:175:#define LE_LINK		0x80
+On Fri, Aug 19, 2011 at 9:36 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>Yes, the work on MAP server is ongoing.
 
-Indeed it does. Also, the patch (from Ville) that introduced this to the
-kernel has Marcel's Ack on it, so I guess it's fine then.
+Okay, I will assume that you are just working on the server side so I
+can begin work on the IVI client side.
 
-Johan
+I look forward to working with you and finding out more about working
+in an open source environment.
+
+All the best,
+David O Carroll
