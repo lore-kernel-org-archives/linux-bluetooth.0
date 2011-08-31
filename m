@@ -4,41 +4,32 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v4 1/4] Fix disconnect SCO at same time than RFCOMM
-Date: Wed, 31 Aug 2011 17:48:49 +0200
-Message-Id: <1314805732-30418-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v4 0/4] Add support for HandsfreeGateway to Media
+Date: Wed, 31 Aug 2011 17:48:48 +0200
+Message-Id: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If RFCOMM disconnects, SCO should be disconnected too.
----
- audio/gateway.c |    7 +------
- 1 files changed, 1 insertions(+), 6 deletions(-)
+Hi,
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 142b12e..59c91dd 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -222,15 +222,10 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
- 			struct audio_device *dev)
- {
--	struct gateway *gw = dev->gateway;
--
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
- 
--	g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
--	g_io_channel_unref(gw->rfcomm);
--	gw->rfcomm = NULL;
--	change_state(dev, GATEWAY_STATE_DISCONNECTED);
-+	gateway_close(dev);
- 
- 	return FALSE;
- }
--- 
-1.7.1
+The first patch in this series fix the issue remaining in v2.
+It also fix a crash because the request_stream callback was run synchronously.
+After that two minor fixes.
+
+Best regards,
+Frédéric
+
+Frédéric Dalleau (4):
+  Fix disconnect SCO at same time than RFCOMM
+  Fix asynchronously run request stream cb
+  Fix state to "playing" on SCO establishment
+  Set state to "connecting" on connection requested
+
+ audio/gateway.c |  153 +++++++++++++++++++++++++++++++++++++------------------
+ audio/gateway.h |    2 +-
+ audio/unix.c    |   13 ++---
+ 3 files changed, 109 insertions(+), 59 deletions(-)
 
