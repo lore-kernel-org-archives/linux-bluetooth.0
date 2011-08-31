@@ -1,57 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Nami" <nami@qca.qualcomm.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH obexd] Return correct obex service driver in
- obex_session_start
-Date: Fri, 1 Jul 2011 02:50:46 +0000
-Message-ID: <EC94610F2568494D8D9291885C48D3103D0DC8@nasanexd01a.na.qualcomm.com>
-References: <1309419294-9903-1-git-send-email-nami.li@atheros.com>
-	<BANLkTim8jj13o8zeRawV_QpT9+rp-afrbQ@mail.gmail.com>
-	<EC94610F2568494D8D9291885C48D3103D08A1@nasanexd01a.na.qualcomm.com>
- <BANLkTi=YQcF-s+k2b26Rj5WeB--TOGsoHw@mail.gmail.com>
-In-Reply-To: <BANLkTi=YQcF-s+k2b26Rj5WeB--TOGsoHw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Wed, 31 Aug 2011 10:53:02 -0700 (PDT)
+From: Mat Martineau <mathewm@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+    linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org,
+    padovan@profusion.mobi
+Subject: Re: [RFCv0 0/5] extended window size and extended control field
+ support
+In-Reply-To: <1314728311.3373.246.camel@aeonflux>
+Message-ID: <alpine.DEB.2.02.1108311044300.14580@mathewm-linux>
+References: <1314688721-16742-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>  <alpine.DEB.2.02.1108300842410.14580@mathewm-linux> <1314728311.3373.246.camel@aeonflux>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBTbGF3b21pciBCb2NoZW5za2kg
-W21haWx0bzpsa3NsYXdla0BnbWFpbC5jb21dIA0KU2VudDogMjAxMeW5tDbmnIgzMOaXpSAxODoy
-Ng0KVG86IExpLCBOYW1pDQpDYzogTHVpeiBBdWd1c3RvIHZvbiBEZW50ejsgbGludXgtYmx1ZXRv
-b3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSCBvYmV4ZF0gUmV0dXJuIGNv
-cnJlY3Qgb2JleCBzZXJ2aWNlIGRyaXZlciBpbiBvYmV4X3Nlc3Npb25fc3RhcnQNCg0KT24gVGh1
-LCBKdW4gMzAsIDIwMTEgYXQgMTI6MDEgUE0sIExpLCBOYW1pIDxuYW1pQHFjYS5xdWFsY29tbS5j
-b20+IHdyb3RlOg0KPiBXZWxsLCBpZiB0aGUgcHJvZmlsZSBpcyBPUFAsIHRoZW4geW91IGNhbiBn
-ZXQgY29ycmVjdCBzZXJ2aWNlIGRyaXZlci4gQnV0IGlmIHRoZSBwcm9maWxlIGlzIEZUUCwgYmVj
-YXVzZSBpbiBmdHAuYzoNCj4NCj4gc3RhdGljIHN0cnVjdCBvYmV4X3NlcnZpY2VfZHJpdmVyIGZ0
-cCA9IHsNCj4gwqAgwqAgwqAgwqAubmFtZSA9ICJGaWxlIFRyYW5zZmVyIHNlcnZlciIsDQo+IMKg
-IMKgIMKgIMKgLnNlcnZpY2UgPSBPQkVYX0ZUUCwNCj4gwqAgwqAgwqAgwqAuY2hhbm5lbCA9IEZU
-UF9DSEFOTkVMLA0KPiDCoCDCoCDCoCDCoC5wc20gPSBGVFBfUFNNLA0KPiDCoCDCoCDCoCDCoC5y
-ZWNvcmQgPSBGVFBfUkVDT1JELA0KPiDCoCDCoCDCoCDCoC50YXJnZXQgPSBGVFBfVEFSR0VULA0K
-PiDCoCDCoCDCoCDCoC50YXJnZXRfc2l6ZSA9IFRBUkdFVF9TSVpFLA0KPiDCoCDCoCDCoCDCoC5j
-b25uZWN0ID0gZnRwX2Nvbm5lY3QsDQo+IMKgIMKgIMKgIMKgLmdldCA9IGZ0cF9nZXQsDQo+IMKg
-IMKgIMKgIMKgLnB1dCA9IGZ0cF9wdXQsDQo+IMKgIMKgIMKgIMKgLmNoa3B1dCA9IGZ0cF9jaGtw
-dXQsDQo+IMKgIMKgIMKgIMKgLnNldHBhdGggPSBmdHBfc2V0cGF0aCwNCj4gwqAgwqAgwqAgwqAu
-ZGlzY29ubmVjdCA9IGZ0cF9kaXNjb25uZWN0DQo+IH07DQo+IEl0YHMgdGFyZ2V0IGlzIG5vdCBu
-dWxsLCB0YXJnZXRfc2l6ZSBpcyAxNiwgc28gIiBvYmV4X3NlcnZpY2VfZHJpdmVyX2ZpbmQoc2Vy
-dmVyLT5kcml2ZXJzLCBOVUxMLDAsIE5VTEwsIDApIiB3aWxsIHJldHVybiBudWxsLg0KPg0KPiBB
-bmQgSWBtIG5vdCBwaWNraW5nIHVwIHRoZSBmaXJzdCBkcml2ZXIgaW4gdGhlIGxpc3QsIGFjdHVh
-bGx5IGl0IGlzIHRoZSBvbmx5IG9uZSBpbiB0aGUgbGlzdC4NCg0KSW4gY2FzZSBvZiBvdGhlciBw
-cm9maWxlcywgdGhlcmUgaXMgT0JFWCBjb25uZWN0IGNvbW1hbmQgcmVxdWlyZWQsIGFuZCB0aGVu
-IHRoZSBhcHByb3ByaWF0ZSBkcml2ZXIgd2lsbCBiZSBzZWxlY3RlZCBpbiBjYWxsYmFjayBmb3Ig
-T0JFWCBjb25uZWN0IGV2ZW50IChzZWUgY21kX2Nvbm5lY3QoKSkuDQoNCi0tDQpTbGF3b21pciBC
-b2NoZW5za2kNCg0KDQpZZXAsIHlvdSBjYW4gZ2V0IHJpZ2h0IGRpdmVyIGFmdGVyIGNtZF9jb25u
-ZWN0KCkuIEJ1dCBJIHRoaW5rIHVzZXIgc2hvdWxkIGdldCBjb3JyZWN0IGRyaXZlciBvbmNlIG9i
-ZXggc2Vzc2lvbiBzdGFydCwgbm90IGFmdGVyIGNvbm5lY3QgY21kLiBXaGF0IGlmIHVzZXIgd2Fu
-dCB0byB1c2UgZHJpdmVyIGluIG9iZXhfc2Vzc2lvbl9zdGFydCgpID8gSSBuZWVkIHRvIHVzZSBp
-dCB3aGVuIGFkZCBPQkVYIG92ZXIgTDJDQVAuDQpGb3IgT1BQLCBpdCBkb2VzbmB0IHJlZ2lzdGVy
-IHRhcmdldCBhbmQgdGFyZ2V0IHNpemUgaW4gb3BwLmMuIFNvIHdoZW4geW91IGNhbGwgIm9iZXhf
-c2VydmljZV9kcml2ZXJfZmluZChzZXJ2ZXItPmRyaXZlcnMsIE5VTEwsIDAsIE5VTEwsIDApOyAi
-LCBpdCBhbHNvIHJldHVybnMgb24gZmlyc3QgYW5kIG9ubHkgbGlzdCBtZW1iZXI6DQoNCgkJCQkJ
-ICBpZiAobWVtbmNtcDAodGFyZ2V0LCB0YXJnZXRfc2l6ZSwgZHJpdmVyLT50YXJnZXQsZHJpdmVy
-LT50YXJnZXRfc2l6ZSkgPT0gMCkJCQlyZXR1cm4gZHJpdmVyOw0Kd2hpY2ggaXMgYWN0dWFsbHkg
-PT09PiAgICBpZiAobWVtbmNtcDAoTlVMTCwwLCBOVUxMLDApID09IDApCQkJcmV0dXJuIGRyaXZl
-cjsNCg0KDQpTbyBJIHRoaW5rIG15IHBhdGNoIGlzIE9LLg0KDQpSZWdhcmRzLA0KTmFtaQ0KDQoN
-Cg0K
+
+On Tue, 30 Aug 2011, Marcel Holtmann wrote:
+
+> Hi Mat,
+>
+>>> First draft patches applied to my previous EFS patches. Please comment.
+>>>
+>>> Adds support for extended window size option (EWS) and extended control
+>>> field. Code partly based on Atheros patches sent a year ago and Qualcomm
+>>> code git://codeaurora.org/kernel/msm.git.
+>>>
+>>> To decode EWS option and extended control field please apply patch to hcidump
+>>> which I sent to linux-bluetooth.
+>>>
+>>> Andrei Emeltchenko (5):
+>>>  Bluetooth: extended window size option support
+>>>  Bluetooth: l2cap extended control field support
+>>>  Bluetooth: EWS: support extended seq numbers
+>>>  Bluetooth: remove magic numbers in l2cap
+>>>  Bluetooth: prevent unneeded fragmentation in l2cap
+>>>
+>>> include/net/bluetooth/l2cap.h |  304 ++++++++++++++++++++++----
+>>> net/bluetooth/l2cap_core.c    |  481 +++++++++++++++++++++++++----------------
+>>> net/bluetooth/l2cap_sock.c    |   11 +-
+>>> 3 files changed, 562 insertions(+), 234 deletions(-)
+>>>
+>>> --
+>>> 1.7.4.1
+>>
+>> Extended window size is next on my list to upstream.  As you probably
+>> noticed, the git://codeaurora.org/kernel/msm.git code has a slightly
+>> different approach to handling the two control field types.  The
+>> fields are handled in a struct that's part of the bt_cb control block,
+>> and only read/written in wire format when the frame is first received
+>> or about to be sent.  Are there any issues with this method (other
+>> than the fact that I haven't upstreamed it yet)?  Some of the
+>> subsequent L2CAP state machine changes depend on this.
+>
+> in general using bt_cb is fine, but it depends a little bit on the
+> details. The space of the skb cb is limited. So we need to be cautious
+> here.
+
+Yes, I've been keeping that limited space in mind.  Some of the data 
+already in bt_cb was control field data, so I removed the redundant 
+entries.
+
+> We are also currently making bt_cb global for all protocols. Maybe one
+> way is to have l2cap_cb for this. We need to see what makes more sense
+> and what is more efficient.
+>
+>> Please let me know if there are specific features from the
+>> git://codeaurora.org/kernel/msm.git code base that you would like to
+>> prioritize for upstreaming - there's a lot to do to bring in those
+>> L2CAP and AMP changes, and I'll have more time to devote to it in
+>> mid-September.  I think we can gain a lot by reviewing each other's
+>> patches and coordinating our efforts.
+>
+> Maybe just for reference, you should post a set of patches to the
+> mailing list so they are archived and seen by others. Digging into a
+> generic msm.git tree is not really efficient.
+
+I'll take a look at that - I'd have to split up the commits in that 
+git repository in order for them to be suitable for the mailing list.
+
+
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
