@@ -1,35 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v4 0/4] Add support for HandsfreeGateway to Media
-Date: Wed, 31 Aug 2011 17:48:48 +0200
-Message-Id: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: second scan timing out, bisected to 314b2381a79c6bfe3ddc4ba3806ecb6aec27a3db
+Mime-Version: 1.0 (Apple Message framework v1244.3)
+Content-Type: text/plain; charset=iso-8859-1
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <201108311616.56297.oneukum@suse.de>
+Date: Wed, 31 Aug 2011 11:46:31 -0300
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <29B50A2B-987E-4942-B94B-D15ACD5425F6@openbossa.org>
+References: <201108301005.20103.oliver@neukum.org> <201108301552.19010.oliver@neukum.org> <407EE2E8-9841-4A67-B63D-F2084E341C92@openbossa.org> <201108311616.56297.oneukum@suse.de>
+To: Oliver Neukum <oneukum@suse.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Oliver,
 
-The first patch in this series fix the issue remaining in v2.
-It also fix a crash because the request_stream callback was run synchronously.
-After that two minor fixes.
+On Aug 31, 2011, at 11:16 AM, Oliver Neukum wrote:
 
-Best regards,
-Frédéric
+> Am Dienstag, 30. August 2011, 16:53:04 schrieb Andre Guedes:
+>> I'm working on a new version of discovery procedure support and I have
+>> the fix for this issue in that patch series (see [PATCH v2 01/16]
+>> Bluetooth: Periodic Inquiry and mgmt discovering event).
+>> 
+>> Soon, I'll send the new version of discovery patches to ML.
+> 
+> Hi,
+> 
+> what else does this patch do?
 
-Frédéric Dalleau (4):
-  Fix disconnect SCO at same time than RFCOMM
-  Fix asynchronously run request stream cb
-  Fix state to "playing" on SCO establishment
-  Set state to "connecting" on connection requested
+It changes hci_event.c so periodic inquiry don't send
+mgmt_discovering events.
 
- audio/gateway.c |  153 +++++++++++++++++++++++++++++++++++++------------------
- audio/gateway.h |    2 +-
- audio/unix.c    |   13 ++---
- 3 files changed, 109 insertions(+), 59 deletions(-)
+The discovery patch series adds support for LE-Only and
+BR/EDR/LE discovery procedure through management interface
+(BR/EDR is already supported).
 
+BR,
+
+Andre
