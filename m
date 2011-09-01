@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/5] Bluetooth: EWS: extended window size option support
-Date: Thu,  1 Sep 2011 17:45:06 +0300
-Message-Id: <1314888310-5337-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 3/5] Bluetooth: EWS: support extended seq numbers
+Date: Thu,  1 Sep 2011 17:45:08 +0300
+Message-Id: <1314888310-5337-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1314888310-5337-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1314888310-5337-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,269 +11,234 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds support for EWS option. Code partly based on Qualcomm and Atheros
-patches sent upstream a year ago.
+Adds support for extended sequence numbers found in
+extended control fields.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |   11 +++++--
- net/bluetooth/l2cap_core.c    |   62 +++++++++++++++++++++++++++++++++++++++--
- net/bluetooth/l2cap_sock.c    |   10 +++---
- 3 files changed, 72 insertions(+), 11 deletions(-)
+ include/net/bluetooth/l2cap.h |   17 +++++++++++
+ net/bluetooth/l2cap_core.c    |   63 +++++++++++++++++++---------------------
+ net/bluetooth/l2cap_sock.c    |    1 +
+ 3 files changed, 48 insertions(+), 33 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index fc81771..29fb05a 100644
+index b4b657e..a1742cb 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -31,7 +31,7 @@
- #define L2CAP_DEFAULT_MTU		672
- #define L2CAP_DEFAULT_MIN_MTU		48
- #define L2CAP_DEFAULT_FLUSH_TO		0xffff
--#define L2CAP_DEFAULT_TX_WINDOW		63
-+#define L2CAP_DEFAULT_MAX_TX_WINDOW	63
- #define L2CAP_DEFAULT_MAX_TX		3
- #define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
- #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
-@@ -42,6 +42,8 @@
- #define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
- #define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
- 
-+#define L2CAP_DEFAULT_MAX_EXT_WINDOW	0x3FFF
-+
- #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
- #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
- 
-@@ -240,6 +242,7 @@ struct l2cap_conf_opt {
- #define L2CAP_CONF_RFC		0x04
- #define L2CAP_CONF_FCS		0x05
- #define L2CAP_CONF_EFS		0x06
-+#define L2CAP_CONF_EWS		0x07
- 
- #define L2CAP_CONF_MAX_SIZE	22
- 
-@@ -357,7 +360,7 @@ struct l2cap_chan {
- 
+@@ -384,6 +384,7 @@ struct l2cap_chan {
  	__u8		fcs;
  
--	__u8		tx_win;
-+	__u16		tx_win;
+ 	__u16		tx_win;
++	__u16		tx_win_max;
  	__u8		max_tx;
  	__u16		retrans_timeout;
  	__u16		monitor_timeout;
-@@ -381,7 +384,7 @@ struct l2cap_chan {
- 	struct sk_buff	*sdu;
- 	struct sk_buff	*sdu_last_frag;
+@@ -552,6 +553,22 @@ enum {
+ 		L2CAP_DEFAULT_ACK_TO);
+ #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
  
--	__u8		remote_tx_win;
-+	__u16		remote_tx_win;
- 	__u8		remote_max_tx;
- 	__u16		remote_mps;
- 
-@@ -490,6 +493,7 @@ enum {
- 	CONF_STATE2_DEVICE,
- 	CONF_LOCAL_PEND,
- 	CONF_REMOTE_PEND,
-+	CONF_EWS_RECV,
- };
- 
- #define L2CAP_CONF_MAX_CONF_REQ 2
-@@ -510,6 +514,7 @@ enum {
- /* Definitions for flags in l2cap_chan */
- enum {
- 	FLAG_EFS_ENABLE,
-+	FLAG_EXT_CTRL,
- };
- 
- #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
++static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
++{
++	int offset;
++
++	offset = (seq1 - seq2) % (chan->tx_win_max + 1);
++	if (offset < 0)
++		offset += (chan->tx_win_max + 1);
++
++	return offset;
++}
++
++static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
++{
++	return (seq + 1) % (chan->tx_win_max + 1);
++}
++
+ static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
+ {
+ 	int sub;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cb5ddbf..51dc994 100644
+index 0a8d6e1..7e9fcf3 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -58,6 +58,7 @@
+@@ -1311,7 +1311,7 @@ static void l2cap_streaming_send(struct l2cap_chan *chan)
  
- int disable_ertm;
- int disable_flowspec = 1;
-+int disable_extwindow = 1;
+ 		l2cap_do_send(chan, skb);
  
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { 0x02, };
-@@ -1924,6 +1925,28 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
- 			chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+-		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
++		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+ 	}
  }
  
-+static inline bool __l2cap_ews_supported(struct l2cap_chan *chan)
-+{
-+	return !disable_extwindow &&
-+			chan->conn->feat_mask & L2CAP_FEAT_EXT_WINDOW;
-+}
+@@ -1405,7 +1405,8 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 		__set_retrans_timer(chan);
+ 
+ 		bt_cb(skb)->tx_seq = chan->next_tx_seq;
+-		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
 +
-+static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
-+{
-+	if (chan->tx_win > L2CAP_DEFAULT_MAX_TX_WINDOW &&
-+			__l2cap_ews_supported(chan)) {
-+		/* use extended control field */
-+		set_bit(FLAG_EXT_CTRL, &chan->flags);
-+		if (chan->tx_win > L2CAP_DEFAULT_MAX_EXT_WINDOW)
-+			chan->tx_win = L2CAP_DEFAULT_MAX_EXT_WINDOW;
-+	} else {
-+		if (chan->tx_win > L2CAP_DEFAULT_MAX_TX_WINDOW)
-+			chan->tx_win = L2CAP_DEFAULT_MAX_TX_WINDOW;
++		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+ 
+ 		if (bt_cb(skb)->retries == 1)
+ 			chan->unacked_frames++;
+@@ -1955,13 +1956,16 @@ static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ 			__l2cap_ews_supported(chan)) {
+ 		/* use extended control field */
+ 		set_bit(FLAG_EXT_CTRL, &chan->flags);
++		chan->tx_win_max = L2CAP_DEFAULT_MAX_EXT_WINDOW;
 +
+ 		if (chan->tx_win > L2CAP_DEFAULT_MAX_EXT_WINDOW)
+ 			chan->tx_win = L2CAP_DEFAULT_MAX_EXT_WINDOW;
+ 	} else {
 +		clear_bit(FLAG_EXT_CTRL, &chan->flags);
-+	}
-+}
++		chan->tx_win_max = L2CAP_DEFAULT_MAX_TX_WINDOW;
 +
- static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
- {
- 	struct l2cap_conf_req *req = data;
-@@ -1975,7 +1998,6 @@ done:
- 
- 	case L2CAP_MODE_ERTM:
- 		rfc.mode            = L2CAP_MODE_ERTM;
--		rfc.txwin_size      = chan->tx_win;
- 		rfc.max_transmit    = chan->max_tx;
- 		rfc.retrans_timeout = 0;
- 		rfc.monitor_timeout = 0;
-@@ -1983,6 +2005,10 @@ done:
- 		if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
- 			rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
- 
-+		l2cap_txwin_setup(chan);
-+		rfc.txwin_size = chan->tx_win > L2CAP_DEFAULT_MAX_TX_WINDOW ?
-+			L2CAP_DEFAULT_MAX_TX_WINDOW : chan->tx_win;
-+
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
- 							(unsigned long) &rfc);
- 
-@@ -2022,6 +2048,10 @@ done:
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
- 		}
- 
-+		if (__l2cap_ews_supported(chan) &&
-+				test_bit(FLAG_EXT_CTRL, &chan->flags))
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
-+					chan->tx_win);
- 		break;
- 
- 	case L2CAP_MODE_STREAMING:
-@@ -2059,7 +2089,10 @@ done:
- 			chan->fcs = L2CAP_FCS_NONE;
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
- 		}
+ 		if (chan->tx_win > L2CAP_DEFAULT_MAX_TX_WINDOW)
+ 			chan->tx_win = L2CAP_DEFAULT_MAX_TX_WINDOW;
 -
-+		
-+		if (__l2cap_ews_supported(chan) &&
-+				test_bit(FLAG_EXT_CTRL, &chan->flags))
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2, 0);
- 		break;
+-		clear_bit(FLAG_EXT_CTRL, &chan->flags);
+ 	}
+ }
+ 
+@@ -2176,6 +2180,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 		case L2CAP_CONF_EWS:
+ 			set_bit(FLAG_EXT_CTRL, &chan->flags);
+ 			chan->remote_tx_win = val;
++			chan->tx_win_max = L2CAP_DEFAULT_MAX_EXT_WINDOW;
+ 			set_bit(CONF_EWS_RECV, &chan->conf_state);
+ 			break;
+ 
+@@ -3369,18 +3374,14 @@ static int l2cap_add_to_srej_queue(struct l2cap_chan *chan, struct sk_buff *skb,
+ 		return 0;
  	}
  
-@@ -2119,6 +2152,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
- 				memcpy(&efs, (void *) val, olen);
- 			break;
+-	tx_seq_offset = (tx_seq - chan->buffer_seq) % 64;
+-	if (tx_seq_offset < 0)
+-		tx_seq_offset += 64;
++	tx_seq_offset = __seq_offset(chan, tx_seq, chan->buffer_seq);
  
-+		case L2CAP_CONF_EWS:
-+			set_bit(FLAG_EXT_CTRL, &chan->flags);
-+			chan->remote_tx_win = val;
-+			set_bit(CONF_EWS_RECV, &chan->conf_state);
-+			break;
-+
- 		default:
- 			if (hint)
- 				break;
-@@ -2209,7 +2248,11 @@ done:
- 			break;
+ 	do {
+ 		if (bt_cb(next_skb)->tx_seq == tx_seq)
+ 			return -EINVAL;
  
- 		case L2CAP_MODE_ERTM:
--			chan->remote_tx_win = rfc.txwin_size;
-+			if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
-+				chan->remote_tx_win = rfc.txwin_size;
-+			else
-+				rfc.txwin_size = L2CAP_DEFAULT_MAX_TX_WINDOW;
-+
- 			chan->remote_max_tx = rfc.max_transmit;
+-		next_tx_seq_offset = (bt_cb(next_skb)->tx_seq -
+-						chan->buffer_seq) % 64;
+-		if (next_tx_seq_offset < 0)
+-			next_tx_seq_offset += 64;
++		next_tx_seq_offset = __seq_offset(chan,
++				bt_cb(next_skb)->tx_seq, chan->buffer_seq);
  
- 			if (le16_to_cpu(rfc.max_pdu_size) > chan->conn->mtu - 10)
-@@ -2330,6 +2373,13 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
- 					sizeof(efs), (unsigned long) &efs);
+ 		if (next_tx_seq_offset > tx_seq_offset) {
+ 			__skb_queue_before(&chan->srej_q, next_skb, skb);
+@@ -3570,9 +3571,8 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u16 tx_seq)
  			break;
-+
-+		case L2CAP_CONF_EWS:
-+			chan->tx_win = val < L2CAP_DEFAULT_MAX_EXT_WINDOW ?
-+				val : L2CAP_DEFAULT_MAX_EXT_WINDOW;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS,
-+							2, chan->tx_win);
-+			break;
  		}
+ 
+-		chan->buffer_seq_srej =
+-			(chan->buffer_seq_srej + 1) % 64;
+-		tx_seq = (tx_seq + 1) % 64;
++		chan->buffer_seq_srej = __next_seq(chan, chan->buffer_seq_srej);
++		tx_seq = __next_seq(chan, tx_seq);
+ 	}
+ }
+ 
+@@ -3607,10 +3607,13 @@ static void l2cap_send_srejframe(struct l2cap_chan *chan, u16 tx_seq)
+ 
+ 		new = kzalloc(sizeof(struct srej_list), GFP_ATOMIC);
+ 		new->tx_seq = chan->expected_tx_seq;
+-		chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
++
++		chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
++
+ 		list_add_tail(&new->list, &chan->srej_l);
+ 	}
+-	chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
++
++	chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
+ }
+ 
+ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_control, struct sk_buff *skb)
+@@ -3636,9 +3639,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
+ 	chan->expected_ack_seq = req_seq;
+ 	l2cap_drop_acked_frames(chan);
+ 
+-	tx_seq_offset = (tx_seq - chan->buffer_seq) % 64;
+-	if (tx_seq_offset < 0)
+-		tx_seq_offset += 64;
++	tx_seq_offset = __seq_offset(chan, tx_seq, chan->buffer_seq);
+ 
+ 	/* invalid tx_seq */
+ 	if (tx_seq_offset >= chan->tx_win) {
+@@ -3686,10 +3687,8 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
+ 			l2cap_send_srejframe(chan, tx_seq);
+ 		}
+ 	} else {
+-		expected_tx_seq_offset =
+-			(chan->expected_tx_seq - chan->buffer_seq) % 64;
+-		if (expected_tx_seq_offset < 0)
+-			expected_tx_seq_offset += 64;
++		expected_tx_seq_offset = __seq_offset(chan,
++				chan->expected_tx_seq, chan->buffer_seq);
+ 
+ 		/* duplicated tx_seq */
+ 		if (tx_seq_offset < expected_tx_seq_offset)
+@@ -3714,7 +3713,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
+ 	return 0;
+ 
+ expected:
+-	chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
++	chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
+ 
+ 	if (test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
+ 		bt_cb(skb)->tx_seq = tx_seq;
+@@ -3724,7 +3723,8 @@ expected:
  	}
  
-@@ -2972,6 +3022,9 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 		if (!disable_flowspec)
- 			feat_mask |= L2CAP_FEAT_EXT_FLOW;
- 
-+		if (!disable_extwindow)
-+			feat_mask |= L2CAP_FEAT_EXT_WINDOW;
+ 	err = l2cap_reassemble_sdu(chan, skb, rx_control);
+-	chan->buffer_seq = (chan->buffer_seq + 1) % 64;
++	chan->buffer_seq = __next_seq(chan, chan->buffer_seq);
 +
- 		put_unaligned_le32(feat_mask, rsp->data);
- 		l2cap_send_cmd(conn, cmd->ident,
- 					L2CAP_INFO_RSP, sizeof(buf), buf);
-@@ -4496,3 +4549,6 @@ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
+ 	if (err < 0) {
+ 		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+ 		return err;
+@@ -3939,14 +3939,11 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 	}
  
- module_param(disable_flowspec, bool, 0644);
- MODULE_PARM_DESC(disable_flowspec, "Disable Extended Flow Specification");
+ 	req_seq = __get_reqseq(chan, control);
+-	req_seq_offset = (req_seq - chan->expected_ack_seq) % 64;
+-	if (req_seq_offset < 0)
+-		req_seq_offset += 64;
+ 
+-	next_tx_seq_offset =
+-		(chan->next_tx_seq - chan->expected_ack_seq) % 64;
+-	if (next_tx_seq_offset < 0)
+-		next_tx_seq_offset += 64;
++	req_seq_offset = __seq_offset(chan, req_seq, chan->expected_ack_seq);
 +
-+module_param(disable_extwindow, bool, 0644);
-+MODULE_PARM_DESC(disable_extwindow, "Disable Extended Window Size");
++	next_tx_seq_offset = __seq_offset(chan, chan->next_tx_seq,
++			chan->expected_ack_seq);
+ 
+ 	/* check for invalid req-seq */
+ 	if (req_seq_offset > next_tx_seq_offset) {
+@@ -4051,7 +4048,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 			/* TODO: Notify userland of missing data */
+ 		}
+ 
+-		chan->expected_tx_seq = (tx_seq + 1) % 64;
++		chan->expected_tx_seq = __next_seq(chan, tx_seq);
+ 
+ 		if (l2cap_reassemble_sdu(chan, skb, control) == -EMSGSIZE)
+ 			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 61f1f62..d6a4f63 100644
+index d6a4f63..bf343aa 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -331,7 +331,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
- 		opts.mode     = chan->mode;
- 		opts.fcs      = chan->fcs;
- 		opts.max_tx   = chan->max_tx;
--		opts.txwin_size = (__u16)chan->tx_win;
-+		opts.txwin_size = chan->tx_win;
+@@ -969,6 +969,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
  
- 		len = min_t(unsigned int, len, sizeof(opts));
- 		if (copy_to_user(optval, (char *) &opts, len))
-@@ -500,7 +500,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		opts.mode     = chan->mode;
- 		opts.fcs      = chan->fcs;
- 		opts.max_tx   = chan->max_tx;
--		opts.txwin_size = (__u16)chan->tx_win;
-+		opts.txwin_size = chan->tx_win;
+ 	/* Default config options */
+ 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
++	chan->tx_win_max = L2CAP_DEFAULT_MAX_TX_WINDOW;
  
- 		len = min_t(unsigned int, sizeof(opts), optlen);
- 		if (copy_from_user((char *) &opts, optval, len)) {
-@@ -508,7 +508,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 			break;
- 		}
- 
--		if (opts.txwin_size > L2CAP_DEFAULT_TX_WINDOW) {
-+		if (opts.txwin_size > L2CAP_DEFAULT_MAX_EXT_WINDOW) {
- 			err = -EINVAL;
- 			break;
- 		}
-@@ -532,7 +532,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		chan->omtu = opts.omtu;
- 		chan->fcs  = opts.fcs;
- 		chan->max_tx = opts.max_tx;
--		chan->tx_win = (__u8)opts.txwin_size;
-+		chan->tx_win = opts.txwin_size;
- 		break;
- 
- 	case L2CAP_LM:
-@@ -958,7 +958,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		}
- 		chan->max_tx = L2CAP_DEFAULT_MAX_TX;
- 		chan->fcs  = L2CAP_FCS_CRC16;
--		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
-+		chan->tx_win = L2CAP_DEFAULT_MAX_TX_WINDOW;
- 		chan->sec_level = BT_SECURITY_LOW;
- 		chan->role_switch = 0;
- 		chan->force_reliable = 0;
+ 	chan->data = sk;
+ 	chan->ops = &l2cap_chan_ops;
 -- 
 1.7.4.1
 
