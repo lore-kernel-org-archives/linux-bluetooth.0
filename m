@@ -1,25 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E5F1DD6.2090102@bluewatersys.com>
-Date: Thu, 01 Sep 2011 17:53:26 +1200
-From: Andre Renaud <andre@bluewatersys.com>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 1 Sep 2011 00:58:33 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Linux Bluetooth mini-summit in Prague
+Message-ID: <20110901035833.GC15578@joana>
+References: <1312874654.3373.97.camel@aeonflux>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: PCM audio output
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1312874654.3373.97.camel@aeonflux>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-I am working with an embedded device which has a Marvell 8688 based
-bluetooth chip. We would like to use an external headset, but rather
-than have the audio be transmitted over the HCI layer, we'd like it to
-be sent directly out the PCM lines from the bluetooth chip, thus Linux
-really doesn't see any audio data, but is responsible for setting up the
-link/keys/authentication etc...
+Hi all,
 
-Are there any instructions on how to go about this? I've had a quick
-look around, and this doesn't seem to be a particularly popular
-configuration.
+This is a reminder about our Bluetooth Summit happening in October, in Prague.
 
-Regards,
-Andre
+The Kernel Summit staff would like to have our invite list soon, so contact
+Marcel or myself if you wanna join the Bluetooth mini-summit, also tell us if
+you have topic proposals.
+
+	Gustavo
+
+
+* Marcel Holtmann <marcel@holtmann.org> [2011-08-09 09:24:14 +0200]:
+
+> Hi everybody,
+> 
+> we decided to have Bluetooth mini-summit in Prague along with the Kernel
+> summit and the LinuxCon Europe.
+> 
+> http://events.linuxfoundation.org/events/linux-kernel-summit/schedule
+> 
+> If you are interested in joining us, please contact Gustavo and myself
+> for getting you on the invitation list.
+> 
+> We are also collecting proposal for the agenda now. Right now everything
+> is wide open, but the Bluetooth 3.0 and 4.0 will be two major topics as
+> it seems.
+> 
+> Regards
+> 
+> Marcel
