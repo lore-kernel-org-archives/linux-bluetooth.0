@@ -1,44 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Sep 2011 15:28:27 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 3/3 v2] client: port to gobex
-Message-ID: <20110901182827.GA5919@samus.indt.org>
-References: <1314870472-31983-1-git-send-email-luiz.dentz@gmail.com>
- <1314870472-31983-3-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314870472-31983-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <20110901072416.GA17434@dell.ger.corp.intel.com>
+References: <4E5F1DD6.2090102@bluewatersys.com>
+	<20110901072416.GA17434@dell.ger.corp.intel.com>
+Date: Thu, 1 Sep 2011 09:31:21 -0600
+Message-ID: <CAKLsOOOJt4F1MuDrZEnOBzR2Vt77rm1vq=tHhVDgKLFdy-SkHQ@mail.gmail.com>
+Subject: Re: PCM audio output
+From: Brad Midgley <bmidgley@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Johan,
 
-On 12:47 Thu 01 Sep, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This remove gwobex dependency of the client using gobex instead.
-> 
-> Based on initial work by Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  Makefile.am       |    2 +-
->  client/driver.h   |    2 +-
->  client/ftp.c      |  139 +++++++++++++------
->  client/pbap.c     |  144 ++++++++++++++------
->  client/session.c  |   76 ++++++++---
->  client/session.h  |    8 +-
->  client/sync.c     |    3 +
->  client/transfer.c |  390 ++++++++++++++++++++++++++++++----------------------
->  client/transfer.h |    5 +-
->  9 files changed, 494 insertions(+), 275 deletions(-)
-> 
+> If your system uses PulseAudio you're in luck since it has built-in
+> support for this. However, pulse expects the kernel to provide an ALSA
+> device abstraction for the PCM hardware link to the Bluetooth
+> controller. You can tell the bluetooth-device module the name of this
+> special ALSA device through the sco_sink and sco_source parameters.
 
-Great job.
+Are you aware of anyone who has put these pieces together in something
+that we can look at? I've seen discussed what it would look like a
+couple of times but not specifics yet.
 
-Take my "Ack", may it serve you well :-)
+I see the doc/media-api.txt. Are there tests or examples of the
+minimal media calls to make sco connection monitoring work?
 
-
-Cheers,
 -- 
-Vinicius
+Brad Midgley
