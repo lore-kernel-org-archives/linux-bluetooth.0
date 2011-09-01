@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 7/7] Bluetooth: EFS: parse l2cap config rsp pending
-Date: Thu,  1 Sep 2011 14:07:36 +0300
-Message-Id: <1314875256-6904-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 1/7] Bluetooth: L2CAP extended feature mask update
+Date: Thu,  1 Sep 2011 14:07:30 +0300
+Message-Id: <1314875256-6904-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,67 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add parsing for L2CAP pending response for EFS. Currently
-respond with success when we receive both configuration responses
-pending.
+Update L2CAP extended feature mask to reflect recent BT spec.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   32 ++++++++++++++++++++++++++++++++
- 1 files changed, 32 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c2c5eb7..cb5ddbf 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2757,6 +2757,15 @@ static inline int l2cap_config_req(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 		chan->num_conf_req++;
- 	}
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 6fa1140..9850cb5 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -91,13 +91,17 @@ struct l2cap_conninfo {
+ #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
+ #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
  
-+	if (test_bit(CONF_REMOTE_PEND, &chan->conf_state)) {
-+		/* check compatibility */
-+		clear_bit(CONF_LOCAL_PEND, &chan->conf_state);
-+		set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
-+		l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
-+				l2cap_build_conf_rsp(chan, rsp,
-+					L2CAP_CONF_SUCCESS, 0x0000), rsp);
-+	}
-+
- unlock:
- 	bh_unlock_sock(sk);
- 	return 0;
-@@ -2786,8 +2795,31 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn, struct l2cap_cmd_hdr
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
-+		clear_bit(CONF_REMOTE_PEND, &chan->conf_state);
- 		break;
+-/* L2CAP feature mask */
++/* L2CAP extended feature mask */
+ #define L2CAP_FEAT_FLOWCTL	0x00000001
+ #define L2CAP_FEAT_RETRANS	0x00000002
++#define L2CAP_FEAT_BIDIR_QOS	0x00000004
+ #define L2CAP_FEAT_ERTM		0x00000008
+ #define L2CAP_FEAT_STREAMING	0x00000010
+ #define L2CAP_FEAT_FCS		0x00000020
++#define L2CAP_FEAT_EXT_FLOW	0x00000040
+ #define L2CAP_FEAT_FIXED_CHAN	0x00000080
++#define L2CAP_FEAT_EXT_WINDOW	0x00000100
++#define L2CAP_FEAT_UCD		0x00000200
  
-+	case L2CAP_CONF_PENDING:
-+		set_bit(CONF_REMOTE_PEND, &chan->conf_state);
-+
-+		if (test_bit(CONF_LOCAL_PEND, &chan->conf_state)) {
-+			char buf[64];
-+
-+			len = l2cap_parse_conf_rsp(chan, rsp->data, len,
-+					buf, &result);
-+			if (len < 0) {
-+				l2cap_send_disconn_req(conn, chan, ECONNRESET);
-+				goto done;
-+			}
-+
-+			/* check compatibility */
-+			clear_bit(CONF_LOCAL_PEND, &chan->conf_state);
-+			set_bit(CONF_OUTPUT_DONE, &chan->conf_state);
-+			l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP,
-+					l2cap_build_conf_rsp(chan, buf,
-+						L2CAP_CONF_SUCCESS, 0x0000), buf);
-+		}
-+		goto done;
-+
- 	case L2CAP_CONF_UNACCEPT:
- 		if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
- 			char req[64];
+ /* L2CAP checksum option */
+ #define L2CAP_FCS_NONE		0x00
 -- 
 1.7.4.1
 
