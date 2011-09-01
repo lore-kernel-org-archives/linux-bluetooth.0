@@ -1,32 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: using management interface from WiFi driver
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
-Cc: "Johan Hedberg (johan.hedberg@gmail.com)" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 01 Sep 2011 04:36:52 -0700
-In-Reply-To: <480687D4EEFE7447A2E09AADFF6673621AF82890@nasanexd02a.na.qualcomm.com>
-References: <480687D4EEFE7447A2E09AADFF6673621AF82890@nasanexd02a.na.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1314877014.3373.280.camel@aeonflux>
-Mime-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFCv2 3/7] Bluetooth: EFS: add disable_flowspec kernel param
+Date: Thu,  1 Sep 2011 14:07:32 +0300
+Message-Id: <1314875256-6904-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Suraj,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> I am working on a Bluetooth -WiFi coex mechanism in our WiFi kernel driver which would like get information regarding certain ongoing Bluetooth operations to manage BT-WiFI shared resources.
-> Some of the operations we are interested are inquiry status, SCO, A2DP streaming status.
-> 
-> Is there any API exported by the management interface that I can call in my WiFi device driver so as to get information like "Is SCO connected?" or "Is inquiry going on?" etc?
+Make extended flowspec option kernel parameter. Disabled by default.
 
-let me stop you right here. I thought that I made this perfectly clear
-on linux-wireless. Any coex handling between WiFi and Bluetooth will be
-done from mac80211 to Bluetooth subsystem in the kernel. And not via
-userspace tools.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index be30c32..4167cb0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -57,6 +57,7 @@
+ #include <net/bluetooth/smp.h>
+ 
+ int disable_ertm;
++int disable_flowspec = 1;
+ 
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+ static u8 l2cap_fixed_chan[8] = { 0x02, };
+@@ -2775,6 +2776,9 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 		if (!disable_ertm)
+ 			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
+ 							 | L2CAP_FEAT_FCS;
++		if (!disable_flowspec)
++			feat_mask |= L2CAP_FEAT_EXT_FLOW;
++
+ 		put_unaligned_le32(feat_mask, rsp->data);
+ 		l2cap_send_cmd(conn, cmd->ident,
+ 					L2CAP_INFO_RSP, sizeof(buf), buf);
+@@ -4296,3 +4300,6 @@ void l2cap_exit(void)
+ 
+ module_param(disable_ertm, bool, 0644);
+ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
++
++module_param(disable_flowspec, bool, 0644);
++MODULE_PARM_DESC(disable_flowspec, "Disable Extended Flow Specification");
+-- 
+1.7.4.1
 
