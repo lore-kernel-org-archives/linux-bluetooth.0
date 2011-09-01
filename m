@@ -1,42 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Johan Hedberg (johan.hedberg@gmail.com)" <johan.hedberg@gmail.com>,
+Subject: Re: using management interface from WiFi driver
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
+Cc: "Johan Hedberg (johan.hedberg@gmail.com)" <johan.hedberg@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: using management interface from WiFi driver
-Date: Thu, 1 Sep 2011 12:05:58 +0000
-Message-ID: <480687D4EEFE7447A2E09AADFF6673621AF829C7@nasanexd02a.na.qualcomm.com>
+Date: Thu, 01 Sep 2011 04:36:52 -0700
+In-Reply-To: <480687D4EEFE7447A2E09AADFF6673621AF82890@nasanexd02a.na.qualcomm.com>
 References: <480687D4EEFE7447A2E09AADFF6673621AF82890@nasanexd02a.na.qualcomm.com>
- <1314877014.3373.280.camel@aeonflux>
-In-Reply-To: <1314877014.3373.280.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1314877014.3373.280.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFRodXJzZGF5
-LCBTZXB0ZW1iZXIgMDEsIDIwMTEgNTowNyBQTQ0KPiBUbzogU3VtYW5nYWxhLCBTdXJhag0KPiBD
-YzogSm9oYW4gSGVkYmVyZyAoam9oYW4uaGVkYmVyZ0BnbWFpbC5jb20pOyBsaW51eC0NCj4gYmx1
-ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogdXNpbmcgbWFuYWdlbWVudCBp
-bnRlcmZhY2UgZnJvbSBXaUZpIGRyaXZlcg0KPiANCj4gSGkgU3VyYWosDQo+IA0KPiA+IEkgYW0g
-d29ya2luZyBvbiBhIEJsdWV0b290aCAtV2lGaSBjb2V4IG1lY2hhbmlzbSBpbiBvdXIgV2lGaSBr
-ZXJuZWwgZHJpdmVyDQo+IHdoaWNoIHdvdWxkIGxpa2UgZ2V0IGluZm9ybWF0aW9uIHJlZ2FyZGlu
-ZyBjZXJ0YWluIG9uZ29pbmcgQmx1ZXRvb3RoIG9wZXJhdGlvbnMNCj4gdG8gbWFuYWdlIEJULVdp
-Rkkgc2hhcmVkIHJlc291cmNlcy4NCj4gPiBTb21lIG9mIHRoZSBvcGVyYXRpb25zIHdlIGFyZSBp
-bnRlcmVzdGVkIGFyZSBpbnF1aXJ5IHN0YXR1cywgU0NPLCBBMkRQDQo+IHN0cmVhbWluZyBzdGF0
-dXMuDQo+ID4NCj4gPiBJcyB0aGVyZSBhbnkgQVBJIGV4cG9ydGVkIGJ5IHRoZSBtYW5hZ2VtZW50
-IGludGVyZmFjZSB0aGF0IEkgY2FuIGNhbGwgaW4gbXkNCj4gV2lGaSBkZXZpY2UgZHJpdmVyIHNv
-IGFzIHRvIGdldCBpbmZvcm1hdGlvbiBsaWtlICJJcyBTQ08gY29ubmVjdGVkPyIgb3IgIklzIGlu
-cXVpcnkNCj4gZ29pbmcgb24/IiBldGM/DQo+IA0KPiBsZXQgbWUgc3RvcCB5b3UgcmlnaHQgaGVy
-ZS4gSSB0aG91Z2h0IHRoYXQgSSBtYWRlIHRoaXMgcGVyZmVjdGx5IGNsZWFyIG9uIGxpbnV4LQ0K
-PiB3aXJlbGVzcy4gQW55IGNvZXggaGFuZGxpbmcgYmV0d2VlbiBXaUZpIGFuZCBCbHVldG9vdGgg
-d2lsbCBiZSBkb25lIGZyb20NCj4gbWFjODAyMTEgdG8gQmx1ZXRvb3RoIHN1YnN5c3RlbSBpbiB0
-aGUga2VybmVsLiBBbmQgbm90IHZpYSB1c2Vyc3BhY2UgdG9vbHMuDQo+IA0KPiBSZWdhcmRzDQo+
-IA0KPiBNYXJjZWwNCj4gDQoNCkkgd2FzIHJlZmVycmluZyB0byBhbnkgQVBJIGluIHRoZSBjb3Jl
-IG1hbmFnZW1lbnQgbW9kdWxlIGluc2lkZSB0aGUgQmx1ZXRvb3RoIGNvcmUgb25seS4gTm90IHZp
-YSB1c2VyIHNwYWNlIHNvY2tldCBpbnRlcmZhY2UuDQpNYXkgYmUgSSBkaWQgbm90IG1ha2UgbXkg
-cXVlc3Rpb24gY2xlYXIgZW5vdWdoLiBJIGFtIHlldCB0byB0YWtlIGEgbG9vayBhdCB0aGUgbWFu
-YWdlbWVudCBpbnRlcmZhY2UgaW1wbGVtZW50YXRpb24sIHNvIG5vdCB0aGF0IGZhbWlsaWFyIHdp
-dGggdGhhdCBhbHNvLg0KDQpDYW4geW91IHN1Z2dlc3QgYW55IHdheSBJIGNhbiBnZXQgdGhpcyBp
-bmZvcm1hdGlvbiBkaXJlY3RseSBmcm9tIEJsdWV0b290aCBIQ0kgY29yZT8NCg0KUmVnYXJkcw0K
-U3VyYWoNCg0KDQo=
+Hi Suraj,
+
+> I am working on a Bluetooth -WiFi coex mechanism in our WiFi kernel driver which would like get information regarding certain ongoing Bluetooth operations to manage BT-WiFI shared resources.
+> Some of the operations we are interested are inquiry status, SCO, A2DP streaming status.
+> 
+> Is there any API exported by the management interface that I can call in my WiFi device driver so as to get information like "Is SCO connected?" or "Is inquiry going on?" etc?
+
+let me stop you right here. I thought that I made this perfectly clear
+on linux-wireless. Any coex handling between WiFi and Bluetooth will be
+done from mac80211 to Bluetooth subsystem in the kernel. And not via
+userspace tools.
+
+Regards
+
+Marcel
+
+
