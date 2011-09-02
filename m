@@ -1,82 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [RFC BlueZ 07/11] Add display lock watcher on maemo6 plugin
-Date: Fri,  2 Sep 2011 18:38:37 -0300
-Message-Id: <1314999521-11261-8-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 06/11] Disable automatic connections after 3 minutes
+Date: Fri,  2 Sep 2011 18:38:36 -0300
+Message-Id: <1314999521-11261-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-
-Implements display status signal watcher in maemo6 plugin.
 ---
- plugins/maemo6.c |   30 ++++++++++++++++++++++++++++++
- 1 files changed, 30 insertions(+), 0 deletions(-)
+ src/adapter.c |   24 ++++++++++++++++++++++++
+ src/device.c  |    8 ++++++++
+ 2 files changed, 32 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/maemo6.c b/plugins/maemo6.c
-index 56f2664..0247f20 100644
---- a/plugins/maemo6.c
-+++ b/plugins/maemo6.c
-@@ -46,12 +46,35 @@
- #define MCE_RADIO_STATES_CHANGE_REQ	"req_radio_states_change"
- #define MCE_RADIO_STATES_GET		"get_radio_states"
- #define MCE_RADIO_STATES_SIG		"radio_states_ind"
-+#define MCE_TKLOCK_MODE_SIG		"tklock_mode_ind"
+diff --git a/src/adapter.c b/src/adapter.c
+index eec721c..d282157 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -78,6 +78,7 @@
+ #define check_address(address) bachk(address)
  
- static guint watch_id;
-+static guint tklock_watch_id;
- static DBusConnection *conn = NULL;
- static gboolean mce_bt_set = FALSE;
- static gboolean collision = FALSE;
+ #define OFF_TIMER 3
++#define AUTO_TIMER	180
  
-+static void mce_tklock_mode_cb(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
+ static DBusConnection *connection = NULL;
+ static GSList *adapter_drivers = NULL;
+@@ -134,6 +135,7 @@ struct btd_adapter {
+ 	GSList *mode_sessions;		/* Request Mode sessions */
+ 	GSList *disc_sessions;		/* Discovery sessions */
+ 	guint scheduler_id;		/* Scheduler handle */
++	guint auto_timeout_id;		/* Automatic connections timeout */
+ 	sdp_list_t *services;		/* Services associated to adapter */
+ 
+ 	gboolean pairable;		/* pairable state */
+@@ -3538,6 +3540,22 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
+ 	return 0;
+ }
+ 
++static gboolean disable_auto(gpointer user_data)
 +{
-+	DBusMessageIter args;
-+	const char *sigvalue;
 +	struct btd_adapter *adapter = user_data;
++	GSList *l;
 +
-+	if (!dbus_message_iter_init(message, &args)) {
-+		error("message has no arguments");
-+		return;
++	for (l = adapter->devices; l; l = l->next) {
++		struct btd_device *device = l->data;
++
++		device_set_auto_connect(device, FALSE);
 +	}
 +
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING) {
-+		error("argument is not string");
-+		return;
-+	}
++	adapter->auto_timeout_id = 0;
 +
-+	dbus_message_iter_get_basic(&args, &sigvalue);
-+	DBG("got signal with value %s", sigvalue);
++	return FALSE;
 +}
 +
- static gboolean mce_signal_callback(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
+ static void set_auto_connect(gpointer data, gpointer user_data)
  {
-@@ -204,6 +227,10 @@ static int mce_probe(struct btd_adapter *adapter)
- 					MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
- 					mce_signal_callback, adapter, NULL);
+ 	struct btd_device *device = data;
+@@ -3555,7 +3573,13 @@ void btd_adapter_system_unlocked(struct btd_adapter *adapter)
  
-+	tklock_watch_id = g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_PATH,
-+					MCE_SIGNAL_IF, MCE_TKLOCK_MODE_SIG,
-+					mce_tklock_mode_cb, adapter, NULL);
+ 	DBG("Unlocked");
+ 
++	if (adapter->auto_timeout_id)
++		return;
 +
- 	btd_adapter_register_powered_callback(adapter, adapter_powered);
- 
- 	return 0;
-@@ -216,6 +243,9 @@ static void mce_remove(struct btd_adapter *adapter)
- 	if (watch_id > 0)
- 		g_dbus_remove_watch(conn, watch_id);
- 
-+	if (tklock_watch_id > 0)
-+		g_dbus_remove_watch(conn, tklock_watch_id);
+ 	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
 +
- 	btd_adapter_unregister_powered_callback(adapter, adapter_powered);
++	adapter->auto_timeout_id = g_timeout_add_seconds(AUTO_TIMER,
++						disable_auto, adapter);
  }
+ 
+ void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+diff --git a/src/device.c b/src/device.c
+index 4f5c6d8..1daa063 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1946,6 +1946,14 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ 
+ 	device->auto_connect = enable;
+ 
++	/* Disabling auto connect */
++	if (enable == FALSE) {
++		if (device->auto_id)
++			g_source_remove(device->auto_id);
++		return;
++	}
++
++	/* Enabling auto connect */
+ 	if (device->auto_id != 0)
+ 		return;
  
 -- 
 1.7.6
