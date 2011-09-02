@@ -1,24 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Sep 2011 14:43:53 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 2/4] Bluetooth: Expose hci connections through debugfs
-Message-ID: <20110902174353.GA12684@joana>
-References: <1314194701.2219.15.camel@THOR>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314194701.2219.15.camel@THOR>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ] Fix remove emitting Paired=false when deleting device
+Date: Fri,  2 Sep 2011 20:31:56 +0300
+Message-Id: <1314984716-20688-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+When adapter is requested to remove device, device's property
+Paired=false is emitted after the adapter notifies clients that
+list Devices is empty. Some clients get confused.
 
-* Peter Hurley <peter@hurleysoftware.com> [2011-08-24 10:05:01 -0400]:
+Emitting property was introduced in clean-up patch
+c92a4af85f480c16f3ff017783c821304c899ce5. Since such notification
+does not have practical meaning, it is better to remove it.
 
-> Add "connections" file to "hciX" debugfs directory and output
-> hci_conn internal state.
+Setting device->paired is also not needed since device is removed.
+---
+ src/device.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-I would like to see an output example in the commit message for this.
+diff --git a/src/device.c b/src/device.c
+index 96e798f..3342242 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -992,7 +992,6 @@ static void device_remove_stored(struct btd_device *device)
+ 		delete_entry(&src, "linkkeys", addr);
+ 		delete_entry(&src, "aliases", addr);
+ 		device_set_bonded(device, FALSE);
+-		device_set_paired(device, FALSE);
+ 	}
+ 	delete_entry(&src, "profiles", addr);
+ 	delete_entry(&src, "trusts", addr);
+-- 
+1.7.4.1
 
-	Gustavo
