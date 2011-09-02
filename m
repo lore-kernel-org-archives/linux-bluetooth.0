@@ -1,39 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Sep 2011 15:14:56 -0300
+Date: Fri, 2 Sep 2011 15:01:12 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: chen.ganir@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Chen Ganir <chen.ganir@ti.com>
-Subject: Re: [PATCH] Bluetooth-next: Fixed BT ST Channel reg order
-Message-ID: <20110902181456.GF12684@joana>
-References: <1314701908-15860-1-git-send-email-chen.ganir@ti.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] Bluetooth: Move SMP fields to a separate structure
+Message-ID: <20110902180112.GE12684@joana>
+References: <1313798415-8555-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314701908-15860-1-git-send-email-chen.ganir@ti.com>
+In-Reply-To: <1313798415-8555-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Vinicius,
 
-* chen.ganir@gmail.com <chen.ganir@gmail.com> [2011-08-30 13:58:28 +0300]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-08-19 21:00:12 -0300]:
 
-> From: Chen Ganir <chen.ganir@ti.com>
+> The objective is to make the core to have as little as possible
+> information about SMP procedures and logic. Now, all the SMP
+> specific information is hidden from the core.
 > 
-> Reordered the BT ST channel registration, to make sure that the
-> event channel is registered before all others. This prevents a
-> situation where incoming events may cause kernel panic in the ST
-> driver if the event channel is not yet registered to handle
-> incoming events.In addition, the deregistration of the channels
-> was also modified, to be in the reversed order of the registration,
-> to allow the event channel to be the last one unregistered.
-> 
-> Signed-off-by: Chen Ganir <chen.ganir@ti.com>
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 > ---
->  drivers/bluetooth/btwilink.c |   16 ++++++++--------
->  1 files changed, 8 insertions(+), 8 deletions(-)
+>  include/net/bluetooth/hci_core.h |    2 -
+>  include/net/bluetooth/l2cap.h    |   10 +--
+>  net/bluetooth/hci_core.c         |    8 ---
+>  net/bluetooth/smp.c              |  118 ++++++++++++++++++++-----------------
+>  4 files changed, 67 insertions(+), 71 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 6e68e43..cc1ea91 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -195,8 +195,6 @@ struct hci_dev {
+>  
+>  	__u16			init_last_cmd;
+>  
+> -	struct crypto_blkcipher	*tfm;
+> -
+>  	struct inquiry_cache	inq_cache;
+>  	struct hci_conn_hash	conn_hash;
+>  	struct list_head	blacklist;
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 6fa1140..00e42aa 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -386,6 +386,8 @@ struct l2cap_ops {
+>  	void			(*state_change) (void *data, int state);
+>  };
+>  
+> +struct smp_chan;
 
-Applied, thanks.
-
-I will push this patch only when kernel.org is back, the same is valid for
-other patches I applied.
+Just define this on smp.h, it's easy.
 
 	Gustavo
