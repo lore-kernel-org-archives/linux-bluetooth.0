@@ -2,44 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 10/11] Add an interval between connection attempts
-Date: Fri,  2 Sep 2011 18:38:40 -0300
-Message-Id: <1314999521-11261-11-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 08/11] Notify unlocked event when using maemo6 plugin
+Date: Fri,  2 Sep 2011 18:38:38 -0300
+Message-Id: <1314999521-11261-9-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For connection attempts to the same remote device, add 5 seconds
-interval until the next connect attempt.
+Inform the adapter that the system has been unlocked when the MCE
+sends the tklock_mode_ind signal. This signal will trigger the
+automatic re-connections for bonded devices.
 ---
- src/device.c |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+ plugins/maemo6.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 1daa063..4f58afc 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -66,6 +66,8 @@
- #define DISCONNECT_TIMER	2
- #define DISCOVERY_TIMER		2
+diff --git a/plugins/maemo6.c b/plugins/maemo6.c
+index 0247f20..8d203df 100644
+--- a/plugins/maemo6.c
++++ b/plugins/maemo6.c
+@@ -73,6 +73,9 @@ static void mce_tklock_mode_cb(DBusConnection *connection,
  
-+#define AUTO_CONNECTION_INTERVAL	5 /* Next connection attempt */
+ 	dbus_message_iter_get_basic(&args, &sigvalue);
+ 	DBG("got signal with value %s", sigvalue);
 +
- /* When all services should trust a remote device */
- #define GLOBAL_TRUST "[all]"
++	if (g_strcmp0("unlocked", sigvalue) == 0)
++		btd_adapter_system_unlocked(adapter);
+ }
  
-@@ -1705,8 +1707,9 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 			device->browse = NULL;
- 			browse_request_free(req, TRUE);
- 		} else if (device->auto_connect)
--			device->auto_id = g_idle_add_full(
-+			device->auto_id = g_timeout_add_seconds_full(
- 						G_PRIORITY_DEFAULT_IDLE,
-+						AUTO_CONNECTION_INTERVAL,
- 						att_connect, device,
- 						att_connect_dispatched);
- 
+ static gboolean mce_signal_callback(DBusConnection *connection,
 -- 
 1.7.6
 
