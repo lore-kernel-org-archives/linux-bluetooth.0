@@ -2,58 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ 00/11] Re-connections triggered by platform event
-Date: Fri,  2 Sep 2011 18:38:30 -0300
-Message-Id: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 09/11] Add automatic connect timeout config option
+Date: Fri,  2 Sep 2011 18:38:39 -0300
+Message-Id: <1314999521-11261-10-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial proposal to enable re-connection(for ATT) started by platform/
-user actions. eg: Screen unlocked.
+Add new option in main.conf allowing change the default automatic
+connection timer. This value defines how many seconds re-connection
+for bonded devices will be active when a platform/user event triggers
+the automatic re-connections.
+---
+ src/adapter.c |    3 +--
+ src/hcid.h    |    1 +
+ src/main.c    |   12 ++++++++++++
+ src/main.conf |    6 ++++++
+ 4 files changed, 20 insertions(+), 2 deletions(-)
 
-Use case: When the user unlock the screen, automatic re-connections for
-bonded devices will be started. It will remain active for 3 minutes
-(configurable).
-
-The code needs cleanup, I am exposing the idea to get feedback before
-clean the code and fix corner cases. In order to achieve better control
-of re-connections, "Pending" state needs to be extended to LE. At the
-moment, only BR/EDR supports setting a connection request as pending
-when the controller returns Command Disallowed.
-
-Development branch:
-git://git.infradead.org/users/cktakahasi/bluez.git proximity-devel-w35
-
-Comments/Suggestions?
-
-BR,
-Claudio.
-
-Anderson Briglia (1):
-  Add display lock watcher on maemo6 plugin
-
-Claudio Takahasi (10):
-  Remove timer to trigger connection attempts
-  Add set auto connect in device
-  Add continuous connection attempt
-  Add checking if profiles are requesting connection
-  Add tracking of connect sources
-  Disable automatic connections after 3 minutes
-  Notify unlocked event when using maemo6 plugin
-  Add automatic connect timeout config option
-  Add an interval between connection attempts
-  Enable re-connections when disconnected
-
- plugins/maemo6.c |   33 ++++++++++++++++++
- src/adapter.c    |   43 +++++++++++++++++++++++
- src/adapter.h    |    1 +
- src/device.c     |   99 ++++++++++++++++++++++++++++++++++++++----------------
- src/device.h     |    1 +
- src/hcid.h       |    1 +
- src/main.c       |   12 ++++++
- src/main.conf    |    6 +++
- 8 files changed, 167 insertions(+), 29 deletions(-)
-
+diff --git a/src/adapter.c b/src/adapter.c
+index d282157..6b1cce6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -78,7 +78,6 @@
+ #define check_address(address) bachk(address)
+ 
+ #define OFF_TIMER 3
+-#define AUTO_TIMER	180
+ 
+ static DBusConnection *connection = NULL;
+ static GSList *adapter_drivers = NULL;
+@@ -3578,7 +3577,7 @@ void btd_adapter_system_unlocked(struct btd_adapter *adapter)
+ 
+ 	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
+ 
+-	adapter->auto_timeout_id = g_timeout_add_seconds(AUTO_TIMER,
++	adapter->auto_timeout_id = g_timeout_add_seconds(main_opts.autoto,
+ 						disable_auto, adapter);
+ }
+ 
+diff --git a/src/hcid.h b/src/hcid.h
+index ef25c79..e993a16 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -29,6 +29,7 @@ struct main_opts {
+ 	char		*name;
+ 	uint32_t	class;
+ 	uint16_t	pageto;
++	uint16_t	autoto;
+ 	uint32_t	discovto;
+ 	uint32_t	pairto;
+ 	uint16_t	link_mode;
+diff --git a/src/main.c b/src/main.c
+index 06becfe..9b23803 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -63,6 +63,7 @@
+ #define LAST_ADAPTER_EXIT_TIMEOUT 30
+ 
+ #define DEFAULT_DISCOVERABLE_TIMEOUT 180 /* 3 minutes */
++#define DEFAULT_AUTO_CONNECT_TIMEOUT 180 /* 3 minutes */
+ 
+ struct main_opts main_opts;
+ 
+@@ -128,6 +129,16 @@ static void parse_config(GKeyFile *config)
+ 		main_opts.flags |= 1 << HCID_SET_PAGETO;
+ 	}
+ 
++	val = g_key_file_get_integer(config, "General", "AutoConnectTimeout",
++									&err);
++	if (err) {
++		DBG("%s", err->message);
++		g_clear_error(&err);
++	} else {
++		DBG("auto_to=%d", val);
++		main_opts.autoto = val;
++	}
++
+ 	str = g_key_file_get_string(config, "General", "Name", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+@@ -230,6 +241,7 @@ static void init_defaults(void)
+ 	main_opts.mode	= MODE_CONNECTABLE;
+ 	main_opts.name	= g_strdup("BlueZ");
+ 	main_opts.discovto	= DEFAULT_DISCOVERABLE_TIMEOUT;
++	main_opts.autoto = DEFAULT_AUTO_CONNECT_TIMEOUT;
+ 	main_opts.remember_powered = TRUE;
+ 	main_opts.reverse_sdp = TRUE;
+ 	main_opts.name_resolv = TRUE;
+diff --git a/src/main.conf b/src/main.conf
+index a9e2060..8ae817d 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -30,6 +30,12 @@ PageTimeout = 8192
+ # The value is in seconds. Defaults is 30.
+ DiscoverSchedulerInterval = 30
+ 
++# Automatic connection for bonded devices driven by platform/user events.
++# If a platform plugin uses this mechanism, automatic connections will be
++# enabled during the interval defined below. Initially, this feature
++# intends to be used to establish connections to ATT channels.
++AutoConnectTimeout = 180
++
+ # What value should be assumed for the adapter Powered property when
+ # SetProperty(Powered, ...) hasn't been called yet. Defaults to true
+ InitiallyPowered = true
 -- 
 1.7.6
 
