@@ -1,99 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Fri, 2 Sep 2011 19:51:40 -0400
-Subject: [RFC v2 2/4] Bluetooth: Expose hci connections through debugfs
-Message-ID: <1315007500.2495.3.camel@THOR>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ 00/11] Re-connections triggered by platform event
+Date: Fri,  2 Sep 2011 18:38:30 -0300
+Message-Id: <1314999521-11261-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add "connections" file to "hciX" debugfs directory and output
-hci_conn internal state.
+Initial proposal to enable re-connection(for ATT) started by platform/
+user actions. eg: Screen unlocked.
 
-Example file contents:
-                          s            a     p
-                  h   t   t  o  s  k   u  s  s  p  r
-                  n   y   a  u  s  e   t  e  e  i  e
-Dest              l   p   t  t  p  y   h  c  c  n  f
-BC:0D:A5:7A:F5:96 14  ACL 1  1  1 0xff 0  1  0  0  1
-00:0D:FD:1E:99:30 13  ACL 1  0  0 0xff 4  2  2  0  1
-00:07:61:B2:3E:97 12  ACL 1  0  0 0xff 4  0  0  0  2
-00:07:61:76:D8:1B 11  ACL 1  0  0 0xff 4  1  0  0  2
+Use case: When the user unlock the screen, automatic re-connections for
+bonded devices will be started. It will remain active for 3 minutes
+(configurable).
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
+The code needs cleanup, I am exposing the idea to get feedback before
+clean the code and fix corner cases. In order to achieve better control
+of re-connections, "Pending" state needs to be extended to LE. At the
+moment, only BR/EDR supports setting a connection request as pending
+when the controller returns Command Disallowed.
 
-v2: Add example output to commit msg
+Development branch:
+git://git.infradead.org/users/cktakahasi/bluez.git proximity-devel-w35
 
- net/bluetooth/hci_sysfs.c |   46 +++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 46 insertions(+), 0 deletions(-)
+Comments/Suggestions?
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 22f1a6c..3d00769 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -542,6 +542,49 @@ static int auto_accept_delay_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
- 					auto_accept_delay_set, "%llu\n");
- 
-+static int connections_show(struct seq_file *f, void *p)
-+{
-+	struct hci_dev *hdev = f->private;
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct list_head *l;
-+	
-+	hci_dev_lock_bh(hdev);
-+
-+	seq_printf(f, "                          s            a     p\n");
-+	seq_printf(f, "                  h   t   t  o  s  k   u  s  s  p  r\n");
-+	seq_printf(f, "                  n   y   a  u  s  e   t  e  e  i  e\n");
-+	seq_printf(f, "Dest              l   p   t  t  p  y   h  c  c  n  f\n");
-+
-+	list_for_each(l, &h->list) {
-+		struct hci_conn *c;
-+		c = list_entry(l, struct hci_conn, list);
-+
-+		seq_printf(f, "%s %-3d %3s %d  %d  %d 0x%.2x %d  %d  %d %2d  %d\n",
-+				batostr(&c->dst), c->handle, 
-+				link_typetostr(c->type),
-+				c->state, c->out, c->ssp_mode,
-+				c->key_type, c->auth_type, c->sec_level,
-+				c->pending_sec_level, c->pin_length,
-+				atomic_read(&c->devref));
-+	}
-+
-+	hci_dev_unlock_bh(hdev);
-+
-+	return 0;
-+}
-+
-+static int connections_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, connections_show, inode->i_private);
-+}
-+
-+static const struct file_operations connections_fops = {
-+	.open		= connections_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- int hci_register_sysfs(struct hci_dev *hdev)
- {
- 	struct device *dev = &hdev->dev;
-@@ -578,6 +621,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
- 
- 	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
- 						&auto_accept_delay_fops);
-+
-+	debugfs_create_file("connections", 0444, hdev->debugfs, hdev,
-+						&connections_fops);
- 	return 0;
- }
- 
+BR,
+Claudio.
+
+Anderson Briglia (1):
+  Add display lock watcher on maemo6 plugin
+
+Claudio Takahasi (10):
+  Remove timer to trigger connection attempts
+  Add set auto connect in device
+  Add continuous connection attempt
+  Add checking if profiles are requesting connection
+  Add tracking of connect sources
+  Disable automatic connections after 3 minutes
+  Notify unlocked event when using maemo6 plugin
+  Add automatic connect timeout config option
+  Add an interval between connection attempts
+  Enable re-connections when disconnected
+
+ plugins/maemo6.c |   33 ++++++++++++++++++
+ src/adapter.c    |   43 +++++++++++++++++++++++
+ src/adapter.h    |    1 +
+ src/device.c     |   99 ++++++++++++++++++++++++++++++++++++++----------------
+ src/device.h     |    1 +
+ src/hcid.h       |    1 +
+ src/main.c       |   12 ++++++
+ src/main.conf    |    6 +++
+ 8 files changed, 167 insertions(+), 29 deletions(-)
+
 -- 
-1.7.4.1
+1.7.6
 
