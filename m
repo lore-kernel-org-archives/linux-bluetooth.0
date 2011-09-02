@@ -1,51 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 2 Sep 2011 11:23:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Renaud <andre@bluewatersys.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: PCM audio output
-Message-ID: <20110902082308.GA17562@dell>
-References: <4E5F1DD6.2090102@bluewatersys.com>
- <20110901072416.GA17434@dell.ger.corp.intel.com>
- <4E5FF591.7060905@bluewatersys.com>
+From: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Johannes Berg <johannes@sipsolutions.net>, "linville@tuxdriver.com"
+	<linville@tuxdriver.com>, "Balasubramanian, senthilkumar"
+	<senthilb@qca.qualcomm.com>, "Mehta, Vipin" <vipimeht@qca.qualcomm.com>,
+	"Valo, Kalle" <kvalo@qca.qualcomm.com>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: RE: [RFC] nl80211: Added NL80211 commands for Bluetooth-WiFi coex
+Date: Fri, 2 Sep 2011 07:54:34 +0000
+Message-ID: <480687D4EEFE7447A2E09AADFF6673621AF82B5C@nasanexd02a.na.qualcomm.com>
+References: <1314771915-8848-1-git-send-email-surajs@qca.qualcomm.com>
+	 (sfid-20110831_082525_612687_34CC3735),<1314772217.4161.10.camel@jlt3.sipsolutions.net>
+	 <480687D4EEFE7447A2E09AADFF6673621AF7CDCF@nasanexd02a.na.qualcomm.com>
+	 ,<1314772832.4161.16.camel@jlt3.sipsolutions.net>
+	 <480687D4EEFE7447A2E09AADFF6673621AF7CE0B@nasanexd02a.na.qualcomm.com>
+	 <1314801657.3373.260.camel@aeonflux>
+	 <480687D4EEFE7447A2E09AADFF6673621AF7DF82@nasanexd02a.na.qualcomm.com>
+	 <1314831118.3373.266.camel@aeonflux>
+	 <480687D4EEFE7447A2E09AADFF6673621AF827CC@nasanexd02a.na.qualcomm.com>
+ <1314877381.3373.284.camel@aeonflux>
+In-Reply-To: <1314877381.3373.284.camel@aeonflux>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E5FF591.7060905@bluewatersys.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
-
-On Fri, Sep 02, 2011, Andre Renaud wrote:
-> Another issue I'm trying to get my head around, is that the system I'm
-> working on doesn't have audio attached to the CPU. The PCM lines are
-> going to an external FPGA which is entirely independent. So the Linux
-> kernel has no Alsa drivers, and no audio codec. Due to space limitations
-> of the filesystem, subsystems like PulseAudio are probably not going to
-> be available.
-
-I suppose you still have *some* component in the system which knows
-about the need for a SCO link? All you'd need is to have this component
-register an endpoint through the BlueZ Media API and have it request the
-SCO link whenever you need it. Luiz already pointed out in his email the
-test/simple-endpoint script which should give you some idea of what to
-do. When there's a HFP or HSP connection you'll get the D-Bus object
-path of the media transport object through the SetConfiguration callback
-of the endpoint you registered and then you can call the Acquire method
-that the transport object provides to get the actual SCO link.
-
-> I think this essentially comes down to vendor specific HCI writes to
-> toggle the audio path, but I'm not sure if I have a full understanding
-> of how it all works.
-> 
-> Can anyone tell me how they went about setting up an audio connection
-> with an Bluetooth headset, and then configured the audio to go over the
-> PCM channel?
-
-The PCM routing part will always be hardware dependent. So what someone
-else did won't necessarily help you much unless they had the exact same
-hardware as you. If the setting isn't hard-coded in the controller you'd
-typically set it through some vendor-dependent command during the
-initialization phase.
-
-Johan
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFRodXJzZGF5
+LCBTZXB0ZW1iZXIgMDEsIDIwMTEgNToxMyBQTQ0KPiBUbzogU3VtYW5nYWxhLCBTdXJhag0KPiBD
+YzogSm9oYW5uZXMgQmVyZzsgbGludmlsbGVAdHV4ZHJpdmVyLmNvbTsgYXRoNmtsLWRldmVsOyBC
+YWxhc3VicmFtYW5pYW4sDQo+IHNlbnRoaWxrdW1hcjsgTWVodGEsIFZpcGluOyBWYWxvLCBLYWxs
+ZTsgbGludXgtd2lyZWxlc3NAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJFOiBbUkZDXSBu
+bDgwMjExOiBBZGRlZCBOTDgwMjExIGNvbW1hbmRzIGZvciBCbHVldG9vdGgtV2lGaSBjb2V4DQo+
+IA0KPiBIaSBTdXJhaiwNCj4gDQo+ID4gPiA+ID4gdGhpcyBsb29rcyBsaWtlIHRoZSB0b3RhbCB3
+cm9uZyBhcHByb2FjaCB0byBtZS4gVGhpcyBuZWVkcyB0byBiZQ0KPiA+ID4gPiA+IGRvbmUNCj4g
+PiA+IGJldHdlZW4gbWFjODAyMTEgYW5kIEJsdWV0b290aCBzdWJzeXN0ZW1zIGluIHRoZSBrZXJu
+ZWwgZGlyZWN0bHkuDQo+ID4gPiBHb2luZyB0aHJvdWdoIHVzZXJzcGFjZSBmb3IgdGhpcyBpcyBh
+IHByZXR0eSBiYWQgaWRlYS4NCj4gPiA+ID4NCj4gPiA+ID4gPiBFc3BlY2lhbGx5IGlmIHlvdSB3
+YW5uYSBsaXN0ZW4gb24gRC1CdXMgZXZlbnRzIGZyb20gYmx1ZXRvb3RoZA0KPiA+ID4gPiA+IGFu
+ZCB0aGVuIHJ1bg0KPiA+ID4gYW5vdGhlciBwcm9jZXNzIHRvIHRoZW4gZXhlY3V0ZSBubDgwMjEx
+IGNvbW1hbmRzIGxvb2tzIGxpa2UgdG90YWwNCj4gPiA+IG92ZXJoZWFkIGF0IG5vIGdhaW4uIE5v
+dCB0byB0YWxrIGFib3V0IHBvdGVudGlhbCBsYXRlbmN5ID4gZWZmZWN0cw0KPiA+ID4gdGhhdCBt
+aWdodCBiZSBjb3VudGVycHJvZHVjdGl2ZS4NCj4gPiA+ID4NCj4gPiA+ID4gPiBXaGF0IHlvdSBy
+ZWFsbHkgd2FudCBpcyBhIHdheSB0byBtYXJrIEEyRFAgY2hhbm5lbHMgZm9yDQo+ID4gPiA+ID4g
+c3RyZWFtaW5nIGZyb20NCj4gPiA+IHVzZXJzcGFjZSBhcyBzdHJlYW1pbmcvcmVhbHRpbWUvcHJp
+b3JpdHkgc28gdGhlIEJsdWV0b290aCBzdWJzeXN0ZW0NCj4gPiA+IGtub3dzIG9uIHdoYXQgdG8g
+ZG8gd2l0aCBpdCBhbmQgdGhhdCB3YXkgY2FuIGFsc28gdGVsbCA+ID4gbWFjODAyMTENCj4gPiA+
+IGNvcnJlY3RseSBhYm91dCBjb2V4IHNldHRpbmdzLg0KPiA+ID4gPg0KPiA+ID4gPiA+IFdlIGFy
+ZSBhbHJlYWR5IHNldHRpbmdzIGZsdXNoYWJsZSBmbGFncyBmb3IgQTJEUCBzdHJlYW1pbmcNCj4g
+PiA+ID4gPiBjaGFubmVscyBhbmQgdGhlcmUNCj4gPiA+IGlzIHdvcmsgb25nb2luZyBmb3IgU09f
+UFJJT1JJVFkgc3VwcG9ydCB3aXRoIEwyQ0FQIHNvY2tldHMuDQo+ID4gPiA+DQo+ID4gPiA+IE1v
+cmUgdGhhbiB0aGUgQTJEUCBjb25uZWN0aW9uLCBpdCB3b3VsZCBiZSBtb3JlIHVzZWZ1bCB0byBm
+aW5kIG91dA0KPiA+ID4gPiB3aGVuDQo+ID4gPiBBMkRQIHN0YXJ0L3N0b3Agc3RyZWFtaW5nIHNv
+IHRoYXQgd2UgY2FuIGtub3cgd2hlbiB0byByZWFsbG9jYXRlDQo+ID4gPiByZXNvdXJjZSB0byBC
+bHVldG9vdGguIElzIGl0IHBvc3NpYmxlIHRvIHRhcCB0aGlzIGluZm9ybWF0aW9uIG91dCBvZiB0
+aGUNCj4gQmx1ZXRvb3RoIGNvcmU/DQo+ID4gPiA+IEFsc28sIGNhbiB5b3Ugc3VnZ2VzdCBhIHdh
+eSB0byBnZXQgQTJEUCBzdHJlYW1pbmcgc3RhdHVzLCBpbnF1aXJ5DQo+ID4gPiA+IHN0YXR1cywg
+YW5kDQo+ID4gPiBTQ08gYW5kIEFDTCByb2xlIHdpdGhvdXQgYSBoYWNrIGluIHRoZSBCbHVldG9v
+dGggc3Vic3lzdGVtPw0KPiA+ID4NCj4gPiA+IHRoZSBpbnF1aXJ5IHN0YXR1cyBpcyB0cmFja2Vk
+IGJ5IHRoZSBMaW51eCBrZXJuZWwgc2luY2UgZXZlci4gU2FtZQ0KPiA+ID4gZ29lcyBmb3IgQUNM
+IGFuZCBTQ08gc3RhdHVzLiBUaGUga2VybmVsIGtlZXBzIHRyYWNrIG92ZXIgYWxtb3N0DQo+ID4g
+PiBldmVyeXRoaW5nIG9uIHRoZSBIQ0kgbGV2ZWwgYW5kIHdpbGwgZG8gcHJvcGVyIGNsZWFudXAg
+YWZ0ZXJ3YXJkcy4gRG9pbmcgdGhpcw0KPiBpbiB1c2Vyc3BhY2Ugd2lsbCBub3Qgd29yayBvdXQu
+DQo+ID4gPiBBbmQgaXQgaXMgYWxzbyByYWN5Lg0KPiA+ID4NCj4gPiA+IEVzcGVjaWFsbHkgaW4g
+dGhlIGZ1dHVyZSBibHVldG9vdGhkIHdpbGwgYmUgdHJhY2tpbmcgbGVzcyBhbmQgbGVzcw0KPiA+
+ID4gaW5mb3JtYXRpb24uIFRoZSBuZXcgbWFuYWdlbWVudCBpbnRlcmZhY2Ugd2lsbCBoaWRlIGFs
+bW9zdCBldmVyeQ0KPiA+ID4gc2luZ2xlIHN0YXRlIGZyb20gYmx1ZXRvb3RoZCB3aGVyZSB0aGUg
+a2VybmVsIGlzIGRvaW5nIHRoZSBqb2INCj4gPiA+IGFueXdheSBhbmQgY2FuIGRvIGEgd2F5IGJl
+dHRlciBqb2IgaW4gdGhlIGZpcnN0IHBsYWNlLiBUaGlzIGlzIGFsc28NCj4gPiA+IGxlYWRzIHRv
+IHBvd2VyIGNvbnN1bXB0aW9uIGFkdmFudGFnZXMgc2luY2UgYmx1ZXRvb3RoZCBkb2VzIG5vdCBu
+ZWVkDQo+ID4gPiB0byBiZSB3b2tlbiB1cCB0aGF0IG9mdGVuIGFueXdheS4gQW5kIGluIGFkZGl0
+aW9uIHRoZSBrZXJuZWwgaGFzIG5vdCBkZWFsDQo+IHdpdGggdGhlIGV4dHJhIEhDSSBmaWx0ZXIg
+aGFuZGxpbmcuDQo+ID4gPg0KPiA+ID4gVGhlIG9ubHkgdGhpbmcgdGhhdCB5b3UgbWVudGlvbmVk
+IGhlcmUgaXMgQTJEUCBzdHJlYW1pbmcuIEFuZCBieSB0aGUNCj4gPiA+IG5hdHVyZSBvZiB0aGUg
+QTJEUCBwcm90b2NvbCwgeW91IGRvIGVzdGFibGlzaCBhIHNlY29uZCBMMkNBUCBjaGFubmVsDQo+
+ID4gPiB0aGF0IGlzIGp1c3QgdXNlZCBmb3Igc3RyZWFtaW5nLiBUaGF0IGNoYW5uZWwgaXMgYWxz
+byBvbmx5IHByZXNlbnQNCj4gPiA+IGlmIHlvdSBhcmUgc3RyZWFtaW5nIHJpZ2h0IG5vdy4gSWYg
+bm90IHN0cmVhbWluZyBpcyBnb2luZyBvbiwgaXQNCj4gPiA+IHdpbGwgYmUgZGlzY29ubmVjdGVk
+LiBTbyBpdCBpcyBwcmV0dHkgZWFzeSB0byBoYXZlIGJsdWV0b290aGQgdGFnDQo+ID4gPiBzdWNo
+IGEgY2hhbm5lbCB3aXRoIHByb3BlciBTT19QUklPUklUWSAob25jZSB3ZSBoYXZlIHRoYXQgY29k
+ZQ0KPiA+ID4gbWVyZ2VkIHVwc3RyZWFtKSBhbmQgdGhlbiB0aGUgQmx1ZXRvb3RoIHN1YnN5c3Rl
+bSBrbm93cyB3aGVuIEEyRFANCj4gc3RyZWFtaW5nIG9yIGFueSBoaWdoIHByaW9yaXR5L3JlYWx0
+aW1lIGRhdGEgaXMgdHJhbnNmZXJyZWQgb3ZlciBCbHVldG9vdGguDQo+ID4NCj4gPiBSZWdhcmRp
+bmcgU0NPIGFuZCBJbnF1aXJ5IHN0YXR1cywgZG8gd2UgaGF2ZSBhbiBleGlzdGluZyBBUEkgaW4g
+Qmx1ZXRvb3RoIGNvcmUNCj4gdGhhdCBJIGNhbiB1c2UgdG8gZ2V0IHRoYXQgaW5mb3JtYXRpb24/
+DQo+IA0KPiB0aGVyZSBpcyBvYnZpb3VzbHkgbm8gZXhwb3J0ZWQgc3ltYm9scyBvciBhbnl0aGlu
+ZyBhbGlrZS4gU2luY2Ugd2Ugb25seSBleHBvcnQNCj4gdGhpbmdzIHRoYXQgYXJlIHVzZWQgYnkg
+ZHJpdmVycyBvciBvdGhlciBzdWJzeXN0ZW0uIFNvIHlvdSB3b3VsZCBuZWVkIHRvIGNyZWF0ZQ0K
+PiBzdWNoIGFuIEFQSS4NCj4gDQo+IEhvd2V2ZXIgZmlyc3Qgd2UgbmVlZCB0byBlc3RhYmxpc2gg
+aW4gd2hpY2ggZGlyZWN0aW9uIHRoaXMgc2hvdWxkIGJlIGRvbmUNCj4gYW55d2F5LiBTaG91bGQg
+dGhlIEJsdWV0b290aCBzdWJzeXN0ZW0gbm90aWZ5IG1hYzgwMjExIHVuY29uZGl0aW9uYWwgb3IN
+Cj4gc2hvdWxkIG1hYzgwMjExIHJlZ2lzdGVyIG5vdGlmaWVycyBvZiB0aGUgQmx1ZXRvb3RoIHN1
+YnN5c3RlbS4NCj4gDQo+IFdlIGFsc28gc2hvdWxkIG5vdCBmb3JnZXQgZGlyZWN0IGludGVncmF0
+aW9uIHN1cHBvcnQgZm9yIGNoYW5naW5nIEFGSCBjaGFubmVsDQo+IG1hcHMgYmFzZWQgb24gdGhl
+IHVzZWQgV2lGaSBjaGFubmVscy4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANCg0K
+SWYgd2UgY2FuIHByb3ZpZGUgImhjaV9kZXYiIGFzIHRoZSBoYW5kbGUgdG8gdGhlIEJsdWV0b290
+aCBjb3JlLCBkb2VzIGl0IG1ha2Ugc2Vuc2UgdG8gZm9sbG93IHRoZSBiZWxvdyBzdGVwcyB0byBz
+ZW5kIGNoYW5uZWwgY2xhc3NpZmljYXRpb24/DQoxLiBJbXBsZW1lbnQgYW4gTkw4MDIxMSBjb21t
+YW5kIHRvIHByb3ZpZGUgdGhlIEJsdWV0b290aCBCREFERFIuDQoyLiBTZW5kIGl0IGRvd24gdG8g
+dGhlIFdpRmkgZHJpdmVyIHZpYSBhIGNmZzgwMjExIEFQSS4NCjMuIExldCBpdCBjYWxsICJoY2lf
+Z2V0X3JvdXRlIiB0byBnZXQgYSBoY2lfaGRldiBoYW5kbGUuDQo0LiBFeHBvcnQgYW4gQVBJIHRv
+IHNldCBjaGFubmVsIGNsYXNzaWZpY2F0aW9uIGluIEJsdWV0b290aCBIQ0kgY29yZS4NCjUuIExl
+dCB0aGUgV2lGaSBkcml2ZXIgZm9ybSB0aGUgY2hhbm5lbCBjbGFzc2lmaWNhdGlvbiBhbmQgY2Fs
+bCB0aGUgQmx1ZXRvb3RoIGNvcmUgIndyaXRlIGNoYW5uZWwgY2xhc3NpZmljYXRpb24iIEFQSSB0
+byBzZXQgdGhlIGNoYW5uZWxzLg0KDQpSZWdhcmRzDQpTdXJhag0KDQo=
