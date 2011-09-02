@@ -2,48 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Bartosz Szatkowski <bulislaw@linux.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bartosz Szatkowski <bulislaw@linux.com>
-Subject: [PATCH obexd 2/8] MAP Tracker: Fix memory issue in folder listing
-Date: Fri,  2 Sep 2011 10:57:54 +0200
-Message-Id: <1314953880-4663-2-git-send-email-bulislaw@linux.com>
-In-Reply-To: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
-References: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
+Subject: [PATCH obexd 1/8] MAP Tracker: Fix folder and path handling
+Date: Fri,  2 Sep 2011 10:57:53 +0200
+Message-Id: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- plugins/messages-tracker.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ plugins/messages-tracker.c |   11 +++++++----
+ 1 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/plugins/messages-tracker.c b/plugins/messages-tracker.c
-index eebfca3..218a016 100644
+index 43321f6..eebfca3 100644
 --- a/plugins/messages-tracker.c
 +++ b/plugins/messages-tracker.c
-@@ -40,7 +40,7 @@ struct message_folder {
- struct session {
- 	char *cwd;
- 	struct message_folder *folder;
--	const char *name;
-+	char *name;
- 	uint16_t max;
- 	uint16_t offset;
- 	void *user_data;
-@@ -279,6 +279,7 @@ static gboolean async_get_folder_listing(void *s) {
- 							session->user_data);
- 
- 	g_free(path);
-+	g_free(session->name);
- 
- 	return FALSE;
- }
-@@ -289,7 +290,7 @@ int messages_get_folder_listing(void *s, const char *name,
- 					void *user_data)
+@@ -124,13 +124,13 @@ static void create_folder_tree()
  {
- 	struct session *session = s;
--	session->name = name;
-+	session->name = g_strdup(name);
- 	session->max = max;
- 	session->offset = offset;
- 	session->folder_list_cb = callback;
+ 	struct message_folder *parent, *child;
+ 
+-	folder_tree = create_folder("/", NULL);
++	folder_tree = create_folder("/", "FILTER (!BOUND(?msg))");
+ 
+-	parent = create_folder("telecom", NULL);
++	parent = create_folder("telecom", "FILTER (!BOUND(?msg))");
+ 	folder_tree->subfolders = g_slist_append(folder_tree->subfolders,
+ 								parent);
+ 
+-	child = create_folder("msg", NULL);
++	child = create_folder("msg", "FILTER (!BOUND(?msg))");
+ 	parent->subfolders = g_slist_append(parent->subfolders, child);
+ 
+ 	parent = child;
+@@ -217,7 +217,10 @@ int messages_set_folder(void *s, const char *name, gboolean cdup)
+ 									NULL);
+ 	g_free(tmp);
+ 
+-	newabs = g_build_filename("/", newrel, NULL);
++	if (newrel[0] != '/')
++		newabs = g_build_filename("/", newrel, NULL);
++	else
++		newabs = g_strdup(newrel);
+ 
+ 	session->folder = get_folder(newabs);
+ 	if (session->folder == NULL) {
 -- 
 1.7.4.1
 
