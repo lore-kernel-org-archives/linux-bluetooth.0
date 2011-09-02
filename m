@@ -1,106 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Sumangala, Suraj" <surajs@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johannes Berg <johannes@sipsolutions.net>, "linville@tuxdriver.com"
-	<linville@tuxdriver.com>, "Balasubramanian, senthilkumar"
-	<senthilb@qca.qualcomm.com>, "Mehta, Vipin" <vipimeht@qca.qualcomm.com>,
-	"Valo, Kalle" <kvalo@qca.qualcomm.com>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC] nl80211: Added NL80211 commands for Bluetooth-WiFi coex
-Date: Fri, 2 Sep 2011 07:54:34 +0000
-Message-ID: <480687D4EEFE7447A2E09AADFF6673621AF82B5C@nasanexd02a.na.qualcomm.com>
-References: <1314771915-8848-1-git-send-email-surajs@qca.qualcomm.com>
-	 (sfid-20110831_082525_612687_34CC3735),<1314772217.4161.10.camel@jlt3.sipsolutions.net>
-	 <480687D4EEFE7447A2E09AADFF6673621AF7CDCF@nasanexd02a.na.qualcomm.com>
-	 ,<1314772832.4161.16.camel@jlt3.sipsolutions.net>
-	 <480687D4EEFE7447A2E09AADFF6673621AF7CE0B@nasanexd02a.na.qualcomm.com>
-	 <1314801657.3373.260.camel@aeonflux>
-	 <480687D4EEFE7447A2E09AADFF6673621AF7DF82@nasanexd02a.na.qualcomm.com>
-	 <1314831118.3373.266.camel@aeonflux>
-	 <480687D4EEFE7447A2E09AADFF6673621AF827CC@nasanexd02a.na.qualcomm.com>
- <1314877381.3373.284.camel@aeonflux>
-In-Reply-To: <1314877381.3373.284.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 2 Sep 2011 10:25:09 +0300
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFCv2 6/7] Bluetooth: add EFS option in l2cap conf req
+Message-ID: <20110902072500.GA6423@aemeltch-MOBL1>
+References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1314875256-6904-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <201109011445.03117.szymon.janc@tieto.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201109011445.03117.szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFRodXJzZGF5
-LCBTZXB0ZW1iZXIgMDEsIDIwMTEgNToxMyBQTQ0KPiBUbzogU3VtYW5nYWxhLCBTdXJhag0KPiBD
-YzogSm9oYW5uZXMgQmVyZzsgbGludmlsbGVAdHV4ZHJpdmVyLmNvbTsgYXRoNmtsLWRldmVsOyBC
-YWxhc3VicmFtYW5pYW4sDQo+IHNlbnRoaWxrdW1hcjsgTWVodGEsIFZpcGluOyBWYWxvLCBLYWxs
-ZTsgbGludXgtd2lyZWxlc3NAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJFOiBbUkZDXSBu
-bDgwMjExOiBBZGRlZCBOTDgwMjExIGNvbW1hbmRzIGZvciBCbHVldG9vdGgtV2lGaSBjb2V4DQo+
-IA0KPiBIaSBTdXJhaiwNCj4gDQo+ID4gPiA+ID4gdGhpcyBsb29rcyBsaWtlIHRoZSB0b3RhbCB3
-cm9uZyBhcHByb2FjaCB0byBtZS4gVGhpcyBuZWVkcyB0byBiZQ0KPiA+ID4gPiA+IGRvbmUNCj4g
-PiA+IGJldHdlZW4gbWFjODAyMTEgYW5kIEJsdWV0b290aCBzdWJzeXN0ZW1zIGluIHRoZSBrZXJu
-ZWwgZGlyZWN0bHkuDQo+ID4gPiBHb2luZyB0aHJvdWdoIHVzZXJzcGFjZSBmb3IgdGhpcyBpcyBh
-IHByZXR0eSBiYWQgaWRlYS4NCj4gPiA+ID4NCj4gPiA+ID4gPiBFc3BlY2lhbGx5IGlmIHlvdSB3
-YW5uYSBsaXN0ZW4gb24gRC1CdXMgZXZlbnRzIGZyb20gYmx1ZXRvb3RoZA0KPiA+ID4gPiA+IGFu
-ZCB0aGVuIHJ1bg0KPiA+ID4gYW5vdGhlciBwcm9jZXNzIHRvIHRoZW4gZXhlY3V0ZSBubDgwMjEx
-IGNvbW1hbmRzIGxvb2tzIGxpa2UgdG90YWwNCj4gPiA+IG92ZXJoZWFkIGF0IG5vIGdhaW4uIE5v
-dCB0byB0YWxrIGFib3V0IHBvdGVudGlhbCBsYXRlbmN5ID4gZWZmZWN0cw0KPiA+ID4gdGhhdCBt
-aWdodCBiZSBjb3VudGVycHJvZHVjdGl2ZS4NCj4gPiA+ID4NCj4gPiA+ID4gPiBXaGF0IHlvdSBy
-ZWFsbHkgd2FudCBpcyBhIHdheSB0byBtYXJrIEEyRFAgY2hhbm5lbHMgZm9yDQo+ID4gPiA+ID4g
-c3RyZWFtaW5nIGZyb20NCj4gPiA+IHVzZXJzcGFjZSBhcyBzdHJlYW1pbmcvcmVhbHRpbWUvcHJp
-b3JpdHkgc28gdGhlIEJsdWV0b290aCBzdWJzeXN0ZW0NCj4gPiA+IGtub3dzIG9uIHdoYXQgdG8g
-ZG8gd2l0aCBpdCBhbmQgdGhhdCB3YXkgY2FuIGFsc28gdGVsbCA+ID4gbWFjODAyMTENCj4gPiA+
-IGNvcnJlY3RseSBhYm91dCBjb2V4IHNldHRpbmdzLg0KPiA+ID4gPg0KPiA+ID4gPiA+IFdlIGFy
-ZSBhbHJlYWR5IHNldHRpbmdzIGZsdXNoYWJsZSBmbGFncyBmb3IgQTJEUCBzdHJlYW1pbmcNCj4g
-PiA+ID4gPiBjaGFubmVscyBhbmQgdGhlcmUNCj4gPiA+IGlzIHdvcmsgb25nb2luZyBmb3IgU09f
-UFJJT1JJVFkgc3VwcG9ydCB3aXRoIEwyQ0FQIHNvY2tldHMuDQo+ID4gPiA+DQo+ID4gPiA+IE1v
-cmUgdGhhbiB0aGUgQTJEUCBjb25uZWN0aW9uLCBpdCB3b3VsZCBiZSBtb3JlIHVzZWZ1bCB0byBm
-aW5kIG91dA0KPiA+ID4gPiB3aGVuDQo+ID4gPiBBMkRQIHN0YXJ0L3N0b3Agc3RyZWFtaW5nIHNv
-IHRoYXQgd2UgY2FuIGtub3cgd2hlbiB0byByZWFsbG9jYXRlDQo+ID4gPiByZXNvdXJjZSB0byBC
-bHVldG9vdGguIElzIGl0IHBvc3NpYmxlIHRvIHRhcCB0aGlzIGluZm9ybWF0aW9uIG91dCBvZiB0
-aGUNCj4gQmx1ZXRvb3RoIGNvcmU/DQo+ID4gPiA+IEFsc28sIGNhbiB5b3Ugc3VnZ2VzdCBhIHdh
-eSB0byBnZXQgQTJEUCBzdHJlYW1pbmcgc3RhdHVzLCBpbnF1aXJ5DQo+ID4gPiA+IHN0YXR1cywg
-YW5kDQo+ID4gPiBTQ08gYW5kIEFDTCByb2xlIHdpdGhvdXQgYSBoYWNrIGluIHRoZSBCbHVldG9v
-dGggc3Vic3lzdGVtPw0KPiA+ID4NCj4gPiA+IHRoZSBpbnF1aXJ5IHN0YXR1cyBpcyB0cmFja2Vk
-IGJ5IHRoZSBMaW51eCBrZXJuZWwgc2luY2UgZXZlci4gU2FtZQ0KPiA+ID4gZ29lcyBmb3IgQUNM
-IGFuZCBTQ08gc3RhdHVzLiBUaGUga2VybmVsIGtlZXBzIHRyYWNrIG92ZXIgYWxtb3N0DQo+ID4g
-PiBldmVyeXRoaW5nIG9uIHRoZSBIQ0kgbGV2ZWwgYW5kIHdpbGwgZG8gcHJvcGVyIGNsZWFudXAg
-YWZ0ZXJ3YXJkcy4gRG9pbmcgdGhpcw0KPiBpbiB1c2Vyc3BhY2Ugd2lsbCBub3Qgd29yayBvdXQu
-DQo+ID4gPiBBbmQgaXQgaXMgYWxzbyByYWN5Lg0KPiA+ID4NCj4gPiA+IEVzcGVjaWFsbHkgaW4g
-dGhlIGZ1dHVyZSBibHVldG9vdGhkIHdpbGwgYmUgdHJhY2tpbmcgbGVzcyBhbmQgbGVzcw0KPiA+
-ID4gaW5mb3JtYXRpb24uIFRoZSBuZXcgbWFuYWdlbWVudCBpbnRlcmZhY2Ugd2lsbCBoaWRlIGFs
-bW9zdCBldmVyeQ0KPiA+ID4gc2luZ2xlIHN0YXRlIGZyb20gYmx1ZXRvb3RoZCB3aGVyZSB0aGUg
-a2VybmVsIGlzIGRvaW5nIHRoZSBqb2INCj4gPiA+IGFueXdheSBhbmQgY2FuIGRvIGEgd2F5IGJl
-dHRlciBqb2IgaW4gdGhlIGZpcnN0IHBsYWNlLiBUaGlzIGlzIGFsc28NCj4gPiA+IGxlYWRzIHRv
-IHBvd2VyIGNvbnN1bXB0aW9uIGFkdmFudGFnZXMgc2luY2UgYmx1ZXRvb3RoZCBkb2VzIG5vdCBu
-ZWVkDQo+ID4gPiB0byBiZSB3b2tlbiB1cCB0aGF0IG9mdGVuIGFueXdheS4gQW5kIGluIGFkZGl0
-aW9uIHRoZSBrZXJuZWwgaGFzIG5vdCBkZWFsDQo+IHdpdGggdGhlIGV4dHJhIEhDSSBmaWx0ZXIg
-aGFuZGxpbmcuDQo+ID4gPg0KPiA+ID4gVGhlIG9ubHkgdGhpbmcgdGhhdCB5b3UgbWVudGlvbmVk
-IGhlcmUgaXMgQTJEUCBzdHJlYW1pbmcuIEFuZCBieSB0aGUNCj4gPiA+IG5hdHVyZSBvZiB0aGUg
-QTJEUCBwcm90b2NvbCwgeW91IGRvIGVzdGFibGlzaCBhIHNlY29uZCBMMkNBUCBjaGFubmVsDQo+
-ID4gPiB0aGF0IGlzIGp1c3QgdXNlZCBmb3Igc3RyZWFtaW5nLiBUaGF0IGNoYW5uZWwgaXMgYWxz
-byBvbmx5IHByZXNlbnQNCj4gPiA+IGlmIHlvdSBhcmUgc3RyZWFtaW5nIHJpZ2h0IG5vdy4gSWYg
-bm90IHN0cmVhbWluZyBpcyBnb2luZyBvbiwgaXQNCj4gPiA+IHdpbGwgYmUgZGlzY29ubmVjdGVk
-LiBTbyBpdCBpcyBwcmV0dHkgZWFzeSB0byBoYXZlIGJsdWV0b290aGQgdGFnDQo+ID4gPiBzdWNo
-IGEgY2hhbm5lbCB3aXRoIHByb3BlciBTT19QUklPUklUWSAob25jZSB3ZSBoYXZlIHRoYXQgY29k
-ZQ0KPiA+ID4gbWVyZ2VkIHVwc3RyZWFtKSBhbmQgdGhlbiB0aGUgQmx1ZXRvb3RoIHN1YnN5c3Rl
-bSBrbm93cyB3aGVuIEEyRFANCj4gc3RyZWFtaW5nIG9yIGFueSBoaWdoIHByaW9yaXR5L3JlYWx0
-aW1lIGRhdGEgaXMgdHJhbnNmZXJyZWQgb3ZlciBCbHVldG9vdGguDQo+ID4NCj4gPiBSZWdhcmRp
-bmcgU0NPIGFuZCBJbnF1aXJ5IHN0YXR1cywgZG8gd2UgaGF2ZSBhbiBleGlzdGluZyBBUEkgaW4g
-Qmx1ZXRvb3RoIGNvcmUNCj4gdGhhdCBJIGNhbiB1c2UgdG8gZ2V0IHRoYXQgaW5mb3JtYXRpb24/
-DQo+IA0KPiB0aGVyZSBpcyBvYnZpb3VzbHkgbm8gZXhwb3J0ZWQgc3ltYm9scyBvciBhbnl0aGlu
-ZyBhbGlrZS4gU2luY2Ugd2Ugb25seSBleHBvcnQNCj4gdGhpbmdzIHRoYXQgYXJlIHVzZWQgYnkg
-ZHJpdmVycyBvciBvdGhlciBzdWJzeXN0ZW0uIFNvIHlvdSB3b3VsZCBuZWVkIHRvIGNyZWF0ZQ0K
-PiBzdWNoIGFuIEFQSS4NCj4gDQo+IEhvd2V2ZXIgZmlyc3Qgd2UgbmVlZCB0byBlc3RhYmxpc2gg
-aW4gd2hpY2ggZGlyZWN0aW9uIHRoaXMgc2hvdWxkIGJlIGRvbmUNCj4gYW55d2F5LiBTaG91bGQg
-dGhlIEJsdWV0b290aCBzdWJzeXN0ZW0gbm90aWZ5IG1hYzgwMjExIHVuY29uZGl0aW9uYWwgb3IN
-Cj4gc2hvdWxkIG1hYzgwMjExIHJlZ2lzdGVyIG5vdGlmaWVycyBvZiB0aGUgQmx1ZXRvb3RoIHN1
-YnN5c3RlbS4NCj4gDQo+IFdlIGFsc28gc2hvdWxkIG5vdCBmb3JnZXQgZGlyZWN0IGludGVncmF0
-aW9uIHN1cHBvcnQgZm9yIGNoYW5naW5nIEFGSCBjaGFubmVsDQo+IG1hcHMgYmFzZWQgb24gdGhl
-IHVzZWQgV2lGaSBjaGFubmVscy4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANCg0K
-SWYgd2UgY2FuIHByb3ZpZGUgImhjaV9kZXYiIGFzIHRoZSBoYW5kbGUgdG8gdGhlIEJsdWV0b290
-aCBjb3JlLCBkb2VzIGl0IG1ha2Ugc2Vuc2UgdG8gZm9sbG93IHRoZSBiZWxvdyBzdGVwcyB0byBz
-ZW5kIGNoYW5uZWwgY2xhc3NpZmljYXRpb24/DQoxLiBJbXBsZW1lbnQgYW4gTkw4MDIxMSBjb21t
-YW5kIHRvIHByb3ZpZGUgdGhlIEJsdWV0b290aCBCREFERFIuDQoyLiBTZW5kIGl0IGRvd24gdG8g
-dGhlIFdpRmkgZHJpdmVyIHZpYSBhIGNmZzgwMjExIEFQSS4NCjMuIExldCBpdCBjYWxsICJoY2lf
-Z2V0X3JvdXRlIiB0byBnZXQgYSBoY2lfaGRldiBoYW5kbGUuDQo0LiBFeHBvcnQgYW4gQVBJIHRv
-IHNldCBjaGFubmVsIGNsYXNzaWZpY2F0aW9uIGluIEJsdWV0b290aCBIQ0kgY29yZS4NCjUuIExl
-dCB0aGUgV2lGaSBkcml2ZXIgZm9ybSB0aGUgY2hhbm5lbCBjbGFzc2lmaWNhdGlvbiBhbmQgY2Fs
-bCB0aGUgQmx1ZXRvb3RoIGNvcmUgIndyaXRlIGNoYW5uZWwgY2xhc3NpZmljYXRpb24iIEFQSSB0
-byBzZXQgdGhlIGNoYW5uZWxzLg0KDQpSZWdhcmRzDQpTdXJhag0KDQo=
+Hi Szymon,
+
+On Thu, Sep 01, 2011 at 02:45:03PM +0200, Szymon Janc wrote:
+> Hi Andrei,
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Adds extended flowspec option when building l2cap config request
+> > EFS is added if both the local and remote L2CAP entities have
+> > indicated support for the Extended Flow Specification for BR/EDR
+> > 
+> > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> > (sent Sun, 22 Aug 2010)
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/l2cap.h |    2 +
+> >  net/bluetooth/l2cap_core.c    |   70 ++++++++++++++++++++++++++++++++++++++++-
+> >  2 files changed, 71 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index 1f26a39..fc81771 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -445,6 +445,8 @@ struct l2cap_conn {
+> >  	__u32		rx_len;
+> >  	__u8		tx_ident;
+> >  
+> > +	__u8		flowspec_ident;
+> > +
+> >  	__u8		disc_reason;
+> >  
+> >  	__u8		preq[7]; /* SMP Pairing Request */
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 02908f0..c2c5eb7 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -549,6 +549,26 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
+> >  	return id;
+> >  }
+> >  
+> > +static inline u8 l2cap_flowspec_ident(struct l2cap_conn *conn)
+> > +{
+> > +	u8 id;
+> > +
+> > +	/* Get next available ident for the flow spec of guaranteed channel.
+> > +	 *    2 - 255 are used.
+> > +	 */
+> > +
+> > +	spin_lock_bh(&conn->lock);
+> > +
+> > +	if (++conn->flowspec_ident > 256)
+> > +		conn->flowspec_ident = 2;
+> 
+> flowspec_ident is u8, shouldn't this be 'if (++conn->flowspec_ident < 2)' ?
+> Also shouldn't you check if there is no channel with specified id before using that id?
+
+Yes you are right here. But I am thinking to drop this function as we
+might to support only Best Effort with fixed ident.
+
+Best regards 
+Andrei Emeltchenko 
+
+
+> 
+> > +
+> > +	id = conn->flowspec_ident;
+> > +
+> > +	spin_unlock_bh(&conn->lock);
+> > +
+> > +	return id;
+> > +}
+> > +
+> >  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len, void *data)
+> >  {
+> >  	struct sk_buff *skb = l2cap_build_cmd(conn, code, ident, len, data);
+> > @@ -1908,6 +1928,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+> >  {
+> >  	struct l2cap_conf_req *req = data;
+> >  	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
+> > +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
+> >  	void *ptr = req->data;
+> >  
+> >  	BT_DBG("chan %p", chan);
+> > @@ -1921,7 +1942,11 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+> >  		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
+> >  			break;
+> >  
+> > -		/* fall through */
+> > +		if (__l2cap_efs_supported(chan))
+> > +			set_bit(FLAG_EFS_ENABLE, &chan->flags);
+> > +
+> > +		break;
+> > +
+> >  	default:
+> >  		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
+> >  		break;
+> > @@ -1961,6 +1986,33 @@ done:
+> >  		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> >  							(unsigned long) &rfc);
+> >  
+> > +		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+> > +			efs.service_type = chan->local_stype;
+> > +			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
+> > +			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
+> > +
+> > +			if (chan->local_stype == L2CAP_SERV_BESTEFFORT) {
+> > +				chan->local_id = 1;
+> > +				efs.id = chan->local_id;
+> > +				efs.access_latency =
+> > +					cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
+> > +				efs.flush_timeout =
+> > +					cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
+> > +			} else {
+> > +				/* As spec, the ident shall be unique within
+> > +				   the scope of a physical link.
+> > +				 */
+> > +				chan->local_id = l2cap_flowspec_ident(chan->conn);
+> > +				efs.id = chan->local_id;
+> > +				efs.access_latency =
+> > +					cpu_to_le32(chan->local_acc_lat);
+> > +				efs.flush_timeout =
+> > +					cpu_to_le32(chan->local_flush_to);
+> > +			}
+> > +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> > +					sizeof(efs), (unsigned long) &efs);
+> > +		}
+> > +
+> >  		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+> >  			break;
+> >  
+> > @@ -1969,6 +2021,7 @@ done:
+> >  			chan->fcs = L2CAP_FCS_NONE;
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> > +
+> >  		break;
+> >  
+> >  	case L2CAP_MODE_STREAMING:
+> > @@ -1984,6 +2037,20 @@ done:
+> >  		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> >  							(unsigned long) &rfc);
+> >  
+> > +		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+> > +			efs.id = 1;
+> > +			efs.service_type = L2CAP_SERV_BESTEFFORT;
+> > +			efs.max_sdu_size =
+> > +				cpu_to_le16(chan->local_msdu);
+> > +			efs.sdu_inter_time =
+> > +				cpu_to_le32(chan->local_sdu_itime);
+> > +			efs.access_latency = 0;
+> > +			efs.flush_timeout = 0;
+> > +
+> > +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> > +					sizeof(efs), (unsigned long) &efs);
+> > +		}
+> > +
+> >  		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+> >  			break;
+> >  
+> > @@ -1992,6 +2059,7 @@ done:
+> >  			chan->fcs = L2CAP_FCS_NONE;
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> > +
+> >  		break;
+> >  	}
+> >  
+> > 
+> 
+> -- 
+> BR
+> Szymon Janc
