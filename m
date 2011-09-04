@@ -1,52 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1314805732-30418-2-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1314805732-30418-2-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Mon, 5 Sep 2011 10:55:53 +0300
-Message-ID: <CABBYNZKk5yCdMaM3b4Q+Yw11dZWTnku4_Fx1Hac0MVD8wbvC0w@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] Fix disconnect SCO at same time than RFCOMM
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Is bluetooth supported on lastest mac-mini?
+From: Jurgen Kramer <gtmkramer@xs4all.nl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: John Frankish <j-frankish@slb.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sun, 04 Sep 2011 20:24:51 +0200
+In-Reply-To: <CABBYNZJ_qVo1npo2XhjA4C3d2ss66CS-hKPtsFXC0M=_Er0sww@mail.gmail.com>
+References: <654DF80AD31A344E93DBCC6280BD6DEF222465B6@NL0230MBX08N1.DIR.slb.com>
+	 <CABBYNZLTJQkm0jv6NpmyoFV8sPUeLbrb+8DAUEBPB2J5yGfEsA@mail.gmail.com>
+	 <654DF80AD31A344E93DBCC6280BD6DEF22247990@NL0230MBX08N1.DIR.slb.com>
+	 <CABBYNZJ_qVo1npo2XhjA4C3d2ss66CS-hKPtsFXC0M=_Er0sww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1315160697.2441.9.camel@paragon.slim>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+On Sun, 2011-09-04 at 21:12 +0300, Luiz Augusto von Dentz wrote:
+> Hi John,
+> >>
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c index
+> >> 91d13a9..16abfd1 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
+> >> @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
+> >>         /* Apple MacBookPro8,2 */
+> >>         { USB_DEVICE(0x05ac, 0x821a) },
+> >>
+> >> +       /* Apple Mac Mini */
+> >> +       { USB_DEVICE(0x05ac, 0x4500) },
+> >> +
+> >>         /* AVM BlueFRITZ! USB v2.0 */
+> >>         { USB_DEVICE(0x057c, 0x3800) },
+> >>
+> >>
+> > Thanks, I recompiled the 3.0.3 kernel with the patch, but my machine crashed as soon as the driver tried to load..
+> 
+> Maybe it needs more changes, iirc this new mac minis have BT 4.0
+> controllers... Can you get any logs where it is crashing?
+> 
+> 
+Hi,
 
-2011/8/31 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
-> If RFCOMM disconnects, SCO should be disconnected too.
-> ---
->  audio/gateway.c |    7 +------
->  1 files changed, 1 insertions(+), 6 deletions(-)
->
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index 142b12e..59c91dd 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -222,15 +222,10 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
->  static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
->                        struct audio_device *dev)
->  {
-> -       struct gateway *gw = dev->gateway;
-> -
->        if (cond & G_IO_NVAL)
->                return FALSE;
->
-> -       g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
-> -       g_io_channel_unref(gw->rfcomm);
-> -       gw->rfcomm = NULL;
-> -       change_state(dev, GATEWAY_STATE_DISCONNECTED);
-> +       gateway_close(dev);
->
->        return FALSE;
->  }
-> --
-> 1.7.1
+I've sent the needed patch to the list a couple of hours ago.
 
-Looks good, ack.
+Jurgen
 
--- 
-Luiz Augusto von Dentz
