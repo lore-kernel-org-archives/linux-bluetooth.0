@@ -1,42 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Jurgen Kramer <gtmkramer@xs4all.nl>
-Subject: RE: [PATCH] btusb.c: add support for 2011 mac mini
-Date: Mon, 5 Sep 2011 17:21:34 +0000
-Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF22248652@NL0230MBX08N1.DIR.slb.com>
-References: <1315152103.2441.6.camel@paragon.slim>
-In-Reply-To: <1315152103.2441.6.camel@paragon.slim>
-Content-Type: text/plain; charset="utf-8"
+Date: Mon, 5 Sep 2011 11:19:50 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] Bluetooth: Fix not sending a Link Key Negative Reply
+Message-ID: <20110905141950.GA26578@samus.indt.org>
+References: <1314985882-24059-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1314985882-24059-3-git-send-email-vinicius.gomes@openbossa.org>
+ <20110905081842.GA3517@dell.ger.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110905081842.GA3517@dell.ger.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWJsdWV0b290aC1v
-d25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtDQo+IG93bmVyQHZn
-ZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEp1cmdlbiBLcmFtZXINCj4gU2VudDogU3VuZGF5
-LCAwNCBTZXB0ZW1iZXIsIDIwMTEgMjA6MDINCj4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtl
-cm5lbC5vcmcNCj4gU3ViamVjdDogW1BBVENIXSBidHVzYi5jOiBhZGQgc3VwcG9ydCBmb3IgMjAx
-MSBtYWMgbWluaQ0KPiANCj4gVG9kYXkgSSBub3RpY2VkIHRoYXQgdGhlIHVzYiBibHVldG9vdGgg
-YWRhcHRlciAoQkNNMjA0NkIxKSBvbiBteSAyMDExIG1hYw0KPiBtaW5pIHdhcyBub3Qgd29ya2lu
-Zy4gSSd2ZSBjcmVhdGVkIGEgcGF0Y2ggdG8gZ2V0IGl0IGdvaW5nLg0KPiANCj4gZGlmZiAtLWdp
-dCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5j
-IGluZGV4DQo+IDNlZjQ3NjAuLjhkODA3YzUgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0dXNiLmMNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiBAQCAtNzUs
-NiArNzUsOSBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYnR1c2JfdGFibGVbXSA9IHsN
-Cj4gIAkvKiBBcHBsZSBNYWNCb29rUHJvOCwyICovDQo+ICAJeyBVU0JfREVWSUNFKDB4MDVhYywg
-MHg4MjFhKSB9LA0KPiANCj4gKwkvKiBBcHBsZSBNYWNNaW5pNSwxICovDQo+ICsJeyBVU0JfREVW
-SUNFKDB4MDVhYywgMHg4MjgxKSB9LA0KPiArDQo+ICAJLyogQVZNIEJsdWVGUklUWiEgVVNCIHYy
-LjAgKi8NCj4gIAl7IFVTQl9ERVZJQ0UoMHgwNTdjLCAweDM4MDApIH0sDQo+IA0KPiBQYXRjaCBp
-cyBhZ2FpbnN0IGN1cnJlbnQga2VybmVsIGdpdC4NCj4gDQo+IEp1cmdlbg0KPiANCkkgdHJpZWQg
-dGhpcyBwYXRjaCB3aXRoIHRoZSAzLjAuMyBrZXJuZWwuDQoNCldoZW4gSSBvbmx5IGNvbXBpbGVk
-IHRoZSBtb2R1bGVzIGluIGRyaXZlcnMvYmx1ZXRvb3RoIGFuZCB3aXRob3V0IE1vZHVsZS5zeW12
-ZXJzIChzbyBubyBkZXBzKSwgSSBnb3QgdGhpcyB3aGVuIEkgbWFudWFsbHkgbG9hZGVkIHRoZSBt
-b2R1bGVzOg0KDQpidHVzYjogVW5rbm93biBzeW1ib2wgaGNpX2ZyZWVfZGV2IChlcnIgMCkNCmJ0
-dXNiOiBVbmtub3duIHN5bWJvbCBoY2lfYWxsb2NfZGV2IChlcnIgMCkNCi4uLg0KDQpJIGxvYWRl
-ZCBoY2lfdWFydCBhbmQgaGNpX3ZoY2kgKGFzIGEgZ3Vlc3MgdG8gd2hhdCB3YXMgbWlzc2luZykg
-YW5kIHRoaW5ncyB3b3JrZWQuDQoNCkkgdGhlbiB3ZW50IGJhY2sgYW5kIHJlY29tcGlsZWQgdGhl
-IGZ1bGwga2VybmVsIC0gYXMgcGVyIG1vZGluZm8sIHRoZSBvbmx5IGRlcCBmb3IgYnR1c2Igd2Fz
-IGJsdWV0b290aCAtIGFuZCB0aGluZ3MgZGlkIG5vdCB3b3JrLCBldmVuIHdoZW4gSSBtYW51YWxs
-eSBsb2FkZWQgaGNpX3VhcnQgYW5kIGhjaV92aGNpLg0KDQpBbnkgaWRlYXMgd2h5IHRoaXMgbWln
-aHQgYmU/DQoNClJlZ2FyZHMNCkpvaG4NCg0K
+Hi Johan,
+
+On 11:18 Mon 05 Sep, Johan Hedberg wrote:
+> Hi Vinicius,
+> 
+> On Fri, Sep 02, 2011, Vinicius Costa Gomes wrote:
+> > In the case that there are no keys loaded in the adapter, we should
+> > also respond the Link Key Request event with the Link Key Negative
+> > Reply command.
+> > 
+> > Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> > ---
+> >  net/bluetooth/hci_event.c |    8 +++++---
+> >  1 files changed, 5 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 8404cd9..79f89d2 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -2208,11 +2208,13 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
+> >  
+> >  	BT_DBG("%s", hdev->name);
+> >  
+> > -	if (!test_bit(HCI_LINK_KEYS, &hdev->flags))
+> > -		return;
+> > -
+> >  	hci_dev_lock(hdev);
+> >  
+> > +	if (!test_bit(HCI_LINK_KEYS, &hdev->flags)) {
+> > +		BT_DBG("%s has no keys", hdev->name);
+> > +		goto not_found;
+> > +	}
+> > +
+> >  	key = hci_find_link_key(hdev, &ev->bdaddr);
+> >  	if (!key) {
+> >  		BT_DBG("%s link key not found for %s", hdev->name,
+> > -- 
+> > 1.7.6.1
+> 
+> Nack. The purpose of this check in the beginning of the function is to
+> prevent breakage on systems that do not use the management interface.
+> With your patch you'd break all systems that use hciops. The
+> HCI_LINK_KEYS bit will only be set when user space sends the
+> MGMT_OP_LOAD_KEYS command.
+
+Ok. This patch is to be ignored then. The rest of the series should should
+still be considered.
+
+> 
+> Johan
+
+Cheers,
+-- 
+Vinicius
