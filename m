@@ -1,58 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Sep 2011 11:18:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Fix not sending a Link Key Negative Reply
-Message-ID: <20110905081842.GA3517@dell.ger.corp.intel.com>
-References: <1314985882-24059-1-git-send-email-vinicius.gomes@openbossa.org>
- <1314985882-24059-3-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314985882-24059-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1314805732-30418-5-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1314805732-30418-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1314805732-30418-5-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Mon, 5 Sep 2011 11:10:49 +0300
+Message-ID: <CABBYNZLmdM6tQ0+nmd+AR8ko_RZkVDN6q+b8-q5ws1oUEGq9Qw@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] Set state to "connecting" on connection requested
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Frédéric,
 
-On Fri, Sep 02, 2011, Vinicius Costa Gomes wrote:
-> In the case that there are no keys loaded in the adapter, we should
-> also respond the Link Key Request event with the Link Key Negative
-> Reply command.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+2011/8/31 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
+> This change will become necessary when
+> integrating the Audio interface which rely on
+> state change to confirm that connection
+> has started successfully.
 > ---
->  net/bluetooth/hci_event.c |    8 +++++---
->  1 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 8404cd9..79f89d2 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2208,11 +2208,13 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
->  
->  	BT_DBG("%s", hdev->name);
->  
-> -	if (!test_bit(HCI_LINK_KEYS, &hdev->flags))
-> -		return;
+>  audio/gateway.c |    7 +++----
+>  1 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/audio/gateway.c b/audio/gateway.c
+> index 7b6c535..e5295c8 100644
+> --- a/audio/gateway.c
+> +++ b/audio/gateway.c
+> @@ -318,8 +318,6 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *err,
+>                goto fail;
+>        }
+>
+> -       change_state(dev, GATEWAY_STATE_CONNECTING);
 > -
->  	hci_dev_lock(hdev);
->  
-> +	if (!test_bit(HCI_LINK_KEYS, &hdev->flags)) {
-> +		BT_DBG("%s has no keys", hdev->name);
-> +		goto not_found;
-> +	}
+>        sk = g_io_channel_unix_get_fd(chan);
+>
+>        gw->rfcomm = g_io_channel_ref(chan);
+> @@ -494,8 +492,6 @@ static void get_record_cb(sdp_list_t *recs, int err, gpointer user_data)
+>        }
+>
+>        g_io_channel_unref(io);
+> -
+> -       change_state(dev, GATEWAY_STATE_CONNECTING);
+>        return;
+>
+>  fail:
+> @@ -515,6 +511,7 @@ static int get_records(struct audio_device *device)
+>  {
+>        uuid_t uuid;
+>
+> +       change_state(device, GATEWAY_STATE_CONNECTING);
+>        sdp_uuid16_create(&uuid, HANDSFREE_AGW_SVCLASS_ID);
+>        return bt_search_service(&device->src, &device->dst, &uuid,
+>                                get_record_cb, device, NULL);
+> @@ -758,6 +755,8 @@ int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
+>
+>        dev->gateway->rfcomm = g_io_channel_ref(io);
+>
+> +       change_state(dev, GATEWAY_STATE_CONNECTING);
 > +
->  	key = hci_find_link_key(hdev, &ev->bdaddr);
->  	if (!key) {
->  		BT_DBG("%s link key not found for %s", hdev->name,
-> -- 
-> 1.7.6.1
 
-Nack. The purpose of this check in the beginning of the function is to
-prevent breakage on systems that do not use the management interface.
-With your patch you'd break all systems that use hciops. The
-HCI_LINK_KEYS bit will only be set when user space sends the
-MGMT_OP_LOAD_KEYS command.
+I suspect this will not track/close if the connection
+fails/authorization is rejected, for headset we have headset_set_state
+public and then if the authorization fails we set the state back to
+disconnected so we properly signal that we are no longer connecting
+and close the connection.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
