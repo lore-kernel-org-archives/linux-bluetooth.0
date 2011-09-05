@@ -1,61 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 5 Sep 2011 14:25:15 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Jurgen Kramer <gtmkramer@xs4all.nl>
-Subject: Re: [PATCH] btusb.c: add support for 2011 mac mini
-Message-ID: <20110905172515.GA2594@joana>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Jurgen Kramer <gtmkramer@xs4all.nl>
+Subject: RE: [PATCH] btusb.c: add support for 2011 mac mini
+Date: Mon, 5 Sep 2011 17:21:34 +0000
+Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF22248652@NL0230MBX08N1.DIR.slb.com>
 References: <1315152103.2441.6.camel@paragon.slim>
- <654DF80AD31A344E93DBCC6280BD6DEF22248652@NL0230MBX08N1.DIR.slb.com>
+In-Reply-To: <1315152103.2441.6.camel@paragon.slim>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <654DF80AD31A344E93DBCC6280BD6DEF22248652@NL0230MBX08N1.DIR.slb.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
-
-* John Frankish <j-frankish@slb.com> [2011-09-05 17:21:34 +0000]:
-
-> 
-> > -----Original Message-----
-> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> > owner@vger.kernel.org] On Behalf Of Jurgen Kramer
-> > Sent: Sunday, 04 September, 2011 20:02
-> > To: linux-bluetooth@vger.kernel.org
-> > Subject: [PATCH] btusb.c: add support for 2011 mac mini
-> > 
-> > Today I noticed that the usb bluetooth adapter (BCM2046B1) on my 2011 mac
-> > mini was not working. I've created a patch to get it going.
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c index
-> > 3ef4760..8d807c5 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
-> >  	/* Apple MacBookPro8,2 */
-> >  	{ USB_DEVICE(0x05ac, 0x821a) },
-> > 
-> > +	/* Apple MacMini5,1 */
-> > +	{ USB_DEVICE(0x05ac, 0x8281) },
-> > +
-> >  	/* AVM BlueFRITZ! USB v2.0 */
-> >  	{ USB_DEVICE(0x057c, 0x3800) },
-> > 
-> > Patch is against current kernel git.
-> > 
-> > Jurgen
-> > 
-> I tried this patch with the 3.0.3 kernel.
-> 
-> When I only compiled the modules in drivers/bluetooth and without Module.symvers (so no deps), I got this when I manually loaded the modules:
-> 
-> btusb: Unknown symbol hci_free_dev (err 0)
-> btusb: Unknown symbol hci_alloc_dev (err 0)
-> ...
-
-You have to enable other bluetooth modules as well. bluetooth.ko at least.
-rfcomm, bnep and hidp if you need then.
-
-	Gustavo
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4LWJsdWV0b290aC1v
+d25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtDQo+IG93bmVyQHZn
+ZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEp1cmdlbiBLcmFtZXINCj4gU2VudDogU3VuZGF5
+LCAwNCBTZXB0ZW1iZXIsIDIwMTEgMjA6MDINCj4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtl
+cm5lbC5vcmcNCj4gU3ViamVjdDogW1BBVENIXSBidHVzYi5jOiBhZGQgc3VwcG9ydCBmb3IgMjAx
+MSBtYWMgbWluaQ0KPiANCj4gVG9kYXkgSSBub3RpY2VkIHRoYXQgdGhlIHVzYiBibHVldG9vdGgg
+YWRhcHRlciAoQkNNMjA0NkIxKSBvbiBteSAyMDExIG1hYw0KPiBtaW5pIHdhcyBub3Qgd29ya2lu
+Zy4gSSd2ZSBjcmVhdGVkIGEgcGF0Y2ggdG8gZ2V0IGl0IGdvaW5nLg0KPiANCj4gZGlmZiAtLWdp
+dCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5j
+IGluZGV4DQo+IDNlZjQ3NjAuLjhkODA3YzUgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRv
+b3RoL2J0dXNiLmMNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiBAQCAtNzUs
+NiArNzUsOSBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYnR1c2JfdGFibGVbXSA9IHsN
+Cj4gIAkvKiBBcHBsZSBNYWNCb29rUHJvOCwyICovDQo+ICAJeyBVU0JfREVWSUNFKDB4MDVhYywg
+MHg4MjFhKSB9LA0KPiANCj4gKwkvKiBBcHBsZSBNYWNNaW5pNSwxICovDQo+ICsJeyBVU0JfREVW
+SUNFKDB4MDVhYywgMHg4MjgxKSB9LA0KPiArDQo+ICAJLyogQVZNIEJsdWVGUklUWiEgVVNCIHYy
+LjAgKi8NCj4gIAl7IFVTQl9ERVZJQ0UoMHgwNTdjLCAweDM4MDApIH0sDQo+IA0KPiBQYXRjaCBp
+cyBhZ2FpbnN0IGN1cnJlbnQga2VybmVsIGdpdC4NCj4gDQo+IEp1cmdlbg0KPiANCkkgdHJpZWQg
+dGhpcyBwYXRjaCB3aXRoIHRoZSAzLjAuMyBrZXJuZWwuDQoNCldoZW4gSSBvbmx5IGNvbXBpbGVk
+IHRoZSBtb2R1bGVzIGluIGRyaXZlcnMvYmx1ZXRvb3RoIGFuZCB3aXRob3V0IE1vZHVsZS5zeW12
+ZXJzIChzbyBubyBkZXBzKSwgSSBnb3QgdGhpcyB3aGVuIEkgbWFudWFsbHkgbG9hZGVkIHRoZSBt
+b2R1bGVzOg0KDQpidHVzYjogVW5rbm93biBzeW1ib2wgaGNpX2ZyZWVfZGV2IChlcnIgMCkNCmJ0
+dXNiOiBVbmtub3duIHN5bWJvbCBoY2lfYWxsb2NfZGV2IChlcnIgMCkNCi4uLg0KDQpJIGxvYWRl
+ZCBoY2lfdWFydCBhbmQgaGNpX3ZoY2kgKGFzIGEgZ3Vlc3MgdG8gd2hhdCB3YXMgbWlzc2luZykg
+YW5kIHRoaW5ncyB3b3JrZWQuDQoNCkkgdGhlbiB3ZW50IGJhY2sgYW5kIHJlY29tcGlsZWQgdGhl
+IGZ1bGwga2VybmVsIC0gYXMgcGVyIG1vZGluZm8sIHRoZSBvbmx5IGRlcCBmb3IgYnR1c2Igd2Fz
+IGJsdWV0b290aCAtIGFuZCB0aGluZ3MgZGlkIG5vdCB3b3JrLCBldmVuIHdoZW4gSSBtYW51YWxs
+eSBsb2FkZWQgaGNpX3VhcnQgYW5kIGhjaV92aGNpLg0KDQpBbnkgaWRlYXMgd2h5IHRoaXMgbWln
+aHQgYmU/DQoNClJlZ2FyZHMNCkpvaG4NCg0K
