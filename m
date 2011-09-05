@@ -1,76 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 15/16] Bluetooth: Support LE-Only discovery procedure
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Date: Mon, 5 Sep 2011 11:18:42 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Sep 2011 11:00:57 +0200
-In-Reply-To: <E08AB77C-CFED-4C47-ACE2-5BF773B2BC2F@openbossa.org>
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
-	 <1311623405-31108-16-git-send-email-andre.guedes@openbossa.org>
-	 <1312984325.3373.119.camel@aeonflux>
-	 <E08AB77C-CFED-4C47-ACE2-5BF773B2BC2F@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315213258.1979.14.camel@aeonflux>
-Mime-Version: 1.0
+Subject: Re: [PATCH 2/3] Bluetooth: Fix not sending a Link Key Negative Reply
+Message-ID: <20110905081842.GA3517@dell.ger.corp.intel.com>
+References: <1314985882-24059-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1314985882-24059-3-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1314985882-24059-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Vinicius,
 
-> >> This patch adds support for LE-Only discovery procedure through
-> >> management interface.
-> >>
-> >> A new flag (HCI_LE_SCAN) was created to inform if the controller is
-> >> performing LE scan. The HCI_LE_SCAN flag is set/cleared when the
-> >> controller starts/stops scanning.
-> >>
-> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> >> ---
-> >> include/net/bluetooth/hci.h |    2 ++
-> >> net/bluetooth/hci_event.c   |   39 +++++++++++++++++++++++++++++++++ 
-> >> +++---
-> >> net/bluetooth/mgmt.c        |    5 +++++
-> >> 3 files changed, 43 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/ 
-> >> hci.h
-> >> index fb40388..c4fdeeb 100644
-> >> --- a/include/net/bluetooth/hci.h
-> >> +++ b/include/net/bluetooth/hci.h
-> >> @@ -86,6 +86,8 @@ enum {
-> >> 	HCI_DEBUG_KEYS,
-> >>
-> >> 	HCI_RESET,
-> >> +
-> >> +	HCI_LE_SCAN,
-> >> };
-> >
-> > I am really against adding any new flags here. This is a public API  
-> > and
-> > a horrible one actually.
-> >
-> > We need to have these states internal and stop adding more flags to  
-> > this
-> > public API.
+On Fri, Sep 02, 2011, Vinicius Costa Gomes wrote:
+> In the case that there are no keys loaded in the adapter, we should
+> also respond the Link Key Request event with the Link Key Negative
+> Reply command.
 > 
-> The HCI_LE_SCAN flag is really device/controller related as well as
-> HCI_INQURY flag is. They both have similar meaning and using. Besides,
-> the userspace (hciconfig) might be interested in checking this flag to
-> know if the controller is carrying out the LE scan (just like it does
-> with HCI_INQUIRY flag).
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  net/bluetooth/hci_event.c |    8 +++++---
+>  1 files changed, 5 insertions(+), 3 deletions(-)
 > 
-> So, may you consider we keep this flag here?
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 8404cd9..79f89d2 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2208,11 +2208,13 @@ static inline void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff
+>  
+>  	BT_DBG("%s", hdev->name);
+>  
+> -	if (!test_bit(HCI_LINK_KEYS, &hdev->flags))
+> -		return;
+> -
+>  	hci_dev_lock(hdev);
+>  
+> +	if (!test_bit(HCI_LINK_KEYS, &hdev->flags)) {
+> +		BT_DBG("%s has no keys", hdev->name);
+> +		goto not_found;
+> +	}
+> +
+>  	key = hci_find_link_key(hdev, &ev->bdaddr);
+>  	if (!key) {
+>  		BT_DBG("%s link key not found for %s", hdev->name,
+> -- 
+> 1.7.6.1
 
-we can keep it for a little bit, but long term, these need to go away.
-Especially since they are not available via the mgmt API (and that is
-good this way).
+Nack. The purpose of this check in the beginning of the function is to
+prevent breakage on systems that do not use the management interface.
+With your patch you'd break all systems that use hciops. The
+HCI_LINK_KEYS bit will only be set when user space sends the
+MGMT_OP_LOAD_KEYS command.
 
-Btw. it is not about telling the userspace that we currently run a
-discovery procedure, it is more about how the flags are defined and how
-bad off an ABI that is.
-
-Regards
-
-Marcel
-
-
+Johan
