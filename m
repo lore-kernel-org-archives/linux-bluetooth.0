@@ -1,70 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 11/16] Bluetooth: Add 'eir_len' param to
- mgmt_device_found()
+Subject: Re: [PATCH v2 15/16] Bluetooth: Support LE-Only discovery procedure
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Sep 2011 11:03:34 +0200
-In-Reply-To: <A943531F-02F0-4809-A45F-03FE4923B6EF@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 05 Sep 2011 11:00:57 +0200
+In-Reply-To: <E08AB77C-CFED-4C47-ACE2-5BF773B2BC2F@openbossa.org>
 References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org>
-	 <1311623405-31108-12-git-send-email-andre.guedes@openbossa.org>
-	 <1312984225.3373.118.camel@aeonflux>
-	 <CAJdJm_PWZzbLvLyrr7NyXgemd_GcWH4A9=F5w93cN9qHHb_dig@mail.gmail.com>
-	 <1312989466.3373.126.camel@aeonflux>
-	 <7E90DB69-1056-4706-9531-BA4D12199A27@openbossa.org>
-	 <CAJdJm_Mg4e1bLqYFmQxSctWT6y+GMg2xtJLwavtYoM5yWYJPcw@mail.gmail.com>
-	 <1313022419.3373.137.camel@aeonflux>
-	 <A943531F-02F0-4809-A45F-03FE4923B6EF@openbossa.org>
+	 <1311623405-31108-16-git-send-email-andre.guedes@openbossa.org>
+	 <1312984325.3373.119.camel@aeonflux>
+	 <E08AB77C-CFED-4C47-ACE2-5BF773B2BC2F@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315213416.1979.16.camel@aeonflux>
+Message-ID: <1315213258.1979.14.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> >>> The advertising report event has the 'Length' field to inform the
-> >>> 'Data' field length, so I believe it has a variable length.
-> >>> According to its description, the 'Length' field may vary from 0x00
-> >>> to 0x1F (31) bytes.
+> >> This patch adds support for LE-Only discovery procedure through
+> >> management interface.
 > >>
-> >> You are right. Although the section 11 gives the impression the size
-> >> is always 31, this is not what happens on actual hardware, which
-> >> usually sends only the significant bytes (and the length is know from
-> >> the "Length" field.
+> >> A new flag (HCI_LE_SCAN) was created to inform if the controller is
+> >> performing LE scan. The HCI_LE_SCAN flag is set/cleared when the
+> >> controller starts/stops scanning.
 > >>
-> >>> The only drawback I see so far is copying extra ~200 bytes each time
-> >>> we get a advertising report data.
+> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> >> ---
+> >> include/net/bluetooth/hci.h |    2 ++
+> >> net/bluetooth/hci_event.c   |   39 +++++++++++++++++++++++++++++++++ 
+> >> +++---
+> >> net/bluetooth/mgmt.c        |    5 +++++
+> >> 3 files changed, 43 insertions(+), 3 deletions(-)
 > >>
-> >> I agree. If this event is being sent on each adv. data report event,
-> >> it will be more than 6 times the amount of data (with non-significant
-> >> bytes containing only zeroes) sent to userspace.
+> >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/ 
+> >> hci.h
+> >> index fb40388..c4fdeeb 100644
+> >> --- a/include/net/bluetooth/hci.h
+> >> +++ b/include/net/bluetooth/hci.h
+> >> @@ -86,6 +86,8 @@ enum {
+> >> 	HCI_DEBUG_KEYS,
+> >>
+> >> 	HCI_RESET,
+> >> +
+> >> +	HCI_LE_SCAN,
+> >> };
 > >
-> > if we wanna save bytes copied and send to userspace, then we might  
-> > even
-> > fix this for BR/EDR. Since while it is fixed there only a fraction is
-> > used there most of the times.
+> > I am really against adding any new flags here. This is a public API  
+> > and
+> > a horrible one actually.
+> >
+> > We need to have these states internal and stop adding more flags to  
+> > this
+> > public API.
 > 
-> IMO changing the struct device_found is another issue (this would
-> require userspace changes too).
-
-personally I break this one now, instead of later.
-
-> The point in adding the eir_len parameter is to avoid:
->      * preparing (memset and copy EIR from adv report) a 240-bytes
->        temporary buffer to pass to mgmt_device_found()
->      * to memcpy() ~200 useless bytes to ev.eir in mgmt_device_found()
+> The HCI_LE_SCAN flag is really device/controller related as well as
+> HCI_INQURY flag is. They both have similar meaning and using. Besides,
+> the userspace (hciconfig) might be interested in checking this flag to
+> know if the controller is carrying out the LE scan (just like it does
+> with HCI_INQUIRY flag).
 > 
-> For each advertising data we gather from the LE scan (which can be
-> a lot) we would need to do that.
+> So, may you consider we keep this flag here?
 
-And the same applies to BR/EDR actually. It is just that we never really
-encounter lot of inquiry results (except UPF), but it is the same
-problem that we end up copying data around for no good reason.
+we can keep it for a little bit, but long term, these need to go away.
+Especially since they are not available via the mgmt API (and that is
+good this way).
 
-If we wanna optimize this, then we better do it for both. So we have the
-same handling towards userspace.
+Btw. it is not about telling the userspace that we currently run a
+discovery procedure, it is more about how the flags are defined and how
+bad off an ABI that is.
 
 Regards
 
