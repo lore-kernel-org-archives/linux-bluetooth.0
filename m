@@ -1,262 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] sbc: Use __asm__ keyword
-Date: Tue,  6 Sep 2011 10:40:44 +0300
-Message-Id: <1315294844-28020-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Tue, 6 Sep 2011 02:16:57 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
+ connections
+Message-ID: <20110906051657.GB13617@joana>
+References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
+ <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
+ <1314116296.3373.213.camel@aeonflux>
+ <20110823162822.GA26522@joana>
+ <1314117006.3373.214.camel@aeonflux>
+ <20110823164501.GB26522@joana>
+ <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
+ <1314129089.3373.218.camel@aeonflux>
+ <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Maarten Bosmans <mkbosmans@gmail.com>
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-24 13:43:47 +0300]:
 
----
- sbc/sbc_primitives_armv6.c  |    4 ++--
- sbc/sbc_primitives_iwmmxt.c |    4 ++--
- sbc/sbc_primitives_mmx.c    |   14 +++++++-------
- sbc/sbc_primitives_neon.c   |   28 ++++++++++++++--------------
- 4 files changed, 25 insertions(+), 25 deletions(-)
+> Hi Marcel,
+> 
+> On Tue, Aug 23, 2011 at 10:51 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > Hi Luiz,
+> >
+> >> > This already fails today. Our code doesn't allow us to call twice the Connect
+> >> > method, so we can't have two of the same UUID connected.
+> >>
+> >> Well with RFCOMM you can't really connect multiple times to the same
+> >> channel/UUID and if we return the same fd clients will probably have
+> >> conflicts.
+> >
+> > you can not connect the same channel twice (except in the other
+> > direction), that is true, but you can connect to a different channel
+> > with a different UUID. That is the reason why we also allow connection
+> > by handles. Or at least we should.
+> 
+> You mean record handle? Currently we support connecting by UUID,
+> friendly name or channel.
+> 
+> > So even if we would make this limitation of 1 connection per UUID, the
+> > API is a fully asymmetric then. You are suppose to disconnect with the
+> > result of the connect call. I do not like that at all. It is bad API
+> > design and we are trying to squeeze this in the wrong way.
+> 
+> Currently we support disconnecting by UUID, friendly name, channel and
+> dev node. As you mentioned it doesn't really work for fd since it is
+> only unique per process, in the other hand the parameter is a pattern.
+> 
+> Perhaps what we should be doing is to return a object path in
+> Serial.Connect e.g. [variable
+> prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serialXX then Disconnect
+> just get it as parameter, the drawback is that this does not return
+> the tty/fd immediately so we need another round-trip or return
+> multiple values to Connect.
 
-diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
-index 9586098..b321272 100644
---- a/sbc/sbc_primitives_armv6.c
-+++ b/sbc/sbc_primitives_armv6.c
-@@ -41,7 +41,7 @@
- static void __attribute__((naked)) sbc_analyze_four_armv6()
- {
- 	/* r0 = in, r1 = out, r2 = consts */
--	asm volatile (
-+	__asm__ volatile (
- 		"push   {r1, r4-r7, lr}\n"
- 		"push   {r8-r11}\n"
- 		"ldrd   r4,  r5,  [r0, #0]\n"
-@@ -112,7 +112,7 @@ static void __attribute__((naked)) sbc_analyze_four_armv6()
- static void __attribute__((naked)) sbc_analyze_eight_armv6()
- {
- 	/* r0 = in, r1 = out, r2 = consts */
--	asm volatile (
-+	__asm__ volatile (
- 		"push   {r1, r4-r7, lr}\n"
- 		"push   {r8-r11}\n"
- 		"ldrd   r4,  r5,  [r0, #24]\n"
-diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
-index 213967e..e0bd060 100644
---- a/sbc/sbc_primitives_iwmmxt.c
-+++ b/sbc/sbc_primitives_iwmmxt.c
-@@ -42,7 +42,7 @@
- static inline void sbc_analyze_four_iwmmxt(const int16_t *in, int32_t *out,
- 					const FIXED_T *consts)
- {
--	asm volatile (
-+	__asm__ volatile (
- 		"wldrd        wr0, [%0]\n"
- 		"tbcstw       wr4, %2\n"
- 		"wldrd        wr2, [%1]\n"
-@@ -115,7 +115,7 @@ static inline void sbc_analyze_four_iwmmxt(const int16_t *in, int32_t *out,
- static inline void sbc_analyze_eight_iwmmxt(const int16_t *in, int32_t *out,
- 							const FIXED_T *consts)
- {
--	asm volatile (
-+	__asm__ volatile (
- 		"wldrd        wr0, [%0]\n"
- 		"tbcstw       wr15, %2\n"
- 		"wldrd        wr1, [%0, #8]\n"
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 7f2fbc3..27e9a56 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -45,7 +45,7 @@ static inline void sbc_analyze_four_mmx(const int16_t *in, int32_t *out,
- 		1 << (SBC_PROTO_FIXED4_SCALE - 1),
- 		1 << (SBC_PROTO_FIXED4_SCALE - 1),
- 	};
--	asm volatile (
-+	__asm__ volatile (
- 		"movq        (%0), %%mm0\n"
- 		"movq       8(%0), %%mm1\n"
- 		"pmaddwd     (%1), %%mm0\n"
-@@ -111,7 +111,7 @@ static inline void sbc_analyze_eight_mmx(const int16_t *in, int32_t *out,
- 		1 << (SBC_PROTO_FIXED8_SCALE - 1),
- 		1 << (SBC_PROTO_FIXED8_SCALE - 1),
- 	};
--	asm volatile (
-+	__asm__ volatile (
- 		"movq        (%0), %%mm0\n"
- 		"movq       8(%0), %%mm1\n"
- 		"movq      16(%0), %%mm2\n"
-@@ -258,7 +258,7 @@ static inline void sbc_analyze_4b_4s_mmx(int16_t *x, int32_t *out,
- 	out += out_stride;
- 	sbc_analyze_four_mmx(x + 0, out, analysis_consts_fixed4_simd_even);
- 
--	asm volatile ("emms\n");
-+	__asm__ volatile ("emms\n");
- }
- 
- static inline void sbc_analyze_4b_8s_mmx(int16_t *x, int32_t *out,
-@@ -273,7 +273,7 @@ static inline void sbc_analyze_4b_8s_mmx(int16_t *x, int32_t *out,
- 	out += out_stride;
- 	sbc_analyze_eight_mmx(x + 0, out, analysis_consts_fixed8_simd_even);
- 
--	asm volatile ("emms\n");
-+	__asm__ volatile ("emms\n");
- }
- 
- static void sbc_calc_scalefactors_mmx(
-@@ -291,7 +291,7 @@ static void sbc_calc_scalefactors_mmx(
- 		for (sb = 0; sb < subbands; sb += 2) {
- 			blk = (blocks - 1) * (((char *) &sb_sample_f[1][0][0] -
- 				(char *) &sb_sample_f[0][0][0]));
--			asm volatile (
-+			__asm__ volatile (
- 				"movq         (%4), %%mm0\n"
- 			"1:\n"
- 				"movq     (%1, %0), %%mm1\n"
-@@ -326,7 +326,7 @@ static void sbc_calc_scalefactors_mmx(
- 			: "cc", "memory");
- 		}
- 	}
--	asm volatile ("emms\n");
-+	__asm__ volatile ("emms\n");
- }
- 
- static int check_mmx_support(void)
-@@ -335,7 +335,7 @@ static int check_mmx_support(void)
- 	return 1; /* We assume that all 64-bit processors have MMX support */
- #else
- 	int cpuid_feature_information;
--	asm volatile (
-+	__asm__ volatile (
- 		/* According to Intel manual, CPUID instruction is supported
- 		 * if the value of ID bit (bit 21) in EFLAGS can be modified */
- 		"pushf\n"
-diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
-index 0572158..5d4d0e3 100644
---- a/sbc/sbc_primitives_neon.c
-+++ b/sbc/sbc_primitives_neon.c
-@@ -44,7 +44,7 @@ static inline void _sbc_analyze_four_neon(const int16_t *in, int32_t *out,
- 	/* TODO: merge even and odd cases (or even merge all four calls to this
- 	 * function) in order to have only aligned reads from 'in' array
- 	 * and reduce number of load instructions */
--	asm volatile (
-+	__asm__ volatile (
- 		"vld1.16    {d4, d5}, [%0, :64]!\n"
- 		"vld1.16    {d8, d9}, [%1, :128]!\n"
- 
-@@ -104,7 +104,7 @@ static inline void _sbc_analyze_eight_neon(const int16_t *in, int32_t *out,
- 	/* TODO: merge even and odd cases (or even merge all four calls to this
- 	 * function) in order to have only aligned reads from 'in' array
- 	 * and reduce number of load instructions */
--	asm volatile (
-+	__asm__ volatile (
- 		"vld1.16    {d4, d5}, [%0, :64]!\n"
- 		"vld1.16    {d8, d9}, [%1, :128]!\n"
- 
-@@ -247,7 +247,7 @@ static void sbc_calc_scalefactors_neon(
- 		for (sb = 0; sb < subbands; sb += 4) {
- 			int blk = blocks;
- 			int32_t *in = &sb_sample_f[0][ch][sb];
--			asm volatile (
-+			__asm__ volatile (
- 				"vmov.s32  q0, #0\n"
- 				"vmov.s32  q1, %[c1]\n"
- 				"vmov.s32  q14, #1\n"
-@@ -306,7 +306,7 @@ int sbc_calc_scalefactors_j_neon(
- 
- 	i = subbands;
- 
--	asm volatile (
-+	__asm__ volatile (
- 		/*
- 		 * constants: q13 = (31 - SCALE_OUT_BITS), q14 = 1
- 		 * input:     q0  = ((1 << SCALE_OUT_BITS) + 1)
-@@ -561,7 +561,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_4s_neon_internal(
- 	if (position < nsamples) {
- 		int16_t *dst = &X[0][SBC_X_BUFFER_SIZE - 40];
- 		int16_t *src = &X[0][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
- 			"vst1.16 {d0, d1, d2, d3}, [%[dst], :128]!\n"
- 			"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
-@@ -575,7 +575,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_4s_neon_internal(
- 		if (nchannels > 1) {
- 			dst = &X[1][SBC_X_BUFFER_SIZE - 40];
- 			src = &X[1][position];
--			asm volatile (
-+			__asm__ volatile (
- 				"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
- 				"vst1.16 {d0, d1, d2, d3}, [%[dst], :128]!\n"
- 				"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
-@@ -594,7 +594,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_4s_neon_internal(
- 		/* poor 'pcm' alignment */
- 		int16_t *x = &X[0][position];
- 		int16_t *y = &X[1][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #16\n"
-@@ -628,7 +628,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_4s_neon_internal(
- 		/* proper 'pcm' alignment */
- 		int16_t *x = &X[0][position];
- 		int16_t *y = &X[1][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #16\n"
-@@ -658,7 +658,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_4s_neon_internal(
- 			  "d20", "d21", "d22", "d23");
- 	} else {
- 		int16_t *x = &X[0][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #16\n"
-@@ -703,7 +703,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- 	if (position < nsamples) {
- 		int16_t *dst = &X[0][SBC_X_BUFFER_SIZE - 72];
- 		int16_t *src = &X[0][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
- 			"vst1.16 {d0, d1, d2, d3}, [%[dst], :128]!\n"
- 			"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
-@@ -721,7 +721,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- 		if (nchannels > 1) {
- 			dst = &X[1][SBC_X_BUFFER_SIZE - 72];
- 			src = &X[1][position];
--			asm volatile (
-+			__asm__ volatile (
- 				"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
- 				"vst1.16 {d0, d1, d2, d3}, [%[dst], :128]!\n"
- 				"vld1.16 {d0, d1, d2, d3}, [%[src], :128]!\n"
-@@ -744,7 +744,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- 		/* poor 'pcm' alignment */
- 		int16_t *x = &X[0][position];
- 		int16_t *y = &X[1][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1, d2, d3}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #32\n"
-@@ -782,7 +782,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- 		/* proper 'pcm' alignment */
- 		int16_t *x = &X[0][position];
- 		int16_t *y = &X[1][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1, d2, d3}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #32\n"
-@@ -816,7 +816,7 @@ static SBC_ALWAYS_INLINE int sbc_enc_process_input_8s_neon_internal(
- 			  "d20", "d21", "d22", "d23");
- 	} else {
- 		int16_t *x = &X[0][position];
--		asm volatile (
-+		__asm__ volatile (
- 			"vld1.8  {d0, d1, d2, d3}, [%[perm], :128]\n"
- 		"1:\n"
- 			"sub     %[x], %[x], #32\n"
--- 
-1.7.6.1
+I've been discussing this with Johan and we came to two possible solutions.
+The first one is the similar as this one, with three functions: 
 
+	handle, fd ConnectFD("pattern")
+
+	ConnectCancel(handle)
+
+	Disconnect(handle)
+
+And other with only ConnectFD() (and maybe ConnectCancel method). Disconnect
+would be handled by the client with shutdown().
+
+I'm tempted to go with this last approach, it's simpler and easier. What do
+you think?
+
+	Gustavo
