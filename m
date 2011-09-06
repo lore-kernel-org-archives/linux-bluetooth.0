@@ -1,77 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Tue, 6 Sep 2011 02:16:57 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
- connections
-Message-ID: <20110906051657.GB13617@joana>
-References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
- <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
- <1314116296.3373.213.camel@aeonflux>
- <20110823162822.GA26522@joana>
- <1314117006.3373.214.camel@aeonflux>
- <20110823164501.GB26522@joana>
- <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
- <1314129089.3373.218.camel@aeonflux>
- <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Gustavo Padovan <padovan@profusion.mobi>
+Subject: RE: [PATCH] btusb.c: add support for 2011 mac mini
+Date: Tue, 6 Sep 2011 03:45:24 +0000
+Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF22248841@NL0230MBX08N1.DIR.slb.com>
+References: <1315152103.2441.6.camel@paragon.slim>
+ <654DF80AD31A344E93DBCC6280BD6DEF22248652@NL0230MBX08N1.DIR.slb.com>
+ <20110905172515.GA2594@joana>
+In-Reply-To: <20110905172515.GA2594@joana>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-24 13:43:47 +0300]:
-
-> Hi Marcel,
+ > Hi John,
 > 
-> On Tue, Aug 23, 2011 at 10:51 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Luiz,
+> * John Frankish <j-frankish@slb.com> [2011-09-05 17:21:34 +0000]:
+> 
 > >
-> >> > This already fails today. Our code doesn't allow us to call twice the Connect
-> >> > method, so we can't have two of the same UUID connected.
-> >>
-> >> Well with RFCOMM you can't really connect multiple times to the same
-> >> channel/UUID and if we return the same fd clients will probably have
-> >> conflicts.
+> > > -----Original Message-----
+> > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > > owner@vger.kernel.org] On Behalf Of Jurgen Kramer
+> > > Sent: Sunday, 04 September, 2011 20:02
+> > > To: linux-bluetooth@vger.kernel.org
+> > > Subject: [PATCH] btusb.c: add support for 2011 mac mini
+> > >
+> > > Today I noticed that the usb bluetooth adapter (BCM2046B1) on my
+> > > 2011 mac mini was not working. I've created a patch to get it going.
+> > >
+> > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > > index
+> > > 3ef4760..8d807c5 100644
+> > > --- a/drivers/bluetooth/btusb.c
+> > > +++ b/drivers/bluetooth/btusb.c
+> > > @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
+> > >  	/* Apple MacBookPro8,2 */
+> > >  	{ USB_DEVICE(0x05ac, 0x821a) },
+> > >
+> > > +	/* Apple MacMini5,1 */
+> > > +	{ USB_DEVICE(0x05ac, 0x8281) },
+> > > +
+> > >  	/* AVM BlueFRITZ! USB v2.0 */
+> > >  	{ USB_DEVICE(0x057c, 0x3800) },
+> > >
+> > > Patch is against current kernel git.
+> > >
+> > > Jurgen
+> > >
+> > I tried this patch with the 3.0.3 kernel.
 > >
-> > you can not connect the same channel twice (except in the other
-> > direction), that is true, but you can connect to a different channel
-> > with a different UUID. That is the reason why we also allow connection
-> > by handles. Or at least we should.
+> > When I only compiled the modules in drivers/bluetooth and without
+> Module.symvers (so no deps), I got this when I manually loaded the
+> modules:
+> >
+> > btusb: Unknown symbol hci_free_dev (err 0)
+> > btusb: Unknown symbol hci_alloc_dev (err 0) ...
 > 
-> You mean record handle? Currently we support connecting by UUID,
-> friendly name or channel.
+> You have to enable other bluetooth modules as well. bluetooth.ko at least.
+> rfcomm, bnep and hidp if you need then.
 > 
-> > So even if we would make this limitation of 1 connection per UUID, the
-> > API is a fully asymmetric then. You are suppose to disconnect with the
-> > result of the connect call. I do not like that at all. It is bad API
-> > design and we are trying to squeeze this in the wrong way.
-> 
-> Currently we support disconnecting by UUID, friendly name, channel and
-> dev node. As you mentioned it doesn't really work for fd since it is
-> only unique per process, in the other hand the parameter is a pattern.
-> 
-> Perhaps what we should be doing is to return a object path in
-> Serial.Connect e.g. [variable
-> prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serialXX then Disconnect
-> just get it as parameter, the drawback is that this does not return
-> the tty/fd immediately so we need another round-trip or return
-> multiple values to Connect.
+> 	Gustavo
+> --
+Knowing that the patched btusb was recompiled without Module.symvers, I had already loaded the bluetooth module prior to loading btusb. In any case, this attempt worked and I could successfully see other Bluetooth devices.
 
-I've been discussing this with Johan and we came to two possible solutions.
-The first one is the similar as this one, with three functions: 
+It was when I recompiled the full kernel source with the btusb patch that things did not work..
 
-	handle, fd ConnectFD("pattern")
-
-	ConnectCancel(handle)
-
-	Disconnect(handle)
-
-And other with only ConnectFD() (and maybe ConnectCancel method). Disconnect
-would be handled by the client with shutdown().
-
-I'm tempted to go with this last approach, it's simpler and easier. What do
-you think?
-
-	Gustavo
+Regards
+John
