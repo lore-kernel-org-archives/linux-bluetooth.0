@@ -4,41 +4,41 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v5 1/6] Fix disconnect SCO at same time than RFCOMM
-Date: Tue,  6 Sep 2011 15:55:48 +0200
-Message-Id: <1315317353-14412-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v5 0/6] Add support for HandsfreeGateway to Media
+Date: Tue,  6 Sep 2011 15:55:47 +0200
+Message-Id: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If RFCOMM disconnects, SCO should be disconnected too.
----
- audio/gateway.c |    7 +------
- 1 files changed, 1 insertions(+), 6 deletions(-)
+Hi,
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index 142b12e..59c91dd 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -222,15 +222,10 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
- 			struct audio_device *dev)
- {
--	struct gateway *gw = dev->gateway;
--
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
- 
--	g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
--	g_io_channel_unref(gw->rfcomm);
--	gw->rfcomm = NULL;
--	change_state(dev, GATEWAY_STATE_DISCONNECTED);
-+	gateway_close(dev);
- 
- 	return FALSE;
- }
--- 
-1.7.1
+The first patch in this series fix the issue remaining in v2.
+It also fix a crash because the request_stream callback was run synchronously.
+After that various fixes.
+
+Changes from v4 :
+Patch 2: take Luiz comment into account and create error domain for
+gateway
+Patch 4: also make sure gateway is set back to disconnected state in case of
+authorize errors.
+
+Best regards,
+Frédéric
+
+Frédéric Dalleau (6):
+  Fix disconnect SCO at same time than RFCOMM
+  Fix asynchronously run request stream cb
+  Fix state to "playing" on SCO establishment
+  Set state to "connecting" on connection requested
+  Fix reference count issue in incoming connections
+  Check all states before allowing gw connection
+
+ audio/gateway.c |  194 ++++++++++++++++++++++++++++++++++++++-----------------
+ audio/gateway.h |   12 +++-
+ audio/manager.c |    8 ++-
+ audio/unix.c    |   13 +---
+ 4 files changed, 155 insertions(+), 72 deletions(-)
 
