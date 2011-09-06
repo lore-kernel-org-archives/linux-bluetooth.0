@@ -1,61 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Hurley <peter@hurleysoftware.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 6 Sep 2011 15:39:18 -0400
-Subject: Re: [PATCH v2 10/13] Bluetooth: Fix setting the connection
- sec_level when encryption fails
-Message-ID: <1315337959.11425.23.camel@THOR>
-References: <1314313359-12652-1-git-send-email-vcgomes@gmail.com>
-	 <1314313359-12652-11-git-send-email-vcgomes@gmail.com>
-In-Reply-To: <1314313359-12652-11-git-send-email-vcgomes@gmail.com>
-Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
+In-Reply-To: <CAMhHtTzN0hr_LucwSd8Sg=+XHkyV2nSyAECrg-2FOavfS+69xA@mail.gmail.com>
+References: <CAJdJm_OmwPrc_3nT3zOSa0PLQBfr8hzyXuWHj=JJXYdWagoG7w@mail.gmail.com>
+ <CAMhHtTzr_jguh1MpF+_-4m1_he-4KhR7fc9TscsVb4aFDX12jA@mail.gmail.com> <CAMhHtTzN0hr_LucwSd8Sg=+XHkyV2nSyAECrg-2FOavfS+69xA@mail.gmail.com>
+From: VISHWANATH KM <a21174@motorola.com>
+Date: Tue, 6 Sep 2011 23:12:40 +0530
+Message-ID: <CACbkbUJxdNsjcS8iQSxTwDNAFmRpW_Q9D7oHjVvq6ZK43WGrHA@mail.gmail.com>
+Subject: Re: [RFC] New mgmt API for Features Exchange (was: Re: Security level
+ for Primary Services discovery during pairing)
+To: Ash K <ashoksarf@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
-On Thu, 2011-08-25 at 19:02 -0400, Vinicius Costa Gomes wrote:
-> From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> 
-> If the encryption changed event indicates that happened an error we
-> should not set the security level of the connection.
-> 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 7aa02e2..b6f1865 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -797,7 +797,7 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
->  	if (conn->sec_level == BT_SECURITY_SDP)
->  		conn->sec_level = BT_SECURITY_LOW;
->  
-> -	if (conn->pending_sec_level > conn->sec_level)
-> +	if (!status && conn->pending_sec_level > conn->sec_level)
->  		conn->sec_level = conn->pending_sec_level;
+On Tue, Aug 9, 2011 at 3:30 AM, Ash K <ashoksarf@gmail.com> wrote:
+>
+> Also, section 2.1 from core spec 4.0 L2CAP says:
+>
+> 2.1 CHANNEL IDENTIFIERS
+> A channel identifier (CID) is the local name representing a logical
+> channel endpoint
+> on the device. The null identifier (0x0000) shall never be used as a destination
+> endpoint. Identifiers from 0x0001 to 0x003F are reserved for specific
+> L2CAP functions. These channels are referred to as Fixed Channels. At a minimum,
+> the L2CAP Signaling channel (Fixed Channel 0x0001) or the L2CAP LE
+> Signaling channel (Fixed Channel 0x0005) shall be supported. If Fixed Channel
+> 0x0005 is supported, then Fixed Channels 0x0004 and 0x0006 shall be
+> supported (see Table 2.1).
+>
+> Which mean SMP L2CAP (0x0006) channel is mandatory if a device is
+> using LE connection. In least case a implementation would have to
+> implement SMP module which returns error (pairing not supported or
+> command not supported). This procedure could be used to identify if
+> SMP is supported.
 
-I think this should be moved out of hci_encrypt_cfm and directly into
-hci_encrypt_change_evt. Currently, the only place this assignment is
-valid is on receipt of a successful Encryption Change Event (Although,
-where is the Encryption Key Refresh Complete Event handling? Or does the
-current SMP implementation not allow sec_level elevation?)
+I miss the conclusion, so in above case when remote returns error
+(pairing/cmd not supported) do we disconnect the LE ACL link or
+continue with our usecase, ( here the usecase is doing primary service
+discovery and disconnect as part of CreatePairedDevice API), pls
+clarify
 
-Also, I believe that this assignment should only occur on LE links
-(which should be specifically tested for). For example, what if an ACL
-link authenticates at BT_SECURITY_MEDIUM level successfully but then
-later a specific service attempts to authenticates at BT_SECURITY_HIGH
-level but fails. The pending_sec_level will still be set to
-BT_SECURITY_HIGH so SET_CONN_ENCRYPT just needs to be resent and the ACL
-link will be promoted to BT_SECURITY_HIGH.
-
-Maybe instead of testing for an LE link, a new pend bit should be
-introduced to indicate that this link is specifically expecting to set
-the link sec_level as a result of sending the LE_START_ENCRYPTION cmd?
-
-Regards,
-Peter Hurley
+>
+> As I said in earlier mail, SMP procedure might not be invoked until a
+> service requests for it. This might make error handling easier, since
+> once would have just return GATT procedure failure since stating
+> remote device does not support pairing or pairing command.
+>
+>
+> On Mon, Aug 8, 2011 at 12:05 PM, Ash K <ashoksarf@gmail.com> wrote:
+> > Hi All,
+> >
+> > LE is designed for low energy devices and as far as I can understand
+> > Encryption/security related features are should not be used until the
+> > service requests for it (even if it is supported), this might drain
+> > low energy devices unnecessarily (since some service may not need
+> > security). For example: Device Information service access.
+> >
+> > The correct procedure would be to start security related procedure
+> > once any GATT service request for it. You can see the procedure in
+> > "BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 365 of 656"
+> > (Bluetooth 4.0 core spec absolute page number 1725). Attached the flow
+> > chart image from spec.
+> >
+> > As soon as you see a request for security mode, you can assume that
+> > remote device supports SMP and encryption bit can also be verified
+> > from remote feature.
+> >
+> > Let me know thoughts.
+> >
+> > Thanks,
+> > Ashok
+> >
+> > On Mon, Aug 8, 2011 at 10:32 AM, Anderson Lizardo
+> > <anderson.lizardo@openbossa.org> wrote:
+> >> Hi,
+> >>
+> >> On Mon, Aug 8, 2011 at 10:59 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+> >>>> I think you have two options:
+> >>>>
+> >>>> 1) Always use CreateDevice(). Then if you want to issue SMP pairing,
+> >>>> you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
+> >>>> (I haven't tested this lately, but I remember it used to work).
+> >>>>
+> >>>> 2) Extend the kernel Management API to allow Features Exchange. See
+> >>>> doc/mgmt-api.txt for the existing commands, to have an idea on how it
+> >>>> works (I recommend first sending an API proposal here to the list).
+> >>>
+> >>> Option 2 sounds better, where we use CreatePairedDevice and after the LE ACL
+> >>> is established we can do LE Read Remote features, (similar to what we do for
+> >>> BR i.e we do HCI Read Remote features in conn complete ) and if Encryption
+> >>> feature bit is set then we trigger SMP else we don't, pls let me know if any
+> >>> comments, if this sounds ok then i will mail the changes to this maillist
+> >>> for further review
+> >>
+> >> Let's hear others opinions. Johan, Marcel, Gustavo?
+> >>
+> >> Regards,
+> >> --
+> >> Anderson Lizardo
+> >> Instituto Nokia de Tecnologia - INdT
+> >> Manaus - Brazil
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> >> the body of a message to majordomo@vger.kernel.org
+> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >>
+> >
+> >
+> >
+> > --
+> > Ash
+> >
+>
+>
+>
+> --
+> Ash
