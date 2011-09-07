@@ -1,96 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 5/5] Bluetooth: EWS: prevent unneeded fragmentation in l2cap
-Date: Wed,  7 Sep 2011 17:05:14 +0300
-Message-Id: <1315404314-12045-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMhHtTyPuOtXFa-bYWUKkN1XcPkBUiu0t-2w9QCOG8iaRn=YGA@mail.gmail.com>
+References: <CAJdJm_OmwPrc_3nT3zOSa0PLQBfr8hzyXuWHj=JJXYdWagoG7w@mail.gmail.com>
+ <CAMhHtTzr_jguh1MpF+_-4m1_he-4KhR7fc9TscsVb4aFDX12jA@mail.gmail.com>
+ <CAMhHtTzN0hr_LucwSd8Sg=+XHkyV2nSyAECrg-2FOavfS+69xA@mail.gmail.com>
+ <CACbkbUJxdNsjcS8iQSxTwDNAFmRpW_Q9D7oHjVvq6ZK43WGrHA@mail.gmail.com> <CAMhHtTyPuOtXFa-bYWUKkN1XcPkBUiu0t-2w9QCOG8iaRn=YGA@mail.gmail.com>
+From: Ash K <ashoksarf@gmail.com>
+Date: Wed, 7 Sep 2011 10:34:30 -0500
+Message-ID: <CAMhHtTxu3WXY2K8ZxCtBu=U69mNerXbcimA=2nNuMhGF9w6ypQ@mail.gmail.com>
+Subject: Re: [RFC] New mgmt API for Features Exchange (was: Re: Security level
+ for Primary Services discovery during pairing)
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+If the two procedure are running independently, primary service
+discovery is not dependent on pairing and pairing is not dependent on
+primary service discovery, one would return error for pairing and
+continue with primary service discovery. Once primary service
+discovery is done, LE ACL can be disconnected.
 
-Calculate pdu length before creating I-frame. Otherwise if
-conn->mtu - (headers) < remote_mps we get fragmented packets in
-create_iframe_pdu function.
+Same way as SDP and pairing can be done onver BR/EDR.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |   26 ++++++++++++++++++--------
- 1 files changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0d72a82..bb18a27 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1560,8 +1560,6 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct m
- 	int err, count, hlen;
- 	struct l2cap_hdr *lh;
- 
--	BT_DBG("sk %p len %d", sk, (int)len);
--
- 	if (!conn)
- 		return ERR_PTR(-ENOTCONN);
- 
-@@ -1576,6 +1574,9 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan, struct m
- 	if (chan->fcs == L2CAP_FCS_CRC16)
- 		hlen += L2CAP_FCS_SIZE;
- 
-+	BT_DBG("sk %p, msg %p, len %d, sdulen %d, hlen %d",
-+		sk, msg, (int)len, (int)sdulen, hlen);
-+
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
- 	skb = bt_skb_send_alloc(sk, count + hlen,
- 			msg->msg_flags & MSG_DONTWAIT, &err);
-@@ -1611,23 +1612,30 @@ static int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, si
- 	struct sk_buff_head sar_queue;
- 	u32 control;
- 	size_t size = 0;
-+	size_t pdu_len;
- 
- 	skb_queue_head_init(&sar_queue);
-+	
- 	control = __set_ctrl_sar(chan, L2CAP_SAR_START);
--	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
-+
-+	pdu_len = chan->conn->mtu;
-+	pdu_len -= L2CAP_EXTENDED_HDR_SIZE + L2CAP_FCS_SIZE + L2CAP_SDULEN_SIZE;
-+	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
-+
-+	skb = l2cap_create_iframe_pdu(chan, msg, pdu_len, control, len);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
- 	__skb_queue_tail(&sar_queue, skb);
--	len -= chan->remote_mps;
--	size += chan->remote_mps;
-+	len -= pdu_len;
-+	size += pdu_len;
- 
- 	while (len > 0) {
- 		size_t buflen;
- 
--		if (len > chan->remote_mps) {
-+		if (len > pdu_len) {
- 			control = __set_ctrl_sar(chan, L2CAP_SAR_CONTINUE);
--			buflen = chan->remote_mps;
-+			buflen = pdu_len;
- 		} else {
- 			control = __set_ctrl_sar(chan, L2CAP_SAR_END);
- 			buflen = len;
-@@ -3311,8 +3319,10 @@ static int l2cap_check_fcs(struct l2cap_chan *chan,  struct sk_buff *skb)
- 		rcv_fcs = get_unaligned_le16(skb->data + skb->len);
- 		our_fcs = crc16(0, skb->data - hdr_size, skb->len + hdr_size);
- 
--		if (our_fcs != rcv_fcs)
-+		if (our_fcs != rcv_fcs) {
-+			BT_DBG("FCS check failed");
- 			return -EBADMSG;
-+		}
- 	}
- 	return 0;
- }
+
+
+> On Tue, Sep 6, 2011 at 12:42 PM, VISHWANATH KM <a21174@motorola.com> wrote:
+>> Hi,
+>>
+>> On Tue, Aug 9, 2011 at 3:30 AM, Ash K <ashoksarf@gmail.com> wrote:
+>>>
+>>> Also, section 2.1 from core spec 4.0 L2CAP says:
+>>>
+>>> 2.1 CHANNEL IDENTIFIERS
+>>> A channel identifier (CID) is the local name representing a logical
+>>> channel endpoint
+>>> on the device. The null identifier (0x0000) shall never be used as a destination
+>>> endpoint. Identifiers from 0x0001 to 0x003F are reserved for specific
+>>> L2CAP functions. These channels are referred to as Fixed Channels. At a minimum,
+>>> the L2CAP Signaling channel (Fixed Channel 0x0001) or the L2CAP LE
+>>> Signaling channel (Fixed Channel 0x0005) shall be supported. If Fixed Channel
+>>> 0x0005 is supported, then Fixed Channels 0x0004 and 0x0006 shall be
+>>> supported (see Table 2.1).
+>>>
+>>> Which mean SMP L2CAP (0x0006) channel is mandatory if a device is
+>>> using LE connection. In least case a implementation would have to
+>>> implement SMP module which returns error (pairing not supported or
+>>> command not supported). This procedure could be used to identify if
+>>> SMP is supported.
+>>
+>> I miss the conclusion, so in above case when remote returns error
+>> (pairing/cmd not supported) do we disconnect the LE ACL link or
+>> continue with our usecase, ( here the usecase is doing primary service
+>> discovery and disconnect as part of CreatePairedDevice API), pls
+>> clarify
+>>
+>>>
+>>> As I said in earlier mail, SMP procedure might not be invoked until a
+>>> service requests for it. This might make error handling easier, since
+>>> once would have just return GATT procedure failure since stating
+>>> remote device does not support pairing or pairing command.
+>>>
+>>>
+>>> On Mon, Aug 8, 2011 at 12:05 PM, Ash K <ashoksarf@gmail.com> wrote:
+>>> > Hi All,
+>>> >
+>>> > LE is designed for low energy devices and as far as I can understand
+>>> > Encryption/security related features are should not be used until the
+>>> > service requests for it (even if it is supported), this might drain
+>>> > low energy devices unnecessarily (since some service may not need
+>>> > security). For example: Device Information service access.
+>>> >
+>>> > The correct procedure would be to start security related procedure
+>>> > once any GATT service request for it. You can see the procedure in
+>>> > "BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 365 of 656"
+>>> > (Bluetooth 4.0 core spec absolute page number 1725). Attached the flow
+>>> > chart image from spec.
+>>> >
+>>> > As soon as you see a request for security mode, you can assume that
+>>> > remote device supports SMP and encryption bit can also be verified
+>>> > from remote feature.
+>>> >
+>>> > Let me know thoughts.
+>>> >
+>>> > Thanks,
+>>> > Ashok
+>>> >
+>>> > On Mon, Aug 8, 2011 at 10:32 AM, Anderson Lizardo
+>>> > <anderson.lizardo@openbossa.org> wrote:
+>>> >> Hi,
+>>> >>
+>>> >> On Mon, Aug 8, 2011 at 10:59 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+>>> >>>> I think you have two options:
+>>> >>>>
+>>> >>>> 1) Always use CreateDevice(). Then if you want to issue SMP pairing,
+>>> >>>> you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
+>>> >>>> (I haven't tested this lately, but I remember it used to work).
+>>> >>>>
+>>> >>>> 2) Extend the kernel Management API to allow Features Exchange. See
+>>> >>>> doc/mgmt-api.txt for the existing commands, to have an idea on how it
+>>> >>>> works (I recommend first sending an API proposal here to the list).
+>>> >>>
+>>> >>> Option 2 sounds better, where we use CreatePairedDevice and after the LE ACL
+>>> >>> is established we can do LE Read Remote features, (similar to what we do for
+>>> >>> BR i.e we do HCI Read Remote features in conn complete ) and if Encryption
+>>> >>> feature bit is set then we trigger SMP else we don't, pls let me know if any
+>>> >>> comments, if this sounds ok then i will mail the changes to this maillist
+>>> >>> for further review
+>>> >>
+>>> >> Let's hear others opinions. Johan, Marcel, Gustavo?
+>>> >>
+>>> >> Regards,
+>>> >> --
+>>> >> Anderson Lizardo
+>>> >> Instituto Nokia de Tecnologia - INdT
+>>> >> Manaus - Brazil
+>>> >> --
+>>> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> >> the body of a message to majordomo@vger.kernel.org
+>>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>> >>
+>>> >
+>>> >
+>>> >
+>>> > --
+>>> > Ash
+>>> >
+>>>
+>>>
+>>>
+>>> --
+>>> Ash
+
+
+
 -- 
-1.7.4.1
-
+Ash
