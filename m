@@ -1,40 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E6746C4.90903@visionsystems.de>
+Date: Wed, 07 Sep 2011 12:26:12 +0200
+From: Yegor Yefremov <yegor_sub1@visionsystems.de>
+Reply-To: yegor_sub1@visionsystems.de
 MIME-Version: 1.0
-In-Reply-To: <1315396567.1979.36.camel@aeonflux>
-References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
-	<1314033585-22244-2-git-send-email-padovan@profusion.mobi>
-	<1314116296.3373.213.camel@aeonflux>
-	<20110823162822.GA26522@joana>
-	<1314117006.3373.214.camel@aeonflux>
-	<20110823164501.GB26522@joana>
-	<CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
-	<1314129089.3373.218.camel@aeonflux>
-	<CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
-	<20110906051657.GB13617@joana>
-	<CABBYNZ+wMVMQ=43dgZpPAXpP-17Tr4rdRHWjYqyKnARbn0SudQ@mail.gmail.com>
-	<1315396567.1979.36.camel@aeonflux>
-Date: Wed, 7 Sep 2011 15:09:02 +0300
-Message-ID: <CABBYNZ+D+VGs7DAFKTd0fa3gdrGyA_SqwqXxgpVZUJv_uhTO=w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing connections
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+CC: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] hciattach: fix serial speed setting for wl1271
+References: <4E64D1B4.9020300@visionsystems.de>
+In-Reply-To: <4E64D1B4.9020300@visionsystems.de>
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Am 05.09.2011 15:42, schrieb Yegor Yefremov:
+> override speed setting if firmware script issues serial settings command,
+> otherwise the value given in the firmware script will be overridden.
+> 
+> Example:
+> 
+> hciattach /dev/ttyO1 texas 115200
+> 
+> will fail, because /dev/ttyO1 will be opened with 115200 b/s, then
+> the firmware script will set the buadrate to 3000000 b/s, after UART init
+> hciattach.c will set the baudrate to 115200, so communication is broken.
+> 
+> The only correct way is to set both speeds:
+> 
+> hciattach -s 115200 /dev/ttyO1 texas 3000000
+> 
+> With this patch only initial speed must be specified. The former semantic
+> will be preserved in case the firmware script doesn't provide serial
+> settings action.
+> 
+> Tested with wl1271 and firmware TIInit_7.2.31.bts
+> 
+> Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
+> ---
+>  tools/hciattach.c    |    2 +-
+>  tools/hciattach.h    |    2 +-
+>  tools/hciattach_ti.c |   19 +++++++++++--------
+>  3 files changed, 13 insertions(+), 10 deletions(-)
+> 
 
-On Wed, Sep 7, 2011 at 2:56 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> yes, you do have to keep track of the client. You wanna do a proper
-> shutdown if the client exits unexpectedly. Or forgets to call shutdown.
-
-I guess the kernel would auto release the socket if the process exit
-and nobody else has a reference to it, so if we close our fd after it
-has been transferred the only one with reference is the client, iirc
-this was a problem to tty because we have to release the devnode to
-disconnect which involves ioctl but afaik that is not the case for
-sockets and the client can basically call close and be done with it,
-right?
-
--- 
-Luiz Augusto von Dentz
+See this thread for more info: http://e2e.ti.com/support/low_power_rf/f/307/t/57254.aspx
