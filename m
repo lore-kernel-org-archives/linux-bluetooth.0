@@ -1,45 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E6746C4.90903@visionsystems.de>
-Date: Wed, 07 Sep 2011 12:26:12 +0200
-From: Yegor Yefremov <yegor_sub1@visionsystems.de>
-Reply-To: yegor_sub1@visionsystems.de
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] hciattach: fix serial speed setting for wl1271
-References: <4E64D1B4.9020300@visionsystems.de>
-In-Reply-To: <4E64D1B4.9020300@visionsystems.de>
-Content-Type: text/plain; charset=ISO-8859-15
+In-Reply-To: <20110906051657.GB13617@joana>
+References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
+	<1314033585-22244-2-git-send-email-padovan@profusion.mobi>
+	<1314116296.3373.213.camel@aeonflux>
+	<20110823162822.GA26522@joana>
+	<1314117006.3373.214.camel@aeonflux>
+	<20110823164501.GB26522@joana>
+	<CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
+	<1314129089.3373.218.camel@aeonflux>
+	<CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
+	<20110906051657.GB13617@joana>
+Date: Wed, 7 Sep 2011 10:50:15 +0300
+Message-ID: <CABBYNZ+wMVMQ=43dgZpPAXpP-17Tr4rdRHWjYqyKnARbn0SudQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing connections
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 05.09.2011 15:42, schrieb Yegor Yefremov:
-> override speed setting if firmware script issues serial settings command,
-> otherwise the value given in the firmware script will be overridden.
-> 
-> Example:
-> 
-> hciattach /dev/ttyO1 texas 115200
-> 
-> will fail, because /dev/ttyO1 will be opened with 115200 b/s, then
-> the firmware script will set the buadrate to 3000000 b/s, after UART init
-> hciattach.c will set the baudrate to 115200, so communication is broken.
-> 
-> The only correct way is to set both speeds:
-> 
-> hciattach -s 115200 /dev/ttyO1 texas 3000000
-> 
-> With this patch only initial speed must be specified. The former semantic
-> will be preserved in case the firmware script doesn't provide serial
-> settings action.
-> 
-> Tested with wl1271 and firmware TIInit_7.2.31.bts
-> 
-> Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
-> ---
->  tools/hciattach.c    |    2 +-
->  tools/hciattach.h    |    2 +-
->  tools/hciattach_ti.c |   19 +++++++++++--------
->  3 files changed, 13 insertions(+), 10 deletions(-)
-> 
+Hi Gustavo,
 
-See this thread for more info: http://e2e.ti.com/support/low_power_rf/f/307/t/57254.aspx
+On Tue, Sep 6, 2011 at 8:16 AM, Gustavo Padovan <padovan@profusion.mobi> wr=
+ote:
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-08-24 13:43:47 +030=
+0]:
+>
+>> Hi Marcel,
+>>
+>> On Tue, Aug 23, 2011 at 10:51 PM, Marcel Holtmann <marcel@holtmann.org> =
+wrote:
+>> > Hi Luiz,
+>> >
+>> >> > This already fails today. Our code doesn't allow us to call twice t=
+he Connect
+>> >> > method, so we can't have two of the same UUID connected.
+>> >>
+>> >> Well with RFCOMM you can't really connect multiple times to the same
+>> >> channel/UUID and if we return the same fd clients will probably have
+>> >> conflicts.
+>> >
+>> > you can not connect the same channel twice (except in the other
+>> > direction), that is true, but you can connect to a different channel
+>> > with a different UUID. That is the reason why we also allow connection
+>> > by handles. Or at least we should.
+>>
+>> You mean record handle? Currently we support connecting by UUID,
+>> friendly name or channel.
+>>
+>> > So even if we would make this limitation of 1 connection per UUID, the
+>> > API is a fully asymmetric then. You are suppose to disconnect with the
+>> > result of the connect call. I do not like that at all. It is bad API
+>> > design and we are trying to squeeze this in the wrong way.
+>>
+>> Currently we support disconnecting by UUID, friendly name, channel and
+>> dev node. As you mentioned it doesn't really work for fd since it is
+>> only unique per process, in the other hand the parameter is a pattern.
+>>
+>> Perhaps what we should be doing is to return a object path in
+>> Serial.Connect e.g. [variable
+>> prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serialXX then Disconnect
+>> just get it as parameter, the drawback is that this does not return
+>> the tty/fd immediately so we need another round-trip or return
+>> multiple values to Connect.
+>
+> I've been discussing this with Johan and we came to two possible solution=
+s.
+> The first one is the similar as this one, with three functions:
+>
+> =A0 =A0 =A0 =A0handle, fd ConnectFD("pattern")
+>
+> =A0 =A0 =A0 =A0ConnectCancel(handle)
+>
+> =A0 =A0 =A0 =A0Disconnect(handle)
+>
+> And other with only ConnectFD() (and maybe ConnectCancel method). Disconn=
+ect
+> would be handled by the client with shutdown().
+>
+> I'm tempted to go with this last approach, it's simpler and easier. What =
+do
+> you think?
+
+Yep, I guess the shutdown is the simplest one and I suppose we don't
+have to keep any tracking/reference to the fd in bluetoothd it is up
+to the client process to deal with the connection.
+
+
+--=20
+Luiz Augusto von Dentz
