@@ -1,121 +1,193 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH obexd v3 1/3] Extend functions parameter list for vCard's format
-Date: Thu,  8 Sep 2011 15:12:18 +0200
-Message-Id: <1315487540-16607-1-git-send-email-michalski.raf@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CACbkbUJW7W85B96q0iT+iXH3JtW76fJ3CVnQVNOr8Dgwei3JYg@mail.gmail.com>
+References: <CAJdJm_OmwPrc_3nT3zOSa0PLQBfr8hzyXuWHj=JJXYdWagoG7w@mail.gmail.com>
+ <CAMhHtTzr_jguh1MpF+_-4m1_he-4KhR7fc9TscsVb4aFDX12jA@mail.gmail.com>
+ <CAMhHtTzN0hr_LucwSd8Sg=+XHkyV2nSyAECrg-2FOavfS+69xA@mail.gmail.com>
+ <CACbkbUJxdNsjcS8iQSxTwDNAFmRpW_Q9D7oHjVvq6ZK43WGrHA@mail.gmail.com>
+ <CAMhHtTyPuOtXFa-bYWUKkN1XcPkBUiu0t-2w9QCOG8iaRn=YGA@mail.gmail.com> <CACbkbUJW7W85B96q0iT+iXH3JtW76fJ3CVnQVNOr8Dgwei3JYg@mail.gmail.com>
+From: Ash K <ashoksarf@gmail.com>
+Date: Wed, 7 Sep 2011 15:19:06 -0500
+Message-ID: <CAMhHtTyNxmVd=p5nmL=MC0ZTnzFTmiB8EYt+Goe0yMWA+5r_EA@mail.gmail.com>
+Subject: Re: [RFC] New mgmt API for Features Exchange (was: Re: Security level
+ for Primary Services discovery during pairing)
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	VISHWANATH KM <a21174@motorola.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends some functions ("get_escaped_fields" and some from
-"vcard_printf_*" family) parameter list for format value, since it would
-be needed to select escaping and encoding method, depending on vCard's
-type (vCard 2.1 or vCard 3.0).
----
- plugins/vcard.c |   23 ++++++++++++-----------
- 1 files changed, 12 insertions(+), 11 deletions(-)
+> As per current implementation in l2cap_recv_frame, if we recv SMP
+> error/not supported from remote device then it disconnects the l2cap
+> channel, and create_paired_device expects primary service to happen
+> with security level high, so in this case two procedures are dependent
 
-diff --git a/plugins/vcard.c b/plugins/vcard.c
-index a4a1921..3b9d9cd 100644
---- a/plugins/vcard.c
-+++ b/plugins/vcard.c
-@@ -144,7 +144,7 @@ done:
- 	dest[j] = 0;
- }
- 
--static void get_escaped_fields(char **fields, ...)
-+static void get_escaped_fields(uint8_t format, char **fields, ...)
- {
- 	va_list ap;
- 	GString *line;
-@@ -201,7 +201,7 @@ static gboolean contact_fields_present(struct phonebook_contact * contact)
- 	return FALSE;
- }
- 
--static void vcard_printf_name(GString *vcards,
-+static void vcard_printf_name(GString *vcards, uint8_t format,
- 					struct phonebook_contact *contact)
- {
- 	char *fields;
-@@ -219,7 +219,7 @@ static void vcard_printf_name(GString *vcards,
- 	}
- 
- 
--	get_escaped_fields(&fields, contact->family,
-+	get_escaped_fields(format, &fields, contact->family,
- 				contact->given, contact->additional,
- 				contact->prefix, contact->suffix,
- 				NULL);
-@@ -229,7 +229,8 @@ static void vcard_printf_name(GString *vcards,
- 	g_free(fields);
- }
- 
--static void vcard_printf_fullname(GString *vcards, const char *text)
-+static void vcard_printf_fullname(GString *vcards, uint8_t format,
-+							const char *text)
- {
- 	char field[LEN_MAX];
- 	add_slash(field, text, LEN_MAX, strlen(text));
-@@ -405,7 +406,7 @@ static gboolean org_fields_present(struct phonebook_contact *contact)
- 	return FALSE;
- }
- 
--static void vcard_printf_org(GString *vcards,
-+static void vcard_printf_org(GString *vcards, uint8_t format,
- 					struct phonebook_contact *contact)
- {
- 	char *fields;
-@@ -413,7 +414,7 @@ static void vcard_printf_org(GString *vcards,
- 	if (org_fields_present(contact) == FALSE)
- 		return;
- 
--	get_escaped_fields(&fields, contact->company,
-+	get_escaped_fields(format, &fields, contact->company,
- 					contact->department, NULL);
- 
- 	vcard_printf(vcards, "ORG:%s", fields);
-@@ -476,7 +477,7 @@ static void vcard_printf_address(GString *vcards, uint8_t format,
- 	g_free(fields);
- }
- 
--static void vcard_printf_datetime(GString *vcards,
-+static void vcard_printf_datetime(GString *vcards, uint8_t format,
- 					struct phonebook_contact *contact)
- {
- 	const char *type;
-@@ -528,11 +529,11 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- 		vcard_printf_tag(vcards, format, "UID", NULL, contact->uid);
- 
- 	if (filter & FILTER_N)
--		vcard_printf_name(vcards, contact);
-+		vcard_printf_name(vcards, format, contact);
- 
- 	if (filter & FILTER_FN && (*contact->fullname ||
- 					format == FORMAT_VCARD30))
--		vcard_printf_fullname(vcards, contact->fullname);
-+		vcard_printf_fullname(vcards, format, contact->fullname);
- 
- 	if (filter & FILTER_TEL) {
- 		GSList *l = contact->numbers;
-@@ -590,7 +591,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- 							contact->photo);
- 
- 	if (filter & FILTER_ORG)
--		vcard_printf_org(vcards, contact);
-+		vcard_printf_org(vcards, format, contact);
- 
- 	if (filter & FILTER_ROLE && *contact->role)
- 		vcard_printf_tag(vcards, format, "ROLE", NULL, contact->role);
-@@ -599,7 +600,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
- 		vcard_printf_tag(vcards, format, "TITLE", NULL, contact->title);
- 
- 	if (filter & FILTER_X_IRMC_CALL_DATETIME)
--		vcard_printf_datetime(vcards, contact);
-+		vcard_printf_datetime(vcards, format, contact);
- 
- 	vcard_printf_end(vcards);
- }
+
+I suppose you mean "create_paired_device expects primary service discovery"
+
+This behavior does NOT violate specification.
+
+However one should be careful about the use-cases which may include a
+device which doesn't support SMP. If pairing is initiated a
+appropriate error should be returned to application, stating "remote
+device does not support pairing/no facility for secured connection"
+but it may allow application to access unsecured data transfers. i.e a
+specific error code stating the reason while returning as pairing
+failed status.
+
+When a application/user receive this error code, application could use
+GATT/profile specific APIs to access any of supported
+profiles/services.
+
+Also note that primary service discovery procedure does NOT demand
+need any security. In this use case, we are doing pairing procedure
+and followed by primary service discovery to identify the services
+supported, this is not exactly same as simple service discovery.
+
+
+On Wed, Sep 7, 2011 at 10:52 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+> Hi,
+>
+> On Wed, Sep 7, 2011 at 8:28 PM, Ash K <ashoksarf@gmail.com> wrote:
+>>
+>> If the two procedure are running independently, primary service
+>> discovery is not dependent on pairing and pairing is not dependent on
+>> primary service discovery, one would return error for pairing and
+>> continue with primary service discovery. Once primary service
+>> discovery is done, LE ACL can be disconnected.
+>>
+>> Same way as SDP and pairing can be done onver BR/EDR.
+>>
+>
+> As per current implementation in l2cap_recv_frame, if we recv SMP
+> error/not supported from remote device then it disconnects the l2cap
+> channel, and create_paired_device expects primary service to happen
+> with security level high, so in this case two procedures are dependent
+> on each other. I am not sure if current behavior is ok ? as from spec
+> section ( 5.3.5.1 Pairing Not Supported by Slave page 649) failure
+> conditions it doesn't mention about either continuing or closing of
+> channel, let me know your opinion.
+>
+> Regards
+> Vishwanath
+>
+>>
+>> On Tue, Sep 6, 2011 at 12:42 PM, VISHWANATH KM <a21174@motorola.com> wrote:
+>> > Hi,
+>> >
+>> > On Tue, Aug 9, 2011 at 3:30 AM, Ash K <ashoksarf@gmail.com> wrote:
+>> >>
+>> >> Also, section 2.1 from core spec 4.0 L2CAP says:
+>> >>
+>> >> 2.1 CHANNEL IDENTIFIERS
+>> >> A channel identifier (CID) is the local name representing a logical
+>> >> channel endpoint
+>> >> on the device. The null identifier (0x0000) shall never be used as a destination
+>> >> endpoint. Identifiers from 0x0001 to 0x003F are reserved for specific
+>> >> L2CAP functions. These channels are referred to as Fixed Channels. At a minimum,
+>> >> the L2CAP Signaling channel (Fixed Channel 0x0001) or the L2CAP LE
+>> >> Signaling channel (Fixed Channel 0x0005) shall be supported. If Fixed Channel
+>> >> 0x0005 is supported, then Fixed Channels 0x0004 and 0x0006 shall be
+>> >> supported (see Table 2.1).
+>> >>
+>> >> Which mean SMP L2CAP (0x0006) channel is mandatory if a device is
+>> >> using LE connection. In least case a implementation would have to
+>> >> implement SMP module which returns error (pairing not supported or
+>> >> command not supported). This procedure could be used to identify if
+>> >> SMP is supported.
+>> >
+>> > I miss the conclusion, so in above case when remote returns error
+>> > (pairing/cmd not supported) do we disconnect the LE ACL link or
+>> > continue with our usecase, ( here the usecase is doing primary service
+>> > discovery and disconnect as part of CreatePairedDevice API), pls
+>> > clarify
+>> >
+>> >>
+>> >> As I said in earlier mail, SMP procedure might not be invoked until a
+>> >> service requests for it. This might make error handling easier, since
+>> >> once would have just return GATT procedure failure since stating
+>> >> remote device does not support pairing or pairing command.
+>> >>
+>> >>
+>> >> On Mon, Aug 8, 2011 at 12:05 PM, Ash K <ashoksarf@gmail.com> wrote:
+>> >> > Hi All,
+>> >> >
+>> >> > LE is designed for low energy devices and as far as I can understand
+>> >> > Encryption/security related features are should not be used until the
+>> >> > service requests for it (even if it is supported), this might drain
+>> >> > low energy devices unnecessarily (since some service may not need
+>> >> > security). For example: Device Information service access.
+>> >> >
+>> >> > The correct procedure would be to start security related procedure
+>> >> > once any GATT service request for it. You can see the procedure in
+>> >> > "BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 365 of 656"
+>> >> > (Bluetooth 4.0 core spec absolute page number 1725). Attached the flow
+>> >> > chart image from spec.
+>> >> >
+>> >> > As soon as you see a request for security mode, you can assume that
+>> >> > remote device supports SMP and encryption bit can also be verified
+>> >> > from remote feature.
+>> >> >
+>> >> > Let me know thoughts.
+>> >> >
+>> >> > Thanks,
+>> >> > Ashok
+>> >> >
+>> >> > On Mon, Aug 8, 2011 at 10:32 AM, Anderson Lizardo
+>> >> > <anderson.lizardo@openbossa.org> wrote:
+>> >> >> Hi,
+>> >> >>
+>> >> >> On Mon, Aug 8, 2011 at 10:59 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+>> >> >>>> I think you have two options:
+>> >> >>>>
+>> >> >>>> 1) Always use CreateDevice(). Then if you want to issue SMP pairing,
+>> >> >>>> you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
+>> >> >>>> (I haven't tested this lately, but I remember it used to work).
+>> >> >>>>
+>> >> >>>> 2) Extend the kernel Management API to allow Features Exchange. See
+>> >> >>>> doc/mgmt-api.txt for the existing commands, to have an idea on how it
+>> >> >>>> works (I recommend first sending an API proposal here to the list).
+>> >> >>>
+>> >> >>> Option 2 sounds better, where we use CreatePairedDevice and after the LE ACL
+>> >> >>> is established we can do LE Read Remote features, (similar to what we do for
+>> >> >>> BR i.e we do HCI Read Remote features in conn complete ) and if Encryption
+>> >> >>> feature bit is set then we trigger SMP else we don't, pls let me know if any
+>> >> >>> comments, if this sounds ok then i will mail the changes to this maillist
+>> >> >>> for further review
+>> >> >>
+>> >> >> Let's hear others opinions. Johan, Marcel, Gustavo?
+>> >> >>
+>> >> >> Regards,
+>> >> >> --
+>> >> >> Anderson Lizardo
+>> >> >> Instituto Nokia de Tecnologia - INdT
+>> >> >> Manaus - Brazil
+>> >> >> --
+>> >> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> >> >> the body of a message to majordomo@vger.kernel.org
+>> >> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> >> >>
+>> >> >
+>> >> >
+>> >> >
+>> >> > --
+>> >> > Ash
+>> >> >
+>> >>
+>> >>
+>> >>
+>> >> --
+>> >> Ash
+>> >
+>>
+>>
+>>
+>> --
+>> Ash
+>
+
+
+
 -- 
-1.6.3.3
-
+Ash
