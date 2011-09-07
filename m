@@ -1,48 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
- connections
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 07 Sep 2011 14:46:42 +0200
-In-Reply-To: <CABBYNZ+D+VGs7DAFKTd0fa3gdrGyA_SqwqXxgpVZUJv_uhTO=w@mail.gmail.com>
-References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
-	 <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
-	 <1314116296.3373.213.camel@aeonflux> <20110823162822.GA26522@joana>
-	 <1314117006.3373.214.camel@aeonflux> <20110823164501.GB26522@joana>
-	 <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
-	 <1314129089.3373.218.camel@aeonflux>
-	 <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
-	 <20110906051657.GB13617@joana>
-	 <CABBYNZ+wMVMQ=43dgZpPAXpP-17Tr4rdRHWjYqyKnARbn0SudQ@mail.gmail.com>
-	 <1315396567.1979.36.camel@aeonflux>
-	 <CABBYNZ+D+VGs7DAFKTd0fa3gdrGyA_SqwqXxgpVZUJv_uhTO=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315399602.1979.39.camel@aeonflux>
-Mime-Version: 1.0
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 0/7] EFS: extended flow specification option support
+Date: Wed,  7 Sep 2011 17:04:04 +0300
+Message-Id: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> > yes, you do have to keep track of the client. You wanna do a proper
-> > shutdown if the client exits unexpectedly. Or forgets to call shutdown.
-> 
-> I guess the kernel would auto release the socket if the process exit
-> and nobody else has a reference to it, so if we close our fd after it
-> has been transferred the only one with reference is the client, iirc
-> this was a problem to tty because we have to release the devnode to
-> disconnect which involves ioctl but afaik that is not the case for
-> sockets and the client can basically call close and be done with it,
-> right?
+Implementation of EFS based upon series of patches sent upstream in Aug 2010
+by Haijun Liu.
 
-does dbus-daemon holds the reference for the time of D-Bus message to be
-in flight between bluetoothd and the client? If not, then we have a race
-condition here, because we dropped the reference before it ended up on
-the other side.
+http://marc.info/?a=128277503500005&r=1&w=2
 
-Regards
+Changes:
+	* RFC: initial release
+	* RFCv2: rebase & take care about comments:
+		- use flag in l2cap_chan instead of variable
+		- move channel init out from parse_conf_req
+		- other style fixes
+	* PATCHv1: support only Best Effort channels for now.
 
-Marcel
+L2CAP sequence looks like the one below:
+(my patches for decoding EFS have been applied to hcidump)
 
+...
+< ACL data: handle 1 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00f8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Extended Flow Specification
+        Fixed Channels
+< ACL data: handle 1 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 3
+> ACL data: handle 1 flags 0x02 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list
+< ACL data: handle 1 flags 0x00 dlen 12
+    L2CAP(s): Connect req: psm 4113 scid 0x0040
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
+      Connection pending - No futher information available
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 2
+< ACL data: handle 1 flags 0x00 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x00f8
+        Enhanced Retransmission mode
+        Streaming mode
+        FCS Option
+        Extended Flow Specification
+        Fixed Channels
+> ACL data: handle 1 flags 0x02 dlen 10
+    L2CAP(s): Info req: type 3
+< ACL data: handle 1 flags 0x00 dlen 20
+    L2CAP(s): Info rsp: type 3 result 0
+      Fixed channel list
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 1 flags 0x00 dlen 41
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0,
+          MTo 0, MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime
+          0xffffffff, AccLat 0xffffffff, FlushTO 0x0000ffff) 
+> ACL data: handle 1 flags 0x02 dlen 41
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0, MTo 0,
+          MPS 1009) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+< ACL data: handle 1 flags 0x00 dlen 47
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
+      Pending
+      MTU 672 
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
+          MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+> ACL data: handle 1 flags 0x02 dlen 47
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
+      Pending
+      MTU 672 
+      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
+          MPS 500) 
+      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
+          AccLat 0xffffffff, FlushTO 0x0000ffff) 
+< ACL data: handle 1 flags 0x00 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 1 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+...
+< ACL data: handle 1 flags 0x00 dlen 510
+    L2CAP(d): cid 0x0040 len 506 ctrl 0x4000 fcs 0x5337 [psm 4113]
+      I-frame: Start (len 672) TxSeq 0 ReqSeq 0
+...
+
+
+Andrei Emeltchenko (7):
+  Bluetooth: EFS: l2cap extended feature mask update
+  Bluetooth: EFS: definitions and headers
+  Bluetooth: EFS: add disable_flowspec kernel param
+  Bluetooth: EFS: parse l2cap config request
+  Bluetooth: EFS: parse l2cap config response
+  Bluetooth: EFS: add efs option in l2cap conf req
+  Bluetooth: EFS: parse l2cap config rsp pending
+
+ include/net/bluetooth/l2cap.h |   47 +++++++++++-
+ net/bluetooth/l2cap_core.c    |  180 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 222 insertions(+), 5 deletions(-)
+
+-- 
+1.7.4.1
 
