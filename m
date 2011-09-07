@@ -1,96 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/2] serial: Add support to Disconnect fd passing
- connections
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Wed, 07 Sep 2011 13:54:47 +0200
-In-Reply-To: <20110906051657.GB13617@joana>
-References: <1314033585-22244-1-git-send-email-padovan@profusion.mobi>
-	 <1314033585-22244-2-git-send-email-padovan@profusion.mobi>
-	 <1314116296.3373.213.camel@aeonflux> <20110823162822.GA26522@joana>
-	 <1314117006.3373.214.camel@aeonflux> <20110823164501.GB26522@joana>
-	 <CABBYNZLLGijC1A2MfuOKYqfiNQB=UuKsQ+awE804AkHZLfoZ4g@mail.gmail.com>
-	 <1314129089.3373.218.camel@aeonflux>
-	 <CABBYNZJx4-ciwfoXeFsiDvBN4hszTE_imqq=Cb-ssoBsdx+UQg@mail.gmail.com>
-	 <20110906051657.GB13617@joana>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315396489.1979.35.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <CAMhHtTyPuOtXFa-bYWUKkN1XcPkBUiu0t-2w9QCOG8iaRn=YGA@mail.gmail.com>
+References: <CAJdJm_OmwPrc_3nT3zOSa0PLQBfr8hzyXuWHj=JJXYdWagoG7w@mail.gmail.com>
+ <CAMhHtTzr_jguh1MpF+_-4m1_he-4KhR7fc9TscsVb4aFDX12jA@mail.gmail.com>
+ <CAMhHtTzN0hr_LucwSd8Sg=+XHkyV2nSyAECrg-2FOavfS+69xA@mail.gmail.com>
+ <CACbkbUJxdNsjcS8iQSxTwDNAFmRpW_Q9D7oHjVvq6ZK43WGrHA@mail.gmail.com> <CAMhHtTyPuOtXFa-bYWUKkN1XcPkBUiu0t-2w9QCOG8iaRn=YGA@mail.gmail.com>
+From: VISHWANATH KM <a21174@motorola.com>
+Date: Wed, 7 Sep 2011 21:56:57 +0530
+Message-ID: <CACbkbUJMW+fVh=QvcPm-_fhQ0rv9oSy8rmpqq2c7K5r8qMnVSA@mail.gmail.com>
+Subject: Re: [RFC] New mgmt API for Features Exchange (was: Re: Security level
+ for Primary Services discovery during pairing)
+To: Ash K <ashoksarf@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi
 
-> > >> > This already fails today. Our code doesn't allow us to call twice the Connect
-> > >> > method, so we can't have two of the same UUID connected.
-> > >>
-> > >> Well with RFCOMM you can't really connect multiple times to the same
-> > >> channel/UUID and if we return the same fd clients will probably have
-> > >> conflicts.
-> > >
-> > > you can not connect the same channel twice (except in the other
-> > > direction), that is true, but you can connect to a different channel
-> > > with a different UUID. That is the reason why we also allow connection
-> > > by handles. Or at least we should.
-> > 
-> > You mean record handle? Currently we support connecting by UUID,
-> > friendly name or channel.
-> > 
-> > > So even if we would make this limitation of 1 connection per UUID, the
-> > > API is a fully asymmetric then. You are suppose to disconnect with the
-> > > result of the connect call. I do not like that at all. It is bad API
-> > > design and we are trying to squeeze this in the wrong way.
-> > 
-> > Currently we support disconnecting by UUID, friendly name, channel and
-> > dev node. As you mentioned it doesn't really work for fd since it is
-> > only unique per process, in the other hand the parameter is a pattern.
-> > 
-> > Perhaps what we should be doing is to return a object path in
-> > Serial.Connect e.g. [variable
-> > prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serialXX then Disconnect
-> > just get it as parameter, the drawback is that this does not return
-> > the tty/fd immediately so we need another round-trip or return
-> > multiple values to Connect.
-> 
-> I've been discussing this with Johan and we came to two possible solutions.
-> The first one is the similar as this one, with three functions: 
-> 
-> 	handle, fd ConnectFD("pattern")
-> 
-> 	ConnectCancel(handle)
-> 
-> 	Disconnect(handle)
-> 
-> And other with only ConnectFD() (and maybe ConnectCancel method). Disconnect
-> would be handled by the client with shutdown().
-> 
-> I'm tempted to go with this last approach, it's simpler and easier. What do
-> you think?
+On Wed, Sep 7, 2011 at 8:28 PM, Ash K <ashoksarf@gmail.com> wrote:
+> If the two procedure are running independently, primary service
+> discovery is not dependent on pairing and pairing is not dependent on
+> primary service discovery, one would return error for pairing and
+> continue with primary service discovery. Once primary service
+> discovery is done, LE ACL can be disconnected.
+>
+> Same way as SDP and pairing can be done onver BR/EDR.
+>
 
-I thin the last approach sounds a lot better. It is simpler for the
-client and not really intrusive on the API level.
-
-If you want the ConnectCancel method, then it would be with pattern as
-parameter. Since of course ConnectFD would only return once the
-connection establishment is complete. Hence calling ConnectCancel with a
-handle would be rather pointless. And btw. CancelConnect would most like
-fit better with our existing API semantics.
-
-As a long term approach, I think we need to redesign this anyway and
-make this fully generic for L2CAP and RFCOMM. Since with fd passing we
-can be having socket type like interaction with D-Bus and allow
-applications to connect to remote systems the way they choose.
-
-The real interesting part could be here if we represent SDP service
-records as object path and then allow a connect method on top of these
-that will return a fd and also allows proper monitoring of that
-connection and addition options. And same could be done for a generic
-server over D-Bus. But this is future talk :)
+As per current implementation in l2cap_recv_frame, if we recv SMP
+error/not supported from remote device then it disconnects the l2cap
+channel, and create_paired_device expects primary service to happen
+with security level high, so in this case two procedures are dependent
+on each other. I am not sure if current behavior is ok ? as from spec
+section ( 5.3.5.1 Pairing Not Supported by Slave page 649) failure
+conditions it doesn't mention about either continuing or closing of
+channel, let me know your opinion.
 
 Regards
+Vishwanath
 
-Marcel
 
-
+>
+> On Tue, Sep 6, 2011 at 12:42 PM, VISHWANATH KM <a21174@motorola.com> wrote:
+>> Hi,
+>>
+>> On Tue, Aug 9, 2011 at 3:30 AM, Ash K <ashoksarf@gmail.com> wrote:
+>>>
+>>> Also, section 2.1 from core spec 4.0 L2CAP says:
+>>>
+>>> 2.1 CHANNEL IDENTIFIERS
+>>> A channel identifier (CID) is the local name representing a logical
+>>> channel endpoint
+>>> on the device. The null identifier (0x0000) shall never be used as a destination
+>>> endpoint. Identifiers from 0x0001 to 0x003F are reserved for specific
+>>> L2CAP functions. These channels are referred to as Fixed Channels. At a minimum,
+>>> the L2CAP Signaling channel (Fixed Channel 0x0001) or the L2CAP LE
+>>> Signaling channel (Fixed Channel 0x0005) shall be supported. If Fixed Channel
+>>> 0x0005 is supported, then Fixed Channels 0x0004 and 0x0006 shall be
+>>> supported (see Table 2.1).
+>>>
+>>> Which mean SMP L2CAP (0x0006) channel is mandatory if a device is
+>>> using LE connection. In least case a implementation would have to
+>>> implement SMP module which returns error (pairing not supported or
+>>> command not supported). This procedure could be used to identify if
+>>> SMP is supported.
+>>
+>> I miss the conclusion, so in above case when remote returns error
+>> (pairing/cmd not supported) do we disconnect the LE ACL link or
+>> continue with our usecase, ( here the usecase is doing primary service
+>> discovery and disconnect as part of CreatePairedDevice API), pls
+>> clarify
+>>
+>>>
+>>> As I said in earlier mail, SMP procedure might not be invoked until a
+>>> service requests for it. This might make error handling easier, since
+>>> once would have just return GATT procedure failure since stating
+>>> remote device does not support pairing or pairing command.
+>>>
+>>>
+>>> On Mon, Aug 8, 2011 at 12:05 PM, Ash K <ashoksarf@gmail.com> wrote:
+>>> > Hi All,
+>>> >
+>>> > LE is designed for low energy devices and as far as I can understand
+>>> > Encryption/security related features are should not be used until the
+>>> > service requests for it (even if it is supported), this might drain
+>>> > low energy devices unnecessarily (since some service may not need
+>>> > security). For example: Device Information service access.
+>>> >
+>>> > The correct procedure would be to start security related procedure
+>>> > once any GATT service request for it. You can see the procedure in
+>>> > "BLUETOOTH SPECIFICATION Version 4.0 [Vol 3] page 365 of 656"
+>>> > (Bluetooth 4.0 core spec absolute page number 1725). Attached the flow
+>>> > chart image from spec.
+>>> >
+>>> > As soon as you see a request for security mode, you can assume that
+>>> > remote device supports SMP and encryption bit can also be verified
+>>> > from remote feature.
+>>> >
+>>> > Let me know thoughts.
+>>> >
+>>> > Thanks,
+>>> > Ashok
+>>> >
+>>> > On Mon, Aug 8, 2011 at 10:32 AM, Anderson Lizardo
+>>> > <anderson.lizardo@openbossa.org> wrote:
+>>> >> Hi,
+>>> >>
+>>> >> On Mon, Aug 8, 2011 at 10:59 AM, VISHWANATH KM <a21174@motorola.com> wrote:
+>>> >>>> I think you have two options:
+>>> >>>>
+>>> >>>> 1) Always use CreateDevice(). Then if you want to issue SMP pairing,
+>>> >>>> you can change the BT_IO_SECLEVEL when connection with bt_io_connect()
+>>> >>>> (I haven't tested this lately, but I remember it used to work).
+>>> >>>>
+>>> >>>> 2) Extend the kernel Management API to allow Features Exchange. See
+>>> >>>> doc/mgmt-api.txt for the existing commands, to have an idea on how it
+>>> >>>> works (I recommend first sending an API proposal here to the list).
+>>> >>>
+>>> >>> Option 2 sounds better, where we use CreatePairedDevice and after the LE ACL
+>>> >>> is established we can do LE Read Remote features, (similar to what we do for
+>>> >>> BR i.e we do HCI Read Remote features in conn complete ) and if Encryption
+>>> >>> feature bit is set then we trigger SMP else we don't, pls let me know if any
+>>> >>> comments, if this sounds ok then i will mail the changes to this maillist
+>>> >>> for further review
+>>> >>
+>>> >> Let's hear others opinions. Johan, Marcel, Gustavo?
+>>> >>
+>>> >> Regards,
+>>> >> --
+>>> >> Anderson Lizardo
+>>> >> Instituto Nokia de Tecnologia - INdT
+>>> >> Manaus - Brazil
+>>> >> --
+>>> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> >> the body of a message to majordomo@vger.kernel.org
+>>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>> >>
+>>> >
+>>> >
+>>> >
+>>> > --
+>>> > Ash
+>>> >
+>>>
+>>>
+>>>
+>>> --
+>>> Ash
+>>
+>
+>
+>
+> --
+> Ash
+>
