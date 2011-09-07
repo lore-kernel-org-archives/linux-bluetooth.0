@@ -1,123 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/7] EFS: extended flow specification option support
-Date: Wed,  7 Sep 2011 17:04:04 +0300
-Message-Id: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 6/7] Bluetooth: EFS: add efs option in l2cap conf req
+Date: Wed,  7 Sep 2011 17:04:10 +0300
+Message-Id: <1315404251-11960-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Implementation of EFS based upon series of patches sent upstream in Aug 2010
-by Haijun Liu.
+Adds extended flowspec option when building l2cap config request
+EFS is added if both the local and remote L2CAP entities have
+indicated support for the Extended Flow Specification for BR/EDR
 
-http://marc.info/?a=128277503500005&r=1&w=2
+Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+(sent Sun, 22 Aug 2010)
 
-Changes:
-	* RFC: initial release
-	* RFCv2: rebase & take care about comments:
-		- use flag in l2cap_chan instead of variable
-		- move channel init out from parse_conf_req
-		- other style fixes
-	* PATCHv1: support only Best Effort channels for now.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 41 insertions(+), 1 deletions(-)
 
-L2CAP sequence looks like the one below:
-(my patches for decoding EFS have been applied to hcidump)
-
-...
-< ACL data: handle 1 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 2
-> ACL data: handle 1 flags 0x02 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x00f8
-        Enhanced Retransmission mode
-        Streaming mode
-        FCS Option
-        Extended Flow Specification
-        Fixed Channels
-< ACL data: handle 1 flags 0x00 dlen 10
-    L2CAP(s): Info req: type 3
-> ACL data: handle 1 flags 0x02 dlen 20
-    L2CAP(s): Info rsp: type 3 result 0
-      Fixed channel list
-< ACL data: handle 1 flags 0x00 dlen 12
-    L2CAP(s): Connect req: psm 4113 scid 0x0040
-> ACL data: handle 1 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
-      Connection pending - No futher information available
-> ACL data: handle 1 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 2
-< ACL data: handle 1 flags 0x00 dlen 16
-    L2CAP(s): Info rsp: type 2 result 0
-      Extended feature mask 0x00f8
-        Enhanced Retransmission mode
-        Streaming mode
-        FCS Option
-        Extended Flow Specification
-        Fixed Channels
-> ACL data: handle 1 flags 0x02 dlen 10
-    L2CAP(s): Info req: type 3
-< ACL data: handle 1 flags 0x00 dlen 20
-    L2CAP(s): Info rsp: type 3 result 0
-      Fixed channel list
-> ACL data: handle 1 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-      Connection successful
-< ACL data: handle 1 flags 0x00 dlen 41
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
-      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0,
-          MTo 0, MPS 500) 
-      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime
-          0xffffffff, AccLat 0xffffffff, FlushTO 0x0000ffff) 
-> ACL data: handle 1 flags 0x02 dlen 41
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 29
-      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 0, MTo 0,
-          MPS 1009) 
-      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
-          AccLat 0xffffffff, FlushTO 0x0000ffff) 
-< ACL data: handle 1 flags 0x00 dlen 47
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
-      Pending
-      MTU 672 
-      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
-          MPS 500) 
-      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
-          AccLat 0xffffffff, FlushTO 0x0000ffff) 
-> ACL data: handle 1 flags 0x02 dlen 47
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 4 clen 33
-      Pending
-      MTU 672 
-      RFC 0x03 (Enhanced Retransmission, TxWin 63, MaxTx 3, RTo 2000, MTo 12000,
-          MPS 500) 
-      EFS (Id 0x01, SerType Best Effort, MaxSDU 0xffff, SDUitime 0xffffffff,
-          AccLat 0xffffffff, FlushTO 0x0000ffff) 
-< ACL data: handle 1 flags 0x00 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> ACL data: handle 1 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-...
-< ACL data: handle 1 flags 0x00 dlen 510
-    L2CAP(d): cid 0x0040 len 506 ctrl 0x4000 fcs 0x5337 [psm 4113]
-      I-frame: Start (len 672) TxSeq 0 ReqSeq 0
-...
-
-
-Andrei Emeltchenko (7):
-  Bluetooth: EFS: l2cap extended feature mask update
-  Bluetooth: EFS: definitions and headers
-  Bluetooth: EFS: add disable_flowspec kernel param
-  Bluetooth: EFS: parse l2cap config request
-  Bluetooth: EFS: parse l2cap config response
-  Bluetooth: EFS: add efs option in l2cap conf req
-  Bluetooth: EFS: parse l2cap config rsp pending
-
- include/net/bluetooth/l2cap.h |   47 +++++++++++-
- net/bluetooth/l2cap_core.c    |  180 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 222 insertions(+), 5 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6f6a3d9..419b6ab 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1913,6 +1913,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+ {
+ 	struct l2cap_conf_req *req = data;
+ 	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
++	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
+ 	void *ptr = req->data;
+ 
+ 	BT_DBG("chan %p", chan);
+@@ -1926,7 +1927,11 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+ 		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
+ 			break;
+ 
+-		/* fall through */
++		if (__l2cap_efs_supported(chan))
++			set_bit(FLAG_EFS_ENABLE, &chan->flags);
++
++		break;
++
+ 	default:
+ 		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
+ 		break;
+@@ -1966,6 +1971,25 @@ done:
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+ 							(unsigned long) &rfc);
+ 
++		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++			efs.service_type = chan->local_stype;
++			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
++			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
++
++			if (chan->local_stype != L2CAP_SERV_BESTEFFORT)
++				break;
++
++			chan->local_id = 1;
++			efs.id = chan->local_id;
++			efs.access_latency =
++				cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
++			efs.flush_timeout =
++				cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
++
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++		}
++
+ 		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+ 			break;
+ 
+@@ -1974,6 +1998,7 @@ done:
+ 			chan->fcs = L2CAP_FCS_NONE;
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+ 		}
++
+ 		break;
+ 
+ 	case L2CAP_MODE_STREAMING:
+@@ -1989,6 +2014,20 @@ done:
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+ 							(unsigned long) &rfc);
+ 
++		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++			efs.id = 1;
++			efs.service_type = L2CAP_SERV_BESTEFFORT;
++			efs.max_sdu_size =
++				cpu_to_le16(chan->local_msdu);
++			efs.sdu_inter_time =
++				cpu_to_le32(chan->local_sdu_itime);
++			efs.access_latency = 0;
++			efs.flush_timeout = 0;
++
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++		}
++
+ 		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+ 			break;
+ 
+@@ -1997,6 +2036,7 @@ done:
+ 			chan->fcs = L2CAP_FCS_NONE;
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+ 		}
++
+ 		break;
+ 	}
+ 
 -- 
 1.7.4.1
 
