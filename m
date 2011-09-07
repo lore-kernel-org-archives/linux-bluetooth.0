@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 6/7] Bluetooth: EFS: add efs option in l2cap conf req
-Date: Wed,  7 Sep 2011 17:04:10 +0300
-Message-Id: <1315404251-11960-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 4/7] Bluetooth: EFS: parse l2cap config request
+Date: Wed,  7 Sep 2011 17:04:08 +0300
+Message-Id: <1315404251-11960-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,106 +11,140 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds extended flowspec option when building l2cap config request
-EFS is added if both the local and remote L2CAP entities have
-indicated support for the Extended Flow Specification for BR/EDR
-
+Add parsing extended flowspec option in L2cap config request
 Based upon haijun.liu <haijun.liu@atheros.com> series of patches
 (sent Sun, 22 Aug 2010)
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |   42 +++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 41 insertions(+), 1 deletions(-)
+ net/bluetooth/l2cap_core.c |   70 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 68 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6f6a3d9..419b6ab 100644
+index aa02037..7fdd176 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1913,6 +1913,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
- {
- 	struct l2cap_conf_req *req = data;
- 	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
-+	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
- 	void *ptr = req->data;
- 
- 	BT_DBG("chan %p", chan);
-@@ -1926,7 +1927,11 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
- 		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
- 			break;
- 
--		/* fall through */
-+		if (__l2cap_efs_supported(chan))
-+			set_bit(FLAG_EFS_ENABLE, &chan->flags);
-+
-+		break;
-+
- 	default:
- 		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
- 		break;
-@@ -1966,6 +1971,25 @@ done:
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
- 							(unsigned long) &rfc);
- 
-+		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
-+			efs.service_type = chan->local_stype;
-+			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
-+			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
-+
-+			if (chan->local_stype != L2CAP_SERV_BESTEFFORT)
-+				break;
-+
-+			chan->local_id = 1;
-+			efs.id = chan->local_id;
-+			efs.access_latency =
-+				cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
-+			efs.flush_timeout =
-+				cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
-+
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+					sizeof(efs), (unsigned long) &efs);
-+		}
-+
- 		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
- 			break;
- 
-@@ -1974,6 +1998,7 @@ done:
- 			chan->fcs = L2CAP_FCS_NONE;
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
- 		}
-+
- 		break;
- 
- 	case L2CAP_MODE_STREAMING:
-@@ -1989,6 +2014,20 @@ done:
- 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
- 							(unsigned long) &rfc);
- 
-+		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
-+			efs.id = 1;
-+			efs.service_type = L2CAP_SERV_BESTEFFORT;
-+			efs.max_sdu_size =
-+				cpu_to_le16(chan->local_msdu);
-+			efs.sdu_inter_time =
-+				cpu_to_le32(chan->local_sdu_itime);
-+			efs.access_latency = 0;
-+			efs.flush_timeout = 0;
-+
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+					sizeof(efs), (unsigned long) &efs);
-+		}
-+
- 		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
- 			break;
- 
-@@ -1997,6 +2036,7 @@ done:
- 			chan->fcs = L2CAP_FCS_NONE;
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
- 		}
-+
- 		break;
+@@ -338,6 +338,14 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
  	}
  
++	if (!disable_flowspec) {
++		chan->local_stype = L2CAP_SERV_BESTEFFORT;
++		chan->local_msdu = L2CAP_DEFAULT_MAX_SDU_SIZE;
++		chan->local_sdu_itime = L2CAP_DEFAULT_SDU_ARRIVAL_TIME;
++		chan->local_acc_lat = L2CAP_DEFAULT_ACCESS_LATENCY;
++		chan->local_flush_to = L2CAP_DEFAULT_FLUSH_TO;
++	}
++
+ 	chan_hold(chan);
+ 
+ 	list_add(&chan->list, &conn->chan_l);
+@@ -1895,6 +1903,12 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
+ 	}
+ }
+ 
++static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
++{
++	return !disable_flowspec &&
++			chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
++}
++
+ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+ {
+ 	struct l2cap_conf_req *req = data;
+@@ -2001,6 +2015,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 	int type, hint, olen;
+ 	unsigned long val;
+ 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
++	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
++	u8 remote_efs = 0;
+ 	u16 mtu = L2CAP_DEFAULT_MTU;
+ 	u16 result = L2CAP_CONF_SUCCESS;
+ 
+@@ -2032,7 +2048,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 		case L2CAP_CONF_FCS:
+ 			if (val == L2CAP_FCS_NONE)
+ 				set_bit(CONF_NO_FCS_RECV, &chan->conf_state);
++			break;
+ 
++		case L2CAP_CONF_EFS:
++			remote_efs = 1;
++			if (olen == sizeof(efs))
++				memcpy(&efs, (void *) val, olen);
+ 			break;
+ 
+ 		default:
+@@ -2057,7 +2078,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 			break;
+ 		}
+ 
+-		if (chan->mode != rfc.mode)
++		if (remote_efs && __l2cap_efs_supported(chan))
++			set_bit(FLAG_EFS_ENABLE, &chan->flags);
++
++		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
+ 			return -ECONNREFUSED;
+ 
+ 		break;
+@@ -2075,8 +2099,35 @@ done:
+ 					sizeof(rfc), (unsigned long) &rfc);
+ 	}
+ 
++	/*
++	   Add extended flow specification option check here.
++	 */
++	if (result == L2CAP_CONF_SUCCESS && remote_efs) {
++		if (!test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++			/* remote efs support , local efs not supported */
++
++			result = L2CAP_CONF_REJECT;
++			return -ECONNREFUSED;
++		}
++		
++		if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
++				efs.service_type != L2CAP_SERV_NOTRAFIC &&
++				efs.service_type != chan->local_stype) {
++
++			result = L2CAP_CONF_UNACCEPT;
++
++			if (chan->num_conf_req >= 1)
++				return -ECONNREFUSED;
+ 
+-	if (result == L2CAP_CONF_SUCCESS) {
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++		} else {
++			result = L2CAP_CONF_PENDING;
++			set_bit(CONF_LOCAL_PEND, &chan->conf_state);
++		}
++	}
++
++	if (result == L2CAP_CONF_SUCCESS || result == L2CAP_CONF_PENDING) {
+ 		/* Configure output options and let the other side know
+ 		 * which ones we don't like. */
+ 
+@@ -2113,6 +2164,21 @@ done:
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+ 					sizeof(rfc), (unsigned long) &rfc);
+ 
++			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++				chan->remote_id = efs.id;
++				chan->remote_stype = efs.service_type;
++				chan->remote_msdu =
++					le16_to_cpu(efs.max_sdu_size);
++				chan->remote_flush_to =
++					le32_to_cpu(efs.flush_timeout);
++				chan->remote_acc_lat =
++					le32_to_cpu(efs.access_latency);
++				chan->remote_sdu_itime =
++					le32_to_cpu(efs.sdu_inter_time);
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++						sizeof(efs), (unsigned long) &efs);
++			}
++
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
 -- 
 1.7.4.1
 
