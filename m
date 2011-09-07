@@ -1,114 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/4] Bluetooth: convert force_active variable to flag in l2cap chan
-Date: Wed,  7 Sep 2011 17:08:06 +0300
-Message-Id: <1315404487-12105-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1315404487-12105-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1315404487-12105-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/7] Bluetooth: EFS: definitions and headers
+Date: Wed,  7 Sep 2011 17:04:06 +0300
+Message-Id: <1315404251-11960-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1315404251-11960-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-force_active variable inside l2cap_chan is a logical one and can
-be easily converted to flag
+Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+(sent Sun, 22 Aug 2010)
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |    4 ++--
- net/bluetooth/l2cap_sock.c    |   14 +++++++++-----
- 3 files changed, 12 insertions(+), 8 deletions(-)
+ include/net/bluetooth/l2cap.h |   41 +++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 41 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 1302bf5..d027e28 100644
+index 9850cb5..1f26a39 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -370,7 +370,6 @@ struct l2cap_chan {
+@@ -38,6 +38,9 @@
+ #define L2CAP_DEFAULT_MAX_PDU_SIZE	1009    /* Sized for 3-DH5 packet */
+ #define L2CAP_DEFAULT_ACK_TO		200
+ #define L2CAP_LE_DEFAULT_MTU		23
++#define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
++#define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
++#define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
  
- 	__u8		sec_level;
- 	__u8		role_switch;
--	__u8		force_active;
+ #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
+ #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
+@@ -218,6 +221,8 @@ struct l2cap_conf_rsp {
+ #define L2CAP_CONF_UNACCEPT	0x0001
+ #define L2CAP_CONF_REJECT	0x0002
+ #define L2CAP_CONF_UNKNOWN	0x0003
++#define L2CAP_CONF_PENDING	0x0004
++#define L2CAP_CONF_EFS_REJECT	0x0005
  
- 	__u8		ident;
+ struct l2cap_conf_opt {
+ 	__u8       type;
+@@ -234,6 +239,7 @@ struct l2cap_conf_opt {
+ #define L2CAP_CONF_QOS		0x03
+ #define L2CAP_CONF_RFC		0x04
+ #define L2CAP_CONF_FCS		0x05
++#define L2CAP_CONF_EFS		0x06
  
-@@ -533,6 +532,7 @@ enum {
+ #define L2CAP_CONF_MAX_SIZE	22
  
- /* Definitions for flags in l2cap_chan */
- enum {
-+	FLAG_FORCE_ACTIVE,
- 	FLAG_FORCE_RELIABLE,
- 	FLAG_FLUSHABLE,
- 	FLAG_EFS_ENABLE,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 72caee5..b38755c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -621,7 +621,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u32 control)
- 	else
- 		flags = ACL_START;
+@@ -252,6 +258,19 @@ struct l2cap_conf_rfc {
+ #define L2CAP_MODE_ERTM		0x03
+ #define L2CAP_MODE_STREAMING	0x04
  
--	bt_cb(skb)->force_active = chan->force_active;
-+	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 
- 	hci_send_acl(chan->conn->hcon, skb, flags);
- }
-@@ -1275,7 +1275,7 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 	else
- 		flags = ACL_START;
- 
--	bt_cb(skb)->force_active = chan->force_active;
-+	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	hci_send_acl(hcon, skb, flags);
- }
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 9da0ee3..4aa6e1b 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -459,7 +459,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
- 
--		pwr.force_active = chan->force_active;
-+		pwr.force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 
- 		len = min_t(unsigned int, len, sizeof(pwr));
- 		if (copy_to_user(optval, (char *) &pwr, len))
-@@ -680,7 +680,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			err = -EFAULT;
- 			break;
- 		}
--		chan->force_active = pwr.force_active;
++struct l2cap_conf_efs {
++	__u8       id;
++	__u8       service_type;
++	__le16     max_sdu_size;
++	__le32     sdu_inter_time;
++	__le32     access_latency;
++	__le32     flush_timeout;
++} __packed;
 +
-+		if (pwr.force_active)
-+			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-+		else
-+			clear_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 		break;
++#define L2CAP_SERV_NOTRAFIC	0x00
++#define L2CAP_SERV_BESTEFFORT	0x01
++#define L2CAP_SERV_GUARANTEED	0x02
++
+ struct l2cap_disconn_req {
+ 	__le16     dcid;
+ 	__le16     scid;
+@@ -346,6 +365,7 @@ struct l2cap_chan {
  
- 	default:
-@@ -942,7 +946,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
- 		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
- 			set_bit(FLAG_FLUSHABLE, &chan->flags);
--		chan->force_active = pchan->force_active;
-+		if (test_bit(FLAG_FORCE_ACTIVE, &pchan->flags))
-+			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	} else {
+ 	unsigned long	conf_state;
+ 	unsigned long	conn_state;
++	unsigned long	flags;
  
- 		switch (sk->sk_type) {
-@@ -973,8 +978,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		chan->role_switch = 0;
- 		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
- 		clear_bit(FLAG_FLUSHABLE, &chan->flags);
--		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
--
-+		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	}
+ 	__u8		next_tx_seq;
+ 	__u8		expected_ack_seq;
+@@ -365,6 +385,20 @@ struct l2cap_chan {
+ 	__u8		remote_max_tx;
+ 	__u16		remote_mps;
  
- 	/* Default config options */
++	__u8		local_id;
++	__u8		local_stype;
++	__u16		local_msdu;
++	__u32		local_sdu_itime;
++	__u32		local_acc_lat;
++	__u32		local_flush_to;
++
++	__u8		remote_id;
++	__u8		remote_stype;
++	__u16		remote_msdu;
++	__u32		remote_sdu_itime;
++	__u32		remote_acc_lat;
++	__u32		remote_flush_to;
++
+ 	struct timer_list	chan_timer;
+ 	struct timer_list	retrans_timer;
+ 	struct timer_list	monitor_timer;
+@@ -452,6 +486,8 @@ enum {
+ 	CONF_CONNECT_PEND,
+ 	CONF_NO_FCS_RECV,
+ 	CONF_STATE2_DEVICE,
++	CONF_LOCAL_PEND,
++	CONF_REMOTE_PEND,
+ };
+ 
+ #define L2CAP_CONF_MAX_CONF_REQ 2
+@@ -469,6 +505,11 @@ enum {
+ 	CONN_RNR_SENT,
+ };
+ 
++/* Definitions for flags in l2cap_chan */
++enum {
++	FLAG_EFS_ENABLE,
++};
++
+ #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+ #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+ #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
 -- 
 1.7.4.1
 
