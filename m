@@ -1,89 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: David Stockwell <dstockwell@frequency-one.com>
-Subject: [PATCH 3/5] avrcp: get/set three-byte company-id
-Date: Thu,  8 Sep 2011 20:14:48 -0300
-Message-Id: <1315523690-11195-4-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 4/5] avrcp: limit avrcp packet size to the MTU of AV/C
+Date: Thu,  8 Sep 2011 20:14:49 -0300
+Message-Id: <1315523690-11195-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: David Stockwell <dstockwell@frequency-one.com>
+AVRCP is an extension of AV/C spec which has a limit of 512 bytes. The
+only place where it can exceed this value is in the response to
+GetElementAttributes command.
 
+Now we simply don't add the attributes that would overflow the available
+buffer space.
 ---
- audio/control.c |   36 +++++++++++++++++++++++++++---------
- 1 files changed, 27 insertions(+), 9 deletions(-)
+ audio/control.c |   51 +++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 41 insertions(+), 10 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 2f240f0..0a333db 100644
+index 0a333db..c162a62 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -471,6 +471,28 @@ static sdp_record_t *avrcp_tg_record(void)
- 	return record;
- }
+@@ -266,6 +266,10 @@ struct avrcp_spec_avc_pdu {
+ #error "Unknown byte order"
+ #endif
  
-+/**
-+ *	get_company_id:
-+ *
-+ *	Get three-byte Company_ID from incoming AVRCP message
-+ */
-+static uint32_t get_company_id(const uint8_t cid[3])
-+{
-+	return cid[0] << 16 | cid[1] << 8 | cid[2];
-+}
++#define AVC_MTU			512
++#define AVRCP_PDU_MTU		(AVC_MTU - AVRCP_HEADER_LENGTH \
++					- AVRCP_SPECAVCPDU_HEADER_LENGTH)
 +
-+/**
-+ *	set_company_id:
-+ *
-+ *	Set three-byte Company_ID into outgoing AVRCP message
-+ */
-+static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
-+{
-+	cid[0] = cid_in >> 16;
-+	cid[1] = cid_in >> 8;
-+	cid[2] = cid_in;
-+}
-+
- static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
+ struct avctp_state_callback {
+ 	avctp_state_cb cb;
+ 	void *user_data;
+@@ -869,7 +873,8 @@ static void mp_set_playback_status(struct control *control, uint8_t status,
+  * attribute, -ENOENT is returned.
+  */
+ static int mp_get_media_attribute(struct media_player *mp,
+-						uint32_t id, uint8_t *buf)
++						uint32_t id, uint8_t *buf,
++						uint16_t maxlen)
  {
- 	struct uinput_event event;
-@@ -748,9 +770,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
- 	avrcp->subunit_type = SUBUNIT_PANEL;
- 	avrcp->opcode = OP_VENDORDEP;
+ 	struct media_info_elem {
+ 		uint32_t id;
+@@ -882,21 +887,33 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 	uint16_t len;
+ 	char valstr[20];
  
--	pdu->company_id[0] = IEEEID_BTSIG >> 16;
--	pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
--	pdu->company_id[2] = IEEEID_BTSIG & 0xFF;
-+	set_company_id(pdu->company_id, IEEEID_BTSIG);
- 
- 	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
- 	pdu->params[0] = id;
-@@ -995,9 +1015,8 @@ static int avrcp_handle_get_capabilities(struct control *control,
- 	switch (pdu->params[0]) {
- 	case CAP_COMPANY_ID:
- 		for (i = 0; i < G_N_ELEMENTS(company_ids); i++) {
--			pdu->params[2 + i * 3] = company_ids[i] >> 16;
--			pdu->params[3 + i * 3] = (company_ids[i] >> 8) & 0xFF;
--			pdu->params[4 + i * 3] = company_ids[i] & 0xFF;
-+			set_company_id(&pdu->params[2 + i * 3],
-+							company_ids[i]);
++	if (maxlen < sizeof(struct media_info_elem))
++		return -ENOBUFS;
++
++	/* Subtract the size of elem header from the available space */
++	maxlen -= sizeof(struct media_info_elem);
++
+ 	switch (id) {
+ 	case MEDIA_INFO_TITLE:
+-		if (mi->title) {
+-			len = strlen(mi->title);
+-			memcpy(elem->val, mi->title, len);
+-		} else {
++		if (mi->title == NULL) {
+ 			len = 0;
++			break;
  		}
  
- 		pdu->params_len = htons(2 + (3 * G_N_ELEMENTS(company_ids)));
-@@ -1378,9 +1397,8 @@ static int handle_vendordep_pdu(struct control *control,
- 					int operand_count)
- {
- 	struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
--	uint32_t company_id = (pdu->company_id[0] << 16) |
--				(pdu->company_id[1] << 8) |
--				(pdu->company_id[2]);
-+	uint32_t company_id = get_company_id(pdu->company_id);
++		len = strlen(mi->title);
++		if (len > maxlen)
++			return -ENOBUFS;
 +
- 	int len;
++		memcpy(elem->val, mi->title, len);
+ 		break;
+ 	case MEDIA_INFO_ARTIST:
+ 		if (mi->artist == NULL)
+ 			return -ENOENT;
  
- 	if (company_id != IEEEID_BTSIG ||
+ 		len = strlen(mi->artist);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, mi->artist, len);
+ 		break;
+ 	case MEDIA_INFO_ALBUM:
+@@ -904,6 +921,9 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 			return -ENOENT;
+ 
+ 		len = strlen(mi->album);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, mi->album, len);
+ 		break;
+ 	case MEDIA_INFO_GENRE:
+@@ -911,6 +931,9 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 			return -ENOENT;
+ 
+ 		len = strlen(mi->genre);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, mi->genre, len);
+ 		break;
+ 
+@@ -920,6 +943,9 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 
+ 		snprintf(valstr, 20, "%u", mi->track);
+ 		len = strlen(valstr);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, valstr, len);
+ 		break;
+ 	case MEDIA_INFO_N_TRACKS:
+@@ -928,6 +954,9 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 
+ 		snprintf(valstr, 20, "%u", mi->ntracks);
+ 		len = strlen(valstr);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, valstr, len);
+ 		break;
+ 	case MEDIA_INFO_PLAYING_TIME:
+@@ -936,6 +965,9 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 
+ 		snprintf(valstr, 20, "%u", mi->track_len);
+ 		len = strlen(valstr);
++		if (len > maxlen)
++			return -ENOBUFS;
++
+ 		memcpy(elem->val, valstr, len);
+ 		break;
+ 	default:
+@@ -1115,8 +1147,6 @@ static int avrcp_handle_get_element_attributes(struct control *control,
+ 	pos = 1; /* Keep track of current position in reponse */
+ 	nattr = pdu->params[8];
+ 
+-	if (!control->mp)
+-		goto done;
+ 
+ 	if (!nattr) {
+ 		/*
+@@ -1125,7 +1155,8 @@ static int avrcp_handle_get_element_attributes(struct control *control,
+ 		 */
+ 		for (i = 1; i < MEDIA_INFO_LAST; i++) {
+ 			size = mp_get_media_attribute(control->mp, i,
+-							&pdu->params[pos]);
++					&pdu->params[pos], AVRCP_PDU_MTU - pos);
++
+ 
+ 			if (size > 0) {
+ 				len++;
+@@ -1141,7 +1172,8 @@ static int avrcp_handle_get_element_attributes(struct control *control,
+ 			uint32_t attr = ntohl(attr_ids[i]);
+ 
+ 			size = mp_get_media_attribute(control->mp, attr,
+-							&pdu->params[pos]);
++							&pdu->params[pos],
++							AVRCP_PDU_MTU - pos);
+ 
+ 			if (size > 0) {
+ 				len++;
+@@ -1155,7 +1187,6 @@ static int avrcp_handle_get_element_attributes(struct control *control,
+ 			goto err;
+ 	}
+ 
+-done:
+ 	pdu->params[0] = len;
+ 	pdu->params_len = htons(pos);
+ 
 -- 
 1.7.6.1
 
