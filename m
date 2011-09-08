@@ -2,114 +2,120 @@ Return-Path: <cyrus@holtmann.org>
 From: Rafal Michalski <michalski.raf@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH obexd v3 2/3] Escape semicolons in vCard's fields
-Date: Thu,  8 Sep 2011 15:12:19 +0200
-Message-Id: <1315487540-16607-2-git-send-email-michalski.raf@gmail.com>
-In-Reply-To: <1315487540-16607-1-git-send-email-michalski.raf@gmail.com>
-References: <1315487540-16607-1-git-send-email-michalski.raf@gmail.com>
+Subject: [PATCH obexd v3 1/3] Extend functions parameter list for vCard's format
+Date: Thu,  8 Sep 2011 15:12:18 +0200
+Message-Id: <1315487540-16607-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch provides possibility to escape only semicolon character
-in vCard's fields, as vCard 2.1 specification requires
-(for comparision vCard 3.0 requires escaping for set of characters:
-'\n', '\r', ';', ',', '\').
+This patch extends some functions ("get_escaped_fields" and some from
+"vcard_printf_*" family) parameter list for format value, since it would
+be needed to select escaping and encoding method, depending on vCard's
+type (vCard 2.1 or vCard 3.0).
 ---
- plugins/vcard.c |   39 +++++++++++++++++++++++++++++++++------
- 1 files changed, 33 insertions(+), 6 deletions(-)
+ plugins/vcard.c |   23 ++++++++++++-----------
+ 1 files changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/plugins/vcard.c b/plugins/vcard.c
-index 3b9d9cd..b694438 100644
+index a4a1921..3b9d9cd 100644
 --- a/plugins/vcard.c
 +++ b/plugins/vcard.c
-@@ -144,6 +144,33 @@ done:
+@@ -144,7 +144,7 @@ done:
  	dest[j] = 0;
  }
  
-+static void escape_semicolon(char *dest, const char *src, int len_max, int len)
-+{
-+	int i, j;
-+
-+	for (i = 0, j = 0; i < len && j + 1 < len_max; i++, j++) {
-+		if (src[i] == ';') {
-+			if (j + 2 >= len_max)
-+				break;
-+
-+			dest[j++] = '\\';
-+		}
-+
-+		dest[j] = src[i];
-+	}
-+
-+	dest[j] = 0;
-+}
-+
-+static void set_escape(uint8_t format, char *dest, const char *src,
-+							int len_max, int len)
-+{
-+	if (format == FORMAT_VCARD30)
-+		add_slash(dest, src, len_max, len);
-+	else if (format == FORMAT_VCARD21)
-+		escape_semicolon(dest, src, len_max, len);
-+}
-+
- static void get_escaped_fields(uint8_t format, char **fields, ...)
+-static void get_escaped_fields(char **fields, ...)
++static void get_escaped_fields(uint8_t format, char **fields, ...)
  {
  	va_list ap;
-@@ -155,7 +182,7 @@ static void get_escaped_fields(uint8_t format, char **fields, ...)
- 	line = g_string_new("");
+ 	GString *line;
+@@ -201,7 +201,7 @@ static gboolean contact_fields_present(struct phonebook_contact * contact)
+ 	return FALSE;
+ }
  
- 	for (field = va_arg(ap, char *); field; ) {
--		add_slash(escaped, field, LEN_MAX, strlen(field));
-+		set_escape(format, escaped, field, LEN_MAX, strlen(field));
- 		g_string_append(line, escaped);
+-static void vcard_printf_name(GString *vcards,
++static void vcard_printf_name(GString *vcards, uint8_t format,
+ 					struct phonebook_contact *contact)
+ {
+ 	char *fields;
+@@ -219,7 +219,7 @@ static void vcard_printf_name(GString *vcards,
+ 	}
  
- 		field = va_arg(ap, char *);
-@@ -233,7 +260,7 @@ static void vcard_printf_fullname(GString *vcards, uint8_t format,
- 							const char *text)
+ 
+-	get_escaped_fields(&fields, contact->family,
++	get_escaped_fields(format, &fields, contact->family,
+ 				contact->given, contact->additional,
+ 				contact->prefix, contact->suffix,
+ 				NULL);
+@@ -229,7 +229,8 @@ static void vcard_printf_name(GString *vcards,
+ 	g_free(fields);
+ }
+ 
+-static void vcard_printf_fullname(GString *vcards, const char *text)
++static void vcard_printf_fullname(GString *vcards, uint8_t format,
++							const char *text)
  {
  	char field[LEN_MAX];
--	add_slash(field, text, LEN_MAX, strlen(text));
-+	set_escape(format, field, text, LEN_MAX, strlen(text));
- 	vcard_printf(vcards, "FN:%s", field);
+ 	add_slash(field, text, LEN_MAX, strlen(text));
+@@ -405,7 +406,7 @@ static gboolean org_fields_present(struct phonebook_contact *contact)
+ 	return FALSE;
  }
  
-@@ -318,7 +345,7 @@ static void vcard_printf_tag(GString *vcards, uint8_t format,
+-static void vcard_printf_org(GString *vcards,
++static void vcard_printf_org(GString *vcards, uint8_t format,
+ 					struct phonebook_contact *contact)
+ {
+ 	char *fields;
+@@ -413,7 +414,7 @@ static void vcard_printf_org(GString *vcards,
+ 	if (org_fields_present(contact) == FALSE)
+ 		return;
  
- 	snprintf(buf, LEN_MAX, "%s%s%s%s", tag, separator, type, category);
+-	get_escaped_fields(&fields, contact->company,
++	get_escaped_fields(format, &fields, contact->company,
+ 					contact->department, NULL);
  
--	add_slash(field, fld, LEN_MAX, len);
-+	set_escape(format, field, fld, LEN_MAX, len);
- 	vcard_printf(vcards, "%s:%s", buf, field);
+ 	vcard_printf(vcards, "ORG:%s", fields);
+@@ -476,7 +477,7 @@ static void vcard_printf_address(GString *vcards, uint8_t format,
+ 	g_free(fields);
  }
  
-@@ -354,7 +381,7 @@ static void vcard_printf_email(GString *vcards, uint8_t format,
- 			category_string = "TYPE=INTERNET;TYPE=OTHER";
- 	}
+-static void vcard_printf_datetime(GString *vcards,
++static void vcard_printf_datetime(GString *vcards, uint8_t format,
+ 					struct phonebook_contact *contact)
+ {
+ 	const char *type;
+@@ -528,11 +529,11 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
+ 		vcard_printf_tag(vcards, format, "UID", NULL, contact->uid);
  
--	add_slash(field, address, LEN_MAX, len);
-+	set_escape(format, field, address, LEN_MAX, len);
- 	vcard_printf(vcards, "EMAIL;%s:%s", category_string, field);
+ 	if (filter & FILTER_N)
+-		vcard_printf_name(vcards, contact);
++		vcard_printf_name(vcards, format, contact);
+ 
+ 	if (filter & FILTER_FN && (*contact->fullname ||
+ 					format == FORMAT_VCARD30))
+-		vcard_printf_fullname(vcards, contact->fullname);
++		vcard_printf_fullname(vcards, format, contact->fullname);
+ 
+ 	if (filter & FILTER_TEL) {
+ 		GSList *l = contact->numbers;
+@@ -590,7 +591,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
+ 							contact->photo);
+ 
+ 	if (filter & FILTER_ORG)
+-		vcard_printf_org(vcards, contact);
++		vcard_printf_org(vcards, format, contact);
+ 
+ 	if (filter & FILTER_ROLE && *contact->role)
+ 		vcard_printf_tag(vcards, format, "ROLE", NULL, contact->role);
+@@ -599,7 +600,7 @@ void phonebook_add_contact(GString *vcards, struct phonebook_contact *contact,
+ 		vcard_printf_tag(vcards, format, "TITLE", NULL, contact->title);
+ 
+ 	if (filter & FILTER_X_IRMC_CALL_DATETIME)
+-		vcard_printf_datetime(vcards, contact);
++		vcard_printf_datetime(vcards, format, contact);
+ 
+ 	vcard_printf_end(vcards);
  }
- 
-@@ -391,7 +418,7 @@ static void vcard_printf_url(GString *vcards, uint8_t format,
- 		break;
- 	}
- 
--	add_slash(field, url, LEN_MAX, strlen(url));
-+	set_escape(format, field, url, LEN_MAX, strlen(url));
- 	vcard_printf(vcards, "URL;%s:%s", category_string, field);
- }
- 
-@@ -464,7 +491,7 @@ static void vcard_printf_address(GString *vcards, uint8_t format,
- 	for (l = address->fields; l; l = l->next) {
- 		char *field = l->data;
- 
--		add_slash(field_esc, field, LEN_MAX, strlen(field));
-+		set_escape(format, field_esc, field, LEN_MAX, strlen(field));
- 		g_strlcat(fields, field_esc, len);
- 
- 		if (l->next)
 -- 
 1.6.3.3
 
