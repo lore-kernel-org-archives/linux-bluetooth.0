@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: David Stockwell <dstockwell@frequency-one.com>
-Subject: [PATCH 2/5] avrcp: fix handling of metadata item 0x7
-Date: Thu,  8 Sep 2011 20:14:47 -0300
-Message-Id: <1315523690-11195-3-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 1/5] avrcp: use LAST element on media_info_id enum
+Date: Thu,  8 Sep 2011 20:14:46 -0300
+Message-Id: <1315523690-11195-2-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,50 +12,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: David Stockwell <dstockwell@frequency-one.com>
 
-Metadata field number 0x7 should be the total playing time of the track
-(TrackDuration) in msec, not current position within track.
 ---
- audio/control.c |   18 ++++++------------
- 1 files changed, 6 insertions(+), 12 deletions(-)
+ audio/control.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 8857737..2f240f0 100644
+index 9990b06..8857737 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -194,7 +194,7 @@ enum media_info_id {
- 	MEDIA_INFO_TRACK =		4,
+@@ -195,6 +195,7 @@ enum media_info_id {
  	MEDIA_INFO_N_TRACKS =		5,
  	MEDIA_INFO_GENRE =		6,
--	MEDIA_INFO_CURRENT_POSITION =	7,
-+	MEDIA_INFO_PLAYING_TIME =	7,
- 	MEDIA_INFO_LAST
+ 	MEDIA_INFO_CURRENT_POSITION =	7,
++	MEDIA_INFO_LAST
  };
  
-@@ -910,19 +910,13 @@ static int mp_get_media_attribute(struct media_player *mp,
- 		len = strlen(valstr);
- 		memcpy(elem->val, valstr, len);
- 		break;
--	case MEDIA_INFO_CURRENT_POSITION:
--		if (mi->elapsed != 0xFFFFFFFF) {
--			uint32_t elapsed;
--
--			mp_get_playback_status(mp, NULL, &elapsed, NULL);
--
--			snprintf(valstr, 20, "%u", elapsed);
--			len = strlen(valstr);
--			memcpy(elem->val, valstr, len);
--		} else {
-+	case MEDIA_INFO_PLAYING_TIME:
-+		if (mi->track_len == 0xFFFFFFFF)
- 			return -ENOENT;
--		}
+ static DBusConnection *connection = NULL;
+@@ -1109,7 +1110,7 @@ static int avrcp_handle_get_element_attributes(struct control *control,
+ 		 * Return all available information, at least
+ 		 * title must be returned.
+ 		 */
+-		for (i = 1; i <= MEDIA_INFO_CURRENT_POSITION; i++) {
++		for (i = 1; i < MEDIA_INFO_LAST; i++) {
+ 			size = mp_get_media_attribute(control->mp, i,
+ 							&pdu->params[pos]);
  
-+		snprintf(valstr, 20, "%u", mi->track_len);
-+		len = strlen(valstr);
-+		memcpy(elem->val, valstr, len);
- 		break;
- 	default:
- 		return -EINVAL;
 -- 
 1.7.6.1
 
