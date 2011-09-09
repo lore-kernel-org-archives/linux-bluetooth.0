@@ -1,50 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2 09/16] Bluetooth: Prepare for full support discovery procedures
-Mime-Version: 1.0 (Apple Message framework v1244.3)
-Content-Type: text/plain; charset=us-ascii
-From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <1313022292.3373.135.camel@aeonflux>
-Date: Fri, 9 Sep 2011 17:43:23 -0300
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <81818DFE-DD03-43DB-A44C-E00A4B319079@openbossa.org>
-References: <1311623405-31108-1-git-send-email-andre.guedes@openbossa.org> <1311623405-31108-10-git-send-email-andre.guedes@openbossa.org> <1312984092.3373.116.camel@aeonflux> <59EF67F7-A9E0-4C6D-963E-C4EF90F611FC@openbossa.org> <1313022292.3373.135.camel@aeonflux>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Peter Hurley <peter@hurleysoftware.com>
+To: "pacho@condmat1.ciencias.uniovi.es"
+	<pacho@condmat1.ciencias.uniovi.es>
+CC: Glenn Phillips <glenn@coriolis-storm.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 9 Sep 2011 16:11:32 -0400
+Subject: Re: Logitec MX5500 Bluetooth Version mismatch causing
+ non-connectivity, workaround found
+Message-ID: <1315599092.2004.85.camel@THOR>
+References: <CAJD6O4KmmdrTLSj6Kj2PThFnkaFpcHp6y51b6a-LGygPw94e3g@mail.gmail.com>
+	 <CAJD6O4+-e73hB1ody_cq-38HwF9p2ESQwQDAY-io_7bzHz3nFQ@mail.gmail.com>
+	 <1315595445.29906.1.camel@belkin4>
+In-Reply-To: <1315595445.29906.1.camel@belkin4>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Aug 10, 2011, at 9:24 PM, Marcel Holtmann wrote:
->>> I don't think this is a good idea. You keep forgetting if you actually
->>> have LE switched on or not.
->>> 
->>> I think we should keep it like this and just keep a global hci_dev  
->>> state
->>> which discovery procedure to use. Depending on if the device is just
->>> really LE-Only, it is dual-stack, but LE got switched off (we will  
->>> need
->>> this eventually for testing) or it is just only BR/EDR.
->> 
->> I agree. What really matters for the discovery procedure is the
->> operation mode not the device type. The term "device type" was
->> misused here.
->> 
->> About the global hci_dev state, IMO we may not need it. By looking
->> at the controller's LMP features we are able to infer what is the
->> controller's operation mode.
+On Fri, 2011-09-09 at 15:10 -0400, Pacho Ramos wrote:
+> El vie, 09-09-2011 a las 11:22 -0700, Glenn Phillips escribió:
+> > On Fri, Sep 9, 2011 at 11:07 AM, Glenn Phillips
+> > <glenn@coriolis-storm.com> wrote:
+> > 
+> >     Hello, I have recently become aware of and have since experienced
+> > some issues with my Logitec MX 5500 BT Kb/mouse combo.  After some
+> > recent updates to my Sabayon linux(gentoo) system I have been unable
+> > to use my Keyboard without modifying my udev rules.
+> >     I have generated a bug report on our bugzilla already here:
+> > http://bugs.sabayon.org/process_bug.cgi
+> > 
+> >     Link to /var/log/messages output http://pastebin.sabayon.org/pastie/7014
+> >     and link to my workaround:
+> > http://ubuntuforums.org/archive/index.php/t-1466806.html
+> > 
+> >     However I do not believe this is a good solution as this may break
+> > other Logitec devices that rely on bluetooth functionality rather than
+> > being able to fall back on usb only.
+> > 
+> >     current version of bluez - 4.96-r1
+> >     previous working version - 4.93
+> > 
+> >     Thank you
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
 > 
-> you need to look at the extended features page 1, but yes, if you have
-> that available, the it might be as simple as have the global state.
+> Looks like:
+> https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/658471
 > 
-> It really depends on how often you have to check. Maybe it is worth to
-> just have a simple operation mode variable compared to always have to
-> access multiple bits in the features array. Depends on how often you
-> need to use it.
+> summarizes your problem
 
-Yes, sure. Since we don't check these bits so often, we can check the
-LMP features instead of having the global variable. This way we keep
-it simple.
+Hi Pacho,
+I think Glenn means that he doesn't want to enable HCI mode. See my
+earlier post here
+http://marc.info/?l=linux-bluetooth&m=130713595419913&w=2
 
-BR,
+Hi Glenn,
+The link you posted to sabayon.org is cookie-specific. Please repost
+with a usable link.
 
-Andre.
+The workaround you found on ubuntuforums.org is bogus. Until something
+more suitable is found, if you don't want to run Bluetooth uninstall
+bluez.
+
+Regards,
+Peter Hurley
