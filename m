@@ -1,33 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 Sep 2011 15:35:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Stockwell <dstockwell@frequency-one.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
-Message-ID: <20110909123517.GA26219@dell.ger.corp.intel.com>
-References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1315523690-11195-4-git-send-email-lucas.demarchi@profusion.mobi>
- <20110909104123.GA23711@dell.ger.corp.intel.com>
- <11E07DE5941E41239E3CE07CF9712B64@freqoneremote>
+Message-ID: <4B499F5909CB43EAA30894396D6AAD68@freqoneremote>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>,
+	<linux-bluetooth@vger.kernel.org>
+Cc: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
+References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
+Date: Fri, 9 Sep 2011 07:22:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <11E07DE5941E41239E3CE07CF9712B64@freqoneremote>
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+That's fair.  For what it's worth, would this be better as an enum?
 
-On Fri, Sep 09, 2011, David Stockwell wrote:
-> A short cut: the output is a contiguous array of uint_8, so masking
-> with 0xFF should be unnecessary.  Would this be required for non-x86
-> (including x86_64) architectures?
+DS
 
-Firstly, please don't top-post on this mailing list.
+-----Original Message----- 
+From: Lucas De Marchi
+Sent: Thursday, September 08, 2011 6:32 PM
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi
+Subject: [PATCH hcidump] avrcp: fix name of metadata field
 
-If you don't do "& 0xff" and the value you're trying to assign to cid[n]
-is greater than 0xff isn't the result of the integer overflow that
-follows essentially the same as if you had done "% (0xff + 1)" (which is
-not what you want in this case).
+Metadata field number 0x7 should be the track duration and not the
+progress of the track playback. Thus rename it to a better description.
+---
+parser/avrcp.c |    6 +++---
+1 files changed, 3 insertions(+), 3 deletions(-)
 
-Johan
+diff --git a/parser/avrcp.c b/parser/avrcp.c
+index f8e4443..0b98a3e 100644
+--- a/parser/avrcp.c
++++ b/parser/avrcp.c
+@@ -166,7 +166,7 @@
+#define AVRCP_MEDIA_ATTRIBUTE_TRACK 0x4
+#define AVRCP_MEDIA_ATTRIBUTE_TOTAL 0x5
+#define AVRCP_MEDIA_ATTRIBUTE_GENRE 0x6
+-#define AVRCP_MEDIA_ATTRIBUTE_PROGRESS 0x7
++#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x7
+
+/* play status */
+#define AVRCP_PLAY_STATUS_STOPPED 0x00
+@@ -909,8 +909,8 @@ static const char *mediattr2str(uint32_t attr)
+  return "Track Total";
+  case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+  return "Genre";
+- case AVRCP_MEDIA_ATTRIBUTE_PROGRESS:
+- return "Progress";
++ case AVRCP_MEDIA_ATTRIBUTE_DURATION:
++ return "Track duration";
+  default:
+  return "Reserved";
+  }
+-- 
+1.7.6.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+
