@@ -1,48 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E6A247C.5040403@nokia.com>
-Date: Fri, 09 Sep 2011 17:36:44 +0300
-From: Antti Julku <antti.julku@nokia.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Name resolution for mgmt interface
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <4B499F5909CB43EAA30894396D6AAD68@freqoneremote>
+References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi> <4B499F5909CB43EAA30894396D6AAD68@freqoneremote>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Fri, 9 Sep 2011 10:29:47 -0300
+Message-ID: <CAMOw1v4sPndKk6A12phG-HDTX7cuL7w_Z_WGGwkEsvGRL_WNQA@mail.gmail.com>
+Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
+To: David Stockwell <dstockwell@frequency-one.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi David,
 
-Hello Bluetooth experts,
+On Fri, Sep 9, 2011 at 9:22 AM, David Stockwell
+<dstockwell@frequency-one.com> wrote:
+> That's fair.  For what it's worth, would this be better as an enum?
 
-Name resolution of older devices not supporting EIR is still missing 
-from the management interface. I discussed with Johan, and he suggested 
-the following architecture (if I understood correctly):
+Please, don't top-post.
 
-New command and event are added to mgmt interface:
-  * Unknown Names Event
-  * Resolve Names Command
+The avrcp parser in hcidump was done entirely with defines... I don't
+see any point in changing that.
 
-When device discovery is completed, kernel sends list of BT addresses of 
-devices which names are unknown (no name in EIR data) with Unknown Names 
-Event.
-
-User space can then request name resolving with Resolve Names Command, 
-which takes list of BT addresses as parameter. User space gets a Remote 
-Name Event for each device.
-
-Internally kernel would have a list of found devices, to which devices 
-are added during discovery. Device in the list is flagged as unknown 
-unless there was name for it in EIR data. After discovery is completed, 
-event with list of unknown devices is sent, and the found devices list 
-is cleared (it's valid only during one discovery session).
-
-Not sure if name resolution should be included in the discovery session 
-done via mgmt interface (while Discovering Event indicates discovery is 
-ongoing), and how to track discovery state in that case. Maybe another 
-state is needed in hdev->flags (e.g. HCI_DISCOVERY) if HCI_INQUIRY is 
-not enough?
-
-Any opinions? I think it would be good to have wider discussion before 
-making patches.
-
-Br,
-Antti
-
+Lucas De Marchi
