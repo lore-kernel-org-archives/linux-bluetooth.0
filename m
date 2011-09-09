@@ -2,59 +2,153 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/5] Remove create_file calls for read operations
-Date: Fri,  9 Sep 2011 09:51:06 -0300
-Message-Id: <1315572669-5006-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/5] Remove storing device type
+Date: Fri,  9 Sep 2011 09:51:05 -0300
+Message-Id: <1315572669-5006-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1315572669-5006-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1315572669-5006-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes some read only functions in storage.c removing
-create_file function calls.
+Device type doesn't need to be stored since GATT services information
+exported through basic rate can be retrieved from the SDP records.
+Device "type" is also a wrong expression to represent the operation
+mode: over which transport GATT service is being exported.
 ---
- src/storage.c |    8 --------
- 1 files changed, 0 insertions(+), 8 deletions(-)
+ src/adapter.c |   28 ----------------------------
+ src/device.c  |    2 --
+ src/storage.c |   38 --------------------------------------
+ src/storage.h |    3 ---
+ 4 files changed, 0 insertions(+), 71 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 52ef934..917c641 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2057,31 +2057,6 @@ static void create_stored_device_from_blocked(char *key, char *value,
+ 	}
+ }
+ 
+-static void create_stored_device_from_types(char *key, char *value,
+-							void *user_data)
+-{
+-	GSList *l;
+-	struct btd_adapter *adapter = user_data;
+-	struct btd_device *device;
+-	uint8_t type;
+-
+-	type = strtol(value, NULL, 16);
+-
+-	l = g_slist_find_custom(adapter->devices,
+-				key, (GCompareFunc) device_address_cmp);
+-	if (l) {
+-		device = l->data;
+-		device_set_type(device, type);
+-		return;
+-	}
+-
+-	device = device_create(connection, adapter, key, type);
+-	if (device) {
+-		device_set_temporary(device, FALSE);
+-		adapter->devices = g_slist_append(adapter->devices, device);
+-	}
+-}
+-
+ static GSList *string_to_primary_list(char *str)
+ {
+ 	GSList *l = NULL;
+@@ -2200,9 +2175,6 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "blocked");
+ 	textfile_foreach(filename, create_stored_device_from_blocked, adapter);
+-
+-	create_name(filename, PATH_MAX, STORAGEDIR, srcaddr, "types");
+-	textfile_foreach(filename, create_stored_device_from_types, adapter);
+ }
+ 
+ int btd_adapter_block_address(struct btd_adapter *adapter, bdaddr_t *bdaddr)
+diff --git a/src/device.c b/src/device.c
+index f484238..cbe47bd 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1510,7 +1510,6 @@ cleanup:
+ 		device_get_address(device, &dba);
+ 
+ 		store_profiles(device);
+-		write_device_type(&sba, &dba, device->type);
+ 	}
+ 
+ 	device->browse = NULL;
+@@ -1598,7 +1597,6 @@ static void store_services(struct btd_device *device)
+ 	adapter_get_address(adapter, &sba);
+ 	device_get_address(device, &dba);
+ 
+-	write_device_type(&sba, &dba, device->type);
+ 	write_device_services(&sba, &dba, str);
+ 
+ 	g_free(str);
 diff --git a/src/storage.c b/src/storage.c
-index 1002753..c2d1edc 100644
+index 3414e34..1002753 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -1110,8 +1110,6 @@ int read_device_pairable(bdaddr_t *bdaddr, gboolean *mode)
- 
- 	create_filename(filename, PATH_MAX, bdaddr, "config");
- 
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--
- 	str = textfile_get(filename, "pairable");
- 	if (!str)
- 		return -ENOENT;
-@@ -1238,8 +1236,6 @@ char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba)
- 
- 	create_filename(filename, PATH_MAX, sba, "primary");
- 
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--
- 	ba2str(dba, addr);
- 
- 	return textfile_caseget(filename, addr);
-@@ -1268,8 +1264,6 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
- 
- 	create_filename(filename, PATH_MAX, sba, "characteristic");
- 
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--
- 	ba2str(dba, addr);
- 
- 	snprintf(key, sizeof(key), "%17s#%04X", addr, handle);
-@@ -1299,8 +1293,6 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
- 
- 	create_filename(filename, PATH_MAX, sba, "attributes");
- 
--	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--
+@@ -1304,44 +1304,6 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
  	return textfile_foreach(filename, func, data);
  }
+ 
+-int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
+-						device_type_t type)
+-{
+-	char filename[PATH_MAX + 1], addr[18], chars[3];
+-
+-	create_filename(filename, PATH_MAX, sba, "types");
+-
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-
+-	ba2str(dba, addr);
+-
+-	snprintf(chars, sizeof(chars), "%2.2X", type);
+-
+-	return textfile_put(filename, addr, chars);
+-}
+-
+-device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba)
+-{
+-	char filename[PATH_MAX + 1], addr[18], *chars;
+-	device_type_t type;
+-
+-	create_filename(filename, PATH_MAX, sba, "types");
+-
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+-
+-	ba2str(dba, addr);
+-
+-	chars = textfile_caseget(filename, addr);
+-	if (chars == NULL)
+-		return DEVICE_TYPE_UNKNOWN;
+-
+-	type = strtol(chars, NULL, 16);
+-
+-	free(chars);
+-
+-	return type;
+-}
+-
+ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key)
+ {
+ 	char filename[PATH_MAX + 1], addr[18];
+diff --git a/src/storage.h b/src/storage.h
+index 14e072d..4627afe 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -84,9 +84,6 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
+ int write_device_attribute(const bdaddr_t *sba, const bdaddr_t *dba,
+                                         uint16_t handle, const char *chars);
+ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data);
+-int write_device_type(const bdaddr_t *sba, const bdaddr_t *dba,
+-						device_type_t type);
+-device_type_t read_device_type(const bdaddr_t *sba, const bdaddr_t *dba);
+ int write_longtermkeys(bdaddr_t *local, bdaddr_t *peer, const char *key);
+ gboolean has_longtermkeys(bdaddr_t *local, bdaddr_t *peer);
  
 -- 
 1.7.6
