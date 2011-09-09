@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4B499F5909CB43EAA30894396D6AAD68@freqoneremote>
+Message-ID: <11E07DE5941E41239E3CE07CF9712B64@freqoneremote>
 From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>,
-	<linux-bluetooth@vger.kernel.org>
-Cc: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
-References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
-Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
-Date: Fri, 9 Sep 2011 07:22:50 -0500
+To: "Johan Hedberg" <johan.hedberg@gmail.com>,
+	"Lucas De Marchi" <lucas.demarchi@profusion.mobi>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi> <1315523690-11195-4-git-send-email-lucas.demarchi@profusion.mobi> <20110909104123.GA23711@dell.ger.corp.intel.com>
+In-Reply-To: <20110909104123.GA23711@dell.ger.corp.intel.com>
+Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
+Date: Fri, 9 Sep 2011 07:21:31 -0500
 MIME-Version: 1.0
 Content-Type: text/plain;
 	format=flowed;
@@ -16,53 +16,31 @@ Content-Type: text/plain;
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-That's fair.  For what it's worth, would this be better as an enum?
+A short cut: the output is a contiguous array of uint_8, so masking with 
+0xFF should be unnecessary.  Would this be required for non-x86 (including 
+x86_64) architectures?
 
 DS
 
 -----Original Message----- 
-From: Lucas De Marchi
-Sent: Thursday, September 08, 2011 6:32 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi
-Subject: [PATCH hcidump] avrcp: fix name of metadata field
+From: Johan Hedberg
+Sent: Friday, September 09, 2011 5:41 AM
+To: Lucas De Marchi
+Cc: linux-bluetooth@vger.kernel.org ; David Stockwell
+Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
 
-Metadata field number 0x7 should be the track duration and not the
-progress of the track playback. Thus rename it to a better description.
----
-parser/avrcp.c |    6 +++---
-1 files changed, 3 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index f8e4443..0b98a3e 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -166,7 +166,7 @@
-#define AVRCP_MEDIA_ATTRIBUTE_TRACK 0x4
-#define AVRCP_MEDIA_ATTRIBUTE_TOTAL 0x5
-#define AVRCP_MEDIA_ATTRIBUTE_GENRE 0x6
--#define AVRCP_MEDIA_ATTRIBUTE_PROGRESS 0x7
-+#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x7
+On Thu, Sep 08, 2011, Lucas De Marchi wrote:
+> +static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
+> +{
+> + cid[0] = cid_in >> 16;
+> + cid[1] = cid_in >> 8;
+> + cid[2] = cid_in;
+> +}
 
-/* play status */
-#define AVRCP_PLAY_STATUS_STOPPED 0x00
-@@ -909,8 +909,8 @@ static const char *mediattr2str(uint32_t attr)
-  return "Track Total";
-  case AVRCP_MEDIA_ATTRIBUTE_GENRE:
-  return "Genre";
-- case AVRCP_MEDIA_ATTRIBUTE_PROGRESS:
-- return "Progress";
-+ case AVRCP_MEDIA_ATTRIBUTE_DURATION:
-+ return "Track duration";
-  default:
-  return "Reserved";
-  }
--- 
-1.7.6.1
+You seem to have forgotten the "& 0xff" part here. Other than that I
+didn't seen any obvious issues in the patch set.
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+Johan 
 
