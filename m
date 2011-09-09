@@ -1,54 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E5E50B9244041B0A9BE9481D893C2FC@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi> <4B499F5909CB43EAA30894396D6AAD68@freqoneremote> <CAMOw1v4sPndKk6A12phG-HDTX7cuL7w_Z_WGGwkEsvGRL_WNQA@mail.gmail.com>
-In-Reply-To: <CAMOw1v4sPndKk6A12phG-HDTX7cuL7w_Z_WGGwkEsvGRL_WNQA@mail.gmail.com>
-Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
-Date: Fri, 9 Sep 2011 18:16:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+In-Reply-To: <4E6A247C.5040403@nokia.com>
+References: <4E6A247C.5040403@nokia.com>
+Date: Fri, 9 Sep 2011 19:19:54 -0300
+Message-ID: <CAKT1EBdGAyxBh_aeTjPAhOeU2vHSsjbpgi91=vG8HqLv8aV0Yw@mail.gmail.com>
+Subject: Re: Name resolution for mgmt interface
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Antti,
 
------Original Message----- 
-From: Lucas De Marchi
-Sent: Friday, September 09, 2011 8:29 AM
-To: David Stockwell
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
+On Fri, Sep 9, 2011 at 11:36 AM, Antti Julku <antti.julku@nokia.com> wrote:
+>
+> Hello Bluetooth experts,
+>
+> Name resolution of older devices not supporting EIR is still missing from
+> the management interface. I discussed with Johan, and he suggested the
+> following architecture (if I understood correctly):
+>
+> New command and event are added to mgmt interface:
+>  * Unknown Names Event
+>  * Resolve Names Command
+>
+> When device discovery is completed, kernel sends list of BT addresses of
+> devices which names are unknown (no name in EIR data) with Unknown Names
+> Event.
 
-Hi David,
+Does it worth to parse the EIR data twice(kernel and userspace)?
 
-On Fri, Sep 9, 2011 at 9:22 AM, David Stockwell
-<dstockwell@frequency-one.com> wrote:
-> That's fair.  For what it's worth, would this be better as an enum?
+My suggestion is to remove the Unknown Names Event and add the Resolve
+Names Command only.
 
-Please, don't top-post.
+No matter the decision, we need to evaluate how to map the discovering
+session properly, I mean how to sync kernel and userspace events and
+signals. One think that it is not clear to me: does name resolution
+belongs to discovery procedure? I am not talking about the SPEC, it is
+more how we define the concept in BlueZ. Should bluetoothd send
+"Discovering=false" after finishing all name resolution or when
+inquiry finishes? After clarifying this last question, I think it will
+be easier to define which mgmt events will be necessary.
 
-++++ I realized I did it afterwards, sorry.  I then decided it would be 
-wasteful to send yet another e-mail (to you, Johan, the devel list, etc.) 
-apologizing.
-For most of my e-mail, I am on Windows 7, and I just forgot.
+>
+> User space can then request name resolving with Resolve Names Command, which
+> takes list of BT addresses as parameter. User space gets a Remote Name Event
+> for each device.
+>
+> Internally kernel would have a list of found devices, to which devices are
+> added during discovery. Device in the list is flagged as unknown unless
+> there was name for it in EIR data. After discovery is completed, event with
+> list of unknown devices is sent, and the found devices list is cleared (it's
+> valid only during one discovery session).
+>
+> Not sure if name resolution should be included in the discovery session done
+> via mgmt interface (while Discovering Event indicates discovery is ongoing),
+> and how to track discovery state in that case. Maybe another state is needed
+> in hdev->flags (e.g. HCI_DISCOVERY) if HCI_INQUIRY is not enough?
 
-The avrcp parser in hcidump was done entirely with defines... I don't
-see any point in changing that.
+The userspace needs to decide if name resolution is required based on
+NameResolving(main.conf) and entries found in the
+storage(/var/lib/bluetooth/.../names).
 
-+++++ At this point, I agree with you, and in fact coded my version the same 
-way.  In the Windows/.Net world, they strongly recommend enums because the 
-compilers can provide somewhat better error checking.  No matter either way, 
-just something to think about.
+Another hdev->flags? I am afraid that Marcel will be against it.
 
-Lucas De Marchi
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html 
+BR,
+Claudio
 
+>
+> Any opinions? I think it would be good to have wider discussion before
+> making patches.
+>
+> Br,
+> Antti
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
