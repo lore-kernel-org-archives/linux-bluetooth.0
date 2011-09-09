@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <83EA6ECBBD0D44FFB9F5CBB90B58E540@freqoneremote>
+Message-ID: <4E5E50B9244041B0A9BE9481D893C2FC@freqoneremote>
 From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Johan Hedberg" <johan.hedberg@gmail.com>
-Cc: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>,
-	<linux-bluetooth@vger.kernel.org>
-References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi> <1315523690-11195-4-git-send-email-lucas.demarchi@profusion.mobi> <20110909104123.GA23711@dell.ger.corp.intel.com> <11E07DE5941E41239E3CE07CF9712B64@freqoneremote> <20110909123517.GA26219@dell.ger.corp.intel.com>
-In-Reply-To: <20110909123517.GA26219@dell.ger.corp.intel.com>
-Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
-Date: Fri, 9 Sep 2011 18:19:42 -0500
+To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi> <4B499F5909CB43EAA30894396D6AAD68@freqoneremote> <CAMOw1v4sPndKk6A12phG-HDTX7cuL7w_Z_WGGwkEsvGRL_WNQA@mail.gmail.com>
+In-Reply-To: <CAMOw1v4sPndKk6A12phG-HDTX7cuL7w_Z_WGGwkEsvGRL_WNQA@mail.gmail.com>
+Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
+Date: Fri, 9 Sep 2011 18:16:27 -0500
 MIME-Version: 1.0
 Content-Type: text/plain;
 	format=flowed;
@@ -16,35 +15,37 @@ Content-Type: text/plain;
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan
+Hi Lucas,
 
 -----Original Message----- 
-From: Johan Hedberg
-Sent: Friday, September 09, 2011 7:35 AM
+From: Lucas De Marchi
+Sent: Friday, September 09, 2011 8:29 AM
 To: David Stockwell
-Cc: Lucas De Marchi ; linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
 
 Hi David,
 
-On Fri, Sep 09, 2011, David Stockwell wrote:
-> A short cut: the output is a contiguous array of uint_8, so masking
-> with 0xFF should be unnecessary.  Would this be required for non-x86
-> (including x86_64) architectures?
+On Fri, Sep 9, 2011 at 9:22 AM, David Stockwell
+<dstockwell@frequency-one.com> wrote:
+> That's fair.  For what it's worth, would this be better as an enum?
 
-Firstly, please don't top-post on this mailing list.
+Please, don't top-post.
 
-+++++ Sorry...I am quite entrenched in the .Net world by day, so I forgot. 
-Then did not send an apology afterwards.
+++++ I realized I did it afterwards, sorry.  I then decided it would be 
+wasteful to send yet another e-mail (to you, Johan, the devel list, etc.) 
+apologizing.
+For most of my e-mail, I am on Windows 7, and I just forgot.
 
-If you don't do "& 0xff" and the value you're trying to assign to cid[n]
-is greater than 0xff isn't the result of the integer overflow that
-follows essentially the same as if you had done "% (0xff + 1)" (which is
-not what you want in this case).
+The avrcp parser in hcidump was done entirely with defines... I don't
+see any point in changing that.
 
-+++++ I saw the rest of the discussion...cheers.
++++++ At this point, I agree with you, and in fact coded my version the same 
+way.  In the Windows/.Net world, they strongly recommend enums because the 
+compilers can provide somewhat better error checking.  No matter either way, 
+just something to think about.
 
-Johan
+Lucas De Marchi
 --
 To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
 in
