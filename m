@@ -1,59 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E6A0ED1.5050802@gmail.com>
+Date: Fri, 09 Sep 2011 15:04:17 +0200
+From: Alexander Skwar <alexanders.mailinglists+nospam@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20110909124645.GA26822@dell.ger.corp.intel.com>
-References: <1315523690-11195-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1315523690-11195-4-git-send-email-lucas.demarchi@profusion.mobi>
- <20110909104123.GA23711@dell.ger.corp.intel.com> <11E07DE5941E41239E3CE07CF9712B64@freqoneremote>
- <20110909123517.GA26219@dell.ger.corp.intel.com> <20110909124645.GA26822@dell.ger.corp.intel.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Fri, 9 Sep 2011 10:04:05 -0300
-Message-ID: <CAMOw1v6Xyi2hkmOEmo2PzFh_gB7e_PF6-SPtGHcc2B=bjrAj0w@mail.gmail.com>
-Subject: Re: [PATCH 3/5] avrcp: get/set three-byte company-id
-To: David Stockwell <dstockwell@frequency-one.com>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth Mailingliste <linux-bluetooth@vger.kernel.org>
+Subject: Audio output (a2dp) is skipping a lot
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-On Fri, Sep 9, 2011 at 9:46 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
->
-> On Fri, Sep 09, 2011, Johan Hedberg wrote:
->> On Fri, Sep 09, 2011, David Stockwell wrote:
->> > A short cut: the output is a contiguous array of uint_8, so masking
->> > with 0xFF should be unnecessary. �Would this be required for non-x86
->> > (including x86_64) architectures?
->>
->> Firstly, please don't top-post on this mailing list.
->>
->> If you don't do "& 0xff" and the value you're trying to assign to cid[n]
->> is greater than 0xff isn't the result of the integer overflow that
->> follows essentially the same as if you had done "% (0xff + 1)" (which is
->> not what you want in this case).
->
-> Actually those two operations result in the same value (I even did a
-> quick test program for this). So you're right :)
-
-I thought the same as you when I saw this code, but after testing the
-same code was being generated too.
-
-If we had the following:
-
-#define BAAA 0x204050
-uint8_t c[3];
-
-c[1] = BAAA >> 16;
-
-Then it would give us "warning: large integer implicitly truncated to
-unsigned type [-Woverflow]"
+Hi.
 
 
-But with "uint32_t baaa = 0x204050" there's no such warning and the
-compiler does the right thing.
+I've got an Arctic P311 bluetooth headset[1] and on my PC, I'm using
+a Hama Nano-Bluetooth-USB-Adapter Version 3.0+EDR Class1 dongle[2].
+The system is a openSUSE 11.4 64bit PC with KDE 4.6.0 and PulseAudio
+pulseaudio-0.9.22-6.11.1.x86_64.
+
+I noticed, that the audio output in a2dp mode is quite "jerky" (haven't
+tried the mono hsp mode). Not really surprisingly, I found a lot of
+messages like the following in my /var/log/messages, when I grep for
+"pulseaudio"[3]:
+
+[…]
+Sep  9 11:37:38 ewzw032 pulseaudio[2984]: module-bluetooth-device.c: 
+Skipping 296858 us (= 52364 bytes) in audio stream
+[…]
+
+Sound thus sounds terrible.
+
+When I then disconnect the Bluetooth connection and connect again, sound
+is fine. At least most of the time - earlier today, sound was messed
+up also right after building the connection.
+
+Normally, I play music with Amarok. But I found, that even much more
+simple commands like the following create bad output:
+
+   paplay -d bluez_sink.00_1A_7D_60_67_1F -p /usr/share/sounds/pop.wav
+
+   env PULSE_SINK=bluez_sink.00_1A_7D_60_67_1F \
+     mpg123 -a pulse /home/ask/tmp/Test.mp3
+
+In "lsusb", the BT dongle is this:
+
+Bus 001 Device 048: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth 
+Dongle (HCI mode)
+
+You can find the "lsusb -v" output for this device on pastebin[4].
+
+Is there anything that can be done about this?
 
 
+Links:
 
-Lucas De Marchi
+[1] Arctic P311 -> http://www.arctic.ac/en/p/sound/headsets/35/p311.html
+[2] Hama BT Dongle -> http://x.co/Zaev --> 
+http://www.hama.de/portal/articleId*28219728/action*2563/searchMode*1/bySearch*49238
+[3] /var/log/messages -> http://pastebin.com/vUMEY9R4
+[4] lsusb -v -d 0a12:0001 -> http://pastebin.com/xzYSWB9w
+
+
+Best regards,
+
+Alexander
+-- 
+↯     Lifestream (Twitter, Blog, …) ↣ http://sup.skwar.me/     ↯
+↯  Chat (Jabber/Google Talk) ↣ a@skwar.me ; Twitter: @alexs77  ↯
