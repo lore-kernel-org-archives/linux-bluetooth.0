@@ -1,67 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
+From: <tim.howes@accenture.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH bluetooth-next] Added force_acl_master param for
+ bluetooth module
+Date: Mon, 12 Sep 2011 15:57:14 +0000
+Message-ID: <DABFC48DA02357418ED8A1EAD50CD9C012F6BDFB@048-CH1MPN1-123.048d.mgd.msft.net>
+References: <1315798377-3660-1-git-send-email-iliak@ti.com>
+	 <1315819740.1937.17.camel@aeonflux>
+	 <AC090B9732AB2B4DB7FF476E907FE66001321E6C14@dnce02.ent.ti.com>
+ <1315836675.1937.20.camel@aeonflux>
+ <AC090B9732AB2B4DB7FF476E907FE6600132269EFD@dnce02.ent.ti.com>
+In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE6600132269EFD@dnce02.ent.ti.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL9LAadUvWPmOTA+0gPxjanNEwZXEndtHzfL7J4s=fLiQ@mail.gmail.com>
-References: <1315826997-13818-1-git-send-email-luiz.dentz@gmail.com>
-	<1315826997-13818-2-git-send-email-luiz.dentz@gmail.com>
-	<CAMOw1v4-Rik3EtFhf7Q-YP8Fu2+6TU0FjH4WkkGHqtyu4PBKpQ@mail.gmail.com>
-	<201109121537.13920.szymon.janc@tieto.com>
-	<CABBYNZL9LAadUvWPmOTA+0gPxjanNEwZXEndtHzfL7J4s=fLiQ@mail.gmail.com>
-Date: Mon, 12 Sep 2011 18:57:57 +0300
-Message-ID: <CABBYNZKQGngWtv6Y2N7dhBGXN0J5u4HjP3dVQh9re0GvpOVaUQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/5] AVRCP: rename avrcp_header to avc_header
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+SGkgSWxpYSwNCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
+LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
+DQo+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIElsaWEsIEtvbG9taW5za3kN
+Cj4gU2VudDogMTIgU2VwdGVtYmVyIDIwMTEgMTY6MTMNCj4gVG86IE1hcmNlbCBIb2x0bWFubg0K
+PiBDYzogaWxpYS5rb2xvbWluc2t5QGdtYWlsLmNvbTsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2Vy
+bmVsLm9yZw0KPiBTdWJqZWN0OiBSRTogW1BBVENIIGJsdWV0b290aC1uZXh0XSBBZGRlZCBmb3Jj
+ZV9hY2xfbWFzdGVyIHBhcmFtIGZvcg0KPiBibHVldG9vdGggbW9kdWxlDQo+DQo+ID4gLS0tLS1P
+cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiBGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21haWx0bzpt
+YXJjZWxAaG9sdG1hbm4ub3JnXQ0KPiA+IFNlbnQ6IE1vbmRheSwgU2VwdGVtYmVyIDEyLCAyMDEx
+IDU6MTEgUE0NCj4gPiBUbzogSWxpYSwgS29sb21pbnNreQ0KPiA+IENjOiBpbGlhLmtvbG9taW5z
+a3lAZ21haWwuY29tOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+ID4gU3ViamVj
+dDogUkU6IFtQQVRDSCBibHVldG9vdGgtbmV4dF0gQWRkZWQgZm9yY2VfYWNsX21hc3RlciBwYXJh
+bSBmb3INCj4gPiBibHVldG9vdGggbW9kdWxlDQo+ID4NCj4gPiBIaSBJbGlhLA0KPiA+DQo+ID4g
+PiA+ID4gVGhpcyBwYXJhbSBhbGxvd3Mgcm9sZSBzd2l0Y2ggcmVxdWVzdCB3aGlsZSBhY2NlcHRp
+bmcgYSBuZXcgYWNsDQo+ID4gPiA+ID4gY29ubmVjdGlvbi4gVGhpcyBpcyBhbiBlbmhhbmNlbWVu
+dCB0byBsMmNhcCBMMkNBUF9MTSByb2xlDQo+ID4gc3dpdGNoaW5nDQo+ID4gPiA+ID4gY2FwYWJp
+bGl0eSB3aGljaCBhbGxvd3MgcmVxdWVzdGluZyByb2xlIHN3aXRjaCB3aXRob3V0DQo+ID4gbW9k
+aWZpY2F0aW9uDQo+ID4gPiA+ID4gdG8gdGhlIGFwcGxpY2F0aW9uIGNvZGUuIEl0IHdhcyBvYnNl
+cnZlZCB0aGF0IG9wZXJhdGluZyBhcyBhDQo+ID4gbWFzdGVyDQo+ID4gPiA+ID4gb2YgcGljb25l
+dCAoYXMgb3Bvc2VkIHRvIHNjYXR0ZXJuZXQgY29uZmlnKSBpcyBiZW5lZmljaWFsIHdoZW4NCj4g
+PiA+ID4gPiBxb3MgKGZsb3dfc3BlYykgZ3VhcmFudGVlcyBhcmUgcmVxdWVzdGVkLg0KPiA+ID4g
+Pg0KPiA+ID4gPiA8c25pcD4NCj4gPiA+ID4NCj4gPiA+ID4gPiAgbW9kdWxlX3BhcmFtKGVuYWJs
+ZV9sZSwgYm9vbCwgMDQ0NCk7DQo+ID4gPiA+ID4gIE1PRFVMRV9QQVJNX0RFU0MoZW5hYmxlX2xl
+LCAiRW5hYmxlIExFIHN1cHBvcnQiKTsNCj4gPiA+ID4gPiArbW9kdWxlX3BhcmFtKGZvcmNlX2Fj
+bF9tYXN0ZXIsIGJvb2wsIDA2NDQpOw0KPiA+ID4gPiA+ICtNT0RVTEVfUEFSTV9ERVNDKGZvcmNl
+X2FjbF9tYXN0ZXIsICJBbHdheXMgdHJ5IHRvIHN3aXRjaCB0bw0KPiA+IG1hc3Rlcg0KPiA+ID4g
+PiByb2xlIG9uIEFDTCBsaW5rIik7DQo+ID4gPiA+DQo+ID4gPiA+IHVzaW5nIGtlcm5lbCBtb2R1
+bGUgcGFyYW1ldGVycyBpcyBub3QgYW4gYWNjZXB0YWJsZSBBUEkvQUJJIGZvcg0KPiA+IHRoaXMu
+DQo+ID4gPiBJdCBpcyBub3QgQVBJL0FCSSwgaXQgaXMgYSB3YXkgdG8gY29uZmlndXJlIGEgc3lz
+dGVtIHdpdGhvdXQNCj4gPiBtb2RpZnlpbmcNCj4gPiA+IGFwcGxpY2F0aW9uIGNvZGUgYW5kIGl0
+4oCZcyBhcyB1c2VmdWwgYXMgdGhlIG90aGVyIEJsdWV0b290aCBtb2R1bGUNCj4gPiA+IHBhcmFt
+cy4NCj4gPg0KPiA+IG5vLCB3ZSB1c2Uga2VybmVsIHBhcmFtZXRlcnMgdG8gb24gcHVycG9zZSBu
+b3QgZW5hYmxlIGZlYXR1cmVzIHRoYXQNCj4gPiBoYXZlDQo+ID4gbm90IHBhc3NlZCBxdWFsaWZp
+Y2F0aW9uIHlldC4gV2UgZG8gbm90IHVzZSBpdCBmb3IgZ2VuZXJhbCBwdXJwb3NlDQo+ID4gY29u
+ZmlndXJhdGlvbi4NCj4gPg0KPiA+IEFuZCBidHcuIHdoYXQgaXMgd3Jvbmcgd2l0aCB0aGUgc2V0
+dGluZyBsbSB0byBtYXN0ZXIgdmlhIGhjaWNvbmZpZz8NCj4gWW91IGFyZSByaWdodCwgSSBtaXNz
+ZWQgdGhpcyBmdW5jdGlvbmFsaXR5Lg0KPiA+IFRoYXQNCj4gPiBzYWlkLCBJIGFtIHByZXR0eSBt
+dWNoIGFnYWluc3QgZ2VuZXJhbCBwdXJwb3NlIHNldHRpbmcgdGhhdCBhcmUgbm90DQo+ID4gcmVh
+bGx5IGJvdW5kIHRvIGFueSBzcGVjaWZpYyBzZXJ2aWNlL3Byb2ZpbGUuIFRoZSBzdW0gb2YgcHJv
+ZmlsZXMNCj4gPiBzaG91bGQNCj4gPiBkZWZpbmUgYSBwcm9wZXIgcG9saWN5IGFuZCBub3Qgc29t
+ZSBtYWdpYyBnbG9iYWwgc2V0dGluZy4gT3RoZXJ3aXNlDQo+IHlvdQ0KPiA+IGVhc2lseSBydW4g
+aW50byBkZWFkLWxvY2sgc2NlbmFyaW9zLg0KPiBJIGFtIG5vdCBzdXJlIEkgdW5kZXJzdGFuZCB0
+aGUgcmVsYXRpb24gdG8gZGVhZGxvY2tzIGluIHRoaXMgY29udGV4dCwNCj4gYnV0IHNpbmNlIHRo
+aXMgZnVuY3Rpb25hbGl0eSBhbHJlYWR5IGV4aXN0cyBpbiBoY2ljb25maWcsIEkgZ3Vlc3MNCj4g
+d2UgYXJlIGRvbmUgaGVyZS4NCg0KVGhlIGRlYWRsb2NrIHdvdWxkIGJlIGlmIHR3byBkZXZpY2Vz
+IHRyeSB0byBjb25uZWN0IGFuZCBib3RoIHRyeSB0byBmb3JjZSB0aGVtc2VsdmVzIHRvIGJlIG1h
+c3Rlci4gIFRoaXMgd2lsbCBub3QgY2F1c2UgYSBjb25uZWN0aW9uIHRvIHN1Y2NlZWQgLSB0aGlz
+IHdpbGwgY3JlYXRlIGFuIHVuaGFwcHkgdXNlci4NCg0KRXZlbiBpZiB0aGUgZnVuY3Rpb24gaXMg
+aW4gaGNpY29uZmlnLCBhZGRpbmcgbmV3IHdheXMgb2YgZG9pbmcgc29tZXRoaW5nIHdyb25nIGlz
+IHN0aWxsIG5vdCByaWdodC4gIFdlJ3ZlIGFsbCB0cmllZCB0byBtb3ZlIGF3YXkgZnJvbSBmaXhp
+bmcgcm9sZXMgb3ZlciB0aGUgeWVhcnMuDQoNCk1hcmNlbCBwdXQgaXQgdmVyeSB3ZWxsIHRoYXQg
+dGhlIGxpbmsgcm9sZSBwb2xpY3kgc2hvdWxkIGJlIGJhc2VkIG9uIHRoZSBzdW0gb2YgcHJvZmls
+ZXMsIHJhdGhlciB0aGFuIGEgZ2xvYmFsIHNldHRpbmcuDQoNCg0KVGltDQoNCg0KX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18NClRoaXMgbWVzc2FnZSBpcyBmb3IgdGhlIGRlc2lnbmF0
+ZWQgcmVjaXBpZW50IG9ubHkgYW5kIG1heSBjb250YWluIHByaXZpbGVnZWQsIHByb3ByaWV0YXJ5
+LCBvciBvdGhlcndpc2UgcHJpdmF0ZSBpbmZvcm1hdGlvbi4gSWYgeW91IGhhdmUgcmVjZWl2ZWQg
+aXQgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZGVs
+ZXRlIHRoZSBvcmlnaW5hbC4gQW55IG90aGVyIHVzZSBvZiB0aGUgZW1haWwgYnkgeW91IGlzIHBy
+b2hpYml0ZWQuDQo=
 
-On Mon, Sep 12, 2011 at 5:56 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Szymon,
->
-> On Mon, Sep 12, 2011 at 4:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
->>> Hi Luiz
->>
->>> >        sk = g_io_channel_unix_get_fd(control->io);
->>> > @@ -1451,19 +1451,19 @@ static struct pdu_handler {
->>> >  /* handle vendordep pdu inside an avctp packet */
->>> >  static int handle_vendordep_pdu(struct control *control,
->>> >                                        struct avctp_header *avctp,
->>> > -                                       struct avrcp_header *avrcp,
->>> > +                                       struct avc_header *avc,
->>> >                                        int operand_count)
->>> >  {
->>> >        struct pdu_handler *handler;
->>> > -       struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
->>> > +       struct avrcp_spec_avc_pdu *pdu = (void *) avc + AVC_HEADER_LENGTH;
->>>
->>> We might want to change this to:
->>>
->>> struct avrcp_spec_avc_pdu *pdu = (avrcp_spec_avc_pdu *)(avc +
->>> AVC_HEADER_LENGTH);
->>
->> I don't think this is correct, that would result in jumping
->> 5 * (sizeof (struct avc_header)) bytes..
->
-> I fail to see how the multiplication got into you equation, but anyway
-> I would prefer using something like this (void *)
-> &avc[AVC_HEADER_LENGTH], but that should be a different patch.
-
-Somebody (Thanks Hendrik), just point out this is wrong as much it was
-wrong before and indeed it does the multiplication due to avc type (I
-really failed to see that), anyway this will gonna away with other
-cleanups since basically the callback receives a pointer to beginning
-of the PDU in the callback (operands):
-
-typedef size_t (*avctp_pdu_cb) (struct avctp *session, uint8_t transaction,
-					uint8_t *code, uint8_t *subunit,
-					uint8_t *operands, size_t operand_count,
-					void *user_data);
-
-
--- 
-Luiz Augusto von Dentz
