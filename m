@@ -1,31 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
-References: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 12 Sep 2011 14:57:17 -0300
-Message-ID: <CAMOw1v65ksB1e4TkrsjT6dO_kJPodxqiJCHjAM8+gV8EZP8XSw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5 v2] AVRCP: use a vtable to simplify PDU parsing/handling
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 5/5 v3] Bluetooth: recalculate priorities when channels are starving
+Date: Mon, 12 Sep 2011 20:00:53 +0300
+Message-Id: <1315846853-27442-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
+References: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Sep 12, 2011 at 1:33 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This simplify a bit the handling by introducing common checks before
-> calling the handler callback, it is also much easier to add/remove
-> new PDUs in this way.
-> ---
->  audio/control.c |  321 +++++++++++++++++++++----------------------------------
->  1 files changed, 124 insertions(+), 197 deletions(-)
->
+To avoid starvation the priority is recalculated so that the starving
+channels are promoted to HCI_PRIO_MAX - 1 (6).
 
-Ack.
+HCI_PRIO_MAX (7) is considered special, because it requires CAP_NET_ADMIN
+capability which can be used to provide more guaranties, so it is not used
+when promoting.
 
-Lucas De Marchi
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c |   56 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 55 insertions(+), 1 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 821b69b..0fd4fc3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2207,6 +2207,53 @@ static inline struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
+ 	return chan;
+ }
+ 
++static void hci_prio_recalculate(struct hci_dev *hdev, __u8 type)
++{
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn *conn;
++	int num = 0;
++
++	BT_DBG("%s", hdev->name);
++
++	list_for_each_entry(conn, &h->list, list) {
++		struct hci_chan_hash *ch;
++		struct hci_chan *chan;
++
++		if (conn->type != type)
++			continue;
++
++		if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
++			continue;
++
++		num++;
++
++		ch = &conn->chan_hash;
++		list_for_each_entry(chan, &ch->list, list) {
++			struct sk_buff *skb;
++
++			if (chan->sent) {
++				chan->sent = 0;
++				continue;
++			}
++
++			if (skb_queue_empty(&chan->data_q))
++				continue;
++
++			skb = skb_peek(&chan->data_q);
++			if (skb->priority >= HCI_PRIO_MAX - 1)
++				continue;
++
++			skb->priority = HCI_PRIO_MAX - 1;
++
++			BT_DBG("chan %p skb %p promoted to %d", chan, skb,
++								skb->priority);
++		}
++
++		if (hci_conn_num(hdev, type) == num)
++			break;
++	}
++}
++
+ static inline void hci_sched_acl(struct hci_dev *hdev)
+ {
+ 	struct hci_chan *chan;
+@@ -2245,6 +2292,9 @@ static inline void hci_sched_acl(struct hci_dev *hdev)
+ 			chan->conn->sent++;
+ 		}
+ 	}
++
++	if (cnt != hdev->acl_cnt)
++		hci_prio_recalculate(hdev, ACL_LINK);
+ }
+ 
+ /* Schedule SCO */
+@@ -2298,7 +2348,7 @@ static inline void hci_sched_le(struct hci_dev *hdev)
+ {
+ 	struct hci_chan *chan;
+ 	struct sk_buff *skb;
+-	int quote, cnt;
++	int quote, cnt, tmp;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -2314,6 +2364,7 @@ static inline void hci_sched_le(struct hci_dev *hdev)
+ 	}
+ 
+ 	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
++	tmp = cnt;
+ 	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+ 		while (quote-- && (skb = skb_dequeue(&chan->data_q))) {
+ 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+@@ -2332,6 +2383,9 @@ static inline void hci_sched_le(struct hci_dev *hdev)
+ 		hdev->le_cnt = cnt;
+ 	else
+ 		hdev->acl_cnt = cnt;
++
++	if (cnt != tmp)
++		hci_prio_recalculate(hdev, LE_LINK);
+ }
+ 
+ static void hci_tx_task(unsigned long arg)
+-- 
+1.7.6.1
+
