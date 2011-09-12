@@ -1,173 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/5 v3] Bluetooth: set skbuffer priority based on L2CAP socket priority
-Date: Mon, 12 Sep 2011 20:00:49 +0300
-Message-Id: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1315635815.1937.4.camel@aeonflux>
+References: <4E6A247C.5040403@nokia.com>
+	<CAKT1EBdGAyxBh_aeTjPAhOeU2vHSsjbpgi91=vG8HqLv8aV0Yw@mail.gmail.com>
+	<1315635815.1937.4.camel@aeonflux>
+Date: Mon, 12 Sep 2011 13:56:06 -0300
+Message-ID: <CAKT1EBc4z+rvgqKr1SuE_iYvBMqhLJ=E5AW6k5cq65nqa9EW=A@mail.gmail.com>
+Subject: Re: Name resolution for mgmt interface
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Antti Julku <antti.julku@nokia.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-This uses SO_PRIORITY to set the skbuffer priority field
+On Sat, Sep 10, 2011 at 3:23 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Claudio,
+>
+>> > Name resolution of older devices not supporting EIR is still missing f=
+rom
+>> > the management interface. I discussed with Johan, and he suggested the
+>> > following architecture (if I understood correctly):
+>> >
+>> > New command and event are added to mgmt interface:
+>> > =C2=A0* Unknown Names Event
+>> > =C2=A0* Resolve Names Command
+>> >
+>> > When device discovery is completed, kernel sends list of BT addresses =
+of
+>> > devices which names are unknown (no name in EIR data) with Unknown Nam=
+es
+>> > Event.
+>>
+>> Does it worth to parse the EIR data twice(kernel and userspace)?
+>>
+>> My suggestion is to remove the Unknown Names Event and add the Resolve
+>> Names Command only.
+>>
+>> No matter the decision, we need to evaluate how to map the discovering
+>> session properly, I mean how to sync kernel and userspace events and
+>> signals. One think that it is not clear to me: does name resolution
+>> belongs to discovery procedure? I am not talking about the SPEC, it is
+>> more how we define the concept in BlueZ. Should bluetoothd send
+>> "Discovering=3Dfalse" after finishing all name resolution or when
+>> inquiry finishes? After clarifying this last question, I think it will
+>> be easier to define which mgmt events will be necessary.
+>>
+>> >
+>> > User space can then request name resolving with Resolve Names Command,=
+ which
+>> > takes list of BT addresses as parameter. User space gets a Remote Name=
+ Event
+>> > for each device.
+>> >
+>> > Internally kernel would have a list of found devices, to which devices=
+ are
+>> > added during discovery. Device in the list is flagged as unknown unles=
+s
+>> > there was name for it in EIR data. After discovery is completed, event=
+ with
+>> > list of unknown devices is sent, and the found devices list is cleared=
+ (it's
+>> > valid only during one discovery session).
+>> >
+>> > Not sure if name resolution should be included in the discovery sessio=
+n done
+>> > via mgmt interface (while Discovering Event indicates discovery is ong=
+oing),
+>> > and how to track discovery state in that case. Maybe another state is =
+needed
+>> > in hdev->flags (e.g. HCI_DISCOVERY) if HCI_INQUIRY is not enough?
+>>
+>> The userspace needs to decide if name resolution is required based on
+>> NameResolving(main.conf) and entries found in the
+>> storage(/var/lib/bluetooth/.../names).
+>>
+>> Another hdev->flags? I am afraid that Marcel will be against it.
+>
+> I remember that I already discussed this Johan a long time ago. So the
+> name resolving is part of the discovery procedure. And luckily it only
+> applies to pre 2.1 devices (or broken devices). The kernel is 100%
+> responsible for handling the name resolving. However it does not track
+> the names actually, it just tracks if the name is already cached or not.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h |    3 +++
- include/net/bluetooth/l2cap.h    |    3 ++-
- net/bluetooth/l2cap_core.c       |   27 ++++++++++++++++++++-------
- net/bluetooth/l2cap_sock.c       |    2 +-
- 4 files changed, 26 insertions(+), 9 deletions(-)
+ok. When I mentioned parse the name in the EIR is actually check if
+complete name type is included in the EIR.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e2ba4d6..0742828 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -32,6 +32,9 @@
- #define HCI_PROTO_L2CAP	0
- #define HCI_PROTO_SCO	1
- 
-+/* HCI priority */
-+#define HCI_PRIO_MAX	7
-+
- /* HCI Core structures */
- struct inquiry_data {
- 	bdaddr_t	bdaddr;
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 4f34ad2..f018e5d 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -511,7 +511,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk);
- void l2cap_chan_close(struct l2cap_chan *chan, int reason);
- void l2cap_chan_destroy(struct l2cap_chan *chan);
- int l2cap_chan_connect(struct l2cap_chan *chan);
--int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
-+int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
-+								u32 priority);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- 
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b3bdb48..0b6e1ae 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -556,6 +556,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
- 		flags = ACL_START;
- 
- 	bt_cb(skb)->force_active = BT_POWER_FORCE_ACTIVE_ON;
-+	skb->priority = HCI_PRIO_MAX;
- 
- 	hci_send_acl(conn->hcon, skb, flags);
- }
-@@ -1245,7 +1246,8 @@ void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 	struct hci_conn *hcon = chan->conn->hcon;
- 	u16 flags;
- 
--	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
-+	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
-+							skb->priority);
- 
- 	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
- 		flags = ACL_START_NO_FLUSH;
-@@ -1451,6 +1453,8 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
- 		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
- 			return -EFAULT;
- 
-+		(*frag)->priority = skb->priority;
-+
- 		sent += count;
- 		len  -= count;
- 
-@@ -1460,7 +1464,9 @@ static inline int l2cap_skbuff_fromiovec(struct sock *sk, struct msghdr *msg, in
- 	return sent;
- }
- 
--struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
-+						struct msghdr *msg, size_t len,
-+						u32 priority)
- {
- 	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1468,7 +1474,7 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
- 	int err, count, hlen = L2CAP_HDR_SIZE + 2;
- 	struct l2cap_hdr *lh;
- 
--	BT_DBG("sk %p len %d", sk, (int)len);
-+	BT_DBG("sk %p len %d priority %u", sk, (int)len, priority);
- 
- 	count = min_t(unsigned int, (conn->mtu - hlen), len);
- 	skb = bt_skb_send_alloc(sk, count + hlen,
-@@ -1476,6 +1482,8 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
- 	if (!skb)
- 		return ERR_PTR(err);
- 
-+	skb->priority = priority;
-+
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
- 	lh->cid = cpu_to_le16(chan->dcid);
-@@ -1490,7 +1498,9 @@ struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct msghdr
- 	return skb;
- }
- 
--struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
-+						struct msghdr *msg, size_t len,
-+						u32 priority)
- {
- 	struct sock *sk = chan->sk;
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1506,6 +1516,8 @@ struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan, struct msghdr *m
- 	if (!skb)
- 		return ERR_PTR(err);
- 
-+	skb->priority = priority;
-+
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
- 	lh->cid = cpu_to_le16(chan->dcid);
-@@ -1610,7 +1622,8 @@ int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, size_t le
- 	return size;
- }
- 
--int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
-+int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
-+								u32 priority)
- {
- 	struct sk_buff *skb;
- 	u16 control;
-@@ -1618,7 +1631,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 
- 	/* Connectionless channel */
- 	if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
--		skb = l2cap_create_connless_pdu(chan, msg, len);
-+		skb = l2cap_create_connless_pdu(chan, msg, len, priority);
- 		if (IS_ERR(skb))
- 			return PTR_ERR(skb);
- 
-@@ -1633,7 +1646,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
- 			return -EMSGSIZE;
- 
- 		/* Create a basic PDU */
--		skb = l2cap_create_basic_pdu(chan, msg, len);
-+		skb = l2cap_create_basic_pdu(chan, msg, len, priority);
- 		if (IS_ERR(skb))
- 			return PTR_ERR(skb);
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 61f1f62..7fb0404 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -706,7 +706,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock, struct ms
- 		return -ENOTCONN;
- 	}
- 
--	err = l2cap_chan_send(chan, msg, len);
-+	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
- 
- 	release_sock(sk);
- 	return err;
--- 
-1.7.6.1
+>
+> There is no need for the kernel to store the names since it will never
+> ever use them. So either on start of bluetoothd we just load the list of
+> known cached names into the kernel or the kernel has to ask bluetoothd
+> for each address if there is a name cached or not.
+>
+> The reason why name resolving needs to be part of the discovery
+> procedure and in full control by the kernel is that we need to be able
+> to cancel it. A name resolving transaction is a baseband connections and
+> it will conflict with other connection establishment procedures. So the
+> kernel needs to track these and be able to cancel it, before it tries
+> any other connection attempt.
 
+Based on your comments I am writing below my analysis of your
+suggested approaches.
+
+1o. Approach: Load name when bluetoothd starts
+This approach seems to be more easy, since it will require less
+interaction between kernel and userspace. MGMT command complete for
+start discovery will be sent after name resolution finishes. The
+discovery concept will be include name resolution.
+* Pros/Facts:
+  - extend start discovery to enable name resolving or assume that if
+the kernel receives "load names" command it should resolve names
+  - direct mapping of MGMT discovering events to DBUS discovering signals
+  - no extra MGMT command to cancel name resolving, stop discovery
+will automatically cancel name resolution if necessary
+* Cons:
+  - Checking of "complete name" in the EIR in the kernel
+
+2o. Ask bluetoothd for each address
+In my opinion this approach will be more difficult to implement. If I
+understood correctly, you are proposing a new command containing a
+list of address to resolve names.
+* Pros/Facts:
+  - new mgmt command to resolve names
+  - no need to check EIR "complete name" type in kernel: it can be
+verified in the kernel, but it will give meaningful benefits.
+  - MGMT discovering false event and MGMT command complete for start
+discovery needs to be sent after inquiry(or LE scan) finishes: it is
+not possible to know if the userspace will request name for at least
+one address.
+* Cons:
+  - two extra MGMT command to start/stop name resolution
+  - MGMT discovering false event can not be directly mapped to DBUS
+Discovering signal
+
+BR,
+Claudio
+
+>
+> Regards
+>
+> Marcel
