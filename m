@@ -1,163 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-From: <tim.howes@accenture.com>
-To: <marcel@holtmann.org>, <claudio.takahasi@openbossa.org>
-CC: <antti.julku@nokia.com>, <linux-bluetooth@vger.kernel.org>
-Subject: RE: Name resolution for mgmt interface
-Date: Mon, 12 Sep 2011 19:15:33 +0000
-Message-ID: <DABFC48DA02357418ED8A1EAD50CD9C012F6BF69@048-CH1MPN1-123.048d.mgd.msft.net>
+Subject: Re: Name resolution for mgmt interface
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Antti Julku <antti.julku@nokia.com>,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 12 Sep 2011 21:07:20 +0200
+In-Reply-To: <CAKT1EBc4z+rvgqKr1SuE_iYvBMqhLJ=E5AW6k5cq65nqa9EW=A@mail.gmail.com>
 References: <4E6A247C.5040403@nokia.com>
 	 <CAKT1EBdGAyxBh_aeTjPAhOeU2vHSsjbpgi91=vG8HqLv8aV0Yw@mail.gmail.com>
 	 <1315635815.1937.4.camel@aeonflux>
 	 <CAKT1EBc4z+rvgqKr1SuE_iYvBMqhLJ=E5AW6k5cq65nqa9EW=A@mail.gmail.com>
- <1315854441.1937.28.camel@aeonflux>
-In-Reply-To: <1315854441.1937.28.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1315854441.1937.28.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsDQoNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51
-eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3Ro
-LQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBNYXJjZWwgSG9sdG1hbm4N
-Cj4gU2VudDogMTIgU2VwdGVtYmVyIDIwMTEgMjA6MDcNCj4gVG86IENsYXVkaW8gVGFrYWhhc2kN
-Cj4gQ2M6IEFudHRpIEp1bGt1OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1
-YmplY3Q6IFJlOiBOYW1lIHJlc29sdXRpb24gZm9yIG1nbXQgaW50ZXJmYWNlDQo+DQo+IEhpIENs
-YXVkaW8sDQo+DQo+ID4gPj4gPiBOYW1lIHJlc29sdXRpb24gb2Ygb2xkZXIgZGV2aWNlcyBub3Qg
-c3VwcG9ydGluZyBFSVIgaXMgc3RpbGwNCj4gbWlzc2luZyBmcm9tDQo+ID4gPj4gPiB0aGUgbWFu
-YWdlbWVudCBpbnRlcmZhY2UuIEkgZGlzY3Vzc2VkIHdpdGggSm9oYW4sIGFuZCBoZQ0KPiBzdWdn
-ZXN0ZWQgdGhlDQo+ID4gPj4gPiBmb2xsb3dpbmcgYXJjaGl0ZWN0dXJlIChpZiBJIHVuZGVyc3Rv
-b2QgY29ycmVjdGx5KToNCj4gPiA+PiA+DQo+ID4gPj4gPiBOZXcgY29tbWFuZCBhbmQgZXZlbnQg
-YXJlIGFkZGVkIHRvIG1nbXQgaW50ZXJmYWNlOg0KPiA+ID4+ID4gICogVW5rbm93biBOYW1lcyBF
-dmVudA0KPiA+ID4+ID4gICogUmVzb2x2ZSBOYW1lcyBDb21tYW5kDQo+ID4gPj4gPg0KPiA+ID4+
-ID4gV2hlbiBkZXZpY2UgZGlzY292ZXJ5IGlzIGNvbXBsZXRlZCwga2VybmVsIHNlbmRzIGxpc3Qg
-b2YgQlQNCj4gYWRkcmVzc2VzIG9mDQo+ID4gPj4gPiBkZXZpY2VzIHdoaWNoIG5hbWVzIGFyZSB1
-bmtub3duIChubyBuYW1lIGluIEVJUiBkYXRhKSB3aXRoDQo+IFVua25vd24gTmFtZXMNCj4gPiA+
-PiA+IEV2ZW50Lg0KPiA+ID4+DQo+ID4gPj4gRG9lcyBpdCB3b3J0aCB0byBwYXJzZSB0aGUgRUlS
-IGRhdGEgdHdpY2Uoa2VybmVsIGFuZCB1c2Vyc3BhY2UpPw0KPiA+ID4+DQo+ID4gPj4gTXkgc3Vn
-Z2VzdGlvbiBpcyB0byByZW1vdmUgdGhlIFVua25vd24gTmFtZXMgRXZlbnQgYW5kIGFkZCB0aGUN
-Cj4gUmVzb2x2ZQ0KPiA+ID4+IE5hbWVzIENvbW1hbmQgb25seS4NCj4gPiA+Pg0KPiA+ID4+IE5v
-IG1hdHRlciB0aGUgZGVjaXNpb24sIHdlIG5lZWQgdG8gZXZhbHVhdGUgaG93IHRvIG1hcCB0aGUN
-Cj4gZGlzY292ZXJpbmcNCj4gPiA+PiBzZXNzaW9uIHByb3Blcmx5LCBJIG1lYW4gaG93IHRvIHN5
-bmMga2VybmVsIGFuZCB1c2Vyc3BhY2UgZXZlbnRzDQo+IGFuZA0KPiA+ID4+IHNpZ25hbHMuIE9u
-ZSB0aGluayB0aGF0IGl0IGlzIG5vdCBjbGVhciB0byBtZTogZG9lcyBuYW1lDQo+IHJlc29sdXRp
-b24NCj4gPiA+PiBiZWxvbmdzIHRvIGRpc2NvdmVyeSBwcm9jZWR1cmU/IEkgYW0gbm90IHRhbGtp
-bmcgYWJvdXQgdGhlIFNQRUMsDQo+IGl0IGlzDQo+ID4gPj4gbW9yZSBob3cgd2UgZGVmaW5lIHRo
-ZSBjb25jZXB0IGluIEJsdWVaLiBTaG91bGQgYmx1ZXRvb3RoZCBzZW5kDQo+ID4gPj4gIkRpc2Nv
-dmVyaW5nPWZhbHNlIiBhZnRlciBmaW5pc2hpbmcgYWxsIG5hbWUgcmVzb2x1dGlvbiBvciB3aGVu
-DQo+ID4gPj4gaW5xdWlyeSBmaW5pc2hlcz8gQWZ0ZXIgY2xhcmlmeWluZyB0aGlzIGxhc3QgcXVl
-c3Rpb24sIEkgdGhpbmsgaXQNCj4gd2lsbA0KPiA+ID4+IGJlIGVhc2llciB0byBkZWZpbmUgd2hp
-Y2ggbWdtdCBldmVudHMgd2lsbCBiZSBuZWNlc3NhcnkuDQo+ID4gPj4NCj4gPiA+PiA+DQo+ID4g
-Pj4gPiBVc2VyIHNwYWNlIGNhbiB0aGVuIHJlcXVlc3QgbmFtZSByZXNvbHZpbmcgd2l0aCBSZXNv
-bHZlIE5hbWVzDQo+IENvbW1hbmQsIHdoaWNoDQo+ID4gPj4gPiB0YWtlcyBsaXN0IG9mIEJUIGFk
-ZHJlc3NlcyBhcyBwYXJhbWV0ZXIuIFVzZXIgc3BhY2UgZ2V0cyBhDQo+IFJlbW90ZSBOYW1lIEV2
-ZW50DQo+ID4gPj4gPiBmb3IgZWFjaCBkZXZpY2UuDQo+ID4gPj4gPg0KPiA+ID4+ID4gSW50ZXJu
-YWxseSBrZXJuZWwgd291bGQgaGF2ZSBhIGxpc3Qgb2YgZm91bmQgZGV2aWNlcywgdG8gd2hpY2gN
-Cj4gZGV2aWNlcyBhcmUNCj4gPiA+PiA+IGFkZGVkIGR1cmluZyBkaXNjb3ZlcnkuIERldmljZSBp
-biB0aGUgbGlzdCBpcyBmbGFnZ2VkIGFzIHVua25vd24NCj4gdW5sZXNzDQo+ID4gPj4gPiB0aGVy
-ZSB3YXMgbmFtZSBmb3IgaXQgaW4gRUlSIGRhdGEuIEFmdGVyIGRpc2NvdmVyeSBpcyBjb21wbGV0
-ZWQsDQo+IGV2ZW50IHdpdGgNCj4gPiA+PiA+IGxpc3Qgb2YgdW5rbm93biBkZXZpY2VzIGlzIHNl
-bnQsIGFuZCB0aGUgZm91bmQgZGV2aWNlcyBsaXN0IGlzDQo+IGNsZWFyZWQgKGl0J3MNCj4gPiA+
-PiA+IHZhbGlkIG9ubHkgZHVyaW5nIG9uZSBkaXNjb3Zlcnkgc2Vzc2lvbikuDQo+ID4gPj4gPg0K
-PiA+ID4+ID4gTm90IHN1cmUgaWYgbmFtZSByZXNvbHV0aW9uIHNob3VsZCBiZSBpbmNsdWRlZCBp
-biB0aGUgZGlzY292ZXJ5DQo+IHNlc3Npb24gZG9uZQ0KPiA+ID4+ID4gdmlhIG1nbXQgaW50ZXJm
-YWNlICh3aGlsZSBEaXNjb3ZlcmluZyBFdmVudCBpbmRpY2F0ZXMgZGlzY292ZXJ5DQo+IGlzIG9u
-Z29pbmcpLA0KPiA+ID4+ID4gYW5kIGhvdyB0byB0cmFjayBkaXNjb3Zlcnkgc3RhdGUgaW4gdGhh
-dCBjYXNlLiBNYXliZSBhbm90aGVyDQo+IHN0YXRlIGlzIG5lZWRlZA0KPiA+ID4+ID4gaW4gaGRl
-di0+ZmxhZ3MgKGUuZy4gSENJX0RJU0NPVkVSWSkgaWYgSENJX0lOUVVJUlkgaXMgbm90DQo+IGVu
-b3VnaD8NCj4gPiA+Pg0KPiA+ID4+IFRoZSB1c2Vyc3BhY2UgbmVlZHMgdG8gZGVjaWRlIGlmIG5h
-bWUgcmVzb2x1dGlvbiBpcyByZXF1aXJlZCBiYXNlZA0KPiBvbg0KPiA+ID4+IE5hbWVSZXNvbHZp
-bmcobWFpbi5jb25mKSBhbmQgZW50cmllcyBmb3VuZCBpbiB0aGUNCj4gPiA+PiBzdG9yYWdlKC92
-YXIvbGliL2JsdWV0b290aC8uLi4vbmFtZXMpLg0KPiA+ID4+DQo+ID4gPj4gQW5vdGhlciBoZGV2
-LT5mbGFncz8gSSBhbSBhZnJhaWQgdGhhdCBNYXJjZWwgd2lsbCBiZSBhZ2FpbnN0IGl0Lg0KPiA+
-ID4NCj4gPiA+IEkgcmVtZW1iZXIgdGhhdCBJIGFscmVhZHkgZGlzY3Vzc2VkIHRoaXMgSm9oYW4g
-YSBsb25nIHRpbWUgYWdvLiBTbw0KPiB0aGUNCj4gPiA+IG5hbWUgcmVzb2x2aW5nIGlzIHBhcnQg
-b2YgdGhlIGRpc2NvdmVyeSBwcm9jZWR1cmUuIEFuZCBsdWNraWx5IGl0DQo+IG9ubHkNCj4gPiA+
-IGFwcGxpZXMgdG8gcHJlIDIuMSBkZXZpY2VzIChvciBicm9rZW4gZGV2aWNlcykuIFRoZSBrZXJu
-ZWwgaXMgMTAwJQ0KPiA+ID4gcmVzcG9uc2libGUgZm9yIGhhbmRsaW5nIHRoZSBuYW1lIHJlc29s
-dmluZy4gSG93ZXZlciBpdCBkb2VzIG5vdA0KPiB0cmFjaw0KPiA+ID4gdGhlIG5hbWVzIGFjdHVh
-bGx5LCBpdCBqdXN0IHRyYWNrcyBpZiB0aGUgbmFtZSBpcyBhbHJlYWR5IGNhY2hlZCBvcg0KPiBu
-b3QuDQo+ID4NCj4gPiBvay4gV2hlbiBJIG1lbnRpb25lZCBwYXJzZSB0aGUgbmFtZSBpbiB0aGUg
-RUlSIGlzIGFjdHVhbGx5IGNoZWNrIGlmDQo+ID4gY29tcGxldGUgbmFtZSB0eXBlIGlzIGluY2x1
-ZGVkIGluIHRoZSBFSVIuDQo+DQo+IHllcCwgdGhlIGtlcm5lbCBuZWVkcyB0byBrbm93IGlmIGl0
-IGhhcyB0byByZXF1ZXN0IHRoZSBuYW1lIG9yIG5vdC4NCj4NCj4gSG93ZXZlciBpdCBkb2VzIG5v
-dCBtZWFuIHRoYXQgdGhlIGtlcm5lbCBoYXMgdG8gcGFyc2UgRUlSIGFjdHVhbGx5LCBpdA0KPiBj
-b3VsZCBhbHNvIGFzayB1c2Vyc3BhY2UgZm9yIG5hbWVzIGl0IHNob3VsZCByZXF1ZXN0LiBTb21l
-dGhpbmcgbGlrZSBJDQo+IGFtIGRvbmUgd2l0aCB0aGUgaW5xdWlyeSwgaGVyZSBhcmUgdGhlIEJE
-X0FERFJzIHdpdGhvdXQgRUlSLCB0ZWxsIG1lDQo+IHdoaWNoIG9uZXMgSSBzaG91bGQgcmVxdWVz
-dC4NCj4NCj4gPiA+IFRoZXJlIGlzIG5vIG5lZWQgZm9yIHRoZSBrZXJuZWwgdG8gc3RvcmUgdGhl
-IG5hbWVzIHNpbmNlIGl0IHdpbGwNCj4gbmV2ZXINCj4gPiA+IGV2ZXIgdXNlIHRoZW0uIFNvIGVp
-dGhlciBvbiBzdGFydCBvZiBibHVldG9vdGhkIHdlIGp1c3QgbG9hZCB0aGUNCj4gbGlzdCBvZg0K
-PiA+ID4ga25vd24gY2FjaGVkIG5hbWVzIGludG8gdGhlIGtlcm5lbCBvciB0aGUga2VybmVsIGhh
-cyB0byBhc2sNCj4gYmx1ZXRvb3RoZA0KPiA+ID4gZm9yIGVhY2ggYWRkcmVzcyBpZiB0aGVyZSBp
-cyBhIG5hbWUgY2FjaGVkIG9yIG5vdC4NCj4gPiA+DQo+ID4gPiBUaGUgcmVhc29uIHdoeSBuYW1l
-IHJlc29sdmluZyBuZWVkcyB0byBiZSBwYXJ0IG9mIHRoZSBkaXNjb3ZlcnkNCj4gPiA+IHByb2Nl
-ZHVyZSBhbmQgaW4gZnVsbCBjb250cm9sIGJ5IHRoZSBrZXJuZWwgaXMgdGhhdCB3ZSBuZWVkIHRv
-IGJlDQo+IGFibGUNCj4gPiA+IHRvIGNhbmNlbCBpdC4gQSBuYW1lIHJlc29sdmluZyB0cmFuc2Fj
-dGlvbiBpcyBhIGJhc2ViYW5kDQo+IGNvbm5lY3Rpb25zIGFuZA0KPiA+ID4gaXQgd2lsbCBjb25m
-bGljdCB3aXRoIG90aGVyIGNvbm5lY3Rpb24gZXN0YWJsaXNobWVudCBwcm9jZWR1cmVzLiBTbw0K
-PiB0aGUNCj4gPiA+IGtlcm5lbCBuZWVkcyB0byB0cmFjayB0aGVzZSBhbmQgYmUgYWJsZSB0byBj
-YW5jZWwgaXQsIGJlZm9yZSBpdA0KPiB0cmllcw0KPiA+ID4gYW55IG90aGVyIGNvbm5lY3Rpb24g
-YXR0ZW1wdC4NCj4gPg0KPiA+IEJhc2VkIG9uIHlvdXIgY29tbWVudHMgSSBhbSB3cml0aW5nIGJl
-bG93IG15IGFuYWx5c2lzIG9mIHlvdXINCj4gPiBzdWdnZXN0ZWQgYXBwcm9hY2hlcy4NCj4gPg0K
-PiA+IDFvLiBBcHByb2FjaDogTG9hZCBuYW1lIHdoZW4gYmx1ZXRvb3RoZCBzdGFydHMNCj4gPiBU
-aGlzIGFwcHJvYWNoIHNlZW1zIHRvIGJlIG1vcmUgZWFzeSwgc2luY2UgaXQgd2lsbCByZXF1aXJl
-IGxlc3MNCj4gPiBpbnRlcmFjdGlvbiBiZXR3ZWVuIGtlcm5lbCBhbmQgdXNlcnNwYWNlLiBNR01U
-IGNvbW1hbmQgY29tcGxldGUgZm9yDQo+ID4gc3RhcnQgZGlzY292ZXJ5IHdpbGwgYmUgc2VudCBh
-ZnRlciBuYW1lIHJlc29sdXRpb24gZmluaXNoZXMuIFRoZQ0KPiA+IGRpc2NvdmVyeSBjb25jZXB0
-IHdpbGwgYmUgaW5jbHVkZSBuYW1lIHJlc29sdXRpb24uDQo+ID4gKiBQcm9zL0ZhY3RzOg0KPiA+
-ICAgLSBleHRlbmQgc3RhcnQgZGlzY292ZXJ5IHRvIGVuYWJsZSBuYW1lIHJlc29sdmluZyBvciBh
-c3N1bWUgdGhhdCBpZg0KPiA+IHRoZSBrZXJuZWwgcmVjZWl2ZXMgImxvYWQgbmFtZXMiIGNvbW1h
-bmQgaXQgc2hvdWxkIHJlc29sdmUgbmFtZXMNCj4gPiAgIC0gZGlyZWN0IG1hcHBpbmcgb2YgTUdN
-VCBkaXNjb3ZlcmluZyBldmVudHMgdG8gREJVUyBkaXNjb3ZlcmluZw0KPiBzaWduYWxzDQo+ID4g
-ICAtIG5vIGV4dHJhIE1HTVQgY29tbWFuZCB0byBjYW5jZWwgbmFtZSByZXNvbHZpbmcsIHN0b3Ag
-ZGlzY292ZXJ5DQo+ID4gd2lsbCBhdXRvbWF0aWNhbGx5IGNhbmNlbCBuYW1lIHJlc29sdXRpb24g
-aWYgbmVjZXNzYXJ5DQo+ID4gKiBDb25zOg0KPiA+ICAgLSBDaGVja2luZyBvZiAiY29tcGxldGUg
-bmFtZSIgaW4gdGhlIEVJUiBpbiB0aGUga2VybmVsDQo+ID4NCj4gPiAyby4gQXNrIGJsdWV0b290
-aGQgZm9yIGVhY2ggYWRkcmVzcw0KPiA+IEluIG15IG9waW5pb24gdGhpcyBhcHByb2FjaCB3aWxs
-IGJlIG1vcmUgZGlmZmljdWx0IHRvIGltcGxlbWVudC4gSWYgSQ0KPiA+IHVuZGVyc3Rvb2QgY29y
-cmVjdGx5LCB5b3UgYXJlIHByb3Bvc2luZyBhIG5ldyBjb21tYW5kIGNvbnRhaW5pbmcgYQ0KPiA+
-IGxpc3Qgb2YgYWRkcmVzcyB0byByZXNvbHZlIG5hbWVzLg0KPiA+ICogUHJvcy9GYWN0czoNCj4g
-PiAgIC0gbmV3IG1nbXQgY29tbWFuZCB0byByZXNvbHZlIG5hbWVzDQo+ID4gICAtIG5vIG5lZWQg
-dG8gY2hlY2sgRUlSICJjb21wbGV0ZSBuYW1lIiB0eXBlIGluIGtlcm5lbDogaXQgY2FuIGJlDQo+
-ID4gdmVyaWZpZWQgaW4gdGhlIGtlcm5lbCwgYnV0IGl0IHdpbGwgZ2l2ZSBtZWFuaW5nZnVsIGJl
-bmVmaXRzLg0KPiA+ICAgLSBNR01UIGRpc2NvdmVyaW5nIGZhbHNlIGV2ZW50IGFuZCBNR01UIGNv
-bW1hbmQgY29tcGxldGUgZm9yIHN0YXJ0DQo+ID4gZGlzY292ZXJ5IG5lZWRzIHRvIGJlIHNlbnQg
-YWZ0ZXIgaW5xdWlyeShvciBMRSBzY2FuKSBmaW5pc2hlczogaXQgaXMNCj4gPiBub3QgcG9zc2li
-bGUgdG8ga25vdyBpZiB0aGUgdXNlcnNwYWNlIHdpbGwgcmVxdWVzdCBuYW1lIGZvciBhdCBsZWFz
-dA0KPiA+IG9uZSBhZGRyZXNzLg0KPiA+ICogQ29uczoNCj4gPiAgIC0gdHdvIGV4dHJhIE1HTVQg
-Y29tbWFuZCB0byBzdGFydC9zdG9wIG5hbWUgcmVzb2x1dGlvbg0KPiA+ICAgLSBNR01UIGRpc2Nv
-dmVyaW5nIGZhbHNlIGV2ZW50IGNhbiBub3QgYmUgZGlyZWN0bHkgbWFwcGVkIHRvIERCVVMNCj4g
-PiBEaXNjb3ZlcmluZyBzaWduYWwNCj4NCj4gSSBob25lc3RseSBkb24ndCBrbm93IHdoaWNoIG9u
-ZSBpcyBlYXNpZXIuIFdlIGFsc28gaGF2ZSB0byBrZWVwIHRoZQ0KPiBtZW1vcnkgY29uc3RyYWlu
-dHMgaW4gbWluZC4gU28gZm9yIGhvdyBtYW55IEJEX0FERFIgZG9lcyB0aGUga2VybmVsDQo+IG5l
-ZWRzIHRvIHN0b3JlIHRoZSBmbGFnIG5hbWUgcmVzb2x2ZWQgYWxyZWFkeSB5ZXMvbm8/IFdpdGgg
-c3lzdGVtIHRoYXQNCj4gYXJlIHJ1bm5pbmcgZm9yIHllYXJzLCB0aGlzIGNhbiBnZXQgcHJldHR5
-IGJpZy4NCj4NCj4gTXkgY3VycmVudCB0YWtlIG9uIHRoaXMgKHdoaWNoIGlzIG5vdCBmaW5hbCkg
-aXMgdGhhdCBhZnRlciBpbnF1aXJ5DQo+IGNvbXBsZXRlLCB0aGUga2VybmVsIG5lZWRzIHRvIGFz
-ayB1c2Vyc3BhY2UgdG8gY29uZmlybSB3aGljaCBuYW1lcyB0bw0KPiByZXNvbHZlLiBJdCBpcyBh
-biBhY3Rpb24gdHJpZ2dlcmVkIGJ5IHRoZSBrZXJuZWwgYW5kIHVzZXJzcGFjZSBqdXN0DQo+IHJl
-c3BvbmRzIHdpdGggdGhlIHJlc3VsdCB0by4gU28gdGhlIGtlcm5lbCBoYXMgZnVsbCBjb250cm9s
-IGhlcmUuDQo+DQo+IE91ciBvbmx5IGxpbWl0IGlzIHRoZSBtZ210IGZyYW1lIHNpemUsIGJ1dCBl
-dmVuIGlmIHdlIHB1dCBlYWNoIGNvbmZpcm0NCj4gcmVxdWVzdCBpbnRvIGEgc2VwYXJhdGUgZXZl
-bnQvY29tbWFuZCBzZXF1ZW5jZSwgdGhpcyB3aWxsIGJlIHN0aWxsIGZhc3QNCj4gZW5vdWdoIGV2
-ZW4gZm9yIDIwMCBkZXZpY2VzIGluIHJhbmdlLiBBbmQgb2YgY291cnNlIGZvciBMRSBvciAyLjEg
-d2l0aA0KPiBFSVIgd2UgZG8gbm90IGJvdGhlci4NCj4NCj4gUXVlc3Rpb24gaXMganVzdCBsZWZ0
-IGZvciBzaG9ydCBuYW1lcy4gQW5kIHdlIGNvdWxkIGp1c3QgYmUgc25lYWt5IGFuZA0KPiBub3Qg
-Ym90aGVyIGFuZCB3YWl0IHVudGlsIHNvbWVvbmUgYWN0dWFsbHkgc2VsZWN0cyBpdCBmb3IgcGFp
-cmluZy4gT25jZQ0KPiB0aGUgQUNMIGxpbmsgaXMgdXAsIHdlIGp1c3QgdXBkYXRlIHRoZSBuYW1l
-IGFueXdheS4NCj4NCj4gT3Igd2UganVzdCBxdWlja2x5IHBhcnNlIHRoZSBFSVIgYW5kIGRlY2lk
-ZSBpbnNpZGUgdGhlIGtlcm5lbCBpZiBpdCBpcw0KPiB0aGUgZnVsbCBuYW1lLCB3ZSBkb24ndCBi
-b3RoZXIsIGlmIGl0IGlzIHRoZSBzaG9ydCBuYW1lLCB3ZSBhc2sNCj4gdXNlcnNwYWNlLiBBcyBJ
-IHNpZGUgbm90ZSBoZXJlLCBJIGhhdmUgeWV0IHRvIHNlZSBhIGRldmljZSB0aGF0IHVzZXMNCj4g
-dGhlDQo+IHNob3J0bmFtZSBmZWF0dXJlLiBUaGV5IGFsd2F5cyB0cnkgdG8gaW5jbHVkZSB0aGUg
-ZnVsbG5hbWUuDQo+DQoNCg0KVGhpcyBsYXN0IG9uZSBpcyB0aGUgYXBwcm9hY2ggd2UgdG9vayBp
-biBTeW1iaWFuIE9TLiAgVGhlIHNob3J0IG5hbWUgbWF5IGJlIGp1c3QgZmluZSBmb3IgdGhlIHdp
-ZHRoIG9mIHRoZSBVSSB3aWRnZXQgaW4gd2hpY2ggaW5xdWlyeSByZXN1bHRzIGFyZSBkaXNwbGF5
-ZWQsIHNvIGFueSBhdXRvbm9tb3VzIGxvd2VyLWxldmVsIHJlcXVlc3Qgb2YgbG9uZ2VyIG5vbi1F
-SVIgbmFtZXMgbWF5IGJlIHdhc3RlZCBiZWNhdXNlIHRoZSBVSSBkaWRuJ3QgbmVlZCBhbnkgbW9y
-ZSBjaGFyYWN0ZXJzIChhbmQgc2F2ZXMgcmFkaW8gdGltZSwgd2hpY2ggaXMgcXVpdGUgYSBsb3Qg
-Zm9yIFJOUikuDQoNClRpbQ0KDQoNCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQpU
-aGlzIG1lc3NhZ2UgaXMgZm9yIHRoZSBkZXNpZ25hdGVkIHJlY2lwaWVudCBvbmx5IGFuZCBtYXkg
-Y29udGFpbiBwcml2aWxlZ2VkLCBwcm9wcmlldGFyeSwgb3Igb3RoZXJ3aXNlIHByaXZhdGUgaW5m
-b3JtYXRpb24uIElmIHlvdSBoYXZlIHJlY2VpdmVkIGl0IGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5
-IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSB0aGUgb3JpZ2luYWwuIEFueSBvdGhl
-ciB1c2Ugb2YgdGhlIGVtYWlsIGJ5IHlvdSBpcyBwcm9oaWJpdGVkLg0K
+Hi Claudio,
+
+> >> > Name resolution of older devices not supporting EIR is still missing from
+> >> > the management interface. I discussed with Johan, and he suggested the
+> >> > following architecture (if I understood correctly):
+> >> >
+> >> > New command and event are added to mgmt interface:
+> >> >  * Unknown Names Event
+> >> >  * Resolve Names Command
+> >> >
+> >> > When device discovery is completed, kernel sends list of BT addresses of
+> >> > devices which names are unknown (no name in EIR data) with Unknown Names
+> >> > Event.
+> >>
+> >> Does it worth to parse the EIR data twice(kernel and userspace)?
+> >>
+> >> My suggestion is to remove the Unknown Names Event and add the Resolve
+> >> Names Command only.
+> >>
+> >> No matter the decision, we need to evaluate how to map the discovering
+> >> session properly, I mean how to sync kernel and userspace events and
+> >> signals. One think that it is not clear to me: does name resolution
+> >> belongs to discovery procedure? I am not talking about the SPEC, it is
+> >> more how we define the concept in BlueZ. Should bluetoothd send
+> >> "Discovering=false" after finishing all name resolution or when
+> >> inquiry finishes? After clarifying this last question, I think it will
+> >> be easier to define which mgmt events will be necessary.
+> >>
+> >> >
+> >> > User space can then request name resolving with Resolve Names Command, which
+> >> > takes list of BT addresses as parameter. User space gets a Remote Name Event
+> >> > for each device.
+> >> >
+> >> > Internally kernel would have a list of found devices, to which devices are
+> >> > added during discovery. Device in the list is flagged as unknown unless
+> >> > there was name for it in EIR data. After discovery is completed, event with
+> >> > list of unknown devices is sent, and the found devices list is cleared (it's
+> >> > valid only during one discovery session).
+> >> >
+> >> > Not sure if name resolution should be included in the discovery session done
+> >> > via mgmt interface (while Discovering Event indicates discovery is ongoing),
+> >> > and how to track discovery state in that case. Maybe another state is needed
+> >> > in hdev->flags (e.g. HCI_DISCOVERY) if HCI_INQUIRY is not enough?
+> >>
+> >> The userspace needs to decide if name resolution is required based on
+> >> NameResolving(main.conf) and entries found in the
+> >> storage(/var/lib/bluetooth/.../names).
+> >>
+> >> Another hdev->flags? I am afraid that Marcel will be against it.
+> >
+> > I remember that I already discussed this Johan a long time ago. So the
+> > name resolving is part of the discovery procedure. And luckily it only
+> > applies to pre 2.1 devices (or broken devices). The kernel is 100%
+> > responsible for handling the name resolving. However it does not track
+> > the names actually, it just tracks if the name is already cached or not.
+> 
+> ok. When I mentioned parse the name in the EIR is actually check if
+> complete name type is included in the EIR.
+
+yep, the kernel needs to know if it has to request the name or not.
+
+However it does not mean that the kernel has to parse EIR actually, it
+could also ask userspace for names it should request. Something like I
+am done with the inquiry, here are the BD_ADDRs without EIR, tell me
+which ones I should request.
+
+> > There is no need for the kernel to store the names since it will never
+> > ever use them. So either on start of bluetoothd we just load the list of
+> > known cached names into the kernel or the kernel has to ask bluetoothd
+> > for each address if there is a name cached or not.
+> >
+> > The reason why name resolving needs to be part of the discovery
+> > procedure and in full control by the kernel is that we need to be able
+> > to cancel it. A name resolving transaction is a baseband connections and
+> > it will conflict with other connection establishment procedures. So the
+> > kernel needs to track these and be able to cancel it, before it tries
+> > any other connection attempt.
+> 
+> Based on your comments I am writing below my analysis of your
+> suggested approaches.
+> 
+> 1o. Approach: Load name when bluetoothd starts
+> This approach seems to be more easy, since it will require less
+> interaction between kernel and userspace. MGMT command complete for
+> start discovery will be sent after name resolution finishes. The
+> discovery concept will be include name resolution.
+> * Pros/Facts:
+>   - extend start discovery to enable name resolving or assume that if
+> the kernel receives "load names" command it should resolve names
+>   - direct mapping of MGMT discovering events to DBUS discovering signals
+>   - no extra MGMT command to cancel name resolving, stop discovery
+> will automatically cancel name resolution if necessary
+> * Cons:
+>   - Checking of "complete name" in the EIR in the kernel
+> 
+> 2o. Ask bluetoothd for each address
+> In my opinion this approach will be more difficult to implement. If I
+> understood correctly, you are proposing a new command containing a
+> list of address to resolve names.
+> * Pros/Facts:
+>   - new mgmt command to resolve names
+>   - no need to check EIR "complete name" type in kernel: it can be
+> verified in the kernel, but it will give meaningful benefits.
+>   - MGMT discovering false event and MGMT command complete for start
+> discovery needs to be sent after inquiry(or LE scan) finishes: it is
+> not possible to know if the userspace will request name for at least
+> one address.
+> * Cons:
+>   - two extra MGMT command to start/stop name resolution
+>   - MGMT discovering false event can not be directly mapped to DBUS
+> Discovering signal
+
+I honestly don't know which one is easier. We also have to keep the
+memory constraints in mind. So for how many BD_ADDR does the kernel
+needs to store the flag name resolved already yes/no? With system that
+are running for years, this can get pretty big.
+
+My current take on this (which is not final) is that after inquiry
+complete, the kernel needs to ask userspace to confirm which names to
+resolve. It is an action triggered by the kernel and userspace just
+responds with the result to. So the kernel has full control here.
+
+Our only limit is the mgmt frame size, but even if we put each confirm
+request into a separate event/command sequence, this will be still fast
+enough even for 200 devices in range. And of course for LE or 2.1 with
+EIR we do not bother.
+
+Question is just left for short names. And we could just be sneaky and
+not bother and wait until someone actually selects it for pairing. Once
+the ACL link is up, we just update the name anyway.
+
+Or we just quickly parse the EIR and decide inside the kernel if it is
+the full name, we don't bother, if it is the short name, we ask
+userspace. As I side note here, I have yet to see a device that uses the
+shortname feature. They always try to include the fullname.
+
+Regards
+
+Marcel
+
+
