@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5 v2] AVRCP: rename avrcp_spec_avc_pdu to avrcp_header
-Date: Mon, 12 Sep 2011 19:33:59 +0300
-Message-Id: <1315845241-17077-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5 v2] AVRCP: rename avrcp_header to avc_header
+Date: Mon, 12 Sep 2011 19:33:58 +0300
+Message-Id: <1315845241-17077-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
 References: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,208 +11,264 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Since old avrcp_header got renamed to avc_header now we can use
-avrcp_header for AVRCP PDUs.
+AVCTP carries AV/C packets/PDUs not AVRCP as avrcp_header suggests.
 ---
- audio/control.c |   44 ++++++++++++++++++++++----------------------
- 1 files changed, 22 insertions(+), 22 deletions(-)
+ audio/control.c |   96 +++++++++++++++++++++++++++---------------------------
+ 1 files changed, 48 insertions(+), 48 deletions(-)
 
 diff --git a/audio/control.c b/audio/control.c
-index 91ab8d4..cafb951 100644
+index f84c7f7..91ab8d4 100644
 --- a/audio/control.c
 +++ b/audio/control.c
-@@ -221,7 +221,7 @@ struct avc_header {
+@@ -212,14 +212,14 @@ struct avctp_header {
  } __attribute__ ((packed));
- #define AVC_HEADER_LENGTH 3
+ #define AVCTP_HEADER_LENGTH 3
  
--struct avrcp_spec_avc_pdu {
-+struct avrcp_header {
+-struct avrcp_header {
++struct avc_header {
+ 	uint8_t code:4;
+ 	uint8_t _hdr0:4;
+ 	uint8_t subunit_id:3;
+ 	uint8_t subunit_type:5;
+ 	uint8_t opcode;
+ } __attribute__ ((packed));
+-#define AVRCP_HEADER_LENGTH 3
++#define AVC_HEADER_LENGTH 3
+ 
+ struct avrcp_spec_avc_pdu {
  	uint8_t company_id[3];
- 	uint8_t pdu_id;
- 	uint8_t packet_type:2;
-@@ -229,7 +229,7 @@ struct avrcp_spec_avc_pdu {
- 	uint16_t params_len;
- 	uint8_t params[0];
+@@ -242,14 +242,14 @@ struct avctp_header {
  } __attribute__ ((packed));
--#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+#define AVRCP_HEADER_LENGTH 7
+ #define AVCTP_HEADER_LENGTH 3
  
- #elif __BYTE_ORDER == __BIG_ENDIAN
- 
-@@ -251,7 +251,7 @@ struct avc_header {
+-struct avrcp_header {
++struct avc_header {
+ 	uint8_t _hdr0:4;
+ 	uint8_t code:4;
+ 	uint8_t subunit_type:5;
+ 	uint8_t subunit_id:3;
+ 	uint8_t opcode;
  } __attribute__ ((packed));
- #define AVC_HEADER_LENGTH 3
+-#define AVRCP_HEADER_LENGTH 3
++#define AVC_HEADER_LENGTH 3
  
--struct avrcp_spec_avc_pdu {
-+struct avrcp_header {
+ struct avrcp_spec_avc_pdu {
  	uint8_t company_id[3];
- 	uint8_t pdu_id;
- 	uint8_t rsvd:6;
-@@ -259,7 +259,7 @@ struct avrcp_spec_avc_pdu {
- 	uint16_t params_len;
- 	uint8_t params[0];
- } __attribute__ ((packed));
--#define AVRCP_SPECAVCPDU_HEADER_LENGTH 7
-+#define AVRCP_HEADER_LENGTH 7
+@@ -721,12 +721,12 @@ static const char *battery_status_to_str(enum battery_status status)
  
- #else
- #error "Unknown byte order"
-@@ -722,10 +722,10 @@ static const char *battery_status_to_str(enum battery_status status)
  static int avctp_send_event(struct control *control, uint8_t id, void *data)
  {
- 	uint8_t buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
--					AVRCP_SPECAVCPDU_HEADER_LENGTH + 9];
-+					AVRCP_HEADER_LENGTH + 9];
+-	uint8_t buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
++	uint8_t buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
+ 					AVRCP_SPECAVCPDU_HEADER_LENGTH + 9];
  	struct avctp_header *avctp = (void *) buf;
- 	struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
--	struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
-+	struct avrcp_header *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
- 							AVC_HEADER_LENGTH];
+-	struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
++	struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
+ 	struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
+-							AVRCP_HEADER_LENGTH];
++							AVC_HEADER_LENGTH];
  	int sk;
  	uint16_t size;
-@@ -781,7 +781,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+ 
+@@ -743,9 +743,9 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+ 	avctp->cr = AVCTP_RESPONSE;
+ 	avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
+ 
+-	avrcp->code = CTYPE_CHANGED;
+-	avrcp->subunit_type = SUBUNIT_PANEL;
+-	avrcp->opcode = OP_VENDORDEP;
++	avc->code = CTYPE_CHANGED;
++	avc->subunit_type = SUBUNIT_PANEL;
++	avc->opcode = OP_VENDORDEP;
+ 
+ 	pdu->company_id[0] = IEEEID_BTSIG >> 16;
+ 	pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
+@@ -780,7 +780,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
+ 	}
  
  	pdu->params_len = htons(size);
- 	size += AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
--					AVRCP_SPECAVCPDU_HEADER_LENGTH;
-+					AVRCP_HEADER_LENGTH;
+-	size += AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
++	size += AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
+ 					AVRCP_SPECAVCPDU_HEADER_LENGTH;
  
  	sk = g_io_channel_unix_get_fd(control->io);
- 
-@@ -987,7 +987,7 @@ static void mp_set_media_attributes(struct control *control,
- }
- 
- static uint8_t avrcp_handle_get_capabilities(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1027,7 +1027,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_list_player_attributes(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1061,7 +1061,7 @@ done:
- }
- 
- static uint8_t avrcp_handle_list_player_values(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1092,7 +1092,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_get_element_attributes(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1161,7 +1161,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_get_current_player_value(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1225,7 +1225,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_set_player_value(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1278,7 +1278,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_displayable_charset(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1298,7 +1298,7 @@ static uint8_t avrcp_handle_displayable_charset(struct control *control,
- }
- 
- static uint8_t avrcp_handle_ct_battery_status(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1325,7 +1325,7 @@ err:
- }
- 
- static uint8_t avrcp_handle_get_play_status(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1360,7 +1360,7 @@ static uint8_t avrcp_handle_get_play_status(struct control *control,
- }
- 
- static uint8_t avrcp_handle_register_notification(struct control *control,
--						struct avrcp_spec_avc_pdu *pdu,
-+						struct avrcp_header *pdu,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-@@ -1418,7 +1418,7 @@ static struct pdu_handler {
- 	uint8_t pdu_id;
- 	uint8_t code;
- 	uint8_t (*func) (struct control *control,
--					struct avrcp_spec_avc_pdu *pdu,
-+					struct avrcp_header *pdu,
- 					uint8_t transaction);
- } handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES, CTYPE_STATUS,
-@@ -1455,7 +1455,7 @@ static int handle_vendordep_pdu(struct control *control,
+@@ -1451,19 +1451,19 @@ static struct pdu_handler {
+ /* handle vendordep pdu inside an avctp packet */
+ static int handle_vendordep_pdu(struct control *control,
+ 					struct avctp_header *avctp,
+-					struct avrcp_header *avrcp,
++					struct avc_header *avc,
  					int operand_count)
  {
  	struct pdu_handler *handler;
--	struct avrcp_spec_avc_pdu *pdu = (void *) avc + AVC_HEADER_LENGTH;
-+	struct avrcp_header *pdu = (void *) avc + AVC_HEADER_LENGTH;
+-	struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
++	struct avrcp_spec_avc_pdu *pdu = (void *) avc + AVC_HEADER_LENGTH;
  	uint32_t company_id = (pdu->company_id[0] << 16) |
  				(pdu->company_id[1] << 8) |
  				(pdu->company_id[2]);
-@@ -1469,7 +1469,7 @@ static int handle_vendordep_pdu(struct control *control,
+ 
+ 	if (company_id != IEEEID_BTSIG ||
+ 				pdu->packet_type != AVCTP_PACKET_SINGLE) {
+-		avrcp->code = CTYPE_NOT_IMPLEMENTED;
+-		return AVRCP_HEADER_LENGTH;
++		avc->code = CTYPE_NOT_IMPLEMENTED;
++		return AVC_HEADER_LENGTH;
+ 	}
+ 
  	pdu->packet_type = 0;
- 	pdu->rsvd = 0;
+@@ -1477,7 +1477,7 @@ static int handle_vendordep_pdu(struct control *control,
+ 			break;
+ 	}
  
--	if (operand_count + 3 < AVRCP_SPECAVCPDU_HEADER_LENGTH)
-+	if (operand_count + 3 < AVRCP_HEADER_LENGTH)
+-	if (!handler || handler->code != avrcp->code) {
++	if (!handler || handler->code != avc->code) {
+ 		pdu->params[0] = E_INVALID_COMMAND;
  		goto err_metadata;
+ 	}
+@@ -1487,16 +1487,16 @@ static int handle_vendordep_pdu(struct control *control,
+ 		goto err_metadata;
+ 	}
  
- 	for (handler = handlers; handler; handler++) {
-@@ -1489,14 +1489,14 @@ static int handle_vendordep_pdu(struct control *control,
+-	avrcp->code = handler->func(control, pdu, avctp->transaction);
++	avc->code = handler->func(control, pdu, avctp->transaction);
  
- 	avc->code = handler->func(control, pdu, avctp->transaction);
- 
--	return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH +
-+	return AVC_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
+-	return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH +
++	return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH +
  						ntohs(pdu->params_len);
  
  err_metadata:
  	pdu->params_len = htons(1);
- 	avc->code = CTYPE_REJECTED;
+-	avrcp->code = CTYPE_REJECTED;
++	avc->code = CTYPE_REJECTED;
  
--	return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
-+	return AVC_HEADER_LENGTH + AVRCP_HEADER_LENGTH + 1;
+-	return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
++	return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
  }
  
  static void avctp_disconnected(struct audio_device *dev)
+@@ -1593,7 +1593,7 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
+ 	struct control *control = data;
+ 	unsigned char buf[1024], *operands;
+ 	struct avctp_header *avctp;
+-	struct avrcp_header *avrcp;
++	struct avc_header *avc;
+ 	int ret, packet_size, operand_count, sock;
+ 
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
+@@ -1622,65 +1622,65 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
+ 			avctp->cr, avctp->ipid, ntohs(avctp->pid));
+ 
+ 	ret -= sizeof(struct avctp_header);
+-	if ((unsigned int) ret < sizeof(struct avrcp_header)) {
++	if ((unsigned int) ret < sizeof(struct avc_header)) {
+ 		error("Too small AVRCP packet");
+ 		goto failed;
+ 	}
+ 
+-	avrcp = (struct avrcp_header *) (buf + sizeof(struct avctp_header));
++	avc = (struct avc_header *) (buf + sizeof(struct avctp_header));
+ 
+-	ret -= sizeof(struct avrcp_header);
++	ret -= sizeof(struct avc_header);
+ 
+-	operands = buf + sizeof(struct avctp_header) + sizeof(struct avrcp_header);
++	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
+ 	operand_count = ret;
+ 
+-	DBG("AVRCP %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
++	DBG("AV/C %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
+ 			"opcode 0x%02X, %d operands",
+ 			avctp->cr ? "response" : "command",
+-			avrcp->code, avrcp->subunit_type, avrcp->subunit_id,
+-			avrcp->opcode, operand_count);
++			avc->code, avc->subunit_type, avc->subunit_id,
++			avc->opcode, operand_count);
+ 
+ 	if (avctp->packet_type != AVCTP_PACKET_SINGLE) {
+ 		avctp->cr = AVCTP_RESPONSE;
+-		avrcp->code = CTYPE_NOT_IMPLEMENTED;
++		avc->code = CTYPE_NOT_IMPLEMENTED;
+ 	} else if (avctp->pid != htons(AV_REMOTE_SVCLASS_ID)) {
+ 		avctp->ipid = 1;
+ 		avctp->cr = AVCTP_RESPONSE;
+ 		packet_size = sizeof(*avctp);
+ 	} else if (avctp->cr == AVCTP_COMMAND &&
+-			avrcp->code == CTYPE_CONTROL &&
+-			avrcp->subunit_type == SUBUNIT_PANEL &&
+-			avrcp->opcode == OP_PASSTHROUGH) {
++			avc->code == CTYPE_CONTROL &&
++			avc->subunit_type == SUBUNIT_PANEL &&
++			avc->opcode == OP_PASSTHROUGH) {
+ 		handle_panel_passthrough(control, operands, operand_count);
+ 		avctp->cr = AVCTP_RESPONSE;
+-		avrcp->code = CTYPE_ACCEPTED;
++		avc->code = CTYPE_ACCEPTED;
+ 	} else if (avctp->cr == AVCTP_COMMAND &&
+-			avrcp->code == CTYPE_STATUS &&
+-			(avrcp->opcode == OP_UNITINFO
+-			|| avrcp->opcode == OP_SUBUNITINFO)) {
++			avc->code == CTYPE_STATUS &&
++			(avc->opcode == OP_UNITINFO
++			|| avc->opcode == OP_SUBUNITINFO)) {
+ 		avctp->cr = AVCTP_RESPONSE;
+-		avrcp->code = CTYPE_STABLE;
++		avc->code = CTYPE_STABLE;
+ 		/* The first operand should be 0x07 for the UNITINFO response.
+ 		 * Neither AVRCP (section 22.1, page 117) nor AVC Digital
+ 		 * Interface Command Set (section 9.2.1, page 45) specs
+ 		 * explain this value but both use it */
+-		if (operand_count >= 1 && avrcp->opcode == OP_UNITINFO)
++		if (operand_count >= 1 && avc->opcode == OP_UNITINFO)
+ 			operands[0] = 0x07;
+ 		if (operand_count >= 2)
+ 			operands[1] = SUBUNIT_PANEL << 3;
+-		DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
++		DBG("reply to %s", avc->opcode == OP_UNITINFO ?
+ 				"OP_UNITINFO" : "OP_SUBUNITINFO");
+ 	} else if (avctp->cr == AVCTP_COMMAND &&
+-			avrcp->opcode == OP_VENDORDEP) {
++			avc->opcode == OP_VENDORDEP) {
+ 		int r_size;
+ 		operand_count -= 3;
+ 		avctp->cr = AVCTP_RESPONSE;
+-		r_size = handle_vendordep_pdu(control, avctp, avrcp,
++		r_size = handle_vendordep_pdu(control, avctp, avc,
+ 								operand_count);
+ 		packet_size = AVCTP_HEADER_LENGTH + r_size;
+ 	} else {
+ 		avctp->cr = AVCTP_RESPONSE;
+-		avrcp->code = CTYPE_REJECTED;
++		avc->code = CTYPE_REJECTED;
+ 	}
+ 
+ 	ret = write(sock, buf, packet_size);
+@@ -2092,10 +2092,10 @@ static DBusMessage *control_is_connected(DBusConnection *conn,
+ 
+ static int avctp_send_passthrough(struct control *control, uint8_t op)
+ {
+-	unsigned char buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH + 2];
++	unsigned char buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH + 2];
+ 	struct avctp_header *avctp = (void *) buf;
+-	struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
+-	uint8_t *operands = &buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH];
++	struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
++	uint8_t *operands = &buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
+ 	int sk = g_io_channel_unix_get_fd(control->io);
+ 	static uint8_t transaction = 0;
+ 
+@@ -2106,9 +2106,9 @@ static int avctp_send_passthrough(struct control *control, uint8_t op)
+ 	avctp->cr = AVCTP_COMMAND;
+ 	avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
+ 
+-	avrcp->code = CTYPE_CONTROL;
+-	avrcp->subunit_type = SUBUNIT_PANEL;
+-	avrcp->opcode = OP_PASSTHROUGH;
++	avc->code = CTYPE_CONTROL;
++	avc->subunit_type = SUBUNIT_PANEL;
++	avc->opcode = OP_PASSTHROUGH;
+ 
+ 	operands[0] = op & 0x7f;
+ 	operands[1] = 0;
 -- 
 1.7.6.1
 
