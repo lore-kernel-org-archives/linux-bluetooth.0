@@ -1,306 +1,246 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1315826997-13818-2-git-send-email-luiz.dentz@gmail.com>
-References: <1315826997-13818-1-git-send-email-luiz.dentz@gmail.com> <1315826997-13818-2-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 12 Sep 2011 10:10:17 -0300
-Message-ID: <CAMOw1v4-Rik3EtFhf7Q-YP8Fu2+6TU0FjH4WkkGHqtyu4PBKpQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/5] AVRCP: rename avrcp_header to avc_header
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/3] Serialize powering up/down in maemo6 plugin
+Date: Mon, 12 Sep 2011 09:06:31 -0300
+Message-Id: <1315829192-30924-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1315829192-30924-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1315829192-30924-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+This patch fixes wrong adapter state when using Management interface.
+When bluetoothd starts, the adapter should be switched to the state
+informed by Maemo6 MCE. In the current implementation, Maemo6 plugin
+sends set powered command when the adapter is still powering up, the
+last command sent fails(kernel returns EALREADY).
+---
+ plugins/maemo6.c |  136 +++++++++++++++++++++++++++---------------------------
+ 1 files changed, 68 insertions(+), 68 deletions(-)
 
-On Mon, Sep 12, 2011 at 8:29 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> AVCTP carries AV/C packets/PDUs not AVRCP as avrcp_header suggests.
-> ---
->  audio/control.c |   98 +++++++++++++++++++++++++++---------------------------
->  1 files changed, 49 insertions(+), 49 deletions(-)
+diff --git a/plugins/maemo6.c b/plugins/maemo6.c
+index 56f2664..00fb3fa 100644
+--- a/plugins/maemo6.c
++++ b/plugins/maemo6.c
+@@ -50,7 +50,7 @@
+ static guint watch_id;
+ static DBusConnection *conn = NULL;
+ static gboolean mce_bt_set = FALSE;
+-static gboolean collision = FALSE;
++static gboolean mce_bt_on = FALSE;
+ 
+ static gboolean mce_signal_callback(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+@@ -58,6 +58,7 @@ static gboolean mce_signal_callback(DBusConnection *connection,
+ 	DBusMessageIter args;
+ 	uint32_t sigvalue;
+ 	struct btd_adapter *adapter = user_data;
++	int err;
+ 
+ 	DBG("received mce signal");
+ 
+@@ -71,13 +72,16 @@ static gboolean mce_signal_callback(DBusConnection *connection,
+ 
+ 		/* set the adapter according to the mce signal
+ 		   and remember the value */
+-		mce_bt_set = sigvalue & MCE_RADIO_STATE_BLUETOOTH ?
+-								TRUE : FALSE;
++		mce_bt_on = sigvalue & MCE_RADIO_STATE_BLUETOOTH ? TRUE : FALSE;
+ 
+-		if (mce_bt_set)
+-			btd_adapter_switch_online(adapter);
++		if (mce_bt_on)
++			err = btd_adapter_switch_online(adapter);
+ 		else
+-			btd_adapter_switch_offline(adapter);
++			err = btd_adapter_switch_offline(adapter);
++
++		if (err == 0)
++			mce_bt_set = TRUE;
++
+ 	}
+ 
+ 	return TRUE;
+@@ -85,46 +89,43 @@ static gboolean mce_signal_callback(DBusConnection *connection,
+ 
+ static void read_radio_states_cb(DBusPendingCall *call, void *user_data)
+ {
+-	DBusError err;
++	DBusError derr;
+ 	DBusMessage *reply;
+ 	dbus_uint32_t radio_states;
+ 	struct btd_adapter *adapter = user_data;
++	int err;
+ 
+ 	reply = dbus_pending_call_steal_reply(call);
+ 
+-	dbus_error_init(&err);
+-	if (dbus_set_error_from_message(&err, reply)) {
++	dbus_error_init(&derr);
++	if (dbus_set_error_from_message(&derr, reply)) {
+ 		error("mce replied with an error: %s, %s",
+-				err.name, err.message);
+-		dbus_error_free(&err);
++				derr.name, derr.message);
++		dbus_error_free(&derr);
+ 		goto done;
+ 	}
+ 
+-	dbus_error_init(&err);
+-	if (dbus_message_get_args(reply, &err,
++	dbus_error_init(&derr);
++	if (dbus_message_get_args(reply, &derr,
+ 				DBUS_TYPE_UINT32, &radio_states,
+ 				DBUS_TYPE_INVALID) == FALSE) {
+ 		error("unable to parse get_radio_states reply: %s, %s",
+-							err.name, err.message);
+-		dbus_error_free(&err);
++							derr.name, derr.message);
++		dbus_error_free(&derr);
+ 		goto done;
+ 	}
+ 
+ 	DBG("radio_states: %d", radio_states);
+ 
+-	mce_bt_set = radio_states & MCE_RADIO_STATE_BLUETOOTH ? TRUE : FALSE;
++	mce_bt_on = radio_states & MCE_RADIO_STATE_BLUETOOTH ? TRUE : FALSE;
+ 
+-	/* check if the adapter has not completed the initial power
+-	 * cycle, if so delay action to mce_notify_powered */
+-	collision = mce_bt_set && adapter_powering_down(adapter);
+-
+-	if (collision)
+-		goto done;
+-
+-	if (mce_bt_set)
+-		btd_adapter_switch_online(adapter);
++	if (mce_bt_on)
++		err = btd_adapter_switch_online(adapter);
+ 	else
+-		btd_adapter_switch_offline(adapter);
++		err = btd_adapter_switch_offline(adapter);
++
++	if (err == 0)
++		mce_bt_set = TRUE;
+ 
+ done:
+ 	dbus_message_unref(reply);
+@@ -133,73 +134,72 @@ done:
+ static void adapter_powered(struct btd_adapter *adapter, gboolean powered)
+ {
+ 	DBusMessage *msg;
+-	dbus_uint32_t radio_states = 0;
+-	dbus_uint32_t radio_mask = MCE_RADIO_STATE_BLUETOOTH;
+ 	static gboolean startup = TRUE;
+ 
+ 	DBG("adapter_powered called with %d", powered);
+ 
+ 	if (startup) {
++		DBusPendingCall *call;
++
++		/* Initialization: sync adapter state and MCE radio state */
++
++		DBG("Startup: reading MCE Bluetooth radio state...");
+ 		startup = FALSE;
+-		return;
+-	}
+ 
+-	/* check if the plugin got the get_radio_states reply from the
+-	 * mce when the adapter was not yet down during the power
+-	 * cycling when bluetoothd is started */
+-	if (collision) {
+-		error("maemo6: powered state collision");
+-		collision = FALSE;
++		msg = dbus_message_new_method_call(MCE_SERVICE,
++					MCE_REQUEST_PATH, MCE_REQUEST_IF,
++					MCE_RADIO_STATES_GET);
+ 
+-		if (mce_bt_set)
+-			btd_adapter_switch_online(adapter);
++		if (!dbus_connection_send_with_reply(conn, msg, &call, -1)) {
++			error("calling %s failed", MCE_RADIO_STATES_GET);
++			dbus_message_unref(msg);
++			return;
++		}
+ 
++		dbus_pending_call_set_notify(call, read_radio_states_cb,
++								adapter, NULL);
++		dbus_pending_call_unref(call);
++		dbus_message_unref(msg);
+ 		return;
+ 	}
+ 
+-	/* nothing to do if the states match */
+-	if (mce_bt_set == powered)
++	/* MCE initiated operation */
++	if (mce_bt_set == TRUE) {
++		mce_bt_set = FALSE;
+ 		return;
++	}
+ 
+-	/* set the mce value according to the state of the adapter */
+-	msg = dbus_message_new_method_call(MCE_SERVICE, MCE_REQUEST_PATH,
+-				MCE_REQUEST_IF, MCE_RADIO_STATES_CHANGE_REQ);
++	/* Non MCE operation: set MCE according to adapter state */
++	if (mce_bt_on != powered) {
++		dbus_uint32_t radio_states;
++		dbus_uint32_t radio_mask = MCE_RADIO_STATE_BLUETOOTH;
+ 
+-	if (powered)
+-		radio_states = MCE_RADIO_STATE_BLUETOOTH;
++		msg = dbus_message_new_method_call(MCE_SERVICE,
++					MCE_REQUEST_PATH, MCE_REQUEST_IF,
++					MCE_RADIO_STATES_CHANGE_REQ);
+ 
+-	dbus_message_append_args(msg, DBUS_TYPE_UINT32, &radio_states,
+-				DBUS_TYPE_UINT32, &radio_mask,
+-				DBUS_TYPE_INVALID);
++		radio_states = (powered ? MCE_RADIO_STATE_BLUETOOTH : 0);
+ 
+-	if (dbus_connection_send(conn, msg, NULL))
+-		mce_bt_set = powered;
+-	else
+-		error("calling %s failed", MCE_RADIO_STATES_CHANGE_REQ);
++		DBG("Changing MCE Bluetooth radio state to: %d", radio_states);
+ 
+-	dbus_message_unref(msg);
++		dbus_message_append_args(msg, DBUS_TYPE_UINT32, &radio_states,
++					DBUS_TYPE_UINT32, &radio_mask,
++					DBUS_TYPE_INVALID);
++
++		if (dbus_connection_send(conn, msg, NULL))
++			mce_bt_on = powered;
++		else
++			error("calling %s failed", MCE_RADIO_STATES_CHANGE_REQ);
++
++		dbus_message_unref(msg);
++	}
+ }
+ 
+ static int mce_probe(struct btd_adapter *adapter)
+ {
+-	DBusMessage *msg;
+-	DBusPendingCall *call;
+ 
+ 	DBG("path %s", adapter_get_path(adapter));
+ 
+-	msg = dbus_message_new_method_call(MCE_SERVICE, MCE_REQUEST_PATH,
+-					MCE_REQUEST_IF, MCE_RADIO_STATES_GET);
+-
+-	if (!dbus_connection_send_with_reply(conn, msg, &call, -1)) {
+-		error("calling %s failed", MCE_RADIO_STATES_GET);
+-		dbus_message_unref(msg);
+-		return -1;
+-	}
+-
+-	dbus_pending_call_set_notify(call, read_radio_states_cb, adapter, NULL);
+-	dbus_pending_call_unref(call);
+-	dbus_message_unref(msg);
+-
+ 	watch_id = g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_PATH,
+ 					MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
+ 					mce_signal_callback, adapter, NULL);
+-- 
+1.7.6
 
-This was the next one in my TODO list. I'm glad you did it :-)
-
-
-
-
->
-> diff --git a/audio/control.c b/audio/control.c
-> index f84c7f7..37b0806 100644
-> --- a/audio/control.c
-> +++ b/audio/control.c
-> @@ -212,14 +212,14 @@ struct avctp_header {
->  } __attribute__ ((packed));
->  #define AVCTP_HEADER_LENGTH 3
->
-> -struct avrcp_header {
-> +struct avc_header {
->        uint8_t code:4;
->        uint8_t _hdr0:4;
->        uint8_t subunit_id:3;
->        uint8_t subunit_type:5;
->        uint8_t opcode;
->  } __attribute__ ((packed));
-> -#define AVRCP_HEADER_LENGTH 3
-> +#define AVC_HEADER_LENGTH 3
->
->  struct avrcp_spec_avc_pdu {
->        uint8_t company_id[3];
-> @@ -242,14 +242,14 @@ struct avctp_header {
->  } __attribute__ ((packed));
->  #define AVCTP_HEADER_LENGTH 3
->
-> -struct avrcp_header {
-> +struct avc_header {
->        uint8_t _hdr0:4;
->        uint8_t code:4;
->        uint8_t subunit_type:5;
->        uint8_t subunit_id:3;
->        uint8_t opcode;
->  } __attribute__ ((packed));
-> -#define AVRCP_HEADER_LENGTH 3
-> +#define AVC_HEADER_LENGTH 3
->
->  struct avrcp_spec_avc_pdu {
->        uint8_t company_id[3];
-> @@ -721,13 +721,13 @@ static const char *battery_status_to_str(enum battery_status status)
->
->  static int avctp_send_event(struct control *control, uint8_t id, void *data)
->  {
-> -       uint8_t buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
-> +       uint8_t buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
->                                        AVRCP_SPECAVCPDU_HEADER_LENGTH + 9];
->        struct avctp_header *avctp = (void *) buf;
-> -       struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
-> +       struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
->        struct avrcp_spec_avc_pdu *pdu = (void *) &buf[AVCTP_HEADER_LENGTH +
-> -                                                       AVRCP_HEADER_LENGTH];
-> -       int sk;
-> +                                                       AVC_HEADER_LENGTH];
-> +       int sk = g_io_channel_unix_get_fd(control->io);
-
-You are re-introducing a bug here. Please see "dec26ee Fix fd usage
-when not connected"
-
-
->        uint16_t size;
->
->        if (control->state != AVCTP_STATE_CONNECTED)
-> @@ -743,9 +743,9 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
->        avctp->cr = AVCTP_RESPONSE;
->        avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
->
-> -       avrcp->code = CTYPE_CHANGED;
-> -       avrcp->subunit_type = SUBUNIT_PANEL;
-> -       avrcp->opcode = OP_VENDORDEP;
-> +       avc->code = CTYPE_CHANGED;
-> +       avc->subunit_type = SUBUNIT_PANEL;
-> +       avc->opcode = OP_VENDORDEP;
->
->        pdu->company_id[0] = IEEEID_BTSIG >> 16;
->        pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
-> @@ -780,7 +780,7 @@ static int avctp_send_event(struct control *control, uint8_t id, void *data)
->        }
->
->        pdu->params_len = htons(size);
-> -       size += AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH +
-> +       size += AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH +
->                                        AVRCP_SPECAVCPDU_HEADER_LENGTH;
->
->        sk = g_io_channel_unix_get_fd(control->io);
-> @@ -1451,19 +1451,19 @@ static struct pdu_handler {
->  /* handle vendordep pdu inside an avctp packet */
->  static int handle_vendordep_pdu(struct control *control,
->                                        struct avctp_header *avctp,
-> -                                       struct avrcp_header *avrcp,
-> +                                       struct avc_header *avc,
->                                        int operand_count)
->  {
->        struct pdu_handler *handler;
-> -       struct avrcp_spec_avc_pdu *pdu = (void *) avrcp + AVRCP_HEADER_LENGTH;
-> +       struct avrcp_spec_avc_pdu *pdu = (void *) avc + AVC_HEADER_LENGTH;
-
-We might want to change this to:
-
-struct avrcp_spec_avc_pdu *pdu = (avrcp_spec_avc_pdu *)(avc +
-AVC_HEADER_LENGTH);
-
-This way we kill some warnings on ARM: arithmetic with void pointer
-
-
->        uint32_t company_id = (pdu->company_id[0] << 16) |
->                                (pdu->company_id[1] << 8) |
->                                (pdu->company_id[2]);
->
->        if (company_id != IEEEID_BTSIG ||
->                                pdu->packet_type != AVCTP_PACKET_SINGLE) {
-> -               avrcp->code = CTYPE_NOT_IMPLEMENTED;
-> -               return AVRCP_HEADER_LENGTH;
-> +               avc->code = CTYPE_NOT_IMPLEMENTED;
-> +               return AVC_HEADER_LENGTH;
->        }
->
->        pdu->packet_type = 0;
-> @@ -1477,7 +1477,7 @@ static int handle_vendordep_pdu(struct control *control,
->                        break;
->        }
->
-> -       if (!handler || handler->code != avrcp->code) {
-> +       if (!handler || handler->code != avc->code) {
->                pdu->params[0] = E_INVALID_COMMAND;
->                goto err_metadata;
->        }
-> @@ -1487,16 +1487,16 @@ static int handle_vendordep_pdu(struct control *control,
->                goto err_metadata;
->        }
->
-> -       avrcp->code = handler->func(control, pdu, avctp->transaction);
-> +       avc->code = handler->func(control, pdu, avctp->transaction);
->
-> -       return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH +
-> +       return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH +
->                                                ntohs(pdu->params_len);
->
->  err_metadata:
->        pdu->params_len = htons(1);
-> -       avrcp->code = CTYPE_REJECTED;
-> +       avc->code = CTYPE_REJECTED;
->
-> -       return AVRCP_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
-> +       return AVC_HEADER_LENGTH + AVRCP_SPECAVCPDU_HEADER_LENGTH + 1;
->  }
->
->  static void avctp_disconnected(struct audio_device *dev)
-> @@ -1593,7 +1593,7 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
->        struct control *control = data;
->        unsigned char buf[1024], *operands;
->        struct avctp_header *avctp;
-> -       struct avrcp_header *avrcp;
-> +       struct avc_header *avc;
->        int ret, packet_size, operand_count, sock;
->
->        if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL))
-> @@ -1622,65 +1622,65 @@ static gboolean control_cb(GIOChannel *chan, GIOCondition cond,
->                        avctp->cr, avctp->ipid, ntohs(avctp->pid));
->
->        ret -= sizeof(struct avctp_header);
-> -       if ((unsigned int) ret < sizeof(struct avrcp_header)) {
-> +       if ((unsigned int) ret < sizeof(struct avc_header)) {
->                error("Too small AVRCP packet");
->                goto failed;
->        }
->
-> -       avrcp = (struct avrcp_header *) (buf + sizeof(struct avctp_header));
-> +       avc = (struct avc_header *) (buf + sizeof(struct avctp_header));
->
-> -       ret -= sizeof(struct avrcp_header);
-> +       ret -= sizeof(struct avc_header);
->
-> -       operands = buf + sizeof(struct avctp_header) + sizeof(struct avrcp_header);
-> +       operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
->        operand_count = ret;
->
-> -       DBG("AVRCP %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
-> +       DBG("AV/C %s 0x%01X, subunit_type 0x%02X, subunit_id 0x%01X, "
->                        "opcode 0x%02X, %d operands",
->                        avctp->cr ? "response" : "command",
-> -                       avrcp->code, avrcp->subunit_type, avrcp->subunit_id,
-> -                       avrcp->opcode, operand_count);
-> +                       avc->code, avc->subunit_type, avc->subunit_id,
-> +                       avc->opcode, operand_count);
->
->        if (avctp->packet_type != AVCTP_PACKET_SINGLE) {
->                avctp->cr = AVCTP_RESPONSE;
-> -               avrcp->code = CTYPE_NOT_IMPLEMENTED;
-> +               avc->code = CTYPE_NOT_IMPLEMENTED;
->        } else if (avctp->pid != htons(AV_REMOTE_SVCLASS_ID)) {
->                avctp->ipid = 1;
->                avctp->cr = AVCTP_RESPONSE;
->                packet_size = sizeof(*avctp);
->        } else if (avctp->cr == AVCTP_COMMAND &&
-> -                       avrcp->code == CTYPE_CONTROL &&
-> -                       avrcp->subunit_type == SUBUNIT_PANEL &&
-> -                       avrcp->opcode == OP_PASSTHROUGH) {
-> +                       avc->code == CTYPE_CONTROL &&
-> +                       avc->subunit_type == SUBUNIT_PANEL &&
-> +                       avc->opcode == OP_PASSTHROUGH) {
->                handle_panel_passthrough(control, operands, operand_count);
->                avctp->cr = AVCTP_RESPONSE;
-> -               avrcp->code = CTYPE_ACCEPTED;
-> +               avc->code = CTYPE_ACCEPTED;
->        } else if (avctp->cr == AVCTP_COMMAND &&
-> -                       avrcp->code == CTYPE_STATUS &&
-> -                       (avrcp->opcode == OP_UNITINFO
-> -                       || avrcp->opcode == OP_SUBUNITINFO)) {
-> +                       avc->code == CTYPE_STATUS &&
-> +                       (avc->opcode == OP_UNITINFO
-> +                       || avc->opcode == OP_SUBUNITINFO)) {
->                avctp->cr = AVCTP_RESPONSE;
-> -               avrcp->code = CTYPE_STABLE;
-> +               avc->code = CTYPE_STABLE;
->                /* The first operand should be 0x07 for the UNITINFO response.
->                 * Neither AVRCP (section 22.1, page 117) nor AVC Digital
->                 * Interface Command Set (section 9.2.1, page 45) specs
->                 * explain this value but both use it */
-> -               if (operand_count >= 1 && avrcp->opcode == OP_UNITINFO)
-> +               if (operand_count >= 1 && avc->opcode == OP_UNITINFO)
->                        operands[0] = 0x07;
->                if (operand_count >= 2)
->                        operands[1] = SUBUNIT_PANEL << 3;
-> -               DBG("reply to %s", avrcp->opcode == OP_UNITINFO ?
-> +               DBG("reply to %s", avc->opcode == OP_UNITINFO ?
->                                "OP_UNITINFO" : "OP_SUBUNITINFO");
->        } else if (avctp->cr == AVCTP_COMMAND &&
-> -                       avrcp->opcode == OP_VENDORDEP) {
-> +                       avc->opcode == OP_VENDORDEP) {
->                int r_size;
->                operand_count -= 3;
->                avctp->cr = AVCTP_RESPONSE;
-> -               r_size = handle_vendordep_pdu(control, avctp, avrcp,
-> +               r_size = handle_vendordep_pdu(control, avctp, avc,
->                                                                operand_count);
->                packet_size = AVCTP_HEADER_LENGTH + r_size;
->        } else {
->                avctp->cr = AVCTP_RESPONSE;
-> -               avrcp->code = CTYPE_REJECTED;
-> +               avc->code = CTYPE_REJECTED;
->        }
->
->        ret = write(sock, buf, packet_size);
-> @@ -2092,10 +2092,10 @@ static DBusMessage *control_is_connected(DBusConnection *conn,
->
->  static int avctp_send_passthrough(struct control *control, uint8_t op)
->  {
-> -       unsigned char buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH + 2];
-> +       unsigned char buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH + 2];
->        struct avctp_header *avctp = (void *) buf;
-> -       struct avrcp_header *avrcp = (void *) &buf[AVCTP_HEADER_LENGTH];
-> -       uint8_t *operands = &buf[AVCTP_HEADER_LENGTH + AVRCP_HEADER_LENGTH];
-> +       struct avc_header *avc = (void *) &buf[AVCTP_HEADER_LENGTH];
-> +       uint8_t *operands = &buf[AVCTP_HEADER_LENGTH + AVC_HEADER_LENGTH];
->        int sk = g_io_channel_unix_get_fd(control->io);
->        static uint8_t transaction = 0;
->
-> @@ -2106,9 +2106,9 @@ static int avctp_send_passthrough(struct control *control, uint8_t op)
->        avctp->cr = AVCTP_COMMAND;
->        avctp->pid = htons(AV_REMOTE_SVCLASS_ID);
->
-> -       avrcp->code = CTYPE_CONTROL;
-> -       avrcp->subunit_type = SUBUNIT_PANEL;
-> -       avrcp->opcode = OP_PASSTHROUGH;
-> +       avc->code = CTYPE_CONTROL;
-> +       avc->subunit_type = SUBUNIT_PANEL;
-> +       avc->opcode = OP_PASSTHROUGH;
->
->        operands[0] = op & 0x7f;
->        operands[1] = 0;
-> --
-
-The rest looks good to me.
-
-Lucas De Marchi
