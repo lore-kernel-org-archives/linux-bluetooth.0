@@ -1,55 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: RE: [PATCH bluetooth-next] Added force_acl_master param for
- bluetooth module
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Ilia, Kolominsky" <iliak@ti.com>
-Cc: "ilia.kolominsky@gmail.com" <ilia.kolominsky@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 12 Sep 2011 16:11:14 +0200
-In-Reply-To: <AC090B9732AB2B4DB7FF476E907FE66001321E6C14@dnce02.ent.ti.com>
-References: <1315798377-3660-1-git-send-email-iliak@ti.com>
-	 <1315819740.1937.17.camel@aeonflux>
-	 <AC090B9732AB2B4DB7FF476E907FE66001321E6C14@dnce02.ent.ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315836675.1937.20.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1315826997-13818-3-git-send-email-luiz.dentz@gmail.com>
+References: <1315826997-13818-1-git-send-email-luiz.dentz@gmail.com> <1315826997-13818-3-git-send-email-luiz.dentz@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 12 Sep 2011 10:47:23 -0300
+Message-ID: <CAMOw1v5OOunZpxvvxVdCQkM-KbJpp3QBvNFOAROzvYCf6wU0jQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/5] AVRCP: rename avrcp_spec_avc_pdu to avrcp_header
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilia,
+On Mon, Sep 12, 2011 at 8:29 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Since old avrcp_header got renamed to avc_header now we can use
+> avrcp_header for AVRCP PDUs.
+> ---
+>  audio/control.c |   44 ++++++++++++++++++++++----------------------
+>  1 files changed, 22 insertions(+), 22 deletions(-)
 
-> > > This param allows role switch request while accepting a new acl
-> > > connection. This is an enhancement to l2cap L2CAP_LM role switching
-> > > capability which allows requesting role switch without modification
-> > > to the application code. It was observed that operating as a master
-> > > of piconet (as oposed to scatternet config) is beneficial when
-> > > qos (flow_spec) guarantees are requested.
-> > 
-> > <snip>
-> > 
-> > >  module_param(enable_le, bool, 0444);
-> > >  MODULE_PARM_DESC(enable_le, "Enable LE support");
-> > > +module_param(force_acl_master, bool, 0644);
-> > > +MODULE_PARM_DESC(force_acl_master, "Always try to switch to master
-> > role on ACL link");
-> > 
-> > using kernel module parameters is not an acceptable API/ABI for this.
-> It is not API/ABI, it is a way to configure a system without modifying
-> application code and itâ€™s as useful as the other Bluetooth module
-> params.
-
-no, we use kernel parameters to on purpose not enable features that have
-not passed qualification yet. We do not use it for general purpose
-configuration.
-
-And btw. what is wrong with the setting lm to master via hciconfig? That
-said, I am pretty much against general purpose setting that are not
-really bound to any specific service/profile. The sum of profiles should
-define a proper policy and not some magic global setting. Otherwise you
-easily run into dead-lock scenarios.
-
-Regards
-
-Marcel
+ack
 
 
+Lucas De Marchi
