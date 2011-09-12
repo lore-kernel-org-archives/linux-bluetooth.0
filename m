@@ -1,40 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        "ilia.kolominsky@gmail.com"
-	<ilia.kolominsky@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 12 Sep 2011 11:57:17 +0200
-Subject: RE: [PATCH bluetooth-next] Added force_acl_master param for
+Subject: Re: [PATCH bluetooth-next] Added force_acl_master param for
  bluetooth module
-Message-ID: <AC090B9732AB2B4DB7FF476E907FE66001321E6C14@dnce02.ent.ti.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ilia.kolominsky@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Ilia Kolomisnky <iliak@ti.com>
+Date: Mon, 12 Sep 2011 11:28:59 +0200
+In-Reply-To: <1315798377-3660-1-git-send-email-iliak@ti.com>
 References: <1315798377-3660-1-git-send-email-iliak@ti.com>
- <1315819740.1937.17.camel@aeonflux>
-In-Reply-To: <1315819740.1937.17.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1315819740.1937.17.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXJjZWwgSG9sdG1h
-bm4gW21haWx0bzptYXJjZWxAaG9sdG1hbm4ub3JnXQ0KPiBTZW50OiBNb25kYXksIFNlcHRlbWJl
-ciAxMiwgMjAxMSAxMjoyOSBQTQ0KPiBUbzogaWxpYS5rb2xvbWluc2t5QGdtYWlsLmNvbQ0KPiBD
-YzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgSWxpYSwgS29sb21pbnNreQ0KPiBT
-dWJqZWN0OiBSZTogW1BBVENIIGJsdWV0b290aC1uZXh0XSBBZGRlZCBmb3JjZV9hY2xfbWFzdGVy
-IHBhcmFtIGZvcg0KPiBibHVldG9vdGggbW9kdWxlDQo+IA0KPiBIaSBJbGlhLA0KPiANCj4gPiBU
-aGlzIHBhcmFtIGFsbG93cyByb2xlIHN3aXRjaCByZXF1ZXN0IHdoaWxlIGFjY2VwdGluZyBhIG5l
-dyBhY2wNCj4gPiBjb25uZWN0aW9uLiBUaGlzIGlzIGFuIGVuaGFuY2VtZW50IHRvIGwyY2FwIEwy
-Q0FQX0xNIHJvbGUgc3dpdGNoaW5nDQo+ID4gY2FwYWJpbGl0eSB3aGljaCBhbGxvd3MgcmVxdWVz
-dGluZyByb2xlIHN3aXRjaCB3aXRob3V0IG1vZGlmaWNhdGlvbg0KPiA+IHRvIHRoZSBhcHBsaWNh
-dGlvbiBjb2RlLiBJdCB3YXMgb2JzZXJ2ZWQgdGhhdCBvcGVyYXRpbmcgYXMgYSBtYXN0ZXINCj4g
-PiBvZiBwaWNvbmV0IChhcyBvcG9zZWQgdG8gc2NhdHRlcm5ldCBjb25maWcpIGlzIGJlbmVmaWNp
-YWwgd2hlbg0KPiA+IHFvcyAoZmxvd19zcGVjKSBndWFyYW50ZWVzIGFyZSByZXF1ZXN0ZWQuDQo+
-IA0KPiA8c25pcD4NCj4gDQo+ID4gIG1vZHVsZV9wYXJhbShlbmFibGVfbGUsIGJvb2wsIDA0NDQp
-Ow0KPiA+ICBNT0RVTEVfUEFSTV9ERVNDKGVuYWJsZV9sZSwgIkVuYWJsZSBMRSBzdXBwb3J0Iik7
-DQo+ID4gK21vZHVsZV9wYXJhbShmb3JjZV9hY2xfbWFzdGVyLCBib29sLCAwNjQ0KTsNCj4gPiAr
-TU9EVUxFX1BBUk1fREVTQyhmb3JjZV9hY2xfbWFzdGVyLCAiQWx3YXlzIHRyeSB0byBzd2l0Y2gg
-dG8gbWFzdGVyDQo+IHJvbGUgb24gQUNMIGxpbmsiKTsNCj4gDQo+IHVzaW5nIGtlcm5lbCBtb2R1
-bGUgcGFyYW1ldGVycyBpcyBub3QgYW4gYWNjZXB0YWJsZSBBUEkvQUJJIGZvciB0aGlzLg0KSXQg
-aXMgbm90IEFQSS9BQkksIGl0IGlzIGEgd2F5IHRvIGNvbmZpZ3VyZSBhIHN5c3RlbSB3aXRob3V0
-IG1vZGlmeWluZw0KYXBwbGljYXRpb24gY29kZSBhbmQgaXTigJlzIGFzIHVzZWZ1bCBhcyB0aGUg
-b3RoZXIgQmx1ZXRvb3RoIG1vZHVsZQ0KcGFyYW1zLg0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFy
-Y2VsDQo+IA0KDQpSZWdhcmRzLA0KSWxpYQ0KDQo=
+Hi Ilia,
+
+> This param allows role switch request while accepting a new acl
+> connection. This is an enhancement to l2cap L2CAP_LM role switching
+> capability which allows requesting role switch without modification
+> to the application code. It was observed that operating as a master
+> of piconet (as oposed to scatternet config) is beneficial when
+> qos (flow_spec) guarantees are requested.
+
+<snip>
+ 
+>  module_param(enable_le, bool, 0444);
+>  MODULE_PARM_DESC(enable_le, "Enable LE support");
+> +module_param(force_acl_master, bool, 0644);
+> +MODULE_PARM_DESC(force_acl_master, "Always try to switch to master role on ACL link");
+
+using kernel module parameters is not an acceptable API/ABI for this.
+
+Regards
+
+Marcel
+
+
