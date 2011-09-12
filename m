@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKx=YWwA3y9LxG1yScByxXS2C9nhgjCpuXtkVVyMEmCjA@mail.gmail.com>
+In-Reply-To: <CAMOw1v4-Rik3EtFhf7Q-YP8Fu2+6TU0FjH4WkkGHqtyu4PBKpQ@mail.gmail.com>
 References: <1315826997-13818-1-git-send-email-luiz.dentz@gmail.com>
- <CAMOw1v6DkURj+MVoA99=E7Nihe3_97O5Dh2b+94WSnVM4Yixxg@mail.gmail.com> <CABBYNZKx=YWwA3y9LxG1yScByxXS2C9nhgjCpuXtkVVyMEmCjA@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 12 Sep 2011 11:49:25 -0300
-Message-ID: <CAMOw1v67cXYEWFYQznVR7Gj6zbKodOmQSOr5hZ=4XpXrkq6b_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] AVRCP: use a vtable to simplify PDU parsing/handling
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	<1315826997-13818-2-git-send-email-luiz.dentz@gmail.com>
+	<CAMOw1v4-Rik3EtFhf7Q-YP8Fu2+6TU0FjH4WkkGHqtyu4PBKpQ@mail.gmail.com>
+Date: Mon, 12 Sep 2011 17:48:53 +0300
+Message-ID: <CABBYNZ+j32ME=n2AmqWSfv7_2xnMGBe5FZewT0dQOCC3akOy1w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/5] AVRCP: rename avrcp_header to avc_header
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Sep 12, 2011 at 11:40 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
+Hi Lucas,
+
+On Mon, Sep 12, 2011 at 4:10 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>> -       int sk;
+>> +                                                       AVC_HEADER_LENGTH];
+>> +       int sk = g_io_channel_unix_get_fd(control->io);
 >
-> On Mon, Sep 12, 2011 at 4:25 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> It might be my CFLAGS, but aren't you getting warnings of unused
->> parameters since now every handler carries the transaction id?
+> You are re-introducing a bug here. Please see "dec26ee Fix fd usage
+> when not connected"
+
+Must have reintroduced it when I was rebasing it, gonna fix it.
+
 >
-> Nope and Im not sure why checking unused parameter would be a nice
-> thing to have, specially dummy callbacks normally ignores some/all the
-> parameters.
+>> +       struct avrcp_spec_avc_pdu *pdu = (void *) avc + AVC_HEADER_LENGTH;
 >
+> We might want to change this to:
+>
+> struct avrcp_spec_avc_pdu *pdu = (avrcp_spec_avc_pdu *)(avc +
+> AVC_HEADER_LENGTH);
+>
+> This way we kill some warnings on ARM: arithmetic with void pointer
 
-Right, I've just checked the file acinclude.m4 and BlueZ uses
-"-Wno-unused-parameter" in its CFLAGS.
+Don't remember seeing any problem with it, but anyway it is not
+something Im introducing.
 
-It's fine, then.
-
-
-Lucas De Marchi
+-- 
+Luiz Augusto von Dentz
