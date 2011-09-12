@@ -1,55 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ilia, Kolominsky" <iliak@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "ilia.kolominsky@gmail.com" <ilia.kolominsky@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Mon, 12 Sep 2011 17:12:46 +0200
-Subject: RE: [PATCH bluetooth-next] Added force_acl_master param for
- bluetooth module
-Message-ID: <AC090B9732AB2B4DB7FF476E907FE6600132269EFD@dnce02.ent.ti.com>
-References: <1315798377-3660-1-git-send-email-iliak@ti.com>
-	 <1315819740.1937.17.camel@aeonflux>
-	 <AC090B9732AB2B4DB7FF476E907FE66001321E6C14@dnce02.ent.ti.com>
- <1315836675.1937.20.camel@aeonflux>
-In-Reply-To: <1315836675.1937.20.camel@aeonflux>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 12 Sep 2011 18:05:01 +0300
+Message-ID: <CABBYNZJtK8bdzmUsviafYQbvfxhX=6AG5=Jm4Hj62L9_1Chbcg@mail.gmail.com>
+Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Stockwell <dstockwell@frequency-one.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNYXJjZWwgSG9sdG1hbm4gW21h
-aWx0bzptYXJjZWxAaG9sdG1hbm4ub3JnXQ0KPiBTZW50OiBNb25kYXksIFNlcHRlbWJlciAxMiwg
-MjAxMSA1OjExIFBNDQo+IFRvOiBJbGlhLCBLb2xvbWluc2t5DQo+IENjOiBpbGlhLmtvbG9taW5z
-a3lAZ21haWwuY29tOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6
-IFJFOiBbUEFUQ0ggYmx1ZXRvb3RoLW5leHRdIEFkZGVkIGZvcmNlX2FjbF9tYXN0ZXIgcGFyYW0g
-Zm9yDQo+IGJsdWV0b290aCBtb2R1bGUNCj4gDQo+IEhpIElsaWEsDQo+IA0KPiA+ID4gPiBUaGlz
-IHBhcmFtIGFsbG93cyByb2xlIHN3aXRjaCByZXF1ZXN0IHdoaWxlIGFjY2VwdGluZyBhIG5ldyBh
-Y2wNCj4gPiA+ID4gY29ubmVjdGlvbi4gVGhpcyBpcyBhbiBlbmhhbmNlbWVudCB0byBsMmNhcCBM
-MkNBUF9MTSByb2xlDQo+IHN3aXRjaGluZw0KPiA+ID4gPiBjYXBhYmlsaXR5IHdoaWNoIGFsbG93
-cyByZXF1ZXN0aW5nIHJvbGUgc3dpdGNoIHdpdGhvdXQNCj4gbW9kaWZpY2F0aW9uDQo+ID4gPiA+
-IHRvIHRoZSBhcHBsaWNhdGlvbiBjb2RlLiBJdCB3YXMgb2JzZXJ2ZWQgdGhhdCBvcGVyYXRpbmcg
-YXMgYQ0KPiBtYXN0ZXINCj4gPiA+ID4gb2YgcGljb25ldCAoYXMgb3Bvc2VkIHRvIHNjYXR0ZXJu
-ZXQgY29uZmlnKSBpcyBiZW5lZmljaWFsIHdoZW4NCj4gPiA+ID4gcW9zIChmbG93X3NwZWMpIGd1
-YXJhbnRlZXMgYXJlIHJlcXVlc3RlZC4NCj4gPiA+DQo+ID4gPiA8c25pcD4NCj4gPiA+DQo+ID4g
-PiA+ICBtb2R1bGVfcGFyYW0oZW5hYmxlX2xlLCBib29sLCAwNDQ0KTsNCj4gPiA+ID4gIE1PRFVM
-RV9QQVJNX0RFU0MoZW5hYmxlX2xlLCAiRW5hYmxlIExFIHN1cHBvcnQiKTsNCj4gPiA+ID4gK21v
-ZHVsZV9wYXJhbShmb3JjZV9hY2xfbWFzdGVyLCBib29sLCAwNjQ0KTsNCj4gPiA+ID4gK01PRFVM
-RV9QQVJNX0RFU0MoZm9yY2VfYWNsX21hc3RlciwgIkFsd2F5cyB0cnkgdG8gc3dpdGNoIHRvDQo+
-IG1hc3Rlcg0KPiA+ID4gcm9sZSBvbiBBQ0wgbGluayIpOw0KPiA+ID4NCj4gPiA+IHVzaW5nIGtl
-cm5lbCBtb2R1bGUgcGFyYW1ldGVycyBpcyBub3QgYW4gYWNjZXB0YWJsZSBBUEkvQUJJIGZvcg0K
-PiB0aGlzLg0KPiA+IEl0IGlzIG5vdCBBUEkvQUJJLCBpdCBpcyBhIHdheSB0byBjb25maWd1cmUg
-YSBzeXN0ZW0gd2l0aG91dA0KPiBtb2RpZnlpbmcNCj4gPiBhcHBsaWNhdGlvbiBjb2RlIGFuZCBp
-dOKAmXMgYXMgdXNlZnVsIGFzIHRoZSBvdGhlciBCbHVldG9vdGggbW9kdWxlDQo+ID4gcGFyYW1z
-Lg0KPiANCj4gbm8sIHdlIHVzZSBrZXJuZWwgcGFyYW1ldGVycyB0byBvbiBwdXJwb3NlIG5vdCBl
-bmFibGUgZmVhdHVyZXMgdGhhdA0KPiBoYXZlDQo+IG5vdCBwYXNzZWQgcXVhbGlmaWNhdGlvbiB5
-ZXQuIFdlIGRvIG5vdCB1c2UgaXQgZm9yIGdlbmVyYWwgcHVycG9zZQ0KPiBjb25maWd1cmF0aW9u
-Lg0KPiANCj4gQW5kIGJ0dy4gd2hhdCBpcyB3cm9uZyB3aXRoIHRoZSBzZXR0aW5nIGxtIHRvIG1h
-c3RlciB2aWEgaGNpY29uZmlnPw0KWW91IGFyZSByaWdodCwgSSBtaXNzZWQgdGhpcyBmdW5jdGlv
-bmFsaXR5Lg0KPiBUaGF0DQo+IHNhaWQsIEkgYW0gcHJldHR5IG11Y2ggYWdhaW5zdCBnZW5lcmFs
-IHB1cnBvc2Ugc2V0dGluZyB0aGF0IGFyZSBub3QNCj4gcmVhbGx5IGJvdW5kIHRvIGFueSBzcGVj
-aWZpYyBzZXJ2aWNlL3Byb2ZpbGUuIFRoZSBzdW0gb2YgcHJvZmlsZXMNCj4gc2hvdWxkDQo+IGRl
-ZmluZSBhIHByb3BlciBwb2xpY3kgYW5kIG5vdCBzb21lIG1hZ2ljIGdsb2JhbCBzZXR0aW5nLiBP
-dGhlcndpc2UgeW91DQo+IGVhc2lseSBydW4gaW50byBkZWFkLWxvY2sgc2NlbmFyaW9zLg0KSSBh
-bSBub3Qgc3VyZSBJIHVuZGVyc3RhbmQgdGhlIHJlbGF0aW9uIHRvIGRlYWRsb2NrcyBpbiB0aGlz
-IGNvbnRleHQsDQpidXQgc2luY2UgdGhpcyBmdW5jdGlvbmFsaXR5IGFscmVhZHkgZXhpc3RzIGlu
-IGhjaWNvbmZpZywgSSBndWVzcw0Kd2UgYXJlIGRvbmUgaGVyZS4NCj4gDQo+IFJlZ2FyZHMNCj4g
-DQo+IE1hcmNlbA0KPiANClJlZ2FyZHMsDQpJbGlhDQo=
+Hi Lucas,
+
+On Fri, Sep 9, 2011 at 2:32 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> Metadata field number 0x7 should be the track duration and not the
+> progress of the track playback. Thus rename it to a better description.
+> ---
+>  parser/avrcp.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/parser/avrcp.c b/parser/avrcp.c
+> index f8e4443..0b98a3e 100644
+> --- a/parser/avrcp.c
+> +++ b/parser/avrcp.c
+> @@ -166,7 +166,7 @@
+>  #define AVRCP_MEDIA_ATTRIBUTE_TRACK    0x4
+>  #define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x5
+>  #define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x6
+> -#define AVRCP_MEDIA_ATTRIBUTE_PROGRESS 0x7
+> +#define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x7
+>
+>  /* play status */
+>  #define AVRCP_PLAY_STATUS_STOPPED      0x00
+> @@ -909,8 +909,8 @@ static const char *mediattr2str(uint32_t attr)
+>                return "Track Total";
+>        case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+>                return "Genre";
+> -       case AVRCP_MEDIA_ATTRIBUTE_PROGRESS:
+> -               return "Progress";
+> +       case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+> +               return "Track duration";
+>        default:
+>                return "Reserved";
+>        }
+> --
+> 1.7.6.1
+
+Ack
+
+@David: Lets keep hcidump simple, if we start doing enums for
+everything in hcidump we would just introduce more code for almost
+nothing back for a tracing tool.
+
+-- 
+Luiz Augusto von Dentz
