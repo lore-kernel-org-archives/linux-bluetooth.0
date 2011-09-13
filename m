@@ -1,240 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] Fix parser of AVRCP continuing messages
-Date: Tue, 13 Sep 2011 11:21:25 -0300
-Message-Id: <1315923685-30574-1-git-send-email-lucas.demarchi@profusion.mobi>
+From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: GATT Dbus APIs Use.
+Date: Tue, 13 Sep 2011 11:21:58 +0000
+Message-ID: <F82830D409D80E4881C83250E051B74B47843B59@banasiexm01.ASIA.ROOT.PRI>
+References: <F82830D409D80E4881C83250E051B74B47842A44@banasiexm01.ASIA.ROOT.PRI>
+ <CAKT1EBcHZnwwhBO8RgjQEjyt4DSMCEZ7JWPf+B-Abf+05XsvCg@mail.gmail.com>
+In-Reply-To: <CAKT1EBcHZnwwhBO8RgjQEjyt4DSMCEZ7JWPf+B-Abf+05XsvCg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If packet_type is not START or SINGLE, we have to continue where we
-stopped from previous packet. Therefore we must store where we left on
-previous packet due to packet size limit. We store both the number of
-attributes missing and the lenght of the last attribute that is missing.
-
-An example interaction for this implementation, obtained with PTS test
-TC_TG_MDI_BV_04_C (I reduced the MTU in order to reproduce it here and
-values between brackets I added now):
-
-> AVCTP: Command : pt 0x00 transaction 2 pid 0x110e
-    AV/C: Status: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: GetElementAttributes: pt Single len 0x0009
-        Identifier: 0x0 (PLAYING)
-        AttributeCount: 0x00
-< AVCTP: Response : pt 0x00 transaction 2 pid 0x110e
-    AV/C: Stable: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: GetElementAttributes: pt Start len 0x0118
-        AttributeCount: 0x04
-        Attribute: 0x00000001 (Title)
-        CharsetID: 0x006a (UTF-8)
-        AttributeValueLength: 0x001b
-        AttributeValue: isso eh um titulo mei longo
-        Attribute: 0x00000003 (Album)
-        CharsetID: 0x006a (UTF-8)
-        AttributeValueLength: 0x00fe
-	AttributeValue: super-long-album-name super-long-album-name
-	super-long-album-name super-long-album-name super-long-album
-	super-long-album-name [... snip... ] super-long-album-name-1234
-> AVCTP: Command : pt 0x00 transaction 2 pid 0x110e
-    AV/C: Control: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: RequestContinuingResponse: pt Single len 0x0001
-< AVCTP: Response : pt 0x00 transaction 2 pid 0x110e
-    AV/C: Stable: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: GetElementAttributes: pt End len 0x002a
-        ContinuingAttributeValue: 678900000000000000
-        Attribute: 0x00000005 (Track Total)
-        CharsetID: 0x006a (UTF-8)
-        AttributeValueLength: 0x0002
-        AttributeValue: 30
-        Attribute: 0x00000006 (Genre)
-        CharsetID: 0x006a (UTF-8)
-        AttributeValueLength: 0x0006
-        AttributeValue: Gospel
----
- parser/avrcp.c |   94 +++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 files changed, 79 insertions(+), 15 deletions(-)
-
-diff --git a/parser/avrcp.c b/parser/avrcp.c
-index 0b98a3e..65d3bda 100644
---- a/parser/avrcp.c
-+++ b/parser/avrcp.c
-@@ -87,6 +87,12 @@
- #define AVC_PANEL_FORWARD		0x4b
- #define AVC_PANEL_BACKWARD		0x4c
- 
-+/* Packet types */
-+#define AVRCP_PACKET_TYPE_SINGLE	0x00
-+#define AVRCP_PACKET_TYPE_START		0x01
-+#define AVRCP_PACKET_TYPE_CONTINUING	0x02
-+#define AVRCP_PACKET_TYPE_END		0x03
-+
- /* pdu ids */
- #define AVRCP_GET_CAPABILITIES		0x10
- #define AVRCP_LIST_PLAYER_ATTRIBUTES	0x11
-@@ -176,6 +182,11 @@
- #define AVRCP_PLAY_STATUS_REV_SEEK	0x04
- #define AVRCP_PLAY_STATUS_ERROR		0xFF
- 
-+static struct avrcp_continuing {
-+	uint16_t num;
-+	uint16_t size;
-+} avrcp_continuing;
-+
- static const char *ctype2str(uint8_t ctype)
- {
- 	switch (ctype & 0x0f) {
-@@ -224,6 +235,22 @@ static const char *opcode2str(uint8_t opcode)
- 	}
- }
- 
-+static const char *pt2str(uint8_t pt)
-+{
-+	switch (pt) {
-+	case AVRCP_PACKET_TYPE_SINGLE:
-+		return "Single";
-+	case AVRCP_PACKET_TYPE_START:
-+		return "Start";
-+	case AVRCP_PACKET_TYPE_CONTINUING:
-+		return "Continuing";
-+	case AVRCP_PACKET_TYPE_END:
-+		return "End";
-+	default:
-+		return "Unknown";
-+	}
-+}
-+
- static const char *pdu2str(uint8_t pduid)
- {
- 	switch (pduid) {
-@@ -917,7 +944,8 @@ static const char *mediattr2str(uint32_t attr)
- }
- 
- static void avrcp_get_element_attributes_dump(int level, struct frame *frm,
--						uint8_t ctype, uint16_t len)
-+						uint8_t ctype, uint16_t len,
-+						uint8_t pt)
- {
- 	uint64_t id;
- 	uint8_t num;
-@@ -953,18 +981,45 @@ static void avrcp_get_element_attributes_dump(int level, struct frame *frm,
- 	return;
- 
- response:
--	if (len < 1) {
--		printf("PDU Malformed\n");
--		raw_dump(level, frm);
--		return;
--	}
-+	if (pt == AVRCP_PACKET_TYPE_SINGLE || pt == AVRCP_PACKET_TYPE_START) {
-+		if (len < 1) {
-+			printf("PDU Malformed\n");
-+			raw_dump(level, frm);
-+			return;
-+		}
- 
--	num = get_u8(frm);
--	printf("AttributeCount: 0x%02x\n", num);
-+		num = get_u8(frm);
-+		avrcp_continuing.num = num;
-+		printf("AttributeCount: 0x%02x\n", num);
-+		len--;
-+	} else {
-+		num = avrcp_continuing.num;
-+
-+		if (avrcp_continuing.size > 0) {
-+			uint16_t size;
-+
-+			if (avrcp_continuing.size > len) {
-+				size = len;
-+				avrcp_continuing.size -= len;
-+			} else {
-+				size = avrcp_continuing.size;
-+				avrcp_continuing.size = 0;
-+			}
-+
-+			printf("ContinuingAttributeValue: ");
-+			for (; size > 0; size--) {
-+				uint8_t c = get_u8(frm);
-+				printf("%1c", isprint(c) ? c : '.');
-+			}
-+			printf("\n");
- 
--	for (; num > 0; num--) {
-+			len -= size;
-+		}
-+	}
-+
-+	while (num > 0 && len > 0) {
- 		uint32_t attr;
--		uint16_t charset, len;
-+		uint16_t charset, attrlen;
- 
- 		p_indent(level, frm);
- 
-@@ -978,19 +1033,26 @@ response:
- 							charset2str(charset));
- 
- 		p_indent(level, frm);
-+		attrlen = get_u16(frm);
-+		printf("AttributeValueLength: 0x%04x\n", attrlen);
- 
--		len = get_u16(frm);
--		printf("AttributeValueLength: 0x%04x\n", len);
-+		len -= sizeof(attr) + sizeof(charset) + sizeof(attrlen);
-+		num--;
- 
- 		p_indent(level, frm);
- 
- 		printf("AttributeValue: ");
--		for (; len > 0; len--) {
-+		for (; attrlen > 0 && len > 0; attrlen--, len--) {
- 			uint8_t c = get_u8(frm);
- 			printf("%1c", isprint(c) ? c : '.');
- 		}
- 		printf("\n");
-+
-+		if (attrlen > 0)
-+			avrcp_continuing.size = attrlen;
- 	}
-+
-+	avrcp_continuing.num = num;
- }
- 
- static const char *playstatus2str(uint8_t status)
-@@ -1153,7 +1215,8 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 	pt = get_u8(frm);
- 	len = get_u16(frm);
- 
--	printf("AVRCP: %s: pt 0x%02x len 0x%04x\n", pdu2str(pduid), pt, len);
-+	printf("AVRCP: %s: pt %s len 0x%04x\n", pdu2str(pduid),
-+							pt2str(pt), len);
- 
- 	if (len != frm->len) {
- 		p_indent(level, frm);
-@@ -1198,7 +1261,8 @@ static void avrcp_pdu_dump(int level, struct frame *frm, uint8_t ctype)
- 		avrcp_ct_battery_status_dump(level + 1, frm, ctype, len);
- 		break;
- 	case AVRCP_GET_ELEMENT_ATTRIBUTES:
--		avrcp_get_element_attributes_dump(level + 1, frm, ctype, len);
-+		avrcp_get_element_attributes_dump(level + 1, frm, ctype, len,
-+									pt);
- 		break;
- 	case AVRCP_GET_PLAY_STATUS:
- 		avrcp_get_play_status_dump(level + 1, frm, ctype, len);
--- 
-1.7.6.1
-
+SGkgQ2xhdWRpbywNClRoYW5rcyBmb3IgeW91ciBpbnB1dHMuIEkgbmVlZGVk
+IGNvZGUgcmVmZXJlbmNlIHRvIG1vZHVsZXMgd2hpY2ggdXNlIHRoZSBhdHRy
+aWJ1dGUgZGJ1cyBtZXRob2RzKEV4YW1wbGU6IE1lbnRpb25lZCBiZWxvdykg
+cmF0aGVyIHRoYW4gZGlyZWN0bHkgdXNpbmcgR0FUVCBBUElzIChnYXR0X2Rp
+c2NvdmVyX2NoYXIoKSkuIA0KDQpFWEFNUExFOg0KSW50ZXJmYWNlCW9yZy5i
+bHVlei5DaGFyYWN0ZXJpc3RpYw0KDQotLSBkaWN0IEdldFByb3BlcnRpZXMo
+KQ0KLS0gYXJyYXl7b2JqZWN0fSBEaXNjb3ZlckNoYXJhY3RlcmlzdGljcygp
+DQoNClRoYW5rcywNClZpamF5DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
+LS0tDQpGcm9tOiBsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwu
+b3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVs
+Lm9yZ10gT24gQmVoYWxmIE9mIENsYXVkaW8gVGFrYWhhc2kNClNlbnQ6IFR1
+ZXNkYXksIEF1Z3VzdCAzMCwgMjAxMSA1OjQ0IFBNDQpUbzogVmlqYXlrdW1h
+ciBEYWRtb2RlDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
+Zw0KU3ViamVjdDogUmU6IEdBVFQgRGJ1cyBBUElzIFVzZS4NCg0KSGkgVmlq
+YXksDQoNCk9uIE1vbiwgQXVnIDI5LCAyMDExIGF0IDEwOjI5IEFNLCBWaWph
+eWt1bWFyIERhZG1vZGUNCjxWaWpheWt1bWFyLkRhZG1vZGVAY3NyLmNvbT4g
+d3JvdGU6DQo+IEhpLA0KPiBDb3VsZCB5b3UgcGxlYXNlIGxldCBtZSBrbm93
+IGlmIHRoZXJlIGFyZSBhbnkgbW9kdWxlcyB3aGljaCBtYWtlcyB1c2Ugb2Yg
+dGhlIEdBVFQgQ2xpZW50IERidXMgQVBJcyBhcyBtZW50aW9uZWQgaW4gL2Rv
+Yy9hdHRyaWJ1dGUtYXBpLnR4dC4NCj4NCj4gSSBhbSBoYXBweSB0byBoYXZl
+IHNvbWUgY29kZSByZWZlcmVuY2VzIGZvciB0aGUgc2FtZS4NCj4NCj4gVGhh
+bmtzLA0KPiBWaWpheQ0KDQpGaXJzdCBvZiBhbGwgeW91IHdpbGwgbmVlZCBh
+IGtlcm5lbCB3aXRoIFNNIGFuZCBJbnRlcmxlYXZlZCBkaXNjb3ZlcnkNCnBh
+dGNoZXMuIEkgc2VudCBhbiBlLW1haWwgc29tZSB3ZWVrcyBhZ28gd2l0aCBy
+ZXBvc2l0b3J5IHJlZmVyZW5jZXMNCmFuZCBkZXZlbG9wbWVudCBzdGF0dXMs
+IHNlYXJjaCBmb3IgIlJlOiBDdXJyZW50IHN0YXR1cyBvbiBCTEUNCmRldmVs
+b3BtZW50DQoiIGluIHRoZSBNTC4NCg0KR2VuZXJpYyBBUEkoYXR0cmlidXRl
+LWFwaS50eHQpIGlzIHdvcmtpbmcsIHVzZSBkLWZlZXQgb3IgdGVzdC1hdHRy
+aWINCnRvIHRlc3QgdGhlIGF0dHJpYnV0ZSBBUEkuIEJMRSBhbmQgQlIvRURS
+IHVzZSB0aGUgc2FtZSBtZXRob2RzIHRvDQpkaXNjb3ZlciBhbmQgImNyZWF0
+ZSIgZGV2aWNlcywgY2FsbCBTdGFydERpc2NvdmVyeSgpIGZvbGxvd2VkIGJ5
+DQpDcmVhdGVEZXZpY2UoKSBvciBDcmVhdGVQYWlyZWREZXZpY2UoKSB0byAi
+Y3JlYXRlIiB0aGUgZGV2aWNlICJvYmplY3QiDQp0aGF0IHlvdSB3YW5uYSBy
+ZWFkIGF0dHJpYnV0ZXMuDQoNCkdlbmVyaWMgQVBJIG5lZWRzIHNvbWUgZXh0
+cmEgZWZmb3J0IHRvIGZpeCBzb21lIGtub3duIGlzc3VlcywgYnV0IGluDQpn
+ZW5lcmFsIGlzIGZ1bmN0aW9uYWwuIExldCBtZSBrbm93IGlmIHlvdSB3YW5u
+YSB0ZXN0KGZvcmNlKSBvdmVyDQpCUi9FRFIsIEkgaGF2ZSBhIHNtYWxsIHBh
+dGNoIHRoYXQgYWxsb3dzIGl0Lg0KDQpCUiwNCkNsYXVkaW8NCi0tDQpUbyB1
+bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5z
+dWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJvZHkgb2YgYSBt
+ZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFq
+b3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jk
+b21vLWluZm8uaHRtbA0KDQoNCiBUbyByZXBvcnQgdGhpcyBlbWFpbCBhcyBz
+cGFtIGNsaWNrIGh0dHBzOi8vd3d3Lm1haWxjb250cm9sLmNvbS9zci93UXcw
+em1qUG9IZEpUWkd5T0NycmhnPT0gLg0KCgpNZW1iZXIgb2YgdGhlIENTUiBw
+bGMgZ3JvdXAgb2YgY29tcGFuaWVzLiBDU1IgcGxjIHJlZ2lzdGVyZWQgaW4g
+RW5nbGFuZCBhbmQgV2FsZXMsIHJlZ2lzdGVyZWQgbnVtYmVyIDQxODczNDYs
+IHJlZ2lzdGVyZWQgb2ZmaWNlIENodXJjaGlsbCBIb3VzZSwgQ2FtYnJpZGdl
+IEJ1c2luZXNzIFBhcmssIENvd2xleSBSb2FkLCBDYW1icmlkZ2UsIENCNCAw
+V1osIFVuaXRlZCBLaW5nZG9tCk1vcmUgaW5mb3JtYXRpb24gY2FuIGJlIGZv
+dW5kIGF0IHd3dy5jc3IuY29tLiBGb2xsb3cgQ1NSIG9uIFR3aXR0ZXIgYXQg
+aHR0cDovL3R3aXR0ZXIuY29tL0NTUl9QTEMgYW5kIHJlYWQgb3VyIGJsb2cg
+YXQgd3d3LmNzci5jb20vYmxvZwo=
