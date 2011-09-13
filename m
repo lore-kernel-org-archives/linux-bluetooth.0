@@ -1,43 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Sep 2011 17:17:24 -0300
+Date: Tue, 13 Sep 2011 16:55:00 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 3/7] Bluetooth: EFS: add disable_flowspec kernel param
-Message-ID: <20110913201724.GE16856@joana>
-References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1314875256-6904-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC v2 2/4] Bluetooth: Expose hci connections through debugfs
+Message-ID: <20110913195500.GD16856@joana>
+References: <1315007500.2495.3.camel@THOR>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314875256-6904-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1315007500.2495.3.camel@THOR>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Peter,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-01 14:07:32 +0300]:
+* Peter Hurley <peter@hurleysoftware.com> [2011-09-02 19:51:40 -0400]:
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Add "connections" file to "hciX" debugfs directory and output
+> hci_conn internal state.
 > 
-> Make extended flowspec option kernel parameter. Disabled by default.
+> Example file contents:
+>                           s            a     p
+>                   h   t   t  o  s  k   u  s  s  p  r
+>                   n   y   a  u  s  e   t  e  e  i  e
+> Dest              l   p   t  t  p  y   h  c  c  n  f
+
+I prefer if you do like this:
+
+Dest		    handle type stat out ssp ...
+
+everything on the same line.
+
+> BC:0D:A5:7A:F5:96 14  ACL 1  1  1 0xff 0  1  0  0  1
+> 00:0D:FD:1E:99:30 13  ACL 1  0  0 0xff 4  2  2  0  1
+> 00:07:61:B2:3E:97 12  ACL 1  0  0 0xff 4  0  0  0  2
+> 00:07:61:76:D8:1B 11  ACL 1  0  0 0xff 4  1  0  0  2
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 > ---
->  net/bluetooth/l2cap_core.c |    7 +++++++
->  1 files changed, 7 insertions(+), 0 deletions(-)
 > 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index be30c32..4167cb0 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -57,6 +57,7 @@
->  #include <net/bluetooth/smp.h>
+> v2: Add example output to commit msg
+> 
+>  net/bluetooth/hci_sysfs.c |   46 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 46 insertions(+), 0 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 22f1a6c..3d00769 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -542,6 +542,49 @@ static int auto_accept_delay_get(void *data, u64 *val)
+>  DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+>  					auto_accept_delay_set, "%llu\n");
 >  
->  int disable_ertm;
-> +int disable_flowspec = 1;
+> +static int connections_show(struct seq_file *f, void *p)
+> +{
+> +	struct hci_dev *hdev = f->private;
+> +	struct hci_conn_hash *h = &hdev->conn_hash;
+> +	struct list_head *l;
+> +	
+> +	hci_dev_lock_bh(hdev);
+> +
+> +	seq_printf(f, "                          s            a     p\n");
+> +	seq_printf(f, "                  h   t   t  o  s  k   u  s  s  p  r\n");
+> +	seq_printf(f, "                  n   y   a  u  s  e   t  e  e  i  e\n");
+> +	seq_printf(f, "Dest              l   p   t  t  p  y   h  c  c  n  f\n");
+> +
+> +	list_for_each(l, &h->list) {
+> +		struct hci_conn *c;
+> +		c = list_entry(l, struct hci_conn, list);
+> +
+> +		seq_printf(f, "%s %-3d %3s %d  %d  %d 0x%.2x %d  %d  %d %2d  %d\n",
+> +				batostr(&c->dst), c->handle, 
+> +				link_typetostr(c->type),
+> +				c->state, c->out, c->ssp_mode,
+> +				c->key_type, c->auth_type, c->sec_level,
+> +				c->pending_sec_level, c->pin_length,
+> +				atomic_read(&c->devref));
+> +	}
+> +
+> +	hci_dev_unlock_bh(hdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static int connections_open(struct inode *inode, struct file *file)
+> +{
+> +	return single_open(file, connections_show, inode->i_private);
+> +}
+> +
+> +static const struct file_operations connections_fops = {
+> +	.open		= connections_open,
+> +	.read		= seq_read,
+> +	.llseek		= seq_lseek,
+> +	.release	= single_release,
+> +};
+> +
+>  int hci_register_sysfs(struct hci_dev *hdev)
+>  {
+>  	struct device *dev = &hdev->dev;
+> @@ -578,6 +621,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
+>  
+>  	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
+>  						&auto_accept_delay_fops);
+> +
+> +	debugfs_create_file("connections", 0444, hdev->debugfs, hdev,
+> +						&connections_fops);
+>  	return 0;
+>  }
 
-I'm not sure if we need one parameter for each feature, I think a
-disable_hs (for high speed) could work. This is only to keep the code upstream
-while it is not qualified.
+otherwise looks good.
 
 	Gustavo
