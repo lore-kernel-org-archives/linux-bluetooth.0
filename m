@@ -1,37 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Sep 2011 18:38:35 -0300
+Date: Tue, 13 Sep 2011 17:32:03 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Bluetooth: Move SMP crypto functions to a
- workqueue
-Message-ID: <20110913213835.GG16856@joana>
-References: <1315243891-21875-1-git-send-email-vinicius.gomes@openbossa.org>
- <1315243891-21875-3-git-send-email-vinicius.gomes@openbossa.org>
+Subject: Re: [RFCv2 4/7] Bluetooth: parse EFS in l2cap config request
+Message-ID: <20110913203203.GF16856@joana>
+References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1314875256-6904-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1315243891-21875-3-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1314875256-6904-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Andrei,
 
-* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-09-05 14:31:31 -0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-01 14:07:33 +0300]:
 
-> The function crypto_blkcipher_setkey() called by smp_e()
-> can sleep, so all the crypto work has to be moved to
-> hci_dev workqueue.
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> Add parsing extended flowspec option in L2cap config request
+> Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> (sent Sun, 22 Aug 2010)
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/smp.h |    9 ++-
->  net/bluetooth/l2cap_core.c  |    2 +-
->  net/bluetooth/smp.c         |  277 +++++++++++++++++++++++++++----------------
->  3 files changed, 185 insertions(+), 103 deletions(-)
+>  net/bluetooth/l2cap_core.c |   70 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 68 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 4167cb0..b7f36da 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -338,6 +338,14 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+>  		chan->omtu = L2CAP_DEFAULT_MTU;
+>  	}
+>  
+> +	if (!disable_flowspec) {
 
-
-These two patches have been applied. Thanks.
-
-btw, my tree is now hosted at https://github.com/padovan/bluetooth-next
+We don't need this check, it doesn't hurt set these param wihout flowspec
+enabled.
 
 	Gustavo
