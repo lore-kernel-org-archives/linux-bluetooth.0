@@ -1,113 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Sep 2011 16:55:00 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC v2 2/4] Bluetooth: Expose hci connections through debugfs
-Message-ID: <20110913195500.GD16856@joana>
-References: <1315007500.2495.3.camel@THOR>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1315007500.2495.3.camel@THOR>
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: "Gustavo F. Padovan" <padovan@profusion.mobi>
+Subject: [PATCH 2/2] serial: add Serial.ConnectFD()
+Date: Tue, 13 Sep 2011 15:16:05 -0300
+Message-Id: <1315937765-32168-2-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1315937765-32168-1-git-send-email-padovan@profusion.mobi>
+References: <1315937765-32168-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+From: "Gustavo F. Padovan" <padovan@profusion.mobi>
 
-* Peter Hurley <peter@hurleysoftware.com> [2011-09-02 19:51:40 -0400]:
+It's similar to Serial.Connect() but returns the actual RFCOMM file
+descriptor instead of creating a device in /dev
+---
+ doc/serial-api.txt |   16 ++++++++++++++++
+ serial/port.c      |   25 ++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 1 deletions(-)
 
-> Add "connections" file to "hciX" debugfs directory and output
-> hci_conn internal state.
-> 
-> Example file contents:
->                           s            a     p
->                   h   t   t  o  s  k   u  s  s  p  r
->                   n   y   a  u  s  e   t  e  e  i  e
-> Dest              l   p   t  t  p  y   h  c  c  n  f
+diff --git a/doc/serial-api.txt b/doc/serial-api.txt
+index 5f9bd5f..98b0ad4 100644
+--- a/doc/serial-api.txt
++++ b/doc/serial-api.txt
+@@ -26,6 +26,22 @@ Methods		string Connect(string pattern)
+ 					 org.bluez.Error.ConnectionAttemptFailed
+ 					 org.bluez.Error.NotSupported
+ 
++Methods		fd ConnectFD(string pattern) [experimental]
++
++			Connects to a specific RFCOMM based service on a
++			remote device and returns a file descriptor to talk
++			 with this device.
++
++			Possible patterns: UUID 128 bit as string
++					   Profile short names, e.g: spp, dun
++					   RFCOMM channel as string, 1-30
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.InProgress
++					 org.bluez.Error.ConnectionAttemptFailed
++					 org.bluez.Error.NotSupported
++
++
+ 		void Disconnect(string device)
+ 
+ 			Disconnect a RFCOMM TTY device that has been
+diff --git a/serial/port.c b/serial/port.c
+index a931ebd..7f5fce1 100644
+--- a/serial/port.c
++++ b/serial/port.c
+@@ -63,6 +63,10 @@
+ #define MAX_OPEN_TRIES		5
+ #define OPEN_WAIT		300	/* ms. udev node creation retry wait */
+ 
++#ifndef DBUS_TYPE_UNIX_FD
++#define DBUS_TYPE_UNIX_FD -1
++#endif
++
+ struct serial_device {
+ 	DBusConnection	*conn;		/* for name listener handling */
+ 	bdaddr_t	src;		/* Source (local) address */
+@@ -318,6 +322,21 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
+ 		goto fail;
+ 	}
+ 
++	sk = g_io_channel_unix_get_fd(chan);
++
++	if (dbus_message_has_member(port->msg, "ConnectFD")) {
++		reply = g_dbus_create_reply(port->msg, DBUS_TYPE_UNIX_FD, &sk,
++							DBUS_TYPE_INVALID);
++		g_dbus_send_message(device->conn, reply);
++
++		close(sk);
++
++		g_dbus_remove_watch(device->conn, port->listener_id);
++		port->listener_id = 0;
++
++		return;
++	}
++
+ 	memset(&req, 0, sizeof(req));
+ 	req.dev_id = -1;
+ 	req.flags = (1 << RFCOMM_REUSE_DLC);
+@@ -328,7 +347,6 @@ static void rfcomm_connect_cb(GIOChannel *chan, GError *conn_err,
+ 	g_io_channel_unref(port->io);
+ 	port->io = NULL;
+ 
+-	sk = g_io_channel_unix_get_fd(chan);
+ 	port->id = ioctl(sk, RFCOMMCREATEDEV, &req);
+ 	if (port->id < 0) {
+ 		int err = -errno;
+@@ -474,6 +492,9 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 	const char *pattern;
+ 	int err;
+ 
++	if (dbus_message_has_member(msg, "ConnectFD") && DBUS_TYPE_UNIX_FD < 0)
++		return btd_error_not_supported(msg);
++
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return NULL;
+@@ -497,6 +518,7 @@ static DBusMessage *port_connect(DBusConnection *conn,
+ 						dbus_message_get_sender(msg),
+ 						port_owner_exited, port,
+ 						NULL);
++
+ 	port->msg = dbus_message_ref(msg);
+ 
+ 	err = connect_port(port);
+@@ -544,6 +566,7 @@ static DBusMessage *port_disconnect(DBusConnection *conn,
+ 
+ static GDBusMethodTable port_methods[] = {
+ 	{ "Connect",    "s", "s", port_connect, G_DBUS_METHOD_FLAG_ASYNC },
++	{ "ConnectFD",    "s", "h", port_connect, G_DBUS_METHOD_FLAG_ASYNC },
+ 	{ "Disconnect", "s", "",  port_disconnect },
+ 	{ }
+ };
+-- 
+1.7.6.2
 
-I prefer if you do like this:
-
-Dest		    handle type stat out ssp ...
-
-everything on the same line.
-
-> BC:0D:A5:7A:F5:96 14  ACL 1  1  1 0xff 0  1  0  0  1
-> 00:0D:FD:1E:99:30 13  ACL 1  0  0 0xff 4  2  2  0  1
-> 00:07:61:B2:3E:97 12  ACL 1  0  0 0xff 4  0  0  0  2
-> 00:07:61:76:D8:1B 11  ACL 1  0  0 0xff 4  1  0  0  2
-> 
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
-> ---
-> 
-> v2: Add example output to commit msg
-> 
->  net/bluetooth/hci_sysfs.c |   46 +++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 46 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 22f1a6c..3d00769 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -542,6 +542,49 @@ static int auto_accept_delay_get(void *data, u64 *val)
->  DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
->  					auto_accept_delay_set, "%llu\n");
->  
-> +static int connections_show(struct seq_file *f, void *p)
-> +{
-> +	struct hci_dev *hdev = f->private;
-> +	struct hci_conn_hash *h = &hdev->conn_hash;
-> +	struct list_head *l;
-> +	
-> +	hci_dev_lock_bh(hdev);
-> +
-> +	seq_printf(f, "                          s            a     p\n");
-> +	seq_printf(f, "                  h   t   t  o  s  k   u  s  s  p  r\n");
-> +	seq_printf(f, "                  n   y   a  u  s  e   t  e  e  i  e\n");
-> +	seq_printf(f, "Dest              l   p   t  t  p  y   h  c  c  n  f\n");
-> +
-> +	list_for_each(l, &h->list) {
-> +		struct hci_conn *c;
-> +		c = list_entry(l, struct hci_conn, list);
-> +
-> +		seq_printf(f, "%s %-3d %3s %d  %d  %d 0x%.2x %d  %d  %d %2d  %d\n",
-> +				batostr(&c->dst), c->handle, 
-> +				link_typetostr(c->type),
-> +				c->state, c->out, c->ssp_mode,
-> +				c->key_type, c->auth_type, c->sec_level,
-> +				c->pending_sec_level, c->pin_length,
-> +				atomic_read(&c->devref));
-> +	}
-> +
-> +	hci_dev_unlock_bh(hdev);
-> +
-> +	return 0;
-> +}
-> +
-> +static int connections_open(struct inode *inode, struct file *file)
-> +{
-> +	return single_open(file, connections_show, inode->i_private);
-> +}
-> +
-> +static const struct file_operations connections_fops = {
-> +	.open		= connections_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= single_release,
-> +};
-> +
->  int hci_register_sysfs(struct hci_dev *hdev)
->  {
->  	struct device *dev = &hdev->dev;
-> @@ -578,6 +621,9 @@ int hci_register_sysfs(struct hci_dev *hdev)
->  
->  	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
->  						&auto_accept_delay_fops);
-> +
-> +	debugfs_create_file("connections", 0444, hdev->debugfs, hdev,
-> +						&connections_fops);
->  	return 0;
->  }
-
-otherwise looks good.
-
-	Gustavo
