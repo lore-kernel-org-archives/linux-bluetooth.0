@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Sep 2011 20:43:52 -0300
+Date: Tue, 13 Sep 2011 18:38:35 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Pieter-Augustijn Van Malleghem <p-a@scarlet.be>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Add MacBookAir4,1 support
-Message-ID: <20110913234352.GH16856@joana>
-References: <20110907062810.GA4755@Caligula>
+Subject: Re: [PATCH v2 2/2] Bluetooth: Move SMP crypto functions to a
+ workqueue
+Message-ID: <20110913213835.GG16856@joana>
+References: <1315243891-21875-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1315243891-21875-3-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110907062810.GA4755@Caligula>
+In-Reply-To: <1315243891-21875-3-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pieter-Augustijn,
+Hi Vinicius,
 
-* Pieter-Augustijn Van Malleghem <p-a@scarlet.be> [2011-09-07 02:28:10 -0400]:
+* Vinicius Costa Gomes <vinicius.gomes@openbossa.org> [2011-09-05 14:31:31 -0300]:
 
-> This patch against current git adds the hardware ID for the Apple 
-> MacBookAir4,1, released in July 2011. The device features a BCM2046 
-> USB chip. The patch was inspired by the previous modifications adding 
-> support for the MacBookAir3,x. 
+> The function crypto_blkcipher_setkey() called by smp_e()
+> can sleep, so all the crypto work has to be moved to
+> hci_dev workqueue.
 > 
-> Signed-off-by: Pieter-Augustijn Van Malleghem <p-a@scarlet.be>
-> --- linux/drivers/bluetooth/btusb.c	2011-09-06 23:41:57.000000000 -0400
-> +++ patched/drivers/bluetooth/btusb.c	2011-09-06 23:50:27.000000000 -0400
-> @@ -72,6 +72,9 @@
->  	/* Apple MacBookAir3,1, MacBookAir3,2 */
->  	{ USB_DEVICE(0x05ac, 0x821b) },
->  
-> +	/* Apple MacBookAir4,1 */
-> +	{ USB_DEVICE(0x05ac, 0x821f) },
-> +
->  	/* Apple MacBookPro8,2 */
->  	{ USB_DEVICE(0x05ac, 0x821a) },
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+> ---
+>  include/net/bluetooth/smp.h |    9 ++-
+>  net/bluetooth/l2cap_core.c  |    2 +-
+>  net/bluetooth/smp.c         |  277 +++++++++++++++++++++++++++----------------
+>  3 files changed, 185 insertions(+), 103 deletions(-)
 
-Patch has been applied, thanks.
+
+These two patches have been applied. Thanks.
+
+btw, my tree is now hosted at https://github.com/padovan/bluetooth-next
 
 	Gustavo
