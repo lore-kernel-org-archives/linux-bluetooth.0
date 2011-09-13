@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Name resolution for mgmt interface
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Antti Julku <antti.julku@nokia.com>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 13 Sep 2011 10:48:30 +0200
-In-Reply-To: <4E6EFAAF.3050505@nokia.com>
-References: <4E6A247C.5040403@nokia.com>
-		 <CAKT1EBdGAyxBh_aeTjPAhOeU2vHSsjbpgi91=vG8HqLv8aV0Yw@mail.gmail.com>
-		 <1315635815.1937.4.camel@aeonflux>
-		 <CAKT1EBc4z+rvgqKr1SuE_iYvBMqhLJ=E5AW6k5cq65nqa9EW=A@mail.gmail.com>
-	 <1315854441.1937.28.camel@aeonflux> <4E6EFAAF.3050505@nokia.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1315903712.1937.30.camel@aeonflux>
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd] client: fix possible crash on GetFile
+Date: Tue, 13 Sep 2011 11:11:16 +0300
+Message-Id: <1315901476-31728-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antti,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> > I honestly don't know which one is easier. We also have to keep the
-> > memory constraints in mind. So for how many BD_ADDR does the kernel
-> > needs to store the flag name resolved already yes/no? With system that
-> > are running for years, this can get pretty big.
-> >
-> > My current take on this (which is not final) is that after inquiry
-> > complete, the kernel needs to ask userspace to confirm which names to
-> > resolve. It is an action triggered by the kernel and userspace just
-> > responds with the result to. So the kernel has full control here.
-> >
-> 
-> Can we assume that user space will always reply? Or how long should 
-> kernel wait for confirmation from user space, before ending discovery 
-> procedure and sending Discovering=0 event?
+Invalid read of size 8
+   at 0x413DA1: get_file_callback (ftp.c:184)
+   by 0x40A74E: transfer_complete (gobex-transfer.c:73)
+   by 0x40AB91: transfer_response (gobex-transfer.c:172)
+   by 0x40847A: handle_response (gobex.c:629)
+   by 0x408C06: incoming_data (gobex.c:811)
+   by 0x3E01043DBC: g_main_context_dispatch (in /lib64/libglib-2.0.so.0.2910.0)
+   by 0x3E010445A7: ??? (in /lib64/libglib-2.0.so.0.2910.0)
+   by 0x3E01044AF4: g_main_loop_run (in /lib64/libglib-2.0.so.0.2910.0)
+   by 0x404CD4: main (main.c:102)
+ Address 0x8 is not stack'd, malloc'd or (recently) free'd
+---
+ client/ftp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-the kernel should know if there is an open mgmt socket or not. If there
-is not, then we should not bother asking userspace. If there is then we
-have to have a timeout associated with each request. However such a
-timeout is needed by requests asking for the link key or pin code
-anyway. So that should be a generic handling in the first place.
-
-Regards
-
-Marcel
-
+diff --git a/client/ftp.c b/client/ftp.c
+index 2d1a87c..336fc26 100644
+--- a/client/ftp.c
++++ b/client/ftp.c
+@@ -305,7 +305,7 @@ static DBusMessage *get_file(DBusConnection *connection,
+ 				"org.openobex.Error.InvalidArguments", NULL);
+ 
+ 	if (obc_session_get(session, NULL, source_file,
+-			target_file, NULL, 0, get_file_callback, NULL) < 0)
++			target_file, NULL, 0, get_file_callback, ftp) < 0)
+ 		return g_dbus_create_error(message,
+ 				"org.openobex.Error.Failed",
+ 				"Failed");
+-- 
+1.7.6.1
 
