@@ -1,68 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: GATT Dbus APIs Use.
-Date: Tue, 13 Sep 2011 11:21:58 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B47843B59@banasiexm01.ASIA.ROOT.PRI>
-References: <F82830D409D80E4881C83250E051B74B47842A44@banasiexm01.ASIA.ROOT.PRI>
- <CAKT1EBcHZnwwhBO8RgjQEjyt4DSMCEZ7JWPf+B-Abf+05XsvCg@mail.gmail.com>
-In-Reply-To: <CAKT1EBcHZnwwhBO8RgjQEjyt4DSMCEZ7JWPf+B-Abf+05XsvCg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <4E6A0ED1.5050802@gmail.com>
+References: <4E6A0ED1.5050802@gmail.com>
+From: Alexander Skwar <alexanders.mailinglists+nospam@gmail.com>
+Date: Tue, 13 Sep 2011 12:31:47 +0200
+Message-ID: <CADn-QaMAK7eZKWcr4ZJS3hvwkHQbYUBMpCMi-5jE3AH1k4TE-Q@mail.gmail.com>
+Subject: Re: Audio output (a2dp) is skipping a lot
+To: linux-bluetooth Mailingliste <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywNClRoYW5rcyBmb3IgeW91ciBpbnB1dHMuIEkgbmVlZGVk
-IGNvZGUgcmVmZXJlbmNlIHRvIG1vZHVsZXMgd2hpY2ggdXNlIHRoZSBhdHRy
-aWJ1dGUgZGJ1cyBtZXRob2RzKEV4YW1wbGU6IE1lbnRpb25lZCBiZWxvdykg
-cmF0aGVyIHRoYW4gZGlyZWN0bHkgdXNpbmcgR0FUVCBBUElzIChnYXR0X2Rp
-c2NvdmVyX2NoYXIoKSkuIA0KDQpFWEFNUExFOg0KSW50ZXJmYWNlCW9yZy5i
-bHVlei5DaGFyYWN0ZXJpc3RpYw0KDQotLSBkaWN0IEdldFByb3BlcnRpZXMo
-KQ0KLS0gYXJyYXl7b2JqZWN0fSBEaXNjb3ZlckNoYXJhY3RlcmlzdGljcygp
-DQoNClRoYW5rcywNClZpamF5DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwu
-b3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVs
-Lm9yZ10gT24gQmVoYWxmIE9mIENsYXVkaW8gVGFrYWhhc2kNClNlbnQ6IFR1
-ZXNkYXksIEF1Z3VzdCAzMCwgMjAxMSA1OjQ0IFBNDQpUbzogVmlqYXlrdW1h
-ciBEYWRtb2RlDQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9y
-Zw0KU3ViamVjdDogUmU6IEdBVFQgRGJ1cyBBUElzIFVzZS4NCg0KSGkgVmlq
-YXksDQoNCk9uIE1vbiwgQXVnIDI5LCAyMDExIGF0IDEwOjI5IEFNLCBWaWph
-eWt1bWFyIERhZG1vZGUNCjxWaWpheWt1bWFyLkRhZG1vZGVAY3NyLmNvbT4g
-d3JvdGU6DQo+IEhpLA0KPiBDb3VsZCB5b3UgcGxlYXNlIGxldCBtZSBrbm93
-IGlmIHRoZXJlIGFyZSBhbnkgbW9kdWxlcyB3aGljaCBtYWtlcyB1c2Ugb2Yg
-dGhlIEdBVFQgQ2xpZW50IERidXMgQVBJcyBhcyBtZW50aW9uZWQgaW4gL2Rv
-Yy9hdHRyaWJ1dGUtYXBpLnR4dC4NCj4NCj4gSSBhbSBoYXBweSB0byBoYXZl
-IHNvbWUgY29kZSByZWZlcmVuY2VzIGZvciB0aGUgc2FtZS4NCj4NCj4gVGhh
-bmtzLA0KPiBWaWpheQ0KDQpGaXJzdCBvZiBhbGwgeW91IHdpbGwgbmVlZCBh
-IGtlcm5lbCB3aXRoIFNNIGFuZCBJbnRlcmxlYXZlZCBkaXNjb3ZlcnkNCnBh
-dGNoZXMuIEkgc2VudCBhbiBlLW1haWwgc29tZSB3ZWVrcyBhZ28gd2l0aCBy
-ZXBvc2l0b3J5IHJlZmVyZW5jZXMNCmFuZCBkZXZlbG9wbWVudCBzdGF0dXMs
-IHNlYXJjaCBmb3IgIlJlOiBDdXJyZW50IHN0YXR1cyBvbiBCTEUNCmRldmVs
-b3BtZW50DQoiIGluIHRoZSBNTC4NCg0KR2VuZXJpYyBBUEkoYXR0cmlidXRl
-LWFwaS50eHQpIGlzIHdvcmtpbmcsIHVzZSBkLWZlZXQgb3IgdGVzdC1hdHRy
-aWINCnRvIHRlc3QgdGhlIGF0dHJpYnV0ZSBBUEkuIEJMRSBhbmQgQlIvRURS
-IHVzZSB0aGUgc2FtZSBtZXRob2RzIHRvDQpkaXNjb3ZlciBhbmQgImNyZWF0
-ZSIgZGV2aWNlcywgY2FsbCBTdGFydERpc2NvdmVyeSgpIGZvbGxvd2VkIGJ5
-DQpDcmVhdGVEZXZpY2UoKSBvciBDcmVhdGVQYWlyZWREZXZpY2UoKSB0byAi
-Y3JlYXRlIiB0aGUgZGV2aWNlICJvYmplY3QiDQp0aGF0IHlvdSB3YW5uYSBy
-ZWFkIGF0dHJpYnV0ZXMuDQoNCkdlbmVyaWMgQVBJIG5lZWRzIHNvbWUgZXh0
-cmEgZWZmb3J0IHRvIGZpeCBzb21lIGtub3duIGlzc3VlcywgYnV0IGluDQpn
-ZW5lcmFsIGlzIGZ1bmN0aW9uYWwuIExldCBtZSBrbm93IGlmIHlvdSB3YW5u
-YSB0ZXN0KGZvcmNlKSBvdmVyDQpCUi9FRFIsIEkgaGF2ZSBhIHNtYWxsIHBh
-dGNoIHRoYXQgYWxsb3dzIGl0Lg0KDQpCUiwNCkNsYXVkaW8NCi0tDQpUbyB1
-bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5z
-dWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJvZHkgb2YgYSBt
-ZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFq
-b3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jk
-b21vLWluZm8uaHRtbA0KDQoNCiBUbyByZXBvcnQgdGhpcyBlbWFpbCBhcyBz
-cGFtIGNsaWNrIGh0dHBzOi8vd3d3Lm1haWxjb250cm9sLmNvbS9zci93UXcw
-em1qUG9IZEpUWkd5T0NycmhnPT0gLg0KCgpNZW1iZXIgb2YgdGhlIENTUiBw
-bGMgZ3JvdXAgb2YgY29tcGFuaWVzLiBDU1IgcGxjIHJlZ2lzdGVyZWQgaW4g
-RW5nbGFuZCBhbmQgV2FsZXMsIHJlZ2lzdGVyZWQgbnVtYmVyIDQxODczNDYs
-IHJlZ2lzdGVyZWQgb2ZmaWNlIENodXJjaGlsbCBIb3VzZSwgQ2FtYnJpZGdl
-IEJ1c2luZXNzIFBhcmssIENvd2xleSBSb2FkLCBDYW1icmlkZ2UsIENCNCAw
-V1osIFVuaXRlZCBLaW5nZG9tCk1vcmUgaW5mb3JtYXRpb24gY2FuIGJlIGZv
-dW5kIGF0IHd3dy5jc3IuY29tLiBGb2xsb3cgQ1NSIG9uIFR3aXR0ZXIgYXQg
-aHR0cDovL3R3aXR0ZXIuY29tL0NTUl9QTEMgYW5kIHJlYWQgb3VyIGJsb2cg
-YXQgd3d3LmNzci5jb20vYmxvZwo=
+Hello again.
+
+
+On Fri, Sep 9, 2011 at 15:04, Alexander Skwar
+<alexanders.mailinglists+nospam@gmail.com> wrote:
+> Hi.
+>
+>
+> I've got an Arctic P311 bluetooth headset[1] and on my PC, I'm using
+> a Hama Nano-Bluetooth-USB-Adapter Version 3.0+EDR Class1 dongle[2].
+> The system is a openSUSE 11.4 64bit PC with KDE 4.6.0 and PulseAudio
+> pulseaudio-0.9.22-6.11.1.x86_64.
+
+
+
+I've got a "new"/"different" Bluetooth dongle, which seems to be the
+same device...
+
+In lsusb:
+
+Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
+
+With this new BT dongle, sound is just as skippy as it was with my "old"
+bluetooth dongle.
+
+I think this allows to rule out the assumption, that the BT dongle is
+broken. As the headsets work just fine on Android and on OS X, I think
+we can also conclude that the headsets are okay.
+
+Why is it, that Linux is unable to keep up a good connection to the BT
+headset and thus is skipping *a lot*?
+
+Distance between BT dongle and headset: Tested from a few centimeters
+to 1-2 meters. Direct line of sight. Normal office environment.
+
+Could somebody with better knowledge maybe try to explain why this is
+so bad? :(
+
+
+Thanks a lot,
+Alexander
+
+
+
+> I noticed, that the audio output in a2dp mode is quite "jerky" (haven't
+> tried the mono hsp mode). Not really surprisingly, I found a lot of
+> messages like the following in my /var/log/messages, when I grep for
+> "pulseaudio"[3]:
+>
+> […]
+> Sep  9 11:37:38 ewzw032 pulseaudio[2984]: module-bluetooth-device.c:
+> Skipping 296858 us (= 52364 bytes) in audio stream
+> […]
+>
+> Sound thus sounds terrible.
+>
+> When I then disconnect the Bluetooth connection and connect again, sound
+> is fine. At least most of the time - earlier today, sound was messed
+> up also right after building the connection.
+>
+> Normally, I play music with Amarok. But I found, that even much more
+> simple commands like the following create bad output:
+>
+>  paplay -d bluez_sink.00_1A_7D_60_67_1F -p /usr/share/sounds/pop.wav
+>
+>  env PULSE_SINK=bluez_sink.00_1A_7D_60_67_1F \
+>    mpg123 -a pulse /home/ask/tmp/Test.mp3
+>
+> In "lsusb", the BT dongle is this:
+>
+> Bus 001 Device 048: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+> Dongle (HCI mode)
+>
+> You can find the "lsusb -v" output for this device on pastebin[4].
+>
+> Is there anything that can be done about this?
+>
+>
+> Links:
+>
+> [1] Arctic P311 -> http://www.arctic.ac/en/p/sound/headsets/35/p311.html
+> [2] Hama BT Dongle -> http://x.co/Zaev -->
+> http://www.hama.de/portal/articleId*28219728/action*2563/searchMode*1/bySearch*49238
+> [3] /var/log/messages -> http://pastebin.com/vUMEY9R4
+> [4] lsusb -v -d 0a12:0001 -> http://pastebin.com/xzYSWB9w
+>
+>
+> Best regards,
+>
+> Alexander
+> --
+> ↯     Lifestream (Twitter, Blog, …) ↣ http://sup.skwar.me/     ↯
+> ↯  Chat (Jabber/Google Talk) ↣ a@skwar.me ; Twitter: @alexs77  ↯
+>
+
+
+
+-- 
+Alexander
+--
+↯    Lifestream (Twitter, Blog, …) ↣ http://alexs77.soup.io/     ↯
+↯ Chat (Jabber/Google Talk) ↣ a.skwar@gmail.com , AIM: alexws77  ↯
