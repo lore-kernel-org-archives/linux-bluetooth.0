@@ -1,42 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <DABFC48DA02357418ED8A1EAD50CD9C012F6BF69@048-CH1MPN1-123.048d.mgd.msft.net>
+References: <4E6A247C.5040403@nokia.com>
+	<CAKT1EBdGAyxBh_aeTjPAhOeU2vHSsjbpgi91=vG8HqLv8aV0Yw@mail.gmail.com>
+	<1315635815.1937.4.camel@aeonflux>
+	<CAKT1EBc4z+rvgqKr1SuE_iYvBMqhLJ=E5AW6k5cq65nqa9EW=A@mail.gmail.com>
+	<1315854441.1937.28.camel@aeonflux>
+	<DABFC48DA02357418ED8A1EAD50CD9C012F6BF69@048-CH1MPN1-123.048d.mgd.msft.net>
+Date: Tue, 13 Sep 2011 10:55:46 +0300
+Message-ID: <CABBYNZLYa121-oERdc5v9KWAyzjDD8DcVF+Yc76QQd+tj4M4Cg@mail.gmail.com>
+Subject: Re: Name resolution for mgmt interface
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] client: fix possible crash on GetFile
-Date: Tue, 13 Sep 2011 11:11:16 +0300
-Message-Id: <1315901476-31728-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: tim.howes@accenture.com
+Cc: marcel@holtmann.org, claudio.takahasi@openbossa.org, antti.julku@nokia.com,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Tim,
 
-Invalid read of size 8
-   at 0x413DA1: get_file_callback (ftp.c:184)
-   by 0x40A74E: transfer_complete (gobex-transfer.c:73)
-   by 0x40AB91: transfer_response (gobex-transfer.c:172)
-   by 0x40847A: handle_response (gobex.c:629)
-   by 0x408C06: incoming_data (gobex.c:811)
-   by 0x3E01043DBC: g_main_context_dispatch (in /lib64/libglib-2.0.so.0.2910.0)
-   by 0x3E010445A7: ??? (in /lib64/libglib-2.0.so.0.2910.0)
-   by 0x3E01044AF4: g_main_loop_run (in /lib64/libglib-2.0.so.0.2910.0)
-   by 0x404CD4: main (main.c:102)
- Address 0x8 is not stack'd, malloc'd or (recently) free'd
----
- client/ftp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Mon, Sep 12, 2011 at 10:15 PM,  <tim.howes@accenture.com> wrote:
+> This last one is the approach we took in Symbian OS. =A0The short name ma=
+y be just fine for the width of the UI widget in which inquiry results are =
+displayed, so any autonomous lower-level request of longer non-EIR names ma=
+y be wasted because the UI didn't need any more characters (and saves radio=
+ time, which is quite a lot for RNR).
 
-diff --git a/client/ftp.c b/client/ftp.c
-index 2d1a87c..336fc26 100644
---- a/client/ftp.c
-+++ b/client/ftp.c
-@@ -305,7 +305,7 @@ static DBusMessage *get_file(DBusConnection *connection,
- 				"org.openobex.Error.InvalidArguments", NULL);
- 
- 	if (obc_session_get(session, NULL, source_file,
--			target_file, NULL, 0, get_file_callback, NULL) < 0)
-+			target_file, NULL, 0, get_file_callback, ftp) < 0)
- 		return g_dbus_create_error(message,
- 				"org.openobex.Error.Failed",
- 				"Failed");
--- 
-1.7.6.1
+It would be nice to use such approach but iirc there are some devices
+with broken EIR short names e.g. Nokia~1, so we use the short name but
+don't store it permanently so the full name has to be resolved. But
+that is not a big deal since the BlueZ discovery takes care of this
+automatically.
 
+--=20
+Luiz Augusto von Dentz
