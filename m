@@ -1,52 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] btusb.c: add support for 2011 mac mini
-From: Jurgen Kramer <gtmkramer@xs4all.nl>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 14 Sep 2011 16:05:52 +0200
-In-Reply-To: <20110913235205.GI16856@joana>
-References: <1315152103.2441.6.camel@paragon.slim>
-	 <20110913235205.GI16856@joana>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316009157.1992.5.camel@paragon.slim>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Wed, 14 Sep 2011 10:38:25 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 3/7] Bluetooth: EFS: add disable_flowspec kernel param
+Message-ID: <20110914125421.GR16856@joana>
+References: <1314875256-6904-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1314875256-6904-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20110913201724.GE16856@joana>
+ <1315978212.1937.35.camel@aeonflux>
+ <20110914083056.GA11048@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110914083056.GA11048@aemeltch-MOBL1>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2011-09-13 at 20:52 -0300, Gustavo Padovan wrote:
-> Hi Jurgen,
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-14 11:30:59 +0300]:
+
+> Hi,
 > 
-> * Jurgen Kramer <gtmkramer@xs4all.nl> [2011-09-04 18:01:42 +0200]:
+> On Wed, Sep 14, 2011 at 07:30:11AM +0200, Marcel Holtmann wrote:
+> > > >  int disable_ertm;
+> > > > +int disable_flowspec = 1;
+> > > 
+> > > I'm not sure if we need one parameter for each feature, I think a
+> > > disable_hs (for high speed) could work. This is only to keep the code upstream
+> > > while it is not qualified.
+> > 
+> > and it should be named enable_hs similar to enable_le.
 > 
-> > Today I noticed that the usb bluetooth adapter (BCM2046B1) on my 2011
-> > mac mini was not working. I've created a patch to get it going.
-> 
-> I need your Signed-off-by: line to apply the patch.
-> 
-> 	Gustavo
-> --
-OK, thanks. Here it goes:
+> I can change this to enable_hs despite IMO those L2CAP features are not
+> tight to HS.
 
-Patch for btusb.c to enable the usb bluetooth adapter (BCM2046B1) on the
-2011 mac mini (MacMini5,1).
+Sure, but they will be used most with high_speed, so enable_hs makes sense.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3ef4760..cbecc6e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[] = {
- 	/* Apple MacBookPro8,2 */
- 	{ USB_DEVICE(0x05ac, 0x821a) },
- 
-+	{* Apple MacMini5,1 */
-+	{ USB_DEVICE(0x05ac, 0x8281) },
-+
- 	/* AVM BlueFRITZ! USB v2.0 */
- 	{ USB_DEVICE(0x057c, 0x3800) },
-
-Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
-
-
-
-Jurgen
-
+	Gustavo
