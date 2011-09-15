@@ -2,71 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v2 3/5] Remove not referenced function in storage.c
-Date: Thu, 15 Sep 2011 16:32:21 -0300
-Message-Id: <1316115141-19802-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1315572669-5006-4-git-send-email-claudio.takahasi@openbossa.org>
-References: <1315572669-5006-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 2/5] Remove create_file calls for read operations
+Date: Thu, 15 Sep 2011 16:32:11 -0300
+Message-Id: <1316115131-19766-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1315572669-5006-3-git-send-email-claudio.takahasi@openbossa.org>
+References: <1315572669-5006-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch fixes some read only functions in storage.c removing
+create_file function calls.
 ---
- src/storage.c |   29 -----------------------------
- src/storage.h |    1 -
- 2 files changed, 0 insertions(+), 30 deletions(-)
+ src/storage.c |    8 --------
+ 1 files changed, 0 insertions(+), 8 deletions(-)
 
 diff --git a/src/storage.c b/src/storage.c
-index 8d3a39d..85cfed8 100644
+index 8511823..8d3a39d 100644
 --- a/src/storage.c
 +++ b/src/storage.c
-@@ -732,35 +732,6 @@ gboolean read_trust(const bdaddr_t *local, const char *addr, const char *service
- 	return ret;
- }
+@@ -1110,8 +1110,6 @@ int read_device_pairable(bdaddr_t *bdaddr, gboolean *mode)
  
--struct trust_list {
--	GSList *trusts;
--	const char *service;
--};
+ 	create_filename(filename, PATH_MAX, bdaddr, "config");
+ 
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 -
--static void append_trust(char *key, char *value, void *data)
--{
--	struct trust_list *list = data;
+ 	str = textfile_get(filename, "pairable");
+ 	if (!str)
+ 		return -ENOENT;
+@@ -1238,8 +1236,6 @@ char *read_device_services(const bdaddr_t *sba, const bdaddr_t *dba)
+ 
+ 	create_filename(filename, PATH_MAX, sba, "primary");
+ 
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 -
--	if (strstr(value, list->service))
--		list->trusts = g_slist_append(list->trusts, g_strdup(key));
--}
+ 	ba2str(dba, addr);
+ 
+ 	return textfile_caseget(filename, addr);
+@@ -1268,8 +1264,6 @@ char *read_device_characteristics(const bdaddr_t *sba, const bdaddr_t *dba,
+ 
+ 	create_filename(filename, PATH_MAX, sba, "characteristic");
+ 
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 -
--GSList *list_trusts(bdaddr_t *local, const char *service)
--{
--	char filename[PATH_MAX + 1];
--	struct trust_list list;
+ 	ba2str(dba, addr);
+ 
+ 	snprintf(key, sizeof(key), "%17s#%04X", addr, handle);
+@@ -1299,7 +1293,5 @@ int read_device_attributes(const bdaddr_t *sba, textfile_cb func, void *data)
+ 
+ 	create_filename(filename, PATH_MAX, sba, "attributes");
+ 
+-	create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 -
--	create_filename(filename, PATH_MAX, local, "trusts");
--
--	list.trusts = NULL;
--	list.service = service;
--
--	if (textfile_foreach(filename, append_trust, &list) < 0)
--		return NULL;
--
--	return list.trusts;
--}
--
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles)
- {
- 	char filename[PATH_MAX + 1], addr[18];
-diff --git a/src/storage.h b/src/storage.h
-index 7340ff7..dbe717f 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -52,7 +52,6 @@ int read_link_key(bdaddr_t *local, bdaddr_t *peer, unsigned char *key, uint8_t *
- ssize_t read_pin_code(bdaddr_t *local, bdaddr_t *peer, char *pin);
- gboolean read_trust(const bdaddr_t *local, const char *addr, const char *service);
- int write_trust(const char *src, const char *addr, const char *service, gboolean trust);
--GSList *list_trusts(bdaddr_t *local, const char *service);
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles);
- int delete_entry(bdaddr_t *src, const char *storage, const char *key);
- int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
+ 	return textfile_foreach(filename, func, data);
+ }
 -- 
 1.7.6.1
 
