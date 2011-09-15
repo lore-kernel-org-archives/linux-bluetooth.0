@@ -1,88 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
 To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Date: Thu, 15 Sep 2011 09:04:05 -0400
-Subject: Re: Local security mode 4 with security mode 3 remotes
-Message-ID: <1316091845.11366.17.camel@THOR>
-References: <1312831632.2289.26.camel@THOR>
-In-Reply-To: <1312831632.2289.26.camel@THOR>
+Date: Thu, 15 Sep 2011 09:03:54 -0400
+Subject: Re: [PATCH v2] Bluetooth: Preserve auth + encrypt for sec mode 3
+ remotes
+Message-ID: <1316091834.11366.16.camel@THOR>
+References: <1312922561.2261.9.camel@THOR>
+In-Reply-To: <1312922561.2261.9.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2011-08-08 at 15:27 -0400, Peter Hurley wrote:
-> I've just noticed that when a 2.1+ host controller connects to a 2.0-
-> remote device, the kernel re-authenticates and re-encrypts the ACL link
-> -- although the link was already encrypted. For example,
+On Tue, 2011-08-09 at 16:42 -0400, Peter Hurley wrote:
+> Legacy remote devices (v 2.0-) can establish link-level
+> encryption as part of ACL connection establishment
+> (ie., security mode 3). The host controller indicates link-level
+> encryption is established in this case with the
+> Encryption_Enabled flag of the Connection Complete event.
 > 
-> 2011-08-08 12:43:18.558584 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
->     bdaddr 00:0D:FD:1E:99:30 role 0x00
->     Role: Master
-> 2011-08-08 12:43:18.561558 > HCI Event: Command Status (0x0f) plen 4
->     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> 2011-08-08 12:43:18.737647 > HCI Event: Role Change (0x12) plen 8
->     status 0x00 bdaddr 00:0D:FD:1E:99:30 role 0x00
->     Role: Master
-> 2011-08-08 12:43:18.876717 > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:0D:FD:1E:99:30
-> 2011-08-08 12:43:18.876824 < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->     bdaddr 00:0D:FD:1E:99:30 key AF20110EE1D32E2C27821EC3719FE7FF
-> 2011-08-08 12:43:18.956757 > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Reply (0x01|0x000b) ncmd 1
->     status 0x00 bdaddr 00:0D:FD:1E:99:30
-> 2011-08-08 12:43:19.143850 > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 13 bdaddr 00:0D:FD:1E:99:30 type ACL encrypt 0x01
+> This two-part fix first sets the correct link state for this
+> condition and, second, bypasses additional auth + encrypt for
+> subsequent security level elevations (up to but not including
+> BT_SECURITY_HIGH).
 > 
-> Legacy security-level 3 remote device that creates an encrypted
-> connection.
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> ---
 > 
-> ... < snip > ... Incoming RFCOMM connection
+> v2: Remove redundant ssp_mode tests and set connection
+> security level from pending when handling conn_complete evt 
 > 
-> 2011-08-08 12:43:19.510035 > ACL data: handle 13 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 3 scid 0x0041
-> 2011-08-08 12:43:19.510051 < ACL data: handle 13 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
->       Connection successful
+>  net/bluetooth/hci_conn.c  |   13 +++++++++++--
+>  net/bluetooth/hci_event.c |    9 +++++++++
+>  2 files changed, 20 insertions(+), 2 deletions(-)
 > 
-> ... < snip > ... Re-auth & re-encrypt (sec_level of RFCOMM dlc was medium)
-> 
-> 2011-08-08 12:43:19.677119 > ACL data: handle 13 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0040 len 4 [psm 3]
->       RFCOMM(s): SABM: cr 1 dlci 26 pf 1 ilen 0 fcs 0xe7 
-> 2011-08-08 12:43:19.677144 < HCI Command: Authentication Requested (0x01|0x0011) plen 2
->     handle 13
-> 2011-08-08 12:43:19.679118 > HCI Event: Command Status (0x0f) plen 4
->     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> 2011-08-08 12:43:19.754156 > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:0D:FD:1E:99:30
-> 2011-08-08 12:43:19.754234 < HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
->     bdaddr 00:0D:FD:1E:99:30 key AF20110EE1D32E2C27821EC3719FE7FF
-> 2011-08-08 12:43:19.836196 > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Reply (0x01|0x000b) ncmd 1
->     status 0x00 bdaddr 00:0D:FD:1E:99:30
-> 2011-08-08 12:43:19.837197 > HCI Event: Auth Complete (0x06) plen 3
->     status 0x00 handle 13
-> 2011-08-08 12:43:19.837207 < HCI Command: Set Connection Encryption (0x01|0x0013) plen 3
->     handle 13 encrypt 0x01
-> 2011-08-08 12:43:19.839198 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 13 packets 1
-> 2011-08-08 12:43:19.841197 > HCI Event: Command Status (0x0f) plen 4
->     Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
-> 2011-08-08 12:43:19.843199 > HCI Event: Encrypt Change (0x08) plen 4
->     status 0x00 handle 13 encrypt 0x01
-> 
-> 
-> What is the consensus opinion regarding redundant auth + encrypt for
-> legacy devices?
-> 
-> FWIW, in my opinion, Figure 5.5 of the Core 4.0 spec, Vol 3, Part C -
-> Generic Access Profile (pg 305 of 656) shows a flowchart with a decision
-> branch labeled "Encryption Enabled?" that allows an immediate bypass of
-> auth + encrypt to a positive L2CAP_Connect_Resp.
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index e333274..bfdd63f 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -541,9 +541,18 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+>  	if (conn->pending_sec_level > sec_level)
+>  		sec_level = conn->pending_sec_level;
+>  
+> -	if (sec_level > conn->sec_level)
+> +	if (sec_level > conn->sec_level) {
+>  		conn->pending_sec_level = sec_level;
+> -	else if (conn->link_mode & HCI_LM_AUTH)
+> +		/* Legacy security mode 3 remote devices that are already
+> +		 * auth'd do not need to re-auth unless promoting to
+> +		 * BT_SECURITY_HIGH */
+> +		if (!(conn->hdev->ssp_mode > 0 && conn->ssp_mode > 0) &&
+> +				(sec_level != BT_SECURITY_HIGH) &&
+> +				(conn->link_mode & HCI_LM_AUTH)) {
+> +			conn->sec_level = sec_level;
+> +			return 1;
+> +		}
+> +	} else if (conn->link_mode & HCI_LM_AUTH)
+>  		return 1;
+>  
+>  	/* Make sure we preserve an existing MITM requirement*/
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 77930aa..464cfb4 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1311,6 +1311,15 @@ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *s
+>  		if (test_bit(HCI_ENCRYPT, &hdev->flags))
+>  			conn->link_mode |= HCI_LM_ENCRYPT;
+>  
+> +		/* Indicate the correct link state for legacy sec mode 3
+> +		 * remote devices for which the LM has already established
+> +		 * link encryption */
+> +		if (conn->type == ACL_LINK && ev->encr_mode == 0x01 &&
+> +				conn->pending_sec_level != BT_SECURITY_HIGH) {
+> +			conn->link_mode |= HCI_LM_AUTH | HCI_LM_ENCRYPT;
+> +			conn->sec_level = conn->pending_sec_level;
+> +		}
+> +
+>  		/* Get remote features */
+>  		if (conn->type == ACL_LINK) {
+>  			struct hci_cp_read_remote_features cp;
+> -- 
 
-To answer my own query here, the Core 4.0 spec, Vol 3, Part C - Generic
-Access Profile has this to say in section 5.2.2.2.2, Authentication
+Turns out this is not allowed per spec. From the Core 4.0 spec, Vol 3,
+Part C - Generic Access Profile, Section 5.2.2.2.2, Authentication
 Required for Access to Local Service by Remote Device:
 
 "A Bluetooth device in security mode 4 shall respond to authentication
@@ -92,6 +92,3 @@ authentication of the remote device shall be performed after the receipt
 of the channel establishment request is received, and before the channel
 establishment response is sent."
 
-The way I read this statement is that legacy devices *must* be
-re-authenticated -- so that precludes my associated patch, "Bluetooth:
-Preserve auth + encrypt for sec mode 3 remotes".
