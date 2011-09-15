@@ -1,55 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 From: Peter Hurley <peter@hurleysoftware.com>
-To: "Waldemar.Rymarkiewicz@tieto.com" <Waldemar.Rymarkiewicz@tieto.com>
-CC: "padovan@profusion.mobi" <padovan@profusion.mobi>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 15 Sep 2011 09:18:58 -0400
-Subject: RE: [PATCH v3 1/2] Bluetooth: Fix auth_complete_evt for legacy units
-Message-ID: <1316092738.11366.29.camel@THOR>
-References: <1306849766-31540-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-	 ,<1315505817.2004.70.camel@THOR>
-	 <99B09243E1A5DA4898CDD8B700111448177F047B65@EXMB04.eu.tieto.com>
-In-Reply-To: <99B09243E1A5DA4898CDD8B700111448177F047B65@EXMB04.eu.tieto.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Thu, 15 Sep 2011 09:04:05 -0400
+Subject: Re: Local security mode 4 with security mode 3 remotes
+Message-ID: <1316091845.11366.17.camel@THOR>
+References: <1312831632.2289.26.camel@THOR>
+In-Reply-To: <1312831632.2289.26.camel@THOR>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
-
-On Fri, 2011-09-09 at 02:42 -0400, Waldemar.Rymarkiewicz@tieto.com
-wrote:
-> Hi Peter,
+On Mon, 2011-08-08 at 15:27 -0400, Peter Hurley wrote:
+> I've just noticed that when a 2.1+ host controller connects to a 2.0-
+> remote device, the kernel re-authenticates and re-encrypts the ACL link
+> -- although the link was already encrypted. For example,
 > 
-> >> Legacy devices don't re-authenticate the link properly if a link key
-> >> already exists.  Thus, don't update sec_level for this case even if
-> >> hci_auth_complete_evt indicates success. Otherwise the sec_level will
-> >> not reflect a real security on the link.
-> 
-> >Can you clarify what you mean by "Legacy devices don't re-authenticate
-> >the link properly if a link key already exists"?
-> 
-> I don't have a BT spec behind me now, but the point is that the legacy devices will not initiate new paring if the link key already exists.
-> In another words, if the remote device has already been authenticated (e.g. with 4 digit pin), but the service requires higher security (use of 16 digit pin) the whole auth procedure will not start i.e. link_key_request ... etc. Instead, the controller returns auth_req with success immediately.
-
-This behavior is unique to the controllers you tested. The Core 4.0 spec
-(Vol 2, Part E - HCI Functional Spec, Section 7.1.15 Authentication
-Requested Command) has this to say regarding this controller behavior:
-
-"On receipt of an Authentication Requested Command, a local BR/EDR
-Controller that is not in Simple Pairing Mode may use an existing stored
-link key and respond immediately to the Host with an Authentication
-Complete event.
-
-This behavior is not recommended for controllers as it offers the Host
-no method for enhancing the security of an existing link (e.g., in the
-case where a profile mandating a minimum passkey length is started over
-a link that is already authenticated with shorter passkey than the new
-service requires)."
-
-Here's a sequence from a controller that does not have this undesirable
-behavior:
-
 > 2011-08-08 12:43:18.558584 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
 >     bdaddr 00:0D:FD:1E:99:30 role 0x00
 >     Role: Master
@@ -105,15 +71,27 @@ behavior:
 >     Set Connection Encryption (0x01|0x0013) status 0x00 ncmd 1
 > 2011-08-08 12:43:19.843199 > HCI Event: Encrypt Change (0x08) plen 4
 >     status 0x00 handle 13 encrypt 0x01
+> 
+> 
+> What is the consensus opinion regarding redundant auth + encrypt for
+> legacy devices?
+> 
+> FWIW, in my opinion, Figure 5.5 of the Core 4.0 spec, Vol 3, Part C -
+> Generic Access Profile (pg 305 of 656) shows a flowchart with a decision
+> branch labeled "Encryption Enabled?" that allows an immediate bypass of
+> auth + encrypt to a positive L2CAP_Connect_Resp.
 
-As you can see here, this controller correctly issues a Link Key Request
-event as a result of receiving an Authentication Requested command (thus
-giving the host stack the opportunity to re-pair at a higher security
-level).
+To answer my own query here, the Core 4.0 spec, Vol 3, Part C - Generic
+Access Profile has this to say in section 5.2.2.2.2, Authentication
+Required for Access to Local Service by Remote Device:
 
-Unfortunately, your patch disables sec_level promotion of legacy devices
-for *all* controllers.
+"A Bluetooth device in security mode 4 shall respond to authentication
+and pairing requests during link establishment when the remote device is
+in security mode 3 for backwards compatibility reasons. However,
+authentication of the remote device shall be performed after the receipt
+of the channel establishment request is received, and before the channel
+establishment response is sent."
 
-Regards,
-Peter Hurley
-
+The way I read this statement is that legacy devices *must* be
+re-authenticated -- so that precludes my associated patch, "Bluetooth:
+Preserve auth + encrypt for sec mode 3 remotes".
