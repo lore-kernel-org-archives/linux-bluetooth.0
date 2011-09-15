@@ -1,31 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH v2] btusb.c: add support for 2011 mac mini
-From: Jurgen Kramer <gtmkramer@xs4all.nl>
+MIME-Version: 1.0
+Date: Thu, 15 Sep 2011 15:35:41 +0200
+Message-ID: <CACLukzKQK2_-i1qUPKrtGq0_2gCG854+QORqo03vHrmUxT2yUQ@mail.gmail.com>
+Subject: git Bluez broken down
+From: Santiago Carot <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Thu, 15 Sep 2011 18:04:44 +0200
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316102688.1973.5.camel@paragon.slim>
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hopefully this patch is now correct.
-Patch against current kernel git to add ID for MacMini5,1 to btusb.c
+Hello,
 
-Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
---- linux/drivers/bluetooth/btusb.c	2011-09-14 17:31:09.411475756 +0200
-+++ linux.new/drivers/bluetooth/btusb.c	2011-09-14 17:33:37.727484053
-+0200
-@@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[
- 	/* Apple MacBookPro8,2 */
- 	{ USB_DEVICE(0x05ac, 0x821a) },
- 
-+	/* Apple MacMini5,1 */
-+	{ USB_DEVICE(0x05ac, 0x8281) },
-+
- 	/* AVM BlueFRITZ! USB v2.0 */
- 	{ USB_DEVICE(0x057c, 0x3800) },
- 
+It seems that bluez repository has broken down so that I can't
+synchronize my local repo before sending some patches that I have
+prepared. I would like to know if are you using an alternative one
+while problems get fixed in kernel.og.
 
-Jurgen
-
+Regards.
