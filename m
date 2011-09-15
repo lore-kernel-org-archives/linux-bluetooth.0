@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: David Stockwell <dstockwell@frequency-one.com>
-Subject: [PATCH 5/5] avrcp: get/set three-byte company-id
-Date: Thu, 15 Sep 2011 01:21:37 -0300
-Message-Id: <1316060497-4068-6-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 4/5] avrcp: fix handling of metadata item 0x7
+Date: Thu, 15 Sep 2011 01:21:36 -0300
+Message-Id: <1316060497-4068-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1316060497-4068-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1316060497-4068-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,77 +12,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: David Stockwell <dstockwell@frequency-one.com>
 
+Metadata field number 0x7 should be the total playing time of the track
+(TrackDuration) in msec, not current position within track.
 ---
- audio/avrcp.c |   35 ++++++++++++++++++++++++++---------
- 1 files changed, 26 insertions(+), 9 deletions(-)
+ audio/avrcp.c |   18 ++++++------------
+ 1 files changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 835249b..f962946 100644
+index f7f3924..835249b 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -517,6 +517,28 @@ static const char *battery_status_to_str(enum battery_status status)
- 	return NULL;
- }
+@@ -141,7 +141,7 @@ enum media_info_id {
+ 	MEDIA_INFO_TRACK =		4,
+ 	MEDIA_INFO_N_TRACKS =		5,
+ 	MEDIA_INFO_GENRE =		6,
+-	MEDIA_INFO_CURRENT_POSITION =	7,
++	MEDIA_INFO_PLAYING_TIME =	7,
+ 	MEDIA_INFO_LAST
+ };
  
-+/*
-+ * get_company_id:
-+ *
-+ * Get three-byte Company_ID from incoming AVRCP message
-+ */
-+static uint32_t get_company_id(const uint8_t cid[3])
-+{
-+	return cid[0] << 16 | cid[1] << 8 | cid[2];
-+}
-+
-+/*
-+ * set_company_id:
-+ *
-+ * Set three-byte Company_ID into outgoing AVRCP message
-+ */
-+static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
-+{
-+	cid[0] = cid_in >> 16;
-+	cid[1] = cid_in >> 8;
-+	cid[2] = cid_in;
-+}
-+
- static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
- {
- 	uint8_t buf[AVRCP_HEADER_LENGTH + 9];
-@@ -532,9 +554,7 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
+@@ -690,19 +690,13 @@ static int mp_get_media_attribute(struct media_player *mp,
+ 		len = strlen(valstr);
+ 		memcpy(elem->val, valstr, len);
+ 		break;
+-	case MEDIA_INFO_CURRENT_POSITION:
+-		if (mi->elapsed != 0xFFFFFFFF) {
+-			uint32_t elapsed;
+-
+-			mp_get_playback_status(mp, NULL, &elapsed, NULL);
+-
+-			snprintf(valstr, 20, "%u", elapsed);
+-			len = strlen(valstr);
+-			memcpy(elem->val, valstr, len);
+-		} else {
++	case MEDIA_INFO_PLAYING_TIME:
++		if (mi->track_len == 0xFFFFFFFF)
+ 			return -ENOENT;
+-		}
  
- 	memset(buf, 0, sizeof(buf));
- 
--	pdu->company_id[0] = IEEEID_BTSIG >> 16;
--	pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
--	pdu->company_id[2] = IEEEID_BTSIG & 0xFF;
-+	set_company_id(pdu->company_id, IEEEID_BTSIG);
- 
- 	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
- 	pdu->params[0] = id;
-@@ -774,9 +794,8 @@ static uint8_t avrcp_handle_get_capabilities(struct media_player *mp,
- 	switch (pdu->params[0]) {
- 	case CAP_COMPANY_ID:
- 		for (i = 0; i < G_N_ELEMENTS(company_ids); i++) {
--			pdu->params[2 + i * 3] = company_ids[i] >> 16;
--			pdu->params[3 + i * 3] = (company_ids[i] >> 8) & 0xFF;
--			pdu->params[4 + i * 3] = company_ids[i] & 0xFF;
-+			set_company_id(&pdu->params[2 + i * 3],
-+							company_ids[i]);
- 		}
- 
- 		pdu->params_len = htons(2 + (3 * G_N_ELEMENTS(company_ids)));
-@@ -1206,9 +1225,7 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
- 	struct media_player *mp = user_data;
- 	struct pdu_handler *handler;
- 	struct avrcp_header *pdu = (void *) operands;
--	uint32_t company_id = (pdu->company_id[0] << 16) |
--				(pdu->company_id[1] << 8) |
--				(pdu->company_id[2]);
-+	uint32_t company_id = get_company_id(pdu->company_id);
- 
- 	if (company_id != IEEEID_BTSIG) {
- 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
++		snprintf(valstr, 20, "%u", mi->track_len);
++		len = strlen(valstr);
++		memcpy(elem->val, valstr, len);
+ 		break;
+ 	default:
+ 		return -EINVAL;
 -- 
 1.7.6.1
 
