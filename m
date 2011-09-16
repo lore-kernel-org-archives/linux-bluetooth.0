@@ -1,77 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
-Date: Fri, 16 Sep 2011 11:57:57 +0300
-Message-Id: <1316163477-5820-1-git-send-email-dmitriy.paliy@nokia.com>
+MIME-Version: 1.0
+In-Reply-To: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
+References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
+Date: Fri, 16 Sep 2011 11:07:01 +0300
+Message-ID: <CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com>
+Subject: Re: obexd: obex_handle_input: poll event HUP ERR
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alex Mach <alexvm12e@mail.ru>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SendDTMF method call is replaced by StartDTMF/StopDTMF in maemo6 telephony
-driver. StartDTMF/StopDTMF places DTMF tone in queue on modem side playing
-it minimum required time. When using SendDTMF, modem ignores new tone
-until currently playing one is not finished.
+Hi Alex,
 
-Downside of StartDTMF/StopDTMF combination is absence of audio feedback to
-hands-free.
----
- audio/telephony-maemo6.c |   31 ++++++++++++++++++++++++-------
- 1 files changed, 24 insertions(+), 7 deletions(-)
+On Thu, Sep 15, 2011 at 11:44 AM, Alex Mach <alexvm12e@mail.ru> wrote:
+>
+> Hello,
+>
+> I have a problem with receiving files with obexd. After it receives header
+>  it hangs up the connection with
+> obex_handle_input: poll event HUP ERR
+>
+> bluez-4.95
+> kernel-2.6.38.7 armv5tejl GNU/Linux
+> libopenobex1-1.5
+> obexd-0.42
+>
+> /usr/sbin/obexd --auto-accept --root=/var/obex
+>
+> obexd[844]: obexd daemon 0.42
+> obexd[844]: src/main.c:main() Entering main loop
+> obexd[844]: src/manager.c:manager_init()
+> obexd[844]: src/plugin.c:plugin_init() Loading builtin plugins
+> obexd[844]: src/transport.c:obex_transport_driver_register() driver 0x37a00 transport bluetooth registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin bluetooth loaded
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a94 mimetype x-obex/folder-listing registered
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a58 mimetype x-obex/capability registered
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37ad0 mimetype x-obex/folder-listing registered
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a1c mimetype (null) registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin filesystem loaded
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37b18 service Object Push server registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin opp loaded
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37b64 service File Transfer server registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin ftp loaded
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37bf0 mimetype x-bt/phonebook registered
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37c2c mimetype x-bt/vcard-listing registered
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37c68 mimetype x-bt/vcard registered
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37bb0 service Phonebook Access server registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin pbap loaded
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37cf0 mimetype (null) registered
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37cb0 service Message Access server registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin mas loaded
+> obexd[844]: plugins/irmc.c:irmc_init()
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37d3c mimetype (null) registered
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37d78 service IRMC Sync server registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin irmc loaded
+> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37dc4 mimetype (null) registered
+> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37e00 service OBEX server for SyncML, using SyncEvolution registered
+> obexd[844]: src/plugin.c:add_plugin() Plugin syncevolution loaded
+> obexd[844]: src/plugin.c:plugin_init() Loading plugins /var/buildroot-2011.05/output/staging/usr/lib/obex/plugins
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 9
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 10
+> obexd[844]: src/server.c:obex_server_init() No service driver registered
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 15
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 14
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 19
+> obexd[844]: plugins/bluetooth.c:start() listening on channel 16
+> obexd[844]: plugins/bluetooth.c:find_adapter() FindAdapter(any)
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Object Push server, handle: 0x10005
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: File Transfer server, handle: 0x10006
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Phonebook Access server, handle: 0x10007
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: IRMC Sync server, handle: 0x10008
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: OBEX server for SyncML, using SyncEvolution, handle: 0x10009
+> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Message Access server, handle: 0x1000a
+>
+> obexd[844]: bluetooth: New connection from: 04:A8:2A:36:D5:0C, channel 9
+> obexd[844]: REQHINT(0x1), CONNECT(0x0), (null)(0x0)
+> obexd[844]: REQ(0x2), CONNECT(0x0), (null)(0x0)
+> obexd[844]: src/obex.c:cmd_connect() Version: 0x10. Flags: 0x00  OBEX packet length: 32767
+> obexd[844]: src/obex.c:cmd_connect() Resizing stream chunks to 32567
+> obexd[844]: src/obex.c:cmd_connect() Selected driver: Object Push server
+> obexd[844]: REQ(0x2), CONNECT(0x0), CONTINUE(0x10)
+> obexd[844]: REQDONE(0x3), CONNECT(0x0), (null)(0x0)
+> obexd[844]: REQHINT(0x1), PUT(0x2), (null)(0x0)
+> obexd[844]: REQCHECK(0xb), PUT(0x2), (null)(0x0)
+> obexd[844]: src/obex.c:check_put() OBEX_HDR_NAME: (null)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index a5845c4..01768c8 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -732,17 +732,26 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
- 						CME_ERROR_AG_FAILURE);
- }
- 
--void telephony_transmit_dtmf_req(void *telephony_device, char tone)
-+static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
- {
--	int ret;
--	char buf[2] = { tone, '\0' }, *buf_ptr = buf;
-+	send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
-+				CSD_CALL_INTERFACE, "StopDTMF",
-+				NULL, NULL,
-+				DBUS_TYPE_INVALID);
-+}
- 
--	DBG("telephony-maemo6: transmit dtmf: %s", buf);
-+static void start_dtmf(void *telephony_device, char tone)
-+{
-+	int ret;
- 
-+	/*
-+	 * Stop tone immediately, modem will place it in queue and play
-+	 * required time.
-+	 */
- 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--				CSD_CALL_INTERFACE, "SendDTMF",
--				NULL, NULL,
--				DBUS_TYPE_STRING, &buf_ptr,
-+				CSD_CALL_INTERFACE, "StartDTMF",
-+				start_dtmf_reply, NULL,
-+				DBUS_TYPE_BYTE, &tone,
- 				DBUS_TYPE_INVALID);
- 	if (ret < 0) {
- 		telephony_transmit_dtmf_rsp(telephony_device,
-@@ -751,6 +760,14 @@ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
- 	}
- 
- 	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
-+
-+}
-+
-+void telephony_transmit_dtmf_req(void *telephony_device, char tone)
-+{
-+	DBG("telephony-maemo6: transmit dtmf: %c", tone);
-+
-+	start_dtmf(telephony_device, tone);
- }
- 
- void telephony_subscriber_number_req(void *telephony_device)
+Problem seems to be here, apparently we could not convert the name
+received (Unicode length 18 according to hcidump), so the name is not
+set cause plugin/ftp.c:268 to fail. Could you please check what is the
+string in the header and if that is really a utf16 as the spec
+mandates.
+
+
 -- 
-1.7.4.1
-
+Luiz Augusto von Dentz
