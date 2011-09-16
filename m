@@ -1,63 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E73CEB5.9090406@goop.org>
-Date: Fri, 16 Sep 2011 15:33:25 -0700
-From: Jeremy Fitzhardinge <jeremy@goop.org>
-MIME-Version: 1.0
-To: padovan@profusion.mobi
-CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Keith Packard <keithp@keithp.com>
-Subject: Re: Bluetooth regression with headphones
-References: <4E6EB2DE.8090102@goop.org>
-In-Reply-To: <4E6EB2DE.8090102@goop.org>
-Content-Type: text/plain; charset=UTF-8
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/4] Bluetooth: convert force_reliable variable to flag in l2cap chan
+Date: Fri, 16 Sep 2011 16:53:40 +0300
+Message-Id: <1316181222-32634-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1316181222-32634-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1316181222-32634-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/12/2011 06:33 PM, Jeremy Fitzhardinge wrote:
-> Hi all,
->
-> I reported a regression in connecting my Nokia BH-905i headphones in
-> June this year (https://lkml.org/lkml/2011/6/23/770), which was the same
-> problem Keith Packard reported in https://lkml.org/lkml/2011/6/9/63.  
-> It was briefly fixed in
-> git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-2.6.git.
->
-> Unfortunately it regressed again by the time of the linux-3.0 release,
-> to something with similar symptoms: the headphones won't reliably
-> connect to my laptop unless I freshly re-pair them.  However, unlike the
-> original bug, they will very occasionally connect normally, though I
-> don't know why.
->
-> This behaviour has been consistent since 3.0 up until the current
-> 3.1-rc6 kernel.
->
-> What further information can I provide?  How can I help debug this?
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I turned on debugging by running "bluetoothd -n -d", and got the
-following when trying to connect my headphones:
+force_reliable variable inside l2cap_chan is a logical one and can
+be easily converted to flag
+---
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |    2 +-
+ net/bluetooth/l2cap_sock.c    |   13 +++++++++----
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-Sep 16 15:30:47 saboo bluetoothd[22025]: bluetoothd[22025]: audio/headset.c:headset_set_state() State changed /org/bluez/22025/hci0/dev_00_0B_E4_A6_6C_0D: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECTING
-Sep 16 15:30:47 saboo bluetoothd[22025]: bluetoothd[22025]: src/adapter.c:adapter_get_device() 00:0B:E4:A6:6C:0D
-Sep 16 15:30:47 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:remote_features_information() hci0 status 0
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:remote_name_information() hci0 status 0
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: audio/headset.c:headset_set_channel() Discovered Handsfree service on channel 1
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: audio/headset.c:rfcomm_connect() /org/bluez/22025/hci0/dev_00_0B_E4_A6_6C_0D: Connecting to 00:0B:E4:A6:6C:0D channel 1
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:link_key_request() hci0 dba 00:0B:E4:A6:6C:0D
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:link_key_request() kernel auth requirements = 0x04
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:link_key_request() Matching key found
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:link_key_request() link key type 0x04
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: plugins/hciops.c:auth_complete() hci0 status 0
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: src/event.c:btd_event_bonding_process_complete() status=00
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: src/adapter.c:adapter_get_device() 00:0B:E4:A6:6C:0D
-Sep 16 15:30:48 saboo bluetoothd[22025]: bluetoothd[22025]: src/event.c:btd_event_bonding_process_complete() no pending auth request
-Sep 16 15:30:50 saboo bluetoothd[22025]: bluetoothd[22025]: Permission denied (13)
-Sep 16 15:30:50 saboo bluetoothd[22025]: Permission denied (13)
-Sep 16 15:30:50 saboo bluetoothd[22025]: bluetoothd[22025]: audio/headset.c:headset_set_state() State changed /org/bluez/22025/hci0/dev_00_0B_E4_A6_6C_0D: HEADSET_STATE_CONNECTING -> HEADSET_STATE_DISCONNECTED
-Sep 16 15:30:50 saboo bluetoothd[22025]: bluetoothd[22025]: src/adapter.c:adapter_get_device() 00:0B:E4:A6:6C:0D
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0d09ff7..af81a7e 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -370,7 +370,6 @@ struct l2cap_chan {
+ 
+ 	__u8		sec_level;
+ 	__u8		role_switch;
+-	__u8		force_reliable;
+ 	__u8		force_active;
+ 
+ 	__u8		ident;
+@@ -534,6 +533,7 @@ enum {
+ 
+ /* Definitions for flags in l2cap_chan */
+ enum {
++	FLAG_FORCE_RELIABLE,
+ 	FLAG_FLUSHABLE,
+ 	FLAG_EFS_ENABLE,
+ 	FLAG_EXT_CTRL,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index affda07..2307819 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -961,7 +961,7 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
+ 
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			sk->sk_err = err;
+ 	}
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 83596de..1ba2187 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -359,7 +359,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 		if (chan->role_switch)
+ 			opt |= L2CAP_LM_MASTER;
+ 
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			opt |= L2CAP_LM_RELIABLE;
+ 
+ 		if (put_user(opt, (u32 __user *) optval))
+@@ -550,7 +550,11 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 			chan->sec_level = BT_SECURITY_HIGH;
+ 
+ 		chan->role_switch    = (opt & L2CAP_LM_MASTER);
+-		chan->force_reliable = (opt & L2CAP_LM_RELIABLE);
++
++		if (opt & L2CAP_LM_RELIABLE)
++			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
++		else
++			clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		break;
+ 
+ 	default:
+@@ -934,7 +938,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = pchan->tx_win;
+ 		chan->sec_level = pchan->sec_level;
+ 		chan->role_switch = pchan->role_switch;
+-		chan->force_reliable = pchan->force_reliable;
++		if (test_bit(FLAG_FORCE_RELIABLE, &pchan->flags))
++			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
+ 			set_bit(FLAG_FLUSHABLE, &chan->flags);
+ 		chan->force_active = pchan->force_active;
+@@ -966,7 +971,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = L2CAP_DEFAULT_MAX_TX_WINDOW;
+ 		chan->sec_level = BT_SECURITY_LOW;
+ 		chan->role_switch = 0;
+-		chan->force_reliable = 0;
++		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		clear_bit(FLAG_FLUSHABLE, &chan->flags);
+ 		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
+ 
+-- 
+1.7.4.1
 
-
-Does this cast any light on what's going wrong?
-
-Thanks,
-    J
