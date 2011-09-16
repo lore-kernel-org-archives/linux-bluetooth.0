@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/7] Bluetooth: EFS: l2cap extended feature mask update
-Date: Fri, 16 Sep 2011 16:26:30 +0300
-Message-Id: <1316179596-30906-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
+References: <1316113131-10944-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
+	<CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
+Date: Fri, 16 Sep 2011 09:15:57 -0400
+Message-ID: <CAJdJm_N_9tdCea=DhKu9s=YUm6TRKDKBgQ-bMRp3CHOLAqMZpQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix allocation of attribute values
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Hendrik,
 
-Update L2CAP extended feature mask to reflect recent BT spec.
+On Fri, Sep 16, 2011 at 7:05 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+>>>                memcpy(a->data, value, vlen);
+>>
+>> And here you do...hmm...hard to tell since the pointer now shows to...where?
+>> Even if that pointer is valid and is assigned the right size memory, you
+>> just leaked memory.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+After some thought (and thanks to Johan over IRC), I now see which
+issue you are referring to. I'm reviewing all other places where this
+bug might happen as well. Unfortunately, looks like it slipped through
+manual review and valgrind altogether :(
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 6fa1140..9850cb5 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -91,13 +91,17 @@ struct l2cap_conninfo {
- #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
- #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
- 
--/* L2CAP feature mask */
-+/* L2CAP extended feature mask */
- #define L2CAP_FEAT_FLOWCTL	0x00000001
- #define L2CAP_FEAT_RETRANS	0x00000002
-+#define L2CAP_FEAT_BIDIR_QOS	0x00000004
- #define L2CAP_FEAT_ERTM		0x00000008
- #define L2CAP_FEAT_STREAMING	0x00000010
- #define L2CAP_FEAT_FCS		0x00000020
-+#define L2CAP_FEAT_EXT_FLOW	0x00000040
- #define L2CAP_FEAT_FIXED_CHAN	0x00000080
-+#define L2CAP_FEAT_EXT_WINDOW	0x00000100
-+#define L2CAP_FEAT_UCD		0x00000200
- 
- /* L2CAP checksum option */
- #define L2CAP_FCS_NONE		0x00
+Thanks,
 -- 
-1.7.4.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
