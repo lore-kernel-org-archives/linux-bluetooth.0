@@ -1,98 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
-References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
-Date: Fri, 16 Sep 2011 11:07:01 +0300
-Message-ID: <CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com>
-Subject: Re: obexd: obex_handle_input: poll event HUP ERR
+In-Reply-To: <1316060497-4068-6-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1316060497-4068-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1316060497-4068-6-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 16 Sep 2011 10:51:37 +0300
+Message-ID: <CABBYNZJAmVEW=M8wS+UJWdB6Jy7XqfN2kCFMhi4rfCyKxt3X0w@mail.gmail.com>
+Subject: Re: [PATCH 5/5] avrcp: get/set three-byte company-id
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Alex Mach <alexvm12e@mail.ru>
-Cc: linux-bluetooth@vger.kernel.org
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org,
+	David Stockwell <dstockwell@frequency-one.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Lucas and David,
 
-On Thu, Sep 15, 2011 at 11:44 AM, Alex Mach <alexvm12e@mail.ru> wrote:
+On Thu, Sep 15, 2011 at 7:21 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> From: David Stockwell <dstockwell@frequency-one.com>
 >
-> Hello,
+> ---
+>  audio/avrcp.c |   35 ++++++++++++++++++++++++++---------
+>  1 files changed, 26 insertions(+), 9 deletions(-)
 >
-> I have a problem with receiving files with obexd. After it receives header
->  it hangs up the connection with
-> obex_handle_input: poll event HUP ERR
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index 835249b..f962946 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -517,6 +517,28 @@ static const char *battery_status_to_str(enum battery_status status)
+>        return NULL;
+>  }
 >
-> bluez-4.95
-> kernel-2.6.38.7 armv5tejl GNU/Linux
-> libopenobex1-1.5
-> obexd-0.42
+> +/*
+> + * get_company_id:
+> + *
+> + * Get three-byte Company_ID from incoming AVRCP message
+> + */
+> +static uint32_t get_company_id(const uint8_t cid[3])
+> +{
+> +       return cid[0] << 16 | cid[1] << 8 | cid[2];
+> +}
+> +
+> +/*
+> + * set_company_id:
+> + *
+> + * Set three-byte Company_ID into outgoing AVRCP message
+> + */
+> +static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
+> +{
+> +       cid[0] = cid_in >> 16;
+> +       cid[1] = cid_in >> 8;
+> +       cid[2] = cid_in;
+> +}
+> +
+>  static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
+>  {
+>        uint8_t buf[AVRCP_HEADER_LENGTH + 9];
+> @@ -532,9 +554,7 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
 >
-> /usr/sbin/obexd --auto-accept --root=/var/obex
+>        memset(buf, 0, sizeof(buf));
 >
-> obexd[844]: obexd daemon 0.42
-> obexd[844]: src/main.c:main() Entering main loop
-> obexd[844]: src/manager.c:manager_init()
-> obexd[844]: src/plugin.c:plugin_init() Loading builtin plugins
-> obexd[844]: src/transport.c:obex_transport_driver_register() driver 0x37a00 transport bluetooth registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin bluetooth loaded
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a94 mimetype x-obex/folder-listing registered
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a58 mimetype x-obex/capability registered
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37ad0 mimetype x-obex/folder-listing registered
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37a1c mimetype (null) registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin filesystem loaded
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37b18 service Object Push server registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin opp loaded
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37b64 service File Transfer server registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin ftp loaded
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37bf0 mimetype x-bt/phonebook registered
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37c2c mimetype x-bt/vcard-listing registered
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37c68 mimetype x-bt/vcard registered
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37bb0 service Phonebook Access server registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin pbap loaded
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37cf0 mimetype (null) registered
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37cb0 service Message Access server registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin mas loaded
-> obexd[844]: plugins/irmc.c:irmc_init()
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37d3c mimetype (null) registered
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37d78 service IRMC Sync server registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin irmc loaded
-> obexd[844]: src/mimetype.c:obex_mime_type_driver_register() driver 0x37dc4 mimetype (null) registered
-> obexd[844]: src/service.c:obex_service_driver_register() driver 0x37e00 service OBEX server for SyncML, using SyncEvolution registered
-> obexd[844]: src/plugin.c:add_plugin() Plugin syncevolution loaded
-> obexd[844]: src/plugin.c:plugin_init() Loading plugins /var/buildroot-2011.05/output/staging/usr/lib/obex/plugins
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 9
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 10
-> obexd[844]: src/server.c:obex_server_init() No service driver registered
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 15
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 14
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 19
-> obexd[844]: plugins/bluetooth.c:start() listening on channel 16
-> obexd[844]: plugins/bluetooth.c:find_adapter() FindAdapter(any)
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Object Push server, handle: 0x10005
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: File Transfer server, handle: 0x10006
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Phonebook Access server, handle: 0x10007
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: IRMC Sync server, handle: 0x10008
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: OBEX server for SyncML, using SyncEvolution, handle: 0x10009
-> obexd[844]: plugins/bluetooth.c:add_record_reply() Registered: Message Access server, handle: 0x1000a
+> -       pdu->company_id[0] = IEEEID_BTSIG >> 16;
+> -       pdu->company_id[1] = (IEEEID_BTSIG >> 8) & 0xFF;
+> -       pdu->company_id[2] = IEEEID_BTSIG & 0xFF;
+> +       set_company_id(pdu->company_id, IEEEID_BTSIG);
 >
-> obexd[844]: bluetooth: New connection from: 04:A8:2A:36:D5:0C, channel 9
-> obexd[844]: REQHINT(0x1), CONNECT(0x0), (null)(0x0)
-> obexd[844]: REQ(0x2), CONNECT(0x0), (null)(0x0)
-> obexd[844]: src/obex.c:cmd_connect() Version: 0x10. Flags: 0x00  OBEX packet length: 32767
-> obexd[844]: src/obex.c:cmd_connect() Resizing stream chunks to 32567
-> obexd[844]: src/obex.c:cmd_connect() Selected driver: Object Push server
-> obexd[844]: REQ(0x2), CONNECT(0x0), CONTINUE(0x10)
-> obexd[844]: REQDONE(0x3), CONNECT(0x0), (null)(0x0)
-> obexd[844]: REQHINT(0x1), PUT(0x2), (null)(0x0)
-> obexd[844]: REQCHECK(0xb), PUT(0x2), (null)(0x0)
-> obexd[844]: src/obex.c:check_put() OBEX_HDR_NAME: (null)
+>        pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
+>        pdu->params[0] = id;
+> @@ -774,9 +794,8 @@ static uint8_t avrcp_handle_get_capabilities(struct media_player *mp,
+>        switch (pdu->params[0]) {
+>        case CAP_COMPANY_ID:
+>                for (i = 0; i < G_N_ELEMENTS(company_ids); i++) {
+> -                       pdu->params[2 + i * 3] = company_ids[i] >> 16;
+> -                       pdu->params[3 + i * 3] = (company_ids[i] >> 8) & 0xFF;
+> -                       pdu->params[4 + i * 3] = company_ids[i] & 0xFF;
+> +                       set_company_id(&pdu->params[2 + i * 3],
+> +                                                       company_ids[i]);
+>                }
+>
+>                pdu->params_len = htons(2 + (3 * G_N_ELEMENTS(company_ids)));
+> @@ -1206,9 +1225,7 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+>        struct media_player *mp = user_data;
+>        struct pdu_handler *handler;
+>        struct avrcp_header *pdu = (void *) operands;
+> -       uint32_t company_id = (pdu->company_id[0] << 16) |
+> -                               (pdu->company_id[1] << 8) |
+> -                               (pdu->company_id[2]);
+> +       uint32_t company_id = get_company_id(pdu->company_id);
+>
+>        if (company_id != IEEEID_BTSIG) {
+>                *code = AVC_CTYPE_NOT_IMPLEMENTED;
+> --
+> 1.7.6.1
 
-Problem seems to be here, apparently we could not convert the name
-received (Unicode length 18 according to hcidump), so the name is not
-set cause plugin/ftp.c:268 to fail. Could you please check what is the
-string in the header and if that is really a utf16 as the spec
-mandates.
-
+Ack.
 
 -- 
 Luiz Augusto von Dentz
