@@ -1,54 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: John Frankish <j-frankish@slb.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Gustavo Padovan <padovan@profusion.mobi>,
-	Jurgen Kramer <gtmkramer@xs4all.nl>
-Subject: RE: [PATCH v2] btusb.c: add support for 2011 mac mini
-Date: Fri, 16 Sep 2011 08:58:21 +0000
-Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF2224F3D9@NL0230MBX08N1.DIR.slb.com>
-References: <1316102688.1973.5.camel@paragon.slim>
- <20110915162821.GA4690@joana>
-In-Reply-To: <20110915162821.GA4690@joana>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
+Date: Fri, 16 Sep 2011 11:57:57 +0300
+Message-Id: <1316163477-5820-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+SendDTMF method call is replaced by StartDTMF/StopDTMF in maemo6 telephony
+driver. StartDTMF/StopDTMF places DTMF tone in queue on modem side playing
+it minimum required time. When using SendDTMF, modem ignores new tone
+until currently playing one is not finished.
 
+Downside of StartDTMF/StopDTMF combination is absence of audio feedback to
+hands-free.
+---
+ audio/telephony-maemo6.c |   31 ++++++++++++++++++++++++-------
+ 1 files changed, 24 insertions(+), 7 deletions(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gustavo Padovan
-> Sent: Thursday, 15 September, 2011 20:28
-> To: Jurgen Kramer
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH v2] btusb.c: add support for 2011 mac mini
-> 
-> Hi Jurgen,
-> 
-> * Jurgen Kramer <gtmkramer@xs4all.nl> [2011-09-15 18:04:44 +0200]:
-> 
-> > Hopefully this patch is now correct.
-> > Patch against current kernel git to add ID for MacMini5,1 to btusb.c
-> >
-> > Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
-> > --- linux/drivers/bluetooth/btusb.c	2011-09-14 17:31:09.411475756 +0200
-> > +++ linux.new/drivers/bluetooth/btusb.c	2011-09-14
-> 17:33:37.727484053
-> > +0200
-> > @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[
-> >  	/* Apple MacBookPro8,2 */
-> >  	{ USB_DEVICE(0x05ac, 0x821a) },
-> >
-> > +	/* Apple MacMini5,1 */
-> > +	{ USB_DEVICE(0x05ac, 0x8281) },
-> > +
-> >  	/* AVM BlueFRITZ! USB v2.0 */
-> >  	{ USB_DEVICE(0x057c, 0x3800) },
-> 
-Hmm, mine says the id is:
-
-DMI: Apple Inc. Macmini5,3/Mac-7BA5B2794B2CDB12, BIOS MM51.88Z.0075.B00.1106271442 06/27/2011
-
-..rather than " MacMini5,1"
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index a5845c4..01768c8 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -732,17 +732,26 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+ 						CME_ERROR_AG_FAILURE);
+ }
+ 
+-void telephony_transmit_dtmf_req(void *telephony_device, char tone)
++static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
+ {
+-	int ret;
+-	char buf[2] = { tone, '\0' }, *buf_ptr = buf;
++	send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
++				CSD_CALL_INTERFACE, "StopDTMF",
++				NULL, NULL,
++				DBUS_TYPE_INVALID);
++}
+ 
+-	DBG("telephony-maemo6: transmit dtmf: %s", buf);
++static void start_dtmf(void *telephony_device, char tone)
++{
++	int ret;
+ 
++	/*
++	 * Stop tone immediately, modem will place it in queue and play
++	 * required time.
++	 */
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+-				CSD_CALL_INTERFACE, "SendDTMF",
+-				NULL, NULL,
+-				DBUS_TYPE_STRING, &buf_ptr,
++				CSD_CALL_INTERFACE, "StartDTMF",
++				start_dtmf_reply, NULL,
++				DBUS_TYPE_BYTE, &tone,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0) {
+ 		telephony_transmit_dtmf_rsp(telephony_device,
+@@ -751,6 +760,14 @@ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
+ 	}
+ 
+ 	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
++
++}
++
++void telephony_transmit_dtmf_req(void *telephony_device, char tone)
++{
++	DBG("telephony-maemo6: transmit dtmf: %c", tone);
++
++	start_dtmf(telephony_device, tone);
+ }
+ 
+ void telephony_subscriber_number_req(void *telephony_device)
+-- 
+1.7.4.1
 
