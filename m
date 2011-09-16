@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1316060497-4068-3-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1316060497-4068-2-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1316060497-4068-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1316060497-4068-3-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Fri, 16 Sep 2011 10:47:47 +0300
-Message-ID: <CABBYNZ+tn5RMXWFMSmz0gCK0gZm2Ak44+9mf0ArD-=m9bzO4AA@mail.gmail.com>
-Subject: Re: [PATCH 2/5] avrcp: fix overwrite of number of attributes
+	<1316060497-4068-2-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 16 Sep 2011 10:39:32 +0300
+Message-ID: <CABBYNZ+5QGcUZMrLZzu1XYfiJOHGtFPtkirF6T0T2=K10fA6dg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] avrcp: fix missing error code
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,51 +17,26 @@ Hi Lucas,
 
 On Thu, Sep 15, 2011 at 7:21 AM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
-> The response of GetCurrentPlayerApplicationSettingValue expects the
-> first operand to be the number of attributes in response. Since we start
-> with len=0, we were overwriting this number with the value of the first
-> attribute.
->
-> Also use g_memdup instead of g_malloc + memcpy.
 > ---
->  audio/avrcp.c |   12 +++++-------
->  1 files changed, 5 insertions(+), 7 deletions(-)
+>  audio/avrcp.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 >
 > diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 9b1d797..783ba02 100644
+> index c9eae6e..9b1d797 100644
 > --- a/audio/avrcp.c
 > +++ b/audio/avrcp.c
-> @@ -947,8 +947,7 @@ static uint8_t avrcp_handle_get_current_player_value(struct media_player *mp,
->         * Save a copy of requested settings because we can override them
->         * while responding
->         */
-> -       settings = g_malloc(pdu->params[0]);
-> -       memcpy(settings, &pdu->params[1], pdu->params[0]);
-> +       settings = g_memdup(&pdu->params[1], pdu->params[0]);
->        len = 0;
+> @@ -1228,8 +1228,10 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+>        pdu->packet_type = 0;
+>        pdu->rsvd = 0;
 >
->        /*
-> @@ -972,16 +971,15 @@ static uint8_t avrcp_handle_get_current_player_value(struct media_player *mp,
->                        continue;
->                }
+> -       if (operand_count + 3 < AVRCP_HEADER_LENGTH)
+> +       if (operand_count + 3 < AVRCP_HEADER_LENGTH) {
+> +               pdu->params[0] = E_INVALID_COMMAND;
+>                goto err_metadata;
+> +       }
 >
-> -               pdu->params[len] = settings[i];
-> -               pdu->params[len + 1] = val;
-> -               len += 2;
-> +               pdu->params[++len] = settings[i];
-> +               pdu->params[++len] = val;
->        }
->
->        g_free(settings);
->
->        if (len) {
-> -               pdu->params[0] = len;
-> -               pdu->params_len = htons(2 * len + 1);
-> +               pdu->params[0] = len / 2;
-> +               pdu->params_len = htons(len + 1);
->
->                return AVC_CTYPE_STABLE;
->        }
+>        for (handler = handlers; handler; handler++) {
+>                if (handler->pdu_id == pdu->pdu_id)
 > --
 > 1.7.6.1
 >
