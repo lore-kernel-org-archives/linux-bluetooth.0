@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 16 Sep 2011 14:43:17 +0300
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 5/5] Bluetooth: EWS: prevent unneeded fragmentation in
+ l2cap
+Message-ID: <20110916114308.GA25990@aemeltch-MOBL1>
+References: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1315404314-12045-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20110914035104.GN16856@joana>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
-References: <1316113131-10944-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
-	<CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
-Date: Fri, 16 Sep 2011 09:15:57 -0400
-Message-ID: <CAJdJm_N_9tdCea=DhKu9s=YUm6TRKDKBgQ-bMRp3CHOLAqMZpQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix allocation of attribute values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Hendrik Sattler <post@hendrik-sattler.de>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110914035104.GN16856@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
+Hi Gustavo,
 
-On Fri, Sep 16, 2011 at 7:05 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
->>>                memcpy(a->data, value, vlen);
->>
->> And here you do...hmm...hard to tell since the pointer now shows to...where?
->> Even if that pointer is valid and is assigned the right size memory, you
->> just leaked memory.
+On Wed, Sep 14, 2011 at 12:51:04AM -0300, Gustavo Padovan wrote:
+> Hi Andrei,
+> 
+> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-07 17:05:14 +0300]:
+> 
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Calculate pdu length before creating I-frame. Otherwise if
+> > conn->mtu - (headers) < remote_mps we get fragmented packets in
+> > create_iframe_pdu function.
+> 
+> You might check the way we set the remote_mps, it seems you are not taking
+> that in account.
 
-After some thought (and thanks to Johan over IRC), I now see which
-issue you are referring to. I'm reviewing all other places where this
-bug might happen as well. Unfortunately, looks like it slipped through
-manual review and valgrind altogether :(
+You are right, I was confused by magic "rfc.max_pdu_size =
+cpu_to_le16(chan->conn->mtu - 10)"
 
-Thanks,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+I will send new patch with fixes like the one below:
+
+-               rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+-               if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
+-                       rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
++
++               rfc.max_pdu_size = cpu_to_le16(min_t(u16,
++                                               L2CAP_DEFAULT_MAX_PDU_SIZE,
++                                               chan->conn->mtu -
++                                               L2CAP_EXTENDED_HDR_SIZE -
++                                               L2CAP_SDULEN_SIZE -
++                                               L2CAP_FCS_SIZE));
+
+Regards,
+Andrei
