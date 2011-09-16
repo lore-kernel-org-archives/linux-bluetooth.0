@@ -1,16 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 0/1] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
-Date: Fri, 16 Sep 2011 12:35:10 +0300
-Message-Id: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: RE: [PATCH v2] btusb.c: add support for 2011 mac mini
+From: Jurgen Kramer <gtmkramer@xs4all.nl>
+To: John Frankish <j-frankish@slb.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Gustavo Padovan <padovan@profusion.mobi>
+Date: Fri, 16 Sep 2011 11:08:13 +0200
+In-Reply-To: <654DF80AD31A344E93DBCC6280BD6DEF2224F3D9@NL0230MBX08N1.DIR.slb.com>
+References: <1316102688.1973.5.camel@paragon.slim>
+	 <20110915162821.GA4690@joana>
+	 <654DF80AD31A344E93DBCC6280BD6DEF2224F3D9@NL0230MBX08N1.DIR.slb.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1316164099.1976.4.camel@paragon.slim>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Fri, 2011-09-16 at 08:58 +0000, John Frankish wrote:
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Gustavo Padovan
+> > Sent: Thursday, 15 September, 2011 20:28
+> > To: Jurgen Kramer
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Subject: Re: [PATCH v2] btusb.c: add support for 2011 mac mini
+> > 
+> > Hi Jurgen,
+> > 
+> > * Jurgen Kramer <gtmkramer@xs4all.nl> [2011-09-15 18:04:44 +0200]:
+> > 
+> > > Hopefully this patch is now correct.
+> > > Patch against current kernel git to add ID for MacMini5,1 to btusb.c
+> > >
+> > > Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
+> > > --- linux/drivers/bluetooth/btusb.c	2011-09-14 17:31:09.411475756 +0200
+> > > +++ linux.new/drivers/bluetooth/btusb.c	2011-09-14
+> > 17:33:37.727484053
+> > > +0200
+> > > @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[
+> > >  	/* Apple MacBookPro8,2 */
+> > >  	{ USB_DEVICE(0x05ac, 0x821a) },
+> > >
+> > > +	/* Apple MacMini5,1 */
+> > > +	{ USB_DEVICE(0x05ac, 0x8281) },
+> > > +
+> > >  	/* AVM BlueFRITZ! USB v2.0 */
+> > >  	{ USB_DEVICE(0x057c, 0x3800) },
+> > 
+> Hmm, mine says the id is:
+> 
+> DMI: Apple Inc. Macmini5,3/Mac-7BA5B2794B2CDB12, BIOS MM51.88Z.0075.B00.1106271442 06/27/2011
+> 
+> ..rather than " MacMini5,1"
+> 
+Yes, there are multiple models all which all have a different model name, 5,1/5,2/5,3 etc.
+I have the base mini (intel GPU), you probably have the server version.
+The patch should work regardless as it is not depended on DMI info.
 
-Spare empty line is removed from previous version of patch.
+Jurgen
 
-BR,
-Dmitriy
 
