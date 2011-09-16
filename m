@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/7] Bluetooth: EFS: add enable_hs kernel param
-Date: Fri, 16 Sep 2011 16:26:32 +0300
-Message-Id: <1316179596-30906-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 5/7] Bluetooth: EFS: parse l2cap config response
+Date: Fri, 16 Sep 2011 16:26:34 +0300
+Message-Id: <1316179596-30906-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add enable_hs kernel parameter. L2CAP_FEAT_EXT_FLOW depends on it.
+Add parsing extended flowspec in l2cap config response
+Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+(sent Sun, 22 Aug 2010)
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |   28 +++++++++++++++++++++++++++-
+ 1 files changed, 27 insertions(+), 1 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ebe2703..4b05248 100644
+index f2aa2fe..6e7a680f 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -57,6 +57,7 @@
- #include <net/bluetooth/smp.h>
+@@ -2215,6 +2215,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 	int type, olen;
+ 	unsigned long val;
+ 	struct l2cap_conf_rfc rfc;
++	struct l2cap_conf_efs efs;
  
- int disable_ertm;
-+int enable_hs;
+ 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
  
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
- static u8 l2cap_fixed_chan[8] = { 0x02, };
-@@ -2780,6 +2781,9 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
- 		if (!disable_ertm)
- 			feat_mask |= L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING
- 							 | L2CAP_FEAT_FCS;
-+		if (enable_hs)
-+			feat_mask |= L2CAP_FEAT_EXT_FLOW;
+@@ -2250,6 +2251,19 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+ 					sizeof(rfc), (unsigned long) &rfc);
+ 			break;
 +
- 		put_unaligned_le32(feat_mask, rsp->data);
- 		l2cap_send_cmd(conn, cmd->ident,
- 					L2CAP_INFO_RSP, sizeof(buf), buf);
-@@ -4304,3 +4308,6 @@ void l2cap_exit(void)
- 
- module_param(disable_ertm, bool, 0644);
- MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
++		case L2CAP_CONF_EFS:
++			if (olen == sizeof(efs))
++				memcpy(&efs, (void *)val, olen);
 +
-+module_param(enable_hs, bool, 0644);
-+MODULE_PARM_DESC(enable_hs, "Enable High Speed");
++			if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
++				efs.service_type != L2CAP_SERV_NOTRAFIC &&
++				efs.service_type != chan->local_stype)
++				return -ECONNREFUSED;
++
++			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++			break;
+ 		}
+ 	}
+ 
+@@ -2258,13 +2272,25 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+ 
+ 	chan->mode = rfc.mode;
+ 
+-	if (*result == L2CAP_CONF_SUCCESS) {
++	if (*result == L2CAP_CONF_SUCCESS || *result == L2CAP_CONF_PENDING) {
+ 		switch (rfc.mode) {
+ 		case L2CAP_MODE_ERTM:
+ 			chan->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
+ 			chan->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
++
++			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++				chan->local_msdu =
++					le16_to_cpu(efs.max_sdu_size);
++				chan->local_sdu_itime =
++					le32_to_cpu(efs.sdu_inter_time);
++				chan->local_acc_lat =
++					le32_to_cpu(efs.access_latency);
++				chan->local_flush_to =
++					le32_to_cpu(efs.flush_timeout);
++			}
+ 			break;
++
+ 		case L2CAP_MODE_STREAMING:
+ 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
+ 		}
 -- 
 1.7.4.1
 
