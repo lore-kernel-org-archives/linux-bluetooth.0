@@ -1,108 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
-References: <1316113131-10944-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
-Date: Fri, 16 Sep 2011 07:05:36 -0400
-Message-ID: <CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix allocation of attribute values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Hendrik Sattler <post@hendrik-sattler.de>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v2] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
+Date: Fri, 16 Sep 2011 12:35:11 +0300
+Message-Id: <1316165711-12168-2-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hendrik,
+SendDTMF method call is replaced by StartDTMF/StopDTMF in maemo6 telephony
+driver. StartDTMF/StopDTMF places DTMF tone in queue on modem side playing
+it minimum required time. When using SendDTMF, modem ignores new tone
+until currently playing one is not finished.
 
-On Fri, Sep 16, 2011 at 4:35 AM, Hendrik Sattler
-<post@hendrik-sattler.de> wrote:
->>                /* Create a private copy of the Client Characteristic
->>                 * Configuration attribute */
->> -               a = g_malloc0(sizeof(*a) + vlen);
->> +               a = g_new0(struct attribute, 1);
->> +               a->data = g_malloc0(vlen);
->
-> Here you assign the pointer...
->
->> +
->>                memcpy(a, orig_attr, sizeof(*a));
->
-> ...and here your overwrite it.
-> Hint: if that is written as
->   *a = *orig_attr;
-> you get a compile-time type check for free.
+Downside of StartDTMF/StopDTMF combination is absence of audio feedback to
+hands-free.
+---
+ audio/telephony-maemo6.c |   30 +++++++++++++++++++++++-------
+ 1 files changed, 23 insertions(+), 7 deletions(-)
 
-You are right, this is simpler and safer, I'll change it.
-
->
->>                memcpy(a->data, value, vlen);
->
-> And here you do...hmm...hard to tell since the pointer now shows to...where?
-> Even if that pointer is valid and is assigned the right size memory, you
-> just leaked memory.
-
-This is the main point of this patch. a->data used to be allocated
-together with struct attribute, because of this:
-
-struct attribute {
-...
-       uint8_t data[0];
-};
-
-This has now been changed on this commit so that the data field is
-just a pointer to a separately allocated buffer:
-
-struct attribute {
-...
-       uint8_t *data;
-};
-
-In this new version, the "data" field is a (initially NULL) pointer
-that is allocated along with its container (struct attribute). But you
-reminded me that I need to optimize this:
-
-a->data = g_malloc0(vlen);
-...
-memcpy(a->data, value, vlen);
-
-Into this:
-
-a->data = g_memdup(value, vlen);
-
-(much more readable). Plain assignment can't be used here because
-a->data is a dynamic array whose size is only known at run-time.
-
->
->> @@ -1242,7 +1252,9 @@ struct attribute *attrib_db_add(uint16_t handle,
->> bt_uuid_t *uuid, int read_reqs,
->>        if (g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp))
->>                return NULL;
->>
->> -       a = g_malloc0(sizeof(struct attribute) + len);
->> +       a = g_new0(struct attribute, 1);
->> +       a->data = g_malloc0(len);
->> +
->>        a->handle = handle;
->>        memcpy(&a->uuid, uuid, sizeof(bt_uuid_t));
->
-> This could also use assignement-instead-of-memcpy but that's out-of-scope of
-> this patch?
-
-Correct, but we can fix this in a separate patch as it has a few other
-places on BlueZ code to be fixed as well.
-
->> -       attrib_notify_clients(a);
->> +       if (uuid != NULL)
->> +               memcpy(&a->uuid, uuid, sizeof(bt_uuid_t));
->
-> But here you could write: a->uuid = *uuid;
-
-Yes, will change.
-
-Thanks,
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index a5845c4..ad5d06f 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -732,17 +732,26 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+ 						CME_ERROR_AG_FAILURE);
+ }
+ 
+-void telephony_transmit_dtmf_req(void *telephony_device, char tone)
++static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
+ {
+-	int ret;
+-	char buf[2] = { tone, '\0' }, *buf_ptr = buf;
++	send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
++				CSD_CALL_INTERFACE, "StopDTMF",
++				NULL, NULL,
++				DBUS_TYPE_INVALID);
++}
+ 
+-	DBG("telephony-maemo6: transmit dtmf: %s", buf);
++static void start_dtmf(void *telephony_device, char tone)
++{
++	int ret;
+ 
++	/*
++	 * Stop tone immediately, modem will place it in queue and play
++	 * required time.
++	 */
+ 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
+-				CSD_CALL_INTERFACE, "SendDTMF",
+-				NULL, NULL,
+-				DBUS_TYPE_STRING, &buf_ptr,
++				CSD_CALL_INTERFACE, "StartDTMF",
++				start_dtmf_reply, NULL,
++				DBUS_TYPE_BYTE, &tone,
+ 				DBUS_TYPE_INVALID);
+ 	if (ret < 0) {
+ 		telephony_transmit_dtmf_rsp(telephony_device,
+@@ -753,6 +762,13 @@ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
+ 	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
+ }
+ 
++void telephony_transmit_dtmf_req(void *telephony_device, char tone)
++{
++	DBG("telephony-maemo6: transmit dtmf: %c", tone);
++
++	start_dtmf(telephony_device, tone);
++}
++
+ void telephony_subscriber_number_req(void *telephony_device)
+ {
+ 	DBG("telephony-maemo6: subscriber number request");
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.4.1
+
