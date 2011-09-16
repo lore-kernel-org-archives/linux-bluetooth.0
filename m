@@ -1,50 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Sep 2011 14:43:17 +0300
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 5/5] Bluetooth: EWS: prevent unneeded fragmentation in
- l2cap
-Message-ID: <20110916114308.GA25990@aemeltch-MOBL1>
-References: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1315404314-12045-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20110914035104.GN16856@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110914035104.GN16856@joana>
+In-Reply-To: <20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
+References: <1316113131-10944-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20110916103553.15662dyub01c99wk@mail.hendrik-sattler.de>
+Date: Fri, 16 Sep 2011 07:05:36 -0400
+Message-ID: <CAJdJm_N9e+7pfcsxBFWSMrv-97rq8GcnMZ0gVi_Z-c-i-pT7UQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix allocation of attribute values
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Hendrik,
 
-On Wed, Sep 14, 2011 at 12:51:04AM -0300, Gustavo Padovan wrote:
-> Hi Andrei,
-> 
-> * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-07 17:05:14 +0300]:
-> 
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Calculate pdu length before creating I-frame. Otherwise if
-> > conn->mtu - (headers) < remote_mps we get fragmented packets in
-> > create_iframe_pdu function.
-> 
-> You might check the way we set the remote_mps, it seems you are not taking
-> that in account.
+On Fri, Sep 16, 2011 at 4:35 AM, Hendrik Sattler
+<post@hendrik-sattler.de> wrote:
+>>                /* Create a private copy of the Client Characteristic
+>>                 * Configuration attribute */
+>> -               a = g_malloc0(sizeof(*a) + vlen);
+>> +               a = g_new0(struct attribute, 1);
+>> +               a->data = g_malloc0(vlen);
+>
+> Here you assign the pointer...
+>
+>> +
+>>                memcpy(a, orig_attr, sizeof(*a));
+>
+> ...and here your overwrite it.
+> Hint: if that is written as
+>   *a = *orig_attr;
+> you get a compile-time type check for free.
 
-You are right, I was confused by magic "rfc.max_pdu_size =
-cpu_to_le16(chan->conn->mtu - 10)"
+You are right, this is simpler and safer, I'll change it.
 
-I will send new patch with fixes like the one below:
+>
+>>                memcpy(a->data, value, vlen);
+>
+> And here you do...hmm...hard to tell since the pointer now shows to...where?
+> Even if that pointer is valid and is assigned the right size memory, you
+> just leaked memory.
 
--               rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
--               if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
--                       rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
-+
-+               rfc.max_pdu_size = cpu_to_le16(min_t(u16,
-+                                               L2CAP_DEFAULT_MAX_PDU_SIZE,
-+                                               chan->conn->mtu -
-+                                               L2CAP_EXTENDED_HDR_SIZE -
-+                                               L2CAP_SDULEN_SIZE -
-+                                               L2CAP_FCS_SIZE));
+This is the main point of this patch. a->data used to be allocated
+together with struct attribute, because of this:
 
-Regards,
-Andrei
+struct attribute {
+...
+       uint8_t data[0];
+};
+
+This has now been changed on this commit so that the data field is
+just a pointer to a separately allocated buffer:
+
+struct attribute {
+...
+       uint8_t *data;
+};
+
+In this new version, the "data" field is a (initially NULL) pointer
+that is allocated along with its container (struct attribute). But you
+reminded me that I need to optimize this:
+
+a->data = g_malloc0(vlen);
+...
+memcpy(a->data, value, vlen);
+
+Into this:
+
+a->data = g_memdup(value, vlen);
+
+(much more readable). Plain assignment can't be used here because
+a->data is a dynamic array whose size is only known at run-time.
+
+>
+>> @@ -1242,7 +1252,9 @@ struct attribute *attrib_db_add(uint16_t handle,
+>> bt_uuid_t *uuid, int read_reqs,
+>>        if (g_slist_find_custom(database, GUINT_TO_POINTER(h), handle_cmp))
+>>                return NULL;
+>>
+>> -       a = g_malloc0(sizeof(struct attribute) + len);
+>> +       a = g_new0(struct attribute, 1);
+>> +       a->data = g_malloc0(len);
+>> +
+>>        a->handle = handle;
+>>        memcpy(&a->uuid, uuid, sizeof(bt_uuid_t));
+>
+> This could also use assignement-instead-of-memcpy but that's out-of-scope of
+> this patch?
+
+Correct, but we can fix this in a separate patch as it has a few other
+places on BlueZ code to be fixed as well.
+
+>> -       attrib_notify_clients(a);
+>> +       if (uuid != NULL)
+>> +               memcpy(&a->uuid, uuid, sizeof(bt_uuid_t));
+>
+> But here you could write: a->uuid = *uuid;
+
+Yes, will change.
+
+Thanks,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
