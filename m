@@ -1,55 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1316060497-4068-4-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1316060497-4068-3-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1316060497-4068-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1316060497-4068-4-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Fri, 16 Sep 2011 10:49:40 +0300
-Message-ID: <CABBYNZKmdDB+6r+74vN4enb-Z6ZsgYGfQujjAKgh1g06YDn+Fw@mail.gmail.com>
-Subject: Re: [PATCH 3/5] avrcp: use LAST element on media_info_id enum
+	<1316060497-4068-3-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 16 Sep 2011 10:47:47 +0300
+Message-ID: <CABBYNZ+tn5RMXWFMSmz0gCK0gZm2Ak44+9mf0ArD-=m9bzO4AA@mail.gmail.com>
+Subject: Re: [PATCH 2/5] avrcp: fix overwrite of number of attributes
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Stockwell <dstockwell@frequency-one.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas, David,
+Hi Lucas,
 
 On Thu, Sep 15, 2011 at 7:21 AM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
-> From: David Stockwell <dstockwell@frequency-one.com>
+> The response of GetCurrentPlayerApplicationSettingValue expects the
+> first operand to be the number of attributes in response. Since we start
+> with len=0, we were overwriting this number with the value of the first
+> attribute.
 >
+> Also use g_memdup instead of g_malloc + memcpy.
 > ---
->  audio/avrcp.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
+>  audio/avrcp.c |   12 +++++-------
+>  1 files changed, 5 insertions(+), 7 deletions(-)
 >
 > diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 783ba02..f7f3924 100644
+> index 9b1d797..783ba02 100644
 > --- a/audio/avrcp.c
 > +++ b/audio/avrcp.c
-> @@ -142,6 +142,7 @@ enum media_info_id {
->        MEDIA_INFO_N_TRACKS =           5,
->        MEDIA_INFO_GENRE =              6,
->        MEDIA_INFO_CURRENT_POSITION =   7,
-> +       MEDIA_INFO_LAST
->  };
+> @@ -947,8 +947,7 @@ static uint8_t avrcp_handle_get_current_player_value(struct media_player *mp,
+>         * Save a copy of requested settings because we can override them
+>         * while responding
+>         */
+> -       settings = g_malloc(pdu->params[0]);
+> -       memcpy(settings, &pdu->params[1], pdu->params[0]);
+> +       settings = g_memdup(&pdu->params[1], pdu->params[0]);
+>        len = 0;
 >
->  #if __BYTE_ORDER == __LITTLE_ENDIAN
-> @@ -890,7 +891,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct media_player *mp,
->                 * Return all available information, at least
->                 * title must be returned.
->                 */
-> -               for (i = 1; i <= MEDIA_INFO_CURRENT_POSITION; i++) {
-> +               for (i = 1; i < MEDIA_INFO_LAST; i++) {
->                        size = mp_get_media_attribute(mp, i,
->                                                        &pdu->params[pos]);
+>        /*
+> @@ -972,16 +971,15 @@ static uint8_t avrcp_handle_get_current_player_value(struct media_player *mp,
+>                        continue;
+>                }
 >
+> -               pdu->params[len] = settings[i];
+> -               pdu->params[len + 1] = val;
+> -               len += 2;
+> +               pdu->params[++len] = settings[i];
+> +               pdu->params[++len] = val;
+>        }
+>
+>        g_free(settings);
+>
+>        if (len) {
+> -               pdu->params[0] = len;
+> -               pdu->params_len = htons(2 * len + 1);
+> +               pdu->params[0] = len / 2;
+> +               pdu->params_len = htons(len + 1);
+>
+>                return AVC_CTYPE_STABLE;
+>        }
 > --
 > 1.7.6.1
+>
+> --
 
 Ack.
-
 
 -- 
 Luiz Augusto von Dentz
