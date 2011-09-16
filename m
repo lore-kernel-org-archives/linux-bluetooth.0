@@ -1,78 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ v2] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
-Date: Fri, 16 Sep 2011 12:35:11 +0300
-Message-Id: <1316165711-12168-2-git-send-email-dmitriy.paliy@nokia.com>
-In-Reply-To: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v2 0/1] Replace SendDTMF by StartDTMF/StopDTMF in maemo6
+Date: Fri, 16 Sep 2011 12:35:10 +0300
+Message-Id: <1316165711-12168-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SendDTMF method call is replaced by StartDTMF/StopDTMF in maemo6 telephony
-driver. StartDTMF/StopDTMF places DTMF tone in queue on modem side playing
-it minimum required time. When using SendDTMF, modem ignores new tone
-until currently playing one is not finished.
+Hi,
 
-Downside of StartDTMF/StopDTMF combination is absence of audio feedback to
-hands-free.
----
- audio/telephony-maemo6.c |   30 +++++++++++++++++++++++-------
- 1 files changed, 23 insertions(+), 7 deletions(-)
+Spare empty line is removed from previous version of patch.
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index a5845c4..ad5d06f 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -732,17 +732,26 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
- 						CME_ERROR_AG_FAILURE);
- }
- 
--void telephony_transmit_dtmf_req(void *telephony_device, char tone)
-+static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
- {
--	int ret;
--	char buf[2] = { tone, '\0' }, *buf_ptr = buf;
-+	send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
-+				CSD_CALL_INTERFACE, "StopDTMF",
-+				NULL, NULL,
-+				DBUS_TYPE_INVALID);
-+}
- 
--	DBG("telephony-maemo6: transmit dtmf: %s", buf);
-+static void start_dtmf(void *telephony_device, char tone)
-+{
-+	int ret;
- 
-+	/*
-+	 * Stop tone immediately, modem will place it in queue and play
-+	 * required time.
-+	 */
- 	ret = send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
--				CSD_CALL_INTERFACE, "SendDTMF",
--				NULL, NULL,
--				DBUS_TYPE_STRING, &buf_ptr,
-+				CSD_CALL_INTERFACE, "StartDTMF",
-+				start_dtmf_reply, NULL,
-+				DBUS_TYPE_BYTE, &tone,
- 				DBUS_TYPE_INVALID);
- 	if (ret < 0) {
- 		telephony_transmit_dtmf_rsp(telephony_device,
-@@ -753,6 +762,13 @@ void telephony_transmit_dtmf_req(void *telephony_device, char tone)
- 	telephony_transmit_dtmf_rsp(telephony_device, CME_ERROR_NONE);
- }
- 
-+void telephony_transmit_dtmf_req(void *telephony_device, char tone)
-+{
-+	DBG("telephony-maemo6: transmit dtmf: %c", tone);
-+
-+	start_dtmf(telephony_device, tone);
-+}
-+
- void telephony_subscriber_number_req(void *telephony_device)
- {
- 	DBG("telephony-maemo6: subscriber number request");
--- 
-1.7.4.1
+BR,
+Dmitriy
 
