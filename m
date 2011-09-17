@@ -1,79 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+From: John Frankish <j-frankish@slb.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Gustavo Padovan <padovan@profusion.mobi>,
+	Jurgen Kramer <gtmkramer@xs4all.nl>
 Subject: RE: [PATCH v2] btusb.c: add support for 2011 mac mini
-From: Jurgen Kramer <gtmkramer@xs4all.nl>
-To: John Frankish <j-frankish@slb.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <padovan@profusion.mobi>
-Date: Sat, 17 Sep 2011 15:50:55 +0200
-In-Reply-To: <654DF80AD31A344E93DBCC6280BD6DEF2224FAE7@NL0230MBX08N1.DIR.slb.com>
+Date: Sat, 17 Sep 2011 12:58:49 +0000
+Message-ID: <654DF80AD31A344E93DBCC6280BD6DEF2224FAE7@NL0230MBX08N1.DIR.slb.com>
 References: <1316102688.1973.5.camel@paragon.slim>
 	 <20110915162821.GA4690@joana>
 	 <654DF80AD31A344E93DBCC6280BD6DEF2224F3D9@NL0230MBX08N1.DIR.slb.com>
-	 <1316164099.1976.4.camel@paragon.slim>
-	 <654DF80AD31A344E93DBCC6280BD6DEF2224FAE7@NL0230MBX08N1.DIR.slb.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316267470.6744.2.camel@paragon.slim>
-Mime-Version: 1.0
+ <1316164099.1976.4.camel@paragon.slim>
+In-Reply-To: <1316164099.1976.4.camel@paragon.slim>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2011-09-17 at 12:58 +0000, John Frankish wrote:
-> > > > -----Original Message-----
-> > > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> > > > owner@vger.kernel.org] On Behalf Of Gustavo Padovan
-> > > > Sent: Thursday, 15 September, 2011 20:28
-> > > > To: Jurgen Kramer
-> > > > Cc: linux-bluetooth@vger.kernel.org
-> > > > Subject: Re: [PATCH v2] btusb.c: add support for 2011 mac mini
-> > > >
-> > > > Hi Jurgen,
-> > > >
-> > > > * Jurgen Kramer <gtmkramer@xs4all.nl> [2011-09-15 18:04:44 +0200]:
-> > > >
-> > > > > Hopefully this patch is now correct.
-> > > > > Patch against current kernel git to add ID for MacMini5,1 to
-> > > > > btusb.c
-> > > > >
-> > > > > Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
-> > > > > --- linux/drivers/bluetooth/btusb.c	2011-09-14
-> > 17:31:09.411475756 +0200
-> > > > > +++ linux.new/drivers/bluetooth/btusb.c	2011-09-14
-> > > > 17:33:37.727484053
-> > > > > +0200
-> > > > > @@ -75,6 +75,9 @@ static struct usb_device_id btusb_table[
-> > > > >  	/* Apple MacBookPro8,2 */
-> > > > >  	{ USB_DEVICE(0x05ac, 0x821a) },
-> > > > >
-> > > > > +	/* Apple MacMini5,1 */
-> > > > > +	{ USB_DEVICE(0x05ac, 0x8281) },
-> > > > > +
-> > > > >  	/* AVM BlueFRITZ! USB v2.0 */
-> > > > >  	{ USB_DEVICE(0x057c, 0x3800) },
-> > > >
-> > > Hmm, mine says the id is:
-> > >
-> > > DMI: Apple Inc. Macmini5,3/Mac-7BA5B2794B2CDB12, BIOS
-> > > MM51.88Z.0075.B00.1106271442 06/27/2011
-> > >
-> > > ..rather than " MacMini5,1"
-> > >
-> > Yes, there are multiple models all which all have a different model name,
-> > 5,1/5,2/5,3 etc.
-> > I have the base mini (intel GPU), you probably have the server version.
-> > The patch should work regardless as it is not depended on DMI info.
-> > 
-> Just to let you know the patch works on the latest mac mini server:
-> 
-> DMI: Apple Inc. Macmini5,3/Mac-7BA5B2794B2CDB12, BIOS MM51.88Z.0075.B00.1106271442 06/27/2011
-> 
-> Bus 001 Device 003: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0 Hub (part of BCM2046 Bluetooth)
-> 
-> ..I'm not totally sure why id:0x4500 should work when the patch is for id:0x8281, but anyway :)
-> 
-> 
-Thanks for testing.
-The BCM2046 is a hub with multiple devices, one of which is the
-bluetooth device. You can check with lsusb -t
-
-
-
+PiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IGxpbnV4LWJsdWV0
+b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtDQo+ID4g
+PiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBHdXN0YXZvIFBhZG92YW4NCj4g
+PiA+IFNlbnQ6IFRodXJzZGF5LCAxNSBTZXB0ZW1iZXIsIDIwMTEgMjA6MjgNCj4gPiA+IFRvOiBK
+dXJnZW4gS3JhbWVyDQo+ID4gPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0K
+PiA+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2Ml0gYnR1c2IuYzogYWRkIHN1cHBvcnQgZm9yIDIw
+MTEgbWFjIG1pbmkNCj4gPiA+DQo+ID4gPiBIaSBKdXJnZW4sDQo+ID4gPg0KPiA+ID4gKiBKdXJn
+ZW4gS3JhbWVyIDxndG1rcmFtZXJAeHM0YWxsLm5sPiBbMjAxMS0wOS0xNSAxODowNDo0NCArMDIw
+MF06DQo+ID4gPg0KPiA+ID4gPiBIb3BlZnVsbHkgdGhpcyBwYXRjaCBpcyBub3cgY29ycmVjdC4N
+Cj4gPiA+ID4gUGF0Y2ggYWdhaW5zdCBjdXJyZW50IGtlcm5lbCBnaXQgdG8gYWRkIElEIGZvciBN
+YWNNaW5pNSwxIHRvDQo+ID4gPiA+IGJ0dXNiLmMNCj4gPiA+ID4NCj4gPiA+ID4gU2lnbmVkLW9m
+Zi1ieTogSnVyZ2VuIEtyYW1lciA8Z3Rta3JhbWVyQHhzNGFsbC5ubD4NCj4gPiA+ID4gLS0tIGxp
+bnV4L2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMJMjAxMS0wOS0xNA0KPiAxNzozMTowOS40MTE0
+NzU3NTYgKzAyMDANCj4gPiA+ID4gKysrIGxpbnV4Lm5ldy9kcml2ZXJzL2JsdWV0b290aC9idHVz
+Yi5jCTIwMTEtMDktMTQNCj4gPiA+IDE3OjMzOjM3LjcyNzQ4NDA1Mw0KPiA+ID4gPiArMDIwMA0K
+PiA+ID4gPiBAQCAtNzUsNiArNzUsOSBAQCBzdGF0aWMgc3RydWN0IHVzYl9kZXZpY2VfaWQgYnR1
+c2JfdGFibGVbDQo+ID4gPiA+ICAJLyogQXBwbGUgTWFjQm9va1BybzgsMiAqLw0KPiA+ID4gPiAg
+CXsgVVNCX0RFVklDRSgweDA1YWMsIDB4ODIxYSkgfSwNCj4gPiA+ID4NCj4gPiA+ID4gKwkvKiBB
+cHBsZSBNYWNNaW5pNSwxICovDQo+ID4gPiA+ICsJeyBVU0JfREVWSUNFKDB4MDVhYywgMHg4Mjgx
+KSB9LA0KPiA+ID4gPiArDQo+ID4gPiA+ICAJLyogQVZNIEJsdWVGUklUWiEgVVNCIHYyLjAgKi8N
+Cj4gPiA+ID4gIAl7IFVTQl9ERVZJQ0UoMHgwNTdjLCAweDM4MDApIH0sDQo+ID4gPg0KPiA+IEht
+bSwgbWluZSBzYXlzIHRoZSBpZCBpczoNCj4gPg0KPiA+IERNSTogQXBwbGUgSW5jLiBNYWNtaW5p
+NSwzL01hYy03QkE1QjI3OTRCMkNEQjEyLCBCSU9TDQo+ID4gTU01MS44OFouMDA3NS5CMDAuMTEw
+NjI3MTQ0MiAwNi8yNy8yMDExDQo+ID4NCj4gPiAuLnJhdGhlciB0aGFuICIgTWFjTWluaTUsMSIN
+Cj4gPg0KPiBZZXMsIHRoZXJlIGFyZSBtdWx0aXBsZSBtb2RlbHMgYWxsIHdoaWNoIGFsbCBoYXZl
+IGEgZGlmZmVyZW50IG1vZGVsIG5hbWUsDQo+IDUsMS81LDIvNSwzIGV0Yy4NCj4gSSBoYXZlIHRo
+ZSBiYXNlIG1pbmkgKGludGVsIEdQVSksIHlvdSBwcm9iYWJseSBoYXZlIHRoZSBzZXJ2ZXIgdmVy
+c2lvbi4NCj4gVGhlIHBhdGNoIHNob3VsZCB3b3JrIHJlZ2FyZGxlc3MgYXMgaXQgaXMgbm90IGRl
+cGVuZGVkIG9uIERNSSBpbmZvLg0KPiANCkp1c3QgdG8gbGV0IHlvdSBrbm93IHRoZSBwYXRjaCB3
+b3JrcyBvbiB0aGUgbGF0ZXN0IG1hYyBtaW5pIHNlcnZlcjoNCg0KRE1JOiBBcHBsZSBJbmMuIE1h
+Y21pbmk1LDMvTWFjLTdCQTVCMjc5NEIyQ0RCMTIsIEJJT1MgTU01MS44OFouMDA3NS5CMDAuMTEw
+NjI3MTQ0MiAwNi8yNy8yMDExDQoNCkJ1cyAwMDEgRGV2aWNlIDAwMzogSUQgMGE1Yzo0NTAwIEJy
+b2FkY29tIENvcnAuIEJDTTIwNDZCMSBVU0IgMi4wIEh1YiAocGFydCBvZiBCQ00yMDQ2IEJsdWV0
+b290aCkNCg0KLi5JJ20gbm90IHRvdGFsbHkgc3VyZSB3aHkgaWQ6MHg0NTAwIHNob3VsZCB3b3Jr
+IHdoZW4gdGhlIHBhdGNoIGlzIGZvciBpZDoweDgyODEsIGJ1dCBhbnl3YXkgOikNCg0K
