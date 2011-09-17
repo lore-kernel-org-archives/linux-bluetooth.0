@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <syamsidhardh@gmail.com>
-Subject: [PATCH] Fix crash when update service record with an invalid XML
-Date: Sun, 18 Sep 2011 14:59:15 +0530
-Message-Id: <1316338155-3862-1-git-send-email-syamsidhardh@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 17 Sep 2011 17:26:34 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2011-09-17
+Message-ID: <20110917202634.GA3819@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we pass an invalid xml to sdp_xml_parse_record(), then it returns
-NULL. Further we are passing the this NULL pointer to the
-sdp_record_free(), which leads to invalid memory access.
----
- plugins/service.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+Hi John,
 
-diff --git a/plugins/service.c b/plugins/service.c
-index d73cdea..14a5cb6 100644
---- a/plugins/service.c
-+++ b/plugins/service.c
-@@ -436,7 +436,6 @@ static DBusMessage *update_xml_record(DBusConnection *conn,
- 	sdp_record = sdp_xml_parse_record(record, len);
- 	if (!sdp_record) {
- 		error("Parsing of XML service record failed");
--		sdp_record_free(sdp_record);
- 		return btd_error_failed(msg,
- 					"Parsing of XML service record failed");
- 	}
--- 
-1.7.4.1
+This is probably my unique pull request for 3.1, it fixes an regression with
+the HCI_INQUIRY flag, it was not getting cleaned after scan. Fix by Oliver
+Neukum. Also support for two new apple devices and a simple fix the to
+btwilink driver.
 
+Please pull, or let me know any problem. Thanks.
+
+	Gustavo
+
+The following changes since commit 2249b011432ca3dcce112f0f71e0f531b4bb9347:
+
+  iwlagn: workaround bug crashing some APs (2011-09-16 15:32:12 -0400)
+
+are available in the git repository at:
+  git://github.com/padovan/bluetooth-next.git for-3.1
+
+Chen Ganir (1):
+      Bluetooth: Fixed BT ST Channel reg order
+
+Jurgen Kramer (1):
+      Bluetooth: add support for 2011 mac mini
+
+Oliver Neukum (1):
+      Bluetooth: Fix timeout on scanning for the second time
+
+Pieter-Augustijn Van Malleghem (1):
+      Bluetooth: Add MacBookAir4,1 support
+
+ drivers/bluetooth/btusb.c    |    6 ++++++
+ drivers/bluetooth/btwilink.c |   16 ++++++++--------
+ net/bluetooth/hci_event.c    |   17 ++++++++---------
+ 3 files changed, 22 insertions(+), 17 deletions(-)
