@@ -1,20 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Santiago Carot-Nemesio <sancane@gmail.com>
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: 
-Date: Mon, 19 Sep 2011 10:52:30 +0200
-Message-Id: <1316422359-16167-1-git-send-email-sancane@gmail.com>
+Cc: Syam Sidhardhan <syamsidhardh@gmail.com>
+Subject: [PATCH] Fix crash when update service record with an invalid XML
+Date: Sun, 18 Sep 2011 14:59:15 +0530
+Message-Id: <1316338155-3862-1-git-send-email-syamsidhardh@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Next set of patches enhances support for health thermometer thermomter profile.
+If we pass an invalid xml to sdp_xml_parse_record(), then it returns
+NULL. Further we are passing the this NULL pointer to the
+sdp_record_free(), which leads to invalid memory access.
+---
+ plugins/service.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-[PATCH 1/9] Load device driver if thermometer service attribute
-[PATCH 2/9] Register Health Thermometer Interface
-[PATCH 3/9] Unregister Health Thermometer Interface
-[PATCH 4/9] Add functions to manage attio callbacks
-[PATCH 5/9] Add handler function to manage GATT indications
-[PATCH 6/9] Get all characteristics in thermometer service
-[PATCH 7/9] Read temperature type characteristic
-[PATCH 8/9] Read measurement interval characteristic
-[PATCH 9/9] Set Intermediate property if intermediate temp.
+diff --git a/plugins/service.c b/plugins/service.c
+index d73cdea..14a5cb6 100644
+--- a/plugins/service.c
++++ b/plugins/service.c
+@@ -436,7 +436,6 @@ static DBusMessage *update_xml_record(DBusConnection *conn,
+ 	sdp_record = sdp_xml_parse_record(record, len);
+ 	if (!sdp_record) {
+ 		error("Parsing of XML service record failed");
+-		sdp_record_free(sdp_record);
+ 		return btd_error_failed(msg,
+ 					"Parsing of XML service record failed");
+ 	}
+-- 
+1.7.4.1
+
