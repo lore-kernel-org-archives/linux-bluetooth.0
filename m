@@ -1,63 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: linux-bluetooth@vger.kernel.org
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Bastien Nocera <hadess@hadess.net>
-Subject: [RFC PATCH BlueZ 1/3] Add a btd_manager_get_default_adapter_str() call
-Date: Mon, 19 Sep 2011 19:42:03 +0200
-Message-Id: <1316454126-32614-2-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
-References: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
+MIME-Version: 1.0
+In-Reply-To: <CAKT1EBcp6uyb14nktvo89Mwq=+13-aXTReN7FOF24R2SeJABGw@mail.gmail.com>
+References: <1316422359-16167-1-git-send-email-sancane@gmail.com>
+	<1316422359-16167-2-git-send-email-sancane@gmail.com>
+	<CAJdJm_M=19tbUqYFztW8EJM5qCOdy00ddZ6rRMtgtQ0hcN55YA@mail.gmail.com>
+	<CACLukzKE_5c--JS+FbWS23w_hs_MG9kYkGF_U_5isPM1WF_AFQ@mail.gmail.com>
+	<CAJdJm_PhQVMgMR-iKGwEx89=_J=J_pumSfZU8qovz_mtYks=TA@mail.gmail.com>
+	<CAKT1EBcp6uyb14nktvo89Mwq=+13-aXTReN7FOF24R2SeJABGw@mail.gmail.com>
+Date: Mon, 19 Sep 2011 19:31:32 +0200
+Message-ID: <CACLukzJgDVdHLO_kbqhcrZ0anQvJ6-mg3K86JzbrGWwU9rF6Og@mail.gmail.com>
+Subject: Re: [PATCH 1/9] Load device driver if thermometer service attribute
+ appears in GATT
+From: Santiago Carot <sancane@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to get the default adapter address as a string,
-this is going to be used by the external playstation-peripheral plugin.
----
- src/manager.h |    1 +
- src/manager.c |   16 ++++++++++++++++
- 2 files changed, 17 insertions(+), 0 deletions(-)
+Hi,
 
-diff --git a/src/manager.h b/src/manager.h
-index 4f92d2f..91d9894 100644
---- a/src/manager.h
-+++ b/src/manager.h
-@@ -36,6 +36,7 @@ const char *manager_get_base_path(void);
- struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
- struct btd_adapter *manager_find_adapter_by_id(int id);
- struct btd_adapter *manager_get_default_adapter(void);
-+char *btd_manager_get_default_adapter_str(void);
- void manager_foreach_adapter(adapter_cb func, gpointer user_data);
- GSList *manager_get_adapters(void);
- struct btd_adapter *btd_manager_register_adapter(int id);
-diff --git a/src/manager.c b/src/manager.c
-index 464b0ca..8947f85 100644
---- a/src/manager.c
-+++ b/src/manager.c
-@@ -270,6 +270,22 @@ struct btd_adapter *manager_get_default_adapter(void)
- 	return manager_find_adapter_by_id(default_adapter_id);
- }
- 
-+char *btd_manager_get_default_adapter_str(void)
-+{
-+	struct btd_adapter *adapter;
-+	bdaddr_t adapter_bdaddr;
-+	char *str = bt_malloc(18);
-+
-+	adapter = manager_get_default_adapter();
-+	if (adapter == NULL) {
-+		return NULL;
-+	}
-+
-+	adapter_get_address(adapter, &adapter_bdaddr);
-+	ba2str(&adapter_bdaddr, str);
-+	return str;
-+}
-+
- static void manager_remove_adapter(struct btd_adapter *adapter)
- {
- 	uint16_t dev_id = adapter_get_dev_id(adapter);
--- 
-1.7.6.3
+2011/9/19 Claudio Takahasi <claudio.takahasi@openbossa.org>:
+> Hi Santiago,
+>
+> On Mon, Sep 19, 2011 at 11:39 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> Hi,
+>>
+>> On Mon, Sep 19, 2011 at 8:57 AM, Santiago Carot <sancane@gmail.com> wrote:
+>>>>>  static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
+>>>>>  {
+>>>>> -       return thermometer_register(connection, device);
+>>>>> +       struct att_primary *tattr;
+>>>>> +       GSList *l, *primaries;
+>>>>> +
+>>>>> +       primaries = btd_device_get_primaries(device);
+>>>>> +
+>>>>> +       l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_SVC_UUID,
+>>>>> +                                                       primary_uuid_cmp);
+>>>>
+>>>> I think this is incorrect. You should compare against the 128-bit
+>>>> UUID, not the 16-bit one. I.e. use HEALTH_THERMOMETER_UUID here.
+>>>
+>>> Are you sure?. In my tests, the function btd_device_get_primaries only
+>>> gives me 16-bit UUIDs. If I try the 128-bit ones it doesn't work. That
+>>> the reason wich I did this. Do you have any idea for this?
+>>
+>> A bug maybe? See the proximity monitor manager.c, it uses 128-bit
+>> string. Claudio, any comments?
+>>
+>> Regards,
+>> --
+>> Anderson Lizardo
+>> Instituto Nokia de Tecnologia - INdT
+>> Manaus - Brazil
+>
+>
+> Are you testing over Basic Rate? Looking quickly the code, the
+> function which extract the primary service UUID from the service
+> record doesn't convert the UUIDs to UUUID128 before converting to
+> string.
+> BTW: why are you checking again if the thermometer UUID is in the
+> list? The driver will only be probed if at least one UUID matches.
+>
 
+Yes, I'm testing over Basic rate by now, but you are rigth, that code
+would'nt be needed because the driver is being already proved. I'm
+going to change for next set of patches.
+
+Thank you very much.
+
+BR
+Santi
