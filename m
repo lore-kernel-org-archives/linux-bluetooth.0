@@ -1,139 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 01/14] Bluetooth: Periodic Inquiry and mgmt discovering event
-Date: Mon, 19 Sep 2011 18:35:23 -0300
-Message-Id: <1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
-References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v4 00/14] Discovery support
+Date: Mon, 19 Sep 2011 18:35:22 -0300
+Message-Id: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-By using periodic inquiry command we're not able to detect correctly
-when the controller has started inquiry.
+Hi Gustavo,
 
-Today we have this workaround in inquiry result event handler to set
-the HCI_INQUIRY flag when it sees the first inquiry result event.
-This workaround isn't enough because the device may be performing
-an inquiry but the HCI_INQUIRY flag is not set. For instance, if
-there is no device in range, no inquiry result event is generated,
-consequently, the HCI_INQUIRY flags isn't set when it should so.
+I rebased the discovery series as you asked.
 
-We rely on HCI_INQUIRY flag to implement the discovery procedure
-properly. So, as we aren't able to clear/set the HCI_INQUIRY flag in
-a reliable manner, periodic inquiry events shouldn't change the
-HCI_INQUIRY flag. In future, if needed, we might add a new flag (e.g.
-HCI_PINQUIRY) to know if the controller is performing periodic
-inquiry.
+Andre. 
 
-Thus, due to that issue and in order to keep compatibility with
-userspace, periodic inquiry events shouldn't send mgmt discovering
-events.
+Andre Guedes (14):
+  Bluetooth: Periodic Inquiry and mgmt discovering event
+  Bluetooth: Add mgmt_discovery_complete()
+  Bluetooth: Check pending command in start_discovery()
+  Bluetooth: Check pending commands in stop_discovery()
+  Bluetooth: Create hci_do_inquiry()
+  Bluetooth: Create hci_cancel_inquiry()
+  Bluetooth: Handle race condition in Discovery
+  Bluetooth: Prepare for full support discovery procedures
+  Bluetooth: Send mgmt_discovering events
+  Bluetooth: Add 'eir_len' param to mgmt_device_found()
+  Bluetooth: Report LE devices
+  Bluetooth: LE scan infra-structure
+  Bluetooth: Support LE-Only discovery procedure
+  Bluetooth: Support BR/EDR/LE discovery procedure
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_event.c |   43 +++++++++++--------------------------------
- 1 files changed, 11 insertions(+), 32 deletions(-)
+ include/net/bluetooth/hci.h      |   12 ++++
+ include/net/bluetooth/hci_core.h |   15 ++++-
+ net/bluetooth/hci_core.c         |   96 +++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  104 ++++++++++++++++++-----------
+ net/bluetooth/mgmt.c             |  135 +++++++++++++++++++++++++++++++++++---
+ 5 files changed, 312 insertions(+), 50 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 35083f2..89faf48 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -58,9 +58,9 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
--	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
--			test_bit(HCI_MGMT, &hdev->flags))
--		mgmt_discovering(hdev->id, 0);
-+	clear_bit(HCI_INQUIRY, &hdev->flags);
-+
-+	mgmt_discovering(hdev->id, 0);
- 
- 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
- 
-@@ -76,10 +76,6 @@ static void hci_cc_exit_periodic_inq(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (status)
- 		return;
- 
--	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
--				test_bit(HCI_MGMT, &hdev->flags))
--		mgmt_discovering(hdev->id, 0);
--
- 	hci_conn_check_pending(hdev);
- }
- 
-@@ -958,9 +954,9 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 		return;
- 	}
- 
--	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags) &&
--				test_bit(HCI_MGMT, &hdev->flags))
--		mgmt_discovering(hdev->id, 1);
-+	set_bit(HCI_INQUIRY, &hdev->flags);
-+
-+	mgmt_discovering(hdev->id, 1);
- }
- 
- static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
-@@ -1339,13 +1335,14 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
- 
- 	BT_DBG("%s status %d", hdev->name, status);
- 
--	if (test_and_clear_bit(HCI_INQUIRY, &hdev->flags) &&
--				test_bit(HCI_MGMT, &hdev->flags))
--		mgmt_discovering(hdev->id, 0);
--
- 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 	hci_conn_check_pending(hdev);
-+
-+	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
-+		return;
-+
-+	mgmt_discovering(hdev->id, 0);
- }
- 
- static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -1361,12 +1358,6 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
- 
- 	hci_dev_lock(hdev);
- 
--	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
--
--		if (test_bit(HCI_MGMT, &hdev->flags))
--			mgmt_discovering(hdev->id, 1);
--	}
--
- 	for (; num_rsp; num_rsp--, info++) {
- 		bacpy(&data.bdaddr, &info->bdaddr);
- 		data.pscan_rep_mode	= info->pscan_rep_mode;
-@@ -2359,12 +2350,6 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
- 
- 	hci_dev_lock(hdev);
- 
--	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
--
--		if (test_bit(HCI_MGMT, &hdev->flags))
--			mgmt_discovering(hdev->id, 1);
--	}
--
- 	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
- 		struct inquiry_info_with_rssi_and_pscan_mode *info;
- 		info = (void *) (skb->data + 1);
-@@ -2527,12 +2512,6 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
- 	if (!num_rsp)
- 		return;
- 
--	if (!test_and_set_bit(HCI_INQUIRY, &hdev->flags)) {
--
--		if (test_bit(HCI_MGMT, &hdev->flags))
--			mgmt_discovering(hdev->id, 1);
--	}
--
- 	hci_dev_lock(hdev);
- 
- 	for (; num_rsp; num_rsp--, info++) {
 -- 
 1.7.5.2
 
