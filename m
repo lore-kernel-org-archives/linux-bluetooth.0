@@ -1,75 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 19 Sep 2011 14:13:30 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv1 5/5] Bluetooth: EWS: prevent unneeded fragmentation in
+ l2cap
+Message-ID: <20110919171330.GA2643@joana>
+References: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1315404314-12045-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20110914035104.GN16856@joana>
+ <20110916114308.GA25990@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <CAKT1EBcp6uyb14nktvo89Mwq=+13-aXTReN7FOF24R2SeJABGw@mail.gmail.com>
-References: <1316422359-16167-1-git-send-email-sancane@gmail.com>
-	<1316422359-16167-2-git-send-email-sancane@gmail.com>
-	<CAJdJm_M=19tbUqYFztW8EJM5qCOdy00ddZ6rRMtgtQ0hcN55YA@mail.gmail.com>
-	<CACLukzKE_5c--JS+FbWS23w_hs_MG9kYkGF_U_5isPM1WF_AFQ@mail.gmail.com>
-	<CAJdJm_PhQVMgMR-iKGwEx89=_J=J_pumSfZU8qovz_mtYks=TA@mail.gmail.com>
-	<CAKT1EBcp6uyb14nktvo89Mwq=+13-aXTReN7FOF24R2SeJABGw@mail.gmail.com>
-Date: Mon, 19 Sep 2011 19:31:32 +0200
-Message-ID: <CACLukzJgDVdHLO_kbqhcrZ0anQvJ6-mg3K86JzbrGWwU9rF6Og@mail.gmail.com>
-Subject: Re: [PATCH 1/9] Load device driver if thermometer service attribute
- appears in GATT
-From: Santiago Carot <sancane@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20110916114308.GA25990@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-2011/9/19 Claudio Takahasi <claudio.takahasi@openbossa.org>:
-> Hi Santiago,
->
-> On Mon, Sep 19, 2011 at 11:39 AM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->> Hi,
->>
->> On Mon, Sep 19, 2011 at 8:57 AM, Santiago Carot <sancane@gmail.com> wrote:
->>>>>  static int thermometer_driver_probe(struct btd_device *device, GSList *uuids)
->>>>>  {
->>>>> -       return thermometer_register(connection, device);
->>>>> +       struct att_primary *tattr;
->>>>> +       GSList *l, *primaries;
->>>>> +
->>>>> +       primaries = btd_device_get_primaries(device);
->>>>> +
->>>>> +       l = g_slist_find_custom(primaries, HEALTH_THERMOMETER_SVC_UUID,
->>>>> +                                                       primary_uuid_cmp);
->>>>
->>>> I think this is incorrect. You should compare against the 128-bit
->>>> UUID, not the 16-bit one. I.e. use HEALTH_THERMOMETER_UUID here.
->>>
->>> Are you sure?. In my tests, the function btd_device_get_primaries only
->>> gives me 16-bit UUIDs. If I try the 128-bit ones it doesn't work. That
->>> the reason wich I did this. Do you have any idea for this?
->>
->> A bug maybe? See the proximity monitor manager.c, it uses 128-bit
->> string. Claudio, any comments?
->>
->> Regards,
->> --
->> Anderson Lizardo
->> Instituto Nokia de Tecnologia - INdT
->> Manaus - Brazil
->
->
-> Are you testing over Basic Rate? Looking quickly the code, the
-> function which extract the primary service UUID from the service
-> record doesn't convert the UUIDs to UUUID128 before converting to
-> string.
-> BTW: why are you checking again if the thermometer UUID is in the
-> list? The driver will only be probed if at least one UUID matches.
->
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-16 14:43:17 +0300]:
 
-Yes, I'm testing over Basic rate by now, but you are rigth, that code
-would'nt be needed because the driver is being already proved. I'm
-going to change for next set of patches.
+> Hi Gustavo,
+> 
+> On Wed, Sep 14, 2011 at 12:51:04AM -0300, Gustavo Padovan wrote:
+> > Hi Andrei,
+> > 
+> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-07 17:05:14 +0300]:
+> > 
+> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > > 
+> > > Calculate pdu length before creating I-frame. Otherwise if
+> > > conn->mtu - (headers) < remote_mps we get fragmented packets in
+> > > create_iframe_pdu function.
+> > 
+> > You might check the way we set the remote_mps, it seems you are not taking
+> > that in account.
+> 
+> You are right, I was confused by magic "rfc.max_pdu_size =
+> cpu_to_le16(chan->conn->mtu - 10)"
+> 
+> I will send new patch with fixes like the one below:
+> 
+> -               rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+> -               if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
+> -                       rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
+> +
+> +               rfc.max_pdu_size = cpu_to_le16(min_t(u16,
+> +                                               L2CAP_DEFAULT_MAX_PDU_SIZE,
+> +                                               chan->conn->mtu -
+> +                                               L2CAP_EXTENDED_HDR_SIZE -
+> +                                               L2CAP_SDULEN_SIZE -
+> +                                               L2CAP_FCS_SIZE));
 
-Thank you very much.
+Then do this in two parts:
 
-BR
-Santi
+		size = min_t(...)
+		rfc.max_pdu_size = cpu_to_le16(size);
+
+
+	Gustavo
