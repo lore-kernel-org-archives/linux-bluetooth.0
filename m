@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ 1/4] Fix error handling in start_dtmf_reply
-Date: Mon, 19 Sep 2011 13:54:36 +0300
-Message-Id: <1316429679-18651-1-git-send-email-dmitriy.paliy@nokia.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 9/9] Set Intermediate property if intermediate temp. characteristic is supported
+Date: Mon, 19 Sep 2011 10:52:39 +0200
+Message-Id: <1316422359-16167-10-git-send-email-sancane@gmail.com>
+In-Reply-To: <1316422359-16167-9-git-send-email-sancane@gmail.com>
+References: <1316422359-16167-1-git-send-email-sancane@gmail.com>
+ <1316422359-16167-2-git-send-email-sancane@gmail.com>
+ <1316422359-16167-3-git-send-email-sancane@gmail.com>
+ <1316422359-16167-4-git-send-email-sancane@gmail.com>
+ <1316422359-16167-5-git-send-email-sancane@gmail.com>
+ <1316422359-16167-6-git-send-email-sancane@gmail.com>
+ <1316422359-16167-7-git-send-email-sancane@gmail.com>
+ <1316422359-16167-8-git-send-email-sancane@gmail.com>
+ <1316422359-16167-9-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If csd replyed with error to StartDTMF, then StopDTMF method call
-is not sent.
 ---
- audio/telephony-maemo6.c |   17 ++++++++++++++++-
- 1 files changed, 16 insertions(+), 1 deletions(-)
+ thermometer/thermometer.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index ad5d06f..1f3cdef 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -734,10 +734,25 @@ void telephony_dial_number_req(void *telephony_device, const char *number)
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 0178e99..fdf459e 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -258,7 +258,8 @@ static void process_thermometer_char(struct characteristic *ch)
+ 	GAttribResultFunc func;
  
- static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
- {
--	send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
-+	DBusError err;
-+	DBusMessage *reply;
-+
-+	reply = dbus_pending_call_steal_reply(call);
-+
-+	dbus_error_init(&err);
-+	if (dbus_set_error_from_message(&err, reply)) {
-+		error("csd replied with an error: %s, %s",
-+				err.name, err.message);
-+
-+		dbus_error_free(&err);
-+	} else
-+		send_method_call(CSD_CALL_BUS_NAME, CSD_CALL_PATH,
- 				CSD_CALL_INTERFACE, "StopDTMF",
- 				NULL, NULL,
- 				DBUS_TYPE_INVALID);
-+
-+	dbus_message_unref(reply);
-+	dbus_pending_call_unref(call);
- }
- 
- static void start_dtmf(void *telephony_device, char tone)
+ 	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
+-		/* TODO: Change intermediate property and emit signal */
++		gboolean intermediate = TRUE;
++		change_property(ch->t, "Intermediate", &intermediate);
+ 		return;
+ 	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
+ 		func = read_temp_type_cb;
 -- 
-1.7.4.1
+1.7.6.1
 
