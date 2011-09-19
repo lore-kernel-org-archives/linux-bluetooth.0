@@ -1,41 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 00/14] Discovery support
-Date: Mon, 19 Sep 2011 18:35:22 -0300
-Message-Id: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 19 Sep 2011 18:17:23 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 2/5 v3] Bluetooth: mark l2cap_create_iframe_pdu as static
+Message-ID: <20110919211723.GK2643@joana>
+References: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
+ <1315846853-27442-2-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1315846853-27442-2-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-I rebased the discovery series as you asked.
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-09-12 20:00:50 +0300]:
 
-Andre. 
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> l2cap_create_iframe_pdu is only used in l2cap_core.c
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
 
-Andre Guedes (14):
-  Bluetooth: Periodic Inquiry and mgmt discovering event
-  Bluetooth: Add mgmt_discovery_complete()
-  Bluetooth: Check pending command in start_discovery()
-  Bluetooth: Check pending commands in stop_discovery()
-  Bluetooth: Create hci_do_inquiry()
-  Bluetooth: Create hci_cancel_inquiry()
-  Bluetooth: Handle race condition in Discovery
-  Bluetooth: Prepare for full support discovery procedures
-  Bluetooth: Send mgmt_discovering events
-  Bluetooth: Add 'eir_len' param to mgmt_device_found()
-  Bluetooth: Report LE devices
-  Bluetooth: LE scan infra-structure
-  Bluetooth: Support LE-Only discovery procedure
-  Bluetooth: Support BR/EDR/LE discovery procedure
+Applied, thanks.
 
- include/net/bluetooth/hci.h      |   12 ++++
- include/net/bluetooth/hci_core.h |   15 ++++-
- net/bluetooth/hci_core.c         |   96 +++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  104 ++++++++++++++++++-----------
- net/bluetooth/mgmt.c             |  135 +++++++++++++++++++++++++++++++++++---
- 5 files changed, 312 insertions(+), 50 deletions(-)
-
--- 
-1.7.5.2
-
+	Gustavo
