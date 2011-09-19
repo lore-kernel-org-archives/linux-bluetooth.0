@@ -1,76 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 08/14] Bluetooth: Prepare for full support discovery procedures
-Date: Mon, 19 Sep 2011 18:35:30 -0300
-Message-Id: <1316468136-12472-9-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v4 07/14] Bluetooth: Handle race condition in Discovery
+Date: Mon, 19 Sep 2011 18:35:29 -0300
+Message-Id: <1316468136-12472-8-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
 References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch prepares start_discovery() to support LE-Only and BR/EDR/LE
-discovery procedures (BR/EDR is already supported).
+If MGMT_OP_STOP_DISCOVERY command is issued before the kernel
+receives the HCI Inquiry Command Status Event from the controller
+then that command will fail and the discovery procedure won't be
+stopped. This situation may occur if a MGMT_OP_STOP_DISCOVERY
+command is issued just after a MGMT_OP_START_DISCOVERY.
+
+This race condition can be handled by checking for pending
+MGMT_OP_STOP_DISCOVERY command in inquiry command status event
+handler. If we have a pending MGMT_OP_STOP_DISCOVERY command we
+cancel the ongoing discovery.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci.h      |    1 +
  include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/mgmt.c             |   10 +++++++++-
- 3 files changed, 11 insertions(+), 1 deletions(-)
+ net/bluetooth/hci_event.c        |    3 +++
+ net/bluetooth/mgmt.c             |   14 +++++++++++++-
+ 3 files changed, 17 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index aaf79af..1e11e7f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -202,6 +202,7 @@ enum {
- 
- #define LMP_EV4		0x01
- #define LMP_EV5		0x02
-+#define LMP_NO_BREDR	0x20
- #define LMP_LE		0x40
- 
- #define LMP_SNIFF_SUBR	0x02
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 36e15cc..e0c9790 100644
+index 4a79a50..36e15cc 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -613,6 +613,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
- #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
- #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
-+#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
- #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+@@ -876,6 +876,7 @@ int mgmt_discovering(u16 index, u8 discovering);
+ int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
+ int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+ int mgmt_discovery_complete(u16 index, u8 status);
++int mgmt_has_pending_stop_discov(u16 index);
  
- /* ----- Extended LMP capabilities ----- */
+ /* HCI info for socket */
+ #define hci_pi(sk) ((struct hci_pinfo *) sk)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b44f362..c9d641b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -962,6 +962,9 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+ 	set_bit(HCI_INQUIRY, &hdev->flags);
+ 
+ 	mgmt_discovering(hdev->id, 1);
++
++	if (mgmt_has_pending_stop_discov(hdev->id))
++		hci_cancel_inquiry(hdev);
+ }
+ 
+ static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 58cf33a..3a0815b 100644
+index d84f242..58cf33a 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -32,6 +32,8 @@
- #define MGMT_VERSION	0
- #define MGMT_REVISION	1
- 
-+#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
-+
- struct pending_cmd {
- 	struct list_head list;
- 	__u16 opcode;
-@@ -1632,7 +1634,13 @@ static int start_discovery(struct sock *sk, u16 index)
+@@ -1674,7 +1674,11 @@ static int stop_discovery(struct sock *sk, u16 index)
  		goto failed;
  	}
  
--	err = hci_do_inquiry(hdev, 0x08);
-+	if (lmp_host_le_capable(hdev) && lmp_bredr_capable(hdev))
-+		err = -ENOSYS;
-+	else if (lmp_host_le_capable(hdev))
-+		err = -ENOSYS;
+-	err = hci_cancel_inquiry(hdev);
++	if (test_bit(HCI_INQUIRY, &hdev->flags))
++		err = hci_cancel_inquiry(hdev);
 +	else
-+		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
++		err = 0;
 +
  	if (err < 0)
  		mgmt_pending_remove(cmd);
  
+@@ -2419,3 +2423,11 @@ int mgmt_discovery_complete(u16 index, u8 status)
+ 
+ 	return 0;
+ }
++
++int mgmt_has_pending_stop_discov(u16 index)
++{
++	if (mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index))
++		return 1;
++
++	return 0;
++}
 -- 
 1.7.5.2
 
