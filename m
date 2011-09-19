@@ -1,57 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Sep 2011 09:28:19 +0300
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 5/5] Bluetooth: EWS: prevent unneeded fragmentation in
- l2cap
-Message-ID: <20110920062816.GA28526@aemeltch-MOBL1>
-References: <1315404314-12045-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1315404314-12045-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20110914035104.GN16856@joana>
- <20110916114308.GA25990@aemeltch-MOBL1>
- <20110919171330.GA2643@joana>
+Date: Mon, 19 Sep 2011 18:45:05 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/5 v2] Bluetooth: make use sk_priority to priritize RFCOMM
+ packets
+Message-ID: <20110919214505.GM2643@joana>
+References: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
+ <1315846853-27442-3-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110919171330.GA2643@joana>
+In-Reply-To: <1315846853-27442-3-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-On Mon, Sep 19, 2011 at 02:13:30PM -0300, Gustavo Padovan wrote:
-> > > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-07 17:05:14 +0300]:
-> > > 
-> > > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > > 
-> > > > Calculate pdu length before creating I-frame. Otherwise if
-> > > > conn->mtu - (headers) < remote_mps we get fragmented packets in
-> > > > create_iframe_pdu function.
-> > > 
-> > > You might check the way we set the remote_mps, it seems you are not taking
-> > > that in account.
-> > 
-> > You are right, I was confused by magic "rfc.max_pdu_size =
-> > cpu_to_le16(chan->conn->mtu - 10)"
-> > 
-> > I will send new patch with fixes like the one below:
-> > 
-> > -               rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
-> > -               if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
-> > -                       rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
-> > +
-> > +               rfc.max_pdu_size = cpu_to_le16(min_t(u16,
-> > +                                               L2CAP_DEFAULT_MAX_PDU_SIZE,
-> > +                                               chan->conn->mtu -
-> > +                                               L2CAP_EXTENDED_HDR_SIZE -
-> > +                                               L2CAP_SDULEN_SIZE -
-> > +                                               L2CAP_FCS_SIZE));
+* Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2011-09-12 20:00:51 +0300]:
+
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Then do this in two parts:
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/rfcomm/core.c |   51 +++++++++++++++++++++++++++++-------------
+>  net/bluetooth/rfcomm/sock.c |    2 +
+>  2 files changed, 37 insertions(+), 16 deletions(-)
 > 
-> 		size = min_t(...)
-> 		rfc.max_pdu_size = cpu_to_le16(size);
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 85580f2..bfc6bce 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -65,7 +65,8 @@ static DEFINE_MUTEX(rfcomm_mutex);
+>  
+>  static LIST_HEAD(session_list);
+>  
+> -static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
+> +static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
+> +							u32 priority);
+>  static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
+>  static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
+>  static int rfcomm_queue_disc(struct rfcomm_dlc *d);
+> @@ -747,19 +748,34 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
+>  }
+>  
+>  /* ---- RFCOMM frame sending ---- */
+> -static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len)
+> +static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
+> +							u32 priority)
+>  {
+>  	struct socket *sock = s->sock;
+> +	struct sock *sk = sock->sk;
+>  	struct kvec iv = { data, len };
+>  	struct msghdr msg;
+>  
+> -	BT_DBG("session %p len %d", s, len);
+> +	BT_DBG("session %p len %d priority %u", s, len, priority);
+> +
+> +	if (sk->sk_priority != priority) {
+> +		lock_sock(sk);
+> +		sk->sk_priority = priority;
+> +		release_sock(sk);
+> +	}
+>  
+>  	memset(&msg, 0, sizeof(msg));
+>  
+>  	return kernel_sendmsg(sock, &msg, &iv, 1, len);
+>  }
+>  
+> +static int rfcomm_send_cmd(struct rfcomm_session *s, struct rfcomm_cmd *cmd)
+> +{
+> +	BT_DBG("%p cmd %u", s, cmd->ctrl);
+> +
+> +	return rfcomm_send_frame(s, (void *) cmd, sizeof(*cmd), HCI_PRIO_MAX);
 
-This can be done, is this the only comment?
 
-Best regards 
-Andrei Emeltchenko 
+What's the idea here? Prioritize commands over data? But does this really
+happen? Because we have only one queue to receive the data in L2CAP. There
+is no separation between data and cmd there.
+
+Also, did you check if we can send RFCOMM commands and data out of order?
+
+I really would like to rewrite l2cap-rfcomm iteraction before adding new
+features here.
+
+
+	Gustavo
