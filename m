@@ -4,61 +4,126 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Antonio Ospite <ospite@studenti.unina.it>,
 	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
 	Bastien Nocera <hadess@hadess.net>
-Subject: [RFC PATCH BlueZ 2/3] Add a btd_store_record_string() call
-Date: Mon, 19 Sep 2011 19:42:04 +0200
-Message-Id: <1316454126-32614-3-git-send-email-ospite@studenti.unina.it>
+Subject: [RCF PATCH Bluez 3/3] Add a btd_device_set_trusted() call
+Date: Mon, 19 Sep 2011 19:42:05 +0200
+Message-Id: <1316454126-32614-4-git-send-email-ospite@studenti.unina.it>
 In-Reply-To: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
 References: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to store an SDP record passed as a string, this is
-going to be used by the external playstation-peripheral plugin.
+Add a new btd_* call to set a device as trusted, this is going to be
+used by the external playstation-peripheral plugin.
 ---
- src/storage.h |    1 +
- src/storage.c |   17 +++++++++++++++++
- 2 files changed, 18 insertions(+), 0 deletions(-)
+ src/device.h |    6 +++++
+ src/device.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+), 0 deletions(-)
 
-diff --git a/src/storage.h b/src/storage.h
-index bb64727..c94c691 100644
---- a/src/storage.h
-+++ b/src/storage.h
-@@ -56,6 +56,7 @@ GSList *list_trusts(bdaddr_t *local, const char *service);
- int write_device_profiles(bdaddr_t *src, bdaddr_t *dst, const char *profiles);
- int delete_entry(bdaddr_t *src, const char *storage, const char *key);
- int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec);
-+int btd_store_record_string(const gchar *src, const gchar *dst, const gchar *record_str);
- sdp_record_t *record_from_string(const gchar *str);
- sdp_record_t *fetch_record(const gchar *src, const gchar *dst, const uint32_t handle);
- int delete_record(const gchar *src, const gchar *dst, const uint32_t handle);
-diff --git a/src/storage.c b/src/storage.c
-index 1f3da6e..8bf2d8d 100644
---- a/src/storage.c
-+++ b/src/storage.c
-@@ -816,6 +816,23 @@ int store_record(const gchar *src, const gchar *dst, sdp_record_t *rec)
- 	return err;
+diff --git a/src/device.h b/src/device.h
+index 6efcf63..f1b43b7 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -60,6 +60,12 @@ void device_register_services(DBusConnection *conn, struct btd_device *device,
+ 						GSList *prim_list, int psm);
+ GSList *device_services_from_record(struct btd_device *device,
+ 							GSList *profiles);
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   const char *uuid);
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+ struct btd_adapter *device_get_adapter(struct btd_device *device);
+ void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
+diff --git a/src/device.c b/src/device.c
+index 96e798f..67182c9 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -49,6 +49,7 @@
+ #include "att.h"
+ #include "hcid.h"
+ #include "adapter.h"
++#include "manager.h"
+ #include "gattrib.h"
+ #include "attio.h"
+ #include "device.h"
+@@ -2481,6 +2482,75 @@ GSList *btd_device_get_primaries(struct btd_device *device)
+ 	return device->primaries;
  }
  
-+int btd_store_record_string(const gchar *src,
-+			    const gchar *dst,
-+			    const gchar *record_str)
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   const char *uuid)
 +{
-+	sdp_record_t *record;
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	DBusConnection *conn;
++	bdaddr_t src;
++	bdaddr_t dst;
 +	int ret = 0;
 +
-+	record = record_from_string(record_str);
-+	if (record == NULL) {
-+		return -ENOMEM;
-+	}
-+	ret = store_record(src, dst, record);
-+	sdp_record_free(record);
++	str2ba(adapter_address, &src);
++	str2ba(device_address, &dst);
 +
++	/* XXX: is this really needed? Association works even without it */
++	write_device_name(&dst, &src, name);
++
++	/* Set the device id */
++	store_device_id(adapter_address, device_address, 0xffff, vendor_id,
++			product_id, 0);
++	/* Don't write a profile here,
++	 * it will be updated when the device connects */
++
++	write_trust(adapter_address, device_address, "[all]", TRUE);
++
++	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (conn == NULL) {
++		DBG("Failed to get on the bus");
++		ret = -EPERM;
++		goto out;
++	}
++
++	adapter = manager_find_adapter(&src);
++	if (adapter == NULL) {
++		DBG("Failed to get the adapter");
++		ret = -EPERM;
++		goto out_dbus_unref;
++	}
++
++	/* This is needed: adapter_find_device() wouldn't need a Dbus
++	 * connection but it would not be enough as it only searches for
++	 * already existing devices, while adapter_get_device() will create a
++	 * new device if necessary.
++	 */
++	device = adapter_get_device(conn, adapter, device_address);
++	if (device == NULL) {
++		DBG("Failed to get the device");
++		ret = -ENODEV;
++		goto out_dbus_unref;
++	}
++
++	btd_device_add_uuid(device, uuid);
++
++	/* XXX: these two should not be needed either, as the values are reset
++	 * on the actual BT connection. We are just preparing for it now, we
++	 * are still connected via USB. I just wanted confirmation on that.
++	 */
++	device_set_temporary(device, FALSE);
++	device_set_name(device, name);
++
++out_dbus_unref:
++	dbus_connection_unref(conn);
++out:
 +	return ret;
 +}
 +
- sdp_record_t *record_from_string(const gchar *str)
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
  {
- 	sdp_record_t *rec;
+ 	GSList *uuid_list;
 -- 
 1.7.6.3
 
