@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ v2] Fix remove emitting Paired=false when deleting device
-Date: Tue, 20 Sep 2011 22:09:50 +0300
-Message-Id: <1316545790-3065-1-git-send-email-dmitriy.paliy@nokia.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
+Date: Tue, 20 Sep 2011 15:31:36 -0300
+Message-Id: <1316543496-18575-4-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adapter is requested to remove device, device's property
-Paired=false is emitted after the adapter notifies clients that
-list Devices is empty. Some clients get confused.
-
-Emitting property was introduced in clean-up patch
-c92a4af85f480c16f3ff017783c821304c899ce5. Since such notification
-does not have practical meaning, it is better to remove it.
 ---
- src/device.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ audio/avctp.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 96e798f..3a2d88f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -992,7 +992,8 @@ static void device_remove_stored(struct btd_device *device)
- 		delete_entry(&src, "linkkeys", addr);
- 		delete_entry(&src, "aliases", addr);
- 		device_set_bonded(device, FALSE);
--		device_set_paired(device, FALSE);
-+		device->paired = FALSE;
-+		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
- 	}
- 	delete_entry(&src, "profiles", addr);
- 	delete_entry(&src, "trusts", addr);
+diff --git a/audio/avctp.c b/audio/avctp.c
+index e9b8e40..59fbed9 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -155,6 +155,8 @@ static struct {
+ 	{ "BACKWARD",		BACKWARD_OP,		KEY_PREVIOUSSONG },
+ 	{ "REWIND",		REWIND_OP,		KEY_REWIND },
+ 	{ "FAST FORWARD",	FAST_FORWARD_OP,	KEY_FASTFORWARD },
++	{ "VOLUME UP",		VOL_UP_OP,		KEY_VOLUMEUP },
++	{ "VOLUME DOWN",	VOL_DOWN_OP,		KEY_VOLUMEDOWN },
+ 	{ NULL }
+ };
+ 
 -- 
-1.7.4.1
+1.7.6.1
 
