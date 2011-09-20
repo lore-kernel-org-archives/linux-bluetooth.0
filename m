@@ -1,56 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1316540841-14713-10-git-send-email-sancane@gmail.com>
-References: <1316540841-14713-1-git-send-email-sancane@gmail.com>
-	<1316540841-14713-2-git-send-email-sancane@gmail.com>
-	<1316540841-14713-3-git-send-email-sancane@gmail.com>
-	<1316540841-14713-4-git-send-email-sancane@gmail.com>
-	<1316540841-14713-5-git-send-email-sancane@gmail.com>
-	<1316540841-14713-6-git-send-email-sancane@gmail.com>
-	<1316540841-14713-7-git-send-email-sancane@gmail.com>
-	<1316540841-14713-8-git-send-email-sancane@gmail.com>
-	<1316540841-14713-9-git-send-email-sancane@gmail.com>
-	<1316540841-14713-10-git-send-email-sancane@gmail.com>
-Date: Tue, 20 Sep 2011 22:28:39 +0200
-Message-ID: <CACLukzLcLmbmPwXX6OOM4RLFc4BfAaAWJibVssxtm8aqgud4zQ@mail.gmail.com>
-Subject: Re: [PATCH 09/19] Set Intermediate property if intermediate temp.
- characteristic is supported
-From: Santiago Carot <sancane@gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ v2] Fix remove emitting Paired=false when deleting device
+Date: Tue, 20 Sep 2011 22:09:50 +0300
+Message-Id: <1316545790-3065-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When adapter is requested to remove device, device's property
+Paired=false is emitted after the adapter notifies clients that
+list Devices is empty. Some clients get confused.
 
-This is only a set  of 9 patches. Subject should seem as [PATCH X/09].
-In any case, patches are valid.
+Emitting property was introduced in clean-up patch
+c92a4af85f480c16f3ff017783c821304c899ce5. Since such notification
+does not have practical meaning, it is better to remove it.
+---
+ src/device.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-Sorry for the mess.
+diff --git a/src/device.c b/src/device.c
+index 96e798f..3a2d88f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -992,7 +992,8 @@ static void device_remove_stored(struct btd_device *device)
+ 		delete_entry(&src, "linkkeys", addr);
+ 		delete_entry(&src, "aliases", addr);
+ 		device_set_bonded(device, FALSE);
+-		device_set_paired(device, FALSE);
++		device->paired = FALSE;
++		btd_adapter_remove_bonding(device->adapter, &device->bdaddr);
+ 	}
+ 	delete_entry(&src, "profiles", addr);
+ 	delete_entry(&src, "trusts", addr);
+-- 
+1.7.4.1
 
-Regards
-
-2011/9/20 Santiago Carot-Nemesio <sancane@gmail.com>:
-> ---
->  thermometer/thermometer.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
->
-> diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-> index 0178e99..fdf459e 100644
-> --- a/thermometer/thermometer.c
-> +++ b/thermometer/thermometer.c
-> @@ -258,7 +258,8 @@ static void process_thermometer_char(struct characteristic *ch)
->        GAttribResultFunc func;
->
->        if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
-> -               /* TODO: Change intermediate property and emit signal */
-> +               gboolean intermediate = TRUE;
-> +               change_property(ch->t, "Intermediate", &intermediate);
->                return;
->        } else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
->                func = read_temp_type_cb;
-> --
-> 1.7.6.1
->
->
