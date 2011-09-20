@@ -1,47 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v4 03/14] Bluetooth: Check pending command in
- start_discovery()
+Subject: Re: [PATCH v4 01/14] Bluetooth: Periodic Inquiry and mgmt
+ discovering event
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Sep 2011 14:26:48 +0200
-In-Reply-To: <1316468136-12472-4-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 20 Sep 2011 14:23:33 +0200
+In-Reply-To: <1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
 References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
-	 <1316468136-12472-4-git-send-email-andre.guedes@openbossa.org>
+	 <1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316521610.1937.72.camel@aeonflux>
+Message-ID: <1316521416.1937.70.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> If discovery procedure is already running then EINPROGRESS command
-> status should be returned.
+> By using periodic inquiry command we're not able to detect correctly
+> when the controller has started inquiry.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/mgmt.c |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
+> Today we have this workaround in inquiry result event handler to set
+> the HCI_INQUIRY flag when it sees the first inquiry result event.
+> This workaround isn't enough because the device may be performing
+> an inquiry but the HCI_INQUIRY flag is not set. For instance, if
+> there is no device in range, no inquiry result event is generated,
+> consequently, the HCI_INQUIRY flags isn't set when it should so.
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index cc0c204..d8333e0 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1622,6 +1622,12 @@ static int start_discovery(struct sock *sk, u16 index)
->  
->  	hci_dev_lock_bh(hdev);
->  
-> +	if (mgmt_pending_find(MGMT_OP_START_DISCOVERY, index)) {
-> +		err = cmd_status(sk, index, MGMT_OP_START_DISCOVERY,
-> +								EINPROGRESS);
-> +		goto failed;
-> +	}
-> +
+> We rely on HCI_INQUIRY flag to implement the discovery procedure
+> properly. So, as we aren't able to clear/set the HCI_INQUIRY flag in
+> a reliable manner, periodic inquiry events shouldn't change the
+> HCI_INQUIRY flag. In future, if needed, we might add a new flag (e.g.
+> HCI_PINQUIRY) to know if the controller is performing periodic
+> inquiry.
+> 
+> Thus, due to that issue and in order to keep compatibility with
+> userspace, periodic inquiry events shouldn't send mgmt discovering
+> events.
 
-the idea is correct, but instead of using mgmt_pending_find we should
-have an internal flags field to track our current states. That is way
-more efficient then looking for pending commands.
+I spend some time thinking about this and yes, we need to clean this
+mess up right now.
+
+So intermixing inquiry with periodic inquiry was a bad idea and we
+should split this. So I think internally hci_dev needs a variable to
+track if we have enabled periodic inquiry or not. So it should express
+if periodic inquiry is on or off. Nothing else since we should not
+bother with trying to match periodic inquiry result to inquiry results.
+I would actually go this far that we should ignore inquiry result events
+from periodic inquiry.
+
+Lets start creating some hci_dev internal state flags variable to track
+certain states/modes of the controller. As I said earlier, overloading a
+public API/ABI is not a good idea at all.
+
+For tracking periodic inquiry state/mode we just need to be careful and
+take an inquiry result outside of start inquiry and inquiry complete as
+indication that periodic inquiry is active. There is still a potential
+false positive as you mentioned, but that also should not matter since
+periodic inquiry is suspending itself anyway. Important is just that we
+track inquiry and periodic inquiry states separately.
+
+Another assumption is that periodic inquiry is only used by special
+applications and it is essentially triggered by 3rd party daemons doing
+something special for their needs. If periodic inquiry is enabled, I am
+even fine failing the mgmt_start_discovery command with an error.
+
+So in conclusion, I wanna have us tracking if the controller is
+currently doing periodic inquiry. And if you wanna export that state,
+then lets do it via debugfs.
 
 Regards
 
