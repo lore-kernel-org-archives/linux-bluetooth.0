@@ -1,75 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v4 01/14] Bluetooth: Periodic Inquiry and mgmt
- discovering event
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Sep 2011 14:23:33 +0200
-In-Reply-To: <1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
-References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
-	 <1316468136-12472-2-git-send-email-andre.guedes@openbossa.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316521416.1937.70.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1316454126-32614-2-git-send-email-ospite@studenti.unina.it>
+References: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
+	<1316454126-32614-2-git-send-email-ospite@studenti.unina.it>
+Date: Tue, 20 Sep 2011 14:30:42 +0300
+Message-ID: <CABBYNZL4wmb=ZvwDZasoZVx939-HZkv=u8xzZZR_jdqnF_+aLw@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ 1/3] Add a btd_manager_get_default_adapter_str() call
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Bastien Nocera <hadess@hadess.net>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Antonio,
 
-> By using periodic inquiry command we're not able to detect correctly
-> when the controller has started inquiry.
-> 
-> Today we have this workaround in inquiry result event handler to set
-> the HCI_INQUIRY flag when it sees the first inquiry result event.
-> This workaround isn't enough because the device may be performing
-> an inquiry but the HCI_INQUIRY flag is not set. For instance, if
-> there is no device in range, no inquiry result event is generated,
-> consequently, the HCI_INQUIRY flags isn't set when it should so.
-> 
-> We rely on HCI_INQUIRY flag to implement the discovery procedure
-> properly. So, as we aren't able to clear/set the HCI_INQUIRY flag in
-> a reliable manner, periodic inquiry events shouldn't change the
-> HCI_INQUIRY flag. In future, if needed, we might add a new flag (e.g.
-> HCI_PINQUIRY) to know if the controller is performing periodic
-> inquiry.
-> 
-> Thus, due to that issue and in order to keep compatibility with
-> userspace, periodic inquiry events shouldn't send mgmt discovering
-> events.
+On Mon, Sep 19, 2011 at 8:42 PM, Antonio Ospite
+<ospite@studenti.unina.it> wrote:
+> Add a new btd_* call to get the default adapter address as a string,
+> this is going to be used by the external playstation-peripheral plugin.
+> ---
+>  src/manager.h |    1 +
+>  src/manager.c |   16 ++++++++++++++++
+>  2 files changed, 17 insertions(+), 0 deletions(-)
+>
+> diff --git a/src/manager.h b/src/manager.h
+> index 4f92d2f..91d9894 100644
+> --- a/src/manager.h
+> +++ b/src/manager.h
+> @@ -36,6 +36,7 @@ const char *manager_get_base_path(void);
+>  struct btd_adapter *manager_find_adapter(const bdaddr_t *sba);
+>  struct btd_adapter *manager_find_adapter_by_id(int id);
+>  struct btd_adapter *manager_get_default_adapter(void);
+> +char *btd_manager_get_default_adapter_str(void);
+>  void manager_foreach_adapter(adapter_cb func, gpointer user_data);
+>  GSList *manager_get_adapters(void);
+>  struct btd_adapter *btd_manager_register_adapter(int id);
+> diff --git a/src/manager.c b/src/manager.c
+> index 464b0ca..8947f85 100644
+> --- a/src/manager.c
+> +++ b/src/manager.c
+> @@ -270,6 +270,22 @@ struct btd_adapter *manager_get_default_adapter(void)
+>        return manager_find_adapter_by_id(default_adapter_id);
+>  }
+>
+> +char *btd_manager_get_default_adapter_str(void)
+> +{
+> +       struct btd_adapter *adapter;
+> +       bdaddr_t adapter_bdaddr;
+> +       char *str = bt_malloc(18);
+> +
+> +       adapter = manager_get_default_adapter();
+> +       if (adapter == NULL) {
+> +               return NULL;
+> +       }
+> +
+> +       adapter_get_address(adapter, &adapter_bdaddr);
+> +       ba2str(&adapter_bdaddr, str);
+> +       return str;
+> +}
+> +
 
-I spend some time thinking about this and yes, we need to clean this
-mess up right now.
+It doesn't seems that gonna be very useful for the core daemon,
+besides you can always get the bdaddr and convert yourself, if the
+purpose is just to be a helper function then perhaps we should find
+another place. Btw are you sure you need the adapter address and not
+the remote device address?
 
-So intermixing inquiry with periodic inquiry was a bad idea and we
-should split this. So I think internally hci_dev needs a variable to
-track if we have enabled periodic inquiry or not. So it should express
-if periodic inquiry is on or off. Nothing else since we should not
-bother with trying to match periodic inquiry result to inquiry results.
-I would actually go this far that we should ignore inquiry result events
-from periodic inquiry.
-
-Lets start creating some hci_dev internal state flags variable to track
-certain states/modes of the controller. As I said earlier, overloading a
-public API/ABI is not a good idea at all.
-
-For tracking periodic inquiry state/mode we just need to be careful and
-take an inquiry result outside of start inquiry and inquiry complete as
-indication that periodic inquiry is active. There is still a potential
-false positive as you mentioned, but that also should not matter since
-periodic inquiry is suspending itself anyway. Important is just that we
-track inquiry and periodic inquiry states separately.
-
-Another assumption is that periodic inquiry is only used by special
-applications and it is essentially triggered by 3rd party daemons doing
-something special for their needs. If periodic inquiry is enabled, I am
-even fine failing the mgmt_start_discovery command with an error.
-
-So in conclusion, I wanna have us tracking if the controller is
-currently doing periodic inquiry. And if you wanna export that state,
-then lets do it via debugfs.
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
