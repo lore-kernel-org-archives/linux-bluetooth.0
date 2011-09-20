@@ -1,98 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 3/5 v2] Bluetooth: make use sk_priority to priritize
- RFCOMM packets
+Subject: Re: [PATCH v4 13/14] Bluetooth: Support LE-Only discovery procedure
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <padovan@profusion.mobi>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Tue, 20 Sep 2011 15:04:49 +0200
-In-Reply-To: <20110919214505.GM2643@joana>
-References: <1315846853-27442-1-git-send-email-luiz.dentz@gmail.com>
-	 <1315846853-27442-3-git-send-email-luiz.dentz@gmail.com>
-	 <20110919214505.GM2643@joana>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 20 Sep 2011 15:00:15 +0200
+In-Reply-To: <1316468136-12472-14-git-send-email-andre.guedes@openbossa.org>
+References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org>
+	 <1316468136-12472-14-git-send-email-andre.guedes@openbossa.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316523890.1937.101.camel@aeonflux>
+Message-ID: <1316523616.1937.97.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andre,
 
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  net/bluetooth/rfcomm/core.c |   51 +++++++++++++++++++++++++++++-------------
-> >  net/bluetooth/rfcomm/sock.c |    2 +
-> >  2 files changed, 37 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> > index 85580f2..bfc6bce 100644
-> > --- a/net/bluetooth/rfcomm/core.c
-> > +++ b/net/bluetooth/rfcomm/core.c
-> > @@ -65,7 +65,8 @@ static DEFINE_MUTEX(rfcomm_mutex);
-> >  
-> >  static LIST_HEAD(session_list);
-> >  
-> > -static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len);
-> > +static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
-> > +							u32 priority);
-> >  static int rfcomm_send_sabm(struct rfcomm_session *s, u8 dlci);
-> >  static int rfcomm_send_disc(struct rfcomm_session *s, u8 dlci);
-> >  static int rfcomm_queue_disc(struct rfcomm_dlc *d);
-> > @@ -747,19 +748,34 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
-> >  }
-> >  
-> >  /* ---- RFCOMM frame sending ---- */
-> > -static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len)
-> > +static int rfcomm_send_frame(struct rfcomm_session *s, u8 *data, int len,
-> > +							u32 priority)
-> >  {
-> >  	struct socket *sock = s->sock;
-> > +	struct sock *sk = sock->sk;
-> >  	struct kvec iv = { data, len };
-> >  	struct msghdr msg;
-> >  
-> > -	BT_DBG("session %p len %d", s, len);
-> > +	BT_DBG("session %p len %d priority %u", s, len, priority);
-> > +
-> > +	if (sk->sk_priority != priority) {
-> > +		lock_sock(sk);
-> > +		sk->sk_priority = priority;
-> > +		release_sock(sk);
-> > +	}
-> >  
-> >  	memset(&msg, 0, sizeof(msg));
-> >  
-> >  	return kernel_sendmsg(sock, &msg, &iv, 1, len);
-> >  }
-> >  
-> > +static int rfcomm_send_cmd(struct rfcomm_session *s, struct rfcomm_cmd *cmd)
-> > +{
-> > +	BT_DBG("%p cmd %u", s, cmd->ctrl);
-> > +
-> > +	return rfcomm_send_frame(s, (void *) cmd, sizeof(*cmd), HCI_PRIO_MAX);
+> This patch adds support for LE-Only discovery procedure through
+> management interface.
 > 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/hci_event.c |   16 +++++++++++++---
+>  net/bluetooth/mgmt.c      |   13 ++++++++++++-
+>  2 files changed, 25 insertions(+), 4 deletions(-)
 > 
-> What's the idea here? Prioritize commands over data? But does this really
-> happen? Because we have only one queue to receive the data in L2CAP. There
-> is no separation between data and cmd there.
-> 
-> Also, did you check if we can send RFCOMM commands and data out of order?
-> 
-> I really would like to rewrite l2cap-rfcomm iteraction before adding new
-> features here.
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 5bbba54..0408c50 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -889,14 +889,16 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  
+>  	BT_DBG("%s status 0x%x", hdev->name, status);
+>  
+> -	if (status)
+> -		return;
+> -
+>  	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
+>  	if (!cp)
+>  		return;
+>  
+>  	if (cp->enable == 0x01) {
+> +		if (status) {
+> +			mgmt_discovery_complete(hdev->id, status);
+> +			return;
+> +		}
+> +
+>  		set_bit(HCI_LE_SCAN, &hdev->flags);
+>  
+>  		mgmt_discovering(hdev->id, 1);
+> @@ -906,7 +908,15 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+>  		hci_dev_lock(hdev);
+>  		hci_adv_entries_clear(hdev);
+>  		hci_dev_unlock(hdev);
+> +
+> +		if (mgmt_has_pending_stop_discov(hdev->id))
+> +			hci_cancel_le_scan(hdev);
+>  	} else if (cp->enable == 0x00) {
+> +		mgmt_discovery_complete(hdev->id, status);
+> +
+> +		if (status)
+> +			return;
+> +
+>  		clear_bit(HCI_LE_SCAN, &hdev->flags);
+>  
+>  		mgmt_discovering(hdev->id, 0);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 1eee5cc..e869422 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -32,6 +32,14 @@
+>  #define MGMT_VERSION	0
+>  #define MGMT_REVISION	1
+>  
+> +/*
+> + * These LE scan and inquiry parameters were chosen according to LE General
+> + * Discovery Procedure specification.
+> + */
+> +#define LE_SCAN_TYPE 0x01
+> +#define LE_SCAN_WIN 0x12
+> +#define LE_SCAN_INT 0x12
+> +#define LE_SCAN_TIMEOUT_LE_ONLY 10240 /* TGAP(gen_disc_scan_min) */
 
-lets just forget RFCOMM for now and make SO_PRIORITY setsockopt calls
-return an error code. Priority on RFCOMM links is also rather pointless
-since they all go via the same L2CAP PSM anyway. You would end up
-prioritizing all RFCOMM connections over any other L2CAP connection.
+And an extra empty line here to make clear these a independent values.
 
-So if you try to prioritize HFP then you also prioritize PBAP in the end
-and we are back where we started. We could implement the 27.007 priority
-support inside RFCOMM, but that seems even more pointless endeavor.
+>  #define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
+>  
+>  struct pending_cmd {
+> @@ -1637,7 +1645,8 @@ static int start_discovery(struct sock *sk, u16 index)
+>  	if (lmp_host_le_capable(hdev) && lmp_bredr_capable(hdev))
+>  		err = -ENOSYS;
+>  	else if (lmp_host_le_capable(hdev))
+> -		err = -ENOSYS;
+> +		err = hci_do_le_scan(hdev, LE_SCAN_TYPE, LE_SCAN_INT,
+> +					LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
+>  	else
+>  		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
+>  
+> @@ -1684,6 +1693,8 @@ static int stop_discovery(struct sock *sk, u16 index)
+>  
+>  	if (test_bit(HCI_INQUIRY, &hdev->flags))
+>  		err = hci_cancel_inquiry(hdev);
+> +	else if (test_bit(HCI_LE_SCAN, &hdev->flags))
+> +		err = hci_cancel_le_scan(hdev);
+>  	else
+>  		err = 0;
+>  
 
-What we really want is prioritized L2CAP links and hopefully in the
-future everything moves over to use L2CAP directly anyway and RFCOMM
-will be slowly dying out.
+I see where you wanna go with this now. I am a bit afraid of the code
+complexity with the discovery stop/start/complete etc. messages.
+
+This is all too much done differently for 3 different possible use
+cases. And I just think we need more general handling. For example:
+
+	inquiry_started()
+	inquiry_result()
+	inquiry_completed()
+	le_scan_started()
+	le_scan_result()
+	le_scan_completed()
+
+And based on the controller capabilities, the current states etc. a
+central place decides to send out which events at which time and to
+allow certain commands or not.
+
+If we do not centralize this, then I am afraid we duplicate this logic
+three times.
 
 Regards
 
