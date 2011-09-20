@@ -1,199 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/3] avrcp: limit avrcp packet size to the MTU of AV/C
-Date: Tue, 20 Sep 2011 15:31:34 -0300
-Message-Id: <1316543496-18575-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 06/19] Get all characteristics in thermometer service
+Date: Tue, 20 Sep 2011 19:47:18 +0200
+Message-Id: <1316540841-14713-7-git-send-email-sancane@gmail.com>
+In-Reply-To: <1316540841-14713-6-git-send-email-sancane@gmail.com>
+References: <1316540841-14713-1-git-send-email-sancane@gmail.com>
+ <1316540841-14713-2-git-send-email-sancane@gmail.com>
+ <1316540841-14713-3-git-send-email-sancane@gmail.com>
+ <1316540841-14713-4-git-send-email-sancane@gmail.com>
+ <1316540841-14713-5-git-send-email-sancane@gmail.com>
+ <1316540841-14713-6-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AVRCP is an extension of AV/C spec which has a limit of 512 bytes. The
-only place where it can exceed this value is in the response to
-GetElementAttributes command.
-
-Now we simply don't add the attributes that would overflow the available
-buffer space.
 ---
- audio/avctp.c |    2 -
- audio/avctp.h |    3 ++
- audio/avrcp.c |   58 +++++++++++++++++++++++++++++++++-----------------------
- 3 files changed, 37 insertions(+), 26 deletions(-)
+ thermometer/thermometer.c |  110 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 110 insertions(+), 0 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index 2800a16..e9b8e40 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -84,7 +84,6 @@ struct avc_header {
- 	uint8_t subunit_type:5;
- 	uint8_t opcode;
- } __attribute__ ((packed));
--#define AVC_HEADER_LENGTH 3
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index f8c17c6..f0b977e 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -30,10 +30,15 @@
+ #include "gattrib.h"
+ #include "attio.h"
+ #include "att.h"
++#include "gatt.h"
+ #include "thermometer.h"
  
- #elif __BYTE_ORDER == __BIG_ENDIAN
+ #define THERMOMETER_INTERFACE "org.bluez.Thermometer"
  
-@@ -104,7 +103,6 @@ struct avc_header {
- 	uint8_t subunit_id:3;
- 	uint8_t opcode;
- } __attribute__ ((packed));
--#define AVC_HEADER_LENGTH 3
- 
- #else
- #error "Unknown byte order"
-diff --git a/audio/avctp.h b/audio/avctp.h
-index 2dab8fa..9727485 100644
---- a/audio/avctp.h
-+++ b/audio/avctp.h
-@@ -24,6 +24,9 @@
- 
- #define AVCTP_PSM 23
- 
-+#define AVC_MTU 512
-+#define AVC_HEADER_LENGTH 3
++#define TEMPERATURE_TYPE_UUID		"00002a1d-0000-1000-8000-00805f9b34fb"
++#define INTERMEDIATE_TEMPERATURE_UUID	"00002a1e-0000-1000-8000-00805f9b34fb"
++#define MEASUREMENT_INTERVAL_UUID	"00002a21-0000-1000-8000-00805f9b34fb"
 +
- /* ctype entries */
- #define AVC_CTYPE_CONTROL		0x0
- #define AVC_CTYPE_STATUS		0x1
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index f962946..ba04a12 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -173,6 +173,9 @@ struct avrcp_header {
- #error "Unknown byte order"
- #endif
- 
-+#define AVRCP_MTU	(AVC_MTU - AVC_HEADER_LENGTH)
-+#define AVRCP_PDU_MTU	(AVRCP_MTU - AVRCP_HEADER_LENGTH)
+ struct thermometer {
+ 	DBusConnection          *conn;		/* The connection to the bus */
+ 	struct btd_device       *dev;		/* Device reference */
+@@ -41,10 +46,31 @@ struct thermometer {
+ 	struct att_range	*svc_range;	/* Thermometer range */
+ 	gint                    attioid;	/* Att watcher id */
+ 	gint			attindid;	/* Att incications id */
++	GSList			*chars;		/* Characteristics */
++};
 +
- struct avrcp_server {
- 	bdaddr_t src;
- 	uint32_t tg_record_id;
-@@ -649,7 +652,8 @@ static void mp_set_playback_status(struct media_player *mp, uint8_t status,
-  * attribute, -ENOENT is returned.
-  */
- static int mp_get_media_attribute(struct media_player *mp,
--						uint32_t id, uint8_t *buf)
-+						uint32_t id, uint8_t *buf,
-+						uint16_t maxlen)
++struct characteristic {
++	struct att_char		attr;	/* Characteristic */
++	GSList			*desc;	/* Descriptors */
++	struct thermometer	*t;	/* Thermometer where the char belongs */
++};
++
++struct descriptor {
++	struct characteristic	*ch;
++	uint16_t		handle;
++	bt_uuid_t		uuid;
+ };
+ 
+ static GSList *thermometers = NULL;
+ 
++static void destroy_char(gpointer user_data)
++{
++	struct characteristic *c = user_data;
++
++	g_slist_free_full(c->desc, g_free);
++	g_free(c);
++}
++
+ static void destroy_thermometer(gpointer user_data)
  {
- 	struct media_info_elem {
- 		uint32_t id;
-@@ -661,67 +665,72 @@ static int mp_get_media_attribute(struct media_player *mp,
- 	struct media_info_elem *elem = (void *)buf;
- 	uint16_t len;
- 	char valstr[20];
-+	char *valp;
+ 	struct thermometer *t = user_data;
+@@ -58,6 +84,9 @@ static void destroy_thermometer(gpointer user_data)
+ 	if (t->attrib)
+ 		g_attrib_unref(t->attrib);
+ 
++	if (t->chars)
++		g_slist_free_full(t->chars, destroy_char);
 +
-+	if (maxlen < sizeof(struct media_info_elem))
-+		return -ENOBUFS;
+ 	dbus_connection_unref(t->conn);
+ 	btd_device_unref(t->dev);
+ 	g_free(t->svc_range);
+@@ -75,6 +104,85 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	/* TODO */
++}
 +
-+	/* Subtract the size of elem header from the available space */
-+	maxlen -= sizeof(struct media_info_elem);
- 
- 	switch (id) {
- 	case MEDIA_INFO_TITLE:
--		if (mi->title) {
--			len = strlen(mi->title);
--			memcpy(elem->val, mi->title, len);
--		} else {
--			len = 0;
--		}
--
-+		valp = mi->title;
- 		break;
- 	case MEDIA_INFO_ARTIST:
- 		if (mi->artist == NULL)
- 			return -ENOENT;
- 
--		len = strlen(mi->artist);
--		memcpy(elem->val, mi->artist, len);
-+		valp = mi->artist;
- 		break;
- 	case MEDIA_INFO_ALBUM:
- 		if (mi->album == NULL)
- 			return -ENOENT;
- 
--		len = strlen(mi->album);
--		memcpy(elem->val, mi->album, len);
-+		valp = mi->album;
- 		break;
- 	case MEDIA_INFO_GENRE:
- 		if (mi->genre == NULL)
- 			return -ENOENT;
- 
--		len = strlen(mi->genre);
--		memcpy(elem->val, mi->genre, len);
-+		valp = mi->genre;
- 		break;
--
- 	case MEDIA_INFO_TRACK:
- 		if (!mi->track)
- 			return -ENOENT;
- 
- 		snprintf(valstr, 20, "%u", mi->track);
--		len = strlen(valstr);
--		memcpy(elem->val, valstr, len);
-+		valp = valstr;
- 		break;
- 	case MEDIA_INFO_N_TRACKS:
- 		if (!mi->ntracks)
- 			return -ENOENT;
- 
- 		snprintf(valstr, 20, "%u", mi->ntracks);
--		len = strlen(valstr);
--		memcpy(elem->val, valstr, len);
-+		valp = valstr;
- 		break;
- 	case MEDIA_INFO_PLAYING_TIME:
- 		if (mi->track_len == 0xFFFFFFFF)
- 			return -ENOENT;
- 
- 		snprintf(valstr, 20, "%u", mi->track_len);
--		len = strlen(valstr);
--		memcpy(elem->val, valstr, len);
-+		valp = valstr;
- 		break;
- 	default:
- 		return -EINVAL;
- 	}
- 
-+	if (valp) {
-+		len = strlen(valp);
++static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	/* TODO */
++}
 +
-+		if (len > maxlen)
-+			return -ENOBUFS;
++static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	/* TODO */
++}
 +
-+		memcpy(elem->val, valp, len);
-+	} else {
-+		len = 0;
++static void process_thermometer_char(struct characteristic *ch)
++{
++	GAttribResultFunc func;
++
++	if (g_strcmp0(ch->attr.uuid, INTERMEDIATE_TEMPERATURE_UUID) == 0) {
++		/* TODO: Change intermediate property and emit signal */
++		return;
++	} else if (g_strcmp0(ch->attr.uuid, TEMPERATURE_TYPE_UUID) == 0)
++		func = read_temp_type_cb;
++	else if (g_strcmp0(ch->attr.uuid, MEASUREMENT_INTERVAL_UUID) == 0)
++		func = read_interval_cb;
++	else
++		return;
++
++	gatt_read_char(ch->t->attrib, ch->attr.value_handle, 0, func, ch);
++}
++
++static void configure_thermometer_cb(GSList *characteristics, guint8 status,
++							gpointer user_data)
++{
++	struct thermometer *t = user_data;
++	GSList *l;
++
++	if (status) {
++		error("Discover thermometer characteristics: %s",
++							att_ecode2str(status));
++		return;
 +	}
 +
- 	elem->id = htonl(id);
- 	elem->charset = htons(0x6A); /* Always use UTF-8 */
- 	elem->len = htons(len);
-@@ -905,8 +914,8 @@ static uint8_t avrcp_handle_get_element_attributes(struct media_player *mp,
- 		 * title must be returned.
- 		 */
- 		for (i = 1; i < MEDIA_INFO_LAST; i++) {
--			size = mp_get_media_attribute(mp, i,
--							&pdu->params[pos]);
-+			size = mp_get_media_attribute(mp, i, &pdu->params[pos],
-+							AVRCP_PDU_MTU - pos);
++	for (l = characteristics; l; l = l->next) {
++		struct att_char *c = l->data;
++		struct characteristic *ch;
++		uint16_t start, end;
++
++		ch = g_new0(struct characteristic, 1);
++		ch->attr.handle = c->handle;
++		ch->attr.properties = c->properties;
++		ch->attr.value_handle = c->value_handle;
++		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
++		ch->t = t;
++
++		t->chars = g_slist_append(t->chars, ch);
++
++		process_thermometer_char(ch);
++
++		start = c->value_handle + 1;
++
++		if (l->next) {
++			struct att_char *c = l->next->data;
++			if (start == c->handle)
++				continue;
++			end = c->handle - 1;
++		} else if (c->value_handle != t->svc_range->end)
++			end = t->svc_range->end;
++		else
++			continue;
++
++		gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
++	}
++}
++
+ static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -152,6 +260,8 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
  
- 			if (size > 0) {
- 				len++;
-@@ -922,7 +931,8 @@ static uint8_t avrcp_handle_get_element_attributes(struct media_player *mp,
- 			uint32_t attr = ntohl(attr_ids[i]);
+ 	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
+ 							ind_handler, t, NULL);
++	gatt_discover_char(t->attrib, t->svc_range->start, t->svc_range->end,
++					NULL, configure_thermometer_cb, t);
+ }
  
- 			size = mp_get_media_attribute(mp, attr,
--							&pdu->params[pos]);
-+							&pdu->params[pos],
-+							AVRCP_PDU_MTU - pos);
- 
- 			if (size > 0) {
- 				len++;
+ static void attio_disconnected_cb(gpointer user_data)
 -- 
 1.7.6.1
 
