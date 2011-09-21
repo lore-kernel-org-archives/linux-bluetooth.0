@@ -1,52 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oneukum@suse.de>
+To: Jesse Sung <jesse.sung@canonical.com>
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
+Date: Wed, 21 Sep 2011 10:45:22 +0200
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
+References: <4E7840CF.5010805@canonical.com> <1316523932.1937.102.camel@aeonflux> <4E794037.6090809@canonical.com>
+In-Reply-To: <4E794037.6090809@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <1315317353-14412-2-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1315317353-14412-2-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Wed, 21 Sep 2011 11:41:47 +0300
-Message-ID: <CABBYNZLfEG53i6bJFDUG5YZeZm_CTmAUrgXY2ocsJbnpN7=8Jg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/6] Fix disconnect SCO at same time than RFCOMM
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201109211045.22997.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Am Mittwoch, 21. September 2011, 03:39:03 schrieb Jesse Sung:
+> > please prove that this is needed. What does usb-devices tell you about
+> > this device?
+>=20
+> Hi Marcel,
+>=20
+> Currently I only have the output of lsusb -v at hand:
+>=20
+> Bus 001 Device 003: ID 413c:8197 Dell Computer Corp.
+> Device Descriptor:
+>    bLength                18
+>    bDescriptorType         1
+>    bcdUSB               2.00
+>    bDeviceClass          255 Vendor Specific Class
+>    bDeviceSubClass         1
+>    bDeviceProtocol         1
+>    bMaxPacketSize0        64
+>    idVendor           0x413c Dell Computer Corp.
+>    idProduct          0x8197
+>    bcdDevice            1.12
+>    iManufacturer           1 Broadcom Corp
+>    iProduct                2 BCM20702A0
+[..]
+>      Interface Descriptor:
+>        bLength                 9
+>        bDescriptorType         4
+>        bInterfaceNumber        0
+>        bAlternateSetting       0
+>        bNumEndpoints           3
+>        bInterfaceClass       255 Vendor Specific Class
 
-2011/9/6 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
-> If RFCOMM disconnects, SCO should be disconnected too.
-> ---
->  audio/gateway.c |    7 +------
->  1 files changed, 1 insertions(+), 6 deletions(-)
->
-> diff --git a/audio/gateway.c b/audio/gateway.c
-> index 142b12e..59c91dd 100644
-> --- a/audio/gateway.c
-> +++ b/audio/gateway.c
-> @@ -222,15 +222,10 @@ static void sco_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
->  static gboolean rfcomm_disconnect_cb(GIOChannel *chan, GIOCondition cond,
->                        struct audio_device *dev)
->  {
-> -       struct gateway *gw = dev->gateway;
-> -
->        if (cond & G_IO_NVAL)
->                return FALSE;
->
-> -       g_io_channel_shutdown(gw->rfcomm, TRUE, NULL);
-> -       g_io_channel_unref(gw->rfcomm);
-> -       gw->rfcomm = NULL;
-> -       change_state(dev, GATEWAY_STATE_DISCONNECTED);
-> +       gateway_close(dev);
->
->        return FALSE;
->  }
-> --
-> 1.7.1
+Hi,
 
-Ack.
+this is really all you need. As soon as it reports that class, you need to =
+have
+the vendor:device in the driver to bind. Otherwise usbcore won't even probe.
 
--- 
-Luiz Augusto von Dentz
+	Regards
+		Oliver
+
+=2D-=20
+=2D - -=20
+SUSE LINUX Products GmbH, GF: Jeff Hawn, Jennifer Guild, Felix Imend=C3=B6r=
+ffer, HRB 16746 (AG N=C3=BCrnberg)=20
+Maxfeldstra=C3=9Fe 5                        =20
+90409 N=C3=BCrnberg=20
+Germany=20
+=2D - -=20
