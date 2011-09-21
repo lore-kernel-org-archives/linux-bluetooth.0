@@ -1,65 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <1E0C6F4C3D9940BA8E8D3BA2FC16B573@alexm>
+From: "Alex Mach" <alexvm12e@mail.ru>
+To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc: <linux-bluetooth@vger.kernel.org>
+References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru> <CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com>
+Subject: Re: obexd: obex_handle_input: poll event HUP ERR
+Date: Wed, 21 Sep 2011 16:13:40 +0400
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com>
-References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1316543496-18575-4-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 21 Sep 2011 09:15:38 -0300
-Message-ID: <CAMOw1v7WsdVJH9T4mAtAcu645-SDNGvgsgFobeGqQ87vhN21RA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+	format=flowed;
+	charset="ISO-8859-1";
+	reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Luiz,
 
-On Wed, Sep 21, 2011 at 7:33 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
+the string in the header seems ok (file name is 1087.mid):
+
+> ACL data: handle 42 flags 0x02 dlen 70
+    L2CAP(d): cid 0x0040 len 66 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 18 pf 1 ilen 61 fcs 0xd2 credits 1
+        OBEX: Put cmd(c): len 61
+        Name (0x01) = Unicode length 18
+        0000: 00 31 00 30 00 38 00 37  00 2e 00 6d 00 69 00 64 
+.1.0.8.7...m.i.d
+        0010: 00 00 
+..
+        Length (0xc3) = 6718
+        Type (0x42) = Sequence length 11
+        0000: 61 75 64 69 6f 2f 6d 69  64 69 00 
+audio/midi.
+        Time (0x44) = Sequence length 15
+        0000: 32 30 31 31 30 39 30 33  54 31 33 32 36 34 38 
+20110903T132648
+
+>> I have a problem with receiving files with obexd. After it receives 
+>> header
+>> it hangs up the connection with
+>> obex_handle_input: poll event HUP ERR
 >
-> On Tue, Sep 20, 2011 at 9:31 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> ---
->>  audio/avctp.c |    2 ++
->>  1 files changed, 2 insertions(+), 0 deletions(-)
+>> bluez-4.95
+>> kernel-2.6.38.7 armv5tejl GNU/Linux
+>> libopenobex1-1.5
+>> obexd-0.42
 >>
->> diff --git a/audio/avctp.c b/audio/avctp.c
->> index e9b8e40..59fbed9 100644
->> --- a/audio/avctp.c
->> +++ b/audio/avctp.c
->> @@ -155,6 +155,8 @@ static struct {
->>        { "BACKWARD",           BACKWARD_OP,            KEY_PREVIOUSSONG },
->>        { "REWIND",             REWIND_OP,              KEY_REWIND },
->>        { "FAST FORWARD",       FAST_FORWARD_OP,        KEY_FASTFORWARD },
->> +       { "VOLUME UP",          VOL_UP_OP,              KEY_VOLUMEUP },
->> +       { "VOLUME DOWN",        VOL_DOWN_OP,            KEY_VOLUMEDOWN },
->>        { NULL }
->>  };
->
-> Have a look at the SIMULTANEOUS USE OF HFP, A2DP, AND AVRCP PROFILES
-> white paper:
->
-> Recommendation 16:
-> If volume is changed on the RD, the RD should not send an AVRCP volume
-> command to the MP device.
-> Motivation 16:
-> Sending an AVRCP volume command to the MP may cause the MP to send
-> again an AVRCP volume
-> command to the RD device which could lead to an endless loop of AVRCP
-> volume commands.
->
+>> /usr/sbin/obexd --auto-accept --root=/var/obex
+>>
+>> obexd[844]: src/obex.c:check_put() OBEX_HDR_NAME: (null)
 
-Humnn... ok
+> Problem seems to be here, apparently we could not convert the name
+> received (Unicode length 18 according to hcidump), so the name is not
+> set cause plugin/ftp.c:268 to fail. Could you please check what is the
+> string in the header and if that is really a utf16 as the spec
+> mandates.
 
-> We don't support those because it is very likely that it would create
-> the endless loop with those devices as we can only act as a MP we just
-> ignore, for RD this would probably be useful so the handling of the
-> keys need to take into account the role of the device.
+> -- 
+> Luiz Augusto von Dentz
 
-You mean, it's simply a matter of checking we are only TG before
-calling send_key?
+Thanks,
+Alex. 
 
-
-Lucas De Marchi
