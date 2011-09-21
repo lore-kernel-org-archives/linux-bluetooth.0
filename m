@@ -1,26 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-Date: Wed, 21 Sep 2011 21:20:53 +0200
-From: "Michael Lochov" <mlochov@gmx.com>
-Message-ID: <20110921192053.136390@gmx.com>
+Message-ID: <4E79FB51.5030008@canonical.com>
+Date: Wed, 21 Sep 2011 22:57:21 +0800
+From: Jesse Sung <jesse.sung@canonical.com>
 MIME-Version: 1.0
-Subject: Frequency Hop Selection Help
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
+Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
+References: <4E7840CF.5010805@canonical.com>	 <1316523932.1937.102.camel@aeonflux> <4E794037.6090809@canonical.com> <1316591610.1937.107.camel@aeonflux>
+In-Reply-To: <1316591610.1937.107.camel@aeonflux>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 09/21/2011 03:53 PM, Marcel Holtmann wrote:
+> Hi Jesse,
+>
+>> btusb would not take care of this device without its id in the table.
+>>
+>> If the output of usb-devices is still needed, please let me know.
+>
+> yes, I just wanna see usb-devices and not go through 3 pages of verbose
+> lsusb output since that is not helping me.
 
-This question is more related to the Bluetooth specification that Bluez, specifically I'm trying to understand the frequency hopping selection for Inquiry scan mode. I have a working selection kernel that works perfectly for the basic 79 channel connected state and I now want to alter the inputs to get it working for the Inquriy state.
+Hi Marcel,
 
-According to the specification (p94 of v4), BD_ADDR input to the selection kernel is replaced by the GIAC 0x9E8B33 and the DIC 0x00 for inquiry mode, so everything in my selection kernel that used an Address, i replaced with 0x009E8B33. 
+usb-devices output:
 
-The only other major change is the X input, defined as: Xi = { CLKN[16-12] + k_offset + ( CLKN[4-2,0] + CLKN[16-12] ) mod 16 } mod 32. Here I assumed the 4-2,0 bit positions of the native clock to mean I use bits 4,3,2,0. And i used 8 as the k_offset, is this correct?
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=413c ProdID=8197 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=D0DF9AA9C9F1
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-The problem is I don't get the correct channel values out, but I know my selection kernel works perfectly for connected state so there is a problem specific with my inquiry mode inputs. Either im using the GIAC incorrectly and ignoring the ULAP or im understanding the X = {} forumula wrong.
-
-To make matters more confusing, the sample data (p. 1235) is different across the 3 examples for inquiry mode? The only difference is the ULAP, which I understood was replaced with the GIAC here? So surely only the clock & k_offset should effect the frequency selection in inquiry mode.
-
-Thanks very much.
-
-Michael
+Thanks,
+Jesse
