@@ -1,41 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E79FB51.5030008@canonical.com>
-Date: Wed, 21 Sep 2011 22:57:21 +0800
-From: Jesse Sung <jesse.sung@canonical.com>
+Message-ID: <4E79E3EC.20200@tieto.com>
+Date: Wed, 21 Sep 2011 15:17:32 +0200
+From: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
-Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
-References: <4E7840CF.5010805@canonical.com>	 <1316523932.1937.102.camel@aeonflux> <4E794037.6090809@canonical.com> <1316591610.1937.107.camel@aeonflux>
-In-Reply-To: <1316591610.1937.107.camel@aeonflux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Dan Carpenter <dan.carpenter@oracle.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluetooth: Add secure flag for mgmt_pin_code_req
+References: <20110921070804.GA5982@elgon.mountain>
+In-Reply-To: <20110921070804.GA5982@elgon.mountain>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/21/2011 03:53 PM, Marcel Holtmann wrote:
-> Hi Jesse,
+> dereferenced unconditionally here.
 >
->> btusb would not take care of this device without its id in the table.
->>
->> If the output of usb-devices is still needed, please let me know.
->
-> yes, I just wanna see usb-devices and not go through 3 pages of verbose
-> lsusb output since that is not helping me.
+>    2190				secure = 1;
+>    2191			else
 
-Hi Marcel,
-
-usb-devices output:
-
-T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=413c ProdID=8197 Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=D0DF9AA9C9F1
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+Obviously, will sent a patch in a while.
 
 Thanks,
-Jesse
+/Waldek
