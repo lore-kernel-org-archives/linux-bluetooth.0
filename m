@@ -1,49 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 Sep 2011 10:08:04 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: waldemar.rymarkiewicz@tieto.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: re: Bluetooth: Add secure flag for mgmt_pin_code_req
-Message-ID: <20110921070804.GA5982@elgon.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ] Workaround for missing seclevel update on acceptor
+Date: Tue, 20 Sep 2011 23:09:28 -0400
+Message-Id: <1316574568-31707-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Waldemar Rymarkiewicz,
+This workaround is only useful when testing GATT over BR/EDR. Without
+this, you cannot write to attributes which require authentication.
 
-This is a semi-automatic email about new static checker warnings.
+Note: for LE, the seclevel is updated correctly after pairing, so
+reading it with getsockopt() works fine.
+---
+ src/attrib-server.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
-Thu Apr 28 12:07:59 2011 +0200
-a770bb5aea84: "Bluetooth: Add secure flag for mgmt_pin_code_req"
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 5c86085..f79d4e8 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -168,6 +168,14 @@ static uint8_t att_check_reqs(struct gatt_channel *channel, uint8_t opcode,
+ 	 * to authentication and medium to encryption permission. */
+ 	if (!channel->encrypted)
+ 		channel->encrypted = g_attrib_is_encrypted(channel->attrib);
++
++	/* FIXME: on BR/EDR, the security level on acceptor side is not updated
++	 * when the link is encrypted. As a workaround, check if there are any
++	 * active linkkeys for the connection. */
++	if (!channel->encrypted && !channel->le && read_link_key(&channel->src,
++						&channel->dst, NULL, NULL) == 0)
++		channel->encrypted = TRUE;
++
+ 	if (reqs == ATT_AUTHENTICATION && !channel->encrypted)
+ 		return ATT_ECODE_AUTHENTICATION;
+ 	else if (reqs == ATT_AUTHORIZATION)
+-- 
+1.7.0.4
 
-Leads to the following Smatch complaint:
-net/bluetooth/hci_event.c +2189 hci_pin_code_request_evt()
-	 error: we previously assumed 'conn' could be null (see line 2177)
-
-net/bluetooth/hci_event.c
-  2176		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
-  2177		if (conn && conn->state == BT_CONNECTED) {
-                    ^^^^
-conn can be NULL.
-
-  2178			hci_conn_hold(conn);
-  2179			conn->disc_timeout = HCI_PAIRING_TIMEOUT;
-  2180			hci_conn_put(conn);
-  2181		}
-  2182	
-  2183		if (!test_bit(HCI_PAIRABLE, &hdev->flags))
-  2184			hci_send_cmd(hdev, HCI_OP_PIN_CODE_NEG_REPLY,
-  2185						sizeof(ev->bdaddr), &ev->bdaddr);
-  2186		else if (test_bit(HCI_MGMT, &hdev->flags)) {
-  2187			u8 secure;
-  2188	
-  2189			if (conn->pending_sec_level == BT_SECURITY_HIGH)
-                            ^^^^^^^^^^^^^^^^^^^^^^^
-dereferenced unconditionally here.
-
-  2190				secure = 1;
-  2191			else
-
-regards,
-dan carpenter
