@@ -1,63 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oneukum@suse.de>
-To: Jesse Sung <jesse.sung@canonical.com>
-Subject: Re: [PATCH] Bluetooth: Add support for Broadcom BCM20702A0.
-Date: Wed, 21 Sep 2011 10:45:22 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, 854399@bugs.launchpad.net
-References: <4E7840CF.5010805@canonical.com> <1316523932.1937.102.camel@aeonflux> <4E794037.6090809@canonical.com>
-In-Reply-To: <4E794037.6090809@canonical.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201109211045.22997.oneukum@suse.de>
+Subject: Re: [PATCH] bluetooth: Fix for security block issue.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Antti Julku <antti.julku@nokia.com>
+Cc: Lukasz.Rymanowski@tieto.com, mika.linnanoja@nokia.com,
+	linux-bluetooth@vger.kernel.org, ville.tervo@nokia.com,
+	linus.walleij@stericsson.com,
+	par-gunnar.p.hjalmdahl@stericsson.com, padovan@profusion.mobi
+Date: Wed, 21 Sep 2011 10:01:56 +0200
+In-Reply-To: <4E7990A9.2070709@nokia.com>
+References: <1295965639-16683-1-git-send-email-lukasz.rymanowski@tieto.com>
+	 <1295971990.1520.53.camel@aeonflux> <4DB935D9.5080302@nokia.com>
+	 <20110428095139.GJ18898@null> <4DBA6D97.7050207@nokia.com>
+	 <7D7F2FD3846CF6429ACEBDFB5A2DD86F07F33ED77A@EXMB01.eu.tieto.com>
+	 <20110505190948.GD2098@joana> <4E7990A9.2070709@nokia.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1316592118.1937.114.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Mittwoch, 21. September 2011, 03:39:03 schrieb Jesse Sung:
-> > please prove that this is needed. What does usb-devices tell you about
-> > this device?
->=20
-> Hi Marcel,
->=20
-> Currently I only have the output of lsusb -v at hand:
->=20
-> Bus 001 Device 003: ID 413c:8197 Dell Computer Corp.
-> Device Descriptor:
->    bLength                18
->    bDescriptorType         1
->    bcdUSB               2.00
->    bDeviceClass          255 Vendor Specific Class
->    bDeviceSubClass         1
->    bDeviceProtocol         1
->    bMaxPacketSize0        64
->    idVendor           0x413c Dell Computer Corp.
->    idProduct          0x8197
->    bcdDevice            1.12
->    iManufacturer           1 Broadcom Corp
->    iProduct                2 BCM20702A0
-[..]
->      Interface Descriptor:
->        bLength                 9
->        bDescriptorType         4
->        bInterfaceNumber        0
->        bAlternateSetting       0
->        bNumEndpoints           3
->        bInterfaceClass       255 Vendor Specific Class
+Hi Antti,
 
-Hi,
+> >>> It's easy to reproduce at least with these dongles:
+> >>>
+> >>> Alink BLUEUSB21 (BCM)
+> >>> Belkin BT2.1 F8T017 (BCM)
+> >>> DeLock 2.1 (CSR)
+> >>> PTS 2.1 (CSR)
+> >>>
+> >>> So most of our BT 2.1 dongles seem to be buggy. It would be nice to
+> >>> have a workaround since it happens with so many dongles.
+> >>
+> >> If there is so many buggy devices I think Gustavo and Marcel could consider to take this patch.
+> >
+> > The patch is too hackish, I don't wanna have such workaround in the tree.
+> > It is a good idea check the USB stack for possible causes for this bug.
+> >
+> 
+> We checked this with USB sniffer. Data comes from USB in the same order 
+> as shown in hcidump, so USB seems to work correctly.
 
-this is really all you need. As soon as it reports that class, you need to =
-have
-the vendor:device in the driver to bind. Otherwise usbcore won't even probe.
+and this means that the Bluetooth controller is screwing this up.
 
-	Regards
-		Oliver
+If you take a real Bluetooth air sniffer then you see that the packet is
+most likely encrypted. Problem is just that we do not know for sure. And
+the Bluetooth specification is pretty clear on what to do in these
+cases. There is even a special qualification test case for this.
 
-=2D-=20
-=2D - -=20
-SUSE LINUX Products GmbH, GF: Jeff Hawn, Jennifer Guild, Felix Imend=C3=B6r=
-ffer, HRB 16746 (AG N=C3=BCrnberg)=20
-Maxfeldstra=C3=9Fe 5                        =20
-90409 N=C3=BCrnberg=20
-Germany=20
-=2D - -=20
+The real problem is that the HCI event packets and HCI data packets are
+on a different endpoint when you do this over USB. And there is no real
+guarantee of ordering in USB when you go over different endpoints.
+
+This is essentially the same problem when some controllers send the
+first data packet before we received the Connect Complete event with the
+connection handle.
+
+Fact is that the chip manufactures need to start testing for this. And
+BlueZ is faster with its event processing than other stacks. That is
+something they have to deal with.
+
+Regards
+
+Marcel
+
+
