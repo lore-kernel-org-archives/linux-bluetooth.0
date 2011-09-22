@@ -1,84 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 22 Sep 2011 17:47:39 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2011-09-22
-Message-ID: <20110922204739.GA2673@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com>
+References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1316543496-18575-4-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 22 Sep 2011 15:02:08 -0300
+Message-ID: <CAMOw1v47ns-m8b66Sb07HOvt354XVb32bHCVpjqo7+wr_k1i-w@mail.gmail.com>
+Subject: Re: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Luiz,
 
-Here are a bunch of patches for 3.2. The biggest changes are for Bluetooth Low
-Energy. The rest are mostly bugfixes and cleanups, except a simple
-optimization on our scheduler and improvements to the Management Interface.
+On Wed, Sep 21, 2011 at 7:33 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Tue, Sep 20, 2011 at 9:31 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> ---
+>>  audio/avctp.c |    2 ++
+>>  1 files changed, 2 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/audio/avctp.c b/audio/avctp.c
+>> index e9b8e40..59fbed9 100644
+>> --- a/audio/avctp.c
+>> +++ b/audio/avctp.c
+>> @@ -155,6 +155,8 @@ static struct {
+>>        { "BACKWARD",           BACKWARD_OP,            KEY_PREVIOUSSONG },
+>>        { "REWIND",             REWIND_OP,              KEY_REWIND },
+>>        { "FAST FORWARD",       FAST_FORWARD_OP,        KEY_FASTFORWARD },
+>> +       { "VOLUME UP",          VOL_UP_OP,              KEY_VOLUMEUP },
+>> +       { "VOLUME DOWN",        VOL_DOWN_OP,            KEY_VOLUMEDOWN },
+>>        { NULL }
+>>  };
+>
+> Have a look at the SIMULTANEOUS USE OF HFP, A2DP, AND AVRCP PROFILES
+> white paper:
+>
+> Recommendation 16:
+> If volume is changed on the RD, the RD should not send an AVRCP volume
+> command to the MP device.
+> Motivation 16:
+> Sending an AVRCP volume command to the MP may cause the MP to send
+> again an AVRCP volume
+> command to the RD device which could lead to an endless loop of AVRCP
+> volume commands.
 
-Please pull, or let me know any problems.
+So this recommendation says that if we are the rendering device (and therefore
+the CT) and the volume was changed on the rendering device, we should not send
+the AVRCP volume command. In BlueZ parlance means we are on CT role and
+org.bluez.Control.{VolumeUp(), VolumeDown()} should not be called, right?
 
-	Gustavo
+Since handle_passthrough_command() is called when we *receive* a command, I
+think looking at recommendation 17 makes more sense, doesn't it?
 
-The following changes since commit da3ba88a9996cd64c6768bed5727e02da81e2c8d:
+Recomentation 17: If a device receives an AVRCP volume command, it shall not
+send back an AVRCP volume command.
+Motivation 17: This will also ensure that endless loop does not happen with
+existing devices which do not comply with the recommendation.
 
-  rtlwifi: Combine instances of RTL_HAL_IS_CCK_RATE macros. (2011-09-20 14:43:50 -0400)
+So, we should not send back (through AVRCP) the volume command. However BlueZ
+*should* forward this command to the application to the application, otherwise
+the application will just not respond to the command.
 
-are available in the git repository at:
-  git://github.com/padovan/bluetooth-next.git master
 
-Anderson Briglia (1):
-      Bluetooth: Fix wrong memcpy size on LE start encryption
+Currently, the following scenario doesn't work (WARNING: I'm not good at ASCII
+art :-) )
 
-Andre Guedes (2):
-      Bluetooth: Reduce critical region.
-      Bluetooth: Check 'dev_class' in mgmt_device_found()
 
-Antti Julku (2):
-      Bluetooth: Add mgmt command for fast connectable mode
-      Bluetooth: Add mgmt events for blacklisting
+Media Player
+============
+    PC
+  running  <---------------------------> Bluetooth speaker
+   BlueZ
+     ^ ↑
+     | ↑
+     | ↑ AVRCP_volume_up
+     | ↑
+     v ↑
+   Remote
+ Controller
 
-David Herrmann (1):
-      Bluetooth: hidp: Add support for NO_INIT_REPORTS quirk
 
-Luiz Augusto von Dentz (2):
-      Bluetooth: make use of connection number to optimize the scheduler
-      Bluetooth: mark l2cap_create_iframe_pdu as static
+What do you think?
 
-Peter Hurley (1):
-      Bluetooth: Add LE link type for debugfs output
 
-Vinicius Costa Gomes (15):
-      Bluetooth: Reset the security timer when a command is queued
-      Bluetooth: Add a flag to indicate that SMP is going on
-      Bluetooth: Use the same timeouts for both ACL and LE links
-      Bluetooth: Add support for pairing via mgmt over LE
-      Bluetooth: Add support for running SMP without a socket
-      Bluetooth: Add link_type information to the mgmt Connected event
-      Bluetooth: Move SMP fields to a separate structure
-      Bluetooth: Move SMP crypto functions to a workqueue
-      Bluetooth: Require authentication if MITM protection is requested
-      Bluetooth: Use the MEDIUM security level for pairings
-      Bluetooth: Fix sending wrong authentication requirements
-      Bluetooth: Use the LTK after receiving a LE Security Request
-      Revert "Bluetooth: Add support for communicating keys with userspace"
-      Bluetooth: Fix not setting a pending security level
-      Bluetooth: Remove support for other SMP keys than the LTK
-
- include/net/bluetooth/hci.h      |   10 +
- include/net/bluetooth/hci_core.h |   25 ++-
- include/net/bluetooth/l2cap.h    |    8 +-
- include/net/bluetooth/mgmt.h     |   16 ++
- include/net/bluetooth/smp.h      |   17 ++
- net/bluetooth/hci_conn.c         |    2 +-
- net/bluetooth/hci_core.c         |   57 ++---
- net/bluetooth/hci_event.c        |   16 +-
- net/bluetooth/hci_sock.c         |   18 ++-
- net/bluetooth/hci_sysfs.c        |    2 +
- net/bluetooth/hidp/core.c        |    3 +
- net/bluetooth/l2cap_core.c       |   18 ++-
- net/bluetooth/mgmt.c             |  212 ++++++++++++++------
- net/bluetooth/smp.c              |  421 +++++++++++++++++++++++---------------
- 14 files changed, 538 insertions(+), 287 deletions(-)
-
+Lucas De Marchi
