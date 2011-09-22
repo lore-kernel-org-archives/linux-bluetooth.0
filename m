@@ -1,54 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Fix possible NULL pointer dereference
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	padovan@profusion.mobi,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
-Date: Thu, 22 Sep 2011 11:51:40 +0200
-In-Reply-To: <1316671092-4387-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <20110921070804.GA5982@elgon.mountain>
-	 <1316671092-4387-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316685104.1937.120.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <002f01cc78fa$f27c95f0$2947dd0a@ALEXM>
+References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
+	<CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com>
+	<1E0C6F4C3D9940BA8E8D3BA2FC16B573@alexm>
+	<CABBYNZ+hXiRQv7KesdgX790wWPabYXvUecq0D=2PjgmVEWTL2A@mail.gmail.com>
+	<002f01cc78fa$f27c95f0$2947dd0a@ALEXM>
+Date: Thu, 22 Sep 2011 11:07:25 +0300
+Message-ID: <CABBYNZKXoKZPL5EESrfbs7ZuU=b0509m7V7_Zs08s42a_6q0RQ@mail.gmail.com>
+Subject: Re: obexd: obex_handle_input: poll event HUP ERR
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: alexvm12e@mail.ru
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi,
 
-> Checking conn->pending_sec_level if there is no connection leads to potential
-> null pointer dereference. Don't process pin_code_request_event at all if no
-> connection exists.
-> 
-> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
-> ---
->  net/bluetooth/hci_event.c |   30 ++++++++++++++++--------------
->  1 files changed, 16 insertions(+), 14 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index a520787..41c2562 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2175,24 +2175,26 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
->  	hci_dev_lock(hdev);
->  
->  	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
-> -	if (conn && conn->state == BT_CONNECTED) {
-> -		hci_conn_hold(conn);
-> -		conn->disc_timeout = HCI_PAIRING_TIMEOUT;
-> -		hci_conn_put(conn);
-> -	}
-> +	if (conn) {
+On Thu, Sep 22, 2011 at 10:40 AM,  <alexvm12e@mail.ru> wrote:
+>
+> Hi Luiz,
+>
+>
+>> Can you try the following:
+>
+>> diff --git a/src/obex.c b/src/obex.c
+>> index d8f4648..7b68814 100644
+>> --- a/src/obex.c
+>> +++ b/src/obex.c
+>> @@ -985,6 +985,7 @@ static gboolean check_put(obex_t *obex, obex_object_t
+>> *obj)
+>>       unsigned int hlen;
+>>       uint8_t hi;
+>>       int ret;
+>> +       GError *err = NULL;
+>>
+>>       os = OBEX_GetUserData(obex);
+>>
+>> @@ -1010,7 +1011,12 @@ static gboolean check_put(obex_t *obex,
+>> obex_object_t *obj)
+>>                               continue;
+>>
+>>                       os->name = g_convert((const char *) hd.bs, hlen,
+>> -                                       "UTF8", "UTF16BE", NULL, NULL,
+>> NULL);
+>> +                                       "UTF8", "UTF16BE", NULL, NULL,
+>> &err);
+>> +                       if (err) {
+>> +                               error("%s", err->message);
+>> +                               g_error_free(err);
+>> +                       }
+>> +
+>>                       DBG("OBEX_HDR_NAME: %s", os->name);
+>>                       break;
+>
+> obexd[844]: Conversion from character set 'UTF16BE' to 'UTF8' is not
+> supported
+>
+> As I understood this is a glib problem not obexd. Thanks for your help.
 
-what is from with this:
+Yep, probably some dependency missing so that it makes glib unable to
+do the conversion. Anyway I think I gonna go ahead and add these so
+that it is easier to detect such problem in the future.
 
-	if (!conn)
-		goto unlock;
-
-Regards
-
-Marcel
-
-
+-- 
+Luiz Augusto von Dentz
