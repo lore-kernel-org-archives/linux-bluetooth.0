@@ -1,34 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH RFC BlueZ 0/3] GATT: high level API for service registration
-Date: Thu, 22 Sep 2011 16:56:35 -0400
-Message-Id: <1316724998-1466-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 22 Sep 2011 17:47:39 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2011-09-22
+Message-ID: <20110922204739.GA2673@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi John,
 
-This RFC series contain a proposal for a internal API that simplifies GATT
-service registration on server implementations. It is built on top of current
-"low level" attribute API, and both can be used at the same time without
-problem.
+Here are a bunch of patches for 3.2. The biggest changes are for Bluetooth Low
+Energy. The rest are mostly bugfixes and cleanups, except a simple
+optimization on our scheduler and improvements to the Management Interface.
 
-As an example, I converted a service from the GATT example profile (see patch
-#3).
+Please pull, or let me know any problems.
 
-I would like to hear your opinion on the approach (using varargs). There are
-some limitations on current implementation:
+	Gustavo
 
-* No support for aggregate format descriptors, included services
-* Support for many descriptors is missing
-* No support for "static" characteristic values. All readable or writeable
-* characteristic needs a corresponding read or write callback
+The following changes since commit da3ba88a9996cd64c6768bed5727e02da81e2c8d:
 
-Comments are very welcome, even if it is to propose another API.
+  rtlwifi: Combine instances of RTL_HAL_IS_CCK_RATE macros. (2011-09-20 14:43:50 -0400)
 
-Regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia (INdT)
-Manaus - Brazil
+are available in the git repository at:
+  git://github.com/padovan/bluetooth-next.git master
+
+Anderson Briglia (1):
+      Bluetooth: Fix wrong memcpy size on LE start encryption
+
+Andre Guedes (2):
+      Bluetooth: Reduce critical region.
+      Bluetooth: Check 'dev_class' in mgmt_device_found()
+
+Antti Julku (2):
+      Bluetooth: Add mgmt command for fast connectable mode
+      Bluetooth: Add mgmt events for blacklisting
+
+David Herrmann (1):
+      Bluetooth: hidp: Add support for NO_INIT_REPORTS quirk
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: make use of connection number to optimize the scheduler
+      Bluetooth: mark l2cap_create_iframe_pdu as static
+
+Peter Hurley (1):
+      Bluetooth: Add LE link type for debugfs output
+
+Vinicius Costa Gomes (15):
+      Bluetooth: Reset the security timer when a command is queued
+      Bluetooth: Add a flag to indicate that SMP is going on
+      Bluetooth: Use the same timeouts for both ACL and LE links
+      Bluetooth: Add support for pairing via mgmt over LE
+      Bluetooth: Add support for running SMP without a socket
+      Bluetooth: Add link_type information to the mgmt Connected event
+      Bluetooth: Move SMP fields to a separate structure
+      Bluetooth: Move SMP crypto functions to a workqueue
+      Bluetooth: Require authentication if MITM protection is requested
+      Bluetooth: Use the MEDIUM security level for pairings
+      Bluetooth: Fix sending wrong authentication requirements
+      Bluetooth: Use the LTK after receiving a LE Security Request
+      Revert "Bluetooth: Add support for communicating keys with userspace"
+      Bluetooth: Fix not setting a pending security level
+      Bluetooth: Remove support for other SMP keys than the LTK
+
+ include/net/bluetooth/hci.h      |   10 +
+ include/net/bluetooth/hci_core.h |   25 ++-
+ include/net/bluetooth/l2cap.h    |    8 +-
+ include/net/bluetooth/mgmt.h     |   16 ++
+ include/net/bluetooth/smp.h      |   17 ++
+ net/bluetooth/hci_conn.c         |    2 +-
+ net/bluetooth/hci_core.c         |   57 ++---
+ net/bluetooth/hci_event.c        |   16 +-
+ net/bluetooth/hci_sock.c         |   18 ++-
+ net/bluetooth/hci_sysfs.c        |    2 +
+ net/bluetooth/hidp/core.c        |    3 +
+ net/bluetooth/l2cap_core.c       |   18 ++-
+ net/bluetooth/mgmt.c             |  212 ++++++++++++++------
+ net/bluetooth/smp.c              |  421 +++++++++++++++++++++++---------------
+ 14 files changed, 538 insertions(+), 287 deletions(-)
+
