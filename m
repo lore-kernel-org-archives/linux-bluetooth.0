@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <002f01cc78fa$f27c95f0$2947dd0a@ALEXM>
-References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru>
-	<CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com>
-	<1E0C6F4C3D9940BA8E8D3BA2FC16B573@alexm>
-	<CABBYNZ+hXiRQv7KesdgX790wWPabYXvUecq0D=2PjgmVEWTL2A@mail.gmail.com>
-	<002f01cc78fa$f27c95f0$2947dd0a@ALEXM>
-Date: Thu, 22 Sep 2011 11:07:25 +0300
-Message-ID: <CABBYNZKXoKZPL5EESrfbs7ZuU=b0509m7V7_Zs08s42a_6q0RQ@mail.gmail.com>
-Subject: Re: obexd: obex_handle_input: poll event HUP ERR
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: alexvm12e@mail.ru
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH obexd 4/4] Code clean-up: Simplify vCard's phone number printing
+Date: Thu, 22 Sep 2011 09:52:48 +0200
+Message-Id: <1316677968-3494-4-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1316677968-3494-3-git-send-email-michalski.raf@gmail.com>
+References: <1316677968-3494-1-git-send-email-michalski.raf@gmail.com>
+ <1316677968-3494-2-git-send-email-michalski.raf@gmail.com>
+ <1316677968-3494-3-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Previously, it was trynig to create string (by snprintf function
+and stored in "buf" buffer) containing "%s" formatting piece for
+"vcard_printf" function.
+In this case "\%" is not valid escape sequence (it is "%%" for percent
+character) - backslash is ignored, so sequence "\%s" is treated as "%s"
+and replaced by string for "number" field when snprintf function is
+executed. Hence "vcard_printf" function has nothing to do with "number"
+field, since "buf" does not contain any "%s" formatting sequence.
 
-On Thu, Sep 22, 2011 at 10:40 AM,  <alexvm12e@mail.ru> wrote:
->
-> Hi Luiz,
->
->
->> Can you try the following:
->
->> diff --git a/src/obex.c b/src/obex.c
->> index d8f4648..7b68814 100644
->> --- a/src/obex.c
->> +++ b/src/obex.c
->> @@ -985,6 +985,7 @@ static gboolean check_put(obex_t *obex, obex_object_t
->> *obj)
->>       unsigned int hlen;
->>       uint8_t hi;
->>       int ret;
->> +       GError *err = NULL;
->>
->>       os = OBEX_GetUserData(obex);
->>
->> @@ -1010,7 +1011,12 @@ static gboolean check_put(obex_t *obex,
->> obex_object_t *obj)
->>                               continue;
->>
->>                       os->name = g_convert((const char *) hd.bs, hlen,
->> -                                       "UTF8", "UTF16BE", NULL, NULL,
->> NULL);
->> +                                       "UTF8", "UTF16BE", NULL, NULL,
->> &err);
->> +                       if (err) {
->> +                               error("%s", err->message);
->> +                               g_error_free(err);
->> +                       }
->> +
->>                       DBG("OBEX_HDR_NAME: %s", os->name);
->>                       break;
->
-> obexd[844]: Conversion from character set 'UTF16BE' to 'UTF8' is not
-> supported
->
-> As I understood this is a glib problem not obexd. Thanks for your help.
+This patch make simplification for printing phone number field by
+avoiding storing formatting pieces (for instance "%%s"). Now string
+for phone number field is stored directly in "field" buffer
+(common with Quoted Printable encoding) and simply passed to
+"vcard_printf" function.
+---
+ plugins/vcard.c |    8 +++-----
+ 1 files changed, 3 insertions(+), 5 deletions(-)
 
-Yep, probably some dependency missing so that it makes glib unable to
-do the conversion. Anyway I think I gonna go ahead and add these so
-that it is easier to detect such problem in the future.
-
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index 901a2ac..5b581fb 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -450,17 +450,15 @@ static void vcard_printf_number(GString *vcards, uint8_t format,
+ 	if ((type == TYPE_INTERNATIONAL) && (number[0] != '+'))
+ 		intl = "+";
+ 
++	snprintf(field, sizeof(field), "%s%s", intl, number);
++
+ 	if (select_qp_encoding(format, number, NULL)) {
+ 		snprintf(buf, sizeof(buf), "TEL;%s", category_string);
+-		snprintf(field, sizeof(field), "%s%s", intl, number);
+ 		vcard_qp_print_encoded(vcards, buf, field, NULL);
+ 		return;
+ 	}
+ 
+-	snprintf(buf, sizeof(buf), "TEL;%s:%s\%s", category_string,
+-								intl, number);
+-
+-	vcard_printf(vcards, buf, number);
++	vcard_printf(vcards, "TEL;%s:%s", category_string, field);
+ }
+ 
+ static void vcard_printf_tag(GString *vcards, uint8_t format,
 -- 
-Luiz Augusto von Dentz
+1.6.3.3
+
