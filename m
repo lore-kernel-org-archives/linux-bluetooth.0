@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] Remove use of read_device_id in input plugin
-Date: Thu, 22 Sep 2011 18:51:51 +0300
-Message-Id: <1316706712-17611-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1316706712-17611-1-git-send-email-luiz.dentz@gmail.com>
-References: <1316706712-17611-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix possible NULL pointer dereference
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"padovan@profusion.mobi" <padovan@profusion.mobi>,
+	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
+Date: Thu, 22 Sep 2011 12:58:41 +0200
+In-Reply-To: <4E7B0DBF.7060406@tieto.com>
+References: <20110921070804.GA5982@elgon.mountain>
+		 <1316671092-4387-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+	 <1316685104.1937.120.camel@aeonflux> <4E7B0DBF.7060406@tieto.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1316689122.1937.124.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Waldemar,
 
-Make use of btd_device_get_vendor, btd_device_get_product and
-btd_device_get_version intead.
----
- input/device.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+> >>   	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,&ev->bdaddr);
+> >> -	if (conn&&  conn->state == BT_CONNECTED) {
+> >> -		hci_conn_hold(conn);
+> >> -		conn->disc_timeout = HCI_PAIRING_TIMEOUT;
+> >> -		hci_conn_put(conn);
+> >> -	}
+> >> +	if (conn) {
+> >
+> > what is from with this:
+> >
+> > 	if (!conn)
+> > 		goto unlock;
+> >
+> 
+> Well, the file is mixed in style, thus I chose the style as for nearby 
+> functions. Anyway, if this form is preferable let me know and will update.
 
-diff --git a/input/device.c b/input/device.c
-index 70d0ba2..9ff7f20 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -596,8 +596,9 @@ static int hidp_add_connection(const struct input_device *idev,
- 	extract_hid_record(rec, req);
- 	sdp_record_free(rec);
- 
--	read_device_id(src_addr, dst_addr, NULL,
--				&req->vendor, &req->product, &req->version);
-+	req->vendor = btd_device_get_vendor(idev->device);
-+	req->product = btd_device_get_product(idev->device);
-+	req->version = btd_device_get_version(idev->device);
- 
- 	fake_hid = get_fake_hid(req->vendor, req->product);
- 	if (fake_hid) {
--- 
-1.7.6.2
+for simple code pieces, I don't really mind, but this function is
+getting more and more complicated. So less indentation is preferred.
+
+Regards
+
+Marcel
+
 
