@@ -2,103 +2,67 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH RFC BlueZ 3/3] Migrate example service to high level GATT API
-Date: Thu, 22 Sep 2011 16:56:38 -0400
-Message-Id: <1316724998-1466-4-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ 2/3] Add GATT_OPT_CHR_VALUE_GET_HANDLE to gatt_service_add()
+Date: Thu, 22 Sep 2011 16:56:37 -0400
+Message-Id: <1316724998-1466-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1316724998-1466-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1316724998-1466-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commit migrates the dummy "Battery Service" from example GATT
-plugin to demonstrate how the new API is used.
+This new parameter accepts a pointer to a variable where the attribute
+handle for the characteristic value is stored.
 ---
- plugins/gatt-example.c |   61 +++++++++++++----------------------------------
- 1 files changed, 17 insertions(+), 44 deletions(-)
+ attrib/gatt-service.c |    7 +++++++
+ attrib/gatt-service.h |    3 +++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index 955d9fa..1456284 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -33,6 +33,7 @@
- #include "hcid.h"
- #include "log.h"
- #include "gattrib.h"
-+#include "gatt-service.h"
- #include "att.h"
- #include "attrib-server.h"
+diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
+index c6da71a..5bfeb0e 100644
+--- a/attrib/gatt-service.c
++++ b/attrib/gatt-service.c
+@@ -44,6 +44,7 @@ struct gatt_info {
+ 	int authorization;
+ 	GSList *callbacks;
+ 	unsigned int num_attrs;
++	uint16_t *value_handle;
+ };
  
-@@ -57,54 +58,26 @@
+ struct attrib_cb {
+@@ -85,6 +86,9 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
+ 			cb->fn = va_arg(args, void *);
+ 			info->callbacks = g_slist_append(info->callbacks, cb);
+ 			break;
++		case GATT_OPT_CHR_VALUE_GET_HANDLE:
++			info->value_handle = va_arg(args, void *);
++			break;
+ 		case GATT_OPT_CHR_AUTHENTICATION:
+ 			info->authentication = va_arg(args, gatt_option);
+ 			break;
+@@ -205,6 +209,9 @@ static gboolean add_characteristic(uint16_t *handle, struct gatt_info *info)
+ 		}
+ 	}
  
- static GSList *sdp_handles = NULL;
- 
--static void register_battery_service(void)
-+static uint8_t battery_state_read(struct attribute *a, gpointer user_data)
- {
--	uint16_t start_handle, h;
--	const int svc_size = 4;
--	uint32_t sdp_handle;
--	uint8_t atval[256];
--	bt_uuid_t uuid;
--
--	start_handle = attrib_db_find_avail(svc_size);
--	if (start_handle == 0) {
--		error("Not enough free handles to register service");
--		return;
--	}
-+	uint8_t value;
- 
--	DBG("start_handle=0x%04x", start_handle);
--
--	h = start_handle;
-+	value = 0x04;
-+	attrib_db_update(a->handle, NULL, &value, sizeof(value), NULL);
- 
--	/* Battery state service: primary service definition */
--	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
--	att_put_u16(BATTERY_STATE_SVC_UUID, &atval[0]);
--	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 2);
--
--	/* Battery: battery state characteristic */
--	bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
--	atval[0] = ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_NOTIFY;
--	att_put_u16(h + 1, &atval[1]);
--	att_put_u16(BATTERY_STATE_UUID, &atval[3]);
--	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 5);
--
--	/* Battery: battery state attribute */
--	bt_uuid16_create(&uuid, BATTERY_STATE_UUID);
--	atval[0] = 0x04;
--	attrib_db_add(h++, &uuid, ATT_NONE, ATT_NOT_PERMITTED, atval, 1);
--
--	/* Battery: Client Characteristic Configuration */
--	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	atval[0] = 0x00;
--	atval[1] = 0x00;
--	attrib_db_add(h++, &uuid, ATT_NONE, ATT_AUTHENTICATION, atval, 2);
--
--	g_assert(h - start_handle == svc_size);
-+	return 0;
-+}
- 
--	/* Add an SDP record for the above service */
--	sdp_handle = attrib_create_sdp(start_handle, "Battery State Service");
--	if (sdp_handle)
--		sdp_handles = g_slist_prepend(sdp_handles,
--						GUINT_TO_POINTER(sdp_handle));
-+static void register_battery_service(void)
-+{
-+	gatt_service_add(GATT_PRIM_SVC_UUID, BATTERY_STATE_SVC_UUID,
-+			/* battery state characteristic */
-+			GATT_OPT_CHR_UUID, BATTERY_STATE_UUID,
-+			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
-+							ATT_CHAR_PROPER_NOTIFY,
-+			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ, battery_state_read,
++	if (info->value_handle)
++		*info->value_handle = a->handle;
 +
-+			GATT_OPT_INVALID);
- }
+ 	/* client characteristic configuration descriptor */
+ 	if (info->props & (ATT_CHAR_PROPER_NOTIFY | ATT_CHAR_PROPER_INDICATE)) {
+ 		uint8_t cfg_val[2];
+diff --git a/attrib/gatt-service.h b/attrib/gatt-service.h
+index 83e0bea..ab403fd 100644
+--- a/attrib/gatt-service.h
++++ b/attrib/gatt-service.h
+@@ -30,6 +30,9 @@ typedef enum {
+ 	GATT_OPT_CHR_AUTHENTICATION,
+ 	GATT_OPT_CHR_AUTHORIZATION,
  
- static void register_termometer_service(const uint16_t manuf1[2],
++	/* Get attribute handle for characteristic value */
++	GATT_OPT_CHR_VALUE_GET_HANDLE,
++
+ 	/* arguments for authentication/authorization */
+ 	GATT_CHR_VALUE_READ,
+ 	GATT_CHR_VALUE_WRITE,
 -- 
 1.7.0.4
 
