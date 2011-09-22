@@ -1,56 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <002f01cc78fa$f27c95f0$2947dd0a@ALEXM>
-From: <alexvm12e@mail.ru>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <E1R47Z5-0000QH-00.alexvm12e-mail-ru@f167.mail.ru><CABBYNZJzJPf1KYVpDJvr_UO722DTYzRV0vG6X7OnUHZVK8aq_A@mail.gmail.com><1E0C6F4C3D9940BA8E8D3BA2FC16B573@alexm> <CABBYNZ+hXiRQv7KesdgX790wWPabYXvUecq0D=2PjgmVEWTL2A@mail.gmail.com>
-Subject: Re: obexd: obex_handle_input: poll event HUP ERR
-Date: Thu, 22 Sep 2011 00:40:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+Date: Thu, 22 Sep 2011 13:00:51 +0530
+Message-ID: <CAMxgYMM5LxoD=RC44ARObUh9jV=d9LXyd6Gegi0MS95v7bW7GA@mail.gmail.com>
+Subject: Dynamicall control the maximum or default transmit power
+From: Vaishali Dhakate <justdoit.wg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Ed Tsang <netdesign_98@...>
+Subject: Dynamicall control the maximum or default transmit power
+Newsgroups: gmane.linux.bluez.kernel
+Date: 2009-02-18 20:12:08 GMT (2 years, 30 weeks, 4 days, 23 hours and
+16 minutes ago)
 
-Hi Luiz,
+Hi, I am looking at possibility of dynamically control the maximum or
+default transmit power.
+   Basically I would like to change the transmit power level during
+inquiry. So I could kind of dynamically
+control the physical range of devices that I see. In CSR's Bluecore
+chip, I think there are pskey that
+
+stored the maximum and default transmit power. And there seem to be
+bccmd psget 0x0017 to get the value.
+  Now my problem is I am using a class 1 dongle using Broadcom
+chipset. Is there a way to dynamically control the
+
+default or maximum transmit power e.g.
+   hcitool cmd 0x.. 0x.. ..... ?
+
+   During the inquiry paging, does anyone know if they use default or
+maximum transmit power?
+
+Thanks,
+Edwin
 
 
-> Can you try the following:
 
-> diff --git a/src/obex.c b/src/obex.c
-> index d8f4648..7b68814 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -985,6 +985,7 @@ static gboolean check_put(obex_t *obex, obex_object_t 
-> *obj)
->        unsigned int hlen;
->        uint8_t hi;
->        int ret;
-> +       GError *err = NULL;
->
->        os = OBEX_GetUserData(obex);
->
-> @@ -1010,7 +1011,12 @@ static gboolean check_put(obex_t *obex,
-> obex_object_t *obj)
->                                continue;
->
->                        os->name = g_convert((const char *) hd.bs, hlen,
-> -                                       "UTF8", "UTF16BE", NULL, NULL, NULL);
-> +                                       "UTF8", "UTF16BE", NULL, NULL, &err);
-> +                       if (err) {
-> +                               error("%s", err->message);
-> +                               g_error_free(err);
-> +                       }
-> +
->                        DBG("OBEX_HDR_NAME: %s", os->name);
->                        break;
+Regarding this.
+I also have the same question I am trying to find answer to ? Want to
+know if you found the answer. I see three ways of doing this.
+1)In the bcm4329 code
+2)using bccmd
+3)using hcitool cmd 0x0 0x0..
 
-obexd[844]: Conversion from character set 'UTF16BE' to 'UTF8' is not supported
+Going through the code can be time consuming And I ll have to go to
+the theory before I start, Already scimmed through it to see if there
+is any power control or anything like utility for hw control in the
+driver , in the drivers/net/wireless/bcm4329 ..
 
-As I understood this is a glib problem not obexd. Thanks for your help.
+I compiled bccmd , But this doesnot support some chips like mine
+bcm4329 , the bccmd is for CSR chips ,Plz correct me , Mine is not
+working on the phone. Maybe I ll have to take a clue from the bccmd
+tool to write my own or check in the code where these pskeys will be.
+So far I can surmise they are soemwhere in the eeprom. Also this phy.c
+has some reference to power tables. Need to look carefully.
 
-Alex. 
+Next hcitool is the option. hcitool I ll look into the ogf and ocf
+commands in the LMP specifications that I can send, havent tried this.
+Tell me how did you do it.
 
+Just thought I ll send you a mail,if you could plz share your
+experience regarding this.
+
+Regards
+Vaishali
