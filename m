@@ -1,31 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ] Fix test-proximity usage info
-Date: Fri, 23 Sep 2011 11:05:15 -0300
-Message-Id: <1316786715-21546-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH 3/3] Minor style fix
+Date: Fri, 23 Sep 2011 14:59:25 +0200
+Message-Id: <1316782765-24147-3-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1316782765-24147-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1316782765-24147-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- test/test-proximity |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ audio/gateway.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/test/test-proximity b/test/test-proximity
-index 04faf4e..289908e 100755
---- a/test/test-proximity
-+++ b/test/test-proximity
-@@ -46,7 +46,8 @@ if __name__ == "__main__":
- 	if (len(args) < 1):
- 		print "Usage: %s <command>" % (sys.argv[0])
- 		print ""
--		print "  LinkLossAlertLevel <none|mild|high>"
-+		print "  -b MAC LinkLossAlertLevel <none|mild|high>"
-+		print "  -b MAC ImmediateAlertLevel <none|mild|high>"
- 		sys.exit(1)
+diff --git a/audio/gateway.c b/audio/gateway.c
+index b98dfba..19c7ee3 100644
+--- a/audio/gateway.c
++++ b/audio/gateway.c
+@@ -755,7 +755,6 @@ struct gateway *gateway_init(struct audio_device *dev)
+ 		return NULL;
  
- 	device_path = adapter.FindDevice(options.address)
+ 	return g_new0(struct gateway, 1);
+-
+ }
+ 
+ gboolean gateway_is_connected(struct audio_device *dev)
 -- 
-1.7.6.1
+1.7.4.1
 
