@@ -1,51 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v4 03/14] Bluetooth: Check pending command in start_discovery()
+Subject: Re: [PATCH v4 02/14] Bluetooth: Add mgmt_discovery_complete()
 Mime-Version: 1.0 (Apple Message framework v1244.3)
 Content-Type: text/plain; charset=us-ascii
 From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <1316521610.1937.72.camel@aeonflux>
-Date: Fri, 23 Sep 2011 16:13:19 -0300
+In-Reply-To: <1316521786.1937.75.camel@aeonflux>
+Date: Fri, 23 Sep 2011 16:13:04 -0300
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <569C5CF2-08CB-4A09-941F-9E9AC2E8C29C@openbossa.org>
-References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org> <1316468136-12472-4-git-send-email-andre.guedes@openbossa.org> <1316521610.1937.72.camel@aeonflux>
+Message-Id: <E35EC615-A59F-45E2-9E5A-A413262D5433@openbossa.org>
+References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org> <1316468136-12472-3-git-send-email-andre.guedes@openbossa.org> <1316521786.1937.75.camel@aeonflux>
 To: Marcel Holtmann <marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sep 20, 2011, at 9:26 AM, Marcel Holtmann wrote:
+On Sep 20, 2011, at 9:29 AM, Marcel Holtmann wrote:
 
 > Hi Andre,
 > 
->> If discovery procedure is already running then EINPROGRESS command
->> status should be returned.
+>> This patch adds the mgmt_discovery_complete() function which
+>> removes pending discovery commands and sends command complete/
+>> status events.
+>> 
+>> This function should be called when the discovery procedure finishes.
 >> 
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> net/bluetooth/mgmt.c |    6 ++++++
->> 1 files changed, 6 insertions(+), 0 deletions(-)
+>> include/net/bluetooth/hci_core.h |    1 +
+>> net/bluetooth/hci_event.c        |    7 +++++++
+>> net/bluetooth/mgmt.c             |   31 +++++++++++++++++++++++++++++++
+>> 3 files changed, 39 insertions(+), 0 deletions(-)
+>> 
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index 5b92442..df6fa85 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -875,6 +875,7 @@ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+>> int mgmt_discovering(u16 index, u8 discovering);
+>> int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
+>> int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
+>> +int mgmt_discovery_complete(u16 index, u8 status);
+>> 
+>> /* HCI info for socket */
+>> #define hci_pi(sk) ((struct hci_pinfo *) sk)
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 89faf48..b44f362 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -55,6 +55,8 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+>> 
+>> 	BT_DBG("%s status 0x%x", hdev->name, status);
+>> 
+>> +	mgmt_discovery_complete(hdev->id, status);
+>> +
+>> 	if (status)
+>> 		return;
+>> 
+>> @@ -951,6 +953,9 @@ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
+>> 	if (status) {
+>> 		hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+>> 		hci_conn_check_pending(hdev);
+>> +
+>> +		mgmt_discovery_complete(hdev->id, status);
+>> +
+>> 		return;
+>> 	}
+>> 
+>> @@ -1342,6 +1347,8 @@ static inline void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff
+>> 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+>> 		return;
+>> 
+>> +	mgmt_discovery_complete(hdev->id, 0);
+>> +
+>> 	mgmt_discovering(hdev->id, 0);
+>> }
 >> 
 >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index cc0c204..d8333e0 100644
+>> index 5a94eec..cc0c204 100644
 >> --- a/net/bluetooth/mgmt.c
 >> +++ b/net/bluetooth/mgmt.c
->> @@ -1622,6 +1622,12 @@ static int start_discovery(struct sock *sk, u16 index)
->> 
->> 	hci_dev_lock_bh(hdev);
->> 
->> +	if (mgmt_pending_find(MGMT_OP_START_DISCOVERY, index)) {
->> +		err = cmd_status(sk, index, MGMT_OP_START_DISCOVERY,
->> +								EINPROGRESS);
->> +		goto failed;
->> +	}
+>> @@ -2378,3 +2378,34 @@ int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr)
+>> 	return mgmt_event(MGMT_EV_DEVICE_UNBLOCKED, index, &ev, sizeof(ev),
+>> 						cmd ? cmd->sk : NULL);
+>> }
+>> +
+>> +int mgmt_discovery_complete(u16 index, u8 status)
+>> +{
+>> +	struct pending_cmd *cmd_start;
+>> +	struct pending_cmd *cmd_stop;
+>> +	u8 discov_status = bt_to_errno(status);
+>> +
+>> +	cmd_start = mgmt_pending_find(MGMT_OP_START_DISCOVERY, index);
+>> +	if (!cmd_start)
+>> +		return -ENOENT;
+>> +
+>> +	BT_DBG("hci%u status %u", index, status);
+>> +
+>> +	cmd_stop = mgmt_pending_find(MGMT_OP_STOP_DISCOVERY, index);
+>> +	if (cmd_stop && status == 0)
+>> +		discov_status = ECANCELED;
+>> +
+>> +	if (discov_status)
+>> +		cmd_status(cmd_start->sk, index, MGMT_OP_START_DISCOVERY,
+>> +								discov_status);
+>> +	else
+>> +		cmd_complete(cmd_start->sk, index, MGMT_OP_START_DISCOVERY,
+>> +								NULL, 0);
+>> +
+>> +	mgmt_pending_remove(cmd_start);
+>> +
+>> +	if (cmd_stop)
+>> +		mgmt_pending_remove(cmd_stop);
 >> +
 > 
-> the idea is correct, but instead of using mgmt_pending_find we should
-> have an internal flags field to track our current states. That is way
-> more efficient then looking for pending commands.
+> doing this via an internal flags variable to track current states seems
+> a bit more efficient then these lookups. It also seems a bit cleaner
+> from a code point of view and easy to read and understand.
 
+I see this as a tradeoff. To implement this mgmt internal flag we
+would add extra code to control it and this would make the code
+more complex. Moreover, this extra logic would tell us the same
+information we already have by looking up discovery commands in
+mgmt pending list.
 
-See my reply about having an mgmt internal flag on patch 02/14.
+About the code performance you highlighted, most of the time the
+mgmt pending list have only a few elements. So, I don't see those
+lookups degrading the overall code performance.
+
+BTW, we'll need those lookups anyway since the discovery commands
+must be removed from the pending list once the discovery terminates.
+
+> 
+> Can the race condition between cmd_status and cmd_complete really happen
+> in reality. I am thinking that we rather should not signal POLLOUT and
+> return an error on write if cmd_status has not yet been sent. The
+> cmd_status should be always immediate anyway.
+
+BR,
 
 Andre
