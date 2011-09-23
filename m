@@ -1,68 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 1/3] Check all states before allowing gw connection
-Date: Fri, 23 Sep 2011 14:59:23 +0200
-Message-Id: <1316782765-24147-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH BlueZ] Fix possible crash while removing a device
+Date: Fri, 23 Sep 2011 15:36:39 +0300
+Message-Id: <1316781399-10977-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/gateway.c |   10 ++++++++++
- audio/gateway.h |    1 +
- audio/manager.c |    2 +-
- 3 files changed, 12 insertions(+), 1 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/audio/gateway.c b/audio/gateway.c
-index f3e6c6a..ca44576 100644
---- a/audio/gateway.c
-+++ b/audio/gateway.c
-@@ -764,6 +764,16 @@ gboolean gateway_is_connected(struct audio_device *dev)
- 			dev->gateway->state == GATEWAY_STATE_CONNECTED);
+If adapter has more than one sdp session active find_by_bdaddr always
+return the first one regardless if the device address match or not
+which leads to the following crash:
+
+Invalid read of size 4
+   at 0x16CB31: search_cb (in /usr/sbin/bluetoothd)
+   by 0x15C0CA: connect_watch (in /usr/sbin/bluetoothd)
+   by 0x48CFD37: g_io_unix_dispatch (in /usr/lib/libglib-2.0.so.0.2800.6)
+   by 0x488B4A0: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.2800.6)
+   by 0x488BCD0: g_main_context_iterate.clone.5 (in /usr/lib/libglib-2.0.so.0.2800.6)
+   by 0x488C3B8: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.2800.6)
+   by 0x152D09: main (in /usr/sbin/bluetoothd)
+  Address 0x4c8c600 is 16 bytes inside a block of size 48 free'd
+   at 0x48234A9: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+   by 0x48920F0: g_free (in /usr/lib/libglib-2.0.so.0.2800.6)
+   by 0x16BDD3: browse_request_free (in /usr/sbin/bluetoothd)
+   by 0x16C7A2: browse_request_cancel (in /usr/sbin/bluetoothd)
+
+Reported by Alberto José Rodríguez Rodríguez <ajrodriguez@blulabs.es>
+---
+ src/glib-helper.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index 22c14e7..0288c9c 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -333,9 +333,13 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+ static gint find_by_bdaddr(gconstpointer data, gconstpointer user_data)
+ {
+ 	const struct search_context *ctxt = data, *search = user_data;
++	int ret;
+ 
+-	return (bacmp(&ctxt->dst, &search->dst) &&
+-					bacmp(&ctxt->src, &search->src));
++	ret = bacmp(&ctxt->src, &search->src);
++	if (ret != 0)
++		return ret;
++
++	return bacmp(&ctxt->dst, &search->dst);
  }
  
-+gboolean gateway_is_active(struct audio_device *dev)
-+{
-+	struct gateway *gw = dev->gateway;
-+
-+	if (gw->state != GATEWAY_STATE_DISCONNECTED)
-+		return TRUE;
-+
-+	return FALSE;
-+}
-+
- int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io)
- {
- 	if (!io)
-diff --git a/audio/gateway.h b/audio/gateway.h
-index a8ed2f2..77f5787 100644
---- a/audio/gateway.h
-+++ b/audio/gateway.h
-@@ -57,6 +57,7 @@ typedef void (*gateway_stream_cb_t) (struct audio_device *dev, GError *err,
- void gateway_set_state(struct audio_device *dev, gateway_state_t new_state);
- void gateway_unregister(struct audio_device *dev);
- struct gateway *gateway_init(struct audio_device *device);
-+gboolean gateway_is_active(struct audio_device *dev);
- gboolean gateway_is_connected(struct audio_device *dev);
- int gateway_connect_rfcomm(struct audio_device *dev, GIOChannel *io);
- int gateway_connect_sco(struct audio_device *dev, GIOChannel *chan);
-diff --git a/audio/manager.c b/audio/manager.c
-index 053562e..06d3f0e 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -594,7 +594,7 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
- 			goto drop;
- 	}
- 
--	if (gateway_is_connected(device)) {
-+	if (gateway_is_active(device)) {
- 		DBG("Refusing new connection since one already exists");
- 		goto drop;
- 	}
+ int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst)
 -- 
-1.7.4.1
+1.7.6.2
 
