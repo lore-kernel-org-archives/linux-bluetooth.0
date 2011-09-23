@@ -1,31 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2] Bluetooth: Fix possible NULL pointer dereference
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
-Date: Fri, 23 Sep 2011 10:05:06 +0200
-In-Reply-To: <1316764890-11806-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-References: <1316764890-11806-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1316765111.1937.136.camel@aeonflux>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, <padovan@profusion.mobi>, Johan
+ Hedberg <johan.hedberg@gmail.com>, Waldemar Rymarkiewicz
+	<waldemar.rymarkiewicz@tieto.com>, Waldemar Rymarkiewicz
+	<waldemar.rymarkiewicz@gmail.com>
+Subject: [PATCH v2] Bluetooth: Fix possible NULL pointer dereference
+Date: Fri, 23 Sep 2011 10:01:30 +0200
+Message-ID: <1316764890-11806-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Checking conn->pending_sec_level if there is no connection leads to potential
+null pointer dereference. Don't process pin_code_request_event at all if no
+connection exists.
 
-> Checking conn->pending_sec_level if there is no connection leads to potential
-> null pointer dereference. Don't process pin_code_request_event at all if no
-> connection exists.
-> 
-> Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
+Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
+---
+ net/bluetooth/hci_event.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a520787..10a4569 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2175,7 +2175,10 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+-	if (conn && conn->state == BT_CONNECTED) {
++	if (!conn)
++		goto unlock;
++
++	if (conn->state == BT_CONNECTED) {
+ 		hci_conn_hold(conn);
+ 		conn->disc_timeout = HCI_PAIRING_TIMEOUT;
+ 		hci_conn_put(conn);
+@@ -2195,6 +2198,7 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
+ 		mgmt_pin_code_request(hdev->id, &ev->bdaddr, secure);
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-- 
+1.7.6.3
