@@ -1,111 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v4 07/14] Bluetooth: Handle race condition in Discovery
+Subject: Re: [PATCH v4 05/14] Bluetooth: Create hci_do_inquiry()
 Mime-Version: 1.0 (Apple Message framework v1244.3)
 Content-Type: text/plain; charset=us-ascii
 From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <1316522234.1937.81.camel@aeonflux>
-Date: Fri, 23 Sep 2011 16:13:50 -0300
+In-Reply-To: <1316521868.1937.76.camel@aeonflux>
+Date: Fri, 23 Sep 2011 16:13:33 -0300
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2CF28A50-3159-4B3F-AAC4-0E12E2B24D54@openbossa.org>
-References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org> <1316468136-12472-8-git-send-email-andre.guedes@openbossa.org> <1316522234.1937.81.camel@aeonflux>
+Message-Id: <4AD06E0E-704B-42E6-980D-3720541D07AB@openbossa.org>
+References: <1316468136-12472-1-git-send-email-andre.guedes@openbossa.org> <1316468136-12472-6-git-send-email-andre.guedes@openbossa.org> <1316521868.1937.76.camel@aeonflux>
 To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sep 20, 2011, at 9:37 AM, Marcel Holtmann wrote:
+On Sep 20, 2011, at 9:31 AM, Marcel Holtmann wrote:
 
 > Hi Andre,
 >=20
->> If MGMT_OP_STOP_DISCOVERY command is issued before the kernel
->> receives the HCI Inquiry Command Status Event from the controller
->> then that command will fail and the discovery procedure won't be
->> stopped. This situation may occur if a MGMT_OP_STOP_DISCOVERY
->> command is issued just after a MGMT_OP_START_DISCOVERY.
+>> This patch adds a function to hci_core to carry out inquiry.
 >>=20
->> This race condition can be handled by checking for pending
->> MGMT_OP_STOP_DISCOVERY command in inquiry command status event
->> handler. If we have a pending MGMT_OP_STOP_DISCOVERY command we
->> cancel the ongoing discovery.
+>> All inquiry code from start_discovery() were replaced by a
+>> hci_do_inquiry() call.
 >>=20
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> include/net/bluetooth/hci_core.h |    1 +
->> net/bluetooth/hci_event.c        |    3 +++
->> net/bluetooth/mgmt.c             |   14 +++++++++++++-
->> 3 files changed, 17 insertions(+), 1 deletions(-)
+>> include/net/bluetooth/hci_core.h |    2 ++
+>> net/bluetooth/hci_core.c         |   17 +++++++++++++++++
+>> net/bluetooth/mgmt.c             |    9 +--------
+>> 3 files changed, 20 insertions(+), 8 deletions(-)
 >>=20
 >> diff --git a/include/net/bluetooth/hci_core.h =
 b/include/net/bluetooth/hci_core.h
->> index 4a79a50..36e15cc 100644
+>> index df6fa85..b7c070b 100644
 >> --- a/include/net/bluetooth/hci_core.h
 >> +++ b/include/net/bluetooth/hci_core.h
->> @@ -876,6 +876,7 @@ int mgmt_discovering(u16 index, u8 discovering);
->> int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
->> int mgmt_device_unblocked(u16 index, bdaddr_t *bdaddr);
->> int mgmt_discovery_complete(u16 index, u8 status);
->> +int mgmt_has_pending_stop_discov(u16 index);
+>> @@ -914,4 +914,6 @@ void hci_le_start_enc(struct hci_conn *conn, =
+__le16 ediv, __u8 rand[8],
+>> void hci_le_ltk_reply(struct hci_conn *conn, u8 ltk[16]);
+>> void hci_le_ltk_neg_reply(struct hci_conn *conn);
 >>=20
->> /* HCI info for socket */
->> #define hci_pi(sk) ((struct hci_pinfo *) sk)
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index b44f362..c9d641b 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -962,6 +962,9 @@ static inline void hci_cs_inquiry(struct hci_dev =
-*hdev, __u8 status)
->> 	set_bit(HCI_INQUIRY, &hdev->flags);
->>=20
->> 	mgmt_discovering(hdev->id, 1);
+>> +int hci_do_inquiry(struct hci_dev *hdev, u8 length);
 >> +
->> +	if (mgmt_has_pending_stop_discov(hdev->id))
->> +		hci_cancel_inquiry(hdev);
->> }
->>=20
->> static inline void hci_cs_create_conn(struct hci_dev *hdev, __u8 =
-status)
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index d84f242..58cf33a 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -1674,7 +1674,11 @@ static int stop_discovery(struct sock *sk, u16 =
-index)
->> 		goto failed;
+>> #endif /* __HCI_CORE_H */
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 04bc31d..ebfd963 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -2405,3 +2405,20 @@ static void hci_cmd_task(unsigned long arg)
+>> 		}
 >> 	}
->>=20
->> -	err =3D hci_cancel_inquiry(hdev);
->> +	if (test_bit(HCI_INQUIRY, &hdev->flags))
->> +		err =3D hci_cancel_inquiry(hdev);
->> +	else
->> +		err =3D 0;
+>> }
 >> +
+>> +int hci_do_inquiry(struct hci_dev *hdev, u8 length)
+>> +{
+>> +	u8 lap[3] =3D {0x33, 0x8b, 0x9e};
 >=20
-> do we really just wanna always return success here? Even if
-> stop_discovery is called for a none existing discovery.
+> { 0x33, ... 0x9e } with proper space please. Otherwise.
+>=20
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-If stop_discovery() is called for a none existing discovery
-this code isn't even reached since stop_discovery() will
-return in MGMT_OP_START_DISCOVERY pending command check at=20
-the beginning of stop_discovery().
-
-If we have an ongoing discovery but the HCI_INQUIRY flag isn't
-set, then we are in the race condition window. Only in that case,
-we return 0 and postpone the discovery cancel operation.
-
-> And btw. since you just changed the hci_cancel_inquiry() to return
-> -EPERM if the HCI_INQUIRY flag is not set you could do this simpler by
-> just checking the return value directly. No double check of the
-> HCI_INQUIRY flag.
-
-Yes, I could have done like this, but since in a further patch I'll
-add the HCI_LE_SCAN flag check I've done his way here (please see
-patch 13/14).
-
-The HCI_INQUIRY check in hci_cancel_inquiry() is to make sure no
-HCI_OP_CANCEL_INQUIRY command is issued unless the controller is
-in inquiry mode (spec recommendations).
-
-The HCI_INQUIRY (and HCI_LE_SCAN) check in stop_discovery() stands
-for sending the right command to cancel the ongoing discovery.
+Sure, I'll fix it.
 
 Andre=
