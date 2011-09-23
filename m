@@ -1,49 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>, <padovan@profusion.mobi>, Johan
- Hedberg <johan.hedberg@gmail.com>, Waldemar Rymarkiewicz
-	<waldemar.rymarkiewicz@tieto.com>, Waldemar Rymarkiewicz
-	<waldemar.rymarkiewicz@gmail.com>
-Subject: [PATCH v2] Bluetooth: Fix possible NULL pointer dereference
-Date: Fri, 23 Sep 2011 10:01:30 +0200
-Message-ID: <1316764890-11806-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAMOw1v47ns-m8b66Sb07HOvt354XVb32bHCVpjqo7+wr_k1i-w@mail.gmail.com>
+References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1316543496-18575-4-git-send-email-lucas.demarchi@profusion.mobi>
+	<CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com>
+	<CAMOw1v47ns-m8b66Sb07HOvt354XVb32bHCVpjqo7+wr_k1i-w@mail.gmail.com>
+Date: Fri, 23 Sep 2011 10:48:54 +0300
+Message-ID: <CABBYNZKH53pxSahoQL4AJf14F8fMChMC93+2gq5CA_wQCC4Xfg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Checking conn->pending_sec_level if there is no connection leads to potential
-null pointer dereference. Don't process pin_code_request_event at all if no
-connection exists.
+Hi Lucas,
 
-Signed-off-by: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
----
- net/bluetooth/hci_event.c |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+On Thu, Sep 22, 2011 at 9:02 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> Hi Luiz,
+>
+> On Wed, Sep 21, 2011 at 7:33 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Lucas,
+>>
+>> On Tue, Sep 20, 2011 at 9:31 PM, Lucas De Marchi
+>> <lucas.demarchi@profusion.mobi> wrote:
+>>> ---
+>>>  audio/avctp.c |    2 ++
+>>>  1 files changed, 2 insertions(+), 0 deletions(-)
+>>>
+>>> diff --git a/audio/avctp.c b/audio/avctp.c
+>>> index e9b8e40..59fbed9 100644
+>>> --- a/audio/avctp.c
+>>> +++ b/audio/avctp.c
+>>> @@ -155,6 +155,8 @@ static struct {
+>>>        { "BACKWARD",           BACKWARD_OP,            KEY_PREVIOUSSONG },
+>>>        { "REWIND",             REWIND_OP,              KEY_REWIND },
+>>>        { "FAST FORWARD",       FAST_FORWARD_OP,        KEY_FASTFORWARD },
+>>> +       { "VOLUME UP",          VOL_UP_OP,              KEY_VOLUMEUP },
+>>> +       { "VOLUME DOWN",        VOL_DOWN_OP,            KEY_VOLUMEDOWN },
+>>>        { NULL }
+>>>  };
+>>
+>> Have a look at the SIMULTANEOUS USE OF HFP, A2DP, AND AVRCP PROFILES
+>> white paper:
+>>
+>> Recommendation 16:
+>> If volume is changed on the RD, the RD should not send an AVRCP volume
+>> command to the MP device.
+>> Motivation 16:
+>> Sending an AVRCP volume command to the MP may cause the MP to send
+>> again an AVRCP volume
+>> command to the RD device which could lead to an endless loop of AVRCP
+>> volume commands.
+>
+> So this recommendation says that if we are the rendering device (and therefore
+> the CT) and the volume was changed on the rendering device, we should not send
+> the AVRCP volume command. In BlueZ parlance means we are on CT role and
+> org.bluez.Control.{VolumeUp(), VolumeDown()} should not be called, right?
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a520787..10a4569 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2175,7 +2175,10 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
--	if (conn && conn->state == BT_CONNECTED) {
-+	if (!conn)
-+		goto unlock;
-+
-+	if (conn->state == BT_CONNECTED) {
- 		hci_conn_hold(conn);
- 		conn->disc_timeout = HCI_PAIRING_TIMEOUT;
- 		hci_conn_put(conn);
-@@ -2195,6 +2198,7 @@ static inline void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff
- 		mgmt_pin_code_request(hdev->id, &ev->bdaddr, secure);
- 	}
- 
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
+I don't think MP and RD refer to CT or TG AVRCP roles, so a
+phone/tablet/pc would be consider a MP (source/encoder) and
+headsets/carkits/speakers RD (sink/decoder) and yes we should probably
+deprecate VolumeUp and VolumeDown because they cannot be synchronized
+properly and use absolute volume control if supported by the remote
+device, Im also planning to move volume control per transport so the
+endpoints can do the volume control since they are the ones
+generating/consuming the data.
+
+> Since handle_passthrough_command() is called when we *receive* a command, I
+> think looking at recommendation 17 makes more sense, doesn't it?
+>
+> Recomentation 17: If a device receives an AVRCP volume command, it shall not
+> send back an AVRCP volume command.
+> Motivation 17: This will also ensure that endless loop does not happen with
+> existing devices which do not comply with the recommendation.
+
+Yep, with panel volume commands it impossible to synchronize the
+volumes, so with AVRCP 1.0 the only thing that really works is to
+increase/decrease volume of the stream itself, but that is also not
+recommended see recommendation 27.
+
+> So, we should not send back (through AVRCP) the volume command. However BlueZ
+> *should* forward this command to the application to the application, otherwise
+> the application will just not respond to the command.
+
+Actually the solution that creates less problems is to just ignore the
+volume commands all together, if we receive we cannot indicate to
+applications because we don't what level the remote side is so it is
+very likely it will be out of sync and we cannot send anything back
+either.
+
+>
+> Currently, the following scenario doesn't work (WARNING: I'm not good at ASCII
+> art :-) )
+>
+>
+> Media Player
+> ============
+>    PC
+>  running  <---------------------------> Bluetooth speaker
+>   BlueZ
+>     ^ ↑
+>     | ↑
+>     | ↑ AVRCP_volume_up
+>     | ↑
+>     v ↑
+>   Remote
+>  Controller
+>
+
+Well this separate the speaker for the controller, but the normal case
+is that they sit together so when the user presses volume up it
+changes its speaker gain and there is nothing we can do about it, in
+fact if we change the stream volume it will actually cause a double
+volume change.
+
+To summarize:
+
+1. Local volume changes: stream volume level is changed without
+sending any command
+2. Remote volume changes: volume commands are ignored
+
+> What do you think?
+
+We need absolute volume control to make this work properly.
+
 -- 
-1.7.6.3
+Luiz Augusto von Dentz
