@@ -1,59 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Inquiry Failed with status 0x0c
+From: Alberto =?ISO-8859-1?Q?Jos=E9_Rodr=EDguez_?=
+	 =?ISO-8859-1?Q?Rodr=EDguez?= <ajrodriguez@blulabs.es>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] Fix possible crash while removing a device
-Date: Fri, 23 Sep 2011 15:36:39 +0300
-Message-Id: <1316781399-10977-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 23 Sep 2011 14:15:53 +0200
+Message-ID: <1316780153.3433.6.camel@localhost>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Some times when I'm doing an inquiry, the inquiry fails with status
+0x0c. What is it means? Thanks in advance
 
-If adapter has more than one sdp session active find_by_bdaddr always
-return the first one regardless if the device address match or not
-which leads to the following crash:
-
-Invalid read of size 4
-   at 0x16CB31: search_cb (in /usr/sbin/bluetoothd)
-   by 0x15C0CA: connect_watch (in /usr/sbin/bluetoothd)
-   by 0x48CFD37: g_io_unix_dispatch (in /usr/lib/libglib-2.0.so.0.2800.6)
-   by 0x488B4A0: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.2800.6)
-   by 0x488BCD0: g_main_context_iterate.clone.5 (in /usr/lib/libglib-2.0.so.0.2800.6)
-   by 0x488C3B8: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.2800.6)
-   by 0x152D09: main (in /usr/sbin/bluetoothd)
-  Address 0x4c8c600 is 16 bytes inside a block of size 48 free'd
-   at 0x48234A9: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-   by 0x48920F0: g_free (in /usr/lib/libglib-2.0.so.0.2800.6)
-   by 0x16BDD3: browse_request_free (in /usr/sbin/bluetoothd)
-   by 0x16C7A2: browse_request_cancel (in /usr/sbin/bluetoothd)
-
-Reported by Alberto José Rodríguez Rodríguez <ajrodriguez@blulabs.es>
----
- src/glib-helper.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/src/glib-helper.c b/src/glib-helper.c
-index 22c14e7..0288c9c 100644
---- a/src/glib-helper.c
-+++ b/src/glib-helper.c
-@@ -333,9 +333,13 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
- static gint find_by_bdaddr(gconstpointer data, gconstpointer user_data)
- {
- 	const struct search_context *ctxt = data, *search = user_data;
-+	int ret;
- 
--	return (bacmp(&ctxt->dst, &search->dst) &&
--					bacmp(&ctxt->src, &search->src));
-+	ret = bacmp(&ctxt->src, &search->src);
-+	if (ret != 0)
-+		return ret;
-+
-+	return bacmp(&ctxt->dst, &search->dst);
- }
- 
- int bt_cancel_discovery(const bdaddr_t *src, const bdaddr_t *dst)
--- 
-1.7.6.2
+..........................
+bluetoothd[2432]: src/device.c:device_remove() Removing
+device /org/bluez/2432/hci0/dev_00_1D_6E_91_22_8F
+bluetoothd[2432]: src/device.c:btd_device_unref() 0x4d88330: ref=0
+bluetoothd[2432]: src/device.c:device_free() 0x4d88330
+bluetoothd[2432]: plugins/hciops.c:__get_remote_version() hci0 handle 43
+bluetoothd[2432]: plugins/hciops.c:__get_remote_version() hci0 handle 42
+bluetoothd[2432]: plugins/hciops.c:disconn_complete() handle 43 status
+0x00
+bluetoothd[2432]: src/event.c:btd_event_disconn_complete() 
+bluetoothd[2432]: src/adapter.c:adapter_remove_connection() 
+bluetoothd[2432]: src/device.c:search_cb() 0C:DD:EF:0B:C8:35: No service
+update
+bluetoothd[2432]: src/device.c:btd_device_unref() 0x5206c88: ref=1
+bluetoothd[2432]: src/device.c:btd_device_ref() 0x5206c88: ref=2
+bluetoothd[2432]: plugins/hciops.c:conn_complete() status 0x00
+bluetoothd[2432]: src/adapter.c:adapter_get_device() 0C:DD:EF:0B:C8:35
+bluetoothd[2432]: plugins/hciops.c:remote_features_information() hci0
+status 0
+bluetoothd[2432]: plugins/hciops.c:remote_version_information() hci0
+status 0
+bluetoothd[2432]: plugins/hciops.c:__get_remote_version() hci0 handle 42
+bluetoothd[2432]: plugins/hciops.c:hciops_start_inquiry() hci0 length 8
+bluetoothd[2432]: Discovery session 0x6372f88 with :1.252 activated
+bluetoothd[2432]: src/adapter.c:session_ref() 0x6372f88: ref=1
+bluetoothd[2432]: plugins/hciops.c:disconn_complete() handle 42 status
+0x00
+bluetoothd[2432]: src/event.c:btd_event_disconn_complete() 
+bluetoothd[2432]: src/adapter.c:adapter_remove_connection() 
+bluetoothd[2432]: Inquiry Failed with status 0x0c
+bluetoothd[2432]: plugins/hciops.c:conn_complete() status 0x00
+bluetoothd[2432]: src/adapter.c:adapter_get_device() 0C:DD:EF:0B:C8:35
+bluetoothd[2432]: plugins/hciops.c:remote_features_information() hci0
+status 0
+bluetoothd[2432]: src/device.c:device_probe_drivers() Probing drivers
+for 0C:DD:EF:0B:C8:35
+bluetoothd[2432]: src/device.c:btd_device_unref() 0x5206c88: ref=1
+bluetoothd[2432]: plugins/hciops.c:disconn_complete() handle 43 status
+0x00
+bluetoothd[2432]: src/event.c:btd_event_disconn_complete() 
+bluetoothd[2432]: src/adapter.c:adapter_remove_connection()
 
