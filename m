@@ -1,46 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 08/11] Set auto connect from maemo6 plugin
-Date: Mon, 26 Sep 2011 14:48:25 -0300
-Message-Id: <1317059308-20038-9-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Anderson Briglia <anderson.briglia@openbossa.org>
+Subject: [PATCH BlueZ 07/11] Add display lock watcher on maemo6 plugin
+Date: Mon, 26 Sep 2011 14:48:24 -0300
+Message-Id: <1317059308-20038-8-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Inform the adapter that the system has been unlocked when the MCE
-sends the tklock_mode_ind signal. This signal will trigger the
-automatic re-connections for the devices selected by the profiles.
-Profiles register ATTIO callbacks to indicate that ATT connection
-is required.
+From: Anderson Briglia <anderson.briglia@openbossa.org>
+
+Implements display status signal watcher in maemo6 plugin.
 ---
- plugins/maemo6.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ plugins/maemo6.c |   28 ++++++++++++++++++++++++++++
+ 1 files changed, 28 insertions(+), 0 deletions(-)
 
 diff --git a/plugins/maemo6.c b/plugins/maemo6.c
-index e380acd..6c34116 100644
+index 00fb3fa..e380acd 100644
 --- a/plugins/maemo6.c
 +++ b/plugins/maemo6.c
-@@ -57,6 +57,7 @@ static gboolean mce_bt_on = FALSE;
- static gboolean mce_tklock_mode_cb(DBusConnection *connection,
+@@ -46,12 +46,33 @@
+ #define MCE_RADIO_STATES_CHANGE_REQ	"req_radio_states_change"
+ #define MCE_RADIO_STATES_GET		"get_radio_states"
+ #define MCE_RADIO_STATES_SIG		"radio_states_ind"
++#define MCE_TKLOCK_MODE_SIG		"tklock_mode_ind"
+ 
+ static guint watch_id;
++static guint tklock_watch_id;
+ static DBusConnection *conn = NULL;
+ static gboolean mce_bt_set = FALSE;
+ static gboolean mce_bt_on = FALSE;
+ 
++static gboolean mce_tklock_mode_cb(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	DBusMessageIter args;
++	const char *sigvalue;
++
++	if (!dbus_message_iter_init(message, &args)) {
++		error("message has no arguments");
++	} else if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING) {
++		error("argument is not string");
++	} else {
++
++		dbus_message_iter_get_basic(&args, &sigvalue);
++		DBG("got signal with value %s", sigvalue);
++	}
++
++	return TRUE;
++}
++
+ static gboolean mce_signal_callback(DBusConnection *connection,
  					DBusMessage *message, void *user_data)
  {
-+	struct btd_adapter *adapter = user_data;
- 	DBusMessageIter args;
- 	const char *sigvalue;
+@@ -204,6 +225,10 @@ static int mce_probe(struct btd_adapter *adapter)
+ 					MCE_SIGNAL_IF, MCE_RADIO_STATES_SIG,
+ 					mce_signal_callback, adapter, NULL);
  
-@@ -68,6 +69,9 @@ static gboolean mce_tklock_mode_cb(DBusConnection *connection,
- 
- 		dbus_message_iter_get_basic(&args, &sigvalue);
- 		DBG("got signal with value %s", sigvalue);
++	tklock_watch_id = g_dbus_add_signal_watch(conn, NULL, MCE_SIGNAL_PATH,
++					MCE_SIGNAL_IF, MCE_TKLOCK_MODE_SIG,
++					mce_tklock_mode_cb, adapter, NULL);
 +
-+		if (g_strcmp0("unlocked", sigvalue) == 0 && mce_bt_on)
-+			btd_adapter_enable_auto_connect(adapter);
- 	}
+ 	btd_adapter_register_powered_callback(adapter, adapter_powered);
  
- 	return TRUE;
+ 	return 0;
+@@ -216,6 +241,9 @@ static void mce_remove(struct btd_adapter *adapter)
+ 	if (watch_id > 0)
+ 		g_dbus_remove_watch(conn, watch_id);
+ 
++	if (tklock_watch_id > 0)
++		g_dbus_remove_watch(conn, tklock_watch_id);
++
+ 	btd_adapter_unregister_powered_callback(adapter, adapter_powered);
+ }
+ 
 -- 
 1.7.6.1
 
