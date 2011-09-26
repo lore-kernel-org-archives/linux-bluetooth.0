@@ -1,134 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 01/11] Remove timer to trigger connection attempts
-Date: Mon, 26 Sep 2011 14:48:18 -0300
-Message-Id: <1317059308-20038-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <par-gunnar.p.hjalmdahl@stericsson.com>,
+	<ulrik.lauren@stericsson.com>, <henrik.possung@stericsson.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: rfcomm: Fix sleep in invalid context in rfcomm_security_cfm
+Date: Mon, 26 Sep 2011 14:19:47 +0200
+Message-ID: <1317039587-22992-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Removes continuous timer for ATTIO connection attempts. A new approach
-is being implemented managing scanning and connection attempts driven
-by platform/user actions. eg: screen unlocked.
----
- src/device.c |   35 +++++------------------------------
- 1 files changed, 5 insertions(+), 30 deletions(-)
+This was triggered by turning off encryption on ACL link when rfcomm
+was using high security. rfcomm_security_cfm (which is called from rx
+task) was closing DLC and this involves sending disconnect message
+(and locking socket).
 
-diff --git a/src/device.c b/src/device.c
-index 800deb8..07409af 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -65,7 +65,6 @@
+Move closing DLC to rfcomm_process_dlcs and only flag DLC for closure
+in rfcomm_security_cfm.
+
+BUG: sleeping function called from invalid context at net/core/sock.c:2032
+in_atomic(): 1, irqs_disabled(): 0, pid: 1788, name: kworker/0:3
+[<c0068a08>] (unwind_backtrace+0x0/0x108) from [<c05e25dc>] (dump_stack+0x20/0x24)
+[<c05e25dc>] (dump_stack+0x20/0x24) from [<c0087ba8>] (__might_sleep+0x110/0x12c)
+[<c0087ba8>] (__might_sleep+0x110/0x12c) from [<c04801d8>] (lock_sock_nested+0x2c/0x64)
+[<c04801d8>] (lock_sock_nested+0x2c/0x64) from [<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc)
+[<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc) from [<c047cf6c>] (sock_sendmsg+0xb0/0xd0)
+[<c047cf6c>] (sock_sendmsg+0xb0/0xd0) from [<c047cfc8>] (kernel_sendmsg+0x3c/0x44)
+[<c047cfc8>] (kernel_sendmsg+0x3c/0x44) from [<c056b0e8>] (rfcomm_send_frame+0x50/0x58)
+[<c056b0e8>] (rfcomm_send_frame+0x50/0x58) from [<c056b168>] (rfcomm_send_disc+0x78/0x80)
+[<c056b168>] (rfcomm_send_disc+0x78/0x80) from [<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc)
+[<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc) from [<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0)
+[<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0) from [<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84)
+[<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84) from [<c0550380>] (hci_rx_task+0x1d0/0x2d0)
+[<c0550380>] (hci_rx_task+0x1d0/0x2d0) from [<c009ee04>] (tasklet_action+0x138/0x1e4)
+[<c009ee04>] (tasklet_action+0x138/0x1e4) from [<c009f21c>] (__do_softirq+0xcc/0x274)
+[<c009f21c>] (__do_softirq+0xcc/0x274) from [<c009f6c0>] (do_softirq+0x60/0x6c)
+[<c009f6c0>] (do_softirq+0x60/0x6c) from [<c009f794>] (local_bh_enable_ip+0xc8/0xd4)
+[<c009f794>] (local_bh_enable_ip+0xc8/0xd4) from [<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c)
+[<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c) from [<c040d470>] (data_from_chip+0xf4/0xaec)
+[<c040d470>] (data_from_chip+0xf4/0xaec) from [<c04136c0>] (send_skb_to_core+0x40/0x178)
+[<c04136c0>] (send_skb_to_core+0x40/0x178) from [<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0)
+[<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0) from [<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0)
+[<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0) from [<c02cbd9c>] (flush_to_ldisc+0x188/0x198)
+[<c02cbd9c>] (flush_to_ldisc+0x188/0x198) from [<c00b2774>] (process_one_work+0x144/0x4b8)
+[<c00b2774>] (process_one_work+0x144/0x4b8) from [<c00b2e8c>] (worker_thread+0x198/0x468)
+[<c00b2e8c>] (worker_thread+0x198/0x468) from [<c00b9bc8>] (kthread+0x98/0xa0)
+[<c00b9bc8>] (kthread+0x98/0xa0) from [<c0061744>] (kernel_thread_exit+0x0/0x8)
+
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+ include/net/bluetooth/rfcomm.h |    1 +
+ net/bluetooth/rfcomm/core.c    |    9 +++++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index d5eee20..e2e3eca 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -211,6 +211,7 @@ struct rfcomm_dlc {
+ #define RFCOMM_AUTH_ACCEPT  6
+ #define RFCOMM_AUTH_REJECT  7
+ #define RFCOMM_DEFER_SETUP  8
++#define RFCOMM_ENC_DROP     9
  
- #define DISCONNECT_TIMER	2
- #define DISCOVERY_TIMER		2
--#define AUTOCONNECT_INTERVAL	45
+ /* Scheduling flags and events */
+ #define RFCOMM_SCHED_WAKEUP 31
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 38b618c..4e32e18 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1802,6 +1802,11 @@ static inline void rfcomm_process_dlcs(struct rfcomm_session *s)
+ 			continue;
+ 		}
  
- /* When all services should trust a remote device */
- #define GLOBAL_TRUST "[all]"
-@@ -140,7 +139,6 @@ struct btd_device {
- 	GSList		*attios;
- 	GSList		*attios_offline;
- 	guint		attachid;		/* Attrib server attach */
--	guint		attioid;
- 
- 	gboolean	connected;
- 
-@@ -237,9 +235,6 @@ static void device_free(gpointer user_data)
- 	if (device->discov_timer)
- 		g_source_remove(device->discov_timer);
- 
--	if (device->attioid)
--		g_source_remove(device->attioid);
--
- 	DBG("%p", device);
- 
- 	g_free(device->authr);
-@@ -1614,19 +1609,12 @@ static void attio_disconnected(gpointer data, gpointer user_data)
- 		attio->dcfunc(attio->user_data);
- }
- 
--static gboolean att_auto_connect(gpointer user_data);
--
- static void attrib_disconnected(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
- 
- 	g_slist_foreach(device->attios, attio_disconnected, NULL);
- 
--	if ((device->attios || device->attios_offline) && device->attioid == 0)
--		device->attioid = g_timeout_add_seconds(AUTOCONNECT_INTERVAL,
--							att_auto_connect,
--							device);
--
- 	attrib_channel_detach(device->attachid);
- 	g_attrib_unref(device->attrib);
- 	device->attrib = NULL;
-@@ -1707,11 +1695,6 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 		return;
- 	}
- 
--	if (device->attioid) {
--		g_source_remove(device->attioid);
--		device->attioid = 0;
--	}
--
- 	attrib = g_attrib_new(io);
- 	device->attachid = attrib_channel_attach(attrib, TRUE);
- 	if (device->attachid == 0)
-@@ -1729,7 +1712,7 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	}
- }
- 
--static gboolean att_auto_connect(gpointer user_data)
-+static gboolean att_connect(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
- 	struct btd_adapter *adapter = device->adapter;
-@@ -1764,12 +1747,12 @@ static gboolean att_auto_connect(gpointer user_data)
- 	if (io == NULL) {
- 		error("ATT bt_io_connect(%s): %s", addr, gerr->message);
- 		g_error_free(gerr);
--		return TRUE;
-+		return FALSE;
- 	}
- 
- 	g_io_channel_unref(io);
- 
--	return TRUE;
-+	return FALSE;
- }
- 
- int device_browse_primary(struct btd_device *device, DBusConnection *conn,
-@@ -2677,11 +2660,8 @@ guint btd_device_add_attio_callback(struct btd_device *device,
- 		device->attios_offline = g_slist_append(device->attios_offline,
- 									attio);
- 		g_idle_add(notify_attios, device);
--	} else if (device->attioid == 0) {
--		att_auto_connect(device);
--		device->attioid = g_timeout_add_seconds(AUTOCONNECT_INTERVAL,
--							att_auto_connect,
--							device);
-+	} else {
-+		g_idle_add(att_connect, device);
- 		device->attios = g_slist_append(device->attios, attio);
- 	}
- 
-@@ -2722,11 +2702,6 @@ gboolean btd_device_remove_attio_callback(struct btd_device *device, guint id)
- 	if (device->attios != NULL || device->attios_offline != NULL)
- 		return TRUE;
- 
--	if (device->attioid) {
--		g_source_remove(device->attioid);
--		device->attioid = 0;
--	}
--
- 	if (device->attachid) {
- 		attrib_channel_detach(device->attachid);
- 		device->attachid = 0;
++		if (test_bit(RFCOMM_ENC_DROP, &d->flags)) {
++			__rfcomm_dlc_close(d, ECONNREFUSED);
++			continue;
++		}
++
+ 		if (test_and_clear_bit(RFCOMM_AUTH_ACCEPT, &d->flags)) {
+ 			rfcomm_dlc_clear_timer(d);
+ 			if (d->out) {
+@@ -2077,7 +2082,7 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ 		if (test_and_clear_bit(RFCOMM_SEC_PENDING, &d->flags)) {
+ 			rfcomm_dlc_clear_timer(d);
+ 			if (status || encrypt == 0x00) {
+-				__rfcomm_dlc_close(d, ECONNREFUSED);
++				set_bit(RFCOMM_ENC_DROP, &d->flags);
+ 				continue;
+ 			}
+ 		}
+@@ -2088,7 +2093,7 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ 				rfcomm_dlc_set_timer(d, RFCOMM_AUTH_TIMEOUT);
+ 				continue;
+ 			} else if (d->sec_level == BT_SECURITY_HIGH) {
+-				__rfcomm_dlc_close(d, ECONNREFUSED);
++				set_bit(RFCOMM_ENC_DROP, &d->flags);
+ 				continue;
+ 			}
+ 		}
 -- 
-1.7.6.1
+on behalf of ST-Ericsson
 
