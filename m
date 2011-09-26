@@ -1,69 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Briglia <anderson.briglia@openbossa.org>
-Subject: [PATCH RFC BlueZ 14/16] Phone Alert: Mute once using new NGFD API
-Date: Mon, 26 Sep 2011 15:13:40 -0400
-Message-Id: <1317064422-1654-15-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ 07/16] Phone Alert: implement agent for N9
+Date: Mon, 26 Sep 2011 15:13:33 -0400
+Message-Id: <1317064422-1654-8-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-
-NGFD API has changed and now we have a dbus method to mute the ringer.
 ---
- alert/server.c |   22 +++++++++++++++++++++-
- 1 files changed, 21 insertions(+), 1 deletions(-)
+ test/phone-agent.py |  150 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 150 insertions(+), 0 deletions(-)
+ create mode 100755 test/phone-agent.py
 
-diff --git a/alert/server.c b/alert/server.c
-index fb088a5..77540a7 100644
---- a/alert/server.c
-+++ b/alert/server.c
-@@ -49,6 +49,11 @@
- #define ALERT_INTERFACE "org.bluez.PhoneAlert"
- #define ALERT_PATH "/test/phonealert"
- 
-+/* OHM plugin D-Bus definitions */
-+#define OHM_BUS_NAME		"com.nokia.NonGraphicFeedback1"
-+#define OHM_INTERFACE		"com.nokia.NonGraphicFeedback1"
-+#define OHM_PATH		"/com/nokia/NonGraphicFeedback1"
+diff --git a/test/phone-agent.py b/test/phone-agent.py
+new file mode 100755
+index 0000000..2d9cf2d
+--- /dev/null
++++ b/test/phone-agent.py
+@@ -0,0 +1,150 @@
++#!/usr/bin/python
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++import gobject
 +
- enum {
- 	ALERT_RINGER_STATE = 1 << 0,
- 	ALERT_VIBRATOR_STATE = 1 << 1,
-@@ -102,6 +107,21 @@ static void agent_operation(const char *operation)
- 		error("D-Bus error: agent_operation %s", operation);
- }
- 
-+static void stop_ringtone(void)
-+{
-+	DBusMessage *message;
++StateIncoming = 0
++StateEnded = 6
 +
-+	message = dbus_message_new_method_call(OHM_BUS_NAME, OHM_PATH,
-+					OHM_INTERFACE, "StopRingtone");
-+	if (message == NULL) {
-+		error("Couldn't allocate D-Bus message");
-+		return;
-+	}
++on_call = False
++saved_ringer_setting = None
++ringer_setting = None
++silent_mode = False
 +
-+	if (!g_dbus_send_message(connection, message))
-+		error("Failed to send D-Bus message");
-+}
++def set_ringer(value):
++    global ringer_setting
++    ringer_setting = value
++    profiled.set_value("", "ringing.alert.type", value, dbus_interface="com.nokia.profiled")
 +
- static uint8_t control_point_write(struct attribute *a, gpointer user_data)
- {
- 	DBG("a = %p", a);
-@@ -111,7 +131,7 @@ static uint8_t control_point_write(struct attribute *a, gpointer user_data)
- 		agent_operation("SetSilentMode");
- 		break;
- 	case MUTE_ONCE:
--		agent_operation("MuteOnce");
-+		stop_ringtone();
- 		break;
- 	case CANCEL_SILENT_MODE:
- 		agent_operation("CancelSilentMode");
++def get_ringer():
++    return profiled.get_value("", "ringing.alert.type", dbus_interface="com.nokia.profiled")
++
++def silence_ringer():
++    print "silence_ringer()"
++    global saved_ringer_setting, ringer_setting
++    saved_ringer_setting = ringer_setting
++    set_ringer("Silent")
++
++def restore_ringer():
++    global saved_ringer_setting
++    if saved_ringer_setting:
++        print "Restoring ringer setting to \"%s\"" % saved_ringer_setting
++        set_ringer(saved_ringer_setting)
++        saved_ringer_setting = None
++
++def call_state_changed(*args, **kwargs):
++    global on_call
++
++    for item in args[0]:
++        if not isinstance(item, dbus.Dictionary):
++            continue
++        if item.get("state") is None:
++            continue
++        if item["state"] == StateIncoming:
++            on_call = True
++        elif item["state"] == StateEnded:
++            on_call = False
++            if not silent_mode:
++                restore_ringer()
++
++def profile_changed(*args, **kwargs):
++    global ringer_setting
++    print "profile_changed()"
++    for item in args[3]:
++        if item[0] != "ringing.alert.type":
++            continue
++        print "Ringer: %s" % item[1]
++        if item[1] != ringer_setting or silent_mode:
++            ringer_setting = item[1]
++            print "NotifyRingerSetting(%s)" % ringer_setting
++            phone.NotifyRingerSetting(ringer_setting)
++            if silent_mode:
++                # User has changed profile, update saved setting
++                saved_ringer_setting = ringer_setting
++
++class PhoneAgent(dbus.service.Object):
++    @dbus.service.method("org.bluez.PhoneAgent",
++            in_signature="", out_signature="")
++    def MuteOnce(self):
++        print "MuteOnce()"
++
++        global silent_mode
++        if silent_mode:
++            print "In Silent mode"
++            return
++
++        global on_call
++        if not on_call:
++            print "No active call"
++            return
++
++        global ringer_setting
++        if ringer_setting == "Silent":
++            print "Ringer already silent"
++            return
++
++        silence_ringer()
++
++    @dbus.service.method("org.bluez.PhoneAgent",
++            in_signature="", out_signature="")
++    def SetSilentMode(self):
++        print "SetSilentMode()"
++
++        global silent_mode
++        if silent_mode:
++            return
++
++        silence_ringer()
++        silent_mode = True
++
++    @dbus.service.method("org.bluez.PhoneAgent",
++            in_signature="", out_signature="")
++    def CancelSilentMode(self):
++        print "CancelSilentMode()"
++
++        global silent_mode
++        if not silent_mode:
++            return
++
++        silent_mode = False
++        restore_ringer()
++
++    @dbus.service.method("org.bluez.PhoneAgent",
++            in_signature="", out_signature="s")
++    def GetSilentMode(self):
++        print "GetSilentMode()"
++
++        global ringer_setting
++        return ringer_setting
++
++if __name__ == "__main__":
++    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++    system_bus = dbus.SystemBus()
++    session_bus = dbus.SessionBus()
++    agent_path = "/test/phoneagent"
++
++    # Monitor call incoming/ended events
++    contextkit = session_bus.get_object("com.nokia.CallUi.Context",
++            "/com/nokia/CallUi/ActiveCall")
++    contextkit.connect_to_signal("ValueChanged", call_state_changed,
++            dbus_interface="org.maemo.contextkit.Property")
++
++    profiled = session_bus.get_object("com.nokia.profiled",
++            "/com/nokia/profiled")
++    # Monitor profile changes
++    profiled.connect_to_signal("profile_changed", profile_changed,
++            dbus_interface="com.nokia.profiled")
++    ringer_setting = get_ringer()
++
++    phone = dbus.Interface(system_bus.get_object("org.bluez",
++            "/test/phonealert"), "org.bluez.PhoneAlert")
++
++    agent = PhoneAgent(system_bus, agent_path)
++    phone.RegisterAgent(agent_path)
++    print "destination:", system_bus.get_unique_name()
++
++    mainloop = gobject.MainLoop()
++    mainloop.run()
 -- 
 1.7.0.4
 
