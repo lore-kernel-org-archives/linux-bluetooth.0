@@ -1,54 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH RFC BlueZ 00/16] Phone Alert Status GATT Profile (server)
-Date: Mon, 26 Sep 2011 15:13:26 -0400
-Message-Id: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH RFC BlueZ 03/16] Phone Alert: add Ringer Setting characteristic
+Date: Mon, 26 Sep 2011 15:13:29 -0400
+Message-Id: <1317064422-1654-4-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-This RFC series contains our current work in progress for Phone Alert Status
-GATT profile (server role). This profile was recently adopted and you can find
-it on the Bluetooth SIG page:
+---
+ alert/server.c |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
 
-https://www.bluetooth.org/Technical/Specifications/adopted.htm
-
-We are sending these patches now for public review, and to discuss a few
-implementation issues. A few notes about the implementation:
-
-* Some events monitored by the profile require access to the session bus. Our
-  approach was to introduce an Agent which listens on the session bus and sends
-  events to BlueZ (which listens to system bus).
-
-* The "Phone Agent" contains two D-Bus methods: SetSilentMode() and
-  CancelSilentMode(). These methods map to the same functions found on the PAS
-  profile. The implementation is platform specific, but on N9 (Harmattan) it
-  asks the profile daemon to change to/from the "Silent" profile.
-
-* The Alert Server exports three D-Bus methods: RegisterAgent(),
-  NotifyRingerSetting(), NotifyAlertStatus(). These methods are called by the
-  agent to notify platform specific events which cause either Ringer Setting or
-  Alert Status (Ringer, Vibrator, Display) changes.
-
-There are a number of know issues:
-
-* The agent API is not stable yet. We are unsure if yet another agent is the
-  best solution. Any ideas? (Remember: there is a requirement to read things
-  from session bus).
-
-* There is a call to NGF (N9 specific component) inside alert/server.c. This
-  should be moved to the Maemo6/harmattan specific code inside BlueZ. Ideally,
-  we should move anything platform-specific and shared between profiles (e.g.
-  the "Stop Ringtone" call used by HFP which is now used by Phone Alert) to a
-  common place in BlueZ.
-
-Feedback is very welcome.
-
-Regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia (INdT)
-Manaus - Brazil
+diff --git a/alert/server.c b/alert/server.c
+index 6d02adb..1135ca0 100644
+--- a/alert/server.c
++++ b/alert/server.c
+@@ -39,6 +39,7 @@
+ #define PHONE_ALERT_STATUS_SVC_UUID		0x180E
+ 
+ #define RINGER_CP_CHR_UUID		0x2A40
++#define RINGER_SETTING_CHR_UUID		0x2A41
+ 
+ static uint8_t control_point_write(struct attribute *a, gpointer user_data)
+ {
+@@ -47,6 +48,13 @@ static uint8_t control_point_write(struct attribute *a, gpointer user_data)
+ 	return 0;
+ }
+ 
++static uint8_t ringer_setting_read(struct attribute *a, gpointer user_data)
++{
++	DBG("a = %p", a);
++
++	return 0;
++}
++
+ static void register_phone_alert_service(void)
+ {
+ 	/* Phone Alert Status Service */
+@@ -56,6 +64,12 @@ static void register_phone_alert_service(void)
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE,
+ 			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
+ 			control_point_write,
++			/* Ringer Setting characteristic */
++			GATT_OPT_CHR_UUID, RINGER_SETTING_CHR_UUID,
++			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
++							ATT_CHAR_PROPER_NOTIFY,
++			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
++			ringer_setting_read,
+ 			GATT_OPT_INVALID);
+ }
+ 
+-- 
+1.7.0.4
 
