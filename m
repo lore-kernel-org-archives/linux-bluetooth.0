@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH RFC BlueZ 10/16] Phone Alert: add GetAlertStatus() call in alert server
-Date: Mon, 26 Sep 2011 15:13:36 -0400
-Message-Id: <1317064422-1654-11-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ 11/16] Phone Alert: add method for reading Alert Status
+Date: Mon, 26 Sep 2011 15:13:37 -0400
+Message-Id: <1317064422-1654-12-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,129 +12,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-The new method GetAlertStatus() is used to initiate the current value of
-Alert Status characteristic. This value will be used when reading
-operation is required and to update attribute server.
-
-NOTE: Only Ringer State field from Alert Status characteristic is
-updated.
 ---
- alert/server.c |   81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 80 insertions(+), 1 deletions(-)
+ test/phone-agent.py |   22 ++++++++++++++++++++++
+ 1 files changed, 22 insertions(+), 0 deletions(-)
 
-diff --git a/alert/server.c b/alert/server.c
-index 2466f8b..cc2cd53 100644
---- a/alert/server.c
-+++ b/alert/server.c
-@@ -50,6 +50,12 @@
- #define ALERT_PATH "/test/phonealert"
+diff --git a/test/phone-agent.py b/test/phone-agent.py
+index 2d9cf2d..927fdb1 100755
+--- a/test/phone-agent.py
++++ b/test/phone-agent.py
+@@ -8,10 +8,13 @@ import gobject
+ StateIncoming = 0
+ StateEnded = 6
  
- enum {
-+	ALERT_RINGER_STATE = 1 << 0,
-+	ALERT_VIBRATOR_STATE = 1 << 1,
-+	ALERT_DISPLAY_STATE = 1 << 2,
-+};
++ALERT_RINGER_STATE = 1 << 0
 +
-+enum {
- 	SET_SILENT_MODE = 1,
- 	MUTE_ONCE,
- 	CANCEL_SILENT_MODE,
-@@ -68,6 +74,7 @@ struct agent {
+ on_call = False
+ saved_ringer_setting = None
+ ringer_setting = None
+ silent_mode = False
++alert_status = 0x00
  
- static DBusConnection *connection = NULL;
- static uint8_t ringer_setting = 0xff;
-+static uint8_t alert_status = 0xff;
- static uint16_t handle_ringer_setting = 0x0000;
- static struct agent agent;
+ def set_ringer(value):
+     global ringer_setting
+@@ -21,6 +24,14 @@ def set_ringer(value):
+ def get_ringer():
+     return profiled.get_value("", "ringing.alert.type", dbus_interface="com.nokia.profiled")
  
-@@ -115,6 +122,68 @@ static uint8_t control_point_write(struct attribute *a, gpointer user_data)
- 	return 0;
- }
++def set_alert_status():
++    global ringer_setting, alert_status, on_call
++
++    if on_call and ringer_setting != "Silent":
++        alert_status |= ALERT_RINGER_STATE
++    else:
++        alert_status &= ~ALERT_RINGER_STATE
++
+ def silence_ringer():
+     print "silence_ringer()"
+     global saved_ringer_setting, ringer_setting
+@@ -119,6 +130,15 @@ class PhoneAgent(dbus.service.Object):
+         global ringer_setting
+         return ringer_setting
  
-+static void get_alert_reply(DBusPendingCall *call, void *user_data)
-+{
-+	DBusError derr;
-+	DBusMessage *reply;
-+	DBusMessageIter iter;
-+	uint8_t state;
++    @dbus.service.method("org.bluez.PhoneAgent",
++            in_signature="", out_signature="y")
++    def GetAlertStatus(self):
++        print "GetAlertStatus()"
 +
-+	reply = dbus_pending_call_steal_reply(call);
++        global alert_status
++        return alert_status
 +
-+	dbus_error_init(&derr);
-+	if (dbus_set_error_from_message(&derr, reply)) {
-+		error("D-Bus replied with error: %s, %s", derr.name,
-+								derr.message);
-+		dbus_error_free(&derr);
-+		goto done;
-+	}
 +
-+	dbus_message_iter_init(reply, &iter);
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE) {
-+		error("Unexpected signature for reply");
-+		goto done;
-+	}
-+
-+	dbus_message_iter_get_basic(&iter, &state);
-+
-+	DBG("Ringer State: %s",
-+			state & ALERT_RINGER_STATE ? "Active": "Not Active");
-+
-+	alert_status = state;
-+
-+done:
-+	dbus_message_unref(reply);
-+	dbus_pending_call_unref(call);
-+}
-+
-+static void get_alert_status(DBusConnection *conn, void *user_data)
-+{
-+	DBusMessage *msg;
-+	DBusPendingCall *call;
-+
-+	if (!agent.name) {
-+		error("Agent not registered");
-+		return;
-+	}
-+
-+	DBG("Get Alert Status: agent %s, %s", agent.name, agent.path);
-+
-+	msg = dbus_message_new_method_call(agent.name, agent.path,
-+					AGENT_INTERFACE, "GetAlertStatus");
-+	if (msg == NULL) {
-+		error("Unable to allocate new D-Bus message");
-+		return;
-+	}
-+
-+	if (!dbus_connection_send_with_reply(connection, msg, &call, -1)) {
-+		error("Failed to send D-Bus message");
-+		return;
-+	}
-+
-+	dbus_pending_call_set_notify(call, get_alert_reply, NULL, NULL);
-+}
-+
- static void get_silent_reply(DBusPendingCall *call, void *user_data)
- {
- 	DBusError derr;
-@@ -181,7 +250,17 @@ static void get_silent_mode(DBusConnection *conn, void *user_data)
+ if __name__ == "__main__":
+     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
  
- static uint8_t alert_status_read(struct attribute *a, gpointer user_data)
- {
--	DBG("a = %p", a);
-+	if (alert_status == 0xff) {
-+		get_alert_status(connection, NULL);
-+		return ATT_ECODE_IO;
-+	}
-+
-+	DBG("a = %p, state = %s", a,
-+		alert_status & ALERT_RINGER_STATE ? "Active": "Not Active");
-+
-+	if (a->data == NULL || a->data[0] != alert_status)
-+		attrib_db_update(a->handle, NULL, &alert_status,
-+						sizeof(alert_status), NULL);
+@@ -139,6 +159,8 @@ if __name__ == "__main__":
+             dbus_interface="com.nokia.profiled")
+     ringer_setting = get_ringer()
  
- 	return 0;
- }
++    set_alert_status()
++
+     phone = dbus.Interface(system_bus.get_object("org.bluez",
+             "/test/phonealert"), "org.bluez.PhoneAlert")
+ 
 -- 
 1.7.0.4
 
