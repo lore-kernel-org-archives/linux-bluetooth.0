@@ -1,51 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_le_adv_report_evt code refactoring
-Date: Mon, 26 Sep 2011 20:48:35 -0300
-Message-Id: <1317080915-3901-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ 4/4] Time Server: use time zone and DST from system
+Date: Mon, 26 Sep 2011 17:01:37 -0400
+Message-Id: <1317070897-17508-5-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1317070897-17508-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1317070897-17508-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to treat the first advertising entry differently
-from the potential other ones. Besides, the current implementation
-can easily leads to typos.
-
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c |   14 ++++++--------
- 1 files changed, 6 insertions(+), 8 deletions(-)
+ time/server.c |   12 ++++++++++--
+ 1 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8404cd9..570b57a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2836,19 +2836,17 @@ unlock:
- static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
- 						struct sk_buff *skb)
- {
--	struct hci_ev_le_advertising_info *ev;
--	u8 num_reports;
--
--	num_reports = skb->data[0];
--	ev = (void *) &skb->data[1];
-+	u8 num_reports = skb->data[0];
-+	void *ptr = &skb->data[1];
+diff --git a/time/server.c b/time/server.c
+index 5079f35..1f624a6 100644
+--- a/time/server.c
++++ b/time/server.c
+@@ -88,8 +88,16 @@ static uint8_t local_time_info_read(struct attribute *a, gpointer user_data)
  
- 	hci_dev_lock(hdev);
+ 	DBG("a=%p", a);
  
--	hci_add_adv_entry(hdev, ev);
-+	while (num_reports--) {
-+		struct hci_ev_le_advertising_info *ev = ptr;
- 
--	while (--num_reports) {
--		ev = (void *) (ev->data + ev->length + 1);
- 		hci_add_adv_entry(hdev, ev);
+-	value[0] = 0xff; /* DST Offset (255: unknown) */
+-	value[1] = 0x80; /* Time Zone (-128: unknown) */
++	tzset();
 +
-+		ptr += sizeof(*ev) + ev->length + 1;
- 	}
++	/* FIXME: POSIX "daylight" variable only indicates whether there is DST
++	 * for the local time or not. The offset is unknown. */
++	value[0] = daylight ? 0xff : 0x00;
++
++	/* Convert POSIX "timezone" (seconds West of GMT) to Time Profile
++	 * format (offset from UTC in number of 15 minutes increments). */
++	value[1] = (uint8_t) (-1 * timezone / (60 * 15));
++
+ 	attrib_db_update(a->handle, NULL, value, sizeof(value), NULL);
  
- 	hci_dev_unlock(hdev);
+ 	return 0;
 -- 
-1.7.5.2
+1.7.0.4
 
