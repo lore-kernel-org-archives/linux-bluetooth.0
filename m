@@ -1,55 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Message-ID: <4E80CB8F.4070600@ahsoftware.de>
+Date: Mon, 26 Sep 2011 20:59:27 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH RFC BlueZ 01/16] Phone Alert: add Phone Alert Service
-Date: Mon, 26 Sep 2011 15:13:27 -0400
-Message-Id: <1317064422-1654-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: 70-hid2hci.rules and Logitech dongles
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bruna Moreira <bruna.moreira@openbossa.org>
+Hello,
 
----
- alert/server.c |   19 +++++++++++++++++++
- 1 files changed, 19 insertions(+), 0 deletions(-)
+I'm having a Logitech dongle which identifies itself as 046d:0b02, 
+046d:c70b and 046d:c70c and for which only hiddev devices are available 
+after startup (when in HID mode).
 
-diff --git a/alert/server.c b/alert/server.c
-index d91b156..a4b301d 100644
---- a/alert/server.c
-+++ b/alert/server.c
-@@ -26,10 +26,29 @@
- #include <config.h>
- #endif
- 
-+#include <glib.h>
-+#include <bluetooth/uuid.h>
-+
-+#include "att.h"
-+#include "gattrib.h"
-+#include "attrib-server.h"
-+#include "gatt-service.h"
-+#include "log.h"
- #include "server.h"
- 
-+#define PHONE_ALERT_STATUS_SVC_UUID		0x180E
-+
-+static void register_phone_alert_service(void)
-+{
-+	/* Phone Alert Status Service */
-+	gatt_service_add(GATT_PRIM_SVC_UUID, PHONE_ALERT_STATUS_SVC_UUID,
-+			GATT_OPT_INVALID);
-+}
-+
- int alert_server_init(void)
- {
-+	register_phone_alert_service();
-+
- 	return 0;
- }
- 
--- 
-1.7.0.4
+To use the bluetooth functionality I had to change the rule in 
+70-hid2hci.rules from
 
+# Logitech devices
+KERNEL=="hiddev*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c70[35e]", \
+   RUN+="hid2hci --method=logitech-hid --devpath=%p"
+
+to
+
+# Logitech devices
+KERNEL=="hiddev*", ATTRS{idVendor}=="046d", 
+ATTRS{idProduct}=="c70[35bce]", \
+   RUN+="hid2hci --method=logitech-hid --devpath=%p"
+
+After the dongle is in HCI mode, the hiddev device disappears and the 
+hidraw devices are appearing.
+
+I'm not sure why there is a rule for hidraw devices in that file too and 
+I've just disabled it.
+
+I've first reported it for Fedora ( 
+https://bugzilla.redhat.com/show_bug.cgi?id=741247 ) but after having 
+seen that those rules are appearing in almost every distribution, I 
+thought I should report that upstream (here) too.
+
+Regards,
+
+Alexander
