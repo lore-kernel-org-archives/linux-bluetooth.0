@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [PATCH RFC BlueZ 08/16] Phone Alert: implement NotifyRingerSetting() method
-Date: Mon, 26 Sep 2011 15:13:34 -0400
-Message-Id: <1317064422-1654-9-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH RFC BlueZ 09/16] Phone Alert: add Alert Status characteristic
+Date: Mon, 26 Sep 2011 15:13:35 -0400
+Message-Id: <1317064422-1654-10-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1317064422-1654-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,66 +12,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 
-Update Ringer Setting characteristic in alert server. This new value
-will be notifiable if it was configured.
 ---
- alert/server.c |   28 +++++++++++++++++++++++++++-
- 1 files changed, 27 insertions(+), 1 deletions(-)
+ alert/server.c |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
 
 diff --git a/alert/server.c b/alert/server.c
-index 6b39bd4..d5b1e7b 100644
+index d5b1e7b..2466f8b 100644
 --- a/alert/server.c
 +++ b/alert/server.c
-@@ -67,6 +67,7 @@ struct agent {
+@@ -41,6 +41,7 @@
  
- static DBusConnection *connection = NULL;
- static uint8_t ringer_setting = 0xff;
-+static uint16_t handle_ringer_setting = 0x0000;
- static struct agent agent;
+ #define PHONE_ALERT_STATUS_SVC_UUID		0x180E
  
- static void agent_operation(const char *operation)
-@@ -209,6 +210,7 @@ static void register_phone_alert_service(void)
- 							ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 			ringer_setting_read,
-+			GATT_OPT_CHR_VALUE_GET_HANDLE, &handle_ringer_setting,
- 			GATT_OPT_INVALID);
++#define ALERT_STATUS_CHR_UUID		0x2A3F
+ #define RINGER_CP_CHR_UUID		0x2A40
+ #define RINGER_SETTING_CHR_UUID		0x2A41
+ 
+@@ -178,6 +179,13 @@ static void get_silent_mode(DBusConnection *conn, void *user_data)
+ 	dbus_pending_call_set_notify(call, get_silent_reply, NULL, NULL);
  }
  
-@@ -249,8 +251,32 @@ static DBusMessage *register_agent(DBusConnection *conn, DBusMessage *msg,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static DBusMessage *notify_ringer_setting(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
++static uint8_t alert_status_read(struct attribute *a, gpointer user_data)
 +{
-+	const char *setting;
++	DBG("a = %p", a);
 +
-+	if (agent.name == NULL)
-+		return NULL;
-+
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &setting,
-+							DBUS_TYPE_INVALID))
-+		return NULL;
-+
-+	if (g_str_equal(setting, "Silent"))
-+		ringer_setting = RINGER_SILENT;
-+	else
-+		ringer_setting = RINGER_NORMAL;
-+
-+	attrib_db_update(handle_ringer_setting, NULL, &ringer_setting,
-+						sizeof(ringer_setting), NULL);
-+
-+	return dbus_message_new_method_return(msg);
++	return 0;
 +}
 +
- static GDBusMethodTable alert_methods[] = {
--	{ "RegisterAgent",	"o",	"",	register_agent },
-+	{ "RegisterAgent",	"o",	"",	register_agent		},
-+	{ "NotifyRingerSetting","s",	"",	notify_ringer_setting	},
- 	{ }
- };
- 
+ static uint8_t ringer_setting_read(struct attribute *a, gpointer user_data)
+ {
+ 	if (ringer_setting == 0xff) {
+@@ -199,6 +207,12 @@ static void register_phone_alert_service(void)
+ {
+ 	/* Phone Alert Status Service */
+ 	gatt_service_add(GATT_PRIM_SVC_UUID, PHONE_ALERT_STATUS_SVC_UUID,
++			/* Alert Status characteristic */
++			GATT_OPT_CHR_UUID, ALERT_STATUS_CHR_UUID,
++			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
++							ATT_CHAR_PROPER_NOTIFY,
++			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
++			alert_status_read,
+ 			/* Ringer Control Point characteristic */
+ 			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
+ 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE,
 -- 
 1.7.0.4
 
