@@ -1,27 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 11:32:01 +0300
+Date: Tue, 27 Sep 2011 11:30:23 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] serial: fix DBus message reply
-Message-ID: <20110927083201.GJ3952@dell>
-References: <1315937765-32168-1-git-send-email-padovan@profusion.mobi>
+Subject: Re: [PATCH BlueZ 1/5 v2] AVRCP: use a vtable to simplify PDU
+ parsing/handling
+Message-ID: <20110927083023.GI3952@dell>
+References: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1315937765-32168-1-git-send-email-padovan@profusion.mobi>
+In-Reply-To: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Luiz,
 
-On Tue, Sep 13, 2011, Gustavo F. Padovan wrote:
-> From: "Gustavo F. Padovan" <padovan@profusion.mobi>
-> 
-> If reply is NULL we have a crash.
+On Mon, Sep 12, 2011, Luiz Augusto von Dentz wrote:
+> This simplify a bit the handling by introducing common checks before
+> calling the handler callback, it is also much easier to add/remove
+> new PDUs in this way.
 > ---
->  serial/port.c |    6 ++----
->  1 files changed, 2 insertions(+), 4 deletions(-)
+>  audio/control.c |  321 +++++++++++++++++++++----------------------------------
+>  1 files changed, 124 insertions(+), 197 deletions(-)
 
-Both patches applied. Thanks.
+All five patches applied. Thanks.
 
 Johan
