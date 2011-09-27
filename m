@@ -1,48 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:26:53 +0300
+Date: Tue, 27 Sep 2011 12:25:41 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Yegor Yefremov <yegor_sub1@visionsystems.de>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] hciattach: fix serial speed setting for wl1271
-Message-ID: <20110927092653.GX3952@dell>
-References: <4E64D1B4.9020300@visionsystems.de>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 0/6] Add support for HandsfreeGateway to Media
+Message-ID: <20110927092541.GW3952@dell>
+References: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4E64D1B4.9020300@visionsystems.de>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1315317353-14412-1-git-send-email-frederic.dalleau@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yegor,
+Hi Frédéric,
 
-On Mon, Sep 05, 2011, Yegor Yefremov wrote:
-> override speed setting if firmware script issues serial settings command,
-> otherwise the value given in the firmware script will be overridden.
+On Tue, Sep 06, 2011, Frédéric Dalleau wrote:
+> The first patch in this series fix the issue remaining in v2.
+> It also fix a crash because the request_stream callback was run synchronously.
+> After that various fixes.
 > 
-> Example:
+> Changes from v4 :
+> Patch 2: take Luiz comment into account and create error domain for
+> gateway
+> Patch 4: also make sure gateway is set back to disconnected state in case of
+> authorize errors.
 > 
-> hciattach /dev/ttyO1 texas 115200
+> Best regards,
+> Frédéric
 > 
-> will fail, because /dev/ttyO1 will be opened with 115200 b/s, then
-> the firmware script will set the buadrate to 3000000 b/s, after UART init
-> hciattach.c will set the baudrate to 115200, so communication is broken.
+> Frédéric Dalleau (6):
+>   Fix disconnect SCO at same time than RFCOMM
+>   Fix asynchronously run request stream cb
+>   Fix state to "playing" on SCO establishment
+>   Set state to "connecting" on connection requested
+>   Fix reference count issue in incoming connections
+>   Check all states before allowing gw connection
 > 
-> The only correct way is to set both speeds:
-> 
-> hciattach -s 115200 /dev/ttyO1 texas 3000000
-> 
-> With this patch only initial speed must be specified. The former semantic
-> will be preserved in case the firmware script doesn't provide serial
-> settings action.
-> 
-> Tested with wl1271 and firmware TIInit_7.2.31.bts
-> 
-> Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
-> ---
->  tools/hciattach.c    |    2 +-
->  tools/hciattach.h    |    2 +-
->  tools/hciattach_ti.c |   19 +++++++++++--------
->  3 files changed, 13 insertions(+), 10 deletions(-)
+>  audio/gateway.c |  194 ++++++++++++++++++++++++++++++++++++++-----------------
+>  audio/gateway.h |   12 +++-
+>  audio/manager.c |    8 ++-
+>  audio/unix.c    |   13 +---
+>  4 files changed, 155 insertions(+), 72 deletions(-)
 
-Applied after fixing the commit message (we don't use Signed-off-by).
-Thanks.
+Patches 1-5 have been applied. Thanks.
 
 Johan
