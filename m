@@ -1,26 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:57:53 +0300
+Date: Tue, 27 Sep 2011 12:56:44 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH hcidump] avrcp: fix name of metadata field
-Message-ID: <20110927095753.GB6190@dell>
-References: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: Re: [PATCHv3 1/2] hcidump: decode extended window size option
+Message-ID: <20110927095644.GA6190@dell>
+References: <1314360337-26395-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1315524770-12000-1-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1314360337-26395-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Andrei,
 
-On Thu, Sep 08, 2011, Lucas De Marchi wrote:
-> Metadata field number 0x7 should be the track duration and not the
-> progress of the track playback. Thus rename it to a better description.
+On Fri, Aug 26, 2011, Emeltchenko Andrei wrote:
 > ---
->  parser/avrcp.c |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
+>  parser/l2cap.c |    9 +++++++++
+>  1 files changed, 9 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+Patch 1 has been applied but 2 fails to apply.
 
 Johan
