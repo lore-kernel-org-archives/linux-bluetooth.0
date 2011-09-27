@@ -1,27 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:32:47 +0300
+Date: Tue, 27 Sep 2011 12:32:11 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Antti Julku <antti.julku@nokia.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Implement fast connectable mode for mgmt interface
-Message-ID: <20110927093247.GE3952@dell>
-References: <1308303854-2017-1-git-send-email-antti.julku@nokia.com>
+Subject: Re: [PATCH BlueZ] Fix test-proximity usage info
+Message-ID: <20110927093210.GD3952@dell>
+References: <1316786715-21546-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1308303854-2017-1-git-send-email-antti.julku@nokia.com>
+In-Reply-To: <1316786715-21546-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antti,
+Hi Claudio,
 
-On Fri, Jun 17, 2011, Antti Julku wrote:
-> Management interface implementation for fast connectable mode.
+On Fri, Sep 23, 2011, Claudio Takahasi wrote:
 > ---
->  doc/mgmt-api.txt  |    8 ++++++++
->  lib/mgmt.h        |    5 +++++
->  plugins/mgmtops.c |   24 +++++++++++++++++++++---
->  3 files changed, 34 insertions(+), 3 deletions(-)
+>  test/test-proximity |    3 ++-
+>  1 files changed, 2 insertions(+), 1 deletions(-)
 
-Both patches applied. Thanks.
+Applied. Thanks.
 
 Johan
