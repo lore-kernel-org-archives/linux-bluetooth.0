@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:14:32 +0300
+Date: Tue, 27 Sep 2011 11:22:41 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Antti Julku <antti.julku@nokia.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 1/5] Remove storing device type
-Message-ID: <20110927091432.GM3952@dell>
-References: <1315572669-5006-2-git-send-email-claudio.takahasi@openbossa.org>
- <1316115103-19730-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ] Add support for blacklisting events
+Message-ID: <20110927082241.GB3952@dell>
+References: <1311854423-1471-1-git-send-email-antti.julku@nokia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1316115103-19730-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1311854423-1471-1-git-send-email-antti.julku@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Antti,
 
-On Thu, Sep 15, 2011, Claudio Takahasi wrote:
-> Device type doesn't need to be stored since GATT services information
-> exported through basic rate can be retrieved from the SDP records.
-> Device "type" is also a wrong expression to represent the operation
-> mode: over which transport GATT service is being exported.
+On Thu, Jul 28, 2011, Antti Julku wrote:
+> Add support for mgmt interface events for device blocking/unblocking.
+> Kernel sends a mgmt event when a device has been blocked by another
+> management socket or with ioctl command (e.g. by hciconfig).
+> 
+> Parameter update_only is added to device_block/unblock functions in
+> device.c to avoid code copying. When update_only is true, blocking
+> command is not sent to kernel, but only device status is updated and
+> dbus signal is sent.
 > ---
->  src/adapter.c |   28 ----------------------------
->  src/device.c  |    2 --
->  src/storage.c |   38 --------------------------------------
->  src/storage.h |    3 ---
->  4 files changed, 0 insertions(+), 71 deletions(-)
+>  lib/mgmt.h        |   10 +++++++++
+>  plugins/mgmtops.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/device.c      |   27 +++++++++++++++----------
+>  src/device.h      |    5 ++++
+>  src/event.c       |   26 +++++++++++++++++++++++++
+>  src/event.h       |    2 +
+>  6 files changed, 113 insertions(+), 11 deletions(-)
 
-All five patches applied. Thanks.
+Applied. Thanks.
 
 Johan
