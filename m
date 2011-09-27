@@ -1,72 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: <sunil.kumar5@wipro.com>
-To: <Edwin.Tsang@ca.flextronics.com>, <kengyu@ubuntu.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bug: bluetooth not working after suspend/resume
-Date: Tue, 27 Sep 2011 13:55:46 +0000
-Message-ID: <C78B19ECBCA2E64588CEDF39E57A4D700EFC10@BLR-SJP-MBX2.wipro.com>
+Subject: Re: Bug: bluetooth not working after suspend/resume
+From: etsang <Edwin.Tsang@ca.flextronics.com>
+To: =?ISO-8859-1?Q?Keng-Y=FC?= Lin <kengyu@ubuntu.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
 References: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
- <1317131531.2158.7.camel@etsang-laptop>
-In-Reply-To: <1317131531.2158.7.camel@etsang-laptop>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 27 Sep 2011 09:52:11 -0400
+Message-ID: <1317131531.2158.7.camel@etsang-laptop>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgZXRzYW5nLExpbiwNCg0KSSB0aGluayB0aGlzIGlzc3VlIGlzIG9ic2VydmVkIHdoZW4gdGhl
-IEZpcm13YXJlIGlzIGJlaW5nIGRvd25sb2FkZWQgdG8gQlQgbW9kdWxlIHdpdGggbW9yZSBsb2Fk
-IG9uIENQVSh3aXRoIG90aGVyIGFjdGl2aXRpZXMpIGFuZCB0aGUgRmlybXdhcmUgZG93bmxvYWQg
-dGFzayBub3QgZ2V0dGluZyBlbm91Z2ggb2YgQ1BVLg0KDQpTaW1pbGFyIGlzc3VlIHdhcyBvYnNl
-cnZlZCB3aXRoIFdMMTI3MSBhbmQga2VybmVsIDIuNi4yOC4yLg0KDQpUaGFua3MgJiBSZWdhcmRz
-LA0KU3VuaWwNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0
-b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJA
-dmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgZXRzYW5nDQpTZW50OiBUdWVzZGF5LCBTZXB0
-ZW1iZXIgMjcsIDIwMTEgNzoyMiBQTQ0KVG86IEtlbmctWcO8IExpbg0KQ2M6IGxpbnV4LWJsdWV0
-b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBCdWc6IGJsdWV0b290aCBub3Qgd29y
-a2luZyBhZnRlciBzdXNwZW5kL3Jlc3VtZQ0KDQpIaSBLZW55dSwNCiAgSSBhbSB3b3JraW5nIG9u
-IGEgc2ltaWxhciBCVCBpc3N1ZS4gQnV0IGl0IGlzIG9uIEFuZHJvaWQgR2luZ2VyYnJlYWQNCmtl
-cm5lbCAyLjYuMjUuNysuICBBZnRlciBhIGlkbGUgZm9yIGEgd2hpbGUgdGhlIEJUIHdhcyBub3Qg
-cmV0dXJuIGFueQ0KaW5xdWlyeSByZXN1bHQgKGlmIGl0IHdhcyBub3QpLCBpZiB0dXJuIG9mZiBC
-VCB0aGVuIGl0IHdpbGwgbm90IHR1cm4NCmFnYWluIHVudGlsIGEgcG93ZXIgY3ljbGUuIE9uIHRo
-ZSBrZXJuYWwgbG9nIGl0IHdhcyBzaG93aW5nIHByb2JsZW0NCmxvYWRpbmcgaW50byB0aGUgVEkg
-d2wzMjd4LiANCi0tLQ0KVElpbml0XzcuMi4zMS5idHMNCm5vIHByb3BlciByZXNwb25zZSBkdXJp
-bmcgZncgZG93bmxvYWQuDQpEbyB5b3UgeW91IGhhdmUgYSBzaW1pbGFyIGZ3IGRvd25sb2FkIGZh
-aWx1cmUgd2hlbiBhdHRlbXB0IHRvIHR1cm4gb24NCkJULiBPciBtaWdodCBiZSBhIGRpZmZlcmVu
-dCBpc3N1ZT8NCg0KRWQNCk9uIFR1ZSwgMjAxMS0wOS0yNyBhdCAxNjoyNSArMDgwMCwgS2VuZy1Z
-w7wgTGluIHdyb3RlOg0KPiBIaSBhbGw6DQo+ICAgU2luY2Uga2VybmVsLm9yZy9idWd6aWxsYSBp
-cyBkZWFkIGZvciBhIHdoaWxlLCBJIHNlbnQgdGhlIGJ1ZyByZXBvcnQNCj4gaGVyZSBpbiBob3Bl
-IHRvIGdldCBtb3JlIGluc2lnaHQuDQo+IA0KPiAgIFRoaXMgaXMgYSBsb25nLWxhc3RpbmcgYnVn
-IGFuZCBoYXBwZW5zIGFjcm9zcyBzZXZlcmFsIGRpc3Ryb3Mgd2l0aA0KPiBkaWZmZXJlbnQgY29t
-YmluYXRpb25zIG9mIGJsdWV6L2tlcm5lbCB2ZXJpc2lvbnMgYnV0IHNoYXJlcyBtdWNoIHRoZQ0K
-PiBzYW1lIHN5bXB0b20gdGhhdCBibHVldG9vdGggaXMgbm90IHdvcmtpbmcgYWZ0ZXIgdGhlIHJl
-c3VtZS4gQXMgc2Vlbg0KPiBpbiB0aGUgYnVnIHJlcG9ydCBiZWxvdywgaXQgaGFwcGVucyBvbiBh
-IHZhcmlldHkgb2YgZGlmZmVyZW50IGxhcHRvcHMNCj4gdG9vLg0KPiANCj4gICBSZWRoYXQ6DQo+
-ICAgICBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTcyNzEwNg0K
-PiANCj4gICBEZWJpYW46DQo+ICAgICBodHRwOi8vYnVncy5kZWJpYW4ub3JnL2NnaS1iaW4vYnVn
-cmVwb3J0LmNnaT9idWc9NjE0OTI5DQo+IA0KPiAgIFVidW50dToNCj4gICAgIGh0dHBzOi8vbGF1
-bmNocGFkLm5ldC9idWdzLzgyNDE0NA0KPiAgICAgaHR0cHM6Ly9sYXVuY2hwYWQubmV0L2J1Z3Mv
-ODI0NjMzDQo+ICAgICBodHRwczovL2xhdW5jaHBhZC5uZXQvYnVncy84MjM0NjcNCj4gICAgIGh0
-dHBzOi8vbGF1bmNocGFkLm5ldC9idWdzLzgyMjcwNQ0KPiANCj4gICBQZXJzb25hbGx5IEkgZGlk
-IHNvbWUgaW52ZXN0aWdhdGlvbiBvbiB0aGUgaXNzdWUgYW5kIGZvdW5kIHRoYXQNCj4gYmx1ZXRv
-b3RoZCBkb2VzIG5vdCByZWNlaXZlIHRoZSBIQ0kgY29tbWFuZHMgb2YgcmVhZF9iZF9hZGRyLA0K
-PiByZWFkX2xvY2FsX3ZlcnNpb24sIHJlYWRfbG9jYWxfZmVhdHVyZXMsIG5vciByZWFkX2xvY2Fs
-X25hbWUuIFNvIGluDQo+IGJsdWV6LnBsdWdpbnMvaGNpb3BzLmM6ZGV2aWNlX2RldnVwX3NldHVw
-KCksIGluaXRfYWRhcHRlcigpIGlzIG5vdA0KPiBjYWxsZWQgYXQgcmVzdW1lLg0KPiANCj4gICBJ
-dCBjYW4gYmUgZnVydGhlciBjb25maXJtZWQgYnkgdGhlIGF0dGFjaGVkIHBhdGNoIG9mIGJsdWV6
-LiBJdCBpcw0KPiB1Z2x5IGJ1dCBjYW4gd29yayBhcm91bmQgdGhlIGJ1ZyBhcyByZXBvcnRlZCBp
-biBzb21lIG9mIHRoZSBidWcNCj4gdHJhY2tlcnMgYWJvdmUuDQo+IA0KPiAgIEkgYW0gbG9va2lu
-ZyBmb3IgYW55IGFkdmljZSB0byBnZXQgaXQgbW92ZSBvbiwgIGZvciB0aGUgZGVidWdnaW5nDQo+
-IGFuZCB0aGUgZml4aW5nLg0KPiANCj4gICBUaGFua3MsDQo+IC1rZW5neXUNCg0KDQogDQpMZWdh
-bCBEaXNjbGFpbWVyOg0KVGhlIGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIG1lc3NhZ2Ug
-bWF5IGJlIHByaXZpbGVnZWQgYW5kIGNvbmZpZGVudGlhbC4gSXQgaXMgaW50ZW5kZWQgdG8gYmUg
-cmVhZCBvbmx5IGJ5IHRoZSBpbmRpdmlkdWFsIG9yIGVudGl0eSB0byB3aG9tIGl0IGlzIGFkZHJl
-c3NlZCBvciBieSB0aGVpciBkZXNpZ25lZS4gSWYgdGhlIHJlYWRlciBvZiB0aGlzIG1lc3NhZ2Ug
-aXMgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHlvdSBhcmUgb24gbm90aWNlIHRoYXQgYW55
-IGRpc3RyaWJ1dGlvbiBvZiB0aGlzIG1lc3NhZ2UsIGluIGFueSBmb3JtLCBpcyBzdHJpY3RseSBw
-cm9oaWJpdGVkLiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIG1lc3NhZ2UgaW4gZXJyb3IsIHBs
-ZWFzZSBpbW1lZGlhdGVseSBub3RpZnkgdGhlIHNlbmRlciBhbmQgZGVsZXRlIG9yIGRlc3Ryb3kg
-YW55IGNvcHkgb2YgdGhpcyBtZXNzYWdlDQoNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMg
-bGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhl
-IGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFq
-b3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRt
-bA0K
+Hi Kenyu,
+  I am working on a similar BT issue. But it is on Android Gingerbread
+kernel 2.6.25.7+.  After a idle for a while the BT was not return any
+inquiry result (if it was not), if turn off BT then it will not turn
+again until a power cycle. On the kernal log it was showing problem
+loading into the TI wl327x. 
+---
+TIinit_7.2.31.bts
+no proper response during fw download.
+Do you you have a similar fw download failure when attempt to turn on
+BT. Or might be a different issue?
+
+Ed
+On Tue, 2011-09-27 at 16:25 +0800, Keng-Yü Lin wrote:
+> Hi all:
+>   Since kernel.org/bugzilla is dead for a while, I sent the bug report
+> here in hope to get more insight.
+> 
+>   This is a long-lasting bug and happens across several distros with
+> different combinations of bluez/kernel verisions but shares much the
+> same symptom that bluetooth is not working after the resume. As seen
+> in the bug report below, it happens on a variety of different laptops
+> too.
+> 
+>   Redhat:
+>     https://bugzilla.redhat.com/show_bug.cgi?id=727106
+> 
+>   Debian:
+>     http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614929
+> 
+>   Ubuntu:
+>     https://launchpad.net/bugs/824144
+>     https://launchpad.net/bugs/824633
+>     https://launchpad.net/bugs/823467
+>     https://launchpad.net/bugs/822705
+> 
+>   Personally I did some investigation on the issue and found that
+> bluetoothd does not receive the HCI commands of read_bd_addr,
+> read_local_version, read_local_features, nor read_local_name. So in
+> bluez.plugins/hciops.c:device_devup_setup(), init_adapter() is not
+> called at resume.
+> 
+>   It can be further confirmed by the attached patch of bluez. It is
+> ugly but can work around the bug as reported in some of the bug
+> trackers above.
+> 
+>   I am looking for any advice to get it move on,  for the debugging
+> and the fixing.
+> 
+>   Thanks,
+> -kengyu
+
+
+ 
+Legal Disclaimer:
+The information contained in this message may be privileged and confidential. It is intended to be read only by the individual or entity to whom it is addressed or by their designee. If the reader of this message is not the intended recipient, you are on notice that any distribution of this message, in any form, is strictly prohibited. If you have received this message in error, please immediately notify the sender and delete or destroy any copy of this message
+
