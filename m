@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:39:55 +0300
+Date: Tue, 27 Sep 2011 12:39:05 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/5] MAP: Add typedef for folder listing callback
-Message-ID: <20110927093955.GI3952@dell>
-References: <1314953864-25686-1-git-send-email-lkslawek@gmail.com>
+Subject: Re: [PATCH obexd] Remove test/main.c
+Message-ID: <20110927093905.GH3952@dell>
+References: <1314879277-4792-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314953864-25686-1-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1314879277-4792-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawek,
+Hi Luiz,
 
-On Fri, Sep 02, 2011, Slawomir Bochenski wrote:
+On Thu, Sep 01, 2011, Luiz Augusto von Dentz wrote:
+> It is not useful anymore since gwobex will be removed and we
+> have already tools/test-client and tools/test-server for gobex.
 > ---
->  plugins/messages-dummy.c |    3 +--
->  plugins/messages.h       |    6 ++++--
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>  Makefile.am |    6 -
+>  test/main.c |  316 -----------------------------------------------------------
+>  2 files changed, 0 insertions(+), 322 deletions(-)
+>  delete mode 100644 test/main.c
 
-All five patches applied. Thanks.
+Applied. Thanks.
 
 Johan
