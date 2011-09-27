@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:46:14 +0300
+Date: Tue, 27 Sep 2011 12:39:55 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bartosz Szatkowski <bulislaw@linux.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/8] MAP Tracker: Fix folder and path handling
-Message-ID: <20110927094614.GJ3952@dell>
-References: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
+Subject: Re: [PATCH obexd 1/5] MAP: Add typedef for folder listing callback
+Message-ID: <20110927093955.GI3952@dell>
+References: <1314953864-25686-1-git-send-email-lkslawek@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
+In-Reply-To: <1314953864-25686-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bartosz,
+Hi Slawek,
 
-On Fri, Sep 02, 2011, Bartosz Szatkowski wrote:
+On Fri, Sep 02, 2011, Slawomir Bochenski wrote:
 > ---
->  plugins/messages-tracker.c |   11 +++++++----
->  1 files changed, 7 insertions(+), 4 deletions(-)
+>  plugins/messages-dummy.c |    3 +--
+>  plugins/messages.h       |    6 ++++--
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 
-Patches 1 and 2 have been applied. I didn't see any response to the
-issues raised for patch 3 (I might have forgotten though if that
-discussion happened on IRC).
+All five patches applied. Thanks.
 
 Johan
