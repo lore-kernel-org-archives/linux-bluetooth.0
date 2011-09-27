@@ -1,24 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 16:42:17 +0300
+Date: Tue, 27 Sep 2011 16:36:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 0/5] Replace SendDTMF by StartDTMF/StopDTMF in
- maemo6
-Message-ID: <20110927134217.GA9640@dell>
-References: <1317118967-18469-1-git-send-email-dmitriy.paliy@nokia.com>
+Subject: Re: [PATCH hcidump v2] hcidump: parse extended control field in l2cap
+Message-ID: <20110927133657.GA9071@dell>
+References: <1317127529-15094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317118967-18469-1-git-send-email-dmitriy.paliy@nokia.com>
+In-Reply-To: <1317127529-15094-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Andrei,
 
-On Tue, Sep 27, 2011, Dmitriy Paliy wrote:
-> This version contains few fixes, like use of static function and DTMF
-> definitions for tone-generator daemon.
+On Tue, Sep 27, 2011, Emeltchenko Andrei wrote:
+> Adds support for parsing extended control field. Extended control
+> field may be used for ERTM and streaming mode (if EWS specified).
+> ext_ctrl flag resides in cid table, added fixes for P-bit decode.
+> ---
+>  parser/l2cap.c |  140 ++++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 files changed, 112 insertions(+), 28 deletions(-)
 
-Thanks. All five patches have been applied.
+Both patches have been applied. Thanks.
 
 Johan
