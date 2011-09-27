@@ -1,58 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH hcidump 1/2] Remove magic numbers in l2cap decoding
-Date: Tue, 27 Sep 2011 14:30:55 +0300
-Message-Id: <1317123056-14235-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <20110927132332.23237dubrv7x0k08@mail.hendrik-sattler.de>
+Date: Tue, 27 Sep 2011 13:23:32 +0200
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: Colin Beckingham <colbec@start.ca>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Installation from git did not proceed cleanly?
+References: <4E81AA25.6090907@start.ca>
+In-Reply-To: <4E81AA25.6090907@start.ca>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Zitat von Colin Beckingham <colbec@start.ca>:
 
----
- parser/l2cap.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+> Hi, a few observations on installation from git repository on a  
+> reasonably fresh install of OpenSUSE 11.4. (Previous installations  
+> from tar.gz have all run correctly first time.)
+>
+> 1. Fetching the clone from the temporary repo not a problem
+> 2. ./configure instruction from README/INSTALL did not work, no  
+> configure found
 
-diff --git a/parser/l2cap.c b/parser/l2cap.c
-index 8d05314..d3d3b1c 100644
---- a/parser/l2cap.c
-+++ b/parser/l2cap.c
-@@ -346,13 +346,13 @@ static char *fcs2str(uint8_t fcs)
- static char *sar2str(uint8_t sar)
- {
- 	switch (sar) {
--	case 0x00:
-+	case L2CAP_SAR_UNSEGMENTED:
- 		return "Unsegmented";
--	case 0x01:
-+	case L2CAP_SAR_START:
- 		return "Start";
--	case 0x02:
-+	case L2CAP_SAR_END:
- 		return "End";
--	case 0x03:
-+	case L2CAP_SAR_CONTINUE:
- 		return "Continuation";
- 	default:
- 		return "Bad SAR";
-@@ -363,13 +363,13 @@ static char *sar2str(uint8_t sar)
- static char *supervisory2str(uint8_t supervisory)
- {
- 	switch (supervisory) {
--	case 0x00:
-+	case L2CAP_SUPER_RR:
- 		return "Receiver Ready (RR)";
--	case 0x01:
-+	case L2CAP_SUPER_REJ:
- 		return "Reject (REJ)";
--	case 0x02:
-+	case L2CAP_SUPER_RNR:
- 		return "Receiver Not Ready (RNR)";
--	case 0x03:
-+	case L2CAP_SUPER_SREJ:
- 		return "Select Reject (SREJ)";
- 	default:
- 		return "Bad Supervisory";
--- 
-1.7.4.1
+That one is called boot-strapping and is the same for many projects  
+using autoconf. For convenience reasons, it's done before creating  
+tarballs. That's probably the reason you are not used to it.
+
+So to create the configure script (and other files), either run "chmod  
++x bootstrap; ./bootstrap" or just "autoreconf -f -i".
+
+HS
+
+
 
