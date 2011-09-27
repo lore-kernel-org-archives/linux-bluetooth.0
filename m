@@ -1,28 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 11:30:23 +0300
+Date: Tue, 27 Sep 2011 11:28:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bruno Dilly <bdilly@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5 v2] AVRCP: use a vtable to simplify PDU
- parsing/handling
-Message-ID: <20110927083023.GI3952@dell>
-References: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH -v2 3/3] Add test for serial proxy and serial proxy
+ manager
+Message-ID: <20110927082857.GH3952@dell>
+References: <1314709463-4712-1-git-send-email-bdilly@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1315845241-17077-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1314709463-4712-1-git-send-email-bdilly@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Bruno,
 
-On Mon, Sep 12, 2011, Luiz Augusto von Dentz wrote:
-> This simplify a bit the handling by introducing common checks before
-> calling the handler callback, it is also much easier to add/remove
-> new PDUs in this way.
+On Tue, Aug 30, 2011, Bruno Dilly wrote:
 > ---
->  audio/control.c |  321 +++++++++++++++++++++----------------------------------
->  1 files changed, 124 insertions(+), 197 deletions(-)
+>  Makefile.tools         |    2 +-
+>  test/test-serial-proxy |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 65 insertions(+), 1 deletions(-)
+>  create mode 100755 test/test-serial-proxy
 
-All five patches applied. Thanks.
+Applied. Thanks.
 
 Johan
