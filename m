@@ -1,32 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 Sep 2011 12:47:08 +0300
+Date: Tue, 27 Sep 2011 12:46:14 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
+To: Bartosz Szatkowski <bulislaw@linux.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/2] Refactoring address fields handled in vcard
- module
-Message-ID: <20110927094708.GK3952@dell>
-References: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
+Subject: Re: [PATCH obexd 1/8] MAP Tracker: Fix folder and path handling
+Message-ID: <20110927094614.GJ3952@dell>
+References: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1314009177-19178-1-git-send-email-michalski.raf@gmail.com>
+In-Reply-To: <1314953880-4663-1-git-send-email-bulislaw@linux.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+Hi Bartosz,
 
-On Mon, Aug 22, 2011, Rafal Michalski wrote:
-> This patch introduces phonebook_addr struct for more intuitive
-> handling address fields from backend. Now address fields are managed
-> by linked list (wrapped by structure) and it is used for printing vCard
-> address fields, instead of buffers set (combined with g_strsplit
-> and snprintf functions).
+On Fri, Sep 02, 2011, Bartosz Szatkowski wrote:
 > ---
->  plugins/phonebook-tracker.c |   72 +++++++++++++++++++++++++++++++++++++-----
->  plugins/vcard.c             |   70 +++++++++++++++++++----------------------
->  plugins/vcard.h             |    7 +++-
->  3 files changed, 101 insertions(+), 48 deletions(-)
+>  plugins/messages-tracker.c |   11 +++++++----
+>  1 files changed, 7 insertions(+), 4 deletions(-)
 
-Both patches applied. Thanks.
+Patches 1 and 2 have been applied. I didn't see any response to the
+issues raised for patch 3 (I might have forgotten though if that
+discussion happened on IRC).
 
 Johan
