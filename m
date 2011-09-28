@@ -2,144 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 2/9] Register Health Thermometer Interface
-Date: Wed, 28 Sep 2011 19:48:39 +0200
-Message-Id: <1317232126-12640-3-git-send-email-sancane@gmail.com>
-In-Reply-To: <1317232126-12640-2-git-send-email-sancane@gmail.com>
+Subject: [PATCH 8/9] Read measurement interval characteristic
+Date: Wed, 28 Sep 2011 19:48:45 +0200
+Message-Id: <1317232126-12640-9-git-send-email-sancane@gmail.com>
+In-Reply-To: <1317232126-12640-8-git-send-email-sancane@gmail.com>
 References: <1317232126-12640-1-git-send-email-sancane@gmail.com>
  <1317232126-12640-2-git-send-email-sancane@gmail.com>
+ <1317232126-12640-3-git-send-email-sancane@gmail.com>
+ <1317232126-12640-4-git-send-email-sancane@gmail.com>
+ <1317232126-12640-5-git-send-email-sancane@gmail.com>
+ <1317232126-12640-6-git-send-email-sancane@gmail.com>
+ <1317232126-12640-7-git-send-email-sancane@gmail.com>
+ <1317232126-12640-8-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |  108 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 107 insertions(+), 1 deletions(-)
+ thermometer/thermometer.c |   72 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 71 insertions(+), 1 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 027ae02..a89d8a9 100644
+index de5f155..f9371c2 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -25,13 +25,119 @@
+@@ -23,6 +23,7 @@
+ #include <gdbus.h>
+ #include <bluetooth/uuid.h>
  
++#include "dbus-common.h"
  #include "adapter.h"
  #include "device.h"
-+#include "error.h"
-+#include "log.h"
-+#include "gattrib.h"
- #include "att.h"
- #include "thermometer.h"
- 
-+#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
-+
-+struct thermometer {
-+	DBusConnection          *conn;		/* The connection to the bus */
-+	struct btd_device       *dev;		/* Device reference */
-+	struct att_range	*svc_range;	/* Thermometer range */
-+};
-+
-+static GSList *thermometers = NULL;
-+
-+static void destroy_thermometer(gpointer user_data)
-+{
-+	struct thermometer *t = user_data;
-+
-+	dbus_connection_unref(t->conn);
-+	btd_device_unref(t->dev);
-+	g_free(t->svc_range);
-+        g_free(t);
-+}
-+
-+static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	/* TODO: */
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
-+						"Function not implemented.");
-+}
-+
-+static GDBusMethodTable thermometer_methods[] = {
-+	{ "GetProperties",	"",	"a{sv}",	get_properties },
-+	{ "SetProperty",	"sv",	"",		set_property,
-+						G_DBUS_METHOD_FLAG_ASYNC },
-+	{ "RegisterWatcher",	"o",	"",		register_watcher },
-+	{ "UnregisterWatcher",	"o",	"",		unregister_watcher },
-+	{ "EnableIntermediateMeasurement", "o", "", enable_intermediate },
-+	{ "DisableIntermediateMeasurement","o",	"", disable_intermediate },
-+	{ }
-+};
-+
-+static GDBusSignalTable thermometer_signals[] = {
-+	{ "PropertyChanged",	"sv"	},
-+	{ }
-+};
-+
- int thermometer_register(DBusConnection *connection, struct btd_device *device,
- 						struct att_primary *tattr)
- {
--	/* TODO: Register Health Thermometer Interface */
-+	const gchar *path = device_get_path(device);
-+	struct thermometer *t;
-+
-+	t = g_new0(struct thermometer, 1);
-+	t->conn = dbus_connection_ref(connection);
-+	t->dev = btd_device_ref(device);
-+	t->svc_range = g_new0(struct att_range, 1);
-+	t->svc_range->start = tattr->start;
-+	t->svc_range->end = tattr->end;
-+
-+	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
-+				thermometer_methods, thermometer_signals,
-+				NULL, t, destroy_thermometer)) {
-+		error("D-Bus failed to register %s interface",
-+							THERMOMETER_INTERFACE);
-+		destroy_thermometer(t);
-+		return -1;
-+	}
-+
-+	thermometers = g_slist_prepend(thermometers, t);
- 	return 0;
+ #include "error.h"
+@@ -129,6 +130,51 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
  }
  
++static void change_property(struct thermometer *t, const gchar *name,
++							gpointer value) {
++	if (g_strcmp0(name, "Intermediate") == 0) {
++		gboolean *intermediate = value;
++		if (t->intermediate == *intermediate)
++			return;
++
++		t->intermediate = *intermediate;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_BOOLEAN, &t->intermediate);
++	} else if (g_strcmp0(name, "Interval") == 0) {
++		uint16_t *interval = value;
++		if (t->has_interval && t->interval == *interval)
++			return;
++
++		if (!t->has_interval)
++			t->has_interval = TRUE;
++
++		t->interval = *interval;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->interval);
++	} else if (g_strcmp0(name, "Maximum") == 0) {
++		uint16_t *max = value;
++		if (t->max == *max)
++			return;
++
++		t->max = *max;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->max);
++	} else if (g_strcmp0(name, "Minimum") == 0) {
++		uint16_t *min = value;
++		if (t->min == *min)
++			return;
++
++		t->min = *min;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->min);
++	} else
++		DBG("%s is not a thermometer property", name);
++}
++
+ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+@@ -164,7 +210,31 @@ static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+-	/* TODO */
++	struct characteristic *ch = user_data;
++	uint8_t value[ATT_MAX_MTU];
++	uint16_t *p, interval;
++	int vlen;
++
++	if (status != 0) {
++		DBG("Measurement Interval value read failed: %s",
++							att_ecode2str(status));
++		return;
++	}
++
++	if (!dec_read_resp(pdu, len, value, &vlen)) {
++		DBG("Protocol error\n");
++		return;
++	}
++
++	if (vlen < 2) {
++		DBG("Invalid Interval received");
++		return;
++	}
++
++	p = (uint16_t *) value;
++	interval = btohs(*p);
++
++	change_property(ch->t, "Interval", &interval);
+ }
+ 
+ static void process_thermometer_char(struct characteristic *ch)
 -- 
 1.7.6.1
 
