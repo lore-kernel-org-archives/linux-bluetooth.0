@@ -1,102 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1317232126-12640-8-git-send-email-sancane@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 2/9] Register Health Thermometer Interface
+Date: Wed, 28 Sep 2011 19:48:39 +0200
+Message-Id: <1317232126-12640-3-git-send-email-sancane@gmail.com>
+In-Reply-To: <1317232126-12640-2-git-send-email-sancane@gmail.com>
 References: <1317232126-12640-1-git-send-email-sancane@gmail.com>
-	<1317232126-12640-2-git-send-email-sancane@gmail.com>
-	<1317232126-12640-3-git-send-email-sancane@gmail.com>
-	<1317232126-12640-4-git-send-email-sancane@gmail.com>
-	<1317232126-12640-5-git-send-email-sancane@gmail.com>
-	<1317232126-12640-6-git-send-email-sancane@gmail.com>
-	<1317232126-12640-7-git-send-email-sancane@gmail.com>
-	<1317232126-12640-8-git-send-email-sancane@gmail.com>
-Date: Wed, 28 Sep 2011 14:26:50 -0400
-Message-ID: <CAJdJm_OGGROUJ1NoJAdT09CTVEngrNdfxYWC5c7kp8RhJcvvcA@mail.gmail.com>
-Subject: Re: [PATCH 7/9] Read temperature type characteristic
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+ <1317232126-12640-2-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+---
+ thermometer/thermometer.c |  108 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 107 insertions(+), 1 deletions(-)
 
-On Wed, Sep 28, 2011 at 1:48 PM, Santiago Carot-Nemesio
-<sancane@gmail.com> wrote:
-> +static gchar* temptype2str(uint8_t value)
-
-Small conding style issue here: gchar*  -> gchar *
-
-> +{
-> +       switch (value) {
-> +       case 1: return "Armpit";
-> +       case 2: return "Body";
-> +       case 3: return "Ear";
-> +       case 4: return "Finger";
-> +       case 5: return "Intestines";
-> +       case 6: return "Mouth";
-> +       case 7: return "Rectum";
-> +       case 8: return "Toe";
-> +       case 9: return "Tympanum";
-> +       default:
-> +               error("Temperature type %d reserved for future use", value);
-> +               return NULL;
-> +       };
-> +}
-> +
->  static void destroy_char(gpointer user_data)
->  {
->        struct characteristic *c = user_data;
-> @@ -113,7 +138,27 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
->  static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
->                                                        gpointer user_data)
->  {
-> -       /* TODO */
-> +       struct characteristic *ch = user_data;
-> +       struct thermometer *t = ch->t;
-> +       uint8_t value;
-> +       int vlen;
-> +
-> +       if (status != 0) {
-> +               DBG("Temperature Type value read failed: %s",
-> +                                                       att_ecode2str(status));
-> +               return;
-> +       }
-> +
-> +       if (!dec_read_resp(pdu, len, &value, &vlen)) {
-
-Your code is assuming that the read response PDU will always have a
-one-byte value. This will cause memory corruption if the peer sends an
-error response with size greater than 2 (first byte is the opcode).
-
-Either put a check like "if (len == sizeof(uint8_t) + 1 &&
-read_read_resp(...))", or use:
-
-uint8_t value[ATT_MAX_MTU];
-
-and cast the first byte.
-
-(just noticed that Proximity monitor code has the same bug...)
-
-> +               DBG("Protocol error");
-> +               return;
-> +       }
-> +
-> +       DBG("TEMPERATURE TYPE: %s", temptype2str(value));
-
-Can you avoid using all-caps on the DBG() message above?
-
-> +       if (!t->has_interval)
-> +               t->has_interval = TRUE;
-
-Why the if() check? You could just do "t->has_interval = TRUE;" always.
-
-> +
-> +       t->type = value;
->  }
-
-Regards,
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 027ae02..a89d8a9 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -25,13 +25,119 @@
+ 
+ #include "adapter.h"
+ #include "device.h"
++#include "error.h"
++#include "log.h"
++#include "gattrib.h"
+ #include "att.h"
+ #include "thermometer.h"
+ 
++#define THERMOMETER_INTERFACE "org.bluez.Thermometer"
++
++struct thermometer {
++	DBusConnection          *conn;		/* The connection to the bus */
++	struct btd_device       *dev;		/* Device reference */
++	struct att_range	*svc_range;	/* Thermometer range */
++};
++
++static GSList *thermometers = NULL;
++
++static void destroy_thermometer(gpointer user_data)
++{
++	struct thermometer *t = user_data;
++
++	dbus_connection_unref(t->conn);
++	btd_device_unref(t->dev);
++	g_free(t->svc_range);
++        g_free(t);
++}
++
++static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static DBusMessage *disable_intermediate(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	/* TODO: */
++	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
++						"Function not implemented.");
++}
++
++static GDBusMethodTable thermometer_methods[] = {
++	{ "GetProperties",	"",	"a{sv}",	get_properties },
++	{ "SetProperty",	"sv",	"",		set_property,
++						G_DBUS_METHOD_FLAG_ASYNC },
++	{ "RegisterWatcher",	"o",	"",		register_watcher },
++	{ "UnregisterWatcher",	"o",	"",		unregister_watcher },
++	{ "EnableIntermediateMeasurement", "o", "", enable_intermediate },
++	{ "DisableIntermediateMeasurement","o",	"", disable_intermediate },
++	{ }
++};
++
++static GDBusSignalTable thermometer_signals[] = {
++	{ "PropertyChanged",	"sv"	},
++	{ }
++};
++
+ int thermometer_register(DBusConnection *connection, struct btd_device *device,
+ 						struct att_primary *tattr)
+ {
+-	/* TODO: Register Health Thermometer Interface */
++	const gchar *path = device_get_path(device);
++	struct thermometer *t;
++
++	t = g_new0(struct thermometer, 1);
++	t->conn = dbus_connection_ref(connection);
++	t->dev = btd_device_ref(device);
++	t->svc_range = g_new0(struct att_range, 1);
++	t->svc_range->start = tattr->start;
++	t->svc_range->end = tattr->end;
++
++	if (!g_dbus_register_interface(t->conn, path, THERMOMETER_INTERFACE,
++				thermometer_methods, thermometer_signals,
++				NULL, t, destroy_thermometer)) {
++		error("D-Bus failed to register %s interface",
++							THERMOMETER_INTERFACE);
++		destroy_thermometer(t);
++		return -1;
++	}
++
++	thermometers = g_slist_prepend(thermometers, t);
+ 	return 0;
+ }
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.6.1
+
