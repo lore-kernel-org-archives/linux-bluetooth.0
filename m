@@ -2,33 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/3] AVRCP: fix changed notification
-Date: Thu, 29 Sep 2011 14:07:28 -0300
-Message-Id: <1317316050-12855-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 0/3] track-changed notification
+Date: Thu, 29 Sep 2011 14:07:27 -0300
+Message-Id: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We sure want to send notifications only when section is not NULL.
-Otherwise we either crash or do not send the expected notification.
----
- audio/avrcp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+While implementing the feature in the last patch, I noticed the track-changed
+notification was not working anymore due to recent split of audio/control.c.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index ac9a107..e5b51db 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -549,7 +549,7 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
- 	uint16_t size;
- 	int err;
- 
--	if (mp->session)
-+	if (mp->session == NULL)
- 		return -ENOTCONN;
- 
- 	if (!(mp->registered_events & (1 << id)))
+First two patches fix the issues and 3rd patch puts an UID in media_info. AVRCP
+1.3 allows only two values:
+	- 0x0: track playing
+	- UINT64_MAX: no track playing/selected.
+
+AVRCP 1.4 properly uses this field though, so I'm already preparing the ground
+for it.
+
+Lucas De Marchi (3):
+  AVRCP: fix changed notification
+  AVRCP: fix missing bytes on notification
+  AVRCP: allow track to be un-selected
+
+ audio/avrcp.c |   40 +++++++++++++++++++++-------------------
+ 1 files changed, 21 insertions(+), 19 deletions(-)
+
 -- 
 1.7.6.4
 
