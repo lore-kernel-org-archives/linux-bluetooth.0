@@ -1,176 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 29 Sep 2011 16:34:34 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Oliver Neukum <oneukum@suse.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] btusb: add device entry for Broadcom SoftSailing
+Message-ID: <20110929193434.GE2605@joana>
+References: <201109211141.45978.oneukum@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+qTbbhLsO-GXdi9pvS9ep7FJ+yhYfS_bbCqup4=1Dk5Q@mail.gmail.com>
-References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1317316050-12855-4-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZ+qTbbhLsO-GXdi9pvS9ep7FJ+yhYfS_bbCqup4=1Dk5Q@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 29 Sep 2011 16:54:26 -0300
-Message-ID: <CAMOw1v7ZVnyTJGZZXZJis8Wj5EbEv-cY5SuFsxRF5YnEdA6iSg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] AVRCP: allow track to be un-selected
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <201109211141.45978.oneukum@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Oliver,
 
-On Thu, Sep 29, 2011 at 4:31 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
->
-> On Thu, Sep 29, 2011 at 8:07 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> As of now there was no way to tell BlueZ that no track is selected. Now
->> if client send us a ChangeTrack() with empty metadata, it means there's no
->> track currently selected/playing. This is necessary in order to pass
->> TP/NFY/BV-04-C that expects us to respond with:
->>        - 0x0: a track is playing
->>        - UINT64_MAX: there's no track playing
->> ---
->>  audio/avrcp.c |   36 +++++++++++++++++++-----------------
->>  1 files changed, 19 insertions(+), 17 deletions(-)
->>
->> diff --git a/audio/avrcp.c b/audio/avrcp.c
->> index 6e8b8ff..8fb23e0 100644
->> --- a/audio/avrcp.c
->> +++ b/audio/avrcp.c
->> @@ -191,6 +191,7 @@ struct media_info {
->>        uint32_t track;
->>        uint32_t track_len;
->>        uint32_t elapsed;
->> +       uint64_t uid;
->>  };
->>
->>  struct media_player {
->> @@ -570,18 +571,11 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
->>                pdu->params[1] = *((uint8_t *)data);
->>
->>                break;
->> -       case AVRCP_EVENT_TRACK_CHANGED: {
->> +       case AVRCP_EVENT_TRACK_CHANGED:
->>                size = 9;
->> -
->> -               /*
->> -                * AVRCP 1.3 supports only one track identifier: PLAYING
->> -                * (0x0). When 1.4 version is added, this shall be changed to
->> -                * contain the identifier of the track.
->> -                */
->> -               memset(&pdu->params[1], 0, 8);
->> +               memcpy(&pdu->params[1], (uint64_t *) data, sizeof(uint64_t));
->>
->>                break;
->> -       }
->>        default:
->>                error("Unknown event %u", id);
->>                return -EINVAL;
->> @@ -753,6 +747,9 @@ static int mp_get_attribute(struct media_player *mp, uint8_t attr)
->>  static void mp_set_media_attributes(struct media_player *mp,
->>                                                        struct media_info *mi)
->>  {
->> +       if (mp->mi.uid == UINT64_MAX && mi->uid == UINT64_MAX)
->> +               return;
->> +
->>        g_free(mp->mi.title);
->>        mp->mi.title = g_strdup(mi->title);
->>
->> @@ -768,6 +765,7 @@ static void mp_set_media_attributes(struct media_player *mp,
->>        mp->mi.ntracks = mi->ntracks;
->>        mp->mi.track = mi->track;
->>        mp->mi.track_len = mi->track_len;
->> +       mp->mi.uid = mi->uid;
->>
->>        /*
->>         * elapsed is special. Whenever the track changes, we reset it to 0,
->> @@ -782,7 +780,7 @@ static void mp_set_media_attributes(struct media_player *mp,
->>                        mi->title, mi->artist, mi->album, mi->genre,
->>                        mi->ntracks, mi->track, mi->track_len);
->>
->> -       avrcp_send_event(mp, AVRCP_EVENT_TRACK_CHANGED, NULL);
->> +       avrcp_send_event(mp, AVRCP_EVENT_TRACK_CHANGED, &mi->uid);
->>  }
->>
->>  static uint8_t avrcp_handle_get_capabilities(struct media_player *mp,
->> @@ -1166,8 +1164,7 @@ static uint8_t avrcp_handle_register_notification(struct media_player *mp,
->>                break;
->>        case AVRCP_EVENT_TRACK_CHANGED:
->>                len = 9;
->> -
->> -               memset(&pdu->params[1], 0, 8);
->> +               memcpy(&pdu->params[1], &mp->mi.uid, sizeof(uint64_t));
->>
->>                break;
->>        default:
->> @@ -1320,6 +1317,7 @@ static void media_info_init(struct media_info *mi)
->>         */
->>        mi->track_len = 0xFFFFFFFF;
->>        mi->elapsed = 0xFFFFFFFF;
->> +       mi->uid = UINT64_MAX;
->>  }
->>
->>  gboolean avrcp_connect(struct audio_device *dev)
->> @@ -1518,6 +1516,7 @@ static gboolean media_info_parse(DBusMessageIter *iter, struct media_info *mi)
->>        DBusMessageIter dict;
->>        DBusMessageIter var;
->>        int ctype;
->> +       int nattr;
->>
->>        ctype = dbus_message_iter_get_arg_type(iter);
->>        if (ctype != DBUS_TYPE_ARRAY)
->> @@ -1526,8 +1525,8 @@ static gboolean media_info_parse(DBusMessageIter *iter, struct media_info *mi)
->>        media_info_init(mi);
->>        dbus_message_iter_recurse(iter, &dict);
->>
->> -       while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
->> -                                                       DBUS_TYPE_INVALID) {
->> +       for(nattr = 0; (ctype = dbus_message_iter_get_arg_type(&dict)) !=
->> +                                               DBUS_TYPE_INVALID; nattr++) {
->>                DBusMessageIter entry;
->>                const char *key;
->>
->> @@ -1595,8 +1594,12 @@ static gboolean media_info_parse(DBusMessageIter *iter, struct media_info *mi)
->>                dbus_message_iter_next(&dict);
->>        }
->>
->> -       if (mi->title == NULL)
->> -               return FALSE;
->> +       if (nattr > 0) {
->> +               if (mi->title == NULL)
->> +                       return FALSE;
->> +
->> +               mi->uid = 0;
->> +       }
->>
->>        return TRUE;
->>  }
->> @@ -1609,7 +1612,6 @@ static DBusMessage *mp_change_track(DBusConnection *conn,
->>        DBusMessageIter iter;
->>        struct media_info mi;
->>
->> -
->>        dbus_message_iter_init(msg, &iter);
->>        if (!media_info_parse(&iter, &mi))
->>                return btd_error_invalid_args(msg);
->> --
->> 1.7.6.4
->
-> I have this more or less covered in mine yet to be published changes
-> to have player registration per adapter, so I would like to ask you to
-> hold this a bit until I finish to avoid to many conflicts.
+* Oliver Neukum <oneukum@suse.de> [2011-09-21 11:41:45 +0200]:
 
-It's not a nice thing asking to wait for unpublished code. Do you have
-an ETA? The code above is a very basic thing, necessary for people
-doing AVRCP 1.3 certification.
+> From 0cea73465cd22373c5cd43a3edd25fbd4bb532ef Mon Sep 17 00:00:00 2001
+> From: Oliver Neukum <oliver@neukum.org>
+> Date: Wed, 21 Sep 2011 11:37:15 +0200
+> Subject: [PATCH] btusb: add device entry for Broadcom SoftSailing
+> 
+> This device declares itself to be vendor specific
+> It therefore needs to be added to the device table
+> to make btusb bind.
+> 
+> Signed-off-by: Oliver Neukum <oneukum@suse.de>
 
-I already have other patches queued here:
- - TRACK_REACHED_END event;
- - TRACK_REACHED_START event;
- - PDU_CONTINUING / PDU_ABORT (this was already sent once, but I will
-refactor it as requested)
+Applied, thanks.
 
-So there are already conflicts and they will continue to exist if we
-don't sync what we are doing.
-
-
-
-Lucas De Marchi
+	Gustavo
