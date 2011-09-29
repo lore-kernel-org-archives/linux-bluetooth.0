@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
-Date: Thu, 29 Sep 2011 16:28:47 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [patch] bluetooth: hci_ll: clean up types a bit
-Message-ID: <20110929192847.GD2605@joana>
-References: <20110926061412.GA11832@elgon.mountain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20110926061412.GA11832@elgon.mountain>
+In-Reply-To: <1317316050-12855-3-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1317316050-12855-3-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 29 Sep 2011 22:18:23 +0300
+Message-ID: <CABBYNZ+92-G4zO-BXYQtMx24ucc=-2H1zvyOmRoq8iPv2gOTKQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] AVRCP: fix missing bytes on notification
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+Hi Lucas,
 
-* Dan Carpenter <dan.carpenter@oracle.com> [2011-09-26 09:14:12 +0300]:
+On Thu, Sep 29, 2011 at 8:07 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> ---
+>  audio/avrcp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index e5b51db..6e8b8ff 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -591,7 +591,7 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
+>
+>        err = avctp_send_vendordep(mp->session, mp->transaction_events[id],
+>                                        AVC_CTYPE_CHANGED, AVC_SUBUNIT_PANEL,
+> -                                       buf, size);
+> +                                       buf, size + AVRCP_HEADER_LENGTH);
+>        if (err < 0)
+>                return err;
+>
+> --
+> 1.7.6.4
 
-> I'm doing an audit of places where min_t() casting truncates a
-> variable such as:
-> 	len = min_t(unsigned int, ll->rx_count, count);
-> Here ll->rx_count is unsigned long, but we cast it to unsigned int
-> and lose the significant bits.
-> 
-> Looking at the code ->rx_count is never more than 256 so we could
-> just make it an int.
+Ack.
 
-Where is this 256 maximum? I'm not seeing it?
-
-	Gustavo
+-- 
+Luiz Augusto von Dentz
