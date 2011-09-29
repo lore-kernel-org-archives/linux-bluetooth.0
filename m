@@ -1,30 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 Sep 2011 15:27:03 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_le_adv_report_evt code refactoring
-Message-ID: <20110929182703.GA2605@joana>
-References: <1317080915-3901-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317080915-3901-1-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1317316050-12855-2-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi> <1317316050-12855-2-git-send-email-lucas.demarchi@profusion.mobi>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Thu, 29 Sep 2011 15:01:05 -0300
+Message-ID: <CAMOw1v5C5w0yORoiwRoDrDop=6bncHU0CNSp95q3M5mr3zjbmA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] AVRCP: fix changed notification
+To: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Luiz,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-09-26 20:48:35 -0300]:
-
-> There is no reason to treat the first advertising entry differently
-> from the potential other ones. Besides, the current implementation
-> can easily leads to typos.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+On Thu, Sep 29, 2011 at 2:07 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> We sure want to send notifications only when section is not NULL.
+> Otherwise we either crash or do not send the expected notification.
 > ---
->  net/bluetooth/hci_event.c |   14 ++++++--------
->  1 files changed, 6 insertions(+), 8 deletions(-)
+>  audio/avrcp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index ac9a107..e5b51db 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -549,7 +549,7 @@ static int avrcp_send_event(struct media_player *mp, uint8_t id, void *data)
+>        uint16_t size;
+>        int err;
+>
+> -       if (mp->session)
+> +       if (mp->session == NULL)
+>                return -ENOTCONN;
 
-Applied, thanks.
+This fixes the issue with recent code move, but thinking about it see
+the following scenario:
 
-	Gustavo
+1) CT connects to TG and registers itself for events
+2) CT disconnects
+3) CT connects again, but does not register for receiving track-change
+notification
+4) Track changes and we send the track-change notification
+
+
+It seems like (4) is wrong and what we really need to do is to
+unregister the events when we are disconnected. What do you think?
+
+
+
+Lucas De Marchi
