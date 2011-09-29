@@ -1,60 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 3/9] Unregister Health Thermometer Interface
-Date: Thu, 29 Sep 2011 15:46:22 +0200
-Message-Id: <1317303988-26310-4-git-send-email-sancane@gmail.com>
-In-Reply-To: <1317303988-26310-3-git-send-email-sancane@gmail.com>
-References: <1317303988-26310-1-git-send-email-sancane@gmail.com>
- <1317303988-26310-2-git-send-email-sancane@gmail.com>
- <1317303988-26310-3-git-send-email-sancane@gmail.com>
+Subject: Health Thermometer Profile patches
+Date: Thu, 29 Sep 2011 15:46:19 +0200
+Message-Id: <1317303988-26310-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- thermometer/thermometer.c |   23 ++++++++++++++++++++++-
- 1 files changed, 22 insertions(+), 1 deletions(-)
+This is a new set of patches for health thermometer profile.
+They include all fixes suggested previously.	
 
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index a89d8a9..cdfe455 100644
---- a/thermometer/thermometer.c
-+++ b/thermometer/thermometer.c
-@@ -51,6 +51,17 @@ static void destroy_thermometer(gpointer user_data)
-         g_free(t);
- }
- 
-+static gint cmp_device(gconstpointer a, gconstpointer b)
-+{
-+	const struct thermometer *t = a;
-+	const struct btd_device *dev = b;
-+
-+	if (dev == t->dev)
-+		return 0;
-+
-+	return -1;
-+}
-+
- static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -143,5 +154,15 @@ int thermometer_register(DBusConnection *connection, struct btd_device *device,
- 
- void thermometer_unregister(struct btd_device *device)
- {
--	/* TODO: Unregister Health Thermometer Interface */
-+	struct thermometer *t;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(thermometers, device, cmp_device);
-+	if (!l)
-+		return;
-+
-+	t = l->data;
-+	thermometers = g_slist_remove(thermometers, t);
-+	g_dbus_unregister_interface(t->conn, device_get_path(t->dev),
-+							THERMOMETER_INTERFACE);
- }
--- 
-1.7.6.1
-
+[PATCH 1/9] Get thermometer service range to load the driver.
+[PATCH 2/9] Register Health Thermometer Interface
+[PATCH 3/9] Unregister Health Thermometer Interface
+[PATCH 4/9] Add functions to manage attio callbacks
+[PATCH 5/9] Add handler function to manage GATT indications
+[PATCH 6/9] Get all characteristics in thermometer service
+[PATCH 7/9] Read temperature type characteristic
+[PATCH 8/9] Read measurement interval characteristic
+[PATCH 9/9] Set Intermediate property if intermediate temp.
