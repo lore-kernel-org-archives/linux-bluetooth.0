@@ -1,124 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <97EE5E556FD3483EAA57E6174F6254C0@freqoneremote>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "Lucas De Marchi" <lucas.demarchi@profusion.mobi>,
-	"Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-References: <1316543496-18575-1-git-send-email-lucas.demarchi@profusion.mobi> <1316543496-18575-4-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZLjLTBtd9AeRzkzzRBjxeiq+20hC_bf-KM+_1C6sNXocw@mail.gmail.com> <CAMOw1v47ns-m8b66Sb07HOvt354XVb32bHCVpjqo7+wr_k1i-w@mail.gmail.com> <CABBYNZKH53pxSahoQL4AJf14F8fMChMC93+2gq5CA_wQCC4Xfg@mail.gmail.com> <CAMOw1v4FkTcY8+Q=4rube5GR8baLKB1GvMYnch7oEUw=FiXBbA@mail.gmail.com>
-In-Reply-To: <CAMOw1v4FkTcY8+Q=4rube5GR8baLKB1GvMYnch7oEUw=FiXBbA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
-Date: Fri, 30 Sep 2011 19:36:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="iso-8859-1";
-	reply-type=original
+In-Reply-To: <1317249357-1362-2-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1317249357-1362-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1317249357-1362-2-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 30 Sep 2011 17:55:45 +0300
+Message-ID: <CABBYNZLz13Ev27PgdJo3uqfM0PSGtNLWDiZE_zXgPUA4oKUCYA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] AVRCP: fix case when only one setting is provided
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys...
+Hi Lucas,
 
------Original Message----- 
-From: Lucas De Marchi
-Sent: Tuesday, September 27, 2011 5:15 AM
-To: Luiz Augusto von Dentz
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] avrcp: handle volume up/down passthroughs as TG
-
-Hi Luiz,
-
-On Fri, Sep 23, 2011 at 4:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lucas,
+On Thu, Sep 29, 2011 at 1:35 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> If CT tries to change an Application Setting providing only one
+> setting, the size of the PDU will be 3 bytes. Therefore we should check
+> if the PDU is shorter than or equal 3, not only shorter.
+> ---
+>  audio/avrcp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> On Thu, Sep 22, 2011 at 9:02 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> Hi Luiz,
->>
->> On Wed, Sep 21, 2011 at 7:33 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Lucas,
->>>
->>> On Tue, Sep 20, 2011 at 9:31 PM, Lucas De Marchi
->>> <lucas.demarchi@profusion.mobi> wrote:
->>>> ---
->>>>  audio/avctp.c |    2 ++
->>>>  1 files changed, 2 insertions(+), 0 deletions(-)
->>>>
->>>> diff --git a/audio/avctp.c b/audio/avctp.c
->>>> index e9b8e40..59fbed9 100644
->>>> --- a/audio/avctp.c
->>>> +++ b/audio/avctp.c
->>>> @@ -155,6 +155,8 @@ static struct {
->>>>        { "BACKWARD",           BACKWARD_OP, 
->>>>            KEY_PREVIOUSSONG },
->>>>        { "REWIND",             REWIND_OP,              KEY_REWIND },
->>>>        { "FAST FORWARD",       FAST_FORWARD_OP, 
->>>>        KEY_FASTFORWARD },
->>>> +       { "VOLUME UP",          VOL_UP_OP,              KEY_VOLUMEUP },
->>>> +       { "VOLUME DOWN",        VOL_DOWN_OP, 
->>>>            KEY_VOLUMEDOWN },
->>>>        { NULL }
->>>>  };
->>>
->>> Have a look at the SIMULTANEOUS USE OF HFP, A2DP, AND AVRCP PROFILES
->>> white paper:
->>>
->>> Recommendation 16:
->>> If volume is changed on the RD, the RD should not send an AVRCP volume
->>> command to the MP device.
->>> Motivation 16:
->>> Sending an AVRCP volume command to the MP may cause the MP to send
->>> again an AVRCP volume
->>> command to the RD device which could lead to an endless loop of AVRCP
->>> volume commands.
->>
->> So this recommendation says that if we are the rendering device (and 
->> therefore
->> the CT) and the volume was changed on the rendering device, we should not 
->> send
->> the AVRCP volume command. In BlueZ parlance means we are on CT role and
->> org.bluez.Control.{VolumeUp(), VolumeDown()} should not be called, right?
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index e7b0d1b..ac9a107 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -1021,7 +1021,7 @@ static uint8_t avrcp_handle_set_player_value(struct media_player *mp,
+>        uint16_t len = ntohs(pdu->params_len);
+>        unsigned int i;
 >
-> I don't think MP and RD refer to CT or TG AVRCP roles, so a
-> phone/tablet/pc would be consider a MP (source/encoder) and
-> headsets/carkits/speakers RD (sink/decoder) and yes we should probably
-> deprecate VolumeUp and VolumeDown because they cannot be synchronized
-> properly and use absolute volume control if supported by the remote
-> device, Im also planning to move volume control per transport so the
-> endpoints can do the volume control since they are the ones
-> generating/consuming the data.
+> -       if (len < 3)
+> +       if (len <= 3)
+>                goto err;
+>
+>        len = 0;
+> --
+> 1.7.6.4
+>
+> --
 
-What I was not convinced of is that if we have two devices running
-BlueZ (one as CT and the other as TG), CT would send the volume
-up/down commands and TG would always ignore.
+Ack.
 
-It just doesn't seem right CT not being able to talk to TG when both
-use BlueZ. However if you are going to deprecate the calls for CT in
-favor of something better, go for it.
 
-+++++
-I was out of town on business, and too busy to check this list.  Notice that 
-even my apology is in-posted...so no flames this time, please ;-)
-
-I think it is a bad idea to just deprecate this function.
-
-Not every system uses Bluetooth speakers, and in any event, the CT talks to 
-the TG and not directly to the speakers.  So, the TG should accept the CT 
-command and do whatever it needs to to change the volume as the CT 
-commanded.
-
-If the TG is playing through BT speakers, it could pass the command through 
-(maybe as CT to TG/RD).  However, that would be an application function, a 
-layer above what we should be doing in BlueZ, IMO.  It would be a mistake to 
-get too clever and over-encapsulate everything into BlueZ, locking down its 
-uses to a severely limited set of use-cases.
-+++++
-
-Lucas De Marchi
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" 
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html 
-
+-- 
+Luiz Augusto von Dentz
