@@ -1,32 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] Fix regression when disconnecting AVRCP
-Date: Mon,  3 Oct 2011 17:57:50 +0300
-Message-Id: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 3 Oct 2011 16:15:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] AVRCP: fix missing bytes on notification
+Message-ID: <20111003131538.GA21055@fusion.localdomain>
+References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1317316050-12855-3-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1317316050-12855-3-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lucas,
 
-This prevent to disconnect AVRCP when doing e.g. Audio.Disconnect
----
- audio/avctp.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Thu, Sep 29, 2011, Lucas De Marchi wrote:
+> ---
+>  audio/avrcp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avctp.c b/audio/avctp.c
-index e9b8e40..b8cb36e 100644
---- a/audio/avctp.c
-+++ b/audio/avctp.c
-@@ -1021,7 +1021,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
- 
- void avctp_disconnect(struct avctp *session)
- {
--	if (session->io)
-+	if (!session->io)
- 		return;
- 
- 	avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
--- 
-1.7.6.2
+This patch has also been applied. Thanks.
 
+Johan
