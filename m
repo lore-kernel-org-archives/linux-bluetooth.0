@@ -1,26 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Inquiry Failed with status 0x0c
-From: Alberto =?ISO-8859-1?Q?Jos=E9_Rodr=EDguez_?=
-	 =?ISO-8859-1?Q?Rodr=EDguez?= <ajrodriguez@blulabs.es>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <CAMxgYMOfCRi6JiSQogVFVA52Ax9+hnSn3O4k3-2Xw9BerEji2g@mail.gmail.com>
-References: <1316780153.3433.6.camel@localhost>
-	 <1317375540.1582.8.camel@localhost>
-	 <CAMxgYMOfCRi6JiSQogVFVA52Ax9+hnSn3O4k3-2Xw9BerEji2g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 03 Oct 2011 12:37:24 +0200
-Message-ID: <1317638244.1583.9.camel@localhost>
-Mime-Version: 1.0
+Date: Mon, 3 Oct 2011 11:56:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] AVRCP: fix changed notification
+Message-ID: <20111003085646.GF8956@fusion.localdomain>
+References: <1317316050-12855-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1317316050-12855-2-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1317316050-12855-2-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-0x0c means that the command is disallowed with the current adapter's
-status. I think that I executing two incompatible commands concurrently,
-but my main problem is that the inquiry session remains opened although
-the adapter never initiate the discovering proccess.
+Hi Lucas,
 
-El lun, 03-10-2011 a las 15:55 +0530, Vaishali D escribió:
-> Look carefully on this , I think the status 0x0c doesnt mean failure ,
-> It means success.
-> Regards
+On Thu, Sep 29, 2011, Lucas De Marchi wrote:
+> We sure want to send notifications only when section is not NULL.
+> Otherwise we either crash or do not send the expected notification.
+> ---
+>  audio/avrcp.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
+Thanks. This patch has been applied.
+
+Johan
