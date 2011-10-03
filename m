@@ -1,47 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
-References: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 3 Oct 2011 16:24:04 -0300
-Message-ID: <CAMOw1v53jigz-ASB=XRDa756gR04+-CKu2umPHBanRjRC2BmsA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] Fix regression when disconnecting AVRCP
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 3 Oct 2011 19:43:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ 2/2] Fix possible crash when player is destroyed
+Message-ID: <20111003164354.GB3369@fusion.localdomain>
+References: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
+ <1317653871-14689-2-git-send-email-luiz.dentz@gmail.com>
+ <CABBYNZ+hOfQu95QHv9khAj4gO6T584m=WWuiLbG3j6frS8vyJw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CABBYNZ+hOfQu95QHv9khAj4gO6T584m=WWuiLbG3j6frS8vyJw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Mon, Oct 3, 2011 at 11:57 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This prevent to disconnect AVRCP when doing e.g. Audio.Disconnect
-> ---
-> =A0audio/avctp.c | =A0 =A02 +-
-> =A01 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/avctp.c b/audio/avctp.c
-> index e9b8e40..b8cb36e 100644
-> --- a/audio/avctp.c
-> +++ b/audio/avctp.c
-> @@ -1021,7 +1021,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, co=
-nst bdaddr_t *dst)
->
-> =A0void avctp_disconnect(struct avctp *session)
-> =A0{
-> - =A0 =A0 =A0 if (session->io)
-> + =A0 =A0 =A0 if (!session->io)
+On Mon, Oct 03, 2011, Luiz Augusto von Dentz wrote:
+> On Mon, Oct 3, 2011 at 5:57 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > When player is unregistered/destroyed its pdu handler should also be
+> > removed.
+> > ---
+> >  audio/avrcp.c |    3 +++
+> >  1 files changed, 3 insertions(+), 0 deletions(-)
+> >
+> > diff --git a/audio/avrcp.c b/audio/avrcp.c
+> > index 5aa8dc5..9a73ff4 100644
+> > --- a/audio/avrcp.c
+> > +++ b/audio/avrcp.c
+> > @@ -1101,6 +1101,9 @@ static void player_destroy(gpointer data)
+> >        if (player->destroy)
+> >                player->destroy(player->user_data);
+> >
+> > +       if (player->handler)
+> > +               avctp_unregister_pdu_handler(player->handler);
+> > +
+> >        g_free(player);
+> >  }
+> >
+> > --
+> > 1.7.6.2
+> 
+> Please skip this since player_destroy is not even upstream yet.
 
-At least in oFono we have a coding style rule to always compare
-pointers to NULL. I even have an old patch in bluez/gdbus for this:
-6e66423fe87441e3e61e5a325fde1515efa63ac5
+Ok. The first patch has anyway been pushed upstream.
 
-Luiz, Johan, Marcel: wouldn't it be better if BlueZ used this rule,
-too? (and put the rules somewhere like oFono does?)
-
-
-
-Lucas De Marchi
+Johan
