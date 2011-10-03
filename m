@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] Fix possible crash when player is destroyed
-Date: Mon,  3 Oct 2011 17:57:51 +0300
-Message-Id: <1317653871-14689-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
-References: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] Fix regression when disconnecting AVRCP
+Date: Mon,  3 Oct 2011 17:57:50 +0300
+Message-Id: <1317653871-14689-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When player is unregistered/destroyed its pdu handler should also be
-removed.
+This prevent to disconnect AVRCP when doing e.g. Audio.Disconnect
 ---
- audio/avrcp.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ audio/avctp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 5aa8dc5..9a73ff4 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -1101,6 +1101,9 @@ static void player_destroy(gpointer data)
- 	if (player->destroy)
- 		player->destroy(player->user_data);
+diff --git a/audio/avctp.c b/audio/avctp.c
+index e9b8e40..b8cb36e 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -1021,7 +1021,7 @@ struct avctp *avctp_connect(const bdaddr_t *src, const bdaddr_t *dst)
  
-+	if (player->handler)
-+		avctp_unregister_pdu_handler(player->handler);
-+
- 	g_free(player);
- }
+ void avctp_disconnect(struct avctp *session)
+ {
+-	if (session->io)
++	if (!session->io)
+ 		return;
  
+ 	avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
 -- 
 1.7.6.2
 
