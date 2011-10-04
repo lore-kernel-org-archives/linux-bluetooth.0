@@ -1,47 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Fix EIR parsing in evt_le_advertising_report_dump
-Date: Tue,  4 Oct 2011 19:55:07 -0300
-Message-Id: <1317768907-24106-1-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 4 Oct 2011 17:03:37 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: aji.kumar@accenture.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Remote connection not working on target - failing at RFCOMM level
+Message-ID: <20111004200337.GB9945@joana>
+References: <558B77349A98DB438591B5FD93003409119C0703@048-CH1MPN1-141.048d.mgd.msft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <558B77349A98DB438591B5FD93003409119C0703@048-CH1MPN1-141.048d.mgd.msft.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Only the first EIR data structure from the LE advertising report
-event is dumped. This patch fix this, so all EIR data structure
-present in that event is dumped.
----
- parser/hci.c |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+Hi Aji,
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 610177b..698a301 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -3534,6 +3534,7 @@ static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
- 	while (num_reports--) {
- 		char addr[18];
- 		le_advertising_info *info = frm->ptr;
-+		int offset = 0;
- 
- 		p_ba2str(&info->bdaddr, addr);
- 
-@@ -3544,9 +3545,12 @@ static inline void evt_le_advertising_report_dump(int level, struct frame *frm)
- 		printf("bdaddr %s (%s)\n", addr,
- 					bdaddrtype2str(info->bdaddr_type));
- 
--		if (info->length > 0) {
--			ext_inquiry_data_dump(level, frm,
--					((uint8_t *) &info->length) + 1);
-+		while (offset < info->length) {
-+			int eir_data_len = info->data[offset];
-+
-+			ext_inquiry_data_dump(level, frm, &info->data[offset]);
-+
-+			offset += eir_data_len + 1;
- 		}
- 
- 		frm->ptr += LE_ADVERTISING_INFO_SIZE + info->length;
--- 
-1.7.5.2
+* aji.kumar@accenture.com <aji.kumar@accenture.com> [2011-10-04 07:03:12 +0000]:
 
+> Hi All,
+> 
+> I am facing one peculiar issue with remote imitated connection from my phone to a target running Bluez.
+> 
+> Scenario:
+>         1. I Pair my phone with a target running Bluez(ARM based platform).
+
+Are you running upstream BlueZ and kernel? could you try those and see if the
+bug still happens.
+
+	Gustavo
