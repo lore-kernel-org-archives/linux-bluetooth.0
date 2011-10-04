@@ -2,48 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH Bluez 00/11] Re-connections triggered by platform event
-Date: Tue,  4 Oct 2011 15:30:10 -0300
-Message-Id: <1317753010-13784-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 4/4] Minor cleanup in attrib server channel disconnect
+Date: Tue,  4 Oct 2011 14:52:23 -0300
+Message-Id: <1317750743-22632-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1316438402-9982-4-git-send-email-claudio.takahasi@openbossa.org>
+References: <1316438402-9982-4-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Patch series rebased. No changes from previous version.
+---
+ src/attrib-server.c |   29 ++++++++++-------------------
+ 1 files changed, 10 insertions(+), 19 deletions(-)
 
-Proposal to enable re-connection(for ATT) started by platform/user
-actions. eg: Screen unlocked.
-
-Use case: When the user unlocks the screen, automatic re-connections for
-bonded devices will start. It will remain active for a short period of
-time(default 1 min).
-
-Anderson Briglia (2):
-  Add display lock watcher on maemo6 plugin
-  Enable re-connection if reason is Timeout
-
-Claudio Takahasi (9):
-  Remove timer to trigger connection attempts
-  Add set auto connect in device
-  Add continuous connection attempt
-  Add checking if profiles are requesting connection
-  Fix repeated connection attempt to the same remote
-  Disable automatic connections after 60 seconds
-  Set auto connect from maemo6 plugin
-  Add an interval between connection attempts
-  Add automatic connect timeout config option
-
- plugins/maemo6.c |   32 +++++++++++++++
- src/adapter.c    |   40 +++++++++++++++++++
- src/adapter.h    |    1 +
- src/device.c     |  113 ++++++++++++++++++++++++++++++++++++++++--------------
- src/device.h     |    1 +
- src/hcid.h       |    1 +
- src/main.c       |   12 ++++++
- src/main.conf    |    6 +++
- 8 files changed, 177 insertions(+), 29 deletions(-)
-
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 5a50ade..95efd9f 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -783,12 +783,8 @@ static void attrib_free(void *data)
+ 	g_free(a);
+ }
+ 
+-static void channel_disconnect(void *user_data)
++static void channel_free(struct gatt_channel *channel)
+ {
+-	struct gatt_channel *channel = user_data;
+-
+-	clients = g_slist_remove(clients, channel);
+-
+ 	g_slist_free(channel->notify);
+ 	g_slist_free(channel->indicate);
+ 	g_slist_free_full(channel->configs, attrib_free);
+@@ -797,6 +793,14 @@ static void channel_disconnect(void *user_data)
+ 	g_free(channel);
+ }
+ 
++static void channel_disconnect(void *user_data)
++{
++	struct gatt_channel *channel = user_data;
++
++	clients = g_slist_remove(clients, channel);
++	channel_free(channel);
++}
++
+ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+ 							gpointer user_data)
+ {
+@@ -1173,8 +1177,6 @@ failed:
+ 
+ void attrib_server_exit(void)
+ {
+-	GSList *l;
+-
+ 	g_slist_free_full(database, attrib_free);
+ 
+ 	if (l2cap_io) {
+@@ -1187,18 +1189,7 @@ void attrib_server_exit(void)
+ 		g_io_channel_shutdown(le_io, FALSE, NULL);
+ 	}
+ 
+-	for (l = clients; l; l = l->next) {
+-		struct gatt_channel *channel = l->data;
+-
+-		g_slist_free(channel->notify);
+-		g_slist_free(channel->indicate);
+-		g_slist_free_full(channel->configs, attrib_free);
+-
+-		g_attrib_unref(channel->attrib);
+-		g_free(channel);
+-	}
+-
+-	g_slist_free(clients);
++	g_slist_free_full(clients, (GDestroyNotify) channel_free);
+ 
+ 	if (gatt_sdp_handle)
+ 		remove_record_from_server(gatt_sdp_handle);
 -- 
 1.7.7
 
