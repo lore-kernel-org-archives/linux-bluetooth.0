@@ -2,58 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH Bluez 03/11] Add continuous connection attempt
-Date: Tue,  4 Oct 2011 15:30:57 -0300
-Message-Id: <1317753057-13902-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1317059308-20038-4-git-send-email-claudio.takahasi@openbossa.org>
-References: <1317059308-20038-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH Bluez 02/11] Add set auto connect in device
+Date: Tue,  4 Oct 2011 15:30:46 -0300
+Message-Id: <1317753046-13864-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1317059308-20038-3-git-send-email-claudio.takahasi@openbossa.org>
+References: <1317059308-20038-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If auto connect is enabled, queue another connection attempt until
-the adapter sets auto connect to FALSE. The behaviour depends on if the
-address is found in the advertising cache or not.
+Skeleton of automatic connections driven by platform/user event.
+Two layers will manage connections: Profiles can request on demand
+connections registering ATTIO connection callbacks(one attempt) for
+a given device and platform/user action can trigger automatic
+connections for devices with ATTIO callbacks registered.
 ---
- src/device.c |   12 +++++++++++-
- 1 files changed, 11 insertions(+), 1 deletions(-)
+ src/adapter.c |   17 +++++++++++++++++
+ src/adapter.h |    1 +
+ src/device.c  |   15 +++++++++++++++
+ src/device.h  |    1 +
+ 4 files changed, 34 insertions(+), 0 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index b3622cb..605a9f2 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3417,6 +3417,23 @@ int btd_adapter_switch_offline(struct btd_adapter *adapter)
+ 	return 0;
+ }
+ 
++static void set_auto_connect(gpointer data, gpointer user_data)
++{
++	struct btd_device *device = data;
++
++	device_set_auto_connect(device, TRUE);
++}
++
++void btd_adapter_enable_auto_connect(struct btd_adapter *adapter)
++{
++	if (!adapter->up)
++		return;
++
++	DBG("Enabling automatic connections");
++
++	g_slist_foreach(adapter->devices, set_auto_connect, NULL);
++}
++
+ void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+ 							btd_adapter_pin_cb_t cb)
+ {
+diff --git a/src/adapter.h b/src/adapter.h
+index 7ef0af0..d30e82a 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -163,6 +163,7 @@ gboolean adapter_powering_down(struct btd_adapter *adapter);
+ int btd_adapter_restore_powered(struct btd_adapter *adapter);
+ int btd_adapter_switch_online(struct btd_adapter *adapter);
+ int btd_adapter_switch_offline(struct btd_adapter *adapter);
++void btd_adapter_enable_auto_connect(struct btd_adapter *adapter);
+ 
+ typedef ssize_t (*btd_adapter_pin_cb_t) (struct btd_adapter *adapter,
+ 					struct btd_device *dev, char *out);
 diff --git a/src/device.c b/src/device.c
-index 5243797..c3eaf45 100644
+index 393d276..5243797 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -1760,6 +1760,8 @@ done:
- 	browse_request_free(req, shutdown);
+@@ -151,6 +151,7 @@ struct btd_device {
+ 	gboolean	paired;
+ 	gboolean	blocked;
+ 	gboolean	bonded;
++	gboolean	auto_connect;
+ 
+ 	gboolean	authorizing;
+ 	gint		ref;
+@@ -2005,6 +2006,20 @@ void device_set_bonded(struct btd_device *device, gboolean bonded)
+ 	device->bonded = bonded;
  }
  
-+static gboolean att_connect(gpointer user_data);
++void device_set_auto_connect(struct btd_device *device, gboolean enable)
++{
++	char addr[18];
 +
- static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-@@ -1777,7 +1779,8 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 
- 			device->browse = NULL;
- 			browse_request_free(req, TRUE);
--		}
-+		} else if (device->auto_connect)
-+			g_idle_add(att_connect, device);
- 
- 		return;
- 	}
-@@ -2018,6 +2021,13 @@ void device_set_auto_connect(struct btd_device *device, gboolean enable)
- 	DBG("%s auto connect: %d", addr, enable);
- 
- 	device->auto_connect = enable;
-+
-+	if (device->attrib) {
-+		DBG("Already connected");
++	if (!device)
 +		return;
-+	}
 +
-+	g_idle_add(att_connect, device);
- }
- 
++	ba2str(&device->bdaddr, addr);
++
++	DBG("%s auto connect: %d", addr, enable);
++
++	device->auto_connect = enable;
++}
++
  void device_set_type(struct btd_device *device, device_type_t type)
+ {
+ 	if (!device)
+diff --git a/src/device.h b/src/device.h
+index 2e17a83..1ea5ce4 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -77,6 +77,7 @@ void device_set_paired(struct btd_device *device, gboolean paired);
+ void device_set_temporary(struct btd_device *device, gboolean temporary);
+ void device_set_type(struct btd_device *device, device_type_t type);
+ void device_set_bonded(struct btd_device *device, gboolean bonded);
++void device_set_auto_connect(struct btd_device *device, gboolean enable);
+ gboolean device_is_connected(struct btd_device *device);
+ DBusMessage *device_create_bonding(struct btd_device *device,
+ 				DBusConnection *conn, DBusMessage *msg,
 -- 
 1.7.7
 
