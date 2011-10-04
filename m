@@ -1,55 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH] AVRCP: fix loop over number of application settings
-Date: Mon,  3 Oct 2011 23:56:00 -0300
-Message-Id: <1317696960-1937-1-git-send-email-lucas.demarchi@profusion.mobi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 3 Oct 2011 23:28:21 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2011-10-03
+Message-ID: <20111004022821.GA7951@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
+Hi John,
 
-Hi, Luiz,
+Last pull request for 3.2, just a few patches here. The most important ones are
+from Mat Martineau that adds support to handle fragmented skbs in
+bt_sock_stream_recvmsg(). The rest are just fixes and clean ups.
 
-I applied this patch on top of yours. If you are able to test the "set_player_value"
-at UPF, please apply this patch first.
+Please pull! Or let me know any problem, thanks.
+
+	Gustavo
 
 
-Regards,
+The following changes since commit 76ed94be65c8bd80b565865c186dd9f24bb2f23b:
 
- audio/avrcp.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+  ath9k_hw: set pci_express capability true for AR9480 (2011-10-03 15:22:42 -0400)
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index cfdb313..6969fac 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -719,6 +719,7 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
- 	if (len <= 3)
- 		goto err;
- 
-+	DBG("len %u", len);
- 	len = 0;
- 
- 	/*
-@@ -728,13 +729,14 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
- 	 * attribute is valid, we respond with no parameters. Otherwise an
- 	 * E_INVALID_PARAM is sent.
- 	 */
--	for (i = 1; i < pdu->params[0]; i += 2) {
-+	for (i = 1; i < (2 * pdu->params[0] + 1U); i += 2) {
- 		uint8_t attr = pdu->params[i];
- 		uint8_t val = pdu->params[i + 1];
- 
- 		if (player_set_attribute(player, attr, val) < 0)
- 			continue;
- 
-+		DBG("set attr %u val %u", attr, val);
- 		len++;
- 	}
- 
--- 
-1.7.6.4
+are available in the git repository at:
+  git://github.com/padovan/bluetooth-next.git master
 
+Anderson Lizardo (1):
+      Bluetooth: use recommended LE connection parameters
+
+Andre Guedes (1):
+      Bluetooth: hci_le_adv_report_evt code refactoring
+
+Mat Martineau (3):
+      Bluetooth: Linearize skbs for use in BNEP, CMTP, HIDP, and RFCOMM
+      Bluetooth: Handle fragmented skbs in bt_sock_stream_recvmsg()
+      Bluetooth: Perform L2CAP SDU reassembly without copying data
+
+Oliver Neukum (1):
+      btusb: add device entry for Broadcom SoftSailing
+
+Peter Hurley (1):
+      Bluetooth: Allow ACL packets over USB in HCI_RAW mode
+
+Szymon Janc (1):
+      Bluetooth: Mark not declared l2cap_core functions as static
+
+Waldemar Rymarkiewicz (1):
+      Bluetooth: Fix possible NULL pointer dereference
+
+ drivers/bluetooth/btusb.c     |    6 +-
+ include/net/bluetooth/l2cap.h |    3 +-
+ net/bluetooth/af_bluetooth.c  |   30 +++++-
+ net/bluetooth/bnep/core.c     |    5 +-
+ net/bluetooth/cmtp/core.c     |    5 +-
+ net/bluetooth/hci_conn.c      |   14 +-
+ net/bluetooth/hci_event.c     |   20 ++--
+ net/bluetooth/hidp/core.c     |   10 ++-
+ net/bluetooth/l2cap_core.c    |  255 ++++++++++++++---------------------------
+ net/bluetooth/rfcomm/core.c   |    5 +-
+ 10 files changed, 157 insertions(+), 196 deletions(-)
