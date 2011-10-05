@@ -2,31 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 2/4] Fix missing format in call to g_error_new
-Date: Wed,  5 Oct 2011 16:32:38 +0200
-Message-Id: <1317825160-21429-2-git-send-email-lkslawek@gmail.com>
-In-Reply-To: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
-References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH obexd 1/4] Reverse order of calls in os_reset_session
+Date: Wed,  5 Oct 2011 16:32:37 +0200
+Message-Id: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This replaces:
+service->get/put, mime->open, ..., service->reset, mime->close
+logic, with a more appropriate:
+service->get/put, mime->open, ..., mime->close, service->reset
 ---
- client/transfer.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ src/obex.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/client/transfer.c b/client/transfer.c
-index 85139ac..b6994d1 100644
---- a/client/transfer.c
-+++ b/client/transfer.c
-@@ -143,7 +143,7 @@ static void obc_transfer_abort(struct obc_transfer *transfer)
- 	if (callback) {
- 		GError *err;
+diff --git a/src/obex.c b/src/obex.c
+index d8f4648..938937c 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -284,8 +284,6 @@ static void os_session_mark_aborted(struct obex_session *os)
+ static void os_reset_session(struct obex_session *os)
+ {
+ 	os_session_mark_aborted(os);
+-	if (os->service && os->service->reset)
+-		os->service->reset(os, os->service_data);
  
--		err = g_error_new(OBEX_IO_ERROR, -ECANCELED,
-+		err = g_error_new(OBEX_IO_ERROR, -ECANCELED, "%s",
- 							strerror(ECANCELED));
- 		callback->func(transfer, transfer->transferred, err,
- 							callback->data);
+ 	if (os->object) {
+ 		os->driver->set_io_watch(os->object, NULL, NULL);
+@@ -297,6 +295,9 @@ static void os_reset_session(struct obex_session *os)
+ 			os->driver->remove(os->path);
+ 	}
+ 
++	if (os->service && os->service->reset)
++		os->service->reset(os, os->service_data);
++
+ 	if (os->name) {
+ 		g_free(os->name);
+ 		os->name = NULL;
 -- 
 1.7.4.1
 
