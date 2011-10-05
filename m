@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Oct 2011 13:32:42 +0300
+Date: Wed, 5 Oct 2011 11:19:25 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Gomes <vinicius.gomes@openbossa.org>,
-	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: Re: [PATCH BlueZ] Fix memory corruption when decoding Read Response
- PDU
-Message-ID: <20111005103242.GA29660@fusion.localdomain>
-References: <1317236492-13064-1-git-send-email-anderson.lizardo@openbossa.org>
- <20111003085145.GC8956@fusion.localdomain>
- <CAJdJm_NHQJgKQ8Oec0F_zHfWtxfNia1jhddmocVwTO_dWKx1pg@mail.gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 3/4] Add attrib server channel detach
+Message-ID: <20111005081925.GB11882@fusion.localdomain>
+References: <CAKT1EBeusTPfkxJ59otvV29dpBUHqYt1U5afUEPYr50vEk+xkw@mail.gmail.com>
+ <1317750628-22563-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_NHQJgKQ8Oec0F_zHfWtxfNia1jhddmocVwTO_dWKx1pg@mail.gmail.com>
+In-Reply-To: <1317750628-22563-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Claudio,
 
-On Tue, Oct 04, 2011, Anderson Lizardo wrote:
-> > Have you considered changing the API so that the caller could tell the
-> > function the size of the supplied buffer?
-> 
-> Yes. I even mentioned on the last paragraph :)
+On Tue, Oct 04, 2011, Claudio Takahasi wrote:
+> BlueZ will act as GAP central role, so for outgoing connections the
+> central is responsible for disconnecting the link. This patch adds
+> a function allowing the central to detach from the local attribute
+> server(removing the last GAttrib reference).
+> ---
+>  src/attrib-server.c |   34 +++++++++++++++++++++++++++++++---
+>  src/attrib-server.h |    3 ++-
+>  src/device.c        |   11 ++++++++++-
+>  3 files changed, 43 insertions(+), 5 deletions(-)
 
-Yep, I missed it. Sorry.
-
-> I was afraid it was too late to change this, but if you thing it is
-> not an issue for external/third party code to break now, we can change
-> this now.
-
-This is not a public API so there's no problem there. (even if it was
-public we'd have marked it as experimental for now)
+These two patches have also been applied. Thanks.
 
 Johan
