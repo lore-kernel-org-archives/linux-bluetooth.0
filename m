@@ -1,52 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Oct 2011 18:05:33 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/11] Re-connections triggered by platform event
-Message-ID: <20111005150533.GA4111@fusion.localdomain>
-References: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1317696960-1937-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1317696960-1937-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Wed, 5 Oct 2011 18:30:04 +0300
+Message-ID: <CABBYNZL4BHPPFUBc6rcnZT9UoO13zg2-9d-V=09BNavaKuQuog@mail.gmail.com>
+Subject: Re: [PATCH] AVRCP: fix loop over number of application settings
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Lucas,
 
-On Mon, Sep 26, 2011, Claudio Takahasi wrote:
-> Proposal to enable re-connection(for ATT) started by platform/user
-> actions. eg: Screen unlocked.
-> 
-> Use case: When the user unlocks the screen, automatic re-connections for
-> bonded devices will start. It will remain active for a short period of
-> time(default 1 min).
-> 
-> Anderson Briglia (2):
->   Add display lock watcher on maemo6 plugin
->   Enable re-connection if reason is Timeout
-> 
-> Claudio Takahasi (9):
->   Remove timer to trigger connection attempts
->   Add set auto connect in device
->   Add continuous connection attempt
->   Add checking if profiles are requesting connection
->   Fix repeated connection attempt to the same remote
->   Disable automatic connections after 60 seconds
->   Set auto connect from maemo6 plugin
->   Add an interval between connection attempts
->   Add automatic connect timeout config option
-> 
->  plugins/maemo6.c |   32 +++++++++++++++
->  src/adapter.c    |   40 +++++++++++++++++++
->  src/adapter.h    |    1 +
->  src/device.c     |  113 ++++++++++++++++++++++++++++++++++++++++--------------
->  src/device.h     |    1 +
->  src/hcid.h       |    1 +
->  src/main.c       |   12 ++++++
->  src/main.conf    |    6 +++
->  8 files changed, 177 insertions(+), 29 deletions(-)
+On Tue, Oct 4, 2011 at 5:56 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> ---
+>
+> Hi, Luiz,
+>
+> I applied this patch on top of yours. If you are able to test the "set_player_value"
+> at UPF, please apply this patch first.
+>
+>
+> Regards,
+>
+>  audio/avrcp.c |    4 +++-
+>  1 files changed, 3 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index cfdb313..6969fac 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -719,6 +719,7 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
+>        if (len <= 3)
+>                goto err;
+>
+> +       DBG("len %u", len);
+>        len = 0;
+>
+>        /*
+> @@ -728,13 +729,14 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
+>         * attribute is valid, we respond with no parameters. Otherwise an
+>         * E_INVALID_PARAM is sent.
+>         */
+> -       for (i = 1; i < pdu->params[0]; i += 2) {
+> +       for (i = 1; i < (2 * pdu->params[0] + 1U); i += 2) {
+>                uint8_t attr = pdu->params[i];
+>                uint8_t val = pdu->params[i + 1];
+>
+>                if (player_set_attribute(player, attr, val) < 0)
+>                        continue;
+>
+> +               DBG("set attr %u val %u", attr, val);
+>                len++;
+>        }
 
-All patches have been applied. Thanks.
+Maybe we can have an auxiliary pointer to the current params, e.g.
+uint8_t *param = &pdu->params[1] and then we increment the actual
+pointer without messing around with i which is the number of
+attributes.
 
-Johan
+-- 
+Luiz Augusto von Dentz
