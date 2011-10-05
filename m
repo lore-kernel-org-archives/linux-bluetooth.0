@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] Add simple-player test script
-Date: Wed,  5 Oct 2011 23:02:16 +0300
-Message-Id: <1317844938-21950-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] Remove MediaPlayer interface from control-api.txt
+Date: Wed,  5 Oct 2011 23:02:17 +0300
+Message-Id: <1317844938-21950-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1317844938-21950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1317844938-21950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,72 +12,64 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- test/simple-player |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 56 insertions(+), 0 deletions(-)
- create mode 100755 test/simple-player
+ doc/control-api.txt |   47 -----------------------------------------------
+ 1 files changed, 0 insertions(+), 47 deletions(-)
 
-diff --git a/test/simple-player b/test/simple-player
-new file mode 100755
-index 0000000..f483897
---- /dev/null
-+++ b/test/simple-player
-@@ -0,0 +1,56 @@
-+#!/usr/bin/python
-+
-+import sys
-+import dbus
-+import dbus.service
-+import dbus.mainloop.glib
-+import gobject
-+
-+class Player(dbus.service.Object):
-+	@dbus.service.method("org.bluez.MediaPlayer",
-+					in_signature="sv", out_signature="")
-+	def SetProperty(self, key, value):
-+		print "SetProperty (%s, %s)" % (key, value)
-+		return
-+
-+if __name__ == '__main__':
-+	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+	bus = dbus.SystemBus()
-+	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-+						"org.bluez.Manager")
-+
-+	if len(sys.argv) > 1:
-+		path = manager.FindAdapter(sys.argv[1])
-+	else:
-+		path = manager.DefaultAdapter()
-+
-+	media = dbus.Interface(bus.get_object("org.bluez", path),
-+						"org.bluez.Media")
-+
-+	path = "/test/player"
-+	player = Player(bus, path)
-+	mainloop = gobject.MainLoop()
-+
-+	properties = dbus.Dictionary({ "Equalizer" : "off",
-+					"Repeat" : "off",
-+					"Shuffle" : "off",
-+					"Scan" : "off",
-+					"Status" : "playing",
-+					"Position" : dbus.UInt32(0) })
-+
-+	print properties
-+
-+	metadata = dbus.Dictionary({ "Title" : "Title",
-+					"Artist" : "Artist",
-+					"Album" : "Album",
-+					"Genre" : "Genre",
-+					"NumberOfTracks" : dbus.UInt32(10),
-+					"Number" : dbus.UInt32(1),
-+					"Duration" : dbus.UInt32(10000) })
-+
-+	print metadata
-+
-+	media.RegisterPlayer(path, properties, metadata)
-+
-+	mainloop.run()
+diff --git a/doc/control-api.txt b/doc/control-api.txt
+index a7e5cbb..e3a13e9 100644
+--- a/doc/control-api.txt
++++ b/doc/control-api.txt
+@@ -93,50 +93,3 @@ Properties	uint8 SubUnitID [readonly]
+ 		array{string} Capabilities [readonly]
+ 
+ 			List of Capabilities provided by the connected device.
+-
+-
+-MediaPlayer hierarchy  [experimental]
+-=====================
+-
+-Service		org.bluez
+-Interface	org.bluez.MediaPlayer
+-Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+-
+-Methods		void ChangePlayback(string status, uint32 elapsed)
+-
+-			The status can be "playing", "stopped", "paused",
+-			"forward-seek", "reverse-seek" or "error". Elapsed is
+-			the position within the track in milliseconds.
+-
+-		void ChangeTrack(dict metadata)
+-
+-			Called to send the mandated TrackChange event and
+-			potential metadata information.
+-
+-			Current defined metadata information are represented
+-			with the following keys:
+-
+-				Title		string	(mandatory)
+-				Artist		string
+-				Album		string
+-				Genre		string
+-				NumberOfTracks	uint32
+-				TrackNumber	uint32
+-				TrackDuration	uint32	(in milliseconds)
+-
+-		void SetProperty(string property, variant value)
+-
+-			Called to set the media-player's properties
+-
+-			Current defined properties are represented with the
+-			following keys and values:
+-
+-				Equalizer	off, on
+-				Repeat		off, singletrack, alltracks, group
+-				Shuffle		off, alltracks, group
+-				Scan		off, alltracks, group
+-
+-Signals		PropertyChanged(string setting, variant value)
+-
+-			Called when one of the settings are changed by the
+-			remote device or to inform its battery status.
 -- 
 1.7.6.4
 
