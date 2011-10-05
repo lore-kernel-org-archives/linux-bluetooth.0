@@ -1,67 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1317696960-1937-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1317696960-1937-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Wed, 5 Oct 2011 18:30:04 +0300
-Message-ID: <CABBYNZL4BHPPFUBc6rcnZT9UoO13zg2-9d-V=09BNavaKuQuog@mail.gmail.com>
-Subject: Re: [PATCH] AVRCP: fix loop over number of application settings
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
+References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+	<1317825160-21429-4-git-send-email-lkslawek@gmail.com>
+	<CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
+	<CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
+Date: Wed, 5 Oct 2011 17:20:17 +0200
+Message-ID: <CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver flush()
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+On Wed, Oct 5, 2011 at 5:17 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>> By removing this it wont flush on EOS, so Im not sure why you removed
+>> it since OBEX_EV_REQ is only generated for the request not for the
+>> streams itself. Actually if OpenOBEX had an event for that represent
+>> the FINAL bit that would solve the problem with unknown size, but for
+>> gobex this is exposed directly in the callback so I wouldn't change
+>> that now.
+>>
+>>
+>> You got this wrong, the purpose of this code is to flush on end of
+>> stream not in the beginning/put request, so if we have consecutive
+>> puts the last packet should cause a flush so the driver can sync any
+>> buffered data before close which needs to be immediately.
+>
+> Again, OBEX_EV_REQ will be the very _last_ thing called. This code
+> flushes after all write()-s. After the final packet.
 
-On Tue, Oct 4, 2011 at 5:56 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> ---
->
-> Hi, Luiz,
->
-> I applied this patch on top of yours. If you are able to test the "set_player_value"
-> at UPF, please apply this patch first.
+To be specific: the order of events from openobex are OBEX_EV_REQHINT,
+OBEX_EV_REQCHECK, multiple OBEX_EV_STREAMAVAIL (as we are starting
+streaming in REQHINT), and then OBEX_EV_REQ.
 >
 >
-> Regards,
+> --
+> Slawomir Bochenski
 >
->  audio/avrcp.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index cfdb313..6969fac 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -719,6 +719,7 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
->        if (len <= 3)
->                goto err;
->
-> +       DBG("len %u", len);
->        len = 0;
->
->        /*
-> @@ -728,13 +729,14 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
->         * attribute is valid, we respond with no parameters. Otherwise an
->         * E_INVALID_PARAM is sent.
->         */
-> -       for (i = 1; i < pdu->params[0]; i += 2) {
-> +       for (i = 1; i < (2 * pdu->params[0] + 1U); i += 2) {
->                uint8_t attr = pdu->params[i];
->                uint8_t val = pdu->params[i + 1];
->
->                if (player_set_attribute(player, attr, val) < 0)
->                        continue;
->
-> +               DBG("set attr %u val %u", attr, val);
->                len++;
->        }
 
-Maybe we can have an auxiliary pointer to the current params, e.g.
-uint8_t *param = &pdu->params[1] and then we increment the actual
-pointer without messing around with i which is the number of
-attributes.
+
 
 -- 
-Luiz Augusto von Dentz
+Slawomir Bochenski
