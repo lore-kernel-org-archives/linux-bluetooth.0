@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Slawomir Bochenski <lkslawek@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Subject: [PATCH obexd 1/4] Reverse order of calls in os_reset_session
-Date: Wed,  5 Oct 2011 16:32:37 +0200
-Message-Id: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+Subject: [PATCH BlueZ] Fix crash when remote connects to AVRCP without having a record
+Date: Wed,  5 Oct 2011 17:24:50 +0300
+Message-Id: <1317824690-7710-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This replaces:
-service->get/put, mime->open, ..., service->reset, mime->close
-logic, with a more appropriate:
-service->get/put, mime->open, ..., mime->close, service->reset
----
- src/obex.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/obex.c b/src/obex.c
-index d8f4648..938937c 100644
---- a/src/obex.c
-+++ b/src/obex.c
-@@ -284,8 +284,6 @@ static void os_session_mark_aborted(struct obex_session *os)
- static void os_reset_session(struct obex_session *os)
- {
- 	os_session_mark_aborted(os);
--	if (os->service && os->service->reset)
--		os->service->reset(os, os->service_data);
- 
- 	if (os->object) {
- 		os->driver->set_io_watch(os->object, NULL, NULL);
-@@ -297,6 +295,9 @@ static void os_reset_session(struct obex_session *os)
- 			os->driver->remove(os->path);
+Device object may exist but control wont be initialized causing the
+following crash:
+
+Invalid read of size 8
+   at 0x12B510: state_changed (control.c:90)
+   by 0x12BA20: avctp_set_state (avctp.c:367)
+   by 0x12C0DC: avctp_confirm_cb (avctp.c:733)
+   by 0x166481: server_cb (btio.c:200)
+   by 0x4E75ADC: g_main_context_dispatch (in /lib64/libglib-2.0.so.0.3000.0)
+   by 0x4E762D7: ??? (in /lib64/libglib-2.0.so.0.3000.0)
+   by 0x4E76824: g_main_loop_run (in /lib64/libglib-2.0.so.0.3000.0)
+   by 0x11ED19: main (main.c:473)
+ Address 0x8 is not stack'd, malloc'd or (recently) free'd
+---
+ audio/avctp.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/audio/avctp.c b/audio/avctp.c
+index 89ef70c..df3b2b8 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -722,7 +722,12 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
+ 					address);
+ 			goto drop;
+ 		}
++	}
++
++	if (dev->control == NULL) {
+ 		btd_device_add_uuid(dev->btd_dev, AVRCP_REMOTE_UUID);
++		if (dev->control == NULL)
++			goto drop;
  	}
  
-+	if (os->service && os->service->reset)
-+		os->service->reset(os, os->service_data);
-+
- 	if (os->name) {
- 		g_free(os->name);
- 		os->name = NULL;
+ 	if (session->io) {
 -- 
-1.7.4.1
+1.7.6.4
 
