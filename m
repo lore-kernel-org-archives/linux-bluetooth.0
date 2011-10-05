@@ -1,135 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] Remove test-media-player
-Date: Wed,  5 Oct 2011 23:02:18 +0300
-Message-Id: <1317844938-21950-4-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1317844938-21950-1-git-send-email-luiz.dentz@gmail.com>
-References: <1317844938-21950-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+=pruSoDhsbf=g+ZsbxTgWkoci1PXfiDyc83ikTKQ5eg@mail.gmail.com>
+References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+	<1317825160-21429-4-git-send-email-lkslawek@gmail.com>
+	<CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
+	<CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
+	<CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
+	<CABBYNZJOosjm-Uok+p9+smd0ek=0Hc3LG43x1y3A9qQhWp5Egg@mail.gmail.com>
+	<CA+i+Aw3yNJpDbSywcHLZ9Y6CDY4SWx2FnvE-f0ZTbtj=4=cWQg@mail.gmail.com>
+	<CABBYNZ+=pruSoDhsbf=g+ZsbxTgWkoci1PXfiDyc83ikTKQ5eg@mail.gmail.com>
+Date: Wed, 5 Oct 2011 19:28:59 +0200
+Message-ID: <CA+i+Aw0yVhxVt8-H5KD0_Y4fpRaY7+wUP8=pUqD8j66j+LntsA@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver flush()
+From: Slawomir Bochenski <lkslawek@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Oct 5, 2011 at 6:43 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Wed, Oct 5, 2011 at 7:12 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
+>> On Wed, Oct 5, 2011 at 5:38 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> I don't think this is true, if it was then why would we call
+>>> service->put on the end of stream and I also never see this happening
+>>> in practice e.g. calling ftp_put in the end of stream.
+>>
+>> Actually, if you will add DBG call to filesystem_write() you will
+>> clearly see, that ftp_put is called at the end of stream.
+>
+> That is true only if the body is not bigger than the MTU, in other
+> words the body is not fragmented, otherwise it would be pointless to
+> check for name and folder only at the very end of the stream.
 
----
- test/test-media-player |  108 ------------------------------------------------
- 1 files changed, 0 insertions(+), 108 deletions(-)
- delete mode 100755 test/test-media-player
+False. You check the name and folder after OBEX_EV_REQCHECK, which was
+specificaly added to allow earlier checks.
 
-diff --git a/test/test-media-player b/test/test-media-player
-deleted file mode 100755
-index 712cf31..0000000
---- a/test/test-media-player
-+++ /dev/null
-@@ -1,108 +0,0 @@
--#!/usr/bin/python
--
--import sys
--import dbus
--from optparse import OptionParser, make_option
--
--USAGE = "Usage: %prog [options] <command> [args]"
--COMMANDS = """
--Commands:
--    changetrack <bdaddr> <key> <value> [<key> <value> ...]
--
--    changeplayback <bdaddr> status elapsed-time
--        status: one of playing, stopped, paused, forward-seek, reverse-seek
--                or error.
--        elapsed-time: in milliseconds
--
--    setproperty <bdaddr> property value
--        setting: one of Equalizer, Repeat, Shuffle or Scan
--        value: value correspondent to the setting specified
--"""
--
--class MyParser(OptionParser):
--    def format_epilog(self, formatter):
--        return self.epilog
--
--bus = dbus.SystemBus()
--
--manager = dbus.Interface(bus.get_object("org.bluez", "/"), "org.bluez.Manager")
--
--option_list = [
--		make_option("-i", "--device", action="store",
--				type="string", dest="dev_id"),
--		]
--parser = MyParser(option_list=option_list, usage=USAGE, epilog=COMMANDS)
--
--(options, args) = parser.parse_args()
--
--if len(args) < 2:
--    parser.print_help()
--    sys.exit(1)
--
--if options.dev_id:
--	adapter_path = manager.FindAdapter(options.dev_id)
--else:
--	adapter_path = manager.DefaultAdapter()
--
--adapter = dbus.Interface(bus.get_object("org.bluez", adapter_path),
--							"org.bluez.Adapter")
--
--device = adapter.FindDevice(args[1])
--control = dbus.Interface(bus.get_object("org.bluez", device),
--                                "org.bluez.Control")
--mp = dbus.Interface(bus.get_object("org.bluez", device),
--                                "org.bluez.MediaPlayer")
--
--def handle_change_track(mp, args):
--    if len(args) % 2 != 0:
--        print("Don't know how to handle odd number of parameters")
--        print(USAGE)
--        sys.exit(1)
--
--    d = dict()
--    for i in range(2, len(args), 2):
--        key = args[i]
--        if key == "Title" or key == "Artist" or key == "Album" \
--                                            or key == "Genre":
--            d[key] = dbus.String(args[i + 1].decode(sys.stdin.encoding))
--        elif key == "NumberOfTracks" or key == "TrackNumber"       \
--                                            or key == "TrackDuration":
--            d[key] = dbus.UInt32(int(args[i + 1]))
--        else:
--            print("Unknown metadata: %s" % key)
--            sys.exit(1)
--
--    d = dbus.Dictionary(d, signature='sv')
--    mp.ChangeTrack(d)
--
--def handle_change_playback(mp, args):
--    if len(args) != 4:
--        print(USAGE)
--        sys.exit(1)
--
--    status = dbus.String(args[2])
--    elapsed = dbus.UInt32(long(args[3]))
--
--    mp.ChangePlayback(status, elapsed)
--
--def handle_set_property(mp, args):
--    if len(args) != 4:
--        print(USAGE)
--        sys.exit(1)
--
--    prop = dbus.String(args[2])
--    value = dbus.String(args[3])
--
--    mp.SetProperty(prop, value)
--
--
--handlers = { 'changetrack': handle_change_track,
--             'changeplayback': handle_change_playback,
--             'setproperty': handle_set_property }
--
--if not args[0] in handlers:
--    print("Unknown command -- %s" % argv[1])
--    print(USAGE)
--    sys.exit(1)
--
--handlers[args[0]](mp, args)
+> I also
+> don't like the fact that OBEX_EV_REQ is generated in the end of the
+> first package, it is really confusing that a request event comes after
+> its data, but maybe there is a reason for that or the intention was
+> not that so we are not handling the event the way it was meant?
+
+OBEX_EV_REQ is delivered when the remote party finished sending
+request, not after first OBEX packet. This is the way it is intented
+in OpenOBEX.
+
+Please do check it or consult OpenOBEX code/documentation.
+
+If you still do not agree, please to present an actual case when this
+won't work. Please do try first with a transfer larger than the MTU
+before assuming anything (maximum MTU is 64K, send a larger file),
+
 -- 
-1.7.6.4
-
+Slawomir Bochenski
