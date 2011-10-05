@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1317825160-21429-4-git-send-email-lkslawek@gmail.com>
-References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
-	<1317825160-21429-4-git-send-email-lkslawek@gmail.com>
-Date: Wed, 5 Oct 2011 17:04:01 +0200
-Message-ID: <CA+i+Aw3WLMrFdxLZieVy9CoDQxtG=NNgVyo9HFPmQkDK2+5jRA@mail.gmail.com>
-Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver flush()
 From: Slawomir Bochenski <lkslawek@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Slawomir Bochenski <lkslawek@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH obexd 2/2] Pass through error returned by open in PUTs
+Date: Wed,  5 Oct 2011 16:52:05 +0200
+Message-Id: <1317826325-26436-2-git-send-email-lkslawek@gmail.com>
+In-Reply-To: <1317826325-26436-1-git-send-email-lkslawek@gmail.com>
+References: <1317826325-26436-1-git-send-email-lkslawek@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 5, 2011 at 4:32 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> OBEX_EV_REQ is the last thing that we are going to receive on PUT and
-> this is always going to be delivered. As the service driver will start
-> receiving data at or before its .put(), we can simply call flush() after
-> that. This also makes flush() usable in PUTs without length header.
+---
+ src/obex.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-One thing I've forgotten to mention:
+diff --git a/src/obex.c b/src/obex.c
+index b0a4183..59bbe7a 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -958,7 +958,7 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+ 					(size_t *) &os->size : NULL, &err);
+ 	if (os->object == NULL) {
+ 		error("open(%s): %s (%d)", filename, strerror(-err), -err);
+-		return -EPERM;
++		return err;
+ 	}
+ 
+ 	os->path = g_strdup(filename);
+-- 
+1.7.4.1
 
-Additionally the return value from flush() now follows the usual
-conventions - -EAGAIN is used to suspend request, other values less
-than zero will set appropriate OBEX error code.
