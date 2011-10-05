@@ -1,45 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 11/15] Bluetooth: Report LE devices
-Date: Wed,  5 Oct 2011 20:20:43 -0300
-Message-Id: <1317856847-28167-12-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v5 10/15] Bluetooth: Add 'eir_len' param to mgmt_device_found()
+Date: Wed,  5 Oct 2011 20:20:42 -0300
+Message-Id: <1317856847-28167-11-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
 References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Devices found during LE scan should be reported to userspace through
-mgmt_device_found events.
+This patch adds a new parameter to mgmt_device_found() to inform
+the length of 'eir' pointer.
+
+EIR data from LE advertising report event doesn't have a fixed length
+as EIR data from extended inquiry result event does. We needed to
+change mgmt_device_found() so it copies 'eir_len' bytes instead of
+HCI_MAX_EIR_LENGTH.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_event.c        |    9 +++++----
+ net/bluetooth/mgmt.c             |    7 +++++--
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e0c9790..65a1ccf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -871,7 +871,7 @@ int mgmt_set_local_name_complete(u16 index, u8 *name, u8 status);
+ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ 								u8 status);
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+-								u8 *eir);
++							u8 *eir, u8 eir_len);
+ int mgmt_remote_name(u16 index, bdaddr_t *bdaddr, u8 *name);
+ int mgmt_discovering(u16 index, u8 discovering);
+ int mgmt_device_blocked(u16 index, bdaddr_t *bdaddr);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fceb2ea..8f3e00d 100644
+index 0bbd8fe..fceb2ea 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2834,6 +2834,7 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
- {
- 	u8 num_reports = skb->data[0];
- 	void *ptr = &skb->data[1];
-+	s8 rssi;
- 
- 	hci_dev_lock(hdev);
- 
-@@ -2842,6 +2843,10 @@ static inline void hci_le_adv_report_evt(struct hci_dev *hdev,
- 
- 		hci_add_adv_entry(hdev, ev);
- 
-+		rssi = ev->data[ev->length];
-+		mgmt_device_found(hdev->id, &ev->bdaddr, NULL, rssi, ev->data,
-+								ev->length);
-+
- 		ptr += sizeof(*ev) + ev->length + 1;
+@@ -1383,7 +1383,7 @@ static inline void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *
+ 		data.ssp_mode		= 0x00;
+ 		hci_inquiry_cache_update(hdev, &data);
+ 		mgmt_device_found(hdev->id, &info->bdaddr, info->dev_class, 0,
+-									NULL);
++								NULL, 0);
  	}
  
+ 	hci_dev_unlock(hdev);
+@@ -2384,7 +2384,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 			hci_inquiry_cache_update(hdev, &data);
+ 			mgmt_device_found(hdev->id, &info->bdaddr,
+ 						info->dev_class, info->rssi,
+-						NULL);
++						NULL, 0);
+ 		}
+ 	} else {
+ 		struct inquiry_info_with_rssi *info = (void *) (skb->data + 1);
+@@ -2401,7 +2401,7 @@ static inline void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, struct
+ 			hci_inquiry_cache_update(hdev, &data);
+ 			mgmt_device_found(hdev->id, &info->bdaddr,
+ 						info->dev_class, info->rssi,
+-						NULL);
++						NULL, 0);
+ 		}
+ 	}
+ 
+@@ -2543,7 +2543,8 @@ static inline void hci_extended_inquiry_result_evt(struct hci_dev *hdev, struct
+ 		data.ssp_mode		= 0x01;
+ 		hci_inquiry_cache_update(hdev, &data);
+ 		mgmt_device_found(hdev->id, &info->bdaddr, info->dev_class,
+-						info->rssi, info->data);
++						info->rssi, info->data,
++						sizeof(info->data));
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0040e37..0b08e29 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2341,17 +2341,20 @@ int mgmt_read_local_oob_data_reply_complete(u16 index, u8 *hash, u8 *randomizer,
+ }
+ 
+ int mgmt_device_found(u16 index, bdaddr_t *bdaddr, u8 *dev_class, s8 rssi,
+-								u8 *eir)
++							u8 *eir, u8 eir_len)
+ {
+ 	struct mgmt_ev_device_found ev;
+ 
++	if (eir_len > sizeof(ev.eir))
++		return -EINVAL;
++
+ 	memset(&ev, 0, sizeof(ev));
+ 
+ 	bacpy(&ev.bdaddr, bdaddr);
+ 	ev.rssi = rssi;
+ 
+ 	if (eir)
+-		memcpy(ev.eir, eir, sizeof(ev.eir));
++		memcpy(ev.eir, eir, eir_len);
+ 
+ 	if (dev_class)
+ 		memcpy(ev.dev_class, dev_class, sizeof(ev.dev_class));
 -- 
 1.7.5.2
 
