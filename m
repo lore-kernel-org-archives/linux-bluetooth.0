@@ -1,48 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
-References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
-	<1317825160-21429-4-git-send-email-lkslawek@gmail.com>
-	<CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
-	<CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
-	<CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
-Date: Wed, 5 Oct 2011 18:38:33 +0300
-Message-ID: <CABBYNZJOosjm-Uok+p9+smd0ek=0Hc3LG43x1y3A9qQhWp5Egg@mail.gmail.com>
-Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver flush()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
+Date: Wed, 5 Oct 2011 18:05:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ 00/11] Re-connections triggered by platform event
+Message-ID: <20111005150533.GA4111@fusion.localdomain>
+References: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1317059308-20038-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawomir,
+Hi Claudio,
 
-On Wed, Oct 5, 2011 at 6:20 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> On Wed, Oct 5, 2011 at 5:17 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
->>> By removing this it wont flush on EOS, so Im not sure why you removed
->>> it since OBEX_EV_REQ is only generated for the request not for the
->>> streams itself. Actually if OpenOBEX had an event for that represent
->>> the FINAL bit that would solve the problem with unknown size, but for
->>> gobex this is exposed directly in the callback so I wouldn't change
->>> that now.
->>>
->>>
->>> You got this wrong, the purpose of this code is to flush on end of
->>> stream not in the beginning/put request, so if we have consecutive
->>> puts the last packet should cause a flush so the driver can sync any
->>> buffered data before close which needs to be immediately.
->>
->> Again, OBEX_EV_REQ will be the very _last_ thing called. This code
->> flushes after all write()-s. After the final packet.
->
-> To be specific: the order of events from openobex are OBEX_EV_REQHINT,
-> OBEX_EV_REQCHECK, multiple OBEX_EV_STREAMAVAIL (as we are starting
-> streaming in REQHINT), and then OBEX_EV_REQ.
+On Mon, Sep 26, 2011, Claudio Takahasi wrote:
+> Proposal to enable re-connection(for ATT) started by platform/user
+> actions. eg: Screen unlocked.
+> 
+> Use case: When the user unlocks the screen, automatic re-connections for
+> bonded devices will start. It will remain active for a short period of
+> time(default 1 min).
+> 
+> Anderson Briglia (2):
+>   Add display lock watcher on maemo6 plugin
+>   Enable re-connection if reason is Timeout
+> 
+> Claudio Takahasi (9):
+>   Remove timer to trigger connection attempts
+>   Add set auto connect in device
+>   Add continuous connection attempt
+>   Add checking if profiles are requesting connection
+>   Fix repeated connection attempt to the same remote
+>   Disable automatic connections after 60 seconds
+>   Set auto connect from maemo6 plugin
+>   Add an interval between connection attempts
+>   Add automatic connect timeout config option
+> 
+>  plugins/maemo6.c |   32 +++++++++++++++
+>  src/adapter.c    |   40 +++++++++++++++++++
+>  src/adapter.h    |    1 +
+>  src/device.c     |  113 ++++++++++++++++++++++++++++++++++++++++--------------
+>  src/device.h     |    1 +
+>  src/hcid.h       |    1 +
+>  src/main.c       |   12 ++++++
+>  src/main.conf    |    6 +++
+>  8 files changed, 177 insertions(+), 29 deletions(-)
 
-I don't think this is true, if it was then why would we call
-service->put on the end of stream and I also never see this happening
-in practice e.g. calling ftp_put in the end of stream.
+All patches have been applied. Thanks.
 
--- 
-Luiz Augusto von Dentz
+Johan
