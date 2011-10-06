@@ -1,51 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/2] AVRCP: fix loop over number of application settings
-Date: Thu,  6 Oct 2011 08:49:44 -0300
-Message-Id: <1317901785-1757-1-git-send-email-lucas.demarchi@profusion.mobi>
+Message-ID: <20111006121057.126252wjxrc55ukg@mail.hendrik-sattler.de>
+Date: Thu, 06 Oct 2011 12:10:57 +0200
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver
+ flush()
+References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+ <1317825160-21429-4-git-send-email-lkslawek@gmail.com>
+ <CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
+ <CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
+ <CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
+ <CABBYNZJOosjm-Uok+p9+smd0ek=0Hc3LG43x1y3A9qQhWp5Egg@mail.gmail.com>
+ <20111006094430.20945f35guft5q4g@mail.hendrik-sattler.de>
+ <CABBYNZLBi_3sAohSShnHTfayd=g0VqZ2CYJC=5qfHBQiHcQsSg@mail.gmail.com>
+In-Reply-To: <CABBYNZLBi_3sAohSShnHTfayd=g0VqZ2CYJC=5qfHBQiHcQsSg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/avrcp.c |   13 +++++--------
- 1 files changed, 5 insertions(+), 8 deletions(-)
+Zitat von Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> On Thu, Oct 6, 2011 at 10:44 AM, Hendrik Sattler
+> <post@hendrik-sattler.de> wrote:
+>> The order is correct. Actually, with openobex-1.5 it may happen that you see
+>> one OBEX_EV_STREAMAVAIL before OBEX_EV_REQCHECK if a BODY header is included
+>> in the first packet, and no OBEX_EV_REQCHECK if the PUT has only one packet.
+>>
+>> However, for current git (if a new version is ever going to be released),
+>> this order is strictly correct if the request is not aborted before being
+>> complete.
+>
+> Yep, so obexd is broken for quite some time, since we do check also on
+> OBEX_EV_REQ, but the documentation is not very clear about it since it
+> says:
+>
+> /* An incoming request has arrived */
+>
+> Also it doesn't help that OpenOBEX has tree events with similar
+> interpretation and probably because REQCHECK is not always generate we
+> had to have a proper check also on REQ too.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 96a0d36..c36af5d 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -715,12 +715,11 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
- {
- 	uint16_t len = ntohs(pdu->params_len);
- 	unsigned int i;
-+	uint8_t *param;
- 
--	if (len < 3)
-+	if (len < 3 || len > 2 * pdu->params[0] + 1U)
- 		goto err;
- 
--	len = 0;
--
- 	/*
- 	 * From sec. 5.7 of AVRCP 1.3 spec, we should igore non-existent IDs
- 	 * and set the existent ones. Sec. 5.2.4 is not clear however how to
-@@ -728,11 +727,9 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
- 	 * attribute is valid, we respond with no parameters. Otherwise an
- 	 * E_INVALID_PARAM is sent.
- 	 */
--	for (i = 1; i <= pdu->params[0]; i += 2) {
--		uint8_t attr = pdu->params[i];
--		uint8_t val = pdu->params[i + 1];
--
--		if (player_set_attribute(player, attr, val) < 0)
-+	for (len = 0, i = 0, param = &pdu->params[1]; i < pdu->params[0];
-+							i++, param += 2) {
-+		if (player_set_attribute(player, param[0], param[1]) < 0)
- 			continue;
- 
- 		len++;
--- 
-1.7.7
+Ask Marcel why there is no new release of OpenOBEX! This could have  
+been fixed for months.
+
+> Well I guess this is another reason to move on and start porting the server
+> side to gobex which is much more mainloop friendly and less confusing is this
+> aspect.
+
+s/mainloop/glib/
+
+HS
+
 
