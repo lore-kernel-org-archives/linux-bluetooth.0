@@ -1,26 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Oct 2011 11:59:35 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] Fix possible crash when using syncevolution plugin
-Message-ID: <20111006085935.GA26908@fusion.localdomain>
-References: <1317890818-15669-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317890818-15669-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd] Fix possible crash when using syncevolution plugin
+Date: Thu,  6 Oct 2011 11:46:58 +0300
+Message-Id: <1317890818-15669-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Oct 06, 2011, Luiz Augusto von Dentz wrote:
-> Context os need to be set since synce_write uses it, in addiction
-> check if context is valid in synce_open.
-> ---
->  plugins/syncevolution.c |    5 ++++-
->  1 files changed, 4 insertions(+), 1 deletions(-)
+Context os need to be set since synce_write uses it, in addiction
+check if context is valid in synce_open.
+---
+ plugins/syncevolution.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Applied. Thanks.
+diff --git a/plugins/syncevolution.c b/plugins/syncevolution.c
+index ae13e43..a389783 100644
+--- a/plugins/syncevolution.c
++++ b/plugins/syncevolution.c
+@@ -230,6 +230,7 @@ static void *synce_connect(struct obex_session *os, int *err)
+ 	context->dbus_conn = conn;
+ 	context->lasterr = -EAGAIN;
+ 	context->id = obex_get_id(os);
++	context->os = os;
+ 
+ 	if (err)
+ 		*err = 0;
+@@ -281,8 +282,10 @@ static void synce_disconnect(struct obex_session *os, void *user_data)
+ static void *synce_open(const char *name, int oflag, mode_t mode,
+ 				void *user_data, size_t *size, int *err)
+ {
++	struct synce_context *context = user_data;
++
+ 	if (err)
+-		*err = 0;
++		*err = context ? 0 : -EFAULT;
+ 
+ 	return user_data;
+ }
+-- 
+1.7.6.4
 
-Johan
