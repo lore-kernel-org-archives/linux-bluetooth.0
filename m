@@ -1,81 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Oct 2011 15:50:41 -0300
+Date: Thu, 6 Oct 2011 15:23:43 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 08/15] Bluetooth: Prepare for full support discovery
- procedures
-Message-ID: <20111006185041.GI5652@joana>
-References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
- <1317856847-28167-9-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCHv2 4/4] Bluetooth: convert role_switch variable to flag in
+ l2cap chan
+Message-ID: <20111006182342.GH5652@joana>
+References: <1316181222-32634-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1316181222-32634-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317856847-28167-9-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1316181222-32634-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Andrei,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:40 -0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-16 16:53:42 +0300]:
 
-> This patch prepares start_discovery() to support LE-Only and BR/EDR/LE
-> discovery procedures (BR/EDR is already supported).
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> role_switch variable inside l2cap_chan is a logical one and can
+> be easily converted to flag
 > ---
->  include/net/bluetooth/hci.h      |    1 +
->  include/net/bluetooth/hci_core.h |    1 +
->  net/bluetooth/mgmt.c             |   12 +++++++++++-
->  3 files changed, 13 insertions(+), 1 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index aaf79af..1e11e7f 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -202,6 +202,7 @@ enum {
->  
->  #define LMP_EV4		0x01
->  #define LMP_EV5		0x02
-> +#define LMP_NO_BREDR	0x20
->  #define LMP_LE		0x40
->  
->  #define LMP_SNIFF_SUBR	0x02
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 36e15cc..e0c9790 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -613,6 +613,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->  #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
->  #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
->  #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
-> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
->  #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
->  
->  /* ----- Extended LMP capabilities ----- */
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 58cf33a..0040e37 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -32,6 +32,8 @@
->  #define MGMT_VERSION	0
->  #define MGMT_REVISION	1
->  
-> +#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
-> +
->  struct pending_cmd {
->  	struct list_head list;
->  	__u16 opcode;
-> @@ -1632,7 +1634,15 @@ static int start_discovery(struct sock *sk, u16 index)
->  		goto failed;
->  	}
->  
-> -	err = hci_do_inquiry(hdev, 0x08);
-> +	if (lmp_host_le_capable(hdev)) {
-> +		if (lmp_bredr_capable(hdev))
-> +			err = -ENOSYS;
-> +		else
-> +			err = -ENOSYS;
+>  include/net/bluetooth/l2cap.h |    2 +-
+>  net/bluetooth/l2cap_core.c    |    4 ++--
+>  net/bluetooth/l2cap_sock.c    |   12 ++++++++----
+>  3 files changed, 11 insertions(+), 7 deletions(-)
 
-This seems a lot wrong.
+These four patches can came first. Please rebase them.
 
 	Gustavo
