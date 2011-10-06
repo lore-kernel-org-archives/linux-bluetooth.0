@@ -1,120 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Oct 2011 14:34:25 -0300
+Date: Thu, 6 Oct 2011 14:32:59 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 2/7] Bluetooth: EFS: definitions and headers
-Message-ID: <20111006173425.GB5652@joana>
+Subject: Re: [PATCHv2 4/7] Bluetooth: EFS: parse l2cap config request
+Message-ID: <20111006173259.GA5652@joana>
 References: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1316179596-30906-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1316179596-30906-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1316179596-30906-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1316179596-30906-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-16 16:26:31 +0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-16 16:26:33 +0300]:
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
+> Add parsing extended flowspec option in L2cap config request
 > Based upon haijun.liu <haijun.liu@atheros.com> series of patches
 > (sent Sun, 22 Aug 2010)
 > 
 > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > ---
->  include/net/bluetooth/l2cap.h |   41 +++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 41 insertions(+), 0 deletions(-)
+>  net/bluetooth/l2cap_core.c |   67 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 65 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 9850cb5..1f26a39 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -38,6 +38,9 @@
->  #define L2CAP_DEFAULT_MAX_PDU_SIZE	1009    /* Sized for 3-DH5 packet */
->  #define L2CAP_DEFAULT_ACK_TO		200
->  #define L2CAP_LE_DEFAULT_MTU		23
-> +#define L2CAP_DEFAULT_MAX_SDU_SIZE	0xFFFF
-> +#define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
-> +#define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 4b05248..f2aa2fe 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -338,6 +338,12 @@ static void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+>  		chan->omtu = L2CAP_DEFAULT_MTU;
+>  	}
 >  
->  #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
->  #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
-> @@ -218,6 +221,8 @@ struct l2cap_conf_rsp {
->  #define L2CAP_CONF_UNACCEPT	0x0001
->  #define L2CAP_CONF_REJECT	0x0002
->  #define L2CAP_CONF_UNKNOWN	0x0003
-> +#define L2CAP_CONF_PENDING	0x0004
-> +#define L2CAP_CONF_EFS_REJECT	0x0005
->  
->  struct l2cap_conf_opt {
->  	__u8       type;
-> @@ -234,6 +239,7 @@ struct l2cap_conf_opt {
->  #define L2CAP_CONF_QOS		0x03
->  #define L2CAP_CONF_RFC		0x04
->  #define L2CAP_CONF_FCS		0x05
-> +#define L2CAP_CONF_EFS		0x06
->  
->  #define L2CAP_CONF_MAX_SIZE	22
->  
-> @@ -252,6 +258,19 @@ struct l2cap_conf_rfc {
->  #define L2CAP_MODE_ERTM		0x03
->  #define L2CAP_MODE_STREAMING	0x04
->  
-> +struct l2cap_conf_efs {
-> +	__u8       id;
-> +	__u8       service_type;
-> +	__le16     max_sdu_size;
-> +	__le32     sdu_inter_time;
-> +	__le32     access_latency;
-> +	__le32     flush_timeout;
-> +} __packed;
+> +	chan->local_stype = L2CAP_SERV_BESTEFFORT;
+> +	chan->local_msdu = L2CAP_DEFAULT_MAX_SDU_SIZE;
+> +	chan->local_sdu_itime = L2CAP_DEFAULT_SDU_ARRIVAL_TIME;
+> +	chan->local_acc_lat = L2CAP_DEFAULT_ACCESS_LATENCY;
+> +	chan->local_flush_to = L2CAP_DEFAULT_FLUSH_TO;
 > +
-> +#define L2CAP_SERV_NOTRAFIC	0x00
-> +#define L2CAP_SERV_BESTEFFORT	0x01
-> +#define L2CAP_SERV_GUARANTEED	0x02
-> +
->  struct l2cap_disconn_req {
->  	__le16     dcid;
->  	__le16     scid;
-> @@ -346,6 +365,7 @@ struct l2cap_chan {
+>  	chan_hold(chan);
 >  
->  	unsigned long	conf_state;
->  	unsigned long	conn_state;
-> +	unsigned long	flags;
+>  	list_add(&chan->list, &conn->chan_l);
+> @@ -1895,6 +1901,11 @@ static inline __u8 l2cap_select_mode(__u8 mode, __u16 remote_feat_mask)
+>  	}
+>  }
 >  
->  	__u8		next_tx_seq;
->  	__u8		expected_ack_seq;
-> @@ -365,6 +385,20 @@ struct l2cap_chan {
->  	__u8		remote_max_tx;
->  	__u16		remote_mps;
+> +static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
+> +{
+> +	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+> +}
+> +
+>  static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+>  {
+>  	struct l2cap_conf_req *req = data;
+> @@ -2001,6 +2012,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+>  	int type, hint, olen;
+>  	unsigned long val;
+>  	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+> +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
+> +	u8 remote_efs = 0;
+>  	u16 mtu = L2CAP_DEFAULT_MTU;
+>  	u16 result = L2CAP_CONF_SUCCESS;
 >  
-> +	__u8		local_id;
-> +	__u8		local_stype;
-> +	__u16		local_msdu;
-> +	__u32		local_sdu_itime;
-> +	__u32		local_acc_lat;
-> +	__u32		local_flush_to;
+> @@ -2032,7 +2045,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+>  		case L2CAP_CONF_FCS:
+>  			if (val == L2CAP_FCS_NONE)
+>  				set_bit(CONF_NO_FCS_RECV, &chan->conf_state);
+> +			break;
+>  
+> +		case L2CAP_CONF_EFS:
+> +			remote_efs = 1;
+> +			if (olen == sizeof(efs))
+> +				memcpy(&efs, (void *) val, olen);
+>  			break;
+>  
+>  		default:
+> @@ -2057,7 +2075,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+>  			break;
+>  		}
+>  
+> -		if (chan->mode != rfc.mode)
+> +		if (remote_efs && __l2cap_efs_supported(chan))
+> +			set_bit(FLAG_EFS_ENABLE, &chan->flags);
 > +
-> +	__u8		remote_id;
-> +	__u8		remote_stype;
-> +	__u16		remote_msdu;
-> +	__u32		remote_sdu_itime;
-> +	__u32		remote_acc_lat;
-> +	__u32		remote_flush_to;
-> +
->  	struct timer_list	chan_timer;
->  	struct timer_list	retrans_timer;
->  	struct timer_list	monitor_timer;
-> @@ -452,6 +486,8 @@ enum {
->  	CONF_CONNECT_PEND,
->  	CONF_NO_FCS_RECV,
->  	CONF_STATE2_DEVICE,
-> +	CONF_LOCAL_PEND,
-> +	CONF_REMOTE_PEND,
+> +		if (!l2cap_mode_supported(chan->mode, chan->conn->feat_mask))
 
-I think I already asked this, but I may have forgotten. What are these two
-flags for? I can't get anything from their names.
+The l2cap_mode_supported() check is fundamentally different from the check
+chan->mode != rfc.mode. Any particularly why you changed this?
+
+>  			return -ECONNREFUSED;
+>  
+>  		break;
+> @@ -2075,8 +2096,35 @@ done:
+>  					sizeof(rfc), (unsigned long) &rfc);
+>  	}
+>  
+> +	/*
+> +	   Add extended flow specification option check here.
+> +	 */
+> +	if (result == L2CAP_CONF_SUCCESS && remote_efs) {
+> +		if (!test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+
+If FLAG_EFS_ENABLE is enabled here it means remote_efs is 1, then you don't
+need to check again for remote_efs in the line above.
+
+> +			/* remote efs support , local efs not supported */
+> +
+> +			result = L2CAP_CONF_REJECT;
+> +			return -ECONNREFUSED;
+> +		}
+> +
+> +		if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
+> +				efs.service_type != L2CAP_SERV_NOTRAFIC &&
+> +				efs.service_type != chan->local_stype) {
+> +
+> +			result = L2CAP_CONF_UNACCEPT;
+> +
+> +			if (chan->num_conf_req >= 1)
+> +				return -ECONNREFUSED;
+>  
+> -	if (result == L2CAP_CONF_SUCCESS) {
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> +					sizeof(efs), (unsigned long) &efs);
+> +		} else {
+> +			result = L2CAP_CONF_PENDING;
+> +			set_bit(CONF_LOCAL_PEND, &chan->conf_state);
+> +		}
+> +	}
+> +
+> +	if (result == L2CAP_CONF_SUCCESS || result == L2CAP_CONF_PENDING) {
+
+There is too much checks against L2CAP_CONF_SUCCESS, can we rework this part
+of the code.
 
 	Gustavo
