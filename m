@@ -1,58 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20111006121057.126252wjxrc55ukg@mail.hendrik-sattler.de>
-Date: Thu, 06 Oct 2011 12:10:57 +0200
-From: Hendrik Sattler <post@hendrik-sattler.de>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver
- flush()
-References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
- <1317825160-21429-4-git-send-email-lkslawek@gmail.com>
- <CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
- <CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
- <CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
- <CABBYNZJOosjm-Uok+p9+smd0ek=0Hc3LG43x1y3A9qQhWp5Egg@mail.gmail.com>
- <20111006094430.20945f35guft5q4g@mail.hendrik-sattler.de>
- <CABBYNZLBi_3sAohSShnHTfayd=g0VqZ2CYJC=5qfHBQiHcQsSg@mail.gmail.com>
-In-Reply-To: <CABBYNZLBi_3sAohSShnHTfayd=g0VqZ2CYJC=5qfHBQiHcQsSg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+In-Reply-To: <CA+i+Aw3YGAfFJJoXftWV7a=PW7FYkFGLA0pZPZsMhhDgebJJrQ@mail.gmail.com>
+References: <1317825160-21429-1-git-send-email-lkslawek@gmail.com>
+	<1317825160-21429-4-git-send-email-lkslawek@gmail.com>
+	<CABBYNZJyPMny8MfqxDsJ256Q+Ft-1+DFwfWbi12MxNz1rEJ8cw@mail.gmail.com>
+	<CA+i+Aw3=DUoVs68xQwHcZG_OBh0eYOG3q2xhYcvc_8J+wciAnA@mail.gmail.com>
+	<CA+i+Aw1wCnxAfij3c0dQCVsDXhBHCrwWoyJhv6=Ctdn=T7kfXQ@mail.gmail.com>
+	<CABBYNZJOosjm-Uok+p9+smd0ek=0Hc3LG43x1y3A9qQhWp5Egg@mail.gmail.com>
+	<20111006094430.20945f35guft5q4g@mail.hendrik-sattler.de>
+	<CABBYNZLBi_3sAohSShnHTfayd=g0VqZ2CYJC=5qfHBQiHcQsSg@mail.gmail.com>
+	<CA+i+Aw3YGAfFJJoXftWV7a=PW7FYkFGLA0pZPZsMhhDgebJJrQ@mail.gmail.com>
+Date: Thu, 6 Oct 2011 12:17:05 +0300
+Message-ID: <CABBYNZK2kXdaSRcmZGNchu90WzXsvmotXaFD7N_2vPLAT4AjeA@mail.gmail.com>
+Subject: Re: [PATCH obexd 4/4] Simplify code for calling mime driver flush()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Slawomir Bochenski <lkslawek@gmail.com>
+Cc: Hendrik Sattler <post@hendrik-sattler.de>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Zitat von Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> On Thu, Oct 6, 2011 at 10:44 AM, Hendrik Sattler
-> <post@hendrik-sattler.de> wrote:
->> The order is correct. Actually, with openobex-1.5 it may happen that you see
->> one OBEX_EV_STREAMAVAIL before OBEX_EV_REQCHECK if a BODY header is included
->> in the first packet, and no OBEX_EV_REQCHECK if the PUT has only one packet.
->>
->> However, for current git (if a new version is ever going to be released),
->> this order is strictly correct if the request is not aborted before being
->> complete.
+Hi Slawomir,
+
+On Thu, Oct 6, 2011 at 11:21 AM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
 >
-> Yep, so obexd is broken for quite some time, since we do check also on
-> OBEX_EV_REQ, but the documentation is not very clear about it since it
-> says:
->
-> /* An incoming request has arrived */
->
-> Also it doesn't help that OpenOBEX has tree events with similar
-> interpretation and probably because REQCHECK is not always generate we
-> had to have a proper check also on REQ too.
+> obexd works as it should. The code is coping with this by doing a
+> buffering on behalf of a service driver if the service driver is not
+> using chkput. So from the service perspective it will be still put,
+> open, write, as the actual writing to mime driver is started at
+> obex_put_stream_start.
 
-Ask Marcel why there is no new release of OpenOBEX! This could have  
-been fixed for months.
+Except that we should not buffer more than MTU size, also this is
+completely the opposite of what we should be doing which is to copy
+buffers as little as possible. As for broken I mean the design is
+broken since if the service does not implement .put obexd should
+return not implemented right in the first packet, actually .put is
+completely useless right now since it is basically as calling a .flush
+but it does useless checks.
 
-> Well I guess this is another reason to move on and start porting the server
-> side to gobex which is much more mainloop friendly and less confusing is this
-> aspect.
-
-s/mainloop/glib/
-
-HS
-
-
+-- 
+Luiz Augusto von Dentz
