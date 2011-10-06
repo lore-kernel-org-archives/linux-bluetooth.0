@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Oct 2011 15:24:26 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] AVRCP: move MediaPlayer to adapter object
-Message-ID: <20111006122423.GA15489@aemeltch-MOBL1>
-References: <1317844938-21950-1-git-send-email-luiz.dentz@gmail.com>
- <20111006081647.GA23687@fusion.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111006081647.GA23687@fusion.localdomain>
+In-Reply-To: <1317901785-1757-2-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1317901785-1757-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1317901785-1757-2-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 6 Oct 2011 15:21:15 +0300
+Message-ID: <CABBYNZ+UWp4Y96-fzkbYBZEE+Q_T0Ub_eM3wmzNqbpqDWsbp7A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] AVRCP: do not allow CT to set a property not supported
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Hi Lucas,
 
-On Thu, Oct 06, 2011 at 11:16:47AM +0300, Johan Hedberg wrote:
-> Hi Luiz,
-> 
-> On Wed, Oct 05, 2011, Luiz Augusto von Dentz wrote:
-> > This move the MediaPlayer registration to adapter object on Media
-> > interface so we can track players properly.
-> > ---
-> >  audio/avrcp.c     |  840 +++++++++++------------------------------------------
-> >  audio/avrcp.h     |   67 ++++-
-> >  audio/device.c    |    3 -
-> >  audio/device.h    |    2 -
-> >  audio/manager.c   |    7 -
-> >  audio/media.c     |  784 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >  doc/media-api.txt |  163 +++++++++++
-> >  7 files changed, 1179 insertions(+), 687 deletions(-)
-> 
-> All four patches have been applied. Thanks.
+On Thu, Oct 6, 2011 at 2:49 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> If player never set a property, it means it doesn't support it. Doesn't
+> allow the remote side to set it and send a REJECTED response.
+> ---
+>  audio/media.c     |    3 +++
+>  doc/media-api.txt |    2 +-
+>  2 files changed, 4 insertions(+), 1 deletions(-)
+>
+> diff --git a/audio/media.c b/audio/media.c
+> index 9057d70..8d7b65b 100644
+> --- a/audio/media.c
+> +++ b/audio/media.c
+> @@ -1126,6 +1126,9 @@ static int set_setting(uint8_t attr, uint8_t val, void *user_data)
+>        if (property == NULL || value == NULL)
+>                return -EINVAL;
+>
+> +       if (!g_hash_table_lookup(mp->settings, GUINT_TO_POINTER(attr)))
+> +               return -EINVAL;
+> +
+>        msg = dbus_message_new_method_call(mp->sender, mp->path,
+>                                                MEDIA_PLAYER_INTERFACE,
+>                                                "SetProperty");
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index af4cfa0..7dc7661 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -133,7 +133,7 @@ Object path freely definable
+>  Methods                void SetProperty(string property, variant value)
+>
+>                        Changes the value of the specified property. Only
+> -                       properties that are listed a read-write can be changed.
+> +                       properties that are listed as read-write can be changed.
+>
+>                        On success this will emit a PropertyChanged signal.
+>
+> --
+> 1.7.7
 
-Can it cause this:
+Ack.
 
-$ LANG=en make
-make --no-print-directory all-am
-  CC     audio/media.o
-cc1: warnings being treated as errors
-audio/media.c: In function 'get_setting':
-audio/media.c:1106:44: error: cast to pointer from integer of different
-size
-make[1]: *** [audio/media.o] Error 1
-make: *** [all] Error 2
-
-in the line below:
-        <------8<-------------------------------------------------------------
-        |  value = g_hash_table_lookup(mp->settings, GUINT_TO_POINTER(attr));
-        <------8<-------------------------------------------------------------
-
-Is patch below OK?
-
-@@ -1103,7 +1103,8 @@ static int get_setting(uint8_t attr, void
-*user_data)
- 
-        DBG("%s", attr_to_str(attr));
- 
--       value = g_hash_table_lookup(mp->settings, GUINT_TO_POINTER(attr));
-+       value = g_hash_table_lookup(mp->settings,
-+                                       GUINT_TO_POINTER((uint32_t) attr));
-        if (!value)
-                return -EINVAL;
- 
-
-Best regards 
-Andrei Emeltchenko 
+-- 
+Luiz Augusto von Dentz
