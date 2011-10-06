@@ -1,36 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1317905191-30118-1-git-send-email-luiz.dentz@gmail.com>
-References: <1317905191-30118-1-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 6 Oct 2011 18:33:07 -0300
-Message-ID: <CAMOw1v5_EJNp3cS8u9QvKA87yELF7FE-nFAm_jSNWbtm_i4g_Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Add mpris-player to test
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH v5 13/15] Bluetooth: LE scan infra-structure
+Mime-Version: 1.0 (Apple Message framework v1244.3)
+Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <20111006190618.GJ5652@joana>
+Date: Thu, 6 Oct 2011 17:31:06 -0300
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <781D602C-370E-4F06-9D4D-DC69F27294E7@openbossa.org>
+References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org> <1317856847-28167-14-git-send-email-andre.guedes@openbossa.org> <20111006190618.GJ5652@joana>
+To: Gustavo Padovan <padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+Hi Gustavo,
 
-On Thu, Oct 6, 2011 at 9:46 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> It gather information from players implementing mpris spec and convert
-> to org.bluez.MediaPlayer spec.
-> ---
->  Makefile.tools      |    4 +-
->  test/mpris-player.c |  959 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 962 insertions(+), 1 deletions(-)
->  create mode 100644 test/mpris-player.c
->
+On Oct 6, 2011, at 4:06 PM, Gustavo Padovan wrote:
 
-What Media Player do you have? I've tried VLC and exaile here and both
-support only version 1.0. I didn't find one to support version 2.0
+> Hi Andre,
+> 
+> * Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:45 -0300]:
+> 
+>> This patch adds to hci_core the infra-structure to carry out the
+>> LE scan. Functions were created to init the LE scan and cancel
+>> an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
+>> 
+>> Also, the HCI_LE_SCAN flag was created to inform if the controller
+>> is performing LE scan. The flag is set/cleared when the controller
+>> starts/stops scanning.
+>> 
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> include/net/bluetooth/hci.h      |    2 +
+>> include/net/bluetooth/hci_core.h |    5 +++
+>> net/bluetooth/hci_core.c         |   69 ++++++++++++++++++++++++++++++++++++++
+>> net/bluetooth/hci_event.c        |    4 ++
+>> 4 files changed, 80 insertions(+), 0 deletions(-)
+>> 
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>> index 11537b8..7520544 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -86,6 +86,8 @@ enum {
+>> 	HCI_DEBUG_KEYS,
+>> 
+>> 	HCI_RESET,
+>> +
+>> +	HCI_LE_SCAN,
+> 
+> I remember that Marcel commented against this here. Let's hide this
+> internally.
 
+If I got it right, Marcel agreed in keeping this flag here, but we
+won't export it to userspace now (we'll keep it hidden internally).
 
-regards,
-Lucas De Marchi
+BTW, this is the same approach we already have for other flags.
+
+BR,
+
+Andre
