@@ -1,162 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] Fix using the attribute struct for encoding ATT pdus
-Date: Thu,  6 Oct 2011 15:01:48 -0300
-Message-Id: <1317924108-25463-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1317911897-6567-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1317911897-6567-1-git-send-email-vinicius.gomes@openbossa.org>
+Date: Thu, 6 Oct 2011 14:44:46 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 6/7] Bluetooth: EFS: add efs option in l2cap conf req
+Message-ID: <20111006174446.GE5652@joana>
+References: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1316179596-30906-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1316179596-30906-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The enconding and decoding of ATT pdus should be kept as much
-free of dependences from other parts of the code as possible, so
-it can be used in many contexts.
+Hi Andrei,
 
-In this case, for encoding and decoding notifications and indications
-we did have to pass an instance of an attribute instead of direct
-values.
----
- attrib/att.c        |   45 +++++++++++++++++++++++++--------------------
- attrib/att.h        |    9 ++++++---
- src/attrib-server.c |    6 ++++--
- 3 files changed, 35 insertions(+), 25 deletions(-)
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-09-16 16:26:35 +0300]:
 
-diff --git a/attrib/att.c b/attrib/att.c
-index c3cbf86..a3a8947 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -820,60 +820,65 @@ struct att_data_list *dec_find_info_resp(const uint8_t *pdu, int len,
- 	return list;
- }
- 
--uint16_t enc_notification(struct attribute *a, uint8_t *pdu, int len)
-+uint16_t enc_notification(uint16_t handle, uint8_t *value, int vlen,
-+						uint8_t *pdu, int len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
- 
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < (a->len + min_len))
-+	if (len < (vlen + min_len))
- 		return 0;
- 
- 	pdu[0] = ATT_OP_HANDLE_NOTIFY;
--	att_put_u16(a->handle, &pdu[1]);
--	memcpy(&pdu[3], a->data, a->len);
-+	att_put_u16(handle, &pdu[1]);
-+	memcpy(&pdu[3], value, vlen);
- 
--	return a->len + min_len;
-+	return vlen + min_len;
- }
- 
--uint16_t enc_indication(struct attribute *a, uint8_t *pdu, int len)
-+uint16_t enc_indication(uint16_t handle, uint8_t *value, int vlen,
-+						uint8_t *pdu, int len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
- 
- 	if (pdu == NULL)
- 		return 0;
- 
--	if (len < (a->len + min_len))
-+	if (len < (vlen + min_len))
- 		return 0;
- 
- 	pdu[0] = ATT_OP_HANDLE_IND;
--	att_put_u16(a->handle, &pdu[1]);
--	memcpy(&pdu[3], a->data, a->len);
-+	att_put_u16(handle, &pdu[1]);
-+	memcpy(&pdu[3], value, vlen);
- 
--	return a->len + min_len;
-+	return vlen + min_len;
- }
- 
--struct attribute *dec_indication(const uint8_t *pdu, int len)
-+uint16_t dec_indication(const uint8_t *pdu, int len, uint16_t *handle,
-+						uint8_t *value, int vlen)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(uint16_t);
--	struct attribute *a;
-+	uint16_t dlen;
- 
- 	if (pdu == NULL)
--		return NULL;
-+		return 0;
- 
- 	if (pdu[0] != ATT_OP_HANDLE_IND)
--		return NULL;
-+		return 0;
- 
- 	if (len < min_len)
--		return NULL;
-+		return 0;
-+
-+	dlen = MIN(len - min_len, vlen);
-+
-+	if (handle)
-+		*handle = att_get_u16(&pdu[1]);
- 
--	a = g_new0(struct attribute, 1);
--	a->handle = att_get_u16(&pdu[1]);
--	a->len = len - min_len;
--	a->data = g_memdup(&pdu[3], a->len);
-+	memcpy(value, &pdu[3], dlen);
- 
--	return a;
-+	return dlen;
- }
- 
- uint16_t enc_confirmation(uint8_t *pdu, int len)
-diff --git a/attrib/att.h b/attrib/att.h
-index 3de1726..851e6ba 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -299,9 +299,12 @@ uint16_t enc_find_info_resp(uint8_t format, struct att_data_list *list,
- 							uint8_t *pdu, int len);
- struct att_data_list *dec_find_info_resp(const uint8_t *pdu, int len,
- 							uint8_t *format);
--uint16_t enc_notification(struct attribute *a, uint8_t *pdu, int len);
--uint16_t enc_indication(struct attribute *a, uint8_t *pdu, int len);
--struct attribute *dec_indication(const uint8_t *pdu, int len);
-+uint16_t enc_notification(uint16_t handle, uint8_t *value, int vlen,
-+						uint8_t *pdu, int len);
-+uint16_t enc_indication(uint16_t handle, uint8_t *value, int vlen,
-+						uint8_t *pdu, int len);
-+uint16_t dec_indication(const uint8_t *pdu, int len, uint16_t *handle,
-+						uint8_t *value, int vlen);
- uint16_t enc_confirmation(uint8_t *pdu, int len);
- 
- uint16_t enc_mtu_req(uint16_t mtu, uint8_t *pdu, int len);
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 95efd9f..9ba5f74 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -1040,7 +1040,8 @@ static void attrib_notify_clients(struct attribute *attr)
- 			uint8_t pdu[ATT_MAX_MTU];
- 			uint16_t len;
- 
--			len = enc_notification(attr, pdu, channel->mtu);
-+			len = enc_notification(attr->handle, attr->data,
-+						attr->len, pdu, channel->mtu);
- 			if (len == 0)
- 				continue;
- 
-@@ -1054,7 +1055,8 @@ static void attrib_notify_clients(struct attribute *attr)
- 			uint8_t pdu[ATT_MAX_MTU];
- 			uint16_t len;
- 
--			len = enc_indication(attr, pdu, channel->mtu);
-+			len = enc_indication(attr->handle, attr->data,
-+						attr->len, pdu, channel->mtu);
- 			if (len == 0)
- 				return;
- 
--- 
-1.7.6.1
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Adds extended flowspec option when building l2cap config request
+> EFS is added if both the local and remote L2CAP entities have
+> indicated support for the Extended Flow Specification for BR/EDR
+> 
+> Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> (sent Sun, 22 Aug 2010)
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |   42 +++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 41 insertions(+), 1 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 6e7a680f..b4a620d 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1910,6 +1910,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+>  {
+>  	struct l2cap_conf_req *req = data;
+>  	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
+> +	struct l2cap_conf_efs efs = { .service_type = L2CAP_SERV_BESTEFFORT };
+>  	void *ptr = req->data;
+>  
+>  	BT_DBG("chan %p", chan);
+> @@ -1923,7 +1924,11 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+>  		if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state))
+>  			break;
+>  
+> -		/* fall through */
+> +		if (__l2cap_efs_supported(chan))
+> +			set_bit(FLAG_EFS_ENABLE, &chan->flags);
+> +
+> +		break;
 
+Are you sure that this break here doesn't change the behaviour of the code?
+This L2CAP code was tested against PTS, and it's fully working. Can you assure
+me that you are keeping the old behaviour?
+
+> +
+>  	default:
+>  		chan->mode = l2cap_select_mode(rfc.mode, chan->conn->feat_mask);
+>  		break;
+> @@ -1963,6 +1968,25 @@ done:
+>  		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+>  							(unsigned long) &rfc);
+>  
+> +		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+> +			efs.service_type = chan->local_stype;
+> +			efs.max_sdu_size = cpu_to_le16(chan->local_msdu);
+> +			efs.sdu_inter_time = cpu_to_le32(chan->local_sdu_itime);
+> +
+> +			if (chan->local_stype != L2CAP_SERV_BESTEFFORT)
+> +				break;
+> +
+> +			chan->local_id = 1;
+> +			efs.id = chan->local_id;
+> +			efs.access_latency =
+> +				cpu_to_le32(L2CAP_DEFAULT_ACCESS_LATENCY);
+> +			efs.flush_timeout =
+> +				cpu_to_le32(L2CAP_DEFAULT_FLUSH_TO);
+> +
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> +					sizeof(efs), (unsigned long) &efs);
+> +		}
+> +
+>  		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+>  			break;
+>  
+> @@ -1971,6 +1995,7 @@ done:
+>  			chan->fcs = L2CAP_FCS_NONE;
+>  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+>  		}
+> +
+
+Extra blank line.
+
+>  		break;
+>  
+>  	case L2CAP_MODE_STREAMING:
+> @@ -1986,6 +2011,20 @@ done:
+>  		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+>  							(unsigned long) &rfc);
+>  
+> +		if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
+> +			efs.id = 1;
+> +			efs.service_type = L2CAP_SERV_BESTEFFORT;
+> +			efs.max_sdu_size =
+> +				cpu_to_le16(chan->local_msdu);
+> +			efs.sdu_inter_time =
+> +				cpu_to_le32(chan->local_sdu_itime);
+> +			efs.access_latency = 0;
+> +			efs.flush_timeout = 0;
+> +
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> +					sizeof(efs), (unsigned long) &efs);
+> +		}
+> +
+>  		if (!(chan->conn->feat_mask & L2CAP_FEAT_FCS))
+>  			break;
+>  
+> @@ -1994,6 +2033,7 @@ done:
+>  			chan->fcs = L2CAP_FCS_NONE;
+>  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+>  		}
+> +
+
+Same here.
+
+	Gustavo
