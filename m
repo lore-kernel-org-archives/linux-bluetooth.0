@@ -2,48 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 2/2] AVRCP: do not allow CT to set a property not supported
-Date: Thu,  6 Oct 2011 08:49:45 -0300
-Message-Id: <1317901785-1757-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1317901785-1757-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1317901785-1757-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 1/2] AVRCP: fix loop over number of application settings
+Date: Thu,  6 Oct 2011 08:49:44 -0300
+Message-Id: <1317901785-1757-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If player never set a property, it means it doesn't support it. Doesn't
-allow the remote side to set it and send a REJECTED response.
 ---
- audio/media.c     |    3 +++
- doc/media-api.txt |    2 +-
- 2 files changed, 4 insertions(+), 1 deletions(-)
+ audio/avrcp.c |   13 +++++--------
+ 1 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/audio/media.c b/audio/media.c
-index 9057d70..8d7b65b 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1126,6 +1126,9 @@ static int set_setting(uint8_t attr, uint8_t val, void *user_data)
- 	if (property == NULL || value == NULL)
- 		return -EINVAL;
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 96a0d36..c36af5d 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -715,12 +715,11 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
+ {
+ 	uint16_t len = ntohs(pdu->params_len);
+ 	unsigned int i;
++	uint8_t *param;
  
-+	if (!g_hash_table_lookup(mp->settings, GUINT_TO_POINTER(attr)))
-+		return -EINVAL;
-+
- 	msg = dbus_message_new_method_call(mp->sender, mp->path,
- 						MEDIA_PLAYER_INTERFACE,
- 						"SetProperty");
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index af4cfa0..7dc7661 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -133,7 +133,7 @@ Object path	freely definable
- Methods		void SetProperty(string property, variant value)
+-	if (len < 3)
++	if (len < 3 || len > 2 * pdu->params[0] + 1U)
+ 		goto err;
  
- 			Changes the value of the specified property. Only
--			properties that are listed a read-write can be changed.
-+			properties that are listed as read-write can be changed.
+-	len = 0;
+-
+ 	/*
+ 	 * From sec. 5.7 of AVRCP 1.3 spec, we should igore non-existent IDs
+ 	 * and set the existent ones. Sec. 5.2.4 is not clear however how to
+@@ -728,11 +727,9 @@ static uint8_t avrcp_handle_set_player_value(struct avrcp_player *player,
+ 	 * attribute is valid, we respond with no parameters. Otherwise an
+ 	 * E_INVALID_PARAM is sent.
+ 	 */
+-	for (i = 1; i <= pdu->params[0]; i += 2) {
+-		uint8_t attr = pdu->params[i];
+-		uint8_t val = pdu->params[i + 1];
+-
+-		if (player_set_attribute(player, attr, val) < 0)
++	for (len = 0, i = 0, param = &pdu->params[1]; i < pdu->params[0];
++							i++, param += 2) {
++		if (player_set_attribute(player, param[0], param[1]) < 0)
+ 			continue;
  
- 			On success this will emit a PropertyChanged signal.
- 
+ 		len++;
 -- 
 1.7.7
 
