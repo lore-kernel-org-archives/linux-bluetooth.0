@@ -1,60 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Oct 2011 03:35:30 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth trees back to kernel.org
-Message-ID: <20111008063530.GA6767@joana>
+Date: Fri, 7 Oct 2011 23:31:05 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 13/15] Bluetooth: LE scan infra-structure
+Message-ID: <20111007203105.GC23669@fusion.localdomain>
+References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
+ <1317856847-28167-14-git-send-email-andre.guedes@openbossa.org>
+ <20111006190618.GJ5652@joana>
+ <781D602C-370E-4F06-9D4D-DC69F27294E7@openbossa.org>
+ <20111007201233.GB4108@joana>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cWoXeonUoKmBZSoM"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111007201233.GB4108@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gustavo,
 
---cWoXeonUoKmBZSoM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Fri, Oct 07, 2011, Gustavo Padovan wrote:
+> hdev->flags is exported to userspace, it is not internal. We need to create
+> other place in struct hci_dev to keep this info. See some of Marcel's reply on
+> this.
 
-Hi Everyone,
+I think the best idea proposed so far is to have a hdev->legacy_flags
+with a bare minimum set of possible values (HCI_UP, etc). This variable
+is then exported to user space while a new hdev->flags can be created
+which remains private within the kernel.
 
-Today I got my new credentials from kernel.org and managed to push my trees back
-to there. Now you can see both bluetooth-next[1] and bluetooth current[2] at
-git.kernel.org
-
-The bluetooth kernel trees hosted at github won't be updated anymore and
-shouldn't be considered as upstream.
-
-Also I took the opportunity to extinct bluetooth-next-2.6 and bluetooth-2.6
-trees(that were only copies of bluetooth-next and bluetooth trees). These
-names doesn't make sense anymore after the 3.0 release.
-
-Regards,
-
-	Gustavo
-
-
-[1] http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth-next.git
-[2] http://git.kernel.org/?p=linux/kernel/git/padovan/bluetooth.git
-
---cWoXeonUoKmBZSoM
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBAgAGBQJOj+8yAAoJEPs3PUX4s20oiGMQAJSCilp8yvVhRBQ/oG3lEGuu
-EEfcencSSkf9tyePsDdOA/OIjaRmaYmND9t9LpcqG3Ok9rVs67u7Ng0mOPslANKV
-9XmgrKUFV0yyxA1kBKYdU+2f69dsDlZWhfil/cG/Q3lYX63AD+5pIVYR6K1n+XYt
-UIY4dBZYYCQglV/QZwhlm98vLeMm4YH0bHxUhfkBYww0n58MWtdl9R237J0QVBfZ
-BIkr7Keg/OKlnxDz9AdgbHFDNB/cS/xvOrxcOPNqKQOYkYfCu3EBB3bu4WqWN5PC
-Sg8w1Uk/xnHhOcoHNf6X3HDK84LfhqTo6SWVBBaxhq9EHKEAsTD8QhaNkGGkfPl8
-J2iWXSQVgk5Ybjt8+wuKa31E8jvbjXnbSrimG8owiTx5nBXxKHfSpnRd/jQGd6NM
-teKILn/HgDa0uXdUkHVvZqTlJBuETiZn/ZinBAUDbfIN+SHCvwZUkBLwdyAwBGuR
-fcXRa5Z+9dLbH7SlirEIH6WjNqP3iVnKXsc2xd+poGG8Vig//goMbsbEdD0UgB4r
-zr089ZUBbvNzU0CXBgifBUrp5uEkbUtwG1KRRwni23R+3cBXluGFnMB2Iw/PTe2P
-7/7pNqv6Waf3jNhVQhIgxww1Au1KmjOU7LybSNtNvm/EOIKYukET/yssubCgIFRf
-RlcuV99Efd47kBrc/Ey7
-=JAAx
------END PGP SIGNATURE-----
-
---cWoXeonUoKmBZSoM--
+Johan
