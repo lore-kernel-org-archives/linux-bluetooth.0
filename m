@@ -1,102 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 7 Oct 2011 16:51:49 -0300
+Date: Fri, 7 Oct 2011 15:22:14 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 08/15] Bluetooth: Prepare for full support discovery
- procedures
-Message-ID: <20111007195149.GA4108@joana>
-References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
- <1317856847-28167-9-git-send-email-andre.guedes@openbossa.org>
- <20111006185041.GI5652@joana>
- <8EBD0209-B0F2-4AEB-B876-D87F8A32C5F6@openbossa.org>
+Subject: Re: [PATCH 1/4] Bluetooth: convert flushable variable to flag in
+ l2cap chan
+Message-ID: <20111007182214.GA2695@joana>
+References: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8EBD0209-B0F2-4AEB-B876-D87F8A32C5F6@openbossa.org>
+In-Reply-To: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Andrei,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-10-06 17:30:39 -0300]:
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-07 16:54:03 +0300]:
 
-> Hi Gustavo,
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> On Oct 6, 2011, at 3:50 PM, Gustavo Padovan wrote:
+> flushable variable inside l2cap_chan is a logical one and can
+> be easily converted to flag. Added flags in l2cap_chan structure.
 > 
-> > Hi Andre,
-> > 
-> > * Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:40 -0300]:
-> > 
-> >> This patch prepares start_discovery() to support LE-Only and BR/EDR/LE
-> >> discovery procedures (BR/EDR is already supported).
-> >> 
-> >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> >> ---
-> >> include/net/bluetooth/hci.h      |    1 +
-> >> include/net/bluetooth/hci_core.h |    1 +
-> >> net/bluetooth/mgmt.c             |   12 +++++++++++-
-> >> 3 files changed, 13 insertions(+), 1 deletions(-)
-> >> 
-> >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> >> index aaf79af..1e11e7f 100644
-> >> --- a/include/net/bluetooth/hci.h
-> >> +++ b/include/net/bluetooth/hci.h
-> >> @@ -202,6 +202,7 @@ enum {
-> >> 
-> >> #define LMP_EV4		0x01
-> >> #define LMP_EV5		0x02
-> >> +#define LMP_NO_BREDR	0x20
-> >> #define LMP_LE		0x40
-> >> 
-> >> #define LMP_SNIFF_SUBR	0x02
-> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >> index 36e15cc..e0c9790 100644
-> >> --- a/include/net/bluetooth/hci_core.h
-> >> +++ b/include/net/bluetooth/hci_core.h
-> >> @@ -613,6 +613,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-> >> #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
-> >> #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
-> >> #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
-> >> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
-> >> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
-> >> 
-> >> /* ----- Extended LMP capabilities ----- */
-> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> >> index 58cf33a..0040e37 100644
-> >> --- a/net/bluetooth/mgmt.c
-> >> +++ b/net/bluetooth/mgmt.c
-> >> @@ -32,6 +32,8 @@
-> >> #define MGMT_VERSION	0
-> >> #define MGMT_REVISION	1
-> >> 
-> >> +#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
-> >> +
-> >> struct pending_cmd {
-> >> 	struct list_head list;
-> >> 	__u16 opcode;
-> >> @@ -1632,7 +1634,15 @@ static int start_discovery(struct sock *sk, u16 index)
-> >> 		goto failed;
-> >> 	}
-> >> 
-> >> -	err = hci_do_inquiry(hdev, 0x08);
-> >> +	if (lmp_host_le_capable(hdev)) {
-> >> +		if (lmp_bredr_capable(hdev))
-> >> +			err = -ENOSYS;
-> >> +		else
-> >> +			err = -ENOSYS;
-> > 
-> > This seems a lot wrong.
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |    7 ++++++-
+>  net/bluetooth/l2cap_core.c    |    3 ++-
+>  net/bluetooth/l2cap_sock.c    |   15 ++++++++++-----
+>  3 files changed, 18 insertions(+), 7 deletions(-)
 > 
-> As the patch message says it prepares for supporting LE-only and
-> BR/EDR/LE discovery procedures. If you take a look further in the
-> patch series you'll see these -ENOSYS being replaced as soon as
-> those procedures are supported. Please take a look at patches 14
-> and 15.
-> 
-> Anyway, if you don't like this, I can squash it in patch 14. Please
-> let me know.
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 2933767..0fe5d59 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -326,7 +326,6 @@ struct l2cap_chan {
+>  	__u8		sec_level;
+>  	__u8		role_switch;
+>  	__u8		force_reliable;
+> -	__u8		flushable;
+>  	__u8		force_active;
+>  
+>  	__u8		ident;
+> @@ -346,6 +345,7 @@ struct l2cap_chan {
+>  
+>  	unsigned long	conf_state;
+>  	unsigned long	conn_state;
+> +	unsigned long	flags;
+>  
+>  	__u8		next_tx_seq;
+>  	__u8		expected_ack_seq;
+> @@ -463,6 +463,11 @@ enum {
+>  	CONN_RNR_SENT,
+>  };
+>  
+> +/* Definitions for flags in l2cap_chan */
+> +enum {
+> +	FLAG_FLUSHABLE,
+> +};
+> +
+>  #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+>  #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+>  #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 3158cec..b21ecff 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1253,7 +1253,8 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+>  
+>  	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
+>  
+> -	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
+> +	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
+> +					lmp_no_flush_capable(hcon->hdev))
+>  		flags = ACL_START_NO_FLUSH;
+>  	else
+>  		flags = ACL_START;
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 61f1f62..81fc8f0 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -446,14 +446,15 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+>  		break;
+>  
+>  	case BT_FLUSHABLE:
+> -		if (put_user(chan->flushable, (u32 __user *) optval))
+> +		if (put_user(test_bit(FLAG_FLUSHABLE, &chan->flags),
+> +						(u32 __user *) optval))
+>  			err = -EFAULT;
+>  
+>  		break;
+>  
+>  	case BT_POWER:
+>  		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
+> -				&& sk->sk_type != SOCK_RAW) {
+> +						&& sk->sk_type != SOCK_RAW) {
 
-Please do that, makes more sense to me.
+This change doesn't belong to this patch. Please fix this and resend.
 
 	Gustavo
