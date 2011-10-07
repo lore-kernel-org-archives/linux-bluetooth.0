@@ -1,67 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 7 Oct 2011 17:12:33 -0300
+Date: Fri, 7 Oct 2011 16:51:49 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 13/15] Bluetooth: LE scan infra-structure
-Message-ID: <20111007201233.GB4108@joana>
+Subject: Re: [PATCH v5 08/15] Bluetooth: Prepare for full support discovery
+ procedures
+Message-ID: <20111007195149.GA4108@joana>
 References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org>
- <1317856847-28167-14-git-send-email-andre.guedes@openbossa.org>
- <20111006190618.GJ5652@joana>
- <781D602C-370E-4F06-9D4D-DC69F27294E7@openbossa.org>
+ <1317856847-28167-9-git-send-email-andre.guedes@openbossa.org>
+ <20111006185041.GI5652@joana>
+ <8EBD0209-B0F2-4AEB-B876-D87F8A32C5F6@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <781D602C-370E-4F06-9D4D-DC69F27294E7@openbossa.org>
+In-Reply-To: <8EBD0209-B0F2-4AEB-B876-D87F8A32C5F6@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2011-10-06 17:31:06 -0300]:
+* Andre Guedes <andre.guedes@openbossa.org> [2011-10-06 17:30:39 -0300]:
 
 > Hi Gustavo,
 > 
-> On Oct 6, 2011, at 4:06 PM, Gustavo Padovan wrote:
+> On Oct 6, 2011, at 3:50 PM, Gustavo Padovan wrote:
 > 
 > > Hi Andre,
 > > 
-> > * Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:45 -0300]:
+> > * Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:40 -0300]:
 > > 
-> >> This patch adds to hci_core the infra-structure to carry out the
-> >> LE scan. Functions were created to init the LE scan and cancel
-> >> an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
-> >> 
-> >> Also, the HCI_LE_SCAN flag was created to inform if the controller
-> >> is performing LE scan. The flag is set/cleared when the controller
-> >> starts/stops scanning.
+> >> This patch prepares start_discovery() to support LE-Only and BR/EDR/LE
+> >> discovery procedures (BR/EDR is already supported).
 > >> 
 > >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > >> ---
-> >> include/net/bluetooth/hci.h      |    2 +
-> >> include/net/bluetooth/hci_core.h |    5 +++
-> >> net/bluetooth/hci_core.c         |   69 ++++++++++++++++++++++++++++++++++++++
-> >> net/bluetooth/hci_event.c        |    4 ++
-> >> 4 files changed, 80 insertions(+), 0 deletions(-)
+> >> include/net/bluetooth/hci.h      |    1 +
+> >> include/net/bluetooth/hci_core.h |    1 +
+> >> net/bluetooth/mgmt.c             |   12 +++++++++++-
+> >> 3 files changed, 13 insertions(+), 1 deletions(-)
 > >> 
 > >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> >> index 11537b8..7520544 100644
+> >> index aaf79af..1e11e7f 100644
 > >> --- a/include/net/bluetooth/hci.h
 > >> +++ b/include/net/bluetooth/hci.h
-> >> @@ -86,6 +86,8 @@ enum {
-> >> 	HCI_DEBUG_KEYS,
+> >> @@ -202,6 +202,7 @@ enum {
 > >> 
-> >> 	HCI_RESET,
+> >> #define LMP_EV4		0x01
+> >> #define LMP_EV5		0x02
+> >> +#define LMP_NO_BREDR	0x20
+> >> #define LMP_LE		0x40
+> >> 
+> >> #define LMP_SNIFF_SUBR	0x02
+> >> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >> index 36e15cc..e0c9790 100644
+> >> --- a/include/net/bluetooth/hci_core.h
+> >> +++ b/include/net/bluetooth/hci_core.h
+> >> @@ -613,6 +613,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+> >> #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
+> >> #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
+> >> #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
+> >> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
+> >> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
+> >> 
+> >> /* ----- Extended LMP capabilities ----- */
+> >> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> >> index 58cf33a..0040e37 100644
+> >> --- a/net/bluetooth/mgmt.c
+> >> +++ b/net/bluetooth/mgmt.c
+> >> @@ -32,6 +32,8 @@
+> >> #define MGMT_VERSION	0
+> >> #define MGMT_REVISION	1
+> >> 
+> >> +#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
 > >> +
-> >> +	HCI_LE_SCAN,
+> >> struct pending_cmd {
+> >> 	struct list_head list;
+> >> 	__u16 opcode;
+> >> @@ -1632,7 +1634,15 @@ static int start_discovery(struct sock *sk, u16 index)
+> >> 		goto failed;
+> >> 	}
+> >> 
+> >> -	err = hci_do_inquiry(hdev, 0x08);
+> >> +	if (lmp_host_le_capable(hdev)) {
+> >> +		if (lmp_bredr_capable(hdev))
+> >> +			err = -ENOSYS;
+> >> +		else
+> >> +			err = -ENOSYS;
 > > 
-> > I remember that Marcel commented against this here. Let's hide this
-> > internally.
+> > This seems a lot wrong.
 > 
-> If I got it right, Marcel agreed in keeping this flag here, but we
-> won't export it to userspace now (we'll keep it hidden internally).
+> As the patch message says it prepares for supporting LE-only and
+> BR/EDR/LE discovery procedures. If you take a look further in the
+> patch series you'll see these -ENOSYS being replaced as soon as
+> those procedures are supported. Please take a look at patches 14
+> and 15.
+> 
+> Anyway, if you don't like this, I can squash it in patch 14. Please
+> let me know.
 
-hdev->flags is exported to userspace, it is not internal. We need to create
-other place in struct hci_dev to keep this info. See some of Marcel's reply on
-this.
+Please do that, makes more sense to me.
 
 	Gustavo
