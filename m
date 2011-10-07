@@ -1,123 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: convert flushable variable to flag in l2cap chan
-Date: Fri,  7 Oct 2011 16:54:03 +0300
-Message-Id: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/4] Bluetooth: convert force_reliable variable to flag in l2cap chan
+Date: Fri,  7 Oct 2011 16:54:04 +0300
+Message-Id: <1317995646-11174-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-flushable variable inside l2cap_chan is a logical one and can
-be easily converted to flag. Added flags in l2cap_chan structure.
+force_reliable variable inside l2cap_chan is a logical one and can
+be easily converted to flag
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |    7 ++++++-
- net/bluetooth/l2cap_core.c    |    3 ++-
- net/bluetooth/l2cap_sock.c    |   15 ++++++++++-----
- 3 files changed, 18 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |    2 +-
+ net/bluetooth/l2cap_core.c    |    2 +-
+ net/bluetooth/l2cap_sock.c    |   13 +++++++++----
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 2933767..0fe5d59 100644
+index 0fe5d59..6c0d247 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -326,7 +326,6 @@ struct l2cap_chan {
+@@ -325,7 +325,6 @@ struct l2cap_chan {
+ 
  	__u8		sec_level;
  	__u8		role_switch;
- 	__u8		force_reliable;
--	__u8		flushable;
+-	__u8		force_reliable;
  	__u8		force_active;
  
  	__u8		ident;
-@@ -346,6 +345,7 @@ struct l2cap_chan {
+@@ -465,6 +464,7 @@ enum {
  
- 	unsigned long	conf_state;
- 	unsigned long	conn_state;
-+	unsigned long	flags;
- 
- 	__u8		next_tx_seq;
- 	__u8		expected_ack_seq;
-@@ -463,6 +463,11 @@ enum {
- 	CONN_RNR_SENT,
+ /* Definitions for flags in l2cap_chan */
+ enum {
++	FLAG_FORCE_RELIABLE,
+ 	FLAG_FLUSHABLE,
  };
  
-+/* Definitions for flags in l2cap_chan */
-+enum {
-+	FLAG_FLUSHABLE,
-+};
-+
- #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
- #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
- #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3158cec..b21ecff 100644
+index b21ecff..57e4b2c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1253,7 +1253,8 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+@@ -948,7 +948,7 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
  
- 	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			sk->sk_err = err;
+ 	}
  
--	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
-+	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
-+					lmp_no_flush_capable(hcon->hdev))
- 		flags = ACL_START_NO_FLUSH;
- 	else
- 		flags = ACL_START;
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 61f1f62..81fc8f0 100644
+index 81fc8f0..ec0458c 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -446,14 +446,15 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 		break;
+@@ -359,7 +359,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 		if (chan->role_switch)
+ 			opt |= L2CAP_LM_MASTER;
  
- 	case BT_FLUSHABLE:
--		if (put_user(chan->flushable, (u32 __user *) optval))
-+		if (put_user(test_bit(FLAG_FLUSHABLE, &chan->flags),
-+						(u32 __user *) optval))
- 			err = -EFAULT;
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			opt |= L2CAP_LM_RELIABLE;
  
- 		break;
+ 		if (put_user(opt, (u32 __user *) optval))
+@@ -550,7 +550,11 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
+ 			chan->sec_level = BT_SECURITY_HIGH;
  
- 	case BT_POWER:
- 		if (sk->sk_type != SOCK_SEQPACKET && sk->sk_type != SOCK_STREAM
--				&& sk->sk_type != SOCK_RAW) {
-+						&& sk->sk_type != SOCK_RAW) {
- 			err = -EINVAL;
- 			break;
- 		}
-@@ -655,7 +656,10 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			}
- 		}
- 
--		chan->flushable = opt;
-+		if (opt)
-+			set_bit(FLAG_FLUSHABLE, &chan->flags);
+ 		chan->role_switch    = (opt & L2CAP_LM_MASTER);
+-		chan->force_reliable = (opt & L2CAP_LM_RELIABLE);
++
++		if (opt & L2CAP_LM_RELIABLE)
++			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
 +		else
-+			clear_bit(FLAG_FLUSHABLE, &chan->flags);
++			clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
  		break;
  
- 	case BT_POWER:
-@@ -931,7 +935,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 	default:
+@@ -934,7 +938,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = pchan->tx_win;
  		chan->sec_level = pchan->sec_level;
  		chan->role_switch = pchan->role_switch;
- 		chan->force_reliable = pchan->force_reliable;
--		chan->flushable = pchan->flushable;
-+		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
-+			set_bit(FLAG_FLUSHABLE, &chan->flags);
+-		chan->force_reliable = pchan->force_reliable;
++		if (test_bit(FLAG_FORCE_RELIABLE, &pchan->flags))
++			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
+ 			set_bit(FLAG_FLUSHABLE, &chan->flags);
  		chan->force_active = pchan->force_active;
- 	} else {
- 
-@@ -962,7 +967,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+@@ -966,7 +971,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
  		chan->sec_level = BT_SECURITY_LOW;
  		chan->role_switch = 0;
- 		chan->force_reliable = 0;
--		chan->flushable = BT_FLUSHABLE_OFF;
-+		clear_bit(FLAG_FLUSHABLE, &chan->flags);
+-		chan->force_reliable = 0;
++		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		clear_bit(FLAG_FLUSHABLE, &chan->flags);
  		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
  
- 	}
 -- 
 1.7.4.1
 
