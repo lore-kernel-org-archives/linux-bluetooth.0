@@ -1,114 +1,258 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 7 Oct 2011 13:33:09 +0300
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: convert force_active variable to flag in l2cap chan
-Date: Fri,  7 Oct 2011 16:54:05 +0300
-Message-Id: <1317995646-11174-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1317995646-11174-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv2 1/5] Bluetooth: EWS: extended window size option support
+Message-ID: <20111007103303.GA30817@aemeltch-MOBL1>
+References: <1316180379-31607-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1316180379-31607-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111006180514.GF5652@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111006180514.GF5652@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Gustavo,
 
-force_active variable inside l2cap_chan is a logical one and can
-be easily converted to flag
+On Thu, Oct 06, 2011 at 03:05:14PM -0300, Gustavo Padovan wrote:
+> > Adds support for EWS option. Code partly based on Qualcomm and Atheros
+> > patches sent upstream a year ago.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/l2cap.h |   11 ++++++--
+> >  net/bluetooth/l2cap_core.c    |   53 +++++++++++++++++++++++++++++++++++++---
+> >  net/bluetooth/l2cap_sock.c    |   10 ++++----
+> >  3 files changed, 62 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> > index 1f26a39..92eac16 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -31,7 +31,7 @@
+> >  #define L2CAP_DEFAULT_MTU		672
+> >  #define L2CAP_DEFAULT_MIN_MTU		48
+> >  #define L2CAP_DEFAULT_FLUSH_TO		0xffff
+> > -#define L2CAP_DEFAULT_TX_WINDOW		63
+> > +#define L2CAP_DEFAULT_MAX_TX_WINDOW	63
+> 
+> Just keep this macro as is.
+> 
+> >  #define L2CAP_DEFAULT_MAX_TX		3
+> >  #define L2CAP_DEFAULT_RETRANS_TO	2000    /* 2 seconds */
+> >  #define L2CAP_DEFAULT_MONITOR_TO	12000   /* 12 seconds */
+> > @@ -42,6 +42,8 @@
+> >  #define L2CAP_DEFAULT_SDU_ARRIVAL_TIME	0xFFFFFFFF
+> >  #define L2CAP_DEFAULT_ACCESS_LATENCY	0xFFFFFFFF
+> >  
+> > +#define L2CAP_DEFAULT_MAX_EXT_WINDOW	0x3FFF
+> > +
+> 
+> and remove MAX from this one.
+> 
+> >  #define L2CAP_CONN_TIMEOUT	(40000) /* 40 seconds */
+> >  #define L2CAP_INFO_TIMEOUT	(4000)  /*  4 seconds */
+> >  
+> > @@ -240,6 +242,7 @@ struct l2cap_conf_opt {
+> >  #define L2CAP_CONF_RFC		0x04
+> >  #define L2CAP_CONF_FCS		0x05
+> >  #define L2CAP_CONF_EFS		0x06
+> > +#define L2CAP_CONF_EWS		0x07
+> >  
+> >  #define L2CAP_CONF_MAX_SIZE	22
+> >  
+> > @@ -357,7 +360,7 @@ struct l2cap_chan {
+> >  
+> >  	__u8		fcs;
+> >  
+> > -	__u8		tx_win;
+> > +	__u16		tx_win;
+> >  	__u8		max_tx;
+> >  	__u16		retrans_timeout;
+> >  	__u16		monitor_timeout;
+> > @@ -381,7 +384,7 @@ struct l2cap_chan {
+> >  	struct sk_buff	*sdu;
+> >  	struct sk_buff	*sdu_last_frag;
+> >  
+> > -	__u8		remote_tx_win;
+> > +	__u16		remote_tx_win;
+> >  	__u8		remote_max_tx;
+> >  	__u16		remote_mps;
+> >  
+> > @@ -488,6 +491,7 @@ enum {
+> >  	CONF_STATE2_DEVICE,
+> >  	CONF_LOCAL_PEND,
+> >  	CONF_REMOTE_PEND,
+> > +	CONF_EWS_RECV,
+> >  };
+> >  
+> >  #define L2CAP_CONF_MAX_CONF_REQ 2
+> > @@ -508,6 +512,7 @@ enum {
+> >  /* Definitions for flags in l2cap_chan */
+> >  enum {
+> >  	FLAG_EFS_ENABLE,
+> > +	FLAG_EXT_CTRL,
+> >  };
+> >  
+> >  #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 7aad856..69e974a 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -1906,6 +1906,22 @@ static inline bool __l2cap_efs_supported(struct l2cap_chan *chan)
+> >  	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_FLOW;
+> >  }
+> >  
+> > +static inline bool __l2cap_ews_supported(struct l2cap_chan *chan)
+> > +{
+> > +	return enable_hs && chan->conn->feat_mask & L2CAP_FEAT_EXT_WINDOW;
+> > +}
+> > +
+> > +static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+> > +{
+> > +	if (chan->tx_win > L2CAP_DEFAULT_MAX_TX_WINDOW &&
+> > +						__l2cap_ews_supported(chan))
+> > +		/* use extended control field */
+> > +		set_bit(FLAG_EXT_CTRL, &chan->flags);
+> > +	else
+> > +		chan->tx_win = min_t(u16, chan->tx_win,
+> > +						L2CAP_DEFAULT_MAX_TX_WINDOW);
+> > +}
+> > +
+> >  static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+> >  {
+> >  	struct l2cap_conf_req *req = data;
+> > @@ -1957,7 +1973,6 @@ done:
+> >  
+> >  	case L2CAP_MODE_ERTM:
+> >  		rfc.mode            = L2CAP_MODE_ERTM;
+> > -		rfc.txwin_size      = chan->tx_win;
+> >  		rfc.max_transmit    = chan->max_tx;
+> >  		rfc.retrans_timeout = 0;
+> >  		rfc.monitor_timeout = 0;
+> > @@ -1965,6 +1980,11 @@ done:
+> >  		if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
+> >  			rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
+> >  
+> > +		l2cap_txwin_setup(chan);
+> > +
+> > +		rfc.txwin_size = min_t(u16, chan->tx_win,
+> > +						L2CAP_DEFAULT_MAX_TX_WINDOW);
+> 
+> rfc.txwin_size is exactly chan->tx_win.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |    4 ++--
- net/bluetooth/l2cap_sock.c    |   14 +++++++++-----
- 3 files changed, 12 insertions(+), 8 deletions(-)
+chan->tx_win might be bigger then L2CAP_DEFAULT_MAX_TX_WINDOW since we
+allow to set bigger value via socket (see below).
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 6c0d247..440e7b8 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -325,7 +325,6 @@ struct l2cap_chan {
- 
- 	__u8		sec_level;
- 	__u8		role_switch;
--	__u8		force_active;
- 
- 	__u8		ident;
- 
-@@ -464,6 +463,7 @@ enum {
- 
- /* Definitions for flags in l2cap_chan */
- enum {
-+	FLAG_FORCE_ACTIVE,
- 	FLAG_FORCE_RELIABLE,
- 	FLAG_FLUSHABLE,
- };
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 57e4b2c..aeeacf8 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -605,7 +605,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u16 control)
- 	else
- 		flags = ACL_START;
- 
--	bt_cb(skb)->force_active = chan->force_active;
-+	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 
- 	hci_send_acl(chan->conn->hcon, skb, flags);
- }
-@@ -1259,7 +1259,7 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
- 	else
- 		flags = ACL_START;
- 
--	bt_cb(skb)->force_active = chan->force_active;
-+	bt_cb(skb)->force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	hci_send_acl(hcon, skb, flags);
- }
- 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ec0458c..492d5ab 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -459,7 +459,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
- 			break;
- 		}
- 
--		pwr.force_active = chan->force_active;
-+		pwr.force_active = test_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 
- 		len = min_t(unsigned int, len, sizeof(pwr));
- 		if (copy_to_user(optval, (char *) &pwr, len))
-@@ -680,7 +680,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			err = -EFAULT;
- 			break;
- 		}
--		chan->force_active = pwr.force_active;
-+
-+		if (pwr.force_active)
-+			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-+		else
-+			clear_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 		break;
- 
- 	default:
-@@ -942,7 +946,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
- 		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
- 			set_bit(FLAG_FLUSHABLE, &chan->flags);
--		chan->force_active = pchan->force_active;
-+		if (test_bit(FLAG_FORCE_ACTIVE, &pchan->flags))
-+			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	} else {
- 
- 		switch (sk->sk_type) {
-@@ -973,8 +978,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		chan->role_switch = 0;
- 		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
- 		clear_bit(FLAG_FLUSHABLE, &chan->flags);
--		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
--
-+		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	}
- 
- 	/* Default config options */
--- 
-1.7.4.1
+Current idea is to allow user to set txwin < EXT_WINDOW and if ews_supported
+and txwin > TX_WINDOW then we enable extended control field.
 
+> Also I would like to see a patch cleaning up the names we give to the tx
+> window. Some places is tx_win, others txwin_size or even txwin.
+
+This is true, I can create clean up patch later.
+
+> 
+> > +
+> >  		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> >  							(unsigned long) &rfc);
+> >  
+> > @@ -1996,6 +2016,10 @@ done:
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> >  
+> > +		if (__l2cap_ews_supported(chan) &&
+> > +				test_bit(FLAG_EXT_CTRL, &chan->flags))
+> 
+> if EXT_CTRL is true there is no need to to check for __l2cap_ews_supported().
+> It is true as well.
+
+will fix
+
+> 
+> > +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
+> > +					chan->tx_win);
+> >  		break;
+> >  
+> >  	case L2CAP_MODE_STREAMING:
+> > @@ -2033,7 +2057,10 @@ done:
+> >  			chan->fcs = L2CAP_FCS_NONE;
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FCS, 1, chan->fcs);
+> >  		}
+> > -
+> > +		
+> > +		if (__l2cap_ews_supported(chan) &&
+> > +				test_bit(FLAG_EXT_CTRL, &chan->flags))
+> > +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2, 0);
+> 
+> same here.
+
+OK, btw in streaming mode we do not use txwin so I do not know how to
+trigger EXT_CTRL from user. 
+
+I think I will remove this code at all.
+
+> 
+> >  		break;
+> >  	}
+> >  
+> > @@ -2093,6 +2120,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+> >  				memcpy(&efs, (void *) val, olen);
+> >  			break;
+> >  
+> > +		case L2CAP_CONF_EWS:
+> > +			set_bit(FLAG_EXT_CTRL, &chan->flags);
+> > +			chan->remote_tx_win = val;
+> > +			set_bit(CONF_EWS_RECV, &chan->conf_state);
+> > +			break;
+> > +
+> >  		default:
+> >  			if (hint)
+> >  				break;
+> > @@ -2183,7 +2216,11 @@ done:
+> >  			break;
+> >  
+> >  		case L2CAP_MODE_ERTM:
+> > -			chan->remote_tx_win = rfc.txwin_size;
+> > +			if (!test_bit(CONF_EWS_RECV, &chan->conf_state))
+> > +				chan->remote_tx_win = rfc.txwin_size;
+> > +			else
+> > +				rfc.txwin_size = L2CAP_DEFAULT_MAX_TX_WINDOW;
+> > +
+> 
+> This seems better:
+> 			if (test_bit(CONF_EWS_RECV)
+> 				rfc.txwin_size = L2CAP_DEFAULT_MAX_TX_WINDOW
+> 
+> 			chan->remote_tx_win = rfc.txwin_size;
+
+remote_tx_win and rfc.txwin_size are different in size. remote_tx_win
+might be bigger then L2CAP_DEFAULT_MAX_TX_WINDOW.
+
+> Actually why does this code exist? Why do you want to set tx_win to
+> L2CAP_DEFAULT_MAX_TX_WINDOW when EWS is received.
+
+I thought it would be better to put this value despite RFC field will be
+ignored. Otherwise the field would be the same as for streaming mode.
+
+> >  			chan->remote_max_tx = rfc.max_transmit;
+> >  
+> >  			if (le16_to_cpu(rfc.max_pdu_size) > chan->conn->mtu - 10)
+> > @@ -2304,6 +2341,13 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
+> >  			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
+> >  					sizeof(efs), (unsigned long) &efs);
+> >  			break;
+> > +
+> > +		case L2CAP_CONF_EWS:
+> > +			chan->tx_win = val < L2CAP_DEFAULT_MAX_EXT_WINDOW ?
+> > +				val : L2CAP_DEFAULT_MAX_EXT_WINDOW;
+> 
+> This should be <=, but the end result is the same.
+
+I change it to:
+
+chan->tx_win = min_t(u16, val, L2CAP_DEFAULT_EXT_WINDOW);
+
+Best regards 
+Andrei Emeltchenko 
