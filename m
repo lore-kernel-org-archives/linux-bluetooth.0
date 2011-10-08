@@ -4,82 +4,91 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	padovan@profusion.mobi,
 	David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 2/3] Bluetooth: Rename sysfs un/register to add/del
-Date: Sat,  8 Oct 2011 14:58:48 +0200
-Message-Id: <1318078729-4158-2-git-send-email-dh.herrmann@googlemail.com>
-In-Reply-To: <1318078729-4158-1-git-send-email-dh.herrmann@googlemail.com>
-References: <1318078729-4158-1-git-send-email-dh.herrmann@googlemail.com>
+Subject: [PATCH 1/3] Bluetooth: Fix hci core device initialization
+Date: Sat,  8 Oct 2011 14:58:47 +0200
+Message-Id: <1318078729-4158-1-git-send-email-dh.herrmann@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we introduced hci_init_sysfs() we should also rename hci_register_sysfs() and
-hci_unregister_sysfs() to hci_add_sysfs() and hci_del_sysfs() like we do with
-hci_conn_add/del_sysfs(). It looks more consistent now.
+We must not call device_del() if we didn't use device_add(). See module.c for
+comments on that. Therefore, we need to call device_initialize() when allocating
+the hci device and later device_add() instead of device_register().
+
+This also fixes a bug when hci_register_dev() failed and we call hci_free_dev()
+without a valid core device. hci_free_dev() segfaults while calling put_device()
+on invalid memory.
+
+We already do this with hci_conn connections (hci_conn_init_sysfs()) so they do
+not need to be fixed.
 
 Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
 ---
- include/net/bluetooth/hci_core.h |    4 ++--
- net/bluetooth/hci_core.c         |    4 ++--
- net/bluetooth/hci_sysfs.c        |    4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |    1 +
+ net/bluetooth/hci_sysfs.c        |   18 ++++++++++++------
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 81741ac..2d03b0b 100644
+index 5b92442..81741ac 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -598,8 +598,8 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
+@@ -597,6 +597,7 @@ int hci_recv_frame(struct sk_buff *skb);
+ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
  int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
  
- void hci_init_sysfs(struct hci_dev *hdev);
--int hci_register_sysfs(struct hci_dev *hdev);
--void hci_unregister_sysfs(struct hci_dev *hdev);
-+int hci_add_sysfs(struct hci_dev *hdev);
-+void hci_del_sysfs(struct hci_dev *hdev);
++void hci_init_sysfs(struct hci_dev *hdev);
+ int hci_register_sysfs(struct hci_dev *hdev);
+ void hci_unregister_sysfs(struct hci_dev *hdev);
  void hci_conn_init_sysfs(struct hci_conn *conn);
- void hci_conn_add_sysfs(struct hci_conn *conn);
- void hci_conn_del_sysfs(struct hci_conn *conn);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d2445cb..4975578 100644
+index b84458d..d2445cb 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1506,7 +1506,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	if (!hdev->workqueue)
- 		goto nomem;
+@@ -912,6 +912,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	if (!hdev)
+ 		return NULL;
  
--	hci_register_sysfs(hdev);
-+	hci_add_sysfs(hdev);
++	hci_init_sysfs(hdev);
+ 	skb_queue_head_init(&hdev->driver_init);
  
- 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
- 				RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops, hdev);
-@@ -1561,7 +1561,7 @@ int hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
- 	}
- 
--	hci_unregister_sysfs(hdev);
-+	hci_del_sysfs(hdev);
- 
- 	hci_del_off_timer(hdev);
- 	del_timer(&hdev->adv_timer);
+ 	return hdev;
 diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index a7d5de3..1f9f876 100644
+index 22f1a6c..a7d5de3 100644
 --- a/net/bluetooth/hci_sysfs.c
 +++ b/net/bluetooth/hci_sysfs.c
-@@ -553,7 +553,7 @@ void hci_init_sysfs(struct hci_dev *hdev)
- 	device_initialize(dev);
- }
+@@ -542,6 +542,17 @@ static int auto_accept_delay_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+ 					auto_accept_delay_set, "%llu\n");
  
--int hci_register_sysfs(struct hci_dev *hdev)
-+int hci_add_sysfs(struct hci_dev *hdev)
++void hci_init_sysfs(struct hci_dev *hdev)
++{
++	struct device *dev = &hdev->dev;
++
++	dev->type = &bt_host;
++	dev->class = bt_class;
++
++	dev_set_drvdata(dev, hdev);
++	device_initialize(dev);
++}
++
+ int hci_register_sysfs(struct hci_dev *hdev)
  {
  	struct device *dev = &hdev->dev;
- 	int err;
-@@ -587,7 +587,7 @@ int hci_register_sysfs(struct hci_dev *hdev)
- 	return 0;
- }
+@@ -549,15 +560,10 @@ int hci_register_sysfs(struct hci_dev *hdev)
  
--void hci_unregister_sysfs(struct hci_dev *hdev)
-+void hci_del_sysfs(struct hci_dev *hdev)
- {
  	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 
+-	dev->type = &bt_host;
+-	dev->class = bt_class;
+ 	dev->parent = hdev->parent;
+-
+ 	dev_set_name(dev, "%s", hdev->name);
+ 
+-	dev_set_drvdata(dev, hdev);
+-
+-	err = device_register(dev);
++	err = device_add(dev);
+ 	if (err < 0)
+ 		return err;
  
 -- 
 1.7.7
