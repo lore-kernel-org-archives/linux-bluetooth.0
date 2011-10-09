@@ -1,44 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH 1/2] Bluetooth: btusb: also be quiet when suspending
+Subject: [PATCH 0/2] Bluetooth: btusb: handle usb_submit_urb error similarly
 From: Paul Bolle <pebolle@tiscali.nl>
-To: "Gustavo F. Padovan" <padovan@profusion.mobi>, Marcel Holtmann
- <marcel@holtmann.org>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan"
+ <padovan@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Date: Sun, 09 Oct 2011 12:12:16 +0200
-Message-ID: <1318155136.1903.23.camel@x61.thuisdomein>
+Date: Sun, 09 Oct 2011 12:11:30 +0200
+Message-ID: <1318155090.1903.22.camel@x61.thuisdomein>
 Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-usb_submit_urb() returns -ENODEV when a usb device is disconnected. In
-commit 4935f1c164ac528dff3538f97953b385ba500710 ("Bluetooth: btusb: be
-quiet on device disconnect") I stopped treating that return as an error
-in the three btusb_*_complete() functions.
+0) These two patches are follow-ups to commit
+4935f1c164ac528dff3538f97953b385ba500710 ("Bluetooth: btusb: be quiet on
+device disconnect"). One difference with that commit is that I stopped
+adding comments explaining -EPERM and -ENODEV, because it seemed a bit
+silly to repeat those comments that often.
 
-It turns out btusb_send_frame() generates a similar error if the system
-is suspended while the bluetooth usb device is enabled. The sensible
-thing to do here seems to be to treat -ENODEV (and -EPERM) just like the
-btusb_*_complete() functions now do.
+1) Note that I haven't actually ever seen the errors I now hide (in case
+of "urb is being killed" or "device got disconnected") in the second
+patch, so I'd appreciate a more careful review of that patch.
 
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
----
- drivers/bluetooth/btusb.c |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+2) Also note that there's a call of usb_submit_urb() in play_deferred()
+which never prints an error. Should it do that if usb_submit_urb()
+returns a negative value?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9cbac6b..3d1afe7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -765,7 +765,9 @@ skip_waking:
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err < 0) {
--		BT_ERR("%s urb %p submission failed", hdev->name, urb);
-+		if (err != -EPERM && err != -ENODEV)
-+			BT_ERR("%s urb %p submission failed (%d)",
-+						hdev->name, urb, -err);
- 		kfree(urb->setup_packet);
- 		usb_unanchor_urb(urb);
- 	} else {
+Paul Bolle (2):
+  Bluetooth: btusb: also be quiet when suspending
+  Bluetooth: btusb: hide more usb_submit_urb errors
+
+ drivers/bluetooth/btusb.c |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
+
 -- 
 1.7.4.4
