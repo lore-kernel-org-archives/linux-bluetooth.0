@@ -1,83 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4E91AC76.2000101@optimaster.eu>
+Date: Sun, 09 Oct 2011 16:15:18 +0200
+From: Krisztian Kocsis <krisztian.kocsis@optimaster.eu>
 MIME-Version: 1.0
-In-Reply-To: <4E91AC1C.9020306@optimaster.eu>
-References: <bf39f3bbabbfb3881523f71163d1359b@optimaster.eu>
-	<4E91AC1C.9020306@optimaster.eu>
-Date: Sun, 9 Oct 2011 22:53:38 +0300
-Message-ID: <CABBYNZ+UU_ADSYscvzr2g5n+u55JF0qf5ksxEs_hn7s3B+-8ZA@mail.gmail.com>
-Subject: Re: [pulseaudio-discuss] Fwd: Re: Bluetooth Headset Problem #2
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Krisztian Kocsis <krisztian.kocsis@optimaster.eu>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: Fwd: Re: [pulseaudio-discuss] Bluetooth Headset Problem Update
+References: <1318138170.6357.20.camel@jarl>
+In-Reply-To: <1318138170.6357.20.camel@jarl>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-On Sun, Oct 9, 2011 at 5:13 PM, Krisztian Kocsis
-<krisztian.kocsis@optimaster.eu> wrote:
->
->
-> -------- Original Message --------
-> Subject:        [pulseaudio-discuss] Fwd: Re: Bluetooth Headset Problem #2
-> Date:   Sat, 08 Oct 2011 15:52:11 +0200
-> From:   krisztian.kocsis@optimaster.eu
-> Reply-To:       General PulseAudio Discussion
-> <pulseaudio-discuss@lists.freedesktop.org>
-> To:     <pulseaudio-discuss@lists.freedesktop.org>
->
->
->
-> Sorry, here are the attachments.
->
-> -------- Original Message --------
-> Subject: Re: Bluetooth Headset Problem
-> Date: Sat, 08 Oct 2011 14:11:31 +0200
->  From: krisztian.kocsis@optimaster.eu
-> To: Luiz Augusto von Dentz<luiz.dentz@gmail.com>
->
-> Hello!
->
-> I didn't help!
->
-> Here is who I test it:
->
-> - Load kernel (2.6.24.6) modules: bluetooth, hci_usb, l2cap, rfcomm,
-> sco
-> - Start bluez (4.96): bluetoothd -d -n (debug, foreground)
-> - Start simple-agent: simple-agent 0000
-> - Test device connection with: hcitool cc 00:07:A4:EE:8F:03 (already
-> paired)
-> - Start pulseaudio (0.9.23):
-> LD_LIBRARY_PATH=/afc/lib/pulse-0.9.23/modules /afc/bin/pulseaudio
-> --system --high-priority --disallow-exit --log-target=stderr
-> --use-pid-file --disable-shm -vvvvvvv
-> - Connect to headset: dbus-send --system --print-reply --dest=org.bluez
-> /org/bluez/2848/hci0/dev_00_07_A4_EE_8F_03 org.bluez.Headset.Connect
-> (dbus 1.4.14)
-> - Activate hsp profile: pactl set-card-profile 0 hsp
-> - Trying to play a WAV: paplay -p -v /afc/tmp/test.wav (hangs at Time:
-> 0.000s)
-> - Trying to play an MP3 with mpg123 (1.13.3): mpg123 -vvvvv -o pulse
-> /afc/tmp/armin.mp3 (hangs at frame 6)
->
-> Did I miss some commands or actions which are required to play
-> something on a headset?
-> I'v attached the config files of bluez and pulseaudio and the logs
-> also.
 
-What is the audio routing in this system, HCI or PCM directly in the
-controller with or without a alsa device? Actually before you do check
-about that check how it works with a normal Linux distro and a dongle,
-that uses HCI routing so the audio is sent/received via socket
-interface. Embedded devices normally uses PCM routing which you need
-check in the hardware documentation, currently you will need a alsa
-device to be able to properly route passing it as argument to
-module-device-bluetooth (iirc sco-sink/sco-source).
+-------- Original Message --------
+Subject: 	Re: [pulseaudio-discuss] Bluetooth Headset Problem Update
+Date: 	Sun, 09 Oct 2011 08:29:28 +0300
+From: 	Tanu Kaskinen <tanuk@iki.fi>
+Reply-To: 	General PulseAudio Discussion 
+<pulseaudio-discuss@lists.freedesktop.org>
+To: 	General PulseAudio Discussion 
+<pulseaudio-discuss@lists.freedesktop.org>
 
-Again you need to be able to respond what routing settings you
-controller uses, otherwise we won't be able to help you.
+
+
+On Sat, 2011-10-08 at 22:09 +0200, krisztian.kocsis@optimaster.eu wrote:
+>  Hi!
+>
+>  The BIG difference when the output is oss and bluetooth is when
+>  bluetooth output is used with paplay, then paplay never receives a
+>  PA_COMMAND_REQUEST op, i don't know why.
+>  In the background PA dispatches PA_COMMAND_GET_PLAYBACK_LATENCY
+>  messages continuously (as seen with OSS output).
+>
+>  The playback_stream_request_bytes() function is only called from
+>  handle_seek() and never called from sink_input_pop_cb() (which function
+>  is also never called)!
+>
+>  The call chain is not so trivial, please help me how to find the point
+>  where sink_input_pop_cb() should be called and why PA cannot reach this
+>  point.
+
+sink_input_pop_cb() is called when the sink requests audio from the sink
+input. If the sink isn't suspended and the sink input isn't corked
+(which they aren't in this case), the pop() callback should be called
+very frequently. If it's not called, it means that the bluetooth sink is
+not requesting any audio. So the problem is in bluez or
+module-bluetooth-device. The pulseaudio log doesn't contain any error
+messages, so I don't have any more clues for what might be wrong. (I
+didn't spot any errors in the bluez log either, but I'm not experienced
+in interpreting the bluez logs.)
 
 -- 
-Luiz Augusto von Dentz
+Tanu
+
+
+_______________________________________________
+pulseaudio-discuss mailing list
+pulseaudio-discuss@lists.freedesktop.org
+http://lists.freedesktop.org/mailman/listinfo/pulseaudio-discuss
+
