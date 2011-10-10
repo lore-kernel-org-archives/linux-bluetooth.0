@@ -1,41 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Xu <martin.xu@intel.com>
+Subject: Question about A2DP, Pulseaudio.
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Martin Xu <martin.xu@intel.com>
-Subject: [PATCH] Add Unknow after LEMeta Event
-Date: Mon, 10 Oct 2011 02:21:57 -0700
-Message-Id: <1318238517-4702-1-git-send-email-martin.xu@intel.com>
+Content-type: text/plain; charset=UTF-8
+Date: Mon, 10 Oct 2011 17:11:26 +0900
+Message-id: <1318234286.16562.8.camel@chanten-desktop>
+MIME-version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to Core_v4.0
-LE Meta Event Event Code is 0x3E, While Physical Link Complete Event Code is 0x40
-So add Unknow after LEMeta Event
----
- parser/hci.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+Hello bluetooth developers.
 
-diff --git a/parser/hci.c b/parser/hci.c
-index 610177b..d36b54b 100644
---- a/parser/hci.c
-+++ b/parser/hci.c
-@@ -44,7 +44,7 @@ static inline uint16_t get_manufacturer(void)
- 	return (manufacturer == DEFAULT_COMPID ? parser.defcompid : manufacturer);
- }
- 
--#define EVENT_NUM 76
-+#define EVENT_NUM 77
- static char *event_str[EVENT_NUM + 1] = {
- 	"Unknown",
- 	"Inquiry Complete",
-@@ -109,6 +109,7 @@ static char *event_str[EVENT_NUM + 1] = {
- 	"Keypress Notification",
- 	"Remote Host Supported Features Notification",
- 	"LE Meta Event",
-+	"Unknown",
- 	"Physical Link Complete",
- 	"Channel Selected",
- 	"Disconnection Physical Link Complete",
--- 
-1.7.2.2
+I have a few questions about BlueZ,PulseAudio.
+If there are any plan to develop. I want to discuss how to implement the
+below.
+
+1. How to handle New Codec(A2DP) between BlueZ and PulseAudio
+As far as I understand puleaduio add_card() working by UUID info.
+however , in case of mpeg and other codec, we can't use it.
+
+I think AudioSink dbus interface should provide codec info that headset
+supports. Based on it, PulseaAudio can know headset support codec info.
+
+Bluez audio.conf should have option related to this.
+
+2. auto_connect.
+Could you explain this purpose? 
+
+4. Is there anyone could explain sco_sink, sco_source? If there are ALSA
+code related to it, could you tell me the link that explain ?
+
+
+BR
+Chanyeol Park
 
