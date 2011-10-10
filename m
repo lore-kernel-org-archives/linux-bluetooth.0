@@ -1,109 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v5 08/15] Bluetooth: Prepare for full support discovery procedures
-Mime-Version: 1.0 (Apple Message framework v1244.3)
-Content-Type: text/plain; charset=us-ascii
-From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <20111007195149.GA4108@joana>
-Date: Mon, 10 Oct 2011 13:47:22 -0300
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <82E9A78A-1D53-42ED-BD1B-909DA0250E15@openbossa.org>
-References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org> <1317856847-28167-9-git-send-email-andre.guedes@openbossa.org> <20111006185041.GI5652@joana> <8EBD0209-B0F2-4AEB-B876-D87F8A32C5F6@openbossa.org> <20111007195149.GA4108@joana>
-To: Gustavo Padovan <padovan@profusion.mobi>
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-bluetooth@vger.kernel.org
+Cc: Antonio Ospite <ospite@studenti.unina.it>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Bastien Nocera <hadess@hadess.net>
+Subject: [RFC PATCH BlueZ RESEND 3/3] Add a btd_device_set_trusted() call
+Date: Mon, 10 Oct 2011 17:50:53 +0200
+Message-Id: <1318261853-22448-3-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
+References: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Add a new btd_* call to set a device as trusted, this is going to be
+used by the external playstation-peripheral plugin.
+---
+ src/device.h |    6 +++++
+ src/device.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+), 0 deletions(-)
 
-On Oct 7, 2011, at 4:51 PM, Gustavo Padovan wrote:
+diff --git a/src/device.h b/src/device.h
+index 1ea5ce4..4994d2a 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -63,6 +63,12 @@ void device_register_services(DBusConnection *conn, struct btd_device *device,
+ 						GSList *prim_list, int psm);
+ GSList *device_services_from_record(struct btd_device *device,
+ 							GSList *profiles);
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   const char *uuid);
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid);
+ struct btd_adapter *device_get_adapter(struct btd_device *device);
+ void device_get_address(struct btd_device *device, bdaddr_t *bdaddr);
+diff --git a/src/device.c b/src/device.c
+index 68d504d..2d167d3 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -49,6 +49,7 @@
+ #include "att.h"
+ #include "hcid.h"
+ #include "adapter.h"
++#include "manager.h"
+ #include "gattrib.h"
+ #include "attio.h"
+ #include "device.h"
+@@ -2698,6 +2699,75 @@ GSList *btd_device_get_primaries(struct btd_device *device)
+ 	return device->primaries;
+ }
+ 
++int btd_device_set_trusted(const char *adapter_address,
++			   const char *device_address,
++			   char *name,
++			   uint16_t vendor_id,
++			   uint16_t product_id,
++			   const char *uuid)
++{
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	DBusConnection *conn;
++	bdaddr_t src;
++	bdaddr_t dst;
++	int ret = 0;
++
++	str2ba(adapter_address, &src);
++	str2ba(device_address, &dst);
++
++	/* XXX: is this really needed? Association works even without it */
++	write_device_name(&dst, &src, name);
++
++	/* Set the device id */
++	store_device_id(adapter_address, device_address, 0xffff, vendor_id,
++			product_id, 0);
++	/* Don't write a profile here,
++	 * it will be updated when the device connects */
++
++	write_trust(adapter_address, device_address, "[all]", TRUE);
++
++	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (conn == NULL) {
++		DBG("Failed to get on the bus");
++		ret = -EPERM;
++		goto out;
++	}
++
++	adapter = manager_find_adapter(&src);
++	if (adapter == NULL) {
++		DBG("Failed to get the adapter");
++		ret = -EPERM;
++		goto out_dbus_unref;
++	}
++
++	/* This is needed: adapter_find_device() wouldn't need a Dbus
++	 * connection but it would not be enough as it only searches for
++	 * already existing devices, while adapter_get_device() will create a
++	 * new device if necessary.
++	 */
++	device = adapter_get_device(conn, adapter, device_address);
++	if (device == NULL) {
++		DBG("Failed to get the device");
++		ret = -ENODEV;
++		goto out_dbus_unref;
++	}
++
++	btd_device_add_uuid(device, uuid);
++
++	/* XXX: these two should not be needed either, as the values are reset
++	 * on the actual BT connection. We are just preparing for it now, we
++	 * are still connected via USB. I just wanted confirmation on that.
++	 */
++	device_set_temporary(device, FALSE);
++	device_set_name(device, name);
++
++out_dbus_unref:
++	dbus_connection_unref(conn);
++out:
++	return ret;
++}
++
+ void btd_device_add_uuid(struct btd_device *device, const char *uuid)
+ {
+ 	GSList *uuid_list;
+-- 
+1.7.6.3
 
-> Hi Andre,
-> 
-> * Andre Guedes <andre.guedes@openbossa.org> [2011-10-06 17:30:39 -0300]:
-> 
->> Hi Gustavo,
->> 
->> On Oct 6, 2011, at 3:50 PM, Gustavo Padovan wrote:
->> 
->>> Hi Andre,
->>> 
->>> * Andre Guedes <andre.guedes@openbossa.org> [2011-10-05 20:20:40 -0300]:
->>> 
->>>> This patch prepares start_discovery() to support LE-Only and BR/EDR/LE
->>>> discovery procedures (BR/EDR is already supported).
->>>> 
->>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->>>> ---
->>>> include/net/bluetooth/hci.h      |    1 +
->>>> include/net/bluetooth/hci_core.h |    1 +
->>>> net/bluetooth/mgmt.c             |   12 +++++++++++-
->>>> 3 files changed, 13 insertions(+), 1 deletions(-)
->>>> 
->>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>> index aaf79af..1e11e7f 100644
->>>> --- a/include/net/bluetooth/hci.h
->>>> +++ b/include/net/bluetooth/hci.h
->>>> @@ -202,6 +202,7 @@ enum {
->>>> 
->>>> #define LMP_EV4		0x01
->>>> #define LMP_EV5		0x02
->>>> +#define LMP_NO_BREDR	0x20
->>>> #define LMP_LE		0x40
->>>> 
->>>> #define LMP_SNIFF_SUBR	0x02
->>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>>> index 36e15cc..e0c9790 100644
->>>> --- a/include/net/bluetooth/hci_core.h
->>>> +++ b/include/net/bluetooth/hci_core.h
->>>> @@ -613,6 +613,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->>>> #define lmp_esco_capable(dev)      ((dev)->features[3] & LMP_ESCO)
->>>> #define lmp_ssp_capable(dev)       ((dev)->features[6] & LMP_SIMPLE_PAIR)
->>>> #define lmp_no_flush_capable(dev)  ((dev)->features[6] & LMP_NO_FLUSH)
->>>> +#define lmp_bredr_capable(dev)     (!((dev)->features[4] & LMP_NO_BREDR))
->>>> #define lmp_le_capable(dev)        ((dev)->features[4] & LMP_LE)
->>>> 
->>>> /* ----- Extended LMP capabilities ----- */
->>>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->>>> index 58cf33a..0040e37 100644
->>>> --- a/net/bluetooth/mgmt.c
->>>> +++ b/net/bluetooth/mgmt.c
->>>> @@ -32,6 +32,8 @@
->>>> #define MGMT_VERSION	0
->>>> #define MGMT_REVISION	1
->>>> 
->>>> +#define INQUIRY_LEN_BREDR 0x08 /* TGAP(100) */
->>>> +
->>>> struct pending_cmd {
->>>> 	struct list_head list;
->>>> 	__u16 opcode;
->>>> @@ -1632,7 +1634,15 @@ static int start_discovery(struct sock *sk, u16 index)
->>>> 		goto failed;
->>>> 	}
->>>> 
->>>> -	err = hci_do_inquiry(hdev, 0x08);
->>>> +	if (lmp_host_le_capable(hdev)) {
->>>> +		if (lmp_bredr_capable(hdev))
->>>> +			err = -ENOSYS;
->>>> +		else
->>>> +			err = -ENOSYS;
->>> 
->>> This seems a lot wrong.
->> 
->> As the patch message says it prepares for supporting LE-only and
->> BR/EDR/LE discovery procedures. If you take a look further in the
->> patch series you'll see these -ENOSYS being replaced as soon as
->> those procedures are supported. Please take a look at patches 14
->> and 15.
->> 
->> Anyway, if you don't like this, I can squash it in patch 14. Please
->> let me know.
-> 
-> Please do that, makes more sense to me.
-
-Ok, I'll do that. So, don't apply patches 08, 14 and 15. I'll squash
-it and resend patches 14 and 15.
-
-All other patches are still applicable.
-
-BR,
-
-Andre
