@@ -1,42 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Oct 2011 10:22:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Santiago Carot-Nemesio <sancane@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/9] Add functions to manage attio callbacks
-Message-ID: <20111010072259.GE4094@fusion.localdomain>
-References: <1317303988-26310-1-git-send-email-sancane@gmail.com>
- <1317303988-26310-2-git-send-email-sancane@gmail.com>
- <1317303988-26310-3-git-send-email-sancane@gmail.com>
- <1317303988-26310-4-git-send-email-sancane@gmail.com>
- <1317303988-26310-5-git-send-email-sancane@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317303988-26310-5-git-send-email-sancane@gmail.com>
+From: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Radoslaw Jablonski <radoslawjablonski@gmail.com>
+Subject: [PATCH obexd 2/2] Add NULL-field checking in vcard_printf_address
+Date: Mon, 10 Oct 2011 09:22:39 +0200
+Message-Id: <1318231359-3309-2-git-send-email-radoslawjablonski@gmail.com>
+In-Reply-To: <1318231359-3309-1-git-send-email-radoslawjablonski@gmail.com>
+References: <1318231359-3309-1-git-send-email-radoslawjablonski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santiago,
+Without that checking strlen(..) could be called with NULL
+as param and this will result crash (in some scenarios
+'field' may be NULL)
+---
+ plugins/vcard.c |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
-On Thu, Sep 29, 2011, Santiago Carot-Nemesio wrote:
-> @@ -36,7 +37,9 @@
->  struct thermometer {
->  	DBusConnection          *conn;		/* The connection to the bus */
->  	struct btd_device       *dev;		/* Device reference */
-> +	GAttrib			*attrib;	/* GATT connection */
->  	struct att_range	*svc_range;	/* Thermometer range */
-> +	gint                    attioid;	/* Att watcher id */
->  };
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index c0a33cb..dc20a77 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -680,8 +680,11 @@ static void vcard_printf_address(GString *vcards, uint8_t format,
+ 	for (l = address->fields; l; l = l->next) {
+ 		char *field = l->data;
+ 
+-		set_escape(format, field_esc, field, LEN_MAX, strlen(field));
+-		g_strlcat(fields, field_esc, len);
++		if (field) {
++			set_escape(format, field_esc, field, LEN_MAX,
++								strlen(field));
++			g_strlcat(fields, field_esc, len);
++		}
+ 
+ 		if (l->next)
+ 			/* not adding ';' after last addr field */
+-- 
+1.7.0.4
 
-Looking at the attio.h API, the attioid should be guint and not gint,
-right? Also, this struct has the same inconsistency in indentation. Some
-lines use spaces whereas other use tabs. Please fix this (though
-potentially in a separate coding-style cleanup patch since the
-inconsistency exists there already before this patch).
-
-> +	if (t->attioid)
-> +		btd_device_remove_attio_callback(t->dev, t->attioid);
-
-Please use if (t->attioid > 0)
-
-Johan
