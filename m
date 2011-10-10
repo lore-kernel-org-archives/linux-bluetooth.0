@@ -2,37 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 6/7] AVRCP: Do not list values for unsupported attributes
-Date: Mon, 10 Oct 2011 09:37:10 -0300
-Message-Id: <1318250231-14001-6-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 5/7] Move debug messages to their correspondent getters
+Date: Mon, 10 Oct 2011 09:37:09 -0300
+Message-Id: <1318250231-14001-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1318250231-14001-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1318250231-14001-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/avrcp.c |    7 +++----
- 1 files changed, 3 insertions(+), 4 deletions(-)
+ audio/avrcp.c |   19 ++++++++++---------
+ 1 files changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index ea175e3..0d9b6d0 100644
+index 058fa83..ea175e3 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -565,11 +565,10 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp_player *player,
- 	if (len != 1 || !player)
- 		goto err;
+@@ -474,9 +474,15 @@ static int player_set_attribute(struct avrcp_player *player,
  
--	len = attr_get_max_val(pdu->params[0]);
--	if (!len) {
--		error("Attribute is invalid: %u", pdu->params[0]);
-+	if (player_get_attribute(player, pdu->params[0]) < 0)
- 		goto err;
--	}
+ static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
+ {
+-	DBG("Get attribute: %u", attr);
++	int value;
+ 
+-	return player->cb->get_setting(attr, player->user_data);
++	DBG("attr %u", attr);
 +
-+	len = attr_get_max_val(pdu->params[0]);
++	value = player->cb->get_setting(attr, player->user_data);
++	if (value < 0)
++		DBG("attr %u not supported by player", attr);
++
++	return value;
+ }
  
- 	for (i = 1; i <= len; i++)
- 		pdu->params[i] = i;
+ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
+@@ -535,10 +541,8 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp_player *player,
+ 		goto done;
+ 
+ 	for (i = 1; i <= AVRCP_ATTRIBUTE_SCAN; i++) {
+-		if (player_get_attribute(player, i) < 0) {
+-			DBG("Ignoring setting %u: not supported by player", i);
++		if (player_get_attribute(player, i) < 0)
+ 			continue;
+-		}
+ 
+ 		len++;
+ 		pdu->params[len] = i;
+@@ -677,11 +681,8 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp_player *player
+ 		}
+ 
+ 		val = player_get_attribute(player, settings[i]);
+-		if (val < 0) {
+-			DBG("Ignoring %u: not supported by player",
+-								settings[i]);
++		if (val < 0)
+ 			continue;
+-		}
+ 
+ 		pdu->params[++len] = settings[i];
+ 		pdu->params[++len] = val;
 -- 
 1.7.7
 
