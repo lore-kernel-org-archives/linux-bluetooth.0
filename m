@@ -1,77 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Oct 2011 22:08:22 +0200
-From: Antonio Ospite <ospite@studenti.unina.it>
-To: Daniele Forsi <dforsi@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	Bastien Nocera <hadess@hadess.net>
-Subject: Re: [RFC PATCH BlueZ RESEND 1/3] Add a
- btd_manager_get_default_adapter_str() call
-Message-Id: <20111010220822.154276932b59aa2e1a606795@studenti.unina.it>
-In-Reply-To: <CAN_we7PX3DRxHrwa_A23nFD=FfwW-gQ2p39aFT7S6fGoD_rdXQ@mail.gmail.com>
-References: <1316454126-32614-1-git-send-email-ospite@studenti.unina.it>
-	<1318261853-22448-1-git-send-email-ospite@studenti.unina.it>
-	<CAN_we7PX3DRxHrwa_A23nFD=FfwW-gQ2p39aFT7S6fGoD_rdXQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__10_Oct_2011_22_08_22_+0200_Oejke7O_Gd6tTlM_"
+MIME-Version: 1.0
+In-Reply-To: <CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
+References: <CABax29VLUHg_jePnhHz_6WHYCZBHoir5TBLuauK+Ktfg9-8Xjw@mail.gmail.com>
+	<CACY+gR3t4RXuhUEi9486qsP+p0GCYArHW+PO5QfBfEUfnd=xEg@mail.gmail.com>
+Date: Mon, 10 Oct 2011 21:10:40 +0200
+Message-ID: <CABax29X1tFt8Am_i7y5nZsjs_D2QY9pbv19316Wn6RVq7ksEDA@mail.gmail.com>
+Subject: Re: A2DP quality (bluetooth-alsa)
+From: "qduaty@gmail.com" <qduaty@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Signature=_Mon__10_Oct_2011_22_08_22_+0200_Oejke7O_Gd6tTlM_
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Mon, 10 Oct 2011 19:16:26 +0200
-Daniele Forsi <dforsi@gmail.com> wrote:
+2011/10/10 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> It can be 2 things, either a bug or the device maximum bitpool is
+> actually 53 so we cannot negotiate it.
 
-> 2011/10/10 Antonio Ospite:
->=20
-> > +char *btd_manager_get_default_adapter_str(void)
->=20
-> > + =A0 =A0 =A0 char *str =3D bt_malloc(18);
-> > +
-> > + =A0 =A0 =A0 adapter =3D manager_get_default_adapter();
-> > + =A0 =A0 =A0 if (adapter =3D=3D NULL) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return NULL;
->=20
-> you are leaking str if you return here
-> --=20
-> Daniele Forsi
+My headset indeed reports bitpool range up to 53. WinMo seems to
+either override it, or present some features that cause the Nokia BT
+chip to report a wider range. Unfortunately I don't know how to
+disable encryption in Windows Mobile to capture its bluetooth session
+(and how to capture it with Bluez). Can 'hcidump' do this?
 
-Thanks Daniele, I'll move the allocation down, just before using str.
+> PulseAudio uses 64 as bitpool maximum and it seems to work fine
 
-Not that it is an excuse, but those patches are more to test the water
-than meant for inclusion as they are :)
+Yes, wIth movies, games etc. the quality is excellent.
 
-For the record, I originally intended to use batostr() here,
-unfortunately it returns the bdaddr reversed and fixing it would break
-the API.
+2011/10/10 Siarhei Siamashka <siarhei.siamashka@gmail.com>:
+> On Mon, Oct 10, 2011 at 1:40 PM, qduaty@gmail.com <qduaty@gmail.com> wrote:
+> Could you please provide a link to the Xiph Foundation's article you
+> have mentioned? Also what does "SBC is unable to encode such material
+> properly" mean?
 
-Regards,
-   Antonio
+I remember it was their "About" article, but it seems either they
+shortened it (removing fragments irrelevant to their mission) or it
+has never been there and I've seen it somewhere else. Anyway, the
+whole phenomena is called "Loudness war". CD's are recorded with
+dynamics compression, so their sound has distortions introduced in
+production and high energy in all subbands at the same time. Thus, SBC
+must encode distortions as well as higher energy in all subbands.
 
---=20
-Antonio Ospite
-http://ao2.it
+> The SBC decoder seems to be clamping the out-of-range values [...]
+> not doing any clamping is a lot worse and letting the samples
+> overflow results in really bad audible clicks.
 
-PGP public key ID: 0x4553B001
+Maybe sin() would help, who knows? Obviously in the decoder, which
+usually cannot be reprogrammed, but future /bluez devices/ could
+benefit from this.
 
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
+> What kind of A2DP headset are you using yourself?
 
---Signature=_Mon__10_Oct_2011_22_08_22_+0200_Oejke7O_Gd6tTlM_
-Content-Type: application/pgp-signature
+Nokia BT-503. Its quality is enough to notice an obvious difference
+between 'computer' bitpool (<=53) and that coming from Windows Mobile
+(128 does not cause skipping yet). In presence of dynamics
+compression, even two guitars with a vocal can be distinguished only
+with higher bitpool. Another example is a symphony - I can hear
+individual instruments from WinMo, and a "movie soundtrack" from
+Bluez. I don't know how the device deals with clicks, but I never
+heard them. Usual (and also annoying) distortion is a 'chirp' in some
+bands.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAk6TULYACgkQ5xr2akVTsAHKXwCgggzOdkTIqEwhjafuw/IM8U0E
-dhkAnRE5GLdesR/ugdrECkHiTcPQm39o
-=/Bfg
------END PGP SIGNATURE-----
-
---Signature=_Mon__10_Oct_2011_22_08_22_+0200_Oejke7O_Gd6tTlM_--
+Regards
+--
+Sebastian Olter
