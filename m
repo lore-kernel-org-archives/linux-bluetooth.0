@@ -2,65 +2,146 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 5/7] Move debug messages to their correspondent getters
-Date: Mon, 10 Oct 2011 09:37:09 -0300
-Message-Id: <1318250231-14001-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 4/7] Don't overwrite metadata when changing track
+Date: Mon, 10 Oct 2011 09:37:08 -0300
+Message-Id: <1318250231-14001-4-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1318250231-14001-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1318250231-14001-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- audio/avrcp.c |   19 ++++++++++---------
- 1 files changed, 10 insertions(+), 9 deletions(-)
+If we use the same hash table to set the new metadata, we have 2
+undesired behaviors:
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 058fa83..ea175e3 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -474,9 +474,15 @@ static int player_set_attribute(struct avrcp_player *player,
- 
- static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
+1) New track may contain fields from previous track if it didn't set all
+the fields
+2) If we fail on parsing the signal, we will still change some of the
+fields
+---
+ audio/media.c |   43 ++++++++++++++++++++++++++-----------------
+ 1 files changed, 26 insertions(+), 17 deletions(-)
+
+diff --git a/audio/media.c b/audio/media.c
+index 32dab86..13a0c78 100644
+--- a/audio/media.c
++++ b/audio/media.c
+@@ -1351,8 +1351,8 @@ static gboolean parse_player_metadata(struct media_player *mp,
  {
--	DBG("Get attribute: %u", attr);
-+	int value;
+ 	DBusMessageIter dict;
+ 	DBusMessageIter var;
++	GHashTable *track;
+ 	int ctype;
+-	gboolean title = FALSE;
  
--	return player->cb->get_setting(attr, player->user_data);
-+	DBG("attr %u", attr);
+ 	ctype = dbus_message_iter_get_arg_type(iter);
+ 	if (ctype != DBUS_TYPE_ARRAY)
+@@ -1360,6 +1360,9 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 
+ 	dbus_message_iter_recurse(iter, &dict);
+ 
++	track = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
++							metadata_value_free);
 +
-+	value = player->cb->get_setting(attr, player->user_data);
-+	if (value < 0)
-+		DBG("attr %u not supported by player", attr);
-+
-+	return value;
- }
+ 	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
+ 							DBUS_TYPE_INVALID) {
+ 		DBusMessageIter entry;
+@@ -1368,21 +1371,21 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 		int id;
  
- static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
-@@ -535,10 +541,8 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp_player *player,
- 		goto done;
+ 		if (ctype != DBUS_TYPE_DICT_ENTRY)
+-			return FALSE;
++			goto parse_error;
  
- 	for (i = 1; i <= AVRCP_ATTRIBUTE_SCAN; i++) {
--		if (player_get_attribute(player, i) < 0) {
--			DBG("Ignoring setting %u: not supported by player", i);
-+		if (player_get_attribute(player, i) < 0)
- 			continue;
--		}
+ 		dbus_message_iter_recurse(&dict, &entry);
+ 		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
+-			return FALSE;
++			goto parse_error;
  
- 		len++;
- 		pdu->params[len] = i;
-@@ -677,11 +681,8 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp_player *player
+ 		dbus_message_iter_get_basic(&entry, &key);
+ 		dbus_message_iter_next(&entry);
+ 
+ 		id = metadata_to_val(key);
+ 		if (id < 0)
+-			return FALSE;
++			goto parse_error;
+ 
+ 		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
+-			return FALSE;
++			goto parse_error;
+ 
+ 		dbus_message_iter_recurse(&entry, &var);
+ 
+@@ -1391,13 +1394,12 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 
+ 		switch (id) {
+ 		case AVRCP_MEDIA_ATTRIBUTE_TITLE:
+-			title = TRUE;
+ 		case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
+ 		case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
+ 		case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+ 			if (value->type != DBUS_TYPE_STRING) {
+ 				g_free(value);
+-				return FALSE;
++				goto parse_error;
+ 			}
+ 
+ 			dbus_message_iter_get_basic(&var, &value->value.str);
+@@ -1407,13 +1409,13 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 		case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+ 			if (value->type != DBUS_TYPE_UINT32) {
+ 				g_free(value);
+-				return FALSE;
++				goto parse_error;
+ 			}
+ 
+ 			dbus_message_iter_get_basic(&var, &value->value.num);
+ 			break;
+ 		default:
+-			return FALSE;
++			goto parse_error;
  		}
  
- 		val = player_get_attribute(player, settings[i]);
--		if (val < 0) {
--			DBG("Ignoring %u: not supported by player",
--								settings[i]);
-+		if (val < 0)
- 			continue;
--		}
+ 		switch (value->type) {
+@@ -1425,24 +1427,31 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 			DBG("%s=%u", key, value->value.num);
+ 		}
  
- 		pdu->params[++len] = settings[i];
- 		pdu->params[++len] = val;
+-		if (!mp->track)
+-			mp->track = g_hash_table_new_full(g_direct_hash,
+-							g_direct_equal, NULL,
+-							metadata_value_free);
+-
+-		g_hash_table_replace(mp->track, GUINT_TO_POINTER(id), value);
++		g_hash_table_replace(track, GUINT_TO_POINTER(id), value);
+ 		dbus_message_iter_next(&dict);
+ 	}
+ 
+-	if (title == FALSE)
+-		return TRUE;
++	if (g_hash_table_size(track) == 0) {
++		g_hash_table_unref(track);
++		track = NULL;
++	}
+ 
++	if (mp->track != NULL)
++		g_hash_table_unref(mp->track);
++
++	mp->track = track;
+ 	mp->position = 0;
+ 	g_timer_start(mp->timer);
+ 
+ 	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, NULL);
+ 
+ 	return TRUE;
++
++parse_error:
++	if (track)
++		g_hash_table_unref(track);
++
++	return FALSE;
+ }
+ 
+ static gboolean track_changed(DBusConnection *connection, DBusMessage *msg,
 -- 
 1.7.7
 
