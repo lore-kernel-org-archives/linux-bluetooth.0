@@ -1,36 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Question about A2DP, Pulseaudio.
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Content-type: text/plain; charset=UTF-8
-Date: Mon, 10 Oct 2011 17:11:26 +0900
-Message-id: <1318234286.16562.8.camel@chanten-desktop>
-MIME-version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20111010073511.GI4094@fusion.localdomain>
+References: <1317303988-26310-1-git-send-email-sancane@gmail.com>
+	<1317303988-26310-2-git-send-email-sancane@gmail.com>
+	<1317303988-26310-3-git-send-email-sancane@gmail.com>
+	<1317303988-26310-4-git-send-email-sancane@gmail.com>
+	<1317303988-26310-5-git-send-email-sancane@gmail.com>
+	<1317303988-26310-6-git-send-email-sancane@gmail.com>
+	<1317303988-26310-7-git-send-email-sancane@gmail.com>
+	<1317303988-26310-8-git-send-email-sancane@gmail.com>
+	<1317303988-26310-9-git-send-email-sancane@gmail.com>
+	<20111010073511.GI4094@fusion.localdomain>
+Date: Mon, 10 Oct 2011 10:04:36 +0200
+Message-ID: <CACLukz+1d4a2AuOS23MMzDpTOKpxTqV5n_ZJecUpcvaNa4zwbQ@mail.gmail.com>
+Subject: Re: [PATCH 8/9] Read measurement interval characteristic
+From: Santiago Carot <sancane@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello bluetooth developers.
+Hi Johan!
 
-I have a few questions about BlueZ,PulseAudio.
-If there are any plan to develop. I want to discuss how to implement the
-below.
+Thanks your comments.
 
-1. How to handle New Codec(A2DP) between BlueZ and PulseAudio
-As far as I understand puleaduio add_card() working by UUID info.
-however , in case of mpeg and other codec, we can't use it.
+2011/10/10 Johan Hedberg <johan.hedberg@gmail.com>:
+> Hi Santiago,
+>
+> On Thu, Sep 29, 2011, Santiago Carot-Nemesio wrote:
+>> @@ -148,7 +192,31 @@ static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+>>  static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+>>                                                       gpointer user_data)
+>>  {
+>> -     /* TODO */
+>> +     struct characteristic *ch = user_data;
+>> +     uint8_t value[ATT_MAX_MTU];
+>> +     uint16_t *p, interval;
+>> +     int vlen;
+>> +
+>> +     if (status != 0) {
+>> +             DBG("Measurement Interval value read failed: %s",
+>> +                                                     att_ecode2str(status));
+>> +             return;
+>> +     }
+>> +
+>> +     if (!dec_read_resp(pdu, len, value, &vlen)) {
+>> +             DBG("Protocol error\n");
+>> +             return;
+>> +     }
+>> +
+>> +     if (vlen < 2) {
+>> +             DBG("Invalid Interval received");
+>> +             return;
+>> +     }
+>> +
+>> +     p = (uint16_t *) value;
+>> +     interval = btohs(*p);
+>
+> This looks like a potential unaligned access issue. Probably safer to
+> use bt_get_unaligned here.
 
-I think AudioSink dbus interface should provide codec info that headset
-supports. Based on it, PulseaAudio can know headset support codec info.
+ I'm going to review this and all previous issues you have mentioned
+regarding to previous patches, when I get ready I'll send you a new
+set fixing them.
 
-Bluez audio.conf should have option related to this.
+Once more, thank you all for your patient.
 
-2. auto_connect.
-Could you explain this purpose? 
-
-4. Is there anyone could explain sco_sink, sco_source? If there are ALSA
-code related to it, could you tell me the link that explain ?
-
-
-BR
-Chanyeol Park
-
+Regards.
+Santiago
