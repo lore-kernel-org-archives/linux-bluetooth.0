@@ -1,69 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Oct 2011 12:44:57 +0300
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] Bluetooth: convert force_active variable to flag in
- l2cap chan
-Message-ID: <20111011094454.GC19953@aemeltch-MOBL1>
-References: <1318232034-13410-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1318232034-13410-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111010210706.GC6936@joana>
- <20111011075032.GB19953@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111011075032.GB19953@aemeltch-MOBL1>
+In-Reply-To: <1318324718-19760-1-git-send-email-dmitriy.paliy@nokia.com>
+References: <1318324718-19760-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 11 Oct 2011 12:44:42 +0300
+Message-ID: <CABBYNZKGzBROENrBs0g8RQPBR4faeugOqXr5=FyjykHu5fn3Kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix call status in +CLCC for maemo6 telephony
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Dmitriy,
 
-On Tue, Oct 11, 2011 at 10:50:34AM +0300, Emeltchenko Andrei wrote:
-> > > @@ -942,7 +946,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
-> > >  			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
-> > >  		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
-> > >  			set_bit(FLAG_FLUSHABLE, &chan->flags);
-> > > -		chan->force_active = pchan->force_active;
-> > > +		if (test_bit(FLAG_FORCE_ACTIVE, &pchan->flags))
-> > > +			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-> > >  	} else {
-> > >  
-> > >  		switch (sk->sk_type) {
-> > > @@ -973,8 +978,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
-> > >  		chan->role_switch = 0;
-> > >  		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
-> > >  		clear_bit(FLAG_FLUSHABLE, &chan->flags);
-> > > -		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
-> > > -
-> > > +		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-> > 
-> > One last comment: set chan->flags to 0 here, the just to set the bits that
-> > needs to be 1 at initialization.
-> 
-> Sorry do not understand this :-(
-> 
-> Do you mean assign chan->flags = 0; and set_bit only for
-> FLAG_FORCE_ACTIVE?
+On Tue, Oct 11, 2011 at 12:18 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
+> If list current calls is requested when there is second incoming call
+> and csd call status is CSD_CALL_STATUS_PROCEEDING, then returned 'state
+> of the call' value in +CLCC is 4 (incoming, MT call), which is incorrect.
+> Indication than proceeds from incoming to waiting state.
+>
+> This patch sets the corresponding value to 5 (waiting, MT call) in
+> maemo6 telephony driver for the second call.
+> ---
+>  audio/telephony-maemo6.c |    8 ++++++--
+>  1 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+> index 102daeb..13bb198 100644
+> --- a/audio/telephony-maemo6.c
+> +++ b/audio/telephony-maemo6.c
+> @@ -932,8 +932,12 @@ static int csd_status_to_hfp(struct csd_call *call)
+>                /* PROCEEDING can happen in outgoing/incoming */
+>                if (call->originating)
+>                        return CALL_STATUS_DIALING;
+> -               else
+> -                       return CALL_STATUS_INCOMING;
+> +               else {
+> +                       if (g_slist_length(active_calls) > 0)
+> +                               return CALL_STATUS_WAITING;
+> +                       else
+> +                               return CALL_STATUS_INCOMING;
+> +               }
 
-Just sent patches with cumulative difference below:
-
-
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 3ca71b4..4b388b7 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -979,9 +979,7 @@ static void l2cap_sock_init(struct sock *sk, struct
-sock *parent)
-                chan->fcs  = L2CAP_FCS_CRC16;
-                chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
-                chan->sec_level = BT_SECURITY_LOW;
--               clear_bit(FLAG_ROLE_SWITCH, &chan->flags);
--               clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
--               clear_bit(FLAG_FLUSHABLE, &chan->flags);
-+               chan->flags = 0;
-                set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
-        }
+I guess you could have else if (g_slist_length(active_calls) > 0)
+which is less indentation, other than that looks ok.
 
 
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Luiz Augusto von Dentz
