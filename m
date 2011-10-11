@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: convert force_active variable to flag in l2cap chan
-Date: Tue, 11 Oct 2011 12:01:10 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1318232034-13410-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <20111011075032.GB19953@aemeltch-MOBL1> <20111011094454.GC19953@aemeltch-MOBL1>
-In-Reply-To: <20111011094454.GC19953@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Message-Id: <201110111201.10853.szymon.janc@tieto.com>
+In-Reply-To: <1318250231-14001-6-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1318250231-14001-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1318250231-14001-6-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Tue, 11 Oct 2011 12:55:09 +0300
+Message-ID: <CABBYNZJOmC2LgabvzT+Qz_xL5BKsUrcz2TTALjpypQWJSBmRpA@mail.gmail.com>
+Subject: Re: [PATCH 6/7] AVRCP: Do not list values for unsupported attributes
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lucas,
 
-> > Sorry do not understand this :-(
-> > 
-> > Do you mean assign chan->flags = 0; and set_bit only for
-> > FLAG_FORCE_ACTIVE?
-> 
-> Just sent patches with cumulative difference below:
+On Mon, Oct 10, 2011 at 3:37 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> ---
+>  audio/avrcp.c |    7 +++----
+>  1 files changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/audio/avrcp.c b/audio/avrcp.c
+> index ea175e3..0d9b6d0 100644
+> --- a/audio/avrcp.c
+> +++ b/audio/avrcp.c
+> @@ -565,11 +565,10 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp_player *player,
+>        if (len != 1 || !player)
+>                goto err;
+>
+> -       len = attr_get_max_val(pdu->params[0]);
+> -       if (!len) {
+> -               error("Attribute is invalid: %u", pdu->params[0]);
+> +       if (player_get_attribute(player, pdu->params[0]) < 0)
+>                goto err;
+> -       }
+> +
+> +       len = attr_get_max_val(pdu->params[0]);
+>
+>        for (i = 1; i <= len; i++)
+>                pdu->params[i] = i;
+> --
+> 1.7.7
 
-I guess you could do similar in l2cap_sock_init() chan->flags = pchan->flags
-instead of test_bit/set_bit burst.
- 
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 3ca71b4..4b388b7 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -979,9 +979,7 @@ static void l2cap_sock_init(struct sock *sk, struct
-> sock *parent)
->                 chan->fcs  = L2CAP_FCS_CRC16;
->                 chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
->                 chan->sec_level = BT_SECURITY_LOW;
-> -               clear_bit(FLAG_ROLE_SWITCH, &chan->flags);
-> -               clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
-> -               clear_bit(FLAG_FLUSHABLE, &chan->flags);
-> +               chan->flags = 0;
->                 set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
->         }
+Ack.
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
