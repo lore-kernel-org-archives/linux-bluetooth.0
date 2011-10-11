@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 10/16] Bluetooth: EWS: rewrite handling POLL (P) bit
-Date: Tue, 11 Oct 2011 13:37:50 +0300
-Message-Id: <1318329476-30153-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 09/16] Bluetooth: EWS: rewrite handling FINAL (F) bit
+Date: Tue, 11 Oct 2011 13:37:49 +0300
+Message-Id: <1318329476-30153-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,102 +11,134 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle POLL (P) bit in L2CAP ERTM using information about control field type.
+Handle final (F) bit in L2CAP using information about control field type.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |   16 ++++++++++++++++
- net/bluetooth/l2cap_core.c    |   14 +++++++-------
- 2 files changed, 23 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |   15 +++++++++++++++
+ net/bluetooth/l2cap_core.c    |   20 ++++++++++----------
+ 2 files changed, 25 insertions(+), 10 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3110c43..67a2fdb 100644
+index 9444dce..3110c43 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -627,6 +627,22 @@ static inline bool __is_ctrl_final(struct l2cap_chan *chan, __u32 ctrl)
- 	else
- 		return ctrl & L2CAP_CTRL_FINAL;
+@@ -612,6 +612,21 @@ static inline __u32 __set_ctrl_super(struct l2cap_chan *chan, __u32 super)
+ 							L2CAP_CTRL_SUPERVISE;
  }
-+
-+static inline __u32 __set_ctrl_poll(struct l2cap_chan *chan)
+ 
++static inline __u32 __set_ctrl_final(struct l2cap_chan *chan)
 +{
 +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		return L2CAP_EXT_CTRL_POLL;
++		return L2CAP_EXT_CTRL_FINAL;
 +	else
-+		return L2CAP_CTRL_POLL;
++		return L2CAP_CTRL_FINAL;
 +}
 +
-+static inline bool __is_ctrl_poll(struct l2cap_chan *chan, __u32 ctrl)
++static inline bool __is_ctrl_final(struct l2cap_chan *chan, __u32 ctrl)
 +{
 +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		return ctrl & L2CAP_EXT_CTRL_POLL;
++		return ctrl & L2CAP_EXT_CTRL_FINAL;
 +	else
-+		return ctrl & L2CAP_CTRL_POLL;
++		return ctrl & L2CAP_CTRL_FINAL;
 +}
  extern int disable_ertm;
  
  int l2cap_init_sockets(void);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index c500d1c..97aa545 100644
+index 9262a00..c500d1c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -585,7 +585,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u16 control)
- 		control |= __set_ctrl_final(chan);
+@@ -582,7 +582,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u16 control)
+ 	control |= __set_sframe(chan);
+ 
+ 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
+-		control |= L2CAP_CTRL_FINAL;
++		control |= __set_ctrl_final(chan);
  
  	if (test_and_clear_bit(CONN_SEND_PBIT, &chan->conn_state))
--		control |= L2CAP_CTRL_POLL;
-+		control |= __set_ctrl_poll(chan);
+ 		control |= L2CAP_CTRL_POLL;
+@@ -1315,7 +1315,7 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u16 tx_seq)
+ 	control &= __get_sar_mask(chan);
  
- 	skb = bt_skb_alloc(count, GFP_ATOMIC);
- 	if (!skb)
-@@ -3304,7 +3304,7 @@ static void l2cap_ertm_exit_local_busy(struct l2cap_chan *chan)
- 		goto done;
+ 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
+-		control |= L2CAP_CTRL_FINAL;
++		control |= __set_ctrl_final(chan);
  
- 	control = __set_reqseq(chan, chan->buffer_seq);
--	control |= L2CAP_CTRL_POLL;
-+	control |= __set_ctrl_poll(chan);
- 	control |= __set_ctrl_super(chan, L2CAP_SUPER_RR);
- 	l2cap_send_sframe(chan, control);
- 	chan->retry_count = 1;
-@@ -3538,7 +3538,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
- 	chan->expected_ack_seq = __get_reqseq(chan, rx_control);
- 	l2cap_drop_acked_frames(chan);
+ 	control |= __set_reqseq(chan, chan->buffer_seq);
+ 	control |= __set_txseq(chan, tx_seq);
+@@ -1355,7 +1355,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 		control &= __get_sar_mask(chan);
  
--	if (rx_control & L2CAP_CTRL_POLL) {
-+	if (__is_ctrl_poll(chan, rx_control)) {
- 		set_bit(CONN_SEND_FBIT, &chan->conn_state);
- 		if (test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
- 			if (test_bit(CONN_REMOTE_BUSY, &chan->conn_state) &&
-@@ -3599,7 +3599,7 @@ static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_
+ 		if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
+-			control |= L2CAP_CTRL_FINAL;
++			control |= __set_ctrl_final(chan);
  
- 	clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+ 		control |= __set_reqseq(chan, chan->buffer_seq);
+ 		control |= __set_txseq(chan, chan->next_tx_seq);
+@@ -1428,7 +1428,7 @@ static void l2cap_send_srejtail(struct l2cap_chan *chan)
+ 	u16 control;
  
--	if (rx_control & L2CAP_CTRL_POLL) {
-+	if (__is_ctrl_poll(chan, rx_control)) {
- 		chan->expected_ack_seq = tx_seq;
- 		l2cap_drop_acked_frames(chan);
+ 	control = __set_ctrl_super(chan, L2CAP_SUPER_SREJ);
+-	control |= L2CAP_CTRL_FINAL;
++	control |= __set_ctrl_final(chan);
  
-@@ -3637,17 +3637,17 @@ static inline void l2cap_data_channel_rnrframe(struct l2cap_chan *chan, u16 rx_c
+ 	tail = list_entry((&chan->srej_l)->prev, struct srej_list, list);
+ 	control |= __set_reqseq(chan, tail->tx_seq);
+@@ -3407,7 +3407,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ 	BT_DBG("chan %p len %d tx_seq %d rx_control 0x%4.4x", chan, skb->len,
+ 							tx_seq, rx_control);
+ 
+-	if (L2CAP_CTRL_FINAL & rx_control &&
++	if (__is_ctrl_final(chan, rx_control) &&
+ 			test_bit(CONN_WAIT_F, &chan->conn_state)) {
+ 		__clear_monitor_timer(chan);
+ 		if (chan->unacked_frames > 0)
+@@ -3512,7 +3512,7 @@ expected:
+ 		return err;
+ 	}
+ 
+-	if (rx_control & L2CAP_CTRL_FINAL) {
++	if (__is_ctrl_final(chan, rx_control)) {
+ 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
+ 			l2cap_retransmit_frames(chan);
+ 	}
+@@ -3551,7 +3551,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
+ 			l2cap_send_i_or_rr_or_rnr(chan);
+ 		}
+ 
+-	} else if (rx_control & L2CAP_CTRL_FINAL) {
++	} else if (__is_ctrl_final(chan, rx_control)) {
+ 		clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+ 
+ 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
+@@ -3581,7 +3581,7 @@ static inline void l2cap_data_channel_rejframe(struct l2cap_chan *chan, u16 rx_c
  	chan->expected_ack_seq = tx_seq;
  	l2cap_drop_acked_frames(chan);
  
--	if (rx_control & L2CAP_CTRL_POLL)
-+	if (__is_ctrl_poll(chan, rx_control))
- 		set_bit(CONN_SEND_FBIT, &chan->conn_state);
- 
- 	if (!test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
- 		__clear_retrans_timer(chan);
--		if (rx_control & L2CAP_CTRL_POLL)
-+		if (__is_ctrl_poll(chan, rx_control))
- 			l2cap_send_rr_or_rnr(chan, L2CAP_CTRL_FINAL);
- 		return;
- 	}
- 
--	if (rx_control & L2CAP_CTRL_POLL) {
-+	if (__is_ctrl_poll(chan, rx_control)) {
- 		l2cap_send_srejtail(chan);
+-	if (rx_control & L2CAP_CTRL_FINAL) {
++	if (__is_ctrl_final(chan, rx_control)) {
+ 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
+ 			l2cap_retransmit_frames(chan);
  	} else {
- 		rx_control = __set_ctrl_super(chan, L2CAP_SUPER_RR);
+@@ -3612,7 +3612,7 @@ static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_
+ 			chan->srej_save_reqseq = tx_seq;
+ 			set_bit(CONN_SREJ_ACT, &chan->conn_state);
+ 		}
+-	} else if (rx_control & L2CAP_CTRL_FINAL) {
++	} else if (__is_ctrl_final(chan, rx_control)) {
+ 		if (test_bit(CONN_SREJ_ACT, &chan->conn_state) &&
+ 				chan->srej_save_reqseq == tx_seq)
+ 			clear_bit(CONN_SREJ_ACT, &chan->conn_state);
+@@ -3659,7 +3659,7 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u16 rx_cont
+ {
+ 	BT_DBG("chan %p rx_control 0x%4.4x len %d", chan, rx_control, skb->len);
+ 
+-	if (L2CAP_CTRL_FINAL & rx_control &&
++	if (__is_ctrl_final(chan, rx_control) &&
+ 			test_bit(CONN_WAIT_F, &chan->conn_state)) {
+ 		__clear_monitor_timer(chan);
+ 		if (chan->unacked_frames > 0)
 -- 
 1.7.4.1
 
