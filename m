@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 4/4] Bluetooth: convert role_switch variable to flag in l2cap chan
-Date: Tue, 11 Oct 2011 14:04:34 +0300
-Message-Id: <1318331074-32054-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 2/4] Bluetooth: convert force_reliable variable to flag in l2cap chan
+Date: Tue, 11 Oct 2011 14:04:32 +0300
+Message-Id: <1318331074-32054-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1318331074-32054-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1318331074-32054-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-role_switch variable inside l2cap_chan is a logical one and can
+force_reliable variable inside l2cap_chan is a logical one and can
 be easily converted to flag
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
  include/net/bluetooth/l2cap.h |    2 +-
- net/bluetooth/l2cap_core.c    |    4 ++--
- net/bluetooth/l2cap_sock.c    |    9 +++++----
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_core.c    |    2 +-
+ net/bluetooth/l2cap_sock.c    |   10 ++++++----
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 440e7b8..aea083c 100644
+index 0fe5d59..6c0d247 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -324,7 +324,6 @@ struct l2cap_chan {
- 	__le16		sport;
+@@ -325,7 +325,6 @@ struct l2cap_chan {
  
  	__u8		sec_level;
--	__u8		role_switch;
+ 	__u8		role_switch;
+-	__u8		force_reliable;
+ 	__u8		force_active;
  
  	__u8		ident;
- 
-@@ -463,6 +462,7 @@ enum {
+@@ -465,6 +464,7 @@ enum {
  
  /* Definitions for flags in l2cap_chan */
  enum {
-+	FLAG_ROLE_SWITCH,
- 	FLAG_FORCE_ACTIVE,
- 	FLAG_FORCE_RELIABLE,
++	FLAG_FORCE_RELIABLE,
  	FLAG_FLUSHABLE,
+ };
+ 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index aeeacf8..18a08c5 100644
+index b21ecff..57e4b2c 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -3938,12 +3938,12 @@ static int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+@@ -948,7 +948,7 @@ static void l2cap_conn_unreliable(struct l2cap_conn *conn, int err)
+ 	list_for_each_entry(chan, &conn->chan_l, list) {
+ 		struct sock *sk = chan->sk;
  
- 		if (!bacmp(&bt_sk(sk)->src, &hdev->bdaddr)) {
- 			lm1 |= HCI_LM_ACCEPT;
--			if (c->role_switch)
-+			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
- 				lm1 |= HCI_LM_MASTER;
- 			exact++;
- 		} else if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY)) {
- 			lm2 |= HCI_LM_ACCEPT;
--			if (c->role_switch)
-+			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
- 				lm2 |= HCI_LM_MASTER;
- 		}
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			sk->sk_err = err;
  	}
+ 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index bf196c6..48ad8ba 100644
+index 99782cb..405d736 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -356,7 +356,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
- 			break;
- 		}
- 
--		if (chan->role_switch)
-+		if (test_bit(FLAG_ROLE_SWITCH, &chan->flags))
+@@ -359,7 +359,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname, char __us
+ 		if (chan->role_switch)
  			opt |= L2CAP_LM_MASTER;
  
- 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
-@@ -549,7 +549,10 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
- 		if (opt & L2CAP_LM_SECURE)
+-		if (chan->force_reliable)
++		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			opt |= L2CAP_LM_RELIABLE;
+ 
+ 		if (put_user(opt, (u32 __user *) optval))
+@@ -550,7 +550,11 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname, char __us
  			chan->sec_level = BT_SECURITY_HIGH;
  
--		chan->role_switch    = (opt & L2CAP_LM_MASTER);
-+		if (opt & L2CAP_LM_MASTER)
-+			set_bit(FLAG_ROLE_SWITCH, &chan->flags);
+ 		chan->role_switch    = (opt & L2CAP_LM_MASTER);
+-		chan->force_reliable = (opt & L2CAP_LM_RELIABLE);
++
++		if (opt & L2CAP_LM_RELIABLE)
++			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
 +		else
-+			clear_bit(FLAG_ROLE_SWITCH, &chan->flags);
++			clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+ 		break;
  
- 		if (opt & L2CAP_LM_RELIABLE)
- 			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
-@@ -941,7 +944,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		chan->max_tx = pchan->max_tx;
+ 	default:
+@@ -934,7 +938,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
  		chan->tx_win = pchan->tx_win;
  		chan->sec_level = pchan->sec_level;
--		chan->role_switch = pchan->role_switch;
+ 		chan->role_switch = pchan->role_switch;
+-		chan->force_reliable = pchan->force_reliable;
  		chan->flags = pchan->flags;
+ 		chan->force_active = pchan->force_active;
  	} else {
- 
-@@ -970,7 +972,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		chan->fcs  = L2CAP_FCS_CRC16;
+@@ -965,7 +968,6 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
  		chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
  		chan->sec_level = BT_SECURITY_LOW;
--		chan->role_switch = 0;
+ 		chan->role_switch = 0;
+-		chan->force_reliable = 0;
  		chan->flags = 0;
- 		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 	}
+ 		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
+ 
 -- 
 1.7.4.1
 
