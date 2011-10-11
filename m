@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 13/16] Bluetooth: EWS: support extended seq numbers
-Date: Tue, 11 Oct 2011 13:37:53 +0300
-Message-Id: <1318329476-30153-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 05/16] Bluetooth: EWS: rewrite handling SAR bits
+Date: Tue, 11 Oct 2011 13:37:45 +0300
+Message-Id: <1318329476-30153-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,234 +11,197 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds support for extended sequence numbers found in
-extended control fields.
+Segmentation and Reassembly (SAR) occupies different windows in standard and
+extended control fields. Convert hardcoded masks to relative ones and use shift
+to access SAR bits.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |    2 +-
- include/net/bluetooth/l2cap.h     |   17 ++++++++++
- net/bluetooth/l2cap_core.c        |   63 +++++++++++++++++-------------------
- 3 files changed, 48 insertions(+), 34 deletions(-)
+ include/net/bluetooth/l2cap.h |   37 ++++++++++++++++++++++++++++++++-----
+ net/bluetooth/l2cap_core.c    |   30 +++++++++++++++---------------
+ 2 files changed, 47 insertions(+), 20 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index e727555..fb1acb3 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -158,7 +158,7 @@ struct bt_skb_cb {
- 	__u8 pkt_type;
- 	__u8 incoming;
- 	__u16 expect;
--	__u8 tx_seq;
-+	__u16 tx_seq;
- 	__u8 retries;
- 	__u8 sar;
- 	unsigned short channel;
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3a5f4c0..b3ae9ea 100644
+index f24f5cf..0759ac6 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -355,6 +355,7 @@ struct l2cap_chan {
- 	__u8		fcs;
+@@ -146,10 +146,10 @@ struct l2cap_conninfo {
+ #define L2CAP_SUPER_SREJ	0x03
  
- 	__u16		tx_win;
-+	__u16		tx_win_max;
- 	__u8		max_tx;
- 	__u16		retrans_timeout;
- 	__u16		monitor_timeout;
-@@ -502,6 +503,22 @@ enum {
- 		L2CAP_DEFAULT_ACK_TO);
- #define __clear_ack_timer(c) l2cap_clear_timer(c, &c->ack_timer)
+ /* L2CAP Segmentation and Reassembly */
+-#define L2CAP_SDU_UNSEGMENTED       0x0000
+-#define L2CAP_SDU_START             0x4000
+-#define L2CAP_SDU_END               0x8000
+-#define L2CAP_SDU_CONTINUE          0xC000
++#define L2CAP_SAR_UNSEGMENTED	0x00
++#define L2CAP_SAR_START		0x01
++#define L2CAP_SAR_END		0x02
++#define L2CAP_SAR_CONTINUE	0x03
  
-+static inline int __seq_offset(struct l2cap_chan *chan, __u16 seq1, __u16 seq2)
+ /* L2CAP Command rej. reasons */
+ #define L2CAP_REJ_NOT_UNDERSTOOD	0x0000
+@@ -516,7 +516,34 @@ static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
+ #define __get_reqseq(ctrl)	(((ctrl) & L2CAP_CTRL_REQSEQ) >> 8)
+ #define __is_iframe(ctrl)	(!((ctrl) & L2CAP_CTRL_FRAME_TYPE))
+ #define __is_sframe(ctrl)	((ctrl) & L2CAP_CTRL_FRAME_TYPE)
+-#define __is_sar_start(ctrl)	(((ctrl) & L2CAP_CTRL_SAR) == L2CAP_SDU_START)
++static inline __u8 __get_ctrl_sar(struct l2cap_chan *chan, __u32 ctrl)
 +{
-+	int offset;
-+
-+	offset = (seq1 - seq2) % (chan->tx_win_max + 1);
-+	if (offset < 0)
-+		offset += (chan->tx_win_max + 1);
-+
-+	return offset;
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
++		return (ctrl & L2CAP_EXT_CTRL_SAR) >> L2CAP_EXT_CTRL_SAR_SHIFT;
++	else
++		return (ctrl & L2CAP_CTRL_SAR) >> L2CAP_CTRL_SAR_SHIFT;
 +}
 +
-+static inline __u16 __next_seq(struct l2cap_chan *chan, __u16 seq)
++static inline __u32 __set_ctrl_sar(struct l2cap_chan *chan, __u32 sar)
 +{
-+	return (seq + 1) % (chan->tx_win_max + 1);
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
++		return (sar << L2CAP_EXT_CTRL_SAR_SHIFT) & L2CAP_EXT_CTRL_SAR;
++	else
++		return (sar << L2CAP_CTRL_SAR_SHIFT) & L2CAP_CTRL_SAR;
 +}
 +
- static inline int l2cap_tx_window_full(struct l2cap_chan *ch)
++static inline bool __is_sar_start(struct l2cap_chan *chan, __u32 ctrl)
++{
++	return __get_ctrl_sar(chan, ctrl) == L2CAP_SAR_START;
++}
++
++static inline __u32 __get_sar_mask(struct l2cap_chan *chan)
++{
++	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
++		return L2CAP_EXT_CTRL_SAR;
++	else
++		return L2CAP_CTRL_SAR;
++}
+ 
+ static inline __u8 __get_ctrl_super(struct l2cap_chan *chan, __u32 ctrl)
  {
- 	int sub;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 92b0f03..2f1cd92 100644
+index 93b5da6..9ee42ba 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1288,7 +1288,7 @@ static void l2cap_streaming_send(struct l2cap_chan *chan)
+@@ -1311,7 +1311,7 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u8 tx_seq)
+ 	tx_skb = skb_clone(skb, GFP_ATOMIC);
+ 	bt_cb(skb)->retries++;
+ 	control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+-	control &= L2CAP_CTRL_SAR;
++	control &= __get_sar_mask(chan);
  
- 		l2cap_do_send(chan, skb);
+ 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
+ 		control |= L2CAP_CTRL_FINAL;
+@@ -1351,7 +1351,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 		bt_cb(skb)->retries++;
  
--		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
-+		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
- 	}
- }
+ 		control = get_unaligned_le16(tx_skb->data + L2CAP_HDR_SIZE);
+-		control &= L2CAP_CTRL_SAR;
++		control &= __get_sar_mask(chan);
  
-@@ -1382,7 +1382,8 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
- 		__set_retrans_timer(chan);
+ 		if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
+ 			control |= L2CAP_CTRL_FINAL;
+@@ -1582,7 +1582,7 @@ static int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, si
+ 	size_t size = 0;
  
- 		bt_cb(skb)->tx_seq = chan->next_tx_seq;
--		chan->next_tx_seq = (chan->next_tx_seq + 1) % 64;
-+
-+		chan->next_tx_seq = __next_seq(chan, chan->next_tx_seq);
+ 	skb_queue_head_init(&sar_queue);
+-	control = L2CAP_SDU_START;
++	control = __set_ctrl_sar(chan, L2CAP_SAR_START);
+ 	skb = l2cap_create_iframe_pdu(chan, msg, chan->remote_mps, control, len);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+@@ -1595,10 +1595,10 @@ static int l2cap_sar_segment_sdu(struct l2cap_chan *chan, struct msghdr *msg, si
+ 		size_t buflen;
  
- 		if (bt_cb(skb)->retries == 1)
- 			chan->unacked_frames++;
-@@ -1924,12 +1925,15 @@ static inline bool __l2cap_ews_supported(struct l2cap_chan *chan)
- static inline void l2cap_txwin_setup(struct l2cap_chan *chan)
+ 		if (len > chan->remote_mps) {
+-			control = L2CAP_SDU_CONTINUE;
++			control = __set_ctrl_sar(chan, L2CAP_SAR_CONTINUE);
+ 			buflen = chan->remote_mps;
+ 		} else {
+-			control = L2CAP_SDU_END;
++			control = __set_ctrl_sar(chan, L2CAP_SAR_END);
+ 			buflen = len;
+ 		}
+ 
+@@ -1654,7 +1654,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len)
+ 	case L2CAP_MODE_STREAMING:
+ 		/* Entire SDU fits into one PDU */
+ 		if (len <= chan->remote_mps) {
+-			control = L2CAP_SDU_UNSEGMENTED;
++			control = __set_ctrl_sar(chan, L2CAP_SAR_UNSEGMENTED);
+ 			skb = l2cap_create_iframe_pdu(chan, msg, len, control,
+ 									0);
+ 			if (IS_ERR(skb))
+@@ -3201,15 +3201,15 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u1
  {
- 	if (chan->tx_win > L2CAP_DEFAULT_TX_WINDOW &&
--						__l2cap_ews_supported(chan))
-+						__l2cap_ews_supported(chan)) {
- 		/* use extended control field */
- 		set_bit(FLAG_EXT_CTRL, &chan->flags);
--	else
-+		chan->tx_win_max = L2CAP_DEFAULT_EXT_WINDOW;
-+	} else {
- 		chan->tx_win = min_t(u16, chan->tx_win,
- 						L2CAP_DEFAULT_TX_WINDOW);
-+		chan->tx_win_max = L2CAP_DEFAULT_TX_WINDOW;
-+	}
- }
+ 	int err = -EINVAL;
  
- static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
-@@ -2086,6 +2090,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
- 
- 			set_bit(FLAG_EXT_CTRL, &chan->flags);
- 			set_bit(CONF_EWS_RECV, &chan->conf_state);
-+			chan->tx_win_max = L2CAP_DEFAULT_EXT_WINDOW;
- 			chan->remote_tx_win = val;
+-	switch (control & L2CAP_CTRL_SAR) {
+-	case L2CAP_SDU_UNSEGMENTED:
++	switch (__get_ctrl_sar(chan, control)) {
++	case L2CAP_SAR_UNSEGMENTED:
+ 		if (chan->sdu)
  			break;
  
-@@ -3173,18 +3178,14 @@ static int l2cap_add_to_srej_queue(struct l2cap_chan *chan, struct sk_buff *skb,
- 		return 0;
- 	}
+ 		err = chan->ops->recv(chan->data, skb);
+ 		break;
  
--	tx_seq_offset = (tx_seq - chan->buffer_seq) % 64;
--	if (tx_seq_offset < 0)
--		tx_seq_offset += 64;
-+	tx_seq_offset = __seq_offset(chan, tx_seq, chan->buffer_seq);
- 
- 	do {
- 		if (bt_cb(next_skb)->tx_seq == tx_seq)
- 			return -EINVAL;
- 
--		next_tx_seq_offset = (bt_cb(next_skb)->tx_seq -
--						chan->buffer_seq) % 64;
--		if (next_tx_seq_offset < 0)
--			next_tx_seq_offset += 64;
-+		next_tx_seq_offset = __seq_offset(chan,
-+				bt_cb(next_skb)->tx_seq, chan->buffer_seq);
- 
- 		if (next_tx_seq_offset > tx_seq_offset) {
- 			__skb_queue_before(&chan->srej_q, next_skb, skb);
-@@ -3374,9 +3375,8 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u16 tx_seq)
+-	case L2CAP_SDU_START:
++	case L2CAP_SAR_START:
+ 		if (chan->sdu)
  			break;
- 		}
  
--		chan->buffer_seq_srej =
--			(chan->buffer_seq_srej + 1) % 64;
--		tx_seq = (tx_seq + 1) % 64;
-+		chan->buffer_seq_srej = __next_seq(chan, chan->buffer_seq_srej);
-+		tx_seq = __next_seq(chan, tx_seq);
- 	}
- }
+@@ -3231,7 +3231,7 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u1
+ 		err = 0;
+ 		break;
  
-@@ -3411,10 +3411,13 @@ static void l2cap_send_srejframe(struct l2cap_chan *chan, u16 tx_seq)
+-	case L2CAP_SDU_CONTINUE:
++	case L2CAP_SAR_CONTINUE:
+ 		if (!chan->sdu)
+ 			break;
  
- 		new = kzalloc(sizeof(struct srej_list), GFP_ATOMIC);
- 		new->tx_seq = chan->expected_tx_seq;
--		chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
-+
-+		chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
-+
- 		list_add_tail(&new->list, &chan->srej_l);
- 	}
--	chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
-+
-+	chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
- }
+@@ -3245,7 +3245,7 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u1
+ 		err = 0;
+ 		break;
  
- static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_control, struct sk_buff *skb)
-@@ -3440,9 +3443,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
- 	chan->expected_ack_seq = req_seq;
- 	l2cap_drop_acked_frames(chan);
+-	case L2CAP_SDU_END:
++	case L2CAP_SAR_END:
+ 		if (!chan->sdu)
+ 			break;
  
--	tx_seq_offset = (tx_seq - chan->buffer_seq) % 64;
--	if (tx_seq_offset < 0)
--		tx_seq_offset += 64;
-+	tx_seq_offset = __seq_offset(chan, tx_seq, chan->buffer_seq);
+@@ -3343,7 +3343,7 @@ static void l2cap_check_srej_gap(struct l2cap_chan *chan, u8 tx_seq)
+ 			break;
  
- 	/* invalid tx_seq */
- 	if (tx_seq_offset >= chan->tx_win) {
-@@ -3490,10 +3491,8 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
- 			l2cap_send_srejframe(chan, tx_seq);
- 		}
- 	} else {
--		expected_tx_seq_offset =
--			(chan->expected_tx_seq - chan->buffer_seq) % 64;
--		if (expected_tx_seq_offset < 0)
--			expected_tx_seq_offset += 64;
-+		expected_tx_seq_offset = __seq_offset(chan,
-+				chan->expected_tx_seq, chan->buffer_seq);
+ 		skb = skb_dequeue(&chan->srej_q);
+-		control = bt_cb(skb)->sar << L2CAP_CTRL_SAR_SHIFT;
++		control = __set_ctrl_sar(chan, bt_cb(skb)->sar);
+ 		err = l2cap_reassemble_sdu(chan, skb, control);
  
- 		/* duplicated tx_seq */
- 		if (tx_seq_offset < expected_tx_seq_offset)
-@@ -3518,7 +3517,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u32 rx_cont
- 	return 0;
+ 		if (err < 0) {
+@@ -3398,7 +3398,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
+ {
+ 	u8 tx_seq = __get_txseq(rx_control);
+ 	u8 req_seq = __get_reqseq(rx_control);
+-	u8 sar = rx_control >> L2CAP_CTRL_SAR_SHIFT;
++	u8 sar = __get_ctrl_sar(chan, rx_control);
+ 	int tx_seq_offset, expected_tx_seq_offset;
+ 	int num_to_ack = (chan->tx_win/6) + 1;
+ 	int err = 0;
+@@ -3707,7 +3707,7 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (l2cap_check_fcs(chan, skb))
+ 		goto drop;
  
- expected:
--	chan->expected_tx_seq = (chan->expected_tx_seq + 1) % 64;
-+	chan->expected_tx_seq = __next_seq(chan, chan->expected_tx_seq);
+-	if (__is_sar_start(control) && __is_iframe(control))
++	if (__is_sar_start(chan, control) && __is_iframe(control))
+ 		len -= 2;
  
- 	if (test_bit(CONN_SREJ_SENT, &chan->conn_state)) {
- 		bt_cb(skb)->tx_seq = tx_seq;
-@@ -3528,7 +3527,8 @@ expected:
- 	}
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+@@ -3811,7 +3811,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 		if (l2cap_check_fcs(chan, skb))
+ 			goto drop;
  
- 	err = l2cap_reassemble_sdu(chan, skb, rx_control);
--	chan->buffer_seq = (chan->buffer_seq + 1) % 64;
-+	chan->buffer_seq = __next_seq(chan, chan->buffer_seq);
-+
- 	if (err < 0) {
- 		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
- 		return err;
-@@ -3741,14 +3741,11 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
- 	}
+-		if (__is_sar_start(control))
++		if (__is_sar_start(chan, control))
+ 			len -= 2;
  
- 	req_seq = __get_reqseq(chan, control);
--	req_seq_offset = (req_seq - chan->expected_ack_seq) % 64;
--	if (req_seq_offset < 0)
--		req_seq_offset += 64;
- 
--	next_tx_seq_offset =
--		(chan->next_tx_seq - chan->expected_ack_seq) % 64;
--	if (next_tx_seq_offset < 0)
--		next_tx_seq_offset += 64;
-+	req_seq_offset = __seq_offset(chan, req_seq, chan->expected_ack_seq);
-+
-+	next_tx_seq_offset = __seq_offset(chan, chan->next_tx_seq,
-+						chan->expected_ack_seq);
- 
- 	/* check for invalid req-seq */
- 	if (req_seq_offset > next_tx_seq_offset) {
-@@ -3853,7 +3850,7 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
- 			/* TODO: Notify userland of missing data */
- 		}
- 
--		chan->expected_tx_seq = (tx_seq + 1) % 64;
-+		chan->expected_tx_seq = __next_seq(chan, tx_seq);
- 
- 		if (l2cap_reassemble_sdu(chan, skb, control) == -EMSGSIZE)
- 			l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+ 		if (chan->fcs == L2CAP_FCS_CRC16)
 -- 
 1.7.4.1
 
