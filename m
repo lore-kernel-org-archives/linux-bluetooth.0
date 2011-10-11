@@ -1,51 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1318324718-19760-1-git-send-email-dmitriy.paliy@nokia.com>
-References: <1318324718-19760-1-git-send-email-dmitriy.paliy@nokia.com>
-Date: Tue, 11 Oct 2011 12:44:42 +0300
-Message-ID: <CABBYNZKGzBROENrBs0g8RQPBR4faeugOqXr5=FyjykHu5fn3Kw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix call status in +CLCC for maemo6 telephony
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 1/4] Bluetooth: convert flushable variable to flag in l2cap chan
+Date: Tue, 11 Oct 2011 12:35:02 +0300
+Message-Id: <1318325705-29588-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Oct 11, 2011 at 12:18 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
-> If list current calls is requested when there is second incoming call
-> and csd call status is CSD_CALL_STATUS_PROCEEDING, then returned 'state
-> of the call' value in +CLCC is 4 (incoming, MT call), which is incorrect.
-> Indication than proceeds from incoming to waiting state.
->
-> This patch sets the corresponding value to 5 (waiting, MT call) in
-> maemo6 telephony driver for the second call.
-> ---
->  audio/telephony-maemo6.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-> index 102daeb..13bb198 100644
-> --- a/audio/telephony-maemo6.c
-> +++ b/audio/telephony-maemo6.c
-> @@ -932,8 +932,12 @@ static int csd_status_to_hfp(struct csd_call *call)
->                /* PROCEEDING can happen in outgoing/incoming */
->                if (call->originating)
->                        return CALL_STATUS_DIALING;
-> -               else
-> -                       return CALL_STATUS_INCOMING;
-> +               else {
-> +                       if (g_slist_length(active_calls) > 0)
-> +                               return CALL_STATUS_WAITING;
-> +                       else
-> +                               return CALL_STATUS_INCOMING;
-> +               }
+flushable variable inside l2cap_chan is a logical one and can
+be easily converted to flag. Added flags in l2cap_chan structure.
 
-I guess you could have else if (g_slist_length(active_calls) > 0)
-which is less indentation, other than that looks ok.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/l2cap.h |    7 ++++++-
+ net/bluetooth/l2cap_core.c    |    3 ++-
+ net/bluetooth/l2cap_sock.c    |   13 +++++++++----
+ 3 files changed, 17 insertions(+), 6 deletions(-)
 
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 2933767..0fe5d59 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -326,7 +326,6 @@ struct l2cap_chan {
+ 	__u8		sec_level;
+ 	__u8		role_switch;
+ 	__u8		force_reliable;
+-	__u8		flushable;
+ 	__u8		force_active;
+ 
+ 	__u8		ident;
+@@ -346,6 +345,7 @@ struct l2cap_chan {
+ 
+ 	unsigned long	conf_state;
+ 	unsigned long	conn_state;
++	unsigned long	flags;
+ 
+ 	__u8		next_tx_seq;
+ 	__u8		expected_ack_seq;
+@@ -463,6 +463,11 @@ enum {
+ 	CONN_RNR_SENT,
+ };
+ 
++/* Definitions for flags in l2cap_chan */
++enum {
++	FLAG_FLUSHABLE,
++};
++
+ #define __set_chan_timer(c, t) l2cap_set_timer(c, &c->chan_timer, (t))
+ #define __clear_chan_timer(c) l2cap_clear_timer(c, &c->chan_timer)
+ #define __set_retrans_timer(c) l2cap_set_timer(c, &c->retrans_timer, \
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3158cec..b21ecff 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1253,7 +1253,8 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+ 
+ 	BT_DBG("chan %p, skb %p len %d", chan, skb, skb->len);
+ 
+-	if (!chan->flushable && lmp_no_flush_capable(hcon->hdev))
++	if (!test_bit(FLAG_FLUSHABLE, &chan->flags) &&
++					lmp_no_flush_capable(hcon->hdev))
+ 		flags = ACL_START_NO_FLUSH;
+ 	else
+ 		flags = ACL_START;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 61f1f62..9bd132e 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -446,7 +446,8 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+ 		break;
+ 
+ 	case BT_FLUSHABLE:
+-		if (put_user(chan->flushable, (u32 __user *) optval))
++		if (put_user(test_bit(FLAG_FLUSHABLE, &chan->flags),
++						(u32 __user *) optval))
+ 			err = -EFAULT;
+ 
+ 		break;
+@@ -655,7 +656,10 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
+ 			}
+ 		}
+ 
+-		chan->flushable = opt;
++		if (opt)
++			set_bit(FLAG_FLUSHABLE, &chan->flags);
++		else
++			clear_bit(FLAG_FLUSHABLE, &chan->flags);
+ 		break;
+ 
+ 	case BT_POWER:
+@@ -931,7 +935,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->sec_level = pchan->sec_level;
+ 		chan->role_switch = pchan->role_switch;
+ 		chan->force_reliable = pchan->force_reliable;
+-		chan->flushable = pchan->flushable;
++		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
++			set_bit(FLAG_FLUSHABLE, &chan->flags);
+ 		chan->force_active = pchan->force_active;
+ 	} else {
+ 
+@@ -962,7 +967,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+ 		chan->sec_level = BT_SECURITY_LOW;
+ 		chan->role_switch = 0;
+ 		chan->force_reliable = 0;
+-		chan->flushable = BT_FLUSHABLE_OFF;
++		chan->flags = 0;
+ 		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
+ 
+ 	}
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
