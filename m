@@ -1,93 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20111010184442.GA6936@joana>
-References: <1318078729-4158-1-git-send-email-dh.herrmann@googlemail.com>
-	<20111010184442.GA6936@joana>
-Date: Tue, 11 Oct 2011 14:35:01 +0200
-Message-ID: <CANq1E4S2gngG9CfFSxHUsefA2HTij0-ToGDGjDx1eyOOzLYxRw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] Bluetooth: Fix hci core device initialization
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: David Herrmann <dh.herrmann@googlemail.com>, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
+In-Reply-To: <1318332898-21272-2-git-send-email-dmitriy.paliy@nokia.com>
+References: <1318332898-21272-1-git-send-email-dmitriy.paliy@nokia.com>
+	<1318332898-21272-2-git-send-email-dmitriy.paliy@nokia.com>
+Date: Tue, 11 Oct 2011 15:12:18 +0300
+Message-ID: <CABBYNZJ8Stu6wLEC-6urfi6SWn6nkYeeAuKiWg76Bz0bOAGCKQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] Fix call status in +CLCC for maemo6 telephony
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
+Hi Dmitriy,
 
-On Mon, Oct 10, 2011 at 8:44 PM, Gustavo Padovan <padovan@profusion.mobi> w=
-rote:
-> Hi David,
+On Tue, Oct 11, 2011 at 2:34 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
+> If list current calls is requested when there is second incoming call
+> and csd call status is CSD_CALL_STATUS_PROCEEDING, then returned 'state
+> of the call' value in +CLCC is 4 (incoming, MT call), which is incorrect.
+> Indication than proceeds from incoming to waiting state.
 >
-> * David Herrmann <dh.herrmann@googlemail.com> [2011-10-08 14:58:47 +0200]=
-:
+> This patch sets the corresponding value to 5 (waiting, MT call) in
+> maemo6 telephony driver for the second call.
+> ---
+>  audio/telephony-maemo6.c |   12 ++++++++++--
+>  1 files changed, 10 insertions(+), 2 deletions(-)
 >
->> We must not call device_del() if we didn't use device_add(). See module.=
-c for
->> comments on that. Therefore, we need to call device_initialize() when al=
-locating
->> the hci device and later device_add() instead of device_register().
->>
->> This also fixes a bug when hci_register_dev() failed and we call hci_fre=
-e_dev()
->> without a valid core device. hci_free_dev() segfaults while calling put_=
-device()
->> on invalid memory.
->
-> Please let me know if the following diff also fixes this problem.
-> It seems to fixes other issues like failing in usb_driver_claim_interface=
-().
-
-Could you elaborate more? I what way does may patch not fix this issue?
-
-> =A0 =A0 =A0 =A0Gustavo
->
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b84458d..ac446a7 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -922,9 +922,6 @@ EXPORT_SYMBOL(hci_alloc_dev);
-> =A0void hci_free_dev(struct hci_dev *hdev)
-> =A0{
-> =A0 =A0 =A0 =A0skb_queue_purge(&hdev->driver_init);
-> -
-> - =A0 =A0 =A0 /* will free via device release */
-> - =A0 =A0 =A0 put_device(&hdev->dev);
-
-This does not work. We need to drop a reference here, otherwise this
-function is totally useless except cleaning up the skb queue. In fact,
-this function will be called on an HCI device without having a
-reference.
-
-> =A0}
-> =A0EXPORT_SYMBOL(hci_free_dev);
->
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 22f1a6c..1e5ccde 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -587,7 +587,7 @@ void hci_unregister_sysfs(struct hci_dev *hdev)
->
-> =A0 =A0 =A0 =A0debugfs_remove_recursive(hdev->debugfs);
->
-> - =A0 =A0 =A0 device_del(&hdev->dev);
-> + =A0 =A0 =A0 device_unregister(&hdev->dev);
-
-This drops the last reference in most cases and hence "hdev" will get
-deleted here and the caller (hci_unregister_dev) will fail cleaning up
-the device.
-The problem is, we actually have two reference counts. The
-device_get/device_put reference count (which actually cleans up the
-hdev device with kfree() when dropping the last reference) and the
-hdev->refcnt which is in charge of cleaning up the caller's data. We
-need to take a reference with device_get() in hci_alloc_dev and drop
-it in hci_free_dev, otherwise we have inconsistent behaviour.
-
-> =A0}
->
-> =A0int __init bt_sysfs_init(void)
->
+> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+> index 102daeb..82cb274 100644
+> --- a/audio/telephony-maemo6.c
+> +++ b/audio/telephony-maemo6.c
+> @@ -932,8 +932,16 @@ static int csd_status_to_hfp(struct csd_call *call)
+>                /* PROCEEDING can happen in outgoing/incoming */
+>                if (call->originating)
+>                        return CALL_STATUS_DIALING;
+> -               else
+> -                       return CALL_STATUS_INCOMING;
+> +
+> +               /*
+> +                * PROCEEDING is followed by WAITING CSD status, therefore
+> +                * second incoming call status indication is set immediately
+> +                * to waiting.
+> +                */
+> +               if (g_slist_length(active_calls) > 0)
+> +                       return CALL_STATUS_WAITING;
+> +
+> +               return CALL_STATUS_INCOMING;
+>        case CSD_CALL_STATUS_COMING:
+>                return CALL_STATUS_INCOMING;
+>        case CSD_CALL_STATUS_MO_ALERTING:
+> --
+> 1.7.4.1
 >
 
-Regards
-David
+Ack.
+
+-- 
+Luiz Augusto von Dentz
