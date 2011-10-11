@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 09/16] Bluetooth: EWS: rewrite handling FINAL (F) bit
-Date: Tue, 11 Oct 2011 13:37:49 +0300
-Message-Id: <1318329476-30153-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 16/16] Bluetooth: EWS: fix max_pdu calculation
+Date: Tue, 11 Oct 2011 13:37:56 +0300
+Message-Id: <1318329476-30153-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,134 +11,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle final (F) bit in L2CAP using information about control field type.
+Fix max_pdu_size calculationin for RFC. Change magic number to human readable
+defines.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/l2cap.h |   15 +++++++++++++++
- net/bluetooth/l2cap_core.c    |   20 ++++++++++----------
- 2 files changed, 25 insertions(+), 10 deletions(-)
+ net/bluetooth/l2cap_core.c |   42 ++++++++++++++++++++++++++++--------------
+ 1 files changed, 28 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 9444dce..3110c43 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -612,6 +612,21 @@ static inline __u32 __set_ctrl_super(struct l2cap_chan *chan, __u32 super)
- 							L2CAP_CTRL_SUPERVISE;
- }
- 
-+static inline __u32 __set_ctrl_final(struct l2cap_chan *chan)
-+{
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		return L2CAP_EXT_CTRL_FINAL;
-+	else
-+		return L2CAP_CTRL_FINAL;
-+}
-+
-+static inline bool __is_ctrl_final(struct l2cap_chan *chan, __u32 ctrl)
-+{
-+	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-+		return ctrl & L2CAP_EXT_CTRL_FINAL;
-+	else
-+		return ctrl & L2CAP_CTRL_FINAL;
-+}
- extern int disable_ertm;
- 
- int l2cap_init_sockets(void);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9262a00..c500d1c 100644
+index a703301..d418ddb 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -582,7 +582,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u16 control)
- 	control |= __set_sframe(chan);
+@@ -1947,6 +1947,7 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data)
+ 	struct l2cap_conf_req *req = data;
+ 	struct l2cap_conf_rfc rfc = { .mode = chan->mode };
+ 	void *ptr = req->data;
++	u16 size;
  
- 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
--		control |= L2CAP_CTRL_FINAL;
-+		control |= __set_ctrl_final(chan);
+ 	BT_DBG("chan %p", chan);
  
- 	if (test_and_clear_bit(CONN_SEND_PBIT, &chan->conn_state))
- 		control |= L2CAP_CTRL_POLL;
-@@ -1315,7 +1315,7 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u16 tx_seq)
- 	control &= __get_sar_mask(chan);
+@@ -1991,9 +1992,12 @@ done:
+ 		rfc.max_transmit    = chan->max_tx;
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
+-		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+-		if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
+-			rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
++
++		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
++						L2CAP_EXT_HDR_SIZE -
++						L2CAP_SDULEN_SIZE -
++						L2CAP_FCS_SIZE);
++		rfc.max_pdu_size = cpu_to_le16(size);
  
- 	if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
--		control |= L2CAP_CTRL_FINAL;
-+		control |= __set_ctrl_final(chan);
+ 		l2cap_txwin_setup(chan);
  
- 	control |= __set_reqseq(chan, chan->buffer_seq);
- 	control |= __set_txseq(chan, tx_seq);
-@@ -1355,7 +1355,7 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
- 		control &= __get_sar_mask(chan);
+@@ -2023,9 +2027,12 @@ done:
+ 		rfc.max_transmit    = 0;
+ 		rfc.retrans_timeout = 0;
+ 		rfc.monitor_timeout = 0;
+-		rfc.max_pdu_size    = cpu_to_le16(L2CAP_DEFAULT_MAX_PDU_SIZE);
+-		if (L2CAP_DEFAULT_MAX_PDU_SIZE > chan->conn->mtu - 10)
+-			rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
++
++		size = min_t(u16, L2CAP_DEFAULT_MAX_PDU_SIZE, chan->conn->mtu -
++						L2CAP_EXT_HDR_SIZE -
++						L2CAP_SDULEN_SIZE -
++						L2CAP_FCS_SIZE);
++		rfc.max_pdu_size = cpu_to_le16(size);
  
- 		if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
--			control |= L2CAP_CTRL_FINAL;
-+			control |= __set_ctrl_final(chan);
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+ 							(unsigned long) &rfc);
+@@ -2058,6 +2065,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+ 	u16 mtu = L2CAP_DEFAULT_MTU;
+ 	u16 result = L2CAP_CONF_SUCCESS;
++	u16 size;
  
- 		control |= __set_reqseq(chan, chan->buffer_seq);
- 		control |= __set_txseq(chan, chan->next_tx_seq);
-@@ -1428,7 +1428,7 @@ static void l2cap_send_srejtail(struct l2cap_chan *chan)
- 	u16 control;
+ 	BT_DBG("chan %p", chan);
  
- 	control = __set_ctrl_super(chan, L2CAP_SUPER_SREJ);
--	control |= L2CAP_CTRL_FINAL;
-+	control |= __set_ctrl_final(chan);
+@@ -2167,10 +2175,13 @@ done:
  
- 	tail = list_entry((&chan->srej_l)->prev, struct srej_list, list);
- 	control |= __set_reqseq(chan, tail->tx_seq);
-@@ -3407,7 +3407,7 @@ static inline int l2cap_data_channel_iframe(struct l2cap_chan *chan, u16 rx_cont
- 	BT_DBG("chan %p len %d tx_seq %d rx_control 0x%4.4x", chan, skb->len,
- 							tx_seq, rx_control);
+ 			chan->remote_max_tx = rfc.max_transmit;
  
--	if (L2CAP_CTRL_FINAL & rx_control &&
-+	if (__is_ctrl_final(chan, rx_control) &&
- 			test_bit(CONN_WAIT_F, &chan->conn_state)) {
- 		__clear_monitor_timer(chan);
- 		if (chan->unacked_frames > 0)
-@@ -3512,7 +3512,7 @@ expected:
- 		return err;
- 	}
+-			if (le16_to_cpu(rfc.max_pdu_size) > chan->conn->mtu - 10)
+-				rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
+-
+-			chan->remote_mps = le16_to_cpu(rfc.max_pdu_size);
++			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
++						chan->conn->mtu -
++						L2CAP_EXT_HDR_SIZE -
++						L2CAP_SDULEN_SIZE -
++						L2CAP_FCS_SIZE);
++			rfc.max_pdu_size = cpu_to_le16(size);
++			chan->remote_mps = size;
  
--	if (rx_control & L2CAP_CTRL_FINAL) {
-+	if (__is_ctrl_final(chan, rx_control)) {
- 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
- 			l2cap_retransmit_frames(chan);
- 	}
-@@ -3551,7 +3551,7 @@ static inline void l2cap_data_channel_rrframe(struct l2cap_chan *chan, u16 rx_co
- 			l2cap_send_i_or_rr_or_rnr(chan);
- 		}
+ 			rfc.retrans_timeout =
+ 				le16_to_cpu(L2CAP_DEFAULT_RETRANS_TO);
+@@ -2185,10 +2196,13 @@ done:
+ 			break;
  
--	} else if (rx_control & L2CAP_CTRL_FINAL) {
-+	} else if (__is_ctrl_final(chan, rx_control)) {
- 		clear_bit(CONN_REMOTE_BUSY, &chan->conn_state);
+ 		case L2CAP_MODE_STREAMING:
+-			if (le16_to_cpu(rfc.max_pdu_size) > chan->conn->mtu - 10)
+-				rfc.max_pdu_size = cpu_to_le16(chan->conn->mtu - 10);
+-
+-			chan->remote_mps = le16_to_cpu(rfc.max_pdu_size);
++			size = min_t(u16, le16_to_cpu(rfc.max_pdu_size),
++						chan->conn->mtu -
++						L2CAP_EXT_HDR_SIZE -
++						L2CAP_SDULEN_SIZE -
++						L2CAP_FCS_SIZE);
++			rfc.max_pdu_size = cpu_to_le16(size);
++			chan->remote_mps = size;
  
- 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
-@@ -3581,7 +3581,7 @@ static inline void l2cap_data_channel_rejframe(struct l2cap_chan *chan, u16 rx_c
- 	chan->expected_ack_seq = tx_seq;
- 	l2cap_drop_acked_frames(chan);
+ 			set_bit(CONF_MODE_DONE, &chan->conf_state);
  
--	if (rx_control & L2CAP_CTRL_FINAL) {
-+	if (__is_ctrl_final(chan, rx_control)) {
- 		if (!test_and_clear_bit(CONN_REJ_ACT, &chan->conn_state))
- 			l2cap_retransmit_frames(chan);
- 	} else {
-@@ -3612,7 +3612,7 @@ static inline void l2cap_data_channel_srejframe(struct l2cap_chan *chan, u16 rx_
- 			chan->srej_save_reqseq = tx_seq;
- 			set_bit(CONN_SREJ_ACT, &chan->conn_state);
- 		}
--	} else if (rx_control & L2CAP_CTRL_FINAL) {
-+	} else if (__is_ctrl_final(chan, rx_control)) {
- 		if (test_bit(CONN_SREJ_ACT, &chan->conn_state) &&
- 				chan->srej_save_reqseq == tx_seq)
- 			clear_bit(CONN_SREJ_ACT, &chan->conn_state);
-@@ -3659,7 +3659,7 @@ static inline int l2cap_data_channel_sframe(struct l2cap_chan *chan, u16 rx_cont
- {
- 	BT_DBG("chan %p rx_control 0x%4.4x len %d", chan, rx_control, skb->len);
- 
--	if (L2CAP_CTRL_FINAL & rx_control &&
-+	if (__is_ctrl_final(chan, rx_control) &&
- 			test_bit(CONN_WAIT_F, &chan->conn_state)) {
- 		__clear_monitor_timer(chan);
- 		if (chan->unacked_frames > 0)
 -- 
 1.7.4.1
 
