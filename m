@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Lin, Mengdong" <mengdong.lin@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Lin, Mengdong" <mengdong.lin@intel.com>
-Date: Tue, 11 Oct 2011 14:19:51 +0800
-Subject: RE: Question about A2DP, Pulseaudio.
-Message-ID: <749B9D3DBF0F054390025D9EAFF47F2212D28D505D@shsmsx501.ccr.corp.intel.com>
+Subject: Re: Question about A2DP, Pulseaudio.
+From: Arun Raghavan <arun.raghavan@collabora.co.uk>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 11 Oct 2011 11:37:01 +0530
+In-Reply-To: <1318234286.16562.8.camel@chanten-desktop>
 References: <1318234286.16562.8.camel@chanten-desktop>
- <1318313229.11749.22.camel@snowflake>
-In-Reply-To: <1318313229.11749.22.camel@snowflake>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1318313229.11749.22.camel@snowflake>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiA+IDQuIElzIHRoZXJlIGFueW9uZSBjb3VsZCBleHBsYWluIHNjb19zaW5rLCBzY29fc291cmNl
-PyBJZiB0aGVyZSBhcmUgQUxTQQ0KPiA+IGNvZGUgcmVsYXRlZCB0byBpdCwgY291bGQgeW91IHRl
-bGwgbWUgdGhlIGxpbmsgdGhhdCBleHBsYWluID8NCg0KPiDigKYgQXBwYXJlbnRseSBzb21lIHN5
-c3RlbSBkb24ndCBldmVuIGJvdGhlcg0KPiBleHBvcnRpbmcgdGhpcyBhdWRpbyBwYXRoIHRvIHRo
-ZSBzb2Z0d2FyZSBzdGFjayBiZWNhdXNlIGl0IGlzIG9ubHkNCj4gYWN0aXZlIHdoaWxlIG9uIGNh
-bGwsIGlmIHRoaXMgaXMgeW91ciBjYXNlIHRoZW4gaXQgbWVhbnMgd2UgY2Fubm90DQo+IGNvbnRy
-b2wgdGhlIGF1ZGlvIHJvdXRpbmcgaW4gc29mdHdhcmUgYW5kIHdlIHByb2JhYmx5IHNob3VsZCBk
-bw0KPiBub3RoaW5nIChlLmcuIHNldCBzY29fc2luay9zY29fc291cmNlIHRvICJub25lIiBhbmQg
-d2hlbiBIRlAvSFNQIGlzDQo+IGFjdGl2ZSBzZXQgY2FyZCBwcm9maWxlIHRvICdPZmYnKSwgYnV0
-IG5vdGUgdGhhdCB0aGlzIHR5cGUgb2YNCj4gY29uZmlndXJhdGlvbiBoYXMgbWFueSBsaW1pdGF0
-aW9uIGZvciBpbnN0YW5jZSBhIHN5c3RlbSBsaWtlIHRoYXQNCj4gY2Fubm90IGRvIG5hdmlnYXRp
-b24gb3Igdm9pY2UgY29tbWFuZHMgdXNpbmcgU0NPLg0KDQpIaSBMdWl6LA0KDQpXb3VsZCB5b3Ug
-a2luZGx5IHNoYXJlIG1vcmUgaW5mb3JtYXRpb24gb24gYSBzeXN0ZW0gdGhhdCBkb2VzIG5vdCBl
-eHBvcnQgU0NPIGF1ZGlvIHBhdGggdG8gdGhlIHNvZnR3YXJlIHN0YWNrPyBJcyBpdCBhIHR5cGlj
-YWwgZGVzaWduIGZvciBoYW5kc2V0Pw0KSWYgSSBoYXZlIGEgQlQgaGVhZHNldCB0aGF0IGNhbiBz
-dXBwb3J0IGJvdGggQTJEUCBhbmQgSFNQIHByb2ZpbGUsIGFuZCBJIHdhbnQgdG8gaGVhciBtdXNp
-YyBpbiBBMkRQIGFuZCBtYWtlIGEgcGhvbmUgY2FsbCBpbiBIU1AgcHJvZmlsZSBvbiBzdWNoIGEg
-c3lzdGVtLCBpcyBpdCBwb3NzaWJsZT8gDQpJZiBpdOKAmXMgcG9zc2libGUsIGhvdyBjYW4gcHVs
-c2VhdWRpbyBzZXQgQlQgaGVhZHNldCB0byBBMkRQIHByb2ZpbGUgZm9yIG11c2ljIGFuZCBjaGFu
-Z2UgdG8g4oCYT2Zm4oCZIHByb2ZpbGUgb24gY2FsbD8gQ2FuIFBBIGtub3cgd2hlbiBhIGNhbGwg
-YmVnaW5zIG9yIGVuZHMgb24gc3VjaCBhIHN5c3RlbSwgaW4gb3JkZXIgdG8gY2hhbmdlIEJUIHBy
-b2ZpbGU/DQoNCkdyZWF0IFRoYW5rcw0KTWVuZ2RvbmcNCg0K
+On Mon, 2011-10-10 at 17:11 +0900, Chan-yeol Park wrote:
+> Hello bluetooth developers.
+> 
+> I have a few questions about BlueZ,PulseAudio.
+> If there are any plan to develop. I want to discuss how to implement the
+> below.
+> 
+> 1. How to handle New Codec(A2DP) between BlueZ and PulseAudio
+> As far as I understand puleaduio add_card() working by UUID info.
+> however , in case of mpeg and other codec, we can't use it.
+
+JFYI, I have a branch that does switching between PCM-MPEG using the old
+Unix sockets API at:
+
+http://cgit.collabora.com/git/user/arun/pulseaudio.git/log/?h=passthrough
+
+There's a bug w.r.t. applying the correct sample rate (44.1 kHz works
+fine, 48 kHz audio seems to be playing at 44.1 kHz).
+
+Cheers,
+Arun
+
