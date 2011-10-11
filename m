@@ -1,60 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1318332898-21272-2-git-send-email-dmitriy.paliy@nokia.com>
-References: <1318332898-21272-1-git-send-email-dmitriy.paliy@nokia.com>
-	<1318332898-21272-2-git-send-email-dmitriy.paliy@nokia.com>
-Date: Tue, 11 Oct 2011 15:12:18 +0300
-Message-ID: <CABBYNZJ8Stu6wLEC-6urfi6SWn6nkYeeAuKiWg76Bz0bOAGCKQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] Fix call status in +CLCC for maemo6 telephony
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Date: Tue, 11 Oct 2011 14:47:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ 2/2] Add support for parsing the remote name during
+ LE Scan
+Message-ID: <20111011114750.GA17137@fusion.localdomain>
+References: <1317912132-6644-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1317912132-6644-2-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1317912132-6644-2-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+Hi Vinicius,
 
-On Tue, Oct 11, 2011 at 2:34 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
-> If list current calls is requested when there is second incoming call
-> and csd call status is CSD_CALL_STATUS_PROCEEDING, then returned 'state
-> of the call' value in +CLCC is 4 (incoming, MT call), which is incorrect.
-> Indication than proceeds from incoming to waiting state.
->
-> This patch sets the corresponding value to 5 (waiting, MT call) in
-> maemo6 telephony driver for the second call.
+On Thu, Oct 06, 2011, Vinicius Costa Gomes wrote:
 > ---
->  audio/telephony-maemo6.c |   12 ++++++++++--
->  1 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-> index 102daeb..82cb274 100644
-> --- a/audio/telephony-maemo6.c
-> +++ b/audio/telephony-maemo6.c
-> @@ -932,8 +932,16 @@ static int csd_status_to_hfp(struct csd_call *call)
->                /* PROCEEDING can happen in outgoing/incoming */
->                if (call->originating)
->                        return CALL_STATUS_DIALING;
-> -               else
-> -                       return CALL_STATUS_INCOMING;
-> +
-> +               /*
-> +                * PROCEEDING is followed by WAITING CSD status, therefore
-> +                * second incoming call status indication is set immediately
-> +                * to waiting.
-> +                */
-> +               if (g_slist_length(active_calls) > 0)
-> +                       return CALL_STATUS_WAITING;
-> +
-> +               return CALL_STATUS_INCOMING;
->        case CSD_CALL_STATUS_COMING:
->                return CALL_STATUS_INCOMING;
->        case CSD_CALL_STATUS_MO_ALERTING:
-> --
-> 1.7.4.1
->
+>  tools/hcitool.c |   52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 51 insertions(+), 1 deletions(-)
 
-Ack.
+Could you rebase and resend this patch. It doesn't apply anymore.
 
--- 
-Luiz Augusto von Dentz
+Johan
