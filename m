@@ -1,84 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHMBquWOHbNp8DLcNRRHwyPF8qs3GgFFz83AbkLJdFoBfk0Wpw@mail.gmail.com>
-References: <1318324718-19760-1-git-send-email-dmitriy.paliy@nokia.com>
-	<CABBYNZKGzBROENrBs0g8RQPBR4faeugOqXr5=FyjykHu5fn3Kw@mail.gmail.com>
-	<CAHMBquWOHbNp8DLcNRRHwyPF8qs3GgFFz83AbkLJdFoBfk0Wpw@mail.gmail.com>
-Date: Tue, 11 Oct 2011 13:57:43 +0300
-Message-ID: <CABBYNZKQ592p--QnfZ-Swx1-37B5z4kSGqCr1YzUCk+EMLXv_Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix call status in +CLCC for maemo6 telephony
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@gmail.com>
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 15/16] Bluetooth: EWS: remove magic numbers in l2cap
+Date: Tue, 11 Oct 2011 13:37:55 +0300
+Message-Id: <1318329476-30153-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Oct 11, 2011 at 1:13 PM, Dmitriy Paliy <dmitriy.paliy@gmail.com> wrote:
-> Hi Luiz,
->
-> On Tue, Oct 11, 2011 at 12:44 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Dmitriy,
->>
->> On Tue, Oct 11, 2011 at 12:18 PM, Dmitriy Paliy <dmitriy.paliy@nokia.com> wrote:
->>> If list current calls is requested when there is second incoming call
->>> and csd call status is CSD_CALL_STATUS_PROCEEDING, then returned 'state
->>> of the call' value in +CLCC is 4 (incoming, MT call), which is incorrect.
->>> Indication than proceeds from incoming to waiting state.
->>>
->>> This patch sets the corresponding value to 5 (waiting, MT call) in
->>> maemo6 telephony driver for the second call.
->>> ---
->>>  audio/telephony-maemo6.c |    8 ++++++--
->>>  1 files changed, 6 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
->>> index 102daeb..13bb198 100644
->>> --- a/audio/telephony-maemo6.c
->>> +++ b/audio/telephony-maemo6.c
->>> @@ -932,8 +932,12 @@ static int csd_status_to_hfp(struct csd_call *call)
->>>                /* PROCEEDING can happen in outgoing/incoming */
->>>                if (call->originating)
->>>                        return CALL_STATUS_DIALING;
->>> -               else
->>> -                       return CALL_STATUS_INCOMING;
->>> +               else {
->>> +                       if (g_slist_length(active_calls) > 0)
->>> +                               return CALL_STATUS_WAITING;
->>> +                       else
->>> +                               return CALL_STATUS_INCOMING;
->>> +               }
->>
->> I guess you could have else if (g_slist_length(active_calls) > 0)
->> which is less indentation, other than that looks ok.
->
-> In this way it looks grouped in better way to my taste, since there
-> are two cases (incoming and dialing), and those have sub-cases. Note,
-> that dialing may have also two sub-cases in theory (2: dialling, 3:
-> alerting). Such structure
-> if (call->originating)
-> ...
-> else if (g_slist_length(active_calls) > 0)
-> ...
-> else
-> looks more confusing. What do you think?
+Remove magic numbers for FCS, SDU LEN and PSM LEN
+when calculating packet payload.
 
-Actually since we are returning we probably don't need this amount of
-else, so something like the following should be equivalent:
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ net/bluetooth/l2cap_core.c |   46 ++++++++++++++++++++++++-------------------
+ 1 files changed, 26 insertions(+), 20 deletions(-)
 
--               else
--                       return CALL_STATUS_INCOMING;
-+
-+               if (g_slist_length(active_calls) > 0)
-+                       return CALL_STATUS_WAITING;
-+
-+               return CALL_STATUS_INCOMING;
-
-Also, I guess the number of active calls must be > 1 to be on waiting, isn't it?
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2f1cd92..a703301 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -578,7 +578,7 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u32 control)
+ 		hlen = L2CAP_ENH_HDR_SIZE;
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+-		hlen += 2;
++		hlen += L2CAP_FCS_SIZE;
+ 
+ 	BT_DBG("chan %p, control 0x%8.8x", chan, control);
+ 
+@@ -603,8 +603,8 @@ static inline void l2cap_send_sframe(struct l2cap_chan *chan, u32 control)
+ 	__put_control_put(chan, control, skb);
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16) {
+-		u16 fcs = crc16(0, (u8 *)lh, count - 2);
+-		put_unaligned_le16(fcs, skb_put(skb, 2));
++		u16 fcs = crc16(0, (u8 *)lh, count - L2CAP_FCS_SIZE);
++		put_unaligned_le16(fcs, skb_put(skb, L2CAP_FCS_SIZE));
+ 	}
+ 
+ 	if (lmp_no_flush_capable(conn->hcon->hdev))
+@@ -1282,8 +1282,10 @@ static void l2cap_streaming_send(struct l2cap_chan *chan)
+ 		__put_control(chan, control, skb->data + L2CAP_HDR_SIZE);
+ 
+ 		if (chan->fcs == L2CAP_FCS_CRC16) {
+-			fcs = crc16(0, (u8 *)skb->data, skb->len - 2);
+-			put_unaligned_le16(fcs, skb->data + skb->len - 2);
++			fcs = crc16(0, (u8 *)skb->data,
++						skb->len - L2CAP_FCS_SIZE);
++			put_unaligned_le16(fcs,
++					skb->data + skb->len - L2CAP_FCS_SIZE);
+ 		}
+ 
+ 		l2cap_do_send(chan, skb);
+@@ -1332,8 +1334,10 @@ static void l2cap_retransmit_one_frame(struct l2cap_chan *chan, u16 tx_seq)
+ 	__put_control(chan, control, tx_skb->data + L2CAP_HDR_SIZE);
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16) {
+-		fcs = crc16(0, (u8 *)tx_skb->data, tx_skb->len - 2);
+-		put_unaligned_le16(fcs, tx_skb->data + tx_skb->len - 2);
++		fcs = crc16(0, (u8 *)tx_skb->data,
++						tx_skb->len - L2CAP_FCS_SIZE);
++		put_unaligned_le16(fcs,
++				tx_skb->data + tx_skb->len - L2CAP_FCS_SIZE);
+ 	}
+ 
+ 	l2cap_do_send(chan, tx_skb);
+@@ -1373,8 +1377,10 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
+ 		__put_control(chan, control, tx_skb->data + L2CAP_HDR_SIZE);
+ 
+ 		if (chan->fcs == L2CAP_FCS_CRC16) {
+-			fcs = crc16(0, (u8 *)skb->data, tx_skb->len - 2);
+-			put_unaligned_le16(fcs, skb->data + tx_skb->len - 2);
++			fcs = crc16(0, (u8 *)skb->data,
++						tx_skb->len - L2CAP_FCS_SIZE);
++			put_unaligned_le16(fcs, skb->data +
++						tx_skb->len - L2CAP_FCS_SIZE);
+ 		}
+ 
+ 		l2cap_do_send(chan, tx_skb);
+@@ -1484,7 +1490,7 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan, struct
+ 	struct sock *sk = chan->sk;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff *skb;
+-	int err, count, hlen = L2CAP_HDR_SIZE + 2;
++	int err, count, hlen = L2CAP_HDR_SIZE + L2CAP_PSMLEN_SIZE;
+ 	struct l2cap_hdr *lh;
+ 
+ 	BT_DBG("sk %p len %d", sk, (int)len);
+@@ -1559,10 +1565,10 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 		hlen = L2CAP_ENH_HDR_SIZE;
+ 
+ 	if (sdulen)
+-		hlen += 2;
++		hlen += L2CAP_SDULEN_SIZE;
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+-		hlen += 2;
++		hlen += L2CAP_FCS_SIZE;
+ 
+ 	count = min_t(unsigned int, (conn->mtu - hlen), len);
+ 	skb = bt_skb_send_alloc(sk, count + hlen,
+@@ -1578,7 +1584,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	__put_control_put(chan, control, skb);
+ 
+ 	if (sdulen)
+-		put_unaligned_le16(sdulen, skb_put(skb, 2));
++		put_unaligned_le16(sdulen, skb_put(skb, L2CAP_SDULEN_SIZE));
+ 
+ 	err = l2cap_skbuff_fromiovec(sk, msg, len, count, skb);
+ 	if (unlikely(err < 0)) {
+@@ -1587,7 +1593,7 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
+ 	}
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+-		put_unaligned_le16(0, skb_put(skb, 2));
++		put_unaligned_le16(0, skb_put(skb, L2CAP_FCS_SIZE));
+ 
+ 	bt_cb(skb)->retries = 0;
+ 	return skb;
+@@ -3128,7 +3134,7 @@ static int l2cap_check_fcs(struct l2cap_chan *chan,  struct sk_buff *skb)
+ 		hdr_size = L2CAP_ENH_HDR_SIZE;
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16) {
+-		skb_trim(skb, skb->len - 2);
++		skb_trim(skb, skb->len - L2CAP_FCS_SIZE);
+ 		rcv_fcs = get_unaligned_le16(skb->data + skb->len);
+ 		our_fcs = crc16(0, skb->data - hdr_size, skb->len + hdr_size);
+ 
+@@ -3238,7 +3244,7 @@ static int l2cap_reassemble_sdu(struct l2cap_chan *chan, struct sk_buff *skb, u3
+ 			break;
+ 
+ 		chan->sdu_len = get_unaligned_le16(skb->data);
+-		skb_pull(skb, 2);
++		skb_pull(skb, L2CAP_SDULEN_SIZE);
+ 
+ 		if (chan->sdu_len > chan->imtu) {
+ 			err = -EMSGSIZE;
+@@ -3730,10 +3736,10 @@ static int l2cap_ertm_data_rcv(struct sock *sk, struct sk_buff *skb)
+ 		goto drop;
+ 
+ 	if (__is_sar_start(chan, control) && !__is_sframe(chan, control))
+-		len -= 2;
++		len -= L2CAP_SDULEN_SIZE;
+ 
+ 	if (chan->fcs == L2CAP_FCS_CRC16)
+-		len -= 2;
++		len -= L2CAP_FCS_SIZE;
+ 
+ 	if (len > chan->mps) {
+ 		l2cap_send_disconn_req(chan->conn, chan, ECONNRESET);
+@@ -3830,10 +3836,10 @@ static inline int l2cap_data_channel(struct l2cap_conn *conn, u16 cid, struct sk
+ 			goto drop;
+ 
+ 		if (__is_sar_start(chan, control))
+-			len -= 2;
++			len -= L2CAP_SDULEN_SIZE;
+ 
+ 		if (chan->fcs == L2CAP_FCS_CRC16)
+-			len -= 2;
++			len -= L2CAP_FCS_SIZE;
+ 
+ 		if (len > chan->mps || len < 0 || __is_sframe(chan, control))
+ 			goto drop;
 -- 
-Luiz Augusto von Dentz
+1.7.4.1
+
