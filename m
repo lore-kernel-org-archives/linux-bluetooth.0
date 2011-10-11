@@ -1,57 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 11 Oct 2011 12:44:57 +0300
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/4] Bluetooth: convert force_active variable to flag in
+ l2cap chan
+Message-ID: <20111011094454.GC19953@aemeltch-MOBL1>
+References: <1318232034-13410-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1318232034-13410-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20111010210706.GC6936@joana>
+ <20111011075032.GB19953@aemeltch-MOBL1>
 MIME-Version: 1.0
-In-Reply-To: <1317978670-24903-2-git-send-email-lkslawek@gmail.com>
-References: <1317978670-24903-1-git-send-email-lkslawek@gmail.com>
-	<1317978670-24903-2-git-send-email-lkslawek@gmail.com>
-Date: Tue, 11 Oct 2011 12:46:09 +0300
-Message-ID: <CABBYNZJOjg9m++xM=+Nj1UvX7tcij-mcprLOvG1f07HEOQWorg@mail.gmail.com>
-Subject: Re: [PATCH obexd 1/1] Fix OPP not sending TransferCompleted signal
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Slawomir Bochenski <lkslawek@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111011075032.GB19953@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Slawomir,
+Hi Gustavo,
 
-On Fri, Oct 7, 2011 at 12:11 PM, Slawomir Bochenski <lkslawek@gmail.com> wrote:
-> Commit 934b3b2f5f8432b67822be9f83a141fe3783cbd7 introduced a regression
-> in OPP, by making it not send TransferCompleted signal. This happened
-> because OPP was calling manager_emit_transfer_completed() on .reset(),
-> and manager_emit_transfer_completed() in turn checks if the os->object
-> is not NULL. This fixes this by moving clearing os->object after doing
-> service driver .reset().
-> ---
->  src/obex.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/src/obex.c b/src/obex.c
-> index 59bbe7a..a0c17c1 100644
-> --- a/src/obex.c
-> +++ b/src/obex.c
-> @@ -288,8 +288,6 @@ static void os_reset_session(struct obex_session *os)
->        if (os->object) {
->                os->driver->set_io_watch(os->object, NULL, NULL);
->                os->driver->close(os->object);
-> -               os->object = NULL;
-> -               os->obj = NULL;
->                if (os->aborted && os->cmd == OBEX_CMD_PUT && os->path &&
->                                os->driver->remove)
->                        os->driver->remove(os->path);
-> @@ -315,6 +313,8 @@ static void os_reset_session(struct obex_session *os)
->                os->path = NULL;
->        }
->
-> +       os->object = NULL;
-> +       os->obj = NULL;
->        os->driver = NULL;
->        os->aborted = FALSE;
->        os->pending = 0;
-> --
-> 1.7.4.1
+On Tue, Oct 11, 2011 at 10:50:34AM +0300, Emeltchenko Andrei wrote:
+> > > @@ -942,7 +946,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+> > >  			set_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+> > >  		if (test_bit(FLAG_FLUSHABLE, &pchan->flags))
+> > >  			set_bit(FLAG_FLUSHABLE, &chan->flags);
+> > > -		chan->force_active = pchan->force_active;
+> > > +		if (test_bit(FLAG_FORCE_ACTIVE, &pchan->flags))
+> > > +			set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+> > >  	} else {
+> > >  
+> > >  		switch (sk->sk_type) {
+> > > @@ -973,8 +978,7 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
+> > >  		chan->role_switch = 0;
+> > >  		clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+> > >  		clear_bit(FLAG_FLUSHABLE, &chan->flags);
+> > > -		chan->force_active = BT_POWER_FORCE_ACTIVE_ON;
+> > > -
+> > > +		set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+> > 
+> > One last comment: set chan->flags to 0 here, the just to set the bits that
+> > needs to be 1 at initialization.
+> 
+> Sorry do not understand this :-(
+> 
+> Do you mean assign chan->flags = 0; and set_bit only for
+> FLAG_FORCE_ACTIVE?
 
-Ack.
+Just sent patches with cumulative difference below:
 
--- 
-Luiz Augusto von Dentz
+
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 3ca71b4..4b388b7 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -979,9 +979,7 @@ static void l2cap_sock_init(struct sock *sk, struct
+sock *parent)
+                chan->fcs  = L2CAP_FCS_CRC16;
+                chan->tx_win = L2CAP_DEFAULT_TX_WINDOW;
+                chan->sec_level = BT_SECURITY_LOW;
+-               clear_bit(FLAG_ROLE_SWITCH, &chan->flags);
+-               clear_bit(FLAG_FORCE_RELIABLE, &chan->flags);
+-               clear_bit(FLAG_FLUSHABLE, &chan->flags);
++               chan->flags = 0;
+                set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+        }
+
+
+Best regards 
+Andrei Emeltchenko 
+
