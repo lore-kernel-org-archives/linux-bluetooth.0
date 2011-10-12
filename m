@@ -1,24 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Oct 2011 11:00:30 +0300
+Date: Wed, 12 Oct 2011 10:55:38 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] Remove leftover code of device type storage
-Message-ID: <20111012080030.GA14510@fusion.localdomain>
-References: <1318358856-11962-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH BlueZ] Update control documentation to reflect the
+ implementation
+Message-ID: <20111012075538.GB13957@fusion.localdomain>
+References: <1318244860-9474-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1318358856-11962-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1318244860-9474-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Luiz,
 
-On Tue, Oct 11, 2011, Claudio Takahasi wrote:
+On Mon, Oct 10, 2011, Luiz Augusto von Dentz wrote:
+> Many of the methods and signal don't make much sense since we now have
+> a dedicated interfaces that are Media and MediaPlayer.
 > ---
->  src/device.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+>  doc/control-api.txt |   61 ++++----------------------------------------------
+>  1 files changed, 5 insertions(+), 56 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
