@@ -2,62 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 07/12] Add callback to list available metadata IDs
-Date: Wed, 12 Oct 2011 12:11:17 -0300
-Message-Id: <1318432282-25002-7-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 05/12] Move debug messages to their correspondent getters
+Date: Wed, 12 Oct 2011 12:11:15 -0300
+Message-Id: <1318432282-25002-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- audio/avrcp.h |    1 +
- audio/media.c |   13 +++++++++++++
- 2 files changed, 14 insertions(+), 0 deletions(-)
+ audio/avrcp.c |   19 ++++++++++---------
+ 1 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 66d09bc..360a80a 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -76,6 +76,7 @@ struct avrcp_player_cb {
- 	int (*get_setting) (uint8_t attr, void *user_data);
- 	int (*set_setting) (uint8_t attr, uint8_t value, void *user_data);
- 	void *(*get_metadata) (uint32_t id, void *user_data);
-+	GList *(*list_metadata) (void *user_data);
- 	uint8_t (*get_status) (void *user_data);
- 	uint32_t (*get_position) (void *user_data);
- };
-diff --git a/audio/media.c b/audio/media.c
-index 56913d5..5a74fec 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1156,6 +1156,18 @@ static int set_setting(uint8_t attr, uint8_t val, void *user_data)
- 	return 0;
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index c36af5d..6bddf5b 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -474,9 +474,15 @@ static int player_set_attribute(struct avrcp_player *player,
+ 
+ static int player_get_attribute(struct avrcp_player *player, uint8_t attr)
+ {
+-	DBG("Get attribute: %u", attr);
++	int value;
+ 
+-	return player->cb->get_setting(attr, player->user_data);
++	DBG("attr %u", attr);
++
++	value = player->cb->get_setting(attr, player->user_data);
++	if (value < 0)
++		DBG("attr %u not supported by player", attr);
++
++	return value;
  }
  
-+static GList *list_metadata(void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+
-+	DBG("");
-+
-+	if (mp->track == NULL)
-+		return NULL;
-+
-+	return g_hash_table_get_keys(mp->track);
-+}
-+
- static void *get_metadata(uint32_t id, void *user_data)
- {
- 	struct media_player *mp = user_data;
-@@ -1207,6 +1219,7 @@ static uint32_t get_position(void *user_data)
- static struct avrcp_player_cb player_cb = {
- 	.get_setting = get_setting,
- 	.set_setting = set_setting,
-+	.list_metadata = list_metadata,
- 	.get_metadata = get_metadata,
- 	.get_position = get_position,
- 	.get_status = get_status
+ static uint8_t avrcp_handle_get_capabilities(struct avrcp_player *player,
+@@ -535,10 +541,8 @@ static uint8_t avrcp_handle_list_player_attributes(struct avrcp_player *player,
+ 		goto done;
+ 
+ 	for (i = 1; i <= AVRCP_ATTRIBUTE_SCAN; i++) {
+-		if (player_get_attribute(player, i) < 0) {
+-			DBG("Ignoring setting %u: not supported by player", i);
++		if (player_get_attribute(player, i) < 0)
+ 			continue;
+-		}
+ 
+ 		len++;
+ 		pdu->params[len] = i;
+@@ -681,11 +685,8 @@ static uint8_t avrcp_handle_get_current_player_value(struct avrcp_player *player
+ 		}
+ 
+ 		val = player_get_attribute(player, settings[i]);
+-		if (val < 0) {
+-			DBG("Ignoring %u: not supported by player",
+-								settings[i]);
++		if (val < 0)
+ 			continue;
+-		}
+ 
+ 		pdu->params[++len] = settings[i];
+ 		pdu->params[++len] = val;
 -- 
 1.7.7
 
