@@ -2,43 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 09/12] AVRCP: Check if len matches number of IDs
-Date: Wed, 12 Oct 2011 12:11:19 -0300
-Message-Id: <1318432282-25002-9-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 08/12] AVRCP: Return error for invalid metadata IDs
+Date: Wed, 12 Oct 2011 12:11:18 -0300
+Message-Id: <1318432282-25002-8-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If number of attributes remote side provided is larger than the length
-we read, we would read garbage from stack memory.
 ---
- audio/avrcp.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ audio/avrcp.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/audio/avrcp.c b/audio/avrcp.c
-index 0ca91a5..8b46650 100644
+index a7987fb..0ca91a5 100644
 --- a/audio/avrcp.c
 +++ b/audio/avrcp.c
-@@ -597,12 +597,16 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
- 	int size;
- 	unsigned int i;
+@@ -427,6 +427,10 @@ static int player_get_media_attribute(struct avrcp_player *player,
  
--	if (len < 8 || *identifier != 0)
-+	if (len < 9 || *identifier != 0)
-+		goto err;
+ 	DBG("Get media attribute: %u", id);
+ 
++	if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
++			id > AVRCP_MEDIA_ATTRIBUTE_LAST)
++		return -ENOENT;
 +
-+	nattr = pdu->params[8];
-+
-+	if (len < nattr * sizeof(uint32_t) + 1)
- 		goto err;
+ 	value = player->cb->get_metadata(id, player->user_data);
+ 	if (value == NULL) {
+ 		len = 0;
+@@ -452,8 +456,6 @@ static int player_get_media_attribute(struct avrcp_player *player,
+ 			return -ENOBUFS;
+ 		memcpy(elem->val, valstr, len);
+ 		break;
+-	default:
+-		return -ENOENT;
+ 	}
  
- 	len = 0;
- 	pos = 1; /* Keep track of current position in reponse */
--	nattr = pdu->params[8];
- 
- 	if (!nattr) {
- 		/*
+ done:
 -- 
 1.7.7
 
