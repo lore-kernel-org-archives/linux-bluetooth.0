@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 3/4] Bluetooth: physical link HCI interface to AMP
-Date: Wed, 12 Oct 2011 10:53:58 +0300
-Message-Id: <1318406039-24843-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 4/4] Bluetooth: add A2MP fixed channel when hs_enabled
+Date: Wed, 12 Oct 2011 10:53:59 +0300
+Message-Id: <1318406039-24843-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1318406039-24843-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1318406039-24843-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adds support for physical link create/acceppt/disconnect AMP HCI
-commands. To be used by the upper layer.
-Backport from CodeAurora & Atheros
+Adds A2MP fixed channel in L2CAP fixed channel supported.
+Remove magic numbers and simplify code as we need only 1 octet.
 
 Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- include/net/bluetooth/hci.h |   24 ++++++++++++++++++++++
- net/bluetooth/hci_core.c    |   45 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    5 +++++
+ net/bluetooth/l2cap_core.c    |   12 ++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5a6fa24..8748121 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -30,6 +30,8 @@
- #define HCI_MAX_EVENT_SIZE	260
- #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 45d1814..f195978 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -112,6 +112,10 @@ struct l2cap_conninfo {
+ #define L2CAP_FCS_NONE		0x00
+ #define L2CAP_FCS_CRC16		0x01
  
-+#define HCI_MAX_AMP_KEY_SIZE	32
++/* L2CAP fixed channels */
++#define L2CAP_FC_L2CAP		0x02
++#define L2CAP_FC_A2MP		0x08
 +
- /* HCI dev events */
- #define HCI_DEV_REG			1
- #define HCI_DEV_UNREG			2
-@@ -467,6 +469,28 @@ struct hci_cp_io_capability_neg_reply {
- 	__u8     reason;
- } __packed;
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR			0xC000
+ #define L2CAP_CTRL_REQSEQ		0x3F00
+@@ -441,6 +445,7 @@ struct l2cap_conn {
+ 	unsigned int	mtu;
  
-+#define HCI_OP_CREATE_PHY_LINK		0x0435
-+struct hci_cp_create_phy_link {
-+	__u8     handle;
-+	__u8     key_len;
-+	__u8     key_type;
-+	__u8     key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_ACCEPT_PHY_LINK		0x0436
-+struct hci_cp_accept_phy_link {
-+	__u8	handle;
-+	__u8	key_len;
-+	__u8	key_type;
-+	__u8	key[HCI_MAX_AMP_KEY_SIZE];
-+} __packed;
-+
-+#define HCI_OP_DISC_PHY_LINK		0x0437
-+struct hci_cp_disc_phy_link {
-+	__u8     handle;
-+	__u8     reason;
-+} __packed;
-+
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b84458d..afd246e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -315,6 +315,51 @@ static void hci_linkpol_req(struct hci_dev *hdev, unsigned long opt)
- 	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
- }
+ 	__u32		feat_mask;
++	__u8		fc_mask;
  
-+/* AMP HCI interface */
-+void hci_phylink_create_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
-+{
-+	struct hci_cp_create_phy_link cp;
+ 	__u8		info_state;
+ 	__u8		info_ident;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9144d70..152b68f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -60,7 +60,7 @@ int disable_ertm;
+ int enable_hs;
+ 
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+-static u8 l2cap_fixed_chan[8] = { 0x02, };
++static u8 l2cap_fixed_chan = L2CAP_FC_L2CAP;
+ 
+ static LIST_HEAD(chan_list);
+ static DEFINE_RWLOCK(chan_list_lock);
+@@ -2891,9 +2891,16 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 	} else if (type == L2CAP_IT_FIXED_CHAN) {
+ 		u8 buf[12];
+ 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
 +
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
++		memset(buf, 0, sizeof(buf));
+ 		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
+ 		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+-		memcpy(buf + 4, l2cap_fixed_chan, 8);
 +
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
++		if (enable_hs)
++			l2cap_fixed_chan |= L2CAP_FC_A2MP;
 +
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_CREATE_PHY_LINK, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_phylink_create_req);
++		rsp->data[0] = l2cap_fixed_chan;
 +
-+void hci_phylink_accept_req(struct hci_dev *hdev, __u8 handle, __u8 key_len,
-+						__u8 key_type, __u8 *key)
-+{
-+	struct hci_cp_accept_phy_link cp;
-+
-+	cp.handle	= handle;
-+	cp.key_type	= key_type;
-+	cp.key_len	= min_t(__u8, key_len, HCI_MAX_AMP_KEY_SIZE);
-+
-+	BT_DBG("key len %d, phy handle %d", cp.key_len, cp.handle);
-+
-+	memcpy(cp.key, key, cp.key_len);
-+	hci_send_cmd(hdev, HCI_OP_ACCEPT_PHY_LINK, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_phylink_accept_req);
-+
-+void hci_phylink_disc_req(struct hci_dev *hdev, __u8 handle, __u8 reason)
-+{
-+	struct hci_cp_disc_phy_link cp;
-+
-+	BT_DBG("handle %d reason %d", handle, reason);
-+
-+	cp.handle = handle;
-+	cp.reason = reason;
-+	hci_send_cmd(hdev, HCI_OP_DISC_PHY_LINK, sizeof(cp), &cp);
-+}
-+EXPORT_SYMBOL(hci_phylink_disc_req);
-+
- /* Get HCI device by index.
-  * Device is held on return. */
- struct hci_dev *hci_dev_get(int index)
+ 		l2cap_send_cmd(conn, cmd->ident,
+ 					L2CAP_INFO_RSP, sizeof(buf), buf);
+ 	} else {
+@@ -2951,6 +2958,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 			l2cap_conn_start(conn);
+ 		}
+ 	} else if (type == L2CAP_IT_FIXED_CHAN) {
++		conn->fc_mask = rsp->data[0];
+ 		conn->info_state |= L2CAP_INFO_FEAT_MASK_REQ_DONE;
+ 		conn->info_ident = 0;
+ 
 -- 
 1.7.4.1
 
