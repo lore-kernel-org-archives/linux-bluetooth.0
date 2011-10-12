@@ -1,48 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Keng-Yu Lin <kengyu@ubuntu.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Keng-Yu Lin <kengyu@ubuntu.com>
-Subject: [RFC] Bluez: Fix the adapter is not initialised after resume
-Date: Thu, 13 Oct 2011 09:35:12 +0800
-Message-Id: <1318469712-6639-1-git-send-email-kengyu@ubuntu.com>
-In-Reply-To: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
-References: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 06/12] AVRCP: Do not list values for unsupported attributes
+Date: Wed, 12 Oct 2011 12:11:16 -0300
+Message-Id: <1318432282-25002-6-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-init_adapter() is not called due to missing HCI commands of
-read_bd_addr, read_local_version, read_local_features,
-and read_local_name on some machines.
 ---
- plugins/hciops.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ audio/avrcp.c |    7 +++----
+ 1 files changed, 3 insertions(+), 4 deletions(-)
 
- Please see the links of the bug in different distros:
-   https://bugzilla.redhat.com/show_bug.cgi?id=727106
-   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614929
-   https://launchpad.net/bugs/824144
-   https://launchpad.net/bugs/824633
-   https://launchpad.net/bugs/823467
-   https://launchpad.net/bugs/822705
-
- It is confirmed that this patch fixes for Dell Latutude 2120
- and EeePC 1001PXD.
-
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 9fb28c8..5f339c1 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -2502,8 +2502,8 @@ static void device_devup_setup(int index)
- 	hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_STORED_LINK_KEY,
- 					READ_STORED_LINK_KEY_CP_SIZE, &cp);
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 6bddf5b..a7987fb 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -565,11 +565,10 @@ static uint8_t avrcp_handle_list_player_values(struct avrcp_player *player,
+ 	if (len != 1 || !player)
+ 		goto err;
  
--	if (!dev->pending)
--		init_adapter(index);
-+	DBG("dev->pending=%d", dev->pending);
-+	init_adapter(index);
- }
+-	len = attr_get_max_val(pdu->params[0]);
+-	if (!len) {
+-		error("Attribute is invalid: %u", pdu->params[0]);
++	if (player_get_attribute(player, pdu->params[0]) < 0)
+ 		goto err;
+-	}
++
++	len = attr_get_max_val(pdu->params[0]);
  
- static void init_pending(int index)
+ 	for (i = 1; i <= len; i++)
+ 		pdu->params[i] = i;
 -- 
-1.7.5.4
+1.7.7
 
