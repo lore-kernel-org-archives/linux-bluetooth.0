@@ -4,62 +4,50 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 1/9] Bluetooth: Add BT_AMP_POLICY socket option
-Date: Thu, 13 Oct 2011 15:00:39 -0700
-Message-Id: <1318543247-27130-2-git-send-email-mathewm@codeaurora.org>
-In-Reply-To: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
-References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 0/9] AMP interface and signal framework
+Date: Thu, 13 Oct 2011 15:00:38 -0700
+Message-Id: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Allow control of AMP functionality on L2CAP sockets. By default,
-connections will be restricted to BR/EDR.  Manipulating the
-BT_AMP_POLICY option allows for channels to be moved to or created
-on AMP controllers.
+This patch set includes the AMP policy socket option that was
+previously discussed and accepted in to bluetooth-testing, and the
+signaling framework for AMP channel creation and AMP channel moves.
 
-Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
----
- include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
- 1 files changed, 27 insertions(+), 0 deletions(-)
+There is overlap with Andrei Emeltchenko's RFC ("L2CAP and HCI
+preparation code for A2MP") earlier this week.  We (and Andrei) aren't
+trying to have dueling patch sets - we very much want to cooperate and
+get the AMP functionality upstreamed efficiently.  We were in touch
+with him earlier in the week to see how far he was with the porting
+effort.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index e727555..14ae418 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -77,6 +77,33 @@ struct bt_power {
- #define BT_POWER_FORCE_ACTIVE_OFF 0
- #define BT_POWER_FORCE_ACTIVE_ON  1
- 
-+#define BT_AMP_POLICY	10
-+
-+/* Require BR/EDR (default policy)
-+ *   AMP controllers cannot be used.
-+ *   Channel move requests from the remote device are denied.
-+ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
-+ */
-+#define BT_AMP_POLICY_REQUIRE_BR_EDR   0
-+
-+/* Prefer AMP
-+ *   Allow use of AMP controllers
-+ *   If the L2CAP channel is currently on BR/EDR and AMP controller
-+ *     resources are available, initiate a channel move to AMP.
-+ *   Channel move requests from the remote device are allowed.
-+ *   If the L2CAP socket has not been connected yet, try to create
-+ *     and configure the channel directly on an AMP controller rather
-+ *     than BR/EDR.
-+ */
-+#define BT_AMP_POLICY_PREFER_AMP       1
-+
-+/* Prefer BR/EDR
-+ *   Allow use of AMP controllers.
-+ *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
-+ *   Channel move requests from the remote device are allowed.
-+ */
-+#define BT_AMP_POLICY_PREFER_BR_EDR    2
-+
- __attribute__((format (printf, 2, 3)))
- int bt_printk(const char *level, const char *fmt, ...);
- 
+Next steps:
+ * L2CAP lockstep configuration
+ * HCI layer changes for AMP HCI commands and physical/logical links
+ * The rest of the create channel and move channel code
+ * Move channel coordination with ERTM
+ * AMP manager
+ * ERTM optimizations
+
+Mat Martineau (9):
+  Bluetooth: Add BT_AMP_POLICY socket option
+  Bluetooth: Add AMP policy information to l2cap_chan
+  Bluetooth: Get/set AMP policy socket option
+  Bluetooth: Add AMP-related data and structures for channel signals
+  Bluetooth: Add signal handlers for channel creation
+  Bluetooth: Add definitions for L2CAP fixed channels
+  Bluetooth: Use symbolic values for the fixed channel map
+  Bluetooth: Add AMP header file
+  Bluetooth: Add signal handlers for channel moves
+
+ include/net/bluetooth/amp.h       |   20 +++++
+ include/net/bluetooth/bluetooth.h |   27 ++++++
+ include/net/bluetooth/l2cap.h     |   65 ++++++++++++++
+ net/bluetooth/l2cap_core.c        |  172 ++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/l2cap_sock.c        |   25 ++++++
+ 5 files changed, 308 insertions(+), 1 deletions(-)
+ create mode 100644 include/net/bluetooth/amp.h
+
 -- 
 1.7.7
 
