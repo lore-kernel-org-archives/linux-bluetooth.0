@@ -1,64 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Oct 2011 15:54:58 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/11] Bluetooth: New mgmt messages for SMP Keys
-Message-ID: <20111013185458.GB31083@samus.indt.org>
-References: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1313798895-8705-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
+References: <F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
+Date: Thu, 13 Oct 2011 15:27:38 -0300
+Message-ID: <CAKT1EBfYAgNQwX3KcbCM_JCiSTjZi5BnWhFZqSGXWWqv7zWvqw@mail.gmail.com>
+Subject: Re: Proposal for GATT Client Dbus API.
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 21:08 Fri 19 Aug, Vinicius Costa Gomes wrote:
-> Hi,
-> 
-> Using new messages for SMP keys allow for simpler code as it is always
-> clear from context the kind of key that is necessary.
-
-I guess it's time to bring some threads back from the dead. How about
-starting with this one.
-
-I think that the most controversial thing about this series are how the
-new messages are organized (the union thing). Comments are very welcome
-:-)
-
-> 
-> Along with this are some fixes for problems found while implementing the
-> Proximity Profile.
-> 
-> --
-> 
-> Vinicius Costa Gomes (11):
->   Bluetooth: Use the LTK after receiving a LE Security Request
->   Revert "Bluetooth: Add support for communicating keys with userspace"
->   Bluetooth: Add structures for the new SMP messages
->   Bluetooth: Add support for cleaning the SMP key list
->   Bluetooth: Add handlers for the new mgmt messages
->   Bluetooth: Rename smp_key_size to enc_size
->   Bluetooth: Use the smp_keys list for accessing SMP keys
->   Bluetooth: Remove the link key if LE pairing fails
->   Bluetooth: Fix not setting a pending security level
->   Bluetooth: Fix setting the connection sec_level when encryption fails
->   Bluetooth: Remove support for other SMP keys than the LTK
-> 
->  include/net/bluetooth/hci.h      |    1 +
->  include/net/bluetooth/hci_core.h |   39 ++++++---
->  include/net/bluetooth/mgmt.h     |   26 ++++++-
->  net/bluetooth/hci_core.c         |  103 ++++++++++++++++---------
->  net/bluetooth/hci_event.c        |   13 ++-
->  net/bluetooth/l2cap_core.c       |    6 +-
->  net/bluetooth/mgmt.c             |  159 +++++++++++++++++++++++++++-----------
->  net/bluetooth/smp.c              |   78 +++++++++++--------
->  8 files changed, 291 insertions(+), 134 deletions(-)
-> 
-> --
-> 1.7.6
-> 
-
-Cheers,
--- 
-Vinicius
+SGkgVmlqYXksCgpPbiBUdWUsIE9jdCA0LCAyMDExIGF0IDEwOjU5IEFNLCBWaWpheWt1bWFyIERh
+ZG1vZGUKPFZpamF5a3VtYXIuRGFkbW9kZUBjc3IuY29tPiB3cm90ZToKPiBIaSwKPgo+IFRoaXMg
+cG9zdCBjb250YWlucyBhIHByb3Bvc2FsIGZvciB0aGUgREJVUyBHQVRUIEFQSShHYXR0IENMSUVO
+VCkgdGhhdCBlbmhhbmNlcyB0aGUgZXhpc3RpbmcgR0FUVAo+IGZ1bmN0aW9uYWxpdHkgcHJvdmlk
+ZWQgYnkgREJVUyBBUElzIGludGVyZmFjZS4gV2hpY2ggaW5jbHVkZSBNZXRob2RzLFNpZ25hbHMg
+YW5kIFByb3BlcnRpZXMuCj4gQ291bGQgeW91IHBsZWFzZSBwcm92aWRlIHlvdXIgY29tbWVudHMg
+YW5kIGZlZWRiYWNrIGZvciB0aGUgc2FtZT8gT3Igd2UgbmVlZCBtb3JlIEFQSXMgdG8gY292ZXIg
+YWxsIEdBVFQgQ2xpZW50IGZ1bmN0aW9uYWxpdHk/Cj4KPiAuIFJlZ2lzdGVyQ2hhcmFjdGVyaXN0
+aWNzV2F0Y2hlciBjYW4gYmUgdXNlZCB0byBtb25pdG9yIHNwZWNpZmljIENoYXJhY3RlcmlzdGlj
+IGNoYW5nZS4KPiAuIFByb3BlcnR5Q2hhbmdlZCBTaWduYWwgZm9yIHRoZSBTZXRQcm9wZXJ0eSgp
+Lgo+IC4gU2VydmljZUNoYW5nZWQgYW5kIENoYXJhY3RlcmlzdGljQ2hhbmdlZCBTaWduYWwgZm9y
+IFNlcnZpY2Ugb3IgQ2hhcmFjdGVyaXN0aWMgY2hhbmdlcyBvbiB0aGUgc2VydmVyLgo+IC4gTmV3
+IFByb3BlcnRpZXMgZm9yIFBlcm1pc3Npb25zIGFuZCByZW1haW5pbmcgQ2hhcmFjdGVyaXN0aWMg
+RGVzY3JpcHRvcnMuCj4KPiBQRkEgdGhlIHVwZGF0ZWQgZG9jdW1lbnQgIm5ldy1hdHRyaWJ1dGUt
+YXBpLnR4dCIuCj4KPiBQcm9wb3NlZCBOZXcgQVBJOgo+Cj4gRGV2aWNlIENoYXJhY3RlcmlzdGlj
+IGhpZXJhcmNoeQo+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KPiBTZXJ2aWNlwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3JnLmJsdWV6Cj4gSW50ZXJmYWNlwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIG9yZy5ibHVlei5DaGFyYWN0ZXJpc3RpYwo+IE9iamVjdCBwYXRo
+wqDCoMKgwqDCoMKgwqAgW3ByZWZpeF0ve2hjaTB9L3tkZXZpY2UwfS97c2VydmljZTB9L3tjaGFy
+YWN0ZXJpc3RpYzAsLi4ufQo+Cj4gTWV0aG9kczoKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoFJlZ2lzdGVyQ2hhcmFjdGVyaXN0aWNzV2F0Y2hlcihvYmplY3QgYWdlbnQpCj4g
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBSZWdpc3RlciBhIHdhdGNoZXIgdG8gbW9uaXRvciBjaGFyYWN0ZXJpc3Rp
+YyBjaGFuZ2VzLgo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQSB3YXRjaGVyIHdpbGwgYmUgcmVnaXN0ZXJlZCBm
+b3IgdGhlIHNwZWNpZmljIGNoYXJhY3RlcmlzdGljIGFuZCB3aWxsCj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBu
+b3RpZnkgYWJvdXQgYW55IGNoYW5nZWQgY2hhcmFjdGVyaXN0aWNzLgoKSXMgaXQgcmVhbGx5IG5l
+Y2Vzc2FyeT8gSSB0aG91Z2h0IHJlZ2lzdGVyaW5nIGEgd2F0Y2hlciBhdCBzZXJ2aWNlCiJsZXZl
+bCIgd2FzIGVub3VnaC4KCj4gU2lnbmFsczoKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgUHJvcGVydHlDaGFuZ2VkKHN0cmluZyBuYW1lLCB2YXJpYW50IHZh
+bHVlKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgVGhpcyBzaWduYWwgaW5kaWNhdGVzIGEgY2hhbmdlZCB2YWx1
+ZSBvZiB0aGUgZ2l2ZW4KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByb3BlcnR5Lgo+Cj4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTZXJ2aWNlQ2hhbmdlZCAoZGljdCB2
+YWx1ZXMpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBUaGlzIHNpZ25hbCBpbmRpY2F0ZXMgc2VydmljZSBhZGRl
+ZCBvbiBzZXJ2ZXIuCgpDb3VsZCB5b3UgcGxlYXNlIGV4cGxhaW4gdGhlIHJlbGF0aW9uIGJldHdl
+ZW4gdGhpcyBwcm9wZXJ0eSBhbmQKU2VydmljZSBDaGFuZ2VkIGNoYXJhY3RlcmlzdGljKEdlbmVy
+aWMgQXR0cmlidXRlIFByb2ZpbGUgU2VydmljZSk/CkluIG15IG9waW5pb24sIGl0IGlzIGEgc2Vy
+dmljZSBwcm9wZXJ0eSBpbnN0ZWFkIG9mIGNoYXJhY3RlcmlzdGljIHByb3BlcnR5LgoKPgo+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQ2hhcmFjdGVyaXN0
+aWNDaGFuZ2VkIChkaWN0IHZhbHVlcykKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFRoaXMgc2lnbmFsIGluZGlj
+YXRlcyBjaGFyYWN0ZXJpc3RpYyBhZGRlZCBvbiBzZXJ2ZXIuCj4KPiBQcm9wZXJ0aWVzOgo+IMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdWludDggUHJvcGVy
+dHkgW3JlYWRvbmx5XQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgVGhlIGNoYXJhY3RlcmlzdGljIHByb3BlcnR5
+LCBmb3JtYXQgZGVmaW5lZCBieSBHQVRUIHNwZWMuCj4KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB1aW50MTYgQ29uZmlndXJhdGlvbiBbcmVhZG9ubHld
+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBPcHRpb25hbCBmaWVsZCBjb250YWluaW5nIHRoZSBjb25maWd1cmF0
+aW9uIHZhbHVlIG9uIHRoZSBzZXJ2ZXIuCgpSZWFkIG9ubHk/IENDQyBjYW4gYmUgd3JpdGVhYmxl
+IHJpZ2h0PwoKQlIsCkNsYXVkaW8uCgo+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgdWludDE2IEV4dGVuZGVkIFtyZWFkb25seV0KPiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIFRoZSBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlwdG9yIGRlc2NyaWJpbmcKPiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHRoZSBhZGRpdGlvbmFsIENoYXJhY3RlcmlzdGljIFByb3BlcnRpZXMuCj4KPiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB1aW50MTYgQWdncmVnYXRl
+IFtyZWFkb25seV0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE9wdGlvbmFsIENoYXJhY3RlcmlzdGljIGRlc2Ny
+aXB0b3Igd2hpY2ggZGVmaW5lcyB0aGUKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGZvcm1hdCBvZiBhbiBhZ2dyZWdh
+dGVkIENoYXJhY3RlcmlzdGljIFZhbHVlLgo+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50MTYgQ3VzdG9tIFtyZWFkb25seV0KPiDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoE9wdGlvbmFsIENoYXJhY3RlcmlzdGljIGRlc2NyaXB0b3Igd2hpY2ggZGVmaW5lcyBwcm9m
+aWxlIGRlZmluZWQgZGVzY3JpcHRvciBVVUlEJ3MuCj4KPgo+IFRoYW5rcywKPiBWaWpheQo+Cj4K
+PiBNZW1iZXIgb2YgdGhlIENTUiBwbGMgZ3JvdXAgb2YgY29tcGFuaWVzLiBDU1IgcGxjIHJlZ2lz
+dGVyZWQgaW4gRW5nbGFuZCBhbmQgV2FsZXMsIHJlZ2lzdGVyZWQgbnVtYmVyIDQxODczNDYsIHJl
+Z2lzdGVyZWQgb2ZmaWNlIENodXJjaGlsbCBIb3VzZSwgQ2FtYnJpZGdlIEJ1c2luZXNzIFBhcmss
+IENvd2xleSBSb2FkLCBDYW1icmlkZ2UsIENCNCAwV1osIFVuaXRlZCBLaW5nZG9tCj4gTW9yZSBp
+bmZvcm1hdGlvbiBjYW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEZvbGxvdyBDU1Igb24gVHdp
+dHRlciBhdCBodHRwOi8vdHdpdHRlci5jb20vQ1NSX1BMQyBhbmQgcmVhZCBvdXIgYmxvZyBhdCB3
+d3cuY3NyLmNvbS9ibG9nCj4K
