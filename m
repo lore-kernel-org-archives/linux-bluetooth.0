@@ -1,49 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Anderson Briglia <anderson.briglia@openbossa.org>
-Date: Thu, 13 Oct 2011 11:00:46 -0400
-Message-ID: <CALJ2SBKknjOrPzjMjjQrGSvcJCeD3QkCJ9u2-xgoEGvjSfj4Zg@mail.gmail.com>
-Subject: Bluetooth kernel module refcount bug
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/2] Remove CCC if the device is not bonded
+Date: Thu, 13 Oct 2011 11:53:09 -0300
+Message-Id: <1318517589-17372-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1318517589-17372-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1318517589-17372-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Changes attrib server to remove CCC entries of the device when the
+connection is established if the device is not bonded.
+---
+ src/attrib-server.c |   15 +++++++++++++++
+ 1 files changed, 15 insertions(+), 0 deletions(-)
 
-I've been investigating a bug related to the bluetooth kernel module.
-The bug refers to module unloading and Management Interface usage. It
-is not a critical bug but it is very annoying when you need to
-load/unload the bluetooth module.
-To reproduce it, just follow the steps (you can use the current
-linux-bluetooth and bluez source trees):
-
-1. Load the bluetooth kernel module with "enable_mgmt" argument.
-2. Start the bluetooth daemon.
-3. Stop the bluetooth daemon.
-4. Try to unload the kernel module.
-
-At my tests I was using an USB dongle and btusb kernel module is
-loaded as well. I could noticed that hciops has some cleanup and
-shutdown functions that are called when the bluetoothd stops. I didn't
-find the same for Management, no problem with that since the socket is
-closed and seems that we do not need other operations here. But before
-unload the btusb and bluetooth modules I had to do a "hciconfig hci0
-down" and some cleanup is did. btusb module can be unloaded but
-bluetooth module still have one reference that I was not able to find
-in the code. I put some debugging messages at every module_get and
-module_put functions (hci_dev_get and hci_dev_put), and seems that
-everything is ok.
-
-Is anyone else having this problem? Since this bug seems to be quite
-old, and the test procedure is painful I would like to request your
-help to fix it.
-
-Best regards,
-
-Anderson Briglia
-
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 523a835..8798429 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -38,10 +38,14 @@
+ #include <bluetooth/sdp_lib.h>
+ 
+ #include "log.h"
++#include "gdbus.h"
+ #include "glib-helper.h"
+ #include "btio.h"
+ #include "sdpd.h"
+ #include "hcid.h"
++#include "adapter.h"
++#include "device.h"
++#include "manager.h"
+ #include "att.h"
+ #include "gattrib.h"
+ #include "storage.h"
+@@ -834,9 +838,12 @@ done:
+ 
+ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
+ {
++	struct btd_adapter *adapter;
++	struct btd_device *device;
+ 	struct gatt_channel *channel;
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
++	char addr[18];
+ 	uint16_t cid;
+ 
+ 	io = g_attrib_get_channel(attrib);
+@@ -856,6 +863,14 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
+ 		return 0;
+ 	}
+ 
++	adapter = manager_find_adapter(&channel->src);
++
++	ba2str(&channel->dst, addr);
++	device = adapter_find_device(adapter, addr);
++
++	if (device_is_bonded(device) == FALSE)
++		delete_device_ccc(&channel->src, &channel->dst);
++
+ 	if (channel->mtu > ATT_MAX_MTU)
+ 		channel->mtu = ATT_MAX_MTU;
+ 
 -- 
-INdT - Instituto Nokia de tecnologia
-+55 92 2126 1122
-+55 92 8423 3183
+1.7.7
+
