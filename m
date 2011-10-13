@@ -1,96 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLYbLDtR2_o+9a2_Z+b+UHntLbzknj9D1n-JN5qUwDWRw@mail.gmail.com>
-References: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
-	<1318469712-6639-1-git-send-email-kengyu@ubuntu.com>
-	<CABBYNZLYbLDtR2_o+9a2_Z+b+UHntLbzknj9D1n-JN5qUwDWRw@mail.gmail.com>
-Date: Thu, 13 Oct 2011 14:23:01 +0300
-Message-ID: <CABBYNZLetRKb=RQoq0XffCg7LwKK8B8p3kRq8Ws-44NdA3An-A@mail.gmail.com>
-Subject: Re: [RFC] Bluez: Fix the adapter is not initialised after resume
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Keng-Yu Lin <kengyu@ubuntu.com>
+Date: Thu, 13 Oct 2011 22:14:32 +1100
+From: NeilBrown <neilb@suse.de>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: Help understanding Agent 'capabilities'.
+Message-ID: <20111013221432.625e1bfd@notabene.brown>
+In-Reply-To: <CABBYNZJs4zXqhPkSV6HUbLzFk7_-cuf-+kVgmw+A0hcMRCXLxw@mail.gmail.com>
+References: <20111013165526.0dbbe0fc@notabene.brown>
+	<CABBYNZJs4zXqhPkSV6HUbLzFk7_-cuf-+kVgmw+A0hcMRCXLxw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/+/vxOvdwX.ep6dejjZsGsIN"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--Sig_/+/vxOvdwX.ep6dejjZsGsIN
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 13, 2011 at 10:35 AM, Luiz Augusto von Dentz
+On Thu, 13 Oct 2011 10:39:22 +0300 Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
->
-> Thanks for the patch, but I suspect this may cause some problems if we
-> didn't receive all the pending information, do you have bluetoothd
-> logs showing the sequence of the events leading to this?
->
-> --
 
-Ive been able to reproduce it myself, it is not all the time that it
-happens but when it does happen it is because we missed a command
-(might be a kernel bug). We have a workaround for this already but it
-doesn't work most of the times because the adapter is not up so it
-doesn't accept commands, the following should fix the problem:
+> Hi Neil,
+>=20
+> On Thu, Oct 13, 2011 at 8:55 AM, NeilBrown <neilb@suse.de> wrote:
+> >
+> > Hi,
+> > =A0I've been trying enhance my understanding of bluetooth and as part o=
+f that
+> > =A0I have been experimenting with simple-agent to create pairing betwee=
+n two
+> > =A0Linux hosts (a phone and a laptop as it happens).
+> >
+> > =A0My understanding of Secure Simple Pairing is that there are a number=
+ of
+> > =A0authentication mechanism and that the "best" would be chosen based o=
+n the
+> > =A0that capabilities given to the agent.
+> >
+> > =A0So if both devices tell the monitor "DisplayYesNo", it would not be =
+able to
+> > =A0do Passkey entry and would choose Numeric comparison.
+> > =A0So both agents would get RequestConfirmation call backs.
+> >
+> > =A0But I cannot make that happen.
+> >
+> > =A0No matter what capability I give to simple-agent, one of them asks m=
+e for a
+> > =A0pass key, then the other one does, and they have to match. =A0i.e. t=
+hey both
+> > =A0get RequestPinCode.
+> > =A0So they seem to be assuming at least one device has a keyboard (the =
+first
+> > =A0could generate a number in the agent and display it I guess).
+> >
+> > =A0Is there something else I have to change to force it to use Numeric
+> > =A0comparison (or even 'just works') authentication? =A0Is this documen=
+ted
+> > =A0somewhere?
+> >
+> > =A0I'm using 4.88 on one system and 4.96 on the other.
+>=20
+> For SSP you need both controllers to be >=3D 2.1, if you are seeing
+> pincode requests then probably one or both controller are using legacy
+> pairing.
+>=20
 
-diff --git a/plugins/hciops.c b/plugins/hciops.c
-index 9fb28c8..d0ba3ad 100644
---- a/plugins/hciops.c
-+++ b/plugins/hciops.c
-@@ -1482,21 +1482,6 @@ static void read_local_name_complete(int index,
-read_local_name_rp *rp)
+Thanks.  That does explain it.
 
-        DBG("Got name for hci%d", index);
+I knew about that but must have been confusing 'pass code' and 'pin code' in
+my mind and so thought it didn't look like the legacy version.
 
--       /* Even though it shouldn't happen (assuming the kernel behaves
--        * properly) it seems like we might miss the very first
--        * initialization commands that the kernel sends. So check for
--        * it here (since read_local_name is one of the last init
--        * commands) and resend the first ones if we haven't seen
--        * their results yet */
--
--       if (hci_test_bit(PENDING_FEATURES, &dev->pending))
--               hci_send_cmd(dev->sk, OGF_INFO_PARAM,
--                                       OCF_READ_LOCAL_FEATURES, 0, NULL);
--
--       if (hci_test_bit(PENDING_VERSION, &dev->pending))
--               hci_send_cmd(dev->sk, OGF_INFO_PARAM,
--                                       OCF_READ_LOCAL_VERSION, 0, NULL);
--
-        if (!dev->pending && dev->up)
-                init_adapter(index);
- }
-@@ -2502,8 +2487,31 @@ static void device_devup_setup(int index)
-        hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_STORED_LINK_KEY,
-                                        READ_STORED_LINK_KEY_CP_SIZE, &cp);
+What is the easiest way to find out what bluetooth version the controller is
+using?  I tried looking around and didn't find anything obvious.
+Or is the LegacyPairing property the best hint?
 
--       if (!dev->pending)
-+       if (!dev->pending) {
-                init_adapter(index);
-+               return;
-+       }
-+
-+       /* Even though it shouldn't happen (assuming the kernel behaves
-+        * properly) it seems like we might miss the very first
-+        * initialization commands that the kernel sends. So check for
-+        * it here and resend the ones we haven't seen their results yet */
-+
-+       if (hci_test_bit(PENDING_FEATURES, &dev->pending))
-+               hci_send_cmd(dev->sk, OGF_INFO_PARAM,
-+                                       OCF_READ_LOCAL_FEATURES, 0, NULL);
-+
-+       if (hci_test_bit(PENDING_VERSION, &dev->pending))
-+               hci_send_cmd(dev->sk, OGF_INFO_PARAM,
-+                                       OCF_READ_LOCAL_VERSION, 0, NULL);
-+
-+       if (hci_test_bit(PENDING_NAME, &dev->pending))
-+               hci_send_cmd(dev->sk, OGF_HOST_CTL,
-+                                       OCF_READ_LOCAL_NAME, 0, 0);
-+
-+       if (hci_test_bit(PENDING_BDADDR, &dev->pending))
-+               hci_send_cmd(dev->sk, OGF_INFO_PARAM,
-+                                       OCF_READ_BD_ADDR, 0, NULL);
- }
+Thanks again (and to Johan).
 
- static void init_pending(int index)
+NeilBrown
 
--- 
-Luiz Augusto von Dentz
+
+--Sig_/+/vxOvdwX.ep6dejjZsGsIN
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+iQIVAwUBTpbIIDnsnt1WYoG5AQJpQBAAn9WxgLNjSSBAO/C2OZt9JafC6fufULwj
+A5WeQDzaLZR/xW1JghT8mbQ9SE6/ONuiUxLptirNTlN5j8wxy8MveXMdQALH3vOW
+4/VffECHl01LiTQ6snCF9ccdOC+SJtJMgnm0kOk7gKiN+omRsihrviLXfiw6FFOs
+mgzrcDnQgFPAGKUIzE9I1dX22VkNHZmjNyJgEK0Cy3udpJlieFp5NNZp07jEPwWl
+kDruG4uuisBkBD85DQ93ohUkc4VovJCaejWWbc0hsRzXm06sM/ywHpLGEnZQnXSO
+jpPmHp7ur1nsh7SV612wfHbQSIZJsvY7F3RREmx9rj23bEG2BMYgqYcW1fQonul2
+fI9UliIwQuqke4fEjNOs95mMfiXDrxpWVg/fgjEAT8fJyc6iSAGju1w1AF9hCAFk
+FYOz+o76bWhKyLC8zuseijsmFiNO1UDfuwcUtiaCo4dZLgBakjHOj7YeSYUcQUnz
+j7TiIVqch0CVQREJayCNhUnwB8koZOVXBG/XRjY5Gh9dVtpSjiS8q30iN1DmP8SH
+k9ELsInvQBfiY6BVWC+90imyaeNZvSWQcPNm8YYksApo1KIDqKgMe2GXZurDly9M
+5qriHkBuD9ISQ67Srx/lzh+9an/cwQZbQaARRaIIaSkmeOa95S6fhgnxVzUE6aZO
+3vi0PX8PVCM=
+=knXY
+-----END PGP SIGNATURE-----
+
+--Sig_/+/vxOvdwX.ep6dejjZsGsIN--
