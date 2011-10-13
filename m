@@ -1,99 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH BlueZ] Add support for parsing the remote name during LE Scan
-Date: Thu, 13 Oct 2011 18:39:07 -0300
-Message-Id: <1318541947-13947-1-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1318524096-2412-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1318524096-2412-1-git-send-email-vinicius.gomes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: "Gustavo F. Padovan" <pao@profusion.mobi>
+Date: Thu, 13 Oct 2011 17:51:13 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: David Herrmann <dh.herrmann@googlemail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH 1/3] Bluetooth: Fix hci core device initialization
+Message-ID: <20111013205113.GJ20892@joana>
+References: <1318078729-4158-1-git-send-email-dh.herrmann@googlemail.com>
+ <20111010184442.GA6936@joana>
+ <CANq1E4S2gngG9CfFSxHUsefA2HTij0-ToGDGjDx1eyOOzLYxRw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CANq1E4S2gngG9CfFSxHUsefA2HTij0-ToGDGjDx1eyOOzLYxRw@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/hcitool.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 53 insertions(+), 1 deletions(-)
+Hi David,
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 6184a4c..3547794 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -54,6 +54,18 @@
- #define FLAGS_LIMITED_MODE_BIT 0x01
- #define FLAGS_GENERAL_MODE_BIT 0x02
- 
-+#define EIR_FLAGS                   0x01  /* flags */
-+#define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
-+#define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
-+#define EIR_UUID32_SOME             0x04  /* 32-bit UUID, more available */
-+#define EIR_UUID32_ALL              0x05  /* 32-bit UUID, all listed */
-+#define EIR_UUID128_SOME            0x06  /* 128-bit UUID, more available */
-+#define EIR_UUID128_ALL             0x07  /* 128-bit UUID, all listed */
-+#define EIR_NAME_SHORT              0x08  /* shortened local name */
-+#define EIR_NAME_COMPLETE           0x09  /* complete local name */
-+#define EIR_TX_POWER                0x0A  /* transmit power level */
-+#define EIR_DEVICE_ID               0x10  /* device ID */
-+
- #define for_each_opt(opt, long, short) while ((opt=getopt_long(argc, argv, short ? short:"+", long, NULL)) != -1)
- 
- static volatile int signal_received = 0;
-@@ -2354,6 +2366,40 @@ static void sigint_handler(int sig)
- 	signal_received = sig;
- }
- 
-+static void eir_parse_name(uint8_t *eir_data, char *name)
-+{
-+	int len;
-+
-+	if (eir_data == NULL)
-+		goto failed;
-+
-+	len = 0;
-+	while (len < HCI_MAX_EIR_LENGTH - 1) {
-+		uint8_t field_len = eir_data[0];
-+
-+		/* Check for the end of EIR */
-+		if (field_len == 0)
-+			break;
-+
-+		switch (eir_data[1]) {
-+		case EIR_NAME_SHORT:
-+		case EIR_NAME_COMPLETE:
-+			if (field_len > HCI_MAX_NAME_LENGTH)
-+				goto failed;
-+
-+			memcpy(name, &eir_data[2], field_len - 1);
-+			return;
-+		}
-+
-+		len += field_len + 1;
-+		eir_data += field_len + 1;
-+	}
-+
-+failed:
-+	sprintf(name, "(unknown)");
-+	return;
-+}
-+
- static int print_advertising_devices(int dd, uint8_t filter_type)
- {
- 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr;
-@@ -2409,8 +2455,14 @@ static int print_advertising_devices(int dd, uint8_t filter_type)
- 		/* Ignoring multiple reports */
- 		info = (le_advertising_info *) (meta->data + 1);
- 		if (check_report_filter(filter_type, info)) {
-+			char name[HCI_MAX_NAME_LENGTH + 1];
-+
-+			memset(name, 0, sizeof(name));
-+
- 			ba2str(&info->bdaddr, addr);
--			printf("%s\n", addr);
-+			eir_parse_name(info->data, name);
-+
-+			printf("%s %s\n", addr, name);
- 		}
- 	}
- 
--- 
-1.7.7
+* David Herrmann <dh.herrmann@googlemail.com> [2011-10-11 14:35:01 +0200]:
 
+> Hi Gustavo
+>=20
+> On Mon, Oct 10, 2011 at 8:44 PM, Gustavo Padovan <padovan@profusion.mobi>=
+ wrote:
+> > Hi David,
+> >
+> > * David Herrmann <dh.herrmann@googlemail.com> [2011-10-08 14:58:47 +020=
+0]:
+> >
+> >> We must not call device_del() if we didn't use device_add(). See modul=
+e.c for
+> >> comments on that. Therefore, we need to call device_initialize() when =
+allocating
+> >> the hci device and later device_add() instead of device_register().
+> >>
+> >> This also fixes a bug when hci_register_dev() failed and we call hci_f=
+ree_dev()
+> >> without a valid core device. hci_free_dev() segfaults while calling pu=
+t_device()
+> >> on invalid memory.
+> >
+> > Please let me know if the following diff also fixes this problem.
+> > It seems to fixes other issues like failing in usb_driver_claim_interfa=
+ce().
+>=20
+> Could you elaborate more? I what way does may patch not fix this issue?
+>=20
+> > =A0 =A0 =A0 =A0Gustavo
+> >
+> >
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index b84458d..ac446a7 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -922,9 +922,6 @@ EXPORT_SYMBOL(hci_alloc_dev);
+> > =A0void hci_free_dev(struct hci_dev *hdev)
+> > =A0{
+> > =A0 =A0 =A0 =A0skb_queue_purge(&hdev->driver_init);
+> > -
+> > - =A0 =A0 =A0 /* will free via device release */
+> > - =A0 =A0 =A0 put_device(&hdev->dev);
+>=20
+> This does not work. We need to drop a reference here, otherwise this
+> function is totally useless except cleaning up the skb queue. In fact,
+> this function will be called on an HCI device without having a
+> reference.
+
+Yes, I forgot about this put_device magic.
+
+I reconsidered your patches and applied them all. Thanks.
+
+	Gustavo
