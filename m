@@ -4,64 +4,45 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCH 3/9] Bluetooth: Get/set AMP policy socket option
-Date: Thu, 13 Oct 2011 15:00:41 -0700
-Message-Id: <1318543247-27130-4-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCH 7/9] Bluetooth: Use symbolic values for the fixed channel map
+Date: Thu, 13 Oct 2011 15:00:45 -0700
+Message-Id: <1318543247-27130-8-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
 References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Checks for valid policy value and L2CAP mode.
+The A2MP fixed channel bit is only set when high-speed mode is enabled.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_sock.c |   25 +++++++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 836d12e..9431e38 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -467,6 +467,11 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d023156..e38258b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -60,7 +60,7 @@ int disable_ertm;
+ int enable_hs;
  
- 		break;
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+-static u8 l2cap_fixed_chan[8] = { 0x02, };
++static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
  
-+	case BT_AMP_POLICY:
-+		if (put_user(chan->amp_policy, (u32 __user *) optval))
-+			err = -EFAULT;
-+		break;
+ static LIST_HEAD(chan_list);
+ static DEFINE_RWLOCK(chan_list_lock);
+@@ -2849,6 +2849,10 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+ 	} else if (type == L2CAP_IT_FIXED_CHAN) {
+ 		u8 buf[12];
+ 		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
 +
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-@@ -690,6 +695,26 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
- 			clear_bit(FLAG_FORCE_ACTIVE, &chan->flags);
- 		break;
- 
-+	case BT_AMP_POLICY:
-+		if (get_user(opt, (u32 __user *) optval)) {
-+			err = -EFAULT;
-+			break;
-+		}
++		if (enable_hs)
++			l2cap_fixed_chan[0] |= L2CAP_FC_A2MP;
 +
-+		if (opt > BT_AMP_POLICY_PREFER_BR_EDR) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		if (chan->mode != L2CAP_MODE_ERTM &&
-+			 chan->mode != L2CAP_MODE_STREAMING) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		chan->amp_policy = (u8) opt;
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
+ 		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
+ 		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+ 		memcpy(buf + 4, l2cap_fixed_chan, 8);
 -- 
 1.7.7
 
