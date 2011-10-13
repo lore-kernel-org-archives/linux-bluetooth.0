@@ -1,36 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Lin, Mengdong" <mengdong.lin@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 13 Oct 2011 11:14:51 +0800
-Subject: RE: Question about A2DP, Pulseaudio.
-Message-ID: <749B9D3DBF0F054390025D9EAFF47F2212D292CE9E@shsmsx501.ccr.corp.intel.com>
-References: <1318234286.16562.8.camel@chanten-desktop>
-	<1318313229.11749.22.camel@snowflake>
-	<749B9D3DBF0F054390025D9EAFF47F2212D28D505D@shsmsx501.ccr.corp.intel.com>
-	<CABBYNZK2C9x3CeuiEiqwBGkpo-MZFDFstYRtMFnYtZAt9YZzFA@mail.gmail.com>
-	<749B9D3DBF0F054390025D9EAFF47F2212D28D564A@shsmsx501.ccr.corp.intel.com>
- <CABBYNZLZGP0NZHbKUngERLasT1AAVdq2WUvdg7ASM0QotL2XeQ@mail.gmail.com>
-In-Reply-To: <CABBYNZLZGP0NZHbKUngERLasT1AAVdq2WUvdg7ASM0QotL2XeQ@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+From: Keng-Yu Lin <kengyu@ubuntu.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Keng-Yu Lin <kengyu@ubuntu.com>
+Subject: [RFC] Bluez: Fix the adapter is not initialised after resume
+Date: Thu, 13 Oct 2011 09:35:12 +0800
+Message-Id: <1318469712-6639-1-git-send-email-kengyu@ubuntu.com>
+In-Reply-To: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
+References: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > -  For cell phone call, to let PA know a cell phone call begins so that it can set
-> BT profile to "Off" and pause music, are you suggesting we write a PA module
-> to detect cell modem call event?
-> 
-> Not exactly, we could probably have some mechanism to tag streams e.g.
-> the dialer app tags its stream as 'voice' and the media player as
-> 'music', this way PA don't need to depend on any telephony stack to do
-> the profile switch.
+init_adapter() is not called due to missing HCI commands of
+read_bd_addr, read_local_version, read_local_features,
+and read_local_name on some machines.
+---
+ plugins/hciops.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-I feel this method has a gap: 
-Since the voice data from cell modem bypass PA in such a system, will the dialer app create the sink-input/source-output stream tagged as 'voice' or 'phone' for PA?
-If the phone streams do not appear in PA, PA cannot know the time to switch profile by checking the stream's media role.
+ Please see the links of the bug in different distros:
+   https://bugzilla.redhat.com/show_bug.cgi?id=727106
+   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614929
+   https://launchpad.net/bugs/824144
+   https://launchpad.net/bugs/824633
+   https://launchpad.net/bugs/823467
+   https://launchpad.net/bugs/822705
 
-Please correct me if I misunderstand something.
+ It is confirmed that this patch fixes for Dell Latutude 2120
+ and EeePC 1001PXD.
 
-Great thanks
-Mengdong
+diff --git a/plugins/hciops.c b/plugins/hciops.c
+index 9fb28c8..5f339c1 100644
+--- a/plugins/hciops.c
++++ b/plugins/hciops.c
+@@ -2502,8 +2502,8 @@ static void device_devup_setup(int index)
+ 	hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_STORED_LINK_KEY,
+ 					READ_STORED_LINK_KEY_CP_SIZE, &cp);
+ 
+-	if (!dev->pending)
+-		init_adapter(index);
++	DBG("dev->pending=%d", dev->pending);
++	init_adapter(index);
+ }
+ 
+ static void init_pending(int index)
+-- 
+1.7.5.4
+
