@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Oct 2011 16:11:18 +0300
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 2/7] Bluetooth: EFS: definitions and headers
-Message-ID: <20111013131109.GC13721@aemeltch-MOBL1>
-References: <1316179596-30906-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1316179596-30906-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111006173425.GB5652@joana>
+Date: Thu, 13 Oct 2011 16:10:28 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Don't overwrite metadata when changing track
+Message-ID: <20111013131028.GA22730@fusion.localdomain>
+References: <1318510623-7484-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111006173425.GB5652@joana>
+In-Reply-To: <1318510623-7484-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Lucas,
 
-On Thu, Oct 06, 2011 at 02:34:25PM -0300, Gustavo Padovan wrote:
-> > @@ -452,6 +486,8 @@ enum {
-> >  	CONF_CONNECT_PEND,
-> >  	CONF_NO_FCS_RECV,
-> >  	CONF_STATE2_DEVICE,
-> > +	CONF_LOCAL_PEND,
-> > +	CONF_REMOTE_PEND,
+On Thu, Oct 13, 2011, Lucas De Marchi wrote:
+> If we use the same hash table to set the new metadata, we have 2
+> undesired behaviors:
 > 
-> I think I already asked this, but I may have forgotten. What are these two
-> flags for? I can't get anything from their names.
+> 1) New track may contain fields from previous track if it didn't set all
+> the fields
+> 2) If we fail on parsing the signal, we will still change some of the
+> fields
+> ---
+>  audio/media.c     |   42 ++++++++++++++++++++++++++++--------------
+>  doc/media-api.txt |    6 ++++++
+>  2 files changed, 34 insertions(+), 14 deletions(-)
 
-The meaning for those flags are: CONF_LOCAL_PEND - local side sent L2CAP
-Conf Rsp Pending, same for remote side. BTW: I am now rebasing those
-patches so it would be easier to read.
+Both patches applied. Thanks.
 
-Best regards 
-Andrei Emeltchenko 
+Johan
