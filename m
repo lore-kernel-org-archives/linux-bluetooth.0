@@ -1,56 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1318469712-6639-1-git-send-email-kengyu@ubuntu.com>
-References: <CADXHx7Z=9EFEweZ+LouXWdRePu6OBrj36uGA78=BMKjo0oMEJQ@mail.gmail.com>
-	<1318469712-6639-1-git-send-email-kengyu@ubuntu.com>
-Date: Thu, 13 Oct 2011 10:35:06 +0300
-Message-ID: <CABBYNZLYbLDtR2_o+9a2_Z+b+UHntLbzknj9D1n-JN5qUwDWRw@mail.gmail.com>
-Subject: Re: [RFC] Bluez: Fix the adapter is not initialised after resume
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Keng-Yu Lin <kengyu@ubuntu.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Thu, 13 Oct 2011 16:55:26 +1100
+From: NeilBrown <neilb@suse.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Help understanding Agent 'capabilities'.
+Message-ID: <20111013165526.0dbbe0fc@notabene.brown>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/o8unG_o8VTVDBS7.S51VV40"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+--Sig_/o8unG_o8VTVDBS7.S51VV40
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+
 Hi,
+ I've been trying enhance my understanding of bluetooth and as part of that
+ I have been experimenting with simple-agent to create pairing between two
+ Linux hosts (a phone and a laptop as it happens).
 
-On Thu, Oct 13, 2011 at 4:35 AM, Keng-Yu Lin <kengyu@ubuntu.com> wrote:
-> init_adapter() is not called due to missing HCI commands of
-> read_bd_addr, read_local_version, read_local_features,
-> and read_local_name on some machines.
-> ---
->  plugins/hciops.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
->
->  Please see the links of the bug in different distros:
->   https://bugzilla.redhat.com/show_bug.cgi?id=727106
->   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=614929
->   https://launchpad.net/bugs/824144
->   https://launchpad.net/bugs/824633
->   https://launchpad.net/bugs/823467
->   https://launchpad.net/bugs/822705
->
->  It is confirmed that this patch fixes for Dell Latutude 2120
->  and EeePC 1001PXD.
->
-> diff --git a/plugins/hciops.c b/plugins/hciops.c
-> index 9fb28c8..5f339c1 100644
-> --- a/plugins/hciops.c
-> +++ b/plugins/hciops.c
-> @@ -2502,8 +2502,8 @@ static void device_devup_setup(int index)
->        hci_send_cmd(dev->sk, OGF_HOST_CTL, OCF_READ_STORED_LINK_KEY,
->                                        READ_STORED_LINK_KEY_CP_SIZE, &cp);
->
-> -       if (!dev->pending)
-> -               init_adapter(index);
-> +       DBG("dev->pending=%d", dev->pending);
-> +       init_adapter(index);
->  }
+ My understanding of Secure Simple Pairing is that there are a number of
+ authentication mechanism and that the "best" would be chosen based on the
+ that capabilities given to the agent.
 
-Thanks for the patch, but I suspect this may cause some problems if we
-didn't receive all the pending information, do you have bluetoothd
-logs showing the sequence of the events leading to this?
+ So if both devices tell the monitor "DisplayYesNo", it would not be able to
+ do Passkey entry and would choose Numeric comparison.
+ So both agents would get RequestConfirmation call backs.
 
--- 
-Luiz Augusto von Dentz
+ But I cannot make that happen.
+
+ No matter what capability I give to simple-agent, one of them asks me for a
+ pass key, then the other one does, and they have to match.  i.e. they both
+ get RequestPinCode.
+ So they seem to be assuming at least one device has a keyboard (the first
+ could generate a number in the agent and display it I guess).
+
+ Is there something else I have to change to force it to use Numeric
+ comparison (or even 'just works') authentication?  Is this documented
+ somewhere?
+
+ I'm using 4.88 on one system and 4.96 on the other.
+
+Thanks,
+NeilBrown
+
+--Sig_/o8unG_o8VTVDBS7.S51VV40
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+iQIVAwUBTpZ9Tjnsnt1WYoG5AQLVSA//boae6vz8LWZS73WLjS2xm6UlIYuGJs10
+egtfRuPV7UhJgyrPCQqaQ1WR/SMT5XVx5UGETHY2aU3dW5MP6W27ld1eBFdQP4gh
+EN3SD+Y+O3e7zC+zCSyAbqgbs4QyeIuwL0Ipz7jrbWqe2r3bOvzZv3YNiWRDBs4l
+idnDkIDtrXXAqGFmDPZaSVb8aMFYKK4c0NZuOnRkY7atwryXwwofUkTYZp4icKxb
+fKJThJ2MScfnOmaClJ4hCXsPEnKvEp7RpBcXwPbNauHQsTB44nM5XN0xed7tiRds
+z9tbSaK2NgxRVhyUJH5MSG7iIKYq8G/jlYgirA/Oc+s3D7MvtsvRd2NCtlnGmmZZ
+Khtd0oo54gdjzmzRKoxXR/3sOvID7MUeEQdV0ap1hyqep/p14/6a66MKQIw3rjEF
+GTRhYnC8M4hGFkd+cfgDhFQhnTV7pF9NPzwXoA8w+4JwGcYpROCUhk7rqQfKb3dV
+VpjEq026jnx1LQAHjmnvmYPqrZMANAuw9ntIS3NhNiAQkA7HXdD0nauzcXlwGk70
++N0ZqEIq0MrxiSQ24NHC93OY+iIXmUUWcxtLbYR4/aIxaS5kAiaB9xc+Zi984qgE
+PfmG1957ia9N1bx+i+y8zHj5ViaRdzgJDOvzWLjppjbvPDwBBU/APhISCkEfS4Wi
+DyajVJ/54es=
+=s1N7
+-----END PGP SIGNATURE-----
+
+--Sig_/o8unG_o8VTVDBS7.S51VV40--
