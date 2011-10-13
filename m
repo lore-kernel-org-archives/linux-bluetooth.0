@@ -2,34 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 3/7] Remove CCC for read by type
-Date: Thu, 13 Oct 2011 11:43:20 -0300
-Message-Id: <1318517004-17003-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/7] Remove CCC for read by group
+Date: Thu, 13 Oct 2011 11:43:19 -0300
+Message-Id: <1318517004-17003-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1318517004-17003-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Read by type is never used to iterate through attributes related to
-Client Characteristic Configuration or any other descriptor.
+Read by group is used to discover all primary services. Client
+Characteristic Configuration is not applied to service definition.
 ---
  src/attrib-server.c |    5 -----
  1 files changed, 0 insertions(+), 5 deletions(-)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 25fe8b3..b66943e 100644
+index 9ba5f74..25fe8b3 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -415,7 +415,6 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
- 					ATT_ECODE_INVALID_HANDLE, pdu, len);
+@@ -314,7 +314,6 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
  
- 	for (l = database, length = 0, types = NULL; l; l = l->next) {
+ 	last_handle = end;
+ 	for (l = database, groups = NULL, cur = NULL; l; l = l->next) {
 -		struct attribute *client_attr;
  
  		a = l->data;
  
-@@ -431,10 +430,6 @@ static uint16_t read_by_type(struct gatt_channel *channel, uint16_t start,
- 		status = att_check_reqs(channel, ATT_OP_READ_BY_TYPE_REQ,
+@@ -344,10 +343,6 @@ static uint16_t read_by_group(struct gatt_channel *channel, uint16_t start,
+ 		status = att_check_reqs(channel, ATT_OP_READ_BY_GROUP_REQ,
  								a->read_reqs);
  
 -		client_attr = client_cfg_attribute(channel, a, a->data, a->len);
