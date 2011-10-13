@@ -1,39 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ] Fix +CLCC in maemo6 during CSD_CALL_STATUS_COMING
-Date: Thu, 13 Oct 2011 13:25:51 +0300
-Message-Id: <1318501551-10048-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Thu, 13 Oct 2011 13:12:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 12/12] Improve test/simple-player to allow user
+ interaction
+Message-ID: <20111013101227.GA17879@fusion.localdomain>
+References: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1318432282-25002-12-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318432282-25002-12-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the same issue as in 8a6119ea1c685fc61419ee444a5967596f524c1c
-but for CSD_CALL_STATUS_COMING. Call status change sequence in csd is
-IDLE to COMING, COMING to PROCEEDING, and PROCEEDING to WAITING.
+Hi Lucas,
 
-Returned 'state of the call' value after CSD_CALL_STATUS_COMING, as well
-as after CSD_CALL_STATUS_PROCEEDING, in +CLCC shall be 5 (waiting, MT
-call) instead of 4 (incoming, MT call) in maemo6 telephony driver for the
-second incoming call.
----
- audio/telephony-maemo6.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+On Wed, Oct 12, 2011, Lucas De Marchi wrote:
+> Allow user to trigger TrackChanged and PropertyChanged. Calls made by
+> remote side (coming from D-Bus) are printed to stderr while the ones to
+> interact with user go to stdout.
+> ---
+>  test/simple-player |   71 +++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 files changed, 67 insertions(+), 4 deletions(-)
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 82cb274..40d1bab 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -943,6 +943,9 @@ static int csd_status_to_hfp(struct csd_call *call)
- 
- 		return CALL_STATUS_INCOMING;
- 	case CSD_CALL_STATUS_COMING:
-+		if (g_slist_length(active_calls) > 0)
-+			return CALL_STATUS_WAITING;
-+
- 		return CALL_STATUS_INCOMING;
- 	case CSD_CALL_STATUS_MO_ALERTING:
- 		return CALL_STATUS_ALERTING;
--- 
-1.7.4.1
+Patches 5-12 have been applied also. Thanks.
 
+Johan
