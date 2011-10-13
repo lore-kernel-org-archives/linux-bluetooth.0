@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Oct 2011 13:34:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Fix crash on power off in maemo6 after sending DTMF
-Message-ID: <20111013103409.GA19481@fusion.localdomain>
-References: <1318500158-9529-1-git-send-email-dmitriy.paliy@nokia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1318500158-9529-1-git-send-email-dmitriy.paliy@nokia.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ] Fix +CLCC in maemo6 during CSD_CALL_STATUS_COMING
+Date: Thu, 13 Oct 2011 13:25:51 +0300
+Message-Id: <1318501551-10048-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitriy,
+This fixes the same issue as in 8a6119ea1c685fc61419ee444a5967596f524c1c
+but for CSD_CALL_STATUS_COMING. Call status change sequence in csd is
+IDLE to COMING, COMING to PROCEEDING, and PROCEEDING to WAITING.
 
-On Thu, Oct 13, 2011, Dmitriy Paliy wrote:
-> This fixes regression introduced in
-> b48e610314fb466035b198f594c5b6a68126fcf1. Crash happens when powering
-> off adapter after sending DTMF tone.
-> ---
->  audio/telephony-maemo6.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+Returned 'state of the call' value after CSD_CALL_STATUS_COMING, as well
+as after CSD_CALL_STATUS_PROCEEDING, in +CLCC shall be 5 (waiting, MT
+call) instead of 4 (incoming, MT call) in maemo6 telephony driver for the
+second incoming call.
+---
+ audio/telephony-maemo6.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-Applied. Thanks.
+diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
+index 82cb274..40d1bab 100644
+--- a/audio/telephony-maemo6.c
++++ b/audio/telephony-maemo6.c
+@@ -943,6 +943,9 @@ static int csd_status_to_hfp(struct csd_call *call)
+ 
+ 		return CALL_STATUS_INCOMING;
+ 	case CSD_CALL_STATUS_COMING:
++		if (g_slist_length(active_calls) > 0)
++			return CALL_STATUS_WAITING;
++
+ 		return CALL_STATUS_INCOMING;
+ 	case CSD_CALL_STATUS_MO_ALERTING:
+ 		return CALL_STATUS_ALERTING;
+-- 
+1.7.4.1
 
-Johan
