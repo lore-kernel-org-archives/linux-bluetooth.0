@@ -1,47 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 3/9] Bluetooth: Get/set AMP policy socket option
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Mat Martineau <mathewm@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Date: Thu, 13 Oct 2011 15:35:53 -0700
-In-Reply-To: <1318543247-27130-4-git-send-email-mathewm@codeaurora.org>
+From: Mat Martineau <mathewm@codeaurora.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
+	andrei.emeltchenko@intel.com,
+	Mat Martineau <mathewm@codeaurora.org>
+Subject: [PATCH 5/9] Bluetooth: Add signal handlers for channel creation
+Date: Thu, 13 Oct 2011 15:00:43 -0700
+Message-Id: <1318543247-27130-6-git-send-email-mathewm@codeaurora.org>
+In-Reply-To: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
 References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
-	 <1318543247-27130-4-git-send-email-mathewm@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1318545356.15441.39.camel@aeonflux>
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mat,
+Handle both "create channel request" and "create channel response".
 
-> Checks for valid policy value and L2CAP mode.
-> 
-> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> ---
->  net/bluetooth/l2cap_sock.c |   25 +++++++++++++++++++++++++
->  1 files changed, 25 insertions(+), 0 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 836d12e..9431e38 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -467,6 +467,11 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
->  
->  		break;
->  
-> +	case BT_AMP_POLICY:
-> +		if (put_user(chan->amp_policy, (u32 __user *) optval))
-> +			err = -EFAULT;
+Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+---
+ net/bluetooth/l2cap_core.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 43 insertions(+), 0 deletions(-)
 
-I prefer to not just add such an option just yet. We only want to add
-socket option once they are functional. Otherwise we have problems to
-detect if such an option is working or not. So enabling this option
-should be the last patch after we have AMP implemented.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 439e715..d023156 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2918,6 +2918,41 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn, struct l2cap_cm
+ 	return 0;
+ }
+ 
++static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
++					struct l2cap_cmd_hdr *cmd, u8 *data)
++{
++	struct l2cap_create_chan_req *req =
++		(struct l2cap_create_chan_req *) data;
++	struct l2cap_create_chan_rsp rsp;
++	u16 psm, scid;
++
++	psm = le16_to_cpu(req->psm);
++	scid = le16_to_cpu(req->scid);
++
++	BT_DBG("psm %d, scid %d, amp_id %d", (int) psm, (int) scid,
++		(int) req->amp_id);
++
++	/* Placeholder: Always reject */
++
++	rsp.dcid = 0;
++	rsp.scid = cpu_to_le16(scid);
++	rsp.result = L2CAP_CREATE_CHAN_REFUSED_CONTROLLER;
++	rsp.status = L2CAP_CREATE_CHAN_STATUS_NONE;
++
++	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
++		       sizeof(rsp), &rsp);
++
++	return 0;
++}
++
++static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
++					struct l2cap_cmd_hdr *cmd, u8 *data)
++{
++	BT_DBG("conn %p", conn);
++
++	return l2cap_connect_rsp(conn, cmd, data);
++}
++
+ static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
+ 							u16 to_multiplier)
+ {
+@@ -3030,6 +3065,14 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		err = l2cap_information_rsp(conn, cmd, data);
+ 		break;
+ 
++	case L2CAP_CREATE_CHAN_REQ:
++		err = l2cap_create_channel_req(conn, cmd, data);
++		break;
++
++	case L2CAP_CREATE_CHAN_RSP:
++		err = l2cap_create_channel_rsp(conn, cmd, data);
++		break;
++
+ 	default:
+ 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
+ 		err = -EINVAL;
+-- 
+1.7.7
 
-Regards
-
-Marcel
-
+--
+Mat Martineau
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
 
