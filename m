@@ -1,66 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Oct 2011 14:25:44 -0300
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	"Gustavo F. Padovan" <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix permission of enable_le param
-Message-ID: <20111013172544.GA31083@samus.indt.org>
-References: <1318359533-7640-1-git-send-email-padovan@profusion.mobi>
- <CAKT1EBf7fXR61TRGoKx6N0kKerXdmewphL-yu3J6vJjqbehNkA@mail.gmail.com>
- <CAJdJm_N6L5bYctkivfDgfPnuHEATwgLC+d4gDW+5P1iRP5+vPQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_N6L5bYctkivfDgfPnuHEATwgLC+d4gDW+5P1iRP5+vPQ@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH BlueZ] Add support for parsing the remote name during LE Scan
+Date: Thu, 13 Oct 2011 13:41:36 -0300
+Message-Id: <1318524096-2412-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1317912132-6644-2-git-send-email-vinicius.gomes@openbossa.org>
+References: <1317912132-6644-2-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+---
+ tools/hcitool.c |   52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 51 insertions(+), 1 deletions(-)
 
-On 16:28 Tue 11 Oct, Anderson Lizardo wrote:
-> Hi,
-> 
-> On Tue, Oct 11, 2011 at 3:33 PM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
-> > On Tue, Oct 11, 2011 at 3:58 PM, Gustavo F. Padovan
-> > <padovan@profusion.mobi> wrote:
-> >> With 0444 it is impossible to change the param, changing it to 0644.
-> >
-> > If you allow changing the "enable_le" parameter dynamically it is also
-> > necessary check the controller features and update the LE host
-> > supported bit(if necessary).
-> > I am afraid that allowing to change it dynamically will break the
-> > consistency: what is gonna happen with the active operations(discovery
-> > & connections)?
-> >
-> > In our backlog we were planning to check LE host supported bit to
-> > allow/block LE connections or any other feature related to LE.
-> 
-> For me, it makes more sense to have bluez set LE host supported bit on
-> start, and have no "enable_le" module parameter at all.
-
-While I agree with this, IMHO we are not ready for it yet, I would wait
-for all the major functionalities to be integrated before removing it.
-
-And there's the minor point that sometimes for testing and qualification
-you have the hardware but don't want to have LE enabled.
-
-> 
-> I think just allowing to change enable_le after the module has been
-> loaded will not work as expected.
-> 
-> Regards,
-> -- 
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 6184a4c..8baf7e7 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -54,6 +54,18 @@
+ #define FLAGS_LIMITED_MODE_BIT 0x01
+ #define FLAGS_GENERAL_MODE_BIT 0x02
+ 
++#define EIR_FLAGS                   0x01  /* flags */
++#define EIR_UUID16_SOME             0x02  /* 16-bit UUID, more available */
++#define EIR_UUID16_ALL              0x03  /* 16-bit UUID, all listed */
++#define EIR_UUID32_SOME             0x04  /* 32-bit UUID, more available */
++#define EIR_UUID32_ALL              0x05  /* 32-bit UUID, all listed */
++#define EIR_UUID128_SOME            0x06  /* 128-bit UUID, more available */
++#define EIR_UUID128_ALL             0x07  /* 128-bit UUID, all listed */
++#define EIR_NAME_SHORT              0x08  /* shortened local name */
++#define EIR_NAME_COMPLETE           0x09  /* complete local name */
++#define EIR_TX_POWER                0x0A  /* transmit power level */
++#define EIR_DEVICE_ID               0x10  /* device ID */
++
+ #define for_each_opt(opt, long, short) while ((opt=getopt_long(argc, argv, short ? short:"+", long, NULL)) != -1)
+ 
+ static volatile int signal_received = 0;
+@@ -2354,6 +2366,38 @@ static void sigint_handler(int sig)
+ 	signal_received = sig;
+ }
+ 
++static char *eir_parse_name(uint8_t *eir_data)
++{
++	int len;
++
++	if (eir_data == NULL)
++		return NULL;
++
++	len = 0;
++	while (len < HCI_MAX_EIR_LENGTH - 1) {
++		uint8_t field_len = eir_data[0];
++		char *name;
++
++		/* Check for the end of EIR */
++		if (field_len == 0)
++			break;
++
++		switch (eir_data[1]) {
++		case EIR_NAME_SHORT:
++		case EIR_NAME_COMPLETE:
++			name = malloc(sizeof(char) * field_len);
++			memset(name, 0, field_len);
++			memcpy(name, &eir_data[2], field_len - 1);
++			return name;
++		}
++
++		len += field_len + 1;
++		eir_data += field_len + 1;
++	}
++
++	return NULL;
++}
++
+ static int print_advertising_devices(int dd, uint8_t filter_type)
+ {
+ 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr;
+@@ -2409,8 +2453,14 @@ static int print_advertising_devices(int dd, uint8_t filter_type)
+ 		/* Ignoring multiple reports */
+ 		info = (le_advertising_info *) (meta->data + 1);
+ 		if (check_report_filter(filter_type, info)) {
++			char *name;
++
+ 			ba2str(&info->bdaddr, addr);
+-			printf("%s\n", addr);
++			name = eir_parse_name(info->data);
++
++			printf("%s %s\n", addr, name ? : "(unknown)");
++
++			free(name);
+ 		}
+ 	}
+ 
 -- 
-Vinicius
+1.7.7
+
