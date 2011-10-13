@@ -1,33 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
-Subject: [PATCH BlueZ] Fix crash on power off in maemo6 after sending DTMF
-Date: Thu, 13 Oct 2011 13:02:38 +0300
-Message-Id: <1318500158-9529-1-git-send-email-dmitriy.paliy@nokia.com>
+Date: Thu, 13 Oct 2011 10:48:23 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: NeilBrown <neilb@suse.de>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Help understanding Agent 'capabilities'.
+Message-ID: <20111013074823.GD8289@fusion.localdomain>
+References: <20111013165526.0dbbe0fc@notabene.brown>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111013165526.0dbbe0fc@notabene.brown>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes regression introduced in
-b48e610314fb466035b198f594c5b6a68126fcf1. Crash happens when powering
-off adapter after sending DTMF tone.
----
- audio/telephony-maemo6.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Hi Neil,
 
-diff --git a/audio/telephony-maemo6.c b/audio/telephony-maemo6.c
-index 82cb274..1910410 100644
---- a/audio/telephony-maemo6.c
-+++ b/audio/telephony-maemo6.c
-@@ -771,7 +771,7 @@ static void start_dtmf_reply(DBusPendingCall *call, void *user_data)
- 				DBUS_TYPE_INVALID);
- 
- 	dbus_message_unref(reply);
--	dbus_pending_call_unref(call);
-+	remove_pending(call);
- }
- 
- static void start_dtmf(void *telephony_device, char tone)
--- 
-1.7.4.1
+On Thu, Oct 13, 2011, NeilBrown wrote:
+>  I've been trying enhance my understanding of bluetooth and as part of that
+>  I have been experimenting with simple-agent to create pairing between two
+>  Linux hosts (a phone and a laptop as it happens).
+> 
+>  My understanding of Secure Simple Pairing is that there are a number of
+>  authentication mechanism and that the "best" would be chosen based on the
+>  that capabilities given to the agent.
+> 
+>  So if both devices tell the monitor "DisplayYesNo", it would not be able to
+>  do Passkey entry and would choose Numeric comparison.
+>  So both agents would get RequestConfirmation call backs.
+> 
+>  But I cannot make that happen.
+> 
+>  No matter what capability I give to simple-agent, one of them asks me for a
+>  pass key, then the other one does, and they have to match.  i.e. they both
+>  get RequestPinCode.
 
+If you get RequestPinCode it means that at least one of the devices
+isn't capable of SSP, i.e. is a pre-2.1 Bluetooth controller. In such
+cases the IO capability is irrelevant (as the concept doesn't exist for
+2.0 and older devices).
+
+Johan
