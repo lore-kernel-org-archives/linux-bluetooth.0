@@ -1,91 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 13 Oct 2011 14:25:44 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	"Gustavo F. Padovan" <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix permission of enable_le param
+Message-ID: <20111013172544.GA31083@samus.indt.org>
+References: <1318359533-7640-1-git-send-email-padovan@profusion.mobi>
+ <CAKT1EBf7fXR61TRGoKx6N0kKerXdmewphL-yu3J6vJjqbehNkA@mail.gmail.com>
+ <CAJdJm_N6L5bYctkivfDgfPnuHEATwgLC+d4gDW+5P1iRP5+vPQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
-References: <F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
-Date: Thu, 13 Oct 2011 15:27:38 -0300
-Message-ID: <CAKT1EBfYAgNQwX3KcbCM_JCiSTjZi5BnWhFZqSGXWWqv7zWvqw@mail.gmail.com>
-Subject: Re: Proposal for GATT Client Dbus API.
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_N6L5bYctkivfDgfPnuHEATwgLC+d4gDW+5P1iRP5+vPQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgVmlqYXksCgpPbiBUdWUsIE9jdCA0LCAyMDExIGF0IDEwOjU5IEFNLCBWaWpheWt1bWFyIERh
-ZG1vZGUKPFZpamF5a3VtYXIuRGFkbW9kZUBjc3IuY29tPiB3cm90ZToKPiBIaSwKPgo+IFRoaXMg
-cG9zdCBjb250YWlucyBhIHByb3Bvc2FsIGZvciB0aGUgREJVUyBHQVRUIEFQSShHYXR0IENMSUVO
-VCkgdGhhdCBlbmhhbmNlcyB0aGUgZXhpc3RpbmcgR0FUVAo+IGZ1bmN0aW9uYWxpdHkgcHJvdmlk
-ZWQgYnkgREJVUyBBUElzIGludGVyZmFjZS4gV2hpY2ggaW5jbHVkZSBNZXRob2RzLFNpZ25hbHMg
-YW5kIFByb3BlcnRpZXMuCj4gQ291bGQgeW91IHBsZWFzZSBwcm92aWRlIHlvdXIgY29tbWVudHMg
-YW5kIGZlZWRiYWNrIGZvciB0aGUgc2FtZT8gT3Igd2UgbmVlZCBtb3JlIEFQSXMgdG8gY292ZXIg
-YWxsIEdBVFQgQ2xpZW50IGZ1bmN0aW9uYWxpdHk/Cj4KPiAuIFJlZ2lzdGVyQ2hhcmFjdGVyaXN0
-aWNzV2F0Y2hlciBjYW4gYmUgdXNlZCB0byBtb25pdG9yIHNwZWNpZmljIENoYXJhY3RlcmlzdGlj
-IGNoYW5nZS4KPiAuIFByb3BlcnR5Q2hhbmdlZCBTaWduYWwgZm9yIHRoZSBTZXRQcm9wZXJ0eSgp
-Lgo+IC4gU2VydmljZUNoYW5nZWQgYW5kIENoYXJhY3RlcmlzdGljQ2hhbmdlZCBTaWduYWwgZm9y
-IFNlcnZpY2Ugb3IgQ2hhcmFjdGVyaXN0aWMgY2hhbmdlcyBvbiB0aGUgc2VydmVyLgo+IC4gTmV3
-IFByb3BlcnRpZXMgZm9yIFBlcm1pc3Npb25zIGFuZCByZW1haW5pbmcgQ2hhcmFjdGVyaXN0aWMg
-RGVzY3JpcHRvcnMuCj4KPiBQRkEgdGhlIHVwZGF0ZWQgZG9jdW1lbnQgIm5ldy1hdHRyaWJ1dGUt
-YXBpLnR4dCIuCj4KPiBQcm9wb3NlZCBOZXcgQVBJOgo+Cj4gRGV2aWNlIENoYXJhY3RlcmlzdGlj
-IGhpZXJhcmNoeQo+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KPiBTZXJ2aWNlwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgb3JnLmJsdWV6Cj4gSW50ZXJmYWNlwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIG9yZy5ibHVlei5DaGFyYWN0ZXJpc3RpYwo+IE9iamVjdCBwYXRo
-wqDCoMKgwqDCoMKgwqAgW3ByZWZpeF0ve2hjaTB9L3tkZXZpY2UwfS97c2VydmljZTB9L3tjaGFy
-YWN0ZXJpc3RpYzAsLi4ufQo+Cj4gTWV0aG9kczoKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoFJlZ2lzdGVyQ2hhcmFjdGVyaXN0aWNzV2F0Y2hlcihvYmplY3QgYWdlbnQpCj4g
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCBSZWdpc3RlciBhIHdhdGNoZXIgdG8gbW9uaXRvciBjaGFyYWN0ZXJpc3Rp
-YyBjaGFuZ2VzLgo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQSB3YXRjaGVyIHdpbGwgYmUgcmVnaXN0ZXJlZCBm
-b3IgdGhlIHNwZWNpZmljIGNoYXJhY3RlcmlzdGljIGFuZCB3aWxsCj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBu
-b3RpZnkgYWJvdXQgYW55IGNoYW5nZWQgY2hhcmFjdGVyaXN0aWNzLgoKSXMgaXQgcmVhbGx5IG5l
-Y2Vzc2FyeT8gSSB0aG91Z2h0IHJlZ2lzdGVyaW5nIGEgd2F0Y2hlciBhdCBzZXJ2aWNlCiJsZXZl
-bCIgd2FzIGVub3VnaC4KCj4gU2lnbmFsczoKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgUHJvcGVydHlDaGFuZ2VkKHN0cmluZyBuYW1lLCB2YXJpYW50IHZh
-bHVlKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgVGhpcyBzaWduYWwgaW5kaWNhdGVzIGEgY2hhbmdlZCB2YWx1
-ZSBvZiB0aGUgZ2l2ZW4KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByb3BlcnR5Lgo+Cj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTZXJ2aWNlQ2hhbmdlZCAoZGljdCB2
-YWx1ZXMpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBUaGlzIHNpZ25hbCBpbmRpY2F0ZXMgc2VydmljZSBhZGRl
-ZCBvbiBzZXJ2ZXIuCgpDb3VsZCB5b3UgcGxlYXNlIGV4cGxhaW4gdGhlIHJlbGF0aW9uIGJldHdl
-ZW4gdGhpcyBwcm9wZXJ0eSBhbmQKU2VydmljZSBDaGFuZ2VkIGNoYXJhY3RlcmlzdGljKEdlbmVy
-aWMgQXR0cmlidXRlIFByb2ZpbGUgU2VydmljZSk/CkluIG15IG9waW5pb24sIGl0IGlzIGEgc2Vy
-dmljZSBwcm9wZXJ0eSBpbnN0ZWFkIG9mIGNoYXJhY3RlcmlzdGljIHByb3BlcnR5LgoKPgo+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQ2hhcmFjdGVyaXN0
-aWNDaGFuZ2VkIChkaWN0IHZhbHVlcykKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIFRoaXMgc2lnbmFsIGluZGlj
-YXRlcyBjaGFyYWN0ZXJpc3RpYyBhZGRlZCBvbiBzZXJ2ZXIuCj4KPiBQcm9wZXJ0aWVzOgo+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdWludDggUHJvcGVy
-dHkgW3JlYWRvbmx5XQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgVGhlIGNoYXJhY3RlcmlzdGljIHByb3BlcnR5
-LCBmb3JtYXQgZGVmaW5lZCBieSBHQVRUIHNwZWMuCj4KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB1aW50MTYgQ29uZmlndXJhdGlvbiBbcmVhZG9ubHld
-Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBPcHRpb25hbCBmaWVsZCBjb250YWluaW5nIHRoZSBjb25maWd1cmF0
-aW9uIHZhbHVlIG9uIHRoZSBzZXJ2ZXIuCgpSZWFkIG9ubHk/IENDQyBjYW4gYmUgd3JpdGVhYmxl
-IHJpZ2h0PwoKQlIsCkNsYXVkaW8uCgo+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgdWludDE2IEV4dGVuZGVkIFtyZWFkb25seV0KPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIFRoZSBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlwdG9yIGRlc2NyaWJpbmcKPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIHRoZSBhZGRpdGlvbmFsIENoYXJhY3RlcmlzdGljIFByb3BlcnRpZXMuCj4KPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB1aW50MTYgQWdncmVnYXRl
-IFtyZWFkb25seV0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIE9wdGlvbmFsIENoYXJhY3RlcmlzdGljIGRlc2Ny
-aXB0b3Igd2hpY2ggZGVmaW5lcyB0aGUKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGZvcm1hdCBvZiBhbiBhZ2dyZWdh
-dGVkIENoYXJhY3RlcmlzdGljIFZhbHVlLgo+Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCB1aW50MTYgQ3VzdG9tIFtyZWFkb25seV0KPiDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoE9wdGlvbmFsIENoYXJhY3RlcmlzdGljIGRlc2NyaXB0b3Igd2hpY2ggZGVmaW5lcyBwcm9m
-aWxlIGRlZmluZWQgZGVzY3JpcHRvciBVVUlEJ3MuCj4KPgo+IFRoYW5rcywKPiBWaWpheQo+Cj4K
-PiBNZW1iZXIgb2YgdGhlIENTUiBwbGMgZ3JvdXAgb2YgY29tcGFuaWVzLiBDU1IgcGxjIHJlZ2lz
-dGVyZWQgaW4gRW5nbGFuZCBhbmQgV2FsZXMsIHJlZ2lzdGVyZWQgbnVtYmVyIDQxODczNDYsIHJl
-Z2lzdGVyZWQgb2ZmaWNlIENodXJjaGlsbCBIb3VzZSwgQ2FtYnJpZGdlIEJ1c2luZXNzIFBhcmss
-IENvd2xleSBSb2FkLCBDYW1icmlkZ2UsIENCNCAwV1osIFVuaXRlZCBLaW5nZG9tCj4gTW9yZSBp
-bmZvcm1hdGlvbiBjYW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEZvbGxvdyBDU1Igb24gVHdp
-dHRlciBhdCBodHRwOi8vdHdpdHRlci5jb20vQ1NSX1BMQyBhbmQgcmVhZCBvdXIgYmxvZyBhdCB3
-d3cuY3NyLmNvbS9ibG9nCj4K
+Hi Lizardo,
+
+On 16:28 Tue 11 Oct, Anderson Lizardo wrote:
+> Hi,
+> 
+> On Tue, Oct 11, 2011 at 3:33 PM, Claudio Takahasi
+> <claudio.takahasi@openbossa.org> wrote:
+> > On Tue, Oct 11, 2011 at 3:58 PM, Gustavo F. Padovan
+> > <padovan@profusion.mobi> wrote:
+> >> With 0444 it is impossible to change the param, changing it to 0644.
+> >
+> > If you allow changing the "enable_le" parameter dynamically it is also
+> > necessary check the controller features and update the LE host
+> > supported bit(if necessary).
+> > I am afraid that allowing to change it dynamically will break the
+> > consistency: what is gonna happen with the active operations(discovery
+> > & connections)?
+> >
+> > In our backlog we were planning to check LE host supported bit to
+> > allow/block LE connections or any other feature related to LE.
+> 
+> For me, it makes more sense to have bluez set LE host supported bit on
+> start, and have no "enable_le" module parameter at all.
+
+While I agree with this, IMHO we are not ready for it yet, I would wait
+for all the major functionalities to be integrated before removing it.
+
+And there's the minor point that sometimes for testing and qualification
+you have the hardware but don't want to have LE enabled.
+
+> 
+> I think just allowing to change enable_le after the module has been
+> loaded will not work as expected.
+> 
+> Regards,
+> -- 
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+-- 
+Vinicius
