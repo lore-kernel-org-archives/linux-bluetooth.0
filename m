@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Oct 2011 10:48:23 +0300
+Date: Thu, 13 Oct 2011 10:44:52 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: NeilBrown <neilb@suse.de>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Help understanding Agent 'capabilities'.
-Message-ID: <20111013074823.GD8289@fusion.localdomain>
-References: <20111013165526.0dbbe0fc@notabene.brown>
+Subject: Re: [PATCH 04/12] Make title always available in metadata
+Message-ID: <20111013074452.GC8289@fusion.localdomain>
+References: <1318432282-25002-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1318432282-25002-4-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111013165526.0dbbe0fc@notabene.brown>
+In-Reply-To: <1318432282-25002-4-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Neil,
+Hi Lucas,
 
-On Thu, Oct 13, 2011, NeilBrown wrote:
->  I've been trying enhance my understanding of bluetooth and as part of that
->  I have been experimenting with simple-agent to create pairing between two
->  Linux hosts (a phone and a laptop as it happens).
+On Wed, Oct 12, 2011, Lucas De Marchi wrote:
+> ---
+>  audio/media.c |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
 > 
->  My understanding of Secure Simple Pairing is that there are a number of
->  authentication mechanism and that the "best" would be chosen based on the
->  that capabilities given to the agent.
-> 
->  So if both devices tell the monitor "DisplayYesNo", it would not be able to
->  do Passkey entry and would choose Numeric comparison.
->  So both agents would get RequestConfirmation call backs.
-> 
->  But I cannot make that happen.
-> 
->  No matter what capability I give to simple-agent, one of them asks me for a
->  pass key, then the other one does, and they have to match.  i.e. they both
->  get RequestPinCode.
+> diff --git a/audio/media.c b/audio/media.c
+> index c9fe0f0..56913d5 100644
+> --- a/audio/media.c
+> +++ b/audio/media.c
+> @@ -1438,6 +1438,11 @@ static gboolean parse_player_metadata(struct media_player *mp,
+>  	if (g_hash_table_size(track) == 0) {
+>  		g_hash_table_unref(track);
+>  		track = NULL;
+> +	} else if (title == FALSE) {
+> +		struct metadata_value *value = g_new(struct metadata_value, 1);
+> +
+> +		value->type = DBUS_TYPE_STRING;
+> +		value->value.str = g_strdup("");
+>  	}
+>  
+>  	if (mp->track != NULL)
 
-If you get RequestPinCode it means that at least one of the devices
-isn't capable of SSP, i.e. is a pre-2.1 Bluetooth controller. In such
-cases the IO capability is irrelevant (as the concept doesn't exist for
-2.0 and older devices).
+This doesn't make any sense. You're allocating a new variable which is
+only available inside the "else if" scope, and then doing nothing with
+it. Additionally this memory is leaked once you exit the scope.
 
 Johan
