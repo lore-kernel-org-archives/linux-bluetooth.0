@@ -2,66 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ 2/2] Remove CCC if the device is not bonded
-Date: Thu, 13 Oct 2011 11:53:09 -0300
-Message-Id: <1318517589-17372-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 1/2] Add storage function to remove CCC of a device
+Date: Thu, 13 Oct 2011 11:53:08 -0300
+Message-Id: <1318517589-17372-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1318517589-17372-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1318517589-17372-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes attrib server to remove CCC entries of the device when the
-connection is established if the device is not bonded.
 ---
- src/attrib-server.c |   15 +++++++++++++++
- 1 files changed, 15 insertions(+), 0 deletions(-)
+ src/storage.c |   11 +++++++++++
+ src/storage.h |    1 +
+ 2 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 523a835..8798429 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -38,10 +38,14 @@
- #include <bluetooth/sdp_lib.h>
+diff --git a/src/storage.c b/src/storage.c
+index 3aa1b7f..429351a 100644
+--- a/src/storage.c
++++ b/src/storage.c
+@@ -1304,3 +1304,14 @@ int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
  
- #include "log.h"
-+#include "gdbus.h"
- #include "glib-helper.h"
- #include "btio.h"
- #include "sdpd.h"
- #include "hcid.h"
-+#include "adapter.h"
-+#include "device.h"
-+#include "manager.h"
- #include "att.h"
- #include "gattrib.h"
- #include "storage.h"
-@@ -834,9 +838,12 @@ done:
- 
- guint attrib_channel_attach(GAttrib *attrib, gboolean out)
- {
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
- 	struct gatt_channel *channel;
- 	GIOChannel *io;
- 	GError *gerr = NULL;
-+	char addr[18];
- 	uint16_t cid;
- 
- 	io = g_attrib_get_channel(attrib);
-@@ -856,6 +863,14 @@ guint attrib_channel_attach(GAttrib *attrib, gboolean out)
- 		return 0;
- 	}
- 
-+	adapter = manager_find_adapter(&channel->src);
+ 	return textfile_put(filename, key, config);
+ }
 +
-+	ba2str(&channel->dst, addr);
-+	device = adapter_find_device(adapter, addr);
++void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer)
++{
++	char filename[PATH_MAX + 1], addr[18];
 +
-+	if (device_is_bonded(device) == FALSE)
-+		delete_device_ccc(&channel->src, &channel->dst);
++	ba2str(peer, addr);
 +
- 	if (channel->mtu > ATT_MAX_MTU)
- 		channel->mtu = ATT_MAX_MTU;
++	/* Deleting all CCC values of a given address */
++	create_filename(filename, PATH_MAX, local, "ccc");
++	delete_by_pattern(filename, addr);
++}
+diff --git a/src/storage.h b/src/storage.h
+index 1cb3637..51259f6 100644
+--- a/src/storage.h
++++ b/src/storage.h
+@@ -87,6 +87,7 @@ int read_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
+ 							uint16_t *value);
+ int write_device_ccc(bdaddr_t *local, bdaddr_t *peer, uint16_t handle,
+ 							uint16_t value);
++void delete_device_ccc(bdaddr_t *local, bdaddr_t *peer);
+ 
+ #define PNP_UUID		"00001200-0000-1000-8000-00805f9b34fb"
  
 -- 
 1.7.7
