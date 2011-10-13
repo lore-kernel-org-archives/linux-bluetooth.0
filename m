@@ -2,76 +2,120 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 5/9] Add handler function to manage GATT indications
-Date: Thu, 13 Oct 2011 17:29:18 +0200
-Message-Id: <1318519762-17475-6-git-send-email-sancane@gmail.com>
-In-Reply-To: <1318519762-17475-5-git-send-email-sancane@gmail.com>
+Subject: [PATCH 8/9] Read measurement interval characteristic
+Date: Thu, 13 Oct 2011 17:29:21 +0200
+Message-Id: <1318519762-17475-9-git-send-email-sancane@gmail.com>
+In-Reply-To: <1318519762-17475-8-git-send-email-sancane@gmail.com>
 References: <1318519762-17475-1-git-send-email-sancane@gmail.com>
  <1318519762-17475-2-git-send-email-sancane@gmail.com>
  <1318519762-17475-3-git-send-email-sancane@gmail.com>
  <1318519762-17475-4-git-send-email-sancane@gmail.com>
  <1318519762-17475-5-git-send-email-sancane@gmail.com>
+ <1318519762-17475-6-git-send-email-sancane@gmail.com>
+ <1318519762-17475-7-git-send-email-sancane@gmail.com>
+ <1318519762-17475-8-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |   17 +++++++++++++++++
- 1 files changed, 17 insertions(+), 0 deletions(-)
+ thermometer/thermometer.c |   70 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 69 insertions(+), 1 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 33a2b7b..1e2caf5 100644
+index 163a804..d679fb8 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -41,6 +41,7 @@ struct thermometer {
- 	GAttrib			*attrib;	/* GATT connection */
- 	struct att_range	*svc_range;	/* Thermometer range */
- 	guint			attioid;	/* Att watcher id */
-+	guint			attindid;	/* Att incications id */
- };
+@@ -24,6 +24,7 @@
+ #include <errno.h>
+ #include <bluetooth/uuid.h>
  
- static GSList *thermometers = NULL;
-@@ -52,6 +53,9 @@ static void destroy_thermometer(gpointer user_data)
- 	if (t->attioid > 0)
- 		btd_device_remove_attio_callback(t->dev, t->attioid);
++#include "dbus-common.h"
+ #include "adapter.h"
+ #include "device.h"
+ #include "error.h"
+@@ -112,6 +113,49 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
  
-+	if (t->attindid > 0)
-+		g_attrib_unregister(t->attrib, t->attindid);
++static void change_property(struct thermometer *t, const gchar *name,
++							gpointer value) {
++	if (g_strcmp0(name, "Intermediate") == 0) {
++		gboolean *intermediate = value;
++		if (t->intermediate == *intermediate)
++			return;
 +
- 	if (t->attrib != NULL)
- 		g_attrib_unref(t->attrib);
- 
-@@ -136,11 +140,19 @@ static GDBusSignalTable thermometer_signals[] = {
- 	{ }
- };
- 
-+static void ind_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
-+{
-+	/* TODO: Process indication */
++		t->intermediate = *intermediate;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_BOOLEAN, &t->intermediate);
++	} else if (g_strcmp0(name, "Interval") == 0) {
++		uint16_t *interval = value;
++		if (t->has_interval && t->interval == *interval)
++			return;
++
++		t->has_interval = TRUE;
++		t->interval = *interval;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->interval);
++	} else if (g_strcmp0(name, "Maximum") == 0) {
++		uint16_t *max = value;
++		if (t->max == *max)
++			return;
++
++		t->max = *max;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->max);
++	} else if (g_strcmp0(name, "Minimum") == 0) {
++		uint16_t *min = value;
++		if (t->min == *min)
++			return;
++
++		t->min = *min;
++		emit_property_changed(t->conn, device_get_path(t->dev),
++					THERMOMETER_INTERFACE, name,
++					DBUS_TYPE_UINT16, &t->min);
++	} else
++		DBG("%s is not a thermometer property", name);
 +}
 +
- static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
  {
- 	struct thermometer *t = user_data;
- 
- 	t->attrib = g_attrib_ref(attrib);
+@@ -149,7 +193,31 @@ static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 							gpointer user_data)
+ {
+-	/* TODO */
++	struct characteristic *ch = user_data;
++	uint8_t value[ATT_MAX_MTU];
++	uint16_t *p, interval;
++	int vlen;
 +
-+	t->attindid = g_attrib_register(t->attrib, ATT_OP_HANDLE_IND,
-+							ind_handler, t, NULL);
- }
- 
- static void attio_disconnected_cb(gpointer user_data)
-@@ -149,6 +161,11 @@ static void attio_disconnected_cb(gpointer user_data)
- 
- 	DBG("GATT Disconnected");
- 
-+	if (t->attindid > 0) {
-+		g_attrib_unregister(t->attrib, t->attindid);
-+		t->attindid = 0;
++	if (status != 0) {
++		DBG("Measurement Interval value read failed: %s",
++							att_ecode2str(status));
++		return;
 +	}
 +
- 	g_attrib_unref(t->attrib);
- 	t->attrib = NULL;
++	if (!dec_read_resp(pdu, len, value, &vlen)) {
++		DBG("Protocol error\n");
++		return;
++	}
++
++	if (vlen < 2) {
++		DBG("Invalid Interval received");
++		return;
++	}
++
++	p = (uint16_t *) value;
++	interval = btohs(bt_get_unaligned(p));
++
++	change_property(ch->t, "Interval", &interval);
  }
+ 
+ static void process_thermometer_char(struct characteristic *ch)
 -- 
 1.7.6.1
 
