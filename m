@@ -2,137 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/5] AVRCP: Use track's UID in event notification
-Date: Fri, 14 Oct 2011 18:28:28 -0300
-Message-Id: <1318627712-9725-2-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH 0/5] Request/Abort Continuing and some minor things
+Date: Fri, 14 Oct 2011 18:28:27 -0300
+Message-Id: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When registering for TRACK_CHANGED event, CT expects the track's UID in
-the INTERIM and CHANGED responses. According to AVRCP 1.3 spec, there
-are only 2 possible values:
-	1) 0: there's a track selected
-	2) UINT32_MAX: there's no track selected
+Hi all,
 
-AVRCP 1.4 reserves the value UINT64_MAX for the second case. Since this
-later value is the one used in certification process for best IOP
-we return UINT64_MAX instead of the former.
+Patch 1 allows TG to correctly inform CT whether there's a track selected.
+Second patch is an easy event to add, track reached start. Third is a fix to
+RequestPlayStatus.
 
-This implementation allows to pass PTS test TP/NFY/BV-05-C.
----
- audio/avrcp.c |   16 +++++-----------
- audio/avrcp.h |    1 +
- audio/media.c |   17 ++++++++++++++++-
- 3 files changed, 22 insertions(+), 12 deletions(-)
+Last 2 patches are the ones more important. They cover the Request/abort
+continuing responses. In my previous implementation (that doesn't apply
+anymore) I was generating all the PDUs in the first GetElementAttributes
+request, putting them in a queue and sending them upon receipt of
+RequestContinuing. Another approach (requested by Luiz) is to save the list of
+attributes we need to send, the position within the last attribute we sent and
+the pdu id. Then we can generate new PDUs only if CT asks us to continue.
 
-diff --git a/audio/avrcp.c b/audio/avrcp.c
-index ac7c8d4..076fdf4 100644
---- a/audio/avrcp.c
-+++ b/audio/avrcp.c
-@@ -363,18 +363,11 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
- 		pdu->params[1] = *((uint8_t *)data);
- 
- 		break;
--	case AVRCP_EVENT_TRACK_CHANGED: {
-+	case AVRCP_EVENT_TRACK_CHANGED:
- 		size = 9;
--
--		/*
--		 * AVRCP 1.3 supports only one track identifier: PLAYING
--		 * (0x0). When 1.4 version is added, this shall be changed to
--		 * contain the identifier of the track.
--		 */
--		memset(&pdu->params[1], 0, 8);
-+		memcpy(&pdu->params[1], data, sizeof(uint64_t));
- 
- 		break;
--	}
- 	default:
- 		error("Unknown event %u", id);
- 		return -EINVAL;
-@@ -828,6 +821,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
- 						uint8_t transaction)
- {
- 	uint16_t len = ntohs(pdu->params_len);
-+	uint64_t uid;
- 
- 	/*
- 	 * 1 byte for EventID, 4 bytes for Playback interval but the latest
-@@ -845,8 +839,8 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
- 		break;
- 	case AVRCP_EVENT_TRACK_CHANGED:
- 		len = 9;
--
--		memset(&pdu->params[1], 0, 8);
-+		uid = player->cb->get_uid(player->user_data);
-+		memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
- 
- 		break;
- 	default:
-diff --git a/audio/avrcp.h b/audio/avrcp.h
-index 360a80a..8cf95a4 100644
---- a/audio/avrcp.h
-+++ b/audio/avrcp.h
-@@ -75,6 +75,7 @@
- struct avrcp_player_cb {
- 	int (*get_setting) (uint8_t attr, void *user_data);
- 	int (*set_setting) (uint8_t attr, uint8_t value, void *user_data);
-+	uint64_t (*get_uid) (void *user_data);
- 	void *(*get_metadata) (uint32_t id, void *user_data);
- 	GList *(*list_metadata) (void *user_data);
- 	uint8_t (*get_status) (void *user_data);
-diff --git a/audio/media.c b/audio/media.c
-index 519cafe..9ef393b 100644
---- a/audio/media.c
-+++ b/audio/media.c
-@@ -1168,6 +1168,18 @@ static GList *list_metadata(void *user_data)
- 	return g_hash_table_get_keys(mp->track);
- }
- 
-+static uint64_t get_uid(void *user_data)
-+{
-+	struct media_player *mp = user_data;
-+
-+	DBG("%p", mp->track);
-+
-+	if (mp->track == NULL)
-+		return UINT64_MAX;
-+
-+	return 0;
-+}
-+
- static void *get_metadata(uint32_t id, void *user_data)
- {
- 	struct media_player *mp = user_data;
-@@ -1220,6 +1232,7 @@ static struct avrcp_player_cb player_cb = {
- 	.get_setting = get_setting,
- 	.set_setting = set_setting,
- 	.list_metadata = list_metadata,
-+	.get_uid = get_uid,
- 	.get_metadata = get_metadata,
- 	.get_position = get_position,
- 	.get_status = get_status
-@@ -1369,6 +1382,7 @@ static gboolean parse_player_metadata(struct media_player *mp,
- 	GHashTable *track;
- 	int ctype;
- 	gboolean title = FALSE;
-+	uint64_t uid;
- 
- 	ctype = dbus_message_iter_get_arg_type(iter);
- 	if (ctype != DBUS_TYPE_ARRAY)
-@@ -1466,8 +1480,9 @@ static gboolean parse_player_metadata(struct media_player *mp,
- 	mp->track = track;
- 	mp->position = 0;
- 	g_timer_start(mp->timer);
-+	uid = get_uid(mp);
- 
--	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, NULL);
-+	avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, &uid);
- 
- 	return TRUE;
- 
+I implemented the later, hoping it would be simpler than the former. However
+it's not, but there are some benefits:
+i) We don't allocate "lots" of space to keep pending pdus
+ii) The first request to GetElementAttributes is much quicker this way since we
+generate only one PDU.
+
+Lucas De Marchi (5):
+  AVRCP: Use track's UID in event notification
+  AVRCP: implement TRACK-REACHED-START event
+  AVRCP: respond with UINT32_MAX if duration is not available
+  AVRCP: Implement AbortContinuingResponse PDU
+  AVRCP: Implement RequestContinuingResponse PDU
+
+ audio/avrcp.c     |  301 ++++++++++++++++++++++++++++++++++++++++-------------
+ audio/avrcp.h     |    3 +
+ audio/media.c     |   22 ++++-
+ doc/media-api.txt |    4 +-
+ 4 files changed, 256 insertions(+), 74 deletions(-)
+
 -- 
 1.7.7
 
