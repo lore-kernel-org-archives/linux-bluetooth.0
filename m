@@ -1,78 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Oct 2011 14:34:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] Add support for parsing the remote name during LE
- Scan
-Message-ID: <20111014113407.GA15909@fusion.localdomain>
-References: <1318524096-2412-1-git-send-email-vinicius.gomes@openbossa.org>
- <1318541947-13947-1-git-send-email-vinicius.gomes@openbossa.org>
- <20111014080144.GA2125@fusion.localdomain>
+Date: Fri, 14 Oct 2011 14:20:39 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org
+Subject: Re: [PATCH 2/9] Bluetooth: Add AMP policy information to l2cap_chan
+Message-ID: <20111014112037.GC32656@aemeltch-MOBL1>
+References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
+ <1318543247-27130-3-git-send-email-mathewm@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111014080144.GA2125@fusion.localdomain>
+In-Reply-To: <1318543247-27130-3-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Mat,
 
-On Fri, Oct 14, 2011, Johan Hedberg wrote:
-> Hi Vinicius,
+On Thu, Oct 13, 2011 at 03:00:40PM -0700, Mat Martineau wrote:
+> Each channel has an active AMP policy to require BR/EDR (the default),
+> prefer AMP, or prefer BR/EDR.
 > 
-> On Thu, Oct 13, 2011, Vinicius Costa Gomes wrote:
-> > +	while (len < HCI_MAX_EIR_LENGTH - 1) {
-> > +		uint8_t field_len = eir_data[0];
-> > +
-> > +		/* Check for the end of EIR */
-> > +		if (field_len == 0)
-> > +			break;
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
-> I suppose there should also be a check for:
-> 
-> 	if (len + field_len > HCI_MAX_EIR_LENGTH)
-> 		goto failed;
-> 
-> Otherwise you're gonna access past the end of the eir_data buffer when
-> you do the memcpy later.
-> 
-> > +
-> > +		switch (eir_data[1]) {
-> > +		case EIR_NAME_SHORT:
-> > +		case EIR_NAME_COMPLETE:
-> > +			if (field_len > HCI_MAX_NAME_LENGTH)
-> > +				goto failed;
-> 
-> If you add the if-statement I suggested earlier you can remove this one
-> (since it becomes redundant).
-> 
-> > +
-> > +			memcpy(name, &eir_data[2], field_len - 1);
-> > +			return;
-> > +		}
-> > +
-> > +		len += field_len + 1;
-> > +		eir_data += field_len + 1;
-> > +	}
-> > +
-> > +failed:
-> > +	sprintf(name, "(unknown)");
-> > +	return;
-> > +}
-> 
-> Please remove the unnecessary return statement here.
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 806b950..e77d39f 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -357,6 +357,7 @@ struct l2cap_chan {
+>  	__u8		num_conf_rsp;
+>  
+>  	__u8		fcs;
+> +	__u8		amp_policy;
 
-I had a slight confusion with my local patch handling and your patch
-went upstream by mistake. So, I ended up fixing these issues by myself.
-There were actually several more issues which I spotted and fixed in the
-same go:
+I would merge this patch with following one since this is only one line.
 
-- read_flags() had missing checks too
-- The LE EIR data length is variable and max 0x1f (31) bytes, i.e. not
-  HCI_MAX_EIR_LENGTH
-- Because of the above limit the name is max 29 bytes
+>  
+>  	__u16		tx_win;
+>  	__u8		max_tx;
+> -- 
+> 1.7.7
+> 
+> --
+> Mat Martineau
+> Employee of Qualcomm Innovation Center, Inc.
+> Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
 
-Please check upstream (github) and verify that I didn't make any mistake
-(since I was only able to do only limited testing here).
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
-Johan
