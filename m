@@ -1,67 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Oct 2011 15:03:41 -0300
-From: Gustavo Padovan <padovan@profusion.mobi>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com,
-	henrik.possung@stericsson.com
-Subject: Re: [PATCH] Bluetooth: rfcomm: Fix sleep in invalid context in
- rfcomm_security_cfm
-Message-ID: <20111014180341.GA30989@joana>
-References: <1317039587-22992-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1317039587-22992-1-git-send-email-szymon.janc@tieto.com>
+From: Rafal Michalski <michalski.raf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rafal Michalski <michalski.raf@gmail.com>
+Subject: [PATCH obexd] Fix breaking long lines in vCard's fields
+Date: Fri, 14 Oct 2011 16:01:22 +0200
+Message-Id: <1318600882-14204-1-git-send-email-michalski.raf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Previously limit length for vCard's (vCard 2.1 with Quoted Printable
+encoding) property line was always set as 75 (QP_LINE_LEN), after
+processing each single subfield (for instance under ADR property).
+Thus it was not possible to reach limit equal to 0 (then breaking line
+is required) for all property subfields.
+This patch fixes that issue and length of first line, containing property
+parameters, is limited as well.
+---
+ plugins/vcard.c |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
 
-* Szymon Janc <szymon.janc@tieto.com> [2011-09-26 14:19:47 +0200]:
+diff --git a/plugins/vcard.c b/plugins/vcard.c
+index 743f19f..7cc7994 100644
+--- a/plugins/vcard.c
++++ b/plugins/vcard.c
+@@ -277,6 +277,8 @@ static gboolean utf8_select(const char *field)
+ static void vcard_qp_print_encoded(GString *vcards, const char *desc, ...)
+ {
+ 	const char *field, *charset = "";
++	const char *encoding = ";ENCODING=QUOTED-PRINTABLE";
++	size_t limit, param_len;
+ 	va_list ap;
+ 
+ 	va_start(ap, desc);
+@@ -290,13 +292,16 @@ static void vcard_qp_print_encoded(GString *vcards, const char *desc, ...)
+ 
+ 	va_end(ap);
+ 
+-	vcard_printf(vcards, "%s;ENCODING=QUOTED-PRINTABLE%s:", desc, charset);
++	vcard_printf(vcards, "%s%s%s:", desc, encoding, charset);
+ 	g_string_truncate(vcards, vcards->len - 2);
+ 
++	param_len = strlen(desc) + strlen(encoding) + strlen(charset) + 1;
++	limit = QP_LINE_LEN - param_len;
++
+ 	va_start(ap, desc);
+ 
+ 	for (field = va_arg(ap, char *); field != NULL; ) {
+-		size_t i, limit = QP_LINE_LEN, size = strlen(field);
++		size_t i, size = strlen(field);
+ 
+ 		for (i = 0; i < size; ++i) {
+ 			if (set_qp_encoding(field[i])) {
+-- 
+1.6.3.3
 
-> This was triggered by turning off encryption on ACL link when rfcomm
-> was using high security. rfcomm_security_cfm (which is called from rx
-> task) was closing DLC and this involves sending disconnect message
-> (and locking socket).
-> 
-> Move closing DLC to rfcomm_process_dlcs and only flag DLC for closure
-> in rfcomm_security_cfm.
-> 
-> BUG: sleeping function called from invalid context at net/core/sock.c:2032
-> in_atomic(): 1, irqs_disabled(): 0, pid: 1788, name: kworker/0:3
-> [<c0068a08>] (unwind_backtrace+0x0/0x108) from [<c05e25dc>] (dump_stack+0x20/0x24)
-> [<c05e25dc>] (dump_stack+0x20/0x24) from [<c0087ba8>] (__might_sleep+0x110/0x12c)
-> [<c0087ba8>] (__might_sleep+0x110/0x12c) from [<c04801d8>] (lock_sock_nested+0x2c/0x64)
-> [<c04801d8>] (lock_sock_nested+0x2c/0x64) from [<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc)
-> [<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc) from [<c047cf6c>] (sock_sendmsg+0xb0/0xd0)
-> [<c047cf6c>] (sock_sendmsg+0xb0/0xd0) from [<c047cfc8>] (kernel_sendmsg+0x3c/0x44)
-> [<c047cfc8>] (kernel_sendmsg+0x3c/0x44) from [<c056b0e8>] (rfcomm_send_frame+0x50/0x58)
-> [<c056b0e8>] (rfcomm_send_frame+0x50/0x58) from [<c056b168>] (rfcomm_send_disc+0x78/0x80)
-> [<c056b168>] (rfcomm_send_disc+0x78/0x80) from [<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc)
-> [<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc) from [<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0)
-> [<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0) from [<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84)
-> [<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84) from [<c0550380>] (hci_rx_task+0x1d0/0x2d0)
-> [<c0550380>] (hci_rx_task+0x1d0/0x2d0) from [<c009ee04>] (tasklet_action+0x138/0x1e4)
-> [<c009ee04>] (tasklet_action+0x138/0x1e4) from [<c009f21c>] (__do_softirq+0xcc/0x274)
-> [<c009f21c>] (__do_softirq+0xcc/0x274) from [<c009f6c0>] (do_softirq+0x60/0x6c)
-> [<c009f6c0>] (do_softirq+0x60/0x6c) from [<c009f794>] (local_bh_enable_ip+0xc8/0xd4)
-> [<c009f794>] (local_bh_enable_ip+0xc8/0xd4) from [<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c)
-> [<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c) from [<c040d470>] (data_from_chip+0xf4/0xaec)
-> [<c040d470>] (data_from_chip+0xf4/0xaec) from [<c04136c0>] (send_skb_to_core+0x40/0x178)
-> [<c04136c0>] (send_skb_to_core+0x40/0x178) from [<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0)
-> [<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0) from [<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0)
-> [<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0) from [<c02cbd9c>] (flush_to_ldisc+0x188/0x198)
-> [<c02cbd9c>] (flush_to_ldisc+0x188/0x198) from [<c00b2774>] (process_one_work+0x144/0x4b8)
-> [<c00b2774>] (process_one_work+0x144/0x4b8) from [<c00b2e8c>] (worker_thread+0x198/0x468)
-> [<c00b2e8c>] (worker_thread+0x198/0x468) from [<c00b9bc8>] (kthread+0x98/0xa0)
-> [<c00b9bc8>] (kthread+0x98/0xa0) from [<c0061744>] (kernel_thread_exit+0x0/0x8)
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
-> ---
->  include/net/bluetooth/rfcomm.h |    1 +
->  net/bluetooth/rfcomm/core.c    |    9 +++++++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
-
-Applied, thanks.
-
-	Gustavo
