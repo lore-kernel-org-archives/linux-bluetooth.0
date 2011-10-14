@@ -1,107 +1,341 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Oct 2011 15:38:11 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-    pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Subject: Re: [PATCH 1/9] Bluetooth: Add BT_AMP_POLICY socket option
-In-Reply-To: <1318549090.15441.49.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1110141410410.9993@mathewm-linux>
-References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>  <1318543247-27130-2-git-send-email-mathewm@codeaurora.org> <1318549090.15441.49.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 5/5] AVRCP: Implement RequestContinuingResponse PDU
+Date: Fri, 14 Oct 2011 18:28:32 -0300
+Message-Id: <1318627712-9725-6-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ audio/avrcp.c |  215 ++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 files changed, 158 insertions(+), 57 deletions(-)
 
-On Thu, 13 Oct 2011, Marcel Holtmann wrote:
+diff --git a/audio/avrcp.c b/audio/avrcp.c
+index 1babb94..3c1b752 100644
+--- a/audio/avrcp.c
++++ b/audio/avrcp.c
+@@ -64,6 +64,12 @@
+ #define E_PARAM_NOT_FOUND	0x02
+ #define E_INTERNAL		0x03
+ 
++/* Packet types */
++#define AVRCP_PACKET_TYPE_SINGLE	0x00
++#define AVRCP_PACKET_TYPE_START		0x01
++#define AVRCP_PACKET_TYPE_CONTINUING	0x02
++#define AVRCP_PACKET_TYPE_END		0x03
++
+ /* PDU types for metadata transfer */
+ #define AVRCP_GET_CAPABILITIES		0x10
+ #define AVRCP_LIST_PLAYER_ATTRIBUTES	0X11
+@@ -77,6 +83,7 @@
+ #define AVRCP_GET_ELEMENT_ATTRIBUTES	0x20
+ #define AVRCP_GET_PLAY_STATUS		0x30
+ #define AVRCP_REGISTER_NOTIFICATION	0x31
++#define AVRCP_REQUEST_CONTINUING	0x40
+ #define AVRCP_ABORT_CONTINUING		0x41
+ 
+ /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+@@ -399,75 +406,119 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+ }
+ 
+ /*
+- * Copy media_info field to a buffer, intended to be used in a response to
+- * GetElementAttributes message.
+- *
+- * It assumes there's enough space in the buffer and on success it returns the
+- * size written.
++ * Write media attribute to buffer, taking care of writing the header when
++ * necessary, not writing more than @param maxlen and starting string from
++ * @param last_idx.
+  *
+- * If @param id is not valid, -EINVAL is returned. If there's no space left on
+- * the buffer -ENOBUFS is returned.
++ * If there isn't enough space in the buffer even for the header, it returns
++ * -ENOBUFS. Otherwise it returns the size written to buffer and the position
++ *  within the media attribute in @param last_idx.
+  */
+-static int player_get_media_attribute(struct avrcp_player *player,
++static int player_write_media_attribute(struct avrcp_player *player,
+ 						uint32_t id, uint8_t *buf,
+-						uint16_t maxlen)
++						uint16_t maxlen,
++						unsigned int *last_idx)
+ {
+-	struct media_info_elem {
++	struct media_attribute_header {
+ 		uint32_t id;
+ 		uint16_t charset;
+ 		uint16_t len;
+-		uint8_t val[];
+ 	};
+-	struct media_info_elem *elem = (void *)buf;
++	uint8_t *val;
++	struct media_attribute_header *hdr;
+ 	uint16_t len;
+ 	char valstr[20];
+ 	void *value;
+ 
+-	if (maxlen < sizeof(struct media_info_elem))
+-		return -ENOBUFS;
++	if (*last_idx == 0) {
++		/*
++		 * Write header first, but bail out if even that
++		 * doesn't fit in PDU.
++		 */
++		if (maxlen < sizeof(*hdr))
++			return -ENOBUFS;
+ 
+-	/* Subtract the size of elem header from the available space */
+-	maxlen -= sizeof(struct media_info_elem);
++		maxlen -= sizeof(*hdr);
++		hdr = (void *) buf;
++		hdr->id = htonl(id);
++		hdr->charset = htons(0x6A); /* Always use UTF-8 */
++		val = ((uint8_t *) hdr) + sizeof(*hdr);
++	} else {
++		hdr = NULL;
++		val = buf;
++	}
+ 
+ 	DBG("Get media attribute: %u", id);
+ 
+-	if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+-			id > AVRCP_MEDIA_ATTRIBUTE_LAST)
+-		return -ENOENT;
+-
+ 	value = player->cb->get_metadata(id, player->user_data);
+ 	if (value == NULL) {
+-		len = 0;
+-		goto done;
++		hdr->len = 0;
++		return sizeof(*hdr);
+ 	}
+ 
+ 	switch (id) {
+-	case AVRCP_MEDIA_ATTRIBUTE_TITLE:
+-	case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
+-	case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
+-	case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+-		len = strlen((char *) value);
+-		if (len > maxlen)
+-			return -ENOBUFS;
+-		memcpy(elem->val, value, len);
+-		break;
+ 	case AVRCP_MEDIA_ATTRIBUTE_TRACK:
+ 	case AVRCP_MEDIA_ATTRIBUTE_N_TRACKS:
+ 	case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+ 		snprintf(valstr, 20, "%u", GPOINTER_TO_UINT(value));
+-		len = strlen(valstr);
+-		if (len > maxlen)
+-			return -ENOBUFS;
+-		memcpy(elem->val, valstr, len);
++		value = valstr;
+ 		break;
+ 	}
+ 
+-done:
+-	elem->id = htonl(id);
+-	elem->charset = htons(0x6A); /* Always use UTF-8 */
+-	elem->len = htons(len);
++	len = strlen(value);
++	if (hdr != NULL)
++		hdr->len = htons(len);
++
++	value = ((char *) value) + *last_idx;
++	len -= *last_idx;
++
++	if (len > maxlen) {
++		*last_idx += maxlen;
++		len = maxlen;
++	} else {
++		*last_idx = 0;
++	}
++
++	memcpy(val, value, len);
++
++	return val - buf + len;
++}
+ 
+-	return sizeof(struct media_info_elem) + len;
++static GList *player_fill_media_attribute(struct avrcp_player *player,
++					GList *attr_ids, uint8_t *buf,
++					uint16_t *pos, unsigned int *last_idx)
++{
++	GList *l;
++
++	for (l = attr_ids; l != NULL; l = g_list_delete_link(l, l)) {
++		uint32_t attr = GPOINTER_TO_UINT(l->data);
++		int size;
++
++		size = player_write_media_attribute(player, attr, &buf[*pos],
++							AVRCP_PDU_MTU - *pos,
++							last_idx);
++		if (size < 0)
++			break;
++
++		*pos += size;
++
++		if (*last_idx)
++			break;
++	}
++
++	return l;
++}
++
++static struct pending_pdu *pending_pdu_new(uint8_t pdu_id, GList *attr_ids,
++							unsigned int last_idx)
++{
++	struct pending_pdu *pending = g_new(struct pending_pdu, 1);
++
++	pending->pdu_id = pdu_id;
++	pending->attr_ids = attr_ids;
++	pending->last_idx = last_idx;
++
++	return pending;
+ }
+ 
+ static gboolean player_abort_pending_pdu(struct avrcp_player *player)
+@@ -611,8 +662,8 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+ 	uint64_t *identifier = (uint64_t *) &pdu->params[0];
+ 	uint16_t pos;
+ 	uint8_t nattr;
+-	int size;
+-	GList *l, *attr_ids;
++	GList *attr_ids;
++	unsigned int last_idx;
+ 
+ 	if (len < 9 || *identifier != 0)
+ 		goto err;
+@@ -628,12 +679,20 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+ 		 * title must be returned if there's a track selected.
+ 		 */
+ 		attr_ids = player->cb->list_metadata(player->user_data);
++		len = g_list_length(attr_ids);
+ 	} else {
+ 		unsigned int i;
+ 		uint32_t *attr = (uint32_t *) &pdu->params[9];
+ 
+-		for (i = 0, attr_ids = NULL; i < nattr; i++, attr++) {
++		for (i = 0, len = 0, attr_ids = NULL; i < nattr; i++, attr++) {
+ 			uint32_t id = ntohl(bt_get_unaligned(attr));
++
++			/* Don't add invalid attributes */
++			if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
++					id > AVRCP_MEDIA_ATTRIBUTE_LAST)
++				continue;
++
++			len++;
+ 			attr_ids = g_list_prepend(attr_ids,
+ 							GUINT_TO_POINTER(id));
+ 		}
+@@ -641,24 +700,21 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+ 		attr_ids = g_list_reverse(attr_ids);
+ 	}
+ 
+-	for (l = attr_ids, len = 0, pos = 1; l != NULL; l = l->next) {
+-		uint32_t attr = GPOINTER_TO_UINT(l->data);
++	if (!len)
++		goto err;
+ 
+-		size = player_get_media_attribute(player, attr,
+-							&pdu->params[pos],
+-							AVRCP_PDU_MTU - pos);
++	player_abort_pending_pdu(player);
++	pos = 1;
++	last_idx = 0;
++	attr_ids = player_fill_media_attribute(player, attr_ids, pdu->params,
++							&pos, &last_idx);
+ 
+-		if (size >= 0) {
+-			len++;
+-			pos += size;
+-		}
++	if (attr_ids != NULL) {
++		player->pending_pdu = pending_pdu_new(pdu->pdu_id, attr_ids,
++								last_idx);
++		pdu->packet_type = AVRCP_PACKET_TYPE_START;
+ 	}
+ 
+-	g_list_free(attr_ids);
+-
+-	if (!len)
+-		goto err;
+-
+ 	pdu->params[0] = len;
+ 	pdu->params_len = htons(pos);
+ 
+@@ -889,6 +945,46 @@ err:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_request_continuing(struct avrcp_player *player,
++						struct avrcp_header *pdu,
++						uint8_t transaction)
++{
++	uint16_t len = ntohs(pdu->params_len);
++	struct pending_pdu *pending;
++
++	if (len != 1 || player->pending_pdu == NULL)
++		goto err;
++
++	pending = player->pending_pdu;
++
++	if (pending->pdu_id != pdu->params[0])
++		goto err;
++
++
++	len = 0;
++	pending->attr_ids = player_fill_media_attribute(player,
++							pending->attr_ids,
++							pdu->params, &len,
++							&pending->last_idx);
++	pdu->pdu_id = pending->pdu_id;
++
++	if (pending->attr_ids == NULL) {
++		g_free(player->pending_pdu);
++		player->pending_pdu = NULL;
++		pdu->packet_type = AVRCP_PACKET_TYPE_END;
++	} else {
++		pdu->packet_type = AVRCP_PACKET_TYPE_CONTINUING;
++	}
++
++	pdu->params_len = htons(len);
++
++	return AVC_CTYPE_STABLE;
++err:
++	pdu->params_len = htons(1);
++	pdu->params[0] = E_INVALID_PARAM;
++	return AVC_CTYPE_REJECTED;
++}
++
+ static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
+ 						struct avrcp_header *pdu,
+ 						uint8_t transaction)
+@@ -947,8 +1043,11 @@ static struct pdu_handler {
+ 					avrcp_handle_get_play_status },
+ 		{ AVRCP_REGISTER_NOTIFICATION, AVC_CTYPE_NOTIFY,
+ 					avrcp_handle_register_notification },
++		{ AVRCP_REQUEST_CONTINUING, AVC_CTYPE_CONTROL,
++					avrcp_handle_request_continuing },
+ 		{ AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+ 					avrcp_handle_abort_continuing },
++
+ 		{ },
+ };
+ 
+@@ -997,6 +1096,8 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
+ 	*code = handler->func(player, pdu, transaction);
+ 
+ 	if (*code != AVC_CTYPE_REJECTED &&
++				pdu->pdu_id != AVRCP_GET_ELEMENT_ATTRIBUTES &&
++				pdu->pdu_id != AVRCP_REQUEST_CONTINUING &&
+ 				pdu->pdu_id != AVRCP_ABORT_CONTINUING)
+ 		player_abort_pending_pdu(player);
+ 
+-- 
+1.7.7
 
-> Hi Mat,
->
->> Allow control of AMP functionality on L2CAP sockets. By default,
->> connections will be restricted to BR/EDR.  Manipulating the
->> BT_AMP_POLICY option allows for channels to be moved to or created
->> on AMP controllers.
->>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
->>  1 files changed, 27 insertions(+), 0 deletions(-)
->>
->> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->> index e727555..14ae418 100644
->> --- a/include/net/bluetooth/bluetooth.h
->> +++ b/include/net/bluetooth/bluetooth.h
->> @@ -77,6 +77,33 @@ struct bt_power {
->>  #define BT_POWER_FORCE_ACTIVE_OFF 0
->>  #define BT_POWER_FORCE_ACTIVE_ON  1
->>
->> +#define BT_AMP_POLICY	10
->> +
->> +/* Require BR/EDR (default policy)
->> + *   AMP controllers cannot be used.
->> + *   Channel move requests from the remote device are denied.
->> + *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
->> + */
->> +#define BT_AMP_POLICY_REQUIRE_BR_EDR   0
->
-> so lets brainstorm a little bit with the names here. Do we really wanna
-> use the term AMP_POLICY? Is it really AMP specific? Or do we better make
-> ourselves a bit more future proof?
->
-> I am currently thinking a bit more generic. Maybe this is not the best
-> choice, but lets entertain this for a bit. So what about calling this
-> BT_CHANNEL_POLICY?
->
-> And instead of REQUIRE_BR_EDR I would call it BREDR_ONLY.
-
-It's no problem to fine-tune the names.
-
-So, if BT_CHANNEL_POLICY is a good option name, how about these option 
-values:
-
-BT_CHANNEL_POLICY_BREDR_ONLY
-BT_CHANNEL_POLICY_AMP_PREFERRED
-BT_CHANNEL_POLICY_BREDR_PREFERRED
-
-
->> +/* Prefer AMP
->> + *   Allow use of AMP controllers
->> + *   If the L2CAP channel is currently on BR/EDR and AMP controller
->> + *     resources are available, initiate a channel move to AMP.
->> + *   Channel move requests from the remote device are allowed.
->> + *   If the L2CAP socket has not been connected yet, try to create
->> + *     and configure the channel directly on an AMP controller rather
->> + *     than BR/EDR.
->> + */
->> +#define BT_AMP_POLICY_PREFER_AMP       1
->> +
->> +/* Prefer BR/EDR
->> + *   Allow use of AMP controllers.
->> + *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
->> + *   Channel move requests from the remote device are allowed.
->> + */
->> +#define BT_AMP_POLICY_PREFER_BR_EDR    2
->
-> We might also wanna look into the option of having a SCM message in the
-> socket that tells us the current type. Or at least tells us when we
-> successfully switched to AMP or back to BR/EDR. Since obviously we are
-> not blocking on the setsockopt call.
->
-> Not sure if applications actually do care, but for OBEX it might be
-> interesting to know if you are on an AMP controller right now or not.
-
-Yes, that would be a nice feature.  OBEX seems to work well even 
-without it, though.  The OBEX connection is made over BREDR, and the 
-socket option is changed after the OBEX connection is made but before 
-any gets or puts.  What you see in hcidump is that the move starts 
-before the first get or put goes out over BREDR - those OBEX packets 
-sit in the ERTM tx queue while the channel move happens.  When the 
-move completes, the transfer immediatly proceeds on the AMP 
-controller.
-
-
-Regards,
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
