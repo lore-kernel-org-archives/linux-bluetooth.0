@@ -1,101 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 15 Oct 2011 07:17:38 -0400
-From: "Martin G. Miller" <mgmiller@optonline.net>
-Subject: Logitech bluetooth Dinovo keyboard problem
-To: linux-bluetooth@vger.kernel.org
-Message-id: <1318677458.18157.37.camel@tux>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+Date: Fri, 14 Oct 2011 20:51:35 -0300
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCH 7/9] Bluetooth: Use symbolic values for the fixed channel
+ map
+Message-ID: <20111014235135.GF30989@joana>
+References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
+ <1318543247-27130-8-git-send-email-mathewm@codeaurora.org>
+ <20111014123608.GB4753@aemeltch-MOBL1>
+ <alpine.DEB.2.02.1110141559060.9993@mathewm-linux>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1110141559060.9993@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear sirs;
+Hi Mat,
 
-I am writing at the request of the Ubuntu bug team for a recurrent
-problem with this device.
+* Mat Martineau <mathewm@codeaurora.org> [2011-10-14 16:04:01 -0700]:
 
-Martin Pitt at Ubuntu.com suggested:
+> 
+> 
+> On Fri, 14 Oct 2011, Andrei Emeltchenko wrote:
+> 
+> >Hi Mat,
+> >
+> >On Thu, Oct 13, 2011 at 03:00:45PM -0700, Mat Martineau wrote:
+> >>The A2MP fixed channel bit is only set when high-speed mode is enabled.
+> >
+> >It might make sense to merge previous patch with definitions of
+> >L2CAP_FC_L2CAP and L2CAP_FC_A2MP, otherwise these 2 patches are a bit
+> >small.
+> >
+> >>
+> >>Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >>---
+> >> net/bluetooth/l2cap_core.c |    6 +++++-
+> >> 1 files changed, 5 insertions(+), 1 deletions(-)
+> >>
+> >>diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >>index d023156..e38258b 100644
+> >>--- a/net/bluetooth/l2cap_core.c
+> >>+++ b/net/bluetooth/l2cap_core.c
+> >>@@ -60,7 +60,7 @@ int disable_ertm;
+> >> int enable_hs;
+> >>
+> >> static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+> >>-static u8 l2cap_fixed_chan[8] = { 0x02, };
+> >>+static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
+> >
+> >I personally do not like present approach with allocating 8-octet array
+> >when we need only one octet _FOR_NOW_. (Also assigning is not clear enough).
+> >
+> >Why not:
+> >
+> ><------8<-----------------------------------------------
+> >|  @@ -60,7 +60,7 @@ int disable_ertm;
+> >|   int enable_hs;
+> >|
+> >|   static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+> >|  -static u8 l2cap_fixed_chan[8] = { 0x02, };
+> >|  +static u8 l2cap_fixed_chan = L2CAP_FC_L2CAP;
+> >|
+> >|   static LIST_HEAD(chan_list);
+> >|   static DEFINE_RWLOCK(chan_list_lock);
+> >|
+> ><------8<-----------------------------------------------
+> 
+> Since the fixed channel map is 8 bytes, it makes some sense to have
+> this data structure match what is used in the info request.  The 8th
+> byte contains a bit that's defined for the AMP test manager too.
 
-Can someone who is affected by this please mail this problem to
-linux-bluetooth kernel at vger kernel org with the proposed rule change?
-We have patched
-this at least four times, and evertime we do it, some other device
-stopped working. Instead of keeping to fiddle with this at the distro
-level, it would be a lot better if this could be fixed/applied upstream,
-and affected people could then try out potential other solutions
-suggested by the bluez developers.
+Yes, let's keep the 8 octet array. It make more sense as we use it on the
+information response.  Btw, I fine with this patch.
 
-Here is the problem and my current work around:
-
-First as entered  at a continuation of an older launchpad.net bug #
-123920   
-
-Total regression with this issue in 11.10 32 bit
-
-I had this dinovo edge bluetooth keyboard/trackpad working perfectly in
-11.04.  Since the upgrade to 11.10 "Oneiric"  I am back to not being
-able to use it.  It refuses to pair and the old entry (changing hiddraw
-to hidraw)  in lib/udev/rules.d/70-hid2hic.rules  is gone.  If I put it
-in it still does not work.   The bluetooth pairing apple just goes
-around in circles, asking to enter a code number that appears on screen,
-followed by a failed to pair.  If you just try to use the keyboard
-without running the bluetooth applet, it pops up a dialog asking to
-grant permission, but checking the box and telling it grant does not
-work.   Also, my Apple magic track pad, which worked perfectly in 11.04
-also fails to pair in 11.10.  It now asks for a key which does not
-exist.  In 11.04 it just asked to pair and then worked.
-
-Finally, I created a new bug report because the problem had been sorted
-with the older code and has reappeared in the latest code.
-see launchpad.net bug # 872940 
-Public bug reported:
-
-Ubuntu 11.10 32 bit upgraded from 11.04 on 12 Oct. 2011
-
-What is expected to happen:  The Logitech dinovo bluetooth
-keyboard/trackpad should continue to work as before.
-What happened instead:  The keyboard now fails to connect and cannot be
-paired with the bluetooth dialog.
-
-The problem is in the udev rules.  In 11.04 there was a special line
-in /lib/udev/rules.d/70-hid2hci.rules for Logitech devices that started
-with KERNEL=="hidraw*".  
-This is now missing in 11.10
-I edited /lib/udev/rules.d/62-bluez-hid2hic.rules and changed the hiddev
-to hidraw, saved the file and rebooted.
-The keyboard and trackpad now work as expected.
-
-The file as it exists now is less complex then the one in 11.04 as there
-were several items listed in the Logitech section.  I suspect that the
-11.04 version allowed other logitech devices to work in hiddev mode.
-Someone more knowledgeable then me needs to compare the 2 versions of
-the file to ensure total compatibility.
-
-The Logitech section from 11.04 looks like this:
-# Logitech devices
-KERNEL=="hiddev*", ATTRS{idVendor}=="046d",
-ATTRS{idProduct}=="c70[35e]", \
-  RUN+="hid2hci --method=logitech-hid --devpath=%p"
-KERNEL=="hidraw*", ATTRS{idVendor}=="046d",
-ATTRS{idProduct}=="c70[4abc]|c71[34bc]", \
-  RUN+="hid2hci --method=logitech-hid --devpath=%p"
-
-The Logitech section from 11.10 looks like this before modification:
-# Logitech devices
-KERNEL=="hiddev*", ATTRS{idVendor}=="046d",
-ATTRS{idProduct}=="c70[345abce]|c71[34bc]", \
-  RUN+="hid2hci --method=logitech-hid --devpath=%p"
-
-This is what I changed it to:
-# Logitech devices
-KERNEL=="hidraw*", ATTRS{idVendor}=="046d",
-ATTRS{idProduct}=="c70[345abce]|c71[34bc]", \
-  RUN+="hid2hci --method=logitech-hid --devpath=%p"
-
-
--- 
-        
-"Don't fear the penguin"
-    Dr. Martin G. Miller
-mgmiller@optonline.net
-
+	Gustavo
