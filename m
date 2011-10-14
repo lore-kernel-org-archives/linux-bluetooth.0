@@ -1,39 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Claudio Takahasi'" <claudio.takahasi@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Proposal for GATT Client Dbus API.
-Date: Fri, 14 Oct 2011 11:51:23 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4784E604@banasiexm01.ASIA.ROOT.PRI>
-References: <F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
- <CAKT1EBfYAgNQwX3KcbCM_JCiSTjZi5BnWhFZqSGXWWqv7zWvqw@mail.gmail.com>
-In-Reply-To: <CAKT1EBfYAgNQwX3KcbCM_JCiSTjZi5BnWhFZqSGXWWqv7zWvqw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 14 Oct 2011 14:34:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Add support for parsing the remote name during LE
+ Scan
+Message-ID: <20111014113407.GA15909@fusion.localdomain>
+References: <1318524096-2412-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1318541947-13947-1-git-send-email-vinicius.gomes@openbossa.org>
+ <20111014080144.GA2125@fusion.localdomain>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111014080144.GA2125@fusion.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQ2xhdWRpbywNClRoYW5rcyBmb3IgeW91ciBpbnB1dHMuIFBsZWFzZSBm
-aW5kIG15IGNvbW1lbnRzIGlubGluZS4NCg0KPiBJcyBpdCByZWFsbHkgbmVj
-ZXNzYXJ5PyBJIHRob3VnaHQgcmVnaXN0ZXJpbmcgYSB3YXRjaGVyIGF0IHNl
-cnZpY2UNCj4gImxldmVsIiB3YXMgZW5vdWdoLg0KDQpZZXMuIEkgdGhpbmsg
-aWYgd2UgaWYgd2UgaGF2ZSB3YXRjaGVyIGF0IHNlcnZpY2UgbGV2ZWwgaXMg
-ZW5vdWdoIGNhdXNlIGhhdmluZyBhIHNwZWNpZmljIGNoYXJhY3RlcmlzdGlj
-IHdhdGNoZXIgd291bGQgbm90IGhlbHAgbXVjaC4NCg0KPiBDb3VsZCB5b3Ug
-cGxlYXNlIGV4cGxhaW4gdGhlIHJlbGF0aW9uIGJldHdlZW4gdGhpcyBwcm9w
-ZXJ0eSBhbmQNCj4gU2VydmljZSBDaGFuZ2VkIGNoYXJhY3RlcmlzdGljKEdl
-bmVyaWMgQXR0cmlidXRlIFByb2ZpbGUgU2VydmljZSk/DQo+IEluIG15IG9w
-aW5pb24sIGl0IGlzIGEgc2VydmljZSBwcm9wZXJ0eSBpbnN0ZWFkIG9mIGNo
-YXJhY3RlcmlzdGljIHByb3BlcnR5Lg0KDQpZZXMgeW91IGFyZSBjb3JyZWN0
-LiBTZXJ2aWNlQ2hhbmdlZCgpIHdpbGwgZG8uIA0KDQo+IFJlYWQgb25seT8g
-Q0NDIGNhbiBiZSB3cml0ZWFibGUgcmlnaHQ/DQogSXQncyBhY3R1YWxseSAi
-My4zLjEuMSBDaGFyYWN0ZXJpc3RpYyBQcm9wZXJ0aWVzIiBmcm9tIHNwZWMu
-IA0KDQoNClRoYW5rcywNClZpamF5DQoKCk1lbWJlciBvZiB0aGUgQ1NSIHBs
-YyBncm91cCBvZiBjb21wYW5pZXMuIENTUiBwbGMgcmVnaXN0ZXJlZCBpbiBF
-bmdsYW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJlZCBudW1iZXIgNDE4NzM0Niwg
-cmVnaXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxsIEhvdXNlLCBDYW1icmlkZ2Ug
-QnVzaW5lc3MgUGFyaywgQ293bGV5IFJvYWQsIENhbWJyaWRnZSwgQ0I0IDBX
-WiwgVW5pdGVkIEtpbmdkb20KTW9yZSBpbmZvcm1hdGlvbiBjYW4gYmUgZm91
-bmQgYXQgd3d3LmNzci5jb20uIEZvbGxvdyBDU1Igb24gVHdpdHRlciBhdCBo
-dHRwOi8vdHdpdHRlci5jb20vQ1NSX1BMQyBhbmQgcmVhZCBvdXIgYmxvZyBh
-dCB3d3cuY3NyLmNvbS9ibG9nCg==
+Hi Vinicius,
+
+On Fri, Oct 14, 2011, Johan Hedberg wrote:
+> Hi Vinicius,
+> 
+> On Thu, Oct 13, 2011, Vinicius Costa Gomes wrote:
+> > +	while (len < HCI_MAX_EIR_LENGTH - 1) {
+> > +		uint8_t field_len = eir_data[0];
+> > +
+> > +		/* Check for the end of EIR */
+> > +		if (field_len == 0)
+> > +			break;
+> 
+> I suppose there should also be a check for:
+> 
+> 	if (len + field_len > HCI_MAX_EIR_LENGTH)
+> 		goto failed;
+> 
+> Otherwise you're gonna access past the end of the eir_data buffer when
+> you do the memcpy later.
+> 
+> > +
+> > +		switch (eir_data[1]) {
+> > +		case EIR_NAME_SHORT:
+> > +		case EIR_NAME_COMPLETE:
+> > +			if (field_len > HCI_MAX_NAME_LENGTH)
+> > +				goto failed;
+> 
+> If you add the if-statement I suggested earlier you can remove this one
+> (since it becomes redundant).
+> 
+> > +
+> > +			memcpy(name, &eir_data[2], field_len - 1);
+> > +			return;
+> > +		}
+> > +
+> > +		len += field_len + 1;
+> > +		eir_data += field_len + 1;
+> > +	}
+> > +
+> > +failed:
+> > +	sprintf(name, "(unknown)");
+> > +	return;
+> > +}
+> 
+> Please remove the unnecessary return statement here.
+
+I had a slight confusion with my local patch handling and your patch
+went upstream by mistake. So, I ended up fixing these issues by myself.
+There were actually several more issues which I spotted and fixed in the
+same go:
+
+- read_flags() had missing checks too
+- The LE EIR data length is variable and max 0x1f (31) bytes, i.e. not
+  HCI_MAX_EIR_LENGTH
+- Because of the above limit the name is max 29 bytes
+
+Please check upstream (github) and verify that I didn't make any mistake
+(since I was only able to do only limited testing here).
+
+Johan
