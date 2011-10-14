@@ -1,46 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 0/5] Request/Abort Continuing and some minor things
-Date: Fri, 14 Oct 2011 18:28:27 -0300
-Message-Id: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Fri, 14 Oct 2011 22:15:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 hcidump 3/3] decode fixed channel list info rsp
+Message-ID: <20111014191554.GA8723@fusion.localdomain>
+References: <1318408296-28840-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1318408296-28840-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318408296-28840-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Andrei,
 
-Patch 1 allows TG to correctly inform CT whether there's a track selected.
-Second patch is an easy event to add, track reached start. Third is a fix to
-RequestPlayStatus.
+On Wed, Oct 12, 2011, Emeltchenko Andrei wrote:
+> @@ -241,6 +250,8 @@ static uint32_t get_val(uint8_t *ptr, uint8_t len)
+>  		return btohs(bt_get_unaligned((uint16_t *) ptr));
+>  	case 4:
+>  		return btohl(bt_get_unaligned((uint32_t *) ptr));
+> +	case 8:
+> +		return btohll(bt_get_unaligned((uint64_t *) ptr));
+>  	}
+>  	return 0;
+>  }
 
-Last 2 patches are the ones more important. They cover the Request/abort
-continuing responses. In my previous implementation (that doesn't apply
-anymore) I was generating all the PDUs in the first GetElementAttributes
-request, putting them in a queue and sending them upon receipt of
-RequestContinuing. Another approach (requested by Luiz) is to save the list of
-attributes we need to send, the position within the last attribute we sent and
-the pdu id. Then we can generate new PDUs only if CT asks us to continue.
+Looks to me like you've forgotten to update the return type of get_val()
+from uint32_t to uint64_t. Other than that I haven't spotted any major
+issues with this patch series.
 
-I implemented the later, hoping it would be simpler than the former. However
-it's not, but there are some benefits:
-i) We don't allocate "lots" of space to keep pending pdus
-ii) The first request to GetElementAttributes is much quicker this way since we
-generate only one PDU.
-
-Lucas De Marchi (5):
-  AVRCP: Use track's UID in event notification
-  AVRCP: implement TRACK-REACHED-START event
-  AVRCP: respond with UINT32_MAX if duration is not available
-  AVRCP: Implement AbortContinuingResponse PDU
-  AVRCP: Implement RequestContinuingResponse PDU
-
- audio/avrcp.c     |  301 ++++++++++++++++++++++++++++++++++++++++-------------
- audio/avrcp.h     |    3 +
- audio/media.c     |   22 ++++-
- doc/media-api.txt |    4 +-
- 4 files changed, 256 insertions(+), 74 deletions(-)
-
--- 
-1.7.7
-
+Johan
