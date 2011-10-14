@@ -1,130 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Oct 2011 15:09:15 -0300
+Date: Fri, 14 Oct 2011 15:03:41 -0300
 From: Gustavo Padovan <padovan@profusion.mobi>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 11/16] Bluetooth: EWS: handling different Control fields
-Message-ID: <20111014180915.GB30989@joana>
-References: <1318329476-30153-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1318329476-30153-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20111013194925.GB20892@joana>
- <20111014105600.GA32656@aemeltch-MOBL1>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	par-gunnar.p.hjalmdahl@stericsson.com, ulrik.lauren@stericsson.com,
+	henrik.possung@stericsson.com
+Subject: Re: [PATCH] Bluetooth: rfcomm: Fix sleep in invalid context in
+ rfcomm_security_cfm
+Message-ID: <20111014180341.GA30989@joana>
+References: <1317039587-22992-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20111014105600.GA32656@aemeltch-MOBL1>
+In-Reply-To: <1317039587-22992-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-14 13:56:03 +0300]:
+* Szymon Janc <szymon.janc@tieto.com> [2011-09-26 14:19:47 +0200]:
 
-> Hi Gustavo,
+> This was triggered by turning off encryption on ACL link when rfcomm
+> was using high security. rfcomm_security_cfm (which is called from rx
+> task) was closing DLC and this involves sending disconnect message
+> (and locking socket).
 > 
-> On Thu, Oct 13, 2011 at 04:49:25PM -0300, Gustavo Padovan wrote:
-> > * Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-11 13:37:51 +0300]:
-> > 
-> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > 
-> > > There are three different Control Field formats: the Standard Control
-> > > Field, the Enhanced Control Field, and the Extended Control Field.
-> > > Patch adds function to handle all those fields seamlessly.
-> > > 
-> > > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > > ---
-> > >  include/net/bluetooth/l2cap.h |   43 +++++++++++++++++++
-> > >  net/bluetooth/l2cap_core.c    |   93 +++++++++++++++++++++-------------------
-> > >  2 files changed, 92 insertions(+), 44 deletions(-)
-> > > 
-> > > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > > index 67a2fdb..3a5f4c0 100644
-> > > --- a/include/net/bluetooth/l2cap.h
-> > > +++ b/include/net/bluetooth/l2cap.h
-> > > @@ -27,6 +27,8 @@
-> > >  #ifndef __L2CAP_H
-> > >  #define __L2CAP_H
-> > >  
-> > > +#include <asm/unaligned.h>
-> > > +
-> > >  /* L2CAP defaults */
-> > >  #define L2CAP_DEFAULT_MTU		672
-> > >  #define L2CAP_DEFAULT_MIN_MTU		48
-> > > @@ -643,6 +645,47 @@ static inline bool __is_ctrl_poll(struct l2cap_chan *chan, __u32 ctrl)
-> > >  	else
-> > >  		return ctrl & L2CAP_CTRL_POLL;
-> > >  }
-> > > +
-> > > +static inline __u32 __get_control(struct l2cap_chan *chan, void *p)
-> > > +{
-> > > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-> > > +		return get_unaligned_le32(p);
-> > > +	else
-> > > +		return get_unaligned_le16(p);
-> > > +}
-> > > +
-> > > +static inline __u32 __get_control_pull(struct l2cap_chan *chan,
-> > > +		struct sk_buff *skb, void *p)
-> > > +{
-> > > +	__u32 ctrl;
-> > > +
-> > > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
-> > > +		ctrl = get_unaligned_le32(p);
-> > > +		skb_pull(skb, 4);
-> > > +	} else {
-> > > +		ctrl = get_unaligned_le16(p);
-> > > +		skb_pull(skb, 2);
-> > > +	}
-> > 
-> > 
-> > I prefer not hide the skb_pull inside another function.
+> Move closing DLC to rfcomm_process_dlcs and only flag DLC for closure
+> in rfcomm_security_cfm.
 > 
-> OK, I will change it to something like:
+> BUG: sleeping function called from invalid context at net/core/sock.c:2032
+> in_atomic(): 1, irqs_disabled(): 0, pid: 1788, name: kworker/0:3
+> [<c0068a08>] (unwind_backtrace+0x0/0x108) from [<c05e25dc>] (dump_stack+0x20/0x24)
+> [<c05e25dc>] (dump_stack+0x20/0x24) from [<c0087ba8>] (__might_sleep+0x110/0x12c)
+> [<c0087ba8>] (__might_sleep+0x110/0x12c) from [<c04801d8>] (lock_sock_nested+0x2c/0x64)
+> [<c04801d8>] (lock_sock_nested+0x2c/0x64) from [<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc)
+> [<c05670c8>] (l2cap_sock_sendmsg+0x58/0xcc) from [<c047cf6c>] (sock_sendmsg+0xb0/0xd0)
+> [<c047cf6c>] (sock_sendmsg+0xb0/0xd0) from [<c047cfc8>] (kernel_sendmsg+0x3c/0x44)
+> [<c047cfc8>] (kernel_sendmsg+0x3c/0x44) from [<c056b0e8>] (rfcomm_send_frame+0x50/0x58)
+> [<c056b0e8>] (rfcomm_send_frame+0x50/0x58) from [<c056b168>] (rfcomm_send_disc+0x78/0x80)
+> [<c056b168>] (rfcomm_send_disc+0x78/0x80) from [<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc)
+> [<c056b9f4>] (__rfcomm_dlc_close+0x2d0/0x2fc) from [<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0)
+> [<c056bbac>] (rfcomm_security_cfm+0x140/0x1e0) from [<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84)
+> [<c0555ec0>] (hci_event_packet+0x1ce8/0x4d84) from [<c0550380>] (hci_rx_task+0x1d0/0x2d0)
+> [<c0550380>] (hci_rx_task+0x1d0/0x2d0) from [<c009ee04>] (tasklet_action+0x138/0x1e4)
+> [<c009ee04>] (tasklet_action+0x138/0x1e4) from [<c009f21c>] (__do_softirq+0xcc/0x274)
+> [<c009f21c>] (__do_softirq+0xcc/0x274) from [<c009f6c0>] (do_softirq+0x60/0x6c)
+> [<c009f6c0>] (do_softirq+0x60/0x6c) from [<c009f794>] (local_bh_enable_ip+0xc8/0xd4)
+> [<c009f794>] (local_bh_enable_ip+0xc8/0xd4) from [<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c)
+> [<c05e5804>] (_raw_spin_unlock_bh+0x48/0x4c) from [<c040d470>] (data_from_chip+0xf4/0xaec)
+> [<c040d470>] (data_from_chip+0xf4/0xaec) from [<c04136c0>] (send_skb_to_core+0x40/0x178)
+> [<c04136c0>] (send_skb_to_core+0x40/0x178) from [<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0)
+> [<c04139f4>] (cg2900_hu_receive+0x15c/0x2d0) from [<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0)
+> [<c0414cb8>] (hci_uart_tty_receive+0x74/0xa0) from [<c02cbd9c>] (flush_to_ldisc+0x188/0x198)
+> [<c02cbd9c>] (flush_to_ldisc+0x188/0x198) from [<c00b2774>] (process_one_work+0x144/0x4b8)
+> [<c00b2774>] (process_one_work+0x144/0x4b8) from [<c00b2e8c>] (worker_thread+0x198/0x468)
+> [<c00b2e8c>] (worker_thread+0x198/0x468) from [<c00b9bc8>] (kthread+0x98/0xa0)
+> [<c00b9bc8>] (kthread+0x98/0xa0) from [<c0061744>] (kernel_thread_exit+0x0/0x8)
 > 
-> <------8<----------------------------------------------------------------
-> |  @@ -4005,7 +4009,8 @@ static int l2cap_ertm_data_rcv(struct sock *sk,
-> |  struct sk_buff *skb)
-> |          u16 req_seq;
-> |          int len, next_tx_seq_offset, req_seq_offset;
-> |
-> |  -       control = __get_control_pull(chan, skb, skb->data);
-> |  +       control = __get_control(chan, skb->data);
-> |  +       skb_pull(skb, __get_ctrl_size(chan));
-> |          len = skb->len;
-> |
-> |          /*
-> |
-> <------8<----------------------------------------------------------------
-> 
-> 
-> > > +
-> > > +	return ctrl;
-> > > +}
-> > > +
-> > > +static inline void __put_control(struct l2cap_chan *chan, __u32 control, void *p)
-> > > +{
-> > > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-> > > +		return put_unaligned_le32(control, p);
-> > > +	else
-> > > +		return put_unaligned_le16(control, p);
-> > > +}
-> > > +
-> > > +static inline void __put_control_put(struct l2cap_chan *chan, __u32 control, void *p)
-> > > +{
-> > > +	if (test_bit(FLAG_EXT_CTRL, &chan->flags))
-> > > +		return put_unaligned_le32(control, skb_put(p, 4));
-> > > +	else
-> > > +		return put_unaligned_le16(control, skb_put(p, 2));
-> > > +}
-> > 
-> > 
-> > get ride of this, you still can do __put_control(chan, control,
-> > skb_put())
-> the second argument in skb_put changes so I cannot use proposed way.
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> ---
+>  include/net/bluetooth/rfcomm.h |    1 +
+>  net/bluetooth/rfcomm/core.c    |    9 +++++++--
+>  2 files changed, 8 insertions(+), 2 deletions(-)
 
-Why not? 
-
-You just call __put_control(chan, control, skb_put(skb, N));
-
-This pass exactly what you want to __put_control(). Do you agree?
+Applied, thanks.
 
 	Gustavo
