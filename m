@@ -1,68 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Oct 2011 08:27:00 +1100
-From: NeilBrown <neilb@suse.de>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Help understanding Agent 'capabilities'.
-Message-ID: <20111017082700.2ef1b1d4@notabene.brown>
-In-Reply-To: <20111013112830.GA20868@fusion.localdomain>
-References: <20111013165526.0dbbe0fc@notabene.brown>
-	<CABBYNZJs4zXqhPkSV6HUbLzFk7_-cuf-+kVgmw+A0hcMRCXLxw@mail.gmail.com>
-	<20111013221432.625e1bfd@notabene.brown>
-	<20111013112830.GA20868@fusion.localdomain>
+Subject: Re: [PATCH 1/9] Bluetooth: Add BT_AMP_POLICY socket option
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
+Date: Sat, 15 Oct 2011 11:43:16 -0700
+In-Reply-To: <alpine.DEB.2.02.1110141410410.9993@mathewm-linux>
+References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
+	  <1318543247-27130-2-git-send-email-mathewm@codeaurora.org>
+	 <1318549090.15441.49.camel@aeonflux>
+	 <alpine.DEB.2.02.1110141410410.9993@mathewm-linux>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1318704223.15441.71.camel@aeonflux>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=PGP-SHA1;
- boundary="Sig_/ILvvvdXVRN7iC+wliAw/s6o"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Sig_/ILvvvdXVRN7iC+wliAw/s6o
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Mat,
 
-On Thu, 13 Oct 2011 14:28:30 +0300 Johan Hedberg <johan.hedberg@gmail.com>
-wrote:
+> >> Allow control of AMP functionality on L2CAP sockets. By default,
+> >> connections will be restricted to BR/EDR.  Manipulating the
+> >> BT_AMP_POLICY option allows for channels to be moved to or created
+> >> on AMP controllers.
+> >>
+> >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >> ---
+> >>  include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
+> >>  1 files changed, 27 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> >> index e727555..14ae418 100644
+> >> --- a/include/net/bluetooth/bluetooth.h
+> >> +++ b/include/net/bluetooth/bluetooth.h
+> >> @@ -77,6 +77,33 @@ struct bt_power {
+> >>  #define BT_POWER_FORCE_ACTIVE_OFF 0
+> >>  #define BT_POWER_FORCE_ACTIVE_ON  1
+> >>
+> >> +#define BT_AMP_POLICY	10
+> >> +
+> >> +/* Require BR/EDR (default policy)
+> >> + *   AMP controllers cannot be used.
+> >> + *   Channel move requests from the remote device are denied.
+> >> + *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
+> >> + */
+> >> +#define BT_AMP_POLICY_REQUIRE_BR_EDR   0
+> >
+> > so lets brainstorm a little bit with the names here. Do we really wanna
+> > use the term AMP_POLICY? Is it really AMP specific? Or do we better make
+> > ourselves a bit more future proof?
+> >
+> > I am currently thinking a bit more generic. Maybe this is not the best
+> > choice, but lets entertain this for a bit. So what about calling this
+> > BT_CHANNEL_POLICY?
+> >
+> > And instead of REQUIRE_BR_EDR I would call it BREDR_ONLY.
+> 
+> It's no problem to fine-tune the names.
+> 
+> So, if BT_CHANNEL_POLICY is a good option name, how about these option 
+> values:
+> 
+> BT_CHANNEL_POLICY_BREDR_ONLY
+> BT_CHANNEL_POLICY_AMP_PREFERRED
+> BT_CHANNEL_POLICY_BREDR_PREFERRED
 
-> Hi Neil,
->=20
-> On Thu, Oct 13, 2011, NeilBrown wrote:
-> > What is the easiest way to find out what bluetooth version the controll=
-er is
-> > using?  I tried looking around and didn't find anything obvious.
->=20
-> E.g. the output of "hciconfig hci0 version" should show you this.
->=20
-> Johan
+lets resort the list as
 
-and so it does.=20
-One of the devices I was using is indeed 2.0. The other is 3.0
+BT_CHANNEL_POLICY_BREDR_ONLY
+BT_CHANNEL_POLICY_BREDR_PREFERRED
+BT_CHANNEL_POLICY_AMP_PREFERRED
 
-Thanks a lot.
+and I would think we are good. However any other opinion on the naming
+would be welcome here as well. I was just brainstorming here.
 
-NeilBrown
+> >> +/* Prefer AMP
+> >> + *   Allow use of AMP controllers
+> >> + *   If the L2CAP channel is currently on BR/EDR and AMP controller
+> >> + *     resources are available, initiate a channel move to AMP.
+> >> + *   Channel move requests from the remote device are allowed.
+> >> + *   If the L2CAP socket has not been connected yet, try to create
+> >> + *     and configure the channel directly on an AMP controller rather
+> >> + *     than BR/EDR.
+> >> + */
+> >> +#define BT_AMP_POLICY_PREFER_AMP       1
+> >> +
+> >> +/* Prefer BR/EDR
+> >> + *   Allow use of AMP controllers.
+> >> + *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
+> >> + *   Channel move requests from the remote device are allowed.
+> >> + */
+> >> +#define BT_AMP_POLICY_PREFER_BR_EDR    2
+> >
+> > We might also wanna look into the option of having a SCM message in the
+> > socket that tells us the current type. Or at least tells us when we
+> > successfully switched to AMP or back to BR/EDR. Since obviously we are
+> > not blocking on the setsockopt call.
+> >
+> > Not sure if applications actually do care, but for OBEX it might be
+> > interesting to know if you are on an AMP controller right now or not.
+> 
+> Yes, that would be a nice feature.  OBEX seems to work well even 
+> without it, though.  The OBEX connection is made over BREDR, and the 
+> socket option is changed after the OBEX connection is made but before 
+> any gets or puts.  What you see in hcidump is that the move starts 
+> before the first get or put goes out over BREDR - those OBEX packets 
+> sit in the ERTM tx queue while the channel move happens.  When the 
+> move completes, the transfer immediatly proceeds on the AMP 
+> controller.
+
+If it works for fine for you guys right now, then we could do that later
+and don't have to worry right now. However before we make enable_hs on
+by default I like to have this figured out.
+
+Regards
+
+Marcel
 
 
---Sig_/ILvvvdXVRN7iC+wliAw/s6o
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.18 (GNU/Linux)
-
-iQIVAwUBTptMKjnsnt1WYoG5AQI5EA/7BrsQFPrIfMy6aaf/ZyL3mQbhnhKEWd2l
-Vu5Uc9zlZkRQjlD1ob7IcuGqcpCwpZxeNSsna1z4+KF2mDnc0PvC5t6sLbeYJWSW
-uiZvLd8eJ+Ex+gYf8g3WahCG32R556WZ48sXr+J5TjJPWy3f+Bq8h1fQGqMqoWdI
-ENVKxZXJW8BN1OkfKd8WlYmyDD6KNlqi5Ce3aLuXPjEa/QDhwHh0VH3MWygq+TGD
-u/nNqKuRQWEFta4QubFDADUmTfJbu+HEYBvN+sVtqs52TS/gEc+MPIUwlsEZMVUv
-WCK88nja9B9T54DQ9vwjrlgQKW0k8o3NtntXHlZBU+xZtabuGcYNsDwegO1qcHAC
-REn/0FbUd5rdha8yXIEkincbvorBnbvYwyrs8ycOZ9MfLJPOs+wMht28vdsid6zA
-I/etL31jyZZI++8jQIhFKxdVf4VTxhMu1wy1MjOL/97jEsbrQVaweUdPaxwbckrZ
-5BthJRAwvtlwfwEajNwtVUON2fop80Wy4/p8rcd3UaY8WpKh0S+hoh+86sO4n1h6
-qqwsamDe5Zhae7Bhhvrrda1lGJD/qx/M8CGjQ+7IjSkrsHUv9msyKRocVqpHVYdJ
-1VThR9fwqy2zVhF2A9HFpeH7Opht9SetzprF/B0reMV+RhJyw1R5CqqhEO+mZkZJ
-l3iAEvero3s=
-=5P+x
------END PGP SIGNATURE-----
-
---Sig_/ILvvvdXVRN7iC+wliAw/s6o--
