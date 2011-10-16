@@ -1,118 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Subject: [PATCH] sbc: overflow bugfix and audio decoding quality improvement
-Date: Mon, 17 Oct 2011 04:24:38 +0300
-Message-Id: <1318814678-25640-1-git-send-email-siarhei.siamashka@gmail.com>
+Date: Mon, 17 Oct 2011 08:27:00 +1100
+From: NeilBrown <neilb@suse.de>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Help understanding Agent 'capabilities'.
+Message-ID: <20111017082700.2ef1b1d4@notabene.brown>
+In-Reply-To: <20111013112830.GA20868@fusion.localdomain>
+References: <20111013165526.0dbbe0fc@notabene.brown>
+	<CABBYNZJs4zXqhPkSV6HUbLzFk7_-cuf-+kVgmw+A0hcMRCXLxw@mail.gmail.com>
+	<20111013221432.625e1bfd@notabene.brown>
+	<20111013112830.GA20868@fusion.localdomain>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/ILvvvdXVRN7iC+wliAw/s6o"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Siarhei Siamashka <siarhei.siamashka@nokia.com>
+--Sig_/ILvvvdXVRN7iC+wliAw/s6o
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The "(((audio_sample << 1) | 1) << frame->scale_factor[ch][sb])"
-part of expression
-    "frame->sb_sample[blk][ch][sb] =
-        (((audio_sample << 1) | 1) << frame->scale_factor[ch][sb]) /
-        levels[ch][sb] - (1 << frame->scale_factor[ch][sb])"
-in "sbc_unpack_frame" function can sometimes overflow 32-bit signed int.
-This problem can be reproduced by first using bitpool 128 and encoding
-some random noise data, and then feeding it to sbc decoder. The obvious
-thing to do would be to change "audio_sample" variable type to uint32_t.
+On Thu, 13 Oct 2011 14:28:30 +0300 Johan Hedberg <johan.hedberg@gmail.com>
+wrote:
 
-However the problem is a little bit more complicated. According
-to the section "12.6.2 Scale Factors" of A2DP spec:
-    scalefactor[ch][sb] = pow(2.0, (scale_factor[ch][sb] + 1))
+> Hi Neil,
+>=20
+> On Thu, Oct 13, 2011, NeilBrown wrote:
+> > What is the easiest way to find out what bluetooth version the controll=
+er is
+> > using?  I tried looking around and didn't find anything obvious.
+>=20
+> E.g. the output of "hciconfig hci0 version" should show you this.
+>=20
+> Johan
 
-And according to "12.6.4 Reconstruction of the Subband Samples":
-    sb_sample[blk][ch][sb] = scalefactor[ch][sb] *
-        ((audio_sample[blk][ch][sb]*2.0+1.0) / levels[ch][sb]-1.0);
+and so it does.=20
+One of the devices I was using is indeed 2.0. The other is 3.0
 
-Hence the current code for calculating "sb_sample[blk][ch][sb]" is
-not quite correct, because it loses one least significant bit of
-sample data and passes twice smaller sample values to the synthesis
-filter (the filter also deviates from the spec to compensate this).
-This all has quite a noticeable impact on audio quality. Moreover,
-it makes sense to keep a few extra bits of precision here in order
-to minimize rounding errors. So the proposed patch introduces a new
-SBCDEC_FIXED_EXTRA_BITS constant and uses uint64_t data type
-for intermediate calculations in order to safeguard against
-overflows. This patch intentionally addresses only the quality
-issue, but performance can be also improved later (like replacing
-division with multiplication by reciprocal).
+Thanks a lot.
 
-Test for the difference of sbc encoding/decoding roundtrip vs.
-the original audio file for joint stereo, bitpool 128, 8 subbands
-and http://media.xiph.org/sintel/sintel-master-st.flac sample
-demonstrates some quality improvement:
+NeilBrown
 
-=== before ===
-    --- comparing original / sbc_encoder.exe + sbcdec ---
-    stddev:    4.64 PSNR: 82.97 bytes:170495708/170496000
-=== after ===
-    --- comparing original / sbc_encoder.exe + sbcdec ---
-    stddev:    1.95 PSNR: 90.50 bytes:170495708/170496000
----
- sbc/sbc.c        |   11 +++++++----
- sbc/sbc_tables.h |    6 ++++--
- 2 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 77fcc5d..13f87c0 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -383,7 +383,7 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
- 	int crc_pos = 0;
- 	int32_t temp;
- 
--	int audio_sample;
-+	uint32_t audio_sample;
- 	int ch, sb, blk, bit;	/* channel, subband, block and bit standard
- 				   counters */
- 	int bits[2][8];		/* bits distribution */
-@@ -494,6 +494,9 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
- 		for (ch = 0; ch < frame->channels; ch++) {
- 			for (sb = 0; sb < frame->subbands; sb++) {
- 				if (levels[ch][sb] > 0) {
-+					uint32_t shift =
-+						frame->scale_factor[ch][sb] +
-+						1 + SBCDEC_FIXED_EXTRA_BITS;
- 					audio_sample = 0;
- 					for (bit = 0; bit < bits[ch][sb]; bit++) {
- 						if (consumed > len * 8)
-@@ -505,9 +508,9 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
- 						consumed++;
- 					}
- 
--					frame->sb_sample[blk][ch][sb] =
--						(((audio_sample << 1) | 1) << frame->scale_factor[ch][sb]) /
--						levels[ch][sb] - (1 << frame->scale_factor[ch][sb]);
-+					frame->sb_sample[blk][ch][sb] = (int32_t)
-+						(((((uint64_t)audio_sample << 1) | 1) << shift) /
-+						levels[ch][sb]) - (1 << shift);
- 				} else
- 					frame->sb_sample[blk][ch][sb] = 0;
- 			}
-diff --git a/sbc/sbc_tables.h b/sbc/sbc_tables.h
-index 28c0d54..25e24e6 100644
---- a/sbc/sbc_tables.h
-+++ b/sbc/sbc_tables.h
-@@ -40,11 +40,13 @@ static const int sbc_offset8[4][8] = {
- 	{ -4, 0, 0, 0, 0, 0, 1, 2 }
- };
- 
-+/* extra bits of precision for the synthesis filter input data */
-+#define SBCDEC_FIXED_EXTRA_BITS 2
- 
- #define SS4(val) ASR(val, SCALE_SPROTO4_TBL)
- #define SS8(val) ASR(val, SCALE_SPROTO8_TBL)
--#define SN4(val) ASR(val, SCALE_NPROTO4_TBL)
--#define SN8(val) ASR(val, SCALE_NPROTO8_TBL)
-+#define SN4(val) ASR(val, SCALE_NPROTO4_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)
-+#define SN8(val) ASR(val, SCALE_NPROTO8_TBL + 1 + SBCDEC_FIXED_EXTRA_BITS)
- 
- static const int32_t sbc_proto_4_40m0[] = {
- 	SS4(0x00000000), SS4(0xffa6982f), SS4(0xfba93848), SS4(0x0456c7b8),
--- 
-1.7.3.4
+--Sig_/ILvvvdXVRN7iC+wliAw/s6o
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+iQIVAwUBTptMKjnsnt1WYoG5AQI5EA/7BrsQFPrIfMy6aaf/ZyL3mQbhnhKEWd2l
+Vu5Uc9zlZkRQjlD1ob7IcuGqcpCwpZxeNSsna1z4+KF2mDnc0PvC5t6sLbeYJWSW
+uiZvLd8eJ+Ex+gYf8g3WahCG32R556WZ48sXr+J5TjJPWy3f+Bq8h1fQGqMqoWdI
+ENVKxZXJW8BN1OkfKd8WlYmyDD6KNlqi5Ce3aLuXPjEa/QDhwHh0VH3MWygq+TGD
+u/nNqKuRQWEFta4QubFDADUmTfJbu+HEYBvN+sVtqs52TS/gEc+MPIUwlsEZMVUv
+WCK88nja9B9T54DQ9vwjrlgQKW0k8o3NtntXHlZBU+xZtabuGcYNsDwegO1qcHAC
+REn/0FbUd5rdha8yXIEkincbvorBnbvYwyrs8ycOZ9MfLJPOs+wMht28vdsid6zA
+I/etL31jyZZI++8jQIhFKxdVf4VTxhMu1wy1MjOL/97jEsbrQVaweUdPaxwbckrZ
+5BthJRAwvtlwfwEajNwtVUON2fop80Wy4/p8rcd3UaY8WpKh0S+hoh+86sO4n1h6
+qqwsamDe5Zhae7Bhhvrrda1lGJD/qx/M8CGjQ+7IjSkrsHUv9msyKRocVqpHVYdJ
+1VThR9fwqy2zVhF2A9HFpeH7Opht9SetzprF/B0reMV+RhJyw1R5CqqhEO+mZkZJ
+l3iAEvero3s=
+=5P+x
+-----END PGP SIGNATURE-----
+
+--Sig_/ILvvvdXVRN7iC+wliAw/s6o--
