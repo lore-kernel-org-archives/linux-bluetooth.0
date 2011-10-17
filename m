@@ -1,34 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: chanyeol.park@samsung.com
-Subject: [PATCH] Fix input pending connect handling
-Date: Mon, 17 Oct 2011 21:07:37 +0900
-Message-id: <1318853257-10667-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCHv4 1/3] Bluetooth: EFS: parse L2CAP config request
+Date: Mon, 17 Oct 2011 14:35:30 +0300
+Message-Id: <1318851332-23700-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-iconn->pending_connect needs to be freed after sending the error reply
+Add parsing Extended Flow Specification option in L2CAP Config Request
+Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+(sent Sun, 22 Aug 2010)
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- input/device.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ net/bluetooth/l2cap_core.c |   44 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 43 insertions(+), 1 deletions(-)
 
-diff --git a/input/device.c b/input/device.c
-index 9ff7f20..16eb155 100644
---- a/input/device.c
-+++ b/input/device.c
-@@ -825,6 +825,9 @@ failed:
- 	reply = btd_error_failed(iconn->pending_connect, err_msg);
- 	g_dbus_send_message(idev->conn, reply);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5f4a264..e79039d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2115,6 +2115,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 	int type, hint, olen;
+ 	unsigned long val;
+ 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
++	struct l2cap_conf_efs efs;
++	u8 remote_efs = 0;
+ 	u16 mtu = L2CAP_DEFAULT_MTU;
+ 	u16 result = L2CAP_CONF_SUCCESS;
+ 	u16 size;
+@@ -2147,7 +2149,12 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 		case L2CAP_CONF_FCS:
+ 			if (val == L2CAP_FCS_NONE)
+ 				set_bit(CONF_NO_FCS_RECV, &chan->conf_state);
++			break;
  
-+	dbus_message_unref(iconn->pending_connect);
-+	iconn->pending_connect = NULL;
++		case L2CAP_CONF_EFS:
++			remote_efs = 1;
++			if (olen == sizeof(efs))
++				memcpy(&efs, (void *) val, olen);
+ 			break;
+ 
+ 		case L2CAP_CONF_EWS:
+@@ -2182,6 +2189,13 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data)
+ 			break;
+ 		}
+ 
++		if (remote_efs) {
++			if (__l2cap_efs_supported(chan))
++				set_bit(FLAG_EFS_ENABLE, &chan->flags);
++			else
++				return -ECONNREFUSED;
++		}
 +
- 	/* So we guarantee the interrupt channel is closed before the
- 	 * control channel (if we only do unref GLib will close it only
- 	 * after returning control to the mainloop */
+ 		if (chan->mode != rfc.mode)
+ 			return -ECONNREFUSED;
+ 
+@@ -2200,7 +2214,6 @@ done:
+ 					sizeof(rfc), (unsigned long) &rfc);
+ 	}
+ 
+-
+ 	if (result == L2CAP_CONF_SUCCESS) {
+ 		/* Configure output options and let the other side know
+ 		 * which ones we don't like. */
+@@ -2213,6 +2226,22 @@ done:
+ 		}
+ 		l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, chan->omtu);
+ 
++		if (remote_efs) {
++			if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
++					efs.stype != L2CAP_SERV_NOTRAFIC &&
++					efs.stype != chan->local_stype) {
++
++				result = L2CAP_CONF_UNACCEPT;
++
++				if (chan->num_conf_req >= 1)
++					return -ECONNREFUSED;
++
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++								sizeof(efs),
++							(unsigned long) &efs);
++			}
++		}
++
+ 		switch (rfc.mode) {
+ 		case L2CAP_MODE_BASIC:
+ 			chan->fcs = L2CAP_FCS_NONE;
+@@ -2245,6 +2274,19 @@ done:
+ 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
+ 					sizeof(rfc), (unsigned long) &rfc);
+ 
++			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
++				chan->remote_id = efs.id;
++				chan->remote_stype = efs.stype;
++				chan->remote_msdu = le16_to_cpu(efs.msdu);
++				chan->remote_flush_to =
++						le32_to_cpu(efs.flush_to);
++				chan->remote_acc_lat =
++						le32_to_cpu(efs.acc_lat);
++				chan->remote_sdu_itime =
++					le32_to_cpu(efs.sdu_itime);
++				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
++					sizeof(efs), (unsigned long) &efs);
++			}
+ 			break;
+ 
+ 		case L2CAP_MODE_STREAMING:
 -- 
 1.7.4.1
 
