@@ -1,101 +1,340 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v5 13/15] Bluetooth: LE scan infra-structure
-Mime-Version: 1.0 (Apple Message framework v1244.3)
-Content-Type: text/plain; charset=us-ascii
-From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <1318702742.15441.60.camel@aeonflux>
-Date: Mon, 17 Oct 2011 09:50:20 -0300
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
- linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Message-Id: <8278D4EF-657A-4E7F-8678-7703627524FD@openbossa.org>
-References: <1317856847-28167-1-git-send-email-andre.guedes@openbossa.org> <1317856847-28167-14-git-send-email-andre.guedes@openbossa.org> <20111006190618.GJ5652@joana> <781D602C-370E-4F06-9D4D-DC69F27294E7@openbossa.org> <20111007201233.GB4108@joana> <A58B9034-BFE6-44D1-A5B0-74DBF764778D@openbossa.org> <1318702742.15441.60.camel@aeonflux>
-To: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLGsA3JmdMRz0qGK9fdxZdehr5aJmu94xN_ipOcX8tjaA@mail.gmail.com>
+References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1318627712-9725-6-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZLGsA3JmdMRz0qGK9fdxZdehr5aJmu94xN_ipOcX8tjaA@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 17 Oct 2011 10:27:30 -0200
+Message-ID: <CAMOw1v7yr=gKK8fdT=VaS6WnwooUtBW9XOFhxmPS1j4NxNgbkg@mail.gmail.com>
+Subject: Re: [PATCH 5/5] AVRCP: Implement RequestContinuingResponse PDU
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Oct 15, 2011, at 3:18 PM, Marcel Holtmann wrote:
+On Mon, Oct 17, 2011 at 7:41 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Sat, Oct 15, 2011 at 12:28 AM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> ---
+>>  audio/avrcp.c |  215 ++++++++++++++++++++++++++++++++++++++++++---------------
+>>  1 files changed, 158 insertions(+), 57 deletions(-)
+>>
+>> diff --git a/audio/avrcp.c b/audio/avrcp.c
+>> index 1babb94..3c1b752 100644
+>> --- a/audio/avrcp.c
+>> +++ b/audio/avrcp.c
+>> @@ -64,6 +64,12 @@
+>>  #define E_PARAM_NOT_FOUND      0x02
+>>  #define E_INTERNAL             0x03
+>>
+>> +/* Packet types */
+>> +#define AVRCP_PACKET_TYPE_SINGLE       0x00
+>> +#define AVRCP_PACKET_TYPE_START                0x01
+>> +#define AVRCP_PACKET_TYPE_CONTINUING   0x02
+>> +#define AVRCP_PACKET_TYPE_END          0x03
+>> +
+>>  /* PDU types for metadata transfer */
+>>  #define AVRCP_GET_CAPABILITIES         0x10
+>>  #define AVRCP_LIST_PLAYER_ATTRIBUTES   0X11
+>> @@ -77,6 +83,7 @@
+>>  #define AVRCP_GET_ELEMENT_ATTRIBUTES   0x20
+>>  #define AVRCP_GET_PLAY_STATUS          0x30
+>>  #define AVRCP_REGISTER_NOTIFICATION    0x31
+>> +#define AVRCP_REQUEST_CONTINUING       0x40
+>>  #define AVRCP_ABORT_CONTINUING         0x41
+>>
+>>  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+>> @@ -399,75 +406,119 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
+>>  }
+>>
+>>  /*
+>> - * Copy media_info field to a buffer, intended to be used in a response to
+>> - * GetElementAttributes message.
+>> - *
+>> - * It assumes there's enough space in the buffer and on success it returns the
+>> - * size written.
+>> + * Write media attribute to buffer, taking care of writing the header when
+>> + * necessary, not writing more than @param maxlen and starting string from
+>> + * @param last_idx.
+>>  *
+>> - * If @param id is not valid, -EINVAL is returned. If there's no space left on
+>> - * the buffer -ENOBUFS is returned.
+>> + * If there isn't enough space in the buffer even for the header, it returns
+>> + * -ENOBUFS. Otherwise it returns the size written to buffer and the position
+>> + *  within the media attribute in @param last_idx.
+>>  */
+>> -static int player_get_media_attribute(struct avrcp_player *player,
+>> +static int player_write_media_attribute(struct avrcp_player *player,
+>>                                                uint32_t id, uint8_t *buf,
+>> -                                               uint16_t maxlen)
+>> +                                               uint16_t maxlen,
+>> +                                               unsigned int *last_idx)
+>>  {
+>> -       struct media_info_elem {
+>> +       struct media_attribute_header {
+>>                uint32_t id;
+>>                uint16_t charset;
+>>                uint16_t len;
+>> -               uint8_t val[];
+>>        };
+>> -       struct media_info_elem *elem = (void *)buf;
+>> +       uint8_t *val;
+>> +       struct media_attribute_header *hdr;
+>>        uint16_t len;
+>>        char valstr[20];
+>>        void *value;
+>>
+>> -       if (maxlen < sizeof(struct media_info_elem))
+>> -               return -ENOBUFS;
+>> +       if (*last_idx == 0) {
+>> +               /*
+>> +                * Write header first, but bail out if even that
+>> +                * doesn't fit in PDU.
+>> +                */
+>> +               if (maxlen < sizeof(*hdr))
+>> +                       return -ENOBUFS;
+>>
+>> -       /* Subtract the size of elem header from the available space */
+>> -       maxlen -= sizeof(struct media_info_elem);
+>> +               maxlen -= sizeof(*hdr);
+>> +               hdr = (void *) buf;
+>> +               hdr->id = htonl(id);
+>> +               hdr->charset = htons(0x6A); /* Always use UTF-8 */
+>> +               val = ((uint8_t *) hdr) + sizeof(*hdr);
+>> +       } else {
+>> +               hdr = NULL;
+>> +               val = buf;
+>> +       }
+>>
+>>        DBG("Get media attribute: %u", id);
+>>
+>> -       if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+>> -                       id > AVRCP_MEDIA_ATTRIBUTE_LAST)
+>> -               return -ENOENT;
+>> -
+>>        value = player->cb->get_metadata(id, player->user_data);
+>>        if (value == NULL) {
+>> -               len = 0;
+>> -               goto done;
+>> +               hdr->len = 0;
+>> +               return sizeof(*hdr);
+>>        }
+>>
+>>        switch (id) {
+>> -       case AVRCP_MEDIA_ATTRIBUTE_TITLE:
+>> -       case AVRCP_MEDIA_ATTRIBUTE_ARTIST:
+>> -       case AVRCP_MEDIA_ATTRIBUTE_ALBUM:
+>> -       case AVRCP_MEDIA_ATTRIBUTE_GENRE:
+>> -               len = strlen((char *) value);
+>> -               if (len > maxlen)
+>> -                       return -ENOBUFS;
+>> -               memcpy(elem->val, value, len);
+>> -               break;
+>>        case AVRCP_MEDIA_ATTRIBUTE_TRACK:
+>>        case AVRCP_MEDIA_ATTRIBUTE_N_TRACKS:
+>>        case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+>>                snprintf(valstr, 20, "%u", GPOINTER_TO_UINT(value));
+>> -               len = strlen(valstr);
+>> -               if (len > maxlen)
+>> -                       return -ENOBUFS;
+>> -               memcpy(elem->val, valstr, len);
+>> +               value = valstr;
+>>                break;
+>>        }
+>>
+>> -done:
+>> -       elem->id = htonl(id);
+>> -       elem->charset = htons(0x6A); /* Always use UTF-8 */
+>> -       elem->len = htons(len);
+>> +       len = strlen(value);
+>> +       if (hdr != NULL)
+>> +               hdr->len = htons(len);
+>> +
+>> +       value = ((char *) value) + *last_idx;
+>> +       len -= *last_idx;
+>> +
+>> +       if (len > maxlen) {
+>> +               *last_idx += maxlen;
+>> +               len = maxlen;
+>> +       } else {
+>> +               *last_idx = 0;
+>> +       }
+>> +
+>> +       memcpy(val, value, len);
+>> +
+>> +       return val - buf + len;
+>
+> So the reason you have val - buf is to track if header was written or
+> not, right?
 
-> Hi Andre,
->=20
->>>>>> This patch adds to hci_core the infra-structure to carry out the
->>>>>> LE scan. Functions were created to init the LE scan and cancel
->>>>>> an ongoing scanning (hci_do_le_scan and hci_cancel_le_scan).
->>>>>>=20
->>>>>> Also, the HCI_LE_SCAN flag was created to inform if the =
-controller
->>>>>> is performing LE scan. The flag is set/cleared when the =
-controller
->>>>>> starts/stops scanning.
->>>>>>=20
->>>>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->>>>>> ---
->>>>>> include/net/bluetooth/hci.h      |    2 +
->>>>>> include/net/bluetooth/hci_core.h |    5 +++
->>>>>> net/bluetooth/hci_core.c         |   69 =
-++++++++++++++++++++++++++++++++++++++
->>>>>> net/bluetooth/hci_event.c        |    4 ++
->>>>>> 4 files changed, 80 insertions(+), 0 deletions(-)
->>>>>>=20
->>>>>> diff --git a/include/net/bluetooth/hci.h =
-b/include/net/bluetooth/hci.h
->>>>>> index 11537b8..7520544 100644
->>>>>> --- a/include/net/bluetooth/hci.h
->>>>>> +++ b/include/net/bluetooth/hci.h
->>>>>> @@ -86,6 +86,8 @@ enum {
->>>>>> 	HCI_DEBUG_KEYS,
->>>>>>=20
->>>>>> 	HCI_RESET,
->>>>>> +
->>>>>> +	HCI_LE_SCAN,
->>>>>=20
->>>>> I remember that Marcel commented against this here. Let's hide =
-this
->>>>> internally.
->>>>=20
->>>> If I got it right, Marcel agreed in keeping this flag here, but we
->>>> won't export it to userspace now (we'll keep it hidden internally).
->>>=20
->>> hdev->flags is exported to userspace, it is not internal. We need to =
-create
->>> other place in struct hci_dev to keep this info. See some of =
-Marcel's reply on
->>> this.
->>=20
->> When I said "export to userspace" I meant to add this flag to =
-userspace
->> header (lib/hci.h). Even though hdev->flags is exported to userspace,
->> if the flag is not defined at that header the userspace cannot decode =
-it
->> properly. This way the flag is hidden internally in kernel.
->>=20
->> Marcel, could you clarify this? Are you fine with we keep this =
-HCI_LE_SCAN
->> in hdev->flags?
->=20
-> so the hdev->flags has to stay as it is right now since otherwise you
-> need to change every single driver that sets HCI_RUNNING.
->=20
-> And I do not wanna export any single bit to the user that it does not
-> need to see. And right now it only needs HCI_UP to HCI_RAW, because =
-they
-> have been there since ever. And deprecated them takes a bit longer. =
-But
-> even they will be deprecated in the long run. Any other bit that you
-> guys introduced goes against this and needs to be fixed.
->=20
-> The one part I do not get right now is why is it so hard to introduce =
-a
-> new flags variable for this. I mentioned this really early on and you
-> keep sending patches for it and we keep discussing this.
->=20
-> So I make this pretty simple, call this hdev->mgmt_flags and start
-> changing these NOW. These flags need to stay internal. Mixing it with
-> anything that is exported to userspace is a really bad idea.
+Correct.
 
-Ok, I'll implement a new flags variable and add the LE_SCAN flag to it.
-Then we can start moving other flags to this new flags variable.
+> In that case I would suggest using something like hdr ?
+> sizeof(*hdr) + len : len or perhaps moving the header filling to
+> player_fill_media_attribute might simplify this, so you only have to
+> keep track of the written value in player_write_media_attribute.
 
-Thanks,
+Yeah, I think moving the header filling to player_fill_media_attribute
+is a better idea.
 
-Andre
+
+>> +}
+>>
+>> -       return sizeof(struct media_info_elem) + len;
+>> +static GList *player_fill_media_attribute(struct avrcp_player *player,
+>> +                                       GList *attr_ids, uint8_t *buf,
+>> +                                       uint16_t *pos, unsigned int *last_idx)
+>> +{
+>> +       GList *l;
+>> +
+>> +       for (l = attr_ids; l != NULL; l = g_list_delete_link(l, l)) {
+>> +               uint32_t attr = GPOINTER_TO_UINT(l->data);
+>> +               int size;
+>> +
+>> +               size = player_write_media_attribute(player, attr, &buf[*pos],
+>> +                                                       AVRCP_PDU_MTU - *pos,
+>> +                                                       last_idx);
+>> +               if (size < 0)
+>> +                       break;
+>> +
+>> +               *pos += size;
+>> +
+>> +               if (*last_idx)
+>> +                       break;
+>> +       }
+>> +
+>> +       return l;
+>> +}
+>> +
+>> -               for (i = 0, attr_ids = NULL; i < nattr; i++, attr++) {
+>> +               for (i = 0, len = 0, attr_ids = NULL; i < nattr; i++, attr++) {
+>>                        uint32_t id = ntohl(bt_get_unaligned(attr));
+>> +
+>> +                       /* Don't add invalid attributes */
+>> +                       if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
+>> +                                       id > AVRCP_MEDIA_ATTRIBUTE_LAST)
+>> +                               continue;
+>> +
+>> +                       len++;
+>>                        attr_ids = g_list_prepend(attr_ids,
+>>                                                        GUINT_TO_POINTER(id));
+>>                }
+>
+> This sounds like a different bug, I mean not checking for invalid
+> attributes, if it was introduced in the previous patch can you please
+> fix it in place?
+
+It's not a bug. In order to to save the list of pending attributes, I
+have to make sure only valid attributes are in the list because I have
+to answer in the first PDU the number of attributes I'll be
+responding. Without pdu-continuing, this check could be where it was
+before.
+
+
+
+>
+>> @@ -641,24 +700,21 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp_player *player,
+>>                attr_ids = g_list_reverse(attr_ids);
+>>        }
+>>
+>> -       for (l = attr_ids, len = 0, pos = 1; l != NULL; l = l->next) {
+>> -               uint32_t attr = GPOINTER_TO_UINT(l->data);
+>> +       if (!len)
+>> +               goto err;
+>>
+>> -               size = player_get_media_attribute(player, attr,
+>> -                                                       &pdu->params[pos],
+>> -                                                       AVRCP_PDU_MTU - pos);
+>> +       player_abort_pending_pdu(player);
+>> +       pos = 1;
+>> +       last_idx = 0;
+>> +       attr_ids = player_fill_media_attribute(player, attr_ids, pdu->params,
+>> +                                                       &pos, &last_idx);
+>>
+>> -               if (size >= 0) {
+>> -                       len++;
+>> -                       pos += size;
+>> -               }
+>> +       if (attr_ids != NULL) {
+>> +               player->pending_pdu = pending_pdu_new(pdu->pdu_id, attr_ids,
+>> +                                                               last_idx);
+>> +               pdu->packet_type = AVRCP_PACKET_TYPE_START;
+>>        }
+>>
+>> -       g_list_free(attr_ids);
+>> -
+>> -       if (!len)
+>> -               goto err;
+>> -
+>>        pdu->params[0] = len;
+>>        pdu->params_len = htons(pos);
+>>
+>> @@ -889,6 +945,46 @@ err:
+>>        return AVC_CTYPE_REJECTED;
+>>  }
+>>
+>> +static uint8_t avrcp_handle_request_continuing(struct avrcp_player *player,
+>> +                                               struct avrcp_header *pdu,
+>> +                                               uint8_t transaction)
+>> +{
+>> +       uint16_t len = ntohs(pdu->params_len);
+>> +       struct pending_pdu *pending;
+>> +
+>> +       if (len != 1 || player->pending_pdu == NULL)
+>> +               goto err;
+>> +
+>> +       pending = player->pending_pdu;
+>> +
+>> +       if (pending->pdu_id != pdu->params[0])
+>> +               goto err;
+>> +
+>> +
+>> +       len = 0;
+>> +       pending->attr_ids = player_fill_media_attribute(player,
+>> +                                                       pending->attr_ids,
+>> +                                                       pdu->params, &len,
+>> +                                                       &pending->last_idx);
+>> +       pdu->pdu_id = pending->pdu_id;
+>> +
+>> +       if (pending->attr_ids == NULL) {
+>> +               g_free(player->pending_pdu);
+>> +               player->pending_pdu = NULL;
+>> +               pdu->packet_type = AVRCP_PACKET_TYPE_END;
+>> +       } else {
+>> +               pdu->packet_type = AVRCP_PACKET_TYPE_CONTINUING;
+>> +       }
+>> +
+>> +       pdu->params_len = htons(len);
+>> +
+>> +       return AVC_CTYPE_STABLE;
+>> +err:
+>> +       pdu->params_len = htons(1);
+>> +       pdu->params[0] = E_INVALID_PARAM;
+>> +       return AVC_CTYPE_REJECTED;
+>> +}
+>> +
+>>  static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
+>>                                                struct avrcp_header *pdu,
+>>                                                uint8_t transaction)
+>> @@ -947,8 +1043,11 @@ static struct pdu_handler {
+>>                                        avrcp_handle_get_play_status },
+>>                { AVRCP_REGISTER_NOTIFICATION, AVC_CTYPE_NOTIFY,
+>>                                        avrcp_handle_register_notification },
+>> +               { AVRCP_REQUEST_CONTINUING, AVC_CTYPE_CONTROL,
+>> +                                       avrcp_handle_request_continuing },
+>>                { AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+>>                                        avrcp_handle_abort_continuing },
+>> +
+>
+> Empty line above is not really needed.
+
+ok
+
+
+Lucas De Marchi
