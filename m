@@ -1,52 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4E9C1E89.5050407@visionsystems.de>
-Date: Mon, 17 Oct 2011 14:24:41 +0200
-From: Yegor Yefremov <yegor_sub1@visionsystems.de>
-Reply-To: yegor_sub1@visionsystems.de
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-CC: Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com
-Subject: Re: [PATCH] hciattach: fix serial speed setting for wl1271
-References: <4E64D1B4.9020300@visionsystems.de> <20110927092653.GX3952@dell>
-In-Reply-To: <20110927092653.GX3952@dell>
+In-Reply-To: <CABBYNZJvjGxp4M8ZQrmFwDc4FMqsjm7w8mh7Sb9BwFTQuQ7jJQ@mail.gmail.com>
+References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1318627712-9725-4-git-send-email-lucas.demarchi@profusion.mobi> <CABBYNZJvjGxp4M8ZQrmFwDc4FMqsjm7w8mh7Sb9BwFTQuQ7jJQ@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 17 Oct 2011 10:13:15 -0200
+Message-ID: <CAMOw1v5t1SujrTBiLsMz_KezWQPRK9C9YSNBevJqv59oWoUunA@mail.gmail.com>
+Subject: Re: [PATCH 3/5] AVRCP: respond with UINT32_MAX if duration is not available
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 27.09.2011 11:26, schrieb Johan Hedberg:
-> Hi Yegor,
+Hi Luiz,
+
+On Mon, Oct 17, 2011 at 5:57 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
 >
-> On Mon, Sep 05, 2011, Yegor Yefremov wrote:
->> override speed setting if firmware script issues serial settings command,
->> otherwise the value given in the firmware script will be overridden.
+> On Sat, Oct 15, 2011 at 12:28 AM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> Section 5.4.1 of AVRCP 1.3 spec says:
 >>
->> Example:
+>>        If TG does not support SongLength And SongPosition on TG, then TG shall
+>>        return 0xFFFFFFFF.
 >>
->> hciattach /dev/ttyO1 texas 115200
->>
->> will fail, because /dev/ttyO1 will be opened with 115200 b/s, then
->> the firmware script will set the buadrate to 3000000 b/s, after UART init
->> hciattach.c will set the baudrate to 115200, so communication is broken.
->>
->> The only correct way is to set both speeds:
->>
->> hciattach -s 115200 /dev/ttyO1 texas 3000000
->>
->> With this patch only initial speed must be specified. The former semantic
->> will be preserved in case the firmware script doesn't provide serial
->> settings action.
->>
->> Tested with wl1271 and firmware TIInit_7.2.31.bts
->>
->> Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
+>> SongPosition is always available, but song length depends on user to
+>> provied it.
 >> ---
->>  tools/hciattach.c    |    2 +-
->>  tools/hciattach.h    |    2 +-
->>  tools/hciattach_ti.c |   19 +++++++++++--------
->>  3 files changed, 13 insertions(+), 10 deletions(-)
-> Applied after fixing the commit message (we don't use Signed-off-by).
-> Thanks.
+>>  audio/avrcp.c     |    2 +-
+>>  doc/media-api.txt |    4 +++-
+>>  2 files changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/audio/avrcp.c b/audio/avrcp.c
+>> index 8b48e83..1b55e33 100644
+>> --- a/audio/avrcp.c
+>> +++ b/audio/avrcp.c
+>> @@ -808,7 +808,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
+>>                                                AVRCP_MEDIA_ATTRIBUTE_DURATION,
+>>                                                player->user_data));
+>>
+>> -       duration = htonl(duration);
+>> +       duration = duration ? htonl(duration) : UINT32_MAX;
+>>        position = htonl(position);
+>
+> I would prefer doing this on RegisterPlayer/parse_player_metadata as
+> we do with title, so if is not present then we set UINT32_MAX.
 
-Thanks for committing. By the way, what is happening with http://git.kernel.org/?p=bluetooth/bluez-gnome.git;a=summary? Will it be up in some days?
+Humn... I don't know if this is good. 'Duration' is replied on both
+GetElementAttributes and GetPlayStatus commands and they have
+different ways to inform about a unavailable attribute. While in the
+former we should use zero-length string, the later uses UINT32_MAX.
 
-Best regards,
-Yegor
+
+>
+>>        memcpy(&pdu->params[0], &duration, 4);
+>> diff --git a/doc/media-api.txt b/doc/media-api.txt
+>> index b8dcdbd..204f33e 100644
+>> --- a/doc/media-api.txt
+>> +++ b/doc/media-api.txt
+>> @@ -114,7 +114,9 @@ Methods             void RegisterEndpoint(object endpoint, dict properties)
+>>
+>>                                uint32 Duration:
+>>
+>> -                                       Track duration in milliseconds
+>> +                                       Track duration in milliseconds. If it's
+>> +                                       set to 0 or left blank, it will be
+>> +                                       treated as not available.
+>
+> 0 might be a valid duration so I would just treat as not available if
+> Duration is not part of the metadata or if the value is actually
+> UINT32_MAX which can happen if the duration exceeds 32 bits.
+
+Ok.
+
+Lucas De Marchi
