@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1318627712-9725-5-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1318627712-9725-4-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1318627712-9725-5-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 17 Oct 2011 11:05:04 +0300
-Message-ID: <CABBYNZJGr2uVe-u-n_f_LL+Exk4om8b3R72ccgRkS1nCzkt01w@mail.gmail.com>
-Subject: Re: [PATCH 4/5] AVRCP: Implement AbortContinuingResponse PDU
+	<1318627712-9725-4-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 17 Oct 2011 10:57:26 +0300
+Message-ID: <CABBYNZJvjGxp4M8ZQrmFwDc4FMqsjm7w8mh7Sb9BwFTQuQ7jJQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] AVRCP: respond with UINT32_MAX if duration is not available
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
@@ -17,129 +17,51 @@ Hi Lucas,
 
 On Sat, Oct 15, 2011 at 12:28 AM, Lucas De Marchi
 <lucas.demarchi@profusion.mobi> wrote:
+> Section 5.4.1 of AVRCP 1.3 spec says:
+>
+>        If TG does not support SongLength And SongPosition on TG, then TG shall
+>        return 0xFFFFFFFF.
+>
+> SongPosition is always available, but song length depends on user to
+> provied it.
 > ---
->  audio/avrcp.c |   55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 55 insertions(+), 0 deletions(-)
+>  audio/avrcp.c     |    2 +-
+>  doc/media-api.txt |    4 +++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
 >
 > diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index 1b55e33..1babb94 100644
+> index 8b48e83..1b55e33 100644
 > --- a/audio/avrcp.c
 > +++ b/audio/avrcp.c
-> @@ -77,6 +77,7 @@
->  #define AVRCP_GET_ELEMENT_ATTRIBUTES   0x20
->  #define AVRCP_GET_PLAY_STATUS          0x30
->  #define AVRCP_REGISTER_NOTIFICATION    0x31
-> +#define AVRCP_ABORT_CONTINUING         0x41
+> @@ -808,7 +808,7 @@ static uint8_t avrcp_handle_get_play_status(struct avrcp_player *player,
+>                                                AVRCP_MEDIA_ATTRIBUTE_DURATION,
+>                                                player->user_data));
 >
->  /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
->  #define CAP_COMPANY_ID         0x02
-> @@ -129,6 +130,12 @@ struct avrcp_server {
->        struct avrcp_player *active_player;
->  };
->
-> +struct pending_pdu {
-> +       uint8_t pdu_id;
-> +       GList *attr_ids;
-> +       unsigned int last_idx;
-> +};
-> +
->  struct avrcp_player {
->        struct avrcp_server *server;
->        struct avctp *session;
-> @@ -137,6 +144,7 @@ struct avrcp_player {
->        unsigned int handler;
->        uint16_t registered_events;
->        uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
-> +       struct pending_pdu *pending_pdu;
->
->        struct avrcp_player_cb *cb;
->        void *user_data;
-> @@ -462,6 +470,18 @@ done:
->        return sizeof(struct media_info_elem) + len;
->  }
->
-> +static gboolean player_abort_pending_pdu(struct avrcp_player *player)
-> +{
-> +       if (player->pending_pdu == NULL)
-> +               return FALSE;
-> +
-> +       g_list_free(player->pending_pdu->attr_ids);
-> +       g_free(player->pending_pdu);
-> +       player->pending_pdu = NULL;
-> +
-> +       return TRUE;
-> +}
-> +
->  static int player_set_attribute(struct avrcp_player *player,
->                                                uint8_t attr, uint8_t val)
->  {
-> @@ -869,6 +889,33 @@ err:
->        return AVC_CTYPE_REJECTED;
->  }
->
-> +static uint8_t avrcp_handle_abort_continuing(struct avrcp_player *player,
-> +                                               struct avrcp_header *pdu,
-> +                                               uint8_t transaction)
-> +{
-> +       uint16_t len = ntohs(pdu->params_len);
-> +       struct pending_pdu *pending;
-> +
-> +       if (len != 1 || player->pending_pdu == NULL)
-> +               goto err;
-> +
-> +       pending = player->pending_pdu;
-> +
-> +       if (pending->pdu_id != pdu->params[0])
-> +               goto err;
-> +
-> +       player_abort_pending_pdu(player);
-> +       pdu->params_len = 0;
-> +
-> +       return AVC_CTYPE_STABLE;
-> +
-> +err:
-> +       pdu->params_len = htons(1);
-> +       pdu->params[0] = E_INVALID_PARAM;
-> +       return AVC_CTYPE_REJECTED;
-> +}
-> +
-> +
->  static struct pdu_handler {
->        uint8_t pdu_id;
->        uint8_t code;
-> @@ -900,6 +947,8 @@ static struct pdu_handler {
->                                        avrcp_handle_get_play_status },
->                { AVRCP_REGISTER_NOTIFICATION, AVC_CTYPE_NOTIFY,
->                                        avrcp_handle_register_notification },
-> +               { AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
-> +                                       avrcp_handle_abort_continuing },
->                { },
->  };
->
-> @@ -947,6 +996,10 @@ static size_t handle_vendordep_pdu(struct avctp *session, uint8_t transaction,
->
->        *code = handler->func(player, pdu, transaction);
->
-> +       if (*code != AVC_CTYPE_REJECTED &&
-> +                               pdu->pdu_id != AVRCP_ABORT_CONTINUING)
-> +               player_abort_pending_pdu(player);
-> +
->        return AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
->
->  err_metadata:
-> @@ -1100,6 +1153,8 @@ static void player_destroy(gpointer data)
->        if (player->destroy)
->                player->destroy(player->user_data);
->
-> +       player_abort_pending_pdu(player);
-> +
->        if (player->handler)
->                avctp_unregister_pdu_handler(player->handler);
->
-> --
-> 1.7.7
+> -       duration = htonl(duration);
+> +       duration = duration ? htonl(duration) : UINT32_MAX;
+>        position = htonl(position);
 
-Ack.
+I would prefer doing this on RegisterPlayer/parse_player_metadata as
+we do with title, so if is not present then we set UINT32_MAX.
+
+>        memcpy(&pdu->params[0], &duration, 4);
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index b8dcdbd..204f33e 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -114,7 +114,9 @@ Methods             void RegisterEndpoint(object endpoint, dict properties)
+>
+>                                uint32 Duration:
+>
+> -                                       Track duration in milliseconds
+> +                                       Track duration in milliseconds. If it's
+> +                                       set to 0 or left blank, it will be
+> +                                       treated as not available.
+
+0 might be a valid duration so I would just treat as not available if
+Duration is not part of the metadata or if the value is actually
+UINT32_MAX which can happen if the duration exceeds 32 bits.
+
 
 -- 
 Luiz Augusto von Dentz
