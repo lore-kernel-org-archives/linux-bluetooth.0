@@ -3,31 +3,52 @@ From: Szymon Janc <szymon@janc.net.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon@janc.net.pl>
 Subject: [PATCH] Bluetooth: Increase HCI reset timeout in hci_dev_do_close
-Date: Mon, 17 Oct 2011 23:05:49 +0200
-Message-Id: <1318885549-14784-2-git-send-email-szymon@janc.net.pl>
-In-Reply-To: <1318885549-14784-1-git-send-email-szymon@janc.net.pl>
-References: <1318885549-14784-1-git-send-email-szymon@janc.net.pl>
+Date: Mon, 17 Oct 2011 23:05:48 +0200
+Message-Id: <1318885549-14784-1-git-send-email-szymon@janc.net.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Szymon Janc <szymon@janc.net.pl>
----
+Hi,
+
+I've noticed that my CSR usb dongle was not working if it was plugged in when
+PC was booting. It looks like I get two HCI reset command complete events (see
+hcidump logs below).
+The root cause is reset called from off_timer. Timeout for this reset to
+complete is set to 250ms and my bt dongle requires more time for replying with
+command complete event. After that, chip seems to reply with reset command
+complete event for next non-reset command.
+
+Attached patch increase mentioned timeout to HCI_INIT_TIMEOUT, this value is
+already used for timeouting hci_reset_req in hci_dev_reset().
+
+This might also be related to BT not working after suspend that was reported
+here some time ago.
+
+
+Hcidump log:
+
+2011-09-12 23:13:27.379465 < HCI Command: Reset (0x03|0x0003) plen 0
+2011-09-12 23:13:27.380797 > HCI Event: Command Complete (0x0e) plen 4
+    Reset (0x03|0x0003) ncmd 1
+    status 0x00
+2011-09-12 23:13:27.380859 < HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+2011-09-12 23:13:27.760789 > HCI Event: Command Complete (0x0e) plen 4
+    Reset (0x03|0x0003) ncmd 1
+    status 0x00
+2011-09-12 23:13:27.760831 < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+2011-09-12 23:13:27.764780 > HCI Event: Command Complete (0x0e) plen 12
+    Read Local Version Information (0x04|0x0001) ncmd 1
+    status 0x00
+    HCI Version: 1.1 (0x1) HCI Revision: 0x36f
+    LMP Version: 1.1 (0x1) LMP Subversion: 0x36f
+    Manufacturer: Cambridge Silicon Radio (10)
+
+Szymon Janc (1):
+  Bluetooth: Increase HCI reset timeout in hci_dev_do_close
+
  net/bluetooth/hci_core.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fdcbf8f..f5dad71 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -613,7 +613,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	if (!test_bit(HCI_RAW, &hdev->flags)) {
- 		set_bit(HCI_INIT, &hdev->flags);
- 		__hci_request(hdev, hci_reset_req, 0,
--					msecs_to_jiffies(250));
-+					msecs_to_jiffies(HCI_INIT_TIMEOUT));
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
 -- 
 1.7.7
 
