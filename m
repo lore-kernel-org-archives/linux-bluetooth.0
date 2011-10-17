@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: convert spaces to tabs in l2cap
+Subject: Re: [PATCHv3 1/4] add btohll macro
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 17 Oct 2011 08:52:07 -0700
-In-Reply-To: <1318859423-26489-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1318859423-26489-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 17 Oct 2011 08:32:10 -0700
+In-Reply-To: <1318839662-13609-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1318839662-13609-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1318839662-13609-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1318866730.15441.99.camel@aeonflux>
+Message-ID: <1318865532.15441.97.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -16,15 +17,9 @@ Hi Andrei,
 
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  include/net/bluetooth/l2cap.h |  108 ++++++++++++++++++++--------------------
->  1 files changed, 54 insertions(+), 54 deletions(-)
+> handle 64 bit swap
 
-please lets not do that. It will break too many peoples pending patches
-right now and it is sort of legacy in Bluetooth coding style to keep
-these as spaces. Same as for HCI btw.
+get this first merged into bluez.git and then backport it.
 
 Regards
 
