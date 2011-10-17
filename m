@@ -1,33 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 0/5] Request/Abort Continuing and some minor things
-Date: Mon, 17 Oct 2011 18:34:26 -0200
-Message-Id: <1318883671-10932-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Mon, 17 Oct 2011 18:10:08 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv4 2/3] Bluetooth: EFS: parse L2CAP config response
+Message-ID: <20111017201008.GD2631@joana>
+References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes from previous version:
+Hi Andrei,
 
- - 2/5: fix minor coding style issue
- - 3/5: allow 0 to be a valid duration value
- - 5/5: fill attribute header in player_fill_media_attribute() in order to
-   simplify implementation
+* Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com> [2011-10-17 14:35:31 +0300]:
 
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Add parsing Extended Flow Specification in L2CAP Config Response.
+> Based upon haijun.liu <haijun.liu@atheros.com> series of patches
+> (sent Sun, 22 Aug 2010)
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
+>  1 files changed, 24 insertions(+), 0 deletions(-)
 
-Lucas De Marchi (5):
-  AVRCP: Use track's UID in event notification
-  AVRCP: implement TRACK-REACHED-START event
-  AVRCP: respond with UINT32_MAX if duration is not available
-  AVRCP: Implement AbortContinuingResponse PDU
-  AVRCP: Implement RequestContinuingResponse PDU
+Applied, thanks.
 
- audio/avrcp.c |  307 +++++++++++++++++++++++++++++++++++++++++----------------
- audio/avrcp.h |    3 +
- audio/media.c |   22 ++++-
- 3 files changed, 246 insertions(+), 86 deletions(-)
-
--- 
-1.7.7
-
+	Gustavo
