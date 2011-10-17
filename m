@@ -1,41 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 0/3] EFS: last chunks
-Date: Mon, 17 Oct 2011 14:35:29 +0300
-Message-Id: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 17 Oct 2011 14:16:00 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] fix build
+Message-ID: <20111017111600.GA20179@fusion.localdomain>
+References: <1318848980-569-1-git-send-email-frederic.danis@linux.intel.com>
+ <20111017111035.GA19306@fusion.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20111017111035.GA19306@fusion.localdomain>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Mon, Oct 17, 2011, Johan Hedberg wrote:
+> Strange. Current git compiles just fine under Fedora 16 beta (gcc 2.6.1)
+> as well as debian unstable (also gcc 2.6.1). Which gcc version do you
+> use?
 
-Implementation of EFS based upon series of patches sent upstream in Aug 2010
-by Haijun Liu.
+s/2.6.1/4.6.1/
 
-http://marc.info/?a=128277503500005&r=1&w=2
-
-Changes:
-	* RFC: initial release
-	* RFCv2: rebase & take care about comments:
-		- use flag in l2cap_chan instead of variable
-		- move channel init out from parse_conf_req
-		- other style fixes
-	* PATCHv1: support only Best Effort channels for now.
-	* PATCHv2: disable_flowspec -> enable_hs, style fixes
-	* PATCHv3: rebase, split functionality to appropriate
-		patches, taking comments from ML.
-	* PATCHv4: simplify logic in parse_conf_req function
-		following Gustavo comments.
-
-Andrei Emeltchenko (3):
-  Bluetooth: EFS: parse L2CAP config request
-  Bluetooth: EFS: parse L2CAP config response
-  Bluetooth: EFS: implement L2CAP config pending state
-
- include/net/bluetooth/l2cap.h |    3 +
- net/bluetooth/l2cap_core.c    |  115 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 116 insertions(+), 2 deletions(-)
-
--- 
-1.7.4.1
-
+Johan
