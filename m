@@ -1,75 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 2/3] Bluetooth: EFS: parse L2CAP config response
-Date: Mon, 17 Oct 2011 14:35:31 +0300
-Message-Id: <1318851332-23700-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 0/3] EFS: last chunks
+Date: Mon, 17 Oct 2011 14:35:29 +0300
+Message-Id: <1318851332-23700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add parsing Extended Flow Specification in L2CAP Config Response.
-Based upon haijun.liu <haijun.liu@atheros.com> series of patches
-(sent Sun, 22 Aug 2010)
+Implementation of EFS based upon series of patches sent upstream in Aug 2010
+by Haijun Liu.
 
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
----
- net/bluetooth/l2cap_core.c |   24 ++++++++++++++++++++++++
- 1 files changed, 24 insertions(+), 0 deletions(-)
+http://marc.info/?a=128277503500005&r=1&w=2
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e79039d..9bc34e4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2329,6 +2329,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 	int type, olen;
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc;
-+	struct l2cap_conf_efs efs;
- 
- 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
- 
-@@ -2371,6 +2372,19 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS,
- 							2, chan->tx_win);
- 			break;
-+
-+		case L2CAP_CONF_EFS:
-+			if (olen == sizeof(efs))
-+				memcpy(&efs, (void *)val, olen);
-+
-+			if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
-+					efs.stype != L2CAP_SERV_NOTRAFIC &&
-+					efs.stype != chan->local_stype)
-+				return -ECONNREFUSED;
-+
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS,
-+					sizeof(efs), (unsigned long) &efs);
-+			break;
- 		}
- 	}
- 
-@@ -2385,7 +2399,17 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len, voi
- 			chan->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
- 			chan->monitor_timeout = le16_to_cpu(rfc.monitor_timeout);
- 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
-+
-+			if (test_bit(FLAG_EFS_ENABLE, &chan->flags)) {
-+				chan->local_msdu = le16_to_cpu(efs.msdu);
-+				chan->local_sdu_itime =
-+						le32_to_cpu(efs.sdu_itime);
-+				chan->local_acc_lat = le32_to_cpu(efs.acc_lat);
-+				chan->local_flush_to =
-+						le32_to_cpu(efs.flush_to);
-+			}
- 			break;
-+
- 		case L2CAP_MODE_STREAMING:
- 			chan->mps    = le16_to_cpu(rfc.max_pdu_size);
- 		}
+Changes:
+	* RFC: initial release
+	* RFCv2: rebase & take care about comments:
+		- use flag in l2cap_chan instead of variable
+		- move channel init out from parse_conf_req
+		- other style fixes
+	* PATCHv1: support only Best Effort channels for now.
+	* PATCHv2: disable_flowspec -> enable_hs, style fixes
+	* PATCHv3: rebase, split functionality to appropriate
+		patches, taking comments from ML.
+	* PATCHv4: simplify logic in parse_conf_req function
+		following Gustavo comments.
+
+Andrei Emeltchenko (3):
+  Bluetooth: EFS: parse L2CAP config request
+  Bluetooth: EFS: parse L2CAP config response
+  Bluetooth: EFS: implement L2CAP config pending state
+
+ include/net/bluetooth/l2cap.h |    3 +
+ net/bluetooth/l2cap_core.c    |  115 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 116 insertions(+), 2 deletions(-)
+
 -- 
 1.7.4.1
 
