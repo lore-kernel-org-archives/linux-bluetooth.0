@@ -1,51 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/9] Bluetooth: Add BT_AMP_POLICY socket option
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Mat Martineau <mathewm@codeaurora.org>,
-	linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Date: Mon, 17 Oct 2011 08:56:54 -0700
-In-Reply-To: <CABBYNZKtyro_ep=X1Baq51oUXueqMDVEr_0aZw54+c48SvtWcw@mail.gmail.com>
-References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
-	 <1318543247-27130-2-git-send-email-mathewm@codeaurora.org>
-	 <1318549090.15441.49.camel@aeonflux>
-	 <alpine.DEB.2.02.1110141410410.9993@mathewm-linux>
-	 <CABBYNZKtyro_ep=X1Baq51oUXueqMDVEr_0aZw54+c48SvtWcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1318867017.15441.102.camel@aeonflux>
-Mime-Version: 1.0
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
+	<frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] fix build
+Date: Mon, 17 Oct 2011 17:56:05 +0200
+Message-Id: <1318866965-11091-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+src/eir.c: In function 'eir_parse':
+src/eir.c:72: error: 'name_len' may be used uninitialized in this function
 
-> >> Not sure if applications actually do care, but for OBEX it might be
-> >> interesting to know if you are on an AMP controller right now or not.
-> >
-> > Yes, that would be a nice feature.  OBEX seems to work well even without it,
-> > though.  The OBEX connection is made over BREDR, and the socket option is
-> > changed after the OBEX connection is made but before any gets or puts.  What
-> > you see in hcidump is that the move starts before the first get or put goes
-> > out over BREDR - those OBEX packets sit in the ERTM tx queue while the
-> > channel move happens.  When the move completes, the transfer immediatly
-> > proceeds on the AMP controller.
-> 
-> I guess the is implementation dependent, for obexd we might want to
-> check if the transfer will take a considerable amount of time to
-> decide whether or not to use AMP, in some case it might not worth to
-> switch because it will take more time than transferring over BDEDR.
+and
 
-there has been discussions that you should be waiting for the first
-packet on BR/EDR and hope that it indicates the length of the data to
-follow. And then make a decision to allow switching or not. All three
-options would support this behavior right now.
+thermometer/thermometer.c: In function 'destroy_char':
+thermometer/thermometer.c:79: error: implicit declaration of function 'g_slist_free_full'
+---
+ src/eir.c                 |    2 +-
+ thermometer/thermometer.c |    5 +++++
+ 2 files changed, 6 insertions(+), 1 deletions(-)
 
-Until we are collecting real data for the switching time with BlueZ, we
-will have no idea anyway and everything will be a guess.
-
-Regards
-
-Marcel
-
+diff --git a/src/eir.c b/src/eir.c
+index 8772191..8ada364 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -69,7 +69,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data)
+ 	uuid_t service;
+ 	char *uuid_str;
+ 	const char *name = NULL;
+-	size_t name_len;
++	size_t name_len = 0;
+ 	unsigned int i;
+ 
+ 	eir->flags = -1;
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 7621926..653ec76 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -20,6 +20,10 @@
+  *
+  */
+ 
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
+ #include <gdbus.h>
+ #include <errno.h>
+ #include <bluetooth/uuid.h>
+@@ -34,6 +38,7 @@
+ #include "att.h"
+ #include "gatt.h"
+ #include "thermometer.h"
++#include "glib-helper.h"
+ 
+ #define THERMOMETER_INTERFACE "org.bluez.Thermometer"
+ 
+-- 
+1.7.1
 
