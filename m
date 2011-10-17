@@ -1,150 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 17 Oct 2011 10:31:24 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: Gustavo Padovan <padovan@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
+Subject: Re: [PATCH 9/9] Bluetooth: Add signal handlers for channel moves
+Message-ID: <20111017073122.GC6724@aemeltch-MOBL1>
+References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
+ <1318543247-27130-10-git-send-email-mathewm@codeaurora.org>
+ <20111014184650.GD30989@joana>
+ <alpine.DEB.2.02.1110141618420.9993@mathewm-linux>
 MIME-Version: 1.0
-In-Reply-To: <1318627712-9725-2-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1318627712-9725-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1318627712-9725-2-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Mon, 17 Oct 2011 10:35:21 +0300
-Message-ID: <CABBYNZJtpwYtrXyDKHQCd+MhQX9uE649PV3zVdv40qvs2DsmRQ@mail.gmail.com>
-Subject: Re: [PATCH 1/5] AVRCP: Use track's UID in event notification
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <alpine.DEB.2.02.1110141618420.9993@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Mat,
 
-On Sat, Oct 15, 2011 at 12:28 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> When registering for TRACK_CHANGED event, CT expects the track's UID in
-> the INTERIM and CHANGED responses. According to AVRCP 1.3 spec, there
-> are only 2 possible values:
->        1) 0: there's a track selected
->        2) UINT32_MAX: there's no track selected
->
-> AVRCP 1.4 reserves the value UINT64_MAX for the second case. Since this
-> later value is the one used in certification process for best IOP
-> we return UINT64_MAX instead of the former.
->
-> This implementation allows to pass PTS test TP/NFY/BV-05-C.
-> ---
->  audio/avrcp.c |   16 +++++-----------
->  audio/avrcp.h |    1 +
->  audio/media.c |   17 ++++++++++++++++-
->  3 files changed, 22 insertions(+), 12 deletions(-)
->
-> diff --git a/audio/avrcp.c b/audio/avrcp.c
-> index ac7c8d4..076fdf4 100644
-> --- a/audio/avrcp.c
-> +++ b/audio/avrcp.c
-> @@ -363,18 +363,11 @@ int avrcp_player_event(struct avrcp_player *player, uint8_t id, void *data)
->                pdu->params[1] = *((uint8_t *)data);
->
->                break;
-> -       case AVRCP_EVENT_TRACK_CHANGED: {
-> +       case AVRCP_EVENT_TRACK_CHANGED:
->                size = 9;
-> -
-> -               /*
-> -                * AVRCP 1.3 supports only one track identifier: PLAYING
-> -                * (0x0). When 1.4 version is added, this shall be changed to
-> -                * contain the identifier of the track.
-> -                */
-> -               memset(&pdu->params[1], 0, 8);
-> +               memcpy(&pdu->params[1], data, sizeof(uint64_t));
->
->                break;
-> -       }
->        default:
->                error("Unknown event %u", id);
->                return -EINVAL;
-> @@ -828,6 +821,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
->                                                uint8_t transaction)
->  {
->        uint16_t len = ntohs(pdu->params_len);
-> +       uint64_t uid;
->
->        /*
->         * 1 byte for EventID, 4 bytes for Playback interval but the latest
-> @@ -845,8 +839,8 @@ static uint8_t avrcp_handle_register_notification(struct avrcp_player *player,
->                break;
->        case AVRCP_EVENT_TRACK_CHANGED:
->                len = 9;
-> -
-> -               memset(&pdu->params[1], 0, 8);
-> +               uid = player->cb->get_uid(player->user_data);
-> +               memcpy(&pdu->params[1], &uid, sizeof(uint64_t));
->
->                break;
->        default:
-> diff --git a/audio/avrcp.h b/audio/avrcp.h
-> index 360a80a..8cf95a4 100644
-> --- a/audio/avrcp.h
-> +++ b/audio/avrcp.h
-> @@ -75,6 +75,7 @@
->  struct avrcp_player_cb {
->        int (*get_setting) (uint8_t attr, void *user_data);
->        int (*set_setting) (uint8_t attr, uint8_t value, void *user_data);
-> +       uint64_t (*get_uid) (void *user_data);
->        void *(*get_metadata) (uint32_t id, void *user_data);
->        GList *(*list_metadata) (void *user_data);
->        uint8_t (*get_status) (void *user_data);
-> diff --git a/audio/media.c b/audio/media.c
-> index 519cafe..9ef393b 100644
-> --- a/audio/media.c
-> +++ b/audio/media.c
-> @@ -1168,6 +1168,18 @@ static GList *list_metadata(void *user_data)
->        return g_hash_table_get_keys(mp->track);
->  }
->
-> +static uint64_t get_uid(void *user_data)
-> +{
-> +       struct media_player *mp = user_data;
-> +
-> +       DBG("%p", mp->track);
-> +
-> +       if (mp->track == NULL)
-> +               return UINT64_MAX;
-> +
-> +       return 0;
-> +}
-> +
->  static void *get_metadata(uint32_t id, void *user_data)
->  {
->        struct media_player *mp = user_data;
-> @@ -1220,6 +1232,7 @@ static struct avrcp_player_cb player_cb = {
->        .get_setting = get_setting,
->        .set_setting = set_setting,
->        .list_metadata = list_metadata,
-> +       .get_uid = get_uid,
->        .get_metadata = get_metadata,
->        .get_position = get_position,
->        .get_status = get_status
-> @@ -1369,6 +1382,7 @@ static gboolean parse_player_metadata(struct media_player *mp,
->        GHashTable *track;
->        int ctype;
->        gboolean title = FALSE;
-> +       uint64_t uid;
->
->        ctype = dbus_message_iter_get_arg_type(iter);
->        if (ctype != DBUS_TYPE_ARRAY)
-> @@ -1466,8 +1480,9 @@ static gboolean parse_player_metadata(struct media_player *mp,
->        mp->track = track;
->        mp->position = 0;
->        g_timer_start(mp->timer);
-> +       uid = get_uid(mp);
->
-> -       avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, NULL);
-> +       avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_CHANGED, &uid);
->
->        return TRUE;
->
-> --
-> 1.7.7
->
+On Fri, Oct 14, 2011 at 04:19:53PM -0700, Mat Martineau wrote:
+> >>AMP channels can be moved between BR/EDR and AMP controllers using a
+> >>sequence of signals. Every attempted channel move involves a series of
+> >>four signals:
+> >>
+> >>   Move Initiator                 Move Responder
+> >>        |                                 |
+> >>        |       Move Channel Request      |
+> >>        |  ---------------------------->  |
+> >>        |                                 |
+> >>        |       Move Channel Response     |
+> >>        |  <----------------------------  |
+> >>        |                                 |
+> >>        |       Move Channel Confirm      |
+> >>        |  ---------------------------->  |
+> >>        |                                 |
+> >>        |  Move Channel Confirm Response  |
+> >>	|  <----------------------------  |
+> >>
+> >>All four signals are sent even if the move fails.
+> >>
+> >>Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >>---
+> >> net/bluetooth/l2cap_core.c |  123 ++++++++++++++++++++++++++++++++++++++++++++
+> >> 1 files changed, 123 insertions(+), 0 deletions(-)
+> >>
+> >>diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >>index e38258b..ba64bab 100644
+> >>--- a/net/bluetooth/l2cap_core.c
+> >>+++ b/net/bluetooth/l2cap_core.c
+> >>@@ -2957,6 +2957,112 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
+> >> 	return l2cap_connect_rsp(conn, cmd, data);
+> >> }
+> >>
+> >>+static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+> >>+				u16 icid, u16 result)
+> >>+{
+> >>+	struct l2cap_move_chan_rsp rsp;
+> >>+
+> >>+	BT_DBG("icid %d, result %d", (int) icid, (int) result);
 
-Ack.
+BTW: why do you need type conversion here and below?
 
--- 
-Luiz Augusto von Dentz
+Best regards 
+Andrei Emeltchenko 
+
+> >>+
+> >>+	rsp.icid = cpu_to_le16(icid);
+> >>+	rsp.result = cpu_to_le16(result);
+> >>+
+> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
+> >>+}
+> >>+
+> >>+static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
+> >>+				struct l2cap_chan *chan, u16 icid, u16 result)
+> >>+{
+> >>+	struct l2cap_move_chan_cfm cfm;
+> >>+	u8 ident;
+> >>+
+> >>+	BT_DBG("icid %d, result %d", (int) icid, (int) result);
+> >>+
+> >>+	ident = l2cap_get_ident(conn);
+> >>+	if (chan)
+> >>+		chan->ident = ident;
+> >>+
+> >>+	cfm.icid = cpu_to_le16(icid);
+> >>+	cfm.result = cpu_to_le16(result);
+> >>+
+> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
+> >>+}
+> >>+
+> >>+static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+> >>+					u16 icid)
+> >>+{
+> >>+	struct l2cap_move_chan_cfm_rsp rsp;
+> >>+
+> >>+	BT_DBG("icid %d", (int) icid);
+> >>+
+> >>+	rsp.icid = cpu_to_le16(icid);
+> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
+> >>+}
+> >>+
+> >>+static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+> >>+					struct l2cap_cmd_hdr *cmd, u8 *data)
+> >>+{
+> >>+	struct l2cap_move_chan_req *req = (struct l2cap_move_chan_req *) data;
+> >>+	u16 icid = 0;
+> >>+	u16 result = L2CAP_MOVE_CHAN_REFUSED_NOT_ALLOWED;
+> >>+
+> >>+	icid = le16_to_cpu(req->icid);
+> >>+
+> >>+	BT_DBG("icid %d, dest_amp_id %d", (int) icid, (int) req->dest_amp_id);
+> >>+
+> >>+	/* Placeholder: Always refuse */
+> >>+	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
+> >>+
+> >>+	return 0;
+> >>+}
+> >
+> >It's a good idea protect the move channel request with enable_hs.
+> 
+> Yes, I'll require enable_hs to have the move channel do anything.
+> When enable_hs is false, it seems like it should return a
+> L2CAP_MOVE_CHAN_REFUSED_NOT_ALLOWED response like it does now.
