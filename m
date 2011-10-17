@@ -1,55 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon@janc.net.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon@janc.net.pl>
-Subject: [PATCH] Bluetooth: Increase HCI reset timeout in hci_dev_do_close
-Date: Mon, 17 Oct 2011 23:05:48 +0200
-Message-Id: <1318885549-14784-1-git-send-email-szymon@janc.net.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 17 Oct 2011 18:39:01 -0200
+From: Gustavo Padovan <padovan@profusion.mobi>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2011-10-17
+Message-ID: <20111017203900.GE2631@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi John,
 
-I've noticed that my CSR usb dongle was not working if it was plugged in when
-PC was booting. It looks like I get two HCI reset command complete events (see
-hcidump logs below).
-The root cause is reset called from off_timer. Timeout for this reset to
-complete is set to 250ms and my bt dongle requires more time for replying with
-command complete event. After that, chip seems to reply with reset command
-complete event for next non-reset command.
+As the 3.1 release is taking too long to happen I decided to send you another
+pull request. If you think it's too late just ignore it, or queue it up for
+3.3 merge window. Do what is better to you. ;)
 
-Attached patch increase mentioned timeout to HCI_INIT_TIMEOUT, this value is
-already used for timeouting hci_reset_req in hci_dev_reset().
+The bigger changes here are from Andrei, he did many changes in L2CAP looking
+forward for the Bluetooth 3.0 High Speed implementation. It is the biggest
+change on High Speed until now.
 
-This might also be related to BT not working after suspend that was reported
-here some time ago.
+There are some fixes on the hidp module by David Hermann, Peter Hurley and me.
+The rest are just clean ups and small fixes.
 
+Thanks.
 
-Hcidump log:
-
-2011-09-12 23:13:27.379465 < HCI Command: Reset (0x03|0x0003) plen 0
-2011-09-12 23:13:27.380797 > HCI Event: Command Complete (0x0e) plen 4
-    Reset (0x03|0x0003) ncmd 1
-    status 0x00
-2011-09-12 23:13:27.380859 < HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
-2011-09-12 23:13:27.760789 > HCI Event: Command Complete (0x0e) plen 4
-    Reset (0x03|0x0003) ncmd 1
-    status 0x00
-2011-09-12 23:13:27.760831 < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-2011-09-12 23:13:27.764780 > HCI Event: Command Complete (0x0e) plen 12
-    Read Local Version Information (0x04|0x0001) ncmd 1
-    status 0x00
-    HCI Version: 1.1 (0x1) HCI Revision: 0x36f
-    LMP Version: 1.1 (0x1) LMP Subversion: 0x36f
-    Manufacturer: Cambridge Silicon Radio (10)
-
-Szymon Janc (1):
-  Bluetooth: Increase HCI reset timeout in hci_dev_do_close
-
- net/bluetooth/hci_core.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
--- 
-1.7.7
+	Gustavo
 
 
+The following changes since commit fd38f734cb8200529e281338514945fcbff2364b:
+
+  igbvf: convert to ndo_fix_features (2011-10-16 13:18:47 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/padovan/bluetooth-next.git master
+
+Andrei Emeltchenko (27):
+      Bluetooth: EFS: l2cap extended feature mask update
+      Bluetooth: EFS: add enable_hs kernel param
+      Bluetooth: convert flushable variable to flag in l2cap chan
+      Bluetooth: convert force_reliable variable to flag in l2cap chan
+      Bluetooth: convert force_active variable to flag in l2cap chan
+      Bluetooth: convert role_switch variable to flag in l2cap chan
+      Bluetooth: clean up spaces in L2CAP header
+      Bluetooth: EWS: extended window size option support
+      Bluetooth: EWS: adds ext control field bit mask
+      Bluetooth: EWS: rewrite handling Supervisory (S) bits
+      Bluetooth: EWS: rewrite handling SAR bits
+      Bluetooth: EWS: rewrite reqseq calculation
+      Bluetooth: EWS: rewrite L2CAP ERTM txseq calculation
+      Bluetooth: EWS: rewrite check frame type function
+      Bluetooth: EWS: rewrite handling FINAL (F) bit
+      Bluetooth: EWS: rewrite handling POLL (P) bit
+      Bluetooth: EWS: recalculate L2CAP header size
+      Bluetooth: EWS: define L2CAP header sizes
+      Bluetooth: EFS: definitions and headers
+      Bluetooth: EFS: assign default values in chan add
+      Bluetooth: EFS: add efs option in L2CAP conf req
+      Bluetooth: AMP: read local amp info HCI command
+      Bluetooth: EWS: handling different Control fields
+      Bluetooth: EWS: support extended seq numbers
+      Bluetooth: EWS: remove magic numbers in l2cap
+      Bluetooth: EWS: fix max_pdu calculation
+      Bluetooth: EFS: parse L2CAP config request
+
+David Herrmann (4):
+      Bluetooth: hidp: Stop I/O on shutdown
+      Bluetooth: Fix hci core device initialization
+      Bluetooth: Rename sysfs un/register to add/del
+      Bluetooth: Forward errors from hci_register_dev
+
+Gustavo F. Padovan (14):
+      Bluetooth: use list_for_each_entry() in hidp
+      Bluetooth: prioritize the interrupt channel in hidp
+      Bluetooth: Trasmit interrupt channel messages first
+      Bluetooth: Fix input device registration
+      Bluetooth: Remove wrong error check
+      Bluetooth: Uses test_and_clear_bit() when possible
+      Bluetooth: Delay session allocation in hidp
+      Bluetooth: Rename hidp_find_connection()
+      Bluetooth: Fix permission of enable_le param
+      Bluetooth: return proper error if sock_queue_rcv_skb() fails
+      Bluetooth: Add missing cmd_status() in mgmt
+      Bluetooth: Use list_for_each_entry() in mgmt
+      Bluetooth: Fix mgmt interaction with userspace
+      Bluetooth: Fix missing cmd_status in mgmt
+
+Paul Bolle (2):
+      Bluetooth: btusb: also be quiet when suspending
+      Bluetooth: btusb: hide more usb_submit_urb errors
+
+Peter Hurley (1):
+      Bluetooth: hidp: safely acquire hci connection
+
+ drivers/bluetooth/btusb.c         |   13 +-
+ include/net/bluetooth/bluetooth.h |    2 +-
+ include/net/bluetooth/hci.h       |   15 +
+ include/net/bluetooth/hci_core.h  |   16 +-
+ include/net/bluetooth/l2cap.h     |  342 ++++++++++++++++++----
+ include/net/bluetooth/mgmt.h      |    2 -
+ net/bluetooth/hci_core.c          |   21 +-
+ net/bluetooth/hci_event.c         |   30 ++-
+ net/bluetooth/hci_sysfs.c         |   22 +-
+ net/bluetooth/hidp/core.c         |  150 +++++-----
+ net/bluetooth/l2cap_core.c        |  594 ++++++++++++++++++++++++-------------
+ net/bluetooth/l2cap_sock.c        |   51 ++--
+ net/bluetooth/mgmt.c              |   26 +-
+ 13 files changed, 905 insertions(+), 379 deletions(-)
