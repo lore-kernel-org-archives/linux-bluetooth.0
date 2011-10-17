@@ -1,62 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] fix build
-Date: Mon, 17 Oct 2011 17:56:05 +0200
-Message-Id: <1318866965-11091-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH] Bluetooth: convert spaces to tabs in l2cap
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 17 Oct 2011 08:52:07 -0700
+In-Reply-To: <1318859423-26489-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1318859423-26489-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1318866730.15441.99.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-src/eir.c: In function 'eir_parse':
-src/eir.c:72: error: 'name_len' may be used uninitialized in this function
+Hi Andrei,
 
-and
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  include/net/bluetooth/l2cap.h |  108 ++++++++++++++++++++--------------------
+>  1 files changed, 54 insertions(+), 54 deletions(-)
 
-thermometer/thermometer.c: In function 'destroy_char':
-thermometer/thermometer.c:79: error: implicit declaration of function 'g_slist_free_full'
----
- src/eir.c                 |    2 +-
- thermometer/thermometer.c |    5 +++++
- 2 files changed, 6 insertions(+), 1 deletions(-)
+please lets not do that. It will break too many peoples pending patches
+right now and it is sort of legacy in Bluetooth coding style to keep
+these as spaces. Same as for HCI btw.
 
-diff --git a/src/eir.c b/src/eir.c
-index 8772191..8ada364 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -69,7 +69,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data)
- 	uuid_t service;
- 	char *uuid_str;
- 	const char *name = NULL;
--	size_t name_len;
-+	size_t name_len = 0;
- 	unsigned int i;
- 
- 	eir->flags = -1;
-diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 7621926..653ec76 100644
---- a/thermometer/thermometer.c
-+++ b/thermometer/thermometer.c
-@@ -20,6 +20,10 @@
-  *
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
- #include <gdbus.h>
- #include <errno.h>
- #include <bluetooth/uuid.h>
-@@ -34,6 +38,7 @@
- #include "att.h"
- #include "gatt.h"
- #include "thermometer.h"
-+#include "glib-helper.h"
- 
- #define THERMOMETER_INTERFACE "org.bluez.Thermometer"
- 
--- 
-1.7.1
+Regards
+
+Marcel
+
 
