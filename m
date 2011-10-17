@@ -1,124 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Oct 2011 10:31:24 +0300
+Date: Mon, 17 Oct 2011 10:23:46 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Mat Martineau <mathewm@codeaurora.org>
-Cc: Gustavo Padovan <padovan@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org, pkrystad@codeaurora.org
-Subject: Re: [PATCH 9/9] Bluetooth: Add signal handlers for channel moves
-Message-ID: <20111017073122.GC6724@aemeltch-MOBL1>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org
+Subject: Re: [PATCH 4/9] Bluetooth: Add AMP-related data and structures for
+ channel signals
+Message-ID: <20111017072343.GB6724@aemeltch-MOBL1>
 References: <1318543247-27130-1-git-send-email-mathewm@codeaurora.org>
- <1318543247-27130-10-git-send-email-mathewm@codeaurora.org>
- <20111014184650.GD30989@joana>
- <alpine.DEB.2.02.1110141618420.9993@mathewm-linux>
+ <1318543247-27130-5-git-send-email-mathewm@codeaurora.org>
+ <20111014121912.GA4753@aemeltch-MOBL1>
+ <alpine.DEB.2.02.1110141541560.9993@mathewm-linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.DEB.2.02.1110141618420.9993@mathewm-linux>
+In-Reply-To: <alpine.DEB.2.02.1110141541560.9993@mathewm-linux>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-On Fri, Oct 14, 2011 at 04:19:53PM -0700, Mat Martineau wrote:
-> >>AMP channels can be moved between BR/EDR and AMP controllers using a
-> >>sequence of signals. Every attempted channel move involves a series of
-> >>four signals:
-> >>
-> >>   Move Initiator                 Move Responder
-> >>        |                                 |
-> >>        |       Move Channel Request      |
-> >>        |  ---------------------------->  |
-> >>        |                                 |
-> >>        |       Move Channel Response     |
-> >>        |  <----------------------------  |
-> >>        |                                 |
-> >>        |       Move Channel Confirm      |
-> >>        |  ---------------------------->  |
-> >>        |                                 |
-> >>        |  Move Channel Confirm Response  |
-> >>	|  <----------------------------  |
-> >>
-> >>All four signals are sent even if the move fails.
-> >>
-> >>Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
-> >>---
-> >> net/bluetooth/l2cap_core.c |  123 ++++++++++++++++++++++++++++++++++++++++++++
-> >> 1 files changed, 123 insertions(+), 0 deletions(-)
-> >>
-> >>diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >>index e38258b..ba64bab 100644
-> >>--- a/net/bluetooth/l2cap_core.c
-> >>+++ b/net/bluetooth/l2cap_core.c
-> >>@@ -2957,6 +2957,112 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
-> >> 	return l2cap_connect_rsp(conn, cmd, data);
-> >> }
-> >>
-> >>+static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
-> >>+				u16 icid, u16 result)
-> >>+{
-> >>+	struct l2cap_move_chan_rsp rsp;
+On Fri, Oct 14, 2011 at 03:58:27PM -0700, Mat Martineau wrote:
+> >>+#define L2CAP_CREATE_CHAN_STATUS_NONE		0x0000
+> >>+#define L2CAP_CREATE_CHAN_STATUS_AUTHENTICATION	0x0001
+> >>+#define L2CAP_CREATE_CHAN_STATUS_AUTHORIZATION	0x0002
+> >
+> >Isn't it a little bit log? why not CR/CS as it is already done?
+> 
+> I was staying close to the spec, but I admit it's verbose by Linux
+> kernel standards.  I'll adopt your shorter names.
+> 
+> 
+> >BTW: I've done it different way. Since STATUS and RESULT are almost the same for
+> >connect/create my patch is:
+> >
+> ><------8<-----------------------------------------
+> >|  @@ -214,14 +216,15 @@ struct l2cap_conn_rsp {
+> >|   #define L2CAP_CID_DYN_START    0x0040
+> >|   #define L2CAP_CID_DYN_END      0xffff
+> >|
+> >|  -/* connect result */
+> >|  +/* connect/create channel results */
+> >|   #define L2CAP_CR_SUCCESS       0x0000
+> >|   #define L2CAP_CR_PEND          0x0001
+> >|   #define L2CAP_CR_BAD_PSM       0x0002
+> >|   #define L2CAP_CR_SEC_BLOCK     0x0003
+> >|   #define L2CAP_CR_NO_MEM                0x0004
+> >|  +#define L2CAP_CR_BAD_AMP       0x0005
+> >|
+> >|  -/* connect status */
+> >|  +/* connect/create channel status */
+> >|   #define L2CAP_CS_NO_INFO       0x0000
+> >|   #define L2CAP_CS_AUTHEN_PEND   0x0001
+> >|   #define L2CAP_CS_AUTHOR_PEND   0x0002
+> >|
+> ><------8<-----------------------------------------
+> >
 > >>+
-> >>+	BT_DBG("icid %d, result %d", (int) icid, (int) result);
+> >>+struct l2cap_move_chan_req {
+> >>+	__le16      icid;
+> >>+	__u8        dest_amp_id;
+> >>+} __attribute__ ((packed));
+> >>+
+> >>+struct l2cap_move_chan_rsp {
+> >>+	__le16      icid;
+> >>+	__le16      result;
+> >>+} __attribute__ ((packed));
+> >>+
+> >>+#define L2CAP_MOVE_CHAN_SUCCESS			0x0000
+> >>+#define L2CAP_MOVE_CHAN_PENDING			0x0001
+> >>+#define L2CAP_MOVE_CHAN_REFUSED_CONTROLLER	0x0002
+> >>+#define L2CAP_MOVE_CHAN_REFUSED_SAME_ID		0x0003
+> >>+#define L2CAP_MOVE_CHAN_REFUSED_CONFIG		0x0004
+> >>+#define L2CAP_MOVE_CHAN_REFUSED_COLLISION	0x0005
+> >>+#define L2CAP_MOVE_CHAN_REFUSED_NOT_ALLOWED	0x0006
+> >
+> >Same here: use CR and shorter names
+> 
+> How about L2CAP_MC_SUCCESS, L2CAP_MC_PEND, etc.?  While create
+> channel is very similar to the connect request, moving a channel is
+> a whole different idea.
 
-BTW: why do you need type conversion here and below?
+Maybe MR (Move Result, similar to CR) is better.
 
 Best regards 
 Andrei Emeltchenko 
 
-> >>+
-> >>+	rsp.icid = cpu_to_le16(icid);
-> >>+	rsp.result = cpu_to_le16(result);
-> >>+
-> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
-> >>+}
-> >>+
-> >>+static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
-> >>+				struct l2cap_chan *chan, u16 icid, u16 result)
-> >>+{
-> >>+	struct l2cap_move_chan_cfm cfm;
-> >>+	u8 ident;
-> >>+
-> >>+	BT_DBG("icid %d, result %d", (int) icid, (int) result);
-> >>+
-> >>+	ident = l2cap_get_ident(conn);
-> >>+	if (chan)
-> >>+		chan->ident = ident;
-> >>+
-> >>+	cfm.icid = cpu_to_le16(icid);
-> >>+	cfm.result = cpu_to_le16(result);
-> >>+
-> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
-> >>+}
-> >>+
-> >>+static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
-> >>+					u16 icid)
-> >>+{
-> >>+	struct l2cap_move_chan_cfm_rsp rsp;
-> >>+
-> >>+	BT_DBG("icid %d", (int) icid);
-> >>+
-> >>+	rsp.icid = cpu_to_le16(icid);
-> >>+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
-> >>+}
-> >>+
-> >>+static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
-> >>+					struct l2cap_cmd_hdr *cmd, u8 *data)
-> >>+{
-> >>+	struct l2cap_move_chan_req *req = (struct l2cap_move_chan_req *) data;
-> >>+	u16 icid = 0;
-> >>+	u16 result = L2CAP_MOVE_CHAN_REFUSED_NOT_ALLOWED;
-> >>+
-> >>+	icid = le16_to_cpu(req->icid);
-> >>+
-> >>+	BT_DBG("icid %d, dest_amp_id %d", (int) icid, (int) req->dest_amp_id);
-> >>+
-> >>+	/* Placeholder: Always refuse */
-> >>+	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
-> >>+
-> >>+	return 0;
-> >>+}
-> >
-> >It's a good idea protect the move channel request with enable_hs.
-> 
-> Yes, I'll require enable_hs to have the move channel do anything.
-> When enable_hs is false, it seems like it should return a
-> L2CAP_MOVE_CHAN_REFUSED_NOT_ALLOWED response like it does now.
