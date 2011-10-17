@@ -1,28 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 0/4] last chunks of EWS patch
-Date: Mon, 17 Oct 2011 12:19:55 +0300
-Message-Id: <1318843199-18232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 17 Oct 2011 11:26:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Santiago Carot-Nemesio <sancane@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Health Thermometer Profile
+Message-ID: <20111017082637.GA14717@fusion.localdomain>
+References: <1318519762-17475-1-git-send-email-sancane@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318519762-17475-1-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Santiago,
 
-Changes:
-	v4->v5: change __get_ctrl_size => __ctrl_size
+On Thu, Oct 13, 2011, Santiago Carot-Nemesio wrote:
+> This is a new set of patches for HTP wich include all changes sugested previously.
+> 
+> [PATCH 1/9] Get thermometer service range to load the driver.
+> [PATCH 2/9] Register Health Thermometer Interface
+> [PATCH 3/9] Unregister Health Thermometer Interface
+> [PATCH 4/9] Add functions to manage attio callbacks
+> [PATCH 5/9] Add handler function to manage GATT indications
+> [PATCH 6/9] Get all characteristics in thermometer service
+> [PATCH 7/9] Read temperature type characteristic
+> [PATCH 8/9] Read measurement interval characteristic
+> [PATCH 9/9] Set Intermediate property if intermediate temp.
 
-Andrei Emeltchenko (4):
-  Bluetooth: EWS: handling different Control fields
-  Bluetooth: EWS: support extended seq numbers
-  Bluetooth: EWS: remove magic numbers in l2cap
-  Bluetooth: EWS: fix max_pdu calculation
+All 9 patches have been applied. Thanks.
 
- include/net/bluetooth/bluetooth.h |    2 +-
- include/net/bluetooth/l2cap.h     |   45 +++++++
- net/bluetooth/l2cap_core.c        |  246 ++++++++++++++++++++-----------------
- 3 files changed, 181 insertions(+), 112 deletions(-)
-
--- 
-1.7.4.1
-
+Johan
