@@ -1,43 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <4E9CF709.6080706@globaledgesoft.com>
-References: <4E9CF709.6080706@globaledgesoft.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Tue, 18 Oct 2011 20:13:30 -0200
-Message-ID: <CAMOw1v7vqcsqFS3AmuoxHxQXXo-CWea8xJFSomyfDgkFo3b4FQ@mail.gmail.com>
-Subject: Re: AVRCP
-To: sathish <sathish.n@globaledgesoft.com>
+In-Reply-To: <1318953068.15441.124.camel@aeonflux>
+References: <1318925545-4128-1-git-send-email-luiz.dentz@gmail.com>
+	<1318953068.15441.124.camel@aeonflux>
+Date: Wed, 19 Oct 2011 01:04:41 +0300
+Message-ID: <CABBYNZK5zgFWkQa3nuGWjMXQqYL59aBseFFrPa0zy8M01OBwgA@mail.gmail.com>
+Subject: Re: [PATCH obexd] gobex: add missing checks for config.h
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sathish
+Hi Marcel,
 
-On Tue, Oct 18, 2011 at 1:48 AM, sathish <sathish.n@globaledgesoft.com> wrote:
-> Hi,
->   I like to know , how to implement avrcp between two systems in Linux using
-> bluez . Is there any one one who can help me. where bluez supports both
-> control and target. but how to implement it .
+On Tue, Oct 18, 2011 at 6:51 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Luiz,
+>
+>> =A0gobex/gobex-defs.c =A0 | =A0 =A04 ++++
+>> =A0gobex/gobex-header.c | =A0 =A04 ++++
+>> =A0gobex/gobex-packet.c | =A0 =A04 ++++
+>> =A03 files changed, 12 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
+>> index f1f3b38..beb773d 100644
+>> --- a/gobex/gobex-defs.c
+>> +++ b/gobex/gobex-defs.c
+>> @@ -19,6 +19,10 @@
+>> =A0 *
+>> =A0 */
+>>
+>> +#ifdef HAVE_CONFIG_H
+>> +# include "config.h"
+>
+> what is this space between # and include doing here. Please remove that.
+>
+> And it is <config.h> and not "config.h".
 
-The functionality provided in control role is very limited. It's only
-some pieces of 1.0 spec. Since target only reacts to commands coming
-from CT, you'll not be able to do anything useful with 2 systems using
-Linux.
+Copy/paste, well I guess while Im at it I can change all other places
+to be consistent with what you are saying.
 
-
-If you want to use it only as target, it has all the mandatory
-features of AVRCP 1.3 + some optional ones. Then you can use it by:
-
-1) Enable the Media interface in /etc/bluetooth/audio.conf
-2) Start bluetoothd service
-3) Start test/mpris-player
-4) Use a media player that supports mpris 2.0: amarok, rhytmbox and a
-few others.
-
-If you are going to implement it in a media player, I suggest
-implementing our dbus interface, so you can cut the 3rd step.
-
-
-regards,
-Lucas De Marchi
+--=20
+Luiz Augusto von Dentz
