@@ -1,42 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Oct 2011 10:56:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH bluez 1/2] add definitions for L2CAP fixed channels
-Message-ID: <20111018075610.GA28040@fusion.localdomain>
-References: <1318921872-18474-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1318921872-18474-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1318921872-18474-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv5 hcidump 1/3] add btohll macro
+Date: Tue, 18 Oct 2011 10:46:12 +0300
+Message-Id: <1318923974-20817-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1318923974-20817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1318923974-20817-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Oct 18, 2011, Emeltchenko Andrei wrote:
-> ---
->  lib/l2cap.h |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
-> 
-> diff --git a/lib/l2cap.h b/lib/l2cap.h
-> index 47b3dc3..3880551 100644
-> --- a/lib/l2cap.h
-> +++ b/lib/l2cap.h
-> @@ -139,6 +139,11 @@ struct l2cap_conninfo {
->  
->  #define L2CAP_SDULEN_SIZE	2
->  
-> +/* L2CAP fixed channels */
-> +#define L2CAP_FC_L2CAP		0x02
-> +#define L2CAP_FC_CONNLESS	0x04
-> +#define L2CAP_FC_A2MP		0x08
-> +
->  /* L2CAP structures */
->  typedef struct {
->  	uint16_t	len;
+handle 64 bit swap
+---
+ lib/bluetooth.h |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-This doesn't apply to current bluez.git.
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 738e07a..b0680e2 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -93,13 +93,17 @@ enum {
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ #define htobs(d)  (d)
+ #define htobl(d)  (d)
++#define htobll(d) (d)
+ #define btohs(d)  (d)
+ #define btohl(d)  (d)
++#define btohll(d) (d)
+ #elif __BYTE_ORDER == __BIG_ENDIAN
+ #define htobs(d)  bswap_16(d)
+ #define htobl(d)  bswap_32(d)
++#define htobll(d) bswap_64(d)
+ #define btohs(d)  bswap_16(d)
+ #define btohl(d)  bswap_32(d)
++#define btohll(d) bswap_64(d)
+ #else
+ #error "Unknown byte order"
+ #endif
+-- 
+1.7.4.1
 
-Johan
