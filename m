@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+From: Tom Obermayr <to@obit.at>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 18 Oct 2011 22:15:47 +0200
+Subject: Changes with "newer" versions of BlueZ
+Message-ID: <86CCF0EF1DC939439CD39C468BE7BD9C03A68A60A6B4@hal08.bla.local>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1318953068.15441.124.camel@aeonflux>
-References: <1318925545-4128-1-git-send-email-luiz.dentz@gmail.com>
-	<1318953068.15441.124.camel@aeonflux>
-Date: Wed, 19 Oct 2011 01:04:41 +0300
-Message-ID: <CABBYNZK5zgFWkQa3nuGWjMXQqYL59aBseFFrPa0zy8M01OBwgA@mail.gmail.com>
-Subject: Re: [PATCH obexd] gobex: add missing checks for config.h
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Tue, Oct 18, 2011 at 6:51 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Luiz,
->
->> =A0gobex/gobex-defs.c =A0 | =A0 =A04 ++++
->> =A0gobex/gobex-header.c | =A0 =A04 ++++
->> =A0gobex/gobex-packet.c | =A0 =A04 ++++
->> =A03 files changed, 12 insertions(+), 0 deletions(-)
->>
->> diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
->> index f1f3b38..beb773d 100644
->> --- a/gobex/gobex-defs.c
->> +++ b/gobex/gobex-defs.c
->> @@ -19,6 +19,10 @@
->> =A0 *
->> =A0 */
->>
->> +#ifdef HAVE_CONFIG_H
->> +# include "config.h"
->
-> what is this space between # and include doing here. Please remove that.
->
-> And it is <config.h> and not "config.h".
-
-Copy/paste, well I guess while Im at it I can change all other places
-to be consistent with what you are saying.
-
---=20
-Luiz Augusto von Dentz
+SeKAmW0gaGF2aW5nIHNldmVyYWwgcHJvYmxlbXMgd2l0aCAibmV3ZXIiIHZlcnNpb25zIG9mIEJs
+dWVaIOKAkyBzb21lIChvciBldmVuIGFsbCkgb2Ygd2hpY2ggbWlnaHQgYmUgaW50ZW50aW9uYWws
+IGJ1dCBJ4oCZbSBpbnRlcmVzdGVkIGluIHNvbHV0aW9ucyBvciB3b3JrYXJvdW5kcy4NCg0KUHJl
+dmlvdXNseSB1c2VkIGJsdWV6IG9uIGEgQ2VudE9TIDUgc3lzdGVtIHdpdGggdGhlIGZvbGxvd2lu
+ZyB2ZXJzaW9uczoNCg0KCUxpbnV4IDIuNi4xOC0yNzQuZWw1IA0KCWJsdWV6LWxpYnMtMy43LTEu
+MQ0KCWJsdWV6LWhjaWR1bXAtMS4zMi0xDQoJYmx1ZXotdXRpbHMtMy43LTIuMi5lbDUuY2VudG9z
+DQoNCldpdGggdGhhdCBzeXN0ZW0gZXZlcnl0aGluZyB3b3JrZWQgZmluZSwgdXNpbmcgZml2ZSBk
+aWZmZXJlbnQgdXNiIGJ0IGFkYXB0ZXJzLiBJIGNvdWxkIGwycGluZyBhbiBhcmJpdHJhcnkgYnQg
+ZGV2aWNlLCBjcmVhdGUgY29ubmVjdGlvbnMgd2l0aCBoY2l0b29sIGNjIHRoYXQgc3RheWVkIGFj
+dGl2ZSB1bnRpbCBJIGRpc2Nvbm5lY3RlZCB0aGVtIGFnYWluIChhbGwgd2l0aG91dCBwYWlyaW5n
+IG9yIGF1dGhlbnRpY2F0aW5nKS4NCg0KTm93IEkgaGF2ZSB0d28gbmV3ZXIgc3lzdGVtcyB0aGF0
+IHJ1biBvbiBibHVleiAzLjM2IChPcGVuV1JUKSBhbmQgNC45NiAoVWJ1bnR1IDExLjEwKSwgYW5k
+IHdpdGggYm90aCB0aGVzZSBzeXN0ZW1zIHRoZSBiZWhhdmlvciBoYXMgY2hhbmdlZC4NCg0KV2l0
+aCA0Ljk2IEkgY2Fubm90IGV2ZW4gbDJwaW5nIGFub3RoZXIgZGV2aWNlLiBMMnBpbmcgcmVwb3J0
+czoNCg0KCUNhbid0IGNvbm5lY3Q6IFBlcm1pc3Npb24gZGVuaWVkDQoNCkhjaWR1bXAgcnVubmlu
+ZyBkdXJpbmcgbDJwaW5nOg0KDQo+IEhDSSBFdmVudDogU2ltcGxlIFBhaXJpbmcgQ29tcGxldGUg
+KDB4MzYpIHBsZW4gNw0KwqDCoMKgIHN0YXR1cyAweDA1IGJkYWRkciA3QzpDNTozNzpGQzoyNzpC
+MA0KwqDCoMKgIEVycm9yOiBBdXRoZW50aWNhdGlvbiBGYWlsdXJlDQo+IEhDSSBFdmVudDogQXV0
+aCBDb21wbGV0ZSAoMHgwNikgcGxlbiAzDQrCoMKgwqAgc3RhdHVzIDB4MDUgaGFuZGxlIDQzDQrC
+oMKgwqAgRXJyb3I6IEF1dGhlbnRpY2F0aW9uIEZhaWx1cmUNCjwgSENJIENvbW1hbmQ6IERpc2Nv
+bm5lY3QgKDB4MDF8MHgwMDA2KSBwbGVuIDMNCsKgwqDCoCBoYW5kbGUgNDMgcmVhc29uIDB4MTMN
+CsKgwqDCoCBSZWFzb246IFJlbW90ZSBVc2VyIFRlcm1pbmF0ZWQgQ29ubmVjdGlvbg0KDQpJIHRy
+aWVkIHNldHRpbmcgaGNpY29uZmlnIG5vYXV0aCBidXQgdGhhdCBkb2VzbuKAmXQgbWFrZSBhbnkg
+ZGlmZmVyZW5jZS4gV2hhdCBkbyBJIGhhdmUgdG8gY29uZmlndXJlIHNldCB0byBnZXQgbDJwaW5n
+IHdvcmtpbmcgYWdhaW4gbGlrZSBpbiB0aGUgb2xkZXIgYmx1ZXogdmVyc2lvbnM/DQoNClRoaXMg
+c3RpbGwgd29ya3MgaW4gMy4zNiwgYnV0IG5vdCBpbiA0Ljk2Lg0KDQpBbm90aGVyIHByb2JsZW0g
+d2l0aCBib3RoIDMuMzYgYW5kIDQuOTYgaXMgc3VwcG9ydCBmb3Igb2xkIGJ0IGFkYXB0ZXJzLiAz
+Ljcgd29ya3MgZmluZSB3aXRoIGFsbCBteSBvbGQgYWRhcHRlcnMsIDMuMzYgYW5kIDQuOTYgYXBw
+YXJlbnRseSBjYW7igJl0IHNldCBsaW5rIHBvbGljeSBvbiB0aG9zZSBvbGRlciBhZGFwdGVycy4g
+SXMgdGhlcmUgYW4gZWFzeSB3b3JrYXJvdW5kIGZvciB0aGlzPyBJZiBub3QgSeKAmWxsIGp1c3Qg
+YnV5IHNvbWUgbW9yZSDigqwxMCBhZGFwdGVyc+KApg0KDQpUaGUgdGhpcmQgZGlmZmVyZW5jZSBJ
+IG5vdGljZWQgaXMgd2l0aCBjb25uZWN0aW9ucyBjcmVhdGVkIHdpdGggaGNpdG9vbCBjYy4gT24g
+My43IHRoYXQgY29ubmVjdGlvbiBzdGF5cyB1cCB1bnRpbCBJIGRpc2Nvbm5lY3QgYWdhaW4gd2l0
+aCBoY2l0b29sIGRjLiBPbiAzLjM2IGFuZCA0Ljk2IHRoZSBjb25uZWN0aW9uIGlzIGNyZWF0ZWQg
+YnV0IGF1dG9tYXRpY2FsbHkgZGlzY29ubmVjdHMgYWZ0ZXIgYSBzZWNvbmQgb3IgdHdvLiBUaGlz
+IGlzIHByb2JhYmx5IGFsbCBjb25uZWN0ZWQgd2l0aCBhdXRoZW50aWNhdGlvbiBvciBwZXJtaXNz
+aW9ucyBzb21laG93LCBidXQgYWdhaW4gSeKAmWQgbGlrZSB0byBiZSBhYmxlIHRvIHJlY3JlYXRl
+IHRoZSBvbGQgYmVoYXZpb3Igb2YgMy43Lg0KDQpJIGRvbuKAmXQga25vdyBleGFjdGx5IHdoaWNo
+IHZlcnNpb25zIGludHJvZHVjZWQgdGhvc2UgY2hhbmdlcyBhcyBJIG9ubHkgaGF2ZSB0aG9zZSB0
+aHJlZSB2ZXJzaW9ucyBhdmFpbGFibGUgb24gc3lzdGVtcy4NCg0KSeKAmWxsIGJlIGhhcHB5IHRv
+IHN1cHBseSB0cmFjZXMsIGRlYnVnIGxvZ3MgZXRjLiBpZiBpdCBjYW4gaGVscC4NCg0KUmVnYXJk
+cywNCg0KVG9tDQoNCg==
