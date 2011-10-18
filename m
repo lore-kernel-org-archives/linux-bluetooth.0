@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Cc: chanyeol.park@samsung.com
-Subject: [PATCH] Fix missing initialization of eir name_len
-Date: Tue, 18 Oct 2011 19:42:02 +0900
-Message-id: <1318934522-31475-1-git-send-email-chanyeol.park@samsung.com>
+Date: Tue, 18 Oct 2011 13:30:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4] fix implicit declaration of 'g_slist_free_full'
+Message-ID: <20111018103059.GA24843@fusion.localdomain>
+References: <1318932653-15433-1-git-send-email-frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1318932653-15433-1-git-send-email-frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Frédéric,
 
----
- src/eir.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+On Tue, Oct 18, 2011, Frédéric Danis wrote:
+> audio/avrcp.c: In function 'avrcp_unregister':
+> audio/avrcp.c:1253: error: implicit declaration of function 'g_slist_free_full'
+> 
+> thermometer/thermometer.c: In function 'destroy_char':
+> thermometer/thermometer.c:79: error: implicit declaration of function 'g_slist_free_full'
+> ---
+>  audio/avrcp.c             |    2 +-
+>  thermometer/thermometer.c |    5 +++++
+>  2 files changed, 6 insertions(+), 1 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index e82d30b..b76bfa2 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -70,7 +70,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data)
- 	uuid_t service;
- 	char *uuid_str;
- 	const char *name = NULL;
--	size_t name_len;
-+	size_t name_len = 0;
- 	unsigned int i;
- 
- 	eir->flags = -1;
--- 
-1.7.4.1
+Applied. Thanks.
 
+Btw, to be consistent with the commit history, in the future please
+start the commit message with a capital letter, i.e. "Fix.." instead of
+"fix..".
+
+Johan
