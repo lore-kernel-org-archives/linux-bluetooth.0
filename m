@@ -1,65 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd] gobex: add missing checks for config.h
-Date: Tue, 18 Oct 2011 11:12:25 +0300
-Message-Id: <1318925545-4128-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 18 Oct 2011 10:56:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH bluez 1/2] add definitions for L2CAP fixed channels
+Message-ID: <20111018075610.GA28040@fusion.localdomain>
+References: <1318921872-18474-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1318921872-18474-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318921872-18474-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
----
- gobex/gobex-defs.c   |    4 ++++
- gobex/gobex-header.c |    4 ++++
- gobex/gobex-packet.c |    4 ++++
- 3 files changed, 12 insertions(+), 0 deletions(-)
+On Tue, Oct 18, 2011, Emeltchenko Andrei wrote:
+> ---
+>  lib/l2cap.h |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+> 
+> diff --git a/lib/l2cap.h b/lib/l2cap.h
+> index 47b3dc3..3880551 100644
+> --- a/lib/l2cap.h
+> +++ b/lib/l2cap.h
+> @@ -139,6 +139,11 @@ struct l2cap_conninfo {
+>  
+>  #define L2CAP_SDULEN_SIZE	2
+>  
+> +/* L2CAP fixed channels */
+> +#define L2CAP_FC_L2CAP		0x02
+> +#define L2CAP_FC_CONNLESS	0x04
+> +#define L2CAP_FC_A2MP		0x08
+> +
+>  /* L2CAP structures */
+>  typedef struct {
+>  	uint16_t	len;
 
-diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
-index f1f3b38..beb773d 100644
---- a/gobex/gobex-defs.c
-+++ b/gobex/gobex-defs.c
-@@ -19,6 +19,10 @@
-  *
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+# include "config.h"
-+#endif
-+
- #include <glib.h>
- 
- #include "gobex-defs.h"
-diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-index e70d5e4..da982a7 100644
---- a/gobex/gobex-header.c
-+++ b/gobex/gobex-header.c
-@@ -19,6 +19,10 @@
-  *
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+# include "config.h"
-+#endif
-+
- #include <string.h>
- 
- #include "gobex-header.h"
-diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
-index d59bbce..b539430 100644
---- a/gobex/gobex-packet.c
-+++ b/gobex/gobex-packet.c
-@@ -19,6 +19,10 @@
-  *
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+# include "config.h"
-+#endif
-+
- #include <string.h>
- #include <errno.h>
- 
--- 
-1.7.6.4
+This doesn't apply to current bluez.git.
 
+Johan
