@@ -1,25 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vijaykumar Dadmode <Vijaykumar.Dadmode@csr.com>
-To: "'Anderson Lizardo'" <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Proposal for GATT Client Dbus API.
-Date: Tue, 18 Oct 2011 11:02:29 +0000
-Message-ID: <F82830D409D80E4881C83250E051B74B4784F0B3@banasiexm01.ASIA.ROOT.PRI>
-References: <AcyCnA5DqBiEIGAzQEqnbRbpdBNd8AAAHtNw>
-	<F82830D409D80E4881C83250E051B74B4784BE4F@banasiexm01.ASIA.ROOT.PRI>
- <CAJdJm_O5Bf22=iJZqpJ9SgOCQ-MSxv7WPdwXYXko-mcyiTx=3Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_O5Bf22=iJZqpJ9SgOCQ-MSxv7WPdwXYXko-mcyiTx=3Q@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Tue, 18 Oct 2011 13:58:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: chanyeol.park@samsung.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix missing initialization of eir name_len
+Message-ID: <20111018105829.GA3732@fusion.localdomain>
+References: <1318934522-31475-1-git-send-email-chanyeol.park@samsung.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318934522-31475-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
-Thanks for your inputs. I am extending the current doc/attribute-api.txt. Will work towards your proposed changes and update the same. 
+Hi Chan-yeol,
 
-Thanks,
-Vijay
+On Tue, Oct 18, 2011, chanyeol.park@samsung.com wrote:
+> From: Chan-yeol Park <chanyeol.park@samsung.com>
+> 
+> ---
+>  src/eir.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/src/eir.c b/src/eir.c
+> index e82d30b..b76bfa2 100644
+> --- a/src/eir.c
+> +++ b/src/eir.c
+> @@ -70,7 +70,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data)
+>  	uuid_t service;
+>  	char *uuid_str;
+>  	const char *name = NULL;
+> -	size_t name_len;
+> +	size_t name_len = 0;
+>  	unsigned int i;
+>  
+>  	eir->flags = -1;
 
+This was already discussed on the list:
+http://www.spinics.net/lists/linux-bluetooth/msg17222.html
 
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
-More information can be found at www.csr.com. Follow CSR on Twitter at http://twitter.com/CSR_PLC and read our blog at www.csr.com/blog
+It's essentially a gcc bug which doesn't show up with newer gcc
+versions. Instead of adding this unnecessary initialization, Marcels
+proposal was to rewrite the eir_parse function since its logic is quite
+hard to follow right now.
+
+Johan
