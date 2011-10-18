@@ -1,57 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v3] fix build
+Subject: Re: [PATCHv3 3/4] add 64 bit get_val support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: =?ISO-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Date: Tue, 18 Oct 2011 09:36:13 -0700
-In-Reply-To: <20111018081952.GA8054@aemeltch-MOBL1>
-References: <1318866965-11091-1-git-send-email-frederic.danis@linux.intel.com>
-	 <20111018081952.GA8054@aemeltch-MOBL1>
+To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 18 Oct 2011 08:53:51 -0700
+In-Reply-To: <20111018063327.GA7784@aemeltch-MOBL1>
+References: <1318839662-13609-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1318839662-13609-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1318865471.15441.96.camel@aeonflux> <20111018063327.GA7784@aemeltch-MOBL1>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1318955775.15441.137.camel@aeonflux>
+Message-ID: <1318953233.15441.125.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> > src/eir.c: In function 'eir_parse':
-> > src/eir.c:72: error: 'name_len' may be used uninitialized in this function
+> > >  parser/l2cap.c |   18 ++++++++++--------
+> > >  1 files changed, 10 insertions(+), 8 deletions(-)
+> > > 
+> > > diff --git a/parser/l2cap.c b/parser/l2cap.c
+> > > index 6a5a4b2..e1fc1f8 100644
+> > > --- a/parser/l2cap.c
+> > > +++ b/parser/l2cap.c
+> > > @@ -232,7 +232,7 @@ static uint8_t get_ext_ctrl(int in, uint16_t handle, uint16_t cid)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > -static uint32_t get_val(uint8_t *ptr, uint8_t len)
+> > > +static uint64_t get_val(uint8_t *ptr, uint8_t len)
+> > >  {
+> > >  	switch (len) {
+> > >  	case 1:
+> > > @@ -241,6 +241,8 @@ static uint32_t get_val(uint8_t *ptr, uint8_t len)
+> > >  		return btohs(bt_get_unaligned((uint16_t *) ptr));
+> > >  	case 4:
+> > >  		return btohl(bt_get_unaligned((uint32_t *) ptr));
+> > > +	case 8:
+> > > +		return btohll(bt_get_unaligned((uint64_t *) ptr));
+> > >  	}
+> > >  	return 0;
+> > >  }
 > > 
-> > and
-> > 
-> > thermometer/thermometer.c: In function 'destroy_char':
-> > thermometer/thermometer.c:79: error: implicit declaration of function 'g_slist_free_full'
-> > ---
-> >  src/eir.c                 |    2 +-
-> >  thermometer/thermometer.c |    5 +++++
-> >  2 files changed, 6 insertions(+), 1 deletions(-)
-> > 
-> > diff --git a/src/eir.c b/src/eir.c
-> > index 8772191..8ada364 100644
-> > --- a/src/eir.c
-> > +++ b/src/eir.c
-> > @@ -69,7 +69,7 @@ int eir_parse(struct eir_data *eir, uint8_t *eir_data)
-> >  	uuid_t service;
-> >  	char *uuid_str;
-> >  	const char *name = NULL;
-> > -	size_t name_len;
-> > +	size_t name_len = 0;
+> > turning everything into a uint64 is a bit heavy. Just change this into
+> > broken down version. get_uint64, get_uint32, get_uint16 etc. Otherwise
+> > you keep casting yourself crazy.
 > 
-> BTW: shall we change build flags otherwise bluez is not building anymore.
-> 
-> make
-> make --no-print-directory all-am
->   CC     src/eir.o
-> cc1: warnings being treated as errors
-> src/eir.c: In function ‘eir_parse’:
-> src/eir.c:73:9: error: ‘name_len’ may be used uninitialized in this
-> function
-> make[1]: *** [src/eir.o] Ошибка 1
-> make: *** [all] Ошибка 2
+> Yes, casting does not look nice. What about if I keep everything AS IS and
+> just use btohll(bt_get_unaligned((ptr)) to access 64 bit value.
 
-it builds fine if you install a recent distro with a recent gcc.
+this does not make it more readable. Create helpers like get_uint64 for
+it.
 
 Regards
 
