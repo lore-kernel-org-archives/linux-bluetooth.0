@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 3/7 v2] gobex: log commands using G_OBEX_DEBUG_COMMAND
-Date: Tue, 18 Oct 2011 15:47:28 +0300
-Message-Id: <1318942052-15475-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 2/7] gobex: log errors using G_OBEX_DEBUG_ERROR
+Date: Tue, 18 Oct 2011 15:47:27 +0300
+Message-Id: <1318942052-15475-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1318942052-15475-1-git-send-email-luiz.dentz@gmail.com>
 References: <1318942052-15475-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,130 +12,234 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- gobex/gobex.c |   26 ++++++++++++++++++++++++++
- 1 files changed, 26 insertions(+), 0 deletions(-)
+ gobex/gobex-header.c   |    4 ++++
+ gobex/gobex-packet.c   |    4 ++++
+ gobex/gobex-transfer.c |    8 ++++++++
+ gobex/gobex.c          |   32 +++++++++++++++++++++++++-------
+ 4 files changed, 41 insertions(+), 7 deletions(-)
 
+diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+index 0dade51..45fe0e6 100644
+--- a/gobex/gobex-header.c
++++ b/gobex/gobex-header.c
+@@ -26,6 +26,7 @@
+ #include <string.h>
+ 
+ #include "gobex-header.h"
++#include "gobex-debug.h"
+ 
+ /* Header types */
+ #define G_OBEX_HDR_ENC_UNICODE	(0 << 6)
+@@ -143,6 +144,7 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
+ 	if (len < 2) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 						"Too short header in packet");
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return NULL;
+ 	}
+ 
+@@ -266,6 +268,8 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
+ 	return header;
+ 
+ failed:
++	if (*err)
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 	g_obex_header_free(header);
+ 	return NULL;
+ }
+diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
+index df94031..80accd1 100644
+--- a/gobex/gobex-packet.c
++++ b/gobex/gobex-packet.c
+@@ -28,6 +28,7 @@
+ 
+ #include "gobex-defs.h"
+ #include "gobex-packet.h"
++#include "gobex-debug.h"
+ 
+ #define FINAL_BIT 0x80
+ 
+@@ -291,12 +292,14 @@ GObexPacket *g_obex_packet_decode(const void *data, gsize len,
+ 	if (data_policy == G_OBEX_DATA_INHERIT) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_INVALID_ARGS,
+ 							"Invalid data policy");
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return NULL;
+ 	}
+ 
+ 	if (len < 3 + header_offset) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 					"Not enough data to decode packet");
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return NULL;
+ 	}
+ 
+@@ -308,6 +311,7 @@ GObexPacket *g_obex_packet_decode(const void *data, gsize len,
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 				"Incorrect packet length (%u != %zu)",
+ 				packet_len, len);
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return NULL;
+ 	}
+ 
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index 7278cb3..4ccf535 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -19,10 +19,15 @@
+  *
+  */
+ 
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++
+ #include <string.h>
+ #include <errno.h>
+ 
+ #include "gobex.h"
++#include "gobex-debug.h"
+ 
+ #define FIRST_PACKET_TIMEOUT 60
+ 
+@@ -89,6 +94,7 @@ static void transfer_abort_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	/* Intentionally override error */
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 						"Operation was aborted");
++	g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
+ 	transfer_complete(transfer, err);
+ 	g_error_free(err);
+ }
+@@ -188,6 +194,7 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 							transfer, &err);
+ failed:
+ 	if (err != NULL) {
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
+ 		transfer_complete(transfer, err);
+ 		g_error_free(err);
+ 	}
+@@ -448,6 +455,7 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
+ 
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 				"Data producer function failed");
++	g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
+ 	transfer_complete(transfer, err);
+ 	g_error_free(err);
+ 
 diff --git a/gobex/gobex.c b/gobex/gobex.c
-index da2ff01..3930cd7 100644
+index e1cf5e3..da2ff01 100644
 --- a/gobex/gobex.c
 +++ b/gobex/gobex.c
-@@ -371,6 +371,8 @@ gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err)
- 	struct pending_pkt *p;
- 	gboolean ret;
+@@ -168,18 +168,23 @@ static gboolean req_timeout(gpointer user_data)
+ {
+ 	GObex *obex = user_data;
+ 	struct pending_pkt *p = obex->pending_req;
++	GError *err;
  
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
+ 	g_assert(p != NULL);
+ 
+ 	obex->pending_req = NULL;
+ 
+-	if (p->rsp_func) {
+-		GError *err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_TIMEOUT,
++	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_TIMEOUT,
+ 					"Timed out waiting for response");
 +
++	g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
++
++	obex->pending_req = NULL;
++
++	if (p->rsp_func)
+ 		p->rsp_func(obex, err, NULL, p->rsp_data);
+-		g_error_free(err);
+-	}
+ 
++	g_error_free(err);
+ 	pending_pkt_free(p);
+ 
+ 	return FALSE;
+@@ -311,6 +316,7 @@ static gboolean g_obex_send_internal(GObex *obex, struct pending_pkt *p,
+ 	if (obex->io == NULL) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_DISCONNECTED,
+ 					"The transport is not connected");
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return FALSE;
+ 	}
+ 
+@@ -368,6 +374,7 @@ gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err)
  	if (obex == NULL || pkt == NULL) {
  		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_INVALID_ARGS,
  				"Invalid arguments");
-@@ -399,6 +401,8 @@ guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
- 	struct pending_pkt *p;
- 	static guint id = 1;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	if (obex->conn_id == CONNID_INVALID)
- 		goto create_pending;
- 
-@@ -587,6 +591,8 @@ gboolean g_obex_remove_request_function(GObex *obex, guint id)
- 
- void g_obex_suspend(GObex *obex)
- {
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	if (obex->write_source > 0) {
- 		g_source_remove(obex->write_source);
- 		obex->write_source = 0;
-@@ -597,6 +603,8 @@ void g_obex_suspend(GObex *obex)
- 
- void g_obex_resume(GObex *obex)
- {
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	obex->suspended = FALSE;
- 
- 	if (g_queue_get_length(obex->tx_queue) > 0 || obex->tx_data > 0)
-@@ -908,6 +916,8 @@ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 			gobex_debug = G_OBEX_DEBUG_NONE;
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return FALSE;
  	}
  
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
+@@ -638,6 +645,10 @@ static void handle_response(GObex *obex, GError *err, GObexPacket *rsp)
+ 		err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 					"The operation was cancelled");
+ 
++	if (err)
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
 +
- 	if (io == NULL)
- 		return NULL;
- 
-@@ -969,6 +979,8 @@ GObex *g_obex_ref(GObex *obex)
- 
- 	g_atomic_int_inc(&obex->ref_count);
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
 +
- 	return obex;
+ 	if (p->rsp_func) {
+ 		p->rsp_func(obex, err, rsp, p->rsp_data);
+ 
+@@ -709,6 +720,7 @@ static gboolean read_stream(GObex *obex, GError **err)
+ 	if (obex->rx_pkt_len > obex->rx_mtu) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 				"Too big incoming packet");
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
+ 		return FALSE;
+ 	}
+ 
+@@ -741,7 +753,7 @@ static gboolean read_packet(GObex *obex, GError **err)
+ 	if (obex->rx_data > 0) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 				"RX buffer not empty before reading packet");
+-		return FALSE;
++		goto fail;
+ 	}
+ 
+ 	status = g_io_channel_read_chars(io, (gchar *) obex->rx_buf,
+@@ -750,7 +762,7 @@ static gboolean read_packet(GObex *obex, GError **err)
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 				"Unable to read data: %s", read_err->message);
+ 		g_error_free(read_err);
+-		return FALSE;
++		goto fail;
+ 	}
+ 
+ 	obex->rx_data += rbytes;
+@@ -758,7 +770,7 @@ static gboolean read_packet(GObex *obex, GError **err)
+ 	if (rbytes < 3) {
+ 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+ 				"Incomplete packet received");
+-		return FALSE;
++		goto fail;
+ 	}
+ 
+ 	memcpy(&u16, &obex->rx_buf[1], sizeof(u16));
+@@ -772,6 +784,9 @@ static gboolean read_packet(GObex *obex, GError **err)
+ 	}
+ 
+ 	return TRUE;
++fail:
++	g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", (*err)->message);
++	return FALSE;
  }
  
-@@ -978,6 +990,8 @@ void g_obex_unref(GObex *obex)
+ static gboolean incoming_data(GIOChannel *io, GIOCondition cond,
+@@ -846,6 +861,9 @@ static gboolean incoming_data(GIOChannel *io, GIOCondition cond,
+ 	return TRUE;
  
- 	last_ref = g_atomic_int_dec_and_test(&obex->ref_count);
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
+ failed:
++	if (err)
++		g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
 +
- 	if (!last_ref)
- 		return;
- 
-@@ -1013,6 +1027,8 @@ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
- 	struct connect_data data;
- 	va_list args;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
-+
- 	va_start(args, first_hdr_id);
- 	req = g_obex_packet_new_valist(G_OBEX_OP_CONNECT, TRUE,
- 							first_hdr_id, args);
-@@ -1030,6 +1046,8 @@ guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
- 	GObexPacket *req;
- 	struct setpath_data data;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	req = g_obex_packet_new(G_OBEX_OP_SETPATH, TRUE, G_OBEX_HDR_INVALID);
- 
- 	memset(&data, 0, sizeof(data));
-@@ -1054,6 +1072,8 @@ guint g_obex_mkdir(GObex *obex, const char *path, GObexResponseFunc func,
- 	GObexPacket *req;
- 	struct setpath_data data;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	req = g_obex_packet_new(G_OBEX_OP_SETPATH, TRUE, G_OBEX_HDR_NAME, path,
- 							G_OBEX_HDR_INVALID);
- 
-@@ -1068,6 +1088,8 @@ guint g_obex_delete(GObex *obex, const char *name, GObexResponseFunc func,
- {
- 	GObexPacket *req;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	req = g_obex_packet_new(G_OBEX_OP_PUT, TRUE, G_OBEX_HDR_NAME, name,
- 							G_OBEX_HDR_INVALID);
- 
-@@ -1080,6 +1102,8 @@ guint g_obex_copy(GObex *obex, const char *name, const char *dest,
- {
- 	GObexPacket *req;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	req = g_obex_packet_new(G_OBEX_OP_ACTION, TRUE,
- 					G_OBEX_HDR_ACTION, G_OBEX_ACTION_COPY,
- 					G_OBEX_HDR_NAME, name,
-@@ -1095,6 +1119,8 @@ guint g_obex_move(GObex *obex, const char *name, const char *dest,
- {
- 	GObexPacket *req;
- 
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "conn %u", obex->conn_id);
-+
- 	req = g_obex_packet_new(G_OBEX_OP_ACTION, TRUE,
- 					G_OBEX_HDR_ACTION, G_OBEX_ACTION_MOVE,
- 					G_OBEX_HDR_NAME, name,
+ 	g_io_channel_unref(obex->io);
+ 	obex->io = NULL;
+ 	obex->io_source = 0;
 -- 
 1.7.6.4
 
