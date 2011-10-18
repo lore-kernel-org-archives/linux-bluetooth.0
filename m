@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <4E9CF709.6080706@globaledgesoft.com>
+References: <4E9CF709.6080706@globaledgesoft.com>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH 1/2] Fix MediaPlayer documentation
-Date: Tue, 18 Oct 2011 21:24:38 -0200
-Message-Id: <1318980279-2331-1-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Tue, 18 Oct 2011 20:13:30 -0200
+Message-ID: <CAMOw1v7vqcsqFS3AmuoxHxQXXo-CWea8xJFSomyfDgkFo3b4FQ@mail.gmail.com>
+Subject: Re: AVRCP
+To: sathish <sathish.n@globaledgesoft.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/media-api.txt |   10 ++--------
- 1 files changed, 2 insertions(+), 8 deletions(-)
+Hi Sathish
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index b8dcdbd..e061f38 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -180,12 +180,6 @@ Signals		PropertyChanged(string setting, variant value)
- 
- 					Track duration in milliseconds
- 
--		StatusChanged(string status, uint32 position)
--
--			Possible status: "playing", "stopped", "paused",
--					"forward-seek", "reverse-seek" or
--					"error"
--
- Properties	string Equalizer [readwrite]
- 
- 			Possible values: "off" or "on"
-@@ -203,13 +197,13 @@ Properties	string Equalizer [readwrite]
- 
- 			Possible values: "off", "alltracks" or "group"
- 
--		string Status [readonly]
-+		string Status [readwrite]
- 
- 			Possible status: "playing", "stopped", "paused",
- 					"forward-seek", "reverse-seek" or
- 					"error"
- 
--		uint32 Position [readonly]
-+		uint32 Position [readwrite]
- 
- 			Playback position in milliseconds
- 
--- 
-1.7.7
+On Tue, Oct 18, 2011 at 1:48 AM, sathish <sathish.n@globaledgesoft.com> wrote:
+> Hi,
+>   I like to know , how to implement avrcp between two systems in Linux using
+> bluez . Is there any one one who can help me. where bluez supports both
+> control and target. but how to implement it .
 
+The functionality provided in control role is very limited. It's only
+some pieces of 1.0 spec. Since target only reacts to commands coming
+from CT, you'll not be able to do anything useful with 2 systems using
+Linux.
+
+
+If you want to use it only as target, it has all the mandatory
+features of AVRCP 1.3 + some optional ones. Then you can use it by:
+
+1) Enable the Media interface in /etc/bluetooth/audio.conf
+2) Start bluetoothd service
+3) Start test/mpris-player
+4) Use a media player that supports mpris 2.0: amarok, rhytmbox and a
+few others.
+
+If you are going to implement it in a media player, I suggest
+implementing our dbus interface, so you can cut the 3rd step.
+
+
+regards,
+Lucas De Marchi
