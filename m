@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 5/7 v2] gobex: log headers using G_OBEX_DEBUG_HEADER
-Date: Tue, 18 Oct 2011 15:47:30 +0300
-Message-Id: <1318942052-15475-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 4/7 v2] gobex: log transfers using G_OBEX_DEBUG_TRANSFER
+Date: Tue, 18 Oct 2011 15:47:29 +0300
+Message-Id: <1318942052-15475-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1318942052-15475-1-git-send-email-luiz.dentz@gmail.com>
 References: <1318942052-15475-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,189 +12,238 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- gobex/gobex-header.c |   49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 49 insertions(+), 0 deletions(-)
+ gobex/gobex-transfer.c |   50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 50 insertions(+), 0 deletions(-)
 
-diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-index 45fe0e6..da982a7 100644
---- a/gobex/gobex-header.c
-+++ b/gobex/gobex-header.c
-@@ -93,6 +93,9 @@ gssize g_obex_header_encode(GObexHeader *header, void *buf, gsize buf_len)
- 	gunichar2 *utf16;
- 	glong utf16_len;
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index 4ccf535..b9c8507 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -54,6 +54,8 @@ struct transfer {
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
-+
- 	if (buf_len < header->hlen)
- 		return -1;
- 
-@@ -152,6 +155,9 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
- 
- 	ptr = get_bytes(&header->id, ptr, sizeof(header->id));
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
-+
- 	switch (G_OBEX_HDR_ENC(header->id)) {
- 	case G_OBEX_HDR_ENC_UNICODE:
- 		if (len < 3) {
-@@ -276,6 +282,9 @@ failed:
- 
- void g_obex_header_free(GObexHeader *header)
+ static void transfer_free(struct transfer *transfer)
  {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	switch (G_OBEX_HDR_ENC(header->id)) {
- 	case G_OBEX_HDR_ENC_UNICODE:
- 		g_free(header->v.string);
-@@ -296,17 +305,25 @@ void g_obex_header_free(GObexHeader *header)
+ 	transfers = g_slist_remove(transfers, transfer);
  
- gboolean g_obex_header_get_unicode(GObexHeader *header, const char **str)
+ 	if (transfer->req_id > 0)
+@@ -77,6 +79,8 @@ static void transfer_free(struct transfer *transfer)
+ 
+ static void transfer_complete(struct transfer *transfer, GError *err)
  {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UNICODE)
- 		return FALSE;
+ 	transfer->complete_func(transfer->obex, err, transfer->user_data);
+ 	/* Check if the complete_func removed the transfer */
+ 	if (g_slist_find(transfers, transfer) == NULL)
+@@ -89,6 +93,8 @@ static void transfer_abort_response(GObex *obex, GError *err, GObexPacket *rsp,
+ {
+ 	struct transfer *transfer = user_data;
  
- 	*str = header->v.string;
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%s", *str);
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	return TRUE;
+ 	transfer->req_id = 0;
+ 
+ 	/* Intentionally override error */
+@@ -156,6 +162,8 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	GObexPacket *req;
+ 	gboolean rspcode, final;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	transfer->req_id = 0;
+ 
+ 	if (err != NULL) {
+@@ -206,6 +214,8 @@ static struct transfer *transfer_new(GObex *obex, guint8 opcode,
+ 	static guint next_id = 1;
+ 	struct transfer *transfer;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p opcode %u", obex, opcode);
++
+ 	transfer = g_new0(struct transfer, 1);
+ 
+ 	transfer->id = next_id++;
+@@ -225,6 +235,8 @@ guint g_obex_put_req_pkt(GObex *obex, GObexPacket *req,
+ {
+ 	struct transfer *transfer;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
++
+ 	if (g_obex_packet_get_operation(req, NULL) != G_OBEX_OP_PUT)
+ 		return 0;
+ 
+@@ -240,6 +252,8 @@ guint g_obex_put_req_pkt(GObex *obex, GObexPacket *req,
+ 		return 0;
+ 	}
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	return transfer->id;
  }
  
- gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
- 								gsize *len)
- {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
+@@ -251,6 +265,8 @@ guint g_obex_put_req(GObex *obex, GObexDataProducer data_func,
+ 	GObexPacket *req;
+ 	va_list args;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
 +
- 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_BYTES)
- 		return FALSE;
+ 	transfer = transfer_new(obex, G_OBEX_OP_PUT, complete_func, user_data);
+ 	transfer->data_producer = data_func;
  
-@@ -322,21 +339,31 @@ gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
+@@ -268,6 +284,8 @@ guint g_obex_put_req(GObex *obex, GObexDataProducer data_func,
+ 		return 0;
+ 	}
  
- gboolean g_obex_header_get_uint8(GObexHeader *header, guint8 *val)
- {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UINT8)
- 		return FALSE;
- 
- 	*val = header->v.u8;
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", *val);
-+
- 	return TRUE;
+ 	return transfer->id;
  }
  
- gboolean g_obex_header_get_uint32(GObexHeader *header, guint32 *val)
- {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
-+						G_OBEX_HDR_ENC(header->id));
+@@ -277,6 +295,8 @@ static void transfer_abort_req(GObex *obex, GObexPacket *req, gpointer user_data
+ 	GObexPacket *rsp;
+ 	GError *err;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UINT32)
- 		return FALSE;
- 
- 	*val = header->v.u32;
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", *val);
-+
- 	return TRUE;
- }
- 
-@@ -345,6 +372,8 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str)
- 	GObexHeader *header;
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 						"Request was aborted");
+ 	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
+@@ -294,6 +314,8 @@ static guint8 put_get_bytes(struct transfer *transfer, GObexPacket *req)
+ 	const guint8 *buf;
  	gsize len;
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UNICODE)
- 		return NULL;
+ 	g_obex_packet_get_operation(req, &final);
+ 	if (final)
+ 		rsp = G_OBEX_RSP_SUCCESS;
+@@ -321,6 +343,8 @@ static void transfer_put_req_first(struct transfer *transfer, GObexPacket *req,
+ 	GObexPacket *rsp;
+ 	guint8 rspcode;
  
-@@ -358,6 +387,8 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str)
- 	header->hlen = len == 0 ? 3 : 3 + ((len + 1) * 2);
- 	header->v.string = g_strdup(str);
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%s", header->v.string);
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	return header;
+ 	rspcode = put_get_bytes(transfer, req);
+ 
+ 	rsp = g_obex_packet_new_valist(rspcode, TRUE, first_hdr_id, args);
+@@ -340,6 +364,8 @@ static void transfer_put_req(GObex *obex, GObexPacket *req, gpointer user_data)
+ 	GObexPacket *rsp;
+ 	guint8 rspcode;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	rspcode = put_get_bytes(transfer, req);
+ 
+ 	rsp = g_obex_packet_new(rspcode, TRUE, G_OBEX_HDR_INVALID);
+@@ -361,6 +387,8 @@ guint g_obex_put_rsp(GObex *obex, GObexPacket *req,
+ 	va_list args;
+ 	guint id;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
++
+ 	transfer = transfer_new(obex, G_OBEX_OP_PUT, complete_func, user_data);
+ 	transfer->data_consumer = data_func;
+ 
+@@ -379,6 +407,8 @@ guint g_obex_put_rsp(GObex *obex, GObexPacket *req,
+ 						transfer_abort_req, transfer);
+ 	transfer->abort_id = id;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	return transfer->id;
  }
  
-@@ -365,6 +396,8 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
+@@ -388,6 +418,8 @@ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
  {
- 	GObexHeader *header;
+ 	struct transfer *transfer;
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
 +
- 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_BYTES)
- 		return NULL;
+ 	if (g_obex_packet_get_operation(req, NULL) != G_OBEX_OP_GET)
+ 		return 0;
  
-@@ -382,6 +415,8 @@ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
- {
- 	GObexHeader *header;
+@@ -401,6 +433,8 @@ guint g_obex_get_req_pkt(GObex *obex, GObexPacket *req,
+ 		return 0;
+ 	}
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UINT8)
- 		return NULL;
- 
-@@ -392,6 +427,8 @@ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
- 	header->hlen = 2;
- 	header->v.u8 = val;
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", header->v.u8);
-+
- 	return header;
+ 	return transfer->id;
  }
  
-@@ -399,6 +436,8 @@ GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val)
- {
- 	GObexHeader *header;
+@@ -412,6 +446,8 @@ guint g_obex_get_req(GObex *obex, GObexDataConsumer data_func,
+ 	GObexPacket *req;
+ 	va_list args;
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
 +
- 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UINT32)
- 		return NULL;
+ 	transfer = transfer_new(obex, G_OBEX_OP_GET, complete_func, user_data);
+ 	transfer->data_consumer = data_func;
  
-@@ -409,16 +448,24 @@ GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val)
- 	header->hlen = 5;
- 	header->v.u32 = val;
+@@ -427,6 +463,8 @@ guint g_obex_get_req(GObex *obex, GObexDataConsumer data_func,
+ 		return 0;
+ 	}
  
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", header->v.u32);
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	return header;
+ 	return transfer->id;
  }
  
- guint8 g_obex_header_get_id(GObexHeader *header)
- {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x id 0x%02x",
-+				G_OBEX_HDR_ENC(header->id), header->id);
+@@ -437,6 +475,8 @@ static gssize get_get_data(void *buf, gsize len, gpointer user_data)
+ 	GError *err = NULL;
+ 	gssize ret;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
 +
- 	return header->id;
+ 	ret = transfer->data_producer(buf, len, transfer->user_data);
+ 	if (ret > 0)
+ 		return ret;
+@@ -468,6 +508,8 @@ static void transfer_get_req_first(struct transfer *transfer,
+ 	GError *err = NULL;
+ 	GObexPacket *rsp;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	rsp = g_obex_packet_new_valist(G_OBEX_RSP_CONTINUE, TRUE,
+ 							first_hdr_id, args);
+ 	g_obex_packet_add_body(rsp, get_get_data, transfer);
+@@ -484,6 +526,8 @@ static void transfer_get_req(GObex *obex, GObexPacket *req, gpointer user_data)
+ 	GError *err = NULL;
+ 	GObexPacket *rsp;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	rsp = g_obex_packet_new(G_OBEX_RSP_CONTINUE, TRUE, G_OBEX_HDR_INVALID);
+ 	g_obex_packet_add_body(rsp, get_get_data, transfer);
+ 
+@@ -501,6 +545,8 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 	va_list args;
+ 	guint id;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "obex %p", obex);
++
+ 	transfer = transfer_new(obex, G_OBEX_OP_GET, complete_func, user_data);
+ 	transfer->data_producer = data_func;
+ 
+@@ -519,6 +565,8 @@ guint g_obex_get_rsp(GObex *obex, GObexDataProducer data_func,
+ 						transfer_abort_req, transfer);
+ 	transfer->abort_id = id;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
++
+ 	return transfer->id;
  }
  
- guint16 g_obex_header_get_length(GObexHeader *header)
- {
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x length %zu",
-+				G_OBEX_HDR_ENC(header->id), header->hlen);
+@@ -527,6 +575,8 @@ gboolean g_obex_cancel_transfer(guint id)
+ 	struct transfer *transfer = NULL;
+ 	GSList *l;
+ 
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
 +
- 	return header->hlen;
- }
- 
-@@ -428,6 +475,8 @@ GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
- 	unsigned int id = first_hdr_id;
- 	GSList *l = NULL;
- 
-+	g_obex_debug(G_OBEX_DEBUG_HEADER, "");
-+
- 	*total_len = 0;
- 
- 	while (id != G_OBEX_HDR_INVALID) {
+ 	for (l = transfers; l != NULL; l = g_slist_next(l)) {
+ 		struct transfer *t = l->data;
+ 		if (t->id == id) {
 -- 
 1.7.6.4
 
