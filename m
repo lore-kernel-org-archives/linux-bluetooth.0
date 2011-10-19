@@ -1,56 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ganir, Chen" <chen.ganir@ti.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 19 Oct 2011 21:50:05 +0200
-Subject: RE: LE discovery procedure
-Message-ID: <7769C83744F2C34A841232EF77AEA20C01DC6AB191@dnce01.ent.ti.com>
-References: <4E9E65FF.1000400@globaledgesoft.com>
-	<7769C83744F2C34A841232EF77AEA20C01DC6AADCE@dnce01.ent.ti.com>
- <CAJdJm_Mxr_ubnALkUs7_mn41ZzoZdTWC45NhAwcBmueE195UOQ@mail.gmail.com>
-In-Reply-To: <CAJdJm_Mxr_ubnALkUs7_mn41ZzoZdTWC45NhAwcBmueE195UOQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Subject: Re: [PATCHv2 2/9] Bluetooth: Change scope of the enable_hs module
+ parameter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
+Date: Wed, 19 Oct 2011 12:18:16 -0700
+In-Reply-To: <1319046247-3391-3-git-send-email-mathewm@codeaurora.org>
+References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
+	 <1319046247-3391-3-git-send-email-mathewm@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1319051898.15441.179.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson
+Hi Mat,
 
+> This variable is currently only accessible within l2cap_core.c, but
+> it is also needed in l2cap_sock.c
 > 
-> Actually we check it, but on the BlueZ side (as you know, our host
-> stack is composed of kernel+userspace). From
-> adapter_emit_device_found() in src/adapter.c:
+> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> ---
+>  include/net/bluetooth/l2cap.h |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 > 
->         if (dev->le) {
->                 gboolean broadcaster;
-> 
->                 if (dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC))
->                         broadcaster = FALSE;
->                 else
->                         broadcaster = TRUE;
-> 
->                 emit_device_found(adapter->path, paddr,
->                 [...]
-> 
-> But note that we still send the "DeviceFound" D-Bus signal, but with a
-> "Broadcaster" property which UI can use to ignore the device.
-> 
-> Filtering on the kernel requires parsing Adv. data, and may not allow
-> us to implement Broadcaster role on BlueZ (and on external
-> applications as well) in future.
-> 
-> IMHO the kernel should still notify userspace of the device, then
-> BlueZ can filter out the Broadcaster devices as necessary, *unless* we
-> plan to parse all AD information on kernel, which is not a good idea
-> IMHO.
-> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index fddc82a..fd090db 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -730,6 +730,7 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
+>  }
+>  
+>  extern int disable_ertm;
+> +extern int enable_hs;
+>  
+>  int l2cap_init_sockets(void);
+>  void l2cap_cleanup_sockets(void);
 
-I'm not so comfortable using the same Device Found event both for discovering devices and for observing.
-In addition, maybe the 'broadcaster variable is the wrong name for this variable. The true meaning is 'discoverable'. A peripheral can broadcast services and other advertising information while broadcasting as discoverable, so this flag may be confusing.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-This also means that the upper layer using this API should keep its own state, to differ between discovering devices (where discoverable devices are displayed as discoverable and broadcast data is collected) or just 'observing' advertising data, where the central device just searches for broadcast data, and has no intention of connecting to a device. In this case, a DEVICE_FOUND event is a bit confusing.
+Regards
 
-Do you know if anyone is working on extending the capabilities of the EIR parser for more advertising data types (such as services)? We need to think of a proper way to pass the EIR information to the user in the event.
+Marcel
 
-Best regards,
-Chen Ganir.
+
