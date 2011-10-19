@@ -1,75 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv2 7/9] Bluetooth: Use symbolic values for the fixed
- channel map
+Subject: Re: [PATCHv2 6/9] Bluetooth: Add definitions for L2CAP fixed
+ channels
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
 	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Date: Wed, 19 Oct 2011 15:05:02 -0700
-In-Reply-To: <alpine.DEB.2.02.1110191428330.1976@mathewm-linux>
+Date: Wed, 19 Oct 2011 15:02:54 -0700
+In-Reply-To: <alpine.DEB.2.02.1110191402420.1976@mathewm-linux>
 References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
-	  <1319046247-3391-8-git-send-email-mathewm@codeaurora.org>
-	 <1319051362.15441.171.camel@aeonflux>
-	 <alpine.DEB.2.02.1110191428330.1976@mathewm-linux>
+	  <1319046247-3391-7-git-send-email-mathewm@codeaurora.org>
+	 <1319051041.15441.167.camel@aeonflux>
+	 <alpine.DEB.2.02.1110191402420.1976@mathewm-linux>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1319061905.15441.190.camel@aeonflux>
+Message-ID: <1319061777.15441.188.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-> >> The A2MP fixed channel bit is only set when high-speed mode is enabled.
+> >> Symbolic fixed channel IDs will be used instead of magic numbers.
 > >>
 > >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > >> ---
-> >>  net/bluetooth/l2cap_core.c |    6 +++++-
-> >>  1 files changed, 5 insertions(+), 1 deletions(-)
+> >>  include/net/bluetooth/l2cap.h |    4 ++++
+> >>  1 files changed, 4 insertions(+), 0 deletions(-)
 > >>
-> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >> index 67f0ab6..f250392 100644
-> >> --- a/net/bluetooth/l2cap_core.c
-> >> +++ b/net/bluetooth/l2cap_core.c
-> >> @@ -60,7 +60,7 @@ int disable_ertm;
-> >>  int enable_hs;
+> >> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> >> index 4f4f318..b8b25f6 100644
+> >> --- a/include/net/bluetooth/l2cap.h
+> >> +++ b/include/net/bluetooth/l2cap.h
+> >> @@ -119,6 +119,10 @@ struct l2cap_conninfo {
+> >>  #define L2CAP_FCS_NONE		0x00
+> >>  #define L2CAP_FCS_CRC16		0x01
 > >>
-> >>  static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
-> >> -static u8 l2cap_fixed_chan[8] = { 0x02, };
-> >> +static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
-> >>
-> >>  static LIST_HEAD(chan_list);
-> >>  static DEFINE_RWLOCK(chan_list_lock);
-> >> @@ -2975,6 +2975,10 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
-> >>  	} else if (type == L2CAP_IT_FIXED_CHAN) {
-> >>  		u8 buf[12];
-> >>  		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
+> >> +/* L2CAP fixed channels */
+> >> +#define L2CAP_FC_L2CAP		0x02
+> >> +#define L2CAP_FC_A2MP		0x08
 > >> +
-> >> +		if (enable_hs)
-> >> +			l2cap_fixed_chan[0] |= L2CAP_FC_A2MP;
-> >> +
-> >>  		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
-> >>  		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
-> >>  		memcpy(buf + 4, l2cap_fixed_chan, 8);
 > >
-> > doing it this way is a bit sneaky actually. Since it does not really
-> > allow disabling HS once you enabled it.
-> >
-> > Maybe doing feature enabling/disabling (and also for LE) is better
-> > handled via /sys/kernel/debug/bluetooth/enable_hs.
+> > while you are at it, please add the known fixed channels for SMP and LE
+> > signaling here. They should be in use already somewhere ;)
 > 
-> This is really the only place where anything other than the enable_hs 
-> value itself needs to be manipulated.  It would be less code to just 
-> add an "else" and clear the feature mask bit.  l2cap_fixed_chan[] is 
-> not used anywhere outside this function.
+> The channel mask wasn't a problem at the recent UPF, since the LE 
+> fixed channels are only used on LE connections and the info 
+> request/response are only relevant for BR/EDR.  It seems like these LE 
+> fixed channel bits should not be set when sending an info response or 
+> checked when processing an info response.
 > 
-> If we want to move enable_hs to debugfs, I'll drop this change from 
-> patch set and work on debugfs support for the next patch set.
-> 
-> Any other opinions?
+> Do you still want me to add them?
 
-right now, I would be fine with an else statement to clear the bit.
-However we better add a note to get this merged over to debugfs. In
-general it seems a way better place anyway.
+I have not looked at all LE patches and this might need some
+coordination, but in general yes, I like to have a proper set of fixed
+channel value here. A good implementation would check these first. Even
+if with LE, the LE link manager connection implies LE support, I rather
+have a proper fixed channel mask here.
+
+That said, if you just wanna send a patch that updates this later on, I
+am fine with that as well.
 
 Regards
 
