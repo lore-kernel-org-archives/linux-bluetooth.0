@@ -4,34 +4,44 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv2 2/9] Bluetooth: Change scope of the enable_hs module parameter
-Date: Wed, 19 Oct 2011 10:44:00 -0700
-Message-Id: <1319046247-3391-3-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 9/9] Bluetooth: Guarantee BR-EDR device will be registered as hci0
+Date: Wed, 19 Oct 2011 10:44:07 -0700
+Message-Id: <1319046247-3391-10-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This variable is currently only accessible within l2cap_core.c, but
-it is also needed in l2cap_sock.c
+It's convenient to use the HCI device index the AMP controller id, but
+the spec requires that an AMP controller never has id 0.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/l2cap.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_core.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index fddc82a..fd090db 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -730,6 +730,7 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fdcbf8f..78e6b05 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1426,7 +1426,7 @@ int hci_add_adv_entry(struct hci_dev *hdev,
+ int hci_register_dev(struct hci_dev *hdev)
+ {
+ 	struct list_head *head = &hci_dev_list, *p;
+-	int i, id = 0, error;
++	int i, id, error;
  
- extern int disable_ertm;
-+extern int enable_hs;
+ 	BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
+ 						hdev->bus, hdev->owner);
+@@ -1434,6 +1434,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (!hdev->open || !hdev->close || !hdev->destruct)
+ 		return -EINVAL;
  
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
++	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
++
+ 	write_lock_bh(&hci_dev_list_lock);
+ 
+ 	/* Find first available device id */
 -- 
 1.7.7
 
