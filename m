@@ -1,28 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4E9E65FF.1000400@globaledgesoft.com>
-References: <4E9E65FF.1000400@globaledgesoft.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 19 Oct 2011 13:08:02 -0200
-Message-ID: <CAMOw1v4VqoXoapHWGky7YAj+ZEX8GP5x+JJcJ3g7vU0HxXzsgw@mail.gmail.com>
-Subject: Re: dbus programming
-To: sathish <sathish.n@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd] gobex: fix includes of config.h
+Date: Wed, 19 Oct 2011 17:28:03 +0300
+Message-Id: <1319034483-3215-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sathish
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Oct 19, 2011 at 3:54 AM, sathish <sathish.n@globaledgesoft.com> wrote:
-> Hi,
-> Is there any one who can help for writing bluez avrcp application with dbus
-> programming
+---
+ gobex/gobex-defs.c     |    2 +-
+ gobex/gobex-header.c   |    2 +-
+ gobex/gobex-packet.c   |    2 +-
+ gobex/gobex-transfer.c |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Take a look in test/mpris-player.c if you want to use C or
-test/simple-player if you prefer python.
+diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
+index beb773d..c184c9c 100644
+--- a/gobex/gobex-defs.c
++++ b/gobex/gobex-defs.c
+@@ -20,7 +20,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-# include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <glib.h>
+diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+index da982a7..035725b 100644
+--- a/gobex/gobex-header.c
++++ b/gobex/gobex-header.c
+@@ -20,7 +20,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-# include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <string.h>
+diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
+index b539430..c3e3953 100644
+--- a/gobex/gobex-packet.c
++++ b/gobex/gobex-packet.c
+@@ -20,7 +20,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-# include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <string.h>
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index b9c8507..6d2f7af 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -20,7 +20,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-# include "config.h"
++#include <config.h>
+ #endif
+ 
+ #include <string.h>
+-- 
+1.7.6.4
 
-
-
-Regards,
-Lucas De Marchi
