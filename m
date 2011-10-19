@@ -4,36 +4,34 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv2 6/9] Bluetooth: Add definitions for L2CAP fixed channels
-Date: Wed, 19 Oct 2011 10:44:04 -0700
-Message-Id: <1319046247-3391-7-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 2/9] Bluetooth: Change scope of the enable_hs module parameter
+Date: Wed, 19 Oct 2011 10:44:00 -0700
+Message-Id: <1319046247-3391-3-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Symbolic fixed channel IDs will be used instead of magic numbers.
+This variable is currently only accessible within l2cap_core.c, but
+it is also needed in l2cap_sock.c
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- include/net/bluetooth/l2cap.h |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ include/net/bluetooth/l2cap.h |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 4f4f318..b8b25f6 100644
+index fddc82a..fd090db 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -119,6 +119,10 @@ struct l2cap_conninfo {
- #define L2CAP_FCS_NONE		0x00
- #define L2CAP_FCS_CRC16		0x01
+@@ -730,6 +730,7 @@ static inline __u8 __ctrl_size(struct l2cap_chan *chan)
+ }
  
-+/* L2CAP fixed channels */
-+#define L2CAP_FC_L2CAP		0x02
-+#define L2CAP_FC_A2MP		0x08
-+
- /* L2CAP Control Field bit masks */
- #define L2CAP_CTRL_SAR			0xC000
- #define L2CAP_CTRL_REQSEQ		0x3F00
+ extern int disable_ertm;
++extern int enable_hs;
+ 
+ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
 -- 
 1.7.7
 
