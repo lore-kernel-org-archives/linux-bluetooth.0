@@ -1,57 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHv2 9/9] Bluetooth: Guarantee BR-EDR device will be
- registered as hci0
+Subject: Re: [PATCHv2 8/9] Bluetooth: Add signal handlers for channel moves
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Mat Martineau <mathewm@codeaurora.org>
 Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
 	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Date: Wed, 19 Oct 2011 12:17:08 -0700
-In-Reply-To: <1319046247-3391-10-git-send-email-mathewm@codeaurora.org>
+Date: Wed, 19 Oct 2011 12:11:56 -0700
+In-Reply-To: <1319046247-3391-9-git-send-email-mathewm@codeaurora.org>
 References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
-	 <1319046247-3391-10-git-send-email-mathewm@codeaurora.org>
+	 <1319046247-3391-9-git-send-email-mathewm@codeaurora.org>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1319051830.15441.178.camel@aeonflux>
+Message-ID: <1319051520.15441.173.camel@aeonflux>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mat,
 
-> It's convenient to use the HCI device index the AMP controller id, but
-> the spec requires that an AMP controller never has id 0.
+> AMP channels can be moved between BR/EDR and AMP controllers using a
+> sequence of signals. Every attempted channel move involves a series of
+> four signals:
+> 
+>    Move Initiator                 Move Responder
+>         |                                 |
+>         |       Move Channel Request      |
+>         |  ---------------------------->  |
+>         |                                 |
+>         |       Move Channel Response     |
+>         |  <----------------------------  |
+>         |                                 |
+>         |       Move Channel Confirm      |
+>         |  ---------------------------->  |
+>         |                                 |
+>         |  Move Channel Confirm Response  |
+> 	|  <----------------------------  |
+> 
+> All four signals are sent even if the move fails.
 > 
 > Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 > ---
->  net/bluetooth/hci_core.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
+>  net/bluetooth/l2cap_core.c |  129 +++++++++++++++++++++++++++++++++++++++++++-
+>  1 files changed, 127 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index fdcbf8f..78e6b05 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1426,7 +1426,7 @@ int hci_add_adv_entry(struct hci_dev *hdev,
->  int hci_register_dev(struct hci_dev *hdev)
->  {
->  	struct list_head *head = &hci_dev_list, *p;
-> -	int i, id = 0, error;
-> +	int i, id, error;
->  	BT_DBG("%p name %s bus %d owner %p", hdev, hdev->name,
->  						hdev->bus, hdev->owner);
-> @@ -1434,6 +1434,8 @@ int hci_register_dev(struct hci_dev *hdev)
->  	if (!hdev->open || !hdev->close || !hdev->destruct)
->  		return -EINVAL;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index f250392..fe8aaf7 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3059,8 +3059,7 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
+>  	psm = le16_to_cpu(req->psm);
+>  	scid = le16_to_cpu(req->scid);
 >  
-> +	id = (hdev->dev_type == HCI_BREDR) ? 0 : 1;
+> -	BT_DBG("psm %d, scid %d, amp_id %d", (int) psm, (int) scid,
+> -		(int) req->amp_id);
+> +	BT_DBG("psm %d, scid %d, amp_id %d", psm, scid, req->amp_id);
+
+you need some git foo magic to not add something first and then fix it
+up later ;)
+ 
+>  	if (!enable_hs)
+>  		return -EINVAL;
+> @@ -3085,6 +3084,115 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
+>  	return l2cap_connect_rsp(conn, cmd, data);
+>  }
+>  
+> +static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
+> +				u16 icid, u16 result)
+> +{
+> +	struct l2cap_move_chan_rsp rsp;
 > +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	rsp.icid = cpu_to_le16(icid);
+> +	rsp.result = cpu_to_le16(result);
+> +
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
+> +}
+> +
+> +static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
+> +				struct l2cap_chan *chan, u16 icid, u16 result)
+> +{
+> +	struct l2cap_move_chan_cfm cfm;
+> +	u8 ident;
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	ident = l2cap_get_ident(conn);
+> +	if (chan)
+> +		chan->ident = ident;
+> +
+> +	cfm.icid = cpu_to_le16(icid);
+> +	cfm.result = cpu_to_le16(result);
+> +
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
+> +}
+> +
+> +static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
+> +					u16 icid)
+> +{
+> +	struct l2cap_move_chan_cfm_rsp rsp;
+> +
+> +	BT_DBG("icid %d", icid);
+> +
+> +	rsp.icid = cpu_to_le16(icid);
+> +	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
+> +}
+> +
+> +static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u8 *data)
+> +{
+> +	struct l2cap_move_chan_req *req = (struct l2cap_move_chan_req *) data;
+> +	u16 icid = 0;
+> +	u16 result = L2CAP_MR_NOT_ALLOWED;
+> +
+> +	icid = le16_to_cpu(req->icid);
+> +
+> +	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
+> +
+> +	if (!enable_hs)
+> +		return -EINVAL;
+> +
+> +	/* Placeholder: Always refuse */
+> +	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u8 *data)
+> +{
+> +	struct l2cap_move_chan_rsp *rsp = (struct l2cap_move_chan_rsp *) data;
+> +	u16 icid, result;
+> +
+> +	icid = le16_to_cpu(rsp->icid);
+> +	result = le16_to_cpu(rsp->result);
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	/* Placeholder: Always unconfirmed */
+> +	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u8 *data)
+> +{
+> +	struct l2cap_move_chan_cfm *cfm = (struct l2cap_move_chan_cfm *) data;
+> +	u16 icid, result;
+> +
+> +	icid = le16_to_cpu(cfm->icid);
+> +	result = le16_to_cpu(cfm->result);
+> +
+> +	BT_DBG("icid %d, result %d", icid, result);
+> +
+> +	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
+> +					struct l2cap_cmd_hdr *cmd, u8 *data)
+> +{
+> +	struct l2cap_move_chan_cfm_rsp *rsp =
+> +		(struct l2cap_move_chan_cfm_rsp *) data;
+> +	u16 icid;
+> +
+> +	icid = le16_to_cpu(rsp->icid);
+> +
+> +	BT_DBG("icid %d", icid);
+> +
+> +	return 0;
+> +}
+> +
+>  static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
+>  							u16 to_multiplier)
+>  {
+> @@ -3205,6 +3313,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+>  		err = l2cap_create_channel_rsp(conn, cmd, data);
+>  		break;
+>  
+> +	case L2CAP_MOVE_CHAN_REQ:
+> +		err = l2cap_move_channel_req(conn, cmd, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_RSP:
+> +		err = l2cap_move_channel_rsp(conn, cmd, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_CFM:
+> +		err = l2cap_move_channel_confirm(conn, cmd, data);
+> +		break;
+> +
+> +	case L2CAP_MOVE_CHAN_CFM_RSP:
+> +		err = l2cap_move_channel_confirm_rsp(conn, cmd, data);
+> +		break;
+> +
+> +
+>  	default:
+>  		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
+>  		err = -EINVAL;
 
-this is a pretty nasty hack. Especially since we can have as many BR/EDR
-controllers as we want and then our list of AMPs can have empty spots in
-their list. Also it can happen that the first AMP controller has id 2 or
-higher.
-
-In general I am fine with this, but please add an extra comment about
-the AMP not allowed to be id 0 above this change (similar to what your
-commit message says).
+so besides my comment about u8 *data and the on above, this looks fine
+to me.
 
 Regards
 
