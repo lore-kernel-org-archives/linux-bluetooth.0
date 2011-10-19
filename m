@@ -1,116 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Oct 2011 13:39:20 -0700 (PDT)
-From: Mat Martineau <mathewm@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
-	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
-Subject: Re: [PATCHv2 3/9] Bluetooth: Add channel policy to
- getsockopt/setsockopt
-In-Reply-To: <1319050472.15441.159.camel@aeonflux>
-Message-ID: <alpine.DEB.2.02.1110191325130.1976@mathewm-linux>
-References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>  <1319046247-3391-4-git-send-email-mathewm@codeaurora.org> <1319050472.15441.159.camel@aeonflux>
+From: "Ganir, Chen" <chen.ganir@ti.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 19 Oct 2011 21:50:05 +0200
+Subject: RE: LE discovery procedure
+Message-ID: <7769C83744F2C34A841232EF77AEA20C01DC6AB191@dnce01.ent.ti.com>
+References: <4E9E65FF.1000400@globaledgesoft.com>
+	<7769C83744F2C34A841232EF77AEA20C01DC6AADCE@dnce01.ent.ti.com>
+ <CAJdJm_Mxr_ubnALkUs7_mn41ZzoZdTWC45NhAwcBmueE195UOQ@mail.gmail.com>
+In-Reply-To: <CAJdJm_Mxr_ubnALkUs7_mn41ZzoZdTWC45NhAwcBmueE195UOQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Anderson
 
-On Wed, 19 Oct 2011, Marcel Holtmann wrote:
+> 
+> Actually we check it, but on the BlueZ side (as you know, our host
+> stack is composed of kernel+userspace). From
+> adapter_emit_device_found() in src/adapter.c:
+> 
+>         if (dev->le) {
+>                 gboolean broadcaster;
+> 
+>                 if (dev->flags & (EIR_LIM_DISC | EIR_GEN_DISC))
+>                         broadcaster = FALSE;
+>                 else
+>                         broadcaster = TRUE;
+> 
+>                 emit_device_found(adapter->path, paddr,
+>                 [...]
+> 
+> But note that we still send the "DeviceFound" D-Bus signal, but with a
+> "Broadcaster" property which UI can use to ignore the device.
+> 
+> Filtering on the kernel requires parsing Adv. data, and may not allow
+> us to implement Broadcaster role on BlueZ (and on external
+> applications as well) in future.
+> 
+> IMHO the kernel should still notify userspace of the device, then
+> BlueZ can filter out the Broadcaster devices as necessary, *unless* we
+> plan to parse all AD information on kernel, which is not a good idea
+> IMHO.
+> 
 
-> Hi Mat,
->
->> Each channel has a policy to require BR/EDR (the default),
->> prefer BR/EDR, or prefer AMP.
->>
->> Check for valid policy value and L2CAP mode.
->>
->> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
->> ---
->>  include/net/bluetooth/l2cap.h |    1 +
->>  net/bluetooth/l2cap_sock.c    |   35 +++++++++++++++++++++++++++++++++++
->>  2 files changed, 36 insertions(+), 0 deletions(-)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index fd090db..b0c9345 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -366,6 +366,7 @@ struct l2cap_chan {
->>  	__u16		flush_to;
->>  	__u8		mode;
->>  	__u8		chan_type;
->> +	__u8		chan_policy;
->>
->>  	__le16		sport;
->>
->> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->> index 836d12e..1230e6e 100644
->> --- a/net/bluetooth/l2cap_sock.c
->> +++ b/net/bluetooth/l2cap_sock.c
->> @@ -467,6 +467,16 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname, ch
->>
->>  		break;
->>
->> +	case BT_CHANNEL_POLICY:
->> +		if (!enable_hs) {
->> +			err = -ENOPROTOOPT;
->> +			break;
->> +		}
->> +
->> +		if (put_user(chan->chan_policy, (u32 __user *) optval))
->> +			err = -EFAULT;
->> +		break;
->> +
->>  	default:
->>  		err = -ENOPROTOOPT;
->>  		break;
->> @@ -690,6 +700,31 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname, ch
->>  			clear_bit(FLAG_FORCE_ACTIVE, &chan->flags);
->>  		break;
->>
->> +	case BT_CHANNEL_POLICY:
->> +		if (!enable_hs) {
->> +			err = -ENOPROTOOPT;
->> +			break;
->> +		}
->> +
->> +		if (get_user(opt, (u32 __user *) optval)) {
->> +			err = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		if (opt > BT_CHANNEL_POLICY_AMP_PREFERRED) {
->> +			err = -EINVAL;
->> +			break;
->> +		}
->> +
->> +		if (chan->mode != L2CAP_MODE_ERTM &&
->> +			 chan->mode != L2CAP_MODE_STREAMING) {
->
-> use another tab here instead of the single space.
+I'm not so comfortable using the same Device Found event both for discovering devices and for observing.
+In addition, maybe the 'broadcaster variable is the wrong name for this variable. The true meaning is 'discoverable'. A peripheral can broadcast services and other advertising information while broadcasting as discoverable, so this flag may be confusing.
 
-Ok
+This also means that the upper layer using this API should keep its own state, to differ between discovering devices (where discoverable devices are displayed as discoverable and broadcast data is collected) or just 'observing' advertising data, where the central device just searches for broadcast data, and has no intention of connecting to a device. In this case, a DEVICE_FOUND event is a bit confusing.
 
->> +			err = -EINVAL;
->> +			break;
->> +		}
->
-> And do we wanna keep EINVAL or better do EOPNOTSUPP. I think the later
-> is better here. The value is essentially supported, but not valid on
-> this specific transport.
+Do you know if anyone is working on extending the capabilities of the EIR parser for more advertising data types (such as services)? We need to think of a proper way to pass the EIR information to the user in the event.
 
-I'll change this one to EOPNOTSUPP.
-
->> +
->> +		chan->chan_policy = (u8) opt;
->> +		break;
->> +
->>  	default:
->>  		err = -ENOPROTOOPT;
->>  		break;
-
-Thanks,
---
-Mat Martineau
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
-
+Best regards,
+Chen Ganir.
