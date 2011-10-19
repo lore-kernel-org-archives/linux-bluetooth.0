@@ -1,101 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Oct 2011 11:23:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Siarhei Siamashka <siarhei.siamashka@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Siarhei Siamashka <siarhei.siamashka@nokia.com>
-Subject: Re: [PATCH] sbc: overflow bugfix and audio decoding quality
- improvement
-Message-ID: <20111019082301.GA4297@fusion.localdomain>
-References: <1318814678-25640-1-git-send-email-siarhei.siamashka@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1318814678-25640-1-git-send-email-siarhei.siamashka@gmail.com>
+From: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+	claudio.takahasi@openbossa.org
+Cc: Dmitriy Paliy <dmitriy.paliy@nokia.com>
+Subject: [PATCH BlueZ] Fix release all sessions on powering adapter off
+Date: Wed, 19 Oct 2011 11:19:58 +0300
+Message-Id: <1319012398-13859-1-git-send-email-dmitriy.paliy@nokia.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Siarhei,
+When adapter is powered off, all sessions should be released without
+changing mode, which is contrary to what session_remove does. This
+prevents from such situation when powering off leads to new mode
+derived from mode_sessions.
 
-On Mon, Oct 17, 2011, Siarhei Siamashka wrote:
-> The "(((audio_sample << 1) | 1) << frame->scale_factor[ch][sb])"
-> part of expression
->     "frame->sb_sample[blk][ch][sb] =
->         (((audio_sample << 1) | 1) << frame->scale_factor[ch][sb]) /
->         levels[ch][sb] - (1 << frame->scale_factor[ch][sb])"
-> in "sbc_unpack_frame" function can sometimes overflow 32-bit signed int.
-> This problem can be reproduced by first using bitpool 128 and encoding
-> some random noise data, and then feeding it to sbc decoder. The obvious
-> thing to do would be to change "audio_sample" variable type to uint32_t.
-> 
-> However the problem is a little bit more complicated. According
-> to the section "12.6.2 Scale Factors" of A2DP spec:
->     scalefactor[ch][sb] = pow(2.0, (scale_factor[ch][sb] + 1))
-> 
-> And according to "12.6.4 Reconstruction of the Subband Samples":
->     sb_sample[blk][ch][sb] = scalefactor[ch][sb] *
->         ((audio_sample[blk][ch][sb]*2.0+1.0) / levels[ch][sb]-1.0);
-> 
-> Hence the current code for calculating "sb_sample[blk][ch][sb]" is
-> not quite correct, because it loses one least significant bit of
-> sample data and passes twice smaller sample values to the synthesis
-> filter (the filter also deviates from the spec to compensate this).
-> This all has quite a noticeable impact on audio quality. Moreover,
-> it makes sense to keep a few extra bits of precision here in order
-> to minimize rounding errors. So the proposed patch introduces a new
-> SBCDEC_FIXED_EXTRA_BITS constant and uses uint64_t data type
-> for intermediate calculations in order to safeguard against
-> overflows. This patch intentionally addresses only the quality
-> issue, but performance can be also improved later (like replacing
-> division with multiplication by reciprocal).
-> 
-> Test for the difference of sbc encoding/decoding roundtrip vs.
-> the original audio file for joint stereo, bitpool 128, 8 subbands
-> and http://media.xiph.org/sintel/sintel-master-st.flac sample
-> demonstrates some quality improvement:
-> 
-> === before ===
->     --- comparing original / sbc_encoder.exe + sbcdec ---
->     stddev:    4.64 PSNR: 82.97 bytes:170495708/170496000
-> === after ===
->     --- comparing original / sbc_encoder.exe + sbcdec ---
->     stddev:    1.95 PSNR: 90.50 bytes:170495708/170496000
-> ---
->  sbc/sbc.c        |   11 +++++++----
->  sbc/sbc_tables.h |    6 ++++--
->  2 files changed, 11 insertions(+), 6 deletions(-)
+Currently, if there are multiple mode sessions requested by different
+clients, powering adapter off results in powering immediately it on.
+---
+ src/adapter.c |   14 ++------------
+ 1 files changed, 2 insertions(+), 12 deletions(-)
 
-Applied. Thanks!
+diff --git a/src/adapter.c b/src/adapter.c
+index d1ef17c..6d982a0 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2313,19 +2313,9 @@ static void set_mode_complete(struct btd_adapter *adapter)
+ 
+ 	DBG("");
+ 
+-	/*
+-	 * g_slist_free is not called after g_slist_foreach because the list is
+-	 * updated using g_slist_remove in session_remove.
+-	 */
+ 	if (adapter->mode == MODE_OFF) {
+-		GSList *l;
+-
+-		for (l = adapter->mode_sessions; l;) {
+-			struct session_req *req = l->data;
+-			l = g_slist_next(l);
+-			session_remove(req);
+-			session_free(req);
+-		}
++		g_slist_free_full(adapter->mode_sessions, session_free);
++		adapter->mode_sessions = NULL;
+ 	}
+ 
+ 	if (adapter->pending_mode == NULL)
+-- 
+1.7.4.1
 
-Additionally I pushed another patch to try to reduce the massive
-indentation in the nested for-loops. In general whenever you've got the
-following kind of pattern in a loop:
-
-	if (some condition) {
-		lots
-		of
-		stuff
-		...
-	} else
-		just_a_single_statement;
-
-You can avoid indentation for the larger branch by changing this to:
-
-	if (inverted condition) {
-		just_a_single_statement;
-		continue;
-	}
-
-	lots
-	of
-	stuff
-	...
-
-And if you just have a long if-branch without an else part at all it
-becomes even simpler:
-
-	if (inverted condition)
-		continue;
-
-	<what used to be within a long if-branch>
-
-Johan
