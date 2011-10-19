@@ -4,193 +4,62 @@ To: linux-bluetooth@vger.kernel.org
 Cc: padovan@profusion.mobi, pkrystad@codeaurora.org,
 	andrei.emeltchenko@intel.com,
 	Mat Martineau <mathewm@codeaurora.org>
-Subject: [PATCHv2 8/9] Bluetooth: Add signal handlers for channel moves
-Date: Wed, 19 Oct 2011 10:44:06 -0700
-Message-Id: <1319046247-3391-9-git-send-email-mathewm@codeaurora.org>
+Subject: [PATCHv2 1/9] Bluetooth: Add BT_CHANNEL_POLICY socket option
+Date: Wed, 19 Oct 2011 10:43:59 -0700
+Message-Id: <1319046247-3391-2-git-send-email-mathewm@codeaurora.org>
 In-Reply-To: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AMP channels can be moved between BR/EDR and AMP controllers using a
-sequence of signals. Every attempted channel move involves a series of
-four signals:
-
-   Move Initiator                 Move Responder
-        |                                 |
-        |       Move Channel Request      |
-        |  ---------------------------->  |
-        |                                 |
-        |       Move Channel Response     |
-        |  <----------------------------  |
-        |                                 |
-        |       Move Channel Confirm      |
-        |  ---------------------------->  |
-        |                                 |
-        |  Move Channel Confirm Response  |
-	|  <----------------------------  |
-
-All four signals are sent even if the move fails.
+Allow control of AMP functionality on L2CAP sockets. By default,
+connections will be restricted to BR/EDR.  Manipulating the
+BT_CHANNEL_POLICY option allows for channels to be moved to or created
+on AMP controllers.
 
 Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
 ---
- net/bluetooth/l2cap_core.c |  129 +++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 127 insertions(+), 2 deletions(-)
+ include/net/bluetooth/bluetooth.h |   27 +++++++++++++++++++++++++++
+ 1 files changed, 27 insertions(+), 0 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f250392..fe8aaf7 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3059,8 +3059,7 @@ static inline int l2cap_create_channel_req(struct l2cap_conn *conn,
- 	psm = le16_to_cpu(req->psm);
- 	scid = le16_to_cpu(req->scid);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index fb1acb3..38cd3da 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -77,6 +77,33 @@ struct bt_power {
+ #define BT_POWER_FORCE_ACTIVE_OFF 0
+ #define BT_POWER_FORCE_ACTIVE_ON  1
  
--	BT_DBG("psm %d, scid %d, amp_id %d", (int) psm, (int) scid,
--		(int) req->amp_id);
-+	BT_DBG("psm %d, scid %d, amp_id %d", psm, scid, req->amp_id);
++#define BT_CHANNEL_POLICY	10
++
++/* BR/EDR only (default policy)
++ *   AMP controllers cannot be used.
++ *   Channel move requests from the remote device are denied.
++ *   If the L2CAP channel is currently using AMP, move the channel to BR/EDR.
++ */
++#define BT_CHANNEL_POLICY_BREDR_ONLY		0
++
++/* BR/EDR Preferred
++ *   Allow use of AMP controllers.
++ *   If the L2CAP channel is currently on AMP, move it to BR/EDR.
++ *   Channel move requests from the remote device are allowed.
++ */
++#define BT_CHANNEL_POLICY_BREDR_PREFERRED	1
++
++/* AMP Preferred
++ *   Allow use of AMP controllers
++ *   If the L2CAP channel is currently on BR/EDR and AMP controller
++ *     resources are available, initiate a channel move to AMP.
++ *   Channel move requests from the remote device are allowed.
++ *   If the L2CAP socket has not been connected yet, try to create
++ *     and configure the channel directly on an AMP controller rather
++ *     than BR/EDR.
++ */
++#define BT_CHANNEL_POLICY_AMP_PREFERRED		2
++
+ __attribute__((format (printf, 2, 3)))
+ int bt_printk(const char *level, const char *fmt, ...);
  
- 	if (!enable_hs)
- 		return -EINVAL;
-@@ -3085,6 +3084,115 @@ static inline int l2cap_create_channel_rsp(struct l2cap_conn *conn,
- 	return l2cap_connect_rsp(conn, cmd, data);
- }
- 
-+static void l2cap_send_move_chan_rsp(struct l2cap_conn *conn, u8 ident,
-+				u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_rsp rsp;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	rsp.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static void l2cap_send_move_chan_cfm(struct l2cap_conn *conn,
-+				struct l2cap_chan *chan, u16 icid, u16 result)
-+{
-+	struct l2cap_move_chan_cfm cfm;
-+	u8 ident;
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	ident = l2cap_get_ident(conn);
-+	if (chan)
-+		chan->ident = ident;
-+
-+	cfm.icid = cpu_to_le16(icid);
-+	cfm.result = cpu_to_le16(result);
-+
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM, sizeof(cfm), &cfm);
-+}
-+
-+static void l2cap_send_move_chan_cfm_rsp(struct l2cap_conn *conn, u8 ident,
-+					u16 icid)
-+{
-+	struct l2cap_move_chan_cfm_rsp rsp;
-+
-+	BT_DBG("icid %d", icid);
-+
-+	rsp.icid = cpu_to_le16(icid);
-+	l2cap_send_cmd(conn, ident, L2CAP_MOVE_CHAN_CFM_RSP, sizeof(rsp), &rsp);
-+}
-+
-+static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u8 *data)
-+{
-+	struct l2cap_move_chan_req *req = (struct l2cap_move_chan_req *) data;
-+	u16 icid = 0;
-+	u16 result = L2CAP_MR_NOT_ALLOWED;
-+
-+	icid = le16_to_cpu(req->icid);
-+
-+	BT_DBG("icid %d, dest_amp_id %d", icid, req->dest_amp_id);
-+
-+	if (!enable_hs)
-+		return -EINVAL;
-+
-+	/* Placeholder: Always refuse */
-+	l2cap_send_move_chan_rsp(conn, cmd->ident, icid, result);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_rsp(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u8 *data)
-+{
-+	struct l2cap_move_chan_rsp *rsp = (struct l2cap_move_chan_rsp *) data;
-+	u16 icid, result;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+	result = le16_to_cpu(rsp->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	/* Placeholder: Always unconfirmed */
-+	l2cap_send_move_chan_cfm(conn, NULL, icid, L2CAP_MC_UNCONFIRMED);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u8 *data)
-+{
-+	struct l2cap_move_chan_cfm *cfm = (struct l2cap_move_chan_cfm *) data;
-+	u16 icid, result;
-+
-+	icid = le16_to_cpu(cfm->icid);
-+	result = le16_to_cpu(cfm->result);
-+
-+	BT_DBG("icid %d, result %d", icid, result);
-+
-+	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
-+
-+	return 0;
-+}
-+
-+static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
-+					struct l2cap_cmd_hdr *cmd, u8 *data)
-+{
-+	struct l2cap_move_chan_cfm_rsp *rsp =
-+		(struct l2cap_move_chan_cfm_rsp *) data;
-+	u16 icid;
-+
-+	icid = le16_to_cpu(rsp->icid);
-+
-+	BT_DBG("icid %d", icid);
-+
-+	return 0;
-+}
-+
- static inline int l2cap_check_conn_param(u16 min, u16 max, u16 latency,
- 							u16 to_multiplier)
- {
-@@ -3205,6 +3313,23 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		err = l2cap_create_channel_rsp(conn, cmd, data);
- 		break;
- 
-+	case L2CAP_MOVE_CHAN_REQ:
-+		err = l2cap_move_channel_req(conn, cmd, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_RSP:
-+		err = l2cap_move_channel_rsp(conn, cmd, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM:
-+		err = l2cap_move_channel_confirm(conn, cmd, data);
-+		break;
-+
-+	case L2CAP_MOVE_CHAN_CFM_RSP:
-+		err = l2cap_move_channel_confirm_rsp(conn, cmd, data);
-+		break;
-+
-+
- 	default:
- 		BT_ERR("Unknown BR/EDR signaling command 0x%2.2x", cmd->code);
- 		err = -EINVAL;
 -- 
 1.7.7
 
