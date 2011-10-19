@@ -1,49 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cho, Yu-Chen" <acho@suse.com>
-To: marcel@holtmann.org, padovan@profusion.mobi,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: acho@novell.com, jlee@novell.com, oneukum@suse.com,
-	"Cho, Yu-Chen" <acho@suse.com>
-Subject: [PATCH 2/2] fix device id for Broadcom SoftSailing
-Date: Thu, 20 Oct 2011 12:58:30 +0800
-Message-Id: <588a371b8ea7ca230776ca2ec62412501b532ebd.1319086508.git.acho@suse.com>
-In-Reply-To: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
-References: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
-In-Reply-To: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
-References: <2eb6d1b761a3fddea28294959bde7e9c7ef88043.1319086508.git.acho@suse.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: Re: [PATCHv2 7/9] Bluetooth: Use symbolic values for the fixed
+ channel map
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mat Martineau <mathewm@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi,
+	pkrystad@codeaurora.org, andrei.emeltchenko@intel.com
+Date: Wed, 19 Oct 2011 15:05:02 -0700
+In-Reply-To: <alpine.DEB.2.02.1110191428330.1976@mathewm-linux>
+References: <1319046247-3391-1-git-send-email-mathewm@codeaurora.org>
+	  <1319046247-3391-8-git-send-email-mathewm@codeaurora.org>
+	 <1319051362.15441.171.camel@aeonflux>
+	 <alpine.DEB.2.02.1110191428330.1976@mathewm-linux>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1319061905.15441.190.camel@aeonflux>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed the device VID:PID typo 05ac:21e1 to 0a5c:21e1
+Hi Mat,
 
-Signed-off-by: Cho, Yu-Chen <acho@suse.com>
----
- drivers/bluetooth/btusb.c |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+> >> The A2MP fixed channel bit is only set when high-speed mode is enabled.
+> >>
+> >> Signed-off-by: Mat Martineau <mathewm@codeaurora.org>
+> >> ---
+> >>  net/bluetooth/l2cap_core.c |    6 +++++-
+> >>  1 files changed, 5 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >> index 67f0ab6..f250392 100644
+> >> --- a/net/bluetooth/l2cap_core.c
+> >> +++ b/net/bluetooth/l2cap_core.c
+> >> @@ -60,7 +60,7 @@ int disable_ertm;
+> >>  int enable_hs;
+> >>
+> >>  static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN;
+> >> -static u8 l2cap_fixed_chan[8] = { 0x02, };
+> >> +static u8 l2cap_fixed_chan[8] = { L2CAP_FC_L2CAP, };
+> >>
+> >>  static LIST_HEAD(chan_list);
+> >>  static DEFINE_RWLOCK(chan_list_lock);
+> >> @@ -2975,6 +2975,10 @@ static inline int l2cap_information_req(struct l2cap_conn *conn, struct l2cap_cm
+> >>  	} else if (type == L2CAP_IT_FIXED_CHAN) {
+> >>  		u8 buf[12];
+> >>  		struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) buf;
+> >> +
+> >> +		if (enable_hs)
+> >> +			l2cap_fixed_chan[0] |= L2CAP_FC_A2MP;
+> >> +
+> >>  		rsp->type   = cpu_to_le16(L2CAP_IT_FIXED_CHAN);
+> >>  		rsp->result = cpu_to_le16(L2CAP_IR_SUCCESS);
+> >>  		memcpy(buf + 4, l2cap_fixed_chan, 8);
+> >
+> > doing it this way is a bit sneaky actually. Since it does not really
+> > allow disabling HS once you enabled it.
+> >
+> > Maybe doing feature enabling/disabling (and also for LE) is better
+> > handled via /sys/kernel/debug/bluetooth/enable_hs.
+> 
+> This is really the only place where anything other than the enable_hs 
+> value itself needs to be manipulated.  It would be less code to just 
+> add an "else" and clear the feature mask bit.  l2cap_fixed_chan[] is 
+> not used anywhere outside this function.
+> 
+> If we want to move enable_hs to debugfs, I'll drop this change from 
+> patch set and work on debugfs support for the next patch set.
+> 
+> Any other opinions?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5893ba4..1877e91 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -60,9 +60,6 @@ static struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
- 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
- 
--	/* Broadcom SoftSailing reporting vendor specific */
--	{ USB_DEVICE(0x05ac, 0x21e1) },
--
- 	/* Apple MacBookPro 7,1 */
- 	{ USB_DEVICE(0x05ac, 0x8213) },
- 
-@@ -98,6 +95,8 @@ static struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x0bdb, 0x1002) },
- 
- 	/* Broadcom 20702 Bluetooth 4.0 Adapter */
-+	/* Broadcom SoftSailing reporting vendor specific */
-+	{ USB_DEVICE(0xa5c, 0x21e1) },
- 	/* Broadcom Valentine 802.11bgn 1x1 Combo HMC */
- 	{ USB_DEVICE(0xa5c, 0x21e3) },
- 
--- 
-1.7.3.4
+right now, I would be fine with an else statement to clear the bit.
+However we better add a note to get this merged over to debugfs. In
+general it seems a way better place anyway.
+
+Regards
+
+Marcel
+
 
