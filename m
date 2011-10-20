@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rafal Michalski <michalski.raf@gmail.com>
+From: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Rafal Michalski <michalski.raf@gmail.com>
-Subject: [PATCH obexd] Fix pulling single vCard for parameters header missing
-Date: Thu, 20 Oct 2011 10:34:48 +0200
-Message-Id: <1319099688-4427-1-git-send-email-michalski.raf@gmail.com>
+Subject: [PATCHv6 hcidump 0/4] decode fixed channels
+Date: Thu, 20 Oct 2011 11:30:10 +0300
+Message-Id: <1319099414-27993-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to PBAP specification (ANNEX A), all application-parameters
-are optional in case of pulling single vCard entry, so header for
-application-parameters can be omitted, and it would be valid as well.
-Previously pulling single vCard was always failing with "Bad Request"
-status in such a circumstance.
-This patch fixes that issue and pulling single vCard is done successfully
-with "OK" status. Output vCard would contain all fields under 2.1 format
-(as for default settings).
----
- plugins/pbap.c |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/plugins/pbap.c b/plugins/pbap.c
-index a03f07c..066e37e 100644
---- a/plugins/pbap.c
-+++ b/plugins/pbap.c
-@@ -643,8 +643,12 @@ static int pbap_get(struct obex_session *os, obex_object_t *obj,
- 		return -EBADR;
- 
- 	rsize = obex_aparam_read(os, obj, &buffer);
--	if (rsize < 0)
--		return -EBADR;
-+	if (rsize < 0) {
-+		if (g_ascii_strcasecmp(type, VCARDENTRY_TYPE) != 0)
-+			return -EBADR;
-+
-+		rsize = 0;
-+	}
- 
- 	params = parse_aparam(buffer, rsize);
- 	if (params == NULL)
+Decode fixed channels in L2CAP Information Response
+
+Changes:
+	v2: split headers to different patch per request
+	v3: separate patch adding 64 bit get_val, fixing issues
+	with type conversion
+	v4: typecast => format specifier (%d -> %llu)
+	v5: remove typecasts and use direct access to 64 bit value.
+	v6: add get_uint64 helper
+
+Andrei Emeltchenko (4):
+  add btohll macro
+  add fixed channel definitions
+  get_uint64 helper
+  decode fixed channel list info rsp
+
+ lib/bluetooth.h |    4 ++++
+ lib/l2cap.h     |    5 +++++
+ parser/l2cap.c  |   23 ++++++++++++++++++++---
+ parser/parser.h |    5 +++++
+ 4 files changed, 34 insertions(+), 3 deletions(-)
+
 -- 
-1.6.3.3
+1.7.4.1
 
