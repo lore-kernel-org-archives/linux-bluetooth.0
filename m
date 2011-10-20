@@ -2,160 +2,68 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 3/8] Implement D-Bus register watcher function
-Date: Thu, 20 Oct 2011 11:46:46 +0200
-Message-Id: <1319104011-27747-4-git-send-email-sancane@gmail.com>
-In-Reply-To: <1319104011-27747-3-git-send-email-sancane@gmail.com>
+Subject: [PATCH 8/8] Implement D-Bus get properties function
+Date: Thu, 20 Oct 2011 11:46:51 +0200
+Message-Id: <1319104011-27747-9-git-send-email-sancane@gmail.com>
+In-Reply-To: <1319104011-27747-8-git-send-email-sancane@gmail.com>
 References: <1319104011-27747-1-git-send-email-sancane@gmail.com>
  <1319104011-27747-2-git-send-email-sancane@gmail.com>
  <1319104011-27747-3-git-send-email-sancane@gmail.com>
+ <1319104011-27747-4-git-send-email-sancane@gmail.com>
+ <1319104011-27747-5-git-send-email-sancane@gmail.com>
+ <1319104011-27747-6-git-send-email-sancane@gmail.com>
+ <1319104011-27747-7-git-send-email-sancane@gmail.com>
+ <1319104011-27747-8-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |   96 +++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 93 insertions(+), 3 deletions(-)
+ thermometer/thermometer.c |   32 +++++++++++++++++++++++++++++---
+ 1 files changed, 29 insertions(+), 3 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index 343d72a..05c6ef6 100644
+index 4a2b9c8..99bfe43 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -55,6 +55,7 @@ struct thermometer {
- 	guint			attioid;	/* Att watcher id */
- 	guint			attindid;	/* Att incications id */
- 	GSList			*chars;		/* Characteristics */
-+	GSList			*fwatchers;     /* Final measurements */
- 	gboolean		intermediate;
- 	guint8			type;
- 	guint16			interval;
-@@ -76,8 +77,27 @@ struct descriptor {
- 	bt_uuid_t		uuid;
- };
- 
-+struct watcher {
-+	struct thermometer	*t;
-+	guint			id;
-+	gchar			*srv;
-+	gchar			*path;
-+};
-+
- static GSList *thermometers = NULL;
- 
-+static void destroy_watcher(gpointer user_data)
-+{
-+	struct watcher *watcher = user_data;
-+
-+	if (watcher->id > 0)
-+		g_dbus_remove_watch(watcher->t->conn, watcher->id);
-+
-+	g_free(watcher->path);
-+	g_free(watcher->srv);
-+	g_free(watcher);
-+}
-+
- static void destroy_char(gpointer user_data)
- {
- 	struct characteristic *c = user_data;
-@@ -102,6 +122,9 @@ static void destroy_thermometer(gpointer user_data)
- 	if (t->chars != NULL)
- 		g_slist_free_full(t->chars, destroy_char);
- 
-+	if (t->fwatchers != NULL)
-+		g_slist_free_full(t->fwatchers, destroy_watcher);
-+
- 	dbus_connection_unref(t->conn);
- 	btd_device_unref(t->dev);
- 	g_free(t->svc_range);
-@@ -119,6 +142,19 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
- 	return -1;
- }
- 
-+static gint cmp_watcher(gconstpointer a, gconstpointer b)
-+{
-+	const struct watcher *watcher = a;
-+	const struct watcher *match = b;
-+	int ret;
-+
-+	ret = g_strcmp0(watcher->srv, match->srv);
-+	if (ret != 0)
-+		return ret;
-+
-+	return g_strcmp0(watcher->path, match->path);
-+}
-+
- static void change_property(struct thermometer *t, const gchar *name,
- 							gpointer value) {
- 	if (g_strcmp0(name, "Intermediate") == 0) {
-@@ -413,12 +449,66 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- 						"Function not implemented.");
- }
- 
-+static void enable_final_measurement(struct thermometer *t)
-+{
-+	/* TODO: enable final measurements */
-+}
-+
-+static void watcher_exit(DBusConnection *conn, void *user_data)
-+{
-+	/* TODO: Watcher disconnected */
-+}
-+
-+static struct watcher *find_watcher(struct thermometer *t, const gchar *sender,
-+							const gchar *path)
-+{
-+	struct watcher *match;
-+	GSList *l;
-+
-+	match = g_new0(struct watcher, 1);
-+	match->srv = g_strdup(sender);
-+	match->path = g_strdup(path);
-+
-+	l = g_slist_find_custom(t->fwatchers, match, cmp_watcher);
-+	destroy_watcher(match);
-+
-+	if (l != NULL)
-+		return l->data;
-+
-+	return NULL;
-+}
-+
- static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+@@ -452,9 +452,35 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
  								void *data)
  {
 -	/* TODO: */
 -	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
 -						"Function not implemented.");
-+	const gchar *sender = dbus_message_get_sender(msg);
 +	struct thermometer *t = data;
-+	struct watcher *watcher;
-+	gchar *path;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
 +
-+	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
-+							DBUS_TYPE_INVALID))
-+		return btd_error_invalid_args(msg);
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
 +
-+	watcher = find_watcher(t, sender, path);
-+	if (watcher != NULL)
-+		return btd_error_already_exists(msg);
++	dbus_message_iter_init_append(reply, &iter);
 +
-+	DBG("Thermometer watcher %s registered", path);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 +
-+	watcher = g_new0(struct watcher, 1);
-+	watcher->srv = g_strdup(sender);
-+	watcher->path = g_strdup(path);
-+	watcher->t = t;
-+	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
-+						watcher, destroy_watcher);
++	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
++							&t->intermediate);
 +
-+	if (g_slist_length(t->fwatchers) == 0)
-+		enable_final_measurement(t);
++	if (t->has_interval) {
++		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
++								&t->interval);
++		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
++		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
++	}
 +
-+	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
++	dbus_message_iter_close_container(&iter, &dict);
 +
-+	return dbus_message_new_method_return(msg);
++	return reply;
  }
  
- static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
 -- 
 1.7.6.1
 
