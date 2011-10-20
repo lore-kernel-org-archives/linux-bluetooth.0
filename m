@@ -1,75 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd v2] gobex: fix includes of config.h
-Date: Thu, 20 Oct 2011 10:49:42 +0300
-Message-Id: <1319096982-3040-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 20 Oct 2011 10:37:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Fix leak of dbus message
+Message-ID: <20111020073710.GB11517@fusion.localdomain>
+References: <1318980279-2331-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1318980279-2331-2-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318980279-2331-2-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lucas,
 
----
- gobex/gobex-defs.c     |    2 +-
- gobex/gobex-header.c   |    2 +-
- gobex/gobex-packet.c   |    2 +-
- gobex/gobex-transfer.c |    4 ++++
- 4 files changed, 7 insertions(+), 3 deletions(-)
+On Tue, Oct 18, 2011, Lucas De Marchi wrote:
+> ---
+>  test/mpris-player.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/gobex/gobex-defs.c b/gobex/gobex-defs.c
-index beb773d..c184c9c 100644
---- a/gobex/gobex-defs.c
-+++ b/gobex/gobex-defs.c
-@@ -20,7 +20,7 @@
-  */
- 
- #ifdef HAVE_CONFIG_H
--# include "config.h"
-+#include <config.h>
- #endif
- 
- #include <glib.h>
-diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-index 0dade51..c2f0085 100644
---- a/gobex/gobex-header.c
-+++ b/gobex/gobex-header.c
-@@ -20,7 +20,7 @@
-  */
- 
- #ifdef HAVE_CONFIG_H
--# include "config.h"
-+#include <config.h>
- #endif
- 
- #include <string.h>
-diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
-index df94031..de5a1a8 100644
---- a/gobex/gobex-packet.c
-+++ b/gobex/gobex-packet.c
-@@ -20,7 +20,7 @@
-  */
- 
- #ifdef HAVE_CONFIG_H
--# include "config.h"
-+#include <config.h>
- #endif
- 
- #include <string.h>
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index 7278cb3..ab8cf2b 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -19,6 +19,10 @@
-  *
-  */
- 
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
- #include <string.h>
- #include <errno.h>
- 
--- 
-1.7.6.4
+Applied. Thanks.
 
+Johan
