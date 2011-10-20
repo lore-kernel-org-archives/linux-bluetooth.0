@@ -1,90 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Oct 2011 14:19:56 +0300
+Date: Thu, 20 Oct 2011 14:19:28 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Danis
-	<frederic.danis@linux.intel.com>
+To: "Gustavo F. Padovan" <padovan@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] Simplify eir_parse function
-Message-ID: <20111020111956.GA5742@fusion.localdomain>
-References: <1319100817-8477-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: Re: [PATCH] avdtp: check if the socket is valid
+Message-ID: <20111020111928.GA6486@fusion.localdomain>
+References: <1318968186-6202-1-git-send-email-padovan@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1319100817-8477-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1318968186-6202-1-git-send-email-padovan@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Gustavo,
 
-On Thu, Oct 20, 2011, Frédéric Danis wrote:
-> -int eir_parse(struct eir_data *eir, uint8_t *eir_data)
-> +static void eir_parse_uuid16(struct eir_data *eir, uint8_t *data, uint8_t len)
+On Tue, Oct 18, 2011, Gustavo F. Padovan wrote:
+> ---
+>  audio/avdtp.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+> 
+> diff --git a/audio/avdtp.c b/audio/avdtp.c
+> index d3568ba..08860d2 100644
+> --- a/audio/avdtp.c
+> +++ b/audio/avdtp.c
+> @@ -523,6 +523,8 @@ static gboolean avdtp_send(struct avdtp *session, uint8_t transaction,
+>  	}
+>  
+>  	sock = g_io_channel_unix_get_fd(session->io);
+> +	if (!sock)
+> +		return FALSE;
+>  
+>  	/* Single packet - no fragmentation */
+>  	if (sizeof(struct avdtp_single_header) + len <= session->omtu) {
 
-If you change data to void * it'd make the following changes easier:
-
-> +	uint8_t *uuid_ptr = data;
-
-How about uint16_t *u16 = data;
-
-It would then make the iteration and conversion easier:
-
-> +	service.type = SDP_UUID16;
-> +	for (i = 0; i < len / 2; i++) {
-> +		val16 = uuid_ptr[1];
-> +		val16 = (val16 << 8) + uuid_ptr[0];
-> +		service.value.uuid16 = val16;
-
-This could be simply:
-
-	service.value.uuid16 = btohs(bt_get_unaligned(u16));
-
-> +		uuid_str = bt_uuid2string(&service);
-> +		eir->services = g_slist_append(eir->services, uuid_str);
-> +		uuid_ptr += 2;
-
-And this u16++, actually just put it after i++ directly in the loop
-definintion.
-
-> +static void eir_parse_uuid32(struct eir_data *eir, uint8_t *data, uint8_t len)
-> +{
-> +	uint8_t *uuid_ptr = data;
-
-uint32_t *u32 = data; (assuming you make data void * like above)
-
-> +	service.type = SDP_UUID32;
-> +	for (i = 0; i < len / 4; i++) {
-> +		val32 = uuid_ptr[3];
-> +		for (k = 2; k >= 0; k--)
-> +			val32 = (val32 << 8) + uuid_ptr[k];
-> +		service.value.uuid32 = val32;
-
-Just change this all to:
-
-		service.value.uuid32 = bt_get_unaligned(btohl(u32));
-
-> +		uuid_ptr += 4;
-
-And move this to the for-loop definition after i++ as u32++
-
->  		case EIR_NAME_SHORT:
->  		case EIR_NAME_COMPLETE:
-> -			name = (const char *) &eir_data[2];
-> -			name_len = field_len - 1;
-> +			if (g_utf8_validate((char *) &eir_data[2],
-> +							field_len - 1, NULL))
-> +				eir->name = g_strndup((char *) &eir_data[2],
-> +								field_len - 1);
-> +			else
-> +				eir->name = g_strdup("");
->  			eir->name_complete = eir_data[1] == EIR_NAME_COMPLETE;
->  			break;
-
-If there are multiple name tags in the EIR data you would leak here all
-of them except the last one (devices shouldn't have this but you can't
-control all sorts of crazy things people do). To keep the behavior as
-the existing code, free eir->name when encountering multiple tags and
-just keep the last one.
-
-Also, If the name isn't valid UTF-8 I suppose you can just keep
-eir->name as NULL instead of pointing to an empty string?
+You'll need to give some more background when you're seeing this.
+session->io should be set to NULL if we don't have a proper socket
+available. Also, "if (!sock)" sounds like a weird check for a file
+descriptor or socket where 0 is a valid value (typically reserved for
+stdin but could get reused for something else in case a daemon-like
+process has closed stdin, stdout and stderr). I.e. a validity check for
+such a variable should be if (sock < 0), but as I said in this case you
+should really investigate why session->io isn't NULL.
 
 Johan
