@@ -2,120 +2,69 @@ Return-Path: <cyrus@holtmann.org>
 From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Santiago Carot-Nemesio <sancane@gmail.com>
-Subject: [PATCH 5/8] Enable final measurement indications when first watcher is enabled
-Date: Thu, 20 Oct 2011 11:46:48 +0200
-Message-Id: <1319104011-27747-6-git-send-email-sancane@gmail.com>
-In-Reply-To: <1319104011-27747-5-git-send-email-sancane@gmail.com>
+Subject: [PATCH 4/8] Implement D-Bus unregister watcher function
+Date: Thu, 20 Oct 2011 11:46:47 +0200
+Message-Id: <1319104011-27747-5-git-send-email-sancane@gmail.com>
+In-Reply-To: <1319104011-27747-4-git-send-email-sancane@gmail.com>
 References: <1319104011-27747-1-git-send-email-sancane@gmail.com>
  <1319104011-27747-2-git-send-email-sancane@gmail.com>
  <1319104011-27747-3-git-send-email-sancane@gmail.com>
  <1319104011-27747-4-git-send-email-sancane@gmail.com>
- <1319104011-27747-5-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- thermometer/thermometer.c |   78 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 77 insertions(+), 1 deletions(-)
+ thermometer/thermometer.c |   30 +++++++++++++++++++++++++++---
+ 1 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
-index d6afe17..4a03fc6 100644
+index 05c6ef6..d6afe17 100644
 --- a/thermometer/thermometer.c
 +++ b/thermometer/thermometer.c
-@@ -155,6 +155,22 @@ static gint cmp_watcher(gconstpointer a, gconstpointer b)
- 	return g_strcmp0(watcher->path, match->path);
+@@ -454,6 +454,11 @@ static void enable_final_measurement(struct thermometer *t)
+ 	/* TODO: enable final measurements */
  }
  
-+static gint cmp_char_uuid(gconstpointer a, gconstpointer b)
++static void disable_final_measurement(struct thermometer *t)
 +{
-+	const struct characteristic *ch = a;
-+	const gchar *uuid = b;
-+
-+	return g_strcmp0(ch->attr.uuid, uuid);
++	/* TODO: disable final measurements */
 +}
 +
-+static gint cmp_descriptor(gconstpointer a, gconstpointer b)
-+{
-+	const struct descriptor *desc = a;
-+	const bt_uuid_t *uuid = b;
-+
-+	return bt_uuid_cmp(&desc->uuid, uuid);
-+}
-+
- static void change_property(struct thermometer *t, const gchar *name,
- 							gpointer value) {
- 	if (g_strcmp0(name, "Intermediate") == 0) {
-@@ -449,9 +465,69 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
- 						"Function not implemented.");
- }
- 
-+static struct characteristic *get_characteristic(struct thermometer *t,
-+							const gchar *uuid)
-+{
-+	GSList *l;
-+
-+	l = g_slist_find_custom(t->chars, uuid, cmp_char_uuid);
-+	if (l == NULL)
-+		return NULL;
-+
-+	return l->data;
-+}
-+
-+static struct descriptor *get_descriptor(struct characteristic *ch,
-+							const bt_uuid_t *uuid)
-+{
-+	GSList *l;
-+
-+	l = g_slist_find_custom(ch->desc, uuid, cmp_descriptor);
-+	if (l == NULL)
-+		return NULL;
-+
-+	return l->data;
-+}
-+
-+static void final_measurement_cb (guint8 status, const guint8 *pdu,
-+						guint16 len, gpointer user_data)
-+{
-+	gchar *msg = user_data;
-+
-+	if (status != 0) {
-+		error("%s failed", msg);
-+		return;
-+	}
-+
-+	g_free(msg);
-+}
-+
- static void enable_final_measurement(struct thermometer *t)
+ static void watcher_exit(DBusConnection *conn, void *user_data)
  {
--	/* TODO: enable final measurements */
-+	struct characteristic *ch;
-+	struct descriptor *desc;
-+	bt_uuid_t btuuid;
-+	uint8_t atval[2];
-+	gchar *msg;
+ 	/* TODO: Watcher disconnected */
+@@ -514,9 +519,28 @@ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	/* TODO: */
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
+-						"Function not implemented.");
++	const gchar *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	gchar *path;
 +
-+	ch = get_characteristic(t, TEMPERATURE_MEASUREMENT_UUID);
-+	if (ch == NULL) {
-+		DBG("Temperature measurement characteristic not found");
-+		return;
-+	}
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
 +
-+	bt_uuid16_create(&btuuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+	desc = get_descriptor(ch, &btuuid);
-+	if (desc == NULL) {
-+		DBG("Client characteristic configuration descriptor not found");
-+		return;
-+	}
++	watcher = find_watcher(t, sender, path);
++	if (watcher == NULL)
++		return btd_error_does_not_exist(msg);
 +
-+	atval[0] = 0x02;
-+	atval[1] = 0x00;
-+	msg = g_strdup("Enable final measurement");
-+	gatt_write_char(t->attrib, desc->handle, atval, 2,
-+						final_measurement_cb, msg);
++	DBG("Thermometer watcher %s unregistered", path);
++
++	t->fwatchers = g_slist_remove(t->fwatchers, watcher);
++	destroy_watcher(watcher);
++
++	if (g_slist_length(t->fwatchers) == 0)
++		disable_final_measurement(t);
++
++	return dbus_message_new_method_return(msg);
  }
  
- static void disable_final_measurement(struct thermometer *t)
+ static DBusMessage *enable_intermediate(DBusConnection *conn, DBusMessage *msg,
 -- 
 1.7.6.1
 
