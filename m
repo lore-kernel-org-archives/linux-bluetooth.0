@@ -1,45 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?=
-	<frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Add new dbus telephony driver
-Date: Thu, 20 Oct 2011 15:52:14 +0200
-Message-Id: <1319118738-20131-1-git-send-email-frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAJdJm_PdUWdF0t6wXkww8nODiVJLvUZRdy238DjVA_JBXHp3Zw@mail.gmail.com>
+References: <1319104011-27747-1-git-send-email-sancane@gmail.com>
+	<1319104011-27747-2-git-send-email-sancane@gmail.com>
+	<1319104011-27747-3-git-send-email-sancane@gmail.com>
+	<1319104011-27747-4-git-send-email-sancane@gmail.com>
+	<1319104011-27747-5-git-send-email-sancane@gmail.com>
+	<1319104011-27747-6-git-send-email-sancane@gmail.com>
+	<CAJdJm_PdUWdF0t6wXkww8nODiVJLvUZRdy238DjVA_JBXHp3Zw@mail.gmail.com>
+Date: Thu, 20 Oct 2011 14:54:22 +0200
+Message-ID: <CACLukzL8=E5Q2=PzryzgoDrtcSr7QsVcxmSLy2c_PHkxNTJ-CQ@mail.gmail.com>
+Subject: Re: [PATCH 5/8] Enable final measurement indications when first
+ watcher is enabled
+From: Santiago Carot <sancane@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add a new telephony driver allowing HSP/HFP to be managed
-through an external DBus agent.
-BlueZ takes care of SDP and RFComm parts while the upper layer is
-processed by the agent.
+Hi Anderson,
 
-Current AT parser and dbus code which are only needed by current
-drivers (built-in drivers) are move to telephony-builtin.[ch].
+2011/10/20 Anderson Lizardo <anderson.lizardo@openbossa.org>:
+> Hi Santiago,
+>
+> On Thu, Oct 20, 2011 at 6:46 AM, Santiago Carot-Nemesio
+> <sancane@gmail.com> wrote:
+>> +static void final_measurement_cb (guint8 status, const guint8 *pdu,
+>> +                                               guint16 len, gpointer user_data)
+>
+> There should be no space before "(" in function definitions/declarations.
+>
+>> +{
+>> +       gchar *msg = user_data;
+>> +
+>> +       if (status != 0) {
+>> +               error("%s failed", msg);
+>
+> You don't need to g_free(msg) in case of error?
 
-FrÃ©dÃ©ric Danis (4):
-  Audio: move at parsing code to telephony-builtin.[ch] files
-  Audio: move dbus callbacks to telephony-builtin.c
-  Audio: add adapter to telephony_init/_exit
-  Audio: add dbus telephony driver
+Yes I do, good catch!, I'll work in a new set of patches.
+Thank for your comments.
 
- Makefile.am               |    9 +-
- acinclude.m4              |    1 +
- audio/headset.c           | 1485 +++----------------------------------------
- audio/headset.h           |    4 +
- audio/manager.c           |    4 +-
- audio/telephony-builtin.c | 1570 +++++++++++++++++++++++++++++++++++++++++++++
- audio/telephony-builtin.h |  218 +++++++
- audio/telephony-dbus.c    |  554 ++++++++++++++++
- audio/telephony-dummy.c   |    5 +-
- audio/telephony-maemo5.c  |    5 +-
- audio/telephony-maemo6.c  |    5 +-
- audio/telephony-ofono.c   |    5 +-
- audio/telephony.h         |  225 +------
- doc/audio-api.txt         |   99 +++
- 14 files changed, 2590 insertions(+), 1599 deletions(-)
- create mode 100644 audio/telephony-builtin.c
- create mode 100644 audio/telephony-builtin.h
- create mode 100644 audio/telephony-dbus.c
-
+>
+>> +               return;
+>> +       }
+>> +
+>> +       g_free(msg);
+>> +}
+>> +
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
+>
