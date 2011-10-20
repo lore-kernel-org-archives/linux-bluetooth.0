@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Oct 2011 11:14:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 bluez 0/2] Definitions needed for hcidump
-Message-ID: <20111021081406.GA30417@fusion.localdomain>
-References: <1318926191-17361-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1318926191-17361-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1319115184-16116-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1319115184-16116-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Thu, 20 Oct 2011 17:27:30 -0300
+Message-ID: <CAJdJm_McykSKCoaGZ-9Yi71cciB6zrhKe0wHEyV4-qU9xzBzfQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Simplify eir_parse_uuid* functions
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?=
+	<frederic.danis@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Frédéric,
 
-On Tue, Oct 18, 2011, Emeltchenko Andrei wrote:
-> Those definitions are used in decoding L2CAP fixed channels
-> 
-> Andrei Emeltchenko (2):
->   add definitions for L2CAP fixed channels
->   add btohll / htobll macros
-> 
->  lib/bluetooth.h |    4 ++++
->  lib/l2cap.h     |    5 +++++
->  2 files changed, 9 insertions(+), 0 deletions(-)
+2011/10/20 Frédéric Danis <frederic.danis@linux.intel.com>:
+> +                       if (eir->name)
+> +                               g_free(eir->name);
 
-Both patches have been applied. Thanks
+You don't need to check for NULL before passing a pointer to g_free().
+IMHO just "g_free(eir->name)" is clearer.
 
-In the future, please start your commit messages with capital letters so
-we maintain a consistent commit history.
+> +
+> +                       eir->name = g_strndup((char *) &eir_data[2],
+>                                                                field_len - 1);
+> -                       else
+> -                               eir->name = g_strdup("");
+>                        eir->name_complete = eir_data[1] == EIR_NAME_COMPLETE;
+>                        break;
 
-Johan
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
