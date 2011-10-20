@@ -1,33 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Oct 2011 13:18:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rafal Michalski <michalski.raf@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd] Fix pulling single vCard for parameters header
- missing
-Message-ID: <20111020101831.GA4896@fusion.localdomain>
-References: <1319099688-4427-1-git-send-email-michalski.raf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319099688-4427-1-git-send-email-michalski.raf@gmail.com>
+From: Santiago Carot-Nemesio <sancane@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 3/8] Implement D-Bus register watcher function
+Date: Thu, 20 Oct 2011 11:46:46 +0200
+Message-Id: <1319104011-27747-4-git-send-email-sancane@gmail.com>
+In-Reply-To: <1319104011-27747-3-git-send-email-sancane@gmail.com>
+References: <1319104011-27747-1-git-send-email-sancane@gmail.com>
+ <1319104011-27747-2-git-send-email-sancane@gmail.com>
+ <1319104011-27747-3-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+---
+ thermometer/thermometer.c |   96 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 93 insertions(+), 3 deletions(-)
 
-On Thu, Oct 20, 2011, Rafal Michalski wrote:
-> According to PBAP specification (ANNEX A), all application-parameters
-> are optional in case of pulling single vCard entry, so header for
-> application-parameters can be omitted, and it would be valid as well.
-> Previously pulling single vCard was always failing with "Bad Request"
-> status in such a circumstance.
-> This patch fixes that issue and pulling single vCard is done successfully
-> with "OK" status. Output vCard would contain all fields under 2.1 format
-> (as for default settings).
-> ---
->  plugins/pbap.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index 343d72a..05c6ef6 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -55,6 +55,7 @@ struct thermometer {
+ 	guint			attioid;	/* Att watcher id */
+ 	guint			attindid;	/* Att incications id */
+ 	GSList			*chars;		/* Characteristics */
++	GSList			*fwatchers;     /* Final measurements */
+ 	gboolean		intermediate;
+ 	guint8			type;
+ 	guint16			interval;
+@@ -76,8 +77,27 @@ struct descriptor {
+ 	bt_uuid_t		uuid;
+ };
+ 
++struct watcher {
++	struct thermometer	*t;
++	guint			id;
++	gchar			*srv;
++	gchar			*path;
++};
++
+ static GSList *thermometers = NULL;
+ 
++static void destroy_watcher(gpointer user_data)
++{
++	struct watcher *watcher = user_data;
++
++	if (watcher->id > 0)
++		g_dbus_remove_watch(watcher->t->conn, watcher->id);
++
++	g_free(watcher->path);
++	g_free(watcher->srv);
++	g_free(watcher);
++}
++
+ static void destroy_char(gpointer user_data)
+ {
+ 	struct characteristic *c = user_data;
+@@ -102,6 +122,9 @@ static void destroy_thermometer(gpointer user_data)
+ 	if (t->chars != NULL)
+ 		g_slist_free_full(t->chars, destroy_char);
+ 
++	if (t->fwatchers != NULL)
++		g_slist_free_full(t->fwatchers, destroy_watcher);
++
+ 	dbus_connection_unref(t->conn);
+ 	btd_device_unref(t->dev);
+ 	g_free(t->svc_range);
+@@ -119,6 +142,19 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
++static gint cmp_watcher(gconstpointer a, gconstpointer b)
++{
++	const struct watcher *watcher = a;
++	const struct watcher *match = b;
++	int ret;
++
++	ret = g_strcmp0(watcher->srv, match->srv);
++	if (ret != 0)
++		return ret;
++
++	return g_strcmp0(watcher->path, match->path);
++}
++
+ static void change_property(struct thermometer *t, const gchar *name,
+ 							gpointer value) {
+ 	if (g_strcmp0(name, "Intermediate") == 0) {
+@@ -413,12 +449,66 @@ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
+ 						"Function not implemented.");
+ }
+ 
++static void enable_final_measurement(struct thermometer *t)
++{
++	/* TODO: enable final measurements */
++}
++
++static void watcher_exit(DBusConnection *conn, void *user_data)
++{
++	/* TODO: Watcher disconnected */
++}
++
++static struct watcher *find_watcher(struct thermometer *t, const gchar *sender,
++							const gchar *path)
++{
++	struct watcher *match;
++	GSList *l;
++
++	match = g_new0(struct watcher, 1);
++	match->srv = g_strdup(sender);
++	match->path = g_strdup(path);
++
++	l = g_slist_find_custom(t->fwatchers, match, cmp_watcher);
++	destroy_watcher(match);
++
++	if (l != NULL)
++		return l->data;
++
++	return NULL;
++}
++
+ static DBusMessage *register_watcher(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	/* TODO: */
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
+-						"Function not implemented.");
++	const gchar *sender = dbus_message_get_sender(msg);
++	struct thermometer *t = data;
++	struct watcher *watcher;
++	gchar *path;
++
++	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID))
++		return btd_error_invalid_args(msg);
++
++	watcher = find_watcher(t, sender, path);
++	if (watcher != NULL)
++		return btd_error_already_exists(msg);
++
++	DBG("Thermometer watcher %s registered", path);
++
++	watcher = g_new0(struct watcher, 1);
++	watcher->srv = g_strdup(sender);
++	watcher->path = g_strdup(path);
++	watcher->t = t;
++	watcher->id = g_dbus_add_disconnect_watch(conn, sender, watcher_exit,
++						watcher, destroy_watcher);
++
++	if (g_slist_length(t->fwatchers) == 0)
++		enable_final_measurement(t);
++
++	t->fwatchers = g_slist_prepend(t->fwatchers, watcher);
++
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static DBusMessage *unregister_watcher(DBusConnection *conn, DBusMessage *msg,
+-- 
+1.7.6.1
 
-Applied. Thanks.
-
-Johan
