@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH obexd 6/7 v3] gobex: log packets using G_OBEX_DEBUG_PACKET
-Date: Fri, 21 Oct 2011 13:34:04 +0300
-Message-Id: <1319193245-23058-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH obexd 5/7 v3] gobex: log headers using G_OBEX_DEBUG_HEADER
+Date: Fri, 21 Oct 2011 13:34:03 +0300
+Message-Id: <1319193245-23058-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1319193245-23058-1-git-send-email-luiz.dentz@gmail.com>
 References: <1319193245-23058-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,184 +12,189 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- gobex/gobex-packet.c |   38 ++++++++++++++++++++++++++++++++++++++
- 1 files changed, 38 insertions(+), 0 deletions(-)
+ gobex/gobex-header.c |   49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 49 insertions(+), 0 deletions(-)
 
-diff --git a/gobex/gobex-packet.c b/gobex/gobex-packet.c
-index c7d9e38..c3e3953 100644
---- a/gobex/gobex-packet.c
-+++ b/gobex/gobex-packet.c
-@@ -55,6 +55,8 @@ GObexHeader *g_obex_packet_get_header(GObexPacket *pkt, guint8 id)
- {
- 	GSList *l;
+diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+index 4a28bf8..035725b 100644
+--- a/gobex/gobex-header.c
++++ b/gobex/gobex-header.c
+@@ -93,6 +93,9 @@ gssize g_obex_header_encode(GObexHeader *header, void *buf, gsize buf_len)
+ 	gunichar2 *utf16;
+ 	glong utf16_len;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
 +
- 	for (l = pkt->headers; l != NULL; l = g_slist_next(l)) {
- 		GObexHeader *hdr = l->data;
+ 	if (buf_len < header->hlen)
+ 		return -1;
  
-@@ -69,6 +71,8 @@ GObexHeader *g_obex_packet_get_body(GObexPacket *pkt)
- {
- 	GObexHeader *body;
+@@ -152,6 +155,9 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
+ 	ptr = get_bytes(&header->id, ptr, sizeof(header->id));
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
 +
- 	body = g_obex_packet_get_header(pkt, G_OBEX_HDR_BODY);
- 	if (body != NULL)
- 		return body;
-@@ -78,6 +82,8 @@ GObexHeader *g_obex_packet_get_body(GObexPacket *pkt)
+ 	switch (G_OBEX_HDR_ENC(header->id)) {
+ 	case G_OBEX_HDR_ENC_UNICODE:
+ 		if (len < 3) {
+@@ -276,6 +282,9 @@ failed:
  
- guint8 g_obex_packet_get_operation(GObexPacket *pkt, gboolean *final)
+ void g_obex_header_free(GObexHeader *header)
  {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
 +
- 	if (final)
- 		*final = pkt->final;
+ 	switch (G_OBEX_HDR_ENC(header->id)) {
+ 	case G_OBEX_HDR_ENC_UNICODE:
+ 		g_free(header->v.string);
+@@ -296,17 +305,25 @@ void g_obex_header_free(GObexHeader *header)
  
-@@ -86,6 +92,8 @@ guint8 g_obex_packet_get_operation(GObexPacket *pkt, gboolean *final)
- 
- gboolean g_obex_packet_prepend_header(GObexPacket *pkt, GObexHeader *header)
+ gboolean g_obex_header_get_unicode(GObexHeader *header, const char **str)
  {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
 +
- 	pkt->headers = g_slist_prepend(pkt->headers, header);
- 	pkt->hlen += g_obex_header_get_length(header);
- 
-@@ -94,6 +102,8 @@ gboolean g_obex_packet_prepend_header(GObexPacket *pkt, GObexHeader *header)
- 
- gboolean g_obex_packet_add_header(GObexPacket *pkt, GObexHeader *header)
- {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
-+
- 	pkt->headers = g_slist_append(pkt->headers, header);
- 	pkt->hlen += g_obex_header_get_length(header);
- 
-@@ -103,6 +113,8 @@ gboolean g_obex_packet_add_header(GObexPacket *pkt, GObexHeader *header)
- gboolean g_obex_packet_add_body(GObexPacket *pkt, GObexDataProducer func,
- 							gpointer user_data)
- {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
-+
- 	if (pkt->get_body != NULL)
+ 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UNICODE)
  		return FALSE;
  
-@@ -117,6 +129,8 @@ gboolean g_obex_packet_add_unicode(GObexPacket *pkt, guint8 id,
- {
- 	GObexHeader *hdr;
+ 	*str = header->v.string;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%s", *str);
 +
- 	hdr = g_obex_header_new_unicode(id, str);
- 	if (hdr == NULL)
+ 	return TRUE;
+ }
+ 
+ gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
+ 								gsize *len)
+ {
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
++
+ 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_BYTES)
  		return FALSE;
-@@ -129,6 +143,8 @@ gboolean g_obex_packet_add_bytes(GObexPacket *pkt, guint8 id,
- {
- 	GObexHeader *hdr;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
+@@ -322,21 +339,31 @@ gboolean g_obex_header_get_bytes(GObexHeader *header, const guint8 **val,
+ 
+ gboolean g_obex_header_get_uint8(GObexHeader *header, guint8 *val)
+ {
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
 +
- 	hdr = g_obex_header_new_bytes(id, data, len);
- 	if (hdr == NULL)
+ 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UINT8)
  		return FALSE;
-@@ -140,6 +156,8 @@ gboolean g_obex_packet_add_uint8(GObexPacket *pkt, guint8 id, guint8 val)
- {
- 	GObexHeader *hdr;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
+ 	*val = header->v.u8;
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", *val);
 +
- 	hdr = g_obex_header_new_uint8(id, val);
- 	if (hdr == NULL)
+ 	return TRUE;
+ }
+ 
+ gboolean g_obex_header_get_uint32(GObexHeader *header, guint32 *val)
+ {
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x",
++						G_OBEX_HDR_ENC(header->id));
++
+ 	if (G_OBEX_HDR_ENC(header->id) != G_OBEX_HDR_ENC_UINT32)
  		return FALSE;
-@@ -151,6 +169,8 @@ gboolean g_obex_packet_add_uint32(GObexPacket *pkt, guint8 id, guint32 val)
- {
- 	GObexHeader *hdr;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
-+
- 	hdr = g_obex_header_new_uint32(id, val);
- 	if (hdr == NULL)
- 		return FALSE;
-@@ -160,6 +180,8 @@ gboolean g_obex_packet_add_uint32(GObexPacket *pkt, guint8 id, guint32 val)
+ 	*val = header->v.u32;
  
- const void *g_obex_packet_get_data(GObexPacket *pkt, gsize *len)
- {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", *val);
 +
- 	if (pkt->data_len == 0) {
- 		*len = 0;
+ 	return TRUE;
+ }
+ 
+@@ -345,6 +372,8 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str)
+ 	GObexHeader *header;
+ 	gsize len;
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++
+ 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UNICODE)
  		return NULL;
-@@ -181,6 +203,8 @@ const void *g_obex_packet_get_data(GObexPacket *pkt, gsize *len)
- gboolean g_obex_packet_set_data(GObexPacket *pkt, const void *data, gsize len,
- 						GObexDataPolicy data_policy)
+ 
+@@ -358,6 +387,8 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str)
+ 	header->hlen = len == 0 ? 3 : 3 + ((len + 1) * 2);
+ 	header->v.string = g_strdup(str);
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%s", header->v.string);
++
+ 	return header;
+ }
+ 
+@@ -365,6 +396,8 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
  {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
-+
- 	if (pkt->data.buf || pkt->data.buf_ref)
- 		return FALSE;
+ 	GObexHeader *header;
  
-@@ -207,6 +231,8 @@ GObexPacket *g_obex_packet_new_valist(guint8 opcode, gboolean final,
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
++
+ 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_BYTES)
+ 		return NULL;
+ 
+@@ -382,6 +415,8 @@ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
  {
- 	GObexPacket *pkt;
+ 	GObexHeader *header;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
 +
- 	pkt = g_new0(GObexPacket, 1);
+ 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UINT8)
+ 		return NULL;
  
- 	pkt->opcode = opcode;
-@@ -224,6 +250,8 @@ GObexPacket *g_obex_packet_new(guint8 opcode, gboolean final,
- 	GObexPacket *pkt;
- 	va_list args;
+@@ -392,6 +427,8 @@ GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
+ 	header->hlen = 2;
+ 	header->v.u8 = val;
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", header->v.u8);
 +
- 	va_start(args, first_hdr_id);
- 	pkt = g_obex_packet_new_valist(opcode, final, first_hdr_id, args);
- 	va_end(args);
-@@ -233,6 +261,8 @@ GObexPacket *g_obex_packet_new(guint8 opcode, gboolean final,
+ 	return header;
+ }
  
- void g_obex_packet_free(GObexPacket *pkt)
+@@ -399,6 +436,8 @@ GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val)
  {
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
+ 	GObexHeader *header;
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x", G_OBEX_HDR_ENC(id));
 +
- 	switch (pkt->data_policy) {
- 	case G_OBEX_DATA_INHERIT:
- 	case G_OBEX_DATA_COPY:
-@@ -253,6 +283,8 @@ static gboolean parse_headers(GObexPacket *pkt, const void *data, gsize len,
+ 	if (G_OBEX_HDR_ENC(id) != G_OBEX_HDR_ENC_UINT32)
+ 		return NULL;
+ 
+@@ -409,16 +448,24 @@ GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val)
+ 	header->hlen = 5;
+ 	header->v.u32 = val;
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "%u", header->v.u32);
++
+ 	return header;
+ }
+ 
+ guint8 g_obex_header_get_id(GObexHeader *header)
  {
- 	const guint8 *buf = data;
- 
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x id 0x%02x",
++				G_OBEX_HDR_ENC(header->id), header->id);
 +
- 	while (len > 0) {
- 		GObexHeader *header;
- 		gsize parsed;
-@@ -289,6 +321,8 @@ GObexPacket *g_obex_packet_decode(const void *data, gsize len,
- 	GObexPacket *pkt;
- 	gboolean final;
+ 	return header->id;
+ }
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "");
+ guint16 g_obex_header_get_length(GObexHeader *header)
+ {
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "header 0x%02x length %zu",
++				G_OBEX_HDR_ENC(header->id), header->hlen);
 +
- 	if (data_policy == G_OBEX_DATA_INHERIT) {
- 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_INVALID_ARGS,
- 							"Invalid data policy");
-@@ -343,6 +377,8 @@ static gssize get_body(GObexPacket *pkt, guint8 *buf, gsize len)
- 	guint16 u16;
- 	gssize ret;
+ 	return header->hlen;
+ }
  
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
+@@ -428,6 +475,8 @@ GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
+ 	unsigned int id = first_hdr_id;
+ 	GSList *l = NULL;
+ 
++	g_obex_debug(G_OBEX_DEBUG_HEADER, "");
 +
- 	if (len < 3)
- 		return -ENOBUFS;
+ 	*total_len = 0;
  
-@@ -368,6 +404,8 @@ gssize g_obex_packet_encode(GObexPacket *pkt, guint8 *buf, gsize len)
- 	guint16 u16;
- 	GSList *l;
- 
-+	g_obex_debug(G_OBEX_DEBUG_PACKET, "opcode 0x%02x", pkt->opcode);
-+
- 	if (3 + pkt->data_len + pkt->hlen > len)
- 		return -ENOBUFS;
- 
+ 	while (id != G_OBEX_HDR_INVALID) {
 -- 
 1.7.6.4
 
