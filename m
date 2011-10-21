@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Krystad <pkrystad@codeaurora.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: andrei.emeltchenko@intel.com,
-	Peter Krystad <pkrystad@codeaurora.org>
-Subject: [PATCH 0/4] Add parsing of BT 3.0+HS signalling
-Date: Fri, 21 Oct 2011 16:29:58 -0700
-Message-Id: <1319239802-22457-1-git-send-email-pkrystad@codeaurora.org>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH 5/5] AVRCP: handle volume up/down keys as TG
+Date: Fri, 21 Oct 2011 15:58:28 -0200
+Message-Id: <1319219908-2819-5-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1319219908-2819-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1319219908-2819-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset adds parsing and display of BT 3.0+HS signalling
+---
+ audio/avctp.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Peter Krystad (4):
-  Add parsing of L2CAP Create/Move Channel signals
-  Add parsing of A2MP signals
-  Add parsing of L2CAP Fixed Channel list
-  Minor cleanup of indentation in output
-
- lib/amp.h       |  133 +++++++++++++++
- lib/l2cap.h     |   50 ++++++
- parser/hci.c    |   15 +-
- parser/l2cap.c  |  498 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- parser/parser.h |    1 +
- src/hcidump.c   |    1 +
- 6 files changed, 693 insertions(+), 5 deletions(-)
- create mode 100644 lib/amp.h
-
+diff --git a/audio/avctp.c b/audio/avctp.c
+index df3b2b8..fdd8a9e 100644
+--- a/audio/avctp.c
++++ b/audio/avctp.c
+@@ -155,6 +155,8 @@ static struct {
+ 	{ "BACKWARD",		BACKWARD_OP,		KEY_PREVIOUSSONG },
+ 	{ "REWIND",		REWIND_OP,		KEY_REWIND },
+ 	{ "FAST FORWARD",	FAST_FORWARD_OP,	KEY_FASTFORWARD },
++	{ "VOLUME UP",          VOL_UP_OP,              KEY_VOLUMEUP },
++	{ "VOLUME DOWN",        VOL_DOWN_OP,            KEY_VOLUMEDOWN },
+ 	{ NULL }
+ };
+ 
 -- 
 1.7.7
 
---
-Peter Krystad
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum
