@@ -1,30 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 22 Oct 2011 12:38:09 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH obexd 1/7 v4] gobex: add initial support for debug
-Message-ID: <20111022103809.GA15911@fusion.localdomain>
-References: <1319279370-3871-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1319279370-3871-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH obexd 1/7 v4] gobex: add initial support for debug
+Date: Sat, 22 Oct 2011 13:29:30 +0300
+Message-Id: <1319279370-3871-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sat, Oct 22, 2011, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds support for debug using GOBEX_DEBUG environment variable.
-> ---
->  Makefile.am         |    2 +-
->  gobex/gobex-debug.h |   76 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  gobex/gobex.c       |   20 +++++++++++++
->  3 files changed, 97 insertions(+), 1 deletions(-)
->  create mode 100644 gobex/gobex-debug.h
+This adds support for debug using GOBEX_DEBUG environment variable.
+---
+ Makefile.am         |    2 +-
+ gobex/gobex-debug.h |   76 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ gobex/gobex.c       |   20 +++++++++++++
+ 3 files changed, 97 insertions(+), 1 deletions(-)
+ create mode 100644 gobex/gobex-debug.h
 
-Thanks. All seven patches have been applied.
+diff --git a/Makefile.am b/Makefile.am
+index ccb29ed..2582651 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -20,7 +20,7 @@ gobex_sources = gobex/gobex.h gobex/gobex.c \
+ 			gobex/gobex-defs.h gobex/gobex-defs.c \
+ 			gobex/gobex-packet.c gobex/gobex-packet.h \
+ 			gobex/gobex-header.c gobex/gobex-header.h \
+-			gobex/gobex-transfer.c
++			gobex/gobex-transfer.c gobex/gobex-debug.h
+ 
+ noinst_PROGRAMS =
+ libexec_PROGRAMS =
+diff --git a/gobex/gobex-debug.h b/gobex/gobex-debug.h
+new file mode 100644
+index 0000000..589104e
+--- /dev/null
++++ b/gobex/gobex-debug.h
+@@ -0,0 +1,76 @@
++/*
++ *  OBEX library with GLib integration
++ *
++ *  Copyright (C) 2011  Intel Corporation. All rights reserved.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 as
++ *  published by the Free Software Foundation.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifndef __GOBEX_DEBUG_H
++#define __GOBEX_DEBUG_H
++
++#include <glib.h>
++#include <stdio.h>
++#include <ctype.h>
++
++#define G_OBEX_DEBUG_NONE	1
++#define G_OBEX_DEBUG_ERROR	(1 << 1)
++#define G_OBEX_DEBUG_COMMAND	(1 << 2)
++#define G_OBEX_DEBUG_TRANSFER	(1 << 3)
++#define G_OBEX_DEBUG_HEADER	(1 << 4)
++#define G_OBEX_DEBUG_PACKET	(1 << 5)
++#define G_OBEX_DEBUG_DATA	(1 << 6)
++
++extern guint gobex_debug;
++
++#define g_obex_debug(level, format, ...) \
++	if (gobex_debug & level) \
++		g_debug("%s:%s() " format, __FILE__, __FUNCTION__, \
++							## __VA_ARGS__)
++
++static inline void g_obex_dump(const char *prefix, const void *buf,
++								gsize len)
++{
++	const guint8 *data = buf;
++	int n = 0;
++
++	if (!(gobex_debug & G_OBEX_DEBUG_DATA))
++		return;
++
++	while (len > 0) {
++		int i, size;
++
++		printf("%s %04x:", prefix, n);
++
++		size = len > 16 ? 16 : len;
++
++		for (i = 0; i < size; i++)
++			printf("%02x%s", data[i], (i + 1) % 8 ? " " : "  ");
++
++		for (; i < 16; i++)
++			printf("  %s", (i + 1) % 8 ? " " : "  ");
++
++		for (i = 0; i < size; i++)
++			printf("%1c", isprint(data[i]) ? data[i] : '.');
++
++		printf("\n");
++
++		data += size;
++		len -= size;
++		n += size;
++	}
++}
++
++#endif /* __GOBEX_DEBUG_H */
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index b2c0199..e1cf5e3 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -29,6 +29,7 @@
+ 
+ #include "gobex.h"
+ #include "glib-helper.h"
++#include "gobex-debug.h"
+ 
+ #define G_OBEX_DEFAULT_MTU	4096
+ #define G_OBEX_MINIMUM_MTU	255
+@@ -43,6 +44,8 @@
+ 
+ #define CONNID_INVALID		0xffffffff
+ 
++guint gobex_debug = 0;
++
+ struct _GObex {
+ 	gint ref_count;
+ 	GIOChannel *io;
+@@ -864,12 +867,29 @@ failed:
+ 	return FALSE;
+ }
+ 
++static GDebugKey keys[] = {
++	{ "error",	G_OBEX_DEBUG_ERROR },
++	{ "command",	G_OBEX_DEBUG_COMMAND },
++	{ "transfer",	G_OBEX_DEBUG_TRANSFER },
++	{ "header",	G_OBEX_DEBUG_HEADER },
++	{ "packet",	G_OBEX_DEBUG_PACKET },
++	{ "data",	G_OBEX_DEBUG_DATA },
++};
++
+ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
+ 					gssize io_rx_mtu, gssize io_tx_mtu)
+ {
+ 	GObex *obex;
+ 	GIOCondition cond;
+ 
++	if (gobex_debug == 0) {
++		const char *env = g_getenv("GOBEX_DEBUG");
++		if (env)
++			gobex_debug = g_parse_debug_string(env, keys, 6);
++		else
++			gobex_debug = G_OBEX_DEBUG_NONE;
++	}
++
+ 	if (io == NULL)
+ 		return NULL;
+ 
+-- 
+1.7.6.4
 
-Johan
