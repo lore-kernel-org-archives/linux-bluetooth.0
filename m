@@ -1,87 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1319219908-2819-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1319219908-2819-1-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Sat, 22 Oct 2011 13:09:16 +0300
-Message-ID: <CABBYNZKi0XO1XNehK0MtW=vBSRfF4oz9jfqwohEQzWe8ibbkLw@mail.gmail.com>
-Subject: Re: [PATCH 1/5] Fix handling of dbus signals
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/4] Add parsing of L2CAP Create/Move Channel signals
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Peter Krystad <pkrystad@codeaurora.org>
+Cc: linux-bluetooth@vger.kernel.org, andrei.emeltchenko@intel.com
+Date: Sat, 22 Oct 2011 09:21:58 +0200
+In-Reply-To: <1319239802-22457-2-git-send-email-pkrystad@codeaurora.org>
+References: <1319239802-22457-1-git-send-email-pkrystad@codeaurora.org>
+	 <1319239802-22457-2-git-send-email-pkrystad@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <1319268120.15441.216.camel@aeonflux>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Peter,
 
-On Fri, Oct 21, 2011 at 8:58 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> We're previously leaking a D-Bus message and always returning that
-> the signal was not handled.
+> Add parsing of L2CAP Create/Move Channel signalling.
+> Example output:
+> 
+> 2011-10-18 16:09:47.810208 > ACL data: handle 39 flags 0x02 dlen 13
+>     L2CAP(s): Create req: psm 4097 scid 0x4201 id 17
+> 2011-10-18 16:09:47.810269 < ACL data: handle 39 flags 0x00 dlen 16
+>     L2CAP(s): Create rsp: dcid 0x0040 scid 0x4201 result 1 status 0
+> 2011-10-18 16:09:47.898308 < ACL data: handle 39 flags 0x00 dlen 16
+>     L2CAP(s): Create rsp: dcid 0x0040 scid 0x4201 result 0 status 0
+> 
+> ....
+> 
+> 2011-10-18 14:25:24.646869 > ACL data: handle 39 flags 0x02 dlen 11
+>     L2CAP(s): Move req: icid 0x4000 id 17
+> 2011-10-18 14:25:24.646987 < ACL data: handle 39 flags 0x00 dlen 12
+>     L2CAP(s): Move rsp: icid 0x4000 result 1
+> 2011-10-18 14:25:24.846873 < ACL data: handle 39 flags 0x00 dlen 12
+>     L2CAP(s): Move rsp: icid 0x4000 result 0
+> 2011-10-18 14:25:25.041844 > ACL data: handle 39 flags 0x02 dlen 12
+>     L2CAP(s): Move cfm: icid 0x4000 result 0
+> 2011-10-18 14:25:25.041945 < ACL data: handle 39 flags 0x00 dlen 10
+>     L2CAP(s): Move cfm rsp: icid 0x4000
 > ---
->  test/mpris-player.c |   16 +++++++++++-----
->  1 files changed, 11 insertions(+), 5 deletions(-)
->
-> diff --git a/test/mpris-player.c b/test/mpris-player.c
-> index 29bea46..4592e5d 100644
-> --- a/test/mpris-player.c
-> +++ b/test/mpris-player.c
-> @@ -549,7 +549,7 @@ static DBusHandlerResult properties_changed(DBusConnection *conn,
->        if (!signal) {
->                fprintf(stderr, "Unable to allocate new PropertyChanged"
->                                                        " signal\n");
-> -               goto done;
-> +               goto err;
->        }
->
->        dbus_message_iter_init_append(signal, &entry);
-> @@ -563,13 +563,19 @@ static DBusHandlerResult properties_changed(DBusConnection *conn,
->        dbus_message_iter_next(&iter);
->
->        if (parse_metadata(&iter, &metadata) < 0)
-> -               goto done;
-> +               goto err;
->
->        dbus_message_iter_close_container(&entry, &metadata);
->
->        dbus_connection_send(sys, signal, NULL);
-> +       dbus_message_unref(signal);
-> +       g_free(path);
->
-> -done:
-> +       return DBUS_HANDLER_RESULT_HANDLED;
-> +
-> +err:
-> +       if (signal)
-> +               dbus_message_unref(signal);
->        g_free(path);
->        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
->  }
-> @@ -607,7 +613,7 @@ static DBusHandlerResult session_filter(DBusConnection *conn,
->                add_player(conn, name, new);
->        }
->
-> -       return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-> +       return DBUS_HANDLER_RESULT_HANDLED;
->  }
->
->  static DBusHandlerResult system_filter(DBusConnection *conn,
-> @@ -633,7 +639,7 @@ static DBusHandlerResult system_filter(DBusConnection *conn,
->                __io_terminated = 1;
->        }
->
-> -       return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-> +       return DBUS_HANDLER_RESULT_HANDLED;
->  }
->
->  static char *get_default_adapter(DBusConnection *conn)
-> --
-> 1.7.7
->
-> --
+>  lib/l2cap.h    |   50 +++++++++++++++++++++++++++++
+>  parser/l2cap.c |   97 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 147 insertions(+), 0 deletions(-)
 
-Ack.
+same requirement as with Andrei's patches before. First get them
+accepted into bluez.git and then we port them over here.
+
+Regards
+
+Marcel
 
 
--- 
-Luiz Augusto von Dentz
