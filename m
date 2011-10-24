@@ -1,43 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4EA566BC.6070204@monom.org>
-References: <4EA564C1.8070402@monom.org>
-	<CAMOw1v6Ec=GXvp3nZWa0=vALwWguXO3uo_DHqRJMXyV=_htO_w@mail.gmail.com>
-	<4EA566BC.6070204@monom.org>
-Date: Mon, 24 Oct 2011 16:36:06 +0300
-Message-ID: <CABBYNZL_FvdVDk8dH+uNxys=LRXLtWaBo0rKAfJ72dSfokkdgA@mail.gmail.com>
-Subject: Re: [BUG] Invalid file descriptor.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Daniel Wagner <wagi@monom.org>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v2 BlueZ] Add new command and event for LTK storage support
+Date: Mon, 24 Oct 2011 15:33:32 +0200
+Message-Id: <1319463212-13307-1-git-send-email-vinicius.gomes@openbossa.org>
+In-Reply-To: <1319459187-11092-1-git-send-email-vinicius.gomes@openbossa.org>
+References: <1319459187-11092-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+This documents the new command and event that are to be added to
+the Management API to add support for persistent pairing of LE
+devices.
+---
 
-On Mon, Oct 24, 2011 at 4:23 PM, Daniel Wagner <wagi@monom.org> wrote:
->>
->> What about the patch?
->
-> Sure, I will do as soon I have fixed all outstanding ConnMan bugs I found
-> just recently. In other words don't expect very soon this patch :)
+Changes:
+ - New command code, because new commands were added;
+ - Removed the Debug Keys parameter;
 
-Try with this:
 
-diff --git a/audio/manager.c b/audio/manager.c
-index 818451c..3103824 100644
---- a/audio/manager.c
-+++ b/audio/manager.c
-@@ -607,7 +607,6 @@ static void hf_io_cb(GIOChannel *chan, gpointer data)
-        if (perr < 0) {
-                DBG("Authorization denied!");
-                gateway_set_state(device, GATEWAY_STATE_DISCONNECTED);
--               goto drop;
-        }
+ doc/mgmt-api.txt |   32 ++++++++++++++++++++++++++++++++
+ 1 files changed, 32 insertions(+), 0 deletions(-)
 
-        return;
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 57771b4..9e158a1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -382,6 +382,23 @@ Name Information Command
+ 	expected for each Device Found event with the Confirm Name
+ 	flag set.
 
--- 
-Luiz Augusto von Dentz
++Load Long Term Keys Command
++===========================
++
++	Command Code:		0x0023
++	Controller Index:	<controller id>
++	Command Parameters:	Key Count (2 Octets)
++				Key1 {
++					Address (6 Octets)
++					PIN_Length (1 Octet)
++					Encryption Size (1 Octet)
++					Enc. Diversifier (2 Octets)
++					Random Number (8 Octets)
++					Value (16 Octets)
++				}
++				Key2 {  }
++				...
++
+ Read Tracing Buffer Size Command
+ ================================
+
+@@ -638,3 +655,18 @@ Device Unblocked Event
+ Event Code		0x00016
+ Controller Index	<controller id>
+ Event Parameters	Address (6 Octets)
++
++New Long Term Key Event
++=======================
++
++Event Code		0x0017
++Controller Index	<controller id>
++Event Parameters	Store Hint (1 Octet)
++			Key {
++				Address (6 Octets)
++				PIN_Length (1 Octet)
++				Encryption Size (1 Octet)
++				Enc. Diversifier (2 Octets)
++				Random Number (8 Octets)
++				Value (16 Octets)
++			}
+--
+1.7.7
+
