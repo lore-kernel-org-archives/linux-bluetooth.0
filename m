@@ -1,37 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Santiago Carot-Nemesio <sancane@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Set HCI_MGMT flag only in read_controller_info
-Date: Mon, 24 Oct 2011 22:36:26 +0200
-Message-Id: <1319488586-2779-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Santiago Carot-Nemesio <sancane@gmail.com>
+Subject: [PATCH 8/8] Implement D-Bus get properties function
+Date: Mon, 24 Oct 2011 19:04:08 +0200
+Message-Id: <1319475848-4171-9-git-send-email-sancane@gmail.com>
+In-Reply-To: <1319475848-4171-8-git-send-email-sancane@gmail.com>
+References: <1319475848-4171-1-git-send-email-sancane@gmail.com>
+ <1319475848-4171-2-git-send-email-sancane@gmail.com>
+ <1319475848-4171-3-git-send-email-sancane@gmail.com>
+ <1319475848-4171-4-git-send-email-sancane@gmail.com>
+ <1319475848-4171-5-git-send-email-sancane@gmail.com>
+ <1319475848-4171-6-git-send-email-sancane@gmail.com>
+ <1319475848-4171-7-git-send-email-sancane@gmail.com>
+ <1319475848-4171-8-git-send-email-sancane@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The HCI_MGMT flag should only be set when user space requests the full
-controller information. This way we avoid potential issues with setting
-change events ariving before the actual read_controller_info command
-finishes.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+ thermometer/thermometer.c |   32 +++++++++++++++++++++++++++++---
+ 1 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9ffd7c3..b086c69 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -151,8 +151,6 @@ static int read_index_list(struct sock *sk)
+diff --git a/thermometer/thermometer.c b/thermometer/thermometer.c
+index b71f589..2c1b5b3 100644
+--- a/thermometer/thermometer.c
++++ b/thermometer/thermometer.c
+@@ -449,9 +449,35 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ static DBusMessage *get_properties(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	/* TODO: */
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".ThermometerError",
+-						"Function not implemented.");
++	struct thermometer *t = data;
++	DBusMessageIter iter;
++	DBusMessageIter dict;
++	DBusMessage *reply;
++
++	reply = dbus_message_new_method_return(msg);
++	if (reply == NULL)
++		return NULL;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	dict_append_entry(&dict, "Intermediate", DBUS_TYPE_BOOLEAN,
++							&t->intermediate);
++
++	if (t->has_interval) {
++		dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT16,
++								&t->interval);
++		dict_append_entry(&dict, "Maximum", DBUS_TYPE_UINT16, &t->max);
++		dict_append_entry(&dict, "Minimum", DBUS_TYPE_UINT16, &t->min);
++	}
++
++	dbus_message_iter_close_container(&iter, &dict);
++
++	return reply;
+ }
  
- 		hci_del_off_timer(d);
- 
--		set_bit(HCI_MGMT, &d->flags);
--
- 		if (test_bit(HCI_SETUP, &d->flags))
- 			continue;
- 
+ static DBusMessage *set_property(DBusConnection *conn, DBusMessage *msg,
 -- 
-1.7.7
+1.7.6.1
 
