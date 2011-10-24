@@ -1,39 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4EA564C1.8070402@monom.org>
-Date: Mon, 24 Oct 2011 15:14:41 +0200
-From: Daniel Wagner <wagi@monom.org>
-MIME-Version: 1.0
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BUG] Invalid file descriptor.
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH] Add new command and event for LTK storage support
+Date: Mon, 24 Oct 2011 14:26:27 +0200
+Message-Id: <1319459187-11092-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To whom it might concern,
+This documents the new command and event that are to be added to
+the Management API to add support for persistent pairing of LE
+devices.
+---
+ doc/mgmt-api.txt |   33 +++++++++++++++++++++++++++++++++
+ 1 files changed, 33 insertions(+), 0 deletions(-)
 
-if bluez is running without an agent and the remote device tries to 
-connect to bluez you are able to trigger the "Invalid file descriptor".
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 8d5d8d5..44fef0b 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -356,6 +356,24 @@ Name Information Command
+ 	expected for each Device Found event with the Confirm Name
+ 	flag set.
+ 
++Load Long Term Keys Command
++===========================
++
++	Command Code:		0x0021
++	Controller Index:	<controller id>
++	Command Parameters:	Debug Keys (1 Octet)
++				Key Count (2 Octets)
++				Key1 {
++					Address (6 Octets)
++					PIN_Length (1 Octet)
++					Encryption Size (1 Octet)
++					Enc. Diversifier (2 Octets)
++					Random Number (8 Octets)
++					Value (16 Octets)
++				}
++				Key2 {  }
++				...
++
+ Read Tracing Buffer Size Command
+ ================================
+ 
+@@ -588,3 +606,18 @@ Device Unblocked Event
+ Event Code		0x00016
+ Controller Index	<controller id>
+ Event Parameters	Address (6 Octets)
++
++New Long Term Key Event
++=======================
++
++Event Code		0x0017
++Controller Index	<controller id>
++Event Parameters	Store Hint (1 Octet)
++			Key {
++				Address (6 Octets)
++				PIN_Length (1 Octet)
++				Encryption Size (1 Octet)
++				Enc. Diversifier (2 Octets)
++				Random Number (8 Octets)
++				Value (16 Octets)
++			}
+-- 
+1.7.7
 
-
-bluetoothd[30869]: src/event.c:btd_event_bonding_complete() status 0x00
-bluetoothd[30869]: src/adapter.c:adapter_get_device() A0:4E:04:F6:F5:05
-bluetoothd[30869]: src/device.c:device_bonding_complete() bonding (nil) 
-status 0x00
-bluetoothd[30869]: audio/manager.c:hf_io_cb() Authorization denied!
-
-(bluetoothd:30869): GLib-WARNING **: Invalid file descriptor.
-
-bluetoothd[30869]: plugins/hciops.c:disconn_complete() handle 44 status 0x00
-bluetoothd[30869]: src/event.c:btd_event_disconn_complete()
-bluetoothd[30869]: src/adapter.c:adapter_remove_connection()
-
-
-cheers,
-daniel
-
-ps: I was told to report all crashes and bugs I find. Be prepared. I am 
-a very capable finding bugs :)
---
-To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
