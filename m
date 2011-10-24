@@ -1,76 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Oct 2011 16:03:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] Add new command and event for LTK storage
+ support
+Message-ID: <20111024140319.GA11029@fusion.localdomain>
+References: <1319459187-11092-1-git-send-email-vinicius.gomes@openbossa.org>
+ <1319463212-13307-1-git-send-email-vinicius.gomes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <CALJ2SBJ3qgHV91sS-PXkrS6w7kaxMnHFM0Z-eM2KGUedCZy0nA@mail.gmail.com>
-References: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
-	<CALJ2SBJ3qgHV91sS-PXkrS6w7kaxMnHFM0Z-eM2KGUedCZy0nA@mail.gmail.com>
-Date: Mon, 24 Oct 2011 16:03:48 +0200
-Message-ID: <CANq1E4SK=kbXzgXEWaX4nJGhcVLDdvDJ7V+QFSJ_uX_ab9opgg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Return proper error codes on rfcomm tty init
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: Anderson Briglia <anderson.briglia@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, padovan@profusion.mobi
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1319463212-13307-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 24, 2011 at 3:57 PM, Anderson Briglia
-<anderson.briglia@openbossa.org> wrote:
-> Hi David,
->
-> On Mon, Oct 24, 2011 at 3:30 PM, David Herrmann
-> <dh.herrmann@googlemail.com> wrote:
->> Forward error codes from tty core to the rfcomm_init caller instead of using
->> generic -1 errors.
->>
->> Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
->> ---
->>  net/bluetooth/rfcomm/tty.c |    9 ++++++---
->>  1 files changed, 6 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
->> index c258796..2b753a3 100644
->> --- a/net/bluetooth/rfcomm/tty.c
->> +++ b/net/bluetooth/rfcomm/tty.c
->> @@ -1155,9 +1155,11 @@ static const struct tty_operations rfcomm_ops = {
->>
->>  int __init rfcomm_init_ttys(void)
->>  {
->> +       int error;
->> +
->>        rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
->>        if (!rfcomm_tty_driver)
->> -               return -1;
->> +               return -ENOMEM;
->>
->>        rfcomm_tty_driver->owner        = THIS_MODULE;
->>        rfcomm_tty_driver->driver_name  = "rfcomm";
->> @@ -1172,10 +1174,11 @@ int __init rfcomm_init_ttys(void)
->>        rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
->>        tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
->>
->> -       if (tty_register_driver(rfcomm_tty_driver)) {
->> +       error = tty_register_driver(rfcomm_tty_driver);
->> +       if (error) {
->>                BT_ERR("Can't register RFCOMM TTY driver");
->>                put_tty_driver(rfcomm_tty_driver);
->> -               return -1;
->> +               return error;
->
-> Since you are defining a new variable (error), how about use it on
-> other error paths and add a "goto out" and have just one return path?
+Hi Vinicius,
 
-Isn't it quite common style to have the first error path return
-directly? And then the other error paths use goto. However, there is
-only one additional error path left so I don't see any way to make
-this look nicer.
+On Mon, Oct 24, 2011, Vinicius Costa Gomes wrote:
+> This documents the new command and event that are to be added to
+> the Management API to add support for persistent pairing of LE
+> devices.
+> ---
+> 
+> Changes:
+>  - New command code, because new commands were added;
+>  - Removed the Debug Keys parameter;
+> 
+> 
+>  doc/mgmt-api.txt |   32 ++++++++++++++++++++++++++++++++
+>  1 files changed, 32 insertions(+), 0 deletions(-)
 
-With more than 2 error paths I agree, a goto would be more readable,
-but I cannot see this making this function look nicer. Anyway, if you
-guys want, I can resend with goto's.
+Applied, except that the event needed to be 0x0018 instead of 17 because
+of the new Passkey Request event.
 
-> Regards,
->
-> Anderson Briglia
-
-Regards
-David
+Johan
