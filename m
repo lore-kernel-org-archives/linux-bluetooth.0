@@ -1,20 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH bluez] add get_le/get_be helpers
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH bluez] add get_le/get_be helpers
+Date: Mon, 24 Oct 2011 12:27:41 +0200
 Cc: Emeltchenko Andrei <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 24 Oct 2011 13:50:16 +0200
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1319448004-8513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>  <CAE6HaMkxvTPa1eTj1Og7Lvqn=PvieuKJyzugPouwiUTOsnnW_g@mail.gmail.com>
 In-Reply-To: <CAE6HaMkxvTPa1eTj1Og7Lvqn=PvieuKJyzugPouwiUTOsnnW_g@mail.gmail.com>
-References: <1319448004-8513-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <CAE6HaMkxvTPa1eTj1Og7Lvqn=PvieuKJyzugPouwiUTOsnnW_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <1319457038.15441.230.camel@aeonflux>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Message-Id: <201110241227.41140.szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
 > Sorry if this comes too late, but here's an idea:
 > 
@@ -28,12 +28,11 @@ Hi Vinicius,
 > byte order). The bt_ functions will be used for everything that uses
 > the Bluetooth byte order and the sdp_ ones for SDP, which is the only
 > case of Big Endian defined by Bluetooth, correct me if I am wrong.
+> 
+> What do you think?
 
-lets not try to be too smart. We want the code clearly identify what
-endian is expected. Same as the kernel handles this.
+Some profiles e.g. AVRCP and SAP use big endian...  
 
-Regards
-
-Marcel
-
-
+-- 
+BR
+Szymon
