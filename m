@@ -1,52 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: padovan@profusion.mobi, David Herrmann <dh.herrmann@googlemail.com>
-Subject: [PATCH 1/2] Bluetooth: Return proper error codes on rfcomm tty init
-Date: Mon, 24 Oct 2011 15:30:57 +0200
-Message-Id: <1319463058-29311-1-git-send-email-dh.herrmann@googlemail.com>
+Message-ID: <4EA566BC.6070204@monom.org>
+Date: Mon, 24 Oct 2011 15:23:08 +0200
+From: Daniel Wagner <wagi@monom.org>
+MIME-Version: 1.0
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [BUG] Invalid file descriptor.
+References: <4EA564C1.8070402@monom.org> <CAMOw1v6Ec=GXvp3nZWa0=vALwWguXO3uo_DHqRJMXyV=_htO_w@mail.gmail.com>
+In-Reply-To: <CAMOw1v6Ec=GXvp3nZWa0=vALwWguXO3uo_DHqRJMXyV=_htO_w@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Forward error codes from tty core to the rfcomm_init caller instead of using
-generic -1 errors.
+Hi Lucas,
 
-Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
----
- net/bluetooth/rfcomm/tty.c |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
+On 10/24/2011 03:19 PM, Lucas De Marchi wrote:
+> On Mon, Oct 24, 2011 at 11:14 AM, Daniel Wagner<wagi@monom.org>  wrote:
+>> To whom it might concern,
+>>
+>> if bluez is running without an agent and the remote device tries to connect
+>> to bluez you are able to trigger the "Invalid file descriptor".
+>>
+>>
+>> bluetoothd[30869]: src/event.c:btd_event_bonding_complete() status 0x00
+>> bluetoothd[30869]: src/adapter.c:adapter_get_device() A0:4E:04:F6:F5:05
+>> bluetoothd[30869]: src/device.c:device_bonding_complete() bonding (nil)
+>> status 0x00
+>> bluetoothd[30869]: audio/manager.c:hf_io_cb() Authorization denied!
+>>
+>> (bluetoothd:30869): GLib-WARNING **: Invalid file descriptor.
+>>
+>> bluetoothd[30869]: plugins/hciops.c:disconn_complete() handle 44 status 0x00
+>> bluetoothd[30869]: src/event.c:btd_event_disconn_complete()
+>> bluetoothd[30869]: src/adapter.c:adapter_remove_connection()
+>>
+>>
+>> cheers,
+>> daniel
+>>
+>> ps: I was told to report all crashes and bugs I find. Be prepared. I am a
+>> very capable finding bugs :)
+>
+> What about the patch?
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index c258796..2b753a3 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -1155,9 +1155,11 @@ static const struct tty_operations rfcomm_ops = {
- 
- int __init rfcomm_init_ttys(void)
- {
-+	int error;
-+
- 	rfcomm_tty_driver = alloc_tty_driver(RFCOMM_TTY_PORTS);
- 	if (!rfcomm_tty_driver)
--		return -1;
-+		return -ENOMEM;
- 
- 	rfcomm_tty_driver->owner	= THIS_MODULE;
- 	rfcomm_tty_driver->driver_name	= "rfcomm";
-@@ -1172,10 +1174,11 @@ int __init rfcomm_init_ttys(void)
- 	rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
- 	tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
- 
--	if (tty_register_driver(rfcomm_tty_driver)) {
-+	error = tty_register_driver(rfcomm_tty_driver);
-+	if (error) {
- 		BT_ERR("Can't register RFCOMM TTY driver");
- 		put_tty_driver(rfcomm_tty_driver);
--		return -1;
-+		return error;
- 	}
- 
- 	BT_INFO("RFCOMM TTY layer initialized");
--- 
-1.7.7
+Sure, I will do as soon I have fixed all outstanding ConnMan bugs I 
+found just recently. In other words don't expect very soon this patch :)
 
+cheers,
+daniel
